@@ -462,8 +462,10 @@ export class ExecutionContext {
     this.bar_index = -1;
     this.plots.clear();
     this.plotOrder.length = 0;
+    // Clear input definitions - they get re-registered on bar_index === 0
+    this.inputDefinitions.length = 0;
 
-    // Don't reset inputs - they persist between executions
+    // Don't reset inputs Map - user-set values persist between executions
   }
 }
 
