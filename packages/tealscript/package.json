@@ -1,0 +1,47 @@
+{
+  "name": "@tealstreet/tealscript",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./src/*": "./src/*",
+    "./worker": "./src/worker/worker.ts"
+  },
+  "scripts": {
+    "build": "echo \"Unrequired and disabled when using tsconfig paths aliases, run 'build-force' to test a build.\"",
+    "build-force": "tsup",
+    "build:parser": "node scripts/build-parser.js",
+    "clean": "rimraf ./dist ./coverage ./tsconfig.tsbuildinfo",
+    "dev": "echo \"Unrequired and disabled when using tsconfig paths aliases, run 'dev-force' to watch a dev version.\"",
+    "dev-force": "tsup --watch",
+    "fix-all-files": "eslint . --ext .ts,.tsx,.js,.jsx,.cjs,.mjs --fix",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx,.cjs,.mjs --cache --cache-location ../../.cache/eslint/tealscript.eslintcache",
+    "test": "run-s test-unit",
+    "test-unit": "vitest run",
+    "test-unit-watch": "vitest watch --ui",
+    "typecheck": "tsc --project ./tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "peggy": "^4.0.3"
+  },
+  "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
+    "@tealstreet/prettierrc": "*",
+    "@types/node": "^22.15.3",
+    "@vitest/coverage-v8": "^4.0.16",
+    "@vitest/ui": "^4.0.16",
+    "cross-env": "^7.0.3",
+    "eslint": "^9",
+    "npm-run-all2": "^8.0.4",
+    "prettier": "^3.7.4",
+    "rimraf": "^6.1.2",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.0",
+    "vite-tsconfig-paths": "^5.0.1",
+    "vitest": "^4.0.15"
+  }
+}

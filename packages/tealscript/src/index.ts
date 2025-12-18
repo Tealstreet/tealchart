@@ -1,0 +1,104 @@
+/**
+ * @tealstreet/tealscript
+ *
+ * A browser-based TealScript runtime for TradingView-compatible indicators.
+ */
+
+// Parser
+export {
+  // Parser functions
+  parse,
+  validate,
+  formatParseError,
+  TealScriptParseError,
+  type ParseOptions,
+  // AST types
+  type Program,
+  type Statement,
+  type Expression,
+  type IndicatorDeclaration,
+  type VariableDeclaration,
+  type AssignmentStatement,
+  type ExpressionStatement,
+  type IfStatement,
+  type ForStatement,
+  type WhileStatement,
+  type BreakStatement,
+  type ContinueStatement,
+  type Identifier,
+  type Literal,
+  type NumericLiteral,
+  type StringLiteral,
+  type BooleanLiteral,
+  type ColorLiteral,
+  type BinaryExpression,
+  type UnaryExpression,
+  type ConditionalExpression,
+  type CallExpression,
+  type MemberExpression,
+  type IndexExpression,
+  type ArrayExpression,
+  type NaExpression,
+  type TypeAnnotation,
+  type SourceLocation,
+  // Type guards
+  isExpression,
+  isStatement,
+  isLiteral,
+} from './parser';
+
+// Runtime
+export {
+  // Engine
+  TealScriptEngine,
+  executeScript,
+  type ExecutionResult,
+  type ExecutionError,
+  // Context
+  ExecutionContext,
+  createContext,
+  type Bar,
+  type BarState,
+  type SymInfo,
+  type TimeframeInfo,
+  type PlotOutput,
+  type PlotStyle,
+  type InputDefinition,
+  // Series
+  Series,
+  seriesFrom,
+  constantSeries,
+  getValue,
+  isSeries,
+  type SeriesSnapshot,
+  type MaybeSeriesValue,
+  // Scope
+  Scope,
+  createRootScope,
+  type VarKind,
+  type VariableEntry,
+  type ScopeSnapshot,
+} from './runtime';
+
+// Worker
+export {
+  TealScriptWorker,
+  TealScriptWorkerFactory,
+  type TealScriptWorkerOptions,
+  type WorkerResult,
+  type WorkerError,
+  type ResultCallback,
+  type ErrorCallback,
+  // Protocol types
+  type ToWorkerMessage,
+  type FromWorkerMessage,
+  type InitMessage,
+  type UpdateBarsMessage,
+  type UpdateBarMessage,
+  type SetInputsMessage,
+  type DisposeMessage,
+  type ReadyMessage,
+  type ResultMessage,
+  type ErrorMessage,
+  type ParseErrorMessage,
+} from './worker';
