@@ -805,18 +805,55 @@ export class TealScriptEngine {
     });
   }
 
+  /**
+   * Get a series accessor for a given source value.
+   * Maps current bar values back to their source series.
+   */
+  private getSeriesForSource(source: number, ctx: ExecutionContext): { get: (offset: number) => number | undefined } {
+    // Check if source matches any built-in series at offset 0
+    if (source === ctx.close.get(0)) return ctx.close;
+    if (source === ctx.high.get(0)) return ctx.high;
+    if (source === ctx.low.get(0)) return ctx.low;
+    if (source === ctx.open.get(0)) return ctx.open;
+    if (source === ctx.volume.get(0)) return ctx.volume;
+    // Check derived series
+    if (source === ctx.hl2) return { get: (i) => {
+      const h = ctx.high.get(i);
+      const l = ctx.low.get(i);
+      return h !== undefined && l !== undefined ? (h + l) / 2 : undefined;
+    }};
+    if (source === ctx.hlc3) return { get: (i) => {
+      const h = ctx.high.get(i);
+      const l = ctx.low.get(i);
+      const c = ctx.close.get(i);
+      return h !== undefined && l !== undefined && c !== undefined ? (h + l + c) / 3 : undefined;
+    }};
+    if (source === ctx.ohlc4) return { get: (i) => {
+      const o = ctx.open.get(i);
+      const h = ctx.high.get(i);
+      const l = ctx.low.get(i);
+      const c = ctx.close.get(i);
+      return o !== undefined && h !== undefined && l !== undefined && c !== undefined ? (o + h + l + c) / 4 : undefined;
+    }};
+    // Default: fallback to close (most common case)
+    return ctx.close;
+  }
+
   private registerTaBuiltins(): void {
     // SMA - Simple Moving Average
     this.builtins.set('ta.sma', (args, _namedArgs, ctx) => {
-      const _source = args[0] as number;
+      const source = args[0] as number;
       const length = args[1] as number;
+
+      // Get the series for the source value
+      const series = this.getSeriesForSource(source, ctx);
 
       // Calculate SMA using history
       let sum = 0;
       let count = 0;
 
       for (let i = 0; i < length; i++) {
-        const val = ctx.close.get(i);
+        const val = series.get(i);
         if (val !== undefined && !isNaN(val)) {
           sum += val;
           count++;
@@ -831,14 +868,17 @@ export class TealScriptEngine {
     });
 
     // EMA - Exponential Moving Average
-    this.builtins.set('ta.ema', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.ema', (args, _namedArgs, ctx, scope) => {
       const source = args[0] as number;
       const length = args[1] as number;
 
+      // Get the series for the source value
+      const series = this.getSeriesForSource(source, ctx);
+
       const alpha = 2 / (length + 1);
 
-      // Get previous EMA
-      const emaKey = `_ema_${length}`;
+      // Get previous EMA - use unique key based on source series
+      const emaKey = `_ema_${length}_${source}`;
       let prevEma = scope.get(emaKey) as number | undefined;
 
       if (prevEma === undefined || isNaN(prevEma)) {
@@ -846,7 +886,7 @@ export class TealScriptEngine {
         let sum = 0;
         let count = 0;
         for (let i = 0; i < length; i++) {
-          const val = ctx.close.get(i);
+          const val = series.get(i);
           if (val !== undefined && !isNaN(val)) {
             sum += val;
             count++;
@@ -868,11 +908,14 @@ export class TealScriptEngine {
       const source = args[0] as number;
       const length = args[1] as number;
 
-      // Get previous values
-      const avgGainKey = `_rsi_gain_${length}`;
-      const avgLossKey = `_rsi_loss_${length}`;
+      // Get the series for the source value
+      const series = this.getSeriesForSource(source, ctx);
 
-      const prevSource = ctx.close.get(1);
+      // Get previous values - use unique key based on source
+      const avgGainKey = `_rsi_gain_${length}_${source}`;
+      const avgLossKey = `_rsi_loss_${length}_${source}`;
+
+      const prevSource = series.get(1);
       if (prevSource === undefined) return NaN;
 
       const change = source - prevSource;
@@ -888,8 +931,8 @@ export class TealScriptEngine {
         let totalLoss = 0;
 
         for (let i = 0; i < length; i++) {
-          const curr = ctx.close.get(i);
-          const prev = ctx.close.get(i + 1);
+          const curr = series.get(i);
+          const prev = series.get(i + 1);
           if (curr === undefined || prev === undefined) continue;
 
           const c = curr - prev;
@@ -918,49 +961,90 @@ export class TealScriptEngine {
       const source = args[0] as number;
       const length = (args[1] ?? 1) as number;
 
-      const prev = ctx.close.get(length);
+      // Get the series for the source value
+      const series = this.getSeriesForSource(source, ctx);
+      const prev = series.get(length);
       if (prev === undefined) return NaN;
 
       return source - prev;
     });
 
-    // Crossover
-    this.builtins.set('ta.crossover', (args, _namedArgs, ctx) => {
+    // Crossover - source1 crosses above source2
+    // Uses scope to track previous values of both arguments
+    this.builtins.set('ta.crossover', (args, _namedArgs, ctx, scope) => {
       const source1 = args[0] as number;
       const source2 = args[1] as number;
 
-      // Get previous values - this is a simplification
-      // Real implementation would need to track series
-      const prev1 = ctx.close.get(1);
-      if (prev1 === undefined) return false;
+      // Try to get series for source1 (if it's a built-in series)
+      const series1 = this.getSeriesForSource(source1, ctx);
+      const series2 = this.getSeriesForSource(source2, ctx);
 
-      // Simplified: assume source2 had same value last bar
-      const prev2 = prev1;
+      // Get previous values
+      const prev1 = series1.get(1);
+      const prev2 = series2.get(1);
 
-      return source1 > source2 && prev1 <= prev2;
+      // If we can't get historical values, use scope tracking
+      const trackKey1 = `_cross_src1_${source1}`;
+      const trackKey2 = `_cross_src2_${source2}`;
+
+      const trackedPrev1 = prev1 ?? (scope.get(trackKey1) as number | undefined);
+      const trackedPrev2 = prev2 ?? (scope.get(trackKey2) as number | undefined);
+
+      // Store current values for next bar
+      scope.declare(trackKey1, 'var', source1);
+      scope.declare(trackKey2, 'var', source2);
+
+      if (trackedPrev1 === undefined || trackedPrev2 === undefined) {
+        return false; // Not enough data
+      }
+
+      // Crossover: current above, previous at or below
+      return source1 > source2 && trackedPrev1 <= trackedPrev2;
     });
 
-    // Crossunder
-    this.builtins.set('ta.crossunder', (args, _namedArgs, ctx) => {
+    // Crossunder - source1 crosses below source2
+    this.builtins.set('ta.crossunder', (args, _namedArgs, ctx, scope) => {
       const source1 = args[0] as number;
       const source2 = args[1] as number;
 
-      const prev1 = ctx.close.get(1);
-      if (prev1 === undefined) return false;
+      // Try to get series for source1 (if it's a built-in series)
+      const series1 = this.getSeriesForSource(source1, ctx);
+      const series2 = this.getSeriesForSource(source2, ctx);
 
-      // Simplified: assume source2 had same value last bar
-      const prev2 = prev1;
+      // Get previous values
+      const prev1 = series1.get(1);
+      const prev2 = series2.get(1);
 
-      return source1 < source2 && prev1 >= prev2;
+      // If we can't get historical values, use scope tracking
+      const trackKey1 = `_crossu_src1_${source1}`;
+      const trackKey2 = `_crossu_src2_${source2}`;
+
+      const trackedPrev1 = prev1 ?? (scope.get(trackKey1) as number | undefined);
+      const trackedPrev2 = prev2 ?? (scope.get(trackKey2) as number | undefined);
+
+      // Store current values for next bar
+      scope.declare(trackKey1, 'var', source1);
+      scope.declare(trackKey2, 'var', source2);
+
+      if (trackedPrev1 === undefined || trackedPrev2 === undefined) {
+        return false; // Not enough data
+      }
+
+      // Crossunder: current below, previous at or above
+      return source1 < source2 && trackedPrev1 >= trackedPrev2;
     });
 
-    // Highest
+    // Highest - returns highest value of source over length bars
     this.builtins.set('ta.highest', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
       const length = args[1] as number;
-      let highest = -Infinity;
 
+      // Get the series for the source value (defaults to high if source matches high)
+      const series = this.getSeriesForSource(source, ctx);
+
+      let highest = -Infinity;
       for (let i = 0; i < length; i++) {
-        const val = ctx.high.get(i);
+        const val = series.get(i);
         if (val !== undefined && !isNaN(val) && val > highest) {
           highest = val;
         }
@@ -969,13 +1053,17 @@ export class TealScriptEngine {
       return highest === -Infinity ? NaN : highest;
     });
 
-    // Lowest
+    // Lowest - returns lowest value of source over length bars
     this.builtins.set('ta.lowest', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
       const length = args[1] as number;
-      let lowest = Infinity;
 
+      // Get the series for the source value (defaults to low if source matches low)
+      const series = this.getSeriesForSource(source, ctx);
+
+      let lowest = Infinity;
       for (let i = 0; i < length; i++) {
-        const val = ctx.low.get(i);
+        const val = series.get(i);
         if (val !== undefined && !isNaN(val) && val < lowest) {
           lowest = val;
         }
@@ -1068,6 +1156,182 @@ export class TealScriptEngine {
       scope.declare(signalKey, 'var', signalLine);
 
       return [macdLine, signalLine, histogram];
+    });
+
+    // STDEV - Standard Deviation
+    this.builtins.set('ta.stdev', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
+      const length = args[1] as number;
+
+      // Get the series for the source value
+      const series = this.getSeriesForSource(source, ctx);
+
+      // Collect values
+      const values: number[] = [];
+      for (let i = 0; i < length; i++) {
+        const val = series.get(i);
+        if (val !== undefined && !isNaN(val)) {
+          values.push(val);
+        }
+      }
+
+      if (values.length < length) {
+        return NaN; // Not enough data
+      }
+
+      // Calculate mean
+      const mean = values.reduce((a, b) => a + b, 0) / values.length;
+
+      // Calculate variance (population standard deviation)
+      const squaredDiffs = values.map(v => Math.pow(v - mean, 2));
+      const variance = squaredDiffs.reduce((a, b) => a + b, 0) / values.length;
+
+      return Math.sqrt(variance);
+    });
+
+    // VWAP - Volume Weighted Average Price
+    // Note: Simplified version - doesn't reset at session boundaries
+    this.builtins.set('ta.vwap', (_args, _namedArgs, ctx, scope) => {
+      // VWAP = Σ(Typical Price × Volume) / Σ(Volume)
+      // Typical Price = (High + Low + Close) / 3
+
+      const high = ctx.high.get(0)!;
+      const low = ctx.low.get(0)!;
+      const close = ctx.close.get(0)!;
+      const volume = ctx.volume.get(0)!;
+
+      const typicalPrice = (high + low + close) / 3;
+      const tpv = typicalPrice * volume;
+
+      // Get cumulative values from scope
+      const cumTpvKey = '_vwap_cum_tpv';
+      const cumVolKey = '_vwap_cum_vol';
+
+      const prevCumTpv = (scope.get(cumTpvKey) as number) ?? 0;
+      const prevCumVol = (scope.get(cumVolKey) as number) ?? 0;
+
+      const cumTpv = prevCumTpv + tpv;
+      const cumVol = prevCumVol + volume;
+
+      scope.declare(cumTpvKey, 'var', cumTpv);
+      scope.declare(cumVolKey, 'var', cumVol);
+
+      return cumVol > 0 ? cumTpv / cumVol : NaN;
+    });
+
+    // STOCH - Stochastic Oscillator
+    // Returns [%K, %D]
+    this.builtins.set('ta.stoch', (args, _namedArgs, ctx, scope) => {
+      const length = (args[0] ?? 14) as number;
+      const smoothK = (args[1] ?? 3) as number;
+      const smoothD = (args[2] ?? 3) as number;
+
+      const close = ctx.close.get(0)!;
+
+      // Calculate highest high and lowest low over length
+      let highestHigh = -Infinity;
+      let lowestLow = Infinity;
+
+      for (let i = 0; i < length; i++) {
+        const h = ctx.high.get(i);
+        const l = ctx.low.get(i);
+        if (h !== undefined && h > highestHigh) highestHigh = h;
+        if (l !== undefined && l < lowestLow) lowestLow = l;
+      }
+
+      // Calculate raw %K
+      const range = highestHigh - lowestLow;
+      const rawK = range > 0 ? ((close - lowestLow) / range) * 100 : 50;
+
+      // Smooth %K using SMA
+      const rawKKey = `_stoch_rawK_${length}`;
+      const rawKHistory = (scope.get(rawKKey) as number[]) ?? [];
+      rawKHistory.push(rawK);
+      if (rawKHistory.length > smoothK) rawKHistory.shift();
+      scope.declare(rawKKey, 'var', rawKHistory);
+
+      const k = rawKHistory.reduce((a, b) => a + b, 0) / rawKHistory.length;
+
+      // Calculate %D as SMA of %K
+      const kHistoryKey = `_stoch_k_${length}`;
+      const kHistory = (scope.get(kHistoryKey) as number[]) ?? [];
+      kHistory.push(k);
+      if (kHistory.length > smoothD) kHistory.shift();
+      scope.declare(kHistoryKey, 'var', kHistory);
+
+      const d = kHistory.reduce((a, b) => a + b, 0) / kHistory.length;
+
+      return [k, d];
+    });
+
+    // MOM - Momentum
+    this.builtins.set('ta.mom', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
+      const length = (args[1] ?? 10) as number;
+
+      // Get the series for the source value
+      const series = this.getSeriesForSource(source, ctx);
+      const prev = series.get(length);
+
+      if (prev === undefined) return NaN;
+
+      // Momentum = Current - Previous (length bars ago)
+      return source - prev;
+    });
+
+    // CCI - Commodity Channel Index
+    this.builtins.set('ta.cci', (args, _namedArgs, ctx) => {
+      const length = (args[0] ?? 20) as number;
+
+      // Calculate typical prices for the period
+      const typicalPrices: number[] = [];
+      for (let i = 0; i < length; i++) {
+        const h = ctx.high.get(i);
+        const l = ctx.low.get(i);
+        const c = ctx.close.get(i);
+        if (h !== undefined && l !== undefined && c !== undefined) {
+          typicalPrices.push((h + l + c) / 3);
+        }
+      }
+
+      if (typicalPrices.length < length) {
+        return NaN; // Not enough data
+      }
+
+      const currentTP = typicalPrices[0];
+
+      // Calculate SMA of typical prices
+      const sma = typicalPrices.reduce((a, b) => a + b, 0) / typicalPrices.length;
+
+      // Calculate Mean Deviation
+      const meanDev = typicalPrices.reduce((sum, tp) => sum + Math.abs(tp - sma), 0) / typicalPrices.length;
+
+      if (meanDev === 0) return 0;
+
+      // CCI = (Typical Price - SMA) / (0.015 × Mean Deviation)
+      return (currentTP - sma) / (0.015 * meanDev);
+    });
+
+    // OBV - On-Balance Volume
+    this.builtins.set('ta.obv', (_args, _namedArgs, ctx, scope) => {
+      const close = ctx.close.get(0)!;
+      const prevClose = ctx.close.get(1);
+      const volume = ctx.volume.get(0)!;
+
+      const obvKey = '_obv_value';
+      let obv = (scope.get(obvKey) as number) ?? 0;
+
+      if (prevClose !== undefined) {
+        if (close > prevClose) {
+          obv += volume;
+        } else if (close < prevClose) {
+          obv -= volume;
+        }
+        // If close == prevClose, OBV stays the same
+      }
+
+      scope.declare(obvKey, 'var', obv);
+      return obv;
     });
   }
 }

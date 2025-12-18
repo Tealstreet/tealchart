@@ -76,6 +76,9 @@ export interface PlotOutput {
   title: string;
   values: (number | null)[];
 
+  /** Script ID that produced this plot (set by TealScriptManager) */
+  scriptId?: string;
+
   // Styling
   color: string | (string | null)[];
   linewidth?: number;
