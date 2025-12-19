@@ -622,6 +622,7 @@ export class TealScriptEngine {
       const title = (namedArgs.get('title') ?? args[1] ?? 'Plot') as string;
       const color = (namedArgs.get('color') ?? args[2] ?? '#2196F3') as string;
       const linewidth = (namedArgs.get('linewidth') ?? 1) as number;
+      const style = (namedArgs.get('style') ?? 'line') as string;
 
       // Use stable ID based on title - generated on first bar
       const id = `plot_${title}`;
@@ -631,9 +632,16 @@ export class TealScriptEngine {
           id,
           type: 'plot',
           title,
-          color,
+          color: [],  // Always array for per-bar colors
           linewidth,
+          style: style as 'line' | 'stepline' | 'histogram' | 'cross' | 'circles' | 'columns' | 'area' | 'areabr',
         });
+      }
+
+      // Add color to array for this bar (supports dynamic colors)
+      const plot = ctx.plots.get(id);
+      if (plot && Array.isArray(plot.color)) {
+        plot.color.push(color);
       }
 
       ctx.addPlotValue(id, this.isNa(value) ? null : value);
@@ -684,6 +692,16 @@ export class TealScriptEngine {
 
       return color;
     });
+
+    // Plot style constants
+    this.builtins.set('plot.style_line', () => 'line');
+    this.builtins.set('plot.style_stepline', () => 'stepline');
+    this.builtins.set('plot.style_histogram', () => 'histogram');
+    this.builtins.set('plot.style_circles', () => 'circles');
+    this.builtins.set('plot.style_cross', () => 'cross');
+    this.builtins.set('plot.style_columns', () => 'columns');
+    this.builtins.set('plot.style_area', () => 'area');
+    this.builtins.set('plot.style_areabr', () => 'areabr');
   }
 
   private registerInputBuiltins(): void {
