@@ -197,18 +197,8 @@ export class TealchartRenderer {
       return;
     }
 
-    // Check if any bars are in viewport
-    const hasVisibleBars = bars.some(
-      (bar) => bar.time >= viewport.startTime && bar.time <= viewport.endTime
-    );
-
-    if (!hasVisibleBars) {
-      this.drawNoDataMessage();
-      ctx.restore();
-      return;
-    }
-
     // Pass all bars to renderUnifiedPanes - filtering happens inside each render function
+    // Note: We render even if no bars are visible (scrolled off screen) - only show "no data" when bars.length === 0
     // This is critical for indicators where plot.values is indexed to the full bars array
     this.renderUnifiedPanes(bars, viewport, layout, priceLines, plots, indicatorPaneInfo, crosshair, plotStyleOverrides);
 
@@ -236,15 +226,10 @@ export class TealchartRenderer {
     }
 
     // Filter bars within viewport
+    // Note: We render even if no bars are visible (scrolled off screen) - only show "no data" when bars.length === 0
     const visibleBars = bars.filter(
       (bar) => bar.time >= viewport.startTime && bar.time <= viewport.endTime
     );
-
-    if (visibleBars.length === 0) {
-      this.drawNoDataMessage();
-      ctx.restore();
-      return;
-    }
 
     // Calculate price line label bounds with conflict resolution
     const labelBounds = priceLines ? this.calculatePriceLineLabelBounds(priceLines, viewport) : [];
