@@ -1040,6 +1040,11 @@ export const DEFAULT_INDICATOR_PANE_HEIGHT = 0.15;
  */
 export const MIN_PANE_HEIGHT = 0.05;
 
+/**
+ * Right padding for price axis labels (pixels from canvas edge)
+ */
+export const PRICE_AXIS_RIGHT_PADDING = 2;
+
 // ============================================================================
 // Gap Detection & Recovery
 // ============================================================================

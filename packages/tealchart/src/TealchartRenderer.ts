@@ -16,6 +16,7 @@ import {
   PositionLineRenderData,
   DEFAULT_RENDER_OPTIONS,
   DEFAULT_MARGINS,
+  PRICE_AXIS_RIGHT_PADDING,
   // Legacy types for backward compatibility
   IndicatorPane,
   PaneLayout,
@@ -645,11 +646,11 @@ export class TealchartRenderer {
     // Clamp lineY: can go to top (0) and into volume area, but not below time axis
     const lineY = Math.max(0, Math.min(options.height - margins.bottom, rawLineY));
 
-    // Label box position - right edge exactly at canvas edge
-    const labelX = options.width - bound.width;
+    // Label box position with padding from right edge (matches Konva PriceLineLayer)
+    const labelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
     const labelY = labelCenterY - bound.height / 2;
 
-    // Draw horizontal line - stop at left edge of label (always draw, clamped to visible area)
+    // Draw horizontal line - stop before label with gap (always draw, clamped to visible area)
     ctx.save();
     ctx.strokeStyle = color;
     ctx.lineWidth = bound.lineWidth || 1;
@@ -660,7 +661,7 @@ export class TealchartRenderer {
     }
     ctx.beginPath();
     ctx.moveTo(margins.left, lineY);
-    ctx.lineTo(labelX, lineY);
+    ctx.lineTo(labelX - PRICE_AXIS_RIGHT_PADDING, lineY);
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.restore();
@@ -3641,10 +3642,11 @@ export class TealchartRenderer {
     const color = bound.color;
     const labelCenterY = Math.max(pane.top, Math.min(pane.bottom, bound.adjustedY));
 
-    const labelX = options.width - bound.width;
+    // Label box position with padding from right edge (matches Konva PriceLineLayer)
+    const labelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
     const labelY = labelCenterY - bound.height / 2;
 
-    // Draw horizontal line
+    // Draw horizontal line - stop before label with gap
     ctx.save();
     ctx.strokeStyle = color;
     ctx.lineWidth = bound.lineWidth || 1;
@@ -3653,7 +3655,7 @@ export class TealchartRenderer {
 
     ctx.beginPath();
     ctx.moveTo(margins.left, lineY);
-    ctx.lineTo(labelX, lineY);
+    ctx.lineTo(labelX - PRICE_AXIS_RIGHT_PADDING, lineY);
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.restore();

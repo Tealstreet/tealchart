@@ -9,10 +9,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Group, Line, Rect, Text, Circle } from 'react-konva';
 import type Konva from 'konva';
-import type {
-  PriceLineLabelBounds,
-  ChartMargins,
-  PendingOrderUpdate,
+import {
+  PRICE_AXIS_RIGHT_PADDING,
+  type PriceLineLabelBounds,
+  type ChartMargins,
+  type PendingOrderUpdate,
 } from '../types';
 
 export interface CrosshairState {
@@ -89,9 +90,6 @@ interface TPSLDragState {
   notional?: number;   // Position notional for PnL calculations
   isLong?: boolean;    // Position direction
 }
-
-// Padding from right edge of canvas for price axis labels and lines
-const PRICE_AXIS_RIGHT_PADDING = 2;
 
 /**
  * Calculate magnet percentage for partial TP/SL
