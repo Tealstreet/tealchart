@@ -1,5 +1,5 @@
 /**
- * TealScript Runtime exports
+ * Tealscript Runtime exports
  */
 
 export { Series, seriesFrom, constantSeries, getValue, isSeries, type SeriesSnapshot, type MaybeSeriesValue } from './series';
@@ -19,7 +19,7 @@ export {
 export { Scope, createRootScope, type VarKind, type VariableEntry, type ScopeSnapshot } from './scope';
 
 export {
-  TealScriptEngine,
+  TealscriptEngine,
   executeScript,
   type ExecutionResult,
   type ExecutionError,

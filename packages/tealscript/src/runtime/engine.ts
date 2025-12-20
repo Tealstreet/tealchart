@@ -1,7 +1,7 @@
 /**
- * TealScript Execution Engine
+ * Tealscript Execution Engine
  *
- * Executes parsed TealScript AST bar-by-bar.
+ * Executes parsed Tealscript AST bar-by-bar.
  * This is the interpreter that evaluates expressions and statements.
  */
 
@@ -62,9 +62,9 @@ type BuiltinFunction = (
 ) => unknown;
 
 /**
- * TealScript Engine - executes AST bar-by-bar
+ * Tealscript Engine - executes AST bar-by-bar
  */
-export class TealScriptEngine {
+export class TealscriptEngine {
   private ctx: ExecutionContext;
   private scope: Scope;
   private builtins: Map<string, BuiltinFunction>;
@@ -360,7 +360,7 @@ export class TealScriptEngine {
       case 'ColorLiteral':
         return expr.value;
       case 'NaExpression':
-        return NaN; // TealScript 'na' is represented as NaN
+        return NaN; // Tealscript 'na' is represented as NaN
 
       case 'Identifier':
         return this.evaluateIdentifier(expr);
@@ -424,7 +424,7 @@ export class TealScriptEngine {
     // Handle na (NaN)
     if (this.isNa(left) || this.isNa(right)) {
       if (expr.operator === '==' || expr.operator === '!=') {
-        // na == na is false in TealScript
+        // na == na is false in Tealscript
         if (this.isNa(left) && this.isNa(right)) {
           return expr.operator === '!=';
         }
@@ -1378,6 +1378,6 @@ class ContinueException extends Error {
  * Create and execute a script
  */
 export function executeScript(ast: Program, bars: Bar[], inputs?: Map<string, unknown>): ExecutionResult {
-  const engine = new TealScriptEngine();
+  const engine = new TealscriptEngine();
   return engine.execute(ast, bars, inputs);
 }

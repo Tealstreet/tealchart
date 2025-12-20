@@ -1,7 +1,7 @@
 /**
- * TealScriptWorker - Main Thread Wrapper
+ * TealscriptWorker - Main Thread Wrapper
  *
- * Manages a Web Worker that executes TealScript in isolation.
+ * Manages a Web Worker that executes Tealscript in isolation.
  * Provides a clean async API for the chart integration.
  */
 
@@ -43,9 +43,9 @@ export type ResultCallback = (result: WorkerResult) => void;
 export type ErrorCallback = (error: WorkerError) => void;
 
 /**
- * Options for creating a TealScriptWorker
+ * Options for creating a TealscriptWorker
  */
-export interface TealScriptWorkerOptions {
+export interface TealscriptWorkerOptions {
   /**
    * Called when execution completes successfully
    */
@@ -63,11 +63,11 @@ export interface TealScriptWorkerOptions {
 }
 
 /**
- * TealScriptWorker manages a Web Worker for isolated TealScript execution.
+ * TealscriptWorker manages a Web Worker for isolated Tealscript execution.
  *
  * Usage:
  * ```typescript
- * const worker = new TealScriptWorker({
+ * const worker = new TealscriptWorker({
  *   onResult: (result) => renderPlots(result.plots),
  *   onError: (error) => showError(error.message),
  * });
@@ -81,7 +81,7 @@ export interface TealScriptWorkerOptions {
  * worker.dispose();
  * ```
  */
-export class TealScriptWorker {
+export class TealscriptWorker {
   private worker: Worker | null = null;
   private scriptId: string | null = null;
   private isReady = false;
@@ -92,7 +92,7 @@ export class TealScriptWorker {
   private onError: ErrorCallback | null;
   private onReady: (() => void) | null;
 
-  constructor(options: TealScriptWorkerOptions = {}) {
+  constructor(options: TealscriptWorkerOptions = {}) {
     this.onResult = options.onResult ?? null;
     this.onError = options.onError ?? null;
     this.onReady = options.onReady ?? null;
@@ -145,8 +145,8 @@ export class TealScriptWorker {
     //
     // For now, throw an error indicating this needs to be configured
     throw new Error(
-      'TealScriptWorker.getWorkerUrl() must be implemented. ' +
-      'Use TealScriptWorkerFactory.create() or extend this class.'
+      'TealscriptWorker.getWorkerUrl() must be implemented. ' +
+      'Use TealscriptWorkerFactory.create() or extend this class.'
     );
   }
 
@@ -308,12 +308,12 @@ export class TealScriptWorker {
 }
 
 /**
- * Factory for creating TealScriptWorker instances with proper bundling.
+ * Factory for creating TealscriptWorker instances with proper bundling.
  *
  * This should be used by the chart integration to create workers
  * with the correct worker URL for the build system.
  */
-export class TealScriptWorkerFactory {
+export class TealscriptWorkerFactory {
   private workerUrl: string | URL;
 
   constructor(workerUrl: string | URL) {
@@ -321,13 +321,13 @@ export class TealScriptWorkerFactory {
   }
 
   /**
-   * Create a new TealScriptWorker with the configured worker URL
+   * Create a new TealscriptWorker with the configured worker URL
    */
-  create(options: TealScriptWorkerOptions = {}): TealScriptWorker {
+  create(options: TealscriptWorkerOptions = {}): TealscriptWorker {
     const url = this.workerUrl;
 
     // Create a subclass that provides the worker URL
-    class ConfiguredWorker extends TealScriptWorker {
+    class ConfiguredWorker extends TealscriptWorker {
       protected getWorkerUrl(): string {
         return url instanceof URL ? url.href : url;
       }

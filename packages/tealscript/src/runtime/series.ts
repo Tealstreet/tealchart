@@ -1,7 +1,7 @@
 /**
- * Series - The Heart of TealScript
+ * Series - The Heart of Tealscript
  *
- * In TealScript, every value is a series with history.
+ * In Tealscript, every value is a series with history.
  * series[0] = current bar's value
  * series[1] = previous bar's value
  * series[n] = n bars ago

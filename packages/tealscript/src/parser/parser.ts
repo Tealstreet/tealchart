@@ -1,5 +1,5 @@
 /**
- * TealScript Parser
+ * Tealscript Parser
  *
  * Wraps the Peggy-generated parser with a nice TypeScript interface.
  */
@@ -10,7 +10,7 @@ import * as generatedParser from './generated';
 /**
  * Parse error with location information
  */
-export class TealScriptParseError extends Error {
+export class TealscriptParseError extends Error {
   location: SourceLocation;
   found: string | null;
   expected: Array<{ type: string; description: string }>;
@@ -22,7 +22,7 @@ export class TealScriptParseError extends Error {
     expected: Array<{ type: string; description: string }>
   ) {
     super(message);
-    this.name = 'TealScriptParseError';
+    this.name = 'TealscriptParseError';
     this.location = location;
     this.found = found;
     this.expected = expected;
@@ -40,12 +40,12 @@ export interface ParseOptions {
 }
 
 /**
- * Parse TealScript source code into an AST
+ * Parse Tealscript source code into an AST
  *
- * @param source - The TealScript source code to parse
+ * @param source - The Tealscript source code to parse
  * @param options - Parser options
  * @returns The parsed AST Program node
- * @throws TealScriptParseError if parsing fails
+ * @throws TealscriptParseError if parsing fails
  *
  * @example
  * ```typescript
@@ -66,7 +66,7 @@ export function parse(source: string, options: ParseOptions = {}): Program {
     return result as Program;
   } catch (error) {
     if (isPeggyError(error)) {
-      throw new TealScriptParseError(
+      throw new TealscriptParseError(
         error.message,
         {
           start: {
@@ -110,9 +110,9 @@ function isPeggyError(error: unknown): error is PeggySyntaxError {
 }
 
 /**
- * Validate TealScript source without returning the AST
+ * Validate Tealscript source without returning the AST
  *
- * @param source - The TealScript source code to validate
+ * @param source - The Tealscript source code to validate
  * @returns null if valid, or an error message if invalid
  */
 export function validate(source: string): string | null {
@@ -120,7 +120,7 @@ export function validate(source: string): string | null {
     parse(source);
     return null;
   } catch (error) {
-    if (error instanceof TealScriptParseError) {
+    if (error instanceof TealscriptParseError) {
       return `Line ${error.location.start.line}: ${error.message}`;
     }
     return error instanceof Error ? error.message : 'Unknown error';
@@ -130,7 +130,7 @@ export function validate(source: string): string | null {
 /**
  * Format a parse error for display
  */
-export function formatParseError(error: TealScriptParseError, source: string): string {
+export function formatParseError(error: TealscriptParseError, source: string): string {
   const lines = source.split('\n');
   const line = lines[error.location.start.line - 1] || '';
   const pointer = ' '.repeat(error.location.start.column - 1) + '^';

@@ -1,5 +1,5 @@
 /**
- * TealScript Worker Protocol
+ * Tealscript Worker Protocol
  *
  * Message types for communication between main thread and Web Worker.
  */

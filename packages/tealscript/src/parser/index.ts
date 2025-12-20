@@ -1,5 +1,5 @@
 /**
- * TealScript Parser exports
+ * Tealscript Parser exports
  */
 
 export * from './ast';

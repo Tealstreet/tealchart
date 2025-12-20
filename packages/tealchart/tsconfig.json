@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "target": "ESNext",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "incremental": true,
+    "types": ["vitest/globals"],
+    "paths": {
+      "@tealstreet/tealscript": ["../tealscript/src/index.ts"],
+      "@tealstreet/tealscript/src/*": ["../tealscript/src/*"]
+    }
+  },
+  "exclude": ["**/node_modules", "**/.*/*", "dist"],
+  "include": [
+    ".eslintrc.*",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.mts",
+    "**/*.cjs",
+    "**/*.mjs",
+    "**/*.jsx",
+    "**/*.json"
+  ]
+}

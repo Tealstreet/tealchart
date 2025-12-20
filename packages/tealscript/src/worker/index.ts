@@ -1,16 +1,16 @@
 /**
- * TealScript Worker exports
+ * Tealscript Worker exports
  */
 
 export {
-  TealScriptWorker,
-  TealScriptWorkerFactory,
-  type TealScriptWorkerOptions,
+  TealscriptWorker,
+  TealscriptWorkerFactory,
+  type TealscriptWorkerOptions,
   type WorkerResult,
   type WorkerError,
   type ResultCallback,
   type ErrorCallback,
-} from './TealScriptWorker';
+} from './TealscriptWorker';
 
 export type {
   ToWorkerMessage,

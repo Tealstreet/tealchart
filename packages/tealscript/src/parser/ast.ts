@@ -1,7 +1,7 @@
 /**
- * TealScript AST Type Definitions
+ * Tealscript AST Type Definitions
  *
- * Represents the Abstract Syntax Tree for TealScript v6 (MVP subset).
+ * Represents the Abstract Syntax Tree for Tealscript v6 (MVP subset).
  * Designed to be produced by the Peggy parser and consumed by the runtime.
  */
 
@@ -311,7 +311,7 @@ export interface ArrayExpression extends BaseNode {
 }
 
 /**
- * na value (TealScript's null equivalent)
+ * na value (Tealscript's null equivalent)
  */
 export interface NaExpression extends BaseNode {
   type: 'NaExpression';

@@ -1,14 +1,14 @@
 /**
- * TealScript Web Worker Entry Point
+ * Tealscript Web Worker Entry Point
  *
  * This file runs inside the Web Worker and handles:
  * - Receiving messages from main thread
- * - Parsing and executing TealScript
+ * - Parsing and executing Tealscript
  * - Sending results back to main thread
  */
 
-import { parse, TealScriptParseError } from '../parser';
-import { TealScriptEngine } from '../runtime/engine';
+import { parse, TealscriptParseError } from '../parser';
+import { TealscriptEngine } from '../runtime/engine';
 import type { Program } from '../parser/ast';
 import type { Bar, InputDefinition } from '../runtime/context';
 import type {
@@ -25,7 +25,7 @@ import type {
 interface ScriptState {
   scriptId: string;
   ast: Program;
-  engine: TealScriptEngine;
+  engine: TealscriptEngine;
   bars: Bar[];
   inputs: Record<string, unknown>;
 }
@@ -91,7 +91,7 @@ function handleInit(
     const ast = parse(script);
 
     // Create engine
-    const engine = new TealScriptEngine();
+    const engine = new TealscriptEngine();
 
     // Store state
     state = {
@@ -105,7 +105,7 @@ function handleInit(
     // Execute and send results
     executeAndSendResults();
   } catch (error) {
-    if (error instanceof TealScriptParseError) {
+    if (error instanceof TealscriptParseError) {
       const parseError: ParseErrorMessage = {
         type: 'parseError',
         scriptId,

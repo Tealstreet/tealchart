@@ -1,7 +1,7 @@
 /**
  * @tealstreet/tealscript
  *
- * A browser-based TealScript runtime for TradingView-compatible indicators.
+ * A browser-based Tealscript runtime for TradingView-compatible indicators.
  */
 
 // Parser
@@ -10,7 +10,7 @@ export {
   parse,
   validate,
   formatParseError,
-  TealScriptParseError,
+  TealscriptParseError,
   type ParseOptions,
   // AST types
   type Program,
@@ -50,7 +50,7 @@ export {
 // Runtime
 export {
   // Engine
-  TealScriptEngine,
+  TealscriptEngine,
   executeScript,
   type ExecutionResult,
   type ExecutionError,
@@ -82,9 +82,9 @@ export {
 
 // Worker
 export {
-  TealScriptWorker,
-  TealScriptWorkerFactory,
-  type TealScriptWorkerOptions,
+  TealscriptWorker,
+  TealscriptWorkerFactory,
+  type TealscriptWorkerOptions,
   type WorkerResult,
   type WorkerError,
   type ResultCallback,

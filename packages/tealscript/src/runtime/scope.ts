@@ -40,7 +40,7 @@ interface VariableSnapshot {
 }
 
 /**
- * Scope class - manages variables in TealScript execution
+ * Scope class - manages variables in Tealscript execution
  */
 export class Scope {
   private variables: Map<string, VariableEntry> = new Map();

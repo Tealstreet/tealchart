@@ -1,13 +1,13 @@
 /**
- * TealScript Parser Tests
+ * Tealscript Parser Tests
  */
 
 import { describe, expect, it } from 'vitest';
 
-import { parse, validate, TealScriptParseError, formatParseError } from '../../src/parser';
+import { parse, validate, TealscriptParseError, formatParseError } from '../../src/parser';
 import type { Program, IndicatorDeclaration, VariableDeclaration, CallExpression } from '../../src/parser';
 
-describe('TealScript Parser', () => {
+describe('Tealscript Parser', () => {
   describe('Version annotation', () => {
     it('parses version annotation', () => {
       const ast = parse('//@version=6\n');
@@ -510,16 +510,16 @@ hline(30, "Oversold", color=color.green)
   });
 
   describe('Error handling', () => {
-    it('throws TealScriptParseError on syntax error', () => {
-      expect(() => parse('x = \n')).toThrow(TealScriptParseError);
+    it('throws TealscriptParseError on syntax error', () => {
+      expect(() => parse('x = \n')).toThrow(TealscriptParseError);
     });
 
     it('provides location in error', () => {
       try {
         parse('x = \n');
       } catch (error) {
-        expect(error).toBeInstanceOf(TealScriptParseError);
-        if (error instanceof TealScriptParseError) {
+        expect(error).toBeInstanceOf(TealscriptParseError);
+        if (error instanceof TealscriptParseError) {
           expect(error.location.start.line).toBe(1);
         }
       }
@@ -544,7 +544,7 @@ hline(30, "Oversold", color=color.green)
       try {
         parse(source);
       } catch (error) {
-        if (error instanceof TealScriptParseError) {
+        if (error instanceof TealscriptParseError) {
           const formatted = formatParseError(error, source);
           expect(formatted).toContain('Parse error at line 1');
           expect(formatted).toContain('x = ');

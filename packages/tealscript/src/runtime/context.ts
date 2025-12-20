@@ -1,7 +1,7 @@
 /**
  * Execution Context
  *
- * Holds all state during TealScript execution:
+ * Holds all state during Tealscript execution:
  * - Built-in series (OHLCV, time, volume)
  * - Execution state (bar_index, barstate)
  * - User inputs
@@ -76,7 +76,7 @@ export interface PlotOutput {
   title: string;
   values: (number | null)[];
 
-  /** Script ID that produced this plot (set by TealScriptManager) */
+  /** Script ID that produced this plot (set by TealscriptManager) */
   scriptId?: string;
 
   // Styling
@@ -121,7 +121,7 @@ export interface InputDefinition {
 }
 
 /**
- * Execution Context - the runtime environment for a TealScript
+ * Execution Context - the runtime environment for a Tealscript
  */
 export class ExecutionContext {
   // =========================================================================

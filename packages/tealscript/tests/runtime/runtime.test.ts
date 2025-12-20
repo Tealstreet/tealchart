@@ -1,11 +1,11 @@
 /**
- * TealScript Runtime Tests
+ * Tealscript Runtime Tests
  */
 
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
-import { Series, seriesFrom, ExecutionContext, Scope, TealScriptEngine, executeScript, type Bar } from '../../src/runtime';
+import { Series, seriesFrom, ExecutionContext, Scope, TealscriptEngine, executeScript, type Bar } from '../../src/runtime';
 
 // Helper to create test bars
 function createBars(count: number, startPrice: number = 100): Bar[] {
@@ -245,7 +245,7 @@ describe('Scope', () => {
   });
 });
 
-describe('TealScriptEngine', () => {
+describe('TealscriptEngine', () => {
   const bars = createPredictableBars();
 
   describe('basic execution', () => {
