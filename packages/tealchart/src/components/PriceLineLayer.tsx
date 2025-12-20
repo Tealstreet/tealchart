@@ -131,7 +131,8 @@ const PriceLineGroup: React.FC<{
   onCursorChange?: (cursor: 'default' | 'pointer' | 'grab' | 'grabbing') => void;
   hasContextMenuButton?: boolean;
   registerDrag: (drag: { node: Konva.Rect; originalX: number; originalY: number; onCancel?: () => void }) => void;
-  clearDrag: () => void;
+  clearDrag: (node: Konva.Rect) => void;
+  wasDragCancelled: () => boolean;
 }> = ({
   bound,
   width,
@@ -152,6 +153,7 @@ const PriceLineGroup: React.FC<{
   hasContextMenuButton,
   registerDrag,
   clearDrag,
+  wasDragCancelled,
 }) => {
   // For crosshair on indicator panes, bound.price is in pane's coordinate system (not main price)
   // Use adjustedY directly for crosshair type since it's already calculated with correct pane range
@@ -256,17 +258,20 @@ const PriceLineGroup: React.FC<{
   }, [lineY, yToPrice]);
 
   const handleDragEnd = useCallback((e: Konva.KonvaEventObject<DragEvent>) => {
-    const node = e.target;
+    const node = e.target as Konva.Rect;
     const finalDelta = node.y() - dragStartYRef.current;
     const finalY = lineY + finalDelta;
     const finalPrice = yToPrice(finalY);
 
     // Clear drag registration
-    clearDrag();
+    clearDrag(node);
+
+    // Check if drag was cancelled (escape pressed) - skip order placement
+    const cancelled = wasDragCancelled();
 
     // Trigger callback BEFORE resetting state to set pending state first
     // This prevents snap-back on the render between reset and pending state
-    if (onDragEnd && Math.abs(finalDelta) > 0) {
+    if (!cancelled && onDragEnd && Math.abs(finalDelta) > 0) {
       onDragEnd(bound.lineId, finalPrice);
     }
 
@@ -275,7 +280,7 @@ const PriceLineGroup: React.FC<{
     setDragOffsetY(0);
     setDragPrice(null);
     onCursorChange?.('grab');
-  }, [bound.lineId, lineY, yToPrice, onDragEnd, onCursorChange, clearDrag]);
+  }, [bound.lineId, lineY, yToPrice, onDragEnd, onCursorChange, clearDrag, wasDragCancelled]);
 
   // Constrain drag to vertical only, within chart bounds
   const dragBoundFunc = useCallback((pos: { x: number; y: number }) => {
@@ -513,7 +518,7 @@ const PriceLineGroup: React.FC<{
             });
           }}
           onDragEnd={(e) => {
-            const node = e.target;
+            const node = e.target as Konva.Rect;
             const stage = node.getStage();
             const pointerPos = stage?.getPointerPosition();
             // Reset to original position (not 0,0)
@@ -521,8 +526,10 @@ const PriceLineGroup: React.FC<{
             const originalY = lineY - touchTargetHeight / 2;
             node.x(originalX);
             node.y(originalY);
-            clearDrag();
-            if (pointerPos && tpslDragState) {
+            clearDrag(node);
+            // Check if drag was cancelled (escape pressed) - skip order placement
+            const cancelled = wasDragCancelled();
+            if (!cancelled && pointerPos && tpslDragState) {
               const finalPrice = yToPrice(pointerPos.y);
               const dragDistance = Math.abs(pointerPos.y - tpslDragState.startY);
               if (dragDistance > 5) {
@@ -594,7 +601,7 @@ const PriceLineGroup: React.FC<{
             });
           }}
           onDragEnd={(e) => {
-            const node = e.target;
+            const node = e.target as Konva.Rect;
             const stage = node.getStage();
             const pointerPos = stage?.getPointerPosition();
             // Reset to original position (not 0,0)
@@ -602,8 +609,10 @@ const PriceLineGroup: React.FC<{
             const originalY = lineY - touchTargetHeight / 2;
             node.x(originalX);
             node.y(originalY);
-            clearDrag();
-            if (pointerPos && tpslDragState) {
+            clearDrag(node);
+            // Check if drag was cancelled (escape pressed) - skip order placement
+            const cancelled = wasDragCancelled();
+            if (!cancelled && pointerPos && tpslDragState) {
               const finalPrice = yToPrice(pointerPos.y);
               const dragDistance = Math.abs(pointerPos.y - tpslDragState.startY);
               if (dragDistance > 5) {
@@ -1214,6 +1223,8 @@ interface ActiveDrag {
   originalY: number;
   // Callback to clear component-level state when cancelled
   onCancel?: () => void;
+  // Timestamp when drag was registered (to detect spurious onDragEnd from re-renders)
+  registeredAt?: number;
 }
 
 /**
@@ -1244,15 +1255,35 @@ export const PriceLineLayer: React.FC<PriceLineLayerProps> = ({
 
   // Generalized drag tracking for escape cancellation
   const activeDragRef = useRef<ActiveDrag | null>(null);
+  // Flag to indicate drag was cancelled (prevents onDragEnd from placing orders)
+  const dragCancelledRef = useRef(false);
 
   // Register a drag so it can be cancelled with Escape
+  // Uses a timestamp to prevent immediate clearing from re-render-triggered onDragEnd
   const registerDrag = useCallback((drag: ActiveDrag) => {
-    activeDragRef.current = drag;
+    dragCancelledRef.current = false;  // Reset cancelled flag on new drag
+    activeDragRef.current = { ...drag, registeredAt: Date.now() };
+  }, []);
+
+  // Check if drag was cancelled (and consume the flag)
+  const wasDragCancelled = useCallback(() => {
+    if (dragCancelledRef.current) {
+      dragCancelledRef.current = false;
+      return true;
+    }
+    return false;
   }, []);
 
   // Clear the active drag (called on drag end)
-  const clearDrag = useCallback(() => {
-    activeDragRef.current = null;
+  // Takes the node to verify it's the same drag being cleared (prevents cross-drag interference)
+  // Also checks timestamp to prevent clearing from spurious onDragEnd events triggered by re-renders
+  const clearDrag = useCallback((node: Konva.Rect) => {
+    const active = activeDragRef.current;
+    const timeSinceRegister = active?.registeredAt ? Date.now() - active.registeredAt : 0;
+    // Only clear if nodes match AND at least 100ms has passed (to skip spurious onDragEnd from re-renders)
+    if (active?.node === node && timeSinceRegister > 100) {
+      activeDragRef.current = null;
+    }
   }, []);
 
   // Escape key cancels any active drag
@@ -1260,6 +1291,8 @@ export const PriceLineLayer: React.FC<PriceLineLayerProps> = ({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && activeDragRef.current) {
         const { node, originalX, originalY, onCancel } = activeDragRef.current;
+        // Set cancelled flag BEFORE stopDrag() - stopDrag triggers onDragEnd
+        dragCancelledRef.current = true;
         node.stopDrag();
         node.x(originalX);
         node.y(originalY);
@@ -1269,8 +1302,9 @@ export const PriceLineLayer: React.FC<PriceLineLayerProps> = ({
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    // Use capture phase to get event before anything else can handle it
+    window.addEventListener('keydown', handleKeyDown, true);
+    return () => window.removeEventListener('keydown', handleKeyDown, true);
   }, [onCursorChange]);
 
   const handleDragStart = useCallback((lineId: string, originalY: number, originalPrice: number) => {
@@ -1350,6 +1384,7 @@ export const PriceLineLayer: React.FC<PriceLineLayerProps> = ({
         hasContextMenuButton={hasContextMenuButton}
         registerDrag={registerDrag}
         clearDrag={clearDrag}
+        wasDragCancelled={wasDragCancelled}
       />
     );
   };
