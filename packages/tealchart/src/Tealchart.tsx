@@ -3,7 +3,7 @@
  * Standalone component that accepts render options via props
  */
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRotate } from '@fortawesome/free-solid-svg-icons/faRotate';
@@ -403,6 +403,9 @@ export const Tealchart: React.FC<TealchartProps> = ({
     paneId: null,
     paneValue: null,
   });
+
+  // Force re-render for instant crosshair hide (bypasses RAF delay)
+  const [, forceRender] = useReducer((x: number) => x + 1, 0);
 
   // Touch interaction state
   const touchCrosshairLockedRef = useRef(false); // When true, crosshair stays visible and can be dragged
@@ -1312,16 +1315,59 @@ export const Tealchart: React.FC<TealchartProps> = ({
   const handleMouseLeave = useCallback((_e: React.MouseEvent<HTMLDivElement>) => {
     // Only reset if not dragging (dragging continues via window listeners)
     if (!interactionRef.current.isDragging) {
+      // Check if crosshair was visible (for instant hide via forceRender)
+      const wasVisible = crosshairRef.current.visible;
       interactionRef.current.isOverPriceAxis = false;
       // Hide crosshair and reset button
       crosshairRef.current.visible = false;
       // Also reset touch crosshair lock when leaving
       touchCrosshairLockedRef.current = false;
       setShowResetButton(false);
+      // Force immediate re-render for instant crosshair hide (bypasses RAF delay)
+      if (wasVisible) {
+        forceRender();
+      }
       scheduleRender();
       setCursor('crosshair');
     }
-  }, [scheduleRender]);
+  }, [scheduleRender, forceRender]);
+
+  // Document-level mousemove listener to catch fast mouse exits
+  // The container's onMouseLeave can miss events when the mouse moves quickly
+  useEffect(() => {
+    const handleDocumentMouseMove = (e: MouseEvent) => {
+      // Skip if dragging (drag continues via window listeners)
+      if (interactionRef.current.isDragging) return;
+      // Skip if crosshair not visible (nothing to hide)
+      if (!crosshairRef.current.visible) return;
+      // Skip if no container ref
+      if (!containerRef.current) return;
+
+      const rect = containerRef.current.getBoundingClientRect();
+      const isInside =
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom;
+
+      if (!isInside) {
+        // Mouse is outside container - hide crosshair
+        // Force immediate re-render for instant crosshair hide (bypasses RAF delay)
+        crosshairRef.current.visible = false;
+        touchCrosshairLockedRef.current = false;
+        interactionRef.current.isOverPriceAxis = false;
+        setShowResetButton(false);
+        forceRender();
+        scheduleRender();
+        setCursor('crosshair');
+      }
+    };
+
+    document.addEventListener('mousemove', handleDocumentMouseMove);
+    return () => {
+      document.removeEventListener('mousemove', handleDocumentMouseMove);
+    };
+  }, [scheduleRender, forceRender]);
 
   // Helper to calculate distance between two touch points
   const getTouchDistance = useCallback((touches: Map<number, { x: number; y: number }>) => {
