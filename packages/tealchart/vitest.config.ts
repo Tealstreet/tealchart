@@ -19,7 +19,6 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'clover'],
-      extension: ['js', 'jsx', 'ts', 'tsx'],
       all: true,
     },
     clearMocks: true,

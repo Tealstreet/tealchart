@@ -10,7 +10,7 @@ export {
   type WorkerError,
   type ResultCallback,
   type ErrorCallback,
-} from './TealscriptWorker';
+} from './TealScriptWorker';
 
 export type {
   ToWorkerMessage,

@@ -93,7 +93,7 @@ export function useTealscript(options: UseTealscriptOptions): UseTealscriptRetur
   // Initialize manager on mount
   useEffect(() => {
     const managerOptions: TealscriptManagerOptions = {
-      workerUrl: options.workerUrl,
+      createWorker: () => new Worker(options.workerUrl, { type: 'module' }),
       onPlotsUpdated: (newPlots) => {
         setPlots(newPlots);
       },

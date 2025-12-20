@@ -891,6 +891,9 @@ export interface PositionLineCallbacks {
 export interface InternalOrderLineAdapter extends FullOrderLineAdapter {
   _getRenderData(): OrderLineRenderData;
   _getCallbacks(): OrderLineCallbacks;
+  // TradingView API compatibility (no-op)
+  setBodyFont(font: string): this;
+  setQuantityFont(font: string): this;
 }
 
 /**
@@ -900,6 +903,9 @@ export interface InternalOrderLineAdapter extends FullOrderLineAdapter {
 export interface InternalPositionLineAdapter extends FullPositionLineAdapter {
   _getRenderData(): PositionLineRenderData;
   _getCallbacks(): PositionLineCallbacks;
+  // TradingView API compatibility (no-op)
+  setBodyFont(font: string): this;
+  setQuantityFont(font: string): this;
 }
 
 // ============================================================================
