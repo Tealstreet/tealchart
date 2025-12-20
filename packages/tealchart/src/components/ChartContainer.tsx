@@ -3,8 +3,9 @@
  * Manages Jotai state and coordinates between toolbar and chart
  */
 
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
+import { useMobileTapHover, isTouchDevice } from '../hooks/useMobileTapHover';
 import { ChartTopBar } from './ChartTopBar';
 import { ChartLegend, type ActiveIndicator } from './ChartLegend';
 import { IndicatorSettingsModal } from './IndicatorSettingsModal';
@@ -138,6 +139,58 @@ const IndicatorPaneLegend: React.FC<IndicatorPaneLegendProps> = memo(({
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const t = useChartTranslations();
 
+  // Mobile tap-hover for showing action buttons on touch devices
+  const {
+    isActive: mobileHoverActive,
+    handleTap: handleMobileTap,
+    handleDragStart: handleMobileDragStart,
+    resetTimer: resetMobileTimer,
+  } = useMobileTapHover();
+
+  // Track touch state for tap vs drag detection
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const isTouchDraggingRef = useRef(false);
+  const TOUCH_TAP_THRESHOLD = 10;
+
+  // Touch handlers for mobile tap-hover
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (!isTouchDevice()) return;
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    isTouchDraggingRef.current = false;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    const touch = e.touches[0];
+    const dx = touch.clientX - touchStartRef.current.x;
+    const dy = touch.clientY - touchStartRef.current.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    if (distance > TOUCH_TAP_THRESHOLD) {
+      isTouchDraggingRef.current = true;
+      handleMobileDragStart();
+    }
+  }, [handleMobileDragStart]);
+
+  const handleTouchEnd = useCallback(() => {
+    if (touchStartRef.current && !isTouchDraggingRef.current) {
+      // It was a tap, not a drag - toggle mobile hover
+      handleMobileTap();
+    }
+    touchStartRef.current = null;
+    isTouchDraggingRef.current = false;
+  }, [handleMobileTap]);
+
+  // Reset mobile timer when action buttons are clicked
+  const handleIndicatorAction = useCallback((action: () => void) => {
+    return () => {
+      action();
+      if (mobileHoverActive) {
+        resetMobileTimer();
+      }
+    };
+  }, [mobileHoverActive, resetMobileTimer]);
+
   return (
     <div
       style={{
@@ -149,10 +202,16 @@ const IndicatorPaneLegend: React.FC<IndicatorPaneLegendProps> = memo(({
         fontSize: 11,
         userSelect: 'none',
       }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
     >
       {indicators.map((indicator) => {
         const info = indicatorPaneInfo?.[indicator.id];
         const isHovered = hoveredId === indicator.id;
+        // Show action buttons when either mouse hover (desktop) or mobile tap-hover is active
+        const showActions = isHovered || mobileHoverActive;
 
         // Format input values
         const inputValues = Object.entries(indicator.inputs)
@@ -183,30 +242,30 @@ const IndicatorPaneLegend: React.FC<IndicatorPaneLegendProps> = memo(({
                 {inputValues.join(' · ')}
               </span>
             )}
-            {/* Action buttons - show on hover */}
+            {/* Action buttons - show on hover or mobile tap */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: 4,
-                opacity: isHovered ? 1 : 0,
+                opacity: showActions ? 1 : 0,
                 transition: 'opacity 0.15s',
               }}
             >
               <PaneLegendButton
-                onClick={() => onToggleIndicator?.(indicator.id)}
+                onClick={handleIndicatorAction(() => onToggleIndicator?.(indicator.id))}
                 title={indicator.isVisible ? t.hideIndicator : t.showIndicator}
               >
                 <EyeIconSmall visible={indicator.isVisible} />
               </PaneLegendButton>
               <PaneLegendButton
-                onClick={() => onSettingsIndicator?.(indicator.id)}
+                onClick={handleIndicatorAction(() => onSettingsIndicator?.(indicator.id))}
                 title={t.indicatorSettings}
               >
                 <GearIconSmall />
               </PaneLegendButton>
               <PaneLegendButton
-                onClick={() => onRemoveIndicator?.(indicator.id)}
+                onClick={handleIndicatorAction(() => onRemoveIndicator?.(indicator.id))}
                 title={t.removeIndicator}
               >
                 <TrashIconSmall />

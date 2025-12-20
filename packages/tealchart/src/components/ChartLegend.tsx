@@ -3,9 +3,10 @@
  * Positioned in the top-left corner of the chart canvas area
  */
 
-import React, { memo, useCallback, useMemo, useState } from 'react';
+import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { Bar, ResolutionString } from '../types';
 import { useChartTranslations } from '../i18n';
+import { useMobileTapHover, isTouchDevice } from '../hooks/useMobileTapHover';
 
 // ============================================================================
 // Types
@@ -256,6 +257,59 @@ export const ChartLegend: React.FC<ChartLegendProps> = memo(({
   const [isExpanded, setIsExpanded] = useState(true);
   const [hoveredIndicatorId, setHoveredIndicatorId] = useState<string | null>(null);
 
+  // Mobile tap-hover for showing action buttons on touch devices
+  // Disabled when legend is collapsed (no indicators visible)
+  const {
+    isActive: mobileHoverActive,
+    handleTap: handleMobileTap,
+    handleDragStart: handleMobileDragStart,
+    resetTimer: resetMobileTimer,
+  } = useMobileTapHover({ disabled: !isExpanded });
+
+  // Track touch state for tap vs drag detection
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const isTouchDraggingRef = useRef(false);
+  const TOUCH_TAP_THRESHOLD = 10;
+
+  // Touch handlers for mobile tap-hover
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (!isTouchDevice()) return;
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    isTouchDraggingRef.current = false;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    const touch = e.touches[0];
+    const dx = touch.clientX - touchStartRef.current.x;
+    const dy = touch.clientY - touchStartRef.current.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    if (distance > TOUCH_TAP_THRESHOLD) {
+      isTouchDraggingRef.current = true;
+      handleMobileDragStart();
+    }
+  }, [handleMobileDragStart]);
+
+  const handleTouchEnd = useCallback(() => {
+    if (touchStartRef.current && !isTouchDraggingRef.current) {
+      // It was a tap, not a drag - toggle mobile hover
+      handleMobileTap();
+    }
+    touchStartRef.current = null;
+    isTouchDraggingRef.current = false;
+  }, [handleMobileTap]);
+
+  // Reset mobile timer when action buttons are clicked
+  const handleIndicatorAction = useCallback((action: () => void) => {
+    return () => {
+      action();
+      if (mobileHoverActive) {
+        resetMobileTimer();
+      }
+    };
+  }, [mobileHoverActive, resetMobileTimer]);
+
   // Filter to only show overlay indicators in this legend
   // Non-overlay indicators with dedicated panes will have their legend rendered in the pane
   const overlayIndicators = useMemo(() => {
@@ -297,7 +351,13 @@ export const ChartLegend: React.FC<ChartLegendProps> = memo(({
   const hasOverlayIndicators = overlayIndicators.length > 0;
 
   return (
-    <div style={styles.container}>
+    <div
+      style={styles.container}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
+    >
       {/* Main row: Symbol · Interval · Exchange + OHLC */}
       <div style={styles.mainRow}>
         <div style={styles.symbolInfo}>
@@ -348,11 +408,12 @@ export const ChartLegend: React.FC<ChartLegendProps> = memo(({
               key={indicator.id}
               indicator={indicator}
               isHovered={hoveredIndicatorId === indicator.id}
+              mobileHoverActive={mobileHoverActive}
               onMouseEnter={() => setHoveredIndicatorId(indicator.id)}
               onMouseLeave={() => setHoveredIndicatorId(null)}
-              onToggle={() => onToggleIndicator?.(indicator.id)}
-              onSettings={() => onSettingsIndicator?.(indicator.id)}
-              onRemove={() => onRemoveIndicator?.(indicator.id)}
+              onToggle={handleIndicatorAction(() => onToggleIndicator?.(indicator.id))}
+              onSettings={handleIndicatorAction(() => onSettingsIndicator?.(indicator.id))}
+              onRemove={handleIndicatorAction(() => onRemoveIndicator?.(indicator.id))}
               hideIndicatorLabel={t.hideIndicator}
               showIndicatorLabel={t.showIndicator}
               indicatorSettingsLabel={t.indicatorSettings}
@@ -407,6 +468,8 @@ OHLCItem.displayName = 'OHLCItem';
 interface IndicatorRowProps {
   indicator: ActiveIndicator;
   isHovered: boolean;
+  /** Mobile tap-hover active (shows all action buttons on touch devices) */
+  mobileHoverActive?: boolean;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
   onToggle: () => void;
@@ -421,6 +484,7 @@ interface IndicatorRowProps {
 const IndicatorRow: React.FC<IndicatorRowProps> = memo(({
   indicator,
   isHovered,
+  mobileHoverActive = false,
   onMouseEnter,
   onMouseLeave,
   onToggle,
@@ -431,6 +495,8 @@ const IndicatorRow: React.FC<IndicatorRowProps> = memo(({
   indicatorSettingsLabel,
   removeIndicatorLabel,
 }) => {
+  // Show action buttons when either mouse hover (desktop) or mobile tap-hover is active
+  const showActions = isHovered || mobileHoverActive;
   const [eyeHovered, setEyeHovered] = useState(false);
   const [gearHovered, setGearHovered] = useState(false);
   const [trashHovered, setTrashHovered] = useState(false);
@@ -474,7 +540,7 @@ const IndicatorRow: React.FC<IndicatorRowProps> = memo(({
       <div
         style={{
           ...styles.indicatorActions,
-          ...(isHovered ? styles.indicatorActionsVisible : {}),
+          ...(showActions ? styles.indicatorActionsVisible : {}),
         }}
       >
         <button
