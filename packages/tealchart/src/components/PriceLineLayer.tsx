@@ -173,6 +173,13 @@ const PriceLineGroup: React.FC<{
   const hasTPSLButtons = buttons.length > 0 && (buttons[0].type === 'tp' || buttons[0].type === 'sl');
   const tpslGap = hasTPSLButtons ? 6 : 0; // 6px gap between segments and TP/SL buttons
 
+  // Calculate TP/SL button dimensions for drag handling
+  let tpslButtonsWidth = 0;
+  const tpButton = buttons.find(b => b.type === 'tp');
+  const slButton = buttons.find(b => b.type === 'sl');
+  if (tpButton) tpslButtonsWidth += 24;
+  if (slButton) tpslButtonsWidth += 24;
+
   if (chartLabel && chartLabel.segments.length > 0) {
     // Calculate segments width (these are the draggable parts)
     for (const segment of chartLabel.segments) {
@@ -798,59 +805,40 @@ const ChartLabelGroup: React.FC<{
         onCursorChange?.('default');
       };
 
-      // Constrain drag to vertical only
+      // Constrain drag to vertical only - keep X fixed at button position
       const dragBoundFunc = (pos: { x: number; y: number }) => {
+        // Keep X fixed at original button position, allow Y to move freely
+        // (Y is constrained by chart margins in the visual feedback, not the button itself)
         return {
-          x: 0,  // Keep X at 0 (relative to group)
-          y: Math.max(margins.top - lineY, Math.min(chartWidth - margins.bottom - lineY, pos.y)),
+          x: btnX,
+          y: pos.y,
         };
       };
 
-      // TP/SL button: Group with background + text (non-interactive), then drag handle on top
-      elements.push(
-        <Group
-          key={`button-label-${index}`}
-          listening={false}
-        >
-          <Rect
-            x={btnX}
-            y={y}
-            width={buttonWidth}
-            height={height}
-            fill={button.backgroundColor}
-            stroke={button.borderColor}
-            strokeWidth={1}
-            cornerRadius={cornerRadius}
-          />
-          <Text
-            x={btnX}
-            y={y}
-            width={buttonWidth}
-            height={height}
-            text={button.type === 'tp' ? 'TP' : 'SL'}
-            fontSize={11}
-            fontFamily="sans-serif"
-            fill="#FFFFFF"
-            align="center"
-            verticalAlign="middle"
-          />
-        </Group>
-      );
-      // Invisible drag handle on top for interaction
+      // TP/SL button: background rect is draggable, text rendered last
       elements.push(
         <Rect
-          key={`button-drag-${index}`}
+          key={`button-bg-${index}`}
           x={btnX}
           y={y}
           width={buttonWidth}
           height={height}
-          fill="transparent"
+          fill={button.backgroundColor}
+          stroke={button.borderColor}
+          strokeWidth={1}
+          cornerRadius={cornerRadius}
           draggable={true}
-          onDragStart={handleDragStart}
+          onDragStart={(e) => {
+            console.log('TP/SL drag start', buttonType);
+            handleDragStart(e);
+          }}
           onDragMove={handleDragMove}
           onDragEnd={handleDragEnd}
           dragBoundFunc={dragBoundFunc}
-          onMouseEnter={() => onCursorChange?.('grab')}
+          onMouseEnter={() => {
+            console.log('TP/SL mouse enter', buttonType);
+            onCursorChange?.('grab');
+          }}
           onMouseLeave={() => onCursorChange?.('default')}
         />
       );
@@ -917,6 +905,48 @@ const ChartLabelGroup: React.FC<{
     }
     currentX += buttonWidth;
   });
+
+  // Render TP/SL text labels LAST (on top of everything) - this is required for visibility
+  // hitGraphEnabled={false} ensures the text doesn't block mouse events to elements behind it
+  const tpslButtonWidth = 24;
+  if (buttonXPositions['tp'] !== undefined) {
+    elements.push(
+      <Text
+        key="tp-text"
+        x={buttonXPositions['tp']}
+        y={y}
+        width={tpslButtonWidth}
+        height={height}
+        text="TP"
+        fontSize={11}
+        fontFamily="sans-serif"
+        fill="#FFFFFF"
+        align="center"
+        verticalAlign="middle"
+        listening={false}
+        hitGraphEnabled={false}
+      />
+    );
+  }
+  if (buttonXPositions['sl'] !== undefined) {
+    elements.push(
+      <Text
+        key="sl-text"
+        x={buttonXPositions['sl']}
+        y={y}
+        width={tpslButtonWidth}
+        height={height}
+        text="SL"
+        fontSize={11}
+        fontFamily="sans-serif"
+        fill="#FFFFFF"
+        align="center"
+        verticalAlign="middle"
+        listening={false}
+        hitGraphEnabled={false}
+      />
+    );
+  }
 
   return <Group>{elements}</Group>;
 };

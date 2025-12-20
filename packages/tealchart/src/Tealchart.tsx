@@ -1299,8 +1299,13 @@ export const Tealchart: React.FC<TealchartProps> = ({
     }
   }, []);
 
-  // Touch start handler - attached to container for unified event handling
-  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+  // Touch handlers as refs for native event listeners (passive: false support)
+  const handleTouchStartRef = useRef<(e: TouchEvent) => void>(null!);
+  const handleTouchMoveRef = useRef<(e: TouchEvent) => void>(null!);
+  const handleTouchEndRef = useRef<(e: TouchEvent) => void>(null!);
+
+  // Touch start handler - uses native event for passive: false support
+  handleTouchStartRef.current = (e: TouchEvent) => {
     // Check if touch is over a Konva interactive element (let Konva handle it)
     const firstTouch = e.touches[0];
     if (firstTouch && isOverKonvaInteractiveElement(firstTouch.clientX, firstTouch.clientY)) {
@@ -1383,10 +1388,10 @@ export const Tealchart: React.FC<TealchartProps> = ({
       pinchStartDistanceRef.current = getTouchDistance(activeTouchesRef.current);
       pinchStartViewportRef.current = { ...viewport };
     }
-  }, [viewport, clearLongPressTimer, getTouchDistance, yToPrice, isInDeadZone, isOverPriceAxis, getPaneAtY, openContextMenu, onContextMenu, isOverKonvaInteractiveElement]);
+  };
 
-  // Touch move handler - attached to container for unified event handling
-  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+  // Touch move handler - uses native event for passive: false support
+  handleTouchMoveRef.current = (e: TouchEvent) => {
     e.preventDefault();
 
     const rect = containerRef.current?.getBoundingClientRect();
@@ -1415,6 +1420,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
 
       if (distance > TOUCH_TAP_THRESHOLD) {
         isTouchDraggingRef.current = true;
+        interactionRef.current.isDragging = true; // Prevent viewport sync from overwriting during drag
         clearLongPressTimer(); // Cancel long press if dragging
 
         if (touchCrosshairLockedRef.current) {
@@ -1483,7 +1489,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
               const pixelsPerPrice = chartHeight / priceRange;
 
               const timeDelta = -dx / pixelsPerMs;
-              // Only apply Y delta if Y panning is unlocked
+              // Mobile Y-lock: Y panning locked by default until price axis is dragged
               const priceDelta = touchYPanUnlockedRef.current ? (dy / pixelsPerPrice) : 0;
 
               const newViewport: Viewport = {
@@ -1493,8 +1499,9 @@ export const Tealchart: React.FC<TealchartProps> = ({
                 priceMax: interaction.dragStartViewport.priceMax + priceDelta,
               };
 
-              setViewport(newViewport);
-              onViewportChange?.(newViewport);
+              // Use ref directly like mouse handler (synchronous, no React batching issues)
+              viewportRef.current = newViewport;
+              scheduleRender();
 
               // Request more bars if panning left
               const currentBars = barsRef.current;
@@ -1536,10 +1543,10 @@ export const Tealchart: React.FC<TealchartProps> = ({
         }
       }
     }
-  }, [clearLongPressTimer, getTouchDistance, snapToBarCenter, width, height, margins, getChartDimensions, scheduleRender, onViewportChange, onRequestMoreBars]);
+  };
 
-  // Touch end handler - attached to container for unified event handling
-  const handleTouchEnd = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+  // Touch end handler - uses native event for passive: false support
+  handleTouchEndRef.current = (e: TouchEvent) => {
     e.preventDefault();
 
     // Remove ended touches
@@ -1580,12 +1587,19 @@ export const Tealchart: React.FC<TealchartProps> = ({
 
     // Reset state when all touches end
     if (activeTouchesRef.current.size === 0) {
+      // Sync viewport to React state after drag ends (like mouse up does)
+      if (isTouchDraggingRef.current && viewportRef.current) {
+        setViewport(viewportRef.current);
+        onViewportChange?.(viewportRef.current);
+      }
+
       touchStartRef.current = null;
       isTouchDraggingRef.current = false;
+      interactionRef.current.isDragging = false; // Reset drag flag
       pinchStartDistanceRef.current = 0;
       pinchStartViewportRef.current = null;
     }
-  }, [clearLongPressTimer, isInDeadZone, isOverPriceAxis, snapToBarCenter, scheduleRender]);
+  };
 
   // Handle right-click context menu - attached to container for unified event handling
   const handleContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
@@ -1690,6 +1704,36 @@ export const Tealchart: React.FC<TealchartProps> = ({
     };
   }, []);
 
+  // Native touch event listeners with passive: false to allow preventDefault
+  // This is required because React's synthetic touch events are passive by default
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      handleTouchStartRef.current?.(e);
+    };
+    const handleTouchMove = (e: TouchEvent) => {
+      handleTouchMoveRef.current?.(e);
+    };
+    const handleTouchEnd = (e: TouchEvent) => {
+      handleTouchEndRef.current?.(e);
+    };
+
+    // Use capture: true and passive: false to properly handle touch events
+    container.addEventListener('touchstart', handleTouchStart, { passive: false, capture: true });
+    container.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
+    container.addEventListener('touchend', handleTouchEnd, { passive: false, capture: true });
+    container.addEventListener('touchcancel', handleTouchEnd, { passive: false, capture: true });
+
+    return () => {
+      container.removeEventListener('touchstart', handleTouchStart, { capture: true });
+      container.removeEventListener('touchmove', handleTouchMove, { capture: true });
+      container.removeEventListener('touchend', handleTouchEnd, { capture: true });
+      container.removeEventListener('touchcancel', handleTouchEnd, { capture: true });
+    };
+  }, []);
+
   // Reset button position
   const resetButtonStyle: React.CSSProperties = {
     position: 'absolute',
@@ -1779,14 +1823,11 @@ export const Tealchart: React.FC<TealchartProps> = ({
       ref={containerRef}
       style={{ position: 'relative', width, height, cursor, touchAction: 'none' }}
       // Use capture phase handlers to catch events before Konva's canvas intercepts them
+      // Touch events use native listeners (via useEffect) for passive: false support
       onMouseDownCapture={handleMouseDown}
       onMouseMoveCapture={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onContextMenuCapture={handleContextMenu}
-      onTouchStartCapture={handleTouchStart}
-      onTouchMoveCapture={handleTouchMove}
-      onTouchEndCapture={handleTouchEnd}
-      onTouchCancel={handleTouchEnd}
     >
       <canvas
         ref={canvasRef}
