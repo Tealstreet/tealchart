@@ -1370,8 +1370,9 @@ export const PriceLineLayer: React.FC<PriceLineLayerProps> = ({
 
   // Separate floating and non-floating labels for explicit z-ordering
   // Floating labels (like crosshair) must render AFTER non-floating (order/position)
+  // For crosshair-type entries, only include when crosshair is visible (same as vertical line)
   const nonFloatingBounds = labelBounds.filter(b => !b.floatingLabel);
-  const floatingBounds = labelBounds.filter(b => b.floatingLabel);
+  const floatingBounds = labelBounds.filter(b => b.floatingLabel && (b.type !== 'crosshair' || crosshair?.visible));
 
   const renderBound = (bound: PriceLineLabelBounds) => {
     const lineType = bound.type || 'price';
