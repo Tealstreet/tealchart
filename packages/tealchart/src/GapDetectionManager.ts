@@ -300,11 +300,46 @@ export class GapDetectionManager {
     }
   }
 
+  private _shouldSkipRecovery(reason: GapDetectionReason): boolean {
+    const now = Date.now();
+
+    // Still in backoff period
+    if (now < this._backoffUntil) {
+      console.log(`[GapDetection] Skipping recovery (${reason}) - in backoff until ${new Date(this._backoffUntil).toISOString()}`);
+      return true;
+    }
+
+    // Max retries exceeded
+    if (this._retryCount >= this._options.maxRetries) {
+      console.log(`[GapDetection] Skipping recovery (${reason}) - max retries (${this._options.maxRetries}) exceeded`);
+      return true;
+    }
+
+    return false;
+  }
+
   private _triggerRecovery(reason: GapDetectionReason): void {
     // Check recovery lock
     if (this._isRecovering) {
       console.log(`[GapDetection] Skipping recovery (${reason}) - already recovering`);
       return;
+    }
+
+    // Check backoff and max retries
+    if (this._shouldSkipRecovery(reason)) {
+      return;
+    }
+
+    // Calculate exponential backoff: baseBackoffMs * 2^retryCount
+    const backoffMs = this._options.baseBackoffMs * Math.pow(2, this._retryCount);
+    this._retryCount++;
+    this._backoffUntil = Date.now() + backoffMs;
+    this._lastRecoveryReason = reason;
+
+    // Check if we've hit max retries after this attempt
+    if (this._retryCount >= this._options.maxRetries) {
+      console.log(`[GapDetection] Max retries reached - emitting error state`);
+      this._emitErrorState();
     }
 
     // Set recovery lock
@@ -318,7 +353,7 @@ export class GapDetectionManager {
     this._clearNetworkDebounce();
     this._clearBarTimeout();
 
-    console.log(`[GapDetection] Triggering recovery: ${reason}`);
+    console.log(`[GapDetection] Triggering recovery: ${reason} (attempt ${this._retryCount}/${this._options.maxRetries}, next backoff: ${backoffMs}ms)`);
 
     const event: GapDetectionEvent = {
       reason,
@@ -326,5 +361,60 @@ export class GapDetectionManager {
     };
 
     this._onRecoveryNeeded(event);
+  }
+
+  private _emitErrorState(): void {
+    if (this._onErrorStateChange) {
+      this._onErrorStateChange({
+        hasError: true,
+        retryCount: this._retryCount,
+        maxRetries: this._options.maxRetries,
+        reason: this._lastRecoveryReason ?? undefined,
+      });
+    }
+  }
+
+  // ============================================================================
+  // Public Methods for Retry State Management
+  // ============================================================================
+
+  /**
+   * Reset retry state after successful bar sequence.
+   * Call this when bars are being received successfully without gaps.
+   */
+  resetRetryState(): void {
+    const hadError = this._retryCount >= this._options.maxRetries;
+    this._retryCount = 0;
+    this._backoffUntil = 0;
+    this._lastRecoveryReason = null;
+
+    // Emit cleared error state if we had an error before
+    if (hadError && this._onErrorStateChange) {
+      this._onErrorStateChange(null);
+    }
+  }
+
+  /**
+   * Get current error state for UI display.
+   * Returns null if no error, or error state if max retries exceeded.
+   */
+  getErrorState(): GapDetectionErrorState | null {
+    if (this._retryCount >= this._options.maxRetries) {
+      return {
+        hasError: true,
+        retryCount: this._retryCount,
+        maxRetries: this._options.maxRetries,
+        reason: this._lastRecoveryReason ?? undefined,
+      };
+    }
+    return null;
+  }
+
+  /**
+   * Set callback for error state changes.
+   * Used to update UI when error state changes.
+   */
+  setOnErrorStateChange(callback: (errorState: GapDetectionErrorState | null) => void): void {
+    this._onErrorStateChange = callback;
   }
 }

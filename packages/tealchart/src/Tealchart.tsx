@@ -413,6 +413,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
   const pinchStartViewportRef = useRef<Viewport | null>(null); // Viewport at pinch start
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isTouchDraggingRef = useRef(false); // Track if we've moved enough to be a drag
+  const touchYPanUnlockedRef = useRef(false); // Mobile Y-lock: Y panning locked by default until price axis dragged
   const TOUCH_TAP_THRESHOLD = 10; // Max movement in px to still count as tap
   const LONG_PRESS_DURATION = 500; // ms
 
@@ -831,6 +832,8 @@ export const Tealchart: React.FC<TealchartProps> = ({
       setViewport(newViewport);
       viewportRef.current = newViewport;
       onViewportChange?.(newViewport);
+      // Re-lock mobile Y panning (unlocked by price axis drag)
+      touchYPanUnlockedRef.current = false;
     }
   }, [onViewportChange]);
 
@@ -1438,6 +1441,9 @@ export const Tealchart: React.FC<TealchartProps> = ({
 
             if (interaction.dragMode === 'priceAxisZoom' && interaction.dragStartPaneYRange) {
               // Price axis zoom: drag down = larger range (zoom out), drag up = smaller range (zoom in)
+              // Unlock Y panning for mobile when price axis is interacted with
+              touchYPanUnlockedRef.current = true;
+
               const startRange = interaction.dragStartPaneYRange;
               const yRange = startRange.yMax - startRange.yMin;
               const dragRatio = dy / chartHeight;
@@ -1468,15 +1474,23 @@ export const Tealchart: React.FC<TealchartProps> = ({
               }
               scheduleRender();
             } else {
-              // Pan mode
+              // Pan mode - X always pans, Y only pans if unlocked (mobile Y-lock feature)
+              // On mobile, Y panning is locked by default until user drags price axis
               const timeRange = interaction.dragStartViewport.endTime - interaction.dragStartViewport.startTime;
+              const priceRange = interaction.dragStartViewport.priceMax - interaction.dragStartViewport.priceMin;
+
               const pixelsPerMs = chartWidth / timeRange;
+              const pixelsPerPrice = chartHeight / priceRange;
+
               const timeDelta = -dx / pixelsPerMs;
+              // Only apply Y delta if Y panning is unlocked
+              const priceDelta = touchYPanUnlockedRef.current ? (dy / pixelsPerPrice) : 0;
 
               const newViewport: Viewport = {
-                ...interaction.dragStartViewport,
                 startTime: interaction.dragStartViewport.startTime + timeDelta,
                 endTime: interaction.dragStartViewport.endTime + timeDelta,
+                priceMin: interaction.dragStartViewport.priceMin + priceDelta,
+                priceMax: interaction.dragStartViewport.priceMax + priceDelta,
               };
 
               setViewport(newViewport);

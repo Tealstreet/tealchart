@@ -806,13 +806,14 @@ const ChartLabelGroup: React.FC<{
         };
       };
 
-      // Use separate elements for TP/SL buttons instead of nested Group for better text rendering
-      // The invisible drag handle is separate from the visual button
+      // TP/SL button: Group with background + text (non-interactive), then drag handle on top
       elements.push(
-        <Group key={`button-${index}`}>
-          {/* Visual button (non-draggable) */}
+        <Group
+          key={`button-label-${index}`}
+          listening={false}
+        >
           <Rect
-            x={currentX}
+            x={btnX}
             y={y}
             width={buttonWidth}
             height={height}
@@ -822,35 +823,36 @@ const ChartLabelGroup: React.FC<{
             cornerRadius={cornerRadius}
           />
           <Text
-            x={currentX}
+            x={btnX}
             y={y}
             width={buttonWidth}
             height={height}
-            text={button.icon}
-            fontSize={10}
-            fontStyle="bold"
+            text={button.type === 'tp' ? 'TP' : 'SL'}
+            fontSize={11}
             fontFamily="sans-serif"
-            fill={button.iconColor}
+            fill="#FFFFFF"
             align="center"
             verticalAlign="middle"
-            listening={false}
-          />
-          {/* Invisible drag handle on top */}
-          <Rect
-            x={currentX}
-            y={y}
-            width={buttonWidth}
-            height={height}
-            fill="transparent"
-            draggable={true}
-            onDragStart={handleDragStart}
-            onDragMove={handleDragMove}
-            onDragEnd={handleDragEnd}
-            dragBoundFunc={dragBoundFunc}
-            onMouseEnter={() => onCursorChange?.('grab')}
-            onMouseLeave={() => onCursorChange?.('default')}
           />
         </Group>
+      );
+      // Invisible drag handle on top for interaction
+      elements.push(
+        <Rect
+          key={`button-drag-${index}`}
+          x={btnX}
+          y={y}
+          width={buttonWidth}
+          height={height}
+          fill="transparent"
+          draggable={true}
+          onDragStart={handleDragStart}
+          onDragMove={handleDragMove}
+          onDragEnd={handleDragEnd}
+          dragBoundFunc={dragBoundFunc}
+          onMouseEnter={() => onCursorChange?.('grab')}
+          onMouseLeave={() => onCursorChange?.('default')}
+        />
       );
     } else {
       // Non-TP/SL buttons (cancel, close, reverse)

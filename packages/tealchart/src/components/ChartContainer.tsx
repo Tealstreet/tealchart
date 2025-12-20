@@ -11,7 +11,7 @@ import { IndicatorSettingsModal } from './IndicatorSettingsModal';
 import { Tealchart, TealchartProps } from '../Tealchart';
 import { createChartFocusAtoms, resolutionToMs, formatPriceWithPrecision, PlotStyleOverride, ChartSettings } from '../state/chartState';
 import { type BuiltinIndicator } from '../indicators/builtinIndicators';
-import { Bar, ChartMargins, ContextMenuItem, OrderLineRenderData, PaneLayout, PositionLineRenderData, PriceLine, ResolutionString, Viewport } from '../types';
+import { Bar, ChartMargins, ContextMenuItem, GapDetectionErrorState, OrderLineRenderData, PaneLayout, PositionLineRenderData, PriceLine, ResolutionString, Viewport } from '../types';
 import type { PlotOutput, InputDefinition } from '@tealstreet/tealscript';
 import type { ISaveLoadAdapter } from '../transformer';
 import { TranslationProvider, useChartTranslations, type PartialChartTranslations } from '../i18n';
@@ -104,6 +104,8 @@ export interface ChartContainerProps {
   onCrossHairMoved?: (price: number, time: number) => void;
   /** Translations for i18n support - if not provided, English defaults are used */
   translations?: PartialChartTranslations;
+  /** Gap detection error state (if any) */
+  gapDetectionError?: GapDetectionErrorState | null;
 }
 
 // ============================================================================
@@ -329,6 +331,8 @@ const ChartContainerInner: React.FC<ChartContainerProps> = memo(({
   onCrossHairMoved,
   // i18n
   translations,
+  // Gap detection error
+  gapDetectionError,
 }) => {
   // Get focus atoms for this chart
   const focusAtoms = useMemo(() => createChartFocusAtoms(chartKey), [chartKey]);
@@ -595,6 +599,7 @@ const ChartContainerInner: React.FC<ChartContainerProps> = memo(({
             saveLoadAdapter={saveLoadAdapter}
             onLoadLayout={onLoadLayout}
             onSaveLayout={onSaveLayout}
+            gapDetectionError={gapDetectionError}
           />
         </div>
       )}

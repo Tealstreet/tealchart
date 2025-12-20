@@ -23,6 +23,7 @@ import {
   ContextMenuCallback,
   TealchartWidgetOptions,
   GapDetectionEvent,
+  GapDetectionErrorState,
   IBasicDataFeed,
   LibrarySymbolInfo,
   RenderOptions,
@@ -105,6 +106,8 @@ export class TealchartWidget {
 
   // Gap detection for automatic bar recovery
   private _gapDetectionManager: GapDetectionManager | null = null;
+  private _gapDetectionError: GapDetectionErrorState | null = null;
+  private _gapDetectionErrorUpdateRef: React.MutableRefObject<((error: GapDetectionErrorState | null) => void) | null> = { current: null };
 
   // Track if interval was explicitly provided (for controlled vs uncontrolled behavior)
   private _intervalWasProvided: boolean;
@@ -216,6 +219,14 @@ export class TealchartWidget {
         (event) => this._handleRecoveryNeeded(event),
         options.gapDetection
       );
+      // Wire up error state change callback
+      this._gapDetectionManager.setOnErrorStateChange((error) => {
+        this._gapDetectionError = error;
+        // Notify React component if callback is set
+        if (this._gapDetectionErrorUpdateRef.current) {
+          this._gapDetectionErrorUpdateRef.current(error);
+        }
+      });
     }
 
     // Initialize
@@ -393,9 +404,11 @@ export class TealchartWidget {
       }
     }
 
-    // Record the bar time for gap detection
+    // Record the bar time for gap detection and reset retry state on successful bar
     if (this._gapDetectionManager) {
       this._gapDetectionManager.recordBar(bar.time);
+      // Reset retry state - successful bar means gap is resolved
+      this._gapDetectionManager.resetRetryState();
     }
 
     // Notify Tealscript manager of bar update
@@ -1161,6 +1174,26 @@ export class TealchartWidget {
   headerReady(): Promise<void> {
     // We don't have a header UI, so resolve immediately
     return Promise.resolve();
+  }
+
+  // ============================================================================
+  // Gap Detection Error State
+  // ============================================================================
+
+  /**
+   * Get current gap detection error state.
+   * Returns null if no error, or error state if max retries exceeded.
+   */
+  getGapDetectionError(): GapDetectionErrorState | null {
+    return this._gapDetectionError;
+  }
+
+  /**
+   * Get ref for gap detection error updates.
+   * Used by React components to receive error state changes.
+   */
+  getGapDetectionErrorUpdateRef(): React.MutableRefObject<((error: GapDetectionErrorState | null) => void) | null> {
+    return this._gapDetectionErrorUpdateRef;
   }
 
   /**

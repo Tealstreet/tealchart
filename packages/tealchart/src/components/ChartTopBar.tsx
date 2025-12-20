@@ -11,7 +11,7 @@ import { useChartApiOptional } from '../state/ChartApiContext';
 import { IndicatorsModal } from './IndicatorsModal';
 import { LayoutSelector, type LayoutSelectorProps } from './LayoutSelector';
 import { type BuiltinIndicator } from '../indicators/builtinIndicators';
-import { ResolutionString } from '../types';
+import { ResolutionString, GapDetectionErrorState } from '../types';
 import { useChartTranslations } from '../i18n';
 
 // ============================================================================
@@ -29,6 +29,11 @@ const styles = {
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     gap: 12,
     userSelect: 'none' as const,
+    overflowX: 'auto' as const,
+    overflowY: 'hidden' as const,
+    flexWrap: 'nowrap' as const,
+    scrollbarWidth: 'none' as const, // Firefox
+    msOverflowStyle: 'none' as const, // IE/Edge
   },
   symbol: {
     fontWeight: 600,
@@ -44,11 +49,13 @@ const styles = {
     width: 1,
     height: 16,
     backgroundColor: 'var(--border, #363a45)',
+    flexShrink: 0,
   },
   timeframeGroup: {
     display: 'flex',
     alignItems: 'center',
     gap: 2,
+    flexShrink: 0,
   },
   timeframeButton: {
     padding: '4px 8px',
@@ -81,6 +88,8 @@ const styles = {
     fontSize: 12,
     fontWeight: 500,
     transition: 'background-color 0.15s, color 0.15s',
+    flexShrink: 0,
+    whiteSpace: 'nowrap' as const,
   },
   indicatorsButtonHover: {
     backgroundColor: 'var(--hover-bg, rgba(255, 255, 255, 0.05))',
@@ -93,6 +102,20 @@ const styles = {
   },
   spacer: {
     flex: 1,
+  },
+  errorIndicator: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 4,
+    padding: '4px 8px',
+    borderRadius: 4,
+    backgroundColor: 'rgba(255, 152, 0, 0.15)',
+    color: '#ff9800',
+    fontSize: 11,
+    fontWeight: 500,
+    cursor: 'help',
+    flexShrink: 0,
+    whiteSpace: 'nowrap' as const,
   },
 };
 
@@ -123,6 +146,8 @@ export interface ChartTopBarProps {
   onLoadLayout?: (settings: ChartSettings, warnings: string[], layoutId: string | number, layoutName: string) => void;
   /** Called when save is requested */
   onSaveLayout?: () => void;
+  /** Gap detection error state (if any) */
+  gapDetectionError?: GapDetectionErrorState | null;
 }
 
 // ============================================================================
@@ -141,6 +166,7 @@ export const ChartTopBar: React.FC<ChartTopBarProps> = memo(({
   saveLoadAdapter,
   onLoadLayout,
   onSaveLayout,
+  gapDetectionError,
 }) => {
   // Translations
   const t = useChartTranslations();
@@ -181,7 +207,7 @@ export const ChartTopBar: React.FC<ChartTopBarProps> = memo(({
   return (
     <div style={containerStyle}>
       {/* Symbol */}
-      <div>
+      <div style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
         <span style={styles.symbol}>{symbol}</span>
         {exchangeName && <span style={styles.exchange}>{exchangeName}</span>}
       </div>
@@ -216,6 +242,17 @@ export const ChartTopBar: React.FC<ChartTopBarProps> = memo(({
         <span style={styles.indicatorsIcon}>ƒ</span>
         <span>{t.indicators}</span>
       </button>
+
+      {/* Gap detection error indicator */}
+      {gapDetectionError?.hasError && (
+        <div
+          style={styles.errorIndicator}
+          title={`Data sync issue: ${gapDetectionError.reason || 'unknown'} (${gapDetectionError.retryCount}/${gapDetectionError.maxRetries} retries)`}
+        >
+          <span>⚠️</span>
+          <span>Sync issue</span>
+        </div>
+      )}
 
       {/* Spacer to push layout selector to the right */}
       <div style={styles.spacer} />
