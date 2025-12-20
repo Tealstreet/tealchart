@@ -561,6 +561,7 @@ export class TealchartRenderer {
         // Position-specific fields for bracket TP/SL drag
         positionId: line.positionId,
         partialEnabled: line.partialEnabled,
+        positionData: line.positionData,
       };
     });
 
@@ -2337,7 +2338,9 @@ export class TealchartRenderer {
   computePriceLineLabelBoundsWithLayout(
     priceLines: PriceLine[],
     viewport: Viewport,
-    layout: UnifiedPaneLayout
+    layout: UnifiedPaneLayout,
+    plots?: PlotOutput[],
+    crosshair?: { y: number; visible: boolean; color: string }
   ): PriceLineLabelBounds[] {
     const { ctx, options } = this;
 
@@ -2354,11 +2357,91 @@ export class TealchartRenderer {
     mainPane.yMin = viewport.priceMin;
     mainPane.yMax = viewport.priceMax;
 
+    // Calculate indicator pane Y ranges from plots (needed for targetPaneId support)
+    if (plots) {
+      for (const pane of computedPanes) {
+        if (pane.type === 'indicator' && !pane.fixedRange && pane.indicatorIds) {
+          const paneValues: (number | null)[] = [];
+          for (const plot of plots) {
+            const scriptId = plot.scriptId ?? 'unknown';
+            if (pane.indicatorIds.includes(scriptId) && plot.type === 'plot' && plot.values) {
+              paneValues.push(...plot.values);
+            }
+          }
+          if (paneValues.length > 0) {
+            const range = TealchartRenderer.calculateIndicatorRange(paneValues);
+            pane.yMin = range.min;
+            pane.yMax = range.max;
+          }
+        }
+      }
+    }
+
+    // Build combined price lines list, including crosshair if provided
+    const allPriceLines = [...priceLines];
+
+    // Create crosshair price line with correct pane detection (avoids duplicate pane computation)
+    if (crosshair?.visible) {
+      const crosshairY = crosshair.y;
+      // Find which pane the crosshair is in
+      for (const pane of computedPanes) {
+        if (crosshairY >= pane.top && crosshairY < pane.bottom) {
+          // Calculate value in this pane's coordinate system
+          const ratio = (crosshairY - pane.top) / pane.height;
+          const value = pane.yMax - ratio * (pane.yMax - pane.yMin);
+
+          // Format label based on pane type
+          let labelText: string;
+          const range = pane.yMax - pane.yMin;
+          if (pane.type === 'main') {
+            let decimals: number;
+            if (options.pricePrecision && options.pricePrecision > 0) {
+              decimals = getDecimalPlacesFromPrecision(options.pricePrecision);
+            } else {
+              decimals = range >= 10 ? 0 : range >= 1 ? 1 : range >= 0.01 ? 2 : 3;
+            }
+            labelText = value.toLocaleString('en-US', {
+              minimumFractionDigits: decimals,
+              maximumFractionDigits: decimals,
+            });
+          } else {
+            const indicatorDecimals = Math.abs(value) >= 1000 ? 0 :
+              Math.abs(value) >= 100 ? 1 :
+              Math.abs(value) >= 1 ? 2 : 4;
+            labelText = value.toLocaleString('en-US', {
+              minimumFractionDigits: indicatorDecimals,
+              maximumFractionDigits: indicatorDecimals,
+            });
+          }
+
+          allPriceLines.push({
+            id: '__crosshair__',
+            price: value,
+            lineStyle: 'dashed',
+            color: crosshair.color,
+            type: 'crosshair',
+            floatingLabel: true,
+            targetPaneId: pane.id,
+            label: {
+              primaryText: labelText,
+              backgroundColor: crosshair.color,
+              textColor: options.backgroundColor,
+            },
+          });
+          break; // Only one pane can contain the cursor
+        }
+      }
+    }
+
     // Calculate bounds using pane coordinate system
     const labelFont = '11px sans-serif';
-    const bounds: PriceLineLabelBounds[] = priceLines.map(line => {
-      // Use valueToY which maps to pane coordinates (Y=0 based for main pane)
-      const originalY = this.valueToY(line.price, mainPane);
+    const bounds: PriceLineLabelBounds[] = allPriceLines.map(line => {
+      // Find the target pane (default to main if not specified)
+      const targetPaneId = line.targetPaneId || 'main';
+      const targetPane = computedPanes.find(p => p.id === targetPaneId) || mainPane;
+
+      // Use valueToY with the correct pane
+      const originalY = this.valueToY(line.price, targetPane);
       const primaryWidth = getCachedTextWidth(ctx, line.label.primaryText, labelFont);
       const secondaryWidth = line.label.secondaryText ? getCachedTextWidth(ctx, line.label.secondaryText, labelFont) : 0;
       const width = Math.max(primaryWidth, secondaryWidth) + 12;
@@ -2386,6 +2469,9 @@ export class TealchartRenderer {
         // Position-specific fields for bracket TP/SL drag
         positionId: line.positionId,
         partialEnabled: line.partialEnabled,
+        positionData: line.positionData,
+        // Pass through targetPaneId for pane-aware rendering
+        targetPaneId: line.targetPaneId,
       };
     });
 
@@ -2401,25 +2487,32 @@ export class TealchartRenderer {
 
     const allBounds = [...staticBounds, ...floatingBounds];
 
-    // Clamp adjustedY to keep labels within main pane visible bounds
-    // For main pane, respect top bar safe zone (labels stay below margins.top)
+    // Clamp adjustedY to keep labels within their target pane's visible bounds
     const visibleTop = this.margins.top;
     for (const bound of allBounds) {
+      const targetPaneId = bound.targetPaneId || 'main';
+      const targetPane = computedPanes.find(p => p.id === targetPaneId) || mainPane;
+
       const labelTop = bound.adjustedY - bound.height / 2;
       const labelBottom = bound.adjustedY + bound.height / 2;
 
-      if (labelTop < visibleTop) {
-        bound.adjustedY = visibleTop + bound.height / 2;
+      // For main pane, respect top bar safe zone
+      const paneTop = targetPane.type === 'main' ? visibleTop : targetPane.top;
+
+      if (labelTop < paneTop) {
+        bound.adjustedY = paneTop + bound.height / 2;
       }
-      if (labelBottom > mainPane.bottom) {
-        bound.adjustedY = mainPane.bottom - bound.height / 2;
+      if (labelBottom > targetPane.bottom) {
+        bound.adjustedY = targetPane.bottom - bound.height / 2;
       }
     }
 
-    // Filter to visible area
-    return allBounds.filter(b =>
-      b.originalY >= mainPane.top && b.originalY <= mainPane.bottom
-    );
+    // Filter to visible area within each line's target pane
+    return allBounds.filter(b => {
+      const targetPaneId = b.targetPaneId || 'main';
+      const targetPane = computedPanes.find(p => p.id === targetPaneId) || mainPane;
+      return b.originalY >= targetPane.top && b.originalY <= targetPane.bottom;
+    });
   }
 
   /**
@@ -2737,103 +2830,6 @@ export class TealchartRenderer {
         return pane;
       }
     }
-    return null;
-  }
-
-  /**
-   * Get crosshair price line for Konva rendering with correct pane detection
-   * Returns a PriceLine with proper targetPaneId and value for whichever pane contains the crosshair
-   */
-  getCrosshairPriceLine(
-    crosshairY: number,
-    viewport: Viewport,
-    layout: UnifiedPaneLayout,
-    plots?: PlotOutput[],
-    crosshairColor?: string
-  ): PriceLine | null {
-    const { options } = this;
-    const color = crosshairColor || options.crosshairColor;
-
-    // Compute panes layout
-    const computedPanes = this.computePanesLayout(layout, options.height);
-
-    // Set main pane's Y range from viewport
-    const mainPane = computedPanes.find(p => p.type === 'main');
-    if (mainPane) {
-      mainPane.yMin = viewport.priceMin;
-      mainPane.yMax = viewport.priceMax;
-    }
-
-    // Calculate indicator pane Y ranges from plots (same as in renderUnifiedPanes)
-    if (plots) {
-      for (const pane of computedPanes) {
-        if (pane.type === 'indicator' && !pane.fixedRange && pane.indicatorIds) {
-          const paneValues: (number | null)[] = [];
-          for (const plot of plots) {
-            const scriptId = plot.scriptId ?? 'unknown';
-            if (pane.indicatorIds.includes(scriptId) && plot.type === 'plot' && plot.values) {
-              paneValues.push(...plot.values);
-            }
-          }
-          if (paneValues.length > 0) {
-            const range = TealchartRenderer.calculateIndicatorRange(paneValues);
-            pane.yMin = range.min;
-            pane.yMax = range.max;
-          }
-        }
-      }
-    }
-
-    // Find which pane the crosshair Y is in
-    for (const pane of computedPanes) {
-      if (crosshairY >= pane.top && crosshairY < pane.bottom) {
-        // Calculate value in this pane's coordinate system
-        const ratio = (crosshairY - pane.top) / pane.height;
-        const value = pane.yMax - ratio * (pane.yMax - pane.yMin);
-
-        // Format label based on pane type
-        let labelText: string;
-        const range = pane.yMax - pane.yMin;
-        if (pane.type === 'main') {
-          // Use price formatting
-          let decimals: number;
-          if (options.pricePrecision && options.pricePrecision > 0) {
-            decimals = getDecimalPlacesFromPrecision(options.pricePrecision);
-          } else {
-            decimals = range >= 10 ? 0 : range >= 1 ? 1 : range >= 0.01 ? 2 : 3;
-          }
-          labelText = value.toLocaleString('en-US', {
-            minimumFractionDigits: decimals,
-            maximumFractionDigits: decimals,
-          });
-        } else {
-          // Indicator value formatting
-          const indicatorDecimals = Math.abs(value) >= 1000 ? 0 :
-            Math.abs(value) >= 100 ? 1 :
-            Math.abs(value) >= 1 ? 2 : 4;
-          labelText = value.toLocaleString('en-US', {
-            minimumFractionDigits: indicatorDecimals,
-            maximumFractionDigits: indicatorDecimals,
-          });
-        }
-
-        return {
-          id: '__crosshair__',
-          price: value,
-          lineStyle: 'dashed',
-          color,
-          type: 'crosshair',
-          floatingLabel: true,
-          targetPaneId: pane.id,
-          label: {
-            primaryText: labelText,
-            backgroundColor: color,
-            textColor: options.backgroundColor,
-          },
-        };
-      }
-    }
-
     return null;
   }
 

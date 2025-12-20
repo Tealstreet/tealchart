@@ -686,27 +686,10 @@ export const Tealchart: React.FC<TealchartProps> = ({
           onCrossHairMoved?.(crosshair.price, crosshair.time);
         }
 
-        // Add crosshair to allPriceLines for Konva layer
-        const allPriceLinesWithCrosshair: PriceLine[] = [...allPriceLines];
-
-        // Add crosshair price line (if visible) - use helper that detects which pane the cursor is in
-        if (crosshair.visible) {
-          const crosshairColor = renderOptions?.crosshairColor || '#888888';
-          const crosshairLine = rendererRef.current.getCrosshairPriceLine(
-            crosshair.y,
-            viewportRef.current,
-            layout,
-            plotsRef.current,
-            crosshairColor
-          );
-          if (crosshairLine) {
-            allPriceLinesWithCrosshair.push(crosshairLine);
-          }
-        }
-
         // Compute label bounds for ALL price lines (including order/position/crosshair) for Konva layer
         // Use dirty checking to skip expensive recomputation when nothing changed
-        const linePrices = allPriceLinesWithCrosshair.map(l => l.price.toFixed(6)).join(',');
+        // Crosshair is passed directly to avoid duplicate pane computation
+        const linePrices = allPriceLines.map(l => l.price.toFixed(6)).join(',');
         const boundsKey = `${vp.priceMin.toFixed(4)},${vp.priceMax.toFixed(4)}|${linePrices}|${Math.round(crosshair.y)}`;
         const now = Date.now();
         const isDragging = interactionRef.current.isDragging;
@@ -716,7 +699,14 @@ export const Tealchart: React.FC<TealchartProps> = ({
         const shouldRecompute = keyChanged || (isDragging && now - lastLabelBoundsUpdateRef.current > 16);
 
         if (shouldRecompute) {
-          const computedBounds = rendererRef.current.computePriceLineLabelBoundsWithLayout(allPriceLinesWithCrosshair, viewportRef.current, layout);
+          const crosshairColor = renderOptions?.crosshairColor || '#888888';
+          const computedBounds = rendererRef.current.computePriceLineLabelBoundsWithLayout(
+            allPriceLines,
+            viewportRef.current,
+            layout,
+            plotsRef.current,
+            crosshair.visible ? { y: crosshair.y, visible: true, color: crosshairColor } : undefined
+          );
           labelBoundsRef.current = computedBounds;
           lastLabelBoundsKeyRef.current = boundsKey;
           lastLabelBoundsUpdateRef.current = now;
@@ -1076,6 +1066,28 @@ export const Tealchart: React.FC<TealchartProps> = ({
   useEffect(() => {
     scheduleRender();
   }, [priceLines, orderLines, positionLines, plots, paneLayout, indicatorPaneInfo, scheduleRender]);
+
+  // Escape key cancels any active viewport drag operation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && interactionRef.current.isDragging) {
+        // Reset drag state without applying changes
+        interactionRef.current.isDragging = false;
+        interactionRef.current.dragMode = 'none';
+        // Restore viewport to pre-drag state if available
+        if (interactionRef.current.dragStartViewport) {
+          viewportRef.current = interactionRef.current.dragStartViewport;
+          setViewport(interactionRef.current.dragStartViewport);
+        }
+        interactionRef.current.dragStartViewport = null;
+        setCursor('crosshair');
+        scheduleRender();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [scheduleRender]);
 
   // Window-level mouse move handler for drag continuation off canvas
   const handleWindowMouseMove = useCallback((e: MouseEvent) => {
@@ -1676,10 +1688,27 @@ export const Tealchart: React.FC<TealchartProps> = ({
     // Don't show context menu in dead zones
     if (isInDeadZone(x, y) || isOverPriceAxis(x)) return;
 
+    // Only show context menu on main pane (not indicator panes)
+    const renderer = rendererRef.current;
+    if (renderer && paneLayout) {
+      const layout: UnifiedPaneLayout = {
+        panes: [
+          { id: 'main', type: 'main' as const, heightRatio: 1 - (paneLayout.indicatorPanes?.reduce((sum, p) => sum + p.heightRatio, 0) || 0), yMin: 0, yMax: 1, fixedRange: false },
+          ...(paneLayout.indicatorPanes?.map(p => ({ id: p.id, type: 'indicator' as const, heightRatio: p.heightRatio, yMin: p.yMin ?? 0, yMax: p.yMax ?? 1, fixedRange: false })) || []),
+        ],
+        timeAxisHeight: margins.bottom,
+      };
+      const computedPanes = renderer.computePanesLayout(layout, height);
+      const mainPane = computedPanes[0];
+      if (mainPane && (y < mainPane.top || y >= mainPane.bottom)) {
+        return; // Click is outside main pane
+      }
+    }
+
     // Get price from Y coordinate
     const price = yToPrice(y);
     openContextMenu(price, e.clientX, e.clientY);
-  }, [onContextMenu, isInDeadZone, isOverPriceAxis, yToPrice, openContextMenu]);
+  }, [onContextMenu, isInDeadZone, isOverPriceAxis, yToPrice, openContextMenu, paneLayout, height, margins.bottom]);
 
   // Wheel handler as ref to avoid recreation on every render
   const handleWheelRef = useRef<(e: WheelEvent) => void>(null!);
@@ -1875,6 +1904,10 @@ export const Tealchart: React.FC<TealchartProps> = ({
   // Check if we should render the Konva layer (for order/position/crosshair lines)
   const hasKonvaElements = konvaLabelBounds.length > 0;
 
+  // Check if crosshair is on main pane (for showing + button and context menu)
+  const crosshairBound = konvaLabelBounds.find(b => b.type === 'crosshair');
+  const isCrosshairOnMainPane = !crosshairBound?.targetPaneId || crosshairBound.targetPaneId === 'main';
+
   return (
     <div
       ref={containerRef}
@@ -1930,7 +1963,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
                 visible: crosshairRef.current.visible && !isOverKonvaElementRef.current,
                 color: renderOptions?.crosshairColor || '#888888',
               }}
-              hasContextMenuButton={!!onContextMenu}
+              hasContextMenuButton={!!onContextMenu && isCrosshairOnMainPane}
               onContextMenuButtonClick={onContextMenu ? handleContextMenuButtonClick : undefined}
             />
           </Layer>

@@ -6,7 +6,7 @@
  * - Click handling for cancel/close buttons
  * - Smooth interaction without custom hit detection
  */
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Group, Line, Rect, Text, Circle } from 'react-konva';
 import type Konva from 'konva';
 import type {
@@ -81,30 +81,33 @@ interface TPSLDragState {
   currentY: number;
   currentX: number;
   currentPrice: number;
-  buttonX: number;  // X position of the button for preview line
+  entryPrice: number;  // Position entry price for PnL calculations
+  entryY: number;      // Position Y coordinate for diagonal lines
+  buttonX: number;     // X position of the button for preview line
   partialEnabled: boolean;
   partialPercent: number;  // 100%, 75%, 50%, 25%, or 10%
+  notional?: number;   // Position notional for PnL calculations
+  isLong?: boolean;    // Position direction
 }
-
-// Magnet zones for partial percentages (user drags right to reduce %)
-const PARTIAL_MAGNET_ZONES = [100, 75, 50, 25, 10];
-const PARTIAL_DRAG_THRESHOLD = 30; // pixels per zone
 
 /**
- * Calculate partial percentage from horizontal drag distance
- * Dragging right reduces the percentage through magnet zones
+ * Calculate magnet percentage for partial TP/SL
+ * Symmetric zones: 100% at center, decreasing as you move left OR right
+ * Evenly spaced zones: 0, 55, 110, 165, 220 (55px each from center)
+ * Reference: TradingView charting_library line-tool-position.js
  */
 function calculatePartialPercent(startX: number, currentX: number): number {
-  const deltaX = currentX - startX;
-  if (deltaX <= 0) return 100; // No drag or drag left = 100%
-
-  // Calculate zone index based on drag distance
-  const zoneIndex = Math.min(
-    Math.floor(deltaX / PARTIAL_DRAG_THRESHOLD),
-    PARTIAL_MAGNET_ZONES.length - 1
-  );
-  return PARTIAL_MAGNET_ZONES[zoneIndex];
+  const deltaX = Math.abs(currentX - startX);
+  if (deltaX <= 27) return 100;   // 0-27 (center zone)
+  if (deltaX <= 82) return 75;    // 28-82 (center at 55)
+  if (deltaX <= 137) return 50;   // 83-137 (center at 110)
+  if (deltaX <= 192) return 25;   // 138-192 (center at 165)
+  return 10;                       // 193+ (center at 220)
 }
+
+// Zone offsets from center for visual rendering (55px spacing)
+const ZONE_OFFSETS = [0, 55, 110, 165, 220];
+const ZONE_HALF_WIDTH = 220;
 
 /**
  * Render a single price line with its label(s)
@@ -146,10 +149,28 @@ const PriceLineGroup: React.FC<{
   onCursorChange,
   hasContextMenuButton,
 }) => {
-  const lineY = priceToY(bound.price);
+  // For crosshair on indicator panes, bound.price is in pane's coordinate system (not main price)
+  // Use adjustedY directly for crosshair type since it's already calculated with correct pane range
+  const lineY = bound.type === 'crosshair' ? bound.adjustedY : priceToY(bound.price);
 
   // State for TP/SL button dragging (with preview line)
   const [tpslDragState, setTPSLDragState] = useState<TPSLDragState | null>(null);
+
+  // Escape key cancels any active TP/SL drag
+  useEffect(() => {
+    if (!tpslDragState) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setTPSLDragState(null);
+        onCursorChange?.('default');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [tpslDragState, onCursorChange]);
+
   const labelCenterY = bound.adjustedY;
   const lineType = bound.type || 'price';
 
@@ -456,9 +477,13 @@ const PriceLineGroup: React.FC<{
               currentY: pointerPos.y,
               currentX: pointerPos.x,
               currentPrice: yToPrice(pointerPos.y),
+              entryPrice: bound.price,  // Position line price is entry price
+              entryY: lineY,            // Position line Y coordinate
               buttonX: chartLabelX + segmentsWidth + tpslGap + 12,
               partialEnabled: bound.partialEnabled ?? false,
               partialPercent: 100,
+              notional: bound.positionData?.notional,
+              isLong: bound.positionData?.isLong,
             });
             onCursorChange?.('grabbing');
           }}
@@ -489,7 +514,7 @@ const PriceLineGroup: React.FC<{
               if (dragDistance > 5) {
                 onTPDragEnd?.(bound.lineId, finalPrice, tpslDragState.partialEnabled ? tpslDragState.partialPercent : undefined);
               } else {
-                onTPClick?.(bound.lineId);
+                onTPButtonClick?.(bound.lineId);
               }
             }
             setTPSLDragState(null);
@@ -522,9 +547,13 @@ const PriceLineGroup: React.FC<{
               currentY: pointerPos.y,
               currentX: pointerPos.x,
               currentPrice: yToPrice(pointerPos.y),
+              entryPrice: bound.price,  // Position line price is entry price
+              entryY: lineY,            // Position line Y coordinate
               buttonX: chartLabelX + segmentsWidth + tpslGap + (tpButton ? 24 : 0) + 12,
               partialEnabled: bound.partialEnabled ?? false,
               partialPercent: 100,
+              notional: bound.positionData?.notional,
+              isLong: bound.positionData?.isLong,
             });
             onCursorChange?.('grabbing');
           }}
@@ -555,7 +584,7 @@ const PriceLineGroup: React.FC<{
               if (dragDistance > 5) {
                 onSLDragEnd?.(bound.lineId, finalPrice, tpslDragState.partialEnabled ? tpslDragState.partialPercent : undefined);
               } else {
-                onSLClick?.(bound.lineId);
+                onSLButtonClick?.(bound.lineId);
               }
             }
             setTPSLDragState(null);
@@ -596,65 +625,257 @@ const PriceLineGroup: React.FC<{
         />
       )}
 
-      {/* TP/SL Drag Preview Line - renders on top during drag */}
-      {tpslDragState && (
-        <Group>
-          {/* Dashed horizontal line at drag price */}
-          <Line
-            points={[margins.left, tpslDragState.currentY, width - margins.right, tpslDragState.currentY]}
-            stroke={tpslDragState.type === 'tp' ? '#22c55e' : '#f97316'}
-            strokeWidth={1}
-            dash={[4, 4]}
-          />
-          {/* Price label at right edge */}
-          <Rect
-            x={width - bound.width}
-            y={tpslDragState.currentY - bound.height / 2}
-            width={bound.width}
-            height={bound.height}
-            fill={tpslDragState.type === 'tp' ? '#22c55e' : '#f97316'}
-            cornerRadius={2}
-          />
-          <Text
-            x={width - bound.width}
-            y={tpslDragState.currentY - bound.height / 2}
-            width={bound.width}
-            height={bound.height}
-            text={formatPrice(tpslDragState.currentPrice)}
-            fontSize={11}
-            fontFamily="sans-serif"
-            fill="#ffffff"
-            align="center"
-            verticalAlign="middle"
-          />
-          {/* Partial percentage label (shown when partialEnabled and not 100%) */}
-          {tpslDragState.partialEnabled && tpslDragState.partialPercent < 100 && (
-            <>
-              <Rect
-                x={margins.left + 8}
-                y={tpslDragState.currentY - 10}
-                width={40}
-                height={20}
-                fill={tpslDragState.type === 'tp' ? '#22c55e' : '#f97316'}
-                cornerRadius={2}
+      {/* TP/SL Bracket Zone Preview - renders during drag */}
+      {tpslDragState && (() => {
+        const color = tpslDragState.type === 'tp' ? '#22c55e' : '#f97316';
+        const bgColor = '#1e222d';
+        const borderColor = '#363a45';
+        const isPartialMode = tpslDragState.partialEnabled;
+        const centerX = tpslDragState.startX;
+        const cursorOnRight = tpslDragState.currentX > centerX;
+        const leftEdge = Math.max(margins.left, centerX - ZONE_HALF_WIDTH);
+        const rightEdge = Math.min(width - margins.right, centerX + ZONE_HALF_WIDTH);
+        const top = Math.min(tpslDragState.entryY, tpslDragState.currentY);
+        const bottom = Math.max(tpslDragState.entryY, tpslDragState.currentY);
+        const zoneHeight = bottom - top;
+        const isDraggingUp = tpslDragState.currentY < tpslDragState.entryY;
+
+        // Calculate PnL and percent distance
+        const priceChange = tpslDragState.currentPrice - tpslDragState.entryPrice;
+        const percentDistance = (priceChange / tpslDragState.entryPrice) * 100;
+        const pnl = tpslDragState.notional
+          ? (tpslDragState.isLong ? priceChange : -priceChange) * (tpslDragState.notional / tpslDragState.entryPrice) * (tpslDragState.partialPercent / 100)
+          : null;
+
+        // Build main label text
+        const typeLabel = isPartialMode && tpslDragState.partialPercent < 100
+          ? `${tpslDragState.partialPercent}% ${tpslDragState.type.toUpperCase()}`
+          : tpslDragState.type.toUpperCase();
+        const pnlText = pnl !== null ? `${pnl >= 0 ? '+' : ''}$${Math.abs(pnl).toFixed(2)}` : '';
+        const percentText = `${percentDistance >= 0 ? '+' : ''}${percentDistance.toFixed(2)}%`;
+
+        // Label position - in partial mode snap to zone, in non-partial stay at drag X
+        const zoneOffset = tpslDragState.partialPercent === 100 ? 0 :
+                          tpslDragState.partialPercent === 75 ? 55 :
+                          tpslDragState.partialPercent === 50 ? 110 :
+                          tpslDragState.partialPercent === 25 ? 165 : 220;
+        const labelX = isPartialMode
+          ? (zoneOffset === 0 ? centerX : (cursorOnRight ? centerX + zoneOffset : centerX - zoneOffset))
+          : centerX;
+        const labelY = isPartialMode
+          ? (isDraggingUp ? top + 20 : bottom - 20)
+          : (isDraggingUp ? tpslDragState.currentY - 14 : tpslDragState.currentY + 14);
+
+        // Bottom percentage labels
+        const bottomLabels = [
+          { percent: 10, x: leftEdge, side: 'left' },
+          { percent: 25, x: centerX - 165, side: 'left' },
+          { percent: 50, x: centerX - 110, side: 'left' },
+          { percent: 75, x: centerX - 55, side: 'left' },
+          { percent: 100, x: centerX, side: 'center' },
+          { percent: 75, x: centerX + 55, side: 'right' },
+          { percent: 50, x: centerX + 110, side: 'right' },
+          { percent: 25, x: centerX + 165, side: 'right' },
+          { percent: 10, x: rightEdge, side: 'right' },
+        ].filter(l => l.x >= leftEdge && l.x <= rightEdge);
+
+        const labelBoxY = isDraggingUp ? top - 18 : bottom + 4;
+
+        // Vertical line position
+        const vertLineX = isPartialMode ? rightEdge : centerX;
+
+        return (
+          <Group>
+            {/* Partial mode: Zone rectangle with fill */}
+            {isPartialMode && zoneHeight > 0 && (
+              <>
+                <Rect
+                  x={leftEdge}
+                  y={top}
+                  width={rightEdge - leftEdge}
+                  height={zoneHeight}
+                  fill={color}
+                  opacity={0.08}
+                />
+                <Rect
+                  x={leftEdge}
+                  y={top}
+                  width={rightEdge - leftEdge}
+                  height={zoneHeight}
+                  stroke={color}
+                  strokeWidth={1}
+                  dash={[4, 4]}
+                  opacity={0.6}
+                />
+                {/* V-shape diagonal lines */}
+                <Line
+                  points={isDraggingUp
+                    ? [leftEdge, top, centerX, bottom, rightEdge, top]
+                    : [leftEdge, bottom, centerX, top, rightEdge, bottom]}
+                  stroke={color}
+                  strokeWidth={1}
+                  dash={[4, 4]}
+                  opacity={0.6}
+                />
+                {/* Zone boundary lines */}
+                {[55, 110, 165].map(offset => (
+                  <React.Fragment key={offset}>
+                    {centerX - offset >= leftEdge && (
+                      <Line
+                        points={[centerX - offset, top, centerX - offset, bottom]}
+                        stroke={color}
+                        strokeWidth={1}
+                        dash={[4, 4]}
+                        opacity={0.3}
+                      />
+                    )}
+                    {centerX + offset <= rightEdge && (
+                      <Line
+                        points={[centerX + offset, top, centerX + offset, bottom]}
+                        stroke={color}
+                        strokeWidth={1}
+                        dash={[4, 4]}
+                        opacity={0.3}
+                      />
+                    )}
+                  </React.Fragment>
+                ))}
+                {/* Bottom percentage labels */}
+                {bottomLabels.map((label, i) => {
+                  const isHighlighted = label.percent === tpslDragState.partialPercent && (
+                    label.side === 'center' ||
+                    (label.side === 'right' && cursorOnRight) ||
+                    (label.side === 'left' && !cursorOnRight)
+                  );
+                  const boxWidth = 30;
+                  const boxX = label.x - boxWidth / 2;
+                  return (
+                    <React.Fragment key={`${label.percent}-${label.side}-${i}`}>
+                      {isHighlighted && (
+                        <Rect x={boxX} y={labelBoxY} width={boxWidth} height={14} fill={color} opacity={0.3} />
+                      )}
+                      <Rect x={boxX} y={labelBoxY} width={boxWidth} height={14} fill={bgColor} />
+                      <Rect x={boxX} y={labelBoxY} width={boxWidth} height={14} stroke={isHighlighted ? color : borderColor} strokeWidth={1} />
+                      <Text
+                        x={boxX}
+                        y={labelBoxY}
+                        width={boxWidth}
+                        height={14}
+                        text={`${label.percent}%`}
+                        fontSize={10}
+                        fontFamily="sans-serif"
+                        fill={isHighlighted ? color : '#787b86'}
+                        align="center"
+                        verticalAlign="middle"
+                      />
+                    </React.Fragment>
+                  );
+                })}
+              </>
+            )}
+
+            {/* Dashed horizontal line at bracket price */}
+            <Line
+              points={[margins.left, tpslDragState.currentY, width - margins.right, tpslDragState.currentY]}
+              stroke={color}
+              strokeWidth={1}
+              dash={[4, 4]}
+            />
+
+            {/* Vertical dashed line from entry to bracket */}
+            {zoneHeight > 0 && (
+              <Line
+                points={[vertLineX, top, vertLineX, bottom]}
+                stroke={color}
+                strokeWidth={1}
+                dash={[4, 4]}
+                opacity={0.6}
               />
-              <Text
-                x={margins.left + 8}
-                y={tpslDragState.currentY - 10}
-                width={40}
-                height={20}
-                text={`${tpslDragState.partialPercent}%`}
-                fontSize={11}
-                fontStyle="bold"
-                fontFamily="sans-serif"
-                fill="#ffffff"
-                align="center"
-                verticalAlign="middle"
-              />
-            </>
-          )}
-        </Group>
-      )}
+            )}
+
+            {/* Y-axis percent labels along vertical line */}
+            {zoneHeight > 30 && [0.25, 0.5, 0.75, 1.0].map(ratio => {
+              const labelYPos = isDraggingUp
+                ? bottom - zoneHeight * ratio + (ratio === 1 ? 8 : 0)
+                : top + zoneHeight * ratio + (ratio === 1 ? -8 : 0);
+              const percentAtLevel = percentDistance * ratio;
+              return (
+                <Text
+                  key={ratio}
+                  x={vertLineX + 6}
+                  y={labelYPos - 5}
+                  text={`${percentAtLevel >= 0 ? '' : '-'}${Math.abs(percentAtLevel).toFixed(1)}%`}
+                  fontSize={10}
+                  fontFamily="sans-serif"
+                  fill={color}
+                  opacity={0.7}
+                />
+              );
+            })}
+
+            {/* Main info label (PnL | Type | Percent) */}
+            {(() => {
+              const parts = [pnlText, typeLabel, percentText].filter(Boolean);
+              const totalWidth = parts.length * 50 + (parts.length - 1) * 1;
+              const boxX = labelX - totalWidth / 2;
+              const boxY = labelY - 10;
+              return (
+                <>
+                  <Rect x={boxX} y={boxY} width={totalWidth} height={20} fill={bgColor} />
+                  <Rect x={boxX} y={boxY} width={totalWidth} height={20} stroke={color} strokeWidth={1} />
+                  {parts.map((part, i) => (
+                    <React.Fragment key={i}>
+                      {i > 0 && (
+                        <Line
+                          points={[boxX + i * 51, boxY + 3, boxX + i * 51, boxY + 17]}
+                          stroke={color}
+                          strokeWidth={1}
+                          opacity={0.4}
+                        />
+                      )}
+                      <Text
+                        x={boxX + i * 51}
+                        y={boxY}
+                        width={50}
+                        height={20}
+                        text={part}
+                        fontSize={11}
+                        fontFamily="sans-serif"
+                        fill={color}
+                        align="center"
+                        verticalAlign="middle"
+                      />
+                    </React.Fragment>
+                  ))}
+                </>
+              );
+            })()}
+
+            {/* Price label at right edge - matches standard PriceLineLayer labels */}
+            <Rect
+              x={width - bound.width}
+              y={tpslDragState.currentY - bound.height / 2}
+              width={bound.width}
+              height={bound.height}
+              stroke={color}
+              strokeWidth={1}
+              cornerRadius={2}
+            />
+            <Text
+              x={width - bound.width}
+              y={tpslDragState.currentY - bound.height / 2}
+              width={bound.width}
+              height={bound.height}
+              text={formatPrice(tpslDragState.currentPrice)}
+              fontSize={11}
+              fontFamily="sans-serif"
+              fill={color}
+              align="center"
+              verticalAlign="middle"
+            />
+          </Group>
+        );
+      })()}
 
       {/* Line all the way across if no chart label */}
       {(!chartLabel || chartLabel.segments.length === 0) && (
@@ -1169,7 +1390,8 @@ export const PriceLineLayer: React.FC<PriceLineLayerProps> = ({
       )}
       {/* Context menu "+" button at crosshair position - left of price axis */}
       {/* Note: We set cursor directly on container, NOT via onCursorChange, to avoid isOverKonvaElementRef */}
-      {crosshair?.visible && onContextMenuButtonClick && (
+      {/* Only show on main pane (hasContextMenuButton controls this) */}
+      {crosshair?.visible && hasContextMenuButton && onContextMenuButtonClick && (
         <Group
           x={width - margins.right - 10}
           y={crosshair.y}

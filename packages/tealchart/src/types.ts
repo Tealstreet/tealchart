@@ -216,6 +216,11 @@ export interface PriceLineLabelBounds {
   positionData?: PositionData;
   /** Current bracket configuration (TP/SL prices if already set) */
   brackets?: BracketConfig | null;
+
+  // === Pane targeting for multi-pane support ===
+
+  /** Target pane ID for this line (default: 'main') */
+  targetPaneId?: string;
 }
 
 /**
