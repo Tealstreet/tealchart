@@ -32,6 +32,13 @@ const CACHE_MAX_SIZE = 50;
 const CACHE_TTL_MS = 100; // Cache valid for 100ms (covers rapid re-renders)
 
 /**
+ * Clear the collision cache - call on component mount or significant state changes
+ */
+export function clearCollisionCache(): void {
+  collisionCache.clear();
+}
+
+/**
  * Generate a cache key from label bounds
  */
 function getCacheKey(labels: LabelBounds[]): string {
