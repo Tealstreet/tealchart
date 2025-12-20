@@ -90,6 +90,9 @@ interface TPSLDragState {
   isLong?: boolean;    // Position direction
 }
 
+// Padding from right edge of canvas for price axis labels and lines
+const PRICE_AXIS_RIGHT_PADDING = 2;
+
 /**
  * Calculate magnet percentage for partial TP/SL
  * Symmetric zones: 100% at center, decreasing as you move left OR right
@@ -108,6 +111,25 @@ function calculatePartialPercent(startX: number, currentX: number): number {
 // Zone offsets from center for visual rendering (55px spacing)
 const ZONE_OFFSETS = [0, 55, 110, 165, 220];
 const ZONE_HALF_WIDTH = 220;
+
+/**
+ * Format a countdown to a target timestamp.
+ * Returns MM:SS or HH:MM:SS for times >= 1 hour.
+ */
+function formatCountdown(targetTimeMs: number): string {
+  const now = Date.now();
+  const remaining = Math.max(0, targetTimeMs - now);
+  const totalSeconds = Math.floor(remaining / 1000);
+  const totalMinutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  if (totalMinutes >= 60) {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+  return `${totalMinutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
 
 /**
  * Render a single price line with its label(s)
@@ -169,7 +191,7 @@ const PriceLineGroup: React.FC<{
   const lineType = bound.type || 'price';
 
   // Price axis label position
-  const priceAxisLabelX = width - bound.width;
+  const priceAxisLabelX = width - bound.width - PRICE_AXIS_RIGHT_PADDING;
   const priceAxisLabelY = labelCenterY - bound.height / 2;
 
   // Chart label dimensions
@@ -368,14 +390,48 @@ const PriceLineGroup: React.FC<{
               strokeWidth={1}
               cornerRadius={2}
             />
-            {bound.label.secondaryText ? (
-              // Two lines of text
-              <>
+            {(() => {
+              // Compute secondary text: either from countdownToTime or from the bound
+              const secondaryText = bound.countdownToTime
+                ? formatCountdown(bound.countdownToTime)
+                : bound.label.secondaryText;
+
+              if (secondaryText) {
+                return (
+                  <>
+                    <Text
+                      x={priceAxisLabelX}
+                      y={priceAxisLabelY + 1}
+                      width={bound.width}
+                      height={bound.height / 2}
+                      text={bound.label.primaryText}
+                      fontSize={11}
+                      fontFamily="sans-serif"
+                      fill={bound.label.textColor || bound.color}
+                      align="center"
+                      verticalAlign="middle"
+                    />
+                    <Text
+                      x={priceAxisLabelX}
+                      y={priceAxisLabelY + bound.height / 2 - 1}
+                      width={bound.width}
+                      height={bound.height / 2}
+                      text={secondaryText}
+                      fontSize={11}
+                      fontFamily="sans-serif"
+                      fill={bound.label.textColor || bound.color}
+                      align="center"
+                      verticalAlign="middle"
+                    />
+                  </>
+                );
+              }
+              return (
                 <Text
                   x={priceAxisLabelX}
-                  y={priceAxisLabelY + 1}
+                  y={priceAxisLabelY}
                   width={bound.width}
-                  height={bound.height / 2}
+                  height={bound.height}
                   text={bound.label.primaryText}
                   fontSize={11}
                   fontFamily="sans-serif"
@@ -383,33 +439,8 @@ const PriceLineGroup: React.FC<{
                   align="center"
                   verticalAlign="middle"
                 />
-                <Text
-                  x={priceAxisLabelX}
-                  y={priceAxisLabelY + bound.height / 2 - 1}
-                  width={bound.width}
-                  height={bound.height / 2}
-                  text={bound.label.secondaryText}
-                  fontSize={11}
-                  fontFamily="sans-serif"
-                  fill={bound.label.textColor || bound.color}
-                  align="center"
-                  verticalAlign="middle"
-                />
-              </>
-            ) : (
-              <Text
-                x={priceAxisLabelX}
-                y={priceAxisLabelY}
-                width={bound.width}
-                height={bound.height}
-                text={bound.label.primaryText}
-                fontSize={11}
-                fontFamily="sans-serif"
-                fill={bound.label.textColor || bound.color}
-                align="center"
-                verticalAlign="middle"
-              />
-            )}
+              );
+            })()}
           </>
         )}
       </Group>
@@ -440,7 +471,7 @@ const PriceLineGroup: React.FC<{
       {/* Line from end of segments to price axis - renders BEHIND TP/SL buttons */}
       {chartLabel && chartLabel.segments.length > 0 && (
         <Line
-          points={[chartLabelX + segmentsWidth + 2, offsetLineY, priceAxisLabelX, offsetLineY]}
+          points={[chartLabelX + segmentsWidth + 2, offsetLineY, priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING, offsetLineY]}
           stroke={bound.color}
           strokeWidth={bound.lineWidth || 1}
           dash={lineDash}
@@ -890,7 +921,7 @@ const PriceLineGroup: React.FC<{
 
             {/* Price label at right edge - matches standard PriceLineLayer labels */}
             <Rect
-              x={width - bound.width}
+              x={width - bound.width - PRICE_AXIS_RIGHT_PADDING}
               y={tpslDragState.currentY - bound.height / 2}
               width={bound.width}
               height={bound.height}
@@ -899,7 +930,7 @@ const PriceLineGroup: React.FC<{
               cornerRadius={2}
             />
             <Text
-              x={width - bound.width}
+              x={width - bound.width - PRICE_AXIS_RIGHT_PADDING}
               y={tpslDragState.currentY - bound.height / 2}
               width={bound.width}
               height={bound.height}
@@ -917,7 +948,7 @@ const PriceLineGroup: React.FC<{
       {/* Line all the way across if no chart label */}
       {(!chartLabel || chartLabel.segments.length === 0) && (
         <Line
-          points={[margins.left, offsetLineY, priceAxisLabelX, offsetLineY]}
+          points={[margins.left, offsetLineY, priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING, offsetLineY]}
           stroke={bound.color}
           strokeWidth={bound.lineWidth || 1}
           dash={lineDash}
@@ -945,13 +976,48 @@ const PriceLineGroup: React.FC<{
         strokeWidth={1}
         cornerRadius={2}
       />
-      {bound.label.secondaryText ? (
-        <>
+      {(() => {
+        // Compute secondary text: either from countdownToTime or from the bound
+        const secondaryText = bound.countdownToTime
+          ? formatCountdown(bound.countdownToTime)
+          : bound.label.secondaryText;
+
+        if (secondaryText) {
+          return (
+            <>
+              <Text
+                x={priceAxisLabelX}
+                y={offsetPriceAxisLabelY + 1}
+                width={bound.width}
+                height={bound.height / 2}
+                text={displayPrice}
+                fontSize={11}
+                fontFamily="sans-serif"
+                fill={bound.label.textColor || '#ffffff'}
+                align="center"
+                verticalAlign="middle"
+              />
+              <Text
+                x={priceAxisLabelX}
+                y={offsetPriceAxisLabelY + bound.height / 2 - 1}
+                width={bound.width}
+                height={bound.height / 2}
+                text={secondaryText}
+                fontSize={11}
+                fontFamily="sans-serif"
+                fill={bound.label.textColor || '#ffffff'}
+                align="center"
+                verticalAlign="middle"
+              />
+            </>
+          );
+        }
+        return (
           <Text
             x={priceAxisLabelX}
-            y={offsetPriceAxisLabelY + 1}
+            y={offsetPriceAxisLabelY}
             width={bound.width}
-            height={bound.height / 2}
+            height={bound.height}
             text={displayPrice}
             fontSize={11}
             fontFamily="sans-serif"
@@ -959,33 +1025,8 @@ const PriceLineGroup: React.FC<{
             align="center"
             verticalAlign="middle"
           />
-          <Text
-            x={priceAxisLabelX}
-            y={offsetPriceAxisLabelY + bound.height / 2 - 1}
-            width={bound.width}
-            height={bound.height / 2}
-            text={bound.label.secondaryText}
-            fontSize={11}
-            fontFamily="sans-serif"
-            fill={bound.label.textColor || '#ffffff'}
-            align="center"
-            verticalAlign="middle"
-          />
-        </>
-      ) : (
-        <Text
-          x={priceAxisLabelX}
-          y={offsetPriceAxisLabelY}
-          width={bound.width}
-          height={bound.height}
-          text={displayPrice}
-          fontSize={11}
-          fontFamily="sans-serif"
-          fill={bound.label.textColor || '#ffffff'}
-          align="center"
-          verticalAlign="middle"
-        />
-      )}
+        );
+      })()}
     </Group>
   );
 };
@@ -1268,6 +1309,21 @@ export const PriceLineLayer: React.FC<PriceLineLayerProps> = ({
   onContextMenuButtonClick,
 }) => {
   const dragStateRef = useRef<DragState | null>(null);
+
+  // Countdown tick - updates every second to refresh countdown labels
+  // Only triggers re-render when there are bounds with countdownToTime
+  const [countdownTick, setCountdownTick] = useState(0);
+  const hasCountdown = labelBounds.some(b => b.countdownToTime !== undefined);
+
+  useEffect(() => {
+    if (!hasCountdown) return;
+
+    const timer = window.setInterval(() => {
+      setCountdownTick(t => t + 1);
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [hasCountdown]);
 
   // Generalized drag tracking for escape cancellation
   const activeDragRef = useRef<ActiveDrag | null>(null);

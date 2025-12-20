@@ -605,6 +605,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
                 label: {
                   ...p.label,
                   primaryText: formatPrice(latestBar.close),
+                  // countdownToTime passed through - PriceLineLayer computes the text
                 },
                 priority: p.priority ?? 100,
               };

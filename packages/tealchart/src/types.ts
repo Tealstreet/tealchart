@@ -97,6 +97,12 @@ export interface PriceLine {
    * Use this for frequently-updating lines like last trade price.
    */
   renderLineOnCanvas?: boolean;
+  /**
+   * If set, the label's secondaryText will be computed as a countdown to this timestamp (ms).
+   * The countdown is computed in the RAF loop, avoiding React re-renders every second.
+   * Format: MM:SS or HH:MM:SS for times >= 1 hour.
+   */
+  countdownToTime?: number;
 
   // === TEALSTREET: Position-specific fields for bracket TP/SL ===
 
@@ -205,6 +211,8 @@ export interface PriceLineLabelBounds {
   priority?: number;
   /** If true, line is drawn on canvas, only label in Konva (for high-speed lines) */
   renderLineOnCanvas?: boolean;
+  /** Countdown target time (ms) - PriceLineLayer computes secondaryText from this */
+  countdownToTime?: number;
 
   // === TEALSTREET: Position-specific fields for bracket TP/SL ===
 

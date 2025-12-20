@@ -517,12 +517,14 @@ export class TealchartRenderer {
     const bounds: PriceLineLabelBounds[] = priceLines.map(line => {
       const originalY = this.priceToY(line.price, viewport, priceHeight);
       const primaryWidth = getCachedTextWidth(ctx, line.label.primaryText, labelFont);
-      const secondaryWidth = line.label.secondaryText ? getCachedTextWidth(ctx, line.label.secondaryText, labelFont) : 0;
+      // Check for secondary text or countdown (countdown renders as secondary text)
+      const hasSecondaryText = line.label.secondaryText || line.countdownToTime;
+      const secondaryWidth = line.label.secondaryText ? getCachedTextWidth(ctx, line.label.secondaryText, labelFont) : (line.countdownToTime ? 40 : 0);
       const width = Math.max(primaryWidth, secondaryWidth) + 12;
       // Height includes text + padding + border + extra margin for collision
       // Must match or exceed actual rendered height to prevent visual overlap
       const baseHeight = line.type === 'price' || !line.type ? 20 : 18;
-      const height = line.label.secondaryText ? baseHeight + 6 : baseHeight;
+      const height = hasSecondaryText ? baseHeight + 6 : baseHeight;
 
       return {
         lineId: line.id,
@@ -543,6 +545,7 @@ export class TealchartRenderer {
         floatingLabel: line.floatingLabel,
         priority: line.priority,
         renderLineOnCanvas: line.renderLineOnCanvas,
+        countdownToTime: line.countdownToTime,
         // Position-specific fields for bracket TP/SL drag
         positionId: line.positionId,
         partialEnabled: line.partialEnabled,
@@ -2428,10 +2431,12 @@ export class TealchartRenderer {
       // Use valueToY with the correct pane
       const originalY = this.valueToY(line.price, targetPane);
       const primaryWidth = getCachedTextWidth(ctx, line.label.primaryText, labelFont);
-      const secondaryWidth = line.label.secondaryText ? getCachedTextWidth(ctx, line.label.secondaryText, labelFont) : 0;
+      // Check for secondary text or countdown (countdown renders as secondary text)
+      const hasSecondaryText = line.label.secondaryText || line.countdownToTime;
+      const secondaryWidth = line.label.secondaryText ? getCachedTextWidth(ctx, line.label.secondaryText, labelFont) : (line.countdownToTime ? 40 : 0);
       const width = Math.max(primaryWidth, secondaryWidth) + 12;
       const baseHeight = line.type === 'price' || !line.type ? 20 : 18;
-      const height = line.label.secondaryText ? baseHeight + 6 : baseHeight;
+      const height = hasSecondaryText ? baseHeight + 6 : baseHeight;
 
       return {
         lineId: line.id,
@@ -2451,6 +2456,7 @@ export class TealchartRenderer {
         floatingLabel: line.floatingLabel,
         priority: line.priority,
         renderLineOnCanvas: line.renderLineOnCanvas,
+        countdownToTime: line.countdownToTime,
         // Position-specific fields for bracket TP/SL drag
         positionId: line.positionId,
         partialEnabled: line.partialEnabled,
@@ -3533,12 +3539,14 @@ export class TealchartRenderer {
     const bounds: PriceLineLabelBounds[] = priceLines.map(line => {
       const originalY = this.valueToY(line.price, pane);
       const primaryWidth = ctx.measureText(line.label.primaryText).width;
-      const secondaryWidth = line.label.secondaryText ? ctx.measureText(line.label.secondaryText).width : 0;
+      // Check for secondary text or countdown (countdown renders as secondary text)
+      const hasSecondaryText = line.label.secondaryText || line.countdownToTime;
+      const secondaryWidth = line.label.secondaryText ? ctx.measureText(line.label.secondaryText).width : (line.countdownToTime ? 40 : 0);
       const width = Math.max(primaryWidth, secondaryWidth) + 12;
       // Height includes text + padding + border + extra margin for collision
       // Must match or exceed actual rendered height to prevent visual overlap
       const baseHeight = line.type === 'price' || !line.type ? 20 : 18;
-      const height = line.label.secondaryText ? baseHeight + 6 : baseHeight;
+      const height = hasSecondaryText ? baseHeight + 6 : baseHeight;
 
       return {
         lineId: line.id,
@@ -3558,6 +3566,7 @@ export class TealchartRenderer {
         floatingLabel: line.floatingLabel,
         priority: line.priority,
         renderLineOnCanvas: line.renderLineOnCanvas,
+        countdownToTime: line.countdownToTime,
       };
     });
 

@@ -407,9 +407,6 @@ const ChartContainerInner: React.FC<ChartContainerProps> = memo(({
   const latestClose = latestBar?.close;
   const latestOpen = latestBar?.open;
 
-  // Countdown state for last trade line (updates every second)
-  const [countdown, setCountdown] = useState<string>('--:--');
-
   // Settings modal state
   const [settingsModalIndicatorId, setSettingsModalIndicatorId] = useState<string | null>(null);
 
@@ -479,43 +476,16 @@ const ChartContainerInner: React.FC<ChartContainerProps> = memo(({
     } as Record<string, string>;
   }, [renderOptions]);
 
-  // Calculate bar close time and update countdown every second
+  // Calculate bar close time for countdown (computed in RAF loop, not React state)
   const intervalMs = useMemo(() => resolutionToMs(interval), [interval]);
-
-  // Track the latest bar time to detect new candles
   const latestBarTime = latestBar?.time;
 
-  useEffect(() => {
-    if (!latestBarTime || intervalMs === 0) {
-      setCountdown('--:--');
-      return;
-    }
-
-    const updateCountdown = () => {
-      const now = Date.now();
-      // Handle bar time in either seconds or milliseconds
-      // If bar.time is less than 1e12, it's likely in seconds
-      const barTimeMs = latestBarTime < 1e12 ? latestBarTime * 1000 : latestBarTime;
-      const barCloseTime = barTimeMs + intervalMs;
-      const remaining = Math.max(0, barCloseTime - now);
-      const totalSeconds = Math.floor(remaining / 1000);
-      const totalMinutes = Math.floor(totalSeconds / 60);
-      const seconds = totalSeconds % 60;
-
-      // Format like TradingView: HH:MM:SS for >= 1 hour, MM:SS for < 1 hour
-      if (totalMinutes >= 60) {
-        const hours = Math.floor(totalMinutes / 60);
-        const minutes = totalMinutes % 60;
-        setCountdown(`${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
-      } else {
-        setCountdown(`${totalMinutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
-      }
-    };
-
-    updateCountdown();
-    const timer = window.setInterval(updateCountdown, 1000);
-
-    return () => window.clearInterval(timer);
+  // Compute bar close time for countdown display
+  const barCloseTime = useMemo(() => {
+    if (!latestBarTime || intervalMs === 0) return undefined;
+    // Handle bar time in either seconds or milliseconds
+    const barTimeMs = latestBarTime < 1e12 ? latestBarTime * 1000 : latestBarTime;
+    return barTimeMs + intervalMs;
   }, [latestBarTime, intervalMs]);
 
   // Generate last trade price line
@@ -548,14 +518,16 @@ const ChartContainerInner: React.FC<ChartContainerProps> = memo(({
       color,
       label: {
         primaryText: priceText,
-        secondaryText: countdown,
+        // secondaryText computed in RAF loop via countdownToTime to avoid re-renders every second
       },
       // Render line on canvas for high-speed sync with candles
       // Label rendered in Konva for collision resolution with order/position labels
       renderLineOnCanvas: true,
+      // Countdown computed in RAF loop from this timestamp, avoiding React re-renders every second
+      countdownToTime: barCloseTime,
     };
   // Use primitive values for reliable dependency tracking
-  }, [latestClose, latestOpen, countdown, pricePrecision, renderOptions?.upColor, renderOptions?.downColor]);
+  }, [latestClose, latestOpen, barCloseTime, pricePrecision, renderOptions?.upColor, renderOptions?.downColor]);
 
   // Combine last trade line with external price lines
   const allPriceLines: PriceLine[] = useMemo(() => {
