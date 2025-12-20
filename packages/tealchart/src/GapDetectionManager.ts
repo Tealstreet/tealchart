@@ -8,7 +8,7 @@
  * - Bar timestamp gaps (gap between consecutive bars)
  */
 
-import type { GapDetectionOptions, GapDetectionEvent, GapDetectionReason } from './types';
+import type { GapDetectionOptions, GapDetectionEvent, GapDetectionReason, GapDetectionErrorState } from './types';
 
 /**
  * Default options for gap detection
@@ -20,6 +20,8 @@ const DEFAULT_OPTIONS: Required<GapDetectionOptions> = {
   minBarTimeoutMs: 30000,
   gapThresholdMultiplier: 1.5,
   enabled: true,
+  maxRetries: 3,
+  baseBackoffMs: 5000,
 };
 
 /**
@@ -52,6 +54,12 @@ export class GapDetectionManager {
   // Recovery lock to prevent multiple simultaneous recoveries
   private _isRecovering = false;
   private _recoveryLockMs = 5000; // Minimum time between recoveries
+
+  // Retry/backoff state
+  private _retryCount = 0;
+  private _backoffUntil = 0;
+  private _lastRecoveryReason: GapDetectionReason | null = null;
+  private _onErrorStateChange?: (errorState: GapDetectionErrorState | null) => void;
 
   // Track if manager is started
   private _isStarted = false;

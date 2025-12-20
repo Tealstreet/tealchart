@@ -1050,6 +1050,10 @@ export interface GapDetectionOptions {
   gapThresholdMultiplier?: number;
   /** Whether gap detection is enabled (default: true) */
   enabled?: boolean;
+  /** Maximum number of recovery retries before giving up (default: 3) */
+  maxRetries?: number;
+  /** Base backoff time in ms, doubles each retry (default: 5000) */
+  baseBackoffMs?: number;
 }
 
 /**
@@ -1066,4 +1070,18 @@ export interface GapDetectionEvent {
     actualBarTime?: number;
     gapMs?: number;
   };
+}
+
+/**
+ * Error state from gap detection when max retries exceeded
+ */
+export interface GapDetectionErrorState {
+  /** Whether there is an active error */
+  hasError: boolean;
+  /** Number of retries attempted */
+  retryCount: number;
+  /** Maximum retries allowed */
+  maxRetries: number;
+  /** The reason that caused the error */
+  reason?: GapDetectionReason;
 }

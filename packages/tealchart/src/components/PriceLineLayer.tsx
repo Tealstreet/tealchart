@@ -391,7 +391,7 @@ const PriceLineGroup: React.FC<{
       {/* Line from left margin to chart label */}
       {chartLabel && chartLabel.segments.length > 0 && bound.extendLeft !== false && (
         <Line
-          points={[margins.left, offsetLineY, chartLabelX - 4, offsetLineY]}
+          points={[margins.left, offsetLineY, chartLabelX - 1, offsetLineY]}
           stroke={bound.color}
           strokeWidth={bound.lineWidth || 1}
           dash={lineDash}
@@ -806,22 +806,14 @@ const ChartLabelGroup: React.FC<{
         };
       };
 
+      // Use separate elements for TP/SL buttons instead of nested Group for better text rendering
+      // The invisible drag handle is separate from the visual button
       elements.push(
-        <Group
-          key={`button-${index}`}
-          x={currentX}
-          y={y}
-          draggable={true}
-          onDragStart={handleDragStart}
-          onDragMove={handleDragMove}
-          onDragEnd={handleDragEnd}
-          dragBoundFunc={dragBoundFunc}
-          onMouseEnter={() => onCursorChange?.('grab')}
-          onMouseLeave={() => onCursorChange?.('default')}
-        >
+        <Group key={`button-${index}`}>
+          {/* Visual button (non-draggable) */}
           <Rect
-            x={0}
-            y={0}
+            x={currentX}
+            y={y}
             width={buttonWidth}
             height={height}
             fill={button.backgroundColor}
@@ -830,8 +822,8 @@ const ChartLabelGroup: React.FC<{
             cornerRadius={cornerRadius}
           />
           <Text
-            x={0}
-            y={0}
+            x={currentX}
+            y={y}
             width={buttonWidth}
             height={height}
             text={button.icon}
@@ -840,8 +832,23 @@ const ChartLabelGroup: React.FC<{
             fontFamily="sans-serif"
             fill={button.iconColor}
             align="center"
-            listening={false}
             verticalAlign="middle"
+            listening={false}
+          />
+          {/* Invisible drag handle on top */}
+          <Rect
+            x={currentX}
+            y={y}
+            width={buttonWidth}
+            height={height}
+            fill="transparent"
+            draggable={true}
+            onDragStart={handleDragStart}
+            onDragMove={handleDragMove}
+            onDragEnd={handleDragEnd}
+            dragBoundFunc={dragBoundFunc}
+            onMouseEnter={() => onCursorChange?.('grab')}
+            onMouseLeave={() => onCursorChange?.('default')}
           />
         </Group>
       );

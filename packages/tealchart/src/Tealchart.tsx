@@ -1344,15 +1344,32 @@ export const Tealchart: React.FC<TealchartProps> = ({
         longPressTimerRef.current = null;
       }, LONG_PRESS_DURATION);
 
-      // If crosshair is NOT locked, prepare for potential pan
+      // Determine drag mode based on where touch started (same as mouse)
+      const dragMode: DragMode = isOverPriceAxis(x) ? 'priceAxisZoom' : 'pan';
+
+      // For price axis zoom, detect which pane we're zooming
+      let draggedPaneId: string | null = null;
+      let dragStartPaneYRange: { yMin: number; yMax: number } | null = null;
+
+      if (dragMode === 'priceAxisZoom') {
+        const paneInfo = getPaneAtY(y);
+        if (paneInfo) {
+          draggedPaneId = paneInfo.paneId;
+          dragStartPaneYRange = { yMin: paneInfo.yMin, yMax: paneInfo.yMax };
+        }
+      }
+
+      // If crosshair is NOT locked, prepare for potential pan or price axis zoom
       // If crosshair IS locked, prepare for potential crosshair drag
       if (!touchCrosshairLockedRef.current) {
-        // Will start pan if user drags
         interactionRef.current = {
           ...interactionRef.current,
           dragStartX: x,
           dragStartY: y,
           dragStartViewport: { ...viewport },
+          dragMode,
+          draggedPaneId,
+          dragStartPaneYRange,
         };
       }
     } else if (touchCount === 2) {
@@ -1363,7 +1380,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
       pinchStartDistanceRef.current = getTouchDistance(activeTouchesRef.current);
       pinchStartViewportRef.current = { ...viewport };
     }
-  }, [viewport, clearLongPressTimer, getTouchDistance, yToPrice, isInDeadZone, isOverPriceAxis, openContextMenu, onContextMenu, isOverKonvaInteractiveElement]);
+  }, [viewport, clearLongPressTimer, getTouchDistance, yToPrice, isInDeadZone, isOverPriceAxis, getPaneAtY, openContextMenu, onContextMenu, isOverKonvaInteractiveElement]);
 
   // Touch move handler - attached to container for unified event handling
   const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
@@ -1414,27 +1431,62 @@ export const Tealchart: React.FC<TealchartProps> = ({
 
           scheduleRender();
         } else {
-          // Crosshair not locked - pan the chart
+          // Crosshair not locked - pan or price axis zoom
           const interaction = interactionRef.current;
           if (interaction.dragStartViewport) {
-            const { chartWidth } = getChartDimensions();
-            const timeRange = interaction.dragStartViewport.endTime - interaction.dragStartViewport.startTime;
-            const pixelsPerMs = chartWidth / timeRange;
-            const timeDelta = -dx / pixelsPerMs;
+            const { chartWidth, chartHeight } = getChartDimensions();
 
-            const newViewport: Viewport = {
-              ...interaction.dragStartViewport,
-              startTime: interaction.dragStartViewport.startTime + timeDelta,
-              endTime: interaction.dragStartViewport.endTime + timeDelta,
-            };
+            if (interaction.dragMode === 'priceAxisZoom' && interaction.dragStartPaneYRange) {
+              // Price axis zoom: drag down = larger range (zoom out), drag up = smaller range (zoom in)
+              const startRange = interaction.dragStartPaneYRange;
+              const yRange = startRange.yMax - startRange.yMin;
+              const dragRatio = dy / chartHeight;
+              const zoomFactor = Math.exp(dragRatio * 2);
+              const newYRange = yRange * zoomFactor;
 
-            setViewport(newViewport);
-            onViewportChange?.(newViewport);
+              // Zoom centered on the middle of the current Y range
+              const yCenter = (startRange.yMax + startRange.yMin) / 2;
+              const newYMin = yCenter - newYRange / 2;
+              const newYMax = yCenter + newYRange / 2;
 
-            // Request more bars if panning left
-            const currentBars = barsRef.current;
-            if (timeDelta > 0 && currentBars.length > 0 && newViewport.startTime < currentBars[0].time) {
-              onRequestMoreBars?.('left');
+              // Check if we're zooming the main pane or an indicator pane
+              if (interaction.draggedPaneId === 'main') {
+                // Main pane: update viewport
+                const newViewport: Viewport = {
+                  ...interaction.dragStartViewport,
+                  priceMin: newYMin,
+                  priceMax: newYMax,
+                };
+                setViewport(newViewport);
+                onViewportChange?.(newViewport);
+              } else if (interaction.draggedPaneId) {
+                // Indicator pane: update pane Y override
+                paneYOverridesRef.current.set(interaction.draggedPaneId, {
+                  yMin: newYMin,
+                  yMax: newYMax,
+                });
+              }
+              scheduleRender();
+            } else {
+              // Pan mode
+              const timeRange = interaction.dragStartViewport.endTime - interaction.dragStartViewport.startTime;
+              const pixelsPerMs = chartWidth / timeRange;
+              const timeDelta = -dx / pixelsPerMs;
+
+              const newViewport: Viewport = {
+                ...interaction.dragStartViewport,
+                startTime: interaction.dragStartViewport.startTime + timeDelta,
+                endTime: interaction.dragStartViewport.endTime + timeDelta,
+              };
+
+              setViewport(newViewport);
+              onViewportChange?.(newViewport);
+
+              // Request more bars if panning left
+              const currentBars = barsRef.current;
+              if (timeDelta > 0 && currentBars.length > 0 && newViewport.startTime < currentBars[0].time) {
+                onRequestMoreBars?.('left');
+              }
             }
           }
         }
@@ -1551,7 +1603,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
       closeContextMenu();
     }
 
-    const rect = canvasRef.current?.getBoundingClientRect();
+    const rect = containerRef.current?.getBoundingClientRect();
     if (!rect || !viewportRef.current) return;
 
     const currentViewport = viewportRef.current;
@@ -1607,18 +1659,20 @@ export const Tealchart: React.FC<TealchartProps> = ({
   };
 
   // Native wheel event listener with passive: false to properly prevent scroll
+  // Attached to container (not canvas) for unified event handling
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (!container) return;
 
     const handleWheel = (e: WheelEvent) => {
       handleWheelRef.current?.(e);
     };
 
-    canvas.addEventListener('wheel', handleWheel, { passive: false });
+    // Use capture: true to catch wheel events before Konva can intercept them
+    container.addEventListener('wheel', handleWheel, { passive: false, capture: true });
 
     return () => {
-      canvas.removeEventListener('wheel', handleWheel);
+      container.removeEventListener('wheel', handleWheel, { capture: true });
     };
   }, []);
 
