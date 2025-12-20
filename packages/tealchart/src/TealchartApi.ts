@@ -412,6 +412,15 @@ export class TealchartApi {
         return this;
       },
 
+      // Font styling (no-op for TradingView API compatibility)
+      // TODO: Implement font customization in tealchart renderer
+      setBodyFont(_font: string) {
+        return this;
+      },
+      setQuantityFont(_font: string) {
+        return this;
+      },
+
       // Quantity styling
       setQuantityBackgroundColor(color: string) {
         data.quantityBackgroundColor = color;
@@ -708,6 +717,15 @@ export class TealchartApi {
       setBodyBorderColor(color: string) {
         data.bodyBorderColor = color;
         notifyChange();
+        return this;
+      },
+
+      // Font styling (no-op for TradingView API compatibility)
+      // TODO: Implement font customization in tealchart renderer
+      setBodyFont(_font: string) {
+        return this;
+      },
+      setQuantityFont(_font: string) {
         return this;
       },
 
