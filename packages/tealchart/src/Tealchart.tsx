@@ -417,8 +417,32 @@ export const Tealchart: React.FC<TealchartProps> = ({
   const TOUCH_TAP_THRESHOLD = 10; // Max movement in px to still count as tap
   const LONG_PRESS_DURATION = 500; // ms
 
-  // Reset button visibility (controlled by hover zone)
+  // Reset button visibility (controlled by hover zone on web, tap on mobile)
   const [showResetButton, setShowResetButton] = useState(false);
+  const resetButtonRef = useRef<HTMLButtonElement>(null);
+  const resetButtonAutoHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const RESET_BUTTON_AUTO_HIDE_DELAY = 3000; // ms
+
+  // Start/reset auto-hide timer for mobile reset button
+  const startResetButtonAutoHideTimer = useCallback(() => {
+    // Clear existing timer
+    if (resetButtonAutoHideTimerRef.current) {
+      clearTimeout(resetButtonAutoHideTimerRef.current);
+    }
+    // Start new timer
+    resetButtonAutoHideTimerRef.current = setTimeout(() => {
+      setShowResetButton(false);
+      resetButtonAutoHideTimerRef.current = null;
+    }, RESET_BUTTON_AUTO_HIDE_DELAY);
+  }, []);
+
+  // Clear auto-hide timer (for cleanup or when hiding button)
+  const clearResetButtonAutoHideTimer = useCallback(() => {
+    if (resetButtonAutoHideTimerRef.current) {
+      clearTimeout(resetButtonAutoHideTimerRef.current);
+      resetButtonAutoHideTimerRef.current = null;
+    }
+  }, []);
 
   // Viewport state
   const [viewport, setViewport] = useState<Viewport>(() =>
@@ -786,7 +810,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
     return { chartWidth, chartHeight };
   }, [width, height, margins]);
 
-  // Check if position is in reset button hover zone (lower center area)
+  // Check if position is in reset button hover zone (lower center area) - for mouse
   const isInResetButtonZone = useCallback((x: number, y: number): boolean => {
     const centerX = width / 2;
     const bottomY = height - margins.bottom - 60; // 60px from bottom of chart area
@@ -795,6 +819,11 @@ export const Tealchart: React.FC<TealchartProps> = ({
     const dy = y - bottomY;
     return Math.sqrt(dx * dx + dy * dy) < zoneRadius;
   }, [width, height, margins.bottom]);
+
+  // Check if position is in mobile reset button toggle zone (bottom 150px of canvas)
+  const isInMobileResetZone = useCallback((y: number): boolean => {
+    return y > height - 150;
+  }, [height]);
 
   // Snap X position to nearest bar interval (for crosshair)
   // Snaps to grid based on bar interval, even in empty space
@@ -834,8 +863,10 @@ export const Tealchart: React.FC<TealchartProps> = ({
       onViewportChange?.(newViewport);
       // Re-lock mobile Y panning (unlocked by price axis drag)
       touchYPanUnlockedRef.current = false;
+      // Reset auto-hide timer on button click (keeps button visible for another 3s)
+      startResetButtonAutoHideTimer();
     }
-  }, [onViewportChange]);
+  }, [onViewportChange, startResetButtonAutoHideTimer]);
 
   // Handle order move from Konva drag
   // Uses TradingView pattern: calls the stateful onMove callback registered on the order line adapter
@@ -1306,6 +1337,12 @@ export const Tealchart: React.FC<TealchartProps> = ({
 
   // Touch start handler - uses native event for passive: false support
   handleTouchStartRef.current = (e: TouchEvent) => {
+    // Check if touch is over the reset button (let button handle it)
+    if (resetButtonRef.current && e.target instanceof Node && resetButtonRef.current.contains(e.target)) {
+      // Don't prevent default - let button handle the touch
+      return;
+    }
+
     // Check if touch is over a Konva interactive element (let Konva handle it)
     const firstTouch = e.touches[0];
     if (firstTouch && isOverKonvaInteractiveElement(firstTouch.clientX, firstTouch.clientY)) {
@@ -1392,6 +1429,11 @@ export const Tealchart: React.FC<TealchartProps> = ({
 
   // Touch move handler - uses native event for passive: false support
   handleTouchMoveRef.current = (e: TouchEvent) => {
+    // Let reset button handle its own touch events
+    if (resetButtonRef.current && e.target instanceof Node && resetButtonRef.current.contains(e.target)) {
+      return;
+    }
+
     e.preventDefault();
 
     const rect = containerRef.current?.getBoundingClientRect();
@@ -1422,6 +1464,8 @@ export const Tealchart: React.FC<TealchartProps> = ({
         isTouchDraggingRef.current = true;
         interactionRef.current.isDragging = true; // Prevent viewport sync from overwriting during drag
         clearLongPressTimer(); // Cancel long press if dragging
+        setShowResetButton(false); // Hide reset button when dragging starts
+        clearResetButtonAutoHideTimer(); // Clear the auto-hide timer too
 
         if (touchCrosshairLockedRef.current) {
           // Crosshair is locked - drag moves crosshair proportionally
@@ -1547,6 +1591,11 @@ export const Tealchart: React.FC<TealchartProps> = ({
 
   // Touch end handler - uses native event for passive: false support
   handleTouchEndRef.current = (e: TouchEvent) => {
+    // Let reset button handle its own touch events
+    if (resetButtonRef.current && e.target instanceof Node && resetButtonRef.current.contains(e.target)) {
+      return;
+    }
+
     e.preventDefault();
 
     // Remove ended touches
@@ -1565,7 +1614,22 @@ export const Tealchart: React.FC<TealchartProps> = ({
         const x = touchStartRef.current.x;
         const y = touchStartRef.current.y;
 
-        // Don't toggle in dead zones
+        // Mobile: tap in bottom 150px toggles reset button visibility
+        if (isInMobileResetZone(y)) {
+          setShowResetButton(prev => {
+            if (!prev) {
+              // Showing button - start auto-hide timer
+              startResetButtonAutoHideTimer();
+              return true;
+            } else {
+              // Hiding button - clear timer
+              clearResetButtonAutoHideTimer();
+              return false;
+            }
+          });
+        }
+
+        // Crosshair toggle (independent of reset button toggle)
         if (!isInDeadZone(x, y) && !isOverPriceAxis(x)) {
           // Toggle crosshair locked state
           if (touchCrosshairLockedRef.current) {
@@ -1880,6 +1944,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
         </Stage>
       )}
       <button
+        ref={resetButtonRef}
         style={resetButtonStyle}
         onClick={resetViewport}
         onMouseEnter={() => setShowResetButton(true)}
