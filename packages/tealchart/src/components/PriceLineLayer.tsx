@@ -162,7 +162,10 @@ const PriceLineGroup: React.FC<{
   // State for TP/SL button dragging (with preview line)
   const [tpslDragState, setTPSLDragState] = useState<TPSLDragState | null>(null);
 
-  const labelCenterY = bound.adjustedY;
+  // Compute label position relative to current line position, preserving collision offset
+  // This handles viewport changes between when adjustedY was computed and when Konva renders
+  const collisionOffset = bound.adjustedY - bound.originalY;
+  const labelCenterY = lineY + collisionOffset;
   const lineType = bound.type || 'price';
 
   // Price axis label position
@@ -550,7 +553,7 @@ const PriceLineGroup: React.FC<{
       {/* SL button drag handle - underneath visual button */}
       {slButton && bound.positionId && (
         <Rect
-          x={chartLabelX + segmentsWidth + tpslGap + (tpButton ? 24 : 0)}
+          x={chartLabelX + segmentsWidth + tpslGap + (tpButton ? 25 : 0)}
           y={lineY - touchTargetHeight / 2}
           width={24}
           height={touchTargetHeight}
@@ -561,7 +564,7 @@ const PriceLineGroup: React.FC<{
             const stage = node.getStage();
             const pointerPos = stage?.getPointerPosition();
             if (!pointerPos) return;
-            const originalX = chartLabelX + segmentsWidth + tpslGap + (tpButton ? 24 : 0);
+            const originalX = chartLabelX + segmentsWidth + tpslGap + (tpButton ? 25 : 0);  // 24px + 1px gap
             const originalY = lineY - touchTargetHeight / 2;
             // Register drag for escape cancellation
             registerDrag({
@@ -580,7 +583,7 @@ const PriceLineGroup: React.FC<{
               currentPrice: yToPrice(pointerPos.y),
               entryPrice: bound.price,  // Position line price is entry price
               entryY: lineY,            // Position line Y coordinate
-              buttonX: chartLabelX + segmentsWidth + tpslGap + (tpButton ? 24 : 0) + 12,
+              buttonX: chartLabelX + segmentsWidth + tpslGap + (tpButton ? 25 : 0) + 12,  // 24px + 1px gap
               partialEnabled: bound.partialEnabled ?? false,
               partialPercent: 100,
               notional: bound.positionData?.notional,
@@ -605,7 +608,7 @@ const PriceLineGroup: React.FC<{
             const stage = node.getStage();
             const pointerPos = stage?.getPointerPosition();
             // Reset to original position (not 0,0)
-            const originalX = chartLabelX + segmentsWidth + tpslGap + (tpButton ? 24 : 0);
+            const originalX = chartLabelX + segmentsWidth + tpslGap + (tpButton ? 25 : 0);  // 24px + 1px gap
             const originalY = lineY - touchTargetHeight / 2;
             node.x(originalX);
             node.y(originalY);
@@ -624,7 +627,7 @@ const PriceLineGroup: React.FC<{
             setTPSLDragState(null);
             onCursorChange?.('default');
           }}
-          dragBoundFunc={(pos) => ({ x: chartLabelX + segmentsWidth + tpslGap + (tpButton ? 24 : 0), y: pos.y })}
+          dragBoundFunc={(pos) => ({ x: chartLabelX + segmentsWidth + tpslGap + (tpButton ? 25 : 0), y: pos.y })}
           onMouseEnter={() => onCursorChange?.('grab')}
           onMouseLeave={() => onCursorChange?.('default')}
         />
@@ -1086,18 +1089,23 @@ const ChartLabelGroup: React.FC<{
   buttons.forEach((button, index) => {
     const isLastItem = index === buttonCount - 1;
     const isTPSL = button.type === 'tp' || button.type === 'sl';
-    // TP/SL buttons are separate boxes with all corners rounded
+    // TP/SL buttons: outer corners rounded, inner flat (connected look with distinct borders)
     // Other buttons share corners in a connected group
     const isFirstTPSL = index === 0 && isTPSL;
-    const cornerRadius = isTPSL
-      ? [2, 2, 2, 2]  // TP/SL: all corners rounded (separate boxes)
-      : isFirstTPSL && isLastItem
-        ? [2, 2, 2, 2]
-        : isFirstTPSL
-          ? [2, 0, 0, 2]
-          : isLastItem
-            ? [0, 2, 2, 0]
-            : [0, 0, 0, 0];
+    let cornerRadius: number[];
+    if (button.type === 'tp') {
+      cornerRadius = [2, 0, 0, 2];  // TP: left corners rounded
+    } else if (button.type === 'sl') {
+      cornerRadius = [0, 2, 2, 0];  // SL: right corners rounded
+    } else if (isFirstTPSL && isLastItem) {
+      cornerRadius = [2, 2, 2, 2];
+    } else if (isFirstTPSL) {
+      cornerRadius = [2, 0, 0, 2];
+    } else if (isLastItem) {
+      cornerRadius = [0, 2, 2, 0];
+    } else {
+      cornerRadius = [0, 0, 0, 0];
+    }
     // TP/SL buttons are wider to fit text
     const buttonWidth = isTPSL ? 24 : 16;
 
@@ -1215,6 +1223,10 @@ const ChartLabelGroup: React.FC<{
       );
     }
     currentX += buttonWidth;
+    // Add 1px gap after TP so TP's right border and SL's left border both show
+    if (button.type === 'tp') {
+      currentX += 1;
+    }
   });
 
   return <Group>{elements}</Group>;
