@@ -130,6 +130,8 @@ const PriceLineGroup: React.FC<{
   onSLDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
   onCursorChange?: (cursor: 'default' | 'pointer' | 'grab' | 'grabbing') => void;
   hasContextMenuButton?: boolean;
+  registerDrag: (drag: { node: Konva.Rect; originalX: number; originalY: number; onCancel?: () => void }) => void;
+  clearDrag: () => void;
 }> = ({
   bound,
   width,
@@ -148,6 +150,8 @@ const PriceLineGroup: React.FC<{
   onSLDragEnd,
   onCursorChange,
   hasContextMenuButton,
+  registerDrag,
+  clearDrag,
 }) => {
   // For crosshair on indicator panes, bound.price is in pane's coordinate system (not main price)
   // Use adjustedY directly for crosshair type since it's already calculated with correct pane range
@@ -155,21 +159,6 @@ const PriceLineGroup: React.FC<{
 
   // State for TP/SL button dragging (with preview line)
   const [tpslDragState, setTPSLDragState] = useState<TPSLDragState | null>(null);
-
-  // Escape key cancels any active TP/SL drag
-  useEffect(() => {
-    if (!tpslDragState) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setTPSLDragState(null);
-        onCursorChange?.('default');
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [tpslDragState, onCursorChange]);
 
   const labelCenterY = bound.adjustedY;
   const lineType = bound.type || 'price';
@@ -238,12 +227,23 @@ const PriceLineGroup: React.FC<{
 
   // Handle drag on the chart label segments (the draggable area)
   const handleDragStart = useCallback((e: Konva.KonvaEventObject<DragEvent>) => {
-    dragStartYRef.current = e.target.y();
+    const node = e.target as Konva.Rect;
+    dragStartYRef.current = node.y();
+    // Register drag for escape cancellation
+    registerDrag({
+      node,
+      originalX: node.x(),
+      originalY: node.y(),
+      onCancel: () => {
+        setDragOffsetY(0);
+        setDragPrice(null);
+      },
+    });
     if (onDragStart) {
       onDragStart(bound.lineId, lineY, bound.price);
     }
     onCursorChange?.('grabbing');
-  }, [bound.lineId, bound.price, lineY, onDragStart, onCursorChange]);
+  }, [bound.lineId, bound.price, lineY, onDragStart, onCursorChange, registerDrag]);
 
   const handleDragMove = useCallback((e: Konva.KonvaEventObject<DragEvent>) => {
     const node = e.target;
@@ -261,6 +261,9 @@ const PriceLineGroup: React.FC<{
     const finalY = lineY + finalDelta;
     const finalPrice = yToPrice(finalY);
 
+    // Clear drag registration
+    clearDrag();
+
     // Trigger callback BEFORE resetting state to set pending state first
     // This prevents snap-back on the render between reset and pending state
     if (onDragEnd && Math.abs(finalDelta) > 0) {
@@ -272,7 +275,7 @@ const PriceLineGroup: React.FC<{
     setDragOffsetY(0);
     setDragPrice(null);
     onCursorChange?.('grab');
-  }, [bound.lineId, lineY, yToPrice, onDragEnd, onCursorChange]);
+  }, [bound.lineId, lineY, yToPrice, onDragEnd, onCursorChange, clearDrag]);
 
   // Constrain drag to vertical only, within chart bounds
   const dragBoundFunc = useCallback((pos: { x: number; y: number }) => {
@@ -466,9 +469,19 @@ const PriceLineGroup: React.FC<{
           fill="transparent"
           draggable={true}
           onDragStart={(e) => {
-            const stage = e.target.getStage();
+            const node = e.target as Konva.Rect;
+            const stage = node.getStage();
             const pointerPos = stage?.getPointerPosition();
             if (!pointerPos) return;
+            const originalX = chartLabelX + segmentsWidth + tpslGap;
+            const originalY = lineY - touchTargetHeight / 2;
+            // Register drag for escape cancellation
+            registerDrag({
+              node,
+              originalX,
+              originalY,
+              onCancel: () => setTPSLDragState(null),
+            });
             setTPSLDragState({
               type: 'tp',
               positionId: bound.lineId,
@@ -508,6 +521,7 @@ const PriceLineGroup: React.FC<{
             const originalY = lineY - touchTargetHeight / 2;
             node.x(originalX);
             node.y(originalY);
+            clearDrag();
             if (pointerPos && tpslDragState) {
               const finalPrice = yToPrice(pointerPos.y);
               const dragDistance = Math.abs(pointerPos.y - tpslDragState.startY);
@@ -536,9 +550,19 @@ const PriceLineGroup: React.FC<{
           fill="transparent"
           draggable={true}
           onDragStart={(e) => {
-            const stage = e.target.getStage();
+            const node = e.target as Konva.Rect;
+            const stage = node.getStage();
             const pointerPos = stage?.getPointerPosition();
             if (!pointerPos) return;
+            const originalX = chartLabelX + segmentsWidth + tpslGap + (tpButton ? 24 : 0);
+            const originalY = lineY - touchTargetHeight / 2;
+            // Register drag for escape cancellation
+            registerDrag({
+              node,
+              originalX,
+              originalY,
+              onCancel: () => setTPSLDragState(null),
+            });
             setTPSLDragState({
               type: 'sl',
               positionId: bound.lineId,
@@ -578,6 +602,7 @@ const PriceLineGroup: React.FC<{
             const originalY = lineY - touchTargetHeight / 2;
             node.x(originalX);
             node.y(originalY);
+            clearDrag();
             if (pointerPos && tpslDragState) {
               const finalPrice = yToPrice(pointerPos.y);
               const dragDistance = Math.abs(pointerPos.y - tpslDragState.startY);
@@ -1182,6 +1207,15 @@ const ChartLabelGroup: React.FC<{
   return <Group>{elements}</Group>;
 };
 
+// Shared type for tracking any active Konva drag
+interface ActiveDrag {
+  node: Konva.Rect;
+  originalX: number;
+  originalY: number;
+  // Callback to clear component-level state when cancelled
+  onCancel?: () => void;
+}
+
 /**
  * Main PriceLineLayer component
  */
@@ -1207,6 +1241,37 @@ export const PriceLineLayer: React.FC<PriceLineLayerProps> = ({
   onContextMenuButtonClick,
 }) => {
   const dragStateRef = useRef<DragState | null>(null);
+
+  // Generalized drag tracking for escape cancellation
+  const activeDragRef = useRef<ActiveDrag | null>(null);
+
+  // Register a drag so it can be cancelled with Escape
+  const registerDrag = useCallback((drag: ActiveDrag) => {
+    activeDragRef.current = drag;
+  }, []);
+
+  // Clear the active drag (called on drag end)
+  const clearDrag = useCallback(() => {
+    activeDragRef.current = null;
+  }, []);
+
+  // Escape key cancels any active drag
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && activeDragRef.current) {
+        const { node, originalX, originalY, onCancel } = activeDragRef.current;
+        node.stopDrag();
+        node.x(originalX);
+        node.y(originalY);
+        onCancel?.();
+        activeDragRef.current = null;
+        onCursorChange?.('default');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onCursorChange]);
 
   const handleDragStart = useCallback((lineId: string, originalY: number, originalPrice: number) => {
     dragStateRef.current = { lineId, originalY, originalPrice };
@@ -1283,6 +1348,8 @@ export const PriceLineLayer: React.FC<PriceLineLayerProps> = ({
         onSLDragEnd={onSLDragEnd}
         onCursorChange={onCursorChange}
         hasContextMenuButton={hasContextMenuButton}
+        registerDrag={registerDrag}
+        clearDrag={clearDrag}
       />
     );
   };
