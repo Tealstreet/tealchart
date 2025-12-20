@@ -1079,96 +1079,11 @@ const ChartLabelGroup: React.FC<{
       }
     };
 
-    // For TP/SL buttons, add drag handling
+    // For TP/SL buttons, render visual only (drag handled by parent's invisible Rect)
     if ((button.type === 'tp' || button.type === 'sl') && positionId) {
-      const buttonType = button.type;
       const btnX = currentX;
 
-      const handleDragStart = (e: Konva.KonvaEventObject<DragEvent>) => {
-        const stage = e.target.getStage();
-        const pointerPos = stage?.getPointerPosition();
-        if (!pointerPos) return;
-
-        setTPSLDragState({
-          type: buttonType,
-          positionId,
-          startY: pointerPos.y,
-          startX: pointerPos.x,
-          currentY: pointerPos.y,
-          currentX: pointerPos.x,
-          currentPrice: yToPrice(pointerPos.y),
-          buttonX: btnX + buttonWidth / 2,
-          partialEnabled: partialEnabled ?? false,
-          partialPercent: 100,
-        });
-        onCursorChange?.('grabbing');
-      };
-
-      const handleDragMove = (e: Konva.KonvaEventObject<DragEvent>) => {
-        const stage = e.target.getStage();
-        const pointerPos = stage?.getPointerPosition();
-        if (!pointerPos) return;
-
-        setTPSLDragState(prev => {
-          if (!prev) return prev;
-          // Calculate partial percent if enabled
-          const newPartialPercent = prev.partialEnabled
-            ? calculatePartialPercent(prev.startX, pointerPos.x)
-            : 100;
-          return {
-            ...prev,
-            currentY: pointerPos.y,
-            currentX: pointerPos.x,
-            currentPrice: yToPrice(pointerPos.y),
-            partialPercent: newPartialPercent,
-          };
-        });
-      };
-
-      const handleDragEnd = (e: Konva.KonvaEventObject<DragEvent>) => {
-        const node = e.target;
-        const stage = node.getStage();
-        const pointerPos = stage?.getPointerPosition();
-
-        // Reset button position (Konva moved it during drag)
-        node.y(0);
-        node.x(0);
-
-        if (pointerPos) {
-          const finalPrice = yToPrice(pointerPos.y);
-          // Check if it was actually dragged (not just a click)
-          const dragDistance = tpslDragState ? Math.abs(pointerPos.y - tpslDragState.startY) : 0;
-          if (dragDistance > 5) {
-            // It was a drag, trigger the move callback with partial percent
-            const finalPartialPercent = tpslDragState?.partialEnabled
-              ? tpslDragState.partialPercent
-              : undefined;
-            if (buttonType === 'tp' && onTPDragEnd) {
-              onTPDragEnd(positionId, finalPrice, finalPartialPercent);
-            } else if (buttonType === 'sl' && onSLDragEnd) {
-              onSLDragEnd(positionId, finalPrice, finalPartialPercent);
-            }
-          } else {
-            // It was a click (minimal drag), trigger click callback
-            handleClick();
-          }
-        }
-
-        setTPSLDragState(null);
-        onCursorChange?.('default');
-      };
-
-      // Constrain drag to vertical only - keep X fixed at button position
-      const dragBoundFunc = (pos: { x: number; y: number }) => {
-        // Keep X fixed at original button position, allow Y to move freely
-        // (Y is constrained by chart margins in the visual feedback, not the button itself)
-        return {
-          x: btnX,
-          y: pos.y,
-        };
-      };
-
-      // TP/SL button: visual rect + text label, drag handled by parent component
+      // TP/SL button: visual rect + text label, drag handled by parent component's invisible Rect
       elements.push(
         <Rect
           key={`button-bg-${index}`}
