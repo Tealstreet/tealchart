@@ -2,7 +2,7 @@
  * IndicatorsModal - Modal for selecting and adding indicators to the chart
  */
 
-import React, { memo, useCallback, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   BUILTIN_INDICATORS,
   INDICATOR_CATEGORIES,
@@ -46,6 +46,13 @@ export const IndicatorsModal: React.FC<IndicatorsModalProps> = memo(
     const t = useChartTranslations();
     const [searchQuery, setSearchQuery] = useState('');
     const [hoveredId, setHoveredId] = useState<string | null>(null);
+
+    // Clear search when modal closes
+    useEffect(() => {
+      if (!isOpen) {
+        setSearchQuery('');
+      }
+    }, [isOpen]);
 
     // Filter indicators based on search
     const filteredIndicators = useMemo(() => {

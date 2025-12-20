@@ -260,10 +260,12 @@ export const LayoutSelector: React.FC<LayoutSelectorProps> = memo(({
     loadPersistedLayout();
   }, [currentLayout.layoutId, currentLayout.layoutName, saveLoadAdapter, onLoadLayout, setCurrentLayout]);
 
-  // Fetch layouts when dropdown opens
+  // Fetch layouts when dropdown opens, clear search when it closes
   useEffect(() => {
     if (isOpen) {
       fetchLayouts();
+    } else {
+      setSearchQuery('');
     }
   }, [isOpen]);
 
