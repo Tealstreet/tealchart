@@ -3,6 +3,22 @@
  * No React, no state - just rendering functions
  */
 
+// Cache NumberFormat instances by decimals to avoid recreating on every frame
+// toLocaleString with inline options is slow - using cached formatters is ~10x faster
+const numberFormatCache = new Map<number, Intl.NumberFormat>();
+function getCachedNumberFormatter(decimals: number): Intl.NumberFormat {
+  let formatter = numberFormatCache.get(decimals);
+  if (!formatter) {
+    formatter = new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+      useGrouping: true,
+    });
+    numberFormatCache.set(decimals, formatter);
+  }
+  return formatter;
+}
+
 import {
   Bar,
   Viewport,
@@ -2379,7 +2395,7 @@ export class TealchartRenderer {
           const ratio = (crosshairY - pane.top) / pane.height;
           const value = pane.yMax - ratio * (pane.yMax - pane.yMin);
 
-          // Format label based on pane type
+          // Format label based on pane type (using cached formatters for perf)
           let labelText: string;
           const range = pane.yMax - pane.yMin;
           if (pane.type === 'main') {
@@ -2389,18 +2405,12 @@ export class TealchartRenderer {
             } else {
               decimals = range >= 10 ? 0 : range >= 1 ? 1 : range >= 0.01 ? 2 : 3;
             }
-            labelText = value.toLocaleString('en-US', {
-              minimumFractionDigits: decimals,
-              maximumFractionDigits: decimals,
-            });
+            labelText = getCachedNumberFormatter(decimals).format(value);
           } else {
             const indicatorDecimals = Math.abs(value) >= 1000 ? 0 :
               Math.abs(value) >= 100 ? 1 :
               Math.abs(value) >= 1 ? 2 : 4;
-            labelText = value.toLocaleString('en-US', {
-              minimumFractionDigits: indicatorDecimals,
-              maximumFractionDigits: indicatorDecimals,
-            });
+            labelText = getCachedNumberFormatter(indicatorDecimals).format(value);
           }
 
           allPriceLines.push({
@@ -2896,19 +2906,13 @@ export class TealchartRenderer {
             } else {
               decimals = range >= 10 ? 0 : range >= 1 ? 1 : range >= 0.01 ? 2 : 3;
             }
-            labelText = value.toLocaleString('en-US', {
-              minimumFractionDigits: decimals,
-              maximumFractionDigits: decimals,
-            });
+            labelText = getCachedNumberFormatter(decimals).format(value);
           } else {
             // Indicator value formatting
             const indicatorDecimals = Math.abs(value) >= 1000 ? 0 :
               Math.abs(value) >= 100 ? 1 :
               Math.abs(value) >= 1 ? 2 : 4;
-            labelText = value.toLocaleString('en-US', {
-              minimumFractionDigits: indicatorDecimals,
-              maximumFractionDigits: indicatorDecimals,
-            });
+            labelText = getCachedNumberFormatter(indicatorDecimals).format(value);
           }
 
           allPriceLines.push({
