@@ -1085,17 +1085,21 @@ const ChartLabelGroup: React.FC<{
 
   buttons.forEach((button, index) => {
     const isLastItem = index === buttonCount - 1;
-    // TP/SL buttons group has rounded corners on first button
-    const isFirstTPSL = index === 0 && (button.type === 'tp' || button.type === 'sl');
-    const cornerRadius = isFirstTPSL && isLastItem
-      ? [2, 2, 2, 2]
-      : isFirstTPSL
-        ? [2, 0, 0, 2]
-        : isLastItem
-          ? [0, 2, 2, 0]
-          : [0, 0, 0, 0];
+    const isTPSL = button.type === 'tp' || button.type === 'sl';
+    // TP/SL buttons are separate boxes with all corners rounded
+    // Other buttons share corners in a connected group
+    const isFirstTPSL = index === 0 && isTPSL;
+    const cornerRadius = isTPSL
+      ? [2, 2, 2, 2]  // TP/SL: all corners rounded (separate boxes)
+      : isFirstTPSL && isLastItem
+        ? [2, 2, 2, 2]
+        : isFirstTPSL
+          ? [2, 0, 0, 2]
+          : isLastItem
+            ? [0, 2, 2, 0]
+            : [0, 0, 0, 0];
     // TP/SL buttons are wider to fit text
-    const buttonWidth = (button.type === 'tp' || button.type === 'sl') ? 24 : 16;
+    const buttonWidth = isTPSL ? 24 : 16;
 
     // Store X position for TP/SL buttons
     if (button.type === 'tp' || button.type === 'sl') {
@@ -1143,7 +1147,7 @@ const ChartLabelGroup: React.FC<{
           fontSize={10}
           fontFamily="sans-serif"
           fontStyle="bold"
-          fill="#ffffff"
+          fill={button.iconColor}
           align="center"
           verticalAlign="middle"
           listening={false}

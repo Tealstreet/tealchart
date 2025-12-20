@@ -144,17 +144,17 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
       ...(position.brackets !== null ? [{
         type: 'tp' as const,
         icon: 'TP',
-        backgroundColor: '#22c55e', // Green
-        iconColor: '#FFFFFF',
-        borderColor: '#22c55e',
+        backgroundColor: position.bodyBackgroundColor, // Match position label
+        iconColor: '#22c55e', // Green text
+        borderColor: '#22c55e', // Green border
         tooltip: 'Drag to set Take Profit',
       }] : []),
       ...(position.brackets !== null ? [{
         type: 'sl' as const,
         icon: 'SL',
-        backgroundColor: '#f97316', // Orange
-        iconColor: '#FFFFFF',
-        borderColor: '#f97316',
+        backgroundColor: position.bodyBackgroundColor, // Match position label
+        iconColor: '#f97316', // Orange text
+        borderColor: '#f97316', // Orange border
         tooltip: 'Drag to set Stop Loss',
       }] : []),
       // Only show reverse button if onReverse callback was provided
