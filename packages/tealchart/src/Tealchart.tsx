@@ -200,6 +200,61 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
     brackets: position.brackets,
   };
 }
+
+/**
+ * Generate bracket lines (TP/SL) for a position with active brackets
+ */
+function positionToBracketLines(position: PositionLineRenderData, formatPrice: (price: number) => string): PriceLine[] {
+  const bracketLines: PriceLine[] = [];
+  const brackets = position.brackets;
+
+  if (!brackets) return bracketLines;
+
+  // Take Profit bracket line
+  if (brackets.takeProfit !== undefined && brackets.takeProfit > 0) {
+    bracketLines.push({
+      id: `${position.id}-tp`,
+      price: brackets.takeProfit,
+      lineStyle: 'dashed',
+      color: '#22c55e',  // Green for TP
+      type: 'price',
+      lineLength: 100,
+      extendLeft: true,
+      lineWidth: 1,
+      priority: 70, // Slightly lower than position line
+      label: {
+        primaryText: formatPrice(brackets.takeProfit),
+        secondaryText: 'TP',
+        backgroundColor: '#22c55e',
+        textColor: '#ffffff',
+      },
+    });
+  }
+
+  // Stop Loss bracket line
+  if (brackets.stopLoss !== undefined && brackets.stopLoss > 0) {
+    bracketLines.push({
+      id: `${position.id}-sl`,
+      price: brackets.stopLoss,
+      lineStyle: 'dashed',
+      color: '#f97316',  // Orange for SL
+      type: 'price',
+      lineLength: 100,
+      extendLeft: true,
+      lineWidth: 1,
+      priority: 70, // Slightly lower than position line
+      label: {
+        primaryText: formatPrice(brackets.stopLoss),
+        secondaryText: 'SL',
+        backgroundColor: '#f97316',
+        textColor: '#ffffff',
+      },
+    });
+  }
+
+  return bracketLines;
+}
+
 import type { PlotOutput } from '@tealstreet/tealscript';
 import type { IndicatorPaneInfo } from './components/ChartContainer';
 
@@ -311,7 +366,9 @@ export const Tealchart: React.FC<TealchartProps> = ({
   onMouseUp,
   onCrossHairMoved,
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const stageRef = useRef<any>(null); // Konva Stage ref for hit detection
 
   // Access chart API for order/position callbacks (TradingView pattern)
   const chartApi = useChartApiOptional();
@@ -538,6 +595,8 @@ export const Tealchart: React.FC<TealchartProps> = ({
             return orderLineToPriceLine(o, formatPrice);
           }) || []),
           ...(positionLinesRef.current?.map(p => positionLineToPriceLine(p, formatPrice)) || []),
+          // Add bracket lines (TP/SL) for positions with active brackets
+          ...(positionLinesRef.current?.flatMap(p => positionToBracketLines(p, formatPrice)) || []),
         ];
 
         // Filter out order/position lines for canvas - Konva handles these interactively
@@ -1089,12 +1148,44 @@ export const Tealchart: React.FC<TealchartProps> = ({
     window.removeEventListener('mouseup', handleWindowMouseUp);
   }, [onViewportChange, onMouseUp, handleWindowMouseMove, scheduleRender]);
 
-  // Mouse handlers for pan/zoom
-  const handleMouseDown = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+  // Check if a point is over a Konva interactive element (for hit detection)
+  const isOverKonvaInteractiveElement = useCallback((clientX: number, clientY: number): boolean => {
+    if (!stageRef.current) return false;
+
+    const stage = stageRef.current;
+    const stageContainer = stage.container?.();
+    if (!stageContainer) return false;
+
+    // Get position relative to Konva stage
+    const stageRect = stageContainer.getBoundingClientRect();
+    const stageX = clientX - stageRect.left;
+    const stageY = clientY - stageRect.top;
+
+    // Check if within stage bounds
+    if (stageX < 0 || stageY < 0 || stageX > stage.width() || stageY > stage.height()) {
+      return false;
+    }
+
+    // Use Konva's hit detection
+    const shape = stage.getIntersection({ x: stageX, y: stageY });
+    if (!shape) return false;
+
+    // Check if it's an interactive shape (not stage or layer)
+    const shapeType = shape.getClassName?.();
+    return shapeType !== 'Stage' && shapeType !== 'Layer';
+  }, []);
+
+  // Mouse handlers for pan/zoom - attached to container for unified event handling
+  const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    // Skip if over a Konva interactive element (let Konva handle it)
+    if (isOverKonvaInteractiveElement(e.clientX, e.clientY)) {
+      return;
+    }
+
     // Emit mouse down event for hotkey integration
     onMouseDown?.();
 
-    const rect = canvasRef.current?.getBoundingClientRect();
+    const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
 
     const x = e.clientX - rect.left;
@@ -1132,11 +1223,11 @@ export const Tealchart: React.FC<TealchartProps> = ({
     // Attach window listeners for drag continuation off canvas
     window.addEventListener('mousemove', handleWindowMouseMove);
     window.addEventListener('mouseup', handleWindowMouseUp);
-  }, [viewport, isOverPriceAxis, getPaneAtY, handleWindowMouseMove, handleWindowMouseUp, onMouseDown]);
+  }, [viewport, isOverPriceAxis, getPaneAtY, handleWindowMouseMove, handleWindowMouseUp, onMouseDown, isOverKonvaInteractiveElement]);
 
-  // Canvas mouse move - handles crosshair and cursor updates (drag handled by window listener)
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
-    const rect = canvasRef.current?.getBoundingClientRect();
+  // Container mouse move - handles crosshair and cursor updates (drag handled by window listener)
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
 
     const x = e.clientX - rect.left;
@@ -1174,12 +1265,14 @@ export const Tealchart: React.FC<TealchartProps> = ({
     }
   }, [isOverPriceAxis, isInDeadZone, isInResetButtonZone, showResetButton, scheduleRender, snapToBarCenter, height, margins, renderOptions]);
 
-  const handleMouseLeave = useCallback(() => {
+  const handleMouseLeave = useCallback((_e: React.MouseEvent<HTMLDivElement>) => {
     // Only reset if not dragging (dragging continues via window listeners)
     if (!interactionRef.current.isDragging) {
       interactionRef.current.isOverPriceAxis = false;
       // Hide crosshair and reset button
       crosshairRef.current.visible = false;
+      // Also reset touch crosshair lock when leaving
+      touchCrosshairLockedRef.current = false;
       setShowResetButton(false);
       scheduleRender();
       setCursor('crosshair');
@@ -1203,11 +1296,18 @@ export const Tealchart: React.FC<TealchartProps> = ({
     }
   }, []);
 
-  // Touch start handler
-  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
+  // Touch start handler - attached to container for unified event handling
+  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    // Check if touch is over a Konva interactive element (let Konva handle it)
+    const firstTouch = e.touches[0];
+    if (firstTouch && isOverKonvaInteractiveElement(firstTouch.clientX, firstTouch.clientY)) {
+      // Don't prevent default - let Konva handle the touch
+      return;
+    }
+
     e.preventDefault(); // Prevent browser gestures
 
-    const rect = canvasRef.current?.getBoundingClientRect();
+    const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
 
     // Track all active touches
@@ -1263,13 +1363,13 @@ export const Tealchart: React.FC<TealchartProps> = ({
       pinchStartDistanceRef.current = getTouchDistance(activeTouchesRef.current);
       pinchStartViewportRef.current = { ...viewport };
     }
-  }, [viewport, clearLongPressTimer, getTouchDistance, yToPrice, isInDeadZone, isOverPriceAxis, openContextMenu, onContextMenu]);
+  }, [viewport, clearLongPressTimer, getTouchDistance, yToPrice, isInDeadZone, isOverPriceAxis, openContextMenu, onContextMenu, isOverKonvaInteractiveElement]);
 
-  // Touch move handler
-  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
+  // Touch move handler - attached to container for unified event handling
+  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
     e.preventDefault();
 
-    const rect = canvasRef.current?.getBoundingClientRect();
+    const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
 
     // Update all active touch positions
@@ -1372,8 +1472,8 @@ export const Tealchart: React.FC<TealchartProps> = ({
     }
   }, [clearLongPressTimer, getTouchDistance, snapToBarCenter, width, height, margins, getChartDimensions, scheduleRender, onViewportChange, onRequestMoreBars]);
 
-  // Touch end handler
-  const handleTouchEnd = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
+  // Touch end handler - attached to container for unified event handling
+  const handleTouchEnd = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
     e.preventDefault();
 
     // Remove ended touches
@@ -1389,28 +1489,25 @@ export const Tealchart: React.FC<TealchartProps> = ({
 
       // It's a tap if we didn't drag and it was quick
       if (elapsed < 300) {
-        const rect = canvasRef.current?.getBoundingClientRect();
-        if (rect) {
-          const x = touchStartRef.current.x;
-          const y = touchStartRef.current.y;
+        const x = touchStartRef.current.x;
+        const y = touchStartRef.current.y;
 
-          // Don't toggle in dead zones
-          if (!isInDeadZone(x, y) && !isOverPriceAxis(x)) {
-            // Toggle crosshair locked state
-            if (touchCrosshairLockedRef.current) {
-              // Hide crosshair
-              touchCrosshairLockedRef.current = false;
-              crosshairRef.current.visible = false;
-            } else {
-              // Show and lock crosshair at tap position
-              touchCrosshairLockedRef.current = true;
-              touchCrosshairPositionRef.current = { x, y };
-              crosshairRef.current.x = snapToBarCenter(x);
-              crosshairRef.current.y = y;
-              crosshairRef.current.visible = true;
-            }
-            scheduleRender();
+        // Don't toggle in dead zones
+        if (!isInDeadZone(x, y) && !isOverPriceAxis(x)) {
+          // Toggle crosshair locked state
+          if (touchCrosshairLockedRef.current) {
+            // Hide crosshair
+            touchCrosshairLockedRef.current = false;
+            crosshairRef.current.visible = false;
+          } else {
+            // Show and lock crosshair at tap position
+            touchCrosshairLockedRef.current = true;
+            touchCrosshairPositionRef.current = { x, y };
+            crosshairRef.current.x = snapToBarCenter(x);
+            crosshairRef.current.y = y;
+            crosshairRef.current.visible = true;
           }
+          scheduleRender();
         }
       }
     }
@@ -1424,12 +1521,12 @@ export const Tealchart: React.FC<TealchartProps> = ({
     }
   }, [clearLongPressTimer, isInDeadZone, isOverPriceAxis, snapToBarCenter, scheduleRender]);
 
-  // Handle right-click context menu
-  const handleContextMenu = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+  // Handle right-click context menu - attached to container for unified event handling
+  const handleContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (!onContextMenu) return;
 
-    const rect = canvasRef.current?.getBoundingClientRect();
+    const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
 
     const x = e.clientX - rect.left;
@@ -1610,195 +1707,36 @@ export const Tealchart: React.FC<TealchartProps> = ({
   const hasKonvaElements = konvaLabelBounds.length > 0;
 
   return (
-    <div style={{ position: 'relative', width, height, cursor, touchAction: 'none' }}>
+    <div
+      ref={containerRef}
+      style={{ position: 'relative', width, height, cursor, touchAction: 'none' }}
+      // Use capture phase handlers to catch events before Konva's canvas intercepts them
+      onMouseDownCapture={handleMouseDown}
+      onMouseMoveCapture={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onContextMenuCapture={handleContextMenu}
+      onTouchStartCapture={handleTouchStart}
+      onTouchMoveCapture={handleTouchMove}
+      onTouchEndCapture={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
+    >
       <canvas
         ref={canvasRef}
         style={{
           display: 'block',
         }}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        onContextMenu={handleContextMenu}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onTouchCancel={handleTouchEnd}
       />
       {/* Konva overlay for interactive price lines (order/position drag + cancel buttons) */}
+      {/* Container handles most events; Konva only handles interactive element drag/click */}
       {hasKonvaElements && (
         <Stage
+          ref={stageRef}
           width={width}
           height={mainPaneBounds.height}
           style={{
             position: 'absolute',
             top: mainPaneBounds.top,
             left: 0,
-            touchAction: 'none', // Prevent browser touch scrolling
-          }}
-          onMouseDown={(e) => {
-            // Forward non-interactive clicks to the underlying canvas
-            const stage = e.target.getStage();
-            const clickedOnStage = e.target === stage;
-            const clickedOnLayer = e.target.getType?.() === 'Layer';
-            if (clickedOnStage || clickedOnLayer) {
-              // Click on empty area - forward to canvas (handleMouseDown will call onMouseDown)
-              const canvas = canvasRef.current;
-              if (canvas) {
-                const nativeEvent = e.evt;
-                const syntheticEvent = new MouseEvent('mousedown', {
-                  clientX: nativeEvent.clientX,
-                  clientY: nativeEvent.clientY,
-                  button: nativeEvent.button,
-                  bubbles: true,
-                });
-                canvas.dispatchEvent(syntheticEvent);
-              }
-            } else {
-              // Click on Konva element (order/position label) - emit directly
-              // since the event won't be forwarded to canvas
-              onMouseDown?.();
-            }
-          }}
-          onMouseMove={(e) => {
-            // Forward to canvas for crosshair position updates
-            const canvas = canvasRef.current;
-            if (canvas) {
-              const nativeEvent = e.evt;
-              const syntheticEvent = new MouseEvent('mousemove', {
-                clientX: nativeEvent.clientX,
-                clientY: nativeEvent.clientY,
-                bubbles: true,
-              });
-              canvas.dispatchEvent(syntheticEvent);
-            }
-          }}
-          onMouseLeave={() => {
-            // Hide crosshair when leaving Konva stage area
-            if (!interactionRef.current.isDragging) {
-              crosshairRef.current.visible = false;
-              isOverKonvaElementRef.current = false; // Reset to prevent stuck state
-              scheduleRender();
-            }
-          }}
-          onMouseUp={(e) => {
-            // Check if click was on a Konva element vs empty area
-            const stage = e.target.getStage();
-            const clickedOnStage = e.target === stage;
-            const clickedOnLayer = e.target.getType?.() === 'Layer';
-
-            if (clickedOnStage || clickedOnLayer) {
-              // Click on empty area - forward to canvas (handleWindowMouseUp will call onMouseUp)
-              const canvas = canvasRef.current;
-              if (canvas) {
-                const nativeEvent = e.evt;
-                const syntheticEvent = new MouseEvent('mouseup', {
-                  clientX: nativeEvent.clientX,
-                  clientY: nativeEvent.clientY,
-                  button: nativeEvent.button,
-                  bubbles: true,
-                });
-                canvas.dispatchEvent(syntheticEvent);
-              }
-            } else {
-              // Click on Konva element - emit directly since window listener wasn't attached
-              onMouseUp?.();
-            }
-          }}
-          onWheel={(e) => {
-            // Prevent scroll from propagating to parent page
-            e.evt.preventDefault();
-            e.evt.stopPropagation();
-
-            // Forward wheel events for zoom
-            const canvas = canvasRef.current;
-            if (canvas) {
-              const nativeEvent = e.evt;
-              const syntheticEvent = new WheelEvent('wheel', {
-                clientX: nativeEvent.clientX,
-                clientY: nativeEvent.clientY,
-                deltaX: nativeEvent.deltaX,
-                deltaY: nativeEvent.deltaY,
-                deltaMode: nativeEvent.deltaMode,
-                bubbles: true,
-              });
-              canvas.dispatchEvent(syntheticEvent);
-            }
-          }}
-          onContextMenu={(e) => {
-            // Prevent native context menu and show our custom one
-            e.evt.preventDefault();
-            if (!onContextMenu) return;
-
-            const nativeEvent = e.evt;
-            const rect = canvasRef.current?.getBoundingClientRect();
-            if (!rect) return;
-
-            const x = nativeEvent.clientX - rect.left;
-            const y = nativeEvent.clientY - rect.top;
-
-            // Get price from Y coordinate
-            const price = yToPrice(y);
-            openContextMenu(price, nativeEvent.clientX, nativeEvent.clientY);
-          }}
-          onTouchStart={(e) => {
-            // Forward touches on empty areas to the canvas
-            const stage = e.target.getStage();
-            const touchedOnStage = e.target === stage;
-            const touchedOnLayer = e.target.getType?.() === 'Layer';
-            if (touchedOnStage || touchedOnLayer) {
-              const canvas = canvasRef.current;
-              if (canvas) {
-                const nativeEvent = e.evt;
-                // Create a synthetic TouchEvent for the canvas
-                const touch = nativeEvent.touches[0];
-                if (touch) {
-                  const syntheticEvent = new TouchEvent('touchstart', {
-                    touches: Array.from(nativeEvent.touches),
-                    targetTouches: Array.from(nativeEvent.targetTouches),
-                    changedTouches: Array.from(nativeEvent.changedTouches),
-                    bubbles: true,
-                    cancelable: true,
-                  });
-                  canvas.dispatchEvent(syntheticEvent);
-                }
-              }
-            }
-          }}
-          onTouchMove={(e) => {
-            // Forward touch moves to canvas for panning/crosshair
-            const canvas = canvasRef.current;
-            if (canvas) {
-              const nativeEvent = e.evt;
-              const syntheticEvent = new TouchEvent('touchmove', {
-                touches: Array.from(nativeEvent.touches),
-                targetTouches: Array.from(nativeEvent.targetTouches),
-                changedTouches: Array.from(nativeEvent.changedTouches),
-                bubbles: true,
-                cancelable: true,
-              });
-              canvas.dispatchEvent(syntheticEvent);
-            }
-          }}
-          onTouchEnd={(e) => {
-            // Forward touch end to canvas
-            const stage = e.target.getStage();
-            const touchedOnStage = e.target === stage;
-            const touchedOnLayer = e.target.getType?.() === 'Layer';
-            if (touchedOnStage || touchedOnLayer) {
-              const canvas = canvasRef.current;
-              if (canvas) {
-                const nativeEvent = e.evt;
-                const syntheticEvent = new TouchEvent('touchend', {
-                  touches: Array.from(nativeEvent.touches),
-                  targetTouches: Array.from(nativeEvent.targetTouches),
-                  changedTouches: Array.from(nativeEvent.changedTouches),
-                  bubbles: true,
-                  cancelable: true,
-                });
-                canvas.dispatchEvent(syntheticEvent);
-              }
-            }
           }}
         >
           <Layer>

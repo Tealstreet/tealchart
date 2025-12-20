@@ -106,12 +106,19 @@ export class TealchartWidget {
   // Gap detection for automatic bar recovery
   private _gapDetectionManager: GapDetectionManager | null = null;
 
+  // Track if interval was explicitly provided (for controlled vs uncontrolled behavior)
+  private _intervalWasProvided: boolean;
+
   constructor(container: HTMLElement, options: TealchartWidgetOptions) {
     this._container = container;
     this._options = options;
     this._datafeed = options.datafeed;
     this._symbol = options.symbol;
-    this._interval = options.interval;
+
+    // Track if interval was explicitly provided (for controlled vs uncontrolled behavior)
+    this._intervalWasProvided = options.interval !== undefined && options.interval !== '';
+    // Default to '1h' if no interval provided
+    this._interval = (options.interval || '1h') as ResolutionString;
 
     // Generate chart key for per-chart state persistence
     // Use provided chartKey, or derive from account/panelId, or generate unique ID
@@ -119,6 +126,9 @@ export class TealchartWidget {
 
     // Initialize Jotai focus atoms for this chart
     this._focusAtoms = createChartFocusAtoms(this._chartKey);
+
+    // Sync interval to Jotai atom so ChartTopBar shows correct selection
+    this._jotaiStore.set(this._focusAtoms.intervalAtom, this._interval);
 
     // Initialize pane manager for multi-pane indicator support
     this._paneManager = new PaneManager();
@@ -496,6 +506,12 @@ export class TealchartWidget {
   private _setReady(): void {
     if (this._isReady) return;
     this._isReady = true;
+
+    // Emit initial interval to external listeners if not controlled
+    // This allows the parent (useWidgetStateManagement) to sync its state
+    if (!this._intervalWasProvided) {
+      this._chartApi.emitCurrentInterval();
+    }
 
     // Restore persisted indicators
     this._restorePersistedIndicators();

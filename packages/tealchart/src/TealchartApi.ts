@@ -175,6 +175,14 @@ export class TealchartApi {
     };
   }
 
+  /**
+   * @internal Emit current interval to subscribers (used for initialization)
+   * This allows the parent to sync its state without triggering a data reload
+   */
+  emitCurrentInterval(): void {
+    this._intervalChangedSubscription.emit(this._interval);
+  }
+
   // ============================================================================
   // Data Management
   // ============================================================================

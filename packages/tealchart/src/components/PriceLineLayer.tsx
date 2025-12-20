@@ -72,6 +72,40 @@ interface DragState {
   originalPrice: number;
 }
 
+// State for tracking TP/SL button dragging
+interface TPSLDragState {
+  type: 'tp' | 'sl';
+  positionId: string;
+  startY: number;
+  startX: number;
+  currentY: number;
+  currentX: number;
+  currentPrice: number;
+  buttonX: number;  // X position of the button for preview line
+  partialEnabled: boolean;
+  partialPercent: number;  // 100%, 75%, 50%, 25%, or 10%
+}
+
+// Magnet zones for partial percentages (user drags right to reduce %)
+const PARTIAL_MAGNET_ZONES = [100, 75, 50, 25, 10];
+const PARTIAL_DRAG_THRESHOLD = 30; // pixels per zone
+
+/**
+ * Calculate partial percentage from horizontal drag distance
+ * Dragging right reduces the percentage through magnet zones
+ */
+function calculatePartialPercent(startX: number, currentX: number): number {
+  const deltaX = currentX - startX;
+  if (deltaX <= 0) return 100; // No drag or drag left = 100%
+
+  // Calculate zone index based on drag distance
+  const zoneIndex = Math.min(
+    Math.floor(deltaX / PARTIAL_DRAG_THRESHOLD),
+    PARTIAL_MAGNET_ZONES.length - 1
+  );
+  return PARTIAL_MAGNET_ZONES[zoneIndex];
+}
+
 /**
  * Render a single price line with its label(s)
  */
@@ -89,6 +123,8 @@ const PriceLineGroup: React.FC<{
   onButtonClick?: (lineId: string, buttonType: 'cancel' | 'close' | 'reverse') => void;
   onTPButtonClick?: (positionId: string) => void;
   onSLButtonClick?: (positionId: string) => void;
+  onTPDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
+  onSLDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
   onCursorChange?: (cursor: 'default' | 'pointer' | 'grab' | 'grabbing') => void;
   hasContextMenuButton?: boolean;
 }> = ({
@@ -105,10 +141,15 @@ const PriceLineGroup: React.FC<{
   onButtonClick,
   onTPButtonClick,
   onSLButtonClick,
+  onTPDragEnd,
+  onSLDragEnd,
   onCursorChange,
   hasContextMenuButton,
 }) => {
   const lineY = priceToY(bound.price);
+
+  // State for TP/SL button dragging (with preview line)
+  const [tpslDragState, setTPSLDragState] = useState<TPSLDragState | null>(null);
   const labelCenterY = bound.adjustedY;
   const lineType = bound.type || 'price';
 
@@ -357,6 +398,16 @@ const PriceLineGroup: React.FC<{
         />
       )}
 
+      {/* Line from end of segments to price axis - renders BEHIND TP/SL buttons */}
+      {chartLabel && chartLabel.segments.length > 0 && (
+        <Line
+          points={[chartLabelX + segmentsWidth + 2, offsetLineY, priceAxisLabelX, offsetLineY]}
+          stroke={bound.color}
+          strokeWidth={bound.lineWidth || 1}
+          dash={lineDash}
+        />
+      )}
+
       {/* Invisible drag handle over segments only - underneath for drag events */}
       {/* Note: This Rect stays at original position - Konva controls its movement during drag */}
       {/* Uses touchTargetHeight (44px) for touch-friendly hit area while visual label stays at labelHeight */}
@@ -386,24 +437,84 @@ const PriceLineGroup: React.FC<{
           height={labelHeight}
           lineId={bound.lineId}
           positionId={bound.positionId}
+          partialEnabled={bound.partialEnabled}
           useNarrowText={useNarrowText}
           hasTPSLButtons={hasTPSLButtons}
           tpslGap={tpslGap}
+          lineY={lineY}
+          priceToY={priceToY}
+          yToPrice={yToPrice}
+          chartWidth={width}
+          margins={margins}
           onButtonClick={onButtonClick}
           onTPButtonClick={onTPButtonClick}
           onSLButtonClick={onSLButtonClick}
+          onTPDragEnd={onTPDragEnd}
+          onSLDragEnd={onSLDragEnd}
           onCursorChange={onCursorChange}
+          tpslDragState={tpslDragState}
+          setTPSLDragState={setTPSLDragState}
         />
       )}
 
-      {/* Line from chart label to price axis label */}
-      {chartLabel && chartLabel.segments.length > 0 && (
-        <Line
-          points={[chartLabelX + chartLabelWidth + 2, offsetLineY, priceAxisLabelX, offsetLineY]}
-          stroke={bound.color}
-          strokeWidth={bound.lineWidth || 1}
-          dash={lineDash}
-        />
+      {/* TP/SL Drag Preview Line - renders on top during drag */}
+      {tpslDragState && (
+        <Group>
+          {/* Dashed horizontal line at drag price */}
+          <Line
+            points={[margins.left, tpslDragState.currentY, width - margins.right, tpslDragState.currentY]}
+            stroke={tpslDragState.type === 'tp' ? '#22c55e' : '#f97316'}
+            strokeWidth={1}
+            dash={[4, 4]}
+          />
+          {/* Price label at right edge */}
+          <Rect
+            x={width - bound.width}
+            y={tpslDragState.currentY - bound.height / 2}
+            width={bound.width}
+            height={bound.height}
+            fill={tpslDragState.type === 'tp' ? '#22c55e' : '#f97316'}
+            cornerRadius={2}
+          />
+          <Text
+            x={width - bound.width}
+            y={tpslDragState.currentY - bound.height / 2}
+            width={bound.width}
+            height={bound.height}
+            text={formatPrice(tpslDragState.currentPrice)}
+            fontSize={11}
+            fontFamily="sans-serif"
+            fill="#ffffff"
+            align="center"
+            verticalAlign="middle"
+          />
+          {/* Partial percentage label (shown when partialEnabled and not 100%) */}
+          {tpslDragState.partialEnabled && tpslDragState.partialPercent < 100 && (
+            <>
+              <Rect
+                x={margins.left + 8}
+                y={tpslDragState.currentY - 10}
+                width={40}
+                height={20}
+                fill={tpslDragState.type === 'tp' ? '#22c55e' : '#f97316'}
+                cornerRadius={2}
+              />
+              <Text
+                x={margins.left + 8}
+                y={tpslDragState.currentY - 10}
+                width={40}
+                height={20}
+                text={`${tpslDragState.partialPercent}%`}
+                fontSize={11}
+                fontStyle="bold"
+                fontFamily="sans-serif"
+                fill="#ffffff"
+                align="center"
+                verticalAlign="middle"
+              />
+            </>
+          )}
+        </Group>
       )}
 
       {/* Line all the way across if no chart label */}
@@ -492,14 +603,24 @@ const ChartLabelGroup: React.FC<{
   height: number;
   lineId: string;
   positionId?: string;
+  partialEnabled?: boolean;
   useNarrowText: boolean;
   hasTPSLButtons: boolean;
   tpslGap: number;
+  lineY: number;  // Y position of the price line (for drag constraint)
+  priceToY: (price: number) => number;
+  yToPrice: (y: number) => number;
+  chartWidth: number;
+  margins: ChartMargins;
   onButtonClick?: (lineId: string, buttonType: 'cancel' | 'close' | 'reverse') => void;
   onTPButtonClick?: (positionId: string) => void;
   onSLButtonClick?: (positionId: string) => void;
+  onTPDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
+  onSLDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
   onCursorChange?: (cursor: 'default' | 'pointer' | 'grab' | 'grabbing') => void;
-}> = ({ chartLabel, x, y, height, lineId, positionId, useNarrowText, hasTPSLButtons, tpslGap, onButtonClick, onTPButtonClick, onSLButtonClick, onCursorChange }) => {
+  tpslDragState: TPSLDragState | null;
+  setTPSLDragState: React.Dispatch<React.SetStateAction<TPSLDragState | null>>;
+}> = ({ chartLabel, x, y, height, lineId, positionId, partialEnabled, useNarrowText, hasTPSLButtons, tpslGap, lineY, priceToY, yToPrice, chartWidth, margins, onButtonClick, onTPButtonClick, onSLButtonClick, onTPDragEnd, onSLDragEnd, onCursorChange, tpslDragState, setTPSLDragState }) => {
   let currentX = x;
   const elements: React.ReactNode[] = [];
   const segmentCount = chartLabel.segments.length;
@@ -565,6 +686,9 @@ const ChartLabelGroup: React.FC<{
     currentX += tpslGap;
   }
 
+  // Track button X positions for TP/SL
+  const buttonXPositions: { [key: string]: number } = {};
+
   buttons.forEach((button, index) => {
     const isLastItem = index === buttonCount - 1;
     // TP/SL buttons group has rounded corners on first button
@@ -579,6 +703,11 @@ const ChartLabelGroup: React.FC<{
     // TP/SL buttons are wider to fit text
     const buttonWidth = (button.type === 'tp' || button.type === 'sl') ? 24 : 16;
 
+    // Store X position for TP/SL buttons
+    if (button.type === 'tp' || button.type === 'sl') {
+      buttonXPositions[button.type] = currentX;
+    }
+
     // Handle TP/SL button clicks differently
     const handleClick = () => {
       if (button.type === 'tp' && positionId && onTPButtonClick) {
@@ -590,66 +719,119 @@ const ChartLabelGroup: React.FC<{
       }
     };
 
-    elements.push(
-      <Group
-        key={`button-${index}`}
-        onClick={handleClick}
-        onTap={handleClick}
-        onMouseEnter={() => onCursorChange?.('pointer')}
-        onMouseLeave={() => onCursorChange?.('default')}
-      >
-        <Rect
+    // For TP/SL buttons, add drag handling
+    if ((button.type === 'tp' || button.type === 'sl') && positionId) {
+      const buttonType = button.type;
+      const btnX = currentX;
+
+      const handleDragStart = (e: Konva.KonvaEventObject<DragEvent>) => {
+        const stage = e.target.getStage();
+        const pointerPos = stage?.getPointerPosition();
+        if (!pointerPos) return;
+
+        setTPSLDragState({
+          type: buttonType,
+          positionId,
+          startY: pointerPos.y,
+          startX: pointerPos.x,
+          currentY: pointerPos.y,
+          currentX: pointerPos.x,
+          currentPrice: yToPrice(pointerPos.y),
+          buttonX: btnX + buttonWidth / 2,
+          partialEnabled: partialEnabled ?? false,
+          partialPercent: 100,
+        });
+        onCursorChange?.('grabbing');
+      };
+
+      const handleDragMove = (e: Konva.KonvaEventObject<DragEvent>) => {
+        const stage = e.target.getStage();
+        const pointerPos = stage?.getPointerPosition();
+        if (!pointerPos) return;
+
+        setTPSLDragState(prev => {
+          if (!prev) return prev;
+          // Calculate partial percent if enabled
+          const newPartialPercent = prev.partialEnabled
+            ? calculatePartialPercent(prev.startX, pointerPos.x)
+            : 100;
+          return {
+            ...prev,
+            currentY: pointerPos.y,
+            currentX: pointerPos.x,
+            currentPrice: yToPrice(pointerPos.y),
+            partialPercent: newPartialPercent,
+          };
+        });
+      };
+
+      const handleDragEnd = (e: Konva.KonvaEventObject<DragEvent>) => {
+        const node = e.target;
+        const stage = node.getStage();
+        const pointerPos = stage?.getPointerPosition();
+
+        // Reset button position (Konva moved it during drag)
+        node.y(0);
+        node.x(0);
+
+        if (pointerPos) {
+          const finalPrice = yToPrice(pointerPos.y);
+          // Check if it was actually dragged (not just a click)
+          const dragDistance = tpslDragState ? Math.abs(pointerPos.y - tpslDragState.startY) : 0;
+          if (dragDistance > 5) {
+            // It was a drag, trigger the move callback with partial percent
+            const finalPartialPercent = tpslDragState?.partialEnabled
+              ? tpslDragState.partialPercent
+              : undefined;
+            if (buttonType === 'tp' && onTPDragEnd) {
+              onTPDragEnd(positionId, finalPrice, finalPartialPercent);
+            } else if (buttonType === 'sl' && onSLDragEnd) {
+              onSLDragEnd(positionId, finalPrice, finalPartialPercent);
+            }
+          } else {
+            // It was a click (minimal drag), trigger click callback
+            handleClick();
+          }
+        }
+
+        setTPSLDragState(null);
+        onCursorChange?.('default');
+      };
+
+      // Constrain drag to vertical only
+      const dragBoundFunc = (pos: { x: number; y: number }) => {
+        return {
+          x: 0,  // Keep X at 0 (relative to group)
+          y: Math.max(margins.top - lineY, Math.min(chartWidth - margins.bottom - lineY, pos.y)),
+        };
+      };
+
+      elements.push(
+        <Group
+          key={`button-${index}`}
           x={currentX}
           y={y}
-          width={buttonWidth}
-          height={height}
-          fill={button.backgroundColor}
-          stroke={button.borderColor}
-          strokeWidth={1}
-          cornerRadius={cornerRadius}
-        />
-        {button.type === 'cancel' || button.type === 'close' ? (
-          // X icon - listening={false} so clicks pass through to parent Group
-          <>
-            <Line
-              points={[
-                currentX + 5, y + 5,
-                currentX + 11, y + 13,
-              ]}
-              stroke={button.iconColor}
-              strokeWidth={1.5}
-              listening={false}
-            />
-            <Line
-              points={[
-                currentX + 11, y + 5,
-                currentX + 5, y + 13,
-              ]}
-              stroke={button.iconColor}
-              strokeWidth={1.5}
-              listening={false}
-            />
-          </>
-        ) : button.type === 'reverse' ? (
-          // Reverse arrow icon (simplified)
-          <Text
-            x={currentX}
-            y={y}
+          draggable={true}
+          onDragStart={handleDragStart}
+          onDragMove={handleDragMove}
+          onDragEnd={handleDragEnd}
+          dragBoundFunc={dragBoundFunc}
+          onMouseEnter={() => onCursorChange?.('grab')}
+          onMouseLeave={() => onCursorChange?.('default')}
+        >
+          <Rect
+            x={0}
+            y={0}
             width={buttonWidth}
             height={height}
-            text={button.icon || '\u21c4'}
-            fontSize={11}
-            fontFamily="sans-serif"
-            fill={button.iconColor}
-            align="center"
-            listening={false}
-            verticalAlign="middle"
+            fill={button.backgroundColor}
+            stroke={button.borderColor}
+            strokeWidth={1}
+            cornerRadius={cornerRadius}
           />
-        ) : (button.type === 'tp' || button.type === 'sl') ? (
-          // TP/SL text buttons
           <Text
-            x={currentX}
-            y={y}
+            x={0}
+            y={0}
             width={buttonWidth}
             height={height}
             text={button.icon}
@@ -661,9 +843,69 @@ const ChartLabelGroup: React.FC<{
             listening={false}
             verticalAlign="middle"
           />
-        ) : null}
-      </Group>
-    );
+        </Group>
+      );
+    } else {
+      // Non-TP/SL buttons (cancel, close, reverse)
+      elements.push(
+        <Group
+          key={`button-${index}`}
+          onClick={handleClick}
+          onTap={handleClick}
+          onMouseEnter={() => onCursorChange?.('pointer')}
+          onMouseLeave={() => onCursorChange?.('default')}
+        >
+          <Rect
+            x={currentX}
+            y={y}
+            width={buttonWidth}
+            height={height}
+            fill={button.backgroundColor}
+            stroke={button.borderColor}
+            strokeWidth={1}
+            cornerRadius={cornerRadius}
+          />
+          {button.type === 'cancel' || button.type === 'close' ? (
+            // X icon - listening={false} so clicks pass through to parent Group
+            <>
+              <Line
+                points={[
+                  currentX + 5, y + 5,
+                  currentX + 11, y + 13,
+                ]}
+                stroke={button.iconColor}
+                strokeWidth={1.5}
+                listening={false}
+              />
+              <Line
+                points={[
+                  currentX + 11, y + 5,
+                  currentX + 5, y + 13,
+                ]}
+                stroke={button.iconColor}
+                strokeWidth={1.5}
+                listening={false}
+              />
+            </>
+          ) : button.type === 'reverse' ? (
+            // Reverse arrow icon (simplified)
+            <Text
+              x={currentX}
+              y={y}
+              width={buttonWidth}
+              height={height}
+              text={button.icon || '\u21c4'}
+              fontSize={11}
+              fontFamily="sans-serif"
+              fill={button.iconColor}
+              align="center"
+              listening={false}
+              verticalAlign="middle"
+            />
+          ) : null}
+        </Group>
+      );
+    }
     currentX += buttonWidth;
   });
 
@@ -767,6 +1009,8 @@ export const PriceLineLayer: React.FC<PriceLineLayerProps> = ({
         onButtonClick={handleButtonClick}
         onTPButtonClick={handleTPButtonClick}
         onSLButtonClick={handleSLButtonClick}
+        onTPDragEnd={onTPDragEnd}
+        onSLDragEnd={onSLDragEnd}
         onCursorChange={onCursorChange}
         hasContextMenuButton={hasContextMenuButton}
       />
