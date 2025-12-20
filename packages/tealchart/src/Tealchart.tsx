@@ -689,22 +689,19 @@ export const Tealchart: React.FC<TealchartProps> = ({
         // Add crosshair to allPriceLines for Konva layer
         const allPriceLinesWithCrosshair: PriceLine[] = [...allPriceLines];
 
-        // Add crosshair price line (if visible)
-        if (crosshair.visible && crosshair.price !== undefined && !isNaN(crosshair.price)) {
+        // Add crosshair price line (if visible) - use helper that detects which pane the cursor is in
+        if (crosshair.visible) {
           const crosshairColor = renderOptions?.crosshairColor || '#888888';
-          allPriceLinesWithCrosshair.push({
-            id: '__crosshair__',
-            price: crosshair.price,
-            lineStyle: 'dashed',
-            color: crosshairColor,
-            type: 'crosshair',
-            floatingLabel: true,
-            label: {
-              primaryText: formatPrice(crosshair.price),
-              backgroundColor: crosshairColor,
-              textColor: renderOptions?.backgroundColor || '#1a1a1a',
-            },
-          });
+          const crosshairLine = rendererRef.current.getCrosshairPriceLine(
+            crosshair.y,
+            viewportRef.current,
+            layout,
+            plotsRef.current,
+            crosshairColor
+          );
+          if (crosshairLine) {
+            allPriceLinesWithCrosshair.push(crosshairLine);
+          }
         }
 
         // Compute label bounds for ALL price lines (including order/position/crosshair) for Konva layer
@@ -1849,12 +1846,11 @@ export const Tealchart: React.FC<TealchartProps> = ({
   const mainPaneBounds = computeMainPaneBounds();
 
   // Filter label bounds for order/position lines only (interactive elements)
-  // Also adjust Y coordinates for Konva layer offset (Stage starts at mainPaneBounds.top)
+  // Stage now covers full chart height, so no Y offset adjustment needed
   // Computed directly (not memoized) for immediate updates during drag
   // labelBoundsVersion is used to trigger re-render when ref updates
   void labelBoundsVersion; // Reference to trigger re-render
   void _pendingOrdersVersion; // Reference to trigger re-render on pending state change
-  const offset = mainPaneBounds.top;
   // Include order, position, crosshair, and high-speed lines in Konva layer
   // PriceLineLayer handles z-ordering: non-floating render first, floating (crosshair) renders on top
   // Hide crosshair when hovering over interactive elements (order/position labels)
@@ -1870,13 +1866,10 @@ export const Tealchart: React.FC<TealchartProps> = ({
         return {
           ...b,
           price: pending.pendingPrice,
-          adjustedY: pendingY - offset,
+          adjustedY: pendingY,
         };
       }
-      return {
-        ...b,
-        adjustedY: b.adjustedY - offset,
-      };
+      return b; // No adjustment needed - Stage covers full chart height
     });
 
   // Check if we should render the Konva layer (for order/position/crosshair lines)
@@ -1905,10 +1898,10 @@ export const Tealchart: React.FC<TealchartProps> = ({
         <Stage
           ref={stageRef}
           width={width}
-          height={mainPaneBounds.height}
+          height={height - margins.bottom}
           style={{
             position: 'absolute',
-            top: mainPaneBounds.top,
+            top: 0,
             left: 0,
           }}
         >
@@ -1916,7 +1909,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
             <PriceLineLayer
               labelBounds={konvaLabelBounds}
               width={width}
-              height={mainPaneBounds.height}
+              height={height - margins.bottom}
               margins={margins}
               priceToY={priceToY}
               yToPrice={yToPrice}
@@ -1932,7 +1925,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
               onCursorChange={handleKonvaCursorChange}
               crosshair={{
                 x: crosshairRef.current.x,
-                y: crosshairRef.current.y - mainPaneBounds.top, // Adjust for Konva layer offset
+                y: crosshairRef.current.y,
                 // Hide crosshair when hovering over interactive Konva elements (order/position labels)
                 visible: crosshairRef.current.visible && !isOverKonvaElementRef.current,
                 color: renderOptions?.crosshairColor || '#888888',

@@ -558,6 +558,9 @@ export class TealchartRenderer {
         floatingLabel: line.floatingLabel,
         priority: line.priority,
         renderLineOnCanvas: line.renderLineOnCanvas,
+        // Position-specific fields for bracket TP/SL drag
+        positionId: line.positionId,
+        partialEnabled: line.partialEnabled,
       };
     });
 
@@ -2380,6 +2383,9 @@ export class TealchartRenderer {
         floatingLabel: line.floatingLabel,
         priority: line.priority,
         renderLineOnCanvas: line.renderLineOnCanvas,
+        // Position-specific fields for bracket TP/SL drag
+        positionId: line.positionId,
+        partialEnabled: line.partialEnabled,
       };
     });
 
@@ -2731,6 +2737,103 @@ export class TealchartRenderer {
         return pane;
       }
     }
+    return null;
+  }
+
+  /**
+   * Get crosshair price line for Konva rendering with correct pane detection
+   * Returns a PriceLine with proper targetPaneId and value for whichever pane contains the crosshair
+   */
+  getCrosshairPriceLine(
+    crosshairY: number,
+    viewport: Viewport,
+    layout: UnifiedPaneLayout,
+    plots?: PlotOutput[],
+    crosshairColor?: string
+  ): PriceLine | null {
+    const { options } = this;
+    const color = crosshairColor || options.crosshairColor;
+
+    // Compute panes layout
+    const computedPanes = this.computePanesLayout(layout, options.height);
+
+    // Set main pane's Y range from viewport
+    const mainPane = computedPanes.find(p => p.type === 'main');
+    if (mainPane) {
+      mainPane.yMin = viewport.priceMin;
+      mainPane.yMax = viewport.priceMax;
+    }
+
+    // Calculate indicator pane Y ranges from plots (same as in renderUnifiedPanes)
+    if (plots) {
+      for (const pane of computedPanes) {
+        if (pane.type === 'indicator' && !pane.fixedRange && pane.indicatorIds) {
+          const paneValues: (number | null)[] = [];
+          for (const plot of plots) {
+            const scriptId = plot.scriptId ?? 'unknown';
+            if (pane.indicatorIds.includes(scriptId) && plot.type === 'plot' && plot.values) {
+              paneValues.push(...plot.values);
+            }
+          }
+          if (paneValues.length > 0) {
+            const range = TealchartRenderer.calculateIndicatorRange(paneValues);
+            pane.yMin = range.min;
+            pane.yMax = range.max;
+          }
+        }
+      }
+    }
+
+    // Find which pane the crosshair Y is in
+    for (const pane of computedPanes) {
+      if (crosshairY >= pane.top && crosshairY < pane.bottom) {
+        // Calculate value in this pane's coordinate system
+        const ratio = (crosshairY - pane.top) / pane.height;
+        const value = pane.yMax - ratio * (pane.yMax - pane.yMin);
+
+        // Format label based on pane type
+        let labelText: string;
+        const range = pane.yMax - pane.yMin;
+        if (pane.type === 'main') {
+          // Use price formatting
+          let decimals: number;
+          if (options.pricePrecision && options.pricePrecision > 0) {
+            decimals = getDecimalPlacesFromPrecision(options.pricePrecision);
+          } else {
+            decimals = range >= 10 ? 0 : range >= 1 ? 1 : range >= 0.01 ? 2 : 3;
+          }
+          labelText = value.toLocaleString('en-US', {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals,
+          });
+        } else {
+          // Indicator value formatting
+          const indicatorDecimals = Math.abs(value) >= 1000 ? 0 :
+            Math.abs(value) >= 100 ? 1 :
+            Math.abs(value) >= 1 ? 2 : 4;
+          labelText = value.toLocaleString('en-US', {
+            minimumFractionDigits: indicatorDecimals,
+            maximumFractionDigits: indicatorDecimals,
+          });
+        }
+
+        return {
+          id: '__crosshair__',
+          price: value,
+          lineStyle: 'dashed',
+          color,
+          type: 'crosshair',
+          floatingLabel: true,
+          targetPaneId: pane.id,
+          label: {
+            primaryText: labelText,
+            backgroundColor: color,
+            textColor: options.backgroundColor,
+          },
+        };
+      }
+    }
+
     return null;
   }
 

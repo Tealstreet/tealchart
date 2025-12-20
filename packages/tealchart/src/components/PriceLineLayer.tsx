@@ -435,6 +435,138 @@ const PriceLineGroup: React.FC<{
         />
       )}
 
+      {/* TP button drag handle - underneath visual button */}
+      {tpButton && bound.positionId && (
+        <Rect
+          x={chartLabelX + segmentsWidth + tpslGap}
+          y={lineY - touchTargetHeight / 2}
+          width={24}
+          height={touchTargetHeight}
+          fill="transparent"
+          draggable={true}
+          onDragStart={(e) => {
+            const stage = e.target.getStage();
+            const pointerPos = stage?.getPointerPosition();
+            if (!pointerPos) return;
+            setTPSLDragState({
+              type: 'tp',
+              positionId: bound.lineId,
+              startY: pointerPos.y,
+              startX: pointerPos.x,
+              currentY: pointerPos.y,
+              currentX: pointerPos.x,
+              currentPrice: yToPrice(pointerPos.y),
+              buttonX: chartLabelX + segmentsWidth + tpslGap + 12,
+              partialEnabled: bound.partialEnabled ?? false,
+              partialPercent: 100,
+            });
+            onCursorChange?.('grabbing');
+          }}
+          onDragMove={(e) => {
+            const stage = e.target.getStage();
+            const pointerPos = stage?.getPointerPosition();
+            if (!pointerPos) return;
+            setTPSLDragState(prev => {
+              if (!prev) return prev;
+              const newPartialPercent = prev.partialEnabled
+                ? calculatePartialPercent(prev.startX, pointerPos.x)
+                : 100;
+              return { ...prev, currentY: pointerPos.y, currentX: pointerPos.x, currentPrice: yToPrice(pointerPos.y), partialPercent: newPartialPercent };
+            });
+          }}
+          onDragEnd={(e) => {
+            const node = e.target;
+            const stage = node.getStage();
+            const pointerPos = stage?.getPointerPosition();
+            // Reset to original position (not 0,0)
+            const originalX = chartLabelX + segmentsWidth + tpslGap;
+            const originalY = lineY - touchTargetHeight / 2;
+            node.x(originalX);
+            node.y(originalY);
+            if (pointerPos && tpslDragState) {
+              const finalPrice = yToPrice(pointerPos.y);
+              const dragDistance = Math.abs(pointerPos.y - tpslDragState.startY);
+              if (dragDistance > 5) {
+                onTPDragEnd?.(bound.lineId, finalPrice, tpslDragState.partialEnabled ? tpslDragState.partialPercent : undefined);
+              } else {
+                onTPClick?.(bound.lineId);
+              }
+            }
+            setTPSLDragState(null);
+            onCursorChange?.('default');
+          }}
+          dragBoundFunc={(pos) => ({ x: chartLabelX + segmentsWidth + tpslGap, y: pos.y })}
+          onMouseEnter={() => onCursorChange?.('grab')}
+          onMouseLeave={() => onCursorChange?.('default')}
+        />
+      )}
+
+      {/* SL button drag handle - underneath visual button */}
+      {slButton && bound.positionId && (
+        <Rect
+          x={chartLabelX + segmentsWidth + tpslGap + (tpButton ? 24 : 0)}
+          y={lineY - touchTargetHeight / 2}
+          width={24}
+          height={touchTargetHeight}
+          fill="transparent"
+          draggable={true}
+          onDragStart={(e) => {
+            const stage = e.target.getStage();
+            const pointerPos = stage?.getPointerPosition();
+            if (!pointerPos) return;
+            setTPSLDragState({
+              type: 'sl',
+              positionId: bound.lineId,
+              startY: pointerPos.y,
+              startX: pointerPos.x,
+              currentY: pointerPos.y,
+              currentX: pointerPos.x,
+              currentPrice: yToPrice(pointerPos.y),
+              buttonX: chartLabelX + segmentsWidth + tpslGap + (tpButton ? 24 : 0) + 12,
+              partialEnabled: bound.partialEnabled ?? false,
+              partialPercent: 100,
+            });
+            onCursorChange?.('grabbing');
+          }}
+          onDragMove={(e) => {
+            const stage = e.target.getStage();
+            const pointerPos = stage?.getPointerPosition();
+            if (!pointerPos) return;
+            setTPSLDragState(prev => {
+              if (!prev) return prev;
+              const newPartialPercent = prev.partialEnabled
+                ? calculatePartialPercent(prev.startX, pointerPos.x)
+                : 100;
+              return { ...prev, currentY: pointerPos.y, currentX: pointerPos.x, currentPrice: yToPrice(pointerPos.y), partialPercent: newPartialPercent };
+            });
+          }}
+          onDragEnd={(e) => {
+            const node = e.target;
+            const stage = node.getStage();
+            const pointerPos = stage?.getPointerPosition();
+            // Reset to original position (not 0,0)
+            const originalX = chartLabelX + segmentsWidth + tpslGap + (tpButton ? 24 : 0);
+            const originalY = lineY - touchTargetHeight / 2;
+            node.x(originalX);
+            node.y(originalY);
+            if (pointerPos && tpslDragState) {
+              const finalPrice = yToPrice(pointerPos.y);
+              const dragDistance = Math.abs(pointerPos.y - tpslDragState.startY);
+              if (dragDistance > 5) {
+                onSLDragEnd?.(bound.lineId, finalPrice, tpslDragState.partialEnabled ? tpslDragState.partialPercent : undefined);
+              } else {
+                onSLClick?.(bound.lineId);
+              }
+            }
+            setTPSLDragState(null);
+            onCursorChange?.('default');
+          }}
+          dragBoundFunc={(pos) => ({ x: chartLabelX + segmentsWidth + tpslGap + (tpButton ? 24 : 0), y: pos.y })}
+          onMouseEnter={() => onCursorChange?.('grab')}
+          onMouseLeave={() => onCursorChange?.('default')}
+        />
+      )}
+
       {/* Chart area label - on top so buttons are clickable, segments have listening=false */}
       {chartLabel && chartLabel.segments.length > 0 && (
         <ChartLabelGroup
@@ -815,7 +947,7 @@ const ChartLabelGroup: React.FC<{
         };
       };
 
-      // TP/SL button: background rect is draggable, text rendered last
+      // TP/SL button: visual rect + text label, drag handled by parent component
       elements.push(
         <Rect
           key={`button-bg-${index}`}
@@ -827,19 +959,24 @@ const ChartLabelGroup: React.FC<{
           stroke={button.borderColor}
           strokeWidth={1}
           cornerRadius={cornerRadius}
-          draggable={true}
-          onDragStart={(e) => {
-            console.log('TP/SL drag start', buttonType);
-            handleDragStart(e);
-          }}
-          onDragMove={handleDragMove}
-          onDragEnd={handleDragEnd}
-          dragBoundFunc={dragBoundFunc}
-          onMouseEnter={() => {
-            console.log('TP/SL mouse enter', buttonType);
-            onCursorChange?.('grab');
-          }}
-          onMouseLeave={() => onCursorChange?.('default')}
+          listening={false}
+        />
+      );
+      elements.push(
+        <Text
+          key={`button-text-${index}`}
+          x={btnX}
+          y={y}
+          width={buttonWidth}
+          height={height}
+          text={button.type === 'tp' ? 'TP' : 'SL'}
+          fontSize={10}
+          fontFamily="sans-serif"
+          fontStyle="bold"
+          fill="#ffffff"
+          align="center"
+          verticalAlign="middle"
+          listening={false}
         />
       );
     } else {
@@ -905,48 +1042,6 @@ const ChartLabelGroup: React.FC<{
     }
     currentX += buttonWidth;
   });
-
-  // Render TP/SL text labels LAST (on top of everything) - this is required for visibility
-  // hitGraphEnabled={false} ensures the text doesn't block mouse events to elements behind it
-  const tpslButtonWidth = 24;
-  if (buttonXPositions['tp'] !== undefined) {
-    elements.push(
-      <Text
-        key="tp-text"
-        x={buttonXPositions['tp']}
-        y={y}
-        width={tpslButtonWidth}
-        height={height}
-        text="TP"
-        fontSize={11}
-        fontFamily="sans-serif"
-        fill="#FFFFFF"
-        align="center"
-        verticalAlign="middle"
-        listening={false}
-        hitGraphEnabled={false}
-      />
-    );
-  }
-  if (buttonXPositions['sl'] !== undefined) {
-    elements.push(
-      <Text
-        key="sl-text"
-        x={buttonXPositions['sl']}
-        y={y}
-        width={tpslButtonWidth}
-        height={height}
-        text="SL"
-        fontSize={11}
-        fontFamily="sans-serif"
-        fill="#FFFFFF"
-        align="center"
-        verticalAlign="middle"
-        listening={false}
-        hitGraphEnabled={false}
-      />
-    );
-  }
 
   return <Group>{elements}</Group>;
 };
