@@ -70,6 +70,12 @@ export { TealchartRenderer } from './TealchartRenderer';
 // Gap detection (for advanced usage)
 export { GapDetectionManager } from './GapDetectionManager';
 
+// Debug logging
+export { TealchartLogger, LogLevel, LogCategory } from './debug';
+export type { LogEntry, LogCategoryType, TealchartLoggerOptions } from './debug';
+export { DebugConsole } from './components/DebugConsole';
+export type { DebugConsoleProps } from './components/DebugConsole';
+
 // Event system
 export { EventEmitter, Subscription } from './events/EventEmitter';
 export type { EventCallback } from './events/EventEmitter';

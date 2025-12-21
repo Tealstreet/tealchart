@@ -675,6 +675,13 @@ export interface TealchartWidgetOptions {
    * Default: true
    */
   showBracketButtons?: boolean;
+  /**
+   * Whether to enable debug logging for this chart instance.
+   * When enabled, logs are captured to a ring buffer and can be displayed in the UI.
+   * Console output is also enabled when true.
+   * Default: true
+   */
+  debugLoggingEnabled?: boolean;
 }
 
 // ============================================================================

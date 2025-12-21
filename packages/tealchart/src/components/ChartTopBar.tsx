@@ -10,8 +10,10 @@ import { createChartFocusAtoms, AVAILABLE_TIMEFRAMES, type ChartSettings } from 
 import { useChartApiOptional } from '../state/ChartApiContext';
 import { IndicatorsModal } from './IndicatorsModal';
 import { LayoutSelector, type LayoutSelectorProps } from './LayoutSelector';
+import { DebugConsole } from './DebugConsole';
 import { type BuiltinIndicator } from '../indicators/builtinIndicators';
 import { ResolutionString, GapDetectionErrorState } from '../types';
+import { TealchartLogger } from '../debug/TealchartLogger';
 import { useChartTranslations } from '../i18n';
 
 // ============================================================================
@@ -148,6 +150,8 @@ export interface ChartTopBarProps {
   onSaveLayout?: () => void;
   /** Gap detection error state (if any) */
   gapDetectionError?: GapDetectionErrorState | null;
+  /** Debug logger for this chart (optional - enables debug console) */
+  logger?: TealchartLogger | null;
 }
 
 // ============================================================================
@@ -167,6 +171,7 @@ export const ChartTopBar: React.FC<ChartTopBarProps> = memo(({
   onLoadLayout,
   onSaveLayout,
   gapDetectionError,
+  logger,
 }) => {
   // Translations
   const t = useChartTranslations();
@@ -253,6 +258,9 @@ export const ChartTopBar: React.FC<ChartTopBarProps> = memo(({
           <span>Sync issue</span>
         </div>
       )}
+
+      {/* Debug console (optional) */}
+      {logger && <DebugConsole logger={logger} />}
 
       {/* Spacer to push layout selector to the right */}
       <div style={styles.spacer} />

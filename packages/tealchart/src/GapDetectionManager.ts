@@ -9,6 +9,7 @@
  */
 
 import type { GapDetectionOptions, GapDetectionEvent, GapDetectionReason, GapDetectionErrorState } from './types';
+import { TealchartLogger, LogCategory } from './debug/TealchartLogger';
 
 /**
  * Default options for gap detection
@@ -64,6 +65,9 @@ export class GapDetectionManager {
   // Track if manager is started
   private _isStarted = false;
 
+  // Logger instance for debug output
+  private _logger: TealchartLogger | null = null;
+
   constructor(
     onRecoveryNeeded: (event: GapDetectionEvent) => void,
     options?: GapDetectionOptions
@@ -83,11 +87,21 @@ export class GapDetectionManager {
   }
 
   /**
+   * Set the logger instance for debug output
+   */
+  setLogger(logger: TealchartLogger | null): void {
+    this._logger = logger;
+  }
+
+  /**
    * Set the bar interval in milliseconds
    * This determines the expected frequency of new bars
    */
   setInterval(intervalMs: number): void {
+    const oldInterval = this._intervalMs;
     this._intervalMs = intervalMs;
+
+    this._logger?.debug(LogCategory.GapDetection, `Interval changed: ${oldInterval}ms → ${intervalMs}ms`);
 
     // Restart bar timeout with new interval if started
     if (this._isStarted && this._lastBarTime > 0) {
@@ -100,7 +114,26 @@ export class GapDetectionManager {
    * Updates the last bar time and restarts the timeout
    */
   recordBar(barTime: number): void {
+    const prevBarTime = this._lastBarTime;
     this._lastBarTime = barTime;
+
+    // Log bar recording with gap info if there was a previous bar
+    if (prevBarTime > 0) {
+      const gap = barTime - prevBarTime;
+      const expectedGap = this._intervalMs;
+      if (gap > expectedGap * 1.5) {
+        this._logger?.warn(LogCategory.GapDetection, `Bar received with gap: ${gap}ms (expected: ${expectedGap}ms)`, {
+          prevBarTime: new Date(prevBarTime).toISOString(),
+          newBarTime: new Date(barTime).toISOString(),
+          gap,
+          expectedGap,
+        });
+      } else {
+        this._logger?.debug(LogCategory.GapDetection, `Bar recorded: ${new Date(barTime).toISOString()}`);
+      }
+    } else {
+      this._logger?.debug(LogCategory.GapDetection, `First bar recorded: ${new Date(barTime).toISOString()}`);
+    }
 
     // Restart bar timeout if started
     if (this._isStarted) {
@@ -123,6 +156,15 @@ export class GapDetectionManager {
 
     // Check if the gap exceeds the threshold
     if (actualGap > gapThreshold) {
+      this._logger?.warn(LogCategory.GapDetection, `Gap detected in bars`, {
+        lastBarTime: new Date(this._lastBarTime).toISOString(),
+        newBarTime: new Date(newBarTime).toISOString(),
+        expectedNextBarTime: new Date(expectedNextBarTime).toISOString(),
+        actualGap,
+        gapThreshold,
+        missedBars: Math.floor(actualGap / this._intervalMs) - 1,
+      });
+
       return {
         reason: 'bar-gap',
         timestamp: Date.now(),
@@ -142,10 +184,21 @@ export class GapDetectionManager {
    * Call this after subscribing to bars
    */
   start(): void {
-    if (this._isStarted) return;
-    if (!this._options.enabled) return;
+    if (this._isStarted) {
+      this._logger?.debug(LogCategory.GapDetection, 'Start called but already started');
+      return;
+    }
+    if (!this._options.enabled) {
+      this._logger?.debug(LogCategory.GapDetection, 'Start called but gap detection disabled');
+      return;
+    }
 
     this._isStarted = true;
+    this._logger?.info(LogCategory.GapDetection, 'Started gap detection monitoring', {
+      intervalMs: this._intervalMs,
+      lastBarTime: this._lastBarTime > 0 ? new Date(this._lastBarTime).toISOString() : null,
+      options: this._options,
+    });
 
     // Set up event listeners
     this._setupEventListeners();
@@ -222,11 +275,13 @@ export class GapDetectionManager {
     if (isHidden) {
       // Going hidden - track this state
       this._wasHidden = true;
+      this._logger?.debug(LogCategory.GapDetection, 'Tab hidden - pausing bar timeout');
       // Clear bar timeout since we won't be getting updates
       this._clearBarTimeout();
     } else if (this._wasHidden) {
       // Coming back from hidden - schedule recovery
       this._wasHidden = false;
+      this._logger?.info(LogCategory.GapDetection, 'Tab visible again - scheduling recovery check');
       this._scheduleVisibilityRecovery();
     }
   }
@@ -234,12 +289,14 @@ export class GapDetectionManager {
   private _handleOnline(): void {
     if (this._wasOffline) {
       this._wasOffline = false;
+      this._logger?.info(LogCategory.GapDetection, 'Network reconnected - scheduling recovery check');
       this._scheduleNetworkRecovery();
     }
   }
 
   private _handleOffline(): void {
     this._wasOffline = true;
+    this._logger?.warn(LogCategory.GapDetection, 'Network offline - pausing bar timeout');
     // Clear bar timeout since we won't be getting updates
     this._clearBarTimeout();
   }
@@ -305,13 +362,19 @@ export class GapDetectionManager {
 
     // Still in backoff period
     if (now < this._backoffUntil) {
-      console.log(`[GapDetection] Skipping recovery (${reason}) - in backoff until ${new Date(this._backoffUntil).toISOString()}`);
+      this._logger?.debug(LogCategory.GapDetection, `Skipping recovery (${reason}) - in backoff`, {
+        backoffUntil: new Date(this._backoffUntil).toISOString(),
+        remainingMs: this._backoffUntil - now,
+      });
       return true;
     }
 
     // Max retries exceeded
     if (this._retryCount >= this._options.maxRetries) {
-      console.log(`[GapDetection] Skipping recovery (${reason}) - max retries (${this._options.maxRetries}) exceeded`);
+      this._logger?.warn(LogCategory.GapDetection, `Skipping recovery (${reason}) - max retries exceeded`, {
+        retryCount: this._retryCount,
+        maxRetries: this._options.maxRetries,
+      });
       return true;
     }
 
@@ -321,7 +384,7 @@ export class GapDetectionManager {
   private _triggerRecovery(reason: GapDetectionReason): void {
     // Check recovery lock
     if (this._isRecovering) {
-      console.log(`[GapDetection] Skipping recovery (${reason}) - already recovering`);
+      this._logger?.debug(LogCategory.GapDetection, `Skipping recovery (${reason}) - already recovering`);
       return;
     }
 
@@ -338,7 +401,11 @@ export class GapDetectionManager {
 
     // Check if we've hit max retries after this attempt
     if (this._retryCount >= this._options.maxRetries) {
-      console.log(`[GapDetection] Max retries reached - emitting error state`);
+      this._logger?.error(LogCategory.GapDetection, 'Max retries reached - emitting error state', {
+        retryCount: this._retryCount,
+        maxRetries: this._options.maxRetries,
+        reason,
+      });
       this._emitErrorState();
     }
 
@@ -353,7 +420,12 @@ export class GapDetectionManager {
     this._clearNetworkDebounce();
     this._clearBarTimeout();
 
-    console.log(`[GapDetection] Triggering recovery: ${reason} (attempt ${this._retryCount}/${this._options.maxRetries}, next backoff: ${backoffMs}ms)`);
+    this._logger?.info(LogCategory.GapDetection, `Triggering recovery: ${reason}`, {
+      attempt: this._retryCount,
+      maxRetries: this._options.maxRetries,
+      nextBackoffMs: backoffMs,
+      backoffUntil: new Date(this._backoffUntil).toISOString(),
+    });
 
     const event: GapDetectionEvent = {
       reason,
@@ -384,9 +456,17 @@ export class GapDetectionManager {
    */
   resetRetryState(): void {
     const hadError = this._retryCount >= this._options.maxRetries;
+    const prevRetryCount = this._retryCount;
     this._retryCount = 0;
     this._backoffUntil = 0;
     this._lastRecoveryReason = null;
+
+    if (prevRetryCount > 0) {
+      this._logger?.info(LogCategory.GapDetection, 'Retry state reset - bars flowing normally', {
+        previousRetryCount: prevRetryCount,
+        hadError,
+      });
+    }
 
     // Emit cleared error state if we had an error before
     if (hadError && this._onErrorStateChange) {

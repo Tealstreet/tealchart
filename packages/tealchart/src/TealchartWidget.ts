@@ -16,6 +16,7 @@ import { createChartFocusAtoms, getCurrentLayoutAtom, getIsDirtyAtom, getSaveSta
 import { generateIndicatorId } from './state/indicatorActions';
 import { PaneManager } from './rendering/PaneManager';
 import { GapDetectionManager } from './GapDetectionManager';
+import { TealchartLogger, LogCategory } from './debug/TealchartLogger';
 import type { PlotOutput } from '@tealstreet/tealscript';
 import {
   Bar,
@@ -112,6 +113,9 @@ export class TealchartWidget {
   // Track if interval was explicitly provided (for controlled vs uncontrolled behavior)
   private _intervalWasProvided: boolean;
 
+  // Debug logger for this chart instance
+  private _logger: TealchartLogger;
+
   constructor(container: HTMLElement, options: TealchartWidgetOptions) {
     this._container = container;
     this._options = options;
@@ -135,6 +139,18 @@ export class TealchartWidget {
 
     // Initialize pane manager for multi-pane indicator support
     this._paneManager = new PaneManager();
+
+    // Initialize debug logger
+    // Console output is controlled by debugLoggingEnabled option (default: true)
+    this._logger = new TealchartLogger({
+      consoleOutput: options.debugLoggingEnabled !== false,
+      consolePrefix: `[Tealchart:${this._chartKey}]`,
+    });
+    this._logger.info(LogCategory.Widget, 'Widget initializing', {
+      chartKey: this._chartKey,
+      symbol: this._symbol,
+      interval: this._interval,
+    });
 
     this._eventEmitter = new EventEmitter();
     this._chartApi = new TealchartApi(this._symbol, this._interval, options.account);
@@ -219,6 +235,8 @@ export class TealchartWidget {
         (event) => this._handleRecoveryNeeded(event),
         options.gapDetection
       );
+      // Pass logger to gap detection manager
+      this._gapDetectionManager.setLogger(this._logger);
       // Wire up error state change callback
       this._gapDetectionManager.setOnErrorStateChange((error) => {
         this._gapDetectionError = error;
@@ -721,6 +739,8 @@ export class TealchartWidget {
               this._chartApi.emitCrossHairMoved({ price, time });
             }
           },
+          // Debug logger for the console
+          logger: this._logger,
         })
       )
     );
@@ -1194,6 +1214,14 @@ export class TealchartWidget {
    */
   getGapDetectionErrorUpdateRef(): React.MutableRefObject<((error: GapDetectionErrorState | null) => void) | null> {
     return this._gapDetectionErrorUpdateRef;
+  }
+
+  /**
+   * Get the debug logger for this chart instance.
+   * Used by React components to display logs in the UI.
+   */
+  getLogger(): TealchartLogger {
+    return this._logger;
   }
 
   /**

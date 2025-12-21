@@ -16,6 +16,7 @@ import { Bar, ChartMargins, ContextMenuItem, GapDetectionErrorState, OrderLineRe
 import type { PlotOutput, InputDefinition } from '@tealstreet/tealscript';
 import type { ISaveLoadAdapter } from '../transformer';
 import { TranslationProvider, useChartTranslations, type PartialChartTranslations } from '../i18n';
+import type { TealchartLogger } from '../debug/TealchartLogger';
 
 /** Info about each indicator for pane assignment */
 export interface IndicatorPaneInfo {
@@ -107,6 +108,8 @@ export interface ChartContainerProps {
   translations?: PartialChartTranslations;
   /** Gap detection error state (if any) */
   gapDetectionError?: GapDetectionErrorState | null;
+  /** Debug logger for this chart (optional - enables debug console in top bar) */
+  logger?: TealchartLogger | null;
 }
 
 // ============================================================================
@@ -392,6 +395,8 @@ const ChartContainerInner: React.FC<ChartContainerProps> = memo(({
   translations,
   // Gap detection error
   gapDetectionError,
+  // Debug logging
+  logger,
 }) => {
   // Get focus atoms for this chart
   const focusAtoms = useMemo(() => createChartFocusAtoms(chartKey), [chartKey]);
@@ -631,6 +636,7 @@ const ChartContainerInner: React.FC<ChartContainerProps> = memo(({
             onLoadLayout={onLoadLayout}
             onSaveLayout={onSaveLayout}
             gapDetectionError={gapDetectionError}
+            logger={logger}
           />
         </div>
       )}
