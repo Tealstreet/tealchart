@@ -5,7 +5,7 @@
  * Logs are captured even when the overlay is closed.
  */
 
-import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { LogEntry, LogLevel, TealchartLogger } from '../debug/TealchartLogger';
 
 // ============================================================================
@@ -92,6 +92,13 @@ const styles = {
   headerActions: {
     display: 'flex',
     gap: 8,
+    alignItems: 'center',
+  },
+  dragHandle: {
+    cursor: 'move',
+    padding: '0 8px',
+    color: 'var(--text2, #787b86)',
+    userSelect: 'none' as const,
   },
   headerButton: {
     padding: '4px 8px',
@@ -121,6 +128,8 @@ const styles = {
     borderRadius: 2,
     marginBottom: 2,
     wordBreak: 'break-word' as const,
+    userSelect: 'text' as const,
+    cursor: 'text',
   },
   logEntryDebug: {
     color: 'var(--text2, #787b86)',
@@ -153,6 +162,46 @@ const styles = {
     color: 'var(--text2, #787b86)',
     fontSize: 12,
   },
+  dupeCount: {
+    marginLeft: 6,
+    padding: '0 4px',
+    borderRadius: 3,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    color: 'var(--text2, #787b86)',
+    fontSize: 10,
+    fontWeight: 500,
+  },
+  filterContainer: {
+    padding: '4px 12px 8px',
+    borderBottom: '1px solid var(--border, #363a45)',
+  },
+  filterInput: {
+    width: '100%',
+    padding: '4px 8px',
+    border: '1px solid var(--border, #363a45)',
+    borderRadius: 4,
+    backgroundColor: 'var(--input-bg, #1e222d)',
+    color: 'var(--text, #d1d4dc)',
+    fontSize: 11,
+    fontFamily: 'Monaco, Consolas, "Courier New", monospace',
+    outline: 'none',
+  },
+  resizeHandle: {
+    position: 'absolute' as const,
+    bottom: 0,
+    right: 0,
+    width: 24,
+    height: 24,
+    cursor: 'se-resize',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'var(--text2, #787b86)',
+    fontSize: 18,
+    userSelect: 'none' as const,
+    backgroundColor: 'var(--card-header-bg, #262a35)',
+    borderTopLeftRadius: 4,
+  },
 };
 
 // ============================================================================
@@ -173,20 +222,29 @@ export const DebugConsole: React.FC<DebugConsoleProps> = memo(({ logger }) => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [buttonHovered, setButtonHovered] = useState(false);
   const [clearHovered, setClearHovered] = useState(false);
+  const [copyHovered, setCopyHovered] = useState(false);
+  const [overlayPosition, setOverlayPosition] = useState({ top: 0, left: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [isResizing, setIsResizing] = useState(false);
+  const [overlaySize, setOverlaySize] = useState({ width: 500, height: 400 });
+  const [filter, setFilter] = useState('');
   const logListRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
-  // Subscribe to logger updates
+  // Subscribe to logger updates (only when overlay is open to save perf)
   useEffect(() => {
-    if (!logger) {
-      setLogs([]);
+    if (!logger || !isOpen) {
       return;
     }
 
     return logger.subscribe((entries) => {
-      setLogs(entries);
+      // Copy array for React state (logger passes internal array directly)
+      setLogs([...entries]);
     });
-  }, [logger]);
+  }, [logger, isOpen]);
 
   // Auto-scroll to bottom when new logs arrive and overlay is open
   useEffect(() => {
@@ -212,6 +270,125 @@ export const DebugConsole: React.FC<DebugConsoleProps> = memo(({ logger }) => {
   const handleClear = useCallback(() => {
     logger?.clear();
   }, [logger]);
+
+  const handleToggle = useCallback(() => {
+    if (!isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setOverlayPosition({
+        top: rect.bottom + 4,
+        left: Math.max(8, rect.left),
+      });
+    }
+    setIsOpen(!isOpen);
+  }, [isOpen]);
+
+  // Copy logs to clipboard
+  const handleCopy = useCallback(() => {
+    const text = logs.map(entry => {
+      const time = new Date(entry.timestamp).toISOString();
+      const data = entry.data !== undefined ? ` ${JSON.stringify(entry.data)}` : '';
+      return `${time} [${entry.level}] [${entry.category}] ${entry.message}${data}`;
+    }).join('\n');
+    navigator.clipboard.writeText(text);
+  }, [logs]);
+
+  // Drag handlers
+  const handleDragStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    setDragOffset({
+      x: e.clientX - overlayPosition.left,
+      y: e.clientY - overlayPosition.top,
+    });
+  }, [overlayPosition]);
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      setOverlayPosition({
+        top: e.clientY - dragOffset.y,
+        left: e.clientX - dragOffset.x,
+      });
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, dragOffset]);
+
+  // Resize handlers
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizing(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      // Min size only, no max bounds
+      const newWidth = Math.max(300, e.clientX - overlayPosition.left);
+      const newHeight = Math.max(200, e.clientY - overlayPosition.top);
+      setOverlaySize({ width: newWidth, height: newHeight });
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing, overlayPosition]);
+
+  // Filter logs: +term includes, -term excludes, plain term includes
+  const filteredLogs = useMemo(() => {
+    if (!filter.trim()) return logs;
+
+    const terms = filter.split(/\s+/).filter(Boolean);
+    const includes: string[] = [];
+    const excludes: string[] = [];
+
+    terms.forEach(term => {
+      if (term.startsWith('-') && term.length > 1) {
+        excludes.push(term.slice(1).toLowerCase());
+      } else if (term.startsWith('+') && term.length > 1) {
+        includes.push(term.slice(1).toLowerCase());
+      } else {
+        includes.push(term.toLowerCase());
+      }
+    });
+
+    return logs.filter(entry => {
+      const text = `${entry.category} ${entry.message} ${entry.data !== undefined ? JSON.stringify(entry.data) : ''}`.toLowerCase();
+
+      // Check excludes first
+      for (const ex of excludes) {
+        if (text.includes(ex)) return false;
+      }
+
+      // If no includes specified, show all (that weren't excluded)
+      if (includes.length === 0) return true;
+
+      // Check includes - must match at least one
+      for (const inc of includes) {
+        if (text.includes(inc)) return true;
+      }
+      return false;
+    });
+  }, [logs, filter]);
 
   const formatTimestamp = (ts: number): string => {
     const date = new Date(ts);
@@ -250,13 +427,14 @@ export const DebugConsole: React.FC<DebugConsoleProps> = memo(({ logger }) => {
     <div ref={containerRef} style={styles.container}>
       {/* Toggle button */}
       <button
+        ref={buttonRef}
         style={{
           ...styles.button,
           ...(buttonHovered ? styles.buttonHover : {}),
           ...(isOpen ? styles.buttonActive : {}),
           ...(hasIssues && !isOpen ? styles.buttonWithErrors : {}),
         }}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggle}
         onMouseEnter={() => setButtonHovered(true)}
         onMouseLeave={() => setButtonHovered(false)}
         title="Debug Console"
@@ -268,14 +446,46 @@ export const DebugConsole: React.FC<DebugConsoleProps> = memo(({ logger }) => {
         )}
       </button>
 
-      {/* Overlay */}
+      {/* Overlay - uses fixed positioning to escape overflow:hidden containers */}
       {isOpen && (
-        <div style={styles.overlay}>
+        <div
+          ref={overlayRef}
+          style={{
+            ...styles.overlay,
+            position: 'fixed',
+            top: overlayPosition.top,
+            left: overlayPosition.left,
+            width: overlaySize.width,
+            height: overlaySize.height,
+            maxWidth: 'none',
+            maxHeight: 'none',
+          }}
+        >
           <div style={styles.header}>
+            {/* Drag handle */}
+            <span
+              style={styles.dragHandle}
+              onMouseDown={handleDragStart}
+              title="Drag to move"
+            >
+              ⋮⋮
+            </span>
             <span style={styles.headerTitle}>
-              Debug Console ({logs.length} entries)
+              Debug ({filteredLogs.length}/{logs.length})
             </span>
             <div style={styles.headerActions}>
+              <button
+                style={{
+                  ...styles.headerButton,
+                  ...(copyHovered ? styles.headerButtonHover : {}),
+                }}
+                onClick={handleCopy}
+                onMouseEnter={() => setCopyHovered(true)}
+                onMouseLeave={() => setCopyHovered(false)}
+                title="Copy all logs to clipboard"
+              >
+                Copy
+              </button>
               <button
                 style={{
                   ...styles.headerButton,
@@ -290,11 +500,24 @@ export const DebugConsole: React.FC<DebugConsoleProps> = memo(({ logger }) => {
             </div>
           </div>
 
+          {/* Filter input */}
+          <div style={styles.filterContainer}>
+            <input
+              type="text"
+              style={styles.filterInput}
+              placeholder="Filter: term, +include, -exclude"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+          </div>
+
           <div ref={logListRef} style={styles.logList}>
-            {logs.length === 0 ? (
-              <div style={styles.emptyState}>No logs yet</div>
+            {filteredLogs.length === 0 ? (
+              <div style={styles.emptyState}>
+                {logs.length === 0 ? 'No logs yet' : 'No matching logs'}
+              </div>
             ) : (
-              logs.map((entry) => (
+              filteredLogs.map((entry) => (
                 <div key={entry.id} style={getLogStyle(entry.level)}>
                   <span style={styles.timestamp}>{formatTimestamp(entry.timestamp)}</span>
                   <span style={styles.category}>[{entry.category}]</span>
@@ -306,9 +529,21 @@ export const DebugConsole: React.FC<DebugConsoleProps> = memo(({ logger }) => {
                         : String(entry.data)}
                     </span>
                   )}
+                  {entry.count > 1 && (
+                    <span style={styles.dupeCount}>×{entry.count}</span>
+                  )}
                 </div>
               ))
             )}
+          </div>
+
+          {/* Resize handle */}
+          <div
+            style={styles.resizeHandle}
+            onMouseDown={handleResizeStart}
+            title="Drag to resize"
+          >
+            ⌟
           </div>
         </div>
       )}

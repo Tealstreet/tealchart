@@ -22,6 +22,8 @@ export interface LogEntry {
   category: string;
   message: string;
   data?: unknown;
+  /** Count of consecutive duplicate logs (1 = no dupes) */
+  count: number;
 }
 
 export interface TealchartLoggerOptions {
@@ -46,6 +48,7 @@ export class TealchartLogger {
   private _consoleOutput: boolean;
   private _consolePrefix: string;
   private _enabled = true;
+  private _notifyScheduled = false;
 
   constructor(options: TealchartLoggerOptions = {}) {
     this._maxEntries = options.maxEntries ?? 500;
@@ -75,10 +78,39 @@ export class TealchartLogger {
   }
 
   /**
+   * Check if two log entries are duplicates (same level, category, message, data)
+   */
+  private _isDuplicate(a: LogEntry, level: LogLevel, category: string, message: string, data?: unknown): boolean {
+    return a.level === level &&
+           a.category === category &&
+           a.message === message &&
+           JSON.stringify(a.data) === JSON.stringify(data);
+  }
+
+  /**
    * Log a message
    */
   log(level: LogLevel, category: string, message: string, data?: unknown): void {
     if (!this._enabled) return;
+
+    // Check for duplicate of last entry
+    const lastEntry = this._entries[this._entries.length - 1];
+    if (lastEntry && this._isDuplicate(lastEntry, level, category, message, data)) {
+      // Increment count on existing entry
+      lastEntry.count++;
+      lastEntry.timestamp = Date.now(); // Update timestamp to latest
+
+      // Console output for dupe
+      if (this._consoleOutput) {
+        this._logToConsole(lastEntry);
+      }
+
+      // Schedule notification
+      if (this._listeners.size > 0) {
+        this._scheduleNotify();
+      }
+      return;
+    }
 
     const entry: LogEntry = {
       id: this._nextId++,
@@ -87,14 +119,15 @@ export class TealchartLogger {
       category,
       message,
       data,
+      count: 1,
     };
 
     // Add to buffer
     this._entries.push(entry);
 
-    // Trim if over max
+    // Trim if over max (use splice to mutate in place, avoiding reallocation)
     if (this._entries.length > this._maxEntries) {
-      this._entries = this._entries.slice(-this._maxEntries);
+      this._entries.splice(0, this._entries.length - this._maxEntries);
     }
 
     // Console output
@@ -102,8 +135,10 @@ export class TealchartLogger {
       this._logToConsole(entry);
     }
 
-    // Notify listeners
-    this._notifyListeners();
+    // Schedule batched notification (skip if no listeners)
+    if (this._listeners.size > 0) {
+      this._scheduleNotify();
+    }
   }
 
   /**
@@ -151,6 +186,7 @@ export class TealchartLogger {
    */
   clear(): void {
     this._entries = [];
+    // Notify immediately on clear (user action)
     this._notifyListeners();
   }
 
@@ -160,8 +196,8 @@ export class TealchartLogger {
    */
   subscribe(listener: LogListener): () => void {
     this._listeners.add(listener);
-    // Immediately call with current logs
-    listener(this.getEntries());
+    // Immediately call with current logs (pass directly, don't copy)
+    listener(this._entries);
     return () => {
       this._listeners.delete(listener);
     };
@@ -180,7 +216,8 @@ export class TealchartLogger {
   // ============================================================================
 
   private _logToConsole(entry: LogEntry): void {
-    const prefix = `${this._consolePrefix}[${entry.category}]`;
+    const countStr = entry.count > 1 ? ` (x${entry.count})` : '';
+    const prefix = `${this._consolePrefix}[${entry.category}]${countStr}`;
     const args: unknown[] = [prefix, entry.message];
     if (entry.data !== undefined) {
       args.push(entry.data);
@@ -202,8 +239,23 @@ export class TealchartLogger {
     }
   }
 
+  /**
+   * Schedule a batched notification on next animation frame
+   * This coalesces multiple rapid logs into a single UI update
+   */
+  private _scheduleNotify(): void {
+    if (this._notifyScheduled) return;
+    this._notifyScheduled = true;
+    requestAnimationFrame(() => {
+      this._notifyScheduled = false;
+      this._notifyListeners();
+    });
+  }
+
   private _notifyListeners(): void {
-    const entries = this.getEntries();
+    if (this._listeners.size === 0) return;
+    // Pass entries directly (listeners should not mutate)
+    const entries = this._entries;
     for (const listener of this._listeners) {
       try {
         listener(entries);

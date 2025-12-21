@@ -113,8 +113,8 @@ export class TealchartWidget {
   // Track if interval was explicitly provided (for controlled vs uncontrolled behavior)
   private _intervalWasProvided: boolean;
 
-  // Debug logger for this chart instance
-  private _logger: TealchartLogger;
+  // Debug logger for this chart instance (null if disabled)
+  private _logger: TealchartLogger | null = null;
 
   constructor(container: HTMLElement, options: TealchartWidgetOptions) {
     this._container = container;
@@ -140,17 +140,18 @@ export class TealchartWidget {
     // Initialize pane manager for multi-pane indicator support
     this._paneManager = new PaneManager();
 
-    // Initialize debug logger
-    // Console output is controlled by debugLoggingEnabled option (default: true)
-    this._logger = new TealchartLogger({
-      consoleOutput: options.debugLoggingEnabled !== false,
-      consolePrefix: `[Tealchart:${this._chartKey}]`,
-    });
-    this._logger.info(LogCategory.Widget, 'Widget initializing', {
-      chartKey: this._chartKey,
-      symbol: this._symbol,
-      interval: this._interval,
-    });
+    // Initialize debug logger (skip if disabled for performance profiling)
+    if (!options.disableDebugOverlay) {
+      this._logger = new TealchartLogger({
+        consoleOutput: options.debugLoggingEnabled === true,
+        consolePrefix: `[Tealchart:${this._chartKey}]`,
+      });
+      this._logger.info(LogCategory.Widget, 'Widget initializing', {
+        chartKey: this._chartKey,
+        symbol: this._symbol,
+        interval: this._interval,
+      });
+    }
 
     this._eventEmitter = new EventEmitter();
     this._chartApi = new TealchartApi(this._symbol, this._interval, options.account);
@@ -1219,8 +1220,9 @@ export class TealchartWidget {
   /**
    * Get the debug logger for this chart instance.
    * Used by React components to display logs in the UI.
+   * Returns null if debug overlay is disabled.
    */
-  getLogger(): TealchartLogger {
+  getLogger(): TealchartLogger | null {
     return this._logger;
   }
 

@@ -679,9 +679,15 @@ export interface TealchartWidgetOptions {
    * Whether to enable debug logging for this chart instance.
    * When enabled, logs are captured to a ring buffer and can be displayed in the UI.
    * Console output is also enabled when true.
-   * Default: true
+   * Default: false
    */
   debugLoggingEnabled?: boolean;
+  /**
+   * Completely disable the debug overlay and logger (for performance profiling).
+   * When true, no logger is created and no debug UI is shown.
+   * Default: false
+   */
+  disableDebugOverlay?: boolean;
 }
 
 // ============================================================================
