@@ -143,6 +143,7 @@ export class PriceLineManager {
   private cachedLineGroups: Map<string, Konva.Group> = new Map();
   private lastLabelBoundsSignature: string = '';
   private needsFullRebuild: boolean = true;
+  private lastCrosshairLabel: string = ''; // Track crosshair label to detect pane changes
 
   constructor(options: PriceLineManagerOptions) {
     this.layer = options.layer;
@@ -177,11 +178,19 @@ export class PriceLineManager {
 
     // Track crosshair visibility changes to force rebuild (since crosshair is excluded from signature)
     const crosshairVisibilityChanged = crosshair && crosshair.visible !== this.crosshair.visible;
+
+    // Track crosshair label changes to detect pane transitions
+    // When cursor moves between panes, the label value changes even if visibility stays the same
+    const crosshairBound = labelBounds.find(b => b.type === 'crosshair');
+    const currentCrosshairLabel = crosshairBound?.label?.primaryText ?? '';
+    const crosshairLabelChanged = currentCrosshairLabel !== this.lastCrosshairLabel;
+    this.lastCrosshairLabel = currentCrosshairLabel;
+
     if (crosshair) {
       this.crosshair = crosshair;
     }
 
-    if (structureChanged || this.needsFullRebuild || crosshairVisibilityChanged) {
+    if (structureChanged || this.needsFullRebuild || crosshairVisibilityChanged || crosshairLabelChanged) {
       this.lastLabelBoundsSignature = newSignature;
       this.needsFullRebuild = false;
       this.render();
