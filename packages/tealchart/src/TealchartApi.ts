@@ -547,7 +547,11 @@ export class TealchartApi {
 
       // @internal: Get render data for canvas drawing
       _getRenderData(): OrderLineRenderData {
-        return data;
+        // editable should only be true if there's an onMove callback to handle the drag
+        return {
+          ...data,
+          editable: data.editable && !!_onMoveCallback,
+        };
       },
 
       // @internal: Get callbacks for interaction handling

@@ -103,6 +103,11 @@ export interface PriceLine {
    * Format: MM:SS or HH:MM:SS for times >= 1 hour.
    */
   countdownToTime?: number;
+  /**
+   * Whether this line is draggable (has onMove callback).
+   * Only order lines with an onMove callback should be draggable.
+   */
+  draggable?: boolean;
 
   // === TEALSTREET: Position-specific fields for bracket TP/SL ===
 
@@ -213,6 +218,8 @@ export interface PriceLineLabelBounds {
   renderLineOnCanvas?: boolean;
   /** Countdown target time (ms) - PriceLineLayer computes secondaryText from this */
   countdownToTime?: number;
+  /** Whether this line is draggable (has onMove callback) */
+  draggable?: boolean;
 
   // === TEALSTREET: Position-specific fields for bracket TP/SL ===
 

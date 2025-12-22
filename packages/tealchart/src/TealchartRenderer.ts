@@ -563,6 +563,7 @@ export class TealchartRenderer {
         priority: line.priority,
         renderLineOnCanvas: line.renderLineOnCanvas,
         countdownToTime: line.countdownToTime,
+        draggable: line.draggable,
         // Position-specific fields for bracket TP/SL drag
         positionId: line.positionId,
         partialEnabled: line.partialEnabled,
@@ -2468,6 +2469,7 @@ export class TealchartRenderer {
         priority: line.priority,
         renderLineOnCanvas: line.renderLineOnCanvas,
         countdownToTime: line.countdownToTime,
+        draggable: line.draggable,
         // Position-specific fields for bracket TP/SL drag
         positionId: line.positionId,
         partialEnabled: line.partialEnabled,
@@ -3572,6 +3574,12 @@ export class TealchartRenderer {
         priority: line.priority,
         renderLineOnCanvas: line.renderLineOnCanvas,
         countdownToTime: line.countdownToTime,
+        draggable: line.draggable,
+        // Position-specific fields for bracket TP/SL drag
+        positionId: line.positionId,
+        partialEnabled: line.partialEnabled,
+        positionData: line.positionData,
+        brackets: line.brackets,
       };
     });
 
