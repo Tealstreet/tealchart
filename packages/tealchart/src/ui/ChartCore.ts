@@ -480,6 +480,9 @@ export class ChartCore {
         width: this.options.width,
         height: this.options.height,
         priceAxisWidth: this.margins.right,
+        timeAxisHeight: this.margins.bottom,
+        topMargin: this.margins.top,
+        leftMargin: this.margins.left,
       }),
       getPriceFromY: (y) => this.renderer.publicYToPriceWithLayout(
         y,
@@ -510,6 +513,10 @@ export class ChartCore {
           this.viewport ?? TealchartRenderer.calculateViewport(this.bars)
         );
         this.options.onCrossHairMoved?.(price, time);
+        this.scheduleRender();
+      },
+      onCrossHairVisibilityChange: (visible) => {
+        this.crosshair = { ...this.crosshair, visible };
         this.scheduleRender();
       },
       onMouseDown: () => this.options.onMouseDown?.(),

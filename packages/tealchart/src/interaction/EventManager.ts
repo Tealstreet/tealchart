@@ -28,6 +28,8 @@ export interface EventManagerCallbacks {
   onRequestMoreBars?: (direction: 'left' | 'right') => void;
   /** Called when crosshair position updates */
   onCrossHairMoved?: (x: number, y: number) => void;
+  /** Called when crosshair visibility changes */
+  onCrossHairVisibilityChange?: (visible: boolean) => void;
   /** Called on mouse down (for hotkey integration) */
   onMouseDown?: () => void;
   /** Called on mouse up (for hotkey integration) */
@@ -41,7 +43,14 @@ export interface EventManagerCallbacks {
   /** Get current viewport */
   getViewport: () => Viewport;
   /** Get chart dimensions */
-  getDimensions: () => { width: number; height: number; priceAxisWidth: number };
+  getDimensions: () => {
+    width: number;
+    height: number;
+    priceAxisWidth: number;
+    timeAxisHeight: number;
+    topMargin: number;
+    leftMargin: number;
+  };
   /** Get pane at Y position (for price-axis zoom) */
   getPaneAtY?: (y: number) => PaneInfo | null;
   /** Check if position is over interactive Konva element */
@@ -143,6 +152,7 @@ export class EventManager {
   private boundKeyDown: (e: KeyboardEvent) => void;
   private boundWindowMouseMove: (e: MouseEvent) => void;
   private boundWindowMouseUp: (e: MouseEvent) => void;
+  private boundDocumentMouseMove: (e: MouseEvent) => void;
 
   constructor(container: HTMLElement, callbacks: EventManagerCallbacks) {
     this.container = container;
@@ -161,6 +171,7 @@ export class EventManager {
     this.boundKeyDown = this.handleKeyDown.bind(this);
     this.boundWindowMouseMove = this.handleWindowMouseMove.bind(this);
     this.boundWindowMouseUp = this.handleWindowMouseUp.bind(this);
+    this.boundDocumentMouseMove = this.handleDocumentMouseMove.bind(this);
 
     this.attach();
   }
@@ -221,6 +232,9 @@ export class EventManager {
 
     // Keyboard events
     document.addEventListener('keydown', this.boundKeyDown);
+
+    // Document-level mousemove to catch fast mouse exits
+    document.addEventListener('mousemove', this.boundDocumentMouseMove);
   }
 
   private detach(): void {
@@ -241,6 +255,7 @@ export class EventManager {
 
     // Document events
     document.removeEventListener('keydown', this.boundKeyDown);
+    document.removeEventListener('mousemove', this.boundDocumentMouseMove);
   }
 
   // ============================================================================
@@ -306,12 +321,23 @@ export class EventManager {
     const dims = this.callbacks.getDimensions();
     this.state.isOverPriceAxis = x > dims.width - dims.priceAxisWidth;
 
-    // Update crosshair
+    // Check if in dead zone (top bar or time axis - areas where crosshair shouldn't show)
+    const inDeadZone = y < dims.topMargin || y > dims.height - dims.timeAxisHeight;
+
+    // Update crosshair - hide when over price axis or in dead zones
     if (!this.state.isDragging) {
-      this.crosshair.visible = true;
+      const shouldShowCrosshair = !this.state.isOverPriceAxis && !inDeadZone;
+      const wasVisible = this.crosshair.visible;
+      this.crosshair.visible = shouldShowCrosshair;
       this.crosshair.x = x;
       this.crosshair.y = y;
-      this.callbacks.onCrossHairMoved?.(x, y);
+      if (shouldShowCrosshair) {
+        this.callbacks.onCrossHairMoved?.(x, y);
+      }
+      // Notify visibility change
+      if (wasVisible !== shouldShowCrosshair) {
+        this.callbacks.onCrossHairVisibilityChange?.(shouldShowCrosshair);
+      }
       // Only schedule render when NOT dragging
       // During drag, handleWindowMouseMove handles rendering via onViewportChange
       this.scheduleRender();
@@ -375,8 +401,39 @@ export class EventManager {
 
   private handleMouseLeave(_e: MouseEvent): void {
     if (!this.state.isDragging) {
+      const wasVisible = this.crosshair.visible;
       this.crosshair.visible = false;
+      if (wasVisible) {
+        this.callbacks.onCrossHairVisibilityChange?.(false);
+      }
       this.scheduleRender();
+    }
+  }
+
+  /**
+   * Document-level mousemove listener to catch fast mouse exits
+   * The container's onMouseLeave can miss events when the mouse moves quickly
+   */
+  private handleDocumentMouseMove(e: MouseEvent): void {
+    // Skip if dragging (drag continues via window listeners)
+    if (this.state.isDragging) return;
+    // Skip if crosshair not visible (nothing to hide)
+    if (!this.crosshair.visible) return;
+
+    const rect = this.container.getBoundingClientRect();
+    const isInside =
+      e.clientX >= rect.left &&
+      e.clientX <= rect.right &&
+      e.clientY >= rect.top &&
+      e.clientY <= rect.bottom;
+
+    if (!isInside) {
+      // Mouse is outside container - hide crosshair
+      this.crosshair.visible = false;
+      this.state.isOverPriceAxis = false;
+      this.callbacks.onCrossHairVisibilityChange?.(false);
+      this.scheduleRender();
+      this.callbacks.onCursorChange?.('crosshair');
     }
   }
 
