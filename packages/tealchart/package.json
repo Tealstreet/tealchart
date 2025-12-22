@@ -21,15 +21,12 @@
     "react-dom": "^18.0.0"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.7.2",
-    "@fortawesome/free-solid-svg-icons": "^6.7.2",
-    "@fortawesome/react-fontawesome": "^0.2.3",
+    "@nanostores/persistent": "^1.2.0",
+    "@nanostores/react": "^1.0.0",
     "@tealstreet/react-colorful": "*",
     "@tealstreet/tealscript": "*",
-    "jotai": "^2.16.0",
-    "jotai-optics": "^0.4.0",
     "konva": "^10.0.12",
-    "optics-ts": "^2.4.1",
+    "nanostores": "^1.1.0",
     "react-konva": "^19.2.1"
   },
   "devDependencies": {

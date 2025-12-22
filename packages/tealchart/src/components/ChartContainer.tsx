@@ -1,10 +1,10 @@
 /**
  * ChartContainer - Complete chart component with top bar and canvas
- * Manages Jotai state and coordinates between toolbar and chart
+ * Manages Nanostores state and coordinates between toolbar and chart
  */
 
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useAtom, useSetAtom } from 'jotai';
+import { useStore } from '@nanostores/react';
 import { useMobileTapHover, isTouchDevice } from '../hooks/useMobileTapHover';
 import { ChartTopBar } from './ChartTopBar';
 import { ChartLegend, type ActiveIndicator } from './ChartLegend';
@@ -398,10 +398,11 @@ const ChartContainerInner: React.FC<ChartContainerProps> = memo(({
   // Debug logging
   logger,
 }) => {
-  // Get focus atoms for this chart
-  const focusAtoms = useMemo(() => createChartFocusAtoms(chartKey), [chartKey]);
-  const [interval, setInterval] = useAtom(focusAtoms.intervalAtom);
-  const setSymbol = useSetAtom(focusAtoms.symbolAtom);
+  // Get chart stores for this chart
+  const chartStores = useMemo(() => createChartFocusAtoms(chartKey), [chartKey]);
+  const interval = useStore(chartStores.intervalAtom);
+  const setInterval = chartStores.setInterval;
+  const setSymbol = chartStores.setSymbol;
 
   // Get latest bars directly from props (recalculated on every render for real-time updates)
   const latestBar = bars.length > 0 ? bars[bars.length - 1] : undefined;
