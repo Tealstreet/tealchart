@@ -389,6 +389,7 @@ export class ChartCore {
   private chartContainer: HTMLDivElement;
   private canvas: HTMLCanvasElement;
   private resetButton: HTMLButtonElement | null = null;
+  private resetButtonHoverZone: HTMLDivElement | null = null;
   private contextMenu: HTMLDivElement | null = null;
 
   // Core components
@@ -704,6 +705,9 @@ export class ChartCore {
       this.priceLineManager.setDimensions(width, height, this.margins);
     }
 
+    // Update reset button position
+    this.updateResetButtonPosition();
+
     this.scheduleRender();
   }
 
@@ -836,58 +840,85 @@ export class ChartCore {
   // ============================================================================
 
   private createResetButton(): void {
+    // Circular reset button - matches React version
     this.resetButton = button({
       style: {
         position: 'absolute',
-        bottom: '40px',
-        right: '8px',
-        padding: '6px 10px',
-        backgroundColor: 'rgba(30, 34, 45, 0.9)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        borderRadius: '4px',
-        color: '#d1d4dc',
-        fontSize: '12px',
+        width: '28px',
+        height: '28px',
+        borderRadius: '50%',
+        backgroundColor: 'rgba(60, 60, 70, 0.85)',
+        border: 'none',
+        outline: 'none',
         cursor: 'pointer',
-        display: 'none',
+        display: 'flex',
         alignItems: 'center',
-        gap: '4px',
+        justifyContent: 'center',
+        opacity: '0',
+        transition: 'opacity 0.2s ease-in-out',
+        pointerEvents: 'none',
         zIndex: '10',
       },
+      attrs: { title: 'Reset view' },
       onClick: () => this.resetViewport(),
+      onMouseEnter: () => this.showResetButtonFn(),
+      onMouseLeave: () => this.hideResetButtonFn(),
     });
 
-    // Add rotate icon
-    this.resetButton.appendChild(icons.spinner(12));
-    this.resetButton.appendChild(document.createTextNode('Auto'));
+    // Add refresh icon
+    this.resetButton.appendChild(icons.refresh(14, '#d1d4dc'));
 
     this.chartContainer.appendChild(this.resetButton);
 
-    // Create hover zone for showing reset button
-    const hoverZone = div({
+    // Create circular hover zone (larger than button for easier targeting)
+    this.resetButtonHoverZone = div({
       style: {
         position: 'absolute',
-        bottom: '0',
-        right: '0',
-        width: '150px',
-        height: '150px',
+        width: '100px',
+        height: '100px',
+        borderRadius: '50%',
         zIndex: '1',
+        // Debug: uncomment to see hover zone
+        // backgroundColor: 'rgba(255, 0, 0, 0.1)',
       },
       onMouseEnter: () => this.showResetButtonFn(),
       onMouseLeave: () => this.hideResetButtonFn(),
     });
-    this.chartContainer.appendChild(hoverZone);
+    this.chartContainer.appendChild(this.resetButtonHoverZone);
+
+    // Position button and hover zone
+    this.updateResetButtonPosition();
+  }
+
+  private updateResetButtonPosition(): void {
+    const centerX = this.options.width / 2;
+    const bottomY = this.options.height - this.margins.bottom - 60;
+
+    if (this.resetButton) {
+      this.resetButton.style.left = `${centerX}px`;
+      this.resetButton.style.top = `${bottomY}px`;
+      this.resetButton.style.transform = 'translate(-50%, -50%)';
+    }
+
+    if (this.resetButtonHoverZone) {
+      this.resetButtonHoverZone.style.left = `${centerX}px`;
+      this.resetButtonHoverZone.style.top = `${bottomY}px`;
+      this.resetButtonHoverZone.style.transform = 'translate(-50%, -50%)';
+    }
   }
 
   private showResetButtonFn(): void {
     if (this.resetButton) {
-      this.resetButton.style.display = 'flex';
+      this.resetButton.style.opacity = '1';
+      this.resetButton.style.pointerEvents = 'auto';
       this.showResetButton = true;
     }
   }
 
   private hideResetButtonFn(): void {
     if (this.resetButton) {
-      this.resetButton.style.display = 'none';
+      this.resetButton.style.opacity = '0';
+      this.resetButton.style.pointerEvents = 'none';
       this.showResetButton = false;
     }
   }
