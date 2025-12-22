@@ -1132,7 +1132,7 @@ export class ChartCore {
     // Compute label bounds for Konva layer (with dirty checking)
     // React pattern from Tealchart.tsx:696-727: only recompute when key changes or throttled during drag
     const linePrices = allPriceLines.map(l => l.price.toFixed(6)).join(',');
-    const boundsKey = `${vp.priceMin.toFixed(4)},${vp.priceMax.toFixed(4)}|${linePrices}|${Math.round(this.crosshair.y)}`;
+    const boundsKey = `${vp.priceMin.toFixed(4)},${vp.priceMax.toFixed(4)}|${linePrices}|${this.crosshair.visible}|${Math.round(this.crosshair.y)}`;
     const now = Date.now();
     const keyChanged = boundsKey !== this.lastBoundsKey;
     const isDragging = this.eventManager.getIsDragging();

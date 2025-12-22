@@ -636,9 +636,8 @@ export class TealchartRenderer {
         // Simple price line (last price, countdown timer, etc.)
         this.drawSimplePriceLine(bound, viewport, priceHeight);
       } else if (lineType === 'crosshair') {
-        // Crosshair is rendered by Konva layer for proper z-ordering (floats on top)
-        // Skip canvas rendering
-        continue;
+        // Crosshair horizontal line drawn on canvas, label by Konva (renderLineOnCanvas: true)
+        this.drawSimplePriceLine(bound, viewport, priceHeight);
       } else if (lineType === 'order' || lineType === 'position') {
         // Order/position lines are rendered by Konva layer for interactivity
         // Skip canvas rendering
@@ -668,6 +667,11 @@ export class TealchartRenderer {
     const labelY = labelCenterY - bound.height / 2;
 
     // Draw horizontal line - stop before label with gap (always draw, clamped to visible area)
+    // For crosshair, stop before the + button (at width - margins.right - 10, radius 8)
+    const lineEndX = bound.type === 'crosshair'
+      ? options.width - margins.right - 10 - 8 - 4 // Stop before + button with gap
+      : labelX - PRICE_AXIS_RIGHT_PADDING;
+
     ctx.save();
     ctx.strokeStyle = color;
     ctx.lineWidth = bound.lineWidth || 1;
@@ -678,7 +682,7 @@ export class TealchartRenderer {
     }
     ctx.beginPath();
     ctx.moveTo(margins.left, lineY);
-    ctx.lineTo(labelX - PRICE_AXIS_RIGHT_PADDING, lineY);
+    ctx.lineTo(lineEndX, lineY);
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.restore();
@@ -2386,7 +2390,8 @@ export class TealchartRenderer {
     // Build combined price lines list, including crosshair if provided
     const allPriceLines = [...priceLines];
 
-    // Create crosshair price line with correct pane detection (avoids duplicate pane computation)
+    // Create crosshair price line with correct pane detection
+    // Line is drawn on canvas, label is rendered by Konva (like last-trade line)
     if (crosshair?.visible) {
       const crosshairY = crosshair.y;
       // Find which pane the crosshair is in
@@ -2422,6 +2427,7 @@ export class TealchartRenderer {
             type: 'crosshair',
             floatingLabel: true,
             targetPaneId: pane.id,
+            renderLineOnCanvas: true, // Line drawn on canvas, label by Konva
             label: {
               primaryText: labelText,
               backgroundColor: crosshair.color,
@@ -2884,7 +2890,7 @@ export class TealchartRenderer {
     }
 
     // Create crosshair price lines now that we have correct Y ranges
-    // This is done here so crosshair values are calculated with correct auto-scaled ranges
+    // Line is drawn on canvas, label by Konva (like last-trade line)
     const allPriceLines = priceLines ? [...priceLines] : [];
     if (crosshair?.visible) {
       const crosshairColor = options.crosshairColor;
@@ -2901,7 +2907,6 @@ export class TealchartRenderer {
           let labelText: string;
           const range = pane.yMax - pane.yMin;
           if (pane.type === 'main') {
-            // Use price formatting - prefer pricePrecision if available
             let decimals: number;
             if (options.pricePrecision && options.pricePrecision > 0) {
               decimals = getDecimalPlacesFromPrecision(options.pricePrecision);
@@ -2910,7 +2915,6 @@ export class TealchartRenderer {
             }
             labelText = getCachedNumberFormatter(decimals).format(value);
           } else {
-            // Indicator value formatting
             const indicatorDecimals = Math.abs(value) >= 1000 ? 0 :
               Math.abs(value) >= 100 ? 1 :
               Math.abs(value) >= 1 ? 2 : 4;
@@ -2925,6 +2929,7 @@ export class TealchartRenderer {
             type: 'crosshair',
             floatingLabel: true,
             targetPaneId: pane.id,
+            renderLineOnCanvas: true, // Line drawn on canvas, label by Konva
             label: {
               primaryText: labelText,
               backgroundColor: crosshairColor,
@@ -3631,9 +3636,8 @@ export class TealchartRenderer {
       if (lineType === 'price') {
         this.drawSimplePriceLineInPane(bound, viewport, pane);
       } else if (lineType === 'crosshair') {
-        // Crosshair is rendered by Konva layer for proper z-ordering (floats on top)
-        // Skip canvas rendering
-        continue;
+        // Crosshair: line on canvas, label by Konva (like last-trade)
+        this.drawSimplePriceLineInPane(bound, viewport, pane);
       } else if (lineType === 'order' || lineType === 'position') {
         // Order/position lines are rendered by Konva layer for interactivity
         // Skip canvas rendering
@@ -3659,6 +3663,11 @@ export class TealchartRenderer {
     const labelY = labelCenterY - bound.height / 2;
 
     // Draw horizontal line - stop before label with gap
+    // For crosshair, stop before the + button (at width - margins.right - 10, radius 8)
+    const lineEndX = bound.type === 'crosshair'
+      ? options.width - margins.right - 10 - 8 - 4 // Stop before + button with gap
+      : labelX - PRICE_AXIS_RIGHT_PADDING;
+
     ctx.save();
     ctx.strokeStyle = color;
     ctx.lineWidth = bound.lineWidth || 1;
@@ -3667,7 +3676,7 @@ export class TealchartRenderer {
 
     ctx.beginPath();
     ctx.moveTo(margins.left, lineY);
-    ctx.lineTo(labelX - PRICE_AXIS_RIGHT_PADDING, lineY);
+    ctx.lineTo(lineEndX, lineY);
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.restore();

@@ -174,11 +174,14 @@ export class PriceLineManager {
 
     this.labelBounds = labelBounds;
     this.pendingOrders = pendingOrders;
+
+    // Track crosshair visibility changes to force rebuild (since crosshair is excluded from signature)
+    const crosshairVisibilityChanged = crosshair && crosshair.visible !== this.crosshair.visible;
     if (crosshair) {
       this.crosshair = crosshair;
     }
 
-    if (structureChanged || this.needsFullRebuild) {
+    if (structureChanged || this.needsFullRebuild || crosshairVisibilityChanged) {
       this.lastLabelBoundsSignature = newSignature;
       this.needsFullRebuild = false;
       this.render();
@@ -856,7 +859,7 @@ export class PriceLineManager {
 
     if (!this.crosshair.visible) return;
 
-    // Vertical line
+    // Vertical line (on Konva layer)
     this.crosshairVertical = new Konva.Line({
       points: [this.crosshair.x, 0, this.crosshair.x, height],
       stroke: this.crosshair.color,
@@ -865,6 +868,9 @@ export class PriceLineManager {
       listening: false,
     });
     this.group.add(this.crosshairVertical);
+
+    // Note: Horizontal crosshair line is drawn on canvas (renderLineOnCanvas: true)
+    // Label is rendered by Konva through the price line system (floatingLabel: true)
 
     // Context menu "+" button
     if (this.options.onContextMenuButtonClick) {
