@@ -2924,7 +2924,7 @@ export class TealchartRenderer {
           allPriceLines.push({
             id: '__crosshair__',
             price: value,
-            lineStyle: 'dotted',
+            lineStyle: 'dashed',
             color: crosshairColor,
             type: 'crosshair',
             floatingLabel: true,
@@ -3069,7 +3069,7 @@ export class TealchartRenderer {
     ctx.fillStyle = this.adjustColor(options.backgroundColor, 5);
     ctx.fillRect(margins.left, pane.top, options.width - margins.left, pane.height);
 
-    // Note: Indicator legend is now rendered as React overlay in ChartContainer
+    // Note: Indicator legend is rendered as DOM overlay (IndicatorPaneLegend)
     // for proper hover/click interactions (eye, settings, trash buttons)
 
     // Draw grid for this pane

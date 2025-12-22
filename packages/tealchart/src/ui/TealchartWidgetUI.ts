@@ -15,6 +15,7 @@
 import { ChartCore, type ChartCoreOptions, type IndicatorPaneInfo } from './ChartCore';
 import { ChartTopBar, type ChartTopBarOptions } from './ChartTopBar';
 import { ChartLegend, type ActiveIndicator } from './ChartLegend';
+import { IndicatorPaneLegend } from './IndicatorPaneLegend';
 import { IndicatorsModal } from './IndicatorsModal';
 import { IndicatorSettingsModal } from './IndicatorSettingsModal';
 import { div, span, icons } from './dom';
@@ -118,6 +119,11 @@ export class TealchartWidgetUI {
   private isLoading = false;
   private activeIndicators: ActiveIndicator[] = [];
   private currentPlots: PlotOutput[] = [];
+  private currentPaneLayout: PaneLayout | null = null;
+  private currentIndicatorPaneInfo: Record<string, IndicatorPaneInfo> = {};
+
+  // Indicator pane legends (one per non-overlay indicator pane)
+  private indicatorPaneLegends: Map<string, IndicatorPaneLegend> = new Map();
 
   constructor(options: TealchartWidgetUIOptions) {
     this.options = options;
@@ -303,7 +309,10 @@ export class TealchartWidgetUI {
    * Update pane layout - calls ChartCore directly
    */
   setPaneLayout(layout: PaneLayout): void {
+    this.currentPaneLayout = layout;
     this.chartCore?.setPaneLayout(layout);
+    // Update indicator pane legend positions
+    this.updateIndicatorPaneLegends();
   }
 
   /**
@@ -311,6 +320,7 @@ export class TealchartWidgetUI {
    */
   setActiveIndicators(indicators: ActiveIndicator[], paneInfo: Record<string, IndicatorPaneInfo>): void {
     this.activeIndicators = indicators;
+    this.currentIndicatorPaneInfo = paneInfo;
 
     // Update ChartCore with indicator pane info
     this.chartCore?.setIndicatorPaneInfo(paneInfo);
@@ -327,8 +337,11 @@ export class TealchartWidgetUI {
     }
     this.chartCore?.setPlotStyleOverrides(map);
 
-    // Update legend
+    // Update main legend (overlay indicators)
     this.legend?.setIndicators(indicators, paneInfo);
+
+    // Update indicator pane legends (non-overlay indicators)
+    this.updateIndicatorPaneLegends();
   }
 
   /**
@@ -404,12 +417,104 @@ export class TealchartWidgetUI {
   }
 
   /**
+   * Update indicator pane legends - creates, updates positions, and removes as needed
+   */
+  private updateIndicatorPaneLegends(): void {
+    const paneLayout = this.currentPaneLayout;
+    const paneInfo = this.currentIndicatorPaneInfo;
+    const indicators = this.activeIndicators;
+
+    // If no pane layout or no indicator panes, remove all legends
+    if (!paneLayout || !paneLayout.indicatorPanes || paneLayout.indicatorPanes.length === 0) {
+      for (const legend of this.indicatorPaneLegends.values()) {
+        legend.unmount();
+      }
+      this.indicatorPaneLegends.clear();
+      return;
+    }
+
+    // Get chart height from chartArea
+    const chartHeight = this.chartArea.clientHeight;
+    if (chartHeight <= 0) return;
+
+    // Constants matching the renderer
+    const TIME_AXIS_HEIGHT = 30;
+    const availableHeight = chartHeight - TIME_AXIS_HEIGHT;
+
+    // Calculate main pane height
+    const mainPanePixelHeight = availableHeight * paneLayout.mainPaneHeight;
+
+    // Track which pane IDs we've seen (to remove stale legends)
+    const currentPaneIds = new Set<string>();
+
+    // Calculate positions and update legends for each indicator pane
+    let currentTop = mainPanePixelHeight;
+    for (const pane of paneLayout.indicatorPanes) {
+      const paneHeight = availableHeight * pane.heightRatio;
+      currentPaneIds.add(pane.id);
+
+      // Get indicators for this pane
+      const paneIndicators = indicators.filter(ind => {
+        const info = paneInfo[ind.id];
+        return info?.overlay === false && pane.indicatorIds.includes(ind.id);
+      });
+
+      if (paneIndicators.length === 0) {
+        // No indicators for this pane, remove legend if it exists
+        const existing = this.indicatorPaneLegends.get(pane.id);
+        if (existing) {
+          existing.unmount();
+          this.indicatorPaneLegends.delete(pane.id);
+        }
+        currentTop += paneHeight;
+        continue;
+      }
+
+      // Create or update legend for this pane
+      let legend = this.indicatorPaneLegends.get(pane.id);
+      if (!legend) {
+        // Create new legend
+        legend = new IndicatorPaneLegend({
+          paneId: pane.id,
+          top: currentTop,
+          onToggleIndicator: this.options.onToggleIndicator,
+          onSettingsIndicator: (indicatorId) => this.openIndicatorSettings(indicatorId),
+          onRemoveIndicator: this.options.onRemoveIndicator,
+        });
+        legend.mount(this.chartArea);
+        this.indicatorPaneLegends.set(pane.id, legend);
+      } else {
+        // Update position
+        legend.setPosition(currentTop);
+      }
+
+      // Update indicators
+      legend.setIndicators(paneIndicators, paneInfo);
+
+      currentTop += paneHeight;
+    }
+
+    // Remove legends for panes that no longer exist
+    for (const [paneId, legend] of this.indicatorPaneLegends) {
+      if (!currentPaneIds.has(paneId)) {
+        legend.unmount();
+        this.indicatorPaneLegends.delete(paneId);
+      }
+    }
+  }
+
+  /**
    * Dispose and clean up
    */
   dispose(): void {
     this.chartCore?.dispose();
     this.topBar?.unmount();
     this.legend?.unmount();
+    // Clean up indicator pane legends
+    for (const legend of this.indicatorPaneLegends.values()) {
+      legend.unmount();
+    }
+    this.indicatorPaneLegends.clear();
     this.indicatorsModal?.unmount();
     this.settingsModal?.unmount();
     this.rootEl.remove();
