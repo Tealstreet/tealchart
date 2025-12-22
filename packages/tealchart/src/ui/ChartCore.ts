@@ -516,6 +516,13 @@ export class ChartCore {
       onMouseUp: () => this.options.onMouseUp?.(),
       onContextMenu: (x, y, price, time) => this.handleContextMenu(x, y, price, time),
       onRender: () => this.scheduleRender(),
+      onCursorChange: (cursor) => {
+        this.cursor = cursor;
+        this.chartContainer.style.cursor = cursor;
+        if (this.stage) {
+          this.stage.container().style.cursor = cursor;
+        }
+      },
     });
 
     // Create reset button

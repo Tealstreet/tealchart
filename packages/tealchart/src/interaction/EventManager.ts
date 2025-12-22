@@ -36,6 +36,8 @@ export interface EventManagerCallbacks {
   onContextMenu?: (x: number, y: number, price: number, time: number) => void;
   /** Called when render is needed */
   onRender?: () => void;
+  /** Called when cursor should change */
+  onCursorChange?: (cursor: string) => void;
   /** Get current viewport */
   getViewport: () => Viewport;
   /** Get chart dimensions */
@@ -63,6 +65,9 @@ export interface InteractionState {
   isOverPriceAxis: boolean;
   hoveredX: number;
   hoveredY: number;
+  // Crosshair position at drag start (for tracking during drag)
+  dragStartCrosshairX: number;
+  dragStartCrosshairY: number;
 }
 
 export interface CrosshairState {
@@ -100,6 +105,8 @@ export class EventManager {
     isOverPriceAxis: false,
     hoveredX: 0,
     hoveredY: 0,
+    dragStartCrosshairX: 0,
+    dragStartCrosshairY: 0,
   };
 
   // Crosshair state
@@ -261,6 +268,9 @@ export class EventManager {
     this.state.dragStartX = x;
     this.state.dragStartY = y;
     this.state.dragStartViewport = { ...viewport };
+    // Save crosshair position at drag start for tracking during drag
+    this.state.dragStartCrosshairX = this.crosshair.x;
+    this.state.dragStartCrosshairY = this.crosshair.y;
 
     // Track pane for price-axis zoom
     if (isOverPriceAxis && this.callbacks.getPaneAtY) {
@@ -274,6 +284,13 @@ export class EventManager {
     // Add window listeners for off-canvas drag
     window.addEventListener('mousemove', this.boundWindowMouseMove);
     window.addEventListener('mouseup', this.boundWindowMouseUp);
+
+    // Set cursor based on drag mode
+    if (this.state.dragMode === 'pan') {
+      this.callbacks.onCursorChange?.('grabbing');
+    } else if (this.state.dragMode === 'priceAxisZoom') {
+      this.callbacks.onCursorChange?.('ns-resize');
+    }
 
     this.scheduleRender();
   }
@@ -314,7 +331,12 @@ export class EventManager {
     const dy = y - this.state.dragStartY;
 
     if (this.state.dragMode === 'pan') {
-      this.handlePan(dx);
+      this.handlePan(dx, dy);
+      // Update crosshair to follow data during pan
+      // Crosshair moves with the drag to stay on the same data point
+      this.crosshair.x = this.state.dragStartCrosshairX + dx;
+      this.crosshair.y = this.state.dragStartCrosshairY + dy;
+      this.callbacks.onCrossHairMoved?.(this.crosshair.x, this.crosshair.y);
     } else if (this.state.dragMode === 'priceAxisZoom') {
       this.handlePriceAxisZoom(dy);
     }
@@ -332,6 +354,9 @@ export class EventManager {
     if (this.state.isDragging) {
       this.state.isDragging = false;
       this.state.dragMode = 'none';
+
+      // Reset cursor back to crosshair
+      this.callbacks.onCursorChange?.('crosshair');
 
       // Sync viewport change
       this.callbacks.onViewportChange?.(this.callbacks.getViewport());
@@ -417,6 +442,9 @@ export class EventManager {
       this.state.dragStartY = y;
       this.state.dragStartViewport = { ...viewport };
       this.state.dragMode = isOverPriceAxis ? 'priceAxisZoom' : 'pan';
+      // Save crosshair position at touch start for tracking during drag
+      this.state.dragStartCrosshairX = this.crosshair.x;
+      this.state.dragStartCrosshairY = this.crosshair.y;
 
       if (isOverPriceAxis && this.callbacks.getPaneAtY) {
         const pane = this.callbacks.getPaneAtY(y);
@@ -488,7 +516,11 @@ export class EventManager {
           this.handlePriceAxisZoom(dy);
           // handlePriceAxisZoom calls onViewportChange which schedules render
         } else {
-          this.handlePan(dx);
+          this.handlePan(dx, dy);
+          // Update crosshair to follow data during touch pan
+          this.crosshair.x = this.state.dragStartCrosshairX + dx;
+          this.crosshair.y = this.state.dragStartCrosshairY + dy;
+          this.callbacks.onCrossHairMoved?.(this.crosshair.x, this.crosshair.y);
           // handlePan calls onViewportChange which schedules render
         }
       }
@@ -633,31 +665,43 @@ export class EventManager {
   // Private: Pan & Zoom Helpers
   // ============================================================================
 
-  private handlePan(dx: number): void {
+  private handlePan(dx: number, dy: number): void {
     if (!this.state.dragStartViewport) return;
 
     const viewport = this.callbacks.getViewport();
     const dims = this.callbacks.getDimensions();
 
-    // Calculate time per pixel
+    // Calculate time per pixel (horizontal)
     const timeRange = this.state.dragStartViewport.endTime - this.state.dragStartViewport.startTime;
     const msPerPixel = timeRange / dims.width;
 
-    // Pan by time delta
+    // Calculate price per pixel (vertical)
+    const priceRange = this.state.dragStartViewport.priceMax - this.state.dragStartViewport.priceMin;
+    const chartHeight = dims.height - 30; // Account for time axis (approximate)
+    const pricePerPixel = priceRange / chartHeight;
+
+    // Pan by time delta (horizontal)
     const timePanned = -dx * msPerPixel;
     const newStartTime = this.state.dragStartViewport.startTime + timePanned;
     const newEndTime = this.state.dragStartViewport.endTime + timePanned;
+
+    // Pan by price delta (vertical) - inverted because Y increases downward
+    const pricePanned = dy * pricePerPixel;
+    const newPriceMin = this.state.dragStartViewport.priceMin + pricePanned;
+    const newPriceMax = this.state.dragStartViewport.priceMax + pricePanned;
 
     // Request more bars if panning left (to earlier times)
     if (newStartTime < this.state.dragStartViewport.startTime) {
       this.callbacks.onRequestMoreBars?.('left');
     }
 
-    // Update viewport
+    // Update viewport with both horizontal and vertical pan
     this.callbacks.onViewportChange?.({
       ...viewport,
       startTime: newStartTime,
       endTime: newEndTime,
+      priceMin: newPriceMin,
+      priceMax: newPriceMax,
     });
   }
 
