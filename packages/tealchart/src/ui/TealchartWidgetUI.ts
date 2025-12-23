@@ -186,16 +186,16 @@ export class TealchartWidgetUI {
     // Use mount() instead of getElement() to trigger onMount/render
     this.legend.mount(this.chartArea);
 
-    // Create modals
+    // Create modals (mounted to rootEl so they're positioned within the chart)
     this.indicatorsModal = new IndicatorsModal({
       onSelectIndicator: (indicator) => {
         options.onAddIndicator?.(indicator);
       },
     });
-    this.indicatorsModal.mount(document.body);
+    this.indicatorsModal.mount(this.rootEl);
 
     this.settingsModal = new IndicatorSettingsModal();
-    this.settingsModal.mount(document.body);
+    this.settingsModal.mount(this.rootEl);
 
     // Create loading overlay (hidden by default)
     this.createLoadingOverlay();

@@ -73,7 +73,7 @@ const LINE_STYLE_OPTIONS: { value: LineStyle; label: string }[] = [
 
 const styles = {
   overlay: {
-    position: 'fixed',
+    position: 'absolute',
     top: '0',
     left: '0',
     right: '0',
