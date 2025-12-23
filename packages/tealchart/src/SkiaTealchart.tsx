@@ -1,40 +1,29 @@
-// ⚠️ AUTO-GENERATED FILE - DO NOT EDIT MANUALLY ⚠️
-// This file was copied from tealstreet-next by copy-and-patch.js
-// To re-sync from the web repository, run: yarn sync
-// 
-// To make this file mobile-specific (prevent it from being overwritten on sync):
-// 1. Modify the file as needed for mobile
-// 2. Add to patch-config.json "permanentFiles" array:
-//    - For single file: "web/path/to/this/file.ts"
-//    - For directory: "web/path/to/directory/**/*"
-// 3. Add exception to .gitignore: !src/web/path/to/this/file.ts
-// 4. Force-add to git: git add -f src/web/path/to/this/file.ts
-// 5. Commit your changes
-// 6. IMPORTANT: Replace this header with the MOBILE-PATCHED header (see existing patched files for example)
-//
-// The patch-config.json controls:
-// - permanentFiles: Files that are never overwritten during sync
-// - excludeFromCopy: Files excluded from initial copy
-// - importReplacements: Auto-replace imports with mobile shims
-//
-// See README.md section "Git Configuration for Patched Files" for full details
-
 /**
  * SkiaTealchart - React Native Skia implementation of Tealchart
  *
- * Uses the same TealchartRenderer as web, but with SkiaCanvasContext
- * instead of WebCanvasContext. All grid, axis, and candle rendering
- * logic is shared - only the canvas context implementation differs.
+ * Architecture:
+ * - Layer 1: Skia Canvas (static) - candles, grid, indicators via Picture recording
+ * - Layer 2: Interactive RN Layer - order lines, position lines, crosshair (future)
+ * - Layer 3: Base Gesture Layer - pan, pinch, axis scaling with zone detection
+ *
+ * This mirrors web's Canvas + Konva pattern using Skia + RN components.
  */
 
 import React, { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import { View, StyleSheet, LayoutChangeEvent, Text } from 'react-native';
 import { Canvas, Picture, Skia, createPicture } from '@shopify/react-native-skia';
-import { GestureDetector, Gesture } from 'react-native-gesture-handler';
-import Animated, { useSharedValue, runOnJS } from 'react-native-reanimated';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, { runOnJS } from 'react-native-reanimated';
 
 import { TealchartRenderer } from './TealchartRenderer';
 import { SkiaCanvasContext, CollectedTextItem } from './rendering/SkiaCanvasContext';
+import { useChartGestures } from './mobile/hooks/useChartGestures';
+import { useLabelCollision, type LabelBounds } from './mobile/hooks/useLabelCollision';
+import { OrderLineComponent } from './mobile/components/OrderLineComponent';
+import { PositionLineComponent } from './mobile/components/PositionLineComponent';
+import { CrosshairComponent } from './mobile/components/CrosshairComponent';
+import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
+import { priceToY, yToPrice, xToTime } from './mobile/utils/coordinates';
 import type {
   Bar,
   Viewport,
@@ -90,6 +79,24 @@ export interface SkiaTealchartProps {
   onCrossHairMoved?: (price: number, time: number) => void;
   /** Called when gesture blocks/unblocks parent scroll */
   onSwipeBlockChange?: (blocked: boolean) => void;
+  /** Called when order price is changed via drag */
+  onOrderMove?: (orderId: string, newPrice: number) => void;
+  /** Called when order is cancelled */
+  onOrderCancel?: (orderId: string) => void;
+  /** Called when position is closed */
+  onPositionClose?: (positionId: string) => void;
+  /** Called when position is reversed */
+  onPositionReverse?: (positionId: string) => void;
+  /** Called when TP drag ends */
+  onTPDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
+  /** Called when SL drag ends */
+  onSLDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
+  /** Called when TP button is clicked */
+  onTPClick?: (positionId: string) => void;
+  /** Called when SL button is clicked */
+  onSLClick?: (positionId: string) => void;
+  /** Price precision for display */
+  pricePrecision?: number;
 }
 
 export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
@@ -111,18 +118,28 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   onContextMenu,
   onCrossHairMoved,
   onSwipeBlockChange,
+  onOrderMove,
+  onOrderCancel,
+  onPositionClose,
+  onPositionReverse,
+  onTPDragEnd,
+  onSLDragEnd,
+  onTPClick,
+  onSLClick,
+  pricePrecision = 2,
 }) => {
-  // Dimensions state (use prop or measure from container)
+  // ==========================================================================
+  // Dimensions & Layout
+  // ==========================================================================
+
   const [dimensions, setDimensions] = useState({ width: propWidth || 0, height: propHeight || 0 });
 
-  // Update dimensions when props change
   useEffect(() => {
     if (propWidth && propHeight) {
       setDimensions({ width: propWidth, height: propHeight });
     }
   }, [propWidth, propHeight]);
 
-  // Handle container layout
   const onLayout = useCallback((event: LayoutChangeEvent) => {
     if (!propWidth || !propHeight) {
       const { width, height } = event.nativeEvent.layout;
@@ -130,38 +147,43 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     }
   }, [propWidth, propHeight]);
 
-  // Merge margins with defaults
   const margins: ChartMargins = useMemo(() => ({
     ...DEFAULT_MARGINS,
     ...marginsProp,
   }), [marginsProp]);
 
-  // Viewport state
+  // ==========================================================================
+  // Viewport State
+  // ==========================================================================
+
   const [viewport, setViewport] = useState<Viewport | null>(() =>
     bars.length > 0 ? TealchartRenderer.calculateViewport(bars) : null
   );
-  const viewportRef = useRef(viewport);
-  viewportRef.current = viewport;
 
-  // Keep bars ref for gesture callbacks
-  const barsRef = useRef(bars);
-  barsRef.current = bars;
+  const barsLengthRef = useRef(bars.length);
 
-  // Recalculate viewport when bars change significantly
   useEffect(() => {
-    if (bars.length > 0 && (!viewport || bars.length !== barsRef.current.length)) {
+    if (bars.length > 0 && bars.length !== barsLengthRef.current) {
+      barsLengthRef.current = bars.length;
       const newViewport = TealchartRenderer.calculateViewport(bars);
       setViewport(newViewport);
-      viewportRef.current = newViewport;
       onViewportChange?.(newViewport);
     }
-  }, [bars, viewport, onViewportChange]);
+  }, [bars, onViewportChange]);
 
-  // Full render options
+  const handleViewportChange = useCallback((newViewport: Viewport) => {
+    setViewport(newViewport);
+    onViewportChange?.(newViewport);
+  }, [onViewportChange]);
+
+  // ==========================================================================
+  // Render Options
+  // ==========================================================================
+
   const fullRenderOptions: RenderOptions = useMemo(() => ({
     width: dimensions.width,
     height: dimensions.height,
-    devicePixelRatio: 1, // Skia handles its own scaling
+    devicePixelRatio: 1,
     backgroundColor: renderOptions?.backgroundColor || '#131722',
     upColor: renderOptions?.upColor || '#26a69a',
     downColor: renderOptions?.downColor || '#ef5350',
@@ -173,185 +195,172 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     ...renderOptions,
   }), [dimensions.width, dimensions.height, renderOptions]);
 
-  // Gesture shared values
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
-  const savedTranslateX = useSharedValue(0);
-  const savedTranslateY = useSharedValue(0);
-  const scale = useSharedValue(1);
-  const savedScale = useSharedValue(1);
+  // ==========================================================================
+  // Gestures (using unified hook)
+  // ==========================================================================
 
-  // Pan gesture handler - time-based
-  const updateViewportFromPan = useCallback((deltaX: number, _deltaY: number) => {
-    const currentViewport = viewportRef.current;
-    const currentBars = barsRef.current;
-    if (!currentViewport || currentBars.length === 0 || !dimensions.width) {
-      return;
-    }
+  const chartDimensions = useMemo(() => ({
+    width: dimensions.width,
+    height: dimensions.height,
+    margins,
+  }), [dimensions.width, dimensions.height, margins]);
 
-    const chartWidth = dimensions.width - margins.left - margins.right;
-    const timeRange = currentViewport.endTime - currentViewport.startTime;
-    const msPerPixel = timeRange / chartWidth;
-    const timeDelta = -deltaX * msPerPixel;
+  const { composedGesture } = useChartGestures({
+    dimensions: chartDimensions,
+    bars,
+    viewport,
+    onViewportChange: handleViewportChange,
+    onSwipeBlockChange,
+  });
 
-    const newStartTime = currentViewport.startTime + timeDelta;
-    const newEndTime = currentViewport.endTime + timeDelta;
+  // ==========================================================================
+  // Crosshair State
+  // ==========================================================================
 
-    // Find bars in the new time range to calculate price bounds
-    const visibleBars = currentBars.filter(b => b.time >= newStartTime && b.time <= newEndTime);
+  const [crosshairVisible, setCrosshairVisible] = useState(false);
+  // Store the crosshair position (updated via runOnJS from gestures)
+  const [lastCrosshairPosition, setLastCrosshairPosition] = useState({ x: 0, y: 0 });
 
-    if (visibleBars.length > 0) {
-      const prices = visibleBars.flatMap(b => [b.high, b.low]);
-      const minPrice = Math.min(...prices);
-      const maxPrice = Math.max(...prices);
-      const padding = (maxPrice - minPrice) * 0.1;
+  // Context menu state
+  const [contextMenuVisible, setContextMenuVisible] = useState(false);
+  const [contextMenuItems, setContextMenuItems] = useState<ContextMenuItem[]>([]);
+  const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0, price: 0, time: 0 });
 
-      const newViewport: Viewport = {
-        startTime: newStartTime,
-        endTime: newEndTime,
-        priceMin: minPrice - padding,
-        priceMax: maxPrice + padding,
-      };
+  // Handle crosshair move callback
+  const handleCrosshairMove = useCallback((x: number, y: number) => {
+    // Update last position for context menu
+    setLastCrosshairPosition({ x, y });
 
-      setViewport(newViewport);
-      viewportRef.current = newViewport;
-      onViewportChange?.(newViewport);
-    } else {
-      // No bars in range, just shift time without changing price
-      const newViewport: Viewport = {
-        startTime: newStartTime,
-        endTime: newEndTime,
-        priceMin: currentViewport.priceMin,
-        priceMax: currentViewport.priceMax,
-      };
+    if (!viewport || !onCrossHairMoved) return;
+    const price = yToPrice(y, viewport, chartDimensions);
+    const time = xToTime(x, viewport, chartDimensions);
+    onCrossHairMoved(price, time);
+  }, [viewport, chartDimensions, onCrossHairMoved]);
 
-      setViewport(newViewport);
-      viewportRef.current = newViewport;
-      onViewportChange?.(newViewport);
-    }
-  }, [dimensions.width, margins, onViewportChange]);
+  // Long press gesture for crosshair
+  const longPressGesture = useMemo(() =>
+    Gesture.LongPress()
+      .minDuration(300)
+      .onStart((event) => {
+        runOnJS(setCrosshairVisible)(true);
+        runOnJS(handleCrosshairMove)(event.x, event.y);
+      }),
+    [handleCrosshairMove]
+  );
 
-  // Pan gesture
-  const panGesture = Gesture.Pan()
-    .onStart(() => {
-      savedTranslateX.value = translateX.value;
-      savedTranslateY.value = translateY.value;
-      if (onSwipeBlockChange) {
-        runOnJS(onSwipeBlockChange)(true);
-      }
-    })
-    .onUpdate((event) => {
-      const deltaX = event.translationX - savedTranslateX.value;
-      savedTranslateX.value = event.translationX;
-      runOnJS(updateViewportFromPan)(deltaX, 0);
-    })
-    .onEnd(() => {
-      if (onSwipeBlockChange) {
-        runOnJS(onSwipeBlockChange)(false);
-      }
+  // Pan gesture for moving crosshair (active after long press)
+  const crosshairPanGesture = useMemo(() =>
+    Gesture.Pan()
+      .enabled(crosshairVisible)
+      .onUpdate((event) => {
+        runOnJS(handleCrosshairMove)(event.x, event.y);
+      })
+      .onEnd(() => {
+        // Keep crosshair visible after pan ends - tap elsewhere to hide
+      }),
+    [crosshairVisible, handleCrosshairMove]
+  );
+
+  // Tap gesture to hide crosshair
+  const tapGesture = useMemo(() =>
+    Gesture.Tap()
+      .enabled(crosshairVisible)
+      .onEnd(() => {
+        runOnJS(setCrosshairVisible)(false);
+      }),
+    [crosshairVisible]
+  );
+
+  // Combine all gestures
+  const allGestures = useMemo(() =>
+    Gesture.Race(
+      longPressGesture,
+      Gesture.Simultaneous(
+        composedGesture,
+        crosshairPanGesture,
+        tapGesture
+      )
+    ),
+    [longPressGesture, composedGesture, crosshairPanGesture, tapGesture]
+  );
+
+  // ==========================================================================
+  // Label Collision Resolution
+  // ==========================================================================
+
+  // Build label bounds for collision resolution
+  const labelBoundsInput = useMemo(() => {
+    if (!viewport) return [];
+
+    const bounds: LabelBounds[] = [];
+    const labelHeight = 20;
+
+    // Add order line labels
+    orderLines?.forEach((order) => {
+      bounds.push({
+        id: `order-${order.id}`,
+        originalY: priceToY(order.price, viewport, chartDimensions),
+        adjustedY: 0,
+        height: labelHeight,
+        priority: 1, // Orders have lower priority than positions
+      });
     });
 
-  // Pinch gesture for zoom - time-based
-  const updateViewportFromPinch = useCallback((newScale: number) => {
-    const currentViewport = viewportRef.current;
-    const currentBars = barsRef.current;
-    if (!currentViewport || currentBars.length === 0) return;
+    // Add position line labels
+    positionLines?.forEach((pos) => {
+      bounds.push({
+        id: `position-${pos.id}`,
+        originalY: priceToY(pos.price, viewport, chartDimensions),
+        adjustedY: 0,
+        height: labelHeight,
+        priority: 2, // Positions have higher priority
+      });
+    });
 
-    const timeRange = currentViewport.endTime - currentViewport.startTime;
-    const centerTime = (currentViewport.startTime + currentViewport.endTime) / 2;
+    return bounds;
+  }, [viewport, chartDimensions, orderLines, positionLines]);
 
-    // Limit zoom: min ~10 bars worth of time, max all data
-    const firstBarTime = currentBars[0].time;
-    const lastBarTime = currentBars[currentBars.length - 1].time;
-    const avgBarInterval = (lastBarTime - firstBarTime) / currentBars.length;
-    const minTimeRange = avgBarInterval * 10;
-    const maxTimeRange = lastBarTime - firstBarTime;
+  // Resolve collisions
+  const resolvedLabels = useLabelCollision(labelBoundsInput);
 
-    const newTimeRange = Math.max(minTimeRange, Math.min(maxTimeRange, timeRange / newScale));
+  // Create map from id to adjustedY
+  const labelAdjustments = useMemo(() => {
+    const map = new Map<string, number>();
+    resolvedLabels.forEach((label) => {
+      map.set(label.id, label.adjustedY);
+    });
+    return map;
+  }, [resolvedLabels]);
 
-    if (Math.abs(newTimeRange - timeRange) > avgBarInterval * 0.5) {
-      const newStartTime = centerTime - newTimeRange / 2;
-      const newEndTime = centerTime + newTimeRange / 2;
+  // ==========================================================================
+  // Context Menu Handler
+  // ==========================================================================
 
-      // Find bars in new range for price bounds
-      const visibleBars = currentBars.filter(b => b.time >= newStartTime && b.time <= newEndTime);
-
-      if (visibleBars.length > 0) {
-        const prices = visibleBars.flatMap(b => [b.high, b.low]);
-        const minPrice = Math.min(...prices);
-        const maxPrice = Math.max(...prices);
-        const padding = (maxPrice - minPrice) * 0.1;
-
-        const newViewport: Viewport = {
-          startTime: newStartTime,
-          endTime: newEndTime,
-          priceMin: minPrice - padding,
-          priceMax: maxPrice + padding,
-        };
-
-        setViewport(newViewport);
-        viewportRef.current = newViewport;
-        onViewportChange?.(newViewport);
+  const handleContextMenuPress = useCallback((price: number, time: number) => {
+    if (onContextMenu) {
+      const items = onContextMenu(time, price);
+      if (items && items.length > 0) {
+        setContextMenuItems(items);
+        setContextMenuPosition({
+          x: lastCrosshairPosition.x,
+          y: lastCrosshairPosition.y,
+          price,
+          time,
+        });
+        setContextMenuVisible(true);
       }
     }
-  }, [onViewportChange]);
+  }, [onContextMenu, lastCrosshairPosition]);
 
-  const pinchGesture = Gesture.Pinch()
-    .onStart(() => {
-      savedScale.value = scale.value;
-    })
-    .onUpdate((event) => {
-      const newScale = savedScale.value * event.scale;
-      runOnJS(updateViewportFromPinch)(newScale);
-    });
+  const handleContextMenuClose = useCallback(() => {
+    setContextMenuVisible(false);
+    setContextMenuItems([]);
+  }, []);
 
-  const composedGesture = Gesture.Simultaneous(panGesture, pinchGesture);
+  // ==========================================================================
+  // Skia Picture Rendering (Layer 1: Static)
+  // ==========================================================================
 
-  // Price axis drag gesture - for zooming price scale
-  const priceAxisSavedY = useSharedValue(0);
-  const priceAxisStartPriceRange = useSharedValue(0);
-
-  const updatePriceScaleFromDrag = useCallback((deltaY: number, startRange: number) => {
-    const currentViewport = viewportRef.current;
-    if (!currentViewport) return;
-
-    // Dragging up = zoom in (smaller range), dragging down = zoom out (larger range)
-    const scaleFactor = 1 + (deltaY / dimensions.height) * 2;
-    const newRange = startRange * scaleFactor;
-
-    // Limit the range
-    const minRange = startRange * 0.1;
-    const maxRange = startRange * 10;
-    const clampedRange = Math.max(minRange, Math.min(maxRange, newRange));
-
-    const center = (currentViewport.priceMin + currentViewport.priceMax) / 2;
-    const newPriceMin = center - clampedRange / 2;
-    const newPriceMax = center + clampedRange / 2;
-
-    const newViewport: Viewport = {
-      ...currentViewport,
-      priceMin: newPriceMin,
-      priceMax: newPriceMax,
-    };
-
-    setViewport(newViewport);
-    viewportRef.current = newViewport;
-    onViewportChange?.(newViewport);
-  }, [dimensions.height, onViewportChange]);
-
-  const priceAxisGesture = Gesture.Pan()
-    .onStart(() => {
-      priceAxisSavedY.value = 0;
-      const currentViewport = viewportRef.current;
-      if (currentViewport) {
-        priceAxisStartPriceRange.value = currentViewport.priceMax - currentViewport.priceMin;
-      }
-    })
-    .onUpdate((event) => {
-      runOnJS(updatePriceScaleFromDrag)(event.translationY, priceAxisStartPriceRange.value);
-    });
-
-  // Create Skia Picture for rendering and collect text items
   const { picture, textItems } = useMemo(() => {
     if (!viewport || bars.length === 0 || dimensions.width === 0 || dimensions.height === 0) {
       return { picture: null, textItems: [] as CollectedTextItem[] };
@@ -360,13 +369,9 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     let collectedText: CollectedTextItem[] = [];
 
     const pic = createPicture((canvas) => {
-      // Create SkiaCanvasContext - text will be collected, not drawn
       const ctx = new SkiaCanvasContext(canvas, Skia);
-
-      // Create renderer with context and options
       const renderer = new TealchartRenderer(ctx, fullRenderOptions);
 
-      // Render the chart using the shared renderer
       if (unifiedPaneLayout) {
         renderer.renderWithLayout(
           bars,
@@ -375,33 +380,27 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
           priceLines,
           plots,
           indicatorPaneInfo,
-          undefined, // crosshair
+          undefined,
           plotStyleOverrides
         );
       } else {
         renderer.render(bars, viewport, priceLines, paneLayout);
       }
 
-      // Collect text items for React Native rendering
       collectedText = ctx.getCollectedText();
     }, { width: dimensions.width, height: dimensions.height });
 
     return { picture: pic, textItems: collectedText };
   }, [bars, viewport, dimensions, fullRenderOptions, priceLines, plots, paneLayout, unifiedPaneLayout, indicatorPaneInfo, plotStyleOverrides]);
 
-  // Don't render until we have dimensions
-  if (dimensions.width === 0 || dimensions.height === 0) {
-    return <View style={styles.container} onLayout={onLayout} />;
-  }
+  // ==========================================================================
+  // Text Style Helper
+  // ==========================================================================
 
-  // Helper to convert textAlign/textBaseline to RN styles
-  const getTextStyle = (item: CollectedTextItem) => {
+  const getTextStyle = useCallback((item: CollectedTextItem) => {
     let left = item.x;
     let top = item.y;
 
-    // Adjust for text alignment
-    // Note: RN Text doesn't have textAlign per-item, we adjust position instead
-    // The width estimation is rough - in production you'd measure or use a monospace font
     const estimatedWidth = item.text.length * item.fontSize * 0.6;
 
     if (item.textAlign === 'center') {
@@ -410,7 +409,6 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
       left = item.x - estimatedWidth;
     }
 
-    // Adjust for baseline
     if (item.textBaseline === 'top') {
       // top is default in RN
     } else if (item.textBaseline === 'middle') {
@@ -429,42 +427,99 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
       fontSize: item.fontSize,
       color: item.color,
     };
-  };
+  }, []);
+
+  // ==========================================================================
+  // Render
+  // ==========================================================================
+
+  if (dimensions.width === 0 || dimensions.height === 0) {
+    return <View style={styles.container} onLayout={onLayout} />;
+  }
 
   return (
     <View style={styles.container} onLayout={onLayout}>
-      <GestureDetector gesture={composedGesture}>
-        <Animated.View style={{ width: dimensions.width, height: dimensions.height, position: 'relative' }}>
-          {/* Skia Canvas for chart graphics */}
-          <Canvas style={{ position: 'absolute', width: dimensions.width, height: dimensions.height }}>
-            {picture && <Picture picture={picture} />}
-          </Canvas>
+      {/* Layer 1: Skia Canvas (static rendering) */}
+      <Canvas style={[styles.absoluteFill, { width: dimensions.width, height: dimensions.height }]}>
+        {picture && <Picture picture={picture} />}
+      </Canvas>
 
-          {/* React Native Text overlay for labels */}
-          {textItems.map((item, index) => (
-            <Text
-              key={`${item.text}-${item.x}-${item.y}-${index}`}
-              style={getTextStyle(item)}
-              numberOfLines={1}
-            >
-              {item.text}
-            </Text>
-          ))}
-        </Animated.View>
+      {/* Layer 2: Interactive RN Layer (order lines, crosshair, etc.) */}
+      <View style={[styles.absoluteFill, styles.interactiveLayer]} pointerEvents="box-none">
+        {/* Text labels from Skia renderer */}
+        {textItems.map((item, index) => (
+          <Text
+            key={`${item.text}-${item.x}-${item.y}-${index}`}
+            style={getTextStyle(item)}
+            numberOfLines={1}
+          >
+            {item.text}
+          </Text>
+        ))}
+
+        {/* Order lines */}
+        {viewport && orderLines?.map((order) => (
+          <OrderLineComponent
+            key={order.id}
+            order={order}
+            viewport={viewport}
+            dimensions={chartDimensions}
+            pricePrecision={pricePrecision}
+            useNarrowText={dimensions.width < 400}
+            onPriceChange={onOrderMove}
+            onCancel={onOrderCancel}
+          />
+        ))}
+
+        {/* Position lines */}
+        {viewport && positionLines?.map((position) => (
+          <PositionLineComponent
+            key={position.id}
+            position={position}
+            viewport={viewport}
+            dimensions={chartDimensions}
+            pricePrecision={pricePrecision}
+            useNarrowText={dimensions.width < 400}
+            onClose={onPositionClose}
+            onReverse={onPositionReverse}
+            onTPClick={onTPClick}
+            onSLClick={onSLClick}
+            onTPDragEnd={onTPDragEnd}
+            onSLDragEnd={onSLDragEnd}
+          />
+        ))}
+
+        {/* Crosshair */}
+        {viewport && (
+          <CrosshairComponent
+            x={lastCrosshairPosition.x}
+            y={lastCrosshairPosition.y}
+            visible={crosshairVisible}
+            viewport={viewport}
+            dimensions={chartDimensions}
+            pricePrecision={pricePrecision}
+            showContextMenuButton={!!onContextMenu}
+            onContextMenuPress={handleContextMenuPress}
+          />
+        )}
+      </View>
+
+      {/* Layer 3: Base Gesture Handler */}
+      <GestureDetector gesture={allGestures}>
+        <Animated.View style={[styles.absoluteFill, { width: dimensions.width, height: dimensions.height }]} />
       </GestureDetector>
 
-      {/* Price axis drag zone - positioned over the right margin */}
-      <GestureDetector gesture={priceAxisGesture}>
-        <Animated.View
-          style={{
-            position: 'absolute',
-            right: 0,
-            top: margins.top,
-            width: margins.right,
-            height: dimensions.height - margins.top - margins.bottom,
-          }}
-        />
-      </GestureDetector>
+      {/* Context Menu (Modal) */}
+      <ContextMenuComponent
+        visible={contextMenuVisible}
+        items={contextMenuItems}
+        x={contextMenuPosition.x}
+        y={contextMenuPosition.y}
+        price={contextMenuPosition.price}
+        time={contextMenuPosition.time}
+        pricePrecision={pricePrecision}
+        onClose={handleContextMenuClose}
+      />
     </View>
   );
 };
@@ -472,6 +527,17 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  absoluteFill: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  interactiveLayer: {
+    // Interactive elements go here
+    // pointerEvents="box-none" allows touches to pass through to gesture layer
   },
 });
 
