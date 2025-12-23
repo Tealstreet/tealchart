@@ -129,7 +129,7 @@ export class TealchartWidgetUI {
     this.options = options;
     this.container = options.container;
 
-    // Create root element
+    // Create root element (no background - top bar is transparent)
     this.rootEl = div({
       style: {
         position: 'relative',
@@ -137,7 +137,6 @@ export class TealchartWidgetUI {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: 'var(--chart-bg, #131722)',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         overflow: 'hidden',
       },
@@ -165,6 +164,7 @@ export class TealchartWidgetUI {
         flex: '1',
         position: 'relative',
         minHeight: '0',
+        backgroundColor: 'var(--chart-bg, #131722)',
       },
     });
     this.rootEl.appendChild(this.chartArea);

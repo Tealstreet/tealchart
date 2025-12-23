@@ -319,6 +319,7 @@ export class EventManager {
     this.state.hoveredY = y;
 
     const dims = this.callbacks.getDimensions();
+    const wasOverPriceAxis = this.state.isOverPriceAxis;
     this.state.isOverPriceAxis = x > dims.width - dims.priceAxisWidth;
 
     // Check if in dead zone (top bar or time axis - areas where crosshair shouldn't show)
@@ -337,6 +338,10 @@ export class EventManager {
       // Notify visibility change
       if (wasVisible !== shouldShowCrosshair) {
         this.callbacks.onCrossHairVisibilityChange?.(shouldShowCrosshair);
+      }
+      // Update cursor when hovering over price axis changes
+      if (wasOverPriceAxis !== this.state.isOverPriceAxis) {
+        this.callbacks.onCursorChange?.(this.state.isOverPriceAxis ? 'ns-resize' : 'crosshair');
       }
       // Only schedule render when NOT dragging
       // During drag, handleWindowMouseMove handles rendering via onViewportChange
