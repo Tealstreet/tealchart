@@ -521,7 +521,17 @@ export class ChartCore {
         this.paneYOverrides.set(paneId, { yMin, yMax });
         this.scheduleRender();
       },
-      onRequestMoreBars: (dir) => this.options.onRequestMoreBars?.(dir),
+      onRequestMoreBars: (dir) => {
+        // Only request more bars if viewport is actually before the earliest bar
+        // This matches React's behavior - prevents loading history on every left pan
+        if (dir === 'left' && this.bars.length > 0 && this.viewport) {
+          if (this.viewport.startTime < this.bars[0].time) {
+            this.options.onRequestMoreBars?.(dir);
+          }
+        } else {
+          this.options.onRequestMoreBars?.(dir);
+        }
+      },
       onCrossHairMoved: (x, y) => {
         this.crosshair = { visible: true, x, y };
         const price = this.renderer.publicYToPriceWithLayout(
