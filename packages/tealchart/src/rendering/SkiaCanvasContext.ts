@@ -1,3 +1,24 @@
+// ⚠️ AUTO-GENERATED FILE - DO NOT EDIT MANUALLY ⚠️
+// This file was copied from tealstreet-next by copy-and-patch.js
+// To re-sync from the web repository, run: yarn sync
+// 
+// To make this file mobile-specific (prevent it from being overwritten on sync):
+// 1. Modify the file as needed for mobile
+// 2. Add to patch-config.json "permanentFiles" array:
+//    - For single file: "web/path/to/this/file.ts"
+//    - For directory: "web/path/to/directory/**/*"
+// 3. Add exception to .gitignore: !src/web/path/to/this/file.ts
+// 4. Force-add to git: git add -f src/web/path/to/this/file.ts
+// 5. Commit your changes
+// 6. IMPORTANT: Replace this header with the MOBILE-PATCHED header (see existing patched files for example)
+//
+// The patch-config.json controls:
+// - permanentFiles: Files that are never overwritten during sync
+// - excludeFromCopy: Files excluded from initial copy
+// - importReplacements: Auto-replace imports with mobile shims
+//
+// See README.md section "Git Configuration for Patched Files" for full details
+
 /**
  * SkiaCanvasContext - React Native Skia implementation of CanvasContext
  *
@@ -31,8 +52,11 @@ type SkCanvas = {
   drawText(text: string, x: number, y: number, paint: SkPaint, font: SkFont): void;
 };
 
+// In v2.x, colors are Float32Array [r, g, b, a] with values 0-1
+type SkColor = Float32Array;
+
 type SkPaint = {
-  setColor(color: number): void;
+  setColor(color: SkColor): void;
   setStyle(style: number): void;
   setStrokeWidth(width: number): void;
   setStrokeCap(cap: number): void;
@@ -62,11 +86,12 @@ type SkRect = readonly [number, number, number, number]; // [x, y, width, height
 type SkRRect = { rect: SkRect; rx: number; ry: number };
 type SkPathEffect = unknown;
 
-// Skia factory interface
+// Skia factory interface (react-native-skia v2.x API)
 interface SkiaApi {
   Paint(): SkPaint;
-  Path(): SkPath;
-  Font(typeface?: unknown, size?: number): SkFont;
+  Path: {
+    Make(): SkPath;
+  };
   PathEffect: {
     MakeDash(intervals: number[], phase: number): SkPathEffect;
   };
@@ -107,65 +132,65 @@ interface ContextState {
 }
 
 /**
- * Parse CSS color string to Skia color (ARGB integer)
+ * Parse CSS color string to Skia color (Float32Array [r, g, b, a] with values 0-1)
  */
-function parseColor(color: string): number {
+function parseColor(color: string): Float32Array {
+  let r = 0, g = 0, b = 0, a = 1;
+
   // Handle hex colors
   if (color.startsWith('#')) {
     const hex = color.slice(1);
     if (hex.length === 3) {
       // #RGB -> #RRGGBB
-      const r = parseInt(hex[0] + hex[0], 16);
-      const g = parseInt(hex[1] + hex[1], 16);
-      const b = parseInt(hex[2] + hex[2], 16);
-      return 0xff000000 | (r << 16) | (g << 8) | b;
+      r = parseInt(hex[0] + hex[0], 16) / 255;
+      g = parseInt(hex[1] + hex[1], 16) / 255;
+      b = parseInt(hex[2] + hex[2], 16) / 255;
     } else if (hex.length === 6) {
       // #RRGGBB
-      const r = parseInt(hex.slice(0, 2), 16);
-      const g = parseInt(hex.slice(2, 4), 16);
-      const b = parseInt(hex.slice(4, 6), 16);
-      return 0xff000000 | (r << 16) | (g << 8) | b;
+      r = parseInt(hex.slice(0, 2), 16) / 255;
+      g = parseInt(hex.slice(2, 4), 16) / 255;
+      b = parseInt(hex.slice(4, 6), 16) / 255;
     } else if (hex.length === 8) {
       // #RRGGBBAA
-      const r = parseInt(hex.slice(0, 2), 16);
-      const g = parseInt(hex.slice(2, 4), 16);
-      const b = parseInt(hex.slice(4, 6), 16);
-      const a = parseInt(hex.slice(6, 8), 16);
-      return (a << 24) | (r << 16) | (g << 8) | b;
+      r = parseInt(hex.slice(0, 2), 16) / 255;
+      g = parseInt(hex.slice(2, 4), 16) / 255;
+      b = parseInt(hex.slice(4, 6), 16) / 255;
+      a = parseInt(hex.slice(6, 8), 16) / 255;
     }
+    return new Float32Array([r, g, b, a]);
   }
 
   // Handle rgb/rgba
   const rgbaMatch = color.match(/rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+))?\s*\)/);
   if (rgbaMatch) {
-    const r = parseInt(rgbaMatch[1], 10);
-    const g = parseInt(rgbaMatch[2], 10);
-    const b = parseInt(rgbaMatch[3], 10);
-    const a = rgbaMatch[4] ? Math.round(parseFloat(rgbaMatch[4]) * 255) : 255;
-    return (a << 24) | (r << 16) | (g << 8) | b;
+    r = parseInt(rgbaMatch[1], 10) / 255;
+    g = parseInt(rgbaMatch[2], 10) / 255;
+    b = parseInt(rgbaMatch[3], 10) / 255;
+    a = rgbaMatch[4] ? parseFloat(rgbaMatch[4]) : 1;
+    return new Float32Array([r, g, b, a]);
   }
 
   // Handle named colors (common ones used in charts)
-  const namedColors: Record<string, number> = {
-    black: 0xff000000,
-    white: 0xffffffff,
-    red: 0xffff0000,
-    green: 0xff00ff00,
-    blue: 0xff0000ff,
-    yellow: 0xffffff00,
-    cyan: 0xff00ffff,
-    magenta: 0xffff00ff,
-    transparent: 0x00000000,
-    gray: 0xff808080,
-    grey: 0xff808080,
+  const namedColors: Record<string, [number, number, number, number]> = {
+    black: [0, 0, 0, 1],
+    white: [1, 1, 1, 1],
+    red: [1, 0, 0, 1],
+    green: [0, 1, 0, 1],
+    blue: [0, 0, 1, 1],
+    yellow: [1, 1, 0, 1],
+    cyan: [0, 1, 1, 1],
+    magenta: [1, 0, 1, 1],
+    transparent: [0, 0, 0, 0],
+    gray: [0.5, 0.5, 0.5, 1],
+    grey: [0.5, 0.5, 0.5, 1],
   };
 
   const named = namedColors[color.toLowerCase()];
-  if (named !== undefined) return named;
+  if (named) return new Float32Array(named);
 
   // Default to black
   console.warn(`[SkiaCanvasContext] Unknown color: ${color}, defaulting to black`);
-  return 0xff000000;
+  return new Float32Array([0, 0, 0, 1]);
 }
 
 /**
@@ -183,7 +208,7 @@ export class SkiaCanvasContext implements CanvasContext {
   private fillPaint: SkPaint;
   private strokePaint: SkPaint;
   private textPaint: SkPaint;
-  private skiaFont: SkFont;
+  private skiaFont: SkFont | null = null;
   private stateStack: ContextState[] = [];
   private _lineDash: number[] = [];
 
@@ -203,12 +228,13 @@ export class SkiaCanvasContext implements CanvasContext {
     this.canvas = canvas;
     this.skia = skia;
 
-    // Initialize Skia objects
-    this.currentPath = skia.Path();
+    // Initialize Skia objects (v2.x API uses Path.Make())
+    this.currentPath = skia.Path.Make();
     this.fillPaint = skia.Paint();
     this.strokePaint = skia.Paint();
     this.textPaint = skia.Paint();
-    this.skiaFont = skia.Font(undefined, 12);
+    // Font requires a typeface in v2.x - skip for now, text won't render
+    this.skiaFont = null;
 
     // Configure paints
     this.fillPaint.setStyle(PAINT_STYLE_FILL);
@@ -340,6 +366,9 @@ export class SkiaCanvasContext implements CanvasContext {
   }
 
   fillText(text: string, x: number, y: number): void {
+    // Skip text rendering if no font available (v2.x requires typeface)
+    if (!this.skiaFont) return;
+
     const color = typeof this.fillStyle === 'string' ? this.fillStyle : '#000000';
     this.textPaint.setColor(parseColor(color));
     this.textPaint.setAlphaf(this.globalAlpha);
@@ -446,8 +475,15 @@ export class SkiaCanvasContext implements CanvasContext {
 
   measureText(text: string): TextMetrics {
     const size = parseFontSize(this.font);
-    this.skiaFont.setSize(size);
-    const width = this.skiaFont.measureText(text);
+
+    // Estimate width if no font available (average char width ~0.6 * size)
+    let width: number;
+    if (this.skiaFont) {
+      this.skiaFont.setSize(size);
+      width = this.skiaFont.measureText(text);
+    } else {
+      width = text.length * size * 0.6;
+    }
 
     // Return a minimal TextMetrics-like object
     return {

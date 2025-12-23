@@ -13,6 +13,10 @@ export { TealchartApi, type StudyCreateCallback } from './TealchartApi';
 export { Tealchart } from './Tealchart';
 export type { TealchartProps } from './Tealchart';
 
+// React Native Skia component (for React Native usage)
+export { SkiaTealchart } from './SkiaTealchart';
+export type { SkiaTealchartProps } from './SkiaTealchart';
+
 // Full chart container with top bar (for direct React usage)
 export { ChartContainer } from './components/ChartContainer';
 export type { ChartContainerProps } from './components/ChartContainer';
