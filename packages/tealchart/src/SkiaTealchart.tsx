@@ -307,6 +307,50 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
 
   const composedGesture = Gesture.Simultaneous(panGesture, pinchGesture);
 
+  // Price axis drag gesture - for zooming price scale
+  const priceAxisSavedY = useSharedValue(0);
+  const priceAxisStartPriceRange = useSharedValue(0);
+
+  const updatePriceScaleFromDrag = useCallback((deltaY: number, startRange: number) => {
+    const currentViewport = viewportRef.current;
+    if (!currentViewport) return;
+
+    // Dragging up = zoom in (smaller range), dragging down = zoom out (larger range)
+    const scaleFactor = 1 + (deltaY / dimensions.height) * 2;
+    const newRange = startRange * scaleFactor;
+
+    // Limit the range
+    const minRange = startRange * 0.1;
+    const maxRange = startRange * 10;
+    const clampedRange = Math.max(minRange, Math.min(maxRange, newRange));
+
+    const center = (currentViewport.priceMin + currentViewport.priceMax) / 2;
+    const newPriceMin = center - clampedRange / 2;
+    const newPriceMax = center + clampedRange / 2;
+
+    const newViewport: Viewport = {
+      ...currentViewport,
+      priceMin: newPriceMin,
+      priceMax: newPriceMax,
+    };
+
+    setViewport(newViewport);
+    viewportRef.current = newViewport;
+    onViewportChange?.(newViewport);
+  }, [dimensions.height, onViewportChange]);
+
+  const priceAxisGesture = Gesture.Pan()
+    .onStart(() => {
+      priceAxisSavedY.value = 0;
+      const currentViewport = viewportRef.current;
+      if (currentViewport) {
+        priceAxisStartPriceRange.value = currentViewport.priceMax - currentViewport.priceMin;
+      }
+    })
+    .onUpdate((event) => {
+      runOnJS(updatePriceScaleFromDrag)(event.translationY, priceAxisStartPriceRange.value);
+    });
+
   // Create Skia Picture for rendering and collect text items
   const { picture, textItems } = useMemo(() => {
     if (!viewport || bars.length === 0 || dimensions.width === 0 || dimensions.height === 0) {
@@ -407,6 +451,19 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
             </Text>
           ))}
         </Animated.View>
+      </GestureDetector>
+
+      {/* Price axis drag zone - positioned over the right margin */}
+      <GestureDetector gesture={priceAxisGesture}>
+        <Animated.View
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: margins.top,
+            width: margins.right,
+            height: dimensions.height - margins.top - margins.bottom,
+          }}
+        />
       </GestureDetector>
     </View>
   );
