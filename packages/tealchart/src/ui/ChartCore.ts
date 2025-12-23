@@ -12,7 +12,7 @@
 
 import Konva from 'konva';
 import { TealchartRenderer } from '../TealchartRenderer';
-import { EventManager, type CrosshairState as EventCrosshairState } from '../interaction/EventManager';
+import { EventManager, type CrosshairState as EventCrosshairState, type PaneDividerInfo } from '../interaction/EventManager';
 import { PriceLineManager, type CrosshairState as PriceLineCrosshairState } from '../interaction/PriceLineManager';
 import { div, button, icons } from './dom';
 import {
@@ -86,6 +86,8 @@ export interface ChartCoreOptions {
   onMouseUp?: () => void;
   /** Crosshair moved callback */
   onCrossHairMoved?: (price: number, time: number) => void;
+  /** Called when pane heights change via divider drag */
+  onPaneHeightsChange?: (heights: { paneId: string; heightRatio: number }[]) => void;
 }
 
 // ============================================================================
@@ -416,6 +418,9 @@ export class ChartCore {
   // State
   private pendingOrders = new Map<string, PendingOrderUpdate>();
   private paneYOverrides = new Map<string, { yMin: number; yMax: number }>();
+  private paneHeightOverrides = new Map<string, number>();
+  /** Cache of computed Y ranges from the last render (for indicator panes) */
+  private renderedPaneYRanges = new Map<string, { yMin: number; yMax: number }>();
   private crosshair: EventCrosshairState = { visible: false, x: 0, y: 0 };
   private showResetButton = false;
   private resetButtonTimer: ReturnType<typeof setTimeout> | null = null;
@@ -495,10 +500,24 @@ export class ChartCore {
         this.viewport ?? TealchartRenderer.calculateViewport(this.bars)
       ),
       getPaneAtY: (y) => this.getPaneAtY(y),
+      getDividerAtY: (y) => this.getDividerAtY(y),
+      onPaneHeightsChange: (heights) => {
+        for (const { paneId, heightRatio } of heights) {
+          this.paneHeightOverrides.set(paneId, heightRatio);
+        }
+        this.options.onPaneHeightsChange?.(heights);
+        this.scheduleRender();
+      },
       isOverInteractiveElement: (x, y) => this.isOverInteractiveElement(x, y),
       onViewportChange: (vp) => {
         this.viewport = vp;
         this.options.onViewportChange?.(vp);
+        this.scheduleRender();
+      },
+      onPaneYRangeChange: (paneId, yMin, yMax) => {
+        this.paneYOverrides.set(paneId, { yMin, yMax });
+        // Clear the cached rendered range since override takes precedence
+        this.renderedPaneYRanges.delete(paneId);
         this.scheduleRender();
       },
       onRequestMoreBars: (dir) => this.options.onRequestMoreBars?.(dir),
@@ -717,8 +736,31 @@ export class ChartCore {
   resetViewport(): void {
     this.viewport = TealchartRenderer.calculateViewport(this.bars);
     this.paneYOverrides.clear();
+    this.paneHeightOverrides.clear();
+    this.renderedPaneYRanges.clear(); // Will be recalculated on next render
     this.options.onViewportChange?.(this.viewport);
     this.scheduleRender();
+  }
+
+  /**
+   * Set pane heights (for loading persisted values)
+   */
+  setPaneHeights(heights: { paneId: string; heightRatio: number }[]): void {
+    for (const { paneId, heightRatio } of heights) {
+      this.paneHeightOverrides.set(paneId, heightRatio);
+    }
+    this.scheduleRender();
+  }
+
+  /**
+   * Get current pane heights
+   */
+  getPaneHeights(): { paneId: string; heightRatio: number }[] {
+    const layout = this.getUnifiedLayout();
+    return layout.panes.map(pane => ({
+      paneId: pane.id,
+      heightRatio: pane.heightRatio,
+    }));
   }
 
   /**
@@ -996,25 +1038,29 @@ export class ChartCore {
   private getUnifiedLayout(): UnifiedPaneLayout {
     const baseLayout = this.unifiedPaneLayout || convertToUnifiedLayout(this.paneLayout);
 
-    // Apply pane Y-axis overrides
+    // Apply pane Y-axis overrides and height overrides
     return {
       ...baseLayout,
       panes: baseLayout.panes.map(pane => {
-        const override = this.paneYOverrides.get(pane.id);
-        if (override) {
-          return { ...pane, yMin: override.yMin, yMax: override.yMax, fixedRange: true };
-        }
-        return pane;
+        const yOverride = this.paneYOverrides.get(pane.id);
+        const heightOverride = this.paneHeightOverrides.get(pane.id);
+        return {
+          ...pane,
+          ...(yOverride ? { yMin: yOverride.yMin, yMax: yOverride.yMax, fixedRange: true } : {}),
+          ...(heightOverride !== undefined ? { heightRatio: heightOverride } : {}),
+        };
       }),
     };
   }
 
-  private getPaneAtY(y: number): { paneId: string; yMin: number; yMax: number } | null {
+  private getPaneAtY(y: number): { paneId: string; yMin: number; yMax: number; paneHeight: number } | null {
     const layout = this.getUnifiedLayout();
     const timeAxisHeight = layout.timeAxisHeight;
-    const availableHeight = this.options.height - timeAxisHeight;
+    const topMargin = this.margins.top;
+    const availableHeight = this.options.height - timeAxisHeight - topMargin;
 
-    let currentTop = 0;
+    // Account for top margin (e.g., top bar overlay)
+    let currentTop = topMargin;
     for (const pane of layout.panes) {
       const paneHeight = availableHeight * pane.heightRatio;
       const paneBottom = currentTop + paneHeight;
@@ -1027,12 +1073,187 @@ export class ChartCore {
         if (pane.type === 'main' && !override && this.viewport) {
           yMin = this.viewport.priceMin;
           yMax = this.viewport.priceMax;
+        } else if (pane.type === 'indicator' && !override) {
+          // Try multiple sources for the Y range (in order of accuracy):
+          let foundRange = false;
+
+          // 1. BEST: Cached Y range from last render (exactly matches what's displayed)
+          const renderedRange = this.renderedPaneYRanges.get(pane.id);
+          if (renderedRange) {
+            yMin = renderedRange.yMin;
+            yMax = renderedRange.yMax;
+            foundRange = true;
+          }
+          // 2. Fixed Y axis range from indicatorPaneInfo (for indicators like RSI with fixed bounds)
+          if (!foundRange && pane.indicatorIds && pane.indicatorIds.length > 0) {
+            for (const indicatorId of pane.indicatorIds) {
+              const indicatorInfo = this.indicatorPaneInfo[indicatorId];
+              if (indicatorInfo?.yAxisRange && indicatorInfo.yAxisRange.max > indicatorInfo.yAxisRange.min) {
+                yMin = indicatorInfo.yAxisRange.min;
+                yMax = indicatorInfo.yAxisRange.max;
+                foundRange = true;
+                break;
+              }
+            }
+          }
+          // 3. Pane's own yMin/yMax if valid (from layout)
+          if (!foundRange && pane.yMin !== pane.yMax && (pane.yMin !== 0 || pane.yMax !== 0)) {
+            yMin = pane.yMin;
+            yMax = pane.yMax;
+            foundRange = true;
+          }
+          // 4. Compute from plot data as last resort
+          if (!foundRange) {
+            const computedRange = this.computePaneYRangeFromPlots(pane.id);
+            if (computedRange) {
+              yMin = computedRange.yMin;
+              yMax = computedRange.yMax;
+            }
+          }
         }
 
-        return { paneId: pane.id, yMin, yMax };
+        return { paneId: pane.id, yMin, yMax, paneHeight };
       }
 
       currentTop = paneBottom;
+    }
+
+    return null;
+  }
+
+  private computePaneYRangeFromPlots(paneId: string): { yMin: number; yMax: number } | null {
+    const layout = this.getUnifiedLayout();
+    const pane = layout.panes.find(p => p.id === paneId);
+
+    // Find plots that belong to this pane
+    // Match using the same logic as the renderer: plot.scriptId ?? 'unknown' must be in pane.indicatorIds
+    const panePlots = this.plots.filter(plot => {
+      const scriptId = plot.scriptId ?? 'unknown';
+
+      // Check if scriptId matches pane.indicatorIds (renderer logic)
+      if (pane?.indicatorIds?.includes(scriptId)) {
+        return true;
+      }
+
+      // Check if pane ID matches directly (for single-indicator panes)
+      if (paneId === scriptId) {
+        return true;
+      }
+
+      return false;
+    });
+
+    if (panePlots.length === 0) return null;
+
+    // Collect all numeric values from the plots (same approach as renderer)
+    // The renderer does: paneValues.push(...plot.values) where values is (number | null)[]
+    const paneValues: (number | null)[] = [];
+    for (const plot of panePlots) {
+      if (plot.type === 'plot' && plot.values) {
+        // plot.values is (number | null)[] - push all values
+        paneValues.push(...plot.values);
+      }
+    }
+
+    if (paneValues.length === 0) return null;
+
+    // Calculate min/max from values (same logic as TealchartRenderer.calculateIndicatorRange)
+    let min = Infinity;
+    let max = -Infinity;
+
+    for (const val of paneValues) {
+      if (val !== null && val !== undefined && isFinite(val)) {
+        min = Math.min(min, val);
+        max = Math.max(max, val);
+      }
+    }
+
+    if (!isFinite(min) || !isFinite(max)) return null;
+    if (min === max) {
+      // Add some padding if all values are the same
+      min = min - 1;
+      max = max + 1;
+    }
+
+    // Add 10% padding (same as TealchartRenderer.calculateIndicatorRange)
+    const range = max - min;
+    const padding = range * 0.1;
+    return { yMin: min - padding, yMax: max + padding };
+  }
+
+  /**
+   * Update the rendered pane Y ranges cache
+   * This calculates Y ranges exactly like the renderer does for indicator panes
+   */
+  private updateRenderedPaneYRanges(layout: UnifiedPaneLayout): void {
+    // Calculate Y ranges for indicator panes exactly as the renderer does
+    for (const pane of layout.panes) {
+      // Skip if pane has an override (user has manually adjusted)
+      if (this.paneYOverrides.has(pane.id)) {
+        continue;
+      }
+
+      if (pane.type === 'indicator' && !pane.fixedRange && pane.indicatorIds) {
+        // Collect values exactly as renderer does
+        const paneValues: (number | null)[] = [];
+        for (const plot of this.plots) {
+          const scriptId = plot.scriptId ?? 'unknown';
+          if (pane.indicatorIds.includes(scriptId) && plot.type === 'plot' && plot.values) {
+            paneValues.push(...plot.values);
+          }
+        }
+
+        if (paneValues.length > 0) {
+          // Use same calculation as TealchartRenderer.calculateIndicatorRange
+          const validValues = paneValues.filter((v): v is number => v !== null && !isNaN(v));
+          if (validValues.length > 0) {
+            const min = Math.min(...validValues);
+            const max = Math.max(...validValues);
+            const range = max - min;
+            const pad = range * 0.1; // 10% padding
+            this.renderedPaneYRanges.set(pane.id, {
+              yMin: min - pad,
+              yMax: max + pad,
+            });
+          }
+        }
+      }
+    }
+  }
+
+  private getDividerAtY(y: number): PaneDividerInfo | null {
+    const layout = this.getUnifiedLayout();
+    const panes = layout.panes;
+
+    // Need at least 2 panes for a divider
+    if (panes.length < 2) return null;
+
+    const timeAxisHeight = layout.timeAxisHeight;
+    const topMargin = this.margins.top;
+    const availableHeight = this.options.height - timeAxisHeight - topMargin;
+
+    const DIVIDER_HIT_ZONE = 6; // Pixels around divider that count as "over divider"
+
+    let currentTop = topMargin;
+    for (let i = 0; i < panes.length - 1; i++) {
+      const pane = panes[i];
+      const nextPane = panes[i + 1];
+      const paneHeight = availableHeight * pane.heightRatio;
+      const dividerY = currentTop + paneHeight;
+
+      // Check if y is within hit zone of this divider
+      if (Math.abs(y - dividerY) <= DIVIDER_HIT_ZONE) {
+        return {
+          dividerIndex: i,
+          y: dividerY,
+          paneAboveId: pane.id,
+          paneBelowId: nextPane.id,
+          paneAboveRatio: pane.heightRatio,
+          paneBelowRatio: nextPane.heightRatio,
+        };
+      }
+
+      currentTop += paneHeight;
     }
 
     return null;
@@ -1157,6 +1378,10 @@ export class ChartCore {
       crosshairState,
       this.plotStyleOverrides
     );
+
+    // Cache computed Y ranges for indicator panes (matches renderer's auto-calculation)
+    // This is used by getPaneAtY to get accurate Y ranges on first drag
+    this.updateRenderedPaneYRanges(layout);
 
     this.renderer.drawCrosshair(crosshairState, vp, layout);
 

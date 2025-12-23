@@ -19,11 +19,15 @@ export interface PaneInfo {
   paneId: string;
   yMin: number;
   yMax: number;
+  /** Actual pixel height of this pane */
+  paneHeight: number;
 }
 
 export interface EventManagerCallbacks {
   /** Called when viewport changes (pan, zoom, etc.) */
   onViewportChange?: (viewport: Viewport) => void;
+  /** Called when an indicator pane Y range changes (for price axis zoom) */
+  onPaneYRangeChange?: (paneId: string, yMin: number, yMax: number) => void;
   /** Called when more historical bars are needed */
   onRequestMoreBars?: (direction: 'left' | 'right') => void;
   /** Called when crosshair position updates */
@@ -53,6 +57,10 @@ export interface EventManagerCallbacks {
   };
   /** Get pane at Y position (for price-axis zoom) */
   getPaneAtY?: (y: number) => PaneInfo | null;
+  /** Get divider at Y position (for pane resizing) */
+  getDividerAtY?: (y: number) => PaneDividerInfo | null;
+  /** Called when pane heights change via divider drag */
+  onPaneHeightsChange?: (heights: { paneId: string; heightRatio: number }[]) => void;
   /** Check if position is over interactive Konva element */
   isOverInteractiveElement?: (x: number, y: number) => boolean;
   /** Get price from Y coordinate */
@@ -61,7 +69,22 @@ export interface EventManagerCallbacks {
   getTimeFromX?: (x: number) => number;
 }
 
-export type DragMode = 'none' | 'pan' | 'priceAxisZoom';
+export type DragMode = 'none' | 'pan' | 'priceAxisZoom' | 'paneDivider';
+
+export interface PaneDividerInfo {
+  /** Index of the divider (0 = between pane 0 and 1, etc.) */
+  dividerIndex: number;
+  /** Y position of the divider */
+  y: number;
+  /** ID of the pane above the divider */
+  paneAboveId: string;
+  /** ID of the pane below the divider */
+  paneBelowId: string;
+  /** Height ratio of pane above at drag start */
+  paneAboveRatio: number;
+  /** Height ratio of pane below at drag start */
+  paneBelowRatio: number;
+}
 
 export interface InteractionState {
   isDragging: boolean;
@@ -71,12 +94,17 @@ export interface InteractionState {
   dragStartViewport: Viewport | null;
   draggedPaneId: string | null;
   dragStartPaneYRange: { yMin: number; yMax: number } | null;
+  dragStartPaneHeight: number;
   isOverPriceAxis: boolean;
+  isOverPaneDivider: boolean;
+  hoveredDividerIndex: number;
   hoveredX: number;
   hoveredY: number;
   // Crosshair position at drag start (for tracking during drag)
   dragStartCrosshairX: number;
   dragStartCrosshairY: number;
+  // Pane divider drag state
+  draggedDivider: PaneDividerInfo | null;
 }
 
 export interface CrosshairState {
@@ -111,11 +139,15 @@ export class EventManager {
     dragStartViewport: null,
     draggedPaneId: null,
     dragStartPaneYRange: null,
+    dragStartPaneHeight: 0,
     isOverPriceAxis: false,
+    isOverPaneDivider: false,
+    hoveredDividerIndex: -1,
     hoveredX: 0,
     hoveredY: 0,
     dragStartCrosshairX: 0,
     dragStartCrosshairY: 0,
+    draggedDivider: null,
   };
 
   // Crosshair state
@@ -275,6 +307,22 @@ export class EventManager {
     this.callbacks.onMouseDown?.();
 
     const dims = this.callbacks.getDimensions();
+
+    // Check if over a pane divider first
+    const divider = this.callbacks.getDividerAtY?.(y);
+    if (divider) {
+      this.state.isDragging = true;
+      this.state.dragMode = 'paneDivider';
+      this.state.dragStartX = x;
+      this.state.dragStartY = y;
+      this.state.draggedDivider = divider;
+      this.callbacks.onCursorChange?.('ns-resize');
+
+      window.addEventListener('mousemove', this.boundWindowMouseMove);
+      window.addEventListener('mouseup', this.boundWindowMouseUp);
+      return;
+    }
+
     const isOverPriceAxis = x > dims.width - dims.priceAxisWidth;
 
     const viewport = this.callbacks.getViewport();
@@ -287,12 +335,13 @@ export class EventManager {
     this.state.dragStartCrosshairX = this.crosshair.x;
     this.state.dragStartCrosshairY = this.crosshair.y;
 
-    // Track pane for price-axis zoom
-    if (isOverPriceAxis && this.callbacks.getPaneAtY) {
+    // Track which pane the drag started in (for both pan and price-axis zoom)
+    if (this.callbacks.getPaneAtY) {
       const pane = this.callbacks.getPaneAtY(y);
       if (pane) {
         this.state.draggedPaneId = pane.paneId;
         this.state.dragStartPaneYRange = { yMin: pane.yMin, yMax: pane.yMax };
+        this.state.dragStartPaneHeight = pane.paneHeight;
       }
     }
 
@@ -320,14 +369,20 @@ export class EventManager {
 
     const dims = this.callbacks.getDimensions();
     const wasOverPriceAxis = this.state.isOverPriceAxis;
+    const wasOverPaneDivider = this.state.isOverPaneDivider;
     this.state.isOverPriceAxis = x > dims.width - dims.priceAxisWidth;
+
+    // Check for pane divider hover
+    const divider = this.callbacks.getDividerAtY?.(y);
+    this.state.isOverPaneDivider = divider !== null && divider !== undefined;
+    this.state.hoveredDividerIndex = divider?.dividerIndex ?? -1;
 
     // Check if in dead zone (top bar or time axis - areas where crosshair shouldn't show)
     const inDeadZone = y < dims.topMargin || y > dims.height - dims.timeAxisHeight;
 
-    // Update crosshair - hide when over price axis or in dead zones
+    // Update crosshair - hide when over price axis, divider, or in dead zones
     if (!this.state.isDragging) {
-      const shouldShowCrosshair = !this.state.isOverPriceAxis && !inDeadZone;
+      const shouldShowCrosshair = !this.state.isOverPriceAxis && !this.state.isOverPaneDivider && !inDeadZone;
       const wasVisible = this.crosshair.visible;
       this.crosshair.visible = shouldShowCrosshair;
       this.crosshair.x = x;
@@ -339,9 +394,15 @@ export class EventManager {
       if (wasVisible !== shouldShowCrosshair) {
         this.callbacks.onCrossHairVisibilityChange?.(shouldShowCrosshair);
       }
-      // Update cursor when hovering over price axis changes
-      if (wasOverPriceAxis !== this.state.isOverPriceAxis) {
-        this.callbacks.onCursorChange?.(this.state.isOverPriceAxis ? 'ns-resize' : 'crosshair');
+      // Update cursor based on what we're hovering over
+      if (wasOverPaneDivider !== this.state.isOverPaneDivider || wasOverPriceAxis !== this.state.isOverPriceAxis) {
+        if (this.state.isOverPaneDivider) {
+          this.callbacks.onCursorChange?.('ns-resize');
+        } else if (this.state.isOverPriceAxis) {
+          this.callbacks.onCursorChange?.('ns-resize');
+        } else {
+          this.callbacks.onCursorChange?.('crosshair');
+        }
       }
       // Only schedule render when NOT dragging
       // During drag, handleWindowMouseMove handles rendering via onViewportChange
@@ -352,11 +413,19 @@ export class EventManager {
   }
 
   private handleWindowMouseMove(e: MouseEvent): void {
-    if (!this.state.isDragging || !this.state.dragStartViewport) return;
+    if (!this.state.isDragging) return;
 
     const rect = this.container.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
+
+    // Handle pane divider dragging
+    if (this.state.dragMode === 'paneDivider') {
+      this.handlePaneDividerDrag(y);
+      return;
+    }
+
+    if (!this.state.dragStartViewport) return;
 
     const dx = x - this.state.dragStartX;
     const dy = y - this.state.dragStartY;
@@ -396,6 +465,8 @@ export class EventManager {
     this.state.dragStartViewport = null;
     this.state.draggedPaneId = null;
     this.state.dragStartPaneYRange = null;
+    this.state.dragStartPaneHeight = 0;
+    this.state.draggedDivider = null;
 
     // Remove window listeners
     window.removeEventListener('mousemove', this.boundWindowMouseMove);
@@ -508,12 +579,16 @@ export class EventManager {
       this.state.dragStartCrosshairX = this.crosshair.x;
       this.state.dragStartCrosshairY = this.crosshair.y;
 
-      if (isOverPriceAxis && this.callbacks.getPaneAtY) {
+      // Track which pane the touch started in (for both pan and price-axis zoom)
+      if (this.callbacks.getPaneAtY) {
         const pane = this.callbacks.getPaneAtY(y);
         if (pane) {
           this.state.draggedPaneId = pane.paneId;
           this.state.dragStartPaneYRange = { yMin: pane.yMin, yMax: pane.yMax };
-          this.touchYPanUnlocked = true; // Allow Y-axis zooming immediately for price axis drag
+          this.state.dragStartPaneHeight = pane.paneHeight;
+          if (isOverPriceAxis) {
+            this.touchYPanUnlocked = true; // Allow Y-axis zooming immediately for price axis drag
+          }
         }
       }
 
@@ -638,6 +713,8 @@ export class EventManager {
       this.state.dragStartViewport = null;
       this.state.draggedPaneId = null;
       this.state.dragStartPaneYRange = null;
+      this.state.dragStartPaneHeight = 0;
+      this.state.draggedDivider = null;
     }
 
     // Reset pinch state when going from 2 to 1 touch
@@ -715,6 +792,8 @@ export class EventManager {
       this.state.dragStartViewport = null;
       this.state.draggedPaneId = null;
       this.state.dragStartPaneYRange = null;
+      this.state.dragStartPaneHeight = 0;
+      this.state.draggedDivider = null;
 
       window.removeEventListener('mousemove', this.boundWindowMouseMove);
       window.removeEventListener('mouseup', this.boundWindowMouseUp);
@@ -728,7 +807,7 @@ export class EventManager {
   // ============================================================================
 
   private handlePan(dx: number, dy: number): void {
-    if (!this.state.dragStartViewport) return;
+    if (!this.state.dragStartViewport || !this.state.dragStartPaneYRange || !this.state.draggedPaneId) return;
 
     const viewport = this.callbacks.getViewport();
     const dims = this.callbacks.getDimensions();
@@ -737,41 +816,58 @@ export class EventManager {
     const timeRange = this.state.dragStartViewport.endTime - this.state.dragStartViewport.startTime;
     const msPerPixel = timeRange / dims.width;
 
-    // Calculate price per pixel (vertical)
-    const priceRange = this.state.dragStartViewport.priceMax - this.state.dragStartViewport.priceMin;
-    const chartHeight = dims.height - 30; // Account for time axis (approximate)
-    const pricePerPixel = priceRange / chartHeight;
-
-    // Pan by time delta (horizontal)
+    // Pan by time delta (horizontal) - affects all panes
     const timePanned = -dx * msPerPixel;
     const newStartTime = this.state.dragStartViewport.startTime + timePanned;
     const newEndTime = this.state.dragStartViewport.endTime + timePanned;
-
-    // Pan by price delta (vertical) - inverted because Y increases downward
-    const pricePanned = dy * pricePerPixel;
-    const newPriceMin = this.state.dragStartViewport.priceMin + pricePanned;
-    const newPriceMax = this.state.dragStartViewport.priceMax + pricePanned;
 
     // Request more bars if panning left (to earlier times)
     if (newStartTime < this.state.dragStartViewport.startTime) {
       this.callbacks.onRequestMoreBars?.('left');
     }
 
-    // Update viewport with both horizontal and vertical pan
-    this.callbacks.onViewportChange?.({
-      ...viewport,
-      startTime: newStartTime,
-      endTime: newEndTime,
-      priceMin: newPriceMin,
-      priceMax: newPriceMax,
-    });
+    // Calculate price per pixel using the actual pane height (not full chart height)
+    const { yMin: startYMin, yMax: startYMax } = this.state.dragStartPaneYRange;
+    const priceRange = startYMax - startYMin;
+    const paneHeight = this.state.dragStartPaneHeight || (dims.height - dims.timeAxisHeight - dims.topMargin);
+    const pricePerPixel = priceRange / paneHeight;
+
+    // Pan by price delta (vertical) - inverted because Y increases downward
+    const pricePanned = dy * pricePerPixel;
+    const newPriceMin = startYMin + pricePanned;
+    const newPriceMax = startYMax + pricePanned;
+
+    if (this.state.draggedPaneId === 'main') {
+      // Update viewport for main pane (horizontal + vertical)
+      this.callbacks.onViewportChange?.({
+        ...viewport,
+        startTime: newStartTime,
+        endTime: newEndTime,
+        priceMin: newPriceMin,
+        priceMax: newPriceMax,
+      });
+    } else {
+      // For indicator panes: update time (viewport) + pane Y override separately
+      this.callbacks.onViewportChange?.({
+        ...viewport,
+        startTime: newStartTime,
+        endTime: newEndTime,
+      });
+      this.callbacks.onPaneYRangeChange?.(this.state.draggedPaneId, newPriceMin, newPriceMax);
+    }
   }
 
   private handlePriceAxisZoom(dy: number): void {
-    if (!this.state.dragStartViewport || !this.state.dragStartPaneYRange) return;
+    if (!this.state.dragStartViewport || !this.state.dragStartPaneYRange || !this.state.draggedPaneId) return;
 
-    // Zoom factor based on Y movement
-    const zoomFactor = 1 + dy * 0.005;
+    const dims = this.callbacks.getDimensions();
+    const fullChartHeight = dims.height - dims.timeAxisHeight - dims.topMargin;
+    const paneHeight = this.state.dragStartPaneHeight || fullChartHeight;
+
+    // Scale the zoom factor so smaller panes feel the same as larger ones
+    // A 10% drag on a small pane should zoom the same as 10% drag on large pane
+    const heightScale = fullChartHeight / paneHeight;
+    const zoomFactor = 1 + dy * 0.005 * heightScale;
 
     const { yMin: startPriceMin, yMax: startPriceMax } = this.state.dragStartPaneYRange;
     const range = startPriceMax - startPriceMin;
@@ -781,13 +877,56 @@ export class EventManager {
     const newPriceMin = center - newRange / 2;
     const newPriceMax = center + newRange / 2;
 
-    // Update viewport with new price range
-    const viewport = this.callbacks.getViewport();
-    this.callbacks.onViewportChange?.({
-      ...viewport,
-      priceMin: newPriceMin,
-      priceMax: newPriceMax,
-    });
+    if (this.state.draggedPaneId === 'main') {
+      // Update viewport for main pane
+      const viewport = this.callbacks.getViewport();
+      this.callbacks.onViewportChange?.({
+        ...viewport,
+        priceMin: newPriceMin,
+        priceMax: newPriceMax,
+      });
+    } else {
+      // Update pane Y overrides for indicator panes
+      this.callbacks.onPaneYRangeChange?.(this.state.draggedPaneId, newPriceMin, newPriceMax);
+    }
+  }
+
+  private handlePaneDividerDrag(y: number): void {
+    const divider = this.state.draggedDivider;
+    if (!divider) return;
+
+    const dims = this.callbacks.getDimensions();
+    const availableHeight = dims.height - dims.timeAxisHeight - dims.topMargin;
+
+    // Calculate the delta in pixels from drag start
+    const dy = y - this.state.dragStartY;
+
+    // Convert to ratio change (positive dy = move divider down = pane above gets bigger)
+    const ratioChange = dy / availableHeight;
+
+    // Calculate combined ratio of both panes (they share the space)
+    const combinedRatio = divider.paneAboveRatio + divider.paneBelowRatio;
+
+    // Calculate new ratios ensuring minimum pane height (10% of combined)
+    const minRatio = combinedRatio * 0.1;
+    let newAboveRatio = divider.paneAboveRatio + ratioChange;
+    let newBelowRatio = divider.paneBelowRatio - ratioChange;
+
+    // Clamp to minimum
+    if (newAboveRatio < minRatio) {
+      newAboveRatio = minRatio;
+      newBelowRatio = combinedRatio - minRatio;
+    }
+    if (newBelowRatio < minRatio) {
+      newBelowRatio = minRatio;
+      newAboveRatio = combinedRatio - minRatio;
+    }
+
+    // Notify of height change
+    this.callbacks.onPaneHeightsChange?.([
+      { paneId: divider.paneAboveId, heightRatio: newAboveRatio },
+      { paneId: divider.paneBelowId, heightRatio: newBelowRatio },
+    ]);
   }
 
   private panViewport(viewport: Viewport, pixelDelta: number, width: number): Viewport {
