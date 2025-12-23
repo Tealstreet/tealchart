@@ -63,6 +63,7 @@ type SkPaint = {
   setStrokeJoin(join: number): void;
   setAlphaf(alpha: number): void;
   setPathEffect(effect: SkPathEffect | null): void;
+  setAntiAlias(aa: boolean): void;
   copy(): SkPaint;
 };
 
@@ -79,7 +80,14 @@ type SkPath = {
 
 type SkFont = {
   setSize(size: number): void;
-  measureText(text: string): number;
+  getSize(): number;
+  getTextWidth(text: string, paint?: SkPaint): number;
+};
+
+type SkTypeface = unknown;
+
+type SkFontMgr = {
+  matchFamilyStyle(familyName: string, style?: unknown): SkTypeface | null;
 };
 
 type SkRect = readonly [number, number, number, number]; // [x, y, width, height] or [left, top, right, bottom]
@@ -97,6 +105,10 @@ interface SkiaApi {
   };
   XYWHRect(x: number, y: number, width: number, height: number): SkRect;
   RRectXY(rect: SkRect, rx: number, ry: number): SkRRect;
+  Font(typeface: SkTypeface | null, size: number): SkFont;
+  FontMgr: {
+    System(): SkFontMgr;
+  };
 }
 
 // Paint style constants
@@ -201,7 +213,21 @@ function parseFontSize(font: string): number {
   return match ? parseFloat(match[1]) : 12;
 }
 
+// Text item for collection (rendered by React Native, not Skia)
+export interface CollectedTextItem {
+  text: string;
+  x: number;
+  y: number;
+  color: string;
+  fontSize: number;
+  textAlign: CanvasTextAlign;
+  textBaseline: CanvasTextBaseline;
+}
+
 export class SkiaCanvasContext implements CanvasContext {
+  private static _fontWarningLogged = false;
+  private static _fillTextLogCount = 0;
+
   private canvas: SkCanvas;
   private skia: SkiaApi;
   private currentPath: SkPath;
@@ -210,6 +236,9 @@ export class SkiaCanvasContext implements CanvasContext {
   private textPaint: SkPaint;
   private skiaFont: SkFont | null = null;
   private stateStack: ContextState[] = [];
+
+  // Collect text items for React Native rendering
+  private _collectedText: CollectedTextItem[] = [];
   private _lineDash: number[] = [];
 
   // Public state properties
@@ -224,7 +253,7 @@ export class SkiaCanvasContext implements CanvasContext {
   lineCap: CanvasLineCap = 'butt';
   lineJoin: CanvasLineJoin = 'miter';
 
-  constructor(canvas: SkCanvas, skia: SkiaApi) {
+  constructor(canvas: SkCanvas, skia: SkiaApi, font?: SkFont | null) {
     this.canvas = canvas;
     this.skia = skia;
 
@@ -233,13 +262,15 @@ export class SkiaCanvasContext implements CanvasContext {
     this.fillPaint = skia.Paint();
     this.strokePaint = skia.Paint();
     this.textPaint = skia.Paint();
-    // Font requires a typeface in v2.x - skip for now, text won't render
-    this.skiaFont = null;
+
+    // Use provided font (created via matchFont in caller)
+    this.skiaFont = font ?? null;
 
     // Configure paints
     this.fillPaint.setStyle(PAINT_STYLE_FILL);
     this.strokePaint.setStyle(PAINT_STYLE_STROKE);
     this.textPaint.setStyle(PAINT_STYLE_FILL);
+    this.textPaint.setAntiAlias(true);
   }
 
   // ============================================================================
@@ -308,15 +339,21 @@ export class SkiaCanvasContext implements CanvasContext {
 
   private applyFillStyle(): void {
     const color = typeof this.fillStyle === 'string' ? this.fillStyle : '#000000';
-    this.fillPaint.setColor(parseColor(color));
-    this.fillPaint.setAlphaf(this.globalAlpha);
+    const parsedColor = parseColor(color);
+    // Multiply color alpha with globalAlpha
+    const finalAlpha = parsedColor[3] * this.globalAlpha;
+    this.fillPaint.setColor(parsedColor);
+    this.fillPaint.setAlphaf(finalAlpha);
   }
 
   private applyStrokeStyle(): void {
     const color = typeof this.strokeStyle === 'string' ? this.strokeStyle : '#000000';
-    this.strokePaint.setColor(parseColor(color));
+    const parsedColor = parseColor(color);
+    // Multiply color alpha with globalAlpha
+    const finalAlpha = parsedColor[3] * this.globalAlpha;
+    this.strokePaint.setColor(parsedColor);
     this.strokePaint.setStrokeWidth(this.lineWidth);
-    this.strokePaint.setAlphaf(this.globalAlpha);
+    this.strokePaint.setAlphaf(finalAlpha);
 
     // Line cap
     const capMap: Record<CanvasLineCap, number> = {
@@ -366,40 +403,29 @@ export class SkiaCanvasContext implements CanvasContext {
   }
 
   fillText(text: string, x: number, y: number): void {
-    // Skip text rendering if no font available (v2.x requires typeface)
-    if (!this.skiaFont) return;
-
+    // Collect text for React Native rendering instead of Skia
     const color = typeof this.fillStyle === 'string' ? this.fillStyle : '#000000';
-    this.textPaint.setColor(parseColor(color));
-    this.textPaint.setAlphaf(this.globalAlpha);
-
-    // Update font size
-    const size = parseFontSize(this.font);
-    this.skiaFont.setSize(size);
-
-    // Adjust x based on textAlign
-    let adjustedX = x;
-    if (this.textAlign === 'center') {
-      const width = this.skiaFont.measureText(text);
-      adjustedX = x - width / 2;
-    } else if (this.textAlign === 'right' || this.textAlign === 'end') {
-      const width = this.skiaFont.measureText(text);
-      adjustedX = x - width;
-    }
-
-    // Adjust y based on textBaseline (simplified)
-    let adjustedY = y;
     const fontSize = parseFontSize(this.font);
-    if (this.textBaseline === 'top') {
-      adjustedY = y + fontSize * 0.8;
-    } else if (this.textBaseline === 'middle') {
-      adjustedY = y + fontSize * 0.35;
-    } else if (this.textBaseline === 'bottom') {
-      adjustedY = y - fontSize * 0.2;
-    }
-    // 'alphabetic' is roughly the default
 
-    this.canvas.drawText(text, adjustedX, adjustedY, this.textPaint, this.skiaFont);
+    this._collectedText.push({
+      text,
+      x,
+      y,
+      color,
+      fontSize,
+      textAlign: this.textAlign,
+      textBaseline: this.textBaseline,
+    });
+  }
+
+  // Get collected text items for React Native rendering
+  getCollectedText(): CollectedTextItem[] {
+    return this._collectedText;
+  }
+
+  // Clear collected text (call after rendering)
+  clearCollectedText(): void {
+    this._collectedText = [];
   }
 
   // ============================================================================
@@ -480,7 +506,7 @@ export class SkiaCanvasContext implements CanvasContext {
     let width: number;
     if (this.skiaFont) {
       this.skiaFont.setSize(size);
-      width = this.skiaFont.measureText(text);
+      width = this.skiaFont.getTextWidth(text);
     } else {
       width = text.length * size * 0.6;
     }

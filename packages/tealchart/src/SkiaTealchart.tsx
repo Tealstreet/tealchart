@@ -28,13 +28,13 @@
  */
 
 import React, { useRef, useState, useCallback, useEffect, useMemo } from 'react';
-import { View, StyleSheet, LayoutChangeEvent } from 'react-native';
+import { View, StyleSheet, LayoutChangeEvent, Text } from 'react-native';
 import { Canvas, Picture, Skia, createPicture } from '@shopify/react-native-skia';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { useSharedValue, runOnJS } from 'react-native-reanimated';
 
 import { TealchartRenderer } from './TealchartRenderer';
-import { SkiaCanvasContext } from './rendering/SkiaCanvasContext';
+import { SkiaCanvasContext, CollectedTextItem } from './rendering/SkiaCanvasContext';
 import type {
   Bar,
   Viewport,
@@ -295,14 +295,16 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
 
   const composedGesture = Gesture.Simultaneous(panGesture, pinchGesture);
 
-  // Create Skia Picture for rendering (useMemo for performance)
-  const picture = useMemo(() => {
+  // Create Skia Picture for rendering and collect text items
+  const { picture, textItems } = useMemo(() => {
     if (!viewport || bars.length === 0 || dimensions.width === 0 || dimensions.height === 0) {
-      return null;
+      return { picture: null, textItems: [] as CollectedTextItem[] };
     }
 
-    return createPicture((canvas) => {
-      // Create SkiaCanvasContext from the Skia canvas
+    let collectedText: CollectedTextItem[] = [];
+
+    const pic = createPicture((canvas) => {
+      // Create SkiaCanvasContext - text will be collected, not drawn
       const ctx = new SkiaCanvasContext(canvas, Skia);
 
       // Create renderer with context and options
@@ -323,7 +325,12 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
       } else {
         renderer.render(bars, viewport, priceLines, paneLayout);
       }
+
+      // Collect text items for React Native rendering
+      collectedText = ctx.getCollectedText();
     }, { width: dimensions.width, height: dimensions.height });
+
+    return { picture: pic, textItems: collectedText };
   }, [bars, viewport, dimensions, fullRenderOptions, priceLines, plots, paneLayout, unifiedPaneLayout, indicatorPaneInfo, plotStyleOverrides]);
 
   // Don't render until we have dimensions
@@ -331,13 +338,62 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     return <View style={styles.container} onLayout={onLayout} />;
   }
 
+  // Helper to convert textAlign/textBaseline to RN styles
+  const getTextStyle = (item: CollectedTextItem) => {
+    let left = item.x;
+    let top = item.y;
+
+    // Adjust for text alignment
+    // Note: RN Text doesn't have textAlign per-item, we adjust position instead
+    // The width estimation is rough - in production you'd measure or use a monospace font
+    const estimatedWidth = item.text.length * item.fontSize * 0.6;
+
+    if (item.textAlign === 'center') {
+      left = item.x - estimatedWidth / 2;
+    } else if (item.textAlign === 'right' || item.textAlign === 'end') {
+      left = item.x - estimatedWidth;
+    }
+
+    // Adjust for baseline
+    if (item.textBaseline === 'top') {
+      // top is default in RN
+    } else if (item.textBaseline === 'middle') {
+      top = item.y - item.fontSize / 2;
+    } else if (item.textBaseline === 'bottom') {
+      top = item.y - item.fontSize;
+    } else {
+      // 'alphabetic' - roughly 80% of font size above baseline
+      top = item.y - item.fontSize * 0.8;
+    }
+
+    return {
+      position: 'absolute' as const,
+      left,
+      top,
+      fontSize: item.fontSize,
+      color: item.color,
+    };
+  };
+
   return (
     <View style={styles.container} onLayout={onLayout}>
       <GestureDetector gesture={composedGesture}>
-        <View style={{ width: dimensions.width, height: dimensions.height }}>
-          <Canvas style={{ width: dimensions.width, height: dimensions.height }}>
+        <View style={{ width: dimensions.width, height: dimensions.height, position: 'relative' }}>
+          {/* Skia Canvas for chart graphics */}
+          <Canvas style={{ position: 'absolute', width: dimensions.width, height: dimensions.height }}>
             {picture && <Picture picture={picture} />}
           </Canvas>
+
+          {/* React Native Text overlay for labels */}
+          {textItems.map((item, index) => (
+            <Text
+              key={`${item.text}-${item.x}-${item.y}-${index}`}
+              style={getTextStyle(item)}
+              numberOfLines={1}
+            >
+              {item.text}
+            </Text>
+          ))}
         </View>
       </GestureDetector>
     </View>
