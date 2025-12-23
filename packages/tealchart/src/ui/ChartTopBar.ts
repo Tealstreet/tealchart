@@ -227,18 +227,26 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     for (const tf of AVAILABLE_TIMEFRAMES) {
       const isActive = this.state.interval === tf.value;
-      const isHovered = this.state.hoveredTimeframe === tf.value;
 
       const btn = this.createElement('button', {
         style: {
           ...styles.timeframeButton,
           ...(isActive ? styles.timeframeButtonActive : {}),
-          ...(isHovered && !isActive ? styles.timeframeButtonHover : {}),
         },
         textContent: tf.shortLabel,
-        onClick: () => this.handleTimeframeClick(tf.value as ResolutionString),
-        onMouseEnter: () => this.handleTimeframeHover(tf.value),
-        onMouseLeave: () => this.handleTimeframeHover(null),
+      });
+
+      // Add event listeners directly for reliable handling (no re-render on hover)
+      btn.addEventListener('click', () => this.handleTimeframeClick(tf.value as ResolutionString));
+      btn.addEventListener('mouseenter', () => {
+        if (this.state.interval !== tf.value) {
+          Object.assign(btn.style, styles.timeframeButtonHover);
+        }
+      });
+      btn.addEventListener('mouseleave', () => {
+        if (this.state.interval !== tf.value) {
+          btn.style.backgroundColor = 'transparent';
+        }
       });
 
       tfGroup.appendChild(btn);
@@ -252,13 +260,19 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     // Indicators button
     this.indicatorsBtn = this.createElement('button', {
-      style: {
-        ...styles.indicatorsButton,
-        ...(this.state.indicatorsHovered ? styles.indicatorsButtonHover : {}),
-      },
-      onClick: () => this.options.onIndicatorsClick?.(),
-      onMouseEnter: () => this.setState({ indicatorsHovered: true }),
-      onMouseLeave: () => this.setState({ indicatorsHovered: false }),
+      style: styles.indicatorsButton,
+    });
+
+    // Add event listeners directly for reliable handling
+    this.indicatorsBtn.addEventListener('click', () => {
+      this.options.onIndicatorsClick?.();
+    });
+    this.indicatorsBtn.addEventListener('mouseenter', () => {
+      Object.assign(this.indicatorsBtn!.style, styles.indicatorsButtonHover);
+    });
+    this.indicatorsBtn.addEventListener('mouseleave', () => {
+      this.indicatorsBtn!.style.backgroundColor = 'transparent';
+      this.indicatorsBtn!.style.color = 'var(--text2, #787b86)';
     });
 
     const iconSpan = this.createElement('span', {
@@ -283,18 +297,28 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   // ============================================================================
 
   private handleTimeframeClick(interval: ResolutionString): void {
+    const previousInterval = this.state.interval;
+
     // Update store
     this.chartStore.settings.setKey('interval', interval);
 
-    // Update local state
-    this.setState({ interval });
+    // Update local state (don't use setState to avoid re-render)
+    this.state.interval = interval;
+
+    // Update button styles directly
+    const previousBtn = this.timeframeButtons.get(previousInterval);
+    const newBtn = this.timeframeButtons.get(interval);
+
+    if (previousBtn) {
+      previousBtn.style.backgroundColor = 'transparent';
+      previousBtn.style.color = 'var(--text2, #787b86)';
+    }
+    if (newBtn) {
+      Object.assign(newBtn.style, styles.timeframeButtonActive);
+    }
 
     // Notify parent
     this.options.onIntervalChange?.(interval);
-  }
-
-  private handleTimeframeHover(value: string | null): void {
-    this.setState({ hoveredTimeframe: value });
   }
 
   // ============================================================================

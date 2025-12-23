@@ -56,6 +56,14 @@ interface OHLCElements {
   change: HTMLElement | null;
 }
 
+// Cached indicator list elements for efficient updates
+interface IndicatorListElements {
+  container: HTMLElement | null;
+  toggle: HTMLElement | null;
+  chevron: HTMLElement | null;
+  toggleLabel: HTMLElement | null;
+}
+
 // ============================================================================
 // Styles
 // ============================================================================
@@ -186,6 +194,17 @@ export class ChartLegend extends Component<ChartLegendState> {
     change: null,
   };
 
+  // Cached indicator list elements (avoid rebuilding on every setIndicators call)
+  private indicatorListElements: IndicatorListElements = {
+    container: null,
+    toggle: null,
+    chevron: null,
+    toggleLabel: null,
+  };
+
+  // Track last indicator signature to avoid unnecessary rebuilds
+  private lastIndicatorSignature: string = '';
+
   constructor(options: ChartLegendOptions) {
     super('div', {
       latestBar: null,
@@ -266,9 +285,86 @@ export class ChartLegend extends Component<ChartLegendState> {
     indicators: ActiveIndicator[],
     paneInfo: Record<string, IndicatorPaneInfo>
   ): void {
-    this.state.activeIndicators = indicators;
-    this.state.indicatorPaneInfo = paneInfo;
-    this.render();
+    // Compute signature to detect actual changes (avoid unnecessary re-renders)
+    const overlayIndicators = indicators.filter(ind => {
+      const info = paneInfo[ind.id];
+      return info?.overlay !== false;
+    });
+    const signature = overlayIndicators.map(i => `${i.id}:${i.name}:${i.isVisible}`).join('|');
+
+    // Only update if indicators actually changed
+    if (signature !== this.lastIndicatorSignature) {
+      this.lastIndicatorSignature = signature;
+      this.state.activeIndicators = indicators;
+      this.state.indicatorPaneInfo = paneInfo;
+      this.updateIndicatorList(overlayIndicators);
+    }
+  }
+
+  /**
+   * Update indicator list without full re-render
+   */
+  private updateIndicatorList(overlayIndicators: ActiveIndicator[]): void {
+    // Remove old indicator list if it exists
+    if (this.indicatorListElements.container) {
+      this.indicatorListElements.container.remove();
+      this.indicatorListElements.container = null;
+    }
+    if (this.indicatorListElements.toggle) {
+      this.indicatorListElements.toggle.remove();
+      this.indicatorListElements.toggle = null;
+    }
+
+    // Create new indicator list if there are overlay indicators
+    if (overlayIndicators.length > 0) {
+      // Indicator list container
+      const indicatorList = div({
+        style: {
+          marginTop: '2px',
+          display: this.state.isExpanded ? 'block' : 'none',
+        },
+      });
+
+      for (const indicator of overlayIndicators) {
+        indicatorList.appendChild(this.createIndicatorRow(indicator));
+      }
+
+      this.el.appendChild(indicatorList);
+      this.indicatorListElements.container = indicatorList;
+
+      // Collapse toggle
+      const toggle = div({
+        style: styles.indicatorToggle,
+      });
+
+      const chevron = span({
+        text: '▼',
+        style: {
+          fontSize: '10px',
+          transform: this.state.isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+          transition: 'transform 0.15s',
+          display: 'inline-block',
+        },
+      });
+      toggle.appendChild(chevron);
+
+      const toggleLabel = span({
+        text: `${overlayIndicators.length} indicator${overlayIndicators.length !== 1 ? 's' : ''}`,
+      });
+      toggle.appendChild(toggleLabel);
+
+      // Click handler for toggle
+      toggle.addEventListener('click', () => {
+        this.state.isExpanded = !this.state.isExpanded;
+        indicatorList.style.display = this.state.isExpanded ? 'block' : 'none';
+        chevron.style.transform = this.state.isExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+      });
+
+      this.el.appendChild(toggle);
+      this.indicatorListElements.toggle = toggle;
+      this.indicatorListElements.chevron = chevron;
+      this.indicatorListElements.toggleLabel = toggleLabel;
+    }
   }
 
   // ============================================================================
@@ -280,6 +376,10 @@ export class ChartLegend extends Component<ChartLegendState> {
 
     // Clear cached OHLC elements (will be rebuilt below)
     this.ohlcElements = { open: null, high: null, low: null, close: null, change: null };
+
+    // Clear cached indicator elements (will be rebuilt via setIndicators)
+    this.indicatorListElements = { container: null, toggle: null, chevron: null, toggleLabel: null };
+    this.lastIndicatorSignature = '';
 
     // Main row
     const mainRow = div({ style: styles.mainRow });
@@ -349,50 +449,9 @@ export class ChartLegend extends Component<ChartLegendState> {
 
     this.el.appendChild(mainRow);
 
-    // Overlay indicators (filter out non-overlay)
-    const overlayIndicators = this.state.activeIndicators.filter(ind => {
-      const info = this.state.indicatorPaneInfo[ind.id];
-      return info?.overlay !== false;
-    });
-
-    // Indicator list (if expanded)
-    if (overlayIndicators.length > 0 && this.state.isExpanded) {
-      const indicatorList = div({ style: { marginTop: '2px' } });
-
-      for (const indicator of overlayIndicators) {
-        indicatorList.appendChild(this.createIndicatorRow(indicator));
-      }
-
-      this.el.appendChild(indicatorList);
-    }
-
-    // Collapse toggle
-    if (overlayIndicators.length > 0) {
-      const toggle = div({
-        style: styles.indicatorToggle,
-        onClick: () => {
-          this.state.isExpanded = !this.state.isExpanded;
-          this.render();
-        },
-      });
-
-      // Chevron icon
-      const chevron = span({
-        text: '▼',
-        style: {
-          fontSize: '10px',
-          transform: this.state.isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-          transition: 'transform 0.15s',
-          display: 'inline-block',
-        },
-      });
-      toggle.appendChild(chevron);
-      toggle.appendChild(span({
-        text: `${overlayIndicators.length} indicator${overlayIndicators.length !== 1 ? 's' : ''}`,
-      }));
-
-      this.el.appendChild(toggle);
-    }
+    // Note: Indicator list is rendered separately via updateIndicatorList()
+    // which is called from setIndicators() when indicators change.
+    // This avoids re-rendering the indicator list on every bar update.
   }
 
   private createOHLCItem(label: string, value: string, isUp?: boolean): HTMLElement {
@@ -427,20 +486,10 @@ export class ChartLegend extends Component<ChartLegendState> {
   }
 
   private createIndicatorRow(indicator: ActiveIndicator): HTMLElement {
-    const isHovered = this.state.hoveredIndicatorId === indicator.id;
-
     const row = div({
       style: {
         ...styles.indicatorRow,
         opacity: indicator.isVisible ? '1' : '0.5',
-      },
-      onMouseEnter: () => {
-        this.state.hoveredIndicatorId = indicator.id;
-        this.render();
-      },
-      onMouseLeave: () => {
-        this.state.hoveredIndicatorId = null;
-        this.render();
       },
     });
 
@@ -460,11 +509,11 @@ export class ChartLegend extends Component<ChartLegendState> {
       row.appendChild(inputsDiv);
     }
 
-    // Action buttons
+    // Action buttons (initially hidden)
     const actions = div({
       style: {
         ...styles.indicatorActions,
-        opacity: isHovered ? '1' : '0',
+        opacity: '0',
       },
     });
 
@@ -491,6 +540,17 @@ export class ChartLegend extends Component<ChartLegendState> {
 
     row.appendChild(actions);
 
+    // Add hover handlers that update styles directly (no re-render!)
+    row.addEventListener('mouseenter', () => {
+      this.state.hoveredIndicatorId = indicator.id;
+      actions.style.opacity = '1';
+    });
+
+    row.addEventListener('mouseleave', () => {
+      this.state.hoveredIndicatorId = null;
+      actions.style.opacity = '0';
+    });
+
     return row;
   }
 
@@ -506,12 +566,14 @@ export class ChartLegend extends Component<ChartLegendState> {
         e.stopPropagation();
         onClick();
       },
-      onMouseEnter: (e) => {
-        (e.target as HTMLElement).style.color = 'var(--text, #d1d4dc)';
-      },
-      onMouseLeave: (e) => {
-        (e.target as HTMLElement).style.color = 'var(--text2, #787b86)';
-      },
+    });
+
+    // Use direct event listeners instead of props to ensure correct element targeting
+    btn.addEventListener('mouseenter', () => {
+      btn.style.color = 'var(--text, #d1d4dc)';
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.color = 'var(--text2, #787b86)';
     });
 
     btn.appendChild(icon);

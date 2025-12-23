@@ -90,6 +90,12 @@ const styles = {
 export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
   private options: IndicatorPaneLegendOptions;
 
+  // Cache row elements for efficient hover updates (avoid full re-render)
+  private rowElements: Map<string, { row: HTMLElement; actions: HTMLElement }> = new Map();
+
+  // Track last indicator signature to avoid unnecessary rebuilds
+  private lastIndicatorSignature: string = '';
+
   constructor(options: IndicatorPaneLegendOptions) {
     super('div', {
       indicators: [],
@@ -115,9 +121,16 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
     indicators: ActiveIndicator[],
     paneInfo: Record<string, IndicatorPaneInfo>
   ): void {
-    this.state.indicators = indicators;
-    this.state.indicatorPaneInfo = paneInfo;
-    this.render();
+    // Compute signature to detect actual changes (avoid unnecessary re-renders)
+    const signature = indicators.map(i => `${i.id}:${i.name}:${i.isVisible}`).join('|');
+
+    // Only update if indicators actually changed
+    if (signature !== this.lastIndicatorSignature) {
+      this.lastIndicatorSignature = signature;
+      this.state.indicators = indicators;
+      this.state.indicatorPaneInfo = paneInfo;
+      this.render();
+    }
   }
 
   // ============================================================================
@@ -126,6 +139,7 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
 
   protected render(): void {
     this.el.innerHTML = '';
+    this.rowElements.clear();
 
     for (const indicator of this.state.indicators) {
       this.el.appendChild(this.createIndicatorRow(indicator));
@@ -133,21 +147,12 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
   }
 
   private createIndicatorRow(indicator: ActiveIndicator): HTMLElement {
-    const isHovered = this.state.hoveredIndicatorId === indicator.id;
     const info = this.state.indicatorPaneInfo[indicator.id];
 
     const row = div({
       style: {
         ...styles.indicatorRow,
         opacity: indicator.isVisible ? '1' : '0.5',
-      },
-      onMouseEnter: () => {
-        this.state.hoveredIndicatorId = indicator.id;
-        this.render();
-      },
-      onMouseLeave: () => {
-        this.state.hoveredIndicatorId = null;
-        this.render();
       },
     });
 
@@ -177,11 +182,11 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
       }
     }
 
-    // Action buttons
+    // Action buttons (initially hidden)
     const actions = div({
       style: {
         ...styles.indicatorActions,
-        opacity: isHovered ? '1' : '0',
+        opacity: '0',
       },
     });
 
@@ -208,6 +213,20 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
 
     row.appendChild(actions);
 
+    // Cache elements for hover updates
+    this.rowElements.set(indicator.id, { row, actions });
+
+    // Add hover handlers that update styles directly (no re-render!)
+    row.addEventListener('mouseenter', () => {
+      this.state.hoveredIndicatorId = indicator.id;
+      actions.style.opacity = '1';
+    });
+
+    row.addEventListener('mouseleave', () => {
+      this.state.hoveredIndicatorId = null;
+      actions.style.opacity = '0';
+    });
+
     return row;
   }
 
@@ -223,12 +242,14 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
         e.stopPropagation();
         onClick();
       },
-      onMouseEnter: (e) => {
-        (e.target as HTMLElement).style.color = 'var(--text, #d1d4dc)';
-      },
-      onMouseLeave: (e) => {
-        (e.target as HTMLElement).style.color = 'var(--text2, #787b86)';
-      },
+    });
+
+    // Use direct event listeners instead of props to ensure correct element targeting
+    btn.addEventListener('mouseenter', () => {
+      btn.style.color = 'var(--text, #d1d4dc)';
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.color = 'var(--text2, #787b86)';
     });
 
     btn.appendChild(icon);
