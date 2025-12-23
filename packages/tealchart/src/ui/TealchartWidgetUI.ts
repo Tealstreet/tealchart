@@ -12,6 +12,9 @@
  * - Context menu
  */
 
+// Top bar height - used to offset chart rendering so labels don't appear under the top bar
+const TOP_BAR_HEIGHT = 32;
+
 import { ChartCore, type ChartCoreOptions, type IndicatorPaneInfo } from './ChartCore';
 import { ChartTopBar, type ChartTopBarOptions } from './ChartTopBar';
 import { ChartLegend, type ActiveIndicator } from './ChartLegend';
@@ -129,21 +132,42 @@ export class TealchartWidgetUI {
     this.options = options;
     this.container = options.container;
 
-    // Create root element (no background - top bar is transparent)
+    // Create root element - chart renders at full size, top bar overlays
     this.rootEl = div({
       style: {
         position: 'relative',
         width: '100%',
         height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         overflow: 'hidden',
+        backgroundColor: 'var(--chart-bg, #131722)',
       },
     });
 
-    // Create top bar
+    // Create chart area - takes full size of container (behind top bar)
+    this.chartArea = div({
+      style: {
+        position: 'absolute',
+        top: '0',
+        left: '0',
+        right: '0',
+        bottom: '0',
+      },
+    });
+    this.rootEl.appendChild(this.chartArea);
+
+    // Create top bar - positioned absolutely over the chart
     if (options.showTopBar !== false) {
+      const topBarWrapper = div({
+        style: {
+          position: 'absolute',
+          top: '0',
+          left: '0',
+          right: '0',
+          zIndex: '5',
+        },
+      });
+
       this.topBar = new ChartTopBar({
         chartKey: options.chartKey,
         symbol: options.symbol,
@@ -154,20 +178,9 @@ export class TealchartWidgetUI {
           this.indicatorsModal?.toggle();
         },
       });
-      // Use mount() instead of getElement() to trigger onMount/render
-      this.topBar.mount(this.rootEl);
+      this.topBar.mount(topBarWrapper);
+      this.rootEl.appendChild(topBarWrapper);
     }
-
-    // Create chart area (contains canvas + legend)
-    this.chartArea = div({
-      style: {
-        flex: '1',
-        position: 'relative',
-        minHeight: '0',
-        backgroundColor: 'var(--chart-bg, #131722)',
-      },
-    });
-    this.rootEl.appendChild(this.chartArea);
 
     // Mount to container
     this.container.appendChild(this.rootEl);
@@ -210,10 +223,14 @@ export class TealchartWidgetUI {
     const width = rect.width || 800;
     const height = rect.height || 600;
 
+    // When top bar is shown, add top margin so price labels don't render under it
+    const margins = this.options.showTopBar !== false ? { top: TOP_BAR_HEIGHT } : undefined;
+
     this.chartCore = new ChartCore({
       container: this.chartArea,
       width,
       height,
+      margins,
       renderOptions: this.options.renderOptions,
       onViewportChange: this.options.onViewportChange,
       onRequestMoreBars: this.options.onRequestMoreBars,
