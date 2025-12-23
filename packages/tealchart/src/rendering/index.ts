@@ -8,3 +8,4 @@
 export type { CanvasContext } from './CanvasContext';
 export { isCanvasContext } from './CanvasContext';
 export { WebCanvasContext } from './WebCanvasContext';
+export { SkiaCanvasContext } from './SkiaCanvasContext';
