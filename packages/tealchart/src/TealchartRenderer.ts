@@ -2868,30 +2868,9 @@ export class TealchartRenderer {
       mainPane.yMax = viewport.priceMax;
     }
 
-    // Pre-calculate indicator pane Y ranges (must happen before label bounds calculation)
-    // This is needed for crosshair labels on indicator panes to render at correct Y position
-    if (plots) {
-      for (const pane of computedPanes) {
-        if (pane.type === 'indicator' && !pane.fixedRange && pane.indicatorIds) {
-          const paneValues: (number | null)[] = [];
-          const plotsUsed: string[] = [];
-          for (const plot of plots) {
-            const scriptId = plot.scriptId ?? 'unknown';
-            if (pane.indicatorIds.includes(scriptId) && plot.type === 'plot' && plot.values) {
-              plotsUsed.push(`${scriptId}:${plot.values.length}`);
-              paneValues.push(...plot.values);
-            }
-          }
-          if (paneValues.length > 0) {
-            const range = TealchartRenderer.calculateIndicatorRange(paneValues);
-            pane.yMin = range.min;
-            pane.yMax = range.max;
-          }
-        }
-      }
-    }
+    // INDICATOR RENDERING DISABLED - skip Y range pre-calculation
 
-    // Create crosshair price lines now that we have correct Y ranges
+    // Create crosshair price lines
     // Line is drawn on canvas, label by Konva (like last-trade line)
     const allPriceLines = priceLines ? [...priceLines] : [];
     if (crosshair?.visible) {
@@ -3047,15 +3026,16 @@ export class TealchartRenderer {
 
   /**
    * Render indicator pane content
+   * TEMPORARILY DISABLED - renders empty pane for debugging
    */
   private renderIndicatorPaneContent(
     pane: ComputedPane,
-    bars: Bar[],
-    viewport: Viewport,
-    plots?: PlotOutput[],
-    indicatorPaneInfo?: Record<string, IndicatorPaneInfo>,
-    labelBounds?: PriceLineLabelBounds[],
-    plotStyleOverrides?: Map<string, PlotStyleOverride>
+    _bars: Bar[],
+    _viewport: Viewport,
+    _plots?: PlotOutput[],
+    _indicatorPaneInfo?: Record<string, IndicatorPaneInfo>,
+    _labelBounds?: PriceLineLabelBounds[],
+    _plotStyleOverrides?: Map<string, PlotStyleOverride>
   ): void {
     const { ctx, options, margins } = this;
 
@@ -3071,46 +3051,7 @@ export class TealchartRenderer {
     ctx.fillStyle = this.adjustColor(options.backgroundColor, 5);
     ctx.fillRect(margins.left, pane.top, options.width - margins.left, pane.height);
 
-    // Note: Indicator legend is rendered as DOM overlay (IndicatorPaneLegend)
-    // for proper hover/click interactions (eye, settings, trash buttons)
-
-    // Draw grid for this pane
-    this.renderPaneGrid(pane, viewport);
-
-    // Get plots for this pane's indicators
-    if (plots && pane.indicatorIds) {
-      // Auto-scale if not fixed range
-      if (!pane.fixedRange) {
-        const paneValues: (number | null)[] = [];
-        for (const plot of plots) {
-          const scriptId = plot.scriptId ?? 'unknown';
-          if (pane.indicatorIds.includes(scriptId) && plot.type === 'plot' && plot.values) {
-            paneValues.push(...plot.values);
-          }
-        }
-        if (paneValues.length > 0) {
-          const range = TealchartRenderer.calculateIndicatorRange(paneValues);
-          pane.yMin = range.min;
-          pane.yMax = range.max;
-        }
-      }
-
-      // Render each plot that belongs to this pane
-      for (const plot of plots) {
-        const scriptId = plot.scriptId ?? 'unknown';
-        if (pane.indicatorIds.includes(scriptId)) {
-          this.renderPlotInPane(plot, bars, viewport, pane, plotStyleOverrides);
-        }
-      }
-    }
-
-    // Draw Y-axis for indicator pane
-    this.renderPaneYAxis(pane, labelBounds);
-
-    // Draw price lines on top (for crosshair labels on indicator panes)
-    if (labelBounds && labelBounds.length > 0) {
-      this.drawPriceLinesInPane(labelBounds, viewport, pane);
-    }
+    // ALL INDICATOR RENDERING DISABLED - pane is empty
   }
 
   /**
