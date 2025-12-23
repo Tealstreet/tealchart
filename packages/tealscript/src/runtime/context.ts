@@ -72,7 +72,7 @@ export interface TimeframeInfo {
  */
 export interface PlotOutput {
   id: string;
-  type: 'plot' | 'hline' | 'bgcolor' | 'plotshape' | 'plotchar' | 'plotarrow';
+  type: 'plot' | 'hline' | 'bgcolor' | 'plotshape' | 'plotchar' | 'plotarrow' | 'fill';
   title: string;
   values: (number | null)[];
 
@@ -92,6 +92,15 @@ export interface PlotOutput {
   shape?: string;
   size?: 'tiny' | 'small' | 'normal' | 'large' | 'huge' | 'auto';
   text?: string;
+  char?: string;
+
+  // For plotarrow
+  colorup?: string;
+  colordown?: string;
+
+  // For fill
+  plot1Id?: string;
+  plot2Id?: string;
 }
 
 export type PlotStyle =
