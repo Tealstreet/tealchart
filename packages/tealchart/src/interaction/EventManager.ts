@@ -867,7 +867,9 @@ export class EventManager {
     // Scale the zoom factor so smaller panes feel the same as larger ones
     // A 10% drag on a small pane should zoom the same as 10% drag on large pane
     const heightScale = fullChartHeight / paneHeight;
-    const zoomFactor = 1 + dy * 0.005 * heightScale;
+    // Clamp zoom factor to prevent extreme zoom on fast drags (0.1x to 10x)
+    const rawZoomFactor = 1 + dy * 0.005 * heightScale;
+    const zoomFactor = Math.max(0.1, Math.min(10, rawZoomFactor));
 
     const { yMin: startPriceMin, yMax: startPriceMax } = this.state.dragStartPaneYRange;
     const range = startPriceMax - startPriceMin;
