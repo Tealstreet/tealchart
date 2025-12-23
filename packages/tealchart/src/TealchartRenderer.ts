@@ -45,6 +45,7 @@ import type { PlotOutput, PlotStyle } from '@tealstreet/tealscript';
 import { getDecimalPlacesFromPrecision, PlotStyleOverride, LineStyle } from './state/chartState';
 import type { PaneOffset } from './rendering/PaneManager';
 import { resolveLabelCollisions } from './utils/labelCollision';
+import type { CanvasContext } from './rendering/CanvasContext';
 
 /** Info about an indicator for pane assignment (matches ChartContainer) */
 interface IndicatorPaneInfo {
@@ -77,7 +78,7 @@ function getNumberFormatter(decimals: number): Intl.NumberFormat {
 const textWidthCache = new Map<string, number>();
 const TEXT_WIDTH_CACHE_MAX_SIZE = 500;
 
-function getCachedTextWidth(ctx: CanvasRenderingContext2D, text: string, font: string): number {
+function getCachedTextWidth(ctx: CanvasContext, text: string, font: string): number {
   const cacheKey = `${font}|${text}`;
   const cached = textWidthCache.get(cacheKey);
   if (cached !== undefined) {
@@ -103,12 +104,12 @@ function getCachedTextWidth(ctx: CanvasRenderingContext2D, text: string, font: s
 }
 
 export class TealchartRenderer {
-  private ctx: CanvasRenderingContext2D;
+  private ctx: CanvasContext;
   private options: RenderOptions;
   private margins: ChartMargins;
 
   constructor(
-    ctx: CanvasRenderingContext2D,
+    ctx: CanvasContext,
     options: Partial<RenderOptions> = {},
     margins: Partial<ChartMargins> = {}
   ) {

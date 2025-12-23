@@ -20,6 +20,7 @@ const RotateIcon: React.FC<{ style?: React.CSSProperties }> = ({ style }) => (
 );
 import { Stage, Layer } from 'react-konva';
 import { TealchartRenderer } from './TealchartRenderer';
+import { WebCanvasContext } from './rendering/WebCanvasContext';
 import { Bar, Viewport, RenderOptions, InteractionState, CrosshairState, DragMode, ChartMargins, OrderLineRenderData, PaneLayout, PositionLineRenderData, PriceLine, ChartLineLabel, DEFAULT_MARGINS, UnifiedPaneLayout, ChartPane, PendingOrderUpdate, PriceLineLabelBounds, ContextMenuItem } from './types';
 import { getDecimalPlacesFromPrecision, PlotStyleOverride } from './state/chartState';
 import { PriceLineLayer } from './components/PriceLineLayer';
@@ -1019,8 +1020,8 @@ export const Tealchart: React.FC<TealchartProps> = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const nativeCtx = canvas.getContext('2d');
+    if (!nativeCtx) return;
 
     // Set canvas size for HiDPI
     const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
@@ -1028,6 +1029,9 @@ export const Tealchart: React.FC<TealchartProps> = ({
     canvas.height = height * dpr;
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
+
+    // Wrap in CanvasContext abstraction (enables Skia implementation for React Native)
+    const ctx = new WebCanvasContext(nativeCtx);
 
     // Create renderer if it doesn't exist, or update context after resize
     if (!rendererRef.current) {

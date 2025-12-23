@@ -12,6 +12,7 @@
 
 import Konva from 'konva';
 import { TealchartRenderer } from '../TealchartRenderer';
+import { WebCanvasContext } from '../rendering/WebCanvasContext';
 import { EventManager, type CrosshairState as EventCrosshairState, type PaneDividerInfo } from '../interaction/EventManager';
 import { PriceLineManager, type CrosshairState as PriceLineCrosshairState } from '../interaction/PriceLineManager';
 import { div, button, icons } from './dom';
@@ -461,11 +462,14 @@ export class ChartCore {
     this.canvas.style.height = `${options.height}px`;
 
     // Get 2D context
-    const ctx = this.canvas.getContext('2d');
-    if (!ctx) {
+    const nativeCtx = this.canvas.getContext('2d');
+    if (!nativeCtx) {
       throw new Error('Failed to get 2D canvas context');
     }
-    ctx.scale(dpr, dpr);
+    nativeCtx.scale(dpr, dpr);
+
+    // Wrap in CanvasContext abstraction (enables Skia implementation for React Native)
+    const ctx = new WebCanvasContext(nativeCtx);
 
     // Initialize renderer
     this.renderer = new TealchartRenderer(ctx, {

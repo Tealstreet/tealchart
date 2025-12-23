@@ -161,6 +161,7 @@ export { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from './types';
 
 import Konva from 'konva';
 import { TealchartRenderer } from './TealchartRenderer';
+import { WebCanvasContext, type CanvasContext } from './rendering';
 import { ChartTopBar } from './ui/ChartTopBar';
 import { IndicatorsModal } from './ui/IndicatorsModal';
 import { getChartStore, AVAILABLE_TIMEFRAMES } from './state/chartState';
@@ -205,7 +206,7 @@ export class SimpleChart {
 
   private _rootEl: HTMLElement;
   private _canvasEl: HTMLCanvasElement;
-  private _ctx: CanvasRenderingContext2D;
+  private _ctx: CanvasContext;
   private _renderer: TealchartRenderer;
 
   private _topBar: ChartTopBar | null = null;
@@ -280,8 +281,9 @@ export class SimpleChart {
     this._rootEl.appendChild(chartArea);
     this._container.appendChild(this._rootEl);
 
-    // Get context
-    this._ctx = this._canvasEl.getContext('2d')!;
+    // Get context and wrap in abstraction layer
+    const nativeCtx = this._canvasEl.getContext('2d')!;
+    this._ctx = new WebCanvasContext(nativeCtx);
 
     // Create renderer
     this._renderer = new TealchartRenderer(
