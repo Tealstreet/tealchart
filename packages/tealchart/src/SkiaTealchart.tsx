@@ -31,7 +31,7 @@ import React, { useRef, useState, useCallback, useEffect, useMemo } from 'react'
 import { View, StyleSheet, LayoutChangeEvent, Text } from 'react-native';
 import { Canvas, Picture, Skia, createPicture } from '@shopify/react-native-skia';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
-import { useSharedValue, runOnJS } from 'react-native-reanimated';
+import Animated, { useSharedValue, runOnJS } from 'react-native-reanimated';
 
 import { TealchartRenderer } from './TealchartRenderer';
 import { SkiaCanvasContext, CollectedTextItem } from './rendering/SkiaCanvasContext';
@@ -181,49 +181,53 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   const scale = useSharedValue(1);
   const savedScale = useSharedValue(1);
 
-  // Pan gesture handler
+  // Pan gesture handler - time-based
   const updateViewportFromPan = useCallback((deltaX: number, _deltaY: number) => {
     const currentViewport = viewportRef.current;
     const currentBars = barsRef.current;
-    if (!currentViewport || currentBars.length === 0 || !dimensions.width) return;
+    if (!currentViewport || currentBars.length === 0 || !dimensions.width) {
+      return;
+    }
 
     const chartWidth = dimensions.width - margins.left - margins.right;
-    const visibleBars = currentViewport.endIndex - currentViewport.startIndex;
-    const pixelsPerBar = chartWidth / visibleBars;
-    const barsDelta = Math.round(-deltaX / pixelsPerBar);
+    const timeRange = currentViewport.endTime - currentViewport.startTime;
+    const msPerPixel = timeRange / chartWidth;
+    const timeDelta = -deltaX * msPerPixel;
 
-    // Allow scrolling past data (future space)
-    const minStart = -Math.floor(visibleBars * 0.8);
-    const maxStart = currentBars.length - Math.floor(visibleBars * 0.2);
+    const newStartTime = currentViewport.startTime + timeDelta;
+    const newEndTime = currentViewport.endTime + timeDelta;
 
-    const newStartIndex = Math.max(minStart, Math.min(maxStart, currentViewport.startIndex + barsDelta));
-    const newEndIndex = newStartIndex + visibleBars;
+    // Find bars in the new time range to calculate price bounds
+    const visibleBars = currentBars.filter(b => b.time >= newStartTime && b.time <= newEndTime);
 
-    if (newStartIndex !== currentViewport.startIndex) {
-      // Calculate price range from visible bars
-      const actualStart = Math.max(0, newStartIndex);
-      const actualEnd = Math.min(currentBars.length, newEndIndex);
+    if (visibleBars.length > 0) {
+      const prices = visibleBars.flatMap(b => [b.high, b.low]);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      const padding = (maxPrice - minPrice) * 0.1;
 
-      if (actualStart < actualEnd) {
-        const visibleBarsData = currentBars.slice(actualStart, actualEnd);
-        const prices = visibleBarsData.flatMap(b => [b.high, b.low]);
-        const minPrice = Math.min(...prices);
-        const maxPrice = Math.max(...prices);
-        const padding = (maxPrice - minPrice) * 0.1;
+      const newViewport: Viewport = {
+        startTime: newStartTime,
+        endTime: newEndTime,
+        priceMin: minPrice - padding,
+        priceMax: maxPrice + padding,
+      };
 
-        const newViewport: Viewport = {
-          startIndex: newStartIndex,
-          endIndex: newEndIndex,
-          startTime: currentBars[actualStart]?.time || currentViewport.startTime,
-          endTime: currentBars[Math.min(actualEnd - 1, currentBars.length - 1)]?.time || currentViewport.endTime,
-          priceMin: minPrice - padding,
-          priceMax: maxPrice + padding,
-        };
+      setViewport(newViewport);
+      viewportRef.current = newViewport;
+      onViewportChange?.(newViewport);
+    } else {
+      // No bars in range, just shift time without changing price
+      const newViewport: Viewport = {
+        startTime: newStartTime,
+        endTime: newEndTime,
+        priceMin: currentViewport.priceMin,
+        priceMax: currentViewport.priceMax,
+      };
 
-        setViewport(newViewport);
-        viewportRef.current = newViewport;
-        onViewportChange?.(newViewport);
-      }
+      setViewport(newViewport);
+      viewportRef.current = newViewport;
+      onViewportChange?.(newViewport);
     }
   }, [dimensions.width, margins, onViewportChange]);
 
@@ -247,32 +251,40 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
       }
     });
 
-  // Pinch gesture for zoom
+  // Pinch gesture for zoom - time-based
   const updateViewportFromPinch = useCallback((newScale: number) => {
     const currentViewport = viewportRef.current;
     const currentBars = barsRef.current;
     if (!currentViewport || currentBars.length === 0) return;
 
-    const visibleBars = currentViewport.endIndex - currentViewport.startIndex;
-    const newVisibleBars = Math.max(10, Math.min(currentBars.length, Math.round(visibleBars / newScale)));
+    const timeRange = currentViewport.endTime - currentViewport.startTime;
+    const centerTime = (currentViewport.startTime + currentViewport.endTime) / 2;
 
-    if (newVisibleBars !== visibleBars) {
-      const centerIndex = Math.floor((currentViewport.startIndex + currentViewport.endIndex) / 2);
-      const newStartIndex = Math.max(0, centerIndex - Math.floor(newVisibleBars / 2));
-      const newEndIndex = Math.min(currentBars.length, newStartIndex + newVisibleBars);
+    // Limit zoom: min ~10 bars worth of time, max all data
+    const firstBarTime = currentBars[0].time;
+    const lastBarTime = currentBars[currentBars.length - 1].time;
+    const avgBarInterval = (lastBarTime - firstBarTime) / currentBars.length;
+    const minTimeRange = avgBarInterval * 10;
+    const maxTimeRange = lastBarTime - firstBarTime;
 
-      const visibleBarsData = currentBars.slice(newStartIndex, newEndIndex);
-      if (visibleBarsData.length > 0) {
-        const prices = visibleBarsData.flatMap(b => [b.high, b.low]);
+    const newTimeRange = Math.max(minTimeRange, Math.min(maxTimeRange, timeRange / newScale));
+
+    if (Math.abs(newTimeRange - timeRange) > avgBarInterval * 0.5) {
+      const newStartTime = centerTime - newTimeRange / 2;
+      const newEndTime = centerTime + newTimeRange / 2;
+
+      // Find bars in new range for price bounds
+      const visibleBars = currentBars.filter(b => b.time >= newStartTime && b.time <= newEndTime);
+
+      if (visibleBars.length > 0) {
+        const prices = visibleBars.flatMap(b => [b.high, b.low]);
         const minPrice = Math.min(...prices);
         const maxPrice = Math.max(...prices);
         const padding = (maxPrice - minPrice) * 0.1;
 
         const newViewport: Viewport = {
-          startIndex: newStartIndex,
-          endIndex: newEndIndex,
-          startTime: visibleBarsData[0].time,
-          endTime: visibleBarsData[visibleBarsData.length - 1].time,
+          startTime: newStartTime,
+          endTime: newEndTime,
           priceMin: minPrice - padding,
           priceMax: maxPrice + padding,
         };
@@ -378,7 +390,7 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   return (
     <View style={styles.container} onLayout={onLayout}>
       <GestureDetector gesture={composedGesture}>
-        <View style={{ width: dimensions.width, height: dimensions.height, position: 'relative' }}>
+        <Animated.View style={{ width: dimensions.width, height: dimensions.height, position: 'relative' }}>
           {/* Skia Canvas for chart graphics */}
           <Canvas style={{ position: 'absolute', width: dimensions.width, height: dimensions.height }}>
             {picture && <Picture picture={picture} />}
@@ -394,7 +406,7 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
               {item.text}
             </Text>
           ))}
-        </View>
+        </Animated.View>
       </GestureDetector>
     </View>
   );
