@@ -514,6 +514,11 @@ export class ChartCore {
         this.options.onViewportChange?.(vp);
         this.scheduleRender();
       },
+      onViewportChangeInternal: (vp) => {
+        // Internal update during drag - no external callback to avoid parent re-renders
+        this.viewport = vp;
+        this.scheduleRender();
+      },
       onPaneYRangeChange: (paneId, yMin, yMax) => {
         this.paneYOverrides.set(paneId, { yMin, yMax });
         // Clear the cached rendered range since override takes precedence
@@ -1066,6 +1071,10 @@ export class ChartCore {
       const paneBottom = currentTop + paneHeight;
 
       if (y >= currentTop && y < paneBottom) {
+        // Simple approach matching React version:
+        // 1. Use override if exists
+        // 2. For main pane, use viewport
+        // 3. Otherwise use pane's yMin/yMax (renderer will auto-scale if fixedRange is false)
         const override = this.paneYOverrides.get(pane.id);
         let yMin = override?.yMin ?? pane.yMin;
         let yMax = override?.yMax ?? pane.yMax;
@@ -1073,43 +1082,6 @@ export class ChartCore {
         if (pane.type === 'main' && !override && this.viewport) {
           yMin = this.viewport.priceMin;
           yMax = this.viewport.priceMax;
-        } else if (pane.type === 'indicator' && !override) {
-          // Try multiple sources for the Y range (in order of accuracy):
-          let foundRange = false;
-
-          // 1. BEST: Cached Y range from last render (exactly matches what's displayed)
-          const renderedRange = this.renderedPaneYRanges.get(pane.id);
-          if (renderedRange) {
-            yMin = renderedRange.yMin;
-            yMax = renderedRange.yMax;
-            foundRange = true;
-          }
-          // 2. Fixed Y axis range from indicatorPaneInfo (for indicators like RSI with fixed bounds)
-          if (!foundRange && pane.indicatorIds && pane.indicatorIds.length > 0) {
-            for (const indicatorId of pane.indicatorIds) {
-              const indicatorInfo = this.indicatorPaneInfo[indicatorId];
-              if (indicatorInfo?.yAxisRange && indicatorInfo.yAxisRange.max > indicatorInfo.yAxisRange.min) {
-                yMin = indicatorInfo.yAxisRange.min;
-                yMax = indicatorInfo.yAxisRange.max;
-                foundRange = true;
-                break;
-              }
-            }
-          }
-          // 3. Pane's own yMin/yMax if valid (from layout)
-          if (!foundRange && pane.yMin !== pane.yMax && (pane.yMin !== 0 || pane.yMax !== 0)) {
-            yMin = pane.yMin;
-            yMax = pane.yMax;
-            foundRange = true;
-          }
-          // 4. Compute from plot data as last resort
-          if (!foundRange) {
-            const computedRange = this.computePaneYRangeFromPlots(pane.id);
-            if (computedRange) {
-              yMin = computedRange.yMin;
-              yMax = computedRange.yMax;
-            }
-          }
         }
 
         return { paneId: pane.id, yMin, yMax, paneHeight };
@@ -1196,9 +1168,11 @@ export class ChartCore {
       if (pane.type === 'indicator' && !pane.fixedRange && pane.indicatorIds) {
         // Collect values exactly as renderer does
         const paneValues: (number | null)[] = [];
+        const plotsUsed: string[] = [];
         for (const plot of this.plots) {
           const scriptId = plot.scriptId ?? 'unknown';
           if (pane.indicatorIds.includes(scriptId) && plot.type === 'plot' && plot.values) {
+            plotsUsed.push(`${scriptId}:${plot.values.length}`);
             paneValues.push(...plot.values);
           }
         }
@@ -1211,9 +1185,11 @@ export class ChartCore {
             const max = Math.max(...validValues);
             const range = max - min;
             const pad = range * 0.1; // 10% padding
+            const newYMin = min - pad;
+            const newYMax = max + pad;
             this.renderedPaneYRanges.set(pane.id, {
-              yMin: min - pad,
-              yMax: max + pad,
+              yMin: newYMin,
+              yMax: newYMax,
             });
           }
         }

@@ -2874,9 +2874,11 @@ export class TealchartRenderer {
       for (const pane of computedPanes) {
         if (pane.type === 'indicator' && !pane.fixedRange && pane.indicatorIds) {
           const paneValues: (number | null)[] = [];
+          const plotsUsed: string[] = [];
           for (const plot of plots) {
             const scriptId = plot.scriptId ?? 'unknown';
             if (pane.indicatorIds.includes(scriptId) && plot.type === 'plot' && plot.values) {
+              plotsUsed.push(`${scriptId}:${plot.values.length}`);
               paneValues.push(...plot.values);
             }
           }

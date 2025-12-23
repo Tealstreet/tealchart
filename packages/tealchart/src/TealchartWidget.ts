@@ -499,12 +499,14 @@ export class TealchartWidget {
           this._bars = [...newBars, ...this._bars];
 
           // Notify Tealscript manager of updated bars
+          // Don't render yet - wait for onPlotsUpdated callback to ensure
+          // bars and plots are in sync (aligned by index)
           if (this._tealScriptManager) {
             this._tealScriptManager.setBars(this._bars);
+          } else {
+            // No indicator manager, safe to update UI directly
+            this._ui?.setBars(this._bars);
           }
-
-          // Update UI directly
-          this._ui?.setBars(this._bars);
         }
       },
       (error) => {

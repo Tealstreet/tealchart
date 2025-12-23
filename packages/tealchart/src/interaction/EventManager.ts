@@ -24,8 +24,10 @@ export interface PaneInfo {
 }
 
 export interface EventManagerCallbacks {
-  /** Called when viewport changes (pan, zoom, etc.) */
+  /** Called when viewport changes (pan, zoom, etc.) - triggers external callbacks */
   onViewportChange?: (viewport: Viewport) => void;
+  /** Called during drag for internal viewport updates only (no external callback) */
+  onViewportChangeInternal?: (viewport: Viewport) => void;
   /** Called when an indicator pane Y range changes (for price axis zoom) */
   onPaneYRangeChange?: (paneId: string, yMin: number, yMax: number) => void;
   /** Called when more historical bars are needed */
@@ -677,8 +679,10 @@ export class EventManager {
         const scale = this.pinchStartDistance / currentDistance;
         const dims = this.callbacks.getDimensions();
         const newViewport = this.zoomViewport(this.pinchStartViewport, scale, dims.width);
-        this.callbacks.onViewportChange?.(newViewport);
-        // onViewportChange schedules render, no need for extra scheduleRender
+        // Use internal callback during pinch to avoid triggering external callbacks
+        const updateViewport = this.callbacks.onViewportChangeInternal ?? this.callbacks.onViewportChange;
+        updateViewport?.(newViewport);
+        // updateViewport schedules render, no need for extra scheduleRender
       }
     }
 
@@ -837,9 +841,14 @@ export class EventManager {
     const newPriceMin = startYMin + pricePanned;
     const newPriceMax = startYMax + pricePanned;
 
+    // Use internal callback during drag to avoid triggering external callbacks
+    // This matches React version behavior - viewport ref is updated directly during drag,
+    // external callback is only called at drag end
+    const updateViewport = this.callbacks.onViewportChangeInternal ?? this.callbacks.onViewportChange;
+
     if (this.state.draggedPaneId === 'main') {
       // Update viewport for main pane (horizontal + vertical)
-      this.callbacks.onViewportChange?.({
+      updateViewport?.({
         ...viewport,
         startTime: newStartTime,
         endTime: newEndTime,
@@ -847,13 +856,14 @@ export class EventManager {
         priceMax: newPriceMax,
       });
     } else {
-      // For indicator panes: update time (viewport) + pane Y override separately
-      this.callbacks.onViewportChange?.({
+      // For indicator panes: only update time (viewport), let Y auto-scale
+      // Matching React version behavior - indicator panes don't pan vertically,
+      // they always auto-scale based on visible data. User can zoom Y via price axis.
+      updateViewport?.({
         ...viewport,
         startTime: newStartTime,
         endTime: newEndTime,
       });
-      this.callbacks.onPaneYRangeChange?.(this.state.draggedPaneId, newPriceMin, newPriceMax);
     }
   }
 
@@ -879,10 +889,13 @@ export class EventManager {
     const newPriceMin = center - newRange / 2;
     const newPriceMax = center + newRange / 2;
 
+    // Use internal callback during drag to avoid triggering external callbacks
+    const updateViewport = this.callbacks.onViewportChangeInternal ?? this.callbacks.onViewportChange;
+
     if (this.state.draggedPaneId === 'main') {
       // Update viewport for main pane
       const viewport = this.callbacks.getViewport();
-      this.callbacks.onViewportChange?.({
+      updateViewport?.({
         ...viewport,
         priceMin: newPriceMin,
         priceMax: newPriceMax,
