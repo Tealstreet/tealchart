@@ -5,7 +5,7 @@
  * Matches the web's ChartTopBar styling with React Native components.
  */
 
-import React, { memo, useCallback, useState } from 'react';
+import React, { memo, useCallback, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -67,9 +67,21 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(({
   textSecondaryColor = '#787b86',
   accentColor = '#2962ff',
 }) => {
+  // Internal state for immediate visual feedback (like web's nanostores pattern)
+  // This makes the component work both controlled and uncontrolled
+  const [internalInterval, setInternalInterval] = useState(interval);
+
+  // Sync internal state when prop changes (controlled mode)
+  useEffect(() => {
+    setInternalInterval(interval);
+  }, [interval]);
+
   // Handle timeframe selection
+  // 1. Update internal state immediately (instant visual feedback)
+  // 2. Call external callback (parent can fetch new data, update state, etc.)
   const handleTimeframePress = useCallback((value: string) => {
-    onIntervalChange?.(value);
+    setInternalInterval(value);  // Immediate visual update
+    onIntervalChange?.(value);   // Notify parent
   }, [onIntervalChange]);
 
   return (
@@ -104,7 +116,7 @@ export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(({
             key={tf.value}
             value={tf.value}
             label={tf.shortLabel}
-            isActive={interval === tf.value}
+            isActive={internalInterval === tf.value}
             onPress={handleTimeframePress}
             textColor={textSecondaryColor}
             accentColor={accentColor}
