@@ -23,6 +23,7 @@ import { OrderLineComponent } from './mobile/components/OrderLineComponent';
 import { PositionLineComponent } from './mobile/components/PositionLineComponent';
 import { CrosshairComponent } from './mobile/components/CrosshairComponent';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
+import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
 import { priceToY, yToPrice, xToTime } from './mobile/utils/coordinates';
 import type {
   Bar,
@@ -97,6 +98,21 @@ export interface SkiaTealchartProps {
   onSLClick?: (positionId: string) => void;
   /** Price precision for display */
   pricePrecision?: number;
+  // =========================================================================
+  // Top Bar Props
+  // =========================================================================
+  /** Whether to show the top bar (default: true) */
+  showTopBar?: boolean;
+  /** Current symbol (e.g., "BTC/USDT") */
+  symbol?: string;
+  /** Exchange name (e.g., "Binance") */
+  exchangeName?: string;
+  /** Current selected timeframe interval */
+  interval?: string;
+  /** Called when timeframe changes */
+  onIntervalChange?: (interval: string) => void;
+  /** Called when indicators button is pressed */
+  onIndicatorsPress?: () => void;
 }
 
 export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
@@ -127,6 +143,13 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   onTPClick,
   onSLClick,
   pricePrecision = 2,
+  // Top bar props
+  showTopBar = true,
+  symbol = '',
+  exchangeName,
+  interval = '15',
+  onIntervalChange,
+  onIndicatorsPress,
 }) => {
   // ==========================================================================
   // Dimensions & Layout
@@ -147,10 +170,18 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     }
   }, [propWidth, propHeight]);
 
+  // Top bar height for margin calculation
+  const TOP_BAR_HEIGHT = 36;
+
+  // Increase top margin when top bar is shown to create safe zone for price labels
   const margins: ChartMargins = useMemo(() => ({
     ...DEFAULT_MARGINS,
     ...marginsProp,
-  }), [marginsProp]);
+    // Add top bar height to top margin so price labels don't overlap
+    top: (marginsProp?.top ?? DEFAULT_MARGINS.top) + (showTopBar ? TOP_BAR_HEIGHT : 0),
+  }), [marginsProp, showTopBar]);
+
+  // Chart uses full height (top bar overlays on top, but margins create safe zone)
 
   // ==========================================================================
   // Viewport State
@@ -180,20 +211,25 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   // Render Options
   // ==========================================================================
 
-  const fullRenderOptions: RenderOptions = useMemo(() => ({
-    width: dimensions.width,
-    height: dimensions.height,
-    devicePixelRatio: 1,
-    backgroundColor: renderOptions?.backgroundColor || '#131722',
-    upColor: renderOptions?.upColor || '#26a69a',
-    downColor: renderOptions?.downColor || '#ef5350',
-    textColor: renderOptions?.textColor || '#d1d4dc',
-    gridColor: renderOptions?.gridColor || 'rgba(255, 255, 255, 0.06)',
-    showVolume: renderOptions?.showVolume ?? true,
-    volumeHeight: renderOptions?.volumeHeight ?? 0.15,
-    minCandleWidth: renderOptions?.minCandleWidth ?? 1,
-    ...renderOptions,
-  }), [dimensions.width, dimensions.height, renderOptions]);
+  const fullRenderOptions: RenderOptions = useMemo(() => {
+    console.log('[SkiaTealchart] margins:', margins, 'showTopBar:', showTopBar, 'TOP_BAR_HEIGHT:', TOP_BAR_HEIGHT);
+    return {
+      width: dimensions.width,
+      height: dimensions.height,
+      devicePixelRatio: 1,
+      backgroundColor: renderOptions?.backgroundColor || '#131722',
+      upColor: renderOptions?.upColor || '#26a69a',
+      downColor: renderOptions?.downColor || '#ef5350',
+      textColor: renderOptions?.textColor || '#d1d4dc',
+      gridColor: renderOptions?.gridColor || 'rgba(255, 255, 255, 0.06)',
+      showVolume: renderOptions?.showVolume ?? true,
+      volumeHeight: renderOptions?.volumeHeight ?? 0.15,
+      minCandleWidth: renderOptions?.minCandleWidth ?? 1,
+      ...renderOptions,
+      // Pass margins with top bar offset so price labels have safe zone
+      margins,
+    };
+  }, [dimensions.width, dimensions.height, renderOptions, margins, showTopBar]);
 
   // ==========================================================================
   // Gestures (using unified hook)
@@ -370,7 +406,8 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
 
     const pic = createPicture((canvas) => {
       const ctx = new SkiaCanvasContext(canvas, Skia);
-      const renderer = new TealchartRenderer(ctx, fullRenderOptions);
+      // Pass margins as third parameter (constructor doesn't read from options.margins)
+      const renderer = new TealchartRenderer(ctx, fullRenderOptions, margins);
 
       if (unifiedPaneLayout) {
         renderer.renderWithLayout(
@@ -391,7 +428,7 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     }, { width: dimensions.width, height: dimensions.height });
 
     return { picture: pic, textItems: collectedText };
-  }, [bars, viewport, dimensions, fullRenderOptions, priceLines, plots, paneLayout, unifiedPaneLayout, indicatorPaneInfo, plotStyleOverrides]);
+  }, [bars, viewport, dimensions, fullRenderOptions, margins, priceLines, plots, paneLayout, unifiedPaneLayout, indicatorPaneInfo, plotStyleOverrides]);
 
   // ==========================================================================
   // Text Style Helper
@@ -509,6 +546,19 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
         <Animated.View style={[styles.absoluteFill, { width: dimensions.width, height: dimensions.height }]} />
       </GestureDetector>
 
+      {/* Top Bar (overlay on top of chart) */}
+      {showTopBar && (
+        <View style={styles.topBarOverlay} pointerEvents="box-none">
+          <ChartTopBarComponent
+            symbol={symbol}
+            exchangeName={exchangeName}
+            interval={interval}
+            onIntervalChange={onIntervalChange}
+            onIndicatorsPress={onIndicatorsPress}
+          />
+        </View>
+      )}
+
       {/* Context Menu (Modal) */}
       <ContextMenuComponent
         visible={contextMenuVisible}
@@ -534,6 +584,13 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+  },
+  topBarOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    // No background - transparent overlay
   },
   interactiveLayer: {
     // Interactive elements go here
