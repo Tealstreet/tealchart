@@ -38,16 +38,20 @@ export function useChartGestures({
   // Shared values for gesture state (UI thread)
   const gestureZoneValue = useSharedValue<GestureZone>('chart');
   const savedTranslateX = useSharedValue(0);
+  const savedTranslateY = useSharedValue(0);
   const priceAxisStartRange = useSharedValue(0);
   const timeAxisStartRange = useSharedValue(0);
   const savedScale = useSharedValue(1);
 
-  // Pan handler for chart scrolling (time-based)
+  // Pan handler for chart scrolling (time and price)
   // All data access happens on JS thread via closure
-  const updateViewportFromPan = useCallback((deltaX: number) => {
-    if (!viewport || bars.length === 0 || !dimensions.width) return;
+  const updateViewportFromPan = useCallback((deltaX: number, deltaY: number) => {
+    if (!viewport || !dimensions.width) return;
 
     const chartWidth = dimensions.width - dimensions.margins.left - dimensions.margins.right;
+    const chartHeight = dimensions.height - dimensions.margins.top - dimensions.margins.bottom;
+
+    // Horizontal panning (time axis)
     const timeRange = viewport.endTime - viewport.startTime;
     const msPerPixel = timeRange / chartWidth;
     const timeDelta = -deltaX * msPerPixel;
@@ -55,30 +59,22 @@ export function useChartGestures({
     const newStartTime = viewport.startTime + timeDelta;
     const newEndTime = viewport.endTime + timeDelta;
 
-    // Find bars in the new time range
-    const visibleBars = bars.filter(b => b.time >= newStartTime && b.time <= newEndTime);
+    // Vertical panning (price axis)
+    // Dragging up should increase prices (move viewport down), dragging down should decrease
+    const priceRange = viewport.priceMax - viewport.priceMin;
+    const pricePerPixel = priceRange / chartHeight;
+    const priceDelta = deltaY * pricePerPixel;
 
-    if (visibleBars.length > 0) {
-      const prices = visibleBars.flatMap(b => [b.high, b.low]);
-      const minPrice = Math.min(...prices);
-      const maxPrice = Math.max(...prices);
-      const padding = (maxPrice - minPrice) * 0.1;
+    const newPriceMin = viewport.priceMin + priceDelta;
+    const newPriceMax = viewport.priceMax + priceDelta;
 
-      onViewportChange({
-        startTime: newStartTime,
-        endTime: newEndTime,
-        priceMin: minPrice - padding,
-        priceMax: maxPrice + padding,
-      });
-    } else {
-      onViewportChange({
-        startTime: newStartTime,
-        endTime: newEndTime,
-        priceMin: viewport.priceMin,
-        priceMax: viewport.priceMax,
-      });
-    }
-  }, [viewport, bars, dimensions, onViewportChange]);
+    onViewportChange({
+      startTime: newStartTime,
+      endTime: newEndTime,
+      priceMin: newPriceMin,
+      priceMax: newPriceMax,
+    });
+  }, [viewport, dimensions, onViewportChange]);
 
   // Price axis drag handler
   const updatePriceScale = useCallback((deltaY: number, startRange: number) => {
@@ -192,7 +188,8 @@ export function useChartGestures({
       gestureZoneValue.value = 'outside';
     }
     savedTranslateX.value = 0;
-  }, [dimensions, viewport, onSwipeBlockChange, gestureZoneValue, priceAxisStartRange, timeAxisStartRange, savedTranslateX]);
+    savedTranslateY.value = 0;
+  }, [dimensions, viewport, onSwipeBlockChange, gestureZoneValue, priceAxisStartRange, timeAxisStartRange, savedTranslateX, savedTranslateY]);
 
   // Memoize gestures to prevent recreating on every render
   const panGesture = useMemo(() => {
@@ -210,8 +207,10 @@ export function useChartGestures({
           runOnJS(updateTimeScale)(event.translationX, timeAxisStartRange.value);
         } else if (zone === 'chart') {
           const deltaX = event.translationX - savedTranslateX.value;
+          const deltaY = event.translationY - savedTranslateY.value;
           savedTranslateX.value = event.translationX;
-          runOnJS(updateViewportFromPan)(deltaX);
+          savedTranslateY.value = event.translationY;
+          runOnJS(updateViewportFromPan)(deltaX, deltaY);
         }
       })
       .onEnd(() => {
@@ -230,6 +229,7 @@ export function useChartGestures({
     priceAxisStartRange,
     timeAxisStartRange,
     savedTranslateX,
+    savedTranslateY,
   ]);
 
   // Pinch gesture for zoom
