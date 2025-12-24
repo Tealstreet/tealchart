@@ -170,15 +170,16 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     }
   }, [propWidth, propHeight]);
 
-  // Top bar height for margin calculation
-  const TOP_BAR_HEIGHT = 36;
+  // Top bar safe zone - just enough to keep price labels below the toolbar content
+  // The top bar is 36px tall but we only need ~26px clearance (content is centered)
+  const TOP_BAR_SAFE_ZONE = 26;
 
   // Increase top margin when top bar is shown to create safe zone for price labels
   const margins: ChartMargins = useMemo(() => ({
     ...DEFAULT_MARGINS,
     ...marginsProp,
-    // Add top bar height to top margin so price labels don't overlap
-    top: (marginsProp?.top ?? DEFAULT_MARGINS.top) + (showTopBar ? TOP_BAR_HEIGHT : 0),
+    // Add safe zone to top margin so price labels don't overlap with top bar
+    top: (marginsProp?.top ?? DEFAULT_MARGINS.top) + (showTopBar ? TOP_BAR_SAFE_ZONE : 0),
   }), [marginsProp, showTopBar]);
 
   // Chart uses full height (top bar overlays on top, but margins create safe zone)
@@ -212,7 +213,7 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   // ==========================================================================
 
   const fullRenderOptions: RenderOptions = useMemo(() => {
-    console.log('[SkiaTealchart] margins:', margins, 'showTopBar:', showTopBar, 'TOP_BAR_HEIGHT:', TOP_BAR_HEIGHT);
+    console.log('[SkiaTealchart] margins:', margins, 'showTopBar:', showTopBar);
     return {
       width: dimensions.width,
       height: dimensions.height,

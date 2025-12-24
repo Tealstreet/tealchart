@@ -459,6 +459,9 @@ export class TealchartRenderer {
     // Draw price markers, skipping those that would overlap with price line labels
     const formatter = getNumberFormatter(decimals);
     const labelRightEdge = options.width - 4; // 4px padding from right edge
+    // Bottom safe zone - don't draw price labels that would overlap with time axis
+    const bottomSafeZone = options.height - margins.bottom;
+
     for (const price of priceMarkers) {
       // Map price to Y using same calculation as priceToY()
       // priceMax → margins.top, priceMin → margins.top + priceHeight
@@ -466,6 +469,11 @@ export class TealchartRenderer {
 
       // Skip labels above the top bar (safe zone)
       if (y < margins.top) {
+        continue;
+      }
+
+      // Skip labels that would overlap with time axis (bottom safe zone)
+      if (y > bottomSafeZone - 8) {
         continue;
       }
 
@@ -491,7 +499,8 @@ export class TealchartRenderer {
    */
   private drawTimeAxis(viewport: Viewport): void {
     const { ctx, options, margins } = this;
-    const chartWidth = options.width - margins.left - margins.right;
+    // Use full width minus left margin so time labels extend under price axis (like TradingView)
+    const chartWidth = options.width - margins.left;
     const axisY = options.height - margins.bottom + 15;
 
     const timeMarkers = this.generateTimeMarkers(viewport, chartWidth);
