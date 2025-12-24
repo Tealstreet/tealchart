@@ -125,8 +125,8 @@ const STROKE_JOIN_MITER = 0;
 const STROKE_JOIN_ROUND = 1;
 const STROKE_JOIN_BEVEL = 2;
 
-// Clip op
-const CLIP_OP_INTERSECT = 0;
+// Clip op - Skia ClipOp enum: 0 = Difference (exclude), 1 = Intersect (include)
+const CLIP_OP_INTERSECT = 1;
 
 // State to save/restore
 interface ContextState {
