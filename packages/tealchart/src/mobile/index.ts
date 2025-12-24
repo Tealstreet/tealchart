@@ -12,3 +12,7 @@ export * from './hooks';
 
 // Utilities
 export * from './utils/coordinates';
+
+// Class-based indicator management (matches web's React-agnostic pattern)
+export { MobileIndicatorManager } from './MobileIndicatorManager';
+export type { ActiveIndicator, IndicatorPaneInfo } from './MobileIndicatorManager';

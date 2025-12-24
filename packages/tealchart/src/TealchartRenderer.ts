@@ -41,7 +41,7 @@ import {
   ComputedPane,
   UnifiedPaneLayout,
 } from './types';
-import type { PlotOutput, PlotStyle } from '@tealstreet/tealscript';
+import type { PlotOutput, PlotStyle } from '@packages/tealscript/src';
 import { getDecimalPlacesFromPrecision, PlotStyleOverride, LineStyle } from './state/chartState';
 import type { PaneOffset } from './rendering/PaneManager';
 import { resolveLabelCollisions } from './utils/labelCollision';
@@ -2986,11 +2986,14 @@ export class TealchartRenderer {
   ): void {
     const { ctx, options, margins } = this;
 
-    // Clip to pane bounds (including Y-axis area on right)
+    // Clip to pane bounds for indicator panes only
+    // Main pane is NOT clipped so candles can render under the top bar (transparent overlay)
     ctx.save();
-    ctx.beginPath();
-    ctx.rect(0, pane.top, options.width, pane.height);
-    ctx.clip();
+    if (pane.type !== 'main') {
+      ctx.beginPath();
+      ctx.rect(0, pane.top, options.width, pane.height);
+      ctx.clip();
+    }
 
     if (pane.type === 'main') {
       this.renderMainPaneContent(pane, bars, viewport, priceLines, plots, indicatorPaneInfo, labelBounds, plotStyleOverrides);
@@ -3062,17 +3065,17 @@ export class TealchartRenderer {
   ): void {
     const { ctx, options, margins } = this;
 
+    // Draw pane background first (same as main chart for consistency)
+    ctx.fillStyle = options.backgroundColor;
+    ctx.fillRect(0, pane.top, options.width, pane.height);
+
     // Draw pane separator at top
     ctx.strokeStyle = options.gridColor;
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(margins.left, pane.top);
+    ctx.moveTo(0, pane.top);
     ctx.lineTo(options.width, pane.top);
     ctx.stroke();
-
-    // Draw pane background (slightly different shade)
-    ctx.fillStyle = this.adjustColor(options.backgroundColor, 5);
-    ctx.fillRect(margins.left, pane.top, options.width - margins.left, pane.height);
 
     // Note: Indicator legend is now rendered as React overlay in ChartContainer
     // for proper hover/click interactions (eye, settings, trash buttons)
@@ -3957,23 +3960,16 @@ export class TealchartRenderer {
     // Note: Do NOT call ctx.scale() here - parent renderPlots() already did
     ctx.save();
 
-    const chartWidth = options.width - margins.left - margins.right;
-
-    // Draw pane background (slightly different shade)
-    ctx.fillStyle = this.adjustColor(options.backgroundColor, 5);
-    ctx.fillRect(
-      margins.left,
-      paneOffset.top,
-      chartWidth,
-      paneOffset.height
-    );
+    // Draw pane background (same as main chart for consistency)
+    ctx.fillStyle = options.backgroundColor;
+    ctx.fillRect(0, paneOffset.top, options.width, paneOffset.height);
 
     // Draw pane separator line at top
     ctx.strokeStyle = options.gridColor;
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(margins.left, paneOffset.top);
-    ctx.lineTo(options.width - margins.right, paneOffset.top);
+    ctx.moveTo(0, paneOffset.top);
+    ctx.lineTo(options.width, paneOffset.top);
     ctx.stroke();
 
     // Draw horizontal grid lines in the pane

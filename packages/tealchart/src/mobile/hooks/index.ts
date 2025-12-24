@@ -7,3 +7,6 @@ export type { UseChartGesturesOptions, UseChartGesturesResult } from './useChart
 
 export { useLabelCollision } from './useLabelCollision';
 export type { LabelBounds } from './useLabelCollision';
+
+// Note: usePaneManager was replaced by MobileIndicatorManager class
+// which is exported from ../MobileIndicatorManager
