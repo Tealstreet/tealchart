@@ -1,3 +1,24 @@
+// ⚠️ AUTO-GENERATED FILE - DO NOT EDIT MANUALLY ⚠️
+// This file was copied from tealstreet-next by copy-and-patch.js
+// To re-sync from the web repository, run: yarn sync
+// 
+// To make this file mobile-specific (prevent it from being overwritten on sync):
+// 1. Modify the file as needed for mobile
+// 2. Add to patch-config.json "permanentFiles" array:
+//    - For single file: "web/path/to/this/file.ts"
+//    - For directory: "web/path/to/directory/**/*"
+// 3. Add exception to .gitignore: !src/web/path/to/this/file.ts
+// 4. Force-add to git: git add -f src/web/path/to/this/file.ts
+// 5. Commit your changes
+// 6. IMPORTANT: Replace this header with the MOBILE-PATCHED header (see existing patched files for example)
+//
+// The patch-config.json controls:
+// - permanentFiles: Files that are never overwritten during sync
+// - excludeFromCopy: Files excluded from initial copy
+// - importReplacements: Auto-replace imports with mobile shims
+//
+// See README.md section "Git Configuration for Patched Files" for full details
+
 /**
  * SkiaTealchart - React Native Skia implementation of Tealchart
  *
@@ -24,7 +45,9 @@ import { PositionLineComponent } from './mobile/components/PositionLineComponent
 import { CrosshairComponent } from './mobile/components/CrosshairComponent';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
+import { IndicatorsModalMobile } from './mobile/components/IndicatorsModalMobile';
 import { priceToY, yToPrice, xToTime } from './mobile/utils/coordinates';
+import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type {
   Bar,
   Viewport,
@@ -111,8 +134,13 @@ export interface SkiaTealchartProps {
   interval?: string;
   /** Called when timeframe changes */
   onIntervalChange?: (interval: string) => void;
-  /** Called when indicators button is pressed */
-  onIndicatorsPress?: () => void;
+  // =========================================================================
+  // Indicator Props
+  // =========================================================================
+  /** Called when an indicator is selected from the modal */
+  onAddIndicator?: (indicator: BuiltinIndicator) => void;
+  /** IDs of currently active indicators (for showing checkmarks in modal) */
+  activeIndicatorIds?: string[];
 }
 
 export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
@@ -149,7 +177,9 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   exchangeName,
   interval = '15',
   onIntervalChange,
-  onIndicatorsPress,
+  // Indicator props
+  onAddIndicator,
+  activeIndicatorIds,
 }) => {
   // ==========================================================================
   // Dimensions & Layout
@@ -262,6 +292,21 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const [contextMenuItems, setContextMenuItems] = useState<ContextMenuItem[]>([]);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0, price: 0, time: 0 });
+
+  // Indicators modal state
+  const [indicatorsModalVisible, setIndicatorsModalVisible] = useState(false);
+
+  const handleIndicatorsPress = useCallback(() => {
+    setIndicatorsModalVisible(true);
+  }, []);
+
+  const handleIndicatorsModalClose = useCallback(() => {
+    setIndicatorsModalVisible(false);
+  }, []);
+
+  const handleSelectIndicator = useCallback((indicator: BuiltinIndicator) => {
+    onAddIndicator?.(indicator);
+  }, [onAddIndicator]);
 
   // Handle crosshair move callback
   const handleCrosshairMove = useCallback((x: number, y: number) => {
@@ -555,7 +600,7 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
             exchangeName={exchangeName}
             interval={interval}
             onIntervalChange={onIntervalChange}
-            onIndicatorsPress={onIndicatorsPress}
+            onIndicatorsPress={handleIndicatorsPress}
           />
         </View>
       )}
@@ -570,6 +615,14 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
         time={contextMenuPosition.time}
         pricePrecision={pricePrecision}
         onClose={handleContextMenuClose}
+      />
+
+      {/* Indicators Modal */}
+      <IndicatorsModalMobile
+        visible={indicatorsModalVisible}
+        onClose={handleIndicatorsModalClose}
+        onSelectIndicator={handleSelectIndicator}
+        activeIndicatorIds={activeIndicatorIds}
       />
     </View>
   );
