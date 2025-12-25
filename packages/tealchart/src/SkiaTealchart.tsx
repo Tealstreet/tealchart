@@ -10,10 +10,6 @@
  * - Handles bar fetching, indicators, pane management internally
  * - Renders using Skia instead of canvas
  *
- * Supports two modes:
- * 1. **Datafeed mode** (preferred): Pass `datafeed` prop, widget handles everything internally
- * 2. **Controlled mode** (legacy): Pass `bars` prop directly for parent-controlled rendering
- *
  * Architecture:
  * - Layer 1: Skia Canvas (static) - candles, grid, indicators via Picture recording
  * - Layer 2: Interactive RN Layer - order lines, position lines, crosshair
@@ -49,7 +45,6 @@ import type {
   PriceLine,
   OrderLineRenderData,
   PositionLineRenderData,
-  PaneLayout,
   UnifiedPaneLayout,
   ContextMenuItem,
   IBasicDataFeed,
@@ -64,34 +59,18 @@ interface IndicatorPaneInfo {
 }
 
 export interface SkiaTealchartProps {
+  /** Datafeed for fetching bars - widget handles bar fetching internally (REQUIRED) */
+  datafeed: IBasicDataFeed;
+  /** Symbol to display (e.g., "BTC/USDT") */
+  symbol: string;
+  /** Timeframe interval (e.g., "15", "1h") */
+  interval?: string;
+
+  // ===========================================================================
+  // Layout & Rendering
+  // ===========================================================================
   width?: number;
   height?: number;
-
-  // ===========================================================================
-  // DATAFEED MODE (preferred): Widget handles bar fetching internally
-  // Pass datafeed + symbol, widget manages everything else
-  // ===========================================================================
-  /** Datafeed for fetching bars - when provided, widget handles bar fetching internally */
-  datafeed?: IBasicDataFeed;
-
-  // ===========================================================================
-  // CONTROLLED MODE (legacy): Parent provides bars directly
-  // Used by NativeTealchart during transition period
-  // ===========================================================================
-  /** Bars to render - required in controlled mode, ignored in datafeed mode */
-  bars?: Bar[];
-  /** Tealscript indicator plot outputs - for controlled mode */
-  plots?: PlotOutput[];
-  /** Unified pane layout - for controlled mode */
-  unifiedPaneLayout?: UnifiedPaneLayout;
-  /** Map from study ID to indicator pane info - for controlled mode */
-  indicatorPaneInfo?: Record<string, IndicatorPaneInfo>;
-  /** IDs of currently active indicators - for controlled mode */
-  activeIndicatorIds?: string[];
-
-  // ===========================================================================
-  // Common Props (both modes)
-  // ===========================================================================
   /** Render options for colors and styling */
   renderOptions?: Partial<Omit<RenderOptions, 'width' | 'height' | 'devicePixelRatio'>>;
   /** Custom margins to override defaults */
@@ -102,14 +81,10 @@ export interface SkiaTealchartProps {
   orderLines?: OrderLineRenderData[];
   /** Position lines to render (open positions with PnL) */
   positionLines?: PositionLineRenderData[];
-  /** Pane layout for multi-pane indicator rendering */
-  paneLayout?: PaneLayout;
   /** Map from plotId to style overrides */
   plotStyleOverrides?: Map<string, PlotStyleOverride>;
   /** Called when viewport changes */
   onViewportChange?: (viewport: Viewport) => void;
-  /** Called when more bars are needed */
-  onRequestMoreBars?: (direction: 'left' | 'right') => void;
   /** Context menu callback */
   onContextMenu?: (unixTime: number, price: number) => ContextMenuItem[];
   /** Called when crosshair position changes */
@@ -139,12 +114,8 @@ export interface SkiaTealchartProps {
   // ===========================================================================
   /** Whether to show the top bar (default: true) */
   showTopBar?: boolean;
-  /** Current symbol (e.g., "BTC/USDT") - required for top bar display */
-  symbol?: string;
   /** Exchange name (e.g., "Binance") */
   exchangeName?: string;
-  /** Current selected timeframe interval */
-  interval?: string;
   /** Called when timeframe changes */
   onIntervalChange?: (interval: string) => void;
   /** Called when symbol changes */
@@ -159,24 +130,18 @@ export interface SkiaTealchartProps {
 export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   width: propWidth,
   height: propHeight,
-  // Datafeed mode props
+  // Required datafeed prop
   datafeed,
-  // Controlled mode props
-  bars: controlledBars,
-  plots: controlledPlots,
-  unifiedPaneLayout: controlledUnifiedPaneLayout,
-  indicatorPaneInfo: controlledIndicatorPaneInfo,
-  activeIndicatorIds: controlledActiveIndicatorIds,
-  // Common props
+  symbol: propSymbol,
+  interval: propInterval = '15',
+  // Rendering props
   renderOptions,
   margins: marginsProp,
   priceLines,
   orderLines,
   positionLines,
-  paneLayout,
   plotStyleOverrides,
   onViewportChange,
-  onRequestMoreBars,
   onContextMenu,
   onCrossHairMoved,
   onSwipeBlockChange,
@@ -191,9 +156,7 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   pricePrecision = 2,
   // Top bar props
   showTopBar = true,
-  symbol: propSymbol = '',
   exchangeName,
-  interval: propInterval = '15',
   onIntervalChange,
   onSymbolChange,
   // Indicator props
@@ -201,61 +164,46 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
 }) => {
   // ==========================================================================
   // Core Hook + Indicator Management
-  // Handles both datafeed mode (internal) and controlled mode (external)
   // ==========================================================================
 
   // Force re-render helper for indicator updates
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
 
-  // Create indicator manager for datafeed mode (stable ref)
+  // Create indicator manager (stable ref)
   const indicatorManagerRef = useRef<MobileIndicatorManager | null>(null);
-  if (datafeed && !indicatorManagerRef.current) {
+  if (!indicatorManagerRef.current) {
     indicatorManagerRef.current = new MobileIndicatorManager();
     indicatorManagerRef.current.setOnUpdate(forceUpdate);
   }
 
-  // Use core hook - automatically disabled when datafeed is undefined
+  // Use core hook for bar fetching and state management
   const coreResult = useTealchartCore({
     datafeed,
     symbol: propSymbol,
     interval: propInterval,
-    indicatorManager: indicatorManagerRef.current as IIndicatorManager | undefined,
+    indicatorManager: indicatorManagerRef.current as IIndicatorManager,
     onSymbolChange,
     onIntervalChange,
   });
 
-  // Determine mode from hook result
-  const isDatafeedMode = coreResult.enabled;
+  // Get values from core hook
+  const { bars, symbol, interval, isLoading, unifiedLayout } = coreResult;
 
-  // Unified values: use core result in datafeed mode, controlled props otherwise
-  const bars = isDatafeedMode ? coreResult.bars : (controlledBars || []);
-  const symbol = isDatafeedMode ? coreResult.symbol : propSymbol;
-  const interval = isDatafeedMode ? coreResult.interval : propInterval;
-  const isLoading = isDatafeedMode ? coreResult.isLoading : false;
+  // Get indicator state from manager
+  const plots = indicatorManagerRef.current?.getPlots() || [];
+  const unifiedPaneLayout = indicatorManagerRef.current?.getUnifiedLayout() || unifiedLayout;
+  const indicatorPaneInfo = indicatorManagerRef.current?.getIndicatorPaneInfo() || {};
+  const activeIndicatorIds = indicatorManagerRef.current?.getIndicators().map(ind => ind.indicator.id) || [];
 
-  // Get indicator state from manager in datafeed mode, controlled props otherwise
-  const plots = isDatafeedMode
-    ? indicatorManagerRef.current?.getPlots() || []
-    : controlledPlots || [];
-  const unifiedPaneLayout = isDatafeedMode
-    ? indicatorManagerRef.current?.getUnifiedLayout() || coreResult.unifiedLayout
-    : controlledUnifiedPaneLayout;
-  const indicatorPaneInfo = isDatafeedMode
-    ? indicatorManagerRef.current?.getIndicatorPaneInfo() || {}
-    : controlledIndicatorPaneInfo || {};
-  const activeIndicatorIds = isDatafeedMode
-    ? indicatorManagerRef.current?.getIndicators().map(ind => ind.indicator.id) || []
-    : controlledActiveIndicatorIds || [];
-
-  // Handle indicator addition in datafeed mode
+  // Handle indicator addition
   const handleAddIndicatorInternal = useCallback((indicator: BuiltinIndicator) => {
-    if (isDatafeedMode && indicatorManagerRef.current) {
-      console.log('[SkiaTealchart] Adding indicator (datafeed mode):', indicator.id);
+    if (indicatorManagerRef.current) {
+      console.log('[SkiaTealchart] Adding indicator:', indicator.id);
       indicatorManagerRef.current.addIndicator(indicator);
     }
     // Also call external callback if provided
     onAddIndicator?.(indicator);
-  }, [isDatafeedMode, onAddIndicator]);
+  }, [onAddIndicator]);
 
   // ==========================================================================
   // Dimensions & Layout
@@ -533,26 +481,22 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
       // Pass margins as third parameter (constructor doesn't read from options.margins)
       const renderer = new TealchartRenderer(ctx, fullRenderOptions, margins);
 
-      if (unifiedPaneLayout) {
-        renderer.renderWithLayout(
-          bars,
-          viewport,
-          unifiedPaneLayout,
-          priceLines,
-          plots,
-          indicatorPaneInfo,
-          undefined,
-          plotStyleOverrides
-        );
-      } else {
-        renderer.render(bars, viewport, priceLines, paneLayout);
-      }
+      renderer.renderWithLayout(
+        bars,
+        viewport,
+        unifiedPaneLayout,
+        priceLines,
+        plots,
+        indicatorPaneInfo,
+        undefined,
+        plotStyleOverrides
+      );
 
       collectedText = ctx.getCollectedText();
     }, { width: dimensions.width, height: dimensions.height });
 
     return { picture: pic, textItems: collectedText };
-  }, [bars, viewport, dimensions, fullRenderOptions, margins, priceLines, plots, paneLayout, unifiedPaneLayout, indicatorPaneInfo, plotStyleOverrides]);
+  }, [bars, viewport, dimensions, fullRenderOptions, margins, priceLines, plots, unifiedPaneLayout, indicatorPaneInfo, plotStyleOverrides]);
 
   // ==========================================================================
   // Text Style Helper
