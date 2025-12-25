@@ -604,6 +604,9 @@ export class TealscriptEngine {
 
     // TA functions (basic stubs for now)
     this.registerTaBuiltins();
+
+    // Visual constants (shape, location, size)
+    this.registerVisualConstants();
   }
 
   // Plot ID counters - reset when engine is created
@@ -702,6 +705,174 @@ export class TealscriptEngine {
     this.builtins.set('plot.style_columns', () => 'columns');
     this.builtins.set('plot.style_area', () => 'area');
     this.builtins.set('plot.style_areabr', () => 'areabr');
+
+    // =========================================================================
+    // plotshape - Conditional shape markers
+    // =========================================================================
+    this.builtins.set('plotshape', (args, namedArgs, ctx) => {
+      const series = args[0]; // Can be boolean or number
+      const title = (namedArgs.get('title') ?? args[1] ?? 'Shape') as string;
+      const style = (namedArgs.get('style') ?? 'circle') as string;
+      const location = (namedArgs.get('location') ?? 'abovebar') as string;
+      const color = (namedArgs.get('color') ?? '#2196F3') as string;
+      const size = (namedArgs.get('size') ?? 'normal') as string;
+      const text = (namedArgs.get('text') ?? '') as string;
+
+      const id = `plotshape_${title}`;
+
+      if (ctx.bar_index === 0) {
+        ctx.registerPlot({
+          id,
+          type: 'plotshape',
+          title,
+          color: [],
+          shape: style,
+          location: location as 'abovebar' | 'belowbar' | 'top' | 'bottom' | 'absolute',
+          size: size as 'tiny' | 'small' | 'normal' | 'large' | 'huge' | 'auto',
+          text,
+        });
+      }
+
+      // Add color to array for this bar
+      const plot = ctx.plots.get(id);
+      if (plot && Array.isArray(plot.color)) {
+        plot.color.push(color);
+      }
+
+      // Determine value - true/non-zero means show shape
+      let value: number | null = null;
+      if (typeof series === 'boolean') {
+        value = series ? 1 : null;
+      } else if (typeof series === 'number') {
+        value = !isNaN(series) && series !== 0 ? series : null;
+      }
+
+      ctx.addPlotValue(id, value);
+      return series;
+    });
+
+    // =========================================================================
+    // plotchar - Custom character markers
+    // =========================================================================
+    this.builtins.set('plotchar', (args, namedArgs, ctx) => {
+      const series = args[0]; // Can be boolean or number
+      const title = (namedArgs.get('title') ?? args[1] ?? 'Char') as string;
+      const char = (namedArgs.get('char') ?? '●') as string;
+      const location = (namedArgs.get('location') ?? 'abovebar') as string;
+      const color = (namedArgs.get('color') ?? '#2196F3') as string;
+      const size = (namedArgs.get('size') ?? 'normal') as string;
+      const text = (namedArgs.get('text') ?? '') as string;
+
+      const id = `plotchar_${title}`;
+
+      if (ctx.bar_index === 0) {
+        ctx.registerPlot({
+          id,
+          type: 'plotchar',
+          title,
+          color: [],
+          char,
+          location: location as 'abovebar' | 'belowbar' | 'top' | 'bottom' | 'absolute',
+          size: size as 'tiny' | 'small' | 'normal' | 'large' | 'huge' | 'auto',
+          text,
+        });
+      }
+
+      // Add color to array for this bar
+      const plot = ctx.plots.get(id);
+      if (plot && Array.isArray(plot.color)) {
+        plot.color.push(color);
+      }
+
+      // Determine value
+      let value: number | null = null;
+      if (typeof series === 'boolean') {
+        value = series ? 1 : null;
+      } else if (typeof series === 'number') {
+        value = !isNaN(series) && series !== 0 ? series : null;
+      }
+
+      ctx.addPlotValue(id, value);
+      return series;
+    });
+
+    // =========================================================================
+    // plotarrow - Directional arrows
+    // =========================================================================
+    this.builtins.set('plotarrow', (args, namedArgs, ctx) => {
+      const series = args[0] as number; // Positive = up arrow, negative = down arrow
+      const title = (namedArgs.get('title') ?? 'Arrow') as string;
+      const colorup = (namedArgs.get('colorup') ?? '#4CAF50') as string;
+      const colordown = (namedArgs.get('colordown') ?? '#F44336') as string;
+
+      const id = `plotarrow_${title}`;
+
+      if (ctx.bar_index === 0) {
+        ctx.registerPlot({
+          id,
+          type: 'plotarrow',
+          title,
+          color: [],
+          colorup,
+          colordown,
+          location: 'abovebar', // Arrows position relative to price
+        });
+      }
+
+      // Determine color based on value sign
+      const plot = ctx.plots.get(id);
+      if (plot && Array.isArray(plot.color)) {
+        if (isNaN(series) || series === 0) {
+          plot.color.push(null);
+        } else {
+          plot.color.push(series > 0 ? colorup : colordown);
+        }
+      }
+
+      // Value determines arrow direction and size
+      const value = isNaN(series) || series === 0 ? null : series;
+      ctx.addPlotValue(id, value);
+      return series;
+    });
+
+    // =========================================================================
+    // fill - Fill area between two plots
+    // =========================================================================
+    this.builtins.set('fill', (args, namedArgs, ctx) => {
+      // In PineScript, fill() takes plot IDs returned from plot() calls
+      // For our implementation, we'll use the plot titles to reference them
+      const plot1Id = args[0] as string;
+      const plot2Id = args[1] as string;
+      const color = (namedArgs.get('color') ?? args[2] ?? 'rgba(33, 150, 243, 0.2)') as string;
+      const title = (namedArgs.get('title') ?? 'Fill') as string;
+
+      const id = `fill_${title}`;
+
+      if (ctx.bar_index === 0) {
+        // Reference the actual plot IDs
+        const actualPlot1Id = `plot_${plot1Id}`;
+        const actualPlot2Id = `plot_${plot2Id}`;
+
+        ctx.registerPlot({
+          id,
+          type: 'fill',
+          title,
+          color: [],
+          plot1Id: actualPlot1Id,
+          plot2Id: actualPlot2Id,
+        });
+      }
+
+      // Add color for this bar (supports dynamic colors)
+      const plot = ctx.plots.get(id);
+      if (plot && Array.isArray(plot.color)) {
+        plot.color.push(color);
+      }
+
+      // Fill doesn't have a value per se, but we track it for consistency
+      ctx.addPlotValue(id, 1);
+      return null;
+    });
   }
 
   private registerInputBuiltins(): void {
@@ -821,6 +992,61 @@ export class TealscriptEngine {
       }
       return baseColor;
     });
+  }
+
+  private registerVisualConstants(): void {
+    // =========================================================================
+    // Shape Constants (for plotshape)
+    // =========================================================================
+    const shapes: Record<string, string> = {
+      'shape.triangleup': 'triangleup',
+      'shape.triangledown': 'triangledown',
+      'shape.circle': 'circle',
+      'shape.cross': 'cross',
+      'shape.diamond': 'diamond',
+      'shape.arrowup': 'arrowup',
+      'shape.arrowdown': 'arrowdown',
+      'shape.flag': 'flag',
+      'shape.labelup': 'labelup',
+      'shape.labeldown': 'labeldown',
+      'shape.square': 'square',
+      'shape.xcross': 'xcross',
+    };
+
+    for (const [name, value] of Object.entries(shapes)) {
+      this.builtins.set(name, () => value);
+    }
+
+    // =========================================================================
+    // Location Constants (for plotshape, plotchar)
+    // =========================================================================
+    const locations: Record<string, string> = {
+      'location.abovebar': 'abovebar',
+      'location.belowbar': 'belowbar',
+      'location.top': 'top',
+      'location.bottom': 'bottom',
+      'location.absolute': 'absolute',
+    };
+
+    for (const [name, value] of Object.entries(locations)) {
+      this.builtins.set(name, () => value);
+    }
+
+    // =========================================================================
+    // Size Constants (for plotshape, plotchar)
+    // =========================================================================
+    const sizes: Record<string, string> = {
+      'size.tiny': 'tiny',
+      'size.small': 'small',
+      'size.normal': 'normal',
+      'size.large': 'large',
+      'size.huge': 'huge',
+      'size.auto': 'auto',
+    };
+
+    for (const [name, value] of Object.entries(sizes)) {
+      this.builtins.set(name, () => value);
+    }
   }
 
   /**
@@ -1350,6 +1576,539 @@ export class TealscriptEngine {
 
       scope.declare(obvKey, 'var', obv);
       return obv;
+    });
+
+    // =========================================================================
+    // Phase 1: Additional TA Functions
+    // =========================================================================
+
+    // RMA - Wilder's Smoothed Moving Average (also known as SMMA)
+    // Formula: alpha = 1/length, rma = alpha * source + (1 - alpha) * prev_rma
+    this.builtins.set('ta.rma', (args, _namedArgs, ctx, scope) => {
+      const source = args[0] as number;
+      const length = args[1] as number;
+
+      const series = this.getSeriesForSource(source, ctx);
+      const alpha = 1 / length;
+
+      const rmaKey = `_rma_${length}_${source}`;
+      let prevRma = scope.get(rmaKey) as number | undefined;
+
+      if (prevRma === undefined || isNaN(prevRma)) {
+        // Initialize with SMA
+        let sum = 0;
+        let count = 0;
+        for (let i = 0; i < length; i++) {
+          const val = series.get(i);
+          if (val !== undefined && !isNaN(val)) {
+            sum += val;
+            count++;
+          }
+        }
+        prevRma = count > 0 ? sum / count : source;
+      }
+
+      const rma = alpha * source + (1 - alpha) * prevRma;
+      scope.declare(rmaKey, 'var', rma);
+
+      return rma;
+    });
+
+    // WMA - Weighted Moving Average
+    // Formula: wma = sum(source[i] * weight[i]) / sum(weights) where weight = length - i
+    this.builtins.set('ta.wma', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
+      const length = args[1] as number;
+
+      const series = this.getSeriesForSource(source, ctx);
+
+      let weightedSum = 0;
+      let weightSum = 0;
+
+      for (let i = 0; i < length; i++) {
+        const val = series.get(i);
+        if (val === undefined || isNaN(val)) return NaN;
+
+        const weight = length - i; // Most recent has highest weight
+        weightedSum += val * weight;
+        weightSum += weight;
+      }
+
+      return weightedSum / weightSum;
+    });
+
+    // HMA - Hull Moving Average
+    // Formula: wma(2 * wma(src, len/2) - wma(src, len), sqrt(len))
+    this.builtins.set('ta.hma', (args, _namedArgs, ctx, scope) => {
+      const source = args[0] as number;
+      const length = args[1] as number;
+
+      const series = this.getSeriesForSource(source, ctx);
+
+      // Helper to calculate WMA
+      const calcWma = (len: number, offset: number = 0): number => {
+        let weightedSum = 0;
+        let weightSum = 0;
+
+        for (let i = 0; i < len; i++) {
+          const val = series.get(i + offset);
+          if (val === undefined || isNaN(val)) return NaN;
+
+          const weight = len - i;
+          weightedSum += val * weight;
+          weightSum += weight;
+        }
+
+        return weightedSum / weightSum;
+      };
+
+      const halfLen = Math.floor(length / 2);
+      const sqrtLen = Math.round(Math.sqrt(length));
+
+      // Calculate WMA(src, len/2) and WMA(src, len) for current and past bars
+      const hmaRawKey = `_hma_raw_${length}`;
+      let hmaRawHistory = (scope.get(hmaRawKey) as number[]) ?? [];
+
+      const wmaHalf = calcWma(halfLen);
+      const wmaFull = calcWma(length);
+
+      if (isNaN(wmaHalf) || isNaN(wmaFull)) return NaN;
+
+      const rawHma = 2 * wmaHalf - wmaFull;
+
+      hmaRawHistory.push(rawHma);
+      if (hmaRawHistory.length > sqrtLen) hmaRawHistory.shift();
+      scope.declare(hmaRawKey, 'var', hmaRawHistory);
+
+      // WMA of the raw values
+      if (hmaRawHistory.length < sqrtLen) return NaN;
+
+      let weightedSum = 0;
+      let weightSum = 0;
+      for (let i = 0; i < sqrtLen; i++) {
+        const idx = hmaRawHistory.length - 1 - i;
+        const weight = sqrtLen - i;
+        weightedSum += hmaRawHistory[idx] * weight;
+        weightSum += weight;
+      }
+
+      return weightedSum / weightSum;
+    });
+
+    // BB - Bollinger Bands
+    // Returns [middle, upper, lower]
+    this.builtins.set('ta.bb', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
+      const length = args[1] as number;
+      const mult = (args[2] ?? 2.0) as number;
+
+      const series = this.getSeriesForSource(source, ctx);
+
+      // Calculate SMA (middle)
+      let sum = 0;
+      const values: number[] = [];
+      for (let i = 0; i < length; i++) {
+        const val = series.get(i);
+        if (val === undefined || isNaN(val)) return [NaN, NaN, NaN];
+        sum += val;
+        values.push(val);
+      }
+
+      const middle = sum / length;
+
+      // Calculate standard deviation
+      const squaredDiffs = values.map(v => Math.pow(v - middle, 2));
+      const variance = squaredDiffs.reduce((a, b) => a + b, 0) / length;
+      const stdev = Math.sqrt(variance);
+
+      const upper = middle + mult * stdev;
+      const lower = middle - mult * stdev;
+
+      return [middle, upper, lower];
+    });
+
+    // ROC - Rate of Change (percentage)
+    // Formula: (current - previous) / previous * 100
+    this.builtins.set('ta.roc', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
+      const length = (args[1] ?? 1) as number;
+
+      const series = this.getSeriesForSource(source, ctx);
+      const prev = series.get(length);
+
+      if (prev === undefined || prev === 0) return NaN;
+
+      return ((source - prev) / prev) * 100;
+    });
+
+    // TR - True Range (as a function, can also be accessed as variable)
+    this.builtins.set('ta.tr', (_args, _namedArgs, ctx) => {
+      const high = ctx.high.get(0)!;
+      const low = ctx.low.get(0)!;
+      const prevClose = ctx.close.get(1);
+
+      if (prevClose === undefined) {
+        return high - low;
+      }
+
+      return Math.max(
+        high - low,
+        Math.abs(high - prevClose),
+        Math.abs(low - prevClose)
+      );
+    });
+
+    // SuperTrend - ATR-based trend indicator
+    // Returns [supertrend value, direction (1 = up, -1 = down)]
+    this.builtins.set('ta.supertrend', (args, _namedArgs, ctx, scope) => {
+      const factor = (args[0] ?? 3.0) as number;
+      const atrLength = (args[1] ?? 10) as number;
+
+      const high = ctx.high.get(0)!;
+      const low = ctx.low.get(0)!;
+      const close = ctx.close.get(0)!;
+
+      // Calculate ATR using RMA
+      const prevClose = ctx.close.get(1);
+      let tr: number;
+      if (prevClose === undefined) {
+        tr = high - low;
+      } else {
+        tr = Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose));
+      }
+
+      const atrKey = `_st_atr_${atrLength}`;
+      let atr = scope.get(atrKey) as number | undefined;
+
+      if (atr === undefined || isNaN(atr)) {
+        // Initialize with simple average
+        let sum = 0;
+        for (let i = 0; i < atrLength; i++) {
+          const h = ctx.high.get(i);
+          const l = ctx.low.get(i);
+          const pc = ctx.close.get(i + 1);
+          if (h === undefined || l === undefined) continue;
+          let t = h - l;
+          if (pc !== undefined) {
+            t = Math.max(h - l, Math.abs(h - pc), Math.abs(l - pc));
+          }
+          sum += t;
+        }
+        atr = sum / atrLength;
+      } else {
+        atr = (atr * (atrLength - 1) + tr) / atrLength;
+      }
+      scope.declare(atrKey, 'var', atr);
+
+      // Calculate basic upper and lower bands
+      const hl2 = (high + low) / 2;
+      const basicUpperBand = hl2 + factor * atr;
+      const basicLowerBand = hl2 - factor * atr;
+
+      // Get previous values
+      const prevUpperKey = `_st_upper_${factor}_${atrLength}`;
+      const prevLowerKey = `_st_lower_${factor}_${atrLength}`;
+      const prevDirKey = `_st_dir_${factor}_${atrLength}`;
+
+      let prevUpper = scope.get(prevUpperKey) as number | undefined;
+      let prevLower = scope.get(prevLowerKey) as number | undefined;
+      let prevDir = scope.get(prevDirKey) as number | undefined;
+      const prevCloseVal = ctx.close.get(1);
+
+      // Final upper band
+      let finalUpperBand: number;
+      if (prevUpper === undefined || prevCloseVal === undefined) {
+        finalUpperBand = basicUpperBand;
+      } else {
+        finalUpperBand = basicUpperBand < prevUpper || prevCloseVal > prevUpper
+          ? basicUpperBand
+          : prevUpper;
+      }
+
+      // Final lower band
+      let finalLowerBand: number;
+      if (prevLower === undefined || prevCloseVal === undefined) {
+        finalLowerBand = basicLowerBand;
+      } else {
+        finalLowerBand = basicLowerBand > prevLower || prevCloseVal < prevLower
+          ? basicLowerBand
+          : prevLower;
+      }
+
+      // Determine direction
+      let direction: number;
+      if (prevDir === undefined) {
+        direction = close > finalUpperBand ? 1 : -1;
+      } else {
+        if (prevDir === -1 && close > finalUpperBand) {
+          direction = 1;
+        } else if (prevDir === 1 && close < finalLowerBand) {
+          direction = -1;
+        } else {
+          direction = prevDir;
+        }
+      }
+
+      // SuperTrend value
+      const supertrend = direction === 1 ? finalLowerBand : finalUpperBand;
+
+      scope.declare(prevUpperKey, 'var', finalUpperBand);
+      scope.declare(prevLowerKey, 'var', finalLowerBand);
+      scope.declare(prevDirKey, 'var', direction);
+
+      return [supertrend, direction];
+    });
+
+    // DMI - Directional Movement Index
+    // Returns [diPlus, diMinus, adx]
+    this.builtins.set('ta.dmi', (args, _namedArgs, ctx, scope) => {
+      const length = (args[0] ?? 14) as number;
+      const adxSmoothing = (args[1] ?? 14) as number;
+
+      const high = ctx.high.get(0)!;
+      const low = ctx.low.get(0)!;
+      const prevHigh = ctx.high.get(1);
+      const prevLow = ctx.low.get(1);
+      const prevClose = ctx.close.get(1);
+
+      // Calculate True Range
+      let tr: number;
+      if (prevClose === undefined) {
+        tr = high - low;
+      } else {
+        tr = Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose));
+      }
+
+      // Calculate +DM and -DM
+      let plusDM = 0;
+      let minusDM = 0;
+
+      if (prevHigh !== undefined && prevLow !== undefined) {
+        const upMove = high - prevHigh;
+        const downMove = prevLow - low;
+
+        if (upMove > downMove && upMove > 0) {
+          plusDM = upMove;
+        }
+        if (downMove > upMove && downMove > 0) {
+          minusDM = downMove;
+        }
+      }
+
+      // Smooth with RMA (Wilder's smoothing)
+      const alpha = 1 / length;
+
+      const smoothTrKey = `_dmi_tr_${length}`;
+      const smoothPlusDmKey = `_dmi_plusdm_${length}`;
+      const smoothMinusDmKey = `_dmi_minusdm_${length}`;
+      const smoothAdxKey = `_dmi_adx_${length}_${adxSmoothing}`;
+
+      let smoothTr = scope.get(smoothTrKey) as number ?? tr;
+      let smoothPlusDm = scope.get(smoothPlusDmKey) as number ?? plusDM;
+      let smoothMinusDm = scope.get(smoothMinusDmKey) as number ?? minusDM;
+
+      smoothTr = alpha * tr + (1 - alpha) * smoothTr;
+      smoothPlusDm = alpha * plusDM + (1 - alpha) * smoothPlusDm;
+      smoothMinusDm = alpha * minusDM + (1 - alpha) * smoothMinusDm;
+
+      scope.declare(smoothTrKey, 'var', smoothTr);
+      scope.declare(smoothPlusDmKey, 'var', smoothPlusDm);
+      scope.declare(smoothMinusDmKey, 'var', smoothMinusDm);
+
+      // Calculate DI+ and DI-
+      const diPlus = smoothTr > 0 ? (smoothPlusDm / smoothTr) * 100 : 0;
+      const diMinus = smoothTr > 0 ? (smoothMinusDm / smoothTr) * 100 : 0;
+
+      // Calculate DX and smooth to get ADX
+      const diSum = diPlus + diMinus;
+      const dx = diSum > 0 ? (Math.abs(diPlus - diMinus) / diSum) * 100 : 0;
+
+      let adx = scope.get(smoothAdxKey) as number ?? dx;
+      const adxAlpha = 1 / adxSmoothing;
+      adx = adxAlpha * dx + (1 - adxAlpha) * adx;
+      scope.declare(smoothAdxKey, 'var', adx);
+
+      return [diPlus, diMinus, adx];
+    });
+
+    // SAR - Parabolic Stop and Reverse
+    this.builtins.set('ta.sar', (args, _namedArgs, ctx, scope) => {
+      const start = (args[0] ?? 0.02) as number;
+      const increment = (args[1] ?? 0.02) as number;
+      const maximum = (args[2] ?? 0.2) as number;
+
+      const high = ctx.high.get(0)!;
+      const low = ctx.low.get(0)!;
+
+      const sarKey = '_sar_value';
+      const epKey = '_sar_ep'; // Extreme Point
+      const afKey = '_sar_af'; // Acceleration Factor
+      const trendKey = '_sar_trend'; // 1 = up, -1 = down
+
+      let sar = scope.get(sarKey) as number | undefined;
+      let ep = scope.get(epKey) as number | undefined;
+      let af = scope.get(afKey) as number | undefined;
+      let trend = scope.get(trendKey) as number | undefined;
+
+      if (sar === undefined || ep === undefined || af === undefined || trend === undefined) {
+        // Initialize - start with downtrend assumption
+        sar = high;
+        ep = low;
+        af = start;
+        trend = -1;
+      } else {
+        // Calculate new SAR
+        sar = sar + af * (ep - sar);
+
+        if (trend === 1) {
+          // Uptrend
+          // SAR can't be above prior two lows
+          const prevLow1 = ctx.low.get(1);
+          const prevLow2 = ctx.low.get(2);
+          if (prevLow1 !== undefined) sar = Math.min(sar, prevLow1);
+          if (prevLow2 !== undefined) sar = Math.min(sar, prevLow2);
+
+          if (low < sar) {
+            // Trend reversal
+            trend = -1;
+            sar = ep;
+            ep = low;
+            af = start;
+          } else {
+            if (high > ep) {
+              ep = high;
+              af = Math.min(af + increment, maximum);
+            }
+          }
+        } else {
+          // Downtrend
+          // SAR can't be below prior two highs
+          const prevHigh1 = ctx.high.get(1);
+          const prevHigh2 = ctx.high.get(2);
+          if (prevHigh1 !== undefined) sar = Math.max(sar, prevHigh1);
+          if (prevHigh2 !== undefined) sar = Math.max(sar, prevHigh2);
+
+          if (high > sar) {
+            // Trend reversal
+            trend = 1;
+            sar = ep;
+            ep = high;
+            af = start;
+          } else {
+            if (low < ep) {
+              ep = low;
+              af = Math.min(af + increment, maximum);
+            }
+          }
+        }
+      }
+
+      scope.declare(sarKey, 'var', sar);
+      scope.declare(epKey, 'var', ep);
+      scope.declare(afKey, 'var', af);
+      scope.declare(trendKey, 'var', trend);
+
+      return sar;
+    });
+
+    // PivotHigh - Detect pivot highs
+    // Returns the pivot high price or na
+    this.builtins.set('ta.pivothigh', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
+      const leftBars = (args[1] ?? 5) as number;
+      const rightBars = (args[2] ?? 5) as number;
+
+      const series = this.getSeriesForSource(source, ctx);
+
+      // We need rightBars of data after the potential pivot
+      // The pivot would be at offset = rightBars
+      const pivotValue = series.get(rightBars);
+      if (pivotValue === undefined) return NaN;
+
+      // Check left side (bars before the pivot, at higher offsets)
+      for (let i = 1; i <= leftBars; i++) {
+        const val = series.get(rightBars + i);
+        if (val === undefined || val >= pivotValue) return NaN;
+      }
+
+      // Check right side (bars after the pivot, at lower offsets)
+      for (let i = 1; i <= rightBars; i++) {
+        const val = series.get(rightBars - i);
+        if (val === undefined || val >= pivotValue) return NaN;
+      }
+
+      return pivotValue;
+    });
+
+    // PivotLow - Detect pivot lows
+    // Returns the pivot low price or na
+    this.builtins.set('ta.pivotlow', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
+      const leftBars = (args[1] ?? 5) as number;
+      const rightBars = (args[2] ?? 5) as number;
+
+      const series = this.getSeriesForSource(source, ctx);
+
+      // The pivot would be at offset = rightBars
+      const pivotValue = series.get(rightBars);
+      if (pivotValue === undefined) return NaN;
+
+      // Check left side (bars before the pivot, at higher offsets)
+      for (let i = 1; i <= leftBars; i++) {
+        const val = series.get(rightBars + i);
+        if (val === undefined || val <= pivotValue) return NaN;
+      }
+
+      // Check right side (bars after the pivot, at lower offsets)
+      for (let i = 1; i <= rightBars; i++) {
+        const val = series.get(rightBars - i);
+        if (val === undefined || val <= pivotValue) return NaN;
+      }
+
+      return pivotValue;
+    });
+
+    // LinReg - Linear Regression Value
+    this.builtins.set('ta.linreg', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
+      const length = args[1] as number;
+      const offset = (args[2] ?? 0) as number;
+
+      const series = this.getSeriesForSource(source, ctx);
+
+      // Collect values
+      const values: number[] = [];
+      for (let i = 0; i < length; i++) {
+        const val = series.get(i);
+        if (val === undefined || isNaN(val)) return NaN;
+        values.push(val);
+      }
+
+      // Linear regression: y = mx + b
+      // Using least squares method
+      const n = length;
+      let sumX = 0;
+      let sumY = 0;
+      let sumXY = 0;
+      let sumX2 = 0;
+
+      for (let i = 0; i < n; i++) {
+        const x = n - 1 - i; // x goes from n-1 to 0 (oldest to newest)
+        const y = values[i];
+        sumX += x;
+        sumY += y;
+        sumXY += x * y;
+        sumX2 += x * x;
+      }
+
+      const denominator = n * sumX2 - sumX * sumX;
+      if (denominator === 0) return NaN;
+
+      const slope = (n * sumXY - sumX * sumY) / denominator;
+      const intercept = (sumY - slope * sumX) / n;
+
+      // Calculate value at offset (0 = current bar, negative = future, positive = past)
+      return intercept + slope * (-offset);
     });
   }
 }
