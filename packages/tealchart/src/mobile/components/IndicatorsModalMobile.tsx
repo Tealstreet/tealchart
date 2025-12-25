@@ -31,9 +31,9 @@ export interface IndicatorsModalMobileProps {
   visible: boolean;
   /** Callback to close the modal */
   onClose: () => void;
-  /** Callback when an indicator is selected */
+  /** Callback when an indicator is selected (always adds - same indicator can be added multiple times) */
   onSelectIndicator: (indicator: BuiltinIndicator) => void;
-  /** IDs of currently active indicators (for showing checkmarks) */
+  /** @deprecated No longer used - same indicator can be added multiple times */
   activeIndicatorIds?: string[];
 }
 
@@ -52,7 +52,7 @@ const CATEGORY_LABELS: Record<BuiltinIndicator['category'], string> = {
 // =============================================================================
 
 export const IndicatorsModalMobile: React.FC<IndicatorsModalMobileProps> = memo(
-  ({ visible, onClose, onSelectIndicator, activeIndicatorIds = [] }) => {
+  ({ visible, onClose, onSelectIndicator }) => {
     const theme = useTheme();
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -92,8 +92,6 @@ export const IndicatorsModalMobile: React.FC<IndicatorsModalMobileProps> = memo(
       [onSelectIndicator, onClose]
     );
 
-    const activeSet = useMemo(() => new Set(activeIndicatorIds), [activeIndicatorIds]);
-
     return (
       <ListModal
         visible={visible}
@@ -115,36 +113,33 @@ export const IndicatorsModalMobile: React.FC<IndicatorsModalMobileProps> = memo(
             return (
               <View key={categoryId}>
                 <CategoryHeader label={categoryName} />
-                {indicators.map((indicator) => {
-                  const isActive = activeSet.has(indicator.id);
-
-                  return (
-                    <ListItem
-                      key={indicator.id}
-                      label={indicator.name}
-                      sublabel={indicator.description}
-                      isActive={isActive}
-                      onPress={() => handleIndicatorPress(indicator)}
-                      rightElement={
-                        isActive ? (
+                {indicators.map((indicator) => (
+                  <ListItem
+                    key={indicator.id}
+                    label={indicator.name}
+                    sublabel={indicator.description}
+                    onPress={() => handleIndicatorPress(indicator)}
+                    rightElement={
+                      indicator.overlay ? (
+                        <View style={styles.overlayBadge}>
                           <AntDesign
-                            name="check"
-                            size={16}
-                            color={theme.colors.buyColor}
+                            name="linechart"
+                            size={12}
+                            color={theme.colors.foregroundTransparent}
                           />
-                        ) : indicator.overlay ? (
-                          <View style={styles.overlayBadge}>
-                            <AntDesign
-                              name="linechart"
-                              size={12}
-                              color={theme.colors.foregroundTransparent}
-                            />
-                          </View>
-                        ) : null
-                      }
-                    />
-                  );
-                })}
+                        </View>
+                      ) : (
+                        <View style={styles.overlayBadge}>
+                          <AntDesign
+                            name="areachart"
+                            size={12}
+                            color={theme.colors.foregroundTransparent}
+                          />
+                        </View>
+                      )
+                    }
+                  />
+                ))}
               </View>
             );
           })

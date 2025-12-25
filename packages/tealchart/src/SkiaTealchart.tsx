@@ -1,36 +1,26 @@
-// ⚠️ AUTO-GENERATED FILE - DO NOT EDIT MANUALLY ⚠️
-// This file was copied from tealstreet-next by copy-and-patch.js
-// To re-sync from the web repository, run: yarn sync
-// 
-// To make this file mobile-specific (prevent it from being overwritten on sync):
-// 1. Modify the file as needed for mobile
-// 2. Add to patch-config.json "permanentFiles" array:
-//    - For single file: "web/path/to/this/file.ts"
-//    - For directory: "web/path/to/directory/**/*"
-// 3. Add exception to .gitignore: !src/web/path/to/this/file.ts
-// 4. Force-add to git: git add -f src/web/path/to/this/file.ts
-// 5. Commit your changes
-// 6. IMPORTANT: Replace this header with the MOBILE-PATCHED header (see existing patched files for example)
-//
-// The patch-config.json controls:
-// - permanentFiles: Files that are never overwritten during sync
-// - excludeFromCopy: Files excluded from initial copy
-// - importReplacements: Auto-replace imports with mobile shims
-//
-// See README.md section "Git Configuration for Patched Files" for full details
+// 📱 MOBILE-PATCHED FILE
+// This file has been customized for mobile and will NOT be overwritten by yarn sync.
+// Mobile equivalent of TealchartWidget - accepts datafeed and handles all internal logic.
 
 /**
  * SkiaTealchart - React Native Skia implementation of Tealchart
  *
+ * Mobile equivalent of TealchartWidget on web:
+ * - Accepts datafeed, symbol, interval (like TealchartWidget)
+ * - Handles bar fetching, indicators, pane management internally
+ * - Renders using Skia instead of canvas
+ *
+ * Supports two modes:
+ * 1. **Datafeed mode** (preferred): Pass `datafeed` prop, widget handles everything internally
+ * 2. **Controlled mode** (legacy): Pass `bars` prop directly for parent-controlled rendering
+ *
  * Architecture:
  * - Layer 1: Skia Canvas (static) - candles, grid, indicators via Picture recording
- * - Layer 2: Interactive RN Layer - order lines, position lines, crosshair (future)
+ * - Layer 2: Interactive RN Layer - order lines, position lines, crosshair
  * - Layer 3: Base Gesture Layer - pan, pinch, axis scaling with zone detection
- *
- * This mirrors web's Canvas + Konva pattern using Skia + RN components.
  */
 
-import React, { useRef, useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useRef, useState, useCallback, useEffect, useMemo, useReducer } from 'react';
 import { View, StyleSheet, LayoutChangeEvent, Text } from 'react-native';
 import { Canvas, Picture, Skia, createPicture } from '@shopify/react-native-skia';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -46,7 +36,10 @@ import { CrosshairComponent } from './mobile/components/CrosshairComponent';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
 import { IndicatorsModalMobile } from './mobile/components/IndicatorsModalMobile';
+import { MobileIndicatorManager } from './mobile/MobileIndicatorManager';
 import { priceToY, yToPrice, xToTime } from './mobile/utils/coordinates';
+import { useTealchartCore } from './core/useTealchartCore';
+import type { IIndicatorManager } from './core/ChartWidgetCore';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type {
   Bar,
@@ -59,6 +52,7 @@ import type {
   PaneLayout,
   UnifiedPaneLayout,
   ContextMenuItem,
+  IBasicDataFeed,
 } from './types';
 import { DEFAULT_MARGINS } from './types';
 import type { PlotOutput, PlotStyleOverride } from './state/chartState';
@@ -72,7 +66,32 @@ interface IndicatorPaneInfo {
 export interface SkiaTealchartProps {
   width?: number;
   height?: number;
-  bars: Bar[];
+
+  // ===========================================================================
+  // DATAFEED MODE (preferred): Widget handles bar fetching internally
+  // Pass datafeed + symbol, widget manages everything else
+  // ===========================================================================
+  /** Datafeed for fetching bars - when provided, widget handles bar fetching internally */
+  datafeed?: IBasicDataFeed;
+
+  // ===========================================================================
+  // CONTROLLED MODE (legacy): Parent provides bars directly
+  // Used by NativeTealchart during transition period
+  // ===========================================================================
+  /** Bars to render - required in controlled mode, ignored in datafeed mode */
+  bars?: Bar[];
+  /** Tealscript indicator plot outputs - for controlled mode */
+  plots?: PlotOutput[];
+  /** Unified pane layout - for controlled mode */
+  unifiedPaneLayout?: UnifiedPaneLayout;
+  /** Map from study ID to indicator pane info - for controlled mode */
+  indicatorPaneInfo?: Record<string, IndicatorPaneInfo>;
+  /** IDs of currently active indicators - for controlled mode */
+  activeIndicatorIds?: string[];
+
+  // ===========================================================================
+  // Common Props (both modes)
+  // ===========================================================================
   /** Render options for colors and styling */
   renderOptions?: Partial<Omit<RenderOptions, 'width' | 'height' | 'devicePixelRatio'>>;
   /** Custom margins to override defaults */
@@ -83,14 +102,8 @@ export interface SkiaTealchartProps {
   orderLines?: OrderLineRenderData[];
   /** Position lines to render (open positions with PnL) */
   positionLines?: PositionLineRenderData[];
-  /** Tealscript indicator plot outputs */
-  plots?: PlotOutput[];
   /** Pane layout for multi-pane indicator rendering */
   paneLayout?: PaneLayout;
-  /** Unified pane layout - preferred over paneLayout */
-  unifiedPaneLayout?: UnifiedPaneLayout;
-  /** Map from study ID to indicator pane info */
-  indicatorPaneInfo?: Record<string, IndicatorPaneInfo>;
   /** Map from plotId to style overrides */
   plotStyleOverrides?: Map<string, PlotStyleOverride>;
   /** Called when viewport changes */
@@ -121,12 +134,12 @@ export interface SkiaTealchartProps {
   onSLClick?: (positionId: string) => void;
   /** Price precision for display */
   pricePrecision?: number;
-  // =========================================================================
+  // ===========================================================================
   // Top Bar Props
-  // =========================================================================
+  // ===========================================================================
   /** Whether to show the top bar (default: true) */
   showTopBar?: boolean;
-  /** Current symbol (e.g., "BTC/USDT") */
+  /** Current symbol (e.g., "BTC/USDT") - required for top bar display */
   symbol?: string;
   /** Exchange name (e.g., "Binance") */
   exchangeName?: string;
@@ -134,28 +147,33 @@ export interface SkiaTealchartProps {
   interval?: string;
   /** Called when timeframe changes */
   onIntervalChange?: (interval: string) => void;
-  // =========================================================================
+  /** Called when symbol changes */
+  onSymbolChange?: (symbol: string) => void;
+  // ===========================================================================
   // Indicator Props
-  // =========================================================================
+  // ===========================================================================
   /** Called when an indicator is selected from the modal */
   onAddIndicator?: (indicator: BuiltinIndicator) => void;
-  /** IDs of currently active indicators (for showing checkmarks in modal) */
-  activeIndicatorIds?: string[];
 }
 
 export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   width: propWidth,
   height: propHeight,
-  bars,
+  // Datafeed mode props
+  datafeed,
+  // Controlled mode props
+  bars: controlledBars,
+  plots: controlledPlots,
+  unifiedPaneLayout: controlledUnifiedPaneLayout,
+  indicatorPaneInfo: controlledIndicatorPaneInfo,
+  activeIndicatorIds: controlledActiveIndicatorIds,
+  // Common props
   renderOptions,
   margins: marginsProp,
   priceLines,
   orderLines,
   positionLines,
-  plots,
   paneLayout,
-  unifiedPaneLayout,
-  indicatorPaneInfo,
   plotStyleOverrides,
   onViewportChange,
   onRequestMoreBars,
@@ -173,14 +191,72 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   pricePrecision = 2,
   // Top bar props
   showTopBar = true,
-  symbol = '',
+  symbol: propSymbol = '',
   exchangeName,
-  interval = '15',
+  interval: propInterval = '15',
   onIntervalChange,
+  onSymbolChange,
   // Indicator props
   onAddIndicator,
-  activeIndicatorIds,
 }) => {
+  // ==========================================================================
+  // Core Hook + Indicator Management
+  // Handles both datafeed mode (internal) and controlled mode (external)
+  // ==========================================================================
+
+  // Force re-render helper for indicator updates
+  const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
+
+  // Create indicator manager for datafeed mode (stable ref)
+  const indicatorManagerRef = useRef<MobileIndicatorManager | null>(null);
+  if (datafeed && !indicatorManagerRef.current) {
+    indicatorManagerRef.current = new MobileIndicatorManager();
+    indicatorManagerRef.current.setOnUpdate(forceUpdate);
+  }
+
+  // Use core hook - automatically disabled when datafeed is undefined
+  const coreResult = useTealchartCore({
+    datafeed,
+    symbol: propSymbol,
+    interval: propInterval,
+    indicatorManager: indicatorManagerRef.current as IIndicatorManager | undefined,
+    onSymbolChange,
+    onIntervalChange,
+  });
+
+  // Determine mode from hook result
+  const isDatafeedMode = coreResult.enabled;
+
+  // Unified values: use core result in datafeed mode, controlled props otherwise
+  const bars = isDatafeedMode ? coreResult.bars : (controlledBars || []);
+  const symbol = isDatafeedMode ? coreResult.symbol : propSymbol;
+  const interval = isDatafeedMode ? coreResult.interval : propInterval;
+  const isLoading = isDatafeedMode ? coreResult.isLoading : false;
+
+  // Get indicator state from manager in datafeed mode, controlled props otherwise
+  const plots = isDatafeedMode
+    ? indicatorManagerRef.current?.getPlots() || []
+    : controlledPlots || [];
+  const unifiedPaneLayout = isDatafeedMode
+    ? indicatorManagerRef.current?.getUnifiedLayout() || coreResult.unifiedLayout
+    : controlledUnifiedPaneLayout;
+  const indicatorPaneInfo = isDatafeedMode
+    ? indicatorManagerRef.current?.getIndicatorPaneInfo() || {}
+    : controlledIndicatorPaneInfo || {};
+  const activeIndicatorIds = isDatafeedMode
+    ? indicatorManagerRef.current?.getIndicators().map(ind => ind.indicator.id) || []
+    : controlledActiveIndicatorIds || [];
+
+  // Handle indicator addition in datafeed mode
+  const handleAddIndicatorInternal = useCallback((indicator: BuiltinIndicator) => {
+    if (isDatafeedMode && indicatorManagerRef.current) {
+      console.log('[SkiaTealchart] Adding indicator (datafeed mode):', indicator.id);
+      indicatorManagerRef.current.addIndicator(indicator);
+    }
+    // Also call external callback if provided
+    onAddIndicator?.(indicator);
+  }, [isDatafeedMode, onAddIndicator]);
+
   // ==========================================================================
   // Dimensions & Layout
   // ==========================================================================
@@ -305,8 +381,10 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   }, []);
 
   const handleSelectIndicator = useCallback((indicator: BuiltinIndicator) => {
-    onAddIndicator?.(indicator);
-  }, [onAddIndicator]);
+    console.log('[SkiaTealchart] handleSelectIndicator called:', indicator.id, indicator.name);
+    // Use internal handler which manages indicators in datafeed mode
+    handleAddIndicatorInternal(indicator);
+  }, [handleAddIndicatorInternal]);
 
   // Handle crosshair move callback
   const handleCrosshairMove = useCallback((x: number, y: number) => {

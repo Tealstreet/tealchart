@@ -214,3 +214,25 @@ export type {
   PartialChartTranslations,
   TranslationProviderProps,
 } from './i18n';
+
+// Core widget logic (platform-agnostic)
+export {
+  ChartWidgetCore,
+  getIntervalMs,
+  INITIAL_BAR_COUNT,
+} from './core';
+export type {
+  ChartWidgetCoreOptions,
+  IIndicatorManager,
+} from './core';
+
+// React hook for core widget (works on web and mobile)
+export {
+  useTealchartCore,
+} from './core/useTealchartCore';
+export type {
+  UseTealchartCoreOptions,
+  TealchartCoreState,
+  TealchartCoreActions,
+  UseTealchartCoreReturn,
+} from './core/useTealchartCore';
