@@ -5,5 +5,5 @@
  * to get Skia-based components without breaking web builds.
  */
 
-export { SkiaTealchart } from './SkiaTealchart';
-export type { SkiaTealchartProps } from './SkiaTealchart';
+export { SkiaTealchart } from './src/SkiaTealchart';
+export type { SkiaTealchartProps } from './src/SkiaTealchart';
