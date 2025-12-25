@@ -81,10 +81,11 @@ export class MobileIndicatorManager {
   /**
    * Update bar data and recompute all indicator plots
    * Call this when new bar data arrives
+   * @param silent - If true, don't trigger onUpdate callback (use when batching with RAF)
    */
-  setBars(bars: Bar[]): void {
+  setBars(bars: Bar[], silent = false): void {
     this._bars = bars;
-    this._recomputePlots();
+    this._recomputePlots(silent);
   }
 
   /**
@@ -226,11 +227,12 @@ export class MobileIndicatorManager {
   /**
    * Recompute all indicator plots
    * Called when bars change or indicators are added/removed
+   * @param silent - If true, don't trigger onUpdate callback (for RAF batching)
    */
-  private _recomputePlots(): void {
+  private _recomputePlots(silent = false): void {
     if (this._bars.length === 0) {
       this._plots = [];
-      this._onUpdate?.();
+      if (!silent) this._onUpdate?.();
       return;
     }
 
@@ -240,7 +242,7 @@ export class MobileIndicatorManager {
       const { indicator, instanceId, ast, inputs } = ind;
 
       if (!ast) {
-        console.log('[MobileIndicatorManager] No AST for indicator:', indicator.id);
+        // Silently skip - no need to log for every bar update
         continue;
       }
 
@@ -257,7 +259,6 @@ export class MobileIndicatorManager {
         }
 
         // Execute the script
-        console.log('[MobileIndicatorManager] Executing indicator:', indicator.id, 'bars:', this._bars.length);
         const result = engine.execute(ast, this._bars, inputsMap);
 
         // Tag plots with the instance ID so renderer knows which pane to use
@@ -267,17 +268,14 @@ export class MobileIndicatorManager {
             scriptId: instanceId,
           });
         }
-
-        console.log('[MobileIndicatorManager] Generated', result.plots.length, 'plots for', indicator.id);
       } catch (err) {
         console.error('[MobileIndicatorManager] Error executing indicator:', indicator.id, err);
       }
     }
 
-    console.log('[MobileIndicatorManager] Total plots generated:', allPlots.length);
     this._plots = allPlots;
 
-    // Notify React to re-render
-    this._onUpdate?.();
+    // Notify React to re-render (unless silent mode for RAF batching)
+    if (!silent) this._onUpdate?.();
   }
 }
