@@ -32,7 +32,7 @@
     "@tealstreet/prettierrc": "*",
     "@types/node": "^22.15.3",
     "@vitest/coverage-v8": "^4.0.17",
-    "@vitest/ui": "^4.0.16",
+    "@vitest/ui": "^4.0.17",
     "cross-env": "^7.0.3",
     "eslint": "^9",
     "npm-run-all2": "^8.0.4",
