@@ -3,17 +3,44 @@
  * Standalone component that accepts render options via props
  */
 
+import type { PlotOutput } from '@tealstreet/tealscript';
+import type { IndicatorPaneInfo } from './components/ChartContainer';
+
 import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { flushSync } from 'react-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import { faRotate } from '@fortawesome/free-solid-svg-icons/faRotate';
-import { Stage, Layer } from 'react-konva';
-import { TealchartRenderer } from './TealchartRenderer';
-import { Bar, Viewport, RenderOptions, InteractionState, CrosshairState, DragMode, ChartMargins, OrderLineRenderData, PaneLayout, PositionLineRenderData, PriceLine, ChartLineLabel, DEFAULT_MARGINS, UnifiedPaneLayout, ChartPane, PendingOrderUpdate, PriceLineLabelBounds, ContextMenuItem } from './types';
-import { getDecimalPlacesFromPrecision, PlotStyleOverride } from './state/chartState';
-import { PriceLineLayer } from './components/PriceLineLayer';
+import { FontAwesomeIcon as FontAwesomeIconOriginal } from '@fortawesome/react-fontawesome';
+import { flushSync } from 'react-dom';
+import { Layer, Stage } from 'react-konva';
+
 import { ContextMenu } from './components/ContextMenu';
+import { PriceLineLayer } from './components/PriceLineLayer';
 import { useChartApiOptional } from './state/ChartApiContext';
+import { getDecimalPlacesFromPrecision, PlotStyleOverride } from './state/chartState';
+import { TealchartRenderer } from './TealchartRenderer';
+import {
+  Bar,
+  ChartLineLabel,
+  ChartMargins,
+  ChartPane,
+  ContextMenuItem,
+  CrosshairState,
+  DEFAULT_MARGINS,
+  DragMode,
+  InteractionState,
+  OrderLineRenderData,
+  PaneLayout,
+  PendingOrderUpdate,
+  PositionLineRenderData,
+  PriceLine,
+  PriceLineLabelBounds,
+  RenderOptions,
+  UnifiedPaneLayout,
+  Viewport,
+} from './types';
+
+// Type cast to fix React type mismatch between packages
+const FontAwesomeIcon = FontAwesomeIconOriginal as React.ComponentType<any>;
 
 // Cache NumberFormat instances by decimals to avoid recreating on every frame
 const numberFormatCache = new Map<number, Intl.NumberFormat>();
@@ -46,29 +73,41 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
   const chartLabel: ChartLineLabel = {
     offsetPercent: order.lineLength,
     segments: [
-      ...(order.text ? [{
-        text: order.text,
-        textShort: order.textShort || undefined,
-        backgroundColor: order.bodyBackgroundColor,
-        textColor: order.bodyTextColor,
-        borderColor: order.bodyBorderColor,
-      }] : []),
-      ...(order.quantity ? [{
-        text: order.quantity,
-        textShort: order.quantityShort || undefined,
-        backgroundColor: order.quantityBackgroundColor,
-        textColor: order.quantityTextColor,
-        borderColor: order.quantityBorderColor,
-      }] : []),
+      ...(order.text
+        ? [
+            {
+              text: order.text,
+              textShort: order.textShort || undefined,
+              backgroundColor: order.bodyBackgroundColor,
+              textColor: order.bodyTextColor,
+              borderColor: order.bodyBorderColor,
+            },
+          ]
+        : []),
+      ...(order.quantity
+        ? [
+            {
+              text: order.quantity,
+              textShort: order.quantityShort || undefined,
+              backgroundColor: order.quantityBackgroundColor,
+              textColor: order.quantityTextColor,
+              borderColor: order.quantityBorderColor,
+            },
+          ]
+        : []),
     ],
-    buttons: order.cancellable ? [{
-      type: 'cancel' as const,
-      icon: '×',
-      backgroundColor: order.cancelButtonBackgroundColor,
-      iconColor: order.cancelButtonIconColor,
-      borderColor: order.cancelButtonBorderColor,
-      tooltip: order.cancelTooltip,
-    }] : [],
+    buttons: order.cancellable
+      ? [
+          {
+            type: 'cancel' as const,
+            icon: '×',
+            backgroundColor: order.cancelButtonBackgroundColor,
+            iconColor: order.cancelButtonIconColor,
+            borderColor: order.cancelButtonBorderColor,
+            tooltip: order.cancelTooltip,
+          },
+        ]
+      : [],
   };
 
   return {
@@ -115,66 +154,94 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
     offsetPercent: position.lineLength,
     segments: [
       // Direction (Long/Short)
-      ...(position.text ? [{
-        text: position.text,
-        textShort: position.textShort || undefined,
-        backgroundColor: position.bodyBackgroundColor,
-        textColor: position.bodyTextColor,
-        borderColor: position.bodyBorderColor,
-      }] : []),
+      ...(position.text
+        ? [
+            {
+              text: position.text,
+              textShort: position.textShort || undefined,
+              backgroundColor: position.bodyBackgroundColor,
+              textColor: position.bodyTextColor,
+              borderColor: position.bodyBorderColor,
+            },
+          ]
+        : []),
       // Size/Quantity
-      ...(position.quantity ? [{
-        text: position.quantity,
-        textShort: position.quantityShort || undefined,
-        backgroundColor: position.quantityBackgroundColor,
-        textColor: position.quantityTextColor,
-        borderColor: position.quantityBorderColor,
-      }] : []),
+      ...(position.quantity
+        ? [
+            {
+              text: position.quantity,
+              textShort: position.quantityShort || undefined,
+              backgroundColor: position.quantityBackgroundColor,
+              textColor: position.quantityTextColor,
+              borderColor: position.quantityBorderColor,
+            },
+          ]
+        : []),
       // PnL
-      ...(position.pnl ? [{
-        text: position.pnl,
-        textShort: position.pnlShort || undefined,
-        backgroundColor: position.bodyBackgroundColor,
-        textColor: pnlTextColor,
-        borderColor: position.bodyBorderColor,
-      }] : []),
+      ...(position.pnl
+        ? [
+            {
+              text: position.pnl,
+              textShort: position.pnlShort || undefined,
+              backgroundColor: position.bodyBackgroundColor,
+              textColor: pnlTextColor,
+              borderColor: position.bodyBorderColor,
+            },
+          ]
+        : []),
     ],
     buttons: [
       // TP/SL bracket buttons (shown when brackets are enabled for this position)
       // These are positioned first (left side) for drag accessibility
-      ...(position.brackets !== null ? [{
-        type: 'tp' as const,
-        icon: 'TP',
-        backgroundColor: position.bodyBackgroundColor, // Match position label
-        iconColor: '#22c55e', // Green text
-        borderColor: '#22c55e', // Green border
-        tooltip: 'Drag to set Take Profit',
-      }] : []),
-      ...(position.brackets !== null ? [{
-        type: 'sl' as const,
-        icon: 'SL',
-        backgroundColor: position.bodyBackgroundColor, // Match position label
-        iconColor: '#f97316', // Orange text
-        borderColor: '#f97316', // Orange border
-        tooltip: 'Drag to set Stop Loss',
-      }] : []),
+      ...(position.brackets !== null
+        ? [
+            {
+              type: 'tp' as const,
+              icon: 'TP',
+              backgroundColor: position.bodyBackgroundColor, // Match position label
+              iconColor: '#22c55e', // Green text
+              borderColor: '#22c55e', // Green border
+              tooltip: 'Drag to set Take Profit',
+            },
+          ]
+        : []),
+      ...(position.brackets !== null
+        ? [
+            {
+              type: 'sl' as const,
+              icon: 'SL',
+              backgroundColor: position.bodyBackgroundColor, // Match position label
+              iconColor: '#f97316', // Orange text
+              borderColor: '#f97316', // Orange border
+              tooltip: 'Drag to set Stop Loss',
+            },
+          ]
+        : []),
       // Only show reverse button if onReverse callback was provided
-      ...(position.reversible ? [{
-        type: 'reverse' as const,
-        icon: '↩',
-        backgroundColor: position.reverseButtonBackgroundColor,
-        iconColor: position.reverseButtonIconColor,
-        borderColor: position.reverseButtonBorderColor,
-      }] : []),
+      ...(position.reversible
+        ? [
+            {
+              type: 'reverse' as const,
+              icon: '↩',
+              backgroundColor: position.reverseButtonBackgroundColor,
+              iconColor: position.reverseButtonIconColor,
+              borderColor: position.reverseButtonBorderColor,
+            },
+          ]
+        : []),
       // Only show close button if onClose callback was provided
-      ...(position.closeable ? [{
-        type: 'close' as const,
-        icon: '×',
-        backgroundColor: position.closeButtonBackgroundColor,
-        iconColor: position.closeButtonIconColor,
-        borderColor: position.closeButtonBorderColor,
-        tooltip: position.closeTooltip,
-      }] : []),
+      ...(position.closeable
+        ? [
+            {
+              type: 'close' as const,
+              icon: '×',
+              backgroundColor: position.closeButtonBackgroundColor,
+              iconColor: position.closeButtonIconColor,
+              borderColor: position.closeButtonBorderColor,
+              tooltip: position.closeTooltip,
+            },
+          ]
+        : []),
     ],
   };
 
@@ -218,7 +285,7 @@ function positionToBracketLines(position: PositionLineRenderData, formatPrice: (
       id: `${position.id}-tp`,
       price: brackets.takeProfit,
       lineStyle: 'dashed',
-      color: '#22c55e',  // Green for TP
+      color: '#22c55e', // Green for TP
       type: 'price',
       lineLength: 100,
       extendLeft: true,
@@ -239,7 +306,7 @@ function positionToBracketLines(position: PositionLineRenderData, formatPrice: (
       id: `${position.id}-sl`,
       price: brackets.stopLoss,
       lineStyle: 'dashed',
-      color: '#f97316',  // Orange for SL
+      color: '#f97316', // Orange for SL
       type: 'price',
       lineLength: 100,
       extendLeft: true,
@@ -257,9 +324,6 @@ function positionToBracketLines(position: PositionLineRenderData, formatPrice: (
   return bracketLines;
 }
 
-import type { PlotOutput } from '@tealstreet/tealscript';
-import type { IndicatorPaneInfo } from './components/ChartContainer';
-
 /**
  * Convert legacy PaneLayout to UnifiedPaneLayout
  */
@@ -268,14 +332,16 @@ function convertToUnifiedLayout(paneLayout?: PaneLayout): UnifiedPaneLayout {
 
   if (!paneLayout) {
     return {
-      panes: [{
-        id: 'main',
-        type: 'main',
-        heightRatio: 1.0,
-        yMin: 0,
-        yMax: 0,
-        fixedRange: false,
-      }],
+      panes: [
+        {
+          id: 'main',
+          type: 'main',
+          heightRatio: 1.0,
+          yMin: 0,
+          yMax: 0,
+          fixedRange: false,
+        },
+      ],
       timeAxisHeight,
     };
   }
@@ -377,10 +443,13 @@ export const Tealchart: React.FC<TealchartProps> = ({
   const rendererRef = useRef<TealchartRenderer | null>(null);
 
   // Merge custom margins with defaults (memoized to prevent effect re-runs)
-  const margins: ChartMargins = useMemo(() => ({
-    ...DEFAULT_MARGINS,
-    ...marginsProp,
-  }), [marginsProp?.top, marginsProp?.right, marginsProp?.bottom, marginsProp?.left]);
+  const margins: ChartMargins = useMemo(
+    () => ({
+      ...DEFAULT_MARGINS,
+      ...marginsProp,
+    }),
+    [marginsProp?.top, marginsProp?.right, marginsProp?.bottom, marginsProp?.left],
+  );
 
   // For imperative updates
   const barsRef = useRef<Bar[]>(bars);
@@ -450,9 +519,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
   }, []);
 
   // Viewport state
-  const [viewport, setViewport] = useState<Viewport>(() =>
-    TealchartRenderer.calculateViewport(bars)
-  );
+  const [viewport, setViewport] = useState<Viewport>(() => TealchartRenderer.calculateViewport(bars));
 
   // Cursor state (needs to be state to trigger re-render)
   const [cursor, setCursor] = useState<string>('crosshair');
@@ -523,15 +590,17 @@ export const Tealchart: React.FC<TealchartProps> = ({
   // Note: Only track IDs, not prices - price changes don't affect hover state
   // (pending mechanism handles visual position during price updates)
   const currentFingerprint = useMemo(() => {
-    const orderIds = (orderLines || []).map(o => o.id).sort();
-    const posIds = (positionLines || []).map(p => p.id).sort();
+    const orderIds = (orderLines || []).map((o) => o.id).sort();
+    const posIds = (positionLines || []).map((p) => p.id).sort();
     return `${orderIds.length + posIds.length}:${[...orderIds, ...posIds].join(',')}`;
   }, [orderLines, positionLines]);
 
   // Reset cursor if interactive lines changed while hovering
-  if (prevInteractiveLinesFingerprintRef.current !== '' &&
-      prevInteractiveLinesFingerprintRef.current !== currentFingerprint &&
-      isOverKonvaElementRef.current) {
+  if (
+    prevInteractiveLinesFingerprintRef.current !== '' &&
+    prevInteractiveLinesFingerprintRef.current !== currentFingerprint &&
+    isOverKonvaElementRef.current
+  ) {
     isOverKonvaElementRef.current = false;
     setCursor('crosshair');
   }
@@ -539,7 +608,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
 
   // Clear pending orders for orders that no longer exist (case 2: non-atomic exchange updates)
   // When an order is removed, the drag is effectively complete - no need to wait
-  const currentOrderIds = new Set((orderLines || []).map(o => o.id));
+  const currentOrderIds = new Set((orderLines || []).map((o) => o.id));
   for (const [orderId, pending] of pendingOrdersRef.current) {
     if (!currentOrderIds.has(orderId)) {
       clearTimeout(pending.timeoutId);
@@ -550,7 +619,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
   // Clear pending orders when orderLines price changes from original (case 1: atomic updates)
   // Any price change indicates the update completed (exchange may round to tick size)
   for (const [orderId, pending] of pendingOrdersRef.current) {
-    const order = (orderLines || []).find(o => o.id === orderId);
+    const order = (orderLines || []).find((o) => o.id === orderId);
     if (order && Math.abs(order.price - pending.originalPrice) > 0.0000001) {
       // Order price changed from original - update is complete
       clearTimeout(pending.timeoutId);
@@ -596,7 +665,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
         // For orders with pending updates, use pendingPrice to prevent snap-back on drag release
         // For lines with renderLineOnCanvas (like last-trade), use latest bar price from ref
         const allPriceLines: PriceLine[] = [
-          ...(priceLinesRef.current?.map(p => {
+          ...(priceLinesRef.current?.map((p) => {
             // For high-speed lines, override price from barsRef to stay in sync with candles
             if (p.renderLineOnCanvas && p.id === 'last-trade' && latestBar) {
               const isUp = latestBar.close >= latestBar.open;
@@ -605,8 +674,8 @@ export const Tealchart: React.FC<TealchartProps> = ({
                 price: latestBar.close,
                 // Update color based on current bar direction
                 color: isUp
-                  ? (rendererRef.current?.getOptions()?.upColor || '#26a69a')
-                  : (rendererRef.current?.getOptions()?.downColor || '#ef5350'),
+                  ? rendererRef.current?.getOptions()?.upColor || '#26a69a'
+                  : rendererRef.current?.getOptions()?.downColor || '#ef5350',
                 label: {
                   ...p.label,
                   primaryText: formatPrice(latestBar.close),
@@ -617,7 +686,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
             }
             return { ...p, priority: p.priority ?? 100 };
           }) || []),
-          ...(orderLinesRef.current?.map(o => {
+          ...(orderLinesRef.current?.map((o) => {
             const pending = pendingOrdersRef.current.get(o.id);
             if (pending) {
               // Use pending price to keep line at dragged position until update completes
@@ -625,15 +694,13 @@ export const Tealchart: React.FC<TealchartProps> = ({
             }
             return orderLineToPriceLine(o, formatPrice);
           }) || []),
-          ...(positionLinesRef.current?.map(p => positionLineToPriceLine(p, formatPrice)) || []),
+          ...(positionLinesRef.current?.map((p) => positionLineToPriceLine(p, formatPrice)) || []),
           // Add bracket lines (TP/SL) for positions with active brackets
-          ...(positionLinesRef.current?.flatMap(p => positionToBracketLines(p, formatPrice)) || []),
+          ...(positionLinesRef.current?.flatMap((p) => positionToBracketLines(p, formatPrice)) || []),
         ];
 
         // Filter out order/position lines for canvas - Konva handles these interactively
-        const canvasPriceLines = allPriceLines.filter(
-          line => line.type !== 'order' && line.type !== 'position'
-        );
+        const canvasPriceLines = allPriceLines.filter((line) => line.type !== 'order' && line.type !== 'position');
 
         // Crosshair price lines are now created by the renderer after auto-scaling
         // This ensures correct Y-axis values for indicator panes
@@ -644,7 +711,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
         // Apply pane Y-axis overrides for indicator panes that have been manually zoomed
         const layout: UnifiedPaneLayout = {
           ...baseLayout,
-          panes: baseLayout.panes.map(pane => {
+          panes: baseLayout.panes.map((pane) => {
             const override = paneYOverridesRef.current.get(pane.id);
             if (override) {
               return { ...pane, yMin: override.yMin, yMax: override.yMax, fixedRange: true };
@@ -678,7 +745,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
           plotsRef.current,
           indicatorPaneInfoRef.current,
           crosshair,
-          plotStyleOverridesRef.current
+          plotStyleOverridesRef.current,
         );
 
         // Draw crosshair time label on canvas (vertical + horizontal lines drawn by Konva)
@@ -695,7 +762,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
         // Compute label bounds for ALL price lines (including order/position/crosshair) for Konva layer
         // Use dirty checking to skip expensive recomputation when nothing changed
         // Crosshair is passed directly to avoid duplicate pane computation
-        const linePrices = allPriceLines.map(l => l.price.toFixed(6)).join(',');
+        const linePrices = allPriceLines.map((l) => l.price.toFixed(6)).join(',');
         const boundsKey = `${vp.priceMin.toFixed(4)},${vp.priceMax.toFixed(4)}|${linePrices}|${Math.round(crosshair.y)}`;
         const now = Date.now();
         const isDragging = interactionRef.current.isDragging;
@@ -711,7 +778,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
             viewportRef.current,
             layout,
             plotsRef.current,
-            crosshair.visible ? { y: crosshair.y, visible: true, color: crosshairColor } : undefined
+            crosshair.visible ? { y: crosshair.y, visible: true, color: crosshairColor } : undefined,
           );
           labelBoundsRef.current = computedBounds;
           lastLabelBoundsKeyRef.current = boundsKey;
@@ -720,9 +787,9 @@ export const Tealchart: React.FC<TealchartProps> = ({
           // Trigger re-render for Konva layer
           // Use flushSync during drag for immediate updates (no batching delay)
           if (isDragging) {
-            flushSync(() => setLabelBoundsVersion(v => v + 1));
+            flushSync(() => setLabelBoundsVersion((v) => v + 1));
           } else {
-            setLabelBoundsVersion(v => v + 1);
+            setLabelBoundsVersion((v) => v + 1);
           }
         }
       }
@@ -748,53 +815,62 @@ export const Tealchart: React.FC<TealchartProps> = ({
   }, [onBarsUpdateRef, scheduleRender]);
 
   // Check if position is over price axis (right margin area)
-  const isOverPriceAxis = useCallback((x: number): boolean => {
-    return x > width - margins.right;
-  }, [width, margins.right]);
+  const isOverPriceAxis = useCallback(
+    (x: number): boolean => {
+      return x > width - margins.right;
+    },
+    [width, margins.right],
+  );
 
   // Check if position is in a dead zone (top bar or time axis - areas where crosshair shouldn't show)
-  const isInDeadZone = useCallback((x: number, y: number): boolean => {
-    // Top bar dead zone
-    if (y < margins.top) return true;
-    // Time axis dead zone (bottom)
-    if (y > height - margins.bottom) return true;
-    // Price axis is handled separately (allows Y-axis dragging)
-    return false;
-  }, [margins.top, margins.bottom, height]);
+  const isInDeadZone = useCallback(
+    (x: number, y: number): boolean => {
+      // Top bar dead zone
+      if (y < margins.top) return true;
+      // Time axis dead zone (bottom)
+      if (y > height - margins.bottom) return true;
+      // Price axis is handled separately (allows Y-axis dragging)
+      return false;
+    },
+    [margins.top, margins.bottom, height],
+  );
 
   // Get the pane at a given Y coordinate
-  const getPaneAtY = useCallback((y: number): { paneId: string; pane: ChartPane; yMin: number; yMax: number } | null => {
-    const layout = unifiedPaneLayoutRef.current || convertToUnifiedLayout(paneLayoutRef.current);
-    const timeAxisHeight = layout.timeAxisHeight;
-    const availableHeight = height - timeAxisHeight;
+  const getPaneAtY = useCallback(
+    (y: number): { paneId: string; pane: ChartPane; yMin: number; yMax: number } | null => {
+      const layout = unifiedPaneLayoutRef.current || convertToUnifiedLayout(paneLayoutRef.current);
+      const timeAxisHeight = layout.timeAxisHeight;
+      const availableHeight = height - timeAxisHeight;
 
-    let currentTop = 0;
-    for (const pane of layout.panes) {
-      const paneHeight = availableHeight * pane.heightRatio;
-      const paneBottom = currentTop + paneHeight;
+      let currentTop = 0;
+      for (const pane of layout.panes) {
+        const paneHeight = availableHeight * pane.heightRatio;
+        const paneBottom = currentTop + paneHeight;
 
-      if (y >= currentTop && y < paneBottom) {
-        // Check for Y-axis override
-        const override = paneYOverridesRef.current.get(pane.id);
-        const yMin = override?.yMin ?? pane.yMin;
-        const yMax = override?.yMax ?? pane.yMax;
+        if (y >= currentTop && y < paneBottom) {
+          // Check for Y-axis override
+          const override = paneYOverridesRef.current.get(pane.id);
+          const yMin = override?.yMin ?? pane.yMin;
+          const yMax = override?.yMax ?? pane.yMax;
 
-        // For main pane, use viewport prices if not overridden
-        if (pane.type === 'main' && !override && viewportRef.current) {
-          return {
-            paneId: pane.id,
-            pane,
-            yMin: viewportRef.current.priceMin,
-            yMax: viewportRef.current.priceMax,
-          };
+          // For main pane, use viewport prices if not overridden
+          if (pane.type === 'main' && !override && viewportRef.current) {
+            return {
+              paneId: pane.id,
+              pane,
+              yMin: viewportRef.current.priceMin,
+              yMax: viewportRef.current.priceMax,
+            };
+          }
+
+          return { paneId: pane.id, pane, yMin, yMax };
         }
-
-        return { paneId: pane.id, pane, yMin, yMax };
+        currentTop = paneBottom;
       }
-      currentTop = paneBottom;
-    }
-    return null;
-  }, [height]);
+      return null;
+    },
+    [height],
+  );
 
   // Get chart dimensions
   const getChartDimensions = useCallback(() => {
@@ -804,48 +880,57 @@ export const Tealchart: React.FC<TealchartProps> = ({
   }, [width, height, margins]);
 
   // Check if position is in reset button hover zone (lower center area) - for mouse
-  const isInResetButtonZone = useCallback((x: number, y: number): boolean => {
-    const centerX = width / 2;
-    const bottomY = height - margins.bottom - 60; // 60px from bottom of chart area
-    const zoneRadius = 50; // Hover zone radius
-    const dx = x - centerX;
-    const dy = y - bottomY;
-    return Math.sqrt(dx * dx + dy * dy) < zoneRadius;
-  }, [width, height, margins.bottom]);
+  const isInResetButtonZone = useCallback(
+    (x: number, y: number): boolean => {
+      const centerX = width / 2;
+      const bottomY = height - margins.bottom - 60; // 60px from bottom of chart area
+      const zoneRadius = 50; // Hover zone radius
+      const dx = x - centerX;
+      const dy = y - bottomY;
+      return Math.sqrt(dx * dx + dy * dy) < zoneRadius;
+    },
+    [width, height, margins.bottom],
+  );
 
   // Check if position is in mobile reset button toggle zone (bottom 150px of canvas)
-  const isInMobileResetZone = useCallback((y: number): boolean => {
-    return y > height - 150;
-  }, [height]);
+  const isInMobileResetZone = useCallback(
+    (y: number): boolean => {
+      return y > height - 150;
+    },
+    [height],
+  );
 
   // Snap X position to nearest bar interval (for crosshair)
   // Snaps to grid based on bar interval, even in empty space
-  const snapToBarCenter = useCallback((x: number): number => {
-    const bars = barsRef.current;
-    const currentViewport = viewportRef.current;
-    if (bars.length < 2 || !currentViewport) return x;
+  const snapToBarCenter = useCallback(
+    (x: number): number => {
+      const bars = barsRef.current;
+      const currentViewport = viewportRef.current;
+      if (bars.length < 2 || !currentViewport) return x;
 
-    const { chartWidth } = getChartDimensions();
-    const viewportTimeRange = currentViewport.endTime - currentViewport.startTime;
+      const { chartWidth } = getChartDimensions();
+      const viewportTimeRange = currentViewport.endTime - currentViewport.startTime;
 
-    // Get bar interval from actual bars
-    const barInterval = bars[1].time - bars[0].time;
+      // Get bar interval from actual bars
+      const barInterval = bars[1].time - bars[0].time;
 
-    // Convert X to time
-    const ratio = (x - margins.left) / chartWidth;
-    const time = currentViewport.startTime + ratio * viewportTimeRange;
+      // Convert X to time
+      const ratio = (x - margins.left) / chartWidth;
+      const time = currentViewport.startTime + ratio * viewportTimeRange;
 
-    // Round time to nearest bar interval boundary
-    // Use the first bar's time as the reference point for the grid
-    const firstBarTime = bars[0].time;
-    const timeSinceFirst = time - firstBarTime;
-    const intervalCount = Math.round(timeSinceFirst / barInterval);
-    const snappedTime = firstBarTime + intervalCount * barInterval;
+      // Round time to nearest bar interval boundary
+      // Use the first bar's time as the reference point for the grid
+      const firstBarTime = bars[0].time;
+      const timeSinceFirst = time - firstBarTime;
+      const intervalCount = Math.round(timeSinceFirst / barInterval);
+      const snappedTime = firstBarTime + intervalCount * barInterval;
 
-    // Convert snapped time back to X
-    const snappedRatio = (snappedTime - currentViewport.startTime) / viewportTimeRange;
-    return margins.left + snappedRatio * chartWidth;
-  }, [getChartDimensions, margins.left]);
+      // Convert snapped time back to X
+      const snappedRatio = (snappedTime - currentViewport.startTime) / viewportTimeRange;
+      return margins.left + snappedRatio * chartWidth;
+    },
+    [getChartDimensions, margins.left],
+  );
 
   // Reset viewport to initial state
   const resetViewport = useCallback(() => {
@@ -863,69 +948,93 @@ export const Tealchart: React.FC<TealchartProps> = ({
 
   // Handle order move from Konva drag
   // Uses TradingView pattern: calls the stateful onMove callback registered on the order line adapter
-  const handleOrderMove = useCallback((orderId: string, newPrice: number) => {
-    // Get the current order to find original price
-    const order = orderLinesRef.current?.find(o => o.id === orderId);
-    if (!order) return;
+  const handleOrderMove = useCallback(
+    (orderId: string, newPrice: number) => {
+      // Get the current order to find original price
+      const order = orderLinesRef.current?.find((o) => o.id === orderId);
+      if (!order) return;
 
-    // Create pending update for optimistic UI
-    const pending: PendingOrderUpdate = {
-      orderId,
-      pendingPrice: newPrice,
-      originalPrice: order.price,
-      startTime: Date.now(),
-      timeoutId: setTimeout(() => {
-        // Clear pending state after timeout
-        pendingOrdersRef.current.delete(orderId);
-        setPendingOrdersVersion(v => v + 1);
-      }, 5000),
-    };
+      // Create pending update for optimistic UI
+      const pending: PendingOrderUpdate = {
+        orderId,
+        pendingPrice: newPrice,
+        originalPrice: order.price,
+        startTime: Date.now(),
+        timeoutId: setTimeout(() => {
+          // Clear pending state after timeout
+          pendingOrdersRef.current.delete(orderId);
+          setPendingOrdersVersion((v) => v + 1);
+        }, 5000),
+      };
 
-    // Clear any existing pending for this order
-    const existing = pendingOrdersRef.current.get(orderId);
-    if (existing) {
-      clearTimeout(existing.timeoutId);
-    }
+      // Clear any existing pending for this order
+      const existing = pendingOrdersRef.current.get(orderId);
+      if (existing) {
+        clearTimeout(existing.timeoutId);
+      }
 
-    pendingOrdersRef.current.set(orderId, pending);
-    setPendingOrdersVersion(v => v + 1);
+      pendingOrdersRef.current.set(orderId, pending);
+      setPendingOrdersVersion((v) => v + 1);
 
-    // Call the stateful onMove callback on the order line adapter
-    chartApi?.triggerOrderMove(orderId, newPrice);
-  }, [chartApi]);
+      // Call the stateful onMove callback on the order line adapter
+      chartApi?.triggerOrderMove(orderId, newPrice);
+    },
+    [chartApi],
+  );
 
   // Handle order cancel from Konva button click
   // Uses TradingView pattern: calls the stateful onCancel callback registered on the order line adapter
-  const handleOrderCancel = useCallback((orderId: string) => {
-    chartApi?.triggerOrderCancel(orderId);
-  }, [chartApi]);
+  const handleOrderCancel = useCallback(
+    (orderId: string) => {
+      chartApi?.triggerOrderCancel(orderId);
+    },
+    [chartApi],
+  );
 
   // Handle position close from Konva button click
   // Uses TradingView pattern: calls the stateful onClose callback registered on the position line adapter
-  const handlePositionClose = useCallback((positionId: string) => {
-    chartApi?.triggerPositionClose(positionId);
-  }, [chartApi]);
+  const handlePositionClose = useCallback(
+    (positionId: string) => {
+      chartApi?.triggerPositionClose(positionId);
+    },
+    [chartApi],
+  );
 
-  const handlePositionReverse = useCallback((positionId: string) => {
-    chartApi?.triggerPositionReverse(positionId);
-  }, [chartApi]);
+  const handlePositionReverse = useCallback(
+    (positionId: string) => {
+      chartApi?.triggerPositionReverse(positionId);
+    },
+    [chartApi],
+  );
 
   // TEALSTREET: Bracket TP/SL button handlers
-  const handleTPClick = useCallback((positionId: string) => {
-    chartApi?.triggerTPClick(positionId);
-  }, [chartApi]);
+  const handleTPClick = useCallback(
+    (positionId: string) => {
+      chartApi?.triggerTPClick(positionId);
+    },
+    [chartApi],
+  );
 
-  const handleSLClick = useCallback((positionId: string) => {
-    chartApi?.triggerSLClick(positionId);
-  }, [chartApi]);
+  const handleSLClick = useCallback(
+    (positionId: string) => {
+      chartApi?.triggerSLClick(positionId);
+    },
+    [chartApi],
+  );
 
-  const handleTPDragEnd = useCallback((positionId: string, price: number, partialPercent?: number) => {
-    chartApi?.triggerTPMoveEnd(positionId, price, partialPercent);
-  }, [chartApi]);
+  const handleTPDragEnd = useCallback(
+    (positionId: string, price: number, partialPercent?: number) => {
+      chartApi?.triggerTPMoveEnd(positionId, price, partialPercent);
+    },
+    [chartApi],
+  );
 
-  const handleSLDragEnd = useCallback((positionId: string, price: number, partialPercent?: number) => {
-    chartApi?.triggerSLMoveEnd(positionId, price, partialPercent);
-  }, [chartApi]);
+  const handleSLDragEnd = useCallback(
+    (positionId: string, price: number, partialPercent?: number) => {
+      chartApi?.triggerSLMoveEnd(positionId, price, partialPercent);
+    },
+    [chartApi],
+  );
 
   // Handle cursor change from Konva layer (hover over interactive elements)
   const handleKonvaCursorChange = useCallback((newCursor: 'default' | 'pointer' | 'grab' | 'grabbing') => {
@@ -942,34 +1051,40 @@ export const Tealchart: React.FC<TealchartProps> = ({
 
   // Close context menu
   const closeContextMenu = useCallback(() => {
-    setContextMenuState(prev => ({ ...prev, visible: false }));
+    setContextMenuState((prev) => ({ ...prev, visible: false }));
   }, []);
 
   // Open context menu at given position with price
-  const openContextMenu = useCallback((price: number, screenX: number, screenY: number) => {
-    if (!onContextMenu) return;
+  const openContextMenu = useCallback(
+    (price: number, screenX: number, screenY: number) => {
+      if (!onContextMenu) return;
 
-    // Get unixTime from current crosshair position or use current time
-    const unixTime = crosshairRef.current.time || Date.now();
+      // Get unixTime from current crosshair position or use current time
+      const unixTime = crosshairRef.current.time || Date.now();
 
-    // Get menu items from callback
-    const items = onContextMenu(unixTime, price);
+      // Get menu items from callback
+      const items = onContextMenu(unixTime, price);
 
-    // Don't show if no items
-    if (!items || items.length === 0) return;
+      // Don't show if no items
+      if (!items || items.length === 0) return;
 
-    setContextMenuState({
-      visible: true,
-      x: screenX,
-      y: screenY,
-      items,
-    });
-  }, [onContextMenu]);
+      setContextMenuState({
+        visible: true,
+        x: screenX,
+        y: screenY,
+        items,
+      });
+    },
+    [onContextMenu],
+  );
 
   // Handle context menu button click from PriceLineLayer (+ button)
-  const handleContextMenuButtonClick = useCallback((price: number, screenX: number, screenY: number) => {
-    openContextMenu(price, screenX, screenY);
-  }, [openContextMenu]);
+  const handleContextMenuButtonClick = useCallback(
+    (price: number, screenX: number, screenY: number) => {
+      openContextMenu(price, screenX, screenY);
+    },
+    [openContextMenu],
+  );
 
   // Coordinate conversion functions for Konva layer
   // Uses pane-aware methods that match the canvas coordinate system (main pane starts at Y=0)
@@ -1051,7 +1166,8 @@ export const Tealchart: React.FC<TealchartProps> = ({
     // Recalculate viewport if:
     // 1. This is the first load (no previous time range)
     // 2. The time range has changed significantly (different interval or symbol)
-    const needsViewportRecalc = !lastTimeRange ||
+    const needsViewportRecalc =
+      !lastTimeRange ||
       Math.abs(newTimeRange.start - lastTimeRange.start) > 60000 || // More than 1 minute difference
       Math.abs(newTimeRange.end - lastTimeRange.end) > 60000;
 
@@ -1096,82 +1212,85 @@ export const Tealchart: React.FC<TealchartProps> = ({
   }, [scheduleRender]);
 
   // Window-level mouse move handler for drag continuation off canvas
-  const handleWindowMouseMove = useCallback((e: MouseEvent) => {
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
+  const handleWindowMouseMove = useCallback(
+    (e: MouseEvent) => {
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (!rect) return;
 
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const interaction = interactionRef.current;
-    const { chartHeight } = getChartDimensions();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const interaction = interactionRef.current;
+      const { chartHeight } = getChartDimensions();
 
-    if (interaction.isDragging && interaction.dragStartViewport) {
-      const dx = x - interaction.dragStartX;
-      const dy = y - interaction.dragStartY;
+      if (interaction.isDragging && interaction.dragStartViewport) {
+        const dx = x - interaction.dragStartX;
+        const dy = y - interaction.dragStartY;
 
-      if (interaction.dragMode === 'pan') {
-        // Pan in both X and Y directions
-        const timeRange = interaction.dragStartViewport.endTime - interaction.dragStartViewport.startTime;
-        const priceRange = interaction.dragStartViewport.priceMax - interaction.dragStartViewport.priceMin;
+        if (interaction.dragMode === 'pan') {
+          // Pan in both X and Y directions
+          const timeRange = interaction.dragStartViewport.endTime - interaction.dragStartViewport.startTime;
+          const priceRange = interaction.dragStartViewport.priceMax - interaction.dragStartViewport.priceMin;
 
-        const pixelsPerMs = width / timeRange;
-        const pixelsPerPrice = chartHeight / priceRange;
+          const pixelsPerMs = width / timeRange;
+          const pixelsPerPrice = chartHeight / priceRange;
 
-        const timeDelta = -dx / pixelsPerMs;
-        const priceDelta = dy / pixelsPerPrice; // Inverted because Y increases downward
+          const timeDelta = -dx / pixelsPerMs;
+          const priceDelta = dy / pixelsPerPrice; // Inverted because Y increases downward
 
-        const newViewport: Viewport = {
-          startTime: interaction.dragStartViewport.startTime + timeDelta,
-          endTime: interaction.dragStartViewport.endTime + timeDelta,
-          priceMin: interaction.dragStartViewport.priceMin + priceDelta,
-          priceMax: interaction.dragStartViewport.priceMax + priceDelta,
-        };
-
-        viewportRef.current = newViewport;
-        scheduleRender();
-
-        // Request more bars if panning to edges
-        const currentBars = barsRef.current;
-        if (timeDelta < 0 && currentBars.length > 0 && newViewport.startTime < currentBars[0].time) {
-          onRequestMoreBars?.('left');
-        }
-      } else if (interaction.dragMode === 'priceAxisZoom' && interaction.dragStartPaneYRange) {
-        // Price axis zoom: drag down = larger range (zoom out), drag up = smaller range (zoom in)
-        // Use exponential scaling for natural feel and to prevent negative/zero ranges
-        const startRange = interaction.dragStartPaneYRange;
-        const yRange = startRange.yMax - startRange.yMin;
-        const dragRatio = dy / chartHeight; // -1 to +1 for full height drag
-        // Exponential zoom: e^(dragRatio * 2) gives smooth scaling
-        // dy > 0 (drag down) = zoom out (larger range), dy < 0 (drag up) = zoom in (smaller range)
-        const zoomFactor = Math.exp(dragRatio * 2);
-        const newYRange = yRange * zoomFactor;
-
-        // Zoom centered on the middle of the current Y range
-        const yCenter = (startRange.yMax + startRange.yMin) / 2;
-        const newYMin = yCenter - newYRange / 2;
-        const newYMax = yCenter + newYRange / 2;
-
-        // Check if we're zooming the main pane or an indicator pane
-        if (interaction.draggedPaneId === 'main') {
-          // Main pane: update viewport
           const newViewport: Viewport = {
-            ...interaction.dragStartViewport,
-            priceMin: newYMin,
-            priceMax: newYMax,
+            startTime: interaction.dragStartViewport.startTime + timeDelta,
+            endTime: interaction.dragStartViewport.endTime + timeDelta,
+            priceMin: interaction.dragStartViewport.priceMin + priceDelta,
+            priceMax: interaction.dragStartViewport.priceMax + priceDelta,
           };
-          viewportRef.current = newViewport;
-        } else if (interaction.draggedPaneId) {
-          // Indicator pane: update pane Y override
-          paneYOverridesRef.current.set(interaction.draggedPaneId, {
-            yMin: newYMin,
-            yMax: newYMax,
-          });
-        }
 
-        scheduleRender();
+          viewportRef.current = newViewport;
+          scheduleRender();
+
+          // Request more bars if panning to edges
+          const currentBars = barsRef.current;
+          if (timeDelta < 0 && currentBars.length > 0 && newViewport.startTime < currentBars[0].time) {
+            onRequestMoreBars?.('left');
+          }
+        } else if (interaction.dragMode === 'priceAxisZoom' && interaction.dragStartPaneYRange) {
+          // Price axis zoom: drag down = larger range (zoom out), drag up = smaller range (zoom in)
+          // Use exponential scaling for natural feel and to prevent negative/zero ranges
+          const startRange = interaction.dragStartPaneYRange;
+          const yRange = startRange.yMax - startRange.yMin;
+          const dragRatio = dy / chartHeight; // -1 to +1 for full height drag
+          // Exponential zoom: e^(dragRatio * 2) gives smooth scaling
+          // dy > 0 (drag down) = zoom out (larger range), dy < 0 (drag up) = zoom in (smaller range)
+          const zoomFactor = Math.exp(dragRatio * 2);
+          const newYRange = yRange * zoomFactor;
+
+          // Zoom centered on the middle of the current Y range
+          const yCenter = (startRange.yMax + startRange.yMin) / 2;
+          const newYMin = yCenter - newYRange / 2;
+          const newYMax = yCenter + newYRange / 2;
+
+          // Check if we're zooming the main pane or an indicator pane
+          if (interaction.draggedPaneId === 'main') {
+            // Main pane: update viewport
+            const newViewport: Viewport = {
+              ...interaction.dragStartViewport,
+              priceMin: newYMin,
+              priceMax: newYMax,
+            };
+            viewportRef.current = newViewport;
+          } else if (interaction.draggedPaneId) {
+            // Indicator pane: update pane Y override
+            paneYOverridesRef.current.set(interaction.draggedPaneId, {
+              yMin: newYMin,
+              yMax: newYMax,
+            });
+          }
+
+          scheduleRender();
+        }
       }
-    }
-  }, [width, getChartDimensions, scheduleRender, onRequestMoreBars]);
+    },
+    [width, getChartDimensions, scheduleRender, onRequestMoreBars],
+  );
 
   // Window-level mouse up handler for drag continuation off canvas
   const handleWindowMouseUp = useCallback(() => {
@@ -1225,114 +1344,141 @@ export const Tealchart: React.FC<TealchartProps> = ({
   }, []);
 
   // Mouse handlers for pan/zoom - attached to container for unified event handling
-  const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    // Skip if over a Konva interactive element (let Konva handle it)
-    if (isOverKonvaInteractiveElement(e.clientX, e.clientY)) {
-      return;
-    }
-
-    // Emit mouse down event for hotkey integration
-    onMouseDown?.();
-
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    // Determine drag mode based on where click started
-    const dragMode: DragMode = isOverPriceAxis(x) ? 'priceAxisZoom' : 'pan';
-
-    // For price axis zoom, detect which pane we're zooming
-    let draggedPaneId: string | null = null;
-    let dragStartPaneYRange: { yMin: number; yMax: number } | null = null;
-
-    if (dragMode === 'priceAxisZoom') {
-      const paneInfo = getPaneAtY(y);
-      if (paneInfo) {
-        draggedPaneId = paneInfo.paneId;
-        dragStartPaneYRange = { yMin: paneInfo.yMin, yMax: paneInfo.yMax };
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      // Skip if over a Konva interactive element (let Konva handle it)
+      if (isOverKonvaInteractiveElement(e.clientX, e.clientY)) {
+        return;
       }
-    }
 
-    interactionRef.current = {
-      ...interactionRef.current,
-      isDragging: true,
-      dragMode,
-      dragStartX: x,
-      dragStartY: y,
-      dragStartViewport: { ...viewport },
-      draggedPaneId,
-      dragStartPaneYRange,
-    };
+      // Emit mouse down event for hotkey integration
+      onMouseDown?.();
 
-    // Update cursor
-    setCursor(dragMode === 'priceAxisZoom' ? 'ns-resize' : 'grabbing');
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
 
-    // Attach window listeners for drag continuation off canvas
-    window.addEventListener('mousemove', handleWindowMouseMove);
-    window.addEventListener('mouseup', handleWindowMouseUp);
-  }, [viewport, isOverPriceAxis, getPaneAtY, handleWindowMouseMove, handleWindowMouseUp, onMouseDown, isOverKonvaInteractiveElement]);
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      // Determine drag mode based on where click started
+      const dragMode: DragMode = isOverPriceAxis(x) ? 'priceAxisZoom' : 'pan';
+
+      // For price axis zoom, detect which pane we're zooming
+      let draggedPaneId: string | null = null;
+      let dragStartPaneYRange: { yMin: number; yMax: number } | null = null;
+
+      if (dragMode === 'priceAxisZoom') {
+        const paneInfo = getPaneAtY(y);
+        if (paneInfo) {
+          draggedPaneId = paneInfo.paneId;
+          dragStartPaneYRange = { yMin: paneInfo.yMin, yMax: paneInfo.yMax };
+        }
+      }
+
+      interactionRef.current = {
+        ...interactionRef.current,
+        isDragging: true,
+        dragMode,
+        dragStartX: x,
+        dragStartY: y,
+        dragStartViewport: { ...viewport },
+        draggedPaneId,
+        dragStartPaneYRange,
+      };
+
+      // Update cursor
+      setCursor(dragMode === 'priceAxisZoom' ? 'ns-resize' : 'grabbing');
+
+      // Attach window listeners for drag continuation off canvas
+      window.addEventListener('mousemove', handleWindowMouseMove);
+      window.addEventListener('mouseup', handleWindowMouseUp);
+    },
+    [
+      viewport,
+      isOverPriceAxis,
+      getPaneAtY,
+      handleWindowMouseMove,
+      handleWindowMouseUp,
+      onMouseDown,
+      isOverKonvaInteractiveElement,
+    ],
+  );
 
   // Container mouse move - handles crosshair and cursor updates (drag handled by window listener)
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
 
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const interaction = interactionRef.current;
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const interaction = interactionRef.current;
 
-    // Track if over price axis for cursor
-    interactionRef.current.isOverPriceAxis = isOverPriceAxis(x);
-    interactionRef.current.hoveredX = x;
-    interactionRef.current.hoveredY = y;
+      // Track if over price axis for cursor
+      interactionRef.current.isOverPriceAxis = isOverPriceAxis(x);
+      interactionRef.current.hoveredX = x;
+      interactionRef.current.hoveredY = y;
 
-    // Check if in reset button zone
-    const inResetZone = isInResetButtonZone(x, y);
-    if (inResetZone !== showResetButton) {
-      setShowResetButton(inResetZone);
-    }
-
-    // Update crosshair position (hide when over price axis or in dead zones)
-    // Snap X to nearest bar center for vertical line
-    const inDeadZone = isInDeadZone(x, y);
-    crosshairRef.current.visible = !interactionRef.current.isOverPriceAxis && !inDeadZone;
-    crosshairRef.current.x = snapToBarCenter(x);
-    crosshairRef.current.y = y;
-
-    // Crosshair value calculation is now done by the renderer at render time
-    // This ensures correct values with auto-scaled indicator pane Y ranges
-
-    // Schedule render for crosshair update (if not dragging, which already schedules via window)
-    if (!interaction.isDragging) {
-      scheduleRender();
-      // Update cursor when not dragging AND not over Konva interactive element
-      if (!isOverKonvaElementRef.current) {
-        setCursor(interactionRef.current.isOverPriceAxis ? 'ns-resize' : 'crosshair');
+      // Check if in reset button zone
+      const inResetZone = isInResetButtonZone(x, y);
+      if (inResetZone !== showResetButton) {
+        setShowResetButton(inResetZone);
       }
-    }
-  }, [isOverPriceAxis, isInDeadZone, isInResetButtonZone, showResetButton, scheduleRender, snapToBarCenter, height, margins, renderOptions]);
 
-  const handleMouseLeave = useCallback((_e: React.MouseEvent<HTMLDivElement>) => {
-    // Only reset if not dragging (dragging continues via window listeners)
-    if (!interactionRef.current.isDragging) {
-      // Check if crosshair was visible (for instant hide via forceRender)
-      const wasVisible = crosshairRef.current.visible;
-      interactionRef.current.isOverPriceAxis = false;
-      // Hide crosshair and reset button
-      crosshairRef.current.visible = false;
-      // Also reset touch crosshair lock when leaving
-      touchCrosshairLockedRef.current = false;
-      setShowResetButton(false);
-      // Force immediate re-render for instant crosshair hide (bypasses RAF delay)
-      if (wasVisible) {
-        forceRender();
+      // Update crosshair position (hide when over price axis or in dead zones)
+      // Snap X to nearest bar center for vertical line
+      const inDeadZone = isInDeadZone(x, y);
+      crosshairRef.current.visible = !interactionRef.current.isOverPriceAxis && !inDeadZone;
+      crosshairRef.current.x = snapToBarCenter(x);
+      crosshairRef.current.y = y;
+
+      // Crosshair value calculation is now done by the renderer at render time
+      // This ensures correct values with auto-scaled indicator pane Y ranges
+
+      // Schedule render for crosshair update (if not dragging, which already schedules via window)
+      if (!interaction.isDragging) {
+        scheduleRender();
+        // Update cursor when not dragging AND not over Konva interactive element
+        if (!isOverKonvaElementRef.current) {
+          setCursor(interactionRef.current.isOverPriceAxis ? 'ns-resize' : 'crosshair');
+        }
       }
-      scheduleRender();
-      setCursor('crosshair');
-    }
-  }, [scheduleRender, forceRender]);
+    },
+    [
+      isOverPriceAxis,
+      isInDeadZone,
+      isInResetButtonZone,
+      showResetButton,
+      scheduleRender,
+      snapToBarCenter,
+      height,
+      margins,
+      renderOptions,
+    ],
+  );
+
+  const handleMouseLeave = useCallback(
+    (_e: React.MouseEvent<HTMLDivElement>) => {
+      // Only reset if not dragging (dragging continues via window listeners)
+      if (!interactionRef.current.isDragging) {
+        // Check if crosshair was visible (for instant hide via forceRender)
+        const wasVisible = crosshairRef.current.visible;
+        interactionRef.current.isOverPriceAxis = false;
+        // Hide crosshair and reset button
+        crosshairRef.current.visible = false;
+        // Also reset touch crosshair lock when leaving
+        touchCrosshairLockedRef.current = false;
+        setShowResetButton(false);
+        // Force immediate re-render for instant crosshair hide (bypasses RAF delay)
+        if (wasVisible) {
+          forceRender();
+        }
+        scheduleRender();
+        setCursor('crosshair');
+      }
+    },
+    [scheduleRender, forceRender],
+  );
 
   // Document-level mousemove listener to catch fast mouse exits
   // The container's onMouseLeave can miss events when the mouse moves quickly
@@ -1347,10 +1493,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
 
       const rect = containerRef.current.getBoundingClientRect();
       const isInside =
-        e.clientX >= rect.left &&
-        e.clientX <= rect.right &&
-        e.clientY >= rect.top &&
-        e.clientY <= rect.bottom;
+        e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
 
       if (!isInside) {
         // Mouse is outside container - hide crosshair
@@ -1592,7 +1735,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
 
               const timeDelta = -dx / pixelsPerMs;
               // Mobile Y-lock: Y panning locked by default until price axis is dragged
-              const priceDelta = touchYPanUnlockedRef.current ? (dy / pixelsPerPrice) : 0;
+              const priceDelta = touchYPanUnlockedRef.current ? dy / pixelsPerPrice : 0;
 
               const newViewport: Viewport = {
                 startTime: interaction.dragStartViewport.startTime + timeDelta,
@@ -1674,7 +1817,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
 
         // Mobile: tap in bottom 150px toggles reset button visibility
         if (isInMobileResetZone(y)) {
-          setShowResetButton(prev => {
+          setShowResetButton((prev) => {
             if (!prev) {
               // Showing button - start auto-hide timer
               startResetButtonAutoHideTimer();
@@ -1724,40 +1867,57 @@ export const Tealchart: React.FC<TealchartProps> = ({
   };
 
   // Handle right-click context menu - attached to container for unified event handling
-  const handleContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    if (!onContextMenu) return;
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      if (!onContextMenu) return;
 
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
 
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
 
-    // Don't show context menu in dead zones
-    if (isInDeadZone(x, y) || isOverPriceAxis(x)) return;
+      // Don't show context menu in dead zones
+      if (isInDeadZone(x, y) || isOverPriceAxis(x)) return;
 
-    // Only show context menu on main pane (not indicator panes)
-    const renderer = rendererRef.current;
-    if (renderer && paneLayout) {
-      const layout: UnifiedPaneLayout = {
-        panes: [
-          { id: 'main', type: 'main' as const, heightRatio: 1 - (paneLayout.indicatorPanes?.reduce((sum, p) => sum + p.heightRatio, 0) || 0), yMin: 0, yMax: 1, fixedRange: false },
-          ...(paneLayout.indicatorPanes?.map(p => ({ id: p.id, type: 'indicator' as const, heightRatio: p.heightRatio, yMin: p.yMin ?? 0, yMax: p.yMax ?? 1, fixedRange: false })) || []),
-        ],
-        timeAxisHeight: margins.bottom,
-      };
-      const computedPanes = renderer.computePanesLayout(layout, height);
-      const mainPane = computedPanes[0];
-      if (mainPane && (y < mainPane.top || y >= mainPane.bottom)) {
-        return; // Click is outside main pane
+      // Only show context menu on main pane (not indicator panes)
+      const renderer = rendererRef.current;
+      if (renderer && paneLayout) {
+        const layout: UnifiedPaneLayout = {
+          panes: [
+            {
+              id: 'main',
+              type: 'main' as const,
+              heightRatio: 1 - (paneLayout.indicatorPanes?.reduce((sum, p) => sum + p.heightRatio, 0) || 0),
+              yMin: 0,
+              yMax: 1,
+              fixedRange: false,
+            },
+            ...(paneLayout.indicatorPanes?.map((p) => ({
+              id: p.id,
+              type: 'indicator' as const,
+              heightRatio: p.heightRatio,
+              yMin: p.yMin ?? 0,
+              yMax: p.yMax ?? 1,
+              fixedRange: false,
+            })) || []),
+          ],
+          timeAxisHeight: margins.bottom,
+        };
+        const computedPanes = renderer.computePanesLayout(layout, height);
+        const mainPane = computedPanes[0];
+        if (mainPane && (y < mainPane.top || y >= mainPane.bottom)) {
+          return; // Click is outside main pane
+        }
       }
-    }
 
-    // Get price from Y coordinate
-    const price = yToPrice(y);
-    openContextMenu(price, e.clientX, e.clientY);
-  }, [onContextMenu, isInDeadZone, isOverPriceAxis, yToPrice, openContextMenu, paneLayout, height, margins.bottom]);
+      // Get price from Y coordinate
+      const price = yToPrice(y);
+      openContextMenu(price, e.clientX, e.clientY);
+    },
+    [onContextMenu, isInDeadZone, isOverPriceAxis, yToPrice, openContextMenu, paneLayout, height, margins.bottom],
+  );
 
   // Wheel handler as ref to avoid recreation on every render
   const handleWheelRef = useRef<(e: WheelEvent) => void>(null!);
@@ -1904,21 +2064,39 @@ export const Tealchart: React.FC<TealchartProps> = ({
     }
 
     // Get the unified layout (prefer direct, fall back to legacy conversion)
-    const layout: UnifiedPaneLayout = unifiedPaneLayout || (paneLayout ? {
-      panes: [
-        { id: 'main', type: 'main' as const, heightRatio: 1 - (paneLayout.indicatorPanes?.reduce((sum, p) => sum + p.heightRatio, 0) || 0), yMin: 0, yMax: 1, fixedRange: false },
-        ...(paneLayout.indicatorPanes?.map(p => ({ id: p.id, type: 'indicator' as const, heightRatio: p.heightRatio, yMin: p.yMin ?? 0, yMax: p.yMax ?? 1, fixedRange: false })) || []),
-      ],
-      timeAxisHeight: margins.bottom,
-    } : {
-      panes: [{ id: 'main', type: 'main' as const, heightRatio: 1, yMin: 0, yMax: 1, fixedRange: false }],
-      timeAxisHeight: margins.bottom,
-    });
+    const layout: UnifiedPaneLayout =
+      unifiedPaneLayout ||
+      (paneLayout
+        ? {
+            panes: [
+              {
+                id: 'main',
+                type: 'main' as const,
+                heightRatio: 1 - (paneLayout.indicatorPanes?.reduce((sum, p) => sum + p.heightRatio, 0) || 0),
+                yMin: 0,
+                yMax: 1,
+                fixedRange: false,
+              },
+              ...(paneLayout.indicatorPanes?.map((p) => ({
+                id: p.id,
+                type: 'indicator' as const,
+                heightRatio: p.heightRatio,
+                yMin: p.yMin ?? 0,
+                yMax: p.yMax ?? 1,
+                fixedRange: false,
+              })) || []),
+            ],
+            timeAxisHeight: margins.bottom,
+          }
+        : {
+            panes: [{ id: 'main', type: 'main' as const, heightRatio: 1, yMin: 0, yMax: 1, fixedRange: false }],
+            timeAxisHeight: margins.bottom,
+          });
 
     const computedPanes = renderer.computePanesLayout(layout, height);
     const mainPane = computedPanes[0]; // First pane is always the main pane
 
-    return { top: mainPane?.top ?? margins.top, height: mainPane?.height ?? (height - margins.top - margins.bottom) };
+    return { top: mainPane?.top ?? margins.top, height: mainPane?.height ?? height - margins.top - margins.bottom };
   };
 
   const mainPaneBounds = computeMainPaneBounds();
@@ -1934,8 +2112,14 @@ export const Tealchart: React.FC<TealchartProps> = ({
   // Hide crosshair when hovering over interactive elements (order/position labels)
   // Lines with renderLineOnCanvas only have their LABEL in Konva (line drawn on canvas for sync)
   const konvaLabelBounds = labelBoundsRef.current
-    .filter(b => b.type === 'order' || b.type === 'position' || (b.type === 'crosshair' && !isOverKonvaElementRef.current) || b.renderLineOnCanvas)
-    .map(b => {
+    .filter(
+      (b) =>
+        b.type === 'order' ||
+        b.type === 'position' ||
+        (b.type === 'crosshair' && !isOverKonvaElementRef.current) ||
+        b.renderLineOnCanvas,
+    )
+    .map((b) => {
       // For orders with pending updates, override Y position to prevent snap-back
       // This handles the case where RAF hasn't run yet to update labelBoundsRef
       const pending = b.type === 'order' ? pendingOrdersRef.current.get(b.lineId) : undefined;
@@ -1954,7 +2138,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
   const hasKonvaElements = konvaLabelBounds.length > 0;
 
   // Check if crosshair is on main pane (for showing + button and context menu)
-  const crosshairBound = konvaLabelBounds.find(b => b.type === 'crosshair');
+  const crosshairBound = konvaLabelBounds.find((b) => b.type === 'crosshair');
   const isCrosshairOnMainPane = !crosshairBound?.targetPaneId || crosshairBound.targetPaneId === 'main';
 
   return (
@@ -2025,10 +2209,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
         onMouseEnter={() => setShowResetButton(true)}
         title="Reset view"
       >
-        <FontAwesomeIcon
-          icon={faRotate}
-          style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: 12 }}
-        />
+        <FontAwesomeIcon icon={faRotate} style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: 12 }} />
       </button>
       {/* Context menu overlay */}
       {contextMenuState.visible && (
