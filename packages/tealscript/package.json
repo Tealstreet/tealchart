@@ -36,7 +36,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^9",
     "npm-run-all2": "^8.0.4",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.0",
     "rimraf": "^6.1.2",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
