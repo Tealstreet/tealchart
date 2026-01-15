@@ -28,7 +28,7 @@
     "@tealstreet/tealscript": "*",
     "jotai": "^2.16.2",
     "jotai-optics": "^0.4.0",
-    "konva": "^10.0.12",
+    "konva": "^10.2.0",
     "optics-ts": "^2.4.1",
     "react-konva": "^19.2.1"
   },
