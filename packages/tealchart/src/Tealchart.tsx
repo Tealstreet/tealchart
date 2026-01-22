@@ -120,6 +120,7 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
     extendLeft: order.extendLeft,
     lineWidth: order.lineWidth,
     priority: 50, // Order lines: medium priority
+    draggable: order.editable, // Only draggable if editable AND has onMove callback
     label: {
       primaryText: formatPrice(order.price),
       backgroundColor: order.bodyBackgroundColor,
@@ -254,6 +255,7 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
     extendLeft: position.extendLeft,
     lineWidth: position.lineWidth,
     priority: 75, // Position lines: second highest priority (after price lines)
+    draggable: false, // Position lines are not draggable (no onMove callback)
     label: {
       primaryText: formatPrice(position.price),
       backgroundColor: position.bodyBackgroundColor,

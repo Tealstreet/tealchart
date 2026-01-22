@@ -1430,7 +1430,8 @@ export const PriceLineLayer: React.FC<PriceLineLayerProps> = ({
 
   const renderBound = (bound: PriceLineLabelBounds) => {
     const lineType = bound.type || 'price';
-    const isDraggable = lineType === 'order' || lineType === 'position';
+    // Only draggable if explicitly marked (has onMove callback)
+    const isDraggable = bound.draggable ?? false;
     const isPending = pendingOrders?.has(bound.lineId) ?? false;
 
     return (
