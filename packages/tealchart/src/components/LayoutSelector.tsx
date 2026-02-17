@@ -502,7 +502,7 @@ export const LayoutSelector: React.FC<LayoutSelectorProps> = memo(({
             ) : (
               filteredLayouts.map((layout) => {
                 // Use loose equality for ID comparison (handles string/number mismatch)
-                // eslint-disable-next-line eqeqeq
+                 
                 const isSelected = currentLayout.layoutId != null && currentLayout.layoutId == layout.id;
                 const isHovered = hoveredId === layout.id;
 

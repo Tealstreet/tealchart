@@ -25,23 +25,23 @@
     "typecheck": "tsc --project ./tsconfig.json --noEmit"
   },
   "dependencies": {
-    "peggy": "^4.0.3"
+    "peggy": "^5.0.6"
   },
   "devDependencies": {
-    "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
     "@tealstreet/prettierrc": "*",
     "@types/node": "^22.15.3",
-    "@vitest/coverage-v8": "^4.0.16",
-    "@vitest/ui": "^4.0.16",
+    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/ui": "^4.0.18",
     "cross-env": "^7.0.3",
-    "eslint": "^9",
+    "eslint": "^10",
     "npm-run-all2": "^8.0.4",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.1",
     "rimraf": "^6.1.2",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
-    "vite": "^7.3.0",
+    "vite": "^7.3.1",
     "vite-tsconfig-paths": "^5.0.1",
-    "vitest": "^4.0.15"
+    "vitest": "^4.0.18"
   }
 }
