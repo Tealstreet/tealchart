@@ -3,32 +3,35 @@
  * Mirrors TradingView's IChartingLibraryWidget for drop-in replacement
  */
 
-import { EventEmitter } from './events/EventEmitter';
-import { TealchartApi } from './TealchartApi';
-import { TealchartWidgetUI } from './ui/TealchartWidgetUI';
-import { TealscriptManager } from './tealscript/TealscriptManager';
-import { type BuiltinIndicator, getIndicatorById } from './indicators/builtinIndicators';
-import { getChartStore, type ChartSettings, type IndicatorInstance, type PlotStyleOverride, type ChartStore } from './state/chartState';
-import { generateIndicatorId } from './state/indicatorActions';
-import { PaneManager } from './rendering/PaneManager';
-import { GapDetectionManager } from './GapDetectionManager';
-import { TealchartLogger, LogCategory } from './debug/TealchartLogger';
 import type { PlotOutput } from '@tealstreet/tealscript';
+import type { BuiltinIndicator } from './indicators/builtinIndicators';
+import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
+
+import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
+import { EventEmitter } from './events/EventEmitter';
+import { GapDetectionManager } from './GapDetectionManager';
+import { getIndicatorById } from './indicators/builtinIndicators';
+import { PaneManager } from './rendering/PaneManager';
+import { getChartStore } from './state/chartState';
+import { generateIndicatorId } from './state/indicatorActions';
+import { TealchartApi } from './TealchartApi';
+import { TealscriptManager } from './tealscript/TealscriptManager';
 import {
   Bar,
   ChartOverrides,
   ContextMenuCallback,
-  TealchartWidgetOptions,
-  GapDetectionEvent,
+  DEFAULT_RENDER_OPTIONS,
   GapDetectionErrorState,
+  GapDetectionEvent,
   IBasicDataFeed,
   LibrarySymbolInfo,
   RenderOptions,
   ResolutionString,
+  TealchartWidgetOptions,
   Viewport,
   WidgetEvent,
-  DEFAULT_RENDER_OPTIONS,
 } from './types';
+import { TealchartWidgetUI } from './ui/TealchartWidgetUI';
 
 type EventCallback = (...args: unknown[]) => void;
 
@@ -67,7 +70,6 @@ export class TealchartWidget {
   // Subscription tracking
   private _barSubscriptionGuid: string | null = null;
 
-
   // Historical data loading
   private _isLoadingMoreBars = false;
   private _hasMoreHistoricalData = true;
@@ -105,6 +107,11 @@ export class TealchartWidget {
 
   // Track if interval was explicitly provided (for controlled vs uncontrolled behavior)
   private _intervalWasProvided: boolean;
+
+  // Resize observer for container auto-sizing
+  private _resizeObserver: ResizeObserver | null = null;
+  private _lastContainerWidth = 0;
+  private _lastContainerHeight = 0;
 
   // Debug logger for this chart instance (null if disabled)
   private _logger: TealchartLogger | null = null;
@@ -243,11 +250,27 @@ export class TealchartWidget {
     // Set up keyboard event listeners
     this._setupKeyboardListeners();
 
+    // Set up resize observer for autosize mode
+    if (options.autosize || options.fullscreen) {
+      const target = options.fullscreen ? document.documentElement : container;
+      this._resizeObserver = new ResizeObserver(() => {
+        const { width, height } = this._getContainerSize();
+        if (width !== this._lastContainerWidth || height !== this._lastContainerHeight) {
+          this._lastContainerWidth = width;
+          this._lastContainerHeight = height;
+          if (this._ui) {
+            this._ui.resize(width, height);
+          }
+        }
+      });
+      this._resizeObserver.observe(target);
+    }
+
     // Initialize gap detection manager (enabled by default)
     if (options.gapDetection?.enabled !== false) {
       this._gapDetectionManager = new GapDetectionManager(
         (event) => this._handleRecoveryNeeded(event),
-        options.gapDetection
+        options.gapDetection,
       );
       // Pass logger to gap detection manager
       this._gapDetectionManager.setLogger(this._logger);
@@ -289,7 +312,7 @@ export class TealchartWidget {
         (error) => {
           console.error('[Tealchart] Failed to resolve symbol:', error);
           this._setReady();
-        }
+        },
       );
     });
   }
@@ -330,7 +353,7 @@ export class TealchartWidget {
     const countBack = TealchartWidget.INITIAL_BAR_COUNT;
 
     // Calculate from time: go back countBack bars from now
-    const fromTime = now - (countBack * intervalMs);
+    const fromTime = now - countBack * intervalMs;
 
     const periodParams = {
       countBack,
@@ -371,7 +394,7 @@ export class TealchartWidget {
         console.error('[Tealchart] Failed to load bars:', error);
         this._scheduleRender(); // Re-render to hide loading state
         this._setReady();
-      }
+      },
     );
   }
 
@@ -407,7 +430,7 @@ export class TealchartWidget {
       () => {
         // Reset cache callback - reload bars
         this._loadBars();
-      }
+      },
     );
   }
 
@@ -492,8 +515,8 @@ export class TealchartWidget {
         }
 
         // Prepend new bars to existing bars (avoid duplicates)
-        const existingTimes = new Set(this._bars.map(b => b.time));
-        const newBars = bars.filter(b => !existingTimes.has(b.time));
+        const existingTimes = new Set(this._bars.map((b) => b.time));
+        const newBars = bars.filter((b) => !existingTimes.has(b.time));
 
         if (newBars.length > 0) {
           this._bars = [...newBars, ...this._bars];
@@ -512,7 +535,7 @@ export class TealchartWidget {
       (error) => {
         this._isLoadingMoreBars = false;
         console.error('[Tealchart] Failed to load more bars:', error);
-      }
+      },
     );
   }
 
@@ -591,40 +614,43 @@ export class TealchartWidget {
       }
 
       // Create the study with persisted inputs
-      this._chartApi.createStudy(
-        builtinIndicator.code,
-        builtinIndicator.overlay,
-        false,
-        instance.inputs,
-        {},
-        { displayName: instance.name },
-      ).then((studyApi) => {
-        if (studyApi) {
-          const studyId = studyApi.getId();
+      this._chartApi
+        .createStudy(
+          builtinIndicator.code,
+          builtinIndicator.overlay,
+          false,
+          instance.inputs,
+          {},
+          { displayName: instance.name },
+        )
+        .then((studyApi) => {
+          if (studyApi) {
+            const studyId = studyApi.getId();
 
-          // Track the mapping from instance ID to study ID
-          this._indicatorStudyMap.set(instance.id, studyId);
-          this._studyInstanceMap.set(studyId, instance.id);
+            // Track the mapping from instance ID to study ID
+            this._indicatorStudyMap.set(instance.id, studyId);
+            this._studyInstanceMap.set(studyId, instance.id);
 
-          // Store indicator config for pane lookup
-          this._indicatorConfigMap.set(studyId, builtinIndicator);
+            // Store indicator config for pane lookup
+            this._indicatorConfigMap.set(studyId, builtinIndicator);
 
-          // Register with pane manager
-          this._paneManager.addIndicator({
-            indicatorId: studyId,
-            overlay: builtinIndicator.overlay,
-            yAxisRange: builtinIndicator.yAxisRange,
-          });
+            // Register with pane manager
+            this._paneManager.addIndicator({
+              indicatorId: studyId,
+              overlay: builtinIndicator.overlay,
+              yAxisRange: builtinIndicator.yAxisRange,
+            });
 
-          // Apply visibility state
-          if (!instance.isVisible) {
-            this._chartApi.toggleStudyVisibility(studyId);
-            this._tealScriptManager?.toggleScriptVisibility(studyId);
+            // Apply visibility state
+            if (!instance.isVisible) {
+              this._chartApi.toggleStudyVisibility(studyId);
+              this._tealScriptManager?.toggleScriptVisibility(studyId);
+            }
           }
-        }
-      }).catch((error) => {
-        console.error(`[Tealchart] Failed to restore indicator ${instance.name}:`, error);
-      });
+        })
+        .catch((error) => {
+          console.error(`[Tealchart] Failed to restore indicator ${instance.name}:`, error);
+        });
     }
   }
 
@@ -633,7 +659,7 @@ export class TealchartWidget {
    * Passes current state to UI. ChartCore setters skip unchanged data.
    */
   private _doRender(): void {
-    const showTopBar = this._options.showTopBar !== false;  // Default to true
+    const showTopBar = this._options.showTopBar !== false; // Default to true
 
     // Initialize UI if needed
     if (!this._ui) {
@@ -737,15 +763,11 @@ export class TealchartWidget {
 
     // Update active indicators
     const studyInfos = this._chartApi.getAllStudies();
-    const persistedIndicators = this._chartStore
-      ? this._chartStore.settings.get().indicators
-      : [];
+    const persistedIndicators = this._chartStore ? this._chartStore.settings.get().indicators : [];
 
     const activeIndicators = studyInfos.map((study) => {
       const instanceId = this._studyInstanceMap.get(study.id);
-      const persisted = instanceId
-        ? persistedIndicators.find((ind) => ind.id === instanceId)
-        : undefined;
+      const persisted = instanceId ? persistedIndicators.find((ind) => ind.id === instanceId) : undefined;
       return {
         ...study,
         styleOverrides: persisted?.styleOverrides,
@@ -753,7 +775,10 @@ export class TealchartWidget {
     });
 
     // Build indicator pane info
-    const indicatorPaneInfo: Record<string, { overlay: boolean; yAxisRange?: { min: number; max: number }; name?: string; inputs?: Record<string, unknown> }> = {};
+    const indicatorPaneInfo: Record<
+      string,
+      { overlay: boolean; yAxisRange?: { min: number; max: number }; name?: string; inputs?: Record<string, unknown> }
+    > = {};
     for (const [studyId, config] of this._indicatorConfigMap) {
       const study = this._chartApi.getStudyById(studyId);
       const inputs = study?.getInputs() ?? {};
@@ -781,42 +806,45 @@ export class TealchartWidget {
     const instanceId = generateIndicatorId(indicator.id);
 
     // Create a study using the indicator's Tealscript code
-    this._chartApi.createStudy(
-      indicator.code,
-      indicator.overlay,  // forceOverlay
-      false,  // lock
-      {},  // inputs
-      {},  // overrides
-      { displayName: indicator.name },  // Use friendly name for display
-    ).then((studyApi) => {
-      if (studyApi) {
-        const studyId = studyApi.getId();
+    this._chartApi
+      .createStudy(
+        indicator.code,
+        indicator.overlay, // forceOverlay
+        false, // lock
+        {}, // inputs
+        {}, // overrides
+        { displayName: indicator.name }, // Use friendly name for display
+      )
+      .then((studyApi) => {
+        if (studyApi) {
+          const studyId = studyApi.getId();
 
-        // Track the mapping from instance ID to study ID
-        this._indicatorStudyMap.set(instanceId, studyId);
+          // Track the mapping from instance ID to study ID
+          this._indicatorStudyMap.set(instanceId, studyId);
 
-        // Also track reverse mapping for persistence updates
-        this._studyInstanceMap.set(studyId, instanceId);
+          // Also track reverse mapping for persistence updates
+          this._studyInstanceMap.set(studyId, instanceId);
 
-        // Store indicator config for pane lookup
-        this._indicatorConfigMap.set(studyId, indicator);
+          // Store indicator config for pane lookup
+          this._indicatorConfigMap.set(studyId, indicator);
 
-        // Register with pane manager (non-overlay indicators get their own pane)
-        this._paneManager.addIndicator({
-          indicatorId: studyId,
-          overlay: indicator.overlay,
-          yAxisRange: indicator.yAxisRange,
-        });
+          // Register with pane manager (non-overlay indicators get their own pane)
+          this._paneManager.addIndicator({
+            indicatorId: studyId,
+            overlay: indicator.overlay,
+            yAxisRange: indicator.yAxisRange,
+          });
 
-        // Persist to settings
-        this._persistAddIndicator(instanceId, indicator);
+          // Persist to settings
+          this._persistAddIndicator(instanceId, indicator);
 
-        // Trigger immediate re-render to update chart layout for the new pane
-        this._scheduleRender();
-      }
-    }).catch((error) => {
-      console.error(`[Tealchart] Failed to add indicator ${indicator.name}:`, error);
-    });
+          // Trigger immediate re-render to update chart layout for the new pane
+          this._scheduleRender();
+        }
+      })
+      .catch((error) => {
+        console.error(`[Tealchart] Failed to add indicator ${indicator.name}:`, error);
+      });
   }
 
   /**
@@ -890,7 +918,7 @@ export class TealchartWidget {
         String(currentLayout.layoutId),
         settings,
         currentLayout.layoutName!,
-        this._options.save_load_adapter!
+        this._options.save_load_adapter!,
       )
         .then((chartId) => {
           if (!this._chartStore) return;
@@ -972,7 +1000,7 @@ export class TealchartWidget {
 
     const currentIndicators = this._chartStore.settings.get().indicators;
     const updatedIndicators = currentIndicators.map((ind) =>
-      ind.id === instanceId ? { ...ind, isVisible: !ind.isVisible } : ind
+      ind.id === instanceId ? { ...ind, isVisible: !ind.isVisible } : ind,
     );
 
     this._chartStore.settings.setKey('indicators', updatedIndicators);
@@ -1057,7 +1085,7 @@ export class TealchartWidget {
 
     const currentIndicators = this._chartStore.settings.get().indicators;
     const updatedIndicators = currentIndicators.map((ind) =>
-      ind.id === instanceId ? { ...ind, inputs: { ...ind.inputs, ...inputs } } : ind
+      ind.id === instanceId ? { ...ind, inputs: { ...ind.inputs, ...inputs } } : ind,
     );
 
     this._chartStore.settings.setKey('indicators', updatedIndicators);
@@ -1086,7 +1114,7 @@ export class TealchartWidget {
 
     const currentIndicators = this._chartStore.settings.get().indicators;
     const updatedIndicators = currentIndicators.map((ind) =>
-      ind.id === instanceId ? { ...ind, styleOverrides } : ind
+      ind.id === instanceId ? { ...ind, styleOverrides } : ind,
     );
 
     this._chartStore.settings.setKey('indicators', updatedIndicators);
@@ -1160,7 +1188,7 @@ export class TealchartWidget {
       },
       (error) => {
         console.error('[Tealchart] Failed to resolve symbol:', error);
-      }
+      },
     );
   }
 
@@ -1282,6 +1310,12 @@ export class TealchartWidget {
     if (this._renderRafId !== null) {
       cancelAnimationFrame(this._renderRafId);
       this._renderRafId = null;
+    }
+
+    // Clean up resize observer
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+      this._resizeObserver = null;
     }
 
     // Clean up gap detection manager
@@ -1646,11 +1680,7 @@ export class TealchartWidget {
    * Save chart to server
    * @stub Not yet implemented
    */
-  saveChartToServer(
-    onComplete?: () => void,
-    onFail?: () => void,
-    options?: { chartName?: string }
-  ): void {
+  saveChartToServer(onComplete?: () => void, onFail?: () => void, options?: { chartName?: string }): void {
     console.warn('[Tealchart] Method not implemented: saveChartToServer');
     onFail?.();
   }
@@ -1662,7 +1692,12 @@ export class TealchartWidget {
   /**
    * Handle loading a layout from the LayoutSelector
    */
-  private _handleLoadLayout(settings: ChartSettings, warnings: string[], layoutId: string | number, layoutName: string): void {
+  private _handleLoadLayout(
+    settings: ChartSettings,
+    warnings: string[],
+    layoutId: string | number,
+    layoutName: string,
+  ): void {
     if (warnings.length > 0) {
       console.warn('[Tealchart] Layout load warnings:', warnings);
     }
@@ -1689,27 +1724,29 @@ export class TealchartWidget {
         const builtinIndicator = getIndicatorById(indicator.builtinId);
         if (builtinIndicator) {
           // Create study with saved inputs
-          this._chartApi.createStudy(
-            builtinIndicator.code,
-            builtinIndicator.overlay,
-            false,
-            indicator.inputs,
-            {},
-            { displayName: indicator.name },
-          ).then((studyApi) => {
-            if (studyApi) {
-              const studyId = studyApi.getId();
-              this._indicatorStudyMap.set(indicator.id, studyId);
-              this._studyInstanceMap.set(studyId, indicator.id);
-              this._indicatorConfigMap.set(studyId, builtinIndicator);
-              this._paneManager.addIndicator({
-                indicatorId: studyId,
-                overlay: builtinIndicator.overlay,
-                yAxisRange: builtinIndicator.yAxisRange,
-              });
-              this._scheduleRender();
-            }
-          });
+          this._chartApi
+            .createStudy(
+              builtinIndicator.code,
+              builtinIndicator.overlay,
+              false,
+              indicator.inputs,
+              {},
+              { displayName: indicator.name },
+            )
+            .then((studyApi) => {
+              if (studyApi) {
+                const studyId = studyApi.getId();
+                this._indicatorStudyMap.set(indicator.id, studyId);
+                this._studyInstanceMap.set(studyId, indicator.id);
+                this._indicatorConfigMap.set(studyId, builtinIndicator);
+                this._paneManager.addIndicator({
+                  indicatorId: studyId,
+                  overlay: builtinIndicator.overlay,
+                  yAxisRange: builtinIndicator.yAxisRange,
+                });
+                this._scheduleRender();
+              }
+            });
         } else {
           console.warn('[Tealchart] Unknown indicator:', indicator.builtinId);
         }
@@ -1754,12 +1791,7 @@ export class TealchartWidget {
       if (shouldUpdate) {
         // Update existing layout
         import('./transformer').then(({ updateTealchartLayout }) => {
-          updateTealchartLayout(
-            String(currentLayout.layoutId),
-            settings,
-            layoutName,
-            this._options.save_load_adapter!
-          )
+          updateTealchartLayout(String(currentLayout.layoutId), settings, layoutName, this._options.save_load_adapter!)
             .then((chartId) => {
               if (!this._chartStore) return;
               this._chartStore.currentLayout.set({
@@ -1829,9 +1861,7 @@ export class TealchartWidget {
    */
   private _getCurrentSettings(): ChartSettings {
     // Gather indicator instances from persisted state
-    const indicators = this._chartStore
-      ? this._chartStore.settings.get().indicators
-      : [];
+    const indicators = this._chartStore ? this._chartStore.settings.get().indicators : [];
 
     return {
       symbol: this._symbol,
