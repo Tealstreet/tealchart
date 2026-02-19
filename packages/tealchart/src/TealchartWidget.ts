@@ -144,18 +144,24 @@ export class TealchartWidget {
 
     // Track if interval was explicitly provided (for controlled vs uncontrolled behavior)
     this._intervalWasProvided = options.interval !== undefined && options.interval !== '';
-    // Default to '1h' if no interval provided
-    this._interval = (options.interval || '1h') as ResolutionString;
 
     // Generate chart key for per-chart state persistence
     // Use provided chartKey, or derive from account/panelId, or generate unique ID
     this._chartKey = options.chartKey || `chart_${options.account || ''}_${Date.now()}`;
 
-    // Initialize Nanostores for this chart
+    // Initialize Nanostores for this chart (loads persisted settings from localStorage)
     this._chartStore = getChartStore(this._chartKey);
 
-    // Sync interval to store so ChartTopBar shows correct selection
-    this._chartStore.settings.setKey('interval', this._interval);
+    // Interval priority: explicit option > persisted store value (from localStorage)
+    if (this._intervalWasProvided) {
+      this._interval = options.interval as ResolutionString;
+      // Sync explicitly provided interval to store
+      this._chartStore.settings.setKey('interval', this._interval);
+    } else {
+      // Use persisted interval from localStorage (loaded by getChartStore).
+      // Falls back to DEFAULT_CHART_SETTINGS.interval ('1h') if nothing persisted.
+      this._interval = this._chartStore.settings.get().interval;
+    }
 
     // Initialize pane manager for multi-pane indicator support
     this._paneManager = new PaneManager();
@@ -1218,6 +1224,9 @@ export class TealchartWidget {
     this._bars = [];
     this._hasMoreHistoricalData = true; // Reset for new interval
     this._isLoadingMoreBars = false;
+
+    // Persist interval to per-chart store (for restoration on page refresh)
+    this._chartStore?.settings.setKey('interval', interval);
 
     // Render immediately to show loading state (hides chart)
     this._scheduleRender();

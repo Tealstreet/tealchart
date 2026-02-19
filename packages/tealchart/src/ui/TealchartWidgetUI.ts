@@ -1,3 +1,29 @@
+import type { InputDefinition, PlotOutput } from '@tealstreet/tealscript';
+import type { BuiltinIndicator } from '../indicators/builtinIndicators';
+import type { PlotStyleOverride } from '../state/chartState';
+import type {
+  Bar,
+  ContextMenuItem,
+  OrderLineRenderData,
+  PaneLayout,
+  PositionLineRenderData,
+  RenderOptions,
+  ResolutionString,
+  Viewport,
+} from '../types';
+import type { ChartCoreOptions, IndicatorPaneInfo } from './ChartCore';
+import type { ActiveIndicator } from './ChartLegend';
+import type { ChartTopBarOptions } from './ChartTopBar';
+
+import { getChartStore } from '../state/chartState';
+import { ChartCore } from './ChartCore';
+import { ChartLegend } from './ChartLegend';
+import { ChartTopBar } from './ChartTopBar';
+import { div, icons, span } from './dom';
+import { IndicatorPaneLegend } from './IndicatorPaneLegend';
+import { IndicatorSettingsModal } from './IndicatorSettingsModal';
+import { IndicatorsModal } from './IndicatorsModal';
+
 /**
  * TealchartWidgetUI - Vanilla DOM UI layer for TealchartWidget
  *
@@ -14,28 +40,6 @@
 
 // Top bar height - used to offset chart rendering so labels don't appear under the top bar
 const TOP_BAR_HEIGHT = 32;
-
-import { ChartCore, type ChartCoreOptions, type IndicatorPaneInfo } from './ChartCore';
-import { ChartTopBar, type ChartTopBarOptions } from './ChartTopBar';
-import { ChartLegend, type ActiveIndicator } from './ChartLegend';
-import { IndicatorPaneLegend } from './IndicatorPaneLegend';
-import { IndicatorsModal } from './IndicatorsModal';
-import { IndicatorSettingsModal } from './IndicatorSettingsModal';
-import { div, span, icons } from './dom';
-import { getChartStore } from '../state/chartState';
-import type { BuiltinIndicator } from '../indicators/builtinIndicators';
-import type { PlotStyleOverride } from '../state/chartState';
-import type { InputDefinition, PlotOutput } from '@tealstreet/tealscript';
-import type {
-  Bar,
-  Viewport,
-  RenderOptions,
-  OrderLineRenderData,
-  PositionLineRenderData,
-  PaneLayout,
-  ContextMenuItem,
-  ResolutionString,
-} from '../types';
 
 // ============================================================================
 // Types
@@ -67,7 +71,11 @@ export interface TealchartWidgetUIOptions {
   /** Get study input definitions */
   getStudyInputDefinitions?: (studyId: string) => InputDefinition[];
   /** Callback when indicator settings are saved */
-  onSaveIndicatorSettings?: (indicatorId: string, inputs: Record<string, unknown>, styleOverrides?: PlotStyleOverride[]) => void;
+  onSaveIndicatorSettings?: (
+    indicatorId: string,
+    inputs: Record<string, unknown>,
+    styleOverrides?: PlotStyleOverride[],
+  ) => void;
   /** Callback when viewport changes */
   onViewportChange?: (viewport: Viewport) => void;
   /** Callback when more bars are needed */
@@ -318,7 +326,7 @@ export class TealchartWidgetUI {
    * Update indicator plots - calls ChartCore directly
    */
   setPlots(plots: PlotOutput[]): void {
-    this.currentPlots = plots;  // Store for openIndicatorSettings
+    this.currentPlots = plots; // Store for openIndicatorSettings
     this.chartCore?.setPlots(plots);
   }
 
@@ -373,6 +381,7 @@ export class TealchartWidgetUI {
    * Update interval display
    */
   setInterval(interval: ResolutionString): void {
+    this.topBar?.setInterval(interval);
     this.legend?.setInterval(interval);
   }
 
@@ -408,7 +417,7 @@ export class TealchartWidgetUI {
    * Open indicator settings modal
    */
   openIndicatorSettings(indicatorId: string): void {
-    const indicator = this.activeIndicators.find(i => i.id === indicatorId);
+    const indicator = this.activeIndicators.find((i) => i.id === indicatorId);
     if (!indicator) return;
 
     const inputDefinitions = this.options.getStudyInputDefinitions?.(indicatorId) ?? [];
@@ -422,7 +431,7 @@ export class TealchartWidgetUI {
       indicator.styleOverrides ?? [],
       (inputs, styleOverrides) => {
         this.options.onSaveIndicatorSettings?.(indicatorId, inputs, styleOverrides);
-      }
+      },
     );
   }
 
@@ -471,7 +480,7 @@ export class TealchartWidgetUI {
       currentPaneIds.add(pane.id);
 
       // Get indicators for this pane
-      const paneIndicators = indicators.filter(ind => {
+      const paneIndicators = indicators.filter((ind) => {
         const info = paneInfo[ind.id];
         return info?.overlay === false && pane.indicatorIds.includes(ind.id);
       });

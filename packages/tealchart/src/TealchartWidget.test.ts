@@ -419,6 +419,85 @@ describe('TealchartWidget', () => {
       expect(widgetB.symbol()).toBe('ETHUSDT');
       expect(widgetB.resolution()).toBe('60');
     });
+
+    it('changing interval on widget A does not affect widget B', () => {
+      const dfA = createMockDatafeed();
+      const dfB = createMockDatafeed();
+      const widgetA = createWidget(dfA, { symbol: 'BTCUSDT', chartKey: 'indepA' });
+      const widgetB = createWidget(dfB, { symbol: 'ETHUSDT', chartKey: 'indepB' });
+      completeInit(dfA);
+      completeInit(dfB);
+
+      // Change interval on widget A
+      widgetA.chart().setResolution('5' as ResolutionString);
+
+      // Widget B should still be on '60'
+      expect(widgetB.resolution()).toBe('60');
+
+      // Widget A should be on '5'
+      expect(widgetA.resolution()).toBe('5');
+    });
+
+    it('onIntervalChanged subscription on widget A does not fire on widget B', () => {
+      const dfA = createMockDatafeed();
+      const dfB = createMockDatafeed();
+      const widgetA = createWidget(dfA, { symbol: 'BTCUSDT', chartKey: 'subA' });
+      const widgetB = createWidget(dfB, { symbol: 'ETHUSDT', chartKey: 'subB' });
+      completeInit(dfA);
+      completeInit(dfB);
+
+      const intervalChangesB: string[] = [];
+      widgetB
+        .chart()
+        .onIntervalChanged()
+        .subscribe(null, (interval) => {
+          intervalChangesB.push(interval);
+        });
+
+      // Change interval on widget A
+      widgetA.chart().setResolution('15' as ResolutionString);
+
+      // Widget B's subscription should NOT have fired
+      expect(intervalChangesB).toEqual([]);
+    });
+  });
+
+  // ============================================================================
+  // Per-chart interval persistence
+  // ============================================================================
+  describe('per-chart interval persistence', () => {
+    it('new widget without explicit interval uses persisted store value', () => {
+      // First widget: set interval to 5m and persist to store
+      const df1 = createMockDatafeed();
+      const widget1 = createWidget(df1, { chartKey: 'persist-test', interval: '60' as ResolutionString });
+      completeInit(df1);
+      widget1.chart().setResolution('5' as ResolutionString);
+      expect(widget1.resolution()).toBe('5');
+      widget1.remove();
+
+      // Second widget with SAME chartKey but NO explicit interval:
+      // should pick up '5' from the persisted store
+      const df2 = createMockDatafeed();
+      const widget2 = createWidget(df2, { chartKey: 'persist-test', interval: undefined as any });
+      expect(widget2.resolution()).toBe('5');
+      widget2.remove();
+    });
+
+    it('explicit interval overrides persisted store value', () => {
+      // First widget: set interval to 5m
+      const df1 = createMockDatafeed();
+      const widget1 = createWidget(df1, { chartKey: 'persist-override', interval: '60' as ResolutionString });
+      completeInit(df1);
+      widget1.chart().setResolution('5' as ResolutionString);
+      widget1.remove();
+
+      // Second widget with SAME chartKey but explicit interval '15':
+      // should use '15', not the persisted '5'
+      const df2 = createMockDatafeed();
+      const widget2 = createWidget(df2, { chartKey: 'persist-override', interval: '15' as ResolutionString });
+      expect(widget2.resolution()).toBe('15');
+      widget2.remove();
+    });
   });
 
   // ============================================================================

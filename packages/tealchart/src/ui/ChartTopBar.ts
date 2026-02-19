@@ -145,7 +145,6 @@ const styles = {
 export class ChartTopBar extends Component<ChartTopBarState> {
   private options: ChartTopBarOptions;
   private chartStore: ChartStore;
-  private unsubscribe: (() => void) | null = null;
 
   // Element references
   private timeframeButtons: Map<string, HTMLButtonElement> = new Map();
@@ -178,19 +177,15 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   // ============================================================================
 
   protected onMount(): void {
-    // Subscribe to store changes
-    this.unsubscribe = this.chartStore.settings.subscribe((settings) => {
-      if (settings.interval !== this.state.interval) {
-        this.setState({ interval: settings.interval as ResolutionString });
-      }
-    });
-
+    // NOTE: Do NOT subscribe to chartStore.settings for interval changes here.
+    // The interval is pushed by the widget via setInterval(). Subscribing to the
+    // shared store would cause cross-widget contamination when multiple widgets
+    // share the same chartKey.
     this.render();
   }
 
   protected onUnmount(): void {
-    this.unsubscribe?.();
-    this.unsubscribe = null;
+    // No-op (store subscription removed)
   }
 
   // ============================================================================
@@ -327,6 +322,29 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   // ============================================================================
   // Public API
   // ============================================================================
+
+  /**
+   * Update the active interval (highlights the correct timeframe button)
+   */
+  setInterval(interval: ResolutionString): void {
+    if (interval === this.state.interval) {
+      return; // No change
+    }
+    const previousInterval = this.state.interval;
+    this.state.interval = interval;
+
+    // Update button styles directly (no full re-render needed)
+    const previousBtn = this.timeframeButtons.get(previousInterval);
+    const newBtn = this.timeframeButtons.get(interval);
+
+    if (previousBtn) {
+      previousBtn.style.backgroundColor = 'transparent';
+      previousBtn.style.color = 'var(--text2, #787b86)';
+    }
+    if (newBtn) {
+      Object.assign(newBtn.style, styles.timeframeButtonActive);
+    }
+  }
 
   /**
    * Update the displayed symbol
