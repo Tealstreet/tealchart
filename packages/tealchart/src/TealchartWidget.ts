@@ -76,7 +76,10 @@ export class TealchartWidget {
 
   // Loading state for timeframe changes
   private _isLoadingBars = false;
+  private _wasLoadingBars = false;
   private _loadBarsRequestId = 0;
+  private _resolveSymbolRequestId = 0;
+  private _disposed = false;
 
   // Tealscript indicator support
   private _tealScriptManager: TealscriptManager | null = null;
@@ -301,10 +304,15 @@ export class TealchartWidget {
   private _initialize(): void {
     // Initialize datafeed
     this._datafeed.onReady((config) => {
+      const resolveRequestId = ++this._resolveSymbolRequestId;
+
       // Resolve symbol
       this._datafeed.resolveSymbol(
         this._symbol,
         (symbolInfo) => {
+          if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
+            return;
+          }
           this._symbolInfo = symbolInfo;
           // Extract price precision from pricescale (e.g., 100 -> 0.01, 100000 -> 0.00001)
           if (symbolInfo.pricescale && symbolInfo.pricescale > 0) {
@@ -316,6 +324,9 @@ export class TealchartWidget {
           this._loadBars();
         },
         (error) => {
+          if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
+            return;
+          }
           console.error('[Tealchart] Failed to resolve symbol:', error);
           this._setReady();
         },
@@ -373,8 +384,8 @@ export class TealchartWidget {
       this._interval,
       periodParams,
       (bars, _meta) => {
-        // Check if this request is still valid (not superseded by a newer request)
-        if (requestId !== this._loadBarsRequestId) {
+        // Check if this request is still valid (not superseded or disposed)
+        if (this._disposed || requestId !== this._loadBarsRequestId) {
           return; // Ignore stale response
         }
 
@@ -392,7 +403,7 @@ export class TealchartWidget {
       },
       (error) => {
         // Check if this request is still valid
-        if (requestId !== this._loadBarsRequestId) {
+        if (this._disposed || requestId !== this._loadBarsRequestId) {
           return; // Ignore stale error
         }
 
@@ -497,6 +508,11 @@ export class TealchartWidget {
       return;
     }
 
+    // Capture current request ID — if symbol/interval changes while this request
+    // is in flight, _loadBarsRequestId will be incremented and this callback
+    // will be discarded as stale.
+    const requestId = this._loadBarsRequestId;
+
     // Request same number of bars as initial load, going back from earliest bar
     const intervalMs = this._getIntervalMs(this._interval);
     const countBack = TealchartWidget.INITIAL_BAR_COUNT;
@@ -513,6 +529,11 @@ export class TealchartWidget {
         firstDataRequest: false,
       },
       (bars, _meta) => {
+        // Discard if widget was disposed or symbol/interval changed
+        if (this._disposed || requestId !== this._loadBarsRequestId) {
+          return;
+        }
+
         this._isLoadingMoreBars = false;
 
         if (bars.length === 0) {
@@ -539,6 +560,9 @@ export class TealchartWidget {
         }
       },
       (error) => {
+        if (this._disposed || requestId !== this._loadBarsRequestId) {
+          return;
+        }
         this._isLoadingMoreBars = false;
         console.error('[Tealchart] Failed to load more bars:', error);
       },
@@ -759,7 +783,17 @@ export class TealchartWidget {
     // Update UI state
     this._ui.setBars(this._bars);
     this._ui.setPlots(this._plots);
-    this._ui.setLoading(this._isLoadingBars);
+    // Defer hiding the loading overlay by one frame so ChartCore's RAF-based
+    // render paints the new candles BEFORE the overlay is removed. Without this,
+    // setBars() queues a ChartCore RAF render but setLoading(false) immediately
+    // hides the overlay, exposing one frame of stale/empty canvas.
+    if (this._isLoadingBars) {
+      this._ui.setLoading(true);
+    } else if (this._wasLoadingBars) {
+      // Still loading visually — ChartCore hasn't painted yet. Defer to next frame.
+      requestAnimationFrame(() => this._ui.setLoading(false));
+    }
+    this._wasLoadingBars = this._isLoadingBars;
 
     // Update order and position lines
     const orderLines = this._chartApi.getOrderLinesRenderData();
@@ -1182,10 +1216,17 @@ export class TealchartWidget {
     this._hasMoreHistoricalData = true; // Reset for new symbol
     this._isLoadingMoreBars = false;
 
+    // Increment to invalidate any in-flight resolveSymbol callbacks
+    const resolveRequestId = ++this._resolveSymbolRequestId;
+
     // Resolve new symbol and load bars
     this._datafeed.resolveSymbol(
       symbol,
       (symbolInfo) => {
+        // Ignore stale resolve (superseded by a newer symbol change)
+        if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
+          return;
+        }
         this._symbolInfo = symbolInfo;
         // Update price precision from new symbol's pricescale
         if (symbolInfo.pricescale && symbolInfo.pricescale > 0) {
@@ -1197,6 +1238,9 @@ export class TealchartWidget {
         this._loadBars();
       },
       (error) => {
+        if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
+          return;
+        }
         console.error('[Tealchart] Failed to resolve symbol:', error);
       },
     );
@@ -1295,6 +1339,9 @@ export class TealchartWidget {
    * Remove the widget and clean up
    */
   remove(): void {
+    // Mark as disposed to invalidate all in-flight async callbacks
+    this._disposed = true;
+
     // Unsubscribe from bars
     if (this._barSubscriptionGuid) {
       this._datafeed.unsubscribeBars(this._barSubscriptionGuid);

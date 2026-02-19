@@ -12,13 +12,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { TealchartWidget } from './TealchartWidget';
 
-// Track setSymbol calls at module level (survives mockReset)
+// Track calls at module level (survives mockReset)
 const setSymbolCalls: { symbol: string; exchangeName?: string }[] = [];
+const setBarsCalls: Bar[][] = [];
 
 // Use plain classes for mocks so mockReset doesn't strip implementations
 vi.mock('./ui/TealchartWidgetUI', () => ({
   TealchartWidgetUI: class {
-    setBars() {}
+    setBars(bars: Bar[]) {
+      setBarsCalls.push([...bars]);
+    }
     setPlots() {}
     setLoading() {}
     setOrderLines() {}
@@ -179,6 +182,7 @@ function completeInit(datafeed: MockDatafeed, bars?: Bar[], symbolInfo?: Library
 describe('TealchartWidget', () => {
   beforeEach(() => {
     setSymbolCalls.length = 0;
+    setBarsCalls.length = 0;
     // Return null so _renderRafId doesn't get stuck at 0 after
     // the callback synchronously sets it to null (assignment order issue).
     vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
@@ -596,6 +600,131 @@ describe('TealchartWidget', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);
       expect(widget.activeChartIndex()).toBe(0);
+    });
+  });
+
+  // ============================================================================
+  // Stale Request Guards
+  // ============================================================================
+  describe('stale request guards', () => {
+    it('stale resolveSymbol (out-of-order) does not trigger loadBars', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed);
+
+      // Switch to ETH, capture resolve callback
+      widget.setSymbol('ETHUSDT');
+      const ethResolve = datafeed._resolveSymbolCb!;
+
+      // Switch to SOL (overwrites _resolveSymbolCb)
+      widget.setSymbol('SOLUSDT');
+      const solResolve = datafeed._resolveSymbolCb!;
+
+      // Resolve SOL first (current/correct)
+      solResolve({ ...defaultSymbolInfo, name: 'SOLUSDT' });
+      datafeed._getBarsCb?.(makeBars(5, 2000000, 60000, 100), {});
+
+      const getBarsCountAfterSol = datafeed._getBarsCalls.length;
+
+      // Now resolve stale ETH (arrived late from network)
+      ethResolve({ ...defaultSymbolInfo, name: 'ETHUSDT' });
+
+      // Stale resolve should NOT have triggered a new loadBars
+      expect(datafeed._getBarsCalls.length).toBe(getBarsCountAfterSol);
+      expect(widget.symbol()).toBe('SOLUSDT');
+    });
+
+    it('stale resolveSymbol after remove() does not crash', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+
+      // Capture resolveSymbol callback before completing init
+      const resolveCb = datafeed._resolveSymbolCb!;
+
+      widget.remove();
+
+      // Fire stale resolveSymbol — should not crash
+      expect(() => {
+        resolveCb(defaultSymbolInfo);
+      }).not.toThrow();
+    });
+
+    it('stale getBars after remove() does not crash or apply data', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+
+      // Resolve symbol but capture getBars callback before completing
+      datafeed._resolveSymbolCb?.(defaultSymbolInfo);
+      const getBarsCb = datafeed._getBarsCb!;
+
+      widget.remove();
+
+      // Fire stale getBars — should not crash
+      expect(() => {
+        getBarsCb(makeBars(10), {});
+      }).not.toThrow();
+    });
+
+    it('loadMoreBars callback discarded after symbol switch', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed, makeBars(10, 1000000, 60000, 50000));
+
+      // Trigger loadMoreBars
+      (widget as any)._loadMoreBars('left');
+      const loadMoreCb = datafeed._getBarsCb!;
+
+      // Switch symbol and complete new init
+      widget.setSymbol('ETHUSDT');
+      datafeed._resolveSymbolCb?.({ ...defaultSymbolInfo, name: 'ETHUSDT' });
+      datafeed._getBarsCb?.(makeBars(10, 2000000, 60000, 2000), {});
+
+      setBarsCalls.length = 0; // Clear setBars calls from symbol switch
+
+      // Fire stale loadMore callback with old symbol's historical bars
+      loadMoreCb(makeBars(5, 500000, 60000, 45000), {});
+
+      // Stale loadMore should NOT have called setBars (no contamination)
+      expect(setBarsCalls).toHaveLength(0);
+    });
+
+    it('loadMoreBars callback discarded after interval switch', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed, makeBars(10, 1000000, 60000, 50000));
+
+      // Trigger loadMoreBars
+      (widget as any)._loadMoreBars('left');
+      const loadMoreCb = datafeed._getBarsCb!;
+
+      // Switch interval
+      widget.chart().setResolution('5' as ResolutionString);
+      datafeed._getBarsCb?.(makeBars(10, 1000000, 300000, 50000), {});
+
+      setBarsCalls.length = 0;
+
+      // Fire stale loadMore (from old interval)
+      loadMoreCb(makeBars(5, 500000, 60000, 45000), {});
+
+      // Should be discarded
+      expect(setBarsCalls).toHaveLength(0);
+    });
+
+    it('remove() invalidates in-flight loadMoreBars', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed, makeBars(10, 1000000, 60000, 50000));
+
+      // Trigger loadMoreBars
+      (widget as any)._loadMoreBars('left');
+      const loadMoreCb = datafeed._getBarsCb!;
+
+      widget.remove();
+
+      // Fire stale loadMore — should not crash
+      expect(() => {
+        loadMoreCb(makeBars(5, 500000, 60000, 45000), {});
+      }).not.toThrow();
     });
   });
 });

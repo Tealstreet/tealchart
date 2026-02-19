@@ -258,10 +258,12 @@ export class TealchartWidgetUI {
   }
 
   private createLoadingOverlay(): void {
+    // Position below the top bar so timeframe buttons remain clickable during loading
+    const topOffset = this.options.showTopBar !== false ? TOP_BAR_HEIGHT : 0;
     this.loadingOverlay = div({
       style: {
         position: 'absolute',
-        top: '0',
+        top: `${topOffset}px`,
         left: '0',
         right: '0',
         bottom: '0',
@@ -269,7 +271,7 @@ export class TealchartWidgetUI {
         display: 'none',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: '100',
+        zIndex: '10',
       },
     });
 
