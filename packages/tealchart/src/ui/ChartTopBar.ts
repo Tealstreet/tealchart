@@ -1,12 +1,15 @@
+import type { ChartStore } from '../state/chartState';
+import type { ResolutionString } from '../types';
+import type { ComponentOptions } from './Component';
+
+import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
+import { Component } from './Component';
+
 /**
  * ChartTopBar - Vanilla DOM toolbar for the chart
  *
  * Contains symbol info, timeframe selector, and indicators button.
  */
-
-import { Component, type ComponentOptions } from './Component';
-import { getChartStore, AVAILABLE_TIMEFRAMES, type ChartStore } from '../state/chartState';
-import type { ResolutionString } from '../types';
 
 // ============================================================================
 // Types
@@ -329,6 +332,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
    * Update the displayed symbol
    */
   setSymbol(symbol: string, exchangeName?: string): void {
+    if (symbol === this.options.symbol && (exchangeName === undefined || exchangeName === this.options.exchangeName)) {
+      return; // No change
+    }
     this.options.symbol = symbol;
     if (exchangeName !== undefined) {
       this.options.exchangeName = exchangeName;

@@ -12,6 +12,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { TealchartWidget } from './TealchartWidget';
 
+// Track setSymbol calls at module level (survives mockReset)
+const setSymbolCalls: { symbol: string; exchangeName?: string }[] = [];
+
 // Use plain classes for mocks so mockReset doesn't strip implementations
 vi.mock('./ui/TealchartWidgetUI', () => ({
   TealchartWidgetUI: class {
@@ -23,6 +26,10 @@ vi.mock('./ui/TealchartWidgetUI', () => ({
     setPaneLayout() {}
     setActiveIndicators() {}
     setRenderOptions() {}
+    setSymbol(symbol: string, exchangeName?: string) {
+      setSymbolCalls.push({ symbol, exchangeName });
+    }
+    setInterval() {}
     resize() {}
     dispose() {}
     openIndicatorSettings() {}
@@ -171,9 +178,12 @@ function completeInit(datafeed: MockDatafeed, bars?: Bar[], symbolInfo?: Library
 
 describe('TealchartWidget', () => {
   beforeEach(() => {
+    setSymbolCalls.length = 0;
+    // Return null so _renderRafId doesn't get stuck at 0 after
+    // the callback synchronously sets it to null (assignment order issue).
     vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
       cb(0);
-      return 0;
+      return null;
     });
     vi.stubGlobal('cancelAnimationFrame', vi.fn());
     vi.stubGlobal(
@@ -233,6 +243,24 @@ describe('TealchartWidget', () => {
 
       widget.setSymbol('ETHUSDT');
       expect(widget.symbol()).toBe('ETHUSDT');
+    });
+
+    it('setSymbol updates the UI top bar and legend via setSymbol()', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed);
+
+      widget.setSymbol('ETHUSDT');
+      // Resolve new symbol and provide bars to trigger render
+      datafeed._resolveSymbolCb?.({
+        ...defaultSymbolInfo,
+        name: 'ETHUSDT',
+        pricescale: 100,
+      });
+      datafeed._getBarsCb?.(makeBars(10, 2000000, 60000, 2000), {});
+
+      // _doRender should have called _ui.setSymbol('ETHUSDT')
+      expect(setSymbolCalls.some((c) => c.symbol === 'ETHUSDT')).toBe(true);
     });
 
     it('same symbol is a no-op', () => {

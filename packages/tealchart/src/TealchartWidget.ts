@@ -746,6 +746,10 @@ export class TealchartWidget {
     // Update render options if they've changed
     this._ui.setRenderOptions(this._renderOptions);
 
+    // Update symbol and interval in top bar / legend
+    this._ui.setSymbol(this._symbol);
+    this._ui.setInterval(this._interval);
+
     // Update UI state
     this._ui.setBars(this._bars);
     this._ui.setPlots(this._plots);

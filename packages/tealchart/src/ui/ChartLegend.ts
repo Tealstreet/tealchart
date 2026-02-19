@@ -1,14 +1,16 @@
+import type { PlotStyleOverride } from '../state/chartState';
+import type { Bar, ResolutionString } from '../types';
+import type { ComponentOptions } from './Component';
+
+import { Component } from './Component';
+import { button, div, icons, span } from './dom';
+
 /**
  * ChartLegend - Vanilla DOM legend overlay
  *
  * Shows symbol info, OHLC values, and active indicators list.
  * Positioned in the top-left corner below the top bar.
  */
-
-import { Component, type ComponentOptions } from './Component';
-import { div, span, button, icons } from './dom';
-import type { Bar, ResolutionString } from '../types';
-import type { PlotStyleOverride } from '../state/chartState';
 
 // ============================================================================
 // Types
@@ -224,6 +226,9 @@ export class ChartLegend extends Component<ChartLegendState> {
   // ============================================================================
 
   setSymbol(symbol: string, exchangeName?: string): void {
+    if (symbol === this.options.symbol && (exchangeName === undefined || exchangeName === this.options.exchangeName)) {
+      return;
+    }
     this.options.symbol = symbol;
     if (exchangeName !== undefined) {
       this.options.exchangeName = exchangeName;
@@ -232,6 +237,7 @@ export class ChartLegend extends Component<ChartLegendState> {
   }
 
   setInterval(interval: ResolutionString): void {
+    if (interval === this.options.interval) return;
     this.options.interval = interval;
     this.render();
   }
@@ -266,31 +272,24 @@ export class ChartLegend extends Component<ChartLegendState> {
     }
     if (this.ohlcElements.close) {
       this.ohlcElements.close.textContent = this.formatPrice(bar.close);
-      this.ohlcElements.close.style.color = isUp
-        ? 'var(--buy-color, #26a69a)'
-        : 'var(--sell-color, #ef5350)';
+      this.ohlcElements.close.style.color = isUp ? 'var(--buy-color, #26a69a)' : 'var(--sell-color, #ef5350)';
     }
     if (this.ohlcElements.change && prevBar) {
       const change = bar.close - prevBar.close;
       const changePercent = (change / prevBar.close) * 100;
       const changeUp = change >= 0;
       this.ohlcElements.change.textContent = `${changeUp ? '+' : ''}${change.toFixed(1)} (${changePercent.toFixed(2)}%)`;
-      this.ohlcElements.change.style.color = changeUp
-        ? 'var(--buy-color, #26a69a)'
-        : 'var(--sell-color, #ef5350)';
+      this.ohlcElements.change.style.color = changeUp ? 'var(--buy-color, #26a69a)' : 'var(--sell-color, #ef5350)';
     }
   }
 
-  setIndicators(
-    indicators: ActiveIndicator[],
-    paneInfo: Record<string, IndicatorPaneInfo>
-  ): void {
+  setIndicators(indicators: ActiveIndicator[], paneInfo: Record<string, IndicatorPaneInfo>): void {
     // Compute signature to detect actual changes (avoid unnecessary re-renders)
-    const overlayIndicators = indicators.filter(ind => {
+    const overlayIndicators = indicators.filter((ind) => {
       const info = paneInfo[ind.id];
       return info?.overlay !== false;
     });
-    const signature = overlayIndicators.map(i => `${i.id}:${i.name}:${i.isVisible}`).join('|');
+    const signature = overlayIndicators.map((i) => `${i.id}:${i.name}:${i.isVisible}`).join('|');
 
     // Only update if indicators actually changed
     if (signature !== this.lastIndicatorSignature) {
@@ -392,10 +391,12 @@ export class ChartLegend extends Component<ChartLegendState> {
 
     if (this.options.exchangeName) {
       symbolSection.appendChild(span({ text: '·', style: { color: 'var(--text3, #5d606b)' } }));
-      symbolSection.appendChild(span({
-        text: this.options.exchangeName,
-        style: { color: 'var(--text2, #787b86)' },
-      }));
+      symbolSection.appendChild(
+        span({
+          text: this.options.exchangeName,
+          style: { color: 'var(--text2, #787b86)' },
+        }),
+      );
     }
 
     // Status dot
@@ -412,7 +413,11 @@ export class ChartLegend extends Component<ChartLegendState> {
       const { container: openContainer, valueEl: openEl } = this.createOHLCItemWithRef('O', this.formatPrice(bar.open));
       const { container: highContainer, valueEl: highEl } = this.createOHLCItemWithRef('H', this.formatPrice(bar.high));
       const { container: lowContainer, valueEl: lowEl } = this.createOHLCItemWithRef('L', this.formatPrice(bar.low));
-      const { container: closeContainer, valueEl: closeEl } = this.createOHLCItemWithRef('C', this.formatPrice(bar.close), isUp);
+      const { container: closeContainer, valueEl: closeEl } = this.createOHLCItemWithRef(
+        'C',
+        this.formatPrice(bar.close),
+        isUp,
+      );
 
       ohlcGroup.appendChild(openContainer);
       ohlcGroup.appendChild(highContainer);
@@ -471,7 +476,11 @@ export class ChartLegend extends Component<ChartLegendState> {
    * Create OHLC item and return both container and value element reference
    * Used for caching value elements for fast updates
    */
-  private createOHLCItemWithRef(label: string, value: string, isUp?: boolean): { container: HTMLElement; valueEl: HTMLElement } {
+  private createOHLCItemWithRef(
+    label: string,
+    value: string,
+    isUp?: boolean,
+  ): { container: HTMLElement; valueEl: HTMLElement } {
     const container = div({ style: styles.ohlcItem });
     container.appendChild(span({ text: label, style: styles.ohlcLabel }));
 
@@ -518,25 +527,25 @@ export class ChartLegend extends Component<ChartLegendState> {
     });
 
     // Eye toggle
-    actions.appendChild(this.createIconButton(
-      indicator.isVisible ? icons.eye(14) : icons.eyeOff(14),
-      indicator.isVisible ? 'Hide indicator' : 'Show indicator',
-      () => this.options.onToggleIndicator?.(indicator.id)
-    ));
+    actions.appendChild(
+      this.createIconButton(
+        indicator.isVisible ? icons.eye(14) : icons.eyeOff(14),
+        indicator.isVisible ? 'Hide indicator' : 'Show indicator',
+        () => this.options.onToggleIndicator?.(indicator.id),
+      ),
+    );
 
     // Settings
-    actions.appendChild(this.createIconButton(
-      icons.gear(14),
-      'Indicator settings',
-      () => this.options.onSettingsIndicator?.(indicator.id)
-    ));
+    actions.appendChild(
+      this.createIconButton(icons.gear(14), 'Indicator settings', () =>
+        this.options.onSettingsIndicator?.(indicator.id),
+      ),
+    );
 
     // Remove
-    actions.appendChild(this.createIconButton(
-      icons.trash(14),
-      'Remove indicator',
-      () => this.options.onRemoveIndicator?.(indicator.id)
-    ));
+    actions.appendChild(
+      this.createIconButton(icons.trash(14), 'Remove indicator', () => this.options.onRemoveIndicator?.(indicator.id)),
+    );
 
     row.appendChild(actions);
 
@@ -554,11 +563,7 @@ export class ChartLegend extends Component<ChartLegendState> {
     return row;
   }
 
-  private createIconButton(
-    icon: SVGElement,
-    title: string,
-    onClick: () => void
-  ): HTMLElement {
+  private createIconButton(icon: SVGElement, title: string, onClick: () => void): HTMLElement {
     const btn = button({
       style: styles.iconButton,
       attrs: { title },
