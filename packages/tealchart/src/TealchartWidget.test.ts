@@ -394,30 +394,19 @@ describe('TealchartWidget', () => {
   });
 
   // ============================================================================
-  // Viewport Reset Bug
+  // Viewport Reset Bug — see ChartCore.test.ts for the real regression tests.
+  // The bug (viewport not recalculated after symbol switch) lives in ChartCore.setBars()
+  // which is mocked out here. These tests verify the widget-level data flow only.
   // ============================================================================
-  describe('viewport reset on symbol/interval switch', () => {
-    it('documents current behavior: _handleSymbolChange clears bars but not viewport', () => {
-      // This test documents the current (potentially buggy) behavior.
-      // When setSymbol is called, _bars is set to [] but _viewport is not nulled.
-      // The viewport at widget level is updated by the UI callback onViewportChange.
+  describe('symbol/interval switch data flow', () => {
+    it('setSymbol updates symbol and triggers resolveSymbol + getBars', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);
       completeInit(datafeed, makeBars(10, 1000000, 60000, 50000));
 
-      // Now switch symbol
       widget.setSymbol('ETHUSDT');
-
-      // The widget level symbol changed
       expect(widget.symbol()).toBe('ETHUSDT');
-    });
 
-    it('new symbol data triggers bar loading and UI update', () => {
-      const datafeed = createMockDatafeed();
-      const widget = createWidget(datafeed);
-      completeInit(datafeed, makeBars(10, 1000000, 60000, 50000));
-
-      widget.setSymbol('ETHUSDT');
       // Resolve new symbol
       datafeed._resolveSymbolCb?.({
         ...defaultSymbolInfo,
@@ -428,22 +417,20 @@ describe('TealchartWidget', () => {
       // getBars should have been called for the new symbol
       expect(datafeed._getBarsCalls.length).toBeGreaterThan(1);
 
-      // Provide new bars with very different prices
+      // Provide new bars
       const newBars = makeBars(10, 2000000, 60000, 2000);
       datafeed._getBarsCb?.(newBars, {});
 
-      // Widget should have the new data
       expect(widget.symbol()).toBe('ETHUSDT');
     });
 
-    it('interval change reloads bars', () => {
+    it('setResolution updates interval and reloads bars', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);
       completeInit(datafeed, makeBars(10));
 
       widget.chart().setResolution('5' as ResolutionString);
 
-      // Should be loading new bars
       expect(widget.resolution()).toBe('5');
     });
   });

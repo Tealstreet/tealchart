@@ -10,32 +10,37 @@
  * This is the vanilla equivalent of Tealchart.tsx
  */
 
+import type { PlotOutput } from '@tealstreet/tealscript';
+import type { CrosshairState as EventCrosshairState, PaneDividerInfo } from '../interaction/EventManager';
+import type { CrosshairState as PriceLineCrosshairState } from '../interaction/PriceLineManager';
+import type { PlotStyleOverride } from '../state/chartState';
+
 import Konva from 'konva';
-import { TealchartRenderer } from '../TealchartRenderer';
+
+import { EventManager } from '../interaction/EventManager';
+import { PriceLineManager } from '../interaction/PriceLineManager';
 import { WebCanvasContext } from '../rendering/WebCanvasContext';
-import { EventManager, type CrosshairState as EventCrosshairState, type PaneDividerInfo } from '../interaction/EventManager';
-import { PriceLineManager, type CrosshairState as PriceLineCrosshairState } from '../interaction/PriceLineManager';
-import { div, button, icons } from './dom';
+import { getDecimalPlacesFromPrecision } from '../state/chartState';
+import { TealchartRenderer } from '../TealchartRenderer';
 import {
   Bar,
-  Viewport,
-  RenderOptions,
+  ChartLineLabel,
   ChartMargins,
-  DEFAULT_MARGINS,
-  PriceLine,
-  OrderLineRenderData,
-  PositionLineRenderData,
-  PaneLayout,
-  UnifiedPaneLayout,
   ChartPane,
   ContextMenuItem,
-  PriceLineLabelBounds,
+  DEFAULT_MARGINS,
+  OrderLineRenderData,
+  PaneLayout,
   PendingOrderUpdate,
-  ChartLineLabel,
+  PositionLineRenderData,
   PRICE_AXIS_RIGHT_PADDING,
+  PriceLine,
+  PriceLineLabelBounds,
+  RenderOptions,
+  UnifiedPaneLayout,
+  Viewport,
 } from '../types';
-import { getDecimalPlacesFromPrecision, type PlotStyleOverride } from '../state/chartState';
-import type { PlotOutput } from '@tealstreet/tealscript';
+import { button, div, icons } from './dom';
 
 // ============================================================================
 // Types
@@ -109,14 +114,16 @@ function convertToUnifiedLayout(paneLayout?: PaneLayout): UnifiedPaneLayout {
 
   if (!paneLayout) {
     return {
-      panes: [{
-        id: 'main',
-        type: 'main',
-        heightRatio: 1.0,
-        yMin: 0,
-        yMax: 0,
-        fixedRange: false,
-      }],
+      panes: [
+        {
+          id: 'main',
+          type: 'main',
+          heightRatio: 1.0,
+          yMin: 0,
+          yMax: 0,
+          fixedRange: false,
+        },
+      ],
       timeAxisHeight,
     };
   }
@@ -179,29 +186,41 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
   const chartLabel: ChartLineLabel = {
     offsetPercent: order.lineLength,
     segments: [
-      ...(order.text ? [{
-        text: order.text,
-        textShort: order.textShort || undefined,
-        backgroundColor: order.bodyBackgroundColor,
-        textColor: order.bodyTextColor,
-        borderColor: order.bodyBorderColor,
-      }] : []),
-      ...(order.quantity ? [{
-        text: order.quantity,
-        textShort: order.quantityShort || undefined,
-        backgroundColor: order.quantityBackgroundColor,
-        textColor: order.quantityTextColor,
-        borderColor: order.quantityBorderColor,
-      }] : []),
+      ...(order.text
+        ? [
+            {
+              text: order.text,
+              textShort: order.textShort || undefined,
+              backgroundColor: order.bodyBackgroundColor,
+              textColor: order.bodyTextColor,
+              borderColor: order.bodyBorderColor,
+            },
+          ]
+        : []),
+      ...(order.quantity
+        ? [
+            {
+              text: order.quantity,
+              textShort: order.quantityShort || undefined,
+              backgroundColor: order.quantityBackgroundColor,
+              textColor: order.quantityTextColor,
+              borderColor: order.quantityBorderColor,
+            },
+          ]
+        : []),
     ],
-    buttons: order.cancellable ? [{
-      type: 'cancel' as const,
-      icon: '×',
-      backgroundColor: order.cancelButtonBackgroundColor,
-      iconColor: order.cancelButtonIconColor,
-      borderColor: order.cancelButtonBorderColor,
-      tooltip: order.cancelTooltip,
-    }] : [],
+    buttons: order.cancellable
+      ? [
+          {
+            type: 'cancel' as const,
+            icon: '×',
+            backgroundColor: order.cancelButtonBackgroundColor,
+            iconColor: order.cancelButtonIconColor,
+            borderColor: order.cancelButtonBorderColor,
+            tooltip: order.cancelTooltip,
+          },
+        ]
+      : [],
   };
 
   return {
@@ -246,60 +265,88 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
   const chartLabel: ChartLineLabel = {
     offsetPercent: position.lineLength,
     segments: [
-      ...(position.text ? [{
-        text: position.text,
-        textShort: position.textShort || undefined,
-        backgroundColor: position.bodyBackgroundColor,
-        textColor: position.bodyTextColor,
-        borderColor: position.bodyBorderColor,
-      }] : []),
-      ...(position.quantity ? [{
-        text: position.quantity,
-        textShort: position.quantityShort || undefined,
-        backgroundColor: position.quantityBackgroundColor,
-        textColor: position.quantityTextColor,
-        borderColor: position.quantityBorderColor,
-      }] : []),
-      ...(position.pnl ? [{
-        text: position.pnl,
-        textShort: position.pnlShort || undefined,
-        backgroundColor: position.bodyBackgroundColor,
-        textColor: pnlTextColor,
-        borderColor: position.bodyBorderColor,
-      }] : []),
+      ...(position.text
+        ? [
+            {
+              text: position.text,
+              textShort: position.textShort || undefined,
+              backgroundColor: position.bodyBackgroundColor,
+              textColor: position.bodyTextColor,
+              borderColor: position.bodyBorderColor,
+            },
+          ]
+        : []),
+      ...(position.quantity
+        ? [
+            {
+              text: position.quantity,
+              textShort: position.quantityShort || undefined,
+              backgroundColor: position.quantityBackgroundColor,
+              textColor: position.quantityTextColor,
+              borderColor: position.quantityBorderColor,
+            },
+          ]
+        : []),
+      ...(position.pnl
+        ? [
+            {
+              text: position.pnl,
+              textShort: position.pnlShort || undefined,
+              backgroundColor: position.bodyBackgroundColor,
+              textColor: pnlTextColor,
+              borderColor: position.bodyBorderColor,
+            },
+          ]
+        : []),
     ],
     buttons: [
-      ...(position.brackets !== null ? [{
-        type: 'tp' as const,
-        icon: 'TP',
-        backgroundColor: position.bodyBackgroundColor,
-        iconColor: '#22c55e',
-        borderColor: '#22c55e',
-        tooltip: 'Drag to set Take Profit',
-      }] : []),
-      ...(position.brackets !== null ? [{
-        type: 'sl' as const,
-        icon: 'SL',
-        backgroundColor: position.bodyBackgroundColor,
-        iconColor: '#f97316',
-        borderColor: '#f97316',
-        tooltip: 'Drag to set Stop Loss',
-      }] : []),
-      ...(position.reversible ? [{
-        type: 'reverse' as const,
-        icon: '↩',
-        backgroundColor: position.reverseButtonBackgroundColor,
-        iconColor: position.reverseButtonIconColor,
-        borderColor: position.reverseButtonBorderColor,
-      }] : []),
-      ...(position.closeable ? [{
-        type: 'close' as const,
-        icon: '×',
-        backgroundColor: position.closeButtonBackgroundColor,
-        iconColor: position.closeButtonIconColor,
-        borderColor: position.closeButtonBorderColor,
-        tooltip: position.closeTooltip,
-      }] : []),
+      ...(position.brackets !== null
+        ? [
+            {
+              type: 'tp' as const,
+              icon: 'TP',
+              backgroundColor: position.bodyBackgroundColor,
+              iconColor: '#22c55e',
+              borderColor: '#22c55e',
+              tooltip: 'Drag to set Take Profit',
+            },
+          ]
+        : []),
+      ...(position.brackets !== null
+        ? [
+            {
+              type: 'sl' as const,
+              icon: 'SL',
+              backgroundColor: position.bodyBackgroundColor,
+              iconColor: '#f97316',
+              borderColor: '#f97316',
+              tooltip: 'Drag to set Stop Loss',
+            },
+          ]
+        : []),
+      ...(position.reversible
+        ? [
+            {
+              type: 'reverse' as const,
+              icon: '↩',
+              backgroundColor: position.reverseButtonBackgroundColor,
+              iconColor: position.reverseButtonIconColor,
+              borderColor: position.reverseButtonBorderColor,
+            },
+          ]
+        : []),
+      ...(position.closeable
+        ? [
+            {
+              type: 'close' as const,
+              icon: '×',
+              backgroundColor: position.closeButtonBackgroundColor,
+              iconColor: position.closeButtonIconColor,
+              borderColor: position.closeButtonBorderColor,
+              tooltip: position.closeTooltip,
+            },
+          ]
+        : []),
     ],
   };
 
@@ -472,11 +519,15 @@ export class ChartCore {
     const ctx = new WebCanvasContext(nativeCtx);
 
     // Initialize renderer
-    this.renderer = new TealchartRenderer(ctx, {
-      ...options.renderOptions,
-      width: options.width,
-      height: options.height,
-    }, this.margins);
+    this.renderer = new TealchartRenderer(
+      ctx,
+      {
+        ...options.renderOptions,
+        width: options.width,
+        height: options.height,
+      },
+      this.margins,
+    );
 
     // Initialize Konva stage and layer
     this.initKonva();
@@ -492,15 +543,14 @@ export class ChartCore {
         topMargin: this.margins.top,
         leftMargin: this.margins.left,
       }),
-      getPriceFromY: (y) => this.renderer.publicYToPriceWithLayout(
-        y,
-        this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
-        this.getUnifiedLayout()
-      ),
-      getTimeFromX: (x) => this.renderer.publicXToTime(
-        x,
-        this.viewport ?? TealchartRenderer.calculateViewport(this.bars)
-      ),
+      getPriceFromY: (y) =>
+        this.renderer.publicYToPriceWithLayout(
+          y,
+          this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
+          this.getUnifiedLayout(),
+        ),
+      getTimeFromX: (x) =>
+        this.renderer.publicXToTime(x, this.viewport ?? TealchartRenderer.calculateViewport(this.bars)),
       getPaneAtY: (y) => this.getPaneAtY(y),
       getDividerAtY: (y) => this.getDividerAtY(y),
       onPaneHeightsChange: (heights) => {
@@ -541,12 +591,9 @@ export class ChartCore {
         const price = this.renderer.publicYToPriceWithLayout(
           y,
           this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
-          this.getUnifiedLayout()
+          this.getUnifiedLayout(),
         );
-        const time = this.renderer.publicXToTime(
-          x,
-          this.viewport ?? TealchartRenderer.calculateViewport(this.bars)
-        );
+        const time = this.renderer.publicXToTime(x, this.viewport ?? TealchartRenderer.calculateViewport(this.bars));
         this.options.onCrossHairMoved?.(price, time);
         this.scheduleRender();
       },
@@ -587,7 +634,9 @@ export class ChartCore {
     if (bars === this.bars) return;
 
     this.bars = bars;
-    if (!this.viewport && bars.length > 0) {
+    if (bars.length === 0) {
+      this.viewport = null;
+    } else if (!this.viewport) {
       this.viewport = TealchartRenderer.calculateViewport(bars);
     }
     this.scheduleRender();
@@ -771,7 +820,7 @@ export class ChartCore {
    */
   getPaneHeights(): { paneId: string; heightRatio: number }[] {
     const layout = this.getUnifiedLayout();
-    return layout.panes.map(pane => ({
+    return layout.panes.map((pane) => ({
       paneId: pane.id,
       heightRatio: pane.heightRatio,
     }));
@@ -855,16 +904,18 @@ export class ChartCore {
       width: this.options.width,
       height: this.options.height,
       margins: this.margins,
-      yToPrice: (y) => this.renderer.publicYToPriceWithLayout(
-        y,
-        this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
-        this.getUnifiedLayout()
-      ),
-      priceToY: (price) => this.renderer.publicPriceToYWithLayout(
-        price,
-        this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
-        this.getUnifiedLayout()
-      ),
+      yToPrice: (y) =>
+        this.renderer.publicYToPriceWithLayout(
+          y,
+          this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
+          this.getUnifiedLayout(),
+        ),
+      priceToY: (price) =>
+        this.renderer.publicPriceToYWithLayout(
+          price,
+          this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
+          this.getUnifiedLayout(),
+        ),
       onOrderMove: (id, price) => this.options.onOrderMove?.(id, price),
       onOrderCancel: (id) => this.options.onOrderCancel?.(id),
       onPositionClose: (id) => this.options.onPositionClose?.(id),
@@ -884,7 +935,7 @@ export class ChartCore {
       onContextMenuButtonClick: (price, screenX, screenY) => {
         const time = this.renderer.publicXToTime(
           this.crosshair.x,
-          this.viewport ?? TealchartRenderer.calculateViewport(this.bars)
+          this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
         );
         this.handleContextMenu(screenX, screenY, price, time);
       },
@@ -1056,7 +1107,7 @@ export class ChartCore {
     // Renderer handles auto-scaling for indicator panes without overrides
     return {
       ...baseLayout,
-      panes: baseLayout.panes.map(pane => {
+      panes: baseLayout.panes.map((pane) => {
         const yOverride = this.paneYOverrides.get(pane.id);
         const heightOverride = this.paneHeightOverrides.get(pane.id);
 
@@ -1148,7 +1199,7 @@ export class ChartCore {
     // Remove pending orders that no longer exist in orderLines
     // Simple O(n*m) but both n and m are typically small (<10 orders)
     for (const [id, pending] of this.pendingOrders) {
-      const exists = this.orderLines.some(o => o.id === id);
+      const exists = this.orderLines.some((o) => o.id === id);
       if (!exists) {
         clearTimeout(pending.timeoutId);
         this.pendingOrders.delete(id);
@@ -1200,15 +1251,15 @@ export class ChartCore {
 
     // Build all price lines
     const allPriceLines: PriceLine[] = [
-      ...(this.priceLines.map(p => {
+      ...this.priceLines.map((p) => {
         if (p.renderLineOnCanvas && p.id === 'last-trade' && latestBar) {
           const isUp = latestBar.close >= latestBar.open;
           return {
             ...p,
             price: latestBar.close,
             color: isUp
-              ? (this.renderer.getOptions()?.upColor || '#26a69a')
-              : (this.renderer.getOptions()?.downColor || '#ef5350'),
+              ? this.renderer.getOptions()?.upColor || '#26a69a'
+              : this.renderer.getOptions()?.downColor || '#ef5350',
             label: {
               ...p.label,
               primaryText: formatPrice(latestBar.close),
@@ -1217,22 +1268,20 @@ export class ChartCore {
           };
         }
         return { ...p, priority: p.priority ?? 100 };
-      })),
-      ...(this.orderLines.map(o => {
+      }),
+      ...this.orderLines.map((o) => {
         const pending = this.pendingOrders.get(o.id);
         if (pending) {
           return orderLineToPriceLine({ ...o, price: pending.pendingPrice }, formatPrice);
         }
         return orderLineToPriceLine(o, formatPrice);
-      })),
-      ...(this.positionLines.map(p => positionLineToPriceLine(p, formatPrice))),
-      ...(this.positionLines.flatMap(p => positionToBracketLines(p, formatPrice))),
+      }),
+      ...this.positionLines.map((p) => positionLineToPriceLine(p, formatPrice)),
+      ...this.positionLines.flatMap((p) => positionToBracketLines(p, formatPrice)),
     ];
 
     // Filter canvas-only price lines (order/position handled by Konva)
-    const canvasPriceLines = allPriceLines.filter(
-      line => line.type !== 'order' && line.type !== 'position'
-    );
+    const canvasPriceLines = allPriceLines.filter((line) => line.type !== 'order' && line.type !== 'position');
 
     // Render canvas
     const crosshairColor = this.options.renderOptions?.crosshairColor || '#888888';
@@ -1254,14 +1303,14 @@ export class ChartCore {
       this.plots,
       this.indicatorPaneInfo,
       crosshairState,
-      this.plotStyleOverrides
+      this.plotStyleOverrides,
     );
 
     this.renderer.drawCrosshair(crosshairState, vp, layout);
 
     // Compute label bounds for Konva layer (with dirty checking)
     // React pattern from Tealchart.tsx:696-727: only recompute when key changes or throttled during drag
-    const linePrices = allPriceLines.map(l => l.price.toFixed(6)).join(',');
+    const linePrices = allPriceLines.map((l) => l.price.toFixed(6)).join(',');
     const boundsKey = `${vp.priceMin.toFixed(4)},${vp.priceMax.toFixed(4)}|${linePrices}|${this.crosshair.visible}|${Math.round(this.crosshair.y)}`;
     const now = Date.now();
     const keyChanged = boundsKey !== this.lastBoundsKey;
@@ -1274,7 +1323,7 @@ export class ChartCore {
         vp,
         layout,
         this.plots,
-        this.crosshair.visible ? { y: this.crosshair.y, visible: true, color: crosshairColor } : undefined
+        this.crosshair.visible ? { y: this.crosshair.y, visible: true, color: crosshairColor } : undefined,
       );
       this.lastBoundsKey = boundsKey;
       this.lastBoundsUpdate = now;
