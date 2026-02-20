@@ -7,6 +7,7 @@ import type {
   OrderLineRenderData,
   PaneLayout,
   PositionLineRenderData,
+  PriceLine,
   RenderOptions,
   ResolutionString,
   Viewport,
@@ -322,6 +323,13 @@ export class TealchartWidgetUI {
    */
   setPositionLines(lines: PositionLineRenderData[]): void {
     this.chartCore?.setPositionLines(lines);
+  }
+
+  /**
+   * Update price lines (including last trade line) - calls ChartCore directly
+   */
+  setPriceLines(lines: PriceLine[]): void {
+    this.chartCore?.setPriceLines(lines);
   }
 
   /**

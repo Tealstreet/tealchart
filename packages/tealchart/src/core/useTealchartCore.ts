@@ -47,9 +47,15 @@ export type UseTealchartCoreReturn = TealchartCoreState & TealchartCoreActions &
 
 // Default empty pane layout for disabled state
 const EMPTY_PANE_LAYOUT: UnifiedPaneLayout = {
-  mainPane: { top: 0, height: 0 },
-  indicatorPanes: [],
-  totalHeight: 0,
+  panes: [{
+    id: 'main',
+    type: 'main',
+    heightRatio: 1.0,
+    yMin: 0,
+    yMax: 0,
+    fixedRange: false,
+  }],
+  timeAxisHeight: 30,
 };
 
 /**

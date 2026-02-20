@@ -41,7 +41,7 @@ import {
   ComputedPane,
   UnifiedPaneLayout,
 } from './types';
-import type { PlotOutput, PlotStyle } from '@packages/tealscript/src';
+import type { PlotOutput, PlotStyle } from '@tealstreet/tealscript';
 import { getDecimalPlacesFromPrecision, PlotStyleOverride, LineStyle } from './state/chartState';
 import type { PaneOffset } from './rendering/PaneManager';
 import { resolveLabelCollisions } from './utils/labelCollision';

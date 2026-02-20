@@ -211,7 +211,7 @@ export class PriceLineManager {
     // Exclude: crosshair (handled separately in updateCrosshair)
     return bounds
       .filter(b => b.type !== 'crosshair')
-      .map(b => `${b.lineId}|${b.type}|${b.color}|${b.lineStyle}|${b.draggable}|${b.chartLabel?.segments.length ?? 0}|${b.chartLabel?.buttons.length ?? 0}`)
+      .map(b => `${b.lineId}|${b.type}|${b.color}|${b.lineStyle}|${b.draggable}|${b.chartLabel?.segments.length ?? 0}|${b.chartLabel?.buttons?.length ?? 0}`)
       .join(';');
   }
 

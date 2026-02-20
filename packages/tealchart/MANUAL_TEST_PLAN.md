@@ -77,7 +77,7 @@ Events are internal plumbing. Verify they work by observing that callbacks fire 
 | 2   | Loading state visible      | Switch from 1h to 1D. Watch for loading indicator. | Brief loading state shown before new candles appear.                                 |
 | 3   | Same interval is no-op     | Click the already-active timeframe button.         | Nothing happens. No reload. Button stays highlighted.                                |
 | 4   | Rapid switching            | Click 1m → 5m → 15m → 1h quickly.                  | Only 1h data loads. No flickering between timeframes.                                |
-| 5   | Candle count reasonable    | Switch to 1m, then to 1D.                          | 1m shows many thin candles. 1D shows fewer wide candles. Both fill the viewport.     |
+| 5   | Candle count reasonable    | Switch to 1m, then to 1D.                          | Both show the same number of candles (same zoom factor). Viewport resets on switch.  |
 | 6   | Real-time updates continue | Switch to 1m. Wait for a new candle to form.       | New candle appears at the right edge. Last candle updates in real-time.              |
 
 ### 2C. Multi-Widget Independence — `TealchartWidget.test.ts`

@@ -25,6 +25,7 @@ import {
   GapDetectionEvent,
   IBasicDataFeed,
   LibrarySymbolInfo,
+  PriceLine,
   RenderOptions,
   ResolutionString,
   TealchartWidgetOptions,
@@ -800,6 +801,39 @@ export class TealchartWidget {
     const positionLines = this._chartApi.getPositionLinesRenderData();
     this._ui.setOrderLines(orderLines);
     this._ui.setPositionLines(positionLines);
+
+    // Create and set last trade line
+    const latestBar = this._bars.length > 0 ? this._bars[this._bars.length - 1] : null;
+    if (latestBar) {
+      const intervalMs = this._getIntervalMs(this._interval);
+      // Handle bar time in either seconds or milliseconds
+      const barTimeMs = latestBar.time < 1e12 ? latestBar.time * 1000 : latestBar.time;
+      const barCloseTime = barTimeMs + intervalMs;
+
+      // Format price - ChartCore will override this with proper precision from renderer
+      const priceText = latestBar.close >= 1000
+        ? latestBar.close.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+        : latestBar.close >= 1
+          ? latestBar.close.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          : latestBar.close.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 6 });
+
+      const lastTradeLine: PriceLine = {
+        id: 'last-trade',
+        price: latestBar.close,
+        lineStyle: 'dotted',
+        color: latestBar.close >= latestBar.open
+          ? (this._renderOptions?.upColor || '#26a69a')
+          : (this._renderOptions?.downColor || '#ef5350'),
+        label: {
+          primaryText: priceText,
+          // secondaryText (countdown) computed in renderer via countdownToTime
+        },
+        type: 'price',
+        renderLineOnCanvas: true,
+        countdownToTime: barCloseTime,
+      };
+      this._ui.setPriceLines([lastTradeLine]);
+    }
 
     // Update pane layout
     const paneLayout = this._paneManager.getLayout();
