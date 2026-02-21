@@ -1,0 +1,119 @@
+# CLAUDE.md — @tealstreet/tealchart
+
+Canvas-based OHLCV charting library with a TradingView-compatible widget API.
+
+## Architecture
+
+**Hybrid rendering model:**
+
+- **Canvas 2D API**: Candlesticks, volume, grid, time/price axes, crosshair (high-frequency updates)
+- **Konva.js + react-konva**: Interactive elements on top of canvas — order/position lines with draggable labels, context menus
+
+**Key classes:**
+
+| Class                 | File                                  | Purpose                                                            |
+| --------------------- | ------------------------------------- | ------------------------------------------------------------------ |
+| `TealchartWidget`     | `src/TealchartWidget.ts`              | TradingView-compatible widget (factory: `createTealchartWidget()`) |
+| `TealchartApi`        | `src/TealchartApi.ts`                 | Per-chart API: symbol, interval, trading lines, studies            |
+| `TealchartRenderer`   | `src/TealchartRenderer.ts`            | Pure canvas rendering (~1500 lines, no React state)                |
+| `PaneManager`         | `src/rendering/PaneManager.ts`        | Unified pane layout — main chart and indicator panes               |
+| `TealscriptManager`   | `src/tealscript/TealscriptManager.ts` | Web Worker lifecycle for tealscript indicators                     |
+| `GapDetectionManager` | `src/GapDetectionManager.ts`          | Detects bar data gaps, auto-recovery with backoff                  |
+
+## Directory Structure
+
+```
+src/
+├── Tealchart.tsx               # Main React component (canvas + Konva overlay)
+├── TealchartWidget.ts          # TradingView-compatible widget class
+├── TealchartApi.ts             # Per-chart API (symbol, interval, lines, studies)
+├── TealchartRenderer.ts        # Pure canvas rendering
+├── types.ts                    # Type definitions (~1100 lines)
+├── GapDetectionManager.ts      # Gap detection + auto-recovery
+├── components/                 # React UI
+│   ├── ChartContainer.tsx      # Full chart with top bar + state management
+│   ├── ChartTopBar.tsx         # Timeframe selector, indicators, layouts
+│   ├── IndicatorsModal.tsx     # Add indicator selection
+│   ├── IndicatorSettingsModal.tsx
+│   ├── ChartLegend.tsx         # Indicator legend + visibility toggles
+│   ├── PriceLineLayer.tsx      # Konva layer for order/position lines
+│   └── ContextMenu.tsx
+├── state/                      # Jotai state management
+│   ├── chartState.ts           # Per-chart atoms with atomWithStorage + migrations
+│   ├── ChartApiContext.tsx      # Context provider for TealchartApi
+│   ├── indicatorActions.ts     # Indicator CRUD operations (atoms)
+│   └── safeDeepMerge.ts        # Handles corrupted localStorage
+├── rendering/
+│   └── PaneManager.ts          # Unified pane system (main + indicator panes)
+├── indicators/
+│   └── builtinIndicators.ts    # Registry of tealscript-based indicators (SMA, EMA, RSI, etc.)
+├── tealscript/                 # Tealscript integration
+│   ├── TealscriptManager.ts    # Worker lifecycle management
+│   └── useTealscript.ts        # React hook
+├── transformer/                # TradingView layout interop (bidirectional)
+│   ├── toTvFormat.ts           # CustomChart → TradingView layout
+│   ├── fromTvFormat.ts         # TradingView → CustomChart
+│   ├── indicatorMapping.ts     # Study ID mappings
+│   └── README.md               # Detailed transformer docs
+├── events/EventEmitter.ts      # Pub-sub + Subscription class
+├── debug/TealchartLogger.ts    # Ring buffer logger with categories
+└── i18n/                       # Internationalization context provider
+```
+
+## State Management
+
+Uses Jotai with `atomWithStorage` for per-chart persistence:
+
+```typescript
+// Per-chart atoms created via factory
+createChartFocusAtoms(chartKey) → settingsAtom, indicatorActionsAtoms, dirtyAtom
+getChartSettingsAtom(chartKey) → atomWithStorage(`tealchart:${chartKey}`, defaults)
+```
+
+- Schema versioning via `CHART_SETTINGS_VERSION` with migration system
+- `safeDeepMerge` handles corrupted localStorage gracefully
+
+## Tealscript Integration
+
+1. User selects indicator → `TealchartWidget.createStudy()`
+2. `TealscriptManager` creates a Web Worker with the indicator code
+3. Bar data pushed to worker → plots returned
+4. Overlay indicators render on main pane; non-overlay get dedicated panes
+5. Requires factory function `createTealscriptWorker()` from the consuming app
+
+Built-in indicators defined in `builtinIndicators.ts`: SMA, EMA, RSI, MACD, Bollinger Bands, etc.
+
+## TradingView Compatibility
+
+Implements TradingView-compatible interfaces:
+
+- `IChartingLibraryWidget` — widget lifecycle (`onChartReady`, `remove`)
+- `IChartWidgetApi` — per-chart operations (symbol, interval, studies, trading lines)
+- `IOrderLineAdapter`, `IPositionLineAdapter` — trading line adapters
+- Layout save/load via `transformer/` (bidirectional conversion)
+
+The `transformer/README.md` documents the TradingView layout schema in detail.
+
+## Commands
+
+```bash
+yarn build-force      # Build with tsup
+yarn dev-force        # Watch mode
+yarn test             # Vitest
+yarn typecheck        # tsc --noEmit
+yarn lint             # ESLint
+```
+
+## Key Dependencies
+
+- `konva` / `react-konva` — vector graphics for interactive elements
+- `jotai` / `jotai-optics` / `optics-ts` — atomic state with nested updates
+- `@tealstreet/tealscript` — indicator scripting via Web Workers
+
+## Gotchas
+
+- `TealchartRenderer` is pure canvas — no React; test it independently
+- Text width caching (`ctx.measureText`) provides ~10x speedup — invalidate on font changes
+- `PaneManager` treats main chart as "just another pane" (type: `'main'`)
+- Gap detection has exponential backoff — don't remove the debounce
+- Generated Konva layers must Z-order correctly: canvas → price lines → context menu
