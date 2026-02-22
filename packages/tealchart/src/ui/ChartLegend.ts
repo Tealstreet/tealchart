@@ -86,6 +86,7 @@ const styles = {
     alignItems: 'center',
     gap: '8px',
     marginBottom: '2px',
+    whiteSpace: 'nowrap',
   } as Partial<CSSStyleDeclaration>,
 
   symbolInfo: {
@@ -94,6 +95,7 @@ const styles = {
     gap: '4px',
     color: 'var(--text, #d1d4dc)',
     fontWeight: '500',
+    whiteSpace: 'nowrap',
   } as Partial<CSSStyleDeclaration>,
 
   dot: {
