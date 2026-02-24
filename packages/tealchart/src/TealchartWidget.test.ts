@@ -727,5 +727,27 @@ describe('TealchartWidget', () => {
         loadMoreCb(makeBars(5, 500000, 60000, 45000), {});
       }).not.toThrow();
     });
+
+    it('stale real-time tick from old subscription discarded after symbol switch', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed, makeBars(10, 1000000, 60000, 50000));
+
+      // Capture the old subscription's tick callback
+      const oldTickCb = datafeed._subscribeCb!;
+
+      // Switch symbol
+      widget.setSymbol('ETHUSDT');
+      datafeed._resolveSymbolCb?.({ ...defaultSymbolInfo, name: 'ETHUSDT' });
+      datafeed._getBarsCb?.(makeBars(10, 2000000, 60000, 2000), {});
+
+      setBarsCalls.length = 0;
+
+      // Fire stale tick from old symbol (DOGE-like price on BTC chart)
+      oldTickCb({ time: 2000000 + 10 * 60000, open: 1.42, high: 1.43, low: 1.41, close: 1.42, volume: 100 });
+
+      // The stale tick should NOT have been applied — no setBars call
+      expect(setBarsCalls).toHaveLength(0);
+    });
   });
 });

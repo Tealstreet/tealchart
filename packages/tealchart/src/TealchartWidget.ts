@@ -312,6 +312,9 @@ export class TealchartWidget {
         this._symbol,
         (symbolInfo) => {
           if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
+            this._logger?.debug(LogCategory.Widget, 'Discarded stale resolveSymbol callback (init)', {
+              symbol: symbolInfo.name,
+            });
             return;
           }
           this._symbolInfo = symbolInfo;
@@ -387,7 +390,8 @@ export class TealchartWidget {
       (bars, _meta) => {
         // Check if this request is still valid (not superseded or disposed)
         if (this._disposed || requestId !== this._loadBarsRequestId) {
-          return; // Ignore stale response
+          this._logger?.debug(LogCategory.Widget, 'Discarded stale getBars response', { barCount: bars.length });
+          return;
         }
 
         this._isLoadingBars = false;
@@ -438,14 +442,28 @@ export class TealchartWidget {
       this._gapDetectionManager.start();
     }
 
+    // Capture guid for stale-check in the callback — if the subscription
+    // is replaced before the datafeed fully unsubscribes, late ticks are discarded.
+    const subscriptionGuid = this._barSubscriptionGuid;
+
     this._datafeed.subscribeBars(
       this._symbolInfo,
       this._interval,
       (bar) => {
+        if (this._disposed || subscriptionGuid !== this._barSubscriptionGuid) {
+          this._logger?.debug(LogCategory.Widget, 'Discarded stale real-time tick', {
+            price: bar.close,
+            guid: subscriptionGuid,
+          });
+          return;
+        }
         this._handleNewBar(bar);
       },
       this._barSubscriptionGuid,
       () => {
+        if (this._disposed || subscriptionGuid !== this._barSubscriptionGuid) {
+          return;
+        }
         // Reset cache callback - reload bars
         this._loadBars();
       },
@@ -532,6 +550,7 @@ export class TealchartWidget {
       (bars, _meta) => {
         // Discard if widget was disposed or symbol/interval changed
         if (this._disposed || requestId !== this._loadBarsRequestId) {
+          this._logger?.debug(LogCategory.Widget, 'Discarded stale loadMoreBars response', { barCount: bars.length });
           return;
         }
 
@@ -811,19 +830,21 @@ export class TealchartWidget {
       const barCloseTime = barTimeMs + intervalMs;
 
       // Format price - ChartCore will override this with proper precision from renderer
-      const priceText = latestBar.close >= 1000
-        ? latestBar.close.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
-        : latestBar.close >= 1
-          ? latestBar.close.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-          : latestBar.close.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 6 });
+      const priceText =
+        latestBar.close >= 1000
+          ? latestBar.close.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+          : latestBar.close >= 1
+            ? latestBar.close.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            : latestBar.close.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 6 });
 
       const lastTradeLine: PriceLine = {
         id: 'last-trade',
         price: latestBar.close,
         lineStyle: 'dotted',
-        color: latestBar.close >= latestBar.open
-          ? (this._renderOptions?.upColor || '#26a69a')
-          : (this._renderOptions?.downColor || '#ef5350'),
+        color:
+          latestBar.close >= latestBar.open
+            ? this._renderOptions?.upColor || '#26a69a'
+            : this._renderOptions?.downColor || '#ef5350',
         label: {
           primaryText: priceText,
           // secondaryText (countdown) computed in renderer via countdownToTime
@@ -1259,6 +1280,9 @@ export class TealchartWidget {
       (symbolInfo) => {
         // Ignore stale resolve (superseded by a newer symbol change)
         if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
+          this._logger?.debug(LogCategory.Widget, 'Discarded stale resolveSymbol callback', {
+            symbol: symbolInfo.name,
+          });
           return;
         }
         this._symbolInfo = symbolInfo;
