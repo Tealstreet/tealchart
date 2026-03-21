@@ -23,7 +23,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.2.0",
     "@fortawesome/free-solid-svg-icons": "^7.2.0",
-    "@fortawesome/react-fontawesome": "^3.2.0",
+    "@fortawesome/react-fontawesome": "^3.3.0",
     "@tealstreet/react-colorful": "*",
     "@tealstreet/tealscript": "*",
     "jotai": "^2.18.1",
