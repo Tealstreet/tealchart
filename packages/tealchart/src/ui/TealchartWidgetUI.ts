@@ -109,6 +109,8 @@ export interface TealchartWidgetUIOptions {
   onAutoScaleDisabled?: () => void;
   /** Called when viewport is reset (re-enables auto-scale) */
   onResetViewport?: () => void;
+  /** Returns whether auto-scale is active */
+  isAutoScale?: () => boolean;
 }
 
 // ============================================================================
@@ -261,6 +263,7 @@ export class TealchartWidgetUI {
       onCrossHairMoved: this.options.onCrossHairMoved,
       onAutoScaleDisabled: this.options.onAutoScaleDisabled,
       onResetViewport: this.options.onResetViewport,
+      isAutoScale: this.options.isAutoScale,
     });
   }
 

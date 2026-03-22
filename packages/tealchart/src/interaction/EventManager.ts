@@ -65,6 +65,8 @@ export interface EventManagerCallbacks {
   onPaneHeightsChange?: (heights: { paneId: string; heightRatio: number }[]) => void;
   /** Called when auto-scale should be disabled (user starts price axis zoom) */
   onAutoScaleDisabled?: () => void;
+  /** Returns whether auto-scale is active (pan should skip vertical movement) */
+  isAutoScale?: () => boolean;
   /** Check if position is over interactive Konva element */
   isOverInteractiveElement?: (x: number, y: number) => boolean;
   /** Get price from Y coordinate */
@@ -850,8 +852,9 @@ export class EventManager {
     // external callback is only called at drag end
     const updateViewport = this.callbacks.onViewportChangeInternal ?? this.callbacks.onViewportChange;
 
-    if (this.state.draggedPaneId === 'main') {
+    if (this.state.draggedPaneId === 'main' && !this.callbacks.isAutoScale?.()) {
       // Update viewport for main pane (horizontal + vertical)
+      // When auto-scale is active, skip vertical — auto-scale will recalculate price axis
       updateViewport?.({
         ...viewport,
         startTime: newStartTime,
@@ -860,9 +863,7 @@ export class EventManager {
         priceMax: newPriceMax,
       });
     } else {
-      // For indicator panes: only update time (viewport), let Y auto-scale
-      // Matching React version behavior - indicator panes don't pan vertically,
-      // they always auto-scale based on visible data. User can zoom Y via price axis.
+      // For indicator panes (or main pane with auto-scale): only update time axis
       updateViewport?.({
         ...viewport,
         startTime: newStartTime,

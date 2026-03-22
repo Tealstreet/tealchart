@@ -802,6 +802,7 @@ export class TealchartWidget {
         onResetViewport: () => {
           this._autoScale = true;
         },
+        isAutoScale: () => this._autoScale,
         onRequestMoreBars: (direction) => {
           this._loadMoreBars(direction);
         },

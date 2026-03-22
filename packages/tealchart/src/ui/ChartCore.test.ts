@@ -151,7 +151,7 @@ describe('ChartCore viewport management', () => {
     core.dispose();
   });
 
-  it('setBars([]) followed by setBars(newBars) should recalculate viewport for new data', async () => {
+  it('setBars([]) preserves viewport — caller (TealchartWidget) sets correct viewport via setViewport()', async () => {
     const core = await createChartCore();
 
     // Step 1: Load BTC bars (~$50,000)
@@ -162,36 +162,36 @@ describe('ChartCore viewport management', () => {
     expect(btcViewport).not.toBeNull();
     expect(btcViewport!.priceMin).toBeGreaterThan(40_000);
 
-    // Step 2: Clear bars (simulates symbol switch)
+    // Step 2: Clear bars — viewport is intentionally preserved so the chart
+    // doesn't flash empty during async symbol switch. TealchartWidget calls
+    // setViewport() with a ViewScaleState-reconstructed viewport when new bars arrive.
     core.setBars([]);
+    expect(core.getViewport()).not.toBeNull();
 
-    // Step 3: Load DOGE-like bars (~$3)
+    // Step 3: Caller sets new viewport for DOGE-like bars (~$3), then loads bars
+    core.setViewport({ startTime: 2_000_000, endTime: 2_600_000, priceMin: 2, priceMax: 4 });
     const dogeBars = makeBars(10, 2_000_000, 60_000, 3);
     core.setBars(dogeBars);
 
-    // Viewport SHOULD now reflect DOGE range, not BTC range
     const newViewport = core.getViewport();
     expect(newViewport).not.toBeNull();
-    // If viewport was properly recalculated, priceMax should be << 1000
-    // If the bug persists, priceMax is still ~50,000+ from the BTC range
     expect(newViewport!.priceMax).toBeLessThan(1_000);
 
     core.dispose();
   });
 
-  it('setBars([]) should null the viewport so next setBars recalculates', async () => {
+  it('setBars([]) keeps viewport for seamless transitions', async () => {
     const core = await createChartCore();
 
     // Load initial bars
     const bars = makeBars(10);
     core.setBars(bars);
-    expect(core.getViewport()).not.toBeNull();
+    const vp = core.getViewport();
+    expect(vp).not.toBeNull();
 
-    // Clear bars (symbol/interval switch)
+    // Clear bars — viewport persists (ViewScaleState handles symbol switches at widget level)
     core.setBars([]);
-
-    // Viewport should be null after clearing bars
-    expect(core.getViewport()).toBeNull();
+    expect(core.getViewport()).toEqual(vp);
 
     core.dispose();
   });

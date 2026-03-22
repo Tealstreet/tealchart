@@ -40,6 +40,7 @@ import {
   UnifiedPaneLayout,
   Viewport,
 } from '../types';
+import { applyAutoScale } from '../viewport/viewScale';
 import { button, div, icons } from './dom';
 
 // ============================================================================
@@ -98,6 +99,8 @@ export interface ChartCoreOptions {
   onAutoScaleDisabled?: () => void;
   /** Called when viewport is reset (re-enables auto-scale) */
   onResetViewport?: () => void;
+  /** Returns whether auto-scale is active */
+  isAutoScale?: () => boolean;
 }
 
 // ============================================================================
@@ -570,6 +573,7 @@ export class ChartCore {
       },
       isOverInteractiveElement: (x, y) => this.isOverInteractiveElement(x, y),
       onAutoScaleDisabled: () => this.options.onAutoScaleDisabled?.(),
+      isAutoScale: () => this.options.isAutoScale?.() ?? true,
       onViewportChange: (vp) => {
         this.viewport = vp;
         this.options.onViewportChange?.(vp);
@@ -577,7 +581,8 @@ export class ChartCore {
       },
       onViewportChangeInternal: (vp) => {
         // Internal update during drag - no external callback to avoid parent re-renders
-        this.viewport = vp;
+        // Apply auto-scale during drag so price axis fits visible candles in real time
+        this.viewport = this.options.isAutoScale?.() ? applyAutoScale(vp, this.bars) : vp;
         this.scheduleRender();
       },
       onPaneYRangeChange: (paneId, yMin, yMax) => {
