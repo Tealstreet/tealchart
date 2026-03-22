@@ -811,7 +811,7 @@ export class TealchartWidget {
       this._ui.setLoading(true);
     } else if (this._wasLoadingBars) {
       // Still loading visually — ChartCore hasn't painted yet. Defer to next frame.
-      requestAnimationFrame(() => this._ui.setLoading(false));
+      requestAnimationFrame(() => this._ui?.setLoading(false));
     }
     this._wasLoadingBars = this._isLoadingBars;
 
