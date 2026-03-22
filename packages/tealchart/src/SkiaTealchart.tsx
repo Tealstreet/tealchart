@@ -263,9 +263,24 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   const barsLengthRef = useRef(bars.length);
   const viewScaleRef = useRef<ViewScaleState | null>(null);
 
+  // Track the first bar's time to detect reloads with the same count
+  const barsFirstTimeRef = useRef<number | null>(bars.length > 0 ? bars[0].time : null);
+
   useEffect(() => {
-    if (bars.length > 0 && bars.length !== barsLengthRef.current) {
+    if (bars.length === 0) {
+      // Reset refs when bars are cleared so next load always triggers
+      barsLengthRef.current = 0;
+      barsFirstTimeRef.current = null;
+      return;
+    }
+
+    const firstTime = bars[0].time;
+    const lengthChanged = bars.length !== barsLengthRef.current;
+    const identityChanged = firstTime !== barsFirstTimeRef.current;
+
+    if (lengthChanged || identityChanged) {
       barsLengthRef.current = bars.length;
+      barsFirstTimeRef.current = firstTime;
 
       // Restore viewport from proportional viewScale if available
       let newViewport: Viewport;

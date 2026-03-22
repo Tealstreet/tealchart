@@ -12,7 +12,44 @@ import type { Bar, Viewport, ViewScaleState } from '../types';
 import { TealchartRenderer } from '../TealchartRenderer';
 
 /**
+ * Find the index of the first bar whose time >= target using binary search.
+ * Returns bars.length if no such bar exists.
+ */
+function lowerBound(bars: Bar[], target: number): number {
+  let lo = 0;
+  let hi = bars.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1;
+    if (bars[mid].time < target) {
+      lo = mid + 1;
+    } else {
+      hi = mid;
+    }
+  }
+  return lo;
+}
+
+/**
+ * Find the index of the first bar whose time > target using binary search.
+ * Returns bars.length if no such bar exists.
+ */
+function upperBound(bars: Bar[], target: number): number {
+  let lo = 0;
+  let hi = bars.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1;
+    if (bars[mid].time <= target) {
+      lo = mid + 1;
+    } else {
+      hi = mid;
+    }
+  }
+  return lo;
+}
+
+/**
  * Find the highest high and lowest low among bars within [startTime, endTime].
+ * Uses binary search to locate the visible range since bars are sorted by time.
  * Returns null if no bars fall within the range.
  */
 export function getVisibleBarsBoundingBox(
@@ -20,20 +57,24 @@ export function getVisibleBarsBoundingBox(
   startTime: number,
   endTime: number,
 ): { highest: number; lowest: number } | null {
+  if (bars.length === 0) return null;
+
+  // Binary search for the first bar with time >= startTime
+  const startIdx = lowerBound(bars, startTime);
+  // Binary search for the first bar with time > endTime
+  const endIdx = upperBound(bars, endTime);
+
+  if (startIdx >= endIdx) return null;
+
   let highest = -Infinity;
   let lowest = Infinity;
-  let found = false;
 
-  for (let i = 0; i < bars.length; i++) {
+  for (let i = startIdx; i < endIdx; i++) {
     const bar = bars[i];
-    if (bar.time >= startTime && bar.time <= endTime) {
-      if (bar.high > highest) highest = bar.high;
-      if (bar.low < lowest) lowest = bar.low;
-      found = true;
-    }
+    if (bar.high > highest) highest = bar.high;
+    if (bar.low < lowest) lowest = bar.low;
   }
 
-  if (!found) return null;
   return { highest, lowest };
 }
 
