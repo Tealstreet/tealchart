@@ -298,7 +298,7 @@ export class TealchartWidgetUI {
   // ============================================================================
 
   /**
-   * Update bars - calls ChartCore directly
+   * Update bars (full replacement) - calls ChartCore directly
    */
   setBars(bars: Bar[]): void {
     this.chartCore?.setBars(bars);
@@ -309,6 +309,18 @@ export class TealchartWidgetUI {
       const previousBar = bars.length > 1 ? bars[bars.length - 2] : null;
       this.legend?.setBars(latestBar, previousBar);
     }
+  }
+
+  /**
+   * Update a single bar (real-time tick) - lightweight path that
+   * bypasses the full setBars reference check and render pipeline.
+   */
+  updateBar(bar: Bar, bars: Bar[]): void {
+    this.chartCore?.updateBar(bar);
+
+    // Update legend with latest bar
+    const previousBar = bars.length > 1 ? bars[bars.length - 2] : null;
+    this.legend?.setBars(bar, previousBar);
   }
 
   /**

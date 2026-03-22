@@ -55,6 +55,7 @@ export class TealchartWidget {
   private _interval: ResolutionString;
   private _symbolInfo: LibrarySymbolInfo | null = null;
   private _bars: Bar[] = [];
+  private _barsDirty = false; // true when bars array has been replaced (not just mutated)
   private _viewport: Viewport | null = null;
   private _isReady = false;
   private _readyCallbacks: Array<() => void> = [];
@@ -362,6 +363,7 @@ export class TealchartWidget {
 
   private _loadBars(): void {
     if (!this._symbolInfo) {
+      console.warn('[Tealchart] _loadBars called but no symbolInfo');
       return;
     }
 
@@ -391,12 +393,12 @@ export class TealchartWidget {
       (bars, _meta) => {
         // Check if this request is still valid (not superseded or disposed)
         if (this._disposed || requestId !== this._loadBarsRequestId) {
-          this._logger?.debug(LogCategory.Widget, 'Discarded stale getBars response', { barCount: bars.length });
           return;
         }
 
         this._isLoadingBars = false;
         this._bars = bars;
+        this._barsDirty = true;
 
         // Notify Tealscript manager of all bars
         if (this._tealScriptManager) {
@@ -422,7 +424,10 @@ export class TealchartWidget {
   }
 
   private _subscribeToBars(): void {
-    if (!this._symbolInfo) return;
+    if (!this._symbolInfo) {
+      console.warn('[Tealchart] _subscribeToBars called but no symbolInfo');
+      return;
+    }
 
     // Unsubscribe from previous subscription
     if (this._barSubscriptionGuid) {
@@ -452,10 +457,6 @@ export class TealchartWidget {
       this._interval,
       (bar) => {
         if (this._disposed || subscriptionGuid !== this._barSubscriptionGuid) {
-          this._logger?.debug(LogCategory.Widget, 'Discarded stale real-time tick', {
-            price: bar.close,
-            guid: subscriptionGuid,
-          });
           return;
         }
         this._handleNewBar(bar);
@@ -508,8 +509,13 @@ export class TealchartWidget {
       this._tealScriptManager.updateBar(bar);
     }
 
-    // Update UI directly
-    this._ui?.setBars(this._bars);
+    // Lightweight real-time update — goes directly to ChartCore.updateBar()
+    // which handles mutation + scheduleRender internally.
+    this._ui?.updateBar(bar, this._bars);
+
+    // Also schedule a widget-level render to update the last-trade price
+    // line, order/position lines, and other state computed in _doRender.
+    this._scheduleRender();
   }
 
   private _loadMoreBars(direction: 'left' | 'right'): void {
@@ -568,6 +574,7 @@ export class TealchartWidget {
 
         if (newBars.length > 0) {
           this._bars = [...newBars, ...this._bars];
+          this._barsDirty = true;
 
           // Notify Tealscript manager of updated bars
           // Don't render yet - wait for onPlotsUpdated callback to ensure
@@ -608,6 +615,7 @@ export class TealchartWidget {
 
     // Clear existing bars
     this._bars = [];
+    this._barsDirty = true;
     this._hasMoreHistoricalData = true;
     this._isLoadingMoreBars = false;
 
@@ -801,8 +809,12 @@ export class TealchartWidget {
     this._ui.setSymbol(this._symbol);
     this._ui.setInterval(this._interval);
 
-    // Update UI state
-    this._ui.setBars(this._bars);
+    // Push bars to ChartCore only when the array was replaced (load/reset),
+    // not on every render. Real-time ticks go through updateBar() directly.
+    if (this._barsDirty) {
+      this._ui.setBars(this._bars);
+      this._barsDirty = false;
+    }
     this._ui.setPlots(this._plots);
     // Defer hiding the loading overlay by one frame so ChartCore's RAF-based
     // render paints the new candles BEFORE the overlay is removed. Without this,
@@ -1278,6 +1290,7 @@ export class TealchartWidget {
 
     this._symbol = cleanSymbol;
     this._bars = [];
+    this._barsDirty = true;
     this._hasMoreHistoricalData = true;
     this._isLoadingMoreBars = false;
     this._isLoadingBars = true;
@@ -1349,6 +1362,7 @@ export class TealchartWidget {
 
     this._interval = interval;
     this._bars = [];
+    this._barsDirty = true;
     this._hasMoreHistoricalData = true; // Reset for new interval
     this._isLoadingMoreBars = false;
 
@@ -1380,6 +1394,7 @@ export class TealchartWidget {
 
     // Clear existing bars
     this._bars = [];
+    this._barsDirty = true;
     this._hasMoreHistoricalData = true;
     this._isLoadingMoreBars = false;
     this._isLoadingBars = true;

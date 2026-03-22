@@ -636,7 +636,7 @@ export class ChartCore {
    * Uses reference equality check - bars array is always new when data changes
    */
   setBars(bars: Bar[]): void {
-    // Reference check - if same array, no update needed
+    // Reference check — skip if same array (real-time ticks use updateBar instead)
     if (bars === this.bars) return;
 
     this.bars = bars;
@@ -1274,9 +1274,7 @@ export class ChartCore {
   // ============================================================================
 
   private scheduleRender(): void {
-    if (this.rafId !== null) {
-      cancelAnimationFrame(this.rafId);
-    }
+    if (this.rafId !== null) return; // Already scheduled — coalesce
 
     this.rafId = requestAnimationFrame(() => {
       this.rafId = null;
