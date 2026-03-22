@@ -30,9 +30,11 @@ import {
   ResolutionString,
   TealchartWidgetOptions,
   Viewport,
+  ViewScaleState,
   WidgetEvent,
 } from './types';
 import { TealchartWidgetUI } from './ui/TealchartWidgetUI';
+import { captureViewScale, restoreViewport } from './viewport/viewScale';
 
 type EventCallback = (...args: unknown[]) => void;
 
@@ -57,6 +59,7 @@ export class TealchartWidget {
   private _bars: Bar[] = [];
   private _barsDirty = false; // true when bars array has been replaced (not just mutated)
   private _viewport: Viewport | null = null;
+  private _viewScale: ViewScaleState | null = null;
   private _isReady = false;
   private _readyCallbacks: Array<() => void> = [];
 
@@ -399,6 +402,13 @@ export class TealchartWidget {
         this._isLoadingBars = false;
         this._bars = bars;
         this._barsDirty = true;
+
+        // Restore viewport from proportional viewScale if available
+        if (this._viewScale && bars.length > 0) {
+          const vp = restoreViewport(this._viewScale, bars);
+          this._viewport = vp;
+          this._ui?.setViewport(vp);
+        }
 
         // Notify Tealscript manager of all bars
         if (this._tealScriptManager) {
@@ -757,6 +767,7 @@ export class TealchartWidget {
         },
         onViewportChange: (viewport) => {
           this._viewport = viewport;
+          this._viewScale = captureViewScale(viewport, this._bars);
         },
         onRequestMoreBars: (direction) => {
           this._loadMoreBars(direction);
@@ -1290,7 +1301,6 @@ export class TealchartWidget {
 
     this._symbol = cleanSymbol;
     this._bars = [];
-    this._barsDirty = true;
     this._hasMoreHistoricalData = true;
     this._isLoadingMoreBars = false;
     this._isLoadingBars = true;
@@ -1362,7 +1372,6 @@ export class TealchartWidget {
 
     this._interval = interval;
     this._bars = [];
-    this._barsDirty = true;
     this._hasMoreHistoricalData = true; // Reset for new interval
     this._isLoadingMoreBars = false;
 
@@ -1394,7 +1403,6 @@ export class TealchartWidget {
 
     // Clear existing bars
     this._bars = [];
-    this._barsDirty = true;
     this._hasMoreHistoricalData = true;
     this._isLoadingMoreBars = false;
     this._isLoadingBars = true;

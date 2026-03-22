@@ -312,6 +312,14 @@ export class TealchartWidgetUI {
   }
 
   /**
+   * Set viewport directly - used by TealchartWidget to restore viewport
+   * from ViewScaleState after symbol/interval/account changes.
+   */
+  setViewport(viewport: Viewport): void {
+    this.chartCore?.setViewport(viewport);
+  }
+
+  /**
    * Update a single bar (real-time tick) - lightweight path that
    * bypasses the full setBars reference check and render pipeline.
    */

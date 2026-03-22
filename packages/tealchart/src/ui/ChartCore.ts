@@ -640,9 +640,7 @@ export class ChartCore {
     if (bars === this.bars) return;
 
     this.bars = bars;
-    if (bars.length === 0) {
-      this.viewport = null;
-    } else if (!this.viewport) {
+    if (bars.length > 0 && !this.viewport) {
       this.viewport = TealchartRenderer.calculateViewport(bars);
     }
     this.scheduleRender();

@@ -21,6 +21,16 @@ export interface Viewport {
   priceMax: number; // Top price
 }
 
+// ViewScaleState captures the proportional view state for viewport preservation
+// across symbol/interval/account changes. Time axis is in ms (works across intervals),
+// price axis is proportional (works across symbols with different price ranges).
+export interface ViewScaleState {
+  visibleTimeRange: number; // viewport.endTime - viewport.startTime
+  rightOffsetMs: number; // viewport.endTime - latestBarTime
+  pricePaddingTop: number; // (priceMax - highestWick) / dataRange
+  pricePaddingBottom: number; // (lowestWick - priceMin) / dataRange
+}
+
 // Rendering options
 export interface RenderOptions {
   width: number;
