@@ -6,7 +6,7 @@
  */
 
 import React, { memo, useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { useAtom } from 'jotai';
+import { useStore } from '@nanostores/react';
 import type { ChartSettings, SaveStatus } from '../state/chartState';
 import { createChartFocusAtoms } from '../state/chartState';
 import type { ISaveLoadAdapter, TransformResult } from '../transformer';
@@ -207,11 +207,17 @@ export const LayoutSelector: React.FC<LayoutSelectorProps> = memo(({
   // Translations
   const t = useChartTranslations();
 
-  // Get current layout from persisted atom
-  const focusAtoms = useMemo(() => createChartFocusAtoms(chartKey), [chartKey]);
-  const [currentLayout, setCurrentLayout] = useAtom(focusAtoms.currentLayoutAtom);
-  const [isDirty, setIsDirty] = useAtom(focusAtoms.isDirtyAtom);
-  const [saveStatus] = useAtom(focusAtoms.saveStatusAtom);
+  // Get current layout from persisted stores
+  const chartStores = useMemo(() => createChartFocusAtoms(chartKey), [chartKey]);
+  const currentLayout = useStore(chartStores.currentLayoutAtom);
+  const setCurrentLayout = useCallback((value: typeof currentLayout) => {
+    chartStores.currentLayoutAtom.set(value);
+  }, [chartStores]);
+  const isDirty = useStore(chartStores.isDirtyAtom);
+  const setIsDirty = useCallback((value: boolean) => {
+    chartStores.isDirtyAtom.set(value);
+  }, [chartStores]);
+  const saveStatus = useStore(chartStores.saveStatusAtom);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

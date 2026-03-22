@@ -3,36 +3,36 @@
  * Mirrors TradingView's IChartingLibraryWidget for drop-in replacement
  */
 
-import { createRoot, Root } from 'react-dom/client';
-import React from 'react';
-import { getDefaultStore } from 'jotai';
-import { EventEmitter } from './events/EventEmitter';
-import { TealchartApi } from './TealchartApi';
-import { ChartContainer } from './components/ChartContainer';
-import { ChartApiContext } from './state/ChartApiContext';
-import { TealscriptManager } from './tealscript/TealscriptManager';
-import { type BuiltinIndicator, getIndicatorById } from './indicators/builtinIndicators';
-import { createChartFocusAtoms, getCurrentLayoutAtom, getIsDirtyAtom, getSaveStatusAtom, type ChartSettings, type IndicatorInstance, type PlotStyleOverride } from './state/chartState';
-import { generateIndicatorId } from './state/indicatorActions';
-import { PaneManager } from './rendering/PaneManager';
-import { GapDetectionManager } from './GapDetectionManager';
-import { TealchartLogger, LogCategory } from './debug/TealchartLogger';
 import type { PlotOutput } from '@tealstreet/tealscript';
+import type { BuiltinIndicator } from './indicators/builtinIndicators';
+import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
+
+import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
+import { EventEmitter } from './events/EventEmitter';
+import { GapDetectionManager } from './GapDetectionManager';
+import { getIndicatorById } from './indicators/builtinIndicators';
+import { PaneManager } from './rendering/PaneManager';
+import { getChartStore } from './state/chartState';
+import { generateIndicatorId } from './state/indicatorActions';
+import { TealchartApi } from './TealchartApi';
+import { TealscriptManager } from './tealscript/TealscriptManager';
 import {
   Bar,
   ChartOverrides,
   ContextMenuCallback,
-  TealchartWidgetOptions,
-  GapDetectionEvent,
+  DEFAULT_RENDER_OPTIONS,
   GapDetectionErrorState,
+  GapDetectionEvent,
   IBasicDataFeed,
   LibrarySymbolInfo,
+  PriceLine,
   RenderOptions,
   ResolutionString,
+  TealchartWidgetOptions,
   Viewport,
   WidgetEvent,
-  DEFAULT_RENDER_OPTIONS,
 } from './types';
+import { TealchartWidgetUI } from './ui/TealchartWidgetUI';
 
 type EventCallback = (...args: unknown[]) => void;
 
@@ -45,7 +45,7 @@ export class TealchartWidget {
   private _datafeed: IBasicDataFeed;
   private _chartApi: TealchartApi;
   private _eventEmitter: EventEmitter;
-  private _root: Root | null = null;
+  private _ui: TealchartWidgetUI | null = null;
 
   // Chart key for per-chart state persistence
   private _chartKey: string;
@@ -71,24 +71,23 @@ export class TealchartWidget {
   // Subscription tracking
   private _barSubscriptionGuid: string | null = null;
 
-  // Ref for imperative bar updates
-  private _barsUpdateRef: React.MutableRefObject<((bars: Bar[]) => void) | null> = { current: null };
-
   // Historical data loading
   private _isLoadingMoreBars = false;
   private _hasMoreHistoricalData = true;
 
   // Loading state for timeframe changes
   private _isLoadingBars = false;
+  private _wasLoadingBars = false;
   private _loadBarsRequestId = 0;
+  private _resolveSymbolRequestId = 0;
+  private _disposed = false;
 
   // Tealscript indicator support
   private _tealScriptManager: TealscriptManager | null = null;
   private _plots: PlotOutput[] = [];
 
-  // Jotai store for imperative state access
-  private _jotaiStore = getDefaultStore();
-  private _focusAtoms: ReturnType<typeof createChartFocusAtoms> | null = null;
+  // Nanostores for imperative state access
+  private _chartStore: ChartStore | null = null;
 
   // Map from indicator instance ID to study ID (used for persistence tracking)
   private _indicatorStudyMap = new Map<string, string>();
@@ -108,13 +107,38 @@ export class TealchartWidget {
   // Gap detection for automatic bar recovery
   private _gapDetectionManager: GapDetectionManager | null = null;
   private _gapDetectionError: GapDetectionErrorState | null = null;
-  private _gapDetectionErrorUpdateRef: React.MutableRefObject<((error: GapDetectionErrorState | null) => void) | null> = { current: null };
+  private _gapDetectionErrorCallback: ((error: GapDetectionErrorState | null) => void) | null = null;
 
   // Track if interval was explicitly provided (for controlled vs uncontrolled behavior)
   private _intervalWasProvided: boolean;
 
+  // Resize observer for container auto-sizing
+  private _resizeObserver: ResizeObserver | null = null;
+  private _lastContainerWidth = 0;
+  private _lastContainerHeight = 0;
+
   // Debug logger for this chart instance (null if disabled)
   private _logger: TealchartLogger | null = null;
+
+  // ============================================================================
+  // Batched Rendering System
+  // ============================================================================
+  // All state updates schedule a single batched render via RAF.
+  // The actual render passes current state to UI - ChartCore setters
+  // use reference equality to skip unchanged data (like React refs).
+  private _renderRafId: number | null = null;
+
+  /**
+   * Schedule a batched render. Multiple calls within the same frame
+   * collapse into a single render (like React's batching).
+   */
+  private _scheduleRender(): void {
+    if (this._renderRafId !== null) return; // Already scheduled
+    this._renderRafId = requestAnimationFrame(() => {
+      this._renderRafId = null;
+      this._doRender();
+    });
+  }
 
   constructor(container: HTMLElement, options: TealchartWidgetOptions) {
     this._container = container;
@@ -124,18 +148,24 @@ export class TealchartWidget {
 
     // Track if interval was explicitly provided (for controlled vs uncontrolled behavior)
     this._intervalWasProvided = options.interval !== undefined && options.interval !== '';
-    // Default to '1h' if no interval provided
-    this._interval = (options.interval || '1h') as ResolutionString;
 
     // Generate chart key for per-chart state persistence
     // Use provided chartKey, or derive from account/panelId, or generate unique ID
     this._chartKey = options.chartKey || `chart_${options.account || ''}_${Date.now()}`;
 
-    // Initialize Jotai focus atoms for this chart
-    this._focusAtoms = createChartFocusAtoms(this._chartKey);
+    // Initialize Nanostores for this chart (loads persisted settings from localStorage)
+    this._chartStore = getChartStore(this._chartKey);
 
-    // Sync interval to Jotai atom so ChartTopBar shows correct selection
-    this._jotaiStore.set(this._focusAtoms.intervalAtom, this._interval);
+    // Interval priority: explicit option > persisted store value (from localStorage)
+    if (this._intervalWasProvided) {
+      this._interval = options.interval as ResolutionString;
+      // Sync explicitly provided interval to store
+      this._chartStore.settings.setKey('interval', this._interval);
+    } else {
+      // Use persisted interval from localStorage (loaded by getChartStore).
+      // Falls back to DEFAULT_CHART_SETTINGS.interval ('1h') if nothing persisted.
+      this._interval = this._chartStore.settings.get().interval;
+    }
 
     // Initialize pane manager for multi-pane indicator support
     this._paneManager = new PaneManager();
@@ -167,7 +197,7 @@ export class TealchartWidget {
 
     // Subscribe to order/position line changes to trigger re-renders
     this._chartApi.setOnLinesChanged(() => {
-      this._render();
+      this._scheduleRender();
     });
 
     // Initialize Tealscript manager if worker factory is provided
@@ -176,7 +206,7 @@ export class TealchartWidget {
         createWorker: options.createTealscriptWorker,
         onPlotsUpdated: (plots) => {
           this._plots = plots;
-          this._render();
+          this._scheduleRender();
         },
         onError: (scriptId, error) => {
           console.error(`[Tealchart] Tealscript error in ${scriptId}:`, error.message);
@@ -195,7 +225,7 @@ export class TealchartWidget {
             }
             if (Object.keys(defaultInputs).length > 0) {
               study.setInputs({ ...currentInputs, ...defaultInputs });
-              this._render();
+              this._scheduleRender();
             }
           }
         },
@@ -230,20 +260,36 @@ export class TealchartWidget {
     // Set up keyboard event listeners
     this._setupKeyboardListeners();
 
+    // Set up resize observer for autosize mode
+    if (options.autosize || options.fullscreen) {
+      const target = options.fullscreen ? document.documentElement : container;
+      this._resizeObserver = new ResizeObserver(() => {
+        const { width, height } = this._getContainerSize();
+        if (width !== this._lastContainerWidth || height !== this._lastContainerHeight) {
+          this._lastContainerWidth = width;
+          this._lastContainerHeight = height;
+          if (this._ui) {
+            this._ui.resize(width, height);
+          }
+        }
+      });
+      this._resizeObserver.observe(target);
+    }
+
     // Initialize gap detection manager (enabled by default)
     if (options.gapDetection?.enabled !== false) {
       this._gapDetectionManager = new GapDetectionManager(
         (event) => this._handleRecoveryNeeded(event),
-        options.gapDetection
+        options.gapDetection,
       );
       // Pass logger to gap detection manager
       this._gapDetectionManager.setLogger(this._logger);
       // Wire up error state change callback
       this._gapDetectionManager.setOnErrorStateChange((error) => {
         this._gapDetectionError = error;
-        // Notify React component if callback is set
-        if (this._gapDetectionErrorUpdateRef.current) {
-          this._gapDetectionErrorUpdateRef.current(error);
+        // Notify UI if callback is set
+        if (this._gapDetectionErrorCallback) {
+          this._gapDetectionErrorCallback(error);
         }
       });
     }
@@ -259,10 +305,18 @@ export class TealchartWidget {
   private _initialize(): void {
     // Initialize datafeed
     this._datafeed.onReady((config) => {
+      const resolveRequestId = ++this._resolveSymbolRequestId;
+
       // Resolve symbol
       this._datafeed.resolveSymbol(
         this._symbol,
         (symbolInfo) => {
+          if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
+            this._logger?.debug(LogCategory.Widget, 'Discarded stale resolveSymbol callback (init)', {
+              symbol: symbolInfo.name,
+            });
+            return;
+          }
           this._symbolInfo = symbolInfo;
           // Extract price precision from pricescale (e.g., 100 -> 0.01, 100000 -> 0.00001)
           if (symbolInfo.pricescale && symbolInfo.pricescale > 0) {
@@ -274,9 +328,12 @@ export class TealchartWidget {
           this._loadBars();
         },
         (error) => {
+          if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
+            return;
+          }
           console.error('[Tealchart] Failed to resolve symbol:', error);
           this._setReady();
-        }
+        },
       );
     });
   }
@@ -310,14 +367,14 @@ export class TealchartWidget {
     // Increment request ID to cancel any in-flight requests
     const requestId = ++this._loadBarsRequestId;
     this._isLoadingBars = true;
-    this._render(); // Re-render to show loading state
+    this._scheduleRender(); // Re-render to show loading state
 
     const now = Date.now();
     const intervalMs = this._getIntervalMs(this._interval);
     const countBack = TealchartWidget.INITIAL_BAR_COUNT;
 
     // Calculate from time: go back countBack bars from now
-    const fromTime = now - (countBack * intervalMs);
+    const fromTime = now - countBack * intervalMs;
 
     const periodParams = {
       countBack,
@@ -331,9 +388,10 @@ export class TealchartWidget {
       this._interval,
       periodParams,
       (bars, _meta) => {
-        // Check if this request is still valid (not superseded by a newer request)
-        if (requestId !== this._loadBarsRequestId) {
-          return; // Ignore stale response
+        // Check if this request is still valid (not superseded or disposed)
+        if (this._disposed || requestId !== this._loadBarsRequestId) {
+          this._logger?.debug(LogCategory.Widget, 'Discarded stale getBars response', { barCount: bars.length });
+          return;
         }
 
         this._isLoadingBars = false;
@@ -344,21 +402,21 @@ export class TealchartWidget {
           this._tealScriptManager.setBars(bars);
         }
 
-        this._render();
+        this._scheduleRender();
         this._subscribeToBars();
         this._setReady();
       },
       (error) => {
         // Check if this request is still valid
-        if (requestId !== this._loadBarsRequestId) {
+        if (this._disposed || requestId !== this._loadBarsRequestId) {
           return; // Ignore stale error
         }
 
         this._isLoadingBars = false;
         console.error('[Tealchart] Failed to load bars:', error);
-        this._render(); // Re-render to hide loading state
+        this._scheduleRender(); // Re-render to hide loading state
         this._setReady();
-      }
+      },
     );
   }
 
@@ -384,17 +442,31 @@ export class TealchartWidget {
       this._gapDetectionManager.start();
     }
 
+    // Capture guid for stale-check in the callback — if the subscription
+    // is replaced before the datafeed fully unsubscribes, late ticks are discarded.
+    const subscriptionGuid = this._barSubscriptionGuid;
+
     this._datafeed.subscribeBars(
       this._symbolInfo,
       this._interval,
       (bar) => {
+        if (this._disposed || subscriptionGuid !== this._barSubscriptionGuid) {
+          this._logger?.debug(LogCategory.Widget, 'Discarded stale real-time tick', {
+            price: bar.close,
+            guid: subscriptionGuid,
+          });
+          return;
+        }
         this._handleNewBar(bar);
       },
       this._barSubscriptionGuid,
       () => {
+        if (this._disposed || subscriptionGuid !== this._barSubscriptionGuid) {
+          return;
+        }
         // Reset cache callback - reload bars
         this._loadBars();
-      }
+      },
     );
   }
 
@@ -435,10 +507,8 @@ export class TealchartWidget {
       this._tealScriptManager.updateBar(bar);
     }
 
-    // Use imperative update for performance
-    if (this._barsUpdateRef.current) {
-      this._barsUpdateRef.current(this._bars);
-    }
+    // Update UI directly
+    this._ui?.setBars(this._bars);
   }
 
   private _loadMoreBars(direction: 'left' | 'right'): void {
@@ -457,6 +527,11 @@ export class TealchartWidget {
       return;
     }
 
+    // Capture current request ID — if symbol/interval changes while this request
+    // is in flight, _loadBarsRequestId will be incremented and this callback
+    // will be discarded as stale.
+    const requestId = this._loadBarsRequestId;
+
     // Request same number of bars as initial load, going back from earliest bar
     const intervalMs = this._getIntervalMs(this._interval);
     const countBack = TealchartWidget.INITIAL_BAR_COUNT;
@@ -473,6 +548,12 @@ export class TealchartWidget {
         firstDataRequest: false,
       },
       (bars, _meta) => {
+        // Discard if widget was disposed or symbol/interval changed
+        if (this._disposed || requestId !== this._loadBarsRequestId) {
+          this._logger?.debug(LogCategory.Widget, 'Discarded stale loadMoreBars response', { barCount: bars.length });
+          return;
+        }
+
         this._isLoadingMoreBars = false;
 
         if (bars.length === 0) {
@@ -481,27 +562,30 @@ export class TealchartWidget {
         }
 
         // Prepend new bars to existing bars (avoid duplicates)
-        const existingTimes = new Set(this._bars.map(b => b.time));
-        const newBars = bars.filter(b => !existingTimes.has(b.time));
+        const existingTimes = new Set(this._bars.map((b) => b.time));
+        const newBars = bars.filter((b) => !existingTimes.has(b.time));
 
         if (newBars.length > 0) {
           this._bars = [...newBars, ...this._bars];
 
           // Notify Tealscript manager of updated bars
+          // Don't render yet - wait for onPlotsUpdated callback to ensure
+          // bars and plots are in sync (aligned by index)
           if (this._tealScriptManager) {
             this._tealScriptManager.setBars(this._bars);
-          }
-
-          // Use imperative update for performance
-          if (this._barsUpdateRef.current) {
-            this._barsUpdateRef.current(this._bars);
+          } else {
+            // No indicator manager, safe to update UI directly
+            this._ui?.setBars(this._bars);
           }
         }
       },
       (error) => {
+        if (this._disposed || requestId !== this._loadBarsRequestId) {
+          return;
+        }
         this._isLoadingMoreBars = false;
         console.error('[Tealchart] Failed to load more bars:', error);
-      }
+      },
     );
   }
 
@@ -566,9 +650,9 @@ export class TealchartWidget {
    * Restore indicators from persisted state
    */
   private _restorePersistedIndicators(): void {
-    if (!this._tealScriptManager || !this._focusAtoms) return;
+    if (!this._tealScriptManager || !this._chartStore) return;
 
-    const indicators = this._jotaiStore.get(this._focusAtoms.indicatorsAtom);
+    const indicators = this._chartStore.settings.get().indicators;
     if (!indicators || indicators.length === 0) return;
 
     for (const instance of indicators) {
@@ -580,82 +664,221 @@ export class TealchartWidget {
       }
 
       // Create the study with persisted inputs
-      this._chartApi.createStudy(
-        builtinIndicator.code,
-        builtinIndicator.overlay,
-        false,
-        instance.inputs,
-        {},
-        { displayName: instance.name },
-      ).then((studyApi) => {
-        if (studyApi) {
-          const studyId = studyApi.getId();
+      this._chartApi
+        .createStudy(
+          builtinIndicator.code,
+          builtinIndicator.overlay,
+          false,
+          instance.inputs,
+          {},
+          { displayName: instance.name },
+        )
+        .then((studyApi) => {
+          if (studyApi) {
+            const studyId = studyApi.getId();
 
-          // Track the mapping from instance ID to study ID
-          this._indicatorStudyMap.set(instance.id, studyId);
-          this._studyInstanceMap.set(studyId, instance.id);
+            // Track the mapping from instance ID to study ID
+            this._indicatorStudyMap.set(instance.id, studyId);
+            this._studyInstanceMap.set(studyId, instance.id);
 
-          // Store indicator config for pane lookup
-          this._indicatorConfigMap.set(studyId, builtinIndicator);
+            // Store indicator config for pane lookup
+            this._indicatorConfigMap.set(studyId, builtinIndicator);
 
-          // Register with pane manager
-          this._paneManager.addIndicator({
-            indicatorId: studyId,
-            overlay: builtinIndicator.overlay,
-            yAxisRange: builtinIndicator.yAxisRange,
-          });
+            // Register with pane manager
+            this._paneManager.addIndicator({
+              indicatorId: studyId,
+              overlay: builtinIndicator.overlay,
+              yAxisRange: builtinIndicator.yAxisRange,
+            });
 
-          // Apply visibility state
-          if (!instance.isVisible) {
-            this._chartApi.toggleStudyVisibility(studyId);
-            this._tealScriptManager?.toggleScriptVisibility(studyId);
+            // Apply visibility state
+            if (!instance.isVisible) {
+              this._chartApi.toggleStudyVisibility(studyId);
+              this._tealScriptManager?.toggleScriptVisibility(studyId);
+            }
           }
-        }
-      }).catch((error) => {
-        console.error(`[Tealchart] Failed to restore indicator ${instance.name}:`, error);
-      });
+        })
+        .catch((error) => {
+          console.error(`[Tealchart] Failed to restore indicator ${instance.name}:`, error);
+        });
     }
   }
 
-  private _render(): void {
-    if (!this._root) {
-      this._root = createRoot(this._container);
+  /**
+   * Actual render implementation - called by _scheduleRender() via RAF.
+   * Passes current state to UI. ChartCore setters skip unchanged data.
+   */
+  private _doRender(): void {
+    const showTopBar = this._options.showTopBar !== false; // Default to true
+
+    // Initialize UI if needed
+    if (!this._ui) {
+      this._ui = new TealchartWidgetUI({
+        container: this._container,
+        chartKey: this._chartKey,
+        symbol: this._symbol,
+        interval: this._interval,
+        showTopBar,
+        renderOptions: this._renderOptions,
+        onIntervalChange: (interval) => {
+          // ChartTopBar already calls chartApi.setResolution() which handles
+          // the subscription emission and data reload
+          this._chartApi.setResolution(interval);
+        },
+        onAddIndicator: (indicator) => {
+          this._handleAddIndicator(indicator);
+        },
+        onToggleIndicator: (indicatorId) => {
+          this._handleToggleIndicator(indicatorId);
+        },
+        onSettingsIndicator: (indicatorId) => {
+          this._ui?.openIndicatorSettings(indicatorId);
+        },
+        onRemoveIndicator: (indicatorId) => {
+          this._handleRemoveIndicator(indicatorId);
+        },
+        getStudyInputDefinitions: (studyId) => {
+          return this.getStudyInputDefinitions(studyId);
+        },
+        onSaveIndicatorSettings: (indicatorId, inputs, styleOverrides) => {
+          this.setStudyInputs(indicatorId, inputs);
+          if (styleOverrides) {
+            this.setStudyStyleOverrides(indicatorId, styleOverrides);
+          }
+        },
+        onViewportChange: (viewport) => {
+          this._viewport = viewport;
+        },
+        onRequestMoreBars: (direction) => {
+          this._loadMoreBars(direction);
+        },
+        onOrderMove: (orderId, newPrice) => {
+          this._chartApi.triggerOrderMove(orderId, newPrice);
+        },
+        onOrderCancel: (orderId) => {
+          this._chartApi.triggerOrderCancel(orderId);
+        },
+        onPositionClose: (positionId) => {
+          this._chartApi.triggerPositionClose(positionId);
+        },
+        onPositionReverse: (positionId) => {
+          this._chartApi.triggerPositionReverse(positionId);
+        },
+        onTPDragEnd: (positionId, price, partialPercent) => {
+          this._chartApi.triggerTPMoveEnd(positionId, price, partialPercent);
+        },
+        onSLDragEnd: (positionId, price, partialPercent) => {
+          this._chartApi.triggerSLMoveEnd(positionId, price, partialPercent);
+        },
+        onTPClick: (positionId) => {
+          this._chartApi.triggerTPClick(positionId);
+        },
+        onSLClick: (positionId) => {
+          this._chartApi.triggerSLClick(positionId);
+        },
+        onContextMenu: this._contextMenuCallback || undefined,
+        onMouseDown: () => {
+          this._eventEmitter.emit('mouse_down');
+        },
+        onMouseUp: () => {
+          this._eventEmitter.emit('mouse_up');
+        },
+        onCrossHairMoved: (price, time) => {
+          const now = Date.now();
+          if (now - this._lastCrossHairEmit >= this._crossHairEmitThrottleMs) {
+            this._lastCrossHairEmit = now;
+            this._chartApi.emitCrossHairMoved({ price, time });
+          }
+        },
+      });
     }
 
-    const { width, height } = this._getContainerSize();
-    const showTopBar = this._options.showTopBar !== false;  // Default to true
+    // Update render options if they've changed
+    this._ui.setRenderOptions(this._renderOptions);
 
-    // Get active indicators for the legend and modal
+    // Update symbol and interval in top bar / legend
+    this._ui.setSymbol(this._symbol);
+    this._ui.setInterval(this._interval);
+
+    // Update UI state
+    this._ui.setBars(this._bars);
+    this._ui.setPlots(this._plots);
+    // Defer hiding the loading overlay by one frame so ChartCore's RAF-based
+    // render paints the new candles BEFORE the overlay is removed. Without this,
+    // setBars() queues a ChartCore RAF render but setLoading(false) immediately
+    // hides the overlay, exposing one frame of stale/empty canvas.
+    if (this._isLoadingBars) {
+      this._ui.setLoading(true);
+    } else if (this._wasLoadingBars) {
+      // Still loading visually — ChartCore hasn't painted yet. Defer to next frame.
+      requestAnimationFrame(() => this._ui.setLoading(false));
+    }
+    this._wasLoadingBars = this._isLoadingBars;
+
+    // Update order and position lines
+    const orderLines = this._chartApi.getOrderLinesRenderData();
+    const positionLines = this._chartApi.getPositionLinesRenderData();
+    this._ui.setOrderLines(orderLines);
+    this._ui.setPositionLines(positionLines);
+
+    // Create and set last trade line
+    const latestBar = this._bars.length > 0 ? this._bars[this._bars.length - 1] : null;
+    if (latestBar) {
+      const intervalMs = this._getIntervalMs(this._interval);
+      // Handle bar time in either seconds or milliseconds
+      const barTimeMs = latestBar.time < 1e12 ? latestBar.time * 1000 : latestBar.time;
+      const barCloseTime = barTimeMs + intervalMs;
+
+      // Format price - ChartCore will override this with proper precision from renderer
+      const priceText =
+        latestBar.close >= 1000
+          ? latestBar.close.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+          : latestBar.close >= 1
+            ? latestBar.close.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            : latestBar.close.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 6 });
+
+      const lastTradeLine: PriceLine = {
+        id: 'last-trade',
+        price: latestBar.close,
+        lineStyle: 'dotted',
+        color:
+          latestBar.close >= latestBar.open
+            ? this._renderOptions?.upColor || '#26a69a'
+            : this._renderOptions?.downColor || '#ef5350',
+        label: {
+          primaryText: priceText,
+          // secondaryText (countdown) computed in renderer via countdownToTime
+        },
+        type: 'price',
+        renderLineOnCanvas: true,
+        countdownToTime: barCloseTime,
+      };
+      this._ui.setPriceLines([lastTradeLine]);
+    }
+
+    // Update pane layout
+    const paneLayout = this._paneManager.getLayout();
+    this._ui.setPaneLayout(paneLayout);
+
+    // Update active indicators
     const studyInfos = this._chartApi.getAllStudies();
-
-    // Enrich with styleOverrides from persisted indicator instances
-    const persistedIndicators = this._focusAtoms
-      ? this._jotaiStore.get(this._focusAtoms.indicatorsAtom)
-      : [];
+    const persistedIndicators = this._chartStore ? this._chartStore.settings.get().indicators : [];
 
     const activeIndicators = studyInfos.map((study) => {
-      // Find the persisted indicator by matching study ID -> instance ID
       const instanceId = this._studyInstanceMap.get(study.id);
-      const persisted = instanceId
-        ? persistedIndicators.find((ind) => ind.id === instanceId)
-        : undefined;
+      const persisted = instanceId ? persistedIndicators.find((ind) => ind.id === instanceId) : undefined;
       return {
         ...study,
         styleOverrides: persisted?.styleOverrides,
       };
     });
 
-    // Extract order and position line render data from the chart API
-    const orderLines = this._chartApi.getOrderLinesRenderData();
-    const positionLines = this._chartApi.getPositionLinesRenderData();
-
-    // Get pane layout for multi-pane indicator rendering
-    const paneLayout = this._paneManager.getLayout();
-
-    // Build indicator config map for pane lookup (study ID -> { overlay, yAxisRange, name, inputs })
-    const indicatorPaneInfo: Record<string, { overlay: boolean; yAxisRange?: { min: number; max: number }; name?: string; inputs?: Record<string, unknown> }> = {};
+    // Build indicator pane info
+    const indicatorPaneInfo: Record<
+      string,
+      { overlay: boolean; yAxisRange?: { min: number; max: number }; name?: string; inputs?: Record<string, unknown> }
+    > = {};
     for (const [studyId, config] of this._indicatorConfigMap) {
-      // Get current inputs from the study for display in pane label
       const study = this._chartApi.getStudyById(studyId);
       const inputs = study?.getInputs() ?? {};
       indicatorPaneInfo[studyId] = {
@@ -666,85 +889,7 @@ export class TealchartWidget {
       };
     }
 
-    // Wrap with ChartApiContext.Provider so ChartTopBar can access chartApi
-    // ChartContainer includes the top bar, Jotai Provider, and Tealchart
-    this._root.render(
-      React.createElement(
-        ChartApiContext.Provider,
-        { value: this._chartApi },
-        React.createElement(ChartContainer, {
-          chartKey: this._chartKey,
-          width,
-          height,
-          symbol: this._symbol,
-          bars: this._bars,
-          plots: this._plots,
-          orderLines,
-          positionLines,
-          paneLayout,
-          indicatorPaneInfo,
-          renderOptions: this._renderOptions,
-          onBarsUpdateRef: this._barsUpdateRef,
-          onViewportChange: (viewport: Viewport) => {
-            this._viewport = viewport;
-          },
-          onRequestMoreBars: (direction: 'left' | 'right') => {
-            this._loadMoreBars(direction);
-          },
-          onIntervalChange: (_interval: ResolutionString) => {
-            // This is called from ChartTopBar when user clicks a timeframe
-            // ChartTopBar already calls chartApi.setResolution() which handles
-            // the subscription emission and data reload
-          },
-          onAddIndicator: (indicator: BuiltinIndicator) => {
-            this._handleAddIndicator(indicator);
-          },
-          activeIndicators,
-          onToggleIndicator: (indicatorId: string) => {
-            this._handleToggleIndicator(indicatorId);
-          },
-          onSettingsIndicator: (_indicatorId: string) => {
-            // ChartContainer will handle displaying the modal
-          },
-          onRemoveIndicator: (indicatorId: string) => {
-            this._handleRemoveIndicator(indicatorId);
-          },
-          getStudyInputDefinitions: (studyId: string) => {
-            return this.getStudyInputDefinitions(studyId);
-          },
-          onSaveIndicatorSettings: (indicatorId: string, inputs: Record<string, unknown>, styleOverrides?: PlotStyleOverride[]) => {
-            this.setStudyInputs(indicatorId, inputs);
-            if (styleOverrides) {
-              this.setStudyStyleOverrides(indicatorId, styleOverrides);
-            }
-          },
-          showTopBar,
-          isLoading: this._isLoadingBars,
-          // Layout selector props (when save_load_adapter is provided)
-          saveLoadAdapter: this._options.save_load_adapter,
-          onLoadLayout: this._handleLoadLayout.bind(this),
-          onSaveLayout: this._handleSaveLayout.bind(this),
-          onContextMenu: this._contextMenuCallback || undefined,
-          // Mouse events for hotkey integration
-          onMouseDown: () => {
-            this._eventEmitter.emit('mouse_down');
-          },
-          onMouseUp: () => {
-            this._eventEmitter.emit('mouse_up');
-          },
-          // Crosshair moved event for hotkey integration (throttled to 50ms)
-          onCrossHairMoved: (price: number, time: number) => {
-            const now = Date.now();
-            if (now - this._lastCrossHairEmit >= this._crossHairEmitThrottleMs) {
-              this._lastCrossHairEmit = now;
-              this._chartApi.emitCrossHairMoved({ price, time });
-            }
-          },
-          // Debug logger for the console
-          logger: this._logger,
-        })
-      )
-    );
+    this._ui.setActiveIndicators(activeIndicators, indicatorPaneInfo);
   }
 
   /**
@@ -760,50 +905,53 @@ export class TealchartWidget {
     const instanceId = generateIndicatorId(indicator.id);
 
     // Create a study using the indicator's Tealscript code
-    this._chartApi.createStudy(
-      indicator.code,
-      indicator.overlay,  // forceOverlay
-      false,  // lock
-      {},  // inputs
-      {},  // overrides
-      { displayName: indicator.name },  // Use friendly name for display
-    ).then((studyApi) => {
-      if (studyApi) {
-        const studyId = studyApi.getId();
+    this._chartApi
+      .createStudy(
+        indicator.code,
+        indicator.overlay, // forceOverlay
+        false, // lock
+        {}, // inputs
+        {}, // overrides
+        { displayName: indicator.name }, // Use friendly name for display
+      )
+      .then((studyApi) => {
+        if (studyApi) {
+          const studyId = studyApi.getId();
 
-        // Track the mapping from instance ID to study ID
-        this._indicatorStudyMap.set(instanceId, studyId);
+          // Track the mapping from instance ID to study ID
+          this._indicatorStudyMap.set(instanceId, studyId);
 
-        // Also track reverse mapping for persistence updates
-        this._studyInstanceMap.set(studyId, instanceId);
+          // Also track reverse mapping for persistence updates
+          this._studyInstanceMap.set(studyId, instanceId);
 
-        // Store indicator config for pane lookup
-        this._indicatorConfigMap.set(studyId, indicator);
+          // Store indicator config for pane lookup
+          this._indicatorConfigMap.set(studyId, indicator);
 
-        // Register with pane manager (non-overlay indicators get their own pane)
-        this._paneManager.addIndicator({
-          indicatorId: studyId,
-          overlay: indicator.overlay,
-          yAxisRange: indicator.yAxisRange,
-        });
+          // Register with pane manager (non-overlay indicators get their own pane)
+          this._paneManager.addIndicator({
+            indicatorId: studyId,
+            overlay: indicator.overlay,
+            yAxisRange: indicator.yAxisRange,
+          });
 
-        // Persist to settings
-        this._persistAddIndicator(instanceId, indicator);
+          // Persist to settings
+          this._persistAddIndicator(instanceId, indicator);
 
-        // Trigger immediate re-render to update chart layout for the new pane
-        this._render();
-      }
-    }).catch((error) => {
-      console.error(`[Tealchart] Failed to add indicator ${indicator.name}:`, error);
-    });
+          // Trigger immediate re-render to update chart layout for the new pane
+          this._scheduleRender();
+        }
+      })
+      .catch((error) => {
+        console.error(`[Tealchart] Failed to add indicator ${indicator.name}:`, error);
+      });
   }
 
   /**
    * Mark the layout as having unsaved changes and schedule auto-save
    */
   private _markDirty(): void {
-    const store = getDefaultStore();
-    store.set(getIsDirtyAtom(this._chartKey), true);
+    if (!this._chartStore) return;
+    this._chartStore.isDirty.set(true);
     this._scheduleAutoSave();
   }
 
@@ -824,8 +972,8 @@ export class TealchartWidget {
     }
 
     // Only auto-save if we have a current layout loaded
-    const store = getDefaultStore();
-    const currentLayout = store.get(getCurrentLayoutAtom(this._chartKey));
+    if (!this._chartStore) return;
+    const currentLayout = this._chartStore.currentLayout.get();
     if (!currentLayout.layoutId || !currentLayout.layoutName) {
       return;
     }
@@ -842,8 +990,8 @@ export class TealchartWidget {
   private _handleAutoSave(): void {
     this._autoSaveTimer = null;
 
-    const store = getDefaultStore();
-    const currentLayout = store.get(getCurrentLayoutAtom(this._chartKey));
+    if (!this._chartStore) return;
+    const currentLayout = this._chartStore.currentLayout.get();
 
     // Double-check we still have a layout to save to
     if (!currentLayout.layoutId || !currentLayout.layoutName) {
@@ -851,18 +999,17 @@ export class TealchartWidget {
     }
 
     // Check if still dirty
-    const isDirty = store.get(getIsDirtyAtom(this._chartKey));
+    const isDirty = this._chartStore.isDirty.get();
     if (!isDirty) {
       return;
     }
 
     // Get current settings and save
     const settings = this._getCurrentSettings();
-    const saveStatusAtom = getSaveStatusAtom(this._chartKey);
 
     // Set saving status
-    store.set(saveStatusAtom, 'saving');
-    this._render();
+    this._chartStore.saveStatus.set('saving');
+    this._scheduleRender();
 
     import('./transformer').then(({ updateTealchartLayout }) => {
       // Use update since we have an existing layout ID
@@ -870,34 +1017,38 @@ export class TealchartWidget {
         String(currentLayout.layoutId),
         settings,
         currentLayout.layoutName!,
-        this._options.save_load_adapter!
+        this._options.save_load_adapter!,
       )
         .then((chartId) => {
+          if (!this._chartStore) return;
           // Update layout ID (in case it changed) and clear dirty state
-          store.set(getCurrentLayoutAtom(this._chartKey), {
+          this._chartStore.currentLayout.set({
             layoutId: chartId,
             layoutName: currentLayout.layoutName,
           });
-          store.set(getIsDirtyAtom(this._chartKey), false);
-          store.set(saveStatusAtom, 'success');
-          this._render();
+          this._chartStore.isDirty.set(false);
+          this._chartStore.saveStatus.set('success');
+          this._scheduleRender();
 
           // Start fade after showing success briefly
           setTimeout(() => {
-            store.set(saveStatusAtom, 'success-fading');
-            this._render();
+            if (!this._chartStore) return;
+            this._chartStore.saveStatus.set('success-fading');
+            this._scheduleRender();
 
             // Clear after fade animation (500ms)
             setTimeout(() => {
-              store.set(saveStatusAtom, 'idle');
-              this._render();
+              if (!this._chartStore) return;
+              this._chartStore.saveStatus.set('idle');
+              this._scheduleRender();
             }, 500);
           }, 500);
         })
         .catch((error) => {
           console.error('[Tealchart] Auto-save failed:', error);
-          store.set(saveStatusAtom, 'error');
-          this._render();
+          if (!this._chartStore) return;
+          this._chartStore.saveStatus.set('error');
+          this._scheduleRender();
         });
     });
   }
@@ -906,9 +1057,9 @@ export class TealchartWidget {
    * Persist a new indicator to settings
    */
   private _persistAddIndicator(instanceId: string, indicator: BuiltinIndicator): void {
-    if (!this._focusAtoms) return;
+    if (!this._chartStore) return;
 
-    const currentIndicators = this._jotaiStore.get(this._focusAtoms.indicatorsAtom);
+    const currentIndicators = this._chartStore.settings.get().indicators;
     const newInstance: IndicatorInstance = {
       id: instanceId,
       name: indicator.name,
@@ -918,7 +1069,7 @@ export class TealchartWidget {
       createdAt: Date.now(),
     };
 
-    this._jotaiStore.set(this._focusAtoms.indicatorsAtom, [...currentIndicators, newInstance]);
+    this._chartStore.settings.setKey('indicators', [...currentIndicators, newInstance]);
     this._markDirty();
   }
 
@@ -934,24 +1085,24 @@ export class TealchartWidget {
     this._persistToggleIndicatorVisibility(indicatorId);
 
     // Re-render to update the legend
-    this._render();
+    this._scheduleRender();
   }
 
   /**
    * Persist indicator visibility toggle
    */
   private _persistToggleIndicatorVisibility(studyId: string): void {
-    if (!this._focusAtoms) return;
+    if (!this._chartStore) return;
 
     const instanceId = this._studyInstanceMap.get(studyId);
     if (!instanceId) return;
 
-    const currentIndicators = this._jotaiStore.get(this._focusAtoms.indicatorsAtom);
+    const currentIndicators = this._chartStore.settings.get().indicators;
     const updatedIndicators = currentIndicators.map((ind) =>
-      ind.id === instanceId ? { ...ind, isVisible: !ind.isVisible } : ind
+      ind.id === instanceId ? { ...ind, isVisible: !ind.isVisible } : ind,
     );
 
-    this._jotaiStore.set(this._focusAtoms.indicatorsAtom, updatedIndicators);
+    this._chartStore.settings.setKey('indicators', updatedIndicators);
     this._markDirty();
   }
 
@@ -976,22 +1127,22 @@ export class TealchartWidget {
     // Remove the study via the API
     this._chartApi.removeStudy(indicatorId);
     // Re-render to update the legend
-    this._render();
+    this._scheduleRender();
   }
 
   /**
    * Persist indicator removal
    */
   private _persistRemoveIndicator(studyId: string): void {
-    if (!this._focusAtoms) return;
+    if (!this._chartStore) return;
 
     const instanceId = this._studyInstanceMap.get(studyId);
     if (!instanceId) return;
 
-    const currentIndicators = this._jotaiStore.get(this._focusAtoms.indicatorsAtom);
+    const currentIndicators = this._chartStore.settings.get().indicators;
     const updatedIndicators = currentIndicators.filter((ind) => ind.id !== instanceId);
 
-    this._jotaiStore.set(this._focusAtoms.indicatorsAtom, updatedIndicators);
+    this._chartStore.settings.setKey('indicators', updatedIndicators);
     this._markDirty();
   }
 
@@ -1018,7 +1169,7 @@ export class TealchartWidget {
       this._persistUpdateIndicatorInputs(studyId, inputs);
 
       // Re-render to update the legend
-      this._render();
+      this._scheduleRender();
     }
   }
 
@@ -1026,17 +1177,17 @@ export class TealchartWidget {
    * Persist indicator inputs update
    */
   private _persistUpdateIndicatorInputs(studyId: string, inputs: Record<string, unknown>): void {
-    if (!this._focusAtoms) return;
+    if (!this._chartStore) return;
 
     const instanceId = this._studyInstanceMap.get(studyId);
     if (!instanceId) return;
 
-    const currentIndicators = this._jotaiStore.get(this._focusAtoms.indicatorsAtom);
+    const currentIndicators = this._chartStore.settings.get().indicators;
     const updatedIndicators = currentIndicators.map((ind) =>
-      ind.id === instanceId ? { ...ind, inputs: { ...ind.inputs, ...inputs } } : ind
+      ind.id === instanceId ? { ...ind, inputs: { ...ind.inputs, ...inputs } } : ind,
     );
 
-    this._jotaiStore.set(this._focusAtoms.indicatorsAtom, updatedIndicators);
+    this._chartStore.settings.setKey('indicators', updatedIndicators);
     this._markDirty();
   }
 
@@ -1048,24 +1199,24 @@ export class TealchartWidget {
     this._persistUpdateIndicatorStyles(studyId, styleOverrides);
 
     // Re-render to apply the new styles
-    this._render();
+    this._scheduleRender();
   }
 
   /**
    * Persist indicator style overrides
    */
   private _persistUpdateIndicatorStyles(studyId: string, styleOverrides: PlotStyleOverride[]): void {
-    if (!this._focusAtoms) return;
+    if (!this._chartStore) return;
 
     const instanceId = this._studyInstanceMap.get(studyId);
     if (!instanceId) return;
 
-    const currentIndicators = this._jotaiStore.get(this._focusAtoms.indicatorsAtom);
+    const currentIndicators = this._chartStore.settings.get().indicators;
     const updatedIndicators = currentIndicators.map((ind) =>
-      ind.id === instanceId ? { ...ind, styleOverrides } : ind
+      ind.id === instanceId ? { ...ind, styleOverrides } : ind,
     );
 
-    this._jotaiStore.set(this._focusAtoms.indicatorsAtom, updatedIndicators);
+    this._chartStore.settings.setKey('indicators', updatedIndicators);
     this._markDirty();
   }
 
@@ -1120,10 +1271,20 @@ export class TealchartWidget {
     this._hasMoreHistoricalData = true; // Reset for new symbol
     this._isLoadingMoreBars = false;
 
+    // Increment to invalidate any in-flight resolveSymbol callbacks
+    const resolveRequestId = ++this._resolveSymbolRequestId;
+
     // Resolve new symbol and load bars
     this._datafeed.resolveSymbol(
       symbol,
       (symbolInfo) => {
+        // Ignore stale resolve (superseded by a newer symbol change)
+        if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
+          this._logger?.debug(LogCategory.Widget, 'Discarded stale resolveSymbol callback', {
+            symbol: symbolInfo.name,
+          });
+          return;
+        }
         this._symbolInfo = symbolInfo;
         // Update price precision from new symbol's pricescale
         if (symbolInfo.pricescale && symbolInfo.pricescale > 0) {
@@ -1135,8 +1296,11 @@ export class TealchartWidget {
         this._loadBars();
       },
       (error) => {
+        if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
+          return;
+        }
         console.error('[Tealchart] Failed to resolve symbol:', error);
-      }
+      },
     );
   }
 
@@ -1163,8 +1327,11 @@ export class TealchartWidget {
     this._hasMoreHistoricalData = true; // Reset for new interval
     this._isLoadingMoreBars = false;
 
+    // Persist interval to per-chart store (for restoration on page refresh)
+    this._chartStore?.settings.setKey('interval', interval);
+
     // Render immediately to show loading state (hides chart)
-    this._render();
+    this._scheduleRender();
 
     // Reload bars with new interval
     this._loadBars();
@@ -1210,11 +1377,11 @@ export class TealchartWidget {
   }
 
   /**
-   * Get ref for gap detection error updates.
-   * Used by React components to receive error state changes.
+   * Set callback for gap detection error updates.
+   * Used by UI components to receive error state changes.
    */
-  getGapDetectionErrorUpdateRef(): React.MutableRefObject<((error: GapDetectionErrorState | null) => void) | null> {
-    return this._gapDetectionErrorUpdateRef;
+  setGapDetectionErrorCallback(callback: ((error: GapDetectionErrorState | null) => void) | null): void {
+    this._gapDetectionErrorCallback = callback;
   }
 
   /**
@@ -1230,6 +1397,9 @@ export class TealchartWidget {
    * Remove the widget and clean up
    */
   remove(): void {
+    // Mark as disposed to invalidate all in-flight async callbacks
+    this._disposed = true;
+
     // Unsubscribe from bars
     if (this._barSubscriptionGuid) {
       this._datafeed.unsubscribeBars(this._barSubscriptionGuid);
@@ -1254,6 +1424,18 @@ export class TealchartWidget {
       this._boundHandleMouseLeave = null;
     }
 
+    // Cancel pending render RAF
+    if (this._renderRafId !== null) {
+      cancelAnimationFrame(this._renderRafId);
+      this._renderRafId = null;
+    }
+
+    // Clean up resize observer
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+      this._resizeObserver = null;
+    }
+
     // Clean up gap detection manager
     if (this._gapDetectionManager) {
       this._gapDetectionManager.dispose();
@@ -1272,14 +1454,11 @@ export class TealchartWidget {
     // Clean up event emitter
     this._eventEmitter.removeAllListeners();
 
-    // Unmount React component
-    if (this._root) {
-      this._root.unmount();
-      this._root = null;
+    // Dispose vanilla UI
+    if (this._ui) {
+      this._ui.dispose();
+      this._ui = null;
     }
-
-    // Clear container
-    this._container.innerHTML = '';
   }
 
   // ============================================================================
@@ -1357,8 +1536,8 @@ export class TealchartWidget {
     this._renderOptions = newOptions;
 
     // Re-render if already mounted
-    if (this._root && this._bars.length > 0) {
-      this._render();
+    if (this._ui && this._bars.length > 0) {
+      this._scheduleRender();
     }
   }
 
@@ -1582,8 +1761,8 @@ export class TealchartWidget {
   onContextMenu(callback: ContextMenuCallback): void {
     this._contextMenuCallback = callback;
     // Re-render to enable the context menu UI
-    if (this._root) {
-      this._render();
+    if (this._ui) {
+      this._scheduleRender();
     }
   }
 
@@ -1619,11 +1798,7 @@ export class TealchartWidget {
    * Save chart to server
    * @stub Not yet implemented
    */
-  saveChartToServer(
-    onComplete?: () => void,
-    onFail?: () => void,
-    options?: { chartName?: string }
-  ): void {
+  saveChartToServer(onComplete?: () => void, onFail?: () => void, options?: { chartName?: string }): void {
     console.warn('[Tealchart] Method not implemented: saveChartToServer');
     onFail?.();
   }
@@ -1635,7 +1810,12 @@ export class TealchartWidget {
   /**
    * Handle loading a layout from the LayoutSelector
    */
-  private _handleLoadLayout(settings: ChartSettings, warnings: string[], layoutId: string | number, layoutName: string): void {
+  private _handleLoadLayout(
+    settings: ChartSettings,
+    warnings: string[],
+    layoutId: string | number,
+    layoutName: string,
+  ): void {
     if (warnings.length > 0) {
       console.warn('[Tealchart] Layout load warnings:', warnings);
     }
@@ -1662,27 +1842,29 @@ export class TealchartWidget {
         const builtinIndicator = getIndicatorById(indicator.builtinId);
         if (builtinIndicator) {
           // Create study with saved inputs
-          this._chartApi.createStudy(
-            builtinIndicator.code,
-            builtinIndicator.overlay,
-            false,
-            indicator.inputs,
-            {},
-            { displayName: indicator.name },
-          ).then((studyApi) => {
-            if (studyApi) {
-              const studyId = studyApi.getId();
-              this._indicatorStudyMap.set(indicator.id, studyId);
-              this._studyInstanceMap.set(studyId, indicator.id);
-              this._indicatorConfigMap.set(studyId, builtinIndicator);
-              this._paneManager.addIndicator({
-                indicatorId: studyId,
-                overlay: builtinIndicator.overlay,
-                yAxisRange: builtinIndicator.yAxisRange,
-              });
-              this._render();
-            }
-          });
+          this._chartApi
+            .createStudy(
+              builtinIndicator.code,
+              builtinIndicator.overlay,
+              false,
+              indicator.inputs,
+              {},
+              { displayName: indicator.name },
+            )
+            .then((studyApi) => {
+              if (studyApi) {
+                const studyId = studyApi.getId();
+                this._indicatorStudyMap.set(indicator.id, studyId);
+                this._studyInstanceMap.set(studyId, indicator.id);
+                this._indicatorConfigMap.set(studyId, builtinIndicator);
+                this._paneManager.addIndicator({
+                  indicatorId: studyId,
+                  overlay: builtinIndicator.overlay,
+                  yAxisRange: builtinIndicator.yAxisRange,
+                });
+                this._scheduleRender();
+              }
+            });
         } else {
           console.warn('[Tealchart] Unknown indicator:', indicator.builtinId);
         }
@@ -1690,13 +1872,15 @@ export class TealchartWidget {
     }
 
     // Re-render to reflect the loaded layout
-    this._render();
+    this._scheduleRender();
   }
 
   /**
    * Handle save layout request from LayoutSelector
    */
   private _handleSaveLayout(): void {
+    if (!this._chartStore) return;
+
     // Cancel any pending auto-save
     if (this._autoSaveTimer) {
       clearTimeout(this._autoSaveTimer);
@@ -1705,8 +1889,7 @@ export class TealchartWidget {
 
     // Get current settings
     const settings = this._getCurrentSettings();
-    const store = getDefaultStore();
-    const currentLayout = store.get(getCurrentLayoutAtom(this._chartKey));
+    const currentLayout = this._chartStore.currentLayout.get();
 
     // Pre-fill with current layout name if one is loaded
     const defaultName = currentLayout.layoutName || '';
@@ -1715,11 +1898,9 @@ export class TealchartWidget {
 
     // Save via adapter if available
     if (this._options.save_load_adapter) {
-      const saveStatusAtom = getSaveStatusAtom(this._chartKey);
-
       // Set saving status
-      store.set(saveStatusAtom, 'saving');
-      this._render();
+      this._chartStore.saveStatus.set('saving');
+      this._scheduleRender();
 
       // Determine if we should update existing or create new
       // Update if: same name as current layout AND we have a layout ID
@@ -1728,34 +1909,33 @@ export class TealchartWidget {
       if (shouldUpdate) {
         // Update existing layout
         import('./transformer').then(({ updateTealchartLayout }) => {
-          updateTealchartLayout(
-            String(currentLayout.layoutId),
-            settings,
-            layoutName,
-            this._options.save_load_adapter!
-          )
+          updateTealchartLayout(String(currentLayout.layoutId), settings, layoutName, this._options.save_load_adapter!)
             .then((chartId) => {
-              store.set(getCurrentLayoutAtom(this._chartKey), {
+              if (!this._chartStore) return;
+              this._chartStore.currentLayout.set({
                 layoutId: chartId,
                 layoutName,
               });
-              store.set(getIsDirtyAtom(this._chartKey), false);
-              store.set(saveStatusAtom, 'success');
-              this._render();
+              this._chartStore.isDirty.set(false);
+              this._chartStore.saveStatus.set('success');
+              this._scheduleRender();
 
               setTimeout(() => {
-                store.set(saveStatusAtom, 'success-fading');
-                this._render();
+                if (!this._chartStore) return;
+                this._chartStore.saveStatus.set('success-fading');
+                this._scheduleRender();
                 setTimeout(() => {
-                  store.set(saveStatusAtom, 'idle');
-                  this._render();
+                  if (!this._chartStore) return;
+                  this._chartStore.saveStatus.set('idle');
+                  this._scheduleRender();
                 }, 500);
               }, 500);
             })
             .catch((error) => {
               console.error('[Tealchart] Failed to update layout:', error);
-              store.set(saveStatusAtom, 'error');
-              this._render();
+              if (!this._chartStore) return;
+              this._chartStore.saveStatus.set('error');
+              this._scheduleRender();
             });
         });
       } else {
@@ -1763,27 +1943,31 @@ export class TealchartWidget {
         import('./transformer').then(({ saveTealchartLayout }) => {
           saveTealchartLayout(settings, layoutName, this._options.save_load_adapter!)
             .then((chartId) => {
-              store.set(getCurrentLayoutAtom(this._chartKey), {
+              if (!this._chartStore) return;
+              this._chartStore.currentLayout.set({
                 layoutId: chartId,
                 layoutName,
               });
-              store.set(getIsDirtyAtom(this._chartKey), false);
-              store.set(saveStatusAtom, 'success');
-              this._render();
+              this._chartStore.isDirty.set(false);
+              this._chartStore.saveStatus.set('success');
+              this._scheduleRender();
 
               setTimeout(() => {
-                store.set(saveStatusAtom, 'success-fading');
-                this._render();
+                if (!this._chartStore) return;
+                this._chartStore.saveStatus.set('success-fading');
+                this._scheduleRender();
                 setTimeout(() => {
-                  store.set(saveStatusAtom, 'idle');
-                  this._render();
+                  if (!this._chartStore) return;
+                  this._chartStore.saveStatus.set('idle');
+                  this._scheduleRender();
                 }, 500);
               }, 500);
             })
             .catch((error) => {
               console.error('[Tealchart] Failed to save layout:', error);
-              store.set(saveStatusAtom, 'error');
-              this._render();
+              if (!this._chartStore) return;
+              this._chartStore.saveStatus.set('error');
+              this._scheduleRender();
             });
         });
       }
@@ -1794,13 +1978,8 @@ export class TealchartWidget {
    * Get current chart settings for saving
    */
   private _getCurrentSettings(): ChartSettings {
-    const indicators: IndicatorInstance[] = [];
-
     // Gather indicator instances from persisted state
-    if (this._focusAtoms) {
-      const persistedIndicators = this._jotaiStore.get(this._focusAtoms.indicatorsAtom);
-      indicators.push(...persistedIndicators);
-    }
+    const indicators = this._chartStore ? this._chartStore.settings.get().indicators : [];
 
     return {
       symbol: this._symbol,

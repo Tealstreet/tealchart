@@ -5,7 +5,7 @@
  */
 
 import React, { memo, useCallback, useMemo, useState } from 'react';
-import { useAtom } from 'jotai';
+import { useStore } from '@nanostores/react';
 import { createChartFocusAtoms, AVAILABLE_TIMEFRAMES, type ChartSettings } from '../state/chartState';
 import { useChartApiOptional } from '../state/ChartApiContext';
 import { IndicatorsModal } from './IndicatorsModal';
@@ -183,13 +183,14 @@ export const ChartTopBar: React.FC<ChartTopBarProps> = memo(({
   const [isIndicatorsModalOpen, setIndicatorsModalOpen] = useState(false);
   const [indicatorsButtonHovered, setIndicatorsButtonHovered] = useState(false);
 
-  // Get focus atoms for this chart
-  const focusAtoms = useMemo(() => createChartFocusAtoms(chartKey), [chartKey]);
-  const [interval, setInterval] = useAtom(focusAtoms.intervalAtom);
+  // Get chart stores for this chart
+  const chartStores = useMemo(() => createChartFocusAtoms(chartKey), [chartKey]);
+  const interval = useStore(chartStores.intervalAtom);
+  const setInterval = chartStores.setInterval;
 
   // Handle timeframe change
   // This does THREE things:
-  // 1. Updates Jotai atom (for persistence via atomWithStorage)
+  // 1. Updates Nanostores (for persistence via localStorage)
   // 2. Calls chartApi.setResolution() which emits to TradingView-style subscribers
   // 3. Calls the optional external onIntervalChange callback
   const handleTimeframeClick = useCallback((newInterval: ResolutionString) => {

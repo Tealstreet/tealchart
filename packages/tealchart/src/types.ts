@@ -386,7 +386,7 @@ export interface EnhancedCrossHairState extends CrossHairMovedEventParams {
 /**
  * TradingView-style subscription interface
  */
- 
+
 export interface ISubscription<T extends (...args: any[]) => void> {
   subscribe(obj: object | null, callback: T): void;
   unsubscribe(obj: object | null, callback: T): void;
@@ -568,21 +568,21 @@ export interface IBasicDataFeed {
   resolveSymbol(
     symbolName: string,
     onResolve: (symbolInfo: LibrarySymbolInfo) => void,
-    onError: (reason: string) => void
+    onError: (reason: string) => void,
   ): void;
   getBars(
     symbolInfo: LibrarySymbolInfo,
     resolution: ResolutionString,
     periodParams: PeriodParams,
     onResult: (bars: Bar[], meta: { noData?: boolean }) => void,
-    onError: (reason: string) => void
+    onError: (reason: string) => void,
   ): void;
   subscribeBars(
     symbolInfo: LibrarySymbolInfo,
     resolution: ResolutionString,
     onTick: (bar: Bar) => void,
     listenerGuid: string,
-    onResetCacheNeededCallback: () => void
+    onResetCacheNeededCallback: () => void,
   ): void;
   unsubscribeBars(listenerGuid: string): void;
 }
@@ -633,7 +633,8 @@ export interface PeriodParams {
 export interface TealchartWidgetOptions {
   container: HTMLElement;
   symbol: string;
-  interval: ResolutionString;
+  /** Initial interval. If omitted, uses persisted per-chart value from localStorage. */
+  interval?: ResolutionString;
   datafeed: IBasicDataFeed;
   locale?: string;
   autosize?: boolean;
@@ -993,14 +994,16 @@ export interface UnifiedPaneLayout {
  * Default unified pane layout - just the main pane
  */
 export const DEFAULT_UNIFIED_PANE_LAYOUT: UnifiedPaneLayout = {
-  panes: [{
-    id: 'main',
-    type: 'main',
-    heightRatio: 1.0,
-    yMin: 0,
-    yMax: 0,
-    fixedRange: false,
-  }],
+  panes: [
+    {
+      id: 'main',
+      type: 'main',
+      heightRatio: 1.0,
+      yMin: 0,
+      yMax: 0,
+      fixedRange: false,
+    },
+  ],
   timeAxisHeight: 30,
 };
 
@@ -1072,11 +1075,7 @@ export const PRICE_AXIS_RIGHT_PADDING = 2;
 /**
  * Reason for triggering a gap detection recovery
  */
-export type GapDetectionReason =
-  | 'network-reconnect'
-  | 'visibility-change'
-  | 'bar-timeout'
-  | 'bar-gap';
+export type GapDetectionReason = 'network-reconnect' | 'visibility-change' | 'bar-timeout' | 'bar-gap';
 
 /**
  * Configuration options for gap detection

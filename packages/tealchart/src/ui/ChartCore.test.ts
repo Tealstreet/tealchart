@@ -1,0 +1,254 @@
+import type { Bar, Viewport } from '../types';
+
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { TealchartRenderer } from '../TealchartRenderer';
+
+// Mock Konva with plain classes (survives mockReset)
+vi.mock('konva', () => {
+  class MockLayer {
+    draw() {}
+    destroy() {}
+  }
+  class MockStage {
+    private _container: HTMLDivElement;
+    constructor() {
+      this._container = document.createElement('div');
+    }
+    container() {
+      return this._container;
+    }
+    add() {}
+    destroy() {}
+  }
+  return { default: { Stage: MockStage, Layer: MockLayer }, __esModule: true };
+});
+
+// Mock EventManager (survives mockReset)
+vi.mock('../interaction/EventManager', () => ({
+  EventManager: class {
+    getIsDragging() {
+      return false;
+    }
+    dispose() {}
+  },
+}));
+
+// Mock PriceLineManager
+vi.mock('../interaction/PriceLineManager', () => ({
+  PriceLineManager: class {
+    update() {}
+    setDimensions() {}
+    dispose() {}
+  },
+}));
+
+// ============================================================================
+// Test Helpers
+// ============================================================================
+
+/**
+ * Stub canvas.getContext('2d') so ChartCore can construct in jsdom.
+ * Returns a minimal mock that satisfies WebCanvasContext → TealchartRenderer.
+ */
+function stubCanvasContext(): void {
+  const mockCtx = {
+    canvas: { width: 800, height: 600 },
+    font: '',
+    fillStyle: '',
+    strokeStyle: '',
+    lineWidth: 1,
+    textAlign: 'left',
+    textBaseline: 'top',
+    globalAlpha: 1,
+    lineCap: 'butt',
+    save: () => {},
+    restore: () => {},
+    beginPath: () => {},
+    closePath: () => {},
+    moveTo: () => {},
+    lineTo: () => {},
+    fill: () => {},
+    stroke: () => {},
+    fillRect: () => {},
+    clearRect: () => {},
+    strokeRect: () => {},
+    fillText: () => {},
+    measureText: (text: string) => ({ width: text.length * 7 }),
+    setLineDash: () => {},
+    arc: () => {},
+    clip: () => {},
+    rect: () => {},
+    roundRect: () => {},
+    createLinearGradient: () => ({ addColorStop: () => {} }),
+    getTransform: () => ({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 }),
+    setTransform: () => {},
+    scale: () => {},
+    translate: () => {},
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  HTMLCanvasElement.prototype.getContext = (() => mockCtx) as any;
+}
+
+function makeBars(count: number, startTime = 1_000_000, interval = 60_000, basePrice = 50_000): Bar[] {
+  return Array.from({ length: count }, (_, i) => ({
+    time: startTime + i * interval,
+    open: basePrice + i * 10,
+    high: basePrice + i * 10 + 50,
+    low: basePrice + i * 10 - 50,
+    close: basePrice + (i + 1) * 10,
+    volume: 100 + i,
+  }));
+}
+
+// ============================================================================
+// Tests
+// ============================================================================
+
+describe('ChartCore viewport management', () => {
+  let container: HTMLDivElement;
+
+  beforeEach(() => {
+    stubCanvasContext();
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+      cb(0);
+      return 0;
+    });
+    vi.stubGlobal('cancelAnimationFrame', () => {});
+    vi.stubGlobal('devicePixelRatio', 1);
+
+    container = document.createElement('div');
+    document.body.appendChild(container);
+  });
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  async function createChartCore() {
+    const { ChartCore } = await import('./ChartCore');
+    return new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+    });
+  }
+
+  it('setBars auto-calculates viewport on first bar load', async () => {
+    const core = await createChartCore();
+    expect(core.getViewport()).toBeNull();
+
+    const btcBars = makeBars(10, 1_000_000, 60_000, 50_000);
+    core.setBars(btcBars);
+
+    const vp = core.getViewport();
+    expect(vp).not.toBeNull();
+    // Viewport should be in BTC price range (~50000)
+    expect(vp!.priceMin).toBeGreaterThan(40_000);
+    expect(vp!.priceMax).toBeLessThan(60_000);
+
+    core.dispose();
+  });
+
+  it('setBars([]) followed by setBars(newBars) should recalculate viewport for new data', async () => {
+    const core = await createChartCore();
+
+    // Step 1: Load BTC bars (~$50,000)
+    const btcBars = makeBars(10, 1_000_000, 60_000, 50_000);
+    core.setBars(btcBars);
+
+    const btcViewport = core.getViewport();
+    expect(btcViewport).not.toBeNull();
+    expect(btcViewport!.priceMin).toBeGreaterThan(40_000);
+
+    // Step 2: Clear bars (simulates symbol switch)
+    core.setBars([]);
+
+    // Step 3: Load DOGE-like bars (~$3)
+    const dogeBars = makeBars(10, 2_000_000, 60_000, 3);
+    core.setBars(dogeBars);
+
+    // Viewport SHOULD now reflect DOGE range, not BTC range
+    const newViewport = core.getViewport();
+    expect(newViewport).not.toBeNull();
+    // If viewport was properly recalculated, priceMax should be << 1000
+    // If the bug persists, priceMax is still ~50,000+ from the BTC range
+    expect(newViewport!.priceMax).toBeLessThan(1_000);
+
+    core.dispose();
+  });
+
+  it('setBars([]) should null the viewport so next setBars recalculates', async () => {
+    const core = await createChartCore();
+
+    // Load initial bars
+    const bars = makeBars(10);
+    core.setBars(bars);
+    expect(core.getViewport()).not.toBeNull();
+
+    // Clear bars (symbol/interval switch)
+    core.setBars([]);
+
+    // Viewport should be null after clearing bars
+    expect(core.getViewport()).toBeNull();
+
+    core.dispose();
+  });
+
+  it('setBars with same reference is no-op', async () => {
+    const core = await createChartCore();
+
+    const bars = makeBars(10);
+    core.setBars(bars);
+    const vp1 = core.getViewport();
+
+    // Same reference — should skip entirely
+    core.setBars(bars);
+    const vp2 = core.getViewport();
+
+    expect(vp1).toBe(vp2); // same object, not recalculated
+
+    core.dispose();
+  });
+
+  it('resetViewport recalculates from current bars', async () => {
+    const core = await createChartCore();
+
+    const bars = makeBars(10, 1_000_000, 60_000, 50_000);
+    core.setBars(bars);
+
+    // Manually set a bogus viewport
+    core.setViewport({
+      startTime: 0,
+      endTime: 1,
+      priceMin: 0,
+      priceMax: 1,
+    });
+
+    expect(core.getViewport()!.priceMax).toBe(1);
+
+    // resetViewport should recalculate from bars
+    core.resetViewport();
+    const vp = core.getViewport();
+    expect(vp!.priceMin).toBeGreaterThan(40_000);
+
+    core.dispose();
+  });
+
+  it('viewport matches calculateViewport output for same bars', async () => {
+    const core = await createChartCore();
+    const bars = makeBars(20, 1_000_000, 60_000, 30_000);
+
+    core.setBars(bars);
+    const coreVp = core.getViewport()!;
+    const expectedVp = TealchartRenderer.calculateViewport(bars);
+
+    expect(coreVp.startTime).toBe(expectedVp.startTime);
+    expect(coreVp.endTime).toBe(expectedVp.endTime);
+    expect(coreVp.priceMin).toBe(expectedVp.priceMin);
+    expect(coreVp.priceMax).toBe(expectedVp.priceMax);
+
+    core.dispose();
+  });
+});

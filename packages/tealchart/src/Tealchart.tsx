@@ -8,13 +8,12 @@ import type { IndicatorPaneInfo } from './components/ChartContainer';
 
 import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 
-import { faRotate } from '@fortawesome/free-solid-svg-icons/faRotate';
-import { FontAwesomeIcon as FontAwesomeIconOriginal } from '@fortawesome/react-fontawesome';
 import { flushSync } from 'react-dom';
 import { Layer, Stage } from 'react-konva';
 
 import { ContextMenu } from './components/ContextMenu';
 import { PriceLineLayer } from './components/PriceLineLayer';
+import { WebCanvasContext } from './rendering/WebCanvasContext';
 import { useChartApiOptional } from './state/ChartApiContext';
 import { getDecimalPlacesFromPrecision, PlotStyleOverride } from './state/chartState';
 import { TealchartRenderer } from './TealchartRenderer';
@@ -39,8 +38,19 @@ import {
   Viewport,
 } from './types';
 
-// Type cast to fix React type mismatch between packages
-const FontAwesomeIcon = FontAwesomeIconOriginal as React.ComponentType<any>;
+// Inline rotate icon SVG (replaces FontAwesome for bundle size)
+const RotateIcon: React.FC<{ style?: React.CSSProperties }> = ({ style }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 512 512"
+    width="12"
+    height="12"
+    style={style}
+    fill="currentColor"
+  >
+    <path d="M105.1 202.6c7.7-21.8 20.2-42.3 37.8-59.8c62.5-62.5 163.8-62.5 226.3 0L386.3 160 352 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l111.5 0c0 0 0 0 0 0l.4 0c17.7 0 32-14.3 32-32l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 35.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0C73.2 122 55.6 150.7 44.8 181.4c-5.9 16.7 2.9 34.9 19.5 40.8s34.9-2.9 40.8-19.5zM39 289.3c-5 1.5-9.8 4.2-13.7 8.2c-4 4-6.7 8.8-8.1 14c-.3 1.2-.6 2.5-.8 3.8c-.3 1.7-.4 3.4-.4 5.1L16 432c0 17.7 14.3 32 32 32s32-14.3 32-32l0-35.1 17.6 17.5c0 0 0 0 0 0c87.5 87.4 229.3 87.4 316.7 0c24.4-24.4 42.1-53.1 52.9-83.8c5.9-16.7-2.9-34.9-19.5-40.8s-34.9 2.9-40.8 19.5c-7.7 21.8-20.2 42.3-37.8 59.8c-62.5 62.5-163.8 62.5-226.3 0l-.1-.1L125.6 352l34.4 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L48.4 288c-4.4 0-8.5 .9-12.3 2.6c-.7 .3-1.4 .6-2.1 1c-.8 .4-1.5 .9-2.2 1.4c-1.3 .9-2.5 1.9-3.6 3c-.1 .1-.3 .2-.4 .4c-.1 .1-.3 .2-.4 .4l0 0z" />
+  </svg>
+);
 
 // Cache NumberFormat instances by decimals to avoid recreating on every frame
 const numberFormatCache = new Map<number, Intl.NumberFormat>();
@@ -1123,8 +1133,8 @@ export const Tealchart: React.FC<TealchartProps> = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const nativeCtx = canvas.getContext('2d');
+    if (!nativeCtx) return;
 
     // Set canvas size for HiDPI
     const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
@@ -1132,6 +1142,9 @@ export const Tealchart: React.FC<TealchartProps> = ({
     canvas.height = height * dpr;
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
+
+    // Wrap in CanvasContext abstraction (enables Skia implementation for React Native)
+    const ctx = new WebCanvasContext(nativeCtx);
 
     // Create renderer if it doesn't exist, or update context after resize
     if (!rendererRef.current) {
@@ -2209,7 +2222,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
         onMouseEnter={() => setShowResetButton(true)}
         title="Reset view"
       >
-        <FontAwesomeIcon icon={faRotate} style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: 12 }} />
+        <RotateIcon style={{ color: 'rgba(255, 255, 255, 0.8)' }} />
       </button>
       {/* Context menu overlay */}
       {contextMenuState.visible && (

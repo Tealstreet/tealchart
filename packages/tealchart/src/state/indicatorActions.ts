@@ -1,12 +1,11 @@
 /**
- * Indicator CRUD Action Atoms
+ * Indicator CRUD Actions
  *
- * Provides atom factories for adding, removing, updating, and toggling indicators.
- * Uses write-only atoms that update the indicators array in chart settings.
+ * Provides functions for adding, removing, updating, and toggling indicators.
+ * Framework-agnostic - works with any JavaScript environment.
  */
 
-import { atom } from 'jotai';
-import { getChartSettingsAtom, type IndicatorInstance } from './chartState';
+import { getChartStore, type IndicatorInstance } from './chartState';
 
 // ============================================================================
 // Helper: Generate unique indicator instance ID
@@ -20,179 +19,281 @@ export function generateIndicatorId(builtinId: string): string {
 }
 
 // ============================================================================
-// Add Indicator Atom
+// Indicator Action Functions
 // ============================================================================
 
 /**
- * Create a write-only atom that adds an indicator instance
+ * Add an indicator instance to a chart
  *
  * @param chartKey - The chart key for scoped storage
- * @returns Atom that accepts { builtinId, name, inputs? } and adds to indicators
+ * @param payload - The indicator data to add
+ * @returns The new indicator's ID
+ */
+export function addIndicator(
+  chartKey: string,
+  payload: { builtinId: string; name: string; inputs?: Record<string, unknown> }
+): string {
+  const store = getChartStore(chartKey).settings;
+  const settings = store.get();
+
+  const newIndicator: IndicatorInstance = {
+    id: generateIndicatorId(payload.builtinId),
+    name: payload.name,
+    builtinId: payload.builtinId,
+    inputs: payload.inputs ?? {},
+    isVisible: true,
+    createdAt: Date.now(),
+  };
+
+  store.setKey('indicators', [...settings.indicators, newIndicator]);
+
+  return newIndicator.id;
+}
+
+/**
+ * Remove an indicator by ID
+ *
+ * @param chartKey - The chart key for scoped storage
+ * @param indicatorId - The indicator ID to remove
+ */
+export function removeIndicator(chartKey: string, indicatorId: string): void {
+  const store = getChartStore(chartKey).settings;
+  const settings = store.get();
+
+  store.setKey(
+    'indicators',
+    settings.indicators.filter((ind) => ind.id !== indicatorId)
+  );
+}
+
+/**
+ * Update an indicator's inputs
+ *
+ * @param chartKey - The chart key for scoped storage
+ * @param payload - The indicator ID and new inputs
+ */
+export function updateIndicatorInputs(
+  chartKey: string,
+  payload: { id: string; inputs: Record<string, unknown> }
+): void {
+  const store = getChartStore(chartKey).settings;
+  const settings = store.get();
+
+  store.setKey(
+    'indicators',
+    settings.indicators.map((ind) =>
+      ind.id === payload.id
+        ? { ...ind, inputs: { ...ind.inputs, ...payload.inputs } }
+        : ind
+    )
+  );
+}
+
+/**
+ * Toggle an indicator's visibility
+ *
+ * @param chartKey - The chart key for scoped storage
+ * @param indicatorId - The indicator ID to toggle
+ */
+export function toggleIndicatorVisibility(chartKey: string, indicatorId: string): void {
+  const store = getChartStore(chartKey).settings;
+  const settings = store.get();
+
+  store.setKey(
+    'indicators',
+    settings.indicators.map((ind) =>
+      ind.id === indicatorId ? { ...ind, isVisible: !ind.isVisible } : ind
+    )
+  );
+}
+
+/**
+ * Update an indicator's display name
+ *
+ * @param chartKey - The chart key for scoped storage
+ * @param payload - The indicator ID and new name
+ */
+export function updateIndicatorName(
+  chartKey: string,
+  payload: { id: string; name: string }
+): void {
+  const store = getChartStore(chartKey).settings;
+  const settings = store.get();
+
+  store.setKey(
+    'indicators',
+    settings.indicators.map((ind) =>
+      ind.id === payload.id ? { ...ind, name: payload.name } : ind
+    )
+  );
+}
+
+/**
+ * Update an indicator's style overrides
+ *
+ * @param chartKey - The chart key for scoped storage
+ * @param payload - The indicator ID and style overrides
+ */
+export function updateIndicatorStyles(
+  chartKey: string,
+  payload: { id: string; styleOverrides: IndicatorInstance['styleOverrides'] }
+): void {
+  const store = getChartStore(chartKey).settings;
+  const settings = store.get();
+
+  store.setKey(
+    'indicators',
+    settings.indicators.map((ind) =>
+      ind.id === payload.id ? { ...ind, styleOverrides: payload.styleOverrides } : ind
+    )
+  );
+}
+
+/**
+ * Get a specific indicator by ID
+ *
+ * @param chartKey - The chart key for scoped storage
+ * @param indicatorId - The indicator ID to find
+ * @returns The indicator instance or undefined
+ */
+export function getIndicator(chartKey: string, indicatorId: string): IndicatorInstance | undefined {
+  const store = getChartStore(chartKey).settings;
+  return store.get().indicators.find((ind) => ind.id === indicatorId);
+}
+
+/**
+ * Get all indicators for a chart
+ *
+ * @param chartKey - The chart key for scoped storage
+ * @returns Array of indicator instances
+ */
+export function getIndicators(chartKey: string): IndicatorInstance[] {
+  return getChartStore(chartKey).settings.get().indicators;
+}
+
+/**
+ * Subscribe to indicator changes
+ *
+ * @param chartKey - The chart key for scoped storage
+ * @param callback - Function called when indicators change
+ * @returns Unsubscribe function
+ */
+export function subscribeToIndicators(
+  chartKey: string,
+  callback: (indicators: IndicatorInstance[]) => void
+): () => void {
+  const store = getChartStore(chartKey).settings;
+  let prevIndicators = store.get().indicators;
+
+  return store.subscribe((settings) => {
+    if (settings.indicators !== prevIndicators) {
+      prevIndicators = settings.indicators;
+      callback(settings.indicators);
+    }
+  });
+}
+
+// ============================================================================
+// Backwards Compatibility: Atom-like interface
+// ============================================================================
+
+/**
+ * Interface for bound action functions (backwards compatibility)
+ * @deprecated Use the direct action functions instead
+ */
+export interface IndicatorActions {
+  addIndicator: (payload: { builtinId: string; name: string; inputs?: Record<string, unknown> }) => string;
+  removeIndicator: (indicatorId: string) => void;
+  updateIndicatorInputs: (payload: { id: string; inputs: Record<string, unknown> }) => void;
+  toggleIndicatorVisibility: (indicatorId: string) => void;
+  updateIndicatorName: (payload: { id: string; name: string }) => void;
+  updateIndicatorStyles: (payload: { id: string; styleOverrides: IndicatorInstance['styleOverrides'] }) => void;
+  getIndicator: (indicatorId: string) => IndicatorInstance | undefined;
+  getIndicators: () => IndicatorInstance[];
+  subscribeToIndicators: (callback: (indicators: IndicatorInstance[]) => void) => () => void;
+}
+
+/**
+ * Create indicator actions bound to a specific chart key
+ * @deprecated Use the direct action functions instead
+ *
+ * @param chartKey - The chart key for scoped storage
+ * @returns Object with all action functions bound to the chart key
+ */
+export function createIndicatorActions(chartKey: string): IndicatorActions {
+  return {
+    addIndicator: (payload) => addIndicator(chartKey, payload),
+    removeIndicator: (id) => removeIndicator(chartKey, id),
+    updateIndicatorInputs: (payload) => updateIndicatorInputs(chartKey, payload),
+    toggleIndicatorVisibility: (id) => toggleIndicatorVisibility(chartKey, id),
+    updateIndicatorName: (payload) => updateIndicatorName(chartKey, payload),
+    updateIndicatorStyles: (payload) => updateIndicatorStyles(chartKey, payload),
+    getIndicator: (id) => getIndicator(chartKey, id),
+    getIndicators: () => getIndicators(chartKey),
+    subscribeToIndicators: (cb) => subscribeToIndicators(chartKey, cb),
+  };
+}
+
+// ============================================================================
+// Legacy Atom Factory Exports (for backwards compatibility)
+// ============================================================================
+
+/**
+ * @deprecated Use addIndicator() function instead
  */
 export function createAddIndicatorAtom(chartKey: string) {
-  const settingsAtom = getChartSettingsAtom(chartKey);
-
-  return atom(
-    null, // Read: not used
-    (get, set, payload: { builtinId: string; name: string; inputs?: Record<string, unknown> }) => {
-      const settings = get(settingsAtom);
-      const newIndicator: IndicatorInstance = {
-        id: generateIndicatorId(payload.builtinId),
-        name: payload.name,
-        builtinId: payload.builtinId,
-        inputs: payload.inputs ?? {},
-        isVisible: true,
-        createdAt: Date.now(),
-      };
-
-      set(settingsAtom, {
-        ...settings,
-        indicators: [...settings.indicators, newIndicator],
-      });
-
-      return newIndicator.id;
-    }
-  );
+  return {
+    write: (payload: { builtinId: string; name: string; inputs?: Record<string, unknown> }) =>
+      addIndicator(chartKey, payload),
+  };
 }
 
-// ============================================================================
-// Remove Indicator Atom
-// ============================================================================
-
 /**
- * Create a write-only atom that removes an indicator by ID
- *
- * @param chartKey - The chart key for scoped storage
- * @returns Atom that accepts indicator ID and removes it
+ * @deprecated Use removeIndicator() function instead
  */
 export function createRemoveIndicatorAtom(chartKey: string) {
-  const settingsAtom = getChartSettingsAtom(chartKey);
-
-  return atom(null, (get, set, indicatorId: string) => {
-    const settings = get(settingsAtom);
-    set(settingsAtom, {
-      ...settings,
-      indicators: settings.indicators.filter((ind) => ind.id !== indicatorId),
-    });
-  });
+  return {
+    write: (indicatorId: string) => removeIndicator(chartKey, indicatorId),
+  };
 }
 
-// ============================================================================
-// Update Indicator Inputs Atom
-// ============================================================================
-
 /**
- * Create a write-only atom that updates an indicator's inputs
- *
- * @param chartKey - The chart key for scoped storage
- * @returns Atom that accepts { id, inputs } and merges inputs
+ * @deprecated Use updateIndicatorInputs() function instead
  */
 export function createUpdateIndicatorInputsAtom(chartKey: string) {
-  const settingsAtom = getChartSettingsAtom(chartKey);
-
-  return atom(
-    null,
-    (get, set, payload: { id: string; inputs: Record<string, unknown> }) => {
-      const settings = get(settingsAtom);
-      set(settingsAtom, {
-        ...settings,
-        indicators: settings.indicators.map((ind) =>
-          ind.id === payload.id
-            ? { ...ind, inputs: { ...ind.inputs, ...payload.inputs } }
-            : ind
-        ),
-      });
-    }
-  );
+  return {
+    write: (payload: { id: string; inputs: Record<string, unknown> }) =>
+      updateIndicatorInputs(chartKey, payload),
+  };
 }
 
-// ============================================================================
-// Toggle Indicator Visibility Atom
-// ============================================================================
-
 /**
- * Create a write-only atom that toggles an indicator's visibility
- *
- * @param chartKey - The chart key for scoped storage
- * @returns Atom that accepts indicator ID and flips isVisible
+ * @deprecated Use toggleIndicatorVisibility() function instead
  */
 export function createToggleIndicatorVisibilityAtom(chartKey: string) {
-  const settingsAtom = getChartSettingsAtom(chartKey);
-
-  return atom(null, (get, set, indicatorId: string) => {
-    const settings = get(settingsAtom);
-    set(settingsAtom, {
-      ...settings,
-      indicators: settings.indicators.map((ind) =>
-        ind.id === indicatorId ? { ...ind, isVisible: !ind.isVisible } : ind
-      ),
-    });
-  });
+  return {
+    write: (indicatorId: string) => toggleIndicatorVisibility(chartKey, indicatorId),
+  };
 }
 
-// ============================================================================
-// Update Indicator Name Atom
-// ============================================================================
-
 /**
- * Create a write-only atom that updates an indicator's display name
- *
- * @param chartKey - The chart key for scoped storage
- * @returns Atom that accepts { id, name } and updates the name
+ * @deprecated Use updateIndicatorName() function instead
  */
 export function createUpdateIndicatorNameAtom(chartKey: string) {
-  const settingsAtom = getChartSettingsAtom(chartKey);
-
-  return atom(null, (get, set, payload: { id: string; name: string }) => {
-    const settings = get(settingsAtom);
-    set(settingsAtom, {
-      ...settings,
-      indicators: settings.indicators.map((ind) =>
-        ind.id === payload.id ? { ...ind, name: payload.name } : ind
-      ),
-    });
-  });
-}
-
-// ============================================================================
-// Factory: Create All Indicator Action Atoms
-// ============================================================================
-
-/**
- * Type for the action atoms collection
- */
-interface IndicatorActionAtoms {
-  addIndicatorAtom: ReturnType<typeof createAddIndicatorAtom>;
-  removeIndicatorAtom: ReturnType<typeof createRemoveIndicatorAtom>;
-  updateIndicatorInputsAtom: ReturnType<typeof createUpdateIndicatorInputsAtom>;
-  toggleIndicatorVisibilityAtom: ReturnType<typeof createToggleIndicatorVisibilityAtom>;
-  updateIndicatorNameAtom: ReturnType<typeof createUpdateIndicatorNameAtom>;
+  return {
+    write: (payload: { id: string; name: string }) => updateIndicatorName(chartKey, payload),
+  };
 }
 
 /**
- * Cache for action atoms by chart key
+ * @deprecated Use createIndicatorActions() instead
  */
-const actionAtomsCache = new Map<string, IndicatorActionAtoms>();
-
-/**
- * Create all indicator action atoms for a chart
- *
- * @param chartKey - The chart key for scoped storage
- * @returns Object with all action atoms
- */
-export function createIndicatorActionsAtoms(chartKey: string): IndicatorActionAtoms {
-  let cached = actionAtomsCache.get(chartKey);
-
-  if (!cached) {
-    cached = {
-      addIndicatorAtom: createAddIndicatorAtom(chartKey),
-      removeIndicatorAtom: createRemoveIndicatorAtom(chartKey),
-      updateIndicatorInputsAtom: createUpdateIndicatorInputsAtom(chartKey),
-      toggleIndicatorVisibilityAtom: createToggleIndicatorVisibilityAtom(chartKey),
-      updateIndicatorNameAtom: createUpdateIndicatorNameAtom(chartKey),
-    };
-    actionAtomsCache.set(chartKey, cached);
-  }
-
-  return cached;
+export function createIndicatorActionsAtoms(chartKey: string) {
+  return {
+    addIndicatorAtom: createAddIndicatorAtom(chartKey),
+    removeIndicatorAtom: createRemoveIndicatorAtom(chartKey),
+    updateIndicatorInputsAtom: createUpdateIndicatorInputsAtom(chartKey),
+    toggleIndicatorVisibilityAtom: createToggleIndicatorVisibilityAtom(chartKey),
+    updateIndicatorNameAtom: createUpdateIndicatorNameAtom(chartKey),
+  };
 }

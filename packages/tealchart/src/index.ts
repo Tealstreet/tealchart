@@ -13,6 +13,9 @@ export { TealchartApi, type StudyCreateCallback } from './TealchartApi';
 export { Tealchart } from './Tealchart';
 export type { TealchartProps } from './Tealchart';
 
+// React Native Skia component - import from '@tealstreet/tealchart/native' for React Native
+// NOT exported here to avoid breaking web builds with RN dependencies
+
 // Full chart container with top bar (for direct React usage)
 export { ChartContainer } from './components/ChartContainer';
 export type { ChartContainerProps } from './components/ChartContainer';
@@ -211,3 +214,25 @@ export type {
   PartialChartTranslations,
   TranslationProviderProps,
 } from './i18n';
+
+// Core widget logic (platform-agnostic)
+export {
+  ChartWidgetCore,
+  getIntervalMs,
+  INITIAL_BAR_COUNT,
+} from './core';
+export type {
+  ChartWidgetCoreOptions,
+  IIndicatorManager,
+} from './core';
+
+// React hook for core widget (works on web and mobile)
+export {
+  useTealchartCore,
+} from './core/useTealchartCore';
+export type {
+  UseTealchartCoreOptions,
+  TealchartCoreState,
+  TealchartCoreActions,
+  UseTealchartCoreReturn,
+} from './core/useTealchartCore';

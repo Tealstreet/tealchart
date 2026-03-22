@@ -1,11 +1,11 @@
 /**
- * Chart State Management with Jotai
- * Uses atomWithStorage for persistence with per-chart keys
+ * Chart State Management with Nanostores
+ * Uses persistent stores for localStorage with per-chart keys
+ * Framework-agnostic - works with React, vanilla JS, or any other framework
  */
 
-import { atom } from 'jotai';
-import { atomWithStorage, createJSONStorage } from 'jotai/utils';
-import { focusAtom } from 'jotai-optics';
+import { atom, map, computed, type MapStore, type WritableAtom } from 'nanostores';
+import { persistentMap } from '@nanostores/persistent';
 import { ResolutionString } from '../types';
 import { migrateChartSettings, CHART_SETTINGS_VERSION } from './safeDeepMerge';
 
@@ -105,25 +105,21 @@ const DEFAULT_CURRENT_LAYOUT: CurrentLayoutState = {
   layoutName: null,
 };
 
-/**
- * Cache of dirty state atoms by chart key (not persisted)
- * Tracks whether there are unsaved changes to the layout
- */
-const isDirtyAtomCache = new Map<string, ReturnType<typeof atom<boolean>>>();
+// ============================================================================
+// Chart Store - Combined state for a chart instance
+// ============================================================================
 
-/**
- * Get or create a dirty state atom for a specific chart key
- * This is NOT persisted - it's transient state that resets on page load
- */
-export function getIsDirtyAtom(chartKey: string) {
-  let dirtyAtom = isDirtyAtomCache.get(chartKey);
-
-  if (!dirtyAtom) {
-    dirtyAtom = atom(false);
-    isDirtyAtomCache.set(chartKey, dirtyAtom);
-  }
-
-  return dirtyAtom;
+export interface ChartStore {
+  /** Persistent chart settings */
+  settings: MapStore<ChartSettings>;
+  /** Current layout state (persistent) */
+  currentLayout: MapStore<CurrentLayoutState>;
+  /** Dirty state (transient) - true when there are unsaved changes */
+  isDirty: WritableAtom<boolean>;
+  /** Save status (transient) - tracks save operation state */
+  saveStatus: WritableAtom<SaveStatus>;
+  /** Computed: interval in milliseconds */
+  intervalMs: ReturnType<typeof computed>;
 }
 
 /**
@@ -131,27 +127,8 @@ export function getIsDirtyAtom(chartKey: string) {
  */
 export type SaveStatus = 'idle' | 'saving' | 'success' | 'success-fading' | 'error';
 
-/**
- * Cache of save status atoms by chart key (not persisted)
- */
-const saveStatusAtomCache = new Map<string, ReturnType<typeof atom<SaveStatus>>>();
-
-/**
- * Get or create a save status atom for a specific chart key
- */
-export function getSaveStatusAtom(chartKey: string) {
-  let statusAtom = saveStatusAtomCache.get(chartKey);
-
-  if (!statusAtom) {
-    statusAtom = atom<SaveStatus>('idle');
-    saveStatusAtomCache.set(chartKey, statusAtom);
-  }
-
-  return statusAtom;
-}
-
 // ============================================================================
-// Storage Factory
+// Storage Utilities
 // ============================================================================
 
 /**
@@ -162,167 +139,319 @@ function getStorageKey(chartKey: string): string {
 }
 
 /**
- * Safe JSON storage that handles SSR, errors, and applies migrations
+ * Check if we're in a browser environment
  */
-function createSafeMergeStorage() {
-  const baseStorage = createJSONStorage<ChartSettings>(() => {
-    if (typeof window === 'undefined') {
-      // SSR fallback - return a no-op storage
-      return {
-        getItem: () => null,
-        setItem: () => {},
-        removeItem: () => {},
-      };
-    }
-    return localStorage;
+function isBrowser(): boolean {
+  return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+}
+
+/**
+ * Load and migrate settings from localStorage
+ */
+function loadSettings(chartKey: string): ChartSettings {
+  if (!isBrowser()) return DEFAULT_CHART_SETTINGS;
+
+  try {
+    const key = getStorageKey(chartKey);
+    const stored = localStorage.getItem(key);
+    if (!stored) return DEFAULT_CHART_SETTINGS;
+
+    const parsed = JSON.parse(stored);
+    // Apply migrations and safe merge on read
+    return migrateChartSettings(parsed, DEFAULT_CHART_SETTINGS);
+  } catch {
+    return DEFAULT_CHART_SETTINGS;
+  }
+}
+
+/**
+ * Save settings to localStorage
+ */
+function saveSettings(chartKey: string, settings: ChartSettings): void {
+  if (!isBrowser()) return;
+
+  try {
+    const key = getStorageKey(chartKey);
+    localStorage.setItem(key, JSON.stringify(settings));
+  } catch {
+    // Ignore storage errors (quota exceeded, etc.)
+  }
+}
+
+/**
+ * Load layout state from localStorage
+ */
+function loadLayoutState(chartKey: string): CurrentLayoutState {
+  if (!isBrowser()) return DEFAULT_CURRENT_LAYOUT;
+
+  try {
+    const key = `${getStorageKey(chartKey)}:layout`;
+    const stored = localStorage.getItem(key);
+    if (!stored) return DEFAULT_CURRENT_LAYOUT;
+    return JSON.parse(stored);
+  } catch {
+    return DEFAULT_CURRENT_LAYOUT;
+  }
+}
+
+/**
+ * Save layout state to localStorage
+ */
+function saveLayoutState(chartKey: string, state: CurrentLayoutState): void {
+  if (!isBrowser()) return;
+
+  try {
+    const key = `${getStorageKey(chartKey)}:layout`;
+    localStorage.setItem(key, JSON.stringify(state));
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+// ============================================================================
+// Chart Store Factory
+// ============================================================================
+
+/**
+ * Cache of chart stores by key
+ * This ensures we don't create duplicate stores for the same chart
+ */
+const chartStoreCache = new Map<string, ChartStore>();
+
+/**
+ * Create a persistent map store with auto-save
+ */
+function createPersistentSettingsStore(chartKey: string): MapStore<ChartSettings> {
+  const initialValue = loadSettings(chartKey);
+  const store = map<ChartSettings>(initialValue);
+
+  // Subscribe to changes and persist
+  store.subscribe((value) => {
+    saveSettings(chartKey, value);
   });
 
-  return {
-    ...baseStorage,
-    getItem: (key: string, initialValue: ChartSettings) => {
-      const stored = baseStorage.getItem(key, initialValue);
-      // Apply migrations and safe merge on read
-      return migrateChartSettings(stored, DEFAULT_CHART_SETTINGS);
-    },
-  };
+  return store;
 }
 
-// ============================================================================
-// Atom Factory for Per-Chart Settings
-// ============================================================================
+/**
+ * Create a persistent layout store with auto-save
+ */
+function createPersistentLayoutStore(chartKey: string): MapStore<CurrentLayoutState> {
+  const initialValue = loadLayoutState(chartKey);
+  const store = map<CurrentLayoutState>(initialValue);
+
+  // Subscribe to changes and persist
+  store.subscribe((value) => {
+    saveLayoutState(chartKey, value);
+  });
+
+  return store;
+}
 
 /**
- * Cache of chart settings atoms by key
- * This ensures we don't create duplicate atoms for the same chart
+ * Get or create a chart store for a specific chart key
  */
-const chartSettingsAtomCache = new Map<string, ReturnType<typeof atomWithStorage<ChartSettings>>>();
+export function getChartStore(chartKey: string): ChartStore {
+  let store = chartStoreCache.get(chartKey);
 
-/**
- * Get or create a chart settings atom for a specific chart key
- * Uses atomWithStorage for automatic persistence
- */
-export function getChartSettingsAtom(chartKey: string) {
-  let settingsAtom = chartSettingsAtomCache.get(chartKey);
+  if (!store) {
+    const settings = createPersistentSettingsStore(chartKey);
+    const currentLayout = createPersistentLayoutStore(chartKey);
+    const isDirty = atom(false);
+    const saveStatus = atom<SaveStatus>('idle');
 
-  if (!settingsAtom) {
-    settingsAtom = atomWithStorage<ChartSettings>(
-      getStorageKey(chartKey),
-      DEFAULT_CHART_SETTINGS,
-      createSafeMergeStorage(),
-      { getOnInit: true }
-    );
-    chartSettingsAtomCache.set(chartKey, settingsAtom);
+    // Computed interval in milliseconds
+    const intervalMs = computed(settings, (s) => resolutionToMs(s.interval));
+
+    store = {
+      settings,
+      currentLayout,
+      isDirty,
+      saveStatus,
+      intervalMs,
+    };
+
+    chartStoreCache.set(chartKey, store);
   }
 
-  return settingsAtom;
+  return store;
 }
 
 // ============================================================================
-// Current Layout Atom Factory
+// Convenience Getters (for backwards compatibility)
 // ============================================================================
 
 /**
- * Cache of current layout atoms by chart key
+ * Get the settings store for a chart
+ * @deprecated Use getChartStore(chartKey).settings instead
  */
-const currentLayoutAtomCache = new Map<string, ReturnType<typeof atomWithStorage<CurrentLayoutState>>>();
+export function getChartSettingsAtom(chartKey: string): MapStore<ChartSettings> {
+  return getChartStore(chartKey).settings;
+}
 
 /**
- * Get or create a current layout atom for a specific chart key
- * Tracks which saved layout is currently loaded (separate from settings)
+ * Get the current layout store for a chart
+ * @deprecated Use getChartStore(chartKey).currentLayout instead
  */
-export function getCurrentLayoutAtom(chartKey: string) {
-  let layoutAtom = currentLayoutAtomCache.get(chartKey);
+export function getCurrentLayoutAtom(chartKey: string): MapStore<CurrentLayoutState> {
+  return getChartStore(chartKey).currentLayout;
+}
 
-  if (!layoutAtom) {
-    layoutAtom = atomWithStorage<CurrentLayoutState>(
-      `${getStorageKey(chartKey)}:layout`,
-      DEFAULT_CURRENT_LAYOUT,
-      createJSONStorage(() => {
-        if (typeof window === 'undefined') {
-          return {
-            getItem: () => null,
-            setItem: () => {},
-            removeItem: () => {},
-          };
-        }
-        return localStorage;
-      }),
-      { getOnInit: true }
-    );
-    currentLayoutAtomCache.set(chartKey, layoutAtom);
-  }
+/**
+ * Get the dirty state atom for a chart
+ * @deprecated Use getChartStore(chartKey).isDirty instead
+ */
+export function getIsDirtyAtom(chartKey: string): WritableAtom<boolean> {
+  return getChartStore(chartKey).isDirty;
+}
 
-  return layoutAtom;
+/**
+ * Get the save status atom for a chart
+ * @deprecated Use getChartStore(chartKey).saveStatus instead
+ */
+export function getSaveStatusAtom(chartKey: string): WritableAtom<SaveStatus> {
+  return getChartStore(chartKey).saveStatus;
 }
 
 // ============================================================================
-// Focus Atoms for Individual Settings
+// Store Update Helpers
+// ============================================================================
+
+/**
+ * Update a single property in the settings store
+ */
+export function updateChartSetting<K extends keyof ChartSettings>(
+  chartKey: string,
+  key: K,
+  value: ChartSettings[K]
+): void {
+  const store = getChartStore(chartKey).settings;
+  store.setKey(key, value);
+}
+
+/**
+ * Update multiple properties in the settings store
+ */
+export function updateChartSettings(
+  chartKey: string,
+  updates: Partial<ChartSettings>
+): void {
+  const store = getChartStore(chartKey).settings;
+  const current = store.get();
+  store.set({ ...current, ...updates });
+}
+
+/**
+ * Get the current value of a setting
+ */
+export function getChartSetting<K extends keyof ChartSettings>(
+  chartKey: string,
+  key: K
+): ChartSettings[K] {
+  return getChartStore(chartKey).settings.get()[key];
+}
+
+/**
+ * Subscribe to a specific setting
+ */
+export function subscribeToSetting<K extends keyof ChartSettings>(
+  chartKey: string,
+  key: K,
+  callback: (value: ChartSettings[K]) => void
+): () => void {
+  const store = getChartStore(chartKey).settings;
+  let prevValue = store.get()[key];
+
+  return store.subscribe((settings) => {
+    const newValue = settings[key];
+    if (newValue !== prevValue) {
+      prevValue = newValue;
+      callback(newValue);
+    }
+  });
+}
+
+// ============================================================================
+// Focus Atoms Compatibility Layer
 // ============================================================================
 
 /**
  * Create focus atoms for a specific chart's settings
- * These allow accessing/updating individual settings without re-rendering
- * components that don't depend on them
+ * This provides a similar API to the old Jotai focusAtom pattern
+ * @deprecated Use getChartStore(chartKey) and direct property access instead
  */
 export function createChartFocusAtoms(chartKey: string) {
-  const baseAtom = getChartSettingsAtom(chartKey);
-  const layoutAtom = getCurrentLayoutAtom(chartKey);
-  const dirtyAtom = getIsDirtyAtom(chartKey);
-  const statusAtom = getSaveStatusAtom(chartKey);
+  const store = getChartStore(chartKey);
+
+  // Create computed stores for individual properties
+  const intervalAtom = computed(store.settings, (s) => s.interval);
+  const symbolAtom = computed(store.settings, (s) => s.symbol);
+  const showVolumeAtom = computed(store.settings, (s) => s.showVolume);
+  const volumeHeightAtom = computed(store.settings, (s) => s.volumeHeight);
+  const chartTypeAtom = computed(store.settings, (s) => s.chartType);
+  const autoScaleAtom = computed(store.settings, (s) => s.autoScale);
+  const viewportAtom = computed(store.settings, (s) => s.viewport);
+  const indicatorsAtom = computed(store.settings, (s) => s.indicators);
 
   return {
-    /** Base settings atom */
-    settingsAtom: baseAtom,
+    /** Base settings store */
+    settingsAtom: store.settings,
 
-    /** Current layout atom (separate from settings) */
-    currentLayoutAtom: layoutAtom,
+    /** Current layout store (separate from settings) */
+    currentLayoutAtom: store.currentLayout,
 
     /** Dirty state atom (not persisted) - true when there are unsaved changes */
-    isDirtyAtom: dirtyAtom,
+    isDirtyAtom: store.isDirty,
 
     /** Save status atom (not persisted) - tracks save operation state */
-    saveStatusAtom: statusAtom,
+    saveStatusAtom: store.saveStatus,
 
-    /** Interval/timeframe focus atom */
-    intervalAtom: focusAtom(baseAtom, (optic) => optic.prop('interval')),
+    /** Interval/timeframe computed store */
+    intervalAtom,
 
-    /** Symbol focus atom */
-    symbolAtom: focusAtom(baseAtom, (optic) => optic.prop('symbol')),
+    /** Symbol computed store */
+    symbolAtom,
 
-    /** Show volume toggle focus atom */
-    showVolumeAtom: focusAtom(baseAtom, (optic) => optic.prop('showVolume')),
+    /** Show volume toggle computed store */
+    showVolumeAtom,
 
-    /** Volume height focus atom */
-    volumeHeightAtom: focusAtom(baseAtom, (optic) => optic.prop('volumeHeight')),
+    /** Volume height computed store */
+    volumeHeightAtom,
 
-    /** Chart type focus atom */
-    chartTypeAtom: focusAtom(baseAtom, (optic) => optic.prop('chartType')),
+    /** Chart type computed store */
+    chartTypeAtom,
 
-    /** Auto scale focus atom */
-    autoScaleAtom: focusAtom(baseAtom, (optic) => optic.prop('autoScale')),
+    /** Auto scale computed store */
+    autoScaleAtom,
 
-    /** Viewport focus atom */
-    viewportAtom: focusAtom(baseAtom, (optic) => optic.prop('viewport')),
+    /** Viewport computed store */
+    viewportAtom,
 
-    /** Indicators array focus atom */
-    indicatorsAtom: focusAtom(baseAtom, (optic) => optic.prop('indicators')),
+    /** Indicators array computed store */
+    indicatorsAtom,
+
+    // Setters for individual properties
+    setInterval: (value: ResolutionString) => updateChartSetting(chartKey, 'interval', value),
+    setSymbol: (value: string) => updateChartSetting(chartKey, 'symbol', value),
+    setShowVolume: (value: boolean) => updateChartSetting(chartKey, 'showVolume', value),
+    setVolumeHeight: (value: number) => updateChartSetting(chartKey, 'volumeHeight', value),
+    setChartType: (value: 'candle' | 'line' | 'area') => updateChartSetting(chartKey, 'chartType', value),
+    setAutoScale: (value: boolean) => updateChartSetting(chartKey, 'autoScale', value),
+    setViewport: (value: ChartSettings['viewport']) => updateChartSetting(chartKey, 'viewport', value),
+    setIndicators: (value: IndicatorInstance[]) => updateChartSetting(chartKey, 'indicators', value),
   };
 }
 
 // ============================================================================
-// Derived Atoms
+// Derived Stores
 // ============================================================================
 
 /**
- * Create a derived atom that computes interval in milliseconds
+ * Create a computed store that returns interval in milliseconds
+ * @deprecated Use getChartStore(chartKey).intervalMs instead
  */
 export function createIntervalMsAtom(chartKey: string) {
-  const { intervalAtom } = createChartFocusAtoms(chartKey);
-
-  return atom((get) => {
-    const interval = get(intervalAtom);
-    return resolutionToMs(interval);
-  });
+  return getChartStore(chartKey).intervalMs;
 }
 
 /**
