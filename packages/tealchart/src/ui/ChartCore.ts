@@ -441,6 +441,7 @@ export class ChartCore {
   private resetButton: HTMLButtonElement | null = null;
   private resetButtonHoverZone: HTMLDivElement | null = null;
   private contextMenu: HTMLDivElement | null = null;
+  private contextMenuPlusButton: HTMLDivElement | null = null;
 
   // Core components
   private renderer: TealchartRenderer;
@@ -532,6 +533,9 @@ export class ChartCore {
     // Initialize Konva stage and layer
     this.initKonva();
 
+    // Create context menu "+" button (HTML overlay — not Konva, for reliable clicks)
+    this.initContextMenuPlusButton();
+
     // Initialize event manager
     this.eventManager = new EventManager(this.chartContainer, {
       getViewport: () => this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
@@ -595,10 +599,12 @@ export class ChartCore {
         );
         const time = this.renderer.publicXToTime(x, this.viewport ?? TealchartRenderer.calculateViewport(this.bars));
         this.options.onCrossHairMoved?.(price, time);
+        this.updateContextMenuPlusButton(y, true);
         this.scheduleRender();
       },
       onCrossHairVisibilityChange: (visible) => {
         this.crosshair = { ...this.crosshair, visible };
+        this.updateContextMenuPlusButton(this.crosshair.y, visible);
         this.scheduleRender();
       },
       onMouseDown: () => this.options.onMouseDown?.(),
@@ -630,13 +636,11 @@ export class ChartCore {
    * Uses reference equality check - bars array is always new when data changes
    */
   setBars(bars: Bar[]): void {
-    // Reference check - if same array, no update needed
+    // Reference check — skip if same array (real-time ticks use updateBar instead)
     if (bars === this.bars) return;
 
     this.bars = bars;
-    if (bars.length === 0) {
-      this.viewport = null;
-    } else if (!this.viewport) {
+    if (bars.length > 0 && !this.viewport) {
       this.viewport = TealchartRenderer.calculateViewport(bars);
     }
     this.scheduleRender();
@@ -932,13 +936,6 @@ export class ChartCore {
           this.stage.container().style.cursor = this.cursor;
         }
       },
-      onContextMenuButtonClick: (price, screenX, screenY) => {
-        const time = this.renderer.publicXToTime(
-          this.crosshair.x,
-          this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
-        );
-        this.handleContextMenu(screenX, screenY, price, time);
-      },
     });
   }
 
@@ -1031,8 +1028,71 @@ export class ChartCore {
   }
 
   // ============================================================================
-  // Private: Context Menu
+  // Context Menu + Button
   // ============================================================================
+
+  private initContextMenuPlusButton(): void {
+    const btn = div({
+      style: {
+        position: 'absolute',
+        right: `${this.margins.right + 2}px`,
+        width: '18px',
+        height: '18px',
+        borderRadius: '50%',
+        border: `1px solid ${this.options.renderOptions?.crosshairColor || '#787b86'}`,
+        display: 'none',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        zIndex: '5',
+        fontSize: '14px',
+        lineHeight: '1',
+        color: this.options.renderOptions?.crosshairColor || '#787b86',
+        userSelect: 'none',
+        pointerEvents: 'auto',
+      },
+      text: '+',
+      onClick: (e) => {
+        e.stopPropagation();
+        const y = this.crosshair.y;
+        const price = this.renderer.publicYToPriceWithLayout(
+          y,
+          this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
+          this.getUnifiedLayout(),
+        );
+        const time = this.renderer.publicXToTime(
+          this.crosshair.x,
+          this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
+        );
+        const rect = this.chartContainer.getBoundingClientRect();
+        this.handleContextMenu(rect.right - this.margins.right, rect.top + y, price, time);
+      },
+    });
+
+    btn.addEventListener('mouseenter', () => {
+      btn.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.backgroundColor = 'transparent';
+    });
+
+    this.contextMenuPlusButton = btn;
+    this.chartContainer.appendChild(btn);
+  }
+
+  private updateContextMenuPlusButton(y: number, visible: boolean): void {
+    if (!this.contextMenuPlusButton) return;
+    if (visible && this.options.onContextMenu) {
+      this.contextMenuPlusButton.style.display = 'flex';
+      this.contextMenuPlusButton.style.top = `${y - 9}px`;
+    } else {
+      this.contextMenuPlusButton.style.display = 'none';
+    }
+  }
+
+  setContextMenuCallback(callback: (unixTime: number, price: number) => ContextMenuItem[]): void {
+    this.options.onContextMenu = callback;
+  }
 
   private handleContextMenu(screenX: number, screenY: number, price: number, time: number): void {
     if (!this.options.onContextMenu) return;
@@ -1212,9 +1272,7 @@ export class ChartCore {
   // ============================================================================
 
   private scheduleRender(): void {
-    if (this.rafId !== null) {
-      cancelAnimationFrame(this.rafId);
-    }
+    if (this.rafId !== null) return; // Already scheduled — coalesce
 
     this.rafId = requestAnimationFrame(() => {
       this.rafId = null;

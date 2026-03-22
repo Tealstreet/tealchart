@@ -4,7 +4,6 @@
  */
 
 import { Subscription } from './events/EventEmitter';
-import { createSyncPromise } from './utils/syncPromise';
 import {
   BracketConfig,
   CrossHairMovedEventParams,
@@ -14,8 +13,8 @@ import {
   IOrderLineAdapter,
   IPositionLineAdapter,
   IStudyApi,
-  ITimeScaleApi,
   ISubscription,
+  ITimeScaleApi,
   OrderLineOptions,
   OrderLineRenderData,
   PositionData,
@@ -25,6 +24,7 @@ import {
   ResolutionString,
   StudyInfo,
 } from './types';
+import { createSyncPromise } from './utils/syncPromise';
 
 /**
  * Internal study state
@@ -42,11 +42,7 @@ interface ManagedStudy {
 /**
  * Callback for study creation (implemented by widget)
  */
-export type StudyCreateCallback = (
-  studyId: string,
-  name: string,
-  inputs: Record<string, unknown>
-) => Promise<boolean>;
+export type StudyCreateCallback = (studyId: string, name: string, inputs: Record<string, unknown>) => Promise<boolean>;
 
 /**
  * Per-chart API (equivalent to TradingView's IChartWidgetApi)
@@ -77,6 +73,7 @@ export class TealchartApi {
   // Callback for when symbol/interval changes need to propagate to widget
   private _onSymbolChange?: (symbol: string) => void;
   private _onIntervalChange?: (interval: ResolutionString) => void;
+  private _onResetData?: () => void;
 
   constructor(symbol: string, interval: ResolutionString, account?: string) {
     this._symbol = symbol;
@@ -200,11 +197,12 @@ export class TealchartApi {
   }
 
   /**
-   * Reset chart data and request fresh data from datafeed
+   * Reset chart data and request fresh data from datafeed.
+   * Mirrors TradingView's resetData() — clears cached bars, unsubscribes
+   * from real-time feed, and triggers a full reload cycle.
    */
   resetData(): void {
-    // TODO: Implement - should clear cached bars and trigger new data request
-    console.warn('[Tealchart] resetData called - implementation pending');
+    this._onResetData?.();
   }
 
   // ============================================================================
@@ -936,7 +934,7 @@ export class TealchartApi {
     lock?: boolean,
     inputs?: Record<string, unknown>,
     overrides?: Record<string, unknown>,
-    options?: { checkLimit?: boolean; priceScale?: string; displayName?: string }
+    options?: { checkLimit?: boolean; priceScale?: string; displayName?: string },
   ): Promise<IStudyApi | null> {
     const studyId = `study_${++this._studyIdCounter}`;
 
@@ -1129,6 +1127,13 @@ export class TealchartApi {
   }
 
   /**
+   * @internal Set callback for resetData
+   */
+  setOnResetData(callback: () => void): void {
+    this._onResetData = callback;
+  }
+
+  /**
    * @internal Set account for enhanced crosshair state
    */
   setAccount(account: string): void {
@@ -1155,8 +1160,7 @@ export class TealchartApi {
    * only the last one is kept (typically the confirmed order, not the submitting one)
    */
   getOrderLinesRenderData(): OrderLineRenderData[] {
-    const allLines = Array.from(this._orderLines.values())
-      .map((adapter) => adapter._getRenderData());
+    const allLines = Array.from(this._orderLines.values()).map((adapter) => adapter._getRenderData());
 
     // Deduplicate by orderId - keep last occurrence (Map overwrites earlier entries)
     const seenOrderIds = new Map<string, OrderLineRenderData>();
@@ -1183,8 +1187,7 @@ export class TealchartApi {
    * only the last one is kept
    */
   getPositionLinesRenderData(): PositionLineRenderData[] {
-    const allLines = Array.from(this._positionLines.values())
-      .map((adapter) => adapter._getRenderData());
+    const allLines = Array.from(this._positionLines.values()).map((adapter) => adapter._getRenderData());
 
     // Deduplicate by positionId - keep last occurrence (Map overwrites earlier entries)
     const seenPositionIds = new Map<string, PositionLineRenderData>();

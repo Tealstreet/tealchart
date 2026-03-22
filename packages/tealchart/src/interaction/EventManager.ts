@@ -249,6 +249,9 @@ export class EventManager {
   // ============================================================================
 
   private attach(): void {
+    // Detach first to prevent duplicate listeners on HMR remount
+    this.detach();
+
     // Mouse events (capture phase for priority)
     this.container.addEventListener('mousedown', this.boundMouseDown, { capture: true });
     this.container.addEventListener('mousemove', this.boundMouseMove, { capture: true });
@@ -500,10 +503,7 @@ export class EventManager {
 
     const rect = this.container.getBoundingClientRect();
     const isInside =
-      e.clientX >= rect.left &&
-      e.clientX <= rect.right &&
-      e.clientY >= rect.top &&
-      e.clientY <= rect.bottom;
+      e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
 
     if (!isInside) {
       // Mouse is outside container - hide crosshair
@@ -604,16 +604,12 @@ export class EventManager {
           this.callbacks.onContextMenu?.(x, y, price, time);
         }
       }, LONG_PRESS_DURATION);
-
     } else if (e.touches.length === 2) {
       // Two touches - prepare for pinch zoom
       this.clearLongPressTimer();
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
-      this.pinchStartDistance = Math.hypot(
-        touch2.clientX - touch1.clientX,
-        touch2.clientY - touch1.clientY
-      );
+      this.pinchStartDistance = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
       this.pinchStartViewport = { ...this.callbacks.getViewport() };
     }
 
@@ -663,16 +659,12 @@ export class EventManager {
           // handlePan calls onViewportChange which schedules render
         }
       }
-
     } else if (e.touches.length === 2 && this.pinchStartViewport) {
       // Pinch zoom
       this.clearLongPressTimer();
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
-      const currentDistance = Math.hypot(
-        touch2.clientX - touch1.clientX,
-        touch2.clientY - touch1.clientY
-      );
+      const currentDistance = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
 
       if (this.pinchStartDistance > 0) {
         // Scale inverted: spreading fingers zooms out (shows more data)
@@ -833,7 +825,7 @@ export class EventManager {
     // Calculate price per pixel using the actual pane height (not full chart height)
     const { yMin: startYMin, yMax: startYMax } = this.state.dragStartPaneYRange;
     const priceRange = startYMax - startYMin;
-    const paneHeight = this.state.dragStartPaneHeight || (dims.height - dims.timeAxisHeight - dims.topMargin);
+    const paneHeight = this.state.dragStartPaneHeight || dims.height - dims.timeAxisHeight - dims.topMargin;
     const pricePerPixel = priceRange / paneHeight;
 
     // Pan by price delta (vertical) - inverted because Y increases downward

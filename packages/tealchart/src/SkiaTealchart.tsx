@@ -16,41 +16,46 @@
  * - Layer 3: Base Gesture Layer - pan, pinch, axis scaling with zone detection
  */
 
-import React, { useRef, useState, useCallback, useEffect, useMemo, useReducer } from 'react';
-import { View, StyleSheet, LayoutChangeEvent, Text } from 'react-native';
-import { Canvas, Picture, Skia, createPicture } from '@shopify/react-native-skia';
+import type { IIndicatorManager } from './core/ChartWidgetCore';
+import type { BuiltinIndicator } from './indicators/builtinIndicators';
+import type { LabelBounds } from './mobile/hooks/useLabelCollision';
+import type { PlotOutput, PlotStyleOverride } from './state/chartState';
+import type {
+  Bar,
+  ChartMargins,
+  ContextMenuItem,
+  IBasicDataFeed,
+  OrderLineRenderData,
+  PositionLineRenderData,
+  PriceLine,
+  RenderOptions,
+  UnifiedPaneLayout,
+  Viewport,
+  ViewScaleState,
+} from './types';
+
+import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+
+import { Canvas, createPicture, Picture, Skia } from '@shopify/react-native-skia';
+import { LayoutChangeEvent, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS } from 'react-native-reanimated';
 
-import { TealchartRenderer } from './TealchartRenderer';
-import { SkiaCanvasContext, CollectedTextItem } from './rendering/SkiaCanvasContext';
-import { useChartGestures } from './mobile/hooks/useChartGestures';
-import { useLabelCollision, type LabelBounds } from './mobile/hooks/useLabelCollision';
+import { useTealchartCore } from './core/useTealchartCore';
+import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
+import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
+import { CrosshairComponent } from './mobile/components/CrosshairComponent';
+import { IndicatorsModalMobile } from './mobile/components/IndicatorsModalMobile';
 import { OrderLineComponent } from './mobile/components/OrderLineComponent';
 import { PositionLineComponent } from './mobile/components/PositionLineComponent';
-import { CrosshairComponent } from './mobile/components/CrosshairComponent';
-import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
-import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
-import { IndicatorsModalMobile } from './mobile/components/IndicatorsModalMobile';
+import { useChartGestures } from './mobile/hooks/useChartGestures';
+import { useLabelCollision } from './mobile/hooks/useLabelCollision';
 import { MobileIndicatorManager } from './mobile/MobileIndicatorManager';
-import { priceToY, yToPrice, xToTime } from './mobile/utils/coordinates';
-import { useTealchartCore } from './core/useTealchartCore';
-import type { IIndicatorManager } from './core/ChartWidgetCore';
-import type { BuiltinIndicator } from './indicators/builtinIndicators';
-import type {
-  Bar,
-  Viewport,
-  RenderOptions,
-  ChartMargins,
-  PriceLine,
-  OrderLineRenderData,
-  PositionLineRenderData,
-  UnifiedPaneLayout,
-  ContextMenuItem,
-  IBasicDataFeed,
-} from './types';
+import { priceToY, xToTime, yToPrice } from './mobile/utils/coordinates';
+import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
+import { TealchartRenderer } from './TealchartRenderer';
 import { DEFAULT_MARGINS } from './types';
-import type { PlotOutput, PlotStyleOverride } from './state/chartState';
+import { captureViewScale, restoreViewport } from './viewport/viewScale';
 
 // Indicator pane info type (matches web)
 interface IndicatorPaneInfo {
@@ -193,17 +198,20 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   const plots = indicatorManagerRef.current?.getPlots() || [];
   const unifiedPaneLayout = indicatorManagerRef.current?.getUnifiedLayout() || unifiedLayout;
   const indicatorPaneInfo = indicatorManagerRef.current?.getIndicatorPaneInfo() || {};
-  const activeIndicatorIds = indicatorManagerRef.current?.getIndicators().map(ind => ind.indicator.id) || [];
+  const activeIndicatorIds = indicatorManagerRef.current?.getIndicators().map((ind) => ind.indicator.id) || [];
 
   // Handle indicator addition
-  const handleAddIndicatorInternal = useCallback((indicator: BuiltinIndicator) => {
-    if (indicatorManagerRef.current) {
-      console.log('[SkiaTealchart] Adding indicator:', indicator.id);
-      indicatorManagerRef.current.addIndicator(indicator);
-    }
-    // Also call external callback if provided
-    onAddIndicator?.(indicator);
-  }, [onAddIndicator]);
+  const handleAddIndicatorInternal = useCallback(
+    (indicator: BuiltinIndicator) => {
+      if (indicatorManagerRef.current) {
+        console.log('[SkiaTealchart] Adding indicator:', indicator.id);
+        indicatorManagerRef.current.addIndicator(indicator);
+      }
+      // Also call external callback if provided
+      onAddIndicator?.(indicator);
+    },
+    [onAddIndicator],
+  );
 
   // ==========================================================================
   // Dimensions & Layout
@@ -217,24 +225,30 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     }
   }, [propWidth, propHeight]);
 
-  const onLayout = useCallback((event: LayoutChangeEvent) => {
-    if (!propWidth || !propHeight) {
-      const { width, height } = event.nativeEvent.layout;
-      setDimensions({ width, height });
-    }
-  }, [propWidth, propHeight]);
+  const onLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      if (!propWidth || !propHeight) {
+        const { width, height } = event.nativeEvent.layout;
+        setDimensions({ width, height });
+      }
+    },
+    [propWidth, propHeight],
+  );
 
   // Top bar safe zone - just enough to keep price labels below the toolbar content
   // The top bar is 36px tall but we only need ~26px clearance (content is centered)
   const TOP_BAR_SAFE_ZONE = 26;
 
   // Increase top margin when top bar is shown to create safe zone for price labels
-  const margins: ChartMargins = useMemo(() => ({
-    ...DEFAULT_MARGINS,
-    ...marginsProp,
-    // Add safe zone to top margin so price labels don't overlap with top bar
-    top: (marginsProp?.top ?? DEFAULT_MARGINS.top) + (showTopBar ? TOP_BAR_SAFE_ZONE : 0),
-  }), [marginsProp, showTopBar]);
+  const margins: ChartMargins = useMemo(
+    () => ({
+      ...DEFAULT_MARGINS,
+      ...marginsProp,
+      // Add safe zone to top margin so price labels don't overlap with top bar
+      top: (marginsProp?.top ?? DEFAULT_MARGINS.top) + (showTopBar ? TOP_BAR_SAFE_ZONE : 0),
+    }),
+    [marginsProp, showTopBar],
+  );
 
   // Chart uses full height (top bar overlays on top, but margins create safe zone)
 
@@ -243,24 +257,52 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   // ==========================================================================
 
   const [viewport, setViewport] = useState<Viewport | null>(() =>
-    bars.length > 0 ? TealchartRenderer.calculateViewport(bars) : null
+    bars.length > 0 ? TealchartRenderer.calculateViewport(bars) : null,
   );
 
   const barsLengthRef = useRef(bars.length);
+  const viewScaleRef = useRef<ViewScaleState | null>(null);
+
+  // Track the first bar's time to detect reloads with the same count
+  const barsFirstTimeRef = useRef<number | null>(bars.length > 0 ? bars[0].time : null);
 
   useEffect(() => {
-    if (bars.length > 0 && bars.length !== barsLengthRef.current) {
+    if (bars.length === 0) {
+      // Reset refs when bars are cleared so next load always triggers
+      barsLengthRef.current = 0;
+      barsFirstTimeRef.current = null;
+      return;
+    }
+
+    const firstTime = bars[0].time;
+    const lengthChanged = bars.length !== barsLengthRef.current;
+    const identityChanged = firstTime !== barsFirstTimeRef.current;
+
+    if (lengthChanged || identityChanged) {
       barsLengthRef.current = bars.length;
-      const newViewport = TealchartRenderer.calculateViewport(bars);
+      barsFirstTimeRef.current = firstTime;
+
+      // Restore viewport from proportional viewScale if available
+      let newViewport: Viewport;
+      if (viewScaleRef.current) {
+        newViewport = restoreViewport(viewScaleRef.current, bars);
+      } else {
+        newViewport = TealchartRenderer.calculateViewport(bars);
+      }
+
       setViewport(newViewport);
       onViewportChange?.(newViewport);
     }
   }, [bars, onViewportChange]);
 
-  const handleViewportChange = useCallback((newViewport: Viewport) => {
-    setViewport(newViewport);
-    onViewportChange?.(newViewport);
-  }, [onViewportChange]);
+  const handleViewportChange = useCallback(
+    (newViewport: Viewport) => {
+      setViewport(newViewport);
+      viewScaleRef.current = captureViewScale(newViewport, bars);
+      onViewportChange?.(newViewport);
+    },
+    [onViewportChange, bars],
+  );
 
   // ==========================================================================
   // Render Options
@@ -290,11 +332,14 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   // Gestures (using unified hook)
   // ==========================================================================
 
-  const chartDimensions = useMemo(() => ({
-    width: dimensions.width,
-    height: dimensions.height,
-    margins,
-  }), [dimensions.width, dimensions.height, margins]);
+  const chartDimensions = useMemo(
+    () => ({
+      width: dimensions.width,
+      height: dimensions.height,
+      margins,
+    }),
+    [dimensions.width, dimensions.height, margins],
+  );
 
   const { composedGesture } = useChartGestures({
     dimensions: chartDimensions,
@@ -328,68 +373,70 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     setIndicatorsModalVisible(false);
   }, []);
 
-  const handleSelectIndicator = useCallback((indicator: BuiltinIndicator) => {
-    console.log('[SkiaTealchart] handleSelectIndicator called:', indicator.id, indicator.name);
-    // Use internal handler which manages indicators in datafeed mode
-    handleAddIndicatorInternal(indicator);
-  }, [handleAddIndicatorInternal]);
+  const handleSelectIndicator = useCallback(
+    (indicator: BuiltinIndicator) => {
+      console.log('[SkiaTealchart] handleSelectIndicator called:', indicator.id, indicator.name);
+      // Use internal handler which manages indicators in datafeed mode
+      handleAddIndicatorInternal(indicator);
+    },
+    [handleAddIndicatorInternal],
+  );
 
   // Handle crosshair move callback
-  const handleCrosshairMove = useCallback((x: number, y: number) => {
-    // Update last position for context menu
-    setLastCrosshairPosition({ x, y });
+  const handleCrosshairMove = useCallback(
+    (x: number, y: number) => {
+      // Update last position for context menu
+      setLastCrosshairPosition({ x, y });
 
-    if (!viewport || !onCrossHairMoved) return;
-    const price = yToPrice(y, viewport, chartDimensions);
-    const time = xToTime(x, viewport, chartDimensions);
-    onCrossHairMoved(price, time);
-  }, [viewport, chartDimensions, onCrossHairMoved]);
+      if (!viewport || !onCrossHairMoved) return;
+      const price = yToPrice(y, viewport, chartDimensions);
+      const time = xToTime(x, viewport, chartDimensions);
+      onCrossHairMoved(price, time);
+    },
+    [viewport, chartDimensions, onCrossHairMoved],
+  );
 
   // Long press gesture for crosshair
-  const longPressGesture = useMemo(() =>
-    Gesture.LongPress()
-      .minDuration(300)
-      .onStart((event) => {
-        runOnJS(setCrosshairVisible)(true);
-        runOnJS(handleCrosshairMove)(event.x, event.y);
-      }),
-    [handleCrosshairMove]
+  const longPressGesture = useMemo(
+    () =>
+      Gesture.LongPress()
+        .minDuration(300)
+        .onStart((event) => {
+          runOnJS(setCrosshairVisible)(true);
+          runOnJS(handleCrosshairMove)(event.x, event.y);
+        }),
+    [handleCrosshairMove],
   );
 
   // Pan gesture for moving crosshair (active after long press)
-  const crosshairPanGesture = useMemo(() =>
-    Gesture.Pan()
-      .enabled(crosshairVisible)
-      .onUpdate((event) => {
-        runOnJS(handleCrosshairMove)(event.x, event.y);
-      })
-      .onEnd(() => {
-        // Keep crosshair visible after pan ends - tap elsewhere to hide
-      }),
-    [crosshairVisible, handleCrosshairMove]
+  const crosshairPanGesture = useMemo(
+    () =>
+      Gesture.Pan()
+        .enabled(crosshairVisible)
+        .onUpdate((event) => {
+          runOnJS(handleCrosshairMove)(event.x, event.y);
+        })
+        .onEnd(() => {
+          // Keep crosshair visible after pan ends - tap elsewhere to hide
+        }),
+    [crosshairVisible, handleCrosshairMove],
   );
 
   // Tap gesture to hide crosshair
-  const tapGesture = useMemo(() =>
-    Gesture.Tap()
-      .enabled(crosshairVisible)
-      .onEnd(() => {
-        runOnJS(setCrosshairVisible)(false);
-      }),
-    [crosshairVisible]
+  const tapGesture = useMemo(
+    () =>
+      Gesture.Tap()
+        .enabled(crosshairVisible)
+        .onEnd(() => {
+          runOnJS(setCrosshairVisible)(false);
+        }),
+    [crosshairVisible],
   );
 
   // Combine all gestures
-  const allGestures = useMemo(() =>
-    Gesture.Race(
-      longPressGesture,
-      Gesture.Simultaneous(
-        composedGesture,
-        crosshairPanGesture,
-        tapGesture
-      )
-    ),
-    [longPressGesture, composedGesture, crosshairPanGesture, tapGesture]
+  const allGestures = useMemo(
+    () => Gesture.Race(longPressGesture, Gesture.Simultaneous(composedGesture, crosshairPanGesture, tapGesture)),
+    [longPressGesture, composedGesture, crosshairPanGesture, tapGesture],
   );
 
   // ==========================================================================
@@ -444,21 +491,24 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   // Context Menu Handler
   // ==========================================================================
 
-  const handleContextMenuPress = useCallback((price: number, time: number) => {
-    if (onContextMenu) {
-      const items = onContextMenu(time, price);
-      if (items && items.length > 0) {
-        setContextMenuItems(items);
-        setContextMenuPosition({
-          x: lastCrosshairPosition.x,
-          y: lastCrosshairPosition.y,
-          price,
-          time,
-        });
-        setContextMenuVisible(true);
+  const handleContextMenuPress = useCallback(
+    (price: number, time: number) => {
+      if (onContextMenu) {
+        const items = onContextMenu(time, price);
+        if (items && items.length > 0) {
+          setContextMenuItems(items);
+          setContextMenuPosition({
+            x: lastCrosshairPosition.x,
+            y: lastCrosshairPosition.y,
+            price,
+            time,
+          });
+          setContextMenuVisible(true);
+        }
       }
-    }
-  }, [onContextMenu, lastCrosshairPosition]);
+    },
+    [onContextMenu, lastCrosshairPosition],
+  );
 
   const handleContextMenuClose = useCallback(() => {
     setContextMenuVisible(false);
@@ -476,27 +526,41 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
 
     let collectedText: CollectedTextItem[] = [];
 
-    const pic = createPicture((canvas) => {
-      const ctx = new SkiaCanvasContext(canvas, Skia);
-      // Pass margins as third parameter (constructor doesn't read from options.margins)
-      const renderer = new TealchartRenderer(ctx, fullRenderOptions, margins);
+    const pic = createPicture(
+      (canvas) => {
+        const ctx = new SkiaCanvasContext(canvas, Skia);
+        // Pass margins as third parameter (constructor doesn't read from options.margins)
+        const renderer = new TealchartRenderer(ctx, fullRenderOptions, margins);
 
-      renderer.renderWithLayout(
-        bars,
-        viewport,
-        unifiedPaneLayout,
-        priceLines,
-        plots,
-        indicatorPaneInfo,
-        undefined,
-        plotStyleOverrides
-      );
+        renderer.renderWithLayout(
+          bars,
+          viewport,
+          unifiedPaneLayout,
+          priceLines,
+          plots,
+          indicatorPaneInfo,
+          undefined,
+          plotStyleOverrides,
+        );
 
-      collectedText = ctx.getCollectedText();
-    }, { width: dimensions.width, height: dimensions.height });
+        collectedText = ctx.getCollectedText();
+      },
+      { width: dimensions.width, height: dimensions.height },
+    );
 
     return { picture: pic, textItems: collectedText };
-  }, [bars, viewport, dimensions, fullRenderOptions, margins, priceLines, plots, unifiedPaneLayout, indicatorPaneInfo, plotStyleOverrides]);
+  }, [
+    bars,
+    viewport,
+    dimensions,
+    fullRenderOptions,
+    margins,
+    priceLines,
+    plots,
+    unifiedPaneLayout,
+    indicatorPaneInfo,
+    plotStyleOverrides,
+  ]);
 
   // ==========================================================================
   // Text Style Helper
@@ -553,46 +617,44 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
       <View style={[styles.absoluteFill, styles.interactiveLayer]} pointerEvents="box-none">
         {/* Text labels from Skia renderer */}
         {textItems.map((item, index) => (
-          <Text
-            key={`${item.text}-${item.x}-${item.y}-${index}`}
-            style={getTextStyle(item)}
-            numberOfLines={1}
-          >
+          <Text key={`${item.text}-${item.x}-${item.y}-${index}`} style={getTextStyle(item)} numberOfLines={1}>
             {item.text}
           </Text>
         ))}
 
         {/* Order lines */}
-        {viewport && orderLines?.map((order) => (
-          <OrderLineComponent
-            key={order.id}
-            order={order}
-            viewport={viewport}
-            dimensions={chartDimensions}
-            pricePrecision={pricePrecision}
-            useNarrowText={dimensions.width < 400}
-            onPriceChange={onOrderMove}
-            onCancel={onOrderCancel}
-          />
-        ))}
+        {viewport &&
+          orderLines?.map((order) => (
+            <OrderLineComponent
+              key={order.id}
+              order={order}
+              viewport={viewport}
+              dimensions={chartDimensions}
+              pricePrecision={pricePrecision}
+              useNarrowText={dimensions.width < 400}
+              onPriceChange={onOrderMove}
+              onCancel={onOrderCancel}
+            />
+          ))}
 
         {/* Position lines */}
-        {viewport && positionLines?.map((position) => (
-          <PositionLineComponent
-            key={position.id}
-            position={position}
-            viewport={viewport}
-            dimensions={chartDimensions}
-            pricePrecision={pricePrecision}
-            useNarrowText={dimensions.width < 400}
-            onClose={onPositionClose}
-            onReverse={onPositionReverse}
-            onTPClick={onTPClick}
-            onSLClick={onSLClick}
-            onTPDragEnd={onTPDragEnd}
-            onSLDragEnd={onSLDragEnd}
-          />
-        ))}
+        {viewport &&
+          positionLines?.map((position) => (
+            <PositionLineComponent
+              key={position.id}
+              position={position}
+              viewport={viewport}
+              dimensions={chartDimensions}
+              pricePrecision={pricePrecision}
+              useNarrowText={dimensions.width < 400}
+              onClose={onPositionClose}
+              onReverse={onPositionReverse}
+              onTPClick={onTPClick}
+              onSLClick={onSLClick}
+              onTPDragEnd={onTPDragEnd}
+              onSLDragEnd={onSLDragEnd}
+            />
+          ))}
 
         {/* Crosshair */}
         {viewport && (

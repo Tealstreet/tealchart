@@ -298,7 +298,7 @@ export class TealchartWidgetUI {
   // ============================================================================
 
   /**
-   * Update bars - calls ChartCore directly
+   * Update bars (full replacement) - calls ChartCore directly
    */
   setBars(bars: Bar[]): void {
     this.chartCore?.setBars(bars);
@@ -309,6 +309,26 @@ export class TealchartWidgetUI {
       const previousBar = bars.length > 1 ? bars[bars.length - 2] : null;
       this.legend?.setBars(latestBar, previousBar);
     }
+  }
+
+  /**
+   * Set viewport directly - used by TealchartWidget to restore viewport
+   * from ViewScaleState after symbol/interval/account changes.
+   */
+  setViewport(viewport: Viewport): void {
+    this.chartCore?.setViewport(viewport);
+  }
+
+  /**
+   * Update a single bar (real-time tick) - lightweight path that
+   * bypasses the full setBars reference check and render pipeline.
+   */
+  updateBar(bar: Bar, bars: Bar[]): void {
+    this.chartCore?.updateBar(bar);
+
+    // Update legend with latest bar
+    const previousBar = bars.length > 1 ? bars[bars.length - 2] : null;
+    this.legend?.setBars(bar, previousBar);
   }
 
   /**
@@ -393,6 +413,13 @@ export class TealchartWidgetUI {
   setInterval(interval: ResolutionString): void {
     this.topBar?.setInterval(interval);
     this.legend?.setInterval(interval);
+  }
+
+  /**
+   * Update the context menu callback (called when onContextMenu is registered after init)
+   */
+  setContextMenuCallback(callback: (unixTime: number, price: number) => ContextMenuItem[]): void {
+    this.chartCore?.setContextMenuCallback(callback);
   }
 
   /**

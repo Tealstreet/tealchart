@@ -7,14 +7,11 @@
  * - Crosshair horizontal/vertical lines
  * - Price axis labels
  */
+import type { ChartMargins, PendingOrderUpdate, PriceLineLabelBounds } from '../types';
 
 import Konva from 'konva';
-import {
-  PRICE_AXIS_RIGHT_PADDING,
-  type PriceLineLabelBounds,
-  type ChartMargins,
-  type PendingOrderUpdate,
-} from '../types';
+
+import { PRICE_AXIS_RIGHT_PADDING } from '../types';
 
 // ============================================================================
 // Types
@@ -116,7 +113,6 @@ export class PriceLineManager {
   // Crosshair elements
   private crosshairVertical: Konva.Line | null = null;
   private crosshairHorizontal: Konva.Line | null = null;
-  private contextMenuButton: Konva.Group | null = null;
 
   // Current state
   private labelBounds: PriceLineLabelBounds[] = [];
@@ -167,7 +163,7 @@ export class PriceLineManager {
   update(
     labelBounds: PriceLineLabelBounds[],
     pendingOrders: Map<string, PendingOrderUpdate> = new Map(),
-    crosshair?: CrosshairState
+    crosshair?: CrosshairState,
   ): void {
     // Check if we need a full rebuild or can do incremental update
     const newSignature = this.computeSignature(labelBounds);
@@ -181,7 +177,7 @@ export class PriceLineManager {
 
     // Track crosshair label changes to detect pane transitions
     // When cursor moves between panes, the label value changes even if visibility stays the same
-    const crosshairBound = labelBounds.find(b => b.type === 'crosshair');
+    const crosshairBound = labelBounds.find((b) => b.type === 'crosshair');
     const currentCrosshairLabel = crosshairBound?.label?.primaryText ?? '';
     const crosshairLabelChanged = currentCrosshairLabel !== this.lastCrosshairLabel;
     this.lastCrosshairLabel = currentCrosshairLabel;
@@ -210,8 +206,11 @@ export class PriceLineManager {
     // Exclude: price, originalY, adjustedY (handled by position updates)
     // Exclude: crosshair (handled separately in updateCrosshair)
     return bounds
-      .filter(b => b.type !== 'crosshair')
-      .map(b => `${b.lineId}|${b.type}|${b.color}|${b.lineStyle}|${b.draggable}|${b.chartLabel?.segments.length ?? 0}|${b.chartLabel?.buttons?.length ?? 0}`)
+      .filter((b) => b.type !== 'crosshair')
+      .map(
+        (b) =>
+          `${b.lineId}|${b.type}|${b.color}|${b.lineStyle}|${b.draggable}|${b.chartLabel?.segments.length ?? 0}|${b.chartLabel?.buttons?.length ?? 0}|${b.label?.primaryText ?? ''}`,
+      )
       .join(';');
   }
 
@@ -272,7 +271,7 @@ export class PriceLineManager {
       clearInterval(this.countdownTimer);
       this.countdownTimer = null;
     }
-    document.removeEventListener('keydown', this.handleKeyDown);
+    document.removeEventListener('keydown', this.handleKeyDown, true);
     this.group.destroy();
   }
 
@@ -311,12 +310,14 @@ export class PriceLineManager {
     // Clear existing elements and cache
     this.group.destroyChildren();
     this.cachedLineGroups.clear();
-    this.countdownTextNodes.clear();  // Clear countdown text node references
+    this.countdownTextNodes.clear(); // Clear countdown text node references
+    this.crosshairVertical = null;
+    this.crosshairHorizontal = null;
 
     const { width, margins, priceToY } = this.options;
 
     // Check if we need countdown timer
-    const hasCountdown = this.labelBounds.some(b => b.countdownToTime !== undefined);
+    const hasCountdown = this.labelBounds.some((b) => b.countdownToTime !== undefined);
     if (hasCountdown && !this.countdownTimer) {
       // Use lightweight text-only update instead of full rebuild
       this.countdownTimer = setInterval(() => {
@@ -328,8 +329,10 @@ export class PriceLineManager {
     }
 
     // Separate floating and non-floating labels
-    const nonFloating = this.labelBounds.filter(b => !b.floatingLabel);
-    const floating = this.labelBounds.filter(b => b.floatingLabel && (b.type !== 'crosshair' || this.crosshair.visible));
+    const nonFloating = this.labelBounds.filter((b) => !b.floatingLabel);
+    const floating = this.labelBounds.filter(
+      (b) => b.floatingLabel && (b.type !== 'crosshair' || this.crosshair.visible),
+    );
 
     // Render non-floating first (underneath)
     for (const bound of nonFloating) {
@@ -363,11 +366,7 @@ export class PriceLineManager {
     const priceAxisLabelY = labelCenterY - bound.height / 2;
 
     // Line dash pattern
-    const lineDash = bound.lineStyle === 'dashed'
-      ? [4, 4]
-      : bound.lineStyle === 'dotted'
-        ? [2, 2]
-        : [];
+    const lineDash = bound.lineStyle === 'dashed' ? [4, 4] : bound.lineStyle === 'dotted' ? [2, 2] : [];
 
     // Create group for this price line
     const lineGroup = new Konva.Group({ opacity });
@@ -377,33 +376,37 @@ export class PriceLineManager {
 
     if (lineType === 'price' || lineType === 'crosshair') {
       // Simple price line
-      const lineEndX = (lineType === 'crosshair' && this.options.onContextMenuButtonClick)
-        ? width - margins.right - 18
-        : priceAxisLabelX;
+      const lineEndX =
+        lineType === 'crosshair' && this.options.onContextMenuButtonClick
+          ? width - margins.right - 18
+          : priceAxisLabelX;
 
       // Skip line if rendered on canvas
       if (!bound.renderLineOnCanvas) {
-        lineGroup.add(new Konva.Line({
-          points: [margins.left, lineY, lineEndX, lineY],
-          stroke: bound.color,
-          strokeWidth: bound.lineWidth || 1,
-          dash: lineDash,
-        }));
+        lineGroup.add(
+          new Konva.Line({
+            points: [margins.left, lineY, lineEndX, lineY],
+            stroke: bound.color,
+            strokeWidth: bound.lineWidth || 1,
+            dash: lineDash,
+          }),
+        );
       }
 
       // Connector line if offset
       if (Math.abs(labelCenterY - lineY) > 2) {
-        lineGroup.add(new Konva.Line({
-          points: [priceAxisLabelX, lineY, priceAxisLabelX, labelCenterY],
-          stroke: bound.color,
-          strokeWidth: 1,
-          opacity: 0.5,
-        }));
+        lineGroup.add(
+          new Konva.Line({
+            points: [priceAxisLabelX, lineY, priceAxisLabelX, labelCenterY],
+            stroke: bound.color,
+            strokeWidth: 1,
+            opacity: 0.5,
+          }),
+        );
       }
 
       // Price axis label
       this.renderPriceAxisLabel(lineGroup, bound, priceAxisLabelX, priceAxisLabelY, lineType === 'crosshair');
-
     } else {
       // Trading line (order/position) with chart label
       this.renderTradingLine(lineGroup, bound, lineY, labelCenterY, priceAxisLabelX, priceAxisLabelY, lineDash);
@@ -415,60 +418,66 @@ export class PriceLineManager {
     bound: PriceLineLabelBounds,
     x: number,
     y: number,
-    isCrosshair: boolean
+    isCrosshair: boolean,
   ): void {
-    const secondaryText = bound.countdownToTime
-      ? formatCountdown(bound.countdownToTime)
-      : bound.label.secondaryText;
+    const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
 
     if (isCrosshair) {
       // Filled label for crosshair
-      group.add(new Konva.Rect({
-        x,
-        y,
-        width: bound.width,
-        height: bound.height,
-        fill: bound.label.backgroundColor || bound.color,
-        cornerRadius: 2,
-      }));
-      group.add(new Konva.Text({
-        x,
-        y,
-        width: bound.width,
-        height: bound.height,
-        text: bound.label.primaryText,
-        fontSize: 11,
-        fontFamily: 'sans-serif',
-        fill: bound.label.textColor || '#000000',
-        align: 'center',
-        verticalAlign: 'middle',
-      }));
-    } else {
-      // Border-only label
-      group.add(new Konva.Rect({
-        x,
-        y,
-        width: bound.width,
-        height: bound.height,
-        stroke: bound.color,
-        strokeWidth: 1,
-        cornerRadius: 2,
-      }));
-
-      if (secondaryText) {
-        // Two-line label
-        group.add(new Konva.Text({
+      group.add(
+        new Konva.Rect({
           x,
-          y: y + 1,
+          y,
           width: bound.width,
-          height: bound.height / 2,
+          height: bound.height,
+          fill: bound.label.backgroundColor || bound.color,
+          cornerRadius: 2,
+        }),
+      );
+      group.add(
+        new Konva.Text({
+          x,
+          y,
+          width: bound.width,
+          height: bound.height,
           text: bound.label.primaryText,
           fontSize: 11,
           fontFamily: 'sans-serif',
-          fill: bound.label.textColor || bound.color,
+          fill: bound.label.textColor || '#000000',
           align: 'center',
           verticalAlign: 'middle',
-        }));
+        }),
+      );
+    } else {
+      // Border-only label
+      group.add(
+        new Konva.Rect({
+          x,
+          y,
+          width: bound.width,
+          height: bound.height,
+          stroke: bound.color,
+          strokeWidth: 1,
+          cornerRadius: 2,
+        }),
+      );
+
+      if (secondaryText) {
+        // Two-line label
+        group.add(
+          new Konva.Text({
+            x,
+            y: y + 1,
+            width: bound.width,
+            height: bound.height / 2,
+            text: bound.label.primaryText,
+            fontSize: 11,
+            fontFamily: 'sans-serif',
+            fill: bound.label.textColor || bound.color,
+            align: 'center',
+            verticalAlign: 'middle',
+          }),
+        );
         const secondaryTextNode = new Konva.Text({
           x,
           y: y + bound.height / 2 - 1,
@@ -490,18 +499,20 @@ export class PriceLineManager {
           this.countdownTextNodes.set(bound.lineId, existing);
         }
       } else {
-        group.add(new Konva.Text({
-          x,
-          y,
-          width: bound.width,
-          height: bound.height,
-          text: bound.label.primaryText,
-          fontSize: 11,
-          fontFamily: 'sans-serif',
-          fill: bound.label.textColor || bound.color,
-          align: 'center',
-          verticalAlign: 'middle',
-        }));
+        group.add(
+          new Konva.Text({
+            x,
+            y,
+            width: bound.width,
+            height: bound.height,
+            text: bound.label.primaryText,
+            fontSize: 11,
+            fontFamily: 'sans-serif',
+            fill: bound.label.textColor || bound.color,
+            align: 'center',
+            verticalAlign: 'middle',
+          }),
+        );
       }
     }
   }
@@ -513,7 +524,7 @@ export class PriceLineManager {
     labelCenterY: number,
     priceAxisLabelX: number,
     priceAxisLabelY: number,
-    lineDash: number[]
+    lineDash: number[],
   ): void {
     const { width, margins, yToPrice, priceToY } = this.options;
     const chartLabel = bound.chartLabel;
@@ -535,33 +546,37 @@ export class PriceLineManager {
       }
       chartLabelWidth = segmentsWidth + tpslGap;
       for (const button of buttons) {
-        chartLabelWidth += (button.type === 'tp' || button.type === 'sl') ? 24 : 16;
+        chartLabelWidth += button.type === 'tp' || button.type === 'sl' ? 24 : 16;
       }
 
       const lineLength = bound.lineLength ?? 100;
       const maxLabelX = width - margins.right - chartLabelWidth;
       const minLabelX = margins.left;
-      chartLabelX = minLabelX + ((maxLabelX - minLabelX) * (100 - lineLength) / 100);
+      chartLabelX = minLabelX + ((maxLabelX - minLabelX) * (100 - lineLength)) / 100;
     }
 
     // Left line segment
     if (chartLabel && chartLabel.segments.length > 0 && bound.extendLeft !== false) {
-      group.add(new Konva.Line({
-        points: [margins.left, lineY, chartLabelX - 1, lineY],
-        stroke: bound.color,
-        strokeWidth: bound.lineWidth || 1,
-        dash: lineDash,
-      }));
+      group.add(
+        new Konva.Line({
+          points: [margins.left, lineY, chartLabelX - 1, lineY],
+          stroke: bound.color,
+          strokeWidth: bound.lineWidth || 1,
+          dash: lineDash,
+        }),
+      );
     }
 
     // Right line segment (from end of segments to price axis)
     if (chartLabel && chartLabel.segments.length > 0) {
-      group.add(new Konva.Line({
-        points: [chartLabelX + segmentsWidth + 2, lineY, priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING, lineY],
-        stroke: bound.color,
-        strokeWidth: bound.lineWidth || 1,
-        dash: lineDash,
-      }));
+      group.add(
+        new Konva.Line({
+          points: [chartLabelX + segmentsWidth + 2, lineY, priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING, lineY],
+          stroke: bound.color,
+          strokeWidth: bound.lineWidth || 1,
+          dash: lineDash,
+        }),
+      );
     }
 
     // Invisible drag handle for segments
@@ -634,29 +649,33 @@ export class PriceLineManager {
         const isFirst = i === 0;
         const isLast = i === chartLabel.segments.length - 1;
 
-        segmentGroup.add(new Konva.Rect({
-          x: currentX,
-          y: lineY - LABEL_HEIGHT / 2,
-          width: textWidth,
-          height: LABEL_HEIGHT,
-          fill: segment.backgroundColor,
-          stroke: segment.borderColor,
-          strokeWidth: 1,
-          cornerRadius: isFirst && isLast ? 2 : isFirst ? [2, 0, 0, 2] : isLast ? [0, 2, 2, 0] : 0,
-        }));
+        segmentGroup.add(
+          new Konva.Rect({
+            x: currentX,
+            y: lineY - LABEL_HEIGHT / 2,
+            width: textWidth,
+            height: LABEL_HEIGHT,
+            fill: segment.backgroundColor,
+            stroke: segment.borderColor,
+            strokeWidth: 1,
+            cornerRadius: isFirst && isLast ? 2 : isFirst ? [2, 0, 0, 2] : isLast ? [0, 2, 2, 0] : 0,
+          }),
+        );
 
-        segmentGroup.add(new Konva.Text({
-          x: currentX,
-          y: lineY - LABEL_HEIGHT / 2,
-          width: textWidth,
-          height: LABEL_HEIGHT,
-          text,
-          fontSize: 11,
-          fontFamily: 'sans-serif',
-          fill: segment.textColor,
-          align: 'center',
-          verticalAlign: 'middle',
-        }));
+        segmentGroup.add(
+          new Konva.Text({
+            x: currentX,
+            y: lineY - LABEL_HEIGHT / 2,
+            width: textWidth,
+            height: LABEL_HEIGHT,
+            text,
+            fontSize: 11,
+            fontFamily: 'sans-serif',
+            fill: segment.textColor,
+            align: 'center',
+            verticalAlign: 'middle',
+          }),
+        );
 
         currentX += textWidth;
       }
@@ -675,31 +694,35 @@ export class PriceLineManager {
 
         const buttonGroup = new Konva.Group();
 
-        buttonGroup.add(new Konva.Rect({
-          x: currentX,
-          y: lineY - LABEL_HEIGHT / 2,
-          width: buttonWidth,
-          height: LABEL_HEIGHT,
-          fill: button.backgroundColor,
-          stroke: button.borderColor,
-          strokeWidth: 1,
-          cornerRadius: button.type === 'tp' ? [2, 0, 0, 2] : button.type === 'sl' ? [0, 2, 2, 0] : 2,
-        }));
-
-        if (button.type === 'tp' || button.type === 'sl') {
-          buttonGroup.add(new Konva.Text({
+        buttonGroup.add(
+          new Konva.Rect({
             x: currentX,
             y: lineY - LABEL_HEIGHT / 2,
             width: buttonWidth,
             height: LABEL_HEIGHT,
-            text: button.type === 'tp' ? 'TP' : 'SL',
-            fontSize: 10,
-            fontFamily: 'sans-serif',
-            fontStyle: 'bold',
-            fill: button.iconColor,
-            align: 'center',
-            verticalAlign: 'middle',
-          }));
+            fill: button.backgroundColor,
+            stroke: button.borderColor,
+            strokeWidth: 1,
+            cornerRadius: button.type === 'tp' ? [2, 0, 0, 2] : button.type === 'sl' ? [0, 2, 2, 0] : 2,
+          }),
+        );
+
+        if (button.type === 'tp' || button.type === 'sl') {
+          buttonGroup.add(
+            new Konva.Text({
+              x: currentX,
+              y: lineY - LABEL_HEIGHT / 2,
+              width: buttonWidth,
+              height: LABEL_HEIGHT,
+              text: button.type === 'tp' ? 'TP' : 'SL',
+              fontSize: 10,
+              fontFamily: 'sans-serif',
+              fontStyle: 'bold',
+              fill: button.iconColor,
+              align: 'center',
+              verticalAlign: 'middle',
+            }),
+          );
 
           // TP/SL button click handler
           const btnX = currentX;
@@ -712,21 +735,24 @@ export class PriceLineManager {
           });
           buttonGroup.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
           buttonGroup.on('mouseleave', () => this.options.onCursorChange?.('default'));
-
         } else if (button.type === 'cancel' || button.type === 'close') {
           // X icon
-          buttonGroup.add(new Konva.Line({
-            points: [currentX + 5, lineY - 4, currentX + 11, lineY + 4],
-            stroke: button.iconColor,
-            strokeWidth: 1.5,
-            listening: false,
-          }));
-          buttonGroup.add(new Konva.Line({
-            points: [currentX + 11, lineY - 4, currentX + 5, lineY + 4],
-            stroke: button.iconColor,
-            strokeWidth: 1.5,
-            listening: false,
-          }));
+          buttonGroup.add(
+            new Konva.Line({
+              points: [currentX + 5, lineY - 4, currentX + 11, lineY + 4],
+              stroke: button.iconColor,
+              strokeWidth: 1.5,
+              listening: false,
+            }),
+          );
+          buttonGroup.add(
+            new Konva.Line({
+              points: [currentX + 11, lineY - 4, currentX + 5, lineY + 4],
+              stroke: button.iconColor,
+              strokeWidth: 1.5,
+              listening: false,
+            }),
+          );
 
           buttonGroup.on('click tap', () => {
             if (button.type === 'cancel') {
@@ -737,21 +763,22 @@ export class PriceLineManager {
           });
           buttonGroup.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
           buttonGroup.on('mouseleave', () => this.options.onCursorChange?.('default'));
-
         } else if (button.type === 'reverse') {
-          buttonGroup.add(new Konva.Text({
-            x: currentX,
-            y: lineY - LABEL_HEIGHT / 2,
-            width: buttonWidth,
-            height: LABEL_HEIGHT,
-            text: '\u21c4',
-            fontSize: 11,
-            fontFamily: 'sans-serif',
-            fill: button.iconColor,
-            align: 'center',
-            verticalAlign: 'middle',
-            listening: false,
-          }));
+          buttonGroup.add(
+            new Konva.Text({
+              x: currentX,
+              y: lineY - LABEL_HEIGHT / 2,
+              width: buttonWidth,
+              height: LABEL_HEIGHT,
+              text: '\u21c4',
+              fontSize: 11,
+              fontFamily: 'sans-serif',
+              fill: button.iconColor,
+              align: 'center',
+              verticalAlign: 'middle',
+              listening: false,
+            }),
+          );
 
           buttonGroup.on('click tap', () => {
             this.options.onPositionReverse?.(bound.lineId);
@@ -768,53 +795,59 @@ export class PriceLineManager {
 
     // Line all the way across if no chart label
     if (!chartLabel || chartLabel.segments.length === 0) {
-      group.add(new Konva.Line({
-        points: [margins.left, lineY, priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING, lineY],
-        stroke: bound.color,
-        strokeWidth: bound.lineWidth || 1,
-        dash: lineDash,
-      }));
+      group.add(
+        new Konva.Line({
+          points: [margins.left, lineY, priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING, lineY],
+          stroke: bound.color,
+          strokeWidth: bound.lineWidth || 1,
+          dash: lineDash,
+        }),
+      );
     }
 
     // Connector line if offset
     if (Math.abs(labelCenterY - lineY) > 2) {
-      group.add(new Konva.Line({
-        points: [priceAxisLabelX, lineY, priceAxisLabelX, labelCenterY],
-        stroke: bound.color,
-        strokeWidth: 1,
-        opacity: 0.5,
-      }));
+      group.add(
+        new Konva.Line({
+          points: [priceAxisLabelX, lineY, priceAxisLabelX, labelCenterY],
+          stroke: bound.color,
+          strokeWidth: 1,
+          opacity: 0.5,
+        }),
+      );
     }
 
     // Price axis label (filled for trading lines)
-    const secondaryText = bound.countdownToTime
-      ? formatCountdown(bound.countdownToTime)
-      : bound.label.secondaryText;
+    const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
 
-    group.add(new Konva.Rect({
-      x: priceAxisLabelX,
-      y: priceAxisLabelY,
-      width: bound.width,
-      height: bound.height,
-      fill: bound.label.backgroundColor || bound.color,
-      stroke: bound.color,
-      strokeWidth: 1,
-      cornerRadius: 2,
-    }));
+    group.add(
+      new Konva.Rect({
+        x: priceAxisLabelX,
+        y: priceAxisLabelY,
+        width: bound.width,
+        height: bound.height,
+        fill: bound.label.backgroundColor || bound.color,
+        stroke: bound.color,
+        strokeWidth: 1,
+        cornerRadius: 2,
+      }),
+    );
 
     if (secondaryText) {
-      group.add(new Konva.Text({
-        x: priceAxisLabelX,
-        y: priceAxisLabelY + 1,
-        width: bound.width,
-        height: bound.height / 2,
-        text: bound.label.primaryText,
-        fontSize: 11,
-        fontFamily: 'sans-serif',
-        fill: bound.label.textColor || '#ffffff',
-        align: 'center',
-        verticalAlign: 'middle',
-      }));
+      group.add(
+        new Konva.Text({
+          x: priceAxisLabelX,
+          y: priceAxisLabelY + 1,
+          width: bound.width,
+          height: bound.height / 2,
+          text: bound.label.primaryText,
+          fontSize: 11,
+          fontFamily: 'sans-serif',
+          fill: bound.label.textColor || '#ffffff',
+          align: 'center',
+          verticalAlign: 'middle',
+        }),
+      );
       const tradingSecondaryTextNode = new Konva.Text({
         x: priceAxisLabelX,
         y: priceAxisLabelY + bound.height / 2 - 1,
@@ -836,18 +869,20 @@ export class PriceLineManager {
         this.countdownTextNodes.set(bound.lineId, existing);
       }
     } else {
-      group.add(new Konva.Text({
-        x: priceAxisLabelX,
-        y: priceAxisLabelY,
-        width: bound.width,
-        height: bound.height,
-        text: bound.label.primaryText,
-        fontSize: 11,
-        fontFamily: 'sans-serif',
-        fill: bound.label.textColor || '#ffffff',
-        align: 'center',
-        verticalAlign: 'middle',
-      }));
+      group.add(
+        new Konva.Text({
+          x: priceAxisLabelX,
+          y: priceAxisLabelY,
+          width: bound.width,
+          height: bound.height,
+          text: bound.label.primaryText,
+          fontSize: 11,
+          fontFamily: 'sans-serif',
+          fill: bound.label.textColor || '#ffffff',
+          align: 'center',
+          verticalAlign: 'middle',
+        }),
+      );
     }
   }
 
@@ -856,15 +891,13 @@ export class PriceLineManager {
   // ============================================================================
 
   private updateCrosshair(): void {
-    const { width, height, margins, yToPrice } = this.options;
+    const { height } = this.options;
 
-    // Remove old crosshair elements
+    // Remove old crosshair lines (recreated each frame — lightweight, no interactions)
     this.crosshairVertical?.destroy();
     this.crosshairHorizontal?.destroy();
-    this.contextMenuButton?.destroy();
     this.crosshairVertical = null;
     this.crosshairHorizontal = null;
-    this.contextMenuButton = null;
 
     if (!this.crosshair.visible) return;
 
@@ -880,63 +913,7 @@ export class PriceLineManager {
 
     // Note: Horizontal crosshair line is drawn on canvas (renderLineOnCanvas: true)
     // Label is rendered by Konva through the price line system (floatingLabel: true)
-
-    // Context menu "+" button
-    if (this.options.onContextMenuButtonClick) {
-      this.contextMenuButton = new Konva.Group({
-        x: width - margins.right - 10,
-        y: this.crosshair.y,
-      });
-
-      const circle = new Konva.Circle({
-        radius: 8,
-        stroke: this.crosshair.color,
-        strokeWidth: 1,
-        fill: 'rgba(0,0,0,0.01)',
-      });
-
-      const hLine = new Konva.Line({
-        points: [-4, 0, 4, 0],
-        stroke: this.crosshair.color,
-        strokeWidth: 1.5,
-        listening: false,
-      });
-
-      const vLine = new Konva.Line({
-        points: [0, -4, 0, 4],
-        stroke: this.crosshair.color,
-        strokeWidth: 1.5,
-        listening: false,
-      });
-
-      this.contextMenuButton.add(circle, hLine, vLine);
-
-      this.contextMenuButton.on('click tap', (e) => {
-        const price = yToPrice(this.crosshair.y);
-        const evt = e.evt as MouseEvent | TouchEvent;
-        let clientX = 0, clientY = 0;
-        if ('clientX' in evt) {
-          clientX = evt.clientX;
-          clientY = evt.clientY;
-        } else if ('changedTouches' in evt && evt.changedTouches[0]) {
-          clientX = evt.changedTouches[0].clientX;
-          clientY = evt.changedTouches[0].clientY;
-        }
-        this.options.onContextMenuButtonClick?.(price, clientX, clientY);
-      });
-
-      this.contextMenuButton.on('mouseenter', () => {
-        const container = this.layer.getStage()?.container();
-        if (container) container.style.cursor = 'pointer';
-      });
-
-      this.contextMenuButton.on('mouseleave', () => {
-        const container = this.layer.getStage()?.container();
-        if (container) container.style.cursor = '';
-      });
-
-      this.group.add(this.contextMenuButton);
-    }
+    // Context menu "+" button is an HTML overlay managed by ChartCore (not Konva)
   }
 
   // ============================================================================
