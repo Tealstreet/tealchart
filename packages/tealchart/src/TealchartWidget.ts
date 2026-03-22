@@ -194,6 +194,7 @@ export class TealchartWidget {
     // Set up chart API callbacks
     this._chartApi.setOnSymbolChange((symbol) => this._handleSymbolChange(symbol));
     this._chartApi.setOnIntervalChange((interval) => this._handleIntervalChange(interval));
+    this._chartApi.setOnResetData(() => this._handleResetData());
 
     // Subscribe to order/position line changes to trigger re-renders
     this._chartApi.setOnLinesChanged(() => {
@@ -1255,7 +1256,16 @@ export class TealchartWidget {
   // ============================================================================
 
   private _handleSymbolChange(symbol: string): void {
-    if (this._symbol === symbol) return;
+    // Strip exchange prefix if present (e.g., "bybit:BTCUSDT" → "BTCUSDT")
+    // The datafeed resolveSymbol receives the full string including prefix,
+    // but our internal _symbol should be the clean symbol for comparisons.
+    const parts = symbol.split(':');
+    const cleanSymbol = parts.length > 1 ? parts[1] : symbol;
+
+    // Even if the clean symbol is the same, the full symbol with exchange
+    // prefix may differ (exchange change). Pass the original to resolveSymbol
+    // so the datafeed knows which exchange context to use.
+    const symbolChanged = this._symbol !== cleanSymbol;
 
     // Stop gap detection while changing symbol
     this._gapDetectionManager?.stop();
@@ -1266,15 +1276,28 @@ export class TealchartWidget {
       this._barSubscriptionGuid = null;
     }
 
-    this._symbol = symbol;
+    this._symbol = cleanSymbol;
     this._bars = [];
-    this._hasMoreHistoricalData = true; // Reset for new symbol
+    this._hasMoreHistoricalData = true;
     this._isLoadingMoreBars = false;
+    this._isLoadingBars = true;
+
+    // Notify Tealscript manager of cleared bars
+    if (this._tealScriptManager) {
+      this._tealScriptManager.setBars([]);
+    }
+
+    // Update UI immediately
+    if (symbolChanged) {
+      this._ui?.setSymbol(cleanSymbol);
+    }
+    this._scheduleRender();
 
     // Increment to invalidate any in-flight resolveSymbol callbacks
     const resolveRequestId = ++this._resolveSymbolRequestId;
 
-    // Resolve new symbol and load bars
+    // Resolve new symbol and load bars — pass original (with exchange prefix)
+    // so the datafeed knows which exchange context to use
     this._datafeed.resolveSymbol(
       symbol,
       (symbolInfo) => {
@@ -1300,6 +1323,8 @@ export class TealchartWidget {
           return;
         }
         console.error('[Tealchart] Failed to resolve symbol:', error);
+        this._isLoadingBars = false;
+        this._scheduleRender();
       },
     );
   }
@@ -1335,6 +1360,65 @@ export class TealchartWidget {
 
     // Reload bars with new interval
     this._loadBars();
+  }
+
+  /**
+   * Handle resetData() — full data reload without symbol/interval change.
+   * Called when the exchange changes, reconnection happens, or the datafeed
+   * cache is invalidated. Mirrors TradingView's resetData() behavior:
+   * unsubscribe → clear bars → re-resolve symbol → reload → resubscribe.
+   */
+  private _handleResetData(): void {
+    // Stop gap detection during reset
+    this._gapDetectionManager?.stop();
+
+    // Unsubscribe from real-time updates
+    if (this._barSubscriptionGuid) {
+      this._datafeed.unsubscribeBars(this._barSubscriptionGuid);
+      this._barSubscriptionGuid = null;
+    }
+
+    // Clear existing bars
+    this._bars = [];
+    this._hasMoreHistoricalData = true;
+    this._isLoadingMoreBars = false;
+    this._isLoadingBars = true;
+
+    // Notify Tealscript manager of cleared bars
+    if (this._tealScriptManager) {
+      this._tealScriptManager.setBars([]);
+    }
+
+    this._scheduleRender();
+
+    // Re-resolve symbol (exchange may have changed, affecting symbolInfo)
+    const resolveRequestId = ++this._resolveSymbolRequestId;
+
+    this._datafeed.resolveSymbol(
+      this._symbol,
+      (symbolInfo) => {
+        if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
+          return;
+        }
+        this._symbolInfo = symbolInfo;
+        // Update price precision from potentially new symbol's pricescale
+        if (symbolInfo.pricescale && symbolInfo.pricescale > 0) {
+          this._renderOptions = {
+            ...this._renderOptions,
+            pricePrecision: 1 / symbolInfo.pricescale,
+          };
+        }
+        this._loadBars();
+      },
+      (error) => {
+        if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
+          return;
+        }
+        console.error('[Tealchart] Failed to resolve symbol during resetData:', error);
+        this._isLoadingBars = false;
+        this._scheduleRender();
+      },
+    );
   }
 
   // ============================================================================
