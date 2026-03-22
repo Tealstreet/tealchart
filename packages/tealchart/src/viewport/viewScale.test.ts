@@ -1,8 +1,15 @@
+import type { PlotOutput } from '@tealstreet/tealscript';
 import type { Bar, Viewport } from '../types';
 
 import { describe, expect, it } from 'vitest';
 
-import { applyAutoScale, captureViewScale, getVisibleBarsBoundingBox, restoreViewport } from './viewScale';
+import {
+  applyAutoScale,
+  captureViewScale,
+  getVisibleBarsBoundingBox,
+  getVisiblePlotRange,
+  restoreViewport,
+} from './viewScale';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -389,5 +396,138 @@ describe('applyAutoScale', () => {
 
     expect(result.startTime).toBe(viewport.startTime);
     expect(result.endTime).toBe(viewport.endTime);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getVisiblePlotRange
+// ---------------------------------------------------------------------------
+
+function makePlot(scriptId: string, values: (number | null)[]): PlotOutput {
+  return {
+    id: `${scriptId}_plot`,
+    type: 'plot',
+    title: scriptId,
+    values,
+    scriptId,
+    color: '#ffffff',
+  };
+}
+
+describe('getVisiblePlotRange', () => {
+  it('returns null for empty bars', () => {
+    const plots = [makePlot('rsi', [50, 60, 70])];
+    expect(getVisiblePlotRange(plots, ['rsi'], [], 0, 1_000_000)).toBeNull();
+  });
+
+  it('returns null when no bars fall within range', () => {
+    const bars = makeBars(10, { startTime: 1_000_000, interval: 60_000 });
+    const plots = [
+      makePlot(
+        'rsi',
+        bars.map((_, i) => 30 + i * 5),
+      ),
+    ];
+    expect(getVisiblePlotRange(plots, ['rsi'], bars, 0, 500_000)).toBeNull();
+  });
+
+  it('returns null when all plot values are null', () => {
+    const bars = makeBars(10, { startTime: 1_000_000, interval: 60_000 });
+    const plots = [
+      makePlot(
+        'rsi',
+        bars.map(() => null),
+      ),
+    ];
+    expect(getVisiblePlotRange(plots, ['rsi'], bars, bars[0].time, bars[9].time)).toBeNull();
+  });
+
+  it('returns min/max with padding for visible range', () => {
+    const bars = makeBars(10, { startTime: 1_000_000, interval: 60_000 });
+    // Values: 30, 35, 40, 45, 50, 55, 60, 65, 70, 75
+    const plots = [
+      makePlot(
+        'rsi',
+        bars.map((_, i) => 30 + i * 5),
+      ),
+    ];
+    const result = getVisiblePlotRange(plots, ['rsi'], bars, bars[0].time, bars[9].time);
+
+    expect(result).not.toBeNull();
+    // Range is 30-75, data range = 45, padding = 4.5
+    expect(result!.min).toBeCloseTo(30 - 45 * 0.1, 5);
+    expect(result!.max).toBeCloseTo(75 + 45 * 0.1, 5);
+  });
+
+  it('only considers visible bars, not all values', () => {
+    const bars = makeBars(20, { startTime: 1_000_000, interval: 60_000 });
+    // First 10 bars: 10-100, last 10 bars: 500-590
+    const values = bars.map((_, i) => (i < 10 ? 10 + i * 10 : 500 + (i - 10) * 10));
+    const plots = [makePlot('ind', values)];
+
+    // View only the first 10 bars
+    const result = getVisiblePlotRange(plots, ['ind'], bars, bars[0].time, bars[9].time);
+
+    expect(result).not.toBeNull();
+    expect(result!.max).toBeLessThan(200); // Should NOT include 500+ values
+    expect(result!.min).toBeGreaterThan(-50);
+  });
+
+  it('ignores plots not in indicatorIds', () => {
+    const bars = makeBars(5, { startTime: 1_000_000, interval: 60_000 });
+    const plots = [
+      makePlot(
+        'rsi',
+        bars.map(() => 50),
+      ),
+      makePlot(
+        'macd',
+        bars.map(() => 1000),
+      ), // Should be ignored
+    ];
+
+    const result = getVisiblePlotRange(plots, ['rsi'], bars, bars[0].time, bars[4].time);
+
+    expect(result).not.toBeNull();
+    // Should be around 50, not stretched to 1000
+    expect(result!.max).toBeLessThan(100);
+  });
+
+  it('handles flat values (all same)', () => {
+    const bars = makeBars(5, { startTime: 1_000_000, interval: 60_000 });
+    const plots = [
+      makePlot(
+        'ind',
+        bars.map(() => 42),
+      ),
+    ];
+
+    const result = getVisiblePlotRange(plots, ['ind'], bars, bars[0].time, bars[4].time);
+
+    expect(result).not.toBeNull();
+    expect(result!.max).toBeGreaterThan(42);
+    expect(result!.min).toBeLessThan(42);
+  });
+
+  it('respects custom padding', () => {
+    const bars = makeBars(5, { startTime: 1_000_000, interval: 60_000 });
+    const plots = [makePlot('ind', [10, 20, 30, 40, 50])];
+
+    const result = getVisiblePlotRange(plots, ['ind'], bars, bars[0].time, bars[4].time, 0.2);
+    const range = 50 - 10;
+    expect(result).not.toBeNull();
+    expect(result!.min).toBeCloseTo(10 - range * 0.2, 5);
+    expect(result!.max).toBeCloseTo(50 + range * 0.2, 5);
+  });
+
+  it('combines multiple indicators in indicatorIds', () => {
+    const bars = makeBars(5, { startTime: 1_000_000, interval: 60_000 });
+    const plots = [makePlot('a', [10, 20, 30, 40, 50]), makePlot('b', [-10, -5, 0, 5, 10])];
+
+    const result = getVisiblePlotRange(plots, ['a', 'b'], bars, bars[0].time, bars[4].time);
+
+    expect(result).not.toBeNull();
+    expect(result!.min).toBeLessThan(-10);
+    expect(result!.max).toBeGreaterThan(50);
   });
 });

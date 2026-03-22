@@ -7,6 +7,7 @@
  * No DOM, Skia, or React dependencies — keep this module pure.
  */
 
+import type { PlotOutput } from '@tealstreet/tealscript';
 import type { Bar, Viewport, ViewScaleState } from '../types';
 
 import { TealchartRenderer } from '../TealchartRenderer';
@@ -203,5 +204,72 @@ export function restoreViewport(viewScale: ViewScaleState, bars: Bar[]): Viewpor
     endTime,
     priceMax: bbox.highest + dataRange * viewScale.pricePaddingTop,
     priceMin: bbox.lowest - dataRange * viewScale.pricePaddingBottom,
+  };
+}
+
+/**
+ * Get the min/max Y range for indicator plot values within a visible time range.
+ *
+ * Plot values are indexed parallel to the bars array. Uses binary search to find
+ * the visible bar index range, then scans only those plot values for min/max.
+ *
+ * @param plots - All plot outputs
+ * @param indicatorIds - Script IDs to include in the range calculation
+ * @param bars - The bars array (parallel to plot values)
+ * @param startTime - Visible range start time
+ * @param endTime - Visible range end time
+ * @param padding - Proportional padding to add (default 0.1 = 10%)
+ * @returns {min, max} with padding, or null if no valid values in range
+ */
+export function getVisiblePlotRange(
+  plots: PlotOutput[],
+  indicatorIds: string[],
+  bars: Bar[],
+  startTime: number,
+  endTime: number,
+  padding: number = 0.1,
+): { min: number; max: number } | null {
+  if (bars.length === 0) return null;
+
+  // Binary search for visible bar index range
+  const startIdx = lowerBound(bars, startTime);
+  const endIdx = upperBound(bars, endTime);
+
+  if (startIdx >= endIdx) return null;
+
+  let min = Infinity;
+  let max = -Infinity;
+  let hasValue = false;
+
+  for (const plot of plots) {
+    const scriptId = plot.scriptId ?? 'unknown';
+    if (!indicatorIds.includes(scriptId)) continue;
+    if (plot.type !== 'plot' || !plot.values) continue;
+
+    const values = plot.values;
+    // Scan only the visible range (plot values are parallel to bars)
+    const scanEnd = Math.min(endIdx, values.length);
+    for (let i = startIdx; i < scanEnd; i++) {
+      const v = values[i];
+      if (v !== null && !isNaN(v)) {
+        if (v < min) min = v;
+        if (v > max) max = v;
+        hasValue = true;
+      }
+    }
+  }
+
+  if (!hasValue) return null;
+
+  const range = max - min;
+  if (range === 0) {
+    // All values are the same - use a small default range
+    const safePadding = Math.abs(max) * 0.01 || 1;
+    return { min: min - safePadding, max: max + safePadding };
+  }
+
+  return {
+    min: min - range * padding,
+    max: max + range * padding,
   };
 }

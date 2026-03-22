@@ -25,9 +25,9 @@ export interface UseChartGesturesOptions {
   onViewportChange: (viewport: Viewport) => void;
   onSwipeBlockChange?: (blocked: boolean) => void;
   /** Called when user starts dragging the price axis (disables auto-scale) */
-  onAutoScaleDisabled?: () => void;
-  /** Returns whether auto-scale is active (pan should skip vertical movement) */
-  isAutoScale?: () => boolean;
+  onAutoScaleDisabled?: (paneId: string) => void;
+  /** Returns whether auto-scale is active for a given pane (pan should skip vertical movement) */
+  isAutoScale?: (paneId: string) => boolean;
 }
 
 export interface UseChartGesturesResult {
@@ -69,7 +69,7 @@ export function useChartGestures({
       const newEndTime = viewport.endTime + timeDelta;
 
       // When auto-scale is active, skip vertical — auto-scale will recalculate price axis
-      if (isAutoScale?.()) {
+      if (isAutoScale?.('main')) {
         onViewportChange({
           ...viewport,
           startTime: newStartTime,
@@ -206,7 +206,7 @@ export function useChartGestures({
       if (zone === 'priceAxis' && viewport) {
         gestureZoneValue.value = zone;
         priceAxisStartRange.value = viewport.priceMax - viewport.priceMin;
-        onAutoScaleDisabled?.();
+        onAutoScaleDisabled?.('main');
       } else if (zone === 'timeAxis' && viewport) {
         gestureZoneValue.value = zone;
         timeAxisStartRange.value = viewport.endTime - viewport.startTime;

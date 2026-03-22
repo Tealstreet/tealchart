@@ -64,9 +64,9 @@ export interface EventManagerCallbacks {
   /** Called when pane heights change via divider drag */
   onPaneHeightsChange?: (heights: { paneId: string; heightRatio: number }[]) => void;
   /** Called when auto-scale should be disabled (user starts price axis zoom) */
-  onAutoScaleDisabled?: () => void;
-  /** Returns whether auto-scale is active (pan should skip vertical movement) */
-  isAutoScale?: () => boolean;
+  onAutoScaleDisabled?: (paneId: string) => void;
+  /** Returns whether auto-scale is active for a given pane (pan should skip vertical movement) */
+  isAutoScale?: (paneId: string) => boolean;
   /** Check if position is over interactive Konva element */
   isOverInteractiveElement?: (x: number, y: number) => boolean;
   /** Get price from Y coordinate */
@@ -344,11 +344,6 @@ export class EventManager {
     this.state.dragStartCrosshairX = this.crosshair.x;
     this.state.dragStartCrosshairY = this.crosshair.y;
 
-    // Notify that auto-scale should be disabled when user zooms the price axis
-    if (isOverPriceAxis) {
-      this.callbacks.onAutoScaleDisabled?.();
-    }
-
     // Track which pane the drag started in (for both pan and price-axis zoom)
     if (this.callbacks.getPaneAtY) {
       const pane = this.callbacks.getPaneAtY(y);
@@ -357,6 +352,11 @@ export class EventManager {
         this.state.dragStartPaneYRange = { yMin: pane.yMin, yMax: pane.yMax };
         this.state.dragStartPaneHeight = pane.paneHeight;
       }
+    }
+
+    // Notify that auto-scale should be disabled when user zooms the price axis
+    if (isOverPriceAxis) {
+      this.callbacks.onAutoScaleDisabled?.(this.state.draggedPaneId ?? 'main');
     }
 
     // Add window listeners for off-canvas drag
@@ -590,11 +590,6 @@ export class EventManager {
       this.state.dragStartCrosshairX = this.crosshair.x;
       this.state.dragStartCrosshairY = this.crosshair.y;
 
-      // Notify that auto-scale should be disabled when user zooms the price axis
-      if (isOverPriceAxis) {
-        this.callbacks.onAutoScaleDisabled?.();
-      }
-
       // Track which pane the touch started in (for both pan and price-axis zoom)
       if (this.callbacks.getPaneAtY) {
         const pane = this.callbacks.getPaneAtY(y);
@@ -606,6 +601,11 @@ export class EventManager {
             this.touchYPanUnlocked = true; // Allow Y-axis zooming immediately for price axis drag
           }
         }
+      }
+
+      // Notify that auto-scale should be disabled when user zooms the price axis
+      if (isOverPriceAxis) {
+        this.callbacks.onAutoScaleDisabled?.(this.state.draggedPaneId ?? 'main');
       }
 
       // Start long-press timer for context menu
@@ -852,7 +852,7 @@ export class EventManager {
     // external callback is only called at drag end
     const updateViewport = this.callbacks.onViewportChangeInternal ?? this.callbacks.onViewportChange;
 
-    if (this.state.draggedPaneId === 'main' && !this.callbacks.isAutoScale?.()) {
+    if (this.state.draggedPaneId === 'main' && !this.callbacks.isAutoScale?.('main')) {
       // Update viewport for main pane (horizontal + vertical)
       // When auto-scale is active, skip vertical — auto-scale will recalculate price axis
       updateViewport?.({

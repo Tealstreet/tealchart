@@ -96,11 +96,11 @@ export interface ChartCoreOptions {
   /** Called when pane heights change via divider drag */
   onPaneHeightsChange?: (heights: { paneId: string; heightRatio: number }[]) => void;
   /** Called when auto-scale should be disabled (user starts price axis zoom) */
-  onAutoScaleDisabled?: () => void;
+  onAutoScaleDisabled?: (paneId: string) => void;
   /** Called when viewport is reset (re-enables auto-scale) */
   onResetViewport?: () => void;
-  /** Returns whether auto-scale is active */
-  isAutoScale?: () => boolean;
+  /** Returns whether auto-scale is active for a given pane */
+  isAutoScale?: (paneId: string) => boolean;
 }
 
 // ============================================================================
@@ -474,6 +474,8 @@ export class ChartCore {
   // State
   private pendingOrders = new Map<string, PendingOrderUpdate>();
   private paneYOverrides = new Map<string, { yMin: number; yMax: number }>();
+  /** Auto-scale computed Y ranges from AutoScaleManager (set by TealchartWidget each render) */
+  private autoScalePaneYRanges = new Map<string, { yMin: number; yMax: number }>();
   private paneHeightOverrides = new Map<string, number>();
   private crosshair: EventCrosshairState = { visible: false, x: 0, y: 0 };
   private showResetButton = false;
@@ -572,8 +574,8 @@ export class ChartCore {
         this.scheduleRender();
       },
       isOverInteractiveElement: (x, y) => this.isOverInteractiveElement(x, y),
-      onAutoScaleDisabled: () => this.options.onAutoScaleDisabled?.(),
-      isAutoScale: () => this.options.isAutoScale?.() ?? true,
+      onAutoScaleDisabled: (paneId: string) => this.options.onAutoScaleDisabled?.(paneId),
+      isAutoScale: (paneId: string) => this.options.isAutoScale?.(paneId) ?? true,
       onViewportChange: (vp) => {
         this.viewport = vp;
         this.options.onViewportChange?.(vp);
@@ -582,7 +584,7 @@ export class ChartCore {
       onViewportChangeInternal: (vp) => {
         // Internal update during drag - no external callback to avoid parent re-renders
         // Apply auto-scale during drag so price axis fits visible candles in real time
-        this.viewport = this.options.isAutoScale?.() ? applyAutoScale(vp, this.bars) : vp;
+        this.viewport = this.options.isAutoScale?.('main') ? applyAutoScale(vp, this.bars) : vp;
         this.scheduleRender();
       },
       onPaneYRangeChange: (paneId, yMin, yMax) => {
@@ -817,6 +819,16 @@ export class ChartCore {
     this.paneHeightOverrides.clear();
     this.options.onResetViewport?.();
     this.options.onViewportChange?.(this.viewport);
+    this.scheduleRender();
+  }
+
+  /**
+   * Set auto-scale computed Y ranges for indicator panes.
+   * Called by TealchartWidget each render frame with ranges from AutoScaleManager.
+   * These are used in getUnifiedLayout() for panes that don't have manual Y overrides.
+   */
+  setPaneYRanges(ranges: Map<string, { yMin: number; yMax: number }>): void {
+    this.autoScalePaneYRanges = ranges;
     this.scheduleRender();
   }
 
@@ -1174,17 +1186,29 @@ export class ChartCore {
   private getUnifiedLayout(): UnifiedPaneLayout {
     const baseLayout = this.unifiedPaneLayout || convertToUnifiedLayout(this.paneLayout);
 
-    // Apply user Y-axis overrides and height overrides
-    // Renderer handles auto-scaling for indicator panes without overrides
+    // Apply Y-axis overrides (manual user zoom > auto-scale computed), then height overrides.
+    // Manual paneYOverrides set fixedRange: true (user dragged Y axis).
+    // Auto-scale ranges provide computed Y values without marking fixedRange.
     return {
       ...baseLayout,
       panes: baseLayout.panes.map((pane) => {
         const yOverride = this.paneYOverrides.get(pane.id);
+        const autoScaleRange = this.autoScalePaneYRanges.get(pane.id);
         const heightOverride = this.paneHeightOverrides.get(pane.id);
+
+        let yProps = {};
+        if (yOverride) {
+          // Manual override takes priority — marks fixedRange so renderer won't auto-scale
+          yProps = { yMin: yOverride.yMin, yMax: yOverride.yMax, fixedRange: true };
+        } else if (autoScaleRange) {
+          // Auto-scale computed range — set Y values and mark fixedRange so renderer
+          // uses these values instead of recalculating inline
+          yProps = { yMin: autoScaleRange.yMin, yMax: autoScaleRange.yMax, fixedRange: true };
+        }
 
         return {
           ...pane,
-          ...(yOverride ? { yMin: yOverride.yMin, yMax: yOverride.yMax, fixedRange: true } : {}),
+          ...yProps,
           ...(heightOverride !== undefined ? { heightRatio: heightOverride } : {}),
         };
       }),
