@@ -5,9 +5,10 @@
  * for non-overlay indicators in their dedicated panes.
  */
 
-import { Component } from './Component';
-import { div, span, button, icons } from './dom';
 import type { ActiveIndicator, IndicatorPaneInfo } from './ChartLegend';
+
+import { Component } from './Component';
+import { button, div, icons, span } from './dom';
 
 // ============================================================================
 // Types
@@ -117,12 +118,9 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
     this.el.style.top = `${top + 4}px`;
   }
 
-  setIndicators(
-    indicators: ActiveIndicator[],
-    paneInfo: Record<string, IndicatorPaneInfo>
-  ): void {
+  setIndicators(indicators: ActiveIndicator[], paneInfo: Record<string, IndicatorPaneInfo>): void {
     // Compute signature to detect actual changes (avoid unnecessary re-renders)
-    const signature = indicators.map(i => `${i.id}:${i.name}:${i.isVisible}`).join('|');
+    const signature = indicators.map((i) => `${i.id}:${i.name}:${i.isVisible}:${JSON.stringify(i.inputs)}`).join('|');
 
     // Only update if indicators actually changed
     if (signature !== this.lastIndicatorSignature) {
@@ -157,17 +155,19 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
     });
 
     // Name
-    row.appendChild(span({
-      text: info?.name || indicator.name,
-      style: styles.indicatorName,
-    }));
+    row.appendChild(
+      span({
+        text: info?.name || indicator.name,
+        style: styles.indicatorName,
+      }),
+    );
 
     // Input values
     const inputs = Object.values(indicator.inputs);
     if (inputs.length > 0) {
       const inputText = inputs
-        .filter(v => v !== undefined && v !== null)
-        .map(v => {
+        .filter((v) => v !== undefined && v !== null)
+        .map((v) => {
           if (typeof v === 'number') return v.toString();
           if (typeof v === 'boolean') return v ? 'Yes' : 'No';
           return String(v);
@@ -175,10 +175,12 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
         .join(' · ');
 
       if (inputText) {
-        row.appendChild(span({
-          text: inputText,
-          style: styles.indicatorInputs,
-        }));
+        row.appendChild(
+          span({
+            text: inputText,
+            style: styles.indicatorInputs,
+          }),
+        );
       }
     }
 
@@ -191,25 +193,25 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
     });
 
     // Eye toggle
-    actions.appendChild(this.createIconButton(
-      indicator.isVisible ? icons.eye(14) : icons.eyeOff(14),
-      indicator.isVisible ? 'Hide indicator' : 'Show indicator',
-      () => this.options.onToggleIndicator?.(indicator.id)
-    ));
+    actions.appendChild(
+      this.createIconButton(
+        indicator.isVisible ? icons.eye(14) : icons.eyeOff(14),
+        indicator.isVisible ? 'Hide indicator' : 'Show indicator',
+        () => this.options.onToggleIndicator?.(indicator.id),
+      ),
+    );
 
     // Settings
-    actions.appendChild(this.createIconButton(
-      icons.gear(14),
-      'Indicator settings',
-      () => this.options.onSettingsIndicator?.(indicator.id)
-    ));
+    actions.appendChild(
+      this.createIconButton(icons.gear(14), 'Indicator settings', () =>
+        this.options.onSettingsIndicator?.(indicator.id),
+      ),
+    );
 
     // Remove
-    actions.appendChild(this.createIconButton(
-      icons.trash(14),
-      'Remove indicator',
-      () => this.options.onRemoveIndicator?.(indicator.id)
-    ));
+    actions.appendChild(
+      this.createIconButton(icons.trash(14), 'Remove indicator', () => this.options.onRemoveIndicator?.(indicator.id)),
+    );
 
     row.appendChild(actions);
 
@@ -230,11 +232,7 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
     return row;
   }
 
-  private createIconButton(
-    icon: SVGElement,
-    title: string,
-    onClick: () => void
-  ): HTMLElement {
+  private createIconButton(icon: SVGElement, title: string, onClick: () => void): HTMLElement {
     const btn = button({
       style: styles.iconButton,
       attrs: { title },
