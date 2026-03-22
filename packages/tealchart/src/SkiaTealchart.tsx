@@ -37,7 +37,7 @@ import type {
 import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 
 import { Canvas, createPicture, Picture, Skia } from '@shopify/react-native-skia';
-import { LayoutChangeEvent, StyleSheet, Text, View } from 'react-native';
+import { LayoutChangeEvent, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS } from 'react-native-reanimated';
 
@@ -263,6 +263,8 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   const barsLengthRef = useRef(bars.length);
   const viewScaleRef = useRef<ViewScaleState | null>(null);
   const autoScaleRef = useRef(true);
+  // State mirror of autoScaleRef for re-rendering the reset button
+  const [autoScaleVisible, setAutoScaleVisible] = useState(true);
 
   // Track the first bar's time to detect reloads with the same count
   const barsFirstTimeRef = useRef<number | null>(bars.length > 0 ? bars[0].time : null);
@@ -353,7 +355,21 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
 
   const handleAutoScaleDisabled = useCallback(() => {
     autoScaleRef.current = false;
+    setAutoScaleVisible(false);
   }, []);
+
+  const getIsAutoScale = useCallback(() => autoScaleRef.current, []);
+
+  const handleResetViewport = useCallback(() => {
+    autoScaleRef.current = true;
+    setAutoScaleVisible(true);
+    if (bars.length > 0) {
+      const vp = TealchartRenderer.calculateViewport(bars);
+      setViewport(vp);
+      viewScaleRef.current = captureViewScale(vp, bars);
+      onViewportChange?.(vp);
+    }
+  }, [bars, onViewportChange]);
 
   const { composedGesture } = useChartGestures({
     dimensions: chartDimensions,
@@ -362,6 +378,7 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     onViewportChange: handleViewportChange,
     onSwipeBlockChange,
     onAutoScaleDisabled: handleAutoScaleDisabled,
+    isAutoScale: getIsAutoScale,
   });
 
   // ==========================================================================
@@ -691,6 +708,13 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
         <Animated.View style={[styles.absoluteFill, { width: dimensions.width, height: dimensions.height }]} />
       </GestureDetector>
 
+      {/* Reset viewport button — re-enables auto-scale */}
+      {!autoScaleVisible && (
+        <TouchableOpacity style={styles.resetButton} onPress={handleResetViewport} activeOpacity={0.7}>
+          <Text style={styles.resetButtonText}>↻</Text>
+        </TouchableOpacity>
+      )}
+
       {/* Top Bar (overlay on top of chart) */}
       {showTopBar && (
         <View style={styles.topBarOverlay} pointerEvents="box-none">
@@ -748,6 +772,23 @@ const styles = StyleSheet.create({
   interactiveLayer: {
     // Interactive elements go here
     // pointerEvents="box-none" allows touches to pass through to gesture layer
+  },
+  resetButton: {
+    position: 'absolute',
+    bottom: 40, // Above time axis
+    alignSelf: 'center',
+    left: '50%',
+    marginLeft: -14, // Half of width (28)
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(42, 46, 57, 0.8)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  resetButtonText: {
+    color: '#d1d4dc',
+    fontSize: 16,
   },
 });
 

@@ -26,6 +26,8 @@ export interface UseChartGesturesOptions {
   onSwipeBlockChange?: (blocked: boolean) => void;
   /** Called when user starts dragging the price axis (disables auto-scale) */
   onAutoScaleDisabled?: () => void;
+  /** Returns whether auto-scale is active (pan should skip vertical movement) */
+  isAutoScale?: () => boolean;
 }
 
 export interface UseChartGesturesResult {
@@ -39,6 +41,7 @@ export function useChartGestures({
   onViewportChange,
   onSwipeBlockChange,
   onAutoScaleDisabled,
+  isAutoScale,
 }: UseChartGesturesOptions): UseChartGesturesResult {
   // Shared values for gesture state (UI thread)
   const gestureZoneValue = useSharedValue<GestureZone>('chart');
@@ -65,23 +68,32 @@ export function useChartGestures({
       const newStartTime = viewport.startTime + timeDelta;
       const newEndTime = viewport.endTime + timeDelta;
 
-      // Vertical panning (price axis)
-      // Dragging up should increase prices (move viewport down), dragging down should decrease
-      const priceRange = viewport.priceMax - viewport.priceMin;
-      const pricePerPixel = priceRange / chartHeight;
-      const priceDelta = deltaY * pricePerPixel;
+      // When auto-scale is active, skip vertical — auto-scale will recalculate price axis
+      if (isAutoScale?.()) {
+        onViewportChange({
+          ...viewport,
+          startTime: newStartTime,
+          endTime: newEndTime,
+        });
+      } else {
+        // Vertical panning (price axis)
+        // Dragging up should increase prices (move viewport down), dragging down should decrease
+        const priceRange = viewport.priceMax - viewport.priceMin;
+        const pricePerPixel = priceRange / chartHeight;
+        const priceDelta = deltaY * pricePerPixel;
 
-      const newPriceMin = viewport.priceMin + priceDelta;
-      const newPriceMax = viewport.priceMax + priceDelta;
+        const newPriceMin = viewport.priceMin + priceDelta;
+        const newPriceMax = viewport.priceMax + priceDelta;
 
-      onViewportChange({
-        startTime: newStartTime,
-        endTime: newEndTime,
-        priceMin: newPriceMin,
-        priceMax: newPriceMax,
-      });
+        onViewportChange({
+          startTime: newStartTime,
+          endTime: newEndTime,
+          priceMin: newPriceMin,
+          priceMax: newPriceMax,
+        });
+      }
     },
-    [viewport, dimensions, onViewportChange],
+    [viewport, dimensions, onViewportChange, isAutoScale],
   );
 
   // Price axis drag handler
