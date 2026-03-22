@@ -3,14 +3,10 @@
  *
  * Displays a searchable list of indicators grouped by category.
  */
+import type { BuiltinIndicator } from '../indicators/builtinIndicators';
 
+import { BUILTIN_INDICATORS, INDICATOR_CATEGORIES, searchIndicators } from '../indicators/builtinIndicators';
 import { Component } from './Component';
-import {
-  BUILTIN_INDICATORS,
-  INDICATOR_CATEGORIES,
-  searchIndicators,
-  type BuiltinIndicator,
-} from '../indicators/builtinIndicators';
 
 // ============================================================================
 // Types
@@ -323,7 +319,7 @@ export class IndicatorsModal extends Component<IndicatorsModalState> {
       const categoryKey = CATEGORY_KEYS[categoryId];
       const categoryName = this.getTranslation(
         categoryKey,
-        INDICATOR_CATEGORIES.find((c) => c.id === categoryId)?.name || categoryId
+        INDICATOR_CATEGORIES.find((c) => c.id === categoryId)?.name || categoryId,
       );
 
       // Category header
@@ -342,13 +338,21 @@ export class IndicatorsModal extends Component<IndicatorsModalState> {
           style: {
             ...styles.listItem,
             ...(isActive ? styles.listItemActive : {}),
-            ...(isHovered && !isActive ? styles.listItemHover : {}),
           },
           textContent: indicator.name,
           onClick: () => this.handleIndicatorClick(indicator),
-          onMouseEnter: () => this.setState({ hoveredId: indicator.id }),
-          onMouseLeave: () => this.setState({ hoveredId: null }),
         });
+
+        // Apply hover styles directly to avoid full re-render which destroys
+        // the element before the click event can fire
+        if (!isActive) {
+          item.addEventListener('mouseenter', () => {
+            Object.assign(item.style, styles.listItemHover);
+          });
+          item.addEventListener('mouseleave', () => {
+            item.style.backgroundColor = '';
+          });
+        }
 
         this.contentEl.appendChild(item);
       }
