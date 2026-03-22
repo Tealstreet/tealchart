@@ -21,16 +21,19 @@
     "react-dom": "^18.0.0"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^7.2.0",
+    "@fortawesome/free-solid-svg-icons": "^7.2.0",
+    "@fortawesome/react-fontawesome": "^3.3.0",
     "@nanostores/persistent": "^1.2.0",
     "@nanostores/react": "^1.0.0",
     "nanostores": "^1.1.0",
     "@tealstreet/react-colorful": "*",
     "@tealstreet/tealscript": "*",
-    "jotai": "^2.17.1",
+    "jotai": "^2.18.1",
     "jotai-optics": "^0.4.0",
-    "konva": "^10.2.0",
+    "konva": "^10.2.3",
     "optics-ts": "^2.4.1",
-    "react-konva": "^19.2.2"
+    "react-konva": "^19.2.3"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
@@ -42,10 +45,10 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^18.3.6",
     "@vitejs/plugin-react": "^5.1.4",
-    "@vitest/coverage-v8": "^4.0.18",
-    "@vitest/ui": "^4.0.18",
+    "@vitest/coverage-v8": "^4.1.0",
+    "@vitest/ui": "^4.1.0",
     "cross-env": "^7.0.3",
-    "eslint": "^10",
+    "eslint": "^9.28.0",
     "npm-run-all2": "^8.0.4",
     "prettier": "^3.8.1",
     "react": "^19.2.4",
@@ -53,7 +56,7 @@
     "rimraf": "^6.1.2",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1",
+    "vite": "^8.0.1",
     "vite-tsconfig-paths": "^5.0.1",
     "vitest": "^4.0.18"
   }
