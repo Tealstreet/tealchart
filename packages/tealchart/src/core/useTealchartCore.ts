@@ -5,9 +5,12 @@
  * Works on both web (React) and mobile (React Native).
  */
 
-import { useRef, useState, useEffect, useCallback, useReducer } from 'react';
-import { ChartWidgetCore, type ChartWidgetCoreOptions, type IIndicatorManager } from './ChartWidgetCore';
 import type { Bar, IBasicDataFeed, UnifiedPaneLayout } from '../types';
+import type { ChartWidgetCoreOptions, IIndicatorManager } from './ChartWidgetCore';
+
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+
+import { ChartWidgetCore } from './ChartWidgetCore';
 
 // Force re-render helper
 function useForceUpdate() {
@@ -39,22 +42,25 @@ export interface TealchartCoreActions {
   setIndicatorManager: (manager: IIndicatorManager) => void;
 }
 
-export type UseTealchartCoreReturn = TealchartCoreState & TealchartCoreActions & {
-  core: ChartWidgetCore | null;
-  /** Whether the hook is enabled (datafeed was provided) */
-  enabled: boolean;
-};
+export type UseTealchartCoreReturn = TealchartCoreState &
+  TealchartCoreActions & {
+    core: ChartWidgetCore | null;
+    /** Whether the hook is enabled (datafeed was provided) */
+    enabled: boolean;
+  };
 
 // Default empty pane layout for disabled state
 const EMPTY_PANE_LAYOUT: UnifiedPaneLayout = {
-  panes: [{
-    id: 'main',
-    type: 'main',
-    heightRatio: 1.0,
-    yMin: 0,
-    yMax: 0,
-    fixedRange: false,
-  }],
+  panes: [
+    {
+      id: 'main',
+      type: 'main',
+      heightRatio: 1.0,
+      yMin: 0,
+      yMax: 0,
+      fixedRange: false,
+    },
+  ],
   timeAxisHeight: 30,
 };
 
@@ -89,9 +95,13 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
   const [symbol, setSymbolState] = useState(options.symbol);
   const [interval, setIntervalState] = useState(options.interval || '1h');
 
-  // Create core on mount (only if enabled)
-  if (enabled && !coreRef.current && options.datafeed) {
-    coreRef.current = new ChartWidgetCore({
+  const core = coreRef.current;
+
+  // Create and initialize core in effect (only if enabled)
+  useEffect(() => {
+    if (!enabled || !options.datafeed) return;
+
+    const instance = new ChartWidgetCore({
       datafeed: options.datafeed,
       symbol: options.symbol,
       interval: options.interval,
@@ -108,17 +118,16 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
         options.onIntervalChange?.(i);
       },
     });
-  }
+    coreRef.current = instance;
+    instance.initialize();
+    forceUpdate(); // trigger re-render so consumers see the core
 
-  const core = coreRef.current;
-
-  // Initialize on mount (only if enabled)
-  useEffect(() => {
-    if (core) {
-      core.initialize();
-      return () => core.dispose();
-    }
-  }, [core]);
+    return () => {
+      instance.dispose();
+      coreRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled, options.datafeed]);
 
   // Handle symbol prop changes
   useEffect(() => {
@@ -142,17 +151,26 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
   }, [options.indicatorManager, core]);
 
   // Actions (no-op when disabled)
-  const setSymbol = useCallback((s: string) => {
-    core?.setSymbol(s);
-  }, [core]);
+  const setSymbol = useCallback(
+    (s: string) => {
+      core?.setSymbol(s);
+    },
+    [core],
+  );
 
-  const setIntervalAction = useCallback((i: string) => {
-    core?.setInterval(i);
-  }, [core]);
+  const setIntervalAction = useCallback(
+    (i: string) => {
+      core?.setInterval(i);
+    },
+    [core],
+  );
 
-  const setIndicatorManager = useCallback((manager: IIndicatorManager) => {
-    core?.setIndicatorManager(manager);
-  }, [core]);
+  const setIndicatorManager = useCallback(
+    (manager: IIndicatorManager) => {
+      core?.setIndicatorManager(manager);
+    },
+    [core],
+  );
 
   return {
     // State
