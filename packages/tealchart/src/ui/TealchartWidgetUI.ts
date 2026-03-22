@@ -396,6 +396,13 @@ export class TealchartWidgetUI {
   }
 
   /**
+   * Update the context menu callback (called when onContextMenu is registered after init)
+   */
+  setContextMenuCallback(callback: (unixTime: number, price: number) => ContextMenuItem[]): void {
+    this.chartCore?.setContextMenuCallback(callback);
+  }
+
+  /**
    * Set loading state
    */
   setLoading(loading: boolean): void {

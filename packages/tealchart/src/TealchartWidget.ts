@@ -1760,9 +1760,9 @@ export class TealchartWidget {
    */
   onContextMenu(callback: ContextMenuCallback): void {
     this._contextMenuCallback = callback;
-    // Re-render to enable the context menu UI
+    // Update the UI's context menu callback so it can handle clicks
     if (this._ui) {
-      this._scheduleRender();
+      this._ui.setContextMenuCallback(callback);
     }
   }
 
