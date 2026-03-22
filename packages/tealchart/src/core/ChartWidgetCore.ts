@@ -9,17 +9,11 @@
  * - Mobile: useTealchartCore() hook wraps ChartWidgetCore for React
  */
 
-import { PaneManager } from '../rendering/PaneManager';
-import { EventEmitter } from '../events/EventEmitter';
 import type { BuiltinIndicator } from '../indicators/builtinIndicators';
-import type {
-  Bar,
-  IBasicDataFeed,
-  LibrarySymbolInfo,
-  ResolutionString,
-  Viewport,
-  UnifiedPaneLayout,
-} from '../types';
+import type { Bar, IBasicDataFeed, LibrarySymbolInfo, ResolutionString, UnifiedPaneLayout, Viewport } from '../types';
+
+import { EventEmitter } from '../events/EventEmitter';
+import { PaneManager } from '../rendering/PaneManager';
 
 // Use generic PlotOutput type to avoid import issues across platforms
 type PlotOutput = {
@@ -39,14 +33,24 @@ export const INITIAL_BAR_COUNT = 300;
  * Convert resolution string to milliseconds
  */
 export function getIntervalMs(resolution: ResolutionString | string): number {
-  // Handle day/week resolutions
-  if (resolution === '1D' || resolution === 'D') return 24 * 60 * 60 * 1000;
-  if (resolution === '1W' || resolution === 'W') return 7 * 24 * 60 * 60 * 1000;
+  const upper = resolution.toUpperCase();
 
-  // Handle minute resolutions (numeric strings like "1", "5", "15", "60", "240")
-  const minutes = parseInt(resolution, 10);
-  if (!isNaN(minutes)) {
-    return minutes * 60 * 1000;
+  // Handle day/week resolutions
+  if (upper === '1D' || upper === 'D') return 24 * 60 * 60 * 1000;
+  if (upper === '1W' || upper === 'W') return 7 * 24 * 60 * 60 * 1000;
+
+  // Parse numeric value and optional suffix (e.g., "1h", "4H", "1D", "15", "60")
+  const match = resolution.match(/^(\d+)([hHdDwW]?)$/);
+  if (match) {
+    const value = parseInt(match[1], 10);
+    const suffix = match[2].toUpperCase();
+
+    if (suffix === 'H') return value * 60 * 60 * 1000;
+    if (suffix === 'D') return value * 24 * 60 * 60 * 1000;
+    if (suffix === 'W') return value * 7 * 24 * 60 * 60 * 1000;
+
+    // No suffix means minutes
+    return value * 60 * 1000;
   }
 
   // Default to 1 hour
@@ -163,7 +167,7 @@ export class ChartWidgetCore {
         (error) => {
           console.error('[ChartWidgetCore] Failed to resolve symbol:', error);
           this._setLoading(false);
-        }
+        },
       );
     });
   }
@@ -231,7 +235,7 @@ export class ChartWidgetCore {
 
         this._setLoading(false);
         console.error('[ChartWidgetCore] Failed to load bars:', error);
-      }
+      },
     );
   }
 
@@ -250,7 +254,7 @@ export class ChartWidgetCore {
       this._interval,
       (bar) => this._handleNewBar(bar),
       this._barSubscriptionGuid,
-      () => this._loadBars() // Reset callback
+      () => this._loadBars(), // Reset callback
     );
   }
 
@@ -302,7 +306,7 @@ export class ChartWidgetCore {
       },
       (error) => {
         console.error('[ChartWidgetCore] Failed to resolve symbol:', error);
-      }
+      },
     );
 
     this._onSymbolChange?.(symbol);

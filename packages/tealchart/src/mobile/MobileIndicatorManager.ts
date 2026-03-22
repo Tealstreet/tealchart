@@ -19,11 +19,13 @@
  * }, []);
  * ```
  */
+import type { PlotOutput, Program } from '@packages/tealscript/src';
+import type { Bar, UnifiedPaneLayout } from '../types';
 
-import { PaneManager } from '../rendering/PaneManager';
+import { parse, TealscriptEngine } from '@packages/tealscript/src';
+
 import { type BuiltinIndicator } from '../indicators/builtinIndicators';
-import type { UnifiedPaneLayout, Bar } from '../types';
-import { parse, TealscriptEngine, type PlotOutput, type Program } from '@packages/tealscript/src';
+import { PaneManager } from '../rendering/PaneManager';
 
 /**
  * An active indicator instance
@@ -103,8 +105,6 @@ export class MobileIndicatorManager {
    */
   addIndicator(indicator: BuiltinIndicator, inputs?: Record<string, unknown>): string {
     const instanceId = `${indicator.id}_${++this._instanceCounter}`;
-    console.log('[MobileIndicatorManager] addIndicator:', indicator.id, 'instanceId:', instanceId);
-    console.log('[MobileIndicatorManager] overlay:', indicator.overlay, 'yAxisRange:', indicator.yAxisRange);
 
     // Add to PaneManager (handles pane creation for non-overlay indicators)
     this._paneManager.addIndicator({
@@ -121,7 +121,6 @@ export class MobileIndicatorManager {
       } else if (indicator.code) {
         ast = parse(indicator.code);
         this._astCache.set(indicator.id, ast);
-        console.log('[MobileIndicatorManager] Parsed code for:', indicator.id);
       }
     } catch (err) {
       console.error('[MobileIndicatorManager] Failed to parse indicator code:', indicator.id, err);
@@ -135,9 +134,6 @@ export class MobileIndicatorManager {
       ast,
     });
 
-    console.log('[MobileIndicatorManager] indicators count:', this._indicators.length);
-    console.log('[MobileIndicatorManager] new layout:', JSON.stringify(this._paneManager.getUnifiedLayout(), null, 2));
-
     // Recompute plots with new indicator
     this._recomputePlots();
 
@@ -148,8 +144,6 @@ export class MobileIndicatorManager {
    * Remove an indicator by instance ID
    */
   removeIndicator(instanceId: string): void {
-    console.log('[MobileIndicatorManager] removeIndicator:', instanceId);
-
     // Remove from PaneManager
     this._paneManager.removeIndicator(instanceId);
 

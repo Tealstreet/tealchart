@@ -41,14 +41,8 @@ export { useChartGestures } from './mobile/hooks/useChartGestures';
 export type { UseChartGesturesOptions, UseChartGesturesResult } from './mobile/hooks/useChartGestures';
 
 export { useLabelCollision } from './mobile/hooks/useLabelCollision';
-export type { LabelBounds, LabelCollisionResult } from './mobile/hooks/useLabelCollision';
+export type { LabelBounds } from './mobile/hooks/useLabelCollision';
 
 // Mobile utilities
-export {
-  priceToY,
-  yToPrice,
-  timeToX,
-  xToTime,
-  getGestureZone,
-} from './mobile/utils/coordinates';
+export { priceToY, yToPrice, timeToX, xToTime, getGestureZone } from './mobile/utils/coordinates';
 export type { ChartDimensions, GestureZone } from './mobile/utils/coordinates';

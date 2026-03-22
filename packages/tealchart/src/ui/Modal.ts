@@ -1,11 +1,13 @@
+import type { ComponentOptions } from './Component';
+
+import { Component } from './Component';
+
 /**
  * Modal - Base class for modal dialogs
  *
  * Provides overlay, close button, escape key handling,
  * and click-outside-to-close functionality.
  */
-
-import { Component, type ComponentOptions } from './Component';
 
 // ============================================================================
 // Types
@@ -134,9 +136,8 @@ export class Modal extends Component<ModalState> {
       this.modalEl.style.width = this.options.width;
     }
     if (this.options.maxHeight) {
-      this.modalEl.style.maxHeight = typeof this.options.maxHeight === 'number'
-        ? `${this.options.maxHeight}px`
-        : this.options.maxHeight;
+      this.modalEl.style.maxHeight =
+        typeof this.options.maxHeight === 'number' ? `${this.options.maxHeight}px` : this.options.maxHeight;
     }
     this.overlay.appendChild(this.modalEl);
 
@@ -163,12 +164,12 @@ export class Modal extends Component<ModalState> {
         </svg>`,
         onClick: () => this.close(),
         onMouseEnter: (e) => {
-          (e.target as HTMLElement).style.backgroundColor = 'var(--hover-bg, rgba(255, 255, 255, 0.05))';
-          (e.target as HTMLElement).style.color = 'var(--text, #d1d4dc)';
+          (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--hover-bg, rgba(255, 255, 255, 0.05))';
+          (e.currentTarget as HTMLElement).style.color = 'var(--text, #d1d4dc)';
         },
         onMouseLeave: (e) => {
-          (e.target as HTMLElement).style.backgroundColor = 'transparent';
-          (e.target as HTMLElement).style.color = 'var(--text2, #787b86)';
+          (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+          (e.currentTarget as HTMLElement).style.color = 'var(--text2, #787b86)';
         },
       });
       this.headerEl.appendChild(closeBtn);

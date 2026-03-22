@@ -5,8 +5,9 @@
  * Supports nested submenus and dividers.
  */
 
-import { div, span } from './dom';
 import type { ContextMenuItem } from '../types';
+
+import { div, span } from './dom';
 
 // ============================================================================
 // Types
@@ -108,6 +109,8 @@ export class ContextMenu {
   private options: ContextMenuOptions;
   private closeHandler: ((e: MouseEvent) => void) | null = null;
   private keyHandler: ((e: KeyboardEvent) => void) | null = null;
+  private scrollHandler: (() => void) | null = null;
+  private attachTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   constructor(options: ContextMenuOptions) {
     this.options = options;
@@ -165,16 +168,22 @@ export class ContextMenu {
         ...styles.menuItem,
         ...(isDisabled ? styles.menuItemDisabled : {}),
       },
-      onClick: isDisabled ? undefined : () => {
-        item.click?.();
-        this.close();
-      },
-      onMouseEnter: isDisabled ? undefined : (e) => {
-        Object.assign((e.target as HTMLElement).style, styles.menuItemHover);
-      },
-      onMouseLeave: isDisabled ? undefined : (e) => {
-        (e.target as HTMLElement).style.backgroundColor = 'transparent';
-      },
+      onClick: isDisabled
+        ? undefined
+        : () => {
+            item.click?.();
+            this.close();
+          },
+      onMouseEnter: isDisabled
+        ? undefined
+        : (e) => {
+            Object.assign((e.currentTarget as HTMLElement).style, styles.menuItemHover);
+          },
+      onMouseLeave: isDisabled
+        ? undefined
+        : (e) => {
+            (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+          },
     });
 
     // Label

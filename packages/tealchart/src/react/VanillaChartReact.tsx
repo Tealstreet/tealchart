@@ -26,10 +26,12 @@
  * }
  * ```
  */
+import type { SimpleChartOptions } from '../TealchartVanilla';
+import type { Bar, ResolutionString, Viewport } from '../types';
 
-import React, { useEffect, useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
-import { SimpleChart, createSimpleChart, type SimpleChartOptions } from '../TealchartVanilla';
-import type { Bar, Viewport, ResolutionString } from '../types';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+
+import { createSimpleChart, SimpleChart } from '../TealchartVanilla';
 
 // ============================================================================
 // Types
@@ -95,7 +97,7 @@ export const VanillaChartReact = forwardRef<VanillaChartHandle, VanillaChartReac
       className,
       style,
     },
-    ref
+    ref,
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<SimpleChart | null>(null);
@@ -179,7 +181,7 @@ export const VanillaChartReact = forwardRef<VanillaChartHandle, VanillaChartReac
         }}
       />
     );
-  }
+  },
 );
 
 VanillaChartReact.displayName = 'VanillaChartReact';
@@ -193,25 +195,25 @@ VanillaChartReact.displayName = 'VanillaChartReact';
  */
 export function useVanillaChart(
   containerRef: React.RefObject<HTMLElement>,
-  options: Omit<SimpleChartOptions, 'container'>
+  options: Omit<SimpleChartOptions, 'container'>,
 ): SimpleChart | null {
-  const chartRef = useRef<SimpleChart | null>(null);
+  const [chart, setChart] = useState<SimpleChart | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const chart = createSimpleChart({
+    const instance = createSimpleChart({
       ...options,
       container: containerRef.current,
     });
 
-    chartRef.current = chart;
+    setChart(instance);
 
     return () => {
-      chart.dispose();
-      chartRef.current = null;
+      instance.dispose();
+      setChart(null);
     };
   }, []);
 
-  return chartRef.current;
+  return chart;
 }
