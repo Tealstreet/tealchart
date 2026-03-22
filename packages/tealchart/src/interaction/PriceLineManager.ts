@@ -271,7 +271,7 @@ export class PriceLineManager {
       clearInterval(this.countdownTimer);
       this.countdownTimer = null;
     }
-    document.removeEventListener('keydown', this.handleKeyDown);
+    document.removeEventListener('keydown', this.handleKeyDown, true);
     this.group.destroy();
   }
 
