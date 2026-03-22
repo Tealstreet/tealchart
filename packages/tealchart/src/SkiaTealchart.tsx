@@ -55,7 +55,7 @@ import { priceToY, xToTime, yToPrice } from './mobile/utils/coordinates';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
 import { DEFAULT_MARGINS } from './types';
-import { captureViewScale, restoreViewport } from './viewport/viewScale';
+import { applyAutoScale, captureViewScale, restoreViewport } from './viewport/viewScale';
 
 // Indicator pane info type (matches web)
 interface IndicatorPaneInfo {
@@ -262,6 +262,7 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
 
   const barsLengthRef = useRef(bars.length);
   const viewScaleRef = useRef<ViewScaleState | null>(null);
+  const autoScaleRef = useRef(true);
 
   // Track the first bar's time to detect reloads with the same count
   const barsFirstTimeRef = useRef<number | null>(bars.length > 0 ? bars[0].time : null);
@@ -290,6 +291,11 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
         newViewport = TealchartRenderer.calculateViewport(bars);
       }
 
+      // Apply auto-scale if enabled
+      if (autoScaleRef.current) {
+        newViewport = applyAutoScale(newViewport, bars);
+      }
+
       setViewport(newViewport);
       onViewportChange?.(newViewport);
     }
@@ -297,9 +303,13 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
 
   const handleViewportChange = useCallback(
     (newViewport: Viewport) => {
-      setViewport(newViewport);
-      viewScaleRef.current = captureViewScale(newViewport, bars);
-      onViewportChange?.(newViewport);
+      let vp = newViewport;
+      if (autoScaleRef.current) {
+        vp = applyAutoScale(vp, bars);
+      }
+      setViewport(vp);
+      viewScaleRef.current = captureViewScale(vp, bars);
+      onViewportChange?.(vp);
     },
     [onViewportChange, bars],
   );
@@ -341,12 +351,17 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     [dimensions.width, dimensions.height, margins],
   );
 
+  const handleAutoScaleDisabled = useCallback(() => {
+    autoScaleRef.current = false;
+  }, []);
+
   const { composedGesture } = useChartGestures({
     dimensions: chartDimensions,
     bars,
     viewport,
     onViewportChange: handleViewportChange,
     onSwipeBlockChange,
+    onAutoScaleDisabled: handleAutoScaleDisabled,
   });
 
   // ==========================================================================

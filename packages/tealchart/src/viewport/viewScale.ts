@@ -122,6 +122,36 @@ export function captureViewScale(viewport: Viewport, bars: Bar[]): ViewScaleStat
 }
 
 /**
+ * Auto-scale the price axis to fit visible bars with padding.
+ *
+ * Returns a new viewport with priceMin/priceMax adjusted to fit the visible
+ * candles. Time axis is left unchanged. If no visible bars exist, returns the
+ * viewport unchanged.
+ */
+export function applyAutoScale(viewport: Viewport, bars: Bar[], padding: number = 0.1): Viewport {
+  const bbox = getVisibleBarsBoundingBox(bars, viewport.startTime, viewport.endTime);
+  if (!bbox) return viewport;
+
+  const dataRange = bbox.highest - bbox.lowest;
+
+  if (dataRange === 0) {
+    // All visible bars are the same price — use a small default range
+    const safePadding = bbox.highest * 0.01 || 1;
+    return {
+      ...viewport,
+      priceMax: bbox.highest + safePadding,
+      priceMin: bbox.lowest - safePadding,
+    };
+  }
+
+  return {
+    ...viewport,
+    priceMax: bbox.highest + dataRange * padding,
+    priceMin: bbox.lowest - dataRange * padding,
+  };
+}
+
+/**
  * Reconstruct an absolute viewport from a proportional ViewScaleState + new bars.
  *
  * If bars are empty, falls back to TealchartRenderer.calculateViewport defaults.

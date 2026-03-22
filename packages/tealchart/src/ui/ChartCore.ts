@@ -94,6 +94,10 @@ export interface ChartCoreOptions {
   onCrossHairMoved?: (price: number, time: number) => void;
   /** Called when pane heights change via divider drag */
   onPaneHeightsChange?: (heights: { paneId: string; heightRatio: number }[]) => void;
+  /** Called when auto-scale should be disabled (user starts price axis zoom) */
+  onAutoScaleDisabled?: () => void;
+  /** Called when viewport is reset (re-enables auto-scale) */
+  onResetViewport?: () => void;
 }
 
 // ============================================================================
@@ -565,6 +569,7 @@ export class ChartCore {
         this.scheduleRender();
       },
       isOverInteractiveElement: (x, y) => this.isOverInteractiveElement(x, y),
+      onAutoScaleDisabled: () => this.options.onAutoScaleDisabled?.(),
       onViewportChange: (vp) => {
         this.viewport = vp;
         this.options.onViewportChange?.(vp);
@@ -805,6 +810,7 @@ export class ChartCore {
     this.viewport = TealchartRenderer.calculateViewport(this.bars);
     this.paneYOverrides.clear();
     this.paneHeightOverrides.clear();
+    this.options.onResetViewport?.();
     this.options.onViewportChange?.(this.viewport);
     this.scheduleRender();
   }

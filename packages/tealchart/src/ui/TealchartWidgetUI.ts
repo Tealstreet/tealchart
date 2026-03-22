@@ -105,6 +105,10 @@ export interface TealchartWidgetUIOptions {
   onMouseUp?: () => void;
   /** Crosshair moved callback */
   onCrossHairMoved?: (price: number, time: number) => void;
+  /** Called when auto-scale should be disabled (user starts price axis zoom) */
+  onAutoScaleDisabled?: () => void;
+  /** Called when viewport is reset (re-enables auto-scale) */
+  onResetViewport?: () => void;
 }
 
 // ============================================================================
@@ -255,6 +259,8 @@ export class TealchartWidgetUI {
       onMouseDown: this.options.onMouseDown,
       onMouseUp: this.options.onMouseUp,
       onCrossHairMoved: this.options.onCrossHairMoved,
+      onAutoScaleDisabled: this.options.onAutoScaleDisabled,
+      onResetViewport: this.options.onResetViewport,
     });
   }
 

@@ -63,6 +63,8 @@ export interface EventManagerCallbacks {
   getDividerAtY?: (y: number) => PaneDividerInfo | null;
   /** Called when pane heights change via divider drag */
   onPaneHeightsChange?: (heights: { paneId: string; heightRatio: number }[]) => void;
+  /** Called when auto-scale should be disabled (user starts price axis zoom) */
+  onAutoScaleDisabled?: () => void;
   /** Check if position is over interactive Konva element */
   isOverInteractiveElement?: (x: number, y: number) => boolean;
   /** Get price from Y coordinate */
@@ -340,6 +342,11 @@ export class EventManager {
     this.state.dragStartCrosshairX = this.crosshair.x;
     this.state.dragStartCrosshairY = this.crosshair.y;
 
+    // Notify that auto-scale should be disabled when user zooms the price axis
+    if (isOverPriceAxis) {
+      this.callbacks.onAutoScaleDisabled?.();
+    }
+
     // Track which pane the drag started in (for both pan and price-axis zoom)
     if (this.callbacks.getPaneAtY) {
       const pane = this.callbacks.getPaneAtY(y);
@@ -580,6 +587,11 @@ export class EventManager {
       // Save crosshair position at touch start for tracking during drag
       this.state.dragStartCrosshairX = this.crosshair.x;
       this.state.dragStartCrosshairY = this.crosshair.y;
+
+      // Notify that auto-scale should be disabled when user zooms the price axis
+      if (isOverPriceAxis) {
+        this.callbacks.onAutoScaleDisabled?.();
+      }
 
       // Track which pane the touch started in (for both pan and price-axis zoom)
       if (this.callbacks.getPaneAtY) {

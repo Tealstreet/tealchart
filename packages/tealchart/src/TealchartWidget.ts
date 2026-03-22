@@ -34,7 +34,7 @@ import {
   WidgetEvent,
 } from './types';
 import { TealchartWidgetUI } from './ui/TealchartWidgetUI';
-import { captureViewScale, restoreViewport } from './viewport/viewScale';
+import { applyAutoScale, captureViewScale, restoreViewport } from './viewport/viewScale';
 
 type EventCallback = (...args: unknown[]) => void;
 
@@ -92,6 +92,9 @@ export class TealchartWidget {
 
   // Nanostores for imperative state access
   private _chartStore: ChartStore | null = null;
+
+  // Auto-scale price axis — enabled by default, disabled on price axis zoom, re-enabled on reset
+  private _autoScale: boolean = true;
 
   // Map from indicator instance ID to study ID (used for persistence tracking)
   private _indicatorStudyMap = new Map<string, string>();
@@ -405,7 +408,11 @@ export class TealchartWidget {
 
         // Restore viewport from proportional viewScale if available
         if (this._viewScale && bars.length > 0) {
-          const vp = restoreViewport(this._viewScale, bars);
+          let vp = restoreViewport(this._viewScale, bars);
+          // Apply auto-scale if enabled
+          if (this._autoScale) {
+            vp = applyAutoScale(vp, bars);
+          }
           this._viewport = vp;
           this._ui?.setViewport(vp);
         }
@@ -522,6 +529,16 @@ export class TealchartWidget {
     // Lightweight real-time update — goes directly to ChartCore.updateBar()
     // which handles mutation + scheduleRender internally.
     this._ui?.updateBar(bar, this._bars);
+
+    // Auto-scale: refit price axis if a new tick extends beyond visible range
+    if (this._autoScale && this._viewport) {
+      const fitted = applyAutoScale(this._viewport, this._bars);
+      if (fitted.priceMin !== this._viewport.priceMin || fitted.priceMax !== this._viewport.priceMax) {
+        this._viewport = fitted;
+        this._viewScale = captureViewScale(fitted, this._bars);
+        this._ui?.setViewport(fitted);
+      }
+    }
 
     // Also schedule a widget-level render to update the last-trade price
     // line, order/position lines, and other state computed in _doRender.
@@ -768,6 +785,22 @@ export class TealchartWidget {
         onViewportChange: (viewport) => {
           this._viewport = viewport;
           this._viewScale = captureViewScale(viewport, this._bars);
+
+          // Auto-scale: refit price axis to visible candles
+          if (this._autoScale) {
+            const fitted = applyAutoScale(viewport, this._bars);
+            if (fitted.priceMin !== viewport.priceMin || fitted.priceMax !== viewport.priceMax) {
+              this._viewport = fitted;
+              this._viewScale = captureViewScale(fitted, this._bars);
+              this._ui?.setViewport(fitted);
+            }
+          }
+        },
+        onAutoScaleDisabled: () => {
+          this._autoScale = false;
+        },
+        onResetViewport: () => {
+          this._autoScale = true;
         },
         onRequestMoreBars: (direction) => {
           this._loadMoreBars(direction);

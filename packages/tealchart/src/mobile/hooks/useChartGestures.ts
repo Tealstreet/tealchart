@@ -24,6 +24,8 @@ export interface UseChartGesturesOptions {
   viewport: Viewport | null;
   onViewportChange: (viewport: Viewport) => void;
   onSwipeBlockChange?: (blocked: boolean) => void;
+  /** Called when user starts dragging the price axis (disables auto-scale) */
+  onAutoScaleDisabled?: () => void;
 }
 
 export interface UseChartGesturesResult {
@@ -36,6 +38,7 @@ export function useChartGestures({
   viewport,
   onViewportChange,
   onSwipeBlockChange,
+  onAutoScaleDisabled,
 }: UseChartGesturesOptions): UseChartGesturesResult {
   // Shared values for gesture state (UI thread)
   const gestureZoneValue = useSharedValue<GestureZone>('chart');
@@ -191,6 +194,7 @@ export function useChartGestures({
       if (zone === 'priceAxis' && viewport) {
         gestureZoneValue.value = zone;
         priceAxisStartRange.value = viewport.priceMax - viewport.priceMin;
+        onAutoScaleDisabled?.();
       } else if (zone === 'timeAxis' && viewport) {
         gestureZoneValue.value = zone;
         timeAxisStartRange.value = viewport.endTime - viewport.startTime;
@@ -209,6 +213,7 @@ export function useChartGestures({
       dimensions,
       viewport,
       onSwipeBlockChange,
+      onAutoScaleDisabled,
       gestureZoneValue,
       priceAxisStartRange,
       timeAxisStartRange,

@@ -2,7 +2,7 @@ import type { Bar, Viewport } from '../types';
 
 import { describe, expect, it } from 'vitest';
 
-import { captureViewScale, getVisibleBarsBoundingBox, restoreViewport } from './viewScale';
+import { applyAutoScale, captureViewScale, getVisibleBarsBoundingBox, restoreViewport } from './viewScale';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -281,5 +281,113 @@ describe('edge cases', () => {
     expect(viewScale.rightOffsetMs).toBe(0);
     expect(viewScale.pricePaddingTop).toBe(0.05);
     expect(viewScale.pricePaddingBottom).toBe(0.05);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// applyAutoScale
+// ---------------------------------------------------------------------------
+
+describe('applyAutoScale', () => {
+  it('fits price axis to visible bars with default 10% padding', () => {
+    const bars = makeBars(10, { startTime: 1_000_000, interval: 60_000, basePrice: 100, spread: 20 });
+    const viewport: Viewport = {
+      startTime: bars[0].time,
+      endTime: bars[bars.length - 1].time,
+      priceMin: 0,
+      priceMax: 200,
+    };
+
+    const result = applyAutoScale(viewport, bars);
+
+    // Time axis should be unchanged
+    expect(result.startTime).toBe(viewport.startTime);
+    expect(result.endTime).toBe(viewport.endTime);
+
+    // Price axis should be fitted to visible bars with padding
+    const bbox = getVisibleBarsBoundingBox(bars, viewport.startTime, viewport.endTime)!;
+    const dataRange = bbox.highest - bbox.lowest;
+    expect(result.priceMax).toBeCloseTo(bbox.highest + dataRange * 0.1, 5);
+    expect(result.priceMin).toBeCloseTo(bbox.lowest - dataRange * 0.1, 5);
+  });
+
+  it('handles flat price (all bars same price)', () => {
+    const bars = makeConstantBars(10, 42_000);
+    const viewport: Viewport = {
+      startTime: bars[0].time,
+      endTime: bars[bars.length - 1].time,
+      priceMin: 41_000,
+      priceMax: 43_000,
+    };
+
+    const result = applyAutoScale(viewport, bars);
+
+    // Should produce a valid range centered around 42_000
+    expect(result.priceMax).toBeGreaterThan(42_000);
+    expect(result.priceMin).toBeLessThan(42_000);
+    expect(result.priceMax - result.priceMin).toBeGreaterThan(0);
+  });
+
+  it('returns viewport unchanged when no visible bars', () => {
+    const bars = makeBars(10, { startTime: 1_000_000, interval: 60_000 });
+    const viewport: Viewport = {
+      startTime: 0,
+      endTime: 500_000, // Before all bars
+      priceMin: 100,
+      priceMax: 200,
+    };
+
+    const result = applyAutoScale(viewport, bars);
+
+    expect(result).toEqual(viewport);
+  });
+
+  it('returns viewport unchanged for empty bars array', () => {
+    const viewport: Viewport = {
+      startTime: 0,
+      endTime: 1_000_000,
+      priceMin: 100,
+      priceMax: 200,
+    };
+
+    const result = applyAutoScale(viewport, []);
+
+    expect(result).toEqual(viewport);
+  });
+
+  it('respects custom padding parameter', () => {
+    const bars = makeBars(10, { startTime: 1_000_000, interval: 60_000, basePrice: 100, spread: 20 });
+    const viewport: Viewport = {
+      startTime: bars[0].time,
+      endTime: bars[bars.length - 1].time,
+      priceMin: 0,
+      priceMax: 200,
+    };
+
+    const bbox = getVisibleBarsBoundingBox(bars, viewport.startTime, viewport.endTime)!;
+    const dataRange = bbox.highest - bbox.lowest;
+
+    const result20 = applyAutoScale(viewport, bars, 0.2);
+    expect(result20.priceMax).toBeCloseTo(bbox.highest + dataRange * 0.2, 5);
+    expect(result20.priceMin).toBeCloseTo(bbox.lowest - dataRange * 0.2, 5);
+
+    const result5 = applyAutoScale(viewport, bars, 0.05);
+    expect(result5.priceMax).toBeCloseTo(bbox.highest + dataRange * 0.05, 5);
+    expect(result5.priceMin).toBeCloseTo(bbox.lowest - dataRange * 0.05, 5);
+  });
+
+  it('preserves time axis exactly', () => {
+    const bars = makeBars(20, { startTime: 1_000_000, interval: 60_000, basePrice: 50_000 });
+    const viewport: Viewport = {
+      startTime: bars[5].time,
+      endTime: bars[15].time,
+      priceMin: 10_000,
+      priceMax: 90_000,
+    };
+
+    const result = applyAutoScale(viewport, bars);
+
+    expect(result.startTime).toBe(viewport.startTime);
+    expect(result.endTime).toBe(viewport.endTime);
   });
 });
