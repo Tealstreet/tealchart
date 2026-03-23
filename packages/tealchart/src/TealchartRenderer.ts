@@ -1681,10 +1681,12 @@ export class TealchartRenderer {
     ctx.stroke();
 
     // Draw horizontal crosshair line across chart area
+    // Stop short of the + context menu button (18px wide + 2px offset + 2px gap)
     if (y >= margins.top && y <= options.height - margins.bottom) {
+      const rightStop = options.width - margins.right - 22;
       ctx.beginPath();
       ctx.moveTo(margins.left, y);
-      ctx.lineTo(options.width - margins.right, y);
+      ctx.lineTo(rightStop, y);
       ctx.stroke();
     }
     ctx.setLineDash([]);
