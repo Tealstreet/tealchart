@@ -932,9 +932,11 @@ export class TealchartWidget {
           autoScaleRanges.set(indicatorPane.id, range);
         }
       }
-      if (autoScaleRanges.size > 0) {
-        this._ui.setPaneYRanges(autoScaleRanges);
-      }
+      // Always push ranges (even empty) so stale ranges are cleared on symbol switch / indicator removal
+      this._ui?.setPaneYRanges(autoScaleRanges);
+    } else {
+      // Preconditions not met — clear any existing auto-scale ranges
+      this._ui?.setPaneYRanges(new Map());
     }
 
     // Update active indicators

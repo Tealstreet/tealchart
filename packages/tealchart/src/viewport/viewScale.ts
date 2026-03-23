@@ -137,7 +137,7 @@ export function applyAutoScale(viewport: Viewport, bars: Bar[], padding: number 
 
   if (dataRange === 0) {
     // All visible bars are the same price — use a small default range
-    const safePadding = bbox.highest * 0.01 || 1;
+    const safePadding = Math.abs(bbox.highest) * 0.01 || 1;
     return {
       ...viewport,
       priceMax: bbox.highest + safePadding,
@@ -190,7 +190,7 @@ export function restoreViewport(viewScale: ViewScaleState, bars: Bar[]): Viewpor
 
   if (dataRange === 0) {
     // All visible bars are the same price — use a small default range
-    const safePadding = bbox.highest * 0.01 || 1;
+    const safePadding = Math.abs(bbox.highest) * 0.01 || 1;
     return {
       startTime,
       endTime,

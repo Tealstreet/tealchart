@@ -197,8 +197,33 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
 
   // Get indicator state from manager
   const plots = indicatorManagerRef.current?.getPlots() || [];
-  const unifiedPaneLayout = indicatorManagerRef.current?.getUnifiedLayout() || unifiedLayout;
+  const baseUnifiedPaneLayout = indicatorManagerRef.current?.getUnifiedLayout() || unifiedLayout;
   const indicatorPaneInfo = indicatorManagerRef.current?.getIndicatorPaneInfo() || {};
+
+  // Compute auto-scale Y ranges for indicator panes (matching TealchartWidget behavior)
+  const unifiedPaneLayout = useMemo(() => {
+    if (!viewport || plots.length === 0 || !baseUnifiedPaneLayout) return baseUnifiedPaneLayout;
+
+    return {
+      ...baseUnifiedPaneLayout,
+      panes: baseUnifiedPaneLayout.panes.map((pane) => {
+        if (pane.type !== 'indicator' || pane.fixedRange || !pane.indicatorIds) return pane;
+
+        const range = autoScaleManagerRef.current.applyToPaneYRange(
+          pane.id,
+          plots,
+          pane.indicatorIds,
+          bars,
+          viewport.startTime,
+          viewport.endTime,
+        );
+        if (range) {
+          return { ...pane, yMin: range.yMin, yMax: range.yMax };
+        }
+        return pane;
+      }),
+    };
+  }, [baseUnifiedPaneLayout, viewport, plots, bars]);
   const activeIndicatorIds = indicatorManagerRef.current?.getIndicators().map((ind) => ind.indicator.id) || [];
 
   // Handle indicator addition
@@ -360,7 +385,8 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     autoScaleManagerRef.current.resetAll();
     setAutoScaleAllEnabled(true);
     if (bars.length > 0) {
-      const vp = TealchartRenderer.calculateViewport(bars);
+      const baseVp = TealchartRenderer.calculateViewport(bars);
+      const vp = autoScaleManagerRef.current.applyToViewport(baseVp, bars);
       setViewport(vp);
       viewScaleRef.current = captureViewScale(vp, bars);
       onViewportChange?.(vp);
