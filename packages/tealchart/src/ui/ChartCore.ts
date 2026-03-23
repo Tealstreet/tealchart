@@ -559,7 +559,7 @@ export class ChartCore {
           pendingPrice: newPrice,
           originalPrice,
           startTime: Date.now(),
-          timeoutId: window.setTimeout(() => {
+          timeoutId: setTimeout(() => {
             this.pendingOrders.delete(orderId);
             this.interactiveLineRenderer.forceRebuild();
             this.scheduleRender();
