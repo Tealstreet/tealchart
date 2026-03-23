@@ -1664,7 +1664,7 @@ export class TealchartRenderer {
     ctx.scale(options.devicePixelRatio, options.devicePixelRatio);
 
     // Draw vertical crosshair line
-    ctx.strokeStyle = crosshair.color || options.crosshairColor;
+    ctx.strokeStyle = options.crosshairColor;
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
