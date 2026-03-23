@@ -575,9 +575,17 @@ export class ChartCore {
       onTPClick: (positionId) => this.options.onTPClick?.(positionId),
       onSLClick: (positionId) => this.options.onSLClick?.(positionId),
       formatPrice: (price) => {
-        const decimals =
-          this.options.renderOptions?.pricePrecision ??
-          getDecimalPlacesFromPrecision(this.viewport?.priceMax ?? 0, this.viewport?.priceMin ?? 0);
+        const pricePrecision = this.options.renderOptions?.pricePrecision;
+        let decimals: number;
+        if (pricePrecision && pricePrecision > 0) {
+          decimals = getDecimalPlacesFromPrecision(pricePrecision);
+        } else {
+          const priceRange = (this.viewport?.priceMax ?? 0) - (this.viewport?.priceMin ?? 0);
+          if (priceRange >= 10) decimals = 0;
+          else if (priceRange >= 1) decimals = 1;
+          else if (priceRange >= 0.1) decimals = 2;
+          else decimals = 4;
+        }
         return getNumberFormatter(decimals).format(price);
       },
       onCursorChange: (cursor) => {
