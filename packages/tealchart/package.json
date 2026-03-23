@@ -27,11 +27,12 @@
     "@fortawesome/react-fontawesome": "^3.3.0",
     "@nanostores/persistent": "^1.2.0",
     "@nanostores/react": "^1.0.0",
-    "nanostores": "^1.1.0",
     "@tealstreet/react-colorful": "*",
     "@tealstreet/tealscript": "*",
     "jotai": "^2.18.1",
     "jotai-optics": "^0.4.0",
+    "konva": "^10.2.3",
+    "nanostores": "^1.1.0",
     "optics-ts": "^2.4.1"
   },
   "devDependencies": {
