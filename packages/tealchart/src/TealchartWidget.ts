@@ -30,12 +30,11 @@ import {
   ResolutionString,
   TealchartWidgetOptions,
   Viewport,
-  ViewScaleState,
   WidgetEvent,
 } from './types';
 import { TealchartWidgetUI } from './ui/TealchartWidgetUI';
-import { AutoScaleManager } from './viewport/AutoScaleManager';
-import { captureViewScale, restoreViewport } from './viewport/viewScale';
+import { ViewportController } from './viewport/ViewportController';
+import { intervalToMs } from './viewport/viewScale';
 
 type EventCallback = (...args: unknown[]) => void;
 
@@ -60,7 +59,6 @@ export class TealchartWidget {
   private _bars: Bar[] = [];
   private _barsDirty = false; // true when bars array has been replaced (not just mutated)
   private _viewport: Viewport | null = null;
-  private _viewScale: ViewScaleState | null = null;
   private _isReady = false;
   private _readyCallbacks: Array<() => void> = [];
 
@@ -94,8 +92,8 @@ export class TealchartWidget {
   // Nanostores for imperative state access
   private _chartStore: ChartStore | null = null;
 
-  // Unified auto-scale manager for all panes (main + indicator)
-  private _autoScaleManager = new AutoScaleManager();
+  // Unified viewport controller for all panes (main + indicator)
+  private _viewportController = new ViewportController();
 
   // Map from indicator instance ID to study ID (used for persistence tracking)
   private _indicatorStudyMap = new Map<string, string>();
@@ -350,24 +348,6 @@ export class TealchartWidget {
   // Number of bars to request initially - enough to fill viewport with buffer
   private static readonly INITIAL_BAR_COUNT = 300;
 
-  /**
-   * Convert resolution string to milliseconds
-   */
-  private _getIntervalMs(resolution: ResolutionString): number {
-    // Handle day/week resolutions
-    if (resolution === '1D' || resolution === 'D') return 24 * 60 * 60 * 1000;
-    if (resolution === '1W' || resolution === 'W') return 7 * 24 * 60 * 60 * 1000;
-
-    // Handle minute resolutions (numeric strings like "1", "5", "15", "60", "240")
-    const minutes = parseInt(resolution, 10);
-    if (!isNaN(minutes)) {
-      return minutes * 60 * 1000;
-    }
-
-    // Default to 1 hour
-    return 60 * 60 * 1000;
-  }
-
   private _loadBars(): void {
     if (!this._symbolInfo) {
       console.warn('[Tealchart] _loadBars called but no symbolInfo');
@@ -380,7 +360,7 @@ export class TealchartWidget {
     this._scheduleRender(); // Re-render to show loading state
 
     const now = Date.now();
-    const intervalMs = this._getIntervalMs(this._interval);
+    const intervalMs = intervalToMs(this._interval);
     const countBack = TealchartWidget.INITIAL_BAR_COUNT;
 
     // Calculate from time: go back countBack bars from now
@@ -407,11 +387,9 @@ export class TealchartWidget {
         this._bars = bars;
         this._barsDirty = true;
 
-        // Restore viewport from proportional viewScale if available
-        if (this._viewScale && bars.length > 0) {
-          let vp = restoreViewport(this._viewScale, bars);
-          // Apply auto-scale if enabled
-          vp = this._autoScaleManager.applyToViewport(vp, bars);
+        // Restore viewport from viewScale or calculate default (first load)
+        if (bars.length > 0) {
+          const vp = this._viewportController.handleBarsLoaded(bars, intervalToMs(this._interval));
           this._viewport = vp;
           this._ui?.setViewport(vp);
         }
@@ -453,7 +431,7 @@ export class TealchartWidget {
     this._barSubscriptionGuid = `custom_chart_${this._symbol}_${this._interval}_${Date.now()}`;
 
     // Configure gap detection with the current interval
-    const intervalMs = this._getIntervalMs(this._interval);
+    const intervalMs = intervalToMs(this._interval);
     if (this._gapDetectionManager) {
       this._gapDetectionManager.setInterval(intervalMs);
       // Record the last bar time if we have bars
@@ -530,11 +508,14 @@ export class TealchartWidget {
     this._ui?.updateBar(bar, this._bars);
 
     // Auto-scale: refit price axis if a new tick extends beyond visible range
-    if (this._autoScaleManager.isAutoScale('main') && this._viewport) {
-      const fitted = this._autoScaleManager.applyToViewport(this._viewport, this._bars);
+    if (this._viewportController.isAutoScale('main') && this._viewport) {
+      const fitted = this._viewportController.handleViewportChange(
+        this._viewport,
+        this._bars,
+        intervalToMs(this._interval),
+      );
       if (fitted.priceMin !== this._viewport.priceMin || fitted.priceMax !== this._viewport.priceMax) {
         this._viewport = fitted;
-        this._viewScale = captureViewScale(fitted, this._bars);
         this._ui?.setViewport(fitted);
       }
     }
@@ -566,7 +547,7 @@ export class TealchartWidget {
     const requestId = this._loadBarsRequestId;
 
     // Request same number of bars as initial load, going back from earliest bar
-    const intervalMs = this._getIntervalMs(this._interval);
+    const intervalMs = intervalToMs(this._interval);
     const countBack = TealchartWidget.INITIAL_BAR_COUNT;
     const toTime = Math.floor(earliestBar.time / 1000) - 1; // 1 second before earliest bar
     const fromTime = toTime - Math.floor((countBack * intervalMs) / 1000);
@@ -782,24 +763,23 @@ export class TealchartWidget {
           }
         },
         onViewportChange: (viewport) => {
-          this._viewport = viewport;
-          this._viewScale = captureViewScale(viewport, this._bars);
-
-          // Auto-scale: refit price axis to visible candles
-          const fitted = this._autoScaleManager.applyToViewport(viewport, this._bars);
+          const fitted = this._viewportController.handleViewportChange(
+            viewport,
+            this._bars,
+            intervalToMs(this._interval),
+          );
+          this._viewport = fitted;
           if (fitted.priceMin !== viewport.priceMin || fitted.priceMax !== viewport.priceMax) {
-            this._viewport = fitted;
-            this._viewScale = captureViewScale(fitted, this._bars);
             this._ui?.setViewport(fitted);
           }
         },
         onAutoScaleDisabled: (paneId: string) => {
-          this._autoScaleManager.disableAutoScale(paneId);
+          this._viewportController.disableAutoScale(paneId);
         },
         onResetViewport: () => {
-          this._autoScaleManager.resetAll();
+          this._viewportController.handleReset(this._bars, intervalToMs(this._interval));
         },
-        isAutoScale: (paneId: string) => this._autoScaleManager.isAutoScale(paneId),
+        isAutoScale: (paneId: string) => this._viewportController.isAutoScale(paneId),
         onRequestMoreBars: (direction) => {
           this._loadMoreBars(direction);
         },
@@ -879,7 +859,7 @@ export class TealchartWidget {
     // Create and set last trade line
     const latestBar = this._bars.length > 0 ? this._bars[this._bars.length - 1] : null;
     if (latestBar) {
-      const intervalMs = this._getIntervalMs(this._interval);
+      const intervalMs = intervalToMs(this._interval);
       // Handle bar time in either seconds or milliseconds
       const barTimeMs = latestBar.time < 1e12 ? latestBar.time * 1000 : latestBar.time;
       const barCloseTime = barTimeMs + intervalMs;
@@ -915,23 +895,15 @@ export class TealchartWidget {
     const paneLayout = this._paneManager.getLayout();
     this._ui.setPaneLayout(paneLayout);
 
-    // Compute auto-scale Y ranges for indicator panes via AutoScaleManager
+    // Compute auto-scale Y ranges for indicator panes via ViewportController
     if (this._viewport && paneLayout && this._plots.length > 0) {
-      const autoScaleRanges = new Map<string, { yMin: number; yMax: number }>();
-      for (const indicatorPane of paneLayout.indicatorPanes) {
-        if (indicatorPane.fixedRange) continue; // Skip fixed-range indicators (e.g. RSI 0-100)
-        const range = this._autoScaleManager.applyToPaneYRange(
-          indicatorPane.id,
-          this._plots,
-          indicatorPane.indicatorIds,
-          this._bars,
-          this._viewport.startTime,
-          this._viewport.endTime,
-        );
-        if (range) {
-          autoScaleRanges.set(indicatorPane.id, range);
-        }
-      }
+      const autoScaleRanges = this._viewportController.computePaneYRanges(
+        paneLayout.indicatorPanes,
+        this._plots,
+        this._bars,
+        this._viewport.startTime,
+        this._viewport.endTime,
+      );
       // Always push ranges (even empty) so stale ranges are cleared on symbol switch / indicator removal
       this._ui?.setPaneYRanges(autoScaleRanges);
     } else {

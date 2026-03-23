@@ -8,6 +8,7 @@ import {
   captureViewScale,
   getVisibleBarsBoundingBox,
   getVisiblePlotRange,
+  intervalToMs,
   restoreViewport,
 } from './viewScale';
 
@@ -49,6 +50,47 @@ function makeConstantBars(count: number, price: number, startTime = 1_000_000, i
 }
 
 // ---------------------------------------------------------------------------
+// intervalToMs
+// ---------------------------------------------------------------------------
+
+describe('intervalToMs', () => {
+  it('converts minute resolutions', () => {
+    expect(intervalToMs('1')).toBe(60_000);
+    expect(intervalToMs('5')).toBe(300_000);
+    expect(intervalToMs('15')).toBe(900_000);
+    expect(intervalToMs('60')).toBe(3_600_000);
+    expect(intervalToMs('240')).toBe(14_400_000);
+  });
+
+  it('converts suffixed resolutions (h, m, s)', () => {
+    expect(intervalToMs('1h')).toBe(3_600_000);
+    expect(intervalToMs('4H')).toBe(14_400_000);
+    expect(intervalToMs('5m')).toBe(300_000);
+    expect(intervalToMs('30S')).toBe(30_000);
+    expect(intervalToMs('1s')).toBe(1_000);
+  });
+
+  it('converts day resolutions (case-insensitive)', () => {
+    expect(intervalToMs('1D')).toBe(86_400_000);
+    expect(intervalToMs('D')).toBe(86_400_000);
+    expect(intervalToMs('1d')).toBe(86_400_000);
+    expect(intervalToMs('d')).toBe(86_400_000);
+  });
+
+  it('converts week resolutions (case-insensitive)', () => {
+    expect(intervalToMs('1W')).toBe(604_800_000);
+    expect(intervalToMs('W')).toBe(604_800_000);
+    expect(intervalToMs('1w')).toBe(604_800_000);
+    expect(intervalToMs('w')).toBe(604_800_000);
+  });
+
+  it('defaults to 1 hour for unknown resolutions', () => {
+    expect(intervalToMs('unknown')).toBe(3_600_000);
+    expect(intervalToMs('')).toBe(3_600_000);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // getVisibleBarsBoundingBox
 // ---------------------------------------------------------------------------
 
@@ -80,7 +122,7 @@ describe('getVisibleBarsBoundingBox', () => {
 
   it('returns bounding box for partially visible bars', () => {
     const bars = makeBars(10, { startTime: 1_000_000, interval: 60_000, basePrice: 100, spread: 20 });
-    // Only include bars 3–6 (indices)
+    // Only include bars 3-6 (indices)
     const startTime = bars[3].time;
     const endTime = bars[6].time;
     const result = getVisibleBarsBoundingBox(bars, startTime, endTime);
@@ -110,12 +152,13 @@ describe('getVisibleBarsBoundingBox', () => {
 });
 
 // ---------------------------------------------------------------------------
-// captureViewScale → restoreViewport round-trip
+// captureViewScale / restoreViewport round-trip
 // ---------------------------------------------------------------------------
 
 describe('captureViewScale / restoreViewport round-trip', () => {
   it('produces the same viewport within floating point tolerance', () => {
-    const bars = makeBars(100);
+    const intervalMs = 60_000;
+    const bars = makeBars(100, { interval: intervalMs });
     const viewport: Viewport = {
       startTime: bars[20].time,
       endTime: bars[80].time,
@@ -123,8 +166,8 @@ describe('captureViewScale / restoreViewport round-trip', () => {
       priceMax: bars[80].high + 50,
     };
 
-    const viewScale = captureViewScale(viewport, bars);
-    const restored = restoreViewport(viewScale, bars);
+    const viewScale = captureViewScale(viewport, bars, intervalMs);
+    const restored = restoreViewport(viewScale, bars, intervalMs);
 
     expect(restored.startTime).toBeCloseTo(viewport.startTime, 0);
     expect(restored.endTime).toBeCloseTo(viewport.endTime, 0);
@@ -133,7 +176,8 @@ describe('captureViewScale / restoreViewport round-trip', () => {
   });
 
   it('handles viewport at the exact edges of the bar range', () => {
-    const bars = makeBars(50);
+    const intervalMs = 60_000;
+    const bars = makeBars(50, { interval: intervalMs });
     const viewport: Viewport = {
       startTime: bars[0].time,
       endTime: bars[bars.length - 1].time,
@@ -141,8 +185,8 @@ describe('captureViewScale / restoreViewport round-trip', () => {
       priceMax: bars[bars.length - 1].high + 10,
     };
 
-    const viewScale = captureViewScale(viewport, bars);
-    const restored = restoreViewport(viewScale, bars);
+    const viewScale = captureViewScale(viewport, bars, intervalMs);
+    const restored = restoreViewport(viewScale, bars, intervalMs);
 
     expect(restored.startTime).toBeCloseTo(viewport.startTime, 0);
     expect(restored.endTime).toBeCloseTo(viewport.endTime, 0);
@@ -156,8 +200,9 @@ describe('captureViewScale / restoreViewport round-trip', () => {
 // ---------------------------------------------------------------------------
 
 describe('cross-symbol restore', () => {
-  it('capture from XRP bars (~1.5), restore with BTC bars (~68000) — prices in BTC range', () => {
-    const xrpBars = makeBars(100, { basePrice: 1.5, spread: 0.05, interval: 60_000 });
+  it('capture from XRP bars (~1.5), restore with BTC bars (~68000) -- prices in BTC range', () => {
+    const intervalMs = 60_000;
+    const xrpBars = makeBars(100, { basePrice: 1.5, spread: 0.05, interval: intervalMs });
     const xrpViewport: Viewport = {
       startTime: xrpBars[20].time,
       endTime: xrpBars[80].time,
@@ -165,25 +210,25 @@ describe('cross-symbol restore', () => {
       priceMax: 2.5,
     };
 
-    const viewScale = captureViewScale(xrpViewport, xrpBars);
+    const viewScale = captureViewScale(xrpViewport, xrpBars, intervalMs);
 
-    const btcBars = makeBars(100, { basePrice: 68_000, spread: 500, interval: 60_000 });
-    const restored = restoreViewport(viewScale, btcBars);
+    const btcBars = makeBars(100, { basePrice: 68_000, spread: 500, interval: intervalMs });
+    const restored = restoreViewport(viewScale, btcBars, intervalMs);
 
     // Prices should be in BTC range, not XRP range
     expect(restored.priceMin).toBeGreaterThan(60_000);
     expect(restored.priceMax).toBeLessThan(80_000);
-    // Time range should be preserved
+    // Bar count should be preserved (same interval), so time range should also be preserved
     expect(restored.endTime - restored.startTime).toBeCloseTo(xrpViewport.endTime - xrpViewport.startTime, 0);
   });
 });
 
 // ---------------------------------------------------------------------------
-// Interval change
+// Interval change — bar count preserved (NEW behavior)
 // ---------------------------------------------------------------------------
 
 describe('interval change', () => {
-  it('capture with 1h bars, restore with 4h bars — time range preserved', () => {
+  it('capture with 1h bars, restore with 4h bars -- bar count preserved, time range scales', () => {
     const oneHourMs = 3_600_000;
     const fourHourMs = 4 * oneHourMs;
 
@@ -195,15 +240,67 @@ describe('interval change', () => {
       priceMax: 51_000,
     };
 
-    const viewScale = captureViewScale(viewport1h, bars1h);
+    const viewScale = captureViewScale(viewport1h, bars1h, oneHourMs);
+
+    // Should have captured 60 bars worth of visible range
+    expect(viewScale.visibleBarCount).toBeCloseTo(60, 5);
 
     const bars4h = makeBars(100, { interval: fourHourMs, basePrice: 50_000 });
-    const restored = restoreViewport(viewScale, bars4h);
+    const restored = restoreViewport(viewScale, bars4h, fourHourMs);
 
-    // Time range should be the same duration
-    const originalDuration = viewport1h.endTime - viewport1h.startTime;
+    // Bar count preserved: 60 bars * 4h = 240h time range (vs original 60h)
     const restoredDuration = restored.endTime - restored.startTime;
-    expect(restoredDuration).toBeCloseTo(originalDuration, 0);
+    const expectedDuration = viewScale.visibleBarCount * fourHourMs;
+    expect(restoredDuration).toBeCloseTo(expectedDuration, 0);
+
+    // Time range should be 4x larger (60 bars at 4h vs 60 bars at 1h)
+    const originalDuration = viewport1h.endTime - viewport1h.startTime;
+    expect(restoredDuration).toBeCloseTo(originalDuration * 4, 0);
+  });
+
+  it('capture with 1h bars, restore with 5m bars -- bar count preserved, time range scales', () => {
+    const oneHourMs = 3_600_000;
+    const fiveMinMs = 5 * 60_000;
+
+    const bars1h = makeBars(50, { interval: oneHourMs, basePrice: 50_000 });
+    const viewport: Viewport = {
+      startTime: bars1h[0].time,
+      endTime: bars1h[49].time,
+      priceMin: 49_500,
+      priceMax: 51_000,
+    };
+
+    const viewScale = captureViewScale(viewport, bars1h, oneHourMs);
+    expect(viewScale.visibleBarCount).toBeCloseTo(49, 5);
+
+    const bars5m = makeBars(500, { interval: fiveMinMs, basePrice: 50_000 });
+    const restored = restoreViewport(viewScale, bars5m, fiveMinMs);
+
+    // Time range should be much smaller (49 bars * 5m vs 49 bars * 1h)
+    const restoredDuration = restored.endTime - restored.startTime;
+    const expectedDuration = viewScale.visibleBarCount * fiveMinMs;
+    expect(restoredDuration).toBeCloseTo(expectedDuration, 0);
+  });
+
+  it('fractional bar counts round-trip correctly', () => {
+    const intervalMs = 60_000;
+    const bars = makeBars(100, { interval: intervalMs });
+
+    // Create a viewport that doesn't align to bar boundaries (fractional bar count)
+    const viewport: Viewport = {
+      startTime: bars[20].time + intervalMs / 3, // 1/3 into bar 20
+      endTime: bars[80].time + intervalMs / 2, // 1/2 into bar 80
+      priceMin: 49_500,
+      priceMax: 51_000,
+    };
+
+    const viewScale = captureViewScale(viewport, bars, intervalMs);
+    // Should not be a whole number
+    expect(viewScale.visibleBarCount % 1).not.toBe(0);
+
+    const restored = restoreViewport(viewScale, bars, intervalMs);
+    expect(restored.startTime).toBeCloseTo(viewport.startTime, 0);
+    expect(restored.endTime).toBeCloseTo(viewport.endTime, 0);
   });
 });
 
@@ -214,13 +311,13 @@ describe('interval change', () => {
 describe('edge cases', () => {
   it('restoreViewport with empty bars returns a default viewport', () => {
     const viewScale = {
-      visibleTimeRange: 3_600_000,
-      rightOffsetMs: 0,
+      visibleBarCount: 60,
+      rightOffsetBars: 0,
       pricePaddingTop: 0.05,
       pricePaddingBottom: 0.05,
     };
 
-    const result = restoreViewport(viewScale, []);
+    const result = restoreViewport(viewScale, [], 3_600_000);
     // Should return something reasonable (from calculateViewport defaults)
     expect(result).toHaveProperty('startTime');
     expect(result).toHaveProperty('endTime');
@@ -230,7 +327,8 @@ describe('edge cases', () => {
   });
 
   it('captureViewScale with single bar uses default padding', () => {
-    const bars = makeBars(1, { basePrice: 100, spread: 10 });
+    const intervalMs = 60_000;
+    const bars = makeBars(1, { basePrice: 100, spread: 10, interval: intervalMs });
     const viewport: Viewport = {
       startTime: bars[0].time - 30_000,
       endTime: bars[0].time + 30_000,
@@ -238,14 +336,15 @@ describe('edge cases', () => {
       priceMax: 110,
     };
 
-    const viewScale = captureViewScale(viewport, bars);
-    expect(viewScale.visibleTimeRange).toBe(60_000);
+    const viewScale = captureViewScale(viewport, bars, intervalMs);
+    expect(viewScale.visibleBarCount).toBeCloseTo(1, 5);
     expect(typeof viewScale.pricePaddingTop).toBe('number');
     expect(typeof viewScale.pricePaddingBottom).toBe('number');
   });
 
   it('captureViewScale with all bars same price keeps default padding', () => {
-    const bars = makeConstantBars(10, 42_000);
+    const intervalMs = 60_000;
+    const bars = makeConstantBars(10, 42_000, 1_000_000, intervalMs);
     const viewport: Viewport = {
       startTime: bars[0].time,
       endTime: bars[bars.length - 1].time,
@@ -253,22 +352,23 @@ describe('edge cases', () => {
       priceMax: 42_100,
     };
 
-    const viewScale = captureViewScale(viewport, bars);
-    // dataRange === 0 → default padding 0.05
+    const viewScale = captureViewScale(viewport, bars, intervalMs);
+    // dataRange === 0 -> default padding 0.05
     expect(viewScale.pricePaddingTop).toBe(0.05);
     expect(viewScale.pricePaddingBottom).toBe(0.05);
   });
 
   it('restoreViewport with all bars same price produces valid viewport', () => {
-    const bars = makeConstantBars(10, 42_000);
+    const intervalMs = 60_000;
+    const bars = makeConstantBars(10, 42_000, 1_000_000, intervalMs);
     const viewScale = {
-      visibleTimeRange: bars[bars.length - 1].time - bars[0].time,
-      rightOffsetMs: 0,
+      visibleBarCount: (bars[bars.length - 1].time - bars[0].time) / intervalMs,
+      rightOffsetBars: 0,
       pricePaddingTop: 0.1,
       pricePaddingBottom: 0.1,
     };
 
-    const result = restoreViewport(viewScale, bars);
+    const result = restoreViewport(viewScale, bars, intervalMs);
     expect(result.priceMax).toBeGreaterThan(result.priceMin);
     // Should be centered around 42_000
     expect(result.priceMax).toBeGreaterThan(42_000);
@@ -276,6 +376,7 @@ describe('edge cases', () => {
   });
 
   it('captureViewScale with empty bars returns defaults', () => {
+    const intervalMs = 3_600_000;
     const viewport: Viewport = {
       startTime: 0,
       endTime: 3_600_000,
@@ -283,11 +384,44 @@ describe('edge cases', () => {
       priceMax: 100,
     };
 
-    const viewScale = captureViewScale(viewport, []);
-    expect(viewScale.visibleTimeRange).toBe(3_600_000);
-    expect(viewScale.rightOffsetMs).toBe(0);
+    const viewScale = captureViewScale(viewport, [], intervalMs);
+    expect(viewScale.visibleBarCount).toBeCloseTo(1, 5);
+    expect(viewScale.rightOffsetBars).toBe(0);
     expect(viewScale.pricePaddingTop).toBe(0.05);
     expect(viewScale.pricePaddingBottom).toBe(0.05);
+  });
+
+  it('captureViewScale guards against zero intervalMs', () => {
+    const bars = makeBars(10);
+    const viewport: Viewport = {
+      startTime: bars[0].time,
+      endTime: bars[9].time,
+      priceMin: 49_000,
+      priceMax: 51_000,
+    };
+
+    // Should not throw, should use fallback interval
+    const viewScale = captureViewScale(viewport, bars, 0);
+    expect(viewScale.visibleBarCount).toBeGreaterThan(0);
+    expect(isFinite(viewScale.visibleBarCount)).toBe(true);
+  });
+
+  it('negative rightOffsetBars is preserved (user scrolled left)', () => {
+    const intervalMs = 60_000;
+    const bars = makeBars(100, { interval: intervalMs });
+    // endTime is before the last bar
+    const viewport: Viewport = {
+      startTime: bars[10].time,
+      endTime: bars[70].time,
+      priceMin: 49_000,
+      priceMax: 51_000,
+    };
+
+    const viewScale = captureViewScale(viewport, bars, intervalMs);
+    expect(viewScale.rightOffsetBars).toBeLessThan(0);
+
+    const restored = restoreViewport(viewScale, bars, intervalMs);
+    expect(restored.endTime).toBeCloseTo(viewport.endTime, 0);
   });
 });
 

@@ -22,11 +22,12 @@ export interface Viewport {
 }
 
 // ViewScaleState captures the proportional view state for viewport preservation
-// across symbol/interval/account changes. Time axis is in ms (works across intervals),
-// price axis is proportional (works across symbols with different price ranges).
+// across symbol/interval/account changes. Time axis is bar-count-based so that
+// switching intervals preserves the number of visible candles (matching TradingView).
+// Price axis is proportional (works across symbols with different price ranges).
 export interface ViewScaleState {
-  visibleTimeRange: number; // viewport.endTime - viewport.startTime
-  rightOffsetMs: number; // viewport.endTime - latestBarTime
+  visibleBarCount: number; // number of candles visible (fractional OK)
+  rightOffsetBars: number; // bars past last bar to right edge (negative = scrolled left)
   pricePaddingTop: number; // (priceMax - highestWick) / dataRange
   pricePaddingBottom: number; // (lowestWick - priceMin) / dataRange
 }

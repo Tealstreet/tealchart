@@ -13,6 +13,51 @@ import type { Bar, Viewport, ViewScaleState } from '../types';
 import { TealchartRenderer } from '../TealchartRenderer';
 
 /**
+ * Convert a resolution string (e.g., "1", "5", "15", "60", "240", "1h", "1D", "1W")
+ * to its duration in milliseconds.
+ *
+ * Extracted from TealchartWidget._getIntervalMs() so both web and mobile can share it.
+ */
+export function intervalToMs(resolution: string): number {
+  const trimmed = resolution.trim();
+  const upper = trimmed.toUpperCase();
+
+  // Handle day/week resolutions without numeric prefix
+  if (upper === '1D' || upper === 'D') return 24 * 60 * 60 * 1000;
+  if (upper === '1W' || upper === 'W') return 7 * 24 * 60 * 60 * 1000;
+
+  // Handle pure numeric minute resolutions (e.g., "1", "5", "15", "60", "240")
+  const numeric = Number(trimmed);
+  if (Number.isFinite(numeric) && numeric > 0) {
+    return numeric * 60 * 1000;
+  }
+
+  // Handle suffixed resolutions (e.g., "1h", "4H", "5m", "30S", "1D", "1W")
+  const match = trimmed.match(/^(\d+)\s*([smhdwSMHDW])$/);
+  if (match) {
+    const value = Number(match[1]);
+    const unit = match[2].toUpperCase();
+    if (value > 0) {
+      switch (unit) {
+        case 'S':
+          return value * 1000;
+        case 'M':
+          return value * 60 * 1000;
+        case 'H':
+          return value * 60 * 60 * 1000;
+        case 'D':
+          return value * 24 * 60 * 60 * 1000;
+        case 'W':
+          return value * 7 * 24 * 60 * 60 * 1000;
+      }
+    }
+  }
+
+  // Default to 1 hour
+  return 60 * 60 * 1000;
+}
+
+/**
  * Find the index of the first bar whose time >= target using binary search.
  * Returns bars.length if no such bar exists.
  */
@@ -82,17 +127,22 @@ export function getVisibleBarsBoundingBox(
 /**
  * Capture the current proportional view state from an absolute viewport + bars.
  *
- * Time axis: stored in ms — works across intervals without conversion.
+ * Time axis: stored as bar counts so that switching intervals preserves
+ * the number of visible candles (matching TradingView behavior).
  * Price axis: stored as proportional padding — works across symbols.
+ *
+ * @param intervalMs - Duration of one bar in milliseconds (from intervalToMs())
  */
-export function captureViewScale(viewport: Viewport, bars: Bar[]): ViewScaleState {
+export function captureViewScale(viewport: Viewport, bars: Bar[], intervalMs: number): ViewScaleState {
+  const safeIntervalMs = intervalMs || 3_600_000; // Guard against zero
   const visibleTimeRange = viewport.endTime - viewport.startTime;
+  const visibleBarCount = visibleTimeRange / safeIntervalMs;
 
   // Default right offset: assume latest bar is at the right edge
-  let rightOffsetMs = 0;
+  let rightOffsetBars = 0;
   if (bars.length > 0) {
     const latestBarTime = bars[bars.length - 1].time;
-    rightOffsetMs = viewport.endTime - latestBarTime;
+    rightOffsetBars = (viewport.endTime - latestBarTime) / safeIntervalMs;
   }
 
   // Default proportional padding
@@ -115,8 +165,8 @@ export function captureViewScale(viewport: Viewport, bars: Bar[]): ViewScaleStat
   }
 
   return {
-    visibleTimeRange,
-    rightOffsetMs,
+    visibleBarCount,
+    rightOffsetBars,
     pricePaddingTop,
     pricePaddingBottom,
   };
@@ -156,16 +206,19 @@ export function applyAutoScale(viewport: Viewport, bars: Bar[], padding: number 
  * Reconstruct an absolute viewport from a proportional ViewScaleState + new bars.
  *
  * If bars are empty, falls back to TealchartRenderer.calculateViewport defaults.
+ *
+ * @param intervalMs - Duration of one bar in milliseconds (from intervalToMs())
  */
-export function restoreViewport(viewScale: ViewScaleState, bars: Bar[]): Viewport {
+export function restoreViewport(viewScale: ViewScaleState, bars: Bar[], intervalMs: number): Viewport {
   if (bars.length === 0) {
     // No bars — cannot reconstruct. Return a default viewport.
     return TealchartRenderer.calculateViewport(bars);
   }
 
+  const safeIntervalMs = intervalMs || 3_600_000; // Guard against zero
   const latestBarTime = bars[bars.length - 1].time;
-  const endTime = latestBarTime + viewScale.rightOffsetMs;
-  const startTime = endTime - viewScale.visibleTimeRange;
+  const endTime = latestBarTime + viewScale.rightOffsetBars * safeIntervalMs;
+  const startTime = endTime - viewScale.visibleBarCount * safeIntervalMs;
 
   // Find the bounding box of visible bars in the new data
   const bbox = getVisibleBarsBoundingBox(bars, startTime, endTime);
