@@ -841,7 +841,8 @@ export class TealchartWidget {
     this._ui.setPlots(this._plots);
 
     // Fade canvas while loading bars (previous candles stay visible but faded)
-    this._ui.setCanvasOpacity(this._isLoadingBars ? LOADING_OPACITY : 1);
+    // Show loading dots if no candles at all
+    this._ui.setCanvasOpacity(this._isLoadingBars ? LOADING_OPACITY : 1, this._bars.length > 0);
 
     // Update order and position lines
     const orderLines = this._chartApi.getOrderLinesRenderData();

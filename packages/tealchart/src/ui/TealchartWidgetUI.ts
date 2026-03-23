@@ -124,7 +124,7 @@ export class TealchartWidgetUI {
   // DOM elements
   private rootEl: HTMLDivElement;
   private chartArea: HTMLDivElement;
-  private loadingOverlay: HTMLDivElement | null = null;
+  private loadingDots: HTMLDivElement | null = null;
 
   // Components
   private chartCore: ChartCore | null = null;
@@ -212,6 +212,30 @@ export class TealchartWidgetUI {
     });
     // Use mount() instead of getElement() to trigger onMount/render
     this.legend.mount(this.chartArea);
+
+    // Create loading dots indicator (shown when loading with no candles)
+    // Appended to the legend so it appears below the OHLC/indicator info
+    this.loadingDots = div({
+      style: {
+        display: 'none',
+        fontSize: '20px',
+        color: 'var(--tc-text-color, rgba(255, 255, 255, 0.5))',
+        letterSpacing: '1px',
+        padding: '2px 0 0 4px',
+      },
+    });
+    for (let i = 0; i < 3; i++) {
+      const dot = span({ text: '•' });
+      dot.style.animation = `tc-pulse 1.4s ease-in-out ${i * 0.15}s infinite`;
+      this.loadingDots.appendChild(dot);
+    }
+    if (!document.getElementById('tc-pulse-keyframes')) {
+      const style = document.createElement('style');
+      style.id = 'tc-pulse-keyframes';
+      style.textContent = `@keyframes tc-pulse { 0%, 100% { opacity: 0.15; } 50% { opacity: 0.8; } }`;
+      document.head.appendChild(style);
+    }
+    this.legend?.getElement()?.appendChild(this.loadingDots);
 
     // Create modals (mounted to rootEl so they're positioned within the chart)
     this.indicatorsModal = new IndicatorsModal({
@@ -444,10 +468,14 @@ export class TealchartWidgetUI {
   }
 
   /**
-   * Set canvas opacity (0.5 while loading bars, 1 when loaded)
+   * Set canvas opacity while loading + show loading dots if no candles
    */
-  setCanvasOpacity(opacity: number): void {
+  setCanvasOpacity(opacity: number, hasBars: boolean = true): void {
     this.chartCore?.setCanvasOpacity(opacity);
+    // Show loading dots only when loading AND no candles visible
+    if (this.loadingDots) {
+      this.loadingDots.style.display = opacity < 1 && !hasBars ? 'block' : 'none';
+    }
   }
 
   /**
