@@ -34,6 +34,7 @@ import {
   WidgetEvent,
 } from './types';
 import { TealchartWidgetUI } from './ui/TealchartWidgetUI';
+import { AutoScaleManager } from './viewport/AutoScaleManager';
 import { captureViewScale, restoreViewport } from './viewport/viewScale';
 
 type EventCallback = (...args: unknown[]) => void;
@@ -92,6 +93,9 @@ export class TealchartWidget {
 
   // Nanostores for imperative state access
   private _chartStore: ChartStore | null = null;
+
+  // Unified auto-scale manager for all panes (main + indicator)
+  private _autoScaleManager = new AutoScaleManager();
 
   // Map from indicator instance ID to study ID (used for persistence tracking)
   private _indicatorStudyMap = new Map<string, string>();
@@ -405,7 +409,9 @@ export class TealchartWidget {
 
         // Restore viewport from proportional viewScale if available
         if (this._viewScale && bars.length > 0) {
-          const vp = restoreViewport(this._viewScale, bars);
+          let vp = restoreViewport(this._viewScale, bars);
+          // Apply auto-scale if enabled
+          vp = this._autoScaleManager.applyToViewport(vp, bars);
           this._viewport = vp;
           this._ui?.setViewport(vp);
         }
@@ -522,6 +528,16 @@ export class TealchartWidget {
     // Lightweight real-time update — goes directly to ChartCore.updateBar()
     // which handles mutation + scheduleRender internally.
     this._ui?.updateBar(bar, this._bars);
+
+    // Auto-scale: refit price axis if a new tick extends beyond visible range
+    if (this._autoScaleManager.isAutoScale('main') && this._viewport) {
+      const fitted = this._autoScaleManager.applyToViewport(this._viewport, this._bars);
+      if (fitted.priceMin !== this._viewport.priceMin || fitted.priceMax !== this._viewport.priceMax) {
+        this._viewport = fitted;
+        this._viewScale = captureViewScale(fitted, this._bars);
+        this._ui?.setViewport(fitted);
+      }
+    }
 
     // Also schedule a widget-level render to update the last-trade price
     // line, order/position lines, and other state computed in _doRender.
@@ -768,7 +784,22 @@ export class TealchartWidget {
         onViewportChange: (viewport) => {
           this._viewport = viewport;
           this._viewScale = captureViewScale(viewport, this._bars);
+
+          // Auto-scale: refit price axis to visible candles
+          const fitted = this._autoScaleManager.applyToViewport(viewport, this._bars);
+          if (fitted.priceMin !== viewport.priceMin || fitted.priceMax !== viewport.priceMax) {
+            this._viewport = fitted;
+            this._viewScale = captureViewScale(fitted, this._bars);
+            this._ui?.setViewport(fitted);
+          }
         },
+        onAutoScaleDisabled: (paneId: string) => {
+          this._autoScaleManager.disableAutoScale(paneId);
+        },
+        onResetViewport: () => {
+          this._autoScaleManager.resetAll();
+        },
+        isAutoScale: (paneId: string) => this._autoScaleManager.isAutoScale(paneId),
         onRequestMoreBars: (direction) => {
           this._loadMoreBars(direction);
         },
@@ -883,6 +914,30 @@ export class TealchartWidget {
     // Update pane layout
     const paneLayout = this._paneManager.getLayout();
     this._ui.setPaneLayout(paneLayout);
+
+    // Compute auto-scale Y ranges for indicator panes via AutoScaleManager
+    if (this._viewport && paneLayout && this._plots.length > 0) {
+      const autoScaleRanges = new Map<string, { yMin: number; yMax: number }>();
+      for (const indicatorPane of paneLayout.indicatorPanes) {
+        if (indicatorPane.fixedRange) continue; // Skip fixed-range indicators (e.g. RSI 0-100)
+        const range = this._autoScaleManager.applyToPaneYRange(
+          indicatorPane.id,
+          this._plots,
+          indicatorPane.indicatorIds,
+          this._bars,
+          this._viewport.startTime,
+          this._viewport.endTime,
+        );
+        if (range) {
+          autoScaleRanges.set(indicatorPane.id, range);
+        }
+      }
+      // Always push ranges (even empty) so stale ranges are cleared on symbol switch / indicator removal
+      this._ui?.setPaneYRanges(autoScaleRanges);
+    } else {
+      // Preconditions not met — clear any existing auto-scale ranges
+      this._ui?.setPaneYRanges(new Map());
+    }
 
     // Update active indicators
     const studyInfos = this._chartApi.getAllStudies();

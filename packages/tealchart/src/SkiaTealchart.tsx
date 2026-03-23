@@ -37,7 +37,7 @@ import type {
 import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 
 import { Canvas, createPicture, Picture, Skia } from '@shopify/react-native-skia';
-import { LayoutChangeEvent, StyleSheet, Text, View } from 'react-native';
+import { LayoutChangeEvent, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS } from 'react-native-reanimated';
 
@@ -55,6 +55,7 @@ import { priceToY, xToTime, yToPrice } from './mobile/utils/coordinates';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
 import { DEFAULT_MARGINS } from './types';
+import { AutoScaleManager } from './viewport/AutoScaleManager';
 import { captureViewScale, restoreViewport } from './viewport/viewScale';
 
 // Indicator pane info type (matches web)
@@ -196,8 +197,33 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
 
   // Get indicator state from manager
   const plots = indicatorManagerRef.current?.getPlots() || [];
-  const unifiedPaneLayout = indicatorManagerRef.current?.getUnifiedLayout() || unifiedLayout;
+  const baseUnifiedPaneLayout = indicatorManagerRef.current?.getUnifiedLayout() || unifiedLayout;
   const indicatorPaneInfo = indicatorManagerRef.current?.getIndicatorPaneInfo() || {};
+
+  // Compute auto-scale Y ranges for indicator panes (matching TealchartWidget behavior)
+  const unifiedPaneLayout = useMemo(() => {
+    if (!viewport || plots.length === 0 || !baseUnifiedPaneLayout) return baseUnifiedPaneLayout;
+
+    return {
+      ...baseUnifiedPaneLayout,
+      panes: baseUnifiedPaneLayout.panes.map((pane) => {
+        if (pane.type !== 'indicator' || pane.fixedRange || !pane.indicatorIds) return pane;
+
+        const range = autoScaleManagerRef.current.applyToPaneYRange(
+          pane.id,
+          plots,
+          pane.indicatorIds,
+          bars,
+          viewport.startTime,
+          viewport.endTime,
+        );
+        if (range) {
+          return { ...pane, yMin: range.yMin, yMax: range.yMax };
+        }
+        return pane;
+      }),
+    };
+  }, [baseUnifiedPaneLayout, viewport, plots, bars]);
   const activeIndicatorIds = indicatorManagerRef.current?.getIndicators().map((ind) => ind.indicator.id) || [];
 
   // Handle indicator addition
@@ -262,6 +288,9 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
 
   const barsLengthRef = useRef(bars.length);
   const viewScaleRef = useRef<ViewScaleState | null>(null);
+  const autoScaleManagerRef = useRef(new AutoScaleManager());
+  // State for re-rendering the reset button when any pane has auto-scale disabled
+  const [autoScaleAllEnabled, setAutoScaleAllEnabled] = useState(true);
 
   // Track the first bar's time to detect reloads with the same count
   const barsFirstTimeRef = useRef<number | null>(bars.length > 0 ? bars[0].time : null);
@@ -290,6 +319,9 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
         newViewport = TealchartRenderer.calculateViewport(bars);
       }
 
+      // Apply auto-scale if enabled
+      newViewport = autoScaleManagerRef.current.applyToViewport(newViewport, bars);
+
       setViewport(newViewport);
       onViewportChange?.(newViewport);
     }
@@ -297,9 +329,10 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
 
   const handleViewportChange = useCallback(
     (newViewport: Viewport) => {
-      setViewport(newViewport);
-      viewScaleRef.current = captureViewScale(newViewport, bars);
-      onViewportChange?.(newViewport);
+      const vp = autoScaleManagerRef.current.applyToViewport(newViewport, bars);
+      setViewport(vp);
+      viewScaleRef.current = captureViewScale(vp, bars);
+      onViewportChange?.(vp);
     },
     [onViewportChange, bars],
   );
@@ -341,12 +374,33 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     [dimensions.width, dimensions.height, margins],
   );
 
+  const handleAutoScaleDisabled = useCallback((paneId: string) => {
+    autoScaleManagerRef.current.disableAutoScale(paneId);
+    setAutoScaleAllEnabled(false);
+  }, []);
+
+  const getIsAutoScale = useCallback((paneId: string) => autoScaleManagerRef.current.isAutoScale(paneId), []);
+
+  const handleResetViewport = useCallback(() => {
+    autoScaleManagerRef.current.resetAll();
+    setAutoScaleAllEnabled(true);
+    if (bars.length > 0) {
+      const baseVp = TealchartRenderer.calculateViewport(bars);
+      const vp = autoScaleManagerRef.current.applyToViewport(baseVp, bars);
+      setViewport(vp);
+      viewScaleRef.current = captureViewScale(vp, bars);
+      onViewportChange?.(vp);
+    }
+  }, [bars, onViewportChange]);
+
   const { composedGesture } = useChartGestures({
     dimensions: chartDimensions,
     bars,
     viewport,
     onViewportChange: handleViewportChange,
     onSwipeBlockChange,
+    onAutoScaleDisabled: handleAutoScaleDisabled,
+    isAutoScale: getIsAutoScale,
   });
 
   // ==========================================================================
@@ -676,6 +730,13 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
         <Animated.View style={[styles.absoluteFill, { width: dimensions.width, height: dimensions.height }]} />
       </GestureDetector>
 
+      {/* Reset viewport button — re-enables auto-scale */}
+      {!autoScaleAllEnabled && (
+        <TouchableOpacity style={styles.resetButton} onPress={handleResetViewport} activeOpacity={0.7}>
+          <Text style={styles.resetButtonText}>↻</Text>
+        </TouchableOpacity>
+      )}
+
       {/* Top Bar (overlay on top of chart) */}
       {showTopBar && (
         <View style={styles.topBarOverlay} pointerEvents="box-none">
@@ -733,6 +794,23 @@ const styles = StyleSheet.create({
   interactiveLayer: {
     // Interactive elements go here
     // pointerEvents="box-none" allows touches to pass through to gesture layer
+  },
+  resetButton: {
+    position: 'absolute',
+    bottom: 40, // Above time axis
+    alignSelf: 'center',
+    left: '50%',
+    marginLeft: -14, // Half of width (28)
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(42, 46, 57, 0.8)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  resetButtonText: {
+    color: '#d1d4dc',
+    fontSize: 16,
   },
 });
 

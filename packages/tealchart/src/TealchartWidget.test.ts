@@ -28,6 +28,7 @@ vi.mock('./ui/TealchartWidgetUI', () => ({
     setPositionLines() {}
     setPriceLines() {}
     setPaneLayout() {}
+    setPaneYRanges() {}
     setActiveIndicators() {}
     setRenderOptions() {}
     setSymbol(symbol: string, exchangeName?: string) {

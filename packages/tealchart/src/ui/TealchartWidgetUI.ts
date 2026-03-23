@@ -105,6 +105,12 @@ export interface TealchartWidgetUIOptions {
   onMouseUp?: () => void;
   /** Crosshair moved callback */
   onCrossHairMoved?: (price: number, time: number) => void;
+  /** Called when auto-scale should be disabled (user starts price axis zoom) */
+  onAutoScaleDisabled?: (paneId: string) => void;
+  /** Called when viewport is reset (re-enables auto-scale) */
+  onResetViewport?: () => void;
+  /** Returns whether auto-scale is active for a given pane */
+  isAutoScale?: (paneId: string) => boolean;
 }
 
 // ============================================================================
@@ -255,6 +261,9 @@ export class TealchartWidgetUI {
       onMouseDown: this.options.onMouseDown,
       onMouseUp: this.options.onMouseUp,
       onCrossHairMoved: this.options.onCrossHairMoved,
+      onAutoScaleDisabled: this.options.onAutoScaleDisabled,
+      onResetViewport: this.options.onResetViewport,
+      isAutoScale: this.options.isAutoScale,
     });
   }
 
@@ -358,6 +367,13 @@ export class TealchartWidgetUI {
   setPlots(plots: PlotOutput[]): void {
     this.currentPlots = plots; // Store for openIndicatorSettings
     this.chartCore?.setPlots(plots);
+  }
+
+  /**
+   * Set auto-scale computed Y ranges for indicator panes
+   */
+  setPaneYRanges(ranges: Map<string, { yMin: number; yMax: number }>): void {
+    this.chartCore?.setPaneYRanges(ranges);
   }
 
   /**
