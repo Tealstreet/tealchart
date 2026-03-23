@@ -118,7 +118,7 @@ export class InteractiveLineRenderer {
 
   // Last signature for dirty checking
   private lastSignature = '';
-  private lastCrosshairLabel = '';
+  private lastCrosshairVisible = false;
 
   // Pending orders
   private pendingOrders = new Map<string, PendingOrderUpdate>();
@@ -184,11 +184,11 @@ export class InteractiveLineRenderer {
     const newSignature = this.computeSignature(labelBounds);
     const structureChanged = newSignature !== this.lastSignature;
 
-    // Track crosshair label changes
+    // Track crosshair visibility changes (not text — text updates in-place)
     const crosshairBound = labelBounds.find((b) => b.type === 'crosshair');
-    const currentCrosshairLabel = crosshairBound?.label?.primaryText ?? '';
-    const crosshairLabelChanged = currentCrosshairLabel !== this.lastCrosshairLabel;
-    this.lastCrosshairLabel = currentCrosshairLabel;
+    const crosshairVisible = !!crosshairBound;
+    const crosshairVisibilityChanged = crosshairVisible !== this.lastCrosshairVisible;
+    this.lastCrosshairVisible = crosshairVisible;
 
     // During drag, never rebuild (it would destroy the captured pointer element).
     // Only update positions for non-dragged lines. Hide crosshair during drag.
@@ -204,7 +204,7 @@ export class InteractiveLineRenderer {
       this.crosshairLabel.style.display = '';
     }
 
-    if (structureChanged || crosshairLabelChanged) {
+    if (structureChanged || crosshairVisibilityChanged) {
       this.lastSignature = newSignature;
       this.rebuild(labelBounds, crosshair);
     } else {
@@ -292,11 +292,13 @@ export class InteractiveLineRenderer {
   // ==========================================================================
 
   private computeSignature(bounds: PriceLineLabelBounds[]): string {
+    // Structural signature — only properties that require DOM element rebuild.
+    // Excludes: price, primaryText, positions (handled by updatePositions fast path)
     return bounds
       .filter((b) => b.type !== 'crosshair')
       .map(
         (b) =>
-          `${b.lineId}|${b.type}|${b.color}|${b.lineStyle}|${b.draggable}|${b.chartLabel?.segments.length ?? 0}|${b.chartLabel?.buttons?.length ?? 0}|${b.label?.primaryText ?? ''}`,
+          `${b.lineId}|${b.type}|${b.color}|${b.lineStyle}|${b.draggable}|${b.chartLabel?.segments.length ?? 0}|${b.chartLabel?.buttons?.length ?? 0}`,
       )
       .join(';');
   }
@@ -365,13 +367,22 @@ export class InteractiveLineRenderer {
         labelEl.style.top = `${lineY - LABEL_HEIGHT / 2}px`;
       }
 
-      // Update price axis label position
+      // Update price axis label position and text
       const priceAxisEl = this.priceAxisElements.get(bound.lineId);
       if (priceAxisEl) {
         const priceAxisLabelX = width - bound.width - PRICE_AXIS_RIGHT_PADDING;
         const priceAxisLabelY = labelCenterY - bound.height / 2;
         priceAxisEl.style.top = `${priceAxisLabelY}px`;
         priceAxisEl.style.left = `${priceAxisLabelX}px`;
+        // Update text content in-place (avoids rebuild on price tick)
+        const primarySpan = priceAxisEl.querySelector('span');
+        if (primarySpan) {
+          if (primarySpan.textContent !== bound.label.primaryText) {
+            primarySpan.textContent = bound.label.primaryText;
+          }
+        } else if (priceAxisEl.textContent !== bound.label.primaryText) {
+          priceAxisEl.textContent = bound.label.primaryText;
+        }
       }
 
       // Update connector
@@ -388,6 +399,19 @@ export class InteractiveLineRenderer {
         } else {
           connectorEl.style.display = 'none';
         }
+      }
+    }
+
+    // Update crosshair label text + position in-place (no rebuild)
+    const crosshairBound = bounds.find((b) => b.type === 'crosshair');
+    if (this.crosshairLabel && crosshairBound) {
+      const crosshairY = crosshairBound.adjustedY;
+      this.crosshairLabel.style.top = `${crosshairY - crosshairBound.height / 2}px`;
+      const primarySpan = this.crosshairLabel.querySelector('span');
+      if (primarySpan && primarySpan.textContent !== crosshairBound.label.primaryText) {
+        primarySpan.textContent = crosshairBound.label.primaryText;
+      } else if (!primarySpan && this.crosshairLabel.textContent !== crosshairBound.label.primaryText) {
+        this.crosshairLabel.textContent = crosshairBound.label.primaryText;
       }
     }
 
@@ -557,12 +581,15 @@ export class InteractiveLineRenderer {
         const textWidth = text.length * 6 + 8;
         const isFirst = i === 0;
         const isLast = i === chartLabel.segments.length - 1;
+        const hasButtons = (chartLabel.buttons?.length ?? 0) > 0 || hasTPSLButtons;
+        // Last segment shares edge with buttons — no right rounding
+        const isVisuallyLast = isLast && !hasButtons;
 
         const segEl = document.createElement('span');
         segEl.className = 'tc-segment';
-        if (isFirst && isLast) segEl.classList.add('tc-segment-only');
+        if (isFirst && isVisuallyLast) segEl.classList.add('tc-segment-only');
         else if (isFirst) segEl.classList.add('tc-segment-first');
-        else if (isLast) segEl.classList.add('tc-segment-last');
+        else if (isVisuallyLast) segEl.classList.add('tc-segment-last');
 
         segEl.style.width = `${textWidth}px`;
         segEl.style.backgroundColor = segment.backgroundColor;
@@ -630,7 +657,10 @@ export class InteractiveLineRenderer {
       });
       buttonEl.addEventListener('mouseenter', () => this.options.onCursorChange?.('pointer'));
       buttonEl.addEventListener('mouseleave', () => {
-        if (!this.state.isDragging()) this.options.onCursorChange?.('default');
+        // Restore to parent label's cursor — 'grab' for draggable, 'default' otherwise
+        if (!this.state.isDragging()) {
+          this.options.onCursorChange?.(bound.draggable ? 'grab' : 'default');
+        }
       });
     } else if (btn.type === 'close') {
       buttonEl.textContent = '\u00d7'; // ×
@@ -640,7 +670,10 @@ export class InteractiveLineRenderer {
       });
       buttonEl.addEventListener('mouseenter', () => this.options.onCursorChange?.('pointer'));
       buttonEl.addEventListener('mouseleave', () => {
-        if (!this.state.isDragging()) this.options.onCursorChange?.('default');
+        // Restore to parent label's cursor — 'grab' for draggable, 'default' otherwise
+        if (!this.state.isDragging()) {
+          this.options.onCursorChange?.(bound.draggable ? 'grab' : 'default');
+        }
       });
     } else if (btn.type === 'reverse') {
       buttonEl.textContent = '\u21c4'; // ⇄
@@ -650,7 +683,10 @@ export class InteractiveLineRenderer {
       });
       buttonEl.addEventListener('mouseenter', () => this.options.onCursorChange?.('pointer'));
       buttonEl.addEventListener('mouseleave', () => {
-        if (!this.state.isDragging()) this.options.onCursorChange?.('default');
+        // Restore to parent label's cursor — 'grab' for draggable, 'default' otherwise
+        if (!this.state.isDragging()) {
+          this.options.onCursorChange?.(bound.draggable ? 'grab' : 'default');
+        }
       });
     }
 
@@ -732,7 +768,9 @@ export class InteractiveLineRenderer {
     buttonEl.addEventListener('pointerup', onPointerUp);
     buttonEl.addEventListener('mouseenter', () => this.options.onCursorChange?.('pointer'));
     buttonEl.addEventListener('mouseleave', () => {
-      if (!this.tpslDrag) this.options.onCursorChange?.('default');
+      if (!this.tpslDrag) {
+        this.options.onCursorChange?.(bound.draggable ? 'grab' : 'default');
+      }
     });
   }
 
