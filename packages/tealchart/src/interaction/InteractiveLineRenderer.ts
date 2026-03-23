@@ -450,21 +450,27 @@ export class InteractiveLineRenderer {
     const priceAxisLabelX = width - bound.width - PRICE_AXIS_RIGHT_PADDING;
     const priceAxisLabelY = labelCenterY - bound.height / 2;
 
-    // Skip if renderLineOnCanvas — canvas already drew the label
-    if (bound.renderLineOnCanvas) {
-      return;
-    }
-
     const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
 
+    // Use filled style for lines with background color or countdown (e.g. last-trade)
+    const isFilled = !!bound.label.backgroundColor || bound.countdownToTime !== undefined;
+
     const label = document.createElement('div');
-    label.className = 'tc-price-axis-label tc-price-axis-label-border';
+    label.className = isFilled
+      ? 'tc-price-axis-label tc-price-axis-label-filled'
+      : 'tc-price-axis-label tc-price-axis-label-border';
     label.style.left = `${priceAxisLabelX}px`;
     label.style.top = `${priceAxisLabelY}px`;
     label.style.width = `${bound.width}px`;
     label.style.height = `${bound.height}px`;
-    label.style.borderColor = bound.color;
-    label.style.color = bound.label.textColor || bound.color;
+    if (isFilled) {
+      label.style.backgroundColor = bound.label.backgroundColor || bound.color;
+      label.style.borderColor = bound.color;
+      label.style.color = bound.label.textColor || '#ffffff';
+    } else {
+      label.style.borderColor = bound.color;
+      label.style.color = bound.label.textColor || bound.color;
+    }
 
     if (secondaryText) {
       const primarySpan = document.createElement('span');
