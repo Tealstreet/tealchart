@@ -134,6 +134,14 @@ export class TealchartRenderer {
   }
 
   /**
+   * Get the configured font family string for canvas ctx.font usage.
+   * Falls back to 'sans-serif' if not set (canvas requires a concrete font, not 'inherit').
+   */
+  get font(): string {
+    return this.options.fontFamily || 'sans-serif';
+  }
+
+  /**
    * Convert legacy PaneLayout to UnifiedPaneLayout
    */
   private convertToUnifiedLayout(paneLayout?: PaneLayout): UnifiedPaneLayout {
@@ -458,7 +466,7 @@ export class TealchartRenderer {
     }
 
     ctx.fillStyle = options.textColor;
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.font}`;
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
 
@@ -512,7 +520,7 @@ export class TealchartRenderer {
     const timeMarkers = this.generateTimeMarkers(viewport, chartWidth);
 
     ctx.fillStyle = options.textColor;
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.font}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
 
@@ -529,7 +537,7 @@ export class TealchartRenderer {
   private drawNoDataMessage(): void {
     const { ctx, options } = this;
     ctx.fillStyle = options.textColor;
-    ctx.font = '14px sans-serif';
+    ctx.font = `14px ${this.font}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('No data available', options.width / 2, options.height / 2);
@@ -546,7 +554,7 @@ export class TealchartRenderer {
     const priceHeight = chartHeight - volumeHeight;
 
     // Calculate initial bounds for each label
-    const labelFont = '11px sans-serif';
+    const labelFont = `11px ${this.font}`;
     const bounds: PriceLineLabelBounds[] = priceLines.map((line) => {
       const originalY = this.priceToY(line.price, viewport, priceHeight);
       const primaryWidth = getCachedTextWidth(ctx, line.label.primaryText, labelFont);
@@ -733,7 +741,7 @@ export class TealchartRenderer {
     // Draw text
     const textColor = bound.label.textColor || color;
     ctx.fillStyle = textColor;
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.font}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
@@ -799,7 +807,7 @@ export class TealchartRenderer {
     // Draw text (contrasting color for filled background)
     const textColor = bound.label.textColor || options.backgroundColor;
     ctx.fillStyle = textColor;
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.font}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(bound.label.primaryText, labelX + bound.width / 2, labelCenterY);
@@ -828,7 +836,7 @@ export class TealchartRenderer {
     const labelHeight = 18;
 
     if (chartLabel && chartLabel.segments.length > 0) {
-      ctx.font = '11px sans-serif';
+      ctx.font = `11px ${this.font}`;
 
       // Calculate total width of chart label (no gaps between segments)
       for (const segment of chartLabel.segments) {
@@ -994,7 +1002,7 @@ export class TealchartRenderer {
     // Draw text
     const textColor = bound.label.textColor || '#ffffff';
     ctx.fillStyle = textColor;
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.font}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
@@ -1047,7 +1055,7 @@ export class TealchartRenderer {
     const _isOutsidePrice = line.price < viewport.priceMin || line.price > viewport.priceMax;
 
     // Calculate label dimensions
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.font}`;
     const text = line.textShort || line.text || '';
     const quantity = line.quantityShort || line.quantity || '';
 
@@ -1203,7 +1211,7 @@ export class TealchartRenderer {
     const lineY = Math.max(0, Math.min(options.height - margins.bottom, rawY));
 
     // Calculate label dimensions
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.font}`;
     const text = line.textShort || line.text || '';
     const quantity = line.quantityShort || line.quantity || '';
     const pnl = line.pnlShort || line.pnl || '';
@@ -1385,7 +1393,7 @@ export class TealchartRenderer {
     const priceText = this.formatPrice(price, viewport);
 
     // Calculate label dimensions
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.font}`;
     const textWidth = ctx.measureText(priceText).width;
     const labelWidth = textWidth + 8;
     const labelHeight = 16;
@@ -1412,7 +1420,7 @@ export class TealchartRenderer {
 
     // Draw text
     ctx.fillStyle = textColor;
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.font}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(priceText, labelX + labelWidth / 2, clampedLabelY + labelHeight / 2);
@@ -1522,7 +1530,7 @@ export class TealchartRenderer {
 
     // Text
     ctx.fillStyle = textColor;
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.font}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(text, x + width / 2, y + height / 2);
@@ -1638,7 +1646,7 @@ export class TealchartRenderer {
 
     // Icon text
     ctx.fillStyle = iconColor;
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.font}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(icon, x + width / 2, y + height / 2);
@@ -1686,7 +1694,7 @@ export class TealchartRenderer {
 
     // Draw time label on bottom axis (centered vertically in time axis area)
     const timeLabel = this.formatCrosshairTime(time);
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.font}`;
     const timeLabelWidth = ctx.measureText(timeLabel).width + 8;
     const timeLabelHeight = 18;
     const timeLabelX = x - timeLabelWidth / 2;
@@ -2517,7 +2525,7 @@ export class TealchartRenderer {
     }
 
     // Calculate bounds using pane coordinate system
-    const labelFont = '11px sans-serif';
+    const labelFont = `11px ${this.font}`;
     const bounds: PriceLineLabelBounds[] = allPriceLines.map((line) => {
       // Find the target pane (default to main if not specified)
       const targetPaneId = line.targetPaneId || 'main';
@@ -3221,7 +3229,7 @@ export class TealchartRenderer {
     const x = margins.left + 8;
     let y = pane.top + 16;
 
-    ctx.font = '11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.font = `11px ${this.font}`;
     ctx.fillStyle = options.textColor;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
@@ -3284,7 +3292,7 @@ export class TealchartRenderer {
     const formatter = getNumberFormatter(decimals);
 
     ctx.fillStyle = options.textColor;
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.font}`;
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
 
@@ -3626,7 +3634,7 @@ export class TealchartRenderer {
     const { ctx, options, margins } = this;
 
     // Calculate initial bounds for each label
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.font}`;
     const bounds: PriceLineLabelBounds[] = priceLines.map((line) => {
       const originalY = this.valueToY(line.price, pane);
       const primaryWidth = ctx.measureText(line.label.primaryText).width;
@@ -3782,7 +3790,7 @@ export class TealchartRenderer {
 
     // Label text
     ctx.fillStyle = bound.label.textColor || color;
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.font}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
@@ -3841,7 +3849,7 @@ export class TealchartRenderer {
 
     // Text
     ctx.fillStyle = bound.label.textColor || options.backgroundColor;
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.font}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(bound.label.primaryText, labelX + bound.width / 2, labelCenterY);
@@ -3938,7 +3946,7 @@ export class TealchartRenderer {
     const labelHeight = 18;
 
     if (chartLabel && chartLabel.segments.length > 0) {
-      ctx.font = '11px sans-serif';
+      ctx.font = `11px ${this.font}`;
       for (const segment of chartLabel.segments) {
         const text = segment.textShort || segment.text;
         chartLabelWidth += ctx.measureText(text).width + 8; // padding only, no gap
@@ -4090,7 +4098,7 @@ export class TealchartRenderer {
     ctx.stroke();
 
     ctx.fillStyle = bound.label.textColor || '#ffffff';
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.font}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
@@ -4142,7 +4150,7 @@ export class TealchartRenderer {
 
     // Draw Y-axis labels for this pane
     ctx.fillStyle = options.textColor;
-    ctx.font = '10px sans-serif';
+    ctx.font = `10px ${this.font}`;
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
 

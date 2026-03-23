@@ -499,6 +499,9 @@ export class ChartCore {
     });
     this.container.appendChild(this.chartContainer);
 
+    // Apply render options as CSS variables for HTML overlays
+    this.applyCssVars();
+
     // Create canvas
     this.canvas = document.createElement('canvas');
     this.canvas.style.display = 'block';
@@ -839,7 +842,24 @@ export class ChartCore {
   setRenderOptions(options: Partial<RenderOptions>): void {
     this.options.renderOptions = { ...this.options.renderOptions, ...options };
     this.renderer.setOptions(options);
+    this.applyCssVars();
     this.scheduleRender();
+  }
+
+  /**
+   * Apply render options as CSS variables on the chart container.
+   * HTML overlays (labels, buttons) inherit these for consistent theming.
+   */
+  private applyCssVars(): void {
+    const opts = this.options.renderOptions;
+    if (!opts) return;
+    const s = this.chartContainer.style;
+    if (opts.fontFamily) s.setProperty('--tc-font-family', opts.fontFamily);
+    if (opts.textColor) s.setProperty('--tc-text-color', opts.textColor);
+    if (opts.backgroundColor) s.setProperty('--tc-background-color', opts.backgroundColor);
+    if (opts.upColor) s.setProperty('--tc-up-color', opts.upColor);
+    if (opts.downColor) s.setProperty('--tc-down-color', opts.downColor);
+    if (opts.crosshairColor) s.setProperty('--tc-crosshair-color', opts.crosshairColor);
   }
 
   /**
