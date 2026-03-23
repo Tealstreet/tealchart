@@ -549,7 +549,24 @@ export class ChartCore {
           this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
           this.getUnifiedLayout(),
         ),
-      onOrderMove: (orderId, newPrice) => this.options.onOrderMove?.(orderId, newPrice),
+      onOrderMove: (orderId, newPrice) => {
+        // Store the original price so we can detect when the server confirms the move
+        const originalOrder = this.orderLines.find((o) => o.id === orderId);
+        const originalPrice = originalOrder?.price ?? newPrice;
+        // Hold the line at the new price until the server confirms (or timeout reverts)
+        this.pendingOrders.set(orderId, {
+          orderId,
+          pendingPrice: newPrice,
+          originalPrice,
+          startTime: Date.now(),
+          timeoutId: window.setTimeout(() => {
+            this.pendingOrders.delete(orderId);
+            this.interactiveLineRenderer.forceRebuild();
+            this.scheduleRender();
+          }, 5000),
+        });
+        this.options.onOrderMove?.(orderId, newPrice);
+      },
       onOrderCancel: (orderId) => this.options.onOrderCancel?.(orderId),
       onPositionClose: (positionId) => this.options.onPositionClose?.(positionId),
       onPositionReverse: (positionId) => this.options.onPositionReverse?.(positionId),
@@ -723,9 +740,32 @@ export class ChartCore {
    * Reference equality check - skip if same array (like React refs)
    * Skips updates during drag since orders don't change while dragging chart
    */
+  private lastOrderLinePrices = new Map<string, number>();
+
   setOrderLines(lines: OrderLineRenderData[]): void {
     if (this.eventManager.getIsDragging() || this.interactiveLineRenderer?.isDragging()) return;
-    if (lines === this.orderLines) return;
+    if (lines === this.orderLines && this.pendingOrders.size === 0) return;
+
+    // Detect which orders had their price changed since last call
+    if (this.pendingOrders.size > 0) {
+      for (const line of lines) {
+        const prevPrice = this.lastOrderLinePrices.get(line.id);
+        if (prevPrice !== undefined && prevPrice !== line.price && this.pendingOrders.has(line.id)) {
+          // This order's price changed — server confirmed or app reverted
+          const pending = this.pendingOrders.get(line.id)!;
+          clearTimeout(pending.timeoutId);
+          this.pendingOrders.delete(line.id);
+          this.interactiveLineRenderer.forceRebuild();
+        }
+      }
+    }
+
+    // Update price tracking
+    this.lastOrderLinePrices.clear();
+    for (const line of lines) {
+      this.lastOrderLinePrices.set(line.id, line.price);
+    }
+
     this.orderLines = lines;
     this.cleanupPendingOrders();
     this.scheduleRender();
@@ -1232,14 +1272,19 @@ export class ChartCore {
   }
 
   private cleanupPendingOrders(): void {
-    // Remove pending orders that no longer exist in orderLines
-    // Simple O(n*m) but both n and m are typically small (<10 orders)
+    // Clear pending for orders that no longer exist (cancelled/filled)
+    let cleaned = false;
     for (const [id, pending] of this.pendingOrders) {
       const exists = this.orderLines.some((o) => o.id === id);
       if (!exists) {
         clearTimeout(pending.timeoutId);
         this.pendingOrders.delete(id);
+        cleaned = true;
       }
+    }
+    // Force rebuild so the line renders at the confirmed price (not the pending override)
+    if (cleaned) {
+      this.interactiveLineRenderer.forceRebuild();
     }
   }
 

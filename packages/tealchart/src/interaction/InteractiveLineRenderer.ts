@@ -213,6 +213,13 @@ export class InteractiveLineRenderer {
   }
 
   /**
+   * Force a full rebuild on next update (e.g. after pending order cleanup)
+   */
+  forceRebuild(): void {
+    this.lastSignature = '';
+  }
+
+  /**
    * Update dimensions
    */
   setDimensions(width: number, height: number, margins: ChartMargins): void {
