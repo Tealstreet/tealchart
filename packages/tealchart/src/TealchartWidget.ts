@@ -7,6 +7,7 @@ import type { PlotOutput } from '@tealstreet/tealscript';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
 
+import { LOADING_OPACITY } from './constants';
 import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
 import { EventEmitter } from './events/EventEmitter';
 import { GapDetectionManager } from './GapDetectionManager';
@@ -838,6 +839,9 @@ export class TealchartWidget {
       this._barsDirty = false;
     }
     this._ui.setPlots(this._plots);
+
+    // Fade canvas while loading bars (previous candles stay visible but faded)
+    this._ui.setCanvasOpacity(this._isLoadingBars ? LOADING_OPACITY : 1);
 
     // Update order and position lines
     const orderLines = this._chartApi.getOrderLinesRenderData();

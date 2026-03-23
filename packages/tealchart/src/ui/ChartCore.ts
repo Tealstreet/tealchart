@@ -840,6 +840,10 @@ export class ChartCore {
   /**
    * Update render options (colors, styles)
    */
+  setCanvasOpacity(opacity: number): void {
+    this.canvas.style.opacity = String(opacity);
+  }
+
   setRenderOptions(options: Partial<RenderOptions>): void {
     this.options.renderOptions = { ...this.options.renderOptions, ...options };
     this.renderer.setOptions(options);

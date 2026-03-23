@@ -444,6 +444,13 @@ export class TealchartWidgetUI {
   }
 
   /**
+   * Set canvas opacity (0.5 while loading bars, 1 when loaded)
+   */
+  setCanvasOpacity(opacity: number): void {
+    this.chartCore?.setCanvasOpacity(opacity);
+  }
+
+  /**
    * Update render options (colors, styles) - calls ChartCore directly
    */
   setRenderOptions(options: Partial<RenderOptions>): void {
