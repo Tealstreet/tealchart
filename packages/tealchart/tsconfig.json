@@ -14,15 +14,14 @@
       "@tealstreet/tealscript/src/*": ["../tealscript/src/*"]
     }
   },
-  "exclude": ["**/node_modules", "**/.*/*", "dist"],
-  "include": [
-    ".eslintrc.*",
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.mts",
-    "**/*.cjs",
-    "**/*.mjs",
-    "**/*.jsx",
-    "**/*.json"
-  ]
+  "exclude": [
+    "**/node_modules",
+    "**/.*/*",
+    "dist",
+    "src/mobile/**",
+    "src/SkiaTealchart.tsx",
+    "src/index.native.ts",
+    "native.ts"
+  ],
+  "include": [".eslintrc.*", "**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cjs", "**/*.mjs", "**/*.jsx", "**/*.json"]
 }

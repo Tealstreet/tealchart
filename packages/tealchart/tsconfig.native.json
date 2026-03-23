@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["vitest/globals"]
+  },
+  "include": [
+    "src/mobile/**/*.ts",
+    "src/mobile/**/*.tsx",
+    "src/SkiaTealchart.tsx",
+    "src/index.native.ts",
+    "native.ts",
+    "src/types.ts",
+    "src/state/chartState.ts",
+    "src/core/**/*.ts",
+    "src/viewport/**/*.ts",
+    "src/indicators/**/*.ts",
+    "src/events/**/*.ts",
+    "src/debug/**/*.ts"
+  ],
+  "exclude": ["**/node_modules", "**/.*/*", "dist"]
+}

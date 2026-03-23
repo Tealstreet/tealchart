@@ -14,7 +14,8 @@
     "test": "run-s test-unit",
     "test-unit": "vitest run",
     "test-unit-watch": "vitest watch --ui",
-    "typecheck": "tsc --project ./tsconfig.json --noEmit"
+    "typecheck": "tsc --project ./tsconfig.json --noEmit",
+    "typecheck:native": "tsc --project ./tsconfig.native.json --noEmit"
   },
   "peerDependencies": {
     "react": "^18.0.0",
