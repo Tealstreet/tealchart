@@ -4,7 +4,7 @@
  * Combines:
  * - TealchartRenderer (canvas rendering)
  * - EventManager (mouse/touch/keyboard interactions)
- * - PriceLineManager (Konva layer for interactive order/position lines)
+ * - InteractiveLineRenderer (HTML overlay for order/position labels)
  * - ContextMenu
  *
  * This is the vanilla equivalent of Tealchart.tsx
@@ -12,13 +12,10 @@
 
 import type { PlotOutput } from '@tealstreet/tealscript';
 import type { CrosshairState as EventCrosshairState, PaneDividerInfo } from '../interaction/EventManager';
-import type { CrosshairState as PriceLineCrosshairState } from '../interaction/PriceLineManager';
 import type { PlotStyleOverride } from '../state/chartState';
 
-import Konva from 'konva';
-
 import { EventManager } from '../interaction/EventManager';
-import { PriceLineManager } from '../interaction/PriceLineManager';
+import { InteractiveLineRenderer } from '../interaction/InteractiveLineRenderer';
 import { WebCanvasContext } from '../rendering/WebCanvasContext';
 import { getDecimalPlacesFromPrecision } from '../state/chartState';
 import { TealchartRenderer } from '../TealchartRenderer';
@@ -453,11 +450,7 @@ export class ChartCore {
   // Core components
   private renderer: TealchartRenderer;
   private eventManager: EventManager;
-  private priceLineManager: PriceLineManager | null = null;
-
-  // Konva
-  private stage: Konva.Stage | null = null;
-  private layer: Konva.Layer | null = null;
+  private interactiveLineRenderer: InteractiveLineRenderer;
 
   // Data refs
   private bars: Bar[] = [];
@@ -539,10 +532,44 @@ export class ChartCore {
       this.margins,
     );
 
-    // Initialize Konva stage and layer
-    this.initKonva();
+    // Initialize interactive line renderer (HTML overlay for order/position labels)
+    this.interactiveLineRenderer = new InteractiveLineRenderer(this.chartContainer, {
+      margins: this.margins,
+      width: options.width,
+      height: options.height,
+      yToPrice: (y) =>
+        this.renderer.publicYToPriceWithLayout(
+          y,
+          this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
+          this.getUnifiedLayout(),
+        ),
+      priceToY: (price) =>
+        this.renderer.publicPriceToYWithLayout(
+          price,
+          this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
+          this.getUnifiedLayout(),
+        ),
+      onOrderMove: (orderId, newPrice) => this.options.onOrderMove?.(orderId, newPrice),
+      onOrderCancel: (orderId) => this.options.onOrderCancel?.(orderId),
+      onPositionClose: (positionId) => this.options.onPositionClose?.(positionId),
+      onPositionReverse: (positionId) => this.options.onPositionReverse?.(positionId),
+      onTPDragEnd: (positionId, price, partialPercent) => this.options.onTPDragEnd?.(positionId, price, partialPercent),
+      onSLDragEnd: (positionId, price, partialPercent) => this.options.onSLDragEnd?.(positionId, price, partialPercent),
+      onTPClick: (positionId) => this.options.onTPClick?.(positionId),
+      onSLClick: (positionId) => this.options.onSLClick?.(positionId),
+      formatPrice: (price) => {
+        const decimals =
+          this.options.renderOptions?.pricePrecision ??
+          getDecimalPlacesFromPrecision(this.viewport?.priceMax ?? 0, this.viewport?.priceMin ?? 0);
+        return getNumberFormatter(decimals).format(price);
+      },
+      onCursorChange: (cursor) => {
+        this.cursor = cursor;
+        this.chartContainer.style.cursor = cursor;
+      },
+    });
 
-    // Create context menu "+" button (HTML overlay — not Konva, for reliable clicks)
+    // Create context menu "+" button (HTML overlay)
     this.initContextMenuPlusButton();
 
     // Initialize event manager
@@ -573,7 +600,10 @@ export class ChartCore {
         this.options.onPaneHeightsChange?.(heights);
         this.scheduleRender();
       },
-      isOverInteractiveElement: (x, y) => this.isOverInteractiveElement(x, y),
+      isOverInteractiveElement: (x, y) => {
+        const rect = this.chartContainer.getBoundingClientRect();
+        return this.interactiveLineRenderer.isOverInteractiveElement(rect.left + x, rect.top + y);
+      },
       onAutoScaleDisabled: (paneId: string) => this.options.onAutoScaleDisabled?.(paneId),
       isAutoScale: (paneId: string) => this.options.isAutoScale?.(paneId) ?? true,
       onViewportChange: (vp) => {
@@ -626,9 +656,6 @@ export class ChartCore {
       onCursorChange: (cursor) => {
         this.cursor = cursor;
         this.chartContainer.style.cursor = cursor;
-        if (this.stage) {
-          this.stage.container().style.cursor = cursor;
-        }
       },
     });
 
@@ -697,7 +724,7 @@ export class ChartCore {
    * Skips updates during drag since orders don't change while dragging chart
    */
   setOrderLines(lines: OrderLineRenderData[]): void {
-    if (this.eventManager.getIsDragging()) return;
+    if (this.eventManager.getIsDragging() || this.interactiveLineRenderer?.isDragging()) return;
     if (lines === this.orderLines) return;
     this.orderLines = lines;
     this.cleanupPendingOrders();
@@ -795,14 +822,8 @@ export class ChartCore {
       height,
     });
 
-    if (this.stage) {
-      this.stage.width(width);
-      this.stage.height(height);
-    }
-
-    if (this.priceLineManager) {
-      this.priceLineManager.setDimensions(width, height, this.margins);
-    }
+    // Update interactive line renderer dimensions
+    this.interactiveLineRenderer.setDimensions(width, height, this.margins);
 
     // Update reset button position
     this.updateResetButtonPosition();
@@ -885,81 +906,8 @@ export class ChartCore {
       clearTimeout(this.resetButtonTimer);
     }
     this.eventManager.dispose();
-    this.priceLineManager?.dispose();
-    this.stage?.destroy();
+    this.interactiveLineRenderer.dispose();
     this.chartContainer.remove();
-  }
-
-  // ============================================================================
-  // Private: Konva Setup
-  // ============================================================================
-
-  private initKonva(): void {
-    // Create Konva container
-    const konvaContainer = div({
-      style: {
-        position: 'absolute',
-        top: '0',
-        left: '0',
-        width: '100%',
-        height: '100%',
-        pointerEvents: 'none',
-      },
-    });
-    this.chartContainer.appendChild(konvaContainer);
-
-    // Create stage
-    this.stage = new Konva.Stage({
-      container: konvaContainer,
-      width: this.options.width,
-      height: this.options.height,
-    });
-
-    // Enable pointer events on stage container for interactions
-    const stageContainer = this.stage.container();
-    stageContainer.style.pointerEvents = 'auto';
-    // Set initial cursor
-    stageContainer.style.cursor = 'crosshair';
-
-    // Create layer
-    this.layer = new Konva.Layer();
-    this.stage.add(this.layer);
-
-    // Create PriceLineManager
-    this.priceLineManager = new PriceLineManager({
-      layer: this.layer,
-      width: this.options.width,
-      height: this.options.height,
-      margins: this.margins,
-      yToPrice: (y) =>
-        this.renderer.publicYToPriceWithLayout(
-          y,
-          this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
-          this.getUnifiedLayout(),
-        ),
-      priceToY: (price) =>
-        this.renderer.publicPriceToYWithLayout(
-          price,
-          this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
-          this.getUnifiedLayout(),
-        ),
-      onOrderMove: (id, price) => this.options.onOrderMove?.(id, price),
-      onOrderCancel: (id) => this.options.onOrderCancel?.(id),
-      onPositionClose: (id) => this.options.onPositionClose?.(id),
-      onPositionReverse: (id) => this.options.onPositionReverse?.(id),
-      onTPDragEnd: (id, price, partial) => this.options.onTPDragEnd?.(id, price, partial),
-      onSLDragEnd: (id, price, partial) => this.options.onSLDragEnd?.(id, price, partial),
-      onTPClick: (id) => this.options.onTPClick?.(id),
-      onSLClick: (id) => this.options.onSLClick?.(id),
-      onCursorChange: (cursor) => {
-        this.cursor = cursor === 'default' ? 'crosshair' : cursor;
-        this.chartContainer.style.cursor = this.cursor;
-        // Also set on Konva stage container for proper cursor display
-        if (this.stage) {
-          this.stage.container().style.cursor = this.cursor;
-        }
-      },
-    });
   }
 
   // ============================================================================
@@ -1283,13 +1231,6 @@ export class ChartCore {
     return null;
   }
 
-  private isOverInteractiveElement(x: number, y: number): boolean {
-    if (!this.stage) return false;
-
-    const hit = this.stage.getIntersection({ x, y });
-    return hit !== null && hit.listening();
-  }
-
   private cleanupPendingOrders(): void {
     // Remove pending orders that no longer exist in orderLines
     // Simple O(n*m) but both n and m are typically small (<10 orders)
@@ -1373,13 +1314,20 @@ export class ChartCore {
       ...this.positionLines.flatMap((p) => positionToBracketLines(p, formatPrice)),
     ];
 
-    // Filter canvas-only price lines (order/position handled by Konva)
-    const canvasPriceLines = allPriceLines.filter((line) => line.type !== 'order' && line.type !== 'position');
+    // All price lines go to the canvas renderer — order/position horizontal lines
+    // are drawn on canvas, while their labels/buttons are HTML overlays (InteractiveLineRenderer).
+    // Skip the line being dragged — an HTML drag line replaces it during drag.
+    const dragLineId = this.interactiveLineRenderer?.isDragging()
+      ? this.interactiveLineRenderer.getState().getDragLineId()
+      : null;
+    const canvasPriceLines = dragLineId ? allPriceLines.filter((l) => l.id !== dragLineId) : allPriceLines;
 
     // Render canvas
     const crosshairColor = this.options.renderOptions?.crosshairColor || '#888888';
+    // Hide crosshair during interactive line drag (user is focused on the drag price)
+    const lineDragging = this.interactiveLineRenderer?.isDragging() ?? false;
     const crosshairState = {
-      visible: this.crosshair.visible,
+      visible: this.crosshair.visible && !lineDragging,
       x: this.crosshair.x,
       y: this.crosshair.y,
       price: 0,
@@ -1401,7 +1349,7 @@ export class ChartCore {
 
     this.renderer.drawCrosshair(crosshairState, vp, layout);
 
-    // Compute label bounds for Konva layer (with dirty checking)
+    // Compute label bounds (with dirty checking)
     // React pattern from Tealchart.tsx:696-727: only recompute when key changes or throttled during drag
     const linePrices = allPriceLines.map((l) => l.price.toFixed(6)).join(',');
     const boundsKey = `${vp.priceMin.toFixed(4)},${vp.priceMax.toFixed(4)}|${linePrices}|${this.crosshair.visible}|${Math.round(this.crosshair.y)}`;
@@ -1422,14 +1370,12 @@ export class ChartCore {
       this.lastBoundsUpdate = now;
     }
 
-    // Update PriceLineManager
-    const priceLineCrosshair: PriceLineCrosshairState = {
+    // Update interactive line renderer (HTML overlay labels)
+    this.interactiveLineRenderer.update(this.labelBoundsCache, this.pendingOrders, {
       x: this.crosshair.x,
       y: this.crosshair.y,
       visible: this.crosshair.visible,
       color: crosshairColor,
-    };
-
-    this.priceLineManager?.update(this.labelBoundsCache, this.pendingOrders, priceLineCrosshair);
+    });
   }
 }

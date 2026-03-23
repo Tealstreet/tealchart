@@ -4,41 +4,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { TealchartRenderer } from '../TealchartRenderer';
 
-// Mock Konva with plain classes (survives mockReset)
-vi.mock('konva', () => {
-  class MockLayer {
-    draw() {}
-    destroy() {}
-  }
-  class MockStage {
-    private _container: HTMLDivElement;
-    constructor() {
-      this._container = document.createElement('div');
-    }
-    container() {
-      return this._container;
-    }
-    add() {}
-    destroy() {}
-  }
-  return { default: { Stage: MockStage, Layer: MockLayer }, __esModule: true };
-});
-
 // Mock EventManager (survives mockReset)
 vi.mock('../interaction/EventManager', () => ({
   EventManager: class {
     getIsDragging() {
       return false;
     }
-    dispose() {}
-  },
-}));
-
-// Mock PriceLineManager
-vi.mock('../interaction/PriceLineManager', () => ({
-  PriceLineManager: class {
-    update() {}
-    setDimensions() {}
     dispose() {}
   },
 }));
