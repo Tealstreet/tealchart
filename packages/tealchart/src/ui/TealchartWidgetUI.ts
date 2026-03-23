@@ -153,9 +153,8 @@ export class TealchartWidgetUI {
         position: 'relative',
         width: '100%',
         height: '100%',
-        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        fontFamily: 'var(--tc-font-family, inherit)',
         overflow: 'hidden',
-        backgroundColor: 'var(--chart-bg, #131722)',
       },
     });
 

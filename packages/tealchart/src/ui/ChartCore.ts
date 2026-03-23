@@ -502,9 +502,10 @@ export class ChartCore {
     // Apply render options as CSS variables for HTML overlays
     this.applyCssVars();
 
-    // Create canvas
+    // Create canvas — set CSS background to match render options to prevent flash before first paint
     this.canvas = document.createElement('canvas');
     this.canvas.style.display = 'block';
+    this.canvas.style.backgroundColor = options.renderOptions?.backgroundColor || '#131722';
     this.chartContainer.appendChild(this.canvas);
 
     // Set initial canvas size
@@ -842,6 +843,9 @@ export class ChartCore {
   setRenderOptions(options: Partial<RenderOptions>): void {
     this.options.renderOptions = { ...this.options.renderOptions, ...options };
     this.renderer.setOptions(options);
+    if (options.backgroundColor) {
+      this.canvas.style.backgroundColor = options.backgroundColor;
+    }
     this.applyCssVars();
     this.scheduleRender();
   }
