@@ -1312,10 +1312,10 @@ export class TealchartWidget {
     const parts = symbol.split(':');
     const cleanSymbol = parts.length > 1 ? parts[1] : symbol;
 
-    // Even if the clean symbol is the same, the full symbol with exchange
-    // prefix may differ (exchange change). Pass the original to resolveSymbol
-    // so the datafeed knows which exchange context to use.
-    const symbolChanged = this._symbol !== cleanSymbol;
+    // Skip if symbol hasn't actually changed — prevents reload on click
+    if (this._symbol === cleanSymbol) {
+      return;
+    }
 
     // Stop gap detection while changing symbol
     this._gapDetectionManager?.stop();
