@@ -1,3 +1,16 @@
+// ============================================================================
+// Simple Chart Wrapper (optional convenience class)
+// ============================================================================
+import type { CanvasContext } from './rendering';
+import type { Bar, ChartMargins, RenderOptions, ResolutionString, Viewport } from './types';
+
+import { WebCanvasContext } from './rendering';
+import { AVAILABLE_TIMEFRAMES, getChartStore } from './state/chartState';
+import { TealchartRenderer } from './TealchartRenderer';
+import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from './types';
+import { ChartTopBar } from './ui/ChartTopBar';
+import { IndicatorsModal } from './ui/IndicatorsModal';
+
 /**
  * TealchartVanilla - Framework-agnostic chart components
  *
@@ -15,7 +28,7 @@
  * import {
  *   TealchartRenderer,
  *   EventManager,
- *   PriceLineManager,
+ *   InteractiveLineRenderer,
  *   ChartTopBar,
  *   IndicatorsModal,
  *   getChartStore,
@@ -53,11 +66,8 @@ export {
   type DragMode,
   type PaneInfo,
 } from './interaction/EventManager';
-export {
-  PriceLineManager,
-  type PriceLineManagerOptions,
-  type CrosshairState as PriceLineCrosshairState,
-} from './interaction/PriceLineManager';
+export { InteractiveLineRenderer, type InteractiveLineRendererOptions } from './interaction/InteractiveLineRenderer';
+export { InteractiveLineState } from './interaction/InteractiveLineState';
 
 // UI Components
 export { Component, TemplateComponent, type ComponentOptions } from './ui/Component';
@@ -75,16 +85,8 @@ export {
   type ActiveIndicator as LegendActiveIndicator,
   type IndicatorPaneInfo as LegendIndicatorPaneInfo,
 } from './ui/ChartLegend';
-export {
-  ContextMenu,
-  showContextMenu,
-  type ContextMenuOptions,
-} from './ui/ContextMenu';
-export {
-  ChartCore,
-  type ChartCoreOptions,
-  type IndicatorPaneInfo,
-} from './ui/ChartCore';
+export { ContextMenu, showContextMenu, type ContextMenuOptions } from './ui/ContextMenu';
+export { ChartCore, type ChartCoreOptions, type IndicatorPaneInfo } from './ui/ChartCore';
 
 // DOM utilities
 export {
@@ -115,10 +117,7 @@ export {
   type LineStyle,
   AVAILABLE_TIMEFRAMES,
 } from './state/chartState';
-export {
-  createIndicatorActions,
-  type IndicatorActions,
-} from './state/indicatorActions';
+export { createIndicatorActions, type IndicatorActions } from './state/indicatorActions';
 
 // Indicators
 export {
@@ -154,19 +153,6 @@ export type {
 } from './types';
 
 export { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from './types';
-
-// ============================================================================
-// Simple Chart Wrapper (optional convenience class)
-// ============================================================================
-
-import Konva from 'konva';
-import { TealchartRenderer } from './TealchartRenderer';
-import { WebCanvasContext, type CanvasContext } from './rendering';
-import { ChartTopBar } from './ui/ChartTopBar';
-import { IndicatorsModal } from './ui/IndicatorsModal';
-import { getChartStore, AVAILABLE_TIMEFRAMES } from './state/chartState';
-import type { Bar, Viewport, ChartMargins, ResolutionString, RenderOptions } from './types';
-import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from './types';
 
 /**
  * Options for SimpleChart
@@ -286,11 +272,7 @@ export class SimpleChart {
     this._ctx = new WebCanvasContext(nativeCtx);
 
     // Create renderer
-    this._renderer = new TealchartRenderer(
-      this._ctx,
-      this._renderOptions,
-      this._margins
-    );
+    this._renderer = new TealchartRenderer(this._ctx, this._renderOptions, this._margins);
 
     // Create indicators modal
     this._indicatorsModal = new IndicatorsModal({

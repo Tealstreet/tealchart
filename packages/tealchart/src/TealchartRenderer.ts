@@ -1663,8 +1663,23 @@ export class TealchartRenderer {
     ctx.save();
     ctx.scale(options.devicePixelRatio, options.devicePixelRatio);
 
-    // Vertical line is now drawn by Konva layer for proper z-ordering
-    // Horizontal crosshair lines are also drawn by Konva layer
+    // Draw vertical crosshair line
+    ctx.strokeStyle = options.crosshairColor;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(x, margins.top);
+    ctx.lineTo(x, options.height - margins.bottom);
+    ctx.stroke();
+
+    // Draw horizontal crosshair line across chart area
+    if (y >= margins.top && y <= options.height - margins.bottom) {
+      ctx.beginPath();
+      ctx.moveTo(margins.left, y);
+      ctx.lineTo(options.width - margins.right, y);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
 
     // Calculate time from position for time label
     const time = this.xToTime(x, viewport, chartWidth);
@@ -3698,13 +3713,13 @@ export class TealchartRenderer {
       if (lineType === 'price') {
         this.drawSimplePriceLineInPane(bound, viewport, pane);
       } else if (lineType === 'crosshair') {
-        // Crosshair is rendered by Konva layer for proper z-ordering (floats on top)
-        // Skip canvas rendering
+        // Crosshair label is rendered by HTML overlay for proper z-ordering
+        // Crosshair lines (horizontal/vertical) are drawn separately via drawCrosshair()
         continue;
       } else if (lineType === 'order' || lineType === 'position') {
-        // Order/position lines are rendered by Konva layer for interactivity
-        // Skip canvas rendering
-        continue;
+        // Order/position labels are HTML overlays (InteractiveLineRenderer)
+        // but the horizontal line is drawn on canvas
+        this.drawTradingLineOnCanvas(bound, viewport, pane);
       } else {
         this.drawTradingLineInPane(bound, viewport, pane);
       }
@@ -3830,6 +3845,77 @@ export class TealchartRenderer {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(bound.label.primaryText, labelX + bound.width / 2, labelCenterY);
+  }
+
+  /**
+   * Draw only the horizontal line for an order/position on canvas.
+   * Labels and buttons are rendered by the HTML InteractiveLineRenderer overlay.
+   */
+  private drawTradingLineOnCanvas(bound: PriceLineLabelBounds, _viewport: Viewport, pane: ComputedPane): void {
+    const { ctx, options, margins } = this;
+
+    const lineY = Math.max(pane.top, Math.min(pane.bottom, this.valueToY(bound.price, pane)));
+    const color = bound.color;
+    const lineWidth = bound.lineWidth || 1;
+    const lineLength = bound.lineLength ?? 100;
+    const extendLeft = bound.extendLeft ?? true;
+    const useNarrowText = options.width < 400;
+
+    // Calculate chart label width to know where the line gap is
+    const chartLabel = bound.chartLabel;
+    let segmentsWidth = 0;
+    let chartLabelX = margins.left;
+    const buttons = chartLabel?.buttons || [];
+    const hasTPSLButtons = buttons.length > 0 && (buttons[0].type === 'tp' || buttons[0].type === 'sl');
+
+    if (chartLabel && chartLabel.segments.length > 0) {
+      for (const segment of chartLabel.segments) {
+        const text = useNarrowText && segment.textShort ? segment.textShort : segment.text;
+        segmentsWidth += text.length * 6 + 8;
+      }
+      let chartLabelWidth = segmentsWidth + (hasTPSLButtons ? 6 : 0);
+      for (const button of buttons) {
+        chartLabelWidth += button.type === 'tp' || button.type === 'sl' ? 24 : 16;
+      }
+
+      const maxLabelX = options.width - margins.right - chartLabelWidth;
+      const minLabelX = margins.left;
+      chartLabelX = minLabelX + ((maxLabelX - minLabelX) * (100 - lineLength)) / 100;
+    }
+
+    const priceAxisLabelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
+
+    // Draw line segments
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+    if (bound.lineStyle === 'dashed') ctx.setLineDash([4, 4]);
+    else if (bound.lineStyle === 'dotted') ctx.setLineDash([2, 2]);
+
+    if (chartLabel && chartLabel.segments.length > 0) {
+      // Left line segment (before label)
+      if (extendLeft) {
+        ctx.beginPath();
+        ctx.moveTo(margins.left, lineY);
+        ctx.lineTo(chartLabelX - 1, lineY);
+        ctx.stroke();
+      }
+
+      // Right line segment (after segments, before price axis)
+      ctx.beginPath();
+      ctx.moveTo(chartLabelX + segmentsWidth + 2, lineY);
+      ctx.lineTo(priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING, lineY);
+      ctx.stroke();
+    } else {
+      // No chart label — line all the way across
+      ctx.beginPath();
+      ctx.moveTo(margins.left, lineY);
+      ctx.lineTo(priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING, lineY);
+      ctx.stroke();
+    }
+
+    ctx.setLineDash([]);
+    ctx.restore();
   }
 
   /**

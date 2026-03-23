@@ -1679,8 +1679,7 @@ export class TealchartWidget {
    * Apply study overrides
    * @stub Not yet implemented
    */
-  applyStudiesOverrides(overrides: Record<string, unknown>): void {
-    console.warn('[Tealchart] Method not implemented: applyStudiesOverrides');
+  applyStudiesOverrides(_overrides: Record<string, unknown>): void {
     // TODO: Implement when study support is added
   }
 
@@ -1688,8 +1687,7 @@ export class TealchartWidget {
    * Set CSS custom property
    * @stub Not yet implemented
    */
-  setCSSCustomProperty(key: string, value: string): void {
-    console.warn('[Tealchart] Method not implemented: setCSSCustomProperty');
+  setCSSCustomProperty(_key: string, _value: string): void {
     // TODO: Implement CSS custom properties support
   }
 

@@ -9,10 +9,8 @@ import type { IndicatorPaneInfo } from './components/ChartContainer';
 import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 
 import { flushSync } from 'react-dom';
-import { Layer, Stage } from 'react-konva';
 
 import { ContextMenu } from './components/ContextMenu';
-import { PriceLineLayer } from './components/PriceLineLayer';
 import { WebCanvasContext } from './rendering/WebCanvasContext';
 import { useChartApiOptional } from './state/ChartApiContext';
 import { getDecimalPlacesFromPrecision, PlotStyleOverride } from './state/chartState';
@@ -2171,50 +2169,7 @@ export const Tealchart: React.FC<TealchartProps> = ({
           display: 'block',
         }}
       />
-      {/* Konva overlay for interactive price lines (order/position drag + cancel buttons) */}
-      {/* Container handles most events; Konva only handles interactive element drag/click */}
-      {hasKonvaElements && (
-        <Stage
-          ref={stageRef}
-          width={width}
-          height={height - margins.bottom}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-          }}
-        >
-          <Layer>
-            <PriceLineLayer
-              labelBounds={konvaLabelBounds}
-              width={width}
-              height={height - margins.bottom}
-              margins={margins}
-              priceToY={priceToY}
-              yToPrice={yToPrice}
-              onOrderMove={handleOrderMove}
-              onOrderCancel={handleOrderCancel}
-              onPositionClose={handlePositionClose}
-              onPositionReverse={handlePositionReverse}
-              onTPClick={handleTPClick}
-              onSLClick={handleSLClick}
-              onTPDragEnd={handleTPDragEnd}
-              onSLDragEnd={handleSLDragEnd}
-              pendingOrders={pendingOrdersRef.current}
-              onCursorChange={handleKonvaCursorChange}
-              crosshair={{
-                x: crosshairRef.current.x,
-                y: crosshairRef.current.y,
-                // Hide crosshair when hovering over interactive Konva elements (order/position labels)
-                visible: crosshairRef.current.visible && !isOverKonvaElementRef.current,
-                color: renderOptions?.crosshairColor || '#888888',
-              }}
-              hasContextMenuButton={!!onContextMenu && isCrosshairOnMainPane}
-              onContextMenuButtonClick={onContextMenu ? handleContextMenuButtonClick : undefined}
-            />
-          </Layer>
-        </Stage>
-      )}
+      {/* Interactive line labels rendered by ChartCore's InteractiveLineRenderer (HTML overlays) */}
       <button
         ref={resetButtonRef}
         style={resetButtonStyle}
