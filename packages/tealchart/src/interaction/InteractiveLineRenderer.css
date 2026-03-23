@@ -9,6 +9,8 @@
   pointer-events: none;
   overflow: hidden;
   z-index: 2;
+  /* Tabular (monospaced) digits prevent label width jitter as numbers update */
+  font-variant-numeric: tabular-nums;
 }
 
 /* Label row - positioned absolutely, flex row of segments + buttons */
