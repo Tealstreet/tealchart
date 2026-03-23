@@ -2438,6 +2438,20 @@ export class TealchartRenderer {
   }
 
   /**
+   * Public accessor for formatCrosshairTime — used by ChartCore crosshair overlay
+   */
+  formatCrosshairTimePublic(time: number): string {
+    return this.formatCrosshairTime(time);
+  }
+
+  /**
+   * Public accessor for font string — used by ChartCore crosshair overlay
+   */
+  getFont(): string {
+    return this.font;
+  }
+
+  /**
    * Compute label bounds for price lines without rendering
    * Used by Konva layer for interactive elements
    * @deprecated Use computePriceLineLabelBoundsWithLayout for pane-aware coordinates

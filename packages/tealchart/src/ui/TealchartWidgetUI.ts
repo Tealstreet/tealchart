@@ -1,5 +1,6 @@
 import type { InputDefinition, PlotOutput } from '@tealstreet/tealscript';
 import type { BuiltinIndicator } from '../indicators/builtinIndicators';
+import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
 import type {
   Bar,
@@ -610,6 +611,15 @@ export class TealchartWidgetUI {
         this.indicatorPaneLegends.delete(paneId);
       }
     }
+  }
+
+  /**
+   * Paint the chart — passthrough to ChartCore.
+   * Called synchronously by TealchartWidget._render() after pushing state.
+   * The dirty flags tell ChartCore what needs repainting.
+   */
+  paint(dirty: DirtyFlags): void {
+    this.chartCore?.paint(dirty);
   }
 
   /**

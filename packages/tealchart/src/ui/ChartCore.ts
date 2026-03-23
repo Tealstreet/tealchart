@@ -12,10 +12,12 @@
 
 import type { PlotOutput } from '@tealstreet/tealscript';
 import type { CrosshairState as EventCrosshairState, PaneDividerInfo } from '../interaction/EventManager';
+import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
 
 import { EventManager } from '../interaction/EventManager';
 import { InteractiveLineRenderer } from '../interaction/InteractiveLineRenderer';
+import { DIRTY } from '../rendering/RenderScheduler';
 import { WebCanvasContext } from '../rendering/WebCanvasContext';
 import { getDecimalPlacesFromPrecision } from '../state/chartState';
 import { TealchartRenderer } from '../TealchartRenderer';
@@ -442,6 +444,8 @@ export class ChartCore {
   private container: HTMLElement;
   private chartContainer: HTMLDivElement;
   private canvas: HTMLCanvasElement;
+  private crosshairCanvas: HTMLCanvasElement | null = null;
+  private crosshairCtx: CanvasRenderingContext2D | null = null;
   private resetButton: HTMLButtonElement | null = null;
   private resetButtonHoverZone: HTMLDivElement | null = null;
   private contextMenu: HTMLDivElement | null = null;
@@ -480,8 +484,9 @@ export class ChartCore {
   private lastBoundsUpdate = 0;
   private labelBoundsCache: PriceLineLabelBounds[] = [];
 
-  // RAF
+  // RAF — full render and crosshair-only render use separate IDs
   private rafId: number | null = null;
+  private crosshairRafId: number | null = null;
 
   constructor(options: ChartCoreOptions) {
     this.options = options;
@@ -502,25 +507,44 @@ export class ChartCore {
     // Apply render options as CSS variables for HTML overlays
     this.applyCssVars();
 
-    // Create canvas — set CSS background to match render options to prevent flash before first paint
+    // Create main canvas — set CSS background to match render options to prevent flash before first paint
     this.canvas = document.createElement('canvas');
     this.canvas.style.display = 'block';
     this.canvas.style.backgroundColor = options.renderOptions?.backgroundColor || '#131722';
     this.chartContainer.appendChild(this.canvas);
 
-    // Set initial canvas size
+    // Create crosshair overlay canvas — transparent, same size, on top of main canvas
+    this.crosshairCanvas = document.createElement('canvas');
+    this.crosshairCanvas.style.position = 'absolute';
+    this.crosshairCanvas.style.top = '0';
+    this.crosshairCanvas.style.left = '0';
+    this.crosshairCanvas.style.pointerEvents = 'none';
+    this.chartContainer.appendChild(this.crosshairCanvas);
+
+    // Set initial canvas sizes
     const dpr = window.devicePixelRatio || 1;
     this.canvas.width = options.width * dpr;
     this.canvas.height = options.height * dpr;
     this.canvas.style.width = `${options.width}px`;
     this.canvas.style.height = `${options.height}px`;
 
-    // Get 2D context
+    this.crosshairCanvas.width = options.width * dpr;
+    this.crosshairCanvas.height = options.height * dpr;
+    this.crosshairCanvas.style.width = `${options.width}px`;
+    this.crosshairCanvas.style.height = `${options.height}px`;
+
+    // Get 2D context for main canvas
     const nativeCtx = this.canvas.getContext('2d');
     if (!nativeCtx) {
       throw new Error('Failed to get 2D canvas context');
     }
     nativeCtx.scale(dpr, dpr);
+
+    // Get 2D context for crosshair canvas
+    this.crosshairCtx = this.crosshairCanvas.getContext('2d');
+    if (this.crosshairCtx) {
+      this.crosshairCtx.scale(dpr, dpr);
+    }
 
     // Wrap in CanvasContext abstraction (enables Skia implementation for React Native)
     const ctx = new WebCanvasContext(nativeCtx);
@@ -671,12 +695,14 @@ export class ChartCore {
         const time = this.renderer.publicXToTime(x, this.viewport ?? TealchartRenderer.calculateViewport(this.bars));
         this.options.onCrossHairMoved?.(price, time);
         this.updateContextMenuPlusButton(y, true);
-        this.scheduleRender();
+        // Crosshair-only: skip main canvas, just repaint overlay + interactive lines
+        this.scheduleCrosshairRender();
       },
       onCrossHairVisibilityChange: (visible) => {
         this.crosshair = { ...this.crosshair, visible };
         this.updateContextMenuPlusButton(this.crosshair.y, visible);
-        this.scheduleRender();
+        // Crosshair-only: skip main canvas
+        this.scheduleCrosshairRender();
       },
       onMouseDown: () => this.options.onMouseDown?.(),
       onMouseUp: () => this.options.onMouseUp?.(),
@@ -711,11 +737,12 @@ export class ChartCore {
     if (bars.length > 0 && !this.viewport) {
       this.viewport = TealchartRenderer.calculateViewport(bars);
     }
-    this.scheduleRender();
+    // No scheduleRender — paint() is called by the widget after pushing state
   }
 
   /**
-   * Update a single bar (real-time)
+   * Update a single bar (real-time) — fast path that mutates + paints directly.
+   * Bypasses the widget's render pipeline for low-latency candle updates.
    */
   updateBar(bar: Bar): void {
     if (this.bars.length === 0) {
@@ -728,6 +755,7 @@ export class ChartCore {
         this.bars.push(bar);
       }
     }
+    // updateBar is the fast path — schedule an immediate repaint for this bar
     this.scheduleRender();
   }
 
@@ -736,7 +764,7 @@ export class ChartCore {
    */
   setViewport(viewport: Viewport): void {
     this.viewport = viewport;
-    this.scheduleRender();
+    // No scheduleRender — paint() is called by the widget after pushing state
   }
 
   /**
@@ -744,7 +772,7 @@ export class ChartCore {
    */
   setPriceLines(lines: PriceLine[]): void {
     this.priceLines = lines;
-    this.scheduleRender();
+    // No scheduleRender — paint() is called by the widget after pushing state
   }
 
   /**
@@ -780,7 +808,7 @@ export class ChartCore {
 
     this.orderLines = lines;
     this.cleanupPendingOrders();
-    this.scheduleRender();
+    // No scheduleRender — paint() is called by the widget after pushing state
   }
 
   /**
@@ -792,7 +820,7 @@ export class ChartCore {
     if (this.eventManager.getIsDragging()) return;
     if (lines === this.positionLines) return;
     this.positionLines = lines;
-    this.scheduleRender();
+    // No scheduleRender — paint() is called by the widget after pushing state
   }
 
   /**
@@ -802,7 +830,7 @@ export class ChartCore {
   setPlots(plots: PlotOutput[]): void {
     if (plots === this.plots) return;
     this.plots = plots;
-    this.scheduleRender();
+    // No scheduleRender — paint() is called by the widget after pushing state
   }
 
   /**
@@ -810,7 +838,7 @@ export class ChartCore {
    */
   setPaneLayout(layout: PaneLayout): void {
     this.paneLayout = layout;
-    this.scheduleRender();
+    // No scheduleRender — paint() is called by the widget after pushing state
   }
 
   /**
@@ -818,7 +846,7 @@ export class ChartCore {
    */
   setUnifiedPaneLayout(layout: UnifiedPaneLayout): void {
     this.unifiedPaneLayout = layout;
-    this.scheduleRender();
+    // No scheduleRender — paint() is called by the widget after pushing state
   }
 
   /**
@@ -826,7 +854,7 @@ export class ChartCore {
    */
   setIndicatorPaneInfo(info: Record<string, IndicatorPaneInfo>): void {
     this.indicatorPaneInfo = info;
-    this.scheduleRender();
+    // No scheduleRender — paint() is called by the widget after pushing state
   }
 
   /**
@@ -834,7 +862,7 @@ export class ChartCore {
    */
   setPlotStyleOverrides(overrides: Map<string, PlotStyleOverride>): void {
     this.plotStyleOverrides = overrides;
-    this.scheduleRender();
+    // No scheduleRender — paint() is called by the widget after pushing state
   }
 
   /**
@@ -842,6 +870,9 @@ export class ChartCore {
    */
   setCanvasOpacity(opacity: number): void {
     this.canvas.style.opacity = String(opacity);
+    if (this.crosshairCanvas) {
+      this.crosshairCanvas.style.opacity = String(opacity);
+    }
   }
 
   setRenderOptions(options: Partial<RenderOptions>): void {
@@ -851,7 +882,7 @@ export class ChartCore {
       this.canvas.style.backgroundColor = options.backgroundColor;
     }
     this.applyCssVars();
-    this.scheduleRender();
+    // No scheduleRender — paint() is called by the widget after pushing state
   }
 
   /**
@@ -879,7 +910,7 @@ export class ChartCore {
     this.chartContainer.style.width = `${width}px`;
     this.chartContainer.style.height = `${height}px`;
 
-    // Resize canvas
+    // Resize main canvas
     const dpr = window.devicePixelRatio || 1;
     this.canvas.width = width * dpr;
     this.canvas.height = height * dpr;
@@ -890,6 +921,18 @@ export class ChartCore {
     const ctx = this.canvas.getContext('2d');
     if (ctx) {
       ctx.scale(dpr, dpr);
+    }
+
+    // Resize crosshair overlay canvas
+    if (this.crosshairCanvas) {
+      this.crosshairCanvas.width = width * dpr;
+      this.crosshairCanvas.height = height * dpr;
+      this.crosshairCanvas.style.width = `${width}px`;
+      this.crosshairCanvas.style.height = `${height}px`;
+      const crosshairCtx = this.crosshairCanvas.getContext('2d');
+      if (crosshairCtx) {
+        crosshairCtx.scale(dpr, dpr);
+      }
     }
 
     // Update renderer options
@@ -904,6 +947,7 @@ export class ChartCore {
     // Update reset button position
     this.updateResetButtonPosition();
 
+    // Resize triggers a full repaint via the widget's render scheduler
     this.scheduleRender();
   }
 
@@ -926,7 +970,7 @@ export class ChartCore {
    */
   setPaneYRanges(ranges: Map<string, { yMin: number; yMax: number }>): void {
     this.autoScalePaneYRanges = ranges;
-    this.scheduleRender();
+    // No scheduleRender — paint() is called by the widget after pushing state
   }
 
   /**
@@ -936,7 +980,7 @@ export class ChartCore {
     for (const { paneId, heightRatio } of heights) {
       this.paneHeightOverrides.set(paneId, heightRatio);
     }
-    this.scheduleRender();
+    // No scheduleRender — paint() is called by the widget after pushing state
   }
 
   /**
@@ -977,6 +1021,9 @@ export class ChartCore {
   dispose(): void {
     if (this.rafId !== null) {
       cancelAnimationFrame(this.rafId);
+    }
+    if (this.crosshairRafId !== null) {
+      cancelAnimationFrame(this.crosshairRafId);
     }
     if (this.resetButtonTimer) {
       clearTimeout(this.resetButtonTimer);
@@ -1329,16 +1376,91 @@ export class ChartCore {
   // Private: Render
   // ============================================================================
 
+  /**
+   * Legacy scheduleRender — kept for updateBar() fast path, resize(), and
+   * resetViewport() which are called from within ChartCore itself.
+   * These trigger a full render via their own RAF (separate from widget scheduler).
+   */
   private scheduleRender(): void {
     if (this.rafId !== null) return; // Already scheduled — coalesce
+    // Cancel any pending crosshair-only render (full render includes crosshair)
+    if (this.crosshairRafId !== null) {
+      cancelAnimationFrame(this.crosshairRafId);
+      this.crosshairRafId = null;
+    }
 
     this.rafId = requestAnimationFrame(() => {
       this.rafId = null;
-      this.render();
+      this.renderMainCanvas();
+      this.renderCrosshairOverlay();
+      this.updateInteractiveLines();
     });
   }
 
-  private render(): void {
+  /**
+   * Crosshair-only render — skip main canvas repaint (~0.1ms vs ~5ms).
+   * Used by EventManager crosshair callbacks. If a full render is already
+   * scheduled, this is a no-op (the full render will repaint crosshair too).
+   */
+  private scheduleCrosshairRender(): void {
+    // Full render already pending — it includes crosshair
+    if (this.rafId !== null) return;
+    if (this.crosshairRafId !== null) return; // Already scheduled
+
+    this.crosshairRafId = requestAnimationFrame(() => {
+      this.crosshairRafId = null;
+      this.renderCrosshairOverlay();
+      this.updateInteractiveLines();
+    });
+  }
+
+  /**
+   * Paint the chart based on dirty flags from the widget's RenderScheduler.
+   * Called synchronously — no second RAF. Only repaints what changed.
+   */
+  paint(dirty: DirtyFlags): void {
+    const needsCanvasRepaint =
+      dirty &
+      (DIRTY.VIEWPORT |
+        DIRTY.BARS |
+        DIRTY.PLOTS |
+        DIRTY.LAYOUT |
+        DIRTY.OPTIONS |
+        DIRTY.DATA_LOAD |
+        DIRTY.LINES |
+        DIRTY.FULL);
+
+    if (needsCanvasRepaint) {
+      this.renderMainCanvas();
+    }
+
+    // Crosshair overlay — repaint if crosshair moved OR canvas changed (crosshair position is viewport-relative)
+    if (
+      dirty &
+      (DIRTY.CROSSHAIR |
+        DIRTY.VIEWPORT |
+        DIRTY.BARS |
+        DIRTY.PLOTS |
+        DIRTY.LAYOUT |
+        DIRTY.OPTIONS |
+        DIRTY.DATA_LOAD |
+        DIRTY.LINES |
+        DIRTY.FULL)
+    ) {
+      this.renderCrosshairOverlay();
+    }
+
+    // Interactive line labels — update positions or rebuild
+    if (dirty & (DIRTY.LINES | DIRTY.VIEWPORT | DIRTY.BARS | DIRTY.DATA_LOAD | DIRTY.CROSSHAIR | DIRTY.FULL)) {
+      this.updateInteractiveLines();
+    }
+  }
+
+  /**
+   * Render main canvas — candles, grid, axes, volume, indicators, price lines.
+   * Does NOT draw crosshair (that's on the overlay canvas).
+   */
+  private renderMainCanvas(): void {
     if (this.bars.length === 0 || !this.viewport) return;
 
     const vp = this.viewport;
@@ -1396,16 +1518,12 @@ export class ChartCore {
       ...this.positionLines.flatMap((p) => positionToBracketLines(p, formatPrice)),
     ];
 
-    // All price lines go to the canvas renderer — order/position horizontal lines
-    // are drawn on canvas, while their labels/buttons are HTML overlays (InteractiveLineRenderer).
     // Skip the line being dragged — an HTML drag line replaces it during drag.
     const dragLineId = this.interactiveLineRenderer?.isDragging()
       ? this.interactiveLineRenderer.getState().getDragLineId()
       : null;
     const canvasPriceLines = dragLineId ? allPriceLines.filter((l) => l.id !== dragLineId) : allPriceLines;
 
-    // Render canvas
-    const crosshairColor = this.options.renderOptions?.crosshairColor || '#888888';
     // Hide crosshair during interactive line drag (user is focused on the drag price)
     const lineDragging = this.interactiveLineRenderer?.isDragging() ?? false;
     const crosshairState = {
@@ -1418,6 +1536,8 @@ export class ChartCore {
       paneValue: null,
     };
 
+    // Render candles, grid, axes, volume, indicators, price lines on main canvas
+    // Crosshair is NOT drawn here — it goes on the overlay canvas
     this.renderer.renderWithLayout(
       this.bars,
       vp,
@@ -1429,10 +1549,8 @@ export class ChartCore {
       this.plotStyleOverrides,
     );
 
-    this.renderer.drawCrosshair(crosshairState, vp, layout);
-
-    // Compute label bounds (with dirty checking)
-    // React pattern from Tealchart.tsx:696-727: only recompute when key changes or throttled during drag
+    // Cache label bounds for interactive line renderer
+    const crosshairColor = this.options.renderOptions?.crosshairColor || '#888888';
     const linePrices = allPriceLines.map((l) => l.price.toFixed(6)).join(',');
     const boundsKey = `${vp.priceMin.toFixed(4)},${vp.priceMax.toFixed(4)}|${linePrices}|${this.crosshair.visible}|${Math.round(this.crosshair.y)}`;
     const now = Date.now();
@@ -1451,8 +1569,83 @@ export class ChartCore {
       this.lastBoundsKey = boundsKey;
       this.lastBoundsUpdate = now;
     }
+  }
 
-    // Update interactive line renderer (HTML overlay labels)
+  /**
+   * Render crosshair overlay — just vertical + horizontal dashed lines + time label.
+   * This is extremely cheap (~0.1ms) compared to renderMainCanvas().
+   * Drawn on a separate transparent canvas on top of the main canvas.
+   */
+  private renderCrosshairOverlay(): void {
+    if (!this.crosshairCtx || !this.crosshairCanvas) return;
+
+    const ctx = this.crosshairCtx;
+    const width = this.options.width;
+    const height = this.options.height;
+
+    // Clear the overlay
+    ctx.clearRect(0, 0, width, height);
+
+    // Hide crosshair during interactive line drag
+    const lineDragging = this.interactiveLineRenderer?.isDragging() ?? false;
+    if (!this.crosshair.visible || lineDragging) return;
+    if (!this.viewport) return;
+
+    const { x, y } = this.crosshair;
+    const crosshairColor = this.options.renderOptions?.crosshairColor || '#888888';
+
+    // Check if cursor is in chart area (horizontally)
+    if (x < this.margins.left || x > width - this.margins.right) return;
+
+    // Draw vertical crosshair line
+    ctx.strokeStyle = crosshairColor;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(x, this.margins.top);
+    ctx.lineTo(x, height - this.margins.bottom);
+    ctx.stroke();
+
+    // Draw horizontal crosshair line across chart area
+    // Stop short of the + context menu button (18px wide + 2px offset + 2px gap)
+    if (y >= this.margins.top && y <= height - this.margins.bottom) {
+      const rightStop = width - this.margins.right - 22;
+      ctx.beginPath();
+      ctx.moveTo(this.margins.left, y);
+      ctx.lineTo(rightStop, y);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // Draw time label on bottom axis
+    const time = this.renderer.publicXToTime(x, this.viewport);
+    const timeLabel = this.renderer.formatCrosshairTimePublic(time);
+    const font = this.renderer.getFont();
+    ctx.font = `11px ${font}`;
+    const timeLabelWidth = ctx.measureText(timeLabel).width + 8;
+    const timeLabelHeight = 18;
+    const timeLabelX = x - timeLabelWidth / 2;
+    const timeAxisTop = height - this.margins.bottom;
+    const timeLabelY = timeAxisTop + (this.margins.bottom - timeLabelHeight) / 2;
+
+    // Background
+    ctx.fillStyle = crosshairColor;
+    ctx.beginPath();
+    ctx.roundRect(timeLabelX, timeLabelY, timeLabelWidth, timeLabelHeight, 2);
+    ctx.fill();
+
+    // Text
+    ctx.fillStyle = this.options.renderOptions?.backgroundColor || '#131722';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(timeLabel, x, timeLabelY + timeLabelHeight / 2);
+  }
+
+  /**
+   * Update interactive line renderer (HTML overlay labels)
+   */
+  private updateInteractiveLines(): void {
+    const crosshairColor = this.options.renderOptions?.crosshairColor || '#888888';
     this.interactiveLineRenderer.update(this.labelBoundsCache, this.pendingOrders, {
       x: this.crosshair.x,
       y: this.crosshair.y,

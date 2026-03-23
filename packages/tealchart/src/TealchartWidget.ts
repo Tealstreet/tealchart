@@ -5,6 +5,7 @@
 
 import type { PlotOutput } from '@tealstreet/tealscript';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
+import type { DirtyFlags } from './rendering/RenderScheduler';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
 
 import { LOADING_OPACITY } from './constants';
@@ -13,6 +14,7 @@ import { EventEmitter } from './events/EventEmitter';
 import { GapDetectionManager } from './GapDetectionManager';
 import { getIndicatorById } from './indicators/builtinIndicators';
 import { PaneManager } from './rendering/PaneManager';
+import { DIRTY, RenderScheduler } from './rendering/RenderScheduler';
 import { getChartStore } from './state/chartState';
 import { generateIndicatorId } from './state/indicatorActions';
 import { TealchartApi } from './TealchartApi';
@@ -58,8 +60,6 @@ export class TealchartWidget {
   private _interval: ResolutionString;
   private _symbolInfo: LibrarySymbolInfo | null = null;
   private _bars: Bar[] = [];
-  private _barsDirty = false; // true when bars array has been replaced (not just mutated)
-  private _viewportDirty = false; // true when viewport needs pushing to UI (atomic with bars)
   private _viewport: Viewport | null = null;
   private _isReady = false;
   private _readyCallbacks: Array<() => void> = [];
@@ -129,24 +129,12 @@ export class TealchartWidget {
   private _logger: TealchartLogger | null = null;
 
   // ============================================================================
-  // Batched Rendering System
+  // Unified Render Scheduler (dirty bitmask + single RAF)
   // ============================================================================
-  // All state updates schedule a single batched render via RAF.
-  // The actual render passes current state to UI - ChartCore setters
-  // use reference equality to skip unchanged data (like React refs).
-  private _renderRafId: number | null = null;
-
-  /**
-   * Schedule a batched render. Multiple calls within the same frame
-   * collapse into a single render (like React's batching).
-   */
-  private _scheduleRender(): void {
-    if (this._renderRafId !== null) return; // Already scheduled
-    this._renderRafId = requestAnimationFrame(() => {
-      this._renderRafId = null;
-      this._doRender();
-    });
-  }
+  // All state updates call _scheduler.markDirty(DIRTY.XXX) with the appropriate flag.
+  // Multiple calls within the same frame coalesce into one RAF callback.
+  // The _render(dirty) method pushes only what changed to ChartCore, then calls paint().
+  private _scheduler = new RenderScheduler((dirty) => this._render(dirty));
 
   constructor(container: HTMLElement, options: TealchartWidgetOptions) {
     this._container = container;
@@ -206,7 +194,7 @@ export class TealchartWidget {
 
     // Subscribe to order/position line changes to trigger re-renders
     this._chartApi.setOnLinesChanged(() => {
-      this._scheduleRender();
+      this._scheduler.markDirty(DIRTY.LINES);
     });
 
     // Initialize Tealscript manager if worker factory is provided
@@ -215,7 +203,7 @@ export class TealchartWidget {
         createWorker: options.createTealscriptWorker,
         onPlotsUpdated: (plots) => {
           this._plots = plots;
-          this._scheduleRender();
+          this._scheduler.markDirty(DIRTY.PLOTS);
         },
         onError: (scriptId, error) => {
           console.error(`[Tealchart] Tealscript error in ${scriptId}:`, error.message);
@@ -234,7 +222,7 @@ export class TealchartWidget {
             }
             if (Object.keys(defaultInputs).length > 0) {
               study.setInputs({ ...currentInputs, ...defaultInputs });
-              this._scheduleRender();
+              this._scheduler.markDirty(DIRTY.PLOTS);
             }
           }
         },
@@ -359,7 +347,7 @@ export class TealchartWidget {
     // Increment request ID to cancel any in-flight requests
     const requestId = ++this._loadBarsRequestId;
     this._isLoadingBars = true;
-    this._scheduleRender(); // Re-render to show loading state
+    this._scheduler.markDirty(DIRTY.CROSSHAIR); // Re-render to show faded/loading state
 
     const now = Date.now();
     const intervalMs = intervalToMs(this._interval);
@@ -385,25 +373,27 @@ export class TealchartWidget {
           return;
         }
 
-        this._isLoadingBars = false;
+        // Atomic data transition: set all state before markDirty so it renders in one frame
         this._bars = bars;
-        this._barsDirty = true;
+
+        // Clear old plots — they belong to the old symbol/interval.
+        // New plots will arrive async via onPlotsUpdated callback.
+        this._plots = [];
 
         // Restore viewport from viewScale or calculate default (first load)
-        // Don't call setViewport here — _doRender pushes both bars + viewport
-        // atomically in the same frame to prevent 1-frame flash of old bars at new viewport
         if (bars.length > 0) {
           const vp = this._viewportController.handleBarsLoaded(bars, intervalToMs(this._interval));
           this._viewport = vp;
-          this._viewportDirty = true;
         }
 
-        // Notify Tealscript manager of all bars
+        // Notify Tealscript manager of new bars (plots arrive async via onPlotsUpdated)
         if (this._tealScriptManager) {
           this._tealScriptManager.setBars(bars);
         }
 
-        this._scheduleRender();
+        this._isLoadingBars = false;
+        // Single dirty flag triggers atomic render of viewport + bars + empty plots
+        this._scheduler.markDirty(DIRTY.DATA_LOAD);
         this._subscribeToBars();
         this._setReady();
       },
@@ -415,7 +405,7 @@ export class TealchartWidget {
 
         this._isLoadingBars = false;
         console.error('[Tealchart] Failed to load bars:', error);
-        this._scheduleRender(); // Re-render to hide loading state
+        this._scheduler.markDirty(DIRTY.FULL); // Re-render to hide loading state
         this._setReady();
       },
     );
@@ -524,9 +514,10 @@ export class TealchartWidget {
       }
     }
 
-    // Also schedule a widget-level render to update the last-trade price
-    // line, order/position lines, and other state computed in _doRender.
-    this._scheduleRender();
+    // Schedule widget-level render to update last-trade price line,
+    // order/position lines, and other state. updateBar fast path already
+    // painted candles — we only need LINES for the HTML overlay labels.
+    this._scheduler.markDirty(DIRTY.LINES);
   }
 
   private _loadMoreBars(direction: 'left' | 'right'): void {
@@ -585,7 +576,6 @@ export class TealchartWidget {
 
         if (newBars.length > 0) {
           this._bars = [...newBars, ...this._bars];
-          this._barsDirty = true;
 
           // Notify Tealscript manager of updated bars
           // Don't render yet - wait for onPlotsUpdated callback to ensure
@@ -593,8 +583,8 @@ export class TealchartWidget {
           if (this._tealScriptManager) {
             this._tealScriptManager.setBars(this._bars);
           } else {
-            // No indicator manager, safe to update UI directly
-            this._ui?.setBars(this._bars);
+            // No indicator manager, mark bars dirty for immediate render
+            this._scheduler.markDirty(DIRTY.BARS);
           }
         }
       },
@@ -719,148 +709,249 @@ export class TealchartWidget {
   }
 
   /**
-   * Actual render implementation - called by _scheduleRender() via RAF.
-   * Passes current state to UI. ChartCore setters skip unchanged data.
+   * Initialize the UI (called once on first render).
+   * Separated from _render() for clarity.
    */
-  private _doRender(): void {
+  private _ensureUI(): void {
+    if (this._ui) return;
+
     const showTopBar = this._options.showTopBar !== false; // Default to true
+    this._ui = new TealchartWidgetUI({
+      container: this._container,
+      chartKey: this._chartKey,
+      symbol: this._symbol,
+      interval: this._interval,
+      showTopBar,
+      renderOptions: this._renderOptions,
+      onIntervalChange: (interval) => {
+        this._chartApi.setResolution(interval);
+      },
+      onAddIndicator: (indicator) => {
+        this._handleAddIndicator(indicator);
+      },
+      onToggleIndicator: (indicatorId) => {
+        this._handleToggleIndicator(indicatorId);
+      },
+      onSettingsIndicator: (indicatorId) => {
+        this._ui?.openIndicatorSettings(indicatorId);
+      },
+      onRemoveIndicator: (indicatorId) => {
+        this._handleRemoveIndicator(indicatorId);
+      },
+      getStudyInputDefinitions: (studyId) => {
+        return this.getStudyInputDefinitions(studyId);
+      },
+      onSaveIndicatorSettings: (indicatorId, inputs, styleOverrides) => {
+        this.setStudyInputs(indicatorId, inputs);
+        if (styleOverrides) {
+          this.setStudyStyleOverrides(indicatorId, styleOverrides);
+        }
+      },
+      onViewportChange: (viewport) => {
+        const fitted = this._viewportController.handleViewportChange(
+          viewport,
+          this._bars,
+          intervalToMs(this._interval),
+        );
+        this._viewport = fitted;
+        if (fitted.priceMin !== viewport.priceMin || fitted.priceMax !== viewport.priceMax) {
+          this._ui?.setViewport(fitted);
+        }
+      },
+      onAutoScaleDisabled: (paneId: string) => {
+        this._viewportController.disableAutoScale(paneId);
+      },
+      onResetViewport: () => {
+        this._viewportController.handleReset(this._bars, intervalToMs(this._interval));
+      },
+      isAutoScale: (paneId: string) => this._viewportController.isAutoScale(paneId),
+      onRequestMoreBars: (direction) => {
+        this._loadMoreBars(direction);
+      },
+      onOrderMove: (orderId, newPrice) => {
+        this._chartApi.triggerOrderMove(orderId, newPrice);
+      },
+      onOrderCancel: (orderId) => {
+        this._chartApi.triggerOrderCancel(orderId);
+      },
+      onPositionClose: (positionId) => {
+        this._chartApi.triggerPositionClose(positionId);
+      },
+      onPositionReverse: (positionId) => {
+        this._chartApi.triggerPositionReverse(positionId);
+      },
+      onTPDragEnd: (positionId, price, partialPercent) => {
+        this._chartApi.triggerTPMoveEnd(positionId, price, partialPercent);
+      },
+      onSLDragEnd: (positionId, price, partialPercent) => {
+        this._chartApi.triggerSLMoveEnd(positionId, price, partialPercent);
+      },
+      onTPClick: (positionId) => {
+        this._chartApi.triggerTPClick(positionId);
+      },
+      onSLClick: (positionId) => {
+        this._chartApi.triggerSLClick(positionId);
+      },
+      onContextMenu: this._contextMenuCallback || undefined,
+      onMouseDown: () => {
+        this._eventEmitter.emit('mouse_down');
+      },
+      onMouseUp: () => {
+        this._eventEmitter.emit('mouse_up');
+      },
+      onCrossHairMoved: (price, time) => {
+        const now = Date.now();
+        if (now - this._lastCrossHairEmit >= this._crossHairEmitThrottleMs) {
+          this._lastCrossHairEmit = now;
+          this._chartApi.emitCrossHairMoved({ price, time });
+        }
+      },
+    });
+  }
 
-    // Initialize UI if needed
-    if (!this._ui) {
-      this._ui = new TealchartWidgetUI({
-        container: this._container,
-        chartKey: this._chartKey,
-        symbol: this._symbol,
-        interval: this._interval,
-        showTopBar,
-        renderOptions: this._renderOptions,
-        onIntervalChange: (interval) => {
-          // ChartTopBar already calls chartApi.setResolution() which handles
-          // the subscription emission and data reload
-          this._chartApi.setResolution(interval);
-        },
-        onAddIndicator: (indicator) => {
-          this._handleAddIndicator(indicator);
-        },
-        onToggleIndicator: (indicatorId) => {
-          this._handleToggleIndicator(indicatorId);
-        },
-        onSettingsIndicator: (indicatorId) => {
-          this._ui?.openIndicatorSettings(indicatorId);
-        },
-        onRemoveIndicator: (indicatorId) => {
-          this._handleRemoveIndicator(indicatorId);
-        },
-        getStudyInputDefinitions: (studyId) => {
-          return this.getStudyInputDefinitions(studyId);
-        },
-        onSaveIndicatorSettings: (indicatorId, inputs, styleOverrides) => {
-          this.setStudyInputs(indicatorId, inputs);
-          if (styleOverrides) {
-            this.setStudyStyleOverrides(indicatorId, styleOverrides);
-          }
-        },
-        onViewportChange: (viewport) => {
-          const fitted = this._viewportController.handleViewportChange(
-            viewport,
-            this._bars,
-            intervalToMs(this._interval),
-          );
-          this._viewport = fitted;
-          if (fitted.priceMin !== viewport.priceMin || fitted.priceMax !== viewport.priceMax) {
-            this._ui?.setViewport(fitted);
-          }
-        },
-        onAutoScaleDisabled: (paneId: string) => {
-          this._viewportController.disableAutoScale(paneId);
-        },
-        onResetViewport: () => {
-          this._viewportController.handleReset(this._bars, intervalToMs(this._interval));
-        },
-        isAutoScale: (paneId: string) => this._viewportController.isAutoScale(paneId),
-        onRequestMoreBars: (direction) => {
-          this._loadMoreBars(direction);
-        },
-        onOrderMove: (orderId, newPrice) => {
-          this._chartApi.triggerOrderMove(orderId, newPrice);
-        },
-        onOrderCancel: (orderId) => {
-          this._chartApi.triggerOrderCancel(orderId);
-        },
-        onPositionClose: (positionId) => {
-          this._chartApi.triggerPositionClose(positionId);
-        },
-        onPositionReverse: (positionId) => {
-          this._chartApi.triggerPositionReverse(positionId);
-        },
-        onTPDragEnd: (positionId, price, partialPercent) => {
-          this._chartApi.triggerTPMoveEnd(positionId, price, partialPercent);
-        },
-        onSLDragEnd: (positionId, price, partialPercent) => {
-          this._chartApi.triggerSLMoveEnd(positionId, price, partialPercent);
-        },
-        onTPClick: (positionId) => {
-          this._chartApi.triggerTPClick(positionId);
-        },
-        onSLClick: (positionId) => {
-          this._chartApi.triggerSLClick(positionId);
-        },
-        onContextMenu: this._contextMenuCallback || undefined,
-        onMouseDown: () => {
-          this._eventEmitter.emit('mouse_down');
-        },
-        onMouseUp: () => {
-          this._eventEmitter.emit('mouse_up');
-        },
-        onCrossHairMoved: (price, time) => {
-          const now = Date.now();
-          if (now - this._lastCrossHairEmit >= this._crossHairEmitThrottleMs) {
-            this._lastCrossHairEmit = now;
-            this._chartApi.emitCrossHairMoved({ price, time });
-          }
-        },
-      });
-    }
+  /**
+   * Unified render method — called by RenderScheduler with accumulated dirty flags.
+   * Only pushes what changed to ChartCore, then calls paint() synchronously.
+   */
+  private _render(dirty: DirtyFlags): void {
+    // Initialize UI on first render
+    this._ensureUI();
+    if (!this._ui) return;
 
-    // Update render options if they've changed
-    this._ui.setRenderOptions(this._renderOptions);
-
-    // Update symbol and interval in top bar / legend
-    this._ui.setSymbol(this._symbol);
-    this._ui.setInterval(this._interval);
-
-    // Push bars to ChartCore only when the array was replaced (load/reset),
-    // not on every render. Real-time ticks go through updateBar() directly.
-    // Push viewport + bars atomically to prevent 1-frame flash of old bars at new viewport
-    if (this._viewportDirty) {
-      this._ui.setViewport(this._viewport!);
-      this._viewportDirty = false;
-    }
-    if (this._barsDirty) {
+    // Atomic data transition: push viewport + bars + empty plots in one go
+    if (dirty & DIRTY.DATA_LOAD) {
+      if (this._viewport) {
+        this._ui.setViewport(this._viewport);
+      }
       this._ui.setBars(this._bars);
-      this._barsDirty = false;
+      this._ui.setPlots(this._plots); // Empty after data load — cleared on bars arrival
+      dirty = DIRTY.FULL; // Force full repaint of everything
     }
-    this._ui.setPlots(this._plots);
 
-    // Fade canvas while loading bars (previous candles stay visible but faded)
-    // Show loading dots if no candles at all
+    // Viewport changed (pan/zoom)
+    if (dirty & DIRTY.VIEWPORT) {
+      if (this._viewport) {
+        this._ui.setViewport(this._viewport);
+      }
+    }
+
+    // Bars changed (historical data prepend)
+    if (dirty & DIRTY.BARS) {
+      this._ui.setBars(this._bars);
+    }
+
+    // Plots changed (worker callback with new indicator data)
+    if (dirty & DIRTY.PLOTS) {
+      this._ui.setPlots(this._plots);
+    }
+
+    // Lines changed (order/position updates, last-trade line)
+    if (dirty & DIRTY.LINES) {
+      this._ui.setOrderLines(this._chartApi.getOrderLinesRenderData());
+      this._ui.setPositionLines(this._chartApi.getPositionLinesRenderData());
+      this._updateLastTradeLine();
+    }
+
+    // Layout changed (indicator pane added/removed)
+    if (dirty & DIRTY.LAYOUT) {
+      const paneLayout = this._paneManager.getLayout();
+      this._ui.setPaneLayout(paneLayout);
+    }
+
+    // Options changed (colors, styles)
+    if (dirty & DIRTY.OPTIONS) {
+      this._ui.setRenderOptions(this._renderOptions);
+      this._ui.setSymbol(this._symbol);
+      this._ui.setInterval(this._interval);
+    }
+
+    // Always update opacity + loading dots
     this._ui.setCanvasOpacity(this._isLoadingBars ? LOADING_OPACITY : 1, this._bars.length > 0);
 
-    // Update order and position lines
-    const orderLines = this._chartApi.getOrderLinesRenderData();
-    const positionLines = this._chartApi.getPositionLinesRenderData();
-    this._ui.setOrderLines(orderLines);
-    this._ui.setPositionLines(positionLines);
+    // Compute indicator pane Y ranges when plots have data
+    if (dirty & (DIRTY.PLOTS | DIRTY.VIEWPORT | DIRTY.BARS | DIRTY.DATA_LOAD) && this._plots.length > 0) {
+      const paneLayout = this._paneManager.getLayout();
+      if (this._viewport && paneLayout) {
+        const autoScaleRanges = this._viewportController.computePaneYRanges(
+          paneLayout.indicatorPanes,
+          this._plots,
+          this._bars,
+          this._viewport.startTime,
+          this._viewport.endTime,
+        );
+        this._ui.setPaneYRanges(autoScaleRanges);
+      }
+    }
 
-    // Create and set last trade line
+    // Update active indicators + pane info (needed for legend, indicator pane layout)
+    // Only recompute when layout/plots/options change (not on every crosshair move)
+    if (dirty & (DIRTY.LAYOUT | DIRTY.PLOTS | DIRTY.OPTIONS | DIRTY.LINES | DIRTY.DATA_LOAD | DIRTY.BARS)) {
+      // Update pane layout (in case not already done by LAYOUT flag)
+      if (!(dirty & DIRTY.LAYOUT)) {
+        const paneLayout = this._paneManager.getLayout();
+        this._ui.setPaneLayout(paneLayout);
+      }
+
+      // Update order and position lines (in case not already done by LINES flag)
+      if (!(dirty & DIRTY.LINES)) {
+        this._ui.setOrderLines(this._chartApi.getOrderLinesRenderData());
+        this._ui.setPositionLines(this._chartApi.getPositionLinesRenderData());
+        this._updateLastTradeLine();
+      }
+
+      // Update render options + symbol/interval (in case not already done by OPTIONS flag)
+      if (!(dirty & DIRTY.OPTIONS)) {
+        this._ui.setRenderOptions(this._renderOptions);
+        this._ui.setSymbol(this._symbol);
+        this._ui.setInterval(this._interval);
+      }
+
+      const studyInfos = this._chartApi.getAllStudies();
+      const persistedIndicators = this._chartStore ? this._chartStore.settings.get().indicators : [];
+
+      const activeIndicators = studyInfos.map((study) => {
+        const instanceId = this._studyInstanceMap.get(study.id);
+        const persisted = instanceId ? persistedIndicators.find((ind) => ind.id === instanceId) : undefined;
+        return {
+          ...study,
+          styleOverrides: persisted?.styleOverrides,
+        };
+      });
+
+      // Build indicator pane info
+      const indicatorPaneInfo: Record<
+        string,
+        { overlay: boolean; yAxisRange?: { min: number; max: number }; name?: string; inputs?: Record<string, unknown> }
+      > = {};
+      for (const [studyId, config] of this._indicatorConfigMap) {
+        const study = this._chartApi.getStudyById(studyId);
+        const inputs = study?.getInputs() ?? {};
+        indicatorPaneInfo[studyId] = {
+          overlay: config.overlay,
+          yAxisRange: config.yAxisRange,
+          name: config.name,
+          inputs,
+        };
+      }
+
+      this._ui.setActiveIndicators(activeIndicators, indicatorPaneInfo);
+    }
+
+    // Tell ChartCore to paint — synchronous, no second RAF
+    this._ui.paint(dirty);
+  }
+
+  /**
+   * Update the last-trade price line from latest bar data
+   */
+  private _updateLastTradeLine(): void {
+    if (!this._ui) return;
     const latestBar = this._bars.length > 0 ? this._bars[this._bars.length - 1] : null;
     if (latestBar) {
       const intervalMs = intervalToMs(this._interval);
-      // Handle bar time in either seconds or milliseconds
       const barTimeMs = latestBar.time < 1e12 ? latestBar.time * 1000 : latestBar.time;
       const barCloseTime = barTimeMs + intervalMs;
 
-      // Format price - ChartCore will override this with proper precision from renderer
       const priceText =
         latestBar.close >= 1000
           ? latestBar.close.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
@@ -878,7 +969,6 @@ export class TealchartWidget {
             : this._renderOptions?.downColor || '#ef5350',
         label: {
           primaryText: priceText,
-          // secondaryText (countdown) computed in renderer via countdownToTime
         },
         type: 'price',
         renderLineOnCanvas: true,
@@ -886,57 +976,6 @@ export class TealchartWidget {
       };
       this._ui.setPriceLines([lastTradeLine]);
     }
-
-    // Update pane layout
-    const paneLayout = this._paneManager.getLayout();
-    this._ui.setPaneLayout(paneLayout);
-
-    // Compute auto-scale Y ranges for indicator panes via ViewportController
-    if (this._viewport && paneLayout && this._plots.length > 0) {
-      const autoScaleRanges = this._viewportController.computePaneYRanges(
-        paneLayout.indicatorPanes,
-        this._plots,
-        this._bars,
-        this._viewport.startTime,
-        this._viewport.endTime,
-      );
-      // Always push ranges (even empty) so stale ranges are cleared on symbol switch / indicator removal
-      this._ui?.setPaneYRanges(autoScaleRanges);
-    } else {
-      // Preconditions not met — clear any existing auto-scale ranges
-      this._ui?.setPaneYRanges(new Map());
-    }
-
-    // Update active indicators
-    const studyInfos = this._chartApi.getAllStudies();
-    const persistedIndicators = this._chartStore ? this._chartStore.settings.get().indicators : [];
-
-    const activeIndicators = studyInfos.map((study) => {
-      const instanceId = this._studyInstanceMap.get(study.id);
-      const persisted = instanceId ? persistedIndicators.find((ind) => ind.id === instanceId) : undefined;
-      return {
-        ...study,
-        styleOverrides: persisted?.styleOverrides,
-      };
-    });
-
-    // Build indicator pane info
-    const indicatorPaneInfo: Record<
-      string,
-      { overlay: boolean; yAxisRange?: { min: number; max: number }; name?: string; inputs?: Record<string, unknown> }
-    > = {};
-    for (const [studyId, config] of this._indicatorConfigMap) {
-      const study = this._chartApi.getStudyById(studyId);
-      const inputs = study?.getInputs() ?? {};
-      indicatorPaneInfo[studyId] = {
-        overlay: config.overlay,
-        yAxisRange: config.yAxisRange,
-        name: config.name,
-        inputs,
-      };
-    }
-
-    this._ui.setActiveIndicators(activeIndicators, indicatorPaneInfo);
   }
 
   /**
@@ -985,7 +1024,7 @@ export class TealchartWidget {
           this._persistAddIndicator(instanceId, indicator);
 
           // Trigger immediate re-render to update chart layout for the new pane
-          this._scheduleRender();
+          this._scheduler.markDirty(DIRTY.FULL);
         }
       })
       .catch((error) => {
@@ -1056,7 +1095,7 @@ export class TealchartWidget {
 
     // Set saving status
     this._chartStore.saveStatus.set('saving');
-    this._scheduleRender();
+    this._scheduler.markDirty(DIRTY.FULL);
 
     import('./transformer').then(({ updateTealchartLayout }) => {
       // Use update since we have an existing layout ID
@@ -1075,19 +1114,19 @@ export class TealchartWidget {
           });
           this._chartStore.isDirty.set(false);
           this._chartStore.saveStatus.set('success');
-          this._scheduleRender();
+          this._scheduler.markDirty(DIRTY.FULL);
 
           // Start fade after showing success briefly
           setTimeout(() => {
             if (!this._chartStore) return;
             this._chartStore.saveStatus.set('success-fading');
-            this._scheduleRender();
+            this._scheduler.markDirty(DIRTY.FULL);
 
             // Clear after fade animation (500ms)
             setTimeout(() => {
               if (!this._chartStore) return;
               this._chartStore.saveStatus.set('idle');
-              this._scheduleRender();
+              this._scheduler.markDirty(DIRTY.FULL);
             }, 500);
           }, 500);
         })
@@ -1095,7 +1134,7 @@ export class TealchartWidget {
           console.error('[Tealchart] Auto-save failed:', error);
           if (!this._chartStore) return;
           this._chartStore.saveStatus.set('error');
-          this._scheduleRender();
+          this._scheduler.markDirty(DIRTY.FULL);
         });
     });
   }
@@ -1132,7 +1171,7 @@ export class TealchartWidget {
     this._persistToggleIndicatorVisibility(indicatorId);
 
     // Re-render to update the legend
-    this._scheduleRender();
+    this._scheduler.markDirty(DIRTY.FULL);
   }
 
   /**
@@ -1174,7 +1213,7 @@ export class TealchartWidget {
     // Remove the study via the API
     this._chartApi.removeStudy(indicatorId);
     // Re-render to update the legend
-    this._scheduleRender();
+    this._scheduler.markDirty(DIRTY.FULL);
   }
 
   /**
@@ -1216,7 +1255,7 @@ export class TealchartWidget {
       this._persistUpdateIndicatorInputs(studyId, inputs);
 
       // Re-render to update the legend
-      this._scheduleRender();
+      this._scheduler.markDirty(DIRTY.FULL);
     }
   }
 
@@ -1246,7 +1285,7 @@ export class TealchartWidget {
     this._persistUpdateIndicatorStyles(studyId, styleOverrides);
 
     // Re-render to apply the new styles
-    this._scheduleRender();
+    this._scheduler.markDirty(DIRTY.FULL);
   }
 
   /**
@@ -1301,6 +1340,86 @@ export class TealchartWidget {
   // Symbol/Interval Change Handlers
   // ============================================================================
 
+  /**
+   * Shared transition logic for symbol change, interval change, and resetData.
+   * Handles the common pattern: stop gap detection → unsubscribe → set loading →
+   * update state → schedule render (faded) → resolve symbol → load bars.
+   *
+   * Old bars/plots/viewport are NOT cleared — they stay visible (faded) until
+   * new data arrives, at which point _loadBars atomically replaces them.
+   */
+  private _startDataLoad(options: {
+    newSymbol?: string;
+    newInterval?: ResolutionString;
+    resolveSymbolName?: string; // The symbol name to pass to resolveSymbol (may include exchange prefix)
+    reason: 'symbol' | 'interval' | 'reset';
+  }): void {
+    // Stop gap detection during transition
+    this._gapDetectionManager?.stop();
+
+    // Unsubscribe from old bars
+    if (this._barSubscriptionGuid) {
+      this._datafeed.unsubscribeBars(this._barSubscriptionGuid);
+      this._barSubscriptionGuid = null;
+    }
+
+    // Set loading state — old data stays visible but faded
+    this._isLoadingBars = true;
+    this._hasMoreHistoricalData = true;
+    this._isLoadingMoreBars = false;
+
+    // Update symbol if changed
+    if (options.newSymbol !== undefined) {
+      this._symbol = options.newSymbol;
+      this._ui?.setSymbol(options.newSymbol);
+    }
+
+    // Update interval if changed
+    if (options.newInterval !== undefined) {
+      this._interval = options.newInterval;
+      // Persist interval to per-chart store (for restoration on page refresh)
+      this._chartStore?.settings.setKey('interval', options.newInterval);
+    }
+
+    // Schedule render to show faded state immediately (opacity change only)
+    this._scheduler.markDirty(DIRTY.CROSSHAIR);
+
+    // Increment to invalidate any in-flight resolveSymbol callbacks
+    const resolveRequestId = ++this._resolveSymbolRequestId;
+    const symbolToResolve = options.resolveSymbolName ?? this._symbol;
+
+    // Resolve symbol and start loading bars
+    this._datafeed.resolveSymbol(
+      symbolToResolve,
+      (symbolInfo) => {
+        if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
+          this._logger?.debug(LogCategory.Widget, 'Discarded stale resolveSymbol callback', {
+            symbol: symbolInfo.name,
+            reason: options.reason,
+          });
+          return;
+        }
+        this._symbolInfo = symbolInfo;
+        // Update price precision from symbol's pricescale
+        if (symbolInfo.pricescale && symbolInfo.pricescale > 0) {
+          this._renderOptions = {
+            ...this._renderOptions,
+            pricePrecision: 1 / symbolInfo.pricescale,
+          };
+        }
+        this._loadBars();
+      },
+      (error) => {
+        if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
+          return;
+        }
+        console.error(`[Tealchart] Failed to resolve symbol (${options.reason}):`, error);
+        this._isLoadingBars = false;
+        this._scheduler.markDirty(DIRTY.FULL);
+      },
+    );
+  }
+
   private _handleSymbolChange(symbol: string): void {
     // Strip exchange prefix if present (e.g., "bybit:BTCUSDT" → "BTCUSDT")
     // The datafeed resolveSymbol receives the full string including prefix,
@@ -1313,59 +1432,11 @@ export class TealchartWidget {
       return;
     }
 
-    // Stop gap detection while changing symbol
-    this._gapDetectionManager?.stop();
-
-    // Unsubscribe from old symbol
-    if (this._barSubscriptionGuid) {
-      this._datafeed.unsubscribeBars(this._barSubscriptionGuid);
-      this._barSubscriptionGuid = null;
-    }
-
-    this._symbol = cleanSymbol;
-    // Don't clear bars — keep old candles + indicators visible (faded) until new data arrives
-    this._hasMoreHistoricalData = true;
-    this._isLoadingMoreBars = false;
-    this._isLoadingBars = true;
-
-    // Update UI immediately (symbol always changed — same symbol early-returns above)
-    this._ui?.setSymbol(cleanSymbol);
-    this._scheduleRender();
-
-    // Increment to invalidate any in-flight resolveSymbol callbacks
-    const resolveRequestId = ++this._resolveSymbolRequestId;
-
-    // Resolve new symbol and load bars — pass original (with exchange prefix)
-    // so the datafeed knows which exchange context to use
-    this._datafeed.resolveSymbol(
-      symbol,
-      (symbolInfo) => {
-        // Ignore stale resolve (superseded by a newer symbol change)
-        if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
-          this._logger?.debug(LogCategory.Widget, 'Discarded stale resolveSymbol callback', {
-            symbol: symbolInfo.name,
-          });
-          return;
-        }
-        this._symbolInfo = symbolInfo;
-        // Update price precision from new symbol's pricescale
-        if (symbolInfo.pricescale && symbolInfo.pricescale > 0) {
-          this._renderOptions = {
-            ...this._renderOptions,
-            pricePrecision: 1 / symbolInfo.pricescale,
-          };
-        }
-        this._loadBars();
-      },
-      (error) => {
-        if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
-          return;
-        }
-        console.error('[Tealchart] Failed to resolve symbol:', error);
-        this._isLoadingBars = false;
-        this._scheduleRender();
-      },
-    );
+    this._startDataLoad({
+      newSymbol: cleanSymbol,
+      resolveSymbolName: symbol, // Pass original with exchange prefix
+      reason: 'symbol',
+    });
   }
 
   private _handleIntervalChange(interval: ResolutionString): void {
@@ -1373,33 +1444,10 @@ export class TealchartWidget {
       return;
     }
 
-    // Stop gap detection while changing interval
-    this._gapDetectionManager?.stop();
-
-    // Set loading state FIRST before any other changes
-    // This ensures we don't render stale data during transition
-    this._isLoadingBars = true;
-
-    // Unsubscribe from old interval
-    if (this._barSubscriptionGuid) {
-      this._datafeed.unsubscribeBars(this._barSubscriptionGuid);
-      this._barSubscriptionGuid = null;
-    }
-
-    this._interval = interval;
-    // Don't clear bars — keep old candles visible (faded) until new data arrives
-    this._hasMoreHistoricalData = true;
-    this._isLoadingMoreBars = false;
-    this._isLoadingBars = true;
-
-    // Persist interval to per-chart store (for restoration on page refresh)
-    this._chartStore?.settings.setKey('interval', interval);
-
-    // Render immediately to show faded state
-    this._scheduleRender();
-
-    // Reload bars with new interval
-    this._loadBars();
+    this._startDataLoad({
+      newInterval: interval,
+      reason: 'interval',
+    });
   }
 
   /**
@@ -1409,50 +1457,9 @@ export class TealchartWidget {
    * unsubscribe → clear bars → re-resolve symbol → reload → resubscribe.
    */
   private _handleResetData(): void {
-    // Stop gap detection during reset
-    this._gapDetectionManager?.stop();
-
-    // Unsubscribe from real-time updates
-    if (this._barSubscriptionGuid) {
-      this._datafeed.unsubscribeBars(this._barSubscriptionGuid);
-      this._barSubscriptionGuid = null;
-    }
-
-    // Don't clear bars — keep old candles visible (faded) until new data arrives
-    this._hasMoreHistoricalData = true;
-    this._isLoadingMoreBars = false;
-    this._isLoadingBars = true;
-
-    this._scheduleRender();
-
-    // Re-resolve symbol (exchange may have changed, affecting symbolInfo)
-    const resolveRequestId = ++this._resolveSymbolRequestId;
-
-    this._datafeed.resolveSymbol(
-      this._symbol,
-      (symbolInfo) => {
-        if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
-          return;
-        }
-        this._symbolInfo = symbolInfo;
-        // Update price precision from potentially new symbol's pricescale
-        if (symbolInfo.pricescale && symbolInfo.pricescale > 0) {
-          this._renderOptions = {
-            ...this._renderOptions,
-            pricePrecision: 1 / symbolInfo.pricescale,
-          };
-        }
-        this._loadBars();
-      },
-      (error) => {
-        if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
-          return;
-        }
-        console.error('[Tealchart] Failed to resolve symbol during resetData:', error);
-        this._isLoadingBars = false;
-        this._scheduleRender();
-      },
-    );
+    this._startDataLoad({
+      reason: 'reset',
+    });
   }
 
   // ============================================================================
@@ -1542,11 +1549,8 @@ export class TealchartWidget {
       this._boundHandleMouseLeave = null;
     }
 
-    // Cancel pending render RAF
-    if (this._renderRafId !== null) {
-      cancelAnimationFrame(this._renderRafId);
-      this._renderRafId = null;
-    }
+    // Cancel pending render scheduler
+    this._scheduler.dispose();
 
     // Clean up resize observer
     if (this._resizeObserver) {
@@ -1655,7 +1659,7 @@ export class TealchartWidget {
 
     // Re-render if already mounted
     if (this._ui && this._bars.length > 0) {
-      this._scheduleRender();
+      this._scheduler.markDirty(DIRTY.FULL);
     }
   }
 
@@ -1978,7 +1982,7 @@ export class TealchartWidget {
                   overlay: builtinIndicator.overlay,
                   yAxisRange: builtinIndicator.yAxisRange,
                 });
-                this._scheduleRender();
+                this._scheduler.markDirty(DIRTY.FULL);
               }
             });
         } else {
@@ -1988,7 +1992,7 @@ export class TealchartWidget {
     }
 
     // Re-render to reflect the loaded layout
-    this._scheduleRender();
+    this._scheduler.markDirty(DIRTY.FULL);
   }
 
   /**
@@ -2016,7 +2020,7 @@ export class TealchartWidget {
     if (this._options.save_load_adapter) {
       // Set saving status
       this._chartStore.saveStatus.set('saving');
-      this._scheduleRender();
+      this._scheduler.markDirty(DIRTY.FULL);
 
       // Determine if we should update existing or create new
       // Update if: same name as current layout AND we have a layout ID
@@ -2034,16 +2038,16 @@ export class TealchartWidget {
               });
               this._chartStore.isDirty.set(false);
               this._chartStore.saveStatus.set('success');
-              this._scheduleRender();
+              this._scheduler.markDirty(DIRTY.FULL);
 
               setTimeout(() => {
                 if (!this._chartStore) return;
                 this._chartStore.saveStatus.set('success-fading');
-                this._scheduleRender();
+                this._scheduler.markDirty(DIRTY.FULL);
                 setTimeout(() => {
                   if (!this._chartStore) return;
                   this._chartStore.saveStatus.set('idle');
-                  this._scheduleRender();
+                  this._scheduler.markDirty(DIRTY.FULL);
                 }, 500);
               }, 500);
             })
@@ -2051,7 +2055,7 @@ export class TealchartWidget {
               console.error('[Tealchart] Failed to update layout:', error);
               if (!this._chartStore) return;
               this._chartStore.saveStatus.set('error');
-              this._scheduleRender();
+              this._scheduler.markDirty(DIRTY.FULL);
             });
         });
       } else {
@@ -2066,16 +2070,16 @@ export class TealchartWidget {
               });
               this._chartStore.isDirty.set(false);
               this._chartStore.saveStatus.set('success');
-              this._scheduleRender();
+              this._scheduler.markDirty(DIRTY.FULL);
 
               setTimeout(() => {
                 if (!this._chartStore) return;
                 this._chartStore.saveStatus.set('success-fading');
-                this._scheduleRender();
+                this._scheduler.markDirty(DIRTY.FULL);
                 setTimeout(() => {
                   if (!this._chartStore) return;
                   this._chartStore.saveStatus.set('idle');
-                  this._scheduleRender();
+                  this._scheduler.markDirty(DIRTY.FULL);
                 }, 500);
               }, 500);
             })
@@ -2083,7 +2087,7 @@ export class TealchartWidget {
               console.error('[Tealchart] Failed to save layout:', error);
               if (!this._chartStore) return;
               this._chartStore.saveStatus.set('error');
-              this._scheduleRender();
+              this._scheduler.markDirty(DIRTY.FULL);
             });
         });
       }
