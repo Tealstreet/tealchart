@@ -31,7 +31,6 @@ import type {
   RenderOptions,
   UnifiedPaneLayout,
   Viewport,
-  ViewScaleState,
 } from './types';
 
 import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
@@ -55,8 +54,8 @@ import { priceToY, xToTime, yToPrice } from './mobile/utils/coordinates';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
 import { DEFAULT_MARGINS } from './types';
-import { AutoScaleManager } from './viewport/AutoScaleManager';
-import { captureViewScale, restoreViewport } from './viewport/viewScale';
+import { ViewportController } from './viewport/ViewportController';
+import { intervalToMs } from './viewport/viewScale';
 
 // Indicator pane info type (matches web)
 interface IndicatorPaneInfo {
@@ -204,19 +203,25 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   const unifiedPaneLayout = useMemo(() => {
     if (!viewport || plots.length === 0 || !baseUnifiedPaneLayout) return baseUnifiedPaneLayout;
 
+    // Compute auto-scale Y ranges for indicator panes via ViewportController
+    const indicatorPanes = baseUnifiedPaneLayout.panes
+      .filter((p) => p.type === 'indicator' && p.indicatorIds)
+      .map((p) => ({ id: p.id, fixedRange: p.fixedRange, indicatorIds: p.indicatorIds! }));
+
+    const ranges = viewportControllerRef.current.computePaneYRanges(
+      indicatorPanes,
+      plots,
+      bars,
+      viewport.startTime,
+      viewport.endTime,
+    );
+
+    if (ranges.size === 0) return baseUnifiedPaneLayout;
+
     return {
       ...baseUnifiedPaneLayout,
       panes: baseUnifiedPaneLayout.panes.map((pane) => {
-        if (pane.type !== 'indicator' || pane.fixedRange || !pane.indicatorIds) return pane;
-
-        const range = autoScaleManagerRef.current.applyToPaneYRange(
-          pane.id,
-          plots,
-          pane.indicatorIds,
-          bars,
-          viewport.startTime,
-          viewport.endTime,
-        );
+        const range = ranges.get(pane.id);
         if (range) {
           return { ...pane, yMin: range.yMin, yMax: range.yMax };
         }
@@ -287,8 +292,7 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   );
 
   const barsLengthRef = useRef(bars.length);
-  const viewScaleRef = useRef<ViewScaleState | null>(null);
-  const autoScaleManagerRef = useRef(new AutoScaleManager());
+  const viewportControllerRef = useRef(new ViewportController());
   // State for re-rendering the reset button when any pane has auto-scale disabled
   const [autoScaleAllEnabled, setAutoScaleAllEnabled] = useState(true);
 
@@ -311,17 +315,7 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
       barsLengthRef.current = bars.length;
       barsFirstTimeRef.current = firstTime;
 
-      // Restore viewport from proportional viewScale if available
-      let newViewport: Viewport;
-      if (viewScaleRef.current) {
-        newViewport = restoreViewport(viewScaleRef.current, bars);
-      } else {
-        newViewport = TealchartRenderer.calculateViewport(bars);
-      }
-
-      // Apply auto-scale if enabled
-      newViewport = autoScaleManagerRef.current.applyToViewport(newViewport, bars);
-
+      const newViewport = viewportControllerRef.current.handleBarsLoaded(bars, intervalToMs(interval));
       setViewport(newViewport);
       onViewportChange?.(newViewport);
     }
@@ -329,12 +323,11 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
 
   const handleViewportChange = useCallback(
     (newViewport: Viewport) => {
-      const vp = autoScaleManagerRef.current.applyToViewport(newViewport, bars);
+      const vp = viewportControllerRef.current.handleViewportChange(newViewport, bars, intervalToMs(interval));
       setViewport(vp);
-      viewScaleRef.current = captureViewScale(vp, bars);
       onViewportChange?.(vp);
     },
-    [onViewportChange, bars],
+    [onViewportChange, bars, interval],
   );
 
   // ==========================================================================
@@ -375,23 +368,20 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   );
 
   const handleAutoScaleDisabled = useCallback((paneId: string) => {
-    autoScaleManagerRef.current.disableAutoScale(paneId);
+    viewportControllerRef.current.disableAutoScale(paneId);
     setAutoScaleAllEnabled(false);
   }, []);
 
-  const getIsAutoScale = useCallback((paneId: string) => autoScaleManagerRef.current.isAutoScale(paneId), []);
+  const getIsAutoScale = useCallback((paneId: string) => viewportControllerRef.current.isAutoScale(paneId), []);
 
   const handleResetViewport = useCallback(() => {
-    autoScaleManagerRef.current.resetAll();
     setAutoScaleAllEnabled(true);
     if (bars.length > 0) {
-      const baseVp = TealchartRenderer.calculateViewport(bars);
-      const vp = autoScaleManagerRef.current.applyToViewport(baseVp, bars);
+      const vp = viewportControllerRef.current.handleReset(bars, intervalToMs(interval));
       setViewport(vp);
-      viewScaleRef.current = captureViewScale(vp, bars);
       onViewportChange?.(vp);
     }
-  }, [bars, onViewportChange]);
+  }, [bars, interval, onViewportChange]);
 
   const { composedGesture } = useChartGestures({
     dimensions: chartDimensions,

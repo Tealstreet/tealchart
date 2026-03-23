@@ -49,6 +49,17 @@ export class AutoScaleManager {
   }
 
   /**
+   * Check if any pane has had auto-scale explicitly disabled.
+   * Used for reset button visibility.
+   */
+  hasDisabledPanes(): boolean {
+    for (const enabled of this._paneAutoScale.values()) {
+      if (!enabled) return true;
+    }
+    return false;
+  }
+
+  /**
    * Apply auto-scale to the main pane viewport.
    * If auto-scale is enabled for 'main', fits the price axis to visible bars.
    * Otherwise, returns the viewport unchanged.
