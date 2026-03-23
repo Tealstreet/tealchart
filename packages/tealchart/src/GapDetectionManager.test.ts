@@ -1,14 +1,16 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { GapDetectionManager } from './GapDetectionManager';
 import type { GapDetectionEvent, GapDetectionReason } from './types';
 
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { GapDetectionManager } from './GapDetectionManager';
+
 describe('GapDetectionManager', () => {
-  let onRecoveryNeeded: ReturnType<typeof vi.fn>;
+  let onRecoveryNeeded: ReturnType<typeof vi.fn<(event: GapDetectionEvent) => void>>;
   let manager: GapDetectionManager;
 
   beforeEach(() => {
     vi.useFakeTimers();
-    onRecoveryNeeded = vi.fn();
+    onRecoveryNeeded = vi.fn<(event: GapDetectionEvent) => void>();
   });
 
   afterEach(() => {
@@ -143,9 +145,7 @@ describe('GapDetectionManager', () => {
       vi.advanceTimersByTime(120000);
 
       expect(onRecoveryNeeded).toHaveBeenCalledTimes(1);
-      expect(onRecoveryNeeded).toHaveBeenCalledWith(
-        expect.objectContaining({ reason: 'bar-timeout' })
-      );
+      expect(onRecoveryNeeded).toHaveBeenCalledWith(expect.objectContaining({ reason: 'bar-timeout' }));
     });
 
     it('should respect minBarTimeoutMs', () => {
@@ -250,9 +250,7 @@ describe('GapDetectionManager', () => {
       vi.advanceTimersByTime(1000);
 
       expect(onRecoveryNeeded).toHaveBeenCalledTimes(1);
-      expect(onRecoveryNeeded).toHaveBeenCalledWith(
-        expect.objectContaining({ reason: 'visibility-change' })
-      );
+      expect(onRecoveryNeeded).toHaveBeenCalledWith(expect.objectContaining({ reason: 'visibility-change' }));
     });
 
     it('should debounce rapid visibility changes', () => {
@@ -351,9 +349,7 @@ describe('GapDetectionManager', () => {
       vi.advanceTimersByTime(2000);
 
       expect(onRecoveryNeeded).toHaveBeenCalledTimes(1);
-      expect(onRecoveryNeeded).toHaveBeenCalledWith(
-        expect.objectContaining({ reason: 'network-reconnect' })
-      );
+      expect(onRecoveryNeeded).toHaveBeenCalledWith(expect.objectContaining({ reason: 'network-reconnect' }));
     });
 
     it('should debounce rapid network changes', () => {
@@ -533,18 +529,9 @@ describe('GapDetectionManager', () => {
 
       manager.dispose();
 
-      expect(removeEventListenerSpy).toHaveBeenCalledWith(
-        'visibilitychange',
-        expect.any(Function)
-      );
-      expect(windowRemoveEventListenerSpy).toHaveBeenCalledWith(
-        'online',
-        expect.any(Function)
-      );
-      expect(windowRemoveEventListenerSpy).toHaveBeenCalledWith(
-        'offline',
-        expect.any(Function)
-      );
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
+      expect(windowRemoveEventListenerSpy).toHaveBeenCalledWith('online', expect.any(Function));
+      expect(windowRemoveEventListenerSpy).toHaveBeenCalledWith('offline', expect.any(Function));
     });
 
     it('should not trigger recovery after dispose', () => {
