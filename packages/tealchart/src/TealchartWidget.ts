@@ -59,6 +59,7 @@ export class TealchartWidget {
   private _symbolInfo: LibrarySymbolInfo | null = null;
   private _bars: Bar[] = [];
   private _barsDirty = false; // true when bars array has been replaced (not just mutated)
+  private _viewportDirty = false; // true when viewport needs pushing to UI (atomic with bars)
   private _viewport: Viewport | null = null;
   private _isReady = false;
   private _readyCallbacks: Array<() => void> = [];
@@ -389,10 +390,12 @@ export class TealchartWidget {
         this._barsDirty = true;
 
         // Restore viewport from viewScale or calculate default (first load)
+        // Don't call setViewport here — _doRender pushes both bars + viewport
+        // atomically in the same frame to prevent 1-frame flash of old bars at new viewport
         if (bars.length > 0) {
           const vp = this._viewportController.handleBarsLoaded(bars, intervalToMs(this._interval));
           this._viewport = vp;
-          this._ui?.setViewport(vp);
+          this._viewportDirty = true;
         }
 
         // Notify Tealscript manager of all bars
@@ -828,6 +831,11 @@ export class TealchartWidget {
 
     // Push bars to ChartCore only when the array was replaced (load/reset),
     // not on every render. Real-time ticks go through updateBar() directly.
+    // Push viewport + bars atomically to prevent 1-frame flash of old bars at new viewport
+    if (this._viewportDirty) {
+      this._ui.setViewport(this._viewport!);
+      this._viewportDirty = false;
+    }
     if (this._barsDirty) {
       this._ui.setBars(this._bars);
       this._barsDirty = false;
