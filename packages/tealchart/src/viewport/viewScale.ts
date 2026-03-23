@@ -177,7 +177,7 @@ export function restoreViewport(viewScale: ViewScaleState, bars: Bar[]): Viewpor
       return TealchartRenderer.calculateViewport(bars);
     }
     const dataRange = fullBbox.highest - fullBbox.lowest;
-    const safePadding = dataRange > 0 ? dataRange : fullBbox.highest * 0.01 || 1;
+    const safePadding = dataRange > 0 ? dataRange : Math.abs(fullBbox.highest) * 0.01 || 1;
     return {
       startTime,
       endTime,
