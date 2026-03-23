@@ -838,17 +838,6 @@ export class TealchartWidget {
       this._barsDirty = false;
     }
     this._ui.setPlots(this._plots);
-    // Defer hiding the loading overlay by one frame so ChartCore's RAF-based
-    // render paints the new candles BEFORE the overlay is removed. Without this,
-    // setBars() queues a ChartCore RAF render but setLoading(false) immediately
-    // hides the overlay, exposing one frame of stale/empty canvas.
-    if (this._isLoadingBars) {
-      this._ui.setLoading(true);
-    } else if (this._wasLoadingBars) {
-      // Still loading visually — ChartCore hasn't painted yet. Defer to next frame.
-      requestAnimationFrame(() => this._ui?.setLoading(false));
-    }
-    this._wasLoadingBars = this._isLoadingBars;
 
     // Update order and position lines
     const orderLines = this._chartApi.getOrderLinesRenderData();

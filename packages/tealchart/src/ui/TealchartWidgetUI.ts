@@ -225,8 +225,7 @@ export class TealchartWidgetUI {
     this.settingsModal = new IndicatorSettingsModal();
     this.settingsModal.mount(this.rootEl);
 
-    // Create loading overlay (hidden by default)
-    this.createLoadingOverlay();
+    // No loading overlay — empty canvas grid renders while bars load
   }
 
   // ============================================================================
@@ -441,11 +440,8 @@ export class TealchartWidgetUI {
   /**
    * Set loading state
    */
-  setLoading(loading: boolean): void {
-    this.isLoading = loading;
-    if (this.loadingOverlay) {
-      this.loadingOverlay.style.display = loading ? 'flex' : 'none';
-    }
+  setLoading(_loading: boolean): void {
+    // No-op — empty canvas grid renders while bars load (no overlay needed)
   }
 
   /**
