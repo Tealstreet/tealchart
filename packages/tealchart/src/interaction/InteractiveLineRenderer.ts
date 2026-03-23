@@ -152,9 +152,18 @@ export class InteractiveLineRenderer {
       ((e: KeyboardEvent) => {
         if (e.key === 'Escape') {
           if (this.state.isDragging()) {
+            const dragLineId = this.state.getDragLineId();
             this.state.cancelDrag();
+            // Clean up drag UI
+            if (this.dragLine) {
+              this.dragLine.remove();
+              this.dragLine = null;
+            }
+            if (dragLineId) {
+              const labelEl = this.labelElements.get(dragLineId);
+              labelEl?.classList.remove('tc-dragging');
+            }
             this.options.onCursorChange?.('default');
-            // Force re-render to reset positions
             this.lastSignature = '';
           }
           if (this.tpslDrag) {
@@ -349,7 +358,7 @@ export class InteractiveLineRenderer {
   // ==========================================================================
 
   private updatePositions(bounds: PriceLineLabelBounds[], crosshair?: CrosshairLabelData): void {
-    const { priceToY, width, margins } = this.options;
+    const { priceToY, width } = this.options;
     const dragLineId = this.state.getDragLineId();
 
     for (const bound of bounds) {
@@ -763,9 +772,16 @@ export class InteractiveLineRenderer {
       this.options.onCursorChange?.('default');
     };
 
+    const onPointerCancel = () => {
+      this.tpslDrag = null;
+      this.options.onCursorChange?.('default');
+    };
+
     buttonEl.addEventListener('pointerdown', onPointerDown);
     buttonEl.addEventListener('pointermove', onPointerMove);
     buttonEl.addEventListener('pointerup', onPointerUp);
+    buttonEl.addEventListener('pointercancel', onPointerCancel);
+    buttonEl.addEventListener('lostpointercapture', onPointerCancel);
     buttonEl.addEventListener('mouseenter', () => this.options.onCursorChange?.('pointer'));
     buttonEl.addEventListener('mouseleave', () => {
       if (!this.tpslDrag) {
@@ -853,9 +869,23 @@ export class InteractiveLineRenderer {
       }
     };
 
+    const onPointerCancel = () => {
+      if (!this.state.isDragging() || this.state.getDragLineId() !== bound.lineId) return;
+      this.state.cancelDrag();
+      labelDiv.classList.remove('tc-dragging');
+      if (this.dragLine) {
+        this.dragLine.remove();
+        this.dragLine = null;
+      }
+      this.options.onCursorChange?.('default');
+      this.lastSignature = '';
+    };
+
     labelDiv.addEventListener('pointerdown', onPointerDown);
     labelDiv.addEventListener('pointermove', onPointerMove);
     labelDiv.addEventListener('pointerup', onPointerUp);
+    labelDiv.addEventListener('pointercancel', onPointerCancel);
+    labelDiv.addEventListener('lostpointercapture', onPointerCancel);
 
     // Cursor feedback
     labelDiv.addEventListener('mouseenter', () => {
@@ -945,22 +975,27 @@ export class InteractiveLineRenderer {
   // ==========================================================================
 
   private updateCrosshairVLine(crosshair?: CrosshairLabelData): void {
-    // Remove existing
-    if (this.crosshairVLine) {
-      this.crosshairVLine.remove();
-      this.crosshairVLine = null;
+    if (!crosshair?.visible) {
+      // Hide existing
+      if (this.crosshairVLine) {
+        this.crosshairVLine.style.display = 'none';
+      }
+      return;
     }
 
-    if (!crosshair?.visible) return;
+    if (!this.crosshairVLine) {
+      // Create once, reuse
+      const vline = document.createElement('div');
+      vline.className = 'tc-crosshair-vline';
+      this.lineContainer.appendChild(vline);
+      this.crosshairVLine = vline;
+    }
 
-    const vline = document.createElement('div');
-    vline.className = 'tc-crosshair-vline';
-    vline.style.left = `${crosshair.x}px`;
-    vline.style.height = `${this.options.height}px`;
-    vline.style.borderLeftColor = crosshair.color;
-
-    this.lineContainer.appendChild(vline);
-    this.crosshairVLine = vline;
+    // Update in-place
+    this.crosshairVLine.style.display = '';
+    this.crosshairVLine.style.left = `${crosshair.x}px`;
+    this.crosshairVLine.style.height = `${this.options.height}px`;
+    this.crosshairVLine.style.borderLeftColor = crosshair.color;
   }
 
   // ==========================================================================
