@@ -621,16 +621,10 @@ export class TealchartWidget {
       this._barSubscriptionGuid = null;
     }
 
-    // Clear existing bars
-    this._bars = [];
-    this._barsDirty = true;
+    // Don't clear bars — keep old candles visible (faded) until new data arrives
     this._hasMoreHistoricalData = true;
     this._isLoadingMoreBars = false;
-
-    // Notify Tealscript manager of cleared bars
-    if (this._tealScriptManager) {
-      this._tealScriptManager.setBars([]);
-    }
+    this._isLoadingBars = true;
 
     // Reload bars (this will also re-subscribe)
     this._loadBars();
@@ -1321,20 +1315,13 @@ export class TealchartWidget {
     }
 
     this._symbol = cleanSymbol;
-    this._bars = [];
+    // Don't clear bars — keep old candles + indicators visible (faded) until new data arrives
     this._hasMoreHistoricalData = true;
     this._isLoadingMoreBars = false;
     this._isLoadingBars = true;
 
-    // Notify Tealscript manager of cleared bars
-    if (this._tealScriptManager) {
-      this._tealScriptManager.setBars([]);
-    }
-
-    // Update UI immediately
-    if (symbolChanged) {
-      this._ui?.setSymbol(cleanSymbol);
-    }
+    // Update UI immediately (symbol always changed — same symbol early-returns above)
+    this._ui?.setSymbol(cleanSymbol);
     this._scheduleRender();
 
     // Increment to invalidate any in-flight resolveSymbol callbacks
@@ -1392,14 +1379,15 @@ export class TealchartWidget {
     }
 
     this._interval = interval;
-    this._bars = [];
-    this._hasMoreHistoricalData = true; // Reset for new interval
+    // Don't clear bars — keep old candles visible (faded) until new data arrives
+    this._hasMoreHistoricalData = true;
     this._isLoadingMoreBars = false;
+    this._isLoadingBars = true;
 
     // Persist interval to per-chart store (for restoration on page refresh)
     this._chartStore?.settings.setKey('interval', interval);
 
-    // Render immediately to show loading state (hides chart)
+    // Render immediately to show faded state
     this._scheduleRender();
 
     // Reload bars with new interval
@@ -1422,16 +1410,10 @@ export class TealchartWidget {
       this._barSubscriptionGuid = null;
     }
 
-    // Clear existing bars
-    this._bars = [];
+    // Don't clear bars — keep old candles visible (faded) until new data arrives
     this._hasMoreHistoricalData = true;
     this._isLoadingMoreBars = false;
     this._isLoadingBars = true;
-
-    // Notify Tealscript manager of cleared bars
-    if (this._tealScriptManager) {
-      this._tealScriptManager.setBars([]);
-    }
 
     this._scheduleRender();
 

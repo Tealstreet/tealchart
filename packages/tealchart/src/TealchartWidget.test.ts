@@ -31,6 +31,7 @@ vi.mock('./ui/TealchartWidgetUI', () => ({
     setPaneYRanges() {}
     setActiveIndicators() {}
     setViewport() {}
+    setCanvasOpacity() {}
     setRenderOptions() {}
     setSymbol(symbol: string, exchangeName?: string) {
       setSymbolCalls.push({ symbol, exchangeName });
