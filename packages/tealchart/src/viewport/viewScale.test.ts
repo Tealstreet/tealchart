@@ -62,14 +62,26 @@ describe('intervalToMs', () => {
     expect(intervalToMs('240')).toBe(14_400_000);
   });
 
-  it('converts day resolutions', () => {
-    expect(intervalToMs('1D')).toBe(86_400_000);
-    expect(intervalToMs('D')).toBe(86_400_000);
+  it('converts suffixed resolutions (h, m, s)', () => {
+    expect(intervalToMs('1h')).toBe(3_600_000);
+    expect(intervalToMs('4H')).toBe(14_400_000);
+    expect(intervalToMs('5m')).toBe(300_000);
+    expect(intervalToMs('30S')).toBe(30_000);
+    expect(intervalToMs('1s')).toBe(1_000);
   });
 
-  it('converts week resolutions', () => {
+  it('converts day resolutions (case-insensitive)', () => {
+    expect(intervalToMs('1D')).toBe(86_400_000);
+    expect(intervalToMs('D')).toBe(86_400_000);
+    expect(intervalToMs('1d')).toBe(86_400_000);
+    expect(intervalToMs('d')).toBe(86_400_000);
+  });
+
+  it('converts week resolutions (case-insensitive)', () => {
     expect(intervalToMs('1W')).toBe(604_800_000);
     expect(intervalToMs('W')).toBe(604_800_000);
+    expect(intervalToMs('1w')).toBe(604_800_000);
+    expect(intervalToMs('w')).toBe(604_800_000);
   });
 
   it('defaults to 1 hour for unknown resolutions', () => {
