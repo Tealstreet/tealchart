@@ -14,7 +14,7 @@ import { Series } from './series';
  * Bar data structure
  */
 export interface Bar {
-  time: number;      // Unix timestamp in milliseconds
+  time: number; // Unix timestamp in milliseconds
   open: number;
   high: number;
   low: number;
@@ -46,11 +46,11 @@ export interface BarState {
 export interface SymInfo {
   ticker: string;
   description: string;
-  type: string;        // 'crypto', 'stock', 'forex', etc.
+  type: string; // 'crypto', 'stock', 'forex', etc.
   currency: string;
   basecurrency: string;
-  mintick: number;     // Minimum price movement
-  pricescale: number;  // Price precision
+  mintick: number; // Minimum price movement
+  pricescale: number; // Price precision
   timezone: string;
 }
 
@@ -58,8 +58,8 @@ export interface SymInfo {
  * Timeframe information
  */
 export interface TimeframeInfo {
-  period: string;      // e.g., '1', '5', '60', 'D', 'W'
-  multiplier: number;  // e.g., 1, 5, 60
+  period: string; // e.g., '1', '5', '60', 'D', 'W'
+  multiplier: number; // e.g., 1, 5, 60
   isminutes: boolean;
   isdaily: boolean;
   isweekly: boolean;
@@ -103,15 +103,7 @@ export interface PlotOutput {
   plot2Id?: string;
 }
 
-export type PlotStyle =
-  | 'line'
-  | 'stepline'
-  | 'histogram'
-  | 'cross'
-  | 'circles'
-  | 'columns'
-  | 'area'
-  | 'areabr';
+export type PlotStyle = 'line' | 'stepline' | 'histogram' | 'cross' | 'circles' | 'columns' | 'area' | 'areabr';
 
 /**
  * Input definition from indicator
@@ -457,10 +449,24 @@ export class ExecutionContext {
   }
 
   /**
+   * Truncate all plot value (and color) arrays to the given length.
+   * Used before re-executing the last bar so that re-appended values
+   * don't duplicate the previous tick's output.
+   */
+  truncatePlots(length: number): void {
+    for (const plot of this.plots.values()) {
+      plot.values.length = length;
+      if (Array.isArray(plot.color)) {
+        plot.color.length = length;
+      }
+    }
+  }
+
+  /**
    * Get all plots as array
    */
   getPlots(): PlotOutput[] {
-    return this.plotOrder.map(id => this.plots.get(id)!).filter(Boolean);
+    return this.plotOrder.map((id) => this.plots.get(id)!).filter(Boolean);
   }
 
   // =========================================================================

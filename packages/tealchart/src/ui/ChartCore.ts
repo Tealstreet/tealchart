@@ -1021,7 +1021,7 @@ export class ChartCore {
   /**
    * Dispose and clean up
    */
-  dispose(): void {
+  dispose(preserveDom = false): void {
     if (this.rafId !== null) {
       cancelAnimationFrame(this.rafId);
     }
@@ -1033,7 +1033,10 @@ export class ChartCore {
     }
     this.eventManager.dispose();
     this.interactiveLineRenderer.dispose();
-    // Don't remove chartContainer — old DOM stays visible until new widget paints first frame
+    if (!preserveDom) {
+      this.chartContainer.remove();
+    }
+    // When preserveDom is true, old DOM stays visible until new widget paints first frame
   }
 
   // ============================================================================

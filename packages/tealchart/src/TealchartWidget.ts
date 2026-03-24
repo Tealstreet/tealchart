@@ -1597,9 +1597,11 @@ export class TealchartWidget {
     // Clean up event emitter
     this._eventEmitter.removeAllListeners();
 
-    // Dispose vanilla UI
+    // Dispose vanilla UI — preserve DOM so the new widget can show old
+    // content until its first paint with bars (prevents blank flash).
+    // The new widget's cleanupStaleSiblings() handles removal.
     if (this._ui) {
-      this._ui.dispose();
+      this._ui.dispose(true);
       this._ui = null;
     }
   }

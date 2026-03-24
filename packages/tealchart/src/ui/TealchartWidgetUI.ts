@@ -160,6 +160,7 @@ export class TealchartWidgetUI {
         overflow: 'hidden',
       },
     });
+    this.rootEl.setAttribute('data-tealchart-root', 'true');
 
     // Create chart area - takes full size of container (behind top bar)
     this.chartArea = div({
@@ -595,8 +596,8 @@ export class TealchartWidgetUI {
   /**
    * Dispose and clean up
    */
-  dispose(): void {
-    this.chartCore?.dispose();
+  dispose(preserveDom = false): void {
+    this.chartCore?.dispose(preserveDom);
     this.topBar?.unmount();
     this.legend?.unmount();
     // Clean up indicator pane legends
@@ -606,9 +607,11 @@ export class TealchartWidgetUI {
     this.indicatorPaneLegends.clear();
     this.indicatorsModal?.unmount();
     this.settingsModal?.unmount();
-    // Intentionally do NOT remove rootEl from DOM here.
-    // The new widget keeps old DOM visible until first paint with bars,
-    // then calls cleanupStaleSiblings() to remove old children.
+    if (!preserveDom) {
+      this.rootEl.remove();
+    }
+    // When preserveDom is true, old DOM stays visible until the new widget
+    // paints its first frame, then calls cleanupStaleSiblings() to remove it.
   }
 
   /**
@@ -618,7 +621,7 @@ export class TealchartWidgetUI {
   cleanupStaleSiblings(): void {
     const children = Array.from(this.container.children);
     for (const child of children) {
-      if (child !== this.rootEl) {
+      if (child !== this.rootEl && child.hasAttribute('data-tealchart-root')) {
         child.remove();
       }
     }

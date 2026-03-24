@@ -479,7 +479,7 @@ export class EventManager {
     const dy = Math.abs(mouseY - this.state.dragStartY);
     const wasClick = dx < 5 && dy < 5;
 
-    if (wasClick && this.callbacks.onPaneDoubleClick && this.callbacks.getPaneAtY) {
+    if (wasClick && e.button === 0 && this.callbacks.onPaneDoubleClick && this.callbacks.getPaneAtY) {
       const y = mouseY;
       const pane = this.callbacks.getPaneAtY(y);
       if (pane) {

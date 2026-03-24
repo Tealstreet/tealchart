@@ -482,6 +482,8 @@ plot(close, title="Close")`;
 
       const closePlot = plots.find((p) => p.title === 'Close');
       expect(closePlot).toBeDefined();
+      // Plot array length must match bar count (no duplicates from re-execution)
+      expect(closePlot!.values.length).toBe(bars.length);
       // The last value should reflect the updated close
       expect(closePlot!.values[closePlot!.values.length - 1]).toBe(999);
     });
@@ -505,6 +507,7 @@ plot(close, title="Close")`;
       const updatedBar1 = { ...bars[4], close: 200 };
       const plots1 = engine.updateBar(ast, updatedBar1);
       const close1 = plots1.find((p) => p.title === 'Close')!;
+      expect(close1.values.length).toBe(bars.length);
       expect(close1.values[close1.values.length - 1]).toBe(200);
 
       // Second updateBar — rollback should restore to committed state,
@@ -512,6 +515,7 @@ plot(close, title="Close")`;
       const updatedBar2 = { ...bars[4], close: 300 };
       const plots2 = engine.updateBar(ast, updatedBar2);
       const close2 = plots2.find((p) => p.title === 'Close')!;
+      expect(close2.values.length).toBe(bars.length);
       expect(close2.values[close2.values.length - 1]).toBe(300);
     });
 
@@ -535,6 +539,7 @@ plot(close)`;
       // and values would be wrong. The fact that we get correct plots
       // means the snapshot was taken on the last bar.
       expect(plots.length).toBeGreaterThan(0);
+      expect(plots[0].values.length).toBe(bars.length);
       expect(plots[0].values[plots[0].values.length - 1]).toBe(555);
     });
   });

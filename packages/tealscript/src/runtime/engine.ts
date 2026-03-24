@@ -141,6 +141,10 @@ export class TealscriptEngine {
     this.scope.rollback();
     this.ctx.rollbackBar();
 
+    // Truncate plot arrays to remove the last bar's appended values
+    // so re-execution can re-append them cleanly without duplication
+    this.ctx.truncatePlots(this.ctx.last_bar_index);
+
     // Update current bar data
     this.ctx.updateCurrentBar(bar);
 

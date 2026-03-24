@@ -22,6 +22,7 @@ interface ScriptState {
   engine: TealscriptEngine;
   bars: Bar[];
   inputs: Record<string, unknown>;
+  lastInputs: InputDefinition[];
 }
 
 // Current script state
@@ -89,6 +90,7 @@ function handleInit(scriptId: string, script: string, bars: Bar[], inputs: Recor
       engine,
       bars,
       inputs,
+      lastInputs: [],
     };
 
     // Execute and send results
@@ -143,7 +145,7 @@ function handleUpdateBar(bar: Bar): void {
       type: 'result',
       scriptId: state.scriptId,
       plots,
-      inputs: [], // inputs don't change on tick
+      inputs: state.lastInputs, // send cached inputs from last full execution
     });
   } else {
     // New bar — need full execute to process the new bar through all statements
@@ -201,6 +203,9 @@ function executeAndSendResults(): void {
       ...input,
       type: input.type as InputDefinition['type'],
     }));
+
+    // Cache inputs for intrabar ticks
+    state.lastInputs = inputs;
 
     // Send results
     const resultMessage: ResultMessage = {
