@@ -386,14 +386,17 @@ export class TealchartWidget {
           this._viewport = vp;
         }
 
-        // Notify Tealscript manager of new bars (plots arrive async via onPlotsUpdated)
+        this._isLoadingBars = false;
+        // Single dirty flag triggers atomic render of viewport + bars + empty plots
+        this._scheduler.markDirty(DIRTY.DATA_LOAD);
+
+        // Notify Tealscript AFTER markDirty — worker callback may fire fast and
+        // overwrite _plots. DATA_LOAD in the RAF snapshot ensures empty plots are
+        // pushed first, then PLOTS from worker callback gets its own render frame.
         if (this._tealScriptManager) {
           this._tealScriptManager.setBars(bars);
         }
 
-        this._isLoadingBars = false;
-        // Single dirty flag triggers atomic render of viewport + bars + empty plots
-        this._scheduler.markDirty(DIRTY.DATA_LOAD);
         this._subscribeToBars();
         this._setReady();
       },
@@ -818,13 +821,16 @@ export class TealchartWidget {
     this._ensureUI();
     if (!this._ui) return;
 
-    // Atomic data transition: push viewport + bars + empty plots in one go
+    // Atomic data transition: push viewport + bars + FORCE empty plots in one go.
+    // Worker callback may have raced and set _plots to stale data between
+    // markDirty(DATA_LOAD) and this RAF — override with empty to guarantee clean slate.
     if (dirty & DIRTY.DATA_LOAD) {
+      this._plots = []; // Force empty — reject any stale worker callback
       if (this._viewport) {
         this._ui.setViewport(this._viewport);
       }
       this._ui.setBars(this._bars);
-      this._ui.setPlots(this._plots); // Empty after data load — cleared on bars arrival
+      this._ui.setPlots([]); // Explicitly empty
       dirty = DIRTY.FULL; // Force full repaint of everything
     }
 
