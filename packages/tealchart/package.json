@@ -29,7 +29,7 @@
     "@nanostores/react": "^1.1.0",
     "@tealstreet/react-colorful": "*",
     "@tealstreet/tealscript": "*",
-    "jotai": "^2.19.0",
+    "jotai": "^2.18.1",
     "jotai-optics": "^0.4.0",
     "konva": "^10.2.3",
     "nanostores": "^1.2.0",
@@ -45,8 +45,8 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^18.3.6",
     "@vitejs/plugin-react": "^5.1.4",
-    "@vitest/coverage-v8": "^4.1.1",
-    "@vitest/ui": "^4.1.0",
+    "@vitest/coverage-v8": "^4.1.0",
+    "@vitest/ui": "^4.1.1",
     "cross-env": "^7.0.3",
     "eslint": "^9.28.0",
     "npm-run-all2": "^8.0.4",
@@ -58,6 +58,6 @@
     "typescript": "^5.9.3",
     "vite": "^8.0.2",
     "vite-tsconfig-paths": "^5.0.1",
-    "vitest": "^4.1.1"
+    "vitest": "^4.0.18"
   }
 }
