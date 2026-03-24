@@ -225,7 +225,7 @@ export class TealchartWidgetUI {
       style: {
         display: 'none',
         fontSize: '20px',
-        color: 'var(--tc-text-color, rgba(255, 255, 255, 0.5))',
+        color: 'rgba(255, 255, 255, 0.5)',
         letterSpacing: '1px',
         padding: '2px 0 0 4px',
       },
@@ -423,6 +423,13 @@ export class TealchartWidgetUI {
   setInterval(interval: ResolutionString): void {
     this.topBar?.setInterval(interval);
     this.legend?.setInterval(interval);
+  }
+
+  /**
+   * Update supported resolutions (filters timeframe buttons in top bar)
+   */
+  setSupportedResolutions(resolutions: string[] | null): void {
+    this.topBar?.setSupportedResolutions(resolutions);
   }
 
   /**
