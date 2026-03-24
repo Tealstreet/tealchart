@@ -45,7 +45,7 @@
 
 /* Segment box - colored box with text */
 .tc-segment {
-  padding: 0 4px;
+  padding: 0 6px;
   height: 100%;
   display: flex;
   align-items: center;
