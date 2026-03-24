@@ -12,6 +12,22 @@ function label(originalY: number, height = 20, priority = 0): LabelBounds {
 }
 
 /**
+ * Check that adjustedY ordering matches originalY ordering
+ * (labels that were higher by price stay higher after de-overlap)
+ */
+function assertOrdering(labels: LabelBounds[]): void {
+  for (let i = 0; i < labels.length; i++) {
+    for (let j = i + 1; j < labels.length; j++) {
+      if (labels[i].originalY < labels[j].originalY) {
+        expect(labels[i].adjustedY).toBeLessThanOrEqual(labels[j].adjustedY);
+      } else if (labels[i].originalY > labels[j].originalY) {
+        expect(labels[i].adjustedY).toBeGreaterThanOrEqual(labels[j].adjustedY);
+      }
+    }
+  }
+}
+
+/**
  * Check that no two labels overlap after resolution
  */
 function assertNoOverlaps(labels: LabelBounds[]): void {
@@ -199,6 +215,57 @@ describe('resolveLabelCollisions', () => {
       ];
       resolveLabelCollisions(labels);
       assertNoOverlaps(labels);
+    });
+  });
+
+  describe('ordering preservation', () => {
+    it('maintains originalY ordering in adjustedY', () => {
+      // Labels close together that could get swapped during de-overlap
+      const labels = [label(100, 20), label(105, 20), label(110, 20)];
+      resolveLabelCollisions(labels);
+      assertNoOverlaps(labels);
+      assertOrdering(labels);
+    });
+
+    it('maintains ordering with mixed priorities', () => {
+      // High priority in middle could push others out of order
+      const labels = [
+        label(100, 20, 1),
+        label(105, 20, 10), // anchor
+        label(108, 20, 1),
+        label(112, 20, 1),
+      ];
+      resolveLabelCollisions(labels);
+      assertNoOverlaps(labels);
+      assertOrdering(labels);
+    });
+
+    it('maintains ordering for tightly packed labels', () => {
+      // 6 labels within 30px — forces lots of pushing
+      const labels = [
+        label(100, 18, 0),
+        label(103, 18, 0),
+        label(106, 18, 5),
+        label(109, 18, 0),
+        label(112, 18, 0),
+        label(115, 18, 0),
+      ];
+      resolveLabelCollisions(labels);
+      assertNoOverlaps(labels);
+      assertOrdering(labels);
+    });
+
+    it('never produces inverted ordering for random inputs', () => {
+      for (let trial = 0; trial < 50; trial++) {
+        clearCollisionCache();
+        const count = 3 + Math.floor(Math.random() * 8);
+        const labels = Array.from({ length: count }, () =>
+          label(Math.random() * 500, 15 + Math.random() * 25, Math.floor(Math.random() * 5)),
+        );
+        resolveLabelCollisions(labels);
+        assertNoOverlaps(labels);
+        assertOrdering(labels);
+      }
     });
   });
 });
