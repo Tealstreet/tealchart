@@ -100,6 +100,8 @@ export interface ChartCoreOptions {
   onResetViewport?: () => void;
   /** Returns whether auto-scale is active for a given pane */
   isAutoScale?: (paneId: string) => boolean;
+  /** Called on double-click/double-tap on a pane */
+  onPaneDoubleClick?: (paneId: string) => void;
 }
 
 // ============================================================================
@@ -712,6 +714,7 @@ export class ChartCore {
         this.cursor = cursor;
         this.chartContainer.style.cursor = cursor;
       },
+      onPaneDoubleClick: (paneId) => this.options.onPaneDoubleClick?.(paneId),
     });
 
     // Create reset button
@@ -1018,7 +1021,7 @@ export class ChartCore {
   /**
    * Dispose and clean up
    */
-  dispose(): void {
+  dispose(preserveDom = false): void {
     if (this.rafId !== null) {
       cancelAnimationFrame(this.rafId);
     }
@@ -1030,7 +1033,10 @@ export class ChartCore {
     }
     this.eventManager.dispose();
     this.interactiveLineRenderer.dispose();
-    this.chartContainer.remove();
+    if (!preserveDom) {
+      this.chartContainer.remove();
+    }
+    // When preserveDom is true, old DOM stays visible until new widget paints first frame
   }
 
   // ============================================================================

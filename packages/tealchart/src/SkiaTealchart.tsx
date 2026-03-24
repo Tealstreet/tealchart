@@ -478,10 +478,46 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     [crosshairVisible],
   );
 
+  // Double-tap handler for pane maximize/restore
+  const handleDoubleTap = useCallback(
+    (y: number) => {
+      if (!unifiedPaneLayout || !coreResult.core) return;
+      const panes = unifiedPaneLayout.panes;
+      const availableHeight = dimensions.height - (margins.bottom || 30);
+      let currentTop = margins.top || 0;
+
+      for (const pane of panes) {
+        const paneHeight = availableHeight * pane.heightRatio;
+        if (y >= currentTop && y < currentTop + paneHeight) {
+          coreResult.core.toggleMaximizePane(pane.id);
+          return;
+        }
+        currentTop += paneHeight;
+      }
+    },
+    [unifiedPaneLayout, coreResult.core, dimensions.height, margins],
+  );
+
+  // Double-tap gesture for pane maximize/restore
+  const doubleTapGesture = useMemo(
+    () =>
+      Gesture.Tap()
+        .numberOfTaps(2)
+        .onEnd((event) => {
+          runOnJS(handleDoubleTap)(event.y);
+        }),
+    [handleDoubleTap],
+  );
+
   // Combine all gestures
   const allGestures = useMemo(
-    () => Gesture.Race(longPressGesture, Gesture.Simultaneous(composedGesture, crosshairPanGesture, tapGesture)),
-    [longPressGesture, composedGesture, crosshairPanGesture, tapGesture],
+    () =>
+      Gesture.Race(
+        doubleTapGesture,
+        longPressGesture,
+        Gesture.Simultaneous(composedGesture, crosshairPanGesture, tapGesture),
+      ),
+    [doubleTapGesture, longPressGesture, composedGesture, crosshairPanGesture, tapGesture],
   );
 
   // ==========================================================================

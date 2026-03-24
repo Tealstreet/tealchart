@@ -5,7 +5,15 @@
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
-import { Series, seriesFrom, ExecutionContext, Scope, TealscriptEngine, executeScript, type Bar } from '../../src/runtime';
+import {
+  Series,
+  seriesFrom,
+  ExecutionContext,
+  Scope,
+  TealscriptEngine,
+  executeScript,
+  type Bar,
+} from '../../src/runtime';
 
 // Helper to create test bars
 function createBars(count: number, startPrice: number = 100): Bar[] {
@@ -434,7 +442,10 @@ plot(close, "Close Price", color=color.blue, linewidth=2)
 
       expect(result.plots).toHaveLength(1);
       expect(result.plots[0].title).toBe('Close Price');
-      expect(result.plots[0].color).toBe('#2196F3'); // color.blue
+      // color is per-bar array, every bar should be color.blue
+      const colors = result.plots[0].color;
+      expect(Array.isArray(colors)).toBe(true);
+      expect((colors as string[]).every((c) => c === '#2196F3')).toBe(true);
       expect(result.plots[0].linewidth).toBe(2);
     });
 
@@ -490,7 +501,7 @@ plot(length)
       const result = executeScript(ast, bars, inputs);
 
       // All plot values should be 20 (the overridden input)
-      expect(result.plots[0].values.every(v => v === 20)).toBe(true);
+      expect(result.plots[0].values.every((v) => v === 20)).toBe(true);
     });
   });
 

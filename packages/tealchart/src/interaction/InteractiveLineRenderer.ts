@@ -570,28 +570,29 @@ export class InteractiveLineRenderer {
     const priceAxisLabelX = width - bound.width - PRICE_AXIS_RIGHT_PADDING;
     const priceAxisLabelY = labelCenterY - bound.height / 2;
 
-    // Calculate chart label dimensions
-    let segmentsWidth = 0;
+    // Calculate chart label X position
     let chartLabelX = margins.left;
     const useNarrowText = width < 400;
     const buttons = chartLabel?.buttons || [];
     const hasTPSLButtons = buttons.length > 0 && (buttons[0].type === 'tp' || buttons[0].type === 'sl');
 
     if (chartLabel && chartLabel.segments.length > 0) {
-      for (const segment of chartLabel.segments) {
-        const text = useNarrowText && segment.textShort ? segment.textShort : segment.text;
-        segmentsWidth += text.length * 6 + 8;
-      }
-
       const lineLength = bound.lineLength ?? 100;
-      let chartLabelWidth = segmentsWidth + (hasTPSLButtons ? TP_SL_GAP : 0);
-      for (const button of buttons) {
-        chartLabelWidth += button.type === 'tp' || button.type === 'sl' ? 24 : 16;
+      if (lineLength < 100) {
+        // For non-full-width lines, estimate label width for X positioning
+        // (actual sizing is handled by CSS — this is just for initial placement)
+        let estimatedWidth = 0;
+        for (const segment of chartLabel.segments) {
+          const text = useNarrowText && segment.textShort ? segment.textShort : segment.text;
+          estimatedWidth += text.length * 7 + 14; // rough char width + padding
+        }
+        estimatedWidth += hasTPSLButtons ? TP_SL_GAP : 0;
+        for (const button of buttons) {
+          estimatedWidth += button.type === 'tp' || button.type === 'sl' ? 24 : 16;
+        }
+        const maxLabelX = width - margins.right - estimatedWidth;
+        chartLabelX = margins.left + ((maxLabelX - margins.left) * (100 - lineLength)) / 100;
       }
-
-      const maxLabelX = width - margins.right - chartLabelWidth;
-      const minLabelX = margins.left;
-      chartLabelX = minLabelX + ((maxLabelX - minLabelX) * (100 - lineLength)) / 100;
     }
 
     // Create the chart label div
@@ -605,11 +606,10 @@ export class InteractiveLineRenderer {
       labelDiv.style.left = `${chartLabelX}px`;
       labelDiv.style.top = `${lineY - LABEL_HEIGHT / 2}px`;
 
-      // Render segments
+      // Render segments — no explicit width; CSS padding handles sizing
       for (let i = 0; i < chartLabel.segments.length; i++) {
         const segment = chartLabel.segments[i];
         const text = useNarrowText && segment.textShort ? segment.textShort : segment.text;
-        const textWidth = text.length * 6 + 8;
         const isFirst = i === 0;
         const isLast = i === chartLabel.segments.length - 1;
         const hasButtons = (chartLabel.buttons?.length ?? 0) > 0 || hasTPSLButtons;
@@ -622,7 +622,6 @@ export class InteractiveLineRenderer {
         else if (isFirst) segEl.classList.add('tc-segment-first');
         else if (isVisuallyLast) segEl.classList.add('tc-segment-last');
 
-        segEl.style.width = `${textWidth}px`;
         segEl.style.backgroundColor = segment.backgroundColor;
         segEl.style.color = segment.textColor;
         segEl.style.borderWidth = '1px';

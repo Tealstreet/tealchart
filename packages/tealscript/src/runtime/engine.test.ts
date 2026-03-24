@@ -48,7 +48,7 @@ plot(close, title="Close Price")`;
       const result = executeScript(ast, bars);
 
       expect(result.plots.length).toBeGreaterThan(0);
-      const closePlot = result.plots.find(p => p.title === 'Close Price');
+      const closePlot = result.plots.find((p) => p.title === 'Close Price');
       expect(closePlot).toBeDefined();
       expect(closePlot!.values.length).toBe(10);
     });
@@ -211,8 +211,8 @@ plot(y, title="Or")`;
       const bars = createBars(1);
       const result = executeScript(ast, bars);
 
-      const andPlot = result.plots.find(p => p.title === 'And');
-      const orPlot = result.plots.find(p => p.title === 'Or');
+      const andPlot = result.plots.find((p) => p.title === 'And');
+      const orPlot = result.plots.find((p) => p.title === 'Or');
 
       expect(andPlot!.values[0]).toBe(0);
       expect(orPlot!.values[0]).toBe(1);
@@ -458,6 +458,89 @@ plot(x)`;
       const result = executeScript(ast, bars);
 
       expect(result.errors.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('updateBar (incremental execution)', () => {
+    it('updates plot values on same-timestamp bar', () => {
+      const script = `//@version=6
+indicator("Test")
+plot(close, title="Close")`;
+
+      const ast = parse(script);
+      const bars = createBars(5, 100);
+      const engine = new TealscriptEngine();
+
+      // Full execute
+      const result = engine.execute(ast, bars);
+      const lastPlotValue = result.plots[0].values[4];
+      expect(lastPlotValue).toBeCloseTo(bars[4].close, 5);
+
+      // Update last bar with a different close price
+      const updatedBar = { ...bars[4], close: 999 };
+      const plots = engine.updateBar(ast, updatedBar);
+
+      const closePlot = plots.find((p) => p.title === 'Close');
+      expect(closePlot).toBeDefined();
+      // Plot array length must match bar count (no duplicates from re-execution)
+      expect(closePlot!.values.length).toBe(bars.length);
+      // The last value should reflect the updated close
+      expect(closePlot!.values[closePlot!.values.length - 1]).toBe(999);
+    });
+
+    it('rollback works correctly between updateBar calls', () => {
+      const script = `//@version=6
+indicator("Test")
+plot(close, title="Close")`;
+
+      const ast = parse(script);
+      const bars = createBars(5, 100);
+      const engine = new TealscriptEngine();
+
+      // Full execute
+      const result = engine.execute(ast, bars);
+      const closePlot = result.plots.find((p) => p.title === 'Close')!;
+      const originalLastValue = closePlot.values[4];
+      expect(originalLastValue).toBeCloseTo(bars[4].close, 5);
+
+      // First updateBar with new close
+      const updatedBar1 = { ...bars[4], close: 200 };
+      const plots1 = engine.updateBar(ast, updatedBar1);
+      const close1 = plots1.find((p) => p.title === 'Close')!;
+      expect(close1.values.length).toBe(bars.length);
+      expect(close1.values[close1.values.length - 1]).toBe(200);
+
+      // Second updateBar — rollback should restore to committed state,
+      // so the new close value replaces the previous updateBar's value
+      const updatedBar2 = { ...bars[4], close: 300 };
+      const plots2 = engine.updateBar(ast, updatedBar2);
+      const close2 = plots2.find((p) => p.title === 'Close')!;
+      expect(close2.values.length).toBe(bars.length);
+      expect(close2.values[close2.values.length - 1]).toBe(300);
+    });
+
+    it('snapshot is only taken on the last bar', () => {
+      const script = `//@version=6
+indicator("Test")
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(10, 100);
+      const engine = new TealscriptEngine();
+
+      // Full execute
+      engine.execute(ast, bars);
+
+      // Verify updateBar works (which requires a snapshot from the last bar)
+      const updatedBar = { ...bars[9], close: 555 };
+      const plots = engine.updateBar(ast, updatedBar);
+
+      // If snapshot wasn't taken on last bar, rollback would fail
+      // and values would be wrong. The fact that we get correct plots
+      // means the snapshot was taken on the last bar.
+      expect(plots.length).toBeGreaterThan(0);
+      expect(plots[0].values.length).toBe(bars.length);
+      expect(plots[0].values[plots[0].values.length - 1]).toBe(555);
     });
   });
 });

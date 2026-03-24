@@ -21,8 +21,8 @@ export type VarKind = 'none' | 'var' | 'varip';
 export interface VariableEntry {
   value: unknown;
   kind: VarKind;
-  type?: string;          // Type annotation
-  initialized: boolean;   // Has been initialized at least once
+  type?: string; // Type annotation
+  initialized: boolean; // Has been initialized at least once
   series?: Series<unknown>; // For series variables
 }
 
@@ -60,12 +60,7 @@ export class Scope {
   /**
    * Declare a new variable
    */
-  declare(
-    name: string,
-    kind: VarKind,
-    value: unknown,
-    type?: string
-  ): void {
+  declare(name: string, kind: VarKind, value: unknown, type?: string): void {
     // For var/varip, only initialize if not already declared
     if (kind === 'var' || kind === 'varip') {
       const existing = this.getLocal(name);
@@ -249,8 +244,9 @@ export class Scope {
 
   /**
    * Commit current bar state
+   * @param isLastBar - Only take a snapshot on the last bar (for realtime rollback)
    */
-  commit(): void {
+  commit(isLastBar = false): void {
     // Commit all series
     for (const entry of this.variables.values()) {
       if (entry.series) {
@@ -258,8 +254,10 @@ export class Scope {
       }
     }
 
-    // Save snapshot for rollback
-    this.lastCommittedState = this.snapshot();
+    // Only snapshot on the last bar — rollback is only used for realtime recalculation
+    if (isLastBar) {
+      this.lastCommittedState = this.snapshot();
+    }
   }
 
   /**

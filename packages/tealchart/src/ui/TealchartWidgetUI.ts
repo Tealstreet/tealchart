@@ -112,6 +112,8 @@ export interface TealchartWidgetUIOptions {
   onResetViewport?: () => void;
   /** Returns whether auto-scale is active for a given pane */
   isAutoScale?: (paneId: string) => boolean;
+  /** Called on double-click/double-tap on a pane */
+  onPaneDoubleClick?: (paneId: string) => void;
 }
 
 // ============================================================================
@@ -158,6 +160,7 @@ export class TealchartWidgetUI {
         overflow: 'hidden',
       },
     });
+    this.rootEl.setAttribute('data-tealchart-root', 'true');
 
     // Create chart area - takes full size of container (behind top bar)
     this.chartArea = div({
@@ -197,7 +200,9 @@ export class TealchartWidgetUI {
       this.rootEl.appendChild(topBarWrapper);
     }
 
-    // Mount to container
+    // Mount to container — don't clear old children yet.
+    // The old widget's DOM stays visible until we paint the first frame with bars,
+    // preventing a blank flash during HMR / theme switch / widget recreation.
     this.container.appendChild(this.rootEl);
 
     // Initialize chart core after getting dimensions
@@ -287,6 +292,7 @@ export class TealchartWidgetUI {
       onAutoScaleDisabled: this.options.onAutoScaleDisabled,
       onResetViewport: this.options.onResetViewport,
       isAutoScale: this.options.isAutoScale,
+      onPaneDoubleClick: this.options.onPaneDoubleClick,
     });
   }
 
@@ -590,8 +596,8 @@ export class TealchartWidgetUI {
   /**
    * Dispose and clean up
    */
-  dispose(): void {
-    this.chartCore?.dispose();
+  dispose(preserveDom = false): void {
+    this.chartCore?.dispose(preserveDom);
     this.topBar?.unmount();
     this.legend?.unmount();
     // Clean up indicator pane legends
@@ -601,6 +607,23 @@ export class TealchartWidgetUI {
     this.indicatorPaneLegends.clear();
     this.indicatorsModal?.unmount();
     this.settingsModal?.unmount();
-    this.rootEl.remove();
+    if (!preserveDom) {
+      this.rootEl.remove();
+    }
+    // When preserveDom is true, old DOM stays visible until the new widget
+    // paints its first frame, then calls cleanupStaleSiblings() to remove it.
+  }
+
+  /**
+   * Remove any sibling elements from the container that aren't our rootEl.
+   * Called after first successful paint with bars to clean up old widget DOM.
+   */
+  cleanupStaleSiblings(): void {
+    const children = Array.from(this.container.children);
+    for (const child of children) {
+      if (child !== this.rootEl && child.hasAttribute('data-tealchart-root')) {
+        child.remove();
+      }
+    }
   }
 }

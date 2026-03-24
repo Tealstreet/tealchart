@@ -16,6 +16,8 @@
  */
 
 export interface LabelBounds {
+  /** Optional identifier (used by mobile hook for caching) */
+  id?: string;
   /** Original Y position (center of label) - never changes */
   originalY: number;
   /** Adjusted Y position after collision resolution */
@@ -44,9 +46,7 @@ export function clearCollisionCache(): void {
 function getCacheKey(labels: LabelBounds[]): string {
   // Use originalY and height as key components (priority doesn't affect collision geometry)
   // Round to 1 decimal to handle floating point noise
-  return labels
-    .map(l => `${Math.round(l.originalY * 10)}:${Math.round(l.height * 10)}`)
-    .join('|');
+  return labels.map((l) => `${Math.round(l.originalY * 10)}:${Math.round(l.height * 10)}`).join('|');
 }
 
 /**
@@ -206,6 +206,48 @@ function hasAnyOverlaps<T extends LabelBounds>(labels: T[]): boolean {
 }
 
 /**
+ * Enforce monotonic ordering: labels sorted by originalY must have non-decreasing adjustedY.
+ * When de-overlap pushes labels around, two labels can swap relative positions.
+ * This pass detects inversions and re-stacks to fix them while maintaining no-overlap.
+ */
+function enforceOrdering<T extends LabelBounds>(labels: T[]): void {
+  if (labels.length < 2) return;
+
+  // Sort by originalY to get the "correct" ordering
+  const sorted = [...labels].sort((a, b) => a.originalY - b.originalY);
+
+  // Find inversions and fix by re-stacking downward
+  for (let iter = 0; iter < 5; iter++) {
+    let fixed = false;
+
+    for (let i = 1; i < sorted.length; i++) {
+      const prev = sorted[i - 1];
+      const curr = sorted[i];
+
+      // Inversion: prev should be above (lower adjustedY) but isn't
+      if (prev.adjustedY > curr.adjustedY) {
+        // Swap their adjustedY values
+        const tmp = prev.adjustedY;
+        prev.adjustedY = curr.adjustedY;
+        curr.adjustedY = tmp;
+        fixed = true;
+      }
+
+      // Also fix overlaps while maintaining order
+      const prevBottom = prev.adjustedY + prev.height / 2;
+      const currTop = curr.adjustedY - curr.height / 2;
+      if (prevBottom > currTop + 0.1) {
+        // Push current down to be flush below prev
+        curr.adjustedY = prevBottom + curr.height / 2;
+        fixed = true;
+      }
+    }
+
+    if (!fixed) break;
+  }
+}
+
+/**
  * Prune old entries from cache
  */
 function pruneCache(): void {
@@ -220,14 +262,13 @@ function pruneCache(): void {
     }
   });
 
-  toDelete.forEach(key => {
+  toDelete.forEach((key) => {
     collisionCache.delete(key);
   });
 
   // If still too large, delete oldest entries
   if (collisionCache.size > CACHE_MAX_SIZE) {
-    const entries = Array.from(collisionCache.entries())
-      .sort((a, b) => a[1].timestamp - b[1].timestamp);
+    const entries = Array.from(collisionCache.entries()).sort((a, b) => a[1].timestamp - b[1].timestamp);
 
     const deleteCount = collisionCache.size - CACHE_MAX_SIZE + 10;
     for (let i = 0; i < deleteCount && i < entries.length; i++) {
@@ -270,12 +311,15 @@ export function resolveLabelCollisions<T extends LabelBounds>(labels: T[]): T[] 
     stackCluster(cluster);
   }
 
+  // Enforce ordering after cluster stacking (clusters can also produce inversions)
+  enforceOrdering(labels);
+
   // Early exit: if no overlaps after cluster stacking, skip Phase 3
   if (!hasAnyOverlaps(labels)) {
     // Cache the result
     pruneCache();
     collisionCache.set(cacheKey, {
-      result: labels.map(l => ({ ...l })),
+      result: labels.map((l) => ({ ...l })),
       timestamp: now,
     });
     return labels;
@@ -344,10 +388,15 @@ export function resolveLabelCollisions<T extends LabelBounds>(labels: T[]): T[] 
     locked.push(label);
   }
 
+  // Phase 4: Enforce monotonic ordering
+  // Labels sorted by originalY must have non-decreasing adjustedY.
+  // Phase 3 can violate this when pushing labels by "closest to original" direction.
+  enforceOrdering(labels);
+
   // Cache the result
   pruneCache();
   collisionCache.set(cacheKey, {
-    result: labels.map(l => ({ ...l })),
+    result: labels.map((l) => ({ ...l })),
     timestamp: now,
   });
 

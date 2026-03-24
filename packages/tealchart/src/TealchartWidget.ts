@@ -291,7 +291,13 @@ export class TealchartWidget {
       });
     }
 
-    // Initialize
+    // Create UI synchronously so the canvas exists immediately.
+    // Without this, there's a blank gap between remove() and first bars arriving
+    // because _ensureUI() was deferred until first _render() call.
+    // This prevents blank canvas on HMR, theme switch, or any widget recreation.
+    this._ensureUI();
+
+    // Initialize (async: onReady → resolveSymbol → loadBars)
     this._initialize();
   }
 
@@ -399,6 +405,10 @@ export class TealchartWidget {
 
         this._subscribeToBars();
         this._setReady();
+
+        // Clean up old widget DOM now that we have bars to paint.
+        // Old DOM stayed visible to prevent blank flash during widget recreation.
+        this._ui?.cleanupStaleSiblings?.();
       },
       (error) => {
         // Check if this request is still valid
@@ -808,6 +818,10 @@ export class TealchartWidget {
           this._lastCrossHairEmit = now;
           this._chartApi.emitCrossHairMoved({ price, time });
         }
+      },
+      onPaneDoubleClick: (paneId) => {
+        this._paneManager.toggleMaximizePane(paneId);
+        this._scheduler.markDirty(DIRTY.LAYOUT | DIRTY.VIEWPORT);
       },
     });
   }
@@ -1583,9 +1597,11 @@ export class TealchartWidget {
     // Clean up event emitter
     this._eventEmitter.removeAllListeners();
 
-    // Dispose vanilla UI
+    // Dispose vanilla UI — preserve DOM so the new widget can show old
+    // content until its first paint with bars (prevents blank flash).
+    // The new widget's cleanupStaleSiblings() handles removal.
     if (this._ui) {
-      this._ui.dispose();
+      this._ui.dispose(true);
       this._ui = null;
     }
   }
