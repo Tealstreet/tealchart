@@ -73,6 +73,8 @@ export interface EventManagerCallbacks {
   getPriceFromY?: (y: number) => number;
   /** Get time from X coordinate */
   getTimeFromX?: (x: number) => number;
+  /** Called on double-click/double-tap on a pane */
+  onPaneDoubleClick?: (paneId: string) => void;
 }
 
 export type DragMode = 'none' | 'pan' | 'priceAxisZoom' | 'paneDivider';
@@ -173,6 +175,10 @@ export class EventManager {
   private pinchStartViewport: Viewport | null = null;
   private touchYPanUnlocked = false;
   private longPressTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // Double-click/double-tap tracking
+  private _lastClickTime = 0;
+  private _lastClickPaneId: string | null = null;
 
   // RAF batching
   private renderScheduled = false;
@@ -462,8 +468,35 @@ export class EventManager {
     this.handleWindowMouseUp(e);
   }
 
-  private handleWindowMouseUp(_e: MouseEvent): void {
+  private handleWindowMouseUp(e: MouseEvent): void {
     this.callbacks.onMouseUp?.();
+
+    // Double-click detection — only if mouse didn't move (click, not drag)
+    const rect = this.container.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const dx = Math.abs(mouseX - this.state.dragStartX);
+    const dy = Math.abs(mouseY - this.state.dragStartY);
+    const wasClick = dx < 5 && dy < 5;
+
+    if (wasClick && this.callbacks.onPaneDoubleClick && this.callbacks.getPaneAtY) {
+      const y = mouseY;
+      const pane = this.callbacks.getPaneAtY(y);
+      if (pane) {
+        const now = Date.now();
+        if (this._lastClickPaneId === pane.paneId && now - this._lastClickTime < 300) {
+          this.callbacks.onPaneDoubleClick(pane.paneId);
+          this._lastClickTime = 0;
+          this._lastClickPaneId = null;
+        } else {
+          this._lastClickTime = now;
+          this._lastClickPaneId = pane.paneId;
+        }
+      }
+    } else if (!wasClick) {
+      this._lastClickTime = 0;
+      this._lastClickPaneId = null;
+    }
 
     if (this.state.isDragging) {
       this.state.isDragging = false;
@@ -744,6 +777,24 @@ export class EventManager {
   }
 
   private handleTap(x: number, y: number): void {
+    // Double-tap detection for touch
+    if (this.callbacks.onPaneDoubleClick && this.callbacks.getPaneAtY) {
+      const pane = this.callbacks.getPaneAtY(y);
+      if (pane) {
+        const now = Date.now();
+        if (this._lastClickPaneId === pane.paneId && now - this._lastClickTime < 300) {
+          this.callbacks.onPaneDoubleClick(pane.paneId);
+          // Reset to prevent triple-tap
+          this._lastClickTime = 0;
+          this._lastClickPaneId = null;
+          this.scheduleRender();
+          return;
+        }
+        this._lastClickTime = now;
+        this._lastClickPaneId = pane.paneId;
+      }
+    }
+
     const dims = this.callbacks.getDimensions();
 
     // Bottom zone tap - toggle reset button (handled by UI)

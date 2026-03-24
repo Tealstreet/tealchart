@@ -369,6 +369,14 @@ export class ChartWidgetCore {
     return this._paneManager;
   }
 
+  /**
+   * Toggle maximize/restore for a pane (delegates to PaneManager)
+   */
+  toggleMaximizePane(paneId: string): void {
+    this._paneManager.toggleMaximizePane(paneId);
+    this._scheduleRender();
+  }
+
   // ============================================================================
   // Indicator Management
   // ============================================================================

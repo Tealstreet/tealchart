@@ -8,11 +8,12 @@
 import type {
   ChartPane,
   ComputedPane,
-  UnifiedPaneLayout,
   // Legacy types for backward compatibility
   IndicatorPane,
   PaneLayout,
+  UnifiedPaneLayout,
 } from '../types';
+
 import { DEFAULT_INDICATOR_PANE_HEIGHT, MIN_PANE_HEIGHT } from '../types';
 
 /**
@@ -51,6 +52,11 @@ export class PaneManager {
   /** Pixels reserved for time axis */
   private timeAxisHeight = 30;
 
+  /** Which pane is maximized (null = normal mode) */
+  private _maximizedPaneId: string | null = null;
+  /** Saved height ratios before maximize (for restore) */
+  private _savedHeightRatios: Map<string, number> | null = null;
+
   constructor() {
     // Initialize with just the main pane
     this.panes = [this.createMainPane()];
@@ -81,6 +87,11 @@ export class PaneManager {
     if (overlay) {
       // Overlay indicators render on main pane, nothing to do
       return;
+    }
+
+    // If maximized, restore first so the new pane gets proper layout
+    if (this._maximizedPaneId !== null) {
+      this._restoreFromMaximize();
     }
 
     // Check if we can add to an existing indicator pane with same yAxisRange
@@ -125,6 +136,13 @@ export class PaneManager {
 
         // Remove empty indicator panes
         if (indicatorIds.length === 0) {
+          // If the maximized pane is being removed, restore first
+          if (this._maximizedPaneId === pane.id) {
+            this._restoreFromMaximize();
+          }
+          // Also clean up saved ratios for this pane
+          this._savedHeightRatios?.delete(pane.id);
+
           this.panes.splice(i, 1);
           this.rebalanceHeights();
         }
@@ -156,7 +174,7 @@ export class PaneManager {
    * Get the main pane
    */
   getMainPane(): ChartPane {
-    return this.panes.find(p => p.type === 'main')!;
+    return this.panes.find((p) => p.type === 'main')!;
   }
 
   /**
@@ -170,7 +188,7 @@ export class PaneManager {
    * Get indicator panes only (excludes main)
    */
   getIndicatorPanes(): ChartPane[] {
-    return this.panes.filter(p => p.type === 'indicator');
+    return this.panes.filter((p) => p.type === 'indicator');
   }
 
   /**
@@ -194,7 +212,7 @@ export class PaneManager {
     const availableHeight = totalHeight - this.timeAxisHeight;
     let currentTop = 0;
 
-    return this.panes.map(pane => {
+    return this.panes.map((pane) => {
       const height = availableHeight * pane.heightRatio;
       const computed: ComputedPane = {
         ...pane,
@@ -211,7 +229,7 @@ export class PaneManager {
    * Update Y-axis range for a pane (for auto-scaling)
    */
   updatePaneRange(paneId: string, yMin: number, yMax: number): void {
-    const pane = this.panes.find(p => p.id === paneId);
+    const pane = this.panes.find((p) => p.id === paneId);
     if (pane && !pane.fixedRange) {
       pane.yMin = yMin;
       pane.yMax = yMax;
@@ -315,6 +333,79 @@ export class PaneManager {
   reset(): void {
     this.panes = [this.createMainPane()];
     this.paneIdCounter = 0;
+    this._maximizedPaneId = null;
+    this._savedHeightRatios = null;
+  }
+
+  // ===========================================================================
+  // Maximize / Restore
+  // ===========================================================================
+
+  /**
+   * Toggle maximize for a pane. If already maximized to this pane, restore.
+   * If maximized to a different pane, switch to this one.
+   * No-op when only one pane exists.
+   */
+  toggleMaximizePane(paneId: string): void {
+    // No-op with only main pane
+    if (this.panes.length <= 1) return;
+
+    // Verify pane exists
+    const targetPane = this.panes.find((p) => p.id === paneId);
+    if (!targetPane) return;
+
+    if (this._maximizedPaneId === paneId) {
+      // Restore from maximize
+      this._restoreFromMaximize();
+    } else {
+      // Save current ratios (only if not already maximized)
+      if (this._maximizedPaneId === null) {
+        this._savedHeightRatios = new Map();
+        for (const pane of this.panes) {
+          this._savedHeightRatios.set(pane.id, pane.heightRatio);
+        }
+      }
+
+      // Maximize: target gets 1.0, others get 0
+      for (const pane of this.panes) {
+        pane.heightRatio = pane.id === paneId ? 1.0 : 0;
+      }
+      this._maximizedPaneId = paneId;
+    }
+  }
+
+  /**
+   * Whether any pane is currently maximized
+   */
+  isMaximized(): boolean {
+    return this._maximizedPaneId !== null;
+  }
+
+  /**
+   * Get the ID of the currently maximized pane (null if none)
+   */
+  getMaximizedPaneId(): string | null {
+    return this._maximizedPaneId;
+  }
+
+  /**
+   * Restore pane heights from saved ratios
+   */
+  private _restoreFromMaximize(): void {
+    if (!this._savedHeightRatios) return;
+
+    for (const pane of this.panes) {
+      const saved = this._savedHeightRatios.get(pane.id);
+      if (saved !== undefined) {
+        pane.heightRatio = saved;
+      }
+    }
+
+    // Clean up panes whose saved ratio no longer exists (added while maximized)
+    // They'll get rebalanced on next addIndicator
+
+    this._maximizedPaneId = null;
+    this._savedHeightRatios = null;
   }
 
   // ===========================================================================
@@ -332,7 +423,7 @@ export class PaneManager {
     return {
       mainPaneHeight: mainPane.heightRatio,
       volumePaneHeight: 0, // Volume is now an overlay on main pane
-      indicatorPanes: indicatorPanes.map(p => ({
+      indicatorPanes: indicatorPanes.map((p) => ({
         id: p.id,
         indicatorIds: p.indicatorIds || [],
         heightRatio: p.heightRatio,

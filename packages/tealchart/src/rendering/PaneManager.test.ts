@@ -289,6 +289,142 @@ describe('PaneManager', () => {
     });
   });
 
+  describe('toggleMaximizePane', () => {
+    it('is a no-op when only one pane exists', () => {
+      pm.toggleMaximizePane('main');
+      expect(pm.isMaximized()).toBe(false);
+      expect(pm.getMainPane().heightRatio).toBe(1.0);
+    });
+
+    it('maximizes a pane (gives it 1.0, others 0)', () => {
+      pm.addIndicator({ indicatorId: 'rsi_1', overlay: false });
+      const rsiPane = pm.getIndicatorPanes()[0];
+      pm.toggleMaximizePane(rsiPane.id);
+
+      expect(pm.isMaximized()).toBe(true);
+      expect(pm.getMaximizedPaneId()).toBe(rsiPane.id);
+      expect(rsiPane.heightRatio).toBe(1.0);
+      expect(pm.getMainPane().heightRatio).toBe(0);
+    });
+
+    it('maximizes the main pane (gives it 1.0, indicators 0)', () => {
+      pm.addIndicator({ indicatorId: 'rsi_1', overlay: false });
+      pm.addIndicator({ indicatorId: 'macd_1', overlay: false });
+      pm.toggleMaximizePane('main');
+
+      expect(pm.isMaximized()).toBe(true);
+      expect(pm.getMaximizedPaneId()).toBe('main');
+      expect(pm.getMainPane().heightRatio).toBe(1.0);
+      for (const pane of pm.getIndicatorPanes()) {
+        expect(pane.heightRatio).toBe(0);
+      }
+    });
+
+    it('restores original ratios on second toggle of same pane', () => {
+      pm.addIndicator({ indicatorId: 'rsi_1', overlay: false });
+      const mainRatioBefore = pm.getMainPane().heightRatio;
+      const rsiPane = pm.getIndicatorPanes()[0];
+      const rsiRatioBefore = rsiPane.heightRatio;
+
+      pm.toggleMaximizePane(rsiPane.id);
+      pm.toggleMaximizePane(rsiPane.id);
+
+      expect(pm.isMaximized()).toBe(false);
+      expect(pm.getMaximizedPaneId()).toBeNull();
+      expect(pm.getMainPane().heightRatio).toBeCloseTo(mainRatioBefore, 5);
+      expect(rsiPane.heightRatio).toBeCloseTo(rsiRatioBefore, 5);
+    });
+
+    it('switches maximized pane when toggling a different pane', () => {
+      pm.addIndicator({ indicatorId: 'rsi_1', overlay: false });
+      pm.addIndicator({ indicatorId: 'macd_1', overlay: false });
+      const rsiPane = pm.getIndicatorPanes()[0];
+      const macdPane = pm.getIndicatorPanes()[1];
+
+      pm.toggleMaximizePane(rsiPane.id);
+      expect(pm.getMaximizedPaneId()).toBe(rsiPane.id);
+
+      pm.toggleMaximizePane(macdPane.id);
+      expect(pm.getMaximizedPaneId()).toBe(macdPane.id);
+      expect(macdPane.heightRatio).toBe(1.0);
+      expect(rsiPane.heightRatio).toBe(0);
+    });
+
+    it('restores correctly after switching maximized panes', () => {
+      pm.addIndicator({ indicatorId: 'rsi_1', overlay: false });
+      const mainRatioBefore = pm.getMainPane().heightRatio;
+      const rsiPane = pm.getIndicatorPanes()[0];
+      const rsiRatioBefore = rsiPane.heightRatio;
+
+      pm.toggleMaximizePane(rsiPane.id);
+      pm.toggleMaximizePane('main');
+      pm.toggleMaximizePane('main'); // restore
+
+      expect(pm.isMaximized()).toBe(false);
+      expect(pm.getMainPane().heightRatio).toBeCloseTo(mainRatioBefore, 5);
+      expect(rsiPane.heightRatio).toBeCloseTo(rsiRatioBefore, 5);
+    });
+
+    it('does nothing for non-existent pane', () => {
+      pm.addIndicator({ indicatorId: 'rsi_1', overlay: false });
+      pm.toggleMaximizePane('nonexistent');
+      expect(pm.isMaximized()).toBe(false);
+    });
+
+    it('restores before adding a new indicator', () => {
+      pm.addIndicator({ indicatorId: 'rsi_1', overlay: false });
+      const rsiPane = pm.getIndicatorPanes()[0];
+      pm.toggleMaximizePane(rsiPane.id);
+
+      // Adding a non-overlay indicator should restore first
+      pm.addIndicator({ indicatorId: 'macd_1', overlay: false });
+      expect(pm.isMaximized()).toBe(false);
+      expect(pm.getPanes()).toHaveLength(3); // main + rsi + macd
+      // All panes should have non-zero ratios after rebalance
+      for (const pane of pm.getPanes()) {
+        expect(pane.heightRatio).toBeGreaterThan(0);
+      }
+    });
+
+    it('restores when maximized pane is removed', () => {
+      pm.addIndicator({ indicatorId: 'rsi_1', overlay: false });
+      pm.addIndicator({ indicatorId: 'macd_1', overlay: false });
+      const rsiPane = pm.getIndicatorPanes()[0];
+
+      pm.toggleMaximizePane(rsiPane.id);
+      pm.removeIndicator('rsi_1');
+
+      expect(pm.isMaximized()).toBe(false);
+      expect(pm.getPanes()).toHaveLength(2); // main + macd
+      // Remaining panes should have non-zero ratios
+      for (const pane of pm.getPanes()) {
+        expect(pane.heightRatio).toBeGreaterThan(0);
+      }
+    });
+
+    it('reset clears maximize state', () => {
+      pm.addIndicator({ indicatorId: 'rsi_1', overlay: false });
+      pm.toggleMaximizePane('main');
+      pm.reset();
+
+      expect(pm.isMaximized()).toBe(false);
+      expect(pm.getMaximizedPaneId()).toBeNull();
+      expect(pm.getPanes()).toHaveLength(1);
+    });
+
+    it('zero-height panes get zero pixels in computeLayout', () => {
+      pm.addIndicator({ indicatorId: 'rsi_1', overlay: false });
+      pm.toggleMaximizePane('main');
+
+      const computed = pm.computeLayout(600);
+      const mainComputed = computed.find((p) => p.id === 'main')!;
+      const rsiComputed = computed.find((p) => p.type === 'indicator')!;
+
+      expect(mainComputed.height).toBe(570); // 600 - 30 timeAxis
+      expect(rsiComputed.height).toBe(0);
+    });
+  });
+
   describe('getLayout (legacy)', () => {
     it('returns legacy PaneLayout format', () => {
       pm.addIndicator({ indicatorId: 'rsi_1', overlay: false });

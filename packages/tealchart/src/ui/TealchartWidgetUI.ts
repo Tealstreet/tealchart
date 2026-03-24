@@ -112,6 +112,8 @@ export interface TealchartWidgetUIOptions {
   onResetViewport?: () => void;
   /** Returns whether auto-scale is active for a given pane */
   isAutoScale?: (paneId: string) => boolean;
+  /** Called on double-click/double-tap on a pane */
+  onPaneDoubleClick?: (paneId: string) => void;
 }
 
 // ============================================================================
@@ -197,7 +199,9 @@ export class TealchartWidgetUI {
       this.rootEl.appendChild(topBarWrapper);
     }
 
-    // Mount to container
+    // Mount to container — don't clear old children yet.
+    // The old widget's DOM stays visible until we paint the first frame with bars,
+    // preventing a blank flash during HMR / theme switch / widget recreation.
     this.container.appendChild(this.rootEl);
 
     // Initialize chart core after getting dimensions
@@ -287,6 +291,7 @@ export class TealchartWidgetUI {
       onAutoScaleDisabled: this.options.onAutoScaleDisabled,
       onResetViewport: this.options.onResetViewport,
       isAutoScale: this.options.isAutoScale,
+      onPaneDoubleClick: this.options.onPaneDoubleClick,
     });
   }
 
@@ -601,6 +606,21 @@ export class TealchartWidgetUI {
     this.indicatorPaneLegends.clear();
     this.indicatorsModal?.unmount();
     this.settingsModal?.unmount();
-    this.rootEl.remove();
+    // Intentionally do NOT remove rootEl from DOM here.
+    // The new widget keeps old DOM visible until first paint with bars,
+    // then calls cleanupStaleSiblings() to remove old children.
+  }
+
+  /**
+   * Remove any sibling elements from the container that aren't our rootEl.
+   * Called after first successful paint with bars to clean up old widget DOM.
+   */
+  cleanupStaleSiblings(): void {
+    const children = Array.from(this.container.children);
+    for (const child of children) {
+      if (child !== this.rootEl) {
+        child.remove();
+      }
+    }
   }
 }
