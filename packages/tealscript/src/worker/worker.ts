@@ -11,13 +11,7 @@ import { parse, TealscriptParseError } from '../parser';
 import { TealscriptEngine } from '../runtime/engine';
 import type { Program } from '../parser/ast';
 import type { Bar, InputDefinition } from '../runtime/context';
-import type {
-  ToWorkerMessage,
-  FromWorkerMessage,
-  ResultMessage,
-  ErrorMessage,
-  ParseErrorMessage,
-} from './protocol';
+import type { ToWorkerMessage, FromWorkerMessage, ResultMessage, ErrorMessage, ParseErrorMessage } from './protocol';
 
 /**
  * Worker state for a single script
@@ -80,12 +74,7 @@ self.onmessage = (event: MessageEvent<ToWorkerMessage>) => {
 /**
  * Initialize with script and data
  */
-function handleInit(
-  scriptId: string,
-  script: string,
-  bars: Bar[],
-  inputs: Record<string, unknown>
-): void {
+function handleInit(scriptId: string, script: string, bars: Bar[], inputs: Record<string, unknown>): void {
   try {
     // Parse the script
     const ast = parse(script);
@@ -144,19 +133,23 @@ function handleUpdateBar(bar: Bar): void {
     return;
   }
 
-  // Check if this is an update to the last bar or a new bar
   const lastBar = state.bars[state.bars.length - 1];
 
   if (lastBar && bar.time === lastBar.time) {
-    // Update existing bar
+    // Same bar update (intrabar tick) — rollback + re-execute just this bar
     state.bars[state.bars.length - 1] = bar;
+    const plots = state.engine.updateBar(state.ast, bar);
+    postResult({
+      type: 'result',
+      scriptId: state.scriptId,
+      plots,
+      inputs: [], // inputs don't change on tick
+    });
   } else {
-    // New bar
+    // New bar — need full execute to process the new bar through all statements
     state.bars.push(bar);
+    executeAndSendResults();
   }
-
-  // Re-execute (engine handles rollback internally)
-  executeAndSendResults();
 }
 
 /**

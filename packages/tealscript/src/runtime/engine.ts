@@ -58,7 +58,7 @@ type BuiltinFunction = (
   args: unknown[],
   namedArgs: Map<string, unknown>,
   ctx: ExecutionContext,
-  scope: Scope
+  scope: Scope,
 ) => unknown;
 
 /**
@@ -114,14 +114,15 @@ export class TealscriptEngine {
         }
       }
 
-      // Commit bar
-      this.scope.commit();
+      // Commit bar — only snapshot on the last bar (for realtime rollback)
+      const isLastBar = this.ctx.bar_index === this.ctx.last_bar_index;
+      this.scope.commit(isLastBar);
       this.ctx.commitBar();
     }
 
     return {
       plots: this.ctx.getPlots(),
-      inputs: this.ctx.inputDefinitions.map(def => ({
+      inputs: this.ctx.inputDefinitions.map((def) => ({
         id: def.id,
         type: def.type,
         title: def.title,
@@ -238,11 +239,21 @@ export class TealscriptEngine {
         const numCurrent = currentValue as number;
         const numValue = value as number;
         switch (stmt.operator) {
-          case '+=': newValue = numCurrent + numValue; break;
-          case '-=': newValue = numCurrent - numValue; break;
-          case '*=': newValue = numCurrent * numValue; break;
-          case '/=': newValue = numCurrent / numValue; break;
-          case '%=': newValue = numCurrent % numValue; break;
+          case '+=':
+            newValue = numCurrent + numValue;
+            break;
+          case '-=':
+            newValue = numCurrent - numValue;
+            break;
+          case '*=':
+            newValue = numCurrent * numValue;
+            break;
+          case '/=':
+            newValue = numCurrent / numValue;
+            break;
+          case '%=':
+            newValue = numCurrent % numValue;
+            break;
         }
       }
 
@@ -384,7 +395,7 @@ export class TealscriptEngine {
         return this.evaluateIndex(expr);
 
       case 'ArrayExpression':
-        return expr.elements.map(e => this.evaluateExpression(e));
+        return expr.elements.map((e) => this.evaluateExpression(e));
 
       default:
         throw new Error(`Unknown expression type: ${(expr as Expression).type}`);
@@ -396,17 +407,28 @@ export class TealscriptEngine {
 
     // Check built-in series first
     switch (name) {
-      case 'open': return this.ctx.open.get(0);
-      case 'high': return this.ctx.high.get(0);
-      case 'low': return this.ctx.low.get(0);
-      case 'close': return this.ctx.close.get(0);
-      case 'volume': return this.ctx.volume.get(0);
-      case 'time': return this.ctx.time.get(0);
-      case 'bar_index': return this.ctx.bar_index;
-      case 'last_bar_index': return this.ctx.last_bar_index;
-      case 'hl2': return this.ctx.hl2;
-      case 'hlc3': return this.ctx.hlc3;
-      case 'ohlc4': return this.ctx.ohlc4;
+      case 'open':
+        return this.ctx.open.get(0);
+      case 'high':
+        return this.ctx.high.get(0);
+      case 'low':
+        return this.ctx.low.get(0);
+      case 'close':
+        return this.ctx.close.get(0);
+      case 'volume':
+        return this.ctx.volume.get(0);
+      case 'time':
+        return this.ctx.time.get(0);
+      case 'bar_index':
+        return this.ctx.bar_index;
+      case 'last_bar_index':
+        return this.ctx.last_bar_index;
+      case 'hl2':
+        return this.ctx.hl2;
+      case 'hlc3':
+        return this.ctx.hlc3;
+      case 'ohlc4':
+        return this.ctx.ohlc4;
     }
 
     // Check scope
@@ -435,23 +457,36 @@ export class TealscriptEngine {
 
     switch (expr.operator) {
       // Arithmetic
-      case '+': return (left as number) + (right as number);
-      case '-': return (left as number) - (right as number);
-      case '*': return (left as number) * (right as number);
-      case '/': return (left as number) / (right as number);
-      case '%': return (left as number) % (right as number);
+      case '+':
+        return (left as number) + (right as number);
+      case '-':
+        return (left as number) - (right as number);
+      case '*':
+        return (left as number) * (right as number);
+      case '/':
+        return (left as number) / (right as number);
+      case '%':
+        return (left as number) % (right as number);
 
       // Comparison
-      case '==': return left === right;
-      case '!=': return left !== right;
-      case '<': return (left as number) < (right as number);
-      case '>': return (left as number) > (right as number);
-      case '<=': return (left as number) <= (right as number);
-      case '>=': return (left as number) >= (right as number);
+      case '==':
+        return left === right;
+      case '!=':
+        return left !== right;
+      case '<':
+        return (left as number) < (right as number);
+      case '>':
+        return (left as number) > (right as number);
+      case '<=':
+        return (left as number) <= (right as number);
+      case '>=':
+        return (left as number) >= (right as number);
 
       // Logical
-      case 'and': return this.isTruthy(left) && this.isTruthy(right);
-      case 'or': return this.isTruthy(left) || this.isTruthy(right);
+      case 'and':
+        return this.isTruthy(left) && this.isTruthy(right);
+      case 'or':
+        return this.isTruthy(left) || this.isTruthy(right);
 
       default:
         throw new Error(`Unknown operator: ${expr.operator}`);
@@ -462,9 +497,12 @@ export class TealscriptEngine {
     const arg = this.evaluateExpression(expr.argument);
 
     switch (expr.operator) {
-      case '-': return -(arg as number);
-      case '+': return +(arg as number);
-      case 'not': return !this.isTruthy(arg);
+      case '-':
+        return -(arg as number);
+      case '+':
+        return +(arg as number);
+      case 'not':
+        return !this.isTruthy(arg);
       default:
         throw new Error(`Unknown unary operator: ${expr.operator}`);
     }
@@ -548,12 +586,18 @@ export class TealscriptEngine {
 
       // Check built-in series first
       switch (name) {
-        case 'open': return this.ctx.open.get(offset);
-        case 'high': return this.ctx.high.get(offset);
-        case 'low': return this.ctx.low.get(offset);
-        case 'close': return this.ctx.close.get(offset);
-        case 'volume': return this.ctx.volume.get(offset);
-        case 'time': return this.ctx.time.get(offset);
+        case 'open':
+          return this.ctx.open.get(offset);
+        case 'high':
+          return this.ctx.high.get(offset);
+        case 'low':
+          return this.ctx.low.get(offset);
+        case 'close':
+          return this.ctx.close.get(offset);
+        case 'volume':
+          return this.ctx.volume.get(offset);
+        case 'time':
+          return this.ctx.time.get(offset);
       }
 
       // Check scope for series variable
@@ -635,7 +679,7 @@ export class TealscriptEngine {
           id,
           type: 'plot',
           title,
-          color: [],  // Always array for per-bar colors
+          color: [], // Always array for per-bar colors
           linewidth,
           style: style as 'line' | 'stepline' | 'histogram' | 'cross' | 'circles' | 'columns' | 'area' | 'areabr',
         });
@@ -918,8 +962,8 @@ export class TealscriptEngine {
 
   private registerMathBuiltins(): void {
     this.builtins.set('math.abs', (args) => Math.abs(args[0] as number));
-    this.builtins.set('math.max', (args) => Math.max(...args as number[]));
-    this.builtins.set('math.min', (args) => Math.min(...args as number[]));
+    this.builtins.set('math.max', (args) => Math.max(...(args as number[])));
+    this.builtins.set('math.min', (args) => Math.min(...(args as number[])));
     this.builtins.set('math.sqrt', (args) => Math.sqrt(args[0] as number));
     this.builtins.set('math.pow', (args) => Math.pow(args[0] as number, args[1] as number));
     this.builtins.set('math.log', (args) => Math.log(args[0] as number));
@@ -984,7 +1028,7 @@ export class TealscriptEngine {
 
       // Convert to rgba
       // For simplicity, just return color with alpha
-      const alpha = Math.round((100 - transparency) / 100 * 255);
+      const alpha = Math.round(((100 - transparency) / 100) * 255);
       const alphaHex = alpha.toString(16).padStart(2, '0');
 
       if (baseColor.startsWith('#') && baseColor.length === 7) {
@@ -1061,24 +1105,35 @@ export class TealscriptEngine {
     if (source === ctx.open.get(0)) return ctx.open;
     if (source === ctx.volume.get(0)) return ctx.volume;
     // Check derived series
-    if (source === ctx.hl2) return { get: (i) => {
-      const h = ctx.high.get(i);
-      const l = ctx.low.get(i);
-      return h !== undefined && l !== undefined ? (h + l) / 2 : undefined;
-    }};
-    if (source === ctx.hlc3) return { get: (i) => {
-      const h = ctx.high.get(i);
-      const l = ctx.low.get(i);
-      const c = ctx.close.get(i);
-      return h !== undefined && l !== undefined && c !== undefined ? (h + l + c) / 3 : undefined;
-    }};
-    if (source === ctx.ohlc4) return { get: (i) => {
-      const o = ctx.open.get(i);
-      const h = ctx.high.get(i);
-      const l = ctx.low.get(i);
-      const c = ctx.close.get(i);
-      return o !== undefined && h !== undefined && l !== undefined && c !== undefined ? (o + h + l + c) / 4 : undefined;
-    }};
+    if (source === ctx.hl2)
+      return {
+        get: (i) => {
+          const h = ctx.high.get(i);
+          const l = ctx.low.get(i);
+          return h !== undefined && l !== undefined ? (h + l) / 2 : undefined;
+        },
+      };
+    if (source === ctx.hlc3)
+      return {
+        get: (i) => {
+          const h = ctx.high.get(i);
+          const l = ctx.low.get(i);
+          const c = ctx.close.get(i);
+          return h !== undefined && l !== undefined && c !== undefined ? (h + l + c) / 3 : undefined;
+        },
+      };
+    if (source === ctx.ohlc4)
+      return {
+        get: (i) => {
+          const o = ctx.open.get(i);
+          const h = ctx.high.get(i);
+          const l = ctx.low.get(i);
+          const c = ctx.close.get(i);
+          return o !== undefined && h !== undefined && l !== undefined && c !== undefined
+            ? (o + h + l + c) / 4
+            : undefined;
+        },
+      };
     // Default: fallback to close (most common case)
     return ctx.close;
   }
@@ -1197,7 +1252,7 @@ export class TealscriptEngine {
 
       if (avgLoss === 0) return 100;
       const rs = avgGain / avgLoss;
-      return 100 - (100 / (1 + rs));
+      return 100 - 100 / (1 + rs);
     });
 
     // Change - difference from N bars ago
@@ -1329,11 +1384,7 @@ export class TealscriptEngine {
       if (prevClose === undefined) {
         tr = high - low;
       } else {
-        tr = Math.max(
-          high - low,
-          Math.abs(high - prevClose),
-          Math.abs(low - prevClose)
-        );
+        tr = Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose));
       }
 
       // Use RMA (Wilder's smoothing) for ATR
@@ -1382,15 +1433,15 @@ export class TealscriptEngine {
       const slowKey = `_macd_slow_${slowLen}`;
       const signalKey = `_macd_signal_${signalLen}`;
 
-      let fastEma = scope.get(fastKey) as number ?? source;
-      let slowEma = scope.get(slowKey) as number ?? source;
+      let fastEma = (scope.get(fastKey) as number) ?? source;
+      let slowEma = (scope.get(slowKey) as number) ?? source;
 
       fastEma = fastAlpha * source + (1 - fastAlpha) * fastEma;
       slowEma = slowAlpha * source + (1 - slowAlpha) * slowEma;
 
       const macdLine = fastEma - slowEma;
 
-      let signalLine = scope.get(signalKey) as number ?? macdLine;
+      let signalLine = (scope.get(signalKey) as number) ?? macdLine;
       signalLine = signalAlpha * macdLine + (1 - signalAlpha) * signalLine;
 
       const histogram = macdLine - signalLine;
@@ -1427,7 +1478,7 @@ export class TealscriptEngine {
       const mean = values.reduce((a, b) => a + b, 0) / values.length;
 
       // Calculate variance (population standard deviation)
-      const squaredDiffs = values.map(v => Math.pow(v - mean, 2));
+      const squaredDiffs = values.map((v) => Math.pow(v - mean, 2));
       const variance = squaredDiffs.reduce((a, b) => a + b, 0) / values.length;
 
       return Math.sqrt(variance);
@@ -1717,7 +1768,7 @@ export class TealscriptEngine {
       const middle = sum / length;
 
       // Calculate standard deviation
-      const squaredDiffs = values.map(v => Math.pow(v - middle, 2));
+      const squaredDiffs = values.map((v) => Math.pow(v - middle, 2));
       const variance = squaredDiffs.reduce((a, b) => a + b, 0) / length;
       const stdev = Math.sqrt(variance);
 
@@ -1751,11 +1802,7 @@ export class TealscriptEngine {
         return high - low;
       }
 
-      return Math.max(
-        high - low,
-        Math.abs(high - prevClose),
-        Math.abs(low - prevClose)
-      );
+      return Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose));
     });
 
     // SuperTrend - ATR-based trend indicator
@@ -1820,9 +1867,7 @@ export class TealscriptEngine {
       if (prevUpper === undefined || prevCloseVal === undefined) {
         finalUpperBand = basicUpperBand;
       } else {
-        finalUpperBand = basicUpperBand < prevUpper || prevCloseVal > prevUpper
-          ? basicUpperBand
-          : prevUpper;
+        finalUpperBand = basicUpperBand < prevUpper || prevCloseVal > prevUpper ? basicUpperBand : prevUpper;
       }
 
       // Final lower band
@@ -1830,9 +1875,7 @@ export class TealscriptEngine {
       if (prevLower === undefined || prevCloseVal === undefined) {
         finalLowerBand = basicLowerBand;
       } else {
-        finalLowerBand = basicLowerBand > prevLower || prevCloseVal < prevLower
-          ? basicLowerBand
-          : prevLower;
+        finalLowerBand = basicLowerBand > prevLower || prevCloseVal < prevLower ? basicLowerBand : prevLower;
       }
 
       // Determine direction
@@ -1903,9 +1946,9 @@ export class TealscriptEngine {
       const smoothMinusDmKey = `_dmi_minusdm_${length}`;
       const smoothAdxKey = `_dmi_adx_${length}_${adxSmoothing}`;
 
-      let smoothTr = scope.get(smoothTrKey) as number ?? tr;
-      let smoothPlusDm = scope.get(smoothPlusDmKey) as number ?? plusDM;
-      let smoothMinusDm = scope.get(smoothMinusDmKey) as number ?? minusDM;
+      let smoothTr = (scope.get(smoothTrKey) as number) ?? tr;
+      let smoothPlusDm = (scope.get(smoothPlusDmKey) as number) ?? plusDM;
+      let smoothMinusDm = (scope.get(smoothMinusDmKey) as number) ?? minusDM;
 
       smoothTr = alpha * tr + (1 - alpha) * smoothTr;
       smoothPlusDm = alpha * plusDM + (1 - alpha) * smoothPlusDm;
@@ -1923,7 +1966,7 @@ export class TealscriptEngine {
       const diSum = diPlus + diMinus;
       const dx = diSum > 0 ? (Math.abs(diPlus - diMinus) / diSum) * 100 : 0;
 
-      let adx = scope.get(smoothAdxKey) as number ?? dx;
+      let adx = (scope.get(smoothAdxKey) as number) ?? dx;
       const adxAlpha = 1 / adxSmoothing;
       adx = adxAlpha * dx + (1 - adxAlpha) * adx;
       scope.declare(smoothAdxKey, 'var', adx);
@@ -2108,7 +2151,7 @@ export class TealscriptEngine {
       const intercept = (sumY - slope * sumX) / n;
 
       // Calculate value at offset (0 = current bar, negative = future, positive = past)
-      return intercept + slope * (-offset);
+      return intercept + slope * -offset;
     });
   }
 }
