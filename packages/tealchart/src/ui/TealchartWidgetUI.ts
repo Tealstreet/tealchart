@@ -1,5 +1,6 @@
 import type { InputDefinition, PlotOutput } from '@tealstreet/tealscript';
 import type { BuiltinIndicator } from '../indicators/builtinIndicators';
+import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
 import type {
   Bar,
@@ -124,7 +125,7 @@ export class TealchartWidgetUI {
   // DOM elements
   private rootEl: HTMLDivElement;
   private chartArea: HTMLDivElement;
-  private loadingOverlay: HTMLDivElement | null = null;
+  private loadingDots: HTMLDivElement | null = null;
 
   // Components
   private chartCore: ChartCore | null = null;
@@ -153,9 +154,8 @@ export class TealchartWidgetUI {
         position: 'relative',
         width: '100%',
         height: '100%',
-        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        fontFamily: 'var(--tc-font-family, inherit)',
         overflow: 'hidden',
-        backgroundColor: 'var(--chart-bg, #131722)',
       },
     });
 
@@ -214,6 +214,30 @@ export class TealchartWidgetUI {
     // Use mount() instead of getElement() to trigger onMount/render
     this.legend.mount(this.chartArea);
 
+    // Create loading dots indicator (shown when loading with no candles)
+    // Appended to the legend so it appears below the OHLC/indicator info
+    this.loadingDots = div({
+      style: {
+        display: 'none',
+        fontSize: '20px',
+        color: 'var(--tc-text-color, rgba(255, 255, 255, 0.5))',
+        letterSpacing: '1px',
+        padding: '2px 0 0 4px',
+      },
+    });
+    for (let i = 0; i < 3; i++) {
+      const dot = span({ text: '•' });
+      dot.style.animation = `tc-pulse 1.4s ease-in-out ${i * 0.15}s infinite`;
+      this.loadingDots.appendChild(dot);
+    }
+    if (!document.getElementById('tc-pulse-keyframes')) {
+      const style = document.createElement('style');
+      style.id = 'tc-pulse-keyframes';
+      style.textContent = `@keyframes tc-pulse { 0%, 100% { opacity: 0.15; } 50% { opacity: 0.8; } }`;
+      document.head.appendChild(style);
+    }
+    this.legend?.getElement()?.appendChild(this.loadingDots);
+
     // Create modals (mounted to rootEl so they're positioned within the chart)
     this.indicatorsModal = new IndicatorsModal({
       onSelectIndicator: (indicator) => {
@@ -225,8 +249,7 @@ export class TealchartWidgetUI {
     this.settingsModal = new IndicatorSettingsModal();
     this.settingsModal.mount(this.rootEl);
 
-    // Create loading overlay (hidden by default)
-    this.createLoadingOverlay();
+    // No loading overlay — empty canvas grid renders while bars load
   }
 
   // ============================================================================
@@ -265,41 +288,6 @@ export class TealchartWidgetUI {
       onResetViewport: this.options.onResetViewport,
       isAutoScale: this.options.isAutoScale,
     });
-  }
-
-  private createLoadingOverlay(): void {
-    // Position below the top bar so timeframe buttons remain clickable during loading
-    const topOffset = this.options.showTopBar !== false ? TOP_BAR_HEIGHT : 0;
-    this.loadingOverlay = div({
-      style: {
-        position: 'absolute',
-        top: `${topOffset}px`,
-        left: '0',
-        right: '0',
-        bottom: '0',
-        backgroundColor: 'var(--chart-bg, #131722)',
-        display: 'none',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: '10',
-      },
-    });
-
-    const spinner = div({
-      style: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '12px',
-        color: 'var(--text2, #787b86)',
-      },
-    });
-
-    spinner.appendChild(icons.spinner(24, 'var(--text2, #787b86)'));
-    spinner.appendChild(span({ text: 'Loading chart data...' }));
-
-    this.loadingOverlay.appendChild(spinner);
-    this.chartArea.appendChild(this.loadingOverlay);
   }
 
   // ============================================================================
@@ -441,10 +429,18 @@ export class TealchartWidgetUI {
   /**
    * Set loading state
    */
-  setLoading(loading: boolean): void {
-    this.isLoading = loading;
-    if (this.loadingOverlay) {
-      this.loadingOverlay.style.display = loading ? 'flex' : 'none';
+  setLoading(_loading: boolean): void {
+    // No-op — empty canvas grid renders while bars load (no overlay needed)
+  }
+
+  /**
+   * Set canvas opacity while loading + show loading dots if no candles
+   */
+  setCanvasOpacity(opacity: number, hasBars: boolean = true): void {
+    this.chartCore?.setCanvasOpacity(opacity);
+    // Show loading dots only when loading AND no candles visible
+    if (this.loadingDots) {
+      this.loadingDots.style.display = opacity < 1 && !hasBars ? 'block' : 'none';
     }
   }
 
@@ -580,6 +576,15 @@ export class TealchartWidgetUI {
         this.indicatorPaneLegends.delete(paneId);
       }
     }
+  }
+
+  /**
+   * Paint the chart — passthrough to ChartCore.
+   * Called synchronously by TealchartWidget._render() after pushing state.
+   * The dirty flags tell ChartCore what needs repainting.
+   */
+  paint(dirty: DirtyFlags): void {
+    this.chartCore?.paint(dirty);
   }
 
   /**

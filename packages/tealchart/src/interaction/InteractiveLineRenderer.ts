@@ -394,6 +394,28 @@ export class InteractiveLineRenderer {
         }
       }
 
+      // Reconcile chart label segments — text + colors in-place
+      if (labelEl && bound.chartLabel?.segments) {
+        const useNarrow = this.options.width < 400;
+        const segmentEls = labelEl.querySelectorAll('.tc-segment');
+        for (let i = 0; i < bound.chartLabel.segments.length && i < segmentEls.length; i++) {
+          const seg = bound.chartLabel.segments[i];
+          const el = segmentEls[i] as HTMLElement;
+          const text = useNarrow && seg.textShort ? seg.textShort : seg.text;
+          if (el.textContent !== text) el.textContent = text;
+          if (el.style.backgroundColor !== seg.backgroundColor) el.style.backgroundColor = seg.backgroundColor;
+          if (el.style.color !== seg.textColor) el.style.color = seg.textColor;
+          if (el.style.borderColor !== seg.borderColor) el.style.borderColor = seg.borderColor;
+        }
+      }
+
+      // Reconcile price axis label colors
+      if (priceAxisEl && bound.label) {
+        const bgColor = bound.label.backgroundColor || bound.color;
+        if (priceAxisEl.style.backgroundColor !== bgColor) priceAxisEl.style.backgroundColor = bgColor;
+        if (priceAxisEl.style.borderColor !== bound.color) priceAxisEl.style.borderColor = bound.color;
+      }
+
       // Update connector
       const connectorEl = this.connectorElements.get(bound.lineId);
       if (connectorEl) {

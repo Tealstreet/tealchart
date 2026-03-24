@@ -219,16 +219,20 @@ export class ChartWidgetCore {
       (bars) => {
         if (requestId !== this._loadBarsRequestId) return; // Stale
 
-        this._setLoading(false);
         this._bars = bars;
+        // Clear old plots — they belong to the old symbol/interval
+        this._plots = [];
+        this._setLoading(false);
 
-        // Notify indicator manager
-        this._indicatorManager?.setBars(bars);
-
-        // Notify listeners
+        // Notify listeners BEFORE indicator manager — ensures empty plots
+        // are pushed to UI before worker callback can race with stale data
         this._onBarsChanged?.(bars);
+        this._onPlotsChanged?.(this._plots);
         this._scheduleRender();
         this._subscribeToBars();
+
+        // Notify indicator manager AFTER — worker callback fires later with new data
+        this._indicatorManager?.setBars(bars);
       },
       (error) => {
         if (requestId !== this._loadBarsRequestId) return;
@@ -295,8 +299,9 @@ export class ChartWidgetCore {
     }
 
     this._symbol = symbol;
-    this._bars = [];
+    // Don't clear bars — keep old candles visible (faded) until new data arrives
     this._hasMoreHistoricalData = true;
+    this._setLoading(true);
 
     this._datafeed.resolveSymbol(
       symbol,
@@ -306,6 +311,7 @@ export class ChartWidgetCore {
       },
       (error) => {
         console.error('[ChartWidgetCore] Failed to resolve symbol:', error);
+        this._setLoading(false);
       },
     );
 
@@ -322,7 +328,7 @@ export class ChartWidgetCore {
     }
 
     this._interval = interval as ResolutionString;
-    this._bars = [];
+    // Don't clear bars — keep old candles visible (faded) until new data arrives
     this._hasMoreHistoricalData = true;
     this._setLoading(true);
     this._scheduleRender();

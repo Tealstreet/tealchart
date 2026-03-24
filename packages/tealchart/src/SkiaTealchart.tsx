@@ -40,6 +40,7 @@ import { LayoutChangeEvent, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS } from 'react-native-reanimated';
 
+import { LOADING_OPACITY } from './constants';
 import { useTealchartCore } from './core/useTealchartCore';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
@@ -653,7 +654,12 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   return (
     <View style={styles.container} onLayout={onLayout}>
       {/* Layer 1: Skia Canvas (static rendering) */}
-      <Canvas style={[styles.absoluteFill, { width: dimensions.width, height: dimensions.height }]}>
+      <Canvas
+        style={[
+          styles.absoluteFill,
+          { width: dimensions.width, height: dimensions.height, opacity: isLoading ? LOADING_OPACITY : 1 },
+        ]}
+      >
         {picture && <Picture picture={picture} />}
       </Canvas>
 

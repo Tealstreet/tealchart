@@ -9,6 +9,8 @@
   pointer-events: none;
   overflow: hidden;
   z-index: 2;
+  /* Tabular (monospaced) digits prevent label width jitter as numbers update */
+  font-variant-numeric: tabular-nums;
 }
 
 /* Label row - positioned absolutely, flex row of segments + buttons */
@@ -20,7 +22,7 @@
   user-select: none;
   height: 18px;
   align-items: center;
-  font-family: sans-serif;
+  font-family: var(--tc-font-family, inherit);
   font-size: 11px;
   white-space: nowrap;
   /* No transitions during drag — must be instant */
@@ -73,7 +75,7 @@
   align-items: center;
   justify-content: center;
   padding: 0;
-  font-family: sans-serif;
+  font-family: var(--tc-font-family, inherit);
   box-sizing: border-box;
   pointer-events: auto;
   line-height: 1;
@@ -138,7 +140,7 @@
 .tc-price-axis-label {
   position: absolute;
   pointer-events: none;
-  font-family: sans-serif;
+  font-family: var(--tc-font-family, inherit);
   font-size: 11px;
   display: flex;
   flex-direction: column;
@@ -164,7 +166,7 @@
 .tc-crosshair-label {
   position: absolute;
   pointer-events: none;
-  font-family: sans-serif;
+  font-family: var(--tc-font-family, inherit);
   font-size: 11px;
   display: flex;
   align-items: center;

@@ -31,6 +31,7 @@ vi.mock('./ui/TealchartWidgetUI', () => ({
     setPaneYRanges() {}
     setActiveIndicators() {}
     setViewport() {}
+    setCanvasOpacity() {}
     setRenderOptions() {}
     setSymbol(symbol: string, exchangeName?: string) {
       setSymbolCalls.push({ symbol, exchangeName });
@@ -39,6 +40,7 @@ vi.mock('./ui/TealchartWidgetUI', () => ({
     resize() {}
     dispose() {}
     openIndicatorSettings() {}
+    paint() {}
   },
 }));
 
@@ -700,8 +702,9 @@ describe('TealchartWidget', () => {
       (widget as any)._loadMoreBars('left');
       const loadMoreCb = datafeed._getBarsCb!;
 
-      // Switch interval
+      // Switch interval (now goes through resolveSymbol first)
       widget.chart().setResolution('5' as ResolutionString);
+      datafeed._resolveSymbolCb?.(defaultSymbolInfo);
       datafeed._getBarsCb?.(makeBars(10, 1000000, 300000, 50000), {});
 
       setBarsCalls.length = 0;
