@@ -1383,6 +1383,7 @@ export class TealchartWidget {
     // Update interval if changed
     if (options.newInterval !== undefined) {
       this._interval = options.newInterval;
+      this._ui?.setInterval(options.newInterval);
       // Persist interval to per-chart store (for restoration on page refresh)
       this._chartStore?.settings.setKey('interval', options.newInterval);
     }

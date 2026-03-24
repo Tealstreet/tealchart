@@ -892,7 +892,7 @@ export class ChartCore {
   private applyCssVars(): void {
     const opts = this.options.renderOptions;
     if (!opts) return;
-    const s = this.chartContainer.style;
+    const s = this.container.style;
     if (opts.fontFamily) s.setProperty('--tc-font-family', opts.fontFamily);
     if (opts.textColor) s.setProperty('--tc-text-color', opts.textColor);
     if (opts.backgroundColor) s.setProperty('--tc-background-color', opts.backgroundColor);
@@ -1461,7 +1461,16 @@ export class ChartCore {
    * Does NOT draw crosshair (that's on the overlay canvas).
    */
   private renderMainCanvas(): void {
-    if (this.bars.length === 0 || !this.viewport) return;
+    if (this.bars.length === 0 || !this.viewport) {
+      // Always clear the canvas to avoid stale content
+      const ctx = this.canvas.getContext('2d');
+      if (ctx) {
+        const bgColor = this.options.renderOptions?.backgroundColor || '#131722';
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, this.options.width, this.options.height);
+      }
+      return;
+    }
 
     const vp = this.viewport;
     const layout = this.getUnifiedLayout();

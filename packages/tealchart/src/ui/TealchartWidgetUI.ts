@@ -290,41 +290,6 @@ export class TealchartWidgetUI {
     });
   }
 
-  private createLoadingOverlay(): void {
-    // Position below the top bar so timeframe buttons remain clickable during loading
-    const topOffset = this.options.showTopBar !== false ? TOP_BAR_HEIGHT : 0;
-    this.loadingOverlay = div({
-      style: {
-        position: 'absolute',
-        top: `${topOffset}px`,
-        left: '0',
-        right: '0',
-        bottom: '0',
-        backgroundColor: 'var(--chart-bg, #131722)',
-        display: 'none',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: '10',
-      },
-    });
-
-    const spinner = div({
-      style: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '12px',
-        color: 'var(--text2, #787b86)',
-      },
-    });
-
-    spinner.appendChild(icons.spinner(24, 'var(--text2, #787b86)'));
-    spinner.appendChild(span({ text: 'Loading chart data...' }));
-
-    this.loadingOverlay.appendChild(spinner);
-    this.chartArea.appendChild(this.loadingOverlay);
-  }
-
   // ============================================================================
   // Public API
   // ============================================================================
