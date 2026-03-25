@@ -384,7 +384,25 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
           <Text style={[styles.labelText, { color: order.quantityTextColor }]}>{displayQuantity}</Text>
         </View>
 
-        {/* TP/SL Buttons (if brackets enabled) */}
+        {/* Cancel button — flush with label segments */}
+        {order.cancellable && (
+          <Pressable
+            onPress={handleCancel}
+            style={({ pressed }) => [
+              styles.cancelButton,
+              {
+                backgroundColor: order.cancelButtonBackgroundColor,
+                borderColor: order.cancelButtonBorderColor,
+                opacity: pressed ? 0.7 : 1,
+              },
+            ]}
+            hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
+          >
+            <Text style={[styles.cancelIcon, { color: order.cancelButtonIconColor }]}>×</Text>
+          </Pressable>
+        )}
+
+        {/* TP/SL Buttons (if brackets enabled) — separated by gap */}
         {showBrackets && (
           <View style={styles.bracketButtons}>
             {/* TP Button */}
@@ -421,24 +439,6 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
               </Animated.View>
             </GestureDetector>
           </View>
-        )}
-
-        {/* Cancel button */}
-        {order.cancellable && (
-          <Pressable
-            onPress={handleCancel}
-            style={({ pressed }) => [
-              styles.cancelButton,
-              {
-                backgroundColor: order.cancelButtonBackgroundColor,
-                borderColor: order.cancelButtonBorderColor,
-                opacity: pressed ? 0.7 : 1,
-              },
-            ]}
-            hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
-          >
-            <Text style={[styles.cancelIcon, { color: order.cancelButtonIconColor }]}>×</Text>
-          </Pressable>
         )}
       </View>
 
@@ -514,6 +514,7 @@ const styles = StyleSheet.create({
   bracketButtons: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginLeft: 6, // Gap between cancel button and TP/SL buttons
   },
   bracketButtonWrapper: {
     marginLeft: 0,

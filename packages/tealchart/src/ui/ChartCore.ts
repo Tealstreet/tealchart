@@ -1794,32 +1794,50 @@ export class ChartCore {
 
   /**
    * Update bracket drag state from InteractiveLineRenderer move callbacks.
-   * Looks up the position in positionLines to get entryPrice + positionData.
+   * Looks up position or order lines to get entryPrice + positionData for preview.
    */
   private _updateBracketDragState(
     type: 'tp' | 'sl',
-    positionId: string,
+    lineId: string,
     price: number,
     partialPercent: number,
     dragStartX: number,
     dragCurrentX: number,
   ): void {
-    // Find the position to get entryPrice and positionData
-    const position = this.positionLines.find((p) => (p.positionId || p.id) === positionId);
-    if (!position?.positionData) return;
+    // Try position lines first
+    const position = this.positionLines.find((p) => (p.positionId || p.id) === lineId);
+    if (position?.positionData) {
+      this._bracketDragState = {
+        type,
+        positionId: lineId,
+        price,
+        entryPrice: position.positionData.entryPrice,
+        partialPercent,
+        partialEnabled: position.partialEnabled ?? false,
+        dragStartX,
+        dragCurrentX,
+        positionData: position.positionData,
+      };
+      this.renderCrosshairOverlay();
+      return;
+    }
 
-    this._bracketDragState = {
-      type,
-      positionId,
-      price,
-      entryPrice: position.positionData.entryPrice,
-      partialPercent,
-      partialEnabled: position.partialEnabled ?? false,
-      dragStartX,
-      dragCurrentX,
-      positionData: position.positionData,
-    };
-    this.renderCrosshairOverlay();
+    // Fall back to order lines — use order price as entry
+    const order = this.orderLines.find((o) => (o.orderId || o.id) === lineId);
+    if (order) {
+      this._bracketDragState = {
+        type,
+        positionId: lineId,
+        price,
+        entryPrice: order.price,
+        partialPercent,
+        partialEnabled: order.partialEnabled ?? false,
+        dragStartX,
+        dragCurrentX,
+        positionData: { entryPrice: order.price, isLong: true, notional: 0 },
+      };
+      this.renderCrosshairOverlay();
+    }
   }
 
   /**
@@ -1840,16 +1858,15 @@ export class ChartCore {
     const bracketY = this.renderer.publicPriceToYWithLayout(state.price, this.viewport, layout);
     const entryY = this.renderer.publicPriceToYWithLayout(state.entryPrice, this.viewport, layout);
 
-    // Compute PnL inline
+    // Compute PnL inline (only when notional > 0, i.e. for positions)
     const pd = state.positionData;
+    const hasPnl = pd.notional > 0;
     const priceDiff = pd.isLong ? state.price - state.entryPrice : state.entryPrice - state.price;
-    const pnl = ((priceDiff * pd.notional) / state.entryPrice) * (state.partialPercent / 100);
+    const pnl = hasPnl ? ((priceDiff * pd.notional) / state.entryPrice) * (state.partialPercent / 100) : 0;
     const percentDistance = ((state.price - state.entryPrice) / state.entryPrice) * 100;
 
     // Format values
-    const pnlDecimals = 2;
-    const pnlSign = pnl >= 0 ? '+' : '-';
-    const pnlText = pnlSign + '$' + Math.abs(pnl).toFixed(pnlDecimals);
+    const pnlText = hasPnl ? (pnl >= 0 ? '+' : '-') + '$' + Math.abs(pnl).toFixed(2) : '';
     const pctSign = percentDistance >= 0 ? '+' : '';
     const percentText = pctSign + percentDistance.toFixed(2) + '%';
 

@@ -513,7 +513,7 @@ export class InteractiveLineRenderer {
     let chartLabelX = margins.left;
     const useNarrowText = width < 400;
     const buttons = chartLabel?.buttons || [];
-    const hasTPSLButtons = buttons.length > 0 && (buttons[0].type === 'tp' || buttons[0].type === 'sl');
+    const hasTPSLButtons = buttons.some((b) => b.type === 'tp' || b.type === 'sl');
 
     if (chartLabel && chartLabel.segments.length > 0) {
       const lineLength = bound.lineLength ?? 100;
@@ -571,17 +571,21 @@ export class InteractiveLineRenderer {
         labelDiv.appendChild(segEl);
       }
 
-      // TP/SL gap
-      if (hasTPSLButtons) {
+      // Render buttons — non-TP/SL buttons first, then gap, then TP/SL
+      const nonTPSLButtons = buttons.filter((b) => b.type !== 'tp' && b.type !== 'sl');
+      const tpslButtons = buttons.filter((b) => b.type === 'tp' || b.type === 'sl');
+
+      for (const btn of nonTPSLButtons) {
+        this.renderButton(labelDiv, btn, bound);
+      }
+
+      if (tpslButtons.length > 0) {
         const gap = document.createElement('span');
         gap.className = 'tc-tpsl-gap';
         labelDiv.appendChild(gap);
-      }
-
-      // Render buttons
-      for (let i = 0; i < buttons.length; i++) {
-        const btn = buttons[i];
-        this.renderButton(labelDiv, btn, bound);
+        for (const btn of tpslButtons) {
+          this.renderButton(labelDiv, btn, bound);
+        }
       }
 
       // Wire drag for order lines
