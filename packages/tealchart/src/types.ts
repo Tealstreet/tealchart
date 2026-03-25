@@ -51,6 +51,10 @@ export interface RenderOptions {
   margins?: ChartMargins; // Custom margins override
   pricePrecision?: number; // Market price precision (e.g., 0.00001 for 5 decimal places)
   fontFamily?: string; // Font family for all chart text. Defaults to 'inherit' for HTML overlays, 'sans-serif' for canvas.
+  // Metadata for jailbreak indicators
+  exchange?: string;
+  symbol?: string;
+  resolutionString?: string;
 }
 
 // Last trade info for rendering the current price line (legacy - use PriceLine instead)

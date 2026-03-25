@@ -3055,13 +3055,19 @@ export class TealchartRenderer {
       options.minCandleWidth,
     );
 
+    // Convert bar timestamps from ms to seconds for indicator compatibility
+    const barsInSeconds: Bar[] = bars.map((b) => ({
+      ...b,
+      time: Math.floor(b.time / 1000),
+    }));
+
     return {
       ctx: ctx as unknown as CanvasRenderingContext2D,
-      bars,
+      bars: barsInSeconds,
       candleCoords,
-      exchange: '',
-      symbol: '',
-      resolutionString: '',
+      exchange: options.exchange ?? '',
+      symbol: options.symbol ?? '',
+      resolutionString: options.resolutionString ?? '',
       chartWidth: options.width,
       chartHeight: options.height,
       priceToCoord,

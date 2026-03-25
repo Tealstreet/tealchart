@@ -334,6 +334,13 @@ export class TealchartWidget {
               pricePrecision: 1 / symbolInfo.pricescale,
             };
           }
+          // Pass symbol/interval metadata for jailbreak indicators
+          this._renderOptions = {
+            ...this._renderOptions,
+            symbol: this._symbol,
+            resolutionString: this._interval,
+            exchange: (symbolInfo as any).exchange || '',
+          };
           // Push supported resolutions to UI (filters timeframe selector)
           this._ui?.setSupportedResolutions(this._supportedResolutions);
           this._loadBars();
