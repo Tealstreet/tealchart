@@ -484,9 +484,12 @@ export class ChartCore {
   private resetButtonTimer: ReturnType<typeof setTimeout> | null = null;
   private cursor = 'crosshair';
 
-  // Label bounds dirty checking (React pattern from Tealchart.tsx:696-727)
-  private lastBoundsKey = '';
-  private lastBoundsUpdate = 0;
+  // Collision offset cache — keyed by geometry (IDs + prices + viewport).
+  // Stores only the de-overlap offset per line, NOT label content.
+  // Label content is always built fresh from current line data.
+  private collisionOffsetCache = new Map<string, number>();
+  private lastCollisionKey = '';
+  private lastCollisionUpdate = 0;
   private labelBoundsCache: PriceLineLabelBounds[] = [];
 
   // RAF for full renders
@@ -1532,25 +1535,50 @@ export class ChartCore {
       this.plotStyleOverrides,
     );
 
-    // Cache label bounds for interactive line renderer
+    // Collision resolution cache — only recompute de-overlap when geometry changes.
+    // Label content is always built fresh below so text/color changes are never stale.
     const crosshairColor = this.options.renderOptions?.crosshairColor || '#888888';
-    const linePrices = allPriceLines.map((l) => l.price.toFixed(6)).join(',');
-    const boundsKey = `${vp.priceMin.toFixed(4)},${vp.priceMax.toFixed(4)}|${linePrices}|${this.crosshair.visible}|${Math.round(this.crosshair.y)}`;
+    const collisionKey =
+      allPriceLines
+        .map((l) => `${l.id}:${l.price.toFixed(6)}`)
+        .sort()
+        .join(',') +
+      `|${vp.priceMin.toFixed(4)},${vp.priceMax.toFixed(4)}|${this.crosshair.visible}|${Math.round(this.crosshair.y)}`;
     const now = Date.now();
-    const keyChanged = boundsKey !== this.lastBoundsKey;
+    const collisionKeyChanged = collisionKey !== this.lastCollisionKey;
     const isDragging = this.eventManager.getIsDragging();
-    const shouldRecompute = keyChanged || (isDragging && now - this.lastBoundsUpdate > 16);
+    const shouldResolveCollisions = collisionKeyChanged || (isDragging && now - this.lastCollisionUpdate > 16);
 
-    if (shouldRecompute) {
-      this.labelBoundsCache = this.renderer.computePriceLineLabelBoundsWithLayout(
+    if (shouldResolveCollisions) {
+      // Run expensive collision resolution
+      const resolvedBounds = this.renderer.computePriceLineLabelBoundsWithLayout(
         allPriceLines,
         vp,
         layout,
         this.plots,
         this.crosshair.visible ? { y: this.crosshair.y, visible: true, color: crosshairColor } : undefined,
       );
-      this.lastBoundsKey = boundsKey;
-      this.lastBoundsUpdate = now;
+      // Cache only the collision offsets (adjustedY - originalY) by line ID
+      this.collisionOffsetCache.clear();
+      for (const b of resolvedBounds) {
+        this.collisionOffsetCache.set(b.lineId, b.adjustedY - b.originalY);
+      }
+      this.lastCollisionKey = collisionKey;
+      this.lastCollisionUpdate = now;
+      // Use the fully resolved bounds directly (content is fresh since allPriceLines is current)
+      this.labelBoundsCache = resolvedBounds;
+    } else {
+      // Collision cache hit — geometry unchanged, but label content may have changed.
+      // Refresh content fields in-place from current line data. O(n) with Map lookup.
+      const lineMap = new Map(allPriceLines.map((l) => [l.id, l]));
+      for (const b of this.labelBoundsCache) {
+        const line = lineMap.get(b.lineId);
+        if (line) {
+          b.label = line.label;
+          b.chartLabel = line.chartLabel;
+          b.color = line.color;
+        }
+      }
     }
   }
 

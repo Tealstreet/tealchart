@@ -309,6 +309,7 @@ export class InteractiveLineRenderer {
         (b) =>
           `${b.lineId}|${b.type}|${b.color}|${b.lineStyle}|${b.draggable}|${b.chartLabel?.segments.length ?? 0}|${b.chartLabel?.buttons?.length ?? 0}`,
       )
+      .sort()
       .join(';');
   }
 
