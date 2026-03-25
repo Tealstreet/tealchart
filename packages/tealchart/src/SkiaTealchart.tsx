@@ -195,6 +195,9 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   // Get values from core hook
   const { bars, symbol, interval, isLoading, unifiedLayout } = coreResult;
 
+  // Get supported resolutions from core (for filtering timeframe selector)
+  const supportedResolutions = coreResult.core?.getSupportedResolutions() ?? null;
+
   // Get indicator state from manager
   const plots = indicatorManagerRef.current?.getPlots() || [];
   const baseUnifiedPaneLayout = indicatorManagerRef.current?.getUnifiedLayout() || unifiedLayout;
@@ -778,6 +781,7 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
             interval={interval}
             onIntervalChange={onIntervalChange}
             onIndicatorsPress={handleIndicatorsPress}
+            supportedResolutions={supportedResolutions}
           />
         </View>
       )}

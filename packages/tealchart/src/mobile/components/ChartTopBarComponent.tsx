@@ -5,33 +5,11 @@
  * Matches the web's ChartTopBar styling with React Native components.
  */
 
-import React, { memo, useCallback, useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  ScrollView,
-} from 'react-native';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
-// Timeframe options matching web
-export interface TimeframeOption {
-  value: string;
-  label: string;
-  shortLabel: string;
-}
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-export const AVAILABLE_TIMEFRAMES: TimeframeOption[] = [
-  { value: '1', label: '1 minute', shortLabel: '1m' },
-  { value: '3', label: '3 minutes', shortLabel: '3m' },
-  { value: '5', label: '5 minutes', shortLabel: '5m' },
-  { value: '15', label: '15 minutes', shortLabel: '15m' },
-  { value: '30', label: '30 minutes', shortLabel: '30m' },
-  { value: '60', label: '1 hour', shortLabel: '1h' },
-  { value: '240', label: '4 hours', shortLabel: '4h' },
-  { value: '1D', label: '1 day', shortLabel: '1D' },
-  { value: '1W', label: '1 week', shortLabel: '1W' },
-];
+import { AVAILABLE_TIMEFRAMES } from '../../state/chartState';
 
 export interface ChartTopBarComponentProps {
   /** Current symbol (e.g., "BTC/USDT") */
@@ -52,97 +30,101 @@ export interface ChartTopBarComponentProps {
   textSecondaryColor?: string;
   /** Accent color for active states */
   accentColor?: string;
+  /** Supported resolutions from datafeed (filters timeframe buttons) */
+  supportedResolutions?: string[] | null;
 }
 
 const TOP_BAR_HEIGHT = 36;
 
-export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(({
-  symbol,
-  exchangeName,
-  interval,
-  onIntervalChange,
-  onIndicatorsPress,
-  backgroundColor = 'transparent',
-  textColor = '#d1d4dc',
-  textSecondaryColor = '#787b86',
-  accentColor = '#2962ff',
-}) => {
-  // Internal state for immediate visual feedback (like web's nanostores pattern)
-  // This makes the component work both controlled and uncontrolled
-  const [internalInterval, setInternalInterval] = useState(interval);
+export const ChartTopBarComponent: React.FC<ChartTopBarComponentProps> = memo(
+  ({
+    symbol,
+    exchangeName,
+    interval,
+    onIntervalChange,
+    onIndicatorsPress,
+    backgroundColor = 'transparent',
+    textColor = '#d1d4dc',
+    textSecondaryColor = '#787b86',
+    accentColor = '#2962ff',
+    supportedResolutions,
+  }) => {
+    // Filter timeframes by supported resolutions (if set by datafeed)
+    const timeframes = useMemo(() => {
+      if (!supportedResolutions || supportedResolutions.length === 0) {
+        return AVAILABLE_TIMEFRAMES;
+      }
+      const filtered = AVAILABLE_TIMEFRAMES.filter((tf) => supportedResolutions.includes(tf.value));
+      return filtered.length > 0 ? filtered : AVAILABLE_TIMEFRAMES;
+    }, [supportedResolutions]);
 
-  // Sync internal state when prop changes (controlled mode)
-  useEffect(() => {
-    setInternalInterval(interval);
-  }, [interval]);
+    // Internal state for immediate visual feedback (like web's nanostores pattern)
+    // This makes the component work both controlled and uncontrolled
+    const [internalInterval, setInternalInterval] = useState(interval);
 
-  // Handle timeframe selection
-  // 1. Update internal state immediately (instant visual feedback)
-  // 2. Call external callback (parent can fetch new data, update state, etc.)
-  const handleTimeframePress = useCallback((value: string) => {
-    setInternalInterval(value);  // Immediate visual update
-    onIntervalChange?.(value);   // Notify parent
-  }, [onIntervalChange]);
+    // Sync internal state when prop changes (controlled mode)
+    useEffect(() => {
+      setInternalInterval(interval);
+    }, [interval]);
 
-  return (
-    <View style={[styles.container, { backgroundColor }]}>
-      {/* Symbol display (only shown if symbol is provided) */}
-      {symbol ? (
-        <>
-          <View style={styles.symbolContainer}>
-            <Text style={[styles.symbolText, { color: textColor }]}>{symbol}</Text>
-            {exchangeName && (
-              <Text style={[styles.exchangeText, { color: textSecondaryColor }]}>
-                {exchangeName}
-              </Text>
-            )}
-          </View>
-          {/* Divider after symbol */}
+    // Handle timeframe selection
+    // 1. Update internal state immediately (instant visual feedback)
+    // 2. Call external callback (parent can fetch new data, update state, etc.)
+    const handleTimeframePress = useCallback(
+      (value: string) => {
+        setInternalInterval(value); // Immediate visual update
+        onIntervalChange?.(value); // Notify parent
+      },
+      [onIntervalChange],
+    );
+
+    return (
+      <View style={[styles.container, { backgroundColor }]}>
+        {/* Symbol display (only shown if symbol is provided) */}
+        {symbol ? (
+          <>
+            <View style={styles.symbolContainer}>
+              <Text style={[styles.symbolText, { color: textColor }]}>{symbol}</Text>
+              {exchangeName && <Text style={[styles.exchangeText, { color: textSecondaryColor }]}>{exchangeName}</Text>}
+            </View>
+            {/* Divider after symbol */}
+            <View style={styles.divider} />
+          </>
+        ) : (
+          /* Leading divider when no symbol */
           <View style={styles.divider} />
-        </>
-      ) : (
-        /* Leading divider when no symbol */
+        )}
+
+        {/* Timeframe selector - horizontal scroll */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.timeframeContainer}>
+          {timeframes.map((tf) => (
+            <TimeframeButton
+              key={tf.value}
+              value={tf.value}
+              label={tf.shortLabel}
+              isActive={internalInterval === tf.value}
+              onPress={handleTimeframePress}
+              textColor={textSecondaryColor}
+              accentColor={accentColor}
+            />
+          ))}
+        </ScrollView>
+
+        {/* Divider */}
         <View style={styles.divider} />
-      )}
 
-      {/* Timeframe selector - horizontal scroll */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.timeframeContainer}
-      >
-        {AVAILABLE_TIMEFRAMES.map((tf) => (
-          <TimeframeButton
-            key={tf.value}
-            value={tf.value}
-            label={tf.shortLabel}
-            isActive={internalInterval === tf.value}
-            onPress={handleTimeframePress}
-            textColor={textSecondaryColor}
-            accentColor={accentColor}
-          />
-        ))}
-      </ScrollView>
-
-      {/* Divider */}
-      <View style={styles.divider} />
-
-      {/* Indicators button */}
-      <Pressable
-        style={({ pressed }) => [
-          styles.indicatorsButton,
-          pressed && styles.indicatorsButtonPressed,
-        ]}
-        onPress={onIndicatorsPress}
-      >
-        <Text style={[styles.indicatorsIcon, { color: textSecondaryColor }]}>ƒ</Text>
-        <Text style={[styles.indicatorsText, { color: textSecondaryColor }]}>
-          Indicators
-        </Text>
-      </Pressable>
-    </View>
-  );
-});
+        {/* Indicators button */}
+        <Pressable
+          style={({ pressed }) => [styles.indicatorsButton, pressed && styles.indicatorsButtonPressed]}
+          onPress={onIndicatorsPress}
+        >
+          <Text style={[styles.indicatorsIcon, { color: textSecondaryColor }]}>ƒ</Text>
+          <Text style={[styles.indicatorsText, { color: textSecondaryColor }]}>Indicators</Text>
+        </Pressable>
+      </View>
+    );
+  },
+);
 
 ChartTopBarComponent.displayName = 'ChartTopBarComponent';
 
@@ -159,42 +141,30 @@ interface TimeframeButtonProps {
   accentColor: string;
 }
 
-const TimeframeButton: React.FC<TimeframeButtonProps> = memo(({
-  value,
-  label,
-  isActive,
-  onPress,
-  textColor,
-  accentColor,
-}) => {
-  const [isPressed, setIsPressed] = useState(false);
+const TimeframeButton: React.FC<TimeframeButtonProps> = memo(
+  ({ value, label, isActive, onPress, textColor, accentColor }) => {
+    const [isPressed, setIsPressed] = useState(false);
 
-  const handlePress = useCallback(() => {
-    onPress(value);
-  }, [onPress, value]);
+    const handlePress = useCallback(() => {
+      onPress(value);
+    }, [onPress, value]);
 
-  return (
-    <Pressable
-      onPress={handlePress}
-      onPressIn={() => setIsPressed(true)}
-      onPressOut={() => setIsPressed(false)}
-      style={[
-        styles.timeframeButton,
-        isActive && [styles.timeframeButtonActive, { backgroundColor: `${accentColor}33` }],
-        isPressed && !isActive && styles.timeframeButtonPressed,
-      ]}
-    >
-      <Text
+    return (
+      <Pressable
+        onPress={handlePress}
+        onPressIn={() => setIsPressed(true)}
+        onPressOut={() => setIsPressed(false)}
         style={[
-          styles.timeframeButtonText,
-          { color: isActive ? accentColor : textColor },
+          styles.timeframeButton,
+          isActive && [styles.timeframeButtonActive, { backgroundColor: `${accentColor}33` }],
+          isPressed && !isActive && styles.timeframeButtonPressed,
         ]}
       >
-        {label}
-      </Text>
-    </Pressable>
-  );
-});
+        <Text style={[styles.timeframeButtonText, { color: isActive ? accentColor : textColor }]}>{label}</Text>
+      </Pressable>
+    );
+  },
+);
 
 TimeframeButton.displayName = 'TimeframeButton';
 

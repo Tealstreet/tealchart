@@ -17,5 +17,8 @@ export type { CrosshairComponentProps } from './CrosshairComponent';
 export { ContextMenuComponent } from './ContextMenuComponent';
 export type { ContextMenuComponentProps } from './ContextMenuComponent';
 
-export { ChartTopBarComponent, AVAILABLE_TIMEFRAMES } from './ChartTopBarComponent';
-export type { ChartTopBarComponentProps, TimeframeOption } from './ChartTopBarComponent';
+export { ChartTopBarComponent } from './ChartTopBarComponent';
+export type { ChartTopBarComponentProps } from './ChartTopBarComponent';
+
+export { AVAILABLE_TIMEFRAMES } from '../../state/chartState';
+export type { TimeframeOption } from '../../state/chartState';

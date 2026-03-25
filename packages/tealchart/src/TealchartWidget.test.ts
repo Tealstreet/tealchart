@@ -37,6 +37,7 @@ vi.mock('./ui/TealchartWidgetUI', () => ({
       setSymbolCalls.push({ symbol, exchangeName });
     }
     setInterval() {}
+    setSupportedResolutions() {}
     resize() {}
     dispose() {}
     openIndicatorSettings() {}

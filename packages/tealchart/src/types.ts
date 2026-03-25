@@ -627,6 +627,9 @@ export interface LibrarySymbolInfo {
   has_seconds?: boolean;
   has_daily?: boolean;
   has_weekly_and_monthly?: boolean;
+  intraday_multipliers?: string[];
+  seconds_multipliers?: string[];
+  supported_resolutions?: ResolutionString[];
 }
 
 /**

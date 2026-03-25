@@ -108,6 +108,9 @@ export class ChartWidgetCore {
   protected _viewport: Viewport | null = null;
   protected _plots: PlotOutput[] = [];
 
+  // Supported resolutions from datafeed config (for filtering timeframe selector)
+  protected _supportedResolutions: string[] | null = null;
+
   // State flags
   protected _isLoading = false;
   protected _isLoadingMoreBars = false;
@@ -157,7 +160,9 @@ export class ChartWidgetCore {
    * Initialize the widget - resolve symbol and load bars
    */
   initialize(): void {
-    this._datafeed.onReady(() => {
+    this._datafeed.onReady((config) => {
+      // Store supported resolutions from datafeed config
+      this._supportedResolutions = config.supported_resolutions ?? null;
       this._datafeed.resolveSymbol(
         this._symbol,
         (symbolInfo) => {
@@ -170,6 +175,13 @@ export class ChartWidgetCore {
         },
       );
     });
+  }
+
+  /**
+   * Get supported resolutions from datafeed config (for filtering timeframe selector)
+   */
+  getSupportedResolutions(): string[] | null {
+    return this._supportedResolutions;
   }
 
   /**

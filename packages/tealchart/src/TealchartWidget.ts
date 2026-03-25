@@ -117,6 +117,9 @@ export class TealchartWidget {
   private _gapDetectionError: GapDetectionErrorState | null = null;
   private _gapDetectionErrorCallback: ((error: GapDetectionErrorState | null) => void) | null = null;
 
+  // Supported resolutions from datafeed config (for filtering timeframe selector)
+  private _supportedResolutions: ResolutionString[] | null = null;
+
   // Track if interval was explicitly provided (for controlled vs uncontrolled behavior)
   private _intervalWasProvided: boolean;
 
@@ -308,6 +311,9 @@ export class TealchartWidget {
   private _initialize(): void {
     // Initialize datafeed
     this._datafeed.onReady((config) => {
+      // Store supported resolutions from datafeed config (for filtering timeframe selector)
+      this._supportedResolutions = config.supported_resolutions ?? null;
+
       const resolveRequestId = ++this._resolveSymbolRequestId;
 
       // Resolve symbol
@@ -328,6 +334,8 @@ export class TealchartWidget {
               pricePrecision: 1 / symbolInfo.pricescale,
             };
           }
+          // Push supported resolutions to UI (filters timeframe selector)
+          this._ui?.setSupportedResolutions(this._supportedResolutions);
           this._loadBars();
         },
         (error) => {
@@ -1428,6 +1436,8 @@ export class TealchartWidget {
             pricePrecision: 1 / symbolInfo.pricescale,
           };
         }
+        // Push supported resolutions to UI (may have changed on exchange switch)
+        this._ui?.setSupportedResolutions(this._supportedResolutions);
         this._loadBars();
       },
       (error) => {
