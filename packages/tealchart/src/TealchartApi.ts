@@ -240,7 +240,7 @@ export class TealchartApi {
    * and calling remove() when done.
    */
   createOrderLine(options?: OrderLineOptions): Promise<IOrderLineAdapter> {
-    const id = `order_${++this._lineIdCounter}`;
+    const id = options?.id || `order_${++this._lineIdCounter}`;
     const adapter = this._createOrderLineAdapter(id, options);
     this._orderLines.set(id, adapter);
     this._onLinesChanged?.();
@@ -257,7 +257,7 @@ export class TealchartApi {
    * and calling remove() when done.
    */
   createPositionLine(options?: PositionLineOptions): Promise<IPositionLineAdapter> {
-    const id = `position_${++this._lineIdCounter}`;
+    const id = options?.id || `position_${++this._lineIdCounter}`;
     const adapter = this._createPositionLineAdapter(id, options);
     this._positionLines.set(id, adapter);
     this._onLinesChanged?.();

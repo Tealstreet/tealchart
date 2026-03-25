@@ -434,6 +434,8 @@ export interface ITimeScaleApi {
  * Order line options
  */
 export interface OrderLineOptions {
+  /** External ID for this line (e.g., exchange order ID). Used as the adapter Map key. */
+  id?: string;
   price?: number;
   quantity?: number;
   text?: string;
@@ -489,6 +491,8 @@ export interface IOrderLineAdapter {
  * Position line options
  */
 export interface PositionLineOptions {
+  /** External ID for this line (e.g., exchange position ID). Used as the adapter Map key. */
+  id?: string;
   price?: number;
   quantity?: number;
   text?: string;
