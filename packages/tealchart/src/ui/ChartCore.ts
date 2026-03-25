@@ -523,6 +523,7 @@ export class ChartCore {
     this.crosshairCanvas.style.top = '0';
     this.crosshairCanvas.style.left = '0';
     this.crosshairCanvas.style.pointerEvents = 'none';
+    this.crosshairCanvas.style.zIndex = '3'; // Above interactive line labels (z-index: 2)
     this.chartContainer.appendChild(this.crosshairCanvas);
 
     // Set initial canvas sizes
