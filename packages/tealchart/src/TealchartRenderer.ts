@@ -663,10 +663,6 @@ export class TealchartRenderer {
       if (lineType === 'price') {
         // Simple price line (last price, countdown timer, etc.)
         this.drawSimplePriceLine(bound, viewport, priceHeight);
-      } else if (lineType === 'crosshair') {
-        // Crosshair is rendered by Konva layer for proper z-ordering (floats on top)
-        // Skip canvas rendering
-        continue;
       } else if (lineType === 'order' || lineType === 'position') {
         // Order/position lines are rendered by Konva layer for interactivity
         // Skip canvas rendering
@@ -753,64 +749,6 @@ export class TealchartRenderer {
       // Single line centered
       ctx.fillText(bound.label.primaryText, labelX + bound.width / 2, labelCenterY);
     }
-  }
-
-  /**
-   * Draw crosshair price line (type: 'crosshair') with dotted line and filled label
-   */
-  private drawCrosshairPriceLine(bound: PriceLineLabelBounds, viewport: Viewport, priceHeight: number): void {
-    const { ctx, options, margins } = this;
-
-    const rawLineY = this.priceToY(bound.price, viewport, priceHeight);
-    const color = bound.color;
-    const labelCenterY = bound.adjustedY;
-
-    // Clamp lineY to visible area (can extend into volume area but not below time axis)
-    const lineY = Math.max(0, Math.min(options.height - margins.bottom, rawLineY));
-
-    // Label box position - right edge exactly at canvas edge
-    const labelX = options.width - bound.width;
-    const labelY = labelCenterY - bound.height / 2;
-
-    // Draw dotted horizontal line across chart area (stop at label)
-    ctx.save();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1;
-    ctx.setLineDash([4, 4]);
-    ctx.beginPath();
-    ctx.moveTo(margins.left, lineY);
-    ctx.lineTo(labelX, lineY);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.restore();
-
-    // Draw connector line if label is offset from price line
-    if (Math.abs(labelCenterY - lineY) > 2) {
-      ctx.save();
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 1;
-      ctx.globalAlpha = 0.5;
-      ctx.beginPath();
-      ctx.moveTo(labelX, lineY);
-      ctx.lineTo(labelX, labelCenterY);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    // Draw filled label background (crosshair uses solid fill)
-    const bgColor = bound.label.backgroundColor || color;
-    ctx.fillStyle = bgColor;
-    ctx.beginPath();
-    ctx.roundRect(labelX, labelY, bound.width, bound.height, 2);
-    ctx.fill();
-
-    // Draw text (contrasting color for filled background)
-    const textColor = bound.label.textColor || options.backgroundColor;
-    ctx.fillStyle = textColor;
-    ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(bound.label.primaryText, labelX + bound.width / 2, labelCenterY);
   }
 
   /**
@@ -2470,7 +2408,7 @@ export class TealchartRenderer {
     viewport: Viewport,
     layout: UnifiedPaneLayout,
     plots?: PlotOutput[],
-    crosshair?: { y: number; visible: boolean; color: string },
+    _crosshair?: { y: number; visible: boolean; color: string },
   ): PriceLineLabelBounds[] {
     const { ctx, options } = this;
 
@@ -2491,58 +2429,9 @@ export class TealchartRenderer {
     // and applied via ChartCore.setPaneYRanges() / getUnifiedLayout() before rendering.
     // The panes already have correct yMin/yMax values set.
 
-    // Build combined price lines list, including crosshair if provided
-    const allPriceLines = [...priceLines];
-
-    // Create crosshair price line with correct pane detection (avoids duplicate pane computation)
-    if (crosshair?.visible) {
-      const crosshairY = crosshair.y;
-      // Find which pane the crosshair is in
-      for (const pane of computedPanes) {
-        if (crosshairY >= pane.top && crosshairY < pane.bottom) {
-          // Calculate value in this pane's coordinate system
-          const ratio = (crosshairY - pane.top) / pane.height;
-          const value = pane.yMax - ratio * (pane.yMax - pane.yMin);
-
-          // Format label based on pane type (using cached formatters for perf)
-          let labelText: string;
-          const range = pane.yMax - pane.yMin;
-          if (pane.type === 'main') {
-            let decimals: number;
-            if (options.pricePrecision && options.pricePrecision > 0) {
-              decimals = getDecimalPlacesFromPrecision(options.pricePrecision);
-            } else {
-              decimals = range >= 10 ? 0 : range >= 1 ? 1 : range >= 0.01 ? 2 : 3;
-            }
-            labelText = getCachedNumberFormatter(decimals).format(value);
-          } else {
-            const indicatorDecimals =
-              Math.abs(value) >= 1000 ? 0 : Math.abs(value) >= 100 ? 1 : Math.abs(value) >= 1 ? 2 : 4;
-            labelText = getCachedNumberFormatter(indicatorDecimals).format(value);
-          }
-
-          allPriceLines.push({
-            id: '__crosshair__',
-            price: value,
-            lineStyle: 'dashed',
-            color: crosshair.color,
-            type: 'crosshair',
-            floatingLabel: true,
-            targetPaneId: pane.id,
-            label: {
-              primaryText: labelText,
-              backgroundColor: crosshair.color,
-              textColor: options.backgroundColor,
-            },
-          });
-          break; // Only one pane can contain the cursor
-        }
-      }
-    }
-
     // Calculate bounds using pane coordinate system
     const labelFont = `11px ${this.font}`;
-    const bounds: PriceLineLabelBounds[] = allPriceLines.map((line) => {
+    const bounds: PriceLineLabelBounds[] = priceLines.map((line) => {
       // Find the target pane (default to main if not specified)
       const targetPaneId = line.targetPaneId || 'main';
       const targetPane = computedPanes.find((p) => p.id === targetPaneId) || mainPane;
@@ -2964,7 +2853,7 @@ export class TealchartRenderer {
     priceLines?: PriceLine[],
     plots?: PlotOutput[],
     indicatorPaneInfo?: Record<string, IndicatorPaneInfo>,
-    crosshair?: CrosshairState,
+    _crosshair?: CrosshairState,
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
   ): void {
     const { ctx, options, margins } = this;
@@ -2982,59 +2871,8 @@ export class TealchartRenderer {
     // Indicator pane Y ranges are now computed by AutoScaleManager in TealchartWidget
     // and applied via ChartCore.setPaneYRanges() / getUnifiedLayout() before rendering.
 
-    // Create crosshair price lines now that we have correct Y ranges
-    // This is done here so crosshair values are calculated with correct auto-scaled ranges
-    const allPriceLines = priceLines ? [...priceLines] : [];
-    if (crosshair?.visible) {
-      const crosshairColor = options.crosshairColor;
-      const y = crosshair.y;
-
-      // Find which pane the crosshair Y is in
-      for (const pane of computedPanes) {
-        if (y >= pane.top && y < pane.bottom) {
-          // Calculate value in this pane's coordinate system
-          const ratio = (y - pane.top) / pane.height;
-          const value = pane.yMax - ratio * (pane.yMax - pane.yMin);
-
-          // Format based on pane type
-          let labelText: string;
-          const range = pane.yMax - pane.yMin;
-          if (pane.type === 'main') {
-            // Use price formatting - prefer pricePrecision if available
-            let decimals: number;
-            if (options.pricePrecision && options.pricePrecision > 0) {
-              decimals = getDecimalPlacesFromPrecision(options.pricePrecision);
-            } else {
-              decimals = range >= 10 ? 0 : range >= 1 ? 1 : range >= 0.01 ? 2 : 3;
-            }
-            labelText = getCachedNumberFormatter(decimals).format(value);
-          } else {
-            // Indicator value formatting
-            const indicatorDecimals =
-              Math.abs(value) >= 1000 ? 0 : Math.abs(value) >= 100 ? 1 : Math.abs(value) >= 1 ? 2 : 4;
-            labelText = getCachedNumberFormatter(indicatorDecimals).format(value);
-          }
-
-          allPriceLines.push({
-            id: '__crosshair__',
-            price: value,
-            lineStyle: 'dotted',
-            color: crosshairColor,
-            type: 'crosshair',
-            floatingLabel: true,
-            targetPaneId: pane.id,
-            label: {
-              primaryText: labelText,
-              backgroundColor: crosshairColor,
-              textColor: options.backgroundColor,
-            },
-          });
-          break; // Only one pane can contain the cursor
-        }
-      }
-    }
-
     // Pre-calculate label bounds for each pane (filter lines by targetPaneId)
+    const allPriceLines = priceLines ? [...priceLines] : [];
     const labelBoundsByPane = new Map<string, PriceLineLabelBounds[]>();
     if (allPriceLines.length > 0) {
       for (const pane of computedPanes) {
@@ -3204,7 +3042,7 @@ export class TealchartRenderer {
     // Draw Y-axis for indicator pane
     this.renderPaneYAxis(pane, labelBounds);
 
-    // Draw price lines on top (for crosshair labels on indicator panes)
+    // Draw price lines on top
     if (labelBounds && labelBounds.length > 0) {
       this.drawPriceLinesInPane(labelBounds, viewport, pane);
     }
@@ -3738,10 +3576,6 @@ export class TealchartRenderer {
 
       if (lineType === 'price') {
         this.drawSimplePriceLineInPane(bound, viewport, pane);
-      } else if (lineType === 'crosshair') {
-        // Crosshair label is rendered by HTML overlay for proper z-ordering
-        // Crosshair lines (horizontal/vertical) are drawn separately via drawCrosshair()
-        continue;
       } else if (lineType === 'order' || lineType === 'position') {
         // Order/position labels are HTML overlays (InteractiveLineRenderer)
         // but the horizontal line is drawn on canvas
@@ -3818,59 +3652,6 @@ export class TealchartRenderer {
     } else {
       ctx.fillText(bound.label.primaryText, labelX + bound.width / 2, labelCenterY);
     }
-  }
-
-  /**
-   * Draw crosshair price line within a pane
-   */
-  private drawCrosshairPriceLineInPane(bound: PriceLineLabelBounds, viewport: Viewport, pane: ComputedPane): void {
-    const { ctx, options, margins } = this;
-
-    const lineY = Math.max(pane.top, Math.min(pane.bottom, this.valueToY(bound.price, pane)));
-    const color = bound.color;
-    const labelCenterY = bound.adjustedY;
-
-    const labelX = options.width - bound.width;
-    const labelY = labelCenterY - bound.height / 2;
-
-    // Dotted line
-    ctx.save();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1;
-    ctx.setLineDash([4, 4]);
-    ctx.beginPath();
-    ctx.moveTo(margins.left, lineY);
-    ctx.lineTo(labelX, lineY);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.restore();
-
-    // Connector if offset
-    if (Math.abs(labelCenterY - lineY) > 2) {
-      ctx.save();
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 1;
-      ctx.globalAlpha = 0.5;
-      ctx.beginPath();
-      ctx.moveTo(labelX, lineY);
-      ctx.lineTo(labelX, labelCenterY);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    // Filled label
-    const bgColor = bound.label.backgroundColor || color;
-    ctx.fillStyle = bgColor;
-    ctx.beginPath();
-    ctx.roundRect(labelX, labelY, bound.width, bound.height, 2);
-    ctx.fill();
-
-    // Text
-    ctx.fillStyle = bound.label.textColor || options.backgroundColor;
-    ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(bound.label.primaryText, labelX + bound.width / 2, labelCenterY);
   }
 
   /**

@@ -1563,7 +1563,6 @@ export class ChartCore {
 
     // Collision resolution cache — only recompute de-overlap when geometry changes.
     // Label content is always built fresh below so text/color changes are never stale.
-    const crosshairColor = this.options.renderOptions?.crosshairColor || '#888888';
     // Include bucketed text length per line — triggers rebuild when label width changes
     // significantly (e.g., PnL grows from "$1" to "$1,234"). Bucket to nearest 3 chars
     // so minor text changes (same visual width) don't cause unnecessary rebuilds.
@@ -1574,8 +1573,7 @@ export class ChartCore {
           return `${l.id}:${l.price.toFixed(6)}:${Math.round(textLen / 3)}`;
         })
         .sort()
-        .join(',') +
-      `|${vp.priceMin.toFixed(4)},${vp.priceMax.toFixed(4)}|${this.crosshair.visible}|${Math.round(this.crosshair.y)}`;
+        .join(',') + `|${vp.priceMin.toFixed(4)},${vp.priceMax.toFixed(4)}`;
     const now = Date.now();
     const collisionKeyChanged = collisionKey !== this.lastCollisionKey;
     const isDragging = this.eventManager.getIsDragging();
@@ -1588,7 +1586,7 @@ export class ChartCore {
         vp,
         layout,
         this.plots,
-        this.crosshair.visible ? { y: this.crosshair.y, visible: true, color: crosshairColor } : undefined,
+        undefined,
       );
       // Cache only the collision offsets (adjustedY - originalY) by line ID
       this.collisionOffsetCache.clear();
@@ -2086,14 +2084,6 @@ export class ChartCore {
    * Update interactive line renderer (HTML overlay labels)
    */
   private updateInteractiveLines(): void {
-    const crosshairColor = this.options.renderOptions?.crosshairColor || '#888888';
-    // Filter out crosshair bounds — crosshair is fully canvas-drawn now
-    const nonCrosshairBounds = this.labelBoundsCache.filter((b) => b.type !== 'crosshair');
-    this.interactiveLineRenderer.update(nonCrosshairBounds, this.pendingOrders, {
-      x: this.crosshair.x,
-      y: this.crosshair.y,
-      visible: this.crosshair.visible,
-      color: crosshairColor,
-    });
+    this.interactiveLineRenderer.update(this.labelBoundsCache, this.pendingOrders);
   }
 }

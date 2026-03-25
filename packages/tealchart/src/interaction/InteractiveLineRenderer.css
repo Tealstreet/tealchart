@@ -162,35 +162,6 @@
   /* For trading lines (order/position) - filled background */
 }
 
-/* Crosshair price label */
-.tc-crosshair-label {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  will-change: transform;
-  font-family: var(--tc-font-family, inherit);
-  font-size: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  border-radius: 2px;
-  white-space: nowrap;
-  text-align: center;
-  line-height: 1;
-}
-
-/* Crosshair vertical line (HTML overlay for z-ordering on top of labels) */
-.tc-crosshair-vline {
-  position: absolute;
-  top: 0;
-  width: 0;
-  pointer-events: none;
-  border-left-width: 1px;
-  border-left-style: dashed;
-}
-
 /* Connector line between price line and offset label */
 .tc-connector {
   position: absolute;

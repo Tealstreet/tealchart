@@ -58,13 +58,6 @@ export interface InteractiveLineRendererOptions {
   formatPrice?: (price: number) => string;
 }
 
-interface CrosshairLabelData {
-  x: number;
-  y: number;
-  visible: boolean;
-  color: string;
-}
-
 // ============================================================================
 // Constants
 // ============================================================================
@@ -124,16 +117,11 @@ export class InteractiveLineRenderer {
   private connectorElements = new Map<string, HTMLDivElement>();
   private countdownElements = new Map<string, { el: HTMLSpanElement; targetTime: number }[]>();
 
-  // Crosshair elements
-  private crosshairVLine: HTMLDivElement | null = null;
-  private crosshairLabel: HTMLDivElement | null = null;
-
   // Countdown timer
   private countdownTimer: ReturnType<typeof setInterval> | null = null;
 
   // Last signature for dirty checking
   private lastSignature = '';
-  private lastCrosshairVisible = false;
 
   // Pending orders
   private pendingOrders = new Map<string, PendingOrderUpdate>();
@@ -199,41 +187,24 @@ export class InteractiveLineRenderer {
   /**
    * Full update — create/remove/reposition label divs
    */
-  update(
-    labelBounds: PriceLineLabelBounds[],
-    pendingOrders: Map<string, PendingOrderUpdate> = new Map(),
-    crosshair?: CrosshairLabelData,
-  ): void {
+  update(labelBounds: PriceLineLabelBounds[], pendingOrders: Map<string, PendingOrderUpdate> = new Map()): void {
     this.pendingOrders = pendingOrders;
 
     const newSignature = this.computeSignature(labelBounds);
     const structureChanged = newSignature !== this.lastSignature;
 
-    // Track crosshair visibility changes (not text — text updates in-place)
-    const crosshairBound = labelBounds.find((b) => b.type === 'crosshair');
-    const crosshairVisible = !!crosshairBound;
-    const crosshairVisibilityChanged = crosshairVisible !== this.lastCrosshairVisible;
-    this.lastCrosshairVisible = crosshairVisible;
-
     // During drag, never rebuild (it would destroy the captured pointer element).
-    // Only update positions for non-dragged lines. Hide crosshair during drag.
+    // Only update positions for non-dragged lines.
     if (this.isDragging()) {
-      if (this.crosshairLabel) {
-        this.crosshairLabel.style.display = 'none';
-      }
-      this.updatePositions(labelBounds, crosshair);
+      this.updatePositions(labelBounds);
       return;
     }
-    // Restore crosshair visibility after drag ends
-    if (this.crosshairLabel) {
-      this.crosshairLabel.style.display = '';
-    }
 
-    if (structureChanged || crosshairVisibilityChanged) {
+    if (structureChanged) {
       this.lastSignature = newSignature;
-      this.rebuild(labelBounds, crosshair);
+      this.rebuild(labelBounds);
     } else {
-      this.updatePositions(labelBounds, crosshair);
+      this.updatePositions(labelBounds);
     }
   }
 
@@ -308,8 +279,6 @@ export class InteractiveLineRenderer {
     this.priceAxisElements.clear();
     this.connectorElements.clear();
     this.countdownElements.clear();
-    this.crosshairVLine = null;
-    this.crosshairLabel = null;
   }
 
   // ==========================================================================
@@ -322,7 +291,6 @@ export class InteractiveLineRenderer {
     // trigger a rebuild for correct label X positioning. Bucketed to nearest 3 chars
     // to avoid rebuilds on minor text fluctuations.
     return bounds
-      .filter((b) => b.type !== 'crosshair')
       .map((b) => {
         const textLen = b.chartLabel?.segments.reduce((sum, s) => sum + (s.text?.length || 0), 0) || 0;
         return `${b.lineId}|${b.type}|${b.color}|${b.lineStyle}|${b.draggable}|${b.chartLabel?.segments.length ?? 0}|${b.chartLabel?.buttons?.length ?? 0}|${Math.round(textLen / 3)}`;
@@ -335,15 +303,13 @@ export class InteractiveLineRenderer {
   // Private: Full rebuild
   // ==========================================================================
 
-  private rebuild(bounds: PriceLineLabelBounds[], crosshair?: CrosshairLabelData): void {
+  private rebuild(bounds: PriceLineLabelBounds[]): void {
     // Clear all existing elements
     this.lineContainer.innerHTML = '';
     this.labelElements.clear();
     this.priceAxisElements.clear();
     this.connectorElements.clear();
     this.countdownElements.clear();
-    this.crosshairVLine = null;
-    this.crosshairLabel = null;
 
     // Manage countdown timer
     const hasCountdown = bounds.some((b) => b.countdownToTime !== undefined);
@@ -356,7 +322,7 @@ export class InteractiveLineRenderer {
 
     // Separate floating and non-floating
     const nonFloating = bounds.filter((b) => !b.floatingLabel);
-    const floating = bounds.filter((b) => b.floatingLabel && (b.type !== 'crosshair' || crosshair?.visible));
+    const floating = bounds.filter((b) => b.floatingLabel);
 
     // Render non-floating first
     for (const bound of nonFloating) {
@@ -367,16 +333,13 @@ export class InteractiveLineRenderer {
     for (const bound of floating) {
       this.renderBound(bound);
     }
-
-    // Render crosshair vertical line
-    this.updateCrosshairVLine(crosshair);
   }
 
   // ==========================================================================
   // Private: Position-only update (fast path)
   // ==========================================================================
 
-  private updatePositions(bounds: PriceLineLabelBounds[], crosshair?: CrosshairLabelData): void {
+  private updatePositions(bounds: PriceLineLabelBounds[]): void {
     const { priceToY, width } = this.options;
     const dragLineId = this.state.getDragLineId();
 
@@ -384,8 +347,7 @@ export class InteractiveLineRenderer {
       // Skip the line being dragged — user controls its position via pointer events
       if (dragLineId && bound.lineId === dragLineId) continue;
 
-      const lineType = bound.type || 'price';
-      const lineY = lineType === 'crosshair' ? bound.adjustedY : priceToY(bound.price);
+      const lineY = priceToY(bound.price);
       const collisionOffset = bound.adjustedY - bound.originalY;
       const labelCenterY = lineY + collisionOffset;
 
@@ -451,23 +413,6 @@ export class InteractiveLineRenderer {
         }
       }
     }
-
-    // Update crosshair label text + position in-place (no rebuild)
-    const crosshairBound = bounds.find((b) => b.type === 'crosshair');
-    if (this.crosshairLabel && crosshairBound) {
-      const crosshairY = crosshairBound.adjustedY;
-      const labelX = this.options.width - crosshairBound.width;
-      const labelY = crosshairY - crosshairBound.height / 2;
-      this.crosshairLabel.style.transform = `translate(${labelX}px, ${labelY}px)`;
-      const primarySpan = this.crosshairLabel.querySelector('span');
-      if (primarySpan && primarySpan.textContent !== crosshairBound.label.primaryText) {
-        primarySpan.textContent = crosshairBound.label.primaryText;
-      } else if (!primarySpan && this.crosshairLabel.textContent !== crosshairBound.label.primaryText) {
-        this.crosshairLabel.textContent = crosshairBound.label.primaryText;
-      }
-    }
-
-    this.updateCrosshairVLine(crosshair);
   }
 
   // ==========================================================================
@@ -477,38 +422,12 @@ export class InteractiveLineRenderer {
   private renderBound(bound: PriceLineLabelBounds): void {
     const lineType = bound.type || 'price';
 
-    if (lineType === 'crosshair') {
-      this.renderCrosshairLabel(bound);
-    } else if (lineType === 'order' || lineType === 'position') {
+    if (lineType === 'order' || lineType === 'position') {
       this.renderTradingLabel(bound);
     } else {
       // Simple price line — render price axis label only (line drawn on canvas)
       this.renderPriceAxisLabel(bound);
     }
-  }
-
-  // ==========================================================================
-  // Private: Crosshair label
-  // ==========================================================================
-
-  private renderCrosshairLabel(bound: PriceLineLabelBounds): void {
-    const { width } = this.options;
-    const labelCenterY = bound.adjustedY;
-    const labelX = width - bound.width;
-    const labelY = labelCenterY - bound.height / 2;
-
-    const label = document.createElement('div');
-    label.className = 'tc-crosshair-label';
-    label.style.transform = `translate(${labelX}px, ${labelY}px)`;
-    label.style.width = `${bound.width}px`;
-    label.style.height = `${bound.height}px`;
-    label.style.backgroundColor = bound.label.backgroundColor || bound.color;
-    label.style.color = bound.label.textColor || '#000000';
-    label.textContent = bound.label.primaryText;
-
-    this.lineContainer.appendChild(label);
-    this.crosshairLabel = label;
-    this.priceAxisElements.set(bound.lineId, label);
   }
 
   // ==========================================================================
@@ -1038,19 +957,6 @@ export class InteractiveLineRenderer {
 
     this.lineContainer.appendChild(connector);
     this.connectorElements.set(bound.lineId, connector);
-  }
-
-  // ==========================================================================
-  // Private: Crosshair vertical line
-  // ==========================================================================
-
-  private updateCrosshairVLine(_crosshair?: CrosshairLabelData): void {
-    // Crosshair vertical line is now drawn on the canvas overlay (ChartCore.renderCrosshairOverlay).
-    // No HTML element needed — eliminates DOM mutations on every frame.
-    if (this.crosshairVLine) {
-      this.crosshairVLine.remove();
-      this.crosshairVLine = null;
-    }
   }
 
   // ==========================================================================
