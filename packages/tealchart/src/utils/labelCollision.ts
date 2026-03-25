@@ -45,11 +45,13 @@ export function clearCollisionCache(): void {
  */
 function getCacheKey(labels: LabelBounds[]): string {
   // Include id (if present) so different sets of lines with same geometry produce different keys.
-  // Sort so array order doesn't matter.
-  return labels
-    .map((l) => `${l.id || ''}:${Math.round(l.originalY * 10)}:${Math.round(l.height * 10)}`)
-    .sort()
-    .join('|');
+  const segments = labels.map((l) => `${l.id || ''}:${Math.round(l.originalY * 10)}:${Math.round(l.height * 10)}`);
+  // Only sort when all labels have IDs — otherwise keep positional order
+  // so index-based fallback in collision resolution stays consistent.
+  if (labels.every((l) => l.id)) {
+    segments.sort();
+  }
+  return segments.join('|');
 }
 
 /**

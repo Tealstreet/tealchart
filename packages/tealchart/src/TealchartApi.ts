@@ -241,6 +241,11 @@ export class TealchartApi {
    */
   createOrderLine(options?: OrderLineOptions): Promise<IOrderLineAdapter> {
     const id = options?.id || `order_${++this._lineIdCounter}`;
+    // Clean up existing adapter if recreating with same ID
+    const existingOrder = this._orderLines.get(id);
+    if (existingOrder) {
+      existingOrder.remove();
+    }
     const adapter = this._createOrderLineAdapter(id, options);
     this._orderLines.set(id, adapter);
     this._onLinesChanged?.();
@@ -258,6 +263,11 @@ export class TealchartApi {
    */
   createPositionLine(options?: PositionLineOptions): Promise<IPositionLineAdapter> {
     const id = options?.id || `position_${++this._lineIdCounter}`;
+    // Clean up existing adapter if recreating with same ID
+    const existingPosition = this._positionLines.get(id);
+    if (existingPosition) {
+      existingPosition.remove();
+    }
     const adapter = this._createPositionLineAdapter(id, options);
     this._positionLines.set(id, adapter);
     this._onLinesChanged?.();

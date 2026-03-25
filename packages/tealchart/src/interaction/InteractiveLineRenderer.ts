@@ -751,10 +751,12 @@ export class InteractiveLineRenderer {
     let startX = 0;
     let startY = 0;
     let isDragStarted = false;
+    let cachedRect: DOMRect;
 
     const onPointerDown = (e: PointerEvent) => {
       e.stopPropagation();
       e.preventDefault();
+      cachedRect = this.container.getBoundingClientRect();
       startX = e.clientX;
       startY = e.clientY;
       isDragStarted = false;
@@ -782,14 +784,15 @@ export class InteractiveLineRenderer {
       }
 
       if (isDragStarted) {
-        const rect = this.container.getBoundingClientRect();
-        const localY = e.clientY - rect.top;
+        const localY = e.clientY - cachedRect.top;
         const price = this.options.yToPrice(localY);
         const partialPercent = this.tpslDrag.partialEnabled ? calculatePartialPercent(startX, e.clientX) : 100;
+        const localStartX = startX - cachedRect.left;
+        const localCurrentX = e.clientX - cachedRect.left;
         if (type === 'tp') {
-          this.options.onTPMove?.(this.tpslDrag.positionId, price, partialPercent, startX, e.clientX);
+          this.options.onTPMove?.(this.tpslDrag.positionId, price, partialPercent, localStartX, localCurrentX);
         } else {
-          this.options.onSLMove?.(this.tpslDrag.positionId, price, partialPercent, startX, e.clientX);
+          this.options.onSLMove?.(this.tpslDrag.positionId, price, partialPercent, localStartX, localCurrentX);
         }
       }
     };
@@ -809,8 +812,7 @@ export class InteractiveLineRenderer {
         }
       } else {
         // Drag end — compute price from Y
-        const rect = this.container.getBoundingClientRect();
-        const localY = e.clientY - rect.top;
+        const localY = e.clientY - cachedRect.top;
         const price = this.options.yToPrice(localY);
         const partialPercent = this.tpslDrag.partialEnabled ? calculatePartialPercent(startX, e.clientX) : undefined;
 
