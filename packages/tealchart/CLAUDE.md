@@ -110,6 +110,25 @@ yarn lint             # ESLint
 - `jotai` / `jotai-optics` / `optics-ts` — atomic state with nested updates
 - `@tealstreet/tealscript` — indicator scripting via Web Workers
 
+## Web + Mobile Feature Parity
+
+**CRITICAL: All features must be implemented for BOTH web (canvas/HTML) and mobile (React Native/Skia).**
+
+When implementing any new feature, always implement it for both platforms in the same PR. Do not ship web-only or mobile-only features. The two platforms share:
+
+- `ChartWidgetCore` — shared bar fetching, indicator management, pane management
+- `chartState.ts` — shared state (AVAILABLE_TIMEFRAMES, chart settings)
+- `labelCollision.ts` — shared collision resolution (web imports directly, mobile via `useLabelCollision` hook)
+- `InteractiveLineState.ts` — shared drag state machine
+- `ViewportController` / `viewScale.ts` — shared viewport preservation
+
+Platform-specific rendering:
+
+- **Web**: `ChartCore.ts` (canvas), `InteractiveLineRenderer.ts` (HTML overlays), `EventManager.ts` (mouse/touch)
+- **Mobile**: `SkiaTealchart.tsx` (Skia canvas), `PositionLineComponent.tsx` / `OrderLineComponent.tsx` (RN components), `useChartGestures.ts` (gestures)
+
+When adding features like TP/SL drag preview, crosshair improvements, or new line types — implement for both platforms.
+
 ## Gotchas
 
 - `TealchartRenderer` is pure canvas — no React; test it independently
@@ -117,3 +136,7 @@ yarn lint             # ESLint
 - `PaneManager` treats main chart as "just another pane" (type: `'main'`)
 - Gap detection has exponential backoff — don't remove the debounce
 - Generated Konva layers must Z-order correctly: canvas → price lines → context menu
+- Crosshair overlay canvas has `z-index: 3` — above interactive line container (`z-index: 2`)
+- All crosshair rendering is canvas-drawn (+ button, price label, time label) — zero DOM mutations for performance
+- Event handlers (mousemove, drag, touch) defer all processing to RAF — event handler itself is near-zero cost
+- `style.cursor` writes are guarded (`this.cursor !== cursor`) to avoid triggering style recalculation

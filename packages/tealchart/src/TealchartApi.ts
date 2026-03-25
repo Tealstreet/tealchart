@@ -887,7 +887,19 @@ export class TealchartApi {
 
       // @internal: Get render data for canvas drawing
       _getRenderData(): PositionLineRenderData {
-        return data;
+        return {
+          ...data,
+          callbacks: {
+            onTPClick: _onTPClick ?? undefined,
+            onSLClick: _onSLClick ?? undefined,
+            onTPMove: _onTPMove ?? undefined,
+            onSLMove: _onSLMove ?? undefined,
+            onTPMoveEnd: _onTPMoveEnd ?? undefined,
+            onSLMoveEnd: _onSLMoveEnd ?? undefined,
+            onClose: _onCloseCallback ?? undefined,
+            onReverse: _onReverseCallback ?? undefined,
+          },
+        };
       },
 
       // @internal: Get callbacks for interaction handling
@@ -1260,94 +1272,6 @@ export class TealchartApi {
       const callbacks = adapter._getCallbacks();
       if (callbacks.onReverse) {
         callbacks.onReverse();
-      }
-    }
-  }
-
-  // ============================================================================
-  // TEALSTREET: Bracket TP/SL Trigger Methods
-  // ============================================================================
-
-  /**
-   * @internal Trigger onTPClick callback for a position line
-   * Called when TP button is clicked (without drag)
-   */
-  triggerTPClick(positionId: string): void {
-    const adapter = this._positionLines.get(positionId);
-    if (adapter) {
-      const callbacks = adapter._getCallbacks();
-      if (callbacks.onTPClick) {
-        callbacks.onTPClick();
-      }
-    }
-  }
-
-  /**
-   * @internal Trigger onSLClick callback for a position line
-   * Called when SL button is clicked (without drag)
-   */
-  triggerSLClick(positionId: string): void {
-    const adapter = this._positionLines.get(positionId);
-    if (adapter) {
-      const callbacks = adapter._getCallbacks();
-      if (callbacks.onSLClick) {
-        callbacks.onSLClick();
-      }
-    }
-  }
-
-  /**
-   * @internal Trigger onTPMove callback for a position line
-   * Called during TP button drag to show preview
-   */
-  triggerTPMove(positionId: string, price: number): void {
-    const adapter = this._positionLines.get(positionId);
-    if (adapter) {
-      const callbacks = adapter._getCallbacks();
-      if (callbacks.onTPMove) {
-        callbacks.onTPMove(price);
-      }
-    }
-  }
-
-  /**
-   * @internal Trigger onSLMove callback for a position line
-   * Called during SL button drag to show preview
-   */
-  triggerSLMove(positionId: string, price: number): void {
-    const adapter = this._positionLines.get(positionId);
-    if (adapter) {
-      const callbacks = adapter._getCallbacks();
-      if (callbacks.onSLMove) {
-        callbacks.onSLMove(price);
-      }
-    }
-  }
-
-  /**
-   * @internal Trigger onTPMoveEnd callback for a position line
-   * Called when TP button drag ends to place bracket order
-   */
-  triggerTPMoveEnd(positionId: string, price: number, partialPercent?: number): void {
-    const adapter = this._positionLines.get(positionId);
-    if (adapter) {
-      const callbacks = adapter._getCallbacks();
-      if (callbacks.onTPMoveEnd) {
-        callbacks.onTPMoveEnd(price, partialPercent);
-      }
-    }
-  }
-
-  /**
-   * @internal Trigger onSLMoveEnd callback for a position line
-   * Called when SL button drag ends to place bracket order
-   */
-  triggerSLMoveEnd(positionId: string, price: number, partialPercent?: number): void {
-    const adapter = this._positionLines.get(positionId);
-    if (adapter) {
-      const callbacks = adapter._getCallbacks();
-      if (callbacks.onSLMoveEnd) {
-        callbacks.onSLMoveEnd(price, partialPercent);
       }
     }
   }

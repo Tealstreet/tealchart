@@ -801,18 +801,6 @@ export class TealchartWidget {
       onPositionReverse: (positionId) => {
         this._chartApi.triggerPositionReverse(positionId);
       },
-      onTPDragEnd: (positionId, price, partialPercent) => {
-        this._chartApi.triggerTPMoveEnd(positionId, price, partialPercent);
-      },
-      onSLDragEnd: (positionId, price, partialPercent) => {
-        this._chartApi.triggerSLMoveEnd(positionId, price, partialPercent);
-      },
-      onTPClick: (positionId) => {
-        this._chartApi.triggerTPClick(positionId);
-      },
-      onSLClick: (positionId) => {
-        this._chartApi.triggerSLClick(positionId);
-      },
       onContextMenu: this._contextMenuCallback || undefined,
       onMouseDown: () => {
         this._eventEmitter.emit('mouse_down');

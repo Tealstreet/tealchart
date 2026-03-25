@@ -8,18 +8,16 @@
  * - TP/SL buttons (draggable for bracket orders)
  */
 
-import React, { useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  runOnJS,
-} from 'react-native-reanimated';
-
 import type { PositionLineRenderData, Viewport } from '../../types';
-import { priceToY, yToPrice, type ChartDimensions } from '../utils/coordinates';
+import type { ChartDimensions } from '../utils/coordinates';
+
+import React, { useCallback, useMemo } from 'react';
+
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+
+import { priceToY, yToPrice } from '../utils/coordinates';
 
 export interface PositionLineComponentProps {
   /** Position line render data from adapter */
@@ -32,18 +30,16 @@ export interface PositionLineComponentProps {
   pricePrecision?: number;
   /** Use narrow text (compact display) */
   useNarrowText?: boolean;
-  /** Callback when position is closed */
+  /** Callback when position is closed (fallback if no adapter callback) */
   onClose?: (positionId: string) => void;
-  /** Callback when position is reversed */
+  /** Callback when position is reversed (fallback if no adapter callback) */
   onReverse?: (positionId: string) => void;
-  /** Callback when TP button is clicked */
-  onTPClick?: (positionId: string) => void;
-  /** Callback when SL button is clicked */
-  onSLClick?: (positionId: string) => void;
-  /** Callback when TP is dragged to new price */
-  onTPDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
-  /** Callback when SL is dragged to new price */
-  onSLDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
+  /** Continuous TP drag move callback (for Skia preview state only) */
+  onTPMovePreview?: (positionId: string, price: number) => void;
+  /** Continuous SL drag move callback (for Skia preview state only) */
+  onSLMovePreview?: (positionId: string, price: number) => void;
+  /** Called when any TP/SL drag ends (to clear preview) */
+  onTPSLDragEnd?: () => void;
 }
 
 const TOUCH_TARGET_HEIGHT = 44;
@@ -60,16 +56,12 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   useNarrowText = false,
   onClose,
   onReverse,
-  onTPClick,
-  onSLClick,
-  onTPDragEnd,
-  onSLDragEnd,
+  onTPMovePreview,
+  onSLMovePreview,
+  onTPSLDragEnd,
 }) => {
   // Calculate Y position from price
-  const baseY = useMemo(
-    () => priceToY(position.price, viewport, dimensions),
-    [position.price, viewport, dimensions]
-  );
+  const baseY = useMemo(() => priceToY(position.price, viewport, dimensions), [position.price, viewport, dimensions]);
 
   // Shared values for TP/SL button drag
   const tpTranslateY = useSharedValue(0);
@@ -77,47 +69,78 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   const tpDragging = useSharedValue(false);
   const slDragging = useSharedValue(false);
 
-  // Handle close callback
+  // Handle close callback — fire directly from adapter callbacks
   const handleClose = useCallback(() => {
-    if (onClose && position.closeable) {
-      onClose(position.id);
+    if (position.closeable) {
+      if (position.callbacks?.onClose) {
+        position.callbacks.onClose();
+      } else if (onClose) {
+        onClose(position.id);
+      }
     }
-  }, [onClose, position.id, position.closeable]);
+  }, [onClose, position.id, position.closeable, position.callbacks]);
 
-  // Handle reverse callback
+  // Handle reverse callback — fire directly from adapter callbacks
   const handleReverse = useCallback(() => {
-    if (onReverse && position.reversible) {
-      onReverse(position.id);
+    if (position.reversible) {
+      if (position.callbacks?.onReverse) {
+        position.callbacks.onReverse();
+      } else if (onReverse) {
+        onReverse(position.id);
+      }
     }
-  }, [onReverse, position.id, position.reversible]);
+  }, [onReverse, position.id, position.reversible, position.callbacks]);
 
-  // Handle TP click (no drag)
+  // Handle TP click (no drag) — fire directly from adapter callbacks
   const handleTPClick = useCallback(() => {
-    if (onTPClick) {
-      onTPClick(position.id);
-    }
-  }, [onTPClick, position.id]);
+    position.callbacks?.onTPClick?.();
+  }, [position.callbacks]);
 
-  // Handle SL click (no drag)
+  // Handle SL click (no drag) — fire directly from adapter callbacks
   const handleSLClick = useCallback(() => {
-    if (onSLClick) {
-      onSLClick(position.id);
-    }
-  }, [onSLClick, position.id]);
+    position.callbacks?.onSLClick?.();
+  }, [position.callbacks]);
 
-  // Handle TP drag end
-  const handleTPDragEnd = useCallback((newPrice: number) => {
-    if (onTPDragEnd) {
-      onTPDragEnd(position.id, newPrice);
-    }
-  }, [onTPDragEnd, position.id]);
+  // Handle TP drag end — fire directly from adapter callbacks
+  const handleTPDragEnd = useCallback(
+    (newPrice: number) => {
+      position.callbacks?.onTPMoveEnd?.(newPrice);
+    },
+    [position.callbacks],
+  );
 
-  // Handle SL drag end
-  const handleSLDragEnd = useCallback((newPrice: number) => {
-    if (onSLDragEnd) {
-      onSLDragEnd(position.id, newPrice);
+  // Handle SL drag end — fire directly from adapter callbacks
+  const handleSLDragEnd = useCallback(
+    (newPrice: number) => {
+      position.callbacks?.onSLMoveEnd?.(newPrice);
+    },
+    [position.callbacks],
+  );
+
+  // Handle continuous TP move (for adapter callback + Skia drag preview)
+  const handleTPMove = useCallback(
+    (price: number) => {
+      position.callbacks?.onTPMove?.(price);
+      onTPMovePreview?.(position.id, price);
+    },
+    [position.callbacks, onTPMovePreview, position.id],
+  );
+
+  // Handle continuous SL move (for adapter callback + Skia drag preview)
+  const handleSLMove = useCallback(
+    (price: number) => {
+      position.callbacks?.onSLMove?.(price);
+      onSLMovePreview?.(position.id, price);
+    },
+    [position.callbacks, onSLMovePreview, position.id],
+  );
+
+  // Handle TP/SL drag end (clear preview)
+  const handleTPSLDragEnd = useCallback(() => {
+    if (onTPSLDragEnd) {
+      onTPSLDragEnd();
     }
-  }, [onSLDragEnd, position.id]);
+  }, [onTPSLDragEnd]);
 
   // TP button drag gesture
   const tpPanGesture = useMemo(() => {
@@ -129,11 +152,19 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
       })
       .onUpdate((event) => {
         tpTranslateY.value = event.translationY;
+        // Emit continuous move for Skia drag preview (only after drag threshold)
+        if (Math.abs(event.translationY) >= 5) {
+          const dragPrice = yToPrice(baseY + event.translationY, viewport, dimensions);
+          runOnJS(handleTPMove)(dragPrice);
+        }
       })
       .onEnd((event) => {
         tpDragging.value = false;
         const finalY = baseY + event.translationY;
         const newPrice = yToPrice(finalY, viewport, dimensions);
+
+        // Clear Skia drag preview
+        runOnJS(handleTPSLDragEnd)();
 
         // Check if this was a tap vs drag
         if (Math.abs(event.translationY) < 5) {
@@ -143,8 +174,23 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
         }
 
         tpTranslateY.value = withSpring(0, { damping: 15, stiffness: 150 });
+      })
+      .onFinalize(() => {
+        // Ensure preview is cleared even if gesture is cancelled
+        runOnJS(handleTPSLDragEnd)();
       });
-  }, [position.brackets, baseY, viewport, dimensions, handleTPClick, handleTPDragEnd, tpDragging, tpTranslateY]);
+  }, [
+    position.brackets,
+    baseY,
+    viewport,
+    dimensions,
+    handleTPClick,
+    handleTPDragEnd,
+    handleTPMove,
+    handleTPSLDragEnd,
+    tpDragging,
+    tpTranslateY,
+  ]);
 
   // SL button drag gesture
   const slPanGesture = useMemo(() => {
@@ -156,11 +202,19 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
       })
       .onUpdate((event) => {
         slTranslateY.value = event.translationY;
+        // Emit continuous move for Skia drag preview (only after drag threshold)
+        if (Math.abs(event.translationY) >= 5) {
+          const dragPrice = yToPrice(baseY + event.translationY, viewport, dimensions);
+          runOnJS(handleSLMove)(dragPrice);
+        }
       })
       .onEnd((event) => {
         slDragging.value = false;
         const finalY = baseY + event.translationY;
         const newPrice = yToPrice(finalY, viewport, dimensions);
+
+        // Clear Skia drag preview
+        runOnJS(handleTPSLDragEnd)();
 
         // Check if this was a tap vs drag
         if (Math.abs(event.translationY) < 5) {
@@ -170,8 +224,23 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
         }
 
         slTranslateY.value = withSpring(0, { damping: 15, stiffness: 150 });
+      })
+      .onFinalize(() => {
+        // Ensure preview is cleared even if gesture is cancelled
+        runOnJS(handleTPSLDragEnd)();
       });
-  }, [position.brackets, baseY, viewport, dimensions, handleSLClick, handleSLDragEnd, slDragging, slTranslateY]);
+  }, [
+    position.brackets,
+    baseY,
+    viewport,
+    dimensions,
+    handleSLClick,
+    handleSLDragEnd,
+    handleSLMove,
+    handleTPSLDragEnd,
+    slDragging,
+    slTranslateY,
+  ]);
 
   // Animated styles for TP button
   const tpAnimatedStyle = useAnimatedStyle(() => ({
@@ -186,9 +255,12 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   // Line style based on lineStyle property
   const lineStyle = useMemo(() => {
     switch (position.lineStyle) {
-      case 1: return 'dotted';
-      case 2: return 'dashed';
-      default: return 'solid';
+      case 1:
+        return 'dotted';
+      case 2:
+        return 'dashed';
+      default:
+        return 'solid';
     }
   }, [position.lineStyle]);
 
@@ -196,7 +268,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   const labelX = useMemo(() => {
     const maxLabelX = dimensions.width - dimensions.margins.right - 150;
     const minLabelX = dimensions.margins.left;
-    return minLabelX + ((maxLabelX - minLabelX) * (100 - position.lineLength) / 100);
+    return minLabelX + ((maxLabelX - minLabelX) * (100 - position.lineLength)) / 100;
   }, [position.lineLength, dimensions]);
 
   // Display text (use narrow if appropriate)
@@ -207,9 +279,12 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   // PnL color based on profit state
   const pnlColor = useMemo(() => {
     switch (position.profitState) {
-      case 'positive': return '#22c55e';
-      case 'negative': return '#ef4444';
-      default: return '#9ca3af';
+      case 'positive':
+        return '#22c55e';
+      case 'negative':
+        return '#ef4444';
+      default:
+        return '#9ca3af';
     }
   }, [position.profitState]);
 
@@ -220,12 +295,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   const showBrackets = position.brackets !== null;
 
   return (
-    <View
-      style={[
-        styles.container,
-        { top: baseY - TOUCH_TARGET_HEIGHT / 2 },
-      ]}
-    >
+    <View style={[styles.container, { top: baseY - TOUCH_TARGET_HEIGHT / 2 }]}>
       {/* Horizontal line - left segment (if extendLeft) */}
       {position.extendLeft && (
         <View
@@ -265,9 +335,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
             },
           ]}
         >
-          <Text style={[styles.labelText, { color: position.bodyTextColor }]}>
-            {displayText}
-          </Text>
+          <Text style={[styles.labelText, { color: position.bodyTextColor }]}>{displayText}</Text>
         </View>
 
         {/* Quantity segment */}
@@ -281,9 +349,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
             },
           ]}
         >
-          <Text style={[styles.labelText, { color: position.quantityTextColor }]}>
-            {displayQuantity}
-          </Text>
+          <Text style={[styles.labelText, { color: position.quantityTextColor }]}>{displayQuantity}</Text>
         </View>
 
         {/* PnL segment */}
@@ -297,9 +363,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
             },
           ]}
         >
-          <Text style={[styles.labelText, { color: pnlColor }]}>
-            {displayPnl}
-          </Text>
+          <Text style={[styles.labelText, { color: pnlColor }]}>{displayPnl}</Text>
         </View>
 
         {/* TP/SL Buttons (if brackets enabled) */}
@@ -319,9 +383,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
                     },
                   ]}
                 >
-                  <Text style={[styles.bracketButtonText, { color: TP_COLOR }]}>
-                    TP
-                  </Text>
+                  <Text style={[styles.bracketButtonText, { color: TP_COLOR }]}>TP</Text>
                 </Pressable>
               </Animated.View>
             </GestureDetector>
@@ -341,9 +403,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
                     },
                   ]}
                 >
-                  <Text style={[styles.bracketButtonText, { color: SL_COLOR }]}>
-                    SL
-                  </Text>
+                  <Text style={[styles.bracketButtonText, { color: SL_COLOR }]}>SL</Text>
                 </Pressable>
               </Animated.View>
             </GestureDetector>
@@ -366,9 +426,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
             ]}
             hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
           >
-            <Text style={[styles.actionIcon, { color: position.closeButtonIconColor }]}>
-              ×
-            </Text>
+            <Text style={[styles.actionIcon, { color: position.closeButtonIconColor }]}>×</Text>
           </Pressable>
         )}
 
@@ -389,9 +447,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
             ]}
             hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
           >
-            <Text style={[styles.actionIcon, { color: position.reverseButtonIconColor }]}>
-              ⇄
-            </Text>
+            <Text style={[styles.actionIcon, { color: position.reverseButtonIconColor }]}>⇄</Text>
           </Pressable>
         )}
       </View>
@@ -423,9 +479,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
           },
         ]}
       >
-        <Text style={[styles.priceText, { color: position.bodyTextColor }]}>
-          {formattedPrice}
-        </Text>
+        <Text style={[styles.priceText, { color: position.bodyTextColor }]}>{formattedPrice}</Text>
       </View>
     </View>
   );

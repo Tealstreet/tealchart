@@ -44,9 +44,14 @@ export function clearCollisionCache(): void {
  * Generate a cache key from label bounds
  */
 function getCacheKey(labels: LabelBounds[]): string {
-  // Use originalY and height as key components (priority doesn't affect collision geometry)
-  // Round to 1 decimal to handle floating point noise
-  return labels.map((l) => `${Math.round(l.originalY * 10)}:${Math.round(l.height * 10)}`).join('|');
+  // Include id (if present) so different sets of lines with same geometry produce different keys.
+  const segments = labels.map((l) => `${l.id || ''}:${Math.round(l.originalY * 10)}:${Math.round(l.height * 10)}`);
+  // Only sort when all labels have IDs — otherwise keep positional order
+  // so index-based fallback in collision resolution stays consistent.
+  if (labels.every((l) => l.id)) {
+    segments.sort();
+  }
+  return segments.join('|');
 }
 
 /**
@@ -295,9 +300,22 @@ export function resolveLabelCollisions<T extends LabelBounds>(labels: T[]): T[] 
   const now = Date.now();
   const cached = collisionCache.get(cacheKey);
   if (cached && now - cached.timestamp < CACHE_TTL_MS) {
-    // Apply cached adjustedY values
-    for (let i = 0; i < labels.length && i < cached.result.length; i++) {
-      labels[i].adjustedY = cached.result[i].adjustedY;
+    // Apply cached adjustedY values by ID when possible, fall back to index
+    if (labels.every((l) => l.id)) {
+      const cachedMap = new Map<string, number>();
+      for (const r of cached.result) {
+        if (r.id) cachedMap.set(r.id, r.adjustedY);
+      }
+      for (const label of labels) {
+        const cachedY = cachedMap.get(label.id!);
+        if (cachedY !== undefined) label.adjustedY = cachedY;
+        else label.adjustedY = label.originalY;
+      }
+    } else {
+      // Fallback to index-based for labels without IDs
+      for (let i = 0; i < labels.length && i < cached.result.length; i++) {
+        labels[i].adjustedY = cached.result[i].adjustedY;
+      }
     }
     return labels;
   }

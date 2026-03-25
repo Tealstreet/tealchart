@@ -35,7 +35,19 @@ import type {
 
 import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 
-import { Canvas, createPicture, Picture, Skia } from '@shopify/react-native-skia';
+import {
+  Canvas,
+  createPicture,
+  DashPathEffect,
+  Group,
+  Picture,
+  Rect,
+  Skia,
+  Line as SkiaLine,
+  Text as SkiaText,
+  useFont,
+  vec,
+} from '@shopify/react-native-skia';
 import { LayoutChangeEvent, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS } from 'react-native-reanimated';
@@ -105,14 +117,6 @@ export interface SkiaTealchartProps {
   onPositionClose?: (positionId: string) => void;
   /** Called when position is reversed */
   onPositionReverse?: (positionId: string) => void;
-  /** Called when TP drag ends */
-  onTPDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
-  /** Called when SL drag ends */
-  onSLDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
-  /** Called when TP button is clicked */
-  onTPClick?: (positionId: string) => void;
-  /** Called when SL button is clicked */
-  onSLClick?: (positionId: string) => void;
   /** Price precision for display */
   pricePrecision?: number;
   // ===========================================================================
@@ -155,10 +159,6 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   onOrderCancel,
   onPositionClose,
   onPositionReverse,
-  onTPDragEnd,
-  onSLDragEnd,
-  onTPClick,
-  onSLClick,
   pricePrecision = 2,
   // Top bar props
   showTopBar = true,
@@ -409,6 +409,57 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const [contextMenuItems, setContextMenuItems] = useState<ContextMenuItem[]>([]);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0, price: 0, time: 0 });
+
+  // ==========================================================================
+  // Bracket Drag Preview State (TP/SL drag on Skia canvas)
+  // ==========================================================================
+
+  const [bracketDragState, setBracketDragState] = useState<{
+    type: 'tp' | 'sl';
+    positionId: string;
+    price: number;
+    entryPrice: number;
+    isLong: boolean;
+    notional: number;
+  } | null>(null);
+
+  const handleTPMove = useCallback(
+    (positionId: string, price: number) => {
+      const pos = positionLines?.find((p) => p.id === positionId || p.positionId === positionId);
+      if (pos?.positionData) {
+        setBracketDragState({
+          type: 'tp',
+          positionId,
+          price,
+          entryPrice: pos.positionData.entryPrice,
+          isLong: pos.positionData.isLong,
+          notional: pos.positionData.notional,
+        });
+      }
+    },
+    [positionLines],
+  );
+
+  const handleSLMove = useCallback(
+    (positionId: string, price: number) => {
+      const pos = positionLines?.find((p) => p.id === positionId || p.positionId === positionId);
+      if (pos?.positionData) {
+        setBracketDragState({
+          type: 'sl',
+          positionId,
+          price,
+          entryPrice: pos.positionData.entryPrice,
+          isLong: pos.positionData.isLong,
+          notional: pos.positionData.notional,
+        });
+      }
+    },
+    [positionLines],
+  );
+
+  const handleTPSLDragEnd = useCallback(() => {
+    setBracketDragState(null);
+  }, []);
 
   // Indicators modal state
   const [indicatorsModalVisible, setIndicatorsModalVisible] = useState(false);
@@ -683,6 +734,35 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   }, []);
 
   // ==========================================================================
+  // Bracket Drag Preview (Skia rendering data)
+  // ==========================================================================
+
+  // Font for Skia text rendering in bracket preview
+  const bracketFont = useFont(null, 12);
+
+  // Compute bracket drag preview rendering data
+  const bracketPreview = useMemo(() => {
+    if (!bracketDragState || !viewport) return null;
+
+    const { type, price, entryPrice, isLong, notional } = bracketDragState;
+    const y = priceToY(price, viewport, chartDimensions);
+
+    // PnL estimate: notional * (price - entry) / entry for long, inverted for short
+    const priceDelta = isLong ? price - entryPrice : entryPrice - price;
+    const pnl = (priceDelta / entryPrice) * notional;
+    const pnlSign = pnl >= 0 ? '+' : '';
+    const priceText = price.toFixed(pricePrecision);
+    const pnlText = `${pnlSign}${pnl.toFixed(2)}`;
+    const labelText = `${type.toUpperCase()} ${priceText}  ${pnlText}`;
+
+    const color = type === 'tp' ? '#22c55e' : '#f97316';
+    const chartLeft = chartDimensions.margins.left;
+    const chartRight = chartDimensions.width - chartDimensions.margins.right;
+
+    return { y, color, labelText, chartLeft, chartRight, pnl };
+  }, [bracketDragState, viewport, chartDimensions, pricePrecision]);
+
+  // ==========================================================================
   // Render
   // ==========================================================================
 
@@ -700,6 +780,50 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
         ]}
       >
         {picture && <Picture picture={picture} />}
+
+        {/* Bracket drag preview (TP/SL dashed line + label) */}
+        {bracketPreview && bracketFont && (
+          <Group>
+            {/* Dashed horizontal line at drag price */}
+            <SkiaLine
+              p1={vec(bracketPreview.chartLeft, bracketPreview.y)}
+              p2={vec(bracketPreview.chartRight, bracketPreview.y)}
+              color={bracketPreview.color}
+              strokeWidth={1.5}
+              style="stroke"
+            >
+              <DashPathEffect intervals={[6, 4]} />
+            </SkiaLine>
+
+            {/* Label background */}
+            <Rect
+              x={bracketPreview.chartRight - 160}
+              y={bracketPreview.y - 18}
+              width={155}
+              height={16}
+              color="rgba(19, 23, 34, 0.9)"
+            />
+            {/* Label border */}
+            <Rect
+              x={bracketPreview.chartRight - 160}
+              y={bracketPreview.y - 18}
+              width={155}
+              height={16}
+              color={bracketPreview.color}
+              style="stroke"
+              strokeWidth={1}
+            />
+
+            {/* Label text */}
+            <SkiaText
+              x={bracketPreview.chartRight - 156}
+              y={bracketPreview.y - 6}
+              text={bracketPreview.labelText}
+              font={bracketFont}
+              color={bracketPreview.pnl >= 0 ? '#22c55e' : '#ef4444'}
+            />
+          </Group>
+        )}
       </Canvas>
 
       {/* Layer 2: Interactive RN Layer (order lines, crosshair, etc.) */}
@@ -738,10 +862,9 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
               useNarrowText={dimensions.width < 400}
               onClose={onPositionClose}
               onReverse={onPositionReverse}
-              onTPClick={onTPClick}
-              onSLClick={onSLClick}
-              onTPDragEnd={onTPDragEnd}
-              onSLDragEnd={onSLDragEnd}
+              onTPMovePreview={handleTPMove}
+              onSLMovePreview={handleSLMove}
+              onTPSLDragEnd={handleTPSLDragEnd}
             />
           ))}
 

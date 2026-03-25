@@ -90,14 +90,6 @@ export interface TealchartWidgetUIOptions {
   onPositionClose?: (positionId: string) => void;
   /** Callback when position is reversed */
   onPositionReverse?: (positionId: string) => void;
-  /** Callback when TP drag ends */
-  onTPDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
-  /** Callback when SL drag ends */
-  onSLDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
-  /** Callback when TP is clicked */
-  onTPClick?: (positionId: string) => void;
-  /** Callback when SL is clicked */
-  onSLClick?: (positionId: string) => void;
   /** Context menu callback */
   onContextMenu?: (unixTime: number, price: number) => ContextMenuItem[];
   /** Mouse down callback */
@@ -281,10 +273,6 @@ export class TealchartWidgetUI {
       onOrderCancel: this.options.onOrderCancel,
       onPositionClose: this.options.onPositionClose,
       onPositionReverse: this.options.onPositionReverse,
-      onTPDragEnd: this.options.onTPDragEnd,
-      onSLDragEnd: this.options.onSLDragEnd,
-      onTPClick: this.options.onTPClick,
-      onSLClick: this.options.onSLClick,
       onContextMenu: this.options.onContextMenu,
       onMouseDown: this.options.onMouseDown,
       onMouseUp: this.options.onMouseUp,

@@ -31,6 +31,7 @@ import {
   OrderLineRenderData,
   PaneLayout,
   PendingOrderUpdate,
+  PositionData,
   PositionLineRenderData,
   PRICE_AXIS_RIGHT_PADDING,
   PriceLine,
@@ -76,14 +77,6 @@ export interface ChartCoreOptions {
   onPositionClose?: (positionId: string) => void;
   /** Callback when position reverse button clicked */
   onPositionReverse?: (positionId: string) => void;
-  /** Callback when TP drag ends */
-  onTPDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
-  /** Callback when SL drag ends */
-  onSLDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
-  /** Callback when TP clicked */
-  onTPClick?: (positionId: string) => void;
-  /** Callback when SL clicked */
-  onSLClick?: (positionId: string) => void;
   /** Context menu callback */
   onContextMenu?: (unixTime: number, price: number) => ContextMenuItem[];
   /** Mouse down callback */
@@ -379,6 +372,7 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
     partialEnabled: position.partialEnabled,
     positionData: position.positionData ?? undefined,
     brackets: position.brackets,
+    callbacks: position.callbacks,
   };
 }
 
@@ -484,9 +478,25 @@ export class ChartCore {
   private resetButtonTimer: ReturnType<typeof setTimeout> | null = null;
   private cursor = 'crosshair';
 
-  // Label bounds dirty checking (React pattern from Tealchart.tsx:696-727)
-  private lastBoundsKey = '';
-  private lastBoundsUpdate = 0;
+  // Bracket drag preview state (TP/SL drag visualization on crosshair canvas)
+  private _bracketDragState: {
+    type: 'tp' | 'sl';
+    positionId: string;
+    price: number;
+    entryPrice: number;
+    partialPercent: number;
+    partialEnabled: boolean;
+    dragStartX: number;
+    dragCurrentX: number;
+    positionData: PositionData;
+  } | null = null;
+
+  // Collision offset cache — keyed by geometry (IDs + prices + viewport).
+  // Stores only the de-overlap offset per line, NOT label content.
+  // Label content is always built fresh from current line data.
+  private collisionOffsetCache = new Map<string, number>();
+  private lastCollisionKey = '';
+  private lastCollisionUpdate = 0;
   private labelBoundsCache: PriceLineLabelBounds[] = [];
 
   // RAF for full renders
@@ -603,10 +613,20 @@ export class ChartCore {
       onOrderCancel: (orderId) => this.options.onOrderCancel?.(orderId),
       onPositionClose: (positionId) => this.options.onPositionClose?.(positionId),
       onPositionReverse: (positionId) => this.options.onPositionReverse?.(positionId),
-      onTPDragEnd: (positionId, price, partialPercent) => this.options.onTPDragEnd?.(positionId, price, partialPercent),
-      onSLDragEnd: (positionId, price, partialPercent) => this.options.onSLDragEnd?.(positionId, price, partialPercent),
-      onTPClick: (positionId) => this.options.onTPClick?.(positionId),
-      onSLClick: (positionId) => this.options.onSLClick?.(positionId),
+      onTPMovePreview: (positionId, price, partialPercent, dragStartX, dragCurrentX) => {
+        this._updateBracketDragState('tp', positionId, price, partialPercent, dragStartX, dragCurrentX);
+      },
+      onSLMovePreview: (positionId, price, partialPercent, dragStartX, dragCurrentX) => {
+        this._updateBracketDragState('sl', positionId, price, partialPercent, dragStartX, dragCurrentX);
+      },
+      onTPSLDragEnd: () => {
+        this._bracketDragState = null;
+        this.renderCrosshairOverlay();
+      },
+      onTPSLDragCancel: () => {
+        this._bracketDragState = null;
+        this.renderCrosshairOverlay();
+      },
       formatPrice: (price) => {
         const pricePrecision = this.options.renderOptions?.pricePrecision;
         let decimals: number;
@@ -623,8 +643,17 @@ export class ChartCore {
       },
       onCursorChange: (cursor) => {
         if (this.cursor !== cursor) {
+          const wasDragging = this.cursor === 'grabbing';
           this.cursor = cursor;
           this.chartContainer.style.cursor = cursor;
+          // Clear crosshair overlay when drag starts or ends.
+          // On start: removes stale crosshair lines during drag.
+          // On end: prevents ghost crosshair at pre-drag position
+          // (next mousemove will update position and redraw).
+          if (cursor === 'grabbing' || wasDragging) {
+            this.crosshair.visible = false;
+            this.renderCrosshairOverlay();
+          }
         }
       },
     });
@@ -1532,25 +1561,55 @@ export class ChartCore {
       this.plotStyleOverrides,
     );
 
-    // Cache label bounds for interactive line renderer
-    const crosshairColor = this.options.renderOptions?.crosshairColor || '#888888';
-    const linePrices = allPriceLines.map((l) => l.price.toFixed(6)).join(',');
-    const boundsKey = `${vp.priceMin.toFixed(4)},${vp.priceMax.toFixed(4)}|${linePrices}|${this.crosshair.visible}|${Math.round(this.crosshair.y)}`;
+    // Collision resolution cache — only recompute de-overlap when geometry changes.
+    // Label content is always built fresh below so text/color changes are never stale.
+    // Include bucketed text length per line — triggers rebuild when label width changes
+    // significantly (e.g., PnL grows from "$1" to "$1,234"). Bucket to nearest 3 chars
+    // so minor text changes (same visual width) don't cause unnecessary rebuilds.
+    const collisionKey =
+      allPriceLines
+        .map((l) => {
+          const textLen = l.chartLabel?.segments.reduce((sum, s) => sum + (s.text?.length || 0), 0) || 0;
+          return `${l.id}:${l.price.toFixed(6)}:${Math.round(textLen / 3)}`;
+        })
+        .sort()
+        .join(',') + `|${vp.priceMin.toFixed(4)},${vp.priceMax.toFixed(4)}`;
     const now = Date.now();
-    const keyChanged = boundsKey !== this.lastBoundsKey;
+    const collisionKeyChanged = collisionKey !== this.lastCollisionKey;
     const isDragging = this.eventManager.getIsDragging();
-    const shouldRecompute = keyChanged || (isDragging && now - this.lastBoundsUpdate > 16);
+    const shouldResolveCollisions = collisionKeyChanged || (isDragging && now - this.lastCollisionUpdate > 16);
 
-    if (shouldRecompute) {
-      this.labelBoundsCache = this.renderer.computePriceLineLabelBoundsWithLayout(
+    if (shouldResolveCollisions) {
+      // Run expensive collision resolution
+      const resolvedBounds = this.renderer.computePriceLineLabelBoundsWithLayout(
         allPriceLines,
         vp,
         layout,
         this.plots,
-        this.crosshair.visible ? { y: this.crosshair.y, visible: true, color: crosshairColor } : undefined,
+        undefined,
       );
-      this.lastBoundsKey = boundsKey;
-      this.lastBoundsUpdate = now;
+      // Cache only the collision offsets (adjustedY - originalY) by line ID
+      this.collisionOffsetCache.clear();
+      for (const b of resolvedBounds) {
+        this.collisionOffsetCache.set(b.lineId, b.adjustedY - b.originalY);
+      }
+      this.lastCollisionKey = collisionKey;
+      this.lastCollisionUpdate = now;
+      // Use the fully resolved bounds directly (content is fresh since allPriceLines is current)
+      this.labelBoundsCache = resolvedBounds;
+    } else {
+      // Collision cache hit — geometry unchanged, but label content may have changed.
+      // Refresh content fields in-place from current line data. O(n) with Map lookup.
+      const lineMap = new Map(allPriceLines.map((l) => [l.id, l]));
+      for (const b of this.labelBoundsCache) {
+        const line = lineMap.get(b.lineId);
+        if (line) {
+          b.label = line.label;
+          b.chartLabel = line.chartLabel;
+          b.color = line.color;
+          b.callbacks = line.callbacks;
+        }
+      }
     }
   }
 
@@ -1568,6 +1627,11 @@ export class ChartCore {
 
     // Clear the overlay
     ctx.clearRect(0, 0, width, height);
+
+    // Draw bracket drag preview (even when crosshair is hidden during drag)
+    if (this._bracketDragState && this.viewport) {
+      this._drawBracketPreview(ctx);
+    }
 
     // Hide crosshair during interactive line drag
     const lineDragging = this.interactiveLineRenderer?.isDragging() ?? false;
@@ -1700,17 +1764,326 @@ export class ChartCore {
   }
 
   /**
+   * Update bracket drag state from InteractiveLineRenderer move callbacks.
+   * Looks up the position in positionLines to get entryPrice + positionData.
+   */
+  private _updateBracketDragState(
+    type: 'tp' | 'sl',
+    positionId: string,
+    price: number,
+    partialPercent: number,
+    dragStartX: number,
+    dragCurrentX: number,
+  ): void {
+    // Find the position to get entryPrice and positionData
+    const position = this.positionLines.find((p) => (p.positionId || p.id) === positionId);
+    if (!position?.positionData) return;
+
+    this._bracketDragState = {
+      type,
+      positionId,
+      price,
+      entryPrice: position.positionData.entryPrice,
+      partialPercent,
+      partialEnabled: position.partialEnabled ?? false,
+      dragStartX,
+      dragCurrentX,
+      positionData: position.positionData,
+    };
+    this.renderCrosshairOverlay();
+  }
+
+  /**
+   * Draw TP/SL bracket preview on the crosshair overlay canvas.
+   * Ported from TradingView's _drawBracketLines + _drawBracketZone.
+   */
+  private _drawBracketPreview(ctx: CanvasRenderingContext2D): void {
+    const state = this._bracketDragState;
+    if (!state || !this.viewport) return;
+
+    const chartWidth = this.options.width - this.margins.right;
+    const color = state.type === 'tp' ? '#22c55e' : '#f97316';
+    const bracketType = state.type === 'tp' ? 'TP' : 'SL';
+    const isPartialMode = state.partialEnabled;
+
+    // Convert prices to Y coordinates
+    const layout = this.getUnifiedLayout();
+    const bracketY = this.renderer.publicPriceToYWithLayout(state.price, this.viewport, layout);
+    const entryY = this.renderer.publicPriceToYWithLayout(state.entryPrice, this.viewport, layout);
+
+    // Compute PnL inline
+    const pd = state.positionData;
+    const priceDiff = pd.isLong ? state.price - state.entryPrice : state.entryPrice - state.price;
+    const pnl = ((priceDiff * pd.notional) / state.entryPrice) * (state.partialPercent / 100);
+    const percentDistance = ((state.price - state.entryPrice) / state.entryPrice) * 100;
+
+    // Format values
+    const pnlDecimals = 2;
+    const pnlSign = pnl >= 0 ? '+' : '-';
+    const pnlText = pnlSign + '$' + Math.abs(pnl).toFixed(pnlDecimals);
+    const pctSign = percentDistance >= 0 ? '+' : '';
+    const percentText = pctSign + percentDistance.toFixed(2) + '%';
+
+    // Build type label
+    const typeLabel =
+      isPartialMode && state.partialPercent < 100 ? state.partialPercent + '% Partial ' + bracketType : bracketType;
+
+    ctx.save();
+
+    // ========= Zone visualization =========
+    const zoneHalfWidth = 220;
+    const centerX = state.dragStartX;
+    const cursorOnRight = state.dragCurrentX > centerX;
+    const leftEdge = Math.max(0, centerX - zoneHalfWidth);
+    const rightEdge = Math.min(chartWidth, centerX + zoneHalfWidth);
+
+    const top = Math.min(entryY, bracketY);
+    const bottom = Math.max(entryY, bracketY);
+    const height = bottom - top;
+    const isDraggingUp = bracketY < entryY;
+
+    const bgColor = '#1e222d';
+    const borderColor = '#363a45';
+
+    if (isPartialMode && height > 0) {
+      // Fill rectangle with low opacity
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.08;
+      ctx.fillRect(leftEdge, top, rightEdge - leftEdge, height);
+
+      // Dashed rectangle border
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.globalAlpha = 0.6;
+      ctx.strokeRect(leftEdge, top, rightEdge - leftEdge, height);
+
+      // V-shape diagonal lines from center to corners
+      ctx.beginPath();
+      if (isDraggingUp) {
+        ctx.moveTo(leftEdge, top);
+        ctx.lineTo(centerX, bottom);
+        ctx.lineTo(rightEdge, top);
+      } else {
+        ctx.moveTo(leftEdge, bottom);
+        ctx.lineTo(centerX, top);
+        ctx.lineTo(rightEdge, bottom);
+      }
+      ctx.stroke();
+
+      // Zone boundary lines at 55px intervals
+      ctx.globalAlpha = 0.3;
+      const zoneOffsets = [55, 110, 165];
+      for (const offset of zoneOffsets) {
+        ctx.beginPath();
+        ctx.moveTo(centerX - offset, top);
+        ctx.lineTo(centerX - offset, bottom);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(centerX + offset, top);
+        ctx.lineTo(centerX + offset, bottom);
+        ctx.stroke();
+      }
+
+      ctx.globalAlpha = 1.0;
+      ctx.setLineDash([]);
+
+      // Partial % labels
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const padding = 3;
+      const boxHeight = 14;
+      const labelBoxY = isDraggingUp ? top - 4 - boxHeight : bottom + 4;
+      const labelTextY = labelBoxY + boxHeight / 2;
+
+      const bottomLabels = [
+        { percent: 10, x: leftEdge, side: 'left' as const },
+        { percent: 25, x: centerX - 165, side: 'left' as const },
+        { percent: 50, x: centerX - 110, side: 'left' as const },
+        { percent: 75, x: centerX - 55, side: 'left' as const },
+        { percent: 100, x: centerX, side: 'center' as const },
+        { percent: 75, x: centerX + 55, side: 'right' as const },
+        { percent: 50, x: centerX + 110, side: 'right' as const },
+        { percent: 25, x: centerX + 165, side: 'right' as const },
+        { percent: 10, x: rightEdge, side: 'right' as const },
+      ];
+
+      for (const label of bottomLabels) {
+        const text = label.percent + '%';
+        const textWidth = ctx.measureText(text).width;
+        const boxWidth = textWidth + padding * 2;
+        const boxX = label.x - boxWidth / 2;
+
+        const isHighlighted =
+          label.percent === state.partialPercent &&
+          (label.side === 'center' ||
+            (label.side === 'right' && cursorOnRight) ||
+            (label.side === 'left' && !cursorOnRight));
+
+        if (isHighlighted) {
+          ctx.fillStyle = color;
+          ctx.globalAlpha = 0.3;
+          ctx.fillRect(boxX, labelBoxY, boxWidth, boxHeight);
+          ctx.globalAlpha = 1.0;
+        }
+
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(boxX, labelBoxY, boxWidth, boxHeight);
+        ctx.strokeStyle = isHighlighted ? color : borderColor;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(boxX, labelBoxY, boxWidth, boxHeight);
+        ctx.fillStyle = isHighlighted ? color : '#787b86';
+        ctx.fillText(text, label.x, labelTextY);
+      }
+    }
+
+    // ========= Horizontal dashed line =========
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = color;
+    ctx.globalAlpha = 1.0;
+    const roundedBracketY = Math.round(bracketY);
+    const lineStartX = !isPartialMode ? state.dragStartX : 0;
+    ctx.beginPath();
+    ctx.moveTo(lineStartX, roundedBracketY);
+    ctx.lineTo(chartWidth, roundedBracketY);
+    ctx.stroke();
+
+    // ========= Main label (PnL | type | %) =========
+    const labelParts = [pnlText, typeLabel, percentText].filter(Boolean);
+
+    // Position label
+    const cornerY = isPartialMode
+      ? isDraggingUp
+        ? top + 20
+        : bottom - 20
+      : isDraggingUp
+        ? bracketY - 14
+        : bracketY + 14;
+
+    let cornerX: number;
+    if (isPartialMode) {
+      const offset =
+        state.partialPercent === 100
+          ? 0
+          : state.partialPercent === 75
+            ? 55
+            : state.partialPercent === 50
+              ? 110
+              : state.partialPercent === 25
+                ? 165
+                : 220;
+      if (offset === 0) {
+        cornerX = centerX;
+      } else {
+        cornerX = cursorOnRight ? centerX + offset : centerX - offset;
+      }
+    } else {
+      cornerX = state.dragStartX;
+    }
+
+    ctx.font = '11px sans-serif';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+    ctx.setLineDash([]);
+
+    const sectionPadding = 10;
+    const dividerWidth = 1;
+    let totalWidth = 0;
+    const sectionWidths = labelParts.map((part) => {
+      const w = ctx.measureText(part).width + sectionPadding * 2;
+      totalWidth += w;
+      return w;
+    });
+    totalWidth += (labelParts.length - 1) * dividerWidth;
+
+    const labelBoxHeight = 20;
+    const labelBoxX = cornerX - totalWidth / 2;
+    const mainLabelBoxY = cornerY - labelBoxHeight / 2;
+
+    // Label background
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(labelBoxX, mainLabelBoxY, totalWidth, labelBoxHeight);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(labelBoxX, mainLabelBoxY, totalWidth, labelBoxHeight);
+
+    // Draw each section with dividers
+    let xOffset = labelBoxX;
+    for (let i = 0; i < labelParts.length; i++) {
+      const sectionWidth = sectionWidths[i];
+
+      if (i > 0) {
+        ctx.strokeStyle = color;
+        ctx.globalAlpha = 0.4;
+        ctx.beginPath();
+        ctx.moveTo(xOffset, mainLabelBoxY + 3);
+        ctx.lineTo(xOffset, mainLabelBoxY + labelBoxHeight - 3);
+        ctx.stroke();
+        ctx.globalAlpha = 1.0;
+        xOffset += dividerWidth;
+      }
+
+      ctx.fillStyle = color;
+      ctx.fillText(labelParts[i], xOffset + sectionWidth / 2, cornerY);
+      xOffset += sectionWidth;
+    }
+
+    // ========= Vertical line and price offset labels =========
+    if (state.entryPrice && state.price && height > 0) {
+      const vertLineX = !isPartialMode ? state.dragStartX : rightEdge;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.globalAlpha = 0.6;
+      ctx.beginPath();
+      ctx.moveTo(vertLineX, top);
+      ctx.lineTo(vertLineX, bottom);
+      ctx.stroke();
+      ctx.globalAlpha = 1.0;
+      ctx.setLineDash([]);
+
+      ctx.textBaseline = 'middle';
+      ctx.textAlign = 'left';
+      ctx.font = '10px sans-serif';
+      const rightLabelX = vertLineX + 6;
+
+      const priceRange = state.price - state.entryPrice;
+      const rightLabels = [
+        { percent: 10, yRatio: 0.1 },
+        { percent: 25, yRatio: 0.25 },
+        { percent: 50, yRatio: 0.5 },
+        { percent: 75, yRatio: 0.75 },
+        { percent: 100, yRatio: 1.0 },
+      ];
+
+      for (const label of rightLabels) {
+        let labelYPos = isDraggingUp ? bottom - height * label.yRatio : top + height * label.yRatio;
+
+        if (label.percent === 100) {
+          labelYPos += isDraggingUp ? 8 : -8;
+        }
+
+        const priceAtLevel = state.entryPrice + priceRange * label.yRatio;
+        const percentOffset = ((priceAtLevel - state.entryPrice) / state.entryPrice) * 100;
+        const sign = percentOffset >= 0 ? '' : '-';
+        const text = sign + Math.abs(percentOffset).toFixed(1) + '%';
+
+        ctx.fillStyle = color;
+        ctx.globalAlpha = 0.7;
+        ctx.fillText(text, rightLabelX, labelYPos);
+      }
+      ctx.globalAlpha = 1.0;
+    }
+
+    ctx.restore();
+  }
+
+  /**
    * Update interactive line renderer (HTML overlay labels)
    */
   private updateInteractiveLines(): void {
-    const crosshairColor = this.options.renderOptions?.crosshairColor || '#888888';
-    // Filter out crosshair bounds — crosshair is fully canvas-drawn now
-    const nonCrosshairBounds = this.labelBoundsCache.filter((b) => b.type !== 'crosshair');
-    this.interactiveLineRenderer.update(nonCrosshairBounds, this.pendingOrders, {
-      x: this.crosshair.x,
-      y: this.crosshair.y,
-      visible: this.crosshair.visible,
-      color: crosshairColor,
-    });
+    this.interactiveLineRenderer.update(this.labelBoundsCache, this.pendingOrders);
   }
 }

@@ -44,6 +44,7 @@ export function useLabelCollision<T extends MobileLabelBounds>(inputLabels: T[])
     // Generate cache key from input positions
     const cacheKey = inputLabels
       .map((l) => `${l.id}:${Math.round(l.originalY * 10)}:${Math.round(l.height * 10)}`)
+      .sort()
       .join('|');
 
     const now = Date.now();
