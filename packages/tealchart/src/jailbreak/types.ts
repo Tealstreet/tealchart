@@ -81,3 +81,19 @@ export interface CrossHairTooltip {
   /** Optional color */
   color?: string;
 }
+
+/**
+ * Scale a font size for the current canvas context.
+ *
+ * - Tealchart path: canvas has ctx.scale(dpr, dpr), so logical font sizes render correctly → returns `size` as-is.
+ * - TradingView path: canvas has no pre-scaling, CtxWithPixelRatio handles coords but not fonts → uses
+ *   the wrapper's fontSize() method to scale by DPR.
+ *
+ * Use this when setting ctx.font in indicators that need to work on both chart engines.
+ */
+export function scaleFontSize(ctx: CanvasRenderingContext2D, size: number): number {
+  if ('fontSize' in ctx && typeof (ctx as any).fontSize === 'function') {
+    return (ctx as any).fontSize(size);
+  }
+  return size;
+}
