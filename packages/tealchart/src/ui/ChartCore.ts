@@ -453,6 +453,8 @@ export class ChartCore {
   private contextMenu: HTMLDivElement | null = null;
   // + button drawn on crosshair canvas — hit-test bounds for click detection
   private _plusButtonBounds: { x: number; y: number; r: number } | null = null;
+  // Bound handler for + button click — stored so it can be removed on dispose
+  private plusButtonClickHandler: (e: MouseEvent) => void;
 
   // Core components
   private renderer: TealchartRenderer;
@@ -487,9 +489,8 @@ export class ChartCore {
   private lastBoundsUpdate = 0;
   private labelBoundsCache: PriceLineLabelBounds[] = [];
 
-  // RAF — full render and crosshair-only render use separate IDs
+  // RAF for full renders
   private rafId: number | null = null;
-  private crosshairRafId: number | null = null;
 
   constructor(options: ChartCoreOptions) {
     this.options = options;
@@ -707,13 +708,9 @@ export class ChartCore {
         );
         const time = this.renderer.publicXToTime(x, this.viewport ?? TealchartRenderer.calculateViewport(this.bars));
         this.options.onCrossHairMoved?.(price, time);
-        // Crosshair-only: skip main canvas, just repaint overlay + interactive lines
-        this.scheduleCrosshairRender();
       },
       onCrossHairVisibilityChange: (visible) => {
         this.crosshair = { ...this.crosshair, visible };
-        // Crosshair-only: skip main canvas
-        this.scheduleCrosshairRender();
       },
       onMouseDown: () => this.options.onMouseDown?.(),
       onMouseUp: () => this.options.onMouseUp?.(),
@@ -746,8 +743,8 @@ export class ChartCore {
       onPaneDoubleClick: (paneId) => this.options.onPaneDoubleClick?.(paneId),
     });
 
-    // Click listener for canvas-drawn + button
-    this.chartContainer.addEventListener('click', (e) => {
+    // Click listener for canvas-drawn + button (stored for cleanup in dispose)
+    this.plusButtonClickHandler = (e: MouseEvent) => {
       if (!this._plusButtonBounds || !this.options.onContextMenu) return;
       const rect = this.chartContainer.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -768,7 +765,8 @@ export class ChartCore {
         );
         this.handleContextMenu(rect.right - this.margins.right, rect.top + this.crosshair.y, price, time);
       }
-    });
+    };
+    this.chartContainer.addEventListener('click', this.plusButtonClickHandler);
 
     // Create reset button
     this.createResetButton();
@@ -1078,12 +1076,10 @@ export class ChartCore {
     if (this.rafId !== null) {
       cancelAnimationFrame(this.rafId);
     }
-    if (this.crosshairRafId !== null) {
-      cancelAnimationFrame(this.crosshairRafId);
-    }
     if (this.resetButtonTimer) {
       clearTimeout(this.resetButtonTimer);
     }
+    this.chartContainer.removeEventListener('click', this.plusButtonClickHandler);
     this.eventManager.dispose();
     this.interactiveLineRenderer.dispose();
     if (!preserveDom) {
@@ -1382,34 +1378,12 @@ export class ChartCore {
    */
   private scheduleRender(): void {
     if (this.rafId !== null) return; // Already scheduled — coalesce
-    // Cancel any pending crosshair-only render (full render includes crosshair)
-    if (this.crosshairRafId !== null) {
-      cancelAnimationFrame(this.crosshairRafId);
-      this.crosshairRafId = null;
-    }
 
     this.rafId = requestAnimationFrame(() => {
       this.rafId = null;
       this.renderMainCanvas();
       this.renderCrosshairOverlay();
       this.updateInteractiveLines();
-    });
-  }
-
-  /**
-   * Crosshair-only render — skip main canvas repaint (~0.1ms vs ~5ms).
-   * Used by EventManager crosshair callbacks. If a full render is already
-   * scheduled, this is a no-op (the full render will repaint crosshair too).
-   */
-  private scheduleCrosshairRender(): void {
-    // Full render already pending — it includes crosshair
-    if (this.rafId !== null) return;
-    if (this.crosshairRafId !== null) return; // Already scheduled
-
-    this.crosshairRafId = requestAnimationFrame(() => {
-      this.crosshairRafId = null;
-      // Price label drawn on canvas — zero DOM mutations
-      this.renderCrosshairOverlay();
     });
   }
 
@@ -1701,7 +1675,7 @@ export class ChartCore {
       const pricePrecision = this.options.renderOptions?.pricePrecision;
       let decimals = 2;
       if (pricePrecision && pricePrecision > 0) {
-        decimals = Math.max(0, Math.round(-Math.log10(pricePrecision)));
+        decimals = getDecimalPlacesFromPrecision(pricePrecision);
       }
       const priceText = price.toFixed(decimals);
       ctx.font = `11px ${font}`;
@@ -1729,64 +1703,13 @@ export class ChartCore {
    */
   private updateInteractiveLines(): void {
     const crosshairColor = this.options.renderOptions?.crosshairColor || '#888888';
-    this.interactiveLineRenderer.update(this.labelBoundsCache, this.pendingOrders, {
+    // Filter out crosshair bounds — crosshair is fully canvas-drawn now
+    const nonCrosshairBounds = this.labelBoundsCache.filter((b) => b.type !== 'crosshair');
+    this.interactiveLineRenderer.update(nonCrosshairBounds, this.pendingOrders, {
       x: this.crosshair.x,
       y: this.crosshair.y,
       visible: this.crosshair.visible,
       color: crosshairColor,
     });
-  }
-
-  /**
-   * Lightweight crosshair-only label update — only repositions crosshair price label
-   * and vertical line. Skips signature computation and full label iteration.
-   */
-  private updateCrosshairLabelsOnly(): void {
-    const crosshairColor = this.options.renderOptions?.crosshairColor || '#888888';
-    const crosshairData = {
-      x: this.crosshair.x,
-      y: this.crosshair.y,
-      visible: this.crosshair.visible,
-      color: crosshairColor,
-    };
-
-    if (!this.crosshair.visible || !this.viewport) {
-      this.interactiveLineRenderer.updateCrosshairOnly(undefined, crosshairData);
-      return;
-    }
-
-    // Compute crosshair price label inline (avoids full labelBounds recomputation)
-    const y = this.crosshair.y;
-    const price = this.renderer.publicYToPriceWithLayout(
-      y,
-      this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
-      this.getUnifiedLayout(),
-    );
-    const pricePrecision = this.options.renderOptions?.pricePrecision;
-    let decimals = 2;
-    if (pricePrecision && pricePrecision > 0) {
-      decimals = Math.max(0, Math.round(-Math.log10(pricePrecision)));
-    }
-    const priceText = price.toFixed(decimals);
-    const labelWidth = priceText.length * 7 + 12; // rough estimate, fine for positioning
-    const labelHeight = 18;
-
-    const crosshairBound = {
-      lineId: '__crosshair__',
-      price,
-      originalY: y,
-      adjustedY: y,
-      width: labelWidth,
-      height: labelHeight,
-      color: crosshairColor,
-      label: {
-        primaryText: priceText,
-        backgroundColor: crosshairColor,
-        textColor: this.options.renderOptions?.backgroundColor || '#131722',
-      },
-      type: 'crosshair' as const,
-    };
-
-    this.interactiveLineRenderer.updateCrosshairOnly(crosshairBound as any, crosshairData);
   }
 }

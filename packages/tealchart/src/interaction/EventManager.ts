@@ -1150,26 +1150,10 @@ export class EventManager {
   private scheduleRender(): void {
     if (this.renderScheduled) return;
     this.renderScheduled = true;
-    // Full render supersedes any pending crosshair-only render
-    this.crosshairRenderScheduled = false;
 
     requestAnimationFrame(() => {
       this.renderScheduled = false;
       this.callbacks.onRender?.();
-    });
-  }
-
-  private crosshairRenderScheduled = false;
-
-  private scheduleCrosshairRender(): void {
-    // Full render already pending — it includes crosshair
-    if (this.renderScheduled) return;
-    if (this.crosshairRenderScheduled) return;
-    this.crosshairRenderScheduled = true;
-
-    requestAnimationFrame(() => {
-      this.crosshairRenderScheduled = false;
-      this.callbacks.onCrosshairRender?.();
     });
   }
 }
