@@ -34,25 +34,25 @@ export interface InteractiveLineRendererOptions {
   onOrderCancel?: (orderId: string) => void;
   onPositionClose?: (positionId: string) => void;
   onPositionReverse?: (positionId: string) => void;
-  onTPDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
-  onSLDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
-  onTPMove?: (
+  /** Preview callback for TP drag (for bracket drag preview on crosshair canvas) */
+  onTPMovePreview?: (
     positionId: string,
     price: number,
     partialPercent: number,
     dragStartX: number,
     dragCurrentX: number,
   ) => void;
-  onSLMove?: (
+  /** Preview callback for SL drag (for bracket drag preview on crosshair canvas) */
+  onSLMovePreview?: (
     positionId: string,
     price: number,
     partialPercent: number,
     dragStartX: number,
     dragCurrentX: number,
   ) => void;
+  /** Called when any TP/SL drag ends (to clear bracket preview) */
+  onTPSLDragEnd?: () => void;
   onTPSLDragCancel?: () => void;
-  onTPClick?: (positionId: string) => void;
-  onSLClick?: (positionId: string) => void;
   onCursorChange?: (cursor: 'default' | 'pointer' | 'grab' | 'grabbing') => void;
   /** Format price for display (uses chart's precision settings) */
   formatPrice?: (price: number) => string;
@@ -716,7 +716,11 @@ export class InteractiveLineRenderer {
       buttonEl.textContent = '\u00d7'; // ×
       buttonEl.addEventListener('click', (e) => {
         e.stopPropagation();
-        this.options.onPositionClose?.(bound.lineId);
+        if (bound.callbacks?.onClose) {
+          bound.callbacks.onClose();
+        } else {
+          this.options.onPositionClose?.(bound.lineId);
+        }
       });
       buttonEl.addEventListener('mouseenter', () => this.options.onCursorChange?.('pointer'));
       buttonEl.addEventListener('mouseleave', () => {
@@ -729,7 +733,11 @@ export class InteractiveLineRenderer {
       buttonEl.textContent = '\u21c4'; // ⇄
       buttonEl.addEventListener('click', (e) => {
         e.stopPropagation();
-        this.options.onPositionReverse?.(bound.lineId);
+        if (bound.callbacks?.onReverse) {
+          bound.callbacks.onReverse();
+        } else {
+          this.options.onPositionReverse?.(bound.lineId);
+        }
       });
       buttonEl.addEventListener('mouseenter', () => this.options.onCursorChange?.('pointer'));
       buttonEl.addEventListener('mouseleave', () => {
@@ -790,9 +798,11 @@ export class InteractiveLineRenderer {
         const localStartX = startX - cachedRect.left;
         const localCurrentX = e.clientX - cachedRect.left;
         if (type === 'tp') {
-          this.options.onTPMove?.(this.tpslDrag.positionId, price, partialPercent, localStartX, localCurrentX);
+          bound.callbacks?.onTPMove?.(price, partialPercent);
+          this.options.onTPMovePreview?.(this.tpslDrag.positionId, price, partialPercent, localStartX, localCurrentX);
         } else {
-          this.options.onSLMove?.(this.tpslDrag.positionId, price, partialPercent, localStartX, localCurrentX);
+          bound.callbacks?.onSLMove?.(price, partialPercent);
+          this.options.onSLMovePreview?.(this.tpslDrag.positionId, price, partialPercent, localStartX, localCurrentX);
         }
       }
     };
@@ -804,11 +814,11 @@ export class InteractiveLineRenderer {
       const deltaY = Math.abs(e.clientY - startY);
 
       if (!isDragStarted || (deltaX < DRAG_THRESHOLD && deltaY < DRAG_THRESHOLD)) {
-        // Tap — fire click callback
+        // Tap — fire click callback directly from bound
         if (type === 'tp') {
-          this.options.onTPClick?.(bound.positionId || bound.lineId);
+          bound.callbacks?.onTPClick?.();
         } else {
-          this.options.onSLClick?.(bound.positionId || bound.lineId);
+          bound.callbacks?.onSLClick?.();
         }
       } else {
         // Drag end — compute price from Y
@@ -816,11 +826,13 @@ export class InteractiveLineRenderer {
         const price = this.options.yToPrice(localY);
         const partialPercent = this.tpslDrag.partialEnabled ? calculatePartialPercent(startX, e.clientX) : undefined;
 
+        // Fire callback directly from bound — no string ID lookup
         if (type === 'tp') {
-          this.options.onTPDragEnd?.(bound.positionId || bound.lineId, price, partialPercent);
+          bound.callbacks?.onTPMoveEnd?.(price, partialPercent);
         } else {
-          this.options.onSLDragEnd?.(bound.positionId || bound.lineId, price, partialPercent);
+          bound.callbacks?.onSLMoveEnd?.(price, partialPercent);
         }
+        this.options.onTPSLDragEnd?.();
       }
 
       this.tpslDrag = null;

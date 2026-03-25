@@ -77,14 +77,6 @@ export interface ChartCoreOptions {
   onPositionClose?: (positionId: string) => void;
   /** Callback when position reverse button clicked */
   onPositionReverse?: (positionId: string) => void;
-  /** Callback when TP drag ends */
-  onTPDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
-  /** Callback when SL drag ends */
-  onSLDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
-  /** Callback when TP clicked */
-  onTPClick?: (positionId: string) => void;
-  /** Callback when SL clicked */
-  onSLClick?: (positionId: string) => void;
   /** Context menu callback */
   onContextMenu?: (unixTime: number, price: number) => ContextMenuItem[];
   /** Mouse down callback */
@@ -380,6 +372,7 @@ function positionLineToPriceLine(position: PositionLineRenderData, formatPrice: 
     partialEnabled: position.partialEnabled,
     positionData: position.positionData ?? undefined,
     brackets: position.brackets,
+    callbacks: position.callbacks,
   };
 }
 
@@ -620,28 +613,20 @@ export class ChartCore {
       onOrderCancel: (orderId) => this.options.onOrderCancel?.(orderId),
       onPositionClose: (positionId) => this.options.onPositionClose?.(positionId),
       onPositionReverse: (positionId) => this.options.onPositionReverse?.(positionId),
-      onTPDragEnd: (positionId, price, partialPercent) => {
-        this._bracketDragState = null;
-        this.renderCrosshairOverlay();
-        this.options.onTPDragEnd?.(positionId, price, partialPercent);
-      },
-      onSLDragEnd: (positionId, price, partialPercent) => {
-        this._bracketDragState = null;
-        this.renderCrosshairOverlay();
-        this.options.onSLDragEnd?.(positionId, price, partialPercent);
-      },
-      onTPMove: (positionId, price, partialPercent, dragStartX, dragCurrentX) => {
+      onTPMovePreview: (positionId, price, partialPercent, dragStartX, dragCurrentX) => {
         this._updateBracketDragState('tp', positionId, price, partialPercent, dragStartX, dragCurrentX);
       },
-      onSLMove: (positionId, price, partialPercent, dragStartX, dragCurrentX) => {
+      onSLMovePreview: (positionId, price, partialPercent, dragStartX, dragCurrentX) => {
         this._updateBracketDragState('sl', positionId, price, partialPercent, dragStartX, dragCurrentX);
+      },
+      onTPSLDragEnd: () => {
+        this._bracketDragState = null;
+        this.renderCrosshairOverlay();
       },
       onTPSLDragCancel: () => {
         this._bracketDragState = null;
         this.renderCrosshairOverlay();
       },
-      onTPClick: (positionId) => this.options.onTPClick?.(positionId),
-      onSLClick: (positionId) => this.options.onSLClick?.(positionId),
       formatPrice: (price) => {
         const pricePrecision = this.options.renderOptions?.pricePrecision;
         let decimals: number;
@@ -1615,6 +1600,7 @@ export class ChartCore {
           b.label = line.label;
           b.chartLabel = line.chartLabel;
           b.color = line.color;
+          b.callbacks = line.callbacks;
         }
       }
     }

@@ -131,6 +131,17 @@ export interface PriceLine {
   positionData?: PositionData;
   /** Current bracket configuration (TP/SL prices if already set) */
   brackets?: BracketConfig | null;
+  /** Adapter callbacks carried through render data for direct invocation */
+  callbacks?: {
+    onTPClick?: () => void;
+    onSLClick?: () => void;
+    onTPMove?: (price: number, partialPercent?: number) => void;
+    onSLMove?: (price: number, partialPercent?: number) => void;
+    onTPMoveEnd?: (price: number, partialPercent?: number) => void;
+    onSLMoveEnd?: (price: number, partialPercent?: number) => void;
+    onClose?: () => void;
+    onReverse?: () => void;
+  };
 }
 
 /**
@@ -243,6 +254,17 @@ export interface PriceLineLabelBounds {
   positionData?: PositionData;
   /** Current bracket configuration (TP/SL prices if already set) */
   brackets?: BracketConfig | null;
+  /** Adapter callbacks carried through render data for direct invocation */
+  callbacks?: {
+    onTPClick?: () => void;
+    onSLClick?: () => void;
+    onTPMove?: (price: number, partialPercent?: number) => void;
+    onSLMove?: (price: number, partialPercent?: number) => void;
+    onTPMoveEnd?: (price: number, partialPercent?: number) => void;
+    onSLMoveEnd?: (price: number, partialPercent?: number) => void;
+    onClose?: () => void;
+    onReverse?: () => void;
+  };
 
   // === Pane targeting for multi-pane support ===
 
@@ -434,8 +456,6 @@ export interface ITimeScaleApi {
  * Order line options
  */
 export interface OrderLineOptions {
-  /** External ID for this line (e.g., exchange order ID). Used as the adapter Map key. */
-  id?: string;
   price?: number;
   quantity?: number;
   text?: string;
@@ -491,8 +511,6 @@ export interface IOrderLineAdapter {
  * Position line options
  */
 export interface PositionLineOptions {
-  /** External ID for this line (e.g., exchange position ID). Used as the adapter Map key. */
-  id?: string;
   price?: number;
   quantity?: number;
   text?: string;
@@ -833,6 +851,17 @@ export interface PositionLineRenderData {
   brackets: BracketConfig | null;
   partialEnabled: boolean;
   positionData: PositionData | null;
+  /** Adapter callbacks carried through render data for direct invocation */
+  callbacks?: {
+    onTPClick?: () => void;
+    onSLClick?: () => void;
+    onTPMove?: (price: number, partialPercent?: number) => void;
+    onSLMove?: (price: number, partialPercent?: number) => void;
+    onTPMoveEnd?: (price: number, partialPercent?: number) => void;
+    onSLMoveEnd?: (price: number, partialPercent?: number) => void;
+    onClose?: () => void;
+    onReverse?: () => void;
+  };
 }
 
 // ============================================================================

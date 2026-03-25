@@ -1015,35 +1015,6 @@ export const Tealchart: React.FC<TealchartProps> = ({
     [chartApi],
   );
 
-  // TEALSTREET: Bracket TP/SL button handlers
-  const handleTPClick = useCallback(
-    (positionId: string) => {
-      chartApi?.triggerTPClick(positionId);
-    },
-    [chartApi],
-  );
-
-  const handleSLClick = useCallback(
-    (positionId: string) => {
-      chartApi?.triggerSLClick(positionId);
-    },
-    [chartApi],
-  );
-
-  const handleTPDragEnd = useCallback(
-    (positionId: string, price: number, partialPercent?: number) => {
-      chartApi?.triggerTPMoveEnd(positionId, price, partialPercent);
-    },
-    [chartApi],
-  );
-
-  const handleSLDragEnd = useCallback(
-    (positionId: string, price: number, partialPercent?: number) => {
-      chartApi?.triggerSLMoveEnd(positionId, price, partialPercent);
-    },
-    [chartApi],
-  );
-
   // Handle cursor change from Konva layer (hover over interactive elements)
   const handleKonvaCursorChange = useCallback((newCursor: 'default' | 'pointer' | 'grab' | 'grabbing') => {
     if (newCursor === 'default') {

@@ -117,14 +117,6 @@ export interface SkiaTealchartProps {
   onPositionClose?: (positionId: string) => void;
   /** Called when position is reversed */
   onPositionReverse?: (positionId: string) => void;
-  /** Called when TP drag ends */
-  onTPDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
-  /** Called when SL drag ends */
-  onSLDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
-  /** Called when TP button is clicked */
-  onTPClick?: (positionId: string) => void;
-  /** Called when SL button is clicked */
-  onSLClick?: (positionId: string) => void;
   /** Price precision for display */
   pricePrecision?: number;
   // ===========================================================================
@@ -167,10 +159,6 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   onOrderCancel,
   onPositionClose,
   onPositionReverse,
-  onTPDragEnd,
-  onSLDragEnd,
-  onTPClick,
-  onSLClick,
   pricePrecision = 2,
   // Top bar props
   showTopBar = true,
@@ -874,12 +862,8 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
               useNarrowText={dimensions.width < 400}
               onClose={onPositionClose}
               onReverse={onPositionReverse}
-              onTPClick={onTPClick}
-              onSLClick={onSLClick}
-              onTPDragEnd={onTPDragEnd}
-              onSLDragEnd={onSLDragEnd}
-              onTPMove={handleTPMove}
-              onSLMove={handleSLMove}
+              onTPMovePreview={handleTPMove}
+              onSLMovePreview={handleSLMove}
               onTPSLDragEnd={handleTPSLDragEnd}
             />
           ))}

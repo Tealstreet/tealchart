@@ -30,22 +30,14 @@ export interface PositionLineComponentProps {
   pricePrecision?: number;
   /** Use narrow text (compact display) */
   useNarrowText?: boolean;
-  /** Callback when position is closed */
+  /** Callback when position is closed (fallback if no adapter callback) */
   onClose?: (positionId: string) => void;
-  /** Callback when position is reversed */
+  /** Callback when position is reversed (fallback if no adapter callback) */
   onReverse?: (positionId: string) => void;
-  /** Callback when TP button is clicked */
-  onTPClick?: (positionId: string) => void;
-  /** Callback when SL button is clicked */
-  onSLClick?: (positionId: string) => void;
-  /** Callback when TP is dragged to new price */
-  onTPDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
-  /** Callback when SL is dragged to new price */
-  onSLDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
-  /** Continuous TP drag move callback (for Skia preview) */
-  onTPMove?: (positionId: string, price: number) => void;
-  /** Continuous SL drag move callback (for Skia preview) */
-  onSLMove?: (positionId: string, price: number) => void;
+  /** Continuous TP drag move callback (for Skia preview state only) */
+  onTPMovePreview?: (positionId: string, price: number) => void;
+  /** Continuous SL drag move callback (for Skia preview state only) */
+  onSLMovePreview?: (positionId: string, price: number) => void;
   /** Called when any TP/SL drag ends (to clear preview) */
   onTPSLDragEnd?: () => void;
 }
@@ -64,12 +56,8 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   useNarrowText = false,
   onClose,
   onReverse,
-  onTPClick,
-  onSLClick,
-  onTPDragEnd,
-  onSLDragEnd,
-  onTPMove,
-  onSLMove,
+  onTPMovePreview,
+  onSLMovePreview,
   onTPSLDragEnd,
 }) => {
   // Calculate Y position from price
@@ -81,72 +69,70 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   const tpDragging = useSharedValue(false);
   const slDragging = useSharedValue(false);
 
-  // Handle close callback
+  // Handle close callback — fire directly from adapter callbacks
   const handleClose = useCallback(() => {
-    if (onClose && position.closeable) {
-      onClose(position.id);
+    if (position.closeable) {
+      if (position.callbacks?.onClose) {
+        position.callbacks.onClose();
+      } else if (onClose) {
+        onClose(position.id);
+      }
     }
-  }, [onClose, position.id, position.closeable]);
+  }, [onClose, position.id, position.closeable, position.callbacks]);
 
-  // Handle reverse callback
+  // Handle reverse callback — fire directly from adapter callbacks
   const handleReverse = useCallback(() => {
-    if (onReverse && position.reversible) {
-      onReverse(position.id);
+    if (position.reversible) {
+      if (position.callbacks?.onReverse) {
+        position.callbacks.onReverse();
+      } else if (onReverse) {
+        onReverse(position.id);
+      }
     }
-  }, [onReverse, position.id, position.reversible]);
+  }, [onReverse, position.id, position.reversible, position.callbacks]);
 
-  // Handle TP click (no drag)
+  // Handle TP click (no drag) — fire directly from adapter callbacks
   const handleTPClick = useCallback(() => {
-    if (onTPClick) {
-      onTPClick(position.id);
-    }
-  }, [onTPClick, position.id]);
+    position.callbacks?.onTPClick?.();
+  }, [position.callbacks]);
 
-  // Handle SL click (no drag)
+  // Handle SL click (no drag) — fire directly from adapter callbacks
   const handleSLClick = useCallback(() => {
-    if (onSLClick) {
-      onSLClick(position.id);
-    }
-  }, [onSLClick, position.id]);
+    position.callbacks?.onSLClick?.();
+  }, [position.callbacks]);
 
-  // Handle TP drag end
+  // Handle TP drag end — fire directly from adapter callbacks
   const handleTPDragEnd = useCallback(
     (newPrice: number) => {
-      if (onTPDragEnd) {
-        onTPDragEnd(position.id, newPrice);
-      }
+      position.callbacks?.onTPMoveEnd?.(newPrice);
     },
-    [onTPDragEnd, position.id],
+    [position.callbacks],
   );
 
-  // Handle SL drag end
+  // Handle SL drag end — fire directly from adapter callbacks
   const handleSLDragEnd = useCallback(
     (newPrice: number) => {
-      if (onSLDragEnd) {
-        onSLDragEnd(position.id, newPrice);
-      }
+      position.callbacks?.onSLMoveEnd?.(newPrice);
     },
-    [onSLDragEnd, position.id],
+    [position.callbacks],
   );
 
-  // Handle continuous TP move (for Skia drag preview)
+  // Handle continuous TP move (for adapter callback + Skia drag preview)
   const handleTPMove = useCallback(
     (price: number) => {
-      if (onTPMove) {
-        onTPMove(position.id, price);
-      }
+      position.callbacks?.onTPMove?.(price);
+      onTPMovePreview?.(position.id, price);
     },
-    [onTPMove, position.id],
+    [position.callbacks, onTPMovePreview, position.id],
   );
 
-  // Handle continuous SL move (for Skia drag preview)
+  // Handle continuous SL move (for adapter callback + Skia drag preview)
   const handleSLMove = useCallback(
     (price: number) => {
-      if (onSLMove) {
-        onSLMove(position.id, price);
-      }
+      position.callbacks?.onSLMove?.(price);
+      onSLMovePreview?.(position.id, price);
     },
-    [onSLMove, position.id],
+    [position.callbacks, onSLMovePreview, position.id],
   );
 
   // Handle TP/SL drag end (clear preview)

@@ -2585,6 +2585,8 @@ export class TealchartRenderer {
         positionId: line.positionId,
         partialEnabled: line.partialEnabled,
         positionData: line.positionData,
+        // Adapter callbacks carried through for direct invocation
+        callbacks: line.callbacks,
         // Pass through targetPaneId for pane-aware rendering
         targetPaneId: line.targetPaneId,
       };
