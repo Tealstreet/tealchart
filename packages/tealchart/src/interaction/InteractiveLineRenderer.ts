@@ -622,7 +622,11 @@ export class InteractiveLineRenderer {
       buttonEl.textContent = '\u00d7'; // ×
       buttonEl.addEventListener('click', (e) => {
         e.stopPropagation();
-        this.options.onOrderCancel?.(bound.lineId);
+        if (bound.callbacks?.onCancel) {
+          bound.callbacks.onCancel();
+        } else {
+          this.options.onOrderCancel?.(bound.lineId);
+        }
       });
       buttonEl.addEventListener('mouseenter', () => this.options.onCursorChange?.('pointer'));
       buttonEl.addEventListener('mouseleave', () => {

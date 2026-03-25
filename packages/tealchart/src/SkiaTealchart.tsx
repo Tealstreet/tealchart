@@ -457,6 +457,41 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     [positionLines],
   );
 
+  // Order TP/SL drag move handlers (for Skia bracket preview)
+  const handleOrderTPMove = useCallback(
+    (orderId: string, price: number) => {
+      const order = orderLines?.find((o) => o.id === orderId || o.orderId === orderId);
+      if (order) {
+        setBracketDragState({
+          type: 'tp',
+          positionId: orderId,
+          price,
+          entryPrice: order.price,
+          isLong: true, // Approximation — actual side determined by OrderLineManager
+          notional: 0,
+        });
+      }
+    },
+    [orderLines],
+  );
+
+  const handleOrderSLMove = useCallback(
+    (orderId: string, price: number) => {
+      const order = orderLines?.find((o) => o.id === orderId || o.orderId === orderId);
+      if (order) {
+        setBracketDragState({
+          type: 'sl',
+          positionId: orderId,
+          price,
+          entryPrice: order.price,
+          isLong: true, // Approximation — actual side determined by OrderLineManager
+          notional: 0,
+        });
+      }
+    },
+    [orderLines],
+  );
+
   const handleTPSLDragEnd = useCallback(() => {
     setBracketDragState(null);
   }, []);
@@ -847,6 +882,9 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
               useNarrowText={dimensions.width < 400}
               onPriceChange={onOrderMove}
               onCancel={onOrderCancel}
+              onTPMovePreview={handleOrderTPMove}
+              onSLMovePreview={handleOrderSLMove}
+              onTPSLDragEnd={handleTPSLDragEnd}
             />
           ))}
 

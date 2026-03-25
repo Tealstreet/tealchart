@@ -210,18 +210,44 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
           ]
         : []),
     ],
-    buttons: order.cancellable
-      ? [
-          {
-            type: 'cancel' as const,
-            icon: '×',
-            backgroundColor: order.cancelButtonBackgroundColor,
-            iconColor: order.cancelButtonIconColor,
-            borderColor: order.cancelButtonBorderColor,
-            tooltip: order.cancelTooltip,
-          },
-        ]
-      : [],
+    buttons: [
+      ...(order.brackets !== null
+        ? [
+            {
+              type: 'tp' as const,
+              icon: 'TP',
+              backgroundColor: order.bodyBackgroundColor,
+              iconColor: '#22c55e',
+              borderColor: '#22c55e',
+              tooltip: 'Drag to set Take Profit',
+            },
+          ]
+        : []),
+      ...(order.brackets !== null
+        ? [
+            {
+              type: 'sl' as const,
+              icon: 'SL',
+              backgroundColor: order.bodyBackgroundColor,
+              iconColor: '#f97316',
+              borderColor: '#f97316',
+              tooltip: 'Drag to set Stop Loss',
+            },
+          ]
+        : []),
+      ...(order.cancellable
+        ? [
+            {
+              type: 'cancel' as const,
+              icon: '×',
+              backgroundColor: order.cancelButtonBackgroundColor,
+              iconColor: order.cancelButtonIconColor,
+              borderColor: order.cancelButtonBorderColor,
+              tooltip: order.cancelTooltip,
+            },
+          ]
+        : []),
+    ],
   };
 
   return {
@@ -241,6 +267,9 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
       textColor: order.bodyTextColor,
     },
     chartLabel,
+    partialEnabled: order.partialEnabled,
+    brackets: order.brackets,
+    callbacks: order.callbacks,
   };
 }
 

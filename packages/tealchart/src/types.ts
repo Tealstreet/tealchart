@@ -141,6 +141,7 @@ export interface PriceLine {
     onSLMoveEnd?: (price: number, partialPercent?: number) => void;
     onClose?: () => void;
     onReverse?: () => void;
+    onCancel?: () => void;
   };
 }
 
@@ -264,6 +265,7 @@ export interface PriceLineLabelBounds {
     onSLMoveEnd?: (price: number, partialPercent?: number) => void;
     onClose?: () => void;
     onReverse?: () => void;
+    onCancel?: () => void;
   };
 
   // === Pane targeting for multi-pane support ===
@@ -802,6 +804,16 @@ export interface OrderLineRenderData {
   // TEALSTREET: Bracket state
   brackets: BracketConfig | null;
   partialEnabled: boolean;
+  /** Adapter callbacks carried through render data for direct invocation */
+  callbacks?: {
+    onTPClick?: () => void;
+    onSLClick?: () => void;
+    onTPMove?: (price: number, partialPercent?: number) => void;
+    onSLMove?: (price: number, partialPercent?: number) => void;
+    onTPMoveEnd?: (price: number, partialPercent?: number) => void;
+    onSLMoveEnd?: (price: number, partialPercent?: number) => void;
+    onCancel?: () => void;
+  };
 }
 
 /**

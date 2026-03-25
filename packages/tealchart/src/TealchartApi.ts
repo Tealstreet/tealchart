@@ -549,6 +549,15 @@ export class TealchartApi {
         return {
           ...data,
           editable: data.editable && !!_onMoveCallback,
+          callbacks: {
+            onTPClick: _onTPClick ?? undefined,
+            onSLClick: _onSLClick ?? undefined,
+            onTPMove: _onTPMove ?? undefined,
+            onSLMove: _onSLMove ?? undefined,
+            onTPMoveEnd: _onTPMoveEnd ?? undefined,
+            onSLMoveEnd: _onSLMoveEnd ?? undefined,
+            onCancel: _onCancelCallback ?? undefined,
+          },
         };
       },
 
