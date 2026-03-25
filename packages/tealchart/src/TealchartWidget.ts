@@ -1316,12 +1316,15 @@ export class TealchartWidget {
   private _persistAddIndicator(instanceId: string, indicator: BuiltinIndicator): void {
     if (!this._chartStore) return;
 
+    // For jailbreak indicators, persist the defaults so the settings modal shows correct values
+    const defaultInputs = indicator.jailbreak?.defaults ?? {};
+
     const currentIndicators = this._chartStore.settings.get().indicators;
     const newInstance: IndicatorInstance = {
       id: instanceId,
       name: indicator.name,
       builtinId: indicator.id,
-      inputs: {},
+      inputs: { ...defaultInputs },
       isVisible: true,
       createdAt: Date.now(),
     };
