@@ -1018,28 +1018,13 @@ export class InteractiveLineRenderer {
   // Private: Crosshair vertical line
   // ==========================================================================
 
-  private updateCrosshairVLine(crosshair?: CrosshairLabelData): void {
-    if (!crosshair?.visible) {
-      // Hide existing
-      if (this.crosshairVLine) {
-        this.crosshairVLine.style.display = 'none';
-      }
-      return;
+  private updateCrosshairVLine(_crosshair?: CrosshairLabelData): void {
+    // Crosshair vertical line is now drawn on the canvas overlay (ChartCore.renderCrosshairOverlay).
+    // No HTML element needed — eliminates DOM mutations on every frame.
+    if (this.crosshairVLine) {
+      this.crosshairVLine.remove();
+      this.crosshairVLine = null;
     }
-
-    if (!this.crosshairVLine) {
-      // Create once, reuse
-      const vline = document.createElement('div');
-      vline.className = 'tc-crosshair-vline';
-      this.lineContainer.appendChild(vline);
-      this.crosshairVLine = vline;
-    }
-
-    // Update in-place
-    this.crosshairVLine.style.display = '';
-    this.crosshairVLine.style.left = `${crosshair.x}px`;
-    this.crosshairVLine.style.height = `${this.options.height}px`;
-    this.crosshairVLine.style.borderLeftColor = crosshair.color;
   }
 
   // ==========================================================================
