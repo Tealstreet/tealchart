@@ -1570,9 +1570,15 @@ export class ChartCore {
     // Collision resolution cache — only recompute de-overlap when geometry changes.
     // Label content is always built fresh below so text/color changes are never stale.
     const crosshairColor = this.options.renderOptions?.crosshairColor || '#888888';
+    // Include bucketed text length per line — triggers rebuild when label width changes
+    // significantly (e.g., PnL grows from "$1" to "$1,234"). Bucket to nearest 5 chars
+    // so minor text changes (same visual width) don't cause unnecessary rebuilds.
     const collisionKey =
       allPriceLines
-        .map((l) => `${l.id}:${l.price.toFixed(6)}`)
+        .map((l) => {
+          const textLen = l.chartLabel?.segments.reduce((sum, s) => sum + (s.text?.length || 0), 0) || 0;
+          return `${l.id}:${l.price.toFixed(6)}:${Math.round(textLen / 5)}`;
+        })
         .sort()
         .join(',') +
       `|${vp.priceMin.toFixed(4)},${vp.priceMax.toFixed(4)}|${this.crosshair.visible}|${Math.round(this.crosshair.y)}`;

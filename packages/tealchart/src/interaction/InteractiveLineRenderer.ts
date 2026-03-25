@@ -317,14 +317,16 @@ export class InteractiveLineRenderer {
   // ==========================================================================
 
   private computeSignature(bounds: PriceLineLabelBounds[]): string {
-    // Structural signature — only properties that require DOM element rebuild.
-    // Excludes: price, primaryText, positions (handled by updatePositions fast path)
+    // Structural signature — properties that require DOM element rebuild.
+    // Includes bucketed text length so large text changes (e.g., "Creating..." → "Limit [+$1,234]")
+    // trigger a rebuild for correct label X positioning. Bucketed to nearest 3 chars
+    // to avoid rebuilds on minor text fluctuations.
     return bounds
       .filter((b) => b.type !== 'crosshair')
-      .map(
-        (b) =>
-          `${b.lineId}|${b.type}|${b.color}|${b.lineStyle}|${b.draggable}|${b.chartLabel?.segments.length ?? 0}|${b.chartLabel?.buttons?.length ?? 0}`,
-      )
+      .map((b) => {
+        const textLen = b.chartLabel?.segments.reduce((sum, s) => sum + (s.text?.length || 0), 0) || 0;
+        return `${b.lineId}|${b.type}|${b.color}|${b.lineStyle}|${b.draggable}|${b.chartLabel?.segments.length ?? 0}|${b.chartLabel?.buttons?.length ?? 0}|${Math.round(textLen / 3)}`;
+      })
       .sort()
       .join(';');
   }
