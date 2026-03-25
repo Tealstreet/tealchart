@@ -739,6 +739,16 @@ export interface TealchartWidgetOptions {
    * Default: false
    */
   disableDebugOverlay?: boolean;
+  /**
+   * Factory map for jailbreak (canvas-drawing) indicators.
+   * Keys are builtin indicator IDs (e.g., 'dwmo').
+   * Values are factory functions that return a BarsIndicator instance.
+   *
+   * When an IndicatorInstance references a jailbreak builtin, the widget
+   * uses this map to instantiate the BarsIndicator and register it with
+   * the JailbreakIndicatorManager.
+   */
+  jailbreakIndicatorFactories?: Record<string, () => import('./jailbreak/BarsIndicator').BarsIndicator>;
 }
 
 // ============================================================================

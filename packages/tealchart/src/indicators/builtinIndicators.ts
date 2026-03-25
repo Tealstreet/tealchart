@@ -2,8 +2,39 @@
  * Built-in Indicators Registry
  *
  * Defines the available indicators that can be added to charts.
- * Each indicator has a name, category, and Tealscript code.
+ * Each indicator has a name, category, and Tealscript code (or jailbreak metadata).
  */
+
+/**
+ * Input definition for jailbreak (canvas-drawing) indicators.
+ * Maps to InputDefinition from @tealstreet/tealscript for the settings UI.
+ */
+export interface JailbreakInputDefinition {
+  id: string;
+  name: string;
+  type: 'int' | 'float' | 'bool' | 'string' | 'color';
+  defval: unknown;
+  min?: number;
+  max?: number;
+  step?: number;
+  options?: string[];
+}
+
+/**
+ * Jailbreak indicator metadata.
+ * Jailbreak indicators render directly on canvas via BarsIndicator subclasses,
+ * bypassing the tealscript worker pipeline.
+ */
+export interface JailbreakIndicatorMeta {
+  /** Input definitions for the settings UI */
+  inputs: JailbreakInputDefinition[];
+  /** Default input values */
+  defaults: Record<string, unknown>;
+  /** Palette colors (key -> display name + default color) */
+  palette?: Record<string, { name: string; defaultColor: string }>;
+  /** Whether to render behind candles by default */
+  behindCandles?: boolean;
+}
 
 export interface BuiltinIndicator {
   /** Unique identifier */
@@ -18,23 +49,69 @@ export interface BuiltinIndicator {
   overlay: boolean;
   /** Fixed Y-axis range for non-overlay indicators (e.g., RSI: 0-100) */
   yAxisRange?: { min: number; max: number };
-  /** Tealscript code */
+  /** Tealscript code (empty string for jailbreak indicators) */
   code: string;
+  /** If set, this is a jailbreak (canvas-drawing) indicator, not a tealscript one */
+  jailbreak?: JailbreakIndicatorMeta;
 }
 
 /**
  * Tealstreet custom indicators (placeholders for now)
  */
 const TEALSTREET_INDICATORS: BuiltinIndicator[] = [
-  // These are placeholders - actual implementations will come later
-  // {
-  //   id: 'depth-chart',
-  //   name: 'Depth Chart',
-  //   category: 'tealstreet',
-  //   description: 'Order book depth visualization',
-  //   overlay: false,
-  //   code: '', // Custom implementation needed
-  // },
+  {
+    id: 'dwmo',
+    name: 'DWMO',
+    category: 'tealstreet',
+    description: 'Daily / Weekly / Monthly / Yearly Opens + Monday High/Low',
+    overlay: true,
+    code: '',
+    jailbreak: {
+      inputs: [
+        { id: 'globalOpacity', name: 'Global Opacity', type: 'float', defval: 1, min: 0.05, max: 1, step: 0.01 },
+        { id: 'lineWidth', name: 'Line Width', type: 'float', defval: 1, min: 1, max: 5, step: 0.5 },
+        { id: 'labelFontSize', name: 'Label Font Size', type: 'float', defval: 11, min: 8, max: 40, step: 1 },
+        { id: 'showLabels', name: 'Show Labels', type: 'bool', defval: true },
+        { id: 'showDailyOpen', name: 'Show Daily Open', type: 'bool', defval: true },
+        { id: 'showWeeklyOpen', name: 'Show Weekly Open', type: 'bool', defval: true },
+        { id: 'showMonthlyOpen', name: 'Show Monthly Open', type: 'bool', defval: true },
+        { id: 'showYearlyOpen', name: 'Show Yearly Open', type: 'bool', defval: true },
+        { id: 'showMondayHigh', name: 'Show Monday High', type: 'bool', defval: false },
+        { id: 'showMondayLow', name: 'Show Monday Low', type: 'bool', defval: false },
+        { id: 'showPreviousDailyOpen', name: 'Show Previous Daily Open', type: 'bool', defval: false },
+        { id: 'showPreviousWeeklyOpen', name: 'Show Previous Weekly Open', type: 'bool', defval: false },
+        { id: 'showPreviousMonthlyOpen', name: 'Show Previous Monthly Open', type: 'bool', defval: false },
+        { id: 'showPreviousYearlyOpen', name: 'Show Previous Yearly Open', type: 'bool', defval: false },
+        { id: 'behindCandles', name: 'Behind Candles', type: 'bool', defval: false },
+      ],
+      defaults: {
+        globalOpacity: 1,
+        lineWidth: 1,
+        labelFontSize: 11,
+        showLabels: true,
+        showDailyOpen: true,
+        showWeeklyOpen: true,
+        showMonthlyOpen: true,
+        showYearlyOpen: true,
+        showMondayHigh: false,
+        showMondayLow: false,
+        showPreviousDailyOpen: false,
+        showPreviousWeeklyOpen: false,
+        showPreviousMonthlyOpen: false,
+        showPreviousYearlyOpen: false,
+        behindCandles: false,
+      },
+      palette: {
+        daily: { name: 'Daily Open', defaultColor: 'rgba(56, 189, 248, 0.95)' },
+        weekly: { name: 'Weekly Open', defaultColor: 'rgba(52, 211, 153, 0.95)' },
+        monthly: { name: 'Monthly Open', defaultColor: 'rgba(251, 146, 60, 0.95)' },
+        yearly: { name: 'Yearly Open', defaultColor: 'rgba(239, 83, 80, 0.95)' },
+        mondayHigh: { name: 'Monday High', defaultColor: 'rgba(255, 112, 67, 0.95)' },
+        mondayLow: { name: 'Monday Low', defaultColor: 'rgba(66, 165, 245, 0.95)' },
+      },
+      behindCandles: false,
+    },
+  },
 ];
 
 /**
@@ -477,10 +554,43 @@ export function getIndicatorById(id: string): BuiltinIndicator | undefined {
 export function searchIndicators(query: string): BuiltinIndicator[] {
   const lowerQuery = query.toLowerCase();
   return BUILTIN_INDICATORS.filter(
-    (ind) =>
-      ind.name.toLowerCase().includes(lowerQuery) ||
-      ind.description?.toLowerCase().includes(lowerQuery)
+    (ind) => ind.name.toLowerCase().includes(lowerQuery) || ind.description?.toLowerCase().includes(lowerQuery),
   );
+}
+
+/**
+ * Convert JailbreakInputDefinition[] to InputDefinition[] (from @tealstreet/tealscript)
+ * so that IndicatorSettingsModal can render them using the same form components.
+ */
+export function jailbreakInputsToInputDefinitions(inputs: JailbreakInputDefinition[]): Array<{
+  id: string;
+  type: 'int' | 'float' | 'bool' | 'string' | 'color';
+  title: string;
+  defval: unknown;
+  minval?: number;
+  maxval?: number;
+  step?: number;
+  options?: string[];
+  tooltip?: string;
+  group?: string;
+}> {
+  return inputs.map((input) => ({
+    id: input.id,
+    type: input.type,
+    title: input.name,
+    defval: input.defval,
+    minval: input.min,
+    maxval: input.max,
+    step: input.step,
+    options: input.options,
+  }));
+}
+
+/**
+ * Check if a builtin indicator is a jailbreak (canvas-drawing) indicator
+ */
+export function isJailbreakIndicator(indicator: BuiltinIndicator): boolean {
+  return indicator.jailbreak != null;
 }
 
 /**

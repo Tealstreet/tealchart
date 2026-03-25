@@ -12,7 +12,12 @@ import { LOADING_OPACITY } from './constants';
 import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
 import { EventEmitter } from './events/EventEmitter';
 import { GapDetectionManager } from './GapDetectionManager';
-import { getIndicatorById } from './indicators/builtinIndicators';
+import {
+  getIndicatorById,
+  isJailbreakIndicator,
+  jailbreakInputsToInputDefinitions,
+} from './indicators/builtinIndicators';
+import { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
 import { PaneManager } from './rendering/PaneManager';
 import { DIRTY, RenderScheduler } from './rendering/RenderScheduler';
 import { getChartStore } from './state/chartState';
@@ -90,6 +95,11 @@ export class TealchartWidget {
   // Tealscript indicator support
   private _tealScriptManager: TealscriptManager | null = null;
   private _plots: PlotOutput[] = [];
+
+  // Jailbreak (canvas-drawing) indicator support
+  private _jailbreakManager: JailbreakIndicatorManager | null = null;
+  // Set of indicator instance IDs that are jailbreak indicators (for routing toggle/remove/settings)
+  private _jailbreakInstanceIds = new Set<string>();
 
   // Nanostores for imperative state access
   private _chartStore: ChartStore | null = null;
@@ -255,6 +265,11 @@ export class TealchartWidget {
           this._tealScriptManager.removeScript(studyId);
         }
       });
+    }
+
+    // Initialize JailbreakIndicatorManager if factories are provided
+    if (options.jailbreakIndicatorFactories && Object.keys(options.jailbreakIndicatorFactories).length > 0) {
+      this._jailbreakManager = new JailbreakIndicatorManager();
     }
 
     // Set up keyboard event listeners
@@ -682,7 +697,7 @@ export class TealchartWidget {
    * Restore indicators from persisted state
    */
   private _restorePersistedIndicators(): void {
-    if (!this._tealScriptManager || !this._chartStore) return;
+    if (!this._chartStore) return;
 
     const indicators = this._chartStore.settings.get().indicators;
     if (!indicators || indicators.length === 0) return;
@@ -694,6 +709,15 @@ export class TealchartWidget {
         console.warn(`[Tealchart] Unknown indicator ID: ${instance.builtinId}, skipping`);
         continue;
       }
+
+      // Handle jailbreak indicators separately
+      if (isJailbreakIndicator(builtinIndicator)) {
+        this._restoreJailbreakIndicator(instance, builtinIndicator);
+        continue;
+      }
+
+      // Tealscript indicators require the manager
+      if (!this._tealScriptManager) continue;
 
       // Create the study with persisted inputs
       this._chartApi
@@ -734,6 +758,64 @@ export class TealchartWidget {
           console.error(`[Tealchart] Failed to restore indicator ${instance.name}:`, error);
         });
     }
+  }
+
+  /**
+   * Restore a jailbreak indicator from persisted state
+   */
+  private _restoreJailbreakIndicator(instance: IndicatorInstance, builtin: BuiltinIndicator): void {
+    if (!this._jailbreakManager || !builtin.jailbreak) return;
+
+    const factory = this._options.jailbreakIndicatorFactories?.[builtin.id];
+    if (!factory) {
+      console.warn(`[Tealchart] No factory for jailbreak indicator: ${builtin.id}`);
+      return;
+    }
+
+    const barsIndicator = factory();
+    // Merge defaults with persisted inputs, then palette colors
+    const settings = this._buildJailbreakSettings(builtin, instance.inputs);
+    const behindCandles =
+      (instance.inputs.behindCandles as boolean | undefined) ?? builtin.jailbreak.behindCandles ?? false;
+
+    this._jailbreakManager.register(instance.id, barsIndicator, settings, behindCandles);
+    this._jailbreakInstanceIds.add(instance.id);
+
+    // Store indicator config for pane lookup
+    this._indicatorConfigMap.set(instance.id, builtin);
+
+    // Apply visibility: use internal visibility on the BarsIndicator
+    if (!instance.isVisible) {
+      // BarsIndicator.isVisible() returns true by default; we need to make the manager skip it.
+      // We'll store visibility in the settings and check it during draw.
+      // For now, unregister to hide (toggle will re-register).
+      this._jailbreakManager.unregister(instance.id);
+    }
+
+    // Notify UI to propagate the jailbreak manager
+    this._ui?.setJailbreakManager(this._jailbreakManager);
+    this._scheduler.markDirty(DIRTY.FULL);
+  }
+
+  /**
+   * Build combined settings object for a jailbreak indicator.
+   * Merges builtin defaults, palette colors, and user-provided input overrides.
+   */
+  private _buildJailbreakSettings(builtin: BuiltinIndicator, inputs: Record<string, unknown>): Record<string, unknown> {
+    const jb = builtin.jailbreak!;
+    const settings: Record<string, unknown> = { ...jb.defaults };
+
+    // Add palette defaults as palette_<key> entries
+    if (jb.palette) {
+      for (const [key, value] of Object.entries(jb.palette)) {
+        settings[`palette_${key}`] = value.defaultColor;
+      }
+    }
+
+    // Override with user inputs
+    Object.assign(settings, inputs);
+
+    return settings;
   }
 
   /**
@@ -941,20 +1023,45 @@ export class TealchartWidget {
         };
       });
 
+      // Add jailbreak indicators to active list
+      for (const instanceId of this._jailbreakInstanceIds) {
+        const persisted = persistedIndicators.find((ind) => ind.id === instanceId);
+        if (persisted) {
+          activeIndicators.push({
+            id: instanceId,
+            name: persisted.name,
+            isVisible: persisted.isVisible,
+            inputs: persisted.inputs,
+            styleOverrides: persisted.styleOverrides,
+          });
+        }
+      }
+
       // Build indicator pane info
       const indicatorPaneInfo: Record<
         string,
         { overlay: boolean; yAxisRange?: { min: number; max: number }; name?: string; inputs?: Record<string, unknown> }
       > = {};
       for (const [studyId, config] of this._indicatorConfigMap) {
-        const study = this._chartApi.getStudyById(studyId);
-        const inputs = study?.getInputs() ?? {};
-        indicatorPaneInfo[studyId] = {
-          overlay: config.overlay,
-          yAxisRange: config.yAxisRange,
-          name: config.name,
-          inputs,
-        };
+        // For jailbreak indicators, get inputs from persisted state
+        if (this._jailbreakInstanceIds.has(studyId)) {
+          const persisted = persistedIndicators.find((ind) => ind.id === studyId);
+          indicatorPaneInfo[studyId] = {
+            overlay: config.overlay,
+            yAxisRange: config.yAxisRange,
+            name: config.name,
+            inputs: persisted?.inputs ?? {},
+          };
+        } else {
+          const study = this._chartApi.getStudyById(studyId);
+          const inputs = study?.getInputs() ?? {};
+          indicatorPaneInfo[studyId] = {
+            overlay: config.overlay,
+            yAxisRange: config.yAxisRange,
+            name: config.name,
+            inputs,
+          };
+        }
       }
 
       this._ui.setActiveIndicators(activeIndicators, indicatorPaneInfo);
@@ -1005,6 +1112,12 @@ export class TealchartWidget {
    * Handle adding a built-in indicator
    */
   private _handleAddIndicator(indicator: BuiltinIndicator): void {
+    // Handle jailbreak indicators
+    if (isJailbreakIndicator(indicator)) {
+      this._handleAddJailbreakIndicator(indicator);
+      return;
+    }
+
     if (!this._tealScriptManager) {
       console.warn('[Tealchart] Tealscript not available - cannot add indicator');
       return;
@@ -1053,6 +1166,41 @@ export class TealchartWidget {
       .catch((error) => {
         console.error(`[Tealchart] Failed to add indicator ${indicator.name}:`, error);
       });
+  }
+
+  /**
+   * Handle adding a jailbreak (canvas-drawing) indicator
+   */
+  private _handleAddJailbreakIndicator(indicator: BuiltinIndicator): void {
+    if (!this._jailbreakManager || !indicator.jailbreak) {
+      console.warn('[Tealchart] Jailbreak manager not available or indicator not jailbreak');
+      return;
+    }
+
+    const factory = this._options.jailbreakIndicatorFactories?.[indicator.id];
+    if (!factory) {
+      console.warn(`[Tealchart] No factory for jailbreak indicator: ${indicator.id}`);
+      return;
+    }
+
+    const instanceId = generateIndicatorId(indicator.id);
+    const barsIndicator = factory();
+    const settings = this._buildJailbreakSettings(indicator, {});
+    const behindCandles = indicator.jailbreak.behindCandles ?? false;
+
+    this._jailbreakManager.register(instanceId, barsIndicator, settings, behindCandles);
+    this._jailbreakInstanceIds.add(instanceId);
+
+    // Store indicator config for pane lookup
+    this._indicatorConfigMap.set(instanceId, indicator);
+
+    // Persist to settings (inputs get the defaults)
+    this._persistAddIndicator(instanceId, indicator);
+
+    // Propagate jailbreak manager to rendering pipeline
+    this._ui?.setJailbreakManager(this._jailbreakManager);
+
+    this._scheduler.markDirty(DIRTY.FULL);
   }
 
   /**
@@ -1186,6 +1334,12 @@ export class TealchartWidget {
    * Handle toggling indicator visibility
    */
   private _handleToggleIndicator(indicatorId: string): void {
+    // Check if this is a jailbreak indicator (indicatorId IS the instanceId)
+    if (this._jailbreakInstanceIds.has(indicatorId)) {
+      this._handleToggleJailbreakIndicator(indicatorId);
+      return;
+    }
+
     // Toggle visibility on both the API (for UI state) and TealscriptManager (for plot rendering)
     this._chartApi.toggleStudyVisibility(indicatorId);
     this._tealScriptManager?.toggleScriptVisibility(indicatorId);
@@ -1194,6 +1348,45 @@ export class TealchartWidget {
     this._persistToggleIndicatorVisibility(indicatorId);
 
     // Re-render to update the legend
+    this._scheduler.markDirty(DIRTY.FULL);
+  }
+
+  /**
+   * Toggle visibility for a jailbreak indicator
+   */
+  private _handleToggleJailbreakIndicator(instanceId: string): void {
+    if (!this._jailbreakManager || !this._chartStore) return;
+
+    const currentIndicators = this._chartStore.settings.get().indicators;
+    const instance = currentIndicators.find((ind) => ind.id === instanceId);
+    if (!instance) return;
+
+    const newVisible = !instance.isVisible;
+
+    if (newVisible) {
+      // Re-register the indicator if it was hidden
+      const builtin = getIndicatorById(instance.builtinId);
+      if (builtin?.jailbreak) {
+        const factory = this._options.jailbreakIndicatorFactories?.[builtin.id];
+        if (factory) {
+          const barsIndicator = factory();
+          const settings = this._buildJailbreakSettings(builtin, instance.inputs);
+          const behindCandles =
+            (instance.inputs.behindCandles as boolean | undefined) ?? builtin.jailbreak.behindCandles ?? false;
+          this._jailbreakManager.register(instanceId, barsIndicator, settings, behindCandles);
+        }
+      }
+    } else {
+      // Unregister to hide
+      this._jailbreakManager.unregister(instanceId);
+    }
+
+    // Persist
+    const updatedIndicators = currentIndicators.map((ind) =>
+      ind.id === instanceId ? { ...ind, isVisible: newVisible } : ind,
+    );
+    this._chartStore.settings.setKey('indicators', updatedIndicators);
+    this._markDirty();
     this._scheduler.markDirty(DIRTY.FULL);
   }
 
@@ -1219,6 +1412,12 @@ export class TealchartWidget {
    * Handle removing an indicator
    */
   private _handleRemoveIndicator(indicatorId: string): void {
+    // Check if this is a jailbreak indicator
+    if (this._jailbreakInstanceIds.has(indicatorId)) {
+      this._handleRemoveJailbreakIndicator(indicatorId);
+      return;
+    }
+
     // Persist removal
     this._persistRemoveIndicator(indicatorId);
 
@@ -1240,6 +1439,25 @@ export class TealchartWidget {
   }
 
   /**
+   * Handle removing a jailbreak indicator
+   */
+  private _handleRemoveJailbreakIndicator(instanceId: string): void {
+    if (!this._chartStore) return;
+
+    // Unregister from jailbreak manager
+    this._jailbreakManager?.unregister(instanceId);
+    this._jailbreakInstanceIds.delete(instanceId);
+    this._indicatorConfigMap.delete(instanceId);
+
+    // Remove from persisted settings
+    const currentIndicators = this._chartStore.settings.get().indicators;
+    const updatedIndicators = currentIndicators.filter((ind) => ind.id !== instanceId);
+    this._chartStore.settings.setKey('indicators', updatedIndicators);
+    this._markDirty();
+    this._scheduler.markDirty(DIRTY.FULL);
+  }
+
+  /**
    * Persist indicator removal
    */
   private _persistRemoveIndicator(studyId: string): void {
@@ -1256,16 +1474,41 @@ export class TealchartWidget {
   }
 
   /**
-   * Get input definitions for a study
+   * Get input definitions for a study (or jailbreak indicator instance)
    */
   getStudyInputDefinitions(studyId: string): import('@tealstreet/tealscript').InputDefinition[] {
+    // Check if this is a jailbreak indicator
+    if (this._jailbreakInstanceIds.has(studyId)) {
+      return this._getJailbreakInputDefinitions(studyId);
+    }
     return this._tealScriptManager?.getInputDefinitions(studyId) ?? [];
   }
 
   /**
-   * Set input values for a study
+   * Get input definitions for a jailbreak indicator instance
+   */
+  private _getJailbreakInputDefinitions(instanceId: string): import('@tealstreet/tealscript').InputDefinition[] {
+    if (!this._chartStore) return [];
+
+    const instance = this._chartStore.settings.get().indicators.find((ind) => ind.id === instanceId);
+    if (!instance) return [];
+
+    const builtin = getIndicatorById(instance.builtinId);
+    if (!builtin?.jailbreak) return [];
+
+    return jailbreakInputsToInputDefinitions(builtin.jailbreak.inputs);
+  }
+
+  /**
+   * Set input values for a study (or jailbreak indicator instance)
    */
   setStudyInputs(studyId: string, inputs: Record<string, unknown>): void {
+    // Check if this is a jailbreak indicator
+    if (this._jailbreakInstanceIds.has(studyId)) {
+      this._setJailbreakInputs(studyId, inputs);
+      return;
+    }
+
     if (this._tealScriptManager) {
       this._tealScriptManager.setInputs(studyId, inputs);
       // Also update the API's study state
@@ -1280,6 +1523,45 @@ export class TealchartWidget {
       // Re-render to update the legend
       this._scheduler.markDirty(DIRTY.FULL);
     }
+  }
+
+  /**
+   * Set inputs for a jailbreak indicator and update its registration
+   */
+  private _setJailbreakInputs(instanceId: string, inputs: Record<string, unknown>): void {
+    if (!this._jailbreakManager || !this._chartStore) return;
+
+    const instance = this._chartStore.settings.get().indicators.find((ind) => ind.id === instanceId);
+    if (!instance) return;
+
+    const builtin = getIndicatorById(instance.builtinId);
+    if (!builtin?.jailbreak) return;
+
+    // Merge new inputs with existing
+    const mergedInputs = { ...instance.inputs, ...inputs };
+
+    // Rebuild settings and update the jailbreak manager
+    const settings = this._buildJailbreakSettings(builtin, mergedInputs);
+    this._jailbreakManager.updateSettings(instanceId, settings);
+
+    // Handle behindCandles change: need to re-register since behindCandles is set at register time
+    const newBehindCandles =
+      (mergedInputs.behindCandles as boolean | undefined) ?? builtin.jailbreak.behindCandles ?? false;
+    const factory = this._options.jailbreakIndicatorFactories?.[builtin.id];
+    if (factory && instance.isVisible) {
+      const barsIndicator = factory();
+      this._jailbreakManager.unregister(instanceId);
+      this._jailbreakManager.register(instanceId, barsIndicator, settings, newBehindCandles);
+    }
+
+    // Persist
+    const currentIndicators = this._chartStore.settings.get().indicators;
+    const updatedIndicators = currentIndicators.map((ind) =>
+      ind.id === instanceId ? { ...ind, inputs: mergedInputs } : ind,
+    );
+    this._chartStore.settings.setKey('indicators', updatedIndicators);
+    this._markDirty();
+    this._scheduler.markDirty(DIRTY.FULL);
   }
 
   /**
@@ -1603,6 +1885,10 @@ export class TealchartWidget {
       this._tealScriptManager.dispose();
       this._tealScriptManager = null;
     }
+
+    // Clean up jailbreak indicator state
+    this._jailbreakManager = null;
+    this._jailbreakInstanceIds.clear();
 
     // Clean up chart API
     this._chartApi.dispose();
