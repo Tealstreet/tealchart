@@ -36,6 +36,21 @@ export interface InteractiveLineRendererOptions {
   onPositionReverse?: (positionId: string) => void;
   onTPDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
   onSLDragEnd?: (positionId: string, price: number, partialPercent?: number) => void;
+  onTPMove?: (
+    positionId: string,
+    price: number,
+    partialPercent: number,
+    dragStartX: number,
+    dragCurrentX: number,
+  ) => void;
+  onSLMove?: (
+    positionId: string,
+    price: number,
+    partialPercent: number,
+    dragStartX: number,
+    dragCurrentX: number,
+  ) => void;
+  onTPSLDragCancel?: () => void;
   onTPClick?: (positionId: string) => void;
   onSLClick?: (positionId: string) => void;
   onCursorChange?: (cursor: 'default' | 'pointer' | 'grab' | 'grabbing') => void;
@@ -169,6 +184,7 @@ export class InteractiveLineRenderer {
           if (this.tpslDrag) {
             this.tpslDrag = null;
             this.options.onCursorChange?.('default');
+            this.options.onTPSLDragCancel?.();
           }
         }
       }) as EventListener,
@@ -762,6 +778,18 @@ export class InteractiveLineRenderer {
         isDragStarted = true;
         this.options.onCursorChange?.('grabbing');
       }
+
+      if (isDragStarted) {
+        const rect = this.container.getBoundingClientRect();
+        const localY = e.clientY - rect.top;
+        const price = this.options.yToPrice(localY);
+        const partialPercent = this.tpslDrag.partialEnabled ? calculatePartialPercent(startX, e.clientX) : 100;
+        if (type === 'tp') {
+          this.options.onTPMove?.(this.tpslDrag.positionId, price, partialPercent, startX, e.clientX);
+        } else {
+          this.options.onSLMove?.(this.tpslDrag.positionId, price, partialPercent, startX, e.clientX);
+        }
+      }
     };
 
     const onPointerUp = (e: PointerEvent) => {
@@ -796,8 +824,11 @@ export class InteractiveLineRenderer {
     };
 
     const onPointerCancel = () => {
-      this.tpslDrag = null;
-      this.options.onCursorChange?.('default');
+      if (this.tpslDrag) {
+        this.tpslDrag = null;
+        this.options.onCursorChange?.('default');
+        this.options.onTPSLDragCancel?.();
+      }
     };
 
     buttonEl.addEventListener('pointerdown', onPointerDown);
