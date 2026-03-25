@@ -643,8 +643,17 @@ export class ChartCore {
       },
       onCursorChange: (cursor) => {
         if (this.cursor !== cursor) {
+          const wasDragging = this.cursor === 'grabbing';
           this.cursor = cursor;
           this.chartContainer.style.cursor = cursor;
+          // Clear crosshair overlay when drag starts or ends.
+          // On start: removes stale crosshair lines during drag.
+          // On end: prevents ghost crosshair at pre-drag position
+          // (next mousemove will update position and redraw).
+          if (cursor === 'grabbing' || wasDragging) {
+            this.crosshair.visible = false;
+            this.renderCrosshairOverlay();
+          }
         }
       },
     });
