@@ -3,18 +3,22 @@
  * Contains symbol info, timeframe selector, indicators button, and optional layout selector.
  * OHLC values are displayed in the ChartLegend component.
  */
+import type { ChartSettings } from '../state/chartState';
+import type { LayoutSelectorProps } from './LayoutSelector';
 
 import React, { memo, useCallback, useMemo, useState } from 'react';
+
 import { useStore } from '@nanostores/react';
-import { createChartFocusAtoms, AVAILABLE_TIMEFRAMES, type ChartSettings } from '../state/chartState';
-import { useChartApiOptional } from '../state/ChartApiContext';
-import { IndicatorsModal } from './IndicatorsModal';
-import { LayoutSelector, type LayoutSelectorProps } from './LayoutSelector';
-import { DebugConsole } from './DebugConsole';
-import { type BuiltinIndicator } from '../indicators/builtinIndicators';
-import { ResolutionString, GapDetectionErrorState } from '../types';
+
 import { TealchartLogger } from '../debug/TealchartLogger';
 import { useChartTranslations } from '../i18n';
+import { type BuiltinIndicator } from '../indicators/builtinIndicators';
+import { useChartApiOptional } from '../state/ChartApiContext';
+import { AVAILABLE_TIMEFRAMES, createChartFocusAtoms } from '../state/chartState';
+import { GapDetectionErrorState, ResolutionString } from '../types';
+import { DebugConsole } from './DebugConsole';
+import { IndicatorsModal } from './IndicatorsModal';
+import { LayoutSelector } from './LayoutSelector';
 
 // ============================================================================
 // Styles
@@ -152,140 +156,163 @@ export interface ChartTopBarProps {
   gapDetectionError?: GapDetectionErrorState | null;
   /** Debug logger for this chart (optional - enables debug console) */
   logger?: TealchartLogger | null;
+  /** Supported resolutions from datafeed (filters timeframe buttons) */
+  supportedResolutions?: string[] | null;
 }
 
 // ============================================================================
 // Component
 // ============================================================================
 
-export const ChartTopBar: React.FC<ChartTopBarProps> = memo(({
-  chartKey,
-  symbol,
-  exchangeName,
-  onIntervalChange,
-  onSymbolChange: _onSymbolChange,
-  onAddIndicator,
-  activeIndicatorIds = [],
-  cssVars,
-  saveLoadAdapter,
-  onLoadLayout,
-  onSaveLayout,
-  gapDetectionError,
-  logger,
-}) => {
-  // Translations
-  const t = useChartTranslations();
+export const ChartTopBar: React.FC<ChartTopBarProps> = memo(
+  ({
+    chartKey,
+    symbol,
+    exchangeName,
+    onIntervalChange,
+    onSymbolChange: _onSymbolChange,
+    onAddIndicator,
+    activeIndicatorIds = [],
+    cssVars,
+    saveLoadAdapter,
+    onLoadLayout,
+    onSaveLayout,
+    gapDetectionError,
+    logger,
+    supportedResolutions,
+  }) => {
+    // Translations
+    const t = useChartTranslations();
 
-  // Get chart API from context (optional - may not be available in standalone usage)
-  const chartApi = useChartApiOptional();
+    // Filter timeframes by supported resolutions (if set by datafeed)
+    const timeframes = useMemo(() => {
+      if (!supportedResolutions || supportedResolutions.length === 0) {
+        return AVAILABLE_TIMEFRAMES;
+      }
+      const filtered = AVAILABLE_TIMEFRAMES.filter((tf) => supportedResolutions.includes(tf.value));
+      return filtered.length > 0 ? filtered : AVAILABLE_TIMEFRAMES;
+    }, [supportedResolutions]);
 
-  // Modal state
-  const [isIndicatorsModalOpen, setIndicatorsModalOpen] = useState(false);
-  const [indicatorsButtonHovered, setIndicatorsButtonHovered] = useState(false);
+    // Get chart API from context (optional - may not be available in standalone usage)
+    const chartApi = useChartApiOptional();
 
-  // Get chart stores for this chart
-  const chartStores = useMemo(() => createChartFocusAtoms(chartKey), [chartKey]);
-  const interval = useStore(chartStores.intervalAtom);
-  const setInterval = chartStores.setInterval;
+    // Modal state
+    const [isIndicatorsModalOpen, setIndicatorsModalOpen] = useState(false);
+    const [indicatorsButtonHovered, setIndicatorsButtonHovered] = useState(false);
 
-  // Handle timeframe change
-  // This does THREE things:
-  // 1. Updates Nanostores (for persistence via localStorage)
-  // 2. Calls chartApi.setResolution() which emits to TradingView-style subscribers
-  // 3. Calls the optional external onIntervalChange callback
-  const handleTimeframeClick = useCallback((newInterval: ResolutionString) => {
-    setInterval(newInterval);  // Persist to localStorage
-    chartApi?.setResolution(newInterval);  // Emit to subscribers + trigger data reload
-    onIntervalChange?.(newInterval);  // External callback
-  }, [setInterval, chartApi, onIntervalChange]);
+    // Get chart stores for this chart
+    const chartStores = useMemo(() => createChartFocusAtoms(chartKey), [chartKey]);
+    const interval = useStore(chartStores.intervalAtom);
+    const setInterval = chartStores.setInterval;
 
-  // Handle indicator selection
-  const handleIndicatorSelect = useCallback((indicator: BuiltinIndicator) => {
-    onAddIndicator?.(indicator);
-  }, [onAddIndicator]);
+    // Handle timeframe change
+    // This does THREE things:
+    // 1. Updates Nanostores (for persistence via localStorage)
+    // 2. Calls chartApi.setResolution() which emits to TradingView-style subscribers
+    // 3. Calls the optional external onIntervalChange callback
+    const handleTimeframeClick = useCallback(
+      (newInterval: ResolutionString) => {
+        setInterval(newInterval); // Persist to localStorage
+        chartApi?.setResolution(newInterval); // Emit to subscribers + trigger data reload
+        onIntervalChange?.(newInterval); // External callback
+      },
+      [setInterval, chartApi, onIntervalChange],
+    );
 
-  // Combine styles with CSS vars
-  const containerStyle = useMemo(() => ({
-    ...styles.container,
-    ...cssVars,
-  }), [cssVars]);
+    // Handle indicator selection
+    const handleIndicatorSelect = useCallback(
+      (indicator: BuiltinIndicator) => {
+        onAddIndicator?.(indicator);
+      },
+      [onAddIndicator],
+    );
 
-  return (
-    <div style={containerStyle}>
-      {/* Symbol */}
-      <div style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
-        <span style={styles.symbol}>{symbol}</span>
-        {exchangeName && <span style={styles.exchange}>{exchangeName}</span>}
-      </div>
+    // Combine styles with CSS vars
+    const containerStyle = useMemo(
+      () => ({
+        ...styles.container,
+        ...cssVars,
+      }),
+      [cssVars],
+    );
 
-      <div style={styles.divider} />
-
-      {/* Timeframe selector */}
-      <div style={styles.timeframeGroup}>
-        {AVAILABLE_TIMEFRAMES.map((tf) => (
-          <TimeframeButton
-            key={tf.value}
-            value={tf.value}
-            label={tf.shortLabel}
-            isActive={interval === tf.value}
-            onClick={handleTimeframeClick}
-          />
-        ))}
-      </div>
-
-      <div style={styles.divider} />
-
-      {/* Indicators button */}
-      <button
-        style={{
-          ...styles.indicatorsButton,
-          ...(indicatorsButtonHovered ? styles.indicatorsButtonHover : {}),
-        }}
-        onClick={() => setIndicatorsModalOpen(true)}
-        onMouseEnter={() => setIndicatorsButtonHovered(true)}
-        onMouseLeave={() => setIndicatorsButtonHovered(false)}
-      >
-        <span style={styles.indicatorsIcon}>ƒ</span>
-        <span>{t.indicators}</span>
-      </button>
-
-      {/* Gap detection error indicator */}
-      {gapDetectionError?.hasError && (
-        <div
-          style={styles.errorIndicator}
-          title={`Data sync issue: ${gapDetectionError.reason || 'unknown'} (${gapDetectionError.retryCount}/${gapDetectionError.maxRetries} retries)`}
-        >
-          <span>⚠️</span>
-          <span>Sync issue</span>
+    return (
+      <div style={containerStyle}>
+        {/* Symbol */}
+        <div style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
+          <span style={styles.symbol}>{symbol}</span>
+          {exchangeName && <span style={styles.exchange}>{exchangeName}</span>}
         </div>
-      )}
 
-      {/* Debug console (optional) */}
-      {logger && <DebugConsole logger={logger} />}
+        <div style={styles.divider} />
 
-      {/* Spacer to push layout selector to the right */}
-      <div style={styles.spacer} />
+        {/* Timeframe selector */}
+        <div style={styles.timeframeGroup}>
+          {timeframes.map((tf) => (
+            <TimeframeButton
+              key={tf.value}
+              value={tf.value}
+              label={tf.shortLabel}
+              isActive={interval === tf.value}
+              onClick={handleTimeframeClick}
+            />
+          ))}
+        </div>
 
-      {/* Layout selector (optional, right-aligned) */}
-      {saveLoadAdapter && onLoadLayout && (
-        <LayoutSelector
-          chartKey={chartKey}
-          saveLoadAdapter={saveLoadAdapter}
-          onLoadLayout={onLoadLayout}
-          onSaveLayout={onSaveLayout}
+        <div style={styles.divider} />
+
+        {/* Indicators button */}
+        <button
+          style={{
+            ...styles.indicatorsButton,
+            ...(indicatorsButtonHovered ? styles.indicatorsButtonHover : {}),
+          }}
+          onClick={() => setIndicatorsModalOpen(true)}
+          onMouseEnter={() => setIndicatorsButtonHovered(true)}
+          onMouseLeave={() => setIndicatorsButtonHovered(false)}
+        >
+          <span style={styles.indicatorsIcon}>ƒ</span>
+          <span>{t.indicators}</span>
+        </button>
+
+        {/* Gap detection error indicator */}
+        {gapDetectionError?.hasError && (
+          <div
+            style={styles.errorIndicator}
+            title={`Data sync issue: ${gapDetectionError.reason || 'unknown'} (${gapDetectionError.retryCount}/${gapDetectionError.maxRetries} retries)`}
+          >
+            <span>⚠️</span>
+            <span>Sync issue</span>
+          </div>
+        )}
+
+        {/* Debug console (optional) */}
+        {logger && <DebugConsole logger={logger} />}
+
+        {/* Spacer to push layout selector to the right */}
+        <div style={styles.spacer} />
+
+        {/* Layout selector (optional, right-aligned) */}
+        {saveLoadAdapter && onLoadLayout && (
+          <LayoutSelector
+            chartKey={chartKey}
+            saveLoadAdapter={saveLoadAdapter}
+            onLoadLayout={onLoadLayout}
+            onSaveLayout={onSaveLayout}
+          />
+        )}
+
+        {/* Indicators Modal */}
+        <IndicatorsModal
+          isOpen={isIndicatorsModalOpen}
+          onClose={() => setIndicatorsModalOpen(false)}
+          onSelectIndicator={handleIndicatorSelect}
+          activeIndicatorIds={activeIndicatorIds}
         />
-      )}
-
-      {/* Indicators Modal */}
-      <IndicatorsModal
-        isOpen={isIndicatorsModalOpen}
-        onClose={() => setIndicatorsModalOpen(false)}
-        onSelectIndicator={handleIndicatorSelect}
-        activeIndicatorIds={activeIndicatorIds}
-      />
-    </div>
-  );
-});
+      </div>
+    );
+  },
+);
 
 ChartTopBar.displayName = 'ChartTopBar';
 
@@ -300,19 +327,17 @@ interface TimeframeButtonProps {
   onClick: (value: ResolutionString) => void;
 }
 
-const TimeframeButton: React.FC<TimeframeButtonProps> = memo(({
-  value,
-  label,
-  isActive,
-  onClick,
-}) => {
+const TimeframeButton: React.FC<TimeframeButtonProps> = memo(({ value, label, isActive, onClick }) => {
   const [isHovered, setIsHovered] = React.useState(false);
 
-  const buttonStyle = useMemo(() => ({
-    ...styles.timeframeButton,
-    ...(isActive ? styles.timeframeButtonActive : {}),
-    ...(isHovered && !isActive ? styles.timeframeButtonHover : {}),
-  }), [isActive, isHovered]);
+  const buttonStyle = useMemo(
+    () => ({
+      ...styles.timeframeButton,
+      ...(isActive ? styles.timeframeButtonActive : {}),
+      ...(isHovered && !isActive ? styles.timeframeButtonHover : {}),
+    }),
+    [isActive, isHovered],
+  );
 
   return (
     <button

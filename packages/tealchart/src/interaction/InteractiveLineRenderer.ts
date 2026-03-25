@@ -437,7 +437,9 @@ export class InteractiveLineRenderer {
     const crosshairBound = bounds.find((b) => b.type === 'crosshair');
     if (this.crosshairLabel && crosshairBound) {
       const crosshairY = crosshairBound.adjustedY;
-      this.crosshairLabel.style.top = `${crosshairY - crosshairBound.height / 2}px`;
+      const labelX = this.options.width - crosshairBound.width;
+      const labelY = crosshairY - crosshairBound.height / 2;
+      this.crosshairLabel.style.transform = `translate(${labelX}px, ${labelY}px)`;
       const primarySpan = this.crosshairLabel.querySelector('span');
       if (primarySpan && primarySpan.textContent !== crosshairBound.label.primaryText) {
         primarySpan.textContent = crosshairBound.label.primaryText;
@@ -478,8 +480,7 @@ export class InteractiveLineRenderer {
 
     const label = document.createElement('div');
     label.className = 'tc-crosshair-label';
-    label.style.left = `${labelX}px`;
-    label.style.top = `${labelY}px`;
+    label.style.transform = `translate(${labelX}px, ${labelY}px)`;
     label.style.width = `${bound.width}px`;
     label.style.height = `${bound.height}px`;
     label.style.backgroundColor = bound.label.backgroundColor || bound.color;
@@ -995,28 +996,13 @@ export class InteractiveLineRenderer {
   // Private: Crosshair vertical line
   // ==========================================================================
 
-  private updateCrosshairVLine(crosshair?: CrosshairLabelData): void {
-    if (!crosshair?.visible) {
-      // Hide existing
-      if (this.crosshairVLine) {
-        this.crosshairVLine.style.display = 'none';
-      }
-      return;
+  private updateCrosshairVLine(_crosshair?: CrosshairLabelData): void {
+    // Crosshair vertical line is now drawn on the canvas overlay (ChartCore.renderCrosshairOverlay).
+    // No HTML element needed — eliminates DOM mutations on every frame.
+    if (this.crosshairVLine) {
+      this.crosshairVLine.remove();
+      this.crosshairVLine = null;
     }
-
-    if (!this.crosshairVLine) {
-      // Create once, reuse
-      const vline = document.createElement('div');
-      vline.className = 'tc-crosshair-vline';
-      this.lineContainer.appendChild(vline);
-      this.crosshairVLine = vline;
-    }
-
-    // Update in-place
-    this.crosshairVLine.style.display = '';
-    this.crosshairVLine.style.left = `${crosshair.x}px`;
-    this.crosshairVLine.style.height = `${this.options.height}px`;
-    this.crosshairVLine.style.borderLeftColor = crosshair.color;
   }
 
   // ==========================================================================

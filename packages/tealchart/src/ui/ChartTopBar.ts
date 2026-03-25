@@ -145,6 +145,7 @@ const styles = {
 export class ChartTopBar extends Component<ChartTopBarState> {
   private options: ChartTopBarOptions;
   private chartStore: ChartStore;
+  private supportedResolutions: string[] | null = null;
 
   // Element references
   private timeframeButtons: Map<string, HTMLButtonElement> = new Map();
@@ -223,7 +224,15 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     // Timeframe selector
     const tfGroup = this.createElement('div', { style: styles.timeframeGroup });
 
-    for (const tf of AVAILABLE_TIMEFRAMES) {
+    // Filter timeframes by supported resolutions (if set by datafeed)
+    const filteredTimeframes =
+      this.supportedResolutions && this.supportedResolutions.length > 0
+        ? AVAILABLE_TIMEFRAMES.filter((tf) => this.supportedResolutions!.includes(tf.value))
+        : AVAILABLE_TIMEFRAMES;
+    // Fall back to full list if filtering removes everything
+    const timeframes = filteredTimeframes.length > 0 ? filteredTimeframes : AVAILABLE_TIMEFRAMES;
+
+    for (const tf of timeframes) {
       const isActive = this.state.interval === tf.value;
 
       const btn = this.createElement('button', {
@@ -357,6 +366,15 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     if (exchangeName !== undefined) {
       this.options.exchangeName = exchangeName;
     }
+    this.render();
+  }
+
+  /**
+   * Update the supported resolutions (filters timeframe buttons)
+   * Pass null to show all timeframes (backward compat).
+   */
+  setSupportedResolutions(resolutions: string[] | null): void {
+    this.supportedResolutions = resolutions;
     this.render();
   }
 

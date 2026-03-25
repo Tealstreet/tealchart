@@ -75,6 +75,8 @@ export interface EventManagerCallbacks {
   getTimeFromX?: (x: number) => number;
   /** Called on double-click/double-tap on a pane */
   onPaneDoubleClick?: (paneId: string) => void;
+  /** Crosshair-only render (skips main canvas repaint) */
+  onCrosshairRender?: () => void;
 }
 
 export type DragMode = 'none' | 'pan' | 'priceAxisZoom' | 'paneDivider';
@@ -252,6 +254,10 @@ export class EventManager {
   dispose(): void {
     this.detach();
     this.clearLongPressTimer();
+    if (this._inputRafId !== null) {
+      cancelAnimationFrame(this._inputRafId);
+      this._inputRafId = null;
+    }
   }
 
   // ============================================================================
@@ -379,10 +385,67 @@ export class EventManager {
     this.scheduleRender();
   }
 
+  // Unified pending input state — all high-frequency handlers store data and defer to RAF
+  private _pendingEventType: 'none' | 'move' | 'drag' | 'touchmove' | 'leave' | 'docmove' = 'none';
+  private _pendingMouseClientX = 0;
+  private _pendingMouseClientY = 0;
+  private _pendingTouchEvent: TouchEvent | null = null;
+  private _inputRafId: number | null = null;
+
+  /**
+   * Schedule deferred input processing in next RAF frame.
+   * All high-frequency handlers (mousemove, drag, touchmove, leave, docmove)
+   * store their data and call this instead of processing inline.
+   */
+  private scheduleInputProcessing(): void {
+    if (this._inputRafId !== null) return; // Already scheduled
+    this._inputRafId = requestAnimationFrame(() => {
+      this._inputRafId = null;
+      this.processInput();
+    });
+  }
+
+  /**
+   * Process the pending input event based on type.
+   */
+  private processInput(): void {
+    const type = this._pendingEventType;
+    this._pendingEventType = 'none';
+
+    switch (type) {
+      case 'move':
+        this.processMouseMove();
+        break;
+      case 'drag':
+        this.processDrag();
+        break;
+      case 'touchmove':
+        if (this._pendingTouchEvent) {
+          this.processTouchMove(this._pendingTouchEvent);
+          this._pendingTouchEvent = null;
+        }
+        break;
+      case 'leave':
+        this.processMouseLeave();
+        break;
+      case 'docmove':
+        this.processDocumentMouseMove();
+        break;
+    }
+  }
+
   private handleMouseMove(e: MouseEvent): void {
+    // Store raw coordinates and defer ALL processing to RAF.
+    this._pendingMouseClientX = e.clientX;
+    this._pendingMouseClientY = e.clientY;
+    this._pendingEventType = 'move';
+    this.scheduleInputProcessing();
+  }
+
+  private processMouseMove(): void {
     const rect = this.container.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = this._pendingMouseClientX - rect.left;
+    const y = this._pendingMouseClientY - rect.top;
 
     this.state.hoveredX = x;
     this.state.hoveredY = y;
@@ -424,9 +487,8 @@ export class EventManager {
           this.callbacks.onCursorChange?.('crosshair');
         }
       }
-      // Only schedule render when NOT dragging
-      // During drag, handleWindowMouseMove handles rendering via onViewportChange
-      this.scheduleRender();
+      // Render crosshair overlay directly (we're already in RAF)
+      this.callbacks.onCrosshairRender?.();
     }
     // Note: During drag, we don't call scheduleRender here because
     // handleWindowMouseMove → handlePan → onViewportChange already does it
@@ -434,10 +496,19 @@ export class EventManager {
 
   private handleWindowMouseMove(e: MouseEvent): void {
     if (!this.state.isDragging) return;
+    // Store coordinates and defer to RAF
+    this._pendingMouseClientX = e.clientX;
+    this._pendingMouseClientY = e.clientY;
+    this._pendingEventType = 'drag';
+    this.scheduleInputProcessing();
+  }
+
+  private processDrag(): void {
+    if (!this.state.isDragging) return;
 
     const rect = this.container.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = this._pendingMouseClientX - rect.left;
+    const y = this._pendingMouseClientY - rect.top;
 
     // Handle pane divider dragging
     if (this.state.dragMode === 'paneDivider') {
@@ -453,15 +524,13 @@ export class EventManager {
     if (this.state.dragMode === 'pan') {
       this.handlePan(dx, dy);
       // Update crosshair to follow data during pan
-      // Crosshair moves with the drag to stay on the same data point
       this.crosshair.x = this.state.dragStartCrosshairX + dx;
       this.crosshair.y = this.state.dragStartCrosshairY + dy;
       this.callbacks.onCrossHairMoved?.(this.crosshair.x, this.crosshair.y);
     } else if (this.state.dragMode === 'priceAxisZoom') {
       this.handlePriceAxisZoom(dy);
     }
-    // Note: handlePan and handlePriceAxisZoom call onViewportChange which already schedules a render
-    // No need to call scheduleRender() here to avoid double-rendering
+    // handlePan/handlePriceAxisZoom call onViewportChange(Internal) which schedules render
   }
 
   private handleMouseUp(e: MouseEvent): void {
@@ -524,6 +593,13 @@ export class EventManager {
 
   private handleMouseLeave(_e: MouseEvent): void {
     if (!this.state.isDragging) {
+      this._pendingEventType = 'leave';
+      this.scheduleInputProcessing();
+    }
+  }
+
+  private processMouseLeave(): void {
+    if (!this.state.isDragging) {
       const wasVisible = this.crosshair.visible;
       this.crosshair.visible = false;
       if (wasVisible) {
@@ -542,10 +618,27 @@ export class EventManager {
     if (this.state.isDragging) return;
     // Skip if crosshair not visible (nothing to hide)
     if (!this.crosshair.visible) return;
+    // Don't overwrite a higher-priority pending event (move, drag, touchmove)
+    // Both container mousemove and document mousemove fire for the same event —
+    // container handler sets 'move', we must not clobber it with 'docmove'
+    if (this._pendingEventType !== 'none') return;
+
+    this._pendingMouseClientX = e.clientX;
+    this._pendingMouseClientY = e.clientY;
+    this._pendingEventType = 'docmove';
+    this.scheduleInputProcessing();
+  }
+
+  private processDocumentMouseMove(): void {
+    if (this.state.isDragging) return;
+    if (!this.crosshair.visible) return;
 
     const rect = this.container.getBoundingClientRect();
     const isInside =
-      e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+      this._pendingMouseClientX >= rect.left &&
+      this._pendingMouseClientX <= rect.right &&
+      this._pendingMouseClientY >= rect.top &&
+      this._pendingMouseClientY <= rect.bottom;
 
     if (!isInside) {
       // Mouse is outside container - hide crosshair
@@ -664,7 +757,7 @@ export class EventManager {
   }
 
   private handleTouchMove(e: TouchEvent): void {
-    // Update tracked touches
+    // Update tracked touches synchronously (needed for state consistency)
     for (const touch of Array.from(e.changedTouches)) {
       this.activeTouches.set(touch.identifier, {
         x: touch.clientX,
@@ -672,6 +765,16 @@ export class EventManager {
       });
     }
 
+    // preventDefault must be synchronous
+    e.preventDefault();
+
+    // Store touch event data and defer heavy processing to RAF
+    this._pendingTouchEvent = e;
+    this._pendingEventType = 'touchmove';
+    this.scheduleInputProcessing();
+  }
+
+  private processTouchMove(e: TouchEvent): void {
     const rect = this.container.getBoundingClientRect();
 
     if (e.touches.length === 1 && this.touchStart) {
@@ -696,14 +799,12 @@ export class EventManager {
           this.callbacks.onCrossHairMoved?.(this.crosshair.x, this.crosshair.y);
         } else if (this.state.dragMode === 'priceAxisZoom') {
           this.handlePriceAxisZoom(dy);
-          // handlePriceAxisZoom calls onViewportChange which schedules render
         } else {
           this.handlePan(dx, dy);
           // Update crosshair to follow data during touch pan
           this.crosshair.x = this.state.dragStartCrosshairX + dx;
           this.crosshair.y = this.state.dragStartCrosshairY + dy;
           this.callbacks.onCrossHairMoved?.(this.crosshair.x, this.crosshair.y);
-          // handlePan calls onViewportChange which schedules render
         }
       }
     } else if (e.touches.length === 2 && this.pinchStartViewport) {
@@ -718,16 +819,11 @@ export class EventManager {
         const scale = this.pinchStartDistance / currentDistance;
         const dims = this.callbacks.getDimensions();
         const newViewport = this.zoomViewport(this.pinchStartViewport, scale, dims.width);
-        // Use internal callback during pinch to avoid triggering external callbacks
         const updateViewport = this.callbacks.onViewportChangeInternal ?? this.callbacks.onViewportChange;
         updateViewport?.(newViewport);
-        // updateViewport schedules render, no need for extra scheduleRender
       }
     }
-
-    e.preventDefault();
-    // Note: Most cases above already schedule render via onViewportChange or onCrossHairMoved
-    // Only schedule here for edge cases not covered above
+    // handlePan/handlePriceAxisZoom/onViewportChange/onCrossHairMoved schedule render
   }
 
   private handleTouchEnd(e: TouchEvent): void {
