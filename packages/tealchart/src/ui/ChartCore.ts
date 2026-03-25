@@ -451,7 +451,8 @@ export class ChartCore {
   private resetButton: HTMLButtonElement | null = null;
   private resetButtonHoverZone: HTMLDivElement | null = null;
   private contextMenu: HTMLDivElement | null = null;
-  private contextMenuPlusButton: HTMLDivElement | null = null;
+  // + button drawn on crosshair canvas — hit-test bounds for click detection
+  private _plusButtonBounds: { x: number; y: number; r: number } | null = null;
 
   // Core components
   private renderer: TealchartRenderer;
@@ -619,13 +620,14 @@ export class ChartCore {
         return getNumberFormatter(decimals).format(price);
       },
       onCursorChange: (cursor) => {
-        this.cursor = cursor;
-        this.chartContainer.style.cursor = cursor;
+        if (this.cursor !== cursor) {
+          this.cursor = cursor;
+          this.chartContainer.style.cursor = cursor;
+        }
       },
     });
 
-    // Create context menu "+" button (HTML overlay)
-    this.initContextMenuPlusButton();
+    // + button is now drawn on the crosshair canvas (no HTML element needed)
 
     // Initialize event manager
     this.eventManager = new EventManager(this.chartContainer, {
@@ -656,6 +658,15 @@ export class ChartCore {
         this.scheduleRender();
       },
       isOverInteractiveElement: (x, y) => {
+        // Check + button bounds (canvas-drawn, no DOM element)
+        if (this._plusButtonBounds) {
+          const b = this._plusButtonBounds;
+          const dx = x - b.x;
+          const dy = y - b.y;
+          if (dx * dx + dy * dy <= b.r * b.r) {
+            return true;
+          }
+        }
         const rect = this.chartContainer.getBoundingClientRect();
         return this.interactiveLineRenderer.isOverInteractiveElement(rect.left + x, rect.top + y);
       },
@@ -696,13 +707,11 @@ export class ChartCore {
         );
         const time = this.renderer.publicXToTime(x, this.viewport ?? TealchartRenderer.calculateViewport(this.bars));
         this.options.onCrossHairMoved?.(price, time);
-        this.updateContextMenuPlusButton(y, true);
         // Crosshair-only: skip main canvas, just repaint overlay + interactive lines
         this.scheduleCrosshairRender();
       },
       onCrossHairVisibilityChange: (visible) => {
         this.crosshair = { ...this.crosshair, visible };
-        this.updateContextMenuPlusButton(this.crosshair.y, visible);
         // Crosshair-only: skip main canvas
         this.scheduleCrosshairRender();
       },
@@ -710,11 +719,55 @@ export class ChartCore {
       onMouseUp: () => this.options.onMouseUp?.(),
       onContextMenu: (x, y, price, time) => this.handleContextMenu(x, y, price, time),
       onRender: () => this.scheduleRender(),
+      onCrosshairRender: () => {
+        // Called from within RAF (EventManager defers mousemove to RAF).
+        // Render directly — no need to schedule another RAF frame.
+        // Price label is drawn on canvas — zero DOM mutations.
+        this.renderCrosshairOverlay();
+        // Pointer cursor over canvas-drawn + button
+        const b = this._plusButtonBounds;
+        if (b) {
+          const dx = this.crosshair.x - b.x;
+          const dy = this.crosshair.y - b.y;
+          const overPlus = dx * dx + dy * dy <= b.r * b.r;
+          const wantCursor = overPlus ? 'pointer' : 'crosshair';
+          if (this.cursor !== wantCursor) {
+            this.cursor = wantCursor;
+            this.chartContainer.style.cursor = wantCursor;
+          }
+        }
+      },
       onCursorChange: (cursor) => {
-        this.cursor = cursor;
-        this.chartContainer.style.cursor = cursor;
+        if (this.cursor !== cursor) {
+          this.cursor = cursor;
+          this.chartContainer.style.cursor = cursor;
+        }
       },
       onPaneDoubleClick: (paneId) => this.options.onPaneDoubleClick?.(paneId),
+    });
+
+    // Click listener for canvas-drawn + button
+    this.chartContainer.addEventListener('click', (e) => {
+      if (!this._plusButtonBounds || !this.options.onContextMenu) return;
+      const rect = this.chartContainer.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const b = this._plusButtonBounds;
+      const dx = x - b.x;
+      const dy = y - b.y;
+      if (dx * dx + dy * dy <= b.r * b.r) {
+        e.stopPropagation();
+        const price = this.renderer.publicYToPriceWithLayout(
+          this.crosshair.y,
+          this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
+          this.getUnifiedLayout(),
+        );
+        const time = this.renderer.publicXToTime(
+          this.crosshair.x,
+          this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
+        );
+        this.handleContextMenu(rect.right - this.margins.right, rect.top + this.crosshair.y, price, time);
+      }
     });
 
     // Create reset button
@@ -1131,66 +1184,6 @@ export class ChartCore {
   // Context Menu + Button
   // ============================================================================
 
-  private initContextMenuPlusButton(): void {
-    const btn = div({
-      style: {
-        position: 'absolute',
-        right: `${this.margins.right + 2}px`,
-        width: '18px',
-        height: '18px',
-        borderRadius: '50%',
-        border: `1px solid ${this.options.renderOptions?.crosshairColor || '#787b86'}`,
-        display: 'none',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
-        zIndex: '5',
-        fontSize: '13px',
-        lineHeight: '0',
-        paddingBottom: '2px',
-        color: this.options.renderOptions?.crosshairColor || '#787b86',
-        userSelect: 'none',
-        pointerEvents: 'auto',
-      },
-      text: '+',
-      onClick: (e) => {
-        e.stopPropagation();
-        const y = this.crosshair.y;
-        const price = this.renderer.publicYToPriceWithLayout(
-          y,
-          this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
-          this.getUnifiedLayout(),
-        );
-        const time = this.renderer.publicXToTime(
-          this.crosshair.x,
-          this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
-        );
-        const rect = this.chartContainer.getBoundingClientRect();
-        this.handleContextMenu(rect.right - this.margins.right, rect.top + y, price, time);
-      },
-    });
-
-    btn.addEventListener('mouseenter', () => {
-      btn.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-    });
-    btn.addEventListener('mouseleave', () => {
-      btn.style.backgroundColor = 'transparent';
-    });
-
-    this.contextMenuPlusButton = btn;
-    this.chartContainer.appendChild(btn);
-  }
-
-  private updateContextMenuPlusButton(y: number, visible: boolean): void {
-    if (!this.contextMenuPlusButton) return;
-    if (visible && this.options.onContextMenu) {
-      this.contextMenuPlusButton.style.display = 'flex';
-      this.contextMenuPlusButton.style.top = `${y - 9}px`;
-    } else {
-      this.contextMenuPlusButton.style.display = 'none';
-    }
-  }
-
   setContextMenuCallback(callback: (unixTime: number, price: number) => ContextMenuItem[]): void {
     this.options.onContextMenu = callback;
   }
@@ -1415,8 +1408,8 @@ export class ChartCore {
 
     this.crosshairRafId = requestAnimationFrame(() => {
       this.crosshairRafId = null;
+      // Price label drawn on canvas — zero DOM mutations
       this.renderCrosshairOverlay();
-      this.updateInteractiveLines();
     });
   }
 
@@ -1603,8 +1596,14 @@ export class ChartCore {
 
     // Hide crosshair during interactive line drag
     const lineDragging = this.interactiveLineRenderer?.isDragging() ?? false;
-    if (!this.crosshair.visible || lineDragging) return;
-    if (!this.viewport) return;
+    if (!this.crosshair.visible || lineDragging) {
+      this._plusButtonBounds = null;
+      return;
+    }
+    if (!this.viewport) {
+      this._plusButtonBounds = null;
+      return;
+    }
 
     const { x, y } = this.crosshair;
     const crosshairColor = this.options.renderOptions?.crosshairColor || '#888888';
@@ -1623,14 +1622,55 @@ export class ChartCore {
 
     // Draw horizontal crosshair line across chart area
     // Stop short of the + context menu button (18px wide + 2px offset + 2px gap)
+    const hasContextMenu = !!this.options.onContextMenu;
     if (y >= this.margins.top && y <= height - this.margins.bottom) {
-      const rightStop = width - this.margins.right - 22;
+      const rightStop = hasContextMenu ? width - this.margins.right - 22 : width - this.margins.right;
       ctx.beginPath();
       ctx.moveTo(this.margins.left, y);
       ctx.lineTo(rightStop, y);
       ctx.stroke();
     }
     ctx.setLineDash([]);
+
+    // Draw + button circle on the crosshair line (replaces HTML overlay)
+    if (hasContextMenu && y >= this.margins.top && y <= height - this.margins.bottom) {
+      const btnX = width - this.margins.right - 11; // center of 18px circle, 2px from axis
+      const btnY = y;
+      const btnR = 9; // 18px diameter / 2
+
+      // Store bounds for hit-testing clicks
+      this._plusButtonBounds = { x: btnX, y: btnY, r: btnR };
+
+      // Check hover state
+      const hx = this.crosshair.x;
+      const hy = this.crosshair.y;
+      const dxH = hx - btnX;
+      const dyH = hy - btnY;
+      const isHovered = dxH * dxH + dyH * dyH <= btnR * btnR;
+
+      // Draw circle with optional hover fill
+      if (isHovered) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.beginPath();
+        ctx.arc(btnX, btnY, btnR, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.strokeStyle = crosshairColor;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(btnX, btnY, btnR, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Draw "+" text
+      ctx.fillStyle = crosshairColor;
+      ctx.font = '13px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('+', btnX, btnY);
+    } else {
+      this._plusButtonBounds = null;
+    }
 
     // Draw time label on bottom axis
     const time = this.renderer.publicXToTime(x, this.viewport);
@@ -1654,6 +1694,34 @@ export class ChartCore {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(timeLabel, x, timeLabelY + timeLabelHeight / 2);
+
+    // Draw price label on right Y-axis (replaces HTML crosshair label)
+    if (y >= this.margins.top && y <= height - this.margins.bottom) {
+      const price = this.renderer.publicYToPriceWithLayout(y, this.viewport, this.getUnifiedLayout());
+      const pricePrecision = this.options.renderOptions?.pricePrecision;
+      let decimals = 2;
+      if (pricePrecision && pricePrecision > 0) {
+        decimals = Math.max(0, Math.round(-Math.log10(pricePrecision)));
+      }
+      const priceText = price.toFixed(decimals);
+      ctx.font = `11px ${font}`;
+      const priceLabelWidth = ctx.measureText(priceText).width + 10;
+      const priceLabelHeight = 18;
+      const priceLabelX = width - this.margins.right;
+      const priceLabelY = y - priceLabelHeight / 2;
+
+      // Background
+      ctx.fillStyle = crosshairColor;
+      ctx.beginPath();
+      ctx.roundRect(priceLabelX, priceLabelY, priceLabelWidth, priceLabelHeight, 2);
+      ctx.fill();
+
+      // Text
+      ctx.fillStyle = this.options.renderOptions?.backgroundColor || '#131722';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(priceText, priceLabelX + priceLabelWidth / 2, y);
+    }
   }
 
   /**
@@ -1667,5 +1735,58 @@ export class ChartCore {
       visible: this.crosshair.visible,
       color: crosshairColor,
     });
+  }
+
+  /**
+   * Lightweight crosshair-only label update — only repositions crosshair price label
+   * and vertical line. Skips signature computation and full label iteration.
+   */
+  private updateCrosshairLabelsOnly(): void {
+    const crosshairColor = this.options.renderOptions?.crosshairColor || '#888888';
+    const crosshairData = {
+      x: this.crosshair.x,
+      y: this.crosshair.y,
+      visible: this.crosshair.visible,
+      color: crosshairColor,
+    };
+
+    if (!this.crosshair.visible || !this.viewport) {
+      this.interactiveLineRenderer.updateCrosshairOnly(undefined, crosshairData);
+      return;
+    }
+
+    // Compute crosshair price label inline (avoids full labelBounds recomputation)
+    const y = this.crosshair.y;
+    const price = this.renderer.publicYToPriceWithLayout(
+      y,
+      this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
+      this.getUnifiedLayout(),
+    );
+    const pricePrecision = this.options.renderOptions?.pricePrecision;
+    let decimals = 2;
+    if (pricePrecision && pricePrecision > 0) {
+      decimals = Math.max(0, Math.round(-Math.log10(pricePrecision)));
+    }
+    const priceText = price.toFixed(decimals);
+    const labelWidth = priceText.length * 7 + 12; // rough estimate, fine for positioning
+    const labelHeight = 18;
+
+    const crosshairBound = {
+      lineId: '__crosshair__',
+      price,
+      originalY: y,
+      adjustedY: y,
+      width: labelWidth,
+      height: labelHeight,
+      color: crosshairColor,
+      label: {
+        primaryText: priceText,
+        backgroundColor: crosshairColor,
+        textColor: this.options.renderOptions?.backgroundColor || '#131722',
+      },
+      type: 'crosshair' as const,
+    };
+
+    this.interactiveLineRenderer.updateCrosshairOnly(crosshairBound as any, crosshairData);
   }
 }

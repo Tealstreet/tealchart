@@ -222,6 +222,28 @@ export class InteractiveLineRenderer {
   }
 
   /**
+   * Lightweight crosshair-only update — skips signature computation and label iteration.
+   * Used on pure mousemove where only the crosshair position changed.
+   */
+  updateCrosshairOnly(crosshairBound: PriceLineLabelBounds | undefined, crosshair?: CrosshairLabelData): void {
+    // Update crosshair price label position + text
+    if (this.crosshairLabel && crosshairBound) {
+      const crosshairY = crosshairBound.adjustedY;
+      const labelX = this.options.width - crosshairBound.width;
+      const labelY = crosshairY - crosshairBound.height / 2;
+      this.crosshairLabel.style.transform = `translate(${labelX}px, ${labelY}px)`;
+      const primarySpan = this.crosshairLabel.querySelector('span');
+      if (primarySpan && primarySpan.textContent !== crosshairBound.label.primaryText) {
+        primarySpan.textContent = crosshairBound.label.primaryText;
+      } else if (!primarySpan && this.crosshairLabel.textContent !== crosshairBound.label.primaryText) {
+        this.crosshairLabel.textContent = crosshairBound.label.primaryText;
+      }
+    }
+    // Update crosshair vertical line
+    this.updateCrosshairVLine(crosshair);
+  }
+
+  /**
    * Force a full rebuild on next update (e.g. after pending order cleanup)
    */
   forceRebuild(): void {
@@ -437,7 +459,9 @@ export class InteractiveLineRenderer {
     const crosshairBound = bounds.find((b) => b.type === 'crosshair');
     if (this.crosshairLabel && crosshairBound) {
       const crosshairY = crosshairBound.adjustedY;
-      this.crosshairLabel.style.top = `${crosshairY - crosshairBound.height / 2}px`;
+      const labelX = this.options.width - crosshairBound.width;
+      const labelY = crosshairY - crosshairBound.height / 2;
+      this.crosshairLabel.style.transform = `translate(${labelX}px, ${labelY}px)`;
       const primarySpan = this.crosshairLabel.querySelector('span');
       if (primarySpan && primarySpan.textContent !== crosshairBound.label.primaryText) {
         primarySpan.textContent = crosshairBound.label.primaryText;
@@ -478,8 +502,7 @@ export class InteractiveLineRenderer {
 
     const label = document.createElement('div');
     label.className = 'tc-crosshair-label';
-    label.style.left = `${labelX}px`;
-    label.style.top = `${labelY}px`;
+    label.style.transform = `translate(${labelX}px, ${labelY}px)`;
     label.style.width = `${bound.width}px`;
     label.style.height = `${bound.height}px`;
     label.style.backgroundColor = bound.label.backgroundColor || bound.color;
