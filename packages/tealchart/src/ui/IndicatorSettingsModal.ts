@@ -5,9 +5,10 @@
  * plus style configuration for plot appearance.
  */
 
-import { Component } from './Component';
 import type { InputDefinition, PlotOutput } from '@tealstreet/tealscript';
-import type { PlotStyleOverride, LineStyle } from '../state/chartState';
+import type { LineStyle, PlotStyleOverride } from '../state/chartState';
+
+import { Component } from './Component';
 
 // ============================================================================
 // Types
@@ -91,7 +92,8 @@ const styles = {
     border: '1px solid var(--border, #363a45)',
     minWidth: '320px',
     maxWidth: '480px',
-    maxHeight: '80vh',
+    maxHeight: 'min(80vh, calc(100% - 40px))',
+    overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
@@ -594,9 +596,10 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
         if (def.maxval !== undefined) input.max = String(def.maxval);
         input.step = String(def.step ?? (def.type === 'int' ? 1 : 0.1));
         input.addEventListener('change', (e) => {
-          const val = def.type === 'int'
-            ? parseInt((e.target as HTMLInputElement).value, 10)
-            : parseFloat((e.target as HTMLInputElement).value);
+          const val =
+            def.type === 'int'
+              ? parseInt((e.target as HTMLInputElement).value, 10)
+              : parseFloat((e.target as HTMLInputElement).value);
           this.updateValue(def.id, isNaN(val) ? def.defval : val);
         });
         row.appendChild(input);
@@ -791,12 +794,7 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
     return row;
   }
 
-  private renderStylePopover(
-    plotId: string,
-    color: string,
-    linewidth: number,
-    lineStyle: LineStyle
-  ): HTMLElement {
+  private renderStylePopover(plotId: string, color: string, linewidth: number, lineStyle: LineStyle): HTMLElement {
     const container = document.createElement('div');
     container.style.position = 'absolute';
     container.style.right = '0';
@@ -964,7 +962,7 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
     const existing = this.state.styleOverrides.find((o) => o.plotId === plotId);
     if (existing) {
       this.state.styleOverrides = this.state.styleOverrides.map((o) =>
-        o.plotId === plotId ? { ...o, [key]: value } : o
+        o.plotId === plotId ? { ...o, [key]: value } : o,
       );
     } else {
       this.state.styleOverrides = [...this.state.styleOverrides, { plotId, [key]: value }];
@@ -985,7 +983,7 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
     inputDefinitions: InputDefinition[],
     plots: PlotOutput[],
     styleOverrides: PlotStyleOverride[] | undefined,
-    onSave: (inputs: Record<string, unknown>, styleOverrides?: PlotStyleOverride[]) => void
+    onSave: (inputs: Record<string, unknown>, styleOverrides?: PlotStyleOverride[]) => void,
   ): void {
     if (this.state.isOpen) return;
 
