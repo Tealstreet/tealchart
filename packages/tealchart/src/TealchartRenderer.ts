@@ -1,7 +1,9 @@
 import type { PlotOutput, PlotStyle } from '@tealstreet/tealscript';
+import type { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
 import type { CanvasContext } from './rendering/CanvasContext';
 import type { PaneOffset } from './rendering/PaneManager';
 
+import { computeCandleCoordinates } from './jailbreak/computeCandleCoordinates';
 import { getDecimalPlacesFromPrecision, LineStyle, PlotStyleOverride } from './state/chartState';
 import {
   Bar,
@@ -108,11 +110,20 @@ export class TealchartRenderer {
   private ctx: CanvasContext;
   private options: RenderOptions;
   private margins: ChartMargins;
+  private jailbreakManager: JailbreakIndicatorManager | null = null;
 
   constructor(ctx: CanvasContext, options: Partial<RenderOptions> = {}, margins: Partial<ChartMargins> = {}) {
     this.ctx = ctx;
     this.options = { ...DEFAULT_RENDER_OPTIONS, ...options };
     this.margins = { ...DEFAULT_MARGINS, ...margins };
+  }
+
+  /**
+   * Set the jailbreak indicator manager for custom indicator rendering.
+   * If null, no custom indicators are drawn.
+   */
+  setJailbreakManager(manager: JailbreakIndicatorManager | null): void {
+    this.jailbreakManager = manager;
   }
 
   /**
@@ -2964,12 +2975,28 @@ export class TealchartRenderer {
     // Draw grid for main pane
     this.renderPaneGrid(pane, viewport);
 
+    // Jailbreak indicators: draw behind candles
+    if (this.jailbreakManager && this.jailbreakManager.size > 0 && bars.length > 0) {
+      const jailbreakArgs = this.buildJailbreakDrawArgs(bars, viewport, pane);
+      if (jailbreakArgs) {
+        this.jailbreakManager.drawBehindCandles(jailbreakArgs);
+      }
+    }
+
     // Draw candles
     this.drawCandlesInPane(bars, viewport, pane);
 
     // Draw volume overlay (bottom 10% of main pane)
     if (options.showVolume) {
       this.drawVolumeInPane(bars, viewport, pane);
+    }
+
+    // Jailbreak indicators: draw after candles
+    if (this.jailbreakManager && this.jailbreakManager.size > 0 && bars.length > 0) {
+      const jailbreakArgs = this.buildJailbreakDrawArgs(bars, viewport, pane);
+      if (jailbreakArgs) {
+        this.jailbreakManager.drawAfterCandles(jailbreakArgs);
+      }
     }
 
     // Draw overlay indicator plots (plots that share main pane Y-axis)
@@ -2991,6 +3018,55 @@ export class TealchartRenderer {
     if (labelBounds && labelBounds.length > 0) {
       this.drawPriceLinesInPane(labelBounds, viewport, pane);
     }
+  }
+
+  /**
+   * Build IndicatorDrawArgs for jailbreak indicators from current render state.
+   * Returns null if data is insufficient.
+   */
+  private buildJailbreakDrawArgs(
+    bars: Bar[],
+    viewport: Viewport,
+    pane: ComputedPane,
+  ): Omit<import('./jailbreak/types').IndicatorDrawArgs, 'settings'> | null {
+    const { ctx, options, margins } = this;
+    const priceHeight = pane.height;
+    const chartWidth = options.width - margins.left - margins.right - PRICE_AXIS_RIGHT_PADDING;
+
+    const priceToCoord = (price: number): number => {
+      const ratio = (pane.yMax - price) / (pane.yMax - pane.yMin);
+      return pane.top + ratio * priceHeight;
+    };
+    const coordToPrice = (coord: number): number => {
+      const ratio = (coord - pane.top) / priceHeight;
+      return pane.yMax - ratio * (pane.yMax - pane.yMin);
+    };
+    const timeToX = (time: number): number => {
+      const ratio = (time - viewport.startTime) / (viewport.endTime - viewport.startTime);
+      return margins.left + ratio * chartWidth;
+    };
+
+    const candleCoords = computeCandleCoordinates(
+      bars,
+      viewport,
+      chartWidth,
+      priceToCoord,
+      timeToX,
+      options.minCandleWidth,
+    );
+
+    return {
+      ctx: ctx as unknown as CanvasRenderingContext2D,
+      bars,
+      candleCoords,
+      exchange: '',
+      symbol: '',
+      resolutionString: '',
+      chartWidth: options.width,
+      chartHeight: options.height,
+      priceToCoord,
+      coordToPrice,
+    };
   }
 
   /**

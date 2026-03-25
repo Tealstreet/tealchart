@@ -979,6 +979,16 @@ export class ChartCore {
   }
 
   /**
+   * Set the jailbreak indicator manager for custom indicator rendering on the canvas.
+   * Pass null to disable jailbreak indicators.
+   */
+  setJailbreakManager(
+    manager: import('../jailbreak/JailbreakIndicatorManager').JailbreakIndicatorManager | null,
+  ): void {
+    this.renderer.setJailbreakManager(manager);
+  }
+
+  /**
    * Update render options (colors, styles)
    */
   setCanvasOpacity(opacity: number): void {

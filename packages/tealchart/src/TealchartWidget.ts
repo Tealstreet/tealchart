@@ -1538,6 +1538,14 @@ export class TealchartWidget {
   }
 
   /**
+   * Set the jailbreak indicator manager for custom indicator rendering.
+   * Delegates to the UI / ChartCore / Renderer chain.
+   */
+  setJailbreakManager(manager: import('./jailbreak/JailbreakIndicatorManager').JailbreakIndicatorManager | null): void {
+    this._ui?.setJailbreakManager(manager);
+  }
+
+  /**
    * Remove the widget and clean up
    */
   remove(): void {

@@ -398,6 +398,15 @@ export class TealchartWidgetUI {
   }
 
   /**
+   * Set the jailbreak indicator manager for custom indicator rendering on the canvas.
+   */
+  setJailbreakManager(
+    manager: import('../jailbreak/JailbreakIndicatorManager').JailbreakIndicatorManager | null,
+  ): void {
+    this.chartCore?.setJailbreakManager(manager);
+  }
+
+  /**
    * Update symbol display
    */
   setSymbol(symbol: string, exchangeName?: string): void {
