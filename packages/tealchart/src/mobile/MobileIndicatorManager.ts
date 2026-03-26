@@ -19,7 +19,8 @@
  * }, []);
  * ```
  */
-import type { PlotOutput, Program } from '@packages/tealscript/src';
+import type { InputDefinition, PlotOutput, Program } from '@packages/tealscript/src';
+import type { PlotStyleOverride } from '../state/chartState';
 import type { Bar, UnifiedPaneLayout } from '../types';
 
 import { parse, TealscriptEngine } from '@packages/tealscript/src';
@@ -39,6 +40,8 @@ export interface ActiveIndicator {
   inputs?: Record<string, unknown>;
   /** Parsed AST (cached for performance) */
   ast?: Program;
+  /** Style overrides for plots */
+  styleOverrides?: PlotStyleOverride[];
 }
 
 /**
@@ -64,6 +67,7 @@ export class MobileIndicatorManager {
   private _indicators: ActiveIndicator[] = [];
   private _plots: PlotOutput[] = [];
   private _astCache: Map<string, Program> = new Map();
+  private _inputDefsCache: Map<string, InputDefinition[]> = new Map();
   private _bars: Bar[] = [];
   private _onUpdate: (() => void) | null = null;
   private _instanceCounter = 0;
@@ -150,6 +154,9 @@ export class MobileIndicatorManager {
     // Remove from indicators list
     this._indicators = this._indicators.filter((ind) => ind.instanceId !== instanceId);
 
+    // Clear cached input definitions
+    this._inputDefsCache.delete(instanceId);
+
     // Recompute plots without this indicator
     this._recomputePlots();
   }
@@ -212,6 +219,24 @@ export class MobileIndicatorManager {
   }
 
   /**
+   * Get input definitions for a given indicator instance
+   */
+  getInputDefinitions(instanceId: string): InputDefinition[] {
+    return this._inputDefsCache.get(instanceId) ?? [];
+  }
+
+  /**
+   * Update style overrides for an indicator
+   */
+  updateStyleOverrides(instanceId: string, styleOverrides?: PlotStyleOverride[]): void {
+    const indicator = this._indicators.find((ind) => ind.instanceId === instanceId);
+    if (indicator) {
+      indicator.styleOverrides = styleOverrides;
+      this._onUpdate?.();
+    }
+  }
+
+  /**
    * Get the underlying PaneManager (for advanced use cases)
    */
   getPaneManager(): PaneManager {
@@ -254,6 +279,11 @@ export class MobileIndicatorManager {
 
         // Execute the script
         const result = engine.execute(ast, this._bars, inputsMap);
+
+        // Cache input definitions for settings modal
+        if (result.inputs && result.inputs.length > 0) {
+          this._inputDefsCache.set(instanceId, result.inputs as InputDefinition[]);
+        }
 
         // Tag plots with the instance ID so renderer knows which pane to use
         for (const plot of result.plots) {

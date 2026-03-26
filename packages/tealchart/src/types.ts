@@ -51,6 +51,10 @@ export interface RenderOptions {
   margins?: ChartMargins; // Custom margins override
   pricePrecision?: number; // Market price precision (e.g., 0.00001 for 5 decimal places)
   fontFamily?: string; // Font family for all chart text. Defaults to 'inherit' for HTML overlays, 'sans-serif' for canvas.
+  // Metadata for jailbreak indicators
+  exchange?: string;
+  symbol?: string;
+  resolutionString?: string;
 }
 
 // Last trade info for rendering the current price line (legacy - use PriceLine instead)
@@ -141,6 +145,7 @@ export interface PriceLine {
     onSLMoveEnd?: (price: number, partialPercent?: number) => void;
     onClose?: () => void;
     onReverse?: () => void;
+    onCancel?: () => void;
   };
 }
 
@@ -264,6 +269,7 @@ export interface PriceLineLabelBounds {
     onSLMoveEnd?: (price: number, partialPercent?: number) => void;
     onClose?: () => void;
     onReverse?: () => void;
+    onCancel?: () => void;
   };
 
   // === Pane targeting for multi-pane support ===
@@ -733,6 +739,16 @@ export interface TealchartWidgetOptions {
    * Default: false
    */
   disableDebugOverlay?: boolean;
+  /**
+   * Factory map for jailbreak (canvas-drawing) indicators.
+   * Keys are builtin indicator IDs (e.g., 'dwmo').
+   * Values are factory functions that return a BarsIndicator instance.
+   *
+   * When an IndicatorInstance references a jailbreak builtin, the widget
+   * uses this map to instantiate the BarsIndicator and register it with
+   * the JailbreakIndicatorManager.
+   */
+  jailbreakIndicatorFactories?: Record<string, () => import('./jailbreak/BarsIndicator').BarsIndicator>;
 }
 
 // ============================================================================
@@ -802,6 +818,16 @@ export interface OrderLineRenderData {
   // TEALSTREET: Bracket state
   brackets: BracketConfig | null;
   partialEnabled: boolean;
+  /** Adapter callbacks carried through render data for direct invocation */
+  callbacks?: {
+    onTPClick?: () => void;
+    onSLClick?: () => void;
+    onTPMove?: (price: number, partialPercent?: number) => void;
+    onSLMove?: (price: number, partialPercent?: number) => void;
+    onTPMoveEnd?: (price: number, partialPercent?: number) => void;
+    onSLMoveEnd?: (price: number, partialPercent?: number) => void;
+    onCancel?: () => void;
+  };
 }
 
 /**

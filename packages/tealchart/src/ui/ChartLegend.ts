@@ -507,16 +507,22 @@ export class ChartLegend extends Component<ChartLegendState> {
     // Name
     row.appendChild(span({ text: indicator.name, style: styles.indicatorName }));
 
-    // Input values
+    // Input values (limit to 4, then ellipsis)
     const inputs = Object.values(indicator.inputs);
+    const MAX_INLINE_PARAMS = 4;
     if (inputs.length > 0) {
       const inputsDiv = div({ style: styles.indicatorInputs });
-      inputs.forEach((value, idx) => {
+      const displayInputs = inputs.slice(0, MAX_INLINE_PARAMS);
+      displayInputs.forEach((value, idx) => {
         if (idx > 0) {
           inputsDiv.appendChild(span({ text: '·', style: { marginRight: '4px' } }));
         }
         inputsDiv.appendChild(span({ text: this.formatInput(value) }));
       });
+      if (inputs.length > MAX_INLINE_PARAMS) {
+        inputsDiv.appendChild(span({ text: ' ·', style: { marginRight: '4px' } }));
+        inputsDiv.appendChild(span({ text: '…', style: { opacity: '0.5' } }));
+      }
       row.appendChild(inputsDiv);
     }
 
