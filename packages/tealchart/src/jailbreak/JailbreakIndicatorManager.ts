@@ -1,5 +1,5 @@
 import type { BarsIndicator } from './BarsIndicator';
-import type { IndicatorDrawArgs } from './types';
+import type { CrossHairTooltip, IndicatorDrawArgs, IndicatorTooltipArgs } from './types';
 
 /**
  * A registered indicator with its settings and render ordering.
@@ -17,6 +17,15 @@ interface RegisteredIndicator {
  */
 export class JailbreakIndicatorManager {
   private indicators = new Map<string, RegisteredIndicator>();
+  private _tooltipContext: Record<string, unknown> = {};
+
+  /**
+   * Set extra context that will be merged into tooltip args for all indicators.
+   * The consuming app uses this to pass exchange references, etc.
+   */
+  setTooltipContext(context: Record<string, unknown>): void {
+    this._tooltipContext = context;
+  }
 
   /**
    * Register an indicator instance.
@@ -79,6 +88,25 @@ export class JailbreakIndicatorManager {
         console.error(`[JailbreakIndicatorManager] Error drawing after candles for ${entry.id}:`, err);
       }
     }
+  }
+
+  /**
+   * Collect crosshair tooltips from all visible indicators.
+   * Returns an array of tooltip groups (one group per indicator).
+   */
+  getTooltips(args: Omit<IndicatorTooltipArgs, 'settings'>): CrossHairTooltip[][] {
+    const groups: CrossHairTooltip[][] = [];
+    for (const entry of this.indicators.values()) {
+      if (!entry.indicator.isVisible()) continue;
+      try {
+        const fullArgs = { ...args, ...this._tooltipContext, settings: entry.settings } as IndicatorTooltipArgs;
+        const tooltips = entry.indicator.getTooltipText(fullArgs);
+        if (tooltips.length > 0) groups.push(tooltips);
+      } catch (err) {
+        console.error(`[JailbreakIndicatorManager] Error getting tooltips for ${entry.id}:`, err);
+      }
+    }
+    return groups;
   }
 
   /**

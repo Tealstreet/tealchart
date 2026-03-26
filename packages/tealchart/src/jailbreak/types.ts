@@ -68,18 +68,26 @@ export interface IndicatorTooltipArgs {
   mouseY: number;
   /** Index into bars/candleCoords for the hovered bar */
   barIndex: number;
+  /** Price at crosshair Y position */
+  price: number;
+  /** Exchange name */
+  exchange: string;
+  /** Symbol name */
+  symbol: string;
+  /** Allow extra fields for app-specific context (e.g., exchange store) */
+  [key: string]: unknown;
 }
 
 /**
  * A single tooltip entry returned by an indicator.
  */
 export interface CrossHairTooltip {
-  /** Label text */
-  label: string;
-  /** Value text */
-  value: string;
-  /** Optional color */
+  /** Display text */
+  text: string;
+  /** Text color */
   color?: string;
+  /** Where to show the tooltip */
+  position?: 'left' | 'right' | 'hover';
 }
 
 /**

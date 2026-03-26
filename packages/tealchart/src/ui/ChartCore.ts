@@ -1800,6 +1800,174 @@ export class ChartCore {
       ctx.textBaseline = 'middle';
       ctx.fillText(priceText, priceLabelX + priceLabelWidth / 2, y);
     }
+
+    // Draw jailbreak indicator tooltips
+    this._drawJailbreakTooltips(ctx, x, y);
+  }
+
+  /**
+   * Draw jailbreak indicator tooltips near the crosshair.
+   * Collects tooltips from all visible indicators and renders grouped text boxes.
+   */
+  private _drawJailbreakTooltips(ctx: CanvasRenderingContext2D, cursorX: number, cursorY: number): void {
+    const jailbreakManager = this.renderer.getJailbreakManager();
+    if (!jailbreakManager || jailbreakManager.size === 0) return;
+    if (!this.viewport || this.bars.length === 0) return;
+
+    const width = this.options.width;
+
+    // Compute price at crosshair Y
+    const layout = this.getUnifiedLayout();
+    const price = this.renderer.publicYToPriceWithLayout(cursorY, this.viewport, layout);
+
+    // Find bar index nearest to crosshair X via time
+    const time = this.renderer.publicXToTime(cursorX, this.viewport);
+    let barIndex = 0;
+    const bars = this.bars;
+    // Binary search for nearest bar
+    let lo = 0;
+    let hi = bars.length - 1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >>> 1;
+      if (bars[mid].time < time) {
+        lo = mid + 1;
+      } else {
+        hi = mid - 1;
+      }
+    }
+    barIndex = Math.min(lo, bars.length - 1);
+
+    // Convert bars to seconds for indicator compatibility (same as buildJailbreakDrawArgs)
+    const barsInSeconds = bars.map((b) => ({ ...b, time: Math.floor(b.time / 1000) }));
+
+    const exchange = this.options.renderOptions?.exchange ?? '';
+    const symbol = this.options.renderOptions?.symbol ?? '';
+
+    const tooltipGroups = jailbreakManager.getTooltips({
+      bars: barsInSeconds,
+      mouseX: cursorX,
+      mouseY: cursorY,
+      barIndex,
+      price,
+      exchange,
+      symbol,
+    });
+
+    if (tooltipGroups.length === 0) return;
+
+    // Separate tooltip groups by position
+    const leftGroups: typeof tooltipGroups = [];
+    const hoverGroups: typeof tooltipGroups = [];
+    for (const group of tooltipGroups) {
+      // Check the position of the first tooltip in the group
+      const pos = group[0]?.position ?? 'left';
+      if (pos === 'hover') {
+        hoverGroups.push(group);
+      } else {
+        // both 'left' and 'right' go to left for now (matching TV behavior)
+        leftGroups.push(group);
+      }
+    }
+
+    const bgColor = this.options.renderOptions?.backgroundColor || '#131722';
+    const textColor = this.options.renderOptions?.crosshairColor || '#888888';
+
+    if (leftGroups.length > 0) {
+      this._drawTooltipGroups(ctx, leftGroups, cursorX, cursorY, width, bgColor, textColor, 'left');
+    }
+    if (hoverGroups.length > 0) {
+      this._drawTooltipGroups(ctx, hoverGroups, cursorX, cursorY, width, bgColor, textColor, 'hover');
+    }
+  }
+
+  /**
+   * Render tooltip groups as a canvas text box.
+   */
+  private _drawTooltipGroups(
+    ctx: CanvasRenderingContext2D,
+    groups: import('../jailbreak/types').CrossHairTooltip[][],
+    cursorX: number,
+    cursorY: number,
+    chartWidth: number,
+    bgColor: string,
+    defaultTextColor: string,
+    alignment: 'left' | 'hover',
+  ): void {
+    const flat = groups.flat();
+    if (flat.length === 0) return;
+
+    const fontSize = 12;
+    const font = this.renderer.getFont();
+    ctx.font = `${fontSize}px ${font}`;
+
+    // Measure max text width
+    let maxTextWidth = 0;
+    for (const t of flat) {
+      const w = ctx.measureText(t.text).width;
+      if (w > maxTextWidth) maxTextWidth = w;
+    }
+
+    const textHeight = 15;
+    const padding = 5;
+    const groupPadding = 0.2;
+
+    // Calculate total height including group separators
+    const totalRows = flat.length + (groups.length - 1) * groupPadding * 2;
+    const tooltipHeight = textHeight * totalRows + padding;
+    const tooltipWidth = maxTextWidth + padding * 2;
+
+    // Position the tooltip
+    let rectX: number;
+    if (alignment === 'left') {
+      rectX = 20;
+    } else {
+      // hover: position near cursor, flip side if too close to edge
+      const fitsRight = cursorX + 15 + tooltipWidth < chartWidth - this.margins.right;
+      rectX = fitsRight ? cursorX + 15 : cursorX - tooltipWidth - 15;
+    }
+    const rectY = cursorY - tooltipHeight / 2;
+
+    // Draw background
+    ctx.fillStyle = bgColor;
+    ctx.globalAlpha = 0.85;
+    ctx.beginPath();
+    ctx.roundRect(rectX, rectY, tooltipWidth, tooltipHeight, 3);
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+
+    // Draw border
+    ctx.strokeStyle = defaultTextColor;
+    ctx.globalAlpha = 0.3;
+    ctx.lineWidth = 0.5;
+    ctx.strokeRect(rectX, rectY, tooltipWidth, tooltipHeight);
+    ctx.globalAlpha = 1.0;
+
+    // Draw text rows
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+
+    let rowOffset = 0;
+    for (let gi = 0; gi < groups.length; gi++) {
+      const group = groups[gi];
+      for (const tooltip of group) {
+        ctx.fillStyle = tooltip.color || defaultTextColor;
+        ctx.fillText(tooltip.text, rectX + padding, rectY + rowOffset * textHeight + padding / 1.2);
+        rowOffset++;
+      }
+
+      // Draw separator line between groups (not after last)
+      if (gi < groups.length - 1) {
+        rowOffset += groupPadding;
+        ctx.beginPath();
+        ctx.strokeStyle = defaultTextColor;
+        ctx.globalAlpha = 0.3;
+        ctx.moveTo(rectX, rectY + rowOffset * textHeight + padding / 2);
+        ctx.lineTo(rectX + tooltipWidth, rectY + rowOffset * textHeight + padding / 2);
+        ctx.stroke();
+        ctx.globalAlpha = 1.0;
+        rowOffset += groupPadding;
+      }
+    }
   }
 
   /**

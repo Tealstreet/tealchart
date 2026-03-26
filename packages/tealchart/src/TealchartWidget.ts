@@ -1838,6 +1838,14 @@ export class TealchartWidget {
   }
 
   /**
+   * Set extra tooltip context for jailbreak indicators (e.g., exchange object).
+   * Merged into tooltip args when collecting crosshair tooltips.
+   */
+  setJailbreakTooltipContext(context: Record<string, unknown>): void {
+    this._jailbreakManager?.setTooltipContext(context);
+  }
+
+  /**
    * Remove the widget and clean up
    */
   remove(): void {

@@ -127,6 +127,13 @@ export class TealchartRenderer {
   }
 
   /**
+   * Get the jailbreak indicator manager (if set).
+   */
+  getJailbreakManager(): JailbreakIndicatorManager | null {
+    return this.jailbreakManager;
+  }
+
+  /**
    * Update options (e.g., on theme change)
    */
   setOptions(options: Partial<RenderOptions>): void {
