@@ -11,11 +11,14 @@
  * Uses simple React state for positions to avoid Reanimated worklet issues.
  */
 
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-
 import type { Viewport } from '../../types';
 import type { ChartDimensions } from '../utils/coordinates';
+
+import React, { useMemo } from 'react';
+
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+
+import { safeToFixed } from '../../utils/safeNumber';
 
 export interface CrosshairComponentProps {
   /** X position of crosshair */
@@ -77,7 +80,7 @@ export const CrosshairComponent: React.FC<CrosshairComponentProps> = ({
   }, [x, chartLeft, chartWidth, viewport.startTime, viewport.endTime]);
 
   // Format values for display
-  const priceText = price.toFixed(pricePrecision);
+  const priceText = safeToFixed(price, pricePrecision);
   const timeText = useMemo(() => {
     const date = new Date(time);
     const hours = date.getHours().toString().padStart(2, '0');
@@ -121,9 +124,7 @@ export const CrosshairComponent: React.FC<CrosshairComponentProps> = ({
           {
             top: y,
             left: chartLeft,
-            width: showContextMenuButton
-              ? chartRight - chartLeft - CONTEXT_BUTTON_SIZE - 8
-              : chartRight - chartLeft,
+            width: showContextMenuButton ? chartRight - chartLeft - CONTEXT_BUTTON_SIZE - 8 : chartRight - chartLeft,
             borderTopColor: color,
           },
         ]}

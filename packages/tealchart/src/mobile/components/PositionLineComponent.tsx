@@ -17,6 +17,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
+import { safeToFixed } from '../../utils/safeNumber';
 import { priceToY, yToPrice } from '../utils/coordinates';
 
 export interface PositionLineComponentProps {
@@ -289,7 +290,7 @@ export const PositionLineComponent: React.FC<PositionLineComponentProps> = ({
   }, [position.profitState]);
 
   // Format price for display
-  const formattedPrice = position.price.toFixed(pricePrecision);
+  const formattedPrice = safeToFixed(position.price, pricePrecision);
 
   // Whether to show TP/SL buttons
   const showBrackets = position.brackets !== null;

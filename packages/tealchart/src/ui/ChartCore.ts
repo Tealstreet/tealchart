@@ -40,6 +40,7 @@ import {
   UnifiedPaneLayout,
   Viewport,
 } from '../types';
+import { safeNum, safeToFixed } from '../utils/safeNumber';
 import { applyAutoScale } from '../viewport/viewScale';
 import { button, div, icons } from './dom';
 
@@ -1609,10 +1610,10 @@ export class ChartCore {
       allPriceLines
         .map((l) => {
           const textLen = l.chartLabel?.segments.reduce((sum, s) => sum + (s.text?.length || 0), 0) || 0;
-          return `${l.id}:${l.price.toFixed(6)}:${Math.round(textLen / 3)}`;
+          return `${l.id}:${safeNum(l.price, 0, 'collisionKey.price')}:${Math.round(textLen / 3)}`;
         })
         .sort()
-        .join(',') + `|${vp.priceMin.toFixed(4)},${vp.priceMax.toFixed(4)}`;
+        .join(',') + `|${safeNum(vp.priceMin)},${safeNum(vp.priceMax)}`;
     const now = Date.now();
     const collisionKeyChanged = collisionKey !== this.lastCollisionKey;
     const isDragging = this.eventManager.getIsDragging();
@@ -1781,7 +1782,7 @@ export class ChartCore {
       if (pricePrecision && pricePrecision > 0) {
         decimals = getDecimalPlacesFromPrecision(pricePrecision);
       }
-      const priceText = price.toFixed(decimals);
+      const priceText = safeToFixed(price, decimals, 'crosshairPrice');
       ctx.font = `11px ${font}`;
       const priceLabelWidth = ctx.measureText(priceText).width + 10;
       const priceLabelHeight = 18;
@@ -2044,9 +2045,9 @@ export class ChartCore {
     const percentDistance = ((state.price - state.entryPrice) / state.entryPrice) * 100;
 
     // Format values
-    const pnlText = hasPnl ? (pnl >= 0 ? '+' : '-') + '$' + Math.abs(pnl).toFixed(2) : '';
+    const pnlText = hasPnl ? (pnl >= 0 ? '+' : '-') + '$' + safeToFixed(Math.abs(pnl), 2) : '';
     const pctSign = percentDistance >= 0 ? '+' : '';
-    const percentText = pctSign + percentDistance.toFixed(2) + '%';
+    const percentText = pctSign + safeToFixed(percentDistance, 2) + '%';
 
     // Build type label
     const typeLabel =
@@ -2292,7 +2293,7 @@ export class ChartCore {
         const priceAtLevel = state.entryPrice + priceRange * label.yRatio;
         const percentOffset = ((priceAtLevel - state.entryPrice) / state.entryPrice) * 100;
         const sign = percentOffset >= 0 ? '' : '-';
-        const text = sign + Math.abs(percentOffset).toFixed(1) + '%';
+        const text = sign + safeToFixed(Math.abs(percentOffset), 1) + '%';
 
         ctx.fillStyle = color;
         ctx.globalAlpha = 0.7;

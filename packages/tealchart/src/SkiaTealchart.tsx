@@ -69,6 +69,7 @@ import { priceToY, xToTime, yToPrice } from './mobile/utils/coordinates';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
 import { DEFAULT_MARGINS } from './types';
+import { safeToFixed } from './utils/safeNumber';
 import { ViewportController } from './viewport/ViewportController';
 import { intervalToMs } from './viewport/viewScale';
 
@@ -835,8 +836,8 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     const priceDelta = isLong ? price - entryPrice : entryPrice - price;
     const pnl = (priceDelta / entryPrice) * notional;
     const pnlSign = pnl >= 0 ? '+' : '';
-    const priceText = price.toFixed(pricePrecision);
-    const pnlText = `${pnlSign}${pnl.toFixed(2)}`;
+    const priceText = safeToFixed(price, pricePrecision);
+    const pnlText = `${pnlSign}${safeToFixed(pnl, 2)}`;
     const labelText = `${type.toUpperCase()} ${priceText}  ${pnlText}`;
 
     const color = type === 'tp' ? '#22c55e' : '#f97316';
