@@ -210,18 +210,44 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
           ]
         : []),
     ],
-    buttons: order.cancellable
-      ? [
-          {
-            type: 'cancel' as const,
-            icon: '×',
-            backgroundColor: order.cancelButtonBackgroundColor,
-            iconColor: order.cancelButtonIconColor,
-            borderColor: order.cancelButtonBorderColor,
-            tooltip: order.cancelTooltip,
-          },
-        ]
-      : [],
+    buttons: [
+      ...(order.brackets !== null
+        ? [
+            {
+              type: 'tp' as const,
+              icon: 'TP',
+              backgroundColor: order.bodyBackgroundColor,
+              iconColor: '#22c55e',
+              borderColor: '#22c55e',
+              tooltip: 'Drag to set Take Profit',
+            },
+          ]
+        : []),
+      ...(order.brackets !== null
+        ? [
+            {
+              type: 'sl' as const,
+              icon: 'SL',
+              backgroundColor: order.bodyBackgroundColor,
+              iconColor: '#f97316',
+              borderColor: '#f97316',
+              tooltip: 'Drag to set Stop Loss',
+            },
+          ]
+        : []),
+      ...(order.cancellable
+        ? [
+            {
+              type: 'cancel' as const,
+              icon: '×',
+              backgroundColor: order.cancelButtonBackgroundColor,
+              iconColor: order.cancelButtonIconColor,
+              borderColor: order.cancelButtonBorderColor,
+              tooltip: order.cancelTooltip,
+            },
+          ]
+        : []),
+    ],
   };
 
   return {
@@ -241,6 +267,9 @@ function orderLineToPriceLine(order: OrderLineRenderData, formatPrice: (price: n
       textColor: order.bodyTextColor,
     },
     chartLabel,
+    partialEnabled: order.partialEnabled,
+    brackets: order.brackets,
+    callbacks: order.callbacks,
   };
 }
 
@@ -947,6 +976,16 @@ export class ChartCore {
   setPlotStyleOverrides(overrides: Map<string, PlotStyleOverride>): void {
     this.plotStyleOverrides = overrides;
     // No scheduleRender — paint() is called by the widget after pushing state
+  }
+
+  /**
+   * Set the jailbreak indicator manager for custom indicator rendering on the canvas.
+   * Pass null to disable jailbreak indicators.
+   */
+  setJailbreakManager(
+    manager: import('../jailbreak/JailbreakIndicatorManager').JailbreakIndicatorManager | null,
+  ): void {
+    this.renderer.setJailbreakManager(manager);
   }
 
   /**
@@ -1761,36 +1800,222 @@ export class ChartCore {
       ctx.textBaseline = 'middle';
       ctx.fillText(priceText, priceLabelX + priceLabelWidth / 2, y);
     }
+
+    // Draw jailbreak indicator tooltips
+    this._drawJailbreakTooltips(ctx, x, y);
+  }
+
+  /**
+   * Draw jailbreak indicator tooltips near the crosshair.
+   * Collects tooltips from all visible indicators and renders grouped text boxes.
+   */
+  private _drawJailbreakTooltips(ctx: CanvasRenderingContext2D, cursorX: number, cursorY: number): void {
+    const jailbreakManager = this.renderer.getJailbreakManager();
+    if (!jailbreakManager || jailbreakManager.size === 0) return;
+    if (!this.viewport || this.bars.length === 0) return;
+
+    const width = this.options.width;
+
+    // Compute price at crosshair Y
+    const layout = this.getUnifiedLayout();
+    const price = this.renderer.publicYToPriceWithLayout(cursorY, this.viewport, layout);
+
+    // Find bar index nearest to crosshair X via time
+    const time = this.renderer.publicXToTime(cursorX, this.viewport);
+    let barIndex = 0;
+    const bars = this.bars;
+    // Binary search for nearest bar
+    let lo = 0;
+    let hi = bars.length - 1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >>> 1;
+      if (bars[mid].time < time) {
+        lo = mid + 1;
+      } else {
+        hi = mid - 1;
+      }
+    }
+    barIndex = Math.min(lo, bars.length - 1);
+
+    // Convert bars to seconds for indicator compatibility (same as buildJailbreakDrawArgs)
+    const barsInSeconds = bars.map((b) => ({ ...b, time: Math.floor(b.time / 1000) }));
+
+    const exchange = this.options.renderOptions?.exchange ?? '';
+    const symbol = this.options.renderOptions?.symbol ?? '';
+
+    const tooltipGroups = jailbreakManager.getTooltips({
+      bars: barsInSeconds,
+      mouseX: cursorX,
+      mouseY: cursorY,
+      barIndex,
+      price,
+      exchange,
+      symbol,
+    });
+
+    if (tooltipGroups.length === 0) return;
+
+    // Separate tooltip groups by position
+    const leftGroups: typeof tooltipGroups = [];
+    const hoverGroups: typeof tooltipGroups = [];
+    for (const group of tooltipGroups) {
+      // Check the position of the first tooltip in the group
+      const pos = group[0]?.position ?? 'left';
+      if (pos === 'hover') {
+        hoverGroups.push(group);
+      } else {
+        // both 'left' and 'right' go to left for now (matching TV behavior)
+        leftGroups.push(group);
+      }
+    }
+
+    const bgColor = this.options.renderOptions?.backgroundColor || '#131722';
+    const textColor = this.options.renderOptions?.crosshairColor || '#888888';
+
+    if (leftGroups.length > 0) {
+      this._drawTooltipGroups(ctx, leftGroups, cursorX, cursorY, width, bgColor, textColor, 'left');
+    }
+    if (hoverGroups.length > 0) {
+      this._drawTooltipGroups(ctx, hoverGroups, cursorX, cursorY, width, bgColor, textColor, 'hover');
+    }
+  }
+
+  /**
+   * Render tooltip groups as a canvas text box.
+   */
+  private _drawTooltipGroups(
+    ctx: CanvasRenderingContext2D,
+    groups: import('../jailbreak/types').CrossHairTooltip[][],
+    cursorX: number,
+    cursorY: number,
+    chartWidth: number,
+    bgColor: string,
+    defaultTextColor: string,
+    alignment: 'left' | 'hover',
+  ): void {
+    const flat = groups.flat();
+    if (flat.length === 0) return;
+
+    const fontSize = 12;
+    const font = this.renderer.getFont();
+    ctx.font = `${fontSize}px ${font}`;
+
+    // Measure max text width
+    let maxTextWidth = 0;
+    for (const t of flat) {
+      const w = ctx.measureText(t.text).width;
+      if (w > maxTextWidth) maxTextWidth = w;
+    }
+
+    const textHeight = 15;
+    const padding = 5;
+    const groupPadding = 0.2;
+
+    // Calculate total height including group separators
+    const totalRows = flat.length + (groups.length - 1) * groupPadding * 2;
+    const tooltipHeight = textHeight * totalRows + padding;
+    const tooltipWidth = maxTextWidth + padding * 2;
+
+    // Position the tooltip
+    let rectX: number;
+    if (alignment === 'left') {
+      rectX = 20;
+    } else {
+      // hover: position near cursor, flip side if too close to edge
+      const fitsRight = cursorX + 15 + tooltipWidth < chartWidth - this.margins.right;
+      rectX = fitsRight ? cursorX + 15 : cursorX - tooltipWidth - 15;
+    }
+    const rectY = cursorY - tooltipHeight / 2;
+
+    // Draw background
+    ctx.fillStyle = bgColor;
+    ctx.globalAlpha = 0.85;
+    ctx.beginPath();
+    ctx.roundRect(rectX, rectY, tooltipWidth, tooltipHeight, 3);
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+
+    // Draw border
+    ctx.strokeStyle = defaultTextColor;
+    ctx.globalAlpha = 0.3;
+    ctx.lineWidth = 0.5;
+    ctx.strokeRect(rectX, rectY, tooltipWidth, tooltipHeight);
+    ctx.globalAlpha = 1.0;
+
+    // Draw text rows
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+
+    let rowOffset = 0;
+    for (let gi = 0; gi < groups.length; gi++) {
+      const group = groups[gi];
+      for (const tooltip of group) {
+        ctx.fillStyle = tooltip.color || defaultTextColor;
+        ctx.fillText(tooltip.text, rectX + padding, rectY + rowOffset * textHeight + padding / 1.2);
+        rowOffset++;
+      }
+
+      // Draw separator line between groups (not after last)
+      if (gi < groups.length - 1) {
+        rowOffset += groupPadding;
+        ctx.beginPath();
+        ctx.strokeStyle = defaultTextColor;
+        ctx.globalAlpha = 0.3;
+        ctx.moveTo(rectX, rectY + rowOffset * textHeight + padding / 2);
+        ctx.lineTo(rectX + tooltipWidth, rectY + rowOffset * textHeight + padding / 2);
+        ctx.stroke();
+        ctx.globalAlpha = 1.0;
+        rowOffset += groupPadding;
+      }
+    }
   }
 
   /**
    * Update bracket drag state from InteractiveLineRenderer move callbacks.
-   * Looks up the position in positionLines to get entryPrice + positionData.
+   * Looks up position or order lines to get entryPrice + positionData for preview.
    */
   private _updateBracketDragState(
     type: 'tp' | 'sl',
-    positionId: string,
+    lineId: string,
     price: number,
     partialPercent: number,
     dragStartX: number,
     dragCurrentX: number,
   ): void {
-    // Find the position to get entryPrice and positionData
-    const position = this.positionLines.find((p) => (p.positionId || p.id) === positionId);
-    if (!position?.positionData) return;
+    // Try position lines first
+    const position = this.positionLines.find((p) => (p.positionId || p.id) === lineId);
+    if (position?.positionData) {
+      this._bracketDragState = {
+        type,
+        positionId: lineId,
+        price,
+        entryPrice: position.positionData.entryPrice,
+        partialPercent,
+        partialEnabled: position.partialEnabled ?? false,
+        dragStartX,
+        dragCurrentX,
+        positionData: position.positionData,
+      };
+      this.renderCrosshairOverlay();
+      return;
+    }
 
-    this._bracketDragState = {
-      type,
-      positionId,
-      price,
-      entryPrice: position.positionData.entryPrice,
-      partialPercent,
-      partialEnabled: position.partialEnabled ?? false,
-      dragStartX,
-      dragCurrentX,
-      positionData: position.positionData,
-    };
-    this.renderCrosshairOverlay();
+    // Fall back to order lines — use order price as entry
+    const order = this.orderLines.find((o) => (o.orderId || o.id) === lineId);
+    if (order) {
+      this._bracketDragState = {
+        type,
+        positionId: lineId,
+        price,
+        entryPrice: order.price,
+        partialPercent,
+        partialEnabled: order.partialEnabled ?? false,
+        dragStartX,
+        dragCurrentX,
+        positionData: { entryPrice: order.price, isLong: true, notional: 0 },
+      };
+      this.renderCrosshairOverlay();
+    }
   }
 
   /**
@@ -1811,16 +2036,15 @@ export class ChartCore {
     const bracketY = this.renderer.publicPriceToYWithLayout(state.price, this.viewport, layout);
     const entryY = this.renderer.publicPriceToYWithLayout(state.entryPrice, this.viewport, layout);
 
-    // Compute PnL inline
+    // Compute PnL inline (only when notional > 0, i.e. for positions)
     const pd = state.positionData;
+    const hasPnl = pd.notional > 0;
     const priceDiff = pd.isLong ? state.price - state.entryPrice : state.entryPrice - state.price;
-    const pnl = ((priceDiff * pd.notional) / state.entryPrice) * (state.partialPercent / 100);
+    const pnl = hasPnl ? ((priceDiff * pd.notional) / state.entryPrice) * (state.partialPercent / 100) : 0;
     const percentDistance = ((state.price - state.entryPrice) / state.entryPrice) * 100;
 
     // Format values
-    const pnlDecimals = 2;
-    const pnlSign = pnl >= 0 ? '+' : '-';
-    const pnlText = pnlSign + '$' + Math.abs(pnl).toFixed(pnlDecimals);
+    const pnlText = hasPnl ? (pnl >= 0 ? '+' : '-') + '$' + Math.abs(pnl).toFixed(2) : '';
     const pctSign = percentDistance >= 0 ? '+' : '';
     const percentText = pctSign + percentDistance.toFixed(2) + '%';
 

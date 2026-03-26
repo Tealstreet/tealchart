@@ -4,22 +4,21 @@
  * Mirrors web's Konva-based PriceLineLayer for order lines:
  * - Horizontal price line with dashed styling
  * - Label showing order type, quantity, price
+ * - TP/SL buttons (draggable for bracket orders)
  * - Cancel button
  * - Invisible 44px drag handle for touch-friendly dragging
  */
 
-import React, { useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  runOnJS,
-} from 'react-native-reanimated';
+import type { OrderLineRenderData, Viewport } from '../../types';
+import type { ChartDimensions } from '../utils/coordinates';
 
-import type { OrderLineRenderData, Viewport, ChartMargins } from '../../types';
-import { priceToY, yToPrice, type ChartDimensions } from '../utils/coordinates';
+import React, { useCallback, useMemo } from 'react';
+
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+
+import { priceToY, yToPrice } from '../utils/coordinates';
 
 export interface OrderLineComponentProps {
   /** Order line render data from adapter */
@@ -34,14 +33,21 @@ export interface OrderLineComponentProps {
   useNarrowText?: boolean;
   /** Callback when order price is changed via drag */
   onPriceChange?: (orderId: string, newPrice: number) => void;
-  /** Callback when order is cancelled */
+  /** Callback when order is cancelled (fallback if no adapter callback) */
   onCancel?: (orderId: string) => void;
+  /** Continuous TP drag move callback (for Skia preview state only) */
+  onTPMovePreview?: (orderId: string, price: number) => void;
+  /** Continuous SL drag move callback (for Skia preview state only) */
+  onSLMovePreview?: (orderId: string, price: number) => void;
+  /** Called when any TP/SL drag ends (to clear preview) */
+  onTPSLDragEnd?: () => void;
 }
 
 const TOUCH_TARGET_HEIGHT = 44; // Minimum touch target per accessibility guidelines
 const LABEL_HEIGHT = 18;
-const CONNECTOR_LINE_THRESHOLD = 3; // Min offset to show connector line
-
+const TP_SL_BUTTON_WIDTH = 24;
+const TP_COLOR = '#22c55e'; // Green for take profit
+const SL_COLOR = '#f97316'; // Orange for stop loss
 export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
   order,
   viewport,
@@ -50,33 +56,199 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
   useNarrowText = false,
   onPriceChange,
   onCancel,
+  onTPMovePreview,
+  onSLMovePreview,
+  onTPSLDragEnd,
 }) => {
   // Calculate Y position from price
-  const baseY = useMemo(
-    () => priceToY(order.price, viewport, dimensions),
-    [order.price, viewport, dimensions]
-  );
+  const baseY = useMemo(() => priceToY(order.price, viewport, dimensions), [order.price, viewport, dimensions]);
 
   // Shared values for drag animation
   const translateY = useSharedValue(0);
   const isDragging = useSharedValue(false);
   const startY = useSharedValue(0);
 
+  // Shared values for TP/SL button drag
+  const tpTranslateY = useSharedValue(0);
+  const slTranslateY = useSharedValue(0);
+  const tpDragging = useSharedValue(false);
+  const slDragging = useSharedValue(false);
+
   // Handle price change callback
-  const handlePriceChange = useCallback((newPrice: number) => {
-    if (onPriceChange && order.editable) {
-      onPriceChange(order.id, newPrice);
-    }
-  }, [onPriceChange, order.id, order.editable]);
+  const handlePriceChange = useCallback(
+    (newPrice: number) => {
+      if (onPriceChange && order.editable) {
+        onPriceChange(order.id, newPrice);
+      }
+    },
+    [onPriceChange, order.id, order.editable],
+  );
 
-  // Handle cancel callback
+  // Handle cancel callback — fire directly from adapter callbacks
   const handleCancel = useCallback(() => {
-    if (onCancel && order.cancellable) {
-      onCancel(order.id);
+    if (order.cancellable) {
+      if (order.callbacks?.onCancel) {
+        order.callbacks.onCancel();
+      } else if (onCancel) {
+        onCancel(order.id);
+      }
     }
-  }, [onCancel, order.id, order.cancellable]);
+  }, [onCancel, order.id, order.cancellable, order.callbacks]);
 
-  // Pan gesture for dragging
+  // Handle TP click (no drag) — fire directly from adapter callbacks
+  const handleTPClick = useCallback(() => {
+    order.callbacks?.onTPClick?.();
+  }, [order.callbacks]);
+
+  // Handle SL click (no drag) — fire directly from adapter callbacks
+  const handleSLClick = useCallback(() => {
+    order.callbacks?.onSLClick?.();
+  }, [order.callbacks]);
+
+  // Handle TP drag end — fire directly from adapter callbacks
+  const handleTPDragEnd = useCallback(
+    (newPrice: number) => {
+      order.callbacks?.onTPMoveEnd?.(newPrice);
+    },
+    [order.callbacks],
+  );
+
+  // Handle SL drag end — fire directly from adapter callbacks
+  const handleSLDragEnd = useCallback(
+    (newPrice: number) => {
+      order.callbacks?.onSLMoveEnd?.(newPrice);
+    },
+    [order.callbacks],
+  );
+
+  // Handle continuous TP move (for adapter callback + Skia drag preview)
+  const handleTPMove = useCallback(
+    (price: number) => {
+      order.callbacks?.onTPMove?.(price);
+      onTPMovePreview?.(order.id, price);
+    },
+    [order.callbacks, onTPMovePreview, order.id],
+  );
+
+  // Handle continuous SL move (for adapter callback + Skia drag preview)
+  const handleSLMove = useCallback(
+    (price: number) => {
+      order.callbacks?.onSLMove?.(price);
+      onSLMovePreview?.(order.id, price);
+    },
+    [order.callbacks, onSLMovePreview, order.id],
+  );
+
+  // Handle TP/SL drag end (clear preview)
+  const handleTPSLDragEnd = useCallback(() => {
+    if (onTPSLDragEnd) {
+      onTPSLDragEnd();
+    }
+  }, [onTPSLDragEnd]);
+
+  // TP button drag gesture
+  const tpPanGesture = useMemo(() => {
+    if (!order.brackets) return Gesture.Pan();
+
+    return Gesture.Pan()
+      .onStart(() => {
+        tpDragging.value = true;
+      })
+      .onUpdate((event) => {
+        tpTranslateY.value = event.translationY;
+        if (Math.abs(event.translationY) >= 5) {
+          const dragPrice = yToPrice(baseY + event.translationY, viewport, dimensions);
+          runOnJS(handleTPMove)(dragPrice);
+        }
+      })
+      .onEnd((event) => {
+        tpDragging.value = false;
+        const finalY = baseY + event.translationY;
+        const newPrice = yToPrice(finalY, viewport, dimensions);
+
+        runOnJS(handleTPSLDragEnd)();
+
+        if (Math.abs(event.translationY) < 5) {
+          runOnJS(handleTPClick)();
+        } else {
+          runOnJS(handleTPDragEnd)(newPrice);
+        }
+
+        tpTranslateY.value = withSpring(0, { damping: 15, stiffness: 150 });
+      })
+      .onFinalize(() => {
+        runOnJS(handleTPSLDragEnd)();
+      });
+  }, [
+    order.brackets,
+    baseY,
+    viewport,
+    dimensions,
+    handleTPClick,
+    handleTPDragEnd,
+    handleTPMove,
+    handleTPSLDragEnd,
+    tpDragging,
+    tpTranslateY,
+  ]);
+
+  // SL button drag gesture
+  const slPanGesture = useMemo(() => {
+    if (!order.brackets) return Gesture.Pan();
+
+    return Gesture.Pan()
+      .onStart(() => {
+        slDragging.value = true;
+      })
+      .onUpdate((event) => {
+        slTranslateY.value = event.translationY;
+        if (Math.abs(event.translationY) >= 5) {
+          const dragPrice = yToPrice(baseY + event.translationY, viewport, dimensions);
+          runOnJS(handleSLMove)(dragPrice);
+        }
+      })
+      .onEnd((event) => {
+        slDragging.value = false;
+        const finalY = baseY + event.translationY;
+        const newPrice = yToPrice(finalY, viewport, dimensions);
+
+        runOnJS(handleTPSLDragEnd)();
+
+        if (Math.abs(event.translationY) < 5) {
+          runOnJS(handleSLClick)();
+        } else {
+          runOnJS(handleSLDragEnd)(newPrice);
+        }
+
+        slTranslateY.value = withSpring(0, { damping: 15, stiffness: 150 });
+      })
+      .onFinalize(() => {
+        runOnJS(handleTPSLDragEnd)();
+      });
+  }, [
+    order.brackets,
+    baseY,
+    viewport,
+    dimensions,
+    handleSLClick,
+    handleSLDragEnd,
+    handleSLMove,
+    handleTPSLDragEnd,
+    slDragging,
+    slTranslateY,
+  ]);
+
+  // Animated styles for TP button
+  const tpAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: tpTranslateY.value }],
+  }));
+
+  // Animated styles for SL button
+  const slAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: slTranslateY.value }],
+  }));
+
+  // Pan gesture for dragging (order price change)
   const panGesture = useMemo(() => {
     if (!order.editable) return Gesture.Pan();
 
@@ -112,40 +284,36 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
   const lineStyle = useMemo(() => {
     // 0=solid, 1=dotted, 2=dashed
     switch (order.lineStyle) {
-      case 1: return 'dotted';
-      case 2: return 'dashed';
-      default: return 'solid';
+      case 1:
+        return 'dotted';
+      case 2:
+        return 'dashed';
+      default:
+        return 'solid';
     }
   }, [order.lineStyle]);
 
   // Calculate label positioning based on lineLength
-  const chartWidth = dimensions.width - dimensions.margins.left - dimensions.margins.right;
   const labelX = useMemo(() => {
     // lineLength=100 means line extends full width, label at LEFT edge
     // lineLength=0 means no line extension, label at RIGHT edge (near price axis)
     const maxLabelX = dimensions.width - dimensions.margins.right - 120; // Approximate label width
     const minLabelX = dimensions.margins.left;
-    return minLabelX + ((maxLabelX - minLabelX) * (100 - order.lineLength) / 100);
+    return minLabelX + ((maxLabelX - minLabelX) * (100 - order.lineLength)) / 100;
   }, [order.lineLength, dimensions]);
 
   // Display text (use narrow if appropriate)
   const displayText = useNarrowText ? order.textShort : order.text;
   const displayQuantity = useNarrowText ? order.quantityShort : order.quantity;
 
-  // Price axis label position
-  const priceAxisLabelX = dimensions.width - dimensions.margins.right;
-
   // Format price for display
   const formattedPrice = order.price.toFixed(pricePrecision);
 
+  // Whether to show TP/SL buttons
+  const showBrackets = order.brackets !== null;
+
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        { top: baseY - TOUCH_TARGET_HEIGHT / 2 },
-        animatedContainerStyle,
-      ]}
-    >
+    <Animated.View style={[styles.container, { top: baseY - TOUCH_TARGET_HEIGHT / 2 }, animatedContainerStyle]}>
       {/* Horizontal line - left segment (if extendLeft) */}
       {order.extendLeft && (
         <View
@@ -199,9 +367,7 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
             },
           ]}
         >
-          <Text style={[styles.labelText, { color: order.bodyTextColor }]}>
-            {displayText}
-          </Text>
+          <Text style={[styles.labelText, { color: order.bodyTextColor }]}>{displayText}</Text>
         </View>
 
         {/* Quantity segment */}
@@ -215,12 +381,10 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
             },
           ]}
         >
-          <Text style={[styles.labelText, { color: order.quantityTextColor }]}>
-            {displayQuantity}
-          </Text>
+          <Text style={[styles.labelText, { color: order.quantityTextColor }]}>{displayQuantity}</Text>
         </View>
 
-        {/* Cancel button */}
+        {/* Cancel button — flush with label segments */}
         {order.cancellable && (
           <Pressable
             onPress={handleCancel}
@@ -234,10 +398,47 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
             ]}
             hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
           >
-            <Text style={[styles.cancelIcon, { color: order.cancelButtonIconColor }]}>
-              ×
-            </Text>
+            <Text style={[styles.cancelIcon, { color: order.cancelButtonIconColor }]}>×</Text>
           </Pressable>
+        )}
+
+        {/* TP/SL Buttons (if brackets enabled) — separated by gap */}
+        {showBrackets && (
+          <View style={styles.bracketButtons}>
+            {/* TP Button */}
+            <GestureDetector gesture={tpPanGesture}>
+              <Animated.View style={[styles.bracketButtonWrapper, tpAnimatedStyle]}>
+                <View
+                  style={[
+                    styles.bracketButton,
+                    {
+                      backgroundColor: order.bodyBackgroundColor,
+                      borderColor: TP_COLOR,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.bracketButtonText, { color: TP_COLOR }]}>TP</Text>
+                </View>
+              </Animated.View>
+            </GestureDetector>
+
+            {/* SL Button */}
+            <GestureDetector gesture={slPanGesture}>
+              <Animated.View style={[styles.bracketButtonWrapper, slAnimatedStyle]}>
+                <View
+                  style={[
+                    styles.bracketButton,
+                    {
+                      backgroundColor: order.bodyBackgroundColor,
+                      borderColor: SL_COLOR,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.bracketButtonText, { color: SL_COLOR }]}>SL</Text>
+                </View>
+              </Animated.View>
+            </GestureDetector>
+          </View>
         )}
       </View>
 
@@ -268,9 +469,7 @@ export const OrderLineComponent: React.FC<OrderLineComponentProps> = ({
           },
         ]}
       >
-        <Text style={[styles.priceText, { color: order.bodyTextColor }]}>
-          {formattedPrice}
-        </Text>
+        <Text style={[styles.priceText, { color: order.bodyTextColor }]}>{formattedPrice}</Text>
       </View>
     </Animated.View>
   );
@@ -311,6 +510,26 @@ const styles = StyleSheet.create({
   labelText: {
     fontSize: 11,
     fontFamily: 'System',
+  },
+  bracketButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 6, // Gap between cancel button and TP/SL buttons
+  },
+  bracketButtonWrapper: {
+    marginLeft: 0,
+  },
+  bracketButton: {
+    width: TP_SL_BUTTON_WIDTH,
+    height: LABEL_HEIGHT,
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  bracketButtonText: {
+    fontSize: 9,
+    fontWeight: 'bold',
   },
   cancelButton: {
     width: 18,

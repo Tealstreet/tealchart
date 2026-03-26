@@ -9,32 +9,8 @@ export { TealchartWidget, createTealchartWidget } from './TealchartWidget';
 // Per-chart API
 export { TealchartApi, type StudyCreateCallback } from './TealchartApi';
 
-// React component (for direct usage)
-export { Tealchart } from './Tealchart';
-export type { TealchartProps } from './Tealchart';
-
 // React Native Skia component - import from '@tealstreet/tealchart/native' for React Native
 // NOT exported here to avoid breaking web builds with RN dependencies
-
-// Full chart container with top bar (for direct React usage)
-export { ChartContainer } from './components/ChartContainer';
-export type { ChartContainerProps } from './components/ChartContainer';
-
-// Top bar component (for custom layouts)
-export { ChartTopBar } from './components/ChartTopBar';
-export type { ChartTopBarProps } from './components/ChartTopBar';
-
-// Layout selector (for loading saved layouts)
-export { LayoutSelector } from './components/LayoutSelector';
-export type { LayoutSelectorProps, LayoutInfo } from './components/LayoutSelector';
-
-// Indicators modal (for custom layouts)
-export { IndicatorsModal } from './components/IndicatorsModal';
-export type { IndicatorsModalProps } from './components/IndicatorsModal';
-
-// Shared popover container (for consistent modal styling)
-export { PopoverContainer, popoverStyles } from './components/PopoverContainer';
-export type { PopoverContainerProps } from './components/PopoverContainer';
 
 // Chart API context (for accessing chartApi in custom components)
 export { ChartApiContext, useChartApi, useChartApiOptional } from './state/ChartApiContext';
@@ -76,9 +52,6 @@ export { GapDetectionManager } from './GapDetectionManager';
 // Debug logging
 export { TealchartLogger, LogLevel, LogCategory } from './debug';
 export type { LogEntry, LogCategoryType, TealchartLoggerOptions } from './debug';
-export { DebugConsole } from './components/DebugConsole';
-export type { DebugConsoleProps } from './components/DebugConsole';
-
 // Event system
 export { EventEmitter, Subscription } from './events/EventEmitter';
 export type { EventCallback } from './events/EventEmitter';
@@ -139,14 +112,7 @@ export {
   type UseTealscriptOptions,
   type UseTealscriptReturn,
 } from './tealscript';
-export type {
-  PlotOutput,
-  PlotStyle,
-  InputDefinition,
-  TealscriptBar,
-  WorkerResult,
-  WorkerError,
-} from './tealscript';
+export type { PlotOutput, PlotStyle, InputDefinition, TealscriptBar, WorkerResult, WorkerError } from './tealscript';
 
 // Built-in indicators
 export {
@@ -162,11 +128,7 @@ export type { BuiltinIndicator } from './indicators';
 export { PaneManager } from './rendering/PaneManager';
 export type { PaneOffset, AddIndicatorOptions } from './rendering/PaneManager';
 export type { IndicatorPane, PaneLayout } from './types';
-export {
-  DEFAULT_PANE_LAYOUT,
-  DEFAULT_INDICATOR_PANE_HEIGHT,
-  MIN_PANE_HEIGHT,
-} from './types';
+export { DEFAULT_PANE_LAYOUT, DEFAULT_INDICATOR_PANE_HEIGHT, MIN_PANE_HEIGHT } from './types';
 
 // TradingView Layout Transformer
 // For saving/loading Custom Chart layouts in TradingView format
@@ -203,33 +165,15 @@ export type {
 } from './transformer';
 
 // Internationalization support
-export {
-  TranslationProvider,
-  useChartTranslations,
-  getTranslation,
-  DEFAULT_TRANSLATIONS,
-} from './i18n';
-export type {
-  ChartTranslations,
-  PartialChartTranslations,
-  TranslationProviderProps,
-} from './i18n';
+export { TranslationProvider, useChartTranslations, getTranslation, DEFAULT_TRANSLATIONS } from './i18n';
+export type { ChartTranslations, PartialChartTranslations, TranslationProviderProps } from './i18n';
 
 // Core widget logic (platform-agnostic)
-export {
-  ChartWidgetCore,
-  getIntervalMs,
-  INITIAL_BAR_COUNT,
-} from './core';
-export type {
-  ChartWidgetCoreOptions,
-  IIndicatorManager,
-} from './core';
+export { ChartWidgetCore, getIntervalMs, INITIAL_BAR_COUNT } from './core';
+export type { ChartWidgetCoreOptions, IIndicatorManager } from './core';
 
 // React hook for core widget (works on web and mobile)
-export {
-  useTealchartCore,
-} from './core/useTealchartCore';
+export { useTealchartCore } from './core/useTealchartCore';
 export type {
   UseTealchartCoreOptions,
   TealchartCoreState,

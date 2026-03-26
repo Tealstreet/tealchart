@@ -18,6 +18,7 @@
 
 import type { IIndicatorManager } from './core/ChartWidgetCore';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
+import type { IndicatorSettingsData } from './mobile/components/IndicatorSettingsModalMobile';
 import type { LabelBounds } from './mobile/hooks/useLabelCollision';
 import type { PlotOutput, PlotStyleOverride } from './state/chartState';
 import type {
@@ -57,6 +58,7 @@ import { useTealchartCore } from './core/useTealchartCore';
 import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
 import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
 import { CrosshairComponent } from './mobile/components/CrosshairComponent';
+import { IndicatorSettingsModalMobile } from './mobile/components/IndicatorSettingsModalMobile';
 import { IndicatorsModalMobile } from './mobile/components/IndicatorsModalMobile';
 import { OrderLineComponent } from './mobile/components/OrderLineComponent';
 import { PositionLineComponent } from './mobile/components/PositionLineComponent';
@@ -135,6 +137,8 @@ export interface SkiaTealchartProps {
   // ===========================================================================
   /** Called when an indicator is selected from the modal */
   onAddIndicator?: (indicator: BuiltinIndicator) => void;
+  /** Called to open indicator settings for a given instance ID */
+  onOpenIndicatorSettings?: (instanceId: string) => void;
 }
 
 export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
@@ -457,6 +461,41 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     [positionLines],
   );
 
+  // Order TP/SL drag move handlers (for Skia bracket preview)
+  const handleOrderTPMove = useCallback(
+    (orderId: string, price: number) => {
+      const order = orderLines?.find((o) => o.id === orderId || o.orderId === orderId);
+      if (order) {
+        setBracketDragState({
+          type: 'tp',
+          positionId: orderId,
+          price,
+          entryPrice: order.price,
+          isLong: true, // Approximation — actual side determined by OrderLineManager
+          notional: 0,
+        });
+      }
+    },
+    [orderLines],
+  );
+
+  const handleOrderSLMove = useCallback(
+    (orderId: string, price: number) => {
+      const order = orderLines?.find((o) => o.id === orderId || o.orderId === orderId);
+      if (order) {
+        setBracketDragState({
+          type: 'sl',
+          positionId: orderId,
+          price,
+          entryPrice: order.price,
+          isLong: true, // Approximation — actual side determined by OrderLineManager
+          notional: 0,
+        });
+      }
+    },
+    [orderLines],
+  );
+
   const handleTPSLDragEnd = useCallback(() => {
     setBracketDragState(null);
   }, []);
@@ -479,6 +518,51 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
       handleAddIndicatorInternal(indicator);
     },
     [handleAddIndicatorInternal],
+  );
+
+  // Indicator settings modal state
+  const [settingsModalVisible, setSettingsModalVisible] = useState(false);
+  const [settingsIndicator, setSettingsIndicator] = useState<IndicatorSettingsData | null>(null);
+  const [settingsInputDefs, setSettingsInputDefs] = useState<import('@tealstreet/tealscript').InputDefinition[]>([]);
+  const [settingsPlots, setSettingsPlots] = useState<import('@tealstreet/tealscript').PlotOutput[]>([]);
+
+  const handleOpenIndicatorSettings = useCallback((instanceId: string) => {
+    const manager = indicatorManagerRef.current;
+    if (!manager) return;
+
+    const activeInd = manager.getIndicator(instanceId);
+    if (!activeInd) return;
+
+    const inputDefs = manager.getInputDefinitions(instanceId);
+    const indicatorPlots = manager.getPlots().filter((p) => p.scriptId === instanceId);
+
+    setSettingsIndicator({
+      id: activeInd.instanceId,
+      name: activeInd.indicator.name,
+      inputs: activeInd.inputs ?? {},
+      styleOverrides: activeInd.styleOverrides,
+    });
+    setSettingsInputDefs(inputDefs);
+    setSettingsPlots(indicatorPlots);
+    setSettingsModalVisible(true);
+  }, []);
+
+  const handleSettingsModalClose = useCallback(() => {
+    setSettingsModalVisible(false);
+    setSettingsIndicator(null);
+  }, []);
+
+  const handleSettingsSave = useCallback(
+    (inputs: Record<string, unknown>, styleOverrides?: PlotStyleOverride[]) => {
+      const manager = indicatorManagerRef.current;
+      if (!manager || !settingsIndicator) return;
+
+      manager.updateInputs(settingsIndicator.id, inputs);
+      if (styleOverrides) {
+        manager.updateStyleOverrides(settingsIndicator.id, styleOverrides);
+      }
+    },
+    [settingsIndicator],
   );
 
   // Handle crosshair move callback
@@ -847,6 +931,9 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
               useNarrowText={dimensions.width < 400}
               onPriceChange={onOrderMove}
               onCancel={onOrderCancel}
+              onTPMovePreview={handleOrderTPMove}
+              onSLMovePreview={handleOrderSLMove}
+              onTPSLDragEnd={handleTPSLDragEnd}
             />
           ))}
 
@@ -927,6 +1014,16 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
         onClose={handleIndicatorsModalClose}
         onSelectIndicator={handleSelectIndicator}
         activeIndicatorIds={activeIndicatorIds}
+      />
+
+      {/* Indicator Settings Modal */}
+      <IndicatorSettingsModalMobile
+        visible={settingsModalVisible}
+        onClose={handleSettingsModalClose}
+        indicator={settingsIndicator}
+        inputDefinitions={settingsInputDefs}
+        plots={settingsPlots}
+        onSave={handleSettingsSave}
       />
     </View>
   );
