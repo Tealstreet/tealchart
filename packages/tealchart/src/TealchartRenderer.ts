@@ -3069,8 +3069,15 @@ export class TealchartRenderer {
       time: Math.floor(b.time / 1000),
     }));
 
+    // Get native CanvasRenderingContext2D for jailbreak indicators
+    // (they need full canvas API including createLinearGradient, drawImage etc.)
+    const nativeCtx =
+      'getNativeContext' in ctx
+        ? ((ctx as any).getNativeContext() as CanvasRenderingContext2D)
+        : (ctx as unknown as CanvasRenderingContext2D);
+
     return {
-      ctx: ctx as unknown as CanvasRenderingContext2D,
+      ctx: nativeCtx,
       bars: barsInSeconds,
       candleCoords,
       exchange: options.exchange ?? '',
