@@ -304,6 +304,18 @@ const TEALSTREET_INDICATORS: BuiltinIndicator[] = [
       behindCandles: true,
     },
   },
+  {
+    id: 'risk',
+    name: 'Risk',
+    category: 'tealstreet',
+    description: 'Crosshair tooltip showing position risk, side, size, and PnL',
+    overlay: true,
+    code: '',
+    jailbreak: {
+      inputs: [],
+      defaults: {},
+    },
+  },
 ];
 
 /**
