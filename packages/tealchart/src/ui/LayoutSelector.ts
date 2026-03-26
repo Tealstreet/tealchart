@@ -180,16 +180,16 @@ class LayoutModal extends Modal {
   private renderContent(): void {
     this.contentEl.innerHTML = '';
 
-    // Layout list
-    const tealchartLayouts = this.layouts.filter((l) => l.isTealchart);
+    // Layout list — show all layouts (TV and tealchart are compatible)
+    const allLayouts = this.layouts;
 
-    if (tealchartLayouts.length === 0) {
+    if (allLayouts.length === 0) {
       const emptyEl = document.createElement('div');
       Object.assign(emptyEl.style, selectorStyles.emptyState);
       emptyEl.textContent = 'No saved layouts';
       this.contentEl.appendChild(emptyEl);
     } else {
-      for (const layout of tealchartLayouts) {
+      for (const layout of allLayouts) {
         this.contentEl.appendChild(this.createListItem(layout));
       }
     }
@@ -385,7 +385,7 @@ export class LayoutSelector {
 
   setCurrentLayout(layoutId: string | number | null, layoutName: string | null): void {
     this.currentLayoutId = layoutId;
-    this.buttonLabelEl.textContent = layoutName || 'Default';
+    this.buttonLabelEl.textContent = layoutName || 'Unsaved';
     this.modal.setCurrentLayoutId(layoutId);
   }
 

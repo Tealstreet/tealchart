@@ -1,13 +1,16 @@
+import type { MapStore, WritableAtom } from 'nanostores';
+
+import { atom, computed, map } from 'nanostores';
+
+import { ResolutionString } from '../types';
+import { CHART_SETTINGS_VERSION } from './safeDeepMerge';
+
 /**
  * Chart State Management with Nanostores
- * Uses persistent stores for localStorage with per-chart keys
+ * Settings are in-memory only — loaded from SaveLoadAdapter on startup.
+ * Only CurrentLayoutState (layoutId/layoutName) persists to localStorage.
  * Framework-agnostic - works with React, vanilla JS, or any other framework
  */
-
-import { atom, map, computed, type MapStore, type WritableAtom } from 'nanostores';
-import { persistentMap } from '@nanostores/persistent';
-import { ResolutionString } from '../types';
-import { migrateChartSettings, CHART_SETTINGS_VERSION } from './safeDeepMerge';
 
 // ============================================================================
 // Indicator Instance Interface
@@ -146,39 +149,6 @@ function isBrowser(): boolean {
 }
 
 /**
- * Load and migrate settings from localStorage
- */
-function loadSettings(chartKey: string): ChartSettings {
-  if (!isBrowser()) return DEFAULT_CHART_SETTINGS;
-
-  try {
-    const key = getStorageKey(chartKey);
-    const stored = localStorage.getItem(key);
-    if (!stored) return DEFAULT_CHART_SETTINGS;
-
-    const parsed = JSON.parse(stored);
-    // Apply migrations and safe merge on read
-    return migrateChartSettings(parsed, DEFAULT_CHART_SETTINGS);
-  } catch {
-    return DEFAULT_CHART_SETTINGS;
-  }
-}
-
-/**
- * Save settings to localStorage
- */
-function saveSettings(chartKey: string, settings: ChartSettings): void {
-  if (!isBrowser()) return;
-
-  try {
-    const key = getStorageKey(chartKey);
-    localStorage.setItem(key, JSON.stringify(settings));
-  } catch {
-    // Ignore storage errors (quota exceeded, etc.)
-  }
-}
-
-/**
  * Load layout state from localStorage
  */
 function loadLayoutState(chartKey: string): CurrentLayoutState {
@@ -219,18 +189,11 @@ function saveLayoutState(chartKey: string, state: CurrentLayoutState): void {
 const chartStoreCache = new Map<string, ChartStore>();
 
 /**
- * Create a persistent map store with auto-save
+ * Create an in-memory settings store (no localStorage persistence).
+ * Settings are loaded from the SaveLoadAdapter on startup, not from localStorage.
  */
-function createPersistentSettingsStore(chartKey: string): MapStore<ChartSettings> {
-  const initialValue = loadSettings(chartKey);
-  const store = map<ChartSettings>(initialValue);
-
-  // Subscribe to changes and persist
-  store.subscribe((value) => {
-    saveSettings(chartKey, value);
-  });
-
-  return store;
+function createSettingsStore(): MapStore<ChartSettings> {
+  return map<ChartSettings>({ ...DEFAULT_CHART_SETTINGS });
 }
 
 /**
@@ -255,7 +218,7 @@ export function getChartStore(chartKey: string): ChartStore {
   let store = chartStoreCache.get(chartKey);
 
   if (!store) {
-    const settings = createPersistentSettingsStore(chartKey);
+    const settings = createSettingsStore();
     const currentLayout = createPersistentLayoutStore(chartKey);
     const isDirty = atom(false);
     const saveStatus = atom<SaveStatus>('idle');
@@ -323,7 +286,7 @@ export function getSaveStatusAtom(chartKey: string): WritableAtom<SaveStatus> {
 export function updateChartSetting<K extends keyof ChartSettings>(
   chartKey: string,
   key: K,
-  value: ChartSettings[K]
+  value: ChartSettings[K],
 ): void {
   const store = getChartStore(chartKey).settings;
   store.setKey(key, value);
@@ -332,10 +295,7 @@ export function updateChartSetting<K extends keyof ChartSettings>(
 /**
  * Update multiple properties in the settings store
  */
-export function updateChartSettings(
-  chartKey: string,
-  updates: Partial<ChartSettings>
-): void {
+export function updateChartSettings(chartKey: string, updates: Partial<ChartSettings>): void {
   const store = getChartStore(chartKey).settings;
   const current = store.get();
   store.set({ ...current, ...updates });
@@ -344,10 +304,7 @@ export function updateChartSettings(
 /**
  * Get the current value of a setting
  */
-export function getChartSetting<K extends keyof ChartSettings>(
-  chartKey: string,
-  key: K
-): ChartSettings[K] {
+export function getChartSetting<K extends keyof ChartSettings>(chartKey: string, key: K): ChartSettings[K] {
   return getChartStore(chartKey).settings.get()[key];
 }
 
@@ -357,7 +314,7 @@ export function getChartSetting<K extends keyof ChartSettings>(
 export function subscribeToSetting<K extends keyof ChartSettings>(
   chartKey: string,
   key: K,
-  callback: (value: ChartSettings[K]) => void
+  callback: (value: ChartSettings[K]) => void,
 ): () => void {
   const store = getChartStore(chartKey).settings;
   let prevValue = store.get()[key];
@@ -468,13 +425,19 @@ export function resolutionToMs(resolution: ResolutionString): number {
   const unit = resolution.replace(/[0-9]/g, '').toUpperCase();
 
   switch (unit) {
-    case 'S': return num * 1000;
+    case 'S':
+      return num * 1000;
     case '': // Minutes (no suffix) - TradingView standard
-    case 'M': return num * 60 * 1000;
-    case 'H': return num * 60 * 60 * 1000;
-    case 'D': return num * 24 * 60 * 60 * 1000;
-    case 'W': return num * 7 * 24 * 60 * 60 * 1000;
-    default: return num * 60 * 1000; // Default to minutes for unknown suffixes
+    case 'M':
+      return num * 60 * 1000;
+    case 'H':
+      return num * 60 * 60 * 1000;
+    case 'D':
+      return num * 24 * 60 * 60 * 1000;
+    case 'W':
+      return num * 7 * 24 * 60 * 60 * 1000;
+    default:
+      return num * 60 * 1000; // Default to minutes for unknown suffixes
   }
 }
 
@@ -504,7 +467,7 @@ export const AVAILABLE_TIMEFRAMES: TimeframeOption[] = [
  * Get display label for a resolution
  */
 export function getResolutionLabel(resolution: ResolutionString): string {
-  const option = AVAILABLE_TIMEFRAMES.find(tf => tf.value === resolution);
+  const option = AVAILABLE_TIMEFRAMES.find((tf) => tf.value === resolution);
   return option?.shortLabel || resolution;
 }
 
