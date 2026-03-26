@@ -483,7 +483,7 @@ export class TealchartWidgetUI {
     // Use current plots for this indicator (filter by scriptId)
     const indicatorPlots = this.currentPlots.filter((p: PlotOutput) => p.scriptId === indicatorId);
 
-    this.settingsModal?.open(
+    this.settingsModal?.openWith(
       indicator,
       inputDefinitions,
       indicatorPlots,

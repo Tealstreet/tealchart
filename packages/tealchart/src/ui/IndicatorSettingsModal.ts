@@ -1,14 +1,16 @@
 /**
- * IndicatorSettingsModal - Vanilla DOM modal for configuring indicator settings
+ * IndicatorSettingsModal - Modal for configuring indicator settings
  *
  * Provides form inputs based on Tealscript InputDefinition schema,
  * plus style configuration for plot appearance.
+ * Extends the Modal base class for overlay, header, tabs, footer, escape, click-outside.
  */
 
 import type { InputDefinition, PlotOutput } from '@tealstreet/tealscript';
 import type { LineStyle, PlotStyleOverride } from '../state/chartState';
+import type { ModalOptions } from './Modal';
 
-import { Component } from './Component';
+import { Modal } from './Modal';
 
 // ============================================================================
 // Types
@@ -38,14 +40,6 @@ export interface IndicatorSettingsModalOptions {
   };
 }
 
-interface IndicatorSettingsModalState {
-  isOpen: boolean;
-  activeTab: 'inputs' | 'style';
-  values: Record<string, unknown>;
-  styleOverrides: PlotStyleOverride[];
-  openPopoverId: string | null;
-}
-
 // Source options for 'source' type inputs
 const SOURCE_OPTIONS = [
   { value: 'close', label: 'Close' },
@@ -69,91 +63,12 @@ const LINE_STYLE_OPTIONS: { value: LineStyle; label: string }[] = [
 ];
 
 // ============================================================================
-// Styles
+// Styles (content-specific — overlay/header/tabs/footer from base)
 // ============================================================================
 
-const styles = {
-  overlay: {
-    position: 'absolute',
-    top: '0',
-    left: '0',
-    right: '0',
-    bottom: '0',
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: '10000',
-  } as Partial<CSSStyleDeclaration>,
-
-  modal: {
-    backgroundColor: 'var(--background, #1e222d)',
-    borderRadius: '8px',
-    border: '1px solid var(--border, #363a45)',
-    minWidth: '320px',
-    maxWidth: '480px',
-    maxHeight: 'min(80vh, calc(100% - 40px))',
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  } as Partial<CSSStyleDeclaration>,
-
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '12px 16px',
-    borderBottom: '1px solid var(--border, #363a45)',
-  } as Partial<CSSStyleDeclaration>,
-
-  title: {
-    color: 'var(--text, #d1d4dc)',
-    fontSize: '14px',
-    fontWeight: '600',
-    margin: '0',
-  } as Partial<CSSStyleDeclaration>,
-
-  closeButton: {
-    background: 'none',
-    border: 'none',
-    padding: '4px',
-    cursor: 'pointer',
-    color: 'var(--text2, #787b86)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: '4px',
-  } as Partial<CSSStyleDeclaration>,
-
-  tabs: {
-    display: 'flex',
-    borderBottom: '1px solid var(--border, #363a45)',
-  } as Partial<CSSStyleDeclaration>,
-
-  tab: {
-    padding: '10px 20px',
-    background: 'none',
-    border: 'none',
-    borderBottom: '2px solid transparent',
-    color: 'var(--text2, #787b86)',
-    fontSize: '13px',
-    fontWeight: '500',
-    cursor: 'pointer',
-    transition: 'all 0.15s ease',
-  } as Partial<CSSStyleDeclaration>,
-
-  tabActive: {
-    color: 'var(--text, #d1d4dc)',
-    borderBottomColor: 'var(--text, #d1d4dc)',
-  } as Partial<CSSStyleDeclaration>,
-
+const contentStyles = {
   body: {
     padding: '16px',
-    overflowY: 'auto',
-    flex: '1',
-    minHeight: '120px',
   } as Partial<CSSStyleDeclaration>,
 
   group: {
@@ -226,36 +141,6 @@ const styles = {
     borderRadius: '4px',
     backgroundColor: 'var(--background2, #131722)',
     cursor: 'pointer',
-  } as Partial<CSSStyleDeclaration>,
-
-  footer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    gap: '8px',
-    padding: '12px 16px',
-    borderTop: '1px solid var(--border, #363a45)',
-  } as Partial<CSSStyleDeclaration>,
-
-  button: {
-    padding: '8px 16px',
-    borderRadius: '4px',
-    fontSize: '12px',
-    fontWeight: '500',
-    cursor: 'pointer',
-    border: 'none',
-    outline: 'none',
-  } as Partial<CSSStyleDeclaration>,
-
-  cancelButton: {
-    backgroundColor: 'transparent',
-    border: '1px solid var(--border, #363a45)',
-    color: 'var(--text2, #787b86)',
-  } as Partial<CSSStyleDeclaration>,
-
-  applyButton: {
-    backgroundColor: 'var(--buy-color, #26a69a)',
-    color: '#fff',
   } as Partial<CSSStyleDeclaration>,
 
   // Style tab
@@ -370,147 +255,186 @@ const styles = {
 // IndicatorSettingsModal Class
 // ============================================================================
 
-export class IndicatorSettingsModal extends Component<IndicatorSettingsModalState> {
-  private options: IndicatorSettingsModalOptions;
-  private modalEl: HTMLElement | null = null;
-  private bodyEl: HTMLElement | null = null;
-  private boundKeyDown: (e: KeyboardEvent) => void;
+export class IndicatorSettingsModal extends Modal {
+  private settingsOptions: IndicatorSettingsModalOptions;
 
   // Current indicator data
   private indicator: ActiveIndicator | null = null;
   private inputDefinitions: InputDefinition[] = [];
   private plots: PlotOutput[] = [];
-  private onSave: ((inputs: Record<string, unknown>, styleOverrides?: PlotStyleOverride[]) => void) | null = null;
+  private onSaveCallback: ((inputs: Record<string, unknown>, styleOverrides?: PlotStyleOverride[]) => void) | null =
+    null;
+
+  // Form state (managed directly, not via setState to avoid full rebuilds)
+  private values: Record<string, unknown> = {};
+  private styleOverrides: PlotStyleOverride[] = [];
+  private openPopoverId: string | null = null;
 
   constructor(options: IndicatorSettingsModalOptions = {}) {
-    super('div', {
-      isOpen: false,
-      activeTab: 'inputs',
-      values: {},
-      styleOverrides: [],
-      openPopoverId: null,
-    });
+    const modalOptions: ModalOptions = {
+      title: 'Indicator Settings',
+      showCloseButton: true,
+      closeOnOverlayClick: true,
+      closeOnEscape: true,
+      position: 'absolute',
+      align: 'center',
+      modalBackground: 'var(--background, #1e222d)',
+      border: '1px solid var(--border, #363a45)',
+      maxHeight: 'min(80vh, calc(100% - 40px))',
+      tabs: [
+        { id: 'inputs', label: options.translations?.inputs || 'Inputs' },
+        { id: 'style', label: options.translations?.style || 'Style' },
+      ],
+      showFooter: true,
+      footerLabels: {
+        cancel: options.translations?.cancel || 'Cancel',
+        apply: options.translations?.apply || 'Apply',
+      },
+    };
 
-    this.options = options;
+    super(modalOptions);
 
-    // Setup overlay
-    Object.assign(this.el.style, styles.overlay);
-    this.el.style.display = 'none';
+    this.settingsOptions = options;
 
-    this.boundKeyDown = this.handleKeyDown.bind(this);
+    // Set modal width constraints
+    this.modalEl.style.minWidth = '320px';
+    this.modalEl.style.maxWidth = '480px';
 
-    // Overlay click handler
-    this.el.addEventListener('click', (e) => {
-      if (e.target === this.el) {
-        this.close();
-      }
-    });
+    // Content area styling
+    this.contentEl.style.padding = '16px';
+    this.contentEl.style.overflowY = 'auto';
+    this.contentEl.style.minHeight = '120px';
   }
 
   // ============================================================================
-  // Build Modal Structure
+  // Public API
   // ============================================================================
 
-  private buildModal(): void {
-    this.el.innerHTML = '';
+  /**
+   * Open the modal with indicator data
+   */
+  openWith(
+    indicator: ActiveIndicator,
+    inputDefinitions: InputDefinition[],
+    plots: PlotOutput[],
+    styleOverrides: PlotStyleOverride[] | undefined,
+    onSave: (inputs: Record<string, unknown>, styleOverrides?: PlotStyleOverride[]) => void,
+  ): void {
+    if (this.state.isOpen) return;
 
-    // Modal container
-    this.modalEl = this.createElement('div', { style: styles.modal });
-    this.modalEl.addEventListener('click', (e) => e.stopPropagation());
-    this.el.appendChild(this.modalEl);
+    this.indicator = indicator;
+    this.inputDefinitions = inputDefinitions;
+    this.plots = plots || [];
+    this.onSaveCallback = onSave;
 
-    // Header
-    const header = this.createElement('div', { style: styles.header });
+    // Initialize values from indicator inputs
+    const initialValues: Record<string, unknown> = {};
+    for (const def of inputDefinitions) {
+      initialValues[def.id] = indicator.inputs[def.id] ?? def.defval;
+    }
+    this.values = initialValues;
 
-    const title = this.createElement('h3', {
-      style: styles.title,
-      textContent: this.indicator?.name || 'Indicator Settings',
-    });
-    header.appendChild(title);
+    // Initialize style overrides
+    if (styleOverrides && styleOverrides.length > 0) {
+      this.styleOverrides = [...styleOverrides];
+    } else if (plots) {
+      this.styleOverrides = plots.map((plot) => {
+        let color: string | undefined;
+        if (typeof plot.color === 'string') {
+          color = plot.color;
+        } else if (Array.isArray(plot.color)) {
+          color = plot.color.find((c) => c !== null) ?? undefined;
+        }
+        return {
+          plotId: plot.id,
+          color,
+          linewidth: plot.linewidth ?? 1,
+          lineStyle: 'solid' as LineStyle,
+          opacity: 100,
+        };
+      });
+    } else {
+      this.styleOverrides = [];
+    }
 
-    const closeBtn = this.createElement('button', {
-      style: styles.closeButton,
-      onClick: () => this.close(),
-    });
-    closeBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <line x1="18" y1="6" x2="6" y2="18"></line>
-      <line x1="6" y1="6" x2="18" y2="18"></line>
-    </svg>`;
-    closeBtn.addEventListener('mouseenter', () => {
-      closeBtn.style.color = 'var(--text, #d1d4dc)';
-    });
-    closeBtn.addEventListener('mouseleave', () => {
-      closeBtn.style.color = 'var(--text2, #787b86)';
-    });
-    header.appendChild(closeBtn);
+    this.openPopoverId = null;
 
-    this.modalEl.appendChild(header);
+    // Set title to indicator name
+    this.setTitle(indicator.name || 'Indicator Settings');
 
-    // Tabs
-    const tabs = this.createElement('div', { style: styles.tabs });
+    // Reset to inputs tab
+    this.setActiveTab('inputs');
 
-    const inputsTab = this.createElement('button', {
-      style: {
-        ...styles.tab,
-        ...(this.state.activeTab === 'inputs' ? styles.tabActive : {}),
-      },
-      textContent: this.getTranslation('inputs', 'Inputs'),
-      onClick: () => this.setState({ activeTab: 'inputs', openPopoverId: null }),
-    });
-    tabs.appendChild(inputsTab);
+    // Open the modal (this sets state.isOpen and shows overlay)
+    this.open();
+  }
 
-    const styleTab = this.createElement('button', {
-      style: {
-        ...styles.tab,
-        ...(this.state.activeTab === 'style' ? styles.tabActive : {}),
-      },
-      textContent: this.getTranslation('style', 'Style'),
-      onClick: () => this.setState({ activeTab: 'style', openPopoverId: null }),
-    });
-    tabs.appendChild(styleTab);
+  /**
+   * Update translations
+   */
+  setTranslations(translations: IndicatorSettingsModalOptions['translations']): void {
+    this.settingsOptions.translations = translations;
+    if (this.state.isOpen) {
+      this.renderBody();
+    }
+  }
 
-    this.modalEl.appendChild(tabs);
+  // ============================================================================
+  // Overrides
+  // ============================================================================
 
-    // Body
-    this.bodyEl = this.createElement('div', { style: styles.body });
-    this.modalEl.appendChild(this.bodyEl);
-
-    // Footer
-    const footer = this.createElement('div', { style: styles.footer });
-
-    const cancelBtn = this.createElement('button', {
-      style: { ...styles.button, ...styles.cancelButton },
-      textContent: this.getTranslation('cancel', 'Cancel'),
-      onClick: () => this.close(),
-    });
-    footer.appendChild(cancelBtn);
-
-    const applyBtn = this.createElement('button', {
-      style: { ...styles.button, ...styles.applyButton },
-      textContent: this.getTranslation('apply', 'Apply'),
-      onClick: () => this.handleSave(),
-    });
-    footer.appendChild(applyBtn);
-
-    this.modalEl.appendChild(footer);
-
-    // Render body content
+  protected onOpen(): void {
     this.renderBody();
+  }
+
+  protected onClose(): void {
+    // Clear references
+    this.indicator = null;
+    this.inputDefinitions = [];
+    this.plots = [];
+    this.onSaveCallback = null;
+    this.openPopoverId = null;
+  }
+
+  protected onTabChange(_tabId: string): void {
+    this.openPopoverId = null;
+    this.renderBody();
+  }
+
+  protected handleApply(): void {
+    if (this.onSaveCallback) {
+      const overrides = this.styleOverrides.length > 0 ? this.styleOverrides : undefined;
+      this.onSaveCallback(this.values, overrides);
+    }
+    this.close();
+  }
+
+  /**
+   * Custom escape handling: close popover first, then modal
+   */
+  protected handleKeyDown(e: KeyboardEvent): void {
+    if (e.key === 'Escape') {
+      if (this.openPopoverId) {
+        this.openPopoverId = null;
+        this.renderBody();
+      } else {
+        this.close();
+      }
+    }
+  }
+
+  protected render(): void {
+    if (this.state.isOpen) {
+      this.renderBody();
+    }
   }
 
   // ============================================================================
   // Render
   // ============================================================================
 
-  protected render(): void {
-    if (this.state.isOpen) {
-      this.buildModal();
-    }
-  }
-
   private renderBody(): void {
-    if (!this.bodyEl) return;
-    this.bodyEl.innerHTML = '';
+    this.contentEl.innerHTML = '';
 
     if (this.state.activeTab === 'inputs') {
       this.renderInputsTab();
@@ -520,14 +444,12 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
   }
 
   private renderInputsTab(): void {
-    if (!this.bodyEl) return;
-
     if (this.inputDefinitions.length === 0) {
       const empty = this.createElement('div', {
-        style: styles.emptyState,
+        style: contentStyles.emptyState,
         textContent: this.getTranslation('noConfigurableInputs', 'No configurable inputs'),
       });
-      this.bodyEl.appendChild(empty);
+      this.contentEl.appendChild(empty);
       return;
     }
 
@@ -543,11 +465,11 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
 
     // Render groups
     for (const [groupName, inputs] of groups) {
-      const groupEl = this.createElement('div', { style: styles.group });
+      const groupEl = this.createElement('div', { style: contentStyles.group });
 
       if (groups.size > 1) {
         const groupTitle = this.createElement('div', {
-          style: styles.groupTitle,
+          style: contentStyles.groupTitle,
           textContent: groupName,
         });
         groupEl.appendChild(groupTitle);
@@ -558,24 +480,24 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
         groupEl.appendChild(row);
       }
 
-      this.bodyEl!.appendChild(groupEl);
+      this.contentEl.appendChild(groupEl);
     }
   }
 
   private renderFormInput(def: InputDefinition): HTMLElement {
-    const row = this.createElement('div', { style: styles.formRow });
+    const row = this.createElement('div', { style: contentStyles.formRow });
 
     // Label
     const labelContainer = document.createElement('div');
     const label = this.createElement('div', {
-      style: styles.label,
+      style: contentStyles.label,
       textContent: def.title,
     });
     labelContainer.appendChild(label);
 
     if (def.tooltip) {
       const tooltip = this.createElement('div', {
-        style: styles.tooltip,
+        style: contentStyles.tooltip,
         textContent: def.tooltip,
       });
       labelContainer.appendChild(tooltip);
@@ -583,14 +505,14 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
     row.appendChild(labelContainer);
 
     // Input
-    const currentValue = this.state.values[def.id] ?? def.defval;
+    const currentValue = this.values[def.id] ?? def.defval;
 
     switch (def.type) {
       case 'int':
       case 'float': {
         const input = document.createElement('input');
         input.type = 'number';
-        Object.assign(input.style, styles.input);
+        Object.assign(input.style, contentStyles.input);
         input.value = String(currentValue);
         if (def.minval !== undefined) input.min = String(def.minval);
         if (def.maxval !== undefined) input.max = String(def.maxval);
@@ -609,7 +531,7 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
       case 'bool': {
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-        Object.assign(checkbox.style, styles.checkbox);
+        Object.assign(checkbox.style, contentStyles.checkbox);
         checkbox.checked = Boolean(currentValue);
         checkbox.addEventListener('change', (e) => {
           this.updateValue(def.id, (e.target as HTMLInputElement).checked);
@@ -621,7 +543,7 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
       case 'string': {
         if (def.options && def.options.length > 0) {
           const select = document.createElement('select');
-          Object.assign(select.style, styles.select);
+          Object.assign(select.style, contentStyles.select);
           for (const opt of def.options) {
             const option = document.createElement('option');
             option.value = opt;
@@ -636,7 +558,7 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
         } else {
           const input = document.createElement('input');
           input.type = 'text';
-          Object.assign(input.style, styles.input);
+          Object.assign(input.style, contentStyles.input);
           input.value = String(currentValue);
           input.addEventListener('change', (e) => {
             this.updateValue(def.id, (e.target as HTMLInputElement).value);
@@ -648,7 +570,7 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
 
       case 'source': {
         const select = document.createElement('select');
-        Object.assign(select.style, styles.select);
+        Object.assign(select.style, contentStyles.select);
         for (const opt of SOURCE_OPTIONS) {
           const option = document.createElement('option');
           option.value = opt.value;
@@ -666,7 +588,7 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
       case 'color': {
         const colorInput = document.createElement('input');
         colorInput.type = 'color';
-        Object.assign(colorInput.style, styles.colorInput);
+        Object.assign(colorInput.style, contentStyles.colorInput);
         colorInput.value = String(currentValue);
         colorInput.addEventListener('change', (e) => {
           this.updateValue(def.id, (e.target as HTMLInputElement).value);
@@ -678,7 +600,7 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
       default: {
         const input = document.createElement('input');
         input.type = 'text';
-        Object.assign(input.style, styles.input);
+        Object.assign(input.style, contentStyles.input);
         input.value = String(currentValue);
         input.addEventListener('change', (e) => {
           this.updateValue(def.id, (e.target as HTMLInputElement).value);
@@ -691,14 +613,12 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
   }
 
   private renderStyleTab(): void {
-    if (!this.bodyEl) return;
-
     if (!this.plots || this.plots.length === 0) {
       const empty = this.createElement('div', {
-        style: styles.emptyState,
+        style: contentStyles.emptyState,
         textContent: this.getTranslation('noStyleOptions', 'No style options available'),
       });
-      this.bodyEl.appendChild(empty);
+      this.contentEl.appendChild(empty);
       return;
     }
 
@@ -706,12 +626,12 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
       const plot = this.plots[i];
       const isLast = i === this.plots.length - 1;
       const row = this.renderPlotStyleRow(plot, isLast);
-      this.bodyEl.appendChild(row);
+      this.contentEl.appendChild(row);
     }
   }
 
   private renderPlotStyleRow(plot: PlotOutput, isLast: boolean): HTMLElement {
-    const override = this.state.styleOverrides.find((o) => o.plotId === plot.id);
+    const override = this.styleOverrides.find((o) => o.plotId === plot.id);
 
     // Get base color from plot
     let baseColor = '#2196f3';
@@ -725,12 +645,11 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
     const currentColor = override?.color ?? baseColor;
     const currentLinewidth = override?.linewidth ?? plot.linewidth ?? 1;
     const currentLineStyle = override?.lineStyle ?? 'solid';
-    const currentOpacity = override?.opacity ?? 100;
 
     const row = this.createElement('div', {
       style: {
-        ...styles.plotRow,
-        ...(isLast ? styles.plotRowLast : {}),
+        ...contentStyles.plotRow,
+        ...(isLast ? contentStyles.plotRowLast : {}),
         position: 'relative',
       },
     });
@@ -738,7 +657,7 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
     // Checkbox
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
-    Object.assign(checkbox.style, styles.plotCheckbox);
+    Object.assign(checkbox.style, contentStyles.plotCheckbox);
     checkbox.checked = true;
     checkbox.readOnly = true;
     checkbox.title = this.getTranslation('toggleVisibility', 'Toggle visibility');
@@ -746,23 +665,23 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
 
     // Plot name
     const name = this.createElement('span', {
-      style: styles.plotName,
+      style: contentStyles.plotName,
       textContent: plot.title || plot.id,
     });
     row.appendChild(name);
 
     // Color swatch + line preview
     const preview = this.createElement('div', {
-      style: styles.plotPreview,
+      style: contentStyles.plotPreview,
       onClick: () => {
-        const newPopoverId = this.state.openPopoverId === plot.id ? null : plot.id;
-        this.setState({ openPopoverId: newPopoverId });
+        this.openPopoverId = this.openPopoverId === plot.id ? null : plot.id;
+        this.renderBody();
       },
     });
     preview.title = this.getTranslation('clickToEditStyle', 'Click to edit style');
 
     const colorSwatch = this.createElement('div', {
-      style: { ...styles.colorSwatch, backgroundColor: currentColor },
+      style: { ...contentStyles.colorSwatch, backgroundColor: currentColor },
     });
     preview.appendChild(colorSwatch);
 
@@ -786,7 +705,7 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
     row.appendChild(preview);
 
     // Popover (if open)
-    if (this.state.openPopoverId === plot.id) {
+    if (this.openPopoverId === plot.id) {
       const popoverContainer = this.renderStylePopover(plot.id, currentColor, currentLinewidth, currentLineStyle);
       row.appendChild(popoverContainer);
     }
@@ -803,19 +722,22 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
 
     // Overlay to close on click outside
     const overlay = this.createElement('div', {
-      style: styles.popoverOverlay,
-      onClick: () => this.setState({ openPopoverId: null }),
+      style: contentStyles.popoverOverlay,
+      onClick: () => {
+        this.openPopoverId = null;
+        this.renderBody();
+      },
     });
     container.appendChild(overlay);
 
     // Popover
-    const popover = this.createElement('div', { style: styles.popover });
+    const popover = this.createElement('div', { style: contentStyles.popover });
     popover.addEventListener('click', (e) => e.stopPropagation());
 
     // Color picker
-    const colorRow = this.createElement('div', { style: { ...styles.controlRow, marginBottom: '12px' } });
+    const colorRow = this.createElement('div', { style: { ...contentStyles.controlRow, marginBottom: '12px' } });
     const colorLabel = this.createElement('span', {
-      style: styles.controlLabel,
+      style: contentStyles.controlLabel,
       textContent: 'Color',
     });
     colorRow.appendChild(colorLabel);
@@ -823,7 +745,7 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
     const colorInput = document.createElement('input');
     colorInput.type = 'color';
     colorInput.value = color;
-    Object.assign(colorInput.style, styles.colorInput);
+    Object.assign(colorInput.style, contentStyles.colorInput);
     colorInput.addEventListener('change', (e) => {
       this.updateStyleOverride(plotId, 'color', (e.target as HTMLInputElement).value);
     });
@@ -831,19 +753,19 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
     popover.appendChild(colorRow);
 
     // Line thickness
-    const thicknessRow = this.createElement('div', { style: styles.controlRow });
+    const thicknessRow = this.createElement('div', { style: contentStyles.controlRow });
     const thicknessLabel = this.createElement('span', {
-      style: styles.controlLabel,
+      style: contentStyles.controlLabel,
       textContent: this.getTranslation('thickness', 'Thickness'),
     });
     thicknessRow.appendChild(thicknessLabel);
 
-    const thicknessGroup = this.createElement('div', { style: styles.buttonGroup });
+    const thicknessGroup = this.createElement('div', { style: contentStyles.buttonGroup });
     for (const thickness of LINE_THICKNESS_OPTIONS) {
       const btn = this.createElement('button', {
         style: {
-          ...styles.optionButton,
-          ...(linewidth === thickness ? styles.optionButtonActive : {}),
+          ...contentStyles.optionButton,
+          ...(linewidth === thickness ? contentStyles.optionButtonActive : {}),
         },
         onClick: () => this.updateStyleOverride(plotId, 'linewidth', thickness),
       });
@@ -853,14 +775,14 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
       svg.setAttribute('width', '20');
       svg.setAttribute('height', '12');
       svg.setAttribute('viewBox', '0 0 20 12');
-      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', '2');
-      line.setAttribute('y1', '6');
-      line.setAttribute('x2', '18');
-      line.setAttribute('y2', '6');
-      line.setAttribute('stroke', linewidth === thickness ? '#131722' : '#787b86');
-      line.setAttribute('stroke-width', String(thickness));
-      svg.appendChild(line);
+      const svgLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      svgLine.setAttribute('x1', '2');
+      svgLine.setAttribute('y1', '6');
+      svgLine.setAttribute('x2', '18');
+      svgLine.setAttribute('y2', '6');
+      svgLine.setAttribute('stroke', linewidth === thickness ? '#131722' : '#787b86');
+      svgLine.setAttribute('stroke-width', String(thickness));
+      svg.appendChild(svgLine);
       btn.appendChild(svg);
 
       thicknessGroup.appendChild(btn);
@@ -869,20 +791,20 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
     popover.appendChild(thicknessRow);
 
     // Line style
-    const styleRow = this.createElement('div', { style: { ...styles.controlRow, marginBottom: '0' } });
+    const styleRow = this.createElement('div', { style: { ...contentStyles.controlRow, marginBottom: '0' } });
     const styleLabel = this.createElement('span', {
-      style: styles.controlLabel,
+      style: contentStyles.controlLabel,
       textContent: this.getTranslation('lineStyle', 'Line Style'),
     });
     styleRow.appendChild(styleLabel);
 
-    const styleGroup = this.createElement('div', { style: styles.buttonGroup });
+    const styleGroup = this.createElement('div', { style: contentStyles.buttonGroup });
     for (const opt of LINE_STYLE_OPTIONS) {
       const btn = this.createElement('button', {
         style: {
-          ...styles.optionButton,
+          ...contentStyles.optionButton,
           width: '40px',
-          ...(lineStyle === opt.value ? styles.optionButtonActive : {}),
+          ...(lineStyle === opt.value ? contentStyles.optionButtonActive : {}),
         },
         onClick: () => this.updateStyleOverride(plotId, 'lineStyle', opt.value),
       });
@@ -892,15 +814,15 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
       svg.setAttribute('width', '24');
       svg.setAttribute('height', '12');
       svg.setAttribute('viewBox', '0 0 24 12');
-      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', '2');
-      line.setAttribute('y1', '6');
-      line.setAttribute('x2', '22');
-      line.setAttribute('y2', '6');
-      line.setAttribute('stroke', lineStyle === opt.value ? '#131722' : '#787b86');
-      line.setAttribute('stroke-width', '2');
-      line.setAttribute('stroke-dasharray', this.getDashArray(opt.value));
-      svg.appendChild(line);
+      const svgLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      svgLine.setAttribute('x1', '2');
+      svgLine.setAttribute('y1', '6');
+      svgLine.setAttribute('x2', '22');
+      svgLine.setAttribute('y2', '6');
+      svgLine.setAttribute('stroke', lineStyle === opt.value ? '#131722' : '#787b86');
+      svgLine.setAttribute('stroke-width', '2');
+      svgLine.setAttribute('stroke-dasharray', this.getDashArray(opt.value));
+      svg.appendChild(svgLine);
       btn.appendChild(svg);
 
       styleGroup.appendChild(btn);
@@ -913,33 +835,11 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
   }
 
   // ============================================================================
-  // Event Handlers
-  // ============================================================================
-
-  private handleKeyDown(e: KeyboardEvent): void {
-    if (e.key === 'Escape') {
-      if (this.state.openPopoverId) {
-        this.setState({ openPopoverId: null });
-      } else {
-        this.close();
-      }
-    }
-  }
-
-  private handleSave(): void {
-    if (this.onSave) {
-      const styleOverrides = this.state.styleOverrides.length > 0 ? this.state.styleOverrides : undefined;
-      this.onSave(this.state.values, styleOverrides);
-    }
-    this.close();
-  }
-
-  // ============================================================================
   // Helpers
   // ============================================================================
 
   private getTranslation(key: string, fallback: string): string {
-    const translations = this.options.translations as Record<string, string> | undefined;
+    const translations = this.settingsOptions.translations as Record<string, string> | undefined;
     return translations?.[key] || fallback;
   }
 
@@ -955,119 +855,17 @@ export class IndicatorSettingsModal extends Component<IndicatorSettingsModalStat
   }
 
   private updateValue(id: string, value: unknown): void {
-    this.state.values = { ...this.state.values, [id]: value };
+    this.values = { ...this.values, [id]: value };
   }
 
   private updateStyleOverride(plotId: string, key: keyof PlotStyleOverride, value: string | number | LineStyle): void {
-    const existing = this.state.styleOverrides.find((o) => o.plotId === plotId);
+    const existing = this.styleOverrides.find((o) => o.plotId === plotId);
     if (existing) {
-      this.state.styleOverrides = this.state.styleOverrides.map((o) =>
-        o.plotId === plotId ? { ...o, [key]: value } : o,
-      );
+      this.styleOverrides = this.styleOverrides.map((o) => (o.plotId === plotId ? { ...o, [key]: value } : o));
     } else {
-      this.state.styleOverrides = [...this.state.styleOverrides, { plotId, [key]: value }];
+      this.styleOverrides = [...this.styleOverrides, { plotId, [key]: value }];
     }
     // Re-render the style tab
     this.renderBody();
-  }
-
-  // ============================================================================
-  // Public API
-  // ============================================================================
-
-  /**
-   * Open the modal with indicator data
-   */
-  open(
-    indicator: ActiveIndicator,
-    inputDefinitions: InputDefinition[],
-    plots: PlotOutput[],
-    styleOverrides: PlotStyleOverride[] | undefined,
-    onSave: (inputs: Record<string, unknown>, styleOverrides?: PlotStyleOverride[]) => void,
-  ): void {
-    if (this.state.isOpen) return;
-
-    this.indicator = indicator;
-    this.inputDefinitions = inputDefinitions;
-    this.plots = plots || [];
-    this.onSave = onSave;
-
-    // Initialize values from indicator inputs
-    const initialValues: Record<string, unknown> = {};
-    for (const def of inputDefinitions) {
-      initialValues[def.id] = indicator.inputs[def.id] ?? def.defval;
-    }
-
-    // Initialize style overrides
-    let initialStyleOverrides: PlotStyleOverride[] = [];
-    if (styleOverrides && styleOverrides.length > 0) {
-      initialStyleOverrides = [...styleOverrides];
-    } else if (plots) {
-      initialStyleOverrides = plots.map((plot) => {
-        let color: string | undefined;
-        if (typeof plot.color === 'string') {
-          color = plot.color;
-        } else if (Array.isArray(plot.color)) {
-          color = plot.color.find((c) => c !== null) ?? undefined;
-        }
-        return {
-          plotId: plot.id,
-          color,
-          linewidth: plot.linewidth ?? 1,
-          lineStyle: 'solid' as LineStyle,
-          opacity: 100,
-        };
-      });
-    }
-
-    this.setState({
-      isOpen: true,
-      activeTab: 'inputs',
-      values: initialValues,
-      styleOverrides: initialStyleOverrides,
-      openPopoverId: null,
-    });
-
-    this.el.style.display = 'flex';
-    document.addEventListener('keydown', this.boundKeyDown);
-  }
-
-  /**
-   * Close the modal
-   */
-  close(): void {
-    if (!this.state.isOpen) return;
-
-    this.setState({ isOpen: false, openPopoverId: null });
-    this.el.style.display = 'none';
-
-    document.removeEventListener('keydown', this.boundKeyDown);
-
-    // Clear references
-    this.indicator = null;
-    this.inputDefinitions = [];
-    this.plots = [];
-    this.onSave = null;
-  }
-
-  /**
-   * Check if modal is open
-   */
-  isOpen(): boolean {
-    return this.state.isOpen;
-  }
-
-  /**
-   * Update translations
-   */
-  setTranslations(translations: IndicatorSettingsModalOptions['translations']): void {
-    this.options.translations = translations;
-    if (this.state.isOpen) {
-      this.render();
-    }
-  }
-
-  protected onUnmount(): void {
-    document.removeEventListener('keydown', this.boundKeyDown);
   }
 }
