@@ -1,9 +1,11 @@
 import type { ChartStore } from '../state/chartState';
 import type { ResolutionString } from '../types';
 import type { ComponentOptions } from './Component';
+import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
 import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
 import { Component } from './Component';
+import { LayoutSelector } from './LayoutSelector';
 
 /**
  * ChartTopBar - Vanilla DOM toolbar for the chart
@@ -26,6 +28,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onIntervalChange?: (interval: ResolutionString) => void;
   /** Callback when indicators button is clicked */
   onIndicatorsClick?: () => void;
+  /** Layout selector callbacks (if provided, layout selector is shown) */
+  layoutCallbacks?: LayoutSelectorCallbacks;
   /** CSS variables for theming */
   cssVars?: Record<string, string>;
 }
@@ -150,6 +154,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   // Element references
   private timeframeButtons: Map<string, HTMLButtonElement> = new Map();
   private indicatorsBtn: HTMLButtonElement | null = null;
+  private layoutSelector: LayoutSelector | null = null;
 
   constructor(options: ChartTopBarOptions) {
     super('div', {
@@ -295,8 +300,19 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     this.el.appendChild(this.indicatorsBtn);
 
-    // Spacer (for future layout selector placement)
+    // Spacer
     this.el.appendChild(this.createElement('div', { style: styles.spacer }));
+
+    // Layout selector (after spacer so it's right-aligned)
+    if (this.options.layoutCallbacks) {
+      // Divider before layout selector
+      this.el.appendChild(this.createElement('div', { style: styles.divider }));
+
+      if (!this.layoutSelector) {
+        this.layoutSelector = new LayoutSelector(this.options.layoutCallbacks);
+      }
+      this.el.appendChild(this.layoutSelector.getElement());
+    }
   }
 
   // ============================================================================
@@ -376,6 +392,13 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   setSupportedResolutions(resolutions: string[] | null): void {
     this.supportedResolutions = resolutions;
     this.render();
+  }
+
+  /**
+   * Update the current layout shown in the layout selector
+   */
+  setCurrentLayout(layoutId: string | number | null, layoutName: string | null): void {
+    this.layoutSelector?.setCurrentLayout(layoutId, layoutName);
   }
 
   /**

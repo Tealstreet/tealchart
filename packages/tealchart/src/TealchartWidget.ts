@@ -908,7 +908,37 @@ export class TealchartWidget {
         this._paneManager.toggleMaximizePane(paneId);
         this._scheduler.markDirty(DIRTY.LAYOUT | DIRTY.VIEWPORT);
       },
+      layoutCallbacks: this._options.save_load_adapter
+        ? {
+            getAllLayouts: () => {
+              return import('./transformer').then(({ getAllLayouts }) =>
+                getAllLayouts(this._options.save_load_adapter!),
+              );
+            },
+            onSave: () => {
+              this._handleSaveCurrentLayout();
+            },
+            onSaveAs: (name: string) => {
+              this._handleSaveAsLayout(name);
+            },
+            onLoad: (id: string | number) => {
+              this._handleLoadLayoutById(id);
+            },
+            onDelete: (id: string | number) => {
+              this._handleDeleteLayout(id);
+            },
+            onRename: (id: string | number, newName: string) => {
+              this._handleRenameLayout(id, newName);
+            },
+          }
+        : undefined,
     });
+
+    // Sync the layout selector with the current layout state
+    if (this._chartStore && this._options.save_load_adapter) {
+      const current = this._chartStore.currentLayout.get();
+      this._ui.setCurrentLayout(current.layoutId, current.layoutName);
+    }
   }
 
   /**
@@ -2425,6 +2455,179 @@ export class TealchartWidget {
         });
       }
     }
+  }
+
+  /**
+   * Save the current layout (update in place).
+   * Called from the layout selector "Save" action.
+   */
+  private _handleSaveCurrentLayout(): void {
+    if (!this._chartStore || !this._options.save_load_adapter) return;
+
+    const currentLayout = this._chartStore.currentLayout.get();
+    if (!currentLayout.layoutId || !currentLayout.layoutName) {
+      // No layout loaded — treat as "Save As"
+      const name = prompt('Layout name:');
+      if (name && name.trim()) {
+        this._handleSaveAsLayout(name.trim());
+      }
+      return;
+    }
+
+    const settings = this._getCurrentSettings();
+    this._chartStore.saveStatus.set('saving');
+    this._scheduler.markDirty(DIRTY.FULL);
+
+    import('./transformer').then(({ updateTealchartLayout }) => {
+      updateTealchartLayout(
+        String(currentLayout.layoutId),
+        settings,
+        currentLayout.layoutName!,
+        this._options.save_load_adapter!,
+      )
+        .then((chartId) => {
+          if (!this._chartStore) return;
+          this._chartStore.currentLayout.set({ layoutId: chartId, layoutName: currentLayout.layoutName });
+          this._chartStore.isDirty.set(false);
+          this._showSaveSuccess();
+          this._ui?.setCurrentLayout(chartId, currentLayout.layoutName);
+        })
+        .catch((error) => {
+          console.error('[Tealchart] Failed to save layout:', error);
+          if (!this._chartStore) return;
+          this._chartStore.saveStatus.set('error');
+          this._scheduler.markDirty(DIRTY.FULL);
+        });
+    });
+  }
+
+  /**
+   * Save as a new layout with the given name.
+   * Called from the layout selector "Save As" action.
+   */
+  private _handleSaveAsLayout(layoutName: string): void {
+    if (!this._chartStore || !this._options.save_load_adapter) return;
+
+    const settings = this._getCurrentSettings();
+    this._chartStore.saveStatus.set('saving');
+    this._scheduler.markDirty(DIRTY.FULL);
+
+    import('./transformer').then(({ saveTealchartLayout }) => {
+      saveTealchartLayout(settings, layoutName, this._options.save_load_adapter!)
+        .then((chartId) => {
+          if (!this._chartStore) return;
+          this._chartStore.currentLayout.set({ layoutId: chartId, layoutName });
+          this._chartStore.isDirty.set(false);
+          this._showSaveSuccess();
+          this._ui?.setCurrentLayout(chartId, layoutName);
+        })
+        .catch((error) => {
+          console.error('[Tealchart] Failed to save layout:', error);
+          if (!this._chartStore) return;
+          this._chartStore.saveStatus.set('error');
+          this._scheduler.markDirty(DIRTY.FULL);
+        });
+    });
+  }
+
+  /**
+   * Load a layout by ID.
+   * Called from the layout selector list items.
+   */
+  private _handleLoadLayoutById(layoutId: string | number): void {
+    if (!this._options.save_load_adapter) return;
+
+    import('./transformer').then(({ loadAsTealchart, getAllLayouts }) => {
+      // Get the layout name from the metadata
+      getAllLayouts(this._options.save_load_adapter!).then((layouts) => {
+        const meta = layouts.find((l) => l.id === layoutId);
+        const layoutName = meta?.name || 'Untitled';
+
+        loadAsTealchart(layoutId, this._options.save_load_adapter!).then((result) => {
+          this._handleLoadLayout(result.data, result.warnings, layoutId, layoutName);
+
+          // Update layout selector state
+          if (this._chartStore) {
+            this._chartStore.currentLayout.set({ layoutId: String(layoutId), layoutName });
+            this._chartStore.isDirty.set(false);
+          }
+          this._ui?.setCurrentLayout(layoutId, layoutName);
+        });
+      });
+    });
+  }
+
+  /**
+   * Delete a layout by ID.
+   * Called from the layout selector delete action.
+   */
+  private _handleDeleteLayout(layoutId: string | number): void {
+    if (!this._options.save_load_adapter) return;
+
+    import('./transformer').then(({ deleteLayout }) => {
+      deleteLayout(layoutId, this._options.save_load_adapter!)
+        .then(() => {
+          // If we deleted the currently loaded layout, clear it
+          if (this._chartStore) {
+            const current = this._chartStore.currentLayout.get();
+            if (current.layoutId && String(current.layoutId) === String(layoutId)) {
+              this._chartStore.currentLayout.set({ layoutId: null, layoutName: null });
+              this._ui?.setCurrentLayout(null, null);
+            }
+          }
+        })
+        .catch((error) => {
+          console.error('[Tealchart] Failed to delete layout:', error);
+        });
+    });
+  }
+
+  /**
+   * Rename a layout.
+   * Called from the layout selector rename action.
+   */
+  private _handleRenameLayout(layoutId: string | number, newName: string): void {
+    if (!this._options.save_load_adapter) return;
+
+    // To rename, we load the content, then save it back with the new name
+    import('./transformer').then(({ loadAsTealchart, updateTealchartLayout }) => {
+      loadAsTealchart(layoutId, this._options.save_load_adapter!).then((result) => {
+        updateTealchartLayout(String(layoutId), result.data, newName, this._options.save_load_adapter!)
+          .then(() => {
+            // If this is the current layout, update state
+            if (this._chartStore) {
+              const current = this._chartStore.currentLayout.get();
+              if (current.layoutId && String(current.layoutId) === String(layoutId)) {
+                this._chartStore.currentLayout.set({ layoutId: current.layoutId, layoutName: newName });
+                this._ui?.setCurrentLayout(current.layoutId, newName);
+              }
+            }
+          })
+          .catch((error) => {
+            console.error('[Tealchart] Failed to rename layout:', error);
+          });
+      });
+    });
+  }
+
+  /**
+   * Show save success status with auto-fade
+   */
+  private _showSaveSuccess(): void {
+    if (!this._chartStore) return;
+    this._chartStore.saveStatus.set('success');
+    this._scheduler.markDirty(DIRTY.FULL);
+
+    setTimeout(() => {
+      if (!this._chartStore) return;
+      this._chartStore.saveStatus.set('success-fading');
+      this._scheduler.markDirty(DIRTY.FULL);
+      setTimeout(() => {
+        if (!this._chartStore) return;
+        this._chartStore.saveStatus.set('idle');
+        this._scheduler.markDirty(DIRTY.FULL);
+      }, 500);
+    }, 500);
   }
 
   /**
