@@ -6,16 +6,10 @@
  */
 
 import type { ChartSettings, IndicatorInstance } from '../state/chartState';
-import type { TvChartData, TvChartContent, TvSource, TvPane } from './types';
-import {
-  TRANSFORMER_VERSION,
-  CHART_TYPE_TO_TV_STYLE,
-  TV_CHART_STYLES,
-} from './types';
-import {
-  findMappingByCustomId,
-  mapInputsToTv,
-} from './indicatorMapping';
+import type { TvChartContent, TvChartData, TvPane, TvSource } from './types';
+
+import { findMappingByCustomId, mapInputsToTv } from './indicatorMapping';
+import { CHART_TYPE_TO_TV_STYLE, LINE_STYLE_TO_TV, TRANSFORMER_VERSION, TV_CHART_STYLES } from './types';
 
 // ============================================================================
 // Main Transform Function
@@ -176,6 +170,7 @@ function indicatorToTvSource(indicator: IndicatorInstance): TvSource | null {
         type: 'line',
         color: override.color,
         linewidth: override.linewidth,
+        linestyle: override.lineStyle ? LINE_STYLE_TO_TV[override.lineStyle] : undefined,
         visible: true,
       })),
     },

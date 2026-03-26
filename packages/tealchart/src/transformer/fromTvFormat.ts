@@ -7,19 +7,11 @@
 
 import type { ChartSettings, IndicatorInstance } from '../state/chartState';
 import type { ResolutionString } from '../types';
-import type {
-  TransformResult,
-  TvChartData,
-  TvChartContent,
-  TvPane,
-  TvSource,
-} from './types';
-import { TV_STYLE_TO_CHART_TYPE } from './types';
-import {
-  findMappingByTvStudyId,
-  mapInputsFromTv,
-} from './indicatorMapping';
+import type { TransformResult, TvChartContent, TvChartData, TvPane, TvSource } from './types';
+
 import { CHART_SETTINGS_VERSION } from '../state/safeDeepMerge';
+import { findMappingByTvStudyId, mapInputsFromTv } from './indicatorMapping';
+import { TV_STYLE_TO_CHART_TYPE, TV_TO_LINE_STYLE } from './types';
 
 // ============================================================================
 // Main Transform Function
@@ -88,50 +80,43 @@ export function fromTvFormat(chartData: TvChartData | string): TransformResult<C
   const isTealchartOrigin = tvContent._tealstreetTealchart === true;
 
   // Extract main series info
-  const mainSource = tvContent.sources?.find(
-    (s) => s.type === 'MainSeries' || s.id === tvContent.mainSourceId
-  );
+  const mainSource = tvContent.sources?.find((s) => s.type === 'MainSeries' || s.id === tvContent.mainSourceId);
 
   // Get symbol and interval - try multiple sources in order of preference
   // 1. Outer metadata (from TradingView wrapper)
   // 2. chartData object (if passed as object)
   // 3. Main source state
   // 4. Default values
-  const symbol = (tvContent as any)._outerSymbol
-    ?? (typeof chartData === 'object' ? chartData.symbol : undefined)
-    ?? mainSource?.state?.symbol
-    ?? 'BTCUSDT';
+  const symbol =
+    (tvContent as any)._outerSymbol ??
+    (typeof chartData === 'object' ? chartData.symbol : undefined) ??
+    mainSource?.state?.symbol ??
+    'BTCUSDT';
 
-  const interval = (tvContent as any)._outerResolution
-    ?? (typeof chartData === 'object' ? chartData.resolution : undefined)
-    ?? mainSource?.state?.interval
-    ?? '60';
+  const interval =
+    (tvContent as any)._outerResolution ??
+    (typeof chartData === 'object' ? chartData.resolution : undefined) ??
+    mainSource?.state?.interval ??
+    '60';
 
   // Determine chart type from main series style
   const chartStyle = mainSource?.state?.style ?? 1;
   const chartType = TV_STYLE_TO_CHART_TYPE[chartStyle] ?? 'candle';
 
   // Check for volume pane
-  const hasVolume = tvContent.sources?.some(
-    (s) => s.type === 'Volume' || s.type.toLowerCase().includes('volume')
-  );
+  const hasVolume = tvContent.sources?.some((s) => s.type === 'Volume' || s.type.toLowerCase().includes('volume'));
 
   // Find volume pane height
   let volumeHeight = 0.2;
   const volumePane = tvContent.panes?.find((p) =>
-    p.sources.some((id) =>
-      tvContent.sources?.find((s) => s.id === id && s.type === 'Volume')
-    )
+    p.sources.some((id) => tvContent.sources?.find((s) => s.id === id && s.type === 'Volume')),
   );
   if (volumePane?.height) {
     volumeHeight = volumePane.height;
   }
 
   // Transform indicators
-  const { indicators, warnings: indicatorWarnings, unmapped } = transformIndicators(
-    tvContent,
-    isTealchartOrigin
-  );
+  const { indicators, warnings: indicatorWarnings, unmapped } = transformIndicators(tvContent, isTealchartOrigin);
   warnings.push(...indicatorWarnings);
 
   if (unmapped.length > 0) {
@@ -173,22 +158,20 @@ interface IndicatorTransformResult {
 /**
  * Transform TV sources to Custom Chart indicators
  */
-function transformIndicators(
-  tvContent: TvChartContent,
-  isTealchartOrigin: boolean
-): IndicatorTransformResult {
+function transformIndicators(tvContent: TvChartContent, isTealchartOrigin: boolean): IndicatorTransformResult {
   const indicators: IndicatorInstance[] = [];
   const warnings: string[] = [];
   const unmapped: TvSource[] = [];
 
   // Get sources, excluding main series and volume
-  const studySources = tvContent.sources?.filter(
-    (s) =>
-      s.type !== 'MainSeries' &&
-      s.type !== 'Volume' &&
-      s.id !== tvContent.mainSourceId &&
-      !s.type.toLowerCase().includes('volume')
-  ) ?? [];
+  const studySources =
+    tvContent.sources?.filter(
+      (s) =>
+        s.type !== 'MainSeries' &&
+        s.type !== 'Volume' &&
+        s.id !== tvContent.mainSourceId &&
+        !s.type.toLowerCase().includes('volume'),
+    ) ?? [];
 
   for (const source of studySources) {
     const indicator = tvSourceToIndicator(source);
@@ -225,10 +208,7 @@ function transformIndicators(
 function tvSourceToIndicator(source: TvSource): IndicatorInstance | null {
   // Get the actual study ID from metaInfo (TV stores it there, not in source.type)
   const sourceAny = source as any;
-  const studyId = sourceAny.metaInfo?.fullId
-    || sourceAny.metaInfo?.id
-    || sourceAny.metaInfo?.shortId
-    || source.type;
+  const studyId = sourceAny.metaInfo?.fullId || sourceAny.metaInfo?.id || sourceAny.metaInfo?.shortId || source.type;
 
   const mapping = findMappingByTvStudyId(studyId);
 
@@ -237,17 +217,16 @@ function tvSourceToIndicator(source: TvSource): IndicatorInstance | null {
   }
 
   // Map inputs from TV names to custom names
-  const customInputs = source.state?.inputs
-    ? mapInputsFromTv(studyId, source.state.inputs)
-    : {};
+  const customInputs = source.state?.inputs ? mapInputsFromTv(studyId, source.state.inputs) : {};
 
   // Extract style overrides from TV plots
   const styleOverrides = source.state?.plots
-    ?.filter((p) => p.color || p.linewidth)
+    ?.filter((p) => p.color || p.linewidth || p.linestyle !== undefined)
     .map((p) => ({
       plotId: p.id,
       color: p.color,
       linewidth: p.linewidth,
+      lineStyle: p.linestyle !== undefined ? TV_TO_LINE_STYLE[p.linestyle] : undefined,
     }));
 
   return {

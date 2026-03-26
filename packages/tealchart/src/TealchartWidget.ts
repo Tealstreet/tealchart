@@ -2354,6 +2354,34 @@ export class TealchartWidget {
       }
     }
 
+    // Apply chartType to the store
+    if (settings.chartType && this._chartStore) {
+      this._chartStore.settings.setKey('chartType', settings.chartType);
+    }
+
+    // Apply autoScale setting
+    if (this._chartStore) {
+      this._chartStore.settings.setKey('autoScale', settings.autoScale);
+    }
+    if (!settings.autoScale) {
+      this._viewportController.disableAutoScale('main');
+    }
+
+    // Apply viewport if saved (after symbol/interval change triggers bar load)
+    if (settings.viewport) {
+      const vp = {
+        startTime: settings.viewport.startTime,
+        endTime: settings.viewport.endTime,
+        priceMin: settings.viewport.priceMin,
+        priceMax: settings.viewport.priceMax,
+      };
+      this._viewport = vp;
+      this._ui?.setViewport(vp);
+      if (this._chartStore) {
+        this._chartStore.settings.setKey('viewport', settings.viewport);
+      }
+    }
+
     // Re-render to reflect the loaded layout
     this._scheduler.markDirty(DIRTY.FULL);
   }
@@ -2634,16 +2662,25 @@ export class TealchartWidget {
    * Get current chart settings for saving
    */
   private _getCurrentSettings(): ChartSettings {
-    // Gather indicator instances from persisted state
-    const indicators = this._chartStore ? this._chartStore.settings.get().indicators : [];
+    // Gather settings from persisted state
+    const storeSettings = this._chartStore?.settings.get();
+    const indicators = storeSettings?.indicators ?? [];
 
     return {
       symbol: this._symbol,
       interval: this._interval,
       showVolume: this._renderOptions.showVolume ?? true,
       volumeHeight: this._renderOptions.volumeHeight ?? 0.2,
-      chartType: 'candle',
-      autoScale: true,
+      chartType: storeSettings?.chartType ?? 'candle',
+      autoScale: storeSettings?.autoScale ?? true,
+      viewport: this._viewport
+        ? {
+            startTime: this._viewport.startTime,
+            endTime: this._viewport.endTime,
+            priceMin: this._viewport.priceMin,
+            priceMax: this._viewport.priceMax,
+          }
+        : undefined,
       indicators,
       version: 1,
     };

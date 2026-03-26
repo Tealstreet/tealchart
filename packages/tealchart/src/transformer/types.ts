@@ -127,6 +127,7 @@ export interface TvPlot {
   type: string;
   color?: string;
   linewidth?: number;
+  linestyle?: number; // 0 = solid, 1 = dotted, 2 = dashed
   visible?: boolean;
 }
 
@@ -218,6 +219,33 @@ export const CHART_TYPE_TO_TV_STYLE: Record<string, number> = {
 /**
  * Map TV chart style to custom chart type
  */
+/**
+ * TradingView line style values
+ */
+export const TV_LINE_STYLES = {
+  SOLID: 0,
+  DOTTED: 1,
+  DASHED: 2,
+} as const;
+
+/**
+ * Map custom line style to TV line style
+ */
+export const LINE_STYLE_TO_TV: Record<string, number> = {
+  solid: TV_LINE_STYLES.SOLID,
+  dotted: TV_LINE_STYLES.DOTTED,
+  dashed: TV_LINE_STYLES.DASHED,
+};
+
+/**
+ * Map TV line style to custom line style
+ */
+export const TV_TO_LINE_STYLE: Record<number, 'solid' | 'dotted' | 'dashed'> = {
+  [TV_LINE_STYLES.SOLID]: 'solid',
+  [TV_LINE_STYLES.DOTTED]: 'dotted',
+  [TV_LINE_STYLES.DASHED]: 'dashed',
+};
+
 export const TV_STYLE_TO_CHART_TYPE: Record<number, 'candle' | 'line' | 'area'> = {
   [TV_CHART_STYLES.BARS]: 'candle',
   [TV_CHART_STYLES.CANDLES]: 'candle',
