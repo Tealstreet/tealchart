@@ -250,6 +250,9 @@ export class TealchartWidgetUI {
     this.settingsModal = new IndicatorSettingsModal();
     this.settingsModal.mount(this.rootEl);
 
+    // Mount layout selector modal to rootEl (if layout callbacks are provided)
+    this.topBar?.getLayoutSelector()?.mount(this.rootEl);
+
     // No loading overlay — empty canvas grid renders while bars load
   }
 

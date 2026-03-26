@@ -1,12 +1,16 @@
 /**
- * LayoutSelector - Dropdown for managing saved chart layouts
+ * LayoutSelector - Button + Modal for managing saved chart layouts
  *
- * Shows current layout name, dropdown with saved layouts,
- * and actions: Save, Save As, Rename, Delete.
- * Built with vanilla DOM (same pattern as other UI components).
+ * Button sits in the top bar showing current layout name.
+ * Click opens a Modal (using our standardized Modal base class) with:
+ * - List of saved layouts
+ * - Save / Save As actions
+ * - Per-layout rename / delete on hover
  */
 
 import type { LayoutMetadata } from '../transformer/saveLoadIntegration';
+
+import { Modal } from './Modal';
 
 // ============================================================================
 // Types
@@ -31,14 +35,7 @@ export interface LayoutSelectorCallbacks {
 // Styles
 // ============================================================================
 
-const styles = {
-  wrapper: {
-    position: 'relative',
-    display: 'inline-flex',
-    alignItems: 'center',
-    flexShrink: '0',
-  } as Partial<CSSStyleDeclaration>,
-
+const selectorStyles = {
   button: {
     display: 'flex',
     alignItems: 'center',
@@ -58,65 +55,18 @@ const styles = {
     textOverflow: 'ellipsis',
   } as Partial<CSSStyleDeclaration>,
 
-  buttonHover: {
-    backgroundColor: 'var(--hover-bg, rgba(255, 255, 255, 0.05))',
-    color: 'var(--text, #d1d4dc)',
-  } as Partial<CSSStyleDeclaration>,
-
-  buttonActive: {
-    backgroundColor: 'var(--accent-bg, rgba(41, 98, 255, 0.2))',
-    color: 'var(--accent, #2962ff)',
-  } as Partial<CSSStyleDeclaration>,
-
-  chevron: {
-    fontSize: '8px',
-    marginLeft: '2px',
-    transition: 'transform 0.15s',
-  } as Partial<CSSStyleDeclaration>,
-
-  dropdown: {
-    position: 'absolute',
-    top: '100%',
-    left: '0',
-    marginTop: '4px',
-    minWidth: '220px',
-    maxWidth: '300px',
-    maxHeight: '320px',
-    backgroundColor: 'var(--modal-bg, #1e222d)',
-    border: '1px solid var(--border, #363a45)',
-    borderRadius: '6px',
-    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)',
-    zIndex: '10000',
-    display: 'flex',
-    flexDirection: 'column',
-    overflow: 'hidden',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  } as Partial<CSSStyleDeclaration>,
-
-  listContainer: {
-    flex: '1',
-    overflowY: 'auto',
-    overflowX: 'hidden',
-    padding: '4px 0',
-    minHeight: '0',
-  } as Partial<CSSStyleDeclaration>,
-
   listItem: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '8px 12px',
     cursor: 'pointer',
-    fontSize: '12px',
+    fontSize: '13px',
     color: 'var(--text, #d1d4dc)',
     transition: 'background-color 0.1s',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-  } as Partial<CSSStyleDeclaration>,
-
-  listItemHover: {
-    backgroundColor: 'var(--hover-bg, rgba(255, 255, 255, 0.05))',
   } as Partial<CSSStyleDeclaration>,
 
   listItemActive: {
@@ -145,18 +95,13 @@ const styles = {
     border: 'none',
     color: 'var(--text2, #787b86)',
     cursor: 'pointer',
-    padding: '2px',
+    padding: '2px 4px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: '3px',
+    fontSize: '12px',
     transition: 'color 0.1s, background-color 0.1s',
-  } as Partial<CSSStyleDeclaration>,
-
-  separator: {
-    height: '1px',
-    backgroundColor: 'var(--border, #363a45)',
-    margin: '4px 0',
   } as Partial<CSSStyleDeclaration>,
 
   actionsContainer: {
@@ -170,7 +115,7 @@ const styles = {
     gap: '8px',
     padding: '8px 12px',
     cursor: 'pointer',
-    fontSize: '12px',
+    fontSize: '13px',
     color: 'var(--text2, #787b86)',
     transition: 'background-color 0.1s, color 0.1s',
     whiteSpace: 'nowrap',
@@ -180,248 +125,93 @@ const styles = {
     textAlign: 'left',
   } as Partial<CSSStyleDeclaration>,
 
-  actionItemHover: {
-    backgroundColor: 'var(--hover-bg, rgba(255, 255, 255, 0.05))',
-    color: 'var(--text, #d1d4dc)',
-  } as Partial<CSSStyleDeclaration>,
-
   emptyState: {
-    padding: '16px 12px',
+    padding: '20px 12px',
     fontSize: '12px',
     color: 'var(--text2, #787b86)',
     textAlign: 'center',
-  } as Partial<CSSStyleDeclaration>,
-
-  loadingState: {
-    padding: '16px 12px',
-    fontSize: '12px',
-    color: 'var(--text2, #787b86)',
-    textAlign: 'center',
-  } as Partial<CSSStyleDeclaration>,
-
-  deleteText: {
-    color: '#f44336',
   } as Partial<CSSStyleDeclaration>,
 };
 
 // ============================================================================
-// LayoutSelector Class
+// LayoutModal - extends Modal base class
 // ============================================================================
 
-export class LayoutSelector {
-  private wrapperEl: HTMLDivElement;
-  private buttonEl: HTMLButtonElement;
-  private buttonLabelEl: HTMLSpanElement;
-  private dropdownEl: HTMLDivElement | null = null;
-  private isOpen = false;
+class LayoutModal extends Modal {
   private callbacks: LayoutSelectorCallbacks;
   private currentLayoutId: string | number | null = null;
-  private currentLayoutName: string | null = null;
   private layouts: LayoutMetadata[] = [];
-  private isLoading = false;
-
-  // Bound handlers for cleanup
-  private boundOnClickOutside: (e: MouseEvent) => void;
-  private boundOnKeyDown: (e: KeyboardEvent) => void;
 
   constructor(callbacks: LayoutSelectorCallbacks) {
+    super({
+      title: 'Layouts',
+      width: 320,
+      maxHeight: 'min(80vh, calc(100% - 40px))',
+      position: 'absolute',
+    });
     this.callbacks = callbacks;
-
-    // Bind handlers
-    this.boundOnClickOutside = this.onClickOutside.bind(this);
-    this.boundOnKeyDown = this.onKeyDown.bind(this);
-
-    // Create wrapper
-    this.wrapperEl = document.createElement('div');
-    Object.assign(this.wrapperEl.style, styles.wrapper);
-
-    // Create button
-    this.buttonEl = document.createElement('button');
-    Object.assign(this.buttonEl.style, styles.button);
-
-    this.buttonLabelEl = document.createElement('span');
-    this.buttonLabelEl.style.overflow = 'hidden';
-    this.buttonLabelEl.style.textOverflow = 'ellipsis';
-    this.buttonLabelEl.textContent = 'Default';
-    this.buttonEl.appendChild(this.buttonLabelEl);
-
-    const chevron = document.createElement('span');
-    Object.assign(chevron.style, styles.chevron);
-    chevron.textContent = '\u25BE'; // small down triangle
-    this.buttonEl.appendChild(chevron);
-
-    this.buttonEl.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.toggle();
-    });
-    this.buttonEl.addEventListener('mouseenter', () => {
-      if (!this.isOpen) {
-        Object.assign(this.buttonEl.style, styles.buttonHover);
-      }
-    });
-    this.buttonEl.addEventListener('mouseleave', () => {
-      if (!this.isOpen) {
-        this.buttonEl.style.backgroundColor = 'transparent';
-        this.buttonEl.style.color = 'var(--text2, #787b86)';
-      }
-    });
-
-    this.wrapperEl.appendChild(this.buttonEl);
   }
 
-  // ============================================================================
-  // Public API
-  // ============================================================================
-
-  /**
-   * Get the root DOM element to insert into the top bar
-   */
-  getElement(): HTMLDivElement {
-    return this.wrapperEl;
+  setCurrentLayoutId(id: string | number | null): void {
+    this.currentLayoutId = id;
   }
 
-  /**
-   * Set the current layout (updates button label + highlight)
-   */
-  setCurrentLayout(layoutId: string | number | null, layoutName: string | null): void {
-    this.currentLayoutId = layoutId;
-    this.currentLayoutName = layoutName;
-    this.buttonLabelEl.textContent = layoutName || 'Default';
-  }
-
-  /**
-   * Toggle the dropdown open/closed
-   */
-  toggle(): void {
-    if (this.isOpen) {
-      this.closeDropdown();
-    } else {
-      this.openDropdown();
-    }
-  }
-
-  /**
-   * Clean up event listeners
-   */
-  dispose(): void {
-    this.closeDropdown();
-    this.wrapperEl.remove();
-  }
-
-  // ============================================================================
-  // Dropdown Lifecycle
-  // ============================================================================
-
-  private async openDropdown(): Promise<void> {
-    if (this.isOpen) return;
-    this.isOpen = true;
-
-    // Style the button as active
-    Object.assign(this.buttonEl.style, styles.buttonActive);
-
-    // Create dropdown
-    this.dropdownEl = document.createElement('div');
-    Object.assign(this.dropdownEl.style, styles.dropdown);
-
-    // Prevent click inside dropdown from closing it
-    this.dropdownEl.addEventListener('click', (e) => e.stopPropagation());
-
-    this.wrapperEl.appendChild(this.dropdownEl);
-
-    // Show loading state
-    this.renderLoading();
-
-    // Add global listeners
-    document.addEventListener('click', this.boundOnClickOutside, true);
-    document.addEventListener('keydown', this.boundOnKeyDown);
+  protected onOpen(): void {
+    this.contentEl.innerHTML = '';
+    const loadingEl = document.createElement('div');
+    Object.assign(loadingEl.style, selectorStyles.emptyState);
+    loadingEl.textContent = 'Loading...';
+    this.contentEl.appendChild(loadingEl);
+    this.contentEl.style.padding = '0';
 
     // Fetch layouts
-    try {
-      this.isLoading = true;
-      this.layouts = await this.callbacks.getAllLayouts();
-      this.isLoading = false;
-      this.renderDropdownContent();
-    } catch (err) {
-      this.isLoading = false;
-      console.warn('[LayoutSelector] Failed to fetch layouts:', err);
-      this.renderDropdownContent();
-    }
+    this.callbacks
+      .getAllLayouts()
+      .then((layouts) => {
+        this.layouts = layouts;
+        this.renderContent();
+      })
+      .catch(() => {
+        this.layouts = [];
+        this.renderContent();
+      });
   }
 
-  private closeDropdown(): void {
-    if (!this.isOpen) return;
-    this.isOpen = false;
-
-    // Reset button style
-    this.buttonEl.style.backgroundColor = 'transparent';
-    this.buttonEl.style.color = 'var(--text2, #787b86)';
-
-    // Remove dropdown
-    if (this.dropdownEl) {
-      this.dropdownEl.remove();
-      this.dropdownEl = null;
-    }
-
-    // Remove global listeners
-    document.removeEventListener('click', this.boundOnClickOutside, true);
-    document.removeEventListener('keydown', this.boundOnKeyDown);
-  }
-
-  // ============================================================================
-  // Rendering
-  // ============================================================================
-
-  private renderLoading(): void {
-    if (!this.dropdownEl) return;
-    this.dropdownEl.innerHTML = '';
-    const loadingEl = document.createElement('div');
-    Object.assign(loadingEl.style, styles.loadingState);
-    loadingEl.textContent = 'Loading...';
-    this.dropdownEl.appendChild(loadingEl);
-  }
-
-  private renderDropdownContent(): void {
-    if (!this.dropdownEl) return;
-    this.dropdownEl.innerHTML = '';
+  private renderContent(): void {
+    this.contentEl.innerHTML = '';
 
     // Layout list
-    const listContainer = document.createElement('div');
-    Object.assign(listContainer.style, styles.listContainer);
-
-    // Filter to tealchart layouts only
     const tealchartLayouts = this.layouts.filter((l) => l.isTealchart);
 
     if (tealchartLayouts.length === 0) {
       const emptyEl = document.createElement('div');
-      Object.assign(emptyEl.style, styles.emptyState);
+      Object.assign(emptyEl.style, selectorStyles.emptyState);
       emptyEl.textContent = 'No saved layouts';
-      listContainer.appendChild(emptyEl);
+      this.contentEl.appendChild(emptyEl);
     } else {
       for (const layout of tealchartLayouts) {
-        listContainer.appendChild(this.createListItem(layout));
+        this.contentEl.appendChild(this.createListItem(layout));
       }
     }
 
-    this.dropdownEl.appendChild(listContainer);
-
     // Actions section
     const actionsContainer = document.createElement('div');
-    Object.assign(actionsContainer.style, styles.actionsContainer);
+    Object.assign(actionsContainer.style, selectorStyles.actionsContainer);
 
-    // "Save" action — only if a layout is currently loaded
+    // Save — only if a layout is loaded
     if (this.currentLayoutId) {
       actionsContainer.appendChild(
-        this.createActionItem('Save', '\uD83D\uDCBE', () => {
+        this.createActionItem('Save', () => {
           this.callbacks.onSave();
-          this.closeDropdown();
+          this.close();
         }),
       );
     }
 
-    // "Save As..." action
+    // Save As
     actionsContainer.appendChild(
-      this.createActionItem('Save As...', '\u2795', () => {
-        this.closeDropdown();
+      this.createActionItem('Save As...', () => {
+        this.close();
         const name = prompt('Layout name:');
         if (name && name.trim()) {
           this.callbacks.onSaveAs(name.trim());
@@ -429,38 +219,38 @@ export class LayoutSelector {
       }),
     );
 
-    this.dropdownEl.appendChild(actionsContainer);
+    this.contentEl.appendChild(actionsContainer);
   }
 
   private createListItem(layout: LayoutMetadata): HTMLDivElement {
     const isActive = layout.id === this.currentLayoutId;
     const item = document.createElement('div');
-    Object.assign(item.style, styles.listItem);
+    Object.assign(item.style, selectorStyles.listItem);
     if (isActive) {
-      Object.assign(item.style, styles.listItemActive);
+      Object.assign(item.style, selectorStyles.listItemActive);
     }
 
     // Name
     const nameEl = document.createElement('span');
-    Object.assign(nameEl.style, styles.listItemName);
+    Object.assign(nameEl.style, selectorStyles.listItemName);
     nameEl.textContent = layout.name;
     item.appendChild(nameEl);
 
     // Actions (rename, delete) — visible on hover
     const actionsEl = document.createElement('div');
-    Object.assign(actionsEl.style, styles.listItemActions);
+    Object.assign(actionsEl.style, selectorStyles.listItemActions);
 
     // Rename button
     const renameBtn = document.createElement('button');
-    Object.assign(renameBtn.style, styles.iconButton);
+    Object.assign(renameBtn.style, selectorStyles.iconButton);
     renameBtn.title = 'Rename';
-    renameBtn.textContent = '\u270E'; // pencil
+    renameBtn.textContent = '\u270E';
     renameBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       const newName = prompt('Rename layout:', layout.name);
       if (newName && newName.trim() && newName.trim() !== layout.name) {
         this.callbacks.onRename(layout.id, newName.trim());
-        this.closeDropdown();
+        this.close();
       }
     });
     renameBtn.addEventListener('mouseenter', () => {
@@ -475,14 +265,14 @@ export class LayoutSelector {
 
     // Delete button
     const deleteBtn = document.createElement('button');
-    Object.assign(deleteBtn.style, styles.iconButton);
+    Object.assign(deleteBtn.style, selectorStyles.iconButton);
     deleteBtn.title = 'Delete';
-    deleteBtn.textContent = '\u2715'; // x mark
+    deleteBtn.textContent = '\u2715';
     deleteBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       if (confirm(`Delete layout "${layout.name}"?`)) {
         this.callbacks.onDelete(layout.id);
-        this.closeDropdown();
+        this.close();
       }
     });
     deleteBtn.addEventListener('mouseenter', () => {
@@ -499,45 +289,32 @@ export class LayoutSelector {
 
     // Hover: show actions
     item.addEventListener('mouseenter', () => {
-      if (!isActive) {
-        Object.assign(item.style, styles.listItemHover);
-      }
+      if (!isActive) item.style.backgroundColor = 'var(--hover-bg, rgba(255, 255, 255, 0.05))';
       actionsEl.style.opacity = '1';
     });
     item.addEventListener('mouseleave', () => {
-      if (!isActive) {
-        item.style.backgroundColor = 'transparent';
-      } else {
-        Object.assign(item.style, styles.listItemActive);
-      }
+      item.style.backgroundColor = isActive ? 'var(--accent-bg, rgba(41, 98, 255, 0.15))' : 'transparent';
       actionsEl.style.opacity = '0';
     });
 
     // Click to load
     item.addEventListener('click', () => {
       this.callbacks.onLoad(layout.id);
-      this.closeDropdown();
+      this.close();
     });
 
     return item;
   }
 
-  private createActionItem(label: string, icon: string, onClick: () => void): HTMLButtonElement {
+  private createActionItem(label: string, onClick: () => void): HTMLButtonElement {
     const btn = document.createElement('button');
-    Object.assign(btn.style, styles.actionItem);
-
-    const iconEl = document.createElement('span');
-    iconEl.textContent = icon;
-    iconEl.style.fontSize = '12px';
-    btn.appendChild(iconEl);
-
-    const labelEl = document.createElement('span');
-    labelEl.textContent = label;
-    btn.appendChild(labelEl);
+    Object.assign(btn.style, selectorStyles.actionItem);
+    btn.textContent = label;
 
     btn.addEventListener('click', onClick);
     btn.addEventListener('mouseenter', () => {
-      Object.assign(btn.style, styles.actionItemHover);
+      btn.style.backgroundColor = 'var(--hover-bg, rgba(255, 255, 255, 0.05))';
+      btn.style.color = 'var(--text, #d1d4dc)';
     });
     btn.addEventListener('mouseleave', () => {
       btn.style.backgroundColor = 'transparent';
@@ -546,20 +323,75 @@ export class LayoutSelector {
 
     return btn;
   }
+}
 
-  // ============================================================================
-  // Event Handlers
-  // ============================================================================
+// ============================================================================
+// LayoutSelector - Button + Modal
+// ============================================================================
 
-  private onClickOutside(e: MouseEvent): void {
-    if (!this.wrapperEl.contains(e.target as Node)) {
-      this.closeDropdown();
-    }
+export class LayoutSelector {
+  private buttonEl: HTMLButtonElement;
+  private buttonLabelEl: HTMLSpanElement;
+  private modal: LayoutModal;
+  private currentLayoutId: string | number | null = null;
+
+  constructor(callbacks: LayoutSelectorCallbacks) {
+    // Create button
+    this.buttonEl = document.createElement('button');
+    Object.assign(this.buttonEl.style, selectorStyles.button);
+
+    this.buttonLabelEl = document.createElement('span');
+    this.buttonLabelEl.style.overflow = 'hidden';
+    this.buttonLabelEl.style.textOverflow = 'ellipsis';
+    this.buttonLabelEl.textContent = 'Default';
+    this.buttonEl.appendChild(this.buttonLabelEl);
+
+    const chevron = document.createElement('span');
+    chevron.style.fontSize = '8px';
+    chevron.style.marginLeft = '2px';
+    chevron.textContent = '\u25BE';
+    this.buttonEl.appendChild(chevron);
+
+    this.buttonEl.addEventListener('mouseenter', () => {
+      this.buttonEl.style.backgroundColor = 'var(--hover-bg, rgba(255, 255, 255, 0.05))';
+      this.buttonEl.style.color = 'var(--text, #d1d4dc)';
+    });
+    this.buttonEl.addEventListener('mouseleave', () => {
+      this.buttonEl.style.backgroundColor = 'transparent';
+      this.buttonEl.style.color = 'var(--text2, #787b86)';
+    });
+
+    // Create modal
+    this.modal = new LayoutModal(callbacks);
+
+    // Button opens modal
+    this.buttonEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.modal.toggle();
+    });
   }
 
-  private onKeyDown(e: KeyboardEvent): void {
-    if (e.key === 'Escape') {
-      this.closeDropdown();
-    }
+  /**
+   * Mount the modal overlay to a container element (e.g., chart root).
+   * Call this after construction so the modal renders inside the chart.
+   */
+  mount(container: HTMLElement): void {
+    this.modal.mount(container);
+  }
+
+  getElement(): HTMLButtonElement {
+    return this.buttonEl;
+  }
+
+  setCurrentLayout(layoutId: string | number | null, layoutName: string | null): void {
+    this.currentLayoutId = layoutId;
+    this.buttonLabelEl.textContent = layoutName || 'Default';
+    this.modal.setCurrentLayoutId(layoutId);
+  }
+
+  dispose(): void {
+    this.modal.close();
+    this.buttonEl.remove();
+    this.modal.unmount();
   }
 }

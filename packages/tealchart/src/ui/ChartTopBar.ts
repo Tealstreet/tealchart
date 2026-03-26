@@ -402,6 +402,13 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   }
 
   /**
+   * Get the layout selector (for mounting its modal to the chart root)
+   */
+  getLayoutSelector(): LayoutSelector | null {
+    return this.layoutSelector;
+  }
+
+  /**
    * Update CSS variables
    */
   updateCssVars(vars: Record<string, string>): void {
