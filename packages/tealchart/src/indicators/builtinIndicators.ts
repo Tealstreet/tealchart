@@ -345,6 +345,38 @@ const TEALSTREET_INDICATORS: BuiltinIndicator[] = [
     },
   },
   {
+    id: 'pvsraCombined',
+    name: 'PVSRA Combined',
+    category: 'tealstreet',
+    description: 'PVSRA candle coloring with volume histogram',
+    overlay: true,
+    code: '',
+    jailbreak: {
+      inputs: [
+        { id: 'length', name: 'Length', type: 'int', defval: 10, min: 1, max: 100 },
+        { id: 'showVolume', name: 'Show Volume', type: 'bool', defval: true },
+      ],
+      defaults: {
+        length: 10,
+        showVolume: true,
+      },
+      palette: {
+        barRed: { name: 'Red Vector Histogram Color', defaultColor: '#FF0000' },
+        barGreen: { name: 'Green Vector Histogram Color', defaultColor: '#00FF00' },
+        barViolet: { name: 'Violet Vector Histogram Color', defaultColor: '#A020F0' },
+        barBlue: { name: 'Blue Vector Histogram Color', defaultColor: '#0000FF' },
+        barRegularUp: { name: 'Regular Candle Up Histogram Color', defaultColor: '#808080' },
+        barRegularDown: { name: 'Regular Candle Down Histogram Color', defaultColor: '#404040' },
+        volumeRed: { name: 'Red Vector Volume Color', defaultColor: '#8B0000' },
+        volumeGreen: { name: 'Green Vector Volume Color', defaultColor: '#228B22' },
+        volumeViolet: { name: 'Violet Vector Volume Color', defaultColor: '#800080' },
+        volumeBlue: { name: 'Blue Vector Volume Color', defaultColor: '#00008B' },
+        volumeRegularUp: { name: 'Regular Volume Up Color', defaultColor: '#808080' },
+        volumeRegularDown: { name: 'Regular Volume Down Color', defaultColor: '#404040' },
+      },
+    },
+  },
+  {
     id: 'risk',
     name: 'Risk',
     category: 'tealstreet',
