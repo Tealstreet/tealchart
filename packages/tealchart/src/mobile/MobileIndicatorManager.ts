@@ -154,6 +154,9 @@ export class MobileIndicatorManager {
     // Remove from indicators list
     this._indicators = this._indicators.filter((ind) => ind.instanceId !== instanceId);
 
+    // Clear cached input definitions
+    this._inputDefsCache.delete(instanceId);
+
     // Recompute plots without this indicator
     this._recomputePlots();
   }
