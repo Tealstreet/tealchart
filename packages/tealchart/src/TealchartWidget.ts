@@ -354,7 +354,7 @@ export class TealchartWidget {
             ...this._renderOptions,
             symbol: this._symbol,
             resolutionString: this._interval,
-            exchange: (symbolInfo as any).exchange || '',
+            exchange: ((symbolInfo as any).exchange || '').toLowerCase(),
           };
           // Push supported resolutions to UI (filters timeframe selector)
           this._ui?.setSupportedResolutions(this._supportedResolutions);
