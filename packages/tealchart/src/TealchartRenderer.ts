@@ -2990,11 +2990,14 @@ export class TealchartRenderer {
       }
     }
 
-    // Draw candles
-    this.drawCandlesInPane(bars, viewport, pane);
+    // Draw candles (skip if a jailbreak indicator has hideCandles enabled)
+    const hideCandles = this.jailbreakManager?.hasSettingEnabled('hideCandles') ?? false;
+    if (!hideCandles) {
+      this.drawCandlesInPane(bars, viewport, pane);
+    }
 
     // Draw volume overlay (bottom 10% of main pane)
-    if (options.showVolume) {
+    if (options.showVolume && !hideCandles) {
       this.drawVolumeInPane(bars, viewport, pane);
     }
 
