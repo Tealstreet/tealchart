@@ -3031,7 +3031,8 @@ export class TealchartRenderer {
   ): Omit<import('./jailbreak/types').IndicatorDrawArgs, 'settings'> | null {
     const { ctx, options, margins } = this;
     const priceHeight = pane.height;
-    const chartWidth = options.width - margins.left - margins.right - PRICE_AXIS_RIGHT_PADDING;
+    // Use same extended width as drawCandlesInPane — goes under price axis
+    const chartWidth = options.width - margins.left;
 
     const priceToCoord = (price: number): number => {
       const ratio = (pane.yMax - price) / (pane.yMax - pane.yMin);
