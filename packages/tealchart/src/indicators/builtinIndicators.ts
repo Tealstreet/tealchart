@@ -377,6 +377,28 @@ const TEALSTREET_INDICATORS: BuiltinIndicator[] = [
     },
   },
   {
+    id: 'pvsraHistogram',
+    name: 'PVSRA Histogram',
+    category: 'tealstreet',
+    description: 'Price Volume Spread Range Analysis volume histogram',
+    overlay: true,
+    code: '',
+    jailbreak: {
+      inputs: [{ id: 'length', name: 'Length', type: 'int', defval: 10, min: 1, max: 100 }],
+      defaults: {
+        length: 10,
+      },
+      palette: {
+        histogramRed: { name: 'Red Vector Histogram Color', defaultColor: '#8B0000' },
+        histogramGreen: { name: 'Green Vector Histogram Color', defaultColor: '#228B22' },
+        histogramViolet: { name: 'Violet Vector Histogram Color', defaultColor: '#800080' },
+        histogramBlue: { name: 'Blue Vector Histogram Color', defaultColor: '#00008B' },
+        histogramRegularUp: { name: 'Regular Candle Up Histogram Color', defaultColor: '#808080' },
+        histogramRegularDown: { name: 'Regular Candle Down Histogram Color', defaultColor: '#404040' },
+      },
+    },
+  },
+  {
     id: 'risk',
     name: 'Risk',
     category: 'tealstreet',
