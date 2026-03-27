@@ -193,6 +193,9 @@ export class TealchartWidget {
 
     this._eventEmitter = new EventEmitter();
     this._chartApi = new TealchartApi(this._symbol, this._interval, options.account);
+    this._renderOptions = {
+      ...options.renderOptions,
+    };
 
     // Apply initial overrides if provided
     if (options.overrides) {
@@ -596,7 +599,7 @@ export class TealchartWidget {
 
     // Schedule widget-level render to update last-trade price line,
     // order/position lines, and other state. updateBar fast path already
-    // painted candles — we only need LINES for the HTML overlay labels.
+    // painted candles — we only need LINES for interactive line updates.
     this._scheduler.markDirty(DIRTY.LINES);
   }
 

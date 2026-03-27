@@ -232,7 +232,6 @@ describe('ChartCore viewport management', () => {
       width: 800,
       height: 600,
       renderOptions: {
-        experimentalCanvasInteractiveLines: true,
       },
     });
 
@@ -281,7 +280,6 @@ describe('ChartCore viewport management', () => {
       width: 800,
       height: 600,
       renderOptions: {
-        experimentalCanvasInteractiveLines: true,
       },
     });
 

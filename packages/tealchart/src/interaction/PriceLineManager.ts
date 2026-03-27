@@ -299,6 +299,10 @@ export class PriceLineManager {
     return this.activeDrag !== null;
   }
 
+  getDragLineId(): string | null {
+    return this.activeDrag?.lineId ?? null;
+  }
+
   private updateLineContent(group: Konva.Group, bound: PriceLineLabelBounds): void {
     const refs = group.getAttr('contentRefs') as CachedLineContentRefs | undefined;
     if (!refs) return;
@@ -1069,7 +1073,7 @@ export class PriceLineManager {
 
     // Note: Horizontal crosshair line is drawn on canvas (renderLineOnCanvas: true)
     // Label is rendered by Konva through the price line system (floatingLabel: true)
-    // Context menu "+" button is an HTML overlay managed by ChartCore (not Konva)
+    // Context menu "+" button is drawn by ChartCore on the crosshair canvas (not Konva)
   }
 
   // ============================================================================

@@ -3691,8 +3691,8 @@ export class TealchartRenderer {
       if (lineType === 'price') {
         this.drawSimplePriceLineInPane(bound, viewport, pane);
       } else if (lineType === 'order' || lineType === 'position') {
-        // Order/position labels are HTML overlays (InteractiveLineRenderer)
-        // but the horizontal line is drawn on canvas
+        // Order/position labels and controls are handled by PriceLineManager.
+        // The horizontal line stays on the main canvas.
         this.drawTradingLineOnCanvas(bound, viewport, pane);
       } else {
         this.drawTradingLineInPane(bound, viewport, pane);
@@ -3770,7 +3770,7 @@ export class TealchartRenderer {
 
   /**
    * Draw only the horizontal line for an order/position on canvas.
-   * Labels and buttons are rendered by the HTML InteractiveLineRenderer overlay.
+   * Labels and buttons are rendered by PriceLineManager on the Konva overlay.
    */
   private drawTradingLineOnCanvas(bound: PriceLineLabelBounds, _viewport: Viewport, pane: ComputedPane): void {
     const { ctx, options, margins } = this;
