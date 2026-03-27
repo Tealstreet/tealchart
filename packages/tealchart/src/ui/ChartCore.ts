@@ -1017,12 +1017,24 @@ export class ChartCore {
     const opts = this.options.renderOptions;
     if (!opts) return;
     const s = this.container.style;
-    if (opts.fontFamily) s.setProperty('--tc-font-family', opts.fontFamily);
-    if (opts.textColor) s.setProperty('--tc-text-color', opts.textColor);
-    if (opts.backgroundColor) s.setProperty('--tc-background-color', opts.backgroundColor);
-    if (opts.upColor) s.setProperty('--tc-up-color', opts.upColor);
-    if (opts.downColor) s.setProperty('--tc-down-color', opts.downColor);
-    if (opts.crosshairColor) s.setProperty('--tc-crosshair-color', opts.crosshairColor);
+    if (opts.fontFamily && s.getPropertyValue('--tc-font-family') !== opts.fontFamily) {
+      s.setProperty('--tc-font-family', opts.fontFamily);
+    }
+    if (opts.textColor && s.getPropertyValue('--tc-text-color') !== opts.textColor) {
+      s.setProperty('--tc-text-color', opts.textColor);
+    }
+    if (opts.backgroundColor && s.getPropertyValue('--tc-background-color') !== opts.backgroundColor) {
+      s.setProperty('--tc-background-color', opts.backgroundColor);
+    }
+    if (opts.upColor && s.getPropertyValue('--tc-up-color') !== opts.upColor) {
+      s.setProperty('--tc-up-color', opts.upColor);
+    }
+    if (opts.downColor && s.getPropertyValue('--tc-down-color') !== opts.downColor) {
+      s.setProperty('--tc-down-color', opts.downColor);
+    }
+    if (opts.crosshairColor && s.getPropertyValue('--tc-crosshair-color') !== opts.crosshairColor) {
+      s.setProperty('--tc-crosshair-color', opts.crosshairColor);
+    }
   }
 
   /**

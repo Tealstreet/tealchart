@@ -156,7 +156,11 @@ export class TealchartRenderer {
    * Falls back to 'sans-serif' if not set (canvas requires a concrete font, not 'inherit').
    */
   get font(): string {
-    return this.options.fontFamily || 'sans-serif';
+    const fontFamily = this.options.fontFamily?.trim();
+    if (!fontFamily || fontFamily === 'inherit' || fontFamily.includes('var(')) {
+      return 'sans-serif';
+    }
+    return fontFamily;
   }
 
   /**
