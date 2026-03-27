@@ -251,6 +251,10 @@ export class PriceLineManager {
     this.updateCrosshair();
   }
 
+  isDragging(): boolean {
+    return this.activeDrag !== null;
+  }
+
   /**
    * Dispose and clean up
    */

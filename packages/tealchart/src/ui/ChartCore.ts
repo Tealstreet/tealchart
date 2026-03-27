@@ -15,8 +15,11 @@ import type { CrosshairState as EventCrosshairState, PaneDividerInfo } from '../
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
 
+import Konva from 'konva';
+
 import { EventManager } from '../interaction/EventManager';
 import { InteractiveLineRenderer } from '../interaction/InteractiveLineRenderer';
+import { PriceLineManager } from '../interaction/PriceLineManager';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { WebCanvasContext } from '../rendering/WebCanvasContext';
 import { getDecimalPlacesFromPrecision } from '../state/chartState';
@@ -484,6 +487,8 @@ export class ChartCore {
   private renderer: TealchartRenderer;
   private eventManager: EventManager;
   private interactiveLineRenderer: InteractiveLineRenderer;
+  private priceLineManager: PriceLineManager | null = null;
+  private stage: Konva.Stage | null = null;
 
   // Data refs
   private bars: Bar[] = [];
@@ -531,11 +536,13 @@ export class ChartCore {
 
   // RAF for full renders
   private rafId: number | null = null;
+  private readonly useCanvasOrderLinePoc: boolean;
 
   constructor(options: ChartCoreOptions) {
     this.options = options;
     this.container = options.container;
     this.margins = { ...DEFAULT_MARGINS, ...options.margins };
+    this.useCanvasOrderLinePoc = !!options.renderOptions?.experimentalCanvasOrderLinePoc;
 
     // Create chart container
     this.chartContainer = div({
@@ -605,6 +612,10 @@ export class ChartCore {
       this.margins,
     );
 
+    if (this.useCanvasOrderLinePoc) {
+      this.initKonvaOrderLinePoc();
+    }
+
     // Initialize interactive line renderer (HTML overlay for order/position labels)
     this.interactiveLineRenderer = new InteractiveLineRenderer(this.chartContainer, {
       margins: this.margins,
@@ -622,24 +633,7 @@ export class ChartCore {
           this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
           this.getUnifiedLayout(),
         ),
-      onOrderMove: (orderId, newPrice) => {
-        // Store the original price so we can detect when the server confirms the move
-        const originalOrder = this.orderLines.find((o) => o.id === orderId);
-        const originalPrice = originalOrder?.price ?? newPrice;
-        // Hold the line at the new price until the server confirms (or timeout reverts)
-        this.pendingOrders.set(orderId, {
-          orderId,
-          pendingPrice: newPrice,
-          originalPrice,
-          startTime: Date.now(),
-          timeoutId: setTimeout(() => {
-            this.pendingOrders.delete(orderId);
-            this.interactiveLineRenderer.forceRebuild();
-            this.scheduleRender();
-          }, 5000),
-        });
-        this.options.onOrderMove?.(orderId, newPrice);
-      },
+      onOrderMove: (orderId, newPrice) => this.handleOrderMove(orderId, newPrice),
       onOrderCancel: (orderId) => this.options.onOrderCancel?.(orderId),
       onPositionClose: (positionId) => this.options.onPositionClose?.(positionId),
       onPositionReverse: (positionId) => this.options.onPositionReverse?.(positionId),
@@ -688,6 +682,48 @@ export class ChartCore {
       },
     });
 
+    if (this.stage) {
+      const layer = this.stage.getLayers()[0];
+      if (layer) {
+        this.priceLineManager = new PriceLineManager({
+          layer,
+          width: this.options.width,
+          height: this.options.height,
+          margins: this.margins,
+          yToPrice: (y) =>
+            this.renderer.publicYToPriceWithLayout(
+              y,
+              this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
+              this.getUnifiedLayout(),
+            ),
+          priceToY: (price) =>
+            this.renderer.publicPriceToYWithLayout(
+              price,
+              this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
+              this.getUnifiedLayout(),
+            ),
+          onOrderMove: (orderId, newPrice) => this.handleOrderMove(orderId, newPrice),
+          onOrderCancel: (orderId) => this.options.onOrderCancel?.(orderId),
+          onPositionClose: (positionId) => this.options.onPositionClose?.(positionId),
+          onPositionReverse: (positionId) => this.options.onPositionReverse?.(positionId),
+          onCursorChange: (cursor) => {
+            if (this.cursor !== cursor) {
+              const wasDragging = this.cursor === 'grabbing';
+              this.cursor = cursor;
+              this.chartContainer.style.cursor = cursor;
+              if (this.stage) {
+                this.stage.container().style.cursor = cursor;
+              }
+              if (cursor === 'grabbing' || wasDragging) {
+                this.crosshair.visible = false;
+                this.renderCrosshairOverlay();
+              }
+            }
+          },
+        });
+      }
+    }
+
     // + button is now drawn on the crosshair canvas (no HTML element needed)
 
     // Initialize event manager
@@ -727,6 +763,9 @@ export class ChartCore {
           if (dx * dx + dy * dy <= b.r * b.r) {
             return true;
           }
+        }
+        if (this.isOverKonvaInteractiveElement(x, y)) {
+          return true;
         }
         const rect = this.chartContainer.getBoundingClientRect();
         return this.interactiveLineRenderer.isOverInteractiveElement(rect.left + x, rect.top + y);
@@ -798,6 +837,9 @@ export class ChartCore {
         if (this.cursor !== cursor) {
           this.cursor = cursor;
           this.chartContainer.style.cursor = cursor;
+          if (this.stage) {
+            this.stage.container().style.cursor = cursor;
+          }
         }
       },
       onPaneDoubleClick: (paneId) => this.options.onPaneDoubleClick?.(paneId),
@@ -1037,6 +1079,57 @@ export class ChartCore {
     }
   }
 
+  private initKonvaOrderLinePoc(): void {
+    const konvaContainer = div({
+      style: {
+        position: 'absolute',
+        top: '0',
+        left: '0',
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        zIndex: '2',
+      },
+    });
+    this.chartContainer.appendChild(konvaContainer);
+
+    this.stage = new Konva.Stage({
+      container: konvaContainer,
+      width: this.options.width,
+      height: this.options.height,
+    });
+
+    const stageContainer = this.stage.container();
+    stageContainer.style.pointerEvents = 'auto';
+    stageContainer.style.cursor = this.cursor;
+
+    const layer = new Konva.Layer();
+    this.stage.add(layer);
+  }
+
+  private isOverKonvaInteractiveElement(x: number, y: number): boolean {
+    if (!this.stage) return false;
+    const hit = this.stage.getIntersection({ x, y });
+    return hit !== null && hit.listening();
+  }
+
+  private handleOrderMove(orderId: string, newPrice: number): void {
+    const originalOrder = this.orderLines.find((o) => o.id === orderId);
+    const originalPrice = originalOrder?.price ?? newPrice;
+    this.pendingOrders.set(orderId, {
+      orderId,
+      pendingPrice: newPrice,
+      originalPrice,
+      startTime: Date.now(),
+      timeoutId: setTimeout(() => {
+        this.pendingOrders.delete(orderId);
+        this.interactiveLineRenderer.forceRebuild();
+        this.scheduleRender();
+      }, 5000),
+    });
+    this.options.onOrderMove?.(orderId, newPrice);
+  }
+
   /**
    * Resize the chart
    */
@@ -1079,6 +1172,11 @@ export class ChartCore {
 
     // Update interactive line renderer dimensions
     this.interactiveLineRenderer.setDimensions(width, height, this.margins);
+    if (this.stage) {
+      this.stage.width(width);
+      this.stage.height(height);
+    }
+    this.priceLineManager?.setDimensions(width, height, this.margins);
 
     // Update reset button position
     this.updateResetButtonPosition();
@@ -1163,6 +1261,8 @@ export class ChartCore {
     }
     this.chartContainer.removeEventListener('click', this.plusButtonClickHandler);
     this.eventManager.dispose();
+    this.priceLineManager?.dispose();
+    this.stage?.destroy();
     this.interactiveLineRenderer.dispose();
     if (!preserveDom) {
       this.chartContainer.remove();
@@ -1586,10 +1686,13 @@ export class ChartCore {
     const dragLineId = this.interactiveLineRenderer?.isDragging()
       ? this.interactiveLineRenderer.getState().getDragLineId()
       : null;
-    const canvasPriceLines = dragLineId ? allPriceLines.filter((l) => l.id !== dragLineId) : allPriceLines;
+    const canvasPriceLines = (dragLineId ? allPriceLines.filter((l) => l.id !== dragLineId) : allPriceLines).filter(
+      (line) => !(this.useCanvasOrderLinePoc && line.type === 'order'),
+    );
 
     // Hide crosshair during interactive line drag (user is focused on the drag price)
-    const lineDragging = this.interactiveLineRenderer?.isDragging() ?? false;
+    const lineDragging =
+      (this.interactiveLineRenderer?.isDragging() ?? false) || (this.priceLineManager?.isDragging() ?? false);
     const crosshairState = {
       visible: this.crosshair.visible && !lineDragging,
       x: this.crosshair.x,
@@ -2327,6 +2430,23 @@ export class ChartCore {
    * Update interactive line renderer (HTML overlay labels)
    */
   private updateInteractiveLines(): void {
-    this.interactiveLineRenderer.update(this.labelBoundsCache, this.pendingOrders);
+    const konvaBounds: PriceLineLabelBounds[] = [];
+    const htmlBounds: PriceLineLabelBounds[] = [];
+
+    for (const bound of this.labelBoundsCache) {
+      if (this.useCanvasOrderLinePoc && bound.type === 'order') {
+        konvaBounds.push(bound);
+      } else {
+        htmlBounds.push(bound);
+      }
+    }
+
+    this.priceLineManager?.update(konvaBounds, this.pendingOrders, {
+      x: 0,
+      y: 0,
+      visible: false,
+      color: '',
+    });
+    this.interactiveLineRenderer.update(htmlBounds, this.pendingOrders);
   }
 }
