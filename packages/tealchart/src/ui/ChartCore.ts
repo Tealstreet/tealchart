@@ -1223,6 +1223,7 @@ export class ChartCore {
         this.scheduleRender();
       }, 5000),
     });
+    this.scheduleRender();
     this.options.onOrderMove?.(orderId, newPrice);
   }
 
@@ -2566,6 +2567,9 @@ export class ChartCore {
    * Update interactive line layer
    */
   private updateInteractiveLines(): void {
+    if (this.priceLineManager?.getDragType() === 'order') {
+      return;
+    }
     this.priceLineManager?.update(this.labelBoundsCache, this.pendingOrders, {
       x: 0,
       y: 0,

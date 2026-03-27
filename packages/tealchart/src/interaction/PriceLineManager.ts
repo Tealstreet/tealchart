@@ -164,12 +164,15 @@ export class PriceLineManager {
   // Drag state
   private activeDrag: {
     node: Konva.Rect;
+    group?: Konva.Group;
     type: 'order' | 'tpsl';
     lineId: string;
     positionId?: string;
     buttonType?: 'tp' | 'sl';
     originalY: number;
     originalX?: number;
+    originalGroupY?: number;
+    originalAbsoluteY?: number;
     originalPrice: number;
     startCenterX?: number;
     partialEnabled?: boolean;
@@ -307,6 +310,10 @@ export class PriceLineManager {
 
   isDragging(): boolean {
     return this.activeDrag !== null;
+  }
+
+  getDragType(): 'order' | 'tpsl' | null {
+    return this.activeDrag?.type ?? null;
   }
 
   getDragLineId(): string | null {
@@ -632,25 +639,35 @@ export class PriceLineManager {
     // Invisible drag handle for segments
     if (isDraggable && chartLabel && chartLabel.segments.length > 0 && segmentsWidth > 0) {
       const dragRect = new Konva.Rect({
-        x: chartLabelX,
+        x: margins.left,
         y: lineY - TOUCH_TARGET_HEIGHT / 2,
-        width: segmentsWidth,
+        width: Math.max(priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING - margins.left, segmentsWidth),
         height: TOUCH_TARGET_HEIGHT,
         // Use rgba with very low alpha for hit detection - 'transparent' may not work in all cases
         fill: 'rgba(0, 0, 0, 0.01)',
         draggable: true,
         listening: true, // Explicitly enable listening
       });
+      dragRect.dragDistance(0);
 
       let dragStartY = 0;
+
+      dragRect.on('mousedown touchstart', () => {
+        if (!this.activeDrag) {
+          dragRect.startDrag();
+        }
+      });
 
       dragRect.on('dragstart', () => {
         dragStartY = dragRect.y();
         this.activeDrag = {
           node: dragRect,
+          group,
           type: 'order',
           lineId: bound.lineId,
           originalY: lineY,
+          originalGroupY: group.y(),
+          originalAbsoluteY: dragRect.getAbsolutePosition().y + TOUCH_TARGET_HEIGHT / 2,
           originalPrice: bound.price,
         };
         this.dragCancelled = false;
@@ -659,20 +676,36 @@ export class PriceLineManager {
 
       dragRect.on('dragmove', () => {
         // Constrain to vertical only
-        dragRect.x(chartLabelX);
+        dragRect.x(margins.left);
+        const activeDrag = this.activeDrag;
+        if (!activeDrag || activeDrag.type !== 'order' || activeDrag.node !== dragRect || !activeDrag.group) return;
+
+        const currentAbsoluteY = dragRect.getAbsolutePosition().y + TOUCH_TARGET_HEIGHT / 2;
+        const deltaY = currentAbsoluteY - (activeDrag.originalAbsoluteY ?? activeDrag.originalY);
+        activeDrag.group.y((activeDrag.originalGroupY ?? 0) + deltaY);
+        activeDrag.group.setAttr('lineY', activeDrag.originalY + deltaY);
+        dragRect.y(dragStartY);
+        this.layer.batchDraw();
       });
 
       dragRect.on('dragend', () => {
-        const finalY = dragRect.y() + TOUCH_TARGET_HEIGHT / 2;
+        const activeDrag = this.activeDrag;
+        const finalY =
+          (activeDrag?.group?.getAttr('lineY') as number | undefined) ??
+          dragRect.getAbsolutePosition().y + TOUCH_TARGET_HEIGHT / 2;
         const finalPrice = yToPrice(finalY);
 
         dragRect.y(dragStartY);
-        this.activeDrag = null;
 
         if (!this.dragCancelled && Math.abs(finalY - lineY) > 1) {
           this.options.onOrderMove?.(bound.lineId, finalPrice);
+        } else if (activeDrag?.group) {
+          activeDrag.group.y(activeDrag.originalGroupY ?? 0);
+          activeDrag.group.setAttr('lineY', activeDrag.originalY);
         }
         this.dragCancelled = false;
+        this.activeDrag = null;
+        this.layer.batchDraw();
         // Reset to default/crosshair - the mouse position may have changed during drag
         // and the rect position was reset, so we can't assume mouse is still over it
         this.options.onCursorChange?.('default');
@@ -1114,6 +1147,10 @@ export class PriceLineManager {
       this.dragCancelled = true;
       this.activeDrag.node.stopDrag();
       if (this.activeDrag.type === 'order') {
+        if (this.activeDrag.group) {
+          this.activeDrag.group.y(this.activeDrag.originalGroupY ?? 0);
+          this.activeDrag.group.setAttr('lineY', this.activeDrag.originalY);
+        }
         this.activeDrag.node.y(this.activeDrag.originalY - TOUCH_TARGET_HEIGHT / 2);
       } else {
         if (this.activeDrag.originalX !== undefined) {
@@ -1123,6 +1160,7 @@ export class PriceLineManager {
       }
       this.activeDrag.onCancel?.();
       this.activeDrag = null;
+      this.layer.batchDraw();
       this.options.onCursorChange?.('default');
     }
   };
