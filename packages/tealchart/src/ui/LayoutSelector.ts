@@ -199,7 +199,7 @@ class LayoutModal extends Modal {
     Object.assign(actionsContainer.style, selectorStyles.actionsContainer);
 
     // Save — only if a layout is loaded
-    if (this.currentLayoutId) {
+    if (this.currentLayoutId != null) {
       actionsContainer.appendChild(
         this.createActionItem('Save', () => {
           this.callbacks.onSave();

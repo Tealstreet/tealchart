@@ -1597,10 +1597,11 @@ export class ChartCore {
       allPriceLines
         .map((l) => {
           const textLen = l.chartLabel?.segments.reduce((sum, s) => sum + (s.text?.length || 0), 0) || 0;
-          return `${l.id}:${safeNum(l.price, 0, 'collisionKey.price')}:${Math.round(textLen / 3)}`;
+          return `${l.id}:${safeToFixed(l.price, 6, 'collisionKey.price')}:${Math.round(textLen / 3)}`;
         })
         .sort()
-        .join(',') + `|${safeNum(vp.priceMin)},${safeNum(vp.priceMax)}`;
+        .join(',') +
+      `|${safeToFixed(vp.priceMin, 4, 'collisionKey.priceMin')},${safeToFixed(vp.priceMax, 4, 'collisionKey.priceMax')}`;
     const now = Date.now();
     const collisionKeyChanged = collisionKey !== this.lastCollisionKey;
     const isDragging = this.eventManager.getIsDragging();

@@ -191,7 +191,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   }
 
   protected onUnmount(): void {
-    // No-op (store subscription removed)
+    this.layoutSelector?.dispose();
+    this.layoutSelector = null;
   }
 
   // ============================================================================

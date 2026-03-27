@@ -2,7 +2,7 @@ import type { MapStore, WritableAtom } from 'nanostores';
 
 import { atom, computed, map } from 'nanostores';
 
-import { ResolutionString } from '../types';
+import type { ResolutionString } from '../types';
 import { CHART_SETTINGS_VERSION } from './safeDeepMerge';
 
 /**

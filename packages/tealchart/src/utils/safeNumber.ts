@@ -23,7 +23,7 @@ export function safeToFixed(value: unknown, decimals: number, warnKey?: string):
   if (Number.isFinite(num)) {
     return num.toFixed(decimals);
   }
-  return '0';
+  return (0).toFixed(decimals);
 }
 
 /**
