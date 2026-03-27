@@ -94,7 +94,7 @@ interface CachedLineContentRefs {
   segmentTexts?: Konva.Text[];
   buttonRects?: Konva.Rect[];
   buttonTexts?: Array<Konva.Text | undefined>;
-  buttonIcons?: Array<Konva.Shape | undefined>;
+  buttonIcons?: Array<Konva.Shape[] | undefined>;
 }
 
 // ============================================================================
@@ -129,6 +129,16 @@ function calculatePartialPercent(startX: number, currentX: number): number {
   if (deltaX <= 137) return 50;
   if (deltaX <= 192) return 25;
   return 10;
+}
+
+function getOrderedButtons(buttons: NonNullable<PriceLineLabelBounds['chartLabel']>['buttons'] = []) {
+  const inlineButtons = buttons.filter((button) => button.type !== 'tp' && button.type !== 'sl');
+  const tpslButtons = buttons.filter((button) => button.type === 'tp' || button.type === 'sl');
+  return {
+    inlineButtons,
+    tpslButtons,
+    orderedButtons: [...inlineButtons, ...tpslButtons],
+  };
 }
 
 // ============================================================================
@@ -329,11 +339,12 @@ export class PriceLineManager {
       refs.segmentTexts?.[index]?.fill(segment.textColor);
     });
 
-    bound.chartLabel?.buttons?.forEach((button, index) => {
+    const { orderedButtons } = getOrderedButtons(bound.chartLabel?.buttons || []);
+    orderedButtons.forEach((button, index) => {
       refs.buttonRects?.[index]?.fill(button.backgroundColor);
       refs.buttonRects?.[index]?.stroke(button.borderColor);
       refs.buttonTexts?.[index]?.fill(button.iconColor);
-      refs.buttonIcons?.[index]?.stroke(button.iconColor);
+      refs.buttonIcons?.[index]?.forEach((icon) => icon.stroke(button.iconColor));
     });
   }
 
@@ -575,8 +586,8 @@ export class PriceLineManager {
     let chartLabelX = margins.left;
     const useNarrowText = width < 400;
     const buttons = chartLabel?.buttons || [];
-    const hasTPSLButtons = buttons.length > 0 && (buttons[0].type === 'tp' || buttons[0].type === 'sl');
-    const tpslGap = hasTPSLButtons ? 6 : 0;
+    const { inlineButtons, tpslButtons, orderedButtons } = getOrderedButtons(buttons);
+    const tpslGap = tpslButtons.length > 0 ? 6 : 0;
 
     if (chartLabel && chartLabel.segments.length > 0) {
       for (const segment of chartLabel.segments) {
@@ -584,7 +595,7 @@ export class PriceLineManager {
         segmentsWidth += text.length * 6 + 8;
       }
       chartLabelWidth = segmentsWidth + tpslGap;
-      for (const button of buttons) {
+      for (const button of orderedButtons) {
         chartLabelWidth += button.type === 'tp' || button.type === 'sl' ? 24 : 16;
       }
 
@@ -724,19 +735,25 @@ export class PriceLineManager {
 
       group.add(segmentGroup);
 
-      // Render buttons
-      if (hasTPSLButtons) {
-        currentX += tpslGap;
-      }
-
       refs.buttonRects = [];
       refs.buttonTexts = [];
       refs.buttonIcons = [];
 
-      for (let i = 0; i < buttons.length; i++) {
-        const button = buttons[i];
+      for (let i = 0; i < orderedButtons.length; i++) {
+        const button = orderedButtons[i];
         const isTPSL = button.type === 'tp' || button.type === 'sl';
         const buttonWidth = isTPSL ? 24 : 16;
+        const prevButton = orderedButtons[i - 1];
+        const nextButton = orderedButtons[i + 1];
+        const startsTPSLGroup = isTPSL && prevButton && prevButton.type !== 'tp' && prevButton.type !== 'sl';
+        const isFirstInline = !isTPSL && (!prevButton || prevButton.type === 'tp' || prevButton.type === 'sl');
+        const isLastInline = !isTPSL && (!nextButton || nextButton.type === 'tp' || nextButton.type === 'sl');
+        const isFirstTPSL = isTPSL && (!prevButton || prevButton.type !== 'tp' && prevButton.type !== 'sl');
+        const isLastTPSL = isTPSL && (!nextButton || nextButton.type !== 'tp' && nextButton.type !== 'sl');
+
+        if (startsTPSLGroup || (i === 0 && isTPSL && tpslGap > 0)) {
+          currentX += tpslGap;
+        }
 
         const buttonGroup = new Konva.Group();
         const buttonRect = new Konva.Rect({
@@ -747,7 +764,17 @@ export class PriceLineManager {
           fill: button.backgroundColor,
           stroke: button.borderColor,
           strokeWidth: 1,
-          cornerRadius: button.type === 'tp' ? [2, 0, 0, 2] : button.type === 'sl' ? [0, 2, 2, 0] : 2,
+          cornerRadius: isTPSL
+            ? isFirstTPSL && isLastTPSL
+              ? 2
+              : isFirstTPSL
+                ? [2, 0, 0, 2]
+                : isLastTPSL
+                  ? [0, 2, 2, 0]
+                  : 0
+            : isLastInline
+              ? [0, 2, 2, 0]
+              : 0,
         });
 
         buttonGroup.add(buttonRect);
@@ -883,6 +910,7 @@ export class PriceLineManager {
           });
 
           buttonGroup.add(hitRect);
+          refs.buttonIcons.push(undefined);
         } else if (button.type === 'cancel' || button.type === 'close') {
           // X icon
           const iconLine1 = new Konva.Line({
@@ -899,8 +927,7 @@ export class PriceLineManager {
           });
           buttonGroup.add(iconLine1);
           buttonGroup.add(iconLine2);
-          refs.buttonIcons.push(iconLine1);
-          refs.buttonIcons.push(iconLine2);
+          refs.buttonIcons.push([iconLine1, iconLine2]);
           refs.buttonTexts.push(undefined);
 
           buttonGroup.on('click tap', () => {
@@ -930,6 +957,7 @@ export class PriceLineManager {
           });
           buttonGroup.add(reverseIcon);
           refs.buttonTexts.push(reverseIcon);
+          refs.buttonIcons.push(undefined);
 
           buttonGroup.on('click tap', () => {
             bound.callbacks?.onReverse?.();
@@ -939,11 +967,12 @@ export class PriceLineManager {
           buttonGroup.on('mouseleave', () => this.options.onCursorChange?.('default'));
         } else {
           refs.buttonTexts.push(undefined);
+          refs.buttonIcons.push(undefined);
         }
 
         group.add(buttonGroup);
         currentX += buttonWidth;
-        if (button.type === 'tp') currentX += 1;
+        if (button.type === 'tp' && nextButton?.type === 'sl') currentX += 1;
       }
 
       group.setAttr('contentRefs', refs);
