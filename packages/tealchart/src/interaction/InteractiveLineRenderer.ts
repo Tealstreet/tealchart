@@ -9,6 +9,7 @@ import type { ChartLabelButton, ChartMargins, PendingOrderUpdate, PriceLineLabel
 
 import { PRICE_AXIS_RIGHT_PADDING } from '../types';
 import { DomManager } from '../ui/DomManager';
+import { safeToFixed } from '../utils/safeNumber';
 import { InteractiveLineState } from './InteractiveLineState';
 
 import './InteractiveLineRenderer.css';
@@ -838,7 +839,7 @@ export class InteractiveLineRenderer {
       if (priceAxisEl) {
         priceAxisEl.style.top = `${newY - bound.height / 2}px`;
         // Update the price text to show current drag price
-        const priceText = this.options.formatPrice?.(currentPrice) ?? currentPrice.toFixed(2);
+        const priceText = this.options.formatPrice?.(currentPrice) ?? safeToFixed(currentPrice, 2);
         const primarySpan = priceAxisEl.querySelector('span');
         if (primarySpan) {
           primarySpan.textContent = priceText;

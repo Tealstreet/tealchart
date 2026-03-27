@@ -16,6 +16,7 @@ import type {
 import type { ChartCoreOptions, IndicatorPaneInfo } from './ChartCore';
 import type { ActiveIndicator } from './ChartLegend';
 import type { ChartTopBarOptions } from './ChartTopBar';
+import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
 import { getChartStore } from '../state/chartState';
 import { ChartCore } from './ChartCore';
@@ -106,6 +107,8 @@ export interface TealchartWidgetUIOptions {
   isAutoScale?: (paneId: string) => boolean;
   /** Called on double-click/double-tap on a pane */
   onPaneDoubleClick?: (paneId: string) => void;
+  /** Layout selector callbacks — if provided, layout selector is shown in the top bar */
+  layoutCallbacks?: LayoutSelectorCallbacks;
 }
 
 // ============================================================================
@@ -187,6 +190,7 @@ export class TealchartWidgetUI {
         onIndicatorsClick: () => {
           this.indicatorsModal?.toggle();
         },
+        layoutCallbacks: options.layoutCallbacks,
       });
       this.topBar.mount(topBarWrapper);
       this.rootEl.appendChild(topBarWrapper);
@@ -245,6 +249,9 @@ export class TealchartWidgetUI {
 
     this.settingsModal = new IndicatorSettingsModal();
     this.settingsModal.mount(this.rootEl);
+
+    // Mount layout selector modal to rootEl (if layout callbacks are provided)
+    this.topBar?.getLayoutSelector()?.mount(this.rootEl);
 
     // No loading overlay — empty canvas grid renders while bars load
   }
@@ -427,6 +434,13 @@ export class TealchartWidgetUI {
    */
   setSupportedResolutions(resolutions: string[] | null): void {
     this.topBar?.setSupportedResolutions(resolutions);
+  }
+
+  /**
+   * Update the current layout shown in the layout selector
+   */
+  setCurrentLayout(layoutId: string | number | null, layoutName: string | null): void {
+    this.topBar?.setCurrentLayout(layoutId, layoutName);
   }
 
   /**

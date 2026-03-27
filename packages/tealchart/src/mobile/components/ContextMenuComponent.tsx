@@ -5,17 +5,13 @@
  * Actions are provided by the parent via the onContextMenu callback.
  */
 
-import React, { useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Modal,
-  TouchableWithoutFeedback,
-} from 'react-native';
-
 import type { ContextMenuItem } from '../../types';
+
+import React, { useCallback } from 'react';
+
+import { Modal, Pressable, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+
+import { safeToFixed } from '../../utils/safeNumber';
 
 export interface ContextMenuComponentProps {
   /** Whether the menu is visible */
@@ -51,15 +47,18 @@ export const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
   onClose,
 }) => {
   // Handle item press
-  const handleItemPress = useCallback((item: ContextMenuItem) => {
-    if (item.enabled !== false) {
-      item.click();
-      onClose();
-    }
-  }, [onClose]);
+  const handleItemPress = useCallback(
+    (item: ContextMenuItem) => {
+      if (item.enabled !== false) {
+        item.click();
+        onClose();
+      }
+    },
+    [onClose],
+  );
 
   // Format price for display
-  const formattedPrice = price.toFixed(pricePrecision);
+  const formattedPrice = safeToFixed(price, pricePrecision);
 
   // Format time for display
   const formatTime = (timestamp: number): string => {
@@ -75,20 +74,15 @@ export const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
   const menuX = x + MENU_WIDTH > 350 ? x - MENU_WIDTH : x;
 
   // Separate items by position
-  const topItems = items.filter(item => item.position === 'top');
-  const bottomItems = items.filter(item => item.position === 'bottom');
+  const topItems = items.filter((item) => item.position === 'top');
+  const bottomItems = items.filter((item) => item.position === 'bottom');
 
   if (!visible) {
     return null;
   }
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
@@ -111,21 +105,14 @@ export const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
                     pressed && item.enabled !== false && styles.menuItemPressed,
                   ]}
                 >
-                  <Text
-                    style={[
-                      styles.menuItemText,
-                      item.enabled === false && styles.menuItemTextDisabled,
-                    ]}
-                  >
+                  <Text style={[styles.menuItemText, item.enabled === false && styles.menuItemTextDisabled]}>
                     {item.text}
                   </Text>
                 </Pressable>
               ))}
 
               {/* Separator if both top and bottom items exist */}
-              {topItems.length > 0 && bottomItems.length > 0 && (
-                <View style={styles.separator} />
-              )}
+              {topItems.length > 0 && bottomItems.length > 0 && <View style={styles.separator} />}
 
               {/* Bottom position items */}
               {bottomItems.map((item, index) => (
@@ -138,12 +125,7 @@ export const ContextMenuComponent: React.FC<ContextMenuComponentProps> = ({
                     pressed && item.enabled !== false && styles.menuItemPressed,
                   ]}
                 >
-                  <Text
-                    style={[
-                      styles.menuItemText,
-                      item.enabled === false && styles.menuItemTextDisabled,
-                    ]}
-                  >
+                  <Text style={[styles.menuItemText, item.enabled === false && styles.menuItemTextDisabled]}>
                     {item.text}
                   </Text>
                 </Pressable>

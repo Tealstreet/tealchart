@@ -162,19 +162,18 @@ export class TealchartWidget {
     // Use provided chartKey, or derive from account/panelId, or generate unique ID
     this._chartKey = options.chartKey || `chart_${options.account || ''}_${Date.now()}`;
 
-    // Initialize Nanostores for this chart (loads persisted settings from localStorage)
+    // Initialize Nanostores for this chart (in-memory settings, layout ID from localStorage)
     this._chartStore = getChartStore(this._chartKey);
 
-    // Interval priority: explicit option > persisted store value (from localStorage)
+    // Interval comes from options or defaults to '60' (1 hour).
+    // Settings store is in-memory only — layout from adapter may override later.
     if (this._intervalWasProvided) {
       this._interval = options.interval as ResolutionString;
-      // Sync explicitly provided interval to store
-      this._chartStore.settings.setKey('interval', this._interval);
     } else {
-      // Use persisted interval from localStorage (loaded by getChartStore).
-      // Falls back to DEFAULT_CHART_SETTINGS.interval ('1h') if nothing persisted.
-      this._interval = this._chartStore.settings.get().interval;
+      this._interval = '60' as ResolutionString;
     }
+    // Sync interval to the in-memory store
+    this._chartStore.settings.setKey('interval', this._interval);
 
     // Initialize pane manager for multi-pane indicator support
     this._paneManager = new PaneManager();
@@ -358,7 +357,10 @@ export class TealchartWidget {
           };
           // Push supported resolutions to UI (filters timeframe selector)
           this._ui?.setSupportedResolutions(this._supportedResolutions);
+          // Start loading bars immediately (don't wait for layout)
           this._loadBars();
+          // Load active layout from adapter async (races with bar load)
+          this._loadLayoutFromAdapter();
         },
         (error) => {
           if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
@@ -368,6 +370,41 @@ export class TealchartWidget {
           this._setReady();
         },
       );
+    });
+  }
+
+  /**
+   * Load the active layout from the SaveLoadAdapter on startup.
+   * Runs async — races with bar loading. Layout applies when it arrives.
+   * If no layoutId stored or adapter unavailable, chart starts with defaults.
+   */
+  private _loadLayoutFromAdapter(): void {
+    if (!this._options.save_load_adapter || !this._chartStore) return;
+
+    const current = this._chartStore.currentLayout.get();
+    if (!current.layoutId) {
+      // No layout saved — fresh client, chart uses defaults
+      return;
+    }
+
+    import('./transformer').then(({ loadAsTealchart }) => {
+      loadAsTealchart(current.layoutId!, this._options.save_load_adapter!)
+        .then((result) => {
+          if (this._disposed) return;
+          this._handleLoadLayout(result.data, result.warnings, current.layoutId!, current.layoutName || 'tealstreet');
+          // Sync layout selector UI
+          this._ui?.setCurrentLayout(current.layoutId, current.layoutName);
+        })
+        .catch((error) => {
+          if (this._disposed) return;
+          // Layout no longer exists — clear the reference, start fresh
+          console.warn('[Tealchart] Failed to load saved layout, starting fresh:', error);
+          this._chartStore!.currentLayout.set({
+            layoutId: null,
+            layoutName: null,
+          });
+          this._ui?.setCurrentLayout(null, null);
+        });
     });
   }
 
@@ -908,7 +945,37 @@ export class TealchartWidget {
         this._paneManager.toggleMaximizePane(paneId);
         this._scheduler.markDirty(DIRTY.LAYOUT | DIRTY.VIEWPORT);
       },
+      layoutCallbacks: this._options.save_load_adapter
+        ? {
+            getAllLayouts: () => {
+              return import('./transformer').then(({ getAllLayouts }) =>
+                getAllLayouts(this._options.save_load_adapter!),
+              );
+            },
+            onSave: () => {
+              this._handleSaveCurrentLayout();
+            },
+            onSaveAs: (name: string) => {
+              this._handleSaveAsLayout(name);
+            },
+            onLoad: (id: string | number) => {
+              this._handleLoadLayoutById(id);
+            },
+            onDelete: (id: string | number) => {
+              this._handleDeleteLayout(id);
+            },
+            onRename: (id: string | number, newName: string) => {
+              this._handleRenameLayout(id, newName);
+            },
+          }
+        : undefined,
     });
+
+    // Sync the layout selector with the current layout state
+    if (this._chartStore && this._options.save_load_adapter) {
+      const current = this._chartStore.currentLayout.get();
+      this._ui.setCurrentLayout(current.layoutId, current.layoutName);
+    }
   }
 
   /**
@@ -1213,7 +1280,9 @@ export class TealchartWidget {
   }
 
   /**
-   * Schedule auto-save after the configured delay
+   * Schedule auto-save after the configured delay.
+   * Always fires when adapter is available — creates a new "tealstreet" layout
+   * for fresh clients, or updates the existing layout.
    */
   private _scheduleAutoSave(): void {
     // Clear any existing timer
@@ -1228,14 +1297,9 @@ export class TealchartWidget {
       return;
     }
 
-    // Only auto-save if we have a current layout loaded
     if (!this._chartStore) return;
-    const currentLayout = this._chartStore.currentLayout.get();
-    if (!currentLayout.layoutId || !currentLayout.layoutName) {
-      return;
-    }
 
-    // Schedule auto-save
+    // Schedule auto-save (works for both existing and fresh layouts)
     this._autoSaveTimer = setTimeout(() => {
       this._handleAutoSave();
     }, delay * 1000);
@@ -1247,13 +1311,7 @@ export class TealchartWidget {
   private _handleAutoSave(): void {
     this._autoSaveTimer = null;
 
-    if (!this._chartStore) return;
-    const currentLayout = this._chartStore.currentLayout.get();
-
-    // Double-check we still have a layout to save to
-    if (!currentLayout.layoutId || !currentLayout.layoutName) {
-      return;
-    }
+    if (!this._chartStore || !this._options.save_load_adapter) return;
 
     // Check if still dirty
     const isDirty = this._chartStore.isDirty.get();
@@ -1263,51 +1321,61 @@ export class TealchartWidget {
 
     // Get current settings and save
     const settings = this._getCurrentSettings();
+    const currentLayout = this._chartStore.currentLayout.get();
 
     // Set saving status
     this._chartStore.saveStatus.set('saving');
     this._scheduler.markDirty(DIRTY.FULL);
 
-    import('./transformer').then(({ updateTealchartLayout }) => {
-      // Use update since we have an existing layout ID
-      updateTealchartLayout(
-        String(currentLayout.layoutId),
-        settings,
-        currentLayout.layoutName!,
-        this._options.save_load_adapter!,
-      )
-        .then((chartId) => {
-          if (!this._chartStore) return;
-          // Update layout ID (in case it changed) and clear dirty state
-          this._chartStore.currentLayout.set({
-            layoutId: chartId,
-            layoutName: currentLayout.layoutName,
-          });
-          this._chartStore.isDirty.set(false);
-          this._chartStore.saveStatus.set('success');
-          this._scheduler.markDirty(DIRTY.FULL);
-
-          // Start fade after showing success briefly
-          setTimeout(() => {
+    if (currentLayout.layoutId && currentLayout.layoutName) {
+      // Update existing layout
+      import('./transformer').then(({ updateTealchartLayout }) => {
+        updateTealchartLayout(
+          String(currentLayout.layoutId),
+          settings,
+          currentLayout.layoutName!,
+          this._options.save_load_adapter!,
+        )
+          .then((chartId) => {
             if (!this._chartStore) return;
-            this._chartStore.saveStatus.set('success-fading');
+            this._chartStore.currentLayout.set({
+              layoutId: chartId,
+              layoutName: currentLayout.layoutName,
+            });
+            this._chartStore.isDirty.set(false);
+            this._showSaveSuccess();
+            this._ui?.setCurrentLayout(chartId, currentLayout.layoutName);
+          })
+          .catch((error) => {
+            console.error('[Tealchart] Auto-save failed:', error);
+            if (!this._chartStore) return;
+            this._chartStore.saveStatus.set('error');
             this._scheduler.markDirty(DIRTY.FULL);
-
-            // Clear after fade animation (500ms)
-            setTimeout(() => {
-              if (!this._chartStore) return;
-              this._chartStore.saveStatus.set('idle');
-              this._scheduler.markDirty(DIRTY.FULL);
-            }, 500);
-          }, 500);
-        })
-        .catch((error) => {
-          console.error('[Tealchart] Auto-save failed:', error);
-          if (!this._chartStore) return;
-          this._chartStore.saveStatus.set('error');
-          this._scheduler.markDirty(DIRTY.FULL);
-        });
-    });
+          });
+      });
+    } else {
+      // No layout yet — create a new one named "tealstreet"
+      const layoutName = 'tealstreet';
+      import('./transformer').then(({ saveTealchartLayout }) => {
+        saveTealchartLayout(settings, layoutName, this._options.save_load_adapter!)
+          .then((chartId) => {
+            if (!this._chartStore) return;
+            this._chartStore.currentLayout.set({
+              layoutId: chartId,
+              layoutName,
+            });
+            this._chartStore.isDirty.set(false);
+            this._showSaveSuccess();
+            this._ui?.setCurrentLayout(chartId, layoutName);
+          })
+          .catch((error) => {
+            console.error('[Tealchart] Auto-save (create) failed:', error);
+            if (!this._chartStore) return;
+            this._chartStore.saveStatus.set('error');
+            this._scheduler.markDirty(DIRTY.FULL);
+          });
+      });
+    }
   }
 
   /**
@@ -1686,7 +1754,7 @@ export class TealchartWidget {
     if (options.newInterval !== undefined) {
       this._interval = options.newInterval;
       this._ui?.setInterval(options.newInterval);
-      // Persist interval to per-chart store (for restoration on page refresh)
+      // Sync interval to in-memory store (for auto-save via _getCurrentSettings)
       this._chartStore?.settings.setKey('interval', options.newInterval);
     }
 
@@ -1874,6 +1942,12 @@ export class TealchartWidget {
     if (this._boundHandleMouseLeave) {
       this._container.removeEventListener('mouseleave', this._boundHandleMouseLeave);
       this._boundHandleMouseLeave = null;
+    }
+
+    // Cancel pending auto-save
+    if (this._autoSaveTimer) {
+      clearTimeout(this._autoSaveTimer);
+      this._autoSaveTimer = null;
     }
 
     // Cancel pending render scheduler
@@ -2293,34 +2367,70 @@ export class TealchartWidget {
     if (settings.indicators && settings.indicators.length > 0) {
       for (const indicator of settings.indicators) {
         const builtinIndicator = getIndicatorById(indicator.builtinId);
-        if (builtinIndicator) {
-          // Create study with saved inputs
-          this._chartApi
-            .createStudy(
-              builtinIndicator.code,
-              builtinIndicator.overlay,
-              false,
-              indicator.inputs,
-              {},
-              { displayName: indicator.name },
-            )
-            .then((studyApi) => {
-              if (studyApi) {
-                const studyId = studyApi.getId();
-                this._indicatorStudyMap.set(indicator.id, studyId);
-                this._studyInstanceMap.set(studyId, indicator.id);
-                this._indicatorConfigMap.set(studyId, builtinIndicator);
-                this._paneManager.addIndicator({
-                  indicatorId: studyId,
-                  overlay: builtinIndicator.overlay,
-                  yAxisRange: builtinIndicator.yAxisRange,
-                });
-                this._scheduler.markDirty(DIRTY.FULL);
-              }
-            });
-        } else {
+        if (!builtinIndicator) {
           console.warn('[Tealchart] Unknown indicator:', indicator.builtinId);
+          continue;
         }
+
+        // Route jailbreak indicators to their own handler (they use BarsIndicator, not tealscript)
+        if (builtinIndicator.jailbreak) {
+          this._restoreJailbreakIndicator(indicator, builtinIndicator);
+          continue;
+        }
+
+        // Tealscript indicators: create study with saved inputs
+        this._chartApi
+          .createStudy(
+            builtinIndicator.code,
+            builtinIndicator.overlay,
+            false,
+            indicator.inputs,
+            {},
+            { displayName: indicator.name },
+          )
+          .then((studyApi) => {
+            if (studyApi) {
+              const studyId = studyApi.getId();
+              this._indicatorStudyMap.set(indicator.id, studyId);
+              this._studyInstanceMap.set(studyId, indicator.id);
+              this._indicatorConfigMap.set(studyId, builtinIndicator);
+              this._paneManager.addIndicator({
+                indicatorId: studyId,
+                overlay: builtinIndicator.overlay,
+                yAxisRange: builtinIndicator.yAxisRange,
+              });
+              this._scheduler.markDirty(DIRTY.FULL);
+            }
+          });
+      }
+    }
+
+    // Apply loaded settings to the in-memory store so auto-save can read them
+    if (this._chartStore) {
+      this._chartStore.settings.setKey('indicators', settings.indicators || []);
+      this._chartStore.settings.setKey('showVolume', settings.showVolume);
+      this._chartStore.settings.setKey('volumeHeight', settings.volumeHeight);
+      this._chartStore.settings.setKey('chartType', settings.chartType || 'candle');
+      this._chartStore.settings.setKey('autoScale', settings.autoScale);
+      this._chartStore.settings.setKey('symbol', settings.symbol || this._symbol);
+      this._chartStore.settings.setKey('interval', settings.interval || this._interval);
+    }
+    if (!settings.autoScale) {
+      this._viewportController.disableAutoScale('main');
+    }
+
+    // Apply viewport if saved (after symbol/interval change triggers bar load)
+    if (settings.viewport) {
+      const vp = {
+        startTime: settings.viewport.startTime,
+        endTime: settings.viewport.endTime,
+        priceMin: settings.viewport.priceMin,
+        priceMax: settings.viewport.priceMax,
+      };
+      this._viewport = vp;
+      this._ui?.setViewport(vp);
+      if (this._chartStore) {
+        this._chartStore.settings.setKey('viewport', settings.viewport);
       }
     }
 
@@ -2428,19 +2538,209 @@ export class TealchartWidget {
   }
 
   /**
+   * Save the current layout (update in place).
+   * Called from the layout selector "Save" action.
+   */
+  private _handleSaveCurrentLayout(): void {
+    if (!this._chartStore || !this._options.save_load_adapter) return;
+
+    const currentLayout = this._chartStore.currentLayout.get();
+    if (!currentLayout.layoutId || !currentLayout.layoutName) {
+      // No layout loaded — treat as "Save As"
+      const name = prompt('Layout name:');
+      if (name && name.trim()) {
+        this._handleSaveAsLayout(name.trim());
+      }
+      return;
+    }
+
+    const settings = this._getCurrentSettings();
+    this._chartStore.saveStatus.set('saving');
+    this._scheduler.markDirty(DIRTY.FULL);
+
+    import('./transformer').then(({ updateTealchartLayout }) => {
+      updateTealchartLayout(
+        String(currentLayout.layoutId),
+        settings,
+        currentLayout.layoutName!,
+        this._options.save_load_adapter!,
+      )
+        .then((chartId) => {
+          if (!this._chartStore) return;
+          this._chartStore.currentLayout.set({ layoutId: chartId, layoutName: currentLayout.layoutName });
+          this._chartStore.isDirty.set(false);
+          this._showSaveSuccess();
+          this._ui?.setCurrentLayout(chartId, currentLayout.layoutName);
+        })
+        .catch((error) => {
+          console.error('[Tealchart] Failed to save layout:', error);
+          if (!this._chartStore) return;
+          this._chartStore.saveStatus.set('error');
+          this._scheduler.markDirty(DIRTY.FULL);
+        });
+    });
+  }
+
+  /**
+   * Save as a new layout with the given name.
+   * Called from the layout selector "Save As" action.
+   */
+  private _handleSaveAsLayout(layoutName: string): void {
+    if (!this._chartStore || !this._options.save_load_adapter) return;
+
+    const settings = this._getCurrentSettings();
+    this._chartStore.saveStatus.set('saving');
+    this._scheduler.markDirty(DIRTY.FULL);
+
+    import('./transformer').then(({ saveTealchartLayout }) => {
+      saveTealchartLayout(settings, layoutName, this._options.save_load_adapter!)
+        .then((chartId) => {
+          if (!this._chartStore) return;
+          this._chartStore.currentLayout.set({ layoutId: chartId, layoutName });
+          this._chartStore.isDirty.set(false);
+          this._showSaveSuccess();
+          this._ui?.setCurrentLayout(chartId, layoutName);
+        })
+        .catch((error) => {
+          console.error('[Tealchart] Failed to save layout:', error);
+          if (!this._chartStore) return;
+          this._chartStore.saveStatus.set('error');
+          this._scheduler.markDirty(DIRTY.FULL);
+        });
+    });
+  }
+
+  /**
+   * Load a layout by ID.
+   * Called from the layout selector list items.
+   */
+  private _handleLoadLayoutById(layoutId: string | number): void {
+    if (!this._options.save_load_adapter) return;
+
+    import('./transformer')
+      .then(({ loadAsTealchart, getAllLayouts }) =>
+        getAllLayouts(this._options.save_load_adapter!).then((layouts) => {
+          const meta = layouts.find((l) => l.id === layoutId);
+          const layoutName = meta?.name || 'Untitled';
+
+          return loadAsTealchart(layoutId, this._options.save_load_adapter!).then((result) => ({
+            layoutName,
+            result,
+          }));
+        }),
+      )
+      .then(({ layoutName, result }) => {
+        this._handleLoadLayout(result.data, result.warnings, layoutId, layoutName);
+
+        // Update layout selector state
+        if (this._chartStore) {
+          this._chartStore.currentLayout.set({ layoutId: String(layoutId), layoutName });
+          this._chartStore.isDirty.set(false);
+        }
+        this._ui?.setCurrentLayout(layoutId, layoutName);
+      })
+      .catch((error) => {
+        console.error('[Tealchart] Failed to load layout:', error);
+      });
+  }
+
+  /**
+   * Delete a layout by ID.
+   * Called from the layout selector delete action.
+   */
+  private _handleDeleteLayout(layoutId: string | number): void {
+    if (!this._options.save_load_adapter) return;
+
+    import('./transformer').then(({ deleteLayout }) => {
+      deleteLayout(layoutId, this._options.save_load_adapter!)
+        .then(() => {
+          // If we deleted the currently loaded layout, clear it
+          if (this._chartStore) {
+            const current = this._chartStore.currentLayout.get();
+            if (current.layoutId && String(current.layoutId) === String(layoutId)) {
+              this._chartStore.currentLayout.set({ layoutId: null, layoutName: null });
+              this._ui?.setCurrentLayout(null, null);
+            }
+          }
+        })
+        .catch((error) => {
+          console.error('[Tealchart] Failed to delete layout:', error);
+        });
+    });
+  }
+
+  /**
+   * Rename a layout.
+   * Called from the layout selector rename action.
+   */
+  private _handleRenameLayout(layoutId: string | number, newName: string): void {
+    if (!this._options.save_load_adapter) return;
+
+    // To rename, we load the content, then save it back with the new name
+    import('./transformer')
+      .then(({ loadAsTealchart, updateTealchartLayout }) =>
+        loadAsTealchart(layoutId, this._options.save_load_adapter!).then((result) =>
+          updateTealchartLayout(String(layoutId), result.data, newName, this._options.save_load_adapter!),
+        ),
+      )
+      .then(() => {
+        // If this is the current layout, update state
+        if (this._chartStore) {
+          const current = this._chartStore.currentLayout.get();
+          if (current.layoutId && String(current.layoutId) === String(layoutId)) {
+            this._chartStore.currentLayout.set({ layoutId: current.layoutId, layoutName: newName });
+            this._ui?.setCurrentLayout(current.layoutId, newName);
+          }
+        }
+      })
+      .catch((error) => {
+        console.error('[Tealchart] Failed to rename layout:', error);
+      });
+  }
+
+  /**
+   * Show save success status with auto-fade
+   */
+  private _showSaveSuccess(): void {
+    if (!this._chartStore) return;
+    this._chartStore.saveStatus.set('success');
+    this._scheduler.markDirty(DIRTY.FULL);
+
+    setTimeout(() => {
+      if (!this._chartStore) return;
+      this._chartStore.saveStatus.set('success-fading');
+      this._scheduler.markDirty(DIRTY.FULL);
+      setTimeout(() => {
+        if (!this._chartStore) return;
+        this._chartStore.saveStatus.set('idle');
+        this._scheduler.markDirty(DIRTY.FULL);
+      }, 500);
+    }, 500);
+  }
+
+  /**
    * Get current chart settings for saving
    */
   private _getCurrentSettings(): ChartSettings {
-    // Gather indicator instances from persisted state
-    const indicators = this._chartStore ? this._chartStore.settings.get().indicators : [];
+    // Gather settings from persisted state
+    const storeSettings = this._chartStore?.settings.get();
+    const indicators = storeSettings?.indicators ?? [];
 
     return {
       symbol: this._symbol,
       interval: this._interval,
       showVolume: this._renderOptions.showVolume ?? true,
       volumeHeight: this._renderOptions.volumeHeight ?? 0.2,
-      chartType: 'candle',
-      autoScale: true,
+      chartType: storeSettings?.chartType ?? 'candle',
+      autoScale: storeSettings?.autoScale ?? true,
+      viewport: this._viewport
+        ? {
+            startTime: this._viewport.startTime,
+            endTime: this._viewport.endTime,
+            priceMin: this._viewport.priceMin,
+            priceMax: this._viewport.priceMax,
+          }
+        : undefined,
       indicators,
       version: 1,
     };

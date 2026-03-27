@@ -2,6 +2,7 @@ import type { PlotStyleOverride } from '../state/chartState';
 import type { Bar, ResolutionString } from '../types';
 import type { ComponentOptions } from './Component';
 
+import { safeToFixed } from '../utils/safeNumber';
 import { Component } from './Component';
 import { button, div, icons, span } from './dom';
 
@@ -280,7 +281,7 @@ export class ChartLegend extends Component<ChartLegendState> {
       const change = bar.close - prevBar.close;
       const changePercent = (change / prevBar.close) * 100;
       const changeUp = change >= 0;
-      this.ohlcElements.change.textContent = `${changeUp ? '+' : ''}${change.toFixed(1)} (${changePercent.toFixed(2)}%)`;
+      this.ohlcElements.change.textContent = `${changeUp ? '+' : ''}${safeToFixed(change, 1)} (${safeToFixed(changePercent, 2)}%)`;
       this.ohlcElements.change.style.color = changeUp ? 'var(--buy-color, #26a69a)' : 'var(--sell-color, #ef5350)';
     }
   }
@@ -440,7 +441,7 @@ export class ChartLegend extends Component<ChartLegendState> {
         const changeUp = change >= 0;
 
         const changeEl = span({
-          text: `${changeUp ? '+' : ''}${change.toFixed(1)} (${changePercent.toFixed(2)}%)`,
+          text: `${changeUp ? '+' : ''}${safeToFixed(change, 1)} (${safeToFixed(changePercent, 2)}%)`,
           style: {
             fontFamily: 'monospace',
             fontSize: '11px',
