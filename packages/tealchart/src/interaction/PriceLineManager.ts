@@ -638,10 +638,11 @@ export class PriceLineManager {
 
     // Invisible drag handle for segments
     if (isDraggable && chartLabel && chartLabel.segments.length > 0 && segmentsWidth > 0) {
+      const dragRectX = chartLabelX - 2;
       const dragRect = new Konva.Rect({
-        x: margins.left,
+        x: dragRectX,
         y: lineY - TOUCH_TARGET_HEIGHT / 2,
-        width: Math.max(priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING - margins.left, segmentsWidth),
+        width: segmentsWidth + 4,
         height: TOUCH_TARGET_HEIGHT,
         // Use rgba with very low alpha for hit detection - 'transparent' may not work in all cases
         fill: 'rgba(0, 0, 0, 0.01)',
@@ -676,7 +677,7 @@ export class PriceLineManager {
 
       dragRect.on('dragmove', () => {
         // Constrain to vertical only
-        dragRect.x(margins.left);
+        dragRect.x(dragRectX);
         const activeDrag = this.activeDrag;
         if (!activeDrag || activeDrag.type !== 'order' || activeDrag.node !== dragRect || !activeDrag.group) return;
 
@@ -797,6 +798,7 @@ export class PriceLineManager {
           fill: button.backgroundColor,
           stroke: button.borderColor,
           strokeWidth: 1,
+          listening: !isTPSL,
           cornerRadius: isTPSL
             ? isFirstTPSL && isLastTPSL
               ? 2
@@ -826,6 +828,7 @@ export class PriceLineManager {
             fill: button.iconColor,
             align: 'center',
             verticalAlign: 'middle',
+            listening: false,
           });
           buttonGroup.add(buttonText);
           refs.buttonTexts.push(buttonText);
@@ -839,10 +842,17 @@ export class PriceLineManager {
             draggable: true,
             listening: true,
           });
+          hitRect.dragDistance(0);
           const buttonType = button.type;
           const originalX = currentX;
           const originalY = lineY - LABEL_HEIGHT / 2;
           const startCenterX = originalX + buttonWidth / 2;
+
+          hitRect.on('mousedown touchstart', () => {
+            if (!this.activeDrag) {
+              hitRect.startDrag();
+            }
+          });
 
           hitRect.on('dragstart', () => {
             this.activeDrag = {
@@ -1144,21 +1154,22 @@ export class PriceLineManager {
 
   private handleKeyDown = (e: KeyboardEvent): void => {
     if (e.key === 'Escape' && this.activeDrag) {
+      const activeDrag = this.activeDrag;
       this.dragCancelled = true;
-      this.activeDrag.node.stopDrag();
-      if (this.activeDrag.type === 'order') {
-        if (this.activeDrag.group) {
-          this.activeDrag.group.y(this.activeDrag.originalGroupY ?? 0);
-          this.activeDrag.group.setAttr('lineY', this.activeDrag.originalY);
+      activeDrag.node.stopDrag();
+      if (activeDrag.type === 'order') {
+        if (activeDrag.group) {
+          activeDrag.group.y(activeDrag.originalGroupY ?? 0);
+          activeDrag.group.setAttr('lineY', activeDrag.originalY);
         }
-        this.activeDrag.node.y(this.activeDrag.originalY - TOUCH_TARGET_HEIGHT / 2);
+        activeDrag.node.y(activeDrag.originalY - TOUCH_TARGET_HEIGHT / 2);
       } else {
-        if (this.activeDrag.originalX !== undefined) {
-          this.activeDrag.node.x(this.activeDrag.originalX);
+        if (activeDrag.originalX !== undefined) {
+          activeDrag.node.x(activeDrag.originalX);
         }
-        this.activeDrag.node.y(this.activeDrag.originalY);
+        activeDrag.node.y(activeDrag.originalY);
       }
-      this.activeDrag.onCancel?.();
+      activeDrag.onCancel?.();
       this.activeDrag = null;
       this.layer.batchDraw();
       this.options.onCursorChange?.('default');

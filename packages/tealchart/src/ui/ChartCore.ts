@@ -2567,7 +2567,7 @@ export class ChartCore {
    * Update interactive line layer
    */
   private updateInteractiveLines(): void {
-    if (this.priceLineManager?.getDragType() === 'order') {
+    if (this.priceLineManager?.isDragging()) {
       return;
     }
     this.priceLineManager?.update(this.labelBoundsCache, this.pendingOrders, {
