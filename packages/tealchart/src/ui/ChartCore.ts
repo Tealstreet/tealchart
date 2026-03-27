@@ -121,6 +121,8 @@ interface StyleMutationRecord {
   newValue?: string | null;
   addedNodes?: number;
   removedNodes?: number;
+  parentChain?: string;
+  nodePreview?: string;
 }
 
 // ============================================================================
@@ -128,15 +130,67 @@ interface StyleMutationRecord {
 // ============================================================================
 
 function describeMutationTarget(el: HTMLElement): string {
-  const parts = [el.tagName.toLowerCase()];
-  if (el.id) parts.push(`#${el.id}`);
-  if (el.classList.length > 0) {
-    parts.push(`.${Array.from(el.classList).slice(0, 3).join('.')}`);
+  const describeElement = (node: HTMLElement): string => {
+    const parts = [node.tagName.toLowerCase()];
+    if (node.id) parts.push(`#${node.id}`);
+    if (node.classList.length > 0) {
+      parts.push(`.${Array.from(node.classList).slice(0, 3).join('.')}`);
+    }
+    if (node.getAttribute('data-interactive') === 'true') {
+      parts.push('[data-interactive=true]');
+    }
+    return parts.join('');
+  };
+
+  const parts = [describeElement(el)];
+
+  let parent = el.parentElement;
+  let hops = 0;
+  while (parent && hops < 3) {
+    if (parent.id || parent.classList.length > 0 || parent.getAttribute('data-interactive') === 'true') {
+      parts.push(`<=${describeElement(parent)}`);
+      break;
+    }
+    parent = parent.parentElement;
+    hops += 1;
   }
-  if (el.getAttribute('data-interactive') === 'true') {
-    parts.push('[data-interactive=true]');
-  }
+
   return parts.join('');
+}
+
+function describeParentChain(el: HTMLElement): string | undefined {
+  const chain: string[] = [];
+  let parent = el.parentElement;
+  let hops = 0;
+
+  while (parent && hops < 6) {
+    chain.push(describeMutationTarget(parent).split('<=')[0]);
+    parent = parent.parentElement;
+    hops += 1;
+  }
+
+  return chain.length > 0 ? chain.join(' <- ') : undefined;
+}
+
+function getNodePreview(nodes: NodeList): string | undefined {
+  for (const node of Array.from(nodes)) {
+    if (node instanceof HTMLElement) {
+      const text = node.textContent?.trim();
+      if (text) {
+        return truncateMutationValue(`${node.tagName.toLowerCase()}:${text}`);
+      }
+      return truncateMutationValue(node.outerHTML);
+    }
+
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = node.textContent?.trim();
+      if (text) {
+        return truncateMutationValue(`text:${text}`);
+      }
+    }
+  }
+
+  return undefined;
 }
 
 function truncateMutationValue(value: string | null | undefined): string | undefined {
@@ -171,6 +225,11 @@ class StyleMutationTracer {
                 : undefined,
           addedNodes: mutation.type === 'childList' ? mutation.addedNodes.length : undefined,
           removedNodes: mutation.type === 'childList' ? mutation.removedNodes.length : undefined,
+          parentChain: describeParentChain(target),
+          nodePreview:
+            mutation.type === 'childList'
+              ? getNodePreview(mutation.addedNodes) ?? getNodePreview(mutation.removedNodes)
+              : undefined,
         });
       }
 
@@ -1663,6 +1722,8 @@ export class ChartCore {
       newValue: truncateMutationValue(record.newValue),
       addedNodes: record.addedNodes,
       removedNodes: record.removedNodes,
+      parentChain: record.parentChain,
+      nodePreview: record.nodePreview,
     }));
 
     const compactSummary = summarized
@@ -1674,7 +1735,10 @@ export class ChartCore {
         if (record.type === 'characterData') {
           return `${record.target}.text=${record.newValue ?? '<empty>'}`;
         }
-        return `${record.target}.childList(+${record.addedNodes ?? 0}/-${record.removedNodes ?? 0})`;
+        const extras = [record.nodePreview, record.parentChain].filter(Boolean).join(' <= ');
+        return `${record.target}.childList(+${record.addedNodes ?? 0}/-${record.removedNodes ?? 0})${
+          extras ? `:${extras}` : ''
+        }`;
       })
       .join(' | ');
 
