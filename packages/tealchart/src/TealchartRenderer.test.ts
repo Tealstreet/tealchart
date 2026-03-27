@@ -1,4 +1,4 @@
-import type { Bar, ComputedPane, Viewport } from './types';
+import type { Bar, ComputedPane, PriceLine, UnifiedPaneLayout, Viewport } from './types';
 
 import { describe, expect, it } from 'vitest';
 
@@ -334,6 +334,47 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(typeof y).toBe('number');
       expect(y).toBeGreaterThan(0);
       expect(y).toBeLessThan(600);
+    });
+  });
+
+  describe('renderWithLayout', () => {
+    it('reuses precomputed price line bounds when provided', () => {
+      const ctx = createMockCtx();
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+      const calculateSpy = vi.spyOn(renderer as any, 'calculatePriceLineLabelBoundsForPane');
+
+      const bars = makeBars(20);
+      const viewport = TealchartRenderer.calculateViewport(bars);
+      const layout: UnifiedPaneLayout = {
+        panes: [
+          {
+            id: 'main',
+            type: 'main',
+            heightRatio: 1,
+            yMin: 0,
+            yMax: 0,
+            fixedRange: false,
+          },
+        ],
+        timeAxisHeight: 30,
+      };
+      const priceLines: PriceLine[] = [
+        {
+          id: 'last-trade',
+          price: bars[bars.length - 1]!.close,
+          color: '#26a69a',
+          lineStyle: 'solid',
+          label: {
+            primaryText: '50,200',
+          },
+          targetPaneId: 'main',
+        },
+      ];
+      const precomputedBounds = renderer.computePriceLineLabelBoundsWithLayout(priceLines, viewport, layout);
+
+      renderer.renderWithLayout(bars, viewport, layout, priceLines, [], undefined, undefined, undefined, precomputedBounds);
+
+      expect(calculateSpy).not.toHaveBeenCalled();
     });
   });
 });
