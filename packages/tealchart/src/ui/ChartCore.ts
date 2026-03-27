@@ -536,13 +536,13 @@ export class ChartCore {
 
   // RAF for full renders
   private rafId: number | null = null;
-  private readonly useCanvasOrderLinePoc: boolean;
+  private readonly useCanvasInteractiveLines: boolean;
 
   constructor(options: ChartCoreOptions) {
     this.options = options;
     this.container = options.container;
     this.margins = { ...DEFAULT_MARGINS, ...options.margins };
-    this.useCanvasOrderLinePoc = !!options.renderOptions?.experimentalCanvasOrderLinePoc;
+    this.useCanvasInteractiveLines = !!options.renderOptions?.experimentalCanvasInteractiveLines;
 
     // Create chart container
     this.chartContainer = div({
@@ -612,8 +612,8 @@ export class ChartCore {
       this.margins,
     );
 
-    if (this.useCanvasOrderLinePoc) {
-      this.initKonvaOrderLinePoc();
+    if (this.useCanvasInteractiveLines) {
+      this.initKonvaInteractiveLines();
     }
 
     // Initialize interactive line renderer (HTML overlay for order/position labels)
@@ -706,6 +706,20 @@ export class ChartCore {
           onOrderCancel: (orderId) => this.options.onOrderCancel?.(orderId),
           onPositionClose: (positionId) => this.options.onPositionClose?.(positionId),
           onPositionReverse: (positionId) => this.options.onPositionReverse?.(positionId),
+          onTPMovePreview: (positionId, price, partialPercent, dragStartX, dragCurrentX) => {
+            this._updateBracketDragState('tp', positionId, price, partialPercent, dragStartX, dragCurrentX);
+          },
+          onSLMovePreview: (positionId, price, partialPercent, dragStartX, dragCurrentX) => {
+            this._updateBracketDragState('sl', positionId, price, partialPercent, dragStartX, dragCurrentX);
+          },
+          onTPSLDragEnd: () => {
+            this._bracketDragState = null;
+            this.renderCrosshairOverlay();
+          },
+          onTPSLDragCancel: () => {
+            this._bracketDragState = null;
+            this.renderCrosshairOverlay();
+          },
           onCursorChange: (cursor) => {
             if (this.cursor !== cursor) {
               const wasDragging = this.cursor === 'grabbing';
@@ -939,7 +953,7 @@ export class ChartCore {
   private lastOrderLinePrices = new Map<string, number>();
 
   setOrderLines(lines: OrderLineRenderData[]): void {
-    if (this.eventManager.getIsDragging() || this.interactiveLineRenderer?.isDragging()) return;
+    if (this.eventManager.getIsDragging() || this.interactiveLineRenderer?.isDragging() || this.priceLineManager?.isDragging()) return;
     if (lines === this.orderLines && this.pendingOrders.size === 0) return;
 
     // Detect which orders had their price changed since last call
@@ -973,7 +987,7 @@ export class ChartCore {
    * Skips updates during drag since positions don't change while dragging chart
    */
   setPositionLines(lines: PositionLineRenderData[]): void {
-    if (this.eventManager.getIsDragging()) return;
+    if (this.eventManager.getIsDragging() || this.priceLineManager?.isDragging()) return;
     if (lines === this.positionLines) return;
     this.positionLines = lines;
     // No scheduleRender — paint() is called by the widget after pushing state
@@ -1079,7 +1093,7 @@ export class ChartCore {
     }
   }
 
-  private initKonvaOrderLinePoc(): void {
+  private initKonvaInteractiveLines(): void {
     const konvaContainer = div({
       style: {
         position: 'absolute',
@@ -1687,7 +1701,7 @@ export class ChartCore {
       ? this.interactiveLineRenderer.getState().getDragLineId()
       : null;
     const canvasPriceLines = (dragLineId ? allPriceLines.filter((l) => l.id !== dragLineId) : allPriceLines).filter(
-      (line) => !(this.useCanvasOrderLinePoc && line.type === 'order'),
+      (line) => !(this.useCanvasInteractiveLines && (line.type === 'order' || line.type === 'position')),
     );
 
     // Hide crosshair during interactive line drag (user is focused on the drag price)
@@ -1795,7 +1809,8 @@ export class ChartCore {
     }
 
     // Hide crosshair during interactive line drag
-    const lineDragging = this.interactiveLineRenderer?.isDragging() ?? false;
+    const lineDragging =
+      (this.interactiveLineRenderer?.isDragging() ?? false) || (this.priceLineManager?.isDragging() ?? false);
     if (!this.crosshair.visible || lineDragging) {
       this._plusButtonBounds = null;
       return;
@@ -2434,7 +2449,7 @@ export class ChartCore {
     const htmlBounds: PriceLineLabelBounds[] = [];
 
     for (const bound of this.labelBoundsCache) {
-      if (this.useCanvasOrderLinePoc && bound.type === 'order') {
+      if (this.useCanvasInteractiveLines && (bound.type === 'order' || bound.type === 'position')) {
         konvaBounds.push(bound);
       } else {
         htmlBounds.push(bound);

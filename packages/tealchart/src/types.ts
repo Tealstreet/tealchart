@@ -51,7 +51,7 @@ export interface RenderOptions {
   margins?: ChartMargins; // Custom margins override
   pricePrecision?: number; // Market price precision (e.g., 0.00001 for 5 decimal places)
   fontFamily?: string; // Font family for all chart text. Defaults to 'inherit' for HTML overlays, 'sans-serif' for canvas.
-  experimentalCanvasOrderLinePoc?: boolean; // Route order-line labels and drag handling through Konva instead of HTML overlays.
+  experimentalCanvasInteractiveLines?: boolean; // Route order and position interactive lines through Konva instead of HTML overlays.
   // Metadata for jailbreak indicators
   exchange?: string;
   symbol?: string;

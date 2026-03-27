@@ -225,14 +225,14 @@ describe('ChartCore viewport management', () => {
     core.dispose();
   });
 
-  it('constructs with experimental canvas order-line poc enabled', async () => {
+  it('constructs with experimental canvas interactive lines enabled', async () => {
     const { ChartCore } = await import('./ChartCore');
     const core = new ChartCore({
       container,
       width: 800,
       height: 600,
       renderOptions: {
-        experimentalCanvasOrderLinePoc: true,
+        experimentalCanvasInteractiveLines: true,
       },
     });
 
@@ -264,6 +264,71 @@ describe('ChartCore viewport management', () => {
         cancelButtonIconColor: '#ffffff',
         cancelButtonBorderColor: '#ff0000',
         cancelTooltip: 'Cancel',
+        modifyTooltip: 'Modify',
+        callbacks: {},
+      },
+    ]);
+    core.paint(0xff);
+
+    expect(core.getViewport()).not.toBeNull();
+    core.dispose();
+  });
+
+  it('renders position lines on the experimental canvas interactive-line path', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      renderOptions: {
+        experimentalCanvasInteractiveLines: true,
+      },
+    });
+
+    core.setBars(makeBars(5));
+    core.setPositionLines([
+      {
+        id: 'position-1',
+        positionId: 'position-1',
+        price: 50010,
+        lineColor: '#00ff88',
+        lineStyle: 0,
+        lineLength: 100,
+        extendLeft: true,
+        lineWidth: 1,
+        text: 'Long',
+        textShort: 'Lng',
+        quantity: '1 BTC',
+        quantityShort: '1',
+        pnl: '+$12.50',
+        pnlShort: '+12',
+        profitState: 'positive',
+        bodyBackgroundColor: '#111111',
+        bodyTextColor: '#ffffff',
+        bodyBorderColor: '#00ff88',
+        quantityBackgroundColor: '#111111',
+        quantityTextColor: '#ffffff',
+        quantityBorderColor: '#00ff88',
+        reverseButtonBackgroundColor: '#111111',
+        reverseButtonIconColor: '#ffffff',
+        reverseButtonBorderColor: '#00ff88',
+        closeButtonBackgroundColor: '#111111',
+        closeButtonIconColor: '#ffffff',
+        closeButtonBorderColor: '#00ff88',
+        closeTooltip: 'Close',
+        protectTooltipText: 'Protect',
+        partialEnabled: true,
+        reversible: true,
+        closeable: true,
+        brackets: {
+          takeProfit: 50100,
+          stopLoss: 49900,
+        },
+        positionData: {
+          entryPrice: 50000,
+          isLong: true,
+          notional: 1000,
+        },
         callbacks: {},
       },
     ]);
