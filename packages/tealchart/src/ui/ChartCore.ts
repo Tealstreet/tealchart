@@ -1587,19 +1587,6 @@ export class ChartCore {
       paneValue: null,
     };
 
-    // Render candles, grid, axes, volume, indicators, price lines on main canvas
-    // Crosshair is NOT drawn here — it goes on the overlay canvas
-    this.renderer.renderWithLayout(
-      this.bars,
-      vp,
-      layout,
-      canvasPriceLines,
-      this.plots,
-      this.indicatorPaneInfo,
-      crosshairState,
-      this.plotStyleOverrides,
-    );
-
     // Collision resolution cache — only recompute de-overlap when geometry changes.
     // Label content is always built fresh below so text/color changes are never stale.
     // Include bucketed text length per line — triggers rebuild when label width changes
@@ -1647,9 +1634,27 @@ export class ChartCore {
           b.chartLabel = line.chartLabel;
           b.color = line.color;
           b.callbacks = line.callbacks;
+          b.targetPaneId = line.targetPaneId;
         }
       }
     }
+
+    const canvasLabelBounds =
+      dragLineId ? this.labelBoundsCache.filter((bound) => bound.lineId !== dragLineId) : this.labelBoundsCache;
+
+    // Render candles, grid, axes, volume, indicators, price lines on main canvas
+    // Crosshair is NOT drawn here — it goes on the overlay canvas
+    this.renderer.renderWithLayout(
+      this.bars,
+      vp,
+      layout,
+      canvasPriceLines,
+      this.plots,
+      this.indicatorPaneInfo,
+      crosshairState,
+      this.plotStyleOverrides,
+      canvasLabelBounds,
+    );
   }
 
   /**

@@ -224,6 +224,7 @@ export class TealchartRenderer {
     indicatorPaneInfo?: Record<string, IndicatorPaneInfo>,
     crosshair?: CrosshairState,
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
+    precomputedPriceLineBounds?: PriceLineLabelBounds[],
   ): void {
     const { ctx, options } = this;
     const { width, height, devicePixelRatio } = options;
@@ -252,6 +253,7 @@ export class TealchartRenderer {
       indicatorPaneInfo,
       crosshair,
       plotStyleOverrides,
+      precomputedPriceLineBounds,
     );
 
     ctx.restore();
@@ -610,6 +612,7 @@ export class TealchartRenderer {
         renderLineOnCanvas: line.renderLineOnCanvas,
         countdownToTime: line.countdownToTime,
         draggable: line.draggable,
+        targetPaneId: line.targetPaneId,
         // Position-specific fields for bracket TP/SL drag
         positionId: line.positionId,
         partialEnabled: line.partialEnabled,
@@ -2488,14 +2491,13 @@ export class TealchartRenderer {
         renderLineOnCanvas: line.renderLineOnCanvas,
         countdownToTime: line.countdownToTime,
         draggable: line.draggable,
+        targetPaneId: line.targetPaneId,
         // Position-specific fields for bracket TP/SL drag
         positionId: line.positionId,
         partialEnabled: line.partialEnabled,
         positionData: line.positionData,
         // Adapter callbacks carried through for direct invocation
         callbacks: line.callbacks,
-        // Pass through targetPaneId for pane-aware rendering
-        targetPaneId: line.targetPaneId,
       };
     });
 
@@ -2873,6 +2875,7 @@ export class TealchartRenderer {
     indicatorPaneInfo?: Record<string, IndicatorPaneInfo>,
     _crosshair?: CrosshairState,
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
+    precomputedPriceLineBounds?: PriceLineLabelBounds[],
   ): void {
     const { ctx, options, margins } = this;
 
@@ -2892,7 +2895,14 @@ export class TealchartRenderer {
     // Pre-calculate label bounds for each pane (filter lines by targetPaneId)
     const allPriceLines = priceLines ? [...priceLines] : [];
     const labelBoundsByPane = new Map<string, PriceLineLabelBounds[]>();
-    if (allPriceLines.length > 0) {
+    if (precomputedPriceLineBounds && precomputedPriceLineBounds.length > 0) {
+      for (const pane of computedPanes) {
+        const paneBounds = precomputedPriceLineBounds.filter((bound) => (bound.targetPaneId || 'main') === pane.id);
+        if (paneBounds.length > 0) {
+          labelBoundsByPane.set(pane.id, paneBounds);
+        }
+      }
+    } else if (allPriceLines.length > 0) {
       for (const pane of computedPanes) {
         // Filter lines targeting this pane (default to 'main' if not specified)
         const paneLines = allPriceLines.filter((line) => (line.targetPaneId || 'main') === pane.id);
@@ -3590,14 +3600,14 @@ export class TealchartRenderer {
     const { ctx, options, margins } = this;
 
     // Calculate initial bounds for each label
-    ctx.font = `11px ${this.font}`;
+    const labelFont = `11px ${this.font}`;
     const bounds: PriceLineLabelBounds[] = priceLines.map((line) => {
       const originalY = this.valueToY(line.price, pane);
-      const primaryWidth = ctx.measureText(line.label.primaryText).width;
+      const primaryWidth = getCachedTextWidth(ctx, line.label.primaryText, labelFont);
       // Check for secondary text or countdown (countdown renders as secondary text)
       const hasSecondaryText = line.label.secondaryText || line.countdownToTime;
       const secondaryWidth = line.label.secondaryText
-        ? ctx.measureText(line.label.secondaryText).width
+        ? getCachedTextWidth(ctx, line.label.secondaryText, labelFont)
         : line.countdownToTime
           ? 40
           : 0;
