@@ -973,7 +973,17 @@ export class PriceLineManager {
           refs.buttonIcons.push([iconLine1, iconLine2]);
           refs.buttonTexts.push(undefined);
 
-          buttonGroup.on('click tap', () => {
+          const hitRect = new Konva.Rect({
+            x: currentX,
+            y: lineY - LABEL_HEIGHT / 2,
+            width: buttonWidth,
+            height: LABEL_HEIGHT,
+            fill: 'rgba(0, 0, 0, 0.01)',
+            listening: true,
+          });
+
+          hitRect.on('mousedown touchstart', (e) => {
+            e.cancelBubble = true;
             if (button.type === 'cancel') {
               bound.callbacks?.onCancel?.();
               this.options.onOrderCancel?.(bound.lineId);
@@ -982,8 +992,9 @@ export class PriceLineManager {
               this.options.onPositionClose?.(bound.lineId);
             }
           });
-          buttonGroup.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
-          buttonGroup.on('mouseleave', () => this.options.onCursorChange?.('default'));
+          hitRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
+          hitRect.on('mouseleave', () => this.options.onCursorChange?.('default'));
+          buttonGroup.add(hitRect);
         } else if (button.type === 'reverse') {
           const reverseIcon = new Konva.Text({
             x: currentX,
@@ -1002,12 +1013,23 @@ export class PriceLineManager {
           refs.buttonTexts.push(reverseIcon);
           refs.buttonIcons.push(undefined);
 
-          buttonGroup.on('click tap', () => {
+          const hitRect = new Konva.Rect({
+            x: currentX,
+            y: lineY - LABEL_HEIGHT / 2,
+            width: buttonWidth,
+            height: LABEL_HEIGHT,
+            fill: 'rgba(0, 0, 0, 0.01)',
+            listening: true,
+          });
+
+          hitRect.on('mousedown touchstart', (e) => {
+            e.cancelBubble = true;
             bound.callbacks?.onReverse?.();
             this.options.onPositionReverse?.(bound.lineId);
           });
-          buttonGroup.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
-          buttonGroup.on('mouseleave', () => this.options.onCursorChange?.('default'));
+          hitRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
+          hitRect.on('mouseleave', () => this.options.onCursorChange?.('default'));
+          buttonGroup.add(hitRect);
         } else {
           refs.buttonTexts.push(undefined);
           refs.buttonIcons.push(undefined);
