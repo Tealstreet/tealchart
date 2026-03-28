@@ -974,10 +974,10 @@ export class PriceLineManager {
           refs.buttonTexts.push(undefined);
 
           const hitRect = new Konva.Rect({
-            x: currentX,
-            y: lineY - LABEL_HEIGHT / 2,
-            width: buttonWidth,
-            height: LABEL_HEIGHT,
+            x: currentX - 2,
+            y: lineY - TOUCH_TARGET_HEIGHT / 2,
+            width: buttonWidth + 4,
+            height: TOUCH_TARGET_HEIGHT,
             fill: 'rgba(0, 0, 0, 0.01)',
             listening: true,
           });
@@ -985,10 +985,8 @@ export class PriceLineManager {
           hitRect.on('mousedown touchstart', (e) => {
             e.cancelBubble = true;
             if (button.type === 'cancel') {
-              bound.callbacks?.onCancel?.();
               this.options.onOrderCancel?.(bound.lineId);
             } else {
-              bound.callbacks?.onClose?.();
               this.options.onPositionClose?.(bound.lineId);
             }
           });
@@ -1014,17 +1012,16 @@ export class PriceLineManager {
           refs.buttonIcons.push(undefined);
 
           const hitRect = new Konva.Rect({
-            x: currentX,
-            y: lineY - LABEL_HEIGHT / 2,
-            width: buttonWidth,
-            height: LABEL_HEIGHT,
+            x: currentX - 2,
+            y: lineY - TOUCH_TARGET_HEIGHT / 2,
+            width: buttonWidth + 4,
+            height: TOUCH_TARGET_HEIGHT,
             fill: 'rgba(0, 0, 0, 0.01)',
             listening: true,
           });
 
           hitRect.on('mousedown touchstart', (e) => {
             e.cancelBubble = true;
-            bound.callbacks?.onReverse?.();
             this.options.onPositionReverse?.(bound.lineId);
           });
           hitRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
