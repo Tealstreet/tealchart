@@ -85,6 +85,7 @@ export interface CrosshairState {
 const TOUCH_TARGET_HEIGHT = 44; // Minimum 44px for touch-friendly hit area
 const LABEL_HEIGHT = 18;
 const DRAG_THRESHOLD = 5;
+const SEGMENT_HORIZONTAL_PADDING = 8;
 
 interface CachedLineContentRefs {
   priceAxisRect?: Konva.Rect;
@@ -129,6 +130,29 @@ function calculatePartialPercent(startX: number, currentX: number): number {
   if (deltaX <= 137) return 50;
   if (deltaX <= 192) return 25;
   return 10;
+}
+
+let textMeasureContext: CanvasRenderingContext2D | null = null;
+
+function measureLabelTextWidth(text: string, fontSize = 11, fontFamily = 'sans-serif', fontStyle = ''): number {
+  if (typeof document === 'undefined') {
+    return text.length * 6;
+  }
+
+  if (!textMeasureContext) {
+    textMeasureContext = document.createElement('canvas').getContext('2d');
+  }
+
+  if (!textMeasureContext) {
+    return text.length * 6;
+  }
+
+  textMeasureContext.font = `${fontStyle ? `${fontStyle} ` : ''}${fontSize}px ${fontFamily}`;
+  return textMeasureContext.measureText(text).width;
+}
+
+function getSegmentWidth(text: string): number {
+  return Math.ceil(measureLabelTextWidth(text, 11, 'sans-serif')) + SEGMENT_HORIZONTAL_PADDING;
 }
 
 function getOrderedButtons(buttons: NonNullable<PriceLineLabelBounds['chartLabel']>['buttons'] = []) {
@@ -599,7 +623,7 @@ export class PriceLineManager {
     if (chartLabel && chartLabel.segments.length > 0) {
       for (const segment of chartLabel.segments) {
         const text = useNarrowText && segment.textShort ? segment.textShort : segment.text;
-        segmentsWidth += text.length * 6 + 8;
+        segmentsWidth += getSegmentWidth(text);
       }
       chartLabelWidth = segmentsWidth + tpslGap;
       for (const button of orderedButtons) {
@@ -733,7 +757,7 @@ export class PriceLineManager {
       for (let i = 0; i < chartLabel.segments.length; i++) {
         const segment = chartLabel.segments[i];
         const text = useNarrowText && segment.textShort ? segment.textShort : segment.text;
-        const textWidth = text.length * 6 + 8;
+        const textWidth = getSegmentWidth(text);
         const isFirst = i === 0;
         const isLast = i === chartLabel.segments.length - 1;
 
