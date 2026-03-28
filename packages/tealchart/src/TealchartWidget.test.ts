@@ -15,6 +15,7 @@ import { TealchartWidget } from './TealchartWidget';
 // Track calls at module level (survives mockReset)
 const setSymbolCalls: { symbol: string; exchangeName?: string }[] = [];
 const setBarsCalls: Bar[][] = [];
+const setRenderOptionsCalls: Array<unknown> = [];
 
 // Use plain classes for mocks so mockReset doesn't strip implementations
 vi.mock('./ui/TealchartWidgetUI', () => ({
@@ -32,7 +33,10 @@ vi.mock('./ui/TealchartWidgetUI', () => ({
     setActiveIndicators() {}
     setViewport() {}
     setCanvasOpacity() {}
-    setRenderOptions() {}
+    updateBar() {}
+    setRenderOptions(options: unknown) {
+      setRenderOptionsCalls.push(options);
+    }
     setSymbol(symbol: string, exchangeName?: string) {
       setSymbolCalls.push({ symbol, exchangeName });
     }
@@ -189,6 +193,7 @@ describe('TealchartWidget', () => {
   beforeEach(() => {
     setSymbolCalls.length = 0;
     setBarsCalls.length = 0;
+    setRenderOptionsCalls.length = 0;
     // Return null so _renderRafId doesn't get stuck at 0 after
     // the callback synchronously sets it to null (assignment order issue).
     vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
@@ -318,6 +323,29 @@ describe('TealchartWidget', () => {
 
       // Widget should reflect SOL, not ETH
       expect(widget.symbol()).toBe('SOLUSDT');
+    });
+  });
+
+  describe('real-time updates', () => {
+    it('does not reapply render options on last-bar ticks', () => {
+      const datafeed = createMockDatafeed();
+      createWidget(datafeed);
+      completeInit(datafeed);
+
+      setRenderOptionsCalls.length = 0;
+
+      const lastBarTick: Bar = {
+        time: 1_000_000 + 9 * 60_000,
+        open: 50_090,
+        high: 50_180,
+        low: 50_040,
+        close: 50_155,
+        volume: 999,
+      };
+
+      datafeed._subscribeCb?.(lastBarTick);
+
+      expect(setRenderOptionsCalls).toHaveLength(0);
     });
   });
 

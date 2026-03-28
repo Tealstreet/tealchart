@@ -193,6 +193,9 @@ export class TealchartWidget {
 
     this._eventEmitter = new EventEmitter();
     this._chartApi = new TealchartApi(this._symbol, this._interval, options.account);
+    this._renderOptions = {
+      ...options.renderOptions,
+    };
 
     // Apply initial overrides if provided
     if (options.overrides) {
@@ -596,7 +599,7 @@ export class TealchartWidget {
 
     // Schedule widget-level render to update last-trade price line,
     // order/position lines, and other state. updateBar fast path already
-    // painted candles — we only need LINES for the HTML overlay labels.
+    // painted candles — we only need LINES for interactive line updates.
     this._scheduler.markDirty(DIRTY.LINES);
   }
 
@@ -1055,27 +1058,13 @@ export class TealchartWidget {
       }
     }
 
-    // Update active indicators + pane info (needed for legend, indicator pane layout)
-    // Only recompute when layout/plots/options change (not on every crosshair move)
-    if (dirty & (DIRTY.LAYOUT | DIRTY.PLOTS | DIRTY.OPTIONS | DIRTY.LINES | DIRTY.DATA_LOAD | DIRTY.BARS)) {
+    // Update active indicators + pane info only when indicator/layout metadata changes.
+    // Real-time bar and price-line ticks should not reapply render options or rebuild this UI state.
+    if (dirty & (DIRTY.LAYOUT | DIRTY.PLOTS | DIRTY.OPTIONS | DIRTY.DATA_LOAD)) {
       // Update pane layout (in case not already done by LAYOUT flag)
       if (!(dirty & DIRTY.LAYOUT)) {
         const paneLayout = this._paneManager.getLayout();
         this._ui.setPaneLayout(paneLayout);
-      }
-
-      // Update order and position lines (in case not already done by LINES flag)
-      if (!(dirty & DIRTY.LINES)) {
-        this._ui.setOrderLines(this._chartApi.getOrderLinesRenderData());
-        this._ui.setPositionLines(this._chartApi.getPositionLinesRenderData());
-        this._updateLastTradeLine();
-      }
-
-      // Update render options + symbol/interval (in case not already done by OPTIONS flag)
-      if (!(dirty & DIRTY.OPTIONS)) {
-        this._ui.setRenderOptions(this._renderOptions);
-        this._ui.setSymbol(this._symbol);
-        this._ui.setInterval(this._interval);
       }
 
       const studyInfos = this._chartApi.getAllStudies();

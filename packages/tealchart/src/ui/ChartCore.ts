@@ -4,7 +4,7 @@
  * Combines:
  * - TealchartRenderer (canvas rendering)
  * - EventManager (mouse/touch/keyboard interactions)
- * - InteractiveLineRenderer (HTML overlay for order/position labels)
+ * - PriceLineManager (Konva overlay for order/position labels and controls)
  * - ContextMenu
  *
  * This is the vanilla equivalent of Tealchart.tsx
@@ -15,8 +15,10 @@ import type { CrosshairState as EventCrosshairState, PaneDividerInfo } from '../
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
 
+import Konva from 'konva';
+
 import { EventManager } from '../interaction/EventManager';
-import { InteractiveLineRenderer } from '../interaction/InteractiveLineRenderer';
+import { PriceLineManager } from '../interaction/PriceLineManager';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { WebCanvasContext } from '../rendering/WebCanvasContext';
 import { getDecimalPlacesFromPrecision } from '../state/chartState';
@@ -103,10 +105,6 @@ export interface ChartCoreOptions {
 // ============================================================================
 
 const RESET_BUTTON_AUTO_HIDE_DELAY = 3000;
-
-// ============================================================================
-// Helper Functions
-// ============================================================================
 
 /**
  * Convert legacy PaneLayout to UnifiedPaneLayout
@@ -483,7 +481,8 @@ export class ChartCore {
   // Core components
   private renderer: TealchartRenderer;
   private eventManager: EventManager;
-  private interactiveLineRenderer: InteractiveLineRenderer;
+  private priceLineManager: PriceLineManager | null = null;
+  private stage: Konva.Stage | null = null;
 
   // Data refs
   private bars: Bar[] = [];
@@ -531,7 +530,6 @@ export class ChartCore {
 
   // RAF for full renders
   private rafId: number | null = null;
-
   constructor(options: ChartCoreOptions) {
     this.options = options;
     this.container = options.container;
@@ -548,7 +546,7 @@ export class ChartCore {
     });
     this.container.appendChild(this.chartContainer);
 
-    // Apply render options as CSS variables for HTML overlays
+    // Apply render options as CSS variables for shared chart UI
     this.applyCssVars();
 
     // Create main canvas — set CSS background to match render options to prevent flash before first paint
@@ -605,88 +603,61 @@ export class ChartCore {
       this.margins,
     );
 
-    // Initialize interactive line renderer (HTML overlay for order/position labels)
-    this.interactiveLineRenderer = new InteractiveLineRenderer(this.chartContainer, {
-      margins: this.margins,
-      width: options.width,
-      height: options.height,
-      yToPrice: (y) =>
-        this.renderer.publicYToPriceWithLayout(
-          y,
-          this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
-          this.getUnifiedLayout(),
-        ),
-      priceToY: (price) =>
-        this.renderer.publicPriceToYWithLayout(
-          price,
-          this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
-          this.getUnifiedLayout(),
-        ),
-      onOrderMove: (orderId, newPrice) => {
-        // Store the original price so we can detect when the server confirms the move
-        const originalOrder = this.orderLines.find((o) => o.id === orderId);
-        const originalPrice = originalOrder?.price ?? newPrice;
-        // Hold the line at the new price until the server confirms (or timeout reverts)
-        this.pendingOrders.set(orderId, {
-          orderId,
-          pendingPrice: newPrice,
-          originalPrice,
-          startTime: Date.now(),
-          timeoutId: setTimeout(() => {
-            this.pendingOrders.delete(orderId);
-            this.interactiveLineRenderer.forceRebuild();
-            this.scheduleRender();
-          }, 5000),
-        });
-        this.options.onOrderMove?.(orderId, newPrice);
-      },
-      onOrderCancel: (orderId) => this.options.onOrderCancel?.(orderId),
-      onPositionClose: (positionId) => this.options.onPositionClose?.(positionId),
-      onPositionReverse: (positionId) => this.options.onPositionReverse?.(positionId),
-      onTPMovePreview: (positionId, price, partialPercent, dragStartX, dragCurrentX) => {
-        this._updateBracketDragState('tp', positionId, price, partialPercent, dragStartX, dragCurrentX);
-      },
-      onSLMovePreview: (positionId, price, partialPercent, dragStartX, dragCurrentX) => {
-        this._updateBracketDragState('sl', positionId, price, partialPercent, dragStartX, dragCurrentX);
-      },
-      onTPSLDragEnd: () => {
-        this._bracketDragState = null;
-        this.renderCrosshairOverlay();
-      },
-      onTPSLDragCancel: () => {
-        this._bracketDragState = null;
-        this.renderCrosshairOverlay();
-      },
-      formatPrice: (price) => {
-        const pricePrecision = this.options.renderOptions?.pricePrecision;
-        let decimals: number;
-        if (pricePrecision && pricePrecision > 0) {
-          decimals = getDecimalPlacesFromPrecision(pricePrecision);
-        } else {
-          const priceRange = (this.viewport?.priceMax ?? 0) - (this.viewport?.priceMin ?? 0);
-          if (priceRange >= 10) decimals = 0;
-          else if (priceRange >= 1) decimals = 1;
-          else if (priceRange >= 0.1) decimals = 2;
-          else decimals = 4;
-        }
-        return getNumberFormatter(decimals).format(price);
-      },
-      onCursorChange: (cursor) => {
-        if (this.cursor !== cursor) {
-          const wasDragging = this.cursor === 'grabbing';
-          this.cursor = cursor;
-          this.chartContainer.style.cursor = cursor;
-          // Clear crosshair overlay when drag starts or ends.
-          // On start: removes stale crosshair lines during drag.
-          // On end: prevents ghost crosshair at pre-drag position
-          // (next mousemove will update position and redraw).
-          if (cursor === 'grabbing' || wasDragging) {
-            this.crosshair.visible = false;
+    this.initKonvaInteractiveLines();
+
+    if (this.stage) {
+      const layer = this.stage.getLayers()[0];
+      if (layer) {
+        this.priceLineManager = new PriceLineManager({
+          layer,
+          width: this.options.width,
+          height: this.options.height,
+          margins: this.margins,
+          yToPrice: (y) =>
+            this.renderer.publicYToPriceWithLayout(
+              y,
+              this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
+              this.getUnifiedLayout(),
+            ),
+          priceToY: (price) =>
+            this.renderer.publicPriceToYWithLayout(
+              price,
+              this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
+              this.getUnifiedLayout(),
+            ),
+          onOrderMove: (orderId, newPrice) => this.handleOrderMove(orderId, newPrice),
+          onOrderCancel: (orderId) => this.options.onOrderCancel?.(orderId),
+          onPositionClose: (positionId) => this.options.onPositionClose?.(positionId),
+          onPositionReverse: (positionId) => this.options.onPositionReverse?.(positionId),
+          onTPMovePreview: (positionId, price, partialPercent, dragStartX, dragCurrentX) => {
+            this._updateBracketDragState('tp', positionId, price, partialPercent, dragStartX, dragCurrentX);
+          },
+          onSLMovePreview: (positionId, price, partialPercent, dragStartX, dragCurrentX) => {
+            this._updateBracketDragState('sl', positionId, price, partialPercent, dragStartX, dragCurrentX);
+          },
+          onTPSLDragEnd: () => {
+            this._bracketDragState = null;
             this.renderCrosshairOverlay();
-          }
-        }
-      },
-    });
+          },
+          onTPSLDragCancel: () => {
+            this._bracketDragState = null;
+            this.renderCrosshairOverlay();
+          },
+          onCursorChange: (cursor) => {
+            const wasDragging = this.cursor === 'grabbing';
+            this.cursor = cursor;
+            this.chartContainer.style.cursor = cursor;
+            if (this.stage) {
+              this.stage.container().style.cursor = cursor;
+            }
+            if (cursor === 'grabbing' || wasDragging) {
+              this.crosshair.visible = false;
+              this.renderCrosshairOverlay();
+            }
+          },
+        });
+      }
+    }
 
     // + button is now drawn on the crosshair canvas (no HTML element needed)
 
@@ -728,8 +699,10 @@ export class ChartCore {
             return true;
           }
         }
-        const rect = this.chartContainer.getBoundingClientRect();
-        return this.interactiveLineRenderer.isOverInteractiveElement(rect.left + x, rect.top + y);
+        if (this.isOverKonvaInteractiveElement(x, y)) {
+          return true;
+        }
+        return false;
       },
       onAutoScaleDisabled: (paneId: string) => this.options.onAutoScaleDisabled?.(paneId),
       isAutoScale: (paneId: string) => this.options.isAutoScale?.(paneId) ?? true,
@@ -795,9 +768,10 @@ export class ChartCore {
         }
       },
       onCursorChange: (cursor) => {
-        if (this.cursor !== cursor) {
-          this.cursor = cursor;
-          this.chartContainer.style.cursor = cursor;
+        this.cursor = cursor;
+        this.chartContainer.style.cursor = cursor;
+        if (this.stage) {
+          this.stage.container().style.cursor = cursor;
         }
       },
       onPaneDoubleClick: (paneId) => this.options.onPaneDoubleClick?.(paneId),
@@ -897,7 +871,7 @@ export class ChartCore {
   private lastOrderLinePrices = new Map<string, number>();
 
   setOrderLines(lines: OrderLineRenderData[]): void {
-    if (this.eventManager.getIsDragging() || this.interactiveLineRenderer?.isDragging()) return;
+    if (this.eventManager.getIsDragging() || this.priceLineManager?.isDragging()) return;
     if (lines === this.orderLines && this.pendingOrders.size === 0) return;
 
     // Detect which orders had their price changed since last call
@@ -909,7 +883,6 @@ export class ChartCore {
           const pending = this.pendingOrders.get(line.id)!;
           clearTimeout(pending.timeoutId);
           this.pendingOrders.delete(line.id);
-          this.interactiveLineRenderer.forceRebuild();
         }
       }
     }
@@ -931,7 +904,7 @@ export class ChartCore {
    * Skips updates during drag since positions don't change while dragging chart
    */
   setPositionLines(lines: PositionLineRenderData[]): void {
-    if (this.eventManager.getIsDragging()) return;
+    if (this.eventManager.getIsDragging() || this.priceLineManager?.isDragging()) return;
     if (lines === this.positionLines) return;
     this.positionLines = lines;
     // No scheduleRender — paint() is called by the widget after pushing state
@@ -1011,18 +984,81 @@ export class ChartCore {
 
   /**
    * Apply render options as CSS variables on the chart container.
-   * HTML overlays (labels, buttons) inherit these for consistent theming.
+   * Shared chart UI inherits these for consistent theming.
    */
   private applyCssVars(): void {
     const opts = this.options.renderOptions;
     if (!opts) return;
     const s = this.container.style;
-    if (opts.fontFamily) s.setProperty('--tc-font-family', opts.fontFamily);
-    if (opts.textColor) s.setProperty('--tc-text-color', opts.textColor);
-    if (opts.backgroundColor) s.setProperty('--tc-background-color', opts.backgroundColor);
-    if (opts.upColor) s.setProperty('--tc-up-color', opts.upColor);
-    if (opts.downColor) s.setProperty('--tc-down-color', opts.downColor);
-    if (opts.crosshairColor) s.setProperty('--tc-crosshair-color', opts.crosshairColor);
+    if (opts.fontFamily && s.getPropertyValue('--tc-font-family') !== opts.fontFamily) {
+      s.setProperty('--tc-font-family', opts.fontFamily);
+    }
+    if (opts.textColor && s.getPropertyValue('--tc-text-color') !== opts.textColor) {
+      s.setProperty('--tc-text-color', opts.textColor);
+    }
+    if (opts.backgroundColor && s.getPropertyValue('--tc-background-color') !== opts.backgroundColor) {
+      s.setProperty('--tc-background-color', opts.backgroundColor);
+    }
+    if (opts.upColor && s.getPropertyValue('--tc-up-color') !== opts.upColor) {
+      s.setProperty('--tc-up-color', opts.upColor);
+    }
+    if (opts.downColor && s.getPropertyValue('--tc-down-color') !== opts.downColor) {
+      s.setProperty('--tc-down-color', opts.downColor);
+    }
+    if (opts.crosshairColor && s.getPropertyValue('--tc-crosshair-color') !== opts.crosshairColor) {
+      s.setProperty('--tc-crosshair-color', opts.crosshairColor);
+    }
+  }
+
+  private initKonvaInteractiveLines(): void {
+    const konvaContainer = div({
+      style: {
+        position: 'absolute',
+        top: '0',
+        left: '0',
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        zIndex: '2',
+      },
+    });
+    this.chartContainer.appendChild(konvaContainer);
+
+    this.stage = new Konva.Stage({
+      container: konvaContainer,
+      width: this.options.width,
+      height: this.options.height,
+    });
+
+    const stageContainer = this.stage.container();
+    stageContainer.style.pointerEvents = 'auto';
+    stageContainer.style.cursor = this.cursor;
+
+    const layer = new Konva.Layer();
+    this.stage.add(layer);
+  }
+
+  private isOverKonvaInteractiveElement(x: number, y: number): boolean {
+    if (!this.stage) return false;
+    const hit = this.stage.getIntersection({ x, y });
+    return hit !== null && hit.listening();
+  }
+
+  private handleOrderMove(orderId: string, newPrice: number): void {
+    const originalOrder = this.orderLines.find((o) => o.id === orderId);
+    const originalPrice = originalOrder?.price ?? newPrice;
+    this.pendingOrders.set(orderId, {
+      orderId,
+      pendingPrice: newPrice,
+      originalPrice,
+      startTime: Date.now(),
+      timeoutId: setTimeout(() => {
+        this.pendingOrders.delete(orderId);
+        this.scheduleRender();
+      }, 5000),
+    });
+    this.scheduleRender();
+    this.options.onOrderMove?.(orderId, newPrice);
   }
 
   /**
@@ -1065,8 +1101,11 @@ export class ChartCore {
       height,
     });
 
-    // Update interactive line renderer dimensions
-    this.interactiveLineRenderer.setDimensions(width, height, this.margins);
+    if (this.stage) {
+      this.stage.width(width);
+      this.stage.height(height);
+    }
+    this.priceLineManager?.setDimensions(width, height, this.margins);
 
     // Update reset button position
     this.updateResetButtonPosition();
@@ -1151,7 +1190,8 @@ export class ChartCore {
     }
     this.chartContainer.removeEventListener('click', this.plusButtonClickHandler);
     this.eventManager.dispose();
-    this.interactiveLineRenderer.dispose();
+    this.priceLineManager?.dispose();
+    this.stage?.destroy();
     if (!preserveDom) {
       this.chartContainer.remove();
     }
@@ -1432,9 +1472,7 @@ export class ChartCore {
       }
     }
     // Force rebuild so the line renders at the confirmed price (not the pending override)
-    if (cleaned) {
-      this.interactiveLineRenderer.forceRebuild();
-    }
+    if (cleaned) this.scheduleRender();
   }
 
   // ============================================================================
@@ -1570,14 +1608,14 @@ export class ChartCore {
       ...this.positionLines.flatMap((p) => positionToBracketLines(p, formatPrice)),
     ];
 
-    // Skip the line being dragged — an HTML drag line replaces it during drag.
-    const dragLineId = this.interactiveLineRenderer?.isDragging()
-      ? this.interactiveLineRenderer.getState().getDragLineId()
-      : null;
-    const canvasPriceLines = dragLineId ? allPriceLines.filter((l) => l.id !== dragLineId) : allPriceLines;
+    // Skip the line being dragged — the Konva drag line replaces it during drag.
+    const dragLineId = this.priceLineManager?.getDragLineId() ?? null;
+    const canvasPriceLines = (dragLineId ? allPriceLines.filter((l) => l.id !== dragLineId) : allPriceLines).filter(
+      (line) => line.type !== 'order' && line.type !== 'position',
+    );
 
     // Hide crosshair during interactive line drag (user is focused on the drag price)
-    const lineDragging = this.interactiveLineRenderer?.isDragging() ?? false;
+    const lineDragging = this.priceLineManager?.isDragging() ?? false;
     const crosshairState = {
       visible: this.crosshair.visible && !lineDragging,
       x: this.crosshair.x,
@@ -1641,8 +1679,8 @@ export class ChartCore {
       }
     }
 
-    const canvasLabelBounds =
-      dragLineId ? this.labelBoundsCache.filter((bound) => bound.lineId !== dragLineId) : this.labelBoundsCache;
+    const canvasLabelBounds = (dragLineId ? this.labelBoundsCache.filter((bound) => bound.lineId !== dragLineId) : this.labelBoundsCache)
+      .filter((bound) => bound.type !== 'order' && bound.type !== 'position');
 
     // Render candles, grid, axes, volume, indicators, price lines on main canvas
     // Crosshair is NOT drawn here — it goes on the overlay canvas
@@ -1680,7 +1718,7 @@ export class ChartCore {
     }
 
     // Hide crosshair during interactive line drag
-    const lineDragging = this.interactiveLineRenderer?.isDragging() ?? false;
+    const lineDragging = this.priceLineManager?.isDragging() ?? false;
     if (!this.crosshair.visible || lineDragging) {
       this._plusButtonBounds = null;
       return;
@@ -1717,7 +1755,7 @@ export class ChartCore {
     }
     ctx.setLineDash([]);
 
-    // Draw + button circle on the crosshair line (replaces HTML overlay)
+    // Draw + button circle on the crosshair line
     if (hasContextMenu && y >= this.margins.top && y <= height - this.margins.bottom) {
       const btnX = width - this.margins.right - 11; // center of 18px circle, 2px from axis
       const btnY = y;
@@ -1978,7 +2016,7 @@ export class ChartCore {
   }
 
   /**
-   * Update bracket drag state from InteractiveLineRenderer move callbacks.
+   * Update bracket drag state from interactive line move callbacks.
    * Looks up position or order lines to get entryPrice + positionData for preview.
    */
   private _updateBracketDragState(
@@ -2312,9 +2350,17 @@ export class ChartCore {
   }
 
   /**
-   * Update interactive line renderer (HTML overlay labels)
+   * Update interactive line layer
    */
   private updateInteractiveLines(): void {
-    this.interactiveLineRenderer.update(this.labelBoundsCache, this.pendingOrders);
+    if (this.priceLineManager?.isDragging()) {
+      return;
+    }
+    this.priceLineManager?.update(this.labelBoundsCache, this.pendingOrders, {
+      x: 0,
+      y: 0,
+      visible: false,
+      color: '',
+    });
   }
 }

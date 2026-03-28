@@ -10,5 +10,4 @@ export {
   type DragMode,
   type PaneInfo,
 } from './EventManager';
-export { InteractiveLineRenderer, type InteractiveLineRendererOptions } from './InteractiveLineRenderer';
 export { InteractiveLineState } from './InteractiveLineState';

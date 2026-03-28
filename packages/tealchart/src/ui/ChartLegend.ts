@@ -57,6 +57,11 @@ interface OHLCElements {
   low: HTMLElement | null;
   close: HTMLElement | null;
   change: HTMLElement | null;
+  openText: Text | null;
+  highText: Text | null;
+  lowText: Text | null;
+  closeText: Text | null;
+  changeText: Text | null;
 }
 
 // Cached indicator list elements for efficient updates
@@ -197,6 +202,11 @@ export class ChartLegend extends Component<ChartLegendState> {
     low: null,
     close: null,
     change: null,
+    openText: null,
+    highText: null,
+    lowText: null,
+    closeText: null,
+    changeText: null,
   };
 
   // Cached indicator list elements (avoid rebuilding on every setIndicators call)
@@ -264,25 +274,33 @@ export class ChartLegend extends Component<ChartLegendState> {
   private updateOHLCValues(bar: Bar, prevBar: Bar | null): void {
     const isUp = bar.close >= bar.open;
 
-    if (this.ohlcElements.open) {
-      this.ohlcElements.open.textContent = this.formatPrice(bar.open);
+    if (this.ohlcElements.openText) {
+      this.ohlcElements.openText.nodeValue = this.formatPrice(bar.open);
     }
-    if (this.ohlcElements.high) {
-      this.ohlcElements.high.textContent = this.formatPrice(bar.high);
+    if (this.ohlcElements.highText) {
+      this.ohlcElements.highText.nodeValue = this.formatPrice(bar.high);
     }
-    if (this.ohlcElements.low) {
-      this.ohlcElements.low.textContent = this.formatPrice(bar.low);
+    if (this.ohlcElements.lowText) {
+      this.ohlcElements.lowText.nodeValue = this.formatPrice(bar.low);
+    }
+    if (this.ohlcElements.closeText) {
+      this.ohlcElements.closeText.nodeValue = this.formatPrice(bar.close);
     }
     if (this.ohlcElements.close) {
-      this.ohlcElements.close.textContent = this.formatPrice(bar.close);
-      this.ohlcElements.close.style.color = isUp ? 'var(--buy-color, #26a69a)' : 'var(--sell-color, #ef5350)';
+      const closeColor = isUp ? 'var(--buy-color, #26a69a)' : 'var(--sell-color, #ef5350)';
+      if (this.ohlcElements.close.style.color !== closeColor) {
+        this.ohlcElements.close.style.color = closeColor;
+      }
     }
-    if (this.ohlcElements.change && prevBar) {
+    if (this.ohlcElements.change && this.ohlcElements.changeText && prevBar) {
       const change = bar.close - prevBar.close;
       const changePercent = (change / prevBar.close) * 100;
       const changeUp = change >= 0;
-      this.ohlcElements.change.textContent = `${changeUp ? '+' : ''}${safeToFixed(change, 1)} (${safeToFixed(changePercent, 2)}%)`;
-      this.ohlcElements.change.style.color = changeUp ? 'var(--buy-color, #26a69a)' : 'var(--sell-color, #ef5350)';
+      this.ohlcElements.changeText.nodeValue = `${changeUp ? '+' : ''}${safeToFixed(change, 1)} (${safeToFixed(changePercent, 2)}%)`;
+      const changeColor = changeUp ? 'var(--buy-color, #26a69a)' : 'var(--sell-color, #ef5350)';
+      if (this.ohlcElements.change.style.color !== changeColor) {
+        this.ohlcElements.change.style.color = changeColor;
+      }
     }
   }
 
@@ -377,7 +395,18 @@ export class ChartLegend extends Component<ChartLegendState> {
     this.el.innerHTML = '';
 
     // Clear cached OHLC elements (will be rebuilt below)
-    this.ohlcElements = { open: null, high: null, low: null, close: null, change: null };
+    this.ohlcElements = {
+      open: null,
+      high: null,
+      low: null,
+      close: null,
+      change: null,
+      openText: null,
+      highText: null,
+      lowText: null,
+      closeText: null,
+      changeText: null,
+    };
 
     // Clear cached indicator elements (will be rebuilt via setIndicators)
     this.indicatorListElements = { container: null, toggle: null, chevron: null, toggleLabel: null };
@@ -413,10 +442,19 @@ export class ChartLegend extends Component<ChartLegendState> {
       const isUp = bar.close >= bar.open;
 
       // Create OHLC items and cache the value elements for fast updates
-      const { container: openContainer, valueEl: openEl } = this.createOHLCItemWithRef('O', this.formatPrice(bar.open));
-      const { container: highContainer, valueEl: highEl } = this.createOHLCItemWithRef('H', this.formatPrice(bar.high));
-      const { container: lowContainer, valueEl: lowEl } = this.createOHLCItemWithRef('L', this.formatPrice(bar.low));
-      const { container: closeContainer, valueEl: closeEl } = this.createOHLCItemWithRef(
+      const { container: openContainer, valueEl: openEl, textNode: openText } = this.createOHLCItemWithRef(
+        'O',
+        this.formatPrice(bar.open),
+      );
+      const { container: highContainer, valueEl: highEl, textNode: highText } = this.createOHLCItemWithRef(
+        'H',
+        this.formatPrice(bar.high),
+      );
+      const { container: lowContainer, valueEl: lowEl, textNode: lowText } = this.createOHLCItemWithRef(
+        'L',
+        this.formatPrice(bar.low),
+      );
+      const { container: closeContainer, valueEl: closeEl, textNode: closeText } = this.createOHLCItemWithRef(
         'C',
         this.formatPrice(bar.close),
         isUp,
@@ -432,6 +470,10 @@ export class ChartLegend extends Component<ChartLegendState> {
       this.ohlcElements.high = highEl;
       this.ohlcElements.low = lowEl;
       this.ohlcElements.close = closeEl;
+      this.ohlcElements.openText = openText;
+      this.ohlcElements.highText = highText;
+      this.ohlcElements.lowText = lowText;
+      this.ohlcElements.closeText = closeText;
 
       // Price change
       if (this.state.previousBar) {
@@ -441,15 +483,19 @@ export class ChartLegend extends Component<ChartLegendState> {
         const changeUp = change >= 0;
 
         const changeEl = span({
-          text: `${changeUp ? '+' : ''}${safeToFixed(change, 1)} (${safeToFixed(changePercent, 2)}%)`,
           style: {
             fontFamily: 'monospace',
             fontSize: '11px',
             color: changeUp ? 'var(--buy-color, #26a69a)' : 'var(--sell-color, #ef5350)',
           },
         });
+        const changeText = document.createTextNode(
+          `${changeUp ? '+' : ''}${safeToFixed(change, 1)} (${safeToFixed(changePercent, 2)}%)`,
+        );
+        changeEl.appendChild(changeText);
         ohlcGroup.appendChild(changeEl);
         this.ohlcElements.change = changeEl;
+        this.ohlcElements.changeText = changeText;
       }
 
       mainRow.appendChild(ohlcGroup);
@@ -483,7 +529,7 @@ export class ChartLegend extends Component<ChartLegendState> {
     label: string,
     value: string,
     isUp?: boolean,
-  ): { container: HTMLElement; valueEl: HTMLElement } {
+  ): { container: HTMLElement; valueEl: HTMLElement; textNode: Text } {
     const container = div({ style: styles.ohlcItem });
     container.appendChild(span({ text: label, style: styles.ohlcLabel }));
 
@@ -491,10 +537,12 @@ export class ChartLegend extends Component<ChartLegendState> {
     if (isUp !== undefined) {
       valueStyle.color = isUp ? 'var(--buy-color, #26a69a)' : 'var(--sell-color, #ef5350)';
     }
-    const valueEl = span({ text: value, style: valueStyle });
+    const valueEl = span({ style: valueStyle });
+    const textNode = document.createTextNode(value);
+    valueEl.appendChild(textNode);
     container.appendChild(valueEl);
 
-    return { container, valueEl };
+    return { container, valueEl, textNode };
   }
 
   private createIndicatorRow(indicator: ActiveIndicator): HTMLElement {
