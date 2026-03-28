@@ -124,7 +124,7 @@ When implementing any new feature, always implement it for both platforms in the
 
 Platform-specific rendering:
 
-- **Web**: `ChartCore.ts` (canvas), `InteractiveLineRenderer.ts` (HTML overlays), `EventManager.ts` (mouse/touch)
+- **Web**: `ChartCore.ts` (canvas + Konva interactive lines), `EventManager.ts` (mouse/touch)
 - **Mobile**: `SkiaTealchart.tsx` (Skia canvas), `PositionLineComponent.tsx` / `OrderLineComponent.tsx` (RN components), `useChartGestures.ts` (gestures)
 
 When adding features like TP/SL drag preview, crosshair improvements, or new line types — implement for both platforms.

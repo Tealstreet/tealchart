@@ -50,7 +50,7 @@ export interface RenderOptions {
   maxCandleWidth: number;
   margins?: ChartMargins; // Custom margins override
   pricePrecision?: number; // Market price precision (e.g., 0.00001 for 5 decimal places)
-  fontFamily?: string; // Font family for all chart text. Defaults to 'inherit' for HTML overlays, 'sans-serif' for canvas.
+  fontFamily?: string; // Font family for all chart text. Defaults to 'sans-serif' for canvas rendering.
   // Metadata for jailbreak indicators
   exchange?: string;
   symbol?: string;
@@ -679,6 +679,8 @@ export interface TealchartWidgetOptions {
   /** Initial interval. If omitted, uses persisted per-chart value from localStorage. */
   interval?: ResolutionString;
   datafeed: IBasicDataFeed;
+  /** Initial render options applied before overrides and symbol metadata. */
+  renderOptions?: Partial<RenderOptions>;
   locale?: string;
   autosize?: boolean;
   fullscreen?: boolean;
