@@ -221,7 +221,7 @@ export class TealchartWidget {
           this._scheduler.markDirty(DIRTY.PLOTS);
         },
         onError: (scriptId, error) => {
-          console.error(`[Tealchart] Tealscript error in ${scriptId}:`, error.message);
+          this._logger?.error(LogCategory.Indicators, `Tealscript error in ${scriptId}`, error);
         },
         onInputsDiscovered: (scriptId, inputDefs) => {
           // Populate study's inputs with default values from input definitions
@@ -256,7 +256,7 @@ export class TealchartWidget {
           }
           return true;
         } catch (error) {
-          console.error(`[Tealchart] Failed to create study ${studyId}:`, error);
+          this._logger?.error(LogCategory.Indicators, `Failed to create study ${studyId}`, error);
           return false;
         }
       });
@@ -369,7 +369,7 @@ export class TealchartWidget {
           if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
             return;
           }
-          console.error('[Tealchart] Failed to resolve symbol:', error);
+          this._logger?.error(LogCategory.Datafeed, 'Failed to resolve symbol', error);
           this._setReady();
         },
       );
@@ -401,7 +401,7 @@ export class TealchartWidget {
         .catch((error) => {
           if (this._disposed) return;
           // Layout no longer exists — clear the reference, start fresh
-          console.warn('[Tealchart] Failed to load saved layout, starting fresh:', error);
+          this._logger?.warn(LogCategory.Layout, 'Failed to load saved layout, starting fresh', error);
           this._chartStore!.currentLayout.set({
             layoutId: null,
             layoutName: null,
@@ -416,7 +416,7 @@ export class TealchartWidget {
 
   private _loadBars(): void {
     if (!this._symbolInfo) {
-      console.warn('[Tealchart] _loadBars called but no symbolInfo');
+      this._logger?.warn(LogCategory.Datafeed, '_loadBars called but no symbolInfo');
       return;
     }
 
@@ -487,7 +487,7 @@ export class TealchartWidget {
         }
 
         this._isLoadingBars = false;
-        console.error('[Tealchart] Failed to load bars:', error);
+        this._logger?.error(LogCategory.Datafeed, 'Failed to load bars', error);
         this._scheduler.markDirty(DIRTY.FULL); // Re-render to hide loading state
         this._setReady();
       },
@@ -496,7 +496,7 @@ export class TealchartWidget {
 
   private _subscribeToBars(): void {
     if (!this._symbolInfo) {
-      console.warn('[Tealchart] _subscribeToBars called but no symbolInfo');
+      this._logger?.warn(LogCategory.Datafeed, '_subscribeToBars called but no symbolInfo');
       return;
     }
 
@@ -676,7 +676,7 @@ export class TealchartWidget {
           return;
         }
         this._isLoadingMoreBars = false;
-        console.error('[Tealchart] Failed to load more bars:', error);
+        this._logger?.error(LogCategory.Datafeed, 'Failed to load more bars', error);
       },
     );
   }
@@ -686,7 +686,7 @@ export class TealchartWidget {
    * Clears bars and refetches the visible region
    */
   private _handleRecoveryNeeded(event: GapDetectionEvent): void {
-    console.log(`[Tealchart] Recovery triggered: ${event.reason}`, event.details);
+    this._logger?.info(LogCategory.GapDetection, `Recovery triggered: ${event.reason}`, event.details);
 
     // Stop gap detection while recovering
     this._gapDetectionManager?.stop();
@@ -724,7 +724,7 @@ export class TealchartWidget {
       try {
         cb();
       } catch (e) {
-        console.error('[Tealchart] Error in onChartReady callback:', e);
+        this._logger?.error(LogCategory.Widget, 'Error in onChartReady callback', e);
       }
     });
     this._readyCallbacks = [];
@@ -746,7 +746,7 @@ export class TealchartWidget {
       // Look up the built-in indicator by ID
       const builtinIndicator = getIndicatorById(instance.builtinId);
       if (!builtinIndicator) {
-        console.warn(`[Tealchart] Unknown indicator ID: ${instance.builtinId}, skipping`);
+        this._logger?.warn(LogCategory.Indicators, `Unknown indicator ID: ${instance.builtinId}, skipping`);
         continue;
       }
 
@@ -795,7 +795,7 @@ export class TealchartWidget {
           }
         })
         .catch((error) => {
-          console.error(`[Tealchart] Failed to restore indicator ${instance.name}:`, error);
+          this._logger?.error(LogCategory.Indicators, `Failed to restore indicator ${instance.name}`, error);
         });
     }
   }
@@ -808,7 +808,7 @@ export class TealchartWidget {
 
     const factory = this._options.jailbreakIndicatorFactories?.[builtin.id];
     if (!factory) {
-      console.warn(`[Tealchart] No factory for jailbreak indicator: ${builtin.id}`);
+      this._logger?.warn(LogCategory.Indicators, `No factory for jailbreak indicator: ${builtin.id}`);
       return;
     }
 
@@ -1175,7 +1175,7 @@ export class TealchartWidget {
     }
 
     if (!this._tealScriptManager) {
-      console.warn('[Tealchart] Tealscript not available - cannot add indicator');
+      this._logger?.warn(LogCategory.Indicators, 'Tealscript not available - cannot add indicator');
       return;
     }
 
@@ -1220,7 +1220,7 @@ export class TealchartWidget {
         }
       })
       .catch((error) => {
-        console.error(`[Tealchart] Failed to add indicator ${indicator.name}:`, error);
+        this._logger?.error(LogCategory.Indicators, `Failed to add indicator ${indicator.name}`, error);
       });
   }
 
@@ -1229,13 +1229,13 @@ export class TealchartWidget {
    */
   private _handleAddJailbreakIndicator(indicator: BuiltinIndicator): void {
     if (!this._jailbreakManager || !indicator.jailbreak) {
-      console.warn('[Tealchart] Jailbreak manager not available or indicator not jailbreak');
+      this._logger?.warn(LogCategory.Indicators, 'Jailbreak manager not available or indicator not jailbreak');
       return;
     }
 
     const factory = this._options.jailbreakIndicatorFactories?.[indicator.id];
     if (!factory) {
-      console.warn(`[Tealchart] No factory for jailbreak indicator: ${indicator.id}`);
+      this._logger?.warn(LogCategory.Indicators, `No factory for jailbreak indicator: ${indicator.id}`);
       return;
     }
 
@@ -1336,7 +1336,7 @@ export class TealchartWidget {
             this._ui?.setCurrentLayout(chartId, currentLayout.layoutName);
           })
           .catch((error) => {
-            console.error('[Tealchart] Auto-save failed:', error);
+            this._logger?.error(LogCategory.Layout, 'Auto-save failed', error);
             if (!this._chartStore) return;
             this._chartStore.saveStatus.set('error');
             this._scheduler.markDirty(DIRTY.FULL);
@@ -1358,7 +1358,7 @@ export class TealchartWidget {
             this._ui?.setCurrentLayout(chartId, layoutName);
           })
           .catch((error) => {
-            console.error('[Tealchart] Auto-save (create) failed:', error);
+            this._logger?.error(LogCategory.Layout, 'Auto-save (create) failed', error);
             if (!this._chartStore) return;
             this._chartStore.saveStatus.set('error');
             this._scheduler.markDirty(DIRTY.FULL);
@@ -1781,7 +1781,7 @@ export class TealchartWidget {
         if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
           return;
         }
-        console.error(`[Tealchart] Failed to resolve symbol (${options.reason}):`, error);
+        this._logger?.error(LogCategory.Datafeed, `Failed to resolve symbol (${options.reason})`, error);
         this._isLoadingBars = false;
         this._scheduler.markDirty(DIRTY.FULL);
       },
@@ -1842,7 +1842,7 @@ export class TealchartWidget {
       try {
         callback();
       } catch (e) {
-        console.error('[Tealchart] Error in onChartReady callback:', e);
+        this._logger?.error(LogCategory.Widget, 'Error in onChartReady callback', e);
       }
     } else {
       this._readyCallbacks.push(callback);
@@ -2291,7 +2291,7 @@ export class TealchartWidget {
    * @stub Not yet implemented
    */
   save(callback: (state: object) => void): void {
-    console.warn('[Tealchart] Method not implemented: save');
+    this._logger?.warn(LogCategory.Layout, 'Method not implemented: save');
     // Return minimal state
     callback({
       symbol: this._symbol,
@@ -2305,7 +2305,7 @@ export class TealchartWidget {
    * @stub Not yet implemented
    */
   load(state: object): Promise<void> {
-    console.warn('[Tealchart] Method not implemented: load');
+    this._logger?.warn(LogCategory.Layout, 'Method not implemented: load');
     // TODO: Implement state restoration
     return Promise.resolve();
   }
@@ -2315,7 +2315,7 @@ export class TealchartWidget {
    * @stub Not yet implemented
    */
   saveChartToServer(onComplete?: () => void, onFail?: () => void, options?: { chartName?: string }): void {
-    console.warn('[Tealchart] Method not implemented: saveChartToServer');
+    this._logger?.warn(LogCategory.Layout, 'Method not implemented: saveChartToServer');
     onFail?.();
   }
 
@@ -2333,7 +2333,7 @@ export class TealchartWidget {
     layoutName: string,
   ): void {
     if (warnings.length > 0) {
-      console.warn('[Tealchart] Layout load warnings:', warnings);
+      this._logger?.warn(LogCategory.Layout, 'Layout load warnings', warnings);
     }
 
     // Update symbol if different
@@ -2357,7 +2357,7 @@ export class TealchartWidget {
       for (const indicator of settings.indicators) {
         const builtinIndicator = getIndicatorById(indicator.builtinId);
         if (!builtinIndicator) {
-          console.warn('[Tealchart] Unknown indicator:', indicator.builtinId);
+          this._logger?.warn(LogCategory.Indicators, `Unknown indicator: ${indicator.builtinId}`);
           continue;
         }
 
@@ -2484,7 +2484,7 @@ export class TealchartWidget {
               }, 500);
             })
             .catch((error) => {
-              console.error('[Tealchart] Failed to update layout:', error);
+              this._logger?.error(LogCategory.Layout, 'Failed to update layout', error);
               if (!this._chartStore) return;
               this._chartStore.saveStatus.set('error');
               this._scheduler.markDirty(DIRTY.FULL);
@@ -2516,7 +2516,7 @@ export class TealchartWidget {
               }, 500);
             })
             .catch((error) => {
-              console.error('[Tealchart] Failed to save layout:', error);
+              this._logger?.error(LogCategory.Layout, 'Failed to save layout', error);
               if (!this._chartStore) return;
               this._chartStore.saveStatus.set('error');
               this._scheduler.markDirty(DIRTY.FULL);
@@ -2562,7 +2562,7 @@ export class TealchartWidget {
           this._ui?.setCurrentLayout(chartId, currentLayout.layoutName);
         })
         .catch((error) => {
-          console.error('[Tealchart] Failed to save layout:', error);
+          this._logger?.error(LogCategory.Layout, 'Failed to save layout', error);
           if (!this._chartStore) return;
           this._chartStore.saveStatus.set('error');
           this._scheduler.markDirty(DIRTY.FULL);
@@ -2591,7 +2591,7 @@ export class TealchartWidget {
           this._ui?.setCurrentLayout(chartId, layoutName);
         })
         .catch((error) => {
-          console.error('[Tealchart] Failed to save layout:', error);
+          this._logger?.error(LogCategory.Layout, 'Failed to save layout', error);
           if (!this._chartStore) return;
           this._chartStore.saveStatus.set('error');
           this._scheduler.markDirty(DIRTY.FULL);
@@ -2629,7 +2629,7 @@ export class TealchartWidget {
         this._ui?.setCurrentLayout(layoutId, layoutName);
       })
       .catch((error) => {
-        console.error('[Tealchart] Failed to load layout:', error);
+        this._logger?.error(LogCategory.Layout, 'Failed to load layout', error);
       });
   }
 
@@ -2653,7 +2653,7 @@ export class TealchartWidget {
           }
         })
         .catch((error) => {
-          console.error('[Tealchart] Failed to delete layout:', error);
+          this._logger?.error(LogCategory.Layout, 'Failed to delete layout', error);
         });
     });
   }
@@ -2683,7 +2683,7 @@ export class TealchartWidget {
         }
       })
       .catch((error) => {
-        console.error('[Tealchart] Failed to rename layout:', error);
+        this._logger?.error(LogCategory.Layout, 'Failed to rename layout', error);
       });
   }
 
