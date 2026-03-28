@@ -271,10 +271,38 @@ export class PriceLineManager {
     return bounds
       .map(
         (b) => {
-          const segmentTextLength =
-            b.chartLabel?.segments.reduce((sum, segment) => sum + ((segment.textShort || segment.text).length || 0), 0) ?? 0;
-          const buttonTypes = b.chartLabel?.buttons?.map((button) => button.type).join(',') ?? '';
-          return `${b.lineId}|${b.type}|${b.color}|${b.lineStyle}|${b.draggable}|${Math.round(segmentTextLength / 3)}|${buttonTypes}|${b.label?.primaryText ?? ''}|${b.label?.secondaryText ?? ''}`;
+          const segmentSignature =
+            b.chartLabel?.segments
+              ?.map((segment) =>
+                [
+                  segment.text,
+                  segment.textShort ?? '',
+                  segment.textColor,
+                  segment.backgroundColor,
+                  segment.borderColor,
+                ].join('~'),
+              )
+              .join('|') ?? '';
+          const buttonSignature =
+            b.chartLabel?.buttons
+              ?.map((button) => [button.type, button.backgroundColor, button.borderColor, button.iconColor].join('~'))
+              .join('|') ?? '';
+          return [
+            b.lineId,
+            b.type,
+            b.color,
+            b.lineStyle,
+            b.draggable ? '1' : '0',
+            b.width,
+            b.height,
+            b.lineLength ?? '',
+            b.label?.primaryText ?? '',
+            b.label?.secondaryText ?? '',
+            b.label?.backgroundColor ?? '',
+            b.label?.textColor ?? '',
+            segmentSignature,
+            buttonSignature,
+          ].join('|');
         },
       )
       .sort()
