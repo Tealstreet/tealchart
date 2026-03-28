@@ -645,7 +645,7 @@ export class PriceLineManager {
     let chartLabelX = margins.left;
     const useNarrowText = width < 400;
     const buttons = chartLabel?.buttons || [];
-    const { inlineButtons, tpslButtons, orderedButtons } = getOrderedButtons(buttons);
+    const { tpslButtons, orderedButtons } = getOrderedButtons(buttons);
     const tpslGap = tpslButtons.length > 0 ? 6 : 0;
 
     if (chartLabel && chartLabel.segments.length > 0) {
@@ -1036,14 +1036,12 @@ export class PriceLineManager {
 
           hitRect.on('mousedown touchstart', (e) => {
             e.cancelBubble = true;
-            group.listening(false);
             if (button.type === 'cancel') {
               this.options.onOrderCancel?.(bound.lineId);
             } else {
               this.options.onPositionClose?.(bound.lineId);
             }
             this.options.onCursorChange?.('crosshair');
-            this.layer.batchDraw();
           });
           hitRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
           hitRect.on('mouseleave', () => this.options.onCursorChange?.('crosshair'));
@@ -1077,10 +1075,8 @@ export class PriceLineManager {
 
           hitRect.on('mousedown touchstart', (e) => {
             e.cancelBubble = true;
-            group.listening(false);
             this.options.onPositionReverse?.(bound.lineId);
             this.options.onCursorChange?.('crosshair');
-            this.layer.batchDraw();
           });
           hitRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
           hitRect.on('mouseleave', () => this.options.onCursorChange?.('crosshair'));

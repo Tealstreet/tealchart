@@ -225,7 +225,7 @@ describe('ChartCore viewport management', () => {
     core.dispose();
   });
 
-  it('constructs with experimental canvas interactive lines enabled', async () => {
+  it('constructs with canvas interactive lines', async () => {
     const { ChartCore } = await import('./ChartCore');
     const core = new ChartCore({
       container,

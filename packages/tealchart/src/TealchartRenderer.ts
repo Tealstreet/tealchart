@@ -3691,8 +3691,9 @@ export class TealchartRenderer {
       if (lineType === 'price') {
         this.drawSimplePriceLineInPane(bound, viewport, pane);
       } else if (lineType === 'order' || lineType === 'position') {
-        // Order/position labels and controls are handled by PriceLineManager.
-        // The horizontal line stays on the main canvas.
+        // Order/position labels and controls are handled by PriceLineManager via Konva.
+        // ChartCore filters these bounds out of the main canvas render path, so this is
+        // effectively a fallback if order/position bounds are ever passed through again.
         this.drawTradingLineOnCanvas(bound, viewport, pane);
       } else {
         this.drawTradingLineInPane(bound, viewport, pane);
@@ -3780,7 +3781,9 @@ export class TealchartRenderer {
     const lineWidth = bound.lineWidth || 1;
     const priceAxisLabelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
 
-    // Draw one continuous line — HTML label sits on top via z-index
+    // Draw one continuous line as a fallback path.
+    // In the current pipeline, interactive order/position lines are rendered by
+    // PriceLineManager on the Konva overlay and are filtered out before canvas render.
     ctx.save();
     ctx.strokeStyle = color;
     ctx.lineWidth = lineWidth;

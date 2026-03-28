@@ -46,12 +46,6 @@ import { safeNum, safeToFixed } from '../utils/safeNumber';
 import { applyAutoScale } from '../viewport/viewScale';
 import { button, div, icons } from './dom';
 
-declare global {
-  interface Window {
-    __TEALCHART_STYLE_TRACE_ALL__?: boolean;
-  }
-}
-
 // ============================================================================
 // Types
 // ============================================================================
@@ -111,159 +105,6 @@ export interface ChartCoreOptions {
 // ============================================================================
 
 const RESET_BUTTON_AUTO_HIDE_DELAY = 3000;
-
-interface StyleMutationRecord {
-  ts: number;
-  type: MutationRecord['type'];
-  target: string;
-  attributeName?: string | null;
-  oldValue?: string | null;
-  newValue?: string | null;
-  addedNodes?: number;
-  removedNodes?: number;
-  parentChain?: string;
-  nodePreview?: string;
-}
-
-// ============================================================================
-// Helper Functions
-// ============================================================================
-
-function describeMutationTarget(el: HTMLElement): string {
-  const describeElement = (node: HTMLElement): string => {
-    const parts = [node.tagName.toLowerCase()];
-    if (node.id) parts.push(`#${node.id}`);
-    if (node.classList.length > 0) {
-      parts.push(`.${Array.from(node.classList).slice(0, 3).join('.')}`);
-    }
-    if (node.getAttribute('data-interactive') === 'true') {
-      parts.push('[data-interactive=true]');
-    }
-    return parts.join('');
-  };
-
-  const parts = [describeElement(el)];
-
-  let parent = el.parentElement;
-  let hops = 0;
-  while (parent && hops < 3) {
-    if (parent.id || parent.classList.length > 0 || parent.getAttribute('data-interactive') === 'true') {
-      parts.push(`<=${describeElement(parent)}`);
-      break;
-    }
-    parent = parent.parentElement;
-    hops += 1;
-  }
-
-  return parts.join('');
-}
-
-function describeParentChain(el: HTMLElement): string | undefined {
-  const chain: string[] = [];
-  let parent = el.parentElement;
-  let hops = 0;
-
-  while (parent && hops < 6) {
-    chain.push(describeMutationTarget(parent).split('<=')[0]);
-    parent = parent.parentElement;
-    hops += 1;
-  }
-
-  return chain.length > 0 ? chain.join(' <- ') : undefined;
-}
-
-function getNodePreview(nodes: NodeList): string | undefined {
-  for (const node of Array.from(nodes)) {
-    if (node instanceof HTMLElement) {
-      const text = node.textContent?.trim();
-      if (text) {
-        return truncateMutationValue(`${node.tagName.toLowerCase()}:${text}`);
-      }
-      return truncateMutationValue(node.outerHTML);
-    }
-
-    if (node.nodeType === Node.TEXT_NODE) {
-      const text = node.textContent?.trim();
-      if (text) {
-        return truncateMutationValue(`text:${text}`);
-      }
-    }
-  }
-
-  return undefined;
-}
-
-function truncateMutationValue(value: string | null | undefined): string | undefined {
-  if (value == null || value === '') return undefined;
-  return value.length > 80 ? `${value.slice(0, 77)}...` : value;
-}
-
-class StyleMutationTracer {
-  private observer: MutationObserver | null = null;
-  private records: StyleMutationRecord[] = [];
-
-  constructor() {
-    if (typeof window === 'undefined' || typeof MutationObserver === 'undefined') return;
-
-    this.observer = new MutationObserver((mutations) => {
-      const now = performance.now();
-      for (const mutation of mutations) {
-        const target = mutation.target instanceof HTMLElement ? mutation.target : mutation.target.parentElement;
-        if (!target) continue;
-
-        this.records.push({
-          ts: now,
-          type: mutation.type,
-          target: describeMutationTarget(target),
-          attributeName: mutation.type === 'attributes' ? mutation.attributeName : undefined,
-          oldValue: mutation.oldValue,
-          newValue:
-            mutation.type === 'attributes'
-              ? target.getAttribute(mutation.attributeName || '')
-              : mutation.type === 'characterData'
-                ? mutation.target.textContent
-                : undefined,
-          addedNodes: mutation.type === 'childList' ? mutation.addedNodes.length : undefined,
-          removedNodes: mutation.type === 'childList' ? mutation.removedNodes.length : undefined,
-          parentChain: describeParentChain(target),
-          nodePreview:
-            mutation.type === 'childList'
-              ? getNodePreview(mutation.addedNodes) ?? getNodePreview(mutation.removedNodes)
-              : undefined,
-        });
-      }
-
-      const cutoff = now - 250;
-      if (this.records.length > 400) {
-        this.records = this.records.filter((record) => record.ts >= cutoff);
-      }
-    });
-
-    const root = document.body || document.documentElement;
-    if (!root) return;
-
-    this.observer.observe(root, {
-      subtree: true,
-      childList: true,
-      characterData: true,
-      characterDataOldValue: true,
-      attributes: true,
-      attributeOldValue: true,
-      attributeFilter: ['class', 'style', 'hidden', 'data-state', 'data-side', 'data-open', 'aria-hidden'],
-    });
-  }
-
-  getRecentRecords(withinMs: number): StyleMutationRecord[] {
-    const cutoff = performance.now() - withinMs;
-    return this.records.filter((record) => record.ts >= cutoff);
-  }
-
-  dispose(): void {
-    this.observer?.disconnect();
-    this.observer = null;
-    this.records = [];
-  }
-}
 
 /**
  * Convert legacy PaneLayout to UnifiedPaneLayout
@@ -689,13 +530,10 @@ export class ChartCore {
 
   // RAF for full renders
   private rafId: number | null = null;
-  private readonly styleMutationTracer: StyleMutationTracer | null;
-
   constructor(options: ChartCoreOptions) {
     this.options = options;
     this.container = options.container;
     this.margins = { ...DEFAULT_MARGINS, ...options.margins };
-    this.styleMutationTracer = typeof window !== 'undefined' ? new StyleMutationTracer() : null;
 
     // Create chart container
     this.chartContainer = div({
@@ -1352,7 +1190,6 @@ export class ChartCore {
     }
     this.chartContainer.removeEventListener('click', this.plusButtonClickHandler);
     this.eventManager.dispose();
-    this.styleMutationTracer?.dispose();
     this.priceLineManager?.dispose();
     this.stage?.destroy();
     if (!preserveDom) {
@@ -1663,8 +1500,6 @@ export class ChartCore {
    * Called synchronously — no second RAF. Only repaints what changed.
    */
   paint(dirty: DirtyFlags): void {
-    this.logRecentStyleMutations('paint:start', dirty);
-
     const needsCanvasRepaint =
       dirty &
       (DIRTY.VIEWPORT |
@@ -1699,51 +1534,6 @@ export class ChartCore {
     // Interactive line labels — update positions or rebuild
     if (dirty & (DIRTY.LINES | DIRTY.VIEWPORT | DIRTY.BARS | DIRTY.DATA_LOAD | DIRTY.CROSSHAIR | DIRTY.FULL)) {
       this.updateInteractiveLines();
-    }
-
-    this.logRecentStyleMutations('paint:end', dirty);
-  }
-
-  private logRecentStyleMutations(phase: 'paint:start' | 'paint:end', dirty: DirtyFlags): void {
-    if (!this.styleMutationTracer || typeof window === 'undefined') return;
-
-    const records = this.styleMutationTracer.getRecentRecords(window.__TEALCHART_STYLE_TRACE_ALL__ ? 100 : 24);
-    if (records.length === 0) return;
-
-    const summarized = records.slice(-20).map((record) => ({
-      ageMs: Number((performance.now() - record.ts).toFixed(2)),
-      type: record.type,
-      target: record.target,
-      attribute: record.attributeName ?? undefined,
-      oldValue: truncateMutationValue(record.oldValue),
-      newValue: truncateMutationValue(record.newValue),
-      addedNodes: record.addedNodes,
-      removedNodes: record.removedNodes,
-      parentChain: record.parentChain,
-      nodePreview: record.nodePreview,
-    }));
-
-    const compactSummary = summarized
-      .slice(-6)
-      .map((record) => {
-        if (record.type === 'attributes') {
-          return `${record.target}.${record.attribute ?? 'attr'}=${record.newValue ?? '<empty>'}`;
-        }
-        if (record.type === 'characterData') {
-          return `${record.target}.text=${record.newValue ?? '<empty>'}`;
-        }
-        const extras = [record.nodePreview, record.parentChain].filter(Boolean).join(' <= ');
-        return `${record.target}.childList(+${record.addedNodes ?? 0}/-${record.removedNodes ?? 0})${
-          extras ? `:${extras}` : ''
-        }`;
-      })
-      .join(' | ');
-
-    console.log(
-      `[tealchart-style-trace] ${phase} dirty=${dirty} recent=${records.length} chart=${this.options.width}x${this.options.height} :: ${compactSummary}`,
-    );
-    if (window.__TEALCHART_STYLE_TRACE_ALL__) {
-      console.table(summarized);
     }
   }
 
