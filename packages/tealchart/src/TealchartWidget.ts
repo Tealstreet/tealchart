@@ -221,7 +221,7 @@ export class TealchartWidget {
           this._scheduler.markDirty(DIRTY.PLOTS);
         },
         onError: (scriptId, error) => {
-          this._logger?.error(LogCategory.Indicators, `Tealscript error in ${scriptId}`, error.message);
+          this._logger?.error(LogCategory.Indicators, `Tealscript error in ${scriptId}`, error);
         },
         onInputsDiscovered: (scriptId, inputDefs) => {
           // Populate study's inputs with default values from input definitions
