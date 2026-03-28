@@ -45,8 +45,28 @@ export interface PriceLineManagerOptions {
   onTPClick?: (positionId: string) => void;
   /** Callback when SL button is clicked (without drag) */
   onSLClick?: (positionId: string) => void;
+  /** Preview callback for TP drag */
+  onTPMovePreview?: (
+    positionId: string,
+    price: number,
+    partialPercent: number,
+    dragStartX: number,
+    dragCurrentX: number,
+  ) => void;
+  /** Preview callback for SL drag */
+  onSLMovePreview?: (
+    positionId: string,
+    price: number,
+    partialPercent: number,
+    dragStartX: number,
+    dragCurrentX: number,
+  ) => void;
+  /** Called when any TP/SL drag ends */
+  onTPSLDragEnd?: () => void;
+  /** Called when any TP/SL drag is cancelled */
+  onTPSLDragCancel?: () => void;
   /** Callback when cursor should change */
-  onCursorChange?: (cursor: 'default' | 'pointer' | 'grab' | 'grabbing') => void;
+  onCursorChange?: (cursor: 'crosshair' | 'pointer' | 'grab' | 'grabbing') => void;
   /** Callback when context menu button is clicked */
   onContextMenuButtonClick?: (price: number, screenX: number, screenY: number) => void;
 }
@@ -64,6 +84,19 @@ export interface CrosshairState {
 
 const TOUCH_TARGET_HEIGHT = 44; // Minimum 44px for touch-friendly hit area
 const LABEL_HEIGHT = 18;
+const DRAG_THRESHOLD = 5;
+const SEGMENT_HORIZONTAL_PADDING = 8;
+
+interface CachedLineContentRefs {
+  priceAxisRect?: Konva.Rect;
+  priceAxisPrimaryText?: Konva.Text;
+  priceAxisSecondaryText?: Konva.Text;
+  segmentRects?: Konva.Rect[];
+  segmentTexts?: Konva.Text[];
+  buttonRects?: Konva.Rect[];
+  buttonTexts?: Array<Konva.Text | undefined>;
+  buttonIcons?: Array<Konva.Shape[] | undefined>;
+}
 
 // ============================================================================
 // Helper Functions
@@ -99,6 +132,39 @@ function calculatePartialPercent(startX: number, currentX: number): number {
   return 10;
 }
 
+let textMeasureContext: CanvasRenderingContext2D | null = null;
+
+function measureLabelTextWidth(text: string, fontSize = 11, fontFamily = 'sans-serif', fontStyle = ''): number {
+  if (typeof document === 'undefined') {
+    return text.length * 6;
+  }
+
+  if (!textMeasureContext) {
+    textMeasureContext = document.createElement('canvas').getContext('2d');
+  }
+
+  if (!textMeasureContext) {
+    return text.length * 6;
+  }
+
+  textMeasureContext.font = `${fontStyle ? `${fontStyle} ` : ''}${fontSize}px ${fontFamily}`;
+  return textMeasureContext.measureText(text).width;
+}
+
+function getSegmentWidth(text: string): number {
+  return Math.ceil(measureLabelTextWidth(text, 11, 'sans-serif')) + SEGMENT_HORIZONTAL_PADDING;
+}
+
+function getOrderedButtons(buttons: NonNullable<PriceLineLabelBounds['chartLabel']>['buttons'] = []) {
+  const inlineButtons = buttons.filter((button) => button.type !== 'tp' && button.type !== 'sl');
+  const tpslButtons = buttons.filter((button) => button.type === 'tp' || button.type === 'sl');
+  return {
+    inlineButtons,
+    tpslButtons,
+    orderedButtons: [...inlineButtons, ...tpslButtons],
+  };
+}
+
 // ============================================================================
 // PriceLineManager Class
 // ============================================================================
@@ -122,9 +188,18 @@ export class PriceLineManager {
   // Drag state
   private activeDrag: {
     node: Konva.Rect;
+    group?: Konva.Group;
+    type: 'order' | 'tpsl';
     lineId: string;
+    positionId?: string;
+    buttonType?: 'tp' | 'sl';
     originalY: number;
+    originalX?: number;
+    originalGroupY?: number;
+    originalAbsoluteY?: number;
     originalPrice: number;
+    startCenterX?: number;
+    partialEnabled?: boolean;
     onCancel?: () => void;
   } | null = null;
   private dragCancelled = false;
@@ -195,8 +270,40 @@ export class PriceLineManager {
     // Exclude: price, originalY, adjustedY (handled by position updates)
     return bounds
       .map(
-        (b) =>
-          `${b.lineId}|${b.type}|${b.color}|${b.lineStyle}|${b.draggable}|${b.chartLabel?.segments.length ?? 0}|${b.chartLabel?.buttons?.length ?? 0}|${b.label?.primaryText ?? ''}`,
+        (b) => {
+          const segmentSignature =
+            b.chartLabel?.segments
+              ?.map((segment) =>
+                [
+                  segment.text,
+                  segment.textShort ?? '',
+                  segment.textColor,
+                  segment.backgroundColor,
+                  segment.borderColor,
+                ].join('~'),
+              )
+              .join('|') ?? '';
+          const buttonSignature =
+            b.chartLabel?.buttons
+              ?.map((button) => [button.type, button.backgroundColor, button.borderColor, button.iconColor].join('~'))
+              .join('|') ?? '';
+          return [
+            b.lineId,
+            b.type,
+            b.color,
+            b.lineStyle,
+            b.draggable ? '1' : '0',
+            b.width,
+            b.height,
+            b.lineLength ?? '',
+            b.label?.primaryText ?? '',
+            b.label?.secondaryText ?? '',
+            b.label?.backgroundColor ?? '',
+            b.label?.textColor ?? '',
+            segmentSignature,
+            buttonSignature,
+          ].join('|');
+        },
       )
       .sort()
       .join(';');
@@ -212,7 +319,6 @@ export class PriceLineManager {
       const cachedGroup = this.cachedLineGroups.get(bound.lineId);
       if (cachedGroup) {
         const newY = priceToY(bound.price);
-        const collisionOffset = bound.adjustedY - bound.originalY;
 
         // Update the group's Y position
         // We store the lineY as a custom attribute
@@ -223,6 +329,9 @@ export class PriceLineManager {
           cachedGroup.y(cachedGroup.y() + deltaY);
           cachedGroup.setAttr('lineY', newY);
         }
+
+        cachedGroup.opacity(this.pendingOrders.has(bound.lineId) ? 0.5 : 1);
+        this.updateLineContent(cachedGroup, bound);
       }
     }
 
@@ -249,6 +358,53 @@ export class PriceLineManager {
   setCrosshair(crosshair: CrosshairState): void {
     this.crosshair = crosshair;
     this.updateCrosshair();
+  }
+
+  isDragging(): boolean {
+    return this.activeDrag !== null;
+  }
+
+  getDragType(): 'order' | 'tpsl' | null {
+    return this.activeDrag?.type ?? null;
+  }
+
+  getDragLineId(): string | null {
+    return this.activeDrag?.lineId ?? null;
+  }
+
+  private updateLineContent(group: Konva.Group, bound: PriceLineLabelBounds): void {
+    const refs = group.getAttr('contentRefs') as CachedLineContentRefs | undefined;
+    if (!refs) return;
+
+    if (bound.type !== 'price') {
+      refs.priceAxisRect?.fill(bound.label.backgroundColor || bound.color);
+    }
+    refs.priceAxisRect?.stroke(bound.color);
+
+    refs.priceAxisPrimaryText?.text(bound.label.primaryText);
+    refs.priceAxisPrimaryText?.fill(bound.label.textColor || (bound.type === 'price' ? bound.color : '#ffffff'));
+
+    if (refs.priceAxisSecondaryText && bound.countdownToTime === undefined) {
+      refs.priceAxisSecondaryText.text(bound.label.secondaryText || '');
+      refs.priceAxisSecondaryText.fill(bound.label.textColor || (bound.type === 'price' ? bound.color : '#ffffff'));
+    }
+
+    const useNarrowText = this.options.width < 400;
+    bound.chartLabel?.segments.forEach((segment, index) => {
+      const text = useNarrowText && segment.textShort ? segment.textShort : segment.text;
+      refs.segmentRects?.[index]?.fill(segment.backgroundColor);
+      refs.segmentRects?.[index]?.stroke(segment.borderColor);
+      refs.segmentTexts?.[index]?.text(text);
+      refs.segmentTexts?.[index]?.fill(segment.textColor);
+    });
+
+    const { orderedButtons } = getOrderedButtons(bound.chartLabel?.buttons || []);
+    orderedButtons.forEach((button, index) => {
+      refs.buttonRects?.[index]?.fill(button.backgroundColor);
+      refs.buttonRects?.[index]?.stroke(button.borderColor);
+      refs.buttonTexts?.[index]?.fill(button.iconColor);
+      refs.buttonIcons?.[index]?.forEach((icon) => icon.stroke(button.iconColor));
+    });
   }
 
   /**
@@ -398,36 +554,37 @@ export class PriceLineManager {
 
   private renderPriceAxisLabel(group: Konva.Group, bound: PriceLineLabelBounds, x: number, y: number): void {
     const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
+    const refs = (group.getAttr('contentRefs') as CachedLineContentRefs | undefined) || {};
 
     // Border-only label
-    group.add(
-      new Konva.Rect({
-        x,
-        y,
-        width: bound.width,
-        height: bound.height,
-        stroke: bound.color,
-        strokeWidth: 1,
-        cornerRadius: 2,
-      }),
-    );
+    const priceAxisRect = new Konva.Rect({
+      x,
+      y,
+      width: bound.width,
+      height: bound.height,
+      stroke: bound.color,
+      strokeWidth: 1,
+      cornerRadius: 2,
+    });
+    group.add(priceAxisRect);
+    refs.priceAxisRect = priceAxisRect;
 
     if (secondaryText) {
       // Two-line label
-      group.add(
-        new Konva.Text({
-          x,
-          y: y + 1,
-          width: bound.width,
-          height: bound.height / 2,
-          text: bound.label.primaryText,
-          fontSize: 11,
-          fontFamily: 'sans-serif',
-          fill: bound.label.textColor || bound.color,
-          align: 'center',
-          verticalAlign: 'middle',
-        }),
-      );
+      const primaryTextNode = new Konva.Text({
+        x,
+        y: y + 1,
+        width: bound.width,
+        height: bound.height / 2,
+        text: bound.label.primaryText,
+        fontSize: 11,
+        fontFamily: 'sans-serif',
+        fill: bound.label.textColor || bound.color,
+        align: 'center',
+        verticalAlign: 'middle',
+      });
+      group.add(primaryTextNode);
+      refs.priceAxisPrimaryText = primaryTextNode;
       const secondaryTextNode = new Konva.Text({
         x,
         y: y + bound.height / 2 - 1,
@@ -441,6 +598,7 @@ export class PriceLineManager {
         verticalAlign: 'middle',
       });
       group.add(secondaryTextNode);
+      refs.priceAxisSecondaryText = secondaryTextNode;
 
       // Store reference for efficient countdown updates
       if (bound.countdownToTime !== undefined) {
@@ -449,21 +607,23 @@ export class PriceLineManager {
         this.countdownTextNodes.set(bound.lineId, existing);
       }
     } else {
-      group.add(
-        new Konva.Text({
-          x,
-          y,
-          width: bound.width,
-          height: bound.height,
-          text: bound.label.primaryText,
-          fontSize: 11,
-          fontFamily: 'sans-serif',
-          fill: bound.label.textColor || bound.color,
-          align: 'center',
-          verticalAlign: 'middle',
-        }),
-      );
+      const primaryTextNode = new Konva.Text({
+        x,
+        y,
+        width: bound.width,
+        height: bound.height,
+        text: bound.label.primaryText,
+        fontSize: 11,
+        fontFamily: 'sans-serif',
+        fill: bound.label.textColor || bound.color,
+        align: 'center',
+        verticalAlign: 'middle',
+      });
+      group.add(primaryTextNode);
+      refs.priceAxisPrimaryText = primaryTextNode;
     }
+
+    group.setAttr('contentRefs', refs);
   }
 
   private renderTradingLine(
@@ -485,16 +645,16 @@ export class PriceLineManager {
     let chartLabelX = margins.left;
     const useNarrowText = width < 400;
     const buttons = chartLabel?.buttons || [];
-    const hasTPSLButtons = buttons.length > 0 && (buttons[0].type === 'tp' || buttons[0].type === 'sl');
-    const tpslGap = hasTPSLButtons ? 6 : 0;
+    const { tpslButtons, orderedButtons } = getOrderedButtons(buttons);
+    const tpslGap = tpslButtons.length > 0 ? 6 : 0;
 
     if (chartLabel && chartLabel.segments.length > 0) {
       for (const segment of chartLabel.segments) {
         const text = useNarrowText && segment.textShort ? segment.textShort : segment.text;
-        segmentsWidth += text.length * 6 + 8;
+        segmentsWidth += getSegmentWidth(text);
       }
       chartLabelWidth = segmentsWidth + tpslGap;
-      for (const button of buttons) {
+      for (const button of orderedButtons) {
         chartLabelWidth += button.type === 'tp' || button.type === 'sl' ? 24 : 16;
       }
 
@@ -530,25 +690,37 @@ export class PriceLineManager {
 
     // Invisible drag handle for segments
     if (isDraggable && chartLabel && chartLabel.segments.length > 0 && segmentsWidth > 0) {
+      const dragRectX = chartLabelX - 2;
       const dragRect = new Konva.Rect({
-        x: chartLabelX,
+        x: dragRectX,
         y: lineY - TOUCH_TARGET_HEIGHT / 2,
-        width: segmentsWidth,
+        width: segmentsWidth + 4,
         height: TOUCH_TARGET_HEIGHT,
         // Use rgba with very low alpha for hit detection - 'transparent' may not work in all cases
         fill: 'rgba(0, 0, 0, 0.01)',
         draggable: true,
         listening: true, // Explicitly enable listening
       });
+      dragRect.dragDistance(0);
 
       let dragStartY = 0;
+
+      dragRect.on('mousedown touchstart', () => {
+        if (!this.activeDrag) {
+          dragRect.startDrag();
+        }
+      });
 
       dragRect.on('dragstart', () => {
         dragStartY = dragRect.y();
         this.activeDrag = {
           node: dragRect,
+          group,
+          type: 'order',
           lineId: bound.lineId,
           originalY: lineY,
+          originalGroupY: group.y(),
+          originalAbsoluteY: dragRect.getAbsolutePosition().y + TOUCH_TARGET_HEIGHT / 2,
           originalPrice: bound.price,
         };
         this.dragCancelled = false;
@@ -557,29 +729,45 @@ export class PriceLineManager {
 
       dragRect.on('dragmove', () => {
         // Constrain to vertical only
-        dragRect.x(chartLabelX);
+        dragRect.x(dragRectX);
+        const activeDrag = this.activeDrag;
+        if (!activeDrag || activeDrag.type !== 'order' || activeDrag.node !== dragRect || !activeDrag.group) return;
+
+        const currentAbsoluteY = dragRect.getAbsolutePosition().y + TOUCH_TARGET_HEIGHT / 2;
+        const deltaY = currentAbsoluteY - (activeDrag.originalAbsoluteY ?? activeDrag.originalY);
+        activeDrag.group.y((activeDrag.originalGroupY ?? 0) + deltaY);
+        activeDrag.group.setAttr('lineY', activeDrag.originalY + deltaY);
+        dragRect.y(dragStartY);
+        this.layer.batchDraw();
       });
 
       dragRect.on('dragend', () => {
-        const finalY = dragRect.y() + TOUCH_TARGET_HEIGHT / 2;
+        const activeDrag = this.activeDrag;
+        const finalY =
+          (activeDrag?.group?.getAttr('lineY') as number | undefined) ??
+          dragRect.getAbsolutePosition().y + TOUCH_TARGET_HEIGHT / 2;
         const finalPrice = yToPrice(finalY);
 
         dragRect.y(dragStartY);
-        this.activeDrag = null;
 
         if (!this.dragCancelled && Math.abs(finalY - lineY) > 1) {
           this.options.onOrderMove?.(bound.lineId, finalPrice);
+        } else if (activeDrag?.group) {
+          activeDrag.group.y(activeDrag.originalGroupY ?? 0);
+          activeDrag.group.setAttr('lineY', activeDrag.originalY);
         }
         this.dragCancelled = false;
-        // Reset to default/crosshair - the mouse position may have changed during drag
+        this.activeDrag = null;
+        this.layer.batchDraw();
+        // Reset to crosshair - the mouse position may have changed during drag
         // and the rect position was reset, so we can't assume mouse is still over it
-        this.options.onCursorChange?.('default');
+        this.options.onCursorChange?.('crosshair');
       });
 
       dragRect.on('mouseenter', () => this.options.onCursorChange?.('grab'));
       dragRect.on('mouseleave', () => {
         if (!this.activeDrag) {
-          this.options.onCursorChange?.('default');
+          this.options.onCursorChange?.('crosshair');
         }
       });
 
@@ -590,156 +778,320 @@ export class PriceLineManager {
     if (chartLabel && chartLabel.segments.length > 0) {
       let currentX = chartLabelX;
       const segmentGroup = new Konva.Group({ listening: false });
+      const refs = (group.getAttr('contentRefs') as CachedLineContentRefs | undefined) || {};
+      refs.segmentRects = [];
+      refs.segmentTexts = [];
 
       for (let i = 0; i < chartLabel.segments.length; i++) {
         const segment = chartLabel.segments[i];
         const text = useNarrowText && segment.textShort ? segment.textShort : segment.text;
-        const textWidth = text.length * 6 + 8;
+        const textWidth = getSegmentWidth(text);
         const isFirst = i === 0;
         const isLast = i === chartLabel.segments.length - 1;
 
-        segmentGroup.add(
-          new Konva.Rect({
-            x: currentX,
-            y: lineY - LABEL_HEIGHT / 2,
-            width: textWidth,
-            height: LABEL_HEIGHT,
-            fill: segment.backgroundColor,
-            stroke: segment.borderColor,
-            strokeWidth: 1,
-            cornerRadius: isFirst && isLast ? 2 : isFirst ? [2, 0, 0, 2] : isLast ? [0, 2, 2, 0] : 0,
-          }),
-        );
-
-        segmentGroup.add(
-          new Konva.Text({
-            x: currentX,
-            y: lineY - LABEL_HEIGHT / 2,
-            width: textWidth,
-            height: LABEL_HEIGHT,
-            text,
-            fontSize: 11,
-            fontFamily: 'sans-serif',
-            fill: segment.textColor,
-            align: 'center',
-            verticalAlign: 'middle',
-          }),
-        );
+        const segmentRect = new Konva.Rect({
+          x: currentX,
+          y: lineY - LABEL_HEIGHT / 2,
+          width: textWidth,
+          height: LABEL_HEIGHT,
+          fill: segment.backgroundColor,
+          stroke: segment.borderColor,
+          strokeWidth: 1,
+          cornerRadius: isFirst && isLast ? 2 : isFirst ? [2, 0, 0, 2] : isLast ? [0, 2, 2, 0] : 0,
+        });
+        const segmentText = new Konva.Text({
+          x: currentX,
+          y: lineY - LABEL_HEIGHT / 2,
+          width: textWidth,
+          height: LABEL_HEIGHT,
+          text,
+          fontSize: 11,
+          fontFamily: 'sans-serif',
+          fill: segment.textColor,
+          align: 'center',
+          verticalAlign: 'middle',
+        });
+        segmentGroup.add(segmentRect);
+        segmentGroup.add(segmentText);
+        refs.segmentRects.push(segmentRect);
+        refs.segmentTexts.push(segmentText);
 
         currentX += textWidth;
       }
 
       group.add(segmentGroup);
 
-      // Render buttons
-      if (hasTPSLButtons) {
-        currentX += tpslGap;
-      }
+      refs.buttonRects = [];
+      refs.buttonTexts = [];
+      refs.buttonIcons = [];
 
-      for (let i = 0; i < buttons.length; i++) {
-        const button = buttons[i];
+      for (let i = 0; i < orderedButtons.length; i++) {
+        const button = orderedButtons[i];
         const isTPSL = button.type === 'tp' || button.type === 'sl';
         const buttonWidth = isTPSL ? 24 : 16;
+        const prevButton = orderedButtons[i - 1];
+        const nextButton = orderedButtons[i + 1];
+        const startsTPSLGroup = isTPSL && prevButton && prevButton.type !== 'tp' && prevButton.type !== 'sl';
+        const isFirstInline = !isTPSL && (!prevButton || prevButton.type === 'tp' || prevButton.type === 'sl');
+        const isLastInline = !isTPSL && (!nextButton || nextButton.type === 'tp' || nextButton.type === 'sl');
+        const isFirstTPSL = isTPSL && (!prevButton || prevButton.type !== 'tp' && prevButton.type !== 'sl');
+        const isLastTPSL = isTPSL && (!nextButton || nextButton.type !== 'tp' && nextButton.type !== 'sl');
+
+        if (startsTPSLGroup || (i === 0 && isTPSL && tpslGap > 0)) {
+          currentX += tpslGap;
+        }
 
         const buttonGroup = new Konva.Group();
+        const buttonRect = new Konva.Rect({
+          x: currentX,
+          y: lineY - LABEL_HEIGHT / 2,
+          width: buttonWidth,
+          height: LABEL_HEIGHT,
+          fill: button.backgroundColor,
+          stroke: button.borderColor,
+          strokeWidth: 1,
+          listening: !isTPSL,
+          cornerRadius: isTPSL
+            ? isFirstTPSL && isLastTPSL
+              ? 2
+              : isFirstTPSL
+                ? [2, 0, 0, 2]
+                : isLastTPSL
+                  ? [0, 2, 2, 0]
+                  : 0
+            : isLastInline
+              ? [0, 2, 2, 0]
+              : 0,
+        });
 
-        buttonGroup.add(
-          new Konva.Rect({
+        buttonGroup.add(buttonRect);
+        refs.buttonRects.push(buttonRect);
+
+        if (button.type === 'tp' || button.type === 'sl') {
+          const buttonText = new Konva.Text({
             x: currentX,
             y: lineY - LABEL_HEIGHT / 2,
             width: buttonWidth,
             height: LABEL_HEIGHT,
-            fill: button.backgroundColor,
-            stroke: button.borderColor,
-            strokeWidth: 1,
-            cornerRadius: button.type === 'tp' ? [2, 0, 0, 2] : button.type === 'sl' ? [0, 2, 2, 0] : 2,
-          }),
-        );
+            text: button.type === 'tp' ? 'TP' : 'SL',
+            fontSize: 10,
+            fontFamily: 'sans-serif',
+            fontStyle: 'bold',
+            fill: button.iconColor,
+            align: 'center',
+            verticalAlign: 'middle',
+            listening: false,
+          });
+          buttonGroup.add(buttonText);
+          refs.buttonTexts.push(buttonText);
 
-        if (button.type === 'tp' || button.type === 'sl') {
-          buttonGroup.add(
-            new Konva.Text({
-              x: currentX,
-              y: lineY - LABEL_HEIGHT / 2,
-              width: buttonWidth,
-              height: LABEL_HEIGHT,
-              text: button.type === 'tp' ? 'TP' : 'SL',
-              fontSize: 10,
-              fontFamily: 'sans-serif',
-              fontStyle: 'bold',
-              fill: button.iconColor,
-              align: 'center',
-              verticalAlign: 'middle',
-            }),
-          );
+          const hitRect = new Konva.Rect({
+            x: currentX,
+            y: lineY - LABEL_HEIGHT / 2,
+            width: buttonWidth,
+            height: LABEL_HEIGHT,
+            fill: 'rgba(0, 0, 0, 0.01)',
+            draggable: true,
+            listening: true,
+          });
+          hitRect.dragDistance(0);
+          const buttonType = button.type;
+          const originalX = currentX;
+          const originalY = lineY - LABEL_HEIGHT / 2;
+          const startCenterX = originalX + buttonWidth / 2;
 
-          // TP/SL button click handler
-          const btnX = currentX;
-          buttonGroup.on('click tap', () => {
-            if (button.type === 'tp') {
-              this.options.onTPClick?.(bound.lineId);
-            } else {
-              this.options.onSLClick?.(bound.lineId);
+          hitRect.on('mousedown touchstart', () => {
+            if (!this.activeDrag) {
+              hitRect.startDrag();
             }
           });
-          buttonGroup.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
-          buttonGroup.on('mouseleave', () => this.options.onCursorChange?.('default'));
+
+          hitRect.on('dragstart', () => {
+            this.activeDrag = {
+              node: hitRect,
+              type: 'tpsl',
+              lineId: bound.lineId,
+              positionId: bound.positionId || bound.lineId,
+              buttonType,
+              originalX,
+              originalY,
+              originalPrice: bound.price,
+              startCenterX,
+              partialEnabled: bound.partialEnabled ?? false,
+              onCancel: () => {
+                this.options.onTPSLDragCancel?.();
+              },
+            };
+            this.dragCancelled = false;
+            this.options.onCursorChange?.('grabbing');
+          });
+
+          hitRect.on('dragmove', () => {
+            const activeDrag = this.activeDrag;
+            if (!activeDrag || activeDrag.type !== 'tpsl' || activeDrag.node !== hitRect) return;
+
+            const currentCenterX = hitRect.x() + buttonWidth / 2;
+            const currentCenterY = hitRect.y() + LABEL_HEIGHT / 2;
+            const price = yToPrice(currentCenterY);
+            const partialPercent = activeDrag.partialEnabled
+              ? calculatePartialPercent(activeDrag.startCenterX || startCenterX, currentCenterX)
+              : 100;
+
+            if (buttonType === 'tp') {
+              bound.callbacks?.onTPMove?.(price, partialPercent);
+              this.options.onTPMovePreview?.(
+                activeDrag.positionId || bound.lineId,
+                price,
+                partialPercent,
+                activeDrag.startCenterX || startCenterX,
+                currentCenterX,
+              );
+            } else {
+              bound.callbacks?.onSLMove?.(price, partialPercent);
+              this.options.onSLMovePreview?.(
+                activeDrag.positionId || bound.lineId,
+                price,
+                partialPercent,
+                activeDrag.startCenterX || startCenterX,
+                currentCenterX,
+              );
+            }
+          });
+
+          hitRect.on('dragend', () => {
+            const activeDrag = this.activeDrag;
+            if (!activeDrag || activeDrag.type !== 'tpsl' || activeDrag.node !== hitRect) return;
+
+            const currentCenterX = hitRect.x() + buttonWidth / 2;
+            const currentCenterY = hitRect.y() + LABEL_HEIGHT / 2;
+            const deltaX = Math.abs(currentCenterX - (activeDrag.startCenterX || startCenterX));
+            const deltaY = Math.abs(currentCenterY - (activeDrag.originalY + LABEL_HEIGHT / 2));
+            const price = yToPrice(currentCenterY);
+            const partialPercent = activeDrag.partialEnabled
+              ? calculatePartialPercent(activeDrag.startCenterX || startCenterX, currentCenterX)
+              : undefined;
+
+            hitRect.x(activeDrag.originalX || originalX);
+            hitRect.y(activeDrag.originalY);
+            this.activeDrag = null;
+
+            if (!this.dragCancelled && (deltaX > DRAG_THRESHOLD || deltaY > DRAG_THRESHOLD)) {
+              if (buttonType === 'tp') {
+                bound.callbacks?.onTPMoveEnd?.(price, partialPercent);
+              } else {
+                bound.callbacks?.onSLMoveEnd?.(price, partialPercent);
+              }
+              this.options.onTPSLDragEnd?.();
+            } else if (!this.dragCancelled) {
+              if (buttonType === 'tp') {
+                bound.callbacks?.onTPClick?.();
+                this.options.onTPClick?.(activeDrag.positionId || bound.lineId);
+              } else {
+                bound.callbacks?.onSLClick?.();
+                this.options.onSLClick?.(activeDrag.positionId || bound.lineId);
+              }
+              this.options.onTPSLDragCancel?.();
+            }
+
+            this.dragCancelled = false;
+            this.options.onCursorChange?.('crosshair');
+          });
+
+          hitRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
+          hitRect.on('mouseleave', () => {
+            if (!this.activeDrag) {
+              this.options.onCursorChange?.('crosshair');
+            }
+          });
+
+          buttonGroup.add(hitRect);
+          refs.buttonIcons.push(undefined);
         } else if (button.type === 'cancel' || button.type === 'close') {
           // X icon
-          buttonGroup.add(
-            new Konva.Line({
-              points: [currentX + 5, lineY - 4, currentX + 11, lineY + 4],
-              stroke: button.iconColor,
-              strokeWidth: 1.5,
-              listening: false,
-            }),
-          );
-          buttonGroup.add(
-            new Konva.Line({
-              points: [currentX + 11, lineY - 4, currentX + 5, lineY + 4],
-              stroke: button.iconColor,
-              strokeWidth: 1.5,
-              listening: false,
-            }),
-          );
+          const iconLine1 = new Konva.Line({
+            points: [currentX + 5, lineY - 4, currentX + 11, lineY + 4],
+            stroke: button.iconColor,
+            strokeWidth: 1.5,
+            listening: false,
+          });
+          const iconLine2 = new Konva.Line({
+            points: [currentX + 11, lineY - 4, currentX + 5, lineY + 4],
+            stroke: button.iconColor,
+            strokeWidth: 1.5,
+            listening: false,
+          });
+          buttonGroup.add(iconLine1);
+          buttonGroup.add(iconLine2);
+          refs.buttonIcons.push([iconLine1, iconLine2]);
+          refs.buttonTexts.push(undefined);
 
-          buttonGroup.on('click tap', () => {
+          const hitRect = new Konva.Rect({
+            x: currentX - 2,
+            y: lineY - TOUCH_TARGET_HEIGHT / 2,
+            width: buttonWidth + 4,
+            height: TOUCH_TARGET_HEIGHT,
+            fill: 'rgba(0, 0, 0, 0.01)',
+            listening: true,
+          });
+
+          hitRect.on('mousedown touchstart', (e) => {
+            e.cancelBubble = true;
             if (button.type === 'cancel') {
               this.options.onOrderCancel?.(bound.lineId);
             } else {
               this.options.onPositionClose?.(bound.lineId);
             }
+            this.options.onCursorChange?.('crosshair');
           });
-          buttonGroup.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
-          buttonGroup.on('mouseleave', () => this.options.onCursorChange?.('default'));
+          hitRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
+          hitRect.on('mouseleave', () => this.options.onCursorChange?.('crosshair'));
+          buttonGroup.add(hitRect);
         } else if (button.type === 'reverse') {
-          buttonGroup.add(
-            new Konva.Text({
-              x: currentX,
-              y: lineY - LABEL_HEIGHT / 2,
-              width: buttonWidth,
-              height: LABEL_HEIGHT,
-              text: '\u21c4',
-              fontSize: 11,
-              fontFamily: 'sans-serif',
-              fill: button.iconColor,
-              align: 'center',
-              verticalAlign: 'middle',
-              listening: false,
-            }),
-          );
-
-          buttonGroup.on('click tap', () => {
-            this.options.onPositionReverse?.(bound.lineId);
+          const reverseIcon = new Konva.Text({
+            x: currentX,
+            y: lineY - LABEL_HEIGHT / 2,
+            width: buttonWidth,
+            height: LABEL_HEIGHT,
+            text: '\u21c4',
+            fontSize: 11,
+            fontFamily: 'sans-serif',
+            fill: button.iconColor,
+            align: 'center',
+            verticalAlign: 'middle',
+            listening: false,
           });
-          buttonGroup.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
-          buttonGroup.on('mouseleave', () => this.options.onCursorChange?.('default'));
+          buttonGroup.add(reverseIcon);
+          refs.buttonTexts.push(reverseIcon);
+          refs.buttonIcons.push(undefined);
+
+          const hitRect = new Konva.Rect({
+            x: currentX - 2,
+            y: lineY - TOUCH_TARGET_HEIGHT / 2,
+            width: buttonWidth + 4,
+            height: TOUCH_TARGET_HEIGHT,
+            fill: 'rgba(0, 0, 0, 0.01)',
+            listening: true,
+          });
+
+          hitRect.on('mousedown touchstart', (e) => {
+            e.cancelBubble = true;
+            this.options.onPositionReverse?.(bound.lineId);
+            this.options.onCursorChange?.('crosshair');
+          });
+          hitRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
+          hitRect.on('mouseleave', () => this.options.onCursorChange?.('crosshair'));
+          buttonGroup.add(hitRect);
+        } else {
+          refs.buttonTexts.push(undefined);
+          refs.buttonIcons.push(undefined);
         }
 
         group.add(buttonGroup);
         currentX += buttonWidth;
-        if (button.type === 'tp') currentX += 1;
+        if (button.type === 'tp' && nextButton?.type === 'sl') currentX += 1;
       }
+
+      group.setAttr('contentRefs', refs);
     }
 
     // Line all the way across if no chart label
@@ -769,34 +1121,35 @@ export class PriceLineManager {
     // Price axis label (filled for trading lines)
     const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
 
-    group.add(
-      new Konva.Rect({
-        x: priceAxisLabelX,
-        y: priceAxisLabelY,
-        width: bound.width,
-        height: bound.height,
-        fill: bound.label.backgroundColor || bound.color,
-        stroke: bound.color,
-        strokeWidth: 1,
-        cornerRadius: 2,
-      }),
-    );
+    const refs = (group.getAttr('contentRefs') as CachedLineContentRefs | undefined) || {};
+    const priceAxisRect = new Konva.Rect({
+      x: priceAxisLabelX,
+      y: priceAxisLabelY,
+      width: bound.width,
+      height: bound.height,
+      fill: bound.label.backgroundColor || bound.color,
+      stroke: bound.color,
+      strokeWidth: 1,
+      cornerRadius: 2,
+    });
+    group.add(priceAxisRect);
+    refs.priceAxisRect = priceAxisRect;
 
     if (secondaryText) {
-      group.add(
-        new Konva.Text({
-          x: priceAxisLabelX,
-          y: priceAxisLabelY + 1,
-          width: bound.width,
-          height: bound.height / 2,
-          text: bound.label.primaryText,
-          fontSize: 11,
-          fontFamily: 'sans-serif',
-          fill: bound.label.textColor || '#ffffff',
-          align: 'center',
-          verticalAlign: 'middle',
-        }),
-      );
+      const primaryTextNode = new Konva.Text({
+        x: priceAxisLabelX,
+        y: priceAxisLabelY + 1,
+        width: bound.width,
+        height: bound.height / 2,
+        text: bound.label.primaryText,
+        fontSize: 11,
+        fontFamily: 'sans-serif',
+        fill: bound.label.textColor || '#ffffff',
+        align: 'center',
+        verticalAlign: 'middle',
+      });
+      group.add(primaryTextNode);
+      refs.priceAxisPrimaryText = primaryTextNode;
       const tradingSecondaryTextNode = new Konva.Text({
         x: priceAxisLabelX,
         y: priceAxisLabelY + bound.height / 2 - 1,
@@ -810,6 +1163,7 @@ export class PriceLineManager {
         verticalAlign: 'middle',
       });
       group.add(tradingSecondaryTextNode);
+      refs.priceAxisSecondaryText = tradingSecondaryTextNode;
 
       // Store reference for efficient countdown updates
       if (bound.countdownToTime !== undefined) {
@@ -818,21 +1172,23 @@ export class PriceLineManager {
         this.countdownTextNodes.set(bound.lineId, existing);
       }
     } else {
-      group.add(
-        new Konva.Text({
-          x: priceAxisLabelX,
-          y: priceAxisLabelY,
-          width: bound.width,
-          height: bound.height,
-          text: bound.label.primaryText,
-          fontSize: 11,
-          fontFamily: 'sans-serif',
-          fill: bound.label.textColor || '#ffffff',
-          align: 'center',
-          verticalAlign: 'middle',
-        }),
-      );
+      const primaryTextNode = new Konva.Text({
+        x: priceAxisLabelX,
+        y: priceAxisLabelY,
+        width: bound.width,
+        height: bound.height,
+        text: bound.label.primaryText,
+        fontSize: 11,
+        fontFamily: 'sans-serif',
+        fill: bound.label.textColor || '#ffffff',
+        align: 'center',
+        verticalAlign: 'middle',
+      });
+      group.add(primaryTextNode);
+      refs.priceAxisPrimaryText = primaryTextNode;
     }
+
+    group.setAttr('contentRefs', refs);
   }
 
   // ============================================================================
@@ -862,7 +1218,7 @@ export class PriceLineManager {
 
     // Note: Horizontal crosshair line is drawn on canvas (renderLineOnCanvas: true)
     // Label is rendered by Konva through the price line system (floatingLabel: true)
-    // Context menu "+" button is an HTML overlay managed by ChartCore (not Konva)
+    // Context menu "+" button is drawn by ChartCore on the crosshair canvas (not Konva)
   }
 
   // ============================================================================
@@ -871,12 +1227,25 @@ export class PriceLineManager {
 
   private handleKeyDown = (e: KeyboardEvent): void => {
     if (e.key === 'Escape' && this.activeDrag) {
+      const activeDrag = this.activeDrag;
       this.dragCancelled = true;
-      this.activeDrag.node.stopDrag();
-      this.activeDrag.node.y(this.activeDrag.originalY - TOUCH_TARGET_HEIGHT / 2);
-      this.activeDrag.onCancel?.();
+      activeDrag.node.stopDrag();
+      if (activeDrag.type === 'order') {
+        if (activeDrag.group) {
+          activeDrag.group.y(activeDrag.originalGroupY ?? 0);
+          activeDrag.group.setAttr('lineY', activeDrag.originalY);
+        }
+        activeDrag.node.y(activeDrag.originalY - TOUCH_TARGET_HEIGHT / 2);
+      } else {
+        if (activeDrag.originalX !== undefined) {
+          activeDrag.node.x(activeDrag.originalX);
+        }
+        activeDrag.node.y(activeDrag.originalY);
+      }
+      activeDrag.onCancel?.();
       this.activeDrag = null;
-      this.options.onCursorChange?.('default');
+      this.layer.batchDraw();
+      this.options.onCursorChange?.('crosshair');
     }
   };
 

@@ -28,7 +28,7 @@ import { IndicatorsModal } from './ui/IndicatorsModal';
  * import {
  *   TealchartRenderer,
  *   EventManager,
- *   InteractiveLineRenderer,
+ *   PriceLineManager,
  *   ChartTopBar,
  *   IndicatorsModal,
  *   getChartStore,
@@ -66,7 +66,6 @@ export {
   type DragMode,
   type PaneInfo,
 } from './interaction/EventManager';
-export { InteractiveLineRenderer, type InteractiveLineRendererOptions } from './interaction/InteractiveLineRenderer';
 export { InteractiveLineState } from './interaction/InteractiveLineState';
 
 // UI Components
