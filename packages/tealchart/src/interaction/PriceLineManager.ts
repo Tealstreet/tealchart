@@ -66,7 +66,7 @@ export interface PriceLineManagerOptions {
   /** Called when any TP/SL drag is cancelled */
   onTPSLDragCancel?: () => void;
   /** Callback when cursor should change */
-  onCursorChange?: (cursor: 'default' | 'pointer' | 'grab' | 'grabbing') => void;
+  onCursorChange?: (cursor: 'crosshair' | 'pointer' | 'grab' | 'grabbing') => void;
   /** Callback when context menu button is clicked */
   onContextMenuButtonClick?: (price: number, screenX: number, screenY: number) => void;
 }
@@ -707,15 +707,15 @@ export class PriceLineManager {
         this.dragCancelled = false;
         this.activeDrag = null;
         this.layer.batchDraw();
-        // Reset to default/crosshair - the mouse position may have changed during drag
+        // Reset to crosshair - the mouse position may have changed during drag
         // and the rect position was reset, so we can't assume mouse is still over it
-        this.options.onCursorChange?.('default');
+        this.options.onCursorChange?.('crosshair');
       });
 
       dragRect.on('mouseenter', () => this.options.onCursorChange?.('grab'));
       dragRect.on('mouseleave', () => {
         if (!this.activeDrag) {
-          this.options.onCursorChange?.('default');
+          this.options.onCursorChange?.('crosshair');
         }
       });
 
@@ -942,13 +942,13 @@ export class PriceLineManager {
             }
 
             this.dragCancelled = false;
-            this.options.onCursorChange?.('default');
+            this.options.onCursorChange?.('crosshair');
           });
 
           hitRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
           hitRect.on('mouseleave', () => {
             if (!this.activeDrag) {
-              this.options.onCursorChange?.('default');
+              this.options.onCursorChange?.('crosshair');
             }
           });
 
@@ -984,14 +984,17 @@ export class PriceLineManager {
 
           hitRect.on('mousedown touchstart', (e) => {
             e.cancelBubble = true;
+            group.listening(false);
             if (button.type === 'cancel') {
               this.options.onOrderCancel?.(bound.lineId);
             } else {
               this.options.onPositionClose?.(bound.lineId);
             }
+            this.options.onCursorChange?.('crosshair');
+            this.layer.batchDraw();
           });
           hitRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
-          hitRect.on('mouseleave', () => this.options.onCursorChange?.('default'));
+          hitRect.on('mouseleave', () => this.options.onCursorChange?.('crosshair'));
           buttonGroup.add(hitRect);
         } else if (button.type === 'reverse') {
           const reverseIcon = new Konva.Text({
@@ -1022,10 +1025,13 @@ export class PriceLineManager {
 
           hitRect.on('mousedown touchstart', (e) => {
             e.cancelBubble = true;
+            group.listening(false);
             this.options.onPositionReverse?.(bound.lineId);
+            this.options.onCursorChange?.('crosshair');
+            this.layer.batchDraw();
           });
           hitRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
-          hitRect.on('mouseleave', () => this.options.onCursorChange?.('default'));
+          hitRect.on('mouseleave', () => this.options.onCursorChange?.('crosshair'));
           buttonGroup.add(hitRect);
         } else {
           refs.buttonTexts.push(undefined);
@@ -1191,7 +1197,7 @@ export class PriceLineManager {
       activeDrag.onCancel?.();
       this.activeDrag = null;
       this.layer.batchDraw();
-      this.options.onCursorChange?.('default');
+      this.options.onCursorChange?.('crosshair');
     }
   };
 

@@ -806,17 +806,15 @@ export class ChartCore {
             this.renderCrosshairOverlay();
           },
           onCursorChange: (cursor) => {
-            if (this.cursor !== cursor) {
-              const wasDragging = this.cursor === 'grabbing';
-              this.cursor = cursor;
-              this.chartContainer.style.cursor = cursor;
-              if (this.stage) {
-                this.stage.container().style.cursor = cursor;
-              }
-              if (cursor === 'grabbing' || wasDragging) {
-                this.crosshair.visible = false;
-                this.renderCrosshairOverlay();
-              }
+            const wasDragging = this.cursor === 'grabbing';
+            this.cursor = cursor;
+            this.chartContainer.style.cursor = cursor;
+            if (this.stage) {
+              this.stage.container().style.cursor = cursor;
+            }
+            if (cursor === 'grabbing' || wasDragging) {
+              this.crosshair.visible = false;
+              this.renderCrosshairOverlay();
             }
           },
         });
@@ -932,12 +930,10 @@ export class ChartCore {
         }
       },
       onCursorChange: (cursor) => {
-        if (this.cursor !== cursor) {
-          this.cursor = cursor;
-          this.chartContainer.style.cursor = cursor;
-          if (this.stage) {
-            this.stage.container().style.cursor = cursor;
-          }
+        this.cursor = cursor;
+        this.chartContainer.style.cursor = cursor;
+        if (this.stage) {
+          this.stage.container().style.cursor = cursor;
         }
       },
       onPaneDoubleClick: (paneId) => this.options.onPaneDoubleClick?.(paneId),

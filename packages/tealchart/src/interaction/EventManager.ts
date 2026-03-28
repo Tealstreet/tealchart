@@ -107,6 +107,7 @@ export interface InteractionState {
   dragStartPaneHeight: number;
   isOverPriceAxis: boolean;
   isOverPaneDivider: boolean;
+  isOverInteractive: boolean;
   hoveredDividerIndex: number;
   hoveredX: number;
   hoveredY: number;
@@ -152,6 +153,7 @@ export class EventManager {
     dragStartPaneHeight: 0,
     isOverPriceAxis: false,
     isOverPaneDivider: false,
+    isOverInteractive: false,
     hoveredDividerIndex: -1,
     hoveredX: 0,
     hoveredY: 0,
@@ -451,8 +453,6 @@ export class EventManager {
     this.state.hoveredY = y;
 
     const dims = this.callbacks.getDimensions();
-    const wasOverPriceAxis = this.state.isOverPriceAxis;
-    const wasOverPaneDivider = this.state.isOverPaneDivider;
     this.state.isOverPriceAxis = x > dims.width - dims.priceAxisWidth;
 
     // Check for pane divider hover
@@ -462,6 +462,8 @@ export class EventManager {
 
     // Check if in dead zone (top bar or time axis - areas where crosshair shouldn't show)
     const inDeadZone = y < dims.topMargin || y > dims.height - dims.timeAxisHeight;
+    this.state.isOverInteractive =
+      !this.state.isOverPriceAxis && !this.state.isOverPaneDivider && !inDeadZone && !!this.callbacks.isOverInteractiveElement?.(x, y);
 
     // Update crosshair - hide when over price axis, divider, or in dead zones
     if (!this.state.isDragging) {
@@ -477,15 +479,17 @@ export class EventManager {
       if (wasVisible !== shouldShowCrosshair) {
         this.callbacks.onCrossHairVisibilityChange?.(shouldShowCrosshair);
       }
-      // Update cursor based on what we're hovering over
-      if (wasOverPaneDivider !== this.state.isOverPaneDivider || wasOverPriceAxis !== this.state.isOverPriceAxis) {
-        if (this.state.isOverPaneDivider) {
-          this.callbacks.onCursorChange?.('ns-resize');
-        } else if (this.state.isOverPriceAxis) {
-          this.callbacks.onCursorChange?.('ns-resize');
-        } else {
-          this.callbacks.onCursorChange?.('crosshair');
-        }
+      // Re-assert cursor on every move. Konva/button handlers can set the cursor
+      // directly, and relying only on state transitions can leave the container
+      // stuck in pointer mode after an interaction completes.
+      if (this.state.isOverPaneDivider) {
+        this.callbacks.onCursorChange?.('ns-resize');
+      } else if (this.state.isOverPriceAxis) {
+        this.callbacks.onCursorChange?.('ns-resize');
+      } else if (this.state.isOverInteractive) {
+        this.callbacks.onCursorChange?.('pointer');
+      } else {
+        this.callbacks.onCursorChange?.('crosshair');
       }
       // Render crosshair overlay directly (we're already in RAF)
       this.callbacks.onCrosshairRender?.();
