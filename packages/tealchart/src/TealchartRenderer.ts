@@ -76,6 +76,22 @@ function getNumberFormatter(decimals: number): Intl.NumberFormat {
   return formatter;
 }
 
+function formatCountdown(targetTimeMs: number): string {
+  const now = Date.now();
+  const remaining = Math.max(0, targetTimeMs - now);
+  const totalSeconds = Math.floor(remaining / 1000);
+  const totalMinutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  if (totalMinutes >= 60) {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  return `${totalMinutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
 // Text width cache - avoids expensive ctx.measureText calls
 // Key format: "font|text", value: width in pixels
 const textWidthCache = new Map<string, number>();
@@ -766,10 +782,12 @@ export class TealchartRenderer {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    if (bound.label.secondaryText) {
+    const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
+
+    if (secondaryText) {
       // Two lines of text with minimal padding
       ctx.fillText(bound.label.primaryText, labelX + bound.width / 2, labelY + 7);
-      ctx.fillText(bound.label.secondaryText, labelX + bound.width / 2, labelY + 19);
+      ctx.fillText(secondaryText, labelX + bound.width / 2, labelY + 19);
     } else {
       // Single line centered
       ctx.fillText(bound.label.primaryText, labelX + bound.width / 2, labelCenterY);
@@ -3761,9 +3779,11 @@ export class TealchartRenderer {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    if (bound.label.secondaryText) {
+    const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
+
+    if (secondaryText) {
       ctx.fillText(bound.label.primaryText, labelX + bound.width / 2, labelY + 7);
-      ctx.fillText(bound.label.secondaryText, labelX + bound.width / 2, labelY + 19);
+      ctx.fillText(secondaryText, labelX + bound.width / 2, labelY + 19);
     } else {
       ctx.fillText(bound.label.primaryText, labelX + bound.width / 2, labelCenterY);
     }

@@ -69,6 +69,7 @@ import { priceToY, xToTime, yToPrice } from './mobile/utils/coordinates';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
 import { DEFAULT_MARGINS } from './types';
+import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
 import { safeToFixed } from './utils/safeNumber';
 import { ViewportController } from './viewport/ViewportController';
 import { intervalToMs } from './viewport/viewScale';
@@ -362,6 +363,21 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
       margins,
     };
   }, [dimensions.width, dimensions.height, renderOptions, margins, showTopBar]);
+
+  const effectivePriceLines = useMemo(() => {
+    const latestBar = bars.length > 0 ? bars[bars.length - 1] : null;
+    const lastTradeLine = buildLastTradePriceLine({
+      latestBar,
+      interval,
+      pricePrecision,
+      upColor: fullRenderOptions.upColor,
+      downColor: fullRenderOptions.downColor,
+      renderLineOnCanvas: false,
+    });
+    const nonLastTradeLines = (priceLines ?? []).filter((line) => line.id !== 'last-trade');
+
+    return lastTradeLine ? [...nonLastTradeLines, lastTradeLine] : nonLastTradeLines;
+  }, [bars, interval, priceLines, pricePrecision, fullRenderOptions.upColor, fullRenderOptions.downColor]);
 
   // ==========================================================================
   // Gestures (using unified hook)
@@ -756,7 +772,7 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
           bars,
           viewport,
           unifiedPaneLayout,
-          priceLines,
+          effectivePriceLines,
           plots,
           indicatorPaneInfo,
           undefined,
@@ -775,7 +791,7 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     dimensions,
     fullRenderOptions,
     margins,
-    priceLines,
+    effectivePriceLines,
     plots,
     unifiedPaneLayout,
     indicatorPaneInfo,

@@ -1,6 +1,6 @@
 import type { Bar, ComputedPane, PriceLine, UnifiedPaneLayout, Viewport } from './types';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { TealchartRenderer } from './TealchartRenderer';
 
@@ -375,6 +375,54 @@ describe('TealchartRenderer coordinate transforms', () => {
       renderer.renderWithLayout(bars, viewport, layout, priceLines, [], undefined, undefined, undefined, precomputedBounds);
 
       expect(calculateSpy).not.toHaveBeenCalled();
+    });
+
+    it('renders countdown text for simple price lines with countdownToTime', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-03-29T06:17:00.000Z'));
+
+      const fillText = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillText,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+
+      const bars = makeBars(20);
+      const viewport = TealchartRenderer.calculateViewport(bars);
+      const layout: UnifiedPaneLayout = {
+        panes: [
+          {
+            id: 'main',
+            type: 'main',
+            heightRatio: 1,
+            yMin: 0,
+            yMax: 0,
+            fixedRange: false,
+          },
+        ],
+        timeAxisHeight: 30,
+      };
+      const priceLines: PriceLine[] = [
+        {
+          id: 'last-trade',
+          price: bars[bars.length - 1]!.close,
+          color: '#26a69a',
+          lineStyle: 'dotted',
+          label: {
+            primaryText: '50,200',
+          },
+          countdownToTime: Date.now() + 62_000,
+          targetPaneId: 'main',
+        },
+      ];
+
+      renderer.renderWithLayout(bars, viewport, layout, priceLines);
+
+      expect(fillText).toHaveBeenCalledWith('50,200', expect.any(Number), expect.any(Number));
+      expect(fillText).toHaveBeenCalledWith('01:02', expect.any(Number), expect.any(Number));
+
+      vi.useRealTimers();
     });
   });
 });

@@ -33,7 +33,6 @@ import {
   GapDetectionEvent,
   IBasicDataFeed,
   LibrarySymbolInfo,
-  PriceLine,
   RenderOptions,
   ResolutionString,
   TealchartWidgetOptions,
@@ -41,6 +40,7 @@ import {
   WidgetEvent,
 } from './types';
 import { TealchartWidgetUI } from './ui/TealchartWidgetUI';
+import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
 import { ViewportController } from './viewport/ViewportController';
 import { intervalToMs } from './viewport/viewScale';
 
@@ -1134,32 +1134,15 @@ export class TealchartWidget {
     if (!this._ui) return;
     const latestBar = this._bars.length > 0 ? this._bars[this._bars.length - 1] : null;
     if (latestBar) {
-      const intervalMs = intervalToMs(this._interval);
-      const barTimeMs = latestBar.time < 1e12 ? latestBar.time * 1000 : latestBar.time;
-      const barCloseTime = barTimeMs + intervalMs;
-
-      const priceText =
-        latestBar.close >= 1000
-          ? latestBar.close.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
-          : latestBar.close >= 1
-            ? latestBar.close.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-            : latestBar.close.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 6 });
-
-      const lastTradeLine: PriceLine = {
-        id: 'last-trade',
-        price: latestBar.close,
-        lineStyle: 'dotted',
-        color:
-          latestBar.close >= latestBar.open
-            ? this._renderOptions?.upColor || '#26a69a'
-            : this._renderOptions?.downColor || '#ef5350',
-        label: {
-          primaryText: priceText,
-        },
-        type: 'price',
+      const lastTradeLine = buildLastTradePriceLine({
+        latestBar,
+        interval: this._interval,
+        pricePrecision: this._renderOptions?.pricePrecision,
+        upColor: this._renderOptions?.upColor,
+        downColor: this._renderOptions?.downColor,
         renderLineOnCanvas: true,
-        countdownToTime: barCloseTime,
-      };
+      });
+      if (!lastTradeLine) return;
       this._ui.setPriceLines([lastTradeLine]);
     }
   }
