@@ -618,6 +618,7 @@ export class PriceLineManager {
       stroke: bound.color,
       strokeWidth: 1,
       cornerRadius: 2,
+      listening: false,
     });
     group.add(priceAxisRect);
     refs.priceAxisRect = priceAxisRect;
@@ -635,6 +636,7 @@ export class PriceLineManager {
         fill: bound.label.textColor || bound.color,
         align: 'center',
         verticalAlign: 'middle',
+        listening: false,
       });
       group.add(primaryTextNode);
       refs.priceAxisPrimaryText = primaryTextNode;
@@ -649,6 +651,7 @@ export class PriceLineManager {
         fill: bound.label.textColor || bound.color,
         align: 'center',
         verticalAlign: 'middle',
+        listening: false,
       });
       group.add(secondaryTextNode);
       refs.priceAxisSecondaryText = secondaryTextNode;
@@ -671,6 +674,7 @@ export class PriceLineManager {
         fill: bound.label.textColor || bound.color,
         align: 'center',
         verticalAlign: 'middle',
+        listening: false,
       });
       group.add(primaryTextNode);
       refs.priceAxisPrimaryText = primaryTextNode;
@@ -1189,6 +1193,7 @@ export class PriceLineManager {
       stroke: bound.color,
       strokeWidth: 1,
       cornerRadius: 2,
+      listening: false,
     });
     group.add(priceAxisRect);
     refs.priceAxisRect = priceAxisRect;
@@ -1206,6 +1211,7 @@ export class PriceLineManager {
         fill: bound.label.textColor || '#ffffff',
         align: 'center',
         verticalAlign: 'middle',
+        listening: false,
       });
       group.add(primaryTextNode);
       refs.priceAxisPrimaryText = primaryTextNode;
@@ -1220,6 +1226,7 @@ export class PriceLineManager {
         fill: bound.label.textColor || '#ffffff',
         align: 'center',
         verticalAlign: 'middle',
+        listening: false,
       });
       group.add(tradingSecondaryTextNode);
       refs.priceAxisSecondaryText = tradingSecondaryTextNode;
@@ -1243,6 +1250,7 @@ export class PriceLineManager {
         fill: bound.label.textColor || '#ffffff',
         align: 'center',
         verticalAlign: 'middle',
+        listening: false,
       });
       group.add(primaryTextNode);
       refs.priceAxisPrimaryText = primaryTextNode;

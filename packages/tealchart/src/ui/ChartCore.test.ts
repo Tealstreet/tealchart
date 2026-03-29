@@ -89,6 +89,12 @@ interface PriceLineManagerProbe {
   options: { fontFamily?: string };
 }
 
+interface LineContentRefsProbe {
+  priceAxisRect?: { listening(): boolean };
+  priceAxisPrimaryText?: { listening(): boolean };
+  priceAxisSecondaryText?: { listening(): boolean };
+}
+
 // ============================================================================
 // Tests
 // ============================================================================
@@ -513,6 +519,56 @@ describe('ChartCore viewport management', () => {
     };
     expect(updatedBound.partialEnabled).toBe(true);
     expect(updatedBound.positionId).toBe('position-1b');
+    core.dispose();
+  });
+
+  it('does not mark price-axis labels as interactive Konva hit targets', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+    });
+
+    core.setBars(makeBars(5));
+    core.setOrderLines([
+      {
+        id: 'order-axis-hit',
+        price: 50010,
+        lineColor: '#ff0000',
+        lineStyle: 2,
+        lineLength: 100,
+        extendLeft: true,
+        lineWidth: 1,
+        editable: true,
+        cancellable: true,
+        partialEnabled: false,
+        brackets: null,
+        text: 'Limit',
+        textShort: 'Lmt',
+        quantity: '1',
+        quantityShort: '1',
+        bodyBackgroundColor: '#111111',
+        bodyTextColor: '#ffffff',
+        bodyBorderColor: '#ff0000',
+        quantityBackgroundColor: '#111111',
+        quantityTextColor: '#ffffff',
+        quantityBorderColor: '#ff0000',
+        cancelButtonBackgroundColor: '#111111',
+        cancelButtonIconColor: '#ffffff',
+        cancelButtonBorderColor: '#ff0000',
+        cancelTooltip: 'Cancel',
+        modifyTooltip: 'Modify',
+        callbacks: {},
+      },
+    ]);
+    core.paint(DIRTY.FULL);
+
+    const manager = (core as unknown as { priceLineManager: PriceLineManagerProbe }).priceLineManager;
+    const refs = manager.cachedLineGroups.get('order-axis-hit')?.getAttr('contentRefs') as LineContentRefsProbe;
+
+    expect(refs.priceAxisRect?.listening()).toBe(false);
+    expect(refs.priceAxisPrimaryText?.listening()).toBe(false);
     core.dispose();
   });
 });
