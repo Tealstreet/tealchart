@@ -643,6 +643,7 @@ export class ChartCore {
             this._bracketDragState = null;
             this.renderCrosshairOverlay();
           },
+          fontFamily: this.renderer.font,
           onCursorChange: (cursor) => {
             const wasDragging = this.cursor === 'grabbing';
             this.cursor = cursor;
@@ -975,6 +976,9 @@ export class ChartCore {
   setRenderOptions(options: Partial<RenderOptions>): void {
     this.options.renderOptions = { ...this.options.renderOptions, ...options };
     this.renderer.setOptions(options);
+    if (options.fontFamily !== undefined) {
+      this.priceLineManager?.setFontFamily(this.renderer.font);
+    }
     if (options.backgroundColor) {
       this.canvas.style.backgroundColor = options.backgroundColor;
     }
@@ -1670,9 +1674,21 @@ export class ChartCore {
       for (const b of this.labelBoundsCache) {
         const line = lineMap.get(b.lineId);
         if (line) {
+          b.price = line.price;
           b.label = line.label;
           b.chartLabel = line.chartLabel;
           b.color = line.color;
+          b.lineStyle = line.lineStyle;
+          b.lineLength = line.lineLength;
+          b.extendLeft = line.extendLeft;
+          b.lineWidth = line.lineWidth;
+          b.renderLineOnCanvas = line.renderLineOnCanvas;
+          b.countdownToTime = line.countdownToTime;
+          b.draggable = line.draggable;
+          b.positionId = line.positionId;
+          b.partialEnabled = line.partialEnabled;
+          b.positionData = line.positionData;
+          b.brackets = line.brackets;
           b.callbacks = line.callbacks;
           b.targetPaneId = line.targetPaneId;
         }

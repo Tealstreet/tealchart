@@ -69,6 +69,8 @@ export interface PriceLineManagerOptions {
   onCursorChange?: (cursor: 'crosshair' | 'pointer' | 'grab' | 'grabbing') => void;
   /** Callback when context menu button is clicked */
   onContextMenuButtonClick?: (price: number, screenX: number, screenY: number) => void;
+  /** Font family for Konva label rendering */
+  fontFamily?: string;
 }
 
 export interface CrosshairState {
@@ -96,6 +98,11 @@ interface CachedLineContentRefs {
   buttonRects?: Konva.Rect[];
   buttonTexts?: Array<Konva.Text | undefined>;
   buttonIcons?: Array<Konva.Shape[] | undefined>;
+}
+
+interface CountdownTextNodeRef {
+  text: Konva.Text;
+  targetTime: number;
 }
 
 // ============================================================================
@@ -134,6 +141,14 @@ function calculatePartialPercent(startX: number, currentX: number): number {
 
 let textMeasureContext: CanvasRenderingContext2D | null = null;
 
+function resolveFontFamily(fontFamily?: string): string {
+  const trimmed = fontFamily?.trim();
+  if (!trimmed || trimmed === 'inherit' || trimmed.includes('var(')) {
+    return 'sans-serif';
+  }
+  return trimmed;
+}
+
 function measureLabelTextWidth(text: string, fontSize = 11, fontFamily = 'sans-serif', fontStyle = ''): number {
   if (typeof document === 'undefined') {
     return text.length * 6;
@@ -151,8 +166,8 @@ function measureLabelTextWidth(text: string, fontSize = 11, fontFamily = 'sans-s
   return textMeasureContext.measureText(text).width;
 }
 
-function getSegmentWidth(text: string): number {
-  return Math.ceil(measureLabelTextWidth(text, 11, 'sans-serif')) + SEGMENT_HORIZONTAL_PADDING;
+function getSegmentWidth(text: string, fontFamily: string): number {
+  return Math.ceil(measureLabelTextWidth(text, 11, fontFamily)) + SEGMENT_HORIZONTAL_PADDING;
 }
 
 function getOrderedButtons(buttons: NonNullable<PriceLineLabelBounds['chartLabel']>['buttons'] = []) {
@@ -208,7 +223,7 @@ export class PriceLineManager {
   private countdownTimer: ReturnType<typeof setInterval> | null = null;
 
   // Map of lineId -> countdown Konva.Text nodes for efficient text-only updates
-  private countdownTextNodes: Map<string, { text: Konva.Text; targetTime: number }[]> = new Map();
+  private countdownTextNodes: Map<string, CountdownTextNodeRef[]> = new Map();
 
   // Cached element groups by lineId for efficient updates
   private cachedLineGroups: Map<string, Konva.Group> = new Map();
@@ -296,6 +311,7 @@ export class PriceLineManager {
             b.width,
             b.height,
             b.lineLength ?? '',
+            b.countdownToTime !== undefined ? '1' : '0',
             b.label?.primaryText ?? '',
             b.label?.secondaryText ?? '',
             b.label?.backgroundColor ?? '',
@@ -331,6 +347,7 @@ export class PriceLineManager {
         }
 
         cachedGroup.opacity(this.pendingOrders.has(bound.lineId) ? 0.5 : 1);
+        this.setCurrentBound(cachedGroup, bound);
         this.updateLineContent(cachedGroup, bound);
       }
     }
@@ -372,6 +389,36 @@ export class PriceLineManager {
     return this.activeDrag?.lineId ?? null;
   }
 
+  setFontFamily(fontFamily?: string): void {
+    const nextFontFamily = resolveFontFamily(fontFamily);
+    if (nextFontFamily === this.getTextFontFamily()) return;
+    this.options.fontFamily = nextFontFamily;
+    this.needsFullRebuild = true;
+    this.render();
+  }
+
+  private getTextFontFamily(): string {
+    return resolveFontFamily(this.options.fontFamily);
+  }
+
+  private setCurrentBound(group: Konva.Group, bound: PriceLineLabelBounds): void {
+    group.setAttr('boundData', bound);
+    this.syncCountdownTargets(bound);
+  }
+
+  private getCurrentBound(group: Konva.Group, fallback: PriceLineLabelBounds): PriceLineLabelBounds {
+    return (group.getAttr('boundData') as PriceLineLabelBounds | undefined) ?? fallback;
+  }
+
+  private syncCountdownTargets(bound: PriceLineLabelBounds): void {
+    if (bound.countdownToTime === undefined) return;
+    const refs = this.countdownTextNodes.get(bound.lineId);
+    if (!refs) return;
+    for (const ref of refs) {
+      ref.targetTime = bound.countdownToTime;
+    }
+  }
+
   private updateLineContent(group: Konva.Group, bound: PriceLineLabelBounds): void {
     const refs = group.getAttr('contentRefs') as CachedLineContentRefs | undefined;
     if (!refs) return;
@@ -384,8 +431,12 @@ export class PriceLineManager {
     refs.priceAxisPrimaryText?.text(bound.label.primaryText);
     refs.priceAxisPrimaryText?.fill(bound.label.textColor || (bound.type === 'price' ? bound.color : '#ffffff'));
 
-    if (refs.priceAxisSecondaryText && bound.countdownToTime === undefined) {
-      refs.priceAxisSecondaryText.text(bound.label.secondaryText || '');
+    if (refs.priceAxisSecondaryText) {
+      if (bound.countdownToTime !== undefined) {
+        refs.priceAxisSecondaryText.text(formatCountdown(bound.countdownToTime));
+      } else {
+        refs.priceAxisSecondaryText.text(bound.label.secondaryText || '');
+      }
       refs.priceAxisSecondaryText.fill(bound.label.textColor || (bound.type === 'price' ? bound.color : '#ffffff'));
     }
 
@@ -430,7 +481,7 @@ export class PriceLineManager {
   private updateCountdownTexts(): void {
     let hasUpdates = false;
 
-    for (const [lineId, nodes] of this.countdownTextNodes) {
+    for (const [, nodes] of this.countdownTextNodes) {
       for (const { text, targetTime } of nodes) {
         const newText = formatCountdown(targetTime);
         if (text.text() !== newText) {
@@ -513,6 +564,7 @@ export class PriceLineManager {
     // Create group for this price line
     const lineGroup = new Konva.Group({ opacity });
     lineGroup.setAttr('lineY', lineY); // Store for fast position updates
+    this.setCurrentBound(lineGroup, bound);
     this.group.add(lineGroup);
     this.cachedLineGroups.set(bound.lineId, lineGroup);
 
@@ -555,6 +607,7 @@ export class PriceLineManager {
   private renderPriceAxisLabel(group: Konva.Group, bound: PriceLineLabelBounds, x: number, y: number): void {
     const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
     const refs = (group.getAttr('contentRefs') as CachedLineContentRefs | undefined) || {};
+    const fontFamily = this.getTextFontFamily();
 
     // Border-only label
     const priceAxisRect = new Konva.Rect({
@@ -578,7 +631,7 @@ export class PriceLineManager {
         height: bound.height / 2,
         text: bound.label.primaryText,
         fontSize: 11,
-        fontFamily: 'sans-serif',
+        fontFamily,
         fill: bound.label.textColor || bound.color,
         align: 'center',
         verticalAlign: 'middle',
@@ -592,7 +645,7 @@ export class PriceLineManager {
         height: bound.height / 2,
         text: secondaryText,
         fontSize: 11,
-        fontFamily: 'sans-serif',
+        fontFamily,
         fill: bound.label.textColor || bound.color,
         align: 'center',
         verticalAlign: 'middle',
@@ -614,7 +667,7 @@ export class PriceLineManager {
         height: bound.height,
         text: bound.label.primaryText,
         fontSize: 11,
-        fontFamily: 'sans-serif',
+        fontFamily,
         fill: bound.label.textColor || bound.color,
         align: 'center',
         verticalAlign: 'middle',
@@ -636,6 +689,7 @@ export class PriceLineManager {
     lineDash: number[],
   ): void {
     const { width, margins, yToPrice, priceToY } = this.options;
+    const fontFamily = this.getTextFontFamily();
     const chartLabel = bound.chartLabel;
     const isDraggable = bound.draggable ?? false;
 
@@ -651,7 +705,7 @@ export class PriceLineManager {
     if (chartLabel && chartLabel.segments.length > 0) {
       for (const segment of chartLabel.segments) {
         const text = useNarrowText && segment.textShort ? segment.textShort : segment.text;
-        segmentsWidth += getSegmentWidth(text);
+        segmentsWidth += getSegmentWidth(text, fontFamily);
       }
       chartLabelWidth = segmentsWidth + tpslGap;
       for (const button of orderedButtons) {
@@ -747,11 +801,12 @@ export class PriceLineManager {
           (activeDrag?.group?.getAttr('lineY') as number | undefined) ??
           dragRect.getAbsolutePosition().y + TOUCH_TARGET_HEIGHT / 2;
         const finalPrice = yToPrice(finalY);
+        const currentBound = this.getCurrentBound(group, bound);
 
         dragRect.y(dragStartY);
 
         if (!this.dragCancelled && Math.abs(finalY - lineY) > 1) {
-          this.options.onOrderMove?.(bound.lineId, finalPrice);
+          this.options.onOrderMove?.(currentBound.lineId, finalPrice);
         } else if (activeDrag?.group) {
           activeDrag.group.y(activeDrag.originalGroupY ?? 0);
           activeDrag.group.setAttr('lineY', activeDrag.originalY);
@@ -785,7 +840,7 @@ export class PriceLineManager {
       for (let i = 0; i < chartLabel.segments.length; i++) {
         const segment = chartLabel.segments[i];
         const text = useNarrowText && segment.textShort ? segment.textShort : segment.text;
-        const textWidth = getSegmentWidth(text);
+        const textWidth = getSegmentWidth(text, fontFamily);
         const isFirst = i === 0;
         const isLast = i === chartLabel.segments.length - 1;
 
@@ -806,7 +861,7 @@ export class PriceLineManager {
           height: LABEL_HEIGHT,
           text,
           fontSize: 11,
-          fontFamily: 'sans-serif',
+          fontFamily,
           fill: segment.textColor,
           align: 'center',
           verticalAlign: 'middle',
@@ -875,7 +930,7 @@ export class PriceLineManager {
             height: LABEL_HEIGHT,
             text: button.type === 'tp' ? 'TP' : 'SL',
             fontSize: 10,
-            fontFamily: 'sans-serif',
+            fontFamily,
             fontStyle: 'bold',
             fill: button.iconColor,
             align: 'center',
@@ -907,17 +962,18 @@ export class PriceLineManager {
           });
 
           hitRect.on('dragstart', () => {
+            const currentBound = this.getCurrentBound(group, bound);
             this.activeDrag = {
               node: hitRect,
               type: 'tpsl',
-              lineId: bound.lineId,
-              positionId: bound.positionId || bound.lineId,
+              lineId: currentBound.lineId,
+              positionId: currentBound.positionId || currentBound.lineId,
               buttonType,
               originalX,
               originalY,
-              originalPrice: bound.price,
+              originalPrice: currentBound.price,
               startCenterX,
-              partialEnabled: bound.partialEnabled ?? false,
+              partialEnabled: currentBound.partialEnabled ?? false,
               onCancel: () => {
                 this.options.onTPSLDragCancel?.();
               },
@@ -933,23 +989,24 @@ export class PriceLineManager {
             const currentCenterX = hitRect.x() + buttonWidth / 2;
             const currentCenterY = hitRect.y() + LABEL_HEIGHT / 2;
             const price = yToPrice(currentCenterY);
+            const currentBound = this.getCurrentBound(group, bound);
             const partialPercent = activeDrag.partialEnabled
               ? calculatePartialPercent(activeDrag.startCenterX || startCenterX, currentCenterX)
               : 100;
 
             if (buttonType === 'tp') {
-              bound.callbacks?.onTPMove?.(price, partialPercent);
+              currentBound.callbacks?.onTPMove?.(price, partialPercent);
               this.options.onTPMovePreview?.(
-                activeDrag.positionId || bound.lineId,
+                activeDrag.positionId || currentBound.lineId,
                 price,
                 partialPercent,
                 activeDrag.startCenterX || startCenterX,
                 currentCenterX,
               );
             } else {
-              bound.callbacks?.onSLMove?.(price, partialPercent);
+              currentBound.callbacks?.onSLMove?.(price, partialPercent);
               this.options.onSLMovePreview?.(
-                activeDrag.positionId || bound.lineId,
+                activeDrag.positionId || currentBound.lineId,
                 price,
                 partialPercent,
                 activeDrag.startCenterX || startCenterX,
@@ -967,6 +1024,7 @@ export class PriceLineManager {
             const deltaX = Math.abs(currentCenterX - (activeDrag.startCenterX || startCenterX));
             const deltaY = Math.abs(currentCenterY - (activeDrag.originalY + LABEL_HEIGHT / 2));
             const price = yToPrice(currentCenterY);
+            const currentBound = this.getCurrentBound(group, bound);
             const partialPercent = activeDrag.partialEnabled
               ? calculatePartialPercent(activeDrag.startCenterX || startCenterX, currentCenterX)
               : undefined;
@@ -977,18 +1035,18 @@ export class PriceLineManager {
 
             if (!this.dragCancelled && (deltaX > DRAG_THRESHOLD || deltaY > DRAG_THRESHOLD)) {
               if (buttonType === 'tp') {
-                bound.callbacks?.onTPMoveEnd?.(price, partialPercent);
+                currentBound.callbacks?.onTPMoveEnd?.(price, partialPercent);
               } else {
-                bound.callbacks?.onSLMoveEnd?.(price, partialPercent);
+                currentBound.callbacks?.onSLMoveEnd?.(price, partialPercent);
               }
               this.options.onTPSLDragEnd?.();
             } else if (!this.dragCancelled) {
               if (buttonType === 'tp') {
-                bound.callbacks?.onTPClick?.();
-                this.options.onTPClick?.(activeDrag.positionId || bound.lineId);
+                currentBound.callbacks?.onTPClick?.();
+                this.options.onTPClick?.(activeDrag.positionId || currentBound.lineId);
               } else {
-                bound.callbacks?.onSLClick?.();
-                this.options.onSLClick?.(activeDrag.positionId || bound.lineId);
+                currentBound.callbacks?.onSLClick?.();
+                this.options.onSLClick?.(activeDrag.positionId || currentBound.lineId);
               }
               this.options.onTPSLDragCancel?.();
             }
@@ -1054,7 +1112,7 @@ export class PriceLineManager {
             height: LABEL_HEIGHT,
             text: '\u21c4',
             fontSize: 11,
-            fontFamily: 'sans-serif',
+            fontFamily,
             fill: button.iconColor,
             align: 'center',
             verticalAlign: 'middle',
@@ -1136,6 +1194,7 @@ export class PriceLineManager {
     refs.priceAxisRect = priceAxisRect;
 
     if (secondaryText) {
+      const fontFamily = this.getTextFontFamily();
       const primaryTextNode = new Konva.Text({
         x: priceAxisLabelX,
         y: priceAxisLabelY + 1,
@@ -1143,7 +1202,7 @@ export class PriceLineManager {
         height: bound.height / 2,
         text: bound.label.primaryText,
         fontSize: 11,
-        fontFamily: 'sans-serif',
+        fontFamily,
         fill: bound.label.textColor || '#ffffff',
         align: 'center',
         verticalAlign: 'middle',
@@ -1157,7 +1216,7 @@ export class PriceLineManager {
         height: bound.height / 2,
         text: secondaryText,
         fontSize: 11,
-        fontFamily: 'sans-serif',
+        fontFamily,
         fill: bound.label.textColor || '#ffffff',
         align: 'center',
         verticalAlign: 'middle',
@@ -1172,6 +1231,7 @@ export class PriceLineManager {
         this.countdownTextNodes.set(bound.lineId, existing);
       }
     } else {
+      const fontFamily = this.getTextFontFamily();
       const primaryTextNode = new Konva.Text({
         x: priceAxisLabelX,
         y: priceAxisLabelY,
@@ -1179,7 +1239,7 @@ export class PriceLineManager {
         height: bound.height,
         text: bound.label.primaryText,
         fontSize: 11,
-        fontFamily: 'sans-serif',
+        fontFamily,
         fill: bound.label.textColor || '#ffffff',
         align: 'center',
         verticalAlign: 'middle',

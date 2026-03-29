@@ -3,6 +3,7 @@ import type { Bar, Viewport } from '../types';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { TealchartRenderer } from '../TealchartRenderer';
+import { DIRTY } from '../rendering/RenderScheduler';
 
 // Mock EventManager (survives mockReset)
 vi.mock('../interaction/EventManager', () => ({
@@ -73,6 +74,19 @@ function makeBars(count: number, startTime = 1_000_000, interval = 60_000, baseP
     close: basePrice + (i + 1) * 10,
     volume: 100 + i,
   }));
+}
+
+interface CountdownManagerProbe {
+  countdownTextNodes: Map<string, Array<{ targetTime: number }>>;
+}
+
+interface CachedGroupProbe {
+  getAttr(name: string): unknown;
+}
+
+interface PriceLineManagerProbe {
+  cachedLineGroups: Map<string, CachedGroupProbe>;
+  options: { fontFamily?: string };
 }
 
 // ============================================================================
@@ -333,6 +347,172 @@ describe('ChartCore viewport management', () => {
     core.paint(0xff);
 
     expect(core.getViewport()).not.toBeNull();
+    core.dispose();
+  });
+
+  it('updates cached line countdown targets without forcing a rebuild', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+    });
+
+    core.setBars(makeBars(5));
+    core.setPriceLines([
+      {
+        id: 'countdown-line',
+        price: 50000,
+        lineStyle: 'dashed',
+        color: '#22c55e',
+        label: {
+          primaryText: '50000',
+          secondaryText: 'TP',
+          backgroundColor: '#22c55e',
+          textColor: '#ffffff',
+        },
+        countdownToTime: 1_000,
+      },
+    ]);
+    core.paint(DIRTY.FULL);
+
+    const manager = (core as unknown as { priceLineManager: CountdownManagerProbe }).priceLineManager;
+    expect(manager.countdownTextNodes.get('countdown-line')?.[0]?.targetTime).toBe(1_000);
+
+    core.setPriceLines([
+      {
+        id: 'countdown-line',
+        price: 50000,
+        lineStyle: 'dashed',
+        color: '#22c55e',
+        label: {
+          primaryText: '50000',
+          secondaryText: 'TP',
+          backgroundColor: '#22c55e',
+          textColor: '#ffffff',
+        },
+        countdownToTime: 2_000,
+      },
+    ]);
+    core.paint(DIRTY.FULL);
+
+    expect(manager.countdownTextNodes.get('countdown-line')?.[0]?.targetTime).toBe(2_000);
+    core.dispose();
+  });
+
+  it('updates cached line data and font on the fast path', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      renderOptions: {
+        fontFamily: 'Mock Font',
+      },
+    });
+
+    core.setBars(makeBars(5));
+    core.setPositionLines([
+      {
+        id: 'position-1',
+        positionId: 'position-1',
+        price: 50010,
+        lineColor: '#ff0000',
+        lineStyle: 0,
+        lineLength: 100,
+        extendLeft: true,
+        lineWidth: 1,
+        partialEnabled: false,
+        reversible: false,
+        closeable: true,
+        brackets: {},
+        text: 'Pos',
+        textShort: 'Pos',
+        quantity: '1',
+        quantityShort: '1',
+        pnl: '+$0.00',
+        pnlShort: '+0',
+        profitState: 'positive',
+        bodyBackgroundColor: '#111111',
+        bodyTextColor: '#ffffff',
+        bodyBorderColor: '#ff0000',
+        quantityBackgroundColor: '#111111',
+        quantityTextColor: '#ffffff',
+        quantityBorderColor: '#ff0000',
+        closeButtonBackgroundColor: '#111111',
+        closeButtonIconColor: '#ffffff',
+        closeButtonBorderColor: '#ff0000',
+        closeTooltip: 'Close',
+        protectTooltipText: 'Protect',
+        reverseButtonBackgroundColor: '#111111',
+        reverseButtonIconColor: '#ffffff',
+        reverseButtonBorderColor: '#ff0000',
+        positionData: {
+          entryPrice: 50000,
+          isLong: true,
+          notional: 1000,
+        },
+        callbacks: {},
+      },
+    ]);
+    core.paint(DIRTY.FULL);
+
+    const manager = (core as unknown as { priceLineManager: PriceLineManagerProbe }).priceLineManager;
+    const initialBound = manager.cachedLineGroups.get('position-1')?.getAttr('boundData') as { partialEnabled?: boolean };
+    expect(initialBound.partialEnabled).toBe(false);
+    expect(manager.options.fontFamily).toBe('Mock Font');
+
+    core.setPositionLines([
+      {
+        id: 'position-1',
+        positionId: 'position-1b',
+        price: 50010,
+        lineColor: '#ff0000',
+        lineStyle: 0,
+        lineLength: 100,
+        extendLeft: true,
+        lineWidth: 1,
+        partialEnabled: true,
+        reversible: false,
+        closeable: true,
+        brackets: {},
+        text: 'Pos',
+        textShort: 'Pos',
+        quantity: '1',
+        quantityShort: '1',
+        pnl: '+$0.00',
+        pnlShort: '+0',
+        profitState: 'positive',
+        bodyBackgroundColor: '#111111',
+        bodyTextColor: '#ffffff',
+        bodyBorderColor: '#ff0000',
+        quantityBackgroundColor: '#111111',
+        quantityTextColor: '#ffffff',
+        quantityBorderColor: '#ff0000',
+        closeButtonBackgroundColor: '#111111',
+        closeButtonIconColor: '#ffffff',
+        closeButtonBorderColor: '#ff0000',
+        closeTooltip: 'Close',
+        protectTooltipText: 'Protect',
+        reverseButtonBackgroundColor: '#111111',
+        reverseButtonIconColor: '#ffffff',
+        reverseButtonBorderColor: '#ff0000',
+        positionData: {
+          entryPrice: 50000,
+          isLong: true,
+          notional: 1000,
+        },
+        callbacks: {},
+      },
+    ]);
+    core.paint(DIRTY.FULL);
+
+    const updatedBound = manager.cachedLineGroups.get('position-1')?.getAttr('boundData') as {
+      partialEnabled?: boolean;
+      positionId?: string;
+    };
+    expect(updatedBound.partialEnabled).toBe(true);
+    expect(updatedBound.positionId).toBe('position-1b');
     core.dispose();
   });
 });
