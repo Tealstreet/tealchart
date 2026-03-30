@@ -16,6 +16,7 @@ import { TealchartWidget } from './TealchartWidget';
 const setSymbolCalls: { symbol: string; exchangeName?: string }[] = [];
 const setBarsCalls: Bar[][] = [];
 const setRenderOptionsCalls: Array<unknown> = [];
+const setExecutionLinesCalls: Array<unknown> = [];
 
 // Use plain classes for mocks so mockReset doesn't strip implementations
 vi.mock('./ui/TealchartWidgetUI', () => ({
@@ -27,6 +28,9 @@ vi.mock('./ui/TealchartWidgetUI', () => ({
     setLoading() {}
     setOrderLines() {}
     setPositionLines() {}
+    setExecutionLines(lines: unknown) {
+      setExecutionLinesCalls.push(lines);
+    }
     setPriceLines() {}
     setPaneLayout() {}
     setPaneYRanges() {}
@@ -194,6 +198,7 @@ describe('TealchartWidget', () => {
     setSymbolCalls.length = 0;
     setBarsCalls.length = 0;
     setRenderOptionsCalls.length = 0;
+    setExecutionLinesCalls.length = 0;
     // Return null so _renderRafId doesn't get stuck at 0 after
     // the callback synchronously sets it to null (assignment order issue).
     vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
@@ -323,6 +328,34 @@ describe('TealchartWidget', () => {
 
       // Widget should reflect SOL, not ETH
       expect(widget.symbol()).toBe('SOLUSDT');
+    });
+  });
+
+  describe('execution markers', () => {
+    it('pushes execution shape render data through the widget line render path', async () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed);
+
+      const shape = await widget.chart().createExecutionShape();
+      shape
+        .setPrice(50123.45)
+        .setTime(1710000000)
+        .setDirection('sell')
+        .setText('0.25')
+        .setArrowColor('#ff9500');
+
+      await Promise.resolve();
+
+      const lastCall = setExecutionLinesCalls[setExecutionLinesCalls.length - 1] as Array<any>;
+      expect(lastCall).toHaveLength(1);
+      expect(lastCall[0]).toMatchObject({
+        price: 50123.45,
+        time: 1710000000,
+        direction: 'sell',
+        text: '0.25',
+        arrowColor: '#ff9500',
+      });
     });
   });
 

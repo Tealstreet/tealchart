@@ -71,6 +71,7 @@ export type {
   PriceLine,
   PriceLineLabel,
   PriceLineLabelBounds,
+  ExecutionLineRenderData,
   // TradingView-compatible types
   WidgetEvent,
   ResolutionString,
@@ -81,6 +82,8 @@ export type {
   ContextMenuCallback,
   ITimeScaleApi,
   // Order/Position line types
+  ExecutionDirection,
+  IExecutionLineAdapter,
   OrderLineOptions,
   IOrderLineAdapter,
   PositionLineOptions,

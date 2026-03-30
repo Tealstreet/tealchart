@@ -141,6 +141,7 @@ export type {
   RenderOptions,
   ChartMargins,
   PriceLine,
+  ExecutionLineRenderData,
   OrderLineRenderData,
   PositionLineRenderData,
   PaneLayout,

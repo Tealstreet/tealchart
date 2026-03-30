@@ -572,6 +572,38 @@ export interface IPositionLineAdapter {
 }
 
 /**
+ * Execution line direction (matches TradingView's Direction type)
+ */
+export type ExecutionDirection = 'buy' | 'sell';
+
+/**
+ * Execution line adapter (matches TradingView's IExecutionLineAdapter)
+ */
+export interface IExecutionLineAdapter {
+  remove(): void;
+  getPrice(): number;
+  setPrice(price: number): this;
+  getTime(): number;
+  setTime(time: number): this;
+  getDirection(): ExecutionDirection;
+  setDirection(direction: ExecutionDirection): this;
+  getText(): string;
+  setText(text: string): this;
+  getTooltip(): string;
+  setTooltip(tooltip: string): this;
+  getArrowHeight(): number;
+  setArrowHeight(height: number): this;
+  getArrowSpacing(): number;
+  setArrowSpacing(spacing: number): this;
+  getFont(): string;
+  setFont(font: string): this;
+  getTextColor(): string;
+  setTextColor(color: string): this;
+  getArrowColor(): string;
+  setArrowColor(color: string): this;
+}
+
+/**
  * Study info (for getAllStudies)
  */
 export interface StudyInfo {
@@ -892,6 +924,25 @@ export interface PositionLineRenderData {
   };
 }
 
+/**
+ * Internal render data extracted from execution line adapter.
+ * Contains all properties needed to draw execution markers on canvas.
+ */
+export interface ExecutionLineRenderData {
+  id: string;
+  price: number;
+  /** Unix timestamp in seconds for TradingView compatibility */
+  time: number;
+  direction: ExecutionDirection;
+  text: string;
+  tooltip: string;
+  arrowHeight: number;
+  arrowSpacing: number;
+  font: string;
+  textColor: string;
+  arrowColor: string;
+}
+
 // ============================================================================
 // TEALSTREET Extension Interfaces
 // Custom methods added via patches to TradingView library
@@ -1011,6 +1062,14 @@ export interface InternalPositionLineAdapter extends FullPositionLineAdapter {
   // TradingView API compatibility (no-op)
   setBodyFont(font: string): this;
   setQuantityFont(font: string): this;
+}
+
+/**
+ * Internal execution line adapter with render data getter (used by TealchartApi)
+ * @internal
+ */
+export interface InternalExecutionLineAdapter extends IExecutionLineAdapter {
+  _getRenderData(): ExecutionLineRenderData;
 }
 
 // ============================================================================

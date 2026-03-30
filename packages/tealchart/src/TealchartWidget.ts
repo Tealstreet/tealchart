@@ -1024,6 +1024,7 @@ export class TealchartWidget {
     if (dirty & DIRTY.LINES) {
       this._ui.setOrderLines(this._chartApi.getOrderLinesRenderData());
       this._ui.setPositionLines(this._chartApi.getPositionLinesRenderData());
+      this._ui.setExecutionLines(this._chartApi.getExecutionLinesRenderData());
       this._updateLastTradeLine();
     }
 

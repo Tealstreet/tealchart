@@ -8,8 +8,12 @@ import {
   BracketConfig,
   CrossHairMovedEventParams,
   EnhancedCrossHairState,
+  ExecutionDirection,
+  ExecutionLineRenderData,
+  IExecutionLineAdapter,
   InternalOrderLineAdapter,
   InternalPositionLineAdapter,
+  InternalExecutionLineAdapter,
   IOrderLineAdapter,
   IPositionLineAdapter,
   IStudyApi,
@@ -60,6 +64,7 @@ export class TealchartApi {
   // Trading lines
   private _orderLines: Map<string, InternalOrderLineAdapter> = new Map();
   private _positionLines: Map<string, InternalPositionLineAdapter> = new Map();
+  private _executionLines: Map<string, InternalExecutionLineAdapter> = new Map();
   private _lineIdCounter = 0;
   private _onLinesChanged?: () => void;
   private _onOrderPriceChanged?: (orderId: string, newPrice: number) => void;
@@ -262,6 +267,18 @@ export class TealchartApi {
     this._positionLines.set(id, adapter);
     this._onLinesChanged?.();
     // Return a sync promise - .then() executes immediately to match TradingView behavior
+    return createSyncPromise(adapter);
+  }
+
+  /**
+   * Create an execution marker on the chart.
+   * Returns a Promise for TradingView API compatibility.
+   */
+  createExecutionShape(): Promise<IExecutionLineAdapter> {
+    const id = `execution_${++this._lineIdCounter}`;
+    const adapter = this._createExecutionLineAdapter(id);
+    this._executionLines.set(id, adapter);
+    this._onLinesChanged?.();
     return createSyncPromise(adapter);
   }
 
@@ -931,6 +948,129 @@ export class TealchartApi {
     return adapter;
   }
 
+  /**
+   * @internal Create execution line adapter with TradingView-compatible chaining
+   */
+  private _createExecutionLineAdapter(id: string): InternalExecutionLineAdapter {
+    const data: ExecutionLineRenderData = {
+      id,
+      price: 0,
+      time: 0,
+      direction: 'buy',
+      text: '',
+      tooltip: '',
+      arrowHeight: 20,
+      arrowSpacing: 20,
+      font: `11px sans-serif`,
+      textColor: '#ffffff',
+      arrowColor: '#26a69a',
+    };
+
+    const executionLines = this._executionLines;
+    let notifyPending = false;
+    const notifyChange = () => {
+      if (!notifyPending) {
+        notifyPending = true;
+        queueMicrotask(() => {
+          notifyPending = false;
+          this._onLinesChanged?.();
+        });
+      }
+    };
+
+    const adapter: InternalExecutionLineAdapter = {
+      remove() {
+        executionLines.delete(id);
+        notifyChange();
+      },
+      getPrice() {
+        return data.price;
+      },
+      setPrice(price: number) {
+        data.price = price;
+        notifyChange();
+        return this;
+      },
+      getTime() {
+        return data.time;
+      },
+      setTime(time: number) {
+        data.time = time;
+        notifyChange();
+        return this;
+      },
+      getDirection() {
+        return data.direction;
+      },
+      setDirection(direction: ExecutionDirection) {
+        data.direction = direction;
+        notifyChange();
+        return this;
+      },
+      getText() {
+        return data.text;
+      },
+      setText(text: string) {
+        data.text = text;
+        notifyChange();
+        return this;
+      },
+      getTooltip() {
+        return data.tooltip;
+      },
+      setTooltip(tooltip: string) {
+        data.tooltip = tooltip;
+        notifyChange();
+        return this;
+      },
+      getArrowHeight() {
+        return data.arrowHeight;
+      },
+      setArrowHeight(height: number) {
+        data.arrowHeight = height;
+        notifyChange();
+        return this;
+      },
+      getArrowSpacing() {
+        return data.arrowSpacing;
+      },
+      setArrowSpacing(spacing: number) {
+        data.arrowSpacing = spacing;
+        notifyChange();
+        return this;
+      },
+      getFont() {
+        return data.font;
+      },
+      setFont(font: string) {
+        data.font = font;
+        notifyChange();
+        return this;
+      },
+      getTextColor() {
+        return data.textColor;
+      },
+      setTextColor(color: string) {
+        data.textColor = color;
+        notifyChange();
+        return this;
+      },
+      getArrowColor() {
+        return data.arrowColor;
+      },
+      setArrowColor(color: string) {
+        data.arrowColor = color;
+        notifyChange();
+        return this;
+      },
+      _getRenderData(): ExecutionLineRenderData {
+        return { ...data };
+      },
+    };
+
+    return adapter;
+  }
+
   // ============================================================================
   // Studies
   // ============================================================================
@@ -1118,6 +1258,14 @@ export class TealchartApi {
   }
 
   /**
+   * Clear all execution markers without calling individual remove() callbacks
+   */
+  clearAllExecutionLines(): void {
+    this._executionLines.clear();
+    this._onLinesChanged?.();
+  }
+
+  /**
    * @internal Clean up all subscriptions, lines, and studies
    */
   dispose(): void {
@@ -1126,6 +1274,7 @@ export class TealchartApi {
     this._intervalChangedSubscription.clear();
     this._orderLines.clear();
     this._positionLines.clear();
+    this._executionLines.clear();
     this._studies.clear();
   }
 
@@ -1173,6 +1322,13 @@ export class TealchartApi {
    */
   getPositionLines(): Map<string, InternalPositionLineAdapter> {
     return this._positionLines;
+  }
+
+  /**
+   * @internal Get all execution markers for rendering
+   */
+  getExecutionLines(): Map<string, InternalExecutionLineAdapter> {
+    return this._executionLines;
   }
 
   /**
@@ -1227,6 +1383,13 @@ export class TealchartApi {
     // Add deduplicated lines (last occurrence of each positionId)
     result.push(...seenPositionIds.values());
     return result;
+  }
+
+  /**
+   * @internal Get execution marker render data for canvas drawing
+   */
+  getExecutionLinesRenderData(): ExecutionLineRenderData[] {
+    return Array.from(this._executionLines.values()).map((adapter) => adapter._getRenderData());
   }
 
   /**

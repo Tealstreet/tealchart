@@ -5,6 +5,7 @@ import type { PlotStyleOverride } from '../state/chartState';
 import type {
   Bar,
   ContextMenuItem,
+  ExecutionLineRenderData,
   OrderLineRenderData,
   PaneLayout,
   PositionLineRenderData,
@@ -341,6 +342,13 @@ export class TealchartWidgetUI {
    */
   setPositionLines(lines: PositionLineRenderData[]): void {
     this.chartCore?.setPositionLines(lines);
+  }
+
+  /**
+   * Update execution markers - calls ChartCore directly
+   */
+  setExecutionLines(lines: ExecutionLineRenderData[]): void {
+    this.chartCore?.setExecutionLines(lines);
   }
 
   /**

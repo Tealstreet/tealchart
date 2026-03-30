@@ -30,6 +30,7 @@ import {
   ChartPane,
   ContextMenuItem,
   DEFAULT_MARGINS,
+  ExecutionLineRenderData,
   OrderLineRenderData,
   PaneLayout,
   PendingOrderUpdate,
@@ -490,6 +491,7 @@ export class ChartCore {
   private priceLines: PriceLine[] = [];
   private orderLines: OrderLineRenderData[] = [];
   private positionLines: PositionLineRenderData[] = [];
+  private executionLines: ExecutionLineRenderData[] = [];
   private plots: PlotOutput[] = [];
   private paneLayout: PaneLayout | undefined;
   private unifiedPaneLayout: UnifiedPaneLayout | undefined;
@@ -908,6 +910,16 @@ export class ChartCore {
     if (this.eventManager.getIsDragging() || this.priceLineManager?.isDragging()) return;
     if (lines === this.positionLines) return;
     this.positionLines = lines;
+    // No scheduleRender — paint() is called by the widget after pushing state
+  }
+
+  /**
+   * Set execution markers
+   * Reference equality check - skip if same array
+   */
+  setExecutionLines(lines: ExecutionLineRenderData[]): void {
+    if (lines === this.executionLines) return;
+    this.executionLines = lines;
     // No scheduleRender — paint() is called by the widget after pushing state
   }
 
@@ -1710,6 +1722,7 @@ export class ChartCore {
       crosshairState,
       this.plotStyleOverrides,
       canvasLabelBounds,
+      this.executionLines,
     );
   }
 

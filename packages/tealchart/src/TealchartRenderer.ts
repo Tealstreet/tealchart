@@ -15,6 +15,7 @@ import {
   DEFAULT_MARGINS,
   DEFAULT_RENDER_OPTIONS,
   // Legacy types for backward compatibility
+  ExecutionLineRenderData,
   IndicatorPane,
   LastTradeInfo,
   OrderLineRenderData,
@@ -245,6 +246,7 @@ export class TealchartRenderer {
     crosshair?: CrosshairState,
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
     precomputedPriceLineBounds?: PriceLineLabelBounds[],
+    executionLines?: ExecutionLineRenderData[],
   ): void {
     const { ctx, options } = this;
     const { width, height, devicePixelRatio } = options;
@@ -274,6 +276,7 @@ export class TealchartRenderer {
       crosshair,
       plotStyleOverrides,
       precomputedPriceLineBounds,
+      executionLines,
     );
 
     ctx.restore();
@@ -2898,6 +2901,7 @@ export class TealchartRenderer {
     _crosshair?: CrosshairState,
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
     precomputedPriceLineBounds?: PriceLineLabelBounds[],
+    executionLines?: ExecutionLineRenderData[],
   ): void {
     const { ctx, options, margins } = this;
 
@@ -2943,6 +2947,7 @@ export class TealchartRenderer {
         bars,
         viewport,
         priceLines,
+        executionLines,
         plots,
         indicatorPaneInfo,
         paneLabelBounds,
@@ -2962,6 +2967,7 @@ export class TealchartRenderer {
     bars: Bar[],
     viewport: Viewport,
     priceLines?: PriceLine[],
+    executionLines?: ExecutionLineRenderData[],
     plots?: PlotOutput[],
     indicatorPaneInfo?: Record<string, IndicatorPaneInfo>,
     labelBounds?: PriceLineLabelBounds[],
@@ -2984,6 +2990,7 @@ export class TealchartRenderer {
         bars,
         viewport,
         priceLines,
+        executionLines,
         plots,
         indicatorPaneInfo,
         labelBounds,
@@ -3004,6 +3011,7 @@ export class TealchartRenderer {
     bars: Bar[],
     viewport: Viewport,
     priceLines?: PriceLine[],
+    executionLines?: ExecutionLineRenderData[],
     plots?: PlotOutput[],
     indicatorPaneInfo?: Record<string, IndicatorPaneInfo>,
     labelBounds?: PriceLineLabelBounds[],
@@ -3053,12 +3061,87 @@ export class TealchartRenderer {
       }
     }
 
+    if (executionLines && executionLines.length > 0) {
+      this.drawExecutionMarkersInPane(executionLines, viewport, pane);
+    }
+
     // Draw Y-axis (price axis) for main pane
     this.renderPaneYAxis(pane, labelBounds);
 
     // Draw price lines on top
     if (labelBounds && labelBounds.length > 0) {
       this.drawPriceLinesInPane(labelBounds, viewport, pane);
+    }
+  }
+
+  /**
+   * Draw execution markers (filled orders/trades) in the main pane.
+   * Markers are anchored by candle time and price, matching TradingView's
+   * createExecutionShape() semantics rather than horizontal price lines.
+   */
+  private drawExecutionMarkersInPane(
+    executionLines: ExecutionLineRenderData[],
+    viewport: Viewport,
+    pane: ComputedPane,
+  ): void {
+    const { ctx, options, margins } = this;
+    const chartWidth = options.width - margins.left - margins.right;
+    if (chartWidth <= 0 || viewport.endTime <= viewport.startTime) {
+      return;
+    }
+
+    for (const execution of executionLines) {
+      const timeMs = execution.time < 1_000_000_000_000 ? execution.time * 1000 : execution.time;
+      if (timeMs < viewport.startTime || timeMs > viewport.endTime) {
+        continue;
+      }
+      if (execution.price < pane.yMin || execution.price > pane.yMax) {
+        continue;
+      }
+
+      const ratio = (timeMs - viewport.startTime) / (viewport.endTime - viewport.startTime);
+      const x = margins.left + ratio * chartWidth;
+      const anchorY = this.valueToY(execution.price, pane);
+      const isBuy = execution.direction === 'buy';
+      const arrowHeight = Math.max(8, execution.arrowHeight || 20);
+      const arrowSpacing = Math.max(0, execution.arrowSpacing || 0);
+      const markerCenterY = anchorY + (isBuy ? arrowSpacing : -arrowSpacing);
+
+      const tipY = isBuy ? markerCenterY - arrowHeight / 2 : markerCenterY + arrowHeight / 2;
+      const tailY = isBuy ? markerCenterY + arrowHeight / 2 : markerCenterY - arrowHeight / 2;
+      const headBaseY = isBuy ? markerCenterY - arrowHeight / 8 : markerCenterY + arrowHeight / 8;
+      const headHalfWidth = Math.max(4, arrowHeight * 0.28);
+      const stemHalfWidth = Math.max(1.5, arrowHeight * 0.09);
+
+      ctx.save();
+      ctx.fillStyle = execution.arrowColor;
+      ctx.beginPath();
+      ctx.moveTo(x, tipY);
+      ctx.lineTo(x + headHalfWidth, headBaseY);
+      ctx.lineTo(x + stemHalfWidth, headBaseY);
+      ctx.lineTo(x + stemHalfWidth, tailY);
+      ctx.lineTo(x - stemHalfWidth, tailY);
+      ctx.lineTo(x - stemHalfWidth, headBaseY);
+      ctx.lineTo(x - headHalfWidth, headBaseY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      if (!execution.text) {
+        continue;
+      }
+
+      const labelOffset = arrowHeight / 2 + 10;
+      const textY = isBuy ? markerCenterY + labelOffset : markerCenterY - labelOffset;
+      const font = execution.font?.trim() ? execution.font : `11px ${this.font}`;
+
+      ctx.save();
+      ctx.fillStyle = execution.textColor || execution.arrowColor;
+      ctx.font = font;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = isBuy ? 'top' : 'bottom';
+      ctx.fillText(execution.text, x, textY);
+      ctx.restore();
     }
   }
 
