@@ -1,4 +1,4 @@
-import type { Bar, ComputedPane, PriceLine, UnifiedPaneLayout, Viewport } from './types';
+import type { Bar, ComputedPane, ExecutionLineRenderData, PriceLine, UnifiedPaneLayout, Viewport } from './types';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -248,6 +248,57 @@ describe('TealchartRenderer coordinate transforms', () => {
         expect(time).toBeGreaterThan(prevTime);
         prevTime = time;
       }
+    });
+  });
+
+  describe('execution marker X anchoring', () => {
+    it('uses the same extended chart width as candles', () => {
+      const ctx = createMockCtx();
+      const moveTo = vi.fn();
+      ctx.moveTo = moveTo;
+
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+      const viewport: Viewport = {
+        startTime: 1_000_000,
+        endTime: 2_000_000,
+        priceMin: 40_000,
+        priceMax: 60_000,
+      };
+      const pane: ComputedPane = {
+        id: 'main',
+        type: 'main',
+        heightRatio: 1,
+        yMin: 40_000,
+        yMax: 60_000,
+        fixedRange: false,
+        top: 0,
+        height: 570,
+        bottom: 570,
+      };
+      const executionLines: ExecutionLineRenderData[] = [
+        {
+          id: 'exec-1',
+          price: 50_000,
+          time: 1_500, // seconds, midpoint of viewport after ms normalization
+          direction: 'buy',
+          text: '',
+          tooltip: '',
+          arrowHeight: 20,
+          arrowSpacing: 20,
+          font: '11px sans-serif',
+          textColor: '#fff',
+          arrowColor: '#26a69a',
+        },
+      ];
+
+      (renderer as any).drawExecutionMarkersInPane(executionLines, viewport, pane);
+
+      const opts = renderer.getOptions();
+      const expectedX = opts.margins.left + (opts.width - opts.margins.left) / 2;
+      const legacyX = opts.margins.left + (opts.width - opts.margins.left - opts.margins.right) / 2;
+      const x = moveTo.mock.calls[0]?.[0];
+      expect(x).toBe(expectedX);
+      expect(x).not.toBe(legacyX);
     });
   });
 

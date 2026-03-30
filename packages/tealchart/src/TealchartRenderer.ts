@@ -3085,7 +3085,10 @@ export class TealchartRenderer {
     pane: ComputedPane,
   ): void {
     const { ctx, options, margins } = this;
-    const chartWidth = options.width - margins.left - margins.right;
+    // Match candle rendering X-space, which extends under the price axis.
+    // Using a narrower width here causes markers to drift proportionally when
+    // the visible time range changes.
+    const chartWidth = options.width - margins.left;
     if (chartWidth <= 0 || viewport.endTime <= viewport.startTime) {
       return;
     }
