@@ -14,7 +14,7 @@ import type {
   UnifiedPaneLayout,
 } from '../types';
 
-import { DEFAULT_INDICATOR_PANE_HEIGHT, MIN_PANE_HEIGHT } from '../types';
+import { DEFAULT_INDICATOR_PANE_HEIGHT, MIN_PANE_HEIGHT, TIME_AXIS_HEIGHT } from '../types';
 
 /**
  * Computed pane position for rendering (legacy - use ComputedPane instead)
@@ -50,7 +50,7 @@ export class PaneManager {
   private paneIdCounter = 0;
 
   /** Pixels reserved for time axis */
-  private timeAxisHeight = 30;
+  private timeAxisHeight = TIME_AXIS_HEIGHT;
 
   /** Which pane is maximized (null = normal mode) */
   private _maximizedPaneId: string | null = null;

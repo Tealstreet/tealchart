@@ -638,7 +638,7 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     (y: number) => {
       if (!unifiedPaneLayout || !coreResult.core) return;
       const panes = unifiedPaneLayout.panes;
-      const availableHeight = dimensions.height - (margins.bottom || 30);
+      const availableHeight = dimensions.height - (margins.bottom || DEFAULT_MARGINS.bottom);
       let currentTop = margins.top || 0;
 
       for (const pane of panes) {

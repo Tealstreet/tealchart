@@ -11,6 +11,7 @@ import type { ChartWidgetCoreOptions, IIndicatorManager } from './ChartWidgetCor
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 
 import { ChartWidgetCore } from './ChartWidgetCore';
+import { TIME_AXIS_HEIGHT } from '../types';
 
 // Force re-render helper
 function useForceUpdate() {
@@ -61,7 +62,7 @@ const EMPTY_PANE_LAYOUT: UnifiedPaneLayout = {
       fixedRange: false,
     },
   ],
-  timeAxisHeight: 30,
+  timeAxisHeight: TIME_AXIS_HEIGHT,
 };
 
 /**

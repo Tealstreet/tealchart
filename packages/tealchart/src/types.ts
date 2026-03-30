@@ -311,6 +311,8 @@ export interface ChartMargins {
   left: number;
 }
 
+export const TIME_AXIS_HEIGHT = 26;
+
 // Drag mode types
 export type DragMode = 'none' | 'pan' | 'priceAxisZoom';
 
@@ -382,7 +384,7 @@ export const DEFAULT_RENDER_OPTIONS: RenderOptions = {
 export const DEFAULT_MARGINS: ChartMargins = {
   top: 10,
   right: 58, // Price axis (tightened to match label width)
-  bottom: 30, // Time axis
+  bottom: TIME_AXIS_HEIGHT, // Time axis
   left: 5,
 };
 
@@ -1139,7 +1141,7 @@ export const DEFAULT_UNIFIED_PANE_LAYOUT: UnifiedPaneLayout = {
       fixedRange: false,
     },
   ],
-  timeAxisHeight: 30,
+  timeAxisHeight: TIME_AXIS_HEIGHT,
 };
 
 // ============================================================================

@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { TIME_AXIS_HEIGHT } from '../types';
 import { PaneManager } from './PaneManager';
 
 describe('PaneManager', () => {
@@ -143,10 +144,10 @@ describe('PaneManager', () => {
       const totalHeight = 600;
       const computed = pm.computeLayout(totalHeight);
       expect(computed).toHaveLength(1);
-      // timeAxisHeight = 30 by default
+      // timeAxisHeight matches the shared tealchart default
       expect(computed[0].top).toBe(0);
-      expect(computed[0].height).toBe(570); // 600 - 30
-      expect(computed[0].bottom).toBe(570);
+      expect(computed[0].height).toBe(600 - TIME_AXIS_HEIGHT);
+      expect(computed[0].bottom).toBe(600 - TIME_AXIS_HEIGHT);
     });
 
     it('pane positions do not overlap', () => {
@@ -162,7 +163,7 @@ describe('PaneManager', () => {
       pm.addIndicator({ indicatorId: 'rsi_1', overlay: false });
       const computed = pm.computeLayout(800);
       const totalPaneHeight = computed.reduce((sum, p) => sum + p.height, 0);
-      expect(totalPaneHeight).toBeCloseTo(770, 5); // 800 - 30
+      expect(totalPaneHeight).toBeCloseTo(800 - TIME_AXIS_HEIGHT, 5);
     });
 
     it('each pane has correct type and id', () => {
@@ -420,7 +421,7 @@ describe('PaneManager', () => {
       const mainComputed = computed.find((p) => p.id === 'main')!;
       const rsiComputed = computed.find((p) => p.type === 'indicator')!;
 
-      expect(mainComputed.height).toBe(570); // 600 - 30 timeAxis
+      expect(mainComputed.height).toBe(600 - TIME_AXIS_HEIGHT);
       expect(rsiComputed.height).toBe(0);
     });
   });

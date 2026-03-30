@@ -25,6 +25,7 @@ import {
   PriceLine,
   PriceLineLabelBounds,
   RenderOptions,
+  TIME_AXIS_HEIGHT,
   UnifiedPaneLayout,
   Viewport,
 } from './types';
@@ -184,7 +185,7 @@ export class TealchartRenderer {
    * Convert legacy PaneLayout to UnifiedPaneLayout
    */
   private convertToUnifiedLayout(paneLayout?: PaneLayout): UnifiedPaneLayout {
-    const timeAxisHeight = 30;
+    const timeAxisHeight = TIME_AXIS_HEIGHT;
 
     if (!paneLayout) {
       // Default: main pane takes all space
@@ -558,14 +559,14 @@ export class TealchartRenderer {
     const { ctx, options, margins } = this;
     // Use full width minus left margin so time labels extend under price axis (like TradingView)
     const chartWidth = options.width - margins.left;
-    const axisY = options.height - margins.bottom + 15;
+    const axisY = options.height - margins.bottom / 2;
 
     const timeMarkers = this.generateTimeMarkers(viewport, chartWidth);
 
     ctx.fillStyle = options.textColor;
     ctx.font = `11px ${this.font}`;
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
+    ctx.textBaseline = 'middle';
 
     for (const { time, showMonthLabel, step } of timeMarkers) {
       const x = this.timeToX(time, viewport, chartWidth);

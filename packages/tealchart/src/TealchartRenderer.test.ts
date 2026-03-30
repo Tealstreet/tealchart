@@ -3,6 +3,7 @@ import type { Bar, ComputedPane, ExecutionLineRenderData, PriceLine, UnifiedPane
 import { describe, expect, it, vi } from 'vitest';
 
 import { TealchartRenderer } from './TealchartRenderer';
+import { TIME_AXIS_HEIGHT } from './types';
 
 /**
  * Create a minimal CanvasContext mock for the renderer
@@ -378,7 +379,7 @@ describe('TealchartRenderer coordinate transforms', () => {
             fixedRange: false,
           },
         ],
-        timeAxisHeight: 30,
+        timeAxisHeight: TIME_AXIS_HEIGHT,
       };
 
       const y = renderer.publicPriceToYWithLayout(50000, viewport, layout);
@@ -407,7 +408,7 @@ describe('TealchartRenderer coordinate transforms', () => {
             fixedRange: false,
           },
         ],
-        timeAxisHeight: 30,
+        timeAxisHeight: TIME_AXIS_HEIGHT,
       };
       const priceLines: PriceLine[] = [
         {
@@ -452,7 +453,7 @@ describe('TealchartRenderer coordinate transforms', () => {
             fixedRange: false,
           },
         ],
-        timeAxisHeight: 30,
+        timeAxisHeight: TIME_AXIS_HEIGHT,
       };
       const priceLines: PriceLine[] = [
         {

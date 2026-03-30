@@ -12,6 +12,7 @@ import type {
   PriceLine,
   RenderOptions,
   ResolutionString,
+  TIME_AXIS_HEIGHT,
   Viewport,
 } from '../types';
 import type { ChartCoreOptions, IndicatorPaneInfo } from './ChartCore';
@@ -545,7 +546,6 @@ export class TealchartWidgetUI {
     if (chartHeight <= 0) return;
 
     // Constants matching the renderer
-    const TIME_AXIS_HEIGHT = 30;
     const availableHeight = chartHeight - TIME_AXIS_HEIGHT;
 
     // Calculate main pane height

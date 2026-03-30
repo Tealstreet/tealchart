@@ -40,6 +40,7 @@ import {
   PriceLine,
   PriceLineLabelBounds,
   RenderOptions,
+  TIME_AXIS_HEIGHT,
   UnifiedPaneLayout,
   Viewport,
 } from '../types';
@@ -111,7 +112,7 @@ const RESET_BUTTON_AUTO_HIDE_DELAY = 3000;
  * Convert legacy PaneLayout to UnifiedPaneLayout
  */
 function convertToUnifiedLayout(paneLayout?: PaneLayout): UnifiedPaneLayout {
-  const timeAxisHeight = 30;
+  const timeAxisHeight = TIME_AXIS_HEIGHT;
 
   if (!paneLayout) {
     return {
