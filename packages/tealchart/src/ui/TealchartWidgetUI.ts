@@ -12,7 +12,6 @@ import type {
   PriceLine,
   RenderOptions,
   ResolutionString,
-  TIME_AXIS_HEIGHT,
   Viewport,
 } from '../types';
 import type { ChartCoreOptions, IndicatorPaneInfo } from './ChartCore';
@@ -21,6 +20,7 @@ import type { ChartTopBarOptions } from './ChartTopBar';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
 import { getChartStore } from '../state/chartState';
+import { TIME_AXIS_HEIGHT } from '../types';
 import { ChartCore } from './ChartCore';
 import { ChartLegend } from './ChartLegend';
 import { ChartTopBar } from './ChartTopBar';
