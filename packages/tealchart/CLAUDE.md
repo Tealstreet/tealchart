@@ -24,31 +24,53 @@ Canvas-based OHLCV charting library with a TradingView-compatible widget API.
 
 ```
 src/
-├── Tealchart.tsx               # Main React component (canvas + Konva overlay)
-├── TealchartWidget.ts          # TradingView-compatible widget class
+├── TealchartWidget.ts          # TradingView-compatible widget class (entry)
+├── TealchartVanilla.ts         # Vanilla JS entry point (non-React)
 ├── TealchartApi.ts             # Per-chart API (symbol, interval, lines, studies)
-├── TealchartRenderer.ts        # Pure canvas rendering
-├── types.ts                    # Type definitions (~1100 lines)
+├── TealchartRenderer.ts        # Pure canvas rendering (no React state)
 ├── GapDetectionManager.ts      # Gap detection + auto-recovery
-├── components/                 # React UI
-│   ├── ChartContainer.tsx      # Full chart with top bar + state management
-│   ├── ChartTopBar.tsx         # Timeframe selector, indicators, layouts
-│   ├── IndicatorsModal.tsx     # Add indicator selection
-│   ├── IndicatorSettingsModal.tsx
-│   ├── ChartLegend.tsx         # Indicator legend + visibility toggles
-│   ├── PriceLineLayer.tsx      # Konva layer for order/position lines
-│   └── ContextMenu.tsx
+├── constants.ts
+├── index.ts / index.native.ts  # Package entries (web / React Native)
+├── core/
+│   └── ChartWidgetCore.ts      # Shared widget core used by both platforms
+├── react/
+│   └── VanillaChartReact.tsx   # React wrapper for the vanilla widget
+├── mobile/                     # React Native / Skia implementation
+│   ├── MobileIndicatorManager.ts
+│   ├── components/             # RN components (ChartTopBar, context menu,
+│   │                           # crosshair, order/position lines, modals)
+│   └── hooks/                  # useChartGestures, useLabelCollision
+├── ui/                         # Plain-JS/DOM UI layer (NOT React)
+│   ├── ChartCore.ts            # Canvas + Konva interactive lines
+│   ├── ChartTopBar.ts          # Timeframe selector + indicators + layouts
+│   ├── ChartLegend.ts          # Indicator legend + visibility toggles
+│   ├── ContextMenu.ts
+│   ├── IndicatorsModal.ts
+│   ├── IndicatorSettingsModal.ts
+│   ├── LayoutSelector.ts
+│   ├── Modal.ts                # Modal primitive
+│   ├── DomManager.ts
+│   ├── Component.ts            # Base UI component
+│   └── dom.ts
+├── rendering/
+│   ├── PaneManager.ts          # Unified pane system (main + indicator panes)
+│   ├── CanvasContext.ts        # Web canvas adapter
+│   ├── SkiaCanvasContext.ts    # Mobile Skia adapter
+│   ├── WebCanvasContext.ts
+│   └── RenderScheduler.ts
 ├── state/                      # Jotai state management
-│   ├── chartState.ts           # Per-chart atoms with atomWithStorage + migrations
-│   ├── ChartApiContext.tsx      # Context provider for TealchartApi
+│   ├── chartState.ts           # Per-chart atoms w/ atomWithStorage + migrations
+│   ├── ChartApiContext.tsx     # Context provider for TealchartApi
 │   ├── indicatorActions.ts     # Indicator CRUD operations (atoms)
 │   └── safeDeepMerge.ts        # Handles corrupted localStorage
-├── rendering/
-│   └── PaneManager.ts          # Unified pane system (main + indicator panes)
+├── interaction/                # Drag/click state machines, event manager,
+│   │                           # price line manager (shared web+mobile)
+├── viewport/                   # ViewportController + viewScale + AutoScaleManager
 ├── indicators/
-│   └── builtinIndicators.ts    # Registry of tealscript-based indicators (SMA, EMA, RSI, etc.)
+│   └── builtinIndicators.ts    # Registry of tealscript-based indicators
+├── jailbreak/                  # Tealscript runtime bridge (computeCandleCoordinates etc.)
 ├── tealscript/                 # Tealscript integration
-│   ├── TealscriptManager.ts    # Worker lifecycle management
+│   ├── TealscriptManager.ts    # Web Worker lifecycle management
 │   └── useTealscript.ts        # React hook
 ├── transformer/                # TradingView layout interop (bidirectional)
 │   ├── toTvFormat.ts           # CustomChart → TradingView layout
@@ -57,8 +79,15 @@ src/
 │   └── README.md               # Detailed transformer docs
 ├── events/EventEmitter.ts      # Pub-sub + Subscription class
 ├── debug/TealchartLogger.ts    # Ring buffer logger with categories
+├── hooks/                      # React hooks (useMobileTapHover)
+├── utils/                      # labelCollision, safeNumber, syncPromise
 └── i18n/                       # Internationalization context provider
 ```
+
+> **Note:** there is no `components/` directory at `src/` root. Web UI
+> lives in `ui/` (plain JS/DOM, NOT React), mobile UI in `mobile/`. The
+> only React-adjacent code is `react/VanillaChartReact.tsx` plus a few
+> `.tsx` files in `mobile/components/` and `state/ChartApiContext.tsx`.
 
 ## State Management
 
