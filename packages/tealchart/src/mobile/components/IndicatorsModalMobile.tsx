@@ -123,7 +123,7 @@ export const IndicatorsModalMobile: React.FC<IndicatorsModalMobileProps> = memo(
                       indicator.overlay ? (
                         <View style={styles.overlayBadge}>
                           <AntDesign
-                            name="linechart"
+                            name="line-chart"
                             size={12}
                             color={theme.colors.foregroundTransparent}
                           />
@@ -131,7 +131,7 @@ export const IndicatorsModalMobile: React.FC<IndicatorsModalMobileProps> = memo(
                       ) : (
                         <View style={styles.overlayBadge}>
                           <AntDesign
-                            name="areachart"
+                            name="area-chart"
                             size={12}
                             color={theme.colors.foregroundTransparent}
                           />
