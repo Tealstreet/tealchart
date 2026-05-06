@@ -29,7 +29,7 @@
     "@nanostores/react": "^1.1.0",
     "@tealstreet/react-colorful": "*",
     "@tealstreet/tealscript": "*",
-    "jotai": "^2.19.1",
+    "jotai": "^2.20.0",
     "jotai-optics": "^0.4.0",
     "konva": "^10.3.0",
     "nanostores": "^1.3.0",
