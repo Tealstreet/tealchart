@@ -12,6 +12,9 @@ export class CustomIndicator {
   getTooltipText(_args: IndicatorTooltipArgs): CrossHairTooltip[] {
     return [];
   }
+
+  /** Optional lifecycle hook for indicators that own subscriptions/timers. */
+  destroy(): void {}
 }
 
 /**
