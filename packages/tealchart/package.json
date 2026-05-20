@@ -45,7 +45,7 @@
     "@types/react": "^19.2.15",
     "@types/react-dom": "^18.3.6",
     "@vitejs/plugin-react": "^6.0.2",
-    "@vitest/coverage-v8": "^4.1.6",
+    "@vitest/coverage-v8": "^4.1.7",
     "@vitest/ui": "^4.1.6",
     "cross-env": "^7.0.3",
     "eslint": "^9.28.0",
