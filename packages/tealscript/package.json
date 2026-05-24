@@ -2,6 +2,7 @@
   "name": "@tealstreet/tealscript",
   "version": "0.0.1",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -29,7 +30,6 @@
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
-    "@tealstreet/prettierrc": "*",
     "@types/node": "^22.15.3",
     "@vitest/coverage-v8": "^4.1.7",
     "@vitest/ui": "^4.1.7",

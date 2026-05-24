@@ -1,213 +1,119 @@
-# @tealstreet/custom-chart
+# @tealstreet/tealchart
 
-A standalone custom OHLCV chart package with a TradingView-compatible widget API. Provides a drop-in alternative to TradingView charts with canvas-based rendering.
+Canvas-based OHLCV chart widget with a TradingView-compatible widget
+API, an interactive line overlay (Konva on web, Skia on mobile), and a
+companion DSL ([`@tealstreet/tealscript`](https://github.com/Tealstreet/tealchart/tree/main/packages/tealscript))
+for built-in and user-authored indicators.
 
-## Features
+> Tealchart's widget API mimics the _shape_ of TradingView's charting
+> library so that integrations can target the same surface, but it
+> ships no code from TradingView and is not affiliated with or
+> endorsed by TradingView, Inc.
 
-- Canvas-based OHLCV candlestick rendering
-- TradingView-compatible widget API (`IChartingLibraryWidget` interface)
-- Pan and zoom interactions (mouse drag, scroll wheel, trackpad)
-- Price axis zoom (drag on price axis)
-- Crosshair with price/time labels
-- Historical data backfetch on pan/zoom
-- Configurable colors and styling via theme overrides
-- Reset viewport button
+## What it is
 
-## Installation
+- **Hybrid renderer.** Candlesticks, volume, grid, axes, and crosshair
+  are drawn directly to a 2D canvas for high-frequency updates.
+  Interactive elements (order/position lines, draggable labels,
+  context menus) sit on top via Konva (web) or Skia (mobile).
+- **TradingView-compatible widget API.** Implements
+  `IChartingLibraryWidget`, `IChartWidgetApi`, `IOrderLineAdapter`,
+  and `IPositionLineAdapter` interfaces, plus a bidirectional layout
+  transformer so charts can serialize to and from TradingView's JSON
+  format.
+- **Web + React Native parity.** Shared core (`ChartWidgetCore`,
+  shared state, viewport controller, label collision) with two
+  rendering layers — DOM/canvas/Konva on web,
+  `@shopify/react-native-skia` on mobile.
+- **Indicator system.** Built-in indicators (SMA, EMA, RSI, MACD,
+  Bollinger Bands, etc.) defined via `@tealstreet/tealscript`. User
+  indicators authored in the same DSL run in a Web Worker so the UI
+  thread stays free.
+- **Per-chart persistence.** Jotai `atomWithStorage` with schema
+  versioning and a `safeDeepMerge` recovery path for corrupted
+  localStorage.
 
-The package is part of the Tealstreet monorepo and is available as a workspace dependency:
+## Status
 
-```json
-{
-  "dependencies": {
-    "@tealstreet/custom-chart": "workspace:*"
-  }
-}
-```
+Pre-1.0. Both packages ship as part of the Tealstreet web and mobile
+clients; APIs may move without notice until 1.0.
 
-## Usage
+## Install
 
-### Basic Usage with CustomChart Component
+These packages are distributed as **source** (not published to npm). Vendor
+them from the tealchart source mirror — e.g. as a git submodule — and let your
+bundler transpile the TypeScript (Next.js: add them to `transpilePackages`;
+Metro / React Native: handled automatically).
 
-```tsx
-import { CustomChart } from '@tealstreet/custom-chart';
+`react` 18 or 19 is a peer dependency. Tealchart relies on `konva`,
+`jotai`, `jotai-optics`, `nanostores`, and the FontAwesome runtime —
+see `package.json` for exact versions.
 
-const MyChart = () => {
-  const bars = [...]; // Your OHLCV data
-
-  return (
-    <CustomChart
-      width={800}
-      height={400}
-      bars={bars}
-      renderOptions={{
-        upColor: '#26a69a',
-        downColor: '#ef5350',
-        backgroundColor: '#131722',
-      }}
-    />
-  );
-};
-```
-
-### Widget API (TradingView-compatible)
-
-For integration with existing TradingView infrastructure (like `useWidgetStateManagement`):
+## Quick start
 
 ```tsx
-import { createCustomChartWidget } from '@tealstreet/custom-chart';
+import { createTealchartWidget } from '@tealstreet/tealchart';
 
-const widget = createCustomChartWidget({
-  container: containerElement,
+const widget = createTealchartWidget({
+  container: document.getElementById('chart')!,
   symbol: 'BTCUSDT',
   interval: '1h',
-  datafeed: myDatafeed, // IBasicDataFeed implementation
-  theme: 'Dark',
-  overrides: {
-    'mainSeriesProperties.candleStyle.upColor': '#26a69a',
-    'mainSeriesProperties.candleStyle.downColor': '#ef5350',
-  },
+  datafeed: yourDatafeed, // implements TradingView-style datafeed API
 });
 
-// Widget lifecycle
 widget.onChartReady(() => {
-  console.log('Chart ready');
+  const chart = widget.activeChart();
+  chart.createStudy('RSI', false, false, { length: 14 });
 });
-
-// Clean up
-widget.remove();
 ```
 
-## API Reference
+See `src/TealchartWidget.ts` for the full widget surface.
 
-### CustomChartWidget
+## Architecture (briefly)
 
-TradingView-compatible widget class implementing core chart functionality.
-
-#### Lifecycle Methods
-
-- `onChartReady(callback: () => void)` - Called when chart is ready
-- `headerReady(): Promise<void>` - Resolves when header is ready
-- `remove()` - Dispose the widget and clean up
-
-#### Chart Access
-
-- `chart(index?: number): CustomChartApi` - Get chart API for index
-- `activeChart(): CustomChartApi` - Get active chart API
-- `chartsCount(): Promise<number>` - Get number of charts (always 1)
-
-#### Styling
-
-- `applyOverrides(overrides: ChartOverrides)` - Apply chart style overrides
-- `setCSSCustomProperty(key: string, value: string)` - Set CSS property
-
-#### Events
-
-- `subscribe(event: WidgetEvent, callback: Function)` - Subscribe to events
-- `unsubscribe(event: WidgetEvent, callback: Function)` - Unsubscribe
-
-Supported events: `onAutoSaveNeeded`, `layout_about_to_be_changed`, `chart_loaded`, `layout_changed`, `mouse_down`, `mouse_up`
-
-### CustomChartApi
-
-Per-chart API for symbol/data management.
-
-- `symbol(): string` - Get current symbol
-- `setSymbol(symbol: string)` - Set symbol
-- `resetData()` - Reset and reload data
-- `crossHairMoved(): ISubscription` - Crosshair position subscription
-- `onSymbolChanged(): ISubscription` - Symbol change subscription
-- `onIntervalChanged(): ISubscription` - Interval change subscription
-
-### Bar Interface
-
-```typescript
-interface Bar {
-  time: number;    // Unix timestamp in milliseconds
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  volume: number;
-}
+```text
+src/
+├─ TealchartWidget.ts        # entry: createTealchartWidget()
+├─ TealchartApi.ts           # per-chart API
+├─ TealchartRenderer.ts      # pure-canvas drawing (~1500 LOC)
+├─ core/ChartWidgetCore.ts   # shared web+mobile core
+├─ rendering/                # PaneManager + canvas adapters
+├─ ui/                       # plain-JS/DOM UI layer (not React)
+├─ react/                    # thin React wrapper
+├─ mobile/                   # React Native + Skia implementation
+├─ state/                    # Jotai atoms + persistence
+├─ indicators/               # built-in indicator registry
+├─ tealscript/               # worker bridge for indicator execution
+└─ transformer/              # TradingView layout JSON interop
 ```
 
-### RenderOptions
+The renderer is pure canvas with no React state — testable
+independently of any framework.
 
-```typescript
-interface RenderOptions {
-  width: number;
-  height: number;
-  devicePixelRatio: number;
-  backgroundColor: string;
-  textColor: string;
-  gridColor: string;
-  upColor: string;
-  downColor: string;
-  crosshairColor: string;
-  showVolume: boolean;
-  volumeHeight: number;      // 0-1, fraction of chart height
-  minCandleWidth: number;
-}
+## Mobile
+
+```tsx
+import { SkiaTealchart } from '@tealstreet/tealchart/native';
 ```
 
-## Interactions
+The mobile entry uses `@shopify/react-native-skia` for hardware-
+accelerated rendering. See `src/mobile/` for the RN-specific code and
+gesture handling.
 
-| Action | Behavior |
-|--------|----------|
-| Drag on chart | Pan (time + price) |
-| Scroll wheel vertical | Zoom time axis |
-| Scroll wheel horizontal | Pan time axis |
-| Drag on price axis | Zoom price axis (exponential) |
-| Hover near bottom center | Show reset button |
+## Tealscript integration
 
-## Integration with Tealstreet
+Indicators are written in tealscript, a PineScript-inspired DSL. A
+factory function `createTealscriptWorker()` is required from the
+consuming app (the chart needs to know how to spawn a Web Worker for
+your bundler/runtime). See
+[`@tealstreet/tealscript`](https://github.com/Tealstreet/tealchart/tree/main/packages/tealscript)
+for the language reference.
 
-The package integrates with the existing chart infrastructure:
+## License
 
-1. **CustomChartDirect** - React component that mirrors `TradingViewDirect`, using `useWidgetStateManagement` hook
-2. **CustomChartModule** - Grid module wrapper for the layout system
-3. **DefaultDatafeed** - Reuses existing datafeed for historical data and real-time updates
+MIT — see [LICENSE](./LICENSE).
 
-### Adding to Layout
+## Contributing
 
-Both chart types are available in the grid module system:
-- `chart` - TradingView (existing)
-- `customChart` - Custom chart (this package)
-
-## Development
-
-```bash
-# Build the package
-yarn build
-
-# Run tests
-yarn test
-
-# Type check
-yarn typecheck
-```
-
-## Architecture
-
-```
-packages/custom-chart/
-├── src/
-│   ├── index.ts                 # Main exports
-│   ├── CustomChartWidget.ts     # TradingView-compatible widget class
-│   ├── CustomChartApi.ts        # Per-chart API
-│   ├── CustomChartRenderer.ts   # Canvas rendering engine
-│   ├── CustomChart.tsx          # React component
-│   ├── types.ts                 # Type definitions
-│   └── events/
-│       └── EventEmitter.ts      # Pub-sub for widget events
-```
-
-## Known Limitations
-
-- Single chart only (no multi-chart layouts yet)
-- No indicators/studies support
-- No drawing tools
-- No save/load chart state (stubs only)
-
-These features are planned for future implementation.
+See the umbrella [CONTRIBUTING.md](../../CONTRIBUTING.md). All commits
+are DCO-signed (`git commit -s`).
