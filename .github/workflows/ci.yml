@@ -1,0 +1,28 @@
+# Mirror CI for tealchart. Source-of-truth lives in the monorepo at
+# mirrors/tealchart/.github/workflows/ — contributors cannot edit it here
+# (CODEOWNERS + branch protection). Read-only token, no secrets, no release.
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch: # manual re-run (e.g. validation after a sync)
+
+# Read-only GITHUB_TOKEN — this CI can never push, tag, or release.
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # No committed lockfile yet, so no yarn cache and no --frozen-lockfile.
+      - run: yarn install --network-timeout 600000
+      - run: yarn typecheck
+      - run: yarn lint
+      - run: yarn test

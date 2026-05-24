@@ -1,0 +1,12 @@
+# Maintainer ownership for the tealchart mirror. Branch protection (maintainers
+# only on the default branch) is the load-bearing control; this locks CI + root
+# tooling so contributors can't change how the mirror builds.
+# NOTE: currently @TraderSamwise; swap to a maintainers team handle once one exists.
+*                           @TraderSamwise
+/.github/                   @TraderSamwise
+/CODEOWNERS                 @TraderSamwise
+/package.json               @TraderSamwise
+/turbo.json                 @TraderSamwise
+/tsconfig.base.json         @TraderSamwise
+/eslint.config.mjs          @TraderSamwise
+/eslint.config.frontend.mjs @TraderSamwise
