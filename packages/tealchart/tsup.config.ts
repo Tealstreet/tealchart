@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig((options) => ({
-  entry: ['src/index.ts'],
+  entry: ['src/index.ts', 'src/jailbreak/index.ts'],
   splitting: true,
   treeshake: true,
   clean: true,
