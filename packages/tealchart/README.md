@@ -40,13 +40,12 @@ clients; APIs may move without notice until 1.0.
 
 ## Install
 
-```bash
-npm install @tealstreet/tealchart @tealstreet/tealscript
-# or
-yarn add @tealstreet/tealchart @tealstreet/tealscript
-```
+These packages are distributed as **source** (not published to npm). Vendor
+them from the tealchart source mirror — e.g. as a git submodule — and let your
+bundler transpile the TypeScript (Next.js: add them to `transpilePackages`;
+Metro / React Native: handled automatically).
 
-`react >= 18` is a peer dependency. Tealchart relies on `konva`,
+`react` 18 or 19 is a peer dependency. Tealchart relies on `konva`,
 `jotai`, `jotai-optics`, `nanostores`, and the FontAwesome runtime —
 see `package.json` for exact versions.
 

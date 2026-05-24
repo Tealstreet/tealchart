@@ -33,11 +33,8 @@ without notice until 1.0.
 
 ## Install
 
-```bash
-npm install @tealstreet/tealscript
-# or
-yarn add @tealstreet/tealscript
-```
+Distributed as **source** (not published to npm). Vendor it from the source
+mirror (e.g. as a git submodule) and let your bundler transpile the TypeScript.
 
 `peggy` is the only runtime dependency.
 
