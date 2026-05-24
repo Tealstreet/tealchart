@@ -72,7 +72,7 @@ See `src/TealchartWidget.ts` for the full widget surface.
 
 ## Architecture (briefly)
 
-```
+```text
 src/
 ├─ TealchartWidget.ts        # entry: createTealchartWidget()
 ├─ TealchartApi.ts           # per-chart API

@@ -70,7 +70,7 @@ const ast = parse(source);
 
 Three layers, kept independent:
 
-```
+```text
 parser/   PEG grammar → AST                  (no runtime deps beyond peggy)
 runtime/  AST → series evaluation per bar    (no DOM, no I/O)
 worker/   Web Worker host + main-thread API  (browser-only)

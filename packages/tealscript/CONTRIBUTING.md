@@ -59,5 +59,5 @@ When filing a parser or runtime bug, please include:
 
 ## Code style
 
-We use Prettier + ESLint with the project defaults. Run `yarn lint` and
-`yarn format` before pushing.
+We use Prettier + ESLint with the project defaults. Run `yarn lint`
+(and `yarn fix-all-files` to auto-fix) before pushing.
