@@ -4,23 +4,15 @@
  * Mobile implementation of the web's IndicatorsModal.
  * Uses ListModal for consistent styling and search functionality.
  */
+import type { BuiltinIndicator } from '../../indicators/builtinIndicators';
 
-import React, { memo, useState, useCallback, useMemo, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+
 import { AntDesign } from '@expo/vector-icons';
-import { useTheme } from '@web/hooks/useTheme';
-import {
-  ListModal,
-  ListItem,
-  CategoryHeader,
-  EmptyState,
-} from '@mobile/components/common/ListModal';
-import {
-  BUILTIN_INDICATORS,
-  INDICATOR_CATEGORIES,
-  searchIndicators,
-  type BuiltinIndicator,
-} from '../../indicators/builtinIndicators';
+import { StyleSheet, View } from 'react-native';
+
+import { BUILTIN_INDICATORS, INDICATOR_CATEGORIES, searchIndicators } from '../../indicators/builtinIndicators';
+import { CategoryHeader, EmptyState, ListItem, ListModal, listModalColors } from './common/ListModal';
 
 // =============================================================================
 // Types
@@ -53,7 +45,6 @@ const CATEGORY_LABELS: Record<BuiltinIndicator['category'], string> = {
 
 export const IndicatorsModalMobile: React.FC<IndicatorsModalMobileProps> = memo(
   ({ visible, onClose, onSelectIndicator }) => {
-    const theme = useTheme();
     const [searchQuery, setSearchQuery] = useState('');
 
     // Clear search when modal closes
@@ -89,7 +80,7 @@ export const IndicatorsModalMobile: React.FC<IndicatorsModalMobileProps> = memo(
         onSelectIndicator(indicator);
         onClose();
       },
-      [onSelectIndicator, onClose]
+      [onSelectIndicator, onClose],
     );
 
     return (
@@ -122,19 +113,11 @@ export const IndicatorsModalMobile: React.FC<IndicatorsModalMobileProps> = memo(
                     rightElement={
                       indicator.overlay ? (
                         <View style={styles.overlayBadge}>
-                          <AntDesign
-                            name="line-chart"
-                            size={12}
-                            color={theme.colors.foregroundTransparent}
-                          />
+                          <AntDesign name="line-chart" size={12} color={listModalColors.foregroundTransparent} />
                         </View>
                       ) : (
                         <View style={styles.overlayBadge}>
-                          <AntDesign
-                            name="area-chart"
-                            size={12}
-                            color={theme.colors.foregroundTransparent}
-                          />
+                          <AntDesign name="area-chart" size={12} color={listModalColors.foregroundTransparent} />
                         </View>
                       )
                     }
@@ -146,7 +129,7 @@ export const IndicatorsModalMobile: React.FC<IndicatorsModalMobileProps> = memo(
         )}
       </ListModal>
     );
-  }
+  },
 );
 
 IndicatorsModalMobile.displayName = 'IndicatorsModalMobile';

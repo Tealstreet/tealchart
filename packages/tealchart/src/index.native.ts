@@ -13,14 +13,11 @@ export { SkiaTealchart } from './SkiaTealchart';
 export type { SkiaTealchartProps } from './SkiaTealchart';
 
 // Mobile-specific components
-export {
-  ChartTopBarComponent,
-  AVAILABLE_TIMEFRAMES as MOBILE_TIMEFRAMES,
-} from './mobile/components/ChartTopBarComponent';
-export type {
-  ChartTopBarComponentProps,
-  TimeframeOption as MobileTimeframeOption,
-} from './mobile/components/ChartTopBarComponent';
+export { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
+export type { ChartTopBarComponentProps } from './mobile/components/ChartTopBarComponent';
+// AVAILABLE_TIMEFRAMES / TimeframeOption are defined in chartState, not the top bar component.
+export { AVAILABLE_TIMEFRAMES as MOBILE_TIMEFRAMES } from './state/chartState';
+export type { TimeframeOption as MobileTimeframeOption } from './state/chartState';
 
 // Mobile interactive components
 export {
