@@ -10,6 +10,7 @@ import type {
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { clearChartStoreCache } from './state/chartState';
 import { TealchartWidget } from './TealchartWidget';
 
 // Track calls at module level (survives mockReset)
@@ -218,6 +219,9 @@ describe('TealchartWidget', () => {
   afterEach(() => {
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
+    // Chart stores are cached for the process lifetime; clear between tests so
+    // per-chartKey interval persistence doesn't leak across tests.
+    clearChartStoreCache();
   });
 
   // ============================================================================
@@ -338,12 +342,7 @@ describe('TealchartWidget', () => {
       completeInit(datafeed);
 
       const shape = await widget.chart().createExecutionShape();
-      shape
-        .setPrice(50123.45)
-        .setTime(1710000000)
-        .setDirection('sell')
-        .setText('0.25')
-        .setArrowColor('#ff9500');
+      shape.setPrice(50123.45).setTime(1710000000).setDirection('sell').setText('0.25').setArrowColor('#ff9500');
 
       await Promise.resolve();
 
