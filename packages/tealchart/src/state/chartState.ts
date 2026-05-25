@@ -1,8 +1,8 @@
 import type { MapStore, WritableAtom } from 'nanostores';
+import type { ResolutionString } from '../types';
 
 import { atom, computed, map } from 'nanostores';
 
-import type { ResolutionString } from '../types';
 import { CHART_SETTINGS_VERSION } from './safeDeepMerge';
 
 /**
@@ -238,6 +238,23 @@ export function getChartStore(chartKey: string): ChartStore {
   }
 
   return store;
+}
+
+/**
+ * Whether a chart store already exists for this key (i.e. a prior widget with
+ * the same chartKey created one). Lets a new widget tell "first time seeing
+ * this chart" from "reopening a chart whose interval was already set".
+ */
+export function hasChartStore(chartKey: string): boolean {
+  return chartStoreCache.has(chartKey);
+}
+
+/**
+ * Drop all cached chart stores. Primarily for test isolation — the cache is
+ * process-lifetime, so tests that reuse chartKeys must clear it between runs.
+ */
+export function clearChartStoreCache(): void {
+  chartStoreCache.clear();
 }
 
 // ============================================================================

@@ -20,7 +20,7 @@ import {
 import { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
 import { PaneManager } from './rendering/PaneManager';
 import { DIRTY, RenderScheduler } from './rendering/RenderScheduler';
-import { getChartStore } from './state/chartState';
+import { getChartStore, hasChartStore } from './state/chartState';
 import { generateIndicatorId } from './state/indicatorActions';
 import { TealchartApi } from './TealchartApi';
 import { TealscriptManager } from './tealscript/TealscriptManager';
@@ -162,17 +162,24 @@ export class TealchartWidget {
     // Use provided chartKey, or derive from account/panelId, or generate unique ID
     this._chartKey = options.chartKey || `chart_${options.account || ''}_${Date.now()}`;
 
+    // Did a prior widget with this chartKey already create a store? If so, its
+    // persisted interval should be restored when no explicit interval is given.
+    const hadPersistedStore = hasChartStore(this._chartKey);
+
     // Initialize Nanostores for this chart (in-memory settings, layout ID from localStorage)
     this._chartStore = getChartStore(this._chartKey);
 
-    // Interval comes from options or defaults to '60' (1 hour).
+    // Interval resolution: explicit option wins; otherwise restore the interval
+    // a prior widget persisted for this chartKey; otherwise default to '60' (1h).
     // Settings store is in-memory only — layout from adapter may override later.
     if (this._intervalWasProvided) {
       this._interval = options.interval as ResolutionString;
+    } else if (hadPersistedStore) {
+      this._interval = (this._chartStore.settings.get().interval as ResolutionString) || ('60' as ResolutionString);
     } else {
       this._interval = '60' as ResolutionString;
     }
-    // Sync interval to the in-memory store
+    // Sync the resolved interval back to the in-memory store
     this._chartStore.settings.setKey('interval', this._interval);
 
     // Initialize pane manager for multi-pane indicator support
@@ -1796,6 +1803,8 @@ export class TealchartWidget {
       return;
     }
 
+    // _startDataLoad persists newInterval to the per-chart store, so a later
+    // widget with the same chartKey (and no explicit interval) restores it.
     this._startDataLoad({
       newInterval: interval,
       reason: 'interval',

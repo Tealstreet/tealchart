@@ -1,4 +1,3 @@
-// @ts-nocheck
 import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vitest/config';
@@ -17,7 +16,6 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'clover'],
-      all: true,
     },
     clearMocks: true,
     mockReset: true,
