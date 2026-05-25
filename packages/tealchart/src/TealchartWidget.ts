@@ -1803,10 +1803,8 @@ export class TealchartWidget {
       return;
     }
 
-    // Persist the new interval to the per-chart store so a later widget with the
-    // same chartKey (and no explicit interval) restores it.
-    this._chartStore?.settings.setKey('interval', interval);
-
+    // _startDataLoad persists newInterval to the per-chart store, so a later
+    // widget with the same chartKey (and no explicit interval) restores it.
     this._startDataLoad({
       newInterval: interval,
       reason: 'interval',
