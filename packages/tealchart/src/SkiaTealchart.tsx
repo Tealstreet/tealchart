@@ -20,7 +20,7 @@ import type { IIndicatorManager } from './core/ChartWidgetCore';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { IndicatorSettingsData } from './mobile/components/IndicatorSettingsModalMobile';
 import type { LabelBounds } from './mobile/hooks/useLabelCollision';
-import type { PlotOutput, PlotStyleOverride } from './state/chartState';
+import type { PlotStyleOverride } from './state/chartState';
 import type {
   Bar,
   ChartMargins,

@@ -19,12 +19,11 @@
  * }, []);
  * ```
  */
-import type { InputDefinition, PlotOutput, Program } from '@packages/tealscript/src';
+import type { InputDefinition, PlotOutput, Program } from '@tealstreet/tealscript';
 import type { PlotStyleOverride } from '../state/chartState';
 import type { Bar, UnifiedPaneLayout } from '../types';
 
-import { parse, TealscriptEngine } from '@packages/tealscript/src';
-
+import { parse, TealscriptEngine } from '@tealstreet/tealscript';
 import { type BuiltinIndicator } from '../indicators/builtinIndicators';
 import { PaneManager } from '../rendering/PaneManager';
 
