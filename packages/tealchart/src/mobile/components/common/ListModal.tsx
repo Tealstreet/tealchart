@@ -8,20 +8,11 @@
  * custom picker instead of `IndicatorsModalMobile`.
  */
 
+import type { ViewStyle } from 'react-native';
+
 import React, { useCallback } from 'react';
 
-import { AntDesign } from '@expo/vector-icons';
-import {
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 // =============================================================================
 // Palette (self-contained — no host theme dependency)
@@ -85,6 +76,9 @@ export const ListItem: React.FC<ListItemProps> = ({ label, sublabel, isActive = 
   return (
     <Pressable
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={sublabel ? `${label}, ${sublabel}` : label}
+      accessibilityState={{ selected: isActive }}
       style={({ pressed }) => [
         styles.listItem,
         isActive && styles.listItemActive,
@@ -132,7 +126,7 @@ export const ListModal: React.FC<ListModalProps> = ({
 }) => {
   const showSearch = Boolean(searchPlaceholder && onSearchChange);
 
-  const containerStyle: ViewStyle[] = [styles.container, maxHeight ? { maxHeight } : {}];
+  const containerStyle: ViewStyle[] = [styles.container, maxHeight !== undefined ? { maxHeight } : {}];
 
   const handleOverlayPress = useCallback(() => {
     onClose();
@@ -145,8 +139,13 @@ export const ListModal: React.FC<ListModalProps> = ({
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>{title}</Text>
-            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-              <AntDesign name="close" size={18} color={listModalColors.foregroundTransparent} />
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={onClose}
+              accessibilityRole="button"
+              accessibilityLabel="Close modal"
+            >
+              <Text style={styles.closeIcon}>✕</Text>
             </TouchableOpacity>
           </View>
 
@@ -157,8 +156,9 @@ export const ListModal: React.FC<ListModalProps> = ({
                 style={styles.searchInput}
                 placeholder={searchPlaceholder}
                 placeholderTextColor={listModalColors.foregroundTransparent}
-                value={searchValue}
+                value={searchValue ?? ''}
                 onChangeText={onSearchChange}
+                accessibilityLabel={searchPlaceholder || 'Search'}
                 autoCapitalize="none"
                 autoCorrect={false}
               />
@@ -217,6 +217,11 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: 4,
+  },
+  closeIcon: {
+    fontSize: 18,
+    lineHeight: 18,
+    color: listModalColors.foregroundTransparent,
   },
   searchContainer: {
     paddingHorizontal: 12,
