@@ -451,16 +451,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     }
   }, [bars, interval, onViewportChange]);
 
-  const { composedGesture } = useChartGestures({
-    dimensions: chartDimensions,
-    bars,
-    viewport,
-    onViewportChange: handleViewportChange,
-    onSwipeBlockChange,
-    onAutoScaleDisabled: handleAutoScaleDisabled,
-    isAutoScale: getIsAutoScale,
-  });
-
   // ==========================================================================
   // Crosshair State
   // ==========================================================================
@@ -468,6 +458,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const [crosshairVisible, setCrosshairVisible] = useState(false);
   // Store the crosshair position (updated via runOnJS from gestures)
   const [lastCrosshairPosition, setLastCrosshairPosition] = useState({ x: 0, y: 0 });
+
+  const { composedGesture } = useChartGestures({
+    dimensions: chartDimensions,
+    bars,
+    viewport,
+    onViewportChange: handleViewportChange,
+    enabled: !crosshairVisible,
+    onSwipeBlockChange,
+    onAutoScaleDisabled: handleAutoScaleDisabled,
+    isAutoScale: getIsAutoScale,
+  });
 
   // Context menu state
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
@@ -639,23 +640,41 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [viewport, chartDimensions, onCrossHairMoved],
   );
 
-  // Long press gesture for crosshair
-  const longPressGesture = useMemo(
-    () =>
-      Gesture.LongPress()
-        .minDuration(300)
-        .onStart((event) => {
-          runOnJS(setCrosshairVisible)(true);
-          runOnJS(handleCrosshairMove)(event.x, event.y);
-        }),
-    [handleCrosshairMove],
+  const isPointInChartArea = useCallback(
+    (x: number, y: number) => {
+      const chartLeft = chartDimensions.margins.left;
+      const chartRight = chartDimensions.width - chartDimensions.margins.right;
+      const chartTop = chartDimensions.margins.top;
+      const chartBottom = chartDimensions.height - chartDimensions.margins.bottom;
+
+      return x >= chartLeft && x <= chartRight && y >= chartTop && y <= chartBottom;
+    },
+    [chartDimensions],
   );
 
-  // Pan gesture for moving crosshair (active after long press)
+  const handleCrosshairTap = useCallback(
+    (x: number, y: number) => {
+      if (crosshairVisible) {
+        setCrosshairVisible(false);
+        return;
+      }
+
+      if (!isPointInChartArea(x, y)) return;
+
+      setCrosshairVisible(true);
+      handleCrosshairMove(x, y);
+    },
+    [crosshairVisible, handleCrosshairMove, isPointInChartArea],
+  );
+
+  // Pan gesture for moving crosshair (active only while crosshair is visible)
   const crosshairPanGesture = useMemo(
     () =>
       Gesture.Pan()
         .enabled(crosshairVisible)
+        .onStart((event) => {
+          runOnJS(handleCrosshairMove)(event.x, event.y);
+        })
         .onUpdate((event) => {
           runOnJS(handleCrosshairMove)(event.x, event.y);
         })
@@ -665,15 +684,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [crosshairVisible, handleCrosshairMove],
   );
 
-  // Tap gesture to hide crosshair
+  // Single tap toggles crosshair immediately. Drag gestures win once movement starts.
   const tapGesture = useMemo(
     () =>
       Gesture.Tap()
-        .enabled(crosshairVisible)
-        .onEnd(() => {
-          runOnJS(setCrosshairVisible)(false);
+        .maxDuration(250)
+        .maxDistance(10)
+        .onEnd((event) => {
+          runOnJS(handleCrosshairTap)(event.x, event.y);
         }),
-    [crosshairVisible],
+    [handleCrosshairTap],
   );
 
   // Double-tap handler for pane maximize/restore
@@ -712,10 +732,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () =>
       Gesture.Race(
         doubleTapGesture,
-        longPressGesture,
-        Gesture.Simultaneous(composedGesture, crosshairPanGesture, tapGesture),
+        crosshairPanGesture,
+        tapGesture,
+        composedGesture,
       ),
-    [doubleTapGesture, longPressGesture, composedGesture, crosshairPanGesture, tapGesture],
+    [doubleTapGesture, composedGesture, crosshairPanGesture, tapGesture],
   );
 
   // ==========================================================================
