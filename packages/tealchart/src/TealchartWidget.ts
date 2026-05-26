@@ -229,6 +229,7 @@ export class TealchartWidget {
         },
         onError: (scriptId, error) => {
           this._logger?.error(LogCategory.Indicators, `Tealscript error in ${scriptId}`, error);
+          this._options.onTealscriptError?.(scriptId, error);
         },
         onInputsDiscovered: (scriptId, inputDefs) => {
           // Populate study's inputs with default values from input definitions

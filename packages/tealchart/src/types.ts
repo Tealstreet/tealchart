@@ -3,6 +3,8 @@
  * Designed to be compatible with existing TradingView datafeed infrastructure
  */
 
+import type { WorkerError } from '@tealstreet/tealscript';
+
 // Reuse Bar type from existing codebase
 export interface Bar {
   time: number; // Unix timestamp in milliseconds
@@ -750,6 +752,11 @@ export interface TealchartWidgetOptions {
    * ```
    */
   createTealscriptWorker?: () => Worker;
+  /**
+   * Called when a TealScript study emits a parse/runtime error after creation.
+   * The script id is the study id returned by createStudy().
+   */
+  onTealscriptError?: (scriptId: string, error: WorkerError) => void;
   /**
    * Gap detection configuration for automatic bar recovery.
    * When enabled, the chart will detect gaps in bar data (from network issues,
