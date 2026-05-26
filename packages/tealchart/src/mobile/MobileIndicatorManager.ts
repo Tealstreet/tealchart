@@ -19,11 +19,11 @@
  * }, []);
  * ```
  */
-import type { InputDefinition, PlotOutput, Program } from '@tealstreet/tealscript';
+import type { InputDefinition, PlotOutput, Program, WorkerError } from '@tealstreet/tealscript';
 import type { PlotStyleOverride } from '../state/chartState';
 import type { Bar, UnifiedPaneLayout } from '../types';
 
-import { parse, TealscriptEngine } from '@tealstreet/tealscript';
+import { parse, TealscriptEngine, TealscriptParseError } from '@tealstreet/tealscript';
 import { type BuiltinIndicator } from '../indicators/builtinIndicators';
 import { PaneManager } from '../rendering/PaneManager';
 
@@ -54,6 +54,26 @@ export interface IndicatorPaneInfo {
 }
 
 /**
+ * Options for adding a caller-provided Tealscript indicator.
+ */
+export interface MobileTealscriptIndicatorOptions {
+  /** Stable script/instance ID. A generated ID is used when omitted. */
+  id?: string;
+  /** Raw Tealscript source. */
+  code: string;
+  /** Display name shown in pane labels/settings. */
+  name?: string;
+  /** Whether the indicator renders on the main price pane. Defaults to false. */
+  overlay?: boolean;
+  /** Runtime input values. */
+  inputs?: Record<string, unknown>;
+  /** Fixed Y range for oscillator-style panes. */
+  yAxisRange?: { min: number; max: number };
+}
+
+export type MobileIndicatorErrorCallback = (scriptId: string, error: WorkerError) => void;
+
+/**
  * MobileIndicatorManager - React-agnostic class for managing indicators
  *
  * Key differences from web's TealscriptManager:
@@ -69,6 +89,8 @@ export class MobileIndicatorManager {
   private _inputDefsCache: Map<string, InputDefinition[]> = new Map();
   private _bars: Bar[] = [];
   private _onUpdate: (() => void) | null = null;
+  private _onError: MobileIndicatorErrorCallback | null = null;
+  private _lastErrorKeys: Map<string, string> = new Map();
   private _instanceCounter = 0;
 
   constructor() {
@@ -81,6 +103,13 @@ export class MobileIndicatorManager {
    */
   setOnUpdate(callback: () => void): void {
     this._onUpdate = callback;
+  }
+
+  /**
+   * Subscribe to parse/runtime errors from custom or built-in indicators.
+   */
+  setOnError(callback: MobileIndicatorErrorCallback | null): void {
+    this._onError = callback;
   }
 
   /**
@@ -127,6 +156,7 @@ export class MobileIndicatorManager {
       }
     } catch (err) {
       console.error('[MobileIndicatorManager] Failed to parse indicator code:', indicator.id, err);
+      this._emitError(instanceId, this._toParseError(err));
     }
 
     // Add to indicators list
@@ -144,6 +174,68 @@ export class MobileIndicatorManager {
   }
 
   /**
+   * Add a caller-provided Tealscript indicator.
+   *
+   * This mirrors the worker-backed web path for mobile, but executes
+   * synchronously through TealscriptEngine so Skia can render the plots.
+   */
+  addTealscriptIndicator(options: MobileTealscriptIndicatorOptions): string {
+    const instanceId = options.id?.trim() || `custom_${++this._instanceCounter}`;
+    if (this._indicators.some((indicator) => indicator.instanceId === instanceId)) {
+      this.removeIndicator(instanceId);
+    }
+
+    const indicator: BuiltinIndicator = {
+      id: instanceId,
+      name: options.name?.trim() || 'Custom Indicator',
+      category: 'other',
+      overlay: options.overlay ?? false,
+      yAxisRange: options.yAxisRange,
+      code: options.code,
+    };
+
+    this._paneManager.addIndicator({
+      indicatorId: instanceId,
+      overlay: indicator.overlay,
+      yAxisRange: indicator.yAxisRange,
+    });
+
+    let ast: Program | undefined;
+    try {
+      ast = parse(options.code);
+      this._astCache.set(instanceId, ast);
+      this._clearError(instanceId);
+    } catch (err) {
+      this._emitError(instanceId, this._toParseError(err));
+    }
+
+    this._indicators.push({
+      instanceId,
+      indicator,
+      inputs: options.inputs,
+      ast,
+    });
+
+    this._recomputePlots();
+
+    return instanceId;
+  }
+
+  /**
+   * Compatibility with the optional IIndicatorManager script API.
+   */
+  async addScript(scriptId: string, code: string, inputs?: Record<string, unknown>): Promise<void> {
+    this.addTealscriptIndicator({ id: scriptId, code, name: scriptId, inputs });
+  }
+
+  /**
+   * Compatibility with the optional IIndicatorManager script API.
+   */
+  removeScript(scriptId: string): void {
+    this.removeIndicator(scriptId);
+  }
+
+  /**
    * Remove an indicator by instance ID
    */
   removeIndicator(instanceId: string): void {
@@ -155,6 +247,8 @@ export class MobileIndicatorManager {
 
     // Clear cached input definitions
     this._inputDefsCache.delete(instanceId);
+    this._astCache.delete(instanceId);
+    this._lastErrorKeys.delete(instanceId);
 
     // Recompute plots without this indicator
     this._recomputePlots();
@@ -242,6 +336,52 @@ export class MobileIndicatorManager {
     return this._paneManager;
   }
 
+  private _toParseError(error: unknown): WorkerError {
+    if (error instanceof TealscriptParseError) {
+      return {
+        type: 'parse',
+        message: error.message,
+        line: error.location?.start.line,
+        column: error.location?.start.column,
+      };
+    }
+
+    return {
+      type: 'parse',
+      message: error instanceof Error ? error.message : String(error),
+    };
+  }
+
+  private _toRuntimeError(error: unknown): WorkerError {
+    return {
+      type: 'runtime',
+      message: error instanceof Error ? error.message : String(error),
+    };
+  }
+
+  private _toExecutionError(error: { message: string; line?: number; column?: number }): WorkerError {
+    return {
+      type: 'runtime',
+      message: error.message,
+      line: error.line,
+      column: error.column,
+    };
+  }
+
+  private _emitError(instanceId: string, error: WorkerError): void {
+    const key = `${error.type}:${error.line ?? ''}:${error.column ?? ''}:${error.message}`;
+    if (this._lastErrorKeys.get(instanceId) === key) {
+      return;
+    }
+
+    this._lastErrorKeys.set(instanceId, key);
+    this._onError?.(instanceId, error);
+  }
+
+  private _clearError(instanceId: string): void {
+    this._lastErrorKeys.delete(instanceId);
+  }
+
   /**
    * Recompute all indicator plots
    * Called when bars change or indicators are added/removed
@@ -278,6 +418,12 @@ export class MobileIndicatorManager {
 
         // Execute the script
         const result = engine.execute(ast, this._bars, inputsMap);
+        const firstError = result.errors[0];
+        if (firstError) {
+          this._emitError(instanceId, this._toExecutionError(firstError));
+        } else {
+          this._clearError(instanceId);
+        }
 
         // Cache input definitions for settings modal
         if (result.inputs && result.inputs.length > 0) {
@@ -293,6 +439,7 @@ export class MobileIndicatorManager {
         }
       } catch (err) {
         console.error('[MobileIndicatorManager] Error executing indicator:', indicator.id, err);
+        this._emitError(instanceId, this._toRuntimeError(err));
       }
     }
 

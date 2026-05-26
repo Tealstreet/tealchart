@@ -10,7 +10,7 @@ export * from './index';
 
 // React Native Skia component
 export { SkiaTealchart } from './SkiaTealchart';
-export type { SkiaTealchartProps } from './SkiaTealchart';
+export type { SkiaTealchartHandle, SkiaTealchartProps, SkiaTealscriptIndicatorOptions } from './SkiaTealchart';
 
 // Mobile-specific components
 export { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
