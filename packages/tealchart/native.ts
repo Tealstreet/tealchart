@@ -6,4 +6,4 @@
  */
 
 export { SkiaTealchart } from './src/SkiaTealchart';
-export type { SkiaTealchartProps } from './src/SkiaTealchart';
+export type { SkiaTealchartHandle, SkiaTealchartProps, SkiaTealscriptIndicatorOptions } from './src/SkiaTealchart';

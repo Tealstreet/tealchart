@@ -20,6 +20,7 @@ import type { IIndicatorManager } from './core/ChartWidgetCore';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { IndicatorSettingsData } from './mobile/components/IndicatorSettingsModalMobile';
 import type { LabelBounds } from './mobile/hooks/useLabelCollision';
+import type { MobileTealscriptIndicatorOptions } from './mobile/MobileIndicatorManager';
 import type { PlotStyleOverride } from './state/chartState';
 import type {
   Bar,
@@ -33,8 +34,18 @@ import type {
   UnifiedPaneLayout,
   Viewport,
 } from './types';
+import type { WorkerError } from '@tealstreet/tealscript';
 
-import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from 'react';
 
 import {
   Canvas,
@@ -68,7 +79,7 @@ import { MobileIndicatorManager } from './mobile/MobileIndicatorManager';
 import { priceToY, xToTime, yToPrice } from './mobile/utils/coordinates';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
-import { DEFAULT_MARGINS } from './types';
+import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from './types';
 import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
 import { safeToFixed } from './utils/safeNumber';
 import { ViewportController } from './viewport/ViewportController';
@@ -78,6 +89,13 @@ import { intervalToMs } from './viewport/viewScale';
 interface IndicatorPaneInfo {
   name: string;
   inputs?: Record<string, unknown>;
+}
+
+export type SkiaTealscriptIndicatorOptions = MobileTealscriptIndicatorOptions;
+
+export interface SkiaTealchartHandle {
+  addTealscriptIndicator(options: SkiaTealscriptIndicatorOptions): string | null;
+  removeTealscriptIndicator(instanceId: string): void;
 }
 
 export interface SkiaTealchartProps {
@@ -141,9 +159,11 @@ export interface SkiaTealchartProps {
   onAddIndicator?: (indicator: BuiltinIndicator) => void;
   /** Called to open indicator settings for a given instance ID */
   onOpenIndicatorSettings?: (instanceId: string) => void;
+  /** Called when a Tealscript parse/runtime error occurs */
+  onTealscriptError?: (scriptId: string, error: WorkerError) => void;
 }
 
-export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
+export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>(function SkiaTealchart({
   width: propWidth,
   height: propHeight,
   // Required datafeed prop
@@ -173,7 +193,8 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   onSymbolChange,
   // Indicator props
   onAddIndicator,
-}) => {
+  onTealscriptError,
+}, ref) {
   // ==========================================================================
   // Core Hook + Indicator Management
   // ==========================================================================
@@ -188,12 +209,29 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
     indicatorManagerRef.current.setOnUpdate(forceUpdate);
   }
 
+  useEffect(() => {
+    indicatorManagerRef.current?.setOnError(onTealscriptError ?? null);
+  }, [onTealscriptError]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      addTealscriptIndicator(options: SkiaTealscriptIndicatorOptions): string | null {
+        return indicatorManagerRef.current?.addTealscriptIndicator(options) ?? null;
+      },
+      removeTealscriptIndicator(instanceId: string): void {
+        indicatorManagerRef.current?.removeIndicator(instanceId);
+      },
+    }),
+    [],
+  );
+
   // Use core hook for bar fetching and state management
   const coreResult = useTealchartCore({
     datafeed,
     symbol: propSymbol,
     interval: propInterval,
-    indicatorManager: indicatorManagerRef.current as IIndicatorManager,
+    indicatorManager: indicatorManagerRef.current as unknown as IIndicatorManager,
     onSymbolChange,
     onIntervalChange,
   });
@@ -209,36 +247,6 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   const baseUnifiedPaneLayout = indicatorManagerRef.current?.getUnifiedLayout() || unifiedLayout;
   const indicatorPaneInfo = indicatorManagerRef.current?.getIndicatorPaneInfo() || {};
 
-  // Compute auto-scale Y ranges for indicator panes (matching TealchartWidget behavior)
-  const unifiedPaneLayout = useMemo(() => {
-    if (!viewport || plots.length === 0 || !baseUnifiedPaneLayout) return baseUnifiedPaneLayout;
-
-    // Compute auto-scale Y ranges for indicator panes via ViewportController
-    const indicatorPanes = baseUnifiedPaneLayout.panes
-      .filter((p) => p.type === 'indicator' && p.indicatorIds)
-      .map((p) => ({ id: p.id, fixedRange: p.fixedRange, indicatorIds: p.indicatorIds! }));
-
-    const ranges = viewportControllerRef.current.computePaneYRanges(
-      indicatorPanes,
-      plots,
-      bars,
-      viewport.startTime,
-      viewport.endTime,
-    );
-
-    if (ranges.size === 0) return baseUnifiedPaneLayout;
-
-    return {
-      ...baseUnifiedPaneLayout,
-      panes: baseUnifiedPaneLayout.panes.map((pane) => {
-        const range = ranges.get(pane.id);
-        if (range) {
-          return { ...pane, yMin: range.yMin, yMax: range.yMax };
-        }
-        return pane;
-      }),
-    };
-  }, [baseUnifiedPaneLayout, viewport, plots, bars]);
   const activeIndicatorIds = indicatorManagerRef.current?.getIndicators().map((ind) => ind.indicator.id) || [];
 
   // Handle indicator addition
@@ -309,6 +317,37 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   // Track the first bar's time to detect reloads with the same count
   const barsFirstTimeRef = useRef<number | null>(bars.length > 0 ? bars[0].time : null);
 
+  // Compute auto-scale Y ranges for indicator panes (matching TealchartWidget behavior)
+  const unifiedPaneLayout = useMemo(() => {
+    if (!viewport || plots.length === 0 || !baseUnifiedPaneLayout) return baseUnifiedPaneLayout;
+
+    // Compute auto-scale Y ranges for indicator panes via ViewportController
+    const indicatorPanes = baseUnifiedPaneLayout.panes
+      .filter((p) => p.type === 'indicator' && p.indicatorIds)
+      .map((p) => ({ id: p.id, fixedRange: p.fixedRange, indicatorIds: p.indicatorIds! }));
+
+    const ranges = viewportControllerRef.current.computePaneYRanges(
+      indicatorPanes,
+      plots,
+      bars,
+      viewport.startTime,
+      viewport.endTime,
+    );
+
+    if (ranges.size === 0) return baseUnifiedPaneLayout;
+
+    return {
+      ...baseUnifiedPaneLayout,
+      panes: baseUnifiedPaneLayout.panes.map((pane) => {
+        const range = ranges.get(pane.id);
+        if (range) {
+          return { ...pane, yMin: range.yMin, yMax: range.yMax };
+        }
+        return pane;
+      }),
+    };
+  }, [baseUnifiedPaneLayout, viewport, plots, bars]);
+
   useEffect(() => {
     if (bars.length === 0) {
       // Reset refs when bars are cleared so next load always triggers
@@ -359,6 +398,9 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
       volumeHeight: renderOptions?.volumeHeight ?? 0.15,
       minCandleWidth: renderOptions?.minCandleWidth ?? 1,
       ...renderOptions,
+      crosshairColor: renderOptions?.crosshairColor ?? DEFAULT_RENDER_OPTIONS.crosshairColor,
+      candleSpacing: renderOptions?.candleSpacing ?? DEFAULT_RENDER_OPTIONS.candleSpacing,
+      maxCandleWidth: renderOptions?.maxCandleWidth ?? DEFAULT_RENDER_OPTIONS.maxCandleWidth,
       // Pass margins with top bar offset so price labels have safe zone
       margins,
     };
@@ -683,7 +725,7 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
   const labelBoundsInput = useMemo(() => {
     if (!viewport) return [];
 
-    const bounds: LabelBounds[] = [];
+    const bounds: Array<LabelBounds & { id: string }> = [];
     const labelHeight = 20;
 
     // Add order line labels
@@ -764,7 +806,7 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
 
     const pic = createPicture(
       (canvas) => {
-        const ctx = new SkiaCanvasContext(canvas, Skia);
+        const ctx = new SkiaCanvasContext(canvas as any, Skia as any);
         // Pass margins as third parameter (constructor doesn't read from options.margins)
         const renderer = new TealchartRenderer(ctx, fullRenderOptions, margins);
 
@@ -1044,7 +1086,9 @@ export const SkiaTealchart: React.FC<SkiaTealchartProps> = ({
       />
     </View>
   );
-};
+});
+
+SkiaTealchart.displayName = 'SkiaTealchart';
 
 const styles = StyleSheet.create({
   container: {
