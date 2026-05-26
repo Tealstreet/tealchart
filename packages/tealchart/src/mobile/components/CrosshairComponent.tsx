@@ -37,6 +37,8 @@ export interface CrosshairComponentProps {
   pricePrecision?: number;
   /** Whether to show context menu button */
   showContextMenuButton?: boolean;
+  /** Whether to render crosshair lines in this RN overlay */
+  showLines?: boolean;
   /** Callback when context menu button is pressed */
   onContextMenuPress?: (price: number, time: number) => void;
 }
@@ -55,6 +57,7 @@ export const CrosshairComponent: React.FC<CrosshairComponentProps> = ({
   dimensions,
   pricePrecision = 2,
   showContextMenuButton = true,
+  showLines = true,
   onContextMenuPress,
 }) => {
   // Chart bounds
@@ -104,32 +107,36 @@ export const CrosshairComponent: React.FC<CrosshairComponentProps> = ({
   return (
     <View style={styles.container} pointerEvents="box-none">
       {/* Vertical line */}
-      <View
-        style={[
-          styles.verticalLine,
-          {
-            left: x,
-            top: chartTop,
-            height: chartBottom - chartTop,
-            borderLeftColor: color,
-          },
-        ]}
-        pointerEvents="none"
-      />
+      {showLines && (
+        <View
+          style={[
+            styles.verticalLine,
+            {
+              left: x,
+              top: chartTop,
+              height: chartBottom - chartTop,
+              borderLeftColor: color,
+            },
+          ]}
+          pointerEvents="none"
+        />
+      )}
 
       {/* Horizontal line */}
-      <View
-        style={[
-          styles.horizontalLine,
-          {
-            top: y,
-            left: chartLeft,
-            width: showContextMenuButton ? chartRight - chartLeft - CONTEXT_BUTTON_SIZE - 8 : chartRight - chartLeft,
-            borderTopColor: color,
-          },
-        ]}
-        pointerEvents="none"
-      />
+      {showLines && (
+        <View
+          style={[
+            styles.horizontalLine,
+            {
+              top: y,
+              left: chartLeft,
+              width: showContextMenuButton ? chartRight - chartLeft - CONTEXT_BUTTON_SIZE - 8 : chartRight - chartLeft,
+              borderTopColor: color,
+            },
+          ]}
+          pointerEvents="none"
+        />
+      )}
 
       {/* Price label (right edge) */}
       <View
