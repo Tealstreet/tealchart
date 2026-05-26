@@ -906,6 +906,46 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     return { y, color, labelText, chartLeft, chartRight, pnl };
   }, [bracketDragState, viewport, chartDimensions, pricePrecision]);
 
+  const crosshairOverlay = useMemo(() => {
+    if (!viewport || !crosshairVisible) return null;
+
+    const chartLeft = margins.left;
+    const chartRight = dimensions.width - margins.right;
+    const chartTop = margins.top;
+    const chartBottom = dimensions.height - margins.bottom;
+    const { x, y } = lastCrosshairPosition;
+
+    if (x < chartLeft || x > chartRight) return null;
+
+    const hasContextMenu = !!onContextMenu;
+    const horizontalRight = hasContextMenu ? chartRight - 26 : chartRight;
+    const showHorizontal = y >= chartTop && y <= chartBottom;
+
+    return {
+      color: fullRenderOptions.crosshairColor,
+      x,
+      y,
+      chartLeft,
+      chartRight,
+      chartTop,
+      chartBottom,
+      horizontalRight,
+      showHorizontal,
+    };
+  }, [
+    viewport,
+    crosshairVisible,
+    margins.left,
+    margins.right,
+    margins.top,
+    margins.bottom,
+    dimensions.width,
+    dimensions.height,
+    lastCrosshairPosition,
+    onContextMenu,
+    fullRenderOptions.crosshairColor,
+  ]);
+
   // ==========================================================================
   // Render
   // ==========================================================================
@@ -924,6 +964,33 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         ]}
       >
         {picture && <Picture picture={picture} />}
+
+        {/* Crosshair lines mirror the web overlay and avoid RN dashed-border gaps on iOS. */}
+        {crosshairOverlay && (
+          <Group>
+            <SkiaLine
+              p1={vec(crosshairOverlay.x, crosshairOverlay.chartTop)}
+              p2={vec(crosshairOverlay.x, crosshairOverlay.chartBottom)}
+              color={crosshairOverlay.color}
+              strokeWidth={1}
+              style="stroke"
+            >
+              <DashPathEffect intervals={[4, 4]} />
+            </SkiaLine>
+
+            {crosshairOverlay.showHorizontal && (
+              <SkiaLine
+                p1={vec(crosshairOverlay.chartLeft, crosshairOverlay.y)}
+                p2={vec(crosshairOverlay.horizontalRight, crosshairOverlay.y)}
+                color={crosshairOverlay.color}
+                strokeWidth={1}
+                style="stroke"
+              >
+                <DashPathEffect intervals={[4, 4]} />
+              </SkiaLine>
+            )}
+          </Group>
+        )}
 
         {/* Bracket drag preview (TP/SL dashed line + label) */}
         {bracketPreview && bracketFont && (
@@ -1024,7 +1091,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
             viewport={viewport}
             dimensions={chartDimensions}
             pricePrecision={pricePrecision}
+            color={fullRenderOptions.crosshairColor}
             showContextMenuButton={!!onContextMenu}
+            showLines={false}
             onContextMenuPress={handleContextMenuPress}
           />
         )}
