@@ -1,4 +1,5 @@
 import type { Bar } from '../types';
+import type { BuiltinIndicator } from '../indicators/builtinIndicators';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -82,6 +83,58 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
         column: expect.any(Number),
       }),
     );
+  });
+
+  it('reports parse errors from built-in indicators', () => {
+    const manager = new MobileIndicatorManager();
+    const onError = vi.fn();
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    manager.setOnError(onError);
+    manager.setBars(makeBars(2));
+
+    const indicator: BuiltinIndicator = {
+      id: 'broken-builtin',
+      name: 'Broken Builtin',
+      category: 'other',
+      overlay: false,
+      code: 'indicator("Broken Builtin"\nplot(close)',
+    };
+    const instanceId = manager.addIndicator(indicator);
+
+    expect(manager.getIndicator(instanceId)).toBeDefined();
+    expect(manager.getPlots()).toHaveLength(0);
+    expect(onError).toHaveBeenCalledWith(
+      instanceId,
+      expect.objectContaining({
+        type: 'parse',
+        message: expect.any(String),
+      }),
+    );
+
+    consoleError.mockRestore();
+  });
+
+  it('upserts caller-stable custom Tealscript IDs', () => {
+    const manager = new MobileIndicatorManager();
+    manager.setBars(makeBars(2));
+
+    const firstId = manager.addTealscriptIndicator({
+      id: 'stable-study',
+      name: 'First',
+      code: 'indicator("First")\nplot(close)',
+    });
+    const secondId = manager.addTealscriptIndicator({
+      id: 'stable-study',
+      name: 'Second',
+      code: 'indicator("Second")\nplot(open)',
+    });
+
+    expect(secondId).toBe(firstId);
+    expect(manager.getIndicators()).toHaveLength(1);
+    expect(manager.getIndicator(secondId)?.indicator.name).toBe('Second');
+    expect(manager.getPlots()).toHaveLength(1);
+    expect(manager.getPlots()[0].scriptId).toBe(secondId);
+    expect(manager.getPlots()[0].values).toEqual([100, 101]);
   });
 
   it('reports runtime errors once until the error changes', () => {

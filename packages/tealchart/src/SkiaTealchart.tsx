@@ -41,6 +41,7 @@ import React, {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useMemo,
   useReducer,
   useRef,
@@ -209,7 +210,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     indicatorManagerRef.current.setOnUpdate(forceUpdate);
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     indicatorManagerRef.current?.setOnError(onTealscriptError ?? null);
   }, [onTealscriptError]);
 

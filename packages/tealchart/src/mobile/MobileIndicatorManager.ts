@@ -156,6 +156,7 @@ export class MobileIndicatorManager {
       }
     } catch (err) {
       console.error('[MobileIndicatorManager] Failed to parse indicator code:', indicator.id, err);
+      this._emitError(instanceId, this._toParseError(err));
     }
 
     // Add to indicators list
@@ -180,6 +181,10 @@ export class MobileIndicatorManager {
    */
   addTealscriptIndicator(options: MobileTealscriptIndicatorOptions): string {
     const instanceId = options.id?.trim() || `custom_${++this._instanceCounter}`;
+    if (this._indicators.some((indicator) => indicator.instanceId === instanceId)) {
+      this.removeIndicator(instanceId);
+    }
+
     const indicator: BuiltinIndicator = {
       id: instanceId,
       name: options.name?.trim() || 'Custom Indicator',
