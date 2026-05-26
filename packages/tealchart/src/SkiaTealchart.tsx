@@ -918,7 +918,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     if (x < chartLeft || x > chartRight) return null;
 
     const hasContextMenu = !!onContextMenu;
-    const horizontalRight = hasContextMenu ? chartRight - 22 : chartRight;
+    const horizontalRight = hasContextMenu ? chartRight - 26 : chartRight;
     const showHorizontal = y >= chartTop && y <= chartBottom;
 
     return {
