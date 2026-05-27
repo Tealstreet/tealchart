@@ -9,6 +9,7 @@
 /CODEOWNERS                 @Tealstreet/mirror-maintainers
 /LICENSE                    @Tealstreet/mirror-maintainers
 /NOTICE                     @Tealstreet/mirror-maintainers
+/workspace.josh             @Tealstreet/mirror-maintainers
 /yarn.lock                  @Tealstreet/mirror-maintainers
 /package.json               @Tealstreet/mirror-maintainers
 /turbo.json                 @Tealstreet/mirror-maintainers

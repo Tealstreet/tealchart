@@ -7,3 +7,12 @@
 
 export { SkiaTealchart } from './src/SkiaTealchart';
 export type { SkiaTealchartHandle, SkiaTealchartProps, SkiaTealscriptIndicatorOptions } from './src/SkiaTealchart';
+export {
+  BUILTIN_CHART_THEMES,
+  DARK_CHART_THEME,
+  LIGHT_CHART_THEME,
+  chartThemeToRenderOptions,
+  mergeChartThemeRenderOptions,
+  resolveChartTheme,
+} from './src/theme';
+export type { ChartTheme, ChartThemeInput, ChartThemeName, ChartThemeRenderOptions } from './src/theme';

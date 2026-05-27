@@ -1,8 +1,9 @@
 import type { Bar } from '../types';
 import type { BuiltinIndicator } from '../indicators/builtinIndicators';
 
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import { MobileIndicatorManager } from './MobileIndicatorManager';
 
 function makeBars(count: number): Bar[] {
@@ -17,6 +18,10 @@ function makeBars(count: number): Bar[] {
 }
 
 describe('MobileIndicatorManager custom Tealscript indicators', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
   it('adds caller-provided Tealscript and tags plots with the returned instance ID', () => {
     const manager = new MobileIndicatorManager();
     manager.setBars(makeBars(3));
@@ -63,7 +68,7 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
   it('returns an instance ID and reports parse errors for invalid Tealscript', () => {
     const manager = new MobileIndicatorManager();
     const onError = vi.fn();
-    manager.setOnError(onError);
+    manager.onErrorSubscribe(onError);
     manager.setBars(makeBars(2));
 
     const instanceId = manager.addTealscriptIndicator({
@@ -88,8 +93,7 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
   it('reports parse errors from built-in indicators', () => {
     const manager = new MobileIndicatorManager();
     const onError = vi.fn();
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-    manager.setOnError(onError);
+    manager.onErrorSubscribe(onError);
     manager.setBars(makeBars(2));
 
     const indicator: BuiltinIndicator = {
@@ -110,8 +114,6 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
         message: expect.any(String),
       }),
     );
-
-    consoleError.mockRestore();
   });
 
   it('upserts caller-stable custom Tealscript IDs', () => {
@@ -140,8 +142,7 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
   it('reports runtime errors once until the error changes', () => {
     const manager = new MobileIndicatorManager();
     const onError = vi.fn();
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-    manager.setOnError(onError);
+    manager.onErrorSubscribe(onError);
     manager.setBars(makeBars(2));
 
     const instanceId = manager.addTealscriptIndicator({
@@ -161,7 +162,5 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
         message: expect.stringContaining('ta.missing'),
       }),
     );
-
-    consoleError.mockRestore();
   });
 });

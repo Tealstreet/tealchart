@@ -107,6 +107,17 @@ export type {
 // Default values
 export { DEFAULT_RENDER_OPTIONS, DEFAULT_MARGINS } from './types';
 
+// Cross-platform chart themes
+export {
+  BUILTIN_CHART_THEMES,
+  DARK_CHART_THEME,
+  LIGHT_CHART_THEME,
+  chartThemeToRenderOptions,
+  mergeChartThemeRenderOptions,
+  resolveChartTheme,
+} from './theme';
+export type { ChartTheme, ChartThemeInput, ChartThemeName, ChartThemeRenderOptions } from './theme';
+
 // Tealscript integration
 export {
   TealscriptManager,
