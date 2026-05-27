@@ -4,6 +4,7 @@
  */
 
 import type { WorkerError } from '@tealstreet/tealscript';
+import type { ChartThemeInput } from './theme';
 
 // Reuse Bar type from existing codebase
 export interface Bar {
@@ -720,7 +721,7 @@ export interface TealchartWidgetOptions {
   locale?: string;
   autosize?: boolean;
   fullscreen?: boolean;
-  theme?: 'Light' | 'Dark';
+  theme?: ChartThemeInput;
   overrides?: ChartOverrides;
   // Additional Tealstreet-specific options
   account?: string;

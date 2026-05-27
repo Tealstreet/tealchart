@@ -24,6 +24,8 @@ import type { PlotStyleOverride } from '../state/chartState';
 import type { Bar, UnifiedPaneLayout } from '../types';
 
 import { parse, TealscriptEngine, TealscriptParseError } from '@tealstreet/tealscript';
+import { LogCategory, TealchartLogger } from '../debug/TealchartLogger';
+import { EventEmitter, type EventCallback } from '../events/EventEmitter';
 import { type BuiltinIndicator } from '../indicators/builtinIndicators';
 import { PaneManager } from '../rendering/PaneManager';
 
@@ -73,6 +75,8 @@ export interface MobileTealscriptIndicatorOptions {
 
 export type MobileIndicatorErrorCallback = (scriptId: string, error: WorkerError) => void;
 
+const MOBILE_INDICATOR_ERROR_EVENT = 'indicator:error';
+
 /**
  * MobileIndicatorManager - React-agnostic class for managing indicators
  *
@@ -89,7 +93,11 @@ export class MobileIndicatorManager {
   private _inputDefsCache: Map<string, InputDefinition[]> = new Map();
   private _bars: Bar[] = [];
   private _onUpdate: (() => void) | null = null;
-  private _onError: MobileIndicatorErrorCallback | null = null;
+  private _events = new EventEmitter();
+  private _logger = new TealchartLogger({
+    consoleOutput: false,
+    consolePrefix: '[MobileIndicatorManager]',
+  });
   private _lastErrorKeys: Map<string, string> = new Map();
   private _instanceCounter = 0;
 
@@ -105,11 +113,12 @@ export class MobileIndicatorManager {
     this._onUpdate = callback;
   }
 
-  /**
-   * Subscribe to parse/runtime errors from custom or built-in indicators.
-   */
-  setOnError(callback: MobileIndicatorErrorCallback | null): void {
-    this._onError = callback;
+  onErrorSubscribe(callback: MobileIndicatorErrorCallback): void {
+    this._events.subscribe(MOBILE_INDICATOR_ERROR_EVENT, callback as EventCallback);
+  }
+
+  onErrorUnsubscribe(callback: MobileIndicatorErrorCallback): void {
+    this._events.unsubscribe(MOBILE_INDICATOR_ERROR_EVENT, callback as EventCallback);
   }
 
   /**
@@ -155,7 +164,10 @@ export class MobileIndicatorManager {
         this._astCache.set(indicator.id, ast);
       }
     } catch (err) {
-      console.error('[MobileIndicatorManager] Failed to parse indicator code:', indicator.id, err);
+      this._logger.error(LogCategory.Indicators, 'Failed to parse indicator code', {
+        indicatorId: indicator.id,
+        error: err,
+      });
       this._emitError(instanceId, this._toParseError(err));
     }
 
@@ -375,12 +387,7 @@ export class MobileIndicatorManager {
     }
 
     this._lastErrorKeys.set(instanceId, key);
-    // Isolate the consumer callback: a throwing hook must not abort _recomputePlots.
-    try {
-      this._onError?.(instanceId, error);
-    } catch (cbErr) {
-      console.error('[MobileIndicatorManager] onError callback threw:', cbErr);
-    }
+    this._events.emit(MOBILE_INDICATOR_ERROR_EVENT, instanceId, error);
   }
 
   private _clearError(instanceId: string): void {
@@ -443,7 +450,10 @@ export class MobileIndicatorManager {
           });
         }
       } catch (err) {
-        console.error('[MobileIndicatorManager] Error executing indicator:', indicator.id, err);
+        this._logger.error(LogCategory.Indicators, 'Error executing indicator', {
+          indicatorId: indicator.id,
+          error: err,
+        });
         this._emitError(instanceId, this._toRuntimeError(err));
       }
     }
