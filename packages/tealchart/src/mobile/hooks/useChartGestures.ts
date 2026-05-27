@@ -55,6 +55,9 @@ export function useChartGestures({
   const priceAxisStartRange = useSharedValue(0);
   const timeAxisStartRange = useSharedValue(0);
   const savedScale = useSharedValue(1);
+  const interactionFramePending = useSharedValue(false);
+  const interactionFrameX = useSharedValue(0);
+  const interactionFrameY = useSharedValue(0);
 
   // Pan handler for chart scrolling (time and price)
   // All data access happens on JS thread via closure
@@ -222,6 +225,23 @@ export function useChartGestures({
 
   // Memoize gestures to prevent recreating on every render
   const panGesture = useMemo(() => {
+    const scheduleInteraction = (x: number, y: number) => {
+      'worklet';
+
+      if (!onInteraction) return;
+
+      interactionFrameX.value = x;
+      interactionFrameY.value = y;
+
+      if (interactionFramePending.value) return;
+
+      interactionFramePending.value = true;
+      requestAnimationFrame(() => {
+        interactionFramePending.value = false;
+        runOnJS(onInteraction)(interactionFrameX.value, interactionFrameY.value);
+      });
+    };
+
     return Gesture.Pan()
       .enabled(enabled)
       .onStart((event) => {
@@ -229,9 +249,7 @@ export function useChartGestures({
         runOnJS(handlePanStartAndSetValues)(event.x, event.y);
       })
       .onUpdate((event) => {
-        if (onInteraction) {
-          runOnJS(onInteraction)(event.x, event.y);
-        }
+        scheduleInteraction(event.x, event.y);
 
         const zone = gestureZoneValue.value;
 
@@ -266,10 +284,30 @@ export function useChartGestures({
     timeAxisStartRange,
     savedTranslateX,
     savedTranslateY,
+    interactionFramePending,
+    interactionFrameX,
+    interactionFrameY,
   ]);
 
   // Pinch gesture for zoom
   const pinchGesture = useMemo(() => {
+    const scheduleInteraction = (x: number, y: number) => {
+      'worklet';
+
+      if (!onInteraction) return;
+
+      interactionFrameX.value = x;
+      interactionFrameY.value = y;
+
+      if (interactionFramePending.value) return;
+
+      interactionFramePending.value = true;
+      requestAnimationFrame(() => {
+        interactionFramePending.value = false;
+        runOnJS(onInteraction)(interactionFrameX.value, interactionFrameY.value);
+      });
+    };
+
     return Gesture.Pinch()
       .enabled(enabled)
       .onStart((event) => {
@@ -279,13 +317,19 @@ export function useChartGestures({
         }
       })
       .onUpdate((event) => {
-        if (onInteraction) {
-          runOnJS(onInteraction)(event.focalX, event.focalY);
-        }
+        scheduleInteraction(event.focalX, event.focalY);
         const newScale = savedScale.value * event.scale;
         runOnJS(updateViewportFromPinch)(newScale);
       });
-  }, [enabled, onInteraction, updateViewportFromPinch, savedScale]);
+  }, [
+    enabled,
+    onInteraction,
+    updateViewportFromPinch,
+    savedScale,
+    interactionFramePending,
+    interactionFrameX,
+    interactionFrameY,
+  ]);
 
   // Compose gestures
   const composedGesture = useMemo(() => {

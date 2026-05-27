@@ -1216,7 +1216,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       {/* Reset viewport button — re-enables auto-scale */}
       {resetButtonVisible && (
         <Animated.View style={[styles.resetButtonContainer, resetButtonAnimatedStyle]} pointerEvents="box-none">
-          <TouchableOpacity style={styles.resetButton} onPress={handleResetButtonPress} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={styles.resetButton}
+            onPress={handleResetButtonPress}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Reset chart viewport"
+            accessibilityHint="Resets zoom and auto-scale"
+          >
             <Text style={styles.resetButtonText}>↻</Text>
           </TouchableOpacity>
         </Animated.View>
