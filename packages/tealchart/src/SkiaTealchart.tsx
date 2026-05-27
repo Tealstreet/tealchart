@@ -733,16 +733,20 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [handleDoubleTap],
   );
 
+  const tapOrDoubleTapGesture = useMemo(
+    () => Gesture.Exclusive(doubleTapGesture, tapGesture),
+    [doubleTapGesture, tapGesture],
+  );
+
   // Combine all gestures
   const allGestures = useMemo(
     () =>
       Gesture.Race(
-        doubleTapGesture,
         crosshairPanGesture,
-        tapGesture,
+        tapOrDoubleTapGesture,
         composedGesture,
       ),
-    [doubleTapGesture, composedGesture, crosshairPanGesture, tapGesture],
+    [composedGesture, crosshairPanGesture, tapOrDoubleTapGesture],
   );
 
   // ==========================================================================
