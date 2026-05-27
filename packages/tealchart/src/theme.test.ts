@@ -26,6 +26,19 @@ describe('chart theme helpers', () => {
     expect(first).not.toBe(second);
   });
 
+  it('returns cloned theme objects from resolver', () => {
+    const first = resolveChartTheme('Dark');
+    const second = resolveChartTheme('Dark');
+
+    expect(first).toEqual(second);
+    expect(first).not.toBe(second);
+    expect(first.renderOptions).not.toBe(second.renderOptions);
+
+    first.renderOptions.backgroundColor = '#000000';
+
+    expect(resolveChartTheme('Dark').renderOptions.backgroundColor).toBe('#1e222d');
+  });
+
   it('accepts custom theme objects', () => {
     const theme: ChartTheme = {
       name: 'Premys',
@@ -36,6 +49,8 @@ describe('chart theme helpers', () => {
     };
 
     expect(chartThemeToRenderOptions(theme)).toEqual(theme.renderOptions);
+    expect(resolveChartTheme(theme)).not.toBe(theme);
+    expect(resolveChartTheme(theme).renderOptions).not.toBe(theme.renderOptions);
   });
 
   it('lets explicit render options override theme values', () => {
@@ -50,7 +65,7 @@ describe('chart theme helpers', () => {
   });
 
   it('falls back to the dark theme for invalid runtime values', () => {
-    expect(resolveChartTheme('Unknown' as never)).toBe(resolveChartTheme('Dark'));
-    expect(resolveChartTheme({} as never)).toBe(resolveChartTheme('Dark'));
+    expect(resolveChartTheme('Unknown' as never)).toEqual(resolveChartTheme('Dark'));
+    expect(resolveChartTheme({} as never)).toEqual(resolveChartTheme('Dark'));
   });
 });

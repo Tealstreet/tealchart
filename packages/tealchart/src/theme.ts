@@ -51,12 +51,25 @@ export const BUILTIN_CHART_THEMES: Record<ChartThemeName, ChartTheme> = {
   Light: LIGHT_CHART_THEME,
 };
 
+function cloneChartTheme(theme: ChartTheme): ChartTheme {
+  return {
+    name: theme.name,
+    renderOptions: { ...theme.renderOptions },
+  };
+}
+
 export function resolveChartTheme(theme: ChartThemeInput = 'Dark'): ChartTheme {
+  let resolvedTheme: ChartTheme;
+
   if (typeof theme === 'string') {
-    return BUILTIN_CHART_THEMES[theme as ChartThemeName] ?? DARK_CHART_THEME;
+    resolvedTheme = BUILTIN_CHART_THEMES[theme as ChartThemeName] ?? DARK_CHART_THEME;
+  } else if (theme?.renderOptions) {
+    resolvedTheme = theme;
+  } else {
+    resolvedTheme = DARK_CHART_THEME;
   }
-  if (!theme?.renderOptions) return DARK_CHART_THEME;
-  return theme;
+
+  return cloneChartTheme(resolvedTheme);
 }
 
 export function chartThemeToRenderOptions(theme: ChartThemeInput = 'Dark'): ChartThemeRenderOptions {
