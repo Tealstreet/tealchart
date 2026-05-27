@@ -229,7 +229,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   }
 
   useLayoutEffect(() => {
-    indicatorManagerRef.current?.setOnError(onTealscriptError ?? null);
+    const manager = indicatorManagerRef.current;
+    if (!manager || !onTealscriptError) return;
+    manager.onErrorSubscribe(onTealscriptError);
+    return () => {
+      manager.onErrorUnsubscribe(onTealscriptError);
+    };
   }, [onTealscriptError]);
 
   useImperativeHandle(

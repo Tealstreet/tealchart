@@ -53,8 +53,9 @@ export const BUILTIN_CHART_THEMES: Record<ChartThemeName, ChartTheme> = {
 
 export function resolveChartTheme(theme: ChartThemeInput = 'Dark'): ChartTheme {
   if (typeof theme === 'string') {
-    return BUILTIN_CHART_THEMES[theme];
+    return BUILTIN_CHART_THEMES[theme as ChartThemeName] ?? DARK_CHART_THEME;
   }
+  if (!theme?.renderOptions) return DARK_CHART_THEME;
   return theme;
 }
 
