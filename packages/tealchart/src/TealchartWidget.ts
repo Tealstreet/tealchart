@@ -24,6 +24,8 @@ import { getChartStore, hasChartStore } from './state/chartState';
 import { generateIndicatorId } from './state/indicatorActions';
 import { TealchartApi } from './TealchartApi';
 import { TealscriptManager } from './tealscript/TealscriptManager';
+import { chartThemeToRenderOptions, mergeChartThemeRenderOptions } from './theme';
+import type { ChartThemeInput } from './theme';
 import {
   Bar,
   ChartOverrides,
@@ -200,9 +202,7 @@ export class TealchartWidget {
 
     this._eventEmitter = new EventEmitter();
     this._chartApi = new TealchartApi(this._symbol, this._interval, options.account);
-    this._renderOptions = {
-      ...options.renderOptions,
-    };
+    this._renderOptions = mergeChartThemeRenderOptions(options.theme, options.renderOptions);
 
     // Apply initial overrides if provided
     if (options.overrides) {
@@ -2765,22 +2765,15 @@ export class TealchartWidget {
   /**
    * Change theme
    */
-  changeTheme(theme: 'Light' | 'Dark'): void {
-    // Apply theme-specific overrides
-    if (theme === 'Dark') {
-      this.applyOverrides({
-        'paneProperties.background': '#1e222d',
-        'scalesProperties.textColor': '#787b86',
-        'paneProperties.vertGridProperties.color': '#363a45',
-        'paneProperties.horzGridProperties.color': '#363a45',
-      });
-    } else {
-      this.applyOverrides({
-        'paneProperties.background': '#ffffff',
-        'scalesProperties.textColor': '#131722',
-        'paneProperties.vertGridProperties.color': '#e0e3eb',
-        'paneProperties.horzGridProperties.color': '#e0e3eb',
-      });
+  changeTheme(theme: ChartThemeInput): void {
+    this._renderOptions = {
+      ...this._renderOptions,
+      ...chartThemeToRenderOptions(theme),
+      ...this._options.renderOptions,
+    };
+
+    if (this._ui) {
+      this._scheduler.markDirty(DIRTY.OPTIONS | DIRTY.FULL);
     }
   }
 }

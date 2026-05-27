@@ -80,6 +80,8 @@ import { MobileIndicatorManager } from './mobile/MobileIndicatorManager';
 import { priceToY, xToTime, yToPrice } from './mobile/utils/coordinates';
 import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
 import { TealchartRenderer } from './TealchartRenderer';
+import { mergeChartThemeRenderOptions } from './theme';
+import type { ChartThemeInput } from './theme';
 import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from './types';
 import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
 import { safeToFixed } from './utils/safeNumber';
@@ -101,6 +103,7 @@ export type SkiaTealscriptIndicatorOptions = MobileTealscriptIndicatorOptions;
 export interface SkiaTealchartHandle {
   addTealscriptIndicator(options: SkiaTealscriptIndicatorOptions): string | null;
   removeTealscriptIndicator(instanceId: string): void;
+  changeTheme(theme: ChartThemeInput): void;
 }
 
 export interface SkiaTealchartProps {
@@ -118,6 +121,8 @@ export interface SkiaTealchartProps {
   height?: number;
   /** Render options for colors and styling */
   renderOptions?: Partial<Omit<RenderOptions, 'width' | 'height' | 'devicePixelRatio'>>;
+  /** Built-in or custom chart theme. Explicit renderOptions override theme values. */
+  theme?: ChartThemeInput;
   /** Custom margins to override defaults */
   margins?: Partial<ChartMargins>;
   /** Price lines to render (last trade, orders, positions, etc.) */
@@ -178,6 +183,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     interval: propInterval = '15',
     // Rendering props
     renderOptions,
+    theme = 'Dark',
     margins: marginsProp,
     priceLines,
     orderLines,
@@ -209,6 +215,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   // Force re-render helper for indicator updates
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
+  const [imperativeTheme, setImperativeTheme] = useState<ChartThemeInput | null>(null);
+
+  useEffect(() => {
+    setImperativeTheme(null);
+  }, [theme]);
 
   // Create indicator manager (stable ref)
   const indicatorManagerRef = useRef<MobileIndicatorManager | null>(null);
@@ -229,6 +240,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       },
       removeTealscriptIndicator(instanceId: string): void {
         indicatorManagerRef.current?.removeIndicator(instanceId);
+      },
+      changeTheme(nextTheme: ChartThemeInput): void {
+        setImperativeTheme(nextTheme);
       },
     }),
     [],
@@ -390,27 +404,27 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // ==========================================================================
 
   const fullRenderOptions: RenderOptions = useMemo(() => {
-    console.log('[SkiaTealchart] margins:', margins, 'showTopBar:', showTopBar);
+    const themedRenderOptions = mergeChartThemeRenderOptions(imperativeTheme ?? theme, renderOptions);
     return {
       width: dimensions.width,
       height: dimensions.height,
       devicePixelRatio: 1,
-      backgroundColor: renderOptions?.backgroundColor || '#131722',
-      upColor: renderOptions?.upColor || '#26a69a',
-      downColor: renderOptions?.downColor || '#ef5350',
-      textColor: renderOptions?.textColor || '#d1d4dc',
-      gridColor: renderOptions?.gridColor || 'rgba(255, 255, 255, 0.06)',
-      showVolume: renderOptions?.showVolume ?? true,
-      volumeHeight: renderOptions?.volumeHeight ?? 0.15,
-      minCandleWidth: renderOptions?.minCandleWidth ?? 1,
-      ...renderOptions,
-      crosshairColor: renderOptions?.crosshairColor ?? DEFAULT_RENDER_OPTIONS.crosshairColor,
-      candleSpacing: renderOptions?.candleSpacing ?? DEFAULT_RENDER_OPTIONS.candleSpacing,
-      maxCandleWidth: renderOptions?.maxCandleWidth ?? DEFAULT_RENDER_OPTIONS.maxCandleWidth,
+      backgroundColor: themedRenderOptions.backgroundColor ?? DEFAULT_RENDER_OPTIONS.backgroundColor,
+      upColor: themedRenderOptions.upColor ?? DEFAULT_RENDER_OPTIONS.upColor,
+      downColor: themedRenderOptions.downColor ?? DEFAULT_RENDER_OPTIONS.downColor,
+      textColor: themedRenderOptions.textColor ?? DEFAULT_RENDER_OPTIONS.textColor,
+      gridColor: themedRenderOptions.gridColor ?? DEFAULT_RENDER_OPTIONS.gridColor,
+      showVolume: themedRenderOptions.showVolume ?? true,
+      volumeHeight: themedRenderOptions.volumeHeight ?? 0.15,
+      minCandleWidth: themedRenderOptions.minCandleWidth ?? 1,
+      ...themedRenderOptions,
+      crosshairColor: themedRenderOptions.crosshairColor ?? DEFAULT_RENDER_OPTIONS.crosshairColor,
+      candleSpacing: themedRenderOptions.candleSpacing ?? DEFAULT_RENDER_OPTIONS.candleSpacing,
+      maxCandleWidth: themedRenderOptions.maxCandleWidth ?? DEFAULT_RENDER_OPTIONS.maxCandleWidth,
       // Pass margins with top bar offset so price labels have safe zone
       margins,
     };
-  }, [dimensions.width, dimensions.height, renderOptions, margins, showTopBar]);
+  }, [dimensions.width, dimensions.height, imperativeTheme, margins, renderOptions, theme]);
 
   const effectivePriceLines = useMemo(() => {
     const latestBar = bars.length > 0 ? bars[bars.length - 1] : null;
@@ -1060,11 +1074,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // ==========================================================================
 
   if (dimensions.width === 0 || dimensions.height === 0) {
-    return <View style={styles.container} onLayout={onLayout} />;
+    return <View style={[styles.container, { backgroundColor: fullRenderOptions.backgroundColor }]} onLayout={onLayout} />;
   }
 
   return (
-    <View style={styles.container} onLayout={onLayout}>
+    <View style={[styles.container, { backgroundColor: fullRenderOptions.backgroundColor }]} onLayout={onLayout}>
       {/* Layer 1: Skia Canvas (static rendering) */}
       <Canvas
         style={[
