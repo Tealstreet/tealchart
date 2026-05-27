@@ -23,6 +23,7 @@ export interface UseChartGesturesOptions {
   bars: Bar[];
   viewport: Viewport | null;
   onViewportChange: (viewport: Viewport) => void;
+  enabled?: boolean;
   onSwipeBlockChange?: (blocked: boolean) => void;
   /** Called when user starts dragging the price axis (disables auto-scale) */
   onAutoScaleDisabled?: (paneId: string) => void;
@@ -39,6 +40,7 @@ export function useChartGestures({
   bars,
   viewport,
   onViewportChange,
+  enabled = true,
   onSwipeBlockChange,
   onAutoScaleDisabled,
   isAutoScale,
@@ -68,8 +70,9 @@ export function useChartGestures({
       const newStartTime = viewport.startTime + timeDelta;
       const newEndTime = viewport.endTime + timeDelta;
 
-      // When auto-scale is active, skip vertical — auto-scale will recalculate price axis
       if (isAutoScale?.('main')) {
+        // Auto-scale is still locked. Preserve it by changing time only; the
+        // shared ViewportController will fit Y to the newly visible candles.
         onViewportChange({
           ...viewport,
           startTime: newStartTime,
@@ -101,22 +104,19 @@ export function useChartGestures({
     (deltaY: number, startRange: number) => {
       if (!viewport) return;
 
-      const scaleFactor = 1 + (deltaY / dimensions.height) * 2;
-      const newRange = startRange * scaleFactor;
-
-      const minRange = startRange * 0.1;
-      const maxRange = startRange * 10;
-      const clampedRange = Math.max(minRange, Math.min(maxRange, newRange));
+      const rawZoomFactor = 1 + deltaY * 0.005;
+      const zoomFactor = Math.max(0.1, Math.min(10, rawZoomFactor));
+      const newRange = startRange * zoomFactor;
 
       const center = (viewport.priceMin + viewport.priceMax) / 2;
 
       onViewportChange({
         ...viewport,
-        priceMin: center - clampedRange / 2,
-        priceMax: center + clampedRange / 2,
+        priceMin: center - newRange / 2,
+        priceMax: center + newRange / 2,
       });
     },
-    [viewport, dimensions.height, onViewportChange],
+    [viewport, onViewportChange],
   );
 
   // Time axis drag handler
@@ -139,21 +139,11 @@ export function useChartGestures({
       const newEndTime = viewport.endTime;
       const newStartTime = newEndTime - clampedRange;
 
-      const visibleBars = bars.filter((b) => b.time >= newStartTime && b.time <= newEndTime);
-
-      if (visibleBars.length > 0) {
-        const prices = visibleBars.flatMap((b) => [b.high, b.low]);
-        const minPrice = Math.min(...prices);
-        const maxPrice = Math.max(...prices);
-        const padding = (maxPrice - minPrice) * 0.1;
-
-        onViewportChange({
-          startTime: newStartTime,
-          endTime: newEndTime,
-          priceMin: minPrice - padding,
-          priceMax: maxPrice + padding,
-        });
-      }
+      onViewportChange({
+        ...viewport,
+        startTime: newStartTime,
+        endTime: newEndTime,
+      });
     },
     [viewport, bars, dimensions, onViewportChange],
   );
@@ -178,21 +168,11 @@ export function useChartGestures({
         const newStartTime = centerTime - newTimeRange / 2;
         const newEndTime = centerTime + newTimeRange / 2;
 
-        const visibleBars = bars.filter((b) => b.time >= newStartTime && b.time <= newEndTime);
-
-        if (visibleBars.length > 0) {
-          const prices = visibleBars.flatMap((b) => [b.high, b.low]);
-          const minPrice = Math.min(...prices);
-          const maxPrice = Math.max(...prices);
-          const padding = (maxPrice - minPrice) * 0.1;
-
-          onViewportChange({
-            startTime: newStartTime,
-            endTime: newEndTime,
-            priceMin: minPrice - padding,
-            priceMax: maxPrice + padding,
-          });
-        }
+        onViewportChange({
+          ...viewport,
+          startTime: newStartTime,
+          endTime: newEndTime,
+        });
       }
     },
     [viewport, bars, onViewportChange],
@@ -237,6 +217,7 @@ export function useChartGestures({
   // Memoize gestures to prevent recreating on every render
   const panGesture = useMemo(() => {
     return Gesture.Pan()
+      .enabled(enabled)
       .onStart((event) => {
         // Determine zone and get initial values on JS thread
         runOnJS(handlePanStartAndSetValues)(event.x, event.y);
@@ -264,6 +245,7 @@ export function useChartGestures({
       });
   }, [
     handlePanStartAndSetValues,
+    enabled,
     updatePriceScale,
     updateTimeScale,
     updateViewportFromPan,
@@ -278,6 +260,7 @@ export function useChartGestures({
   // Pinch gesture for zoom
   const pinchGesture = useMemo(() => {
     return Gesture.Pinch()
+      .enabled(enabled)
       .onStart(() => {
         savedScale.value = 1;
       })
@@ -285,7 +268,7 @@ export function useChartGestures({
         const newScale = savedScale.value * event.scale;
         runOnJS(updateViewportFromPinch)(newScale);
       });
-  }, [updateViewportFromPinch, savedScale]);
+  }, [enabled, updateViewportFromPinch, savedScale]);
 
   // Compose gestures
   const composedGesture = useMemo(() => {
