@@ -63,7 +63,7 @@ import {
 } from '@shopify/react-native-skia';
 import { LayoutChangeEvent, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { runOnJS } from 'react-native-reanimated';
+import Animated, { runOnJS, useSharedValue } from 'react-native-reanimated';
 
 import { LOADING_OPACITY } from './constants';
 import { useTealchartCore } from './core/useTealchartCore';
@@ -458,6 +458,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const [crosshairVisible, setCrosshairVisible] = useState(false);
   // Store the crosshair position (updated via runOnJS from gestures)
   const [lastCrosshairPosition, setLastCrosshairPosition] = useState({ x: 0, y: 0 });
+  const crosshairDragStartX = useSharedValue(0);
+  const crosshairDragStartY = useSharedValue(0);
 
   const { composedGesture } = useChartGestures({
     dimensions: chartDimensions,
@@ -672,16 +674,20 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () =>
       Gesture.Pan()
         .enabled(crosshairVisible)
-        .onStart((event) => {
-          runOnJS(handleCrosshairMove)(event.x, event.y);
+        .onStart(() => {
+          crosshairDragStartX.value = lastCrosshairPosition.x;
+          crosshairDragStartY.value = lastCrosshairPosition.y;
         })
         .onUpdate((event) => {
-          runOnJS(handleCrosshairMove)(event.x, event.y);
+          runOnJS(handleCrosshairMove)(
+            crosshairDragStartX.value + event.translationX,
+            crosshairDragStartY.value + event.translationY,
+          );
         })
         .onEnd(() => {
           // Keep crosshair visible after pan ends - tap elsewhere to hide
         }),
-    [crosshairVisible, handleCrosshairMove],
+    [crosshairVisible, crosshairDragStartX, crosshairDragStartY, handleCrosshairMove, lastCrosshairPosition],
   );
 
   // Single tap toggles crosshair immediately. Drag gestures win once movement starts.
