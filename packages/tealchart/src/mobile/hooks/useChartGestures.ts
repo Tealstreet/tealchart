@@ -29,6 +29,8 @@ export interface UseChartGesturesOptions {
   onAutoScaleDisabled?: (paneId: string) => void;
   /** Returns whether auto-scale is active for a given pane (pan should skip vertical movement) */
   isAutoScale?: (paneId: string) => boolean;
+  /** Called for active chart-surface touches so overlays can react without owning gestures */
+  onInteraction?: (x: number, y: number) => void;
 }
 
 export interface UseChartGesturesResult {
@@ -44,6 +46,7 @@ export function useChartGestures({
   onSwipeBlockChange,
   onAutoScaleDisabled,
   isAutoScale,
+  onInteraction,
 }: UseChartGesturesOptions): UseChartGesturesResult {
   // Shared values for gesture state (UI thread)
   const gestureZoneValue = useSharedValue<GestureZone>('chart');
@@ -181,6 +184,8 @@ export function useChartGestures({
   // Handler for pan start - processes zone detection and sets up initial values
   const handlePanStartAndSetValues = useCallback(
     (x: number, y: number) => {
+      onInteraction?.(x, y);
+
       const zone = getGestureZone(x, y, dimensions);
 
       if (zone === 'priceAxis' && viewport) {
@@ -206,6 +211,7 @@ export function useChartGestures({
       viewport,
       onSwipeBlockChange,
       onAutoScaleDisabled,
+      onInteraction,
       gestureZoneValue,
       priceAxisStartRange,
       timeAxisStartRange,
@@ -223,6 +229,10 @@ export function useChartGestures({
         runOnJS(handlePanStartAndSetValues)(event.x, event.y);
       })
       .onUpdate((event) => {
+        if (onInteraction) {
+          runOnJS(onInteraction)(event.x, event.y);
+        }
+
         const zone = gestureZoneValue.value;
 
         if (zone === 'priceAxis') {
@@ -250,6 +260,7 @@ export function useChartGestures({
     updateTimeScale,
     updateViewportFromPan,
     onSwipeBlockChange,
+    onInteraction,
     gestureZoneValue,
     priceAxisStartRange,
     timeAxisStartRange,
@@ -261,14 +272,20 @@ export function useChartGestures({
   const pinchGesture = useMemo(() => {
     return Gesture.Pinch()
       .enabled(enabled)
-      .onStart(() => {
+      .onStart((event) => {
         savedScale.value = 1;
+        if (onInteraction) {
+          runOnJS(onInteraction)(event.focalX, event.focalY);
+        }
       })
       .onUpdate((event) => {
+        if (onInteraction) {
+          runOnJS(onInteraction)(event.focalX, event.focalY);
+        }
         const newScale = savedScale.value * event.scale;
         runOnJS(updateViewportFromPinch)(newScale);
       });
-  }, [enabled, updateViewportFromPinch, savedScale]);
+  }, [enabled, onInteraction, updateViewportFromPinch, savedScale]);
 
   // Compose gestures
   const composedGesture = useMemo(() => {
