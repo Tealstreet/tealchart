@@ -1,0 +1,47 @@
+module.exports = {
+  tabWidth: 2,
+  printWidth: 120,
+  semi: true,
+  trailingComma: 'all',
+  singleQuote: true,
+  endOfLine: 'lf',
+  overrides: [
+    {
+      files: '{*.js?(on),*.js,*.y?(a)ml,.*.js?(on),.*.y?(a)ml,*.md,.prettierrc,.stylelintrc,.babelrc}',
+      options: {
+        tabWidth: 2,
+      },
+    },
+    {
+      files: '{**/.vscode/*.json,**/tsconfig.json,**/tsconfig.*.json}',
+      options: {
+        parser: 'json5',
+        quoteProps: 'preserve',
+        singleQuote: false,
+        trailingComma: 'all',
+      },
+    },
+  ],
+  plugins: ['@ianvs/prettier-plugin-sort-imports'],
+  importOrder: [
+    '<TYPES>^(node:)',
+    '<TYPES>',
+    '<TYPES>^[.]',
+    '',
+    '<BUILTIN_MODULES>',
+    '',
+    '^react$',
+    '',
+    '<THIRD_PARTY_MODULES>',
+    '',
+    '^@tealstreet/(.*)$',
+    '^@/(.*)$',
+    '^(?!.*.s?css$)(?!\\.\\/)(\\.\\.\\/.*$|\\.\\.$)',
+    '^(?!.*.s?css$)(\\.\\/.*$|\\.$)',
+    '.*\\.s?css$',
+  ],
+  importOrderSeparation: true,
+  importOrderMergeDuplicateImports: true,
+  importOrderBuiltinModulesToTop: true,
+  importOrderCaseInsensitive: true,
+};

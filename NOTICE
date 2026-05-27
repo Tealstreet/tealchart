@@ -1,0 +1,14 @@
+SCOPE OF THE MIT LICENSE IN THIS REPOSITORY
+
+The MIT license in LICENSE applies ONLY to the contents of this repository:
+the `tealchart` charting library and the `tealscript` scripting engine (the
+packages under `packages/tealchart` and `packages/tealscript`).
+
+That is the entire scope. The MIT grant does NOT extend to any other
+Tealstreet software, service, product, package, or proprietary component —
+including, without limitation, the `tealstreet-sdk` code (safe-cex, the
+Tealstreet CLI, and their dependencies), which is proprietary and separately
+licensed. The "Tealstreet" name, logos, and trademarks are likewise not
+licensed here.
+
+Copyright (c) 2026 Tealstreet Ltd.
