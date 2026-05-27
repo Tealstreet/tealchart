@@ -16,6 +16,7 @@
  * - Layer 3: Base Gesture Layer - pan, pinch, axis scaling with zone detection
  */
 
+import type { WorkerError } from '@tealstreet/tealscript';
 import type { IIndicatorManager } from './core/ChartWidgetCore';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { IndicatorSettingsData } from './mobile/components/IndicatorSettingsModalMobile';
@@ -34,7 +35,6 @@ import type {
   UnifiedPaneLayout,
   Viewport,
 } from './types';
-import type { WorkerError } from '@tealstreet/tealscript';
 
 import React, {
   forwardRef,
@@ -63,7 +63,7 @@ import {
 } from '@shopify/react-native-skia';
 import { LayoutChangeEvent, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { runOnJS, useSharedValue } from 'react-native-reanimated';
+import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import { LOADING_OPACITY } from './constants';
 import { useTealchartCore } from './core/useTealchartCore';
@@ -85,6 +85,10 @@ import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
 import { safeToFixed } from './utils/safeNumber';
 import { ViewportController } from './viewport/ViewportController';
 import { intervalToMs } from './viewport/viewScale';
+
+const RESET_BUTTON_HIDE_DELAY_MS = 5000;
+const RESET_BUTTON_FADE_MS = 220;
+const RESET_BUTTON_REVEAL_THROTTLE_MS = 250;
 
 // Indicator pane info type (matches web)
 interface IndicatorPaneInfo {
@@ -164,38 +168,41 @@ export interface SkiaTealchartProps {
   onTealscriptError?: (scriptId: string, error: WorkerError) => void;
 }
 
-export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>(function SkiaTealchart({
-  width: propWidth,
-  height: propHeight,
-  // Required datafeed prop
-  datafeed,
-  symbol: propSymbol,
-  interval: propInterval = '15',
-  // Rendering props
-  renderOptions,
-  margins: marginsProp,
-  priceLines,
-  orderLines,
-  positionLines,
-  plotStyleOverrides,
-  onViewportChange,
-  onContextMenu,
-  onCrossHairMoved,
-  onSwipeBlockChange,
-  onOrderMove,
-  onOrderCancel,
-  onPositionClose,
-  onPositionReverse,
-  pricePrecision = 2,
-  // Top bar props
-  showTopBar = true,
-  exchangeName,
-  onIntervalChange,
-  onSymbolChange,
-  // Indicator props
-  onAddIndicator,
-  onTealscriptError,
-}, ref) {
+export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>(function SkiaTealchart(
+  {
+    width: propWidth,
+    height: propHeight,
+    // Required datafeed prop
+    datafeed,
+    symbol: propSymbol,
+    interval: propInterval = '15',
+    // Rendering props
+    renderOptions,
+    margins: marginsProp,
+    priceLines,
+    orderLines,
+    positionLines,
+    plotStyleOverrides,
+    onViewportChange,
+    onContextMenu,
+    onCrossHairMoved,
+    onSwipeBlockChange,
+    onOrderMove,
+    onOrderCancel,
+    onPositionClose,
+    onPositionReverse,
+    pricePrecision = 2,
+    // Top bar props
+    showTopBar = true,
+    exchangeName,
+    onIntervalChange,
+    onSymbolChange,
+    // Indicator props
+    onAddIndicator,
+    onTealscriptError,
+  },
+  ref,
+) {
   // ==========================================================================
   // Core Hook + Indicator Management
   // ==========================================================================
@@ -312,8 +319,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   const barsLengthRef = useRef(bars.length);
   const viewportControllerRef = useRef(new ViewportController());
-  // State for re-rendering the reset button when any pane has auto-scale disabled
-  const [autoScaleAllEnabled, setAutoScaleAllEnabled] = useState(true);
 
   // Track the first bar's time to detect reloads with the same count
   const barsFirstTimeRef = useRef<number | null>(bars.length > 0 ? bars[0].time : null);
@@ -437,13 +442,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   const handleAutoScaleDisabled = useCallback((paneId: string) => {
     viewportControllerRef.current.disableAutoScale(paneId);
-    setAutoScaleAllEnabled(false);
   }, []);
 
   const getIsAutoScale = useCallback((paneId: string) => viewportControllerRef.current.isAutoScale(paneId), []);
 
   const handleResetViewport = useCallback(() => {
-    setAutoScaleAllEnabled(true);
     if (bars.length > 0) {
       const vp = viewportControllerRef.current.handleReset(bars, intervalToMs(interval));
       setViewport(vp);
@@ -461,6 +464,74 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const crosshairDragStartX = useSharedValue(0);
   const crosshairDragStartY = useSharedValue(0);
 
+  const [resetButtonVisible, setResetButtonVisible] = useState(false);
+  const resetButtonOpacity = useSharedValue(0);
+  const resetButtonHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resetButtonFadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resetButtonLastRevealAtRef = useRef(0);
+
+  const clearResetButtonTimers = useCallback(() => {
+    if (resetButtonHideTimerRef.current) {
+      clearTimeout(resetButtonHideTimerRef.current);
+      resetButtonHideTimerRef.current = null;
+    }
+    if (resetButtonFadeTimerRef.current) {
+      clearTimeout(resetButtonFadeTimerRef.current);
+      resetButtonFadeTimerRef.current = null;
+    }
+  }, []);
+
+  const hideResetButtonOverlay = useCallback(() => {
+    resetButtonOpacity.value = withTiming(0, { duration: RESET_BUTTON_FADE_MS });
+    resetButtonFadeTimerRef.current = setTimeout(() => {
+      setResetButtonVisible(false);
+      resetButtonFadeTimerRef.current = null;
+    }, RESET_BUTTON_FADE_MS);
+  }, [resetButtonOpacity]);
+
+  const revealResetButtonOverlay = useCallback(
+    (force = false) => {
+      const now = Date.now();
+      if (!force && now - resetButtonLastRevealAtRef.current < RESET_BUTTON_REVEAL_THROTTLE_MS) return;
+      resetButtonLastRevealAtRef.current = now;
+
+      clearResetButtonTimers();
+      setResetButtonVisible(true);
+      resetButtonOpacity.value = withTiming(1, { duration: 120 });
+      resetButtonHideTimerRef.current = setTimeout(() => {
+        resetButtonHideTimerRef.current = null;
+        hideResetButtonOverlay();
+      }, RESET_BUTTON_HIDE_DELAY_MS);
+    },
+    [clearResetButtonTimers, hideResetButtonOverlay, resetButtonOpacity],
+  );
+
+  const revealResetButtonIfInBottomRegion = useCallback(
+    (_x: number, y: number) => {
+      if (dimensions.height <= 0) return;
+      if (y >= dimensions.height * (2 / 3) && y <= dimensions.height) {
+        revealResetButtonOverlay();
+      }
+    },
+    [dimensions.height, revealResetButtonOverlay],
+  );
+
+  const handleResetButtonPress = useCallback(() => {
+    handleResetViewport();
+    revealResetButtonOverlay(true);
+  }, [handleResetViewport, revealResetButtonOverlay]);
+
+  const resetButtonAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: resetButtonOpacity.value,
+  }));
+
+  useEffect(
+    () => () => {
+      clearResetButtonTimers();
+    },
+    [clearResetButtonTimers],
+  );
+
   const { composedGesture } = useChartGestures({
     dimensions: chartDimensions,
     bars,
@@ -470,6 +541,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onSwipeBlockChange,
     onAutoScaleDisabled: handleAutoScaleDisabled,
     isAutoScale: getIsAutoScale,
+    onInteraction: revealResetButtonIfInBottomRegion,
   });
 
   // Context menu state
@@ -656,6 +728,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   const handleCrosshairTap = useCallback(
     (x: number, y: number) => {
+      revealResetButtonIfInBottomRegion(x, y);
+
       if (crosshairVisible) {
         setCrosshairVisible(false);
         return;
@@ -666,7 +740,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       setCrosshairVisible(true);
       handleCrosshairMove(x, y);
     },
-    [crosshairVisible, handleCrosshairMove, isPointInChartArea],
+    [crosshairVisible, handleCrosshairMove, isPointInChartArea, revealResetButtonIfInBottomRegion],
   );
 
   // Pan gesture for moving crosshair (active only while crosshair is visible)
@@ -674,11 +748,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () =>
       Gesture.Pan()
         .enabled(crosshairVisible)
-        .onStart(() => {
+        .onStart((event) => {
+          runOnJS(revealResetButtonIfInBottomRegion)(event.x, event.y);
           crosshairDragStartX.value = lastCrosshairPosition.x;
           crosshairDragStartY.value = lastCrosshairPosition.y;
         })
         .onUpdate((event) => {
+          runOnJS(revealResetButtonIfInBottomRegion)(event.x, event.y);
           runOnJS(handleCrosshairMove)(
             crosshairDragStartX.value + event.translationX,
             crosshairDragStartY.value + event.translationY,
@@ -687,7 +763,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         .onEnd(() => {
           // Keep crosshair visible after pan ends - tap elsewhere to hide
         }),
-    [crosshairVisible, crosshairDragStartX, crosshairDragStartY, handleCrosshairMove, lastCrosshairPosition],
+    [
+      crosshairVisible,
+      crosshairDragStartX,
+      crosshairDragStartY,
+      handleCrosshairMove,
+      lastCrosshairPosition,
+      revealResetButtonIfInBottomRegion,
+    ],
   );
 
   // Single tap toggles crosshair immediately. Drag gestures win once movement starts.
@@ -740,12 +823,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   // Combine all gestures
   const allGestures = useMemo(
-    () =>
-      Gesture.Race(
-        crosshairPanGesture,
-        tapOrDoubleTapGesture,
-        composedGesture,
-      ),
+    () => Gesture.Race(crosshairPanGesture, tapOrDoubleTapGesture, composedGesture),
     [composedGesture, crosshairPanGesture, tapOrDoubleTapGesture],
   );
 
@@ -1136,10 +1214,19 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       </GestureDetector>
 
       {/* Reset viewport button — re-enables auto-scale */}
-      {!autoScaleAllEnabled && (
-        <TouchableOpacity style={styles.resetButton} onPress={handleResetViewport} activeOpacity={0.7}>
-          <Text style={styles.resetButtonText}>↻</Text>
-        </TouchableOpacity>
+      {resetButtonVisible && (
+        <Animated.View style={[styles.resetButtonContainer, resetButtonAnimatedStyle]} pointerEvents="box-none">
+          <TouchableOpacity
+            style={styles.resetButton}
+            onPress={handleResetButtonPress}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Reset chart viewport"
+            accessibilityHint="Resets zoom and auto-scale"
+          >
+            <Text style={styles.resetButtonText}>↻</Text>
+          </TouchableOpacity>
+        </Animated.View>
       )}
 
       {/* Top Bar (overlay on top of chart) */}
@@ -1213,12 +1300,14 @@ const styles = StyleSheet.create({
     // Interactive elements go here
     // pointerEvents="box-none" allows touches to pass through to gesture layer
   },
-  resetButton: {
+  resetButtonContainer: {
     position: 'absolute',
     bottom: 40, // Above time axis
     alignSelf: 'center',
     left: '50%',
     marginLeft: -14, // Half of width (28)
+  },
+  resetButton: {
     width: 28,
     height: 28,
     borderRadius: 14,
