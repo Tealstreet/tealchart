@@ -686,7 +686,7 @@ export class TealscriptEngine {
 
       // Use plot call order for untitled plots so multiple plot(...) calls do
       // not collapse into one "Plot" series across every bar.
-      const id = hasExplicitTitle ? `plot_${title}` : `plot_${callIndex}`;
+      const id = hasExplicitTitle ? `plot_${title}` : `plot_untitled_${callIndex}`;
 
       if (ctx.bar_index === 0) {
         ctx.registerPlot({

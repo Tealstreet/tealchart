@@ -66,11 +66,33 @@ plot(low, color=color.red)`;
 
       expect(result.errors).toHaveLength(0);
       expect(result.plots).toHaveLength(3);
-      expect(result.plots.map((plot) => plot.id)).toEqual(['plot_0', 'plot_1', 'plot_2']);
+      expect(result.plots.map((plot) => plot.id)).toEqual([
+        'plot_untitled_0',
+        'plot_untitled_1',
+        'plot_untitled_2',
+      ]);
       expect(result.plots.map((plot) => plot.values)).toEqual([
         [100, 100.5, 101],
         [100.5, 101, 101.5],
         [99.7, 100.2, 100.7],
+      ]);
+    });
+
+    it('does not collide untitled plot ids with explicit numeric titles', () => {
+      const script = `//@version=6
+indicator("Test")
+plot(open)
+plot(high, title="0")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.map((plot) => plot.id)).toEqual(['plot_untitled_0', 'plot_0']);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [100, 100.5],
+        [100.5, 101],
       ]);
     });
 
