@@ -100,6 +100,7 @@ export class TealscriptEngine {
     while (this.ctx.advanceBar()) {
       // Advance scope to new bar
       this.scope.advanceBar();
+      this.resetPerBarBuiltinState();
 
       // Execute all statements
       for (const stmt of ast.body) {
@@ -147,6 +148,7 @@ export class TealscriptEngine {
 
     // Update current bar data
     this.ctx.updateCurrentBar(bar);
+    this.resetPerBarBuiltinState();
 
     // Re-execute statements for current bar
     for (const stmt of ast.body) {
@@ -659,8 +661,13 @@ export class TealscriptEngine {
 
   // Plot ID counters - reset when engine is created
   private plotCounter = 0;
+  private plotCallIndex = 0;
   private hlineCounter = 0;
   private bgcolorCounter = 0;
+
+  private resetPerBarBuiltinState(): void {
+    this.plotCallIndex = 0;
+  }
 
   private registerPlotBuiltins(): void {
     // Reset counters for each registration (new engine)
@@ -670,13 +677,16 @@ export class TealscriptEngine {
 
     this.builtins.set('plot', (args, namedArgs, ctx) => {
       const value = args[0] as number;
-      const title = (namedArgs.get('title') ?? args[1] ?? 'Plot') as string;
+      const callIndex = this.plotCallIndex++;
+      const hasExplicitTitle = namedArgs.has('title') || args[1] !== undefined;
+      const title = (namedArgs.get('title') ?? args[1] ?? `Plot ${callIndex + 1}`) as string;
       const color = (namedArgs.get('color') ?? args[2] ?? '#2196F3') as string;
       const linewidth = (namedArgs.get('linewidth') ?? 1) as number;
       const style = (namedArgs.get('style') ?? 'line') as string;
 
-      // Use stable ID based on title - generated on first bar
-      const id = `plot_${title}`;
+      // Use plot call order for untitled plots so multiple plot(...) calls do
+      // not collapse into one "Plot" series across every bar.
+      const id = hasExplicitTitle ? `plot_${title}` : `plot_${callIndex}`;
 
       if (ctx.bar_index === 0) {
         ctx.registerPlot({

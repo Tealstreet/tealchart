@@ -53,6 +53,27 @@ plot(close, title="Close Price")`;
       expect(closePlot!.values.length).toBe(10);
     });
 
+    it('keeps multiple untitled plots as separate series', () => {
+      const script = `//@version=6
+indicator("Test")
+plot(open, color=color.blue)
+plot(high, color=color.green)
+plot(low, color=color.red)`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(3);
+      expect(result.plots.map((plot) => plot.id)).toEqual(['plot_0', 'plot_1', 'plot_2']);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [100, 100.5, 101],
+        [100.5, 101, 101.5],
+        [99.7, 100.2, 100.7],
+      ]);
+    });
+
     it('handles empty bar data', () => {
       const script = `//@version=6
 indicator("Test")
