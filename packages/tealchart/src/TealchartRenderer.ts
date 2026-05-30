@@ -1,4 +1,4 @@
-import type { PlotOutput, PlotStyle } from '@tealstreet/tealscript';
+import type { DrawingOutput, LabelDrawingOutput, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
 import type { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
 import type { CanvasContext } from './rendering/CanvasContext';
 import type { PaneOffset } from './rendering/PaneManager';
@@ -248,6 +248,7 @@ export class TealchartRenderer {
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
     precomputedPriceLineBounds?: PriceLineLabelBounds[],
     executionLines?: ExecutionLineRenderData[],
+    drawings?: DrawingOutput[],
   ): void {
     const { ctx, options } = this;
     const { width, height, devicePixelRatio } = options;
@@ -278,6 +279,7 @@ export class TealchartRenderer {
       plotStyleOverrides,
       precomputedPriceLineBounds,
       executionLines,
+      drawings,
     );
 
     ctx.restore();
@@ -3023,6 +3025,7 @@ export class TealchartRenderer {
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
     precomputedPriceLineBounds?: PriceLineLabelBounds[],
     executionLines?: ExecutionLineRenderData[],
+    drawings?: DrawingOutput[],
   ): void {
     const { ctx, options, margins } = this;
 
@@ -3073,6 +3076,7 @@ export class TealchartRenderer {
         indicatorPaneInfo,
         paneLabelBounds,
         plotStyleOverrides,
+        drawings,
       );
     }
 
@@ -3093,6 +3097,7 @@ export class TealchartRenderer {
     indicatorPaneInfo?: Record<string, IndicatorPaneInfo>,
     labelBounds?: PriceLineLabelBounds[],
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
+    drawings?: DrawingOutput[],
   ): void {
     const { ctx, options, margins } = this;
 
@@ -3116,6 +3121,7 @@ export class TealchartRenderer {
         indicatorPaneInfo,
         labelBounds,
         plotStyleOverrides,
+        drawings,
       );
     } else {
       this.renderIndicatorPaneContent(pane, bars, viewport, plots, indicatorPaneInfo, labelBounds, plotStyleOverrides);
@@ -3137,6 +3143,7 @@ export class TealchartRenderer {
     indicatorPaneInfo?: Record<string, IndicatorPaneInfo>,
     labelBounds?: PriceLineLabelBounds[],
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
+    drawings?: DrawingOutput[],
   ): void {
     const { ctx, options, margins } = this;
 
@@ -3186,6 +3193,10 @@ export class TealchartRenderer {
       this.drawExecutionMarkersInPane(executionLines, viewport, pane);
     }
 
+    if (drawings && drawings.length > 0) {
+      this.renderLabelDrawings(drawings, bars, viewport, pane);
+    }
+
     // Draw Y-axis (price axis) for main pane
     this.renderPaneYAxis(pane, labelBounds);
 
@@ -3193,6 +3204,109 @@ export class TealchartRenderer {
     if (labelBounds && labelBounds.length > 0) {
       this.drawPriceLinesInPane(labelBounds, viewport, pane);
     }
+  }
+
+  private renderLabelDrawings(
+    drawings: DrawingOutput[],
+    bars: Bar[],
+    viewport: Viewport,
+    pane: ComputedPane,
+  ): void {
+    const labels = drawings.filter((drawing): drawing is LabelDrawingOutput => drawing.type === 'label');
+    if (labels.length === 0) return;
+
+    const { ctx, options, margins } = this;
+    const chartWidth = options.width - margins.left;
+    const font = `12px ${this.font}`;
+
+    ctx.save();
+    ctx.font = font;
+    ctx.textBaseline = 'middle';
+
+    for (const label of labels) {
+      const position = this.resolveLabelDrawingPosition(label, bars, viewport, pane, chartWidth);
+      if (!position) continue;
+
+      const text = label.text ?? '';
+      const paddingX = 8;
+      const height = 22;
+      const width = Math.max(18, getCachedTextWidth(ctx, text, font) + paddingX * 2);
+      const radius = 4;
+      const fillColor = label.color ?? '#1f2937';
+      const textColor = label.textColor ?? '#FFFFFF';
+
+      let x = position.x;
+      let y = position.y;
+
+      if (label.style.includes('right')) {
+        x -= width;
+      } else if (!label.style.includes('left')) {
+        x -= width / 2;
+      }
+
+      if (label.style.includes('down') || label.yloc === 'abovebar') {
+        y -= height + 6;
+      } else if (label.style.includes('up') || label.yloc === 'belowbar') {
+        y += 6;
+      } else {
+        y -= height / 2;
+      }
+
+      const minX = margins.left;
+      const maxX = options.width - margins.right - width;
+      const minY = pane.top;
+      const maxY = pane.bottom - height;
+      x = Math.min(maxX, Math.max(minX, x));
+      y = Math.min(maxY, Math.max(minY, y));
+
+      ctx.fillStyle = fillColor;
+      ctx.beginPath();
+      ctx.roundRect(x, y, width, height, radius);
+      ctx.fill();
+
+      ctx.fillStyle = textColor;
+      ctx.textAlign = 'left';
+      ctx.fillText(text, x + paddingX, y + height / 2);
+    }
+
+    ctx.restore();
+  }
+
+  private resolveLabelDrawingPosition(
+    label: LabelDrawingOutput,
+    bars: Bar[],
+    viewport: Viewport,
+    pane: ComputedPane,
+    chartWidth: number,
+  ): { x: number; y: number } | null {
+    const barIndex = Number.isFinite(label.barIndex) ? Math.trunc(label.barIndex) : -1;
+    const xValue = label.x ?? barIndex;
+    const xIndex = Number.isFinite(xValue) ? Math.trunc(xValue) : barIndex;
+    const anchorIndex = label.xloc === 'bar_time' ? barIndex : xIndex;
+    const bar = anchorIndex >= 0 && anchorIndex < bars.length ? bars[anchorIndex] : undefined;
+    const time = label.xloc === 'bar_time'
+      ? xValue
+      : (xIndex >= 0 && xIndex < bars.length ? bars[xIndex].time : undefined);
+    if (time === undefined || time < viewport.startTime || time > viewport.endTime) {
+      return null;
+    }
+
+    const x = this.timeToX(time, viewport, chartWidth);
+    let y: number;
+
+    if (label.yloc === 'abovebar') {
+      if (!bar) return null;
+      y = this.valueToY(bar.high, pane) - 6;
+    } else if (label.yloc === 'belowbar') {
+      if (!bar) return null;
+      y = this.valueToY(bar.low, pane) + 6;
+    } else {
+      if (label.y === null || !Number.isFinite(label.y)) return null;
+      if (label.y < pane.yMin || label.y > pane.yMax) return null;
+      y = this.valueToY(label.y, pane);
+    }
+
+    return { x, y };
   }
 
   /**

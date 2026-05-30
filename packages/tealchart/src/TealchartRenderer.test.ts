@@ -1,4 +1,4 @@
-import type { PlotOutput } from '@tealstreet/tealscript';
+import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 import type { Bar, ComputedPane, ExecutionLineRenderData, PriceLine, UnifiedPaneLayout, Viewport } from './types';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -536,6 +536,107 @@ describe('TealchartRenderer coordinate transforms', () => {
       renderer.renderWithLayout(bars, viewport, layout, priceLines, [], undefined, undefined, undefined, precomputedBounds);
 
       expect(calculateSpy).not.toHaveBeenCalled();
+    });
+
+    it('renders label drawings in the main pane', () => {
+      const fillText = vi.fn();
+      const roundRect = vi.fn();
+      const fill = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillText,
+        roundRect,
+        fill,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+
+      const bars = makeBars(20);
+      const viewport = TealchartRenderer.calculateViewport(bars);
+      const layout: UnifiedPaneLayout = {
+        panes: [
+          {
+            id: 'main',
+            type: 'main',
+            heightRatio: 1,
+            yMin: 0,
+            yMax: 0,
+            fixedRange: false,
+          },
+        ],
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+      };
+      const drawings: DrawingOutput[] = [
+        {
+          id: 'label-1',
+          type: 'label',
+          barIndex: 10,
+          x: 10,
+          y: bars[10]!.close,
+          text: 'Signal',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_left',
+          color: '#123456',
+          textColor: '#FFFFFF',
+          size: 'normal',
+        },
+      ];
+
+      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+
+      expect(roundRect).toHaveBeenCalled();
+      expect(fill).toHaveBeenCalled();
+      expect(fillText).toHaveBeenCalledWith('Signal', expect.any(Number), expect.any(Number));
+    });
+
+    it('positions bar_index label drawings from mutable x values', () => {
+      const roundRect = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        roundRect,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+
+      const bars = makeBars(20);
+      const viewport = TealchartRenderer.calculateViewport(bars);
+      const layout: UnifiedPaneLayout = {
+        panes: [
+          {
+            id: 'main',
+            type: 'main',
+            heightRatio: 1,
+            yMin: 0,
+            yMax: 0,
+            fixedRange: false,
+          },
+        ],
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+      };
+      const drawings: DrawingOutput[] = [
+        {
+          id: 'label-1',
+          type: 'label',
+          barIndex: 5,
+          x: 12,
+          y: bars[12]!.close,
+          text: 'Moved',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_left',
+          color: '#123456',
+          textColor: '#FFFFFF',
+          size: 'normal',
+        },
+      ];
+
+      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+
+      const drawnX = roundRect.mock.calls[0]?.[0];
+      const options = renderer.getOptions();
+      const chartWidth = options.width - options.margins.left;
+      const expectedX = options.margins.left
+        + ((bars[12]!.time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth;
+      expect(drawnX).toBeCloseTo(expectedX, 0);
     });
 
     it('renders countdown text for simple price lines with countdownToTime', () => {

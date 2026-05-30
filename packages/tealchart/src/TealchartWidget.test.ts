@@ -26,6 +26,7 @@ vi.mock('./ui/TealchartWidgetUI', () => ({
       setBarsCalls.push([...bars]);
     }
     setPlots() {}
+    setDrawings() {}
     setLoading() {}
     setOrderLines() {}
     setPositionLines() {}
