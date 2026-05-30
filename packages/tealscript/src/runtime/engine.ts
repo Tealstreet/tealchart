@@ -56,7 +56,7 @@ import {
   unshiftArrayValue,
   type PineArray,
 } from './arrays';
-import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type DrawingOutput, type InputDefinition, type PlotOutput, type PlotStyle } from './context';
+import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type DrawingOutput, type InputDefinition, type LabelDrawingOutput, type PlotOutput, type PlotStyle } from './context';
 import { Scope, createRootScope } from './scope';
 
 /**
@@ -318,12 +318,23 @@ export class TealscriptEngine {
 
   private executeVariableDeclaration(stmt: VariableDeclaration): void {
     const kind = stmt.kind;
-    const value = this.evaluateExpression(stmt.init);
 
     if (stmt.names.type === 'VariableDeclarator') {
       const name = stmt.names.name.name;
+      if (this.shouldSkipInitializedPersistentDeclaration(kind, [name])) {
+        return;
+      }
+      const drawingCount = this.ctx.getDrawingCount();
+      const value = this.evaluateExpression(stmt.init);
       this.scope.declare(name, kind, value, stmt.typeAnnotation?.baseType);
+      this.markPersistentDeclarationDrawings(kind, drawingCount);
     } else if (stmt.names.type === 'TupleDeclarator') {
+      const names = stmt.names.names.map((name) => name.name);
+      if (this.shouldSkipInitializedPersistentDeclaration(kind, names)) {
+        return;
+      }
+      const drawingCount = this.ctx.getDrawingCount();
+      const value = this.evaluateExpression(stmt.init);
       // Tuple destructuring
       if (!Array.isArray(value)) {
         throw new Error('Cannot destructure non-array value');
@@ -333,6 +344,18 @@ export class TealscriptEngine {
         const name = stmt.names.names[i].name;
         this.scope.declare(name, kind, values[i]);
       }
+      this.markPersistentDeclarationDrawings(kind, drawingCount);
+    }
+  }
+
+  private shouldSkipInitializedPersistentDeclaration(kind: string, names: string[]): boolean {
+    if (kind !== 'var' && kind !== 'varip') return false;
+    return names.every((name) => this.scope.getEntry(name)?.initialized);
+  }
+
+  private markPersistentDeclarationDrawings(kind: string, fromIndex: number): void {
+    if (kind === 'var' || kind === 'varip') {
+      this.ctx.markDrawingsPersistentFrom(fromIndex);
     }
   }
 
@@ -852,12 +875,119 @@ export class TealscriptEngine {
         color: this.toNullableColor(namedArgs.get('color')),
         textColor: this.toNullableColor(namedArgs.get('textcolor')),
         size: this.toStringValue(namedArgs.get('size') ?? 'normal'),
+        tooltip: this.toOptionalString(namedArgs.get('tooltip') ?? args[10]),
       });
 
       return id;
     });
 
-    this.builtins.set('label.delete', () => undefined);
+    this.builtins.set('label.delete', (args, _namedArgs, ctx) => {
+      this.withLabel(args[0], ctx, (label) => ctx.deleteDrawing(label.id));
+      return undefined;
+    });
+
+    this.builtins.set('label.copy', (args, _namedArgs, ctx, _scope, callId) => {
+      const labelId = this.toLabelId(args[0]);
+      if (!labelId) return Number.NaN;
+
+      const newId = `label_${callId}_${ctx.bar_index}`;
+      const copy = ctx.copyLabelDrawing(labelId, newId);
+      return copy ? newId : Number.NaN;
+    });
+
+    this.builtins.set('label.set_x', (args, _namedArgs, ctx) => {
+      this.withLabel(args[0], ctx, (label) => {
+        label.x = this.toNullableNumber(args[1]);
+        label.barIndex = ctx.bar_index;
+      });
+      return undefined;
+    });
+
+    this.builtins.set('label.set_y', (args, _namedArgs, ctx) => {
+      this.withLabel(args[0], ctx, (label) => {
+        label.y = this.toNullableNumber(args[1]);
+        label.barIndex = ctx.bar_index;
+      });
+      return undefined;
+    });
+
+    this.builtins.set('label.set_xy', (args, _namedArgs, ctx) => {
+      this.withLabel(args[0], ctx, (label) => {
+        label.x = this.toNullableNumber(args[1]);
+        label.y = this.toNullableNumber(args[2]);
+        label.barIndex = ctx.bar_index;
+      });
+      return undefined;
+    });
+
+    this.builtins.set('label.set_text', (args, _namedArgs, ctx) => {
+      this.withLabel(args[0], ctx, (label) => {
+        label.text = this.toStringValue(args[1] ?? '');
+      });
+      return undefined;
+    });
+
+    this.builtins.set('label.set_xloc', (args, _namedArgs, ctx) => {
+      this.withLabel(args[0], ctx, (label) => {
+        label.x = this.toNullableNumber(args[1]);
+        label.xloc = this.toStringValue(args[2]);
+        label.barIndex = ctx.bar_index;
+      });
+      return undefined;
+    });
+
+    this.builtins.set('label.set_yloc', (args, _namedArgs, ctx) => {
+      this.withLabel(args[0], ctx, (label) => {
+        label.yloc = this.toStringValue(args[1]);
+      });
+      return undefined;
+    });
+
+    this.builtins.set('label.set_style', (args, _namedArgs, ctx) => {
+      this.withLabel(args[0], ctx, (label) => {
+        label.style = this.toStringValue(args[1]);
+      });
+      return undefined;
+    });
+
+    this.builtins.set('label.set_color', (args, _namedArgs, ctx) => {
+      this.withLabel(args[0], ctx, (label) => {
+        label.color = this.toNullableColor(args[1]);
+      });
+      return undefined;
+    });
+
+    this.builtins.set('label.set_textcolor', (args, _namedArgs, ctx) => {
+      this.withLabel(args[0], ctx, (label) => {
+        label.textColor = this.toNullableColor(args[1]);
+      });
+      return undefined;
+    });
+
+    this.builtins.set('label.set_size', (args, _namedArgs, ctx) => {
+      this.withLabel(args[0], ctx, (label) => {
+        label.size = this.toStringValue(args[1]);
+      });
+      return undefined;
+    });
+
+    this.builtins.set('label.set_tooltip', (args, _namedArgs, ctx) => {
+      this.withLabel(args[0], ctx, (label) => {
+        label.tooltip = this.toOptionalString(args[1]);
+      });
+      return undefined;
+    });
+
+    this.builtins.set('label.get_x', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.x ?? Number.NaN));
+    this.builtins.set('label.get_y', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.y ?? Number.NaN));
+    this.builtins.set('label.get_text', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.text));
+    this.builtins.set('label.get_xloc', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.xloc));
+    this.builtins.set('label.get_yloc', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.yloc));
+    this.builtins.set('label.get_style', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.style));
+    this.builtins.set('label.get_color', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.color ?? Number.NaN));
+    this.builtins.set('label.get_textcolor', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.textColor ?? Number.NaN));
+    this.builtins.set('label.get_size', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.size));
+    this.builtins.set('label.get_tooltip', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.tooltip ?? ''));
 
     const constants: Record<string, string> = {
       'xloc.bar_index': 'bar_index',
@@ -889,6 +1019,30 @@ export class TealscriptEngine {
     for (const [name, value] of Object.entries(constants)) {
       this.builtins.set(name, () => value);
     }
+  }
+
+  private toLabelId(value: unknown): string | undefined {
+    if (value === null || value === undefined || this.isNa(value)) return undefined;
+    return String(value);
+  }
+
+  private withLabel(value: unknown, ctx: ExecutionContext, fn: (label: LabelDrawingOutput) => void): void {
+    const labelId = this.toLabelId(value);
+    if (!labelId) return;
+
+    const drawing = ctx.getDrawing(labelId);
+    if (drawing?.type === 'label') {
+      fn(drawing);
+    }
+  }
+
+  private getLabelValue<T>(value: unknown, ctx: ExecutionContext, fn: (label: LabelDrawingOutput) => T): T | number {
+    const labelId = this.toLabelId(value);
+    if (!labelId) return Number.NaN;
+
+    const drawing = ctx.getDrawing(labelId);
+    if (drawing?.type !== 'label') return Number.NaN;
+    return fn(drawing);
   }
 
   private getMethodBuiltinName(methodName: string): string | undefined {
@@ -1260,6 +1414,13 @@ export class TealscriptEngine {
         return this.formatNumber(value, format);
       }
       return String(value);
+    }
+    return String(value);
+  }
+
+  private toOptionalString(value: unknown): string | undefined {
+    if (value === null || value === undefined || this.isNa(value)) {
+      return undefined;
     }
     return String(value);
   }

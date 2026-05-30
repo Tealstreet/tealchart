@@ -1236,4 +1236,40 @@ if barstate.islast
       },
     ]);
   });
+
+  it('updates a persistent last-bar label with Pine setter idioms', () => {
+    const result = runCompatScript(`
+indicator("Persistent Label", overlay=true)
+var marker = label.new(na, na, text="")
+if barstate.islast
+    label.set_xy(marker, bar_index, close)
+    label.set_text(marker, str.format("Close {0}", close))
+    label.set_style(marker, label.style_label_left)
+    label.set_color(marker, color.new(color.blue, 20))
+    label.set_textcolor(marker, color.white)
+    label.set_tooltip(marker, "last confirmed")
+plot(label.get_x(marker), title="Marker X")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'label_label.new_0_0',
+        type: 'label',
+        persistent: true,
+        barIndex: 11,
+        x: 11,
+        y: 112,
+        text: 'Close 112',
+        xloc: 'bar_index',
+        yloc: 'price',
+        style: 'label_left',
+        color: '#2196F3CC',
+        textColor: '#FFFFFF',
+        size: 'normal',
+        tooltip: 'last confirmed',
+      },
+    ]);
+    expect(getPlot(result, 'Marker X').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 11]);
+  });
 });
