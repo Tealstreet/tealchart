@@ -5,6 +5,11 @@ indicator subset toward full Pine Script v6 feature parity. It is intentionally
 broader than the current compatibility matrix: every epic is expected to be a
 multi-phase effort implemented through small, tested PRs.
 
+Structural cleanup that supports this parity work is tracked in
+[`PINE_HYGIENE_EPICS.md`](./PINE_HYGIENE_EPICS.md). Treat that roadmap as the
+engineering guardrail for large parser, runtime, worker, renderer, test, and
+documentation changes.
+
 Primary source references:
 
 - [TradingView Pine Script User Manual](https://www.tradingview.com/pine-script-docs/)
@@ -420,4 +425,3 @@ unblocked:
 8. Named timezone/session completion.
 9. `matrix.*` MVP.
 10. `map.*` MVP.
-
