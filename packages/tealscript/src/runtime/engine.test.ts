@@ -92,6 +92,170 @@ plot(close)`;
         },
       ]);
     });
+
+    it('mutates, reads, copies, and deletes label drawings by handle', () => {
+      const script = `//@version=6
+indicator("Label mutators")
+var anchor = label.new(0, close, text="seed")
+if barstate.islast
+    label.set_xy(anchor, bar_index, high)
+    label.set_text(anchor, "last")
+    label.set_style(anchor, label.style_label_up)
+    label.set_color(anchor, color.green)
+    label.set_textcolor(anchor, color.black)
+    label.set_size(anchor, size.large)
+    label.set_tooltip(anchor, "updated")
+    clone = label.copy(anchor)
+    label.set_text(clone, "copy")
+    label.delete(clone)
+plot(label.get_x(anchor), title="Label X")
+plot(label.get_y(anchor), title="Label Y")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'label_label.new_0_0',
+          type: 'label',
+          persistent: true,
+          barIndex: 2,
+          x: 2,
+          y: 101.5,
+          text: 'last',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_up',
+          color: '#4CAF50',
+          textColor: '#000000',
+          size: 'large',
+          tooltip: 'updated',
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Label X')?.values).toEqual([0, 0, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Label Y')?.values).toEqual([100.2, 100.2, 101.5]);
+    });
+
+    it('preserves persistent label handles during realtime rollback', () => {
+      const script = `//@version=6
+indicator("Realtime label")
+var marker = label.new(0, close, text="")
+if barstate.islast
+    label.set_xy(marker, bar_index, close)
+    label.set_text(marker, str.tostring(close))
+plot(label.get_x(marker), title="Label X")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      engine.updateBar(ast, {
+        ...bars[2],
+        high: 201,
+        close: 200,
+      });
+
+      expect(engine.getDrawings()).toEqual([
+        {
+          id: 'label_label.new_0_0',
+          type: 'label',
+          persistent: true,
+          barIndex: 2,
+          x: 2,
+          y: 200,
+          text: '200',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_left',
+          color: null,
+          textColor: null,
+          size: 'normal',
+          tooltip: undefined,
+        },
+      ]);
+    });
+
+    it('covers label coordinate setters and scalar getters', () => {
+      const script = `//@version=6
+indicator("Label getter coverage")
+var marker = label.new(0, close, text="seed")
+var yonly = label.new(1, close, text="y")
+if barstate.islast
+    label.set_x(marker, bar_index + 3)
+    label.set_y(marker, high)
+    label.set_xloc(marker, bar_index + 5, xloc.bar_time)
+    label.set_yloc(marker, yloc.abovebar)
+    label.set_text(marker, "updated")
+    label.set_style(marker, label.style_label_down)
+    label.set_color(marker, color.blue)
+    label.set_textcolor(marker, color.white)
+    label.set_size(marker, size.tiny)
+    label.set_tooltip(marker, "tip")
+    label.set_yloc(yonly, yloc.belowbar)
+    label.new(na, na, text=str.format("{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}", label.get_text(marker), label.get_xloc(marker), label.get_yloc(marker), label.get_style(marker), label.get_color(marker), label.get_textcolor(marker), label.get_size(marker), label.get_tooltip(marker)))
+plot(label.get_x(marker), title="Label X")
+plot(label.get_y(marker), title="Label Y")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'label_label.new_0_0',
+          type: 'label',
+          persistent: true,
+          barIndex: 2,
+          x: 7,
+          y: 101.5,
+          text: 'updated',
+          xloc: 'bar_time',
+          yloc: 'abovebar',
+          style: 'label_down',
+          color: '#2196F3',
+          textColor: '#FFFFFF',
+          size: 'tiny',
+          tooltip: 'tip',
+        },
+        {
+          id: 'label_label.new_1_0',
+          type: 'label',
+          persistent: true,
+          barIndex: 0,
+          x: 1,
+          y: 100.2,
+          text: 'y',
+          xloc: 'bar_index',
+          yloc: 'belowbar',
+          style: 'label_left',
+          color: null,
+          textColor: null,
+          size: 'normal',
+          tooltip: undefined,
+        },
+        {
+          id: 'label_label.new_0_2',
+          type: 'label',
+          barIndex: 2,
+          x: null,
+          y: null,
+          text: 'updated|bar_time|abovebar|label_down|#2196F3|#FFFFFF|tiny|tip',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_left',
+          color: null,
+          textColor: null,
+          size: 'normal',
+          tooltip: undefined,
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Label X')?.values).toEqual([0, 0, 7]);
+      expect(result.plots.find((plot) => plot.title === 'Label Y')?.values).toEqual([100.2, 100.2, 101.5]);
+    });
   });
 
   describe('basic execution', () => {

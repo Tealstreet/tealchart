@@ -118,6 +118,8 @@ export interface LabelDrawingOutput {
   type: 'label';
   /** Script ID that produced this drawing (set by TealscriptManager). */
   scriptId?: string;
+  /** True when the drawing was created by a persistent declaration. */
+  persistent?: boolean;
   barIndex: number;
   x: number | null;
   y: number | null;
@@ -128,6 +130,7 @@ export interface LabelDrawingOutput {
   color: string | null;
   textColor: string | null;
   size: string;
+  tooltip?: string;
 }
 
 export type DrawingOutput = LabelDrawingOutput;
@@ -576,6 +579,60 @@ export class ExecutionContext {
   }
 
   /**
+   * Current number of drawing outputs.
+   */
+  getDrawingCount(): number {
+    return this.drawings.length;
+  }
+
+  /**
+   * Mark drawings created from an index onward as persistent.
+   */
+  markDrawingsPersistentFrom(index: number): void {
+    for (let i = index; i < this.drawings.length; i++) {
+      const drawing = this.drawings[i];
+      if (drawing) {
+        drawing.persistent = true;
+      }
+    }
+  }
+
+  /**
+   * Get a drawing object by handle ID.
+   */
+  getDrawing(id: string): DrawingOutput | undefined {
+    return this.drawings.find((drawing) => drawing.id === id);
+  }
+
+  /**
+   * Delete a drawing object by handle ID.
+   */
+  deleteDrawing(id: string): void {
+    const index = this.drawings.findIndex((drawing) => drawing.id === id);
+    if (index !== -1) {
+      this.drawings.splice(index, 1);
+    }
+  }
+
+  /**
+   * Copy a label drawing object to a new handle ID.
+   */
+  copyLabelDrawing(id: string, newId: string): LabelDrawingOutput | undefined {
+    const source = this.getDrawing(id);
+    if (!source || source.type !== 'label') return undefined;
+    if (this.getDrawing(newId)) return undefined;
+
+    const copy: LabelDrawingOutput = {
+      ...source,
+      id: newId,
+      barIndex: this.bar_index,
+      persistent: false,
+    };
+    this.drawings.push(copy);
+    return copy;
+  }
+
+  /**
    * Get all drawing outputs as array.
    */
   getDrawings(): DrawingOutput[] {
@@ -588,7 +645,10 @@ export class ExecutionContext {
   truncateDrawings(fromBarIndex: number): void {
     const keepCount = this.drawings.findIndex((drawing) => drawing.barIndex >= fromBarIndex);
     if (keepCount >= 0) {
-      this.drawings.length = keepCount;
+      const prefix = this.drawings.slice(0, keepCount);
+      const persistentTail = this.drawings.slice(keepCount).filter((drawing) => drawing.persistent);
+      this.drawings.length = 0;
+      this.drawings.push(...prefix, ...persistentTail);
     }
   }
 
