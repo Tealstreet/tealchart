@@ -29,6 +29,7 @@ import type {
 import {
   avgArrayValue,
   clearArray,
+  concatArray,
   copyArray,
   createPineArray,
   firstArrayValue,
@@ -38,6 +39,7 @@ import {
   indexOfArrayValue,
   insertArrayValue,
   isPineArray,
+  joinArray,
   lastArrayValue,
   lastIndexOfArrayValue,
   maxArrayValue,
@@ -45,8 +47,10 @@ import {
   popArrayValue,
   pushArrayValue,
   removeArrayValue,
+  reverseArray,
   setArrayValue,
   shiftArrayValue,
+  sortArray,
   sumArrayValue,
   unshiftArrayValue,
   type PineArray,
@@ -808,6 +812,10 @@ export class TealscriptEngine {
       case 'lastindexof':
       case 'insert':
       case 'remove':
+      case 'sort':
+      case 'reverse':
+      case 'join':
+      case 'concat':
       case 'min':
       case 'max':
       case 'sum':
@@ -1901,6 +1909,16 @@ export class TealscriptEngine {
     this.builtins.set('array.unshift', (args) => unshiftArrayValue(readMutableArray(args[0]), args[1]));
     this.builtins.set('array.insert', (args) => insertArrayValue(readMutableArray(args[0]), args[1] as number, args[2]));
     this.builtins.set('array.remove', (args) => removeArrayValue(readMutableArray(args[0]), args[1] as number));
+    this.builtins.set('array.sort', (args, namedArgs) => {
+      sortArray(readMutableArray(args[0]), namedArgs.get('order') ?? args[1]);
+      return null;
+    });
+    this.builtins.set('array.reverse', (args) => {
+      reverseArray(readMutableArray(args[0]));
+      return null;
+    });
+    this.builtins.set('array.join', (args) => joinArray(copyReadonlyArray(readArray(args[0])), args[1]));
+    this.builtins.set('array.concat', (args) => concatArray(readMutableArray(args[0]), copyReadonlyArray(readArray(args[1]))));
     this.builtins.set('array.clear', (args) => {
       clearArray(readMutableArray(args[0]));
       return null;
@@ -2062,6 +2080,15 @@ export class TealscriptEngine {
     };
 
     for (const [name, value] of Object.entries(scaleConstants)) {
+      this.builtins.set(name, () => value);
+    }
+
+    const orderConstants: Record<string, string> = {
+      'order.ascending': 'ascending',
+      'order.descending': 'descending',
+    };
+
+    for (const [name, value] of Object.entries(orderConstants)) {
       this.builtins.set(name, () => value);
     }
   }
