@@ -2464,6 +2464,55 @@ export class TealscriptEngine {
       return Math.sqrt(variance);
     });
 
+    this.builtins.set('ta.variance', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
+      const length = args[1] as number;
+      const series = this.getSeriesForSource(source, ctx);
+
+      const values: number[] = [];
+      for (let i = 0; i < length; i++) {
+        const value = series.get(i);
+        if (value !== undefined && !isNaN(value)) {
+          values.push(value);
+        }
+      }
+
+      if (values.length < length) return NaN;
+
+      const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+      return values.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / values.length;
+    });
+
+    this.builtins.set('ta.dev', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
+      const length = args[1] as number;
+      const series = this.getSeriesForSource(source, ctx);
+
+      const values: number[] = [];
+      for (let i = 0; i < length; i++) {
+        const value = series.get(i);
+        if (value !== undefined && !isNaN(value)) {
+          values.push(value);
+        }
+      }
+
+      if (values.length < length) return NaN;
+
+      const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+      return values.reduce((sum, value) => sum + Math.abs(value - mean), 0) / values.length;
+    });
+
+    this.builtins.set('ta.cum', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      if (isNaN(source)) return NaN;
+
+      const key = `_ta_cum_${callId}`;
+      const previous = (scope.get(key) as number | undefined) ?? 0;
+      const total = previous + source;
+      this.setBuiltinState(scope, key, total);
+      return total;
+    });
+
     // VWAP - Volume Weighted Average Price
     // Note: Simplified version - doesn't reset at session boundaries
     this.builtins.set('ta.vwap', (_args, _namedArgs, ctx, scope) => {
