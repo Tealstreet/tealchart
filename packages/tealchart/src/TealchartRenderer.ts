@@ -1,4 +1,4 @@
-import type { DrawingOutput, LabelDrawingOutput, LineDrawingOutput, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
+import type { DrawingOutput, LabelDrawingOutput, LineDrawingOutput, LineFillDrawingOutput, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
 import type { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
 import type { CanvasContext } from './rendering/CanvasContext';
 import type { PaneOffset } from './rendering/PaneManager';
@@ -3194,6 +3194,7 @@ export class TealchartRenderer {
     }
 
     if (drawings && drawings.length > 0) {
+      this.renderLineFillDrawings(drawings, bars, viewport, pane);
       this.renderLineDrawings(drawings, bars, viewport, pane);
       this.renderLabelDrawings(drawings, bars, viewport, pane);
     }
@@ -3205,6 +3206,54 @@ export class TealchartRenderer {
     if (labelBounds && labelBounds.length > 0) {
       this.drawPriceLinesInPane(labelBounds, viewport, pane);
     }
+  }
+
+  private renderLineFillDrawings(
+    drawings: DrawingOutput[],
+    bars: Bar[],
+    viewport: Viewport,
+    pane: ComputedPane,
+  ): void {
+    const linefills = drawings.filter((drawing): drawing is LineFillDrawingOutput => drawing.type === 'linefill');
+    if (linefills.length === 0) return;
+
+    const lines = new Map(
+      drawings
+        .filter((drawing): drawing is LineDrawingOutput => drawing.type === 'line')
+        .map((line) => [line.id, line]),
+    );
+    if (lines.size === 0) return;
+
+    const { ctx, options, margins } = this;
+    const chartWidth = options.width - margins.left;
+    const minX = margins.left;
+    const maxX = options.width - margins.right;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(margins.left, pane.top, options.width - margins.left - margins.right, pane.height);
+    ctx.clip();
+
+    for (const linefill of linefills) {
+      const line1 = lines.get(linefill.line1);
+      const line2 = lines.get(linefill.line2);
+      if (!line1 || !line2) continue;
+
+      const line1Segment = this.resolveLineDrawingSegment(line1, bars, viewport, pane, chartWidth, minX, maxX);
+      const line2Segment = this.resolveLineDrawingSegment(line2, bars, viewport, pane, chartWidth, minX, maxX);
+      if (!line1Segment || !line2Segment) continue;
+
+      ctx.fillStyle = linefill.color ?? 'rgba(41, 98, 255, 0.18)';
+      ctx.beginPath();
+      ctx.moveTo(line1Segment.start.x, line1Segment.start.y);
+      ctx.lineTo(line1Segment.end.x, line1Segment.end.y);
+      ctx.lineTo(line2Segment.end.x, line2Segment.end.y);
+      ctx.lineTo(line2Segment.start.x, line2Segment.start.y);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    ctx.restore();
   }
 
   private renderLineDrawings(
@@ -3227,11 +3276,8 @@ export class TealchartRenderer {
     ctx.clip();
 
     for (const line of lines) {
-      const start = this.resolveLineDrawingPoint(line.x1, line.y1, line.xloc, bars, viewport, pane, chartWidth);
-      const end = this.resolveLineDrawingPoint(line.x2, line.y2, line.xloc, bars, viewport, pane, chartWidth);
-      if (!start || !end) continue;
-
-      const extended = this.resolveExtendedLineSegment(start, end, line.extend, minX, maxX);
+      const extended = this.resolveLineDrawingSegment(line, bars, viewport, pane, chartWidth, minX, maxX);
+      if (!extended) continue;
 
       ctx.strokeStyle = line.color ?? '#2962FF';
       ctx.lineWidth = Math.max(1, line.width);
@@ -3250,6 +3296,21 @@ export class TealchartRenderer {
 
     ctx.setLineDash([]);
     ctx.restore();
+  }
+
+  private resolveLineDrawingSegment(
+    line: LineDrawingOutput,
+    bars: Bar[],
+    viewport: Viewport,
+    pane: ComputedPane,
+    chartWidth: number,
+    minX: number,
+    maxX: number,
+  ): { start: { x: number; y: number }; end: { x: number; y: number } } | null {
+    const start = this.resolveLineDrawingPoint(line.x1, line.y1, line.xloc, bars, viewport, pane, chartWidth);
+    const end = this.resolveLineDrawingPoint(line.x2, line.y2, line.xloc, bars, viewport, pane, chartWidth);
+    if (!start || !end) return null;
+    return this.resolveExtendedLineSegment(start, end, line.extend, minX, maxX);
   }
 
   private resolveLineDrawingPoint(

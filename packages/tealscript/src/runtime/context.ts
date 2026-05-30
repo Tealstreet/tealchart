@@ -153,7 +153,20 @@ export interface LineDrawingOutput {
   forceOverlay?: boolean;
 }
 
-export type DrawingOutput = LabelDrawingOutput | LineDrawingOutput;
+export interface LineFillDrawingOutput {
+  id: string;
+  type: 'linefill';
+  /** Script ID that produced this drawing (set by TealscriptManager). */
+  scriptId?: string;
+  /** True when the drawing was created by a persistent declaration. */
+  persistent?: boolean;
+  barIndex: number;
+  line1: string;
+  line2: string;
+  color: string | null;
+}
+
+export type DrawingOutput = LabelDrawingOutput | LineDrawingOutput | LineFillDrawingOutput;
 
 export type PlotStyle =
   | 'line'

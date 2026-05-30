@@ -401,6 +401,88 @@ plot(line.get_y2(trend), title="Line Y2")`;
         },
       ]);
     });
+
+    it('creates, reads, mutates, and deletes linefill drawings by handle', () => {
+      const script = `//@version=6
+indicator("Linefill objects")
+var upper = line.new(0, high, 1, high)
+var lower = line.new(0, low, 1, low)
+var channel = linefill.new(upper, lower, color=color.red)
+var deleted = linefill.new(upper, lower, color=color.blue)
+if barstate.islast
+    line.set_xy1(upper, bar_index - 1, high[1])
+    line.set_xy2(upper, bar_index, high)
+    line.set_xy1(lower, bar_index - 1, low[1])
+    line.set_xy2(lower, bar_index, low)
+    linefill.set_color(channel, color.green)
+    linefill.delete(deleted)
+    label.new(na, na, text=str.format("{0}|{1}", linefill.get_line1(channel), linefill.get_line2(channel)))
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'line_line.new_0_0',
+          type: 'line',
+          persistent: true,
+          barIndex: 2,
+          x1: 1,
+          y1: 101,
+          x2: 2,
+          y2: 101.5,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: null,
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+        {
+          id: 'line_line.new_1_0',
+          type: 'line',
+          persistent: true,
+          barIndex: 2,
+          x1: 1,
+          y1: 100.2,
+          x2: 2,
+          y2: 100.7,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: null,
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+        {
+          id: 'linefill_linefill.new_0_0',
+          type: 'linefill',
+          persistent: true,
+          barIndex: 0,
+          line1: 'line_line.new_0_0',
+          line2: 'line_line.new_1_0',
+          color: '#4CAF50',
+        },
+        {
+          id: 'label_label.new_0_2',
+          type: 'label',
+          barIndex: 2,
+          x: null,
+          y: null,
+          text: 'line_line.new_0_0|line_line.new_1_0',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_left',
+          color: null,
+          textColor: null,
+          size: 'normal',
+          tooltip: undefined,
+        },
+      ]);
+    });
   });
 
   describe('basic execution', () => {
