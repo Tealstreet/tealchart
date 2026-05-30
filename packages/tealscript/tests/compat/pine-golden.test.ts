@@ -282,4 +282,21 @@ plot(ta.range(close, 4), title="Close Range")
     expect(getPlot(result, 'Cross Threshold').values).toEqual([false, true, false, true, false, false, false, true, false, false, false, false]);
     expect(roundSeries(getPlot(result, 'Close Range').values)).toEqual([0, 3, 5, 5, 8, 8, 5, 10, 9, 7, 3, 4]);
   });
+
+  it('runs string conversion and formatting helpers', () => {
+    const result = runCompatScript(`
+indicator("String helpers")
+formatted = str.tostring(close, "#.00")
+message = str.format("close={0:#.0}", close)
+joined = "symbol:" + "BTCUSDT"
+plot(formatted == "102.00", title="Formatted Close")
+plot(message == "close=102.0", title="Format Template")
+plot(joined == "symbol:BTCUSDT", title="Concatenated Symbol")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Formatted Close').values).toEqual([true, false, false, false, false, false, false, false, false, false, false, false]);
+    expect(getPlot(result, 'Format Template').values).toEqual([true, false, false, false, false, false, false, false, false, false, false, false]);
+    expect(getPlot(result, 'Concatenated Symbol').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+  });
 });
