@@ -112,7 +112,7 @@ derived regular-series history, and unavailable or future offsets returning
 | `plotshape`, `plotchar`, `plotarrow` | Partial | Core outputs exist; styling parity is incomplete. |
 | `barcolor` | Supported | Produces per-bar candle color outputs consumed by the main-pane renderer. |
 | `plotbar`, `plotcandle` | Supported | Produce OHLC outputs with per-bar body, wick, and border colors; renderer draws custom bars/candles. |
-| `line.*`, `label.*`, `box.*`, `table.*` | Planned | Requires object lifecycle and renderer support. |
+| `line.*`, `label.*`, `box.*`, `table.*` | Planned | Namespace calls report explicit unsupported runtime diagnostics. Object lifecycle and renderer support are still planned. |
 
 ## Alerts, Strategies, And Data
 
@@ -230,6 +230,12 @@ The chart-info pass exposes common static `syminfo.*` and `timeframe.*`
 members used by generated indicators and multi-timeframe script templates,
 including `syminfo.tickerid`, `syminfo.root`, `timeframe.period`,
 `timeframe.main_period`, `timeframe.multiplier`, and timeframe category flags.
+
+## Drawing Diagnostic Coverage
+
+Drawing namespaces (`line.*`, `label.*`, `box.*`, and `table.*`) are accepted
+as parsed member calls and fail with explicit unsupported runtime diagnostics.
+Object handles, lifecycle operations, and rendering are still planned.
 
 ## Strategy Diagnostic Coverage
 
