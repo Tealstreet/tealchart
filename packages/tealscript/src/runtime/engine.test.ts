@@ -57,7 +57,7 @@ plot(close)`;
   });
 
   describe('Pine drawing object outputs', () => {
-    it('records label.new outputs and leaves unsupported object diagnostics explicit', () => {
+    it('records basic drawing outputs and leaves unsupported object diagnostics explicit', () => {
       const script = `//@version=6
 indicator("Drawing calls")
 label.new(bar_index, close, text="x", xloc=xloc.bar_index, yloc=yloc.price, style=label.style_label_down, color=color.red, textcolor=color.white, size=size.small)
@@ -72,7 +72,6 @@ plot(close)`;
 
       expect(result.errors.map((error) => error.message)).toEqual([
         'table.* functions are not supported yet: table.new',
-        'box.* functions are not supported yet: box.new',
       ]);
       expect(result.drawings).toEqual([
         {
@@ -103,6 +102,24 @@ plot(close)`;
           style: 'solid',
           width: 1,
           forceOverlay: false,
+        },
+        {
+          id: 'box_box.new_0_0',
+          type: 'box',
+          barIndex: 0,
+          left: -1,
+          top: 100.5,
+          right: 0,
+          bottom: 99.7,
+          xloc: 'bar_index',
+          extend: 'none',
+          borderColor: null,
+          borderWidth: 1,
+          borderStyle: 'solid',
+          bgcolor: null,
+          text: '',
+          textColor: null,
+          textSize: 'normal',
         },
       ]);
     });
@@ -482,6 +499,137 @@ plot(close)`;
           tooltip: undefined,
         },
       ]);
+    });
+
+    it('mutates, reads, copies, and deletes box drawings by handle', () => {
+      const script = `//@version=6
+indicator("Box objects")
+var zone = box.new(0, high, 1, low, border_color=color.red, border_width=2, border_style=line.style_dotted, bgcolor=color.blue, text="seed")
+if barstate.islast
+    box.set_lefttop(zone, bar_index - 2, high)
+    box.set_rightbottom(zone, bar_index, low)
+    box.set_bgcolor(zone, color.green)
+    box.set_border_color(zone, color.white)
+    box.set_border_width(zone, 3)
+    box.set_border_style(zone, line.style_dashed)
+    box.set_extend(zone, extend.right)
+    box.set_text(zone, "last")
+    box.set_text_color(zone, color.black)
+    box.set_text_size(zone, size.large)
+    clone = box.copy(zone)
+    box.set_text(clone, "copy")
+    box.delete(clone)
+plot(box.get_left(zone), title="Box Left")
+plot(box.get_top(zone), title="Box Top")
+if barstate.islast
+    label.new(na, na, text=str.format("{0}|{1}|{2}", box.get_text(zone), box.get_bgcolor(zone), box.get_border_color(zone)))`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'box_box.new_0_0',
+          type: 'box',
+          persistent: true,
+          barIndex: 2,
+          left: 0,
+          top: 101.5,
+          right: 2,
+          bottom: 100.7,
+          xloc: 'bar_index',
+          extend: 'right',
+          borderColor: '#FFFFFF',
+          borderWidth: 3,
+          borderStyle: 'dashed',
+          bgcolor: '#4CAF50',
+          text: 'last',
+          textColor: '#000000',
+          textSize: 'large',
+        },
+        {
+          id: 'label_label.new_0_2',
+          type: 'label',
+          barIndex: 2,
+          x: null,
+          y: null,
+          text: 'last|#4CAF50|#FFFFFF',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_left',
+          color: null,
+          textColor: null,
+          size: 'normal',
+          tooltip: undefined,
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Box Left')?.values).toEqual([0, 0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Box Top')?.values).toEqual([100.5, 100.5, 101.5]);
+    });
+
+    it('preserves persistent box handles during realtime rollback', () => {
+      const script = `//@version=6
+indicator("Realtime box")
+var zone = box.new(0, high, 1, low)
+if barstate.islast
+    box.set_lefttop(zone, bar_index - 1, high)
+    box.set_rightbottom(zone, bar_index, low)
+plot(box.get_bottom(zone), title="Box Bottom")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      engine.updateBar(ast, {
+        ...bars[2],
+        high: 250,
+        low: 190,
+        close: 220,
+      });
+
+      expect(engine.getDrawings()).toEqual([
+        {
+          id: 'box_box.new_0_0',
+          type: 'box',
+          persistent: true,
+          barIndex: 2,
+          left: 1,
+          top: 250,
+          right: 2,
+          bottom: 190,
+          xloc: 'bar_index',
+          extend: 'none',
+          borderColor: null,
+          borderWidth: 1,
+          borderStyle: 'solid',
+          bgcolor: null,
+          text: '',
+          textColor: null,
+          textSize: 'normal',
+        },
+      ]);
+    });
+
+    it('maps positional box text_size before text_color', () => {
+      const script = `//@version=6
+indicator("Box positional args")
+box.new(0, high, 1, low, color.red, 1, line.style_solid, extend.none, xloc.bar_index, color.green, "txt", size.large, color.black)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings[0]).toMatchObject({
+        type: 'box',
+        text: 'txt',
+        textSize: 'large',
+        textColor: '#000000',
+      });
     });
   });
 
