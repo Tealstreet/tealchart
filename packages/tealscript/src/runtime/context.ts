@@ -166,7 +166,30 @@ export interface LineFillDrawingOutput {
   color: string | null;
 }
 
-export type DrawingOutput = LabelDrawingOutput | LineDrawingOutput | LineFillDrawingOutput;
+export interface BoxDrawingOutput {
+  id: string;
+  type: 'box';
+  /** Script ID that produced this drawing (set by TealscriptManager). */
+  scriptId?: string;
+  /** True when the drawing was created by a persistent declaration. */
+  persistent?: boolean;
+  barIndex: number;
+  left: number | null;
+  top: number | null;
+  right: number | null;
+  bottom: number | null;
+  xloc: string;
+  extend: string;
+  borderColor: string | null;
+  borderWidth: number;
+  borderStyle: string;
+  bgcolor: string | null;
+  text: string;
+  textColor: string | null;
+  textSize: string;
+}
+
+export type DrawingOutput = LabelDrawingOutput | LineDrawingOutput | LineFillDrawingOutput | BoxDrawingOutput;
 
 export type PlotStyle =
   | 'line'
@@ -674,6 +697,24 @@ export class ExecutionContext {
     if (this.getDrawing(newId)) return undefined;
 
     const copy: LineDrawingOutput = {
+      ...source,
+      id: newId,
+      barIndex: this.bar_index,
+      persistent: false,
+    };
+    this.drawings.push(copy);
+    return copy;
+  }
+
+  /**
+   * Copy a box drawing object to a new handle ID.
+   */
+  copyBoxDrawing(id: string, newId: string): BoxDrawingOutput | undefined {
+    const source = this.getDrawing(id);
+    if (!source || source.type !== 'box') return undefined;
+    if (this.getDrawing(newId)) return undefined;
+
+    const copy: BoxDrawingOutput = {
       ...source,
       id: newId,
       barIndex: this.bar_index,

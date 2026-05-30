@@ -67,6 +67,7 @@ export {
   type LabelDrawingOutput,
   type LineDrawingOutput,
   type LineFillDrawingOutput,
+  type BoxDrawingOutput,
   type AlertEvent,
   type AlertFrequency,
   type AlertOutput,
