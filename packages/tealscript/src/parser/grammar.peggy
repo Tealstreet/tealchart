@@ -334,7 +334,36 @@ Indent
 // ============================================================================
 
 Expression
-  = ConditionalExpression
+  = SwitchExpression
+  / ConditionalExpression
+
+SwitchExpression
+  = "switch" !IdentifierPart _ discriminant:ConditionalExpression? _ LineTerminator cases:SwitchCase+ {
+      return {
+        type: 'SwitchExpression',
+        discriminant: discriminant || null,
+        cases,
+        loc: loc()
+      };
+    }
+
+SwitchCase
+  = Indent _ "=>" _ consequent:Expression _ LineTerminator? {
+      return {
+        type: 'SwitchCase',
+        test: null,
+        consequent,
+        loc: loc()
+      };
+    }
+  / Indent _ test:ConditionalExpression _ "=>" _ consequent:Expression _ LineTerminator? {
+      return {
+        type: 'SwitchCase',
+        test,
+        consequent,
+        loc: loc()
+      };
+    }
 
 // Ternary: condition ? true : false
 ConditionalExpression
@@ -570,6 +599,7 @@ IdentifierPart
 ReservedWord
   = ("if" / "else" / "for" / "while" / "break" / "continue" / "var" / "varip"
     / "true" / "false" / "na" / "and" / "or" / "not" / "to" / "by"
+    / "switch"
     / "indicator" / "strategy" / "library" / "import" / "export"
     ) !IdentifierPart
 
