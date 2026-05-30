@@ -156,6 +156,7 @@ export interface CollectionForStatement extends BaseNode {
   type: 'ForStatement';
   kind: 'collection';
   counter: Identifier;
+  indexCounter?: Identifier;
   iterable: Expression;
   body: Statement[];
 }

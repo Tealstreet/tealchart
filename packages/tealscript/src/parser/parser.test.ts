@@ -300,6 +300,21 @@ for i = 0 to 10 by 2
         expect(forStmt).toBeDefined();
         expect(forStmt.step).toBeDefined();
       });
+
+      it('parses collection loops with index and value counters', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+values = array.from(1, 2, 3)
+for [index, value] in values
+    plot(index + value)`);
+
+        const loop = ast.body.find(s => s.type === 'ForStatement');
+        expect(loop?.type).toBe('ForStatement');
+        if (loop?.type === 'ForStatement' && loop.kind === 'collection') {
+          expect(loop.indexCounter?.name).toBe('index');
+          expect(loop.counter.name).toBe('value');
+        }
+      });
     });
 
     describe('while loops', () => {
