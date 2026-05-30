@@ -236,6 +236,40 @@ plot(window.size(), title="Window Size")
     expect(roundSeries(getPlot(result, 'Window Size').values)).toEqual([1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
   });
 
+  it('runs extended array helper idioms', () => {
+    const result = runCompatScript(`
+indicator("Array extended helpers")
+base = array.from(1, 2, 3, 2)
+working = base.copy()
+working.insert(2, 4)
+removed = working.remove(3)
+plot(working.first(), title="First")
+plot(working.last(), title="Last")
+plot(working.includes(4) ? 1 : 0, title="Includes")
+plot(working.indexof(2), title="Index")
+plot(working.lastindexof(2), title="Last Index")
+plot(working.min(), title="Min")
+plot(working.max(), title="Max")
+plot(working.sum(), title="Sum")
+plot(working.avg(), title="Avg")
+plot(removed, title="Removed")
+plot(array.size(base), title="Original Size")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'First').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Last').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Includes').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Index').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Last Index').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Min').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Max').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+    expect(roundSeries(getPlot(result, 'Sum').values)).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
+    expect(roundSeries(getPlot(result, 'Avg').values)).toEqual([2.25, 2.25, 2.25, 2.25, 2.25, 2.25, 2.25, 2.25, 2.25, 2.25, 2.25, 2.25]);
+    expect(roundSeries(getPlot(result, 'Removed').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Original Size').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+  });
+
   it('reads array literal values with array helpers', () => {
     const result = runCompatScript(`
 indicator("Array literal")
