@@ -675,6 +675,7 @@ plot(ta.median(close, length), title="Median")
 plot(ta.mode(close, length), title="Mode")
 plot(ta.percentile_nearest_rank(close, length, 75), title="Nearest")
 plot(ta.percentile_linear_interpolation(close, length, 75), title="Linear")
+plot(ta.percentrank(close, length), title="Percent Rank")
 `);
 
     expect(result.errors).toEqual([]);
@@ -682,6 +683,7 @@ plot(ta.percentile_linear_interpolation(close, length, 75), title="Linear")
     expect(getPlot(result, 'Mode').values).toEqual([null, null, 102, 103, 99, 99, 99, 100, 104, 108, 108, 110]);
     expect(getPlot(result, 'Nearest').values).toEqual([null, null, 107, 107, 107, 103, 104, 109, 109, 111, 111, 112]);
     expect(getPlot(result, 'Linear').values).toEqual([null, null, 106, 106, 105, 101.5, 102, 106.5, 108.5, 110, 110.5, 111.5]);
+    expect(roundSeries(getPlot(result, 'Percent Rank').values)).toEqual([null, null, 100, 33.333333, 33.333333, 66.666667, 100, 100, 66.666667, 100, 66.666667, 100]);
   });
 
   it('runs conditional barcolor helper idioms', () => {
