@@ -84,8 +84,9 @@ Remaining gaps:
 ## Common History Reference Coverage
 
 The history reference pass covers literal offsets such as `close[1]`, dynamic
-offsets such as `close[length]`, derived regular-series history, and unavailable
-or future offsets returning `na`/`null` plot values instead of throwing.
+offsets such as `close[length]`, fractional offsets truncated toward zero,
+derived regular-series history, and unavailable or future offsets returning
+`na`/`null` plot values instead of throwing.
 
 ## Built-ins
 

@@ -191,15 +191,18 @@ plot(dist[1], title="Previous Distance")
 indicator("Dynamic history")
 length = input.int(2, "Lookback")
 previous = close[length]
+fractional = close[1.9]
 future = close[-1]
 tooFar = close[100]
 plot(previous, title="Previous")
+plot(fractional, title="Fractional")
 plot(future, title="Future")
 plot(tooFar, title="Too Far")
 `);
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Previous').values)).toEqual([null, null, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111]);
+    expect(roundSeries(getPlot(result, 'Fractional').values)).toEqual([null, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110]);
     expect(getPlot(result, 'Future').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, null]);
     expect(getPlot(result, 'Too Far').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, null]);
   });
