@@ -39,7 +39,7 @@ import {
   unshiftArrayValue,
   type PineArray,
 } from './arrays';
-import { ExecutionContext, type Bar, type InputDefinition, type PlotOutput } from './context';
+import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type InputDefinition, type PlotOutput } from './context';
 import { Scope, createRootScope } from './scope';
 
 /**
@@ -47,6 +47,7 @@ import { Scope, createRootScope } from './scope';
  */
 export interface ExecutionResult {
   plots: PlotOutput[];
+  alerts: AlertOutput[];
   inputs: InputDefinition[];
   indicatorTitle: string;
   errors: ExecutionError[];
@@ -146,6 +147,7 @@ export class TealscriptEngine {
 
     return {
       plots: this.ctx.getPlots(),
+      alerts: this.ctx.getAlerts(),
       inputs: this.ctx.inputDefinitions.map((def) => ({ ...def })),
       indicatorTitle: this.ctx.indicatorTitle,
       errors: this.errors,
@@ -162,10 +164,12 @@ export class TealscriptEngine {
       functionScope.rollback();
     }
     this.ctx.rollbackBar();
+    this.ctx.bar_index = this.ctx.last_bar_index;
 
     // Truncate plot arrays to remove the last bar's appended values
     // so re-execution can re-append them cleanly without duplication
     this.ctx.truncatePlots(this.ctx.last_bar_index);
+    this.ctx.truncateAlerts(this.ctx.last_bar_index);
 
     // Update current bar data
     this.ctx.updateCurrentBar(bar);
@@ -183,6 +187,13 @@ export class TealscriptEngine {
     }
 
     return this.ctx.getPlots();
+  }
+
+  /**
+   * Get current alert outputs.
+   */
+  getAlerts(): AlertOutput[] {
+    return this.ctx.getAlerts();
   }
 
   // ===========================================================================
@@ -906,6 +917,9 @@ export class TealscriptEngine {
 
     // Visual constants (shape, location, size)
     this.registerVisualConstants();
+
+    // Alert functions and constants
+    this.registerAlertBuiltins();
   }
 
   // Plot ID counters - reset when engine is created
@@ -1294,6 +1308,48 @@ export class TealscriptEngine {
       ctx.addPlotValue(id, 1);
       return null;
     });
+  }
+
+  private normalizeAlertFrequency(value: unknown): AlertFrequency {
+    if (value === 'all' || value === 'once_per_bar_close' || value === 'once_per_bar') {
+      return value;
+    }
+    return 'once_per_bar';
+  }
+
+  private registerAlertBuiltins(): void {
+    this.builtins.set('alertcondition', (args, namedArgs, ctx, _scope, callId) => {
+      const condition = namedArgs.has('condition') ? namedArgs.get('condition') : args[0];
+      const title = String(namedArgs.get('title') ?? args[1] ?? callId);
+      const message = String(namedArgs.get('message') ?? args[2] ?? '');
+      const id = `alertcondition_${title}`;
+      const isActive = this.isTruthy(condition);
+
+      if (!ctx.alerts.has(id)) {
+        ctx.registerAlert({
+          id,
+          type: 'alertcondition',
+          title,
+          message,
+        });
+      }
+
+      ctx.setAlertConditionValue(id, isActive ? true : null);
+      return condition;
+    });
+
+    this.builtins.set('alert', (args, namedArgs, ctx, _scope, callId) => {
+      const message = String(namedArgs.get('message') ?? args[0] ?? '');
+      const frequency = this.normalizeAlertFrequency(namedArgs.get('freq') ?? args[1]);
+      const id = `alert_${callId}`;
+
+      ctx.addAlertEvent(id, message, frequency);
+      return undefined;
+    });
+
+    this.builtins.set('alert.freq_all', () => 'all');
+    this.builtins.set('alert.freq_once_per_bar', () => 'once_per_bar');
+    this.builtins.set('alert.freq_once_per_bar_close', () => 'once_per_bar_close');
   }
 
   private registerInputBuiltins(): void {

@@ -551,6 +551,38 @@ barcolor(candleColor)
     ]);
   });
 
+  it('runs documented alert helper idioms', () => {
+    const result = runCompatScript(`
+indicator("Alert smoke", overlay=true)
+triggerCondition = close > close[1]
+alertcondition(triggerCondition, "Close crossed up", "Close crossed above previous close")
+if triggerCondition
+    alert("Close " + str.tostring(close, "#") + " crossed previous close", alert.freq_once_per_bar_close)
+`);
+
+    expect(result.errors).toEqual([]);
+    const condition = result.alerts.find((alert) => alert.type === 'alertcondition');
+    const directAlert = result.alerts.find((alert) => alert.type === 'alert');
+
+    expect(condition).toMatchObject({
+      title: 'Close crossed up',
+      message: 'Close crossed above previous close',
+    });
+    expect(condition?.values).toEqual([null, true, true, null, null, true, true, true, null, true, null, true]);
+
+    expect(directAlert?.frequency).toBe('once_per_bar_close');
+    expect(directAlert?.events.map((event) => event.barIndex)).toEqual([1, 2, 5, 6, 7, 9, 11]);
+    expect(directAlert?.events.map((event) => event.message)).toEqual([
+      'Close 105 crossed previous close',
+      'Close 107 crossed previous close',
+      'Close 100 crossed previous close',
+      'Close 104 crossed previous close',
+      'Close 109 crossed previous close',
+      'Close 111 crossed previous close',
+      'Close 112 crossed previous close',
+    ]);
+  });
+
   it('runs documented custom candle and bar plotting idioms', () => {
     const result = runCompatScript(`
 indicator("Custom OHLC smoke", overlay=true)

@@ -4,7 +4,7 @@
  * Message types for communication between main thread and Web Worker.
  */
 
-import type { Bar, PlotOutput, InputDefinition } from '../runtime/context';
+import type { AlertOutput, Bar, PlotOutput, InputDefinition } from '../runtime/context';
 
 /**
  * Messages sent from main thread to worker
@@ -81,6 +81,7 @@ export interface ResultMessage {
   type: 'result';
   scriptId: string;
   plots: PlotOutput[];
+  alerts: AlertOutput[];
   inputs: InputDefinition[];
 }
 

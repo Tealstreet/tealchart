@@ -113,6 +113,31 @@ export interface PlotOutput {
 
 export type PlotStyle = 'line' | 'stepline' | 'histogram' | 'cross' | 'circles' | 'columns' | 'area' | 'areabr';
 
+export type AlertFrequency = 'once_per_bar' | 'once_per_bar_close' | 'all';
+
+/**
+ * Alert event from a direct alert() call.
+ */
+export interface AlertEvent {
+  barIndex: number;
+  time: number;
+  message: string;
+  frequency: AlertFrequency;
+}
+
+/**
+ * Alert output from a script.
+ */
+export interface AlertOutput {
+  id: string;
+  type: 'alertcondition' | 'alert';
+  title: string;
+  message: string;
+  values: (boolean | null)[];
+  frequency?: AlertFrequency;
+  events: AlertEvent[];
+}
+
 /**
  * Input definition from indicator
  */
@@ -211,6 +236,16 @@ export class ExecutionContext {
 
   /** Plot order (for layering) */
   readonly plotOrder: string[] = [];
+
+  // =========================================================================
+  // Alert Outputs
+  // =========================================================================
+
+  /** Alert outputs (populated during execution) */
+  readonly alerts: Map<string, AlertOutput> = new Map();
+
+  /** Alert order */
+  readonly alertOrder: string[] = [];
 
   // =========================================================================
   // Internal State
@@ -487,6 +522,86 @@ export class ExecutionContext {
   }
 
   // =========================================================================
+  // Alert Management
+  // =========================================================================
+
+  /**
+   * Register an alert output.
+   */
+  registerAlert(alert: Omit<AlertOutput, 'values' | 'events'>): void {
+    const fullAlert: AlertOutput = {
+      ...alert,
+      values: [],
+      events: [],
+    };
+    this.alerts.set(alert.id, fullAlert);
+    this.alertOrder.push(alert.id);
+  }
+
+  /**
+   * Set an alertcondition value for the current bar.
+   */
+  setAlertConditionValue(id: string, value: boolean | null): void {
+    const alert = this.alerts.get(id);
+    if (!alert) return;
+
+    while (alert.values.length < this.bar_index) {
+      alert.values.push(null);
+    }
+    alert.values[this.bar_index] = value;
+  }
+
+  /**
+   * Add an alert() event for the current bar.
+   */
+  addAlertEvent(id: string, message: string, frequency: AlertFrequency): void {
+    let alert = this.alerts.get(id);
+    if (!alert) {
+      this.registerAlert({
+        id,
+        type: 'alert',
+        title: 'alert',
+        message,
+        frequency,
+      });
+      alert = this.alerts.get(id);
+    }
+
+    if (!alert) return;
+
+    const currentBar = this.getCurrentBar();
+    while (alert.values.length < this.bar_index) {
+      alert.values.push(null);
+    }
+    alert.values[this.bar_index] = true;
+    alert.message = message;
+    alert.frequency = frequency;
+    alert.events.push({
+      barIndex: this.bar_index,
+      time: currentBar?.time ?? this.time.get(0) ?? 0,
+      message,
+      frequency,
+    });
+  }
+
+  /**
+   * Truncate all alert arrays and events to the given length.
+   */
+  truncateAlerts(length: number): void {
+    for (const alert of this.alerts.values()) {
+      alert.values.length = length;
+      alert.events = alert.events.filter((event) => event.barIndex < length);
+    }
+  }
+
+  /**
+   * Get all alerts as array.
+   */
+  getAlerts(): AlertOutput[] {
+    return this.alertOrder.map((id) => this.alerts.get(id)!).filter(Boolean);
+  }
+
+  // =========================================================================
   // Reset
   // =========================================================================
 
@@ -497,6 +612,8 @@ export class ExecutionContext {
     this.bar_index = -1;
     this.plots.clear();
     this.plotOrder.length = 0;
+    this.alerts.clear();
+    this.alertOrder.length = 0;
     // Clear input definitions - they get re-registered on bar_index === 0
     this.inputDefinitions.length = 0;
 

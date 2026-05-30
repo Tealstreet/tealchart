@@ -145,6 +145,7 @@ function handleUpdateBar(bar: Bar): void {
       type: 'result',
       scriptId: state.scriptId,
       plots,
+      alerts: state.engine.getAlerts(),
       inputs: state.lastInputs, // send cached inputs from last full execution
     });
   } else {
@@ -212,6 +213,7 @@ function executeAndSendResults(): void {
       type: 'result',
       scriptId: state.scriptId,
       plots: result.plots,
+      alerts: result.alerts,
       inputs,
     };
     postResult(resultMessage);
