@@ -872,4 +872,30 @@ plot(history, title="History")
     expect(getPlot(result, 'Last Confirmed History').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
     expect(getPlot(result, 'History').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
   });
+
+  it('matches common Pine chart info idioms', () => {
+    const result = runCompatScript(`
+indicator("Chart info docs smoke")
+tickerLen = str.length(syminfo.tickerid)
+rootLen = str.length(syminfo.root)
+periodLen = str.length(timeframe.period)
+intraday = timeframe.isintraday ? 1 : 0
+dwm = timeframe.isdwm ? 1 : 0
+
+plot(tickerLen, title="Ticker ID Length")
+plot(rootLen, title="Root Length")
+plot(periodLen, title="Period Length")
+plot(timeframe.multiplier, title="Multiplier")
+plot(intraday, title="Intraday")
+plot(dwm, title="DWM")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Ticker ID Length').values).toEqual([7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]);
+    expect(getPlot(result, 'Root Length').values).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    expect(getPlot(result, 'Period Length').values).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(getPlot(result, 'Multiplier').values).toEqual([60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60]);
+    expect(getPlot(result, 'Intraday').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'DWM').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  });
 });

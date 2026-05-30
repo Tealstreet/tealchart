@@ -869,6 +869,12 @@ export class TealscriptEngine {
       if (namespace === 'barstate' && prop in this.ctx.barstate) {
         return this.ctx.barstate[prop as keyof typeof this.ctx.barstate];
       }
+      if (namespace === 'syminfo') {
+        return this.evaluateSyminfo(prop);
+      }
+      if (namespace === 'timeframe') {
+        return this.evaluateTimeframe(prop);
+      }
 
       // Check builtins
       const builtin = this.builtins.get(fullName);
@@ -879,6 +885,55 @@ export class TealscriptEngine {
     }
 
     throw new Error('Member access not supported except for namespaced constants');
+  }
+
+  private evaluateSyminfo(prop: string): unknown {
+    switch (prop) {
+      case 'ticker':
+      case 'description':
+      case 'type':
+      case 'currency':
+      case 'basecurrency':
+      case 'mintick':
+      case 'pricescale':
+      case 'timezone':
+        return this.ctx.syminfo[prop];
+      case 'tickerid':
+      case 'main_tickerid':
+        return this.ctx.syminfo.ticker;
+      case 'root':
+        return this.ctx.syminfo.basecurrency;
+      case 'prefix':
+        return '';
+      case 'session':
+        return 'regular';
+      case 'minmove':
+        return this.ctx.syminfo.mintick * this.ctx.syminfo.pricescale;
+      default:
+        throw new Error(`Unknown syminfo property: ${prop}`);
+    }
+  }
+
+  private evaluateTimeframe(prop: string): unknown {
+    switch (prop) {
+      case 'period':
+      case 'multiplier':
+      case 'isminutes':
+      case 'isdaily':
+      case 'isweekly':
+      case 'ismonthly':
+      case 'isintraday':
+        return this.ctx.timeframe[prop];
+      case 'main_period':
+        return this.ctx.timeframe.period;
+      case 'isdwm':
+        return this.ctx.timeframe.isdaily || this.ctx.timeframe.isweekly || this.ctx.timeframe.ismonthly;
+      case 'isseconds':
+      case 'isticks':
+        return false;
+      default:
+        throw new Error(`Unknown timeframe property: ${prop}`);
+    }
   }
 
   private evaluateIndex(expr: IndexExpression): unknown {
