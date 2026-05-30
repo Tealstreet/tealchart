@@ -98,7 +98,7 @@ derived regular-series history, and unavailable or future offsets returning
 
 | Namespace | Status | Notes |
 | --- | --- | --- |
-| `math.*` | Partial | Common numeric functions, constants, `math.avg`, precision rounding, truncation, and angle conversion helpers exist. Pine-specific helpers are still incomplete. |
+| `math.*` | Partial | Common numeric functions, constants, `math.avg`, precision and mintick rounding, truncation, and angle conversion helpers exist. Pine-specific helpers are still incomplete. |
 | `ta.*` | Partial | Includes SMA, EMA, RSI, MACD, ATR, BB, VWAP, Supertrend, DMI, SAR, pivots, `barssince`, `valuewhen`, `vwma`, `highestbars`, `lowestbars`, `cross`, `range`, and more. |
 | `input.*` | Partial | Generic `input()`, int, float, bool, string, color, source, time, symbol, timeframe, session, and text area exist. Advanced UI/display behavior is incomplete. |
 | Time functions | Partial | Calendar functions, `timestamp()`, `time()`, and `time_close()` cover common numeric, UTC/GMT-offset, and same-timeframe session-filter forms. Higher-timeframe aggregation and named timezone databases are still planned. |
@@ -193,7 +193,8 @@ variant color from RGB channels and plotting an RSI gradient.
 ## Common `math.*` Coverage
 
 The common math helper pass covers constants (`math.pi`, `math.e`, `math.phi`),
-variadic `math.avg`, precision-aware `math.round`, `math.trunc`, and
+variadic `math.avg`, precision-aware `math.round`, `math.round_to_mintick`,
+`math.trunc`, and
 degree/radian conversion helpers. The checkpoint fixture follows common Pine
 math idioms by averaging OHLC values, rounding to fixed precision, and
 converting a right angle between radians and degrees.
