@@ -765,6 +765,64 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(stroke.mock.invocationCallOrder.some((order) => order > fillOrder)).toBe(true);
     });
 
+    it('renders box drawings in the main pane', () => {
+      const fillRect = vi.fn();
+      const strokeRect = vi.fn();
+      const fillText = vi.fn();
+      const setLineDash = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillRect,
+        strokeRect,
+        fillText,
+        setLineDash,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+
+      const bars = makeBars(20);
+      const viewport = TealchartRenderer.calculateViewport(bars);
+      const layout: UnifiedPaneLayout = {
+        panes: [
+          {
+            id: 'main',
+            type: 'main',
+            heightRatio: 1,
+            yMin: 0,
+            yMax: 0,
+            fixedRange: false,
+          },
+        ],
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+      };
+      const drawings: DrawingOutput[] = [
+        {
+          id: 'box-1',
+          type: 'box',
+          barIndex: 12,
+          left: 8,
+          top: bars[12]!.high,
+          right: 12,
+          bottom: bars[8]!.low,
+          xloc: 'bar_index',
+          extend: 'none',
+          borderColor: '#00FF00',
+          borderWidth: 2,
+          borderStyle: 'dotted',
+          bgcolor: 'rgba(0, 255, 0, 0.2)',
+          text: 'Zone',
+          textColor: '#FFFFFF',
+          textSize: 'small',
+        },
+      ];
+
+      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+
+      expect(fillRect).toHaveBeenCalled();
+      expect(strokeRect).toHaveBeenCalled();
+      expect(setLineDash).toHaveBeenCalledWith([2, 4]);
+      expect(fillText).toHaveBeenCalledWith('Zone', expect.any(Number), expect.any(Number));
+    });
+
     it('renders countdown text for simple price lines with countdownToTime', () => {
       vi.useFakeTimers();
       vi.setSystemTime(new Date('2026-03-29T06:17:00.000Z'));
