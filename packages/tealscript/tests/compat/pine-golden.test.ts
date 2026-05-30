@@ -198,6 +198,7 @@ plot(previous, title="Previous")
 plot(fractional, title="Fractional")
 plot(future, title="Future")
 plot(tooFar, title="Too Far")
+plot(na(future) ? 1 : 0, title="Future Is NA")
 `);
 
     expect(result.errors).toEqual([]);
@@ -205,6 +206,7 @@ plot(tooFar, title="Too Far")
     expect(roundSeries(getPlot(result, 'Fractional').values)).toEqual([null, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110]);
     expect(getPlot(result, 'Future').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, null]);
     expect(getPlot(result, 'Too Far').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, null]);
+    expect(getPlot(result, 'Future Is NA').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
   });
 
   it('persists root var values across bars', () => {
