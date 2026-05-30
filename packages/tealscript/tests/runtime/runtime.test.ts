@@ -449,6 +449,65 @@ plot(close, "Close Price", color=color.blue, linewidth=2)
       expect(result.plots[0].linewidth).toBe(2);
     });
 
+    it('creates colors from RGB channels and transparency', () => {
+      const code = `//@version=6
+indicator("Test")
+base = color.rgb(10, 20, 30)
+transparent = color.rgb(255, 128, 0, 50)
+updated = color.new(color.blue, 25)
+plot(close, "Base", color=base)
+plot(open, "Transparent", color=transparent)
+plot(high, "Updated", color=updated)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].color).toEqual(Array(bars.length).fill('#0A141EFF'));
+      expect(result.plots[1].color).toEqual(Array(bars.length).fill('#FF800080'));
+      expect(result.plots[2].color).toEqual(Array(bars.length).fill('#2196F3BF'));
+    });
+
+    it('extracts color channels and transparency', () => {
+      const code = `//@version=6
+indicator("Test")
+sample = color.rgb(10, 20, 30, 40)
+plot(color.r(sample), "Red")
+plot(color.g(sample), "Green")
+plot(color.b(sample), "Blue")
+plot(color.t(sample), "Transparency")
+plot(color.r(color.blue), "Named Red")
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values).toEqual(Array(bars.length).fill(10));
+      expect(result.plots[1].values).toEqual(Array(bars.length).fill(20));
+      expect(result.plots[2].values).toEqual(Array(bars.length).fill(30));
+      expect(result.plots[3].values).toEqual(Array(bars.length).fill(40));
+      expect(result.plots[4].values).toEqual(Array(bars.length).fill(33));
+    });
+
+    it('creates colors from gradients', () => {
+      const code = `//@version=6
+indicator("Test")
+lowColor = color.from_gradient(-10, 0, 100, color.red, color.green)
+midColor = color.from_gradient(50, 0, 100, color.rgb(255, 0, 0), color.rgb(0, 255, 0, 50))
+highColor = color.from_gradient(120, 0, 100, color.red, color.green)
+plot(close, "Low", color=lowColor)
+plot(open, "Mid", color=midColor)
+plot(high, "High", color=highColor)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].color).toEqual(Array(bars.length).fill('#F44336FF'));
+      expect(result.plots[1].color).toEqual(Array(bars.length).fill('#808000BF'));
+      expect(result.plots[2].color).toEqual(Array(bars.length).fill('#4CAF50FF'));
+    });
+
     it('creates hline', () => {
       const code = `//@version=6
 indicator("Test")

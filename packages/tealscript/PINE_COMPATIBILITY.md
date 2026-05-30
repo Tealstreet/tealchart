@@ -87,7 +87,7 @@ Remaining gaps:
 | `math.*` | Partial | Common numeric functions exist. Constants and Pine-specific helpers are incomplete. |
 | `ta.*` | Partial | Includes SMA, EMA, RSI, MACD, ATR, BB, VWAP, Supertrend, DMI, SAR, pivots, `barssince`, `valuewhen`, `vwma`, `highestbars`, `lowestbars`, `cross`, `range`, and more. |
 | `input.*` | Partial | Generic `input()`, int, float, bool, string, color, source, time, symbol, timeframe, session, and text area exist. Advanced UI/display behavior is incomplete. |
-| `color.*` | Partial | Core named colors and `color.new()` exist. RGB/from-gradient helpers are missing. |
+| `color.*` | Partial | Core named colors, `color.new()`, `color.rgb()`, channel extraction, and `color.from_gradient()` exist. Named color constants still need exact Pine v6 parity. |
 | `str.*` | Partial | Common conversion, format, search, substring, case, trim, and replace helpers exist. |
 | `array.*` | Planned | High priority for common Pine idioms. |
 | `map.*` / `matrix.*` | Planned | Lower priority than arrays. |
@@ -145,3 +145,10 @@ helpers (`input.time`, `input.timeframe`, `input.symbol`, `input.session`,
 `input.text_area`), and common metadata (`options`, `tooltip`, `group`,
 `inline`, `confirm`, `display`) so generated scripts retain Pine-like control
 definitions.
+
+## Common `color.*` Coverage
+
+The common color helper pass covers `color.rgb`, `color.new`, `color.r`,
+`color.g`, `color.b`, `color.t`, and `color.from_gradient`. The checkpoint
+fixture follows TradingView's documented calculated-color idioms by deriving a
+variant color from RGB channels and plotting an RSI gradient.
