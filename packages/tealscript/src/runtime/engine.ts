@@ -25,6 +25,19 @@ import type {
   IndexExpression,
 } from '../parser/ast';
 
+import {
+  clearArray,
+  createPineArray,
+  getArraySize,
+  getArrayValue,
+  isPineArray,
+  popArrayValue,
+  pushArrayValue,
+  setArrayValue,
+  shiftArrayValue,
+  unshiftArrayValue,
+  type PineArray,
+} from './arrays';
 import { ExecutionContext, type Bar, type PlotOutput } from './context';
 import { Scope, createRootScope } from './scope';
 
@@ -724,6 +737,9 @@ export class TealscriptEngine {
     // Math functions
     this.registerMathBuiltins();
 
+    // Array functions
+    this.registerArrayBuiltins();
+
     // Color constants
     this.registerColorBuiltins();
 
@@ -1081,6 +1097,36 @@ export class TealscriptEngine {
       if (args.length === 0) return NaN;
       const value = args[0];
       return typeof value === 'number' && isNaN(value);
+    });
+  }
+
+  private registerArrayBuiltins(): void {
+    const createArray = (args: unknown[]) => createPineArray(args[0] as number | undefined, args[1]);
+    const readArray = (value: unknown): PineArray => {
+      if (!isPineArray(value)) {
+        throw new Error('Expected array');
+      }
+      return value;
+    };
+
+    this.builtins.set('array.new_float', createArray);
+    this.builtins.set('array.new_int', createArray);
+    this.builtins.set('array.new_bool', createArray);
+    this.builtins.set('array.new_string', createArray);
+
+    this.builtins.set('array.size', (args) => getArraySize(readArray(args[0])));
+    this.builtins.set('array.get', (args) => getArrayValue(readArray(args[0]), args[1] as number));
+    this.builtins.set('array.set', (args) => {
+      setArrayValue(readArray(args[0]), args[1] as number, args[2]);
+      return null;
+    });
+    this.builtins.set('array.push', (args) => pushArrayValue(readArray(args[0]), args[1]));
+    this.builtins.set('array.pop', (args) => popArrayValue(readArray(args[0])));
+    this.builtins.set('array.shift', (args) => shiftArrayValue(readArray(args[0])));
+    this.builtins.set('array.unshift', (args) => unshiftArrayValue(readArray(args[0]), args[1]));
+    this.builtins.set('array.clear', (args) => {
+      clearArray(readArray(args[0]));
+      return null;
     });
   }
 

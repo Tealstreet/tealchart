@@ -176,4 +176,23 @@ plot(countCalls(), title="Function Counter")
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Function Counter').values)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
   });
+
+  it('runs core array mutation helpers', () => {
+    const result = runCompatScript(`
+indicator("Array helpers")
+var array<float> values = array.new_float()
+array.push(values, close)
+lastIndex = array.size(values) - 1
+lastValue = array.get(values, lastIndex)
+array.set(values, 0, 42)
+plot(lastValue, title="Last Value")
+plot(array.get(values, 0), title="First Value")
+plot(array.size(values), title="Size")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Last Value').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+    expect(roundSeries(getPlot(result, 'First Value').values)).toEqual([42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42]);
+    expect(roundSeries(getPlot(result, 'Size').values)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
 });
