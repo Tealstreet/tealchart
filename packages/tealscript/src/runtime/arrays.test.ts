@@ -1,15 +1,27 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  avgArrayValue,
   clearArray,
+  copyArray,
   createPineArray,
+  firstArrayValue,
   getArraySize,
   getArrayValue,
+  includesArrayValue,
+  indexOfArrayValue,
+  insertArrayValue,
   isPineArray,
+  lastArrayValue,
+  lastIndexOfArrayValue,
+  maxArrayValue,
+  minArrayValue,
   popArrayValue,
   pushArrayValue,
+  removeArrayValue,
   setArrayValue,
   shiftArrayValue,
+  sumArrayValue,
   unshiftArrayValue,
 } from './arrays';
 
@@ -67,5 +79,49 @@ describe('PineArray', () => {
 
     expect(getArraySize(array)).toBe(0);
     expect(array.values).toEqual([]);
+  });
+
+  it('copies arrays by value', () => {
+    const array = createPineArray<number>();
+    pushArrayValue(array, 1);
+    pushArrayValue(array, 2);
+
+    const copy = copyArray(array);
+    setArrayValue(copy, 0, 99);
+
+    expect(array.values).toEqual([1, 2]);
+    expect(copy.values).toEqual([99, 2]);
+  });
+
+  it('supports search and edge reads', () => {
+    const array = createPineArray<number>();
+    [3, 5, 3].forEach((value) => pushArrayValue(array, value));
+
+    expect(firstArrayValue(array)).toBe(3);
+    expect(lastArrayValue(array)).toBe(3);
+    expect(includesArrayValue(array, 5)).toBe(true);
+    expect(indexOfArrayValue(array, 3)).toBe(0);
+    expect(lastIndexOfArrayValue(array, 3)).toBe(2);
+  });
+
+  it('supports insert and remove operations', () => {
+    const array = createPineArray<number>();
+    pushArrayValue(array, 1);
+    pushArrayValue(array, 3);
+
+    expect(insertArrayValue(array, 1, 2)).toBe(3);
+    expect(array.values).toEqual([1, 2, 3]);
+    expect(removeArrayValue(array, 1)).toBe(2);
+    expect(array.values).toEqual([1, 3]);
+  });
+
+  it('summarizes numeric arrays', () => {
+    const array = createPineArray<number>();
+    [2, 4, 6].forEach((value) => pushArrayValue(array, value));
+
+    expect(minArrayValue(array)).toBe(2);
+    expect(maxArrayValue(array)).toBe(6);
+    expect(sumArrayValue(array)).toBe(12);
+    expect(avgArrayValue(array)).toBe(4);
   });
 });

@@ -27,15 +27,27 @@ import type {
 } from '../parser/ast';
 
 import {
+  avgArrayValue,
   clearArray,
+  copyArray,
   createPineArray,
+  firstArrayValue,
   getArraySize,
   getArrayValue,
+  includesArrayValue,
+  indexOfArrayValue,
+  insertArrayValue,
   isPineArray,
+  lastArrayValue,
+  lastIndexOfArrayValue,
+  maxArrayValue,
+  minArrayValue,
   popArrayValue,
   pushArrayValue,
+  removeArrayValue,
   setArrayValue,
   shiftArrayValue,
+  sumArrayValue,
   unshiftArrayValue,
   type PineArray,
 } from './arrays';
@@ -672,6 +684,18 @@ export class TealscriptEngine {
       case 'pop':
       case 'shift':
       case 'unshift':
+      case 'copy':
+      case 'first':
+      case 'last':
+      case 'includes':
+      case 'indexof':
+      case 'lastindexof':
+      case 'insert':
+      case 'remove':
+      case 'min':
+      case 'max':
+      case 'sum':
+      case 'avg':
       case 'clear':
         return `array.${methodName}`;
       default:
@@ -1547,11 +1571,27 @@ export class TealscriptEngine {
       }
       return value;
     };
+    const copyReadonlyArray = (value: PineArray | unknown[]): PineArray => {
+      if (Array.isArray(value)) {
+        const array = createPineArray(value.length);
+        value.forEach((item, index) => {
+          array.values[index] = item;
+        });
+        return array;
+      }
+      return value;
+    };
 
     this.builtins.set('array.new_float', createArray);
     this.builtins.set('array.new_int', createArray);
     this.builtins.set('array.new_bool', createArray);
     this.builtins.set('array.new_string', createArray);
+    this.builtins.set('array.from', (args) => {
+      const array = createPineArray();
+      array.values.push(...args);
+      return array;
+    });
+    this.builtins.set('array.copy', (args) => copyArray(copyReadonlyArray(readArray(args[0]))));
 
     this.builtins.set('array.size', (args) => {
       const array = readArray(args[0]);
@@ -1561,6 +1601,15 @@ export class TealscriptEngine {
       const array = readArray(args[0]);
       return Array.isArray(array) ? array[Math.trunc(args[1] as number)] : getArrayValue(array, args[1] as number);
     });
+    this.builtins.set('array.first', (args) => firstArrayValue(copyReadonlyArray(readArray(args[0]))));
+    this.builtins.set('array.last', (args) => lastArrayValue(copyReadonlyArray(readArray(args[0]))));
+    this.builtins.set('array.includes', (args) => includesArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
+    this.builtins.set('array.indexof', (args) => indexOfArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
+    this.builtins.set('array.lastindexof', (args) => lastIndexOfArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
+    this.builtins.set('array.min', (args) => minArrayValue(copyReadonlyArray(readArray(args[0]))));
+    this.builtins.set('array.max', (args) => maxArrayValue(copyReadonlyArray(readArray(args[0]))));
+    this.builtins.set('array.sum', (args) => sumArrayValue(copyReadonlyArray(readArray(args[0]))));
+    this.builtins.set('array.avg', (args) => avgArrayValue(copyReadonlyArray(readArray(args[0]))));
     this.builtins.set('array.set', (args) => {
       setArrayValue(readMutableArray(args[0]), args[1] as number, args[2]);
       return null;
@@ -1569,6 +1618,8 @@ export class TealscriptEngine {
     this.builtins.set('array.pop', (args) => popArrayValue(readMutableArray(args[0])));
     this.builtins.set('array.shift', (args) => shiftArrayValue(readMutableArray(args[0])));
     this.builtins.set('array.unshift', (args) => unshiftArrayValue(readMutableArray(args[0]), args[1]));
+    this.builtins.set('array.insert', (args) => insertArrayValue(readMutableArray(args[0]), args[1] as number, args[2]));
+    this.builtins.set('array.remove', (args) => removeArrayValue(readMutableArray(args[0]), args[1] as number));
     this.builtins.set('array.clear', (args) => {
       clearArray(readMutableArray(args[0]));
       return null;
