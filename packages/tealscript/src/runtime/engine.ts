@@ -1335,7 +1335,7 @@ export class TealscriptEngine {
       const topColor = this.parseColor(args[4]);
 
       if (!this.isFiniteNumber(value) || !this.isFiniteNumber(bottomValue) || !this.isFiniteNumber(topValue) || !bottomColor || !topColor) {
-        return Number.NaN;
+        return null;
       }
 
       const range = topValue - bottomValue;

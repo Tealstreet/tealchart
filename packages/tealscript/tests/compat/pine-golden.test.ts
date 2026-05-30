@@ -463,4 +463,47 @@ plot(showSignalsInput, title="Show Signals")
     expect(getPlot(result, 'MA Length').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Show Signals').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
+
+  it('matches documented Pine calculated color idioms', () => {
+    const result = runCompatScript(`
+indicator("Color docs smoke", overlay=true)
+baseColor = color.rgb(255, 0, 0)
+derivedColor = color.rgb(color.r(baseColor), 128, color.b(baseColor), 50)
+signal = ta.rsi(close, 7)
+signalColor = color.from_gradient(signal, 0, 100, color.rgb(255, 0, 0), color.rgb(0, 255, 0, 50))
+plot(close, title="Close", color=derivedColor)
+plot(signal, title="Signal", color=signalColor)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Close').color).toEqual(Array(compatibilityBars.length).fill('#FF800080'));
+    expect(roundSeries(getPlot(result, 'Signal').values)).toEqual([
+      null,
+      100,
+      100,
+      55.555556,
+      38.461538,
+      42.857143,
+      55.555556,
+      65.217391,
+      57.142857,
+      59.090909,
+      68.421053,
+      88.235294,
+    ]);
+    expect(getPlot(result, 'Signal').color).toEqual([
+      '#2196F3',
+      '#00FF0080',
+      '#00FF0080',
+      '#718E00B8',
+      '#9D6200CF',
+      '#926D00C9',
+      '#718E00B8',
+      '#59A600AD',
+      '#6D9200B8',
+      '#689700B5',
+      '#51AE00A8',
+      '#1EE1008F',
+    ]);
+  });
 });
