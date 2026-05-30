@@ -787,6 +787,12 @@ export class TealscriptEngine {
     return typeof value === 'number' && Number.isFinite(value);
   }
 
+  private toNumber(value: unknown): number {
+    if (typeof value === 'number') return value;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : Number.NaN;
+  }
+
   private setBuiltinState(scope: Scope, key: string, value: unknown): void {
     if (scope.has(key)) {
       scope.set(key, value);
@@ -1172,15 +1178,31 @@ export class TealscriptEngine {
   }
 
   private registerMathBuiltins(): void {
+    this.builtins.set('math.pi', () => Math.PI);
+    this.builtins.set('math.e', () => Math.E);
+    this.builtins.set('math.phi', () => (1 + Math.sqrt(5)) / 2);
+
     this.builtins.set('math.abs', (args) => Math.abs(args[0] as number));
     this.builtins.set('math.max', (args) => Math.max(...(args as number[])));
     this.builtins.set('math.min', (args) => Math.min(...(args as number[])));
+    this.builtins.set('math.avg', (args) => {
+      if (args.length === 0) return Number.NaN;
+      const values = args.map((arg) => this.toNumber(arg));
+      if (values.some((value) => Number.isNaN(value))) return Number.NaN;
+      return values.reduce((sum, value) => sum + value, 0) / values.length;
+    });
     this.builtins.set('math.sqrt', (args) => Math.sqrt(args[0] as number));
     this.builtins.set('math.pow', (args) => Math.pow(args[0] as number, args[1] as number));
     this.builtins.set('math.log', (args) => Math.log(args[0] as number));
     this.builtins.set('math.log10', (args) => Math.log10(args[0] as number));
     this.builtins.set('math.exp', (args) => Math.exp(args[0] as number));
-    this.builtins.set('math.round', (args) => Math.round(args[0] as number));
+    this.builtins.set('math.round', (args) => {
+      const value = this.toNumber(args[0]);
+      const precision = args[1] === undefined ? 0 : Math.trunc(this.toNumber(args[1]));
+      const factor = 10 ** precision;
+      return Math.round(value * factor) / factor;
+    });
+    this.builtins.set('math.trunc', (args) => Math.trunc(this.toNumber(args[0])));
     this.builtins.set('math.floor', (args) => Math.floor(args[0] as number));
     this.builtins.set('math.ceil', (args) => Math.ceil(args[0] as number));
     this.builtins.set('math.sign', (args) => Math.sign(args[0] as number));
@@ -1190,6 +1212,8 @@ export class TealscriptEngine {
     this.builtins.set('math.asin', (args) => Math.asin(args[0] as number));
     this.builtins.set('math.acos', (args) => Math.acos(args[0] as number));
     this.builtins.set('math.atan', (args) => Math.atan(args[0] as number));
+    this.builtins.set('math.toradians', (args) => this.toNumber(args[0]) * (Math.PI / 180));
+    this.builtins.set('math.todegrees', (args) => this.toNumber(args[0]) * (180 / Math.PI));
 
     // nz - replace na with value
     this.builtins.set('nz', (args) => {
