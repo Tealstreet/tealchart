@@ -270,4 +270,16 @@ plot(ta.lowestbars(low, 4), title="Lowest Offset")
     expect(roundSeries(getPlot(result, 'Highest Offset').values)).toEqual([0, 0, 0, 0, 1, 2, 3, 0, 0, 0, 0, 1]);
     expect(roundSeries(getPlot(result, 'Lowest Offset').values)).toEqual([0, 1, 2, 3, 0, 0, 1, 2, 3, 3, 3, 3]);
   });
+
+  it('runs ta.cross and ta.range compatibility helpers', () => {
+    const result = runCompatScript(`
+indicator("TA cross range")
+plot(ta.cross(close, 104), title="Cross Threshold")
+plot(ta.range(close, 4), title="Close Range")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Cross Threshold').values).toEqual([false, true, false, true, false, false, false, true, false, false, false, false]);
+    expect(roundSeries(getPlot(result, 'Close Range').values)).toEqual([0, 3, 5, 5, 8, 8, 5, 10, 9, 7, 3, 4]);
+  });
 });
