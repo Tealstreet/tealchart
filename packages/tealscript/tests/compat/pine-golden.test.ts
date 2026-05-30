@@ -492,7 +492,7 @@ plot(signal, title="Signal", color=signalColor)
       88.235294,
     ]);
     expect(getPlot(result, 'Signal').color).toEqual([
-      '#2196F3',
+      null,
       '#00FF0080',
       '#00FF0080',
       '#718E00B8',

@@ -717,6 +717,13 @@ export class TealscriptEngine {
     return value as number;
   }
 
+  private toPlotColor(value: unknown): string | null {
+    if (value === null || value === undefined || this.isNa(value)) {
+      return null;
+    }
+    return String(value);
+  }
+
   private toStringValue(value: unknown, format?: string): string {
     if (value === null || value === undefined || this.isNa(value)) {
       return 'NaN';
@@ -847,7 +854,8 @@ export class TealscriptEngine {
       const callIndex = this.plotCallIndex++;
       const hasExplicitTitle = namedArgs.has('title') || args[1] !== undefined;
       const title = (namedArgs.get('title') ?? args[1] ?? `Plot ${callIndex + 1}`) as string;
-      const color = (namedArgs.get('color') ?? args[2] ?? '#2196F3') as string;
+      const colorArg = namedArgs.has('color') ? namedArgs.get('color') : args[2] !== undefined ? args[2] : '#2196F3';
+      const color = this.toPlotColor(colorArg);
       const linewidth = (namedArgs.get('linewidth') ?? 1) as number;
       const style = (namedArgs.get('style') ?? 'line') as string;
 
@@ -939,7 +947,7 @@ export class TealscriptEngine {
       const title = (namedArgs.get('title') ?? args[1] ?? 'Shape') as string;
       const style = (namedArgs.get('style') ?? 'circle') as string;
       const location = (namedArgs.get('location') ?? 'abovebar') as string;
-      const color = (namedArgs.get('color') ?? '#2196F3') as string;
+      const color = this.toPlotColor(namedArgs.has('color') ? namedArgs.get('color') : '#2196F3');
       const size = (namedArgs.get('size') ?? 'normal') as string;
       const text = (namedArgs.get('text') ?? '') as string;
 
@@ -984,7 +992,7 @@ export class TealscriptEngine {
       const title = (namedArgs.get('title') ?? args[1] ?? 'Char') as string;
       const char = (namedArgs.get('char') ?? '●') as string;
       const location = (namedArgs.get('location') ?? 'abovebar') as string;
-      const color = (namedArgs.get('color') ?? '#2196F3') as string;
+      const color = this.toPlotColor(namedArgs.has('color') ? namedArgs.get('color') : '#2196F3');
       const size = (namedArgs.get('size') ?? 'normal') as string;
       const text = (namedArgs.get('text') ?? '') as string;
 
@@ -1335,7 +1343,7 @@ export class TealscriptEngine {
       const topColor = this.parseColor(args[4]);
 
       if (!this.isFiniteNumber(value) || !this.isFiniteNumber(bottomValue) || !this.isFiniteNumber(topValue) || !bottomColor || !topColor) {
-        return null;
+        return Number.NaN;
       }
 
       const range = topValue - bottomValue;
