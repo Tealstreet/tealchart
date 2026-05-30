@@ -874,7 +874,10 @@ export class TealscriptEngine {
   }
 
   private evaluateIndex(expr: IndexExpression): unknown {
-    const offset = this.evaluateExpression(expr.index) as number;
+    const offset = this.normalizeIndexOffset(this.evaluateExpression(expr.index));
+    if (offset === null) {
+      return Number.NaN;
+    }
 
     // If object is an identifier, use history access
     if (expr.object.type === 'Identifier') {
@@ -883,27 +886,31 @@ export class TealscriptEngine {
       // Check built-in series first
       switch (name) {
         case 'open':
-          return this.ctx.open.get(offset);
+          return this.naIfMissing(this.ctx.open.get(offset));
         case 'high':
-          return this.ctx.high.get(offset);
+          return this.naIfMissing(this.ctx.high.get(offset));
         case 'low':
-          return this.ctx.low.get(offset);
+          return this.naIfMissing(this.ctx.low.get(offset));
         case 'close':
-          return this.ctx.close.get(offset);
+          return this.naIfMissing(this.ctx.close.get(offset));
         case 'volume':
-          return this.ctx.volume.get(offset);
+          return this.naIfMissing(this.ctx.volume.get(offset));
         case 'time':
-          return this.ctx.time.get(offset);
+          return this.naIfMissing(this.ctx.time.get(offset));
       }
 
       // Check scope for series variable
-      return this.scope.getWithOffset(name, offset);
+      if (this.scope.has(name)) {
+        return this.naIfMissing(this.scope.getWithOffset(name, offset));
+      }
+
+      throw new Error(`Unknown identifier: ${name}`);
     }
 
     // Array index access
     const obj = this.evaluateExpression(expr.object);
     if (Array.isArray(obj)) {
-      return obj[offset];
+      return this.naIfMissing(obj[offset]);
     }
 
     throw new Error('Index access on non-array/non-series');
@@ -923,6 +930,19 @@ export class TealscriptEngine {
 
   private isNa(value: unknown): boolean {
     return typeof value === 'number' && isNaN(value);
+  }
+
+  private normalizeIndexOffset(value: unknown): number | null {
+    if (typeof value !== 'number' || !Number.isFinite(value)) {
+      return null;
+    }
+
+    const offset = Math.trunc(value);
+    return offset < 0 ? null : offset;
+  }
+
+  private naIfMissing(value: unknown): unknown {
+    return value === undefined ? Number.NaN : value;
   }
 
   private toPlotValue(value: unknown): number | null {

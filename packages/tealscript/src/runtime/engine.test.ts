@@ -864,6 +864,57 @@ plot(x)`;
       const plot = result.plots[0];
       expect(plot.values[1]).toBeCloseTo(bars[0].close, 1);
     });
+
+    it('supports dynamic history offsets', () => {
+      const script = `//@version=6
+indicator("Dynamic History")
+length = input.int(2, title="Length")
+x = close[length]
+plot(x)`;
+
+      const ast = parse(script);
+      const bars = createBars(5, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values).toEqual([null, null, 100.2, 100.7, 101.2]);
+    });
+
+    it('truncates fractional dynamic history offsets', () => {
+      const script = `//@version=6
+indicator("Fractional History")
+offset = bar_index > 1 ? 1.9 : 0
+x = close[offset]
+plot(x)`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values).toEqual([100.2, 100.7, 100.7]);
+    });
+
+    it('returns na for future or unavailable history offsets', () => {
+      const script = `//@version=6
+indicator("Invalid History")
+future = close[-1]
+tooFar = close[100]
+plot(future, title="Future")
+plot(tooFar, title="Too Far")
+plot(future == future ? 0 : 1, title="Future Is NA")
+plot(tooFar == tooFar ? 0 : 1, title="Too Far Is NA")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Future')?.values).toEqual([null, null, null]);
+      expect(result.plots.find((plot) => plot.title === 'Too Far')?.values).toEqual([null, null, null]);
+      expect(result.plots.find((plot) => plot.title === 'Future Is NA')?.values).toEqual([1, 1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Too Far Is NA')?.values).toEqual([1, 1, 1]);
+    });
   });
 
   describe('inputs', () => {

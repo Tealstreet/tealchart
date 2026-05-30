@@ -54,7 +54,7 @@ by real Pine examples from official docs or public indicator idioms.
 | Pine feature | Status | Notes |
 | --- | --- | --- |
 | Bar-by-bar execution | Supported | Scripts execute across loaded bars. |
-| History references `x[n]` | Partial | Series and arrays support indexing; dynamic and invalid index behavior needs more tests. |
+| History references `x[n]` | Partial | Series and arrays support indexing; dynamic series offsets and unavailable/future history returning `na` are covered. Broader type diagnostics are still incomplete. |
 | `na` value | Partial | Represented with `NaN`; propagation and bool behavior need Pine v6 coverage. |
 | Built-in price series | Supported | `open`, `high`, `low`, `close`, `volume`, `time`, `hl2`, `hlc3`, `ohlc4`, `hlcc4`. |
 | `bar_index` / `last_bar_index` | Supported | Available as runtime identifiers. |
@@ -80,6 +80,13 @@ Remaining gaps:
   `else if` / `else` branches.
 - Nested indented blocks inside user-defined functions expose limitations in the
   simplified indentation grammar and need continued hardening.
+
+## Common History Reference Coverage
+
+The history reference pass covers literal offsets such as `close[1]`, dynamic
+offsets such as `close[length]`, fractional offsets truncated toward zero,
+derived regular-series history, and unavailable or future offsets returning
+`na`/`null` plot values instead of throwing.
 
 ## Built-ins
 
