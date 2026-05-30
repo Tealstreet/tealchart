@@ -20,6 +20,7 @@ import type {
   BinaryExpression,
   UnaryExpression,
   ConditionalExpression,
+  SwitchExpression,
   CallExpression,
   MemberExpression,
   IndexExpression,
@@ -426,6 +427,9 @@ export class TealscriptEngine {
       case 'ConditionalExpression':
         return this.evaluateConditional(expr);
 
+      case 'SwitchExpression':
+        return this.evaluateSwitch(expr);
+
       case 'CallExpression':
         return this.evaluateCall(expr);
 
@@ -559,6 +563,35 @@ export class TealscriptEngine {
     } else {
       return this.evaluateExpression(expr.alternate);
     }
+  }
+
+  private evaluateSwitch(expr: SwitchExpression): unknown {
+    if (expr.discriminant) {
+      const discriminant = this.evaluateExpression(expr.discriminant);
+      for (const switchCase of expr.cases) {
+        if (!switchCase.test) {
+          return this.evaluateExpression(switchCase.consequent);
+        }
+        const test = this.evaluateExpression(switchCase.test);
+        if (this.switchValuesEqual(discriminant, test)) {
+          return this.evaluateExpression(switchCase.consequent);
+        }
+      }
+      return NaN;
+    }
+
+    for (const switchCase of expr.cases) {
+      if (!switchCase.test || this.isTruthy(this.evaluateExpression(switchCase.test))) {
+        return this.evaluateExpression(switchCase.consequent);
+      }
+    }
+
+    return NaN;
+  }
+
+  private switchValuesEqual(left: unknown, right: unknown): boolean {
+    if (this.isNa(left) || this.isNa(right)) return false;
+    return left === right;
   }
 
   private evaluateCall(expr: CallExpression): unknown {

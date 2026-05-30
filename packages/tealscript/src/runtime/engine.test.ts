@@ -96,6 +96,41 @@ plot(high, title="0")`;
       ]);
     });
 
+    it('evaluates keyed switch expressions', () => {
+      const script = `//@version=6
+indicator("Switch Test")
+mode = "EMA"
+selected = switch mode
+    "SMA" => open
+    "EMA" => close
+    => high
+plot(selected, title="Selected")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Selected')?.values).toEqual([100.2, 100.7, 101.2]);
+    });
+
+    it('evaluates condition-only switch expressions', () => {
+      const script = `//@version=6
+indicator("Switch Conditions")
+direction = switch
+    close > open => 1
+    close < open => -1
+    => 0
+plot(direction, title="Direction")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Direction')?.values).toEqual([1, 1, 1]);
+    });
+
     it('returns plotcandle OHLC and color outputs with na gaps', () => {
       const script = `//@version=6
 indicator("Synthetic candles", overlay=true)
