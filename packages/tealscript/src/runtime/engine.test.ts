@@ -926,6 +926,23 @@ plot(na(str.tonumber("")) ? 1 : 0, title="Empty Is NA")`;
       expect(result.plots.find((plot) => plot.title === 'Empty Is NA')?.values).toEqual([1, 1]);
     });
 
+    it('rounds values to syminfo.mintick', () => {
+      const script = `//@version=6
+indicator("Round To Min Tick")
+plot(math.round_to_mintick(1.234), title="Down")
+plot(math.round_to_mintick(1.235), title="Up")
+plot(math.round_to_mintick(na), title="Missing")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Down')?.values).toEqual([1.23, 1.23]);
+      expect(result.plots.find((plot) => plot.title === 'Up')?.values).toEqual([1.24, 1.24]);
+      expect(result.plots.find((plot) => plot.title === 'Missing')?.values).toEqual([null, null]);
+    });
+
     it('halts realtime updateBar execution on runtime.error', () => {
       const script = `//@version=6
 indicator("Realtime Runtime Error")

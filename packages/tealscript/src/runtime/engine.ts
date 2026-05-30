@@ -2095,6 +2095,12 @@ export class TealscriptEngine {
       const factor = 10 ** precision;
       return Math.round(value * factor) / factor;
     });
+    this.builtins.set('math.round_to_mintick', (args) => {
+      const value = this.toNumber(args[0]);
+      const tick = this.ctx.syminfo.mintick;
+      if (!Number.isFinite(value) || !Number.isFinite(tick) || tick <= 0) return Number.NaN;
+      return Math.round(value / tick) * tick;
+    });
     this.builtins.set('math.trunc', (args) => Math.trunc(this.toNumber(args[0])));
     this.builtins.set('math.floor', (args) => Math.floor(args[0] as number));
     this.builtins.set('math.ceil', (args) => Math.ceil(args[0] as number));
