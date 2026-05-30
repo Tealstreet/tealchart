@@ -226,6 +226,27 @@ plot(removed, title="Removed")`;
       expect(result.plots.find((plot) => plot.title === 'Removed')?.values).toEqual([5, 5]);
     });
 
+    it('returns expression results from user function if branches', () => {
+      const script = `//@version=6
+indicator("Function If")
+positive(value) =>
+    if value > 0
+        1
+negative(value) =>
+    if value < 0
+        -1
+plot(positive(close - open), title="Positive")
+plot(negative(close - open), title="Negative")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Positive')?.values).toEqual([1, 1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Negative')?.values).toEqual([null, null, null]);
+    });
+
     it('evaluates keyed switch expressions', () => {
       const script = `//@version=6
 indicator("Switch Test")
