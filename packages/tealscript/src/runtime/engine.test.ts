@@ -164,6 +164,33 @@ if close > open
       ]);
     });
 
+    it('dispatches array method calls to array builtins', () => {
+      const script = `//@version=6
+indicator("Array Methods")
+var array<float> values = array.new_float()
+values.push(close)
+values.unshift(open)
+first = values.shift()
+lastIndex = values.size() - 1
+last = values.get(lastIndex)
+values.set(0, 42)
+plot(first, title="First")
+plot(last, title="Last")
+plot(values.get(0), title="Head")
+plot(values.size(), title="Size")
+values.clear()`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'First')?.values).toEqual([100, 100.5, 101]);
+      expect(result.plots.find((plot) => plot.title === 'Last')?.values).toEqual([100.2, 100.7, 101.2]);
+      expect(result.plots.find((plot) => plot.title === 'Head')?.values).toEqual([42, 42, 42]);
+      expect(result.plots.find((plot) => plot.title === 'Size')?.values).toEqual([1, 1, 1]);
+    });
+
     it('evaluates keyed switch expressions', () => {
       const script = `//@version=6
 indicator("Switch Test")

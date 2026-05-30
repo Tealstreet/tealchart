@@ -644,6 +644,15 @@ export class TealscriptEngine {
       return builtin(args, namedArgs, this.ctx, this.scope, this.nextBuiltinCallId(fullName));
     }
 
+    const methodBuiltinName = namespace ? this.getMethodBuiltinName(funcName) : undefined;
+    if (methodBuiltinName && expr.callee.type === 'MemberExpression') {
+      const methodBuiltin = this.builtins.get(methodBuiltinName);
+      if (methodBuiltin) {
+        const receiver = this.evaluateExpression(expr.callee.object);
+        return methodBuiltin([receiver, ...args], namedArgs, this.ctx, this.scope, this.nextBuiltinCallId(methodBuiltinName));
+      }
+    }
+
     if (!namespace) {
       const userFunction = this.userFunctions.get(funcName);
       if (userFunction) {
@@ -652,6 +661,22 @@ export class TealscriptEngine {
     }
 
     throw new Error(`Unknown function: ${fullName}`);
+  }
+
+  private getMethodBuiltinName(methodName: string): string | undefined {
+    switch (methodName) {
+      case 'size':
+      case 'get':
+      case 'set':
+      case 'push':
+      case 'pop':
+      case 'shift':
+      case 'unshift':
+      case 'clear':
+        return `array.${methodName}`;
+      default:
+        return undefined;
+    }
   }
 
   private evaluateUserFunction(fn: FunctionDeclaration, args: unknown[], namedArgs: Map<string, unknown>): unknown {
