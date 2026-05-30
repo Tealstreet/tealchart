@@ -216,6 +216,26 @@ array.clear(values)
     expect(roundSeries(getPlot(result, 'Remaining').values)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   });
 
+  it('runs array method helper idioms', () => {
+    const result = runCompatScript(`
+indicator("Array method helpers")
+var array<float> window = array.new_float()
+window.push(close)
+if window.size() > 3
+    window.shift()
+head = window.get(0)
+tail = window.get(window.size() - 1)
+plot(head, title="Window Head")
+plot(tail, title="Window Tail")
+plot(window.size(), title="Window Size")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Window Head').values)).toEqual([102, 102, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111]);
+    expect(roundSeries(getPlot(result, 'Window Tail').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+    expect(roundSeries(getPlot(result, 'Window Size').values)).toEqual([1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+  });
+
   it('reads array literal values with array helpers', () => {
     const result = runCompatScript(`
 indicator("Array literal")
