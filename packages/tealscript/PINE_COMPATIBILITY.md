@@ -46,7 +46,7 @@ by real Pine examples from official docs or public indicator idioms.
 | `while`, `break`, `continue` | Supported | Loop safety limit exists. |
 | User-defined functions | Planned | Required for common Pine snippets. |
 | Methods, e.g. `arr.push(x)` | Planned | Should lower to namespaced built-ins where possible. |
-| `switch` | Planned | Common enough to parse after user functions. |
+| `switch` | Partial | Expression-form keyed and condition-only switches work. Statement-block arms are not implemented yet. |
 | User-defined types | Unsupported | Lower priority than indicators and arrays. |
 
 ## Runtime Semantics
@@ -176,3 +176,12 @@ arrays with `na` gaps preserved as nulls; the Tealchart renderer draws those
 custom bars/candles in overlay and indicator panes. The checkpoint fixture is
 modeled on TradingView's documented custom bar plotting idiom using directional
 body colors, transparent wick colors, and skipped bars.
+
+## Common `switch` Coverage
+
+The switch pass covers expression-form `switch` structures used for mode
+selection and conditional selection. Keyed switches compare a discriminant
+against case values and condition-only switches return the first truthy branch,
+with optional default branches. The checkpoint fixture follows TradingView's
+documented conditional-structure idioms by selecting a moving average from an
+`input.string(... options=...)` mode and deriving a directional signal.
