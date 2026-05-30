@@ -1163,7 +1163,10 @@ export class TealscriptEngine {
     this.builtins.set('str.contains', (args) => this.toStringValue(args[0]).includes(this.toStringValue(args[1])));
     this.builtins.set('str.startswith', (args) => this.toStringValue(args[0]).startsWith(this.toStringValue(args[1])));
     this.builtins.set('str.endswith', (args) => this.toStringValue(args[0]).endsWith(this.toStringValue(args[1])));
-    this.builtins.set('str.pos', (args) => this.toStringValue(args[0]).indexOf(this.toStringValue(args[1])));
+    this.builtins.set('str.pos', (args) => {
+      const index = this.toStringValue(args[0]).indexOf(this.toStringValue(args[1]));
+      return index === -1 ? NaN : index;
+    });
     this.builtins.set('str.substring', (args) => {
       const source = this.toStringValue(args[0]);
       const begin = Math.trunc((args[1] as number | undefined) ?? 0);
