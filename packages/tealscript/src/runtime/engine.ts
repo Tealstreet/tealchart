@@ -3061,6 +3061,42 @@ export class TealscriptEngine {
       return values.reduce((sum, value) => sum + Math.abs(value - mean), 0) / values.length;
     });
 
+    this.builtins.set('ta.covariance', (args, _namedArgs, _ctx, scope, callId) => {
+      const source1 = args[0] as number;
+      const source2 = args[1] as number;
+      const length = this.normalizeLookbackLength(args[2]);
+
+      const values1 = this.getCompleteSourceWindow(scope, `_ta_covariance_source1_${callId}`, source1, length);
+      const values2 = this.getCompleteSourceWindow(scope, `_ta_covariance_source2_${callId}`, source2, length);
+
+      if (!values1 || !values2) return NaN;
+
+      const mean1 = values1.reduce((sum, value) => sum + value, 0) / length;
+      const mean2 = values2.reduce((sum, value) => sum + value, 0) / length;
+
+      return values1.reduce((sum, value, index) => sum + (value - mean1) * (values2[index] - mean2), 0) / length;
+    });
+
+    this.builtins.set('ta.correlation', (args, _namedArgs, _ctx, scope, callId) => {
+      const source1 = args[0] as number;
+      const source2 = args[1] as number;
+      const length = this.normalizeLookbackLength(args[2]);
+
+      const values1 = this.getCompleteSourceWindow(scope, `_ta_correlation_source1_${callId}`, source1, length);
+      const values2 = this.getCompleteSourceWindow(scope, `_ta_correlation_source2_${callId}`, source2, length);
+
+      if (!values1 || !values2) return NaN;
+
+      const mean1 = values1.reduce((sum, value) => sum + value, 0) / length;
+      const mean2 = values2.reduce((sum, value) => sum + value, 0) / length;
+      const covariance = values1.reduce((sum, value, index) => sum + (value - mean1) * (values2[index] - mean2), 0) / length;
+      const variance1 = values1.reduce((sum, value) => sum + Math.pow(value - mean1, 2), 0) / length;
+      const variance2 = values2.reduce((sum, value) => sum + Math.pow(value - mean2, 2), 0) / length;
+      const denominator = Math.sqrt(variance1 * variance2);
+
+      return denominator === 0 ? NaN : covariance / denominator;
+    });
+
     this.builtins.set('ta.median', (args, _namedArgs, _ctx, scope, callId) => {
       const source = args[0] as number;
       const length = this.normalizeLookbackLength(args[1]);

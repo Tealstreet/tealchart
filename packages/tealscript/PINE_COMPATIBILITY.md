@@ -145,7 +145,7 @@ derived regular-series history, and unavailable or future offsets returning
 
 The common TA helper pass covers event helpers (`ta.barssince`,
 `ta.valuewhen`), cumulative/window helpers (`ta.cum`, `ta.dev`,
-`ta.variance`, `ta.vwma`, `ta.swma`, `ta.alma`, `ta.highestbars`,
+`ta.variance`, `ta.covariance`, `ta.correlation`, `ta.vwma`, `ta.swma`, `ta.alma`, `ta.highestbars`,
 `ta.lowestbars`), and compatibility aliases/helpers (`ta.cross`, `ta.range`,
 `ta.rising`, and `ta.falling`). The statistical helper pass covers `ta.median`, `ta.mode`,
 `ta.percentile_nearest_rank`, `ta.percentile_linear_interpolation`, and
