@@ -667,6 +667,23 @@ plot(breakdown, title="Breakdown")
     expect(getPlot(result, 'Breakdown').values).toEqual([false, false, false, true, true, false, false, false, false, false, false, false]);
   });
 
+  it('matches common Pine statistical helper idioms', () => {
+    const result = runCompatScript(`
+indicator("Stats smoke")
+length = input.int(3, "Length")
+plot(ta.median(close, length), title="Median")
+plot(ta.mode(close, length), title="Mode")
+plot(ta.percentile_nearest_rank(close, length, 75), title="Nearest")
+plot(ta.percentile_linear_interpolation(close, length, 75), title="Linear")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Median').values).toEqual([null, null, 105, 105, 103, 100, 100, 104, 108, 109, 110, 111]);
+    expect(getPlot(result, 'Mode').values).toEqual([null, null, 102, 103, 99, 99, 99, 100, 104, 108, 108, 110]);
+    expect(getPlot(result, 'Nearest').values).toEqual([null, null, 107, 107, 107, 103, 104, 109, 109, 111, 111, 112]);
+    expect(getPlot(result, 'Linear').values).toEqual([null, null, 106, 106, 105, 101.5, 102, 106.5, 108.5, 110, 110.5, 111.5]);
+  });
+
   it('runs conditional barcolor helper idioms', () => {
     const result = runCompatScript(`
 indicator("Barcolor smoke", overlay=true)

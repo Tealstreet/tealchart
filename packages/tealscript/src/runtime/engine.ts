@@ -1162,6 +1162,24 @@ export class TealscriptEngine {
     }
   }
 
+  private normalizeLookbackLength(value: unknown): number {
+    return typeof value === 'number' && Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
+  }
+
+  private updateBuiltinSourceHistory(scope: Scope, key: string, source: number, keep: number): number[] {
+    const history = (scope.get(key) as number[] | undefined) ?? [];
+    const nextHistory = [source, ...history].slice(0, keep);
+    this.setBuiltinState(scope, key, nextHistory);
+    return nextHistory;
+  }
+
+  private getCompleteSourceWindow(scope: Scope, key: string, source: number, length: number): number[] | null {
+    if (isNaN(source) || length < 1) return null;
+    const values = this.updateBuiltinSourceHistory(scope, key, source, length);
+    if (values.length < length || values.some((value) => isNaN(value))) return null;
+    return values;
+  }
+
   // ===========================================================================
   // Built-in Functions Registration
   // ===========================================================================
@@ -2315,14 +2333,11 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.rising', (args, _namedArgs, _ctx, scope, callId) => {
       const source = args[0] as number;
-      const rawLength = args[1] as number;
-      const length = Number.isFinite(rawLength) ? Math.max(0, Math.trunc(rawLength)) : 0;
+      const length = this.normalizeLookbackLength(args[1]);
       if (isNaN(source) || length < 1) return false;
 
       const key = `_ta_rising_source_${callId}`;
-      const history = (scope.get(key) as number[] | undefined) ?? [];
-      const nextHistory = [source, ...history].slice(0, length + 1);
-      this.setBuiltinState(scope, key, nextHistory);
+      const nextHistory = this.updateBuiltinSourceHistory(scope, key, source, length + 1);
 
       for (let i = 1; i <= length; i++) {
         const value = nextHistory[i];
@@ -2336,14 +2351,11 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.falling', (args, _namedArgs, _ctx, scope, callId) => {
       const source = args[0] as number;
-      const rawLength = args[1] as number;
-      const length = Number.isFinite(rawLength) ? Math.max(0, Math.trunc(rawLength)) : 0;
+      const length = this.normalizeLookbackLength(args[1]);
       if (isNaN(source) || length < 1) return false;
 
       const key = `_ta_falling_source_${callId}`;
-      const history = (scope.get(key) as number[] | undefined) ?? [];
-      const nextHistory = [source, ...history].slice(0, length + 1);
-      this.setBuiltinState(scope, key, nextHistory);
+      const nextHistory = this.updateBuiltinSourceHistory(scope, key, source, length + 1);
 
       for (let i = 1; i <= length; i++) {
         const value = nextHistory[i];
@@ -2561,6 +2573,68 @@ export class TealscriptEngine {
 
       const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
       return values.reduce((sum, value) => sum + Math.abs(value - mean), 0) / values.length;
+    });
+
+    this.builtins.set('ta.median', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const length = this.normalizeLookbackLength(args[1]);
+      const values = this.getCompleteSourceWindow(scope, `_ta_median_source_${callId}`, source, length);
+      if (!values) return NaN;
+
+      const sorted = [...values].sort((a, b) => a - b);
+      const mid = Math.floor(sorted.length / 2);
+      return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+    });
+
+    this.builtins.set('ta.mode', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const length = this.normalizeLookbackLength(args[1]);
+      const values = this.getCompleteSourceWindow(scope, `_ta_mode_source_${callId}`, source, length);
+      if (!values) return NaN;
+
+      const counts = new Map<number, number>();
+      for (const value of values) {
+        counts.set(value, (counts.get(value) ?? 0) + 1);
+      }
+
+      let mode = values[0];
+      let modeCount = counts.get(mode) ?? 0;
+      for (const [value, count] of counts) {
+        if (count > modeCount || (count === modeCount && value < mode)) {
+          mode = value;
+          modeCount = count;
+        }
+      }
+      return mode;
+    });
+
+    this.builtins.set('ta.percentile_nearest_rank', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const length = this.normalizeLookbackLength(args[1]);
+      const percentage = Math.min(100, Math.max(0, this.toNumber(args[2])));
+      const values = this.getCompleteSourceWindow(scope, `_ta_percentile_nearest_source_${callId}`, source, length);
+      if (!values || isNaN(percentage)) return NaN;
+
+      const sorted = [...values].sort((a, b) => a - b);
+      const rank = Math.max(1, Math.ceil((percentage / 100) * sorted.length));
+      return sorted[rank - 1];
+    });
+
+    this.builtins.set('ta.percentile_linear_interpolation', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const length = this.normalizeLookbackLength(args[1]);
+      const percentage = Math.min(100, Math.max(0, this.toNumber(args[2])));
+      const values = this.getCompleteSourceWindow(scope, `_ta_percentile_linear_source_${callId}`, source, length);
+      if (!values || isNaN(percentage)) return NaN;
+
+      const sorted = [...values].sort((a, b) => a - b);
+      const rank = (percentage / 100) * (sorted.length - 1);
+      const lower = Math.floor(rank);
+      const upper = Math.ceil(rank);
+      if (lower === upper) return sorted[lower];
+
+      const fraction = rank - lower;
+      return sorted[lower] + (sorted[upper] - sorted[lower]) * fraction;
     });
 
     this.builtins.set('ta.cum', (args, _namedArgs, _ctx, scope, callId) => {
