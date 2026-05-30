@@ -181,6 +181,33 @@ x = condition ? a : b`);
 
         expect(ast.body.length).toBeGreaterThan(1);
       });
+
+      it('parses keyed switch expressions', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+mode = "EMA"
+ma = switch mode
+    "EMA" => ta.ema(close, 14)
+    "SMA" => ta.sma(close, 14)
+    => close`);
+
+        const declaration = ast.body.find((s) => s.type === 'VariableDeclaration' && s.names.type === 'VariableDeclarator' && s.names.name.name === 'ma');
+        expect(declaration).toBeDefined();
+        expect(declaration?.type === 'VariableDeclaration' ? declaration.init.type : null).toBe('SwitchExpression');
+      });
+
+      it('parses condition-only switch expressions', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+direction = switch
+    close > open => 1
+    close < open => -1
+    => 0`);
+
+        const declaration = ast.body.find((s) => s.type === 'VariableDeclaration' && s.names.type === 'VariableDeclarator' && s.names.name.name === 'direction');
+        expect(declaration).toBeDefined();
+        expect(declaration?.type === 'VariableDeclaration' ? declaration.init.type : null).toBe('SwitchExpression');
+      });
     });
 
     describe('if statements', () => {
