@@ -55,7 +55,7 @@ by real Pine examples from official docs or public indicator idioms.
 | --- | --- | --- |
 | Bar-by-bar execution | Supported | Scripts execute across loaded bars. |
 | History references `x[n]` | Partial | Series and arrays support indexing; dynamic series offsets and unavailable/future history returning `na` are covered. Broader type diagnostics are still incomplete. |
-| `na` value | Partial | Represented with `NaN`; propagation and bool behavior need Pine v6 coverage. |
+| `na` value | Partial | Bare `na` and callable `na(value)` are supported with `NaN` as the internal representation; broader propagation and bool behavior need Pine v6 coverage. |
 | Built-in price series | Supported | `open`, `high`, `low`, `close`, `volume`, `time`, `hl2`, `hlc3`, `ohlc4`, `hlcc4`. |
 | `bar_index` / `last_bar_index` | Supported | Available as runtime identifiers. |
 | `barstate.*` | Partial | Core booleans exist; realtime semantics need additional coverage. |
