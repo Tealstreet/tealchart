@@ -96,6 +96,72 @@ plot(high, title="0")`;
       ]);
     });
 
+    it('returns plotcandle OHLC and color outputs with na gaps', () => {
+      const script = `//@version=6
+indicator("Synthetic candles", overlay=true)
+o = bar_index == 1 ? na : open
+h = bar_index == 1 ? na : high
+l = bar_index == 1 ? na : low
+c = bar_index == 1 ? na : close
+body = c >= o ? color.green : color.red
+plotcandle(o, h, l, c, title="Synthetic", color=body, wickcolor=color.blue, bordercolor=color.orange)`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      const candles = result.plots.find((plot) => plot.type === 'plotcandle');
+      expect(candles).toBeDefined();
+      expect(candles?.openValues).toEqual([100, null, 101]);
+      expect(candles?.highValues).toEqual([100.5, null, 101.5]);
+      expect(candles?.lowValues).toEqual([99.7, null, 100.7]);
+      expect(candles?.closeValues).toEqual([100.2, null, 101.2]);
+      expect(candles?.values).toEqual([100.2, null, 101.2]);
+      expect(candles?.color).toEqual(['#4CAF50', null, '#4CAF50']);
+      expect(candles?.wickColor).toEqual(['#2196F3', null, '#2196F3']);
+      expect(candles?.borderColor).toEqual(['#FF9800', null, '#FF9800']);
+    });
+
+    it('returns plotbar OHLC outputs with directional colors', () => {
+      const script = `//@version=6
+indicator("Synthetic bars", overlay=true)
+barColor = close >= open ? color.green : color.red
+plotbar(open, high, low, close, title="Bars", color=barColor)`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      const plotBars = result.plots.find((plot) => plot.type === 'plotbar');
+      expect(plotBars).toBeDefined();
+      expect(plotBars?.openValues).toEqual([100, 100.5]);
+      expect(plotBars?.highValues).toEqual([100.5, 101]);
+      expect(plotBars?.lowValues).toEqual([99.7, 100.2]);
+      expect(plotBars?.closeValues).toEqual([100.2, 100.7]);
+      expect(plotBars?.values).toEqual([100.2, 100.7]);
+      expect(plotBars?.color).toEqual(['#4CAF50', '#4CAF50']);
+    });
+
+    it('aligns conditionally executed plotcandle outputs to bar indexes', () => {
+      const script = `//@version=6
+indicator("Conditional candles", overlay=true)
+if bar_index > 0
+    plotcandle(open, high, low, close, title="Late", color=color.green)`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      const candles = result.plots.find((plot) => plot.type === 'plotcandle');
+      expect(candles).toBeDefined();
+      expect(candles?.openValues).toEqual([null, 100.5, 101]);
+      expect(candles?.values).toEqual([null, 100.7, 101.2]);
+      expect(candles?.color).toEqual([null, '#4CAF50', '#4CAF50']);
+    });
+
     it('handles empty bar data', () => {
       const script = `//@version=6
 indicator("Test")
@@ -584,6 +650,30 @@ plot(close)`;
       expect(plots.length).toBeGreaterThan(0);
       expect(plots[0].values.length).toBe(bars.length);
       expect(plots[0].values[plots[0].values.length - 1]).toBe(555);
+    });
+
+    it('truncates OHLC plot arrays before same-timestamp re-execution', () => {
+      const script = `//@version=6
+indicator("Conditional OHLC", overlay=true)
+if close > open
+    plotcandle(open, high, low, close, title="Conditional", color=color.green)`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+
+      const result = engine.execute(ast, bars);
+      const initialPlot = result.plots.find((plot) => plot.type === 'plotcandle');
+      expect(initialPlot?.closeValues?.[2]).toBe(101.2);
+
+      const updatedBar = { ...bars[2], close: bars[2].open - 1 };
+      const plots = engine.updateBar(ast, updatedBar);
+      const updatedPlot = plots.find((plot) => plot.type === 'plotcandle');
+
+      expect(updatedPlot?.values).toEqual([100.2, 100.7]);
+      expect(updatedPlot?.openValues).toEqual([100, 100.5]);
+      expect(updatedPlot?.closeValues).toEqual([100.2, 100.7]);
+      expect(updatedPlot?.color).toEqual(['#4CAF50', '#4CAF50']);
     });
   });
 });

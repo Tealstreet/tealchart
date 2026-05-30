@@ -1786,6 +1786,10 @@ export class TealchartRenderer {
             case 'plot':
               this.renderLinePlot(plot, bars, viewport);
               break;
+            case 'plotbar':
+            case 'plotcandle':
+              this.renderOhlcPlotInLegacyMainPane(plot, bars, viewport);
+              break;
             case 'hline':
               this.renderHline(plot, viewport);
               break;
@@ -2022,6 +2026,120 @@ export class TealchartRenderer {
         ctx.arc(x, y, markerSize, 0, Math.PI * 2);
         ctx.fill();
       }
+    }
+  }
+
+  private getPerBarColor(
+    color: string | (string | null)[] | undefined,
+    barIndex: number,
+    fallback: string,
+  ): string {
+    if (Array.isArray(color)) {
+      return color[barIndex] || fallback;
+    }
+    return color || fallback;
+  }
+
+  private getSlotWidth(bars: Bar[], viewport: Viewport, chartWidth: number): number {
+    const viewportTimeRange = viewport.endTime - viewport.startTime;
+    const fallbackWidth = Math.max(this.options.minCandleWidth, 1);
+    if (viewportTimeRange <= 0 || chartWidth <= 0) {
+      return fallbackWidth;
+    }
+    let barInterval = viewportTimeRange / Math.max(bars.length, 1);
+    if (bars.length >= 2) {
+      barInterval = bars[1].time - bars[0].time;
+    }
+    const slotWidth = barInterval * (chartWidth / viewportTimeRange);
+    return Number.isFinite(slotWidth) && slotWidth > 0 ? slotWidth : fallbackWidth;
+  }
+
+  private renderOhlcPlotInLegacyMainPane(plot: PlotOutput, bars: Bar[], viewport: Viewport): void {
+    const { options, margins } = this;
+    const chartWidth = options.width - margins.left;
+    const chartHeight = options.height - margins.top - margins.bottom;
+    const volumeHeight = options.showVolume ? chartHeight * options.volumeHeight : 0;
+    const priceHeight = chartHeight - volumeHeight;
+
+    this.renderOhlcPlot(plot, bars, viewport, chartWidth, (value) => this.priceToY(value, viewport, priceHeight));
+  }
+
+  private renderOhlcPlot(
+    plot: PlotOutput,
+    bars: Bar[],
+    viewport: Viewport,
+    chartWidth: number,
+    valueToY: (value: number) => number,
+  ): void {
+    const { ctx } = this;
+    const { openValues, highValues, lowValues, closeValues } = plot;
+    if (!openValues || !highValues || !lowValues || !closeValues) return;
+
+    const slotWidth = this.getSlotWidth(bars, viewport, chartWidth);
+    const bodyWidth = Math.max(2, slotWidth * 0.6);
+    const tickWidth = Math.max(3, bodyWidth * 0.45);
+    const fallbackColor = Array.isArray(plot.color) ? plot.color.find(Boolean) || '#2196F3' : plot.color || '#2196F3';
+
+    const scanEnd = Math.min(bars.length, openValues.length, highValues.length, lowValues.length, closeValues.length);
+    for (let i = 0; i < scanEnd; i++) {
+      const bar = bars[i];
+      if (bar.time < viewport.startTime || bar.time > viewport.endTime) continue;
+
+      const open = openValues[i];
+      const high = highValues[i];
+      const low = lowValues[i];
+      const close = closeValues[i];
+      if (
+        open === null ||
+        high === null ||
+        low === null ||
+        close === null ||
+        isNaN(open) ||
+        isNaN(high) ||
+        isNaN(low) ||
+        isNaN(close)
+      ) {
+        continue;
+      }
+
+      const x = this.timeToX(bar.time, viewport, chartWidth);
+      const openY = valueToY(open);
+      const highY = valueToY(high);
+      const lowY = valueToY(low);
+      const closeY = valueToY(close);
+      const bodyColor = this.getPerBarColor(plot.color, i, fallbackColor);
+
+      if (plot.type === 'plotbar') {
+        ctx.strokeStyle = bodyColor;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x, highY);
+        ctx.lineTo(x, lowY);
+        ctx.moveTo(x - tickWidth, openY);
+        ctx.lineTo(x, openY);
+        ctx.moveTo(x, closeY);
+        ctx.lineTo(x + tickWidth, closeY);
+        ctx.stroke();
+        continue;
+      }
+
+      const wickColor = this.getPerBarColor(plot.wickColor, i, bodyColor);
+      const borderColor = this.getPerBarColor(plot.borderColor, i, bodyColor);
+      const bodyTop = Math.min(openY, closeY);
+      const bodyHeight = Math.max(1, Math.abs(closeY - openY));
+
+      ctx.strokeStyle = wickColor;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x, highY);
+      ctx.lineTo(x, lowY);
+      ctx.stroke();
+
+      ctx.fillStyle = bodyColor;
+      ctx.fillRect(x - bodyWidth / 2, bodyTop, bodyWidth, bodyHeight);
+
+      ctx.strokeStyle = borderColor;
+      ctx.strokeRect(x - bodyWidth / 2, bodyTop, bodyWidth, bodyHeight);
     }
   }
 
@@ -3532,6 +3650,11 @@ export class TealchartRenderer {
 
     const { values, color, linewidth = 1, style = 'line' } = plot;
 
+    if (plot.type === 'plotbar' || plot.type === 'plotcandle') {
+      this.renderOhlcPlot(plot, bars, viewport, chartWidth, (value) => this.valueToY(value, pane));
+      return;
+    }
+
     // Handle histogram style
     if (style === 'histogram' || style === 'columns') {
       this.renderHistogramInPaneUnified(plot, bars, viewport, pane, plotStyleOverrides);
@@ -4182,6 +4305,12 @@ export class TealchartRenderer {
       switch (plot.type) {
         case 'plot':
           this.renderLinePlotInPane(plot, bars, viewport, paneOffset);
+          break;
+        case 'plotbar':
+        case 'plotcandle':
+          this.renderOhlcPlot(plot, bars, viewport, options.width - margins.left, (value) =>
+            this.valueToPaneY(value, paneOffset),
+          );
           break;
         case 'hline':
           this.renderHlineInPane(plot, paneOffset);
