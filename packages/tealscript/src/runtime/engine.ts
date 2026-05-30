@@ -1212,6 +1212,8 @@ export class TealscriptEngine {
     this.builtins.set('math.asin', (args) => Math.asin(args[0] as number));
     this.builtins.set('math.acos', (args) => Math.acos(args[0] as number));
     this.builtins.set('math.atan', (args) => Math.atan(args[0] as number));
+    this.builtins.set('math.toradians', (args) => this.toNumber(args[0]) * (Math.PI / 180));
+    this.builtins.set('math.todegrees', (args) => this.toNumber(args[0]) * (180 / Math.PI));
 
     // nz - replace na with value
     this.builtins.set('nz', (args) => {
