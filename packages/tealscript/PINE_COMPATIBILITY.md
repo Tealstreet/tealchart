@@ -59,8 +59,8 @@ by real Pine examples from official docs or public indicator idioms.
 | Built-in price series | Supported | `open`, `high`, `low`, `close`, `volume`, `time`, `hl2`, `hlc3`, `ohlc4`, `hlcc4`. |
 | `bar_index` / `last_bar_index` | Supported | Available as runtime identifiers. |
 | `barstate.*` | Partial | Common booleans are exposed, including `isfirst`, `islast`, `ishistory`, `isrealtime`, `isnew`, `isconfirmed`, and `islastconfirmedhistory`. Realtime tick parity still needs browser-worker coverage. |
-| `syminfo.*` | Partial | Static defaults are present. |
-| `timeframe.*` | Partial | Static defaults are present. |
+| `syminfo.*` | Partial | Static defaults are exposed through common chart-info fields such as `ticker`, `tickerid`, `root`, `mintick`, and `minmove`. Live symbol metadata injection is still planned. |
+| `timeframe.*` | Partial | Static defaults are exposed through common timeframe fields such as `period`, `main_period`, `multiplier`, `isintraday`, and `isdwm`. Live chart timeframe injection is still planned. |
 | Function-local series state | Planned | Needed before UDF-heavy Pine snippets are reliable. |
 | `max_bars_back` | Planned | Declaration is parsed but not enforced/inferred. |
 
@@ -222,6 +222,13 @@ The barstate pass exposes common Pine bar-state booleans through `barstate.*`
 member access. Historical execution marks loaded bars as confirmed history,
 sets `islastconfirmedhistory` on the last historical bar, and switches
 `isrealtime` / `isconfirmed` during realtime current-bar updates.
+
+## Common Chart Info Coverage
+
+The chart-info pass exposes common static `syminfo.*` and `timeframe.*`
+members used by generated indicators and multi-timeframe script templates,
+including `syminfo.tickerid`, `syminfo.root`, `timeframe.period`,
+`timeframe.main_period`, `timeframe.multiplier`, and timeframe category flags.
 
 ## Strategy Diagnostic Coverage
 
