@@ -228,4 +228,19 @@ plot(array.size(values), title="Literal Size")
     expect(roundSeries(getPlot(result, 'Middle').values)).toEqual([20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]);
     expect(roundSeries(getPlot(result, 'Literal Size').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
   });
+
+  it('runs ta.barssince and ta.valuewhen helpers', () => {
+    const result = runCompatScript(`
+indicator("TA event helpers")
+condition = close > open
+plot(ta.barssince(condition), title="Bars Since Green")
+plot(ta.valuewhen(condition, close, 0), title="Last Green Close")
+plot(ta.valuewhen(condition, close, 1), title="Previous Green Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Bars Since Green').values)).toEqual([0, 0, 0, 1, 2, 0, 0, 0, 1, 0, 1, 0]);
+    expect(roundSeries(getPlot(result, 'Last Green Close').values)).toEqual([102, 105, 107, 107, 107, 100, 104, 109, 109, 111, 111, 112]);
+    expect(roundSeries(getPlot(result, 'Previous Green Close').values)).toEqual([null, 102, 105, 105, 105, 107, 100, 104, 104, 109, 109, 111]);
+  });
 });

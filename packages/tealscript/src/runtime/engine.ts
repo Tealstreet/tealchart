@@ -73,6 +73,7 @@ type BuiltinFunction = (
   namedArgs: Map<string, unknown>,
   ctx: ExecutionContext,
   scope: Scope,
+  callId: string,
 ) => unknown;
 
 /**
@@ -603,7 +604,7 @@ export class TealscriptEngine {
     // Look up builtin
     const builtin = this.builtins.get(fullName);
     if (builtin) {
-      return builtin(args, namedArgs, this.ctx, this.scope);
+      return builtin(args, namedArgs, this.ctx, this.scope, this.nextBuiltinCallId(fullName));
     }
 
     if (!namespace) {
@@ -657,7 +658,7 @@ export class TealscriptEngine {
       const builtin = this.builtins.get(fullName);
       if (builtin) {
         // It's a constant, call with no args
-        return builtin([], new Map(), this.ctx, this.scope);
+        return builtin([], new Map(), this.ctx, this.scope, fullName);
       }
     }
 
@@ -723,6 +724,14 @@ export class TealscriptEngine {
     return value as number;
   }
 
+  private setBuiltinState(scope: Scope, key: string, value: unknown): void {
+    if (scope.has(key)) {
+      scope.set(key, value);
+    } else {
+      scope.declare(key, 'var', value);
+    }
+  }
+
   // ===========================================================================
   // Built-in Functions Registration
   // ===========================================================================
@@ -753,11 +762,19 @@ export class TealscriptEngine {
   // Plot ID counters - reset when engine is created
   private plotCounter = 0;
   private plotCallIndex = 0;
+  private builtinCallCounts = new Map<string, number>();
   private hlineCounter = 0;
   private bgcolorCounter = 0;
 
   private resetPerBarBuiltinState(): void {
     this.plotCallIndex = 0;
+    this.builtinCallCounts.clear();
+  }
+
+  private nextBuiltinCallId(name: string): string {
+    const index = this.builtinCallCounts.get(name) ?? 0;
+    this.builtinCallCounts.set(name, index + 1);
+    return `${name}_${index}`;
   }
 
   private registerPlotBuiltins(): void {
@@ -1403,6 +1420,30 @@ export class TealscriptEngine {
       if (avgLoss === 0) return 100;
       const rs = avgGain / avgLoss;
       return 100 - 100 / (1 + rs);
+    });
+
+    this.builtins.set('ta.barssince', (args, _namedArgs, _ctx, scope, callId) => {
+      const condition = this.isTruthy(args[0]);
+      const key = `_barssince_${callId}`;
+      const previous = scope.get(key) as number | undefined;
+      const value = condition ? 0 : previous === undefined || isNaN(previous) ? NaN : previous + 1;
+      this.setBuiltinState(scope, key, value);
+      return value;
+    });
+
+    this.builtins.set('ta.valuewhen', (args, _namedArgs, _ctx, scope, callId) => {
+      const condition = this.isTruthy(args[0]);
+      const source = args[1] as number;
+      const occurrence = Math.max(0, Math.trunc((args[2] as number | undefined) ?? 0));
+      const key = `_valuewhen_${callId}`;
+      const values = (scope.get(key) as unknown[] | undefined) ?? [];
+
+      if (condition) {
+        values.unshift(source);
+      }
+
+      this.setBuiltinState(scope, key, values);
+      return values[occurrence] ?? NaN;
     });
 
     // Change - difference from N bars ago
