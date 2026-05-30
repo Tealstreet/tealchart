@@ -406,6 +406,28 @@ e = math.round(3.7)
       expect(result.errors).toHaveLength(0);
     });
 
+    it('executes Pine math constants and scalar helpers', () => {
+      const code = `//@version=6
+indicator("Test")
+plot(math.pi, "Pi")
+plot(math.e, "Euler")
+plot(math.phi, "Phi")
+plot(math.avg(1, 2, 3, 4), "Average")
+plot(math.round(1.2345, 2), "Rounded")
+plot(math.trunc(-1.9), "Truncated")
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values).toEqual(Array(bars.length).fill(Math.PI));
+      expect(result.plots[1].values).toEqual(Array(bars.length).fill(Math.E));
+      expect(result.plots[2].values).toEqual(Array(bars.length).fill((1 + Math.sqrt(5)) / 2));
+      expect(result.plots[3].values).toEqual(Array(bars.length).fill(2.5));
+      expect(result.plots[4].values).toEqual(Array(bars.length).fill(1.23));
+      expect(result.plots[5].values).toEqual(Array(bars.length).fill(-1));
+    });
+
     it('executes nz function', () => {
       const code = `//@version=6
 indicator("Test")
