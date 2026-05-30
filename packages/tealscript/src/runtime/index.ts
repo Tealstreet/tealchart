@@ -41,6 +41,7 @@ export {
   type PlotStyle,
   type DrawingOutput,
   type LabelDrawingOutput,
+  type LineDrawingOutput,
   type AlertEvent,
   type AlertFrequency,
   type AlertOutput,

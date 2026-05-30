@@ -279,7 +279,7 @@ as `indicatorMaxBarsBack`. Values must be finite, non-negative integers. The
 runtime still keeps full loaded history and does not infer or enforce Pine's
 history buffer sizing rules yet.
 
-## Common Label Drawing Coverage
+## Common Drawing Object Coverage
 
 The label drawing pass covers a first runtime payload slice for common
 last-bar label idioms. `label.new()` accepts positional or named `x`, `y`, and
@@ -294,11 +294,24 @@ drawing output. The label mutation pass covers persistent `var` label handles,
 `get_size`, `get_tooltip`), `label.copy()`, and `label.delete()`. Rendering,
 GC limits, full style parity, and realtime rollback parity remain planned.
 
+The line drawing pass covers common trendline/channel idioms. `line.new()`
+accepts positional or named `x1`, `y1`, `x2`, and `y2` arguments plus common
+`xloc`, `extend`, `color`, `style`, `width`, and `force_overlay` options. The
+runtime returns a line handle string and records a typed drawing output. The
+mutation pass covers persistent `var` line handles, `line.set_x1()`,
+`line.set_x2()`, `line.set_y1()`, `line.set_y2()`, `line.set_xy1()`,
+`line.set_xy2()`, `line.set_xloc()`, `line.set_extend()`,
+`line.set_color()`, `line.set_style()`, `line.set_width()`, scalar coordinate
+getters, `line.get_price()`, `line.copy()`, and `line.delete()`. Rendering
+covers main-pane line segments with basic color/style/width and horizontal
+extension support. `chart.point` overloads, linefills, GC limits, full arrow
+style geometry, and full realtime rollback parity remain planned.
+
 ## Drawing Diagnostic Coverage
 
-Drawing namespaces (`line.*`, `box.*`, and `table.*`) are accepted as parsed
-member calls and fail with explicit unsupported runtime diagnostics. Object
-handles, lifecycle operations, and rendering are still planned.
+Drawing namespaces (`box.*` and `table.*`) are accepted as parsed member calls
+and fail with explicit unsupported runtime diagnostics. Box/table handles,
+lifecycle operations, and rendering are still planned.
 
 ## Strategy Diagnostic Coverage
 
