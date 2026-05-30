@@ -300,6 +300,9 @@ export function registerLineFillBuiltins(builtins: BuiltinRegistry, runtime: Dra
     const line1 = runtime.toDrawingId(namedArgs.get('line1') ?? args[0]);
     const line2 = runtime.toDrawingId(namedArgs.get('line2') ?? args[1]);
     if (!line1 || !line2) return Number.NaN;
+    if (ctx.getDrawing(line1)?.type !== 'line' || ctx.getDrawing(line2)?.type !== 'line') {
+      return Number.NaN;
+    }
 
     const id = `linefill_${callId}_${ctx.bar_index}`;
     ctx.addDrawing({
