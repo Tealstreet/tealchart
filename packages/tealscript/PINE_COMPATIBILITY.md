@@ -110,7 +110,7 @@ Remaining gaps:
 
 | Pine feature | Status | Notes |
 | --- | --- | --- |
-| `alertcondition` / `alert` | Planned | Should collect runtime events before UI integration. |
+| `alertcondition` / `alert` | Partial | Runtime collects `alertcondition()` boolean series and direct `alert()` events with frequency constants. UI integration and full Pine alert throttling are not implemented yet. |
 | `strategy.*` | Unsupported | Parse diagnostics first, backtest ledger later. |
 | Multi-timeframe requests | Planned | Needs deterministic gap/lookahead semantics. |
 | Other-symbol requests | Planned | Needs chart datafeed contract and caching strategy. |
@@ -185,3 +185,13 @@ against case values and condition-only switches return the first truthy branch,
 with optional default branches. The checkpoint fixture follows TradingView's
 documented conditional-structure idioms by selecting a moving average from an
 `input.string(... options=...)` mode and deriving a directional signal.
+
+## Common Alerts Coverage
+
+The alerts pass covers `alertcondition(condition, title, message)` and
+conditional `alert(message, freq)` calls. The runtime emits alert outputs
+alongside plots, preserving per-bar alertcondition values and direct alert
+events with `alert.freq_once_per_bar`, `alert.freq_once_per_bar_close`, and
+`alert.freq_all` constants. The checkpoint fixture follows TradingView's
+documented trigger-condition idiom by deriving a boolean condition, registering
+it with `alertcondition()`, and firing a direct `alert()` from an `if` block.
