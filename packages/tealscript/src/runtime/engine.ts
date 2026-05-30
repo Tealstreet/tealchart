@@ -1111,6 +1111,11 @@ export class TealscriptEngine {
     this.builtins.set('input.bool', createInputFunc('bool'));
     this.builtins.set('input.string', createInputFunc('string'));
     this.builtins.set('input.color', createInputFunc('color'));
+    this.builtins.set('input.time', createInputFunc('time'));
+    this.builtins.set('input.timeframe', createInputFunc('timeframe'));
+    this.builtins.set('input.symbol', createInputFunc('symbol'));
+    this.builtins.set('input.session', createInputFunc('session'));
+    this.builtins.set('input.text_area', createInputFunc('text_area'));
 
     // input.source is special - it returns a series
     this.builtins.set('input.source', (args, namedArgs, _ctx) => {
