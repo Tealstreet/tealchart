@@ -1102,9 +1102,18 @@ export class TealscriptEngine {
 
   private registerArrayBuiltins(): void {
     const createArray = (args: unknown[]) => createPineArray(args[0] as number | undefined, args[1]);
-    const readArray = (value: unknown): PineArray => {
+    const readArray = (value: unknown): PineArray | unknown[] => {
+      if (Array.isArray(value)) {
+        return value;
+      }
       if (!isPineArray(value)) {
         throw new Error('Expected array');
+      }
+      return value;
+    };
+    const readMutableArray = (value: unknown): PineArray => {
+      if (!isPineArray(value)) {
+        throw new Error('Expected mutable array');
       }
       return value;
     };
@@ -1114,18 +1123,24 @@ export class TealscriptEngine {
     this.builtins.set('array.new_bool', createArray);
     this.builtins.set('array.new_string', createArray);
 
-    this.builtins.set('array.size', (args) => getArraySize(readArray(args[0])));
-    this.builtins.set('array.get', (args) => getArrayValue(readArray(args[0]), args[1] as number));
+    this.builtins.set('array.size', (args) => {
+      const array = readArray(args[0]);
+      return Array.isArray(array) ? array.length : getArraySize(array);
+    });
+    this.builtins.set('array.get', (args) => {
+      const array = readArray(args[0]);
+      return Array.isArray(array) ? array[Math.trunc(args[1] as number)] : getArrayValue(array, args[1] as number);
+    });
     this.builtins.set('array.set', (args) => {
-      setArrayValue(readArray(args[0]), args[1] as number, args[2]);
+      setArrayValue(readMutableArray(args[0]), args[1] as number, args[2]);
       return null;
     });
-    this.builtins.set('array.push', (args) => pushArrayValue(readArray(args[0]), args[1]));
-    this.builtins.set('array.pop', (args) => popArrayValue(readArray(args[0])));
-    this.builtins.set('array.shift', (args) => shiftArrayValue(readArray(args[0])));
-    this.builtins.set('array.unshift', (args) => unshiftArrayValue(readArray(args[0]), args[1]));
+    this.builtins.set('array.push', (args) => pushArrayValue(readMutableArray(args[0]), args[1]));
+    this.builtins.set('array.pop', (args) => popArrayValue(readMutableArray(args[0])));
+    this.builtins.set('array.shift', (args) => shiftArrayValue(readMutableArray(args[0])));
+    this.builtins.set('array.unshift', (args) => unshiftArrayValue(readMutableArray(args[0]), args[1]));
     this.builtins.set('array.clear', (args) => {
-      clearArray(readArray(args[0]));
+      clearArray(readMutableArray(args[0]));
       return null;
     });
   }
