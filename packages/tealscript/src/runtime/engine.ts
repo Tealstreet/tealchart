@@ -724,6 +724,50 @@ export class TealscriptEngine {
     return String(value);
   }
 
+  private setOhlcPlotBar(
+    plot: PlotOutput | undefined,
+    barIndex: number,
+    open: number | null,
+    high: number | null,
+    low: number | null,
+    close: number | null,
+    color: string | null,
+    wickColor?: string | null,
+    borderColor?: string | null,
+  ): void {
+    if (!plot) return;
+
+    const hasGap = open === null || high === null || low === null || close === null;
+    const normalizedOpen = hasGap ? null : open;
+    const normalizedHigh = hasGap ? null : high;
+    const normalizedLow = hasGap ? null : low;
+    const normalizedClose = hasGap ? null : close;
+    const normalizedColor = hasGap ? null : color;
+
+    const setAtBar = <T>(values: T[] | undefined, value: T): void => {
+      if (!values) return;
+      while (values.length < barIndex) {
+        values.push(null as T);
+      }
+      values[barIndex] = value;
+    };
+
+    setAtBar(plot.openValues, normalizedOpen);
+    setAtBar(plot.highValues, normalizedHigh);
+    setAtBar(plot.lowValues, normalizedLow);
+    setAtBar(plot.closeValues, normalizedClose);
+    setAtBar(plot.values, normalizedClose);
+    if (Array.isArray(plot.color)) {
+      setAtBar(plot.color, normalizedColor);
+    }
+    if (Array.isArray(plot.wickColor)) {
+      setAtBar(plot.wickColor, hasGap ? null : (wickColor ?? normalizedColor));
+    }
+    if (Array.isArray(plot.borderColor)) {
+      setAtBar(plot.borderColor, hasGap ? null : (borderColor ?? normalizedColor));
+    }
+  }
+
   private toStringValue(value: unknown, format?: string): string {
     if (value === null || value === undefined || this.isNa(value)) {
       return 'NaN';
@@ -963,6 +1007,81 @@ export class TealscriptEngine {
 
       ctx.addPlotValue(id, null);
       return color;
+    });
+
+    this.builtins.set('plotbar', (args, namedArgs, ctx, _scope, callId) => {
+      const open = this.toPlotValue(namedArgs.has('open') ? namedArgs.get('open') : args[0]);
+      const high = this.toPlotValue(namedArgs.has('high') ? namedArgs.get('high') : args[1]);
+      const low = this.toPlotValue(namedArgs.has('low') ? namedArgs.get('low') : args[2]);
+      const close = this.toPlotValue(namedArgs.has('close') ? namedArgs.get('close') : args[3]);
+      const title = (namedArgs.get('title') ?? args[4] ?? callId) as string;
+      const color = this.toPlotColor(
+        namedArgs.has('color')
+          ? namedArgs.get('color')
+          : args[5] !== undefined
+            ? args[5]
+            : close !== null && open !== null && close >= open
+              ? '#4CAF50'
+              : '#F44336',
+      );
+      const id = `plotbar_${title}`;
+
+      let plot = ctx.plots.get(id);
+      if (!plot) {
+        ctx.registerPlot({
+          id,
+          type: 'plotbar',
+          title,
+          color: [],
+          openValues: [],
+          highValues: [],
+          lowValues: [],
+          closeValues: [],
+        });
+        plot = ctx.plots.get(id);
+      }
+
+      this.setOhlcPlotBar(plot, ctx.bar_index, open, high, low, close, color);
+      return close;
+    });
+
+    this.builtins.set('plotcandle', (args, namedArgs, ctx, _scope, callId) => {
+      const open = this.toPlotValue(namedArgs.has('open') ? namedArgs.get('open') : args[0]);
+      const high = this.toPlotValue(namedArgs.has('high') ? namedArgs.get('high') : args[1]);
+      const low = this.toPlotValue(namedArgs.has('low') ? namedArgs.get('low') : args[2]);
+      const close = this.toPlotValue(namedArgs.has('close') ? namedArgs.get('close') : args[3]);
+      const title = (namedArgs.get('title') ?? args[4] ?? callId) as string;
+      const defaultColor = close !== null && open !== null && close >= open ? '#4CAF50' : '#F44336';
+      const color = this.toPlotColor(
+        namedArgs.has('color') ? namedArgs.get('color') : args[5] !== undefined ? args[5] : defaultColor,
+      );
+      const wickColor = this.toPlotColor(
+        namedArgs.has('wickcolor') ? namedArgs.get('wickcolor') : args[6] !== undefined ? args[6] : color,
+      );
+      const borderColor = this.toPlotColor(
+        namedArgs.has('bordercolor') ? namedArgs.get('bordercolor') : color,
+      );
+      const id = `plotcandle_${title}`;
+
+      let plot = ctx.plots.get(id);
+      if (!plot) {
+        ctx.registerPlot({
+          id,
+          type: 'plotcandle',
+          title,
+          color: [],
+          openValues: [],
+          highValues: [],
+          lowValues: [],
+          closeValues: [],
+          wickColor: [],
+          borderColor: [],
+        });
+        plot = ctx.plots.get(id);
+      }
+
+      this.setOhlcPlotBar(plot, ctx.bar_index, open, high, low, close, color, wickColor, borderColor);
+      return close;
     });
 
     // Plot style constants

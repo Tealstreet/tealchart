@@ -72,7 +72,7 @@ export interface TimeframeInfo {
  */
 export interface PlotOutput {
   id: string;
-  type: 'plot' | 'hline' | 'bgcolor' | 'barcolor' | 'plotshape' | 'plotchar' | 'plotarrow' | 'fill';
+  type: 'plot' | 'hline' | 'bgcolor' | 'barcolor' | 'plotbar' | 'plotcandle' | 'plotshape' | 'plotchar' | 'plotarrow' | 'fill';
   title: string;
   values: (number | null)[];
 
@@ -83,6 +83,14 @@ export interface PlotOutput {
   color: string | (string | null)[];
   linewidth?: number;
   style?: PlotStyle;
+
+  // For plotbar/plotcandle
+  openValues?: (number | null)[];
+  highValues?: (number | null)[];
+  lowValues?: (number | null)[];
+  closeValues?: (number | null)[];
+  wickColor?: string | (string | null)[];
+  borderColor?: string | (string | null)[];
 
   // For hline
   price?: number;
