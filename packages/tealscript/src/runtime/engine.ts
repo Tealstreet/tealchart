@@ -57,6 +57,7 @@ import {
   type PineArray,
 } from './arrays';
 import type { BuiltinRegistry } from './builtins/registry';
+import { registerDrawingConstants } from './builtins/drawings';
 import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type BoxDrawingOutput, type DrawingOutput, type InputDefinition, type LabelDrawingOutput, type LineDrawingOutput, type LineFillDrawingOutput, type PlotOutput, type PlotStyle } from './context';
 import {
   getDrawingValue,
@@ -1295,46 +1296,7 @@ export class TealscriptEngine {
     this.builtins.set('box.get_border_color', (args, _namedArgs, ctx) => this.getBoxValue(args[0], ctx, (box) => box.borderColor ?? Number.NaN));
     this.builtins.set('box.get_text', (args, _namedArgs, ctx) => this.getBoxValue(args[0], ctx, (box) => box.text));
 
-    const constants: Record<string, string> = {
-      'xloc.bar_index': 'bar_index',
-      'xloc.bar_time': 'bar_time',
-      'extend.none': 'none',
-      'extend.right': 'right',
-      'extend.left': 'left',
-      'extend.both': 'both',
-      'yloc.price': 'price',
-      'yloc.abovebar': 'abovebar',
-      'yloc.belowbar': 'belowbar',
-      'line.style_solid': 'solid',
-      'line.style_dotted': 'dotted',
-      'line.style_dashed': 'dashed',
-      'line.style_arrow_left': 'arrow_left',
-      'line.style_arrow_right': 'arrow_right',
-      'line.style_arrow_both': 'arrow_both',
-      'label.style_none': 'none',
-      'label.style_label_up': 'label_up',
-      'label.style_label_down': 'label_down',
-      'label.style_label_left': 'label_left',
-      'label.style_label_right': 'label_right',
-      'label.style_label_lower_left': 'label_lower_left',
-      'label.style_label_lower_right': 'label_lower_right',
-      'label.style_label_upper_left': 'label_upper_left',
-      'label.style_label_upper_right': 'label_upper_right',
-      'label.style_circle': 'circle',
-      'label.style_square': 'square',
-      'label.style_diamond': 'diamond',
-      'label.style_cross': 'cross',
-      'label.style_xcross': 'xcross',
-      'label.style_triangleup': 'triangleup',
-      'label.style_triangledown': 'triangledown',
-      'label.style_flag': 'flag',
-      'label.style_arrowup': 'arrowup',
-      'label.style_arrowdown': 'arrowdown',
-    };
-
-    for (const [name, value] of Object.entries(constants)) {
-      this.builtins.set(name, () => value);
-    }
+    registerDrawingConstants(this.builtins);
   }
 
   private toLabelId(value: unknown): string | undefined {
