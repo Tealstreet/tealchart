@@ -41,6 +41,17 @@ indicator("My Indicator", overlay=true, precision=2)`);
         expect(indicator.type).toBe('IndicatorDeclaration');
       });
 
+      it('parses max_bars_back metadata', () => {
+        const ast = parse(`//@version=6
+indicator("My Indicator", max_bars_back=500)`);
+
+        const indicator = ast.body[0];
+        expect(indicator.type).toBe('IndicatorDeclaration');
+        if (indicator.type === 'IndicatorDeclaration') {
+          expect(indicator.max_bars_back?.type).toBe('NumericLiteral');
+        }
+      });
+
       it('parses strategy declarations for unsupported diagnostics', () => {
         const ast = parse(`//@version=6
 strategy("My Strategy", overlay=true)`);

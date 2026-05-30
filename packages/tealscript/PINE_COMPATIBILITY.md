@@ -62,7 +62,7 @@ by real Pine examples from official docs or public indicator idioms.
 | `syminfo.*` | Partial | Static defaults are exposed through common chart-info fields such as `ticker`, `tickerid`, `root`, `mintick`, and `minmove`. Live symbol metadata injection is still planned. |
 | `timeframe.*` | Partial | Static defaults are exposed through common timeframe fields such as `period`, `main_period`, `multiplier`, `isintraday`, and `isdwm`. Live chart timeframe injection is still planned. |
 | Function-local series state | Planned | Needed before UDF-heavy Pine snippets are reliable. |
-| `max_bars_back` | Planned | Declaration is parsed but not enforced/inferred. |
+| `max_bars_back` | Partial | Declaration metadata is parsed, validated, and exposed on execution results; runtime buffer enforcement/inference is not implemented yet. |
 
 ## Scope And Series Audit
 
@@ -230,6 +230,13 @@ The chart-info pass exposes common static `syminfo.*` and `timeframe.*`
 members used by generated indicators and multi-timeframe script templates,
 including `syminfo.tickerid`, `syminfo.root`, `timeframe.period`,
 `timeframe.main_period`, `timeframe.multiplier`, and timeframe category flags.
+
+## `max_bars_back` Declaration Coverage
+
+`indicator(..., max_bars_back=N)` is parsed and recorded on execution results
+as `indicatorMaxBarsBack`. Values must be finite, non-negative integers. The
+runtime still keeps full loaded history and does not infer or enforce Pine's
+history buffer sizing rules yet.
 
 ## Drawing Diagnostic Coverage
 
