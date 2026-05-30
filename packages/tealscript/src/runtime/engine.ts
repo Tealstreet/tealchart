@@ -678,7 +678,7 @@ export class TealscriptEngine {
     }
 
     const result = this.executeFunctionStatements(consequent);
-    return result.hasResult ? result.value : undefined;
+    return result.hasResult ? result.value : Number.NaN;
   }
 
   private switchValuesEqual(left: unknown, right: unknown): boolean {
