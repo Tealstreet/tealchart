@@ -83,4 +83,30 @@ plot(pivotLow, title="Pivot Low")
     expect(getPlot(result, 'VWAP').values).toHaveLength(compatibilityBars.length);
     expect(getPlot(result, 'Pivot High').values.some((value) => value !== null)).toBe(true);
   });
+
+  it('runs single-line user-defined functions', () => {
+    const result = runCompatScript(`
+indicator("UDF single line")
+spread(source, length) => source - ta.sma(source, length)
+plot(spread(close, 3), title="Spread")
+plot(spread(source=high, length=3), title="Named Spread")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Spread').values)).toEqual([null, null, 2.333333, -2, -4, -0.666667, 3, 4.666667, 1, 1.666667, 0.333333, 1]);
+    expect(getPlot(result, 'Named Spread').values).toHaveLength(compatibilityBars.length);
+  });
+
+  it('runs flat multiline user-defined functions', () => {
+    const result = runCompatScript(`
+indicator("UDF multiline")
+rangeSize(highValue, lowValue) =>
+    range = highValue - lowValue
+    math.abs(range)
+plot(rangeSize(high, low), title="Range")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Range').values)).toEqual([4, 5, 4, 7, 6, 5, 6, 7, 5, 5, 5, 5]);
+  });
 });
