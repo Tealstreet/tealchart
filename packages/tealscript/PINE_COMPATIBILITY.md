@@ -103,7 +103,7 @@ derived regular-series history, and unavailable or future offsets returning
 | `input.*` | Partial | Generic `input()`, int, float, bool, string, color, source, time, symbol, timeframe, session, and text area exist. Advanced UI/display behavior is incomplete. |
 | Time functions | Partial | Calendar functions, `timestamp()`, `time()`, and `time_close()` cover common numeric, UTC/GMT-offset, and same-timeframe session-filter forms. Higher-timeframe aggregation and named timezone databases are still planned. |
 | `color.*` | Partial | Core named colors, `color.new()`, `color.rgb()`, channel extraction, and `color.from_gradient()` exist. Named color constants still need exact Pine v6 parity. |
-| `str.*` | Partial | Common conversion, format, search, substring, case, trim, and replace helpers exist. |
+| `str.*` | Partial | Common conversion, number parsing, format, search, substring, case, trim, and replace helpers exist. |
 | `array.*` | Partial | Array construction, read/write, search, copy, insertion/removal, numeric summaries, stack/queue helpers, clear, and common method-call syntax are covered. |
 | `runtime.*` | Partial | `runtime.error()` halts execution with the supplied runtime diagnostic. |
 | Global helpers | Partial | `na()`, `nz()`, `fixnan()`, and explicit `float()`, `int()`, `bool()`, and `string()` casts exist. Broader Pine v6 type-system diagnostics are still planned. |
@@ -153,7 +153,7 @@ The common TA helper pass covers event helpers (`ta.barssince`,
 
 ## Common `str.*` Coverage
 
-The common string helper pass covers `str.tostring`, `str.format`,
+The common string helper pass covers `str.tostring`, `str.tonumber`, `str.format`,
 `str.length`, `str.contains`, `str.startswith`, `str.endswith`, `str.pos`,
 `str.substring`, `str.upper`, `str.lower`, `str.trim`, `str.replace`, and
 `str.replace_all`. These helpers support generated indicators that assemble

@@ -735,6 +735,25 @@ plot(string(12.5) == "12.5", title="String Cast")`;
       expect(result.plots.find((plot) => plot.title === 'String Cast')?.values).toEqual([true, true, true, true]);
     });
 
+    it('parses numeric strings with str.tonumber', () => {
+      const script = `//@version=6
+indicator("String To Number")
+plot(str.tonumber("42.5"), title="Decimal")
+plot(str.tonumber("  -3e2  "), title="Scientific")
+plot(str.tonumber("bad"), title="Invalid")
+plot(na(str.tonumber("")) ? 1 : 0, title="Empty Is NA")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Decimal')?.values).toEqual([42.5, 42.5]);
+      expect(result.plots.find((plot) => plot.title === 'Scientific')?.values).toEqual([-300, -300]);
+      expect(result.plots.find((plot) => plot.title === 'Invalid')?.values).toEqual([null, null]);
+      expect(result.plots.find((plot) => plot.title === 'Empty Is NA')?.values).toEqual([1, 1]);
+    });
+
     it('halts realtime updateBar execution on runtime.error', () => {
       const script = `//@version=6
 indicator("Realtime Runtime Error")
