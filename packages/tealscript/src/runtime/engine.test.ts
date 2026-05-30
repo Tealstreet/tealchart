@@ -921,6 +921,23 @@ plot(x)`;
 
       expect(result.plots[0].values[4]).not.toBeNaN();
     });
+
+    it('calculates cumulative and window statistic TA helpers', () => {
+      const script = `//@version=6
+indicator("TA stats")
+plot(ta.cum(close), title="Cum")
+plot(ta.variance(close, 3), title="Variance")
+plot(ta.dev(close, 3), title="Deviation")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Cum')?.values).toEqual([100.2, 200.9, 302.1]);
+      expect(result.plots.find((plot) => plot.title === 'Variance')?.values).toEqual([null, null, 1 / 6]);
+      expect(result.plots.find((plot) => plot.title === 'Deviation')?.values).toEqual([null, null, 1 / 3]);
+    });
   });
 
   describe('history access', () => {
