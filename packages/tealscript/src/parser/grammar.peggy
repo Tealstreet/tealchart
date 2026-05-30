@@ -90,7 +90,7 @@ IndicatorDeclaration
 
 // User-defined function: f(x, y) => x + y
 FunctionDeclaration
-  = name:Identifier _ "(" _ params:ParameterList? _ ")" _ "=>" _ LineTerminator body:IndentedBlock {
+  = name:Identifier _ "(" _ params:ParameterList? _ ")" _ "=>" _ LineTerminator body:FunctionIndentedBlock {
       return {
         type: 'FunctionDeclaration',
         name,
@@ -319,6 +319,172 @@ IndentedStatement
   = Indent stmt:Statement {
       return stmt;
     }
+
+FunctionIndentedBlock
+  = statements:FunctionIndentedStatement+ {
+      return statements.filter(s => s !== null);
+    }
+
+FunctionIndentedStatement
+  = FunctionIndent stmt:(FunctionIfStatement / Statement) {
+      return stmt;
+    }
+
+FunctionIfStatement
+  = "if" _ test:Expression _ LineTerminator consequent:FunctionNestedBlock alternate:FunctionElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / "if" _ test:Expression _ LineTerminator? _ consequent:SingleLineBody {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent: [consequent],
+        alternate: null,
+        loc: loc()
+      };
+    }
+
+FunctionElseClause
+  = FunctionElseIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionNestedBlock alternate:FunctionElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / FunctionElseIndent "else" _ LineTerminator? block:FunctionNestedBlock {
+      return block;
+    }
+
+FunctionNestedBlock
+  = statements:FunctionNestedStatement+ {
+      return statements.filter(s => s !== null);
+    }
+
+FunctionNestedStatement
+  = FunctionNestedIndent stmt:(FunctionNestedIfStatement / Statement) {
+      return stmt;
+    }
+
+FunctionNestedIfStatement
+  = "if" _ test:Expression _ LineTerminator consequent:FunctionDeepNestedBlock alternate:FunctionNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+
+FunctionNestedElseClause
+  = FunctionNestedIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionDeepNestedBlock alternate:FunctionNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / FunctionNestedIndent "else" _ LineTerminator? block:FunctionDeepNestedBlock {
+      return block;
+    }
+
+FunctionDeepNestedBlock
+  = statements:FunctionDeepNestedStatement+ {
+      return statements.filter(s => s !== null);
+    }
+
+FunctionDeepNestedStatement
+  = FunctionDeepNestedIndent stmt:(FunctionDeepNestedIfStatement / Statement) {
+      return stmt;
+    }
+
+FunctionDeepNestedIfStatement
+  = "if" _ test:Expression _ LineTerminator consequent:FunctionVeryDeepNestedBlock alternate:FunctionDeepNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+
+FunctionDeepNestedElseClause
+  = FunctionDeepNestedIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionVeryDeepNestedBlock alternate:FunctionDeepNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / FunctionDeepNestedIndent "else" _ LineTerminator? block:FunctionVeryDeepNestedBlock {
+      return block;
+    }
+
+FunctionVeryDeepNestedBlock
+  = statements:FunctionVeryDeepNestedStatement+ {
+      return statements.filter(s => s !== null);
+    }
+
+FunctionVeryDeepNestedStatement
+  = FunctionVeryDeepNestedIndent stmt:Statement {
+      return stmt;
+    }
+
+FunctionIndent
+  = "    "
+  / "\t"
+
+FunctionNestedIndent
+  = "        "
+  / "\t\t"
+  / "    \t"
+  / "\t    "
+
+FunctionElseIndent
+  = FunctionNestedIndent
+  / FunctionIndent
+
+FunctionDeepNestedIndent
+  = "            "
+  / "\t\t\t"
+  / "        \t"
+  / "    \t    "
+  / "    \t\t"
+  / "\t        "
+  / "\t    \t"
+  / "\t\t    "
+
+FunctionVeryDeepNestedIndent
+  = "                "
+  / "\t\t\t\t"
+  / "            \t"
+  / "        \t    "
+  / "        \t\t"
+  / "    \t        "
+  / "    \t    \t"
+  / "    \t\t    "
+  / "    \t\t\t"
+  / "\t            "
+  / "\t        \t"
+  / "\t    \t    "
+  / "\t    \t\t"
+  / "\t\t        "
+  / "\t\t    \t"
+  / "\t\t\t    "
 
 SingleLineBody
   = stmt:(VariableDeclaration / AssignmentStatement / ExpressionStatement / BreakStatement / ContinueStatement) {
