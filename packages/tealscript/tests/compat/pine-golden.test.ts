@@ -981,4 +981,49 @@ plot(minuteGate ? 1 : 0, title="Minute Gate")
     expect(getPlot(result, 'Hour').values).toEqual([22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22]);
     expect(getPlot(result, 'Minute Gate').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
   });
+
+  it('matches common Pine session filter idioms', () => {
+    const result = runCompatScript(`
+indicator("Session docs smoke")
+regular = not na(time(timeframe.period, "2218-2224"))
+sessionClose = time_close("1", "2218-2224")
+
+plot(regular ? 1 : 0, title="Regular Session")
+plot(na(sessionClose) ? 0 : 1, title="Session Close")
+plot(time_close - time, title="Bar Duration")
+plot(last_bar_time, title="Last Bar Time")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Regular Session').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0]);
+    expect(getPlot(result, 'Session Close').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0]);
+    expect(getPlot(result, 'Bar Duration').values).toEqual([
+      3_600_000,
+      3_600_000,
+      3_600_000,
+      3_600_000,
+      3_600_000,
+      3_600_000,
+      3_600_000,
+      3_600_000,
+      3_600_000,
+      3_600_000,
+      3_600_000,
+      3_600_000,
+    ]);
+    expect(getPlot(result, 'Last Bar Time').values).toEqual([
+      1_700_000_660_000,
+      1_700_000_660_000,
+      1_700_000_660_000,
+      1_700_000_660_000,
+      1_700_000_660_000,
+      1_700_000_660_000,
+      1_700_000_660_000,
+      1_700_000_660_000,
+      1_700_000_660_000,
+      1_700_000_660_000,
+      1_700_000_660_000,
+      1_700_000_660_000,
+    ]);
+  });
 });
