@@ -352,6 +352,22 @@ plot(selected, title="Selected")`;
       expect(result.plots.find((plot) => plot.title === 'Selected')?.values).toEqual([101.2, 101.7, 102.2]);
     });
 
+    it('returns na for switch block arms without an expression result', () => {
+      const script = `//@version=6
+indicator("Switch Block NA")
+selected = switch
+    close > open =>
+        temp = close + 1
+plot(selected, title="Selected")`;
+
+      const ast = parse(script);
+      const bars = createBars(1, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Selected')?.values[0]).toBeNull();
+    });
+
     it('returns plotcandle OHLC and color outputs with na gaps', () => {
       const script = `//@version=6
 indicator("Synthetic candles", overlay=true)
