@@ -91,7 +91,6 @@ plot(low, color=color.red)`;
       const bars = createBars(3, 100);
       const result = executeScript(ast, bars);
 
-      console.log(result.errors);
       expect(result.errors).toHaveLength(0);
       expect(result.plots).toHaveLength(3);
       expect(result.plots.map((plot) => plot.id)).toEqual([
@@ -903,14 +902,14 @@ future = close[-1]
 tooFar = close[100]
 plot(future, title="Future")
 plot(tooFar, title="Too Far")
-plot(na(future) ? 1 : 0, title="Future Is NA")
-plot(na(tooFar) ? 1 : 0, title="Too Far Is NA")`;
+plot(future == future ? 0 : 1, title="Future Is NA")
+plot(tooFar == tooFar ? 0 : 1, title="Too Far Is NA")`;
 
       const ast = parse(script);
       const bars = createBars(3, 100);
       const result = executeScript(ast, bars);
 
-      expect(result.errors).toHaveLength(0);
+      expect(result.errors).toEqual([]);
       expect(result.plots.find((plot) => plot.title === 'Future')?.values).toEqual([null, null, null]);
       expect(result.plots.find((plot) => plot.title === 'Too Far')?.values).toEqual([null, null, null]);
       expect(result.plots.find((plot) => plot.title === 'Future Is NA')?.values).toEqual([1, 1, 1]);
