@@ -102,6 +102,7 @@ export class TealscriptEngine {
   private builtins: Map<string, BuiltinFunction>;
   private userFunctions: Map<string, FunctionDeclaration>;
   private functionScopes: Map<string, Scope>;
+  private userFunctionCallStack: string[] = [];
   private errors: ExecutionError[] = [];
 
   constructor() {
@@ -122,6 +123,7 @@ export class TealscriptEngine {
     this.ctx.reset();
     this.scope = createRootScope();
     this.functionScopes.clear();
+    this.userFunctionCallStack = [];
     this.registerUserFunctions(ast);
 
     // Load bars into context
@@ -844,9 +846,17 @@ export class TealscriptEngine {
   }
 
   private evaluateUserFunction(fn: FunctionDeclaration, args: unknown[], namedArgs: Map<string, unknown>): unknown {
+    const functionName = fn.name.name;
+    const recursiveIndex = this.userFunctionCallStack.indexOf(functionName);
+    if (recursiveIndex !== -1) {
+      const cycle = [...this.userFunctionCallStack.slice(recursiveIndex), functionName].join(' -> ');
+      throw new Error(`Recursive user function calls are not supported: ${cycle}`);
+    }
+
     const savedScope = this.scope;
-    const functionScope = this.functionScopes.get(fn.name.name) ?? this.scope.createChild();
+    const functionScope = this.functionScopes.get(functionName) ?? this.scope.createChild();
     this.scope = functionScope;
+    this.userFunctionCallStack.push(functionName);
 
     try {
       for (let i = 0; i < fn.params.length; i++) {
@@ -868,6 +878,7 @@ export class TealscriptEngine {
 
       return this.evaluateExpression(fn.body);
     } finally {
+      this.userFunctionCallStack.pop();
       this.scope = savedScope;
     }
   }
