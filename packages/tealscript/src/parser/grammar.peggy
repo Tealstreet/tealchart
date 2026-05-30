@@ -279,6 +279,7 @@ ForStatement
   = "for" _ counter:Identifier _ "in" _ iterable:Expression _ LineTerminator body:IndentedBlock {
       return {
         type: 'ForStatement',
+        kind: 'collection',
         counter,
         iterable,
         body,
@@ -288,6 +289,7 @@ ForStatement
   / "for" _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:IndentedBlock {
       return {
         type: 'ForStatement',
+        kind: 'numeric',
         counter,
         start,
         end,

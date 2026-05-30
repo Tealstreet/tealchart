@@ -562,6 +562,7 @@ function peg$parse(input, options) {
   function peg$f34(counter, iterable, body) {
     return {
       type: 'ForStatement',
+      kind: 'collection',
       counter,
       iterable,
       body,
@@ -571,6 +572,7 @@ function peg$parse(input, options) {
   function peg$f35(counter, start, end, step, body) {
     return {
       type: 'ForStatement',
+      kind: 'numeric',
       counter,
       start,
       end,

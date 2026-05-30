@@ -139,13 +139,23 @@ export interface IfStatement extends BaseNode {
  * for i = 0 to 10 by 2
  *     ...
  */
-export interface ForStatement extends BaseNode {
+export type ForStatement = NumericForStatement | CollectionForStatement;
+
+export interface NumericForStatement extends BaseNode {
   type: 'ForStatement';
+  kind: 'numeric';
   counter: Identifier;
-  start?: Expression;
-  end?: Expression;
+  start: Expression;
+  end: Expression;
   step?: Expression;
-  iterable?: Expression;
+  body: Statement[];
+}
+
+export interface CollectionForStatement extends BaseNode {
+  type: 'ForStatement';
+  kind: 'collection';
+  counter: Identifier;
+  iterable: Expression;
   body: Statement[];
 }
 

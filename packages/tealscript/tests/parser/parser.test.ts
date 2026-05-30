@@ -609,7 +609,11 @@ arrayValue = [1, 2]
     sum := sum + i
 `;
       const ast = parse(code);
-      expect(ast.body[0].type).toBe('ForStatement');
+      const forStmt = ast.body[0];
+      expect(forStmt.type).toBe('ForStatement');
+      if (forStmt.type === 'ForStatement') {
+        expect(forStmt.kind).toBe('numeric');
+      }
     });
 
     it('parses for loop with step', () => {
@@ -620,7 +624,10 @@ arrayValue = [1, 2]
       const forStmt = ast.body[0];
       expect(forStmt.type).toBe('ForStatement');
       if (forStmt.type === 'ForStatement') {
-        expect(forStmt.step).not.toBeNull();
+        expect(forStmt.kind).toBe('numeric');
+        if (forStmt.kind === 'numeric') {
+          expect(forStmt.step).not.toBeNull();
+        }
       }
     });
 
@@ -633,7 +640,10 @@ arrayValue = [1, 2]
 
       expect(forStmt.type).toBe('ForStatement');
       if (forStmt.type === 'ForStatement') {
-        expect(forStmt.iterable?.type).toBe('CallExpression');
+        expect(forStmt.kind).toBe('collection');
+        if (forStmt.kind === 'collection') {
+          expect(forStmt.iterable.type).toBe('CallExpression');
+        }
       }
     });
 
