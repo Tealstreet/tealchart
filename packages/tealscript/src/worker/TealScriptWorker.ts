@@ -5,7 +5,7 @@
  * Provides a clean async API for the chart integration.
  */
 
-import type { AlertOutput, Bar, PlotOutput, InputDefinition } from '../runtime/context';
+import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition } from '../runtime/context';
 import type {
   ToWorkerMessage,
   FromWorkerMessage,
@@ -19,6 +19,7 @@ import type {
  */
 export interface WorkerResult {
   plots: PlotOutput[];
+  drawings: DrawingOutput[];
   alerts: AlertOutput[];
   inputs: InputDefinition[];
 }
@@ -182,6 +183,7 @@ export class TealscriptWorker {
   private handleResult(message: ResultMessage): void {
     this.onResult?.({
       plots: message.plots,
+      drawings: message.drawings,
       alerts: message.alerts,
       inputs: message.inputs,
     });

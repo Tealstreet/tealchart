@@ -56,11 +56,11 @@ plot(close)`;
     });
   });
 
-  describe('unsupported Pine drawing diagnostics', () => {
-    it('records explicit drawing namespace diagnostics', () => {
+  describe('Pine drawing object outputs', () => {
+    it('records label.new outputs and leaves unsupported object diagnostics explicit', () => {
       const script = `//@version=6
 indicator("Drawing calls")
-label.new(bar_index, close, "x")
+label.new(bar_index, close, text="x", xloc=xloc.bar_index, yloc=yloc.price, style=label.style_label_down, color=color.red, textcolor=color.white, size=size.small)
 line.new(bar_index - 1, close[1], bar_index, close)
 table.new(position.top_right, 1, 1)
 box.new(bar_index - 1, high, bar_index, low)
@@ -71,10 +71,25 @@ plot(close)`;
       const result = executeScript(ast, bars);
 
       expect(result.errors.map((error) => error.message)).toEqual([
-        'label.* functions are not supported yet: label.new',
         'line.* functions are not supported yet: line.new',
         'table.* functions are not supported yet: table.new',
         'box.* functions are not supported yet: box.new',
+      ]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'label_label.new_0_0',
+          type: 'label',
+          barIndex: 0,
+          x: 0,
+          y: 100.2,
+          text: 'x',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_down',
+          color: '#F44336',
+          textColor: '#FFFFFF',
+          size: 'small',
+        },
       ]);
     });
   });
