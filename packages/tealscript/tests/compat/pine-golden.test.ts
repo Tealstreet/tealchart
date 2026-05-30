@@ -1282,4 +1282,89 @@ plot(label.get_x(marker), title="Marker X")
     ]);
     expect(getPlot(result, 'Marker X').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 11]);
   });
+
+  it('updates channel lines, linefills, and boxes from common drawing idioms', () => {
+    const result = runCompatScript(`
+indicator("Channel and zone drawings", overlay=true)
+var upper = line.new(0, high, 1, high)
+var lower = line.new(0, low, 1, low)
+var channel = linefill.new(upper, lower, color=color.new(color.green, 70))
+var zone = box.new(0, high, 1, low, border_color=color.blue, bgcolor=color.new(color.blue, 80), text="zone")
+if barstate.islast
+    line.set_xy1(upper, bar_index - 1, high[1])
+    line.set_xy2(upper, bar_index, high)
+    line.set_xy1(lower, bar_index - 1, low[1])
+    line.set_xy2(lower, bar_index, low)
+    linefill.set_color(channel, color.new(color.green, 50))
+    box.set_lefttop(zone, bar_index - 2, high)
+    box.set_rightbottom(zone, bar_index, low)
+    box.set_text(zone, "range")
+plot(line.get_price(upper, bar_index), title="Upper Price")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'line_line.new_0_0',
+        type: 'line',
+        persistent: true,
+        barIndex: 11,
+        x1: 10,
+        y1: 114,
+        x2: 11,
+        y2: 113,
+        xloc: 'bar_index',
+        extend: 'none',
+        color: null,
+        style: 'solid',
+        width: 1,
+        forceOverlay: false,
+      },
+      {
+        id: 'line_line.new_1_0',
+        type: 'line',
+        persistent: true,
+        barIndex: 11,
+        x1: 10,
+        y1: 109,
+        x2: 11,
+        y2: 108,
+        xloc: 'bar_index',
+        extend: 'none',
+        color: null,
+        style: 'solid',
+        width: 1,
+        forceOverlay: false,
+      },
+      {
+        id: 'linefill_linefill.new_0_0',
+        type: 'linefill',
+        persistent: true,
+        barIndex: 0,
+        line1: 'line_line.new_0_0',
+        line2: 'line_line.new_1_0',
+        color: '#4CAF5080',
+      },
+      {
+        id: 'box_box.new_0_0',
+        type: 'box',
+        persistent: true,
+        barIndex: 11,
+        left: 9,
+        top: 113,
+        right: 11,
+        bottom: 108,
+        xloc: 'bar_index',
+        extend: 'none',
+        borderColor: '#2196F3',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        bgcolor: '#2196F333',
+        text: 'range',
+        textColor: null,
+        textSize: 'normal',
+      },
+    ]);
+    expect(getPlot(result, 'Upper Price').values).toEqual([103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 113]);
+  });
 });
