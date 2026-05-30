@@ -995,6 +995,7 @@ plot(ta.median(close, 3), title="Median")
 plot(ta.mode(close, 3), title="Mode")
 plot(ta.percentile_nearest_rank(close, 3, 75), title="Nearest")
 plot(ta.percentile_linear_interpolation(close, 3, 75), title="Linear")
+plot(ta.percentrank(close, 3), title="Percent Rank")
 plot(ta.median(close - open, 3), title="Derived Median")`;
 
       const ast = parse(script);
@@ -1012,6 +1013,7 @@ plot(ta.median(close - open, 3), title="Derived Median")`;
       expect(result.plots.find((plot) => plot.title === 'Mode')?.values).toEqual([null, null, 1, 2, 2]);
       expect(result.plots.find((plot) => plot.title === 'Nearest')?.values).toEqual([null, null, 3, 5, 5]);
       expect(result.plots.find((plot) => plot.title === 'Linear')?.values).toEqual([null, null, 2.5, 4, 4.5]);
+      expect(result.plots.find((plot) => plot.title === 'Percent Rank')?.values).toEqual([null, null, (2 / 3) * 100, 100, (2 / 3) * 100]);
       expect(result.plots.find((plot) => plot.title === 'Derived Median')?.values).toEqual([null, null, 1, 1, 1]);
     });
 

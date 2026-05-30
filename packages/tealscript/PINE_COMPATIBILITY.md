@@ -138,8 +138,8 @@ The common TA helper pass covers event helpers (`ta.barssince`,
 `ta.variance`, `ta.vwma`, `ta.highestbars`, `ta.lowestbars`), and
 compatibility aliases/helpers (`ta.cross`, `ta.range`, `ta.rising`, and
 `ta.falling`). The statistical helper pass covers `ta.median`, `ta.mode`,
-`ta.percentile_nearest_rank`, and `ta.percentile_linear_interpolation`. These
-are covered in the golden compatibility harness.
+`ta.percentile_nearest_rank`, `ta.percentile_linear_interpolation`, and
+`ta.percentrank`. These are covered in the golden compatibility harness.
 
 ## Common `str.*` Coverage
 
