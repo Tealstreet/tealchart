@@ -24,7 +24,18 @@ export function getArrayValue<T = unknown>(array: PineArray<T>, index: number): 
 }
 
 export function setArrayValue<T = unknown>(array: PineArray<T>, index: number, value: T): void {
-  array.values[Math.trunc(index)] = value;
+  let normalizedIndex = Math.trunc(index);
+  const size = getArraySize(array);
+
+  if (normalizedIndex < 0) {
+    normalizedIndex = size + normalizedIndex;
+  }
+
+  if (normalizedIndex < 0 || normalizedIndex >= size) {
+    throw new Error(`Array index ${Math.trunc(index)} is out of bounds. Array size is ${size}`);
+  }
+
+  array.values[normalizedIndex] = value;
 }
 
 export function pushArrayValue<T = unknown>(array: PineArray<T>, value: T): number {

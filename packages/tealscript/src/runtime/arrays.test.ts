@@ -23,13 +23,29 @@ describe('PineArray', () => {
   });
 
   it('reads and writes by numeric index', () => {
-    const array = createPineArray<number>();
+    const array = createPineArray<number>(2);
 
     setArrayValue(array, 0, 10);
     setArrayValue(array, 1, 20);
 
     expect(getArrayValue(array, 0)).toBe(10);
     expect(getArrayValue(array, 1)).toBe(20);
+  });
+
+  it('writes negative indices from the end', () => {
+    const array = createPineArray<number>(3, 0);
+
+    setArrayValue(array, -1, 30);
+
+    expect(array.values).toEqual([0, 0, 30]);
+  });
+
+  it('throws when setting an out-of-bounds index', () => {
+    const array = createPineArray<number>(2, 0);
+
+    expect(() => setArrayValue(array, 2, 30)).toThrow('Array index 2 is out of bounds. Array size is 2');
+    expect(() => setArrayValue(array, -3, 30)).toThrow('Array index -3 is out of bounds. Array size is 2');
+    expect(array.values).toEqual([0, 0]);
   });
 
   it('supports stack and queue operations', () => {
