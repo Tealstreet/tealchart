@@ -94,7 +94,7 @@ plot(spread(source=high, length=3), title="Named Spread")
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Spread').values)).toEqual([null, null, 2.333333, -2, -4, -0.666667, 3, 4.666667, 1, 1.666667, 0.333333, 1]);
-    expect(getPlot(result, 'Named Spread').values).toHaveLength(compatibilityBars.length);
+    expect(roundSeries(getPlot(result, 'Named Spread').values)).toEqual([null, null, 2.333333, 1.333333, -3, -3.666667, 1.666667, 4.666667, 2.333333, 1, 1.666667, 0]);
   });
 
   it('runs flat multiline user-defined functions', () => {
