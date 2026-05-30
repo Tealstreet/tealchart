@@ -84,7 +84,7 @@ Remaining gaps:
 
 | Namespace | Status | Notes |
 | --- | --- | --- |
-| `math.*` | Partial | Common numeric functions exist. Constants and Pine-specific helpers are incomplete. |
+| `math.*` | Partial | Common numeric functions, constants, `math.avg`, precision rounding, truncation, and angle conversion helpers exist. Pine-specific helpers are still incomplete. |
 | `ta.*` | Partial | Includes SMA, EMA, RSI, MACD, ATR, BB, VWAP, Supertrend, DMI, SAR, pivots, `barssince`, `valuewhen`, `vwma`, `highestbars`, `lowestbars`, `cross`, `range`, and more. |
 | `input.*` | Partial | Generic `input()`, int, float, bool, string, color, source, time, symbol, timeframe, session, and text area exist. Advanced UI/display behavior is incomplete. |
 | `color.*` | Partial | Core named colors, `color.new()`, `color.rgb()`, channel extraction, and `color.from_gradient()` exist. Named color constants still need exact Pine v6 parity. |
@@ -152,3 +152,11 @@ The common color helper pass covers `color.rgb`, `color.new`, `color.r`,
 `color.g`, `color.b`, `color.t`, and `color.from_gradient`. The checkpoint
 fixture follows TradingView's documented calculated-color idioms by deriving a
 variant color from RGB channels and plotting an RSI gradient.
+
+## Common `math.*` Coverage
+
+The common math helper pass covers constants (`math.pi`, `math.e`, `math.phi`),
+variadic `math.avg`, precision-aware `math.round`, `math.trunc`, and
+degree/radian conversion helpers. The checkpoint fixture follows common Pine
+math idioms by averaging OHLC values, rounding to fixed precision, and
+converting a right angle between radians and degrees.
