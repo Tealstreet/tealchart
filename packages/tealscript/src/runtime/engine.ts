@@ -2472,9 +2472,12 @@ export class TealscriptEngine {
       const values: number[] = [];
       for (let i = 0; i < length; i++) {
         const value = series.get(i);
-        if (value === undefined || isNaN(value)) return NaN;
-        values.push(value);
+        if (value !== undefined && !isNaN(value)) {
+          values.push(value);
+        }
       }
+
+      if (values.length < length) return NaN;
 
       const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
       return values.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / values.length;
@@ -2488,9 +2491,12 @@ export class TealscriptEngine {
       const values: number[] = [];
       for (let i = 0; i < length; i++) {
         const value = series.get(i);
-        if (value === undefined || isNaN(value)) return NaN;
-        values.push(value);
+        if (value !== undefined && !isNaN(value)) {
+          values.push(value);
+        }
       }
+
+      if (values.length < length) return NaN;
 
       const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
       return values.reduce((sum, value) => sum + Math.abs(value - mean), 0) / values.length;
