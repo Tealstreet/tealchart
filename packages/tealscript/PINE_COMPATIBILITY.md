@@ -121,8 +121,9 @@ derived regular-series history, and unavailable or future offsets returning
 | `plotshape`, `plotchar`, `plotarrow` | Partial | Core outputs exist; styling parity is incomplete. |
 | `barcolor` | Supported | Produces per-bar candle color outputs consumed by the main-pane renderer. |
 | `plotbar`, `plotcandle` | Supported | Produce OHLC outputs with per-bar body, wick, and border colors; renderer draws custom bars/candles. |
-| `label.*` | Partial | `label.new()` emits typed runtime drawing outputs. Common setters/getters, `label.copy()`, and `label.delete()` work for runtime object state. GC limits, full style parity, and renderer support are still planned. |
-| `line.*`, `box.*`, `table.*` | Planned | Namespace calls report explicit unsupported runtime diagnostics. Object lifecycle and renderer support are still planned. |
+| `label.*` | Partial | `label.new()` emits typed runtime drawing outputs. Common setters/getters, `label.copy()`, and `label.delete()` work for runtime object state. Main-pane renderer support exists for basic label boxes. GC limits and full style parity are still planned. |
+| `line.*` | Partial | `line.new()` emits typed runtime drawing outputs. Common coordinate/style setters, coordinate getters, `line.get_price()`, `line.copy()`, and `line.delete()` work for runtime object state. Main-pane renderer support exists for basic line segments and horizontal extension. |
+| `box.*`, `table.*` | Planned | Namespace calls report explicit unsupported runtime diagnostics. Object lifecycle and renderer support are still planned. |
 
 ## Alerts, Strategies, And Data
 
