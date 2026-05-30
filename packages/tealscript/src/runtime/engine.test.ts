@@ -24,6 +24,33 @@ function createBars(count: number, startPrice = 100): Bar[] {
 }
 
 describe('TealscriptEngine', () => {
+  describe('unsupported Pine strategy diagnostics', () => {
+    it('records an explicit strategy declaration diagnostic', () => {
+      const script = `//@version=6
+strategy("Test strategy", overlay=true)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors[0]?.message).toBe('strategy() declarations are not supported yet');
+    });
+
+    it('records an explicit strategy namespace diagnostic', () => {
+      const script = `//@version=6
+indicator("Strategy call")
+strategy.entry("Long", strategy.long)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors[0]?.message).toBe('strategy.* functions are not supported yet: strategy.entry');
+    });
+  });
+
   describe('basic execution', () => {
     it('executes a simple script', () => {
       const script = `//@version=6
@@ -300,6 +327,29 @@ plot(direction, title="Direction")`;
 
       expect(result.errors).toHaveLength(0);
       expect(result.plots.find((plot) => plot.title === 'Direction')?.values).toEqual([1, 1, 1]);
+    });
+
+    it('evaluates switch expression block arms', () => {
+      const script = `//@version=6
+indicator("Switch Block")
+mode = "EMA"
+selected = switch mode
+    "SMA" =>
+        basis = open + 1
+        basis
+    "EMA" =>
+        basis = close + 1
+        basis
+    =>
+        high
+plot(selected, title="Selected")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Selected')?.values).toEqual([101.2, 101.7, 102.2]);
     });
 
     it('returns plotcandle OHLC and color outputs with na gaps', () => {

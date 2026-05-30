@@ -250,6 +250,10 @@ export class TealscriptEngine {
     // Only process on first bar
     if (this.ctx.bar_index !== 0) return;
 
+    if (stmt.declarationKind === 'strategy') {
+      throw new Error('strategy() declarations are not supported yet');
+    }
+
     if (stmt.title) {
       this.ctx.indicatorTitle = this.evaluateExpression(stmt.title) as string;
     }
@@ -649,11 +653,11 @@ export class TealscriptEngine {
       const discriminant = this.evaluateExpression(expr.discriminant);
       for (const switchCase of expr.cases) {
         if (!switchCase.test) {
-          return this.evaluateExpression(switchCase.consequent);
+          return this.evaluateSwitchConsequent(switchCase.consequent);
         }
         const test = this.evaluateExpression(switchCase.test);
         if (this.switchValuesEqual(discriminant, test)) {
-          return this.evaluateExpression(switchCase.consequent);
+          return this.evaluateSwitchConsequent(switchCase.consequent);
         }
       }
       return NaN;
@@ -661,11 +665,20 @@ export class TealscriptEngine {
 
     for (const switchCase of expr.cases) {
       if (!switchCase.test || this.isTruthy(this.evaluateExpression(switchCase.test))) {
-        return this.evaluateExpression(switchCase.consequent);
+        return this.evaluateSwitchConsequent(switchCase.consequent);
       }
     }
 
     return NaN;
+  }
+
+  private evaluateSwitchConsequent(consequent: Expression | Statement[]): unknown {
+    if (!Array.isArray(consequent)) {
+      return this.evaluateExpression(consequent);
+    }
+
+    const result = this.executeFunctionStatements(consequent);
+    return result.hasResult ? result.value : undefined;
   }
 
   private switchValuesEqual(left: unknown, right: unknown): boolean {
@@ -692,6 +705,10 @@ export class TealscriptEngine {
     }
 
     const fullName = namespace ? `${namespace}.${funcName}` : funcName;
+
+    if (namespace === 'strategy') {
+      throw new Error(`strategy.* functions are not supported yet: ${fullName}`);
+    }
 
     // Evaluate arguments
     const args: unknown[] = [];
