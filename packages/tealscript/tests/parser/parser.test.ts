@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { parse, validate, TealscriptParseError, formatParseError } from '../../src/parser';
-import type { Program, IndicatorDeclaration, VariableDeclaration, CallExpression } from '../../src/parser';
+import type { Program, FunctionDeclaration, IndicatorDeclaration, VariableDeclaration, CallExpression } from '../../src/parser';
 
 describe('Tealscript Parser', () => {
   describe('Version annotation', () => {
@@ -94,6 +94,63 @@ describe('Tealscript Parser', () => {
         expect(decl.names.names[0].name).toBe('a');
         expect(decl.names.names[1].name).toBe('b');
         expect(decl.names.names[2].name).toBe('c');
+      }
+    });
+  });
+
+  describe('Function declarations', () => {
+    it('parses single-line user-defined functions without parameters', () => {
+      const ast = parse('answer() => 42\n');
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(fn.name.name).toBe('answer');
+      expect(fn.params).toEqual([]);
+      expect(fn.body).toEqual(expect.objectContaining({
+        type: 'NumericLiteral',
+        value: 42,
+      }));
+    });
+
+    it('parses single-line user-defined functions with parameters', () => {
+      const ast = parse('spread(source, length) => source - ta.sma(source, length)\n');
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(fn.name.name).toBe('spread');
+      expect(fn.params.map((param) => param.name)).toEqual(['source', 'length']);
+      expect(fn.body).toEqual(expect.objectContaining({
+        type: 'BinaryExpression',
+        operator: '-',
+      }));
+    });
+
+    it('parses multiline user-defined functions', () => {
+      const ast = parse(`spread(source, length) =>
+    basis = ta.sma(source, length)
+    source - basis
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(fn.params.map((param) => param.name)).toEqual(['source', 'length']);
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        expect(fn.body.map((statement) => statement.type)).toEqual(['VariableDeclaration', 'ExpressionStatement']);
+      }
+    });
+
+    it('parses multiline functions with multiple expression statements', () => {
+      const ast = parse(`rangeSize(highValue, lowValue) =>
+    range = highValue - lowValue
+    math.abs(range)
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        expect(fn.body.map((statement) => statement.type)).toEqual(['VariableDeclaration', 'ExpressionStatement']);
       }
     });
   });

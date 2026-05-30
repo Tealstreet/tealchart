@@ -35,6 +35,7 @@ export interface Program extends BaseNode {
 
 export type Statement =
   | IndicatorDeclaration
+  | FunctionDeclaration
   | VariableDeclaration
   | AssignmentStatement
   | ExpressionStatement
@@ -58,6 +59,18 @@ export interface IndicatorDeclaration extends BaseNode {
   max_bars_back?: Expression;
   timeframe?: Expression;
   timeframe_gaps?: Expression;
+}
+
+/**
+ * User-defined function declaration.
+ *
+ * myFunc(x, y) => x + y
+ */
+export interface FunctionDeclaration extends BaseNode {
+  type: 'FunctionDeclaration';
+  name: Identifier;
+  params: Identifier[];
+  body: Expression | Statement[];
 }
 
 /**
@@ -369,6 +382,7 @@ export function isExpression(node: AnyNode): node is Expression {
 export function isStatement(node: AnyNode): node is Statement {
   return [
     'IndicatorDeclaration',
+    'FunctionDeclaration',
     'VariableDeclaration',
     'AssignmentStatement',
     'ExpressionStatement',

@@ -10,6 +10,7 @@ import type {
   Statement,
   Expression,
   IndicatorDeclaration,
+  FunctionDeclaration,
   VariableDeclaration,
   AssignmentStatement,
   IfStatement,
@@ -68,12 +69,14 @@ export class TealscriptEngine {
   private ctx: ExecutionContext;
   private scope: Scope;
   private builtins: Map<string, BuiltinFunction>;
+  private userFunctions: Map<string, FunctionDeclaration>;
   private errors: ExecutionError[] = [];
 
   constructor() {
     this.ctx = new ExecutionContext();
     this.scope = createRootScope();
     this.builtins = new Map();
+    this.userFunctions = new Map();
 
     this.registerBuiltins();
   }
@@ -85,6 +88,7 @@ export class TealscriptEngine {
     this.errors = [];
     this.ctx.reset();
     this.scope = createRootScope();
+    this.registerUserFunctions(ast);
 
     // Load bars into context
     this.ctx.loadBars(bars);
@@ -149,6 +153,7 @@ export class TealscriptEngine {
     // Update current bar data
     this.ctx.updateCurrentBar(bar);
     this.resetPerBarBuiltinState();
+    this.registerUserFunctions(ast);
 
     // Re-execute statements for current bar
     for (const stmt of ast.body) {
@@ -171,6 +176,8 @@ export class TealscriptEngine {
     switch (stmt.type) {
       case 'IndicatorDeclaration':
         this.executeIndicator(stmt);
+        break;
+      case 'FunctionDeclaration':
         break;
       case 'VariableDeclaration':
         this.executeVariableDeclaration(stmt);
@@ -209,6 +216,15 @@ export class TealscriptEngine {
     }
     if (stmt.precision) {
       this.ctx.indicatorPrecision = this.evaluateExpression(stmt.precision) as number;
+    }
+  }
+
+  private registerUserFunctions(ast: Program): void {
+    this.userFunctions.clear();
+    for (const stmt of ast.body) {
+      if (stmt.type === 'FunctionDeclaration') {
+        this.userFunctions.set(stmt.name.name, stmt);
+      }
     }
   }
 
@@ -562,7 +578,44 @@ export class TealscriptEngine {
       return builtin(args, namedArgs, this.ctx, this.scope);
     }
 
+    if (!namespace) {
+      const userFunction = this.userFunctions.get(funcName);
+      if (userFunction) {
+        return this.evaluateUserFunction(userFunction, args, namedArgs);
+      }
+    }
+
     throw new Error(`Unknown function: ${fullName}`);
+  }
+
+  private evaluateUserFunction(fn: FunctionDeclaration, args: unknown[], namedArgs: Map<string, unknown>): unknown {
+    const savedScope = this.scope;
+    const functionScope = this.scope.createChild();
+    this.scope = functionScope;
+
+    try {
+      for (let i = 0; i < fn.params.length; i++) {
+        const paramName = fn.params[i].name;
+        const value = namedArgs.has(paramName) ? namedArgs.get(paramName) : args[i];
+        this.scope.declare(paramName, 'none', value);
+      }
+
+      if (Array.isArray(fn.body)) {
+        let result: unknown = undefined;
+        for (const stmt of fn.body) {
+          if (stmt.type === 'ExpressionStatement') {
+            result = this.evaluateExpression(stmt.expression);
+          } else {
+            this.executeStatement(stmt);
+          }
+        }
+        return result;
+      }
+
+      return this.evaluateExpression(fn.body);
+    } finally {
+      this.scope = savedScope;
+    }
   }
 
   private evaluateMember(expr: MemberExpression): unknown {
