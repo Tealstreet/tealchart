@@ -999,6 +999,10 @@ export class TealscriptEngine {
           return this.naIfMissing(this.ctx.volume.get(offset));
         case 'time':
           return this.naIfMissing(this.ctx.time.get(offset));
+        case 'time_close': {
+          const openTime = this.ctx.time.get(offset);
+          return openTime === undefined ? Number.NaN : this.naIfMissing(this.getBarCloseTime(openTime, this.ctx.timeframe.period));
+        }
       }
 
       // Check scope for series variable
