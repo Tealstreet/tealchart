@@ -1,6 +1,11 @@
 export interface PineArray<T = unknown> {
   readonly __tealscriptArray: true;
   values: T[];
+  view?: {
+    parent: PineArray<T>;
+    from: number;
+    to: number;
+  };
 }
 
 export function createPineArray<T = unknown>(size: number = 0, initialValue?: T): PineArray<T> {
@@ -16,11 +21,30 @@ export function isPineArray(value: unknown): value is PineArray {
 }
 
 export function getArraySize(array: PineArray): number {
+  if (array.view) {
+    assertSliceBounds(array);
+    return array.view.to - array.view.from;
+  }
   return array.values.length;
 }
 
 export function getArrayValue<T = unknown>(array: PineArray<T>, index: number): T | undefined {
+  if (array.view) {
+    return getArrayValue(array.view.parent, array.view.from + normalizeExistingIndex(index, getArraySize(array)));
+  }
   return array.values[Math.trunc(index)];
+}
+
+function getArrayValues<T = unknown>(array: PineArray<T>): T[] {
+  return Array.from({ length: getArraySize(array) }, (_, index) => getArrayValue(array, index) as T);
+}
+
+function assertSliceBounds(array: PineArray): void {
+  if (!array.view) return;
+  const parentSize = getArraySize(array.view.parent);
+  if (array.view.from < 0 || array.view.to > parentSize || array.view.from > array.view.to) {
+    throw new Error('Slice is out of bounds of the parent array');
+  }
 }
 
 function normalizeExistingIndex(index: number, size: number): number {
@@ -38,54 +62,89 @@ function normalizeExistingIndex(index: number, size: number): number {
 }
 
 export function setArrayValue<T = unknown>(array: PineArray<T>, index: number, value: T): void {
-  array.values[normalizeExistingIndex(index, getArraySize(array))] = value;
+  const normalizedIndex = normalizeExistingIndex(index, getArraySize(array));
+  if (array.view) {
+    setArrayValue(array.view.parent, array.view.from + normalizedIndex, value);
+    return;
+  }
+  array.values[normalizedIndex] = value;
 }
 
 export function pushArrayValue<T = unknown>(array: PineArray<T>, value: T): number {
+  if (array.view) {
+    insertArrayValue(array.view.parent, array.view.to, value);
+    array.view.to += 1;
+    return getArraySize(array);
+  }
   return array.values.push(value);
 }
 
 export function popArrayValue<T = unknown>(array: PineArray<T>): T | undefined {
+  if (array.view) {
+    const size = getArraySize(array);
+    if (size === 0) return undefined;
+    const value = removeArrayValue(array.view.parent, array.view.from + size - 1);
+    array.view.to -= 1;
+    return value;
+  }
   return array.values.pop();
 }
 
 export function shiftArrayValue<T = unknown>(array: PineArray<T>): T | undefined {
+  if (array.view) {
+    if (getArraySize(array) === 0) return undefined;
+    const value = removeArrayValue(array.view.parent, array.view.from);
+    array.view.to -= 1;
+    return value;
+  }
   return array.values.shift();
 }
 
 export function unshiftArrayValue<T = unknown>(array: PineArray<T>, value: T): number {
+  if (array.view) {
+    insertArrayValue(array.view.parent, array.view.from, value);
+    array.view.to += 1;
+    return getArraySize(array);
+  }
   return array.values.unshift(value);
 }
 
 export function clearArray(array: PineArray): void {
+  if (array.view) {
+    while (getArraySize(array) > 0) {
+      removeArrayValue(array, 0);
+    }
+    return;
+  }
   array.values.length = 0;
 }
 
 export function copyArray<T = unknown>(array: PineArray<T>): PineArray<T> {
   return {
     __tealscriptArray: true,
-    values: [...array.values],
+    values: getArrayValues(array),
   };
 }
 
 export function firstArrayValue<T = unknown>(array: PineArray<T>): T | undefined {
-  return array.values[0];
+  return getArrayValue(array, 0);
 }
 
 export function lastArrayValue<T = unknown>(array: PineArray<T>): T | undefined {
-  return array.values[array.values.length - 1];
+  const size = getArraySize(array);
+  return size === 0 ? undefined : getArrayValue(array, size - 1);
 }
 
 export function includesArrayValue<T = unknown>(array: PineArray<T>, value: T): boolean {
-  return array.values.includes(value);
+  return getArrayValues(array).includes(value);
 }
 
 export function indexOfArrayValue<T = unknown>(array: PineArray<T>, value: T): number {
-  return array.values.indexOf(value);
+  return getArrayValues(array).indexOf(value);
 }
 
 export function lastIndexOfArrayValue<T = unknown>(array: PineArray<T>, value: T): number {
-  return array.values.lastIndexOf(value);
+  return getArrayValues(array).lastIndexOf(value);
 }
 
 export function insertArrayValue<T = unknown>(array: PineArray<T>, index: number, value: T): number {
@@ -100,17 +159,31 @@ export function insertArrayValue<T = unknown>(array: PineArray<T>, index: number
     throw new Error(`Array index ${Math.trunc(index)} is out of bounds. Array size is ${size}`);
   }
 
+  if (array.view) {
+    insertArrayValue(array.view.parent, array.view.from + normalizedIndex, value);
+    array.view.to += 1;
+    return getArraySize(array);
+  }
+
   array.values.splice(normalizedIndex, 0, value);
   return getArraySize(array);
 }
 
 export function removeArrayValue<T = unknown>(array: PineArray<T>, index: number): T | undefined {
-  return array.values.splice(normalizeExistingIndex(index, getArraySize(array)), 1)[0];
+  const normalizedIndex = normalizeExistingIndex(index, getArraySize(array));
+  if (array.view) {
+    const value = removeArrayValue(array.view.parent, array.view.from + normalizedIndex);
+    array.view.to -= 1;
+    return value;
+  }
+
+  return array.values.splice(normalizedIndex, 1)[0];
 }
 
 export function sortArray(array: PineArray, order: unknown = 'ascending'): void {
   const descending = order === 'descending';
-  array.values.sort((left, right) => {
+  const values = getArrayValues(array);
+  values.sort((left, right) => {
     const leftMissing = left === '' || (typeof left === 'number' && Number.isNaN(left));
     const rightMissing = right === '' || (typeof right === 'number' && Number.isNaN(right));
 
@@ -122,6 +195,7 @@ export function sortArray(array: PineArray, order: unknown = 'ascending'): void 
     const result = typeof left === 'number' && typeof right === 'number' ? left - right : compareStrings(String(left), String(right));
     return descending ? -result : result;
   });
+  values.forEach((value, index) => setArrayValue(array, index, value));
 }
 
 function compareStrings(left: string, right: string): number {
@@ -131,20 +205,45 @@ function compareStrings(left: string, right: string): number {
 }
 
 export function reverseArray(array: PineArray): void {
-  array.values.reverse();
+  const values = getArrayValues(array).reverse();
+  values.forEach((value, index) => setArrayValue(array, index, value));
 }
 
 export function joinArray(array: PineArray, separator: unknown = ''): string {
-  return array.values.join(String(separator));
+  return getArrayValues(array).join(String(separator));
 }
 
 export function concatArray<T = unknown>(array: PineArray<T>, other: PineArray<T>): PineArray<T> {
-  array.values.push(...other.values);
+  getArrayValues(other).forEach((value) => pushArrayValue(array, value));
   return array;
 }
 
+export function sliceArray<T = unknown>(array: PineArray<T>, from: number, to: number): PineArray<T> {
+  const normalizedFrom = Math.trunc(from);
+  const normalizedTo = Math.trunc(to);
+  if (!Number.isFinite(normalizedFrom) || !Number.isFinite(normalizedTo)) {
+    throw new Error('Slice indices must be finite numbers');
+  }
+  if (normalizedFrom >= normalizedTo) {
+    throw new Error("Index 'from' should be less than index 'to'");
+  }
+  if (normalizedFrom < 0 || normalizedTo > getArraySize(array)) {
+    throw new Error('Slice is out of bounds of the parent array');
+  }
+
+  return {
+    __tealscriptArray: true,
+    values: [],
+    view: {
+      parent: array,
+      from: normalizedFrom,
+      to: normalizedTo,
+    },
+  };
+}
+
 function numericArrayValues(array: PineArray): number[] {
-  return array.values.map(Number).filter((value) => !Number.isNaN(value));
+  return getArrayValues(array).map(Number).filter((value) => !Number.isNaN(value));
 }
 
 export function minArrayValue(array: PineArray): number {

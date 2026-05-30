@@ -24,6 +24,7 @@ import {
   reverseArray,
   setArrayValue,
   shiftArrayValue,
+  sliceArray,
   sortArray,
   sumArrayValue,
   unshiftArrayValue,
@@ -159,6 +160,54 @@ describe('PineArray', () => {
 
     sortArray(array, 'descending');
     expect(array.values).toEqual(['{ABC}', 'a', 'A', '1', '!']);
+  });
+
+  it('creates slice windows over parent arrays', () => {
+    const array = createPineArray<number>();
+    [0, 1, 2, 3].forEach((value) => pushArrayValue(array, value));
+
+    const slice = sliceArray(array, 0, 3);
+    expect(getArraySize(slice)).toBe(3);
+    expect(getArrayValue(slice, 1)).toBe(1);
+    expect(() => getArrayValue(slice, 3)).toThrow('Array index 3 is out of bounds. Array size is 3');
+
+    expect(removeArrayValue(array, 0)).toBe(0);
+    expect(getArrayValue(slice, 0)).toBe(1);
+    expect(getArrayValue(slice, 2)).toBe(3);
+
+    expect(pushArrayValue(slice, 4)).toBe(4);
+    expect(array.values).toEqual([1, 2, 3, 4]);
+
+    setArrayValue(slice, 1, 20);
+    expect(array.values).toEqual([1, 20, 3, 4]);
+  });
+
+  it('mutates slice windows through common array helpers', () => {
+    const array = createPineArray<number>();
+    [0, 3, 1, 2, 4].forEach((value) => pushArrayValue(array, value));
+    const slice = sliceArray(array, 1, 4);
+
+    sortArray(slice);
+    expect(array.values).toEqual([0, 1, 2, 3, 4]);
+
+    expect(unshiftArrayValue(slice, 9)).toBe(4);
+    expect(array.values).toEqual([0, 9, 1, 2, 3, 4]);
+    expect(shiftArrayValue(slice)).toBe(9);
+    expect(popArrayValue(slice)).toBe(3);
+    expect(array.values).toEqual([0, 1, 2, 4]);
+    expect(joinArray(slice, ',')).toBe('1,2');
+  });
+
+  it('throws when a parent mutation leaves a slice out of bounds', () => {
+    const array = createPineArray<number>();
+    [0, 1, 2, 3, 4].forEach((value) => pushArrayValue(array, value));
+    const slice = sliceArray(array, 3, 5);
+
+    removeArrayValue(array, 0);
+
+    expect(() => getArraySize(slice)).toThrow('Slice is out of bounds of the parent array');
+    expect(() => sliceArray(array, 2, 2)).toThrow("Index 'from' should be less than index 'to'");
+    expect(() => sliceArray(array, Number.NaN, 3)).toThrow('Slice indices must be finite numbers');
   });
 
   it('summarizes numeric arrays', () => {

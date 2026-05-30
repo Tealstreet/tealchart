@@ -466,6 +466,53 @@ plot(values.size(), title="Size")`;
       expect(result.plots.find((plot) => plot.title === 'Size')?.values).toEqual([5, 5]);
     });
 
+    it('executes array slice windows', () => {
+      const script = `//@version=6
+indicator("Array Slice")
+values = array.from(0, 1, 2, 3)
+window = values.slice(0, 3)
+removed = values.remove(0)
+window.push(4)
+window.set(1, 20)
+plot(window.get(0), title="Window First")
+plot(window.get(1), title="Window Second")
+plot(values.size(), title="Parent Size")
+plot(values.get(3), title="Parent Tail")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Window First')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Window Second')?.values).toEqual([20, 20]);
+      expect(result.plots.find((plot) => plot.title === 'Parent Size')?.values).toEqual([4, 4]);
+      expect(result.plots.find((plot) => plot.title === 'Parent Tail')?.values).toEqual([4, 4]);
+    });
+
+    it('iterates array slice windows', () => {
+      const script = `//@version=6
+indicator("Array Slice Loop")
+values = array.from(1, 2, 3, 4)
+window = values.slice(1, 3)
+total = 0
+for value in window
+    total += value
+indexed = 0
+for [index, value] in window
+    indexed += index + value
+plot(total, title="Total")
+plot(indexed, title="Indexed")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Total')?.values).toEqual([5, 5]);
+      expect(result.plots.find((plot) => plot.title === 'Indexed')?.values).toEqual([6, 6]);
+    });
+
     it('returns expression results from user function if branches', () => {
       const script = `//@version=6
 indicator("Function If")
