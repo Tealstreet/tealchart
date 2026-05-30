@@ -105,6 +105,7 @@ derived regular-series history, and unavailable or future offsets returning
 | `color.*` | Partial | Core named colors, `color.new()`, `color.rgb()`, channel extraction, and `color.from_gradient()` exist. Named color constants still need exact Pine v6 parity. |
 | `str.*` | Partial | Common conversion, format, search, substring, case, trim, and replace helpers exist. |
 | `array.*` | Partial | Array construction, read/write, search, copy, insertion/removal, numeric summaries, stack/queue helpers, clear, and common method-call syntax are covered. |
+| `runtime.*` | Partial | `runtime.error()` halts execution with the supplied runtime diagnostic. |
 | `map.*` / `matrix.*` | Planned | Lower priority than arrays. |
 | `request.*` | Planned | Requires Tealchart datafeed design. Start with `request.security()`. |
 
