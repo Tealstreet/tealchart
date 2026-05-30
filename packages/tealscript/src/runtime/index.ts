@@ -39,16 +39,19 @@ export {
   type TimeframeInfo,
   type PlotOutput,
   type PlotStyle,
-  type DrawingOutput,
-  type LabelDrawingOutput,
-  type LineDrawingOutput,
-  type LineFillDrawingOutput,
-  type BoxDrawingOutput,
   type AlertEvent,
   type AlertFrequency,
   type AlertOutput,
   type InputDefinition,
 } from './context';
+
+export type {
+  DrawingOutput,
+  LabelDrawingOutput,
+  LineDrawingOutput,
+  LineFillDrawingOutput,
+  BoxDrawingOutput,
+} from './drawings/types';
 
 export { Scope, createRootScope, type VarKind, type VariableEntry, type ScopeSnapshot } from './scope';
 
