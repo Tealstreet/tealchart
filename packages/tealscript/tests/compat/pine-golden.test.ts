@@ -421,4 +421,28 @@ plot(str.contains(memo, "breakout"), title="Text Area")
     expect(getPlot(result, 'Session').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Text Area').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
+
+  it('preserves common input metadata', () => {
+    const result = runCompatScript(`
+indicator("Input metadata")
+mode = input.string("EMA", "Mode", options=["SMA", "EMA"], tooltip="Average type", group="Calculation", inline="ma", confirm=true)
+plot(mode == "EMA", title="Mode")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.inputs).toEqual([
+      {
+        id: 'input_Mode',
+        type: 'string',
+        title: 'Mode',
+        defval: 'EMA',
+        options: ['SMA', 'EMA'],
+        tooltip: 'Average type',
+        group: 'Calculation',
+        inline: 'ma',
+        confirm: true,
+      },
+    ]);
+    expect(getPlot(result, 'Mode').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+  });
 });
