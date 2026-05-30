@@ -11,6 +11,7 @@ import type {
   WorkerResult,
   WorkerError,
   PlotOutput,
+  AlertOutput,
   InputDefinition,
   Bar,
 } from '@tealstreet/tealscript';
@@ -107,6 +108,7 @@ class TealscriptWorkerWrapper {
       case 'result':
         this.options.onResult?.({
           plots: message.plots as PlotOutput[],
+          alerts: (message.alerts as AlertOutput[] | undefined) ?? [],
           inputs: message.inputs as InputDefinition[],
         });
         break;
