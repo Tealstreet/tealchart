@@ -2826,7 +2826,7 @@ function peg$parse(input, options) {
     let s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10;
 
     s0 = peg$currPos;
-    s1 = peg$parseFunctionIndent();
+    s1 = peg$parseFunctionElseIndent();
     if (s1 !== peg$FAILED) {
       if (input.substr(peg$currPos, 4) === peg$c31) {
         s2 = peg$c31;
@@ -2885,7 +2885,7 @@ function peg$parse(input, options) {
     }
     if (s0 === peg$FAILED) {
       s0 = peg$currPos;
-      s1 = peg$parseFunctionIndent();
+      s1 = peg$parseFunctionElseIndent();
       if (s1 !== peg$FAILED) {
         if (input.substr(peg$currPos, 4) === peg$c31) {
           s2 = peg$c31;
@@ -3218,6 +3218,17 @@ function peg$parse(input, options) {
           }
         }
       }
+    }
+
+    return s0;
+  }
+
+  function peg$parseFunctionElseIndent() {
+    let s0;
+
+    s0 = peg$parseFunctionNestedIndent();
+    if (s0 === peg$FAILED) {
+      s0 = peg$parseFunctionIndent();
     }
 
     return s0;

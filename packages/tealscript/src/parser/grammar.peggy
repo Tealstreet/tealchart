@@ -351,7 +351,7 @@ FunctionIfStatement
     }
 
 FunctionElseClause
-  = FunctionIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionNestedBlock alternate:FunctionElseClause? {
+  = FunctionElseIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionNestedBlock alternate:FunctionElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -360,7 +360,7 @@ FunctionElseClause
         loc: loc()
       };
     }
-  / FunctionIndent "else" _ LineTerminator? block:FunctionNestedBlock {
+  / FunctionElseIndent "else" _ LineTerminator? block:FunctionNestedBlock {
       return block;
     }
 
@@ -418,6 +418,10 @@ FunctionNestedIndent
   / "\t\t"
   / "    \t"
   / "\t    "
+
+FunctionElseIndent
+  = FunctionNestedIndent
+  / FunctionIndent
 
 FunctionDeepNestedIndent
   = "            "
