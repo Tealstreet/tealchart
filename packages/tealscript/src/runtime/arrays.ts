@@ -108,21 +108,26 @@ export function removeArrayValue<T = unknown>(array: PineArray<T>, index: number
   return array.values.splice(normalizeExistingIndex(index, getArraySize(array)), 1)[0];
 }
 
+function numericArrayValues(array: PineArray): number[] {
+  return array.values.map(Number).filter((value) => !Number.isNaN(value));
+}
+
 export function minArrayValue(array: PineArray): number {
-  if (array.values.length === 0) return Number.NaN;
-  return Math.min(...array.values.map(Number));
+  const values = numericArrayValues(array);
+  return values.length === 0 ? Number.NaN : Math.min(...values);
 }
 
 export function maxArrayValue(array: PineArray): number {
-  if (array.values.length === 0) return Number.NaN;
-  return Math.max(...array.values.map(Number));
+  const values = numericArrayValues(array);
+  return values.length === 0 ? Number.NaN : Math.max(...values);
 }
 
 export function sumArrayValue(array: PineArray): number {
-  return array.values.reduce<number>((sum, value) => sum + Number(value), 0);
+  const values = numericArrayValues(array);
+  return values.length === 0 ? Number.NaN : values.reduce((sum, value) => sum + value, 0);
 }
 
 export function avgArrayValue(array: PineArray): number {
-  if (array.values.length === 0) return Number.NaN;
-  return sumArrayValue(array) / array.values.length;
+  const values = numericArrayValues(array);
+  return values.length === 0 ? Number.NaN : values.reduce((sum, value) => sum + value, 0) / values.length;
 }
