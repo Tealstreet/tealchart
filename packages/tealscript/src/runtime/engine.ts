@@ -940,18 +940,25 @@ export class TealscriptEngine {
       const title = (namedArgs.get('title') ?? callId) as string;
       const id = `barcolor_${title}`;
 
-      if (ctx.bar_index === 0) {
+      let plot = ctx.plots.get(id);
+      if (!plot) {
         ctx.registerPlot({
           id,
           type: 'barcolor',
           title,
           color: [],
         });
+        plot = ctx.plots.get(id);
       }
 
-      const plot = ctx.plots.get(id);
       if (plot && Array.isArray(plot.color)) {
-        plot.color.push(color);
+        while (plot.color.length < ctx.bar_index) {
+          plot.color.push(null);
+        }
+        while (plot.values.length < ctx.bar_index) {
+          plot.values.push(null);
+        }
+        plot.color[ctx.bar_index] = color;
       }
 
       ctx.addPlotValue(id, null);

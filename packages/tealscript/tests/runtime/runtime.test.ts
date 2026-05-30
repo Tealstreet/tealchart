@@ -573,6 +573,22 @@ barcolor(candleColor)
       expect(result.plots[0].values).toEqual([null, null, null, null, null]);
     });
 
+    it('aligns conditional bar color output to bar indexes', () => {
+      const code = `//@version=6
+indicator("Test")
+if bar_index >= 2
+    barcolor(color.red)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(1);
+      expect(result.plots[0].type).toBe('barcolor');
+      expect(result.plots[0].color).toEqual([null, null, '#F44336', '#F44336', '#F44336']);
+      expect(result.plots[0].values).toEqual([null, null, null, null, null]);
+    });
+
     it('creates multiple plots', () => {
       const code = `//@version=6
 indicator("Test")
