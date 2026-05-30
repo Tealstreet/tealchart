@@ -124,4 +124,23 @@ describe('PineArray', () => {
     expect(sumArrayValue(array)).toBe(12);
     expect(avgArrayValue(array)).toBe(4);
   });
+
+  it('skips NaN values in numeric summaries', () => {
+    const array = createPineArray<number>();
+    [2, Number.NaN, 6].forEach((value) => pushArrayValue(array, value));
+
+    expect(minArrayValue(array)).toBe(2);
+    expect(maxArrayValue(array)).toBe(6);
+    expect(sumArrayValue(array)).toBe(8);
+    expect(avgArrayValue(array)).toBe(4);
+  });
+
+  it('returns NaN for empty numeric summaries', () => {
+    const array = createPineArray<number>();
+
+    expect(minArrayValue(array)).toBeNaN();
+    expect(maxArrayValue(array)).toBeNaN();
+    expect(sumArrayValue(array)).toBeNaN();
+    expect(avgArrayValue(array)).toBeNaN();
+  });
 });
