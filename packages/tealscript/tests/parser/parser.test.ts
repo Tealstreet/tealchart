@@ -226,6 +226,30 @@ arrayValue = [1, 2]
         expect(Array.isArray(alternate) ? null : alternate?.type).toBe('IfStatement');
       }
     });
+
+    it('parses nested if/else branches inside multiline functions', () => {
+      const ast = parse(`classify(value, enabled) =>
+    if enabled
+        if value > 0
+            1
+        else
+            -1
+    else
+        0
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        const outer = fn.body[0];
+        expect(outer.type).toBe('IfStatement');
+        const inner = outer.type === 'IfStatement' ? outer.consequent[0] : null;
+        expect(inner?.type).toBe('IfStatement');
+        const alternate = inner?.type === 'IfStatement' ? inner.alternate : null;
+        expect(Array.isArray(alternate)).toBe(true);
+      }
+    });
   });
 
   describe('Expressions', () => {

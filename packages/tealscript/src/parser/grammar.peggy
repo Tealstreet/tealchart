@@ -370,7 +370,42 @@ FunctionNestedBlock
     }
 
 FunctionNestedStatement
-  = FunctionNestedIndent stmt:(FunctionIfStatement / Statement) {
+  = FunctionNestedIndent stmt:(FunctionNestedIfStatement / Statement) {
+      return stmt;
+    }
+
+FunctionNestedIfStatement
+  = "if" _ test:Expression _ LineTerminator consequent:FunctionDeepNestedBlock alternate:FunctionNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+
+FunctionNestedElseClause
+  = FunctionNestedIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionDeepNestedBlock alternate:FunctionNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / FunctionNestedIndent "else" _ LineTerminator? block:FunctionDeepNestedBlock {
+      return block;
+    }
+
+FunctionDeepNestedBlock
+  = statements:FunctionDeepNestedStatement+ {
+      return statements.filter(s => s !== null);
+    }
+
+FunctionDeepNestedStatement
+  = FunctionDeepNestedIndent stmt:Statement {
       return stmt;
     }
 
@@ -383,6 +418,13 @@ FunctionNestedIndent
   / "\t\t"
   / "    \t"
   / "\t    "
+
+FunctionDeepNestedIndent
+  = "            "
+  / "\t\t\t"
+  / "        \t"
+  / "    \t\t"
+  / "\t        "
 
 SingleLineBody
   = stmt:(VariableDeclaration / AssignmentStatement / ExpressionStatement / BreakStatement / ContinueStatement) {
