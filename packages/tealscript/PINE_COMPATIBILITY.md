@@ -7,6 +7,9 @@ Script v5/v6 indicators.
 For the broader full-parity plan, see
 [`PINE_PARITY_EPICS.md`](./PINE_PARITY_EPICS.md).
 
+For the canonical inventory row format and parity PR checklist, see
+[`PINE_COMPATIBILITY_INVENTORY.md`](./PINE_COMPATIBILITY_INVENTORY.md).
+
 Status values:
 
 - `Supported` means syntax parses and runtime behavior is covered by tests.
@@ -136,13 +139,12 @@ derived regular-series history, and unavailable or future offsets returning
 | Multi-timeframe requests | Planned | Needs deterministic gap/lookahead semantics. |
 | Other-symbol requests | Planned | Needs chart datafeed contract and caching strategy. |
 
-## PR Roadmap
+## Roadmaps
 
-1. Compatibility matrix and golden test harness.
-2. User-defined functions.
-3. Function scope and series semantics hardening.
-4. `array.*` MVP.
-5. Common missing `ta.*` functions.
+Use this file for current compatibility status only. Use
+[`PINE_PARITY_EPICS.md`](./PINE_PARITY_EPICS.md) for feature-parity sequencing
+and [`PINE_HYGIENE_EPICS.md`](./PINE_HYGIENE_EPICS.md) for structural cleanup
+that supports the parity work.
 
 ## Common `ta.*` Coverage
 
@@ -310,8 +312,9 @@ covers main-pane line segments with basic color/style/width and horizontal
 extension support. `linefill.new()` records fills between two line handles;
 `linefill.set_color()`, `linefill.get_line1()`, `linefill.get_line2()`, and
 `linefill.delete()` are supported, and the renderer fills between resolved
-main-pane line segments. `chart.point` overloads, GC limits, full arrow style
-geometry, and full realtime rollback parity remain planned.
+main-pane line segments. `linefill.new()` rejects missing or non-line handles
+without creating a drawing. `chart.point` overloads, GC limits, full arrow
+style geometry, and full realtime rollback parity remain planned.
 
 The box drawing pass covers common supply/demand zone idioms. `box.new()`
 accepts positional or named `left`, `top`, `right`, and `bottom` arguments plus

@@ -42,17 +42,19 @@ The current runtime already covers a useful common-indicator subset:
   `bar_index`, `last_bar_index`, common `barstate.*`, `syminfo.*`, and
   `timeframe.*` fields.
 - Partial built-in coverage across `ta.*`, `math.*`, `str.*`, `input.*`,
-  `array.*`, `color.*`, time/calendar helpers, visual outputs, and alerts.
+  `array.*`, `color.*`, time/calendar helpers, visual outputs, drawing objects,
+  and alerts.
 - Compatibility golden tests for UDFs, scope/series behavior, arrays, common TA,
   strings, inputs, colors, math, switch, loops, barstate, chart info, calendar,
-  session time, alerts, bar coloring, OHLC plotting, and fill handles.
+  session time, alerts, bar coloring, OHLC plotting, fill handles, and common
+  drawing object handles.
 
 Known structural gaps:
 
 - Pine's qualified type system (`const < input < simple < series`) is not
   modeled as a first-class compiler/runtime contract.
-- `request.*`, `map.*`, `matrix.*`, most drawing object namespaces, libraries,
-  and strategy execution are not implemented.
+- `request.*`, `map.*`, `matrix.*`, `polyline.*`, `table.*`, libraries, and
+  strategy execution are not implemented.
 - Some parser/runtime docs are stale relative to recent compatibility work.
 - Some semantics are approximate, especially source-series inference, `na`
   propagation, realtime `varip`, named timezones, sessions, and higher-timeframe
@@ -297,11 +299,16 @@ Phases:
 2. Implement `chart.point` and coordinate systems: `xloc.bar_index`,
    `xloc.bar_time`, `yloc.price`, above/below bar, future coordinates, and pane
    targeting.
-3. Implement `label.*`: constructors, setters/getters, copy/delete, styles,
-   text, colors, size, tooltip, and renderer integration.
-4. Implement `line.*` and `linefill.*`: constructors, setters/getters,
-   extend/style/width, copy/delete, and renderer integration.
-5. Implement `box.*` and `polyline.*`.
+3. Complete `label.*`: GC limits, full style parity, realtime rollback parity,
+   and remaining renderer details after the current constructor, mutation,
+   copy/delete, and basic renderer support.
+4. Complete `line.*` and `linefill.*`: `chart.point` overloads, full line style
+   geometry, GC limits, realtime rollback parity, and remaining renderer details
+   after the current constructor, mutation, copy/delete, handle validation, and
+   basic renderer support.
+5. Complete `box.*` and implement `polyline.*`: finish box text/layout,
+   `chart.point` overloads, GC limits, realtime rollback parity, and add
+   polyline lifecycle plus renderer support.
 6. Implement `table.*`: fixed positioning, cells, setters, text formatting,
    sizing, background/frame/border, and renderer integration.
 7. Add lifecycle tests for mutation, deletion, copying, GC limits, and realtime
