@@ -624,6 +624,19 @@ arrayValue = [1, 2]
       }
     });
 
+    it('parses collection for loop', () => {
+      const code = `for value in array.from(1, 2, 3)
+    sum := sum + value
+`;
+      const ast = parse(code);
+      const forStmt = ast.body[0];
+
+      expect(forStmt.type).toBe('ForStatement');
+      if (forStmt.type === 'ForStatement') {
+        expect(forStmt.iterable?.type).toBe('CallExpression');
+      }
+    });
+
     it('parses while loop', () => {
       const code = `while x > 0
     x := x - 1

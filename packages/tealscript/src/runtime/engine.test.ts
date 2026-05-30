@@ -596,6 +596,44 @@ plot(sum)`;
 
       expect(result.plots[0].values[0]).toBe(30);
     });
+
+    it('executes collection for loop over Pine arrays', () => {
+      const script = `//@version=6
+indicator("Test")
+values = array.from(1, 2, 3)
+sum = 0
+for value in values
+    sum := sum + value
+plot(sum)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values[0]).toBe(6);
+    });
+
+    it('honors break and continue inside collection for loop', () => {
+      const script = `//@version=6
+indicator("Test")
+values = array.from(1, 2, 3, 4)
+sum = 0
+for value in values
+    if value == 2
+        continue
+    if value == 4
+        break
+    sum := sum + value
+plot(sum)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values[0]).toBe(4);
+    });
   });
 
   describe('math functions', () => {
