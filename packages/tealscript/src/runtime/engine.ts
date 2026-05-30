@@ -563,6 +563,10 @@ export class TealscriptEngine {
         return this.ctx.volume.get(0);
       case 'time':
         return this.ctx.time.get(0);
+      case 'time_close':
+        return this.getBarCloseTime(this.ctx.time.get(0), this.ctx.timeframe.period);
+      case 'last_bar_time':
+        return this.ctx.getBar(this.ctx.last_bar_index)?.time ?? Number.NaN;
       case 'year':
         return this.getCalendarPart('year', this.ctx.time.get(0), this.ctx.syminfo.timezone);
       case 'month':
@@ -3381,6 +3385,8 @@ export class TealscriptEngine {
 
   private registerTimeBuiltins(): void {
     this.builtins.set('timestamp', (args) => this.evaluateTimestamp(args));
+    this.builtins.set('time', (args) => this.evaluateTimeFilter(args, false));
+    this.builtins.set('time_close', (args) => this.evaluateTimeFilter(args, true));
 
     for (const part of ['year', 'month', 'weekofyear', 'dayofmonth', 'dayofweek', 'hour', 'minute', 'second']) {
       this.builtins.set(part, (args) => {
@@ -3397,6 +3403,20 @@ export class TealscriptEngine {
     this.builtins.set('dayofweek.thursday', () => 5);
     this.builtins.set('dayofweek.friday', () => 6);
     this.builtins.set('dayofweek.saturday', () => 7);
+  }
+
+  private evaluateTimeFilter(args: unknown[], closeTime: boolean): number {
+    const timestamp = this.ctx.time.get(0) ?? Number.NaN;
+    const timeframe = args[0] === undefined || args[0] === '' ? this.ctx.timeframe.period : this.toStringValue(args[0]);
+    const session = args[1] === undefined || args[1] === '' ? undefined : this.toStringValue(args[1]);
+    const timezone = args[2] === undefined || args[2] === '' ? this.ctx.syminfo.timezone : this.toStringValue(args[2]);
+
+    if (!Number.isFinite(timestamp)) return Number.NaN;
+    if (session && !this.isTimestampInSession(timestamp, session, timezone)) {
+      return Number.NaN;
+    }
+
+    return closeTime ? this.getBarCloseTime(timestamp, timeframe) : timestamp;
   }
 
   private evaluateTimestamp(args: unknown[]): number {
@@ -3449,6 +3469,72 @@ export class TealscriptEngine {
       default:
         return Number.NaN;
     }
+  }
+
+  private getBarCloseTime(timestamp: unknown, timeframe: string): number {
+    const value = this.toNumber(timestamp);
+    const duration = this.getTimeframeDurationMs(timeframe);
+    if (!Number.isFinite(value) || duration === null) return Number.NaN;
+    return value + duration;
+  }
+
+  private getTimeframeDurationMs(timeframe: string): number | null {
+    const normalized = timeframe.trim().toUpperCase();
+    if (normalized === '') return this.getTimeframeDurationMs(this.ctx.timeframe.period);
+
+    const numericMinutes = Number(normalized);
+    if (Number.isFinite(numericMinutes) && numericMinutes > 0) {
+      return numericMinutes * 60_000;
+    }
+
+    const match = /^(\d+)?([SWDM])$/.exec(normalized);
+    if (!match) return null;
+
+    const multiplier = match[1] === undefined ? 1 : Number(match[1]);
+    switch (match[2]) {
+      case 'S':
+        return multiplier * 1_000;
+      case 'D':
+        return multiplier * 86_400_000;
+      case 'W':
+        return multiplier * 7 * 86_400_000;
+      case 'M':
+        return multiplier * 30 * 86_400_000;
+      default:
+        return null;
+    }
+  }
+
+  private isTimestampInSession(timestamp: number, session: string, timezone: string): boolean {
+    return session.split(',').some((segment) => this.isTimestampInSessionSegment(timestamp, segment.trim(), timezone));
+  }
+
+  private isTimestampInSessionSegment(timestamp: number, segment: string, timezone: string): boolean {
+    const match = /^(\d{4})-(\d{4})(?::([1-7]+))?$/.exec(segment);
+    if (!match) return false;
+
+    const start = this.parseSessionMinute(match[1]);
+    const end = this.parseSessionMinute(match[2]);
+    if (start === null || end === null) return false;
+
+    const day = this.getCalendarPart('dayofweek', timestamp, timezone);
+    const days = match[3];
+    if (days && !days.includes(String(day))) return false;
+
+    if (start === end) return true;
+
+    const hour = this.getCalendarPart('hour', timestamp, timezone);
+    const minute = this.getCalendarPart('minute', timestamp, timezone);
+    const minuteOfDay = hour * 60 + minute;
+
+    return start < end ? minuteOfDay >= start && minuteOfDay < end : minuteOfDay >= start || minuteOfDay < end;
+  }
+
+  private parseSessionMinute(value: string): number | null {
+    const hour = Number(value.slice(0, 2));
+    const minute = Number(value.slice(2, 4));
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
+    return hour * 60 + minute;
   }
 
   private parseTimezoneOffsetMinutes(timezone: string): number {

@@ -96,7 +96,7 @@ derived regular-series history, and unavailable or future offsets returning
 | `math.*` | Partial | Common numeric functions, constants, `math.avg`, precision rounding, truncation, and angle conversion helpers exist. Pine-specific helpers are still incomplete. |
 | `ta.*` | Partial | Includes SMA, EMA, RSI, MACD, ATR, BB, VWAP, Supertrend, DMI, SAR, pivots, `barssince`, `valuewhen`, `vwma`, `highestbars`, `lowestbars`, `cross`, `range`, and more. |
 | `input.*` | Partial | Generic `input()`, int, float, bool, string, color, source, time, symbol, timeframe, session, and text area exist. Advanced UI/display behavior is incomplete. |
-| Time functions | Partial | Calendar functions and `timestamp()` cover common numeric and UTC/GMT-offset forms. `time()`, `time_close()`, session filtering, and named timezone databases are still planned. |
+| Time functions | Partial | Calendar functions, `timestamp()`, `time()`, and `time_close()` cover common numeric, UTC/GMT-offset, and same-timeframe session-filter forms. Higher-timeframe aggregation and named timezone databases are still planned. |
 | `color.*` | Partial | Core named colors, `color.new()`, `color.rgb()`, channel extraction, and `color.from_gradient()` exist. Named color constants still need exact Pine v6 parity. |
 | `str.*` | Partial | Common conversion, format, search, substring, case, trim, and replace helpers exist. |
 | `array.*` | Partial | Array construction, read/write, search, copy, insertion/removal, numeric summaries, stack/queue helpers, clear, and common method-call syntax are covered. |
@@ -243,6 +243,15 @@ and `second`), matching callable helpers such as `hour(time)`, common
 `dayofweek.*` constants, and `timestamp()` forms used in date/time filters.
 The checkpoint fixture follows TradingView's documented calendar-filter idioms
 by gating plots against a start timestamp, weekday, and minute threshold.
+
+## Common Session Time Coverage
+
+The session-time pass covers `time_close`, `last_bar_time`, and same-timeframe
+`time()` / `time_close()` calls with optional session strings such as
+`"0930-1600"` or `"0930-1600:23456"`. Matching bars return their open or close
+UNIX timestamp; non-matching bars return `na`. Multi-timeframe aggregation,
+exchange calendars, named timezone databases, and full overnight-session day
+semantics remain planned.
 
 ## `max_bars_back` Declaration Coverage
 
