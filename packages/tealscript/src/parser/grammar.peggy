@@ -154,7 +154,16 @@ TuplePattern
     }
 
 TypeAnnotation
-  = baseType:TypeName {
+  = "array" _ "<" _ elementType:TypeName _ ">" {
+      return {
+        type: 'TypeAnnotation',
+        baseType: 'array',
+        isArray: true,
+        elementType,
+        loc: loc()
+      };
+    }
+  / baseType:TypeName {
       return {
         type: 'TypeAnnotation',
         baseType,
