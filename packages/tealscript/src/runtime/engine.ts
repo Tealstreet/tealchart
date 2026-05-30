@@ -62,6 +62,7 @@ export interface ExecutionResult {
   alerts: AlertOutput[];
   inputs: InputDefinition[];
   indicatorTitle: string;
+  indicatorMaxBarsBack?: number;
   errors: ExecutionError[];
 }
 
@@ -164,6 +165,7 @@ export class TealscriptEngine {
       alerts: this.ctx.getAlerts(),
       inputs: this.ctx.inputDefinitions.map((def) => ({ ...def })),
       indicatorTitle: this.ctx.indicatorTitle,
+      indicatorMaxBarsBack: this.ctx.indicatorMaxBarsBack,
       errors: this.errors,
     };
   }
@@ -263,6 +265,16 @@ export class TealscriptEngine {
     if (stmt.precision) {
       this.ctx.indicatorPrecision = this.evaluateExpression(stmt.precision) as number;
     }
+    if (stmt.max_bars_back) {
+      this.ctx.indicatorMaxBarsBack = this.normalizeMaxBarsBack(this.evaluateExpression(stmt.max_bars_back));
+    }
+  }
+
+  private normalizeMaxBarsBack(value: unknown): number {
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || !Number.isInteger(value)) {
+      throw new Error('indicator max_bars_back must be a non-negative integer');
+    }
+    return value;
   }
 
   private registerUserFunctions(ast: Program): void {

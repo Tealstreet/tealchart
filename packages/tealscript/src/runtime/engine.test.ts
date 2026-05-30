@@ -103,6 +103,32 @@ plot(close, title="Close Price")`;
       expect(closePlot!.values.length).toBe(10);
     });
 
+    it('records indicator max_bars_back metadata', () => {
+      const script = `//@version=6
+indicator("Buffered", max_bars_back=500)
+plot(close[3])`;
+
+      const ast = parse(script);
+      const bars = createBars(5);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.indicatorMaxBarsBack).toBe(500);
+      expect(result.plots[0].values).toEqual([null, null, null, 100.2, 100.7]);
+    });
+
+    it('reports invalid indicator max_bars_back values', () => {
+      const script = `//@version=6
+indicator("Buffered", max_bars_back=-1)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors[0]?.message).toBe('indicator max_bars_back must be a non-negative integer');
+    });
+
     it('exposes Pine barstate booleans through member access', () => {
       const script = `//@version=6
 indicator("Barstate")

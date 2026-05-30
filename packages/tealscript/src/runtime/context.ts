@@ -263,6 +263,7 @@ export class ExecutionContext {
   /** Indicator settings */
   indicatorOverlay: boolean = false;
   indicatorPrecision: number = 2;
+  indicatorMaxBarsBack?: number;
 
   constructor() {
     this.open = new Series<number>();
@@ -624,6 +625,10 @@ export class ExecutionContext {
     this.plotOrder.length = 0;
     this.alerts.clear();
     this.alertOrder.length = 0;
+    this.indicatorTitle = 'Untitled';
+    this.indicatorOverlay = false;
+    this.indicatorPrecision = 2;
+    this.indicatorMaxBarsBack = undefined;
     // Clear input definitions - they get re-registered on bar_index === 0
     this.inputDefinitions.length = 0;
 
