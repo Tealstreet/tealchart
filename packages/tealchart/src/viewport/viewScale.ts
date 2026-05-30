@@ -297,17 +297,23 @@ export function getVisiblePlotRange(
   for (const plot of plots) {
     const scriptId = plot.scriptId ?? 'unknown';
     if (!indicatorIds.includes(scriptId)) continue;
-    if (plot.type !== 'plot' || !plot.values) continue;
+    if (plot.type !== 'plot' && plot.type !== 'plotbar' && plot.type !== 'plotcandle') continue;
 
-    const values = plot.values;
-    // Scan only the visible range (plot values are parallel to bars)
-    const scanEnd = Math.min(endIdx, values.length);
-    for (let i = startIdx; i < scanEnd; i++) {
-      const v = values[i];
-      if (v !== null && !isNaN(v)) {
-        if (v < min) min = v;
-        if (v > max) max = v;
-        hasValue = true;
+    const values =
+      plot.type === 'plotbar' || plot.type === 'plotcandle'
+        ? [plot.openValues, plot.highValues, plot.lowValues, plot.closeValues]
+        : [plot.values];
+    for (const series of values) {
+      if (!series) continue;
+      // Scan only the visible range (plot values are parallel to bars)
+      const seriesScanEnd = Math.min(endIdx, series.length);
+      for (let i = startIdx; i < seriesScanEnd; i++) {
+        const v = series[i];
+        if (v !== null && !isNaN(v)) {
+          if (v < min) min = v;
+          if (v > max) max = v;
+          hasValue = true;
+        }
       }
     }
   }

@@ -42,6 +42,21 @@ function makePlot(scriptId: string, values: (number | null)[]): PlotOutput {
   };
 }
 
+function makeOhlcPlot(scriptId: string): PlotOutput {
+  return {
+    id: `${scriptId}_plotcandle`,
+    type: 'plotcandle',
+    title: scriptId,
+    values: [100, 105, 110],
+    openValues: [100, 105, 110],
+    highValues: [150, 160, 170],
+    lowValues: [80, 70, 60],
+    closeValues: [105, 110, 115],
+    scriptId,
+    color: '#ffffff',
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Per-pane state
 // ---------------------------------------------------------------------------
@@ -218,5 +233,17 @@ describe('AutoScaleManager.applyToPaneYRange', () => {
     // Should encompass both indicator ranges
     expect(result!.yMin).toBeLessThan(-5);
     expect(result!.yMax).toBeGreaterThan(18);
+  });
+
+  it('includes OHLC high and low values for plotcandle pane ranges', () => {
+    const mgr = new AutoScaleManager();
+    const bars = makeBars(3, { startTime: 1_000_000, interval: 60_000 });
+    const plots = [makeOhlcPlot('custom_candles')];
+
+    const result = mgr.applyToPaneYRange('pane_1', plots, ['custom_candles'], bars, bars[0].time, bars[2].time);
+
+    expect(result).not.toBeNull();
+    expect(result!.yMin).toBeLessThan(60);
+    expect(result!.yMax).toBeGreaterThan(170);
   });
 });
