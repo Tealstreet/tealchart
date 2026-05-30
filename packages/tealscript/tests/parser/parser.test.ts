@@ -85,6 +85,18 @@ describe('Tealscript Parser', () => {
       expect(decl.typeAnnotation?.baseType).toBe('float');
     });
 
+    it('parses array type annotations', () => {
+      const ast = parse('array<float> values = []\n');
+      const decl = ast.body[0] as VariableDeclaration;
+
+      expect(decl.typeAnnotation).toEqual(expect.objectContaining({
+        type: 'TypeAnnotation',
+        baseType: 'array',
+        isArray: true,
+        elementType: 'float',
+      }));
+    });
+
     it('parses tuple destructuring', () => {
       const ast = parse('[a, b, c] = someFunc()\n');
       const decl = ast.body[0] as VariableDeclaration;
