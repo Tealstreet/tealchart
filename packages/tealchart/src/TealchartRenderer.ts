@@ -17,7 +17,6 @@ import {
   // Legacy types for backward compatibility
   ExecutionLineRenderData,
   IndicatorPane,
-  LastTradeInfo,
   OrderLineRenderData,
   PaneLayout,
   PositionLineRenderData,
@@ -35,22 +34,6 @@ import { resolveLabelCollisions } from './utils/labelCollision';
  * TealchartRenderer - Pure canvas rendering for OHLCV data
  * No React, no state - just rendering functions
  */
-
-// Cache NumberFormat instances by decimals to avoid recreating on every frame
-// toLocaleString with inline options is slow - using cached formatters is ~10x faster
-const numberFormatCache = new Map<number, Intl.NumberFormat>();
-function getCachedNumberFormatter(decimals: number): Intl.NumberFormat {
-  let formatter = numberFormatCache.get(decimals);
-  if (!formatter) {
-    formatter = new Intl.NumberFormat('en-US', {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals,
-      useGrouping: true,
-    });
-    numberFormatCache.set(decimals, formatter);
-  }
-  return formatter;
-}
 
 /** Info about an indicator for pane assignment (matches ChartContainer) */
 interface IndicatorPaneInfo {
@@ -1411,61 +1394,6 @@ export class TealchartRenderer {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(priceText, labelX + labelWidth / 2, clampedLabelY + labelHeight / 2);
-  }
-
-  /**
-   * Helper: Draw a horizontal trading line with configurable style
-   */
-  private drawTradingLine(
-    y: number,
-    startX: number,
-    endX: number,
-    color: string,
-    style: number,
-    width: number,
-    lengthPercent: number,
-    extendLeft: boolean,
-  ): void {
-    const { ctx } = this;
-
-    // Calculate actual start/end based on lengthPercent and extendLeft
-    const lineSpan = endX - startX;
-    const actualLength = (lengthPercent / 100) * lineSpan;
-
-    let actualStartX: number;
-    let actualEndX: number;
-
-    if (extendLeft) {
-      // Line extends from left, shortened by lengthPercent
-      actualStartX = startX;
-      actualEndX = startX + actualLength;
-    } else {
-      // Line starts closer to label, extends right
-      actualStartX = endX - actualLength;
-      actualEndX = endX;
-    }
-
-    ctx.save();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = width;
-
-    // Set dash pattern based on style
-    // style: 0=solid, 1=dotted, 2=dashed
-    if (style === 1) {
-      ctx.setLineDash([2, 2]); // Dotted
-    } else if (style === 2) {
-      ctx.setLineDash([4, 4]); // Dashed
-    } else {
-      ctx.setLineDash([]); // Solid
-    }
-
-    ctx.beginPath();
-    ctx.moveTo(actualStartX, y);
-    ctx.lineTo(actualEndX, y);
-    ctx.stroke();
-
-    ctx.setLineDash([]);
-    ctx.restore();
   }
 
   /**
@@ -3780,54 +3708,6 @@ export class TealchartRenderer {
   }
 
   /**
-   * Render indicator legend/label at top-left of a pane
-   */
-  private renderPaneLegend(pane: ComputedPane, indicatorPaneInfo: Record<string, IndicatorPaneInfo>): void {
-    const { ctx, options, margins } = this;
-
-    if (!pane.indicatorIds || pane.indicatorIds.length === 0) return;
-
-    // Collect indicator labels for this pane
-    const labels: string[] = [];
-    for (const indicatorId of pane.indicatorIds) {
-      const info = indicatorPaneInfo[indicatorId];
-      if (info?.name) {
-        // Build label: "Name input1 · input2 · input3"
-        let label = info.name;
-        if (info.inputs && Object.keys(info.inputs).length > 0) {
-          const inputValues = Object.values(info.inputs)
-            .filter((v) => v !== undefined && v !== null)
-            .map((v) => {
-              if (typeof v === 'number') return v.toString();
-              if (typeof v === 'boolean') return v ? 'Yes' : 'No';
-              return String(v);
-            });
-          if (inputValues.length > 0) {
-            label += ' ' + inputValues.join(' · ');
-          }
-        }
-        labels.push(label);
-      }
-    }
-
-    if (labels.length === 0) return;
-
-    // Draw labels
-    const x = margins.left + 8;
-    let y = pane.top + 16;
-
-    ctx.font = `11px ${this.font}`;
-    ctx.fillStyle = options.textColor;
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-
-    for (const label of labels) {
-      ctx.fillText(label, x, y);
-      y += 16;
-    }
-  }
-
-  /**
    * Render grid lines within a pane
    */
   private renderPaneGrid(pane: ComputedPane, viewport: Viewport): void {
@@ -4912,18 +4792,6 @@ export class TealchartRenderer {
     }
 
     return lines;
-  }
-
-  /**
-   * Adjust color brightness (for pane backgrounds)
-   */
-  private adjustColor(hexColor: string, amount: number): string {
-    // Simple hex color adjustment
-    const hex = hexColor.replace('#', '');
-    const r = Math.min(255, Math.max(0, parseInt(hex.substring(0, 2), 16) + amount));
-    const g = Math.min(255, Math.max(0, parseInt(hex.substring(2, 4), 16) + amount));
-    const b = Math.min(255, Math.max(0, parseInt(hex.substring(4, 6), 16) + amount));
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
   }
 
   /**
