@@ -320,4 +320,22 @@ plot(str.length(text), title="Length")
     expect(getPlot(result, 'Substring').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(roundSeries(getPlot(result, 'Length').values)).toEqual([17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17]);
   });
+
+  it('runs string case trim and replacement helpers', () => {
+    const result = runCompatScript(`
+indicator("String transform helpers")
+text = "  btc-usdt-usdt  "
+trimmed = str.trim(text)
+plot(str.upper(trimmed) == "BTC-USDT-USDT", title="Upper")
+plot(str.lower("BTC") == "btc", title="Lower")
+plot(str.replace(trimmed, "usdt", "perp") == "btc-perp-usdt", title="Replace One")
+plot(str.replace_all(trimmed, "usdt", "perp") == "btc-perp-perp", title="Replace All")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Upper').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Lower').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Replace One').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Replace All').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+  });
 });

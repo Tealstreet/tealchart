@@ -1170,6 +1170,15 @@ export class TealscriptEngine {
       const end = args[2] === undefined ? undefined : Math.trunc(args[2] as number);
       return source.substring(begin, end);
     });
+    this.builtins.set('str.upper', (args) => this.toStringValue(args[0]).toUpperCase());
+    this.builtins.set('str.lower', (args) => this.toStringValue(args[0]).toLowerCase());
+    this.builtins.set('str.trim', (args) => this.toStringValue(args[0]).trim());
+    this.builtins.set('str.replace', (args) => {
+      return this.toStringValue(args[0]).replace(this.toStringValue(args[1]), this.toStringValue(args[2]));
+    });
+    this.builtins.set('str.replace_all', (args) => {
+      return this.toStringValue(args[0]).split(this.toStringValue(args[1])).join(this.toStringValue(args[2]));
+    });
   }
 
   private registerArrayBuiltins(): void {
