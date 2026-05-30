@@ -58,6 +58,12 @@ import {
 } from './arrays';
 import type { BuiltinRegistry } from './builtins/registry';
 import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type BoxDrawingOutput, type DrawingOutput, type InputDefinition, type LabelDrawingOutput, type LineDrawingOutput, type LineFillDrawingOutput, type PlotOutput, type PlotStyle } from './context';
+import {
+  getDrawingValue,
+  toDrawingId as toDrawingIdValue,
+  toLineWidth as toLineWidthValue,
+  withDrawing,
+} from './drawings/helpers';
 import { Scope, createRootScope } from './scope';
 
 /**
@@ -1336,88 +1342,43 @@ export class TealscriptEngine {
   }
 
   private toDrawingId(value: unknown): string | undefined {
-    if (value === null || value === undefined || this.isNa(value)) return undefined;
-    return String(value);
+    return toDrawingIdValue(value, (candidate) => this.isNa(candidate));
   }
 
   private toLineWidth(value: unknown): number {
-    return Math.max(1, this.clampNumber(value ?? 1, 1, 100));
+    return toLineWidthValue(value, (candidate, min, max) => this.clampNumber(candidate, min, max));
   }
 
   private withLabel(value: unknown, ctx: ExecutionContext, fn: (label: LabelDrawingOutput) => void): void {
-    const labelId = this.toLabelId(value);
-    if (!labelId) return;
-
-    const drawing = ctx.getDrawing(labelId);
-    if (drawing?.type === 'label') {
-      fn(drawing);
-    }
+    withDrawing(value, ctx, 'label', (candidate) => this.isNa(candidate), fn);
   }
 
   private getLabelValue<T>(value: unknown, ctx: ExecutionContext, fn: (label: LabelDrawingOutput) => T): T | number {
-    const labelId = this.toLabelId(value);
-    if (!labelId) return Number.NaN;
-
-    const drawing = ctx.getDrawing(labelId);
-    if (drawing?.type !== 'label') return Number.NaN;
-    return fn(drawing);
+    return getDrawingValue(value, ctx, 'label', (candidate) => this.isNa(candidate), fn);
   }
 
   private withLine(value: unknown, ctx: ExecutionContext, fn: (line: LineDrawingOutput) => void): void {
-    const lineId = this.toDrawingId(value);
-    if (!lineId) return;
-
-    const drawing = ctx.getDrawing(lineId);
-    if (drawing?.type === 'line') {
-      fn(drawing);
-    }
+    withDrawing(value, ctx, 'line', (candidate) => this.isNa(candidate), fn);
   }
 
   private getLineValue<T>(value: unknown, ctx: ExecutionContext, fn: (line: LineDrawingOutput) => T): T | number {
-    const lineId = this.toDrawingId(value);
-    if (!lineId) return Number.NaN;
-
-    const drawing = ctx.getDrawing(lineId);
-    if (drawing?.type !== 'line') return Number.NaN;
-    return fn(drawing);
+    return getDrawingValue(value, ctx, 'line', (candidate) => this.isNa(candidate), fn);
   }
 
   private withLineFill(value: unknown, ctx: ExecutionContext, fn: (linefill: LineFillDrawingOutput) => void): void {
-    const lineFillId = this.toDrawingId(value);
-    if (!lineFillId) return;
-
-    const drawing = ctx.getDrawing(lineFillId);
-    if (drawing?.type === 'linefill') {
-      fn(drawing);
-    }
+    withDrawing(value, ctx, 'linefill', (candidate) => this.isNa(candidate), fn);
   }
 
   private getLineFillValue<T>(value: unknown, ctx: ExecutionContext, fn: (linefill: LineFillDrawingOutput) => T): T | number {
-    const lineFillId = this.toDrawingId(value);
-    if (!lineFillId) return Number.NaN;
-
-    const drawing = ctx.getDrawing(lineFillId);
-    if (drawing?.type !== 'linefill') return Number.NaN;
-    return fn(drawing);
+    return getDrawingValue(value, ctx, 'linefill', (candidate) => this.isNa(candidate), fn);
   }
 
   private withBox(value: unknown, ctx: ExecutionContext, fn: (box: BoxDrawingOutput) => void): void {
-    const boxId = this.toDrawingId(value);
-    if (!boxId) return;
-
-    const drawing = ctx.getDrawing(boxId);
-    if (drawing?.type === 'box') {
-      fn(drawing);
-    }
+    withDrawing(value, ctx, 'box', (candidate) => this.isNa(candidate), fn);
   }
 
   private getBoxValue<T>(value: unknown, ctx: ExecutionContext, fn: (box: BoxDrawingOutput) => T): T | number {
-    const boxId = this.toDrawingId(value);
-    if (!boxId) return Number.NaN;
-
-    const drawing = ctx.getDrawing(boxId);
-    if (drawing?.type !== 'box') return Number.NaN;
-    return fn(drawing);
+    return getDrawingValue(value, ctx, 'box', (candidate) => this.isNa(candidate), fn);
   }
 
   private interpolateLinePrice(line: LineDrawingOutput, x: number): number {
