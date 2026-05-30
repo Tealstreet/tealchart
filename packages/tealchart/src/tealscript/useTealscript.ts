@@ -7,7 +7,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { TealscriptManager, type TealscriptManagerOptions } from './TealscriptManager';
-import type { PlotOutput, InputDefinition, WorkerError, Bar } from '@tealstreet/tealscript';
+import type { PlotOutput, DrawingOutput, InputDefinition, WorkerError, Bar } from '@tealstreet/tealscript';
 
 /**
  * Options for useTealscript hook
@@ -37,6 +37,9 @@ export interface UseTealscriptReturn {
   /** All plot outputs from all scripts */
   plots: PlotOutput[];
 
+  /** All drawing outputs from all scripts */
+  drawings: DrawingOutput[];
+
   /** Add a new script */
   addScript: (scriptId: string, code: string, inputs?: Record<string, unknown>) => Promise<void>;
 
@@ -54,6 +57,9 @@ export interface UseTealscriptReturn {
 
   /** Get input definitions for a script */
   getInputDefinitions: (scriptId: string) => InputDefinition[];
+
+  /** Get drawings for a script */
+  getDrawings: (scriptId: string) => DrawingOutput[];
 
   /** Get error for a script */
   getError: (scriptId: string) => WorkerError | undefined;
@@ -89,6 +95,7 @@ export interface UseTealscriptReturn {
 export function useTealscript(options: UseTealscriptOptions): UseTealscriptReturn {
   const managerRef = useRef<TealscriptManager | null>(null);
   const [plots, setPlots] = useState<PlotOutput[]>([]);
+  const [drawings, setDrawings] = useState<DrawingOutput[]>([]);
 
   // Initialize manager on mount
   useEffect(() => {
@@ -96,6 +103,9 @@ export function useTealscript(options: UseTealscriptOptions): UseTealscriptRetur
       createWorker: () => new Worker(options.workerUrl, { type: 'module' }),
       onPlotsUpdated: (newPlots) => {
         setPlots(newPlots);
+      },
+      onDrawingsUpdated: (newDrawings) => {
+        setDrawings(newDrawings);
       },
       onError: options.onError,
       onInputsDiscovered: options.onInputsDiscovered,
@@ -139,6 +149,10 @@ export function useTealscript(options: UseTealscriptOptions): UseTealscriptRetur
     return managerRef.current?.getInputDefinitions(scriptId) ?? [];
   }, []);
 
+  const getDrawings = useCallback((scriptId: string): DrawingOutput[] => {
+    return managerRef.current?.getDrawings(scriptId) ?? [];
+  }, []);
+
   const getError = useCallback((scriptId: string): WorkerError | undefined => {
     return managerRef.current?.getError(scriptId);
   }, []);
@@ -153,12 +167,14 @@ export function useTealscript(options: UseTealscriptOptions): UseTealscriptRetur
 
   return {
     plots,
+    drawings,
     addScript,
     removeScript,
     setBars,
     updateBar,
     setInputs,
     getInputDefinitions,
+    getDrawings,
     getError,
     isScriptReady,
     getScriptIds,

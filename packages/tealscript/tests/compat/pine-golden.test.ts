@@ -1171,4 +1171,30 @@ plot(last_bar_time, title="Last Bar Time")
       1_700_000_660_000,
     ]);
   });
+
+  it('emits label drawing outputs from common last-bar label idioms', () => {
+    const result = runCompatScript(`
+indicator("Label docs smoke", overlay=true)
+if barstate.islast
+    label.new(bar_index, close, text=str.tostring(close), style=label.style_label_down, color=color.red, textcolor=color.white, size=size.small)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'label_label.new_0_11',
+        type: 'label',
+        barIndex: 11,
+        x: 11,
+        y: 112,
+        text: '112',
+        xloc: 'bar_index',
+        yloc: 'price',
+        style: 'label_down',
+        color: '#F44336',
+        textColor: '#FFFFFF',
+        size: 'small',
+      },
+    ]);
+  });
 });

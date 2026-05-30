@@ -56,7 +56,7 @@ import {
   unshiftArrayValue,
   type PineArray,
 } from './arrays';
-import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type InputDefinition, type PlotOutput, type PlotStyle } from './context';
+import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type DrawingOutput, type InputDefinition, type PlotOutput, type PlotStyle } from './context';
 import { Scope, createRootScope } from './scope';
 
 /**
@@ -64,6 +64,7 @@ import { Scope, createRootScope } from './scope';
  */
 export interface ExecutionResult {
   plots: PlotOutput[];
+  drawings: DrawingOutput[];
   alerts: AlertOutput[];
   inputs: InputDefinition[];
   indicatorTitle: string;
@@ -169,6 +170,7 @@ export class TealscriptEngine {
 
     return {
       plots: this.ctx.getPlots(),
+      drawings: this.ctx.getDrawings(),
       alerts: this.ctx.getAlerts(),
       inputs: this.ctx.inputDefinitions.map((def) => ({ ...def })),
       indicatorTitle: this.ctx.indicatorTitle,
@@ -192,6 +194,7 @@ export class TealscriptEngine {
     // Truncate plot arrays to remove the last bar's appended values
     // so re-execution can re-append them cleanly without duplication
     this.ctx.truncatePlots(this.ctx.last_bar_index);
+    this.ctx.truncateDrawings(this.ctx.last_bar_index);
     this.ctx.truncateAlerts(this.ctx.last_bar_index);
 
     // Update current bar data
@@ -217,6 +220,13 @@ export class TealscriptEngine {
    */
   getAlerts(): AlertOutput[] {
     return this.ctx.getAlerts();
+  }
+
+  /**
+   * Get current drawing outputs.
+   */
+  getDrawings(): DrawingOutput[] {
+    return this.ctx.getDrawings();
   }
 
   // ===========================================================================
@@ -809,7 +819,66 @@ export class TealscriptEngine {
   }
 
   private isUnsupportedDrawingNamespace(namespace: string): boolean {
-    return namespace === 'line' || namespace === 'label' || namespace === 'box' || namespace === 'table';
+    return namespace === 'line' || namespace === 'box' || namespace === 'table';
+  }
+
+  private registerDrawingBuiltins(): void {
+    this.builtins.set('label.new', (args, namedArgs, ctx, _scope, callId) => {
+      const x = this.toNullableNumber(namedArgs.get('x') ?? args[0]);
+      const y = this.toNullableNumber(namedArgs.get('y') ?? args[1]);
+      const text = this.toStringValue(namedArgs.get('text') ?? args[2] ?? '');
+      const id = `label_${callId}_${ctx.bar_index}`;
+
+      ctx.addDrawing({
+        id,
+        type: 'label',
+        barIndex: ctx.bar_index,
+        x,
+        y,
+        text,
+        xloc: this.toStringValue(namedArgs.get('xloc') ?? 'bar_index'),
+        yloc: this.toStringValue(namedArgs.get('yloc') ?? 'price'),
+        style: this.toStringValue(namedArgs.get('style') ?? 'label_left'),
+        color: this.toNullableColor(namedArgs.get('color')),
+        textColor: this.toNullableColor(namedArgs.get('textcolor')),
+        size: this.toStringValue(namedArgs.get('size') ?? 'normal'),
+      });
+
+      return id;
+    });
+
+    this.builtins.set('label.delete', () => undefined);
+
+    const constants: Record<string, string> = {
+      'xloc.bar_index': 'bar_index',
+      'xloc.bar_time': 'bar_time',
+      'yloc.price': 'price',
+      'yloc.abovebar': 'abovebar',
+      'yloc.belowbar': 'belowbar',
+      'label.style_none': 'none',
+      'label.style_label_up': 'label_up',
+      'label.style_label_down': 'label_down',
+      'label.style_label_left': 'label_left',
+      'label.style_label_right': 'label_right',
+      'label.style_label_lower_left': 'label_lower_left',
+      'label.style_label_lower_right': 'label_lower_right',
+      'label.style_label_upper_left': 'label_upper_left',
+      'label.style_label_upper_right': 'label_upper_right',
+      'label.style_circle': 'circle',
+      'label.style_square': 'square',
+      'label.style_diamond': 'diamond',
+      'label.style_cross': 'cross',
+      'label.style_xcross': 'xcross',
+      'label.style_triangleup': 'triangleup',
+      'label.style_triangledown': 'triangledown',
+      'label.style_flag': 'flag',
+      'label.style_arrowup': 'arrowup',
+      'label.style_arrowdown': 'arrowdown',
+    };
+
+    for (const [name, value] of Object.entries(constants)) {
+      this.builtins.set(name, () => value);
+    }
   }
 
   private getMethodBuiltinName(methodName: string): string | undefined {
@@ -1241,6 +1310,15 @@ export class TealscriptEngine {
     return Number.isFinite(parsed) ? parsed : Number.NaN;
   }
 
+  private toNullableNumber(value: unknown): number | null {
+    const numberValue = this.toNumber(value);
+    return Number.isFinite(numberValue) ? numberValue : null;
+  }
+
+  private toNullableColor(value: unknown): string | null {
+    return typeof value === 'string' ? value : null;
+  }
+
   private setBuiltinState(scope: Scope, key: string, value: unknown): void {
     if (scope.has(key)) {
       scope.set(key, value);
@@ -1283,6 +1361,9 @@ export class TealscriptEngine {
 
     // String functions
     this.registerStringBuiltins();
+
+    // Drawing object functions
+    this.registerDrawingBuiltins();
 
     // Time/calendar functions
     this.registerTimeBuiltins();
