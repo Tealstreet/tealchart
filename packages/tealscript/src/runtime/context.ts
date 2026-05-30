@@ -38,6 +38,8 @@ export interface BarState {
   isnew: boolean;
   /** True if the bar just closed */
   isconfirmed: boolean;
+  /** True on the last confirmed historical bar */
+  islastconfirmedhistory: boolean;
 }
 
 /**
@@ -192,6 +194,7 @@ export class ExecutionContext {
     isrealtime: false,
     isnew: true,
     isconfirmed: false,
+    islastconfirmedhistory: false,
   };
 
   /** Symbol information */
@@ -363,7 +366,11 @@ export class ExecutionContext {
     // Update barstate
     this.barstate.isfirst = this.bar_index === 0;
     this.barstate.islast = this.bar_index === this.last_bar_index;
+    this.barstate.ishistory = true;
+    this.barstate.isrealtime = false;
     this.barstate.isnew = true;
+    this.barstate.isconfirmed = true;
+    this.barstate.islastconfirmedhistory = this.barstate.islast;
 
     return true;
   }
@@ -380,6 +387,8 @@ export class ExecutionContext {
     this.barstate.isnew = false;
     this.barstate.isrealtime = true;
     this.barstate.ishistory = false;
+    this.barstate.isconfirmed = false;
+    this.barstate.islastconfirmedhistory = false;
   }
 
   /**
@@ -394,6 +403,7 @@ export class ExecutionContext {
     this.time.commit();
 
     this.barstate.isconfirmed = true;
+    this.barstate.islastconfirmedhistory = this.barstate.ishistory && this.barstate.islast;
   }
 
   /**

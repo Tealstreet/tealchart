@@ -58,7 +58,7 @@ by real Pine examples from official docs or public indicator idioms.
 | `na` value | Partial | Bare `na` and callable `na(value)` are supported with `NaN` as the internal representation; broader propagation and bool behavior need Pine v6 coverage. |
 | Built-in price series | Supported | `open`, `high`, `low`, `close`, `volume`, `time`, `hl2`, `hlc3`, `ohlc4`, `hlcc4`. |
 | `bar_index` / `last_bar_index` | Supported | Available as runtime identifiers. |
-| `barstate.*` | Partial | Core booleans exist; realtime semantics need additional coverage. |
+| `barstate.*` | Partial | Common booleans are exposed, including `isfirst`, `islast`, `ishistory`, `isrealtime`, `isnew`, `isconfirmed`, and `islastconfirmedhistory`. Realtime tick parity still needs browser-worker coverage. |
 | `syminfo.*` | Partial | Static defaults are present. |
 | `timeframe.*` | Partial | Static defaults are present. |
 | Function-local series state | Planned | Needed before UDF-heavy Pine snippets are reliable. |
@@ -215,6 +215,13 @@ directional signal.
 The loop control pass covers ascending and descending numeric loops, `break`,
 `continue`, collection loops over Pine arrays, and the documented tuple form
 `for [index, value] in values`.
+
+## Common `barstate.*` Coverage
+
+The barstate pass exposes common Pine bar-state booleans through `barstate.*`
+member access. Historical execution marks loaded bars as confirmed history,
+sets `islastconfirmedhistory` on the last historical bar, and switches
+`isrealtime` / `isconfirmed` during realtime current-bar updates.
 
 ## Strategy Diagnostic Coverage
 
