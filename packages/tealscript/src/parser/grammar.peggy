@@ -351,15 +351,21 @@ ConditionalExpression
 
 // Logical OR
 OrExpression
-  = head:AndExpression tail:(_ "or" _ AndExpression)* {
+  = head:AndExpression tail:(_ OrOperator _ AndExpression)* {
       return buildBinaryExpr(head, tail);
     }
 
 // Logical AND
 AndExpression
-  = head:ComparisonExpression tail:(_ "and" _ ComparisonExpression)* {
+  = head:ComparisonExpression tail:(_ AndOperator _ ComparisonExpression)* {
       return buildBinaryExpr(head, tail);
     }
+
+OrOperator
+  = "or" !IdentifierPart { return "or"; }
+
+AndOperator
+  = "and" !IdentifierPart { return "and"; }
 
 // Comparison: ==, !=, <, >, <=, >=
 ComparisonExpression
@@ -384,7 +390,7 @@ MultiplicativeExpression
 
 // Unary: -x, +x, not x
 UnaryExpression
-  = op:("-" / "+" / "not") _ arg:UnaryExpression {
+  = op:("-" / "+" / NotOperator) _ arg:UnaryExpression {
       return {
         type: 'UnaryExpression',
         operator: op,
@@ -394,6 +400,9 @@ UnaryExpression
       };
     }
   / PostfixExpression
+
+NotOperator
+  = "not" !IdentifierPart { return "not"; }
 
 // Postfix: calls, member access, index access
 PostfixExpression

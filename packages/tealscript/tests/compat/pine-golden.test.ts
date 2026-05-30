@@ -360,4 +360,107 @@ plot(str.tostring(5 == 3) == "false", title="Bool False")
     expect(getPlot(result, 'Bool True').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Bool False').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
+
+  it('runs generic input helpers with inferred types', () => {
+    const result = runCompatScript(`
+indicator("Generic inputs")
+length = input(3, "Length")
+enabled = input(true, "Enabled")
+label = input("BTC", "Label")
+plot(ta.sma(close, length), title="Basis")
+plot(enabled, title="Enabled")
+plot(label == "BTC", title="Label")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.inputs).toEqual([
+      {
+        id: 'input_Length',
+        type: 'int',
+        title: 'Length',
+        defval: 3,
+      },
+      {
+        id: 'input_Enabled',
+        type: 'bool',
+        title: 'Enabled',
+        defval: true,
+      },
+      {
+        id: 'input_Label',
+        type: 'string',
+        title: 'Label',
+        defval: 'BTC',
+      },
+    ]);
+    expect(roundSeries(getPlot(result, 'Basis').values)).toEqual([null, null, 104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111]);
+    expect(getPlot(result, 'Enabled').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Label').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+  });
+
+  it('runs common typed input helpers', () => {
+    const result = runCompatScript(`
+indicator("Typed inputs")
+start = input.time(1700000000000, "Start")
+tf = input.timeframe("60", "Timeframe")
+symbol = input.symbol("BINANCE:BTCUSDT", "Symbol")
+session = input.session("0930-1600", "Session")
+memo = input.text_area("watch breakout", "Notes")
+plot(start == 1700000000000, title="Time")
+plot(tf == "60", title="Timeframe")
+plot(symbol == "BINANCE:BTCUSDT", title="Symbol")
+plot(session == "0930-1600", title="Session")
+plot(str.contains(memo, "breakout"), title="Text Area")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.inputs.map((input) => input.type)).toEqual(['time', 'timeframe', 'symbol', 'session', 'text_area']);
+    expect(getPlot(result, 'Time').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Timeframe').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Symbol').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Session').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Text Area').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+  });
+
+  it('preserves common input metadata', () => {
+    const result = runCompatScript(`
+indicator("Input metadata")
+mode = input.string("EMA", "Mode", options=["SMA", "EMA"], tooltip="Average type", group="Calculation", inline="ma", confirm=true)
+plot(mode == "EMA", title="Mode")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.inputs).toEqual([
+      {
+        id: 'input_Mode',
+        type: 'string',
+        title: 'Mode',
+        defval: 'EMA',
+        options: ['SMA', 'EMA'],
+        tooltip: 'Average type',
+        group: 'Calculation',
+        inline: 'ma',
+        confirm: true,
+      },
+    ]);
+    expect(getPlot(result, 'Mode').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+  });
+
+  it('matches documented Pine input helper idioms', () => {
+    const result = runCompatScript(`
+indicator("Input docs smoke")
+maTypeInput = input.string("SMA", "MA type", options=["SMA", "EMA"])
+maLengthInput = input.int(5, "MA length", minval=1)
+showSignalsInput = input.bool(true, "Show signals")
+plot(maTypeInput == "SMA", title="MA Type")
+plot(maLengthInput == 5, title="MA Length")
+plot(showSignalsInput, title="Show Signals")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.inputs.map((input) => input.title)).toEqual(['MA type', 'MA length', 'Show signals']);
+    expect(getPlot(result, 'MA Type').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'MA Length').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Show Signals').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+  });
 });

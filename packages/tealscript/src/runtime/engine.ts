@@ -38,7 +38,7 @@ import {
   unshiftArrayValue,
   type PineArray,
 } from './arrays';
-import { ExecutionContext, type Bar, type PlotOutput } from './context';
+import { ExecutionContext, type Bar, type InputDefinition, type PlotOutput } from './context';
 import { Scope, createRootScope } from './scope';
 
 /**
@@ -46,12 +46,7 @@ import { Scope, createRootScope } from './scope';
  */
 export interface ExecutionResult {
   plots: PlotOutput[];
-  inputs: Array<{
-    id: string;
-    type: string;
-    title: string;
-    defval: unknown;
-  }>;
+  inputs: InputDefinition[];
   indicatorTitle: string;
   errors: ExecutionError[];
 }
@@ -150,12 +145,7 @@ export class TealscriptEngine {
 
     return {
       plots: this.ctx.getPlots(),
-      inputs: this.ctx.inputDefinitions.map((def) => ({
-        id: def.id,
-        type: def.type,
-        title: def.title,
-        defval: def.defval,
-      })),
+      inputs: this.ctx.inputDefinitions.map((def) => ({ ...def })),
       indicatorTitle: this.ctx.indicatorTitle,
       errors: this.errors,
     };
@@ -1072,6 +1062,13 @@ export class TealscriptEngine {
   }
 
   private registerInputBuiltins(): void {
+    const inferInputType = (value: unknown): string => {
+      if (typeof value === 'number') return Number.isInteger(value) ? 'int' : 'float';
+      if (typeof value === 'boolean') return 'bool';
+      if (typeof value === 'string') return 'string';
+      return 'source';
+    };
+
     const createInputFunc = (type: string) => {
       return (args: unknown[], namedArgs: Map<string, unknown>, ctx: ExecutionContext) => {
         const defval = args[0];
@@ -1082,12 +1079,18 @@ export class TealscriptEngine {
         if (ctx.bar_index === 0) {
           ctx.registerInput({
             id,
-            type: type as 'int' | 'float' | 'bool' | 'string' | 'source' | 'color',
+            type: type as 'int' | 'float' | 'bool' | 'string' | 'source' | 'color' | 'time' | 'timeframe' | 'symbol' | 'session' | 'text_area',
             title,
             defval,
             minval: namedArgs.get('minval') as number | undefined,
             maxval: namedArgs.get('maxval') as number | undefined,
             step: namedArgs.get('step') as number | undefined,
+            options: namedArgs.get('options') as unknown[] | undefined,
+            tooltip: namedArgs.get('tooltip') as string | undefined,
+            group: namedArgs.get('group') as string | undefined,
+            inline: namedArgs.get('inline') as string | undefined,
+            confirm: namedArgs.get('confirm') as boolean | undefined,
+            display: namedArgs.get('display'),
           });
         }
 
@@ -1095,11 +1098,20 @@ export class TealscriptEngine {
       };
     };
 
+    this.builtins.set('input', (args, namedArgs, ctx) => {
+      const defval = args[0];
+      return createInputFunc(inferInputType(defval))(args, namedArgs, ctx);
+    });
     this.builtins.set('input.int', createInputFunc('int'));
     this.builtins.set('input.float', createInputFunc('float'));
     this.builtins.set('input.bool', createInputFunc('bool'));
     this.builtins.set('input.string', createInputFunc('string'));
     this.builtins.set('input.color', createInputFunc('color'));
+    this.builtins.set('input.time', createInputFunc('time'));
+    this.builtins.set('input.timeframe', createInputFunc('timeframe'));
+    this.builtins.set('input.symbol', createInputFunc('symbol'));
+    this.builtins.set('input.session', createInputFunc('session'));
+    this.builtins.set('input.text_area', createInputFunc('text_area'));
 
     // input.source is special - it returns a series
     this.builtins.set('input.source', (args, namedArgs, _ctx) => {
