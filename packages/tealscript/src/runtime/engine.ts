@@ -713,6 +713,9 @@ export class TealscriptEngine {
     if (namespace === 'strategy') {
       throw new Error(`strategy.* functions are not supported yet: ${fullName}`);
     }
+    if (namespace && this.isUnsupportedDrawingNamespace(namespace)) {
+      throw new Error(`${namespace}.* functions are not supported yet: ${fullName}`);
+    }
 
     // Evaluate arguments
     const args: unknown[] = [];
@@ -750,6 +753,10 @@ export class TealscriptEngine {
     }
 
     throw new Error(`Unknown function: ${fullName}`);
+  }
+
+  private isUnsupportedDrawingNamespace(namespace: string): boolean {
+    return namespace === 'line' || namespace === 'label' || namespace === 'box' || namespace === 'table';
   }
 
   private getMethodBuiltinName(methodName: string): string | undefined {
