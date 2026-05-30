@@ -557,6 +557,22 @@ hline(100, "Level", color=color.red)
       expect(result.plots[0].price).toBe(100);
     });
 
+    it('creates bar color output', () => {
+      const code = `//@version=6
+indicator("Test")
+candleColor = close >= open ? color.green : na
+barcolor(candleColor)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(1);
+      expect(result.plots[0].type).toBe('barcolor');
+      expect(result.plots[0].color).toEqual(['#4CAF50', '#4CAF50', '#4CAF50', null, null]);
+      expect(result.plots[0].values).toEqual([null, null, null, null, null]);
+    });
+
     it('creates multiple plots', () => {
       const code = `//@version=6
 indicator("Test")
