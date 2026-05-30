@@ -64,7 +64,7 @@ by real Pine examples from official docs or public indicator idioms.
 | `bar_index` / `last_bar_index` | Supported | Available as runtime identifiers. |
 | `barstate.*` | Partial | Common booleans are exposed, including `isfirst`, `islast`, `ishistory`, `isrealtime`, `isnew`, `isconfirmed`, and `islastconfirmedhistory`. Realtime tick parity still needs browser-worker coverage. |
 | `syminfo.*` | Partial | Static defaults are exposed through common chart-info fields such as `ticker`, `tickerid`, `root`, `mintick`, and `minmove`. Live symbol metadata injection is still planned. |
-| `timeframe.*` | Partial | Static defaults are exposed through common timeframe fields such as `period`, `main_period`, `multiplier`, `isintraday`, and `isdwm`. Live chart timeframe injection is still planned. |
+| `timeframe.*` | Partial | Static defaults are exposed through common timeframe fields such as `period`, `main_period`, `multiplier`, `isintraday`, and `isdwm`; `timeframe.in_seconds()` exists for supported timeframe strings. Live chart timeframe injection is still planned. |
 | Function-local series state | Partial | Root and function-local `var` values persist, branch expression returns work, and recursive UDF calls are rejected with explicit diagnostics. Nested block parsing and broader call-site series parity still need hardening. |
 | `max_bars_back` | Partial | Declaration metadata is parsed, validated, and exposed on execution results; runtime buffer enforcement/inference is not implemented yet. |
 
@@ -249,7 +249,8 @@ sets `islastconfirmedhistory` on the last historical bar, and switches
 The chart-info pass exposes common static `syminfo.*` and `timeframe.*`
 members used by generated indicators and multi-timeframe script templates,
 including `syminfo.tickerid`, `syminfo.root`, `timeframe.period`,
-`timeframe.main_period`, `timeframe.multiplier`, and timeframe category flags.
+`timeframe.main_period`, `timeframe.multiplier`, `timeframe.in_seconds()`, and
+timeframe category flags.
 
 ## Common Calendar Coverage
 
