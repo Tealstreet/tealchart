@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { parse, validate, TealscriptParseError, formatParseError } from '../../src/parser';
-import type { Program, IndicatorDeclaration, VariableDeclaration, CallExpression } from '../../src/parser';
+import type { Program, FunctionDeclaration, IndicatorDeclaration, VariableDeclaration, CallExpression } from '../../src/parser';
 
 describe('Tealscript Parser', () => {
   describe('Version annotation', () => {
@@ -95,6 +95,34 @@ describe('Tealscript Parser', () => {
         expect(decl.names.names[1].name).toBe('b');
         expect(decl.names.names[2].name).toBe('c');
       }
+    });
+  });
+
+  describe('Function declarations', () => {
+    it('parses single-line user-defined functions without parameters', () => {
+      const ast = parse('answer() => 42\n');
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(fn.name.name).toBe('answer');
+      expect(fn.params).toEqual([]);
+      expect(fn.body).toEqual(expect.objectContaining({
+        type: 'NumericLiteral',
+        value: 42,
+      }));
+    });
+
+    it('parses single-line user-defined functions with parameters', () => {
+      const ast = parse('spread(source, length) => source - ta.sma(source, length)\n');
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(fn.name.name).toBe('spread');
+      expect(fn.params.map((param) => param.name)).toEqual(['source', 'length']);
+      expect(fn.body).toEqual(expect.objectContaining({
+        type: 'BinaryExpression',
+        operator: '-',
+      }));
     });
   });
 
