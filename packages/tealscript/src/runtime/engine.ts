@@ -89,6 +89,8 @@ type BuiltinFunction = (
  * Tealscript Engine - executes AST bar-by-bar
  */
 export class TealscriptEngine {
+  private static readonly MAX_LOOP_ITERATIONS = 10000;
+
   private ctx: ExecutionContext;
   private scope: Scope;
   private builtins: Map<string, BuiltinFunction>;
@@ -385,8 +387,14 @@ export class TealscriptEngine {
     const savedScope = this.scope;
     this.scope = childScope;
 
+    let iterations = 0;
+
     try {
       for (let i = start; step > 0 ? i <= end : i >= end; i += step) {
+        if (++iterations > TealscriptEngine.MAX_LOOP_ITERATIONS) {
+          throw new Error('Maximum loop iterations exceeded');
+        }
+
         this.scope.declare(stmt.counter.name, 'none', i);
 
         try {
@@ -424,8 +432,14 @@ export class TealscriptEngine {
     const savedScope = this.scope;
     this.scope = childScope;
 
+    let iterations = 0;
+
     try {
       for (const value of values) {
+        if (++iterations > TealscriptEngine.MAX_LOOP_ITERATIONS) {
+          throw new Error('Maximum loop iterations exceeded');
+        }
+
         this.scope.declare(stmt.counter.name, 'none', value);
 
         try {
@@ -449,11 +463,10 @@ export class TealscriptEngine {
     this.scope = childScope;
 
     let iterations = 0;
-    const maxIterations = 10000; // Safety limit
 
     try {
       while (this.isTruthy(this.evaluateExpression(stmt.test))) {
-        if (++iterations > maxIterations) {
+        if (++iterations > TealscriptEngine.MAX_LOOP_ITERATIONS) {
           throw new Error('Maximum loop iterations exceeded');
         }
 
