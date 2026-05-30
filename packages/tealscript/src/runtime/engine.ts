@@ -57,7 +57,7 @@ import {
   type PineArray,
 } from './arrays';
 import type { BuiltinRegistry } from './builtins/registry';
-import { registerDrawingConstants, registerLabelBuiltins, type DrawingBuiltinRuntime } from './builtins/drawings';
+import { registerDrawingConstants, registerLabelBuiltins, registerLineBuiltins, type DrawingBuiltinRuntime } from './builtins/drawings';
 import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type BoxDrawingOutput, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LineFillDrawingOutput, type PlotOutput, type PlotStyle } from './context';
 import {
   getDrawingValue,
@@ -854,143 +854,7 @@ export class TealscriptEngine {
 
   private registerDrawingBuiltins(): void {
     registerLabelBuiltins(this.builtins, this.createDrawingBuiltinRuntime());
-
-    this.builtins.set('line.new', (args, namedArgs, ctx, _scope, callId) => {
-      const x1 = this.toNullableNumber(namedArgs.get('x1') ?? args[0]);
-      const y1 = this.toNullableNumber(namedArgs.get('y1') ?? args[1]);
-      const x2 = this.toNullableNumber(namedArgs.get('x2') ?? args[2]);
-      const y2 = this.toNullableNumber(namedArgs.get('y2') ?? args[3]);
-      const id = `line_${callId}_${ctx.bar_index}`;
-
-      ctx.addDrawing({
-        id,
-        type: 'line',
-        barIndex: ctx.bar_index,
-        x1,
-        y1,
-        x2,
-        y2,
-        xloc: this.toStringValue(namedArgs.get('xloc') ?? args[4] ?? 'bar_index'),
-        extend: this.toStringValue(namedArgs.get('extend') ?? args[5] ?? 'none'),
-        color: this.toNullableColor(namedArgs.get('color') ?? args[6]),
-        style: this.toStringValue(namedArgs.get('style') ?? args[7] ?? 'solid'),
-        width: this.toLineWidth(namedArgs.get('width') ?? args[8]),
-        forceOverlay: Boolean(namedArgs.get('force_overlay') ?? args[9] ?? false),
-      });
-
-      return id;
-    });
-
-    this.builtins.set('line.delete', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => ctx.deleteDrawing(line.id));
-      return undefined;
-    });
-
-    this.builtins.set('line.copy', (args, _namedArgs, ctx, _scope, callId) => {
-      const lineId = this.toDrawingId(args[0]);
-      if (!lineId) return Number.NaN;
-
-      const newId = `line_${callId}_${ctx.bar_index}`;
-      const copy = ctx.copyLineDrawing(lineId, newId);
-      return copy ? newId : Number.NaN;
-    });
-
-    this.builtins.set('line.set_x1', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.x1 = this.toNullableNumber(args[1]);
-        line.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_x2', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.x2 = this.toNullableNumber(args[1]);
-        line.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_y1', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.y1 = this.toNullableNumber(args[1]);
-        line.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_y2', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.y2 = this.toNullableNumber(args[1]);
-        line.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_xy1', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.x1 = this.toNullableNumber(args[1]);
-        line.y1 = this.toNullableNumber(args[2]);
-        line.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_xy2', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.x2 = this.toNullableNumber(args[1]);
-        line.y2 = this.toNullableNumber(args[2]);
-        line.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_xloc', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.x1 = this.toNullableNumber(args[1]);
-        line.x2 = this.toNullableNumber(args[2]);
-        line.xloc = this.toStringValue(args[3]);
-        line.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_extend', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.extend = this.toStringValue(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_color', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.color = this.toNullableColor(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_style', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.style = this.toStringValue(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_width', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.width = this.toLineWidth(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.get_x1', (args, _namedArgs, ctx) => this.getLineValue(args[0], ctx, (line) => line.x1 ?? Number.NaN));
-    this.builtins.set('line.get_x2', (args, _namedArgs, ctx) => this.getLineValue(args[0], ctx, (line) => line.x2 ?? Number.NaN));
-    this.builtins.set('line.get_y1', (args, _namedArgs, ctx) => this.getLineValue(args[0], ctx, (line) => line.y1 ?? Number.NaN));
-    this.builtins.set('line.get_y2', (args, _namedArgs, ctx) => this.getLineValue(args[0], ctx, (line) => line.y2 ?? Number.NaN));
-    this.builtins.set('line.get_price', (args, _namedArgs, ctx) => {
-      const x = this.toNumber(args[1]);
-      return this.getLineValue(args[0], ctx, (line) => this.interpolateLinePrice(line, x));
-    });
+    registerLineBuiltins(this.builtins, this.createDrawingBuiltinRuntime());
 
     this.builtins.set('linefill.new', (args, namedArgs, ctx, _scope, callId) => {
       const line1 = this.toDrawingId(namedArgs.get('line1') ?? args[0]);
@@ -1173,8 +1037,14 @@ export class TealscriptEngine {
       isNa: (value) => this.isNa(value),
       toNullableNumber: (value) => this.toNullableNumber(value),
       toStringValue: (value) => this.toStringValue(value),
+      toNumber: (value) => this.toNumber(value),
       toNullableColor: (value) => this.toNullableColor(value),
       toOptionalString: (value) => this.toOptionalString(value),
+      toLineWidth: (value) => this.toLineWidth(value),
+      toDrawingId: (value) => this.toDrawingId(value),
+      withLine: (value, ctx, fn) => this.withLine(value, ctx, fn),
+      getLineValue: (value, ctx, fn) => this.getLineValue(value, ctx, fn),
+      interpolateLinePrice: (line, x) => this.interpolateLinePrice(line, x),
     };
   }
 

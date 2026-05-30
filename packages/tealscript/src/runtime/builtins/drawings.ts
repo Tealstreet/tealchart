@@ -4,13 +4,21 @@ import {
   toDrawingId,
   withDrawing,
 } from '../drawings/helpers';
+import type { ExecutionContext } from '../context';
+import type { LineDrawingOutput } from '../drawings/types';
 
 export interface DrawingBuiltinRuntime {
   isNa(value: unknown): boolean;
   toNullableNumber(value: unknown): number | null;
   toStringValue(value: unknown): string;
+  toNumber(value: unknown): number;
   toNullableColor(value: unknown): string | null;
   toOptionalString(value: unknown): string | undefined;
+  toLineWidth(value: unknown): number;
+  toDrawingId(value: unknown): string | undefined;
+  withLine(value: unknown, ctx: ExecutionContext, fn: (line: LineDrawingOutput) => void): void;
+  getLineValue<T>(value: unknown, ctx: ExecutionContext, fn: (line: LineDrawingOutput) => T): T | number;
+  interpolateLinePrice(line: LineDrawingOutput, x: number): number;
 }
 
 export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
@@ -146,6 +154,145 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
   builtins.set('label.get_textcolor', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.textColor ?? Number.NaN));
   builtins.set('label.get_size', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.size));
   builtins.set('label.get_tooltip', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.tooltip ?? ''));
+}
+
+export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
+  builtins.set('line.new', (args, namedArgs, ctx, _scope, callId) => {
+    const x1 = runtime.toNullableNumber(namedArgs.get('x1') ?? args[0]);
+    const y1 = runtime.toNullableNumber(namedArgs.get('y1') ?? args[1]);
+    const x2 = runtime.toNullableNumber(namedArgs.get('x2') ?? args[2]);
+    const y2 = runtime.toNullableNumber(namedArgs.get('y2') ?? args[3]);
+    const id = `line_${callId}_${ctx.bar_index}`;
+
+    ctx.addDrawing({
+      id,
+      type: 'line',
+      barIndex: ctx.bar_index,
+      x1,
+      y1,
+      x2,
+      y2,
+      xloc: runtime.toStringValue(namedArgs.get('xloc') ?? args[4] ?? 'bar_index'),
+      extend: runtime.toStringValue(namedArgs.get('extend') ?? args[5] ?? 'none'),
+      color: runtime.toNullableColor(namedArgs.get('color') ?? args[6]),
+      style: runtime.toStringValue(namedArgs.get('style') ?? args[7] ?? 'solid'),
+      width: runtime.toLineWidth(namedArgs.get('width') ?? args[8]),
+      forceOverlay: Boolean(namedArgs.get('force_overlay') ?? args[9] ?? false),
+    });
+
+    return id;
+  });
+
+  builtins.set('line.delete', (args, _namedArgs, ctx) => {
+    runtime.withLine(args[0], ctx, (line) => ctx.deleteDrawing(line.id));
+    return undefined;
+  });
+
+  builtins.set('line.copy', (args, _namedArgs, ctx, _scope, callId) => {
+    const lineId = runtime.toDrawingId(args[0]);
+    if (!lineId) return Number.NaN;
+
+    const newId = `line_${callId}_${ctx.bar_index}`;
+    const copy = ctx.copyLineDrawing(lineId, newId);
+    return copy ? newId : Number.NaN;
+  });
+
+  builtins.set('line.set_x1', (args, _namedArgs, ctx) => {
+    runtime.withLine(args[0], ctx, (line) => {
+      line.x1 = runtime.toNullableNumber(args[1]);
+      line.barIndex = ctx.bar_index;
+    });
+    return undefined;
+  });
+
+  builtins.set('line.set_x2', (args, _namedArgs, ctx) => {
+    runtime.withLine(args[0], ctx, (line) => {
+      line.x2 = runtime.toNullableNumber(args[1]);
+      line.barIndex = ctx.bar_index;
+    });
+    return undefined;
+  });
+
+  builtins.set('line.set_y1', (args, _namedArgs, ctx) => {
+    runtime.withLine(args[0], ctx, (line) => {
+      line.y1 = runtime.toNullableNumber(args[1]);
+      line.barIndex = ctx.bar_index;
+    });
+    return undefined;
+  });
+
+  builtins.set('line.set_y2', (args, _namedArgs, ctx) => {
+    runtime.withLine(args[0], ctx, (line) => {
+      line.y2 = runtime.toNullableNumber(args[1]);
+      line.barIndex = ctx.bar_index;
+    });
+    return undefined;
+  });
+
+  builtins.set('line.set_xy1', (args, _namedArgs, ctx) => {
+    runtime.withLine(args[0], ctx, (line) => {
+      line.x1 = runtime.toNullableNumber(args[1]);
+      line.y1 = runtime.toNullableNumber(args[2]);
+      line.barIndex = ctx.bar_index;
+    });
+    return undefined;
+  });
+
+  builtins.set('line.set_xy2', (args, _namedArgs, ctx) => {
+    runtime.withLine(args[0], ctx, (line) => {
+      line.x2 = runtime.toNullableNumber(args[1]);
+      line.y2 = runtime.toNullableNumber(args[2]);
+      line.barIndex = ctx.bar_index;
+    });
+    return undefined;
+  });
+
+  builtins.set('line.set_xloc', (args, _namedArgs, ctx) => {
+    runtime.withLine(args[0], ctx, (line) => {
+      line.x1 = runtime.toNullableNumber(args[1]);
+      line.x2 = runtime.toNullableNumber(args[2]);
+      line.xloc = runtime.toStringValue(args[3]);
+      line.barIndex = ctx.bar_index;
+    });
+    return undefined;
+  });
+
+  builtins.set('line.set_extend', (args, _namedArgs, ctx) => {
+    runtime.withLine(args[0], ctx, (line) => {
+      line.extend = runtime.toStringValue(args[1]);
+    });
+    return undefined;
+  });
+
+  builtins.set('line.set_color', (args, _namedArgs, ctx) => {
+    runtime.withLine(args[0], ctx, (line) => {
+      line.color = runtime.toNullableColor(args[1]);
+    });
+    return undefined;
+  });
+
+  builtins.set('line.set_style', (args, _namedArgs, ctx) => {
+    runtime.withLine(args[0], ctx, (line) => {
+      line.style = runtime.toStringValue(args[1]);
+    });
+    return undefined;
+  });
+
+  builtins.set('line.set_width', (args, _namedArgs, ctx) => {
+    runtime.withLine(args[0], ctx, (line) => {
+      line.width = runtime.toLineWidth(args[1]);
+    });
+    return undefined;
+  });
+
+  builtins.set('line.get_x1', (args, _namedArgs, ctx) => runtime.getLineValue(args[0], ctx, (line) => line.x1 ?? Number.NaN));
+  builtins.set('line.get_x2', (args, _namedArgs, ctx) => runtime.getLineValue(args[0], ctx, (line) => line.x2 ?? Number.NaN));
+  builtins.set('line.get_y1', (args, _namedArgs, ctx) => runtime.getLineValue(args[0], ctx, (line) => line.y1 ?? Number.NaN));
+  builtins.set('line.get_y2', (args, _namedArgs, ctx) => runtime.getLineValue(args[0], ctx, (line) => line.y2 ?? Number.NaN));
+  builtins.set('line.get_price', (args, _namedArgs, ctx) => {
+    const x = runtime.toNumber(args[1]);
+    return runtime.getLineValue(args[0], ctx, (line) => runtime.interpolateLinePrice(line, x));
+  });
 }
 
 const DRAWING_CONSTANTS: Record<string, string> = {
