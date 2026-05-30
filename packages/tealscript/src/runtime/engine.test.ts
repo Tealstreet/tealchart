@@ -23,6 +23,11 @@ function createBars(count: number, startPrice = 100): Bar[] {
   return bars;
 }
 
+function roundSeries(values: Array<number | null>, digits: number = 6): Array<number | null> {
+  const factor = 10 ** digits;
+  return values.map((value) => (value === null ? null : Math.round(value * factor) / factor));
+}
+
 describe('TealscriptEngine', () => {
   describe('unsupported Pine strategy diagnostics', () => {
     it('records an explicit strategy declaration diagnostic', () => {
@@ -152,6 +157,37 @@ plot(barstate.islastconfirmedhistory ? 1 : 0, title="Last Confirmed History")`;
       expect(result.plots.find((plot) => plot.title === 'New')?.values).toEqual([1, 1, 1]);
       expect(result.plots.find((plot) => plot.title === 'Confirmed')?.values).toEqual([1, 1, 1]);
       expect(result.plots.find((plot) => plot.title === 'Last Confirmed History')?.values).toEqual([0, 0, 1]);
+    });
+
+    it('exposes Pine calendar variables and timestamp helpers', () => {
+      const script = `//@version=6
+indicator("Calendar")
+plot(year, title="Year")
+plot(month, title="Month")
+plot(dayofmonth, title="Day")
+plot(dayofweek == dayofweek.friday ? 1 : 0, title="Friday")
+plot(hour, title="Hour")
+plot(minute, title="Minute")
+plot(second, title="Second")
+plot(timestamp("GMT+2", 2024, 1, 5, 9, 30), title="Timestamp")
+plot(hour(timestamp("GMT+2", 2024, 1, 5, 9, 30), "GMT+2"), title="Timestamp Hour")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: Date.UTC(2024, 0, 5, 7, 30, 15), open: 1, high: 2, low: 1, close: 2, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Year')?.values).toEqual([2024]);
+      expect(result.plots.find((plot) => plot.title === 'Month')?.values).toEqual([1]);
+      expect(result.plots.find((plot) => plot.title === 'Day')?.values).toEqual([5]);
+      expect(result.plots.find((plot) => plot.title === 'Friday')?.values).toEqual([1]);
+      expect(result.plots.find((plot) => plot.title === 'Hour')?.values).toEqual([7]);
+      expect(result.plots.find((plot) => plot.title === 'Minute')?.values).toEqual([30]);
+      expect(result.plots.find((plot) => plot.title === 'Second')?.values).toEqual([15]);
+      expect(result.plots.find((plot) => plot.title === 'Timestamp')?.values).toEqual([Date.UTC(2024, 0, 5, 7, 30)]);
+      expect(result.plots.find((plot) => plot.title === 'Timestamp Hour')?.values).toEqual([9]);
     });
 
     it('exposes Pine syminfo and timeframe values through member access', () => {
@@ -1015,6 +1051,29 @@ plot(ta.median(close - open, 3), title="Derived Median")`;
       expect(result.plots.find((plot) => plot.title === 'Linear')?.values).toEqual([null, null, 2.5, 4, 4.5]);
       expect(result.plots.find((plot) => plot.title === 'Percent Rank')?.values).toEqual([null, null, (2 / 3) * 100, 100, (2 / 3) * 100]);
       expect(result.plots.find((plot) => plot.title === 'Derived Median')?.values).toEqual([null, null, 1, 1, 1]);
+    });
+
+    it('calculates ALMA and SWMA helpers', () => {
+      const script = `//@version=6
+indicator("TA averages")
+plot(ta.swma(close), title="SWMA")
+plot(ta.alma(close, 3, 0.5, 6), title="ALMA")
+plot(ta.swma(close - open), title="Derived SWMA")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 0, high: 1, low: 0, close: 1, volume: 100 },
+        { time: 2, open: 0, high: 3, low: 0, close: 3, volume: 100 },
+        { time: 3, open: 1, high: 2, low: 0, close: 2, volume: 100 },
+        { time: 4, open: 4, high: 5, low: 0, close: 5, volume: 100 },
+        { time: 5, open: 5, high: 4, low: 0, close: 4, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'SWMA')?.values).toEqual([null, null, null, 8 / 3, 3.5]);
+      expect(roundSeries(result.plots.find((plot) => plot.title === 'ALMA')?.values ?? [])).toEqual([null, null, 2.680479, 2.426028, 4.573972]);
+      expect(result.plots.find((plot) => plot.title === 'Derived SWMA')?.values).toEqual([null, null, null, 5 / 3, 1]);
     });
 
     it('calculates rising and falling TA helpers', () => {
