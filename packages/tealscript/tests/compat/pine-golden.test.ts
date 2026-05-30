@@ -173,6 +173,16 @@ plot(distance(close), title="Distance")
     expect(roundSeries(getPlot(result, 'Distance').values)).toEqual([null, null, 2.333333, -2, -4, -0.666667, 3, 4.666667, 1, 1.666667, 0.333333, 1]);
   });
 
+  it('rejects recursive user-defined function calls with a clear diagnostic', () => {
+    const result = runCompatScript(`
+indicator("UDF recursion")
+countdown(value) => value <= 0 ? 0 : countdown(value - 1)
+plot(countdown(2), title="Countdown")
+`);
+
+    expect(result.errors[0]?.message).toBe('Recursive user function calls are not supported: countdown -> countdown');
+  });
+
   it('preserves history for derived regular series variables', () => {
     const result = runCompatScript(`
 indicator("Regular series history")
