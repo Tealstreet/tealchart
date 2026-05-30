@@ -228,4 +228,58 @@ plot(array.size(values), title="Literal Size")
     expect(roundSeries(getPlot(result, 'Middle').values)).toEqual([20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]);
     expect(roundSeries(getPlot(result, 'Literal Size').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
   });
+
+  it('runs ta.barssince and ta.valuewhen helpers', () => {
+    const result = runCompatScript(`
+indicator("TA event helpers")
+condition = close > open
+plot(ta.barssince(condition), title="Bars Since Green")
+plot(ta.valuewhen(condition, close, 0), title="Last Green Close")
+plot(ta.valuewhen(condition, close, 1), title="Previous Green Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Bars Since Green').values)).toEqual([0, 0, 0, 1, 2, 0, 0, 0, 1, 0, 1, 0]);
+    expect(roundSeries(getPlot(result, 'Last Green Close').values)).toEqual([102, 105, 107, 107, 107, 100, 104, 109, 109, 111, 111, 112]);
+    expect(roundSeries(getPlot(result, 'Previous Green Close').values)).toEqual([null, 102, 105, 105, 105, 107, 100, 104, 104, 109, 109, 111]);
+  });
+
+  it('runs ta.vwma and bar-offset window helpers', () => {
+    const result = runCompatScript(`
+indicator("TA window helpers")
+plot(ta.vwma(close, 3), title="VWMA")
+plot(ta.highestbars(high, 4), title="Highest Offset")
+plot(ta.lowestbars(low, 4), title="Lowest Offset")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'VWMA').values)).toEqual([
+      null,
+      null,
+      104.6,
+      104.784615,
+      102.43662,
+      100.635135,
+      101.013333,
+      104.962025,
+      107.121951,
+      109.418605,
+      109.777778,
+      111.023256,
+    ]);
+    expect(roundSeries(getPlot(result, 'Highest Offset').values)).toEqual([0, 0, 0, 0, 1, 2, 3, 0, 0, 0, 0, 1]);
+    expect(roundSeries(getPlot(result, 'Lowest Offset').values)).toEqual([0, 1, 2, 3, 0, 0, 1, 2, 3, 3, 3, 3]);
+  });
+
+  it('runs ta.cross and ta.range compatibility helpers', () => {
+    const result = runCompatScript(`
+indicator("TA cross range")
+plot(ta.cross(close, 104), title="Cross Threshold")
+plot(ta.range(close, 4), title="Close Range")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Cross Threshold').values).toEqual([false, true, false, true, false, false, false, true, false, false, false, false]);
+    expect(roundSeries(getPlot(result, 'Close Range').values)).toEqual([0, 3, 5, 5, 8, 8, 5, 10, 9, 7, 3, 4]);
+  });
 });
