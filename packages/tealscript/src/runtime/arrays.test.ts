@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   avgArrayValue,
   clearArray,
+  concatArray,
   copyArray,
   createPineArray,
   firstArrayValue,
@@ -12,6 +13,7 @@ import {
   indexOfArrayValue,
   insertArrayValue,
   isPineArray,
+  joinArray,
   lastArrayValue,
   lastIndexOfArrayValue,
   maxArrayValue,
@@ -19,8 +21,10 @@ import {
   popArrayValue,
   pushArrayValue,
   removeArrayValue,
+  reverseArray,
   setArrayValue,
   shiftArrayValue,
+  sortArray,
   sumArrayValue,
   unshiftArrayValue,
 } from './arrays';
@@ -113,6 +117,48 @@ describe('PineArray', () => {
     expect(array.values).toEqual([1, 2, 3]);
     expect(removeArrayValue(array, 1)).toBe(2);
     expect(array.values).toEqual([1, 3]);
+  });
+
+  it('sorts and reverses arrays in place', () => {
+    const array = createPineArray<number>();
+    [3, Number.NaN, 1, 2].forEach((value) => pushArrayValue(array, value));
+
+    sortArray(array);
+    expect(array.values).toEqual([1, 2, 3, Number.NaN]);
+
+    sortArray(array, 'descending');
+    expect(array.values).toEqual([Number.NaN, 3, 2, 1]);
+
+    reverseArray(array);
+    expect(array.values).toEqual([1, 2, 3, Number.NaN]);
+  });
+
+  it('concatenates arrays in place and joins values with a separator', () => {
+    const array = createPineArray<string>();
+    ['z', 'a', ''].forEach((value) => pushArrayValue(array, value));
+    const other = createPineArray<string>();
+    pushArrayValue(other, 'm');
+
+    sortArray(array);
+    expect(array.values).toEqual(['a', 'z', '']);
+
+    const returned = concatArray(array, other);
+    setArrayValue(other, 0, 'changed');
+
+    expect(returned).toBe(array);
+    expect(array.values).toEqual(['a', 'z', '', 'm']);
+    expect(joinArray(array, '|')).toBe('a|z||m');
+  });
+
+  it('sorts strings by code-unit order', () => {
+    const array = createPineArray<string>();
+    ['{ABC}', 'a', 'A', '1', '!'].forEach((value) => pushArrayValue(array, value));
+
+    sortArray(array);
+    expect(array.values).toEqual(['!', '1', 'A', 'a', '{ABC}']);
+
+    sortArray(array, 'descending');
+    expect(array.values).toEqual(['{ABC}', 'a', 'A', '1', '!']);
   });
 
   it('summarizes numeric arrays', () => {

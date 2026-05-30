@@ -439,6 +439,33 @@ plot(removed, title="Removed")`;
       expect(result.plots.find((plot) => plot.title === 'Removed')?.values).toEqual([5, 5]);
     });
 
+    it('executes array ordering helpers and methods', () => {
+      const script = `//@version=6
+indicator("Array Ordering")
+values = array.from(3, 1, 2)
+values.sort(order.descending)
+top = values.get(0)
+values.reverse()
+bottom = values.get(0)
+more = array.from(4, 5)
+values.concat(more)
+joined = values.join("|")
+plot(top, title="Top")
+plot(bottom, title="Bottom")
+plot(joined == "1|2|3|4|5" ? 1 : 0, title="Joined")
+plot(values.size(), title="Size")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Top')?.values).toEqual([3, 3]);
+      expect(result.plots.find((plot) => plot.title === 'Bottom')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Joined')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Size')?.values).toEqual([5, 5]);
+    });
+
     it('returns expression results from user function if branches', () => {
       const script = `//@version=6
 indicator("Function If")

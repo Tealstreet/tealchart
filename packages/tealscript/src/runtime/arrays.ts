@@ -108,6 +108,41 @@ export function removeArrayValue<T = unknown>(array: PineArray<T>, index: number
   return array.values.splice(normalizeExistingIndex(index, getArraySize(array)), 1)[0];
 }
 
+export function sortArray(array: PineArray, order: unknown = 'ascending'): void {
+  const descending = order === 'descending';
+  array.values.sort((left, right) => {
+    const leftMissing = left === '' || (typeof left === 'number' && Number.isNaN(left));
+    const rightMissing = right === '' || (typeof right === 'number' && Number.isNaN(right));
+
+    if (leftMissing || rightMissing) {
+      if (leftMissing && rightMissing) return 0;
+      return leftMissing === descending ? -1 : 1;
+    }
+
+    const result = typeof left === 'number' && typeof right === 'number' ? left - right : compareStrings(String(left), String(right));
+    return descending ? -result : result;
+  });
+}
+
+function compareStrings(left: string, right: string): number {
+  if (left < right) return -1;
+  if (left > right) return 1;
+  return 0;
+}
+
+export function reverseArray(array: PineArray): void {
+  array.values.reverse();
+}
+
+export function joinArray(array: PineArray, separator: unknown = ''): string {
+  return array.values.join(String(separator));
+}
+
+export function concatArray<T = unknown>(array: PineArray<T>, other: PineArray<T>): PineArray<T> {
+  array.values.push(...other.values);
+  return array;
+}
+
 function numericArrayValues(array: PineArray): number[] {
   return array.values.map(Number).filter((value) => !Number.isNaN(value));
 }
