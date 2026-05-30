@@ -10,7 +10,7 @@
  * This is the vanilla equivalent of Tealchart.tsx
  */
 
-import type { PlotOutput } from '@tealstreet/tealscript';
+import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 import type { CrosshairState as EventCrosshairState, PaneDividerInfo } from '../interaction/EventManager';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
@@ -494,6 +494,7 @@ export class ChartCore {
   private positionLines: PositionLineRenderData[] = [];
   private executionLines: ExecutionLineRenderData[] = [];
   private plots: PlotOutput[] = [];
+  private drawings: DrawingOutput[] = [];
   private paneLayout: PaneLayout | undefined;
   private unifiedPaneLayout: UnifiedPaneLayout | undefined;
   private indicatorPaneInfo: Record<string, IndicatorPaneInfo> = {};
@@ -931,6 +932,16 @@ export class ChartCore {
   setPlots(plots: PlotOutput[]): void {
     if (plots === this.plots) return;
     this.plots = plots;
+    // No scheduleRender — paint() is called by the widget after pushing state
+  }
+
+  /**
+   * Set indicator drawings
+   * Reference equality check - skip if same array
+   */
+  setDrawings(drawings: DrawingOutput[]): void {
+    if (drawings === this.drawings) return;
+    this.drawings = drawings;
     // No scheduleRender — paint() is called by the widget after pushing state
   }
 
@@ -1724,6 +1735,7 @@ export class ChartCore {
       this.plotStyleOverrides,
       canvasLabelBounds,
       this.executionLines,
+      this.drawings,
     );
   }
 

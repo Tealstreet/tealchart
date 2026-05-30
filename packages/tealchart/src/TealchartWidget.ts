@@ -3,7 +3,7 @@
  * Mirrors TradingView's IChartingLibraryWidget for drop-in replacement
  */
 
-import type { PlotOutput } from '@tealstreet/tealscript';
+import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { DirtyFlags } from './rendering/RenderScheduler';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
@@ -97,6 +97,7 @@ export class TealchartWidget {
   // Tealscript indicator support
   private _tealScriptManager: TealscriptManager | null = null;
   private _plots: PlotOutput[] = [];
+  private _drawings: DrawingOutput[] = [];
 
   // Jailbreak (canvas-drawing) indicator support
   private _jailbreakManager: JailbreakIndicatorManager | null = null;
@@ -225,6 +226,10 @@ export class TealchartWidget {
         createWorker: options.createTealscriptWorker,
         onPlotsUpdated: (plots) => {
           this._plots = plots;
+          this._scheduler.markDirty(DIRTY.PLOTS);
+        },
+        onDrawingsUpdated: (drawings) => {
+          this._drawings = drawings;
           this._scheduler.markDirty(DIRTY.PLOTS);
         },
         onError: (scriptId, error) => {
@@ -466,8 +471,9 @@ export class TealchartWidget {
         this._bars = bars;
 
         // Clear old plots — they belong to the old symbol/interval.
-        // New plots will arrive async via onPlotsUpdated callback.
+        // New visual outputs will arrive async via Tealscript callbacks.
         this._plots = [];
+        this._drawings = [];
 
         // Restore viewport from viewScale or calculate default (first load)
         if (bars.length > 0) {
@@ -1008,11 +1014,13 @@ export class TealchartWidget {
     // markDirty(DATA_LOAD) and this RAF — override with empty to guarantee clean slate.
     if (dirty & DIRTY.DATA_LOAD) {
       this._plots = []; // Force empty — reject any stale worker callback
+      this._drawings = [];
       if (this._viewport) {
         this._ui.setViewport(this._viewport);
       }
       this._ui.setBars(this._bars);
       this._ui.setPlots([]); // Explicitly empty
+      this._ui.setDrawings([]);
       dirty = DIRTY.FULL; // Force full repaint of everything
     }
 
@@ -1031,6 +1039,7 @@ export class TealchartWidget {
     // Plots changed (worker callback with new indicator data)
     if (dirty & DIRTY.PLOTS) {
       this._ui.setPlots(this._plots);
+      this._ui.setDrawings(this._drawings);
     }
 
     // Lines changed (order/position updates, last-trade line)
