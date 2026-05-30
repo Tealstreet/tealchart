@@ -597,6 +597,52 @@ plot(sum)`;
       expect(result.plots[0].values[0]).toBe(30);
     });
 
+    it('executes descending for loop with negative step', () => {
+      const script = `//@version=6
+indicator("Test")
+sum = 0
+for i = 5 to 1 by -2
+    sum := sum + i
+plot(sum)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values[0]).toBe(9);
+    });
+
+    it('rejects zero-step for loops', () => {
+      const script = `//@version=6
+indicator("Test")
+sum = 0
+for i = 1 to 3 by 0
+    sum := sum + i
+plot(sum)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors[0]?.message).toBe('For loop step cannot be zero');
+    });
+
+    it('caps numeric for loop iterations', () => {
+      const script = `//@version=6
+indicator("Test")
+sum = 0
+for i = 1 to 10001
+    sum := sum + i
+plot(sum)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors[0]?.message).toBe('Maximum loop iterations exceeded');
+    });
+
     it('executes collection for loop over Pine arrays', () => {
       const script = `//@version=6
 indicator("Test")
@@ -633,6 +679,22 @@ plot(sum)`;
 
       expect(result.errors).toHaveLength(0);
       expect(result.plots[0].values[0]).toBe(4);
+    });
+
+    it('caps collection for loop iterations', () => {
+      const script = `//@version=6
+indicator("Test")
+values = array.new_float(10001, 1)
+sum = 0
+for value in values
+    sum := sum + value
+plot(sum)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors[0]?.message).toBe('Maximum loop iterations exceeded');
     });
   });
 
