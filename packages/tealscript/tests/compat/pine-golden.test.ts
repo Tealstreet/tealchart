@@ -529,14 +529,14 @@ plot(math.round(math.toradians(180), 6), title="Radians")
   it('runs conditional barcolor helper idioms', () => {
     const result = runCompatScript(`
 indicator("Barcolor smoke", overlay=true)
-candleColor = close > open ? color.green : close < open ? color.red : na
+candleColor = bar_index == 0 ? na : close > open ? color.green : close < open ? color.red : na
 barcolor(candleColor)
 `);
 
     expect(result.errors).toEqual([]);
     const barColors = result.plots.find((plot) => plot.type === 'barcolor');
     expect(barColors?.color).toEqual([
-      '#4CAF50',
+      null,
       '#4CAF50',
       '#4CAF50',
       '#F44336',
