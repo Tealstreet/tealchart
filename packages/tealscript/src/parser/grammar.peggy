@@ -90,7 +90,16 @@ IndicatorDeclaration
 
 // User-defined function: f(x, y) => x + y
 FunctionDeclaration
-  = name:Identifier _ "(" _ params:ParameterList? _ ")" _ "=>" _ body:Expression _ LineTerminator? {
+  = name:Identifier _ "(" _ params:ParameterList? _ ")" _ "=>" _ LineTerminator body:IndentedBlock {
+      return {
+        type: 'FunctionDeclaration',
+        name,
+        params: params || [],
+        body,
+        loc: loc()
+      };
+    }
+  / name:Identifier _ "(" _ params:ParameterList? _ ")" _ "=>" _ body:Expression _ LineTerminator? {
       return {
         type: 'FunctionDeclaration',
         name,
