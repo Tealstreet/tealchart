@@ -449,6 +449,25 @@ plot(close, "Close Price", color=color.blue, linewidth=2)
       expect(result.plots[0].linewidth).toBe(2);
     });
 
+    it('creates colors from RGB channels and transparency', () => {
+      const code = `//@version=6
+indicator("Test")
+base = color.rgb(10, 20, 30)
+transparent = color.rgb(255, 128, 0, 50)
+updated = color.new(color.blue, 25)
+plot(close, "Base", color=base)
+plot(open, "Transparent", color=transparent)
+plot(high, "Updated", color=updated)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].color).toEqual(Array(bars.length).fill('#0A141EFF'));
+      expect(result.plots[1].color).toEqual(Array(bars.length).fill('#FF800080'));
+      expect(result.plots[2].color).toEqual(Array(bars.length).fill('#2196F3BF'));
+    });
+
     it('creates hline', () => {
       const code = `//@version=6
 indicator("Test")

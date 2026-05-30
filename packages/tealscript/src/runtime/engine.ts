@@ -741,6 +741,41 @@ export class TealscriptEngine {
     return String(value);
   }
 
+  private clampNumber(value: unknown, min: number, max: number): number {
+    const numericValue = typeof value === 'number' ? value : Number(value ?? 0);
+    if (!Number.isFinite(numericValue)) return min;
+    return Math.min(max, Math.max(min, Math.round(numericValue)));
+  }
+
+  private transparencyToAlpha(transparency: unknown): number {
+    const normalizedTransparency = this.clampNumber(transparency ?? 0, 0, 100);
+    return this.clampNumber(((100 - normalizedTransparency) / 100) * 255, 0, 255);
+  }
+
+  private alphaToTransparency(alpha: number): number {
+    return this.clampNumber(100 - (alpha / 255) * 100, 0, 100);
+  }
+
+  private formatColor(red: unknown, green: unknown, blue: unknown, transparency: unknown = 0): string {
+    const channels = [red, green, blue, this.transparencyToAlpha(transparency)];
+    return `#${channels.map((channel) => this.clampNumber(channel, 0, 255).toString(16).padStart(2, '0').toUpperCase()).join('')}`;
+  }
+
+  private parseColor(value: unknown): { red: number; green: number; blue: number; alpha: number } | null {
+    if (typeof value !== 'string') return null;
+
+    const match = value.match(/^#([0-9a-fA-F]{6})([0-9a-fA-F]{2})?$/);
+    if (!match) return null;
+
+    const hex = match[1];
+    return {
+      red: parseInt(hex.slice(0, 2), 16),
+      green: parseInt(hex.slice(2, 4), 16),
+      blue: parseInt(hex.slice(4, 6), 16),
+      alpha: match[2] ? parseInt(match[2], 16) : 255,
+    };
+  }
+
   private setBuiltinState(scope: Scope, key: string, value: unknown): void {
     if (scope.has(key)) {
       scope.set(key, value);
@@ -1267,21 +1302,18 @@ export class TealscriptEngine {
       this.builtins.set(name, () => value);
     }
 
-    // color.new(color, transparency)
     this.builtins.set('color.new', (args) => {
-      const baseColor = args[0] as string;
-      const transparency = (args[1] ?? 0) as number;
-
-      // Convert to rgba
-      // For simplicity, just return color with alpha
-      const alpha = Math.round(((100 - transparency) / 100) * 255);
-      const alphaHex = alpha.toString(16).padStart(2, '0');
-
-      if (baseColor.startsWith('#') && baseColor.length === 7) {
-        return baseColor + alphaHex;
+      const parsedColor = this.parseColor(args[0]);
+      if (!parsedColor) {
+        return args[0];
       }
-      return baseColor;
+
+      return this.formatColor(parsedColor.red, parsedColor.green, parsedColor.blue, args[1]);
     });
+
+    this.builtins.set('color.rgb', (args, namedArgs) =>
+      this.formatColor(args[0], args[1], args[2], namedArgs.get('transp') ?? namedArgs.get('transparency') ?? args[3] ?? 0),
+    );
   }
 
   private registerVisualConstants(): void {
