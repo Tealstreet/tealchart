@@ -73,6 +73,7 @@ type BuiltinFunction = (
   namedArgs: Map<string, unknown>,
   ctx: ExecutionContext,
   scope: Scope,
+  callId: string,
 ) => unknown;
 
 /**
@@ -603,7 +604,7 @@ export class TealscriptEngine {
     // Look up builtin
     const builtin = this.builtins.get(fullName);
     if (builtin) {
-      return builtin(args, namedArgs, this.ctx, this.scope);
+      return builtin(args, namedArgs, this.ctx, this.scope, this.nextBuiltinCallId(fullName));
     }
 
     if (!namespace) {
@@ -657,7 +658,7 @@ export class TealscriptEngine {
       const builtin = this.builtins.get(fullName);
       if (builtin) {
         // It's a constant, call with no args
-        return builtin([], new Map(), this.ctx, this.scope);
+        return builtin([], new Map(), this.ctx, this.scope, fullName);
       }
     }
 
@@ -723,6 +724,14 @@ export class TealscriptEngine {
     return value as number;
   }
 
+  private setBuiltinState(scope: Scope, key: string, value: unknown): void {
+    if (scope.has(key)) {
+      scope.set(key, value);
+    } else {
+      scope.declare(key, 'var', value);
+    }
+  }
+
   // ===========================================================================
   // Built-in Functions Registration
   // ===========================================================================
@@ -753,11 +762,19 @@ export class TealscriptEngine {
   // Plot ID counters - reset when engine is created
   private plotCounter = 0;
   private plotCallIndex = 0;
+  private builtinCallCounts = new Map<string, number>();
   private hlineCounter = 0;
   private bgcolorCounter = 0;
 
   private resetPerBarBuiltinState(): void {
     this.plotCallIndex = 0;
+    this.builtinCallCounts.clear();
+  }
+
+  private nextBuiltinCallId(name: string): string {
+    const index = this.builtinCallCounts.get(name) ?? 0;
+    this.builtinCallCounts.set(name, index + 1);
+    return `${name}_${index}`;
   }
 
   private registerPlotBuiltins(): void {
@@ -1405,6 +1422,30 @@ export class TealscriptEngine {
       return 100 - 100 / (1 + rs);
     });
 
+    this.builtins.set('ta.barssince', (args, _namedArgs, _ctx, scope, callId) => {
+      const condition = this.isTruthy(args[0]);
+      const key = `_barssince_${callId}`;
+      const previous = scope.get(key) as number | undefined;
+      const value = condition ? 0 : previous === undefined || isNaN(previous) ? NaN : previous + 1;
+      this.setBuiltinState(scope, key, value);
+      return value;
+    });
+
+    this.builtins.set('ta.valuewhen', (args, _namedArgs, _ctx, scope, callId) => {
+      const condition = this.isTruthy(args[0]);
+      const source = args[1] as number;
+      const occurrence = Math.max(0, Math.trunc((args[2] as number | undefined) ?? 0));
+      const key = `_valuewhen_${callId}`;
+      const values = (scope.get(key) as unknown[] | undefined) ?? [];
+
+      if (condition) {
+        values.unshift(source);
+      }
+
+      this.setBuiltinState(scope, key, values);
+      return values[occurrence] ?? NaN;
+    });
+
     // Change - difference from N bars ago
     this.builtins.set('ta.change', (args, _namedArgs, ctx) => {
       const source = args[0] as number;
@@ -1483,6 +1524,24 @@ export class TealscriptEngine {
       return source1 < source2 && trackedPrev1 >= trackedPrev2;
     });
 
+    this.builtins.set('ta.cross', (args, _namedArgs, ctx, scope, callId) => {
+      const source1 = args[0] as number;
+      const source2 = args[1] as number;
+      const trackKey1 = `_cross_any_src1_${callId}`;
+      const trackKey2 = `_cross_any_src2_${callId}`;
+      const previous1 = scope.get(trackKey1) as number | undefined;
+      const previous2 = scope.get(trackKey2) as number | undefined;
+
+      this.setBuiltinState(scope, trackKey1, source1);
+      this.setBuiltinState(scope, trackKey2, source2);
+
+      if (previous1 === undefined || previous2 === undefined || isNaN(source1) || isNaN(source2) || isNaN(previous1) || isNaN(previous2)) {
+        return false;
+      }
+
+      return (source1 > source2 && previous1 <= previous2) || (source1 < source2 && previous1 >= previous2);
+    });
+
     // Highest - returns highest value of source over length bars
     this.builtins.set('ta.highest', (args, _namedArgs, ctx) => {
       const source = args[0] as number;
@@ -1519,6 +1578,81 @@ export class TealscriptEngine {
       }
 
       return lowest === Infinity ? NaN : lowest;
+    });
+
+    this.builtins.set('ta.range', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
+      const length = args[1] as number;
+      const series = this.getSeriesForSource(source, ctx);
+
+      let highest = -Infinity;
+      let lowest = Infinity;
+      for (let i = 0; i < length; i++) {
+        const value = series.get(i);
+        if (value !== undefined && !isNaN(value)) {
+          if (value > highest) highest = value;
+          if (value < lowest) lowest = value;
+        }
+      }
+
+      return highest === -Infinity || lowest === Infinity ? NaN : highest - lowest;
+    });
+
+    this.builtins.set('ta.highestbars', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
+      const length = args[1] as number;
+      const series = this.getSeriesForSource(source, ctx);
+
+      let highest = -Infinity;
+      let offset = NaN;
+      for (let i = 0; i < length; i++) {
+        const val = series.get(i);
+        if (val !== undefined && !isNaN(val) && val > highest) {
+          highest = val;
+          offset = i;
+        }
+      }
+
+      return offset;
+    });
+
+    this.builtins.set('ta.lowestbars', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
+      const length = args[1] as number;
+      const series = this.getSeriesForSource(source, ctx);
+
+      let lowest = Infinity;
+      let offset = NaN;
+      for (let i = 0; i < length; i++) {
+        const val = series.get(i);
+        if (val !== undefined && !isNaN(val) && val < lowest) {
+          lowest = val;
+          offset = i;
+        }
+      }
+
+      return offset;
+    });
+
+    this.builtins.set('ta.vwma', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
+      const length = args[1] as number;
+      const series = this.getSeriesForSource(source, ctx);
+
+      let weightedSum = 0;
+      let volumeSum = 0;
+      let count = 0;
+      for (let i = 0; i < length; i++) {
+        const value = series.get(i);
+        const volume = ctx.volume.get(i);
+        if (value !== undefined && volume !== undefined && !isNaN(value) && !isNaN(volume)) {
+          weightedSum += value * volume;
+          volumeSum += volume;
+          count++;
+        }
+      }
+
+      return count < length || volumeSum === 0 ? NaN : weightedSum / volumeSum;
     });
 
     // ATR - Average True Range

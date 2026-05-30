@@ -81,7 +81,7 @@ Remaining gaps:
 | Namespace | Status | Notes |
 | --- | --- | --- |
 | `math.*` | Partial | Common numeric functions exist. Constants and Pine-specific helpers are incomplete. |
-| `ta.*` | Partial | Includes SMA, EMA, RSI, MACD, ATR, BB, VWAP, Supertrend, DMI, SAR, pivots, and more. Missing common helpers include `barssince`, `valuewhen`, `vwma`, `highestbars`, `lowestbars`. |
+| `ta.*` | Partial | Includes SMA, EMA, RSI, MACD, ATR, BB, VWAP, Supertrend, DMI, SAR, pivots, `barssince`, `valuewhen`, `vwma`, `highestbars`, `lowestbars`, `cross`, `range`, and more. |
 | `input.*` | Partial | Int, float, bool, string, color, and source exist. Generic `input()`, time, symbol, timeframe, session, and text area are missing. |
 | `color.*` | Partial | Core named colors and `color.new()` exist. RGB/from-gradient helpers are missing. |
 | `str.*` | Planned | Needed for labels, tables, and generated scripts. |
@@ -118,3 +118,10 @@ Remaining gaps:
 3. Function scope and series semantics hardening.
 4. `array.*` MVP.
 5. Common missing `ta.*` functions.
+
+## Common `ta.*` Coverage
+
+The common TA helper pass covers event helpers (`ta.barssince`,
+`ta.valuewhen`), volume/window helpers (`ta.vwma`, `ta.highestbars`,
+`ta.lowestbars`), and compatibility aliases/helpers (`ta.cross`, `ta.range`).
+These are covered in the golden compatibility harness.
