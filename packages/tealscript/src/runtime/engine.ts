@@ -365,17 +365,68 @@ export class TealscriptEngine {
   }
 
   private executeFor(stmt: ForStatement): void {
+    if (stmt.iterable) {
+      this.executeForIn(stmt);
+      return;
+    }
+
+    if (!stmt.start || !stmt.end) {
+      throw new Error('Invalid for loop');
+    }
+
     const start = this.evaluateExpression(stmt.start) as number;
     const end = this.evaluateExpression(stmt.end) as number;
     const step = stmt.step ? (this.evaluateExpression(stmt.step) as number) : 1;
+    if (step === 0) {
+      throw new Error('For loop step cannot be zero');
+    }
 
     const childScope = this.scope.createChild();
     const savedScope = this.scope;
     this.scope = childScope;
 
     try {
-      for (let i = start; i <= end; i += step) {
+      for (let i = start; step > 0 ? i <= end : i >= end; i += step) {
         this.scope.declare(stmt.counter.name, 'none', i);
+
+        try {
+          for (const s of stmt.body) {
+            this.executeStatement(s);
+          }
+        } catch (e) {
+          if (e instanceof BreakException) break;
+          if (e instanceof ContinueException) continue;
+          throw e;
+        }
+      }
+    } finally {
+      this.scope = savedScope;
+    }
+  }
+
+  private executeForIn(stmt: ForStatement): void {
+    if (!stmt.iterable) {
+      throw new Error('Invalid collection for loop');
+    }
+
+    const iterable = this.evaluateExpression(stmt.iterable);
+    let values: unknown[];
+
+    if (Array.isArray(iterable)) {
+      values = iterable;
+    } else if (isPineArray(iterable)) {
+      values = iterable.values;
+    } else {
+      throw new Error('For-in loop expects an array');
+    }
+
+    const childScope = this.scope.createChild();
+    const savedScope = this.scope;
+    this.scope = childScope;
+
+    try {
+      for (const value of values) {
+        this.scope.declare(stmt.counter.name, 'none', value);
 
         try {
           for (const s of stmt.body) {

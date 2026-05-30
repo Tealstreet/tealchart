@@ -142,9 +142,10 @@ export interface IfStatement extends BaseNode {
 export interface ForStatement extends BaseNode {
   type: 'ForStatement';
   counter: Identifier;
-  start: Expression;
-  end: Expression;
+  start?: Expression;
+  end?: Expression;
   step?: Expression;
+  iterable?: Expression;
   body: Statement[];
 }
 

@@ -276,7 +276,16 @@ ElseClause
 
 // For loop
 ForStatement
-  = "for" _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:IndentedBlock {
+  = "for" _ counter:Identifier _ "in" _ iterable:Expression _ LineTerminator body:IndentedBlock {
+      return {
+        type: 'ForStatement',
+        counter,
+        iterable,
+        body,
+        loc: loc()
+      };
+    }
+  / "for" _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:IndentedBlock {
       return {
         type: 'ForStatement',
         counter,
