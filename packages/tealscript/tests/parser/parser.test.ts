@@ -124,6 +124,35 @@ describe('Tealscript Parser', () => {
         operator: '-',
       }));
     });
+
+    it('parses multiline user-defined functions', () => {
+      const ast = parse(`spread(source, length) =>
+    basis = ta.sma(source, length)
+    source - basis
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(fn.params.map((param) => param.name)).toEqual(['source', 'length']);
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        expect(fn.body.map((statement) => statement.type)).toEqual(['VariableDeclaration', 'ExpressionStatement']);
+      }
+    });
+
+    it('parses multiline functions with multiple expression statements', () => {
+      const ast = parse(`rangeSize(highValue, lowValue) =>
+    range = highValue - lowValue
+    math.abs(range)
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        expect(fn.body.map((statement) => statement.type)).toEqual(['VariableDeclaration', 'ExpressionStatement']);
+      }
+    });
   });
 
   describe('Expressions', () => {
