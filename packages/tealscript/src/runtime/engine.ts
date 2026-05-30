@@ -866,6 +866,10 @@ export class TealscriptEngine {
       const prop = expr.property.name;
       const fullName = `${namespace}.${prop}`;
 
+      if (namespace === 'barstate' && prop in this.ctx.barstate) {
+        return this.ctx.barstate[prop as keyof typeof this.ctx.barstate];
+      }
+
       // Check builtins
       const builtin = this.builtins.get(fullName);
       if (builtin) {
