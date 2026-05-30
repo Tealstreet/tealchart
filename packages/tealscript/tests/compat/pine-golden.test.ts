@@ -445,4 +445,22 @@ plot(mode == "EMA", title="Mode")
     ]);
     expect(getPlot(result, 'Mode').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
+
+  it('matches documented Pine input helper idioms', () => {
+    const result = runCompatScript(`
+indicator("Input docs smoke")
+maTypeInput = input.string("SMA", "MA type", options=["SMA", "EMA"])
+maLengthInput = input.int(5, "MA length", minval=1)
+showSignalsInput = input.bool(true, "Show signals")
+plot(maTypeInput == "SMA", title="MA Type")
+plot(maLengthInput == 5, title="MA Length")
+plot(showSignalsInput, title="Show Signals")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.inputs.map((input) => input.title)).toEqual(['MA type', 'MA length', 'Show signals']);
+    expect(getPlot(result, 'MA Type').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'MA Length').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Show Signals').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+  });
 });
