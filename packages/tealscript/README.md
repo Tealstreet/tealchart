@@ -88,6 +88,21 @@ This runs `scripts/build-parser.js` to regenerate
 `grammar.peggy`. **Always commit the generated files alongside grammar
 changes.**
 
+## Pine compatibility harness
+
+Compatibility work is tracked in
+[`PINE_COMPATIBILITY.md`](./PINE_COMPATIBILITY.md). Golden tests live under
+`tests/compat/` and use deterministic OHLCV fixtures so parser/runtime changes
+can be compared against stable output.
+
+```bash
+yarn test:compat
+```
+
+Use the compatibility harness for Pine-parity PRs. Add a failing fixture first
+when fixing a syntax or runtime gap, then update the implementation until the
+fixture passes.
+
 ## License
 
 MIT — see [LICENSE](./LICENSE).
