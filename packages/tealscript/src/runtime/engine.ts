@@ -51,7 +51,7 @@ import {
   unshiftArrayValue,
   type PineArray,
 } from './arrays';
-import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type InputDefinition, type PlotOutput } from './context';
+import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type InputDefinition, type PlotOutput, type PlotStyle } from './context';
 import { Scope, createRootScope } from './scope';
 
 /**
@@ -1277,7 +1277,7 @@ export class TealscriptEngine {
           title,
           color: [], // Always array for per-bar colors
           linewidth,
-          style: style as 'line' | 'stepline' | 'histogram' | 'cross' | 'circles' | 'columns' | 'area' | 'areabr',
+          style: style as PlotStyle,
         });
       }
 
@@ -1443,7 +1443,9 @@ export class TealscriptEngine {
 
     // Plot style constants
     this.builtins.set('plot.style_line', () => 'line');
+    this.builtins.set('plot.style_linebr', () => 'linebr');
     this.builtins.set('plot.style_stepline', () => 'stepline');
+    this.builtins.set('plot.style_stepline_diamond', () => 'stepline_diamond');
     this.builtins.set('plot.style_histogram', () => 'histogram');
     this.builtins.set('plot.style_circles', () => 'circles');
     this.builtins.set('plot.style_cross', () => 'cross');
@@ -2008,6 +2010,40 @@ export class TealscriptEngine {
     };
 
     for (const [name, value] of Object.entries(sizes)) {
+      this.builtins.set(name, () => value);
+    }
+
+    const displayConstants: Record<string, number> = {
+      'display.none': 0,
+      'display.pane': 1,
+      'display.data_window': 2,
+      'display.status_line': 4,
+      'display.price_scale': 8,
+      'display.all': 15,
+    };
+
+    for (const [name, value] of Object.entries(displayConstants)) {
+      this.builtins.set(name, () => value);
+    }
+
+    const formatConstants: Record<string, string> = {
+      'format.inherit': 'inherit',
+      'format.price': 'price',
+      'format.volume': 'volume',
+      'format.percent': 'percent',
+    };
+
+    for (const [name, value] of Object.entries(formatConstants)) {
+      this.builtins.set(name, () => value);
+    }
+
+    const scaleConstants: Record<string, string> = {
+      'scale.left': 'left',
+      'scale.right': 'right',
+      'scale.none': 'none',
+    };
+
+    for (const [name, value] of Object.entries(scaleConstants)) {
       this.builtins.set(name, () => value);
     }
   }
