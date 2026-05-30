@@ -2313,6 +2313,48 @@ export class TealscriptEngine {
       return highest === -Infinity || lowest === Infinity ? NaN : highest - lowest;
     });
 
+    this.builtins.set('ta.rising', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const rawLength = args[1] as number;
+      const length = Number.isFinite(rawLength) ? Math.max(0, Math.trunc(rawLength)) : 0;
+      if (isNaN(source) || length < 1) return false;
+
+      const key = `_ta_rising_source_${callId}`;
+      const history = (scope.get(key) as number[] | undefined) ?? [];
+      const nextHistory = [source, ...history].slice(0, length + 1);
+      this.setBuiltinState(scope, key, nextHistory);
+
+      for (let i = 1; i <= length; i++) {
+        const value = nextHistory[i];
+        if (value === undefined || isNaN(value) || source <= value) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    this.builtins.set('ta.falling', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const rawLength = args[1] as number;
+      const length = Number.isFinite(rawLength) ? Math.max(0, Math.trunc(rawLength)) : 0;
+      if (isNaN(source) || length < 1) return false;
+
+      const key = `_ta_falling_source_${callId}`;
+      const history = (scope.get(key) as number[] | undefined) ?? [];
+      const nextHistory = [source, ...history].slice(0, length + 1);
+      this.setBuiltinState(scope, key, nextHistory);
+
+      for (let i = 1; i <= length; i++) {
+        const value = nextHistory[i];
+        if (value === undefined || isNaN(value) || source >= value) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
     this.builtins.set('ta.highestbars', (args, _namedArgs, ctx) => {
       const source = args[0] as number;
       const length = args[1] as number;
