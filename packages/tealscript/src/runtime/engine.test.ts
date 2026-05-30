@@ -711,6 +711,30 @@ plot(close)`;
       expect(result.plots).toHaveLength(0);
     });
 
+    it('fills gaps with fixnan and casts primitive values explicitly', () => {
+      const script = `//@version=6
+indicator("Global Helpers")
+source = bar_index == 0 or bar_index == 2 ? na : close
+plot(fixnan(source), title="Fixed")
+plot(float("4.5"), title="Float")
+plot(int(4.9), title="Int")
+plot(bool(1), title="Bool True")
+plot(bool(0), title="Bool False")
+plot(string(12.5) == "12.5", title="String Cast")`;
+
+      const ast = parse(script);
+      const bars = createBars(4, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Fixed')?.values).toEqual([null, 100.7, 100.7, 101.7]);
+      expect(result.plots.find((plot) => plot.title === 'Float')?.values).toEqual([4.5, 4.5, 4.5, 4.5]);
+      expect(result.plots.find((plot) => plot.title === 'Int')?.values).toEqual([4, 4, 4, 4]);
+      expect(result.plots.find((plot) => plot.title === 'Bool True')?.values).toEqual([true, true, true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Bool False')?.values).toEqual([false, false, false, false]);
+      expect(result.plots.find((plot) => plot.title === 'String Cast')?.values).toEqual([true, true, true, true]);
+    });
+
     it('halts realtime updateBar execution on runtime.error', () => {
       const script = `//@version=6
 indicator("Realtime Runtime Error")
