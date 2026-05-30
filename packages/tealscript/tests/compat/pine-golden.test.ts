@@ -686,6 +686,18 @@ plot(ta.percentrank(close, length), title="Percent Rank")
     expect(roundSeries(getPlot(result, 'Percent Rank').values)).toEqual([null, null, 100, 33.333333, 33.333333, 66.666667, 100, 100, 66.666667, 100, 66.666667, 100]);
   });
 
+  it('matches common Pine moving-average helper idioms', () => {
+    const result = runCompatScript(`
+indicator("Moving average smoke")
+plot(ta.swma(close), title="SWMA")
+plot(ta.alma(close, 5, 0.85, 6), title="ALMA")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'SWMA').values)).toEqual([null, null, null, 104.833333, 104, 101.833333, 100.833333, 102.666667, 105.666667, 108.166667, 109.5, 110.333333]);
+    expect(roundSeries(getPlot(result, 'ALMA').values)).toEqual([null, null, null, null, 101.918274, 99.97516, 101.504063, 105.458142, 107.88929, 109.296928, 110.200868, 110.912922]);
+  });
+
   it('runs conditional barcolor helper idioms', () => {
     const result = runCompatScript(`
 indicator("Barcolor smoke", overlay=true)
@@ -945,5 +957,28 @@ plot(dwm, title="DWM")
     expect(getPlot(result, 'Multiplier').values).toEqual([60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60]);
     expect(getPlot(result, 'Intraday').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(getPlot(result, 'DWM').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('matches common Pine calendar filter idioms', () => {
+    const result = runCompatScript(`
+indicator("Calendar docs smoke")
+afterStart = time >= timestamp(2023, 11, 14, 22, 20)
+sameDay = year == 2023 and month == 11 and dayofmonth == 14
+isTuesday = dayofweek == dayofweek.tuesday
+minuteGate = minute >= 20
+
+plot(afterStart ? 1 : 0, title="After Start")
+plot(sameDay ? 1 : 0, title="Same Day")
+plot(isTuesday ? 1 : 0, title="Tuesday")
+plot(hour, title="Hour")
+plot(minuteGate ? 1 : 0, title="Minute Gate")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'After Start').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Same Day').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Tuesday').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Hour').values).toEqual([22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22]);
+    expect(getPlot(result, 'Minute Gate').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
   });
 });
