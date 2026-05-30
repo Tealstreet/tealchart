@@ -1562,6 +1562,63 @@ export class TealscriptEngine {
       return lowest === Infinity ? NaN : lowest;
     });
 
+    this.builtins.set('ta.highestbars', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
+      const length = args[1] as number;
+      const series = this.getSeriesForSource(source, ctx);
+
+      let highest = -Infinity;
+      let offset = NaN;
+      for (let i = 0; i < length; i++) {
+        const val = series.get(i);
+        if (val !== undefined && !isNaN(val) && val > highest) {
+          highest = val;
+          offset = i;
+        }
+      }
+
+      return offset;
+    });
+
+    this.builtins.set('ta.lowestbars', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
+      const length = args[1] as number;
+      const series = this.getSeriesForSource(source, ctx);
+
+      let lowest = Infinity;
+      let offset = NaN;
+      for (let i = 0; i < length; i++) {
+        const val = series.get(i);
+        if (val !== undefined && !isNaN(val) && val < lowest) {
+          lowest = val;
+          offset = i;
+        }
+      }
+
+      return offset;
+    });
+
+    this.builtins.set('ta.vwma', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
+      const length = args[1] as number;
+      const series = this.getSeriesForSource(source, ctx);
+
+      let weightedSum = 0;
+      let volumeSum = 0;
+      let count = 0;
+      for (let i = 0; i < length; i++) {
+        const value = series.get(i);
+        const volume = ctx.volume.get(i);
+        if (value !== undefined && volume !== undefined && !isNaN(value) && !isNaN(volume)) {
+          weightedSum += value * volume;
+          volumeSum += volume;
+          count++;
+        }
+      }
+
+      return count < length || volumeSum === 0 ? NaN : weightedSum / volumeSum;
+    });
+
     // ATR - Average True Range
     this.builtins.set('ta.atr', (args, _namedArgs, ctx, scope) => {
       const length = args[0] as number;
