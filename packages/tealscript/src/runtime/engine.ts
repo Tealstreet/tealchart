@@ -3645,6 +3645,11 @@ export class TealscriptEngine {
     this.builtins.set('timestamp', (args) => this.evaluateTimestamp(args));
     this.builtins.set('time', (args) => this.evaluateTimeFilter(args, false));
     this.builtins.set('time_close', (args) => this.evaluateTimeFilter(args, true));
+    this.builtins.set('timeframe.in_seconds', (args) => {
+      const timeframe = args[0] === undefined || args[0] === '' ? this.ctx.timeframe.period : this.toStringValue(args[0]);
+      const duration = this.getTimeframeDurationMs(timeframe);
+      return duration === null ? Number.NaN : duration / 1000;
+    });
 
     for (const part of ['year', 'month', 'weekofyear', 'dayofmonth', 'dayofweek', 'hour', 'minute', 'second']) {
       this.builtins.set(part, (args) => {

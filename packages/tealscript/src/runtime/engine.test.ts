@@ -262,7 +262,11 @@ plot(timeframe.multiplier, title="Timeframe Multiplier")
 plot(str.length(timeframe.period), title="Timeframe Period Length")
 plot(timeframe.isintraday ? 1 : 0, title="Intraday")
 plot(timeframe.isdwm ? 1 : 0, title="DWM")
-plot(str.length(timeframe.main_period), title="Main Period Length")`;
+plot(str.length(timeframe.main_period), title="Main Period Length")
+plot(timeframe.in_seconds(), title="Current Seconds")
+plot(timeframe.in_seconds("1D"), title="Daily Seconds")
+plot(timeframe.in_seconds("15"), title="Minute Seconds")
+plot(timeframe.in_seconds("bad"), title="Invalid Seconds")`;
 
       const ast = parse(script);
       const bars = createBars(2);
@@ -279,6 +283,10 @@ plot(str.length(timeframe.main_period), title="Main Period Length")`;
       expect(result.plots.find((plot) => plot.title === 'Intraday')?.values).toEqual([1, 1]);
       expect(result.plots.find((plot) => plot.title === 'DWM')?.values).toEqual([0, 0]);
       expect(result.plots.find((plot) => plot.title === 'Main Period Length')?.values).toEqual([2, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Current Seconds')?.values).toEqual([3600, 3600]);
+      expect(result.plots.find((plot) => plot.title === 'Daily Seconds')?.values).toEqual([86400, 86400]);
+      expect(result.plots.find((plot) => plot.title === 'Minute Seconds')?.values).toEqual([900, 900]);
+      expect(result.plots.find((plot) => plot.title === 'Invalid Seconds')?.values).toEqual([null, null]);
     });
 
     it('keeps multiple untitled plots as separate series', () => {
