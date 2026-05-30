@@ -374,6 +374,27 @@ plot(values.get(3), title="Parent Tail")
     expect(roundSeries(getPlot(result, 'Parent Tail').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
   });
 
+  it('matches common Pine array index assignment idioms', () => {
+    const result = runCompatScript(`
+indicator("Array index assignment")
+values = array.from(1, 2, 3)
+values[0] := 10
+values[1] += 5
+window = values.slice(0, 2)
+window[1] *= 2
+literal = [4, 5, 6]
+literal[2] := 12
+plot(values[0], title="First")
+plot(values[1], title="Second")
+plot(literal[2], title="Literal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'First').values)).toEqual([10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]);
+    expect(roundSeries(getPlot(result, 'Second').values)).toEqual([14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14]);
+    expect(roundSeries(getPlot(result, 'Literal').values)).toEqual([12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12]);
+  });
+
   it('reads array literal values with array helpers', () => {
     const result = runCompatScript(`
 indicator("Array literal")

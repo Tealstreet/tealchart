@@ -364,6 +364,20 @@ x += 1`);
         expect(assignment).toBeDefined();
         expect(assignment.operator).toBe('+=');
       });
+
+      it('parses index assignment targets', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+values = array.from(1, 2)
+values[0] := 3`);
+
+        const assignment = ast.body.find(s => s.type === 'AssignmentStatement') as {
+          type: string;
+          left: { type: string };
+        };
+        expect(assignment).toBeDefined();
+        expect(assignment.left.type).toBe('IndexExpression');
+      });
     });
   });
 
