@@ -15,6 +15,18 @@ export {
   shiftArrayValue,
   unshiftArrayValue,
   clearArray,
+  copyArray,
+  firstArrayValue,
+  lastArrayValue,
+  includesArrayValue,
+  indexOfArrayValue,
+  lastIndexOfArrayValue,
+  insertArrayValue,
+  removeArrayValue,
+  minArrayValue,
+  maxArrayValue,
+  sumArrayValue,
+  avgArrayValue,
   type PineArray,
 } from './arrays';
 
