@@ -119,7 +119,7 @@ derived regular-series history, and unavailable or future offsets returning
 | `plotshape`, `plotchar`, `plotarrow` | Partial | Core outputs exist; styling parity is incomplete. |
 | `barcolor` | Supported | Produces per-bar candle color outputs consumed by the main-pane renderer. |
 | `plotbar`, `plotcandle` | Supported | Produce OHLC outputs with per-bar body, wick, and border colors; renderer draws custom bars/candles. |
-| `label.*` | Partial | `label.new()` emits typed runtime drawing outputs and `label.delete()` is accepted as a no-op. Setters/getters, lifecycle mutation, GC limits, and renderer support are still planned. |
+| `label.*` | Partial | `label.new()` emits typed runtime drawing outputs. Common setters/getters, `label.copy()`, and `label.delete()` work for runtime object state. GC limits, full style parity, and renderer support are still planned. |
 | `line.*`, `box.*`, `table.*` | Planned | Namespace calls report explicit unsupported runtime diagnostics. Object lifecycle and renderer support are still planned. |
 
 ## Alerts, Strategies, And Data
@@ -274,8 +274,14 @@ The label drawing pass covers a first runtime payload slice for common
 last-bar label idioms. `label.new()` accepts positional or named `x`, `y`, and
 `text` arguments plus common `xloc`, `yloc`, `style`, `color`, `textcolor`, and
 `size` options. The runtime returns a label handle string and records a typed
-drawing output; rendering, mutation setters/getters, copy/delete semantics, GC
-limits, and realtime rollback parity remain planned.
+drawing output. The label mutation pass covers persistent `var` label handles,
+`label.set_x()`, `label.set_y()`, `label.set_xy()`, `label.set_xloc()`,
+`label.set_yloc()`, `label.set_text()`, `label.set_style()`,
+`label.set_color()`, `label.set_textcolor()`, `label.set_size()`,
+`label.set_tooltip()`, matching scalar getters (`get_x`, `get_y`, `get_xloc`,
+`get_yloc`, `get_text`, `get_style`, `get_color`, `get_textcolor`,
+`get_size`, `get_tooltip`), `label.copy()`, and `label.delete()`. Rendering,
+GC limits, full style parity, and realtime rollback parity remain planned.
 
 ## Drawing Diagnostic Coverage
 
