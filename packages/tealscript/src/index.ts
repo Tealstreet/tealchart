@@ -12,6 +12,8 @@ export {
   formatParseError,
   TealscriptParseError,
   type ParseOptions,
+  type ParseResult,
+  type ParseStartRule,
   // AST types
   type Program,
   type Statement,
