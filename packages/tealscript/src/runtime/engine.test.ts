@@ -987,6 +987,32 @@ plot(ta.dev(close, 3), title="Deviation")`;
       expect(result.plots.find((plot) => plot.title === 'Variance')?.values).toEqual([null, null, 1 / 6]);
       expect(result.plots.find((plot) => plot.title === 'Deviation')?.values).toEqual([null, null, 1 / 3]);
     });
+
+    it('calculates rising and falling TA helpers', () => {
+      const script = `//@version=6
+indicator("TA direction")
+plot(ta.rising(close, 2), title="Rising")
+plot(ta.falling(close, 2), title="Falling")
+plot(ta.falling(close - open, 2), title="Derived Falling")
+plot(ta.rising(close), title="Missing Length")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 9, high: 11, low: 9, close: 10, volume: 100 },
+        { time: 2, open: 9, high: 12, low: 10, close: 11, volume: 100 },
+        { time: 3, open: 10, high: 13, low: 11, close: 12, volume: 100 },
+        { time: 4, open: 12, high: 12, low: 9, close: 9, volume: 100 },
+        { time: 5, open: 9, high: 10, low: 8, close: 8, volume: 100 },
+        { time: 6, open: 8, high: 9, low: 7, close: 7, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Rising')?.values).toEqual([false, false, true, false, false, false]);
+      expect(result.plots.find((plot) => plot.title === 'Falling')?.values).toEqual([false, false, false, true, true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Derived Falling')?.values).toEqual([false, false, false, true, false, false]);
+      expect(result.plots.find((plot) => plot.title === 'Missing Length')?.values).toEqual([false, false, false, false, false, false]);
+    });
   });
 
   describe('history access', () => {

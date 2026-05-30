@@ -136,8 +136,8 @@ derived regular-series history, and unavailable or future offsets returning
 The common TA helper pass covers event helpers (`ta.barssince`,
 `ta.valuewhen`), cumulative/window helpers (`ta.cum`, `ta.dev`,
 `ta.variance`, `ta.vwma`, `ta.highestbars`, `ta.lowestbars`), and
-compatibility aliases/helpers (`ta.cross`, `ta.range`). These are covered in
-the golden compatibility harness.
+compatibility aliases/helpers (`ta.cross`, `ta.range`, `ta.rising`, and
+`ta.falling`). These are covered in the golden compatibility harness.
 
 ## Common `str.*` Coverage
 
