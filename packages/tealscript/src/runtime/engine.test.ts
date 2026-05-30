@@ -247,6 +247,26 @@ plot(negative(close - open), title="Negative")`;
       expect(result.plots.find((plot) => plot.title === 'Negative')?.values).toEqual([null, null, null]);
     });
 
+    it('returns expression results from user function else branches', () => {
+      const script = `//@version=6
+indicator("Function If Else")
+classify(value) =>
+    if value > 0
+        1
+    else if value < 0
+        -1
+    else
+        0
+plot(classify(bar_index - 1), title="Classified")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Classified')?.values).toEqual([-1, 0, 1]);
+    });
+
     it('evaluates keyed switch expressions', () => {
       const script = `//@version=6
 indicator("Switch Test")

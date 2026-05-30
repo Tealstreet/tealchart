@@ -205,6 +205,27 @@ arrayValue = [1, 2]
         expect(fn.body.map((statement) => statement.type)).toEqual(['VariableDeclaration', 'ExpressionStatement']);
       }
     });
+
+    it('parses if/else branches inside multiline functions', () => {
+      const ast = parse(`classify(value) =>
+    if value > 0
+        1
+    else if value < 0
+        -1
+    else
+        0
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        const branch = fn.body[0];
+        expect(branch.type).toBe('IfStatement');
+        const alternate = branch.type === 'IfStatement' ? branch.alternate : null;
+        expect(Array.isArray(alternate) ? null : alternate?.type).toBe('IfStatement');
+      }
+    });
   });
 
   describe('Expressions', () => {
