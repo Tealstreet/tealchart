@@ -46,4 +46,3 @@ Checkpoint fixtures should be deterministic and small:
 - Preserve semantic shape from official docs or common public Pine idioms.
 - Avoid depending on TradingView, network access, current market data, or random
   online scripts at test time.
-
