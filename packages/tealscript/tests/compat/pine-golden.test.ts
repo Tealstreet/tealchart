@@ -817,9 +817,13 @@ plotbar(o, h + 1, l - 1, c, title="Custom bars", color=bodyColor)
     const result = runCompatScript(`
 indicator("Visual constants smoke", overlay=true, format=format.price, scale=scale.right)
 displayTarget = display.all - display.status_line
+formatMatches = format.price == "price" and format.volume == "volume" and format.percent == "percent" and format.inherit == "inherit"
+scaleMatches = scale.right == "right" and scale.left == "left" and scale.none == "none"
 plot(close, title="Break Line", style=plot.style_linebr, display=displayTarget)
 plot(open, title="Step Diamonds", style=plot.style_stepline_diamond, display=display.none)
 plot(high, title="Columns", style=plot.style_columns, histbase=100, trackprice=true, show_last=5)
+plot(formatMatches ? 1 : 0, title="Format Constants")
+plot(scaleMatches ? 1 : 0, title="Scale Constants")
 `);
 
     expect(result.errors).toEqual([]);
@@ -827,6 +831,8 @@ plot(high, title="Columns", style=plot.style_columns, histbase=100, trackprice=t
     expect(getPlot(result, 'Step Diamonds').style).toBe('stepline_diamond');
     expect(getPlot(result, 'Columns').style).toBe('columns');
     expect(getPlot(result, 'Break Line').values).toHaveLength(compatibilityBars.length);
+    expect(getPlot(result, 'Format Constants').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'Scale Constants').values).toEqual(Array(compatibilityBars.length).fill(1));
   });
 
   it('matches documented Pine switch selection idioms', () => {
