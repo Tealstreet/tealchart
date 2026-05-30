@@ -1984,6 +1984,12 @@ export class TealscriptEngine {
     this.builtins.set('str.tostring', (args) => {
       return this.toStringValue(args[0], args[1] as string | undefined);
     });
+    this.builtins.set('str.tonumber', (args) => {
+      const source = this.toStringValue(args[0]).trim();
+      if (source.length === 0) return Number.NaN;
+      const value = Number(source);
+      return Number.isFinite(value) ? value : Number.NaN;
+    });
 
     this.builtins.set('str.format', (args) => {
       const template = this.toStringValue(args[0]);
