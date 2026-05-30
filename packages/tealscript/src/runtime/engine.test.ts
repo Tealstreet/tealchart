@@ -196,6 +196,7 @@ indicator("Sessions")
 plot(time, title="Open Time")
 plot(time_close, title="Close Time")
 plot(last_bar_time, title="Last Bar Time")
+plot(time_close[1], title="Previous Close Time")
 plot(time("60", "1430-1600") == time ? 1 : 0, title="In Session")
 plot(na(time("60", "1600-1700")) ? 1 : 0, title="Out Session")
 plot(time_close("30", "1430-1600"), title="Filtered Close")`;
@@ -223,6 +224,11 @@ plot(time_close("30", "1430-1600"), title="Filtered Close")`;
         Date.UTC(2024, 0, 5, 16, 0),
         Date.UTC(2024, 0, 5, 16, 0),
         Date.UTC(2024, 0, 5, 16, 0),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Previous Close Time')?.values).toEqual([
+        null,
+        Date.UTC(2024, 0, 5, 15, 0),
+        Date.UTC(2024, 0, 5, 15, 30),
       ]);
       expect(result.plots.find((plot) => plot.title === 'In Session')?.values).toEqual([0, 1, 0]);
       expect(result.plots.find((plot) => plot.title === 'Out Session')?.values).toEqual([1, 1, 0]);
