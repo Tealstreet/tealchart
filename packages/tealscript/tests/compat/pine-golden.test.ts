@@ -763,4 +763,39 @@ plot(direction, title="Direction")
     ]);
     expect(getPlot(result, 'Direction').values).toEqual([1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, 1]);
   });
+
+  it('matches common Pine loop control idioms', () => {
+    const result = runCompatScript(`
+indicator("Loop control docs smoke")
+sumOdds = 0
+for i = 1 to 7
+    if i % 2 == 0
+        continue
+    if i > 5
+        break
+    sumOdds += i
+
+descending = 0
+for j = 5 to 1 by -2
+    descending += j
+
+values = array.from(1, 2, 3, 4)
+selected = 0
+for value in values
+    if value == 2
+        continue
+    if value == 4
+        break
+    selected += value
+
+plot(sumOdds, title="Odd Sum")
+plot(descending, title="Descending Sum")
+plot(selected, title="Selected Sum")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Odd Sum').values).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
+    expect(getPlot(result, 'Descending Sum').values).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
+    expect(getPlot(result, 'Selected Sum').values).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+  });
 });
