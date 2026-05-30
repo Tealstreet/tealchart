@@ -70,6 +70,23 @@ export class Scope {
       }
     }
 
+    const existing = this.getLocal(name);
+    if (existing) {
+      existing.value = value;
+      existing.kind = kind;
+      existing.type = type;
+      existing.initialized = true;
+
+      if (existing.series) {
+        existing.series.set(value);
+      } else if (this.shouldBecomeSeries(value)) {
+        existing.series = new Series<unknown>();
+        existing.series.advance();
+        existing.series.set(value);
+      }
+      return;
+    }
+
     const entry: VariableEntry = {
       value,
       kind,

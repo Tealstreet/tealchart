@@ -70,6 +70,7 @@ export class TealscriptEngine {
   private scope: Scope;
   private builtins: Map<string, BuiltinFunction>;
   private userFunctions: Map<string, FunctionDeclaration>;
+  private functionScopes: Map<string, Scope>;
   private errors: ExecutionError[] = [];
 
   constructor() {
@@ -77,6 +78,7 @@ export class TealscriptEngine {
     this.scope = createRootScope();
     this.builtins = new Map();
     this.userFunctions = new Map();
+    this.functionScopes = new Map();
 
     this.registerBuiltins();
   }
@@ -88,6 +90,7 @@ export class TealscriptEngine {
     this.errors = [];
     this.ctx.reset();
     this.scope = createRootScope();
+    this.functionScopes.clear();
     this.registerUserFunctions(ast);
 
     // Load bars into context
@@ -104,6 +107,9 @@ export class TealscriptEngine {
     while (this.ctx.advanceBar()) {
       // Advance scope to new bar
       this.scope.advanceBar();
+      for (const functionScope of this.functionScopes.values()) {
+        functionScope.advanceBar();
+      }
       this.resetPerBarBuiltinState();
 
       // Execute all statements
@@ -122,6 +128,9 @@ export class TealscriptEngine {
       // Commit bar — only snapshot on the last bar (for realtime rollback)
       const isLastBar = this.ctx.bar_index === this.ctx.last_bar_index;
       this.scope.commit(isLastBar);
+      for (const functionScope of this.functionScopes.values()) {
+        functionScope.commit(isLastBar);
+      }
       this.ctx.commitBar();
     }
 
@@ -144,6 +153,9 @@ export class TealscriptEngine {
   updateBar(ast: Program, bar: Bar): PlotOutput[] {
     // Rollback to last committed state
     this.scope.rollback();
+    for (const functionScope of this.functionScopes.values()) {
+      functionScope.rollback();
+    }
     this.ctx.rollbackBar();
 
     // Truncate plot arrays to remove the last bar's appended values
@@ -224,6 +236,9 @@ export class TealscriptEngine {
     for (const stmt of ast.body) {
       if (stmt.type === 'FunctionDeclaration') {
         this.userFunctions.set(stmt.name.name, stmt);
+        if (!this.functionScopes.has(stmt.name.name)) {
+          this.functionScopes.set(stmt.name.name, this.scope.createChild());
+        }
       }
     }
   }
@@ -590,7 +605,7 @@ export class TealscriptEngine {
 
   private evaluateUserFunction(fn: FunctionDeclaration, args: unknown[], namedArgs: Map<string, unknown>): unknown {
     const savedScope = this.scope;
-    const functionScope = this.scope.createChild();
+    const functionScope = this.functionScopes.get(fn.name.name) ?? this.scope.createChild();
     this.scope = functionScope;
 
     try {
@@ -688,6 +703,13 @@ export class TealscriptEngine {
     return typeof value === 'number' && isNaN(value);
   }
 
+  private toPlotValue(value: unknown): number | null {
+    if (value === null || value === undefined || this.isNa(value)) {
+      return null;
+    }
+    return value as number;
+  }
+
   // ===========================================================================
   // Built-in Functions Registration
   // ===========================================================================
@@ -758,7 +780,7 @@ export class TealscriptEngine {
         plot.color.push(color);
       }
 
-      ctx.addPlotValue(id, this.isNa(value) ? null : value);
+      ctx.addPlotValue(id, this.toPlotValue(value));
       return value;
     });
 
