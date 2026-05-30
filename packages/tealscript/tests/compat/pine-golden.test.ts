@@ -150,4 +150,30 @@ plot(dist[1], title="Previous Distance")
     expect(roundSeries(getPlot(result, 'Distance').values)).toEqual([null, null, 2.333333, -2, -4, -0.666667, 3, 4.666667, 1, 1.666667, 0.333333, 1]);
     expect(roundSeries(getPlot(result, 'Previous Distance').values)).toEqual([null, null, null, 2.333333, -2, -4, -0.666667, 3, 4.666667, 1, 1.666667, 0.333333]);
   });
+
+  it('persists root var values across bars', () => {
+    const result = runCompatScript(`
+indicator("Root var")
+var counter = 0
+counter += 1
+plot(counter, title="Counter")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Counter').values)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  it('persists function-local var values across bars', () => {
+    const result = runCompatScript(`
+indicator("Function var")
+countCalls() =>
+    var counter = 0
+    counter += 1
+    counter
+plot(countCalls(), title="Function Counter")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Function Counter').values)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
 });
