@@ -525,4 +525,29 @@ plot(math.round(math.toradians(180), 6), title="Radians")
     expect(roundSeries(getPlot(result, 'Right Angle').values)).toEqual([90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90]);
     expect(roundSeries(getPlot(result, 'Radians').values, 6)).toEqual([3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593]);
   });
+
+  it('runs conditional barcolor helper idioms', () => {
+    const result = runCompatScript(`
+indicator("Barcolor smoke", overlay=true)
+candleColor = close > open ? color.green : close < open ? color.red : na
+barcolor(candleColor)
+`);
+
+    expect(result.errors).toEqual([]);
+    const barColors = result.plots.find((plot) => plot.type === 'barcolor');
+    expect(barColors?.color).toEqual([
+      '#4CAF50',
+      '#4CAF50',
+      '#4CAF50',
+      '#F44336',
+      '#F44336',
+      '#4CAF50',
+      '#4CAF50',
+      '#4CAF50',
+      '#F44336',
+      '#4CAF50',
+      '#F44336',
+      '#4CAF50',
+    ]);
+  });
 });

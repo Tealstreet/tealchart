@@ -102,7 +102,7 @@ Remaining gaps:
 | `fill` | Partial | Uses plot IDs, not full Pine handle semantics. |
 | `bgcolor` | Supported | Produces background outputs. |
 | `plotshape`, `plotchar`, `plotarrow` | Partial | Core outputs exist; styling parity is incomplete. |
-| `barcolor` | Planned | Needs chart renderer integration. |
+| `barcolor` | Supported | Produces per-bar candle color outputs consumed by the main-pane renderer. |
 | `plotbar`, `plotcandle` | Planned | Needed for some indicator overlays. |
 | `line.*`, `label.*`, `box.*`, `table.*` | Planned | Requires object lifecycle and renderer support. |
 
@@ -160,3 +160,10 @@ variadic `math.avg`, precision-aware `math.round`, `math.trunc`, and
 degree/radian conversion helpers. The checkpoint fixture follows common Pine
 math idioms by averaging OHLC values, rounding to fixed precision, and
 converting a right angle between radians and degrees.
+
+## Common Visual Coloring Coverage
+
+The visual coloring pass covers `barcolor()` for conditional candle coloring.
+The runtime emits per-bar color outputs and the main-pane renderer applies them
+as candle body/wick overrides, leaving `na` bars on the chart's default up/down
+colors.
