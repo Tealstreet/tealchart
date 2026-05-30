@@ -639,6 +639,60 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(drawnX).toBeCloseTo(expectedX, 0);
     });
 
+    it('renders line drawings in the main pane', () => {
+      const moveTo = vi.fn();
+      const lineTo = vi.fn();
+      const stroke = vi.fn();
+      const setLineDash = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        moveTo,
+        lineTo,
+        stroke,
+        setLineDash,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+
+      const bars = makeBars(20);
+      const viewport = TealchartRenderer.calculateViewport(bars);
+      const layout: UnifiedPaneLayout = {
+        panes: [
+          {
+            id: 'main',
+            type: 'main',
+            heightRatio: 1,
+            yMin: 0,
+            yMax: 0,
+            fixedRange: false,
+          },
+        ],
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+      };
+      const drawings: DrawingOutput[] = [
+        {
+          id: 'line-1',
+          type: 'line',
+          barIndex: 12,
+          x1: 8,
+          y1: bars[8]!.close,
+          x2: 12,
+          y2: bars[12]!.close,
+          xloc: 'bar_index',
+          extend: 'right',
+          color: '#00FF00',
+          style: 'dashed',
+          width: 3,
+        },
+      ];
+
+      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+
+      expect(setLineDash).toHaveBeenCalledWith([6, 4]);
+      expect(moveTo).toHaveBeenCalledWith(expect.any(Number), expect.any(Number));
+      expect(lineTo.mock.calls.at(-1)?.[0]).toBe(renderer.getOptions().width - renderer.getOptions().margins.right);
+      expect(stroke).toHaveBeenCalled();
+    });
+
     it('renders countdown text for simple price lines with countdownToTime', () => {
       vi.useFakeTimers();
       vi.setSystemTime(new Date('2026-03-29T06:17:00.000Z'));
