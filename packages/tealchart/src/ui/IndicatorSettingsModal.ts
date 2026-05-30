@@ -549,7 +549,7 @@ export class IndicatorSettingsModal extends Modal {
             const optionValue = String(opt);
             option.value = optionValue;
             option.textContent = optionValue;
-            option.selected = opt === currentValue;
+            option.selected = optionValue === String(currentValue);
             select.appendChild(option);
           }
           select.addEventListener('change', (e) => {
