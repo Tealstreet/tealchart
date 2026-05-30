@@ -428,6 +428,20 @@ plot(math.trunc(-1.9), "Truncated")
       expect(result.plots[5].values).toEqual(Array(bars.length).fill(-1));
     });
 
+    it('executes Pine math angle conversion helpers', () => {
+      const code = `//@version=6
+indicator("Test")
+plot(math.toradians(180), "Radians")
+plot(math.todegrees(math.pi / 2), "Degrees")
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values.map((value) => (value === null ? null : Math.round(value * 1e6) / 1e6))).toEqual(Array(bars.length).fill(3.141593));
+      expect(result.plots[1].values).toEqual(Array(bars.length).fill(90));
+    });
+
     it('executes nz function', () => {
       const code = `//@version=6
 indicator("Test")
