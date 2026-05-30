@@ -110,7 +110,7 @@ export type PlotStyle = 'line' | 'stepline' | 'histogram' | 'cross' | 'circles' 
  */
 export interface InputDefinition {
   id: string;
-  type: 'int' | 'float' | 'bool' | 'string' | 'source' | 'color';
+  type: 'int' | 'float' | 'bool' | 'string' | 'source' | 'color' | 'time' | 'timeframe' | 'symbol' | 'session' | 'text_area';
   title: string;
   defval: unknown;
   minval?: number;
