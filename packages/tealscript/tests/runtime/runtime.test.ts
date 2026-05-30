@@ -188,6 +188,11 @@ describe('ExecutionContext', () => {
     ctx.advanceBar();
     expect(ctx.barstate.isfirst).toBe(true);
     expect(ctx.barstate.islast).toBe(false);
+    expect(ctx.barstate.ishistory).toBe(true);
+    expect(ctx.barstate.isrealtime).toBe(false);
+    expect(ctx.barstate.isnew).toBe(true);
+    expect(ctx.barstate.isconfirmed).toBe(true);
+    expect(ctx.barstate.islastconfirmedhistory).toBe(false);
 
     while (ctx.advanceBar()) {
       // Continue
@@ -196,6 +201,15 @@ describe('ExecutionContext', () => {
     // At last bar
     expect(ctx.barstate.islast).toBe(true);
     expect(ctx.barstate.isfirst).toBe(false);
+    expect(ctx.barstate.islastconfirmedhistory).toBe(true);
+
+    ctx.updateCurrentBar({ ...bars[bars.length - 1], close: 120 });
+    expect(ctx.barstate.islast).toBe(true);
+    expect(ctx.barstate.ishistory).toBe(false);
+    expect(ctx.barstate.isrealtime).toBe(true);
+    expect(ctx.barstate.isnew).toBe(false);
+    expect(ctx.barstate.isconfirmed).toBe(false);
+    expect(ctx.barstate.islastconfirmedhistory).toBe(false);
   });
 });
 
