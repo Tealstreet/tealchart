@@ -89,6 +89,8 @@ type BuiltinFunction = (
  * Tealscript Engine - executes AST bar-by-bar
  */
 export class TealscriptEngine {
+  private static readonly MAX_LOOP_ITERATIONS = 10000;
+
   private ctx: ExecutionContext;
   private scope: Scope;
   private builtins: Map<string, BuiltinFunction>;
@@ -365,17 +367,72 @@ export class TealscriptEngine {
   }
 
   private executeFor(stmt: ForStatement): void {
+    if (stmt.kind === 'collection') {
+      this.executeForIn(stmt);
+      return;
+    }
+
     const start = this.evaluateExpression(stmt.start) as number;
     const end = this.evaluateExpression(stmt.end) as number;
     const step = stmt.step ? (this.evaluateExpression(stmt.step) as number) : 1;
+    if (step === 0) {
+      throw new Error('For loop step cannot be zero');
+    }
 
     const childScope = this.scope.createChild();
     const savedScope = this.scope;
     this.scope = childScope;
 
+    let iterations = 0;
+
     try {
-      for (let i = start; i <= end; i += step) {
+      for (let i = start; step > 0 ? i <= end : i >= end; i += step) {
+        if (++iterations > TealscriptEngine.MAX_LOOP_ITERATIONS) {
+          throw new Error('Maximum loop iterations exceeded');
+        }
+
         this.scope.declare(stmt.counter.name, 'none', i);
+
+        try {
+          for (const s of stmt.body) {
+            this.executeStatement(s);
+          }
+        } catch (e) {
+          if (e instanceof BreakException) break;
+          if (e instanceof ContinueException) continue;
+          throw e;
+        }
+      }
+    } finally {
+      this.scope = savedScope;
+    }
+  }
+
+  private executeForIn(stmt: Extract<ForStatement, { kind: 'collection' }>): void {
+    const iterable = this.evaluateExpression(stmt.iterable);
+    let values: unknown[];
+
+    if (Array.isArray(iterable)) {
+      values = iterable;
+    } else if (isPineArray(iterable)) {
+      values = iterable.values;
+    } else {
+      throw new Error('For-in loop expects an array');
+    }
+
+    const childScope = this.scope.createChild();
+    const savedScope = this.scope;
+    this.scope = childScope;
+
+    let iterations = 0;
+
+    try {
+      for (const value of values) {
+        if (++iterations > TealscriptEngine.MAX_LOOP_ITERATIONS) {
+          throw new Error('Maximum loop iterations exceeded');
+        }
+
+        this.scope.declare(stmt.counter.name, 'none', value);
 
         try {
           for (const s of stmt.body) {
@@ -398,11 +455,10 @@ export class TealscriptEngine {
     this.scope = childScope;
 
     let iterations = 0;
-    const maxIterations = 10000; // Safety limit
 
     try {
       while (this.isTruthy(this.evaluateExpression(stmt.test))) {
-        if (++iterations > maxIterations) {
+        if (++iterations > TealscriptEngine.MAX_LOOP_ITERATIONS) {
           throw new Error('Maximum loop iterations exceeded');
         }
 

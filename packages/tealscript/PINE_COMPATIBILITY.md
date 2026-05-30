@@ -42,7 +42,7 @@ by real Pine examples from official docs or public indicator idioms.
 | Tuple destructuring | Supported | Used by multi-return built-ins such as `ta.macd`. |
 | `if` / `else if` / `else` | Supported | Statement form is implemented. |
 | Ternary `?:` | Supported | Runtime truthiness needs broader Pine compatibility tests. |
-| `for` loops | Partial | Numeric `for = ... to ... by ...` is supported. Collection loops are not. |
+| `for` loops | Partial | Numeric `for = ... to ... by ...` supports ascending and descending steps. Basic collection `for value in array` loops are supported. Tuple/index collection loops are not. |
 | `while`, `break`, `continue` | Supported | Loop safety limit exists. |
 | User-defined functions | Partial | Single-line functions, flat multiline functions, local scope, nested calls, and `if` / `else if` / `else` branch expression returns are covered. |
 | Methods, e.g. `arr.push(x)` | Partial | Common array methods lower to the matching `array.*` built-ins. Other object namespaces are not implemented yet. |
@@ -210,3 +210,11 @@ events with `alert.freq_once_per_bar`, `alert.freq_once_per_bar_close`, and
 `alert.freq_all` constants. The checkpoint fixture follows TradingView's
 documented trigger-condition idiom by deriving a boolean condition, registering
 it with `alertcondition()`, and firing a direct `alert()` from an `if` block.
+
+## Common Loop Coverage
+
+The loop-control pass covers `break` and `continue` inside numeric loops,
+descending numeric loops with negative `by` steps, and basic collection loops
+over Pine arrays with `for value in array`. The checkpoint fixture follows
+common Pine loop idioms by summing selected values, skipping items with
+`continue`, stopping with `break`, and walking a numeric loop downward.
