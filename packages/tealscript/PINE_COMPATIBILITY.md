@@ -4,6 +4,9 @@ TealScript is Pine-inspired, not a drop-in Pine runtime. This matrix tracks the
 subset needed for AI-generated chart indicators to behave like common Pine
 Script v5/v6 indicators.
 
+For the broader full-parity plan, see
+[`PINE_PARITY_EPICS.md`](./PINE_PARITY_EPICS.md).
+
 Status values:
 
 - `Supported` means syntax parses and runtime behavior is covered by tests.
