@@ -175,6 +175,7 @@ export type Expression =
   | BinaryExpression
   | UnaryExpression
   | ConditionalExpression
+  | SwitchExpression
   | CallExpression
   | MemberExpression
   | IndexExpression
@@ -270,6 +271,29 @@ export interface ConditionalExpression extends BaseNode {
   test: Expression;
   consequent: Expression;
   alternate: Expression;
+}
+
+/**
+ * Switch expression
+ *
+ * switch mode
+ *     "EMA" => ta.ema(close, length)
+ *     => ta.sma(close, length)
+ *
+ * switch
+ *     close > open => 1
+ *     => 0
+ */
+export interface SwitchExpression extends BaseNode {
+  type: 'SwitchExpression';
+  discriminant?: Expression | null;
+  cases: SwitchCase[];
+}
+
+export interface SwitchCase extends BaseNode {
+  type: 'SwitchCase';
+  test?: Expression | null;
+  consequent: Expression;
 }
 
 /**
