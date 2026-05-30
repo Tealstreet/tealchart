@@ -2042,11 +2042,16 @@ export class TealchartRenderer {
 
   private getSlotWidth(bars: Bar[], viewport: Viewport, chartWidth: number): number {
     const viewportTimeRange = viewport.endTime - viewport.startTime;
+    const fallbackWidth = Math.max(this.options.minCandleWidth, 1);
+    if (viewportTimeRange <= 0 || chartWidth <= 0) {
+      return fallbackWidth;
+    }
     let barInterval = viewportTimeRange / Math.max(bars.length, 1);
     if (bars.length >= 2) {
       barInterval = bars[1].time - bars[0].time;
     }
-    return barInterval * (chartWidth / viewportTimeRange);
+    const slotWidth = barInterval * (chartWidth / viewportTimeRange);
+    return Number.isFinite(slotWidth) && slotWidth > 0 ? slotWidth : fallbackWidth;
   }
 
   private renderOhlcPlotInLegacyMainPane(plot: PlotOutput, bars: Bar[], viewport: Viewport): void {

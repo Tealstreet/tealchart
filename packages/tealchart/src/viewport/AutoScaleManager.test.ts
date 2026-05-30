@@ -1,9 +1,14 @@
 import type { PlotOutput } from '@tealstreet/tealscript';
 import type { Bar, Viewport } from '../types';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import { AutoScaleManager } from './AutoScaleManager';
+
+afterEach(() => {
+  clearChartStoreCache();
+});
 
 // ---------------------------------------------------------------------------
 // Helpers
