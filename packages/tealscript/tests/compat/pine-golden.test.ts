@@ -299,4 +299,25 @@ plot(joined == "symbol:BTCUSDT", title="Concatenated Symbol")
     expect(getPlot(result, 'Format Template').values).toEqual([true, false, false, false, false, false, false, false, false, false, false, false]);
     expect(getPlot(result, 'Concatenated Symbol').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
+
+  it('runs string search and substring helpers', () => {
+    const result = runCompatScript(`
+indicator("String search helpers")
+text = "BTCUSDT perpetual"
+plot(str.contains(text, "USDT"), title="Contains")
+plot(str.startswith(text, "BTC"), title="Starts")
+plot(str.endswith(text, "perpetual"), title="Ends")
+plot(str.pos(text, "USDT"), title="Position")
+plot(str.substring(text, 0, 3) == "BTC", title="Substring")
+plot(str.length(text), title="Length")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Contains').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Starts').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Ends').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(roundSeries(getPlot(result, 'Position').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    expect(getPlot(result, 'Substring').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(roundSeries(getPlot(result, 'Length').values)).toEqual([17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17]);
+  });
 });

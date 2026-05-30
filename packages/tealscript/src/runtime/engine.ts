@@ -1158,6 +1158,18 @@ export class TealscriptEngine {
         return this.toStringValue(args[Number(index) + 1], format);
       });
     });
+
+    this.builtins.set('str.length', (args) => this.toStringValue(args[0]).length);
+    this.builtins.set('str.contains', (args) => this.toStringValue(args[0]).includes(this.toStringValue(args[1])));
+    this.builtins.set('str.startswith', (args) => this.toStringValue(args[0]).startsWith(this.toStringValue(args[1])));
+    this.builtins.set('str.endswith', (args) => this.toStringValue(args[0]).endsWith(this.toStringValue(args[1])));
+    this.builtins.set('str.pos', (args) => this.toStringValue(args[0]).indexOf(this.toStringValue(args[1])));
+    this.builtins.set('str.substring', (args) => {
+      const source = this.toStringValue(args[0]);
+      const begin = Math.trunc((args[1] as number | undefined) ?? 0);
+      const end = args[2] === undefined ? undefined : Math.trunc(args[2] as number);
+      return source.substring(begin, end);
+    });
   }
 
   private registerArrayBuiltins(): void {
