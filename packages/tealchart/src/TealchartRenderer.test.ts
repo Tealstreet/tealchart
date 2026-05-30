@@ -1,10 +1,15 @@
 import type { PlotOutput } from '@tealstreet/tealscript';
 import type { Bar, ComputedPane, ExecutionLineRenderData, PriceLine, UnifiedPaneLayout, Viewport } from './types';
 
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { TealchartRenderer } from './TealchartRenderer';
+import { clearChartStoreCache } from './state/chartState';
 import { TIME_AXIS_HEIGHT } from './types';
+
+afterEach(() => {
+  clearChartStoreCache();
+});
 
 /**
  * Create a minimal CanvasContext mock for the renderer

@@ -651,5 +651,29 @@ plot(close)`;
       expect(plots[0].values.length).toBe(bars.length);
       expect(plots[0].values[plots[0].values.length - 1]).toBe(555);
     });
+
+    it('truncates OHLC plot arrays before same-timestamp re-execution', () => {
+      const script = `//@version=6
+indicator("Conditional OHLC", overlay=true)
+if close > open
+    plotcandle(open, high, low, close, title="Conditional", color=color.green)`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+
+      const result = engine.execute(ast, bars);
+      const initialPlot = result.plots.find((plot) => plot.type === 'plotcandle');
+      expect(initialPlot?.closeValues?.[2]).toBe(101.2);
+
+      const updatedBar = { ...bars[2], close: bars[2].open - 1 };
+      const plots = engine.updateBar(ast, updatedBar);
+      const updatedPlot = plots.find((plot) => plot.type === 'plotcandle');
+
+      expect(updatedPlot?.values).toEqual([100.2, 100.7]);
+      expect(updatedPlot?.openValues).toEqual([100, 100.5]);
+      expect(updatedPlot?.closeValues).toEqual([100.2, 100.7]);
+      expect(updatedPlot?.color).toEqual(['#4CAF50', '#4CAF50']);
+    });
   });
 });

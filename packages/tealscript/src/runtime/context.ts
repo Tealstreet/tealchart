@@ -470,6 +470,12 @@ export class ExecutionContext {
       if (Array.isArray(plot.color)) {
         plot.color.length = length;
       }
+      if (plot.openValues) plot.openValues.length = length;
+      if (plot.highValues) plot.highValues.length = length;
+      if (plot.lowValues) plot.lowValues.length = length;
+      if (plot.closeValues) plot.closeValues.length = length;
+      if (Array.isArray(plot.wickColor)) plot.wickColor.length = length;
+      if (Array.isArray(plot.borderColor)) plot.borderColor.length = length;
     }
   }
 
