@@ -103,7 +103,7 @@ Remaining gaps:
 | `bgcolor` | Supported | Produces background outputs. |
 | `plotshape`, `plotchar`, `plotarrow` | Partial | Core outputs exist; styling parity is incomplete. |
 | `barcolor` | Supported | Produces per-bar candle color outputs consumed by the main-pane renderer. |
-| `plotbar`, `plotcandle` | Planned | Needed for some indicator overlays. |
+| `plotbar`, `plotcandle` | Supported | Produce OHLC outputs with per-bar body, wick, and border colors; renderer draws custom bars/candles. |
 | `line.*`, `label.*`, `box.*`, `table.*` | Planned | Requires object lifecycle and renderer support. |
 
 ## Alerts, Strategies, And Data
@@ -167,3 +167,12 @@ The visual coloring pass covers `barcolor()` for conditional candle coloring.
 The runtime emits per-bar color outputs and the main-pane renderer applies them
 as candle body/wick overrides, leaving `na` bars on the chart's default up/down
 colors.
+
+## Common OHLC Plot Coverage
+
+The OHLC plot pass covers `plotbar()` and `plotcandle()` for custom bar and
+candle overlays. The runtime emits open, high, low, close, and per-bar color
+arrays with `na` gaps preserved as nulls; the Tealchart renderer draws those
+custom bars/candles in overlay and indicator panes. The checkpoint fixture is
+modeled on TradingView's documented custom bar plotting idiom using directional
+body colors, transparent wick colors, and skipped bars.
