@@ -913,7 +913,7 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('bgcolor', (args, namedArgs, ctx) => {
-      const color = args[0] as string;
+      const color = this.toPlotColor(args[0]);
       const title = (namedArgs.get('title') ?? 'bgcolor') as string;
 
       const id = `bgcolor_${title}`;
@@ -932,6 +932,36 @@ export class TealscriptEngine {
         plot.color.push(color);
       }
 
+      return color;
+    });
+
+    this.builtins.set('barcolor', (args, namedArgs, ctx, _scope, callId) => {
+      const color = this.toPlotColor(args[0]);
+      const title = (namedArgs.get('title') ?? callId) as string;
+      const id = `barcolor_${title}`;
+
+      let plot = ctx.plots.get(id);
+      if (!plot) {
+        ctx.registerPlot({
+          id,
+          type: 'barcolor',
+          title,
+          color: [],
+        });
+        plot = ctx.plots.get(id);
+      }
+
+      if (plot && Array.isArray(plot.color)) {
+        while (plot.color.length < ctx.bar_index) {
+          plot.color.push(null);
+        }
+        while (plot.values.length < ctx.bar_index) {
+          plot.values.push(null);
+        }
+        plot.color[ctx.bar_index] = color;
+      }
+
+      ctx.addPlotValue(id, null);
       return color;
     });
 

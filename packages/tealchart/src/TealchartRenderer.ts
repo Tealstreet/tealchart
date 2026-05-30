@@ -3034,7 +3034,7 @@ export class TealchartRenderer {
     // Draw candles (skip if a jailbreak indicator has hideCandles enabled)
     const hideCandles = this.jailbreakManager?.hasSettingEnabled('hideCandles') ?? false;
     if (!hideCandles) {
-      this.drawCandlesInPane(bars, viewport, pane);
+      this.drawCandlesInPane(bars, viewport, pane, plots);
     }
 
     // Draw volume overlay (bottom 10% of main pane)
@@ -3398,7 +3398,21 @@ export class TealchartRenderer {
   /**
    * Draw candles within a specific pane
    */
-  private drawCandlesInPane(bars: Bar[], viewport: Viewport, pane: ComputedPane): void {
+  private resolveBarColorOverride(plots: PlotOutput[] | undefined, barIndex: number): string | null {
+    if (!plots) return null;
+
+    let override: string | null = null;
+    for (const plot of plots) {
+      if (plot.type !== 'barcolor' || !Array.isArray(plot.color)) continue;
+      const color = plot.color[barIndex];
+      if (color) {
+        override = color;
+      }
+    }
+    return override;
+  }
+
+  private drawCandlesInPane(bars: Bar[], viewport: Viewport, pane: ComputedPane, plots?: PlotOutput[]): void {
     const { ctx, options, margins } = this;
     // Use extended width that goes under the price axis for transparency effect
     const chartWidth = options.width - margins.left;
@@ -3415,12 +3429,12 @@ export class TealchartRenderer {
     const spacingRatio = 0.2;
     const candleWidth = Math.max(options.minCandleWidth, slotWidth * (1 - spacingRatio));
 
-    for (const bar of bars) {
+    for (const [barIndex, bar] of bars.entries()) {
       if (bar.time < viewport.startTime || bar.time > viewport.endTime) continue;
 
       const x = this.timeToX(bar.time, viewport, chartWidth);
       const isUp = bar.close >= bar.open;
-      const color = isUp ? options.upColor : options.downColor;
+      const color = this.resolveBarColorOverride(plots, barIndex) ?? (isUp ? options.upColor : options.downColor);
 
       // Wick
       const highY = this.valueToY(bar.high, pane);
