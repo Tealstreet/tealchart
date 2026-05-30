@@ -608,4 +608,38 @@ plotbar(o, h + 1, l - 1, c, title="Custom bars", color=bodyColor)
     expect(bars.lowValues).toEqual([null, 100, 103, 101, 97, 95, 98, 102, 105, 106, 108, 107]);
     expect(bars.color).toEqual(candles.color);
   });
+
+  it('matches documented Pine switch selection idioms', () => {
+    const result = runCompatScript(`
+indicator("Switch docs smoke")
+maType = input.string("EMA", "MA Type", options=["EMA", "SMA", "Close"])
+selected = switch maType
+    "EMA" => ta.ema(close, 3)
+    "SMA" => ta.sma(close, 3)
+    => close
+direction = switch
+    close > open => 1
+    close < open => -1
+    => 0
+plot(selected, title="Selected MA")
+plot(direction, title="Direction")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Selected MA').values)).toEqual([
+      102,
+      104.25,
+      105.833333,
+      104,
+      101,
+      100.333333,
+      102.5,
+      106.666667,
+      107.5,
+      110.166667,
+      109.833333,
+      111.5,
+    ]);
+    expect(getPlot(result, 'Direction').values).toEqual([1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, 1]);
+  });
 });
