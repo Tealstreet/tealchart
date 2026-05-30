@@ -45,7 +45,7 @@ by real Pine examples from official docs or public indicator idioms.
 | `for` loops | Partial | Numeric `for = ... to ... by ...` is supported. Collection loops are not. |
 | `while`, `break`, `continue` | Supported | Loop safety limit exists. |
 | User-defined functions | Planned | Required for common Pine snippets. |
-| Methods, e.g. `arr.push(x)` | Planned | Should lower to namespaced built-ins where possible. |
+| Methods, e.g. `arr.push(x)` | Partial | Common array methods lower to the matching `array.*` built-ins. Other object namespaces are not implemented yet. |
 | `switch` | Partial | Expression-form keyed and condition-only switches work. Statement-block arms are not implemented yet. |
 | User-defined types | Unsupported | Lower priority than indicators and arrays. |
 
@@ -89,7 +89,7 @@ Remaining gaps:
 | `input.*` | Partial | Generic `input()`, int, float, bool, string, color, source, time, symbol, timeframe, session, and text area exist. Advanced UI/display behavior is incomplete. |
 | `color.*` | Partial | Core named colors, `color.new()`, `color.rgb()`, channel extraction, and `color.from_gradient()` exist. Named color constants still need exact Pine v6 parity. |
 | `str.*` | Partial | Common conversion, format, search, substring, case, trim, and replace helpers exist. |
-| `array.*` | Planned | High priority for common Pine idioms. |
+| `array.*` | Partial | Array construction, read/write, stack/queue helpers, clear, and common method-call syntax are covered. |
 | `map.*` / `matrix.*` | Planned | Lower priority than arrays. |
 | `request.*` | Planned | Requires Tealchart datafeed design. Start with `request.security()`. |
 
@@ -145,6 +145,16 @@ helpers (`input.time`, `input.timeframe`, `input.symbol`, `input.session`,
 `input.text_area`), and common metadata (`options`, `tooltip`, `group`,
 `inline`, `confirm`, `display`) so generated scripts retain Pine-like control
 definitions.
+
+## Common `array.*` Coverage
+
+The array pass covers typed constructors (`array.new_float`, `array.new_int`,
+`array.new_bool`, `array.new_string`), `array.size`, `array.get`, `array.set`,
+`array.push`, `array.pop`, `array.shift`, `array.unshift`, and `array.clear`.
+Common Pine method syntax now lowers to the same runtime built-ins for calls
+such as `values.push(close)`, `values.size()`, and `values.get(index)`. The
+checkpoint fixture follows rolling-window indicator idioms where an array is
+mutated on each bar and capped with `shift()`.
 
 ## Common `color.*` Coverage
 
