@@ -80,6 +80,31 @@ plot(close, title="Close Price")`;
       expect(closePlot!.values.length).toBe(10);
     });
 
+    it('exposes Pine barstate booleans through member access', () => {
+      const script = `//@version=6
+indicator("Barstate")
+plot(barstate.isfirst ? 1 : 0, title="First")
+plot(barstate.islast ? 1 : 0, title="Last")
+plot(barstate.ishistory ? 1 : 0, title="History")
+plot(barstate.isrealtime ? 1 : 0, title="Realtime")
+plot(barstate.isnew ? 1 : 0, title="New")
+plot(barstate.isconfirmed ? 1 : 0, title="Confirmed")
+plot(barstate.islastconfirmedhistory ? 1 : 0, title="Last Confirmed History")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'First')?.values).toEqual([1, 0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Last')?.values).toEqual([0, 0, 1]);
+      expect(result.plots.find((plot) => plot.title === 'History')?.values).toEqual([1, 1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Realtime')?.values).toEqual([0, 0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'New')?.values).toEqual([1, 1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Confirmed')?.values).toEqual([1, 1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Last Confirmed History')?.values).toEqual([0, 0, 1]);
+    });
+
     it('keeps multiple untitled plots as separate series', () => {
       const script = `//@version=6
 indicator("Test")
