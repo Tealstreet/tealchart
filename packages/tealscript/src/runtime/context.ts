@@ -133,7 +133,27 @@ export interface LabelDrawingOutput {
   tooltip?: string;
 }
 
-export type DrawingOutput = LabelDrawingOutput;
+export interface LineDrawingOutput {
+  id: string;
+  type: 'line';
+  /** Script ID that produced this drawing (set by TealscriptManager). */
+  scriptId?: string;
+  /** True when the drawing was created by a persistent declaration. */
+  persistent?: boolean;
+  barIndex: number;
+  x1: number | null;
+  y1: number | null;
+  x2: number | null;
+  y2: number | null;
+  xloc: string;
+  extend: string;
+  color: string | null;
+  style: string;
+  width: number;
+  forceOverlay?: boolean;
+}
+
+export type DrawingOutput = LabelDrawingOutput | LineDrawingOutput;
 
 export type PlotStyle =
   | 'line'
@@ -623,6 +643,24 @@ export class ExecutionContext {
     if (this.getDrawing(newId)) return undefined;
 
     const copy: LabelDrawingOutput = {
+      ...source,
+      id: newId,
+      barIndex: this.bar_index,
+      persistent: false,
+    };
+    this.drawings.push(copy);
+    return copy;
+  }
+
+  /**
+   * Copy a line drawing object to a new handle ID.
+   */
+  copyLineDrawing(id: string, newId: string): LineDrawingOutput | undefined {
+    const source = this.getDrawing(id);
+    if (!source || source.type !== 'line') return undefined;
+    if (this.getDrawing(newId)) return undefined;
+
+    const copy: LineDrawingOutput = {
       ...source,
       id: newId,
       barIndex: this.bar_index,

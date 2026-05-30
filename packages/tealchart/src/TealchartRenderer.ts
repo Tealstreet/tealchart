@@ -1,4 +1,4 @@
-import type { DrawingOutput, LabelDrawingOutput, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
+import type { DrawingOutput, LabelDrawingOutput, LineDrawingOutput, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
 import type { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
 import type { CanvasContext } from './rendering/CanvasContext';
 import type { PaneOffset } from './rendering/PaneManager';
@@ -3194,6 +3194,7 @@ export class TealchartRenderer {
     }
 
     if (drawings && drawings.length > 0) {
+      this.renderLineDrawings(drawings, bars, viewport, pane);
       this.renderLabelDrawings(drawings, bars, viewport, pane);
     }
 
@@ -3204,6 +3205,110 @@ export class TealchartRenderer {
     if (labelBounds && labelBounds.length > 0) {
       this.drawPriceLinesInPane(labelBounds, viewport, pane);
     }
+  }
+
+  private renderLineDrawings(
+    drawings: DrawingOutput[],
+    bars: Bar[],
+    viewport: Viewport,
+    pane: ComputedPane,
+  ): void {
+    const lines = drawings.filter((drawing): drawing is LineDrawingOutput => drawing.type === 'line');
+    if (lines.length === 0) return;
+
+    const { ctx, options, margins } = this;
+    const chartWidth = options.width - margins.left;
+    const minX = margins.left;
+    const maxX = options.width - margins.right;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(margins.left, pane.top, options.width - margins.left - margins.right, pane.height);
+    ctx.clip();
+
+    for (const line of lines) {
+      const start = this.resolveLineDrawingPoint(line.x1, line.y1, line.xloc, bars, viewport, pane, chartWidth);
+      const end = this.resolveLineDrawingPoint(line.x2, line.y2, line.xloc, bars, viewport, pane, chartWidth);
+      if (!start || !end) continue;
+
+      const extended = this.resolveExtendedLineSegment(start, end, line.extend, minX, maxX);
+
+      ctx.strokeStyle = line.color ?? '#2962FF';
+      ctx.lineWidth = Math.max(1, line.width);
+      if (line.style === 'dashed') {
+        ctx.setLineDash([6, 4]);
+      } else if (line.style === 'dotted') {
+        ctx.setLineDash([2, 4]);
+      } else {
+        ctx.setLineDash([]);
+      }
+      ctx.beginPath();
+      ctx.moveTo(extended.start.x, extended.start.y);
+      ctx.lineTo(extended.end.x, extended.end.y);
+      ctx.stroke();
+    }
+
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  private resolveLineDrawingPoint(
+    xValue: number | null,
+    yValue: number | null,
+    xloc: string,
+    bars: Bar[],
+    viewport: Viewport,
+    pane: ComputedPane,
+    chartWidth: number,
+  ): { x: number; y: number } | null {
+    if (xValue === null || yValue === null || !Number.isFinite(xValue) || !Number.isFinite(yValue)) {
+      return null;
+    }
+
+    const time = xloc === 'bar_time' ? xValue : this.barIndexToTime(xValue, bars);
+    if (time === null) return null;
+
+    const x = this.timeToX(time, viewport, chartWidth);
+    const y = this.valueToY(yValue, pane);
+    return { x, y };
+  }
+
+  private barIndexToTime(index: number, bars: Bar[]): number | null {
+    if (bars.length === 0 || !Number.isFinite(index)) return null;
+
+    const roundedIndex = Math.trunc(index);
+    if (roundedIndex >= 0 && roundedIndex < bars.length) {
+      return bars[roundedIndex]?.time ?? null;
+    }
+
+    const interval = bars.length > 1 ? bars[1]!.time - bars[0]!.time : 60_000;
+    return bars[0]!.time + roundedIndex * interval;
+  }
+
+  private resolveExtendedLineSegment(
+    start: { x: number; y: number },
+    end: { x: number; y: number },
+    extend: string,
+    minX: number,
+    maxX: number,
+  ): { start: { x: number; y: number }; end: { x: number; y: number } } {
+    if (start.x === end.x) {
+      return { start, end };
+    }
+
+    const slope = (end.y - start.y) / (end.x - start.x);
+    const yAt = (x: number): number => start.y + slope * (x - start.x);
+    let nextStart = start;
+    let nextEnd = end;
+
+    if (extend === 'left' || extend === 'both') {
+      nextStart = { x: minX, y: yAt(minX) };
+    }
+    if (extend === 'right' || extend === 'both') {
+      nextEnd = { x: maxX, y: yAt(maxX) };
+    }
+
+    return { start: nextStart, end: nextEnd };
   }
 
   private renderLabelDrawings(

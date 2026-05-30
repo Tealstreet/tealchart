@@ -71,7 +71,6 @@ plot(close)`;
       const result = executeScript(ast, bars);
 
       expect(result.errors.map((error) => error.message)).toEqual([
-        'line.* functions are not supported yet: line.new',
         'table.* functions are not supported yet: table.new',
         'box.* functions are not supported yet: box.new',
       ]);
@@ -89,6 +88,21 @@ plot(close)`;
           color: '#F44336',
           textColor: '#FFFFFF',
           size: 'small',
+        },
+        {
+          id: 'line_line.new_0_0',
+          type: 'line',
+          barIndex: 0,
+          x1: -1,
+          y1: null,
+          x2: 0,
+          y2: 100.2,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: null,
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
         },
       ]);
     });
@@ -255,6 +269,137 @@ plot(label.get_y(marker), title="Label Y")`;
       ]);
       expect(result.plots.find((plot) => plot.title === 'Label X')?.values).toEqual([0, 0, 7]);
       expect(result.plots.find((plot) => plot.title === 'Label Y')?.values).toEqual([100.2, 100.2, 101.5]);
+    });
+
+    it('mutates, reads, copies, and deletes line drawings by handle', () => {
+      const script = `//@version=6
+indicator("Line mutators")
+var trend = line.new(0, close, 1, close + 1, color=color.red, style=line.style_dotted, width=2)
+if barstate.islast
+    line.set_xy1(trend, bar_index - 2, low)
+    line.set_xy2(trend, bar_index, high)
+    line.set_extend(trend, extend.right)
+    line.set_color(trend, color.green)
+    line.set_style(trend, line.style_dashed)
+    line.set_width(trend, 3)
+    clone = line.copy(trend)
+    line.set_color(clone, color.blue)
+    line.delete(clone)
+plot(line.get_x1(trend), title="Line X1")
+plot(line.get_y2(trend), title="Line Y2")
+plot(line.get_price(trend, bar_index - 1), title="Line Mid")`;
+
+      const ast = parse(script);
+      const bars = createBars(4);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'line_line.new_0_0',
+          type: 'line',
+          persistent: true,
+          barIndex: 3,
+          x1: 1,
+          y1: 101.2,
+          x2: 3,
+          y2: 102,
+          xloc: 'bar_index',
+          extend: 'right',
+          color: '#4CAF50',
+          style: 'dashed',
+          width: 3,
+          forceOverlay: false,
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Line X1')?.values).toEqual([0, 0, 0, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Line Y2')?.values).toEqual([101.2, 101.2, 101.2, 102]);
+      expect(result.plots.find((plot) => plot.title === 'Line Mid')?.values).toEqual([99.2, 100.2, 101.2, 101.6]);
+    });
+
+    it('covers line coordinate setters and xloc updates', () => {
+      const script = `//@version=6
+indicator("Line coordinate coverage")
+var trend = line.new(0, close, 1, close)
+if barstate.islast
+    line.set_x1(trend, time[1])
+    line.set_y1(trend, low)
+    line.set_x2(trend, time)
+    line.set_y2(trend, high)
+    line.set_xloc(trend, time[1], time, xloc.bar_time)
+plot(line.get_x1(trend), title="Line X1")
+plot(line.get_x2(trend), title="Line X2")
+plot(line.get_y1(trend), title="Line Y1")
+plot(line.get_y2(trend), title="Line Y2")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'line_line.new_0_0',
+          type: 'line',
+          persistent: true,
+          barIndex: 2,
+          x1: bars[1]!.time,
+          y1: 100.7,
+          x2: bars[2]!.time,
+          y2: 101.5,
+          xloc: 'bar_time',
+          extend: 'none',
+          color: null,
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Line X1')?.values).toEqual([0, 0, bars[1]!.time]);
+      expect(result.plots.find((plot) => plot.title === 'Line X2')?.values).toEqual([1, 1, bars[2]!.time]);
+      expect(result.plots.find((plot) => plot.title === 'Line Y1')?.values).toEqual([100.2, 100.2, 100.7]);
+      expect(result.plots.find((plot) => plot.title === 'Line Y2')?.values).toEqual([100.2, 100.2, 101.5]);
+    });
+
+    it('preserves persistent line handles during realtime rollback', () => {
+      const script = `//@version=6
+indicator("Realtime line")
+var trend = line.new(0, close, 1, close)
+if barstate.islast
+    line.set_xy1(trend, bar_index - 1, low)
+    line.set_xy2(trend, bar_index, high)
+plot(line.get_y2(trend), title="Line Y2")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      engine.updateBar(ast, {
+        ...bars[2],
+        high: 250,
+        low: 190,
+        close: 220,
+      });
+
+      expect(engine.getDrawings()).toEqual([
+        {
+          id: 'line_line.new_0_0',
+          type: 'line',
+          persistent: true,
+          barIndex: 2,
+          x1: 1,
+          y1: 190,
+          x2: 2,
+          y2: 250,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: null,
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+      ]);
     });
   });
 
