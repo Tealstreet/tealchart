@@ -509,6 +509,9 @@ export class TealscriptEngine {
     switch (expr.operator) {
       // Arithmetic
       case '+':
+        if (typeof left === 'string' || typeof right === 'string') {
+          return `${this.toStringValue(left)}${this.toStringValue(right)}`;
+        }
         return (left as number) + (right as number);
       case '-':
         return (left as number) - (right as number);
@@ -724,6 +727,30 @@ export class TealscriptEngine {
     return value as number;
   }
 
+  private toStringValue(value: unknown, format?: string): string {
+    if (value === null || value === undefined || this.isNa(value)) {
+      return 'NaN';
+    }
+    if (typeof value === 'number') {
+      if (format) {
+        return this.formatNumber(value, format);
+      }
+      return String(value);
+    }
+    return String(value);
+  }
+
+  private formatNumber(value: number, format: string): string {
+    const decimalMatch = format.match(/\.([0#]+)/);
+    if (decimalMatch) {
+      return value.toFixed(decimalMatch[1].length);
+    }
+    if (/^[#0,]+$/.test(format)) {
+      return Math.round(value).toString();
+    }
+    return String(value);
+  }
+
   private setBuiltinState(scope: Scope, key: string, value: unknown): void {
     if (scope.has(key)) {
       scope.set(key, value);
@@ -745,6 +772,9 @@ export class TealscriptEngine {
 
     // Math functions
     this.registerMathBuiltins();
+
+    // String functions
+    this.registerStringBuiltins();
 
     // Array functions
     this.registerArrayBuiltins();
@@ -1114,6 +1144,19 @@ export class TealscriptEngine {
       if (args.length === 0) return NaN;
       const value = args[0];
       return typeof value === 'number' && isNaN(value);
+    });
+  }
+
+  private registerStringBuiltins(): void {
+    this.builtins.set('str.tostring', (args) => {
+      return this.toStringValue(args[0], args[1] as string | undefined);
+    });
+
+    this.builtins.set('str.format', (args) => {
+      const template = this.toStringValue(args[0]);
+      return template.replace(/\{(\d+)(?:,[^}:]+)?(?::([^}]+))?\}/g, (_match, index: string, format: string | undefined) => {
+        return this.toStringValue(args[Number(index) + 1], format);
+      });
     });
   }
 
