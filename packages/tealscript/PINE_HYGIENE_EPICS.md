@@ -16,6 +16,27 @@ After an epic PR is ready, run CodeRabbit review, fix or reply to every review
 thread, wait for CI and CodeRabbit to be green, merge, and cut the next branch
 from latest `master`.
 
+## Execution Protocol
+
+Use this protocol for every hygiene epic until the roadmap is complete or the
+work is blocked:
+
+1. Cut one branch from latest `master` for the current epic.
+2. Treat every phase inside the epic as a coherent, committable unit.
+3. For every phase, run all four required gates without skipping:
+   - write the implementation plan
+   - audit the plan before editing
+   - implement and verify the phase
+   - audit the implementation, fix findings, and commit
+4. Open one PR for the completed epic.
+5. Run CodeRabbit review, resolve or reply to every review thread, and wait for
+   CI and CodeRabbit to be green.
+6. Merge the PR with maintainer/admin privileges when review gates are green.
+7. Cut the next branch from updated `master` and continue with the next epic.
+
+Do not batch unrelated epics into one PR. Do not start a dependent epic from a
+stale branch when the previous epic must land first.
+
 ## Why This Exists
 
 The Pine parity roadmap is the product north star. This hygiene roadmap is the
@@ -172,4 +193,3 @@ Phases:
 4. Use the pane-aware path as the required base for polyline and table work.
 
 Done means future visual object parity builds on the correct rendering model.
-
