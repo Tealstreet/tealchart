@@ -926,6 +926,24 @@ plot(na(str.tonumber("")) ? 1 : 0, title="Empty Is NA")`;
       expect(result.plots.find((plot) => plot.title === 'Empty Is NA')?.values).toEqual([1, 1]);
     });
 
+    it('formats timestamps with str.format_time', () => {
+      const script = `//@version=6
+indicator("String Format Time")
+stamp = timestamp("GMT+2", 2024, 1, 5, 9, 30, 15)
+plot(str.format_time(stamp, "yyyy-MM-dd HH:mm:ss", "GMT+2") == "2024-01-05 09:30:15", title="Offset")
+plot(str.format_time(stamp, "yy/MM/dd HH:mm", "UTC") == "24/01/05 07:30", title="UTC")
+plot(str.format_time(na, "yyyy-MM-dd", "UTC") == "NaN", title="Missing")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Offset')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'UTC')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Missing')?.values).toEqual([true, true]);
+    });
+
     it('rounds values to syminfo.mintick', () => {
       const script = `//@version=6
 indicator("Round To Min Tick")
