@@ -85,6 +85,46 @@ describe('Tealscript Parser', () => {
       expect(decl.typeAnnotation?.baseType).toBe('float');
     });
 
+    it('parses identifiers that begin with declaration keywords', () => {
+      const ast = parse(`
+variantColor = color.red
+varipValue = 1
+floatValue = 2
+intValue = 3
+boolValue = true
+stringValue = "ok"
+colorValue = color.blue
+seriesValue = close
+simpleValue = open
+constValue = high
+inputValue = low
+arrayValue = [1, 2]
+`);
+
+      expect(ast.body).toHaveLength(12);
+      const names = ast.body.map((statement) => {
+        const declaration = statement as VariableDeclaration;
+        if (declaration.names.type !== 'VariableDeclarator') {
+          throw new Error('Expected single variable declaration');
+        }
+        return declaration.names.name.name;
+      });
+      expect(names).toEqual([
+        'variantColor',
+        'varipValue',
+        'floatValue',
+        'intValue',
+        'boolValue',
+        'stringValue',
+        'colorValue',
+        'seriesValue',
+        'simpleValue',
+        'constValue',
+        'inputValue',
+        'arrayValue',
+      ]);
+    });
+
     it('parses array type annotations', () => {
       const ast = parse('array<float> values = []\n');
       const decl = ast.body[0] as VariableDeclaration;

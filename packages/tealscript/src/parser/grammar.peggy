@@ -128,8 +128,8 @@ VariableDeclaration
     }
 
 VarKind
-  = "varip" { return 'varip'; }
-  / "var" { return 'var'; }
+  = "varip" !IdentifierPart { return 'varip'; }
+  / "var" !IdentifierPart { return 'var'; }
 
 DeclarationPattern
   = TuplePattern
@@ -154,7 +154,7 @@ TuplePattern
     }
 
 TypeAnnotation
-  = "array" _ "<" _ elementType:TypeName _ ">" {
+  = "array" !IdentifierPart _ "<" _ elementType:TypeName _ ">" {
       return {
         type: 'TypeAnnotation',
         baseType: 'array',
@@ -172,15 +172,15 @@ TypeAnnotation
     }
 
 TypeName
-  = "series" { return 'series'; }
-  / "simple" { return 'simple'; }
-  / "const" { return 'const'; }
-  / "input" { return 'input'; }
-  / "float" { return 'float'; }
-  / "int" { return 'int'; }
-  / "bool" { return 'bool'; }
-  / "string" { return 'string'; }
-  / "color" { return 'color'; }
+  = "series" !IdentifierPart { return 'series'; }
+  / "simple" !IdentifierPart { return 'simple'; }
+  / "const" !IdentifierPart { return 'const'; }
+  / "input" !IdentifierPart { return 'input'; }
+  / "float" !IdentifierPart { return 'float'; }
+  / "int" !IdentifierPart { return 'int'; }
+  / "bool" !IdentifierPart { return 'bool'; }
+  / "string" !IdentifierPart { return 'string'; }
+  / "color" !IdentifierPart { return 'color'; }
 
 // Assignment: x := value
 // Left side can be an identifier, member access, or index access
