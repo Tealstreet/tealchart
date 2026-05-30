@@ -1,4 +1,4 @@
-import type { InputDefinition, PlotOutput } from '@tealstreet/tealscript';
+import type { DrawingOutput, InputDefinition, PlotOutput } from '@tealstreet/tealscript';
 import type { BuiltinIndicator } from '../indicators/builtinIndicators';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
@@ -365,6 +365,13 @@ export class TealchartWidgetUI {
   setPlots(plots: PlotOutput[]): void {
     this.currentPlots = plots; // Store for openIndicatorSettings
     this.chartCore?.setPlots(plots);
+  }
+
+  /**
+   * Update indicator drawings - calls ChartCore directly
+   */
+  setDrawings(drawings: DrawingOutput[]): void {
+    this.chartCore?.setDrawings(drawings);
   }
 
   /**
