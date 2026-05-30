@@ -1,3 +1,4 @@
+import type { PlotOutput } from '@tealstreet/tealscript';
 import type { Bar, ComputedPane, ExecutionLineRenderData, PriceLine, UnifiedPaneLayout, Viewport } from './types';
 
 import { describe, expect, it, vi } from 'vitest';
@@ -300,6 +301,109 @@ describe('TealchartRenderer coordinate transforms', () => {
       const x = moveTo.mock.calls[0]?.[0];
       expect(x).toBe(expectedX);
       expect(x).not.toBe(legacyX);
+    });
+  });
+
+  describe('Pine OHLC plot rendering', () => {
+    it('renders plotcandle outputs with body, wick, and border colors', () => {
+      const fillRect = vi.fn();
+      const strokeRect = vi.fn();
+      const stroke = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillRect,
+        strokeRect,
+        stroke,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0].time,
+        endTime: bars[2].time,
+        priceMin: 40,
+        priceMax: 180,
+      };
+      const pane: ComputedPane = {
+        id: 'main',
+        type: 'main',
+        heightRatio: 1,
+        yMin: 40,
+        yMax: 180,
+        fixedRange: false,
+        top: 0,
+        height: 570,
+        bottom: 570,
+      };
+      const plot: PlotOutput = {
+        id: 'plotcandle_Custom',
+        type: 'plotcandle',
+        title: 'Custom',
+        values: [110, null, 130],
+        openValues: [100, null, 120],
+        highValues: [140, null, 160],
+        lowValues: [90, null, 110],
+        closeValues: [110, null, 130],
+        color: ['#00ff00', null, '#ff0000'],
+        wickColor: ['#0000ff', null, '#00ffff'],
+        borderColor: ['#ffffff', null, '#111111'],
+      };
+
+      (renderer as any).renderPlotInPane(plot, bars, viewport, pane);
+
+      expect(fillRect).toHaveBeenCalledTimes(2);
+      expect(strokeRect).toHaveBeenCalledTimes(2);
+      expect(stroke).toHaveBeenCalledTimes(2);
+      expect(ctx.fillStyle).toBe('#ff0000');
+      expect(ctx.strokeStyle).toBe('#111111');
+    });
+
+    it('renders plotbar outputs as high-low bars with open and close ticks', () => {
+      const moveTo = vi.fn();
+      const lineTo = vi.fn();
+      const stroke = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        moveTo,
+        lineTo,
+        stroke,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0].time,
+        endTime: bars[1].time,
+        priceMin: 40,
+        priceMax: 180,
+      };
+      const pane: ComputedPane = {
+        id: 'main',
+        type: 'main',
+        heightRatio: 1,
+        yMin: 40,
+        yMax: 180,
+        fixedRange: false,
+        top: 0,
+        height: 570,
+        bottom: 570,
+      };
+      const plot: PlotOutput = {
+        id: 'plotbar_Custom',
+        type: 'plotbar',
+        title: 'Custom',
+        values: [110, 130],
+        openValues: [100, 120],
+        highValues: [140, 160],
+        lowValues: [90, 110],
+        closeValues: [110, 130],
+        color: ['#00ff00', '#ff0000'],
+      };
+
+      (renderer as any).renderPlotInPane(plot, bars, viewport, pane);
+
+      expect(stroke).toHaveBeenCalledTimes(2);
+      expect(moveTo).toHaveBeenCalledTimes(6);
+      expect(lineTo).toHaveBeenCalledTimes(6);
+      expect(ctx.strokeStyle).toBe('#ff0000');
     });
   });
 
