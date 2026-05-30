@@ -50,6 +50,7 @@ import {
   reverseArray,
   setArrayValue,
   shiftArrayValue,
+  sliceArray,
   sortArray,
   sumArrayValue,
   unshiftArrayValue,
@@ -435,7 +436,7 @@ export class TealscriptEngine {
     if (Array.isArray(iterable)) {
       values = iterable;
     } else if (isPineArray(iterable)) {
-      values = iterable.values;
+      values = Array.from({ length: getArraySize(iterable) }, (_, index) => getArrayValue(iterable, index));
     } else {
       throw new Error('For-in loop expects an array');
     }
@@ -816,6 +817,7 @@ export class TealscriptEngine {
       case 'reverse':
       case 'join':
       case 'concat':
+      case 'slice':
       case 'min':
       case 'max':
       case 'sum':
@@ -1919,6 +1921,7 @@ export class TealscriptEngine {
     });
     this.builtins.set('array.join', (args) => joinArray(copyReadonlyArray(readArray(args[0])), args[1]));
     this.builtins.set('array.concat', (args) => concatArray(readMutableArray(args[0]), copyReadonlyArray(readArray(args[1]))));
+    this.builtins.set('array.slice', (args) => sliceArray(copyReadonlyArray(readArray(args[0])), args[1] as number, args[2] as number));
     this.builtins.set('array.clear', (args) => {
       clearArray(readMutableArray(args[0]));
       return null;
