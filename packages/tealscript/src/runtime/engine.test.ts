@@ -490,6 +490,91 @@ plot(values.get(3), title="Parent Tail")`;
       expect(result.plots.find((plot) => plot.title === 'Parent Tail')?.values).toEqual([4, 4]);
     });
 
+    it('executes array index reads and assignments', () => {
+      const script = `//@version=6
+indicator("Array Index Assignment")
+values = array.from(1, 2, 3)
+values[0] := 10
+values[1] += 5
+literal = [4, 5, 6]
+literal[2] *= 2
+plot(values[0], title="First")
+plot(values[1], title="Second")
+plot(literal[2], title="Literal")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'First')?.values).toEqual([10, 10]);
+      expect(result.plots.find((plot) => plot.title === 'Second')?.values).toEqual([7, 7]);
+      expect(result.plots.find((plot) => plot.title === 'Literal')?.values).toEqual([12, 12]);
+    });
+
+    it('executes array slice index assignment against the parent array', () => {
+      const script = `//@version=6
+indicator("Array Slice Index Assignment")
+values = array.from(1, 2, 3, 4)
+window = values.slice(1, 3)
+window[0] := 20
+window[1] += 7
+plot(values[1], title="Parent First")
+plot(values[2], title="Parent Second")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Parent First')?.values).toEqual([20, 20]);
+      expect(result.plots.find((plot) => plot.title === 'Parent Second')?.values).toEqual([10, 10]);
+    });
+
+    it('keeps array index access distinct from series history access', () => {
+      const script = `//@version=6
+indicator("Array Index History")
+values = array.from(10, 20)
+spread = close - open
+plot(values[0], title="Array First")
+plot(close[1], title="Previous Close")
+plot(spread[1], title="Previous Spread")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Array First')?.values).toEqual([10, 10, 10]);
+      expect(result.plots.find((plot) => plot.title === 'Previous Close')?.values).toEqual([null, 100.2, 100.7]);
+      expect(roundSeries(result.plots.find((plot) => plot.title === 'Previous Spread')?.values ?? [])).toEqual([null, 0.2, 0.2]);
+    });
+
+    it('rejects invalid array index assignments', () => {
+      const nonArrayScript = `//@version=6
+indicator("Non Array Assignment")
+close[0] := 1
+plot(close)`;
+      const nonArrayResult = executeScript(parse(nonArrayScript), createBars(1, 100));
+      expect(nonArrayResult.errors[0]?.message).toBe('Index assignment expects an array');
+
+      const nonFiniteScript = `//@version=6
+indicator("Non Finite Index Assignment")
+values = array.from(1, 2)
+values[na] := 1
+plot(values[0])`;
+      const nonFiniteResult = executeScript(parse(nonFiniteScript), createBars(1, 100));
+      expect(nonFiniteResult.errors[0]?.message).toBe('Array assignment index must be a finite non-negative number');
+
+      const outOfBoundsScript = `//@version=6
+indicator("Out Of Bounds Assignment")
+values = array.from(1, 2)
+values[9] := 1
+plot(values[0])`;
+      const outOfBoundsResult = executeScript(parse(outOfBoundsScript), createBars(1, 100));
+      expect(outOfBoundsResult.errors[0]?.message).toBe('Array index 9 is out of bounds. Array size is 2');
+    });
+
     it('iterates array slice windows', () => {
       const script = `//@version=6
 indicator("Array Slice Loop")

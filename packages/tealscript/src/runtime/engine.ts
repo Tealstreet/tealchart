@@ -321,34 +321,48 @@ export class TealscriptEngine {
       const name = stmt.left.name;
       const currentValue = this.scope.get(name);
 
-      let newValue = value;
-      if (stmt.operator !== ':=') {
-        // Compound assignment
-        const numCurrent = currentValue as number;
-        const numValue = value as number;
-        switch (stmt.operator) {
-          case '+=':
-            newValue = numCurrent + numValue;
-            break;
-          case '-=':
-            newValue = numCurrent - numValue;
-            break;
-          case '*=':
-            newValue = numCurrent * numValue;
-            break;
-          case '/=':
-            newValue = numCurrent / numValue;
-            break;
-          case '%=':
-            newValue = numCurrent % numValue;
-            break;
-        }
-      }
+      const newValue = this.applyAssignmentOperator(currentValue, value, stmt.operator);
 
       this.scope.set(name, newValue);
+    } else if (stmt.left.type === 'IndexExpression') {
+      this.executeIndexAssignment(stmt.left, value, stmt.operator);
     } else {
-      // Member or index assignment - not supported in MVP
-      throw new Error('Member/index assignment not yet supported');
+      throw new Error('Member assignment not yet supported');
+    }
+  }
+
+  private executeIndexAssignment(target: IndexExpression, value: unknown, operator: AssignmentStatement['operator']): void {
+    const index = this.normalizeIndexOffset(this.evaluateExpression(target.index));
+    if (index === null) {
+      throw new Error('Array assignment index must be a finite non-negative number');
+    }
+
+    const array = this.evaluateExpression(target.object);
+    if (!Array.isArray(array) && !isPineArray(array)) {
+      throw new Error('Index assignment expects an array');
+    }
+
+    const currentValue = this.readArrayElement(array, index);
+    const newValue = this.applyAssignmentOperator(currentValue, value, operator);
+    this.writeArrayElement(array, index, newValue);
+  }
+
+  private applyAssignmentOperator(currentValue: unknown, value: unknown, operator: AssignmentStatement['operator']): unknown {
+    if (operator === ':=') return value;
+
+    const numCurrent = currentValue as number;
+    const numValue = value as number;
+    switch (operator) {
+      case '+=':
+        return numCurrent + numValue;
+      case '-=':
+        return numCurrent - numValue;
+      case '*=':
+        return numCurrent * numValue;
+      case '/=':
+        return numCurrent / numValue;
+      case '%=':
+        return numCurrent % numValue;
     }
   }
 
@@ -991,11 +1005,15 @@ export class TealscriptEngine {
       return Number.NaN;
     }
 
-    // If object is an identifier, use history access
     if (expr.object.type === 'Identifier') {
       const name = expr.object.name;
+      if (this.scope.has(name)) {
+        const value = this.scope.get(name);
+        if (Array.isArray(value) || isPineArray(value)) {
+          return this.naIfMissing(this.readArrayElement(value, offset));
+        }
+      }
 
-      // Check built-in series first
       switch (name) {
         case 'open':
           return this.naIfMissing(this.ctx.open.get(offset));
@@ -1015,7 +1033,6 @@ export class TealscriptEngine {
         }
       }
 
-      // Check scope for series variable
       if (this.scope.has(name)) {
         return this.naIfMissing(this.scope.getWithOffset(name, offset));
       }
@@ -1025,11 +1042,36 @@ export class TealscriptEngine {
 
     // Array index access
     const obj = this.evaluateExpression(expr.object);
-    if (Array.isArray(obj)) {
-      return this.naIfMissing(obj[offset]);
+    if (Array.isArray(obj) || isPineArray(obj)) {
+      return this.naIfMissing(this.readArrayElement(obj, offset));
     }
 
     throw new Error('Index access on non-array/non-series');
+  }
+
+  private readArrayElement(array: unknown, index: number): unknown {
+    if (isPineArray(array)) {
+      return getArrayValue(array, index);
+    }
+    if (Array.isArray(array)) {
+      return array[index];
+    }
+    throw new Error('Index access on non-array/non-series');
+  }
+
+  private writeArrayElement(array: unknown, index: number, value: unknown): void {
+    if (isPineArray(array)) {
+      setArrayValue(array, index, value);
+      return;
+    }
+    if (Array.isArray(array)) {
+      if (index < 0 || index >= array.length) {
+        throw new Error(`Array index ${index} is out of bounds. Array size is ${array.length}`);
+      }
+      array[index] = value;
+      return;
+    }
+    throw new Error('Index assignment expects an array');
   }
 
   // ===========================================================================

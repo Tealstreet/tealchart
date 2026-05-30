@@ -40,8 +40,8 @@ by real Pine examples from official docs or public indicator idioms.
 | `library(...)` / `import` | Unsupported | Out of scope until reusable script modules are designed. |
 | Variable declarations | Supported | Untyped and typed declarations parse. |
 | `var` / `varip` | Partial | Basic persistence exists; function and nested-scope edge cases need hardening. |
-| Reassignment `:=` | Supported | Identifier assignment works. Member/index assignment is not implemented. |
-| Compound assignment | Partial | Identifier compound assignment works. |
+| Reassignment `:=` | Partial | Identifier and array index assignment work. Member assignment is not implemented. |
+| Compound assignment | Partial | Identifier and array index compound assignment work. |
 | Tuple destructuring | Supported | Used by multi-return built-ins such as `ta.macd`. |
 | `if` / `else if` / `else` | Supported | Statement form is implemented. |
 | Ternary `?:` | Supported | Runtime truthiness needs broader Pine compatibility tests. |
