@@ -1633,7 +1633,7 @@ export class TealscriptEngine {
       }
     }
 
-    return reference;
+    return reference.startsWith('plot_') || reference.startsWith('hline_') ? reference : `plot_${reference}`;
   }
 
   private normalizeAlertFrequency(value: unknown): AlertFrequency {

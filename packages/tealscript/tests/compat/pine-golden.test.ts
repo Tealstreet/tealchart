@@ -864,6 +864,23 @@ fill(topLine, bottomLine, color=color.new(color.blue, 90), title="Range Fill")
     expect(rangeFill.color).toEqual(Array(compatibilityBars.length).fill('#2196F31A'));
   });
 
+  it('preserves legacy fill title references before plot registration', () => {
+    const result = runCompatScript(`
+indicator("Legacy fill smoke", overlay=true)
+fill("Upper", "Lower", color=color.new(color.red, 85), title="Legacy Fill")
+plot(high, title="Upper")
+plot(low, title="Lower")
+`);
+
+    expect(result.errors).toEqual([]);
+    const fillPlot = getPlot(result, 'Legacy Fill');
+
+    expect(fillPlot.type).toBe('fill');
+    expect(fillPlot.plot1Id).toBe('plot_Upper');
+    expect(fillPlot.plot2Id).toBe('plot_Lower');
+    expect(fillPlot.color).toEqual(Array(compatibilityBars.length).fill('#F4433626'));
+  });
+
   it('matches documented Pine switch selection idioms', () => {
     const result = runCompatScript(`
 indicator("Switch docs smoke")
