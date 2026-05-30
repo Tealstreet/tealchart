@@ -42,7 +42,7 @@ by real Pine examples from official docs or public indicator idioms.
 | Tuple destructuring | Supported | Used by multi-return built-ins such as `ta.macd`. |
 | `if` / `else if` / `else` | Supported | Statement form is implemented. |
 | Ternary `?:` | Supported | Runtime truthiness needs broader Pine compatibility tests. |
-| `for` loops | Partial | Numeric `for = ... to ... by ...` supports ascending and descending steps. Basic collection `for value in array` loops are supported. Tuple/index collection loops are not. |
+| `for` loops | Partial | Numeric `for = ... to ... by ...` supports ascending and descending steps. Collection `for value in array` and tuple `for [index, value] in array` loops are supported. |
 | `while`, `break`, `continue` | Supported | Loop safety limit exists. |
 | User-defined functions | Partial | Single-line functions, flat multiline functions, local scope, nested calls, and `if` / `else if` / `else` branch expression returns are covered. |
 | Methods, e.g. `arr.push(x)` | Partial | Common array methods lower to the matching `array.*` built-ins. Other object namespaces are not implemented yet. |
@@ -209,6 +209,12 @@ and return the last expression in the selected branch. The checkpoint fixture
 follows TradingView's documented conditional-structure idioms by selecting a
 moving average from an `input.string(... options=...)` mode and deriving a
 directional signal.
+
+## Common Loop Control Coverage
+
+The loop control pass covers ascending and descending numeric loops, `break`,
+`continue`, collection loops over Pine arrays, and the documented tuple form
+`for [index, value] in values`.
 
 ## Strategy Diagnostic Coverage
 
