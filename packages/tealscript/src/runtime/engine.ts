@@ -1177,8 +1177,8 @@ export class TealscriptEngine {
         xloc: this.toStringValue(namedArgs.get('xloc') ?? args[8] ?? 'bar_index'),
         bgcolor: this.toNullableColor(namedArgs.get('bgcolor') ?? args[9]),
         text: this.toStringValue(namedArgs.get('text') ?? args[10] ?? ''),
-        textColor: this.toNullableColor(namedArgs.get('text_color') ?? args[11]),
-        textSize: this.toStringValue(namedArgs.get('text_size') ?? args[13] ?? 'normal'),
+        textSize: this.toStringValue(namedArgs.get('text_size') ?? args[11] ?? 'normal'),
+        textColor: this.toNullableColor(namedArgs.get('text_color') ?? args[12]),
       });
 
       return id;

@@ -612,6 +612,25 @@ plot(box.get_bottom(zone), title="Box Bottom")`;
         },
       ]);
     });
+
+    it('maps positional box text_size before text_color', () => {
+      const script = `//@version=6
+indicator("Box positional args")
+box.new(0, high, 1, low, color.red, 1, line.style_solid, extend.none, xloc.bar_index, color.green, "txt", size.large, color.black)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings[0]).toMatchObject({
+        type: 'box',
+        text: 'txt',
+        textSize: 'large',
+        textColor: '#000000',
+      });
+    });
   });
 
   describe('basic execution', () => {
