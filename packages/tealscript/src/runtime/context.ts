@@ -116,9 +116,12 @@ export interface InputDefinition {
   minval?: number;
   maxval?: number;
   step?: number;
-  options?: string[];
+  options?: unknown[];
   tooltip?: string;
   group?: string;
+  inline?: string;
+  confirm?: boolean;
+  display?: unknown;
 }
 
 /**
