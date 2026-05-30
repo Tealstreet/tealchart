@@ -4,7 +4,7 @@
  * Wraps the Peggy-generated parser with a nice TypeScript interface.
  */
 
-import type { Program, SourceLocation } from './ast';
+import type { Expression, Program, SourceLocation, Statement } from './ast';
 import * as generatedParser from './generated';
 
 /**
@@ -32,9 +32,16 @@ export class TealscriptParseError extends Error {
 /**
  * Parser options
  */
-export interface ParseOptions {
+export type ParseStartRule = 'Program' | 'Expression' | 'Statement';
+
+export type ParseResult<T extends ParseStartRule> =
+  T extends 'Expression' ? Expression :
+  T extends 'Statement' ? Statement :
+  Program;
+
+export interface ParseOptions<T extends ParseStartRule = 'Program'> {
   /** Start rule for parsing (default: 'Program') */
-  startRule?: 'Program' | 'Expression' | 'Statement';
+  startRule?: T;
   /** Source name for error messages */
   grammarSource?: string;
 }
@@ -56,14 +63,18 @@ export interface ParseOptions {
  * `);
  * ```
  */
-export function parse(source: string, options: ParseOptions = {}): Program {
+export function parse(source: string, options?: ParseOptions<'Program'>): Program;
+export function parse(source: string, options: ParseOptions<'Expression'>): Expression;
+export function parse(source: string, options: ParseOptions<'Statement'>): Statement;
+export function parse<T extends ParseStartRule>(source: string, options: ParseOptions<T>): ParseResult<T>;
+export function parse(source: string, options: ParseOptions<ParseStartRule> = {}): Program | Expression | Statement {
   try {
     const result = generatedParser.parse(source, {
       startRule: options.startRule || 'Program',
       grammarSource: options.grammarSource || 'input',
     });
 
-    return result as Program;
+    return result as Program | Expression | Statement;
   } catch (error) {
     if (isPeggyError(error)) {
       throw new TealscriptParseError(
