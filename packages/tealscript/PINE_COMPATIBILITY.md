@@ -123,6 +123,7 @@ derived regular-series history, and unavailable or future offsets returning
 | `plotbar`, `plotcandle` | Supported | Produce OHLC outputs with per-bar body, wick, and border colors; renderer draws custom bars/candles. |
 | `label.*` | Partial | `label.new()` emits typed runtime drawing outputs. Common setters/getters, `label.copy()`, and `label.delete()` work for runtime object state. Main-pane renderer support exists for basic label boxes. GC limits and full style parity are still planned. |
 | `line.*` | Partial | `line.new()` emits typed runtime drawing outputs. Common coordinate/style setters, coordinate getters, `line.get_price()`, `line.copy()`, and `line.delete()` work for runtime object state. Main-pane renderer support exists for basic line segments and horizontal extension. |
+| `linefill.*` | Partial | `linefill.new()` emits typed runtime drawing outputs referencing two line handles. `linefill.set_color()`, `linefill.get_line1()`, `linefill.get_line2()`, and `linefill.delete()` work for runtime object state. Main-pane renderer support fills between resolved line segments. |
 | `box.*`, `table.*` | Planned | Namespace calls report explicit unsupported runtime diagnostics. Object lifecycle and renderer support are still planned. |
 
 ## Alerts, Strategies, And Data
@@ -305,8 +306,11 @@ mutation pass covers persistent `var` line handles, `line.set_x1()`,
 `line.set_color()`, `line.set_style()`, `line.set_width()`, scalar coordinate
 getters, `line.get_price()`, `line.copy()`, and `line.delete()`. Rendering
 covers main-pane line segments with basic color/style/width and horizontal
-extension support. `chart.point` overloads, linefills, GC limits, full arrow
-style geometry, and full realtime rollback parity remain planned.
+extension support. `linefill.new()` records fills between two line handles;
+`linefill.set_color()`, `linefill.get_line1()`, `linefill.get_line2()`, and
+`linefill.delete()` are supported, and the renderer fills between resolved
+main-pane line segments. `chart.point` overloads, GC limits, full arrow style
+geometry, and full realtime rollback parity remain planned.
 
 ## Drawing Diagnostic Coverage
 

@@ -56,7 +56,7 @@ import {
   unshiftArrayValue,
   type PineArray,
 } from './arrays';
-import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type DrawingOutput, type InputDefinition, type LabelDrawingOutput, type LineDrawingOutput, type PlotOutput, type PlotStyle } from './context';
+import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type DrawingOutput, type InputDefinition, type LabelDrawingOutput, type LineDrawingOutput, type LineFillDrawingOutput, type PlotOutput, type PlotStyle } from './context';
 import { Scope, createRootScope } from './scope';
 
 /**
@@ -1126,6 +1126,39 @@ export class TealscriptEngine {
       return this.getLineValue(args[0], ctx, (line) => this.interpolateLinePrice(line, x));
     });
 
+    this.builtins.set('linefill.new', (args, namedArgs, ctx, _scope, callId) => {
+      const line1 = this.toDrawingId(namedArgs.get('line1') ?? args[0]);
+      const line2 = this.toDrawingId(namedArgs.get('line2') ?? args[1]);
+      if (!line1 || !line2) return Number.NaN;
+
+      const id = `linefill_${callId}_${ctx.bar_index}`;
+      ctx.addDrawing({
+        id,
+        type: 'linefill',
+        barIndex: ctx.bar_index,
+        line1,
+        line2,
+        color: this.toNullableColor(namedArgs.get('color') ?? args[2]),
+      });
+
+      return id;
+    });
+
+    this.builtins.set('linefill.delete', (args, _namedArgs, ctx) => {
+      this.withLineFill(args[0], ctx, (linefill) => ctx.deleteDrawing(linefill.id));
+      return undefined;
+    });
+
+    this.builtins.set('linefill.set_color', (args, _namedArgs, ctx) => {
+      this.withLineFill(args[0], ctx, (linefill) => {
+        linefill.color = this.toNullableColor(args[1]);
+      });
+      return undefined;
+    });
+
+    this.builtins.set('linefill.get_line1', (args, _namedArgs, ctx) => this.getLineFillValue(args[0], ctx, (linefill) => linefill.line1));
+    this.builtins.set('linefill.get_line2', (args, _namedArgs, ctx) => this.getLineFillValue(args[0], ctx, (linefill) => linefill.line2));
+
     const constants: Record<string, string> = {
       'xloc.bar_index': 'bar_index',
       'xloc.bar_time': 'bar_time',
@@ -1216,6 +1249,25 @@ export class TealscriptEngine {
 
     const drawing = ctx.getDrawing(lineId);
     if (drawing?.type !== 'line') return Number.NaN;
+    return fn(drawing);
+  }
+
+  private withLineFill(value: unknown, ctx: ExecutionContext, fn: (linefill: LineFillDrawingOutput) => void): void {
+    const lineFillId = this.toDrawingId(value);
+    if (!lineFillId) return;
+
+    const drawing = ctx.getDrawing(lineFillId);
+    if (drawing?.type === 'linefill') {
+      fn(drawing);
+    }
+  }
+
+  private getLineFillValue<T>(value: unknown, ctx: ExecutionContext, fn: (linefill: LineFillDrawingOutput) => T): T | number {
+    const lineFillId = this.toDrawingId(value);
+    if (!lineFillId) return Number.NaN;
+
+    const drawing = ctx.getDrawing(lineFillId);
+    if (drawing?.type !== 'linefill') return Number.NaN;
     return fn(drawing);
   }
 

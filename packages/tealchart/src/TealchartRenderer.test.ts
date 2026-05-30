@@ -693,6 +693,78 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(stroke).toHaveBeenCalled();
     });
 
+    it('renders linefill drawings behind line drawings', () => {
+      const fill = vi.fn();
+      const stroke = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fill,
+        stroke,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+
+      const bars = makeBars(20);
+      const viewport = TealchartRenderer.calculateViewport(bars);
+      const layout: UnifiedPaneLayout = {
+        panes: [
+          {
+            id: 'main',
+            type: 'main',
+            heightRatio: 1,
+            yMin: 0,
+            yMax: 0,
+            fixedRange: false,
+          },
+        ],
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+      };
+      const drawings: DrawingOutput[] = [
+        {
+          id: 'upper',
+          type: 'line',
+          barIndex: 12,
+          x1: 8,
+          y1: bars[8]!.high,
+          x2: 12,
+          y2: bars[12]!.high,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: '#00FF00',
+          style: 'solid',
+          width: 1,
+        },
+        {
+          id: 'lower',
+          type: 'line',
+          barIndex: 12,
+          x1: 8,
+          y1: bars[8]!.low,
+          x2: 12,
+          y2: bars[12]!.low,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: '#00FF00',
+          style: 'solid',
+          width: 1,
+        },
+        {
+          id: 'fill',
+          type: 'linefill',
+          barIndex: 12,
+          line1: 'upper',
+          line2: 'lower',
+          color: 'rgba(0, 255, 0, 0.2)',
+        },
+      ];
+
+      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+
+      expect(fill).toHaveBeenCalled();
+      expect(stroke).toHaveBeenCalled();
+      const fillOrder = fill.mock.invocationCallOrder[0]!;
+      expect(stroke.mock.invocationCallOrder.some((order) => order > fillOrder)).toBe(true);
+    });
+
     it('renders countdown text for simple price lines with countdownToTime', () => {
       vi.useFakeTimers();
       vi.setSystemTime(new Date('2026-03-29T06:17:00.000Z'));
