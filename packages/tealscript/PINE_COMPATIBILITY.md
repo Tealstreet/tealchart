@@ -57,6 +57,7 @@ by real Pine examples from official docs or public indicator idioms.
 | History references `x[n]` | Partial | Series and arrays support indexing; dynamic series offsets and unavailable/future history returning `na` are covered. Broader type diagnostics are still incomplete. |
 | `na` value | Partial | Bare `na` and callable `na(value)` are supported with `NaN` as the internal representation; broader propagation and bool behavior need Pine v6 coverage. |
 | Built-in price series | Supported | `open`, `high`, `low`, `close`, `volume`, `time`, `hl2`, `hlc3`, `ohlc4`, `hlcc4`. |
+| Calendar variables | Partial | `year`, `month`, `weekofyear`, `dayofmonth`, `dayofweek`, `hour`, `minute`, and `second` are derived from the current bar open time. UTC/GMT offset timezones are supported; named exchange timezones still need IANA mapping. |
 | `bar_index` / `last_bar_index` | Supported | Available as runtime identifiers. |
 | `barstate.*` | Partial | Common booleans are exposed, including `isfirst`, `islast`, `ishistory`, `isrealtime`, `isnew`, `isconfirmed`, and `islastconfirmedhistory`. Realtime tick parity still needs browser-worker coverage. |
 | `syminfo.*` | Partial | Static defaults are exposed through common chart-info fields such as `ticker`, `tickerid`, `root`, `mintick`, and `minmove`. Live symbol metadata injection is still planned. |
@@ -95,6 +96,7 @@ derived regular-series history, and unavailable or future offsets returning
 | `math.*` | Partial | Common numeric functions, constants, `math.avg`, precision rounding, truncation, and angle conversion helpers exist. Pine-specific helpers are still incomplete. |
 | `ta.*` | Partial | Includes SMA, EMA, RSI, MACD, ATR, BB, VWAP, Supertrend, DMI, SAR, pivots, `barssince`, `valuewhen`, `vwma`, `highestbars`, `lowestbars`, `cross`, `range`, and more. |
 | `input.*` | Partial | Generic `input()`, int, float, bool, string, color, source, time, symbol, timeframe, session, and text area exist. Advanced UI/display behavior is incomplete. |
+| Time functions | Partial | Calendar functions and `timestamp()` cover common numeric and UTC/GMT-offset forms. `time()`, `time_close()`, session filtering, and named timezone databases are still planned. |
 | `color.*` | Partial | Core named colors, `color.new()`, `color.rgb()`, channel extraction, and `color.from_gradient()` exist. Named color constants still need exact Pine v6 parity. |
 | `str.*` | Partial | Common conversion, format, search, substring, case, trim, and replace helpers exist. |
 | `array.*` | Partial | Array construction, read/write, search, copy, insertion/removal, numeric summaries, stack/queue helpers, clear, and common method-call syntax are covered. |
@@ -135,9 +137,9 @@ derived regular-series history, and unavailable or future offsets returning
 
 The common TA helper pass covers event helpers (`ta.barssince`,
 `ta.valuewhen`), cumulative/window helpers (`ta.cum`, `ta.dev`,
-`ta.variance`, `ta.vwma`, `ta.highestbars`, `ta.lowestbars`), and
-compatibility aliases/helpers (`ta.cross`, `ta.range`, `ta.rising`, and
-`ta.falling`). The statistical helper pass covers `ta.median`, `ta.mode`,
+`ta.variance`, `ta.vwma`, `ta.swma`, `ta.alma`, `ta.highestbars`,
+`ta.lowestbars`), and compatibility aliases/helpers (`ta.cross`, `ta.range`,
+`ta.rising`, and `ta.falling`). The statistical helper pass covers `ta.median`, `ta.mode`,
 `ta.percentile_nearest_rank`, `ta.percentile_linear_interpolation`, and
 `ta.percentrank`. These are covered in the golden compatibility harness.
 
@@ -232,6 +234,15 @@ The chart-info pass exposes common static `syminfo.*` and `timeframe.*`
 members used by generated indicators and multi-timeframe script templates,
 including `syminfo.tickerid`, `syminfo.root`, `timeframe.period`,
 `timeframe.main_period`, `timeframe.multiplier`, and timeframe category flags.
+
+## Common Calendar Coverage
+
+The calendar pass covers Pine's current-bar calendar variables
+(`year`, `month`, `weekofyear`, `dayofmonth`, `dayofweek`, `hour`, `minute`,
+and `second`), matching callable helpers such as `hour(time)`, common
+`dayofweek.*` constants, and `timestamp()` forms used in date/time filters.
+The checkpoint fixture follows TradingView's documented calendar-filter idioms
+by gating plots against a start timestamp, weekday, and minute threshold.
 
 ## `max_bars_back` Declaration Coverage
 
