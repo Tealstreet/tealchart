@@ -72,7 +72,7 @@ export interface TimeframeInfo {
  */
 export interface PlotOutput {
   id: string;
-  type: 'plot' | 'hline' | 'bgcolor' | 'barcolor' | 'plotshape' | 'plotchar' | 'plotarrow' | 'fill';
+  type: 'plot' | 'hline' | 'bgcolor' | 'barcolor' | 'plotbar' | 'plotcandle' | 'plotshape' | 'plotchar' | 'plotarrow' | 'fill';
   title: string;
   values: (number | null)[];
 
@@ -83,6 +83,14 @@ export interface PlotOutput {
   color: string | (string | null)[];
   linewidth?: number;
   style?: PlotStyle;
+
+  // For plotbar/plotcandle
+  openValues?: (number | null)[];
+  highValues?: (number | null)[];
+  lowValues?: (number | null)[];
+  closeValues?: (number | null)[];
+  wickColor?: string | (string | null)[];
+  borderColor?: string | (string | null)[];
 
   // For hline
   price?: number;
@@ -462,6 +470,12 @@ export class ExecutionContext {
       if (Array.isArray(plot.color)) {
         plot.color.length = length;
       }
+      if (plot.openValues) plot.openValues.length = length;
+      if (plot.highValues) plot.highValues.length = length;
+      if (plot.lowValues) plot.lowValues.length = length;
+      if (plot.closeValues) plot.closeValues.length = length;
+      if (Array.isArray(plot.wickColor)) plot.wickColor.length = length;
+      if (Array.isArray(plot.borderColor)) plot.borderColor.length = length;
     }
   }
 

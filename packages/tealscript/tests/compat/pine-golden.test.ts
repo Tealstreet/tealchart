@@ -550,4 +550,62 @@ barcolor(candleColor)
       '#4CAF50',
     ]);
   });
+
+  it('runs documented custom candle and bar plotting idioms', () => {
+    const result = runCompatScript(`
+indicator("Custom OHLC smoke", overlay=true)
+o = bar_index == 0 ? na : open
+h = bar_index == 0 ? na : high
+l = bar_index == 0 ? na : low
+c = bar_index == 0 ? na : close
+upColor = color.silver
+downColor = color.blue
+bodyColor = c >= o ? upColor : downColor
+wickColor = color.new(bodyColor, 70)
+plotcandle(o, h, l, c, title="Custom candles", color=bodyColor, wickcolor=wickColor, bordercolor=bodyColor)
+plotbar(o, h + 1, l - 1, c, title="Custom bars", color=bodyColor)
+`);
+
+    expect(result.errors).toEqual([]);
+    const candles = getPlot(result, 'Custom candles');
+    expect(candles.type).toBe('plotcandle');
+    expect(candles.openValues).toEqual([null, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110]);
+    expect(candles.highValues).toEqual([null, 106, 108, 109, 104, 101, 105, 110, 111, 112, 114, 113]);
+    expect(candles.lowValues).toEqual([null, 101, 104, 102, 98, 96, 99, 103, 106, 107, 109, 108]);
+    expect(candles.closeValues).toEqual([null, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+    expect(candles.color).toEqual([
+      null,
+      '#B2B5BE',
+      '#B2B5BE',
+      '#2196F3',
+      '#2196F3',
+      '#B2B5BE',
+      '#B2B5BE',
+      '#B2B5BE',
+      '#2196F3',
+      '#B2B5BE',
+      '#2196F3',
+      '#B2B5BE',
+    ]);
+    expect(candles.wickColor).toEqual([
+      null,
+      '#B2B5BE4D',
+      '#B2B5BE4D',
+      '#2196F34D',
+      '#2196F34D',
+      '#B2B5BE4D',
+      '#B2B5BE4D',
+      '#B2B5BE4D',
+      '#2196F34D',
+      '#B2B5BE4D',
+      '#2196F34D',
+      '#B2B5BE4D',
+    ]);
+
+    const bars = getPlot(result, 'Custom bars');
+    expect(bars.type).toBe('plotbar');
+    expect(bars.highValues).toEqual([null, 107, 109, 110, 105, 102, 106, 111, 112, 113, 115, 114]);
+    expect(bars.lowValues).toEqual([null, 100, 103, 101, 97, 95, 98, 102, 105, 106, 108, 107]);
+    expect(bars.color).toEqual(candles.color);
+  });
 });
