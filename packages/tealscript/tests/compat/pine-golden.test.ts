@@ -110,6 +110,24 @@ plot(rangeSize(high, low), title="Range")
     expect(roundSeries(getPlot(result, 'Range').values)).toEqual([4, 5, 4, 7, 6, 5, 6, 7, 5, 5, 5, 5]);
   });
 
+  it('runs user-defined function if-branch returns', () => {
+    const result = runCompatScript(`
+indicator("UDF if branch")
+upScore(value) =>
+    if value > 0
+        1
+downScore(value) =>
+    if value < 0
+        -1
+plot(upScore(close - open), title="Up Score")
+plot(downScore(close - open), title="Down Score")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Up Score').values)).toEqual([1, 1, 1, null, null, 1, 1, 1, null, 1, null, 1]);
+    expect(roundSeries(getPlot(result, 'Down Score').values)).toEqual([null, null, null, -1, -1, null, null, null, -1, null, -1, null]);
+  });
+
   it('keeps function-local variables scoped to the function call', () => {
     const result = runCompatScript(`
 indicator("UDF local scope")

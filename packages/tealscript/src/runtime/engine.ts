@@ -718,10 +718,9 @@ export class TealscriptEngine {
       if (Array.isArray(fn.body)) {
         let result: unknown = undefined;
         for (const stmt of fn.body) {
-          if (stmt.type === 'ExpressionStatement') {
-            result = this.evaluateExpression(stmt.expression);
-          } else {
-            this.executeStatement(stmt);
+          const statementResult = this.executeFunctionStatement(stmt);
+          if (statementResult.hasResult) {
+            result = statementResult.value;
           }
         }
         return result;
@@ -731,6 +730,56 @@ export class TealscriptEngine {
     } finally {
       this.scope = savedScope;
     }
+  }
+
+  private executeFunctionStatement(stmt: Statement): { hasResult: boolean; value?: unknown } {
+    if (stmt.type === 'ExpressionStatement') {
+      return { hasResult: true, value: this.evaluateExpression(stmt.expression) };
+    }
+
+    if (stmt.type === 'IfStatement') {
+      return this.executeFunctionIf(stmt);
+    }
+
+    this.executeStatement(stmt);
+    return { hasResult: false };
+  }
+
+  private executeFunctionStatements(statements: Statement[]): { hasResult: boolean; value?: unknown } {
+    const childScope = this.scope.createChild();
+    const savedScope = this.scope;
+    this.scope = childScope;
+
+    try {
+      let result: { hasResult: boolean; value?: unknown } = { hasResult: false };
+      for (const statement of statements) {
+        const statementResult = this.executeFunctionStatement(statement);
+        if (statementResult.hasResult) {
+          result = statementResult;
+        }
+      }
+      return result;
+    } finally {
+      this.scope = savedScope;
+    }
+  }
+
+  private executeFunctionIf(stmt: IfStatement): { hasResult: boolean; value?: unknown } {
+    const condition = this.evaluateExpression(stmt.test);
+
+    if (this.isTruthy(condition)) {
+      return this.executeFunctionStatements(stmt.consequent);
+    }
+
+    if (!stmt.alternate) {
+      return { hasResult: false };
+    }
+
+    if (Array.isArray(stmt.alternate)) {
+      return this.executeFunctionStatements(stmt.alternate);
+    }
+
+    return this.executeFunctionIf(stmt.alternate);
   }
 
   private evaluateMember(expr: MemberExpression): unknown {

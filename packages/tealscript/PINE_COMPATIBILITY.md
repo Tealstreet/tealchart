@@ -44,7 +44,7 @@ by real Pine examples from official docs or public indicator idioms.
 | Ternary `?:` | Supported | Runtime truthiness needs broader Pine compatibility tests. |
 | `for` loops | Partial | Numeric `for = ... to ... by ...` is supported. Collection loops are not. |
 | `while`, `break`, `continue` | Supported | Loop safety limit exists. |
-| User-defined functions | Planned | Required for common Pine snippets. |
+| User-defined functions | Partial | Single-line functions, flat multiline functions, local scope, nested calls, and simple `if` branch expression returns are covered. |
 | Methods, e.g. `arr.push(x)` | Partial | Common array methods lower to the matching `array.*` built-ins. Other object namespaces are not implemented yet. |
 | `switch` | Partial | Expression-form keyed and condition-only switches work. Statement-block arms are not implemented yet. |
 | User-defined types | Unsupported | Lower priority than indicators and arrays. |
@@ -76,9 +76,11 @@ Resolved in the scope/series hardening PR:
 Remaining gaps:
 
 - Flat multiline user-defined functions return the last expression statement.
-  Branch-return behavior for `if`/`else` function bodies is not implemented yet.
+- User-defined function bodies can return expression results from simple `if`
+  branches.
 - Nested indented blocks inside user-defined functions expose limitations in the
-  simplified indentation grammar and need a dedicated parser pass.
+  simplified indentation grammar. `else`/`else if` inside function bodies needs
+  a dedicated parser pass.
 
 ## Built-ins
 
