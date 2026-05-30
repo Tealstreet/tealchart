@@ -1202,7 +1202,7 @@ export class TealscriptEngine {
       const factor = 10 ** precision;
       return Math.round(value * factor) / factor;
     });
-    this.builtins.set('math.trunc', (args) => Math.trunc(args[0] as number));
+    this.builtins.set('math.trunc', (args) => Math.trunc(this.toNumber(args[0])));
     this.builtins.set('math.floor', (args) => Math.floor(args[0] as number));
     this.builtins.set('math.ceil', (args) => Math.ceil(args[0] as number));
     this.builtins.set('math.sign', (args) => Math.sign(args[0] as number));
