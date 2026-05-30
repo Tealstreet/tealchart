@@ -308,6 +308,7 @@ plot(str.contains(text, "USDT"), title="Contains")
 plot(str.startswith(text, "BTC"), title="Starts")
 plot(str.endswith(text, "perpetual"), title="Ends")
 plot(str.pos(text, "USDT"), title="Position")
+plot(str.pos(text, "ETH"), title="Missing Position")
 plot(str.substring(text, 0, 3) == "BTC", title="Substring")
 plot(str.length(text), title="Length")
 `);
@@ -317,6 +318,7 @@ plot(str.length(text), title="Length")
     expect(getPlot(result, 'Starts').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Ends').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(roundSeries(getPlot(result, 'Position').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    expect(getPlot(result, 'Missing Position').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, null]);
     expect(getPlot(result, 'Substring').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(roundSeries(getPlot(result, 'Length').values)).toEqual([17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17]);
   });
