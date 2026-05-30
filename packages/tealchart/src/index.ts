@@ -132,6 +132,8 @@ export type {
   AlertEvent,
   AlertFrequency,
   AlertOutput,
+  DrawingOutput,
+  LabelDrawingOutput,
   InputDefinition,
   TealscriptBar,
   WorkerResult,

@@ -25,6 +25,7 @@ interface ManagedScript {
   code: string;
   worker: TealscriptWorker;
   plots: PlotOutput[];
+  drawings: DrawingOutput[];
   inputs: InputDefinition[];
   isReady: boolean;
   isVisible: boolean;
@@ -53,6 +54,11 @@ export interface TealscriptManagerOptions {
    * Called when any script produces new plot outputs
    */
   onPlotsUpdated?: (plots: PlotOutput[]) => void;
+
+  /**
+   * Called when any script produces new drawing outputs
+   */
+  onDrawingsUpdated?: (drawings: DrawingOutput[]) => void;
 
   /**
    * Called when a script encounters an error
@@ -225,6 +231,7 @@ export class TealscriptManager {
       code,
       worker: worker as unknown as TealscriptWorker,
       plots: [],
+      drawings: [],
       inputs: [],
       isReady: false,
       isVisible: true,
@@ -244,6 +251,7 @@ export class TealscriptManager {
       script.worker.dispose();
       this.scripts.delete(scriptId);
       this.notifyPlotsUpdated();
+      this.notifyDrawingsUpdated();
     }
   }
 
@@ -322,14 +330,39 @@ export class TealscriptManager {
   }
 
   /**
+   * Get all drawing outputs from all visible scripts
+   */
+  getAllDrawings(): DrawingOutput[] {
+    const allDrawings: DrawingOutput[] = [];
+    for (const script of this.scripts.values()) {
+      if (script.isVisible) {
+        // Tag each drawing with its script ID for downstream routing.
+        for (const drawing of script.drawings) {
+          allDrawings.push({ ...drawing, scriptId: script.id });
+        }
+      }
+    }
+    return allDrawings;
+  }
+
+  /**
+   * Get drawings for a specific script
+   */
+  getDrawings(scriptId: string): DrawingOutput[] {
+    const script = this.scripts.get(scriptId);
+    return script?.drawings ?? [];
+  }
+
+  /**
    * Set visibility for a script
    */
   setScriptVisibility(scriptId: string, isVisible: boolean): void {
     const script = this.scripts.get(scriptId);
     if (script) {
       script.isVisible = isVisible;
-      // Notify listeners that plots have changed
-      this.options.onPlotsUpdated?.(this.getAllPlots());
+      // Notify listeners that visual outputs have changed
+      this.notifyPlotsUpdated();
+      this.notifyDrawingsUpdated();
     }
   }
 
@@ -340,8 +373,9 @@ export class TealscriptManager {
     const script = this.scripts.get(scriptId);
     if (script) {
       script.isVisible = !script.isVisible;
-      // Notify listeners that plots have changed
-      this.options.onPlotsUpdated?.(this.getAllPlots());
+      // Notify listeners that visual outputs have changed
+      this.notifyPlotsUpdated();
+      this.notifyDrawingsUpdated();
     }
   }
 
@@ -383,6 +417,8 @@ export class TealscriptManager {
     }
     this.scripts.clear();
     this.bars = [];
+    this.notifyPlotsUpdated();
+    this.notifyDrawingsUpdated();
   }
 
   // =========================================================================
@@ -396,8 +432,9 @@ export class TealscriptManager {
     // Clear any previous error
     script.error = undefined;
 
-    // Update plots
+    // Update visual outputs
     script.plots = result.plots;
+    script.drawings = result.drawings;
 
     // Update input definitions if changed
     if (JSON.stringify(script.inputs) !== JSON.stringify(result.inputs)) {
@@ -407,6 +444,7 @@ export class TealscriptManager {
 
     // Notify listeners
     this.notifyPlotsUpdated();
+    this.notifyDrawingsUpdated();
   }
 
   private handleError(scriptId: string, error: WorkerError): void {
@@ -415,9 +453,11 @@ export class TealscriptManager {
 
     script.error = error;
     script.plots = []; // Clear plots on error
+    script.drawings = []; // Clear drawings on error
 
     this.options.onError?.(scriptId, error);
     this.notifyPlotsUpdated();
+    this.notifyDrawingsUpdated();
   }
 
   private handleReady(scriptId: string): void {
@@ -429,5 +469,9 @@ export class TealscriptManager {
 
   private notifyPlotsUpdated(): void {
     this.options.onPlotsUpdated?.(this.getAllPlots());
+  }
+
+  private notifyDrawingsUpdated(): void {
+    this.options.onDrawingsUpdated?.(this.getAllDrawings());
   }
 }

@@ -116,6 +116,8 @@ export interface PlotOutput {
 export interface LabelDrawingOutput {
   id: string;
   type: 'label';
+  /** Script ID that produced this drawing (set by TealscriptManager). */
+  scriptId?: string;
   barIndex: number;
   x: number | null;
   y: number | null;
