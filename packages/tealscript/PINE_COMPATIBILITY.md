@@ -106,6 +106,7 @@ derived regular-series history, and unavailable or future offsets returning
 | `str.*` | Partial | Common conversion, format, search, substring, case, trim, and replace helpers exist. |
 | `array.*` | Partial | Array construction, read/write, search, copy, insertion/removal, numeric summaries, stack/queue helpers, clear, and common method-call syntax are covered. |
 | `runtime.*` | Partial | `runtime.error()` halts execution with the supplied runtime diagnostic. |
+| Global helpers | Partial | `na()`, `nz()`, `fixnan()`, and explicit `float()`, `int()`, `bool()`, and `string()` casts exist. Broader Pine v6 type-system diagnostics are still planned. |
 | `map.*` / `matrix.*` | Planned | Lower priority than arrays. |
 | `request.*` | Planned | Requires Tealchart datafeed design. Start with `request.security()`. |
 
@@ -196,6 +197,12 @@ variadic `math.avg`, precision-aware `math.round`, `math.trunc`, and
 degree/radian conversion helpers. The checkpoint fixture follows common Pine
 math idioms by averaging OHLC values, rounding to fixed precision, and
 converting a right angle between radians and degrees.
+
+## Common Global Helper Coverage
+
+The global helper pass covers `na`, `nz`, `fixnan`, and explicit primitive
+casts used by generated scripts to normalize optional source values before
+plotting or comparing them.
 
 ## Common Visual Coloring Coverage
 

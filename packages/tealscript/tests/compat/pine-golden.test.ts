@@ -197,6 +197,25 @@ plot(open, title="After")
     expect(roundSeries(getPlot(result, 'After').values)).toEqual([100]);
   });
 
+  it('runs common global helper and cast idioms', () => {
+    const result = runCompatScript(`
+indicator("Global helper casts")
+source = bar_index == 0 or bar_index == 3 ? na : close
+plot(fixnan(source), title="Fixed")
+plot(float("4.5"), title="Float")
+plot(int(4.9), title="Int")
+plot(bool(close > open), title="Bool")
+plot(string(12.5) == "12.5", title="String")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Fixed').values)).toEqual([null, 105, 107, 107, 99, 100, 104, 109, 108, 111, 110, 112]);
+    expect(roundSeries(getPlot(result, 'Float').values)).toEqual([4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5]);
+    expect(roundSeries(getPlot(result, 'Int').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+    expect(getPlot(result, 'Bool').values).toEqual([true, true, true, false, false, true, true, true, false, true, false, true]);
+    expect(getPlot(result, 'String').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+  });
+
   it('preserves history for derived regular series variables', () => {
     const result = runCompatScript(`
 indicator("Regular series history")

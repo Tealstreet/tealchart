@@ -1954,6 +1954,24 @@ export class TealscriptEngine {
       return isNaN(value) ? replacement : value;
     });
 
+    this.builtins.set('fixnan', (args, _namedArgs, _ctx, scope, callId) => {
+      const key = `_fixnan_${callId}`;
+      const value = args[0];
+      if (this.isNa(value)) {
+        return scope.has(key) ? scope.get(key) : Number.NaN;
+      }
+      this.setBuiltinState(scope, key, value);
+      return value;
+    });
+
+    this.builtins.set('float', (args) => this.toNumber(args[0]));
+    this.builtins.set('int', (args) => {
+      const value = this.toNumber(args[0]);
+      return Number.isNaN(value) ? Number.NaN : Math.trunc(value);
+    });
+    this.builtins.set('bool', (args) => this.isTruthy(args[0]));
+    this.builtins.set('string', (args) => this.toStringValue(args[0]));
+
     // na function
     this.builtins.set('na', (args) => {
       if (args.length === 0) return NaN;
