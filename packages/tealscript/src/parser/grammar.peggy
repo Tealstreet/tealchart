@@ -277,11 +277,12 @@ ElseClause
 
 // For loop
 ForStatement
-  = "for" _ counter:Identifier _ "in" _ iterable:Expression _ LineTerminator body:IndentedBlock {
+  = "for" _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:IndentedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
-        counter,
+        counter: counter.valueCounter,
+        indexCounter: counter.indexCounter,
         iterable,
         body,
         loc: loc()
@@ -298,6 +299,14 @@ ForStatement
         body,
         loc: loc()
       };
+    }
+
+CollectionForCounter
+  = "[" _ indexCounter:Identifier _ "," _ valueCounter:Identifier _ "]" {
+      return { indexCounter, valueCounter };
+    }
+  / valueCounter:Identifier {
+      return { valueCounter };
     }
 
 // While loop
