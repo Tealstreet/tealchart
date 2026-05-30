@@ -1130,6 +1130,8 @@ plot(tickerLen, title="Ticker ID Length")
 plot(rootLen, title="Root Length")
 plot(periodLen, title="Period Length")
 plot(timeframe.multiplier, title="Multiplier")
+plot(timeframe.in_seconds(), title="Current Seconds")
+plot(timeframe.in_seconds("1D"), title="Daily Seconds")
 plot(intraday, title="Intraday")
 plot(dwm, title="DWM")
 `);
@@ -1139,6 +1141,8 @@ plot(dwm, title="DWM")
     expect(getPlot(result, 'Root Length').values).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
     expect(getPlot(result, 'Period Length').values).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
     expect(getPlot(result, 'Multiplier').values).toEqual([60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60]);
+    expect(getPlot(result, 'Current Seconds').values).toEqual([3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600]);
+    expect(getPlot(result, 'Daily Seconds').values).toEqual([86400, 86400, 86400, 86400, 86400, 86400, 86400, 86400, 86400, 86400, 86400, 86400]);
     expect(getPlot(result, 'Intraday').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(getPlot(result, 'DWM').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   });
