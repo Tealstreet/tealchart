@@ -1850,8 +1850,10 @@ export class TealchartRenderer {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
+    const isStepLine = style === 'stepline' || style === 'stepline_diamond';
+
     // Set line style
-    if (style === 'stepline') {
+    if (isStepLine) {
       // Step line will be handled in the drawing loop
     } else if (style === 'cross' || style === 'circles') {
       // These are point markers, not lines
@@ -1903,7 +1905,7 @@ export class TealchartRenderer {
         ctx.moveTo(x, y);
         isDrawing = true;
       } else {
-        if (style === 'stepline') {
+        if (isStepLine) {
           // Step line: horizontal then vertical
           ctx.lineTo(x, lastY);
           ctx.lineTo(x, y);
@@ -3691,6 +3693,8 @@ export class TealchartRenderer {
     ctx.lineJoin = 'round';
     ctx.setLineDash(this.lineStyleToDashPattern(effectiveLineStyle));
 
+    const isStepLine = style === 'stepline' || style === 'stepline_diamond';
+
     ctx.beginPath();
     let isDrawing = false;
     let lastX = 0;
@@ -3739,7 +3743,7 @@ export class TealchartRenderer {
         ctx.moveTo(x, y);
         isDrawing = true;
       } else {
-        if (style === 'stepline') {
+        if (isStepLine) {
           ctx.lineTo(x, lastY);
           ctx.lineTo(x, y);
         } else {
@@ -4344,6 +4348,8 @@ export class TealchartRenderer {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
+    const isStepLine = style === 'stepline' || style === 'stepline_diamond';
+
     ctx.beginPath();
     let isDrawing = false;
     let lastX = 0;
@@ -4382,7 +4388,7 @@ export class TealchartRenderer {
         ctx.moveTo(x, y);
         isDrawing = true;
       } else {
-        if (style === 'stepline') {
+        if (isStepLine) {
           ctx.lineTo(x, lastY);
           ctx.lineTo(x, y);
         } else {

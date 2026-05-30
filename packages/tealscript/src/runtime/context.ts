@@ -113,7 +113,17 @@ export interface PlotOutput {
   plot2Id?: string;
 }
 
-export type PlotStyle = 'line' | 'stepline' | 'histogram' | 'cross' | 'circles' | 'columns' | 'area' | 'areabr';
+export type PlotStyle =
+  | 'line'
+  | 'linebr'
+  | 'stepline'
+  | 'stepline_diamond'
+  | 'histogram'
+  | 'cross'
+  | 'circles'
+  | 'columns'
+  | 'area'
+  | 'areabr';
 
 export type AlertFrequency = 'once_per_bar' | 'once_per_bar_close' | 'all';
 

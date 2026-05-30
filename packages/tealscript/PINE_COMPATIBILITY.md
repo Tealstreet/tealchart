@@ -107,7 +107,7 @@ derived regular-series history, and unavailable or future offsets returning
 
 | Pine feature | Status | Notes |
 | --- | --- | --- |
-| `plot` | Partial | Common line styles work; full style/parameter parity is incomplete. |
+| `plot` | Partial | Common line, break-line, step, histogram, marker, column, and area style constants work; full parameter rendering parity is incomplete. |
 | `hline` | Partial | Static horizontal lines work. Handle semantics need fill coverage. |
 | `fill` | Partial | Uses plot IDs, not full Pine handle semantics. |
 | `bgcolor` | Supported | Produces background outputs. |
