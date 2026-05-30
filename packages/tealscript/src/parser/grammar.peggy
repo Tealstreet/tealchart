@@ -90,7 +90,7 @@ IndicatorDeclaration
 
 // User-defined function: f(x, y) => x + y
 FunctionDeclaration
-  = name:Identifier _ "(" _ params:ParameterList? _ ")" _ "=>" _ LineTerminator body:IndentedBlock {
+  = name:Identifier _ "(" _ params:ParameterList? _ ")" _ "=>" _ LineTerminator body:FunctionIndentedBlock {
       return {
         type: 'FunctionDeclaration',
         name,
@@ -319,6 +319,70 @@ IndentedStatement
   = Indent stmt:Statement {
       return stmt;
     }
+
+FunctionIndentedBlock
+  = statements:FunctionIndentedStatement+ {
+      return statements.filter(s => s !== null);
+    }
+
+FunctionIndentedStatement
+  = FunctionIndent stmt:(FunctionIfStatement / Statement) {
+      return stmt;
+    }
+
+FunctionIfStatement
+  = "if" _ test:Expression _ LineTerminator consequent:FunctionNestedBlock alternate:FunctionElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / "if" _ test:Expression _ LineTerminator? _ consequent:SingleLineBody {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent: [consequent],
+        alternate: null,
+        loc: loc()
+      };
+    }
+
+FunctionElseClause
+  = FunctionIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionNestedBlock alternate:FunctionElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / FunctionIndent "else" _ LineTerminator? block:FunctionNestedBlock {
+      return block;
+    }
+
+FunctionNestedBlock
+  = statements:FunctionNestedStatement+ {
+      return statements.filter(s => s !== null);
+    }
+
+FunctionNestedStatement
+  = FunctionNestedIndent stmt:(FunctionIfStatement / Statement) {
+      return stmt;
+    }
+
+FunctionIndent
+  = "    "
+  / "\t"
+
+FunctionNestedIndent
+  = "        "
+  / "\t\t"
+  / "    \t"
+  / "\t    "
 
 SingleLineBody
   = stmt:(VariableDeclaration / AssignmentStatement / ExpressionStatement / BreakStatement / ContinueStatement) {
