@@ -489,6 +489,25 @@ plot(color.r(color.blue), "Named Red")
       expect(result.plots[4].values).toEqual(Array(bars.length).fill(33));
     });
 
+    it('creates colors from gradients', () => {
+      const code = `//@version=6
+indicator("Test")
+lowColor = color.from_gradient(-10, 0, 100, color.red, color.green)
+midColor = color.from_gradient(50, 0, 100, color.rgb(255, 0, 0), color.rgb(0, 255, 0, 50))
+highColor = color.from_gradient(120, 0, 100, color.red, color.green)
+plot(close, "Low", color=lowColor)
+plot(open, "Mid", color=midColor)
+plot(high, "High", color=highColor)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].color).toEqual(Array(bars.length).fill('#F44336FF'));
+      expect(result.plots[1].color).toEqual(Array(bars.length).fill('#808000BF'));
+      expect(result.plots[2].color).toEqual(Array(bars.length).fill('#4CAF50FF'));
+    });
+
     it('creates hline', () => {
       const code = `//@version=6
 indicator("Test")

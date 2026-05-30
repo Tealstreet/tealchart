@@ -776,6 +776,10 @@ export class TealscriptEngine {
     };
   }
 
+  private isFiniteNumber(value: unknown): value is number {
+    return typeof value === 'number' && Number.isFinite(value);
+  }
+
   private setBuiltinState(scope: Scope, key: string, value: unknown): void {
     if (scope.has(key)) {
       scope.set(key, value);
@@ -1321,6 +1325,28 @@ export class TealscriptEngine {
     this.builtins.set('color.t', (args) => {
       const parsedColor = this.parseColor(args[0]);
       return parsedColor ? this.alphaToTransparency(parsedColor.alpha) : Number.NaN;
+    });
+
+    this.builtins.set('color.from_gradient', (args) => {
+      const value = args[0];
+      const bottomValue = args[1];
+      const topValue = args[2];
+      const bottomColor = this.parseColor(args[3]);
+      const topColor = this.parseColor(args[4]);
+
+      if (!this.isFiniteNumber(value) || !this.isFiniteNumber(bottomValue) || !this.isFiniteNumber(topValue) || !bottomColor || !topColor) {
+        return Number.NaN;
+      }
+
+      const range = topValue - bottomValue;
+      const ratio = range === 0 ? 0 : Math.min(1, Math.max(0, (value - bottomValue) / range));
+      const interpolate = (from: number, to: number): number => from + (to - from) * ratio;
+      return this.formatColor(
+        interpolate(bottomColor.red, topColor.red),
+        interpolate(bottomColor.green, topColor.green),
+        interpolate(bottomColor.blue, topColor.blue),
+        this.alphaToTransparency(interpolate(bottomColor.alpha, topColor.alpha)),
+      );
     });
   }
 
