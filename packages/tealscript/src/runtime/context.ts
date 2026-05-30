@@ -8,7 +8,17 @@
  * - Plot outputs
  */
 
+import type { BoxDrawingOutput, DrawingOutput, LabelDrawingOutput, LineDrawingOutput } from './drawings/types';
+import { DrawingStore } from './drawings/store';
 import { Series } from './series';
+
+export type {
+  BoxDrawingOutput,
+  DrawingOutput,
+  LabelDrawingOutput,
+  LineDrawingOutput,
+  LineFillDrawingOutput,
+} from './drawings/types';
 
 /**
  * Bar data structure
@@ -112,84 +122,6 @@ export interface PlotOutput {
   plot1Id?: string;
   plot2Id?: string;
 }
-
-export interface LabelDrawingOutput {
-  id: string;
-  type: 'label';
-  /** Script ID that produced this drawing (set by TealscriptManager). */
-  scriptId?: string;
-  /** True when the drawing was created by a persistent declaration. */
-  persistent?: boolean;
-  barIndex: number;
-  x: number | null;
-  y: number | null;
-  text: string;
-  xloc: string;
-  yloc: string;
-  style: string;
-  color: string | null;
-  textColor: string | null;
-  size: string;
-  tooltip?: string;
-}
-
-export interface LineDrawingOutput {
-  id: string;
-  type: 'line';
-  /** Script ID that produced this drawing (set by TealscriptManager). */
-  scriptId?: string;
-  /** True when the drawing was created by a persistent declaration. */
-  persistent?: boolean;
-  barIndex: number;
-  x1: number | null;
-  y1: number | null;
-  x2: number | null;
-  y2: number | null;
-  xloc: string;
-  extend: string;
-  color: string | null;
-  style: string;
-  width: number;
-  forceOverlay?: boolean;
-}
-
-export interface LineFillDrawingOutput {
-  id: string;
-  type: 'linefill';
-  /** Script ID that produced this drawing (set by TealscriptManager). */
-  scriptId?: string;
-  /** True when the drawing was created by a persistent declaration. */
-  persistent?: boolean;
-  barIndex: number;
-  line1: string;
-  line2: string;
-  color: string | null;
-}
-
-export interface BoxDrawingOutput {
-  id: string;
-  type: 'box';
-  /** Script ID that produced this drawing (set by TealscriptManager). */
-  scriptId?: string;
-  /** True when the drawing was created by a persistent declaration. */
-  persistent?: boolean;
-  barIndex: number;
-  left: number | null;
-  top: number | null;
-  right: number | null;
-  bottom: number | null;
-  xloc: string;
-  extend: string;
-  borderColor: string | null;
-  borderWidth: number;
-  borderStyle: string;
-  bgcolor: string | null;
-  text: string;
-  textColor: string | null;
-  textSize: string;
-}
-
-export type DrawingOutput = LabelDrawingOutput | LineDrawingOutput | LineFillDrawingOutput | BoxDrawingOutput;
 
 export type PlotStyle =
   | 'line'
@@ -332,8 +264,10 @@ export class ExecutionContext {
   // Drawing Outputs
   // =========================================================================
 
+  private readonly drawingStore = new DrawingStore();
+
   /** Drawing object outputs (populated during execution) */
-  readonly drawings: DrawingOutput[] = [];
+  readonly drawings: DrawingOutput[] = this.drawingStore.drawings;
 
   // =========================================================================
   // Alert Outputs
@@ -621,117 +555,70 @@ export class ExecutionContext {
    * Add a drawing object output.
    */
   addDrawing(drawing: DrawingOutput): void {
-    this.drawings.push(drawing);
+    this.drawingStore.add(drawing);
   }
 
   /**
    * Current number of drawing outputs.
    */
   getDrawingCount(): number {
-    return this.drawings.length;
+    return this.drawingStore.count();
   }
 
   /**
    * Mark drawings created from an index onward as persistent.
    */
   markDrawingsPersistentFrom(index: number): void {
-    for (let i = index; i < this.drawings.length; i++) {
-      const drawing = this.drawings[i];
-      if (drawing) {
-        drawing.persistent = true;
-      }
-    }
+    this.drawingStore.markPersistentFrom(index);
   }
 
   /**
    * Get a drawing object by handle ID.
    */
   getDrawing(id: string): DrawingOutput | undefined {
-    return this.drawings.find((drawing) => drawing.id === id);
+    return this.drawingStore.get(id);
   }
 
   /**
    * Delete a drawing object by handle ID.
    */
   deleteDrawing(id: string): void {
-    const index = this.drawings.findIndex((drawing) => drawing.id === id);
-    if (index !== -1) {
-      this.drawings.splice(index, 1);
-    }
+    this.drawingStore.delete(id);
   }
 
   /**
    * Copy a label drawing object to a new handle ID.
    */
   copyLabelDrawing(id: string, newId: string): LabelDrawingOutput | undefined {
-    const source = this.getDrawing(id);
-    if (!source || source.type !== 'label') return undefined;
-    if (this.getDrawing(newId)) return undefined;
-
-    const copy: LabelDrawingOutput = {
-      ...source,
-      id: newId,
-      barIndex: this.bar_index,
-      persistent: false,
-    };
-    this.drawings.push(copy);
-    return copy;
+    return this.drawingStore.copyLabel(id, newId, this.bar_index);
   }
 
   /**
    * Copy a line drawing object to a new handle ID.
    */
   copyLineDrawing(id: string, newId: string): LineDrawingOutput | undefined {
-    const source = this.getDrawing(id);
-    if (!source || source.type !== 'line') return undefined;
-    if (this.getDrawing(newId)) return undefined;
-
-    const copy: LineDrawingOutput = {
-      ...source,
-      id: newId,
-      barIndex: this.bar_index,
-      persistent: false,
-    };
-    this.drawings.push(copy);
-    return copy;
+    return this.drawingStore.copyLine(id, newId, this.bar_index);
   }
 
   /**
    * Copy a box drawing object to a new handle ID.
    */
   copyBoxDrawing(id: string, newId: string): BoxDrawingOutput | undefined {
-    const source = this.getDrawing(id);
-    if (!source || source.type !== 'box') return undefined;
-    if (this.getDrawing(newId)) return undefined;
-
-    const copy: BoxDrawingOutput = {
-      ...source,
-      id: newId,
-      barIndex: this.bar_index,
-      persistent: false,
-    };
-    this.drawings.push(copy);
-    return copy;
+    return this.drawingStore.copyBox(id, newId, this.bar_index);
   }
 
   /**
    * Get all drawing outputs as array.
    */
   getDrawings(): DrawingOutput[] {
-    return [...this.drawings];
+    return this.drawingStore.all();
   }
 
   /**
    * Remove drawing outputs from a bar index onward.
    */
   truncateDrawings(fromBarIndex: number): void {
-    const keepCount = this.drawings.findIndex((drawing) => drawing.barIndex >= fromBarIndex);
-    if (keepCount >= 0) {
-      const prefix = this.drawings.slice(0, keepCount);
-      const persistentTail = this.drawings.slice(keepCount).filter((drawing) => drawing.persistent);
-      this.drawings.length = 0;
-      this.drawings.push(...prefix, ...persistentTail);
-    }
+    this.drawingStore.truncateFromBarIndex(fromBarIndex);
   }
 
   // =========================================================================
@@ -825,7 +712,7 @@ export class ExecutionContext {
     this.bar_index = -1;
     this.plots.clear();
     this.plotOrder.length = 0;
-    this.drawings.length = 0;
+    this.drawingStore.clear();
     this.alerts.clear();
     this.alertOrder.length = 0;
     this.indicatorTitle = 'Untitled';
