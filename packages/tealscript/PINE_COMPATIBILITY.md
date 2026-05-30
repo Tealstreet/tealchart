@@ -7,6 +7,9 @@ Script v5/v6 indicators.
 For the broader full-parity plan, see
 [`PINE_PARITY_EPICS.md`](./PINE_PARITY_EPICS.md).
 
+For the canonical inventory row format and parity PR checklist, see
+[`PINE_COMPATIBILITY_INVENTORY.md`](./PINE_COMPATIBILITY_INVENTORY.md).
+
 Status values:
 
 - `Supported` means syntax parses and runtime behavior is covered by tests.
