@@ -563,6 +563,22 @@ export class TealscriptEngine {
         return this.ctx.volume.get(0);
       case 'time':
         return this.ctx.time.get(0);
+      case 'year':
+        return this.getCalendarPart('year', this.ctx.time.get(0), this.ctx.syminfo.timezone);
+      case 'month':
+        return this.getCalendarPart('month', this.ctx.time.get(0), this.ctx.syminfo.timezone);
+      case 'weekofyear':
+        return this.getCalendarPart('weekofyear', this.ctx.time.get(0), this.ctx.syminfo.timezone);
+      case 'dayofmonth':
+        return this.getCalendarPart('dayofmonth', this.ctx.time.get(0), this.ctx.syminfo.timezone);
+      case 'dayofweek':
+        return this.getCalendarPart('dayofweek', this.ctx.time.get(0), this.ctx.syminfo.timezone);
+      case 'hour':
+        return this.getCalendarPart('hour', this.ctx.time.get(0), this.ctx.syminfo.timezone);
+      case 'minute':
+        return this.getCalendarPart('minute', this.ctx.time.get(0), this.ctx.syminfo.timezone);
+      case 'second':
+        return this.getCalendarPart('second', this.ctx.time.get(0), this.ctx.syminfo.timezone);
       case 'bar_index':
         return this.ctx.bar_index;
       case 'last_bar_index':
@@ -1196,6 +1212,9 @@ export class TealscriptEngine {
 
     // String functions
     this.registerStringBuiltins();
+
+    // Time/calendar functions
+    this.registerTimeBuiltins();
 
     // Array functions
     this.registerArrayBuiltins();
@@ -2862,6 +2881,37 @@ export class TealscriptEngine {
       return weightedSum / weightSum;
     });
 
+    this.builtins.set('ta.swma', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const values = this.getCompleteSourceWindow(scope, `_ta_swma_source_${callId}`, source, 4);
+      if (!values) return NaN;
+
+      return (values[0] + values[1] * 2 + values[2] * 2 + values[3]) / 6;
+    });
+
+    this.builtins.set('ta.alma', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const length = this.normalizeLookbackLength(args[1]);
+      const offset = this.toNumber(args[2]);
+      const sigma = this.toNumber(args[3]);
+      const useFlooredOffset = this.isTruthy(args[4]);
+      const values = this.getCompleteSourceWindow(scope, `_ta_alma_source_${callId}`, source, length);
+      if (!values || isNaN(offset) || !Number.isFinite(sigma) || sigma === 0) return NaN;
+
+      const m = useFlooredOffset ? Math.floor(offset * (length - 1)) : offset * (length - 1);
+      const s = length / sigma;
+      let weightedSum = 0;
+      let weightSum = 0;
+
+      for (let i = 0; i < length; i++) {
+        const weight = Math.exp(-Math.pow(i - m, 2) / (2 * s * s));
+        weightedSum += values[length - 1 - i] * weight;
+        weightSum += weight;
+      }
+
+      return weightSum === 0 ? NaN : weightedSum / weightSum;
+    });
+
     // HMA - Hull Moving Average
     // Formula: wma(2 * wma(src, len/2) - wma(src, len), sqrt(len))
     this.builtins.set('ta.hma', (args, _namedArgs, ctx, scope) => {
@@ -3327,6 +3377,102 @@ export class TealscriptEngine {
       // Calculate value at offset (0 = current bar, negative = future, positive = past)
       return intercept + slope * -offset;
     });
+  }
+
+  private registerTimeBuiltins(): void {
+    this.builtins.set('timestamp', (args) => this.evaluateTimestamp(args));
+
+    for (const part of ['year', 'month', 'weekofyear', 'dayofmonth', 'dayofweek', 'hour', 'minute', 'second']) {
+      this.builtins.set(part, (args) => {
+        const timestamp = args[0] === undefined ? this.ctx.time.get(0) : this.toNumber(args[0]);
+        const timezone = args[1] === undefined ? this.ctx.syminfo.timezone : this.toStringValue(args[1]);
+        return this.getCalendarPart(part, timestamp, timezone);
+      });
+    }
+
+    this.builtins.set('dayofweek.sunday', () => 1);
+    this.builtins.set('dayofweek.monday', () => 2);
+    this.builtins.set('dayofweek.tuesday', () => 3);
+    this.builtins.set('dayofweek.wednesday', () => 4);
+    this.builtins.set('dayofweek.thursday', () => 5);
+    this.builtins.set('dayofweek.friday', () => 6);
+    this.builtins.set('dayofweek.saturday', () => 7);
+  }
+
+  private evaluateTimestamp(args: unknown[]): number {
+    if (args.length === 0) return Number.NaN;
+
+    let timezone = this.ctx.syminfo.timezone;
+    let offset = 0;
+    if (typeof args[0] === 'string') {
+      timezone = this.toStringValue(args[0]);
+      offset = 1;
+    }
+
+    const year = this.toNumber(args[offset]);
+    const month = this.toNumber(args[offset + 1]);
+    const day = this.toNumber(args[offset + 2]);
+    const hour = this.toNumber(args[offset + 3] ?? 0);
+    const minute = this.toNumber(args[offset + 4] ?? 0);
+    const second = this.toNumber(args[offset + 5] ?? 0);
+
+    if ([year, month, day, hour, minute, second].some((value) => !Number.isFinite(value))) {
+      return Number.NaN;
+    }
+
+    const timezoneOffset = this.parseTimezoneOffsetMinutes(timezone);
+    return Date.UTC(Math.trunc(year), Math.trunc(month) - 1, Math.trunc(day), Math.trunc(hour), Math.trunc(minute), Math.trunc(second)) - timezoneOffset * 60000;
+  }
+
+  private getCalendarPart(part: string, timestamp: unknown, timezone: string): number {
+    const value = this.toNumber(timestamp);
+    if (!Number.isFinite(value)) return Number.NaN;
+
+    const date = new Date(value + this.parseTimezoneOffsetMinutes(timezone) * 60000);
+    switch (part) {
+      case 'year':
+        return date.getUTCFullYear();
+      case 'month':
+        return date.getUTCMonth() + 1;
+      case 'weekofyear':
+        return this.getIsoWeek(date);
+      case 'dayofmonth':
+        return date.getUTCDate();
+      case 'dayofweek':
+        return date.getUTCDay() + 1;
+      case 'hour':
+        return date.getUTCHours();
+      case 'minute':
+        return date.getUTCMinutes();
+      case 'second':
+        return date.getUTCSeconds();
+      default:
+        return Number.NaN;
+    }
+  }
+
+  private parseTimezoneOffsetMinutes(timezone: string): number {
+    if (timezone === 'UTC' || timezone === 'GMT' || timezone === 'Etc/UTC') {
+      return 0;
+    }
+
+    const match = /^(?:UTC|GMT)([+-])(\d{1,2})(?::?(\d{2}))?$/.exec(timezone);
+    if (!match) {
+      return 0;
+    }
+
+    const sign = match[1] === '+' ? 1 : -1;
+    const hours = Number(match[2]);
+    const minutes = match[3] === undefined ? 0 : Number(match[3]);
+    return sign * (hours * 60 + minutes);
+  }
+
+  private getIsoWeek(date: Date): number {
+    const copy = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+    const day = copy.getUTCDay() || 7;
+    copy.setUTCDate(copy.getUTCDate() + 4 - day);
+    const yearStart = new Date(Date.UTC(copy.getUTCFullYear(), 0, 1));
+    return Math.ceil(((copy.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
   }
 }
 
