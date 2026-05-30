@@ -527,11 +527,13 @@ message = str.format("close={0:#.0}", close)
 joined = "symbol:" + "BTCUSDT"
 parsed = str.tonumber("42.5")
 invalid = str.tonumber("not a number")
+formattedTime = str.format_time(timestamp("GMT+2", 2024, 1, 5, 9, 30), "yyyy-MM-dd HH:mm", "GMT+2")
 plot(formatted == "102.00", title="Formatted Close")
 plot(message == "close=102.0", title="Format Template")
 plot(joined == "symbol:BTCUSDT", title="Concatenated Symbol")
 plot(parsed, title="Parsed Number")
 plot(na(invalid) ? 1 : 0, title="Invalid Is NA")
+plot(formattedTime == "2024-01-05 09:30", title="Formatted Time")
 `);
 
     expect(result.errors).toEqual([]);
@@ -540,6 +542,7 @@ plot(na(invalid) ? 1 : 0, title="Invalid Is NA")
     expect(getPlot(result, 'Concatenated Symbol').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(roundSeries(getPlot(result, 'Parsed Number').values)).toEqual([42.5, 42.5, 42.5, 42.5, 42.5, 42.5, 42.5, 42.5, 42.5, 42.5, 42.5, 42.5]);
     expect(getPlot(result, 'Invalid Is NA').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Formatted Time').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
 
   it('runs string search and substring helpers', () => {
