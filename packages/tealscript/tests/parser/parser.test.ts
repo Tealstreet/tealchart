@@ -250,6 +250,31 @@ arrayValue = [1, 2]
         expect(Array.isArray(alternate)).toBe(true);
       }
     });
+
+    it('parses third-level nested if branches inside multiline functions', () => {
+      const ast = parse(`classify(value, enabled, strict) =>
+    if enabled
+        if strict
+            if value > 0
+                1
+            else
+                2
+        else
+            0
+    else
+        3
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        const outer = fn.body[0];
+        const middle = outer.type === 'IfStatement' ? outer.consequent[0] : null;
+        const inner = middle?.type === 'IfStatement' ? middle.consequent[0] : null;
+        expect(inner?.type).toBe('IfStatement');
+      }
+    });
   });
 
   describe('Expressions', () => {
