@@ -183,6 +183,20 @@ plot(countdown(2), title="Countdown")
     expect(result.errors[0]?.message).toBe('Recursive user function calls are not supported: countdown -> countdown');
   });
 
+  it('matches runtime.error halting behavior', () => {
+    const result = runCompatScript(`
+indicator("Runtime error")
+plot(close, title="Before")
+if bar_index == 1
+    runtime.error("bad bar")
+plot(open, title="After")
+`);
+
+    expect(result.errors[0]?.message).toBe('bad bar');
+    expect(roundSeries(getPlot(result, 'Before').values)).toEqual([102, 105]);
+    expect(roundSeries(getPlot(result, 'After').values)).toEqual([100]);
+  });
+
   it('preserves history for derived regular series variables', () => {
     const result = runCompatScript(`
 indicator("Regular series history")
