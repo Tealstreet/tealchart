@@ -350,7 +350,8 @@ export type PineType =
   | 'series'
   | 'simple'
   | 'const'
-  | 'input';
+  | 'input'
+  | 'array';
 
 // ============================================================================
 // Helper Types
