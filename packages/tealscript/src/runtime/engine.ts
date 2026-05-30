@@ -155,6 +155,9 @@ export class TealscriptEngine {
             line: stmt.loc?.start.line,
             column: stmt.loc?.start.column,
           });
+          if (error instanceof RuntimeErrorException) {
+            return this.createExecutionResult();
+          }
         }
       }
 
@@ -167,6 +170,10 @@ export class TealscriptEngine {
       this.ctx.commitBar();
     }
 
+    return this.createExecutionResult();
+  }
+
+  private createExecutionResult(): ExecutionResult {
     return {
       plots: this.ctx.getPlots(),
       alerts: this.ctx.getAlerts(),
@@ -1301,6 +1308,9 @@ export class TealscriptEngine {
 
     // Alert functions and constants
     this.registerAlertBuiltins();
+
+    // Runtime helpers
+    this.registerRuntimeBuiltins();
   }
 
   // Plot ID counters - reset when engine is created
@@ -1313,6 +1323,13 @@ export class TealscriptEngine {
   private resetPerBarBuiltinState(): void {
     this.plotCallIndex = 0;
     this.builtinCallCounts.clear();
+  }
+
+  private registerRuntimeBuiltins(): void {
+    this.builtins.set('runtime.error', (args, namedArgs) => {
+      const message = namedArgs.has('message') ? namedArgs.get('message') : args[0];
+      throw new RuntimeErrorException(this.toStringValue(message ?? ''));
+    });
   }
 
   private nextBuiltinCallId(name: string): string {
@@ -3712,6 +3729,16 @@ class ContinueException extends Error {
   constructor() {
     super('continue');
     this.name = 'ContinueException';
+  }
+}
+
+/**
+ * Exception for runtime.error().
+ */
+class RuntimeErrorException extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'RuntimeErrorException';
   }
 }
 

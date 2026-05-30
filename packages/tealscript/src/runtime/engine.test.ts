@@ -666,6 +666,36 @@ plot(even(2), title="Even")`;
       expect(result.errors[0]?.message).toBe('Recursive user function calls are not supported: even -> odd -> even');
     });
 
+    it('halts execution on runtime.error with a message', () => {
+      const script = `//@version=6
+indicator("Runtime Error")
+plot(close, title="Before")
+runtime.error("stop here")
+plot(open, title="After")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors[0]?.message).toBe('stop here');
+      expect(result.plots.find((plot) => plot.title === 'Before')?.values).toEqual([100.2]);
+      expect(result.plots.find((plot) => plot.title === 'After')).toBeUndefined();
+    });
+
+    it('accepts runtime.error named message arguments', () => {
+      const script = `//@version=6
+indicator("Runtime Error Named")
+runtime.error(message="named stop")
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(1, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors[0]?.message).toBe('named stop');
+      expect(result.plots).toHaveLength(0);
+    });
+
     it('evaluates keyed switch expressions', () => {
       const script = `//@version=6
 indicator("Switch Test")
