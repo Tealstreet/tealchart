@@ -338,4 +338,24 @@ plot(str.replace_all(trimmed, "usdt", "perp") == "btc-perp-perp", title="Replace
     expect(getPlot(result, 'Replace One').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Replace All').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
+
+  it('matches documented Pine string formatting examples', () => {
+    const result = runCompatScript(`
+indicator("String docs smoke")
+plot(str.tostring(1.25) == "1.25", title="Default Number")
+plot(str.tostring(1.25, "#") == "1", title="Rounded Integer")
+plot(str.tostring(1.25, "#.#") == "1.3", title="One Decimal")
+plot(str.tostring(1.25, "#.0000") == "1.2500", title="Trailing Zeros")
+plot(str.tostring(true) == "true", title="Bool True")
+plot(str.tostring(5 == 3) == "false", title="Bool False")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Default Number').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Rounded Integer').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'One Decimal').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Trailing Zeros').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Bool True').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Bool False').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+  });
 });
