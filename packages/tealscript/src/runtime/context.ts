@@ -591,16 +591,6 @@ export class ExecutionContext {
   }
 
   /**
-   * Update plot color at current bar
-   */
-  setPlotColor(id: string, color: string): void {
-    const plot = this.plots.get(id);
-    if (plot && Array.isArray(plot.color)) {
-      plot.color[this.bar_index] = color;
-    }
-  }
-
-  /**
    * Truncate all plot value (and color) arrays to the given length.
    * Used before re-executing the last bar so that re-appended values
    * don't duplicate the previous tick's output.

@@ -1995,12 +1995,9 @@ export class TealscriptEngine {
     this.registerRuntimeBuiltins();
   }
 
-  // Plot ID counters - reset when engine is created
-  private plotCounter = 0;
+  // Plot call ordering is reset on every bar so output arrays align by call site.
   private plotCallIndex = 0;
   private builtinCallCounts = new Map<string, number>();
-  private hlineCounter = 0;
-  private bgcolorCounter = 0;
 
   private resetPerBarBuiltinState(): void {
     this.plotCallIndex = 0;
@@ -2021,11 +2018,6 @@ export class TealscriptEngine {
   }
 
   private registerPlotBuiltins(): void {
-    // Reset counters for each registration (new engine)
-    this.plotCounter = 0;
-    this.hlineCounter = 0;
-    this.bgcolorCounter = 0;
-
     this.builtins.set('plot', (args, namedArgs, ctx) => {
       const value = args[0] as number;
       const callIndex = this.plotCallIndex++;
