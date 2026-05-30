@@ -851,4 +851,25 @@ plot(indexed, title="Indexed Sum")
     expect(getPlot(result, 'Selected Sum').values).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
     expect(getPlot(result, 'Indexed Sum').values).toEqual([20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]);
   });
+
+  it('matches common Pine barstate guard idioms', () => {
+    const result = runCompatScript(`
+indicator("Barstate docs smoke")
+lastOnly = barstate.islast ? close : na
+confirmed = barstate.isconfirmed ? 1 : 0
+lastConfirmedHistory = barstate.islastconfirmedhistory ? 1 : 0
+history = barstate.ishistory ? 1 : 0
+
+plot(lastOnly, title="Last Only")
+plot(confirmed, title="Confirmed")
+plot(lastConfirmedHistory, title="Last Confirmed History")
+plot(history, title="History")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Last Only').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 112]);
+    expect(getPlot(result, 'Confirmed').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Last Confirmed History').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+    expect(getPlot(result, 'History').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+  });
 });
