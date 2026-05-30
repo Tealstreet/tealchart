@@ -652,6 +652,21 @@ plot(math.round(math.toradians(180), 6), title="Radians")
     expect(roundSeries(getPlot(result, 'Radians').values, 6)).toEqual([3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593]);
   });
 
+  it('matches common Pine trend direction helper idioms', () => {
+    const result = runCompatScript(`
+indicator("Trend direction smoke")
+lookback = input.int(2, "Lookback")
+breakout = ta.rising(close, lookback)
+breakdown = ta.falling(close, lookback)
+plot(breakout, title="Breakout")
+plot(breakdown, title="Breakdown")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Breakout').values).toEqual([false, false, true, false, false, false, true, true, false, true, false, true]);
+    expect(getPlot(result, 'Breakdown').values).toEqual([false, false, false, true, true, false, false, false, false, false, false, false]);
+  });
+
   it('runs conditional barcolor helper idioms', () => {
     const result = runCompatScript(`
 indicator("Barcolor smoke", overlay=true)
