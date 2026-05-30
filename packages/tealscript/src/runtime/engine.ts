@@ -367,13 +367,9 @@ export class TealscriptEngine {
   }
 
   private executeFor(stmt: ForStatement): void {
-    if (stmt.iterable) {
+    if (stmt.kind === 'collection') {
       this.executeForIn(stmt);
       return;
-    }
-
-    if (!stmt.start || !stmt.end) {
-      throw new Error('Invalid for loop');
     }
 
     const start = this.evaluateExpression(stmt.start) as number;
@@ -412,11 +408,7 @@ export class TealscriptEngine {
     }
   }
 
-  private executeForIn(stmt: ForStatement): void {
-    if (!stmt.iterable) {
-      throw new Error('Invalid collection for loop');
-    }
-
+  private executeForIn(stmt: Extract<ForStatement, { kind: 'collection' }>): void {
     const iterable = this.evaluateExpression(stmt.iterable);
     let values: unknown[];
 
