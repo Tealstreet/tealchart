@@ -68,11 +68,12 @@ EmptyStatement
   = LineTerminator { return null; }
   / Comment { return null; }
 
-// indicator("title", ...)
+// indicator("title", ...) / strategy("title", ...)
 IndicatorDeclaration
-  = "indicator" _ "(" _ args:ArgumentList _ ")" _ LineTerminator? {
+  = declarationKind:("indicator" / "strategy") _ "(" _ args:ArgumentList _ ")" _ LineTerminator? {
       const result = {
         type: 'IndicatorDeclaration',
+        declarationKind,
         loc: loc()
       };
 
@@ -525,7 +526,23 @@ SwitchExpression
     }
 
 SwitchCase
-  = Indent _ "=>" _ consequent:Expression _ LineTerminator? {
+  = Indent _ "=>" _ LineTerminator consequent:FunctionNestedBlock {
+      return {
+        type: 'SwitchCase',
+        test: null,
+        consequent,
+        loc: loc()
+      };
+    }
+  / Indent _ test:ConditionalExpression _ "=>" _ LineTerminator consequent:FunctionNestedBlock {
+      return {
+        type: 'SwitchCase',
+        test,
+        consequent,
+        loc: loc()
+      };
+    }
+  / Indent _ "=>" _ consequent:Expression _ LineTerminator? {
       return {
         type: 'SwitchCase',
         test: null,
@@ -777,7 +794,7 @@ ReservedWord
   = ("if" / "else" / "for" / "while" / "break" / "continue" / "var" / "varip"
     / "true" / "false" / "na" / "and" / "or" / "not" / "to" / "by"
     / "switch"
-    / "indicator" / "strategy" / "library" / "import" / "export"
+    / "indicator" / "library" / "import" / "export"
     ) !IdentifierPart
 
 // ============================================================================

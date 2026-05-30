@@ -738,11 +738,21 @@ selected = switch maType
     "EMA" => ta.ema(close, 3)
     "SMA" => ta.sma(close, 3)
     => close
+blockSelected = switch maType
+    "EMA" =>
+        basis = close + 1
+        basis
+    "SMA" =>
+        basis = close - 1
+        basis
+    =>
+        close
 direction = switch
     close > open => 1
     close < open => -1
     => 0
 plot(selected, title="Selected MA")
+plot(blockSelected, title="Block Selected MA")
 plot(direction, title="Direction")
 `);
 
@@ -760,6 +770,20 @@ plot(direction, title="Direction")
       110.166667,
       109.833333,
       111.5,
+    ]);
+    expect(roundSeries(getPlot(result, 'Block Selected MA').values)).toEqual([
+      103,
+      106,
+      108,
+      104,
+      100,
+      101,
+      105,
+      110,
+      109,
+      112,
+      111,
+      113,
     ]);
     expect(getPlot(result, 'Direction').values).toEqual([1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, 1]);
   });
