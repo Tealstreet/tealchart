@@ -89,7 +89,7 @@ Remaining gaps:
 | `input.*` | Partial | Generic `input()`, int, float, bool, string, color, source, time, symbol, timeframe, session, and text area exist. Advanced UI/display behavior is incomplete. |
 | `color.*` | Partial | Core named colors, `color.new()`, `color.rgb()`, channel extraction, and `color.from_gradient()` exist. Named color constants still need exact Pine v6 parity. |
 | `str.*` | Partial | Common conversion, format, search, substring, case, trim, and replace helpers exist. |
-| `array.*` | Partial | Array construction, read/write, stack/queue helpers, clear, and common method-call syntax are covered. |
+| `array.*` | Partial | Array construction, read/write, search, copy, insertion/removal, numeric summaries, stack/queue helpers, clear, and common method-call syntax are covered. |
 | `map.*` / `matrix.*` | Planned | Lower priority than arrays. |
 | `request.*` | Planned | Requires Tealchart datafeed design. Start with `request.security()`. |
 
@@ -150,11 +150,15 @@ definitions.
 
 The array pass covers typed constructors (`array.new_float`, `array.new_int`,
 `array.new_bool`, `array.new_string`), `array.size`, `array.get`, `array.set`,
-`array.push`, `array.pop`, `array.shift`, `array.unshift`, and `array.clear`.
-Common Pine method syntax now lowers to the same runtime built-ins for calls
-such as `values.push(close)`, `values.size()`, and `values.get(index)`. The
-checkpoint fixture follows rolling-window indicator idioms where an array is
-mutated on each bar and capped with `shift()`.
+`array.push`, `array.pop`, `array.shift`, `array.unshift`, `array.clear`,
+`array.from`, `array.copy`, `array.first`, `array.last`, `array.includes`,
+`array.indexof`, `array.lastindexof`, `array.insert`, `array.remove`,
+`array.min`, `array.max`, `array.sum`, and `array.avg`. Common Pine method
+syntax now lowers to the same runtime built-ins for calls such as
+`values.push(close)`, `values.size()`, `values.get(index)`, and
+`values.avg()`. The checkpoint fixtures follow rolling-window indicator idioms
+and constant-array helper idioms where arrays are copied, searched, summarized,
+and mutated.
 
 ## Common `color.*` Coverage
 
