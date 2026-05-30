@@ -137,4 +137,17 @@ plot(distance(close), title="Distance")
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Distance').values)).toEqual([null, null, 2.333333, -2, -4, -0.666667, 3, 4.666667, 1, 1.666667, 0.333333, 1]);
   });
+
+  it('preserves history for derived regular series variables', () => {
+    const result = runCompatScript(`
+indicator("Regular series history")
+dist = close - ta.sma(close, 3)
+plot(dist, title="Distance")
+plot(dist[1], title="Previous Distance")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Distance').values)).toEqual([null, null, 2.333333, -2, -4, -0.666667, 3, 4.666667, 1, 1.666667, 0.333333, 1]);
+    expect(roundSeries(getPlot(result, 'Previous Distance').values)).toEqual([Number.NaN, null, null, 2.333333, -2, -4, -0.666667, 3, 4.666667, 1, 1.666667, 0.333333]);
+  });
 });
