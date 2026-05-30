@@ -328,6 +328,31 @@ plot(array.size(base), title="Original Size")
     expect(roundSeries(getPlot(result, 'Original Size').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
   });
 
+  it('matches documented Pine array ordering and joining idioms', () => {
+    const result = runCompatScript(`
+indicator("Array ordering helpers")
+values = array.from(3, 1, 2)
+values.sort(order.descending)
+highest = values.get(0)
+array.sort(values, order=order.ascending)
+lowest = values.get(0)
+array.reverse(values)
+values.reverse()
+values.concat(array.from(4, 5))
+joined = values.join("|")
+plot(highest, title="Highest")
+plot(lowest, title="Lowest")
+plot(joined == "1|2|3|4|5" ? 1 : 0, title="Joined")
+plot(values.size(), title="Size")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Highest').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Lowest').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Joined').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Size').values)).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
+  });
+
   it('reads array literal values with array helpers', () => {
     const result = runCompatScript(`
 indicator("Array literal")

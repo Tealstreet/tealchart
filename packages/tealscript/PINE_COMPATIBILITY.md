@@ -166,12 +166,15 @@ The array pass covers typed constructors (`array.new_float`, `array.new_int`,
 `array.push`, `array.pop`, `array.shift`, `array.unshift`, `array.clear`,
 `array.from`, `array.copy`, `array.first`, `array.last`, `array.includes`,
 `array.indexof`, `array.lastindexof`, `array.insert`, `array.remove`,
-`array.min`, `array.max`, `array.sum`, and `array.avg`. Common Pine method
+`array.min`, `array.max`, `array.sum`, `array.avg`, `array.sort`,
+`array.reverse`, `array.join`, and `array.concat`. Common Pine method
 syntax now lowers to the same runtime built-ins for calls such as
 `values.push(close)`, `values.size()`, `values.get(index)`, and
 `values.avg()`. The checkpoint fixtures follow rolling-window indicator idioms
 and constant-array helper idioms where arrays are copied, searched, summarized,
-and mutated.
+ordered, joined, concatenated, and mutated.
+`array.slice` remains planned because Pine-compatible slice view semantics need
+a dedicated array-view model.
 
 ## Common `color.*` Coverage
 
