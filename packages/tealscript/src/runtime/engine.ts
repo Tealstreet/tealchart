@@ -1296,7 +1296,7 @@ export class TealscriptEngine {
       }
 
       ctx.addPlotValue(id, this.toPlotValue(value));
-      return value;
+      return id;
     });
 
     this.builtins.set('hline', (args, namedArgs, ctx) => {
@@ -1318,7 +1318,7 @@ export class TealscriptEngine {
         });
       }
 
-      return price;
+      return id;
     });
 
     this.builtins.set('bgcolor', (args, namedArgs, ctx) => {
@@ -1594,27 +1594,21 @@ export class TealscriptEngine {
     // fill - Fill area between two plots
     // =========================================================================
     this.builtins.set('fill', (args, namedArgs, ctx) => {
-      // In PineScript, fill() takes plot IDs returned from plot() calls
-      // For our implementation, we'll use the plot titles to reference them
-      const plot1Id = args[0] as string;
-      const plot2Id = args[1] as string;
+      const plot1Id = this.resolveFillPlotId(args[0], ctx);
+      const plot2Id = this.resolveFillPlotId(args[1], ctx);
       const color = (namedArgs.get('color') ?? args[2] ?? 'rgba(33, 150, 243, 0.2)') as string;
       const title = (namedArgs.get('title') ?? 'Fill') as string;
 
       const id = `fill_${title}`;
 
       if (ctx.bar_index === 0) {
-        // Reference the actual plot IDs
-        const actualPlot1Id = `plot_${plot1Id}`;
-        const actualPlot2Id = `plot_${plot2Id}`;
-
         ctx.registerPlot({
           id,
           type: 'fill',
           title,
           color: [],
-          plot1Id: actualPlot1Id,
-          plot2Id: actualPlot2Id,
+          plot1Id,
+          plot2Id,
         });
       }
 
@@ -1628,6 +1622,22 @@ export class TealscriptEngine {
       ctx.addPlotValue(id, 1);
       return null;
     });
+  }
+
+  private resolveFillPlotId(value: unknown, ctx: ExecutionContext): string {
+    const reference = String(value);
+    if (ctx.plots.has(reference)) {
+      return reference;
+    }
+
+    for (const prefix of ['plot_', 'hline_']) {
+      const id = `${prefix}${reference}`;
+      if (ctx.plots.has(id)) {
+        return id;
+      }
+    }
+
+    return reference.startsWith('plot_') || reference.startsWith('hline_') ? reference : `plot_${reference}`;
   }
 
   private normalizeAlertFrequency(value: unknown): AlertFrequency {

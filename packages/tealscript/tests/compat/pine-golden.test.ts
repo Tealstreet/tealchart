@@ -835,6 +835,52 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
     expect(getPlot(result, 'Scale Constants').values).toEqual(Array(compatibilityBars.length).fill(1));
   });
 
+  it('fills between Pine plot and hline handles', () => {
+    const result = runCompatScript(`
+indicator("Fill handles smoke", overlay=true)
+basis = ta.sma(close, 3)
+upper = basis + 2
+lower = basis - 2
+upperPlot = plot(upper, title="Upper", color=color.green)
+lowerPlot = plot(lower, title="Lower", color=color.red)
+topLine = hline(110, title="Top")
+bottomLine = hline(100, title="Bottom")
+fill(upperPlot, lowerPlot, color=color.new(color.green, 80), title="Band Fill")
+fill(topLine, bottomLine, color=color.new(color.blue, 90), title="Range Fill")
+`);
+
+    expect(result.errors).toEqual([]);
+    const bandFill = getPlot(result, 'Band Fill');
+    const rangeFill = getPlot(result, 'Range Fill');
+
+    expect(bandFill.type).toBe('fill');
+    expect(bandFill.plot1Id).toBe('plot_Upper');
+    expect(bandFill.plot2Id).toBe('plot_Lower');
+    expect(bandFill.color).toEqual(Array(compatibilityBars.length).fill('#4CAF5033'));
+
+    expect(rangeFill.type).toBe('fill');
+    expect(rangeFill.plot1Id).toBe('hline_Top');
+    expect(rangeFill.plot2Id).toBe('hline_Bottom');
+    expect(rangeFill.color).toEqual(Array(compatibilityBars.length).fill('#2196F31A'));
+  });
+
+  it('preserves legacy fill title references before plot registration', () => {
+    const result = runCompatScript(`
+indicator("Legacy fill smoke", overlay=true)
+fill("Upper", "Lower", color=color.new(color.red, 85), title="Legacy Fill")
+plot(high, title="Upper")
+plot(low, title="Lower")
+`);
+
+    expect(result.errors).toEqual([]);
+    const fillPlot = getPlot(result, 'Legacy Fill');
+
+    expect(fillPlot.type).toBe('fill');
+    expect(fillPlot.plot1Id).toBe('plot_Upper');
+    expect(fillPlot.plot2Id).toBe('plot_Lower');
+    expect(fillPlot.color).toEqual(Array(compatibilityBars.length).fill('#F4433626'));
+  });
+
   it('matches documented Pine switch selection idioms', () => {
     const result = runCompatScript(`
 indicator("Switch docs smoke")
