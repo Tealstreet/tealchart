@@ -221,6 +221,9 @@ export function concatArray<T = unknown>(array: PineArray<T>, other: PineArray<T
 export function sliceArray<T = unknown>(array: PineArray<T>, from: number, to: number): PineArray<T> {
   const normalizedFrom = Math.trunc(from);
   const normalizedTo = Math.trunc(to);
+  if (!Number.isFinite(normalizedFrom) || !Number.isFinite(normalizedTo)) {
+    throw new Error('Slice indices must be finite numbers');
+  }
   if (normalizedFrom >= normalizedTo) {
     throw new Error("Index 'from' should be less than index 'to'");
   }
