@@ -175,6 +175,15 @@ plot(close, color=color.red, linewidth=2)`);
 
         expect(ast.body.length).toBeGreaterThan(1);
       });
+
+      it('parses na as a callable built-in when followed by arguments', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+x = na(close[1])`);
+
+        const declaration = ast.body.find((s) => s.type === 'VariableDeclaration' && s.names.type === 'VariableDeclarator' && s.names.name.name === 'x');
+        expect(declaration?.type === 'VariableDeclaration' ? declaration.init.type : null).toBe('CallExpression');
+      });
     });
 
     describe('history access', () => {

@@ -665,12 +665,18 @@ PostfixExpression
 PrimaryExpression
   = "(" _ expr:Expression _ ")" { return expr; }
   / ArrayLiteral
+  / NaFunctionIdentifier
   / NaLiteral
   / BooleanLiteral
   / ColorLiteral
   / StringLiteral
   / NumberLiteral
   / Identifier
+
+NaFunctionIdentifier
+  = "na" !IdentifierPart &(_ "(") {
+      return { type: 'Identifier', name: 'na', loc: loc() };
+    }
 
 // Array literal
 ArrayLiteral

@@ -902,8 +902,8 @@ future = close[-1]
 tooFar = close[100]
 plot(future, title="Future")
 plot(tooFar, title="Too Far")
-plot(future == future ? 0 : 1, title="Future Is NA")
-plot(tooFar == tooFar ? 0 : 1, title="Too Far Is NA")`;
+plot(na(future) ? 1 : 0, title="Future Is NA")
+plot(na(tooFar) ? 1 : 0, title="Too Far Is NA")`;
 
       const ast = parse(script);
       const bars = createBars(3, 100);
