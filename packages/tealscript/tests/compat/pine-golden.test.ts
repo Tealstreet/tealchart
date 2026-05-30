@@ -506,4 +506,23 @@ plot(signal, title="Signal", color=signalColor)
       '#1EE1008F',
     ]);
   });
+
+  it('matches documented Pine math helper idioms', () => {
+    const result = runCompatScript(`
+indicator("Math docs smoke")
+midpoint = math.avg(open, high, low, close)
+rounded = math.round(midpoint, 2)
+rightAngle = math.todegrees(math.pi / 2)
+plot(rounded, title="Rounded Midpoint")
+plot(math.trunc(-1.9), title="Truncated")
+plot(rightAngle, title="Right Angle")
+plot(math.round(math.toradians(180), 6), title="Radians")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Rounded Midpoint').values, 2)).toEqual([101, 103.5, 106, 105.25, 101, 99, 102, 106.5, 108.5, 109.5, 111, 110.75]);
+    expect(roundSeries(getPlot(result, 'Truncated').values)).toEqual([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
+    expect(roundSeries(getPlot(result, 'Right Angle').values)).toEqual([90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90]);
+    expect(roundSeries(getPlot(result, 'Radians').values, 6)).toEqual([3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593]);
+  });
 });
