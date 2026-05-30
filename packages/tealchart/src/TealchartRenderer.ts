@@ -1,4 +1,4 @@
-import type { DrawingOutput, LabelDrawingOutput, LineDrawingOutput, LineFillDrawingOutput, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
+import type { BoxDrawingOutput, DrawingOutput, LabelDrawingOutput, LineDrawingOutput, LineFillDrawingOutput, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
 import type { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
 import type { CanvasContext } from './rendering/CanvasContext';
 import type { PaneOffset } from './rendering/PaneManager';
@@ -3195,6 +3195,7 @@ export class TealchartRenderer {
 
     if (drawings && drawings.length > 0) {
       this.renderLineFillDrawings(drawings, bars, viewport, pane);
+      this.renderBoxDrawings(drawings, bars, viewport, pane);
       this.renderLineDrawings(drawings, bars, viewport, pane);
       this.renderLabelDrawings(drawings, bars, viewport, pane);
     }
@@ -3205,6 +3206,117 @@ export class TealchartRenderer {
     // Draw price lines on top
     if (labelBounds && labelBounds.length > 0) {
       this.drawPriceLinesInPane(labelBounds, viewport, pane);
+    }
+  }
+
+  private renderBoxDrawings(
+    drawings: DrawingOutput[],
+    bars: Bar[],
+    viewport: Viewport,
+    pane: ComputedPane,
+  ): void {
+    const boxes = drawings.filter((drawing): drawing is BoxDrawingOutput => drawing.type === 'box');
+    if (boxes.length === 0) return;
+
+    const { ctx, options, margins } = this;
+    const chartWidth = options.width - margins.left;
+    const minX = margins.left;
+    const maxX = options.width - margins.right;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(margins.left, pane.top, options.width - margins.left - margins.right, pane.height);
+    ctx.clip();
+
+    for (const box of boxes) {
+      const rect = this.resolveBoxDrawingRect(box, bars, viewport, pane, chartWidth, minX, maxX);
+      if (!rect) continue;
+
+      if (box.bgcolor) {
+        ctx.fillStyle = box.bgcolor;
+        ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+      }
+
+      ctx.strokeStyle = box.borderColor ?? '#2962FF';
+      ctx.lineWidth = Math.max(1, box.borderWidth);
+      if (box.borderStyle === 'dashed') {
+        ctx.setLineDash([6, 4]);
+      } else if (box.borderStyle === 'dotted') {
+        ctx.setLineDash([2, 4]);
+      } else {
+        ctx.setLineDash([]);
+      }
+      ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+
+      if (box.text) {
+        ctx.setLineDash([]);
+        ctx.fillStyle = box.textColor ?? '#FFFFFF';
+        ctx.font = `${this.fontSizeForDrawing(box.textSize)}px ${this.font}`;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText(box.text, rect.x + 6, rect.y + 6);
+      }
+    }
+
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  private resolveBoxDrawingRect(
+    box: BoxDrawingOutput,
+    bars: Bar[],
+    viewport: Viewport,
+    pane: ComputedPane,
+    chartWidth: number,
+    minX: number,
+    maxX: number,
+  ): { x: number; y: number; width: number; height: number } | null {
+    if (
+      box.left === null
+      || box.right === null
+      || box.top === null
+      || box.bottom === null
+      || !Number.isFinite(box.left)
+      || !Number.isFinite(box.right)
+      || !Number.isFinite(box.top)
+      || !Number.isFinite(box.bottom)
+    ) {
+      return null;
+    }
+
+    const leftTime = box.xloc === 'bar_time' ? box.left : this.barIndexToTime(box.left, bars);
+    const rightTime = box.xloc === 'bar_time' ? box.right : this.barIndexToTime(box.right, bars);
+    if (leftTime === null || rightTime === null) return null;
+
+    let leftX = this.timeToX(leftTime, viewport, chartWidth);
+    let rightX = this.timeToX(rightTime, viewport, chartWidth);
+    if (box.extend === 'left' || box.extend === 'both') leftX = minX;
+    if (box.extend === 'right' || box.extend === 'both') rightX = maxX;
+
+    const topY = this.valueToY(box.top, pane);
+    const bottomY = this.valueToY(box.bottom, pane);
+    const x = Math.min(leftX, rightX);
+    const y = Math.min(topY, bottomY);
+    return {
+      x,
+      y,
+      width: Math.abs(rightX - leftX),
+      height: Math.abs(bottomY - topY),
+    };
+  }
+
+  private fontSizeForDrawing(size: string): number {
+    switch (size) {
+      case 'tiny':
+        return 9;
+      case 'small':
+        return 10;
+      case 'large':
+        return 14;
+      case 'huge':
+        return 18;
+      default:
+        return 12;
     }
   }
 
