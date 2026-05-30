@@ -109,4 +109,32 @@ plot(rangeSize(high, low), title="Range")
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Range').values)).toEqual([4, 5, 4, 7, 6, 5, 6, 7, 5, 5, 5, 5]);
   });
+
+  it('keeps function-local variables scoped to the function call', () => {
+    const result = runCompatScript(`
+indicator("UDF local scope")
+basis = 1
+doubleWithLocal(value) =>
+    basis = value * 2
+    basis
+plot(doubleWithLocal(close), title="Doubled")
+plot(basis, title="Global Basis")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Doubled').values)).toEqual([204, 210, 214, 206, 198, 200, 208, 218, 216, 222, 220, 224]);
+    expect(roundSeries(getPlot(result, 'Global Basis').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+  });
+
+  it('supports nested user-defined functions inside indicators', () => {
+    const result = runCompatScript(`
+indicator("UDF nested")
+smooth(source) => ta.sma(source, 3)
+distance(source) => source - smooth(source)
+plot(distance(close), title="Distance")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Distance').values)).toEqual([null, null, 2.333333, -2, -4, -0.666667, 3, 4.666667, 1, 1.666667, 0.333333, 1]);
+  });
 });
