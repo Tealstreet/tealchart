@@ -1456,6 +1456,38 @@ export class TealscriptEngine {
     return `#${channels.map((channel) => this.clampNumber(channel, 0, 255).toString(16).padStart(2, '0').toUpperCase()).join('')}`;
   }
 
+  private formatTimestamp(timestamp: unknown, format: string, timezone: string): string {
+    const value = this.toNumber(timestamp);
+    if (!Number.isFinite(value)) return 'NaN';
+
+    const offsetMs = this.parseTimezoneOffsetMinutes(timezone) * 60_000;
+    const date = new Date(value + offsetMs);
+    const pad = (part: number, length = 2): string => String(part).padStart(length, '0');
+
+    return format.replace(/yyyy|yy|MM|dd|HH|mm|ss|SSS/g, (token) => {
+      switch (token) {
+        case 'yyyy':
+          return String(date.getUTCFullYear());
+        case 'yy':
+          return pad(date.getUTCFullYear() % 100);
+        case 'MM':
+          return pad(date.getUTCMonth() + 1);
+        case 'dd':
+          return pad(date.getUTCDate());
+        case 'HH':
+          return pad(date.getUTCHours());
+        case 'mm':
+          return pad(date.getUTCMinutes());
+        case 'ss':
+          return pad(date.getUTCSeconds());
+        case 'SSS':
+          return pad(date.getUTCMilliseconds(), 3);
+        default:
+          return token;
+      }
+    });
+  }
+
   private parseColor(value: unknown): { red: number; green: number; blue: number; alpha: number } | null {
     if (typeof value !== 'string') return null;
 
@@ -2156,6 +2188,12 @@ export class TealscriptEngine {
       if (source.length === 0) return Number.NaN;
       const value = Number(source);
       return Number.isFinite(value) ? value : Number.NaN;
+    });
+    this.builtins.set('str.format_time', (args) => {
+      const timestamp = args[0] === undefined ? this.ctx.time.get(0) : this.toNumber(args[0]);
+      const format = args[1] === undefined || args[1] === '' ? 'yyyy-MM-dd HH:mm:ss' : this.toStringValue(args[1]);
+      const timezone = args[2] === undefined || args[2] === '' ? this.ctx.syminfo.timezone : this.toStringValue(args[2]);
+      return this.formatTimestamp(timestamp, format, timezone);
     });
 
     this.builtins.set('str.format', (args) => {
