@@ -65,7 +65,7 @@ by real Pine examples from official docs or public indicator idioms.
 | `barstate.*` | Partial | Common booleans are exposed, including `isfirst`, `islast`, `ishistory`, `isrealtime`, `isnew`, `isconfirmed`, and `islastconfirmedhistory`. Realtime tick parity still needs browser-worker coverage. |
 | `syminfo.*` | Partial | Static defaults are exposed through common chart-info fields such as `ticker`, `tickerid`, `root`, `mintick`, and `minmove`. Live symbol metadata injection is still planned. |
 | `timeframe.*` | Partial | Static defaults are exposed through common timeframe fields such as `period`, `main_period`, `multiplier`, `isintraday`, and `isdwm`. Live chart timeframe injection is still planned. |
-| Function-local series state | Planned | Needed before UDF-heavy Pine snippets are reliable. |
+| Function-local series state | Partial | Root and function-local `var` values persist, branch expression returns work, and recursive UDF calls are rejected with explicit diagnostics. Nested block parsing and broader call-site series parity still need hardening. |
 | `max_bars_back` | Partial | Declaration metadata is parsed, validated, and exposed on execution results; runtime buffer enforcement/inference is not implemented yet. |
 
 ## Scope And Series Audit
@@ -77,11 +77,13 @@ Resolved in the scope/series hardening PR:
   such as `dist = close - ta.sma(close, 3)` followed by `dist[1]`.
 - `var` and `varip` persistence now works at root and function-local scopes.
 
-Remaining gaps:
+Covered behavior and remaining gaps:
 
 - Flat multiline user-defined functions return the last expression statement.
 - User-defined function bodies can return expression results from `if` /
   `else if` / `else` branches.
+- Recursive user-defined function calls are rejected with an explicit diagnostic
+  instead of overflowing the runtime stack.
 - Nested indented blocks inside user-defined functions expose limitations in the
   simplified indentation grammar and need continued hardening.
 

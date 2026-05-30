@@ -639,6 +639,33 @@ plot(classify(bar_index - 1), title="Classified")`;
       expect(result.plots.find((plot) => plot.title === 'Classified')?.values).toEqual([-1, 0, 1]);
     });
 
+    it('reports direct recursive user function calls', () => {
+      const script = `//@version=6
+indicator("Direct Recursive Function")
+countdown(value) => value <= 0 ? 0 : countdown(value - 1)
+plot(countdown(2), title="Countdown")`;
+
+      const ast = parse(script);
+      const bars = createBars(1, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors[0]?.message).toBe('Recursive user function calls are not supported: countdown -> countdown');
+    });
+
+    it('reports mutual recursive user function calls', () => {
+      const script = `//@version=6
+indicator("Mutual Recursive Function")
+even(value) => value <= 0 ? 1 : odd(value - 1)
+odd(value) => value <= 0 ? 0 : even(value - 1)
+plot(even(2), title="Even")`;
+
+      const ast = parse(script);
+      const bars = createBars(1, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors[0]?.message).toBe('Recursive user function calls are not supported: even -> odd -> even');
+    });
+
     it('evaluates keyed switch expressions', () => {
       const script = `//@version=6
 indicator("Switch Test")
