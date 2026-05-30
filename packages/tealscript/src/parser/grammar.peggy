@@ -405,7 +405,42 @@ FunctionDeepNestedBlock
     }
 
 FunctionDeepNestedStatement
-  = FunctionDeepNestedIndent stmt:Statement {
+  = FunctionDeepNestedIndent stmt:(FunctionDeepNestedIfStatement / Statement) {
+      return stmt;
+    }
+
+FunctionDeepNestedIfStatement
+  = "if" _ test:Expression _ LineTerminator consequent:FunctionVeryDeepNestedBlock alternate:FunctionDeepNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+
+FunctionDeepNestedElseClause
+  = FunctionDeepNestedIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionVeryDeepNestedBlock alternate:FunctionDeepNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / FunctionDeepNestedIndent "else" _ LineTerminator? block:FunctionVeryDeepNestedBlock {
+      return block;
+    }
+
+FunctionVeryDeepNestedBlock
+  = statements:FunctionVeryDeepNestedStatement+ {
+      return statements.filter(s => s !== null);
+    }
+
+FunctionVeryDeepNestedStatement
+  = FunctionVeryDeepNestedIndent stmt:Statement {
       return stmt;
     }
 
@@ -427,8 +462,29 @@ FunctionDeepNestedIndent
   = "            "
   / "\t\t\t"
   / "        \t"
+  / "    \t    "
   / "    \t\t"
   / "\t        "
+  / "\t    \t"
+  / "\t\t    "
+
+FunctionVeryDeepNestedIndent
+  = "                "
+  / "\t\t\t\t"
+  / "            \t"
+  / "        \t    "
+  / "        \t\t"
+  / "    \t        "
+  / "    \t    \t"
+  / "    \t\t    "
+  / "    \t\t\t"
+  / "\t            "
+  / "\t        \t"
+  / "\t    \t    "
+  / "\t    \t\t"
+  / "\t\t        "
+  / "\t\t    \t"
+  / "\t\t\t    "
 
 SingleLineBody
   = stmt:(VariableDeclaration / AssignmentStatement / ExpressionStatement / BreakStatement / ContinueStatement) {
