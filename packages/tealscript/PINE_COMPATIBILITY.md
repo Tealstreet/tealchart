@@ -62,13 +62,15 @@ Status values:
 
 ## Scope And Series Audit
 
-These gaps are targeted by the scope/series hardening PR:
+Resolved in the scope/series hardening PR:
 
-- Regular variables are reset on each bar, but redeclaration currently replaces
-  the variable entry. That loses accumulated series history for derived values
+- Regular variables are reset on each bar. Previously, redeclaration replaced
+  the variable entry and lost accumulated series history for derived values
   such as `dist = close - ta.sma(close, 3)` followed by `dist[1]`.
-- `var` and `varip` persistence is covered at the root scope, but function-local
-  and nested-block behavior needs regression coverage.
+- `var` and `varip` persistence now works at root and function-local scopes.
+
+Remaining gaps:
+
 - Flat multiline user-defined functions return the last expression statement.
   Branch-return behavior for `if`/`else` function bodies is not implemented yet.
 - Nested indented blocks inside user-defined functions expose limitations in the
