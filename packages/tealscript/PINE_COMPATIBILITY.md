@@ -60,6 +60,20 @@ Status values:
 | Function-local series state | Planned | Needed before UDF-heavy Pine snippets are reliable. |
 | `max_bars_back` | Planned | Declaration is parsed but not enforced/inferred. |
 
+## Scope And Series Audit
+
+These gaps are targeted by the scope/series hardening PR:
+
+- Regular variables are reset on each bar, but redeclaration currently replaces
+  the variable entry. That loses accumulated series history for derived values
+  such as `dist = close - ta.sma(close, 3)` followed by `dist[1]`.
+- `var` and `varip` persistence is covered at the root scope, but function-local
+  and nested-block behavior needs regression coverage.
+- Flat multiline user-defined functions return the last expression statement.
+  Branch-return behavior for `if`/`else` function bodies is not implemented yet.
+- Nested indented blocks inside user-defined functions expose limitations in the
+  simplified indentation grammar and need a dedicated parser pass.
+
 ## Built-ins
 
 | Namespace | Status | Notes |
