@@ -2637,6 +2637,16 @@ export class TealscriptEngine {
       return sorted[lower] + (sorted[upper] - sorted[lower]) * fraction;
     });
 
+    this.builtins.set('ta.percentrank', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const length = this.normalizeLookbackLength(args[1]);
+      const values = this.getCompleteSourceWindow(scope, `_ta_percentrank_source_${callId}`, source, length);
+      if (!values) return NaN;
+
+      const belowOrEqual = values.filter((value) => value <= source).length;
+      return (belowOrEqual / values.length) * 100;
+    });
+
     this.builtins.set('ta.cum', (args, _namedArgs, _ctx, scope, callId) => {
       const source = args[0] as number;
       if (isNaN(source)) return NaN;
