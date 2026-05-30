@@ -509,6 +509,9 @@ export class TealscriptEngine {
     switch (expr.operator) {
       // Arithmetic
       case '+':
+        if (typeof left === 'string' || typeof right === 'string') {
+          return `${this.toStringValue(left)}${this.toStringValue(right)}`;
+        }
         return (left as number) + (right as number);
       case '-':
         return (left as number) - (right as number);
@@ -724,6 +727,30 @@ export class TealscriptEngine {
     return value as number;
   }
 
+  private toStringValue(value: unknown, format?: string): string {
+    if (value === null || value === undefined || this.isNa(value)) {
+      return 'NaN';
+    }
+    if (typeof value === 'number') {
+      if (format) {
+        return this.formatNumber(value, format);
+      }
+      return String(value);
+    }
+    return String(value);
+  }
+
+  private formatNumber(value: number, format: string): string {
+    const decimalMatch = format.match(/\.([0#]+)/);
+    if (decimalMatch) {
+      return value.toFixed(decimalMatch[1].length);
+    }
+    if (/^[#0,]+$/.test(format)) {
+      return Math.round(value).toString();
+    }
+    return String(value);
+  }
+
   private setBuiltinState(scope: Scope, key: string, value: unknown): void {
     if (scope.has(key)) {
       scope.set(key, value);
@@ -745,6 +772,9 @@ export class TealscriptEngine {
 
     // Math functions
     this.registerMathBuiltins();
+
+    // String functions
+    this.registerStringBuiltins();
 
     // Array functions
     this.registerArrayBuiltins();
@@ -1114,6 +1144,43 @@ export class TealscriptEngine {
       if (args.length === 0) return NaN;
       const value = args[0];
       return typeof value === 'number' && isNaN(value);
+    });
+  }
+
+  private registerStringBuiltins(): void {
+    this.builtins.set('str.tostring', (args) => {
+      return this.toStringValue(args[0], args[1] as string | undefined);
+    });
+
+    this.builtins.set('str.format', (args) => {
+      const template = this.toStringValue(args[0]);
+      return template.replace(/\{(\d+)(?:,[^}:]+)?(?::([^}]+))?\}/g, (_match, index: string, format: string | undefined) => {
+        return this.toStringValue(args[Number(index) + 1], format);
+      });
+    });
+
+    this.builtins.set('str.length', (args) => this.toStringValue(args[0]).length);
+    this.builtins.set('str.contains', (args) => this.toStringValue(args[0]).includes(this.toStringValue(args[1])));
+    this.builtins.set('str.startswith', (args) => this.toStringValue(args[0]).startsWith(this.toStringValue(args[1])));
+    this.builtins.set('str.endswith', (args) => this.toStringValue(args[0]).endsWith(this.toStringValue(args[1])));
+    this.builtins.set('str.pos', (args) => {
+      const index = this.toStringValue(args[0]).indexOf(this.toStringValue(args[1]));
+      return index === -1 ? NaN : index;
+    });
+    this.builtins.set('str.substring', (args) => {
+      const source = this.toStringValue(args[0]);
+      const begin = Math.trunc((args[1] as number | undefined) ?? 0);
+      const end = args[2] === undefined ? undefined : Math.trunc(args[2] as number);
+      return source.substring(begin, end);
+    });
+    this.builtins.set('str.upper', (args) => this.toStringValue(args[0]).toUpperCase());
+    this.builtins.set('str.lower', (args) => this.toStringValue(args[0]).toLowerCase());
+    this.builtins.set('str.trim', (args) => this.toStringValue(args[0]).trim());
+    this.builtins.set('str.replace', (args) => {
+      return this.toStringValue(args[0]).replace(this.toStringValue(args[1]), this.toStringValue(args[2]));
+    });
+    this.builtins.set('str.replace_all', (args) => {
+      return this.toStringValue(args[0]).split(this.toStringValue(args[1])).join(this.toStringValue(args[2]));
     });
   }
 

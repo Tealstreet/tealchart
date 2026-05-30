@@ -282,4 +282,82 @@ plot(ta.range(close, 4), title="Close Range")
     expect(getPlot(result, 'Cross Threshold').values).toEqual([false, true, false, true, false, false, false, true, false, false, false, false]);
     expect(roundSeries(getPlot(result, 'Close Range').values)).toEqual([0, 3, 5, 5, 8, 8, 5, 10, 9, 7, 3, 4]);
   });
+
+  it('runs string conversion and formatting helpers', () => {
+    const result = runCompatScript(`
+indicator("String helpers")
+formatted = str.tostring(close, "#.00")
+message = str.format("close={0:#.0}", close)
+joined = "symbol:" + "BTCUSDT"
+plot(formatted == "102.00", title="Formatted Close")
+plot(message == "close=102.0", title="Format Template")
+plot(joined == "symbol:BTCUSDT", title="Concatenated Symbol")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Formatted Close').values).toEqual([true, false, false, false, false, false, false, false, false, false, false, false]);
+    expect(getPlot(result, 'Format Template').values).toEqual([true, false, false, false, false, false, false, false, false, false, false, false]);
+    expect(getPlot(result, 'Concatenated Symbol').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+  });
+
+  it('runs string search and substring helpers', () => {
+    const result = runCompatScript(`
+indicator("String search helpers")
+text = "BTCUSDT perpetual"
+plot(str.contains(text, "USDT"), title="Contains")
+plot(str.startswith(text, "BTC"), title="Starts")
+plot(str.endswith(text, "perpetual"), title="Ends")
+plot(str.pos(text, "USDT"), title="Position")
+plot(str.pos(text, "ETH"), title="Missing Position")
+plot(str.substring(text, 0, 3) == "BTC", title="Substring")
+plot(str.length(text), title="Length")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Contains').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Starts').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Ends').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(roundSeries(getPlot(result, 'Position').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    expect(getPlot(result, 'Missing Position').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, null]);
+    expect(getPlot(result, 'Substring').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(roundSeries(getPlot(result, 'Length').values)).toEqual([17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17]);
+  });
+
+  it('runs string case trim and replacement helpers', () => {
+    const result = runCompatScript(`
+indicator("String transform helpers")
+text = "  btc-usdt-usdt  "
+trimmed = str.trim(text)
+plot(str.upper(trimmed) == "BTC-USDT-USDT", title="Upper")
+plot(str.lower("BTC") == "btc", title="Lower")
+plot(str.replace(trimmed, "usdt", "perp") == "btc-perp-usdt", title="Replace One")
+plot(str.replace_all(trimmed, "usdt", "perp") == "btc-perp-perp", title="Replace All")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Upper').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Lower').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Replace One').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Replace All').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+  });
+
+  it('matches documented Pine string formatting examples', () => {
+    const result = runCompatScript(`
+indicator("String docs smoke")
+plot(str.tostring(1.25) == "1.25", title="Default Number")
+plot(str.tostring(1.25, "#") == "1", title="Rounded Integer")
+plot(str.tostring(1.25, "#.#") == "1.3", title="One Decimal")
+plot(str.tostring(1.25, "#.0000") == "1.2500", title="Trailing Zeros")
+plot(str.tostring(true) == "true", title="Bool True")
+plot(str.tostring(5 == 3) == "false", title="Bool False")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Default Number').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Rounded Integer').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'One Decimal').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Trailing Zeros').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Bool True').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Bool False').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+  });
 });

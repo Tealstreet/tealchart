@@ -22,6 +22,10 @@ Status values:
 5. Multi-timeframe data, drawings, alerts, and strategies follow after the core
    indicator subset is stable.
 
+For each major compatibility epic, add deterministic golden fixtures for the
+new behavior and, at checkpoint boundaries, add reduced smoke fixtures inspired
+by real Pine examples from official docs or public indicator idioms.
+
 ## Syntax
 
 | Pine feature | Status | Notes |
@@ -84,7 +88,7 @@ Remaining gaps:
 | `ta.*` | Partial | Includes SMA, EMA, RSI, MACD, ATR, BB, VWAP, Supertrend, DMI, SAR, pivots, `barssince`, `valuewhen`, `vwma`, `highestbars`, `lowestbars`, `cross`, `range`, and more. |
 | `input.*` | Partial | Int, float, bool, string, color, and source exist. Generic `input()`, time, symbol, timeframe, session, and text area are missing. |
 | `color.*` | Partial | Core named colors and `color.new()` exist. RGB/from-gradient helpers are missing. |
-| `str.*` | Planned | Needed for labels, tables, and generated scripts. |
+| `str.*` | Partial | Common conversion, format, search, substring, case, trim, and replace helpers exist. |
 | `array.*` | Planned | High priority for common Pine idioms. |
 | `map.*` / `matrix.*` | Planned | Lower priority than arrays. |
 | `request.*` | Planned | Requires Tealchart datafeed design. Start with `request.security()`. |
@@ -125,3 +129,11 @@ The common TA helper pass covers event helpers (`ta.barssince`,
 `ta.valuewhen`), volume/window helpers (`ta.vwma`, `ta.highestbars`,
 `ta.lowestbars`), and compatibility aliases/helpers (`ta.cross`, `ta.range`).
 These are covered in the golden compatibility harness.
+
+## Common `str.*` Coverage
+
+The common string helper pass covers `str.tostring`, `str.format`,
+`str.length`, `str.contains`, `str.startswith`, `str.endswith`, `str.pos`,
+`str.substring`, `str.upper`, `str.lower`, `str.trim`, `str.replace`, and
+`str.replace_all`. These helpers support generated indicators that assemble
+labels, table text, and debug strings.
