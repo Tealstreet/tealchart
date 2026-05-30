@@ -233,7 +233,7 @@ arrayValue = [1, 2]
         if value > 0
             1
         else
-            -1
+            2
     else
         0
 `);
