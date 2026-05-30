@@ -20,16 +20,26 @@ thread.
 - **Worker** — a Web Worker entry (`src/worker/worker.ts`) plus a
   main-thread wrapper (`src/worker/TealScriptWorker.ts`) and message
   protocol so heavy indicator computation stays off the UI thread.
-- **Semantic analyzer** — `check()` returns typed diagnostics
-  (line/column/severity) suitable for driving Monaco-style editor
-  features (markers, hovers, signature help, completion).
-
 ## Status
 
 Early. The package is shipped as part of the
 [`tealchart`](https://github.com/Tealstreet/tealchart) charting stack,
 where it powers built-in and user-authored indicators. APIs may move
 without notice until 1.0.
+
+## Public package surface
+
+Supported entrypoints:
+
+- `@tealstreet/tealscript` — parser, runtime, AST, context, series, scope, and
+  worker wrapper exports.
+- `@tealstreet/tealscript/worker` — browser Worker entrypoint.
+
+Temporary compatibility entrypoint:
+
+- `@tealstreet/tealscript/src/*` — source-level imports remain available for
+  existing Tealchart integration code, but new consumers should prefer the root
+  package entrypoint or `./worker`.
 
 ## Install
 
@@ -41,7 +51,7 @@ mirror (e.g. as a git submodule) and let your bundler transpile the TypeScript.
 ## Quick start
 
 ```typescript
-import { check, parse, runScript } from '@tealstreet/tealscript';
+import { executeScript, parse } from '@tealstreet/tealscript';
 
 const source = `
 indicator("My SMA")
@@ -49,18 +59,12 @@ length = 14
 plot(ta.sma(close, length), color=color.blue, linewidth=2)
 `;
 
-// 1. Validate (parse + semantic check)
-const diagnostics = check(source).filter((d) => d.severity === 'error');
-if (diagnostics.length > 0) {
-  console.error(diagnostics);
-  process.exit(1);
-}
-
-// 2. Parse to AST
 const ast = parse(source);
+const result = executeScript(ast, [
+  { time: 1, open: 100, high: 101, low: 99, close: 100, volume: 1000 },
+]);
 
-// 3. (Optional) run via the worker harness against bar data — see the
-//    `src/worker/` files for the message protocol.
+console.log(result.plots);
 ```
 
 ## Architecture
@@ -81,12 +85,14 @@ Only the `worker/` entrypoint needs a real Web Worker environment.
 
 ```bash
 yarn build:parser
+yarn check:parser
 ```
 
 This runs `scripts/build-parser.js` to regenerate
 `src/parser/generated.js` and `src/parser/generated.d.ts` from
 `grammar.peggy`. **Always commit the generated files alongside grammar
-changes.**
+changes.** `yarn check:parser` verifies that checked-in parser artifacts are
+fresh, and `yarn test` runs that check before unit tests.
 
 ## Pine compatibility harness
 
