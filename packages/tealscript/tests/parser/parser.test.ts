@@ -309,6 +309,16 @@ describe('Tealscript Parser', () => {
           }));
         }
       });
+
+      it('does not split logical keyword prefixes inside identifiers', () => {
+        const ast = parse('orderFlow = 1\nandroid = orderFlow + 1\n');
+        const declarations = ast.body.filter((statement): statement is VariableDeclaration => statement.type === 'VariableDeclaration');
+
+        expect(declarations.map((declaration) => declaration.names.type === 'VariableDeclarator' ? declaration.names.name.name : null)).toEqual([
+          'orderFlow',
+          'android',
+        ]);
+      });
     });
 
     describe('Unary expressions', () => {
@@ -330,6 +340,16 @@ describe('Tealscript Parser', () => {
           operator: 'not',
           prefix: true,
         }));
+      });
+
+      it('does not split not prefix inside identifiers', () => {
+        const ast = parse('notes = 1\nvalue = notes + 1\n');
+        const declarations = ast.body.filter((statement): statement is VariableDeclaration => statement.type === 'VariableDeclaration');
+
+        expect(declarations.map((declaration) => declaration.names.type === 'VariableDeclarator' ? declaration.names.name.name : null)).toEqual([
+          'notes',
+          'value',
+        ]);
       });
     });
 

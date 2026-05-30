@@ -110,15 +110,18 @@ export type PlotStyle = 'line' | 'stepline' | 'histogram' | 'cross' | 'circles' 
  */
 export interface InputDefinition {
   id: string;
-  type: 'int' | 'float' | 'bool' | 'string' | 'source' | 'color';
+  type: 'int' | 'float' | 'bool' | 'string' | 'source' | 'color' | 'time' | 'timeframe' | 'symbol' | 'session' | 'text_area';
   title: string;
   defval: unknown;
   minval?: number;
   maxval?: number;
   step?: number;
-  options?: string[];
+  options?: unknown[];
   tooltip?: string;
   group?: string;
+  inline?: string;
+  confirm?: boolean;
+  display?: unknown;
 }
 
 /**
