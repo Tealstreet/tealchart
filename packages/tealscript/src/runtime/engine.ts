@@ -57,8 +57,8 @@ import {
   type PineArray,
 } from './arrays';
 import type { BuiltinRegistry } from './builtins/registry';
-import { registerDrawingConstants } from './builtins/drawings';
-import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type BoxDrawingOutput, type DrawingOutput, type InputDefinition, type LabelDrawingOutput, type LineDrawingOutput, type LineFillDrawingOutput, type PlotOutput, type PlotStyle } from './context';
+import { registerDrawingConstants, registerLabelBuiltins, type DrawingBuiltinRuntime } from './builtins/drawings';
+import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type BoxDrawingOutput, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LineFillDrawingOutput, type PlotOutput, type PlotStyle } from './context';
 import {
   getDrawingValue,
   toDrawingId as toDrawingIdValue,
@@ -853,138 +853,7 @@ export class TealscriptEngine {
   }
 
   private registerDrawingBuiltins(): void {
-    this.builtins.set('label.new', (args, namedArgs, ctx, _scope, callId) => {
-      const x = this.toNullableNumber(namedArgs.get('x') ?? args[0]);
-      const y = this.toNullableNumber(namedArgs.get('y') ?? args[1]);
-      const text = this.toStringValue(namedArgs.get('text') ?? args[2] ?? '');
-      const id = `label_${callId}_${ctx.bar_index}`;
-
-      ctx.addDrawing({
-        id,
-        type: 'label',
-        barIndex: ctx.bar_index,
-        x,
-        y,
-        text,
-        xloc: this.toStringValue(namedArgs.get('xloc') ?? 'bar_index'),
-        yloc: this.toStringValue(namedArgs.get('yloc') ?? 'price'),
-        style: this.toStringValue(namedArgs.get('style') ?? 'label_left'),
-        color: this.toNullableColor(namedArgs.get('color')),
-        textColor: this.toNullableColor(namedArgs.get('textcolor')),
-        size: this.toStringValue(namedArgs.get('size') ?? 'normal'),
-        tooltip: this.toOptionalString(namedArgs.get('tooltip') ?? args[10]),
-      });
-
-      return id;
-    });
-
-    this.builtins.set('label.delete', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => ctx.deleteDrawing(label.id));
-      return undefined;
-    });
-
-    this.builtins.set('label.copy', (args, _namedArgs, ctx, _scope, callId) => {
-      const labelId = this.toLabelId(args[0]);
-      if (!labelId) return Number.NaN;
-
-      const newId = `label_${callId}_${ctx.bar_index}`;
-      const copy = ctx.copyLabelDrawing(labelId, newId);
-      return copy ? newId : Number.NaN;
-    });
-
-    this.builtins.set('label.set_x', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.x = this.toNullableNumber(args[1]);
-        label.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_y', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.y = this.toNullableNumber(args[1]);
-        label.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_xy', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.x = this.toNullableNumber(args[1]);
-        label.y = this.toNullableNumber(args[2]);
-        label.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_text', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.text = this.toStringValue(args[1] ?? '');
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_xloc', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.x = this.toNullableNumber(args[1]);
-        label.xloc = this.toStringValue(args[2]);
-        label.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_yloc', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.yloc = this.toStringValue(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_style', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.style = this.toStringValue(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_color', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.color = this.toNullableColor(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_textcolor', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.textColor = this.toNullableColor(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_size', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.size = this.toStringValue(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_tooltip', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.tooltip = this.toOptionalString(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.get_x', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.x ?? Number.NaN));
-    this.builtins.set('label.get_y', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.y ?? Number.NaN));
-    this.builtins.set('label.get_text', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.text));
-    this.builtins.set('label.get_xloc', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.xloc));
-    this.builtins.set('label.get_yloc', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.yloc));
-    this.builtins.set('label.get_style', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.style));
-    this.builtins.set('label.get_color', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.color ?? Number.NaN));
-    this.builtins.set('label.get_textcolor', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.textColor ?? Number.NaN));
-    this.builtins.set('label.get_size', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.size));
-    this.builtins.set('label.get_tooltip', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.tooltip ?? ''));
+    registerLabelBuiltins(this.builtins, this.createDrawingBuiltinRuntime());
 
     this.builtins.set('line.new', (args, namedArgs, ctx, _scope, callId) => {
       const x1 = this.toNullableNumber(namedArgs.get('x1') ?? args[0]);
@@ -1299,8 +1168,14 @@ export class TealscriptEngine {
     registerDrawingConstants(this.builtins);
   }
 
-  private toLabelId(value: unknown): string | undefined {
-    return this.toDrawingId(value);
+  private createDrawingBuiltinRuntime(): DrawingBuiltinRuntime {
+    return {
+      isNa: (value) => this.isNa(value),
+      toNullableNumber: (value) => this.toNullableNumber(value),
+      toStringValue: (value) => this.toStringValue(value),
+      toNullableColor: (value) => this.toNullableColor(value),
+      toOptionalString: (value) => this.toOptionalString(value),
+    };
   }
 
   private toDrawingId(value: unknown): string | undefined {
@@ -1309,14 +1184,6 @@ export class TealscriptEngine {
 
   private toLineWidth(value: unknown): number {
     return toLineWidthValue(value, (candidate, min, max) => this.clampNumber(candidate, min, max));
-  }
-
-  private withLabel(value: unknown, ctx: ExecutionContext, fn: (label: LabelDrawingOutput) => void): void {
-    withDrawing(value, ctx, 'label', (candidate) => this.isNa(candidate), fn);
-  }
-
-  private getLabelValue<T>(value: unknown, ctx: ExecutionContext, fn: (label: LabelDrawingOutput) => T): T | number {
-    return getDrawingValue(value, ctx, 'label', (candidate) => this.isNa(candidate), fn);
   }
 
   private withLine(value: unknown, ctx: ExecutionContext, fn: (line: LineDrawingOutput) => void): void {
