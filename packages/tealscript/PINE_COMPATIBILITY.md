@@ -108,8 +108,8 @@ derived regular-series history, and unavailable or future offsets returning
 | Pine feature | Status | Notes |
 | --- | --- | --- |
 | `plot` | Partial | Common line, break-line, step, histogram, marker, column, and area style constants work; full parameter rendering parity is incomplete. |
-| `hline` | Partial | Static horizontal lines work. Handle semantics need fill coverage. |
-| `fill` | Partial | Uses plot IDs, not full Pine handle semantics. |
+| `hline` | Partial | Static horizontal lines work and return handles usable by `fill`. |
+| `fill` | Partial | Accepts `plot()` and `hline()` handles, plus legacy title references; advanced fill parameters are incomplete. |
 | `bgcolor` | Supported | Produces background outputs. |
 | `plotshape`, `plotchar`, `plotarrow` | Partial | Core outputs exist; styling parity is incomplete. |
 | `barcolor` | Supported | Produces per-bar candle color outputs consumed by the main-pane renderer. |
