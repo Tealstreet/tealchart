@@ -128,6 +128,23 @@ plot(downScore(close - open), title="Down Score")
     expect(roundSeries(getPlot(result, 'Down Score').values)).toEqual([null, null, null, -1, -1, null, null, null, -1, null, -1, null]);
   });
 
+  it('runs user-defined function if else branch returns', () => {
+    const result = runCompatScript(`
+indicator("UDF if else branch")
+classify(value) =>
+    if value > 0
+        1
+    else if value < 0
+        -1
+    else
+        0
+plot(classify(close - open), title="Candle Direction")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Candle Direction').values)).toEqual([1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, 1]);
+  });
+
   it('keeps function-local variables scoped to the function call', () => {
     const result = runCompatScript(`
 indicator("UDF local scope")
