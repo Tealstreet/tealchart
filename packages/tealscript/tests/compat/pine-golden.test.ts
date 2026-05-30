@@ -835,14 +835,20 @@ for value in values
         break
     selected += value
 
+indexed = 0
+for [index, value] in values
+    indexed += index * value
+
 plot(sumOdds, title="Odd Sum")
 plot(descending, title="Descending Sum")
 plot(selected, title="Selected Sum")
+plot(indexed, title="Indexed Sum")
 `);
 
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Odd Sum').values).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
     expect(getPlot(result, 'Descending Sum').values).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
     expect(getPlot(result, 'Selected Sum').values).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+    expect(getPlot(result, 'Indexed Sum').values).toEqual([20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]);
   });
 });

@@ -431,11 +431,15 @@ export class TealscriptEngine {
     let iterations = 0;
 
     try {
-      for (const value of values) {
+      for (let index = 0; index < values.length; index++) {
         if (++iterations > TealscriptEngine.MAX_LOOP_ITERATIONS) {
           throw new Error('Maximum loop iterations exceeded');
         }
 
+        const value = values[index];
+        if (stmt.indexCounter) {
+          this.scope.declare(stmt.indexCounter.name, 'none', index);
+        }
         this.scope.declare(stmt.counter.name, 'none', value);
 
         try {

@@ -726,6 +726,23 @@ plot(sum)`;
       expect(result.plots[0].values[0]).toBe(6);
     });
 
+    it('executes collection for loop with Pine index and value tuple', () => {
+      const script = `//@version=6
+indicator("Test")
+values = array.from(10, 20, 30)
+sum = 0
+for [index, value] in values
+    sum := sum + index + value
+plot(sum)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values[0]).toBe(63);
+    });
+
     it('honors break and continue inside collection for loop', () => {
       const script = `//@version=6
 indicator("Test")
