@@ -1314,6 +1314,14 @@ export class TealscriptEngine {
     this.builtins.set('color.rgb', (args, namedArgs) =>
       this.formatColor(args[0], args[1], args[2], namedArgs.get('transp') ?? namedArgs.get('transparency') ?? args[3] ?? 0),
     );
+
+    this.builtins.set('color.r', (args) => this.parseColor(args[0])?.red ?? Number.NaN);
+    this.builtins.set('color.g', (args) => this.parseColor(args[0])?.green ?? Number.NaN);
+    this.builtins.set('color.b', (args) => this.parseColor(args[0])?.blue ?? Number.NaN);
+    this.builtins.set('color.t', (args) => {
+      const parsedColor = this.parseColor(args[0]);
+      return parsedColor ? this.alphaToTransparency(parsedColor.alpha) : Number.NaN;
+    });
   }
 
   private registerVisualConstants(): void {

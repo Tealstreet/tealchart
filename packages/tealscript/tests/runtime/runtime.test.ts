@@ -468,6 +468,27 @@ plot(high, "Updated", color=updated)
       expect(result.plots[2].color).toEqual(Array(bars.length).fill('#2196F3BF'));
     });
 
+    it('extracts color channels and transparency', () => {
+      const code = `//@version=6
+indicator("Test")
+sample = color.rgb(10, 20, 30, 40)
+plot(color.r(sample), "Red")
+plot(color.g(sample), "Green")
+plot(color.b(sample), "Blue")
+plot(color.t(sample), "Transparency")
+plot(color.r(color.blue), "Named Red")
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values).toEqual(Array(bars.length).fill(10));
+      expect(result.plots[1].values).toEqual(Array(bars.length).fill(20));
+      expect(result.plots[2].values).toEqual(Array(bars.length).fill(30));
+      expect(result.plots[3].values).toEqual(Array(bars.length).fill(40));
+      expect(result.plots[4].values).toEqual(Array(bars.length).fill(33));
+    });
+
     it('creates hline', () => {
       const code = `//@version=6
 indicator("Test")
