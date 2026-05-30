@@ -501,6 +501,23 @@ plot(close)`;
       ]);
     });
 
+    it('rejects linefill drawings created with non-line handles', () => {
+      const script = `//@version=6
+indicator("Linefill handle validation")
+var marker = label.new(0, close, text="not-line")
+var upper = line.new(0, high, 1, high)
+linefill.new(marker, upper, color=color.red)
+linefill.new("missing", upper, color=color.blue)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings.map((drawing) => drawing.type)).toEqual(['label', 'line']);
+    });
+
     it('mutates, reads, copies, and deletes box drawings by handle', () => {
       const script = `//@version=6
 indicator("Box objects")

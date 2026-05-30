@@ -56,7 +56,15 @@ import {
   unshiftArrayValue,
   type PineArray,
 } from './arrays';
-import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type BoxDrawingOutput, type DrawingOutput, type InputDefinition, type LabelDrawingOutput, type LineDrawingOutput, type LineFillDrawingOutput, type PlotOutput, type PlotStyle } from './context';
+import type { BuiltinRegistry } from './builtins/registry';
+import { registerBoxBuiltins, registerDrawingConstants, registerLabelBuiltins, registerLineBuiltins, registerLineFillBuiltins, type DrawingBuiltinRuntime } from './builtins/drawings';
+import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type PlotOutput, type PlotStyle } from './context';
+import {
+  getDrawingValue,
+  toDrawingId as toDrawingIdValue,
+  toLineWidth as toLineWidthValue,
+  withDrawing,
+} from './drawings/helpers';
 import { Scope, createRootScope } from './scope';
 
 /**
@@ -82,17 +90,6 @@ export interface ExecutionError {
 }
 
 /**
- * Built-in function signature
- */
-type BuiltinFunction = (
-  args: unknown[],
-  namedArgs: Map<string, unknown>,
-  ctx: ExecutionContext,
-  scope: Scope,
-  callId: string,
-) => unknown;
-
-/**
  * Tealscript Engine - executes AST bar-by-bar
  */
 export class TealscriptEngine {
@@ -100,7 +97,7 @@ export class TealscriptEngine {
 
   private ctx: ExecutionContext;
   private scope: Scope;
-  private builtins: Map<string, BuiltinFunction>;
+  private builtins: BuiltinRegistry;
   private userFunctions: Map<string, FunctionDeclaration>;
   private functionScopes: Map<string, Scope>;
   private userFunctionCallStack: string[] = [];
@@ -856,578 +853,44 @@ export class TealscriptEngine {
   }
 
   private registerDrawingBuiltins(): void {
-    this.builtins.set('label.new', (args, namedArgs, ctx, _scope, callId) => {
-      const x = this.toNullableNumber(namedArgs.get('x') ?? args[0]);
-      const y = this.toNullableNumber(namedArgs.get('y') ?? args[1]);
-      const text = this.toStringValue(namedArgs.get('text') ?? args[2] ?? '');
-      const id = `label_${callId}_${ctx.bar_index}`;
+    registerLabelBuiltins(this.builtins, this.createDrawingBuiltinRuntime());
+    registerLineBuiltins(this.builtins, this.createDrawingBuiltinRuntime());
+    registerLineFillBuiltins(this.builtins, this.createDrawingBuiltinRuntime());
+    registerBoxBuiltins(this.builtins, this.createDrawingBuiltinRuntime());
 
-      ctx.addDrawing({
-        id,
-        type: 'label',
-        barIndex: ctx.bar_index,
-        x,
-        y,
-        text,
-        xloc: this.toStringValue(namedArgs.get('xloc') ?? 'bar_index'),
-        yloc: this.toStringValue(namedArgs.get('yloc') ?? 'price'),
-        style: this.toStringValue(namedArgs.get('style') ?? 'label_left'),
-        color: this.toNullableColor(namedArgs.get('color')),
-        textColor: this.toNullableColor(namedArgs.get('textcolor')),
-        size: this.toStringValue(namedArgs.get('size') ?? 'normal'),
-        tooltip: this.toOptionalString(namedArgs.get('tooltip') ?? args[10]),
-      });
-
-      return id;
-    });
-
-    this.builtins.set('label.delete', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => ctx.deleteDrawing(label.id));
-      return undefined;
-    });
-
-    this.builtins.set('label.copy', (args, _namedArgs, ctx, _scope, callId) => {
-      const labelId = this.toLabelId(args[0]);
-      if (!labelId) return Number.NaN;
-
-      const newId = `label_${callId}_${ctx.bar_index}`;
-      const copy = ctx.copyLabelDrawing(labelId, newId);
-      return copy ? newId : Number.NaN;
-    });
-
-    this.builtins.set('label.set_x', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.x = this.toNullableNumber(args[1]);
-        label.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_y', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.y = this.toNullableNumber(args[1]);
-        label.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_xy', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.x = this.toNullableNumber(args[1]);
-        label.y = this.toNullableNumber(args[2]);
-        label.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_text', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.text = this.toStringValue(args[1] ?? '');
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_xloc', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.x = this.toNullableNumber(args[1]);
-        label.xloc = this.toStringValue(args[2]);
-        label.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_yloc', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.yloc = this.toStringValue(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_style', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.style = this.toStringValue(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_color', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.color = this.toNullableColor(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_textcolor', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.textColor = this.toNullableColor(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_size', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.size = this.toStringValue(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.set_tooltip', (args, _namedArgs, ctx) => {
-      this.withLabel(args[0], ctx, (label) => {
-        label.tooltip = this.toOptionalString(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('label.get_x', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.x ?? Number.NaN));
-    this.builtins.set('label.get_y', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.y ?? Number.NaN));
-    this.builtins.set('label.get_text', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.text));
-    this.builtins.set('label.get_xloc', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.xloc));
-    this.builtins.set('label.get_yloc', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.yloc));
-    this.builtins.set('label.get_style', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.style));
-    this.builtins.set('label.get_color', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.color ?? Number.NaN));
-    this.builtins.set('label.get_textcolor', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.textColor ?? Number.NaN));
-    this.builtins.set('label.get_size', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.size));
-    this.builtins.set('label.get_tooltip', (args, _namedArgs, ctx) => this.getLabelValue(args[0], ctx, (label) => label.tooltip ?? ''));
-
-    this.builtins.set('line.new', (args, namedArgs, ctx, _scope, callId) => {
-      const x1 = this.toNullableNumber(namedArgs.get('x1') ?? args[0]);
-      const y1 = this.toNullableNumber(namedArgs.get('y1') ?? args[1]);
-      const x2 = this.toNullableNumber(namedArgs.get('x2') ?? args[2]);
-      const y2 = this.toNullableNumber(namedArgs.get('y2') ?? args[3]);
-      const id = `line_${callId}_${ctx.bar_index}`;
-
-      ctx.addDrawing({
-        id,
-        type: 'line',
-        barIndex: ctx.bar_index,
-        x1,
-        y1,
-        x2,
-        y2,
-        xloc: this.toStringValue(namedArgs.get('xloc') ?? args[4] ?? 'bar_index'),
-        extend: this.toStringValue(namedArgs.get('extend') ?? args[5] ?? 'none'),
-        color: this.toNullableColor(namedArgs.get('color') ?? args[6]),
-        style: this.toStringValue(namedArgs.get('style') ?? args[7] ?? 'solid'),
-        width: this.toLineWidth(namedArgs.get('width') ?? args[8]),
-        forceOverlay: Boolean(namedArgs.get('force_overlay') ?? args[9] ?? false),
-      });
-
-      return id;
-    });
-
-    this.builtins.set('line.delete', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => ctx.deleteDrawing(line.id));
-      return undefined;
-    });
-
-    this.builtins.set('line.copy', (args, _namedArgs, ctx, _scope, callId) => {
-      const lineId = this.toDrawingId(args[0]);
-      if (!lineId) return Number.NaN;
-
-      const newId = `line_${callId}_${ctx.bar_index}`;
-      const copy = ctx.copyLineDrawing(lineId, newId);
-      return copy ? newId : Number.NaN;
-    });
-
-    this.builtins.set('line.set_x1', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.x1 = this.toNullableNumber(args[1]);
-        line.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_x2', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.x2 = this.toNullableNumber(args[1]);
-        line.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_y1', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.y1 = this.toNullableNumber(args[1]);
-        line.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_y2', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.y2 = this.toNullableNumber(args[1]);
-        line.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_xy1', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.x1 = this.toNullableNumber(args[1]);
-        line.y1 = this.toNullableNumber(args[2]);
-        line.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_xy2', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.x2 = this.toNullableNumber(args[1]);
-        line.y2 = this.toNullableNumber(args[2]);
-        line.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_xloc', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.x1 = this.toNullableNumber(args[1]);
-        line.x2 = this.toNullableNumber(args[2]);
-        line.xloc = this.toStringValue(args[3]);
-        line.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_extend', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.extend = this.toStringValue(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_color', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.color = this.toNullableColor(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_style', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.style = this.toStringValue(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.set_width', (args, _namedArgs, ctx) => {
-      this.withLine(args[0], ctx, (line) => {
-        line.width = this.toLineWidth(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('line.get_x1', (args, _namedArgs, ctx) => this.getLineValue(args[0], ctx, (line) => line.x1 ?? Number.NaN));
-    this.builtins.set('line.get_x2', (args, _namedArgs, ctx) => this.getLineValue(args[0], ctx, (line) => line.x2 ?? Number.NaN));
-    this.builtins.set('line.get_y1', (args, _namedArgs, ctx) => this.getLineValue(args[0], ctx, (line) => line.y1 ?? Number.NaN));
-    this.builtins.set('line.get_y2', (args, _namedArgs, ctx) => this.getLineValue(args[0], ctx, (line) => line.y2 ?? Number.NaN));
-    this.builtins.set('line.get_price', (args, _namedArgs, ctx) => {
-      const x = this.toNumber(args[1]);
-      return this.getLineValue(args[0], ctx, (line) => this.interpolateLinePrice(line, x));
-    });
-
-    this.builtins.set('linefill.new', (args, namedArgs, ctx, _scope, callId) => {
-      const line1 = this.toDrawingId(namedArgs.get('line1') ?? args[0]);
-      const line2 = this.toDrawingId(namedArgs.get('line2') ?? args[1]);
-      if (!line1 || !line2) return Number.NaN;
-
-      const id = `linefill_${callId}_${ctx.bar_index}`;
-      ctx.addDrawing({
-        id,
-        type: 'linefill',
-        barIndex: ctx.bar_index,
-        line1,
-        line2,
-        color: this.toNullableColor(namedArgs.get('color') ?? args[2]),
-      });
-
-      return id;
-    });
-
-    this.builtins.set('linefill.delete', (args, _namedArgs, ctx) => {
-      this.withLineFill(args[0], ctx, (linefill) => ctx.deleteDrawing(linefill.id));
-      return undefined;
-    });
-
-    this.builtins.set('linefill.set_color', (args, _namedArgs, ctx) => {
-      this.withLineFill(args[0], ctx, (linefill) => {
-        linefill.color = this.toNullableColor(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('linefill.get_line1', (args, _namedArgs, ctx) => this.getLineFillValue(args[0], ctx, (linefill) => linefill.line1));
-    this.builtins.set('linefill.get_line2', (args, _namedArgs, ctx) => this.getLineFillValue(args[0], ctx, (linefill) => linefill.line2));
-
-    this.builtins.set('box.new', (args, namedArgs, ctx, _scope, callId) => {
-      const id = `box_${callId}_${ctx.bar_index}`;
-
-      ctx.addDrawing({
-        id,
-        type: 'box',
-        barIndex: ctx.bar_index,
-        left: this.toNullableNumber(namedArgs.get('left') ?? args[0]),
-        top: this.toNullableNumber(namedArgs.get('top') ?? args[1]),
-        right: this.toNullableNumber(namedArgs.get('right') ?? args[2]),
-        bottom: this.toNullableNumber(namedArgs.get('bottom') ?? args[3]),
-        borderColor: this.toNullableColor(namedArgs.get('border_color') ?? args[4]),
-        borderWidth: this.toLineWidth(namedArgs.get('border_width') ?? args[5]),
-        borderStyle: this.toStringValue(namedArgs.get('border_style') ?? args[6] ?? 'solid'),
-        extend: this.toStringValue(namedArgs.get('extend') ?? args[7] ?? 'none'),
-        xloc: this.toStringValue(namedArgs.get('xloc') ?? args[8] ?? 'bar_index'),
-        bgcolor: this.toNullableColor(namedArgs.get('bgcolor') ?? args[9]),
-        text: this.toStringValue(namedArgs.get('text') ?? args[10] ?? ''),
-        textSize: this.toStringValue(namedArgs.get('text_size') ?? args[11] ?? 'normal'),
-        textColor: this.toNullableColor(namedArgs.get('text_color') ?? args[12]),
-      });
-
-      return id;
-    });
-
-    this.builtins.set('box.delete', (args, _namedArgs, ctx) => {
-      this.withBox(args[0], ctx, (box) => ctx.deleteDrawing(box.id));
-      return undefined;
-    });
-
-    this.builtins.set('box.copy', (args, _namedArgs, ctx, _scope, callId) => {
-      const boxId = this.toDrawingId(args[0]);
-      if (!boxId) return Number.NaN;
-
-      const newId = `box_${callId}_${ctx.bar_index}`;
-      const copy = ctx.copyBoxDrawing(boxId, newId);
-      return copy ? newId : Number.NaN;
-    });
-
-    this.builtins.set('box.set_left', (args, _namedArgs, ctx) => {
-      this.withBox(args[0], ctx, (box) => {
-        box.left = this.toNullableNumber(args[1]);
-        box.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-    this.builtins.set('box.set_right', (args, _namedArgs, ctx) => {
-      this.withBox(args[0], ctx, (box) => {
-        box.right = this.toNullableNumber(args[1]);
-        box.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-    this.builtins.set('box.set_top', (args, _namedArgs, ctx) => {
-      this.withBox(args[0], ctx, (box) => {
-        box.top = this.toNullableNumber(args[1]);
-        box.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-    this.builtins.set('box.set_bottom', (args, _namedArgs, ctx) => {
-      this.withBox(args[0], ctx, (box) => {
-        box.bottom = this.toNullableNumber(args[1]);
-        box.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-    this.builtins.set('box.set_lefttop', (args, _namedArgs, ctx) => {
-      this.withBox(args[0], ctx, (box) => {
-        box.left = this.toNullableNumber(args[1]);
-        box.top = this.toNullableNumber(args[2]);
-        box.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-    this.builtins.set('box.set_rightbottom', (args, _namedArgs, ctx) => {
-      this.withBox(args[0], ctx, (box) => {
-        box.right = this.toNullableNumber(args[1]);
-        box.bottom = this.toNullableNumber(args[2]);
-        box.barIndex = ctx.bar_index;
-      });
-      return undefined;
-    });
-    this.builtins.set('box.set_bgcolor', (args, _namedArgs, ctx) => {
-      this.withBox(args[0], ctx, (box) => {
-        box.bgcolor = this.toNullableColor(args[1]);
-      });
-      return undefined;
-    });
-    this.builtins.set('box.set_border_color', (args, _namedArgs, ctx) => {
-      this.withBox(args[0], ctx, (box) => {
-        box.borderColor = this.toNullableColor(args[1]);
-      });
-      return undefined;
-    });
-    this.builtins.set('box.set_border_width', (args, _namedArgs, ctx) => {
-      this.withBox(args[0], ctx, (box) => {
-        box.borderWidth = this.toLineWidth(args[1]);
-      });
-      return undefined;
-    });
-    this.builtins.set('box.set_border_style', (args, _namedArgs, ctx) => {
-      this.withBox(args[0], ctx, (box) => {
-        box.borderStyle = this.toStringValue(args[1]);
-      });
-      return undefined;
-    });
-    this.builtins.set('box.set_extend', (args, _namedArgs, ctx) => {
-      this.withBox(args[0], ctx, (box) => {
-        box.extend = this.toStringValue(args[1]);
-      });
-      return undefined;
-    });
-    this.builtins.set('box.set_text', (args, _namedArgs, ctx) => {
-      this.withBox(args[0], ctx, (box) => {
-        box.text = this.toStringValue(args[1] ?? '');
-      });
-      return undefined;
-    });
-    this.builtins.set('box.set_text_color', (args, _namedArgs, ctx) => {
-      this.withBox(args[0], ctx, (box) => {
-        box.textColor = this.toNullableColor(args[1]);
-      });
-      return undefined;
-    });
-    this.builtins.set('box.set_text_size', (args, _namedArgs, ctx) => {
-      this.withBox(args[0], ctx, (box) => {
-        box.textSize = this.toStringValue(args[1]);
-      });
-      return undefined;
-    });
-
-    this.builtins.set('box.get_left', (args, _namedArgs, ctx) => this.getBoxValue(args[0], ctx, (box) => box.left ?? Number.NaN));
-    this.builtins.set('box.get_right', (args, _namedArgs, ctx) => this.getBoxValue(args[0], ctx, (box) => box.right ?? Number.NaN));
-    this.builtins.set('box.get_top', (args, _namedArgs, ctx) => this.getBoxValue(args[0], ctx, (box) => box.top ?? Number.NaN));
-    this.builtins.set('box.get_bottom', (args, _namedArgs, ctx) => this.getBoxValue(args[0], ctx, (box) => box.bottom ?? Number.NaN));
-    this.builtins.set('box.get_bgcolor', (args, _namedArgs, ctx) => this.getBoxValue(args[0], ctx, (box) => box.bgcolor ?? Number.NaN));
-    this.builtins.set('box.get_border_color', (args, _namedArgs, ctx) => this.getBoxValue(args[0], ctx, (box) => box.borderColor ?? Number.NaN));
-    this.builtins.set('box.get_text', (args, _namedArgs, ctx) => this.getBoxValue(args[0], ctx, (box) => box.text));
-
-    const constants: Record<string, string> = {
-      'xloc.bar_index': 'bar_index',
-      'xloc.bar_time': 'bar_time',
-      'extend.none': 'none',
-      'extend.right': 'right',
-      'extend.left': 'left',
-      'extend.both': 'both',
-      'yloc.price': 'price',
-      'yloc.abovebar': 'abovebar',
-      'yloc.belowbar': 'belowbar',
-      'line.style_solid': 'solid',
-      'line.style_dotted': 'dotted',
-      'line.style_dashed': 'dashed',
-      'line.style_arrow_left': 'arrow_left',
-      'line.style_arrow_right': 'arrow_right',
-      'line.style_arrow_both': 'arrow_both',
-      'label.style_none': 'none',
-      'label.style_label_up': 'label_up',
-      'label.style_label_down': 'label_down',
-      'label.style_label_left': 'label_left',
-      'label.style_label_right': 'label_right',
-      'label.style_label_lower_left': 'label_lower_left',
-      'label.style_label_lower_right': 'label_lower_right',
-      'label.style_label_upper_left': 'label_upper_left',
-      'label.style_label_upper_right': 'label_upper_right',
-      'label.style_circle': 'circle',
-      'label.style_square': 'square',
-      'label.style_diamond': 'diamond',
-      'label.style_cross': 'cross',
-      'label.style_xcross': 'xcross',
-      'label.style_triangleup': 'triangleup',
-      'label.style_triangledown': 'triangledown',
-      'label.style_flag': 'flag',
-      'label.style_arrowup': 'arrowup',
-      'label.style_arrowdown': 'arrowdown',
-    };
-
-    for (const [name, value] of Object.entries(constants)) {
-      this.builtins.set(name, () => value);
-    }
+    registerDrawingConstants(this.builtins);
   }
 
-  private toLabelId(value: unknown): string | undefined {
-    return this.toDrawingId(value);
+  private createDrawingBuiltinRuntime(): DrawingBuiltinRuntime {
+    return {
+      isNa: (value) => this.isNa(value),
+      toNullableNumber: (value) => this.toNullableNumber(value),
+      toStringValue: (value) => this.toStringValue(value),
+      toNumber: (value) => this.toNumber(value),
+      toNullableColor: (value) => this.toNullableColor(value),
+      toOptionalString: (value) => this.toOptionalString(value),
+      toLineWidth: (value) => this.toLineWidth(value),
+      toDrawingId: (value) => this.toDrawingId(value),
+      withLine: (value, ctx, fn) => this.withLine(value, ctx, fn),
+      getLineValue: (value, ctx, fn) => this.getLineValue(value, ctx, fn),
+      interpolateLinePrice: (line, x) => this.interpolateLinePrice(line, x),
+    };
   }
 
   private toDrawingId(value: unknown): string | undefined {
-    if (value === null || value === undefined || this.isNa(value)) return undefined;
-    return String(value);
+    return toDrawingIdValue(value, (candidate) => this.isNa(candidate));
   }
 
   private toLineWidth(value: unknown): number {
-    return Math.max(1, this.clampNumber(value ?? 1, 1, 100));
-  }
-
-  private withLabel(value: unknown, ctx: ExecutionContext, fn: (label: LabelDrawingOutput) => void): void {
-    const labelId = this.toLabelId(value);
-    if (!labelId) return;
-
-    const drawing = ctx.getDrawing(labelId);
-    if (drawing?.type === 'label') {
-      fn(drawing);
-    }
-  }
-
-  private getLabelValue<T>(value: unknown, ctx: ExecutionContext, fn: (label: LabelDrawingOutput) => T): T | number {
-    const labelId = this.toLabelId(value);
-    if (!labelId) return Number.NaN;
-
-    const drawing = ctx.getDrawing(labelId);
-    if (drawing?.type !== 'label') return Number.NaN;
-    return fn(drawing);
+    return toLineWidthValue(value, (candidate, min, max) => this.clampNumber(candidate, min, max));
   }
 
   private withLine(value: unknown, ctx: ExecutionContext, fn: (line: LineDrawingOutput) => void): void {
-    const lineId = this.toDrawingId(value);
-    if (!lineId) return;
-
-    const drawing = ctx.getDrawing(lineId);
-    if (drawing?.type === 'line') {
-      fn(drawing);
-    }
+    withDrawing(value, ctx, 'line', (candidate) => this.isNa(candidate), fn);
   }
 
   private getLineValue<T>(value: unknown, ctx: ExecutionContext, fn: (line: LineDrawingOutput) => T): T | number {
-    const lineId = this.toDrawingId(value);
-    if (!lineId) return Number.NaN;
-
-    const drawing = ctx.getDrawing(lineId);
-    if (drawing?.type !== 'line') return Number.NaN;
-    return fn(drawing);
-  }
-
-  private withLineFill(value: unknown, ctx: ExecutionContext, fn: (linefill: LineFillDrawingOutput) => void): void {
-    const lineFillId = this.toDrawingId(value);
-    if (!lineFillId) return;
-
-    const drawing = ctx.getDrawing(lineFillId);
-    if (drawing?.type === 'linefill') {
-      fn(drawing);
-    }
-  }
-
-  private getLineFillValue<T>(value: unknown, ctx: ExecutionContext, fn: (linefill: LineFillDrawingOutput) => T): T | number {
-    const lineFillId = this.toDrawingId(value);
-    if (!lineFillId) return Number.NaN;
-
-    const drawing = ctx.getDrawing(lineFillId);
-    if (drawing?.type !== 'linefill') return Number.NaN;
-    return fn(drawing);
-  }
-
-  private withBox(value: unknown, ctx: ExecutionContext, fn: (box: BoxDrawingOutput) => void): void {
-    const boxId = this.toDrawingId(value);
-    if (!boxId) return;
-
-    const drawing = ctx.getDrawing(boxId);
-    if (drawing?.type === 'box') {
-      fn(drawing);
-    }
-  }
-
-  private getBoxValue<T>(value: unknown, ctx: ExecutionContext, fn: (box: BoxDrawingOutput) => T): T | number {
-    const boxId = this.toDrawingId(value);
-    if (!boxId) return Number.NaN;
-
-    const drawing = ctx.getDrawing(boxId);
-    if (drawing?.type !== 'box') return Number.NaN;
-    return fn(drawing);
+    return getDrawingValue(value, ctx, 'line', (candidate) => this.isNa(candidate), fn);
   }
 
   private interpolateLinePrice(line: LineDrawingOutput, x: number): number {
