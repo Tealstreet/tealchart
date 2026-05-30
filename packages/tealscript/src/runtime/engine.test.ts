@@ -105,6 +105,37 @@ plot(barstate.islastconfirmedhistory ? 1 : 0, title="Last Confirmed History")`;
       expect(result.plots.find((plot) => plot.title === 'Last Confirmed History')?.values).toEqual([0, 0, 1]);
     });
 
+    it('exposes Pine syminfo and timeframe values through member access', () => {
+      const script = `//@version=6
+indicator("Chart Info")
+plot(str.length(syminfo.ticker), title="Ticker Length")
+plot(str.length(syminfo.tickerid), title="Ticker ID Length")
+plot(str.length(syminfo.root), title="Root Length")
+plot(syminfo.mintick, title="Min Tick")
+plot(syminfo.minmove, title="Min Move")
+plot(timeframe.multiplier, title="Timeframe Multiplier")
+plot(str.length(timeframe.period), title="Timeframe Period Length")
+plot(timeframe.isintraday ? 1 : 0, title="Intraday")
+plot(timeframe.isdwm ? 1 : 0, title="DWM")
+plot(str.length(timeframe.main_period), title="Main Period Length")`;
+
+      const ast = parse(script);
+      const bars = createBars(2);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Ticker Length')?.values).toEqual([7, 7]);
+      expect(result.plots.find((plot) => plot.title === 'Ticker ID Length')?.values).toEqual([7, 7]);
+      expect(result.plots.find((plot) => plot.title === 'Root Length')?.values).toEqual([3, 3]);
+      expect(result.plots.find((plot) => plot.title === 'Min Tick')?.values).toEqual([0.01, 0.01]);
+      expect(result.plots.find((plot) => plot.title === 'Min Move')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Timeframe Multiplier')?.values).toEqual([60, 60]);
+      expect(result.plots.find((plot) => plot.title === 'Timeframe Period Length')?.values).toEqual([2, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Intraday')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'DWM')?.values).toEqual([0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Main Period Length')?.values).toEqual([2, 2]);
+    });
+
     it('keeps multiple untitled plots as separate series', () => {
       const script = `//@version=6
 indicator("Test")
