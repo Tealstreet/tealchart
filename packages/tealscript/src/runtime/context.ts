@@ -113,6 +113,25 @@ export interface PlotOutput {
   plot2Id?: string;
 }
 
+export interface LabelDrawingOutput {
+  id: string;
+  type: 'label';
+  /** Script ID that produced this drawing (set by TealscriptManager). */
+  scriptId?: string;
+  barIndex: number;
+  x: number | null;
+  y: number | null;
+  text: string;
+  xloc: string;
+  yloc: string;
+  style: string;
+  color: string | null;
+  textColor: string | null;
+  size: string;
+}
+
+export type DrawingOutput = LabelDrawingOutput;
+
 export type PlotStyle =
   | 'line'
   | 'linebr'
@@ -249,6 +268,13 @@ export class ExecutionContext {
 
   /** Plot order (for layering) */
   readonly plotOrder: string[] = [];
+
+  // =========================================================================
+  // Drawing Outputs
+  // =========================================================================
+
+  /** Drawing object outputs (populated during execution) */
+  readonly drawings: DrawingOutput[] = [];
 
   // =========================================================================
   // Alert Outputs
@@ -542,6 +568,30 @@ export class ExecutionContext {
     return this.plotOrder.map((id) => this.plots.get(id)!).filter(Boolean);
   }
 
+  /**
+   * Add a drawing object output.
+   */
+  addDrawing(drawing: DrawingOutput): void {
+    this.drawings.push(drawing);
+  }
+
+  /**
+   * Get all drawing outputs as array.
+   */
+  getDrawings(): DrawingOutput[] {
+    return [...this.drawings];
+  }
+
+  /**
+   * Remove drawing outputs from a bar index onward.
+   */
+  truncateDrawings(fromBarIndex: number): void {
+    const keepCount = this.drawings.findIndex((drawing) => drawing.barIndex >= fromBarIndex);
+    if (keepCount >= 0) {
+      this.drawings.length = keepCount;
+    }
+  }
+
   // =========================================================================
   // Alert Management
   // =========================================================================
@@ -633,6 +683,7 @@ export class ExecutionContext {
     this.bar_index = -1;
     this.plots.clear();
     this.plotOrder.length = 0;
+    this.drawings.length = 0;
     this.alerts.clear();
     this.alertOrder.length = 0;
     this.indicatorTitle = 'Untitled';

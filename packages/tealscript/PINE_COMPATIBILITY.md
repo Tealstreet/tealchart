@@ -119,7 +119,8 @@ derived regular-series history, and unavailable or future offsets returning
 | `plotshape`, `plotchar`, `plotarrow` | Partial | Core outputs exist; styling parity is incomplete. |
 | `barcolor` | Supported | Produces per-bar candle color outputs consumed by the main-pane renderer. |
 | `plotbar`, `plotcandle` | Supported | Produce OHLC outputs with per-bar body, wick, and border colors; renderer draws custom bars/candles. |
-| `line.*`, `label.*`, `box.*`, `table.*` | Planned | Namespace calls report explicit unsupported runtime diagnostics. Object lifecycle and renderer support are still planned. |
+| `label.*` | Partial | `label.new()` emits typed runtime drawing outputs and `label.delete()` is accepted as a no-op. Setters/getters, lifecycle mutation, GC limits, and renderer support are still planned. |
+| `line.*`, `box.*`, `table.*` | Planned | Namespace calls report explicit unsupported runtime diagnostics. Object lifecycle and renderer support are still planned. |
 
 ## Alerts, Strategies, And Data
 
@@ -267,11 +268,20 @@ as `indicatorMaxBarsBack`. Values must be finite, non-negative integers. The
 runtime still keeps full loaded history and does not infer or enforce Pine's
 history buffer sizing rules yet.
 
+## Common Label Drawing Coverage
+
+The label drawing pass covers a first runtime payload slice for common
+last-bar label idioms. `label.new()` accepts positional or named `x`, `y`, and
+`text` arguments plus common `xloc`, `yloc`, `style`, `color`, `textcolor`, and
+`size` options. The runtime returns a label handle string and records a typed
+drawing output; rendering, mutation setters/getters, copy/delete semantics, GC
+limits, and realtime rollback parity remain planned.
+
 ## Drawing Diagnostic Coverage
 
-Drawing namespaces (`line.*`, `label.*`, `box.*`, and `table.*`) are accepted
-as parsed member calls and fail with explicit unsupported runtime diagnostics.
-Object handles, lifecycle operations, and rendering are still planned.
+Drawing namespaces (`line.*`, `box.*`, and `table.*`) are accepted as parsed
+member calls and fail with explicit unsupported runtime diagnostics. Object
+handles, lifecycle operations, and rendering are still planned.
 
 ## Strategy Diagnostic Coverage
 
