@@ -207,6 +207,7 @@ describe('PineArray', () => {
 
     expect(() => getArraySize(slice)).toThrow('Slice is out of bounds of the parent array');
     expect(() => sliceArray(array, 2, 2)).toThrow("Index 'from' should be less than index 'to'");
+    expect(() => sliceArray(array, Number.NaN, 3)).toThrow('Slice indices must be finite numbers');
   });
 
   it('summarizes numeric arrays', () => {
