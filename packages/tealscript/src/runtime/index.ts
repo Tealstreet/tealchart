@@ -5,6 +5,20 @@
 export { Series, seriesFrom, constantSeries, getValue, isSeries, type SeriesSnapshot, type MaybeSeriesValue } from './series';
 
 export {
+  createPineArray,
+  isPineArray,
+  getArraySize,
+  getArrayValue,
+  setArrayValue,
+  pushArrayValue,
+  popArrayValue,
+  shiftArrayValue,
+  unshiftArrayValue,
+  clearArray,
+  type PineArray,
+} from './arrays';
+
+export {
   ExecutionContext,
   createContext,
   type Bar,
