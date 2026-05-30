@@ -360,4 +360,41 @@ plot(str.tostring(5 == 3) == "false", title="Bool False")
     expect(getPlot(result, 'Bool True').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Bool False').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
+
+  it('runs generic input helpers with inferred types', () => {
+    const result = runCompatScript(`
+indicator("Generic inputs")
+length = input(3, "Length")
+enabled = input(true, "Enabled")
+label = input("BTC", "Label")
+plot(ta.sma(close, length), title="Basis")
+plot(enabled, title="Enabled")
+plot(label == "BTC", title="Label")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.inputs).toEqual([
+      {
+        id: 'input_Length',
+        type: 'int',
+        title: 'Length',
+        defval: 3,
+      },
+      {
+        id: 'input_Enabled',
+        type: 'bool',
+        title: 'Enabled',
+        defval: true,
+      },
+      {
+        id: 'input_Label',
+        type: 'string',
+        title: 'Label',
+        defval: 'BTC',
+      },
+    ]);
+    expect(roundSeries(getPlot(result, 'Basis').values)).toEqual([null, null, 104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111]);
+    expect(getPlot(result, 'Enabled').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Label').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+  });
 });

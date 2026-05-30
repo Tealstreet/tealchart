@@ -1072,6 +1072,13 @@ export class TealscriptEngine {
   }
 
   private registerInputBuiltins(): void {
+    const inferInputType = (value: unknown): string => {
+      if (typeof value === 'number') return Number.isInteger(value) ? 'int' : 'float';
+      if (typeof value === 'boolean') return 'bool';
+      if (typeof value === 'string') return 'string';
+      return 'source';
+    };
+
     const createInputFunc = (type: string) => {
       return (args: unknown[], namedArgs: Map<string, unknown>, ctx: ExecutionContext) => {
         const defval = args[0];
@@ -1082,7 +1089,7 @@ export class TealscriptEngine {
         if (ctx.bar_index === 0) {
           ctx.registerInput({
             id,
-            type: type as 'int' | 'float' | 'bool' | 'string' | 'source' | 'color',
+            type: type as 'int' | 'float' | 'bool' | 'string' | 'source' | 'color' | 'time' | 'timeframe' | 'symbol' | 'session' | 'text_area',
             title,
             defval,
             minval: namedArgs.get('minval') as number | undefined,
@@ -1095,6 +1102,10 @@ export class TealscriptEngine {
       };
     };
 
+    this.builtins.set('input', (args, namedArgs, ctx) => {
+      const defval = args[0];
+      return createInputFunc(inferInputType(defval))(args, namedArgs, ctx);
+    });
     this.builtins.set('input.int', createInputFunc('int'));
     this.builtins.set('input.float', createInputFunc('float'));
     this.builtins.set('input.bool', createInputFunc('bool'));
