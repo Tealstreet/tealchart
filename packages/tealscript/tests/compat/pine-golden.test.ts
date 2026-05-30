@@ -195,4 +195,37 @@ plot(array.size(values), title="Size")
     expect(roundSeries(getPlot(result, 'First Value').values)).toEqual([42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42]);
     expect(roundSeries(getPlot(result, 'Size').values)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
   });
+
+  it('runs stack and queue array helpers', () => {
+    const result = runCompatScript(`
+indicator("Array stack queue")
+var array<int> values = array.new_int()
+array.push(values, 2)
+array.unshift(values, 1)
+first = array.shift(values)
+last = array.pop(values)
+plot(first, title="First")
+plot(last, title="Last")
+plot(array.size(values), title="Remaining")
+array.clear(values)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'First').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Last').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Remaining').values)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('reads array literal values with array helpers', () => {
+    const result = runCompatScript(`
+indicator("Array literal")
+values = [10, 20, 30]
+plot(array.get(values, 1), title="Middle")
+plot(array.size(values), title="Literal Size")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Middle').values)).toEqual([20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]);
+    expect(roundSeries(getPlot(result, 'Literal Size').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+  });
 });
