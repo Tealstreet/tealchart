@@ -186,6 +186,24 @@ plot(dist[1], title="Previous Distance")
     expect(roundSeries(getPlot(result, 'Previous Distance').values)).toEqual([null, null, null, 2.333333, -2, -4, -0.666667, 3, 4.666667, 1, 1.666667, 0.333333]);
   });
 
+  it('runs dynamic history offset idioms', () => {
+    const result = runCompatScript(`
+indicator("Dynamic history")
+length = input.int(2, "Lookback")
+previous = close[length]
+future = close[-1]
+tooFar = close[100]
+plot(previous, title="Previous")
+plot(future, title="Future")
+plot(tooFar, title="Too Far")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Previous').values)).toEqual([null, null, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111]);
+    expect(getPlot(result, 'Future').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, null]);
+    expect(getPlot(result, 'Too Far').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, null]);
+  });
+
   it('persists root var values across bars', () => {
     const result = runCompatScript(`
 indicator("Root var")
