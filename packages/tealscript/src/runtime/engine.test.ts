@@ -696,6 +696,22 @@ plot(close)`;
       expect(result.plots).toHaveLength(0);
     });
 
+    it('halts realtime updateBar execution on runtime.error', () => {
+      const script = `//@version=6
+indicator("Realtime Runtime Error")
+if barstate.isrealtime
+    runtime.error("realtime stop")
+plot(close, title="Close")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const engine = new TealscriptEngine();
+      const result = engine.execute(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(() => engine.updateBar(ast, { ...bars[1], close: 101.5 })).toThrow('realtime stop');
+    });
+
     it('evaluates keyed switch expressions', () => {
       const script = `//@version=6
 indicator("Switch Test")

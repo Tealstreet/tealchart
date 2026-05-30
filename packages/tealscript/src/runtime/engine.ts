@@ -211,6 +211,9 @@ export class TealscriptEngine {
       try {
         this.executeStatement(stmt);
       } catch (error) {
+        if (error instanceof RuntimeErrorException) {
+          throw error;
+        }
         // Log error but continue
         console.error('Execution error:', error);
       }
