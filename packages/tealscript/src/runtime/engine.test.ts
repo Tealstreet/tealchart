@@ -191,6 +191,41 @@ values.clear()`;
       expect(result.plots.find((plot) => plot.title === 'Size')?.values).toEqual([1, 1, 1]);
     });
 
+    it('executes extended array helpers and methods', () => {
+      const script = `//@version=6
+indicator("Array Extras")
+values = array.from(3, 5, 3)
+copy = values.copy()
+copy.insert(1, 4)
+removed = copy.remove(2)
+plot(values.first(), title="First")
+plot(values.last(), title="Last")
+plot(values.includes(5) ? 1 : 0, title="Includes")
+plot(values.indexof(3), title="Index")
+plot(values.lastindexof(3), title="Last Index")
+plot(copy.sum(), title="Sum")
+plot(copy.avg(), title="Avg")
+plot(copy.min(), title="Min")
+plot(copy.max(), title="Max")
+plot(removed, title="Removed")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'First')?.values).toEqual([3, 3]);
+      expect(result.plots.find((plot) => plot.title === 'Last')?.values).toEqual([3, 3]);
+      expect(result.plots.find((plot) => plot.title === 'Includes')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Index')?.values).toEqual([0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Last Index')?.values).toEqual([2, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Sum')?.values).toEqual([10, 10]);
+      expect(result.plots.find((plot) => plot.title === 'Avg')?.values).toEqual([10 / 3, 10 / 3]);
+      expect(result.plots.find((plot) => plot.title === 'Min')?.values).toEqual([3, 3]);
+      expect(result.plots.find((plot) => plot.title === 'Max')?.values).toEqual([4, 4]);
+      expect(result.plots.find((plot) => plot.title === 'Removed')?.values).toEqual([5, 5]);
+    });
+
     it('evaluates keyed switch expressions', () => {
       const script = `//@version=6
 indicator("Switch Test")
