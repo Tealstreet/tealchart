@@ -9,6 +9,9 @@ export { useTealscript, type UseTealscriptOptions, type UseTealscriptReturn } fr
 export type {
   PlotOutput,
   PlotStyle,
+  AlertEvent,
+  AlertFrequency,
+  AlertOutput,
   InputDefinition,
   Bar as TealscriptBar,
   WorkerResult,

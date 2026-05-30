@@ -126,7 +126,17 @@ export {
   type UseTealscriptOptions,
   type UseTealscriptReturn,
 } from './tealscript';
-export type { PlotOutput, PlotStyle, InputDefinition, TealscriptBar, WorkerResult, WorkerError } from './tealscript';
+export type {
+  PlotOutput,
+  PlotStyle,
+  AlertEvent,
+  AlertFrequency,
+  AlertOutput,
+  InputDefinition,
+  TealscriptBar,
+  WorkerResult,
+  WorkerError,
+} from './tealscript';
 
 // Built-in indicators
 export {

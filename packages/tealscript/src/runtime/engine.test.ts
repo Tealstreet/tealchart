@@ -96,6 +96,74 @@ plot(high, title="0")`;
       ]);
     });
 
+    it('collects alertcondition output values', () => {
+      const script = `//@version=6
+indicator("Alerts")
+isUp = close > open
+alertcondition(isUp, title="Green bar", message="Close is above open")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.alerts).toHaveLength(1);
+      expect(result.alerts[0]).toMatchObject({
+        id: 'alertcondition_Green bar',
+        type: 'alertcondition',
+        title: 'Green bar',
+        message: 'Close is above open',
+      });
+      expect(result.alerts[0].values).toEqual([true, true, true]);
+      expect(result.alerts[0].events).toEqual([]);
+    });
+
+    it('aligns conditional alertcondition output to bar indexes', () => {
+      const script = `//@version=6
+indicator("Alerts")
+if bar_index >= 2
+    alertcondition(true, title="Late", message="late condition")`;
+
+      const ast = parse(script);
+      const bars = createBars(5, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.alerts).toHaveLength(1);
+      expect(result.alerts[0].values).toEqual([null, null, true, true, true]);
+    });
+
+    it('collects direct alert events with frequency constants', () => {
+      const script = `//@version=6
+indicator("Alerts")
+if close > open
+    alert("Green bar", alert.freq_once_per_bar_close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.alerts).toHaveLength(1);
+      expect(result.alerts[0]).toMatchObject({
+        id: 'alert_alert_0',
+        type: 'alert',
+        title: 'alert',
+        message: 'Green bar',
+        frequency: 'once_per_bar_close',
+      });
+      expect(result.alerts[0].values).toEqual([true, true, true]);
+      expect(result.alerts[0].events.map((event) => ({
+        barIndex: event.barIndex,
+        message: event.message,
+        frequency: event.frequency,
+      }))).toEqual([
+        { barIndex: 0, message: 'Green bar', frequency: 'once_per_bar_close' },
+        { barIndex: 1, message: 'Green bar', frequency: 'once_per_bar_close' },
+        { barIndex: 2, message: 'Green bar', frequency: 'once_per_bar_close' },
+      ]);
+    });
+
     it('evaluates keyed switch expressions', () => {
       const script = `//@version=6
 indicator("Switch Test")
@@ -709,6 +777,31 @@ if close > open
       expect(updatedPlot?.openValues).toEqual([100, 100.5]);
       expect(updatedPlot?.closeValues).toEqual([100.2, 100.7]);
       expect(updatedPlot?.color).toEqual(['#4CAF50', '#4CAF50']);
+    });
+
+    it('truncates alerts before same-timestamp re-execution', () => {
+      const script = `//@version=6
+indicator("Alerts")
+isUp = close > open
+alertcondition(isUp, title="Green", message="green condition")
+if isUp
+    alert("Green event", alert.freq_once_per_bar)`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+
+      const result = engine.execute(ast, bars);
+      expect(result.alerts.find((alert) => alert.type === 'alertcondition')?.values).toEqual([true, true, true]);
+      expect(result.alerts.find((alert) => alert.type === 'alert')?.events).toHaveLength(3);
+
+      const updatedBar = { ...bars[2], close: bars[2].open - 1 };
+      engine.updateBar(ast, updatedBar);
+      const alerts = engine.getAlerts();
+
+      expect(alerts.find((alert) => alert.type === 'alertcondition')?.values).toEqual([true, true, null]);
+      expect(alerts.find((alert) => alert.type === 'alert')?.values).toEqual([true, true]);
+      expect(alerts.find((alert) => alert.type === 'alert')?.events.map((event) => event.barIndex)).toEqual([0, 1]);
     });
   });
 });
