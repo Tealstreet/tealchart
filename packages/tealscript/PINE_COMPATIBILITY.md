@@ -33,7 +33,7 @@ by real Pine examples from official docs or public indicator idioms.
 | `//@version=6` annotation | Supported | Parser defaults to version 6. |
 | `//@version=5` annotation | Partial | Accepted as a numeric version; no version-specific behavior yet. |
 | `indicator(...)` | Partial | Title, `overlay`, and `precision` are used. Other declaration options are parsed but mostly ignored. |
-| `strategy(...)` | Planned | Should parse with an explicit unsupported/runtime diagnostic before strategy execution exists. |
+| `strategy(...)` | Partial | Parses and reports an explicit unsupported runtime diagnostic before strategy execution exists. |
 | `library(...)` / `import` | Unsupported | Out of scope until reusable script modules are designed. |
 | Variable declarations | Supported | Untyped and typed declarations parse. |
 | `var` / `varip` | Partial | Basic persistence exists; function and nested-scope edge cases need hardening. |
@@ -46,7 +46,7 @@ by real Pine examples from official docs or public indicator idioms.
 | `while`, `break`, `continue` | Supported | Loop safety limit exists. |
 | User-defined functions | Partial | Single-line functions, flat multiline functions, local scope, nested calls, and `if` / `else if` / `else` branch expression returns are covered. |
 | Methods, e.g. `arr.push(x)` | Partial | Common array methods lower to the matching `array.*` built-ins. Other object namespaces are not implemented yet. |
-| `switch` | Partial | Expression-form keyed and condition-only switches work. Statement-block arms are not implemented yet. |
+| `switch` | Partial | Expression-form keyed and condition-only switches work, including multiline statement-block arms that return their last expression. |
 | User-defined types | Unsupported | Lower priority than indicators and arrays. |
 
 ## Runtime Semantics
@@ -112,7 +112,7 @@ Remaining gaps:
 | Pine feature | Status | Notes |
 | --- | --- | --- |
 | `alertcondition` / `alert` | Partial | Runtime collects `alertcondition()` boolean series and direct `alert()` events with frequency constants. UI integration and full Pine alert throttling are not implemented yet. |
-| `strategy.*` | Unsupported | Parse diagnostics first, backtest ledger later. |
+| `strategy.*` | Partial | Namespace calls report explicit unsupported runtime diagnostics; backtest ledger is not implemented. |
 | Multi-timeframe requests | Planned | Needs deterministic gap/lookahead semantics. |
 | Other-symbol requests | Planned | Needs chart datafeed contract and caching strategy. |
 
@@ -197,9 +197,19 @@ body colors, transparent wick colors, and skipped bars.
 The switch pass covers expression-form `switch` structures used for mode
 selection and conditional selection. Keyed switches compare a discriminant
 against case values and condition-only switches return the first truthy branch,
-with optional default branches. The checkpoint fixture follows TradingView's
-documented conditional-structure idioms by selecting a moving average from an
-`input.string(... options=...)` mode and deriving a directional signal.
+with optional default branches. Multiline branch bodies execute local statements
+and return the last expression in the selected branch. The checkpoint fixture
+follows TradingView's documented conditional-structure idioms by selecting a
+moving average from an `input.string(... options=...)` mode and deriving a
+directional signal.
+
+## Strategy Diagnostic Coverage
+
+The strategy diagnostics pass accepts `strategy(...)` declarations and
+`strategy.*` namespace calls so generated or pasted strategy scripts get a clear
+unsupported runtime diagnostic instead of a parser error or unknown identifier.
+Backtest order ledgers, positions, fills, and broker-emulator semantics remain
+out of scope until strategy execution is designed.
 
 ## Common Alerts Coverage
 

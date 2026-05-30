@@ -50,6 +50,7 @@ export type Statement =
  */
 export interface IndicatorDeclaration extends BaseNode {
   type: 'IndicatorDeclaration';
+  declarationKind: 'indicator' | 'strategy';
   title: Expression;
   shorttitle?: Expression;
   overlay?: Expression;
@@ -304,7 +305,7 @@ export interface SwitchExpression extends BaseNode {
 export interface SwitchCase extends BaseNode {
   type: 'SwitchCase';
   test?: Expression | null;
-  consequent: Expression;
+  consequent: Expression | Statement[];
 }
 
 /**

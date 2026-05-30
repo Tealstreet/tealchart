@@ -28,6 +28,9 @@ indicator("My Indicator")`);
         expect(ast.body.length).toBeGreaterThan(0);
         const indicator = ast.body[0];
         expect(indicator.type).toBe('IndicatorDeclaration');
+        if (indicator.type === 'IndicatorDeclaration') {
+          expect(indicator.declarationKind).toBe('indicator');
+        }
       });
 
       it('parses indicator with named parameters', () => {
@@ -36,6 +39,17 @@ indicator("My Indicator", overlay=true, precision=2)`);
 
         const indicator = ast.body[0] as { type: string; overlay?: unknown; precision?: unknown };
         expect(indicator.type).toBe('IndicatorDeclaration');
+      });
+
+      it('parses strategy declarations for unsupported diagnostics', () => {
+        const ast = parse(`//@version=6
+strategy("My Strategy", overlay=true)`);
+
+        const declaration = ast.body[0];
+        expect(declaration.type).toBe('IndicatorDeclaration');
+        if (declaration.type === 'IndicatorDeclaration') {
+          expect(declaration.declarationKind).toBe('strategy');
+        }
       });
     });
 
@@ -207,6 +221,25 @@ direction = switch
         const declaration = ast.body.find((s) => s.type === 'VariableDeclaration' && s.names.type === 'VariableDeclarator' && s.names.name.name === 'direction');
         expect(declaration).toBeDefined();
         expect(declaration?.type === 'VariableDeclaration' ? declaration.init.type : null).toBe('SwitchExpression');
+      });
+
+      it('parses switch expression block arms', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+mode = "EMA"
+ma = switch mode
+    "EMA" =>
+        value = ta.ema(close, 14)
+        value
+    =>
+        close`);
+
+        const declaration = ast.body.find((s) => s.type === 'VariableDeclaration' && s.names.type === 'VariableDeclarator' && s.names.name.name === 'ma');
+        expect(declaration?.type === 'VariableDeclaration' ? declaration.init.type : null).toBe('SwitchExpression');
+        if (declaration?.type === 'VariableDeclaration' && declaration.init.type === 'SwitchExpression') {
+          expect(Array.isArray(declaration.init.cases[0].consequent)).toBe(true);
+          expect(Array.isArray(declaration.init.cases[1].consequent)).toBe(true);
+        }
       });
     });
 
