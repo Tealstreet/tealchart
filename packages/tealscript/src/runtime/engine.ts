@@ -688,6 +688,13 @@ export class TealscriptEngine {
     return typeof value === 'number' && isNaN(value);
   }
 
+  private toPlotValue(value: unknown): number | null {
+    if (value === null || value === undefined || this.isNa(value)) {
+      return null;
+    }
+    return value as number;
+  }
+
   // ===========================================================================
   // Built-in Functions Registration
   // ===========================================================================
@@ -758,7 +765,7 @@ export class TealscriptEngine {
         plot.color.push(color);
       }
 
-      ctx.addPlotValue(id, this.isNa(value) ? null : value);
+      ctx.addPlotValue(id, this.toPlotValue(value));
       return value;
     });
 
