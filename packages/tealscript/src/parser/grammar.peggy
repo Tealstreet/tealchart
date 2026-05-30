@@ -53,6 +53,7 @@ StatementList
 
 Statement
   = IndicatorDeclaration
+  / FunctionDeclaration
   / VariableDeclaration
   / AssignmentStatement
   / IfStatement
@@ -85,6 +86,23 @@ IndicatorDeclaration
       }
 
       return result;
+    }
+
+// User-defined function: f(x, y) => x + y
+FunctionDeclaration
+  = name:Identifier _ "(" _ params:ParameterList? _ ")" _ "=>" _ body:Expression _ LineTerminator? {
+      return {
+        type: 'FunctionDeclaration',
+        name,
+        params: params || [],
+        body,
+        loc: loc()
+      };
+    }
+
+ParameterList
+  = head:Identifier tail:(_ "," _ Identifier)* {
+      return [head, ...tail.map(t => t[3])];
     }
 
 // Variable declaration: var float x = 0.0 or just x = 0.0
