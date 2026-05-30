@@ -988,6 +988,33 @@ plot(ta.dev(close, 3), title="Deviation")`;
       expect(result.plots.find((plot) => plot.title === 'Deviation')?.values).toEqual([null, null, 1 / 3]);
     });
 
+    it('calculates median, mode, and percentile TA helpers', () => {
+      const script = `//@version=6
+indicator("TA percentiles")
+plot(ta.median(close, 3), title="Median")
+plot(ta.mode(close, 3), title="Mode")
+plot(ta.percentile_nearest_rank(close, 3, 75), title="Nearest")
+plot(ta.percentile_linear_interpolation(close, 3, 75), title="Linear")
+plot(ta.median(close - open, 3), title="Derived Median")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 0, high: 1, low: 0, close: 1, volume: 100 },
+        { time: 2, open: 0, high: 3, low: 0, close: 3, volume: 100 },
+        { time: 3, open: 1, high: 2, low: 0, close: 2, volume: 100 },
+        { time: 4, open: 4, high: 5, low: 0, close: 5, volume: 100 },
+        { time: 5, open: 5, high: 4, low: 0, close: 4, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Median')?.values).toEqual([null, null, 2, 3, 4]);
+      expect(result.plots.find((plot) => plot.title === 'Mode')?.values).toEqual([null, null, 1, 2, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Nearest')?.values).toEqual([null, null, 3, 5, 5]);
+      expect(result.plots.find((plot) => plot.title === 'Linear')?.values).toEqual([null, null, 2.5, 4, 4.5]);
+      expect(result.plots.find((plot) => plot.title === 'Derived Median')?.values).toEqual([null, null, 1, 1, 1]);
+    });
+
     it('calculates rising and falling TA helpers', () => {
       const script = `//@version=6
 indicator("TA direction")
