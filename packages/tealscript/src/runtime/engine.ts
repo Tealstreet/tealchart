@@ -56,6 +56,7 @@ import {
   unshiftArrayValue,
   type PineArray,
 } from './arrays';
+import type { BuiltinRegistry } from './builtins/registry';
 import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type BoxDrawingOutput, type DrawingOutput, type InputDefinition, type LabelDrawingOutput, type LineDrawingOutput, type LineFillDrawingOutput, type PlotOutput, type PlotStyle } from './context';
 import { Scope, createRootScope } from './scope';
 
@@ -82,17 +83,6 @@ export interface ExecutionError {
 }
 
 /**
- * Built-in function signature
- */
-type BuiltinFunction = (
-  args: unknown[],
-  namedArgs: Map<string, unknown>,
-  ctx: ExecutionContext,
-  scope: Scope,
-  callId: string,
-) => unknown;
-
-/**
  * Tealscript Engine - executes AST bar-by-bar
  */
 export class TealscriptEngine {
@@ -100,7 +90,7 @@ export class TealscriptEngine {
 
   private ctx: ExecutionContext;
   private scope: Scope;
-  private builtins: Map<string, BuiltinFunction>;
+  private builtins: BuiltinRegistry;
   private userFunctions: Map<string, FunctionDeclaration>;
   private functionScopes: Map<string, Scope>;
   private userFunctionCallStack: string[] = [];
