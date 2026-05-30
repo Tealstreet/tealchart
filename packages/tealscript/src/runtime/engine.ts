@@ -1524,6 +1524,24 @@ export class TealscriptEngine {
       return source1 < source2 && trackedPrev1 >= trackedPrev2;
     });
 
+    this.builtins.set('ta.cross', (args, _namedArgs, ctx, scope, callId) => {
+      const source1 = args[0] as number;
+      const source2 = args[1] as number;
+      const trackKey1 = `_cross_any_src1_${callId}`;
+      const trackKey2 = `_cross_any_src2_${callId}`;
+      const previous1 = scope.get(trackKey1) as number | undefined;
+      const previous2 = scope.get(trackKey2) as number | undefined;
+
+      this.setBuiltinState(scope, trackKey1, source1);
+      this.setBuiltinState(scope, trackKey2, source2);
+
+      if (previous1 === undefined || previous2 === undefined || isNaN(source1) || isNaN(source2) || isNaN(previous1) || isNaN(previous2)) {
+        return false;
+      }
+
+      return (source1 > source2 && previous1 <= previous2) || (source1 < source2 && previous1 >= previous2);
+    });
+
     // Highest - returns highest value of source over length bars
     this.builtins.set('ta.highest', (args, _namedArgs, ctx) => {
       const source = args[0] as number;
@@ -1560,6 +1578,24 @@ export class TealscriptEngine {
       }
 
       return lowest === Infinity ? NaN : lowest;
+    });
+
+    this.builtins.set('ta.range', (args, _namedArgs, ctx) => {
+      const source = args[0] as number;
+      const length = args[1] as number;
+      const series = this.getSeriesForSource(source, ctx);
+
+      let highest = -Infinity;
+      let lowest = Infinity;
+      for (let i = 0; i < length; i++) {
+        const value = series.get(i);
+        if (value !== undefined && !isNaN(value)) {
+          if (value > highest) highest = value;
+          if (value < lowest) lowest = value;
+        }
+      }
+
+      return highest === -Infinity || lowest === Infinity ? NaN : highest - lowest;
     });
 
     this.builtins.set('ta.highestbars', (args, _namedArgs, ctx) => {
