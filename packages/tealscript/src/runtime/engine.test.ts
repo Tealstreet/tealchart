@@ -190,6 +190,45 @@ plot(hour(timestamp("GMT+2", 2024, 1, 5, 9, 30), "GMT+2"), title="Timestamp Hour
       expect(result.plots.find((plot) => plot.title === 'Timestamp Hour')?.values).toEqual([9]);
     });
 
+    it('evaluates Pine time and time_close session filters', () => {
+      const script = `//@version=6
+indicator("Sessions")
+plot(time, title="Open Time")
+plot(time_close, title="Close Time")
+plot(last_bar_time, title="Last Bar Time")
+plot(time("60", "1430-1600") == time ? 1 : 0, title="In Session")
+plot(na(time("60", "1600-1700")) ? 1 : 0, title="Out Session")
+plot(time_close("30", "1430-1600"), title="Filtered Close")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: Date.UTC(2024, 0, 5, 14, 0), open: 1, high: 2, low: 1, close: 2, volume: 100 },
+        { time: Date.UTC(2024, 0, 5, 14, 30), open: 2, high: 3, low: 2, close: 3, volume: 100 },
+        { time: Date.UTC(2024, 0, 5, 16, 0), open: 3, high: 4, low: 3, close: 4, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Open Time')?.values).toEqual([
+        Date.UTC(2024, 0, 5, 14, 0),
+        Date.UTC(2024, 0, 5, 14, 30),
+        Date.UTC(2024, 0, 5, 16, 0),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Close Time')?.values).toEqual([
+        Date.UTC(2024, 0, 5, 15, 0),
+        Date.UTC(2024, 0, 5, 15, 30),
+        Date.UTC(2024, 0, 5, 17, 0),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Last Bar Time')?.values).toEqual([
+        Date.UTC(2024, 0, 5, 16, 0),
+        Date.UTC(2024, 0, 5, 16, 0),
+        Date.UTC(2024, 0, 5, 16, 0),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'In Session')?.values).toEqual([0, 1, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Out Session')?.values).toEqual([1, 1, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Filtered Close')?.values).toEqual([null, Date.UTC(2024, 0, 5, 15, 0), null]);
+    });
+
     it('exposes Pine syminfo and timeframe values through member access', () => {
       const script = `//@version=6
 indicator("Chart Info")
