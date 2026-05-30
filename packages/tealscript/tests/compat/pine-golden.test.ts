@@ -353,6 +353,27 @@ plot(values.size(), title="Size")
     expect(roundSeries(getPlot(result, 'Size').values)).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
   });
 
+  it('matches documented Pine array slice window idioms', () => {
+    const result = runCompatScript(`
+indicator("Array slice window")
+values = array.from(0, 1, 2, 3)
+window = values.slice(0, 3)
+values.remove(0)
+window.push(4)
+window.set(1, 20)
+plot(window.get(0), title="Window First")
+plot(window.get(1), title="Window Second")
+plot(values.size(), title="Parent Size")
+plot(values.get(3), title="Parent Tail")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Window First').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Window Second').values)).toEqual([20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]);
+    expect(roundSeries(getPlot(result, 'Parent Size').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+    expect(roundSeries(getPlot(result, 'Parent Tail').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+  });
+
   it('reads array literal values with array helpers', () => {
     const result = runCompatScript(`
 indicator("Array literal")
