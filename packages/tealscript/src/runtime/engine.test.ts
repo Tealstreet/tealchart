@@ -424,6 +424,30 @@ plot(removed, title="Removed")`;
       expect(result.plots.find((plot) => plot.title === 'Removed')?.values).toEqual([5, 5]);
     });
 
+    it('fills arrays by optional index range', () => {
+      const script = `//@version=6
+indicator("Array Fill")
+values = array.from(1, 2, 3, 4)
+array.fill(values, 9, 1, 3)
+plot(values.get(0), title="First")
+plot(values.get(1), title="Filled A")
+plot(values.get(2), title="Filled B")
+plot(values.get(3), title="Last")
+values.fill(5)
+plot(values.sum(), title="Method Filled Sum")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'First')?.values).toEqual([1, 1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Filled A')?.values).toEqual([9, 9, 9]);
+      expect(result.plots.find((plot) => plot.title === 'Filled B')?.values).toEqual([9, 9, 9]);
+      expect(result.plots.find((plot) => plot.title === 'Last')?.values).toEqual([4, 4, 4]);
+      expect(result.plots.find((plot) => plot.title === 'Method Filled Sum')?.values).toEqual([20, 20, 20]);
+    });
+
     it('executes array ordering helpers and methods', () => {
       const script = `//@version=6
 indicator("Array Ordering")

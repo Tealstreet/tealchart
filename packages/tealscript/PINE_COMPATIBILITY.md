@@ -131,7 +131,7 @@ The array pass covers typed constructors (`array.new_float`, `array.new_int`,
 `array.push`, `array.pop`, `array.shift`, `array.unshift`, `array.clear`,
 `array.from`, `array.copy`, `array.first`, `array.last`, `array.includes`,
 `array.indexof`, `array.lastindexof`, `array.insert`, `array.remove`,
-`array.min`, `array.max`, `array.sum`, `array.avg`, `array.sort`,
+`array.fill`, `array.min`, `array.max`, `array.sum`, `array.avg`, `array.sort`,
 `array.covariance`, `array.reverse`, `array.join`, `array.concat`, and
 `array.slice` window semantics. Common Pine method
 syntax now lowers to the same runtime built-ins for calls such as
