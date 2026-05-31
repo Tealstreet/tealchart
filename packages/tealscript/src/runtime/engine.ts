@@ -670,14 +670,11 @@ export class TealscriptEngine {
     const left = this.evaluateExpression(expr.left);
     const right = this.evaluateExpression(expr.right);
 
-    // Handle na (NaN)
+    // Pine comparison operators return false when either operand is an
+    // undefined variable. Arithmetic keeps propagating na.
     if (this.isNa(left) || this.isNa(right)) {
-      if (expr.operator === '==' || expr.operator === '!=') {
-        // na == na is false in Tealscript
-        if (this.isNa(left) && this.isNa(right)) {
-          return expr.operator === '!=';
-        }
-        return expr.operator === '!=';
+      if (this.isComparisonOperator(expr.operator)) {
+        return false;
       }
       return NaN;
     }
@@ -1210,6 +1207,17 @@ export class TealscriptEngine {
 
   private isNa(value: unknown): boolean {
     return typeof value === 'number' && isNaN(value);
+  }
+
+  private isComparisonOperator(operator: string): boolean {
+    return (
+      operator === '==' ||
+      operator === '!=' ||
+      operator === '<' ||
+      operator === '>' ||
+      operator === '<=' ||
+      operator === '>='
+    );
   }
 
   private normalizeIndexOffset(value: unknown): number | null {

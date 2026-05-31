@@ -135,6 +135,29 @@ plot(string(12.5) == "12.5", title="String")
     expect(getPlot(result, 'String').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
 
+  it('keeps na arithmetic undefined while na comparisons return false', () => {
+    const result = runCompatScript(`
+indicator("NA comparison semantics")
+gap = close[100]
+plot(gap + 1, title="Arithmetic Gap")
+plot(gap == gap, title="NA Equal")
+plot(gap != gap, title="NA Not Equal")
+plot(gap > close, title="NA Greater")
+plot(close >= gap, title="Close Greater Equal NA")
+plot(na(gap) ? 1 : 0, title="NA Function")
+plot(bool(gap), title="Bool Cast")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Arithmetic Gap').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, null]);
+    expect(getPlot(result, 'NA Equal').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, false]);
+    expect(getPlot(result, 'NA Not Equal').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, false]);
+    expect(getPlot(result, 'NA Greater').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, false]);
+    expect(getPlot(result, 'Close Greater Equal NA').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, false]);
+    expect(getPlot(result, 'NA Function').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Bool Cast').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, false]);
+  });
+
   it('preserves history for derived regular series variables', () => {
     const result = runCompatScript(`
 indicator("Regular series history")
