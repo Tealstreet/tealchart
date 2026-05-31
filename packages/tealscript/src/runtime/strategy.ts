@@ -544,14 +544,25 @@ function getTrailingStopFillPrice(
       : low + order.trailOffset;
     order.updatedBarIndex = barIndex;
     order.updatedTime = time;
+    return null;
   } else if (order.direction === 'short') {
     const bestPrice = Math.max(order.trailingBestPrice ?? high, high);
-    order.trailingBestPrice = bestPrice;
-    order.trailingStopPrice = Math.max(order.trailingStopPrice ?? Number.NEGATIVE_INFINITY, bestPrice - order.trailOffset);
+    if (bestPrice > (order.trailingBestPrice ?? Number.NEGATIVE_INFINITY)) {
+      order.trailingBestPrice = bestPrice;
+      order.trailingStopPrice = Math.max(order.trailingStopPrice ?? Number.NEGATIVE_INFINITY, bestPrice - order.trailOffset);
+      order.updatedBarIndex = barIndex;
+      order.updatedTime = time;
+      return null;
+    }
   } else {
     const bestPrice = Math.min(order.trailingBestPrice ?? low, low);
-    order.trailingBestPrice = bestPrice;
-    order.trailingStopPrice = Math.min(order.trailingStopPrice ?? Number.POSITIVE_INFINITY, bestPrice + order.trailOffset);
+    if (bestPrice < (order.trailingBestPrice ?? Number.POSITIVE_INFINITY)) {
+      order.trailingBestPrice = bestPrice;
+      order.trailingStopPrice = Math.min(order.trailingStopPrice ?? Number.POSITIVE_INFINITY, bestPrice + order.trailOffset);
+      order.updatedBarIndex = barIndex;
+      order.updatedTime = time;
+      return null;
+    }
   }
 
   if (order.trailingStopPrice === undefined) {
