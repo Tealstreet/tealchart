@@ -89,6 +89,8 @@ export interface ExecutionError {
   column?: number;
 }
 
+const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['request', 'map', 'matrix', 'polyline', 'ticker']);
+
 /**
  * Tealscript Engine - executes AST bar-by-bar
  */
@@ -806,6 +808,9 @@ export class TealscriptEngine {
     if (namespace === 'strategy') {
       throw new Error(`strategy.* functions are not supported yet: ${fullName}`);
     }
+    if (namespace && this.isPlannedUnsupportedNamespace(namespace)) {
+      throw new Error(`${namespace}.* functions are not supported yet: ${fullName}`);
+    }
     if (namespace && this.isUnsupportedDrawingNamespace(namespace)) {
       throw new Error(`${namespace}.* functions are not supported yet: ${fullName}`);
     }
@@ -850,6 +855,10 @@ export class TealscriptEngine {
 
   private isUnsupportedDrawingNamespace(namespace: string): boolean {
     return namespace === 'table';
+  }
+
+  private isPlannedUnsupportedNamespace(namespace: string): boolean {
+    return PLANNED_UNSUPPORTED_NAMESPACES.has(namespace);
   }
 
   private registerDrawingBuiltins(): void {

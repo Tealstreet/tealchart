@@ -79,9 +79,10 @@ reading the whole runtime.
 | Built-ins | `array.*` | Partial | `src/runtime/arrays.test.ts`; `tests/compat/pine-golden.test.ts` | Full array reference inventory and edge cases remain. |
 | Built-ins | `runtime.*` | Partial | `src/runtime/engine.test.ts`; `tests/compat/pine-golden.test.ts` | Only `runtime.error()` is implemented. |
 | Built-ins | Global helpers | Partial | `tests/compat/pine-golden.test.ts` | Broader type-system diagnostics are planned. |
-| Built-ins | `map.*` | Planned | Roadmap Epic 12 | Runtime/storage/type support is not implemented. |
-| Built-ins | `matrix.*` | Planned | Roadmap Epic 12 | Runtime/storage/type support is not implemented. |
-| Data | `request.*` | Planned | Roadmap Epic 8 | Requires deterministic datafeed contract. |
+| Built-ins | `map.*` | Planned | `tests/compat/pine-unsupported.test.ts`; Roadmap Epic 12 | Namespace emits unsupported diagnostics; runtime/storage/type support is not implemented. |
+| Built-ins | `matrix.*` | Planned | `tests/compat/pine-unsupported.test.ts`; Roadmap Epic 12 | Namespace emits unsupported diagnostics; runtime/storage/type support is not implemented. |
+| Data | `request.*` | Planned | `tests/compat/pine-unsupported.test.ts`; Roadmap Epic 8 | Namespace emits unsupported diagnostics; requires deterministic datafeed contract. |
+| Data | `ticker.*` | Planned | `tests/compat/pine-unsupported.test.ts`; Roadmap Epic 9 | Namespace emits unsupported diagnostics; ticker constructors and synthetic data are not implemented. |
 
 ### Visual Outputs
 
@@ -98,6 +99,7 @@ reading the whole runtime.
 | Drawings | `line.*` | Partial | `src/runtime/drawings/builtins.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | `chart.point`, GC limits, full style geometry, realtime rollback remain. |
 | Drawings | `linefill.*` | Partial | `src/runtime/drawings/builtins.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | Full line coordinate/object parity remains. |
 | Drawings | `box.*` | Partial | `src/runtime/drawings/builtins.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | Text layout, `chart.point`, GC limits, and complete styling remain. |
+| Drawings | `polyline.*` | Planned | `tests/compat/pine-unsupported.test.ts`; Roadmap Epic 11 | Namespace emits unsupported diagnostics; lifecycle and renderer are planned. |
 | Drawings | `table.*` | Planned | `src/runtime/drawings/builtins.test.ts` | Namespace emits unsupported diagnostics; lifecycle and renderer are planned. |
 
 ### Alerts, Strategies, And Data
