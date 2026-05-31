@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createResultMessage, type DrawingOutput, type PlotOutput } from '@tealstreet/tealscript';
+import { createResultMessage, type Bar, type DrawingOutput, type PlotOutput, type WorkerError } from '@tealstreet/tealscript';
 
 import { TealscriptManager } from './TealscriptManager';
 
@@ -23,16 +23,34 @@ class FakeWorker {
   }
 }
 
+interface PostedWorkerMessage {
+  type: string;
+  metadata?: {
+    generation?: number;
+    requestId?: number;
+  };
+}
+
+const plot: PlotOutput = {
+  id: 'plot_close',
+  type: 'plot',
+  title: 'Close',
+  values: [100, 101],
+  color: '#ffffff',
+};
+
+const bar: Bar = {
+  time: 1,
+  open: 100,
+  high: 101,
+  low: 99,
+  close: 100,
+  volume: 10,
+};
+
 describe('TealscriptManager', () => {
   it('consumes bundled worker results through legacy update callbacks', async () => {
     const worker = new FakeWorker();
-    const plot: PlotOutput = {
-      id: 'plot_close',
-      type: 'plot',
-      title: 'Close',
-      values: [100, 101],
-      color: '#ffffff',
-    };
     const drawing: DrawingOutput = {
       id: 'label_1',
       type: 'label',
@@ -75,5 +93,54 @@ describe('TealscriptManager', () => {
     expect(drawingUpdates).toHaveLength(1);
     expect(plotUpdates[0]).toEqual([{ ...plot, scriptId: 'study-1' }]);
     expect(drawingUpdates[0]).toEqual([{ ...drawing, scriptId: 'study-1' }]);
+  });
+
+  it('ignores stale bundled worker results and errors', async () => {
+    const worker = new FakeWorker();
+    const plotUpdates: PlotOutput[][] = [];
+    const errors: Array<{ scriptId: string; error: WorkerError }> = [];
+
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      onPlotsUpdated: (plots) => plotUpdates.push(plots),
+      onError: (scriptId, error) => errors.push({ scriptId, error }),
+    });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")');
+    worker.emit({ type: 'ready' });
+    await addScript;
+    manager.setBars([bar]);
+
+    const [initMessage, updateBarsMessage] = worker.messages as PostedWorkerMessage[];
+    expect(initMessage?.metadata).toEqual({ generation: 1, requestId: 1 });
+    expect(updateBarsMessage?.metadata).toEqual({ generation: 2, requestId: 2 });
+
+    worker.emit(createResultMessage('study-1', {
+      plots: [plot],
+      drawings: [],
+      alerts: [],
+      inputs: [],
+      metadata: initMessage?.metadata,
+    }));
+    worker.emit({
+      type: 'error',
+      scriptId: 'study-1',
+      message: 'old error',
+      metadata: initMessage?.metadata,
+    });
+
+    expect(plotUpdates).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    worker.emit(createResultMessage('study-1', {
+      plots: [plot],
+      drawings: [],
+      alerts: [],
+      inputs: [],
+      metadata: updateBarsMessage?.metadata,
+    }));
+
+    expect(plotUpdates).toHaveLength(1);
+    expect(plotUpdates[0]).toEqual([{ ...plot, scriptId: 'study-1' }]);
   });
 });

@@ -13,10 +13,10 @@ import type {
   WorkerError,
   PlotOutput,
   DrawingOutput,
-  AlertOutput,
   InputDefinition,
   Bar,
   FromWorkerMessage,
+  WorkerOutputMetadata,
 } from '@tealstreet/tealscript';
 
 /**
@@ -83,6 +83,9 @@ class TealscriptWorkerWrapper {
   private readyPromise: Promise<void>;
   private readyResolve: (() => void) | null = null;
   private options: TealscriptWorkerOptions;
+  private requestId = 0;
+  private latestRequestId = 0;
+  private generation = 0;
 
   constructor(worker: Worker, options: TealscriptWorkerOptions) {
     this.worker = worker;
@@ -115,11 +118,17 @@ class TealscriptWorkerWrapper {
         break;
 
       case 'result':
+        if (this.isStaleMessage(message.output?.metadata)) {
+          return;
+        }
         this.options.onResult?.(getResultOutput(message));
         break;
 
       case 'error':
       case 'parseError':
+        if (this.isStaleMessage(message.metadata)) {
+          return;
+        }
         this.options.onError?.({
           type: message.type === 'parseError' ? 'parse' : 'runtime',
           message: message.message as string,
@@ -148,19 +157,20 @@ class TealscriptWorkerWrapper {
       script,
       bars,
       inputs,
+      metadata: this.nextRequestMetadata(true),
     });
   }
 
   updateBars(bars: Bar[]): void {
-    this.worker.postMessage({ type: 'updateBars', bars });
+    this.worker.postMessage({ type: 'updateBars', bars, metadata: this.nextRequestMetadata(true) });
   }
 
   updateBar(bar: Bar): void {
-    this.worker.postMessage({ type: 'updateBar', bar });
+    this.worker.postMessage({ type: 'updateBar', bar, metadata: this.nextRequestMetadata() });
   }
 
   setInputs(inputs: Record<string, unknown>): void {
-    this.worker.postMessage({ type: 'setInputs', inputs });
+    this.worker.postMessage({ type: 'setInputs', inputs, metadata: this.nextRequestMetadata(true) });
   }
 
   dispose(): void {
@@ -170,6 +180,21 @@ class TealscriptWorkerWrapper {
 
   get ready(): boolean {
     return this.isReady;
+  }
+
+  private nextRequestMetadata(newGeneration = false): WorkerOutputMetadata {
+    if (newGeneration) {
+      this.generation += 1;
+    }
+    this.latestRequestId = ++this.requestId;
+    return {
+      generation: this.generation,
+      requestId: this.latestRequestId,
+    };
+  }
+
+  private isStaleMessage(metadata: WorkerOutputMetadata | undefined): boolean {
+    return typeof metadata?.requestId === 'number' && metadata.requestId < this.latestRequestId;
   }
 }
 

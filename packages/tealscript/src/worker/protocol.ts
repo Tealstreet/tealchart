@@ -25,6 +25,7 @@ export interface InitMessage {
   script: string;
   bars: Bar[];
   inputs: Record<string, unknown>;
+  metadata?: WorkerOutputMetadata;
 }
 
 /**
@@ -33,6 +34,7 @@ export interface InitMessage {
 export interface UpdateBarsMessage {
   type: 'updateBars';
   bars: Bar[];
+  metadata?: WorkerOutputMetadata;
 }
 
 /**
@@ -41,6 +43,7 @@ export interface UpdateBarsMessage {
 export interface UpdateBarMessage {
   type: 'updateBar';
   bar: Bar;
+  metadata?: WorkerOutputMetadata;
 }
 
 /**
@@ -49,6 +52,7 @@ export interface UpdateBarMessage {
 export interface SetInputsMessage {
   type: 'setInputs';
   inputs: Record<string, unknown>;
+  metadata?: WorkerOutputMetadata;
 }
 
 /**
@@ -148,6 +152,7 @@ export interface ErrorMessage {
   message: string;
   line?: number;
   column?: number;
+  metadata?: WorkerOutputMetadata;
 }
 
 /**
@@ -159,4 +164,5 @@ export interface ParseErrorMessage {
   message: string;
   line?: number;
   column?: number;
+  metadata?: WorkerOutputMetadata;
 }

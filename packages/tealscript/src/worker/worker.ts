@@ -12,7 +12,7 @@ import { TealscriptEngine } from '../runtime/engine';
 import type { Program } from '../parser/ast';
 import type { Bar, InputDefinition } from '../runtime/context';
 import { createResultMessage } from './protocol';
-import type { ToWorkerMessage, FromWorkerMessage, ErrorMessage, ParseErrorMessage } from './protocol';
+import type { ToWorkerMessage, FromWorkerMessage, WorkerOutputMetadata, ErrorMessage, ParseErrorMessage } from './protocol';
 
 /**
  * Worker state for a single script
@@ -41,23 +41,24 @@ function postResult(message: FromWorkerMessage): void {
  */
 self.onmessage = (event: MessageEvent<ToWorkerMessage>) => {
   const message = event.data;
+  const metadata = 'metadata' in message ? message.metadata : undefined;
 
   try {
     switch (message.type) {
       case 'init':
-        handleInit(message.scriptId, message.script, message.bars, message.inputs);
+        handleInit(message.scriptId, message.script, message.bars, message.inputs, metadata);
         break;
 
       case 'updateBars':
-        handleUpdateBars(message.bars);
+        handleUpdateBars(message.bars, metadata);
         break;
 
       case 'updateBar':
-        handleUpdateBar(message.bar);
+        handleUpdateBar(message.bar, metadata);
         break;
 
       case 'setInputs':
-        handleSetInputs(message.inputs);
+        handleSetInputs(message.inputs, metadata);
         break;
 
       case 'dispose':
@@ -69,14 +70,20 @@ self.onmessage = (event: MessageEvent<ToWorkerMessage>) => {
         console.warn('Unknown message type:', (message as { type: string }).type);
     }
   } catch (error) {
-    handleError(error);
+    handleError(error, metadata);
   }
 };
 
 /**
  * Initialize with script and data
  */
-function handleInit(scriptId: string, script: string, bars: Bar[], inputs: Record<string, unknown>): void {
+function handleInit(
+  scriptId: string,
+  script: string,
+  bars: Bar[],
+  inputs: Record<string, unknown>,
+  metadata?: WorkerOutputMetadata
+): void {
   try {
     // Parse the script
     const ast = parse(script);
@@ -95,7 +102,7 @@ function handleInit(scriptId: string, script: string, bars: Bar[], inputs: Recor
     };
 
     // Execute and send results
-    executeAndSendResults();
+    executeAndSendResults(metadata);
   } catch (error) {
     if (error instanceof TealscriptParseError) {
       const parseError: ParseErrorMessage = {
@@ -104,6 +111,7 @@ function handleInit(scriptId: string, script: string, bars: Bar[], inputs: Recor
         message: error.message,
         line: error.location?.start.line,
         column: error.location?.start.column,
+        metadata,
       };
       postResult(parseError);
     } else {
@@ -115,7 +123,7 @@ function handleInit(scriptId: string, script: string, bars: Bar[], inputs: Recor
 /**
  * Handle full bar replacement (symbol/timeframe change)
  */
-function handleUpdateBars(bars: Bar[]): void {
+function handleUpdateBars(bars: Bar[], metadata?: WorkerOutputMetadata): void {
   if (!state) {
     console.warn('Worker not initialized');
     return;
@@ -124,13 +132,13 @@ function handleUpdateBars(bars: Bar[]): void {
   state.bars = bars;
 
   // Re-execute with new bars
-  executeAndSendResults();
+  executeAndSendResults(metadata);
 }
 
 /**
  * Handle realtime bar update
  */
-function handleUpdateBar(bar: Bar): void {
+function handleUpdateBar(bar: Bar, metadata?: WorkerOutputMetadata): void {
   if (!state) {
     console.warn('Worker not initialized');
     return;
@@ -147,18 +155,19 @@ function handleUpdateBar(bar: Bar): void {
       drawings: state.engine.getDrawings(),
       alerts: state.engine.getAlerts(),
       inputs: state.lastInputs, // send cached inputs from last full execution
+      metadata,
     }));
   } else {
     // New bar — need full execute to process the new bar through all statements
     state.bars.push(bar);
-    executeAndSendResults();
+    executeAndSendResults(metadata);
   }
 }
 
 /**
  * Handle input value changes
  */
-function handleSetInputs(inputs: Record<string, unknown>): void {
+function handleSetInputs(inputs: Record<string, unknown>, metadata?: WorkerOutputMetadata): void {
   if (!state) {
     console.warn('Worker not initialized');
     return;
@@ -167,7 +176,7 @@ function handleSetInputs(inputs: Record<string, unknown>): void {
   state.inputs = inputs;
 
   // Re-execute with new inputs
-  executeAndSendResults();
+  executeAndSendResults(metadata);
 }
 
 /**
@@ -187,7 +196,7 @@ function recordToMap(record: Record<string, unknown>): Map<string, unknown> {
 /**
  * Execute script and send results to main thread
  */
-function executeAndSendResults(): void {
+function executeAndSendResults(metadata?: WorkerOutputMetadata): void {
   if (!state) {
     return;
   }
@@ -214,21 +223,23 @@ function executeAndSendResults(): void {
       drawings: result.drawings,
       alerts: result.alerts,
       inputs,
+      metadata,
     });
     postResult(resultMessage);
   } catch (error) {
-    handleError(error);
+    handleError(error, metadata);
   }
 }
 
 /**
  * Handle execution errors
  */
-function handleError(error: unknown): void {
+function handleError(error: unknown, metadata?: WorkerOutputMetadata): void {
   const errorMessage: ErrorMessage = {
     type: 'error',
     scriptId: state?.scriptId ?? 'unknown',
     message: error instanceof Error ? error.message : String(error),
+    metadata,
   };
   postResult(errorMessage);
 }

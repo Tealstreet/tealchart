@@ -13,6 +13,7 @@ import type {
   ResultMessage,
   ErrorMessage,
   ParseErrorMessage,
+  WorkerOutputMetadata,
 } from './protocol';
 
 /**
@@ -90,6 +91,9 @@ export class TealscriptWorker {
   private isReady = false;
   private readyPromise: Promise<void>;
   private readyResolve: (() => void) | null = null;
+  private requestId = 0;
+  private latestRequestId = 0;
+  private generation = 0;
 
   private onResult: ResultCallback | null;
   private onError: ErrorCallback | null;
@@ -182,6 +186,9 @@ export class TealscriptWorker {
    * Handle successful execution result
    */
   private handleResult(message: ResultMessage): void {
+    if (this.isStaleMessage(message.output?.metadata)) {
+      return;
+    }
     this.onResult?.(getResultOutput(message));
   }
 
@@ -189,6 +196,9 @@ export class TealscriptWorker {
    * Handle runtime error
    */
   private handleError(message: ErrorMessage): void {
+    if (this.isStaleMessage(message.metadata)) {
+      return;
+    }
     this.onError?.({
       type: 'runtime',
       message: message.message,
@@ -201,6 +211,9 @@ export class TealscriptWorker {
    * Handle parse error
    */
   private handleParseError(message: ParseErrorMessage): void {
+    if (this.isStaleMessage(message.metadata)) {
+      return;
+    }
     this.onError?.({
       type: 'parse',
       message: message.message,
@@ -217,6 +230,21 @@ export class TealscriptWorker {
       throw new Error('Worker not initialized');
     }
     this.worker.postMessage(message);
+  }
+
+  private nextRequestMetadata(newGeneration = false): WorkerOutputMetadata {
+    if (newGeneration) {
+      this.generation += 1;
+    }
+    this.latestRequestId = ++this.requestId;
+    return {
+      generation: this.generation,
+      requestId: this.latestRequestId,
+    };
+  }
+
+  private isStaleMessage(metadata: WorkerOutputMetadata | undefined): boolean {
+    return typeof metadata?.requestId === 'number' && metadata.requestId < this.latestRequestId;
   }
 
   /**
@@ -244,6 +272,7 @@ export class TealscriptWorker {
       script,
       bars,
       inputs,
+      metadata: this.nextRequestMetadata(true),
     });
   }
 
@@ -257,6 +286,7 @@ export class TealscriptWorker {
     this.postMessage({
       type: 'updateBars',
       bars,
+      metadata: this.nextRequestMetadata(true),
     });
   }
 
@@ -270,6 +300,7 @@ export class TealscriptWorker {
     this.postMessage({
       type: 'updateBar',
       bar,
+      metadata: this.nextRequestMetadata(),
     });
   }
 
@@ -283,6 +314,7 @@ export class TealscriptWorker {
     this.postMessage({
       type: 'setInputs',
       inputs,
+      metadata: this.nextRequestMetadata(true),
     });
   }
 
