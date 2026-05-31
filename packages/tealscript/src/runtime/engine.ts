@@ -205,6 +205,7 @@ export class TealscriptEngine {
   private builtins: BuiltinRegistry;
   private typeDeclarations: Map<string, TypeDeclaration>;
   private userFunctions: Map<string, FunctionDeclaration>;
+  private userMethods: Map<string, FunctionDeclaration[]>;
   private functionScopes: Map<string, Scope>;
   private requestDatafeed?: RequestDatafeed;
   private requestEvaluationCache = new Map<string, RequestEvaluationCacheEntry>();
@@ -222,6 +223,7 @@ export class TealscriptEngine {
     this.builtins = new Map();
     this.typeDeclarations = new Map();
     this.userFunctions = new Map();
+    this.userMethods = new Map();
     this.functionScopes = new Map();
     this.requestDatafeed = options.requestDatafeed;
 
@@ -525,11 +527,19 @@ export class TealscriptEngine {
 
   private registerUserFunctions(ast: Program): void {
     this.userFunctions.clear();
+    this.userMethods.clear();
     for (const stmt of ast.body) {
       if (stmt.type === 'FunctionDeclaration') {
-        this.userFunctions.set(stmt.name.name, stmt);
-        if (!this.functionScopes.has(stmt.name.name)) {
-          this.functionScopes.set(stmt.name.name, this.scope.createChild());
+        const scopeKey = this.userCallableScopeKey(stmt);
+        if (stmt.isMethod) {
+          const overloads = this.userMethods.get(stmt.name.name) ?? [];
+          overloads.push(stmt);
+          this.userMethods.set(stmt.name.name, overloads);
+        } else {
+          this.userFunctions.set(stmt.name.name, stmt);
+        }
+        if (!this.functionScopes.has(scopeKey)) {
+          this.functionScopes.set(scopeKey, this.scope.createChild());
         }
       }
     }
@@ -1124,9 +1134,18 @@ export class TealscriptEngine {
       return this.evaluateTypeConstructor(namespace, args, namedArgs);
     }
 
-    // Look up builtin
     if (namespace && expr.callee.type === 'MemberExpression' && this.scope.has(namespace)) {
       const receiver = this.evaluateExpression(expr.callee.object);
+      const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs);
+      if (userMethod) {
+        return this.evaluateUserFunction(
+          userMethod,
+          [receiver, ...args],
+          namedArgs,
+          `method ${funcName}`,
+          this.userCallableScopeKey(userMethod),
+        );
+      }
       if (isPineArray(receiver) || isPineMatrix(receiver) || isPineMap(receiver)) {
         const methodBuiltinName = this.getMethodBuiltinName(funcName, receiver);
         const methodBuiltin = this.builtins.get(methodBuiltinName);
@@ -1147,6 +1166,16 @@ export class TealscriptEngine {
 
     if (namespace && expr.callee.type === 'MemberExpression') {
       const receiver = this.evaluateExpression(expr.callee.object);
+      const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs);
+      if (userMethod) {
+        return this.evaluateUserFunction(
+          userMethod,
+          [receiver, ...args],
+          namedArgs,
+          `method ${funcName}`,
+          this.userCallableScopeKey(userMethod),
+        );
+      }
       const methodBuiltinName = this.getMethodBuiltinName(funcName, receiver);
       const methodBuiltin = this.builtins.get(methodBuiltinName);
       if (methodBuiltin) {
@@ -1162,6 +1191,19 @@ export class TealscriptEngine {
     }
 
     throw new Error(`Unknown function: ${fullName}`);
+  }
+
+  private userCallableScopeKey(fn: FunctionDeclaration): string {
+    return fn.isMethod ? `method:${fn.name.name}` : fn.name.name;
+  }
+
+  private findCallableUserMethod(
+    methodName: string,
+    args: unknown[],
+    namedArgs: Map<string, unknown>,
+  ): FunctionDeclaration | undefined {
+    const overloads = this.userMethods.get(methodName);
+    return overloads?.find((method) => this.canCallUserFunction(method, args, namedArgs));
   }
 
   private evaluateTypeConstructor(typeName: string, args: unknown[], namedArgs: Map<string, unknown>): PineUdtObject {
@@ -1468,9 +1510,15 @@ export class TealscriptEngine {
     engine.ctx.timeframe = timeframeInfo;
     engine.ctx.loadBars(requestContext.bars);
     engine.userFunctions = new Map(this.userFunctions);
+    engine.userMethods = new Map(Array.from(this.userMethods, ([name, methods]) => [name, [...methods]]));
     engine.functionScopes.clear();
-    for (const name of engine.userFunctions.keys()) {
-      engine.functionScopes.set(name, engine.scope.createChild());
+    for (const fn of engine.userFunctions.values()) {
+      engine.functionScopes.set(engine.userCallableScopeKey(fn), engine.scope.createChild());
+    }
+    for (const methods of engine.userMethods.values()) {
+      for (const method of methods) {
+        engine.functionScopes.set(engine.userCallableScopeKey(method), engine.scope.createChild());
+      }
     }
 
     const values: unknown[] = [];
@@ -1721,7 +1769,27 @@ export class TealscriptEngine {
     }
   }
 
-  private evaluateUserFunction(fn: FunctionDeclaration, args: unknown[], namedArgs: Map<string, unknown>): unknown {
+  private canCallUserFunction(fn: FunctionDeclaration, args: unknown[], namedArgs: Map<string, unknown>): boolean {
+    if (args.length > fn.params.length) return false;
+
+    const paramNames = new Set(fn.params.map((param) => param.name));
+    for (const argName of namedArgs.keys()) {
+      if (!paramNames.has(argName)) return false;
+    }
+
+    return fn.params.every((param, index) => {
+      const hasPositionalValue = index < args.length;
+      return !(hasPositionalValue && namedArgs.has(param.name));
+    });
+  }
+
+  private evaluateUserFunction(
+    fn: FunctionDeclaration,
+    args: unknown[],
+    namedArgs: Map<string, unknown>,
+    displayName = `function ${fn.name.name}`,
+    scopeKey = this.userCallableScopeKey(fn),
+  ): unknown {
     const functionName = fn.name.name;
     const recursiveIndex = this.userFunctionCallStack.indexOf(functionName);
     if (recursiveIndex !== -1) {
@@ -1731,14 +1799,14 @@ export class TealscriptEngine {
 
     if (args.length > fn.params.length) {
       throw new Error(
-        `Too many arguments for function ${functionName}: expected ${fn.params.length}, got ${args.length}`,
+        `Too many arguments for ${displayName}: expected ${fn.params.length}, got ${args.length}`,
       );
     }
 
     const paramNames = new Set(fn.params.map((param) => param.name));
     for (const argName of namedArgs.keys()) {
       if (!paramNames.has(argName)) {
-        throw new Error(`Unknown argument '${argName}' for function ${functionName}`);
+        throw new Error(`Unknown argument '${argName}' for ${displayName}`);
       }
     }
 
@@ -1747,7 +1815,7 @@ export class TealscriptEngine {
       if (namedArgs.has(paramName)) {
         if (index < args.length) {
           throw new Error(
-            `Argument '${paramName}' for function ${functionName} was supplied multiple times`,
+            `Argument '${paramName}' for ${displayName} was supplied multiple times`,
           );
         }
         return namedArgs.get(paramName);
@@ -1762,7 +1830,7 @@ export class TealscriptEngine {
     });
 
     const savedScope = this.scope;
-    const functionScope = this.functionScopes.get(functionName) ?? this.scope.createChild();
+    const functionScope = this.functionScopes.get(scopeKey) ?? this.scope.createChild();
     this.scope = functionScope;
     this.userFunctionCallStack.push(functionName);
 

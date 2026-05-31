@@ -57,4 +57,26 @@ plot(lastPivot.level, title="Last Pivot Level")
     expect(getPlot(result, 'Pivot Count').values).toEqual([1, 2, 3, 3, 3, 4, 5, 6, 6, 7, 7, 8]);
     expect(roundSeries(getPlot(result, 'Last Pivot Level').values)).toEqual([102, 105, 107, 107, 107, 100, 104, 109, 109, 111, 111, 112]);
   });
+
+  it('runs user-defined methods on primitive values and UDT references', () => {
+    const result = runCompatScript(`
+indicator("User methods")
+type pivotPoint
+    float level
+
+method scaled(float this, float factor = 2) => this * factor
+method lift(pivotPoint this, float amount) =>
+    this.level += amount
+    this
+
+point = pivotPoint.new(close)
+samePoint = point.lift(3)
+plot(close.scaled(2), title="Scaled Close")
+plot(samePoint.level, title="Lifted Level")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Scaled Close').values)).toEqual([204, 210, 214, 206, 198, 200, 208, 218, 216, 222, 220, 224]);
+    expect(roundSeries(getPlot(result, 'Lifted Level').values)).toEqual([105, 108, 110, 106, 102, 103, 107, 112, 111, 114, 113, 115]);
+  });
 });
