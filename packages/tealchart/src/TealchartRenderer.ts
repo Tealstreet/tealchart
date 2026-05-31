@@ -1,9 +1,11 @@
-import type { BoxDrawingOutput, DrawingOutput, LabelDrawingOutput, LineDrawingOutput, LineFillDrawingOutput, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
+import type { BoxDrawingOutput, DrawingOutput, LabelDrawingOutput, LineDrawingOutput, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
 import type { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
 import type { CanvasContext } from './rendering/CanvasContext';
 import type { PaneOffset } from './rendering/PaneManager';
+import type { TealScriptDrawingPartition } from './rendering/TealScriptDrawingPartition';
 
 import { computeCandleCoordinates } from './jailbreak/computeCandleCoordinates';
+import { partitionTealScriptDrawings } from './rendering/TealScriptDrawingPartition';
 import { getDecimalPlacesFromPrecision, LineStyle, PlotStyleOverride } from './state/chartState';
 import {
   Bar,
@@ -3122,10 +3124,11 @@ export class TealchartRenderer {
     }
 
     if (drawings && drawings.length > 0) {
-      this.renderLineFillDrawings(drawings, bars, viewport, pane);
-      this.renderBoxDrawings(drawings, bars, viewport, pane);
-      this.renderLineDrawings(drawings, bars, viewport, pane);
-      this.renderLabelDrawings(drawings, bars, viewport, pane);
+      const drawingPartition = partitionTealScriptDrawings(drawings);
+      this.renderLineFillDrawings(drawingPartition, bars, viewport, pane);
+      this.renderBoxDrawings(drawingPartition.boxes, bars, viewport, pane);
+      this.renderLineDrawings(drawingPartition.lines, bars, viewport, pane);
+      this.renderLabelDrawings(drawingPartition.labels, bars, viewport, pane);
     }
 
     // Draw Y-axis (price axis) for main pane
@@ -3138,12 +3141,11 @@ export class TealchartRenderer {
   }
 
   private renderBoxDrawings(
-    drawings: DrawingOutput[],
+    boxes: BoxDrawingOutput[],
     bars: Bar[],
     viewport: Viewport,
     pane: ComputedPane,
   ): void {
-    const boxes = drawings.filter((drawing): drawing is BoxDrawingOutput => drawing.type === 'box');
     if (boxes.length === 0) return;
 
     const { ctx, options, margins } = this;
@@ -3249,20 +3251,15 @@ export class TealchartRenderer {
   }
 
   private renderLineFillDrawings(
-    drawings: DrawingOutput[],
+    drawingPartition: TealScriptDrawingPartition,
     bars: Bar[],
     viewport: Viewport,
     pane: ComputedPane,
   ): void {
-    const linefills = drawings.filter((drawing): drawing is LineFillDrawingOutput => drawing.type === 'linefill');
+    const { linefills, linesById } = drawingPartition;
     if (linefills.length === 0) return;
 
-    const lines = new Map(
-      drawings
-        .filter((drawing): drawing is LineDrawingOutput => drawing.type === 'line')
-        .map((line) => [line.id, line]),
-    );
-    if (lines.size === 0) return;
+    if (linesById.size === 0) return;
 
     const { ctx, options, margins } = this;
     const chartWidth = options.width - margins.left;
@@ -3275,8 +3272,8 @@ export class TealchartRenderer {
     ctx.clip();
 
     for (const linefill of linefills) {
-      const line1 = lines.get(linefill.line1);
-      const line2 = lines.get(linefill.line2);
+      const line1 = linesById.get(linefill.line1);
+      const line2 = linesById.get(linefill.line2);
       if (!line1 || !line2) continue;
 
       const line1Segment = this.resolveLineDrawingSegment(line1, bars, viewport, pane, chartWidth, minX, maxX);
@@ -3297,12 +3294,11 @@ export class TealchartRenderer {
   }
 
   private renderLineDrawings(
-    drawings: DrawingOutput[],
+    lines: LineDrawingOutput[],
     bars: Bar[],
     viewport: Viewport,
     pane: ComputedPane,
   ): void {
-    const lines = drawings.filter((drawing): drawing is LineDrawingOutput => drawing.type === 'line');
     if (lines.length === 0) return;
 
     const { ctx, options, margins } = this;
@@ -3413,12 +3409,11 @@ export class TealchartRenderer {
   }
 
   private renderLabelDrawings(
-    drawings: DrawingOutput[],
+    labels: LabelDrawingOutput[],
     bars: Bar[],
     viewport: Viewport,
     pane: ComputedPane,
   ): void {
-    const labels = drawings.filter((drawing): drawing is LabelDrawingOutput => drawing.type === 'label');
     if (labels.length === 0) return;
 
     const { ctx, options, margins } = this;
