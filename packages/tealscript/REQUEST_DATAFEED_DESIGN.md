@@ -6,10 +6,11 @@ on TradingView, a live exchange, or Tealchart networking during CI.
 
 ## Current Scope
 
-The contract supports deterministic fixtures and the current same-symbol or
-host-provided other-symbol `request.security()` MVP. Lower-timeframe arrays,
-dynamic/nested requests, synthetic tickers, and external request families remain
-out of scope until later Epic 8 and Epic 9 phases.
+The contract supports deterministic fixtures, same-symbol or host-provided
+other-symbol `request.security()` requests, and the current
+`request.security_lower_tf()` intrabar-array MVP. Dynamic/nested requests,
+synthetic tickers, and external request families remain out of scope until later
+Epic 8 and Epic 9 phases.
 
 ## Contract
 
@@ -53,6 +54,24 @@ other-symbol higher-timeframe requests.
    `calc_bars_count` semantics with deterministic fixtures.
 5. Preserve repaint-safe higher-timeframe behavior in reduced Pine idiom tests.
 
+## `request.security_lower_tf()` MVP
+
+The current runtime implementation supports deterministic lower-timeframe
+requests that return Pine arrays of expression values for each chart bar.
+
+1. Resolve the requested lower-timeframe context from the datafeed using
+   `{ symbol, timeframe, calcBarsCount, currency }`.
+2. Reject equal or higher requested timeframes unless
+   `ignore_invalid_timeframe=true`, matching Pine's lower-timeframe-only
+   contract.
+3. Evaluate the requested expression in the lower-timeframe context with
+   isolated series history and symbol/timeframe metadata.
+4. Collect all requested bars whose timestamps fall inside the current chart bar
+   interval and return their values as a Pine array ordered from earliest to
+   latest.
+5. Support `ignore_invalid_symbol`, `currency`, and `calc_bars_count` routing
+   hints with deterministic fixtures.
+
 ## Integration Path
 
 The engine can accept an optional `RequestDatafeed` in a future PR. Tealchart can
@@ -65,10 +84,9 @@ without changing the fixture-level contract.
 
 ## Non-Goals
 
-This contract does not yet cover dynamic/nested requests, other-symbol routing,
-lower-timeframe intrabar arrays, currency conversion, corporate actions,
-economic data, or synthetic ticker construction. Those belong to later Epic 8
-and Epic 9 phases.
+This contract does not yet cover dynamic/nested requests, currency conversion,
+corporate actions, economic data, or synthetic ticker construction. Those belong
+to later Epic 8 and Epic 9 phases.
 
 ## Test Strategy
 

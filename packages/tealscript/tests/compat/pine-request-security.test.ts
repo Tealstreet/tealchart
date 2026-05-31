@@ -18,12 +18,38 @@ const requestedBars: Bar[] = [
   { time: 1_700_000_240_000, open: 31, high: 35, low: 29, close: 30, volume: 1_200 },
 ];
 
+const lowerChartBars: Bar[] = [
+  { time: 1_700_000_000_000, open: 100, high: 103, low: 99, close: 102, volume: 210 },
+  { time: 1_700_000_120_000, open: 102, high: 105, low: 101, close: 104, volume: 250 },
+  { time: 1_700_000_240_000, open: 104, high: 107, low: 103, close: 106, volume: 290 },
+];
+
+const lowerRequestedBars: Bar[] = [
+  { time: 1_700_000_000_000, open: 10, high: 12, low: 9, close: 11, volume: 100 },
+  { time: 1_700_000_060_000, open: 11, high: 14, low: 10, close: 13, volume: 110 },
+  { time: 1_700_000_120_000, open: 20, high: 23, low: 18, close: 21, volume: 120 },
+  { time: 1_700_000_180_000, open: 21, high: 25, low: 20, close: 24, volume: 130 },
+  { time: 1_700_000_240_000, open: 30, high: 32, low: 29, close: 31, volume: 140 },
+  { time: 1_700_000_300_000, open: 31, high: 35, low: 30, close: 34, volume: 150 },
+];
+
 function requestDatafeed(calcBarsCount?: number): InMemoryRequestDatafeed {
   return new InMemoryRequestDatafeed([
     {
       symbol: 'BTCUSDT',
       timeframe: '2',
       bars: calcBarsCount === undefined ? requestedBars : requestedBars.slice(-calcBarsCount),
+      syminfo: { ticker: 'BTCUSDT', timezone: 'Etc/UTC' },
+    },
+  ]);
+}
+
+function lowerTimeframeRequestDatafeed(): InMemoryRequestDatafeed {
+  return new InMemoryRequestDatafeed([
+    {
+      symbol: 'BTCUSDT',
+      timeframe: '1',
+      bars: lowerRequestedBars,
       syminfo: { ticker: 'BTCUSDT', timezone: 'Etc/UTC' },
     },
   ]);
@@ -202,5 +228,110 @@ plot(request.security("MISSING", "2", close), title="Missing")
       'request.security failed: No request data context for MISSING 2',
       'request.security failed: No request data context for MISSING 2',
     ]);
+  });
+});
+
+describe('Pine request.security_lower_tf compatibility', () => {
+  it('returns lower-timeframe expression values as intrabar arrays ordered by time', () => {
+    const result = runCompatScript(`
+indicator("Lower TF request", timeframe="2")
+intrabars = request.security_lower_tf(syminfo.tickerid, "1", close)
+plot(array.size(intrabars), title="Count")
+plot(array.get(intrabars, 0), title="First")
+plot(array.get(intrabars, array.size(intrabars) - 1), title="Last")
+`, {
+      bars: lowerChartBars,
+      engineOptions: { requestDatafeed: lowerTimeframeRequestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Count').values).toEqual([2, 2, 2]);
+    expect(getPlot(result, 'First').values).toEqual([11, 21, 31]);
+    expect(getPlot(result, 'Last').values).toEqual([13, 24, 34]);
+  });
+
+  it('evaluates lower-timeframe expressions in the requested context', () => {
+    const result = runCompatScript(`
+indicator("Lower TF expression", timeframe="2")
+ranges = request.security_lower_tf(syminfo.tickerid, "1", high - low)
+plot(array.get(ranges, 0), title="First Range")
+plot(array.get(ranges, 1), title="Second Range")
+`, {
+      bars: lowerChartBars,
+      engineOptions: { requestDatafeed: lowerTimeframeRequestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'First Range').values).toEqual([3, 5, 3]);
+    expect(getPlot(result, 'Second Range').values).toEqual([4, 5, 5]);
+  });
+
+  it('passes calc_bars_count to lower-timeframe requests', () => {
+    const result = runCompatScript(`
+indicator("Lower TF calc bars", timeframe="2")
+intrabars = request.security_lower_tf(syminfo.tickerid, "1", close, calc_bars_count=2)
+plot(array.size(intrabars), title="Count")
+`, {
+      bars: lowerChartBars,
+      engineOptions: { requestDatafeed: lowerTimeframeRequestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Count').values).toEqual([0, 0, 2]);
+  });
+
+  it('supports ignore_invalid_symbol for missing lower-timeframe contexts', () => {
+    const result = runCompatScript(`
+indicator("Lower TF missing", timeframe="2")
+missing = request.security_lower_tf("MISSING", "1", close, ignore_invalid_symbol=true)
+plot(array.size(missing), title="Missing Count")
+`, {
+      bars: lowerChartBars,
+      engineOptions: { requestDatafeed: lowerTimeframeRequestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Missing Count').values).toEqual([0, 0, 0]);
+  });
+
+  it('reports missing lower-timeframe contexts when ignore_invalid_symbol is false', () => {
+    const result = runCompatScript(`
+indicator("Lower TF missing error", timeframe="2")
+plot(array.size(request.security_lower_tf("MISSING", "1", close)), title="Missing Count")
+`, {
+      bars: lowerChartBars,
+      engineOptions: { requestDatafeed: lowerTimeframeRequestDatafeed() },
+    });
+
+    expect(result.errors.map((error) => error.message)).toEqual([
+      'request.security_lower_tf failed: No request data context for MISSING 1',
+      'request.security_lower_tf failed: No request data context for MISSING 1',
+      'request.security_lower_tf failed: No request data context for MISSING 1',
+    ]);
+  });
+
+  it('rejects equal or higher timeframe requests unless ignore_invalid_timeframe is true', () => {
+    const invalid = runCompatScript(`
+indicator("Lower TF invalid", timeframe="2")
+plot(array.size(request.security_lower_tf(syminfo.tickerid, "2", close)), title="Count")
+`, {
+      bars: [lowerChartBars[0]!],
+      engineOptions: { requestDatafeed: lowerTimeframeRequestDatafeed() },
+    });
+
+    const ignored = runCompatScript(`
+indicator("Lower TF invalid ignored", timeframe="2")
+values = request.security_lower_tf(syminfo.tickerid, "2", close, ignore_invalid_timeframe=true)
+plot(array.size(values), title="Count")
+`, {
+      bars: [lowerChartBars[0]!],
+      engineOptions: { requestDatafeed: lowerTimeframeRequestDatafeed() },
+    });
+
+    expect(invalid.errors.map((error) => error.message)).toEqual([
+      'request.security_lower_tf requires a lower timeframe than the chart timeframe: 2',
+    ]);
+    expect(ignored.errors).toEqual([]);
+    expect(getPlot(ignored, 'Count').values).toEqual([0]);
   });
 });

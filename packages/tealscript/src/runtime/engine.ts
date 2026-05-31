@@ -924,6 +924,9 @@ export class TealscriptEngine {
     if (fullName === 'request.security') {
       return this.evaluateRequestSecurity(expr, this.nextBuiltinCallId(fullName));
     }
+    if (fullName === 'request.security_lower_tf') {
+      return this.evaluateRequestSecurityLowerTf(expr, this.nextBuiltinCallId(fullName));
+    }
     if (namespace === 'request') {
       throw new Error(`request.* functions are not supported yet: ${fullName}`);
     }
@@ -1026,6 +1029,57 @@ export class TealscriptEngine {
     return this.mergeRequestedValue(cached.bars, cached.values, gaps, lookahead);
   }
 
+  private evaluateRequestSecurityLowerTf(expr: CallExpression, callId: string): PineArray {
+    const symbolArg = this.getCallArgument(expr, 0, 'symbol');
+    const timeframeArg = this.getCallArgument(expr, 1, 'timeframe');
+    const expressionArg = this.getCallArgument(expr, 2, 'expression');
+
+    if (!symbolArg || !timeframeArg || !expressionArg) {
+      throw new Error('request.security_lower_tf requires symbol, timeframe, and expression arguments');
+    }
+    if (!this.requestDatafeed) {
+      throw new Error('request.security_lower_tf requires a request datafeed');
+    }
+
+    const symbol = this.normalizeRequestSymbol(this.evaluateExpression(symbolArg.value));
+    const timeframe = this.normalizeRequestTimeframe(this.evaluateExpression(timeframeArg.value));
+    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalCallArgument(expr, 3, 'ignore_invalid_symbol') ?? false);
+    const currency = this.normalizeOptionalRequestCurrency(this.evaluateOptionalCallArgument(expr, 4, 'currency'));
+    const ignoreInvalidTimeframe = this.isTruthy(this.evaluateOptionalCallArgument(expr, 5, 'ignore_invalid_timeframe') ?? false);
+    const calcBarsCount = this.normalizeOptionalPositiveInteger(this.evaluateOptionalCallArgument(expr, 6, 'calc_bars_count'));
+
+    if (!this.isLowerRequestTimeframe(timeframe)) {
+      if (ignoreInvalidTimeframe) {
+        return createPineArray();
+      }
+      throw new Error(`request.security_lower_tf requires a lower timeframe than the chart timeframe: ${timeframe}`);
+    }
+
+    const result = this.requestDatafeed.getBars({ symbol, timeframe, calcBarsCount, currency });
+    if (!result.ok) {
+      if (ignoreInvalidSymbol && (result.code === 'invalid_symbol' || result.code === 'missing_context')) {
+        return createPineArray();
+      }
+      if (ignoreInvalidTimeframe && result.code === 'invalid_timeframe') {
+        return createPineArray();
+      }
+      throw new Error(`request.security_lower_tf failed: ${result.message}`);
+    }
+
+    const expressionId = this.requestExpressionCacheId(expressionArg.value);
+    const cacheKey = this.requestEvaluationCacheKey(callId, expressionId, symbol, timeframe, currency, calcBarsCount);
+    let cached = this.requestEvaluationCache.get(cacheKey);
+    if (!cached) {
+      cached = {
+        bars: result.context.bars,
+        values: this.evaluateRequestExpressionSeries(expressionArg.value, result.context),
+      };
+      this.requestEvaluationCache.set(cacheKey, cached);
+    }
+
+    return this.collectLowerTimeframeValues(cached.bars, cached.values);
+  }
+
   private getCallArgument(expr: CallExpression, position: number, name: string): CallArgument | undefined {
     return expr.arguments.find((arg) => arg.name?.name === name) ?? expr.arguments.filter((arg) => !arg.name)[position];
   }
@@ -1081,6 +1135,12 @@ export class TealscriptEngine {
 
     const currency = this.toStringValue(value).trim().toUpperCase();
     return currency === '' ? undefined : currency;
+  }
+
+  private isLowerRequestTimeframe(timeframe: string): boolean {
+    const requestDuration = this.getTimeframeDurationMs(timeframe);
+    const chartDuration = this.getTimeframeDurationMs(this.ctx.timeframe.period);
+    return requestDuration !== null && chartDuration !== null && requestDuration < chartDuration;
   }
 
   private requestEvaluationCacheKey(
@@ -1207,6 +1267,37 @@ export class TealscriptEngine {
   private isFirstChartBarAtOrAfter(time: number): boolean {
     const previous = this.ctx.getBar(this.ctx.bar_index - 1);
     return !previous || previous.time < time;
+  }
+
+  private collectLowerTimeframeValues(requestBars: Bar[], requestedValues: unknown[]): PineArray {
+    const array = createPineArray();
+    const chartStart = this.ctx.time.get(0);
+    if (chartStart === undefined || requestBars.length === 0) {
+      return array;
+    }
+
+    const chartEnd = this.getCurrentChartBarEndTime(chartStart);
+    if (!Number.isFinite(chartEnd) || chartEnd <= chartStart) {
+      return array;
+    }
+
+    for (let index = 0; index < requestBars.length; index++) {
+      const requestTime = requestBars[index]!.time;
+      if (requestTime >= chartStart && requestTime < chartEnd) {
+        pushArrayValue(array, requestedValues[index] ?? Number.NaN);
+      }
+    }
+
+    return array;
+  }
+
+  private getCurrentChartBarEndTime(chartStart: number): number {
+    const nextBar = this.ctx.getBar(this.ctx.bar_index + 1);
+    if (nextBar) {
+      return nextBar.time;
+    }
+
+    return this.getBarCloseTime(chartStart, this.ctx.timeframe.period);
   }
 
   private registerDrawingBuiltins(): void {
