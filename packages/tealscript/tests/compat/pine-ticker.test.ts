@@ -31,6 +31,46 @@ function sessionRequestDatafeed(): InMemoryRequestDatafeed {
       ],
       syminfo: { ticker: 'NASDAQ:AAPL|session=extended', timezone: 'Etc/UTC' },
     },
+    {
+      symbol: 'NASDAQ:AAPL|chart=renko:ATR:10',
+      timeframe: '1',
+      bars: [
+        { time: 1_700_000_000_000, open: 180, high: 182, low: 178, close: 182, volume: 1 },
+        { time: 1_700_000_060_000, open: 182, high: 184, low: 182, close: 184, volume: 1 },
+        { time: 1_700_000_120_000, open: 184, high: 184, low: 182, close: 182, volume: 1 },
+      ],
+      syminfo: { ticker: 'NASDAQ:AAPL|chart=renko:ATR:10', timezone: 'Etc/UTC' },
+    },
+    {
+      symbol: 'NASDAQ:AAPL|chart=linebreak:3',
+      timeframe: '1',
+      bars: [
+        { time: 1_700_000_000_000, open: 210, high: 212, low: 209, close: 211, volume: 1 },
+        { time: 1_700_000_060_000, open: 211, high: 213, low: 210, close: 212, volume: 1 },
+        { time: 1_700_000_120_000, open: 212, high: 214, low: 211, close: 213, volume: 1 },
+      ],
+      syminfo: { ticker: 'NASDAQ:AAPL|chart=linebreak:3', timezone: 'Etc/UTC' },
+    },
+    {
+      symbol: 'NASDAQ:AAPL|chart=kagi:ATR:10',
+      timeframe: '1',
+      bars: [
+        { time: 1_700_000_000_000, open: 220, high: 223, low: 219, close: 222, volume: 1 },
+        { time: 1_700_000_060_000, open: 222, high: 225, low: 221, close: 224, volume: 1 },
+        { time: 1_700_000_120_000, open: 224, high: 226, low: 222, close: 223, volume: 1 },
+      ],
+      syminfo: { ticker: 'NASDAQ:AAPL|chart=kagi:ATR:10', timezone: 'Etc/UTC' },
+    },
+    {
+      symbol: 'NASDAQ:AAPL|chart=pointfigure:hl:ATR:14:3',
+      timeframe: '1',
+      bars: [
+        { time: 1_700_000_000_000, open: 230, high: 235, low: 230, close: 235, volume: 1 },
+        { time: 1_700_000_060_000, open: 235, high: 240, low: 235, close: 240, volume: 1 },
+        { time: 1_700_000_120_000, open: 240, high: 240, low: 235, close: 235, volume: 1 },
+      ],
+      syminfo: { ticker: 'NASDAQ:AAPL|chart=pointfigure:hl:ATR:14:3', timezone: 'Etc/UTC' },
+    },
   ]);
 }
 
@@ -108,5 +148,34 @@ plot(haC, title="HA Close")
     expect(getPlot(result, 'HA High').values).toEqual([202, 203, 204]);
     expect(getPlot(result, 'HA Low').values).toEqual([199, 200, 201]);
     expect(getPlot(result, 'HA Close').values).toEqual([200.5, 201.5, 202.5]);
+  });
+
+  it('passes remaining non-standard ticker IDs through request.security', () => {
+    const result = runCompatScript(`
+indicator("Non-standard ticker requests")
+renkoTicker = ticker.renko("NASDAQ:AAPL", "ATR", 10)
+lineBreakTicker = ticker.linebreak("NASDAQ:AAPL", 3)
+kagiTicker = ticker.kagi("NASDAQ:AAPL", "ATR", 10)
+pnfTicker = ticker.pointfigure("NASDAQ:AAPL", "hl", "ATR", 14, 3)
+renkoClose = request.security(renkoTicker, "1", close, lookahead=barmerge.lookahead_on)
+lineBreakClose = request.security(lineBreakTicker, "1", close, lookahead=barmerge.lookahead_on)
+kagiClose = request.security(kagiTicker, "1", close, lookahead=barmerge.lookahead_on)
+[pnfOpen, pnfClose] = request.security(pnfTicker, "1", [open, close], lookahead=barmerge.lookahead_on)
+plot(renkoClose, title="Renko Close")
+plot(lineBreakClose, title="Line Break Close")
+plot(kagiClose, title="Kagi Close")
+plot(pnfOpen, title="PnF Open")
+plot(pnfClose, title="PnF Close")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: sessionRequestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Renko Close').values).toEqual([182, 184, 182]);
+    expect(getPlot(result, 'Line Break Close').values).toEqual([211, 212, 213]);
+    expect(getPlot(result, 'Kagi Close').values).toEqual([222, 224, 223]);
+    expect(getPlot(result, 'PnF Open').values).toEqual([230, 235, 240]);
+    expect(getPlot(result, 'PnF Close').values).toEqual([235, 240, 235]);
   });
 });
