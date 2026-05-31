@@ -1190,6 +1190,38 @@ plot(sum)`;
       expect(result.errors[0]?.message).toBe('Maximum loop iterations exceeded');
     });
 
+    it('evaluates numeric for loop expressions to the last body expression', () => {
+      const script = `//@version=6
+indicator("Test")
+value = for i = 0 to 3
+    i * 2
+plot(value)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values[0]).toBe(6);
+    });
+
+    it('evaluates while loop expressions to the last body expression', () => {
+      const script = `//@version=6
+indicator("Test")
+i = 0
+value = while i < 3
+    i += 1
+    i * 2
+plot(value)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values[0]).toBe(6);
+    });
+
     it('executes collection for loop over Pine arrays', () => {
       const script = `//@version=6
 indicator("Test")

@@ -193,6 +193,8 @@ export type Expression =
   | UnaryExpression
   | ConditionalExpression
   | SwitchExpression
+  | ForStatement
+  | WhileStatement
   | CallExpression
   | MemberExpression
   | IndexExpression

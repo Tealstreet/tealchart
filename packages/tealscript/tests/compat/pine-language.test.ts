@@ -299,6 +299,28 @@ plot(lastWhile(3), title="While Loop")
     expect(roundSeries(getPlot(result, 'While Loop').values)).toEqual(Array(compatibilityBars.length).fill(3));
   });
 
+  it('runs numeric for and while loop expressions', () => {
+    const result = runCompatScript(`
+indicator("Loop expressions")
+numericValue = for i = 0 to 3
+    i * 2
+i = 0
+whileValue = while i < 3
+    i += 1
+    i * 3
+plot(numericValue, title="Numeric Loop Expression")
+plot(whileValue, title="While Loop Expression")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Numeric Loop Expression').values)).toEqual(
+      Array(compatibilityBars.length).fill(6)
+    );
+    expect(roundSeries(getPlot(result, 'While Loop Expression').values)).toEqual(
+      Array(compatibilityBars.length).fill(9)
+    );
+  });
+
   it('rejects recursive user-defined function calls with a clear diagnostic', () => {
     const result = runCompatScript(`
 indicator("UDF recursion")

@@ -632,6 +632,8 @@ Indent
 
 Expression
   = SwitchExpression
+  / NumericForExpression
+  / WhileExpression
   / ConditionalExpression
 
 SwitchExpression
@@ -640,6 +642,30 @@ SwitchExpression
         type: 'SwitchExpression',
         discriminant: discriminant || null,
         cases,
+        loc: loc()
+      };
+    }
+
+NumericForExpression
+  = "for" _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:IndentedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'numeric',
+        counter,
+        start,
+        end,
+        step: step ? step[3] : null,
+        body,
+        loc: loc()
+      };
+    }
+
+WhileExpression
+  = "while" _ test:Expression _ LineTerminator body:IndentedBlock {
+      return {
+        type: 'WhileStatement',
+        test,
+        body,
         loc: loc()
       };
     }

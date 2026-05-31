@@ -774,6 +774,19 @@ arrayValue = [1, 2]
       }
     });
 
+    it('parses numeric for loop expressions', () => {
+      const ast = parse(`value = for i = 0 to 3
+    i
+`);
+      const declaration = ast.body[0] as VariableDeclaration;
+
+      expect(declaration.type).toBe('VariableDeclaration');
+      expect(declaration.init).toEqual(expect.objectContaining({
+        type: 'ForStatement',
+        kind: 'numeric',
+      }));
+    });
+
     it('parses collection for loop', () => {
       const code = `for value in array.from(1, 2, 3)
     sum := sum + value
@@ -796,6 +809,19 @@ arrayValue = [1, 2]
 `;
       const ast = parse(code);
       expect(ast.body[0].type).toBe('WhileStatement');
+    });
+
+    it('parses while loop expressions', () => {
+      const ast = parse(`value = while x > 0
+    x := x - 1
+    x
+`);
+      const declaration = ast.body[0] as VariableDeclaration;
+
+      expect(declaration.type).toBe('VariableDeclaration');
+      expect(declaration.init).toEqual(expect.objectContaining({
+        type: 'WhileStatement',
+      }));
     });
 
     it('parses break', () => {
