@@ -31,6 +31,20 @@ export {
 } from './arrays';
 
 export {
+  createPineMatrix,
+  isPineMatrix,
+  getMatrixRows,
+  getMatrixColumns,
+  getMatrixElementCount,
+  getMatrixValue,
+  setMatrixValue,
+  copyMatrix,
+  matrixRow,
+  matrixColumn,
+  type PineMatrix,
+} from './matrices';
+
+export {
   ExecutionContext,
   createContext,
   type Bar,

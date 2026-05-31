@@ -19,13 +19,11 @@ plot(close)
     const result = runCompatScript(`
 indicator("Unsupported collections")
 map.new()
-matrix.new(2, 2)
 plot(close)
 `, { bars: [compatibilityBars[0]!] });
 
     expect(result.errors.map((error) => error.message)).toEqual([
       'map.* functions are not supported yet: map.new',
-      'matrix.* functions are not supported yet: matrix.new',
     ]);
   });
 

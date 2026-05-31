@@ -90,6 +90,19 @@ import {
   toLineWidth as toLineWidthValue,
   withDrawing,
 } from './drawings/helpers';
+import {
+  copyMatrix,
+  createPineMatrix,
+  getMatrixColumns,
+  getMatrixElementCount,
+  getMatrixRows,
+  getMatrixValue,
+  isPineMatrix,
+  matrixColumn,
+  matrixRow,
+  setMatrixValue,
+  type PineMatrix,
+} from './matrices';
 import { Scope, createRootScope } from './scope';
 import { currencyRateRequestKey, type RequestDataContext, type RequestDatafeed, type RequestSeriesPoint } from './requestDatafeed';
 
@@ -135,7 +148,7 @@ interface TickerModifierParts {
   modifiers: string[];
 }
 
-const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['map', 'matrix', 'ticker']);
+const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['map', 'ticker']);
 
 /**
  * Tealscript Engine - executes AST bar-by-bar
@@ -1035,17 +1048,17 @@ export class TealscriptEngine {
       return builtin(args, namedArgs, this.ctx, this.scope, this.nextBuiltinCallId(fullName));
     }
 
-    const methodBuiltinName = namespace ? this.getMethodBuiltinName(funcName) : undefined;
-    if (methodBuiltinName && expr.callee.type === 'MemberExpression') {
-      const methodBuiltin = this.builtins.get(methodBuiltinName);
-      if (methodBuiltin) {
-        const receiver = this.evaluateExpression(expr.callee.object);
-        return methodBuiltin([receiver, ...args], namedArgs, this.ctx, this.scope, this.nextBuiltinCallId(methodBuiltinName));
-      }
-    }
-
     if (namespace && !this.scope.has(namespace) && this.isPlannedUnsupportedNamespace(namespace)) {
       throw new Error(`${namespace}.* functions are not supported yet: ${fullName}`);
+    }
+
+    if (namespace && expr.callee.type === 'MemberExpression') {
+      const receiver = this.evaluateExpression(expr.callee.object);
+      const methodBuiltinName = this.getMethodBuiltinName(funcName, receiver);
+      const methodBuiltin = this.builtins.get(methodBuiltinName);
+      if (methodBuiltin) {
+        return methodBuiltin([receiver, ...args], namedArgs, this.ctx, this.scope, this.nextBuiltinCallId(methodBuiltinName));
+      }
     }
 
     if (!namespace) {
@@ -1513,7 +1526,11 @@ export class TealscriptEngine {
     return line.y1 + slope * (x - line.x1);
   }
 
-  private getMethodBuiltinName(methodName: string): string | undefined {
+  private getMethodBuiltinName(methodName: string, receiver: unknown): string {
+    if (isPineMatrix(receiver)) {
+      return `matrix.${methodName}`;
+    }
+
     switch (methodName) {
       case 'size':
       case 'get':
@@ -1560,7 +1577,7 @@ export class TealscriptEngine {
       case 'clear':
         return `array.${methodName}`;
       default:
-        return undefined;
+        return `array.${methodName}`;
     }
   }
 
@@ -2466,6 +2483,9 @@ export class TealscriptEngine {
 
     // Array functions
     this.registerArrayBuiltins();
+
+    // Matrix functions
+    this.registerMatrixBuiltins();
 
     // Color constants
     this.registerColorBuiltins();
@@ -3462,6 +3482,40 @@ export class TealscriptEngine {
       clearArray(readMutableArray(args[0]));
       return null;
     });
+  }
+
+  private registerMatrixBuiltins(): void {
+    const createMatrix = (args: unknown[]) => createPineMatrix(args[0] as number | undefined, args[1] as number | undefined, args[2]);
+    const readMatrix = (value: unknown): PineMatrix => {
+      if (!isPineMatrix(value)) {
+        throw new Error('Expected matrix');
+      }
+      return value;
+    };
+
+    this.builtins.set('matrix.new', createMatrix);
+    this.builtins.set('matrix.new_float', createMatrix);
+    this.builtins.set('matrix.new_int', createMatrix);
+    this.builtins.set('matrix.new_bool', createMatrix);
+    this.builtins.set('matrix.new_string', createMatrix);
+    this.builtins.set('matrix.new_color', createMatrix);
+    this.builtins.set('matrix.rows', (args) => getMatrixRows(readMatrix(args[0])));
+    this.builtins.set('matrix.columns', (args) => getMatrixColumns(readMatrix(args[0])));
+    this.builtins.set('matrix.elements_count', (args) => getMatrixElementCount(readMatrix(args[0])));
+    this.builtins.set('matrix.get', (args) => getMatrixValue(readMatrix(args[0]), args[1] as number, args[2] as number));
+    this.builtins.set('matrix.set', (args) => {
+      setMatrixValue(readMatrix(args[0]), args[1] as number, args[2] as number, args[3]);
+      return null;
+    });
+    this.builtins.set('matrix.copy', (args) => copyMatrix(readMatrix(args[0])));
+    this.builtins.set('matrix.row', (args) => matrixRow(readMatrix(args[0]), args[1] as number));
+    this.builtins.set('matrix.col', (args) => matrixColumn(readMatrix(args[0]), args[1] as number));
+    this.builtins.set('matrix.column', (args) => matrixColumn(readMatrix(args[0]), args[1] as number));
+    this.builtins.set('matrix.is_square', (args) => {
+      const matrix = readMatrix(args[0]);
+      return matrix.rows === matrix.columns;
+    });
+    this.builtins.set('matrix.is_valid', (args) => isPineMatrix(args[0]));
   }
 
   private registerColorBuiltins(): void {
