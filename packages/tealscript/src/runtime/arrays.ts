@@ -265,3 +265,20 @@ export function avgArrayValue(array: PineArray): number {
   const values = numericArrayValues(array);
   return values.length === 0 ? Number.NaN : values.reduce((sum, value) => sum + value, 0) / values.length;
 }
+
+export function covarianceArrayValue(left: PineArray, right: PineArray, biased: boolean = true): number {
+  const pairs = getArrayValues(left).map((leftValue, index) => [Number(leftValue), Number(getArrayValue(right, index))]);
+  const numericPairs = pairs.filter(([leftValue, rightValue]) => !Number.isNaN(leftValue) && !Number.isNaN(rightValue));
+  const length = numericPairs.length;
+  if (length === 0 || (!biased && length < 2)) return Number.NaN;
+
+  const leftWindow = numericPairs.map(([value]) => value);
+  const rightWindow = numericPairs.map(([, value]) => value);
+  const leftMean = leftWindow.reduce((sum, value) => sum + value, 0) / length;
+  const rightMean = rightWindow.reduce((sum, value) => sum + value, 0) / length;
+  const covariance = leftWindow.reduce((sum, value, index) => {
+    return sum + (value - leftMean) * (rightWindow[index] - rightMean);
+  }, 0);
+
+  return covariance / (biased ? length : length - 1);
+}

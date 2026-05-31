@@ -5,6 +5,7 @@ import {
   clearArray,
   concatArray,
   copyArray,
+  covarianceArrayValue,
   createPineArray,
   firstArrayValue,
   getArraySize,
@@ -237,5 +238,33 @@ describe('PineArray', () => {
     expect(maxArrayValue(array)).toBeNaN();
     expect(sumArrayValue(array)).toBeNaN();
     expect(avgArrayValue(array)).toBeNaN();
+  });
+
+  it('calculates biased and unbiased covariance for numeric arrays', () => {
+    const left = createPineArray<number>();
+    const right = createPineArray<number>();
+    [2, 4, 6].forEach((value) => pushArrayValue(left, value));
+    [1, 5, 7].forEach((value) => pushArrayValue(right, value));
+
+    expect(covarianceArrayValue(left, right)).toBeCloseTo(4);
+    expect(covarianceArrayValue(left, right, false)).toBeCloseTo(6);
+  });
+
+  it('returns NaN for empty or underfilled covariance samples', () => {
+    const empty = createPineArray<number>();
+    const one = createPineArray<number>();
+    pushArrayValue(one, 1);
+
+    expect(covarianceArrayValue(empty, one)).toBeNaN();
+    expect(covarianceArrayValue(one, one, false)).toBeNaN();
+  });
+
+  it('skips NaN covariance pairs without realigning values', () => {
+    const left = createPineArray<number>();
+    const right = createPineArray<number>();
+    [1, Number.NaN, 3, 4].forEach((value) => pushArrayValue(left, value));
+    [2, 5, Number.NaN, 8].forEach((value) => pushArrayValue(right, value));
+
+    expect(covarianceArrayValue(left, right)).toBeCloseTo(4.5);
   });
 });

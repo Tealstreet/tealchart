@@ -179,8 +179,8 @@ Phases:
 
 1. Build a generated/manual inventory of v6 built-ins from the Reference Manual
    into tracked coverage tables.
-2. Finish `ta.*`: correlation, covariance, oscillator variants, smoothing
-   variants, edge-case parity, tuple returns, and exact `na` handling.
+2. Finish `ta.*`: correlation, oscillator variants, smoothing variants,
+   edge-case parity, tuple returns, and exact `na` handling.
 3. Finish `math.*`: random behavior, mintick rounding, overloads, and exact
    integer/float behavior.
 4. Finish `str.*`: `str.tonumber`, `str.format_time`, formatting edge cases,
@@ -326,7 +326,7 @@ Goal: support complex Pine libraries and object-oriented Pine patterns.
 Phases:
 
 1. Finish array parity: sorting, slicing, joining, reversing, binary search,
-   percentiles, standardization, covariance/correlation helpers, and edge cases.
+   percentiles, standardization, covariance helpers, and edge cases.
 2. Implement `matrix.*` with typed storage, arithmetic/stat helpers, row/column
    access, copy/reshape behavior, and tests.
 3. Implement `map.*` with key/value typing, insertion, lookup, removal, keys,
