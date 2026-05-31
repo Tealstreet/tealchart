@@ -454,11 +454,15 @@ export class TealscriptEngine {
   }
 
   private executeLibrary(_stmt: LibraryDeclaration): void {
+    if (this.ctx.bar_index !== 0) return;
+
     // Local library scripts can execute their global demo code in this runtime.
     // Published-library import resolution is still intentionally unsupported.
   }
 
   private executeImport(stmt: ImportDeclaration): void {
+    if (this.ctx.bar_index !== 0) return;
+
     throw new Error(`import declarations are not supported yet: ${stmt.path} as ${stmt.alias.name}`);
   }
 
