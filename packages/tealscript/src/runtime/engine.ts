@@ -823,7 +823,11 @@ export class TealscriptEngine {
     for (const arg of expr.arguments) {
       const value = this.evaluateExpression(arg.value);
       if (arg.name) {
-        namedArgs.set(arg.name.name, value);
+        const argName = arg.name.name;
+        if (namedArgs.has(argName)) {
+          throw new Error(`Duplicate named argument: ${argName}`);
+        }
+        namedArgs.set(argName, value);
       } else {
         args.push(value);
       }
@@ -968,9 +972,27 @@ export class TealscriptEngine {
       throw new Error(`Recursive user function calls are not supported: ${cycle}`);
     }
 
+    if (args.length > fn.params.length) {
+      throw new Error(
+        `Too many arguments for function ${functionName}: expected ${fn.params.length}, got ${args.length}`,
+      );
+    }
+
+    const paramNames = new Set(fn.params.map((param) => param.name));
+    for (const argName of namedArgs.keys()) {
+      if (!paramNames.has(argName)) {
+        throw new Error(`Unknown argument '${argName}' for function ${functionName}`);
+      }
+    }
+
     const parameterValues = fn.params.map((param, index) => {
       const paramName = param.name;
       if (namedArgs.has(paramName)) {
+        if (index < args.length) {
+          throw new Error(
+            `Argument '${paramName}' for function ${functionName} was supplied multiple times`,
+          );
+        }
         return namedArgs.get(paramName);
       }
       if (index < args.length) {
