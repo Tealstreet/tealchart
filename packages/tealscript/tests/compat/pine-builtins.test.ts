@@ -70,6 +70,7 @@ plot(ta.stoch(close, high, low, 3), title="Stoch Close")
 plot(ta.stoch(hl2, high, low, 3), title="Stoch HL2")
 plot(ta.mfi(hlc3, 3), title="MFI")
 plot(ta.wpr(3), title="WPR")
+plot(ta.cmo(close, 3), title="CMO")
 plot(ta.cci(close, 3), title="Close CCI")
 plot(ta.cci(hlc3, 3), title="Typical CCI")
 `);
@@ -79,6 +80,7 @@ plot(ta.cci(hlc3, 3), title="Typical CCI")
     expect(roundSeries(getPlot(result, 'Stoch HL2').values)).toEqual([null, null, 77.777778, 56.25, 27.272727, 19.230769, 66.666667, 75, 79.166667, 72.222222, 68.75, 50]);
     expect(roundSeries(getPlot(result, 'MFI').values)).toEqual([null, null, 100, 61.624951, 26.076294, 0, 35.319543, 74.59367, 100, 100, 100, 100]);
     expect(roundSeries(getPlot(result, 'WPR').values)).toEqual([null, null, -11.111111, -75, -90.909091, -69.230769, -11.111111, -7.142857, -25, -11.111111, -50, -28.571429]);
+    expect(roundSeries(getPlot(result, 'CMO').values)).toEqual([null, null, null, 11.111111, -60, -77.777778, 11.111111, 100, 80, 77.777778, 20, 66.666667]);
     expect(roundSeries(getPlot(result, 'Close CCI').values)).toEqual([null, null, 87.5, -100, -100, -28.571429, 100, 100, 33.333333, 100, 20, 100]);
     expect(roundSeries(getPlot(result, 'Typical CCI').values)).toEqual([null, null, 95.652174, -25, -100, -70, 100, 100, 64.516129, 100, 84.615385, 50]);
   });
