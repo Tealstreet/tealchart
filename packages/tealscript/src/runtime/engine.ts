@@ -90,6 +90,11 @@ export interface ExecutionError {
   column?: number;
 }
 
+interface RandomBuiltinState {
+  seed: number;
+  state: number;
+}
+
 const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['request', 'map', 'matrix', 'polyline', 'ticker']);
 
 /**
@@ -1652,6 +1657,33 @@ export class TealscriptEngine {
     return values.length < length ? null : values;
   }
 
+  private nextSeededRandom(scope: Scope, key: string, seed: number): number {
+    const state = scope.get(key) as RandomBuiltinState | undefined;
+    const current = state?.seed === seed ? state.state : this.hashRandomSeed(seed);
+    const nextState = (current + 0x6d2b79f5) >>> 0;
+    let value = nextState;
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+    this.setBuiltinState(scope, key, { seed, state: nextState });
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+  }
+
+  private hashRandomSeed(seed: number): number {
+    let value = seed >>> 0;
+    value ^= value >>> 16;
+    value = Math.imul(value, 0x7feb352d);
+    value ^= value >>> 15;
+    value = Math.imul(value, 0x846ca68b);
+    value ^= value >>> 16;
+    return value >>> 0;
+  }
+
+  private toExclusiveUnitRandom(value: number): number {
+    if (value <= 0) return Number.EPSILON;
+    if (value >= 1) return 1 - Number.EPSILON;
+    return value;
+  }
+
   private getCompletePairedSourceWindows(
     scope: Scope,
     leftKey: string,
@@ -2239,6 +2271,23 @@ export class TealscriptEngine {
       const length = this.normalizeLookbackLength(args[1]);
       const values = this.getCompleteNonNaSourceWindow(scope, `_math_sum_source_${callId}`, source, length);
       return values ? values.reduce((sum, value) => sum + value, 0) : Number.NaN;
+    });
+    this.builtins.set('math.random', (args, namedArgs, _ctx, scope, callId) => {
+      const min = this.toNumber(namedArgs.has('min') ? namedArgs.get('min') : args[0] ?? 0);
+      const max = this.toNumber(namedArgs.has('max') ? namedArgs.get('max') : args[1] ?? 1);
+      const seedArg = namedArgs.has('seed') ? namedArgs.get('seed') : args[2];
+      if (!Number.isFinite(min) || !Number.isFinite(max) || max <= min) return Number.NaN;
+
+      let randomValue: number;
+      if (seedArg === undefined) {
+        randomValue = Math.random();
+      } else {
+        const seed = Math.trunc(this.toNumber(seedArg));
+        if (!Number.isFinite(seed)) return Number.NaN;
+        randomValue = this.nextSeededRandom(scope, `_math_random_${callId}`, seed);
+      }
+
+      return min + this.toExclusiveUnitRandom(randomValue) * (max - min);
     });
     this.builtins.set('math.sqrt', (args) => Math.sqrt(args[0] as number));
     this.builtins.set('math.pow', (args) => Math.pow(args[0] as number, args[1] as number));
@@ -3443,6 +3492,39 @@ export class TealscriptEngine {
 
       const total = gains + losses;
       return total === 0 ? 0 : ((gains - losses) / total) * 100;
+    });
+
+    this.builtins.set('ta.tsi', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const shortLength = this.normalizeLookbackLength(args[1]);
+      const longLength = this.normalizeLookbackLength(args[2]);
+      if (isNaN(source) || shortLength < 1 || longLength < 1) return NaN;
+
+      const sourceKey = `_ta_tsi_source_${callId}`;
+      const sourceHistory = (scope.get(sourceKey) as number[] | undefined) ?? [];
+      const previousSource = sourceHistory[0];
+      this.setBuiltinState(scope, sourceKey, [source, ...sourceHistory].slice(0, 2));
+
+      if (previousSource === undefined || isNaN(previousSource)) return NaN;
+
+      const momentum = source - previousSource;
+      const absMomentum = Math.abs(momentum);
+      const longAlpha = 2 / (longLength + 1);
+      const shortAlpha = 2 / (shortLength + 1);
+
+      const ema = (key: string, value: number, alpha: number): number => {
+        const previous = scope.get(key) as number | undefined;
+        const next = previous === undefined || isNaN(previous) ? value : alpha * value + (1 - alpha) * previous;
+        this.setBuiltinState(scope, key, next);
+        return next;
+      };
+
+      const smoothedMomentum = ema(`_ta_tsi_momentum_long_${callId}`, momentum, longAlpha);
+      const smoothedAbsMomentum = ema(`_ta_tsi_abs_long_${callId}`, absMomentum, longAlpha);
+      const doubleSmoothedMomentum = ema(`_ta_tsi_momentum_short_${callId}`, smoothedMomentum, shortAlpha);
+      const doubleSmoothedAbsMomentum = ema(`_ta_tsi_abs_short_${callId}`, smoothedAbsMomentum, shortAlpha);
+
+      return doubleSmoothedAbsMomentum === 0 ? 0 : doubleSmoothedMomentum / doubleSmoothedAbsMomentum;
     });
 
     // MOM - Momentum
