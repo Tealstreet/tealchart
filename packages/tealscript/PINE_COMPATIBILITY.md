@@ -97,7 +97,7 @@ that supports the parity work.
 
 The common TA helper pass covers event helpers (`ta.barssince`,
 `ta.valuewhen`), cumulative/window helpers (`ta.cum`, `ta.dev`,
-`ta.variance`, `ta.correlation`, `ta.cog`, `ta.kc`, `ta.kcw`, `ta.linreg`, `ta.vwma`, `ta.swma`,
+`ta.variance`, `ta.correlation`, `ta.cog`, `ta.kc`, `ta.kcw`, `ta.bb`, `ta.bbw`, `ta.linreg`, `ta.vwma`, `ta.swma`,
 `ta.alma`, `ta.highestbars`, `ta.lowestbars`), oscillator helpers (`ta.stoch`, `ta.mfi`,
 `ta.wpr`, `ta.cci`, `ta.cmo`, `ta.tsi`), and compatibility
 aliases/helpers (`ta.change` numeric and boolean forms, `ta.cross`, `ta.range`,
