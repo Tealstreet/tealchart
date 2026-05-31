@@ -97,6 +97,17 @@ export interface PlotOutput {
   color: string | (string | null)[];
   linewidth?: number;
   style?: PlotStyle;
+  lineStyle?: PlotLineStyle;
+  offset?: number;
+  trackprice?: boolean;
+  histbase?: number;
+  join?: boolean;
+  editable?: boolean;
+  showLast?: number;
+  display?: number;
+  format?: string;
+  precision?: number;
+  forceOverlay?: boolean;
 
   // For plotbar/plotcandle
   openValues?: (number | null)[];
@@ -114,15 +125,19 @@ export interface PlotOutput {
   shape?: string;
   size?: 'tiny' | 'small' | 'normal' | 'large' | 'huge' | 'auto';
   text?: string;
+  textColor?: string | (string | null)[];
   char?: string;
 
   // For plotarrow
   colorup?: string;
   colordown?: string;
+  minHeight?: number;
+  maxHeight?: number;
 
   // For fill
   plot1Id?: string;
   plot2Id?: string;
+  fillgaps?: boolean;
 }
 
 export type PlotStyle =
@@ -136,6 +151,8 @@ export type PlotStyle =
   | 'columns'
   | 'area'
   | 'areabr';
+
+export type PlotLineStyle = 'solid' | 'dotted' | 'dashed';
 
 export type AlertFrequency = 'once_per_bar' | 'once_per_bar_close' | 'all';
 

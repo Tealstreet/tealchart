@@ -412,6 +412,243 @@ describe('TealchartRenderer coordinate transforms', () => {
     });
   });
 
+  describe('hline rendering', () => {
+    it('renders hlines with their configured line style', () => {
+      const setLineDash = vi.fn();
+      const stroke = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        setLineDash,
+        stroke,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const plot: PlotOutput = {
+        id: 'hline_Midline',
+        type: 'hline',
+        title: 'Midline',
+        values: [],
+        color: '#2196F3',
+        linewidth: 2,
+        lineStyle: 'dotted',
+        price: 100,
+      };
+
+      (renderer as any).renderHline(plot, { startTime: 0, endTime: 1, priceMin: 50, priceMax: 150 });
+
+      expect(setLineDash).toHaveBeenCalledWith([2, 3]);
+      expect(stroke).toHaveBeenCalled();
+    });
+  });
+
+  describe('fill rendering', () => {
+    it('bridges plot gaps only when fillgaps is enabled', () => {
+      const fill = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fill,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 0,
+        priceMax: 10,
+      };
+      const upper: PlotOutput = {
+        id: 'plot_Upper',
+        type: 'plot',
+        title: 'Upper',
+        values: [4, null, 6],
+        color: '#2196F3',
+      };
+      const lower: PlotOutput = {
+        id: 'plot_Lower',
+        type: 'plot',
+        title: 'Lower',
+        values: [2, null, 3],
+        color: '#F44336',
+      };
+      const gapFill: PlotOutput = {
+        id: 'fill_Gap',
+        type: 'fill',
+        title: 'Gap',
+        values: [],
+        color: ['#4CAF5033', '#4CAF5033', '#4CAF5033'],
+        plot1Id: 'plot_Upper',
+        plot2Id: 'plot_Lower',
+        fillgaps: false,
+      };
+      const bridgeFill: PlotOutput = {
+        ...gapFill,
+        id: 'fill_Bridge',
+        title: 'Bridge',
+        fillgaps: true,
+      };
+
+      (renderer as any).renderFill(gapFill, [upper, lower, gapFill], bars, viewport, (value: number) => value);
+      expect(fill).not.toHaveBeenCalled();
+
+      (renderer as any).renderFill(bridgeFill, [upper, lower, bridgeFill], bars, viewport, (value: number) => value);
+      expect(fill).toHaveBeenCalledOnce();
+      expect(ctx.fillStyle).toBe('#4CAF5033');
+    });
+  });
+
+  describe('marker rendering', () => {
+    it('renders plotchar glyphs and marker text', () => {
+      const fillText = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillText,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(1, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[0]!.time + 60_000,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plot: PlotOutput = {
+        id: 'plotchar_Test',
+        type: 'plotchar',
+        title: 'Test',
+        values: [1],
+        color: ['#2196F3'],
+        char: 'D',
+        text: 'Down',
+        textColor: '#FFEB3B',
+        location: 'abovebar',
+        size: 'small',
+        offset: 1,
+      };
+
+      (renderer as any).renderPlotShape(plot, bars, viewport);
+
+      expect(fillText).toHaveBeenCalledWith('D', expect.any(Number), expect.any(Number));
+      expect(fillText).toHaveBeenCalledWith('Down', expect.any(Number), expect.any(Number));
+    });
+  });
+
+  describe('background rendering', () => {
+    it('renders bgcolor only for active bars', () => {
+      const fillRect = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillRect,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plot: PlotOutput = {
+        id: 'bgcolor_Session',
+        type: 'bgcolor',
+        title: 'Session',
+        values: [null, 1],
+        color: [null, '#2196F333'],
+      };
+
+      (renderer as any).renderBgcolor(plot, bars, viewport);
+
+      expect(fillRect).toHaveBeenCalledOnce();
+      expect(ctx.fillStyle).toBe('#2196F333');
+    });
+  });
+
+  describe('visual primitive integration', () => {
+    it('routes fills, hlines, markers, and backgrounds through renderPlots', () => {
+      const fillRect = vi.fn();
+      const fill = vi.fn();
+      const fillText = vi.fn();
+      const stroke = vi.fn();
+      const arc = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillRect,
+        fill,
+        fillText,
+        stroke,
+        arc,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plots: PlotOutput[] = [
+        {
+          id: 'bgcolor_Session',
+          type: 'bgcolor',
+          title: 'Session',
+          values: [1, null, null],
+          color: ['#2196F333', null, null],
+        },
+        {
+          id: 'plot_Basis',
+          type: 'plot',
+          title: 'Basis',
+          values: [100, 110, 120],
+          color: ['#2196F3', '#2196F3', '#2196F3'],
+        },
+        {
+          id: 'hline_Level',
+          type: 'hline',
+          title: 'Level',
+          values: [],
+          color: '#787B86',
+          price: 90,
+          lineStyle: 'dotted',
+        },
+        {
+          id: 'fill_Band',
+          type: 'fill',
+          title: 'Band',
+          values: [],
+          color: ['#4CAF5033', '#4CAF5033', '#4CAF5033'],
+          plot1Id: 'plot_Basis',
+          plot2Id: 'hline_Level',
+        },
+        {
+          id: 'plotshape_Mark',
+          type: 'plotshape',
+          title: 'Mark',
+          values: [1, null, 1],
+          color: ['#F44336', null, '#F44336'],
+          shape: 'circle',
+          location: 'abovebar',
+          text: 'M',
+        },
+        {
+          id: 'plotchar_Char',
+          type: 'plotchar',
+          title: 'Char',
+          values: [null, 1, null],
+          color: [null, '#FFEB3B', null],
+          char: 'C',
+          location: 'belowbar',
+        },
+      ];
+
+      renderer.renderPlots(plots, bars, viewport);
+
+      expect(fillRect).toHaveBeenCalled();
+      expect(fill).toHaveBeenCalled();
+      expect(fillText).toHaveBeenCalledWith('M', expect.any(Number), expect.any(Number));
+      expect(fillText).toHaveBeenCalledWith('C', expect.any(Number), expect.any(Number));
+      expect(stroke).toHaveBeenCalled();
+      expect(arc).toHaveBeenCalled();
+    });
+  });
+
   describe('calculateViewport', () => {
     it('returns sensible defaults for empty bars', () => {
       const vp = TealchartRenderer.calculateViewport([]);
