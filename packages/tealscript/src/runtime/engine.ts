@@ -3235,14 +3235,15 @@ export class TealscriptEngine {
       return undefined;
     }
     const requestedQty = this.resolveStrategyOrderQty(qtyType, qtyValue, limitPrice, stopPrice);
-    const qty = isEntry ? this.resolveStrategyEntryTransactionQty(direction, requestedQty) : requestedQty;
 
     const order = submitStrategyOrder(this.ctx.strategyLedger, {
       id,
       direction,
-      qty,
+      qty: requestedQty,
       qtyType,
       qtyValue,
+      isEntry,
+      requestedQty,
       limitPrice,
       stopPrice,
       ocaName,
@@ -3266,14 +3267,6 @@ export class TealscriptEngine {
   private canSubmitStrategyEntry(direction: StrategyDirection): boolean {
     const openEntries = this.ctx.strategyLedger.openTrades.filter((trade) => trade.direction === direction).length;
     return openEntries < this.ctx.strategyLedger.settings.pyramiding + 1;
-  }
-
-  private resolveStrategyEntryTransactionQty(direction: StrategyDirection, requestedQty: number): number {
-    const position = this.ctx.strategyLedger.position;
-    if (position.direction === null || position.direction === direction) {
-      return requestedQty;
-    }
-    return Math.abs(position.size) + requestedQty;
   }
 
   private resolveStrategyOrderQty(
