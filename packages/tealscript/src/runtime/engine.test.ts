@@ -536,6 +536,62 @@ plot(strategy.closedtrades)`;
         [0, 0, 0],
       ]);
     });
+
+    it('keeps strategy.exit OCA cancellation scoped to from_entry', () => {
+      const script = `//@version=6
+strategy("OCA scope")
+if bar_index == 0
+    strategy.entry("A", strategy.long, qty=1)
+    strategy.entry("B", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Bracket", "A", limit=101.4, stop=99)
+    strategy.exit("Bracket", "B", limit=110, stop=99)
+plot(strategy.position_size)`;
+
+      const result = executeScript(parse(script), createBars(3));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        fromEntry: order.fromEntry,
+        status: order.status,
+        ocaName: order.ocaName,
+      }))).toEqual([
+        { id: 'A', fromEntry: undefined, status: 'filled', ocaName: undefined },
+        { id: 'B', fromEntry: undefined, status: 'filled', ocaName: undefined },
+        { id: 'Bracket Limit', fromEntry: 'A', status: 'filled', ocaName: 'A:Bracket' },
+        { id: 'Bracket Stop', fromEntry: 'A', status: 'cancelled', ocaName: 'A:Bracket' },
+        { id: 'Bracket Limit', fromEntry: 'B', status: 'pending', ocaName: 'B:Bracket' },
+        { id: 'Bracket Stop', fromEntry: 'B', status: 'pending', ocaName: 'B:Bracket' },
+      ]);
+    });
+
+    it('does not fill updated strategy.exit prices until a later bar', () => {
+      const script = `//@version=6
+strategy("Exit activation")
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Target", "Long", limit=110)
+if bar_index == 2
+    strategy.exit("Target", "Long", limit=101.4)
+plot(strategy.position_size)`;
+
+      const result = executeScript(parse(script), createBars(4));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        limitPrice: order.limitPrice,
+        activationBarIndex: order.activationBarIndex,
+        updatedBarIndex: order.updatedBarIndex,
+      }))).toEqual([
+        { id: 'Long', status: 'filled', limitPrice: undefined, activationBarIndex: 0, updatedBarIndex: 0 },
+        { id: 'Target', status: 'filled', limitPrice: 101.4, activationBarIndex: 2, updatedBarIndex: 3 },
+      ]);
+      expect(result.strategy.closedTrades[0]?.exitBarIndex).toBe(3);
+    });
   });
 
   describe('user-defined types', () => {

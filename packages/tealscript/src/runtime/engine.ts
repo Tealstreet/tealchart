@@ -3312,6 +3312,7 @@ export class TealscriptEngine {
     const alertProfit = this.toOptionalString(this.getCallArg(args, namedArgs, 17, 'alert_profit'));
     const alertLoss = this.toOptionalString(this.getCallArg(args, namedArgs, 18, 'alert_loss'));
     const suffixOrders = limitPrice !== undefined && stopPrice !== undefined;
+    const exitOcaName = suffixOrders ? this.strategyExitOcaName(id, fromEntry) : undefined;
     this.cancelObsoleteStrategyExitOrders(id, fromEntry, suffixOrders);
 
     if (limitPrice !== undefined) {
@@ -3323,7 +3324,7 @@ export class TealscriptEngine {
         qtyValue: qty,
         limitPrice,
         fromEntry,
-        ocaName: suffixOrders ? id : undefined,
+        ocaName: exitOcaName,
         ocaType: suffixOrders ? 'cancel' : undefined,
         comment: commentProfit ?? comment,
         alertMessage: alertProfit ?? alertMessage,
@@ -3341,7 +3342,7 @@ export class TealscriptEngine {
         qtyValue: qty,
         stopPrice,
         fromEntry,
-        ocaName: suffixOrders ? id : undefined,
+        ocaName: exitOcaName,
         ocaType: suffixOrders ? 'cancel' : undefined,
         comment: commentLoss ?? comment,
         alertMessage: alertLoss ?? alertMessage,
@@ -3351,6 +3352,10 @@ export class TealscriptEngine {
     }
 
     return undefined;
+  }
+
+  private strategyExitOcaName(id: string, fromEntry: string | undefined): string {
+    return fromEntry === undefined ? id : `${fromEntry}:${id}`;
   }
 
   private cancelObsoleteStrategyExitOrders(id: string, fromEntry: string | undefined, suffixOrders: boolean): void {
@@ -3386,6 +3391,7 @@ export class TealscriptEngine {
       return;
     }
 
+    const triggerChanged = existingOrder.limitPrice !== input.limitPrice || existingOrder.stopPrice !== input.stopPrice;
     existingOrder.direction = input.direction;
     if (input.limitPrice !== undefined && input.stopPrice !== undefined) {
       existingOrder.type = 'stop_limit';
@@ -3406,6 +3412,10 @@ export class TealscriptEngine {
     existingOrder.ocaType = input.ocaType;
     existingOrder.comment = input.comment;
     existingOrder.alertMessage = input.alertMessage;
+    if (triggerChanged) {
+      existingOrder.activationBarIndex = input.barIndex;
+      existingOrder.activationTime = input.time;
+    }
     existingOrder.updatedBarIndex = input.barIndex;
     existingOrder.updatedTime = input.time;
   }

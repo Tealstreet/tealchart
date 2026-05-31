@@ -40,6 +40,8 @@ export interface StrategyOrder {
   alertMessage?: string;
   createdBarIndex: number;
   createdTime: number;
+  activationBarIndex: number;
+  activationTime: number;
   updatedBarIndex: number;
   updatedTime: number;
 }
@@ -221,6 +223,8 @@ export function createStrategyOrder(input: StrategyOrderInput): StrategyOrder {
     alertMessage: input.alertMessage,
     createdBarIndex: input.barIndex,
     createdTime: input.time,
+    activationBarIndex: input.barIndex,
+    activationTime: input.time,
     updatedBarIndex: input.barIndex,
     updatedTime: input.time,
   };
@@ -308,7 +312,7 @@ function fillStrategyOrder(
 }
 
 function getPendingOrderFillPrice(order: StrategyOrder, high: number, low: number, barIndex: number): number | null {
-  if (order.status !== 'pending' || order.qty === null || order.createdBarIndex >= barIndex) {
+  if (order.status !== 'pending' || order.qty === null || order.activationBarIndex >= barIndex) {
     return null;
   }
   if (!Number.isFinite(high) || !Number.isFinite(low)) {
