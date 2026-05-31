@@ -374,6 +374,8 @@ plot(open, title="After")
     const result = runCompatScript(`
 indicator("Global helper casts")
 source = bar_index == 0 or bar_index == 3 ? na : close
+plot(nz(source), title="NZ Default")
+plot(nz(source, open), title="NZ Replacement")
 plot(fixnan(source), title="Fixed")
 plot(float("4.5"), title="Float")
 plot(int(4.9), title="Int")
@@ -382,6 +384,8 @@ plot(string(12.5) == "12.5", title="String")
 `);
 
     expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'NZ Default').values)).toEqual([0, 105, 107, 0, 99, 100, 104, 109, 108, 111, 110, 112]);
+    expect(roundSeries(getPlot(result, 'NZ Replacement').values)).toEqual([100, 105, 107, 107, 99, 100, 104, 109, 108, 111, 110, 112]);
     expect(roundSeries(getPlot(result, 'Fixed').values)).toEqual([null, 105, 107, 107, 99, 100, 104, 109, 108, 111, 110, 112]);
     expect(roundSeries(getPlot(result, 'Float').values)).toEqual([4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5]);
     expect(roundSeries(getPlot(result, 'Int').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);

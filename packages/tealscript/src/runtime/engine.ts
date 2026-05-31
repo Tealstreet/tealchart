@@ -2223,12 +2223,14 @@ export class TealscriptEngine {
 
     // nz - replace na with value
     this.builtins.set('nz', (args) => {
-      const value = args[0] as number;
-      const replacement = (args[1] ?? 0) as number;
-      return isNaN(value) ? replacement : value;
+      this.rejectBoolNaHelperArgs('nz', args);
+      const value = args[0];
+      const replacement = args[1] ?? 0;
+      return this.isNa(value) ? replacement : value;
     });
 
     this.builtins.set('fixnan', (args, _namedArgs, _ctx, scope, callId) => {
+      this.rejectBoolNaHelperArgs('fixnan', args);
       const key = `_fixnan_${callId}`;
       const value = args[0];
       if (this.isNa(value)) {
@@ -2252,6 +2254,12 @@ export class TealscriptEngine {
       const value = args[0];
       return typeof value === 'number' && isNaN(value);
     });
+  }
+
+  private rejectBoolNaHelperArgs(functionName: 'nz' | 'fixnan', args: unknown[]): void {
+    if (args.some((value) => typeof value === 'boolean')) {
+      throw new Error(`${functionName}() does not accept bool arguments in Pine v6`);
+    }
   }
 
   private registerStringBuiltins(): void {
