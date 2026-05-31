@@ -1256,6 +1256,42 @@ plot(sum)`;
       expect(result.plots[0].values[0]).toBe(63);
     });
 
+    it('evaluates collection for loop expressions to the last body expression', () => {
+      const script = `//@version=6
+indicator("Test")
+values = array.from(10, 20, 30)
+value = for [index, item] in values
+    index + item
+plot(value)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values[0]).toBe(32);
+    });
+
+    it('preserves the last collection loop expression value across break and continue', () => {
+      const script = `//@version=6
+indicator("Test")
+values = array.from(1, 2, 3, 4)
+value = for item in values
+    if item == 2
+        continue
+    if item == 4
+        break
+    item * 10
+plot(value)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values[0]).toBe(30);
+    });
+
     it('honors break and continue inside collection for loop', () => {
       const script = `//@version=6
 indicator("Test")

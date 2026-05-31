@@ -632,6 +632,7 @@ Indent
 
 Expression
   = SwitchExpression
+  / CollectionForExpression
   / NumericForExpression
   / WhileExpression
   / ConditionalExpression
@@ -642,6 +643,19 @@ SwitchExpression
         type: 'SwitchExpression',
         discriminant: discriminant || null,
         cases,
+        loc: loc()
+      };
+    }
+
+CollectionForExpression
+  = "for" _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:IndentedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'collection',
+        counter: counter.valueCounter,
+        indexCounter: counter.indexCounter,
+        iterable,
+        body,
         loc: loc()
       };
     }
