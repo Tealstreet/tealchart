@@ -31,54 +31,54 @@ reading the whole runtime.
 
 | Area | Feature | Status | Evidence | Remaining gaps |
 | --- | --- | --- | --- | --- |
-| Parser | `//@version=6` annotation | Supported | `tests/parser/parser.test.ts`; `tests/compat/pine-golden.test.ts` | No version-specific runtime branches yet. |
+| Parser | `//@version=6` annotation | Supported | `tests/parser/parser.test.ts`; `tests/compat/pine-basics.test.ts` | No version-specific runtime branches yet. |
 | Parser | `//@version=5` annotation | Partial | `tests/parser/parser.test.ts` | Accepted as numeric version only. |
-| Parser/runtime | `indicator(...)` | Partial | `tests/compat/pine-golden.test.ts`; `src/runtime/engine.test.ts` | Many declaration options are parsed but not fully applied. |
+| Parser/runtime | `indicator(...)` | Partial | `tests/compat/pine-basics.test.ts`; `src/runtime/engine.test.ts` | Many declaration options are parsed but not fully applied. |
 | Parser/runtime | `strategy(...)` | Partial | `src/parser/parser.test.ts`; `src/runtime/engine.test.ts` | Strategy execution and broker emulator are planned. |
 | Parser/runtime | `library(...)` / `import` | Unsupported | Public API guardrails in `tests/public-api/public-entry.test.ts` | Module system is planned for the libraries epic. |
 | Parser/runtime | Variable declarations | Supported | `tests/parser/parser.test.ts`; `tests/runtime/runtime.test.ts` | Qualified type checking is planned. |
-| Parser/runtime | `var` / `varip` | Partial | `tests/compat/pine-golden.test.ts`; `src/runtime/engine.test.ts` | Intrabar `varip` parity and nested-scope edge cases remain. |
+| Parser/runtime | `var` / `varip` | Partial | `tests/compat/pine-language.test.ts`; `src/runtime/engine.test.ts` | Intrabar `varip` parity and nested-scope edge cases remain. |
 | Parser/runtime | Reassignment `:=` | Partial | `tests/parser/parser.test.ts`; `tests/runtime/runtime.test.ts` | Member assignment is not implemented. |
 | Parser/runtime | Compound assignment | Partial | `tests/parser/parser.test.ts`; `tests/runtime/runtime.test.ts` | Member compound assignment is not implemented. |
-| Parser/runtime | Tuple destructuring | Supported | `tests/compat/pine-golden.test.ts` | Broader type diagnostics are planned. |
-| Parser/runtime | `if` / `else if` / `else` | Supported | `tests/parser/parser.test.ts`; `tests/compat/pine-golden.test.ts` | Nested indentation hardening continues under core semantics. |
-| Parser/runtime | Ternary `?:` | Supported | `tests/runtime/runtime.test.ts`; `tests/compat/pine-golden.test.ts` | Broader `na` truthiness fixtures are planned. |
-| Parser/runtime | `for` loops | Partial | `tests/parser/parser.test.ts`; `tests/compat/pine-golden.test.ts` | Full loop return-expression parity remains. |
-| Parser/runtime | `while`, `break`, `continue` | Supported | `tests/parser/parser.test.ts`; `tests/compat/pine-golden.test.ts` | Runtime limits will be hardened in the limits epic. |
-| Parser/runtime | User-defined functions | Partial | `tests/parser/parser.test.ts`; `tests/compat/pine-golden.test.ts` | Nested block parsing and call-site series parity need hardening. |
-| Parser/runtime | Methods, e.g. `arr.push(x)` | Partial | `tests/compat/pine-golden.test.ts`; `src/runtime/arrays.test.ts` | Non-array methods require UDT/method parity work. |
-| Parser/runtime | `switch` | Partial | `tests/parser/parser.test.ts`; `tests/compat/pine-golden.test.ts` | Exhaustive type diagnostics are planned. |
+| Parser/runtime | Tuple destructuring | Supported | `tests/compat/pine-basics.test.ts` | Broader type diagnostics are planned. |
+| Parser/runtime | `if` / `else if` / `else` | Supported | `tests/parser/parser.test.ts`; `tests/compat/pine-language.test.ts` | Nested indentation hardening continues under core semantics. |
+| Parser/runtime | Ternary `?:` | Supported | `tests/runtime/runtime.test.ts`; `tests/compat/pine-visuals.test.ts` | Broader `na` truthiness fixtures are planned. |
+| Parser/runtime | `for` loops | Partial | `tests/parser/parser.test.ts`; `tests/compat/pine-control-time.test.ts` | Full loop return-expression parity remains. |
+| Parser/runtime | `while`, `break`, `continue` | Supported | `tests/parser/parser.test.ts`; `tests/compat/pine-control-time.test.ts` | Runtime limits will be hardened in the limits epic. |
+| Parser/runtime | User-defined functions | Partial | `tests/parser/parser.test.ts`; `tests/compat/pine-language.test.ts` | Nested block parsing and call-site series parity need hardening. |
+| Parser/runtime | Methods, e.g. `arr.push(x)` | Partial | `tests/compat/pine-arrays.test.ts`; `src/runtime/arrays.test.ts` | Non-array methods require UDT/method parity work. |
+| Parser/runtime | `switch` | Partial | `tests/parser/parser.test.ts`; `tests/compat/pine-control-time.test.ts` | Exhaustive type diagnostics are planned. |
 | Parser/runtime | User-defined types | Unsupported | Roadmap Epic 12 | UDT parsing/runtime are planned. |
 
 ### Runtime Semantics
 
 | Area | Feature | Status | Evidence | Remaining gaps |
 | --- | --- | --- | --- | --- |
-| Runtime | Bar-by-bar execution | Supported | `tests/runtime/runtime.test.ts`; `tests/compat/pine-golden.test.ts` | Realtime rollback semantics remain partial. |
-| Runtime | History references `x[n]` | Partial | `tests/compat/pine-golden.test.ts`; `src/runtime/engine.test.ts` | Broader type diagnostics and max-bars inference are planned. |
-| Runtime | `na` value and `na(value)` | Partial | `tests/compat/pine-golden.test.ts` | Pine v6 bool behavior and propagation need more coverage. |
-| Runtime | Built-in price series | Supported | `tests/runtime/runtime.test.ts`; `tests/compat/pine-golden.test.ts` | Host metadata injection is separate. |
-| Runtime | Calendar variables | Partial | `tests/compat/pine-golden.test.ts` | Named IANA timezones and exchange calendars remain. |
-| Runtime | `bar_index` / `last_bar_index` | Supported | `tests/runtime/runtime.test.ts`; `tests/compat/pine-golden.test.ts` | None known for current execution model. |
-| Runtime | `barstate.*` | Partial | `tests/compat/pine-golden.test.ts` | Browser-worker realtime tick parity remains. |
-| Runtime | `syminfo.*` | Partial | `tests/compat/pine-golden.test.ts` | Live symbol metadata injection remains. |
-| Runtime | `timeframe.*` | Partial | `tests/compat/pine-golden.test.ts` | Live chart timeframe injection and comparison helpers remain. |
-| Runtime | Function-local series state | Partial | `tests/compat/pine-golden.test.ts` | Nested block and call-site series parity need hardening. |
-| Runtime | `max_bars_back` | Partial | `tests/compat/pine-golden.test.ts`; `src/runtime/engine.test.ts` | Runtime buffer enforcement/inference is not implemented. |
+| Runtime | Bar-by-bar execution | Supported | `tests/runtime/runtime.test.ts`; `tests/compat/pine-basics.test.ts` | Realtime rollback semantics remain partial. |
+| Runtime | History references `x[n]` | Partial | `tests/compat/pine-language.test.ts`; `src/runtime/engine.test.ts` | Broader type diagnostics and max-bars inference are planned. |
+| Runtime | `na` value and `na(value)` | Partial | `tests/compat/pine-language.test.ts` | Arithmetic propagation, `na()` checks, explicit `bool(na)`, and `na` comparison false semantics are covered; direct `na` comparison diagnostics and full v6 bool type enforcement remain. |
+| Runtime | Built-in price series | Supported | `tests/runtime/runtime.test.ts`; `tests/compat/pine-basics.test.ts` | Host metadata injection is separate. |
+| Runtime | Calendar variables | Partial | `tests/compat/pine-control-time.test.ts` | Named IANA timezones and exchange calendars remain. |
+| Runtime | `bar_index` / `last_bar_index` | Supported | `tests/runtime/runtime.test.ts`; `tests/compat/pine-control-time.test.ts` | None known for current execution model. |
+| Runtime | `barstate.*` | Partial | `tests/compat/pine-control-time.test.ts` | Browser-worker realtime tick parity remains. |
+| Runtime | `syminfo.*` | Partial | `tests/compat/pine-control-time.test.ts` | Live symbol metadata injection remains. |
+| Runtime | `timeframe.*` | Partial | `tests/compat/pine-control-time.test.ts` | Live chart timeframe injection and comparison helpers remain. |
+| Runtime | Function-local series state | Partial | `tests/compat/pine-language.test.ts` | Nested block and call-site series parity need hardening. |
+| Runtime | `max_bars_back` | Partial | `tests/compat/pine-language.test.ts`; `src/runtime/engine.test.ts` | Runtime buffer enforcement/inference is not implemented. |
 
 ### Built-Ins
 
 | Area | Feature | Status | Evidence | Remaining gaps |
 | --- | --- | --- | --- | --- |
-| Built-ins | `math.*` | Partial | `tests/compat/pine-golden.test.ts`; `src/runtime/engine.test.ts` | Random behavior, overloads, and exact int/float parity remain. |
-| Built-ins | `ta.*` | Partial | `tests/compat/pine-golden.test.ts`; `src/runtime/engine.test.ts` | Full reference-manual inventory and edge-case parity remain. |
-| Built-ins | `input.*` | Partial | `tests/compat/pine-golden.test.ts` | Advanced UI/display behavior and validation remain. |
-| Built-ins | Time functions | Partial | `tests/compat/pine-golden.test.ts` | Higher-timeframe aggregation and named timezone databases remain. |
-| Built-ins | `color.*` | Partial | `tests/compat/pine-golden.test.ts` | Exact named constants and theme-sensitive behavior remain. |
-| Built-ins | `str.*` | Partial | `tests/compat/pine-golden.test.ts` | Formatting and Unicode edge cases remain. |
-| Built-ins | `array.*` | Partial | `src/runtime/arrays.test.ts`; `tests/compat/pine-golden.test.ts` | Full array reference inventory and edge cases remain. |
-| Built-ins | `runtime.*` | Partial | `src/runtime/engine.test.ts`; `tests/compat/pine-golden.test.ts` | Only `runtime.error()` is implemented. |
-| Built-ins | Global helpers | Partial | `tests/compat/pine-golden.test.ts` | Broader type-system diagnostics are planned. |
+| Built-ins | `math.*` | Partial | `tests/compat/pine-builtins.test.ts`; `src/runtime/engine.test.ts` | Random behavior, overloads, and exact int/float parity remain. |
+| Built-ins | `ta.*` | Partial | `tests/compat/pine-basics.test.ts`; `tests/compat/pine-builtins.test.ts`; `src/runtime/engine.test.ts` | Full reference-manual inventory and edge-case parity remain. |
+| Built-ins | `input.*` | Partial | `tests/compat/pine-basics.test.ts`; `tests/compat/pine-builtins.test.ts` | Advanced UI/display behavior and validation remain. |
+| Built-ins | Time functions | Partial | `tests/compat/pine-builtins.test.ts`; `tests/compat/pine-control-time.test.ts` | Higher-timeframe aggregation and named timezone databases remain. |
+| Built-ins | `color.*` | Partial | `tests/compat/pine-builtins.test.ts`; `tests/compat/pine-visuals.test.ts` | Exact named constants and theme-sensitive behavior remain. |
+| Built-ins | `str.*` | Partial | `tests/compat/pine-builtins.test.ts` | Formatting and Unicode edge cases remain. |
+| Built-ins | `array.*` | Partial | `src/runtime/arrays.test.ts`; `tests/compat/pine-arrays.test.ts` | Full array reference inventory and edge cases remain. |
+| Built-ins | `runtime.*` | Partial | `src/runtime/engine.test.ts`; `tests/compat/pine-language.test.ts` | Only `runtime.error()` is implemented. |
+| Built-ins | Global helpers | Partial | `tests/compat/pine-language.test.ts` | Broader type-system diagnostics are planned. |
 | Built-ins | `map.*` | Planned | `tests/compat/pine-unsupported.test.ts`; Roadmap Epic 12 | Namespace emits unsupported diagnostics; runtime/storage/type support is not implemented. |
 | Built-ins | `matrix.*` | Planned | `tests/compat/pine-unsupported.test.ts`; Roadmap Epic 12 | Namespace emits unsupported diagnostics; runtime/storage/type support is not implemented. |
 | Data | `request.*` | Planned | `tests/compat/pine-unsupported.test.ts`; Roadmap Epic 8 | Namespace emits unsupported diagnostics; requires deterministic datafeed contract. |
@@ -88,13 +88,13 @@ reading the whole runtime.
 
 | Area | Feature | Status | Evidence | Remaining gaps |
 | --- | --- | --- | --- | --- |
-| Visuals | `plot` | Partial | `tests/compat/pine-golden.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | Full style/z-order/display parity remains. |
-| Visuals | `hline` | Partial | `tests/compat/pine-golden.test.ts` | Full settings and display parity remain. |
-| Visuals | `fill` | Partial | `tests/compat/pine-golden.test.ts` | Advanced parameters and color series behavior remain. |
-| Visuals | `bgcolor` | Supported | `tests/compat/pine-golden.test.ts` | None known for current output shape. |
-| Visuals | `plotshape`, `plotchar`, `plotarrow` | Partial | `tests/compat/pine-golden.test.ts` | Styling/location/display parity remains. |
-| Visuals | `barcolor` | Supported | `tests/compat/pine-golden.test.ts`; renderer tests | None known for current output shape. |
-| Visuals | `plotbar`, `plotcandle` | Supported | `tests/compat/pine-golden.test.ts`; renderer tests | Edge-case parity will continue under visual epic. |
+| Visuals | `plot` | Partial | `tests/compat/pine-basics.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | Full style/z-order/display parity remains. |
+| Visuals | `hline` | Partial | `tests/compat/pine-visuals.test.ts` | Full settings and display parity remain. |
+| Visuals | `fill` | Partial | `tests/compat/pine-visuals.test.ts` | Advanced parameters and color series behavior remain. |
+| Visuals | `bgcolor` | Supported | `tests/compat/pine-visuals.test.ts` | None known for current output shape. |
+| Visuals | `plotshape`, `plotchar`, `plotarrow` | Partial | `tests/compat/pine-visuals.test.ts` | Styling/location/display parity remains. |
+| Visuals | `barcolor` | Supported | `tests/compat/pine-visuals.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | None known for current output shape. |
+| Visuals | `plotbar`, `plotcandle` | Supported | `tests/compat/pine-visuals.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | Edge-case parity will continue under visual epic. |
 | Drawings | `label.*` | Partial | `src/runtime/drawings/builtins.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | GC limits, full style parity, and realtime rollback remain. |
 | Drawings | `line.*` | Partial | `src/runtime/drawings/builtins.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | `chart.point`, GC limits, full style geometry, realtime rollback remain. |
 | Drawings | `linefill.*` | Partial | `src/runtime/drawings/builtins.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | Full line coordinate/object parity remains. |
@@ -106,7 +106,7 @@ reading the whole runtime.
 
 | Area | Feature | Status | Evidence | Remaining gaps |
 | --- | --- | --- | --- | --- |
-| Alerts | `alertcondition` / `alert` | Partial | `tests/compat/pine-golden.test.ts`; `src/runtime/engine.test.ts` | UI integration and full throttling parity remain. |
+| Alerts | `alertcondition` / `alert` | Partial | `tests/compat/pine-control-time.test.ts`; `src/runtime/engine.test.ts` | UI integration and full throttling parity remain. |
 | Strategies | `strategy.*` | Partial | `src/parser/parser.test.ts`; `src/runtime/engine.test.ts` | Broker emulator, ledger, fills, positions, and tester state are planned. |
 | Data | Multi-timeframe requests | Planned | Roadmap Epic 8 | Requires deterministic gap/lookahead semantics. |
 | Data | Other-symbol requests | Planned | Roadmap Epic 8 | Requires chart datafeed contract and caching strategy. |
