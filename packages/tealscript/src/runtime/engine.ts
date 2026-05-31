@@ -184,6 +184,8 @@ interface ImportedLibrary {
   alias: string;
   functions: Map<string, FunctionDeclaration>;
   exportedFunctions: Set<string>;
+  types: Map<string, TypeDeclaration>;
+  exportedTypes: Set<string>;
 }
 
 interface RandomBuiltinState {
@@ -593,6 +595,8 @@ export class TealscriptEngine {
 
       const functions = new Map<string, FunctionDeclaration>();
       const exportedFunctions = new Set<string>();
+      const types = new Map<string, TypeDeclaration>();
+      const exportedTypes = new Set<string>();
       for (const libraryStmt of libraryAst.body) {
         if (libraryStmt.type === 'FunctionDeclaration') {
           functions.set(libraryStmt.name.name, libraryStmt);
@@ -604,6 +608,12 @@ export class TealscriptEngine {
             this.functionScopes.set(scopeKey, this.scope.createChild());
           }
         }
+        if (libraryStmt.type === 'TypeDeclaration') {
+          types.set(libraryStmt.name.name, libraryStmt);
+          if (libraryStmt.exported) {
+            exportedTypes.add(libraryStmt.name.name);
+          }
+        }
       }
 
       this.importedLibraries.set(stmt.alias.name, {
@@ -611,6 +621,8 @@ export class TealscriptEngine {
         alias: stmt.alias.name,
         functions,
         exportedFunctions,
+        types,
+        exportedTypes,
       });
     }
   }
@@ -1200,8 +1212,21 @@ export class TealscriptEngine {
       }
     }
 
-    if (namespace && funcName === 'new' && this.typeDeclarations.has(namespace)) {
-      return this.evaluateTypeConstructor(namespace, args, namedArgs);
+    if (namespace && funcName === 'new') {
+      const currentLibraryType = this.findCurrentLibraryType(namespace);
+      if (currentLibraryType) {
+        return this.evaluateImportedTypeConstructor(currentLibraryType.library, currentLibraryType.declaration, args, namedArgs);
+      }
+      if (this.typeDeclarations.has(namespace)) {
+        return this.evaluateTypeConstructor(namespace, args, namedArgs);
+      }
+      const importedType = this.findImportedType(namespace);
+      if (importedType && importedType.exported) {
+        return this.evaluateImportedTypeConstructor(importedType.library, importedType.declaration, args, namedArgs);
+      }
+      if (importedType) {
+        throw new Error(`Unknown library type: ${namespace}`);
+      }
     }
 
     if (namespace && this.importedLibraries.has(namespace)) {
@@ -1330,6 +1355,45 @@ export class TealscriptEngine {
     }
   }
 
+  private findImportedType(namespace: string): { library: ImportedLibrary; declaration: TypeDeclaration; exported: boolean } | undefined {
+    const parts = namespace.split('.');
+    if (parts.length !== 2) return undefined;
+    const [alias, typeName] = parts;
+    if (!alias || !typeName) return undefined;
+
+    const library = this.importedLibraries.get(alias);
+    const declaration = library?.types.get(typeName);
+    if (!library || !declaration) return undefined;
+
+    return {
+      library,
+      declaration,
+      exported: library.exportedTypes.has(typeName),
+    };
+  }
+
+  private findCurrentLibraryType(typeName: string): { library: ImportedLibrary; declaration: TypeDeclaration } | undefined {
+    if (typeName.includes('.')) return undefined;
+
+    const library = this.currentImportedLibrary();
+    const declaration = library?.types.get(typeName);
+    return library && declaration ? { library, declaration } : undefined;
+  }
+
+  private evaluateImportedTypeConstructor(
+    library: ImportedLibrary,
+    declaration: TypeDeclaration,
+    args: unknown[],
+    namedArgs: Map<string, unknown>,
+  ): PineUdtObject {
+    this.importedLibraryCallStack.push(library.alias);
+    try {
+      return this.evaluateTypeConstructor(`${library.alias}.${declaration.name.name}`, args, namedArgs, declaration);
+    } finally {
+      this.importedLibraryCallStack.pop();
+    }
+  }
+
   private findCallableUserMethod(
     methodName: string,
     args: unknown[],
@@ -1339,8 +1403,12 @@ export class TealscriptEngine {
     return overloads?.find((method) => this.canCallUserFunction(method, args, namedArgs));
   }
 
-  private evaluateTypeConstructor(typeName: string, args: unknown[], namedArgs: Map<string, unknown>): PineUdtObject {
-    const declaration = this.typeDeclarations.get(typeName);
+  private evaluateTypeConstructor(
+    typeName: string,
+    args: unknown[],
+    namedArgs: Map<string, unknown>,
+    declaration = this.typeDeclarations.get(typeName),
+  ): PineUdtObject {
     if (!declaration) {
       throw new Error(`Unknown user-defined type: ${typeName}`);
     }
