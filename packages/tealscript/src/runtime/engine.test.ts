@@ -708,6 +708,38 @@ alert("Close", alert.freq_once_per_bar_close)`;
       expect(alerts[0]?.events.map((event) => event.barIndex)).toEqual([0, 1]);
     });
 
+    it('marks direct alert events from realtime bar updates', () => {
+      const script = `//@version=6
+indicator("Alerts")
+alert("Tick", alert.freq_once_per_bar)`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+
+      const result = engine.execute(ast, bars);
+      expect(result.alerts[0]?.events.map((event) => ({
+        barIndex: event.barIndex,
+        isRealtime: event.isRealtime,
+      }))).toEqual([
+        { barIndex: 0, isRealtime: false },
+        { barIndex: 1, isRealtime: false },
+        { barIndex: 2, isRealtime: false },
+      ]);
+
+      const updatedBar = { ...bars[2], close: bars[2].close + 1 };
+      engine.updateBar(ast, updatedBar);
+
+      expect(engine.getAlerts()[0]?.events.map((event) => ({
+        barIndex: event.barIndex,
+        isRealtime: event.isRealtime,
+      }))).toEqual([
+        { barIndex: 0, isRealtime: false },
+        { barIndex: 1, isRealtime: false },
+        { barIndex: 2, isRealtime: true },
+      ]);
+    });
+
     it('dispatches array method calls to array builtins', () => {
       const script = `//@version=6
 indicator("Array Methods")
