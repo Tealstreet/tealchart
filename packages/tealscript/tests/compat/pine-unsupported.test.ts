@@ -45,13 +45,13 @@ plot(map.get(0))
     const result = runCompatScript(`
 indicator("Unsupported visuals")
 polyline.new()
-ticker.heikinashi(syminfo.tickerid)
+ticker.renko(syminfo.tickerid, "ATR", 10)
 plot(close)
 `, { bars: [compatibilityBars[0]!] });
 
     expect(result.errors.map((error) => error.message)).toEqual([
       'polyline.* functions are not supported yet: polyline.new',
-      'ticker.* functions are not supported yet: ticker.heikinashi',
+      'ticker.* functions are not supported yet: ticker.renko',
     ]);
   });
 

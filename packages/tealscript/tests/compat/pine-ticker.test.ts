@@ -12,6 +12,16 @@ const chartBars: Bar[] = [
 function sessionRequestDatafeed(): InMemoryRequestDatafeed {
   return new InMemoryRequestDatafeed([
     {
+      symbol: 'NASDAQ:AAPL',
+      timeframe: '1',
+      bars: [
+        { time: 1_700_000_000_000, open: 180, high: 182, low: 179, close: 181, volume: 900 },
+        { time: 1_700_000_060_000, open: 181, high: 183, low: 180, close: 182, volume: 950 },
+        { time: 1_700_000_120_000, open: 182, high: 184, low: 181, close: 183, volume: 980 },
+      ],
+      syminfo: { ticker: 'NASDAQ:AAPL', timezone: 'Etc/UTC' },
+    },
+    {
       symbol: 'NASDAQ:AAPL|session=extended',
       timeframe: '1',
       bars: [
@@ -61,5 +71,42 @@ plot(extendedClose, title="Extended Close")
 
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Extended Close').values).toEqual([201, 202, 203]);
+  });
+
+  it('requests deterministic Heikin-Ashi close data from a base ticker context', () => {
+    const result = runCompatScript(`
+indicator("Heikin-Ashi close request")
+haTicker = ticker.heikinashi("NASDAQ:AAPL")
+haClose = request.security(haTicker, "1", close, lookahead=barmerge.lookahead_on)
+plot(haClose, title="HA Close")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: sessionRequestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'HA Close').values).toEqual([180.5, 181.5, 182.5]);
+  });
+
+  it('requests Heikin-Ashi OHLC tuples while preserving session modifiers', () => {
+    const result = runCompatScript(`
+indicator("Heikin-Ashi OHLC request")
+regularTicker = ticker.new("NASDAQ", "AAPL", session.extended)
+haTicker = ticker.heikinashi(regularTicker)
+[haO, haH, haL, haC] = request.security(haTicker, "1", [open, high, low, close], lookahead=barmerge.lookahead_on)
+plot(haO, title="HA Open")
+plot(haH, title="HA High")
+plot(haL, title="HA Low")
+plot(haC, title="HA Close")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: sessionRequestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'HA Open').values).toEqual([200.5, 200.5, 201]);
+    expect(getPlot(result, 'HA High').values).toEqual([202, 203, 204]);
+    expect(getPlot(result, 'HA Low').values).toEqual([199, 200, 201]);
+    expect(getPlot(result, 'HA Close').values).toEqual([200.5, 201.5, 202.5]);
   });
 });

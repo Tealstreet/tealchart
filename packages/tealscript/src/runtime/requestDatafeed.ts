@@ -76,6 +76,17 @@ export function currencyRateRequestKey(fromCurrency: string, toCurrency: string)
   return `${fromCurrency}\u0000${toCurrency}`;
 }
 
+function splitTickerModifiers(symbol: string): { base: string; modifiers: string[] } {
+  const [base = '', ...modifiers] = symbol.split('|');
+  return { base, modifiers };
+}
+
+function removeTickerModifier(symbol: string, prefix: string): string {
+  const { base, modifiers } = splitTickerModifiers(symbol);
+  const kept = modifiers.filter((modifier) => !modifier.startsWith(prefix));
+  return kept.length === 0 ? base : `${base}|${kept.join('|')}`;
+}
+
 function trimBars(bars: Bar[], calcBarsCount: number | undefined): Bar[] {
   if (calcBarsCount === undefined) {
     return bars;
@@ -118,7 +129,8 @@ export class InMemoryRequestDatafeed implements RequestDatafeed {
   }
 
   getBars(query: RequestDatafeedQuery): RequestDatafeedResult {
-    const context = this.contexts.get(requestDatafeedKey(query.symbol, query.timeframe));
+    const context = this.contexts.get(requestDatafeedKey(query.symbol, query.timeframe))
+      ?? this.getSyntheticContext(query.symbol, query.timeframe);
     if (!context) {
       return {
         ok: false,
@@ -140,6 +152,28 @@ export class InMemoryRequestDatafeed implements RequestDatafeed {
     };
   }
 
+  private getSyntheticContext(symbol: string, timeframe: string): RequestDataContext | undefined {
+    if (splitTickerModifiers(symbol).modifiers.includes('chart=heikinashi')) {
+      const baseSymbol = removeTickerModifier(symbol, 'chart=');
+      const baseContext = this.contexts.get(requestDatafeedKey(baseSymbol, timeframe));
+      if (!baseContext) {
+        return undefined;
+      }
+
+      return {
+        ...baseContext,
+        symbol,
+        bars: toHeikinAshiBars(baseContext.bars),
+        syminfo: {
+          ...baseContext.syminfo,
+          ticker: symbol,
+        },
+      };
+    }
+
+    return undefined;
+  }
+
   getSeries(query: RequestSeriesQuery): RequestSeriesResult {
     const context = this.seriesContexts.get(requestSeriesKey(query.family, query.key));
     if (!context) {
@@ -158,4 +192,32 @@ export class InMemoryRequestDatafeed implements RequestDatafeed {
       },
     };
   }
+}
+
+function toHeikinAshiBars(bars: Bar[]): Bar[] {
+  const result: Bar[] = [];
+  let previousOpen: number | undefined;
+  let previousClose: number | undefined;
+
+  for (const bar of bars) {
+    const close = (bar.open + bar.high + bar.low + bar.close) / 4;
+    const open = previousOpen === undefined || previousClose === undefined
+      ? (bar.open + bar.close) / 2
+      : (previousOpen + previousClose) / 2;
+    const high = Math.max(bar.high, open, close);
+    const low = Math.min(bar.low, open, close);
+
+    result.push({
+      ...bar,
+      open,
+      high,
+      low,
+      close,
+    });
+
+    previousOpen = open;
+    previousClose = close;
+  }
+
+  return result;
 }
