@@ -1531,6 +1531,25 @@ plot(ta.cci(hlc3, 3), title="Typical CCI")`;
       expect(result.plots.find((plot) => plot.title === 'Typical CCI')?.values[2]).toBeCloseTo(95.652174);
     });
 
+    it('calculates CMO over source changes', () => {
+      const script = `//@version=6
+indicator("TA CMO")
+plot(ta.cmo(close, 3), title="CMO")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: 2, open: 101, high: 103, low: 100, close: 102, volume: 100 },
+        { time: 3, open: 102, high: 106, low: 101, close: 105, volume: 100 },
+        { time: 4, open: 105, high: 106, low: 102, close: 103, volume: 100 },
+        { time: 5, open: 103, high: 108, low: 103, close: 107, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'CMO')?.values).toEqual([null, null, null, (3 / 7) * 100, (5 / 9) * 100]);
+    });
+
     it('preserves source history when TA lookback length grows', () => {
       const script = `//@version=6
 indicator("Growing lookback")

@@ -3427,6 +3427,24 @@ export class TealscriptEngine {
       return range === 0 ? NaN : ((close - highestHigh) / range) * 100;
     });
 
+    this.builtins.set('ta.cmo', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const length = this.normalizeLookbackLength(args[1] ?? 14);
+      const values = this.getCompleteSourceWindow(scope, `_ta_cmo_source_${callId}`, source, length + 1);
+      if (!values) return NaN;
+
+      let gains = 0;
+      let losses = 0;
+      for (let index = 0; index < length; index++) {
+        const change = values[index] - values[index + 1];
+        if (change > 0) gains += change;
+        if (change < 0) losses -= change;
+      }
+
+      const total = gains + losses;
+      return total === 0 ? 0 : ((gains - losses) / total) * 100;
+    });
+
     // MOM - Momentum
     this.builtins.set('ta.mom', (args, _namedArgs, ctx) => {
       const source = args[0] as number;
