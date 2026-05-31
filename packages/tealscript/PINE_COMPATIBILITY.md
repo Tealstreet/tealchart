@@ -99,7 +99,7 @@ The common TA helper pass covers event helpers (`ta.barssince`,
 `ta.valuewhen`), cumulative/window helpers (`ta.cum`, `ta.dev`,
 `ta.variance`, `ta.correlation`, `ta.linreg`, `ta.vwma`, `ta.swma`, `ta.alma`,
 `ta.highestbars`, `ta.lowestbars`), oscillator helpers (`ta.stoch`, `ta.mfi`,
-`ta.wpr`, `ta.cci`, `ta.cmo`), and compatibility
+`ta.wpr`, `ta.cci`, `ta.cmo`, `ta.tsi`), and compatibility
 aliases/helpers (`ta.change` numeric and boolean forms, `ta.cross`, `ta.range`,
 `ta.rising`, and `ta.falling`). The
 statistical helper pass covers `ta.median`, `ta.mode`,
@@ -150,10 +150,10 @@ variant color from RGB channels and plotting an RSI gradient.
 
 The common math helper pass covers constants (`math.pi`, `math.e`, `math.phi`),
 variadic `math.avg`, precision-aware `math.round`, `math.round_to_mintick`,
-`math.trunc`, `math.sum`, and degree/radian conversion helpers. The checkpoint
-fixture follows common Pine math idioms by averaging OHLC values, rounding to
-fixed precision, converting a right angle between radians and degrees, and
-summing the latest non-`na` source values.
+`math.trunc`, `math.sum`, `math.random`, and degree/radian conversion helpers.
+The checkpoint fixture follows common Pine math idioms by averaging OHLC values,
+rounding to fixed precision, converting a right angle between radians and
+degrees, summing the latest non-`na` source values, and checking random bounds.
 
 ## Common Global Helper Coverage
 
