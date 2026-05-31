@@ -209,6 +209,17 @@ strategy.entry("Long", strategy.long)`;
       expect(result.strategy.position.size).toBeCloseTo(expectedQty);
     });
 
+    it('rejects percent-of-equity orders when equity cannot produce a positive quantity', () => {
+      const script = `//@version=6
+strategy("No equity", initial_capital=0, default_qty_type=strategy.percent_of_equity, default_qty_value=10)
+strategy.entry("Long", strategy.long)`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors[0]?.message).toBe('strategy order resolved qty must be a positive number');
+      expect(result.strategy.orders).toEqual([]);
+    });
+
     it('cancels all pending strategy orders that reuse an id', () => {
       const script = `//@version=6
 strategy("Orders")

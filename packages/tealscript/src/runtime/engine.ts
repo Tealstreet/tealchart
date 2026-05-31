@@ -3276,7 +3276,11 @@ export class TealscriptEngine {
     if (qtyType === 'cash') {
       return qtyValue / priceBasis;
     }
-    return (this.ctx.strategyLedger.equity * (qtyValue / 100)) / priceBasis;
+    const qty = (this.ctx.strategyLedger.equity * (qtyValue / 100)) / priceBasis;
+    if (!Number.isFinite(qty) || qty <= 0) {
+      throw new Error('strategy order resolved qty must be a positive number');
+    }
+    return qty;
   }
 
   private fillPendingStrategyOrdersForCurrentBar(): void {
