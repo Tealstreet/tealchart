@@ -1,9 +1,18 @@
 import { describe, it, expect } from 'vitest';
 import { parse, validate, TealscriptParseError, formatParseError } from './parser';
+import type { Expression, Statement } from './ast';
 
 describe('Tealscript Parser', () => {
   describe('parse', () => {
     describe('version directive', () => {
+      it('returns typed AST nodes for non-program start rules', () => {
+        const expression: Expression = parse('close + 1', { startRule: 'Expression' });
+        const statement: Statement = parse('plot(close)', { startRule: 'Statement' });
+
+        expect(expression.type).toBe('BinaryExpression');
+        expect(statement.type).toBe('ExpressionStatement');
+      });
+
       it('parses version 6 directive', () => {
         const ast = parse(`//@version=6
 indicator("Test")`);
