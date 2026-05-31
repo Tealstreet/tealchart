@@ -107,6 +107,11 @@ interface RequestEvaluationCacheEntry {
   values: unknown[];
 }
 
+interface TickerModifierParts {
+  base: string;
+  modifiers: string[];
+}
+
 const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['map', 'matrix', 'polyline', 'ticker']);
 
 /**
@@ -3367,18 +3372,80 @@ export class TealscriptEngine {
   private registerTickerBuiltins(): void {
     this.builtins.set('session.regular', () => 'regular');
     this.builtins.set('session.extended', () => 'extended');
+    this.builtins.set('adjustment.none', () => 'none');
+    this.builtins.set('adjustment.splits', () => 'splits');
+    this.builtins.set('adjustment.dividends', () => 'dividends');
+    this.builtins.set('backadjustment.on', () => 'on');
+    this.builtins.set('backadjustment.off', () => 'off');
+    this.builtins.set('backadjustment.inherit', () => 'inherit');
+    this.builtins.set('settlement_as_close.on', () => 'on');
+    this.builtins.set('settlement_as_close.off', () => 'off');
+    this.builtins.set('settlement_as_close.inherit', () => 'inherit');
 
     this.builtins.set('ticker.new', (args, namedArgs) => {
       const prefix = this.toStringValue(namedArgs.get('prefix') ?? args[0] ?? '');
       const ticker = this.toStringValue(namedArgs.get('ticker') ?? args[1] ?? '');
       const session = this.normalizeTickerSession(namedArgs.get('session') ?? args[2]);
-      return this.buildTickerId(prefix, ticker, session);
+      const adjustment = this.normalizeTickerModifier(
+        namedArgs.get('adjustment') ?? args[3],
+        'adjustment',
+        ['none', 'splits', 'dividends'],
+      );
+      const backadjustment = this.normalizeTickerModifier(
+        namedArgs.get('backadjustment') ?? args[4],
+        'backadjustment',
+        ['on', 'off', 'inherit'],
+      );
+      const settlementAsClose = this.normalizeTickerModifier(
+        namedArgs.get('settlement_as_close') ?? args[5],
+        'settlement_as_close',
+        ['on', 'off', 'inherit'],
+      );
+      return this.buildTickerId(prefix, ticker, {
+        session,
+        adjustment,
+        backadjustment,
+        settlementAsClose,
+      });
     });
 
     this.builtins.set('ticker.modify', (args, namedArgs) => {
       const tickerId = this.toStringValue(namedArgs.get('tickerid') ?? args[0] ?? '');
       const session = this.normalizeTickerSession(namedArgs.get('session') ?? args[1]);
-      return this.applyTickerSession(tickerId, session);
+      const adjustment = this.normalizeTickerModifier(
+        namedArgs.get('adjustment') ?? args[2],
+        'adjustment',
+        ['none', 'splits', 'dividends'],
+      );
+      const backadjustment = this.normalizeTickerModifier(
+        namedArgs.get('backadjustment') ?? args[3],
+        'backadjustment',
+        ['on', 'off', 'inherit'],
+      );
+      const settlementAsClose = this.normalizeTickerModifier(
+        namedArgs.get('settlement_as_close') ?? args[4],
+        'settlement_as_close',
+        ['on', 'off', 'inherit'],
+      );
+      return this.applyTickerModifiers(tickerId, {
+        session,
+        adjustment,
+        backadjustment,
+        settlementAsClose,
+      });
+    });
+
+    this.builtins.set('ticker.standard', (args, namedArgs) => {
+      const tickerId = this.toStringValue(namedArgs.get('symbol') ?? namedArgs.get('tickerid') ?? args[0] ?? '');
+      return this.parseTickerModifierParts(tickerId, 'ticker.standard').base;
+    });
+
+    this.builtins.set('ticker.inherit', (args, namedArgs) => {
+      const fromTickerId = this.toStringValue(namedArgs.get('from_tickerid') ?? args[0] ?? '');
+      const symbol = this.toStringValue(namedArgs.get('symbol') ?? args[1] ?? '');
+      const source = this.parseTickerModifierParts(fromTickerId, 'ticker.inherit');
+      const target = this.parseTickerModifierParts(symbol, 'ticker.inherit');
+      return source.modifiers.length === 0 ? target.base : `${target.base}|${source.modifiers.join('|')}`;
     });
 
     this.builtins.set('ticker.heikinashi', (args, namedArgs) => {
@@ -3433,38 +3500,118 @@ export class TealscriptEngine {
     throw new Error(`Unsupported ticker session: ${session}`);
   }
 
-  private buildTickerId(prefix: string, ticker: string, session: 'regular' | 'extended' | undefined): string {
-    const base = prefix.trim() === '' ? ticker.trim() : `${prefix.trim()}:${ticker.trim()}`;
-    return this.applyTickerSession(base, session);
+  private normalizeTickerModifier(
+    value: unknown,
+    name: string,
+    allowedValues: readonly string[],
+  ): string | undefined {
+    if (value === undefined || this.isNa(value)) {
+      return undefined;
+    }
+
+    const normalized = this.toStringValue(value).trim().toLowerCase();
+    if (normalized === '') {
+      return undefined;
+    }
+
+    const bareValue = normalized.startsWith(`${name}.`) ? normalized.slice(name.length + 1) : normalized;
+    if (!allowedValues.includes(bareValue)) {
+      throw new Error(`Unsupported ticker ${name}: ${normalized}`);
+    }
+
+    return bareValue;
   }
 
-  private applyTickerSession(tickerId: string, session: 'regular' | 'extended' | undefined): string {
-    const base = tickerId.trim();
-    if (base === '') {
-      throw new Error('ticker.new/ticker.modify requires a non-empty ticker id');
-    }
+  private buildTickerId(
+    prefix: string,
+    ticker: string,
+    modifiers: {
+      session?: 'regular' | 'extended';
+      adjustment?: string;
+      backadjustment?: string;
+      settlementAsClose?: string;
+    },
+  ): string {
+    const base = prefix.trim() === '' ? ticker.trim() : `${prefix.trim()}:${ticker.trim()}`;
+    return this.applyTickerModifiers(base, modifiers);
+  }
 
-    const withoutSession = base.replace(/\|session=(regular|extended)$/u, '');
-    if (session === undefined || session === 'regular') {
-      return withoutSession;
-    }
-    return `${withoutSession}|session=extended`;
+  private applyTickerModifiers(
+    tickerId: string,
+    modifiers: {
+      session?: 'regular' | 'extended';
+      adjustment?: string;
+      backadjustment?: string;
+      settlementAsClose?: string;
+    },
+  ): string {
+    let result = tickerId;
+    result = this.upsertTickerModifier(
+      result,
+      'session',
+      modifiers.session === 'extended' ? 'extended' : undefined,
+      'ticker.new/ticker.modify',
+    );
+    result = this.upsertTickerModifier(
+      result,
+      'adjustment',
+      modifiers.adjustment === undefined || modifiers.adjustment === 'none' ? undefined : modifiers.adjustment,
+      'ticker.new/ticker.modify',
+    );
+    result = this.upsertTickerModifier(
+      result,
+      'backadjustment',
+      modifiers.backadjustment === undefined || modifiers.backadjustment === 'inherit'
+        ? undefined
+        : modifiers.backadjustment,
+      'ticker.new/ticker.modify',
+    );
+    result = this.upsertTickerModifier(
+      result,
+      'settlement_as_close',
+      modifiers.settlementAsClose === undefined || modifiers.settlementAsClose === 'inherit'
+        ? undefined
+        : modifiers.settlementAsClose,
+      'ticker.new/ticker.modify',
+    );
+    return result;
   }
 
   private applyTickerChart(tickerId: string, chart: string, params: unknown[] = []): string {
-    const base = tickerId.trim();
-    if (base === '') {
-      throw new Error(`ticker.${chart} requires a non-empty ticker id`);
-    }
-
-    const withoutChart = base.replace(/\|chart=[^|]+/gu, '');
     const normalizedParams = params
       .filter((param) => param !== undefined && !this.isNa(param))
       .map((param) => encodeURIComponent(this.toStringValue(param).trim()));
     const chartModifier = normalizedParams.length === 0
       ? chart
       : `${chart}:${normalizedParams.join(':')}`;
-    return `${withoutChart}|chart=${chartModifier}`;
+    return this.upsertTickerModifier(tickerId, 'chart', chartModifier, `ticker.${chart}`);
+  }
+
+  private parseTickerModifierParts(tickerId: string, context: string): TickerModifierParts {
+    const [base = '', ...modifiers] = tickerId.trim().split('|');
+    const normalizedBase = base.trim();
+    if (normalizedBase === '') {
+      throw new Error(`${context} requires a non-empty ticker id`);
+    }
+    return {
+      base: normalizedBase,
+      modifiers: modifiers.filter((modifier) => modifier.trim() !== ''),
+    };
+  }
+
+  private upsertTickerModifier(
+    tickerId: string,
+    key: string,
+    value: string | undefined,
+    context: string,
+  ): string {
+    const { base, modifiers } = this.parseTickerModifierParts(tickerId, context);
+    const prefix = `${key}=`;
+    const kept = modifiers.filter((modifier) => !modifier.startsWith(prefix));
+    if (value !== undefined) {
+      kept.push(`${key}=${value}`);
+    }
+    return kept.length === 0 ? base : `${base}|${kept.join('|')}`;
   }
 
   /**

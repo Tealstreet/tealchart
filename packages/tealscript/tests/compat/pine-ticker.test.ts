@@ -32,6 +32,29 @@ function sessionRequestDatafeed(): InMemoryRequestDatafeed {
       syminfo: { ticker: 'NASDAQ:AAPL|session=extended', timezone: 'Etc/UTC' },
     },
     {
+      symbol: 'NASDAQ:AAPL|session=extended|adjustment=splits|backadjustment=on|settlement_as_close=off',
+      timeframe: '1',
+      bars: [
+        { time: 1_700_000_000_000, open: 300, high: 302, low: 299, close: 301, volume: 2_000 },
+        { time: 1_700_000_060_000, open: 301, high: 303, low: 300, close: 302, volume: 2_100 },
+        { time: 1_700_000_120_000, open: 302, high: 304, low: 301, close: 303, volume: 2_200 },
+      ],
+      syminfo: {
+        ticker: 'NASDAQ:AAPL|session=extended|adjustment=splits|backadjustment=on|settlement_as_close=off',
+        timezone: 'Etc/UTC',
+      },
+    },
+    {
+      symbol: 'NASDAQ:MSFT|session=extended|adjustment=dividends',
+      timeframe: '1',
+      bars: [
+        { time: 1_700_000_000_000, open: 300, high: 306, low: 294, close: 302, volume: 3_000 },
+        { time: 1_700_000_060_000, open: 302, high: 308, low: 296, close: 304, volume: 3_100 },
+        { time: 1_700_000_120_000, open: 304, high: 310, low: 298, close: 306, volume: 3_200 },
+      ],
+      syminfo: { ticker: 'NASDAQ:MSFT|session=extended|adjustment=dividends', timezone: 'Etc/UTC' },
+    },
+    {
       symbol: 'NASDAQ:AAPL|chart=renko:ATR:10',
       timeframe: '1',
       bars: [
@@ -113,6 +136,34 @@ plot(extendedClose, title="Extended Close")
     expect(getPlot(result, 'Extended Close').values).toEqual([201, 202, 203]);
   });
 
+  it('propagates ticker modifiers through request.security and standardizes modified IDs', () => {
+    const result = runCompatScript(`
+indicator("Ticker modifier request")
+modifiedTicker = ticker.modify(
+     "NASDAQ:AAPL",
+     session=session.extended,
+     adjustment=adjustment.splits,
+     backadjustment=backadjustment.on,
+     settlement_as_close=settlement_as_close.off)
+standardTicker = ticker.standard(modifiedTicker)
+modifiedClose = request.security(modifiedTicker, "1", close, lookahead=barmerge.lookahead_on)
+standardClose = request.security(standardTicker, "1", close, lookahead=barmerge.lookahead_on)
+plot(modifiedClose, title="Modified Close")
+plot(standardClose, title="Standard Close")
+plot(str.length(modifiedTicker), title="Modified ID Length")
+plot(str.length(standardTicker), title="Standard ID Length")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: sessionRequestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Modified Close').values).toEqual([301, 302, 303]);
+    expect(getPlot(result, 'Standard Close').values).toEqual([181, 182, 183]);
+    expect(getPlot(result, 'Modified ID Length').values).toEqual([88, 88, 88]);
+    expect(getPlot(result, 'Standard ID Length').values).toEqual([11, 11, 11]);
+  });
+
   it('requests deterministic Heikin-Ashi close data from a base ticker context', () => {
     const result = runCompatScript(`
 indicator("Heikin-Ashi close request")
@@ -148,6 +199,24 @@ plot(haC, title="HA Close")
     expect(getPlot(result, 'HA High').values).toEqual([202, 203, 204]);
     expect(getPlot(result, 'HA Low').values).toEqual([199, 200, 201]);
     expect(getPlot(result, 'HA Close').values).toEqual([200.5, 201.5, 202.5]);
+  });
+
+  it('inherits session, adjustment, and chart modifiers for another symbol', () => {
+    const result = runCompatScript(`
+indicator("Inherited ticker modifiers")
+sourceTicker = ticker.heikinashi(ticker.modify("NASDAQ:AAPL", session.extended, adjustment.dividends))
+targetTicker = ticker.inherit(sourceTicker, "NASDAQ:MSFT")
+targetClose = request.security(targetTicker, "1", close, lookahead=barmerge.lookahead_on)
+plot(targetClose, title="Inherited HA Close")
+plot(str.length(ticker.standard(targetTicker)), title="Inherited Standard Length")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: sessionRequestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Inherited HA Close').values).toEqual([300.5, 302.5, 304.5]);
+    expect(getPlot(result, 'Inherited Standard Length').values).toEqual([11, 11, 11]);
   });
 
   it('passes remaining non-standard ticker IDs through request.security', () => {
