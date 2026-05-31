@@ -8,12 +8,22 @@
  * - Plot outputs
  */
 
-import type { BoxDrawingOutput, ChartPoint, DrawingLimits, DrawingObjectType, DrawingOutput, LabelDrawingOutput, LineDrawingOutput } from './drawings/types';
+import type {
+  BoxDrawingOutput,
+  ChartPoint,
+  DrawingLimits,
+  DrawingObjectType,
+  DrawingOutput,
+  LabelDrawingOutput,
+  LineDrawingOutput,
+  PolylineDrawingOutput,
+} from './drawings/types';
 import { DrawingStore } from './drawings/store';
 import { Series } from './series';
 
 export type {
   BoxDrawingOutput,
+  PolylineDrawingOutput,
   ChartPoint,
   DrawingOutput,
   LabelDrawingOutput,
@@ -677,6 +687,13 @@ export class ExecutionContext {
    */
   copyBoxDrawing(id: string, newId: string): BoxDrawingOutput | undefined {
     return this.drawingStore.copyBox(id, newId, this.bar_index);
+  }
+
+  /**
+   * Copy a polyline drawing object to a new handle ID.
+   */
+  copyPolylineDrawing(id: string, newId: string): PolylineDrawingOutput | undefined {
+    return this.drawingStore.copyPolyline(id, newId, this.bar_index);
   }
 
   /**

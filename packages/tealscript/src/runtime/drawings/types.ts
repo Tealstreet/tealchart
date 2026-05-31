@@ -80,7 +80,31 @@ export interface BoxDrawingOutput {
   forceOverlay?: boolean;
 }
 
-export type DrawingOutput = LabelDrawingOutput | LineDrawingOutput | LineFillDrawingOutput | BoxDrawingOutput;
+export interface PolylineDrawingOutput {
+  id: string;
+  type: 'polyline';
+  /** Script ID that produced this drawing (set by TealscriptManager). */
+  scriptId?: string;
+  /** True when the drawing was created by a persistent declaration. */
+  persistent?: boolean;
+  barIndex: number;
+  points: ChartPoint[];
+  curved: boolean;
+  closed: boolean;
+  xloc: string;
+  lineColor: string | null;
+  fillColor: string | null;
+  lineStyle: string;
+  lineWidth: number;
+  forceOverlay?: boolean;
+}
+
+export type DrawingOutput =
+  | LabelDrawingOutput
+  | LineDrawingOutput
+  | LineFillDrawingOutput
+  | BoxDrawingOutput
+  | PolylineDrawingOutput;
 
 export type DrawingObjectType = DrawingOutput['type'];
 

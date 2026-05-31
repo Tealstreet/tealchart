@@ -149,4 +149,34 @@ plot(line.get_price(upper, bar_index), title="Upper Price")
     ]);
     expect(getPlot(result, 'Upper Price').values).toEqual([103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 113]);
   });
+
+  it('emits polylines from chart.point arrays', () => {
+    const result = runCompatScript(`
+indicator("Polyline docs smoke", overlay=true, max_polylines_count=1)
+if barstate.islast
+    points = array.from(chart.point.from_index(bar_index - 2, low[2]), chart.point.from_index(bar_index - 1, high[1]), chart.point.now(close))
+    polyline.new(points, closed=false, line_color=color.red, line_style=line.style_dashed, line_width=2)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'polyline_polyline.new_0_11',
+        type: 'polyline',
+        barIndex: 11,
+        points: [
+          { type: 'chart.point', time: null, index: 9, price: 107 },
+          { type: 'chart.point', time: null, index: 10, price: 114 },
+          { type: 'chart.point', time: compatibilityBars[11]!.time, index: 11, price: 112 },
+        ],
+        curved: false,
+        closed: false,
+        xloc: 'bar_index',
+        lineColor: '#F44336',
+        fillColor: null,
+        lineStyle: 'dashed',
+        lineWidth: 2,
+      },
+    ]);
+  });
 });

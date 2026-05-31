@@ -5,7 +5,13 @@ import {
   withDrawing,
 } from '../drawings/helpers';
 import type { ExecutionContext } from '../context';
-import type { BoxDrawingOutput, ChartPoint, LabelDrawingOutput, LineDrawingOutput } from '../drawings/types';
+import type {
+  BoxDrawingOutput,
+  ChartPoint,
+  LabelDrawingOutput,
+  LineDrawingOutput,
+  PolylineDrawingOutput,
+} from '../drawings/types';
 
 export interface DrawingBuiltinRuntime {
   isNa(value: unknown): boolean;
@@ -31,6 +37,28 @@ function isChartPoint(value: unknown): value is ChartPoint {
 
 function pointX(point: ChartPoint, xloc: string): number | null {
   return xloc === 'bar_time' ? point.time : point.index;
+}
+
+function copyPoint(point: ChartPoint): ChartPoint {
+  return { ...point };
+}
+
+function isPineRuntimeArray(value: unknown): value is { values: unknown[] } {
+  return (
+    typeof value === 'object'
+    && value !== null
+    && (value as { __tealscriptArray?: unknown }).__tealscriptArray === true
+    && Array.isArray((value as { values?: unknown }).values)
+  );
+}
+
+function chartPointArrayValues(value: unknown): ChartPoint[] {
+  const values = Array.isArray(value)
+    ? value
+    : isPineRuntimeArray(value)
+      ? value.values
+      : [];
+  return values.filter(isChartPoint).map(copyPoint);
 }
 
 function optionalString(runtime: DrawingBuiltinRuntime, value: unknown): string | undefined {
@@ -565,6 +593,49 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
   builtins.set('box.get_text_halign', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.textHalign ?? 'left'));
   builtins.set('box.get_text_valign', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.textValign ?? 'top'));
   builtins.set('box.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('box'));
+}
+
+export function registerPolylineBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
+  builtins.set('polyline.new', (args, namedArgs, ctx, _scope, callId) => {
+    const points = chartPointArrayValues(namedArgs.get('points') ?? args[0]);
+    if (points.length === 0) return Number.NaN;
+
+    const id = `polyline_${callId}_${ctx.bar_index}`;
+    const forceOverlay = optionalBoolean(namedArgs.get('force_overlay') ?? args[8]);
+    const drawing: PolylineDrawingOutput = {
+      id,
+      type: 'polyline',
+      barIndex: ctx.bar_index,
+      points,
+      curved: Boolean(namedArgs.get('curved') ?? args[1] ?? false),
+      closed: Boolean(namedArgs.get('closed') ?? args[2] ?? false),
+      xloc: runtime.toStringValue(namedArgs.get('xloc') ?? args[3] ?? 'bar_index'),
+      lineColor: runtime.toNullableColor(namedArgs.get('line_color') ?? args[4]),
+      fillColor: runtime.toNullableColor(namedArgs.get('fill_color') ?? args[5]),
+      lineStyle: runtime.toStringValue(namedArgs.get('line_style') ?? args[6] ?? 'solid'),
+      lineWidth: runtime.toLineWidth(namedArgs.get('line_width') ?? args[7]),
+    };
+    if (forceOverlay !== undefined) drawing.forceOverlay = forceOverlay;
+
+    ctx.addDrawing(drawing);
+    return id;
+  });
+
+  builtins.set('polyline.delete', (args, _namedArgs, ctx) => {
+    withDrawing(args[0], ctx, 'polyline', runtime.isNa, (polyline) => ctx.deleteDrawing(polyline.id));
+    return undefined;
+  });
+
+  builtins.set('polyline.copy', (args, _namedArgs, ctx, _scope, callId) => {
+    const polylineId = runtime.toDrawingId(args[0]);
+    if (!polylineId) return Number.NaN;
+
+    const newId = `polyline_${callId}_${ctx.bar_index}`;
+    const copy = ctx.copyPolylineDrawing(polylineId, newId);
+    return copy ? newId : Number.NaN;
+  });
+
+  builtins.set('polyline.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('polyline'));
 }
 
 const DRAWING_CONSTANTS: Record<string, string> = {

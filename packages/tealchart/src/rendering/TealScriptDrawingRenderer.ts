@@ -7,6 +7,7 @@ import {
   resolveBoxDrawingRect,
   resolveLabelDrawingPosition,
   resolveLineDrawingSegment,
+  resolvePolylineDrawingPoints,
 } from './TealScriptDrawingCoordinates';
 
 export interface TealScriptDrawingRendererOptions {
@@ -43,6 +44,7 @@ export class TealScriptDrawingRenderer {
   ): void {
     this.renderLineFillDrawings(drawingPartition, bars, viewport, pane);
     this.renderBoxDrawings(drawingPartition.boxes, bars, viewport, pane);
+    this.renderPolylineDrawings(drawingPartition.polylines, bars, viewport, pane);
     this.renderLineDrawings(drawingPartition.lines, bars, viewport, pane);
     this.renderLabelDrawings(drawingPartition.labels, bars, viewport, pane);
   }
@@ -260,6 +262,61 @@ export class TealScriptDrawingRenderer {
       ctx.beginPath();
       ctx.moveTo(extended.start.x, extended.start.y);
       ctx.lineTo(extended.end.x, extended.end.y);
+      ctx.stroke();
+    }
+
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  private renderPolylineDrawings(
+    polylines: TealScriptDrawingPartition['polylines'],
+    bars: Bar[],
+    viewport: Viewport,
+    pane: ComputedPane,
+  ): void {
+    if (polylines.length === 0) return;
+
+    const { ctx, options, margins } = this;
+    const chartWidth = options.width - margins.left;
+
+    ctx.save();
+    this.clipToPane(pane);
+
+    for (const polyline of polylines) {
+      const points = resolvePolylineDrawingPoints(
+        polyline,
+        bars,
+        viewport,
+        pane,
+        chartWidth,
+        this.coordinateResolvers,
+      );
+      if (points.length < 2) continue;
+
+      ctx.strokeStyle = polyline.lineColor ?? '#2962FF';
+      ctx.lineWidth = Math.max(1, polyline.lineWidth);
+      if (polyline.lineStyle === 'dashed') {
+        ctx.setLineDash([6, 4]);
+      } else if (polyline.lineStyle === 'dotted') {
+        ctx.setLineDash([2, 4]);
+      } else {
+        ctx.setLineDash([]);
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(points[0]!.x, points[0]!.y);
+      for (let index = 1; index < points.length; index++) {
+        const point = points[index]!;
+        ctx.lineTo(point.x, point.y);
+      }
+      if (polyline.closed) {
+        ctx.closePath();
+        if (polyline.fillColor) {
+          ctx.fillStyle = polyline.fillColor;
+          ctx.fill();
+        }
+      }
       ctx.stroke();
     }
 

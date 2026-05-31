@@ -1,4 +1,12 @@
-import type { BoxDrawingOutput, DrawingLimits, DrawingObjectType, DrawingOutput, LabelDrawingOutput, LineDrawingOutput } from './types';
+import type {
+  BoxDrawingOutput,
+  DrawingLimits,
+  DrawingObjectType,
+  DrawingOutput,
+  LabelDrawingOutput,
+  LineDrawingOutput,
+  PolylineDrawingOutput,
+} from './types';
 
 export const DEFAULT_DRAWING_LIMITS: DrawingLimits = {
   label: 50,
@@ -17,7 +25,7 @@ export const MAX_DRAWING_LIMITS: DrawingLimits = {
 type LimitedDrawingType = Extract<DrawingObjectType, keyof DrawingLimits>;
 
 function isLimitedDrawingType(type: DrawingObjectType | keyof DrawingLimits): type is LimitedDrawingType {
-  return type === 'label' || type === 'line' || type === 'box';
+  return type === 'label' || type === 'line' || type === 'box' || type === 'polyline';
 }
 
 export class DrawingStore {
@@ -112,6 +120,23 @@ export class DrawingStore {
     };
     this.drawings.push(copy);
     this.enforceLimit('box');
+    return copy;
+  }
+
+  copyPolyline(id: string, newId: string, barIndex: number): PolylineDrawingOutput | undefined {
+    const source = this.get(id);
+    if (!source || source.type !== 'polyline') return undefined;
+    if (this.get(newId)) return undefined;
+
+    const copy: PolylineDrawingOutput = {
+      ...source,
+      id: newId,
+      points: source.points.map((point) => ({ ...point })),
+      barIndex,
+      persistent: false,
+    };
+    this.drawings.push(copy);
+    this.enforceLimit('polyline');
     return copy;
   }
 

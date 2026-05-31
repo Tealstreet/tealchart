@@ -1,4 +1,4 @@
-import type { BoxDrawingOutput, LabelDrawingOutput, LineDrawingOutput } from '@tealstreet/tealscript';
+import type { BoxDrawingOutput, LabelDrawingOutput, LineDrawingOutput, PolylineDrawingOutput } from '@tealstreet/tealscript';
 import type { Bar, ComputedPane, Viewport } from '../types';
 
 export interface DrawingPoint {
@@ -97,6 +97,32 @@ export function resolveLineDrawingSegment(
   const end = resolveLineDrawingPoint(line.x2, line.y2, line.xloc, bars, viewport, pane, chartWidth, resolvers);
   if (!start || !end) return null;
   return resolveExtendedLineSegment(start, end, line.extend, minX, maxX);
+}
+
+export function resolvePolylineDrawingPoints(
+  polyline: PolylineDrawingOutput,
+  bars: readonly Bar[],
+  viewport: Viewport,
+  pane: ComputedPane,
+  chartWidth: number,
+  resolvers: DrawingCoordinateResolvers,
+): DrawingPoint[] {
+  const points: DrawingPoint[] = [];
+  for (const point of polyline.points) {
+    const xValue = polyline.xloc === 'bar_time' ? point.time : point.index;
+    const resolved = resolveLineDrawingPoint(
+      xValue,
+      point.price,
+      polyline.xloc,
+      bars,
+      viewport,
+      pane,
+      chartWidth,
+      resolvers,
+    );
+    if (resolved) points.push(resolved);
+  }
+  return points;
 }
 
 export function resolveBoxDrawingRect(

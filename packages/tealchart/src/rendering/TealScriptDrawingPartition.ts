@@ -4,6 +4,7 @@ import type {
   LabelDrawingOutput,
   LineDrawingOutput,
   LineFillDrawingOutput,
+  PolylineDrawingOutput,
 } from '@tealstreet/tealscript';
 
 export interface TealScriptDrawingPartition {
@@ -11,6 +12,7 @@ export interface TealScriptDrawingPartition {
   labels: LabelDrawingOutput[];
   lines: LineDrawingOutput[];
   linefills: LineFillDrawingOutput[];
+  polylines: PolylineDrawingOutput[];
   linesById: Map<string, LineDrawingOutput>;
 }
 
@@ -19,6 +21,7 @@ export function partitionTealScriptDrawings(drawings: readonly DrawingOutput[]):
   const labels: LabelDrawingOutput[] = [];
   const lines: LineDrawingOutput[] = [];
   const linefills: LineFillDrawingOutput[] = [];
+  const polylines: PolylineDrawingOutput[] = [];
   const linesById = new Map<string, LineDrawingOutput>();
 
   for (const drawing of drawings) {
@@ -36,8 +39,11 @@ export function partitionTealScriptDrawings(drawings: readonly DrawingOutput[]):
       case 'linefill':
         linefills.push(drawing);
         break;
+      case 'polyline':
+        polylines.push(drawing);
+        break;
     }
   }
 
-  return { boxes, labels, lines, linefills, linesById };
+  return { boxes, labels, lines, linefills, polylines, linesById };
 }

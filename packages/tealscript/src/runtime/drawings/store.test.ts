@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { DrawingStore } from './store';
-import type { BoxDrawingOutput, LabelDrawingOutput, LineDrawingOutput } from './types';
+import type { BoxDrawingOutput, LabelDrawingOutput, LineDrawingOutput, PolylineDrawingOutput } from './types';
 
 function label(overrides: Partial<LabelDrawingOutput> = {}): LabelDrawingOutput {
   return {
@@ -61,6 +61,26 @@ function box(overrides: Partial<BoxDrawingOutput> = {}): BoxDrawingOutput {
   };
 }
 
+function polyline(overrides: Partial<PolylineDrawingOutput> = {}): PolylineDrawingOutput {
+  return {
+    id: 'polyline_0',
+    type: 'polyline',
+    barIndex: 0,
+    points: [
+      { type: 'chart.point', time: null, index: 0, price: 10 },
+      { type: 'chart.point', time: null, index: 1, price: 11 },
+    ],
+    curved: false,
+    closed: false,
+    xloc: 'bar_index',
+    lineColor: '#000000',
+    fillColor: null,
+    lineStyle: 'solid',
+    lineWidth: 1,
+    ...overrides,
+  };
+}
+
 describe('DrawingStore', () => {
   it('adds, gets, lists, and deletes drawings', () => {
     const store = new DrawingStore();
@@ -85,6 +105,7 @@ describe('DrawingStore', () => {
     const store = new DrawingStore();
     store.setLimit('label', 2);
     store.setLimit('line', 1);
+    store.setLimit('polyline', 1);
 
     store.add(label({ id: 'label_0' }));
     store.add(line({ id: 'line_0' }));
@@ -92,11 +113,14 @@ describe('DrawingStore', () => {
     store.add(line({ id: 'line_1' }));
     store.add(label({ id: 'label_2' }));
     store.add(box({ id: 'box_0' }));
+    store.add(polyline({ id: 'polyline_0' }));
+    store.add(polyline({ id: 'polyline_1' }));
 
     expect(store.getIds('label')).toEqual(['label_1', 'label_2']);
     expect(store.getIds('line')).toEqual(['line_1']);
     expect(store.getIds('box')).toEqual(['box_0']);
-    expect(store.all().map((drawing) => drawing.id)).toEqual(['label_1', 'line_1', 'label_2', 'box_0']);
+    expect(store.getIds('polyline')).toEqual(['polyline_1']);
+    expect(store.all().map((drawing) => drawing.id)).toEqual(['label_1', 'line_1', 'label_2', 'box_0', 'polyline_1']);
   });
 
   it('enforces limits when copying drawings', () => {
@@ -130,15 +154,23 @@ describe('DrawingStore', () => {
     store.add(label({ id: 'label_0', barIndex: 1, persistent: true }));
     store.add(line({ id: 'line_0', barIndex: 1, persistent: true }));
     store.add(box({ id: 'box_0', barIndex: 1, persistent: true }));
+    store.add(polyline({ id: 'polyline_0', barIndex: 1, persistent: true }));
 
     const labelCopy = store.copyLabel('label_0', 'label_1', 7);
     const lineCopy = store.copyLine('line_0', 'line_1', 8);
     const boxCopy = store.copyBox('box_0', 'box_1', 9);
+    const polylineCopy = store.copyPolyline('polyline_0', 'polyline_1', 10);
 
     expect(labelCopy).toMatchObject({ id: 'label_1', type: 'label', barIndex: 7, persistent: false });
     expect(lineCopy).toMatchObject({ id: 'line_1', type: 'line', barIndex: 8, persistent: false });
     expect(boxCopy).toMatchObject({ id: 'box_1', type: 'box', barIndex: 9, persistent: false });
-    expect(store.count()).toBe(6);
+    expect(polylineCopy).toMatchObject({ id: 'polyline_1', type: 'polyline', barIndex: 10, persistent: false });
+    const sourcePolyline = store.get('polyline_0');
+    expect(sourcePolyline?.type).toBe('polyline');
+    if (sourcePolyline?.type === 'polyline') {
+      expect(polylineCopy?.points).not.toBe(sourcePolyline.points);
+    }
+    expect(store.count()).toBe(8);
   });
 
   it('does not copy missing, mismatched, or duplicate drawing ids', () => {

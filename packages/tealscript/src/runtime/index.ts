@@ -54,6 +54,7 @@ export type {
   LineDrawingOutput,
   LineFillDrawingOutput,
   BoxDrawingOutput,
+  PolylineDrawingOutput,
 } from './drawings/types';
 
 export { Scope, createRootScope, type VarKind, type VariableEntry, type ScopeSnapshot } from './scope';

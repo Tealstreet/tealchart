@@ -59,7 +59,15 @@ import {
   type PineArray,
 } from './arrays';
 import type { BuiltinFunction, BuiltinRegistry } from './builtins/registry';
-import { registerBoxBuiltins, registerDrawingConstants, registerLabelBuiltins, registerLineBuiltins, registerLineFillBuiltins, type DrawingBuiltinRuntime } from './builtins/drawings';
+import {
+  registerBoxBuiltins,
+  registerDrawingConstants,
+  registerLabelBuiltins,
+  registerLineBuiltins,
+  registerLineFillBuiltins,
+  registerPolylineBuiltins,
+  type DrawingBuiltinRuntime,
+} from './builtins/drawings';
 import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type ChartPoint, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LogLevel, type LogOutput, type PlotLineStyle, type PlotOutput, type PlotStyle } from './context';
 import {
   getDrawingValue,
@@ -112,7 +120,7 @@ interface TickerModifierParts {
   modifiers: string[];
 }
 
-const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['map', 'matrix', 'polyline', 'ticker']);
+const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['map', 'matrix', 'ticker']);
 
 /**
  * Tealscript Engine - executes AST bar-by-bar
@@ -1432,6 +1440,7 @@ export class TealscriptEngine {
     registerLineBuiltins(this.builtins, this.createDrawingBuiltinRuntime());
     registerLineFillBuiltins(this.builtins, this.createDrawingBuiltinRuntime());
     registerBoxBuiltins(this.builtins, this.createDrawingBuiltinRuntime());
+    registerPolylineBuiltins(this.builtins, this.createDrawingBuiltinRuntime());
 
     registerDrawingConstants(this.builtins);
   }

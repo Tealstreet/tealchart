@@ -3,6 +3,7 @@ import type {
   LabelDrawingOutput,
   LineDrawingOutput,
   LineFillDrawingOutput,
+  PolylineDrawingOutput,
 } from '@tealstreet/tealscript';
 import type { Bar, ComputedPane } from '../types';
 import type { CanvasContext } from './CanvasContext';
@@ -140,6 +141,27 @@ function makeLinefill(overrides: Partial<LineFillDrawingOutput> = {}): LineFillD
   };
 }
 
+function makePolyline(overrides: Partial<PolylineDrawingOutput> = {}): PolylineDrawingOutput {
+  return {
+    id: 'polyline-1',
+    type: 'polyline',
+    barIndex: 0,
+    points: [
+      { type: 'chart.point', time: null, index: 0, price: 10 },
+      { type: 'chart.point', time: null, index: 1, price: 15 },
+      { type: 'chart.point', time: null, index: 2, price: 12 },
+    ],
+    curved: false,
+    closed: false,
+    xloc: 'bar_index',
+    lineColor: '#2962FF',
+    fillColor: null,
+    lineStyle: 'solid',
+    lineWidth: 1,
+    ...overrides,
+  };
+}
+
 describe('TealScriptDrawingRenderer', () => {
   it('renders linefills, boxes, lines, then labels in pane-clipped order', () => {
     const events: string[] = [];
@@ -219,5 +241,38 @@ describe('TealScriptDrawingRenderer', () => {
 
     expect(events).toContain('fillTextStyle:right,bottom');
     expect(events).toContain('fillText:Box:114,124');
+  });
+
+  it('renders polyline paths with optional fill when closed', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makePolyline({ closed: true, fillColor: 'rgba(41, 98, 255, 0.18)' }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).toContain('moveTo:0,110');
+    expect(events).toContain('lineTo:60,60');
+    expect(events).toContain('lineTo:120,90');
+    expect(events).toContain('closePath');
+    expect(events).toContain('fill');
+    expect(events).toContain('stroke');
   });
 });

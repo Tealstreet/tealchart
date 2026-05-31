@@ -753,4 +753,42 @@ plot(current.price, title="Point Price")`;
       expect(result.plots.find((plot) => plot.title === 'Point Index')?.values).toEqual([0, 1, 2]);
       expect(result.plots.find((plot) => plot.title === 'Point Price')?.values).toEqual([100.5, 101, 101.5]);
     });
+
+    it('records, copies, deletes, limits, and exposes polyline drawings', () => {
+      const script = `//@version=6
+indicator("Polylines", overlay=true, max_polylines_count=1)
+points = array.from(chart.point.from_index(0, low), chart.point.from_index(1, high), chart.point.from_index(2, close))
+poly = polyline.new(points, curved=false, closed=true, line_color=color.red, fill_color=color.new(color.blue, 80), line_style=line.style_dotted, line_width=2, force_overlay=true)
+clone = polyline.copy(poly)
+polyline.delete(poly)
+plot(array.size(polyline.all), title="Polylines")`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'polyline_polyline.copy_0_0',
+          type: 'polyline',
+          barIndex: 0,
+          points: [
+            { type: 'chart.point', time: null, index: 0, price: 99.7 },
+            { type: 'chart.point', time: null, index: 1, price: 100.5 },
+            { type: 'chart.point', time: null, index: 2, price: 100.2 },
+          ],
+          curved: false,
+          closed: true,
+          xloc: 'bar_index',
+          lineColor: '#F44336',
+          fillColor: '#2196F333',
+          lineStyle: 'dotted',
+          lineWidth: 2,
+          forceOverlay: true,
+          persistent: false,
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Polylines')?.values).toEqual([1]);
+    });
   });

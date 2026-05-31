@@ -72,6 +72,7 @@ export {
   type LineDrawingOutput,
   type LineFillDrawingOutput,
   type BoxDrawingOutput,
+  type PolylineDrawingOutput,
   type AlertEvent,
   type AlertFrequency,
   type AlertOutput,
