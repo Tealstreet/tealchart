@@ -176,4 +176,56 @@ plot(array.size(values), title="Literal Size")
     expect(roundSeries(getPlot(result, 'Middle').values)).toEqual([20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]);
     expect(roundSeries(getPlot(result, 'Literal Size').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
   });
+
+  it('matches documented Pine array statistical helpers', () => {
+    const result = runCompatScript(`
+indicator("Array statistical helpers")
+values = array.from(1, 2, 3, 4)
+absValues = array.abs(array.from(-2, 3))
+standardized = values.standardize()
+plot(array.range(values), title="Range")
+plot(array.median(values), title="Median")
+plot(array.mode(array.from(2, 1, 2, 3)), title="Mode")
+plot(array.variance(values), title="Variance")
+plot(array.stdev(values, false), title="Unbiased Stdev")
+plot(array.percentile_nearest_rank(values, 50), title="Nearest Rank")
+plot(array.percentile_linear_interpolation(values, 50), title="Linear Percentile")
+plot(array.percentrank(values, 2), title="Percent Rank")
+plot(array.get(standardized, 0), title="Standardized First")
+plot(array.get(absValues, 0), title="Abs First")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Range').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Median').values)).toEqual([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5]);
+    expect(roundSeries(getPlot(result, 'Mode').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Variance').values)).toEqual([1.25, 1.25, 1.25, 1.25, 1.25, 1.25, 1.25, 1.25, 1.25, 1.25, 1.25, 1.25]);
+    expect(roundSeries(getPlot(result, 'Unbiased Stdev').values)).toEqual([1.290994, 1.290994, 1.290994, 1.290994, 1.290994, 1.290994, 1.290994, 1.290994, 1.290994, 1.290994, 1.290994, 1.290994]);
+    expect(roundSeries(getPlot(result, 'Nearest Rank').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Linear Percentile').values)).toEqual([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5]);
+    expect(roundSeries(getPlot(result, 'Percent Rank').values)).toEqual([75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75]);
+    expect(roundSeries(getPlot(result, 'Standardized First').values)).toEqual([-1.341641, -1.341641, -1.341641, -1.341641, -1.341641, -1.341641, -1.341641, -1.341641, -1.341641, -1.341641, -1.341641, -1.341641]);
+    expect(roundSeries(getPlot(result, 'Abs First').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+  });
+
+  it('matches documented Pine array binary-search helpers', () => {
+    const result = runCompatScript(`
+indicator("Array binary search")
+values = array.from(1, 2, 2, 4)
+plot(values.binary_search(2), title="Found")
+plot(array.binary_search(values, 3), title="Missing")
+plot(values.binary_search_leftmost(2), title="Left Found")
+plot(values.binary_search_leftmost(3), title="Left Missing")
+plot(values.binary_search_rightmost(2), title="Right Found")
+plot(values.binary_search_rightmost(3), title="Right Missing")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Found').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Missing').values)).toEqual([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
+    expect(roundSeries(getPlot(result, 'Left Found').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Left Missing').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Right Found').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Right Missing').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+  });
 });
