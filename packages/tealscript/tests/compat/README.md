@@ -1,0 +1,41 @@
+# Pine Compatibility Fixtures
+
+Compatibility fixtures are deterministic checkpoints for Pine-like behavior.
+They should be small enough to review directly and stable enough to run in CI
+without TradingView, network access, live market data, or public scripts at test
+time.
+
+Use `fixtures.ts` helpers by default:
+
+- `compatibilityBars` for fixed OHLCV input.
+- `runCompatScript()` for parse plus execute.
+- `getPlot()` for title-based plot assertions.
+- `roundSeries()` for stable numeric expectations.
+
+## Topic Files
+
+Keep fixtures grouped by behavior:
+
+- `pine-basics.test.ts` for broad smoke coverage.
+- `pine-language.test.ts` for core language/runtime semantics.
+- `pine-arrays.test.ts` for array and method idioms.
+- `pine-builtins.test.ts` for `ta.*`, `math.*`, `str.*`, `input.*`, `color.*`,
+  and global helpers.
+- `pine-visuals.test.ts` for plots, fills, alerts, and non-object visuals.
+- `pine-control-time.test.ts` for switch, loops, barstate, chart info, calendar,
+  sessions, and timeframes.
+- `pine-drawings.test.ts` for labels, lines, boxes, linefills, and future visual
+  object checkpoints.
+
+## Fixture Rules
+
+- Prefer reduced snippets derived from official TradingView docs or common
+  public idioms.
+- Preserve the semantic shape of the Pine idiom, but remove unrelated UI,
+  styling, and large-script scaffolding.
+- Add a short source comment or link when it clarifies the behavior being
+  modeled.
+- Assert concrete plots, drawings, alerts, inputs, or diagnostics.
+- Use hand-checked expected values over `compatibilityBars`.
+- Keep unsupported behavior explicit with a negative diagnostic fixture when a
+  feature is intentionally out of scope for the current epic.
