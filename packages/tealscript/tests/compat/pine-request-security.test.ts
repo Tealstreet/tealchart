@@ -186,6 +186,95 @@ plot(aaplPeriodLen, title="AAPL Period Len")
     expect(getPlot(result, 'AAPL Period Len').values).toEqual([1, 1, 1, 1, 1, 1]);
   });
 
+  it('allows global static requests when dynamic_requests is false', () => {
+    const result = runCompatScript(`
+indicator("Static request", dynamic_requests=false)
+htfClose = request.security(syminfo.tickerid, "2", close, lookahead=barmerge.lookahead_on)
+plot(htfClose, title="HTF Close")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: requestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'HTF Close').values).toEqual([10, 10, 20, 20, 30, 30]);
+  });
+
+  it('allows nested requests when dynamic_requests is true by default', () => {
+    const result = runCompatScript(`
+indicator("Nested dynamic request")
+nested = request.security(
+    "NASDAQ:AAPL",
+    "2",
+    request.security(syminfo.tickerid, "2", close, lookahead=barmerge.lookahead_on),
+    lookahead=barmerge.lookahead_on
+)
+plot(nested, title="Nested")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: multiSymbolRequestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Nested').values).toEqual([181, 181, 185, 185, 188, 188]);
+  });
+
+  it('rejects local-scope and conditional-operand requests when dynamic_requests is false', () => {
+    const local = runCompatScript(`
+indicator("Local request disabled", dynamic_requests=false)
+if close > open
+    plot(request.security(syminfo.tickerid, "2", close), title="Local")
+`, {
+      bars: [chartBars[1]!],
+      engineOptions: { requestDatafeed: requestDatafeed() },
+    });
+
+    const conditional = runCompatScript(`
+indicator("Conditional request disabled", dynamic_requests=false)
+plot(close > open ? request.security(syminfo.tickerid, "2", close) : close, title="Conditional")
+`, {
+      bars: [chartBars[1]!],
+      engineOptions: { requestDatafeed: requestDatafeed() },
+    });
+
+    const logical = runCompatScript(`
+indicator("Logical request disabled", dynamic_requests=false)
+plot(request.security(syminfo.tickerid, "2", close) and close > open ? 1 : 0, title="Logical")
+`, {
+      bars: [chartBars[1]!],
+      engineOptions: { requestDatafeed: requestDatafeed() },
+    });
+
+    expect(local.errors.map((error) => error.message)).toEqual([
+      'request.* calls in local scopes require dynamic_requests=true: request.security',
+    ]);
+    expect(conditional.errors.map((error) => error.message)).toEqual([
+      'request.* calls in local scopes require dynamic_requests=true: request.security',
+    ]);
+    expect(logical.errors.map((error) => error.message)).toEqual([
+      'request.* calls in local scopes require dynamic_requests=true: request.security',
+    ]);
+  });
+
+  it('rejects nested requests when dynamic_requests is false', () => {
+    const result = runCompatScript(`
+indicator("Nested request disabled", dynamic_requests=false)
+plot(request.security(
+    "NASDAQ:AAPL",
+    "2",
+    request.security(syminfo.tickerid, "2", close, lookahead=barmerge.lookahead_on),
+    lookahead=barmerge.lookahead_on
+), title="Nested")
+`, {
+      bars: [chartBars[0]!],
+      engineOptions: { requestDatafeed: multiSymbolRequestDatafeed() },
+    });
+
+    expect(result.errors.map((error) => error.message)).toEqual([
+      'Nested request.* calls require dynamic_requests=true: request.security',
+    ]);
+  });
+
   it('supports ignore_invalid_symbol for missing fixture contexts', () => {
     const result = runCompatScript(`
 indicator("HTF ignore missing")

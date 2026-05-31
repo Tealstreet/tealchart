@@ -60,6 +60,7 @@ export interface IndicatorDeclaration extends BaseNode {
   max_bars_back?: Expression;
   timeframe?: Expression;
   timeframe_gaps?: Expression;
+  dynamic_requests?: Expression;
 }
 
 /**

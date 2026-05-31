@@ -72,6 +72,21 @@ requests that return Pine arrays of expression values for each chart bar.
 5. Support `ignore_invalid_symbol`, `currency`, and `calc_bars_count` routing
    hints with deterministic fixtures.
 
+## Dynamic Requests MVP
+
+Pine v6 enables dynamic requests by default. The current runtime follows that
+default and supports request calls in local scopes plus nested request execution
+for supported `request.security*` calls. When scripts explicitly set
+`dynamic_requests=false` in `indicator()`, the runtime rejects:
+
+- supported `request.*` calls in conditional/loop local scopes;
+- supported `request.*` calls in conditional-expression and `and`/`or`
+  operands;
+- nested supported `request.*` execution inside a requested context.
+
+This MVP does not yet implement Pine's full simple/series qualifier analysis for
+request parameters. That belongs to the qualified type-system epic.
+
 ## Integration Path
 
 The engine can accept an optional `RequestDatafeed` in a future PR. Tealchart can
@@ -84,9 +99,9 @@ without changing the fixture-level contract.
 
 ## Non-Goals
 
-This contract does not yet cover dynamic/nested requests, currency conversion,
-corporate actions, economic data, or synthetic ticker construction. Those belong
-to later Epic 8 and Epic 9 phases.
+This contract does not yet cover full simple/series qualifier diagnostics,
+currency conversion, corporate actions, economic data, or synthetic ticker
+construction. Those belong to later Epic 8 and Epic 9 phases.
 
 ## Test Strategy
 
