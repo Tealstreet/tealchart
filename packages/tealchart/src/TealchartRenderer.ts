@@ -1745,6 +1745,8 @@ export class TealchartRenderer {
               this.renderBgcolor(plot, bars, viewport);
               break;
             case 'plotshape':
+            case 'plotchar':
+            case 'plotarrow':
               this.renderPlotShape(plot, bars, viewport);
               break;
             case 'fill':
@@ -2303,7 +2305,7 @@ export class TealchartRenderer {
   }
 
   /**
-   * Render shape markers (plotshape)
+   * Render shape markers (plotshape, plotchar, plotarrow)
    */
   private renderPlotShape(plot: PlotOutput, bars: Bar[], viewport: Viewport): void {
     const { ctx, options, margins } = this;
@@ -2312,8 +2314,10 @@ export class TealchartRenderer {
     const volumeHeight = options.showVolume ? chartHeight * options.volumeHeight : 0;
     const priceHeight = chartHeight - volumeHeight;
 
-    const { values, color, location = 'abovebar', shape = 'circle', size = 'small' } = plot;
+    const { values, color, location = 'abovebar', shape = 'circle', size = 'small', offset = 0 } = plot;
     const baseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
+    const textColor = Array.isArray(plot.textColor) ? plot.textColor[0] || '#FFFFFF' : plot.textColor || '#FFFFFF';
+    const barInterval = bars.length >= 2 ? bars[1].time - bars[0].time : 0;
 
     // Size mapping
     const sizeMap: Record<string, number> = {
@@ -2339,11 +2343,17 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(bar.time, viewport, chartWidth);
+      const x = this.timeToX(bar.time + offset * barInterval, viewport, chartWidth);
+      const effectiveLocation =
+        plot.type === 'plotarrow'
+          ? value > 0
+            ? 'belowbar'
+            : 'abovebar'
+          : location;
 
       // Determine Y position based on location
       let y: number;
-      switch (location) {
+      switch (effectiveLocation) {
         case 'abovebar':
           y = this.priceToY(bar.high, viewport, priceHeight) - markerSize - 4;
           break;
@@ -2364,10 +2374,27 @@ export class TealchartRenderer {
       }
 
       const shapeColor = Array.isArray(color) && color[i] ? color[i] : baseColor;
+      if (!shapeColor) continue;
       ctx.fillStyle = shapeColor as string;
       ctx.strokeStyle = shapeColor as string;
 
-      this.drawShape(x, y, shape || 'circle', markerSize);
+      if (plot.type === 'plotchar') {
+        ctx.font = `${Math.max(10, markerSize * 2)}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(plot.char || '●', x, y);
+      } else {
+        const markerShape = plot.type === 'plotarrow' ? (value > 0 ? 'arrowup' : 'arrowdown') : shape || 'circle';
+        this.drawShape(x, y, markerShape, markerSize);
+      }
+
+      if (plot.text) {
+        ctx.fillStyle = Array.isArray(plot.textColor) && plot.textColor[i] ? plot.textColor[i] as string : textColor;
+        ctx.font = `${Math.max(10, markerSize * 1.5)}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = effectiveLocation === 'belowbar' ? 'top' : 'bottom';
+        ctx.fillText(plot.text, x, effectiveLocation === 'belowbar' ? y + markerSize : y - markerSize);
+      }
     }
   }
 
@@ -2399,6 +2426,7 @@ export class TealchartRenderer {
         break;
 
       case 'triangleup':
+      case 'arrowup':
         ctx.beginPath();
         ctx.moveTo(x, y - size / 2);
         ctx.lineTo(x + size / 2, y + size / 2);
@@ -2408,6 +2436,7 @@ export class TealchartRenderer {
         break;
 
       case 'triangledown':
+      case 'arrowdown':
         ctx.beginPath();
         ctx.moveTo(x, y + size / 2);
         ctx.lineTo(x + size / 2, y - size / 2);

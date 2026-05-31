@@ -238,6 +238,52 @@ fill(topLine, bottomLine, color.new(color.blue, 90), "Range Fill", true, 4, true
     expect(rangeFill.display).toBe(0);
   });
 
+  it('captures Pine marker visual parameters', () => {
+    const result = runCompatScript(`
+indicator("Marker visuals smoke", overlay=true)
+plotshape(close > open, "Long", shape.triangleup, location.belowbar, color.green, 1, "L", color.white, false, size.large, 5, display.price_scale)
+plotchar(close < open, "Down Char", "D", location.abovebar, color.red, -1, "Down", color.yellow, true, size.small, 6, display.none)
+plotarrow(close - open, "Move Arrow", color.green, color.red, 0, 5, 20, false, 7, display.all)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Long')).toMatchObject({
+      type: 'plotshape',
+      shape: 'triangleup',
+      location: 'belowbar',
+      size: 'large',
+      text: 'L',
+      textColor: '#FFFFFF',
+      offset: 1,
+      editable: false,
+      showLast: 5,
+      display: 8,
+    });
+    expect(getPlot(result, 'Down Char')).toMatchObject({
+      type: 'plotchar',
+      char: 'D',
+      location: 'abovebar',
+      size: 'small',
+      text: 'Down',
+      textColor: '#FFEB3B',
+      offset: -1,
+      editable: true,
+      showLast: 6,
+      display: 0,
+    });
+    expect(getPlot(result, 'Move Arrow')).toMatchObject({
+      type: 'plotarrow',
+      colorup: '#4CAF50',
+      colordown: '#F44336',
+      offset: 0,
+      minHeight: 5,
+      maxHeight: 20,
+      editable: false,
+      showLast: 7,
+      display: 15,
+    });
+  });
+
   it('preserves legacy fill title references before plot registration', () => {
     const result = runCompatScript(`
 indicator("Legacy fill smoke", overlay=true)

@@ -125,11 +125,14 @@ export interface PlotOutput {
   shape?: string;
   size?: 'tiny' | 'small' | 'normal' | 'large' | 'huge' | 'auto';
   text?: string;
+  textColor?: string | (string | null)[];
   char?: string;
 
   // For plotarrow
   colorup?: string;
   colordown?: string;
+  minHeight?: number;
+  maxHeight?: number;
 
   // For fill
   plot1Id?: string;

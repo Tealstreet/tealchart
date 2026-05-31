@@ -2676,12 +2676,20 @@ export class TealscriptEngine {
     // =========================================================================
     this.builtins.set('plotshape', (args, namedArgs, ctx) => {
       const series = args[0]; // Can be boolean or number
-      const title = (namedArgs.get('title') ?? args[1] ?? 'Shape') as string;
-      const style = (namedArgs.get('style') ?? 'circle') as string;
-      const location = (namedArgs.get('location') ?? 'abovebar') as string;
-      const color = this.toPlotColor(namedArgs.has('color') ? namedArgs.get('color') : '#2196F3');
-      const size = (namedArgs.get('size') ?? 'normal') as string;
-      const text = (namedArgs.get('text') ?? '') as string;
+      const title = (this.getCallArg(args, namedArgs, 1, 'title', 'Shape')) as string;
+      const style = (this.getCallArg(args, namedArgs, 2, 'style', 'circle')) as string;
+      const location = (this.getCallArg(args, namedArgs, 3, 'location', 'abovebar')) as string;
+      const color = this.toPlotColor(this.getCallArg(args, namedArgs, 4, 'color', '#2196F3'));
+      const offset = this.toOptionalInteger(this.getCallArg(args, namedArgs, 5, 'offset'));
+      const text = (this.getCallArg(args, namedArgs, 6, 'text', '')) as string;
+      const textColor = this.toPlotColor(this.getCallArg(args, namedArgs, 7, 'textcolor', '#FFFFFF'));
+      const editable = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 8, 'editable'));
+      const size = (this.getCallArg(args, namedArgs, 9, 'size', 'normal')) as string;
+      const showLast = this.toOptionalInteger(this.getCallArg(args, namedArgs, 10, 'show_last'));
+      const display = this.toOptionalInteger(this.getCallArg(args, namedArgs, 11, 'display'));
+      const format = this.toOptionalString(this.getCallArg(args, namedArgs, 12, 'format'));
+      const precision = this.toOptionalInteger(this.getCallArg(args, namedArgs, 13, 'precision'));
+      const forceOverlay = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 14, 'force_overlay'));
 
       const id = `plotshape_${title}`;
 
@@ -2695,6 +2703,14 @@ export class TealscriptEngine {
           location: location as 'abovebar' | 'belowbar' | 'top' | 'bottom' | 'absolute',
           size: size as 'tiny' | 'small' | 'normal' | 'large' | 'huge' | 'auto',
           text,
+          textColor: textColor ?? undefined,
+          offset,
+          editable,
+          showLast,
+          display,
+          format,
+          precision,
+          forceOverlay,
         });
       }
 
@@ -2721,12 +2737,20 @@ export class TealscriptEngine {
     // =========================================================================
     this.builtins.set('plotchar', (args, namedArgs, ctx) => {
       const series = args[0]; // Can be boolean or number
-      const title = (namedArgs.get('title') ?? args[1] ?? 'Char') as string;
-      const char = (namedArgs.get('char') ?? '●') as string;
-      const location = (namedArgs.get('location') ?? 'abovebar') as string;
-      const color = this.toPlotColor(namedArgs.has('color') ? namedArgs.get('color') : '#2196F3');
-      const size = (namedArgs.get('size') ?? 'normal') as string;
-      const text = (namedArgs.get('text') ?? '') as string;
+      const title = (this.getCallArg(args, namedArgs, 1, 'title', 'Char')) as string;
+      const char = (this.getCallArg(args, namedArgs, 2, 'char', '●')) as string;
+      const location = (this.getCallArg(args, namedArgs, 3, 'location', 'abovebar')) as string;
+      const color = this.toPlotColor(this.getCallArg(args, namedArgs, 4, 'color', '#2196F3'));
+      const offset = this.toOptionalInteger(this.getCallArg(args, namedArgs, 5, 'offset'));
+      const text = (this.getCallArg(args, namedArgs, 6, 'text', '')) as string;
+      const textColor = this.toPlotColor(this.getCallArg(args, namedArgs, 7, 'textcolor', '#FFFFFF'));
+      const editable = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 8, 'editable'));
+      const size = (this.getCallArg(args, namedArgs, 9, 'size', 'normal')) as string;
+      const showLast = this.toOptionalInteger(this.getCallArg(args, namedArgs, 10, 'show_last'));
+      const display = this.toOptionalInteger(this.getCallArg(args, namedArgs, 11, 'display'));
+      const format = this.toOptionalString(this.getCallArg(args, namedArgs, 12, 'format'));
+      const precision = this.toOptionalInteger(this.getCallArg(args, namedArgs, 13, 'precision'));
+      const forceOverlay = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 14, 'force_overlay'));
 
       const id = `plotchar_${title}`;
 
@@ -2740,6 +2764,14 @@ export class TealscriptEngine {
           location: location as 'abovebar' | 'belowbar' | 'top' | 'bottom' | 'absolute',
           size: size as 'tiny' | 'small' | 'normal' | 'large' | 'huge' | 'auto',
           text,
+          textColor: textColor ?? undefined,
+          offset,
+          editable,
+          showLast,
+          display,
+          format,
+          precision,
+          forceOverlay,
         });
       }
 
@@ -2766,9 +2798,18 @@ export class TealscriptEngine {
     // =========================================================================
     this.builtins.set('plotarrow', (args, namedArgs, ctx) => {
       const series = args[0] as number; // Positive = up arrow, negative = down arrow
-      const title = (namedArgs.get('title') ?? 'Arrow') as string;
-      const colorup = (namedArgs.get('colorup') ?? '#4CAF50') as string;
-      const colordown = (namedArgs.get('colordown') ?? '#F44336') as string;
+      const title = (this.getCallArg(args, namedArgs, 1, 'title', 'Arrow')) as string;
+      const colorup = (this.getCallArg(args, namedArgs, 2, 'colorup', '#4CAF50')) as string;
+      const colordown = (this.getCallArg(args, namedArgs, 3, 'colordown', '#F44336')) as string;
+      const offset = this.toOptionalInteger(this.getCallArg(args, namedArgs, 4, 'offset'));
+      const minHeight = this.toOptionalInteger(this.getCallArg(args, namedArgs, 5, 'minheight'));
+      const maxHeight = this.toOptionalInteger(this.getCallArg(args, namedArgs, 6, 'maxheight'));
+      const editable = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 7, 'editable'));
+      const showLast = this.toOptionalInteger(this.getCallArg(args, namedArgs, 8, 'show_last'));
+      const display = this.toOptionalInteger(this.getCallArg(args, namedArgs, 9, 'display'));
+      const format = this.toOptionalString(this.getCallArg(args, namedArgs, 10, 'format'));
+      const precision = this.toOptionalInteger(this.getCallArg(args, namedArgs, 11, 'precision'));
+      const forceOverlay = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 12, 'force_overlay'));
 
       const id = `plotarrow_${title}`;
 
@@ -2781,6 +2822,15 @@ export class TealscriptEngine {
           colorup,
           colordown,
           location: 'abovebar', // Arrows position relative to price
+          offset,
+          minHeight,
+          maxHeight,
+          editable,
+          showLast,
+          display,
+          format,
+          precision,
+          forceOverlay,
         });
       }
 

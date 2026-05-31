@@ -495,6 +495,42 @@ describe('TealchartRenderer coordinate transforms', () => {
     });
   });
 
+  describe('marker rendering', () => {
+    it('renders plotchar glyphs and marker text', () => {
+      const fillText = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillText,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(1, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[0]!.time + 60_000,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plot: PlotOutput = {
+        id: 'plotchar_Test',
+        type: 'plotchar',
+        title: 'Test',
+        values: [1],
+        color: ['#2196F3'],
+        char: 'D',
+        text: 'Down',
+        textColor: '#FFEB3B',
+        location: 'abovebar',
+        size: 'small',
+        offset: 1,
+      };
+
+      (renderer as any).renderPlotShape(plot, bars, viewport);
+
+      expect(fillText).toHaveBeenCalledWith('D', expect.any(Number), expect.any(Number));
+      expect(fillText).toHaveBeenCalledWith('Down', expect.any(Number), expect.any(Number));
+    });
+  });
+
   describe('calculateViewport', () => {
     it('returns sensible defaults for empty bars', () => {
       const vp = TealchartRenderer.calculateViewport([]);
