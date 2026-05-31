@@ -56,7 +56,6 @@ export {
   executeScript,
   type ExecutionResult,
   type ExecutionError,
-  type TealscriptEngineOptions,
   // Context
   ExecutionContext,
   createContext,
@@ -77,17 +76,6 @@ export {
   type LogLevel,
   type LogOutput,
   type InputDefinition,
-  // Request datafeed
-  InMemoryRequestDatafeed,
-  requestDatafeedKey,
-  type RequestDataContext,
-  type RequestDatafeed,
-  type RequestDatafeedErrorCode,
-  type RequestDatafeedFailure,
-  type RequestDatafeedKey,
-  type RequestDatafeedQuery,
-  type RequestDatafeedResult,
-  type RequestDatafeedSuccess,
   // Series
   Series,
   seriesFrom,

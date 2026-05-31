@@ -3,15 +3,15 @@ import { describe, expect, it } from 'vitest';
 import { compatibilityBars, runCompatScript } from './fixtures';
 
 describe('Pine compatibility unsupported diagnostics', () => {
-  it('reports planned lower-timeframe data namespace calls explicitly', () => {
+  it('reports planned data namespace calls explicitly', () => {
     const result = runCompatScript(`
-indicator("Unsupported lower timeframe request")
-request.security_lower_tf(syminfo.tickerid, "1", close)
+indicator("Unsupported request")
+request.security(syminfo.tickerid, "1D", close)
 plot(close)
 `, { bars: [compatibilityBars[0]!] });
 
     expect(result.errors.map((error) => error.message)).toEqual([
-      'request.* functions are not supported yet: request.security_lower_tf',
+      'request.* functions are not supported yet: request.security',
     ]);
   });
 

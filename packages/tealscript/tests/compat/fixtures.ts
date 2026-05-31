@@ -1,5 +1,5 @@
 import { parse } from '../../src/parser';
-import { executeScript, type Bar, type ExecutionResult, type PlotOutput, type TealscriptEngineOptions } from '../../src/runtime';
+import { executeScript, type Bar, type ExecutionResult, type PlotOutput } from '../../src/runtime';
 
 export const compatibilityBars: Bar[] = [
   { time: 1_700_000_000_000, open: 100, high: 103, low: 99, close: 102, volume: 1_000 },
@@ -19,11 +19,10 @@ export const compatibilityBars: Bar[] = [
 export interface RunCompatScriptOptions {
   bars?: Bar[];
   inputs?: Map<string, unknown>;
-  engineOptions?: TealscriptEngineOptions;
 }
 
 export function runCompatScript(source: string, options: RunCompatScriptOptions = {}): ExecutionResult {
-  return executeScript(parse(source), options.bars ?? compatibilityBars, options.inputs, options.engineOptions);
+  return executeScript(parse(source), options.bars ?? compatibilityBars, options.inputs);
 }
 
 export function getPlot(result: ExecutionResult, title: string): PlotOutput {
