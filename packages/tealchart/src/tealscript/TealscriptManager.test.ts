@@ -95,7 +95,7 @@ describe('TealscriptManager', () => {
     expect(drawingUpdates[0]).toEqual([{ ...drawing, scriptId: 'study-1' }]);
   });
 
-  it('ignores stale bundled worker results and errors', async () => {
+  it('ignores stale bundled worker results without hiding unsettled init errors', async () => {
     const worker = new FakeWorker();
     const plotUpdates: PlotOutput[][] = [];
     const errors: Array<{ scriptId: string; error: WorkerError }> = [];
@@ -122,15 +122,27 @@ describe('TealscriptManager', () => {
       inputs: [],
       metadata: initMessage?.metadata,
     }));
+    expect(plotUpdates).toHaveLength(0);
+
     worker.emit({
       type: 'error',
       scriptId: 'study-1',
-      message: 'old error',
+      message: 'init error',
       metadata: initMessage?.metadata,
     });
 
-    expect(plotUpdates).toHaveLength(0);
-    expect(errors).toHaveLength(0);
+    expect(plotUpdates).toEqual([[]]);
+    expect(errors).toEqual([
+      {
+        scriptId: 'study-1',
+        error: {
+          type: 'runtime',
+          message: 'init error',
+          line: undefined,
+          column: undefined,
+        },
+      },
+    ]);
 
     worker.emit(createResultMessage('study-1', {
       plots: [plot],
@@ -140,7 +152,39 @@ describe('TealscriptManager', () => {
       metadata: updateBarsMessage?.metadata,
     }));
 
-    expect(plotUpdates).toHaveLength(1);
-    expect(plotUpdates[0]).toEqual([{ ...plot, scriptId: 'study-1' }]);
+    expect(plotUpdates).toHaveLength(2);
+    expect(plotUpdates[1]).toEqual([{ ...plot, scriptId: 'study-1' }]);
+  });
+
+  it('ignores errors from requests older than a settled newer result', async () => {
+    const worker = new FakeWorker();
+    const errors: Array<{ scriptId: string; error: WorkerError }> = [];
+
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      onError: (scriptId, error) => errors.push({ scriptId, error }),
+    });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")');
+    worker.emit({ type: 'ready' });
+    await addScript;
+    manager.setBars([bar]);
+
+    const [initMessage, updateBarsMessage] = worker.messages as PostedWorkerMessage[];
+    worker.emit(createResultMessage('study-1', {
+      plots: [plot],
+      drawings: [],
+      alerts: [],
+      inputs: [],
+      metadata: updateBarsMessage?.metadata,
+    }));
+    worker.emit({
+      type: 'error',
+      scriptId: 'study-1',
+      message: 'old error',
+      metadata: initMessage?.metadata,
+    });
+
+    expect(errors).toHaveLength(0);
   });
 });

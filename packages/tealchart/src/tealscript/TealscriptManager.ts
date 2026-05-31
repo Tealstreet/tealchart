@@ -85,6 +85,7 @@ class TealscriptWorkerWrapper {
   private options: TealscriptWorkerOptions;
   private requestId = 0;
   private latestRequestId = 0;
+  private lastSettledRequestId = 0;
   private generation = 0;
 
   constructor(worker: Worker, options: TealscriptWorkerOptions) {
@@ -121,12 +122,13 @@ class TealscriptWorkerWrapper {
         if (this.isStaleMessage(message.output?.metadata)) {
           return;
         }
+        this.markRequestSettled(message.output?.metadata);
         this.options.onResult?.(getResultOutput(message));
         break;
 
       case 'error':
       case 'parseError':
-        if (this.isStaleMessage(message.metadata)) {
+        if (this.isStaleError(message.metadata)) {
           return;
         }
         this.options.onError?.({
@@ -195,6 +197,16 @@ class TealscriptWorkerWrapper {
 
   private isStaleMessage(metadata: WorkerOutputMetadata | undefined): boolean {
     return typeof metadata?.requestId === 'number' && metadata.requestId < this.latestRequestId;
+  }
+
+  private isStaleError(metadata: WorkerOutputMetadata | undefined): boolean {
+    return typeof metadata?.requestId === 'number' && metadata.requestId <= this.lastSettledRequestId;
+  }
+
+  private markRequestSettled(metadata: WorkerOutputMetadata | undefined): void {
+    if (typeof metadata?.requestId === 'number') {
+      this.lastSettledRequestId = Math.max(this.lastSettledRequestId, metadata.requestId);
+    }
   }
 }
 

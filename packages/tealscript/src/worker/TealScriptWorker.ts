@@ -93,6 +93,7 @@ export class TealscriptWorker {
   private readyResolve: (() => void) | null = null;
   private requestId = 0;
   private latestRequestId = 0;
+  private lastSettledRequestId = 0;
   private generation = 0;
 
   private onResult: ResultCallback | null;
@@ -189,6 +190,7 @@ export class TealscriptWorker {
     if (this.isStaleMessage(message.output?.metadata)) {
       return;
     }
+    this.markRequestSettled(message.output?.metadata);
     this.onResult?.(getResultOutput(message));
   }
 
@@ -196,7 +198,7 @@ export class TealscriptWorker {
    * Handle runtime error
    */
   private handleError(message: ErrorMessage): void {
-    if (this.isStaleMessage(message.metadata)) {
+    if (this.isStaleError(message.metadata)) {
       return;
     }
     this.onError?.({
@@ -211,7 +213,7 @@ export class TealscriptWorker {
    * Handle parse error
    */
   private handleParseError(message: ParseErrorMessage): void {
-    if (this.isStaleMessage(message.metadata)) {
+    if (this.isStaleError(message.metadata)) {
       return;
     }
     this.onError?.({
@@ -245,6 +247,16 @@ export class TealscriptWorker {
 
   private isStaleMessage(metadata: WorkerOutputMetadata | undefined): boolean {
     return typeof metadata?.requestId === 'number' && metadata.requestId < this.latestRequestId;
+  }
+
+  private isStaleError(metadata: WorkerOutputMetadata | undefined): boolean {
+    return typeof metadata?.requestId === 'number' && metadata.requestId <= this.lastSettledRequestId;
+  }
+
+  private markRequestSettled(metadata: WorkerOutputMetadata | undefined): void {
+    if (typeof metadata?.requestId === 'number') {
+      this.lastSettledRequestId = Math.max(this.lastSettledRequestId, metadata.requestId);
+    }
   }
 
   /**
