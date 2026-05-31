@@ -1,5 +1,5 @@
 export type StrategyDirection = 'long' | 'short';
-export type StrategyOrderType = 'market' | 'limit' | 'stop' | 'stop_limit';
+export type StrategyOrderType = 'market' | 'limit' | 'stop' | 'stop_limit' | 'trailing_stop';
 export type StrategyOrderStatus = 'pending' | 'filled' | 'cancelled' | 'rejected';
 export type StrategyOcaType = 'cancel' | 'reduce' | 'none';
 export type StrategyQuantityType = StrategyLedgerSettings['defaultQtyType'];
@@ -35,6 +35,13 @@ export interface StrategyOrder {
   avgFillPrice: number | null;
   limitPrice?: number;
   stopPrice?: number;
+  trailActivationPrice?: number;
+  trailOffset?: number;
+  trailingActivated: boolean;
+  trailingActivatedBarIndex: number | null;
+  trailingActivatedTime: number | null;
+  trailingBestPrice?: number;
+  trailingStopPrice?: number;
   stopLimitActivated: boolean;
   stopLimitActivatedBarIndex: number | null;
   stopLimitActivatedTime: number | null;
@@ -61,6 +68,8 @@ export interface StrategyOrderInput {
   requestedQty?: number | null;
   limitPrice?: number;
   stopPrice?: number;
+  trailActivationPrice?: number;
+  trailOffset?: number;
   fromEntry?: string;
   ocaName?: string;
   ocaType?: StrategyOcaType;
@@ -214,7 +223,12 @@ export function createStrategyOrder(input: StrategyOrderInput): StrategyOrder {
   return {
     id: input.id,
     direction: input.direction,
-    type: inferStrategyOrderType(input.limitPrice, input.stopPrice),
+    type: inferStrategyOrderType(
+      input.limitPrice,
+      input.stopPrice,
+      input.trailActivationPrice,
+      input.trailOffset,
+    ),
     status: 'pending',
     qty: input.qty,
     qtyType: input.qtyType,
@@ -225,6 +239,13 @@ export function createStrategyOrder(input: StrategyOrderInput): StrategyOrder {
     avgFillPrice: null,
     limitPrice: input.limitPrice,
     stopPrice: input.stopPrice,
+    trailActivationPrice: input.trailActivationPrice,
+    trailOffset: input.trailOffset,
+    trailingActivated: false,
+    trailingActivatedBarIndex: null,
+    trailingActivatedTime: null,
+    trailingBestPrice: undefined,
+    trailingStopPrice: undefined,
     stopLimitActivated: false,
     stopLimitActivatedBarIndex: null,
     stopLimitActivatedTime: null,
@@ -390,6 +411,10 @@ function getPendingOrderFillPrice(
     }
   }
 
+  if (order.type === 'trailing_stop') {
+    return getTrailingStopFillPrice(order, high, low, barIndex, time);
+  }
+
   if (
     order.type === 'stop_limit'
     && order.limitPrice !== undefined
@@ -491,7 +516,65 @@ export function cancelAllStrategyOrders(ledger: StrategyLedger, barIndex: number
   return cancelled;
 }
 
-function inferStrategyOrderType(limitPrice: number | undefined, stopPrice: number | undefined): StrategyOrderType {
+function getTrailingStopFillPrice(
+  order: StrategyOrder,
+  high: number,
+  low: number,
+  barIndex: number,
+  time: number,
+): number | null {
+  if (order.trailActivationPrice === undefined || order.trailOffset === undefined) {
+    return null;
+  }
+
+  if (!order.trailingActivated) {
+    const activated = order.direction === 'short'
+      ? high >= order.trailActivationPrice
+      : low <= order.trailActivationPrice;
+    if (!activated) {
+      return null;
+    }
+
+    order.trailingActivated = true;
+    order.trailingActivatedBarIndex = barIndex;
+    order.trailingActivatedTime = time;
+    order.trailingBestPrice = order.direction === 'short' ? high : low;
+    order.trailingStopPrice = order.direction === 'short'
+      ? high - order.trailOffset
+      : low + order.trailOffset;
+    order.updatedBarIndex = barIndex;
+    order.updatedTime = time;
+  } else if (order.direction === 'short') {
+    const bestPrice = Math.max(order.trailingBestPrice ?? high, high);
+    order.trailingBestPrice = bestPrice;
+    order.trailingStopPrice = Math.max(order.trailingStopPrice ?? Number.NEGATIVE_INFINITY, bestPrice - order.trailOffset);
+  } else {
+    const bestPrice = Math.min(order.trailingBestPrice ?? low, low);
+    order.trailingBestPrice = bestPrice;
+    order.trailingStopPrice = Math.min(order.trailingStopPrice ?? Number.POSITIVE_INFINITY, bestPrice + order.trailOffset);
+  }
+
+  if (order.trailingStopPrice === undefined) {
+    return null;
+  }
+  if (order.direction === 'short' && low <= order.trailingStopPrice) {
+    return order.trailingStopPrice;
+  }
+  if (order.direction === 'long' && high >= order.trailingStopPrice) {
+    return order.trailingStopPrice;
+  }
+  return null;
+}
+
+function inferStrategyOrderType(
+  limitPrice: number | undefined,
+  stopPrice: number | undefined,
+  trailActivationPrice: number | undefined,
+  trailOffset: number | undefined,
+): StrategyOrderType {
+  if (trailActivationPrice !== undefined || trailOffset !== undefined) {
+    return 'trailing_stop';
+  }
   if (limitPrice !== undefined && stopPrice !== undefined) {
     return 'stop_limit';
   }
@@ -523,6 +606,14 @@ function validateStrategyOrderInput(input: StrategyOrderInput): void {
   }
   validateOptionalPrice(input.limitPrice, 'limitPrice');
   validateOptionalPrice(input.stopPrice, 'stopPrice');
+  validateOptionalPrice(input.trailActivationPrice, 'trailActivationPrice');
+  validateOptionalPrice(input.trailOffset, 'trailOffset');
+  if ((input.trailActivationPrice === undefined) !== (input.trailOffset === undefined)) {
+    throw new Error('strategy trailing stop requires both activation price and offset');
+  }
+  if (input.trailOffset !== undefined && input.trailOffset <= 0) {
+    throw new Error('strategy trailing stop offset must be positive');
+  }
 }
 
 function validateOptionalPrice(value: number | undefined, name: string): void {

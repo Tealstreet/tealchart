@@ -438,15 +438,18 @@ stop price is crossed, then fill as limit orders on later bars. Fixed, cash, and
 percent-of-equity sizing resolve to concrete order quantities at submission
 time, and `strategy.entry()` enforces same-direction pyramiding limits and
 expands opposite-direction entry transactions to reverse positions. Trailing
-stops, same-bar intrabar path modeling, and full broker-emulator semantics are
-still planned. Fill commissions are applied to fills and debited from strategy
-net profit/equity for `percent`, `cash_per_order`, and `cash_per_contract`
-commission settings. Basic `strategy.opentrades.*` accessors are available for
-open trade entry id, entry price, entry bar/time, signed size, gross open
-profit, and commission. Basic `strategy.closedtrades.*` accessors are available
-for closed trade entry/exit ids, prices, bars/times, signed size, gross profit,
-and commission. Closed-trade outcome counters `strategy.wintrades`,
-`strategy.losstrades`, and `strategy.eventrades` are available.
+stops submitted through `strategy.exit(..., trail_price/trail_points,
+trail_offset)` activate on later bars and ratchet against OHLC highs/lows using
+price-unit offsets. Same-bar intrabar path modeling and full broker-emulator
+semantics are still planned. Fill commissions are applied to fills and debited
+from strategy net profit/equity for `percent`, `cash_per_order`, and
+`cash_per_contract` commission settings. Basic `strategy.opentrades.*`
+accessors are available for open trade entry id, entry price, entry bar/time,
+signed size, gross open profit, and commission. Basic
+`strategy.closedtrades.*` accessors are available for closed trade entry/exit
+ids, prices, bars/times, signed size, gross profit, and commission.
+Closed-trade outcome counters `strategy.wintrades`, `strategy.losstrades`, and
+`strategy.eventrades` are available.
 
 ## Common Alerts Coverage
 
