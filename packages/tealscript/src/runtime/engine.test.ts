@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { TealscriptEngine, executeScript } from './engine';
 import { parse } from '../parser/parser';
 import type { Bar } from './context';
@@ -165,6 +165,52 @@ plot(hour(timestamp("GMT+2", 2024, 1, 5, 9, 30), "GMT+2"), title="Timestamp Hour
       expect(result.plots.find((plot) => plot.title === 'Second')?.values).toEqual([15]);
       expect(result.plots.find((plot) => plot.title === 'Timestamp')?.values).toEqual([Date.UTC(2024, 0, 5, 7, 30)]);
       expect(result.plots.find((plot) => plot.title === 'Timestamp Hour')?.values).toEqual([9]);
+    });
+
+    it('exposes timenow as a runtime timestamp series', () => {
+      const script = `//@version=6
+indicator("Time Now")
+plot(timenow, title="Now")
+plot(timenow[1], title="Previous Now")`;
+
+      const now = Date.UTC(2024, 0, 5, 8, 15);
+      const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(now);
+      try {
+        const ast = parse(script);
+        const bars = createBars(3, 100);
+        const result = executeScript(ast, bars);
+
+        expect(result.errors).toHaveLength(0);
+        expect(result.plots.find((plot) => plot.title === 'Now')?.values).toEqual([now, now, now]);
+        expect(result.plots.find((plot) => plot.title === 'Previous Now')?.values).toEqual([null, now, now]);
+      } finally {
+        nowSpy.mockRestore();
+      }
+    });
+
+    it('refreshes timenow for realtime bar updates', () => {
+      const script = `//@version=6
+indicator("Realtime Time Now")
+plot(timenow, title="Now")`;
+
+      const historicalNow = Date.UTC(2024, 0, 5, 8, 15);
+      const realtimeNow = Date.UTC(2024, 0, 5, 8, 16);
+      const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(historicalNow);
+      try {
+        const ast = parse(script);
+        const bars = createBars(2, 100);
+        const engine = new TealscriptEngine();
+        const result = engine.execute(ast, bars);
+
+        expect(result.plots.find((plot) => plot.title === 'Now')?.values).toEqual([historicalNow, historicalNow]);
+
+        nowSpy.mockReturnValue(realtimeNow);
+        const plots = engine.updateBar(ast, { ...bars[1], close: 101.5 });
+
+        expect(plots.find((plot) => plot.title === 'Now')?.values).toEqual([historicalNow, realtimeNow]);
+      } finally {
+        nowSpy.mockRestore();
+      }
     });
 
     it('evaluates Pine time and time_close session filters', () => {
