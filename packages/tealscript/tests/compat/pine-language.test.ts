@@ -29,6 +29,50 @@ plot(rangeSize(high, low), title="Range")
     expect(roundSeries(getPlot(result, 'Range').values)).toEqual([4, 5, 4, 7, 6, 5, 6, 7, 5, 5, 5, 5]);
   });
 
+  it('runs Pine-style wrapped calls and delimited expressions', () => {
+    const result = runCompatScript(`
+indicator(
+    "Wrapped Delimiters",
+    overlay=true
+)
+offsets = [
+    1,
+    2,
+    3
+]
+basis = ta.sma(
+    close,
+    3
+)
+adjusted = (
+    basis + array.get(
+        offsets,
+        1
+    )
+)
+plot(
+    adjusted,
+    title="Adjusted Basis"
+)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Adjusted Basis').values)).toEqual([
+      null,
+      null,
+      106.666667,
+      107,
+      105,
+      102.666667,
+      103,
+      106.333333,
+      109,
+      111.333333,
+      111.666667,
+      113,
+    ]);
+  });
+
   it('runs user-defined function if-branch returns', () => {
     const result = runCompatScript(`
 indicator("UDF if branch")

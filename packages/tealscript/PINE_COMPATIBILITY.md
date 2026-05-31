@@ -53,6 +53,11 @@ Resolved in the scope/series hardening PR:
 Covered behavior and remaining gaps:
 
 - Flat multiline user-defined functions return the last expression statement.
+- Pine-style wrapped delimiter syntax is supported for multiline
+  `indicator()`/`strategy()` declarations, function calls, array literals, tuple
+  destructuring, index access, and parenthesized expressions. Broader operator
+  line-continuation outside those delimiter contexts still needs parser
+  hardening.
 - User-defined function bodies can return expression results from `if` /
   `else if` / `else` branches.
 - Recursive user-defined function calls are rejected with an explicit diagnostic

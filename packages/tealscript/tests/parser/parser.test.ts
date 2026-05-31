@@ -46,6 +46,25 @@ describe('Tealscript Parser', () => {
         value: 2,
       }));
     });
+
+    it('parses multiline indicator declarations', () => {
+      const ast = parse(`indicator(
+    "Wrapped Indicator",
+    overlay=true,
+    precision=2
+)
+`);
+      const indicator = ast.body[0] as IndicatorDeclaration;
+      expect(indicator.type).toBe('IndicatorDeclaration');
+      expect(indicator.title).toEqual(expect.objectContaining({
+        type: 'StringLiteral',
+        value: 'Wrapped Indicator',
+      }));
+      expect(indicator.overlay).toEqual(expect.objectContaining({
+        type: 'BooleanLiteral',
+        value: true,
+      }));
+    });
   });
 
   describe('Variable declarations', () => {
@@ -146,6 +165,20 @@ arrayValue = [1, 2]
         expect(decl.names.names[0].name).toBe('a');
         expect(decl.names.names[1].name).toBe('b');
         expect(decl.names.names[2].name).toBe('c');
+      }
+    });
+
+    it('parses multiline tuple destructuring', () => {
+      const ast = parse(`[
+    a,
+    b,
+    c
+] = someFunc()
+`);
+      const decl = ast.body[0] as VariableDeclaration;
+      expect(decl.names.type).toBe('TupleDeclarator');
+      if (decl.names.type === 'TupleDeclarator') {
+        expect(decl.names.names).toHaveLength(3);
       }
     });
   });
@@ -500,6 +533,22 @@ arrayValue = [1, 2]
         }));
       });
 
+      it('parses multiline function calls', () => {
+        const ast = parse(`x = foo(
+    1,
+    b=2,
+    c=3
+)
+`);
+        const decl = ast.body[0] as VariableDeclaration;
+        const call = decl.init as CallExpression;
+        expect(call.type).toBe('CallExpression');
+        expect(call.arguments).toHaveLength(3);
+        expect(call.arguments[1]).toEqual(expect.objectContaining({
+          name: expect.objectContaining({ name: 'b' }),
+        }));
+      });
+
       it('parses method call', () => {
         const ast = parse('x = ta.sma(close, 14)\n');
         const decl = ast.body[0] as VariableDeclaration;
@@ -541,6 +590,15 @@ arrayValue = [1, 2]
         const decl = ast.body[0] as VariableDeclaration;
         expect(decl.init.type).toBe('IndexExpression');
       });
+
+      it('parses multiline index access', () => {
+        const ast = parse(`x = arr[
+    i + 1
+]
+`);
+        const decl = ast.body[0] as VariableDeclaration;
+        expect(decl.init.type).toBe('IndexExpression');
+      });
     });
 
     describe('Array literals', () => {
@@ -560,6 +618,31 @@ arrayValue = [1, 2]
         if (decl.init.type === 'ArrayExpression') {
           expect(decl.init.elements).toHaveLength(3);
         }
+      });
+
+      it('parses multiline array literals', () => {
+        const ast = parse(`x = [
+    1,
+    2,
+    3
+]
+`);
+        const decl = ast.body[0] as VariableDeclaration;
+        expect(decl.init.type).toBe('ArrayExpression');
+        if (decl.init.type === 'ArrayExpression') {
+          expect(decl.init.elements).toHaveLength(3);
+        }
+      });
+    });
+
+    describe('Parenthesized expressions', () => {
+      it('parses multiline parenthesized expressions', () => {
+        const ast = parse(`x = (
+    close - open
+)
+`);
+        const decl = ast.body[0] as VariableDeclaration;
+        expect(decl.init.type).toBe('BinaryExpression');
       });
     });
   });
