@@ -242,6 +242,144 @@ plot(p.value, title="Value")
     expect(roundSeries(getPlot(result, 'Value').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
   });
 
+  it('dispatches exported imported library methods on imported user-defined types', () => {
+    const library = parse(`
+library("PivotTools", true)
+export type Pivot
+    int x
+    float y
+export method lifted(Pivot this, float amount) =>
+    this.y += amount
+    this
+`);
+
+    const result = runCompatScript(`
+indicator("Imported library method")
+import TestUser/PivotTools/1 as pivots
+p = pivots.Pivot.new(bar_index, close)
+q = p.lifted(10)
+plot(q.y, title="Lifted")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/PivotTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Lifted').values)).toEqual([112, 115, 117, 113, 109, 110, 114, 119, 118, 121, 120, 122]);
+  });
+
+  it('keeps non-exported imported library methods private externally', () => {
+    const library = parse(`
+library("PivotTools", true)
+export type Pivot
+    float value
+method hidden(Pivot this) => this
+`);
+
+    const result = runCompatScript(`
+indicator("Imported private method")
+import TestUser/PivotTools/1 as pivots
+p = pivots.Pivot.new(close)
+q = p.hidden()
+plot(q.value, title="Value")
+`, {
+      bars: [compatibilityBars[0]!],
+      engineOptions: {
+        libraries: new Map([['TestUser/PivotTools/1', library]]),
+      },
+    });
+
+    expect(result.errors.map((error) => error.message)).toEqual([
+      'Unknown function: p.hidden',
+      'Unknown identifier: q',
+    ]);
+  });
+
+  it('keeps non-exported imported method overloads private externally', () => {
+    const library = parse(`
+library("PivotTools", true)
+export type Pivot
+    float value
+export method choose(Pivot this) => this
+method choose(Pivot this, float amount) =>
+    this.value += amount
+    this
+`);
+
+    const result = runCompatScript(`
+indicator("Imported private method overload")
+import TestUser/PivotTools/1 as pivots
+p = pivots.Pivot.new(close)
+q = p.choose(10)
+plot(q.value, title="Value")
+`, {
+      bars: [compatibilityBars[0]!],
+      engineOptions: {
+        libraries: new Map([['TestUser/PivotTools/1', library]]),
+      },
+    });
+
+    expect(result.errors.map((error) => error.message)).toEqual([
+      'Unknown function: p.choose',
+      'Unknown identifier: q',
+    ]);
+  });
+
+  it('selects imported method overloads by receiver user-defined type', () => {
+    const library = parse(`
+library("PivotTools", true)
+export type Left
+    float x
+export type Right
+    float y
+export method value(Left this) => this.x
+export method value(Right this) => this.y
+`);
+
+    const result = runCompatScript(`
+indicator("Imported receiver overload")
+import TestUser/PivotTools/1 as pivots
+p = pivots.Right.new(close)
+plot(p.value(), title="Value")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/PivotTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Value').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+  });
+
+  it('allows exported imported functions to call library-local methods', () => {
+    const library = parse(`
+library("PivotTools", true)
+type Pivot
+    float value
+method lifted(Pivot this, float amount) =>
+    this.value += amount
+    this
+export make(float value) =>
+    p = Pivot.new(value)
+    p.lifted(10)
+`);
+
+    const result = runCompatScript(`
+indicator("Imported private method factory")
+import TestUser/PivotTools/1 as pivots
+p = pivots.make(close)
+plot(p.value, title="Value")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/PivotTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Value').values)).toEqual([112, 115, 117, 113, 109, 110, 114, 119, 118, 121, 120, 122]);
+  });
+
   it('runs single-line user-defined functions', () => {
     const result = runCompatScript(`
 indicator("UDF single line")

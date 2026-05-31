@@ -184,6 +184,7 @@ interface ImportedLibrary {
   alias: string;
   functions: Map<string, FunctionDeclaration>;
   exportedFunctions: Set<string>;
+  methods: Map<string, FunctionDeclaration[]>;
   types: Map<string, TypeDeclaration>;
   exportedTypes: Set<string>;
 }
@@ -595,13 +596,20 @@ export class TealscriptEngine {
 
       const functions = new Map<string, FunctionDeclaration>();
       const exportedFunctions = new Set<string>();
+      const methods = new Map<string, FunctionDeclaration[]>();
       const types = new Map<string, TypeDeclaration>();
       const exportedTypes = new Set<string>();
       for (const libraryStmt of libraryAst.body) {
         if (libraryStmt.type === 'FunctionDeclaration') {
-          functions.set(libraryStmt.name.name, libraryStmt);
-          if (libraryStmt.exported) {
-            exportedFunctions.add(libraryStmt.name.name);
+          if (libraryStmt.isMethod) {
+            const overloads = methods.get(libraryStmt.name.name) ?? [];
+            overloads.push(libraryStmt);
+            methods.set(libraryStmt.name.name, overloads);
+          } else {
+            functions.set(libraryStmt.name.name, libraryStmt);
+            if (libraryStmt.exported) {
+              exportedFunctions.add(libraryStmt.name.name);
+            }
           }
           const scopeKey = this.importedFunctionScopeKey(stmt.alias.name, libraryStmt);
           if (!this.functionScopes.has(scopeKey)) {
@@ -621,6 +629,7 @@ export class TealscriptEngine {
         alias: stmt.alias.name,
         functions,
         exportedFunctions,
+        methods,
         types,
         exportedTypes,
       });
@@ -1245,6 +1254,15 @@ export class TealscriptEngine {
           this.userCallableScopeKey(userMethod),
         );
       }
+      const importedMethod = this.findCallableImportedMethod(receiver, funcName, [receiver, ...args], namedArgs);
+      if (importedMethod) {
+        return this.evaluateImportedLibraryFunction(
+          importedMethod.library,
+          importedMethod.method,
+          [receiver, ...args],
+          namedArgs,
+        );
+      }
       if (isPineArray(receiver) || isPineMatrix(receiver) || isPineMap(receiver)) {
         const methodBuiltinName = this.getMethodBuiltinName(funcName, receiver);
         const methodBuiltin = this.builtins.get(methodBuiltinName);
@@ -1273,6 +1291,15 @@ export class TealscriptEngine {
           namedArgs,
           `method ${funcName}`,
           this.userCallableScopeKey(userMethod),
+        );
+      }
+      const importedMethod = this.findCallableImportedMethod(receiver, funcName, [receiver, ...args], namedArgs);
+      if (importedMethod) {
+        return this.evaluateImportedLibraryFunction(
+          importedMethod.library,
+          importedMethod.method,
+          [receiver, ...args],
+          namedArgs,
         );
       }
       const methodBuiltinName = this.getMethodBuiltinName(funcName, receiver);
@@ -1401,6 +1428,31 @@ export class TealscriptEngine {
   ): FunctionDeclaration | undefined {
     const overloads = this.userMethods.get(methodName);
     return overloads?.find((method) => this.canCallUserFunction(method, args, namedArgs));
+  }
+
+  private findCallableImportedMethod(
+    receiver: unknown,
+    methodName: string,
+    args: unknown[],
+    namedArgs: Map<string, unknown>,
+  ): { library: ImportedLibrary; method: FunctionDeclaration } | undefined {
+    if (!isPineUdtObject(receiver)) return undefined;
+
+    const [alias, receiverTypeName] = receiver.typeName.split('.');
+    if (!alias || !receiverTypeName) return undefined;
+
+    const library = this.importedLibraries.get(alias);
+    const overloads = library?.methods.get(methodName);
+    if (!library || !overloads) return undefined;
+
+    const isInsideSameLibrary = this.currentImportedLibrary()?.alias === alias;
+    const method = overloads.find((candidate) => {
+      const receiverAnnotation = this.getTypeAnnotationName(candidate.params[0]?.typeAnnotation);
+      if (receiverAnnotation !== receiverTypeName) return false;
+      if (!isInsideSameLibrary && candidate.exported !== true) return false;
+      return this.canCallUserFunction(candidate, args, namedArgs);
+    });
+    return method ? { library, method } : undefined;
   }
 
   private evaluateTypeConstructor(
@@ -1726,6 +1778,11 @@ export class TealscriptEngine {
     for (const [alias, library] of engine.importedLibraries) {
       for (const fn of library.functions.values()) {
         engine.functionScopes.set(engine.importedFunctionScopeKey(alias, fn), engine.scope.createChild());
+      }
+      for (const methods of library.methods.values()) {
+        for (const method of methods) {
+          engine.functionScopes.set(engine.importedFunctionScopeKey(alias, method), engine.scope.createChild());
+        }
       }
     }
 
