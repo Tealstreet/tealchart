@@ -1636,9 +1636,8 @@ export class TealscriptEngine {
   private getCompleteNonNaSourceWindow(scope: Scope, key: string, source: number, length: number): number[] | null {
     if (length < 1) return null;
     const history = (scope.get(key) as number[] | undefined) ?? [];
-    const nextHistory = [source, ...history];
-    this.setBuiltinState(scope, key, nextHistory);
-    const values = nextHistory.filter((value) => !isNaN(value)).slice(0, length);
+    const values = [source, ...history].filter((value) => !isNaN(value)).slice(0, length);
+    this.setBuiltinState(scope, key, values);
     return values.length < length ? null : values;
   }
 
