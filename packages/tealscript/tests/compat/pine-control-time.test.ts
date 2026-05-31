@@ -138,6 +138,11 @@ plot(periodLen, title="Period Length")
 plot(timeframe.multiplier, title="Multiplier")
 plot(timeframe.in_seconds(), title="Current Seconds")
 plot(timeframe.in_seconds("1D"), title="Daily Seconds")
+plot(timeframe.from_seconds(30) == "30S" ? 1 : 0, title="From Seconds")
+plot(timeframe.from_seconds(3600) == "60" ? 1 : 0, title="From Hour")
+plot(timeframe.from_seconds(86400) == "1D" ? 1 : 0, title="From Day")
+plot(timeframe.change("3") ? 1 : 0, title="Three Minute Change")
+plot(timeframe.change("1D") ? 1 : 0, title="Daily Change")
 plot(intraday, title="Intraday")
 plot(dwm, title="DWM")
 `);
@@ -149,6 +154,11 @@ plot(dwm, title="DWM")
     expect(getPlot(result, 'Multiplier').values).toEqual([60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60]);
     expect(getPlot(result, 'Current Seconds').values).toEqual([3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600]);
     expect(getPlot(result, 'Daily Seconds').values).toEqual([86400, 86400, 86400, 86400, 86400, 86400, 86400, 86400, 86400, 86400, 86400, 86400]);
+    expect(getPlot(result, 'From Seconds').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'From Hour').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'From Day').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Three Minute Change').values).toEqual([1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1]);
+    expect(getPlot(result, 'Daily Change').values).toEqual([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     expect(getPlot(result, 'Intraday').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(getPlot(result, 'DWM').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   });

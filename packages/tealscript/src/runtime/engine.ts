@@ -4270,6 +4270,20 @@ export class TealscriptEngine {
       const duration = this.getTimeframeDurationMs(timeframe);
       return duration === null ? Number.NaN : duration / 1000;
     });
+    this.builtins.set('timeframe.from_seconds', (args) => {
+      return this.timeframeFromSeconds(this.toNumber(args[0]));
+    });
+    this.builtins.set('timeframe.change', (args) => {
+      const timeframe = args[0] === undefined || args[0] === '' ? this.ctx.timeframe.period : this.toStringValue(args[0]);
+      const duration = this.getTimeframeDurationMs(timeframe);
+      const currentTime = this.ctx.time.get(0);
+      const previousTime = this.ctx.time.get(1);
+      if (duration === null || currentTime === undefined || !Number.isFinite(currentTime)) return false;
+      if (previousTime === undefined || !Number.isFinite(previousTime)) return true;
+
+      const timezoneOffsetMs = this.parseTimezoneOffsetMinutes(this.ctx.syminfo.timezone) * 60_000;
+      return Math.floor((currentTime + timezoneOffsetMs) / duration) !== Math.floor((previousTime + timezoneOffsetMs) / duration);
+    });
 
     for (const part of ['year', 'month', 'weekofyear', 'dayofmonth', 'dayofweek', 'hour', 'minute', 'second']) {
       this.builtins.set(part, (args) => {
@@ -4286,6 +4300,29 @@ export class TealscriptEngine {
     this.builtins.set('dayofweek.thursday', () => 5);
     this.builtins.set('dayofweek.friday', () => 6);
     this.builtins.set('dayofweek.saturday', () => 7);
+  }
+
+  private timeframeFromSeconds(seconds: number): string {
+    if (!Number.isFinite(seconds) || seconds <= 0) return '';
+
+    const roundedSeconds = Math.ceil(seconds);
+    const secondsMultipliers = [1, 5, 10, 15, 30, 45];
+    const secondsMatch = secondsMultipliers.find((multiplier) => roundedSeconds <= multiplier);
+    if (secondsMatch !== undefined) return `${secondsMatch}S`;
+
+    if (roundedSeconds < 86_400) {
+      return String(Math.min(1440, Math.ceil(roundedSeconds / 60)));
+    }
+
+    if (roundedSeconds < 604_800) {
+      return `${Math.min(365, Math.ceil(roundedSeconds / 86_400))}D`;
+    }
+
+    if (roundedSeconds < 2_592_000) {
+      return `${Math.min(52, Math.ceil(roundedSeconds / 604_800))}W`;
+    }
+
+    return `${Math.min(12, Math.ceil(roundedSeconds / 2_592_000))}M`;
   }
 
   private evaluateTimeFilter(args: unknown[], closeTime: boolean): number {
