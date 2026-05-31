@@ -139,3 +139,9 @@ Every request feature PR should include:
 - expected mapped outputs over chart bars;
 - negative diagnostics for missing or invalid contexts;
 - reduced Pine idiom fixtures where the behavior mirrors common public scripts.
+
+The compatibility suite includes reduced higher-timeframe repaint fixtures based
+on TradingView's documented pattern of using `lookahead=barmerge.lookahead_on`
+with an expression history offset such as `close[1]`. Those tests intentionally
+compare the future-leaking unoffset series with the confirmed-only offset series
+so later request-engine changes cannot silently regress the no-repaint idiom.

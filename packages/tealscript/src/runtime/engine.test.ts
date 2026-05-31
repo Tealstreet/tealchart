@@ -2032,6 +2032,35 @@ plot(x)`;
       expect(result.plots[0].values).toEqual([null, null, 100.2, 100.7, 101.2]);
     });
 
+    it('supports history offsets on derived OHLC source series', () => {
+      const script = `//@version=6
+indicator("Derived Source History")
+plot(hl2[1], title="HL2")
+plot(hlc3[1], title="HLC3")
+plot(ohlc4[1], title="OHLC4")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'HL2')?.values).toEqual([
+        null,
+        (bars[0]!.high + bars[0]!.low) / 2,
+        (bars[1]!.high + bars[1]!.low) / 2,
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'HLC3')?.values).toEqual([
+        null,
+        (bars[0]!.high + bars[0]!.low + bars[0]!.close) / 3,
+        (bars[1]!.high + bars[1]!.low + bars[1]!.close) / 3,
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'OHLC4')?.values).toEqual([
+        null,
+        (bars[0]!.open + bars[0]!.high + bars[0]!.low + bars[0]!.close) / 4,
+        (bars[1]!.open + bars[1]!.high + bars[1]!.low + bars[1]!.close) / 4,
+      ]);
+    });
+
     it('truncates fractional dynamic history offsets', () => {
       const script = `//@version=6
 indicator("Fractional History")
