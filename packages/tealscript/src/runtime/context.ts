@@ -19,7 +19,12 @@ import type {
 } from './drawings/types';
 import { DrawingStore } from './drawings/store';
 import { Series } from './series';
-import { createStrategyLedger, type StrategyLedger, type StrategyLedgerSettings } from './strategy';
+import {
+  cloneStrategyLedger,
+  createStrategyLedger,
+  type StrategyLedger,
+  type StrategyLedgerSettings,
+} from './strategy';
 
 export type {
   BoxDrawingOutput,
@@ -339,6 +344,8 @@ export class ExecutionContext {
   /** Strategy tester ledger state. */
   strategyLedger: StrategyLedger = createStrategyLedger();
 
+  private realtimeStrategyLedgerSnapshot: StrategyLedger = createStrategyLedger();
+
   // =========================================================================
   // Internal State
   // =========================================================================
@@ -513,6 +520,14 @@ export class ExecutionContext {
     this.volume.rollback();
     this.time.rollback();
     this.timenow.rollback();
+    this.strategyLedger = cloneStrategyLedger(this.realtimeStrategyLedgerSnapshot);
+  }
+
+  /**
+   * Snapshot state before the replaceable realtime bar executes.
+   */
+  captureRealtimeRollbackState(): void {
+    this.realtimeStrategyLedgerSnapshot = cloneStrategyLedger(this.strategyLedger);
   }
 
   /**
@@ -863,6 +878,7 @@ export class ExecutionContext {
    */
   setStrategyLedger(settings: Partial<StrategyLedgerSettings>): void {
     this.strategyLedger = createStrategyLedger(settings);
+    this.captureRealtimeRollbackState();
   }
 
   // =========================================================================
@@ -885,6 +901,7 @@ export class ExecutionContext {
     this.indicatorPrecision = 2;
     this.indicatorMaxBarsBack = undefined;
     this.strategyLedger = createStrategyLedger();
+    this.captureRealtimeRollbackState();
     this.timeframe = {
       period: '60',
       multiplier: 60,
