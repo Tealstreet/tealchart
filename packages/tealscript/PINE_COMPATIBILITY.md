@@ -238,9 +238,11 @@ seconds/minutes/D/W/M and tick declaration values, including
 The calendar pass covers Pine's current-bar calendar variables
 (`year`, `month`, `weekofyear`, `dayofmonth`, `dayofweek`, `hour`, `minute`,
 and `second`), matching callable helpers such as `hour(time)`, common
-`dayofweek.*` constants, and `timestamp()` forms used in date/time filters.
-The checkpoint fixture follows TradingView's documented calendar-filter idioms
-by gating plots against a start timestamp, weekday, and minute threshold.
+`dayofweek.*` constants, `timestamp()` forms used in date/time filters, and
+fixed-offset or IANA timezone arguments such as `"GMT+2"` and
+`"America/New_York"`. The checkpoint fixture follows TradingView's documented
+calendar-filter idioms by gating plots against a start timestamp, weekday,
+minute threshold, and named exchange timezone.
 
 ## Common Session Time Coverage
 
@@ -249,8 +251,8 @@ same-timeframe `time()` / `time_close()` calls with optional session strings
 such as `"0930-1600"` or `"0930-1600:23456"`. Matching bars return their open
 or close UNIX timestamp; non-matching bars return `na`. Historical `timenow`
 uses a stable execution timestamp, and realtime updates refresh it per
-re-execution. Multi-timeframe aggregation, exchange calendars, named timezone
-databases, and full overnight-session day semantics remain planned.
+re-execution. Multi-timeframe aggregation, exchange calendars, and full
+overnight-session day semantics remain planned.
 
 ## `max_bars_back` Declaration Coverage
 
