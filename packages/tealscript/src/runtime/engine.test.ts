@@ -758,6 +758,35 @@ plot(na(str.tonumber("")) ? 1 : 0, title="Empty Is NA")`;
       expect(result.plots.find((plot) => plot.title === 'Empty Is NA')?.values).toEqual([1, 1]);
     });
 
+    it('runs string match, repeat, split, and occurrence replace helpers', () => {
+      const script = `//@version=6
+indicator("String Extra Helpers")
+parts = str.split("NASDAQ:AAPL", ":")
+chars = str.split("ABC", "")
+plot(array.size(parts), title="Parts")
+plot(array.get(parts, 1) == "AAPL", title="Second Part")
+plot(array.join(chars, "-") == "A-B-C", title="Split Characters")
+plot(str.match("Go NASDAQ:AAPL now", "[A-Z]+:[A-Z]+") == "NASDAQ:AAPL", title="Regex Match")
+plot(str.match("no symbol", "[0-9]+") == "", title="Missing Match")
+plot(str.repeat("?", 3, ",") == "?,?,?", title="Repeat With Separator")
+plot(na(str.repeat(na, 2)) ? 1 : 0, title="Repeat NA")
+plot(str.replace("a-b-a-b", "b", "x", 1) == "a-b-a-x", title="Replace Occurrence")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Parts')?.values).toEqual([2, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Second Part')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Split Characters')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Regex Match')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Missing Match')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Repeat With Separator')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Repeat NA')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Replace Occurrence')?.values).toEqual([true, true]);
+    });
+
     it('formats timestamps with str.format_time', () => {
       const script = `//@version=6
 indicator("String Format Time")
@@ -1646,19 +1675,33 @@ plot(ta.variance(close, 3), title="Variance")
 plot(ta.dev(close, 3), title="Deviation")
 plot(ta.correlation(close, open, 3), title="Correlation")
 plot(ta.correlation(close, close, 3), title="Self Correlation")
-plot(ta.correlation(close, 1, 3), title="Flat Correlation")`;
+plot(ta.correlation(close, 1, 3), title="Flat Correlation")
+plot(ta.cog(close, 3), title="COG")
+plot(ta.cog(close - open, 3), title="Derived COG")`;
 
       const ast = parse(script);
-      const bars = createBars(3, 100);
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: 2, open: 101, high: 103, low: 100, close: 102, volume: 100 },
+        { time: 3, open: 102, high: 106, low: 101, close: 105, volume: 100 },
+        { time: 4, open: 105, high: 106, low: 102, close: 103, volume: 100 },
+        { time: 5, open: 103, high: 108, low: 103, close: 107, volume: 100 },
+      ];
       const result = executeScript(ast, bars);
 
       expect(result.errors).toHaveLength(0);
-      expect(result.plots.find((plot) => plot.title === 'Cum')?.values).toEqual([100.2, 200.9, 302.1]);
-      expect(result.plots.find((plot) => plot.title === 'Variance')?.values).toEqual([null, null, 1 / 6]);
-      expect(result.plots.find((plot) => plot.title === 'Deviation')?.values).toEqual([null, null, 1 / 3]);
-      expect(result.plots.find((plot) => plot.title === 'Correlation')?.values[2]).toBeCloseTo(1);
+      expect(result.plots.find((plot) => plot.title === 'Cum')?.values).toEqual([100, 202, 307, 410, 517]);
+      expect(result.plots.find((plot) => plot.title === 'Variance')?.values).toEqual([null, null, 38 / 9, 14 / 9, 8 / 3]);
+      const deviationValues = result.plots.find((plot) => plot.title === 'Deviation')?.values ?? [];
+      expect(deviationValues.slice(0, 2)).toEqual([null, null]);
+      expect(deviationValues[2]).toBeCloseTo(16 / 9);
+      expect(deviationValues[3]).toBeCloseTo(10 / 9);
+      expect(deviationValues[4]).toBeCloseTo(4 / 3);
+      expect(result.plots.find((plot) => plot.title === 'Correlation')?.values[2]).toBeCloseTo(0.993399);
       expect(result.plots.find((plot) => plot.title === 'Self Correlation')?.values[2]).toBeCloseTo(1);
-      expect(result.plots.find((plot) => plot.title === 'Flat Correlation')?.values).toEqual([null, null, null]);
+      expect(result.plots.find((plot) => plot.title === 'Flat Correlation')?.values).toEqual([null, null, null, null, null]);
+      expect(result.plots.find((plot) => plot.title === 'COG')?.values).toEqual([null, null, -1.98371335504886, -1.9967741935483871, -1.9936507936507937]);
+      expect(result.plots.find((plot) => plot.title === 'Derived COG')?.values).toEqual([null, null, -1.25, -3.5, -1.8]);
     });
 
     it('calculates median, mode, and percentile TA helpers', () => {

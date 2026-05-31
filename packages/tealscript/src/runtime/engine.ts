@@ -1509,6 +1509,24 @@ export class TealscriptEngine {
     return String(value);
   }
 
+  private replaceStringOccurrence(source: string, target: string, replacement: string, occurrenceArg: unknown): string {
+    const occurrence = occurrenceArg === undefined ? 0 : Math.trunc(this.toNumber(occurrenceArg));
+    if (!Number.isFinite(occurrence) || occurrence < 0) return source;
+    if (target === '') return occurrence === 0 ? source.replace(target, replacement) : source;
+    if (occurrence === 0) return source.replace(target, replacement);
+
+    let fromIndex = 0;
+    for (let index = 0; index <= occurrence; index++) {
+      const matchIndex = source.indexOf(target, fromIndex);
+      if (matchIndex === -1) return source;
+      if (index === occurrence) {
+        return source.slice(0, matchIndex) + replacement + source.slice(matchIndex + target.length);
+      }
+      fromIndex = matchIndex + target.length;
+    }
+    return source;
+  }
+
   private toOptionalString(value: unknown): string | undefined {
     if (value === null || value === undefined || this.isNa(value)) {
       return undefined;
@@ -2398,11 +2416,31 @@ export class TealscriptEngine {
       const end = args[2] === undefined ? undefined : Math.trunc(args[2] as number);
       return source.substring(begin, end);
     });
+    this.builtins.set('str.match', (args) => {
+      const match = this.toStringValue(args[0]).match(new RegExp(this.toStringValue(args[1])));
+      return match?.[0] ?? '';
+    });
+    this.builtins.set('str.repeat', (args) => {
+      if (this.isNa(args[0])) return Number.NaN;
+      const repeat = Math.trunc(this.toNumber(args[1]));
+      if (!Number.isFinite(repeat) || repeat < 0) return Number.NaN;
+      return Array.from({ length: repeat }, () => this.toStringValue(args[0])).join(this.toStringValue(args[2] ?? ''));
+    });
+    this.builtins.set('str.split', (args) => {
+      const array = createPineArray<string>();
+      array.values.push(...this.toStringValue(args[0]).split(this.toStringValue(args[1])));
+      return array;
+    });
     this.builtins.set('str.upper', (args) => this.toStringValue(args[0]).toUpperCase());
     this.builtins.set('str.lower', (args) => this.toStringValue(args[0]).toLowerCase());
     this.builtins.set('str.trim', (args) => this.toStringValue(args[0]).trim());
     this.builtins.set('str.replace', (args) => {
-      return this.toStringValue(args[0]).replace(this.toStringValue(args[1]), this.toStringValue(args[2]));
+      return this.replaceStringOccurrence(
+        this.toStringValue(args[0]),
+        this.toStringValue(args[1]),
+        this.toStringValue(args[2]),
+        args[3],
+      );
     });
     this.builtins.set('str.replace_all', (args) => {
       return this.toStringValue(args[0]).split(this.toStringValue(args[1])).join(this.toStringValue(args[2]));
@@ -3288,6 +3326,19 @@ export class TealscriptEngine {
 
       const denominator = Math.sqrt(leftVariance * rightVariance);
       return denominator === 0 ? NaN : covariance / denominator;
+    });
+
+    this.builtins.set('ta.cog', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const length = this.normalizeLookbackLength(args[1]);
+      const values = this.getCompleteSourceWindow(scope, `_ta_cog_source_${callId}`, source, length);
+      if (!values) return NaN;
+
+      const sum = values.reduce((total, value) => total + value, 0);
+      if (sum === 0) return NaN;
+
+      const weighted = values.reduce((total, value, index) => total + value * (index + 1), 0);
+      return -weighted / sum;
     });
 
     this.builtins.set('ta.median', (args, _namedArgs, _ctx, scope, callId) => {
