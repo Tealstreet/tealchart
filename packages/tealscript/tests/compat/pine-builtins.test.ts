@@ -354,11 +354,13 @@ midpoint = math.avg(open, high, low, close)
 rounded = math.round(midpoint, 2)
 rightAngle = math.todegrees(math.pi / 2)
 mintick = math.round_to_mintick(1.234)
+sparse = bar_index == 2 ? na : close
 plot(rounded, title="Rounded Midpoint")
 plot(math.trunc(-1.9), title="Truncated")
 plot(rightAngle, title="Right Angle")
 plot(mintick, title="Min Tick Rounded")
 plot(math.round(math.toradians(180), 6), title="Radians")
+plot(math.sum(sparse, 3), title="Sparse Sum")
 `);
 
     expect(result.errors).toEqual([]);
@@ -367,6 +369,7 @@ plot(math.round(math.toradians(180), 6), title="Radians")
     expect(roundSeries(getPlot(result, 'Right Angle').values)).toEqual([90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90]);
     expect(roundSeries(getPlot(result, 'Min Tick Rounded').values)).toEqual([1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23]);
     expect(roundSeries(getPlot(result, 'Radians').values, 6)).toEqual([3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593]);
+    expect(roundSeries(getPlot(result, 'Sparse Sum').values)).toEqual([null, null, null, 310, 307, 302, 303, 313, 321, 328, 329, 333]);
   });
 
   it('matches common Pine trend direction helper idioms', () => {
