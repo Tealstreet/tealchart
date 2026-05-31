@@ -60,6 +60,8 @@ Covered behavior and remaining gaps:
   hardening.
 - User-defined function bodies can return expression results from `if` /
   `else if` / `else` branches.
+- User-defined function bodies can return the last expression result from
+  numeric `for`, collection `for ... in`, and `while` loop bodies.
 - User-defined function parameters support Pine-style default arguments. Default
   expressions are evaluated at the call site when the caller omits the
   corresponding positional or named argument.

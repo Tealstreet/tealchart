@@ -352,7 +352,7 @@ FunctionIndentedBlock
     }
 
 FunctionIndentedStatement
-  = FunctionIndent stmt:(FunctionIfStatement / Statement) {
+  = FunctionIndent stmt:(FunctionIfStatement / FunctionForStatement / FunctionWhileStatement / Statement) {
       return stmt;
     }
 
@@ -390,13 +390,48 @@ FunctionElseClause
       return block;
     }
 
+FunctionForStatement
+  = "for" _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:FunctionNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'collection',
+        counter: counter.valueCounter,
+        indexCounter: counter.indexCounter,
+        iterable,
+        body,
+        loc: loc()
+      };
+    }
+  / "for" _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:FunctionNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'numeric',
+        counter,
+        start,
+        end,
+        step: step ? step[3] : null,
+        body,
+        loc: loc()
+      };
+    }
+
+FunctionWhileStatement
+  = "while" _ test:Expression _ LineTerminator body:FunctionNestedBlock {
+      return {
+        type: 'WhileStatement',
+        test,
+        body,
+        loc: loc()
+      };
+    }
+
 FunctionNestedBlock
   = statements:FunctionNestedStatement+ {
       return statements.filter(s => s !== null);
     }
 
 FunctionNestedStatement
-  = FunctionNestedIndent stmt:(FunctionNestedIfStatement / Statement) {
+  = FunctionNestedIndent stmt:(FunctionNestedIfStatement / FunctionNestedForStatement / FunctionNestedWhileStatement / Statement) {
       return stmt;
     }
 
@@ -425,13 +460,48 @@ FunctionNestedElseClause
       return block;
     }
 
+FunctionNestedForStatement
+  = "for" _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:FunctionDeepNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'collection',
+        counter: counter.valueCounter,
+        indexCounter: counter.indexCounter,
+        iterable,
+        body,
+        loc: loc()
+      };
+    }
+  / "for" _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:FunctionDeepNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'numeric',
+        counter,
+        start,
+        end,
+        step: step ? step[3] : null,
+        body,
+        loc: loc()
+      };
+    }
+
+FunctionNestedWhileStatement
+  = "while" _ test:Expression _ LineTerminator body:FunctionDeepNestedBlock {
+      return {
+        type: 'WhileStatement',
+        test,
+        body,
+        loc: loc()
+      };
+    }
+
 FunctionDeepNestedBlock
   = statements:FunctionDeepNestedStatement+ {
       return statements.filter(s => s !== null);
     }
 
 FunctionDeepNestedStatement
-  = FunctionDeepNestedIndent stmt:(FunctionDeepNestedIfStatement / Statement) {
+  = FunctionDeepNestedIndent stmt:(FunctionDeepNestedIfStatement / FunctionDeepNestedForStatement / FunctionDeepNestedWhileStatement / Statement) {
       return stmt;
     }
 
@@ -458,6 +528,41 @@ FunctionDeepNestedElseClause
     }
   / FunctionDeepNestedIndent "else" _ LineTerminator? block:FunctionVeryDeepNestedBlock {
       return block;
+    }
+
+FunctionDeepNestedForStatement
+  = "for" _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:FunctionVeryDeepNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'collection',
+        counter: counter.valueCounter,
+        indexCounter: counter.indexCounter,
+        iterable,
+        body,
+        loc: loc()
+      };
+    }
+  / "for" _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:FunctionVeryDeepNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'numeric',
+        counter,
+        start,
+        end,
+        step: step ? step[3] : null,
+        body,
+        loc: loc()
+      };
+    }
+
+FunctionDeepNestedWhileStatement
+  = "while" _ test:Expression _ LineTerminator body:FunctionVeryDeepNestedBlock {
+      return {
+        type: 'WhileStatement',
+        test,
+        body,
+        loc: loc()
+      };
     }
 
 FunctionVeryDeepNestedBlock

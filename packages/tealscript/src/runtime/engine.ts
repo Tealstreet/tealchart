@@ -1043,8 +1043,152 @@ export class TealscriptEngine {
       return this.executeFunctionIf(stmt);
     }
 
+    if (stmt.type === 'ForStatement') {
+      return this.executeFunctionFor(stmt);
+    }
+
+    if (stmt.type === 'WhileStatement') {
+      return this.executeFunctionWhile(stmt);
+    }
+
     this.executeStatement(stmt);
     return { hasResult: false };
+  }
+
+  private executeFunctionFor(stmt: ForStatement): { hasResult: boolean; value?: unknown } {
+    if (stmt.kind === 'collection') {
+      return this.executeFunctionForIn(stmt);
+    }
+
+    const start = this.evaluateExpression(stmt.start) as number;
+    const end = this.evaluateExpression(stmt.end) as number;
+    const step = stmt.step ? (this.evaluateExpression(stmt.step) as number) : 1;
+    if (step === 0) {
+      throw new Error('For loop step cannot be zero');
+    }
+
+    const childScope = this.scope.createChild();
+    const savedScope = this.scope;
+    this.scope = childScope;
+
+    let iterations = 0;
+    let result: { hasResult: boolean; value?: unknown } = { hasResult: false };
+
+    try {
+      for (let i = start; step > 0 ? i <= end : i >= end; i += step) {
+        if (++iterations > TealscriptEngine.MAX_LOOP_ITERATIONS) {
+          throw new Error('Maximum loop iterations exceeded');
+        }
+
+        this.scope.declare(stmt.counter.name, 'none', i);
+
+        try {
+          const statementResult = this.executeFunctionLoopBody(stmt.body);
+          if (statementResult.hasResult) {
+            result = statementResult;
+          }
+        } catch (e) {
+          if (e instanceof BreakException) break;
+          if (e instanceof ContinueException) continue;
+          throw e;
+        }
+      }
+      return result;
+    } finally {
+      this.scope = savedScope;
+    }
+  }
+
+  private executeFunctionForIn(
+    stmt: Extract<ForStatement, { kind: 'collection' }>,
+  ): { hasResult: boolean; value?: unknown } {
+    const iterable = this.evaluateExpression(stmt.iterable);
+    let values: unknown[];
+
+    if (Array.isArray(iterable)) {
+      values = iterable;
+    } else if (isPineArray(iterable)) {
+      values = Array.from({ length: getArraySize(iterable) }, (_, index) => getArrayValue(iterable, index));
+    } else {
+      throw new Error('For-in loop expects an array');
+    }
+
+    const childScope = this.scope.createChild();
+    const savedScope = this.scope;
+    this.scope = childScope;
+
+    let iterations = 0;
+    let result: { hasResult: boolean; value?: unknown } = { hasResult: false };
+
+    try {
+      for (let index = 0; index < values.length; index++) {
+        if (++iterations > TealscriptEngine.MAX_LOOP_ITERATIONS) {
+          throw new Error('Maximum loop iterations exceeded');
+        }
+
+        const value = values[index];
+        if (stmt.indexCounter) {
+          this.scope.declare(stmt.indexCounter.name, 'none', index);
+        }
+        this.scope.declare(stmt.counter.name, 'none', value);
+
+        try {
+          const statementResult = this.executeFunctionLoopBody(stmt.body);
+          if (statementResult.hasResult) {
+            result = statementResult;
+          }
+        } catch (e) {
+          if (e instanceof BreakException) break;
+          if (e instanceof ContinueException) continue;
+          throw e;
+        }
+      }
+      return result;
+    } finally {
+      this.scope = savedScope;
+    }
+  }
+
+  private executeFunctionWhile(stmt: WhileStatement): { hasResult: boolean; value?: unknown } {
+    const childScope = this.scope.createChild();
+    const savedScope = this.scope;
+    this.scope = childScope;
+
+    let iterations = 0;
+    let result: { hasResult: boolean; value?: unknown } = { hasResult: false };
+
+    try {
+      while (this.isTruthy(this.evaluateExpression(stmt.test))) {
+        if (++iterations > TealscriptEngine.MAX_LOOP_ITERATIONS) {
+          throw new Error('Maximum loop iterations exceeded');
+        }
+
+        try {
+          const statementResult = this.executeFunctionLoopBody(stmt.body);
+          if (statementResult.hasResult) {
+            result = statementResult;
+          }
+        } catch (e) {
+          if (e instanceof BreakException) break;
+          if (e instanceof ContinueException) continue;
+          throw e;
+        }
+      }
+      return result;
+    } finally {
+      this.scope = savedScope;
+    }
+  }
+
+  private executeFunctionLoopBody(statements: Statement[]): { hasResult: boolean; value?: unknown } {
+    let result: { hasResult: boolean; value?: unknown } = { hasResult: false };
+    for (const statement of statements) {
+      const statementResult = this.executeFunctionStatement(statement);
+      if (statementResult.hasResult) {
+        result = statementResult;
+      }
+    }
+    return result;
   }
 
   private executeFunctionStatements(statements: Statement[]): { hasResult: boolean; value?: unknown } {
