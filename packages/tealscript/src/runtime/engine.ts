@@ -1274,7 +1274,7 @@ export class TealscriptEngine {
 
     const builtin = this.builtins.get(fullName);
     if (builtin) {
-      return builtin(args, namedArgs, this.ctx, this.scope, this.nextBuiltinCallId(fullName));
+      return builtin(args, namedArgs, this.ctx, this.scope, this.builtinCallId(fullName, expr));
     }
 
     if (namespace && !this.scope.has(namespace) && this.isPlannedUnsupportedNamespace(namespace)) {
@@ -3058,6 +3058,14 @@ export class TealscriptEngine {
     const index = this.builtinCallCounts.get(name) ?? 0;
     this.builtinCallCounts.set(name, index + 1);
     return `${name}_${index}`;
+  }
+
+  private builtinCallId(name: string, expr: CallExpression): string {
+    if (name === 'alert' && expr.loc) {
+      return `${name}_${expr.loc.start.line}_${expr.loc.start.column}`;
+    }
+
+    return this.nextBuiltinCallId(name);
   }
 
   private registerPlotBuiltins(): void {

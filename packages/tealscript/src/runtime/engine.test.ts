@@ -558,7 +558,7 @@ if close > open
       expect(result.errors).toHaveLength(0);
       expect(result.alerts).toHaveLength(1);
       expect(result.alerts[0]).toMatchObject({
-        id: 'alert_alert_0',
+        id: 'alert_alert_4_5',
         type: 'alert',
         title: 'alert',
         message: 'Green bar',
@@ -574,6 +574,99 @@ if close > open
         { barIndex: 1, message: 'Green bar', frequency: 'once_per_bar_close' },
         { barIndex: 2, message: 'Green bar', frequency: 'once_per_bar_close' },
       ]);
+    });
+
+    it('emits all alert events when using freq_all', () => {
+      const script = `//@version=6
+indicator("Alerts")
+alert("First", alert.freq_all)
+alert("Second", alert.freq_all)`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      const events = result.alerts.flatMap((alert) => alert.events);
+      expect(events.map((event) => ({
+        barIndex: event.barIndex,
+        message: event.message,
+        frequency: event.frequency,
+      })).sort((left, right) => left.barIndex - right.barIndex || left.message.localeCompare(right.message))).toEqual([
+        { barIndex: 0, message: 'First', frequency: 'all' },
+        { barIndex: 0, message: 'Second', frequency: 'all' },
+        { barIndex: 1, message: 'First', frequency: 'all' },
+        { barIndex: 1, message: 'Second', frequency: 'all' },
+      ]);
+    });
+
+    it('emits once per non-all alert call site per bar', () => {
+      const script = `//@version=6
+indicator("Alerts")
+alert("First", alert.freq_once_per_bar)
+alert("Second", alert.freq_once_per_bar)
+alert("Close", alert.freq_once_per_bar_close)`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      const events = result.alerts.flatMap((alert) => alert.events);
+      expect(events.map((event) => ({
+        barIndex: event.barIndex,
+        message: event.message,
+        frequency: event.frequency,
+      }))).toEqual([
+        { barIndex: 0, message: 'First', frequency: 'once_per_bar' },
+        { barIndex: 1, message: 'First', frequency: 'once_per_bar' },
+        { barIndex: 0, message: 'Second', frequency: 'once_per_bar' },
+        { barIndex: 1, message: 'Second', frequency: 'once_per_bar' },
+        { barIndex: 0, message: 'Close', frequency: 'once_per_bar_close' },
+        { barIndex: 1, message: 'Close', frequency: 'once_per_bar_close' },
+      ]);
+    });
+
+    it('suppresses repeated execution of the same non-all alert call site per bar', () => {
+      const script = `//@version=6
+indicator("Alerts")
+for i = 0 to 2
+    alert("Loop", alert.freq_once_per_bar)`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      const events = result.alerts.flatMap((alert) => alert.events);
+      expect(events.map((event) => ({
+        barIndex: event.barIndex,
+        message: event.message,
+        frequency: event.frequency,
+      }))).toEqual([
+        { barIndex: 0, message: 'Loop', frequency: 'once_per_bar' },
+        { barIndex: 1, message: 'Loop', frequency: 'once_per_bar' },
+      ]);
+    });
+
+    it('suppresses once-per-bar-close alerts on unconfirmed realtime updates', () => {
+      const script = `//@version=6
+indicator("Alerts")
+alert("Close", alert.freq_once_per_bar_close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+
+      const result = engine.execute(ast, bars);
+      expect(result.alerts[0]?.events.map((event) => event.barIndex)).toEqual([0, 1, 2]);
+
+      const updatedBar = { ...bars[2], close: bars[2].close + 1 };
+      engine.updateBar(ast, updatedBar);
+
+      const alerts = engine.getAlerts();
+      expect(alerts[0]?.values).toEqual([true, true]);
+      expect(alerts[0]?.events.map((event) => event.barIndex)).toEqual([0, 1]);
     });
 
     it('dispatches array method calls to array builtins', () => {
