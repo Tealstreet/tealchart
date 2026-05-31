@@ -126,6 +126,9 @@ export class TealscriptEngine {
   private requestExpressionIds = new WeakMap<Expression, number>();
   private nextRequestExpressionId = 0;
   private userFunctionCallStack: string[] = [];
+  private indicatorDynamicRequests = true;
+  private requestContextDepth = 0;
+  private requestLocalScopeDepth = 0;
   private errors: ExecutionError[] = [];
 
   constructor(options: TealscriptEngineOptions = {}) {
@@ -151,6 +154,9 @@ export class TealscriptEngine {
     this.requestExpressionIds = new WeakMap();
     this.nextRequestExpressionId = 0;
     this.userFunctionCallStack = [];
+    this.indicatorDynamicRequests = true;
+    this.requestContextDepth = 0;
+    this.requestLocalScopeDepth = 0;
     this.registerUserFunctions(ast);
 
     this.ctx.setNow(Date.now());
@@ -337,6 +343,9 @@ export class TealscriptEngine {
     if (stmt.timeframe) {
       this.applyIndicatorTimeframe(this.evaluateExpression(stmt.timeframe));
     }
+    if (stmt.dynamic_requests) {
+      this.indicatorDynamicRequests = this.isTruthy(this.evaluateExpression(stmt.dynamic_requests));
+    }
   }
 
   private normalizeMaxBarsBack(value: unknown): number {
@@ -513,12 +522,14 @@ export class TealscriptEngine {
       const childScope = this.scope.createChild();
       const savedScope = this.scope;
       this.scope = childScope;
+      this.requestLocalScopeDepth++;
 
       try {
         for (const s of stmt.consequent) {
           this.executeStatement(s);
         }
       } finally {
+        this.requestLocalScopeDepth--;
         this.scope = savedScope;
       }
     } else if (stmt.alternate) {
@@ -526,12 +537,14 @@ export class TealscriptEngine {
         const childScope = this.scope.createChild();
         const savedScope = this.scope;
         this.scope = childScope;
+        this.requestLocalScopeDepth++;
 
         try {
           for (const s of stmt.alternate) {
             this.executeStatement(s);
           }
         } finally {
+          this.requestLocalScopeDepth--;
           this.scope = savedScope;
         }
       } else {
@@ -557,6 +570,7 @@ export class TealscriptEngine {
     const childScope = this.scope.createChild();
     const savedScope = this.scope;
     this.scope = childScope;
+    this.requestLocalScopeDepth++;
 
     let iterations = 0;
 
@@ -579,6 +593,7 @@ export class TealscriptEngine {
         }
       }
     } finally {
+      this.requestLocalScopeDepth--;
       this.scope = savedScope;
     }
   }
@@ -598,6 +613,7 @@ export class TealscriptEngine {
     const childScope = this.scope.createChild();
     const savedScope = this.scope;
     this.scope = childScope;
+    this.requestLocalScopeDepth++;
 
     let iterations = 0;
 
@@ -624,6 +640,7 @@ export class TealscriptEngine {
         }
       }
     } finally {
+      this.requestLocalScopeDepth--;
       this.scope = savedScope;
     }
   }
@@ -632,6 +649,7 @@ export class TealscriptEngine {
     const childScope = this.scope.createChild();
     const savedScope = this.scope;
     this.scope = childScope;
+    this.requestLocalScopeDepth++;
 
     let iterations = 0;
 
@@ -652,6 +670,7 @@ export class TealscriptEngine {
         }
       }
     } finally {
+      this.requestLocalScopeDepth--;
       this.scope = savedScope;
     }
   }
@@ -775,16 +794,18 @@ export class TealscriptEngine {
   }
 
   private evaluateBinary(expr: BinaryExpression): unknown {
-    const left = this.evaluateExpression(expr.left);
+    const left = expr.operator === 'and' || expr.operator === 'or'
+      ? this.evaluateRequestConditionalOperand(expr.left)
+      : this.evaluateExpression(expr.left);
 
     if (expr.operator === 'and') {
       if (!this.isTruthy(left)) return false;
-      return this.isTruthy(this.evaluateExpression(expr.right));
+      return this.isTruthy(this.evaluateRequestConditionalOperand(expr.right));
     }
 
     if (expr.operator === 'or') {
       if (this.isTruthy(left)) return true;
-      return this.isTruthy(this.evaluateExpression(expr.right));
+      return this.isTruthy(this.evaluateRequestConditionalOperand(expr.right));
     }
 
     const right = this.evaluateExpression(expr.right);
@@ -851,9 +872,18 @@ export class TealscriptEngine {
   private evaluateConditional(expr: ConditionalExpression): unknown {
     const test = this.evaluateExpression(expr.test);
     if (this.isTruthy(test)) {
-      return this.evaluateExpression(expr.consequent);
+      return this.evaluateRequestConditionalOperand(expr.consequent);
     } else {
-      return this.evaluateExpression(expr.alternate);
+      return this.evaluateRequestConditionalOperand(expr.alternate);
+    }
+  }
+
+  private evaluateRequestConditionalOperand(expr: Expression): unknown {
+    this.requestLocalScopeDepth++;
+    try {
+      return this.evaluateExpression(expr);
+    } finally {
+      this.requestLocalScopeDepth--;
     }
   }
 
@@ -922,9 +952,11 @@ export class TealscriptEngine {
       throw new Error(`${namespace}.* functions are not supported yet: ${fullName}`);
     }
     if (fullName === 'request.security') {
+      this.assertCanEvaluateRequest(fullName);
       return this.evaluateRequestSecurity(expr, this.nextBuiltinCallId(fullName));
     }
     if (fullName === 'request.security_lower_tf') {
+      this.assertCanEvaluateRequest(fullName);
       return this.evaluateRequestSecurityLowerTf(expr, this.nextBuiltinCallId(fullName));
     }
     if (namespace === 'request') {
@@ -983,6 +1015,18 @@ export class TealscriptEngine {
 
   private isPlannedUnsupportedNamespace(namespace: string): boolean {
     return PLANNED_UNSUPPORTED_NAMESPACES.has(namespace);
+  }
+
+  private assertCanEvaluateRequest(fullName: string): void {
+    if (this.indicatorDynamicRequests) {
+      return;
+    }
+    if (this.requestContextDepth > 0) {
+      throw new Error(`Nested request.* calls require dynamic_requests=true: ${fullName}`);
+    }
+    if (this.requestLocalScopeDepth > 0) {
+      throw new Error(`request.* calls in local scopes require dynamic_requests=true: ${fullName}`);
+    }
   }
 
   private evaluateRequestSecurity(expr: CallExpression, callId: string): unknown {
@@ -1171,6 +1215,8 @@ export class TealscriptEngine {
 
   private evaluateRequestExpressionSeries(expression: Expression, requestContext: RequestDataContext): unknown[] {
     const engine = new TealscriptEngine({ requestDatafeed: this.requestDatafeed });
+    engine.indicatorDynamicRequests = this.indicatorDynamicRequests;
+    engine.requestContextDepth = this.requestContextDepth + 1;
     engine.ctx.setNow(this.ctx.now);
     engine.ctx.syminfo = {
       ...engine.ctx.syminfo,
