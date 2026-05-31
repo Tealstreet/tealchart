@@ -426,12 +426,13 @@ into the exported ledger primitives for settings, orders, fills, trades,
 positions, and equity snapshots. Read-only `strategy.*` state variables such as
 `strategy.equity`, `strategy.position_size`, and trade counters are available
 for scripts. `strategy.entry()`, `strategy.order()`, `strategy.close()`,
-`strategy.close_all()`, `strategy.cancel()`, and `strategy.cancel_all()` record
-or cancel ledger orders. Fixed-size market orders fill immediately at the current
-close and update position size and average price. Basic open/closed trade
-counters are maintained as fixed-size market fills change exposure; limit/stop
-orders, non-fixed default sizing, price-based `strategy.exit()` brackets, and
-full broker-emulator semantics are still planned.
+`strategy.close_all()`, `strategy.exit()`, `strategy.cancel()`, and
+`strategy.cancel_all()` record or cancel ledger orders. Fixed-size market orders
+fill immediately at the current close and update position size and average
+price. Basic open/closed trade counters are maintained as fixed-size market fills
+change exposure. Price-based `strategy.exit()` limit/stop brackets are recorded
+as pending exit orders; limit/stop fills, non-fixed default sizing, trailing
+stops, and full broker-emulator semantics are still planned.
 
 ## Common Alerts Coverage
 

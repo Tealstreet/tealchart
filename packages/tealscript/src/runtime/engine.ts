@@ -1431,6 +1431,7 @@ export class TealscriptEngine {
     return (
       fullName === 'strategy.entry'
       || fullName === 'strategy.order'
+      || fullName === 'strategy.exit'
       || fullName === 'strategy.close'
       || fullName === 'strategy.close_all'
       || fullName === 'strategy.cancel'
@@ -3193,6 +3194,7 @@ export class TealscriptEngine {
     this.builtins.set('strategy.oca.none', () => 'none');
     this.builtins.set('strategy.entry', (args, namedArgs) => this.submitStrategyOrderBuiltin(args, namedArgs));
     this.builtins.set('strategy.order', (args, namedArgs) => this.submitStrategyOrderBuiltin(args, namedArgs));
+    this.builtins.set('strategy.exit', (args, namedArgs) => this.submitStrategyExitBuiltin(args, namedArgs));
     this.builtins.set('strategy.close', (args, namedArgs) => this.submitStrategyCloseBuiltin(args, namedArgs));
     this.builtins.set('strategy.close_all', (args, namedArgs) => this.submitStrategyCloseAllBuiltin(args, namedArgs));
     this.builtins.set('strategy.cancel', (args, namedArgs) => {
@@ -3251,6 +3253,144 @@ export class TealscriptEngine {
     );
 
     return undefined;
+  }
+
+  private submitStrategyExitBuiltin(args: unknown[], namedArgs: Map<string, unknown>): undefined {
+    const id = this.toStringValue(this.getCallArg(args, namedArgs, 0, 'id', ''));
+    if (id === '') {
+      throw new Error('strategy exit id must not be empty');
+    }
+
+    const fromEntry = this.toOptionalString(this.getCallArg(args, namedArgs, 1, 'from_entry'));
+    const matchingTrades = this.ctx.strategyLedger.openTrades.filter((trade) => (
+      fromEntry === undefined ? true : trade.entryOrderId === fromEntry
+    ));
+    if (matchingTrades.length === 0) {
+      return undefined;
+    }
+
+    const direction = matchingTrades[0]?.direction;
+    if (direction === undefined) {
+      return undefined;
+    }
+
+    const exitDirection: StrategyDirection = direction === 'long' ? 'short' : 'long';
+    const openQty = matchingTrades.reduce((total, trade) => total + trade.qty, 0);
+    const qty = this.resolveStrategyCloseQty(
+      openQty,
+      this.toOptionalNumber(this.getCallArg(args, namedArgs, 2, 'qty')),
+      this.toOptionalNumber(this.getCallArg(args, namedArgs, 3, 'qty_percent')),
+      'strategy exit',
+    );
+    if (qty <= 0) {
+      return undefined;
+    }
+
+    const limitPrice = this.toOptionalNumber(this.getCallArg(args, namedArgs, 5, 'limit'));
+    const stopPrice = this.toOptionalNumber(this.getCallArg(args, namedArgs, 7, 'stop'));
+    if (limitPrice === undefined && stopPrice === undefined) {
+      throw new Error('strategy.exit requires a limit or stop price');
+    }
+
+    const comment = this.toOptionalString(this.getCallArg(args, namedArgs, 12, 'comment'));
+    const commentProfit = this.toOptionalString(this.getCallArg(args, namedArgs, 13, 'comment_profit'));
+    const commentLoss = this.toOptionalString(this.getCallArg(args, namedArgs, 14, 'comment_loss'));
+    const alertMessage = this.toOptionalString(this.getCallArg(args, namedArgs, 16, 'alert_message'));
+    const alertProfit = this.toOptionalString(this.getCallArg(args, namedArgs, 17, 'alert_profit'));
+    const alertLoss = this.toOptionalString(this.getCallArg(args, namedArgs, 18, 'alert_loss'));
+    const suffixOrders = limitPrice !== undefined && stopPrice !== undefined;
+    this.cancelObsoleteStrategyExitOrders(id, fromEntry, suffixOrders);
+
+    if (limitPrice !== undefined) {
+      this.submitOrReplaceStrategyExitOrder({
+        id: suffixOrders ? `${id} Limit` : id,
+        direction: exitDirection,
+        qty,
+        qtyType: 'fixed',
+        qtyValue: qty,
+        limitPrice,
+        fromEntry,
+        comment: commentProfit ?? comment,
+        alertMessage: alertProfit ?? alertMessage,
+        barIndex: this.ctx.bar_index,
+        time: this.ctx.time.get(0) ?? 0,
+      });
+    }
+
+    if (stopPrice !== undefined) {
+      this.submitOrReplaceStrategyExitOrder({
+        id: suffixOrders ? `${id} Stop` : id,
+        direction: exitDirection,
+        qty,
+        qtyType: 'fixed',
+        qtyValue: qty,
+        stopPrice,
+        fromEntry,
+        comment: commentLoss ?? comment,
+        alertMessage: alertLoss ?? alertMessage,
+        barIndex: this.ctx.bar_index,
+        time: this.ctx.time.get(0) ?? 0,
+      });
+    }
+
+    return undefined;
+  }
+
+  private cancelObsoleteStrategyExitOrders(id: string, fromEntry: string | undefined, suffixOrders: boolean): void {
+    const activeIds = suffixOrders
+      ? new Set([`${id} Limit`, `${id} Stop`])
+      : new Set([id]);
+
+    for (const order of this.ctx.strategyLedger.orders) {
+      if (order.status !== 'pending' || order.fromEntry !== fromEntry) {
+        continue;
+      }
+      if (order.id !== id && order.id !== `${id} Limit` && order.id !== `${id} Stop`) {
+        continue;
+      }
+      if (activeIds.has(order.id)) {
+        continue;
+      }
+
+      order.status = 'cancelled';
+      order.updatedBarIndex = this.ctx.bar_index;
+      order.updatedTime = this.ctx.time.get(0) ?? 0;
+    }
+  }
+
+  private submitOrReplaceStrategyExitOrder(input: Parameters<typeof submitStrategyOrder>[1]): void {
+    const existingOrder = this.ctx.strategyLedger.orders.find((order) => (
+      order.status === 'pending'
+      && order.id === input.id
+      && order.fromEntry === input.fromEntry
+    ));
+    if (!existingOrder) {
+      submitStrategyOrder(this.ctx.strategyLedger, input);
+      return;
+    }
+
+    existingOrder.direction = input.direction;
+    if (input.limitPrice !== undefined && input.stopPrice !== undefined) {
+      existingOrder.type = 'stop_limit';
+    } else if (input.limitPrice !== undefined) {
+      existingOrder.type = 'limit';
+    } else if (input.stopPrice !== undefined) {
+      existingOrder.type = 'stop';
+    } else {
+      existingOrder.type = 'market';
+    }
+    existingOrder.qty = input.qty;
+    existingOrder.qtyType = input.qtyType;
+    existingOrder.qtyValue = input.qtyValue;
+    existingOrder.limitPrice = input.limitPrice;
+    existingOrder.stopPrice = input.stopPrice;
+    existingOrder.fromEntry = input.fromEntry;
+    existingOrder.ocaName = input.ocaName;
+    existingOrder.ocaType = input.ocaType;
+    existingOrder.comment = input.comment;
+    existingOrder.alertMessage = input.alertMessage;
+    existingOrder.updatedBarIndex = input.barIndex;
+    existingOrder.updatedTime = input.time;
   }
 
   private submitStrategyCloseBuiltin(args: unknown[], namedArgs: Map<string, unknown>): undefined {
