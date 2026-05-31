@@ -188,6 +188,7 @@ export interface AlertOutput {
   title: string;
   message: string;
   values: (boolean | null)[];
+  renderedMessages?: (string | null)[];
   frequency?: AlertFrequency;
   events: AlertEvent[];
 }
@@ -731,14 +732,18 @@ export class ExecutionContext {
   /**
    * Set an alertcondition value for the current bar.
    */
-  setAlertConditionValue(id: string, value: boolean | null): void {
+  setAlertConditionValue(id: string, value: boolean | null, renderedMessage?: string | null): void {
     const alert = this.alerts.get(id);
     if (!alert) return;
 
     while (alert.values.length < this.bar_index) {
       alert.values.push(null);
+      alert.renderedMessages?.push(null);
     }
     alert.values[this.bar_index] = value;
+    if (alert.renderedMessages) {
+      alert.renderedMessages[this.bar_index] = renderedMessage ?? null;
+    }
   }
 
   /**
@@ -797,6 +802,9 @@ export class ExecutionContext {
   truncateAlerts(length: number): void {
     for (const alert of this.alerts.values()) {
       alert.values.length = length;
+      if (alert.renderedMessages) {
+        alert.renderedMessages.length = length;
+      }
       alert.events = alert.events.filter((event) => event.barIndex < length);
     }
   }
