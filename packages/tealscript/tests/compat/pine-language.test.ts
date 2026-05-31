@@ -68,6 +68,27 @@ plot(rt.hidden(close), title="Hidden")
     expect(result.errors.map((error) => error.message)).toEqual(['Unknown library function: rt.hidden']);
   });
 
+  it('allows exported imported library functions to call library-local helpers', () => {
+    const library = parse(`
+library("RangeTools", true)
+hidden(float value) => value * 10
+export scaledSpread(float highValue, float lowValue) => hidden(highValue - lowValue)
+`);
+
+    const result = runCompatScript(`
+indicator("Imported library helper")
+import TestUser/RangeTools/1 as rt
+plot(rt.scaledSpread(high, low), title="Scaled Spread")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/RangeTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Scaled Spread').values)).toEqual([40, 50, 40, 70, 60, 50, 60, 70, 50, 50, 50, 50]);
+  });
+
   it('runs single-line user-defined functions', () => {
     const result = runCompatScript(`
 indicator("UDF single line")

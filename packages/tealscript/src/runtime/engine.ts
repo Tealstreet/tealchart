@@ -183,6 +183,7 @@ interface ImportedLibrary {
   path: string;
   alias: string;
   functions: Map<string, FunctionDeclaration>;
+  exportedFunctions: Set<string>;
 }
 
 interface RandomBuiltinState {
@@ -223,6 +224,7 @@ export class TealscriptEngine {
   private requestExpressionIds = new WeakMap<Expression, number>();
   private nextRequestExpressionId = 0;
   private userFunctionCallStack: string[] = [];
+  private importedLibraryCallStack: string[] = [];
   private indicatorDynamicRequests = true;
   private requestContextDepth = 0;
   private requestLocalScopeDepth = 0;
@@ -256,6 +258,7 @@ export class TealscriptEngine {
     this.requestExpressionIds = new WeakMap();
     this.nextRequestExpressionId = 0;
     this.userFunctionCallStack = [];
+    this.importedLibraryCallStack = [];
     this.indicatorDynamicRequests = true;
     this.requestContextDepth = 0;
     this.requestLocalScopeDepth = 0;
@@ -351,6 +354,7 @@ export class TealscriptEngine {
     this.resetPerBarBuiltinState();
     this.registerTypeDeclarations(ast);
     this.registerUserFunctions(ast);
+    this.importedLibraries.clear();
     this.registerLibraryImports(ast);
 
     // Re-execute statements for current bar
@@ -588,9 +592,13 @@ export class TealscriptEngine {
       if (!libraryAst) continue;
 
       const functions = new Map<string, FunctionDeclaration>();
+      const exportedFunctions = new Set<string>();
       for (const libraryStmt of libraryAst.body) {
-        if (libraryStmt.type === 'FunctionDeclaration' && libraryStmt.exported) {
+        if (libraryStmt.type === 'FunctionDeclaration') {
           functions.set(libraryStmt.name.name, libraryStmt);
+          if (libraryStmt.exported) {
+            exportedFunctions.add(libraryStmt.name.name);
+          }
           const scopeKey = this.importedFunctionScopeKey(stmt.alias.name, libraryStmt);
           if (!this.functionScopes.has(scopeKey)) {
             this.functionScopes.set(scopeKey, this.scope.createChild());
@@ -602,6 +610,7 @@ export class TealscriptEngine {
         path: stmt.path,
         alias: stmt.alias.name,
         functions,
+        exportedFunctions,
       });
     }
   }
@@ -1249,6 +1258,12 @@ export class TealscriptEngine {
     }
 
     if (!namespace) {
+      const importedLibrary = this.currentImportedLibrary();
+      const libraryFunction = importedLibrary?.functions.get(funcName);
+      if (importedLibrary && libraryFunction) {
+        return this.evaluateImportedLibraryFunction(importedLibrary, libraryFunction, args, namedArgs);
+      }
+
       const userFunction = this.userFunctions.get(funcName);
       if (userFunction) {
         return this.evaluateUserFunction(userFunction, args, namedArgs);
@@ -1282,16 +1297,35 @@ export class TealscriptEngine {
   ): unknown {
     const library = this.importedLibraries.get(alias);
     const fn = library?.functions.get(functionName);
-    if (!library || !fn) {
+    if (!library || !fn || !library.exportedFunctions.has(functionName)) {
       throw new Error(`Unknown library function: ${alias}.${functionName}`);
     }
-    return this.evaluateUserFunction(
-      fn,
-      args,
-      namedArgs,
-      `library function ${alias}.${functionName}`,
-      this.importedFunctionScopeKey(alias, fn),
-    );
+    return this.evaluateImportedLibraryFunction(library, fn, args, namedArgs);
+  }
+
+  private currentImportedLibrary(): ImportedLibrary | undefined {
+    const alias = this.importedLibraryCallStack.at(-1);
+    return alias ? this.importedLibraries.get(alias) : undefined;
+  }
+
+  private evaluateImportedLibraryFunction(
+    library: ImportedLibrary,
+    fn: FunctionDeclaration,
+    args: unknown[],
+    namedArgs: Map<string, unknown>,
+  ): unknown {
+    this.importedLibraryCallStack.push(library.alias);
+    try {
+      return this.evaluateUserFunction(
+        fn,
+        args,
+        namedArgs,
+        `library function ${library.alias}.${fn.name.name}`,
+        this.importedFunctionScopeKey(library.alias, fn),
+      );
+    } finally {
+      this.importedLibraryCallStack.pop();
+    }
   }
 
   private findCallableUserMethod(
