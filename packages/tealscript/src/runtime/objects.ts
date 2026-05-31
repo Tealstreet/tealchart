@@ -1,13 +1,19 @@
 export interface PineUdtObject {
   readonly __tealscriptUdt: true;
   readonly typeName: string;
+  readonly varipFields: Set<string>;
   fields: Map<string, unknown>;
 }
 
-export function createPineUdtObject(typeName: string, fields: Iterable<[string, unknown]> = []): PineUdtObject {
+export function createPineUdtObject(
+  typeName: string,
+  fields: Iterable<[string, unknown]> = [],
+  varipFields: Iterable<string> = [],
+): PineUdtObject {
   return {
     __tealscriptUdt: true,
     typeName,
+    varipFields: new Set(varipFields),
     fields: new Map(fields),
   };
 }
@@ -34,5 +40,6 @@ export function copyUdtObject(object: PineUdtObject, cloneValue: (value: unknown
   return createPineUdtObject(
     object.typeName,
     Array.from(object.fields.entries(), ([fieldName, value]) => [fieldName, cloneValue(value)]),
+    object.varipFields,
   );
 }

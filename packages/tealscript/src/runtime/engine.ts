@@ -1174,6 +1174,7 @@ export class TealscriptEngine {
     }
 
     const fieldValues = new Map<string, unknown>();
+    const varipFields = new Set<string>();
     const fieldNames = new Set(declaration.fields.map((field) => field.name.name));
     for (const argName of namedArgs.keys()) {
       if (!fieldNames.has(argName)) {
@@ -1194,10 +1195,13 @@ export class TealscriptEngine {
       } else {
         value = this.evaluateTypeFieldDefault(field);
       }
+      if (field.varip) {
+        varipFields.add(fieldName);
+      }
       fieldValues.set(fieldName, value);
     });
 
-    return createPineUdtObject(typeName, fieldValues);
+    return createPineUdtObject(typeName, fieldValues, varipFields);
   }
 
   private evaluateTypeFieldDefault(field: TypeFieldDeclaration): unknown {

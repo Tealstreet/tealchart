@@ -12,7 +12,7 @@ import { Series, type SeriesSnapshot } from './series';
 import { copyArray, isPineArray } from './arrays';
 import { copyMatrix, isPineMatrix } from './matrices';
 import { copyMap, isPineMap } from './maps';
-import { copyUdtObject, isPineUdtObject } from './objects';
+import { createPineUdtObject, isPineUdtObject, type PineUdtObject } from './objects';
 
 /**
  * Variable declaration kind
@@ -306,12 +306,13 @@ export class Scope {
    */
   snapshot(): ScopeSnapshot {
     const variables = new Map<string, VariableSnapshot>();
+    const cloneContext = createCloneContext();
 
     for (const [name, entry] of this.variables) {
       variables.set(name, {
-        value: cloneSnapshotValue(entry.value),
+        value: cloneSnapshotValue(entry.value, cloneContext),
         initialized: entry.initialized,
-        seriesSnapshot: entry.series ? cloneSeriesSnapshot(entry.series.snapshot()) : undefined,
+        seriesSnapshot: entry.series ? cloneSeriesSnapshot(entry.series.snapshot(), cloneContext) : undefined,
       });
     }
 
@@ -322,13 +323,21 @@ export class Scope {
    * Restore from snapshot
    */
   restore(snapshot: ScopeSnapshot): void {
+    const cloneContext = createCloneContext();
     for (const [name, snap] of snapshot.variables) {
       const entry = this.variables.get(name);
       if (entry) {
-        entry.value = cloneSnapshotValue(snap.value);
+        collectVaripSources(snap.value, entry.value, cloneContext);
+      }
+    }
+
+    for (const [name, snap] of snapshot.variables) {
+      const entry = this.variables.get(name);
+      if (entry) {
+        entry.value = cloneSnapshotValue(snap.value, cloneContext);
         entry.initialized = snap.initialized;
         if (entry.series && snap.seriesSnapshot) {
-          entry.series.restore(cloneSeriesSnapshot(snap.seriesSnapshot));
+          entry.series.restore(cloneSeriesSnapshot(snap.seriesSnapshot, cloneContext));
         }
       }
     }
@@ -386,7 +395,19 @@ export class Scope {
   }
 }
 
-function cloneSnapshotValue(value: unknown): unknown {
+interface CloneContext {
+  udtClones: WeakMap<PineUdtObject, PineUdtObject>;
+  varipSources: WeakMap<PineUdtObject, PineUdtObject>;
+}
+
+function createCloneContext(): CloneContext {
+  return {
+    udtClones: new WeakMap(),
+    varipSources: new WeakMap(),
+  };
+}
+
+function cloneSnapshotValue(value: unknown, context: CloneContext): unknown {
   if (isPineArray(value)) {
     return copyArray(value);
   }
@@ -396,15 +417,42 @@ function cloneSnapshotValue(value: unknown): unknown {
   if (isPineMap(value)) {
     return copyMap(value);
   }
-  return isPineUdtObject(value) ? copyUdtObject(value, cloneSnapshotValue) : value;
+  return isPineUdtObject(value) ? cloneUdtSnapshotValue(value, context) : value;
 }
 
-function cloneSeriesSnapshot(snapshot: SeriesSnapshot<unknown>): SeriesSnapshot<unknown> {
+function cloneUdtSnapshotValue(value: PineUdtObject, context: CloneContext): PineUdtObject {
+  const existing = context.udtClones.get(value);
+  if (existing) return existing;
+
+  const clone = createPineUdtObject(value.typeName, [], value.varipFields);
+  context.udtClones.set(value, clone);
+  const varipSource = context.varipSources.get(value);
+
+  for (const [fieldName, fieldValue] of value.fields) {
+    const sourceValue = varipSource && value.varipFields.has(fieldName)
+      ? varipSource.fields.get(fieldName)
+      : fieldValue;
+    clone.fields.set(fieldName, cloneSnapshotValue(sourceValue, context));
+  }
+
+  return clone;
+}
+
+function collectVaripSources(snapshotValue: unknown, currentValue: unknown, context: CloneContext): void {
+  if (!isPineUdtObject(snapshotValue) || !isPineUdtObject(currentValue)) return;
+
+  context.varipSources.set(snapshotValue, currentValue);
+  for (const [fieldName, nestedSnapshotValue] of snapshotValue.fields) {
+    collectVaripSources(nestedSnapshotValue, currentValue.fields.get(fieldName), context);
+  }
+}
+
+function cloneSeriesSnapshot(snapshot: SeriesSnapshot<unknown>, context: CloneContext): SeriesSnapshot<unknown> {
   return {
-    values: snapshot.values.map(cloneSnapshotValue),
+    values: snapshot.values.map((value) => cloneSnapshotValue(value, context)),
     currentIndex: snapshot.currentIndex,
     committedIndex: snapshot.committedIndex,
-    uncommittedValue: cloneSnapshotValue(snapshot.uncommittedValue),
+    uncommittedValue: cloneSnapshotValue(snapshot.uncommittedValue, context),
     hasUncommittedValue: snapshot.hasUncommittedValue,
   };
 }

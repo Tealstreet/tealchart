@@ -142,6 +142,57 @@ plot(s.firstUpdate, title="First Update")`;
       expect(plots2.find((plot) => plot.title === 'Last')?.values.at(-1)).toBe(300);
       expect(plots2.find((plot) => plot.title === 'First Update')?.values.at(-1)).toBe(300);
     });
+
+    it('preserves shared UDT identity after realtime rollback', () => {
+      const script = `//@version=6
+indicator("UDT Shared Rollback")
+type state
+    float value = 0
+var left = state.new()
+var right = left
+if barstate.islast and barstate.isrealtime
+    right.value := close
+plot(left.value, title="Left")
+plot(right.value, title="Right")`;
+
+      const ast = parse(script);
+      const bars = createBars(5, 100);
+      const engine = new TealscriptEngine();
+      const result = engine.execute(ast, bars);
+      expect(result.errors).toEqual([]);
+
+      const plots = engine.updateBar(ast, { ...bars[4], close: 200 });
+      expect(plots.find((plot) => plot.title === 'Left')?.values.at(-1)).toBe(200);
+      expect(plots.find((plot) => plot.title === 'Right')?.values.at(-1)).toBe(200);
+    });
+
+    it('preserves varip UDT fields across realtime rollback', () => {
+      const script = `//@version=6
+indicator("UDT Varip Field")
+type state
+    varip int ticks = 0
+    float last = na
+var s = state.new()
+if barstate.islast and barstate.isrealtime
+    s.ticks += 1
+    s.last := close
+plot(s.ticks, title="Ticks")
+plot(s.last, title="Last")`;
+
+      const ast = parse(script);
+      const bars = createBars(5, 100);
+      const engine = new TealscriptEngine();
+      const result = engine.execute(ast, bars);
+      expect(result.errors).toEqual([]);
+
+      const plots1 = engine.updateBar(ast, { ...bars[4], close: 200 });
+      expect(plots1.find((plot) => plot.title === 'Ticks')?.values.at(-1)).toBe(1);
+      expect(plots1.find((plot) => plot.title === 'Last')?.values.at(-1)).toBe(200);
+
+      const plots2 = engine.updateBar(ast, { ...bars[4], close: 300 });
+      expect(plots2.find((plot) => plot.title === 'Ticks')?.values.at(-1)).toBe(2);
+      expect(plots2.find((plot) => plot.title === 'Last')?.values.at(-1)).toBe(300);
+    });
   });
 
   describe('basic execution', () => {
