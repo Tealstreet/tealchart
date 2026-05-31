@@ -424,6 +424,72 @@ plot(removed, title="Removed")`;
       expect(result.plots.find((plot) => plot.title === 'Removed')?.values).toEqual([5, 5]);
     });
 
+    it('fills arrays by optional index range', () => {
+      const script = `//@version=6
+indicator("Array Fill")
+values = array.from(1, 2, 3, 4)
+array.fill(values, 9, 1, 3)
+plot(values.get(0), title="First")
+plot(values.get(1), title="Filled A")
+plot(values.get(2), title="Filled B")
+plot(values.get(3), title="Last")
+values.fill(5)
+plot(values.sum(), title="Method Filled Sum")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'First')?.values).toEqual([1, 1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Filled A')?.values).toEqual([9, 9, 9]);
+      expect(result.plots.find((plot) => plot.title === 'Filled B')?.values).toEqual([9, 9, 9]);
+      expect(result.plots.find((plot) => plot.title === 'Last')?.values).toEqual([4, 4, 4]);
+      expect(result.plots.find((plot) => plot.title === 'Method Filled Sum')?.values).toEqual([20, 20, 20]);
+    });
+
+    it('fills arrays from the start, to the end, and rejects invalid bounds', () => {
+      const validScript = `//@version=6
+indicator("Array Fill Bounds")
+values = array.from(1, 2, 3, 4)
+array.fill(values, 8, 0, 2)
+array.fill(values, 7, 2)
+values.fill(6, 2, 2)
+withNa = array.from(1, na, 3)
+withNa.fill(5, 1)
+plot(values.get(0), title="First")
+plot(values.get(1), title="Second")
+plot(values.get(2), title="Third")
+plot(values.get(3), title="Fourth")
+plot(withNa.sum(), title="Filled NA")`;
+
+      const result = executeScript(parse(validScript), createBars(2, 100));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'First')?.values).toEqual([8, 8]);
+      expect(result.plots.find((plot) => plot.title === 'Second')?.values).toEqual([8, 8]);
+      expect(result.plots.find((plot) => plot.title === 'Third')?.values).toEqual([7, 7]);
+      expect(result.plots.find((plot) => plot.title === 'Fourth')?.values).toEqual([7, 7]);
+      expect(result.plots.find((plot) => plot.title === 'Filled NA')?.values).toEqual([11, 11]);
+
+      const invalidScripts = [
+        'array.fill(values, 9, -1, 2)',
+        'array.fill(values, 9, 0, 5)',
+        'array.fill(values, 9, 3, 2)',
+        'array.fill(values, 9, na, 2)',
+      ];
+
+      for (const fillCall of invalidScripts) {
+        const invalidResult = executeScript(parse(`//@version=6
+indicator("Invalid Fill")
+values = array.from(1, 2, 3, 4)
+${fillCall}
+plot(values.get(0))`), createBars(1, 100));
+
+        expect(invalidResult.errors[0]?.message).toBe('Array fill indices are out of bounds');
+      }
+    });
+
     it('executes array ordering helpers and methods', () => {
       const script = `//@version=6
 indicator("Array Ordering")
@@ -758,6 +824,35 @@ plot(na(str.tonumber("")) ? 1 : 0, title="Empty Is NA")`;
       expect(result.plots.find((plot) => plot.title === 'Empty Is NA')?.values).toEqual([1, 1]);
     });
 
+    it('runs string match, repeat, split, and occurrence replace helpers', () => {
+      const script = `//@version=6
+indicator("String Extra Helpers")
+parts = str.split("NASDAQ:AAPL", ":")
+chars = str.split("ABC", "")
+plot(array.size(parts), title="Parts")
+plot(array.get(parts, 1) == "AAPL", title="Second Part")
+plot(array.join(chars, "-") == "A-B-C", title="Split Characters")
+plot(str.match("Go NASDAQ:AAPL now", "[A-Z]+:[A-Z]+") == "NASDAQ:AAPL", title="Regex Match")
+plot(str.match("no symbol", "[0-9]+") == "", title="Missing Match")
+plot(str.repeat("?", 3, ",") == "?,?,?", title="Repeat With Separator")
+plot(na(str.repeat(na, 2)) ? 1 : 0, title="Repeat NA")
+plot(str.replace("a-b-a-b", "b", "x", 1) == "a-b-a-x", title="Replace Occurrence")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Parts')?.values).toEqual([2, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Second Part')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Split Characters')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Regex Match')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Missing Match')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Repeat With Separator')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Repeat NA')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Replace Occurrence')?.values).toEqual([true, true]);
+    });
+
     it('formats timestamps with str.format_time', () => {
       const script = `//@version=6
 indicator("String Format Time")
@@ -791,6 +886,48 @@ plot(math.round_to_mintick(na), title="Missing")`;
       expect(result.plots.find((plot) => plot.title === 'Down')?.values).toEqual([1.23, 1.23]);
       expect(result.plots.find((plot) => plot.title === 'Up')?.values).toEqual([1.24, 1.24]);
       expect(result.plots.find((plot) => plot.title === 'Missing')?.values).toEqual([null, null]);
+    });
+
+    it('generates math.random values in exclusive bounds', () => {
+      const script = `//@version=6
+indicator("Math Random")
+plot(math.random(), title="Default")
+plot(math.random(10, 20), title="Bounded")
+plot(math.random(min=5, max=6, seed=3), title="Named Seeded")
+plot(math.random(1, 1), title="Invalid")`;
+
+      const ast = parse(script);
+      const bars = createBars(5, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Default')?.values.every((value) => value !== null && value > 0 && value < 1)).toBe(true);
+      expect(result.plots.find((plot) => plot.title === 'Bounded')?.values.every((value) => value !== null && value > 10 && value < 20)).toBe(true);
+      expect(result.plots.find((plot) => plot.title === 'Named Seeded')?.values.every((value) => value !== null && value > 5 && value < 6)).toBe(true);
+      expect(result.plots.find((plot) => plot.title === 'Invalid')?.values).toEqual([null, null, null, null, null]);
+    });
+
+    it('makes seeded math.random sequences repeatable', () => {
+      const script = `//@version=6
+indicator("Seeded Random")
+plot(math.random(10, 20, 42), title="Seeded")
+plot(math.random(10, 20, 43), title="Other Seed")`;
+
+      const ast = parse(script);
+      const bars = createBars(6, 100);
+      const first = executeScript(ast, bars);
+      const second = executeScript(ast, bars);
+      const firstSeeded = first.plots.find((plot) => plot.title === 'Seeded')?.values ?? [];
+      const secondSeeded = second.plots.find((plot) => plot.title === 'Seeded')?.values ?? [];
+      const otherSeed = first.plots.find((plot) => plot.title === 'Other Seed')?.values ?? [];
+
+      expect(first.errors).toHaveLength(0);
+      expect(second.errors).toHaveLength(0);
+      expect(firstSeeded).toHaveLength(bars.length);
+      expect(otherSeed).toHaveLength(bars.length);
+      expect(firstSeeded).toEqual(secondSeeded);
+      expect(new Set(firstSeeded).size).toBeGreaterThan(1);
+      expect(otherSeed).not.toEqual(firstSeeded);
     });
 
     it('halts realtime updateBar execution on runtime.error', () => {
@@ -1531,6 +1668,50 @@ plot(ta.cci(hlc3, 3), title="Typical CCI")`;
       expect(result.plots.find((plot) => plot.title === 'Typical CCI')?.values[2]).toBeCloseTo(95.652174);
     });
 
+    it('calculates CMO over source changes', () => {
+      const script = `//@version=6
+indicator("TA CMO")
+plot(ta.cmo(close, 3), title="CMO")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: 2, open: 101, high: 103, low: 100, close: 102, volume: 100 },
+        { time: 3, open: 102, high: 106, low: 101, close: 105, volume: 100 },
+        { time: 4, open: 105, high: 106, low: 102, close: 103, volume: 100 },
+        { time: 5, open: 103, high: 108, low: 103, close: 107, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'CMO')?.values).toEqual([null, null, null, (3 / 7) * 100, (5 / 9) * 100]);
+    });
+
+    it('calculates TSI over double-smoothed source momentum', () => {
+      const script = `//@version=6
+indicator("TA TSI")
+plot(ta.tsi(close, 2, 3), title="TSI")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: 2, open: 101, high: 103, low: 100, close: 102, volume: 100 },
+        { time: 3, open: 102, high: 106, low: 101, close: 105, volume: 100 },
+        { time: 4, open: 105, high: 106, low: 102, close: 103, volume: 100 },
+        { time: 5, open: 103, high: 108, low: 103, close: 107, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'TSI')?.values).toEqual([
+        null,
+        1,
+        1,
+        0.4146341463414634,
+        0.6091205211726384,
+      ]);
+    });
+
     it('preserves source history when TA lookback length grows', () => {
       const script = `//@version=6
 indicator("Growing lookback")
@@ -1560,19 +1741,33 @@ plot(ta.variance(close, 3), title="Variance")
 plot(ta.dev(close, 3), title="Deviation")
 plot(ta.correlation(close, open, 3), title="Correlation")
 plot(ta.correlation(close, close, 3), title="Self Correlation")
-plot(ta.correlation(close, 1, 3), title="Flat Correlation")`;
+plot(ta.correlation(close, 1, 3), title="Flat Correlation")
+plot(ta.cog(close, 3), title="COG")
+plot(ta.cog(close - open, 3), title="Derived COG")`;
 
       const ast = parse(script);
-      const bars = createBars(3, 100);
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: 2, open: 101, high: 103, low: 100, close: 102, volume: 100 },
+        { time: 3, open: 102, high: 106, low: 101, close: 105, volume: 100 },
+        { time: 4, open: 105, high: 106, low: 102, close: 103, volume: 100 },
+        { time: 5, open: 103, high: 108, low: 103, close: 107, volume: 100 },
+      ];
       const result = executeScript(ast, bars);
 
       expect(result.errors).toHaveLength(0);
-      expect(result.plots.find((plot) => plot.title === 'Cum')?.values).toEqual([100.2, 200.9, 302.1]);
-      expect(result.plots.find((plot) => plot.title === 'Variance')?.values).toEqual([null, null, 1 / 6]);
-      expect(result.plots.find((plot) => plot.title === 'Deviation')?.values).toEqual([null, null, 1 / 3]);
-      expect(result.plots.find((plot) => plot.title === 'Correlation')?.values[2]).toBeCloseTo(1);
+      expect(result.plots.find((plot) => plot.title === 'Cum')?.values).toEqual([100, 202, 307, 410, 517]);
+      expect(result.plots.find((plot) => plot.title === 'Variance')?.values).toEqual([null, null, 38 / 9, 14 / 9, 8 / 3]);
+      const deviationValues = result.plots.find((plot) => plot.title === 'Deviation')?.values ?? [];
+      expect(deviationValues.slice(0, 2)).toEqual([null, null]);
+      expect(deviationValues[2]).toBeCloseTo(16 / 9);
+      expect(deviationValues[3]).toBeCloseTo(10 / 9);
+      expect(deviationValues[4]).toBeCloseTo(4 / 3);
+      expect(result.plots.find((plot) => plot.title === 'Correlation')?.values[2]).toBeCloseTo(0.993399);
       expect(result.plots.find((plot) => plot.title === 'Self Correlation')?.values[2]).toBeCloseTo(1);
-      expect(result.plots.find((plot) => plot.title === 'Flat Correlation')?.values).toEqual([null, null, null]);
+      expect(result.plots.find((plot) => plot.title === 'Flat Correlation')?.values).toEqual([null, null, null, null, null]);
+      expect(result.plots.find((plot) => plot.title === 'COG')?.values).toEqual([null, null, -1.98371335504886, -1.9967741935483871, -1.9936507936507937]);
+      expect(result.plots.find((plot) => plot.title === 'Derived COG')?.values).toEqual([null, null, -1.25, -3.5, -1.8]);
     });
 
     it('calculates median, mode, and percentile TA helpers', () => {
