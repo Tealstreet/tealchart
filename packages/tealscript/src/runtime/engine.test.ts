@@ -549,6 +549,21 @@ plot(strategy.closedtrades)`;
       ]);
     });
 
+    it('does not emit strategy order-fill alerts without alert_message fields', () => {
+      const script = `//@version=6
+strategy("No fill alerts")
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.close("Long")
+plot(strategy.closedtrades)`;
+
+      const result = executeScript(parse(script), createBars(2));
+
+      expect(result.errors).toEqual([]);
+      expect(result.alerts.find((alert) => alert.id === 'strategy_order_fills')).toBeUndefined();
+    });
+
     it('closes the full net position with strategy.close_all', () => {
       const script = `//@version=6
 strategy("Close all")
