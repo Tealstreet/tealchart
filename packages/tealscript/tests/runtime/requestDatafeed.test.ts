@@ -84,6 +84,22 @@ describe('request datafeed contract', () => {
     expect(result.context.currency).toBe('EUR');
   });
 
+  it('derives Heikin-Ashi fixture bars from a matching base context', () => {
+    const datafeed = new InMemoryRequestDatafeed([
+      { symbol: 'NASDAQ:AAPL|session=extended', timeframe: '1D', bars },
+    ]);
+    const result = datafeed.getBars({ symbol: 'NASDAQ:AAPL|session=extended|chart=heikinashi', timeframe: '1D' });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) throw new Error(result.message);
+    expect(result.context.symbol).toBe('NASDAQ:AAPL|session=extended|chart=heikinashi');
+    expect(result.context.bars).toEqual([
+      { time: 1_700_000_000_000, open: 102.5, high: 110, low: 90, close: 101.25, volume: 1_000 },
+      { time: 1_700_086_400_000, open: 101.875, high: 115, low: 95, close: 106.25, volume: 1_100 },
+      { time: 1_700_172_800_000, open: 104.0625, high: 120, low: 100, close: 111.25, volume: 1_200 },
+    ]);
+  });
+
   it('returns cloned request series fixture points', () => {
     const datafeed = new InMemoryRequestDatafeed([], [
       {
