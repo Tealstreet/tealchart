@@ -150,6 +150,7 @@ import {
 } from './maps';
 import { Scope, createRootScope } from './scope';
 import { currencyRateRequestKey, type RequestDataContext, type RequestDatafeed, type RequestSeriesPoint } from './requestDatafeed';
+import type { StrategyLedger, StrategyLedgerSettings } from './strategy';
 
 /**
  * Execution result
@@ -162,6 +163,7 @@ export interface ExecutionResult {
   inputs: InputDefinition[];
   indicatorTitle: string;
   indicatorMaxBarsBack?: number;
+  strategy: StrategyLedger;
   errors: ExecutionError[];
 }
 
@@ -327,6 +329,7 @@ export class TealscriptEngine {
       inputs: this.ctx.inputDefinitions.map((def) => ({ ...def })),
       indicatorTitle: this.ctx.indicatorTitle,
       indicatorMaxBarsBack: this.ctx.indicatorMaxBarsBack,
+      strategy: this.ctx.strategyLedger,
       errors: this.errors,
     };
   }
@@ -445,10 +448,6 @@ export class TealscriptEngine {
     // Only process on first bar
     if (this.ctx.bar_index !== 0) return;
 
-    if (stmt.declarationKind === 'strategy') {
-      throw new Error('strategy() declarations are not supported yet');
-    }
-
     if (stmt.title) {
       this.ctx.indicatorTitle = this.evaluateExpression(stmt.title) as string;
     }
@@ -471,6 +470,67 @@ export class TealscriptEngine {
     if (stmt.dynamic_requests) {
       this.indicatorDynamicRequests = this.isTruthy(this.evaluateExpression(stmt.dynamic_requests));
     }
+    if (stmt.declarationKind === 'strategy') {
+      this.applyStrategyDeclaration(stmt);
+    }
+  }
+
+  private applyStrategyDeclaration(stmt: IndicatorDeclaration): void {
+    const settings: Partial<StrategyLedgerSettings> = {
+      title: this.ctx.indicatorTitle,
+      currency: this.ctx.syminfo.currency,
+    };
+
+    if (stmt.initial_capital !== undefined) {
+      settings.initialCapital = this.normalizeNonNegativeNumber(
+        this.evaluateExpression(stmt.initial_capital),
+        'strategy initial_capital',
+      );
+    }
+    if (stmt.currency !== undefined) {
+      settings.currency = this.toStringValue(this.evaluateExpression(stmt.currency));
+    }
+    if (stmt.default_qty_type !== undefined) {
+      settings.defaultQtyType = this.normalizeStrategyDefaultQtyType(this.evaluateExpression(stmt.default_qty_type));
+    }
+    if (stmt.default_qty_value !== undefined) {
+      settings.defaultQtyValue = this.normalizeNonNegativeNumber(
+        this.evaluateExpression(stmt.default_qty_value),
+        'strategy default_qty_value',
+      );
+    }
+    if (stmt.pyramiding !== undefined) {
+      settings.pyramiding = this.normalizeNonNegativeInteger(this.evaluateExpression(stmt.pyramiding), 'strategy pyramiding');
+    }
+    if (stmt.commission_type !== undefined) {
+      settings.commissionType = this.normalizeStrategyCommissionType(this.evaluateExpression(stmt.commission_type));
+    }
+    if (stmt.commission_value !== undefined) {
+      settings.commissionValue = this.normalizeNonNegativeNumber(
+        this.evaluateExpression(stmt.commission_value),
+        'strategy commission_value',
+      );
+    }
+    if (stmt.slippage !== undefined) {
+      settings.slippageTicks = this.normalizeNonNegativeInteger(this.evaluateExpression(stmt.slippage), 'strategy slippage');
+    }
+    if (stmt.margin_long !== undefined) {
+      settings.marginLong = this.normalizeNonNegativeNumber(this.evaluateExpression(stmt.margin_long), 'strategy margin_long');
+    }
+    if (stmt.margin_short !== undefined) {
+      settings.marginShort = this.normalizeNonNegativeNumber(this.evaluateExpression(stmt.margin_short), 'strategy margin_short');
+    }
+    if (stmt.calc_on_order_fills !== undefined) {
+      settings.calcOnOrderFills = this.isTruthy(this.evaluateExpression(stmt.calc_on_order_fills));
+    }
+    if (stmt.calc_on_every_tick !== undefined) {
+      settings.calcOnEveryTick = this.isTruthy(this.evaluateExpression(stmt.calc_on_every_tick));
+    }
+    if (stmt.process_orders_on_close !== undefined) {
+      settings.processOrdersOnClose = this.isTruthy(this.evaluateExpression(stmt.process_orders_on_close));
+    }
+
+    this.ctx.setStrategyLedger(settings);
   }
 
   private executeLibrary(_stmt: LibraryDeclaration): void {
@@ -492,6 +552,36 @@ export class TealscriptEngine {
       throw new Error('indicator max_bars_back must be a non-negative integer');
     }
     return value;
+  }
+
+  private normalizeNonNegativeNumber(value: unknown, name: string): number {
+    const number = this.toNumber(value);
+    if (!Number.isFinite(number) || number < 0) {
+      throw new Error(`${name} must be a non-negative number`);
+    }
+    return number;
+  }
+
+  private normalizeNonNegativeInteger(value: unknown, name: string): number {
+    const number = this.normalizeNonNegativeNumber(value, name);
+    if (!Number.isInteger(number)) {
+      throw new Error(`${name} must be a non-negative integer`);
+    }
+    return number;
+  }
+
+  private normalizeStrategyDefaultQtyType(value: unknown): StrategyLedgerSettings['defaultQtyType'] {
+    if (value === 'fixed' || value === 'cash' || value === 'percent_of_equity') {
+      return value;
+    }
+    throw new Error(`Invalid strategy default_qty_type: ${this.toStringValue(value)}`);
+  }
+
+  private normalizeStrategyCommissionType(value: unknown): StrategyLedgerSettings['commissionType'] {
+    if (value === 'percent' || value === 'cash_per_order' || value === 'cash_per_contract') {
+      return value;
+    }
+    throw new Error(`Invalid strategy commission_type: ${this.toStringValue(value)}`);
   }
 
   private applyDrawingLimit(
@@ -2346,6 +2436,9 @@ export class TealscriptEngine {
       if (namespace === 'timeframe') {
         return this.evaluateTimeframe(prop);
       }
+      if (namespace === 'strategy') {
+        return this.evaluateStrategy(prop);
+      }
 
       // Check builtins
       const builtin = this.builtins.get(fullName);
@@ -2437,6 +2530,48 @@ export class TealscriptEngine {
         return this.ctx.timeframe.isdaily || this.ctx.timeframe.isweekly || this.ctx.timeframe.ismonthly;
       default:
         throw new Error(`Unknown timeframe property: ${prop}`);
+    }
+  }
+
+  private evaluateStrategy(prop: string): unknown {
+    const ledger = this.ctx.strategyLedger;
+    switch (prop) {
+      case 'long':
+        return 'long';
+      case 'short':
+        return 'short';
+      case 'fixed':
+        return 'fixed';
+      case 'cash':
+        return 'cash';
+      case 'percent_of_equity':
+        return 'percent_of_equity';
+      case 'equity':
+        return ledger.equity;
+      case 'initial_capital':
+        return ledger.initialCapital;
+      case 'netprofit':
+        return ledger.netProfit;
+      case 'grossprofit':
+        return ledger.grossProfit;
+      case 'grossloss':
+        return ledger.grossLoss;
+      case 'openprofit':
+        return ledger.position.openProfit;
+      case 'position_size':
+        return ledger.position.size;
+      case 'position_avg_price':
+        return ledger.position.avgPrice ?? Number.NaN;
+      case 'opentrades':
+        return ledger.openTrades.length;
+      case 'closedtrades':
+        return ledger.closedTrades.length;
+      case 'max_runup':
+        return ledger.maxRunup;
+      case 'max_drawdown':
+        return ledger.maxDrawdown;
+      default:
+        throw new Error(`Unknown strategy property: ${prop}`);
     }
   }
 
@@ -3005,6 +3140,9 @@ export class TealscriptEngine {
 
     // Pine Logs helpers
     this.registerLogBuiltins();
+
+    // Strategy declaration constants
+    this.registerStrategyBuiltins();
   }
 
   // Plot call ordering is reset on every bar so output arrays align by call site.
@@ -3021,6 +3159,12 @@ export class TealscriptEngine {
       const message = namedArgs.has('message') ? namedArgs.get('message') : args[0];
       throw new RuntimeErrorException(this.toStringValue(message ?? ''));
     });
+  }
+
+  private registerStrategyBuiltins(): void {
+    this.builtins.set('strategy.commission.percent', () => 'percent');
+    this.builtins.set('strategy.commission.cash_per_order', () => 'cash_per_order');
+    this.builtins.set('strategy.commission.cash_per_contract', () => 'cash_per_contract');
   }
 
   private registerRequestBuiltins(): void {

@@ -421,14 +421,12 @@ operations, and rendering are still planned.
 
 ## Strategy Diagnostic Coverage
 
-The strategy diagnostics pass accepts `strategy(...)` declarations and
-`strategy.*` namespace calls so generated or pasted strategy scripts get a clear
-unsupported runtime diagnostic instead of a parser error or unknown identifier.
-Backtest order ledgers, positions, fills, and broker-emulator semantics remain
-out of scope until strategy execution is designed. The strategy broker epic has
-started with exported ledger primitives for settings, orders, fills, trades,
-positions, and equity snapshots; these types are not wired into script execution
-yet.
+The strategy pass accepts `strategy(...)` declarations and maps common settings
+into the exported ledger primitives for settings, orders, fills, trades,
+positions, and equity snapshots. Read-only `strategy.*` state variables such as
+`strategy.equity`, `strategy.position_size`, and trade counters are available
+for scripts. Order functions such as `strategy.entry()` still emit explicit
+unsupported runtime diagnostics until broker-emulator semantics land.
 
 ## Common Alerts Coverage
 
