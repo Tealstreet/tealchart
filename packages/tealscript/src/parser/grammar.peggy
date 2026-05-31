@@ -6,6 +6,18 @@
  */
 
 {
+  const BUILTIN_TYPE_NAMES = new Set([
+    'int',
+    'float',
+    'bool',
+    'string',
+    'color',
+    'series',
+    'simple',
+    'const',
+    'input',
+  ]);
+
   // Helper to create location info
   function loc() {
     return location();
@@ -53,14 +65,15 @@ StatementList
 
 Statement
   = IndicatorDeclaration
+  / TypeDeclaration
   / FunctionDeclaration
-  / VariableDeclaration
-  / AssignmentStatement
   / IfStatement
   / ForStatement
   / WhileStatement
   / BreakStatement
   / ContinueStatement
+  / VariableDeclaration
+  / AssignmentStatement
   / ExpressionStatement
   / EmptyStatement
 
@@ -87,6 +100,60 @@ IndicatorDeclaration
       }
 
       return result;
+    }
+
+// User-defined type:
+// type pivotPoint
+//     int x
+//     float y
+//     string xloc = xloc.bar_time
+TypeDeclaration
+  = exported:("export" _)? "type" !IdentifierPart _ name:Identifier _ LineTerminator fields:TypeIndentedBlock {
+      return {
+        type: 'TypeDeclaration',
+        name,
+        fields,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+
+TypeIndentedBlock
+  = fields:TypeIndentedField+ {
+      return fields.filter(field => field !== null);
+    }
+
+TypeIndentedField
+  = &Indent Indent field:TypeFieldDeclaration {
+      return field;
+    }
+
+TypeFieldDeclaration
+  = TypedTypeFieldDeclaration
+  / UntypedTypeFieldDeclaration
+
+TypedTypeFieldDeclaration
+  = varip:("varip" !IdentifierPart _)? type:TypeAnnotation _ name:Identifier defaultValue:(_ "=" _ Expression)? _ LineTerminator? {
+      return {
+        type: 'TypeFieldDeclaration',
+        name,
+        typeAnnotation: type,
+        defaultValue: defaultValue ? defaultValue[3] : null,
+        varip: !!varip,
+        loc: loc()
+      };
+    }
+
+UntypedTypeFieldDeclaration
+  = varip:("varip" !IdentifierPart _)? name:Identifier defaultValue:(_ "=" _ Expression)? _ LineTerminator? {
+      return {
+        type: 'TypeFieldDeclaration',
+        name,
+        typeAnnotation: null,
+        defaultValue: defaultValue ? defaultValue[3] : null,
+        varip: !!varip,
+        loc: loc()
+      };
     }
 
 // User-defined function: f(x, y) => x + y
@@ -122,12 +189,28 @@ Parameter
 
 // Variable declaration: var float x = 0.0 or just x = 0.0
 VariableDeclaration
-  = kind:VarKind? _ type:TypeAnnotation? _ pattern:DeclarationPattern _ "=" _ init:Expression _ LineTerminator? {
+  = TypedVariableDeclaration
+  / UntypedVariableDeclaration
+
+TypedVariableDeclaration
+  = kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" _ init:Expression _ LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
         names: pattern,
         typeAnnotation: type,
+        init,
+        loc: loc()
+      };
+    }
+
+UntypedVariableDeclaration
+  = kind:VarKind? _ pattern:DeclarationPattern _ "=" _ init:Expression _ LineTerminator? {
+      return {
+        type: 'VariableDeclaration',
+        kind: kind || 'none',
+        names: pattern,
+        typeAnnotation: null,
         init,
         loc: loc()
       };
@@ -187,6 +270,14 @@ TypeAnnotation
       };
     }
   / baseType:TypeName {
+      if (!BUILTIN_TYPE_NAMES.has(baseType)) {
+        return {
+          type: 'TypeAnnotation',
+          baseType: 'udt',
+          name: baseType,
+          loc: loc()
+        };
+      }
       return {
         type: 'TypeAnnotation',
         baseType,
@@ -204,6 +295,7 @@ TypeName
   / "bool" !IdentifierPart { return 'bool'; }
   / "string" !IdentifierPart { return 'string'; }
   / "color" !IdentifierPart { return 'color'; }
+  / name:IdentifierName { return name; }
 
 // Assignment: x := value
 // Left side can be an identifier, member access, or index access
@@ -979,7 +1071,7 @@ IdentifierPart
 ReservedWord
   = ("if" / "else" / "for" / "while" / "break" / "continue" / "var" / "varip"
     / "true" / "false" / "na" / "and" / "or" / "not" / "to" / "by"
-    / "switch"
+    / "switch" / "type"
     / "indicator" / "library" / "import" / "export"
     ) !IdentifierPart
 

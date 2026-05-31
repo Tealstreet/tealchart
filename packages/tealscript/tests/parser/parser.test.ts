@@ -5,7 +5,14 @@
 import { describe, expect, it } from 'vitest';
 
 import { parse, validate, TealscriptParseError, formatParseError } from '../../src/parser';
-import type { Program, FunctionDeclaration, IndicatorDeclaration, VariableDeclaration, CallExpression } from '../../src/parser';
+import type {
+  Program,
+  FunctionDeclaration,
+  IndicatorDeclaration,
+  TypeDeclaration,
+  VariableDeclaration,
+  CallExpression,
+} from '../../src/parser';
 
 describe('Tealscript Parser', () => {
   describe('Version annotation', () => {
@@ -172,6 +179,17 @@ arrayValue = [1, 2]
       }));
     });
 
+    it('parses user-defined type annotations', () => {
+      const ast = parse('pivotPoint found = na\n');
+      const decl = ast.body[0] as VariableDeclaration;
+
+      expect(decl.typeAnnotation).toEqual(expect.objectContaining({
+        type: 'TypeAnnotation',
+        baseType: 'udt',
+        name: 'pivotPoint',
+      }));
+    });
+
     it('parses tuple destructuring', () => {
       const ast = parse('[a, b, c] = someFunc()\n');
       const decl = ast.body[0] as VariableDeclaration;
@@ -196,6 +214,57 @@ arrayValue = [1, 2]
       if (decl.names.type === 'TupleDeclarator') {
         expect(decl.names.names).toHaveLength(3);
       }
+    });
+  });
+
+  describe('Type declarations', () => {
+    it('parses user-defined type fields and defaults', () => {
+      const ast = parse(`type pivotPoint
+    int x
+    float y
+    string xloc = xloc.bar_time
+    pivotPoint nextPivot = na
+`);
+
+      expect(ast.body).toHaveLength(1);
+      const decl = ast.body[0] as TypeDeclaration;
+      expect(decl.type).toBe('TypeDeclaration');
+      expect(decl.name.name).toBe('pivotPoint');
+      expect(decl.fields).toHaveLength(4);
+      expect(decl.fields[0]).toEqual(expect.objectContaining({
+        type: 'TypeFieldDeclaration',
+        name: expect.objectContaining({ name: 'x' }),
+        typeAnnotation: expect.objectContaining({ baseType: 'int' }),
+      }));
+      expect(decl.fields[2]).toEqual(expect.objectContaining({
+        name: expect.objectContaining({ name: 'xloc' }),
+        defaultValue: expect.objectContaining({ type: 'MemberExpression' }),
+      }));
+      expect(decl.fields[3]).toEqual(expect.objectContaining({
+        name: expect.objectContaining({ name: 'nextPivot' }),
+        typeAnnotation: expect.objectContaining({ baseType: 'udt', name: 'pivotPoint' }),
+      }));
+    });
+
+    it('parses exported user-defined types and varip fields', () => {
+      const ast = parse(`export type tickState
+    varip int updateNo = 0
+    lastPrice = close
+`);
+
+      const decl = ast.body[0] as TypeDeclaration;
+      expect(decl.exported).toBe(true);
+      expect(decl.name.name).toBe('tickState');
+      expect(decl.fields[0]).toEqual(expect.objectContaining({
+        varip: true,
+        typeAnnotation: expect.objectContaining({ baseType: 'int' }),
+        defaultValue: expect.objectContaining({ value: 0 }),
+      }));
+      expect(decl.fields[1]).toEqual(expect.objectContaining({
+        name: expect.objectContaining({ name: 'lastPrice' }),
+        typeAnnotation: null,
+        defaultValue: expect.objectContaining({ name: 'close' }),
+      }));
     });
   });
 
