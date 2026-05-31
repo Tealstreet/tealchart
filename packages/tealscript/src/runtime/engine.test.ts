@@ -448,6 +448,48 @@ plot(values.sum(), title="Method Filled Sum")`;
       expect(result.plots.find((plot) => plot.title === 'Method Filled Sum')?.values).toEqual([20, 20, 20]);
     });
 
+    it('fills arrays from the start, to the end, and rejects invalid bounds', () => {
+      const validScript = `//@version=6
+indicator("Array Fill Bounds")
+values = array.from(1, 2, 3, 4)
+array.fill(values, 8, 0, 2)
+array.fill(values, 7, 2)
+values.fill(6, 2, 2)
+withNa = array.from(1, na, 3)
+withNa.fill(5, 1)
+plot(values.get(0), title="First")
+plot(values.get(1), title="Second")
+plot(values.get(2), title="Third")
+plot(values.get(3), title="Fourth")
+plot(withNa.sum(), title="Filled NA")`;
+
+      const result = executeScript(parse(validScript), createBars(2, 100));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'First')?.values).toEqual([8, 8]);
+      expect(result.plots.find((plot) => plot.title === 'Second')?.values).toEqual([8, 8]);
+      expect(result.plots.find((plot) => plot.title === 'Third')?.values).toEqual([7, 7]);
+      expect(result.plots.find((plot) => plot.title === 'Fourth')?.values).toEqual([7, 7]);
+      expect(result.plots.find((plot) => plot.title === 'Filled NA')?.values).toEqual([11, 11]);
+
+      const invalidScripts = [
+        'array.fill(values, 9, -1, 2)',
+        'array.fill(values, 9, 0, 5)',
+        'array.fill(values, 9, 3, 2)',
+        'array.fill(values, 9, na, 2)',
+      ];
+
+      for (const fillCall of invalidScripts) {
+        const invalidResult = executeScript(parse(`//@version=6
+indicator("Invalid Fill")
+values = array.from(1, 2, 3, 4)
+${fillCall}
+plot(values.get(0))`), createBars(1, 100));
+
+        expect(invalidResult.errors[0]?.message).toBe('Array fill indices are out of bounds');
+      }
+    });
+
     it('executes array ordering helpers and methods', () => {
       const script = `//@version=6
 indicator("Array Ordering")

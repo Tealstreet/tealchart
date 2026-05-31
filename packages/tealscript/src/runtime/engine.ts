@@ -3584,10 +3584,11 @@ export class TealscriptEngine {
         return next;
       };
 
-      const smoothedMomentum = ema(`_ta_tsi_momentum_long_${callId}`, momentum, longAlpha);
-      const smoothedAbsMomentum = ema(`_ta_tsi_abs_long_${callId}`, absMomentum, longAlpha);
-      const doubleSmoothedMomentum = ema(`_ta_tsi_momentum_short_${callId}`, smoothedMomentum, shortAlpha);
-      const doubleSmoothedAbsMomentum = ema(`_ta_tsi_abs_short_${callId}`, smoothedAbsMomentum, shortAlpha);
+      const baseKey = `_ta_tsi_${callId}_${shortLength}_${longLength}`;
+      const smoothedMomentum = ema(`${baseKey}_momentum_long`, momentum, longAlpha);
+      const smoothedAbsMomentum = ema(`${baseKey}_abs_long`, absMomentum, longAlpha);
+      const doubleSmoothedMomentum = ema(`${baseKey}_momentum_short`, smoothedMomentum, shortAlpha);
+      const doubleSmoothedAbsMomentum = ema(`${baseKey}_abs_short`, smoothedAbsMomentum, shortAlpha);
 
       return doubleSmoothedAbsMomentum === 0 ? 0 : doubleSmoothedMomentum / doubleSmoothedAbsMomentum;
     });
