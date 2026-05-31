@@ -105,6 +105,23 @@ export {
   type InputDefinition,
 } from './context';
 
+export {
+  createDefaultStrategySettings,
+  createStrategyLedger,
+  createStrategyPosition,
+  type StrategyDirection,
+  type StrategyEquityPoint,
+  type StrategyFill,
+  type StrategyLedger,
+  type StrategyLedgerSettings,
+  type StrategyOcaType,
+  type StrategyOrder,
+  type StrategyOrderStatus,
+  type StrategyOrderType,
+  type StrategyPosition,
+  type StrategyTrade,
+} from './strategy';
+
 export type {
   DrawingOutput,
   LabelDrawingOutput,
