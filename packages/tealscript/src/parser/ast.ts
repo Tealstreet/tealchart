@@ -415,6 +415,8 @@ export function isExpression(node: AnyNode): node is Expression {
     'BinaryExpression',
     'UnaryExpression',
     'ConditionalExpression',
+    'ForStatement',
+    'WhileStatement',
     'CallExpression',
     'MemberExpression',
     'IndexExpression',
