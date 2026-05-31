@@ -435,12 +435,12 @@ WhileStatement
     }
 
 BreakStatement
-  = "break" _ LineTerminator? {
+  = "break" !IdentifierPart _ LineTerminator? {
       return { type: 'BreakStatement', loc: loc() };
     }
 
 ContinueStatement
-  = "continue" _ LineTerminator? {
+  = "continue" !IdentifierPart _ LineTerminator? {
       return { type: 'ContinueStatement', loc: loc() };
     }
 
