@@ -3249,7 +3249,10 @@ export class TealscriptEngine {
   }
 
   private strategyTradeIndex(args: unknown[], namedArgs: Map<string, unknown>): number {
-    const value = this.getCallArg(args, namedArgs, 0, 'trade_num', 0);
+    const value = this.getCallArg(args, namedArgs, 0, 'trade_num');
+    if (value === undefined) {
+      throw new Error('strategy trade_num is required');
+    }
     const index = this.toOptionalNumber(value);
     if (index === undefined || index < 0 || !Number.isInteger(index)) {
       throw new Error('strategy trade_num must be a non-negative integer');
