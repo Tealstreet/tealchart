@@ -127,18 +127,22 @@ definitions.
 ## Common `array.*` Coverage
 
 The array pass covers typed constructors (`array.new_float`, `array.new_int`,
-`array.new_bool`, `array.new_string`), `array.size`, `array.get`, `array.set`,
-`array.push`, `array.pop`, `array.shift`, `array.unshift`, `array.clear`,
-`array.from`, `array.copy`, `array.first`, `array.last`, `array.includes`,
-`array.indexof`, `array.lastindexof`, `array.insert`, `array.remove`,
-`array.fill`, `array.min`, `array.max`, `array.sum`, `array.avg`, `array.sort`,
-`array.covariance`, `array.reverse`, `array.join`, `array.concat`, and
-`array.slice` window semantics. Common Pine method
-syntax now lowers to the same runtime built-ins for calls such as
-`values.push(close)`, `values.size()`, `values.get(index)`, and
-`values.avg()`. The checkpoint fixtures follow rolling-window indicator idioms
-and constant-array helper idioms where arrays are copied, searched, summarized,
-ordered, sliced, joined, concatenated, mutated, and compared for covariance.
+`array.new_bool`, `array.new_string`, `array.new_color`, and drawing-object
+array constructors), `array.size`, `array.get`, `array.set`, `array.push`,
+`array.pop`, `array.shift`, `array.unshift`, `array.clear`, `array.from`,
+`array.copy`, `array.first`, `array.last`, `array.includes`, `array.every`,
+`array.some`, `array.indexof`, `array.lastindexof`, binary-search helpers,
+`array.insert`, `array.remove`, `array.fill`, `array.abs`, `array.min`,
+`array.max`, `array.sum`, `array.avg`, `array.range`, `array.median`,
+`array.mode`, `array.variance`, `array.stdev`, `array.covariance`,
+percentile helpers, `array.standardize`, `array.sort`, `array.sort_indices`,
+`array.reverse`, `array.join`, `array.concat`, and `array.slice` window
+semantics. Common Pine method syntax now lowers to the same runtime built-ins
+for calls such as `values.push(close)`, `values.size()`, `values.get(index)`,
+`values.avg()`, `values.standardize()`, and `values.sort_indices()`. The
+checkpoint fixtures follow rolling-window indicator idioms and constant-array
+helper idioms where arrays are copied, searched, summarized, ordered, sliced,
+joined, concatenated, mutated, and compared for covariance.
 
 ## Common `color.*` Coverage
 
