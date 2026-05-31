@@ -128,6 +128,8 @@ plot(close, title="Break Line", style=plot.style_linebr, display=displayTarget)
 plot(open, title="Step Diamonds", style=plot.style_stepline_diamond, display=display.none)
 plot(high, title="Columns", style=plot.style_columns, histbase=100, trackprice=true, show_last=5)
 plot(low, "Positional Area", color.red, 3, plot.style_area, true, 90, -1, true, false, 4, display.price_scale, format.volume, 0, true)
+hline(50, "Midline", color=color.blue, linestyle=hline.style_dotted, linewidth=2, editable=false, display=display.price_scale)
+hline(75, "Solid Positional", color.red, hline.style_solid, 3, true, display.none)
 plot(formatMatches ? 1 : 0, title="Format Constants")
 plot(scaleMatches ? 1 : 0, title="Scale Constants")
 `);
@@ -137,6 +139,8 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
     const stepDiamonds = getPlot(result, 'Step Diamonds');
     const columns = getPlot(result, 'Columns');
     const positionalArea = getPlot(result, 'Positional Area');
+    const midline = getPlot(result, 'Midline');
+    const solidPositional = getPlot(result, 'Solid Positional');
 
     expect(breakLine.style).toBe('linebr');
     expect(breakLine.display).toBe(11);
@@ -159,6 +163,24 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
       format: 'volume',
       precision: 0,
       forceOverlay: true,
+    });
+    expect(midline).toMatchObject({
+      type: 'hline',
+      price: 50,
+      color: '#2196F3',
+      lineStyle: 'dotted',
+      linewidth: 2,
+      editable: false,
+      display: 8,
+    });
+    expect(solidPositional).toMatchObject({
+      type: 'hline',
+      price: 75,
+      color: '#F44336',
+      lineStyle: 'solid',
+      linewidth: 3,
+      editable: true,
+      display: 0,
     });
     expect(breakLine.values).toHaveLength(compatibilityBars.length);
     expect(getPlot(result, 'Format Constants').values).toEqual(Array(compatibilityBars.length).fill(1));

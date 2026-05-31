@@ -1,4 +1,4 @@
-import type { DrawingOutput, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
+import type { DrawingOutput, PlotLineStyle, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
 import type { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
 import type { CanvasContext } from './rendering/CanvasContext';
 import type { PaneOffset } from './rendering/PaneManager';
@@ -2168,7 +2168,7 @@ export class TealchartRenderer {
 
     ctx.strokeStyle = color;
     ctx.lineWidth = plot.linewidth || 1;
-    ctx.setLineDash([4, 4]);
+    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'dashed'));
 
     ctx.beginPath();
     ctx.moveTo(margins.left, y);
@@ -3554,7 +3554,7 @@ export class TealchartRenderer {
   /**
    * Convert LineStyle to canvas setLineDash pattern
    */
-  private lineStyleToDashPattern(lineStyle: LineStyle): number[] {
+  private lineStyleToDashPattern(lineStyle: LineStyle | PlotLineStyle): number[] {
     switch (lineStyle) {
       case 'dashed':
         return [6, 4];
@@ -4401,7 +4401,7 @@ export class TealchartRenderer {
 
     ctx.strokeStyle = color;
     ctx.lineWidth = plot.linewidth || 1;
-    ctx.setLineDash([4, 4]);
+    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'dashed'));
 
     ctx.beginPath();
     ctx.moveTo(margins.left, y);

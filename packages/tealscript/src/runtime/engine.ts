@@ -60,7 +60,7 @@ import {
 } from './arrays';
 import type { BuiltinFunction, BuiltinRegistry } from './builtins/registry';
 import { registerBoxBuiltins, registerDrawingConstants, registerLabelBuiltins, registerLineBuiltins, registerLineFillBuiltins, type DrawingBuiltinRuntime } from './builtins/drawings';
-import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LogLevel, type LogOutput, type PlotOutput, type PlotStyle } from './context';
+import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LogLevel, type LogOutput, type PlotLineStyle, type PlotOutput, type PlotStyle } from './context';
 import {
   getDrawingValue,
   toDrawingId as toDrawingIdValue,
@@ -2088,6 +2088,26 @@ export class TealscriptEngine {
     return String(value);
   }
 
+  private getCallArg(args: unknown[], namedArgs: Map<string, unknown>, index: number, name: string, fallback?: unknown): unknown {
+    return namedArgs.has(name) ? namedArgs.get(name) : args[index] !== undefined ? args[index] : fallback;
+  }
+
+  private toOptionalNumber(value: unknown): number | undefined {
+    if (value === undefined || value === null || this.isNa(value)) return undefined;
+    const numberValue = this.toNumber(value);
+    return Number.isFinite(numberValue) ? numberValue : undefined;
+  }
+
+  private toOptionalInteger(value: unknown): number | undefined {
+    const numberValue = this.toOptionalNumber(value);
+    return numberValue === undefined ? undefined : Math.trunc(numberValue);
+  }
+
+  private toOptionalBoolean(value: unknown): boolean | undefined {
+    if (value === undefined || value === null || this.isNa(value)) return undefined;
+    return this.isTruthy(value);
+  }
+
   private formatNumber(value: number, format: string): string {
     const decimalMatch = format.match(/\.([0#]+)/);
     if (decimalMatch) {
@@ -2426,41 +2446,24 @@ export class TealscriptEngine {
 
   private registerPlotBuiltins(): void {
     this.builtins.set('plot', (args, namedArgs, ctx) => {
-      const getArg = (index: number, name: string, fallback?: unknown): unknown => {
-        return namedArgs.has(name) ? namedArgs.get(name) : args[index] !== undefined ? args[index] : fallback;
-      };
-      const optionalNumber = (value: unknown): number | undefined => {
-        if (value === undefined || value === null || this.isNa(value)) return undefined;
-        const numberValue = this.toNumber(value);
-        return Number.isFinite(numberValue) ? numberValue : undefined;
-      };
-      const optionalInteger = (value: unknown): number | undefined => {
-        const numberValue = optionalNumber(value);
-        return numberValue === undefined ? undefined : Math.trunc(numberValue);
-      };
-      const optionalBoolean = (value: unknown): boolean | undefined => {
-        if (value === undefined || value === null || this.isNa(value)) return undefined;
-        return this.isTruthy(value);
-      };
-
       const value = args[0] as number;
       const callIndex = this.plotCallIndex++;
       const hasExplicitTitle = namedArgs.has('title') || args[1] !== undefined;
-      const title = (getArg(1, 'title', `Plot ${callIndex + 1}`)) as string;
-      const colorArg = getArg(2, 'color', '#2196F3');
+      const title = (this.getCallArg(args, namedArgs, 1, 'title', `Plot ${callIndex + 1}`)) as string;
+      const colorArg = this.getCallArg(args, namedArgs, 2, 'color', '#2196F3');
       const color = this.toPlotColor(colorArg);
-      const linewidth = optionalInteger(getArg(3, 'linewidth', 1)) ?? 1;
-      const style = (getArg(4, 'style', 'line')) as string;
-      const trackprice = optionalBoolean(getArg(5, 'trackprice'));
-      const histbase = optionalNumber(getArg(6, 'histbase'));
-      const offset = optionalInteger(getArg(7, 'offset'));
-      const join = optionalBoolean(getArg(8, 'join'));
-      const editable = optionalBoolean(getArg(9, 'editable'));
-      const showLast = optionalInteger(getArg(10, 'show_last'));
-      const display = optionalInteger(getArg(11, 'display'));
-      const format = this.toOptionalString(getArg(12, 'format'));
-      const precision = optionalInteger(getArg(13, 'precision'));
-      const forceOverlay = optionalBoolean(getArg(14, 'force_overlay'));
+      const linewidth = this.toOptionalInteger(this.getCallArg(args, namedArgs, 3, 'linewidth', 1)) ?? 1;
+      const style = (this.getCallArg(args, namedArgs, 4, 'style', 'line')) as string;
+      const trackprice = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 5, 'trackprice'));
+      const histbase = this.toOptionalNumber(this.getCallArg(args, namedArgs, 6, 'histbase'));
+      const offset = this.toOptionalInteger(this.getCallArg(args, namedArgs, 7, 'offset'));
+      const join = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 8, 'join'));
+      const editable = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 9, 'editable'));
+      const showLast = this.toOptionalInteger(this.getCallArg(args, namedArgs, 10, 'show_last'));
+      const display = this.toOptionalInteger(this.getCallArg(args, namedArgs, 11, 'display'));
+      const format = this.toOptionalString(this.getCallArg(args, namedArgs, 12, 'format'));
+      const precision = this.toOptionalInteger(this.getCallArg(args, namedArgs, 13, 'precision'));
+      const forceOverlay = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 14, 'force_overlay'));
 
       // Use plot call order for untitled plots so multiple plot(...) calls do
       // not collapse into one "Plot" series across every bar.
@@ -2498,10 +2501,13 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('hline', (args, namedArgs, ctx) => {
-      const price = args[0] as number;
-      const title = (namedArgs.get('title') ?? args[1] ?? 'HLine') as string;
-      const color = (namedArgs.get('color') ?? args[2] ?? '#787B86') as string;
-      const linewidth = (namedArgs.get('linewidth') ?? 1) as number;
+      const price = this.toNumber(args[0]);
+      const title = (this.getCallArg(args, namedArgs, 1, 'title', 'HLine')) as string;
+      const color = (this.getCallArg(args, namedArgs, 2, 'color', '#787B86')) as string;
+      const lineStyle = this.getCallArg(args, namedArgs, 3, 'linestyle', 'solid') as PlotLineStyle;
+      const linewidth = this.toOptionalInteger(this.getCallArg(args, namedArgs, 4, 'linewidth', 1)) ?? 1;
+      const editable = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 5, 'editable'));
+      const display = this.toOptionalInteger(this.getCallArg(args, namedArgs, 6, 'display'));
 
       const id = `hline_${title}`;
 
@@ -2512,6 +2518,9 @@ export class TealscriptEngine {
           title,
           color,
           linewidth,
+          lineStyle,
+          editable,
+          display,
           price,
         });
       }
@@ -2658,6 +2667,9 @@ export class TealscriptEngine {
     this.builtins.set('plot.style_columns', () => 'columns');
     this.builtins.set('plot.style_area', () => 'area');
     this.builtins.set('plot.style_areabr', () => 'areabr');
+    this.builtins.set('hline.style_solid', () => 'solid');
+    this.builtins.set('hline.style_dotted', () => 'dotted');
+    this.builtins.set('hline.style_dashed', () => 'dashed');
 
     // =========================================================================
     // plotshape - Conditional shape markers

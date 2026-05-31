@@ -97,6 +97,7 @@ export interface PlotOutput {
   color: string | (string | null)[];
   linewidth?: number;
   style?: PlotStyle;
+  lineStyle?: PlotLineStyle;
   offset?: number;
   trackprice?: boolean;
   histbase?: number;
@@ -146,6 +147,8 @@ export type PlotStyle =
   | 'columns'
   | 'area'
   | 'areabr';
+
+export type PlotLineStyle = 'solid' | 'dotted' | 'dashed';
 
 export type AlertFrequency = 'once_per_bar' | 'once_per_bar_close' | 'all';
 

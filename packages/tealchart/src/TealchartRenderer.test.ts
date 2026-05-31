@@ -412,6 +412,34 @@ describe('TealchartRenderer coordinate transforms', () => {
     });
   });
 
+  describe('hline rendering', () => {
+    it('renders hlines with their configured line style', () => {
+      const setLineDash = vi.fn();
+      const stroke = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        setLineDash,
+        stroke,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const plot: PlotOutput = {
+        id: 'hline_Midline',
+        type: 'hline',
+        title: 'Midline',
+        values: [],
+        color: '#2196F3',
+        linewidth: 2,
+        lineStyle: 'dotted',
+        price: 100,
+      };
+
+      (renderer as any).renderHline(plot, { startTime: 0, endTime: 1, priceMin: 50, priceMax: 150 });
+
+      expect(setLineDash).toHaveBeenCalledWith([2, 3]);
+      expect(stroke).toHaveBeenCalled();
+    });
+  });
+
   describe('calculateViewport', () => {
     it('returns sensible defaults for empty bars', () => {
       const vp = TealchartRenderer.calculateViewport([]);
