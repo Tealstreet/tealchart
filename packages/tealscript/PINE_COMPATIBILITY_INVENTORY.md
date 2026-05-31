@@ -38,8 +38,8 @@ reading the whole runtime.
 | Parser/runtime | `library(...)` / `import` | Unsupported | Public API guardrails in `tests/public-api/public-entry.test.ts` | Module system is planned for the libraries epic. |
 | Parser/runtime | Variable declarations | Supported | `tests/parser/parser.test.ts`; `tests/runtime/runtime.test.ts` | Qualified type checking is planned. |
 | Parser/runtime | `var` / `varip` | Partial | `tests/compat/pine-language.test.ts`; `src/runtime/engine.test.ts` | Intrabar `varip` parity and nested-scope edge cases remain. |
-| Parser/runtime | Reassignment `:=` | Partial | `tests/parser/parser.test.ts`; `tests/runtime/runtime.test.ts`; `tests/compat/pine-arrays.test.ts`; `tests/compat/pine-unsupported.test.ts` | Identifier and array index assignment are supported; member assignment has an explicit planned diagnostic until UDT/reference fields land. |
-| Parser/runtime | Compound assignment | Partial | `tests/parser/parser.test.ts`; `tests/runtime/runtime.test.ts`; `tests/compat/pine-arrays.test.ts`; `tests/compat/pine-unsupported.test.ts` | Identifier and array index compound assignment are supported; member compound assignment has an explicit planned diagnostic until UDT/reference fields land. |
+| Parser/runtime | Reassignment `:=` | Partial | `tests/parser/parser.test.ts`; `tests/runtime/runtime.test.ts`; `tests/compat/pine-arrays.test.ts`; `tests/compat/pine-objects.test.ts` | Identifier, array index, and UDT field assignment are supported. Broader object/drawing member assignment diagnostics remain planned. |
+| Parser/runtime | Compound assignment | Partial | `tests/parser/parser.test.ts`; `tests/runtime/runtime.test.ts`; `tests/compat/pine-arrays.test.ts`; `tests/compat/pine-objects.test.ts` | Identifier, array index, and UDT field compound assignment are supported. Broader type diagnostics remain planned. |
 | Parser/runtime | Tuple destructuring | Supported | `tests/compat/pine-basics.test.ts` | Broader type diagnostics are planned. |
 | Parser/runtime | Wrapped and continued expressions | Partial | `tests/parser/parser.test.ts`; `tests/compat/pine-language.test.ts` | Multiline declarations, calls, arrays, tuple patterns, index access, parenthesized expressions, and line continuations after operators are supported. Leading comparison, logical, multiplicative, `+`, and ternary operators are supported; leading `-` remains planned because it conflicts with negative literals in indented Pine bodies. |
 | Parser/runtime | `if` / `else if` / `else` | Supported | `tests/parser/parser.test.ts`; `tests/compat/pine-language.test.ts` | Nested indentation hardening continues under core semantics. |
@@ -49,7 +49,7 @@ reading the whole runtime.
 | Parser/runtime | User-defined functions | Partial | `tests/parser/parser.test.ts`; `tests/compat/pine-language.test.ts` | Single-line and multiline UDFs, named arguments, default parameters, invalid call-shape diagnostics, branch and loop returns, and recursive-call diagnostics are covered. Deeper nested block parsing and call-site series parity need hardening. |
 | Parser/runtime | Methods, e.g. `arr.push(x)` | Partial | `tests/compat/pine-arrays.test.ts`; `src/runtime/arrays.test.ts` | Non-array methods require UDT/method parity work. |
 | Parser/runtime | `switch` | Partial | `tests/parser/parser.test.ts`; `tests/compat/pine-control-time.test.ts` | Exhaustive type diagnostics are planned. |
-| Parser/runtime | User-defined types | Unsupported | Roadmap Epic 12 | UDT parsing/runtime are planned. |
+| Parser/runtime | User-defined types | Partial | `tests/parser/parser.test.ts`; `src/runtime/engine.test.ts`; `tests/compat/pine-objects.test.ts` | Type declarations, fields, constructors, field access/assignment, reference assignment, and rollback are covered. Type enforcement, methods, copy helpers, and libraries remain planned. |
 
 ### Runtime Semantics
 

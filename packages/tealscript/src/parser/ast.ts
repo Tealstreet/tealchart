@@ -35,6 +35,7 @@ export interface Program extends BaseNode {
 
 export type Statement =
   | IndicatorDeclaration
+  | TypeDeclaration
   | FunctionDeclaration
   | VariableDeclaration
   | AssignmentStatement
@@ -68,6 +69,29 @@ export interface IndicatorDeclaration extends BaseNode {
 }
 
 /**
+ * User-defined type declaration.
+ *
+ * type pivotPoint
+ *     int x
+ *     float y
+ *     string xloc = xloc.bar_time
+ */
+export interface TypeDeclaration extends BaseNode {
+  type: 'TypeDeclaration';
+  name: Identifier;
+  fields: TypeFieldDeclaration[];
+  exported?: boolean;
+}
+
+export interface TypeFieldDeclaration extends BaseNode {
+  type: 'TypeFieldDeclaration';
+  name: Identifier;
+  typeAnnotation?: TypeAnnotation | null;
+  defaultValue?: Expression | null;
+  varip?: boolean;
+}
+
+/**
  * User-defined function declaration.
  *
  * myFunc(x, y) => x + y
@@ -94,7 +118,7 @@ export interface VariableDeclaration extends BaseNode {
   type: 'VariableDeclaration';
   kind: 'var' | 'varip' | 'none'; // 'var' persists, 'varip' persists intrabar, 'none' is regular
   names: VariableDeclarator | TupleDeclarator;
-  typeAnnotation?: TypeAnnotation;
+  typeAnnotation?: TypeAnnotation | null;
   init: Expression;
 }
 
@@ -382,23 +406,38 @@ export interface NaExpression extends BaseNode {
 // Type Annotations
 // ============================================================================
 
-export type TypeAnnotation = MapTypeAnnotation | NonMapTypeAnnotation;
+export type TypeAnnotation =
+  | MapTypeAnnotation
+  | CollectionTypeAnnotation
+  | BuiltinTypeAnnotation
+  | UserTypeAnnotation;
 
 export interface MapTypeAnnotation extends BaseNode {
   type: 'TypeAnnotation';
   baseType: 'map';
-  keyType: PineType;
-  valueType: PineType;
+  keyType: string;
+  valueType: string;
 }
 
-export interface NonMapTypeAnnotation extends BaseNode {
+export interface CollectionTypeAnnotation extends BaseNode {
   type: 'TypeAnnotation';
-  baseType: Exclude<PineType, 'map'>;
+  baseType: 'array' | 'matrix';
+  elementType: string;
   isArray?: boolean;
-  elementType?: PineType;
 }
 
-export type PineType =
+export interface BuiltinTypeAnnotation extends BaseNode {
+  type: 'TypeAnnotation';
+  baseType: BuiltinPineType;
+}
+
+export interface UserTypeAnnotation extends BaseNode {
+  type: 'TypeAnnotation';
+  baseType: 'udt';
+  name: string;
+}
+
+export type BuiltinPineType =
   | 'int'
   | 'float'
   | 'bool'
@@ -407,7 +446,10 @@ export type PineType =
   | 'series'
   | 'simple'
   | 'const'
-  | 'input'
+  | 'input';
+
+export type PineType =
+  | BuiltinPineType
   | 'array'
   | 'matrix'
   | 'map';
@@ -416,7 +458,7 @@ export type PineType =
 // Helper Types
 // ============================================================================
 
-export type AnyNode = Program | Statement | Expression | TypeAnnotation | CallArgument;
+export type AnyNode = Program | Statement | Expression | TypeAnnotation | TypeFieldDeclaration | CallArgument;
 
 /**
  * Type guard functions
@@ -444,6 +486,7 @@ export function isExpression(node: AnyNode): node is Expression {
 export function isStatement(node: AnyNode): node is Statement {
   return [
     'IndicatorDeclaration',
+    'TypeDeclaration',
     'FunctionDeclaration',
     'VariableDeclaration',
     'AssignmentStatement',

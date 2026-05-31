@@ -79,6 +79,15 @@ export {
 } from './maps';
 
 export {
+  createPineUdtObject,
+  isPineUdtObject,
+  getUdtField,
+  setUdtField,
+  copyUdtObject,
+  type PineUdtObject,
+} from './objects';
+
+export {
   ExecutionContext,
   createContext,
   type Bar,
