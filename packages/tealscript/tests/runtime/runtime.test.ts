@@ -11,6 +11,12 @@ import {
   ExecutionContext,
   Scope,
   TealscriptEngine,
+  createPineArray,
+  createPineMatrix,
+  getArrayValue,
+  getMatrixValue,
+  pushArrayValue,
+  setMatrixValue,
   executeScript,
   type Bar,
 } from '../../src/runtime';
@@ -264,6 +270,36 @@ describe('Scope', () => {
     // Regular var is reset
     const entry = scope.getEntry('temp');
     expect(entry?.initialized).toBe(false);
+  });
+
+  it('rolls back in-place matrix mutations', () => {
+    const scope = new Scope();
+    const matrix = createPineMatrix<number>(1, 1, 1);
+    scope.declare('matrix', 'var', matrix);
+    scope.commit(true);
+
+    setMatrixValue(matrix, 0, 0, 9);
+    scope.rollback();
+
+    const restored = scope.get('matrix');
+    expect(getMatrixValue(restored as typeof matrix, 0, 0)).toBe(1);
+    expect(restored).not.toBe(matrix);
+  });
+
+  it('rolls back in-place array mutations', () => {
+    const scope = new Scope();
+    const array = createPineArray<number>();
+    pushArrayValue(array, 1);
+    scope.declare('array', 'var', array);
+    scope.commit(true);
+
+    pushArrayValue(array, 2);
+    scope.rollback();
+
+    const restored = scope.get('array');
+    expect(getArrayValue(restored as typeof array, 0)).toBe(1);
+    expect(getArrayValue(restored as typeof array, 1)).toBeUndefined();
+    expect(restored).not.toBe(array);
   });
 });
 

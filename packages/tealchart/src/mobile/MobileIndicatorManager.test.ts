@@ -147,7 +147,7 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
 
     const instanceId = manager.addTealscriptIndicator({
       id: 'broken-runtime',
-      code: 'indicator("Broken Runtime")\nplot(ta.missing(close))',
+      code: 'indicator("Broken Runtime")\nplot(missingRuntime(close))',
     });
 
     manager.setBars(makeBars(3));
@@ -159,7 +159,7 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
       instanceId,
       expect.objectContaining({
         type: 'runtime',
-        message: expect.stringContaining('ta.missing'),
+        message: expect.stringContaining('missingRuntime'),
       }),
     );
   });
