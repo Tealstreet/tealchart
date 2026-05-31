@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { InMemoryRequestDatafeed, type Bar } from '../../src/runtime';
+import { currencyRateRequestKey, InMemoryRequestDatafeed, type Bar } from '../../src/runtime';
 import { getPlot, runCompatScript } from './fixtures';
 
 const chartBars: Bar[] = [
@@ -80,6 +80,20 @@ function multiSymbolRequestDatafeed(): InMemoryRequestDatafeed {
         basecurrency: 'AAPL',
         timezone: 'America/New_York',
       },
+    },
+  ]);
+}
+
+function currencyRateDatafeed(): InMemoryRequestDatafeed {
+  return new InMemoryRequestDatafeed([], [
+    {
+      family: 'currency_rate',
+      key: currencyRateRequestKey('USD', 'GBP'),
+      points: [
+        { time: 1_700_000_000_000, value: 0.8 },
+        { time: 1_700_000_120_000, value: 0.82 },
+        { time: 1_700_000_240_000, value: 0.85 },
+      ],
     },
   ]);
 }
@@ -422,5 +436,82 @@ plot(array.size(values), title="Count")
     ]);
     expect(ignored.errors).toEqual([]);
     expect(getPlot(ignored, 'Count').values).toEqual([0]);
+  });
+});
+
+describe('Pine request.currency_rate compatibility', () => {
+  it('merges currency rate fixture values by chart time', () => {
+    const result = runCompatScript(`
+indicator("Currency rate request")
+rate = request.currency_rate(currency.USD, "GBP")
+plot(rate, title="USDGBP")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: currencyRateDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'USDGBP').values).toEqual([0.8, 0.8, 0.82, 0.82, 0.85, 0.85]);
+  });
+
+  it('merges currency rate fixture values deterministically when points are unsorted', () => {
+    const datafeed = new InMemoryRequestDatafeed([], [
+      {
+        family: 'currency_rate',
+        key: currencyRateRequestKey('USD', 'GBP'),
+        points: [
+          { time: 1_700_000_240_000, value: 0.85 },
+          { time: 1_700_000_000_000, value: 0.8 },
+          { time: 1_700_000_120_000, value: 0.82 },
+        ],
+      },
+    ]);
+    const result = runCompatScript(`
+indicator("Unsorted currency rate request")
+plot(request.currency_rate("USD", "GBP"), title="USDGBP")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: datafeed },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'USDGBP').values).toEqual([0.8, 0.8, 0.82, 0.82, 0.85, 0.85]);
+  });
+
+  it('returns one for matching currencies without a request datafeed', () => {
+    const result = runCompatScript(`
+indicator("Same currency request")
+plot(request.currency_rate("USD", currency.USD), title="Same")
+`, { bars: [chartBars[0]!] });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Same').values).toEqual([1]);
+  });
+
+  it('supports ignore_invalid_currency for missing conversion fixtures', () => {
+    const result = runCompatScript(`
+indicator("Missing currency request")
+plot(request.currency_rate("USD", "EUR", ignore_invalid_currency=true), title="Missing")
+`, {
+      bars: [chartBars[0]!],
+      engineOptions: { requestDatafeed: currencyRateDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Missing').values).toEqual([null]);
+  });
+
+  it('reports missing conversion fixtures when ignore_invalid_currency is false', () => {
+    const result = runCompatScript(`
+indicator("Missing currency request error")
+plot(request.currency_rate("USD", "EUR"), title="Missing")
+`, {
+      bars: [chartBars[0]!],
+      engineOptions: { requestDatafeed: currencyRateDatafeed() },
+    });
+
+    expect(result.errors.map((error) => error.message)).toEqual([
+      'request.currency_rate failed: No request series context for currency_rate USD\u0000EUR',
+    ]);
   });
 });

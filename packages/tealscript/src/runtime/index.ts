@@ -67,7 +67,9 @@ export {
 
 export {
   InMemoryRequestDatafeed,
+  currencyRateRequestKey,
   requestDatafeedKey,
+  requestSeriesKey,
   type RequestDataContext,
   type RequestDatafeed,
   type RequestDatafeedErrorCode,
@@ -76,4 +78,10 @@ export {
   type RequestDatafeedQuery,
   type RequestDatafeedResult,
   type RequestDatafeedSuccess,
+  type RequestSeriesContext,
+  type RequestSeriesFamily,
+  type RequestSeriesPoint,
+  type RequestSeriesQuery,
+  type RequestSeriesResult,
+  type RequestSeriesSuccess,
 } from './requestDatafeed';
