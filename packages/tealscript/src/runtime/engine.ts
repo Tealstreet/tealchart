@@ -1773,13 +1773,18 @@ export class TealscriptEngine {
   ): { hasResult: boolean; value?: unknown } {
     const iterable = this.evaluateExpression(stmt.iterable);
     let values: unknown[];
+    let keys: unknown[] | null = null;
 
     if (Array.isArray(iterable)) {
       values = iterable;
     } else if (isPineArray(iterable)) {
       values = Array.from({ length: getArraySize(iterable) }, (_, index) => getArrayValue(iterable, index));
+    } else if (isPineMap(iterable)) {
+      const entries = mapEntries(iterable);
+      keys = entries.map(([key]) => key);
+      values = entries.map(([, value]) => value);
     } else {
-      throw new Error('For-in loop expects an array');
+      throw new Error('For-in loop expects an array or map');
     }
 
     const childScope = this.scope.createChild();
@@ -1797,7 +1802,7 @@ export class TealscriptEngine {
 
         const value = values[index];
         if (stmt.indexCounter) {
-          this.scope.declare(stmt.indexCounter.name, 'none', index);
+          this.scope.declare(stmt.indexCounter.name, 'none', keys ? keys[index] : index);
         }
         this.scope.declare(stmt.counter.name, 'none', value);
 

@@ -112,4 +112,24 @@ plot(valueSum, title="Value Sum")
     expect(roundSeries(getPlot(result, 'Key Score').values)).toEqual([111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111]);
     expect(roundSeries(getPlot(result, 'Value Sum').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
   });
+
+  it('runs map loop expressions', () => {
+    const result = runCompatScript(`
+indicator("Map loop expressions")
+m = map.new<string, int>()
+m.put("A", 1)
+m.put("B", 2)
+m.put("C", 3)
+sum = 0
+last = for [key, value] in m
+    sum += value
+    key == "C" ? sum : 0
+plot(last, title="Last Result")
+plot(sum, title="Accumulated")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Last Result').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+    expect(roundSeries(getPlot(result, 'Accumulated').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+  });
 });

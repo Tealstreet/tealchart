@@ -382,13 +382,20 @@ export interface NaExpression extends BaseNode {
 // Type Annotations
 // ============================================================================
 
-export interface TypeAnnotation extends BaseNode {
+export type TypeAnnotation = MapTypeAnnotation | NonMapTypeAnnotation;
+
+export interface MapTypeAnnotation extends BaseNode {
   type: 'TypeAnnotation';
-  baseType: PineType;
+  baseType: 'map';
+  keyType: PineType;
+  valueType: PineType;
+}
+
+export interface NonMapTypeAnnotation extends BaseNode {
+  type: 'TypeAnnotation';
+  baseType: Exclude<PineType, 'map'>;
   isArray?: boolean;
   elementType?: PineType;
-  keyType?: PineType;
-  valueType?: PineType;
 }
 
 export type PineType =
