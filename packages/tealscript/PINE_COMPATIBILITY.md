@@ -7,7 +7,8 @@ Script v5/v6 indicators.
 For the broader full-parity plan, see
 [`PINE_PARITY_EPICS.md`](./PINE_PARITY_EPICS.md).
 
-For the canonical inventory row format and parity PR checklist, see
+For the canonical compatibility matrix, inventory row format, and parity PR
+checklist, see
 [`PINE_COMPATIBILITY_INVENTORY.md`](./PINE_COMPATIBILITY_INVENTORY.md).
 
 Status values:
@@ -32,44 +33,13 @@ For each major compatibility epic, add deterministic golden fixtures for the
 new behavior and, at checkpoint boundaries, add reduced smoke fixtures inspired
 by real Pine examples from official docs or public indicator idioms.
 
-## Syntax
+## Current Matrix
 
-| Pine feature | Status | Notes |
-| --- | --- | --- |
-| `//@version=6` annotation | Supported | Parser defaults to version 6. |
-| `//@version=5` annotation | Partial | Accepted as a numeric version; no version-specific behavior yet. |
-| `indicator(...)` | Partial | Title, `overlay`, and `precision` are used. Other declaration options are parsed but mostly ignored. |
-| `strategy(...)` | Partial | Parses and reports an explicit unsupported runtime diagnostic before strategy execution exists. |
-| `library(...)` / `import` | Unsupported | Out of scope until reusable script modules are designed. |
-| Variable declarations | Supported | Untyped and typed declarations parse. |
-| `var` / `varip` | Partial | Basic persistence exists; function and nested-scope edge cases need hardening. |
-| Reassignment `:=` | Partial | Identifier and array index assignment work. Member assignment is not implemented. |
-| Compound assignment | Partial | Identifier and array index compound assignment work. |
-| Tuple destructuring | Supported | Used by multi-return built-ins such as `ta.macd`. |
-| `if` / `else if` / `else` | Supported | Statement form is implemented. |
-| Ternary `?:` | Supported | Runtime truthiness needs broader Pine compatibility tests. |
-| `for` loops | Partial | Numeric `for = ... to ... by ...` supports ascending and descending steps. Collection `for value in array` and tuple `for [index, value] in array` loops are supported. |
-| `while`, `break`, `continue` | Supported | Loop safety limit exists. |
-| User-defined functions | Partial | Single-line functions, flat multiline functions, local scope, nested calls, and `if` / `else if` / `else` branch expression returns are covered. |
-| Methods, e.g. `arr.push(x)` | Partial | Common array methods lower to the matching `array.*` built-ins. Other object namespaces are not implemented yet. |
-| `switch` | Partial | Expression-form keyed and condition-only switches work, including multiline statement-block arms that return their last expression. |
-| User-defined types | Unsupported | Lower priority than indicators and arrays. |
-
-## Runtime Semantics
-
-| Pine feature | Status | Notes |
-| --- | --- | --- |
-| Bar-by-bar execution | Supported | Scripts execute across loaded bars. |
-| History references `x[n]` | Partial | Series and arrays support indexing; dynamic series offsets and unavailable/future history returning `na` are covered. Broader type diagnostics are still incomplete. |
-| `na` value | Partial | Bare `na` and callable `na(value)` are supported with `NaN` as the internal representation; broader propagation and bool behavior need Pine v6 coverage. |
-| Built-in price series | Supported | `open`, `high`, `low`, `close`, `volume`, `time`, `hl2`, `hlc3`, `ohlc4`, `hlcc4`. |
-| Calendar variables | Partial | `year`, `month`, `weekofyear`, `dayofmonth`, `dayofweek`, `hour`, `minute`, and `second` are derived from the current bar open time. UTC/GMT offset timezones are supported; named exchange timezones still need IANA mapping. |
-| `bar_index` / `last_bar_index` | Supported | Available as runtime identifiers. |
-| `barstate.*` | Partial | Common booleans are exposed, including `isfirst`, `islast`, `ishistory`, `isrealtime`, `isnew`, `isconfirmed`, and `islastconfirmedhistory`. Realtime tick parity still needs browser-worker coverage. |
-| `syminfo.*` | Partial | Static defaults are exposed through common chart-info fields such as `ticker`, `tickerid`, `root`, `mintick`, and `minmove`. Live symbol metadata injection is still planned. |
-| `timeframe.*` | Partial | Static defaults are exposed through common timeframe fields such as `period`, `main_period`, `multiplier`, `isintraday`, and `isdwm`; `timeframe.in_seconds()` exists for supported timeframe strings. Live chart timeframe injection is still planned. |
-| Function-local series state | Partial | Root and function-local `var` values persist, branch expression returns work, and recursive UDF calls are rejected with explicit diagnostics. Nested block parsing and broader call-site series parity still need hardening. |
-| `max_bars_back` | Partial | Declaration metadata is parsed, validated, and exposed on execution results; runtime buffer enforcement/inference is not implemented yet. |
+The canonical row-level compatibility matrix lives in
+[`PINE_COMPATIBILITY_INVENTORY.md`](./PINE_COMPATIBILITY_INVENTORY.md). Keep row
+status, evidence, and remaining gaps there so implementation status has one
+source of truth. The sections below provide narrative notes for implemented
+coverage and known limitations.
 
 ## Scope And Series Audit
 
@@ -96,48 +66,6 @@ The history reference pass covers literal offsets such as `close[1]`, dynamic
 offsets such as `close[length]`, fractional offsets truncated toward zero,
 derived regular-series history, and unavailable or future offsets returning
 `na`/`null` plot values instead of throwing.
-
-## Built-ins
-
-| Namespace | Status | Notes |
-| --- | --- | --- |
-| `math.*` | Partial | Common numeric functions, constants, `math.avg`, precision and mintick rounding, truncation, and angle conversion helpers exist. Pine-specific helpers are still incomplete. |
-| `ta.*` | Partial | Includes SMA, EMA, RSI, MACD, ATR, BB, VWAP, Supertrend, DMI, SAR, pivots, `barssince`, `valuewhen`, `vwma`, `highestbars`, `lowestbars`, `cross`, `range`, and more. |
-| `input.*` | Partial | Generic `input()`, int, float, bool, string, color, source, time, symbol, timeframe, session, and text area exist. Advanced UI/display behavior is incomplete. |
-| Time functions | Partial | Calendar functions, `timestamp()`, `time()`, and `time_close()` cover common numeric, UTC/GMT-offset, and same-timeframe session-filter forms. Higher-timeframe aggregation and named timezone databases are still planned. |
-| `color.*` | Partial | Core named colors, `color.new()`, `color.rgb()`, channel extraction, and `color.from_gradient()` exist. Named color constants still need exact Pine v6 parity. |
-| `str.*` | Partial | Common conversion, number parsing, time formatting, format, search, substring, case, trim, and replace helpers exist. |
-| `array.*` | Partial | Array construction, read/write, search, copy, insertion/removal, numeric summaries, stack/queue helpers, clear, and common method-call syntax are covered. |
-| `runtime.*` | Partial | `runtime.error()` halts execution with the supplied runtime diagnostic. |
-| Global helpers | Partial | `na()`, `nz()`, `fixnan()`, and explicit `float()`, `int()`, `bool()`, and `string()` casts exist. Broader Pine v6 type-system diagnostics are still planned. |
-| `map.*` / `matrix.*` | Planned | Lower priority than arrays. |
-| `request.*` | Planned | Requires Tealchart datafeed design. Start with `request.security()`. |
-
-## Visual Outputs
-
-| Pine feature | Status | Notes |
-| --- | --- | --- |
-| `plot` | Partial | Common line, break-line, step, histogram, marker, column, and area style constants work; full parameter rendering parity is incomplete. |
-| `hline` | Partial | Static horizontal lines work and return handles usable by `fill`. |
-| `fill` | Partial | Accepts `plot()` and `hline()` handles, plus legacy title references; advanced fill parameters are incomplete. |
-| `bgcolor` | Supported | Produces background outputs. |
-| `plotshape`, `plotchar`, `plotarrow` | Partial | Core outputs exist; styling parity is incomplete. |
-| `barcolor` | Supported | Produces per-bar candle color outputs consumed by the main-pane renderer. |
-| `plotbar`, `plotcandle` | Supported | Produce OHLC outputs with per-bar body, wick, and border colors; renderer draws custom bars/candles. |
-| `label.*` | Partial | `label.new()` emits typed runtime drawing outputs. Common setters/getters, `label.copy()`, and `label.delete()` work for runtime object state. Main-pane renderer support exists for basic label boxes. GC limits and full style parity are still planned. |
-| `line.*` | Partial | `line.new()` emits typed runtime drawing outputs. Common coordinate/style setters, coordinate getters, `line.get_price()`, `line.copy()`, and `line.delete()` work for runtime object state. Main-pane renderer support exists for basic line segments and horizontal extension. |
-| `linefill.*` | Partial | `linefill.new()` emits typed runtime drawing outputs referencing two line handles. `linefill.set_color()`, `linefill.get_line1()`, `linefill.get_line2()`, and `linefill.delete()` work for runtime object state. Main-pane renderer support fills between resolved line segments. |
-| `box.*` | Partial | `box.new()` emits typed runtime drawing outputs. Common geometry/style/text setters, coordinate/color/text getters, `box.copy()`, and `box.delete()` work for runtime object state. Main-pane renderer support exists for basic filled rectangles, borders, and text. |
-| `table.*` | Planned | Namespace calls report explicit unsupported runtime diagnostics. Object lifecycle and renderer support are still planned. |
-
-## Alerts, Strategies, And Data
-
-| Pine feature | Status | Notes |
-| --- | --- | --- |
-| `alertcondition` / `alert` | Partial | Runtime collects `alertcondition()` boolean series and direct `alert()` events with frequency constants. UI integration and full Pine alert throttling are not implemented yet. |
-| `strategy.*` | Partial | Namespace calls report explicit unsupported runtime diagnostics; backtest ledger is not implemented. |
-| Multi-timeframe requests | Planned | Needs deterministic gap/lookahead semantics. |
-| Other-symbol requests | Planned | Needs chart datafeed contract and caching strategy. |
 
 ## Roadmaps
 
