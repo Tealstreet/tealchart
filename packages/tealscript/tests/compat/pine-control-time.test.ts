@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { compatibilityBars, getPlot, roundSeries, runCompatScript } from './fixtures';
 
@@ -277,5 +277,23 @@ plot(last_bar_time, title="Last Bar Time")
       1_700_000_660_000,
       1_700_000_660_000,
     ]);
+  });
+
+  it('matches common Pine timenow idioms', () => {
+    const now = Date.UTC(2024, 0, 5, 8, 15);
+    const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(now);
+    try {
+      const result = runCompatScript(`
+indicator("Time now docs smoke")
+plot(timenow >= time ? 1 : 0, title="Now After Bar")
+plot(timenow[1] == timenow ? 1 : 0, title="Stable Historical Now")
+`);
+
+      expect(result.errors).toEqual([]);
+      expect(getPlot(result, 'Now After Bar').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+      expect(getPlot(result, 'Stable Historical Now').values).toEqual([0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    } finally {
+      nowSpy.mockRestore();
+    }
   });
 });

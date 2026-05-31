@@ -134,6 +134,8 @@ export class TealscriptEngine {
     this.userFunctionCallStack = [];
     this.registerUserFunctions(ast);
 
+    this.ctx.setNow(Date.now());
+
     // Load bars into context
     this.ctx.loadBars(bars);
 
@@ -205,6 +207,7 @@ export class TealscriptEngine {
     }
     this.ctx.rollbackBar();
     this.ctx.bar_index = this.ctx.last_bar_index;
+    this.ctx.setNow(Date.now());
 
     // Truncate plot arrays to remove the last bar's appended values
     // so re-execution can re-append them cleanly without duplication
@@ -709,6 +712,8 @@ export class TealscriptEngine {
         return this.ctx.volume.get(0);
       case 'time':
         return this.ctx.time.get(0);
+      case 'timenow':
+        return this.ctx.timenow.get(0);
       case 'time_close':
         return this.getBarCloseTime(this.ctx.time.get(0), this.ctx.timeframe.period);
       case 'last_bar_time':
@@ -1415,6 +1420,8 @@ export class TealscriptEngine {
           return this.naIfMissing(this.ctx.volume.get(offset));
         case 'time':
           return this.naIfMissing(this.ctx.time.get(offset));
+        case 'timenow':
+          return this.naIfMissing(this.ctx.timenow.get(offset));
         case 'time_close': {
           const openTime = this.ctx.time.get(offset);
           return openTime === undefined ? Number.NaN : this.naIfMissing(this.getBarCloseTime(openTime, this.ctx.timeframe.period));

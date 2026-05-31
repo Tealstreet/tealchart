@@ -208,6 +208,7 @@ export class ExecutionContext {
   readonly close: Series<number>;
   readonly volume: Series<number>;
   readonly time: Series<number>;
+  readonly timenow: Series<number>;
 
   // HL2, HLC3, OHLC4 are computed on-demand
 
@@ -220,6 +221,9 @@ export class ExecutionContext {
 
   /** Total number of bars */
   last_bar_index: number = -1;
+
+  /** Current runtime wall-clock timestamp in milliseconds. */
+  now: number = Date.now();
 
   /** Bar state information */
   barstate: BarState = {
@@ -321,6 +325,7 @@ export class ExecutionContext {
     this.close = new Series<number>();
     this.volume = new Series<number>();
     this.time = new Series<number>();
+    this.timenow = new Series<number>();
   }
 
   // =========================================================================
@@ -381,6 +386,7 @@ export class ExecutionContext {
     this.close.reset();
     this.volume.reset();
     this.time.reset();
+    this.timenow.reset();
 
     this.bar_index = -1;
   }
@@ -404,6 +410,7 @@ export class ExecutionContext {
     this.close.advance();
     this.volume.advance();
     this.time.advance();
+    this.timenow.advance();
 
     // Set values for current bar
     this.open.set(bar.open);
@@ -412,6 +419,7 @@ export class ExecutionContext {
     this.close.set(bar.close);
     this.volume.set(bar.volume);
     this.time.set(bar.time);
+    this.timenow.set(this.now);
 
     // Update barstate
     this.barstate.isfirst = this.bar_index === 0;
@@ -433,6 +441,7 @@ export class ExecutionContext {
     this.low.set(bar.low);
     this.close.set(bar.close);
     this.volume.set(bar.volume);
+    this.timenow.set(this.now);
 
     this.barstate.isnew = false;
     this.barstate.isrealtime = true;
@@ -451,6 +460,7 @@ export class ExecutionContext {
     this.close.commit();
     this.volume.commit();
     this.time.commit();
+    this.timenow.commit();
 
     this.barstate.isconfirmed = true;
     this.barstate.islastconfirmedhistory = this.barstate.ishistory && this.barstate.islast;
@@ -466,6 +476,7 @@ export class ExecutionContext {
     this.close.rollback();
     this.volume.rollback();
     this.time.rollback();
+    this.timenow.rollback();
   }
 
   /**
@@ -488,6 +499,13 @@ export class ExecutionContext {
    */
   getCurrentBar(): Bar | undefined {
     return this.bars[this.bar_index];
+  }
+
+  /**
+   * Set the current runtime wall-clock timestamp.
+   */
+  setNow(now: number): void {
+    this.now = now;
   }
 
   // =========================================================================

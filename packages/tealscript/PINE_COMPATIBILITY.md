@@ -244,12 +244,13 @@ by gating plots against a start timestamp, weekday, and minute threshold.
 
 ## Common Session Time Coverage
 
-The session-time pass covers `time_close`, `last_bar_time`, and same-timeframe
-`time()` / `time_close()` calls with optional session strings such as
-`"0930-1600"` or `"0930-1600:23456"`. Matching bars return their open or close
-UNIX timestamp; non-matching bars return `na`. Multi-timeframe aggregation,
-exchange calendars, named timezone databases, and full overnight-session day
-semantics remain planned.
+The session-time pass covers `time_close`, `last_bar_time`, `timenow`, and
+same-timeframe `time()` / `time_close()` calls with optional session strings
+such as `"0930-1600"` or `"0930-1600:23456"`. Matching bars return their open
+or close UNIX timestamp; non-matching bars return `na`. Historical `timenow`
+uses a stable execution timestamp, and realtime updates refresh it per
+re-execution. Multi-timeframe aggregation, exchange calendars, named timezone
+databases, and full overnight-session day semantics remain planned.
 
 ## `max_bars_back` Declaration Coverage
 
