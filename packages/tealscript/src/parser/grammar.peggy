@@ -70,7 +70,7 @@ EmptyStatement
 
 // indicator("title", ...) / strategy("title", ...)
 IndicatorDeclaration
-  = declarationKind:("indicator" / "strategy") _ "(" _ args:ArgumentList _ ")" _ LineTerminator? {
+  = declarationKind:("indicator" / "strategy") _ "(" __ args:ArgumentList __ ")" _ LineTerminator? {
       const result = {
         type: 'IndicatorDeclaration',
         declarationKind,
@@ -91,7 +91,7 @@ IndicatorDeclaration
 
 // User-defined function: f(x, y) => x + y
 FunctionDeclaration
-  = name:Identifier _ "(" _ params:ParameterList? _ ")" _ "=>" _ LineTerminator body:FunctionIndentedBlock {
+  = name:Identifier _ "(" __ params:ParameterList? __ ")" _ "=>" _ LineTerminator body:FunctionIndentedBlock {
       return {
         type: 'FunctionDeclaration',
         name,
@@ -100,7 +100,7 @@ FunctionDeclaration
         loc: loc()
       };
     }
-  / name:Identifier _ "(" _ params:ParameterList? _ ")" _ "=>" _ body:Expression _ LineTerminator? {
+  / name:Identifier _ "(" __ params:ParameterList? __ ")" _ "=>" _ body:Expression _ LineTerminator? {
       return {
         type: 'FunctionDeclaration',
         name,
@@ -111,7 +111,7 @@ FunctionDeclaration
     }
 
 ParameterList
-  = head:Identifier tail:(_ "," _ Identifier)* {
+  = head:Identifier tail:(__ "," __ Identifier)* {
       return [head, ...tail.map(t => t[3])];
     }
 
@@ -146,7 +146,7 @@ SinglePattern
     }
 
 TuplePattern
-  = "[" _ head:Identifier tail:(_ "," _ Identifier)* _ "]" {
+  = "[" __ head:Identifier tail:(__ "," __ Identifier)* __ "]" {
       return {
         type: 'TupleDeclarator',
         names: [head, ...tail.map(t => t[3])],
@@ -639,9 +639,9 @@ NotOperator
 // Postfix: calls, member access, index access
 PostfixExpression
   = head:PrimaryExpression tail:(
-      _ "(" _ args:ArgumentList? _ ")" { return { type: 'call', args: args || [] }; }
+      _ "(" __ args:ArgumentList? __ ")" { return { type: 'call', args: args || [] }; }
     / _ "." _ prop:IdentifierName { return { type: 'member', prop }; }
-    / _ "[" _ index:Expression _ "]" { return { type: 'index', index }; }
+    / _ "[" __ index:Expression __ "]" { return { type: 'index', index }; }
   )* {
       return tail.reduce((obj, op) => {
         if (op.type === 'call') {
@@ -672,7 +672,7 @@ PostfixExpression
 
 // Primary expressions
 PrimaryExpression
-  = "(" _ expr:Expression _ ")" { return expr; }
+  = "(" __ expr:Expression __ ")" { return expr; }
   / ArrayLiteral
   / NaFunctionIdentifier
   / NaLiteral
@@ -689,7 +689,7 @@ NaFunctionIdentifier
 
 // Array literal
 ArrayLiteral
-  = "[" _ head:Expression? tail:(_ "," _ Expression)* _ "]" {
+  = "[" __ head:Expression? tail:(__ "," __ Expression)* __ "]" {
       const elements = head ? [head, ...tail.map(t => t[3])] : [];
       return {
         type: 'ArrayExpression',
@@ -817,12 +817,12 @@ ReservedWord
 // ============================================================================
 
 ArgumentList
-  = head:Argument tail:(_ "," _ Argument)* {
+  = head:Argument tail:(__ "," __ Argument)* {
       return [head, ...tail.map(t => t[3])];
     }
 
 Argument
-  = name:Identifier _ "=" _ value:Expression {
+  = name:Identifier __ "=" __ value:Expression {
       return {
         type: 'CallArgument',
         name,
@@ -856,6 +856,10 @@ MultiLineComment
 // Whitespace (no newlines - those are significant)
 _
   = (WhiteSpace / MultiLineComment)*
+
+// Delimited whitespace allows line continuations inside parentheses/brackets.
+__
+  = (WhiteSpace / MultiLineComment / LineTerminator)*
 
 WhiteSpace
   = [ \t]
