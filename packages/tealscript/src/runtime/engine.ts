@@ -31,6 +31,7 @@ import {
   clearArray,
   concatArray,
   copyArray,
+  covarianceArrayValue,
   createPineArray,
   firstArrayValue,
   getArraySize,
@@ -967,6 +968,7 @@ export class TealscriptEngine {
       case 'max':
       case 'sum':
       case 'avg':
+      case 'covariance':
       case 'clear':
         return `array.${methodName}`;
       default:
@@ -1629,6 +1631,28 @@ export class TealscriptEngine {
     const values = this.updateBuiltinSourceHistory(scope, key, source, length);
     if (values.length < length || values.some((value) => isNaN(value))) return null;
     return values;
+  }
+
+  private getCompletePairedSourceWindows(
+    scope: Scope,
+    leftKey: string,
+    rightKey: string,
+    leftSource: number,
+    rightSource: number,
+    length: number,
+  ): [number[], number[]] | null {
+    if (length < 1 || isNaN(leftSource) || isNaN(rightSource)) return null;
+    const leftValues = this.updateBuiltinSourceHistory(scope, leftKey, leftSource, length);
+    const rightValues = this.updateBuiltinSourceHistory(scope, rightKey, rightSource, length);
+    if (
+      leftValues.length < length
+      || rightValues.length < length
+      || leftValues.some((value) => isNaN(value))
+      || rightValues.some((value) => isNaN(value))
+    ) {
+      return null;
+    }
+    return [leftValues, rightValues];
   }
 
   // ===========================================================================
@@ -2367,6 +2391,11 @@ export class TealscriptEngine {
     this.builtins.set('array.max', (args) => maxArrayValue(copyReadonlyArray(readArray(args[0]))));
     this.builtins.set('array.sum', (args) => sumArrayValue(copyReadonlyArray(readArray(args[0]))));
     this.builtins.set('array.avg', (args) => avgArrayValue(copyReadonlyArray(readArray(args[0]))));
+    this.builtins.set('array.covariance', (args) => covarianceArrayValue(
+      copyReadonlyArray(readArray(args[0])),
+      copyReadonlyArray(readArray(args[1])),
+      args[2] === undefined ? true : this.isTruthy(args[2]),
+    ));
     this.builtins.set('array.set', (args) => {
       setArrayValue(readMutableArray(args[0]), args[1] as number, args[2]);
       return null;
@@ -2749,9 +2778,19 @@ export class TealscriptEngine {
     });
 
     // Change - difference from N bars ago
-    this.builtins.set('ta.change', (args, _namedArgs, ctx) => {
-      const source = args[0] as number;
-      const length = (args[1] ?? 1) as number;
+    this.builtins.set('ta.change', (args, _namedArgs, ctx, scope, callId) => {
+      const rawSource = args[0];
+      const length = Math.max(1, Math.trunc((args[1] ?? 1) as number));
+
+      if (typeof rawSource === 'boolean') {
+        const key = `_change_bool_${callId}`;
+        const history = (scope.get(key) as boolean[] | undefined) ?? [];
+        const previous = history[length - 1];
+        this.setBuiltinState(scope, key, [rawSource, ...history].slice(0, length));
+        return previous === undefined ? false : rawSource !== previous;
+      }
+
+      const source = rawSource as number;
 
       // Get the series for the source value
       const series = this.getSeriesForSource(source, ctx);
@@ -3142,6 +3181,39 @@ export class TealscriptEngine {
 
       const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
       return values.reduce((sum, value) => sum + Math.abs(value - mean), 0) / values.length;
+    });
+
+    this.builtins.set('ta.correlation', (args, _namedArgs, _ctx, scope, callId) => {
+      const sourceA = args[0] as number;
+      const sourceB = args[1] as number;
+      const length = this.normalizeLookbackLength(args[2]);
+      const windows = this.getCompletePairedSourceWindows(
+        scope,
+        `_ta_correlation_source_a_${callId}`,
+        `_ta_correlation_source_b_${callId}`,
+        sourceA,
+        sourceB,
+        length,
+      );
+      if (!windows) return NaN;
+
+      const [leftValues, rightValues] = windows;
+      const leftMean = leftValues.reduce((sum, value) => sum + value, 0) / length;
+      const rightMean = rightValues.reduce((sum, value) => sum + value, 0) / length;
+      let covariance = 0;
+      let leftVariance = 0;
+      let rightVariance = 0;
+
+      for (let index = 0; index < length; index++) {
+        const leftDelta = leftValues[index] - leftMean;
+        const rightDelta = rightValues[index] - rightMean;
+        covariance += leftDelta * rightDelta;
+        leftVariance += leftDelta ** 2;
+        rightVariance += rightDelta ** 2;
+      }
+
+      const denominator = Math.sqrt(leftVariance * rightVariance);
+      return denominator === 0 ? NaN : covariance / denominator;
     });
 
     this.builtins.set('ta.median', (args, _namedArgs, _ctx, scope, callId) => {

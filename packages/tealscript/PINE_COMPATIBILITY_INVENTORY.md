@@ -77,7 +77,7 @@ reading the whole runtime.
 | Built-ins | Time functions | Partial | `tests/compat/pine-builtins.test.ts`; `tests/compat/pine-control-time.test.ts` | Higher-timeframe aggregation and named timezone databases remain. |
 | Built-ins | `color.*` | Partial | `tests/compat/pine-builtins.test.ts`; `tests/compat/pine-visuals.test.ts` | Exact named constants and theme-sensitive behavior remain. |
 | Built-ins | `str.*` | Partial | `tests/compat/pine-builtins.test.ts` | Formatting and Unicode edge cases remain. |
-| Built-ins | `array.*` | Partial | `src/runtime/arrays.test.ts`; `tests/compat/pine-arrays.test.ts` | Full array reference inventory and edge cases remain. |
+| Built-ins | `array.*` | Partial | `src/runtime/arrays.test.ts`; `tests/compat/pine-arrays.test.ts`; `tests/compat/pine-builtins.test.ts` | Full array reference inventory and edge cases remain. |
 | Built-ins | `runtime.*` | Partial | `src/runtime/engine.test.ts`; `tests/compat/pine-language.test.ts` | Only `runtime.error()` is implemented. |
 | Built-ins | Global helpers | Partial | `src/runtime/engine.test.ts`; `tests/compat/pine-language.test.ts` | `na`, `nz`, `fixnan`, and primitive casts are covered for common numeric/source idioms; broader type-system diagnostics and exact color overload parity are planned. |
 | Built-ins | `map.*` | Planned | `tests/compat/pine-unsupported.test.ts`; Roadmap Epic 12 | Namespace emits unsupported diagnostics; runtime/storage/type support is not implemented. |
