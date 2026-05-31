@@ -217,14 +217,15 @@ The runtime can also bind imported libraries from a deterministic host-provided
 registry keyed by Pine import path. This supports `alias.exportedFunction(...)`
 calls and exported user-defined type constructors such as `alias.Type.new(...)`
 in offline tests and chart integrations that pre-resolve library source.
-Non-exported library functions and types remain private to their source module,
-but exported library functions can call private helpers and construct
-library-local UDTs.
+Exported imported methods dispatch on imported UDT instances. Non-exported
+library functions, methods, and types remain private to their source module, but
+exported library functions can call private helpers, construct library-local
+UDTs, and use library-local methods.
 
 Published TradingView lookup is not implemented yet. `import` declarations
 without a matching registry entry emit an explicit unsupported diagnostic until
-Epic 12 adds versioned remote/local resolution, exported method/enum namespace
-binding, and full library diagnostics.
+Epic 12 adds versioned remote/local resolution, enum namespace binding, and full
+library diagnostics.
 
 ## Common `color.*` Coverage
 
