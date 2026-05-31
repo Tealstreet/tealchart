@@ -123,6 +123,8 @@ export class TealscriptEngine {
   private functionScopes: Map<string, Scope>;
   private requestDatafeed?: RequestDatafeed;
   private requestEvaluationCache = new Map<string, RequestEvaluationCacheEntry>();
+  private requestExpressionIds = new WeakMap<Expression, number>();
+  private nextRequestExpressionId = 0;
   private userFunctionCallStack: string[] = [];
   private errors: ExecutionError[] = [];
 
@@ -146,6 +148,8 @@ export class TealscriptEngine {
     this.scope = createRootScope();
     this.functionScopes.clear();
     this.requestEvaluationCache.clear();
+    this.requestExpressionIds = new WeakMap();
+    this.nextRequestExpressionId = 0;
     this.userFunctionCallStack = [];
     this.registerUserFunctions(ast);
 
@@ -1007,7 +1011,8 @@ export class TealscriptEngine {
       throw new Error(`request.security failed: ${result.message}`);
     }
 
-    const cacheKey = this.requestEvaluationCacheKey(callId, symbol, timeframe, calcBarsCount);
+    const expressionId = this.requestExpressionCacheId(expressionArg.value);
+    const cacheKey = this.requestEvaluationCacheKey(callId, expressionId, symbol, timeframe, calcBarsCount);
     let cached = this.requestEvaluationCache.get(cacheKey);
     if (!cached) {
       cached = {
@@ -1070,11 +1075,27 @@ export class TealscriptEngine {
 
   private requestEvaluationCacheKey(
     callId: string,
+    expressionId: string,
     symbol: string,
     timeframe: string,
     calcBarsCount: number | undefined,
   ): string {
-    return `${callId}\u0000${symbol}\u0000${timeframe}\u0000${calcBarsCount ?? ''}`;
+    return `${callId}\u0000${expressionId}\u0000${symbol}\u0000${timeframe}\u0000${calcBarsCount ?? ''}`;
+  }
+
+  private requestExpressionCacheId(expression: Expression): string {
+    if (expression.loc) {
+      return `${expression.loc.start.line}:${expression.loc.start.column}-${expression.loc.end.line}:${expression.loc.end.column}`;
+    }
+
+    const existing = this.requestExpressionIds.get(expression);
+    if (existing !== undefined) {
+      return `expr:${existing}`;
+    }
+
+    const next = this.nextRequestExpressionId++;
+    this.requestExpressionIds.set(expression, next);
+    return `expr:${next}`;
   }
 
   private evaluateRequestExpressionSeries(expression: Expression, requestContext: RequestDataContext): unknown[] {

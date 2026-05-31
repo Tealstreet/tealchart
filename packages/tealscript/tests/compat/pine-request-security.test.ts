@@ -13,9 +13,9 @@ const chartBars: Bar[] = [
 ];
 
 const requestedBars: Bar[] = [
-  { time: 1_700_000_000_000, open: 10, high: 15, low: 9, close: 10, volume: 1_000 },
-  { time: 1_700_000_120_000, open: 20, high: 25, low: 19, close: 20, volume: 1_100 },
-  { time: 1_700_000_240_000, open: 30, high: 35, low: 29, close: 30, volume: 1_200 },
+  { time: 1_700_000_000_000, open: 11, high: 15, low: 9, close: 10, volume: 1_000 },
+  { time: 1_700_000_120_000, open: 21, high: 25, low: 19, close: 20, volume: 1_100 },
+  { time: 1_700_000_240_000, open: 31, high: 35, low: 29, close: 30, volume: 1_200 },
 ];
 
 function requestDatafeed(calcBarsCount?: number): InMemoryRequestDatafeed {
@@ -76,6 +76,22 @@ plot(htfAverage, title="HTF Average")
 
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'HTF Average').values).toEqual([null, null, 15, 15, 25, 25]);
+  });
+
+  it('does not reuse cached values across conditional request expressions', () => {
+    const result = runCompatScript(`
+indicator("HTF conditional requests")
+value = bar_index % 2 == 0 ?
+    request.security(syminfo.tickerid, "2", close, lookahead=barmerge.lookahead_on) :
+    request.security(syminfo.tickerid, "2", open, lookahead=barmerge.lookahead_on)
+plot(value, title="Conditional")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: requestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Conditional').values).toEqual([10, 11, 20, 21, 30, 31]);
   });
 
   it('passes calc_bars_count to the request datafeed', () => {
