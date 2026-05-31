@@ -954,7 +954,7 @@ if barstate.isfirst
 if bar_index == 1
     log.warning("bar={0} close={1:#.0}", bar_index, close)
 if barstate.islast
-    log.error(message="finished")`;
+    log.error(message="finished {0}", close)`;
 
       const ast = parse(script);
       const bars = createBars(3, 100);
@@ -964,7 +964,7 @@ if barstate.islast
       expect(result.logs).toEqual([
         { level: 'info', barIndex: 0, time: bars[0].time, message: 'started at 100.2' },
         { level: 'warning', barIndex: 1, time: bars[1].time, message: 'bar=1 close=100.7' },
-        { level: 'error', barIndex: 2, time: bars[2].time, message: 'finished' },
+        { level: 'error', barIndex: 2, time: bars[2].time, message: 'finished 101.2' },
       ]);
     });
 

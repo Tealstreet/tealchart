@@ -1894,7 +1894,8 @@ export class TealscriptEngine {
   private registerLogBuiltins(): void {
     const addLog = (level: LogLevel, args: unknown[], namedArgs: Map<string, unknown>) => {
       const rawMessage = namedArgs.has('message') ? namedArgs.get('message') : args[0];
-      const message = this.formatLogMessage(rawMessage, args.slice(1));
+      const formatArgs = namedArgs.has('message') ? args : args.slice(1);
+      const message = this.formatLogMessage(rawMessage, formatArgs);
       this.ctx.addLog(level, message);
       return undefined;
     };
