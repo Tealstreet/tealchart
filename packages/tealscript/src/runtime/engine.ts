@@ -371,7 +371,9 @@ export class TealscriptEngine {
     } else if (stmt.left.type === 'IndexExpression') {
       this.executeIndexAssignment(stmt.left, value, stmt.operator);
     } else {
-      throw new Error('Member assignment not yet supported');
+      throw new Error(
+        'Member assignment is not supported yet; UDT and reference field assignment are planned for Pine parity Epic 12',
+      );
     }
   }
 
