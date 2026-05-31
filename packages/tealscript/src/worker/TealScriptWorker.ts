@@ -6,12 +6,14 @@
  */
 
 import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition } from '../runtime/context';
+import { getResultOutput } from './protocol';
 import type {
   ToWorkerMessage,
   FromWorkerMessage,
   ResultMessage,
   ErrorMessage,
   ParseErrorMessage,
+  WorkerOutputMetadata,
 } from './protocol';
 
 /**
@@ -89,6 +91,10 @@ export class TealscriptWorker {
   private isReady = false;
   private readyPromise: Promise<void>;
   private readyResolve: (() => void) | null = null;
+  private requestId = 0;
+  private latestRequestId = 0;
+  private lastSettledRequestId = 0;
+  private generation = 0;
 
   private onResult: ResultCallback | null;
   private onError: ErrorCallback | null;
@@ -181,18 +187,20 @@ export class TealscriptWorker {
    * Handle successful execution result
    */
   private handleResult(message: ResultMessage): void {
-    this.onResult?.({
-      plots: message.plots,
-      drawings: message.drawings,
-      alerts: message.alerts,
-      inputs: message.inputs,
-    });
+    if (this.isStaleMessage(message.output?.metadata)) {
+      return;
+    }
+    this.markRequestSettled(message.output?.metadata);
+    this.onResult?.(getResultOutput(message));
   }
 
   /**
    * Handle runtime error
    */
   private handleError(message: ErrorMessage): void {
+    if (this.isStaleError(message.metadata)) {
+      return;
+    }
     this.onError?.({
       type: 'runtime',
       message: message.message,
@@ -205,6 +213,9 @@ export class TealscriptWorker {
    * Handle parse error
    */
   private handleParseError(message: ParseErrorMessage): void {
+    if (this.isStaleError(message.metadata)) {
+      return;
+    }
     this.onError?.({
       type: 'parse',
       message: message.message,
@@ -221,6 +232,31 @@ export class TealscriptWorker {
       throw new Error('Worker not initialized');
     }
     this.worker.postMessage(message);
+  }
+
+  private nextRequestMetadata(newGeneration = false): WorkerOutputMetadata {
+    if (newGeneration) {
+      this.generation += 1;
+    }
+    this.latestRequestId = ++this.requestId;
+    return {
+      generation: this.generation,
+      requestId: this.latestRequestId,
+    };
+  }
+
+  private isStaleMessage(metadata: WorkerOutputMetadata | undefined): boolean {
+    return typeof metadata?.requestId === 'number' && metadata.requestId < this.latestRequestId;
+  }
+
+  private isStaleError(metadata: WorkerOutputMetadata | undefined): boolean {
+    return typeof metadata?.requestId === 'number' && metadata.requestId <= this.lastSettledRequestId;
+  }
+
+  private markRequestSettled(metadata: WorkerOutputMetadata | undefined): void {
+    if (typeof metadata?.requestId === 'number') {
+      this.lastSettledRequestId = Math.max(this.lastSettledRequestId, metadata.requestId);
+    }
   }
 
   /**
@@ -248,6 +284,7 @@ export class TealscriptWorker {
       script,
       bars,
       inputs,
+      metadata: this.nextRequestMetadata(true),
     });
   }
 
@@ -261,6 +298,7 @@ export class TealscriptWorker {
     this.postMessage({
       type: 'updateBars',
       bars,
+      metadata: this.nextRequestMetadata(true),
     });
   }
 
@@ -274,6 +312,7 @@ export class TealscriptWorker {
     this.postMessage({
       type: 'updateBar',
       bar,
+      metadata: this.nextRequestMetadata(),
     });
   }
 
@@ -287,6 +326,7 @@ export class TealscriptWorker {
     this.postMessage({
       type: 'setInputs',
       inputs,
+      metadata: this.nextRequestMetadata(true),
     });
   }
 

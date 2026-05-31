@@ -230,7 +230,7 @@ export class TealchartWidget {
         },
         onDrawingsUpdated: (drawings) => {
           this._drawings = drawings;
-          this._scheduler.markDirty(DIRTY.PLOTS);
+          this._scheduler.markDirty(DIRTY.DRAWINGS);
         },
         onError: (scriptId, error) => {
           this._logger?.error(LogCategory.Indicators, `Tealscript error in ${scriptId}`, error);
@@ -1039,6 +1039,10 @@ export class TealchartWidget {
     // Plots changed (worker callback with new indicator data)
     if (dirty & DIRTY.PLOTS) {
       this._ui.setPlots(this._plots);
+    }
+
+    // Drawings changed (worker callback with new drawing data)
+    if (dirty & DIRTY.DRAWINGS) {
       this._ui.setDrawings(this._drawings);
     }
 

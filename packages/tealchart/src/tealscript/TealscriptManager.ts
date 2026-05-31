@@ -5,6 +5,7 @@
  * an interface for the chart to push bar data and receive plot outputs.
  */
 
+import { getResultOutput } from '@tealstreet/tealscript';
 import type {
   TealscriptWorker,
   TealscriptWorkerOptions,
@@ -12,9 +13,10 @@ import type {
   WorkerError,
   PlotOutput,
   DrawingOutput,
-  AlertOutput,
   InputDefinition,
   Bar,
+  FromWorkerMessage,
+  WorkerOutputMetadata,
 } from '@tealstreet/tealscript';
 
 /**
@@ -81,6 +83,10 @@ class TealscriptWorkerWrapper {
   private readyPromise: Promise<void>;
   private readyResolve: (() => void) | null = null;
   private options: TealscriptWorkerOptions;
+  private requestId = 0;
+  private latestRequestId = 0;
+  private lastSettledRequestId = 0;
+  private generation = 0;
 
   constructor(worker: Worker, options: TealscriptWorkerOptions) {
     this.worker = worker;
@@ -104,7 +110,7 @@ class TealscriptWorkerWrapper {
     };
   }
 
-  private handleMessage(message: { type: string; [key: string]: unknown }): void {
+  private handleMessage(message: FromWorkerMessage): void {
     switch (message.type) {
       case 'ready':
         this.isReady = true;
@@ -113,16 +119,18 @@ class TealscriptWorkerWrapper {
         break;
 
       case 'result':
-        this.options.onResult?.({
-          plots: message.plots as PlotOutput[],
-          drawings: (message.drawings as DrawingOutput[] | undefined) ?? [],
-          alerts: (message.alerts as AlertOutput[] | undefined) ?? [],
-          inputs: message.inputs as InputDefinition[],
-        });
+        if (this.isStaleMessage(message.output?.metadata)) {
+          return;
+        }
+        this.markRequestSettled(message.output?.metadata);
+        this.options.onResult?.(getResultOutput(message));
         break;
 
       case 'error':
       case 'parseError':
+        if (this.isStaleError(message.metadata)) {
+          return;
+        }
         this.options.onError?.({
           type: message.type === 'parseError' ? 'parse' : 'runtime',
           message: message.message as string,
@@ -151,19 +159,20 @@ class TealscriptWorkerWrapper {
       script,
       bars,
       inputs,
+      metadata: this.nextRequestMetadata(true),
     });
   }
 
   updateBars(bars: Bar[]): void {
-    this.worker.postMessage({ type: 'updateBars', bars });
+    this.worker.postMessage({ type: 'updateBars', bars, metadata: this.nextRequestMetadata(true) });
   }
 
   updateBar(bar: Bar): void {
-    this.worker.postMessage({ type: 'updateBar', bar });
+    this.worker.postMessage({ type: 'updateBar', bar, metadata: this.nextRequestMetadata() });
   }
 
   setInputs(inputs: Record<string, unknown>): void {
-    this.worker.postMessage({ type: 'setInputs', inputs });
+    this.worker.postMessage({ type: 'setInputs', inputs, metadata: this.nextRequestMetadata(true) });
   }
 
   dispose(): void {
@@ -173,6 +182,31 @@ class TealscriptWorkerWrapper {
 
   get ready(): boolean {
     return this.isReady;
+  }
+
+  private nextRequestMetadata(newGeneration = false): WorkerOutputMetadata {
+    if (newGeneration) {
+      this.generation += 1;
+    }
+    this.latestRequestId = ++this.requestId;
+    return {
+      generation: this.generation,
+      requestId: this.latestRequestId,
+    };
+  }
+
+  private isStaleMessage(metadata: WorkerOutputMetadata | undefined): boolean {
+    return typeof metadata?.requestId === 'number' && metadata.requestId < this.latestRequestId;
+  }
+
+  private isStaleError(metadata: WorkerOutputMetadata | undefined): boolean {
+    return typeof metadata?.requestId === 'number' && metadata.requestId <= this.lastSettledRequestId;
+  }
+
+  private markRequestSettled(metadata: WorkerOutputMetadata | undefined): void {
+    if (typeof metadata?.requestId === 'number') {
+      this.lastSettledRequestId = Math.max(this.lastSettledRequestId, metadata.requestId);
+    }
   }
 }
 

@@ -43,6 +43,7 @@ describe('RenderScheduler', () => {
         DIRTY.VIEWPORT,
         DIRTY.BARS,
         DIRTY.PLOTS,
+        DIRTY.DRAWINGS,
         DIRTY.LINES,
         DIRTY.LAYOUT,
         DIRTY.OPTIONS,
