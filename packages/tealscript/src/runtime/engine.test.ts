@@ -189,21 +189,24 @@ strategy.cancel_all()`;
       expect(result.strategy.orders.map((order) => order.status)).toEqual(['cancelled', 'cancelled']);
     });
 
-    it('preserves non-fixed default quantity kind on omitted order qty', () => {
+    it('resolves percent-of-equity default quantity on omitted order qty', () => {
       const script = `//@version=6
 strategy("Orders", default_qty_type=strategy.percent_of_equity, default_qty_value=10)
 strategy.entry("Long", strategy.long)`;
 
-      const result = executeScript(parse(script), createBars(1));
+      const bars = createBars(1);
+      const result = executeScript(parse(script), bars);
+      const expectedQty = (100000 * 0.10) / bars[0].close;
 
       expect(result.errors).toEqual([]);
       expect(result.strategy.orders[0]).toMatchObject({
         id: 'Long',
-        status: 'pending',
-        qty: null,
+        status: 'filled',
         qtyType: 'percent_of_equity',
         qtyValue: 10,
       });
+      expect(result.strategy.orders[0]?.qty).toBeCloseTo(expectedQty);
+      expect(result.strategy.position.size).toBeCloseTo(expectedQty);
     });
 
     it('cancels all pending strategy orders that reuse an id', () => {
@@ -497,6 +500,32 @@ plot(strategy.position_size)`;
         avgPrice: 100.3,
       });
       expect(result.plots[0]?.values).toEqual([0, 0, 1]);
+    });
+
+    it('resolves cash default quantity using limit order price basis', () => {
+      const script = `//@version=6
+strategy("Cash sizing", default_qty_type=strategy.cash, default_qty_value=1000)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, limit=100.3)
+plot(strategy.position_size)`;
+
+      const result = executeScript(parse(script), createBars(3));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders[0]).toMatchObject({
+        id: 'Long',
+        qtyType: 'cash',
+        qtyValue: 1000,
+        status: 'filled',
+        avgFillPrice: 100.3,
+      });
+      expect(result.strategy.orders[0]?.qty).toBeCloseTo(1000 / 100.3);
+      expect(result.strategy.position.size).toBeCloseTo(1000 / 100.3);
+      expect(result.plots[0]?.values.map((value) => (value === null ? null : Math.round(value * 1000) / 1000))).toEqual([
+        0,
+        0,
+        Math.round((1000 / 100.3) * 1000) / 1000,
+      ]);
     });
 
     it('fills strategy.exit brackets and cancels the sibling OCA order', () => {
