@@ -218,8 +218,8 @@ sets `islastconfirmedhistory` on the last historical bar, and switches
 The chart-info pass exposes common static `syminfo.*` and `timeframe.*`
 members used by generated indicators and multi-timeframe script templates,
 including `syminfo.tickerid`, `syminfo.root`, `timeframe.period`,
-`timeframe.main_period`, `timeframe.multiplier`, `timeframe.in_seconds()`, and
-timeframe category flags.
+`timeframe.main_period`, `timeframe.multiplier`, `timeframe.in_seconds()`,
+`timeframe.from_seconds()`, `timeframe.change()`, and timeframe category flags.
 
 ## Common Calendar Coverage
 
