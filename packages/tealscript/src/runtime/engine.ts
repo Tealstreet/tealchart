@@ -1875,6 +1875,12 @@ export class TealscriptEngine {
           const openTime = this.ctx.time.get(offset);
           return openTime === undefined ? Number.NaN : this.naIfMissing(this.getBarCloseTime(openTime, this.ctx.timeframe.period));
         }
+        case 'hl2':
+          return this.naIfMissing(this.getHl2(offset));
+        case 'hlc3':
+          return this.naIfMissing(this.getHlc3(offset));
+        case 'ohlc4':
+          return this.naIfMissing(this.getOhlc4(offset));
       }
 
       if (this.scope.has(name)) {
@@ -1891,6 +1897,29 @@ export class TealscriptEngine {
     }
 
     throw new Error('Index access on non-array/non-series');
+  }
+
+  private getHl2(offset: number): number {
+    const high = this.ctx.high.get(offset);
+    const low = this.ctx.low.get(offset);
+    return high === undefined || low === undefined ? Number.NaN : (high + low) / 2;
+  }
+
+  private getHlc3(offset: number): number {
+    const high = this.ctx.high.get(offset);
+    const low = this.ctx.low.get(offset);
+    const close = this.ctx.close.get(offset);
+    return high === undefined || low === undefined || close === undefined ? Number.NaN : (high + low + close) / 3;
+  }
+
+  private getOhlc4(offset: number): number {
+    const open = this.ctx.open.get(offset);
+    const high = this.ctx.high.get(offset);
+    const low = this.ctx.low.get(offset);
+    const close = this.ctx.close.get(offset);
+    return open === undefined || high === undefined || low === undefined || close === undefined
+      ? Number.NaN
+      : (open + high + low + close) / 4;
   }
 
   private readArrayElement(array: unknown, index: number): unknown {
