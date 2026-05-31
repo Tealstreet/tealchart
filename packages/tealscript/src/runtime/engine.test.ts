@@ -793,6 +793,48 @@ plot(math.round_to_mintick(na), title="Missing")`;
       expect(result.plots.find((plot) => plot.title === 'Missing')?.values).toEqual([null, null]);
     });
 
+    it('generates math.random values in exclusive bounds', () => {
+      const script = `//@version=6
+indicator("Math Random")
+plot(math.random(), title="Default")
+plot(math.random(10, 20), title="Bounded")
+plot(math.random(min=5, max=6, seed=3), title="Named Seeded")
+plot(math.random(1, 1), title="Invalid")`;
+
+      const ast = parse(script);
+      const bars = createBars(5, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Default')?.values.every((value) => value !== null && value > 0 && value < 1)).toBe(true);
+      expect(result.plots.find((plot) => plot.title === 'Bounded')?.values.every((value) => value !== null && value > 10 && value < 20)).toBe(true);
+      expect(result.plots.find((plot) => plot.title === 'Named Seeded')?.values.every((value) => value !== null && value > 5 && value < 6)).toBe(true);
+      expect(result.plots.find((plot) => plot.title === 'Invalid')?.values).toEqual([null, null, null, null, null]);
+    });
+
+    it('makes seeded math.random sequences repeatable', () => {
+      const script = `//@version=6
+indicator("Seeded Random")
+plot(math.random(10, 20, 42), title="Seeded")
+plot(math.random(10, 20, 43), title="Other Seed")`;
+
+      const ast = parse(script);
+      const bars = createBars(6, 100);
+      const first = executeScript(ast, bars);
+      const second = executeScript(ast, bars);
+      const firstSeeded = first.plots.find((plot) => plot.title === 'Seeded')?.values ?? [];
+      const secondSeeded = second.plots.find((plot) => plot.title === 'Seeded')?.values ?? [];
+      const otherSeed = first.plots.find((plot) => plot.title === 'Other Seed')?.values ?? [];
+
+      expect(first.errors).toHaveLength(0);
+      expect(second.errors).toHaveLength(0);
+      expect(firstSeeded).toHaveLength(bars.length);
+      expect(otherSeed).toHaveLength(bars.length);
+      expect(firstSeeded).toEqual(secondSeeded);
+      expect(new Set(firstSeeded).size).toBeGreaterThan(1);
+      expect(otherSeed).not.toEqual(firstSeeded);
+    });
+
     it('halts realtime updateBar execution on runtime.error', () => {
       const script = `//@version=6
 indicator("Realtime Runtime Error")
@@ -1548,6 +1590,31 @@ plot(ta.cmo(close, 3), title="CMO")`;
 
       expect(result.errors).toHaveLength(0);
       expect(result.plots.find((plot) => plot.title === 'CMO')?.values).toEqual([null, null, null, (3 / 7) * 100, (5 / 9) * 100]);
+    });
+
+    it('calculates TSI over double-smoothed source momentum', () => {
+      const script = `//@version=6
+indicator("TA TSI")
+plot(ta.tsi(close, 2, 3), title="TSI")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: 2, open: 101, high: 103, low: 100, close: 102, volume: 100 },
+        { time: 3, open: 102, high: 106, low: 101, close: 105, volume: 100 },
+        { time: 4, open: 105, high: 106, low: 102, close: 103, volume: 100 },
+        { time: 5, open: 103, high: 108, low: 103, close: 107, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'TSI')?.values).toEqual([
+        null,
+        1,
+        1,
+        0.4146341463414634,
+        0.6091205211726384,
+      ]);
     });
 
     it('preserves source history when TA lookback length grows', () => {
