@@ -73,6 +73,25 @@ plot(
     ]);
   });
 
+  it('runs Pine-style operator line continuations', () => {
+    const result = runCompatScript(`
+indicator("Operator Continuation")
+value = 1 +
+    2 *
+    3
+flag = true and
+    not
+        false
+selected = flag ?
+    value :
+    0
+plot(selected, title="Selected")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Selected').values)).toEqual(Array(compatibilityBars.length).fill(7));
+  });
+
   it('runs user-defined function if-branch returns', () => {
     const result = runCompatScript(`
 indicator("UDF if branch")

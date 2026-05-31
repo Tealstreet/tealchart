@@ -536,6 +536,20 @@ arrayValue = [1, 2]
           type: 'ConditionalExpression',
         }));
       });
+
+      it('parses operator line continuations', () => {
+        const ast = parse(`x = close >
+    open ?
+    close -
+        open :
+    not
+        false
+`);
+        const decl = ast.body[0] as VariableDeclaration;
+        expect(decl.init).toEqual(expect.objectContaining({
+          type: 'ConditionalExpression',
+        }));
+      });
     });
 
     describe('Call expressions', () => {
