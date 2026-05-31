@@ -110,17 +110,18 @@ plot(strategy.initial_capital)`;
       expect(result.plots[0]?.values).toEqual([0]);
     });
 
-    it('records an explicit strategy namespace diagnostic', () => {
+    it('requires strategy.exit to specify a supported exit price', () => {
       const script = `//@version=6
-indicator("Strategy call")
-strategy.exit("Long exit")
+strategy("Strategy call")
+strategy.entry("Long", strategy.long)
+strategy.exit("Long exit", "Long")
 plot(close)`;
 
       const ast = parse(script);
       const bars = createBars(1);
       const result = executeScript(ast, bars);
 
-      expect(result.errors[0]?.message).toBe('strategy.* functions are not supported yet: strategy.exit');
+      expect(result.errors[0]?.message).toBe('strategy.exit requires a limit or stop price');
     });
 
     it('records strategy entry and order calls as pending ledger orders', () => {
@@ -347,6 +348,97 @@ plot(strategy.closedtrades)`;
         [2, 0],
         [1, 0],
         [0, 1],
+      ]);
+    });
+
+    it('records strategy.exit limit and stop brackets as pending exit orders', () => {
+      const script = `//@version=6
+strategy("Exit brackets")
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.exit("Bracket", "Long", qty_percent=50, limit=102, stop=99, comment_profit="tp", comment_loss="sl")
+plot(strategy.position_size)
+plot(strategy.opentrades)
+plot(strategy.closedtrades)`;
+
+      const result = executeScript(parse(script), createBars(2));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        direction: order.direction,
+        type: order.type,
+        status: order.status,
+        qty: order.qty,
+        fromEntry: order.fromEntry,
+        limitPrice: order.limitPrice,
+        stopPrice: order.stopPrice,
+        comment: order.comment,
+      }))).toEqual([
+        {
+          id: 'Long',
+          direction: 'long',
+          type: 'market',
+          status: 'filled',
+          qty: 2,
+          fromEntry: undefined,
+          limitPrice: undefined,
+          stopPrice: undefined,
+          comment: undefined,
+        },
+        {
+          id: 'Bracket Limit',
+          direction: 'short',
+          type: 'limit',
+          status: 'pending',
+          qty: 1,
+          fromEntry: 'Long',
+          limitPrice: 102,
+          stopPrice: undefined,
+          comment: 'tp',
+        },
+        {
+          id: 'Bracket Stop',
+          direction: 'short',
+          type: 'stop',
+          status: 'pending',
+          qty: 1,
+          fromEntry: 'Long',
+          limitPrice: undefined,
+          stopPrice: 99,
+          comment: 'sl',
+        },
+      ]);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [2, 2],
+        [1, 1],
+        [0, 0],
+      ]);
+    });
+
+    it('updates an existing pending strategy.exit order with the same id', () => {
+      const script = `//@version=6
+strategy("Exit updates")
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Target", "Long", limit=102)
+if bar_index == 2
+    strategy.exit("Target", "Long", limit=103)
+plot(strategy.opentrades)`;
+
+      const result = executeScript(parse(script), createBars(3));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        limitPrice: order.limitPrice,
+        updatedBarIndex: order.updatedBarIndex,
+      }))).toEqual([
+        { id: 'Long', status: 'filled', limitPrice: undefined, updatedBarIndex: 0 },
+        { id: 'Target', status: 'pending', limitPrice: 103, updatedBarIndex: 2 },
       ]);
     });
   });
