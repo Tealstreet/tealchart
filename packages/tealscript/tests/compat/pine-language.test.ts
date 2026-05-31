@@ -136,6 +136,60 @@ plot(distance(close), title="Distance")
     expect(roundSeries(getPlot(result, 'Distance').values)).toEqual([null, null, 2.333333, -2, -4, -0.666667, 3, 4.666667, 1, 1.666667, 0.333333, 1]);
   });
 
+  it('runs user-defined function default parameters', () => {
+    const result = runCompatScript(`
+indicator("UDF default params")
+average(source=close, length=3, offset=1) => ta.sma(source, length) + offset
+plot(average(), title="Default Average")
+plot(average(offset=2), title="Named Override")
+plot(average(length=2), title="Length Override")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Default Average').values)).toEqual([
+      null,
+      null,
+      105.666667,
+      106,
+      104,
+      101.666667,
+      102,
+      105.333333,
+      108,
+      110.333333,
+      110.666667,
+      112,
+    ]);
+    expect(roundSeries(getPlot(result, 'Named Override').values)).toEqual([
+      null,
+      null,
+      106.666667,
+      107,
+      105,
+      102.666667,
+      103,
+      106.333333,
+      109,
+      111.333333,
+      111.666667,
+      113,
+    ]);
+    expect(roundSeries(getPlot(result, 'Length Override').values)).toEqual([
+      null,
+      104.5,
+      107,
+      106,
+      102,
+      100.5,
+      103,
+      107.5,
+      109.5,
+      110.5,
+      111.5,
+      112,
+    ]);
+  });
+
   it('rejects recursive user-defined function calls with a clear diagnostic', () => {
     const result = runCompatScript(`
 indicator("UDF recursion")

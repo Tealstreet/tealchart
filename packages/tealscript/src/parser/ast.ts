@@ -70,8 +70,12 @@ export interface IndicatorDeclaration extends BaseNode {
 export interface FunctionDeclaration extends BaseNode {
   type: 'FunctionDeclaration';
   name: Identifier;
-  params: Identifier[];
+  params: FunctionParameter[];
   body: Expression | Statement[];
+}
+
+export interface FunctionParameter extends Identifier {
+  defaultValue?: Expression;
 }
 
 /**

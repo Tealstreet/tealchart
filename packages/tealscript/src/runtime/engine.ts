@@ -968,6 +968,20 @@ export class TealscriptEngine {
       throw new Error(`Recursive user function calls are not supported: ${cycle}`);
     }
 
+    const parameterValues = fn.params.map((param, index) => {
+      const paramName = param.name;
+      if (namedArgs.has(paramName)) {
+        return namedArgs.get(paramName);
+      }
+      if (index < args.length) {
+        return args[index];
+      }
+      if (param.defaultValue) {
+        return this.evaluateExpression(param.defaultValue);
+      }
+      return undefined;
+    });
+
     const savedScope = this.scope;
     const functionScope = this.functionScopes.get(functionName) ?? this.scope.createChild();
     this.scope = functionScope;
@@ -976,7 +990,7 @@ export class TealscriptEngine {
     try {
       for (let i = 0; i < fn.params.length; i++) {
         const paramName = fn.params[i].name;
-        const value = namedArgs.has(paramName) ? namedArgs.get(paramName) : args[i];
+        const value = parameterValues[i];
         this.scope.declare(paramName, 'none', value);
       }
 

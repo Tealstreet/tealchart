@@ -210,6 +210,22 @@ arrayValue = [1, 2]
       }));
     });
 
+    it('parses user-defined function default parameters', () => {
+      const ast = parse('spread(source=close, length=3) => source - ta.sma(source, length)\n');
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(fn.params.map((param) => param.name)).toEqual(['source', 'length']);
+      expect(fn.params[0].defaultValue).toEqual(expect.objectContaining({
+        type: 'Identifier',
+        name: 'close',
+      }));
+      expect(fn.params[1].defaultValue).toEqual(expect.objectContaining({
+        type: 'NumericLiteral',
+        value: 3,
+      }));
+    });
+
     it('parses multiline user-defined functions', () => {
       const ast = parse(`spread(source, length) =>
     basis = ta.sma(source, length)
