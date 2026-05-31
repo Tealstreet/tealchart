@@ -220,6 +220,9 @@ members used by generated indicators and multi-timeframe script templates,
 including `syminfo.tickerid`, `syminfo.root`, `timeframe.period`,
 `timeframe.main_period`, `timeframe.multiplier`, `timeframe.in_seconds()`,
 `timeframe.from_seconds()`, `timeframe.change()`, and timeframe category flags.
+`indicator(timeframe=...)` updates the exposed timeframe metadata for
+seconds/minutes/D/W/M and tick declaration values, including
+`timeframe.isticks`.
 
 ## Common Calendar Coverage
 

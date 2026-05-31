@@ -163,6 +163,54 @@ plot(dwm, title="DWM")
     expect(getPlot(result, 'DWM').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   });
 
+  it('matches indicator timeframe metadata idioms', () => {
+    const secondsResult = runCompatScript(`
+indicator("Seconds metadata", timeframe="30S")
+plot(timeframe.isseconds ? 1 : 0, title="Seconds")
+plot(timeframe.isminutes ? 1 : 0, title="Minutes")
+plot(timeframe.isintraday ? 1 : 0, title="Intraday")
+plot(timeframe.multiplier, title="Multiplier")
+plot(timeframe.in_seconds(), title="Seconds Value")
+plot(str.length(timeframe.period), title="Period Length")
+`);
+    const dailyResult = runCompatScript(`
+indicator("Daily metadata", timeframe="1D")
+plot(timeframe.isdaily ? 1 : 0, title="Daily")
+plot(timeframe.isdwm ? 1 : 0, title="DWM")
+plot(timeframe.isintraday ? 1 : 0, title="Intraday")
+plot(timeframe.multiplier, title="Multiplier")
+plot(timeframe.in_seconds(), title="Seconds Value")
+`);
+    const tickResult = runCompatScript(`
+indicator("Tick metadata", timeframe="10T")
+plot(timeframe.isticks ? 1 : 0, title="Ticks")
+plot(timeframe.isintraday ? 1 : 0, title="Intraday")
+plot(timeframe.multiplier, title="Multiplier")
+plot(str.length(timeframe.period), title="Period Length")
+`);
+
+    expect(secondsResult.errors).toEqual([]);
+    expect(getPlot(secondsResult, 'Seconds').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(secondsResult, 'Minutes').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    expect(getPlot(secondsResult, 'Intraday').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(secondsResult, 'Multiplier').values).toEqual([30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30]);
+    expect(getPlot(secondsResult, 'Seconds Value').values).toEqual([30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30]);
+    expect(getPlot(secondsResult, 'Period Length').values).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+
+    expect(dailyResult.errors).toEqual([]);
+    expect(getPlot(dailyResult, 'Daily').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(dailyResult, 'DWM').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(dailyResult, 'Intraday').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    expect(getPlot(dailyResult, 'Multiplier').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(dailyResult, 'Seconds Value').values).toEqual([86400, 86400, 86400, 86400, 86400, 86400, 86400, 86400, 86400, 86400, 86400, 86400]);
+
+    expect(tickResult.errors).toEqual([]);
+    expect(getPlot(tickResult, 'Ticks').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(tickResult, 'Intraday').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(tickResult, 'Multiplier').values).toEqual([10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]);
+    expect(getPlot(tickResult, 'Period Length').values).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+  });
+
   it('matches common Pine calendar filter idioms', () => {
     const result = runCompatScript(`
 indicator("Calendar docs smoke")
