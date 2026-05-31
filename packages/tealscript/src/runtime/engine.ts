@@ -3228,6 +3228,43 @@ export class TealscriptEngine {
     this.builtins.set('strategy.opentrades.commission', (args, namedArgs) => (
       this.strategyOpenTrade(args, namedArgs)?.commission ?? Number.NaN
     ));
+    this.builtins.set('strategy.closedtrades.entry_id', (args, namedArgs) => (
+      this.strategyClosedTrade(args, namedArgs)?.entryOrderId ?? ''
+    ));
+    this.builtins.set('strategy.closedtrades.exit_id', (args, namedArgs) => (
+      this.strategyClosedTrade(args, namedArgs)?.exitOrderId ?? ''
+    ));
+    this.builtins.set('strategy.closedtrades.entry_price', (args, namedArgs) => (
+      this.strategyClosedTrade(args, namedArgs)?.entryPrice ?? Number.NaN
+    ));
+    this.builtins.set('strategy.closedtrades.exit_price', (args, namedArgs) => (
+      this.strategyClosedTrade(args, namedArgs)?.exitPrice ?? Number.NaN
+    ));
+    this.builtins.set('strategy.closedtrades.entry_bar_index', (args, namedArgs) => (
+      this.strategyClosedTrade(args, namedArgs)?.entryBarIndex ?? Number.NaN
+    ));
+    this.builtins.set('strategy.closedtrades.exit_bar_index', (args, namedArgs) => (
+      this.strategyClosedTrade(args, namedArgs)?.exitBarIndex ?? Number.NaN
+    ));
+    this.builtins.set('strategy.closedtrades.entry_time', (args, namedArgs) => (
+      this.strategyClosedTrade(args, namedArgs)?.entryTime ?? Number.NaN
+    ));
+    this.builtins.set('strategy.closedtrades.exit_time', (args, namedArgs) => (
+      this.strategyClosedTrade(args, namedArgs)?.exitTime ?? Number.NaN
+    ));
+    this.builtins.set('strategy.closedtrades.size', (args, namedArgs) => {
+      const trade = this.strategyClosedTrade(args, namedArgs);
+      if (!trade) {
+        return Number.NaN;
+      }
+      return trade.direction === 'long' ? trade.qty : -trade.qty;
+    });
+    this.builtins.set('strategy.closedtrades.profit', (args, namedArgs) => (
+      this.strategyClosedTrade(args, namedArgs)?.profit ?? Number.NaN
+    ));
+    this.builtins.set('strategy.closedtrades.commission', (args, namedArgs) => (
+      this.strategyClosedTrade(args, namedArgs)?.commission ?? Number.NaN
+    ));
     this.builtins.set('strategy.entry', (args, namedArgs) => this.submitStrategyOrderBuiltin(args, namedArgs, true));
     this.builtins.set('strategy.order', (args, namedArgs) => this.submitStrategyOrderBuiltin(args, namedArgs, false));
     this.builtins.set('strategy.exit', (args, namedArgs) => this.submitStrategyExitBuiltin(args, namedArgs));
@@ -3246,6 +3283,10 @@ export class TealscriptEngine {
 
   private strategyOpenTrade(args: unknown[], namedArgs: Map<string, unknown>): StrategyTrade | undefined {
     return this.ctx.strategyLedger.openTrades[this.strategyTradeIndex(args, namedArgs)];
+  }
+
+  private strategyClosedTrade(args: unknown[], namedArgs: Map<string, unknown>): StrategyTrade | undefined {
+    return this.ctx.strategyLedger.closedTrades[this.strategyTradeIndex(args, namedArgs)];
   }
 
   private strategyTradeIndex(args: unknown[], namedArgs: Map<string, unknown>): number {
