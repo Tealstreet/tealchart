@@ -186,6 +186,14 @@ describe('PineArray', () => {
     expect(array.values).toEqual([5, -2, 0, 9, 1]);
   });
 
+  it('sorts indices with missing values at the end', () => {
+    const array = createPineArray<number | string>();
+    [3, Number.NaN, 1, ''].forEach((value) => pushArrayValue(array, value));
+
+    expect(sortIndicesArrayValue(array).values).toEqual([2, 0, 1, 3]);
+    expect(sortIndicesArrayValue(array, 'descending').values).toEqual([1, 3, 0, 2]);
+  });
+
   it('creates slice windows over parent arrays', () => {
     const array = createPineArray<number>();
     [0, 1, 2, 3].forEach((value) => pushArrayValue(array, value));

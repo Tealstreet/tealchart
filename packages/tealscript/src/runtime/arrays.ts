@@ -264,6 +264,14 @@ function sortedNumericArrayValues(array: PineArray): number[] {
 }
 
 function compareArrayValues(left: unknown, right: unknown): number {
+  const leftMissing = left === '' || (typeof left === 'number' && Number.isNaN(left));
+  const rightMissing = right === '' || (typeof right === 'number' && Number.isNaN(right));
+
+  if (leftMissing || rightMissing) {
+    if (leftMissing && rightMissing) return 0;
+    return leftMissing ? 1 : -1;
+  }
+
   if (typeof left === 'number' && typeof right === 'number') {
     return left - right;
   }
