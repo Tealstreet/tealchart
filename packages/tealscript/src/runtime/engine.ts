@@ -3411,22 +3411,41 @@ export class TealscriptEngine {
 
     this.builtins.set('ticker.modify', (args, namedArgs) => {
       const tickerId = this.toStringValue(namedArgs.get('tickerid') ?? args[0] ?? '');
-      const session = this.normalizeTickerSession(namedArgs.get('session') ?? args[1]);
-      const adjustment = this.normalizeTickerModifier(
-        namedArgs.get('adjustment') ?? args[2],
-        'adjustment',
-        ['none', 'splits', 'dividends'],
+      const current = this.parseTickerModifierMap(
+        this.parseTickerModifierParts(tickerId, 'ticker.modify').modifiers,
       );
-      const backadjustment = this.normalizeTickerModifier(
-        namedArgs.get('backadjustment') ?? args[3],
-        'backadjustment',
-        ['on', 'off', 'inherit'],
-      );
-      const settlementAsClose = this.normalizeTickerModifier(
-        namedArgs.get('settlement_as_close') ?? args[4],
-        'settlement_as_close',
-        ['on', 'off', 'inherit'],
-      );
+      const hasSession = namedArgs.has('session') || args[1] !== undefined;
+      const hasAdjustment = namedArgs.has('adjustment') || args[2] !== undefined;
+      const hasBackadjustment = namedArgs.has('backadjustment') || args[3] !== undefined;
+      const hasSettlementAsClose = namedArgs.has('settlement_as_close') || args[4] !== undefined;
+      const session = hasSession
+        ? this.normalizeTickerSession(namedArgs.get('session') ?? args[1])
+        : this.normalizeTickerSession(current.get('session'));
+      const adjustment = hasAdjustment
+        ? this.normalizeTickerModifier(
+          namedArgs.get('adjustment') ?? args[2],
+          'adjustment',
+          ['none', 'splits', 'dividends'],
+        )
+        : this.normalizeTickerModifier(current.get('adjustment'), 'adjustment', ['none', 'splits', 'dividends']);
+      const backadjustment = hasBackadjustment
+        ? this.normalizeTickerModifier(
+          namedArgs.get('backadjustment') ?? args[3],
+          'backadjustment',
+          ['on', 'off', 'inherit'],
+        )
+        : this.normalizeTickerModifier(current.get('backadjustment'), 'backadjustment', ['on', 'off', 'inherit']);
+      const settlementAsClose = hasSettlementAsClose
+        ? this.normalizeTickerModifier(
+          namedArgs.get('settlement_as_close') ?? args[4],
+          'settlement_as_close',
+          ['on', 'off', 'inherit'],
+        )
+        : this.normalizeTickerModifier(
+          current.get('settlement_as_close'),
+          'settlement_as_close',
+          ['on', 'off', 'inherit'],
+        );
       return this.applyTickerModifiers(tickerId, {
         session,
         adjustment,
@@ -3597,6 +3616,22 @@ export class TealscriptEngine {
       base: normalizedBase,
       modifiers: modifiers.filter((modifier) => modifier.trim() !== ''),
     };
+  }
+
+  private parseTickerModifierMap(modifiers: string[]): Map<string, string> {
+    const result = new Map<string, string>();
+    for (const modifier of modifiers) {
+      const separatorIndex = modifier.indexOf('=');
+      if (separatorIndex <= 0) {
+        continue;
+      }
+      const key = modifier.slice(0, separatorIndex).trim();
+      const value = modifier.slice(separatorIndex + 1).trim();
+      if (key !== '') {
+        result.set(key, value);
+      }
+    }
+    return result;
   }
 
   private upsertTickerModifier(

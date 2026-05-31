@@ -45,6 +45,19 @@ function sessionRequestDatafeed(): InMemoryRequestDatafeed {
       },
     },
     {
+      symbol: 'NASDAQ:AAPL|adjustment=splits|backadjustment=on|settlement_as_close=off',
+      timeframe: '1',
+      bars: [
+        { time: 1_700_000_000_000, open: 400, high: 402, low: 399, close: 401, volume: 2_000 },
+        { time: 1_700_000_060_000, open: 401, high: 403, low: 400, close: 402, volume: 2_100 },
+        { time: 1_700_000_120_000, open: 402, high: 404, low: 401, close: 403, volume: 2_200 },
+      ],
+      syminfo: {
+        ticker: 'NASDAQ:AAPL|adjustment=splits|backadjustment=on|settlement_as_close=off',
+        timezone: 'Etc/UTC',
+      },
+    },
+    {
       symbol: 'NASDAQ:MSFT|session=extended|adjustment=dividends',
       timeframe: '1',
       bars: [
@@ -146,10 +159,13 @@ modifiedTicker = ticker.modify(
      backadjustment=backadjustment.on,
      settlement_as_close=settlement_as_close.off)
 standardTicker = ticker.standard(modifiedTicker)
+regularTicker = ticker.modify(modifiedTicker, session=session.regular)
 modifiedClose = request.security(modifiedTicker, "1", close, lookahead=barmerge.lookahead_on)
 standardClose = request.security(standardTicker, "1", close, lookahead=barmerge.lookahead_on)
+regularClose = request.security(regularTicker, "1", close, lookahead=barmerge.lookahead_on)
 plot(modifiedClose, title="Modified Close")
 plot(standardClose, title="Standard Close")
+plot(regularClose, title="Regular Modified Close")
 plot(str.length(modifiedTicker), title="Modified ID Length")
 plot(str.length(standardTicker), title="Standard ID Length")
 `, {
@@ -160,6 +176,7 @@ plot(str.length(standardTicker), title="Standard ID Length")
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Modified Close').values).toEqual([301, 302, 303]);
     expect(getPlot(result, 'Standard Close').values).toEqual([181, 182, 183]);
+    expect(getPlot(result, 'Regular Modified Close').values).toEqual([401, 402, 403]);
     expect(getPlot(result, 'Modified ID Length').values).toEqual([88, 88, 88]);
     expect(getPlot(result, 'Standard ID Length').values).toEqual([11, 11, 11]);
   });
