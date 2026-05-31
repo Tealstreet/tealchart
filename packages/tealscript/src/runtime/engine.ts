@@ -57,7 +57,7 @@ import {
   unshiftArrayValue,
   type PineArray,
 } from './arrays';
-import type { BuiltinRegistry } from './builtins/registry';
+import type { BuiltinFunction, BuiltinRegistry } from './builtins/registry';
 import { registerBoxBuiltins, registerDrawingConstants, registerLabelBuiltins, registerLineBuiltins, registerLineFillBuiltins, type DrawingBuiltinRuntime } from './builtins/drawings';
 import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type PlotOutput, type PlotStyle } from './context';
 import {
@@ -3880,6 +3880,20 @@ export class TealscriptEngine {
       const lower = middle - mult * stdev;
 
       return [middle, upper, lower];
+    });
+
+    // BBW - Bollinger Bands Width
+    this.builtins.set('ta.bbw', (args, _namedArgs, ctx, scope, callId) => {
+      const source = args[0] as number;
+      const length = args[1] as number;
+      const mult = (args[2] ?? 2.0) as number;
+      const bb = this.builtins.get('ta.bb') as BuiltinFunction | undefined;
+      if (!bb) return NaN;
+
+      const [middle, upper, lower] = bb([source, length, mult], new Map(), ctx, scope, callId) as number[];
+      if (middle === 0 || isNaN(middle) || isNaN(upper) || isNaN(lower)) return NaN;
+
+      return (upper - lower) / middle;
     });
 
     // ROC - Rate of Change (percentage)
