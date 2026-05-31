@@ -724,6 +724,21 @@ plot(fixnan(close > open) ? 1 : 0)`;
       expect(fixnanResult.errors[0]?.message).toBe('fixnan() does not accept bool arguments in Pine v6');
     });
 
+    it('keeps fixnan state independent per call site', () => {
+      const script = `//@version=6
+indicator("Fixnan Call Sites")
+sourceA = bar_index == 1 ? na : close
+sourceB = bar_index == 2 ? na : open
+plot(fixnan(sourceA), title="Fixed A")
+plot(fixnan(sourceB), title="Fixed B")`;
+
+      const result = executeScript(parse(script), createBars(4, 100));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Fixed A')?.values).toEqual([100.2, 100.2, 101.2, 101.7]);
+      expect(result.plots.find((plot) => plot.title === 'Fixed B')?.values).toEqual([100, 100.5, 100.5, 101.5]);
+    });
+
     it('parses numeric strings with str.tonumber', () => {
       const script = `//@version=6
 indicator("String To Number")
