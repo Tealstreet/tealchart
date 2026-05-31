@@ -8,7 +8,9 @@ import { parse, validate, TealscriptParseError, formatParseError } from '../../s
 import type {
   Program,
   FunctionDeclaration,
+  ImportDeclaration,
   IndicatorDeclaration,
+  LibraryDeclaration,
   TypeDeclaration,
   VariableDeclaration,
   CallExpression,
@@ -75,6 +77,30 @@ describe('Tealscript Parser', () => {
         type: 'BooleanLiteral',
         value: true,
       }));
+    });
+  });
+
+  describe('Library and import declarations', () => {
+    it('parses library declarations', () => {
+      const ast = parse('library("AllTimeHighLow", true)\n');
+      const declaration = ast.body[0] as LibraryDeclaration;
+      expect(declaration.type).toBe('LibraryDeclaration');
+      expect(declaration.title).toEqual(expect.objectContaining({
+        type: 'StringLiteral',
+        value: 'AllTimeHighLow',
+      }));
+      expect(declaration.overlay).toEqual(expect.objectContaining({
+        type: 'BooleanLiteral',
+        value: true,
+      }));
+    });
+
+    it('parses import declarations with aliases', () => {
+      const ast = parse('import TradingView/PivotLabels/1 as dpl\n');
+      const declaration = ast.body[0] as ImportDeclaration;
+      expect(declaration.type).toBe('ImportDeclaration');
+      expect(declaration.path).toBe('TradingView/PivotLabels/1');
+      expect(declaration.alias.name).toBe('dpl');
     });
   });
 
@@ -308,6 +334,25 @@ arrayValue = [1, 2]
       expect(fn.params[1].defaultValue).toEqual(expect.objectContaining({
         type: 'NumericLiteral',
         value: 3,
+      }));
+    });
+
+    it('parses exported functions with typed and qualified parameters', () => {
+      const ast = parse('export makeTickerid(simple string prefix, string ticker) => prefix + ":" + ticker\n');
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(fn.exported).toBe(true);
+      expect(fn.params[0]).toEqual(expect.objectContaining({
+        name: 'prefix',
+        typeAnnotation: expect.objectContaining({
+          baseType: 'string',
+          qualifier: 'simple',
+        }),
+      }));
+      expect(fn.params[1]).toEqual(expect.objectContaining({
+        name: 'ticker',
+        typeAnnotation: expect.objectContaining({ baseType: 'string' }),
       }));
     });
 

@@ -65,6 +65,8 @@ StatementList
 
 Statement
   = IndicatorDeclaration
+  / LibraryDeclaration
+  / ImportDeclaration
   / TypeDeclaration
   / MethodDeclaration
   / FunctionDeclaration
@@ -101,6 +103,42 @@ IndicatorDeclaration
       }
 
       return result;
+    }
+
+// library("title", ...)
+LibraryDeclaration
+  = "library" !IdentifierPart _ "(" __ args:ArgumentList __ ")" _ LineTerminator? {
+      const result = {
+        type: 'LibraryDeclaration',
+        loc: loc()
+      };
+
+      for (const arg of args) {
+        if (arg.name) {
+          result[arg.name.name] = arg.value;
+        } else if (!result.title) {
+          result.title = arg.value;
+        } else if (!result.overlay) {
+          result.overlay = arg.value;
+        }
+      }
+
+      return result;
+    }
+
+ImportDeclaration
+  = "import" !IdentifierPart _ path:ImportPath _ "as" !IdentifierPart _ alias:Identifier _ LineTerminator? {
+      return {
+        type: 'ImportDeclaration',
+        path,
+        alias,
+        loc: loc()
+      };
+    }
+
+ImportPath
+  = parts:$(IdentifierName ("/" [a-zA-Z0-9_]+)+) {
+      return parts;
     }
 
 // User-defined type:
@@ -184,21 +222,23 @@ MethodDeclaration
 
 // User-defined function: f(x, y) => x + y
 FunctionDeclaration
-  = name:Identifier _ "(" __ params:ParameterList? __ ")" _ "=>" _ LineTerminator body:FunctionIndentedBlock {
+  = exported:("export" _)? name:Identifier _ "(" __ params:ParameterList? __ ")" _ "=>" _ LineTerminator body:FunctionIndentedBlock {
       return {
         type: 'FunctionDeclaration',
         name,
         params: params || [],
         body,
+        exported: !!exported,
         loc: loc()
       };
     }
-  / name:Identifier _ "(" __ params:ParameterList? __ ")" _ "=>" _ body:Expression _ LineTerminator? {
+  / exported:("export" _)? name:Identifier _ "(" __ params:ParameterList? __ ")" _ "=>" _ body:Expression _ LineTerminator? {
       return {
         type: 'FunctionDeclaration',
         name,
         params: params || [],
         body,
+        exported: !!exported,
         loc: loc()
       };
     }
@@ -286,6 +326,12 @@ TuplePattern
     }
 
 TypeAnnotation
+  = qualifier:TypeQualifier _ inner:TypeAnnotationBase {
+      return { ...inner, qualifier };
+    }
+  / TypeAnnotationBase
+
+TypeAnnotationBase
   = "array" !IdentifierPart _ "<" _ elementType:TypeName _ ">" {
       return {
         type: 'TypeAnnotation',
@@ -327,6 +373,12 @@ TypeAnnotation
         loc: loc()
       };
     }
+
+TypeQualifier
+  = "series" !IdentifierPart { return 'series'; }
+  / "simple" !IdentifierPart { return 'simple'; }
+  / "const" !IdentifierPart { return 'const'; }
+  / "input" !IdentifierPart { return 'input'; }
 
 TypeName
   = "series" !IdentifierPart { return 'series'; }

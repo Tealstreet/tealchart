@@ -3,6 +3,26 @@ import { describe, expect, it } from 'vitest';
 import { compatibilityBars, getPlot, roundSeries, runCompatScript } from './fixtures';
 
 describe('Pine compatibility golden harness', () => {
+  it('runs local library-style exported functions', () => {
+    const result = runCompatScript(`
+library("AllTimeHighLow", true)
+export hi(float val = high) =>
+    var float ath = val
+    ath := math.max(ath, val)
+    ath
+export lo(float val = low) =>
+    var float atl = val
+    atl := math.min(atl, val)
+    atl
+plot(hi(), title="ATH")
+plot(lo(), title="ATL")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'ATH').values)).toEqual([103, 106, 108, 109, 109, 109, 109, 110, 111, 112, 114, 114]);
+    expect(roundSeries(getPlot(result, 'ATL').values)).toEqual([99, 99, 99, 99, 98, 96, 96, 96, 96, 96, 96, 96]);
+  });
+
   it('runs single-line user-defined functions', () => {
     const result = runCompatScript(`
 indicator("UDF single line")

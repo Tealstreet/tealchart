@@ -35,6 +35,8 @@ export interface Program extends BaseNode {
 
 export type Statement =
   | IndicatorDeclaration
+  | LibraryDeclaration
+  | ImportDeclaration
   | TypeDeclaration
   | FunctionDeclaration
   | VariableDeclaration
@@ -66,6 +68,25 @@ export interface IndicatorDeclaration extends BaseNode {
   timeframe?: Expression;
   timeframe_gaps?: Expression;
   dynamic_requests?: Expression;
+}
+
+/**
+ * library("name", ...)
+ */
+export interface LibraryDeclaration extends BaseNode {
+  type: 'LibraryDeclaration';
+  title: Expression;
+  overlay?: Expression;
+  dynamic_requests?: Expression;
+}
+
+/**
+ * import userName/LibraryName/1 as alias
+ */
+export interface ImportDeclaration extends BaseNode {
+  type: 'ImportDeclaration';
+  path: string;
+  alias: Identifier;
 }
 
 /**
@@ -418,6 +439,7 @@ export type TypeAnnotation =
 export interface MapTypeAnnotation extends BaseNode {
   type: 'TypeAnnotation';
   baseType: 'map';
+  qualifier?: TypeQualifier;
   keyType: string;
   valueType: string;
 }
@@ -425,6 +447,7 @@ export interface MapTypeAnnotation extends BaseNode {
 export interface CollectionTypeAnnotation extends BaseNode {
   type: 'TypeAnnotation';
   baseType: 'array' | 'matrix';
+  qualifier?: TypeQualifier;
   elementType: string;
   isArray?: boolean;
 }
@@ -432,13 +455,17 @@ export interface CollectionTypeAnnotation extends BaseNode {
 export interface BuiltinTypeAnnotation extends BaseNode {
   type: 'TypeAnnotation';
   baseType: BuiltinPineType;
+  qualifier?: TypeQualifier;
 }
 
 export interface UserTypeAnnotation extends BaseNode {
   type: 'TypeAnnotation';
   baseType: 'udt';
+  qualifier?: TypeQualifier;
   name: string;
 }
+
+export type TypeQualifier = 'const' | 'input' | 'simple' | 'series';
 
 export type BuiltinPineType =
   | 'int'
@@ -489,6 +516,8 @@ export function isExpression(node: AnyNode): node is Expression {
 export function isStatement(node: AnyNode): node is Statement {
   return [
     'IndicatorDeclaration',
+    'LibraryDeclaration',
+    'ImportDeclaration',
     'TypeDeclaration',
     'FunctionDeclaration',
     'VariableDeclaration',
