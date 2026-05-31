@@ -443,7 +443,9 @@ still planned. Fill commissions are applied to fills and debited from strategy
 net profit/equity for `percent`, `cash_per_order`, and `cash_per_contract`
 commission settings. Basic `strategy.opentrades.*` accessors are available for
 open trade entry id, entry price, entry bar/time, signed size, gross open
-profit, and commission.
+profit, and commission. Basic `strategy.closedtrades.*` accessors are available
+for closed trade entry/exit ids, prices, bars/times, signed size, gross profit,
+and commission.
 
 ## Common Alerts Coverage
 
