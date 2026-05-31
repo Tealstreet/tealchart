@@ -272,6 +272,69 @@ plot(strategy.opentrades)`;
       ]);
     });
 
+    it('applies percent strategy commissions to fills and net profit', () => {
+      const script = `//@version=6
+strategy("Percent commission",
+    initial_capital=1000,
+    commission_type=strategy.commission.percent,
+    commission_value=0.1)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.close("Long")
+plot(strategy.netprofit)
+plot(strategy.equity)`;
+
+      const bars = createBars(2);
+      const result = executeScript(parse(script), bars);
+      const entryCommission = bars[0].close * 2 * 0.001;
+      const exitCommission = bars[1].close * 2 * 0.001;
+      const grossProfit = (bars[1].close - bars[0].close) * 2;
+      const netProfit = grossProfit - entryCommission - exitCommission;
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.fills.map((fill) => fill.commission)).toEqual([
+        entryCommission,
+        exitCommission,
+      ]);
+      expect(result.strategy.closedTrades[0]).toMatchObject({
+        profit: grossProfit,
+        commission: entryCommission + exitCommission,
+      });
+      expect(result.strategy.netProfit).toBeCloseTo(netProfit);
+      expect(result.strategy.equity).toBeCloseTo(1000 + netProfit);
+      expect(result.plots[0]?.values[0]).toBeCloseTo(-entryCommission);
+      expect(result.plots[1]?.values[1]).toBeCloseTo(1000 + netProfit);
+    });
+
+    it('applies cash per order and cash per contract strategy commissions', () => {
+      const perOrder = executeScript(parse(`//@version=6
+strategy("Cash per order",
+    initial_capital=1000,
+    commission_type=strategy.commission.cash_per_order,
+    commission_value=2)
+strategy.entry("Long", strategy.long, qty=3)
+plot(strategy.equity)`), createBars(1));
+
+      const perContract = executeScript(parse(`//@version=6
+strategy("Cash per contract",
+    initial_capital=1000,
+    commission_type=strategy.commission.cash_per_contract,
+    commission_value=2)
+strategy.entry("Long", strategy.long, qty=3)
+plot(strategy.equity)`), createBars(1));
+
+      expect(perOrder.errors).toEqual([]);
+      expect(perOrder.strategy.fills[0]?.commission).toBe(2);
+      expect(perOrder.strategy.equity).toBe(998);
+      expect(perOrder.plots[0]?.values).toEqual([998]);
+
+      expect(perContract.errors).toEqual([]);
+      expect(perContract.strategy.fills[0]?.commission).toBe(6);
+      expect(perContract.strategy.equity).toBe(994);
+      expect(perContract.plots[0]?.values).toEqual([994]);
+    });
+
     it('rolls back strategy fills between realtime updateBar calls', () => {
       const script = `//@version=6
 strategy("Realtime strategy")
