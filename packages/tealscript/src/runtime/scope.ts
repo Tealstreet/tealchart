@@ -9,6 +9,8 @@
  */
 
 import { Series, type SeriesSnapshot } from './series';
+import { copyArray, isPineArray } from './arrays';
+import { copyMatrix, isPineMatrix } from './matrices';
 
 /**
  * Variable declaration kind
@@ -305,9 +307,9 @@ export class Scope {
 
     for (const [name, entry] of this.variables) {
       variables.set(name, {
-        value: entry.value,
+        value: cloneSnapshotValue(entry.value),
         initialized: entry.initialized,
-        seriesSnapshot: entry.series?.snapshot(),
+        seriesSnapshot: entry.series ? cloneSeriesSnapshot(entry.series.snapshot()) : undefined,
       });
     }
 
@@ -321,10 +323,10 @@ export class Scope {
     for (const [name, snap] of snapshot.variables) {
       const entry = this.variables.get(name);
       if (entry) {
-        entry.value = snap.value;
+        entry.value = cloneSnapshotValue(snap.value);
         entry.initialized = snap.initialized;
         if (entry.series && snap.seriesSnapshot) {
-          entry.series.restore(snap.seriesSnapshot);
+          entry.series.restore(cloneSeriesSnapshot(snap.seriesSnapshot));
         }
       }
     }
@@ -380,6 +382,23 @@ export class Scope {
     }
     return result;
   }
+}
+
+function cloneSnapshotValue(value: unknown): unknown {
+  if (isPineArray(value)) {
+    return copyArray(value);
+  }
+  return isPineMatrix(value) ? copyMatrix(value) : value;
+}
+
+function cloneSeriesSnapshot(snapshot: SeriesSnapshot<unknown>): SeriesSnapshot<unknown> {
+  return {
+    values: snapshot.values.map(cloneSnapshotValue),
+    currentIndex: snapshot.currentIndex,
+    committedIndex: snapshot.committedIndex,
+    uncommittedValue: cloneSnapshotValue(snapshot.uncommittedValue),
+    hasUncommittedValue: snapshot.hasUncommittedValue,
+  };
 }
 
 /**
