@@ -602,10 +602,11 @@ plot(strategy.closedtrades)`;
         id: order.id,
         direction: order.direction,
         qty: order.qty,
+        filledQty: order.filledQty,
         status: order.status,
       }))).toEqual([
-        { id: 'Long', direction: 'long', qty: 2, status: 'filled' },
-        { id: 'Short', direction: 'short', qty: 3, status: 'filled' },
+        { id: 'Long', direction: 'long', qty: 2, filledQty: 2, status: 'filled' },
+        { id: 'Short', direction: 'short', qty: 1, filledQty: 3, status: 'filled' },
       ]);
       expect(result.strategy.position).toMatchObject({
         direction: 'short',
@@ -618,6 +619,46 @@ plot(strategy.closedtrades)`;
         [2, -1],
         [1, 1],
         [0, 1],
+      ]);
+    });
+
+    it('sizes pending strategy.entry reversals from the live position at fill time', () => {
+      const script = `//@version=6
+strategy("Pending entry reversal")
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.entry("ShortStop", strategy.short, qty=1, stop=100.8)
+    strategy.close("Long", qty=1)
+plot(strategy.position_size)
+plot(strategy.opentrades)
+plot(strategy.closedtrades)`;
+
+      const result = executeScript(parse(script), createBars(3));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        qty: order.qty,
+        requestedQty: order.requestedQty,
+        filledQty: order.filledQty,
+        status: order.status,
+      }))).toEqual([
+        { id: 'Long', qty: 2, requestedQty: 2, filledQty: 2, status: 'filled' },
+        { id: 'ShortStop', qty: 1, requestedQty: 1, filledQty: 2, status: 'filled' },
+        { id: 'Close Long', qty: 1, requestedQty: 1, filledQty: 1, status: 'filled' },
+      ]);
+      expect(result.strategy.position).toMatchObject({
+        direction: 'short',
+        size: -1,
+        avgPrice: 100.8,
+      });
+      expect(result.strategy.closedTrades).toHaveLength(2);
+      expect(result.strategy.openTrades).toHaveLength(1);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [2, 1, 1],
+        [1, 1, 1],
+        [0, 1, 1],
       ]);
     });
 
