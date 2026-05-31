@@ -213,10 +213,14 @@ scripts can execute exported helper functions in the same file, which supports
 deterministic compatibility fixtures based on TradingView's documented
 all-time-high/all-time-low library idiom.
 
-Published-library resolution is not implemented yet. `import` declarations
-therefore parse but emit an explicit unsupported diagnostic at runtime until
-Epic 12 adds a module registry, versioned resolution, exported namespace
-binding, and library diagnostics.
+The runtime can also bind imported libraries from a deterministic host-provided
+registry keyed by Pine import path. This supports `alias.exportedFunction(...)`
+calls in offline tests and chart integrations that pre-resolve library source.
+
+Published TradingView lookup is not implemented yet. `import` declarations
+without a matching registry entry emit an explicit unsupported diagnostic until
+Epic 12 adds versioned remote/local resolution, exported type/method/enum
+namespace binding, and full library diagnostics.
 
 ## Common `color.*` Coverage
 

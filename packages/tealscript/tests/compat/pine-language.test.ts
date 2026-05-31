@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { parse } from '../../src/parser';
+import { InMemoryRequestDatafeed } from '../../src/runtime';
 import { compatibilityBars, getPlot, roundSeries, runCompatScript } from './fixtures';
 
 describe('Pine compatibility golden harness', () => {
@@ -21,6 +23,123 @@ plot(lo(), title="ATL")
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'ATH').values)).toEqual([103, 106, 108, 109, 109, 109, 109, 110, 111, 112, 114, 114]);
     expect(roundSeries(getPlot(result, 'ATL').values)).toEqual([99, 99, 99, 99, 98, 96, 96, 96, 96, 96, 96, 96]);
+  });
+
+  it('runs imported exported library functions from a deterministic registry', () => {
+    const library = parse(`
+library("RangeTools", true)
+export spread(float highValue, float lowValue) => highValue - lowValue
+export mid(float highValue, float lowValue) => (highValue + lowValue) / 2
+hidden(float value) => value * 10
+`);
+
+    const result = runCompatScript(`
+indicator("Imported library")
+import TestUser/RangeTools/1 as rt
+plot(rt.spread(high, low), title="Spread")
+plot(rt.mid(high, low), title="Mid")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/RangeTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Spread').values)).toEqual([4, 5, 4, 7, 6, 5, 6, 7, 5, 5, 5, 5]);
+    expect(roundSeries(getPlot(result, 'Mid').values)).toEqual([101, 103.5, 106, 105.5, 101, 98.5, 102, 106.5, 108.5, 109.5, 111.5, 110.5]);
+  });
+
+  it('reports non-exported imported library functions as unknown', () => {
+    const library = parse(`
+library("RangeTools", true)
+hidden(float value) => value * 10
+`);
+
+    const result = runCompatScript(`
+indicator("Imported library hidden function")
+import TestUser/RangeTools/1 as rt
+plot(rt.hidden(close), title="Hidden")
+`, {
+      bars: [compatibilityBars[0]!],
+      engineOptions: {
+        libraries: new Map([['TestUser/RangeTools/1', library]]),
+      },
+    });
+
+    expect(result.errors.map((error) => error.message)).toEqual(['Unknown library function: rt.hidden']);
+  });
+
+  it('allows exported imported library functions to call library-local helpers', () => {
+    const library = parse(`
+library("RangeTools", true)
+hidden(float value) => value * 10
+export scaledSpread(float highValue, float lowValue) => hidden(highValue - lowValue)
+`);
+
+    const result = runCompatScript(`
+indicator("Imported library helper")
+import TestUser/RangeTools/1 as rt
+plot(rt.scaledSpread(high, low), title="Scaled Spread")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/RangeTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Scaled Spread').values)).toEqual([40, 50, 40, 70, 60, 50, 60, 70, 50, 50, 50, 50]);
+  });
+
+  it('keeps imported library helper context inside request security expressions', () => {
+    const library = parse(`
+library("RangeTools", true)
+hidden(float value) => value * 10
+export requestedClose() => request.security(syminfo.tickerid, "1", hidden(close), lookahead=barmerge.lookahead_on)
+`);
+    const requestDatafeed = new InMemoryRequestDatafeed([
+      {
+        symbol: 'BTCUSDT',
+        timeframe: '1',
+        bars: compatibilityBars,
+        syminfo: { ticker: 'BTCUSDT', timezone: 'Etc/UTC' },
+      },
+    ]);
+
+    const result = runCompatScript(`
+indicator("Imported request helper")
+import TestUser/RangeTools/1 as rt
+plot(rt.requestedClose(), title="Requested Close")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/RangeTools/1', library]]),
+        requestDatafeed,
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Requested Close').values)).toEqual([1020, 1050, 1070, 1030, 990, 1000, 1040, 1090, 1080, 1110, 1100, 1120]);
+  });
+
+  it('uses qualified recursion keys for imported library helpers', () => {
+    const library = parse(`
+library("RangeTools", true)
+hidden(float value) => value * 10
+export scaled(float value) => hidden(value)
+`);
+
+    const result = runCompatScript(`
+indicator("Imported library recursion key")
+import TestUser/RangeTools/1 as rt
+hidden(float value) => rt.scaled(value)
+plot(hidden(close), title="Scaled")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/RangeTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Scaled').values)).toEqual([1020, 1050, 1070, 1030, 990, 1000, 1040, 1090, 1080, 1110, 1100, 1120]);
   });
 
   it('runs single-line user-defined functions', () => {
