@@ -124,6 +124,7 @@ plot(lower, title="KC Lower")
 plot(ta.kcw(close, 3, 1.25), title="KC Width")
 plot(hlUpper, title="HL Upper")
 plot(ta.kcw(close, 3, 1.25, false), title="HL Width")
+plot(ta.bbw(close, 3, 2.0), title="BB Width")
 `);
 
     expect(result.errors).toEqual([]);
@@ -133,6 +134,7 @@ plot(ta.kcw(close, 3, 1.25, false), title="HL Width")
     expect(roundSeries(getPlot(result, 'KC Width').values)).toEqual([0.098039, 0.108696, 0.10095, 0.135054, 0.143077, 0.134109, 0.139249, 0.150233, 0.132801, 0.122514, 0.118054, 0.114793]);
     expect(roundSeries(getPlot(result, 'HL Upper').values)).toEqual(roundSeries(getPlot(result, 'KC Upper').values));
     expect(roundSeries(getPlot(result, 'HL Width').values)).toEqual(roundSeries(getPlot(result, 'KC Width').values));
+    expect(roundSeries(getPlot(result, 'BB Width').values)).toEqual([null, null, 0.078528, 0.062209, 0.126834, 0.067537, 0.085554, 0.141155, 0.080757, 0.04563, 0.045491, 0.029423]);
   });
 
   it('runs Pine linear regression helper idioms', () => {
