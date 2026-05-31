@@ -37,6 +37,7 @@ import {
   shiftArrayValue,
   sliceArray,
   sortArray,
+  sortIndicesArrayValue,
   standardizeArrayValue,
   stdevArrayValue,
   sumArrayValue,
@@ -174,6 +175,15 @@ describe('PineArray', () => {
 
     sortArray(array, 'descending');
     expect(array.values).toEqual(['{ABC}', 'a', 'A', '1', '!']);
+  });
+
+  it('returns sorted indices without mutating the source array', () => {
+    const array = createPineArray<number>();
+    [5, -2, 0, 9, 1].forEach((value) => pushArrayValue(array, value));
+
+    expect(sortIndicesArrayValue(array).values).toEqual([1, 2, 4, 0, 3]);
+    expect(sortIndicesArrayValue(array, 'descending').values).toEqual([3, 0, 4, 2, 1]);
+    expect(array.values).toEqual([5, -2, 0, 9, 1]);
   });
 
   it('creates slice windows over parent arrays', () => {

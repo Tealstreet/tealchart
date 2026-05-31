@@ -228,4 +228,30 @@ plot(values.binary_search_rightmost(3), title="Right Missing")
     expect(roundSeries(getPlot(result, 'Right Found').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
     expect(roundSeries(getPlot(result, 'Right Missing').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
   });
+
+  it('matches documented Pine array sort-index and predicate helpers', () => {
+    const result = runCompatScript(`
+indicator("Array sort index and predicates")
+values = array.from(5, -2, 0, 9, 1)
+indices = values.sort_indices()
+descending = array.sort_indices(values, order.descending)
+truthy = array.from(1, true, 2)
+mixed = array.from(0, false, 1)
+colors = array.new_color(2, color.red)
+plot(array.get(indices, 0), title="Smallest Index")
+plot(array.get(descending, 0), title="Largest Index")
+plot(values.every() ? 1 : 0, title="Every Values")
+plot(truthy.every() ? 1 : 0, title="Every Truthy")
+plot(mixed.some() ? 1 : 0, title="Some Mixed")
+plot(array.size(colors), title="Color Array Size")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Smallest Index').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Largest Index').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Every Values').values)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    expect(roundSeries(getPlot(result, 'Every Truthy').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Some Mixed').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Color Array Size').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+  });
 });

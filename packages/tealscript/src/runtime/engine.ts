@@ -64,6 +64,7 @@ import {
   shiftArrayValue,
   sliceArray,
   sortArray,
+  sortIndicesArrayValue,
   standardizeArrayValue,
   stdevArrayValue,
   sumArrayValue,
@@ -1525,6 +1526,8 @@ export class TealscriptEngine {
       case 'first':
       case 'last':
       case 'includes':
+      case 'every':
+      case 'some':
       case 'indexof':
       case 'lastindexof':
       case 'binary_search':
@@ -1533,6 +1536,7 @@ export class TealscriptEngine {
       case 'insert':
       case 'remove':
       case 'sort':
+      case 'sort_indices':
       case 'reverse':
       case 'join':
       case 'concat':
@@ -3338,6 +3342,13 @@ export class TealscriptEngine {
     this.builtins.set('array.new_int', createArray);
     this.builtins.set('array.new_bool', createArray);
     this.builtins.set('array.new_string', createArray);
+    this.builtins.set('array.new_color', createArray);
+    this.builtins.set('array.new_label', createArray);
+    this.builtins.set('array.new_line', createArray);
+    this.builtins.set('array.new_box', createArray);
+    this.builtins.set('array.new_linefill', createArray);
+    this.builtins.set('array.new_polyline', createArray);
+    this.builtins.set('array.new_table', createArray);
     this.builtins.set('array.from', (args) => {
       const array = createPineArray();
       array.values.push(...args);
@@ -3356,6 +3367,20 @@ export class TealscriptEngine {
     this.builtins.set('array.first', (args) => firstArrayValue(copyReadonlyArray(readArray(args[0]))));
     this.builtins.set('array.last', (args) => lastArrayValue(copyReadonlyArray(readArray(args[0]))));
     this.builtins.set('array.includes', (args) => includesArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
+    this.builtins.set('array.every', (args) => {
+      const array = copyReadonlyArray(readArray(args[0]));
+      for (let index = 0; index < getArraySize(array); index++) {
+        if (!this.isTruthy(getArrayValue(array, index))) return false;
+      }
+      return true;
+    });
+    this.builtins.set('array.some', (args) => {
+      const array = copyReadonlyArray(readArray(args[0]));
+      for (let index = 0; index < getArraySize(array); index++) {
+        if (this.isTruthy(getArrayValue(array, index))) return true;
+      }
+      return false;
+    });
     this.builtins.set('array.indexof', (args) => indexOfArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
     this.builtins.set('array.lastindexof', (args) => lastIndexOfArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
     this.builtins.set('array.binary_search', (args) => binarySearchArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
@@ -3409,6 +3434,10 @@ export class TealscriptEngine {
       sortArray(readMutableArray(args[0]), namedArgs.get('order') ?? args[1]);
       return null;
     });
+    this.builtins.set('array.sort_indices', (args, namedArgs) => sortIndicesArrayValue(
+      copyReadonlyArray(readArray(args[0])),
+      namedArgs.get('order') ?? args[1],
+    ));
     this.builtins.set('array.reverse', (args) => {
       reverseArray(readMutableArray(args[0]));
       return null;

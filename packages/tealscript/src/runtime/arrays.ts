@@ -198,6 +198,19 @@ export function sortArray(array: PineArray, order: unknown = 'ascending'): void 
   values.forEach((value, index) => setArrayValue(array, index, value));
 }
 
+export function sortIndicesArrayValue(array: PineArray, order: unknown = 'ascending'): PineArray<number> {
+  const descending = order === 'descending';
+  const indices = getArrayValues(array).map((_value, index) => index);
+  indices.sort((leftIndex, rightIndex) => {
+    const result = compareArrayValues(getArrayValue(array, leftIndex), getArrayValue(array, rightIndex));
+    return descending ? -result : result;
+  });
+
+  const result = createPineArray<number>();
+  indices.forEach((index) => pushArrayValue(result, index));
+  return result;
+}
+
 function compareStrings(left: string, right: string): number {
   if (left < right) return -1;
   if (left > right) return 1;
