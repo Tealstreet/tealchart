@@ -680,7 +680,7 @@ SwitchCase
 
 // Ternary: condition ? true : false
 ConditionalExpression
-  = test:OrExpression _ "?" _ consequent:Expression _ ":" _ alternate:Expression {
+  = test:OrExpression _ "?" OpSpace consequent:Expression _ ":" OpSpace alternate:Expression {
       return {
         type: 'ConditionalExpression',
         test,
@@ -693,13 +693,13 @@ ConditionalExpression
 
 // Logical OR
 OrExpression
-  = head:AndExpression tail:(_ OrOperator _ AndExpression)* {
+  = head:AndExpression tail:(_ OrOperator OpSpace AndExpression)* {
       return buildBinaryExpr(head, tail);
     }
 
 // Logical AND
 AndExpression
-  = head:ComparisonExpression tail:(_ AndOperator _ ComparisonExpression)* {
+  = head:ComparisonExpression tail:(_ AndOperator OpSpace ComparisonExpression)* {
       return buildBinaryExpr(head, tail);
     }
 
@@ -711,7 +711,7 @@ AndOperator
 
 // Comparison: ==, !=, <, >, <=, >=
 ComparisonExpression
-  = head:AdditiveExpression tail:(_ ComparisonOperator _ AdditiveExpression)* {
+  = head:AdditiveExpression tail:(_ ComparisonOperator OpSpace AdditiveExpression)* {
       return buildBinaryExpr(head, tail);
     }
 
@@ -720,19 +720,19 @@ ComparisonOperator
 
 // Addition/Subtraction
 AdditiveExpression
-  = head:MultiplicativeExpression tail:(_ ("+" / "-") _ MultiplicativeExpression)* {
+  = head:MultiplicativeExpression tail:(_ ("+" / "-") OpSpace MultiplicativeExpression)* {
       return buildBinaryExpr(head, tail);
     }
 
 // Multiplication/Division/Modulo
 MultiplicativeExpression
-  = head:UnaryExpression tail:(_ ("*" / "/" / "%") _ UnaryExpression)* {
+  = head:UnaryExpression tail:(_ ("*" / "/" / "%") OpSpace UnaryExpression)* {
       return buildBinaryExpr(head, tail);
     }
 
 // Unary: -x, +x, not x
 UnaryExpression
-  = op:("-" / "+" / NotOperator) _ arg:UnaryExpression {
+  = op:("-" / "+" / NotOperator) OpSpace arg:UnaryExpression {
       return {
         type: 'UnaryExpression',
         operator: op,
@@ -969,6 +969,11 @@ _
 
 // Delimited whitespace allows line continuations inside parentheses/brackets.
 __
+  = (WhiteSpace / MultiLineComment / LineTerminator)*
+
+// Operator whitespace allows Pine line continuations around operators without
+// making newlines generally insignificant between statements.
+OpSpace
   = (WhiteSpace / MultiLineComment / LineTerminator)*
 
 WhiteSpace
