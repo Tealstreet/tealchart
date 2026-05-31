@@ -539,6 +539,66 @@ plot(strategy.position_size)`;
       ]);
     });
 
+    it('activates and fills long stop-limit entry orders on later bars', () => {
+      const script = `//@version=6
+strategy("Long stop-limit")
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1, stop=101, limit=100.7)
+plot(strategy.position_size)`;
+
+      const result = executeScript(parse(script), createBars(4));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders[0]).toMatchObject({
+        id: 'Long',
+        type: 'stop_limit',
+        status: 'filled',
+        stopLimitActivated: true,
+        stopLimitActivatedBarIndex: 1,
+        avgFillPrice: 100.7,
+        updatedBarIndex: 2,
+      });
+      expect(result.strategy.fills.map(({ orderId, price, barIndex }) => ({ orderId, price, barIndex }))).toEqual([
+        { orderId: 'Long', price: 100.7, barIndex: 2 },
+      ]);
+      expect(result.strategy.position).toMatchObject({
+        direction: 'long',
+        size: 1,
+        avgPrice: 100.7,
+      });
+      expect(result.plots[0]?.values).toEqual([0, 0, 0, 1]);
+    });
+
+    it('activates and fills short stop-limit strategy.order calls on later bars', () => {
+      const script = `//@version=6
+strategy("Short stop-limit")
+if bar_index == 0
+    strategy.order("Short", strategy.short, qty=1, stop=100.2, limit=101)
+plot(strategy.position_size)`;
+
+      const result = executeScript(parse(script), createBars(4));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders[0]).toMatchObject({
+        id: 'Short',
+        type: 'stop_limit',
+        status: 'filled',
+        stopLimitActivated: true,
+        stopLimitActivatedBarIndex: 1,
+        avgFillPrice: 101,
+        updatedBarIndex: 2,
+      });
+      expect(result.strategy.fills.map(({ orderId, price, barIndex }) => ({ orderId, price, barIndex }))).toEqual([
+        { orderId: 'Short', price: 101, barIndex: 2 },
+      ]);
+      expect(result.strategy.position).toMatchObject({
+        direction: 'short',
+        size: -1,
+        avgPrice: 101,
+      });
+      expect(result.plots[0]?.values).toEqual([0, 0, 0, -1]);
+    });
+
     it('blocks same-direction strategy.entry calls above the pyramiding limit', () => {
       const script = `//@version=6
 strategy("Pyramiding default")

@@ -432,12 +432,14 @@ fill immediately at the current close and update position size and average
 price. Basic open/closed trade counters are maintained as fixed-size market fills
 change exposure. Price-based `strategy.exit()` limit/stop brackets are recorded
 as pending exit orders. Pending limit/stop orders fill on later bars when OHLC
-crosses their trigger price, and bracket siblings cancel through OCA. Fixed,
-cash, and percent-of-equity sizing resolve to concrete order quantities at
-submission time, and `strategy.entry()` enforces same-direction pyramiding
-limits and expands opposite-direction entry transactions to reverse positions.
-Trailing stops, same-bar intrabar path modeling, and full broker-emulator
-semantics are still planned.
+crosses their trigger price, and bracket siblings cancel through OCA.
+`strategy.entry()` and `strategy.order()` stop-limit orders activate after their
+stop price is crossed, then fill as limit orders on later bars. Fixed, cash, and
+percent-of-equity sizing resolve to concrete order quantities at submission
+time, and `strategy.entry()` enforces same-direction pyramiding limits and
+expands opposite-direction entry transactions to reverse positions. Trailing
+stops, same-bar intrabar path modeling, and full broker-emulator semantics are
+still planned.
 
 ## Common Alerts Coverage
 
