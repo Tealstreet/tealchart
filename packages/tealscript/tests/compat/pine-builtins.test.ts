@@ -353,6 +353,34 @@ plot(mode == "EMA", title="Mode")
     expect(getPlot(result, 'Mode').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
 
+  it('runs price input and active metadata idioms', () => {
+    const result = runCompatScript(`
+indicator("Price input")
+enabled = input.bool(true, "Enabled")
+level = input.price(101.5, "Level", active=enabled, tooltip="Drag level")
+plot(level, title="Level")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.inputs).toEqual([
+      {
+        id: 'input_Enabled',
+        type: 'bool',
+        title: 'Enabled',
+        defval: true,
+      },
+      {
+        id: 'input_Level',
+        type: 'price',
+        title: 'Level',
+        defval: 101.5,
+        tooltip: 'Drag level',
+        active: true,
+      },
+    ]);
+    expect(getPlot(result, 'Level').values).toEqual([101.5, 101.5, 101.5, 101.5, 101.5, 101.5, 101.5, 101.5, 101.5, 101.5, 101.5, 101.5]);
+  });
+
   it('matches documented Pine input helper idioms', () => {
     const result = runCompatScript(`
 indicator("Input docs smoke")

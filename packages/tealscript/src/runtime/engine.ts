@@ -2321,7 +2321,7 @@ export class TealscriptEngine {
         if (ctx.bar_index === 0) {
           ctx.registerInput({
             id,
-            type: type as 'int' | 'float' | 'bool' | 'string' | 'source' | 'color' | 'time' | 'timeframe' | 'symbol' | 'session' | 'text_area',
+            type: type as 'int' | 'float' | 'bool' | 'string' | 'source' | 'color' | 'price' | 'time' | 'timeframe' | 'symbol' | 'session' | 'text_area',
             title,
             defval,
             minval: namedArgs.get('minval') as number | undefined,
@@ -2333,6 +2333,7 @@ export class TealscriptEngine {
             inline: namedArgs.get('inline') as string | undefined,
             confirm: namedArgs.get('confirm') as boolean | undefined,
             display: namedArgs.get('display'),
+            active: namedArgs.get('active'),
           });
         }
 
@@ -2349,6 +2350,7 @@ export class TealscriptEngine {
     this.builtins.set('input.bool', createInputFunc('bool'));
     this.builtins.set('input.string', createInputFunc('string'));
     this.builtins.set('input.color', createInputFunc('color'));
+    this.builtins.set('input.price', createInputFunc('price'));
     this.builtins.set('input.time', createInputFunc('time'));
     this.builtins.set('input.timeframe', createInputFunc('timeframe'));
     this.builtins.set('input.symbol', createInputFunc('symbol'));

@@ -167,7 +167,7 @@ export interface AlertOutput {
  */
 export interface InputDefinition {
   id: string;
-  type: 'int' | 'float' | 'bool' | 'string' | 'source' | 'color' | 'time' | 'timeframe' | 'symbol' | 'session' | 'text_area';
+  type: 'int' | 'float' | 'bool' | 'string' | 'source' | 'color' | 'price' | 'time' | 'timeframe' | 'symbol' | 'session' | 'text_area';
   title: string;
   defval: unknown;
   minval?: number;
@@ -179,6 +179,7 @@ export interface InputDefinition {
   inline?: string;
   confirm?: boolean;
   display?: unknown;
+  active?: unknown;
 }
 
 /**
