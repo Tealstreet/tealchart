@@ -157,6 +157,7 @@ import {
   fillStrategyMarketOrder,
   submitStrategyOrder,
   type StrategyDirection,
+  type StrategyFill,
   type StrategyLedger,
   type StrategyLedgerSettings,
   type StrategyOcaType,
@@ -3348,13 +3349,14 @@ export class TealscriptEngine {
       barIndex: this.ctx.bar_index,
       time: this.ctx.time.get(0) ?? 0,
     });
-    fillStrategyMarketOrder(
+    const fill = fillStrategyMarketOrder(
       this.ctx.strategyLedger,
       order,
       this.ctx.close.get(0) ?? Number.NaN,
       this.ctx.bar_index,
       this.ctx.time.get(0) ?? 0,
     );
+    this.emitStrategyFillAlerts(fill ? [fill] : []);
 
     return undefined;
   }
@@ -3389,13 +3391,23 @@ export class TealscriptEngine {
   }
 
   private fillPendingStrategyOrdersForCurrentBar(): void {
-    fillPendingStrategyOrders(
+    const fills = fillPendingStrategyOrders(
       this.ctx.strategyLedger,
       this.ctx.high.get(0) ?? Number.NaN,
       this.ctx.low.get(0) ?? Number.NaN,
       this.ctx.bar_index,
       this.ctx.time.get(0) ?? 0,
     );
+    this.emitStrategyFillAlerts(fills);
+  }
+
+  private emitStrategyFillAlerts(fills: StrategyFill[]): void {
+    for (const fill of fills) {
+      if (fill.alertMessage === undefined || fill.alertMessage === '') {
+        continue;
+      }
+      this.ctx.addAlertEvent('strategy_order_fills', fill.alertMessage, 'all');
+    }
   }
 
   private submitStrategyExitBuiltin(args: unknown[], namedArgs: Map<string, unknown>): undefined {
@@ -3719,13 +3731,14 @@ export class TealscriptEngine {
       barIndex: this.ctx.bar_index,
       time: this.ctx.time.get(0) ?? 0,
     });
-    fillStrategyMarketOrder(
+    const fill = fillStrategyMarketOrder(
       this.ctx.strategyLedger,
       order,
       this.ctx.close.get(0) ?? Number.NaN,
       this.ctx.bar_index,
       this.ctx.time.get(0) ?? 0,
     );
+    this.emitStrategyFillAlerts(fill ? [fill] : []);
   }
 
   private normalizeStrategyDirection(value: unknown): StrategyDirection {

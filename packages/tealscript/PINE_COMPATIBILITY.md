@@ -449,7 +449,8 @@ signed size, gross open profit, and commission. Basic
 `strategy.closedtrades.*` accessors are available for closed trade entry/exit
 ids, prices, bars/times, signed size, gross profit, and commission.
 Closed-trade outcome counters `strategy.wintrades`, `strategy.losstrades`, and
-`strategy.eventrades` are available.
+`strategy.eventrades` are available. Filled strategy orders with
+`alert_message` emit `strategy_order_fills` alert events.
 
 ## Common Alerts Coverage
 

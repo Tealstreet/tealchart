@@ -521,6 +521,34 @@ plot(strategy.netprofit)`;
       ]);
     });
 
+    it('emits strategy order-fill alerts from alert_message fields', () => {
+      const script = `//@version=6
+strategy("Fill alerts")
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1, alert_message="entry filled")
+if bar_index == 1
+    strategy.close("Long", alert_message="close filled")
+plot(strategy.closedtrades)`;
+
+      const result = executeScript(parse(script), createBars(2));
+      const fillAlerts = result.alerts.find((alert) => alert.id === 'strategy_order_fills');
+
+      expect(result.errors).toEqual([]);
+      expect(fillAlerts).toMatchObject({
+        id: 'strategy_order_fills',
+        type: 'alert',
+        title: 'alert',
+      });
+      expect(fillAlerts?.events.map((event) => ({
+        barIndex: event.barIndex,
+        message: event.message,
+        frequency: event.frequency,
+      }))).toEqual([
+        { barIndex: 0, message: 'entry filled', frequency: 'all' },
+        { barIndex: 1, message: 'close filled', frequency: 'all' },
+      ]);
+    });
+
     it('closes the full net position with strategy.close_all', () => {
       const script = `//@version=6
 strategy("Close all")
