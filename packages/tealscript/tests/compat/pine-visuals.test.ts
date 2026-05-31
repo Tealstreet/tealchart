@@ -332,4 +332,22 @@ plot(low, title="Lower")
     expect(fillPlot.plot2Id).toBe('plot_Lower');
     expect(fillPlot.color).toEqual(Array(compatibilityBars.length).fill('#F4433626'));
   });
+
+  it('keeps unnamed fill calls distinct', () => {
+    const result = runCompatScript(`
+indicator("Unnamed fill smoke", overlay=true)
+upper = plot(high)
+middle = plot(close)
+lower = plot(low)
+fill(upper, middle, color=color.new(color.green, 80))
+fill(middle, lower, color=color.new(color.red, 80))
+`);
+
+    expect(result.errors).toEqual([]);
+    const fills = result.plots.filter((plot) => plot.type === 'fill');
+    expect(fills).toHaveLength(2);
+    expect(fills[0]?.id).not.toBe(fills[1]?.id);
+    expect(fills.map((plot) => plot.plot1Id)).toEqual(['plot_untitled_0', 'plot_untitled_1']);
+    expect(fills.map((plot) => plot.plot2Id)).toEqual(['plot_untitled_1', 'plot_untitled_2']);
+  });
 });

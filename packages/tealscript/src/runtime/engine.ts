@@ -2885,17 +2885,18 @@ export class TealscriptEngine {
     // =========================================================================
     // fill - Fill area between two plots
     // =========================================================================
-    this.builtins.set('fill', (args, namedArgs, ctx) => {
+    this.builtins.set('fill', (args, namedArgs, ctx, _scope, callId) => {
       const plot1Id = this.resolveFillPlotId(args[0], ctx);
       const plot2Id = this.resolveFillPlotId(args[1], ctx);
       const color = this.toPlotColor(this.getCallArg(args, namedArgs, 2, 'color', 'rgba(33, 150, 243, 0.2)'));
+      const hasExplicitTitle = namedArgs.has('title') || args[3] !== undefined;
       const title = (this.getCallArg(args, namedArgs, 3, 'title', 'Fill')) as string;
       const editable = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 4, 'editable'));
       const showLast = this.toOptionalInteger(this.getCallArg(args, namedArgs, 5, 'show_last'));
       const fillgaps = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 6, 'fillgaps'));
       const display = this.toOptionalInteger(this.getCallArg(args, namedArgs, 7, 'display'));
 
-      const id = `fill_${title}`;
+      const id = hasExplicitTitle ? `fill_${title}` : `fill_${callId}`;
 
       if (ctx.bar_index === 0) {
         ctx.registerPlot({
