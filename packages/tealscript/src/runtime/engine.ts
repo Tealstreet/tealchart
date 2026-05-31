@@ -1393,8 +1393,9 @@ export class TealscriptEngine {
       return Number.NaN;
     }
 
+    const sortedPoints = [...points].sort((left, right) => left.time - right.time);
     let value = Number.NaN;
-    for (const point of points) {
+    for (const point of sortedPoints) {
       if (point.time <= chartTime) {
         value = point.value;
       } else {

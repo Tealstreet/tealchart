@@ -454,6 +454,30 @@ plot(rate, title="USDGBP")
     expect(getPlot(result, 'USDGBP').values).toEqual([0.8, 0.8, 0.82, 0.82, 0.85, 0.85]);
   });
 
+  it('merges currency rate fixture values deterministically when points are unsorted', () => {
+    const datafeed = new InMemoryRequestDatafeed([], [
+      {
+        family: 'currency_rate',
+        key: currencyRateRequestKey('USD', 'GBP'),
+        points: [
+          { time: 1_700_000_240_000, value: 0.85 },
+          { time: 1_700_000_000_000, value: 0.8 },
+          { time: 1_700_000_120_000, value: 0.82 },
+        ],
+      },
+    ]);
+    const result = runCompatScript(`
+indicator("Unsorted currency rate request")
+plot(request.currency_rate("USD", "GBP"), title="USDGBP")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: datafeed },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'USDGBP').values).toEqual([0.8, 0.8, 0.82, 0.82, 0.85, 0.85]);
+  });
+
   it('returns one for matching currencies without a request datafeed', () => {
     const result = runCompatScript(`
 indicator("Same currency request")
