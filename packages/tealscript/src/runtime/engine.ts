@@ -1314,6 +1314,7 @@ export class TealscriptEngine {
     args: unknown[],
     namedArgs: Map<string, unknown>,
   ): unknown {
+    const scopeKey = this.importedFunctionScopeKey(library.alias, fn);
     this.importedLibraryCallStack.push(library.alias);
     try {
       return this.evaluateUserFunction(
@@ -1321,7 +1322,8 @@ export class TealscriptEngine {
         args,
         namedArgs,
         `library function ${library.alias}.${fn.name.name}`,
-        this.importedFunctionScopeKey(library.alias, fn),
+        scopeKey,
+        scopeKey,
       );
     } finally {
       this.importedLibraryCallStack.pop();
@@ -1624,6 +1626,7 @@ export class TealscriptEngine {
 
   private evaluateRequestExpressionSeries(expression: Expression, requestContext: RequestDataContext): unknown[] {
     const engine = new TealscriptEngine({ requestDatafeed: this.requestDatafeed, libraries: this.libraries });
+    engine.importedLibraryCallStack = [...this.importedLibraryCallStack];
     engine.indicatorDynamicRequests = this.indicatorDynamicRequests;
     engine.requestContextDepth = this.requestContextDepth + 1;
     engine.ctx.setNow(this.ctx.now);
@@ -1932,11 +1935,11 @@ export class TealscriptEngine {
     namedArgs: Map<string, unknown>,
     displayName = `function ${fn.name.name}`,
     scopeKey = this.userCallableScopeKey(fn),
+    recursionKey = scopeKey,
   ): unknown {
-    const functionName = fn.name.name;
-    const recursiveIndex = this.userFunctionCallStack.indexOf(functionName);
+    const recursiveIndex = this.userFunctionCallStack.indexOf(recursionKey);
     if (recursiveIndex !== -1) {
-      const cycle = [...this.userFunctionCallStack.slice(recursiveIndex), functionName].join(' -> ');
+      const cycle = [...this.userFunctionCallStack.slice(recursiveIndex), recursionKey].join(' -> ');
       throw new Error(`Recursive user function calls are not supported: ${cycle}`);
     }
 
@@ -1975,7 +1978,7 @@ export class TealscriptEngine {
     const savedScope = this.scope;
     const functionScope = this.functionScopes.get(scopeKey) ?? this.scope.createChild();
     this.scope = functionScope;
-    this.userFunctionCallStack.push(functionName);
+    this.userFunctionCallStack.push(recursionKey);
 
     try {
       for (let i = 0; i < fn.params.length; i++) {

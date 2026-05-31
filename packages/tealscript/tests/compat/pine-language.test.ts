@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
+import { InMemoryRequestDatafeed } from '../../src/runtime';
 import { compatibilityBars, getPlot, roundSeries, runCompatScript } from './fixtures';
 
 describe('Pine compatibility golden harness', () => {
@@ -87,6 +88,58 @@ plot(rt.scaledSpread(high, low), title="Scaled Spread")
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Scaled Spread').values)).toEqual([40, 50, 40, 70, 60, 50, 60, 70, 50, 50, 50, 50]);
+  });
+
+  it('keeps imported library helper context inside request security expressions', () => {
+    const library = parse(`
+library("RangeTools", true)
+hidden(float value) => value * 10
+export requestedClose() => request.security(syminfo.tickerid, "1", hidden(close), lookahead=barmerge.lookahead_on)
+`);
+    const requestDatafeed = new InMemoryRequestDatafeed([
+      {
+        symbol: 'BTCUSDT',
+        timeframe: '1',
+        bars: compatibilityBars,
+        syminfo: { ticker: 'BTCUSDT', timezone: 'Etc/UTC' },
+      },
+    ]);
+
+    const result = runCompatScript(`
+indicator("Imported request helper")
+import TestUser/RangeTools/1 as rt
+plot(rt.requestedClose(), title="Requested Close")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/RangeTools/1', library]]),
+        requestDatafeed,
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Requested Close').values)).toEqual([1020, 1050, 1070, 1030, 990, 1000, 1040, 1090, 1080, 1110, 1100, 1120]);
+  });
+
+  it('uses qualified recursion keys for imported library helpers', () => {
+    const library = parse(`
+library("RangeTools", true)
+hidden(float value) => value * 10
+export scaled(float value) => hidden(value)
+`);
+
+    const result = runCompatScript(`
+indicator("Imported library recursion key")
+import TestUser/RangeTools/1 as rt
+hidden(float value) => rt.scaled(value)
+plot(hidden(close), title="Scaled")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/RangeTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Scaled').values)).toEqual([1020, 1050, 1070, 1030, 990, 1000, 1040, 1090, 1080, 1110, 1100, 1120]);
   });
 
   it('runs single-line user-defined functions', () => {
