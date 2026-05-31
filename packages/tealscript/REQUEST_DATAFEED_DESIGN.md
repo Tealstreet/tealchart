@@ -4,11 +4,12 @@ This contract is the deterministic bridge for Pine `request.*` parity work. It
 lets runtime tests provide alternate symbol/timeframe contexts without depending
 on TradingView, a live exchange, or Tealchart networking during CI.
 
-## Scope
+## Current Scope
 
-This PR only adds the contract and an in-memory fixture datafeed. It does not
-enable `request.security()` runtime behavior yet, so existing unsupported
-diagnostics for `request.*` calls remain authoritative until the MVP phase.
+The contract supports deterministic fixtures and the current same-symbol or
+host-provided other-symbol `request.security()` MVP. Lower-timeframe arrays,
+dynamic/nested requests, synthetic tickers, and external request families remain
+out of scope until later Epic 8 and Epic 9 phases.
 
 ## Contract
 
@@ -16,6 +17,8 @@ Callers request bars with a stable key:
 
 - `symbol`: Pine-style ticker identifier such as `BINANCE:BTCUSDT`.
 - `timeframe`: Pine timeframe string such as `60`, `240`, or `1D`.
+- `currency`: optional requested currency routing hint. The MVP passes this to
+  the datafeed and request context metadata but does not perform conversion.
 - `calcBarsCount`: optional tail-window hint matching Pine's
   `calc_bars_count` intent.
 
@@ -36,10 +39,10 @@ Supported error codes are:
 The in-memory fixture implementation clones bars on write and read so tests
 cannot accidentally share mutable bar state across contexts.
 
-## `request.security()` MVP Plan
+## `request.security()` MVP
 
-The first runtime implementation should support same-symbol higher-timeframe
-requests before expanding to other symbols or lower-timeframe arrays.
+The current runtime implementation supports same-symbol and host-provided
+other-symbol higher-timeframe requests.
 
 1. Resolve the requested data context from the datafeed using
    `{ symbol, timeframe, calcBarsCount }`.

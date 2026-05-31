@@ -1001,9 +1001,10 @@ export class TealscriptEngine {
       this.evaluateOptionalCallArgument(expr, 4, 'lookahead') ?? 'barmerge.lookahead_off',
     );
     const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalCallArgument(expr, 5, 'ignore_invalid_symbol') ?? false);
+    const currency = this.normalizeOptionalRequestCurrency(this.evaluateOptionalCallArgument(expr, 6, 'currency'));
     const calcBarsCount = this.normalizeOptionalPositiveInteger(this.evaluateOptionalCallArgument(expr, 7, 'calc_bars_count'));
 
-    const result = this.requestDatafeed.getBars({ symbol, timeframe, calcBarsCount });
+    const result = this.requestDatafeed.getBars({ symbol, timeframe, calcBarsCount, currency });
     if (!result.ok) {
       if (ignoreInvalidSymbol && (result.code === 'invalid_symbol' || result.code === 'missing_context')) {
         return Number.NaN;
@@ -1012,7 +1013,7 @@ export class TealscriptEngine {
     }
 
     const expressionId = this.requestExpressionCacheId(expressionArg.value);
-    const cacheKey = this.requestEvaluationCacheKey(callId, expressionId, symbol, timeframe, calcBarsCount);
+    const cacheKey = this.requestEvaluationCacheKey(callId, expressionId, symbol, timeframe, currency, calcBarsCount);
     let cached = this.requestEvaluationCache.get(cacheKey);
     if (!cached) {
       cached = {
@@ -1073,14 +1074,24 @@ export class TealscriptEngine {
     return Number.isFinite(count) && count > 0 ? count : undefined;
   }
 
+  private normalizeOptionalRequestCurrency(value: unknown): string | undefined {
+    if (value === undefined || this.isNa(value)) {
+      return undefined;
+    }
+
+    const currency = this.toStringValue(value).trim().toUpperCase();
+    return currency === '' ? undefined : currency;
+  }
+
   private requestEvaluationCacheKey(
     callId: string,
     expressionId: string,
     symbol: string,
     timeframe: string,
+    currency: string | undefined,
     calcBarsCount: number | undefined,
   ): string {
-    return `${callId}\u0000${expressionId}\u0000${symbol}\u0000${timeframe}\u0000${calcBarsCount ?? ''}`;
+    return `${callId}\u0000${expressionId}\u0000${symbol}\u0000${timeframe}\u0000${currency ?? ''}\u0000${calcBarsCount ?? ''}`;
   }
 
   private requestExpressionCacheId(expression: Expression): string {

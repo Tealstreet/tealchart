@@ -13,6 +13,7 @@ export interface RequestDatafeedKey {
 
 export interface RequestDatafeedQuery extends RequestDatafeedKey {
   calcBarsCount?: number;
+  currency?: string;
 }
 
 export interface RequestDataContext extends RequestDatafeedKey {
@@ -88,6 +89,7 @@ export class InMemoryRequestDatafeed implements RequestDatafeed {
       ok: true,
       context: {
         ...context,
+        currency: query.currency ?? context.currency,
         bars: bars.map((bar) => ({ ...bar })),
         syminfo: context.syminfo === undefined ? undefined : { ...context.syminfo },
       },

@@ -69,4 +69,15 @@ describe('request datafeed contract', () => {
       message: 'No request data context for BINANCE:ETHUSDT 240',
     });
   });
+
+  it('echoes requested currency routing metadata when provided', () => {
+    const datafeed = new InMemoryRequestDatafeed([
+      { symbol: 'NASDAQ:AAPL', timeframe: '1D', bars, currency: 'USD' },
+    ]);
+    const result = datafeed.getBars({ symbol: 'NASDAQ:AAPL', timeframe: '1D', currency: 'EUR' });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) throw new Error(result.message);
+    expect(result.context.currency).toBe('EUR');
+  });
 });
