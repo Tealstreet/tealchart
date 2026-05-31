@@ -6,6 +6,7 @@ import type { DrawingCoordinateResolvers } from './rendering/TealScriptDrawingCo
 import type { TealScriptDrawingPartition } from './rendering/TealScriptDrawingPartition';
 
 import { computeCandleCoordinates } from './jailbreak/computeCandleCoordinates';
+import { routeTealScriptDrawings } from './rendering/TealScriptDrawingPaneRouting';
 import { partitionTealScriptDrawings } from './rendering/TealScriptDrawingPartition';
 import { TealScriptDrawingRenderer } from './rendering/TealScriptDrawingRenderer';
 import { getDecimalPlacesFromPrecision, LineStyle, PlotStyleOverride } from './state/chartState';
@@ -3002,9 +3003,13 @@ export class TealchartRenderer {
       }
     }
 
-    // Render each pane with its specific price lines
+    const routedDrawings = drawings && drawings.length > 0 ? routeTealScriptDrawings(drawings, computedPanes) : undefined;
+
+    // Render each pane with its specific price lines and TealScript drawings
     for (const pane of computedPanes) {
       const paneLabelBounds = labelBoundsByPane.get(pane.id) || [];
+      const paneDrawings =
+        pane.type === 'main' ? routedDrawings?.main : routedDrawings?.byPaneId.get(pane.id);
       this.renderPaneUnified(
         pane,
         bars,
@@ -3015,7 +3020,7 @@ export class TealchartRenderer {
         indicatorPaneInfo,
         paneLabelBounds,
         plotStyleOverrides,
-        drawings,
+        paneDrawings,
       );
     }
 
@@ -3063,7 +3068,7 @@ export class TealchartRenderer {
         drawings,
       );
     } else {
-      this.renderIndicatorPaneContent(pane, bars, viewport, plots, indicatorPaneInfo, labelBounds, plotStyleOverrides);
+      this.renderIndicatorPaneContent(pane, bars, viewport, plots, indicatorPaneInfo, labelBounds, plotStyleOverrides, drawings);
     }
 
     ctx.restore();
@@ -3310,6 +3315,7 @@ export class TealchartRenderer {
     indicatorPaneInfo?: Record<string, IndicatorPaneInfo>,
     labelBounds?: PriceLineLabelBounds[],
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
+    drawings?: DrawingOutput[],
   ): void {
     const { ctx, options, margins } = this;
 
@@ -3343,6 +3349,11 @@ export class TealchartRenderer {
           this.renderPlotInPane(plot, bars, viewport, pane, plotStyleOverrides);
         }
       }
+    }
+
+    if (drawings && drawings.length > 0) {
+      const drawingPartition = partitionTealScriptDrawings(drawings);
+      this.renderTealScriptDrawings(drawingPartition, bars, viewport, pane);
     }
 
     // Draw Y-axis for indicator pane
