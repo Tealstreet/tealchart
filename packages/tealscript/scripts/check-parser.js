@@ -23,7 +23,15 @@ const checks = [
   },
 ];
 
-const stale = checks.filter((check) => readFileSync(check.path, 'utf-8') !== check.expected);
+const stale = checks.filter((check) => {
+  try {
+    return readFileSync(check.path, 'utf-8') !== check.expected;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`${check.name} is missing or unreadable: ${check.path} (${message})`);
+    return true;
+  }
+});
 
 if (stale.length > 0) {
   for (const check of stale) {
