@@ -298,6 +298,7 @@ function fillStrategyOrder(
     throw new Error('strategy fill price must be finite');
   }
   const fillQty = resolveStrategyFillQty(ledger, order);
+  const commission = resolveStrategyFillCommission(ledger.settings, fillQty, price);
 
   order.status = 'filled';
   order.filledQty = fillQty;
@@ -312,16 +313,41 @@ function fillStrategyOrder(
     direction: order.direction,
     qty: fillQty,
     price,
-    commission: 0,
+    commission,
     slippage: 0,
     barIndex,
     time,
     alertMessage: order.alertMessage,
   };
   ledger.fills.push(fill);
+  applyStrategyCommission(ledger, commission);
   applyStrategyFillToTrades(ledger, fill);
   applyStrategyFillToPosition(ledger, fill);
   return fill;
+}
+
+function resolveStrategyFillCommission(settings: StrategyLedgerSettings, qty: number, price: number): number {
+  if (settings.commissionValue === 0) {
+    return 0;
+  }
+  switch (settings.commissionType) {
+    case 'percent':
+      return price * qty * (settings.commissionValue / 100);
+    case 'cash_per_order':
+      return settings.commissionValue;
+    case 'cash_per_contract':
+      return settings.commissionValue * qty;
+    default:
+      return 0;
+  }
+}
+
+function applyStrategyCommission(ledger: StrategyLedger, commission: number): void {
+  if (commission === 0) {
+    return;
+  }
+  ledger.netProfit -= commission;
+  ledger.equity = ledger.initialCapital + ledger.netProfit;
 }
 
 function resolveStrategyFillQty(ledger: StrategyLedger, order: StrategyOrder): number {
