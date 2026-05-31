@@ -13,6 +13,8 @@ import {
   getMatrixRows,
   getMatrixValue,
   isPineMatrix,
+  isSquareMatrix,
+  isValidMatrix,
   matrixColumn,
   matrixRow,
   maxMatrixValue,
@@ -60,6 +62,13 @@ describe('PineMatrix', () => {
     const matrix = createPineMatrix(1, 1, 0);
     expect(() => getMatrixValue(matrix, 1, 0)).toThrow('Matrix row 1 is out of bounds. row count is 1');
     expect(() => setMatrixValue(matrix, 0, 1, 4)).toThrow('Matrix column 1 is out of bounds. column count is 1');
+  });
+
+  it('checks validity and square shape', () => {
+    expect(isValidMatrix(createPineMatrix(2, 2))).toBe(true);
+    expect(isValidMatrix(null)).toBe(false);
+    expect(isSquareMatrix(createPineMatrix(2, 2))).toBe(true);
+    expect(isSquareMatrix(createPineMatrix(2, 3))).toBe(false);
   });
 
   it('mutates rows, columns, and shape', () => {
@@ -130,9 +139,12 @@ describe('PineMatrix', () => {
 
   it('summarizes numeric matrix values', () => {
     const matrix = createPineMatrix<number>(2, 3, 0);
-    [1, 2, 2, 4, 8, Number.NaN].forEach((value, index) => {
-      matrix.values[index] = value;
-    });
+    setMatrixValue(matrix, 0, 0, 1);
+    setMatrixValue(matrix, 0, 1, 2);
+    setMatrixValue(matrix, 0, 2, 2);
+    setMatrixValue(matrix, 1, 0, 4);
+    setMatrixValue(matrix, 1, 1, 8);
+    setMatrixValue(matrix, 1, 2, Number.NaN);
 
     expect(avgMatrixValue(matrix)).toBe(3.4);
     expect(minMatrixValue(matrix)).toBe(1);

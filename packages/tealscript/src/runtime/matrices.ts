@@ -33,6 +33,14 @@ export function isPineMatrix(value: unknown): value is PineMatrix {
   return Boolean(value && typeof value === 'object' && (value as PineMatrix).__tealscriptMatrix === true);
 }
 
+export function isValidMatrix(value: unknown): value is PineMatrix {
+  return isPineMatrix(value);
+}
+
+export function isSquareMatrix(matrix: PineMatrix): boolean {
+  return matrix.rows === matrix.columns;
+}
+
 export function getMatrixRows(matrix: PineMatrix): number {
   return matrix.rows;
 }

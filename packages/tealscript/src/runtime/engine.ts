@@ -102,6 +102,8 @@ import {
   getMatrixRows,
   getMatrixValue,
   isPineMatrix,
+  isSquareMatrix,
+  isValidMatrix,
   matrixColumn,
   matrixRow,
   maxMatrixValue,
@@ -1058,6 +1060,17 @@ export class TealscriptEngine {
     }
 
     // Look up builtin
+    if (namespace && expr.callee.type === 'MemberExpression' && this.scope.has(namespace)) {
+      const receiver = this.evaluateExpression(expr.callee.object);
+      if (receiver !== undefined) {
+        const methodBuiltinName = this.getMethodBuiltinName(funcName, receiver);
+        const methodBuiltin = this.builtins.get(methodBuiltinName);
+        if (methodBuiltin) {
+          return methodBuiltin([receiver, ...args], namedArgs, this.ctx, this.scope, this.nextBuiltinCallId(methodBuiltinName));
+        }
+      }
+    }
+
     const builtin = this.builtins.get(fullName);
     if (builtin) {
       return builtin(args, namedArgs, this.ctx, this.scope, this.nextBuiltinCallId(fullName));
@@ -3586,10 +3599,9 @@ export class TealscriptEngine {
     this.builtins.set('matrix.col', (args) => matrixColumn(readMatrix(args[0]), args[1] as number));
     this.builtins.set('matrix.column', (args) => matrixColumn(readMatrix(args[0]), args[1] as number));
     this.builtins.set('matrix.is_square', (args) => {
-      const matrix = readMatrix(args[0]);
-      return matrix.rows === matrix.columns;
+      return isSquareMatrix(readMatrix(args[0]));
     });
-    this.builtins.set('matrix.is_valid', (args) => isPineMatrix(args[0]));
+    this.builtins.set('matrix.is_valid', (args) => isValidMatrix(args[0]));
   }
 
   private registerColorBuiltins(): void {

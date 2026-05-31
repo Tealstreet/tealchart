@@ -11,6 +11,9 @@ import {
   ExecutionContext,
   Scope,
   TealscriptEngine,
+  createPineMatrix,
+  getMatrixValue,
+  setMatrixValue,
   executeScript,
   type Bar,
 } from '../../src/runtime';
@@ -264,6 +267,20 @@ describe('Scope', () => {
     // Regular var is reset
     const entry = scope.getEntry('temp');
     expect(entry?.initialized).toBe(false);
+  });
+
+  it('rolls back in-place matrix mutations', () => {
+    const scope = new Scope();
+    const matrix = createPineMatrix<number>(1, 1, 1);
+    scope.declare('matrix', 'var', matrix);
+    scope.commit(true);
+
+    setMatrixValue(matrix, 0, 0, 9);
+    scope.rollback();
+
+    const restored = scope.get('matrix');
+    expect(getMatrixValue(restored as typeof matrix, 0, 0)).toBe(1);
+    expect(restored).not.toBe(matrix);
   });
 });
 

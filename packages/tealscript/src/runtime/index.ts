@@ -33,6 +33,8 @@ export {
 export {
   createPineMatrix,
   isPineMatrix,
+  isValidMatrix,
+  isSquareMatrix,
   getMatrixRows,
   getMatrixColumns,
   getMatrixElementCount,

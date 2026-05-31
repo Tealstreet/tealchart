@@ -108,4 +108,18 @@ plot(m.mode(), title="Mode")
     expect(roundSeries(getPlot(result, 'Median').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
     expect(roundSeries(getPlot(result, 'Mode').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
   });
+
+  it('prefers scoped matrix receivers over the matrix namespace', () => {
+    const result = runCompatScript(`
+indicator("Matrix receiver shadowing")
+matrix = matrix.new_int(2, 2, 0)
+matrix.set(0, 0, 7)
+plot(matrix.rows(), title="Rows")
+plot(matrix.get(0, 0), title="First")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Rows').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'First').values)).toEqual([7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]);
+  });
 });
