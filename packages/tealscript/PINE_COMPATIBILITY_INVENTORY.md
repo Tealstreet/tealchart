@@ -38,8 +38,8 @@ reading the whole runtime.
 | Parser/runtime | `library(...)` / `import` | Unsupported | Public API guardrails in `tests/public-api/public-entry.test.ts` | Module system is planned for the libraries epic. |
 | Parser/runtime | Variable declarations | Supported | `tests/parser/parser.test.ts`; `tests/runtime/runtime.test.ts` | Qualified type checking is planned. |
 | Parser/runtime | `var` / `varip` | Partial | `tests/compat/pine-language.test.ts`; `src/runtime/engine.test.ts` | Intrabar `varip` parity and nested-scope edge cases remain. |
-| Parser/runtime | Reassignment `:=` | Partial | `tests/parser/parser.test.ts`; `tests/runtime/runtime.test.ts` | Member assignment is not implemented. |
-| Parser/runtime | Compound assignment | Partial | `tests/parser/parser.test.ts`; `tests/runtime/runtime.test.ts` | Member compound assignment is not implemented. |
+| Parser/runtime | Reassignment `:=` | Partial | `tests/parser/parser.test.ts`; `tests/runtime/runtime.test.ts`; `tests/compat/pine-arrays.test.ts`; `tests/compat/pine-unsupported.test.ts` | Identifier and array index assignment are supported; member assignment has an explicit planned diagnostic until UDT/reference fields land. |
+| Parser/runtime | Compound assignment | Partial | `tests/parser/parser.test.ts`; `tests/runtime/runtime.test.ts`; `tests/compat/pine-arrays.test.ts`; `tests/compat/pine-unsupported.test.ts` | Identifier and array index compound assignment are supported; member compound assignment has an explicit planned diagnostic until UDT/reference fields land. |
 | Parser/runtime | Tuple destructuring | Supported | `tests/compat/pine-basics.test.ts` | Broader type diagnostics are planned. |
 | Parser/runtime | `if` / `else if` / `else` | Supported | `tests/parser/parser.test.ts`; `tests/compat/pine-language.test.ts` | Nested indentation hardening continues under core semantics. |
 | Parser/runtime | Ternary `?:` | Supported | `tests/runtime/runtime.test.ts`; `tests/compat/pine-visuals.test.ts` | Broader `na` truthiness fixtures are planned. |
