@@ -268,7 +268,8 @@ The ticker pass covers `ticker.new()`, `ticker.modify()`, `ticker.standard()`,
 indicator request workflows. Session, adjustment, back-adjustment,
 settlement-as-close, and chart modifiers propagate as opaque request-datafeed
 keys. The in-memory test datafeed derives Heikin-Ashi OHLC when matching base
-bars exist; other non-standard chart contexts must be supplied by the host.
+bars exist, with tests covering the `ticker.heikinashi()` modifier. Renko, Line
+Break, Kagi, and Point & Figure contexts must be supplied by the host.
 Synthetic strategy/backtest execution remains unsupported until the strategy
 runtime and broker emulator are implemented.
 
