@@ -55,8 +55,27 @@ their constructor parameters. Unlike Heikin-Ashi, the in-memory datafeed does
 not derive those synthetic bars; tests and hosts must provide exact fixture or
 market-data contexts keyed by the constructed ticker ID.
 
-## Later Scope
+## Synthetic Strategy And Backtest Caveats
 
-Future Epic 9 phases should add:
+Epic 9 supports indicator-style synthetic data requests. It does not implement
+Pine strategy backtesting on synthetic chart feeds. Until strategy parity lands:
 
-- Documentation for strategy/backtest caveats on synthetic chart data.
+- `strategy.*` order placement, fills, positions, trades, and broker-emulator
+  outputs remain unsupported regardless of ticker type.
+- `ticker.heikinashi()`, `ticker.renko()`, `ticker.linebreak()`,
+  `ticker.kagi()`, and `ticker.pointfigure()` are safe for deterministic
+  indicator calculations only when the request datafeed can provide the
+  requested context.
+- Heikin-Ashi fixture data is locally derived for indicator tests; it should not
+  be treated as executable market price data for order-fill simulation.
+- Renko, Line Break, Kagi, and Point & Figure fixture data is host supplied.
+  The runtime does not synthesize bricks/lines/reversals, so future strategy
+  support must define whether fills use synthetic OHLC, underlying market OHLC,
+  or a host-provided execution feed.
+- Back-adjustment, settlement-as-close, and corporate-action adjustments are
+  currently opaque request modifiers. Hosts decide whether the resulting bars
+  are adjusted; the runtime does not adjust fills, PnL, or cash ledgers.
+
+These caveats intentionally keep ticker constructors decoupled from strategy
+semantics. Epic 14 owns broker-emulator behavior and should revisit synthetic
+chart execution before enabling backtests over non-standard ticker IDs.

@@ -82,8 +82,8 @@ reading the whole runtime.
 | Built-ins | Global helpers | Partial | `src/runtime/engine.test.ts`; `tests/compat/pine-language.test.ts` | `na`, `nz`, `fixnan`, and primitive casts are covered for common numeric/source idioms; broader type-system diagnostics and exact color overload parity are planned. |
 | Built-ins | `map.*` | Planned | `tests/compat/pine-unsupported.test.ts`; Roadmap Epic 12 | Namespace emits unsupported diagnostics; runtime/storage/type support is not implemented. |
 | Built-ins | `matrix.*` | Planned | `tests/compat/pine-unsupported.test.ts`; Roadmap Epic 12 | Namespace emits unsupported diagnostics; runtime/storage/type support is not implemented. |
-| Data | `request.*` | Planned | `tests/compat/pine-unsupported.test.ts`; Roadmap Epic 8 | Namespace emits unsupported diagnostics; requires deterministic datafeed contract. |
-| Data | `ticker.*` | Planned | `tests/compat/pine-unsupported.test.ts`; Roadmap Epic 9 | Namespace emits unsupported diagnostics; ticker constructors and synthetic data are not implemented. |
+| Data | `request.*` | Partial | `tests/compat/pine-request-security.test.ts`; `tests/runtime/requestDatafeed.test.ts`; Roadmap Epic 8 | Common `request.security()`, lower-timeframe arrays, currency rates, and deterministic datafeed routing are covered; optional economic/corporate data families remain planned. |
+| Data | `ticker.*` | Partial | `tests/compat/pine-ticker.test.ts`; `tests/compat/pine-unsupported.test.ts`; Roadmap Epic 9 | Common ticker constructors and non-standard chart request IDs are covered for indicator workflows; synthetic strategy/backtest behavior remains planned for Epic 14. |
 
 ### Visual Outputs
 
