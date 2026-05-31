@@ -217,6 +217,31 @@ plot(p.value, title="Value")
     expect(roundSeries(getPlot(result, 'Value').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
   });
 
+  it('prefers library-local user-defined types inside imported functions', () => {
+    const library = parse(`
+library("PivotTools", true)
+type Hidden
+    float value
+export make(float value) => Hidden.new(value)
+`);
+
+    const result = runCompatScript(`
+indicator("Imported private type shadowing")
+import TestUser/PivotTools/1 as pivots
+type Hidden
+    float other
+p = pivots.make(close)
+plot(p.value, title="Value")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/PivotTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Value').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+  });
+
   it('runs single-line user-defined functions', () => {
     const result = runCompatScript(`
 indicator("UDF single line")

@@ -1212,20 +1212,20 @@ export class TealscriptEngine {
       }
     }
 
-    if (namespace && funcName === 'new' && this.typeDeclarations.has(namespace)) {
-      return this.evaluateTypeConstructor(namespace, args, namedArgs);
-    }
     if (namespace && funcName === 'new') {
+      const currentLibraryType = this.findCurrentLibraryType(namespace);
+      if (currentLibraryType) {
+        return this.evaluateImportedTypeConstructor(currentLibraryType.library, currentLibraryType.declaration, args, namedArgs);
+      }
+      if (this.typeDeclarations.has(namespace)) {
+        return this.evaluateTypeConstructor(namespace, args, namedArgs);
+      }
       const importedType = this.findImportedType(namespace);
       if (importedType && importedType.exported) {
         return this.evaluateImportedTypeConstructor(importedType.library, importedType.declaration, args, namedArgs);
       }
       if (importedType) {
         throw new Error(`Unknown library type: ${namespace}`);
-      }
-      const currentLibraryType = this.findCurrentLibraryType(namespace);
-      if (currentLibraryType) {
-        return this.evaluateImportedTypeConstructor(currentLibraryType.library, currentLibraryType.declaration, args, namedArgs);
       }
     }
 
