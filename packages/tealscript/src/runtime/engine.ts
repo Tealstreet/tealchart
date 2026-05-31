@@ -97,6 +97,7 @@ const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['request', 'map', 'matrix', 'pol
  */
 export class TealscriptEngine {
   private static readonly MAX_LOOP_ITERATIONS = 10000;
+  private static readonly MAX_BUILTIN_SOURCE_HISTORY = 10000;
 
   private ctx: ExecutionContext;
   private scope: Scope;
@@ -1621,9 +1622,9 @@ export class TealscriptEngine {
 
   private updateBuiltinSourceHistory(scope: Scope, key: string, source: number, keep: number): number[] {
     const history = (scope.get(key) as number[] | undefined) ?? [];
-    const nextHistory = [source, ...history];
+    const nextHistory = [source, ...history].slice(0, keep);
     this.setBuiltinState(scope, key, nextHistory);
-    return nextHistory.slice(0, keep);
+    return nextHistory;
   }
 
   private getCompleteSourceWindow(scope: Scope, key: string, source: number, length: number): number[] | null {
@@ -1633,7 +1634,11 @@ export class TealscriptEngine {
     const maxLength = Math.max(length, previousMaxLength ?? 0);
     this.setBuiltinState(scope, maxLengthKey, maxLength);
 
-    const values = this.updateBuiltinSourceHistory(scope, key, source, maxLength);
+    const keep = Math.min(
+      Math.max(maxLength, this.ctx.bar_index + 1),
+      TealscriptEngine.MAX_BUILTIN_SOURCE_HISTORY,
+    );
+    const values = this.updateBuiltinSourceHistory(scope, key, source, keep);
     const window = values.slice(0, length);
     if (window.length < length || window.some((value) => isNaN(value))) return null;
     return window;
