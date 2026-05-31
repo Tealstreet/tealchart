@@ -76,6 +76,20 @@ indicator("My Indicator", max_bars_back=500)`);
         }
       });
 
+      it('parses drawing object count metadata', () => {
+        const ast = parse(`//@version=6
+indicator("Objects", max_labels_count=3, max_lines_count=4, max_boxes_count=5, max_polylines_count=6)`);
+
+        const indicator = ast.body[0];
+        expect(indicator.type).toBe('IndicatorDeclaration');
+        if (indicator.type === 'IndicatorDeclaration') {
+          expect(indicator.max_labels_count?.type).toBe('NumericLiteral');
+          expect(indicator.max_lines_count?.type).toBe('NumericLiteral');
+          expect(indicator.max_boxes_count?.type).toBe('NumericLiteral');
+          expect(indicator.max_polylines_count?.type).toBe('NumericLiteral');
+        }
+      });
+
       it('parses strategy declarations for unsupported diagnostics', () => {
         const ast = parse(`//@version=6
 strategy("My Strategy", overlay=true)`);

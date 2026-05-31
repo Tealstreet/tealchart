@@ -58,6 +58,10 @@ export interface IndicatorDeclaration extends BaseNode {
   precision?: Expression;
   scale?: Expression;
   max_bars_back?: Expression;
+  max_labels_count?: Expression;
+  max_lines_count?: Expression;
+  max_boxes_count?: Expression;
+  max_polylines_count?: Expression;
   timeframe?: Expression;
   timeframe_gaps?: Expression;
   dynamic_requests?: Expression;

@@ -5,7 +5,15 @@ import {
   withDrawing,
 } from '../drawings/helpers';
 import type { ExecutionContext } from '../context';
-import type { LineDrawingOutput } from '../drawings/types';
+import type {
+  BoxDrawingOutput,
+  ChartPoint,
+  LabelDrawingOutput,
+  LineDrawingOutput,
+  PolylineDrawingOutput,
+  TableCellDrawingOutput,
+  TableDrawingOutput,
+} from '../drawings/types';
 
 export interface DrawingBuiltinRuntime {
   isNa(value: unknown): boolean;
@@ -21,6 +29,65 @@ export interface DrawingBuiltinRuntime {
   interpolateLinePrice(line: LineDrawingOutput, x: number): number;
 }
 
+function isChartPoint(value: unknown): value is ChartPoint {
+  return (
+    typeof value === 'object'
+    && value !== null
+    && (value as { type?: unknown }).type === 'chart.point'
+  );
+}
+
+function pointX(point: ChartPoint, xloc: string): number | null {
+  return xloc === 'bar_time' ? point.time : point.index;
+}
+
+function copyPoint(point: ChartPoint): ChartPoint {
+  return { ...point };
+}
+
+function isPineRuntimeArray(value: unknown): value is { values: unknown[] } {
+  return (
+    typeof value === 'object'
+    && value !== null
+    && (value as { __tealscriptArray?: unknown }).__tealscriptArray === true
+    && Array.isArray((value as { values?: unknown }).values)
+  );
+}
+
+function chartPointArrayValues(value: unknown): ChartPoint[] {
+  const values = Array.isArray(value)
+    ? value
+    : isPineRuntimeArray(value)
+      ? value.values
+      : [];
+  return values.filter(isChartPoint).map(copyPoint);
+}
+
+function optionalString(runtime: DrawingBuiltinRuntime, value: unknown): string | undefined {
+  return value === undefined ? undefined : runtime.toStringValue(value);
+}
+
+function optionalBoolean(value: unknown): boolean | undefined {
+  return value === undefined ? undefined : Boolean(value);
+}
+
+function positiveInteger(runtime: DrawingBuiltinRuntime, value: unknown, fallback: number): number {
+  const parsed = Math.trunc(runtime.toNumber(value ?? fallback));
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function tableCellKey(column: number, row: number): string {
+  return `${column}:${row}`;
+}
+
+function normalizeTableColumn(runtime: DrawingBuiltinRuntime, value: unknown): number {
+  return Math.max(0, Math.trunc(runtime.toNumber(value)));
+}
+
+function normalizeTableRow(runtime: DrawingBuiltinRuntime, value: unknown): number {
+  return Math.max(0, Math.trunc(runtime.toNumber(value)));
+}
+
 export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
   builtins.set('label.new', (args, namedArgs, ctx, _scope, callId) => {
     const x = runtime.toNullableNumber(namedArgs.get('x') ?? args[0]);
@@ -28,7 +95,8 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     const text = runtime.toStringValue(namedArgs.get('text') ?? args[2] ?? '');
     const id = `label_${callId}_${ctx.bar_index}`;
 
-    ctx.addDrawing({
+    const forceOverlay = optionalBoolean(namedArgs.get('force_overlay') ?? args[11]);
+    const drawing: LabelDrawingOutput = {
       id,
       type: 'label',
       barIndex: ctx.bar_index,
@@ -42,7 +110,10 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       textColor: runtime.toNullableColor(namedArgs.get('textcolor')),
       size: runtime.toStringValue(namedArgs.get('size') ?? 'normal'),
       tooltip: runtime.toOptionalString(namedArgs.get('tooltip') ?? args[10]),
-    });
+    };
+    if (forceOverlay !== undefined) drawing.forceOverlay = forceOverlay;
+
+    ctx.addDrawing(drawing);
 
     return id;
   });
@@ -154,14 +225,28 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
   builtins.set('label.get_textcolor', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.textColor ?? Number.NaN));
   builtins.set('label.get_size', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.size));
   builtins.set('label.get_tooltip', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.tooltip ?? ''));
+  builtins.set('label.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('label'));
 }
 
 export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
   builtins.set('line.new', (args, namedArgs, ctx, _scope, callId) => {
-    const x1 = runtime.toNullableNumber(namedArgs.get('x1') ?? args[0]);
-    const y1 = runtime.toNullableNumber(namedArgs.get('y1') ?? args[1]);
-    const x2 = runtime.toNullableNumber(namedArgs.get('x2') ?? args[2]);
-    const y2 = runtime.toNullableNumber(namedArgs.get('y2') ?? args[3]);
+    const firstPoint = namedArgs.get('first_point') ?? args[0];
+    const secondPoint = namedArgs.get('second_point') ?? args[1];
+    const usesPointOverload = isChartPoint(firstPoint) && isChartPoint(secondPoint);
+    const pointArgOffset = usesPointOverload ? 2 : 4;
+    const xloc = runtime.toStringValue(namedArgs.get('xloc') ?? args[pointArgOffset] ?? 'bar_index');
+    const x1 = usesPointOverload
+      ? pointX(firstPoint, xloc)
+      : runtime.toNullableNumber(namedArgs.get('x1') ?? args[0]);
+    const y1 = usesPointOverload
+      ? firstPoint.price
+      : runtime.toNullableNumber(namedArgs.get('y1') ?? args[1]);
+    const x2 = usesPointOverload
+      ? pointX(secondPoint, xloc)
+      : runtime.toNullableNumber(namedArgs.get('x2') ?? args[2]);
+    const y2 = usesPointOverload
+      ? secondPoint.price
+      : runtime.toNullableNumber(namedArgs.get('y2') ?? args[3]);
     const id = `line_${callId}_${ctx.bar_index}`;
 
     ctx.addDrawing({
@@ -172,12 +257,12 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
       y1,
       x2,
       y2,
-      xloc: runtime.toStringValue(namedArgs.get('xloc') ?? args[4] ?? 'bar_index'),
-      extend: runtime.toStringValue(namedArgs.get('extend') ?? args[5] ?? 'none'),
-      color: runtime.toNullableColor(namedArgs.get('color') ?? args[6]),
-      style: runtime.toStringValue(namedArgs.get('style') ?? args[7] ?? 'solid'),
-      width: runtime.toLineWidth(namedArgs.get('width') ?? args[8]),
-      forceOverlay: Boolean(namedArgs.get('force_overlay') ?? args[9] ?? false),
+      xloc,
+      extend: runtime.toStringValue(namedArgs.get('extend') ?? args[pointArgOffset + 1] ?? 'none'),
+      color: runtime.toNullableColor(namedArgs.get('color') ?? args[pointArgOffset + 2]),
+      style: runtime.toStringValue(namedArgs.get('style') ?? args[pointArgOffset + 3] ?? 'solid'),
+      width: runtime.toLineWidth(namedArgs.get('width') ?? args[pointArgOffset + 4]),
+      forceOverlay: Boolean(namedArgs.get('force_overlay') ?? args[pointArgOffset + 5] ?? false),
     });
 
     return id;
@@ -293,6 +378,7 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
     const x = runtime.toNumber(args[1]);
     return runtime.getLineValue(args[0], ctx, (line) => runtime.interpolateLinePrice(line, x));
   });
+  builtins.set('line.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('line'));
 }
 
 export function registerLineFillBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
@@ -331,30 +417,56 @@ export function registerLineFillBuiltins(builtins: BuiltinRegistry, runtime: Dra
 
   builtins.set('linefill.get_line1', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'linefill', runtime.isNa, (linefill) => linefill.line1));
   builtins.set('linefill.get_line2', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'linefill', runtime.isNa, (linefill) => linefill.line2));
+  builtins.set('linefill.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('linefill'));
 }
 
 export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
   builtins.set('box.new', (args, namedArgs, ctx, _scope, callId) => {
     const id = `box_${callId}_${ctx.bar_index}`;
+    const topLeft = namedArgs.get('top_left') ?? args[0];
+    const bottomRight = namedArgs.get('bottom_right') ?? args[1];
+    const usesPointOverload = isChartPoint(topLeft) && isChartPoint(bottomRight);
+    const pointArgOffset = usesPointOverload ? 2 : 4;
+    const xloc = runtime.toStringValue(namedArgs.get('xloc') ?? args[pointArgOffset + 4] ?? 'bar_index');
 
-    ctx.addDrawing({
+    const textHalign = optionalString(runtime, namedArgs.get('text_halign') ?? args[pointArgOffset + 9]);
+    const textValign = optionalString(runtime, namedArgs.get('text_valign') ?? args[pointArgOffset + 10]);
+    const textWrap = optionalString(runtime, namedArgs.get('text_wrap') ?? args[pointArgOffset + 11]);
+    const textFontFamily = optionalString(runtime, namedArgs.get('text_font_family') ?? args[pointArgOffset + 12]);
+    const forceOverlay = optionalBoolean(namedArgs.get('force_overlay') ?? args[pointArgOffset + 13]);
+    const drawing: BoxDrawingOutput = {
       id,
       type: 'box',
       barIndex: ctx.bar_index,
-      left: runtime.toNullableNumber(namedArgs.get('left') ?? args[0]),
-      top: runtime.toNullableNumber(namedArgs.get('top') ?? args[1]),
-      right: runtime.toNullableNumber(namedArgs.get('right') ?? args[2]),
-      bottom: runtime.toNullableNumber(namedArgs.get('bottom') ?? args[3]),
-      borderColor: runtime.toNullableColor(namedArgs.get('border_color') ?? args[4]),
-      borderWidth: runtime.toLineWidth(namedArgs.get('border_width') ?? args[5]),
-      borderStyle: runtime.toStringValue(namedArgs.get('border_style') ?? args[6] ?? 'solid'),
-      extend: runtime.toStringValue(namedArgs.get('extend') ?? args[7] ?? 'none'),
-      xloc: runtime.toStringValue(namedArgs.get('xloc') ?? args[8] ?? 'bar_index'),
-      bgcolor: runtime.toNullableColor(namedArgs.get('bgcolor') ?? args[9]),
-      text: runtime.toStringValue(namedArgs.get('text') ?? args[10] ?? ''),
-      textSize: runtime.toStringValue(namedArgs.get('text_size') ?? args[11] ?? 'normal'),
-      textColor: runtime.toNullableColor(namedArgs.get('text_color') ?? args[12]),
-    });
+      left: usesPointOverload
+        ? pointX(topLeft, xloc)
+        : runtime.toNullableNumber(namedArgs.get('left') ?? args[0]),
+      top: usesPointOverload
+        ? topLeft.price
+        : runtime.toNullableNumber(namedArgs.get('top') ?? args[1]),
+      right: usesPointOverload
+        ? pointX(bottomRight, xloc)
+        : runtime.toNullableNumber(namedArgs.get('right') ?? args[2]),
+      bottom: usesPointOverload
+        ? bottomRight.price
+        : runtime.toNullableNumber(namedArgs.get('bottom') ?? args[3]),
+      borderColor: runtime.toNullableColor(namedArgs.get('border_color') ?? args[pointArgOffset]),
+      borderWidth: runtime.toLineWidth(namedArgs.get('border_width') ?? args[pointArgOffset + 1]),
+      borderStyle: runtime.toStringValue(namedArgs.get('border_style') ?? args[pointArgOffset + 2] ?? 'solid'),
+      extend: runtime.toStringValue(namedArgs.get('extend') ?? args[pointArgOffset + 3] ?? 'none'),
+      xloc,
+      bgcolor: runtime.toNullableColor(namedArgs.get('bgcolor') ?? args[pointArgOffset + 5]),
+      text: runtime.toStringValue(namedArgs.get('text') ?? args[pointArgOffset + 6] ?? ''),
+      textSize: runtime.toStringValue(namedArgs.get('text_size') ?? args[pointArgOffset + 7] ?? 'normal'),
+      textColor: runtime.toNullableColor(namedArgs.get('text_color') ?? args[pointArgOffset + 8]),
+    };
+    if (textHalign !== undefined) drawing.textHalign = textHalign;
+    if (textValign !== undefined) drawing.textValign = textValign;
+    if (textWrap !== undefined) drawing.textWrap = textWrap;
+    if (textFontFamily !== undefined) drawing.textFontFamily = textFontFamily;
+    if (forceOverlay !== undefined) drawing.forceOverlay = forceOverlay;
+
+    ctx.addDrawing(drawing);
 
     return id;
   });
@@ -465,6 +577,30 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
     });
     return undefined;
   });
+  builtins.set('box.set_text_halign', (args, _namedArgs, ctx) => {
+    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
+      box.textHalign = runtime.toStringValue(args[1]);
+    });
+    return undefined;
+  });
+  builtins.set('box.set_text_valign', (args, _namedArgs, ctx) => {
+    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
+      box.textValign = runtime.toStringValue(args[1]);
+    });
+    return undefined;
+  });
+  builtins.set('box.set_text_wrap', (args, _namedArgs, ctx) => {
+    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
+      box.textWrap = runtime.toStringValue(args[1]);
+    });
+    return undefined;
+  });
+  builtins.set('box.set_text_font_family', (args, _namedArgs, ctx) => {
+    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
+      box.textFontFamily = runtime.toStringValue(args[1]);
+    });
+    return undefined;
+  });
 
   builtins.set('box.get_left', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.left ?? Number.NaN));
   builtins.set('box.get_right', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.right ?? Number.NaN));
@@ -473,6 +609,208 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
   builtins.set('box.get_bgcolor', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.bgcolor ?? Number.NaN));
   builtins.set('box.get_border_color', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.borderColor ?? Number.NaN));
   builtins.set('box.get_text', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.text));
+  builtins.set('box.get_text_halign', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.textHalign ?? 'left'));
+  builtins.set('box.get_text_valign', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.textValign ?? 'top'));
+  builtins.set('box.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('box'));
+}
+
+export function registerPolylineBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
+  builtins.set('polyline.new', (args, namedArgs, ctx, _scope, callId) => {
+    const points = chartPointArrayValues(namedArgs.get('points') ?? args[0]);
+    if (points.length === 0) return Number.NaN;
+
+    const id = `polyline_${callId}_${ctx.bar_index}`;
+    const forceOverlay = optionalBoolean(namedArgs.get('force_overlay') ?? args[8]);
+    const drawing: PolylineDrawingOutput = {
+      id,
+      type: 'polyline',
+      barIndex: ctx.bar_index,
+      points,
+      curved: Boolean(namedArgs.get('curved') ?? args[1] ?? false),
+      closed: Boolean(namedArgs.get('closed') ?? args[2] ?? false),
+      xloc: runtime.toStringValue(namedArgs.get('xloc') ?? args[3] ?? 'bar_index'),
+      lineColor: runtime.toNullableColor(namedArgs.get('line_color') ?? args[4]),
+      fillColor: runtime.toNullableColor(namedArgs.get('fill_color') ?? args[5]),
+      lineStyle: runtime.toStringValue(namedArgs.get('line_style') ?? args[6] ?? 'solid'),
+      lineWidth: runtime.toLineWidth(namedArgs.get('line_width') ?? args[7]),
+    };
+    if (forceOverlay !== undefined) drawing.forceOverlay = forceOverlay;
+
+    ctx.addDrawing(drawing);
+    return id;
+  });
+
+  builtins.set('polyline.delete', (args, _namedArgs, ctx) => {
+    withDrawing(args[0], ctx, 'polyline', runtime.isNa, (polyline) => ctx.deleteDrawing(polyline.id));
+    return undefined;
+  });
+
+  builtins.set('polyline.copy', (args, _namedArgs, ctx, _scope, callId) => {
+    const polylineId = runtime.toDrawingId(args[0]);
+    if (!polylineId) return Number.NaN;
+
+    const newId = `polyline_${callId}_${ctx.bar_index}`;
+    const copy = ctx.copyPolylineDrawing(polylineId, newId);
+    return copy ? newId : Number.NaN;
+  });
+
+  builtins.set('polyline.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('polyline'));
+}
+
+export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
+  const withTable = (value: unknown, ctx: ExecutionContext, fn: (table: TableDrawingOutput) => void): void => {
+    withDrawing(value, ctx, 'table', runtime.isNa, fn);
+  };
+  const createDefaultCell = (column: number, row: number): TableCellDrawingOutput => ({
+    column,
+    row,
+    text: '',
+    width: undefined,
+    height: undefined,
+    textColor: null,
+    textHalign: 'center',
+    textValign: 'middle',
+    textSize: 'normal',
+    bgcolor: null,
+  });
+  const upsertCell = (table: TableDrawingOutput, cell: TableCellDrawingOutput): void => {
+    const key = tableCellKey(cell.column, cell.row);
+    const index = table.cells.findIndex((existing) => tableCellKey(existing.column, existing.row) === key);
+    if (index === -1) {
+      table.cells.push(cell);
+    } else {
+      table.cells[index] = cell;
+    }
+  };
+  const normalizeCellCoordinates = (
+    table: TableDrawingOutput,
+    column: unknown,
+    row: unknown,
+  ): { column: number; row: number } => {
+    const normalizedColumn = normalizeTableColumn(runtime, column);
+    const normalizedRow = normalizeTableRow(runtime, row);
+    if (
+      !Number.isFinite(normalizedColumn)
+      || !Number.isFinite(normalizedRow)
+      || normalizedColumn < 0
+      || normalizedColumn >= table.columns
+      || normalizedRow < 0
+      || normalizedRow >= table.rows
+    ) {
+      throw new Error(`Table cell coordinates out of bounds: column ${normalizedColumn}, row ${normalizedRow}`);
+    }
+
+    return { column: normalizedColumn, row: normalizedRow };
+  };
+  const ensureCell = (
+    table: TableDrawingOutput,
+    column: unknown,
+    row: unknown,
+  ): TableCellDrawingOutput => {
+    const coordinates = normalizeCellCoordinates(table, column, row);
+    const existing = table.cells.find((cell) => (
+      cell.column === coordinates.column && cell.row === coordinates.row
+    ));
+    if (existing) return existing;
+
+    const cell = createDefaultCell(coordinates.column, coordinates.row);
+    table.cells.push(cell);
+    return cell;
+  };
+
+  builtins.set('table.new', (args, namedArgs, ctx, _scope, callId) => {
+    const id = `table_${callId}_${ctx.bar_index}`;
+    const drawing: TableDrawingOutput = {
+      id,
+      type: 'table',
+      barIndex: ctx.bar_index,
+      position: runtime.toStringValue(namedArgs.get('position') ?? args[0] ?? 'top_right'),
+      columns: positiveInteger(runtime, namedArgs.get('columns') ?? args[1], 1),
+      rows: positiveInteger(runtime, namedArgs.get('rows') ?? args[2], 1),
+      bgcolor: runtime.toNullableColor(namedArgs.get('bgcolor') ?? args[3]),
+      frameColor: runtime.toNullableColor(namedArgs.get('frame_color') ?? args[4]),
+      frameWidth: runtime.toLineWidth(namedArgs.get('frame_width') ?? args[5]),
+      borderColor: runtime.toNullableColor(namedArgs.get('border_color') ?? args[6]),
+      borderWidth: runtime.toLineWidth(namedArgs.get('border_width') ?? args[7]),
+      cells: [],
+    };
+
+    ctx.addDrawing(drawing);
+    return id;
+  });
+
+  builtins.set('table.delete', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => ctx.deleteDrawing(table.id));
+    return undefined;
+  });
+
+  builtins.set('table.clear', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      const startColumn = normalizeTableColumn(runtime, args[1] ?? 0);
+      const startRow = normalizeTableRow(runtime, args[2] ?? 0);
+      const endColumn = args[3] === undefined ? table.columns - 1 : normalizeTableColumn(runtime, args[3]);
+      const endRow = args[4] === undefined ? table.rows - 1 : normalizeTableRow(runtime, args[4]);
+      table.cells = table.cells.filter((cell) => (
+        cell.column < startColumn
+        || cell.column > endColumn
+        || cell.row < startRow
+        || cell.row > endRow
+      ));
+    });
+    return undefined;
+  });
+
+  builtins.set('table.cell', (args, namedArgs, ctx) => {
+    withTable(namedArgs.get('table_id') ?? args[0], ctx, (table) => {
+      const { column, row } = normalizeCellCoordinates(table, namedArgs.get('column') ?? args[1], namedArgs.get('row') ?? args[2]);
+      upsertCell(table, {
+        column,
+        row,
+        text: runtime.toStringValue(namedArgs.get('text') ?? args[3] ?? ''),
+        width: namedArgs.has('width') || args[4] !== undefined
+          ? runtime.toNullableNumber(namedArgs.get('width') ?? args[4])
+          : undefined,
+        height: namedArgs.has('height') || args[5] !== undefined
+          ? runtime.toNullableNumber(namedArgs.get('height') ?? args[5])
+          : undefined,
+        textColor: runtime.toNullableColor(namedArgs.get('text_color') ?? args[6]),
+        textHalign: runtime.toStringValue(namedArgs.get('text_halign') ?? args[7] ?? 'center'),
+        textValign: runtime.toStringValue(namedArgs.get('text_valign') ?? args[8] ?? 'middle'),
+        textSize: runtime.toStringValue(namedArgs.get('text_size') ?? args[9] ?? 'normal'),
+        bgcolor: runtime.toNullableColor(namedArgs.get('bgcolor') ?? args[10]),
+      });
+    });
+    return undefined;
+  });
+
+  builtins.set('table.cell_set_text', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      const cell = ensureCell(table, args[1], args[2]);
+      cell.text = runtime.toStringValue(args[3] ?? '');
+    });
+    return undefined;
+  });
+  builtins.set('table.cell_set_bgcolor', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      const cell = ensureCell(table, args[1], args[2]);
+      cell.bgcolor = runtime.toNullableColor(args[3]);
+    });
+    return undefined;
+  });
+  builtins.set('table.cell_set_text_color', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      const cell = ensureCell(table, args[1], args[2]);
+      cell.textColor = runtime.toNullableColor(args[3]);
+    });
+    return undefined;
+  });
+  builtins.set('table.cell_set_text_size', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      const cell = ensureCell(table, args[1], args[2]);
+      cell.textSize = runtime.toStringValue(args[3]);
+    });
+    return undefined;
+  });
 }
 
 const DRAWING_CONSTANTS: Record<string, string> = {
@@ -510,10 +848,59 @@ const DRAWING_CONSTANTS: Record<string, string> = {
   'label.style_flag': 'flag',
   'label.style_arrowup': 'arrowup',
   'label.style_arrowdown': 'arrowdown',
+  'text.align_left': 'left',
+  'text.align_center': 'center',
+  'text.align_right': 'right',
+  'text.align_top': 'top',
+  'text.align_middle': 'middle',
+  'text.align_bottom': 'bottom',
+  'text.wrap_none': 'none',
+  'text.wrap_auto': 'auto',
+  'font.family_default': 'default',
+  'font.family_monospace': 'monospace',
+  'position.top_left': 'top_left',
+  'position.top_center': 'top_center',
+  'position.top_right': 'top_right',
+  'position.middle_left': 'middle_left',
+  'position.middle_center': 'middle_center',
+  'position.middle_right': 'middle_right',
+  'position.bottom_left': 'bottom_left',
+  'position.bottom_center': 'bottom_center',
+  'position.bottom_right': 'bottom_right',
 };
 
 export function registerDrawingConstants(builtins: BuiltinRegistry): void {
   for (const [name, value] of Object.entries(DRAWING_CONSTANTS)) {
     builtins.set(name, () => value);
   }
+
+  builtins.set('chart.point.new', (args) => ({
+    type: 'chart.point',
+    time: typeof args[0] === 'number' && Number.isFinite(args[0]) ? args[0] : null,
+    index: typeof args[1] === 'number' && Number.isFinite(args[1]) ? Math.trunc(args[1]) : null,
+    price: typeof args[2] === 'number' && Number.isFinite(args[2]) ? args[2] : null,
+  }));
+  builtins.set('chart.point.now', (args, _namedArgs, ctx) => ({
+    type: 'chart.point',
+    time: ctx.time.get(0) ?? null,
+    index: ctx.bar_index,
+    price: typeof args[0] === 'number' && Number.isFinite(args[0]) ? args[0] : ctx.close.get(0) ?? null,
+  }));
+  builtins.set('chart.point.from_index', (args) => ({
+    type: 'chart.point',
+    time: null,
+    index: typeof args[0] === 'number' && Number.isFinite(args[0]) ? Math.trunc(args[0]) : null,
+    price: typeof args[1] === 'number' && Number.isFinite(args[1]) ? args[1] : null,
+  }));
+  builtins.set('chart.point.from_time', (args) => ({
+    type: 'chart.point',
+    time: typeof args[0] === 'number' && Number.isFinite(args[0]) ? args[0] : null,
+    index: null,
+    price: typeof args[1] === 'number' && Number.isFinite(args[1]) ? args[1] : null,
+  }));
+  builtins.set('chart.point.copy', (args) => {
+    const source = args[0];
+    if (!isChartPoint(source)) return Number.NaN;
+    return { ...source };
+  });
 }

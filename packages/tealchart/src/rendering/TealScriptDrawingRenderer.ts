@@ -7,6 +7,7 @@ import {
   resolveBoxDrawingRect,
   resolveLabelDrawingPosition,
   resolveLineDrawingSegment,
+  resolvePolylineDrawingPoints,
 } from './TealScriptDrawingCoordinates';
 
 export interface TealScriptDrawingRendererOptions {
@@ -43,8 +44,10 @@ export class TealScriptDrawingRenderer {
   ): void {
     this.renderLineFillDrawings(drawingPartition, bars, viewport, pane);
     this.renderBoxDrawings(drawingPartition.boxes, bars, viewport, pane);
+    this.renderPolylineDrawings(drawingPartition.polylines, bars, viewport, pane);
     this.renderLineDrawings(drawingPartition.lines, bars, viewport, pane);
     this.renderLabelDrawings(drawingPartition.labels, bars, viewport, pane);
+    this.renderTableDrawings(drawingPartition.tables, pane);
   }
 
   private clipToPane(pane: ComputedPane): void {
@@ -103,9 +106,10 @@ export class TealScriptDrawingRenderer {
         ctx.setLineDash([]);
         ctx.fillStyle = box.textColor ?? '#FFFFFF';
         ctx.font = `${this.fontSizeForDrawing(box.textSize)}px ${this.font}`;
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
-        ctx.fillText(box.text, rect.x + 6, rect.y + 6);
+        const textPosition = this.resolveBoxTextPosition(box, rect);
+        ctx.textAlign = textPosition.align;
+        ctx.textBaseline = textPosition.baseline;
+        ctx.fillText(box.text, textPosition.x, textPosition.y);
       }
     }
 
@@ -126,6 +130,37 @@ export class TealScriptDrawingRenderer {
       default:
         return 12;
     }
+  }
+
+  private resolveBoxTextPosition(
+    box: TealScriptDrawingPartition['boxes'][number],
+    rect: { x: number; y: number; width: number; height: number },
+  ): { x: number; y: number; align: CanvasTextAlign; baseline: CanvasTextBaseline } {
+    const padding = 6;
+    const halign = box.textHalign ?? 'left';
+    const valign = box.textValign ?? 'top';
+
+    let x = rect.x + padding;
+    let align: CanvasTextAlign = 'left';
+    if (halign === 'center') {
+      x = rect.x + rect.width / 2;
+      align = 'center';
+    } else if (halign === 'right') {
+      x = rect.x + rect.width - padding;
+      align = 'right';
+    }
+
+    let y = rect.y + padding;
+    let baseline: CanvasTextBaseline = 'top';
+    if (valign === 'middle' || valign === 'center') {
+      y = rect.y + rect.height / 2;
+      baseline = 'middle';
+    } else if (valign === 'bottom') {
+      y = rect.y + rect.height - padding;
+      baseline = 'bottom';
+    }
+
+    return { x, y, align, baseline };
   }
 
   private renderLineFillDrawings(
@@ -235,6 +270,61 @@ export class TealScriptDrawingRenderer {
     ctx.restore();
   }
 
+  private renderPolylineDrawings(
+    polylines: TealScriptDrawingPartition['polylines'],
+    bars: Bar[],
+    viewport: Viewport,
+    pane: ComputedPane,
+  ): void {
+    if (polylines.length === 0) return;
+
+    const { ctx, options, margins } = this;
+    const chartWidth = options.width - margins.left;
+
+    ctx.save();
+    this.clipToPane(pane);
+
+    for (const polyline of polylines) {
+      const points = resolvePolylineDrawingPoints(
+        polyline,
+        bars,
+        viewport,
+        pane,
+        chartWidth,
+        this.coordinateResolvers,
+      );
+      if (points.length < 2) continue;
+
+      ctx.strokeStyle = polyline.lineColor ?? '#2962FF';
+      ctx.lineWidth = Math.max(1, polyline.lineWidth);
+      if (polyline.lineStyle === 'dashed') {
+        ctx.setLineDash([6, 4]);
+      } else if (polyline.lineStyle === 'dotted') {
+        ctx.setLineDash([2, 4]);
+      } else {
+        ctx.setLineDash([]);
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(points[0]!.x, points[0]!.y);
+      for (let index = 1; index < points.length; index++) {
+        const point = points[index]!;
+        ctx.lineTo(point.x, point.y);
+      }
+      if (polyline.closed) {
+        ctx.closePath();
+        if (polyline.fillColor) {
+          ctx.fillStyle = polyline.fillColor;
+          ctx.fill();
+        }
+      }
+      ctx.stroke();
+    }
+
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
   private renderLabelDrawings(
     labels: TealScriptDrawingPartition['labels'],
     bars: Bar[],
@@ -305,5 +395,165 @@ export class TealScriptDrawingRenderer {
     }
 
     ctx.restore();
+  }
+
+  private renderTableDrawings(tables: TealScriptDrawingPartition['tables'], pane: ComputedPane): void {
+    if (tables.length === 0) return;
+
+    const { ctx, options, margins } = this;
+    ctx.save();
+
+    for (const table of tables) {
+      const metrics = this.measureTable(table);
+      const origin = this.resolveTableOrigin(table.position, metrics.width, metrics.height, options.width, margins, pane);
+
+      if (table.bgcolor) {
+        ctx.fillStyle = table.bgcolor;
+        ctx.fillRect(origin.x, origin.y, metrics.width, metrics.height);
+      }
+
+      for (let row = 0; row < table.rows; row++) {
+        for (let column = 0; column < table.columns; column++) {
+          const cell = table.cells.find((candidate) => candidate.column === column && candidate.row === row);
+          const x = origin.x + metrics.columnOffsets[column]!;
+          const y = origin.y + metrics.rowOffsets[row]!;
+          const width = metrics.columnWidths[column]!;
+          const height = metrics.rowHeights[row]!;
+
+          if (cell?.bgcolor) {
+            ctx.fillStyle = cell.bgcolor;
+            ctx.fillRect(x, y, width, height);
+          }
+
+          if (table.borderWidth > 0) {
+            ctx.strokeStyle = table.borderColor ?? '#4B5563';
+            ctx.lineWidth = table.borderWidth;
+            ctx.setLineDash([]);
+            ctx.strokeRect(x, y, width, height);
+          }
+
+          if (cell?.text) {
+            const textPosition = this.resolveTableCellTextPosition(cell.textHalign, cell.textValign, x, y, width, height);
+            ctx.fillStyle = cell.textColor ?? '#FFFFFF';
+            ctx.font = `${this.fontSizeForDrawing(cell.textSize)}px ${this.font}`;
+            ctx.textAlign = textPosition.align;
+            ctx.textBaseline = textPosition.baseline;
+            ctx.fillText(cell.text, textPosition.x, textPosition.y);
+          }
+        }
+      }
+
+      if (table.frameWidth > 0) {
+        ctx.strokeStyle = table.frameColor ?? table.borderColor ?? '#4B5563';
+        ctx.lineWidth = table.frameWidth;
+        ctx.setLineDash([]);
+        ctx.strokeRect(origin.x, origin.y, metrics.width, metrics.height);
+      }
+    }
+
+    ctx.restore();
+  }
+
+  private measureTable(table: TealScriptDrawingPartition['tables'][number]): {
+    width: number;
+    height: number;
+    columnWidths: number[];
+    rowHeights: number[];
+    columnOffsets: number[];
+    rowOffsets: number[];
+  } {
+    const defaultColumnWidth = 48;
+    const defaultRowHeight = 22;
+    const columnWidths = Array.from({ length: table.columns }, () => defaultColumnWidth);
+    const rowHeights = Array.from({ length: table.rows }, () => defaultRowHeight);
+
+    for (const cell of table.cells) {
+      if (cell.column < 0 || cell.column >= table.columns || cell.row < 0 || cell.row >= table.rows) continue;
+      const measuredText = cell.text
+        ? this.getTextWidth(this.ctx, cell.text, `${this.fontSizeForDrawing(cell.textSize)}px ${this.font}`) + 12
+        : defaultColumnWidth;
+      columnWidths[cell.column] = Math.max(columnWidths[cell.column]!, cell.width ?? measuredText);
+      rowHeights[cell.row] = Math.max(rowHeights[cell.row]!, cell.height ?? defaultRowHeight);
+    }
+
+    const columnOffsets = this.prefixOffsets(columnWidths);
+    const rowOffsets = this.prefixOffsets(rowHeights);
+    return {
+      width: columnWidths.reduce((sum, width) => sum + width, 0),
+      height: rowHeights.reduce((sum, height) => sum + height, 0),
+      columnWidths,
+      rowHeights,
+      columnOffsets,
+      rowOffsets,
+    };
+  }
+
+  private prefixOffsets(values: number[]): number[] {
+    const offsets: number[] = [];
+    let current = 0;
+    for (const value of values) {
+      offsets.push(current);
+      current += value;
+    }
+    return offsets;
+  }
+
+  private resolveTableOrigin(
+    position: string,
+    width: number,
+    height: number,
+    canvasWidth: number,
+    margins: ChartMargins,
+    pane: ComputedPane,
+  ): { x: number; y: number } {
+    const padding = 8;
+    const drawableWidth = canvasWidth - margins.left - margins.right;
+    let x = margins.left + padding;
+    if (position.endsWith('_center')) {
+      x = margins.left + drawableWidth / 2 - width / 2;
+    } else if (position.endsWith('_right')) {
+      x = canvasWidth - margins.right - width - padding;
+    }
+
+    let y = pane.top + padding;
+    if (position.startsWith('middle_')) {
+      y = pane.top + pane.height / 2 - height / 2;
+    } else if (position.startsWith('bottom_')) {
+      y = pane.bottom - height - padding;
+    }
+
+    return { x, y };
+  }
+
+  private resolveTableCellTextPosition(
+    halign: string,
+    valign: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+  ): { x: number; y: number; align: CanvasTextAlign; baseline: CanvasTextBaseline } {
+    const padding = 6;
+    let textX = x + width / 2;
+    let align: CanvasTextAlign = 'center';
+    if (halign === 'left') {
+      textX = x + padding;
+      align = 'left';
+    } else if (halign === 'right') {
+      textX = x + width - padding;
+      align = 'right';
+    }
+
+    let textY = y + height / 2;
+    let baseline: CanvasTextBaseline = 'middle';
+    if (valign === 'top') {
+      textY = y + padding;
+      baseline = 'top';
+    } else if (valign === 'bottom') {
+      textY = y + height - padding;
+      baseline = 'bottom';
+    }
+
+    return { x: textX, y: textY, align, baseline };
   }
 }
