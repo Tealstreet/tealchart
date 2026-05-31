@@ -29,6 +29,8 @@ export interface StrategyOrder {
   qty: number | null;
   qtyType: StrategyQuantityType;
   qtyValue: number;
+  isEntry: boolean;
+  requestedQty: number | null;
   filledQty: number;
   avgFillPrice: number | null;
   limitPrice?: number;
@@ -52,6 +54,8 @@ export interface StrategyOrderInput {
   qty: number | null;
   qtyType: StrategyQuantityType;
   qtyValue: number;
+  isEntry?: boolean;
+  requestedQty?: number | null;
   limitPrice?: number;
   stopPrice?: number;
   fromEntry?: string;
@@ -212,6 +216,8 @@ export function createStrategyOrder(input: StrategyOrderInput): StrategyOrder {
     qty: input.qty,
     qtyType: input.qtyType,
     qtyValue: input.qtyValue,
+    isEntry: input.isEntry ?? false,
+    requestedQty: input.requestedQty ?? input.qty,
     filledQty: 0,
     avgFillPrice: null,
     limitPrice: input.limitPrice,
@@ -285,9 +291,10 @@ function fillStrategyOrder(
   if (!Number.isFinite(price)) {
     throw new Error('strategy fill price must be finite');
   }
+  const fillQty = resolveStrategyFillQty(ledger, order);
 
   order.status = 'filled';
-  order.filledQty = order.qty;
+  order.filledQty = fillQty;
   order.avgFillPrice = price;
   order.updatedBarIndex = barIndex;
   order.updatedTime = time;
@@ -297,7 +304,7 @@ function fillStrategyOrder(
     orderId: order.id,
     entryId: order.fromEntry,
     direction: order.direction,
-    qty: order.qty,
+    qty: fillQty,
     price,
     commission: 0,
     slippage: 0,
@@ -309,6 +316,19 @@ function fillStrategyOrder(
   applyStrategyFillToTrades(ledger, fill);
   applyStrategyFillToPosition(ledger, fill);
   return fill;
+}
+
+function resolveStrategyFillQty(ledger: StrategyLedger, order: StrategyOrder): number {
+  if (!order.isEntry) {
+    return order.qty ?? 0;
+  }
+
+  const requestedQty = order.requestedQty ?? order.qty ?? 0;
+  const position = ledger.position;
+  if (position.direction === null || position.direction === order.direction) {
+    return requestedQty;
+  }
+  return Math.abs(position.size) + requestedQty;
 }
 
 function getPendingOrderFillPrice(order: StrategyOrder, high: number, low: number, barIndex: number): number | null {
