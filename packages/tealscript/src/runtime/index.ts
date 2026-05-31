@@ -63,3 +63,16 @@ export {
   type ExecutionResult,
   type ExecutionError,
 } from './engine';
+
+export {
+  InMemoryRequestDatafeed,
+  requestDatafeedKey,
+  type RequestDataContext,
+  type RequestDatafeed,
+  type RequestDatafeedErrorCode,
+  type RequestDatafeedFailure,
+  type RequestDatafeedKey,
+  type RequestDatafeedQuery,
+  type RequestDatafeedResult,
+  type RequestDatafeedSuccess,
+} from './requestDatafeed';
