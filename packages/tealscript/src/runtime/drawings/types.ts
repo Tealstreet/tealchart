@@ -16,6 +16,7 @@ export interface LabelDrawingOutput {
   textColor: string | null;
   size: string;
   tooltip?: string;
+  forceOverlay?: boolean;
 }
 
 export interface LineDrawingOutput {
@@ -72,6 +73,11 @@ export interface BoxDrawingOutput {
   text: string;
   textColor: string | null;
   textSize: string;
+  textHalign?: string;
+  textValign?: string;
+  textWrap?: string;
+  textFontFamily?: string;
+  forceOverlay?: boolean;
 }
 
 export type DrawingOutput = LabelDrawingOutput | LineDrawingOutput | LineFillDrawingOutput | BoxDrawingOutput;

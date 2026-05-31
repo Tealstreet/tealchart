@@ -14,7 +14,7 @@ import { partitionTealScriptDrawings } from './TealScriptDrawingPartition';
 import { TealScriptDrawingRenderer } from './TealScriptDrawingRenderer';
 
 function createRecordingContext(events: string[]): CanvasContext {
-  return {
+  const context: CanvasContext = {
     fillStyle: '',
     strokeStyle: '',
     lineWidth: 1,
@@ -36,7 +36,10 @@ function createRecordingContext(events: string[]): CanvasContext {
     stroke: () => events.push('stroke'),
     fillRect: (x, y, width, height) => events.push(`fillRect:${x},${y},${width},${height}`),
     strokeRect: (x, y, width, height) => events.push(`strokeRect:${x},${y},${width},${height}`),
-    fillText: (text, x, y) => events.push(`fillText:${text}:${x},${y}`),
+    fillText: (text, x, y) => {
+      events.push(`fillTextStyle:${context.textAlign},${context.textBaseline}`);
+      events.push(`fillText:${text}:${x},${y}`);
+    },
     save: () => events.push('save'),
     restore: () => events.push('restore'),
     clip: () => events.push('clip'),
@@ -46,6 +49,7 @@ function createRecordingContext(events: string[]): CanvasContext {
     getLineDash: () => [],
     measureText: (text) => ({ width: text.length * 8 }) as TextMetrics,
   };
+  return context;
 }
 
 const bars: Bar[] = [
@@ -182,5 +186,38 @@ describe('TealScriptDrawingRenderer', () => {
     expect(labelTextIndex).toBeGreaterThan(firstStrokeAfterBox);
     expect(clipCount).toBe(3);
     expect(getTextWidth).toHaveBeenCalledWith(ctx, 'Label', '14px sans-serif');
+  });
+
+  it('renders box text using stored horizontal and vertical alignment', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeBox({
+          text: 'Box',
+          textHalign: 'right',
+          textValign: 'bottom',
+        }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).toContain('fillTextStyle:right,bottom');
+    expect(events).toContain('fillText:Box:114,124');
   });
 });

@@ -96,6 +96,15 @@ describe('routeTealScriptDrawings', () => {
     expect(routed.byPaneId.size).toBe(0);
   });
 
+  it('routes forced-overlay labels to the main pane', () => {
+    const drawing = label({ forceOverlay: true });
+
+    const routed = routeTealScriptDrawings([drawing], [mainPane, indicatorPane]);
+
+    expect(routed.main).toEqual([drawing]);
+    expect(routed.byPaneId.size).toBe(0);
+  });
+
   it('preserves per-pane drawing order', () => {
     const first = label({ id: 'label-1' });
     const second = line({ id: 'line-2' });

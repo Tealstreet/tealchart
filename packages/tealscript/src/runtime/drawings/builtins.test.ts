@@ -615,6 +615,43 @@ plot(close)`;
       });
     });
 
+    it('records force-overlay labels and box text layout metadata', () => {
+      const script = `//@version=6
+indicator("Drawing layout", overlay=false)
+label.new(bar_index, close, text="forced", force_overlay=true)
+zone = box.new(0, high, 1, low, text="seed", text_halign=text.align_center, text_valign=text.align_middle, text_wrap=text.wrap_auto, text_font_family=font.family_monospace, force_overlay=true)
+box.set_text_halign(zone, text.align_right)
+box.set_text_valign(zone, text.align_bottom)
+box.set_text_wrap(zone, text.wrap_none)
+box.set_text_font_family(zone, font.family_default)
+label.new(na, na, text=str.format("{0}|{1}", box.get_text_halign(zone), box.get_text_valign(zone)))
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings[0]).toMatchObject({
+        type: 'label',
+        text: 'forced',
+        forceOverlay: true,
+      });
+      expect(result.drawings[1]).toMatchObject({
+        type: 'box',
+        text: 'seed',
+        textHalign: 'right',
+        textValign: 'bottom',
+        textWrap: 'none',
+        textFontFamily: 'default',
+        forceOverlay: true,
+      });
+      expect(result.drawings[2]).toMatchObject({
+        type: 'label',
+        text: 'right|bottom',
+      });
+    });
+
     it('applies declaration object limits and exposes all-id arrays', () => {
       const script = `//@version=6
 indicator("Drawing limits", overlay=true, max_labels_count=2, max_lines_count=1, max_boxes_count=1)

@@ -103,9 +103,10 @@ export class TealScriptDrawingRenderer {
         ctx.setLineDash([]);
         ctx.fillStyle = box.textColor ?? '#FFFFFF';
         ctx.font = `${this.fontSizeForDrawing(box.textSize)}px ${this.font}`;
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
-        ctx.fillText(box.text, rect.x + 6, rect.y + 6);
+        const textPosition = this.resolveBoxTextPosition(box, rect);
+        ctx.textAlign = textPosition.align;
+        ctx.textBaseline = textPosition.baseline;
+        ctx.fillText(box.text, textPosition.x, textPosition.y);
       }
     }
 
@@ -126,6 +127,37 @@ export class TealScriptDrawingRenderer {
       default:
         return 12;
     }
+  }
+
+  private resolveBoxTextPosition(
+    box: TealScriptDrawingPartition['boxes'][number],
+    rect: { x: number; y: number; width: number; height: number },
+  ): { x: number; y: number; align: CanvasTextAlign; baseline: CanvasTextBaseline } {
+    const padding = 6;
+    const halign = box.textHalign ?? 'left';
+    const valign = box.textValign ?? 'top';
+
+    let x = rect.x + padding;
+    let align: CanvasTextAlign = 'left';
+    if (halign === 'center') {
+      x = rect.x + rect.width / 2;
+      align = 'center';
+    } else if (halign === 'right') {
+      x = rect.x + rect.width - padding;
+      align = 'right';
+    }
+
+    let y = rect.y + padding;
+    let baseline: CanvasTextBaseline = 'top';
+    if (valign === 'middle' || valign === 'center') {
+      y = rect.y + rect.height / 2;
+      baseline = 'middle';
+    } else if (valign === 'bottom') {
+      y = rect.y + rect.height - padding;
+      baseline = 'bottom';
+    }
+
+    return { x, y, align, baseline };
   }
 
   private renderLineFillDrawings(

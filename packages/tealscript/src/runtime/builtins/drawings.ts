@@ -5,7 +5,7 @@ import {
   withDrawing,
 } from '../drawings/helpers';
 import type { ExecutionContext } from '../context';
-import type { ChartPoint, LineDrawingOutput } from '../drawings/types';
+import type { BoxDrawingOutput, ChartPoint, LabelDrawingOutput, LineDrawingOutput } from '../drawings/types';
 
 export interface DrawingBuiltinRuntime {
   isNa(value: unknown): boolean;
@@ -33,6 +33,14 @@ function pointX(point: ChartPoint, xloc: string): number | null {
   return xloc === 'bar_time' ? point.time : point.index;
 }
 
+function optionalString(runtime: DrawingBuiltinRuntime, value: unknown): string | undefined {
+  return value === undefined ? undefined : runtime.toStringValue(value);
+}
+
+function optionalBoolean(value: unknown): boolean | undefined {
+  return value === undefined ? undefined : Boolean(value);
+}
+
 export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
   builtins.set('label.new', (args, namedArgs, ctx, _scope, callId) => {
     const x = runtime.toNullableNumber(namedArgs.get('x') ?? args[0]);
@@ -40,7 +48,8 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     const text = runtime.toStringValue(namedArgs.get('text') ?? args[2] ?? '');
     const id = `label_${callId}_${ctx.bar_index}`;
 
-    ctx.addDrawing({
+    const forceOverlay = optionalBoolean(namedArgs.get('force_overlay') ?? args[11]);
+    const drawing: LabelDrawingOutput = {
       id,
       type: 'label',
       barIndex: ctx.bar_index,
@@ -54,7 +63,10 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       textColor: runtime.toNullableColor(namedArgs.get('textcolor')),
       size: runtime.toStringValue(namedArgs.get('size') ?? 'normal'),
       tooltip: runtime.toOptionalString(namedArgs.get('tooltip') ?? args[10]),
-    });
+    };
+    if (forceOverlay !== undefined) drawing.forceOverlay = forceOverlay;
+
+    ctx.addDrawing(drawing);
 
     return id;
   });
@@ -370,7 +382,12 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
     const pointArgOffset = usesPointOverload ? 2 : 4;
     const xloc = runtime.toStringValue(namedArgs.get('xloc') ?? args[pointArgOffset + 4] ?? 'bar_index');
 
-    ctx.addDrawing({
+    const textHalign = optionalString(runtime, namedArgs.get('text_halign') ?? args[pointArgOffset + 9]);
+    const textValign = optionalString(runtime, namedArgs.get('text_valign') ?? args[pointArgOffset + 10]);
+    const textWrap = optionalString(runtime, namedArgs.get('text_wrap') ?? args[pointArgOffset + 11]);
+    const textFontFamily = optionalString(runtime, namedArgs.get('text_font_family') ?? args[pointArgOffset + 12]);
+    const forceOverlay = optionalBoolean(namedArgs.get('force_overlay') ?? args[pointArgOffset + 13]);
+    const drawing: BoxDrawingOutput = {
       id,
       type: 'box',
       barIndex: ctx.bar_index,
@@ -395,7 +412,14 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
       text: runtime.toStringValue(namedArgs.get('text') ?? args[pointArgOffset + 6] ?? ''),
       textSize: runtime.toStringValue(namedArgs.get('text_size') ?? args[pointArgOffset + 7] ?? 'normal'),
       textColor: runtime.toNullableColor(namedArgs.get('text_color') ?? args[pointArgOffset + 8]),
-    });
+    };
+    if (textHalign !== undefined) drawing.textHalign = textHalign;
+    if (textValign !== undefined) drawing.textValign = textValign;
+    if (textWrap !== undefined) drawing.textWrap = textWrap;
+    if (textFontFamily !== undefined) drawing.textFontFamily = textFontFamily;
+    if (forceOverlay !== undefined) drawing.forceOverlay = forceOverlay;
+
+    ctx.addDrawing(drawing);
 
     return id;
   });
@@ -506,6 +530,30 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
     });
     return undefined;
   });
+  builtins.set('box.set_text_halign', (args, _namedArgs, ctx) => {
+    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
+      box.textHalign = runtime.toStringValue(args[1]);
+    });
+    return undefined;
+  });
+  builtins.set('box.set_text_valign', (args, _namedArgs, ctx) => {
+    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
+      box.textValign = runtime.toStringValue(args[1]);
+    });
+    return undefined;
+  });
+  builtins.set('box.set_text_wrap', (args, _namedArgs, ctx) => {
+    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
+      box.textWrap = runtime.toStringValue(args[1]);
+    });
+    return undefined;
+  });
+  builtins.set('box.set_text_font_family', (args, _namedArgs, ctx) => {
+    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
+      box.textFontFamily = runtime.toStringValue(args[1]);
+    });
+    return undefined;
+  });
 
   builtins.set('box.get_left', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.left ?? Number.NaN));
   builtins.set('box.get_right', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.right ?? Number.NaN));
@@ -514,6 +562,8 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
   builtins.set('box.get_bgcolor', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.bgcolor ?? Number.NaN));
   builtins.set('box.get_border_color', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.borderColor ?? Number.NaN));
   builtins.set('box.get_text', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.text));
+  builtins.set('box.get_text_halign', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.textHalign ?? 'left'));
+  builtins.set('box.get_text_valign', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.textValign ?? 'top'));
   builtins.set('box.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('box'));
 }
 
@@ -552,6 +602,16 @@ const DRAWING_CONSTANTS: Record<string, string> = {
   'label.style_flag': 'flag',
   'label.style_arrowup': 'arrowup',
   'label.style_arrowdown': 'arrowdown',
+  'text.align_left': 'left',
+  'text.align_center': 'center',
+  'text.align_right': 'right',
+  'text.align_top': 'top',
+  'text.align_middle': 'middle',
+  'text.align_bottom': 'bottom',
+  'text.wrap_none': 'none',
+  'text.wrap_auto': 'auto',
+  'font.family_default': 'default',
+  'font.family_monospace': 'monospace',
 };
 
 export function registerDrawingConstants(builtins: BuiltinRegistry): void {
