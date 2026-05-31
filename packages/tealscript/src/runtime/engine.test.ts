@@ -1712,6 +1712,37 @@ plot(ta.tsi(close, 2, 3), title="TSI")`;
       ]);
     });
 
+    it('calculates Keltner channels and widths', () => {
+      const script = `//@version=6
+indicator("TA KC")
+[basis, upper, lower] = ta.kc(close, 3, 1.5)
+[hlBasis, hlUpper, hlLower] = ta.kc(close, 3, 1.5, false)
+plot(basis, title="Basis")
+plot(upper, title="Upper")
+plot(lower, title="Lower")
+plot(ta.kcw(close, 3, 1.5), title="Width")
+plot(hlUpper, title="HL Upper")
+plot(ta.kcw(close, 3, 1.5, false), title="HL Width")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: 2, open: 101, high: 103, low: 100, close: 102, volume: 100 },
+        { time: 3, open: 102, high: 106, low: 101, close: 105, volume: 100 },
+        { time: 4, open: 105, high: 106, low: 102, close: 103, volume: 100 },
+        { time: 5, open: 118, high: 120, low: 119, close: 119, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(roundSeries(result.plots.find((plot) => plot.title === 'Basis')?.values ?? [])).toEqual([100, 101, 103, 103, 111]);
+      expect(roundSeries(result.plots.find((plot) => plot.title === 'Upper')?.values ?? [])).toEqual([103, 104.75, 108.625, 108.8125, 126.65625]);
+      expect(roundSeries(result.plots.find((plot) => plot.title === 'Lower')?.values ?? [])).toEqual([97, 97.25, 97.375, 97.1875, 95.34375]);
+      expect(roundSeries(result.plots.find((plot) => plot.title === 'Width')?.values ?? [])).toEqual([0.06, 0.074257, 0.109223, 0.112864, 0.282095]);
+      expect(roundSeries(result.plots.find((plot) => plot.title === 'HL Upper')?.values ?? [])).toEqual([103, 104.75, 108.625, 108.8125, 114.65625]);
+      expect(roundSeries(result.plots.find((plot) => plot.title === 'HL Width')?.values ?? [])).toEqual([0.06, 0.074257, 0.109223, 0.112864, 0.065878]);
+    });
+
     it('preserves source history when TA lookback length grows', () => {
       const script = `//@version=6
 indicator("Growing lookback")
