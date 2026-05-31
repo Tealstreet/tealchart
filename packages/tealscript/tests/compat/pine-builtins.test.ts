@@ -70,6 +70,8 @@ plot(ta.stoch(close, high, low, 3), title="Stoch Close")
 plot(ta.stoch(hl2, high, low, 3), title="Stoch HL2")
 plot(ta.mfi(hlc3, 3), title="MFI")
 plot(ta.wpr(3), title="WPR")
+plot(ta.cci(close, 3), title="Close CCI")
+plot(ta.cci(hlc3, 3), title="Typical CCI")
 `);
 
     expect(result.errors).toEqual([]);
@@ -77,6 +79,8 @@ plot(ta.wpr(3), title="WPR")
     expect(roundSeries(getPlot(result, 'Stoch HL2').values)).toEqual([null, null, 77.777778, 56.25, 27.272727, 19.230769, 66.666667, 75, 79.166667, 72.222222, 68.75, 50]);
     expect(roundSeries(getPlot(result, 'MFI').values)).toEqual([null, null, 100, 61.624951, 26.076294, 0, 35.319543, 74.59367, 100, 100, 100, 100]);
     expect(roundSeries(getPlot(result, 'WPR').values)).toEqual([null, null, -11.111111, -75, -90.909091, -69.230769, -11.111111, -7.142857, -25, -11.111111, -50, -28.571429]);
+    expect(roundSeries(getPlot(result, 'Close CCI').values)).toEqual([null, null, 87.5, -100, -100, -28.571429, 100, 100, 33.333333, 100, 20, 100]);
+    expect(roundSeries(getPlot(result, 'Typical CCI').values)).toEqual([null, null, 95.652174, -25, -100, -70, 100, 100, 64.516129, 100, 84.615385, 50]);
   });
 
   it('runs cumulative and dispersion TA helpers', () => {
@@ -97,6 +101,21 @@ plot(ta.correlation(close, close, 3), title="Self Correlation")
     expect(roundSeries(getPlot(result, 'Close Open Correlation').values)).toEqual([null, null, 0.973684, -0.39736, 0.5, 0.720577, -0.453921, 0.963928, 0.712468, 0, -0.142857, -0.327327]);
     expect(roundSeries(getPlot(result, 'Close High Correlation').values)).toEqual([null, null, 1, -0.327327, 0.755929, 0.81224, 0.544705, 1, 0.940634, 0.654654, 0.5, -0.5]);
     expect(roundSeries(getPlot(result, 'Self Correlation').values)).toEqual([null, null, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+  });
+
+  it('runs Pine linear regression helper idioms', () => {
+    const result = runCompatScript(`
+indicator("Linear regression helpers")
+change = close - close[1]
+plot(ta.linreg(close, 3, 0), title="LinReg")
+plot(ta.linreg(close, 3, 1), title="LinReg Offset")
+plot(ta.linreg(change, 3, 0), title="Change LinReg")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'LinReg').values)).toEqual([null, null, 107.166667, 104, 99, 99.166667, 103.5, 108.833333, 109, 110.333333, 110.666667, 111.5]);
+    expect(roundSeries(getPlot(result, 'LinReg Offset').values)).toEqual([null, null, 104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111]);
+    expect(roundSeries(getPlot(result, 'Change LinReg').values)).toEqual([null, null, null, -3.166667, -5, 0.166667, 4.333333, 5.333333, 0.166667, 1.333333, 0.333333, 0.833333]);
   });
 
   it('runs array covariance helper idioms', () => {

@@ -97,6 +97,7 @@ const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['request', 'map', 'matrix', 'pol
  */
 export class TealscriptEngine {
   private static readonly MAX_LOOP_ITERATIONS = 10000;
+  private static readonly MAX_BUILTIN_SOURCE_HISTORY = 10000;
 
   private ctx: ExecutionContext;
   private scope: Scope;
@@ -1628,9 +1629,19 @@ export class TealscriptEngine {
 
   private getCompleteSourceWindow(scope: Scope, key: string, source: number, length: number): number[] | null {
     if (isNaN(source) || length < 1) return null;
-    const values = this.updateBuiltinSourceHistory(scope, key, source, length);
-    if (values.length < length || values.some((value) => isNaN(value))) return null;
-    return values;
+    const maxLengthKey = `${key}_max_length`;
+    const previousMaxLength = scope.get(maxLengthKey) as number | undefined;
+    const maxLength = Math.max(length, previousMaxLength ?? 0);
+    this.setBuiltinState(scope, maxLengthKey, maxLength);
+
+    const keep = Math.min(
+      Math.max(maxLength, this.ctx.bar_index + 1),
+      TealscriptEngine.MAX_BUILTIN_SOURCE_HISTORY,
+    );
+    const values = this.updateBuiltinSourceHistory(scope, key, source, keep);
+    const window = values.slice(0, length);
+    if (window.length < length || window.some((value) => isNaN(value))) return null;
+    return window;
   }
 
   private getCompleteNonNaSourceWindow(scope: Scope, key: string, source: number, length: number): number[] | null {
@@ -3431,37 +3442,15 @@ export class TealscriptEngine {
       return source - prev;
     });
 
-    // CCI - Commodity Channel Index
-    this.builtins.set('ta.cci', (args, _namedArgs, ctx) => {
-      const length = (args[0] ?? 20) as number;
+    this.builtins.set('ta.cci', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const length = this.normalizeLookbackLength(args[1] ?? 20);
+      const values = this.getCompleteSourceWindow(scope, `_ta_cci_source_${callId}`, source, length);
+      if (!values) return NaN;
 
-      // Calculate typical prices for the period
-      const typicalPrices: number[] = [];
-      for (let i = 0; i < length; i++) {
-        const h = ctx.high.get(i);
-        const l = ctx.low.get(i);
-        const c = ctx.close.get(i);
-        if (h !== undefined && l !== undefined && c !== undefined) {
-          typicalPrices.push((h + l + c) / 3);
-        }
-      }
-
-      if (typicalPrices.length < length) {
-        return NaN; // Not enough data
-      }
-
-      const currentTP = typicalPrices[0];
-
-      // Calculate SMA of typical prices
-      const sma = typicalPrices.reduce((a, b) => a + b, 0) / typicalPrices.length;
-
-      // Calculate Mean Deviation
-      const meanDev = typicalPrices.reduce((sum, tp) => sum + Math.abs(tp - sma), 0) / typicalPrices.length;
-
-      if (meanDev === 0) return 0;
-
-      // CCI = (Typical Price - SMA) / (0.015 × Mean Deviation)
-      return (currentTP - sma) / (0.015 * meanDev);
+      const basis = values.reduce((sum, value) => sum + value, 0) / length;
+      const meanDeviation = values.reduce((sum, value) => sum + Math.abs(value - basis), 0) / length;
+      return meanDeviation === 0 ? 0 : (source - basis) / (0.015 * meanDeviation);
     });
 
     // OBV - On-Balance Volume
@@ -3999,24 +3988,13 @@ export class TealscriptEngine {
       return pivotValue;
     });
 
-    // LinReg - Linear Regression Value
-    this.builtins.set('ta.linreg', (args, _namedArgs, ctx) => {
+    this.builtins.set('ta.linreg', (args, _namedArgs, _ctx, scope, callId) => {
       const source = args[0] as number;
-      const length = args[1] as number;
-      const offset = (args[2] ?? 0) as number;
+      const length = this.normalizeLookbackLength(args[1]);
+      const offset = this.toNumber(args[2] ?? 0);
+      const values = this.getCompleteSourceWindow(scope, `_ta_linreg_source_${callId}`, source, length);
+      if (!values || isNaN(offset)) return NaN;
 
-      const series = this.getSeriesForSource(source, ctx);
-
-      // Collect values
-      const values: number[] = [];
-      for (let i = 0; i < length; i++) {
-        const val = series.get(i);
-        if (val === undefined || isNaN(val)) return NaN;
-        values.push(val);
-      }
-
-      // Linear regression: y = mx + b
-      // Using least squares method
       const n = length;
       let sumX = 0;
       let sumY = 0;
@@ -4024,8 +4002,8 @@ export class TealscriptEngine {
       let sumX2 = 0;
 
       for (let i = 0; i < n; i++) {
-        const x = n - 1 - i; // x goes from n-1 to 0 (oldest to newest)
-        const y = values[i];
+        const x = i;
+        const y = values[n - 1 - i];
         sumX += x;
         sumY += y;
         sumXY += x * y;
@@ -4038,8 +4016,7 @@ export class TealscriptEngine {
       const slope = (n * sumXY - sumX * sumY) / denominator;
       const intercept = (sumY - slope * sumX) / n;
 
-      // Calculate value at offset (0 = current bar, negative = future, positive = past)
-      return intercept + slope * -offset;
+      return intercept + slope * (length - 1 - offset);
     });
   }
 
