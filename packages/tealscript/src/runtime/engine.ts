@@ -4281,7 +4281,8 @@ export class TealscriptEngine {
       if (duration === null || currentTime === undefined || !Number.isFinite(currentTime)) return false;
       if (previousTime === undefined || !Number.isFinite(previousTime)) return true;
 
-      return Math.floor(currentTime / duration) !== Math.floor(previousTime / duration);
+      const timezoneOffsetMs = this.parseTimezoneOffsetMinutes(this.ctx.syminfo.timezone) * 60_000;
+      return Math.floor((currentTime + timezoneOffsetMs) / duration) !== Math.floor((previousTime + timezoneOffsetMs) / duration);
     });
 
     for (const part of ['year', 'month', 'weekofyear', 'dayofmonth', 'dayofweek', 'hour', 'minute', 'second']) {
