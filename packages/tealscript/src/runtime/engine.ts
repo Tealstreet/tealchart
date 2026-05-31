@@ -1062,7 +1062,7 @@ export class TealscriptEngine {
     // Look up builtin
     if (namespace && expr.callee.type === 'MemberExpression' && this.scope.has(namespace)) {
       const receiver = this.evaluateExpression(expr.callee.object);
-      if (receiver !== undefined) {
+      if (isPineArray(receiver) || isPineMatrix(receiver)) {
         const methodBuiltinName = this.getMethodBuiltinName(funcName, receiver);
         const methodBuiltin = this.builtins.get(methodBuiltinName);
         if (methodBuiltin) {

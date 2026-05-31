@@ -9,6 +9,7 @@
  */
 
 import { Series, type SeriesSnapshot } from './series';
+import { copyArray, isPineArray } from './arrays';
 import { copyMatrix, isPineMatrix } from './matrices';
 
 /**
@@ -308,7 +309,7 @@ export class Scope {
       variables.set(name, {
         value: cloneSnapshotValue(entry.value),
         initialized: entry.initialized,
-        seriesSnapshot: entry.series?.snapshot(),
+        seriesSnapshot: entry.series ? cloneSeriesSnapshot(entry.series.snapshot()) : undefined,
       });
     }
 
@@ -325,7 +326,7 @@ export class Scope {
         entry.value = cloneSnapshotValue(snap.value);
         entry.initialized = snap.initialized;
         if (entry.series && snap.seriesSnapshot) {
-          entry.series.restore(snap.seriesSnapshot);
+          entry.series.restore(cloneSeriesSnapshot(snap.seriesSnapshot));
         }
       }
     }
@@ -384,7 +385,20 @@ export class Scope {
 }
 
 function cloneSnapshotValue(value: unknown): unknown {
+  if (isPineArray(value)) {
+    return copyArray(value);
+  }
   return isPineMatrix(value) ? copyMatrix(value) : value;
+}
+
+function cloneSeriesSnapshot(snapshot: SeriesSnapshot<unknown>): SeriesSnapshot<unknown> {
+  return {
+    values: snapshot.values.map(cloneSnapshotValue),
+    currentIndex: snapshot.currentIndex,
+    committedIndex: snapshot.committedIndex,
+    uncommittedValue: cloneSnapshotValue(snapshot.uncommittedValue),
+    hasUncommittedValue: snapshot.hasUncommittedValue,
+  };
 }
 
 /**
