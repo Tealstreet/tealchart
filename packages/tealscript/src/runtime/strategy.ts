@@ -35,6 +35,9 @@ export interface StrategyOrder {
   avgFillPrice: number | null;
   limitPrice?: number;
   stopPrice?: number;
+  stopLimitActivated: boolean;
+  stopLimitActivatedBarIndex: number | null;
+  stopLimitActivatedTime: number | null;
   fromEntry?: string;
   ocaName?: string;
   ocaType?: StrategyOcaType;
@@ -222,6 +225,9 @@ export function createStrategyOrder(input: StrategyOrderInput): StrategyOrder {
     avgFillPrice: null,
     limitPrice: input.limitPrice,
     stopPrice: input.stopPrice,
+    stopLimitActivated: false,
+    stopLimitActivatedBarIndex: null,
+    stopLimitActivatedTime: null,
     fromEntry: input.fromEntry,
     ocaName: input.ocaName,
     ocaType: input.ocaType,
@@ -264,7 +270,7 @@ export function fillPendingStrategyOrders(
 ): StrategyFill[] {
   const fills: StrategyFill[] = [];
   for (const order of ledger.orders) {
-    const price = getPendingOrderFillPrice(order, high, low, barIndex);
+    const price = getPendingOrderFillPrice(order, high, low, barIndex, time);
     if (price === null) {
       continue;
     }
@@ -331,7 +337,13 @@ function resolveStrategyFillQty(ledger: StrategyLedger, order: StrategyOrder): n
   return Math.abs(position.size) + requestedQty;
 }
 
-function getPendingOrderFillPrice(order: StrategyOrder, high: number, low: number, barIndex: number): number | null {
+function getPendingOrderFillPrice(
+  order: StrategyOrder,
+  high: number,
+  low: number,
+  barIndex: number,
+  time: number,
+): number | null {
   if (order.status !== 'pending' || order.qty === null || order.activationBarIndex >= barIndex) {
     return null;
   }
@@ -340,12 +352,7 @@ function getPendingOrderFillPrice(order: StrategyOrder, high: number, low: numbe
   }
 
   if (order.type === 'limit' && order.limitPrice !== undefined) {
-    if (order.direction === 'long' && low <= order.limitPrice) {
-      return order.limitPrice;
-    }
-    if (order.direction === 'short' && high >= order.limitPrice) {
-      return order.limitPrice;
-    }
+    return getLimitOrderFillPrice(order, high, low);
   }
 
   if (order.type === 'stop' && order.stopPrice !== undefined) {
@@ -357,7 +364,53 @@ function getPendingOrderFillPrice(order: StrategyOrder, high: number, low: numbe
     }
   }
 
+  if (
+    order.type === 'stop_limit'
+    && order.limitPrice !== undefined
+    && order.stopPrice !== undefined
+  ) {
+    if (!order.stopLimitActivated) {
+      if (!isStopLimitTriggered(order, high, low)) {
+        return null;
+      }
+      order.stopLimitActivated = true;
+      order.stopLimitActivatedBarIndex = barIndex;
+      order.stopLimitActivatedTime = time;
+      order.updatedBarIndex = barIndex;
+      order.updatedTime = time;
+      return null;
+    }
+
+    if (order.stopLimitActivatedBarIndex !== null && order.stopLimitActivatedBarIndex >= barIndex) {
+      return null;
+    }
+    return getLimitOrderFillPrice(order, high, low);
+  }
+
   return null;
+}
+
+function getLimitOrderFillPrice(order: StrategyOrder, high: number, low: number): number | null {
+  if (order.limitPrice === undefined) {
+    return null;
+  }
+  if (order.direction === 'long' && low <= order.limitPrice) {
+    return order.limitPrice;
+  }
+  if (order.direction === 'short' && high >= order.limitPrice) {
+    return order.limitPrice;
+  }
+  return null;
+}
+
+function isStopLimitTriggered(order: StrategyOrder, high: number, low: number): boolean {
+  if (order.stopPrice === undefined) {
+    return false;
+  }
+  if (order.direction === 'long') {
+    return high >= order.stopPrice;
+  }
+  return low <= order.stopPrice;
 }
 
 function cancelOcaOrders(ledger: StrategyLedger, filledOrder: StrategyOrder, barIndex: number, time: number): void {
