@@ -87,6 +87,7 @@ export {
   cloneStrategyLedger,
   createStrategyOrder,
   fillStrategyMarketOrder,
+  fillPendingStrategyOrders,
   createStrategyLedger,
   createStrategyPosition,
   submitStrategyOrder,
