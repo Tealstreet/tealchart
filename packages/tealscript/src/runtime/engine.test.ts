@@ -1478,7 +1478,10 @@ plot(x)`;
 indicator("TA stats")
 plot(ta.cum(close), title="Cum")
 plot(ta.variance(close, 3), title="Variance")
-plot(ta.dev(close, 3), title="Deviation")`;
+plot(ta.dev(close, 3), title="Deviation")
+plot(ta.correlation(close, open, 3), title="Correlation")
+plot(ta.correlation(close, close, 3), title="Self Correlation")
+plot(ta.correlation(close, 1, 3), title="Flat Correlation")`;
 
       const ast = parse(script);
       const bars = createBars(3, 100);
@@ -1488,6 +1491,9 @@ plot(ta.dev(close, 3), title="Deviation")`;
       expect(result.plots.find((plot) => plot.title === 'Cum')?.values).toEqual([100.2, 200.9, 302.1]);
       expect(result.plots.find((plot) => plot.title === 'Variance')?.values).toEqual([null, null, 1 / 6]);
       expect(result.plots.find((plot) => plot.title === 'Deviation')?.values).toEqual([null, null, 1 / 3]);
+      expect(result.plots.find((plot) => plot.title === 'Correlation')?.values[2]).toBeCloseTo(1);
+      expect(result.plots.find((plot) => plot.title === 'Self Correlation')?.values[2]).toBeCloseTo(1);
+      expect(result.plots.find((plot) => plot.title === 'Flat Correlation')?.values).toEqual([null, null, null]);
     });
 
     it('calculates median, mode, and percentile TA helpers', () => {

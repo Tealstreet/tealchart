@@ -97,7 +97,7 @@ that supports the parity work.
 
 The common TA helper pass covers event helpers (`ta.barssince`,
 `ta.valuewhen`), cumulative/window helpers (`ta.cum`, `ta.dev`,
-`ta.variance`, `ta.vwma`, `ta.swma`, `ta.alma`, `ta.highestbars`,
+`ta.variance`, `ta.correlation`, `ta.vwma`, `ta.swma`, `ta.alma`, `ta.highestbars`,
 `ta.lowestbars`), and compatibility aliases/helpers (`ta.change` numeric and
 boolean forms, `ta.cross`, `ta.range`, `ta.rising`, and `ta.falling`). The
 statistical helper pass covers `ta.median`, `ta.mode`,

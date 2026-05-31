@@ -69,12 +69,18 @@ indicator("Cumulative TA docs smoke")
 plot(ta.cum(close), title="Cum Close")
 plot(ta.variance(close, 3), title="Variance")
 plot(ta.dev(close, 3), title="Mean Deviation")
+plot(ta.correlation(close, open, 3), title="Close Open Correlation")
+plot(ta.correlation(close, high, 3), title="Close High Correlation")
+plot(ta.correlation(close, close, 3), title="Self Correlation")
 `);
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Cum Close').values)).toEqual([102, 207, 314, 417, 516, 616, 720, 829, 937, 1048, 1158, 1270]);
     expect(roundSeries(getPlot(result, 'Variance').values)).toEqual([null, null, 4.222222, 2.666667, 10.666667, 2.888889, 4.666667, 13.555556, 4.666667, 1.555556, 1.555556, 0.666667]);
     expect(roundSeries(getPlot(result, 'Mean Deviation').values)).toEqual([null, null, 1.777778, 1.333333, 2.666667, 1.555556, 2, 3.111111, 2, 1.111111, 1.111111, 0.666667]);
+    expect(roundSeries(getPlot(result, 'Close Open Correlation').values)).toEqual([null, null, 0.973684, -0.39736, 0.5, 0.720577, -0.453921, 0.963928, 0.712468, 0, -0.142857, -0.327327]);
+    expect(roundSeries(getPlot(result, 'Close High Correlation').values)).toEqual([null, null, 1, -0.327327, 0.755929, 0.81224, 0.544705, 1, 0.940634, 0.654654, 0.5, -0.5]);
+    expect(roundSeries(getPlot(result, 'Self Correlation').values)).toEqual([null, null, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
   });
 
   it('runs array covariance helper idioms', () => {
