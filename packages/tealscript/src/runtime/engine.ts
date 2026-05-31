@@ -3570,10 +3570,11 @@ export class TealscriptEngine {
           type: 'alertcondition',
           title,
           message,
+          renderedMessages: [],
         });
       }
 
-      ctx.setAlertConditionValue(id, isActive ? true : null);
+      ctx.setAlertConditionValue(id, isActive ? true : null, isActive ? this.renderAlertConditionMessage(message, ctx) : null);
       return condition;
     });
 
@@ -3589,6 +3590,55 @@ export class TealscriptEngine {
     this.builtins.set('alert.freq_all', () => 'all');
     this.builtins.set('alert.freq_once_per_bar', () => 'once_per_bar');
     this.builtins.set('alert.freq_once_per_bar_close', () => 'once_per_bar_close');
+  }
+
+  private renderAlertConditionMessage(message: string, ctx: ExecutionContext): string {
+    return message.replace(/\{\{\s*([^{}]+?)\s*\}\}/g, (placeholder, rawName: string) => {
+      const name = rawName.trim();
+      const value = this.resolveAlertPlaceholder(name, ctx);
+      return value === undefined ? placeholder : this.toStringValue(value);
+    });
+  }
+
+  private resolveAlertPlaceholder(name: string, ctx: ExecutionContext): unknown {
+    switch (name) {
+      case 'open':
+        return ctx.open.get(0);
+      case 'high':
+        return ctx.high.get(0);
+      case 'low':
+        return ctx.low.get(0);
+      case 'close':
+        return ctx.close.get(0);
+      case 'volume':
+        return ctx.volume.get(0);
+      case 'ticker':
+        return ctx.syminfo.ticker;
+      case 'exchange':
+        return ctx.syminfo.ticker.includes(':') ? ctx.syminfo.ticker.split(':')[0] : '';
+      case 'interval':
+        return ctx.timeframe.period;
+      default:
+        return this.resolveAlertPlotPlaceholder(name, ctx);
+    }
+  }
+
+  private resolveAlertPlotPlaceholder(name: string, ctx: ExecutionContext): unknown {
+    const indexMatch = /^plot_(\d+)$/.exec(name);
+    if (indexMatch) {
+      const index = Number(indexMatch[1]);
+      const plot = ctx.getPlots().filter((output) => output.type === 'plot')[index];
+      return plot?.values[ctx.bar_index];
+    }
+
+    const titleMatch = /^plot\("(.+)"\)$/.exec(name);
+    if (titleMatch) {
+      const title = titleMatch[1];
+      const plot = ctx.getPlots().find((output) => output.type === 'plot' && output.title === title);
+      return plot?.values[ctx.bar_index];
+    }
+
+    return undefined;
   }
 
   private registerInputBuiltins(): void {

@@ -545,6 +545,45 @@ if bar_index >= 2
       expect(result.alerts[0].values).toEqual([null, null, true, true, true]);
     });
 
+    it('renders alertcondition OHLCV and chart placeholders per triggered bar', () => {
+      const script = `//@version=6
+indicator("Alerts", timeframe="15")
+alertcondition(close > open, title="Green", message="{{ticker}} {{exchange}} {{interval}} {{open}} {{high}} {{low}} {{close}} {{volume}}")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.alerts[0]).toMatchObject({
+        title: 'Green',
+        message: '{{ticker}} {{exchange}} {{interval}} {{open}} {{high}} {{low}} {{close}} {{volume}}',
+      });
+      expect(result.alerts[0].values).toEqual([true, true]);
+      expect(result.alerts[0].renderedMessages).toEqual([
+        'BTCUSDT  15 100 100.5 99.7 100.2 1000',
+        'BTCUSDT  15 100.5 101 100.2 100.7 1010',
+      ]);
+    });
+
+    it('renders alertcondition plot placeholders by index and title', () => {
+      const script = `//@version=6
+indicator("Alerts")
+basis = close + 1
+plot(basis, title="Basis")
+alertcondition(true, title="Plot alert", message='basis={{plot_0}} named={{plot("Basis")}} missing={{plot_9}}')`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.alerts[0].renderedMessages).toEqual([
+        'basis=101.2 named=101.2 missing={{plot_9}}',
+        'basis=101.7 named=101.7 missing={{plot_9}}',
+      ]);
+    });
+
     it('collects direct alert events with frequency constants', () => {
       const script = `//@version=6
 indicator("Alerts")
