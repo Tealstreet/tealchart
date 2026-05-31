@@ -113,6 +113,28 @@ plot(ta.cog(close - open, 3), title="Derived COG")
     expect(roundSeries(getPlot(result, 'Derived COG').values)).toEqual([null, null, -2, -9, -1, -2.714286, 6, -1.6, -2.625, -2.285714, -2, -2.25]);
   });
 
+  it('runs Pine channel helper idioms', () => {
+    const result = runCompatScript(`
+indicator("Channel helpers")
+[basis, upper, lower] = ta.kc(close, 3, 1.25)
+[hlBasis, hlUpper, hlLower] = ta.kc(close, 3, 1.25, false)
+plot(basis, title="KC Basis")
+plot(upper, title="KC Upper")
+plot(lower, title="KC Lower")
+plot(ta.kcw(close, 3, 1.25), title="KC Width")
+plot(hlUpper, title="HL Upper")
+plot(ta.kcw(close, 3, 1.25, false), title="HL Width")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'KC Basis').values)).toEqual([102, 103.5, 105.25, 104.125, 101.5625, 100.78125, 102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957]);
+    expect(roundSeries(getPlot(result, 'KC Upper').values)).toEqual([107, 109.125, 110.5625, 111.15625, 108.828125, 107.539063, 109.519531, 113.634766, 113.942383, 115.596191, 115.923096, 117.086548]);
+    expect(roundSeries(getPlot(result, 'KC Lower').values)).toEqual([97, 97.875, 99.9375, 97.09375, 94.296875, 94.023438, 95.261719, 97.755859, 99.75293, 102.251465, 103.000732, 104.375366]);
+    expect(roundSeries(getPlot(result, 'KC Width').values)).toEqual([0.098039, 0.108696, 0.10095, 0.135054, 0.143077, 0.134109, 0.139249, 0.150233, 0.132801, 0.122514, 0.118054, 0.114793]);
+    expect(roundSeries(getPlot(result, 'HL Upper').values)).toEqual(roundSeries(getPlot(result, 'KC Upper').values));
+    expect(roundSeries(getPlot(result, 'HL Width').values)).toEqual(roundSeries(getPlot(result, 'KC Width').values));
+  });
+
   it('runs Pine linear regression helper idioms', () => {
     const result = runCompatScript(`
 indicator("Linear regression helpers")

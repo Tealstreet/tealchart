@@ -1676,6 +1676,48 @@ export class TealscriptEngine {
     return values.length < length ? null : values;
   }
 
+  private updateBuiltinEmaState(scope: Scope, key: string, value: number, length: number): number {
+    const alpha = 2 / (length + 1);
+    const previous = scope.get(key) as number | undefined;
+    const next = previous === undefined || isNaN(previous) ? value : alpha * value + (1 - alpha) * previous;
+    this.setBuiltinState(scope, key, next);
+    return next;
+  }
+
+  private calculateKeltnerChannel(
+    scope: Scope,
+    callId: string,
+    source: number,
+    length: number,
+    multiplier: number,
+    useTrueRange: boolean,
+  ): [number, number, number] {
+    const high = this.ctx.high.get(0);
+    const low = this.ctx.low.get(0);
+    if (
+      length < 1
+      || isNaN(source)
+      || !Number.isFinite(multiplier)
+      || high === undefined
+      || low === undefined
+      || isNaN(high)
+      || isNaN(low)
+    ) {
+      return [NaN, NaN, NaN];
+    }
+
+    const previousClose = this.ctx.close.get(1);
+    const trueRange = previousClose === undefined || isNaN(previousClose)
+      ? high - low
+      : Math.max(high - low, Math.abs(high - previousClose), Math.abs(low - previousClose));
+    const span = useTrueRange ? trueRange : high - low;
+    const baseKey = `_ta_kc_${callId}_${length}_${multiplier}_${useTrueRange ? 'tr' : 'hl'}`;
+    const basis = this.updateBuiltinEmaState(scope, `${baseKey}_basis`, source, length);
+    const range = this.updateBuiltinEmaState(scope, `${baseKey}_range`, span, length);
+
+    return [basis, basis + range * multiplier, basis - range * multiplier];
+  }
+
   private nextSeededRandom(scope: Scope, key: string, seed: number): number {
     const state = scope.get(key) as RandomBuiltinState | undefined;
     const current = state?.seed === seed ? state.state : this.hashRandomSeed(seed);
@@ -3591,6 +3633,25 @@ export class TealscriptEngine {
       const doubleSmoothedAbsMomentum = ema(`${baseKey}_abs_short`, smoothedAbsMomentum, shortAlpha);
 
       return doubleSmoothedAbsMomentum === 0 ? 0 : doubleSmoothedMomentum / doubleSmoothedAbsMomentum;
+    });
+
+    this.builtins.set('ta.kc', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const length = this.normalizeLookbackLength(args[1]);
+      const multiplier = this.toNumber(args[2]);
+      const useTrueRange = args[3] === undefined ? true : this.isTruthy(args[3]);
+
+      return this.calculateKeltnerChannel(scope, callId, source, length, multiplier, useTrueRange);
+    });
+
+    this.builtins.set('ta.kcw', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const length = this.normalizeLookbackLength(args[1]);
+      const multiplier = this.toNumber(args[2]);
+      const useTrueRange = args[3] === undefined ? true : this.isTruthy(args[3]);
+      const [basis, upper, lower] = this.calculateKeltnerChannel(scope, callId, source, length, multiplier, useTrueRange);
+
+      return basis === 0 || isNaN(basis) || isNaN(upper) || isNaN(lower) ? NaN : (upper - lower) / basis;
     });
 
     // MOM - Momentum
