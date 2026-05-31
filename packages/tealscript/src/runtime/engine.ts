@@ -176,6 +176,14 @@ export interface ExecutionError {
 
 export interface TealscriptEngineOptions {
   requestDatafeed?: RequestDatafeed;
+  libraries?: Map<string, Program>;
+}
+
+interface ImportedLibrary {
+  path: string;
+  alias: string;
+  functions: Map<string, FunctionDeclaration>;
+  exportedFunctions: Set<string>;
 }
 
 interface RandomBuiltinState {
@@ -210,10 +218,13 @@ export class TealscriptEngine {
   private userMethods: Map<string, FunctionDeclaration[]>;
   private functionScopes: Map<string, Scope>;
   private requestDatafeed?: RequestDatafeed;
+  private libraries: Map<string, Program>;
+  private importedLibraries = new Map<string, ImportedLibrary>();
   private requestEvaluationCache = new Map<string, RequestEvaluationCacheEntry>();
   private requestExpressionIds = new WeakMap<Expression, number>();
   private nextRequestExpressionId = 0;
   private userFunctionCallStack: string[] = [];
+  private importedLibraryCallStack: string[] = [];
   private indicatorDynamicRequests = true;
   private requestContextDepth = 0;
   private requestLocalScopeDepth = 0;
@@ -228,6 +239,7 @@ export class TealscriptEngine {
     this.userMethods = new Map();
     this.functionScopes = new Map();
     this.requestDatafeed = options.requestDatafeed;
+    this.libraries = options.libraries ?? new Map();
 
     this.registerBuiltins();
   }
@@ -241,15 +253,18 @@ export class TealscriptEngine {
     this.scope = createRootScope();
     this.typeDeclarations.clear();
     this.functionScopes.clear();
+    this.importedLibraries.clear();
     this.requestEvaluationCache.clear();
     this.requestExpressionIds = new WeakMap();
     this.nextRequestExpressionId = 0;
     this.userFunctionCallStack = [];
+    this.importedLibraryCallStack = [];
     this.indicatorDynamicRequests = true;
     this.requestContextDepth = 0;
     this.requestLocalScopeDepth = 0;
     this.registerTypeDeclarations(ast);
     this.registerUserFunctions(ast);
+    this.registerLibraryImports(ast);
 
     this.ctx.setNow(Date.now());
 
@@ -339,6 +354,8 @@ export class TealscriptEngine {
     this.resetPerBarBuiltinState();
     this.registerTypeDeclarations(ast);
     this.registerUserFunctions(ast);
+    this.importedLibraries.clear();
+    this.registerLibraryImports(ast);
 
     // Re-execute statements for current bar
     for (const stmt of ast.body) {
@@ -461,6 +478,7 @@ export class TealscriptEngine {
   }
 
   private executeImport(stmt: ImportDeclaration): void {
+    if (this.importedLibraries.has(stmt.alias.name)) return;
     if (this.ctx.bar_index !== 0) return;
 
     throw new Error(`import declarations are not supported yet: ${stmt.path} as ${stmt.alias.name}`);
@@ -563,6 +581,37 @@ export class TealscriptEngine {
           this.functionScopes.set(scopeKey, this.scope.createChild());
         }
       }
+    }
+  }
+
+  private registerLibraryImports(ast: Program): void {
+    for (const stmt of ast.body) {
+      if (stmt.type !== 'ImportDeclaration') continue;
+
+      const libraryAst = this.libraries.get(stmt.path);
+      if (!libraryAst) continue;
+
+      const functions = new Map<string, FunctionDeclaration>();
+      const exportedFunctions = new Set<string>();
+      for (const libraryStmt of libraryAst.body) {
+        if (libraryStmt.type === 'FunctionDeclaration') {
+          functions.set(libraryStmt.name.name, libraryStmt);
+          if (libraryStmt.exported) {
+            exportedFunctions.add(libraryStmt.name.name);
+          }
+          const scopeKey = this.importedFunctionScopeKey(stmt.alias.name, libraryStmt);
+          if (!this.functionScopes.has(scopeKey)) {
+            this.functionScopes.set(scopeKey, this.scope.createChild());
+          }
+        }
+      }
+
+      this.importedLibraries.set(stmt.alias.name, {
+        path: stmt.path,
+        alias: stmt.alias.name,
+        functions,
+        exportedFunctions,
+      });
     }
   }
 
@@ -1155,6 +1204,10 @@ export class TealscriptEngine {
       return this.evaluateTypeConstructor(namespace, args, namedArgs);
     }
 
+    if (namespace && this.importedLibraries.has(namespace)) {
+      return this.evaluateImportedFunction(namespace, funcName, args, namedArgs);
+    }
+
     if (namespace && expr.callee.type === 'MemberExpression' && this.scope.has(namespace)) {
       const receiver = this.evaluateExpression(expr.callee.object);
       const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs);
@@ -1205,6 +1258,12 @@ export class TealscriptEngine {
     }
 
     if (!namespace) {
+      const importedLibrary = this.currentImportedLibrary();
+      const libraryFunction = importedLibrary?.functions.get(funcName);
+      if (importedLibrary && libraryFunction) {
+        return this.evaluateImportedLibraryFunction(importedLibrary, libraryFunction, args, namedArgs);
+      }
+
       const userFunction = this.userFunctions.get(funcName);
       if (userFunction) {
         return this.evaluateUserFunction(userFunction, args, namedArgs);
@@ -1221,6 +1280,54 @@ export class TealscriptEngine {
       ? `${fn.loc.start.line}:${fn.loc.start.column}-${fn.loc.end.line}:${fn.loc.end.column}`
       : `${fn.params.map((param) => param.typeAnnotation?.baseType ?? 'any').join(',')}#${fn.params.length}`;
     return `method:${fn.name.name}:${locKey}`;
+  }
+
+  private importedFunctionScopeKey(alias: string, fn: FunctionDeclaration): string {
+    const locKey = fn.loc
+      ? `${fn.loc.start.line}:${fn.loc.start.column}-${fn.loc.end.line}:${fn.loc.end.column}`
+      : fn.name.name;
+    return `import:${alias}:${fn.name.name}:${locKey}`;
+  }
+
+  private evaluateImportedFunction(
+    alias: string,
+    functionName: string,
+    args: unknown[],
+    namedArgs: Map<string, unknown>,
+  ): unknown {
+    const library = this.importedLibraries.get(alias);
+    const fn = library?.functions.get(functionName);
+    if (!library || !fn || !library.exportedFunctions.has(functionName)) {
+      throw new Error(`Unknown library function: ${alias}.${functionName}`);
+    }
+    return this.evaluateImportedLibraryFunction(library, fn, args, namedArgs);
+  }
+
+  private currentImportedLibrary(): ImportedLibrary | undefined {
+    const alias = this.importedLibraryCallStack.at(-1);
+    return alias ? this.importedLibraries.get(alias) : undefined;
+  }
+
+  private evaluateImportedLibraryFunction(
+    library: ImportedLibrary,
+    fn: FunctionDeclaration,
+    args: unknown[],
+    namedArgs: Map<string, unknown>,
+  ): unknown {
+    const scopeKey = this.importedFunctionScopeKey(library.alias, fn);
+    this.importedLibraryCallStack.push(library.alias);
+    try {
+      return this.evaluateUserFunction(
+        fn,
+        args,
+        namedArgs,
+        `library function ${library.alias}.${fn.name.name}`,
+        scopeKey,
+        scopeKey,
+      );
+    } finally {
+      this.importedLibraryCallStack.pop();
+    }
   }
 
   private findCallableUserMethod(
@@ -1518,7 +1625,8 @@ export class TealscriptEngine {
   }
 
   private evaluateRequestExpressionSeries(expression: Expression, requestContext: RequestDataContext): unknown[] {
-    const engine = new TealscriptEngine({ requestDatafeed: this.requestDatafeed });
+    const engine = new TealscriptEngine({ requestDatafeed: this.requestDatafeed, libraries: this.libraries });
+    engine.importedLibraryCallStack = [...this.importedLibraryCallStack];
     engine.indicatorDynamicRequests = this.indicatorDynamicRequests;
     engine.requestContextDepth = this.requestContextDepth + 1;
     engine.ctx.setNow(this.ctx.now);
@@ -1537,6 +1645,7 @@ export class TealscriptEngine {
     engine.ctx.loadBars(requestContext.bars);
     engine.userFunctions = new Map(this.userFunctions);
     engine.userMethods = new Map(Array.from(this.userMethods, ([name, methods]) => [name, [...methods]]));
+    engine.importedLibraries = new Map(this.importedLibraries);
     engine.functionScopes.clear();
     for (const fn of engine.userFunctions.values()) {
       engine.functionScopes.set(engine.userCallableScopeKey(fn), engine.scope.createChild());
@@ -1544,6 +1653,11 @@ export class TealscriptEngine {
     for (const methods of engine.userMethods.values()) {
       for (const method of methods) {
         engine.functionScopes.set(engine.userCallableScopeKey(method), engine.scope.createChild());
+      }
+    }
+    for (const [alias, library] of engine.importedLibraries) {
+      for (const fn of library.functions.values()) {
+        engine.functionScopes.set(engine.importedFunctionScopeKey(alias, fn), engine.scope.createChild());
       }
     }
 
@@ -1821,11 +1935,11 @@ export class TealscriptEngine {
     namedArgs: Map<string, unknown>,
     displayName = `function ${fn.name.name}`,
     scopeKey = this.userCallableScopeKey(fn),
+    recursionKey = scopeKey,
   ): unknown {
-    const functionName = fn.name.name;
-    const recursiveIndex = this.userFunctionCallStack.indexOf(functionName);
+    const recursiveIndex = this.userFunctionCallStack.indexOf(recursionKey);
     if (recursiveIndex !== -1) {
-      const cycle = [...this.userFunctionCallStack.slice(recursiveIndex), functionName].join(' -> ');
+      const cycle = [...this.userFunctionCallStack.slice(recursiveIndex), recursionKey].join(' -> ');
       throw new Error(`Recursive user function calls are not supported: ${cycle}`);
     }
 
@@ -1864,7 +1978,7 @@ export class TealscriptEngine {
     const savedScope = this.scope;
     const functionScope = this.functionScopes.get(scopeKey) ?? this.scope.createChild();
     this.scope = functionScope;
-    this.userFunctionCallStack.push(functionName);
+    this.userFunctionCallStack.push(recursionKey);
 
     try {
       for (let i = 0; i < fn.params.length; i++) {
