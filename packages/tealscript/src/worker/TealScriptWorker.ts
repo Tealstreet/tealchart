@@ -5,7 +5,7 @@
  * Provides a clean async API for the chart integration.
  */
 
-import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition } from '../runtime/context';
+import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition, LogOutput } from '../runtime/context';
 import { getResultOutput } from './protocol';
 import type {
   ToWorkerMessage,
@@ -23,6 +23,7 @@ export interface WorkerResult {
   plots: PlotOutput[];
   drawings: DrawingOutput[];
   alerts: AlertOutput[];
+  logs: LogOutput[];
   inputs: InputDefinition[];
 }
 

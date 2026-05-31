@@ -59,7 +59,7 @@ import {
 } from './arrays';
 import type { BuiltinFunction, BuiltinRegistry } from './builtins/registry';
 import { registerBoxBuiltins, registerDrawingConstants, registerLabelBuiltins, registerLineBuiltins, registerLineFillBuiltins, type DrawingBuiltinRuntime } from './builtins/drawings';
-import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type PlotOutput, type PlotStyle } from './context';
+import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LogLevel, type LogOutput, type PlotOutput, type PlotStyle } from './context';
 import {
   getDrawingValue,
   toDrawingId as toDrawingIdValue,
@@ -75,6 +75,7 @@ export interface ExecutionResult {
   plots: PlotOutput[];
   drawings: DrawingOutput[];
   alerts: AlertOutput[];
+  logs: LogOutput[];
   inputs: InputDefinition[];
   indicatorTitle: string;
   indicatorMaxBarsBack?: number;
@@ -185,6 +186,7 @@ export class TealscriptEngine {
       plots: this.ctx.getPlots(),
       drawings: this.ctx.getDrawings(),
       alerts: this.ctx.getAlerts(),
+      logs: this.ctx.getLogs(),
       inputs: this.ctx.inputDefinitions.map((def) => ({ ...def })),
       indicatorTitle: this.ctx.indicatorTitle,
       indicatorMaxBarsBack: this.ctx.indicatorMaxBarsBack,
@@ -209,6 +211,7 @@ export class TealscriptEngine {
     this.ctx.truncatePlots(this.ctx.last_bar_index);
     this.ctx.truncateDrawings(this.ctx.last_bar_index);
     this.ctx.truncateAlerts(this.ctx.last_bar_index);
+    this.ctx.truncateLogs(this.ctx.last_bar_index);
 
     // Update current bar data
     this.ctx.updateCurrentBar(bar);
@@ -243,6 +246,13 @@ export class TealscriptEngine {
    */
   getDrawings(): DrawingOutput[] {
     return this.ctx.getDrawings();
+  }
+
+  /**
+   * Get current Pine log outputs.
+   */
+  getLogs(): LogOutput[] {
+    return this.ctx.getLogs();
   }
 
   // ===========================================================================
@@ -1860,6 +1870,9 @@ export class TealscriptEngine {
 
     // Runtime helpers
     this.registerRuntimeBuiltins();
+
+    // Pine Logs helpers
+    this.registerLogBuiltins();
   }
 
   // Plot call ordering is reset on every bar so output arrays align by call site.
@@ -1875,6 +1888,29 @@ export class TealscriptEngine {
     this.builtins.set('runtime.error', (args, namedArgs) => {
       const message = namedArgs.has('message') ? namedArgs.get('message') : args[0];
       throw new RuntimeErrorException(this.toStringValue(message ?? ''));
+    });
+  }
+
+  private registerLogBuiltins(): void {
+    const addLog = (level: LogLevel, args: unknown[], namedArgs: Map<string, unknown>) => {
+      const rawMessage = namedArgs.has('message') ? namedArgs.get('message') : args[0];
+      const message = this.formatLogMessage(rawMessage, args.slice(1));
+      this.ctx.addLog(level, message);
+      return undefined;
+    };
+
+    this.builtins.set('log.info', (args, namedArgs) => addLog('info', args, namedArgs));
+    this.builtins.set('log.warning', (args, namedArgs) => addLog('warning', args, namedArgs));
+    this.builtins.set('log.error', (args, namedArgs) => addLog('error', args, namedArgs));
+  }
+
+  private formatLogMessage(message: unknown, args: unknown[]): string {
+    const template = this.toStringValue(message ?? '');
+    if (args.length === 0) {
+      return template;
+    }
+    return template.replace(/\{(\d+)(?:,[^}:]+)?(?::([^}]+))?\}/g, (_match, index: string, format: string | undefined) => {
+      return this.toStringValue(args[Number(index)], format);
     });
   }
 

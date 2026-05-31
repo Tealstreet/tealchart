@@ -154,6 +154,7 @@ function handleUpdateBar(bar: Bar, metadata?: WorkerOutputMetadata): void {
       plots,
       drawings: state.engine.getDrawings(),
       alerts: state.engine.getAlerts(),
+      logs: state.engine.getLogs(),
       inputs: state.lastInputs, // send cached inputs from last full execution
       metadata,
     }));
@@ -222,6 +223,7 @@ function executeAndSendResults(metadata?: WorkerOutputMetadata): void {
       plots: result.plots,
       drawings: result.drawings,
       alerts: result.alerts,
+      logs: result.logs,
       inputs,
       metadata,
     });
