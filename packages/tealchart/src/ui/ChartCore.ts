@@ -1533,6 +1533,7 @@ export class ChartCore {
       (DIRTY.VIEWPORT |
         DIRTY.BARS |
         DIRTY.PLOTS |
+        DIRTY.DRAWINGS |
         DIRTY.LAYOUT |
         DIRTY.OPTIONS |
         DIRTY.DATA_LOAD |
@@ -1550,6 +1551,7 @@ export class ChartCore {
         DIRTY.VIEWPORT |
         DIRTY.BARS |
         DIRTY.PLOTS |
+        DIRTY.DRAWINGS |
         DIRTY.LAYOUT |
         DIRTY.OPTIONS |
         DIRTY.DATA_LOAD |
