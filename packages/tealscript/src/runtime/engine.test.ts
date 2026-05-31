@@ -374,6 +374,17 @@ plot(strategy.opentrades.size(99), title="Missing")`;
       expect(result.plots.find((plot) => plot.title === 'Missing')?.values).toEqual([null, null]);
     });
 
+    it('requires a trade number for strategy.opentrades accessors', () => {
+      const script = `//@version=6
+strategy("Missing trade num")
+strategy.entry("Long", strategy.long, qty=1)
+plot(strategy.opentrades.entry_price())`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors[0]?.message).toBe('strategy trade_num is required');
+    });
+
     it('rolls back strategy fills between realtime updateBar calls', () => {
       const script = `//@version=6
 strategy("Realtime strategy")
