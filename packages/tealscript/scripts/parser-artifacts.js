@@ -6,6 +6,8 @@ import peggy from 'peggy';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcDir = join(__dirname, '..', 'src', 'parser');
+const PARSE_START_RULES = ['Program', 'Expression', 'Statement'];
+const PARSE_START_RULE_UNION = PARSE_START_RULES.map((rule) => `'${rule}'`).join(' | ');
 
 export const parserArtifactPaths = {
   grammar: join(srcDir, 'grammar.peggy'),
@@ -18,7 +20,7 @@ export function generateParserArtifacts() {
   const parserSource = peggy.generate(grammar, {
     output: 'source',
     format: 'es',
-    allowedStartRules: ['Program', 'Expression', 'Statement'],
+    allowedStartRules: PARSE_START_RULES,
   });
 
   const declarations = `/**
@@ -28,7 +30,7 @@ export function generateParserArtifacts() {
 
 import type { Expression, Program, Statement } from './ast';
 
-export type ParseStartRule = 'Program' | 'Expression' | 'Statement';
+export type ParseStartRule = ${PARSE_START_RULE_UNION};
 
 export type ParseResult<T extends ParseStartRule> =
   T extends 'Expression' ? Expression :
