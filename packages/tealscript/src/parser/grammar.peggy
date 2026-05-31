@@ -66,6 +66,7 @@ StatementList
 Statement
   = IndicatorDeclaration
   / TypeDeclaration
+  / MethodDeclaration
   / FunctionDeclaration
   / IfStatement
   / ForStatement
@@ -156,6 +157,31 @@ UntypedTypeFieldDeclaration
       };
     }
 
+// User-defined method: method scale(float this, float factor) => this * factor
+MethodDeclaration
+  = exported:("export" _)? "method" !IdentifierPart _ name:Identifier _ "(" __ first:TypedParameter rest:(__ "," __ Parameter)* __ ")" _ "=>" _ LineTerminator body:FunctionIndentedBlock {
+      return {
+        type: 'FunctionDeclaration',
+        name,
+        params: [first, ...rest.map(t => t[3])],
+        body,
+        isMethod: true,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+  / exported:("export" _)? "method" !IdentifierPart _ name:Identifier _ "(" __ first:TypedParameter rest:(__ "," __ Parameter)* __ ")" _ "=>" _ body:Expression _ LineTerminator? {
+      return {
+        type: 'FunctionDeclaration',
+        name,
+        params: [first, ...rest.map(t => t[3])],
+        body,
+        isMethod: true,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+
 // User-defined function: f(x, y) => x + y
 FunctionDeclaration
   = name:Identifier _ "(" __ params:ParameterList? __ ")" _ "=>" _ LineTerminator body:FunctionIndentedBlock {
@@ -183,8 +209,25 @@ ParameterList
     }
 
 Parameter
+  = TypedParameter
+  / UntypedParameter
+
+TypedParameter
+  = typeAnnotation:TypeAnnotation _ name:Identifier defaultValue:(__ "=" __ Expression)? {
+      return {
+        ...name,
+        typeAnnotation,
+        ...(defaultValue ? { defaultValue: defaultValue[3] } : {})
+      };
+    }
+
+UntypedParameter
   = name:Identifier defaultValue:(__ "=" __ Expression)? {
-      return defaultValue ? { ...name, defaultValue: defaultValue[3] } : name;
+      return {
+        ...name,
+        typeAnnotation: null,
+        ...(defaultValue ? { defaultValue: defaultValue[3] } : {})
+      };
     }
 
 // Variable declaration: var float x = 0.0 or just x = 0.0
@@ -1071,7 +1114,7 @@ IdentifierPart
 ReservedWord
   = ("if" / "else" / "for" / "while" / "break" / "continue" / "var" / "varip"
     / "true" / "false" / "na" / "and" / "or" / "not" / "to" / "by"
-    / "switch" / "type"
+    / "switch" / "type" / "method"
     / "indicator" / "library" / "import" / "export"
     ) !IdentifierPart
 

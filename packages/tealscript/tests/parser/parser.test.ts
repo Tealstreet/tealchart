@@ -326,6 +326,24 @@ arrayValue = [1, 2]
       }
     });
 
+    it('parses user-defined methods with typed receivers', () => {
+      const ast = parse('method scale(float this, float factor = 2) => this * factor\n');
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(fn.isMethod).toBe(true);
+      expect(fn.name.name).toBe('scale');
+      expect(fn.params[0]).toEqual(expect.objectContaining({
+        name: 'this',
+        typeAnnotation: expect.objectContaining({ baseType: 'float' }),
+      }));
+      expect(fn.params[1]).toEqual(expect.objectContaining({
+        name: 'factor',
+        typeAnnotation: expect.objectContaining({ baseType: 'float' }),
+        defaultValue: expect.objectContaining({ type: 'NumericLiteral' }),
+      }));
+    });
+
     it('parses loops inside multiline user-defined functions', () => {
       const ast = parse(`lastValue(limit) =>
     for i = 0 to limit

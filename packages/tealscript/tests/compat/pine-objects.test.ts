@@ -57,4 +57,60 @@ plot(lastPivot.level, title="Last Pivot Level")
     expect(getPlot(result, 'Pivot Count').values).toEqual([1, 2, 3, 3, 3, 4, 5, 6, 6, 7, 7, 8]);
     expect(roundSeries(getPlot(result, 'Last Pivot Level').values)).toEqual([102, 105, 107, 107, 107, 100, 104, 109, 109, 111, 111, 112]);
   });
+
+  it('runs user-defined methods on primitive values and UDT references', () => {
+    const result = runCompatScript(`
+indicator("User methods")
+type pivotPoint
+    float level
+
+method scaled(float this, float factor = 2) => this * factor
+method lift(pivotPoint this, float amount) =>
+    this.level += amount
+    this
+
+point = pivotPoint.new(close)
+samePoint = point.lift(3)
+plot(close.scaled(2), title="Scaled Close")
+plot(samePoint.level, title="Lifted Level")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Scaled Close').values)).toEqual([204, 210, 214, 206, 198, 200, 208, 218, 216, 222, 220, 224]);
+    expect(roundSeries(getPlot(result, 'Lifted Level').values)).toEqual([105, 108, 110, 106, 102, 103, 107, 112, 111, 114, 113, 115]);
+  });
+
+  it('keeps overloaded user-defined method scopes isolated', () => {
+    const result = runCompatScript(`
+indicator("Method overload scopes")
+method hits(float this) =>
+    var count = 0
+    count += 1
+    count
+method hits(float this, float step) =>
+    var count = 0
+    count += step
+    count
+
+plot(close.hits(), title="Unary Hits")
+plot(close.hits(10), title="Binary Hits")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Unary Hits').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(getPlot(result, 'Binary Hits').values).toEqual([10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120]);
+  });
+
+  it('uses a compatible method overload when another overload has missing required parameters', () => {
+    const result = runCompatScript(`
+indicator("Method required args")
+method choose(float this, float required) => required
+method choose(float this) => this
+
+plot(close.choose(), title="Selected")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Selected').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+  });
 });

@@ -101,9 +101,12 @@ export interface FunctionDeclaration extends BaseNode {
   name: Identifier;
   params: FunctionParameter[];
   body: Expression | Statement[];
+  isMethod?: boolean;
+  exported?: boolean;
 }
 
 export interface FunctionParameter extends Identifier {
+  typeAnnotation?: TypeAnnotation | null;
   defaultValue?: Expression;
 }
 
