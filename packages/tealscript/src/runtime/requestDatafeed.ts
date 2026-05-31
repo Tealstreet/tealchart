@@ -1,6 +1,7 @@
 import type { Bar, SymInfo } from './context';
 
 export type RequestDatafeedErrorCode =
+  | 'invalid_currency'
   | 'invalid_symbol'
   | 'invalid_timeframe'
   | 'missing_context'
@@ -22,6 +23,22 @@ export interface RequestDataContext extends RequestDatafeedKey {
   currency?: string;
 }
 
+export type RequestSeriesFamily = 'currency_rate';
+
+export interface RequestSeriesPoint {
+  time: number;
+  value: number;
+}
+
+export interface RequestSeriesQuery {
+  family: RequestSeriesFamily;
+  key: string;
+}
+
+export interface RequestSeriesContext extends RequestSeriesQuery {
+  points: RequestSeriesPoint[];
+}
+
 export interface RequestDatafeedSuccess {
   ok: true;
   context: RequestDataContext;
@@ -35,12 +52,28 @@ export interface RequestDatafeedFailure {
 
 export type RequestDatafeedResult = RequestDatafeedSuccess | RequestDatafeedFailure;
 
+export interface RequestSeriesSuccess {
+  ok: true;
+  context: RequestSeriesContext;
+}
+
+export type RequestSeriesResult = RequestSeriesSuccess | RequestDatafeedFailure;
+
 export interface RequestDatafeed {
   getBars(query: RequestDatafeedQuery): RequestDatafeedResult;
+  getSeries?(query: RequestSeriesQuery): RequestSeriesResult;
 }
 
 export function requestDatafeedKey(symbol: string, timeframe: string): string {
   return `${symbol}\u0000${timeframe}`;
+}
+
+export function requestSeriesKey(family: RequestSeriesFamily, key: string): string {
+  return `${family}\u0000${key}`;
+}
+
+export function currencyRateRequestKey(fromCurrency: string, toCurrency: string): string {
+  return `${fromCurrency}\u0000${toCurrency}`;
 }
 
 function trimBars(bars: Bar[], calcBarsCount: number | undefined): Bar[] {
@@ -58,10 +91,14 @@ function trimBars(bars: Bar[], calcBarsCount: number | undefined): Bar[] {
 
 export class InMemoryRequestDatafeed implements RequestDatafeed {
   private readonly contexts = new Map<string, RequestDataContext>();
+  private readonly seriesContexts = new Map<string, RequestSeriesContext>();
 
-  constructor(contexts: RequestDataContext[] = []) {
+  constructor(contexts: RequestDataContext[] = [], seriesContexts: RequestSeriesContext[] = []) {
     for (const context of contexts) {
       this.setContext(context);
+    }
+    for (const context of seriesContexts) {
+      this.setSeriesContext(context);
     }
   }
 
@@ -70,6 +107,13 @@ export class InMemoryRequestDatafeed implements RequestDatafeed {
       ...context,
       bars: context.bars.map((bar) => ({ ...bar })),
       syminfo: context.syminfo === undefined ? undefined : { ...context.syminfo },
+    });
+  }
+
+  setSeriesContext(context: RequestSeriesContext): void {
+    this.seriesContexts.set(requestSeriesKey(context.family, context.key), {
+      ...context,
+      points: context.points.map((point) => ({ ...point })),
     });
   }
 
@@ -92,6 +136,25 @@ export class InMemoryRequestDatafeed implements RequestDatafeed {
         currency: query.currency ?? context.currency,
         bars: bars.map((bar) => ({ ...bar })),
         syminfo: context.syminfo === undefined ? undefined : { ...context.syminfo },
+      },
+    };
+  }
+
+  getSeries(query: RequestSeriesQuery): RequestSeriesResult {
+    const context = this.seriesContexts.get(requestSeriesKey(query.family, query.key));
+    if (!context) {
+      return {
+        ok: false,
+        code: 'missing_context',
+        message: `No request series context for ${query.family} ${query.key}`,
+      };
+    }
+
+    return {
+      ok: true,
+      context: {
+        ...context,
+        points: context.points.map((point) => ({ ...point })),
       },
     };
   }

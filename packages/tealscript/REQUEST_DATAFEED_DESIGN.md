@@ -9,11 +9,13 @@ on TradingView, a live exchange, or Tealchart networking during CI.
 The contract supports deterministic fixtures, same-symbol or host-provided
 other-symbol `request.security()` requests,
 `request.security_lower_tf()` intrabar arrays, and Pine v6 dynamic request
-behavior for supported `request.security*` calls. The dynamic MVP enables local
-scope and nested supported requests by default, while rejecting those forms when
-scripts explicitly set `dynamic_requests=false`. Full simple/series qualifier
-analysis, synthetic tickers, and external request families remain out of scope
-until later Epic 8, Epic 9, and qualified type-system phases.
+behavior for supported `request.security*` calls. It also supports the current
+`request.currency_rate()` fixture-backed series MVP. The dynamic MVP enables
+local scope and nested supported requests by default, while rejecting those
+forms when scripts explicitly set `dynamic_requests=false`. Full simple/series
+qualifier analysis, synthetic tickers, and the remaining external request
+families remain out of scope until later Epic 8, Epic 9, and qualified
+type-system phases.
 
 ## Contract
 
@@ -25,6 +27,13 @@ Callers request bars with a stable key:
   the datafeed and request context metadata but does not perform conversion.
 - `calcBarsCount`: optional tail-window hint matching Pine's
   `calc_bars_count` intent.
+
+Callers request scalar series with:
+
+- `family`: the external series family. The current MVP supports
+  `currency_rate`.
+- `key`: a stable family-specific key. Currency rate keys use
+  `{fromCurrency}\0{toCurrency}`.
 
 The datafeed returns a discriminated result:
 
@@ -42,6 +51,7 @@ Supported error codes are:
 
 The in-memory fixture implementation clones bars on write and read so tests
 cannot accidentally share mutable bar state across contexts.
+It also clones scalar series points for external request fixtures.
 
 ## `request.security()` MVP
 
@@ -90,6 +100,20 @@ for supported `request.security*` calls. When scripts explicitly set
 This MVP does not yet implement Pine's full simple/series qualifier analysis for
 request parameters. That belongs to the qualified type-system epic.
 
+## `request.currency_rate()` MVP
+
+The current runtime implementation supports deterministic currency conversion
+series supplied by the request datafeed.
+
+1. Resolve `{ from, to }` currency codes and return `1` when both currencies
+   match.
+2. Request fixture points from the `currency_rate` series family using a stable
+   from/to key.
+3. Merge the latest point at or before the current chart bar time.
+4. Support `ignore_invalid_currency=true` for missing or invalid fixture
+   contexts.
+5. Provide common `currency.*` constants used by public Pine examples.
+
 ## Integration Path
 
 The engine can accept an optional `RequestDatafeed` in a future PR. Tealchart can
@@ -103,8 +127,9 @@ without changing the fixture-level contract.
 ## Non-Goals
 
 This contract does not yet cover full simple/series qualifier diagnostics,
-currency conversion, corporate actions, economic data, or synthetic ticker
-construction. Those belong to later Epic 8 and Epic 9 phases.
+corporate actions, economic data, financial data, seeded data, footprint data,
+or synthetic ticker construction. Those belong to later Epic 8 and Epic 9
+phases.
 
 ## Test Strategy
 

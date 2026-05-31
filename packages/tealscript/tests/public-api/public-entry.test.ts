@@ -7,10 +7,12 @@ import { describe, expect, it } from 'vitest';
 import {
   executeScript,
   createResultMessage,
+  currencyRateRequestKey,
   getResultOutput,
   InMemoryRequestDatafeed,
   parse,
   requestDatafeedKey,
+  requestSeriesKey,
   TealscriptEngine,
   TealscriptWorker,
   validate,
@@ -48,6 +50,7 @@ describe('public package entrypoints', () => {
     expect(typeof TealscriptWorker).toBe('function');
     expect(typeof InMemoryRequestDatafeed).toBe('function');
     expect(requestDatafeedKey('A', '1D')).toBe('A\u00001D');
+    expect(requestSeriesKey('currency_rate', currencyRateRequestKey('USD', 'EUR'))).toBe('currency_rate\u0000USD\u0000EUR');
     expect(engineOptions.requestDatafeed).toBe(datafeed);
     expect(datafeed.getBars({ symbol: 'A', timeframe: '1D' }).ok).toBe(false);
     expect(normalizedOutput).toEqual(output);

@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  currencyRateRequestKey,
   InMemoryRequestDatafeed,
   requestDatafeedKey,
+  requestSeriesKey,
   type Bar,
   type RequestDataContext,
 } from '../../src/runtime';
@@ -16,6 +18,7 @@ const bars: Bar[] = [
 describe('request datafeed contract', () => {
   it('builds stable symbol/timeframe keys', () => {
     expect(requestDatafeedKey('BINANCE:BTCUSDT', '1D')).toBe('BINANCE:BTCUSDT\u00001D');
+    expect(requestSeriesKey('currency_rate', currencyRateRequestKey('USD', 'GBP'))).toBe('currency_rate\u0000USD\u0000GBP');
   });
 
   it('returns cloned bars for deterministic request fixtures', () => {
@@ -79,5 +82,32 @@ describe('request datafeed contract', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) throw new Error(result.message);
     expect(result.context.currency).toBe('EUR');
+  });
+
+  it('returns cloned request series fixture points', () => {
+    const datafeed = new InMemoryRequestDatafeed([], [
+      {
+        family: 'currency_rate',
+        key: currencyRateRequestKey('USD', 'GBP'),
+        points: [
+          { time: 1_700_000_000_000, value: 0.8 },
+          { time: 1_700_086_400_000, value: 0.82 },
+        ],
+      },
+    ]);
+    const result = datafeed.getSeries?.({ family: 'currency_rate', key: currencyRateRequestKey('USD', 'GBP') });
+
+    expect(result?.ok).toBe(true);
+    if (!result?.ok) throw new Error(result?.message ?? 'expected series context');
+    expect(result.context.points).toEqual([
+      { time: 1_700_000_000_000, value: 0.8 },
+      { time: 1_700_086_400_000, value: 0.82 },
+    ]);
+
+    result.context.points[0].value = 9;
+    const second = datafeed.getSeries?.({ family: 'currency_rate', key: currencyRateRequestKey('USD', 'GBP') });
+    expect(second?.ok).toBe(true);
+    if (!second?.ok) throw new Error(second?.message ?? 'expected series context');
+    expect(second.context.points[0].value).toBe(0.8);
   });
 });
