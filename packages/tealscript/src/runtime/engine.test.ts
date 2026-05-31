@@ -176,6 +176,8 @@ plot(hour(time, "America/New_York"), title="NY Hour")
 plot(hour(nyStamp, "America/New_York"), title="NY Timestamp Hour")
 plot(nyStamp, title="NY Timestamp")
 plot(summerStamp, title="NY Summer Timestamp")
+plot(hour(timestamp("America/New_York", 2024, 3, 10, 2, 30), "America/New_York"), title="NY DST Gap Hour")
+plot(minute(timestamp("America/New_York", 2024, 3, 10, 2, 30), "America/New_York"), title="NY DST Gap Minute")
 plot(str.format_time(time, "yyyy-MM-dd HH:mm:ss", "America/New_York") == "2024-01-05 09:30:00" ? 1 : 0, title="Formatted NY")`;
 
       const ast = parse(script);
@@ -189,6 +191,8 @@ plot(str.format_time(time, "yyyy-MM-dd HH:mm:ss", "America/New_York") == "2024-0
       expect(result.plots.find((plot) => plot.title === 'NY Timestamp Hour')?.values).toEqual([9]);
       expect(result.plots.find((plot) => plot.title === 'NY Timestamp')?.values).toEqual([Date.UTC(2024, 0, 5, 14, 30)]);
       expect(result.plots.find((plot) => plot.title === 'NY Summer Timestamp')?.values).toEqual([Date.UTC(2024, 6, 5, 13, 30)]);
+      expect(result.plots.find((plot) => plot.title === 'NY DST Gap Hour')?.values).toEqual([3]);
+      expect(result.plots.find((plot) => plot.title === 'NY DST Gap Minute')?.values).toEqual([30]);
       expect(result.plots.find((plot) => plot.title === 'Formatted NY')?.values).toEqual([1]);
     });
 

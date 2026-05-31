@@ -74,7 +74,7 @@ reading the whole runtime.
 | Built-ins | `math.*` | Partial | `tests/compat/pine-builtins.test.ts`; `src/runtime/engine.test.ts` | Random behavior, overloads, and exact int/float parity remain. |
 | Built-ins | `ta.*` | Partial | `tests/compat/pine-basics.test.ts`; `tests/compat/pine-builtins.test.ts`; `src/runtime/engine.test.ts` | Full reference-manual inventory and edge-case parity remain. |
 | Built-ins | `input.*` | Partial | `tests/compat/pine-basics.test.ts`; `tests/compat/pine-builtins.test.ts` | Advanced UI/display behavior and validation remain. |
-| Built-ins | Time functions | Partial | `tests/compat/pine-builtins.test.ts`; `tests/compat/pine-control-time.test.ts` | Higher-timeframe aggregation and named timezone databases remain. |
+| Built-ins | Time functions | Partial | `tests/compat/pine-builtins.test.ts`; `tests/compat/pine-control-time.test.ts` | IANA timezones are covered for common timestamp/calendar/session helpers; higher-timeframe aggregation and exchange calendars remain. |
 | Built-ins | `color.*` | Partial | `tests/compat/pine-builtins.test.ts`; `tests/compat/pine-visuals.test.ts` | Exact named constants and theme-sensitive behavior remain. |
 | Built-ins | `str.*` | Partial | `tests/compat/pine-builtins.test.ts` | Formatting and Unicode edge cases remain. |
 | Built-ins | `array.*` | Partial | `src/runtime/arrays.test.ts`; `tests/compat/pine-arrays.test.ts`; `tests/compat/pine-builtins.test.ts` | Full array reference inventory and edge cases remain. |

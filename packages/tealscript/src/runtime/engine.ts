@@ -4464,7 +4464,23 @@ export class TealscriptEngine {
     const initialOffset = this.getTimezoneOffsetMinutes(timezone, utcGuess);
     const resolvedTimestamp = utcGuess - initialOffset * 60000;
     const resolvedOffset = this.getTimezoneOffsetMinutes(timezone, resolvedTimestamp);
-    return utcGuess - resolvedOffset * 60000;
+    const finalTimestamp = utcGuess - resolvedOffset * 60000;
+    const finalOffset = this.getTimezoneOffsetMinutes(timezone, finalTimestamp);
+
+    const localDate = new Date(finalTimestamp + finalOffset * 60000);
+    const roundTrips =
+      localDate.getUTCFullYear() === Math.trunc(year) &&
+      localDate.getUTCMonth() === Math.trunc(month) - 1 &&
+      localDate.getUTCDate() === Math.trunc(day) &&
+      localDate.getUTCHours() === Math.trunc(hour) &&
+      localDate.getUTCMinutes() === Math.trunc(minute) &&
+      localDate.getUTCSeconds() === Math.trunc(second);
+
+    if (!roundTrips && resolvedOffset !== initialOffset) {
+      return finalTimestamp + (resolvedOffset - initialOffset) * 60000;
+    }
+
+    return finalTimestamp;
   }
 
   private getCalendarPart(part: string, timestamp: unknown, timezone: string): number {
