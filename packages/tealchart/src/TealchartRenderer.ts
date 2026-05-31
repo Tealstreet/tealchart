@@ -1,9 +1,13 @@
-import type { BoxDrawingOutput, DrawingOutput, LabelDrawingOutput, LineDrawingOutput, LineFillDrawingOutput, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
+import type { DrawingOutput, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
 import type { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
 import type { CanvasContext } from './rendering/CanvasContext';
 import type { PaneOffset } from './rendering/PaneManager';
+import type { DrawingCoordinateResolvers } from './rendering/TealScriptDrawingCoordinates';
+import type { TealScriptDrawingPartition } from './rendering/TealScriptDrawingPartition';
 
 import { computeCandleCoordinates } from './jailbreak/computeCandleCoordinates';
+import { partitionTealScriptDrawings } from './rendering/TealScriptDrawingPartition';
+import { TealScriptDrawingRenderer } from './rendering/TealScriptDrawingRenderer';
 import { getDecimalPlacesFromPrecision, LineStyle, PlotStyleOverride } from './state/chartState';
 import {
   Bar,
@@ -162,6 +166,13 @@ export class TealchartRenderer {
       return 'sans-serif';
     }
     return fontFamily;
+  }
+
+  private getDrawingCoordinateResolvers(): DrawingCoordinateResolvers {
+    return {
+      timeToX: (time, viewport, chartWidth) => this.timeToX(time, viewport, chartWidth),
+      valueToY: (value, pane) => this.valueToY(value, pane),
+    };
   }
 
   /**
@@ -3122,10 +3133,8 @@ export class TealchartRenderer {
     }
 
     if (drawings && drawings.length > 0) {
-      this.renderLineFillDrawings(drawings, bars, viewport, pane);
-      this.renderBoxDrawings(drawings, bars, viewport, pane);
-      this.renderLineDrawings(drawings, bars, viewport, pane);
-      this.renderLabelDrawings(drawings, bars, viewport, pane);
+      const drawingPartition = partitionTealScriptDrawings(drawings);
+      this.renderTealScriptDrawings(drawingPartition, bars, viewport, pane);
     }
 
     // Draw Y-axis (price axis) for main pane
@@ -3137,382 +3146,20 @@ export class TealchartRenderer {
     }
   }
 
-  private renderBoxDrawings(
-    drawings: DrawingOutput[],
+  private renderTealScriptDrawings(
+    drawingPartition: TealScriptDrawingPartition,
     bars: Bar[],
     viewport: Viewport,
     pane: ComputedPane,
   ): void {
-    const boxes = drawings.filter((drawing): drawing is BoxDrawingOutput => drawing.type === 'box');
-    if (boxes.length === 0) return;
-
-    const { ctx, options, margins } = this;
-    const chartWidth = options.width - margins.left;
-    const minX = margins.left;
-    const maxX = options.width - margins.right;
-
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(margins.left, pane.top, options.width - margins.left - margins.right, pane.height);
-    ctx.clip();
-
-    for (const box of boxes) {
-      const rect = this.resolveBoxDrawingRect(box, bars, viewport, pane, chartWidth, minX, maxX);
-      if (!rect) continue;
-
-      if (box.bgcolor) {
-        ctx.fillStyle = box.bgcolor;
-        ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
-      }
-
-      ctx.strokeStyle = box.borderColor ?? '#2962FF';
-      ctx.lineWidth = Math.max(1, box.borderWidth);
-      if (box.borderStyle === 'dashed') {
-        ctx.setLineDash([6, 4]);
-      } else if (box.borderStyle === 'dotted') {
-        ctx.setLineDash([2, 4]);
-      } else {
-        ctx.setLineDash([]);
-      }
-      ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
-
-      if (box.text) {
-        ctx.setLineDash([]);
-        ctx.fillStyle = box.textColor ?? '#FFFFFF';
-        ctx.font = `${this.fontSizeForDrawing(box.textSize)}px ${this.font}`;
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
-        ctx.fillText(box.text, rect.x + 6, rect.y + 6);
-      }
-    }
-
-    ctx.setLineDash([]);
-    ctx.restore();
-  }
-
-  private resolveBoxDrawingRect(
-    box: BoxDrawingOutput,
-    bars: Bar[],
-    viewport: Viewport,
-    pane: ComputedPane,
-    chartWidth: number,
-    minX: number,
-    maxX: number,
-  ): { x: number; y: number; width: number; height: number } | null {
-    if (
-      box.left === null
-      || box.right === null
-      || box.top === null
-      || box.bottom === null
-      || !Number.isFinite(box.left)
-      || !Number.isFinite(box.right)
-      || !Number.isFinite(box.top)
-      || !Number.isFinite(box.bottom)
-    ) {
-      return null;
-    }
-
-    const leftTime = box.xloc === 'bar_time' ? box.left : this.barIndexToTime(box.left, bars);
-    const rightTime = box.xloc === 'bar_time' ? box.right : this.barIndexToTime(box.right, bars);
-    if (leftTime === null || rightTime === null) return null;
-
-    let leftX = this.timeToX(leftTime, viewport, chartWidth);
-    let rightX = this.timeToX(rightTime, viewport, chartWidth);
-    if (box.extend === 'left' || box.extend === 'both') leftX = minX;
-    if (box.extend === 'right' || box.extend === 'both') rightX = maxX;
-
-    const topY = this.valueToY(box.top, pane);
-    const bottomY = this.valueToY(box.bottom, pane);
-    const x = Math.min(leftX, rightX);
-    const y = Math.min(topY, bottomY);
-    return {
-      x,
-      y,
-      width: Math.abs(rightX - leftX),
-      height: Math.abs(bottomY - topY),
-    };
-  }
-
-  private fontSizeForDrawing(size: string): number {
-    switch (size) {
-      case 'tiny':
-        return 9;
-      case 'small':
-        return 10;
-      case 'large':
-        return 14;
-      case 'huge':
-        return 18;
-      default:
-        return 12;
-    }
-  }
-
-  private renderLineFillDrawings(
-    drawings: DrawingOutput[],
-    bars: Bar[],
-    viewport: Viewport,
-    pane: ComputedPane,
-  ): void {
-    const linefills = drawings.filter((drawing): drawing is LineFillDrawingOutput => drawing.type === 'linefill');
-    if (linefills.length === 0) return;
-
-    const lines = new Map(
-      drawings
-        .filter((drawing): drawing is LineDrawingOutput => drawing.type === 'line')
-        .map((line) => [line.id, line]),
-    );
-    if (lines.size === 0) return;
-
-    const { ctx, options, margins } = this;
-    const chartWidth = options.width - margins.left;
-    const minX = margins.left;
-    const maxX = options.width - margins.right;
-
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(margins.left, pane.top, options.width - margins.left - margins.right, pane.height);
-    ctx.clip();
-
-    for (const linefill of linefills) {
-      const line1 = lines.get(linefill.line1);
-      const line2 = lines.get(linefill.line2);
-      if (!line1 || !line2) continue;
-
-      const line1Segment = this.resolveLineDrawingSegment(line1, bars, viewport, pane, chartWidth, minX, maxX);
-      const line2Segment = this.resolveLineDrawingSegment(line2, bars, viewport, pane, chartWidth, minX, maxX);
-      if (!line1Segment || !line2Segment) continue;
-
-      ctx.fillStyle = linefill.color ?? 'rgba(41, 98, 255, 0.18)';
-      ctx.beginPath();
-      ctx.moveTo(line1Segment.start.x, line1Segment.start.y);
-      ctx.lineTo(line1Segment.end.x, line1Segment.end.y);
-      ctx.lineTo(line2Segment.end.x, line2Segment.end.y);
-      ctx.lineTo(line2Segment.start.x, line2Segment.start.y);
-      ctx.closePath();
-      ctx.fill();
-    }
-
-    ctx.restore();
-  }
-
-  private renderLineDrawings(
-    drawings: DrawingOutput[],
-    bars: Bar[],
-    viewport: Viewport,
-    pane: ComputedPane,
-  ): void {
-    const lines = drawings.filter((drawing): drawing is LineDrawingOutput => drawing.type === 'line');
-    if (lines.length === 0) return;
-
-    const { ctx, options, margins } = this;
-    const chartWidth = options.width - margins.left;
-    const minX = margins.left;
-    const maxX = options.width - margins.right;
-
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(margins.left, pane.top, options.width - margins.left - margins.right, pane.height);
-    ctx.clip();
-
-    for (const line of lines) {
-      const extended = this.resolveLineDrawingSegment(line, bars, viewport, pane, chartWidth, minX, maxX);
-      if (!extended) continue;
-
-      ctx.strokeStyle = line.color ?? '#2962FF';
-      ctx.lineWidth = Math.max(1, line.width);
-      if (line.style === 'dashed') {
-        ctx.setLineDash([6, 4]);
-      } else if (line.style === 'dotted') {
-        ctx.setLineDash([2, 4]);
-      } else {
-        ctx.setLineDash([]);
-      }
-      ctx.beginPath();
-      ctx.moveTo(extended.start.x, extended.start.y);
-      ctx.lineTo(extended.end.x, extended.end.y);
-      ctx.stroke();
-    }
-
-    ctx.setLineDash([]);
-    ctx.restore();
-  }
-
-  private resolveLineDrawingSegment(
-    line: LineDrawingOutput,
-    bars: Bar[],
-    viewport: Viewport,
-    pane: ComputedPane,
-    chartWidth: number,
-    minX: number,
-    maxX: number,
-  ): { start: { x: number; y: number }; end: { x: number; y: number } } | null {
-    const start = this.resolveLineDrawingPoint(line.x1, line.y1, line.xloc, bars, viewport, pane, chartWidth);
-    const end = this.resolveLineDrawingPoint(line.x2, line.y2, line.xloc, bars, viewport, pane, chartWidth);
-    if (!start || !end) return null;
-    return this.resolveExtendedLineSegment(start, end, line.extend, minX, maxX);
-  }
-
-  private resolveLineDrawingPoint(
-    xValue: number | null,
-    yValue: number | null,
-    xloc: string,
-    bars: Bar[],
-    viewport: Viewport,
-    pane: ComputedPane,
-    chartWidth: number,
-  ): { x: number; y: number } | null {
-    if (xValue === null || yValue === null || !Number.isFinite(xValue) || !Number.isFinite(yValue)) {
-      return null;
-    }
-
-    const time = xloc === 'bar_time' ? xValue : this.barIndexToTime(xValue, bars);
-    if (time === null) return null;
-
-    const x = this.timeToX(time, viewport, chartWidth);
-    const y = this.valueToY(yValue, pane);
-    return { x, y };
-  }
-
-  private barIndexToTime(index: number, bars: Bar[]): number | null {
-    if (bars.length === 0 || !Number.isFinite(index)) return null;
-
-    const roundedIndex = Math.trunc(index);
-    if (roundedIndex >= 0 && roundedIndex < bars.length) {
-      return bars[roundedIndex]?.time ?? null;
-    }
-
-    const interval = bars.length > 1 ? bars[1]!.time - bars[0]!.time : 60_000;
-    return bars[0]!.time + roundedIndex * interval;
-  }
-
-  private resolveExtendedLineSegment(
-    start: { x: number; y: number },
-    end: { x: number; y: number },
-    extend: string,
-    minX: number,
-    maxX: number,
-  ): { start: { x: number; y: number }; end: { x: number; y: number } } {
-    if (start.x === end.x) {
-      return { start, end };
-    }
-
-    const slope = (end.y - start.y) / (end.x - start.x);
-    const yAt = (x: number): number => start.y + slope * (x - start.x);
-    let nextStart = start;
-    let nextEnd = end;
-
-    if (extend === 'left' || extend === 'both') {
-      nextStart = { x: minX, y: yAt(minX) };
-    }
-    if (extend === 'right' || extend === 'both') {
-      nextEnd = { x: maxX, y: yAt(maxX) };
-    }
-
-    return { start: nextStart, end: nextEnd };
-  }
-
-  private renderLabelDrawings(
-    drawings: DrawingOutput[],
-    bars: Bar[],
-    viewport: Viewport,
-    pane: ComputedPane,
-  ): void {
-    const labels = drawings.filter((drawing): drawing is LabelDrawingOutput => drawing.type === 'label');
-    if (labels.length === 0) return;
-
-    const { ctx, options, margins } = this;
-    const chartWidth = options.width - margins.left;
-    const font = `12px ${this.font}`;
-
-    ctx.save();
-    ctx.font = font;
-    ctx.textBaseline = 'middle';
-
-    for (const label of labels) {
-      const position = this.resolveLabelDrawingPosition(label, bars, viewport, pane, chartWidth);
-      if (!position) continue;
-
-      const text = label.text ?? '';
-      const paddingX = 8;
-      const height = 22;
-      const width = Math.max(18, getCachedTextWidth(ctx, text, font) + paddingX * 2);
-      const radius = 4;
-      const fillColor = label.color ?? '#1f2937';
-      const textColor = label.textColor ?? '#FFFFFF';
-
-      let x = position.x;
-      let y = position.y;
-
-      if (label.style.includes('right')) {
-        x -= width;
-      } else if (!label.style.includes('left')) {
-        x -= width / 2;
-      }
-
-      if (label.style.includes('down') || label.yloc === 'abovebar') {
-        y -= height + 6;
-      } else if (label.style.includes('up') || label.yloc === 'belowbar') {
-        y += 6;
-      } else {
-        y -= height / 2;
-      }
-
-      const minX = margins.left;
-      const maxX = options.width - margins.right - width;
-      const minY = pane.top;
-      const maxY = pane.bottom - height;
-      x = Math.min(maxX, Math.max(minX, x));
-      y = Math.min(maxY, Math.max(minY, y));
-
-      ctx.fillStyle = fillColor;
-      ctx.beginPath();
-      ctx.roundRect(x, y, width, height, radius);
-      ctx.fill();
-
-      ctx.fillStyle = textColor;
-      ctx.textAlign = 'left';
-      ctx.fillText(text, x + paddingX, y + height / 2);
-    }
-
-    ctx.restore();
-  }
-
-  private resolveLabelDrawingPosition(
-    label: LabelDrawingOutput,
-    bars: Bar[],
-    viewport: Viewport,
-    pane: ComputedPane,
-    chartWidth: number,
-  ): { x: number; y: number } | null {
-    const barIndex = Number.isFinite(label.barIndex) ? Math.trunc(label.barIndex) : -1;
-    const xValue = label.x ?? barIndex;
-    const xIndex = Number.isFinite(xValue) ? Math.trunc(xValue) : barIndex;
-    const anchorIndex = label.xloc === 'bar_time' ? barIndex : xIndex;
-    const bar = anchorIndex >= 0 && anchorIndex < bars.length ? bars[anchorIndex] : undefined;
-    const time = label.xloc === 'bar_time'
-      ? xValue
-      : (xIndex >= 0 && xIndex < bars.length ? bars[xIndex].time : undefined);
-    if (time === undefined || time < viewport.startTime || time > viewport.endTime) {
-      return null;
-    }
-
-    const x = this.timeToX(time, viewport, chartWidth);
-    let y: number;
-
-    if (label.yloc === 'abovebar') {
-      if (!bar) return null;
-      y = this.valueToY(bar.high, pane) - 6;
-    } else if (label.yloc === 'belowbar') {
-      if (!bar) return null;
-      y = this.valueToY(bar.low, pane) + 6;
-    } else {
-      if (label.y === null || !Number.isFinite(label.y)) return null;
-      if (label.y < pane.yMin || label.y > pane.yMax) return null;
-      y = this.valueToY(label.y, pane);
-    }
-
-    return { x, y };
+    new TealScriptDrawingRenderer({
+      ctx: this.ctx,
+      options: this.options,
+      margins: this.margins,
+      font: this.font,
+      coordinateResolvers: this.getDrawingCoordinateResolvers(),
+      getTextWidth: getCachedTextWidth,
+    }).render(drawingPartition, bars, viewport, pane);
   }
 
   /**
