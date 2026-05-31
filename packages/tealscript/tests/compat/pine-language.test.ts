@@ -142,6 +142,81 @@ plot(hidden(close), title="Scaled")
     expect(roundSeries(getPlot(result, 'Scaled').values)).toEqual([1020, 1050, 1070, 1030, 990, 1000, 1040, 1090, 1080, 1110, 1100, 1120]);
   });
 
+  it('constructs exported imported library user-defined types', () => {
+    const library = parse(`
+library("PivotTools", true)
+export type Pivot
+    int x
+    float y
+type Hidden
+    float value
+`);
+
+    const result = runCompatScript(`
+indicator("Imported library type")
+import TestUser/PivotTools/1 as pivots
+p = pivots.Pivot.new(bar_index, close)
+plot(p.x, title="X")
+plot(p.y, title="Y")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/PivotTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'X').values)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    expect(roundSeries(getPlot(result, 'Y').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+  });
+
+  it('keeps non-exported imported library user-defined types private externally', () => {
+    const library = parse(`
+library("PivotTools", true)
+type Hidden
+    float value
+`);
+
+    const result = runCompatScript(`
+indicator("Imported private type")
+import TestUser/PivotTools/1 as pivots
+p = pivots.Hidden.new(close)
+plot(p.value, title="Value")
+`, {
+      bars: [compatibilityBars[0]!],
+      engineOptions: {
+        libraries: new Map([['TestUser/PivotTools/1', library]]),
+      },
+    });
+
+    expect(result.errors.map((error) => error.message)).toEqual([
+      'Unknown library type: pivots.Hidden',
+      'Unknown identifier: p',
+    ]);
+  });
+
+  it('allows exported imported functions to construct library-local types', () => {
+    const library = parse(`
+library("PivotTools", true)
+type Hidden
+    float value
+export make(float value) => Hidden.new(value)
+`);
+
+    const result = runCompatScript(`
+indicator("Imported private type factory")
+import TestUser/PivotTools/1 as pivots
+p = pivots.make(close)
+plot(p.value, title="Value")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/PivotTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Value').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+  });
+
   it('runs single-line user-defined functions', () => {
     const result = runCompatScript(`
 indicator("UDF single line")
