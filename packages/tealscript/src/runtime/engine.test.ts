@@ -1548,7 +1548,7 @@ plot(ta.linreg(close, length, 0), title="LinReg")`;
       const result = executeScript(ast, bars);
 
       expect(result.errors).toHaveLength(0);
-      expect(result.plots.find((plot) => plot.title === 'LinReg')?.values[3]).toBeNull();
+      expect(result.plots.find((plot) => plot.title === 'LinReg')?.values[3]).toBeCloseTo(104.3);
       expect(result.plots.find((plot) => plot.title === 'LinReg')?.values[4]).toBeCloseTo(106.2);
     });
 
