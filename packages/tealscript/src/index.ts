@@ -73,6 +73,8 @@ export {
   type LineFillDrawingOutput,
   type BoxDrawingOutput,
   type PolylineDrawingOutput,
+  type TableCellDrawingOutput,
+  type TableDrawingOutput,
   type AlertEvent,
   type AlertFrequency,
   type AlertOutput,

@@ -66,6 +66,7 @@ import {
   registerLineBuiltins,
   registerLineFillBuiltins,
   registerPolylineBuiltins,
+  registerTableBuiltins,
   type DrawingBuiltinRuntime,
 } from './builtins/drawings';
 import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type ChartPoint, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LogLevel, type LogOutput, type PlotLineStyle, type PlotOutput, type PlotStyle } from './context';
@@ -1043,8 +1044,8 @@ export class TealscriptEngine {
     throw new Error(`Unknown function: ${fullName}`);
   }
 
-  private isUnsupportedDrawingNamespace(namespace: string): boolean {
-    return namespace === 'table';
+  private isUnsupportedDrawingNamespace(_namespace: string): boolean {
+    return false;
   }
 
   private isPlannedUnsupportedNamespace(namespace: string): boolean {
@@ -1441,6 +1442,7 @@ export class TealscriptEngine {
     registerLineFillBuiltins(this.builtins, this.createDrawingBuiltinRuntime());
     registerBoxBuiltins(this.builtins, this.createDrawingBuiltinRuntime());
     registerPolylineBuiltins(this.builtins, this.createDrawingBuiltinRuntime());
+    registerTableBuiltins(this.builtins, this.createDrawingBuiltinRuntime());
 
     registerDrawingConstants(this.builtins);
   }

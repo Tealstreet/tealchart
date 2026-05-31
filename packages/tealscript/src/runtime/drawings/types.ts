@@ -99,12 +99,46 @@ export interface PolylineDrawingOutput {
   forceOverlay?: boolean;
 }
 
+export interface TableCellDrawingOutput {
+  column: number;
+  row: number;
+  text: string;
+  width?: number | null;
+  height?: number | null;
+  textColor: string | null;
+  textSize: string;
+  textHalign: string;
+  textValign: string;
+  bgcolor: string | null;
+}
+
+export interface TableDrawingOutput {
+  id: string;
+  type: 'table';
+  /** Script ID that produced this drawing (set by TealscriptManager). */
+  scriptId?: string;
+  /** True when the drawing was created by a persistent declaration. */
+  persistent?: boolean;
+  barIndex: number;
+  position: string;
+  columns: number;
+  rows: number;
+  bgcolor: string | null;
+  frameColor: string | null;
+  frameWidth: number;
+  borderColor: string | null;
+  borderWidth: number;
+  cells: TableCellDrawingOutput[];
+  forceOverlay: true;
+}
+
 export type DrawingOutput =
   | LabelDrawingOutput
   | LineDrawingOutput
   | LineFillDrawingOutput
   | BoxDrawingOutput
-  | PolylineDrawingOutput;
+  | PolylineDrawingOutput
+  | TableDrawingOutput;
 
 export type DrawingObjectType = DrawingOutput['type'];
 

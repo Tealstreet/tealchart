@@ -4,6 +4,7 @@ import type {
   LineDrawingOutput,
   LineFillDrawingOutput,
   PolylineDrawingOutput,
+  TableDrawingOutput,
 } from '@tealstreet/tealscript';
 import type { Bar, ComputedPane } from '../types';
 import type { CanvasContext } from './CanvasContext';
@@ -162,6 +163,36 @@ function makePolyline(overrides: Partial<PolylineDrawingOutput> = {}): PolylineD
   };
 }
 
+function makeTable(overrides: Partial<TableDrawingOutput> = {}): TableDrawingOutput {
+  return {
+    id: 'table-1',
+    type: 'table',
+    barIndex: 0,
+    position: 'top_right',
+    columns: 1,
+    rows: 1,
+    bgcolor: null,
+    frameColor: '#111111',
+    frameWidth: 1,
+    borderColor: '#222222',
+    borderWidth: 1,
+    forceOverlay: true,
+    cells: [
+      {
+        column: 0,
+        row: 0,
+        text: 'ATR',
+        textColor: '#ffffff',
+        textSize: 'normal',
+        textHalign: 'center',
+        textValign: 'middle',
+        bgcolor: '#111827',
+      },
+    ],
+    ...overrides,
+  };
+}
+
 describe('TealScriptDrawingRenderer', () => {
   it('renders linefills, boxes, lines, then labels in pane-clipped order', () => {
     const events: string[] = [];
@@ -274,5 +305,34 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events).toContain('closePath');
     expect(events).toContain('fill');
     expect(events).toContain('stroke');
+  });
+
+  it('renders fixed-position table cells above chart drawings', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([makeTable()]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).toContain('fillRect:64,8,48,22');
+    expect(events).toContain('strokeRect:64,8,48,22');
+    expect(events).toContain('fillTextStyle:center,middle');
+    expect(events).toContain('fillText:ATR:88,19');
   });
 });

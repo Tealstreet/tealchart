@@ -24,6 +24,8 @@ import { Series } from './series';
 export type {
   BoxDrawingOutput,
   PolylineDrawingOutput,
+  TableCellDrawingOutput,
+  TableDrawingOutput,
   ChartPoint,
   DrawingOutput,
   LabelDrawingOutput,

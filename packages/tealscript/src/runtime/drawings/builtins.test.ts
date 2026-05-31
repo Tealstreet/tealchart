@@ -23,7 +23,7 @@ function createBars(count: number, startPrice = 100): Bar[] {
 }
 
   describe('Pine drawing object outputs', () => {
-    it('records basic drawing outputs and leaves unsupported object diagnostics explicit', () => {
+    it('records basic drawing outputs', () => {
       const script = `//@version=6
 indicator("Drawing calls")
 label.new(bar_index, close, text="x", xloc=xloc.bar_index, yloc=yloc.price, style=label.style_label_down, color=color.red, textcolor=color.white, size=size.small)
@@ -36,9 +36,7 @@ plot(close)`;
       const bars = createBars(1);
       const result = executeScript(ast, bars);
 
-      expect(result.errors.map((error) => error.message)).toEqual([
-        'table.* functions are not supported yet: table.new',
-      ]);
+      expect(result.errors).toEqual([]);
       expect(result.drawings).toEqual([
         {
           id: 'label_label.new_0_0',
@@ -68,6 +66,21 @@ plot(close)`;
           style: 'solid',
           width: 1,
           forceOverlay: false,
+        },
+        {
+          id: 'table_table.new_0_0',
+          type: 'table',
+          barIndex: 0,
+          position: 'top_right',
+          columns: 1,
+          rows: 1,
+          bgcolor: null,
+          frameColor: null,
+          frameWidth: 1,
+          borderColor: null,
+          borderWidth: 1,
+          cells: [],
+          forceOverlay: true,
         },
         {
           id: 'box_box.new_0_0',
@@ -790,5 +803,67 @@ plot(array.size(polyline.all), title="Polylines")`;
         },
       ]);
       expect(result.plots.find((plot) => plot.title === 'Polylines')?.values).toEqual([1]);
+    });
+
+    it('records table cells and common cell setters', () => {
+      const script = `//@version=6
+indicator("Tables", overlay=true)
+var stats = table.new(position.bottom_right, 2, 2, bgcolor=color.new(color.black, 80), frame_color=color.white, frame_width=2, border_color=color.blue, border_width=1)
+if barstate.islast
+    table.cell(stats, 0, 0, "ATR", text_color=color.white, bgcolor=color.blue)
+    table.cell(stats, 1, 0, str.tostring(close), text_halign=text.align_right, text_size=size.large)
+    table.cell_set_text(stats, 1, 0, "last")
+    table.cell_set_bgcolor(stats, 1, 0, color.green)
+    table.cell_set_text_color(stats, 1, 0, color.black)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(2);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'table_table.new_0_0',
+          type: 'table',
+          persistent: true,
+          barIndex: 0,
+          position: 'bottom_right',
+          columns: 2,
+          rows: 2,
+          bgcolor: '#00000033',
+          frameColor: '#FFFFFF',
+          frameWidth: 2,
+          borderColor: '#2196F3',
+          borderWidth: 1,
+          forceOverlay: true,
+          cells: [
+            {
+              column: 0,
+              row: 0,
+              text: 'ATR',
+              width: undefined,
+              height: undefined,
+              textColor: '#FFFFFF',
+              textHalign: 'center',
+              textValign: 'middle',
+              textSize: 'normal',
+              bgcolor: '#2196F3',
+            },
+            {
+              column: 1,
+              row: 0,
+              text: 'last',
+              width: undefined,
+              height: undefined,
+              textColor: '#000000',
+              textHalign: 'right',
+              textValign: 'middle',
+              textSize: 'large',
+              bgcolor: '#4CAF50',
+            },
+          ],
+        },
+      ]);
     });
   });

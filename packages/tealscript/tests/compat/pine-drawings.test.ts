@@ -179,4 +179,59 @@ if barstate.islast
       },
     ]);
   });
+
+  it('emits table cells from common last-bar dashboard idioms', () => {
+    const result = runCompatScript(`
+indicator("Table docs smoke", overlay=true)
+var dashboard = table.new(position.top_right, 2, 1, border_color=color.white, border_width=1)
+if barstate.islast
+    table.cell(dashboard, 0, 0, "Close", text_color=color.white, bgcolor=color.blue)
+    table.cell(dashboard, 1, 0, str.tostring(close), text_color=color.black, bgcolor=color.green)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'table_table.new_0_0',
+        type: 'table',
+        persistent: true,
+        barIndex: 0,
+        position: 'top_right',
+        columns: 2,
+        rows: 1,
+        bgcolor: null,
+        frameColor: null,
+        frameWidth: 1,
+        borderColor: '#FFFFFF',
+        borderWidth: 1,
+        cells: [
+          {
+            column: 0,
+            row: 0,
+            text: 'Close',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#2196F3',
+          },
+          {
+            column: 1,
+            row: 0,
+            text: '112',
+            width: undefined,
+            height: undefined,
+            textColor: '#000000',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#4CAF50',
+          },
+        ],
+        forceOverlay: true,
+      },
+    ]);
+  });
 });

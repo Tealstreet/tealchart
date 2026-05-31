@@ -11,6 +11,8 @@ import type {
   LabelDrawingOutput,
   LineDrawingOutput,
   PolylineDrawingOutput,
+  TableCellDrawingOutput,
+  TableDrawingOutput,
 } from '../drawings/types';
 
 export interface DrawingBuiltinRuntime {
@@ -67,6 +69,23 @@ function optionalString(runtime: DrawingBuiltinRuntime, value: unknown): string 
 
 function optionalBoolean(value: unknown): boolean | undefined {
   return value === undefined ? undefined : Boolean(value);
+}
+
+function positiveInteger(runtime: DrawingBuiltinRuntime, value: unknown, fallback: number): number {
+  const parsed = Math.trunc(runtime.toNumber(value ?? fallback));
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function tableCellKey(column: number, row: number): string {
+  return `${column}:${row}`;
+}
+
+function normalizeTableColumn(runtime: DrawingBuiltinRuntime, value: unknown): number {
+  return Math.max(0, Math.trunc(runtime.toNumber(value)));
+}
+
+function normalizeTableRow(runtime: DrawingBuiltinRuntime, value: unknown): number {
+  return Math.max(0, Math.trunc(runtime.toNumber(value)));
 }
 
 export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
@@ -638,6 +657,124 @@ export function registerPolylineBuiltins(builtins: BuiltinRegistry, runtime: Dra
   builtins.set('polyline.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('polyline'));
 }
 
+export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
+  const withTable = (value: unknown, ctx: ExecutionContext, fn: (table: TableDrawingOutput) => void): void => {
+    withDrawing(value, ctx, 'table', runtime.isNa, fn);
+  };
+  const upsertCell = (table: TableDrawingOutput, cell: TableCellDrawingOutput): void => {
+    const key = tableCellKey(cell.column, cell.row);
+    const index = table.cells.findIndex((existing) => tableCellKey(existing.column, existing.row) === key);
+    if (index === -1) {
+      table.cells.push(cell);
+    } else {
+      table.cells[index] = cell;
+    }
+  };
+  const getCell = (
+    table: TableDrawingOutput,
+    column: unknown,
+    row: unknown,
+  ): TableCellDrawingOutput | undefined => {
+    const normalizedColumn = normalizeTableColumn(runtime, column);
+    const normalizedRow = normalizeTableRow(runtime, row);
+    return table.cells.find((cell) => cell.column === normalizedColumn && cell.row === normalizedRow);
+  };
+
+  builtins.set('table.new', (args, namedArgs, ctx, _scope, callId) => {
+    const id = `table_${callId}_${ctx.bar_index}`;
+    const drawing: TableDrawingOutput = {
+      id,
+      type: 'table',
+      barIndex: ctx.bar_index,
+      position: runtime.toStringValue(namedArgs.get('position') ?? args[0] ?? 'top_right'),
+      columns: positiveInteger(runtime, namedArgs.get('columns') ?? args[1], 1),
+      rows: positiveInteger(runtime, namedArgs.get('rows') ?? args[2], 1),
+      bgcolor: runtime.toNullableColor(namedArgs.get('bgcolor') ?? args[3]),
+      frameColor: runtime.toNullableColor(namedArgs.get('frame_color') ?? args[4]),
+      frameWidth: runtime.toLineWidth(namedArgs.get('frame_width') ?? args[5]),
+      borderColor: runtime.toNullableColor(namedArgs.get('border_color') ?? args[6]),
+      borderWidth: runtime.toLineWidth(namedArgs.get('border_width') ?? args[7]),
+      cells: [],
+      forceOverlay: true,
+    };
+
+    ctx.addDrawing(drawing);
+    return id;
+  });
+
+  builtins.set('table.delete', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => ctx.deleteDrawing(table.id));
+    return undefined;
+  });
+
+  builtins.set('table.clear', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      const startColumn = normalizeTableColumn(runtime, args[1] ?? 0);
+      const startRow = normalizeTableRow(runtime, args[2] ?? 0);
+      const endColumn = args[3] === undefined ? table.columns - 1 : normalizeTableColumn(runtime, args[3]);
+      const endRow = args[4] === undefined ? table.rows - 1 : normalizeTableRow(runtime, args[4]);
+      table.cells = table.cells.filter((cell) => (
+        cell.column < startColumn
+        || cell.column > endColumn
+        || cell.row < startRow
+        || cell.row > endRow
+      ));
+    });
+    return undefined;
+  });
+
+  builtins.set('table.cell', (args, namedArgs, ctx) => {
+    withTable(namedArgs.get('table_id') ?? args[0], ctx, (table) => {
+      upsertCell(table, {
+        column: normalizeTableColumn(runtime, namedArgs.get('column') ?? args[1]),
+        row: normalizeTableRow(runtime, namedArgs.get('row') ?? args[2]),
+        text: runtime.toStringValue(namedArgs.get('text') ?? args[3] ?? ''),
+        width: namedArgs.has('width') || args[4] !== undefined
+          ? runtime.toNullableNumber(namedArgs.get('width') ?? args[4])
+          : undefined,
+        height: namedArgs.has('height') || args[5] !== undefined
+          ? runtime.toNullableNumber(namedArgs.get('height') ?? args[5])
+          : undefined,
+        textColor: runtime.toNullableColor(namedArgs.get('text_color') ?? args[6]),
+        textHalign: runtime.toStringValue(namedArgs.get('text_halign') ?? args[7] ?? 'center'),
+        textValign: runtime.toStringValue(namedArgs.get('text_valign') ?? args[8] ?? 'middle'),
+        textSize: runtime.toStringValue(namedArgs.get('text_size') ?? args[9] ?? 'normal'),
+        bgcolor: runtime.toNullableColor(namedArgs.get('bgcolor') ?? args[10]),
+      });
+    });
+    return undefined;
+  });
+
+  builtins.set('table.cell_set_text', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      const cell = getCell(table, args[1], args[2]);
+      if (cell) cell.text = runtime.toStringValue(args[3] ?? '');
+    });
+    return undefined;
+  });
+  builtins.set('table.cell_set_bgcolor', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      const cell = getCell(table, args[1], args[2]);
+      if (cell) cell.bgcolor = runtime.toNullableColor(args[3]);
+    });
+    return undefined;
+  });
+  builtins.set('table.cell_set_text_color', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      const cell = getCell(table, args[1], args[2]);
+      if (cell) cell.textColor = runtime.toNullableColor(args[3]);
+    });
+    return undefined;
+  });
+  builtins.set('table.cell_set_text_size', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      const cell = getCell(table, args[1], args[2]);
+      if (cell) cell.textSize = runtime.toStringValue(args[3]);
+    });
+    return undefined;
+  });
+}
+
 const DRAWING_CONSTANTS: Record<string, string> = {
   'xloc.bar_index': 'bar_index',
   'xloc.bar_time': 'bar_time',
@@ -683,6 +820,15 @@ const DRAWING_CONSTANTS: Record<string, string> = {
   'text.wrap_auto': 'auto',
   'font.family_default': 'default',
   'font.family_monospace': 'monospace',
+  'position.top_left': 'top_left',
+  'position.top_center': 'top_center',
+  'position.top_right': 'top_right',
+  'position.middle_left': 'middle_left',
+  'position.middle_center': 'middle_center',
+  'position.middle_right': 'middle_right',
+  'position.bottom_left': 'bottom_left',
+  'position.bottom_center': 'bottom_center',
+  'position.bottom_right': 'bottom_right',
 };
 
 export function registerDrawingConstants(builtins: BuiltinRegistry): void {
