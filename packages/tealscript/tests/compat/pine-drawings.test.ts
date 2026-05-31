@@ -230,7 +230,6 @@ if barstate.islast
             bgcolor: '#4CAF50',
           },
         ],
-        forceOverlay: true,
       },
     ]);
   });

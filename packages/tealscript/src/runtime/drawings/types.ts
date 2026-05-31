@@ -129,7 +129,7 @@ export interface TableDrawingOutput {
   borderColor: string | null;
   borderWidth: number;
   cells: TableCellDrawingOutput[];
-  forceOverlay: true;
+  forceOverlay?: boolean;
 }
 
 export type DrawingOutput =

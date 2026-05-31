@@ -43,7 +43,8 @@ export class DrawingStore {
 
   setLimit(type: keyof DrawingLimits, value: number): void {
     const max = MAX_DRAWING_LIMITS[type];
-    this.limits[type] = Math.min(max, Math.max(0, Math.trunc(value)));
+    const normalizedValue = Number.isFinite(value) ? Math.trunc(value) : 0;
+    this.limits[type] = Math.min(max, Math.max(0, normalizedValue));
     this.enforceLimit(type);
   }
 
@@ -156,6 +157,7 @@ export class DrawingStore {
 
   clear(): void {
     this.drawings.length = 0;
+    this.limits = { ...DEFAULT_DRAWING_LIMITS };
   }
 
   private enforceLimit(type: DrawingObjectType | keyof DrawingLimits): void {

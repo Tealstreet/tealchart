@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { DrawingStore } from './store';
+import { DEFAULT_DRAWING_LIMITS, DrawingStore } from './store';
 import type { BoxDrawingOutput, LabelDrawingOutput, LineDrawingOutput, PolylineDrawingOutput } from './types';
 
 function label(overrides: Partial<LabelDrawingOutput> = {}): LabelDrawingOutput {
@@ -123,6 +123,16 @@ describe('DrawingStore', () => {
     expect(store.all().map((drawing) => drawing.id)).toEqual(['label_1', 'line_1', 'label_2', 'box_0', 'polyline_1']);
   });
 
+  it('normalizes non-finite limits to zero', () => {
+    const store = new DrawingStore();
+
+    store.setLimit('label', Number.NaN);
+    store.add(label({ id: 'label_0' }));
+
+    expect(store.getLimit('label')).toBe(0);
+    expect(store.getIds('label')).toEqual([]);
+  });
+
   it('enforces limits when copying drawings', () => {
     const store = new DrawingStore();
     store.setLimit('label', 1);
@@ -200,11 +210,13 @@ describe('DrawingStore', () => {
 
   it('clears all drawings', () => {
     const store = new DrawingStore();
+    store.setLimit('label', 1);
     store.add(label());
 
     store.clear();
 
     expect(store.count()).toBe(0);
     expect(store.all()).toEqual([]);
+    expect(store.getLimit('label')).toBe(DEFAULT_DRAWING_LIMITS.label);
   });
 });

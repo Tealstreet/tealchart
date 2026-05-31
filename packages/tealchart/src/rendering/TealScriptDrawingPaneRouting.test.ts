@@ -1,9 +1,14 @@
 import type { DrawingOutput } from '@tealstreet/tealscript';
 import type { ComputedPane } from '../types';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import { routeTealScriptDrawings } from './TealScriptDrawingPaneRouting';
+
+afterEach(() => {
+  clearChartStoreCache();
+});
 
 const mainPane: ComputedPane = {
   id: 'main',

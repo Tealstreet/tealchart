@@ -80,7 +80,6 @@ plot(close)`;
           borderColor: null,
           borderWidth: 1,
           cells: [],
-          forceOverlay: true,
         },
         {
           id: 'box_box.new_0_0',
@@ -815,6 +814,7 @@ if barstate.islast
     table.cell_set_text(stats, 1, 0, "last")
     table.cell_set_bgcolor(stats, 1, 0, color.green)
     table.cell_set_text_color(stats, 1, 0, color.black)
+    table.cell_set_text(stats, 0, 1, "created")
 plot(close)`;
 
       const ast = parse(script);
@@ -836,7 +836,6 @@ plot(close)`;
           frameWidth: 2,
           borderColor: '#2196F3',
           borderWidth: 1,
-          forceOverlay: true,
           cells: [
             {
               column: 0,
@@ -862,8 +861,35 @@ plot(close)`;
               textSize: 'large',
               bgcolor: '#4CAF50',
             },
+            {
+              column: 0,
+              row: 1,
+              text: 'created',
+              width: undefined,
+              height: undefined,
+              textColor: null,
+              textHalign: 'center',
+              textValign: 'middle',
+              textSize: 'normal',
+              bgcolor: null,
+            },
           ],
         },
       ]);
+    });
+
+    it('reports table cell coordinates outside the declared grid', () => {
+      const script = `//@version=6
+indicator("Tables", overlay=true)
+var stats = table.new(position.bottom_right, 1, 1)
+if barstate.islast
+    table.cell(stats, 1, 0, "outside")
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(2);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors[0]?.message).toBe('Table cell coordinates out of bounds: column 1, row 0');
     });
   });

@@ -9,11 +9,16 @@ import type {
 import type { Bar, ComputedPane } from '../types';
 import type { CanvasContext } from './CanvasContext';
 
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from '../types';
+import { clearChartStoreCache } from '../state/chartState';
 import { partitionTealScriptDrawings } from './TealScriptDrawingPartition';
 import { TealScriptDrawingRenderer } from './TealScriptDrawingRenderer';
+
+afterEach(() => {
+  clearChartStoreCache();
+});
 
 function createRecordingContext(events: string[]): CanvasContext {
   const context: CanvasContext = {
@@ -176,7 +181,6 @@ function makeTable(overrides: Partial<TableDrawingOutput> = {}): TableDrawingOut
     frameWidth: 1,
     borderColor: '#222222',
     borderWidth: 1,
-    forceOverlay: true,
     cells: [
       {
         column: 0,
@@ -330,9 +334,9 @@ describe('TealScriptDrawingRenderer', () => {
       pane,
     );
 
-    expect(events).toContain('fillRect:64,8,48,22');
-    expect(events).toContain('strokeRect:64,8,48,22');
+    expect(events).toContain('fillRect:64,18,48,22');
+    expect(events).toContain('strokeRect:64,18,48,22');
     expect(events).toContain('fillTextStyle:center,middle');
-    expect(events).toContain('fillText:ATR:88,19');
+    expect(events).toContain('fillText:ATR:88,29');
   });
 });

@@ -661,6 +661,18 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
   const withTable = (value: unknown, ctx: ExecutionContext, fn: (table: TableDrawingOutput) => void): void => {
     withDrawing(value, ctx, 'table', runtime.isNa, fn);
   };
+  const createDefaultCell = (column: number, row: number): TableCellDrawingOutput => ({
+    column,
+    row,
+    text: '',
+    width: undefined,
+    height: undefined,
+    textColor: null,
+    textHalign: 'center',
+    textValign: 'middle',
+    textSize: 'normal',
+    bgcolor: null,
+  });
   const upsertCell = (table: TableDrawingOutput, cell: TableCellDrawingOutput): void => {
     const key = tableCellKey(cell.column, cell.row);
     const index = table.cells.findIndex((existing) => tableCellKey(existing.column, existing.row) === key);
@@ -670,14 +682,40 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       table.cells[index] = cell;
     }
   };
-  const getCell = (
+  const normalizeCellCoordinates = (
     table: TableDrawingOutput,
     column: unknown,
     row: unknown,
-  ): TableCellDrawingOutput | undefined => {
+  ): { column: number; row: number } => {
     const normalizedColumn = normalizeTableColumn(runtime, column);
     const normalizedRow = normalizeTableRow(runtime, row);
-    return table.cells.find((cell) => cell.column === normalizedColumn && cell.row === normalizedRow);
+    if (
+      !Number.isFinite(normalizedColumn)
+      || !Number.isFinite(normalizedRow)
+      || normalizedColumn < 0
+      || normalizedColumn >= table.columns
+      || normalizedRow < 0
+      || normalizedRow >= table.rows
+    ) {
+      throw new Error(`Table cell coordinates out of bounds: column ${normalizedColumn}, row ${normalizedRow}`);
+    }
+
+    return { column: normalizedColumn, row: normalizedRow };
+  };
+  const ensureCell = (
+    table: TableDrawingOutput,
+    column: unknown,
+    row: unknown,
+  ): TableCellDrawingOutput => {
+    const coordinates = normalizeCellCoordinates(table, column, row);
+    const existing = table.cells.find((cell) => (
+      cell.column === coordinates.column && cell.row === coordinates.row
+    ));
+    if (existing) return existing;
+
+    const cell = createDefaultCell(coordinates.column, coordinates.row);
+    table.cells.push(cell);
+    return cell;
   };
 
   builtins.set('table.new', (args, namedArgs, ctx, _scope, callId) => {
@@ -695,7 +733,6 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       borderColor: runtime.toNullableColor(namedArgs.get('border_color') ?? args[6]),
       borderWidth: runtime.toLineWidth(namedArgs.get('border_width') ?? args[7]),
       cells: [],
-      forceOverlay: true,
     };
 
     ctx.addDrawing(drawing);
@@ -725,9 +762,10 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
 
   builtins.set('table.cell', (args, namedArgs, ctx) => {
     withTable(namedArgs.get('table_id') ?? args[0], ctx, (table) => {
+      const { column, row } = normalizeCellCoordinates(table, namedArgs.get('column') ?? args[1], namedArgs.get('row') ?? args[2]);
       upsertCell(table, {
-        column: normalizeTableColumn(runtime, namedArgs.get('column') ?? args[1]),
-        row: normalizeTableRow(runtime, namedArgs.get('row') ?? args[2]),
+        column,
+        row,
         text: runtime.toStringValue(namedArgs.get('text') ?? args[3] ?? ''),
         width: namedArgs.has('width') || args[4] !== undefined
           ? runtime.toNullableNumber(namedArgs.get('width') ?? args[4])
@@ -747,29 +785,29 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
 
   builtins.set('table.cell_set_text', (args, _namedArgs, ctx) => {
     withTable(args[0], ctx, (table) => {
-      const cell = getCell(table, args[1], args[2]);
-      if (cell) cell.text = runtime.toStringValue(args[3] ?? '');
+      const cell = ensureCell(table, args[1], args[2]);
+      cell.text = runtime.toStringValue(args[3] ?? '');
     });
     return undefined;
   });
   builtins.set('table.cell_set_bgcolor', (args, _namedArgs, ctx) => {
     withTable(args[0], ctx, (table) => {
-      const cell = getCell(table, args[1], args[2]);
-      if (cell) cell.bgcolor = runtime.toNullableColor(args[3]);
+      const cell = ensureCell(table, args[1], args[2]);
+      cell.bgcolor = runtime.toNullableColor(args[3]);
     });
     return undefined;
   });
   builtins.set('table.cell_set_text_color', (args, _namedArgs, ctx) => {
     withTable(args[0], ctx, (table) => {
-      const cell = getCell(table, args[1], args[2]);
-      if (cell) cell.textColor = runtime.toNullableColor(args[3]);
+      const cell = ensureCell(table, args[1], args[2]);
+      cell.textColor = runtime.toNullableColor(args[3]);
     });
     return undefined;
   });
   builtins.set('table.cell_set_text_size', (args, _namedArgs, ctx) => {
     withTable(args[0], ctx, (table) => {
-      const cell = getCell(table, args[1], args[2]);
-      if (cell) cell.textSize = runtime.toStringValue(args[3]);
+      const cell = ensureCell(table, args[1], args[2]);
+      cell.textSize = runtime.toStringValue(args[3]);
     });
     return undefined;
   });

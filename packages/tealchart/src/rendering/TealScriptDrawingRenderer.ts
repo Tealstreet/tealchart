@@ -47,7 +47,7 @@ export class TealScriptDrawingRenderer {
     this.renderPolylineDrawings(drawingPartition.polylines, bars, viewport, pane);
     this.renderLineDrawings(drawingPartition.lines, bars, viewport, pane);
     this.renderLabelDrawings(drawingPartition.labels, bars, viewport, pane);
-    this.renderTableDrawings(drawingPartition.tables);
+    this.renderTableDrawings(drawingPartition.tables, pane);
   }
 
   private clipToPane(pane: ComputedPane): void {
@@ -397,7 +397,7 @@ export class TealScriptDrawingRenderer {
     ctx.restore();
   }
 
-  private renderTableDrawings(tables: TealScriptDrawingPartition['tables']): void {
+  private renderTableDrawings(tables: TealScriptDrawingPartition['tables'], pane: ComputedPane): void {
     if (tables.length === 0) return;
 
     const { ctx, options, margins } = this;
@@ -405,7 +405,7 @@ export class TealScriptDrawingRenderer {
 
     for (const table of tables) {
       const metrics = this.measureTable(table);
-      const origin = this.resolveTableOrigin(table.position, metrics.width, metrics.height, options.width, options.height, margins);
+      const origin = this.resolveTableOrigin(table.position, metrics.width, metrics.height, options.width, margins, pane);
 
       if (table.bgcolor) {
         ctx.fillStyle = table.bgcolor;
@@ -503,22 +503,23 @@ export class TealScriptDrawingRenderer {
     width: number,
     height: number,
     canvasWidth: number,
-    canvasHeight: number,
     margins: ChartMargins,
+    pane: ComputedPane,
   ): { x: number; y: number } {
     const padding = 8;
+    const drawableWidth = canvasWidth - margins.left - margins.right;
     let x = margins.left + padding;
     if (position.endsWith('_center')) {
-      x = canvasWidth / 2 - width / 2;
+      x = margins.left + drawableWidth / 2 - width / 2;
     } else if (position.endsWith('_right')) {
       x = canvasWidth - margins.right - width - padding;
     }
 
-    let y = padding;
+    let y = pane.top + padding;
     if (position.startsWith('middle_')) {
-      y = canvasHeight / 2 - height / 2;
+      y = pane.top + pane.height / 2 - height / 2;
     } else if (position.startsWith('bottom_')) {
-      y = canvasHeight - height - padding;
+      y = pane.bottom - height - padding;
     }
 
     return { x, y };
