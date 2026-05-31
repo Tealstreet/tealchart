@@ -668,6 +668,17 @@ export class TealscriptEngine {
 
   private evaluateBinary(expr: BinaryExpression): unknown {
     const left = this.evaluateExpression(expr.left);
+
+    if (expr.operator === 'and') {
+      if (!this.isTruthy(left)) return false;
+      return this.isTruthy(this.evaluateExpression(expr.right));
+    }
+
+    if (expr.operator === 'or') {
+      if (this.isTruthy(left)) return true;
+      return this.isTruthy(this.evaluateExpression(expr.right));
+    }
+
     const right = this.evaluateExpression(expr.right);
 
     // Pine comparison operators return false when either operand is an
@@ -708,12 +719,6 @@ export class TealscriptEngine {
         return (left as number) <= (right as number);
       case '>=':
         return (left as number) >= (right as number);
-
-      // Logical
-      case 'and':
-        return this.isTruthy(left) && this.isTruthy(right);
-      case 'or':
-        return this.isTruthy(left) || this.isTruthy(right);
 
       default:
         throw new Error(`Unknown operator: ${expr.operator}`);

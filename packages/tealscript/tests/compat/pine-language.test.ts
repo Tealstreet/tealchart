@@ -158,6 +158,20 @@ plot(bool(gap), title="Bool Cast")
     expect(getPlot(result, 'Bool Cast').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, false]);
   });
 
+  it('short-circuits logical guard expressions', () => {
+    const result = runCompatScript(`
+indicator("Logical short circuit")
+guardedAnd = false and runtime.error("and guard failed")
+guardedOr = true or runtime.error("or guard failed")
+plot(guardedAnd ? 1 : 0, title="Guarded And")
+plot(guardedOr ? 1 : 0, title="Guarded Or")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Guarded And').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Guarded Or').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+  });
+
   it('preserves history for derived regular series variables', () => {
     const result = runCompatScript(`
 indicator("Regular series history")
