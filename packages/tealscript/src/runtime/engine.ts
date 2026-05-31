@@ -301,6 +301,9 @@ export class TealscriptEngine {
     if (stmt.max_bars_back) {
       this.ctx.indicatorMaxBarsBack = this.normalizeMaxBarsBack(this.evaluateExpression(stmt.max_bars_back));
     }
+    if (stmt.timeframe) {
+      this.applyIndicatorTimeframe(this.evaluateExpression(stmt.timeframe));
+    }
   }
 
   private normalizeMaxBarsBack(value: unknown): number {
@@ -308,6 +311,57 @@ export class TealscriptEngine {
       throw new Error('indicator max_bars_back must be a non-negative integer');
     }
     return value;
+  }
+
+  private applyIndicatorTimeframe(value: unknown): void {
+    const period = this.toStringValue(value).trim().toUpperCase();
+    if (period === '') return;
+
+    const info = this.getTimeframeInfo(period);
+    if (info === null) {
+      throw new Error(`Invalid indicator timeframe: ${period}`);
+    }
+
+    this.ctx.timeframe = info;
+  }
+
+  private getTimeframeInfo(period: string): ExecutionContext['timeframe'] | null {
+    const normalized = period.trim().toUpperCase();
+    if (normalized === '') return null;
+
+    const minutes = Number(normalized);
+    if (Number.isFinite(minutes) && minutes > 0) {
+      return {
+        period: normalized,
+        multiplier: minutes,
+        isminutes: true,
+        isdaily: false,
+        isweekly: false,
+        ismonthly: false,
+        isintraday: true,
+        isseconds: false,
+        isticks: false,
+      };
+    }
+
+    const match = /^(\d+)?([STWDM])$/.exec(normalized);
+    if (!match) return null;
+
+    const multiplier = match[1] === undefined ? 1 : Number(match[1]);
+    if (!Number.isFinite(multiplier) || multiplier <= 0) return null;
+
+    const unit = match[2];
+    return {
+      period: normalized,
+      multiplier,
+      isminutes: false,
+      isdaily: unit === 'D',
+      isweekly: unit === 'W',
+      ismonthly: unit === 'M',
+      isintraday: unit === 'S',
+      isseconds: unit === 'S',
+      isticks: unit === 'T',
+    };
   }
 
   private registerUserFunctions(ast: Program): void {
@@ -1311,14 +1365,13 @@ export class TealscriptEngine {
       case 'isweekly':
       case 'ismonthly':
       case 'isintraday':
+      case 'isseconds':
+      case 'isticks':
         return this.ctx.timeframe[prop];
       case 'main_period':
         return this.ctx.timeframe.period;
       case 'isdwm':
         return this.ctx.timeframe.isdaily || this.ctx.timeframe.isweekly || this.ctx.timeframe.ismonthly;
-      case 'isseconds':
-      case 'isticks':
-        return false;
       default:
         throw new Error(`Unknown timeframe property: ${prop}`);
     }
