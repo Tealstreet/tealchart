@@ -342,7 +342,7 @@ IndentedBlock
     }
 
 IndentedStatement
-  = Indent stmt:Statement {
+  = &Indent Indent stmt:Statement {
       return stmt;
     }
 
@@ -352,7 +352,7 @@ FunctionIndentedBlock
     }
 
 FunctionIndentedStatement
-  = FunctionIndent stmt:(FunctionIfStatement / FunctionForStatement / FunctionWhileStatement / Statement) {
+  = &FunctionIndent FunctionIndent stmt:(FunctionIfStatement / FunctionForStatement / FunctionWhileStatement / Statement) {
       return stmt;
     }
 
@@ -431,7 +431,7 @@ FunctionNestedBlock
     }
 
 FunctionNestedStatement
-  = FunctionNestedIndent stmt:(FunctionNestedIfStatement / FunctionNestedForStatement / FunctionNestedWhileStatement / Statement) {
+  = &FunctionNestedIndent FunctionNestedIndent stmt:(FunctionNestedIfStatement / FunctionNestedForStatement / FunctionNestedWhileStatement / Statement) {
       return stmt;
     }
 
@@ -501,7 +501,7 @@ FunctionDeepNestedBlock
     }
 
 FunctionDeepNestedStatement
-  = FunctionDeepNestedIndent stmt:(FunctionDeepNestedIfStatement / FunctionDeepNestedForStatement / FunctionDeepNestedWhileStatement / Statement) {
+  = &FunctionDeepNestedIndent FunctionDeepNestedIndent stmt:(FunctionDeepNestedIfStatement / FunctionDeepNestedForStatement / FunctionDeepNestedWhileStatement / Statement) {
       return stmt;
     }
 
@@ -571,7 +571,7 @@ FunctionVeryDeepNestedBlock
     }
 
 FunctionVeryDeepNestedStatement
-  = FunctionVeryDeepNestedIndent stmt:Statement {
+  = &FunctionVeryDeepNestedIndent FunctionVeryDeepNestedIndent stmt:Statement {
       return stmt;
     }
 
@@ -586,8 +586,8 @@ FunctionNestedIndent
   / "\t    "
 
 FunctionElseIndent
-  = FunctionNestedIndent
-  / FunctionIndent
+  = &FunctionNestedIndent FunctionNestedIndent
+  / &FunctionIndent FunctionIndent
 
 FunctionDeepNestedIndent
   = "            "
@@ -680,7 +680,7 @@ SwitchCase
 
 // Ternary: condition ? true : false
 ConditionalExpression
-  = test:OrExpression _ "?" OpSpace consequent:Expression _ ":" OpSpace alternate:Expression {
+  = test:OrExpression BeforeQuestion "?" OpSpace consequent:Expression BeforeColon ":" OpSpace alternate:Expression {
       return {
         type: 'ConditionalExpression',
         test,
@@ -693,13 +693,13 @@ ConditionalExpression
 
 // Logical OR
 OrExpression
-  = head:AndExpression tail:(_ OrOperator OpSpace AndExpression)* {
+  = head:AndExpression tail:(BeforeOrOperator OrOperator OpSpace AndExpression)* {
       return buildBinaryExpr(head, tail);
     }
 
 // Logical AND
 AndExpression
-  = head:ComparisonExpression tail:(_ AndOperator OpSpace ComparisonExpression)* {
+  = head:ComparisonExpression tail:(BeforeAndOperator AndOperator OpSpace ComparisonExpression)* {
       return buildBinaryExpr(head, tail);
     }
 
@@ -711,7 +711,7 @@ AndOperator
 
 // Comparison: ==, !=, <, >, <=, >=
 ComparisonExpression
-  = head:AdditiveExpression tail:(_ ComparisonOperator OpSpace AdditiveExpression)* {
+  = head:AdditiveExpression tail:(BeforeComparisonOperator ComparisonOperator OpSpace AdditiveExpression)* {
       return buildBinaryExpr(head, tail);
     }
 
@@ -720,13 +720,13 @@ ComparisonOperator
 
 // Addition/Subtraction
 AdditiveExpression
-  = head:MultiplicativeExpression tail:(_ ("+" / "-") OpSpace MultiplicativeExpression)* {
+  = head:MultiplicativeExpression tail:(BeforeAdditiveOperator ("+" / "-") OpSpace MultiplicativeExpression)* {
       return buildBinaryExpr(head, tail);
     }
 
 // Multiplication/Division/Modulo
 MultiplicativeExpression
-  = head:UnaryExpression tail:(_ ("*" / "/" / "%") OpSpace UnaryExpression)* {
+  = head:UnaryExpression tail:(BeforeMultiplicativeOperator ("*" / "/" / "%") OpSpace UnaryExpression)* {
       return buildBinaryExpr(head, tail);
     }
 
@@ -973,6 +973,28 @@ __
 
 // Operator whitespace allows Pine line continuations around operators without
 // making newlines generally insignificant between statements.
+BeforeQuestion
+  = &(__ "?") __
+
+BeforeColon
+  = &(__ ":") __
+
+BeforeOrOperator
+  = &(__ OrOperator) __
+
+BeforeAndOperator
+  = &(__ AndOperator) __
+
+BeforeComparisonOperator
+  = &(__ ComparisonOperator) __
+
+BeforeAdditiveOperator
+  = &(_ ("+" / "-")) _
+  / &(__ "+") __
+
+BeforeMultiplicativeOperator
+  = &(__ ("*" / "/" / "%")) __
+
 OpSpace
   = (WhiteSpace / MultiLineComment / LineTerminator)*
 
