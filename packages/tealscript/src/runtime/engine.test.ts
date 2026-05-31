@@ -1403,6 +1403,28 @@ plot(x)`;
 
       expect(result.plots[0].values[0]).toBe(4);
     });
+
+    it('calculates math.sum over the latest non-na values', () => {
+      const script = `//@version=6
+indicator("Math Sum")
+source = bar_index == 2 ? na : close
+plot(math.sum(close, 3), title="Close Sum")
+plot(math.sum(source, 3), title="Sparse Sum")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: 2, open: 101, high: 103, low: 100, close: 102, volume: 100 },
+        { time: 3, open: 102, high: 106, low: 101, close: 105, volume: 100 },
+        { time: 4, open: 105, high: 106, low: 102, close: 103, volume: 100 },
+        { time: 5, open: 103, high: 108, low: 103, close: 107, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Close Sum')?.values).toEqual([null, null, 307, 310, 315]);
+      expect(result.plots.find((plot) => plot.title === 'Sparse Sum')?.values).toEqual([null, null, null, 305, 312]);
+    });
   });
 
   describe('TA functions', () => {
@@ -1471,6 +1493,23 @@ plot(x)`;
       const result = executeScript(ast, bars);
 
       expect(result.plots[0].values[4]).not.toBeNaN();
+    });
+
+    it('calculates Pine-style scalar ta.stoch', () => {
+      const script = `//@version=6
+indicator("TA stoch")
+plot(ta.stoch(close, high, low, 3), title="Stoch")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 103, low: 99, close: 102, volume: 100 },
+        { time: 2, open: 102, high: 106, low: 101, close: 105, volume: 100 },
+        { time: 3, open: 105, high: 108, low: 104, close: 107, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Stoch')?.values[2]).toBeCloseTo(88.888889);
     });
 
     it('calculates cumulative and window statistic TA helpers', () => {

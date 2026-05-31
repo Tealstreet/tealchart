@@ -63,6 +63,22 @@ plot(directionChanged2 ? 1 : 0, title="Direction Changed 2")
     expect(getPlot(result, 'Direction Changed 2').values).toEqual([0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0]);
   });
 
+  it('runs Pine oscillator helper idioms', () => {
+    const result = runCompatScript(`
+indicator("Oscillator helpers")
+plot(ta.stoch(close, high, low, 3), title="Stoch Close")
+plot(ta.stoch(hl2, high, low, 3), title="Stoch HL2")
+plot(ta.mfi(hlc3, 3), title="MFI")
+plot(ta.wpr(3), title="WPR")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Stoch Close').values)).toEqual([null, null, 88.888889, 25, 9.090909, 30.769231, 88.888889, 92.857143, 75, 88.888889, 50, 71.428571]);
+    expect(roundSeries(getPlot(result, 'Stoch HL2').values)).toEqual([null, null, 77.777778, 56.25, 27.272727, 19.230769, 66.666667, 75, 79.166667, 72.222222, 68.75, 50]);
+    expect(roundSeries(getPlot(result, 'MFI').values)).toEqual([null, null, 100, 61.624951, 26.076294, 0, 35.319543, 74.59367, 100, 100, 100, 100]);
+    expect(roundSeries(getPlot(result, 'WPR').values)).toEqual([null, null, -11.111111, -75, -90.909091, -69.230769, -11.111111, -7.142857, -25, -11.111111, -50, -28.571429]);
+  });
+
   it('runs cumulative and dispersion TA helpers', () => {
     const result = runCompatScript(`
 indicator("Cumulative TA docs smoke")
@@ -342,11 +358,13 @@ midpoint = math.avg(open, high, low, close)
 rounded = math.round(midpoint, 2)
 rightAngle = math.todegrees(math.pi / 2)
 mintick = math.round_to_mintick(1.234)
+sparse = bar_index == 2 ? na : close
 plot(rounded, title="Rounded Midpoint")
 plot(math.trunc(-1.9), title="Truncated")
 plot(rightAngle, title="Right Angle")
 plot(mintick, title="Min Tick Rounded")
 plot(math.round(math.toradians(180), 6), title="Radians")
+plot(math.sum(sparse, 3), title="Sparse Sum")
 `);
 
     expect(result.errors).toEqual([]);
@@ -355,6 +373,7 @@ plot(math.round(math.toradians(180), 6), title="Radians")
     expect(roundSeries(getPlot(result, 'Right Angle').values)).toEqual([90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90]);
     expect(roundSeries(getPlot(result, 'Min Tick Rounded').values)).toEqual([1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23]);
     expect(roundSeries(getPlot(result, 'Radians').values, 6)).toEqual([3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593]);
+    expect(roundSeries(getPlot(result, 'Sparse Sum').values)).toEqual([null, null, null, 310, 307, 302, 303, 313, 321, 328, 329, 333]);
   });
 
   it('matches common Pine trend direction helper idioms', () => {

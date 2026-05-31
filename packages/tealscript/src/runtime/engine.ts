@@ -1633,6 +1633,14 @@ export class TealscriptEngine {
     return values;
   }
 
+  private getCompleteNonNaSourceWindow(scope: Scope, key: string, source: number, length: number): number[] | null {
+    if (length < 1) return null;
+    const history = (scope.get(key) as number[] | undefined) ?? [];
+    const values = [source, ...history].filter((value) => !isNaN(value)).slice(0, length);
+    this.setBuiltinState(scope, key, values);
+    return values.length < length ? null : values;
+  }
+
   private getCompletePairedSourceWindows(
     scope: Scope,
     leftKey: string,
@@ -2214,6 +2222,12 @@ export class TealscriptEngine {
       const values = args.map((arg) => this.toNumber(arg));
       if (values.some((value) => Number.isNaN(value))) return Number.NaN;
       return values.reduce((sum, value) => sum + value, 0) / values.length;
+    });
+    this.builtins.set('math.sum', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = this.toNumber(args[0]);
+      const length = this.normalizeLookbackLength(args[1]);
+      const values = this.getCompleteNonNaSourceWindow(scope, `_math_sum_source_${callId}`, source, length);
+      return values ? values.reduce((sum, value) => sum + value, 0) : Number.NaN;
     });
     this.builtins.set('math.sqrt', (args) => Math.sqrt(args[0] as number));
     this.builtins.set('math.pow', (args) => Math.pow(args[0] as number, args[1] as number));
@@ -3329,49 +3343,77 @@ export class TealscriptEngine {
       return cumVol > 0 ? cumTpv / cumVol : NaN;
     });
 
-    // STOCH - Stochastic Oscillator
-    // Returns [%K, %D]
-    this.builtins.set('ta.stoch', (args, _namedArgs, ctx, scope) => {
-      const length = (args[0] ?? 14) as number;
-      const smoothK = (args[1] ?? 3) as number;
-      const smoothD = (args[2] ?? 3) as number;
+    this.builtins.set('ta.stoch', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const highSource = args[1] as number;
+      const lowSource = args[2] as number;
+      const length = this.normalizeLookbackLength(args[3] ?? 14);
+      const windows = this.getCompletePairedSourceWindows(
+        scope,
+        `_ta_stoch_high_${callId}`,
+        `_ta_stoch_low_${callId}`,
+        highSource,
+        lowSource,
+        length,
+      );
+      if (isNaN(source) || !windows) return NaN;
 
-      const close = ctx.close.get(0)!;
+      const [highValues, lowValues] = windows;
+      const highestHigh = Math.max(...highValues);
+      const lowestLow = Math.min(...lowValues);
+      const range = highestHigh - lowestLow;
+      return range === 0 ? NaN : ((source - lowestLow) / range) * 100;
+    });
 
-      // Calculate highest high and lowest low over length
-      let highestHigh = -Infinity;
-      let lowestLow = Infinity;
+    this.builtins.set('ta.mfi', (args, _namedArgs, ctx, scope, callId) => {
+      const source = args[0] as number;
+      const length = this.normalizeLookbackLength(args[1] ?? 14);
+      const volume = ctx.volume.get(0);
+      const sourceKey = `_ta_mfi_source_${callId}`;
+      const positiveKey = `_ta_mfi_positive_${callId}`;
+      const negativeKey = `_ta_mfi_negative_${callId}`;
+      const sourceHistory = (scope.get(sourceKey) as number[] | undefined) ?? [];
+      const previousSource = sourceHistory[0];
+      this.setBuiltinState(scope, sourceKey, [source, ...sourceHistory].slice(0, length + 1));
 
-      for (let i = 0; i < length; i++) {
-        const h = ctx.high.get(i);
-        const l = ctx.low.get(i);
-        if (h !== undefined && h > highestHigh) highestHigh = h;
-        if (l !== undefined && l < lowestLow) lowestLow = l;
+      if (length < 1 || isNaN(source) || volume === undefined || isNaN(volume)) return NaN;
+
+      let positiveFlow = 0;
+      let negativeFlow = 0;
+      if (previousSource !== undefined && !isNaN(previousSource)) {
+        const rawFlow = source * volume;
+        if (source > previousSource) positiveFlow = rawFlow;
+        if (source < previousSource) negativeFlow = rawFlow;
       }
 
-      // Calculate raw %K
+      const positiveFlows = this.updateBuiltinSourceHistory(scope, positiveKey, positiveFlow, length);
+      const negativeFlows = this.updateBuiltinSourceHistory(scope, negativeKey, negativeFlow, length);
+      if (positiveFlows.length < length || negativeFlows.length < length) return NaN;
+
+      const positiveSum = positiveFlows.reduce((sum, value) => sum + value, 0);
+      const negativeSum = negativeFlows.reduce((sum, value) => sum + value, 0);
+      if (negativeSum === 0) return positiveSum === 0 ? 50 : 100;
+      if (positiveSum === 0) return 0;
+      return 100 - 100 / (1 + positiveSum / negativeSum);
+    });
+
+    this.builtins.set('ta.wpr', (args, _namedArgs, ctx) => {
+      const length = this.normalizeLookbackLength(args[0] ?? 14);
+      const close = ctx.close.get(0);
+      if (length < 1 || close === undefined || isNaN(close)) return NaN;
+
+      let highestHigh = -Infinity;
+      let lowestLow = Infinity;
+      for (let offset = 0; offset < length; offset++) {
+        const high = ctx.high.get(offset);
+        const low = ctx.low.get(offset);
+        if (high === undefined || low === undefined || isNaN(high) || isNaN(low)) return NaN;
+        if (high > highestHigh) highestHigh = high;
+        if (low < lowestLow) lowestLow = low;
+      }
+
       const range = highestHigh - lowestLow;
-      const rawK = range > 0 ? ((close - lowestLow) / range) * 100 : 50;
-
-      // Smooth %K using SMA
-      const rawKKey = `_stoch_rawK_${length}`;
-      const rawKHistory = (scope.get(rawKKey) as number[]) ?? [];
-      rawKHistory.push(rawK);
-      if (rawKHistory.length > smoothK) rawKHistory.shift();
-      scope.declare(rawKKey, 'var', rawKHistory);
-
-      const k = rawKHistory.reduce((a, b) => a + b, 0) / rawKHistory.length;
-
-      // Calculate %D as SMA of %K
-      const kHistoryKey = `_stoch_k_${length}`;
-      const kHistory = (scope.get(kHistoryKey) as number[]) ?? [];
-      kHistory.push(k);
-      if (kHistory.length > smoothD) kHistory.shift();
-      scope.declare(kHistoryKey, 'var', kHistory);
-
-      const d = kHistory.reduce((a, b) => a + b, 0) / kHistory.length;
-
-      return [k, d];
+      return range === 0 ? NaN : ((close - highestHigh) / range) * 100;
     });
 
     // MOM - Momentum
