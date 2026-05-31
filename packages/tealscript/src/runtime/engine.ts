@@ -22,6 +22,7 @@ import type {
   ConditionalExpression,
   SwitchExpression,
   CallExpression,
+  CallArgument,
   MemberExpression,
   IndexExpression,
 } from '../parser/ast';
@@ -67,6 +68,7 @@ import {
   withDrawing,
 } from './drawings/helpers';
 import { Scope, createRootScope } from './scope';
+import type { RequestDataContext, RequestDatafeed } from './requestDatafeed';
 
 /**
  * Execution result
@@ -91,12 +93,21 @@ export interface ExecutionError {
   column?: number;
 }
 
+export interface TealscriptEngineOptions {
+  requestDatafeed?: RequestDatafeed;
+}
+
 interface RandomBuiltinState {
   seed: number;
   state: number;
 }
 
-const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['request', 'map', 'matrix', 'polyline', 'ticker']);
+interface RequestEvaluationCacheEntry {
+  bars: Bar[];
+  values: unknown[];
+}
+
+const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['map', 'matrix', 'polyline', 'ticker']);
 
 /**
  * Tealscript Engine - executes AST bar-by-bar
@@ -110,15 +121,18 @@ export class TealscriptEngine {
   private builtins: BuiltinRegistry;
   private userFunctions: Map<string, FunctionDeclaration>;
   private functionScopes: Map<string, Scope>;
+  private requestDatafeed?: RequestDatafeed;
+  private requestEvaluationCache = new Map<string, RequestEvaluationCacheEntry>();
   private userFunctionCallStack: string[] = [];
   private errors: ExecutionError[] = [];
 
-  constructor() {
+  constructor(options: TealscriptEngineOptions = {}) {
     this.ctx = new ExecutionContext();
     this.scope = createRootScope();
     this.builtins = new Map();
     this.userFunctions = new Map();
     this.functionScopes = new Map();
+    this.requestDatafeed = options.requestDatafeed;
 
     this.registerBuiltins();
   }
@@ -131,6 +145,7 @@ export class TealscriptEngine {
     this.ctx.reset();
     this.scope = createRootScope();
     this.functionScopes.clear();
+    this.requestEvaluationCache.clear();
     this.userFunctionCallStack = [];
     this.registerUserFunctions(ast);
 
@@ -208,6 +223,7 @@ export class TealscriptEngine {
     this.ctx.rollbackBar();
     this.ctx.bar_index = this.ctx.last_bar_index;
     this.ctx.setNow(Date.now());
+    this.requestEvaluationCache.clear();
 
     // Truncate plot arrays to remove the last bar's appended values
     // so re-execution can re-append them cleanly without duplication
@@ -901,6 +917,12 @@ export class TealscriptEngine {
     if (namespace && this.isUnsupportedDrawingNamespace(namespace)) {
       throw new Error(`${namespace}.* functions are not supported yet: ${fullName}`);
     }
+    if (fullName === 'request.security') {
+      return this.evaluateRequestSecurity(expr, this.nextBuiltinCallId(fullName));
+    }
+    if (namespace === 'request') {
+      throw new Error(`request.* functions are not supported yet: ${fullName}`);
+    }
 
     // Evaluate arguments
     const args: unknown[] = [];
@@ -954,6 +976,205 @@ export class TealscriptEngine {
 
   private isPlannedUnsupportedNamespace(namespace: string): boolean {
     return PLANNED_UNSUPPORTED_NAMESPACES.has(namespace);
+  }
+
+  private evaluateRequestSecurity(expr: CallExpression, callId: string): unknown {
+    const symbolArg = this.getCallArgument(expr, 0, 'symbol');
+    const timeframeArg = this.getCallArgument(expr, 1, 'timeframe');
+    const expressionArg = this.getCallArgument(expr, 2, 'expression');
+
+    if (!symbolArg || !timeframeArg || !expressionArg) {
+      throw new Error('request.security requires symbol, timeframe, and expression arguments');
+    }
+    if (!this.requestDatafeed) {
+      throw new Error('request.security requires a request datafeed');
+    }
+
+    const symbol = this.normalizeRequestSymbol(this.evaluateExpression(symbolArg.value));
+    const timeframe = this.normalizeRequestTimeframe(this.evaluateExpression(timeframeArg.value));
+    const gaps = this.normalizeBarmergeGaps(this.evaluateOptionalCallArgument(expr, 3, 'gaps') ?? 'barmerge.gaps_off');
+    const lookahead = this.normalizeBarmergeLookahead(
+      this.evaluateOptionalCallArgument(expr, 4, 'lookahead') ?? 'barmerge.lookahead_off',
+    );
+    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalCallArgument(expr, 5, 'ignore_invalid_symbol') ?? false);
+    const calcBarsCount = this.normalizeOptionalPositiveInteger(this.evaluateOptionalCallArgument(expr, 7, 'calc_bars_count'));
+
+    const result = this.requestDatafeed.getBars({ symbol, timeframe, calcBarsCount });
+    if (!result.ok) {
+      if (ignoreInvalidSymbol && (result.code === 'invalid_symbol' || result.code === 'missing_context')) {
+        return Number.NaN;
+      }
+      throw new Error(`request.security failed: ${result.message}`);
+    }
+
+    const cacheKey = this.requestEvaluationCacheKey(callId, symbol, timeframe, calcBarsCount);
+    let cached = this.requestEvaluationCache.get(cacheKey);
+    if (!cached) {
+      cached = {
+        bars: result.context.bars,
+        values: this.evaluateRequestExpressionSeries(expressionArg.value, result.context),
+      };
+      this.requestEvaluationCache.set(cacheKey, cached);
+    }
+
+    return this.mergeRequestedValue(cached.bars, cached.values, gaps, lookahead);
+  }
+
+  private getCallArgument(expr: CallExpression, position: number, name: string): CallArgument | undefined {
+    return expr.arguments.find((arg) => arg.name?.name === name) ?? expr.arguments.filter((arg) => !arg.name)[position];
+  }
+
+  private evaluateOptionalCallArgument(expr: CallExpression, position: number, name: string): unknown {
+    const arg = this.getCallArgument(expr, position, name);
+    return arg ? this.evaluateExpression(arg.value) : undefined;
+  }
+
+  private normalizeRequestSymbol(value: unknown): string {
+    const symbol = this.toStringValue(value).trim();
+    if (symbol === '' || symbol === this.ctx.syminfo.ticker) {
+      return this.ctx.syminfo.ticker;
+    }
+    return symbol;
+  }
+
+  private normalizeRequestTimeframe(value: unknown): string {
+    const timeframe = this.toStringValue(value).trim().toUpperCase();
+    if (timeframe === '' || timeframe === this.ctx.timeframe.period) {
+      return this.ctx.timeframe.period;
+    }
+    return timeframe;
+  }
+
+  private normalizeBarmergeGaps(value: unknown): 'barmerge.gaps_off' | 'barmerge.gaps_on' {
+    const normalized = this.toStringValue(value);
+    if (normalized === 'barmerge.gaps_on') return 'barmerge.gaps_on';
+    if (normalized === 'barmerge.gaps_off') return 'barmerge.gaps_off';
+    throw new Error(`Unsupported request.security gaps mode: ${normalized}`);
+  }
+
+  private normalizeBarmergeLookahead(value: unknown): 'barmerge.lookahead_off' | 'barmerge.lookahead_on' {
+    const normalized = this.toStringValue(value);
+    if (normalized === 'barmerge.lookahead_on') return 'barmerge.lookahead_on';
+    if (normalized === 'barmerge.lookahead_off') return 'barmerge.lookahead_off';
+    throw new Error(`Unsupported request.security lookahead mode: ${normalized}`);
+  }
+
+  private normalizeOptionalPositiveInteger(value: unknown): number | undefined {
+    if (value === undefined || this.isNa(value)) {
+      return undefined;
+    }
+
+    const count = Math.trunc(this.toNumber(value));
+    return Number.isFinite(count) && count > 0 ? count : undefined;
+  }
+
+  private requestEvaluationCacheKey(
+    callId: string,
+    symbol: string,
+    timeframe: string,
+    calcBarsCount: number | undefined,
+  ): string {
+    return `${callId}\u0000${symbol}\u0000${timeframe}\u0000${calcBarsCount ?? ''}`;
+  }
+
+  private evaluateRequestExpressionSeries(expression: Expression, requestContext: RequestDataContext): unknown[] {
+    const engine = new TealscriptEngine({ requestDatafeed: this.requestDatafeed });
+    engine.ctx.setNow(this.ctx.now);
+    engine.ctx.syminfo = {
+      ...engine.ctx.syminfo,
+      ...requestContext.syminfo,
+      ticker: requestContext.syminfo?.ticker ?? requestContext.symbol,
+      currency: requestContext.currency ?? requestContext.syminfo?.currency ?? engine.ctx.syminfo.currency,
+    };
+
+    const timeframeInfo = engine.getTimeframeInfo(requestContext.timeframe);
+    if (!timeframeInfo) {
+      throw new Error(`Invalid request.security timeframe: ${requestContext.timeframe}`);
+    }
+    engine.ctx.timeframe = timeframeInfo;
+    engine.ctx.loadBars(requestContext.bars);
+    engine.userFunctions = new Map(this.userFunctions);
+    engine.functionScopes.clear();
+    for (const name of engine.userFunctions.keys()) {
+      engine.functionScopes.set(name, engine.scope.createChild());
+    }
+
+    const values: unknown[] = [];
+    while (engine.ctx.advanceBar()) {
+      engine.scope.advanceBar();
+      for (const functionScope of engine.functionScopes.values()) {
+        functionScope.advanceBar();
+      }
+      engine.resetPerBarBuiltinState();
+      values.push(engine.evaluateExpression(expression));
+      const isLastBar = engine.ctx.bar_index === engine.ctx.last_bar_index;
+      engine.scope.commit(isLastBar);
+      for (const functionScope of engine.functionScopes.values()) {
+        functionScope.commit(isLastBar);
+      }
+      engine.ctx.commitBar();
+    }
+
+    return values;
+  }
+
+  private mergeRequestedValue(
+    requestBars: Bar[],
+    requestedValues: unknown[],
+    gaps: 'barmerge.gaps_off' | 'barmerge.gaps_on',
+    lookahead: 'barmerge.lookahead_off' | 'barmerge.lookahead_on',
+  ): unknown {
+    const chartTime = this.ctx.time.get(0);
+    if (chartTime === undefined || requestBars.length === 0) {
+      return Number.NaN;
+    }
+
+    const selectedIndex = lookahead === 'barmerge.lookahead_on'
+      ? this.findActiveRequestBarIndex(requestBars, chartTime)
+      : this.findConfirmedRequestBarIndex(requestBars, chartTime);
+    if (selectedIndex < 0) {
+      return Number.NaN;
+    }
+
+    if (gaps === 'barmerge.gaps_on') {
+      const availableAt = lookahead === 'barmerge.lookahead_on'
+        ? requestBars[selectedIndex]?.time
+        : requestBars[selectedIndex + 1]?.time;
+      if (availableAt === undefined || !this.isFirstChartBarAtOrAfter(availableAt)) {
+        return Number.NaN;
+      }
+    }
+
+    return requestedValues[selectedIndex] ?? Number.NaN;
+  }
+
+  private findActiveRequestBarIndex(requestBars: Bar[], chartTime: number): number {
+    let index = -1;
+    for (let i = 0; i < requestBars.length; i++) {
+      if (requestBars[i]!.time <= chartTime) {
+        index = i;
+      } else {
+        break;
+      }
+    }
+    return index;
+  }
+
+  private findConfirmedRequestBarIndex(requestBars: Bar[], chartTime: number): number {
+    let index = -1;
+    for (let i = 0; i < requestBars.length - 1; i++) {
+      if (requestBars[i + 1]!.time <= chartTime) {
+        index = i;
+      } else {
+        break;
+      }
+    }
+    return index;
+  }
+
+  private isFirstChartBarAtOrAfter(time: number): boolean {
+    const previous = this.ctx.getBar(this.ctx.bar_index - 1);
+    return !previous || previous.time < time;
   }
 
   private registerDrawingBuiltins(): void {
@@ -1878,6 +2099,9 @@ export class TealscriptEngine {
     // Runtime helpers
     this.registerRuntimeBuiltins();
 
+    // Request helpers and constants
+    this.registerRequestBuiltins();
+
     // Pine Logs helpers
     this.registerLogBuiltins();
   }
@@ -1896,6 +2120,13 @@ export class TealscriptEngine {
       const message = namedArgs.has('message') ? namedArgs.get('message') : args[0];
       throw new RuntimeErrorException(this.toStringValue(message ?? ''));
     });
+  }
+
+  private registerRequestBuiltins(): void {
+    this.builtins.set('barmerge.gaps_off', () => 'barmerge.gaps_off');
+    this.builtins.set('barmerge.gaps_on', () => 'barmerge.gaps_on');
+    this.builtins.set('barmerge.lookahead_off', () => 'barmerge.lookahead_off');
+    this.builtins.set('barmerge.lookahead_on', () => 'barmerge.lookahead_on');
   }
 
   private registerLogBuiltins(): void {
@@ -4674,7 +4905,12 @@ class RuntimeErrorException extends Error {
 /**
  * Create and execute a script
  */
-export function executeScript(ast: Program, bars: Bar[], inputs?: Map<string, unknown>): ExecutionResult {
-  const engine = new TealscriptEngine();
+export function executeScript(
+  ast: Program,
+  bars: Bar[],
+  inputs?: Map<string, unknown>,
+  options?: TealscriptEngineOptions,
+): ExecutionResult {
+  const engine = new TealscriptEngine(options);
   return engine.execute(ast, bars, inputs);
 }

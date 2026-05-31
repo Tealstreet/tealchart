@@ -62,6 +62,7 @@ export {
   executeScript,
   type ExecutionResult,
   type ExecutionError,
+  type TealscriptEngineOptions,
 } from './engine';
 
 export {
