@@ -219,6 +219,31 @@ plot(close, title="Close", title="Duplicate")
     expect(duplicateNamed.errors[0]?.message).toBe('Duplicate named argument: title');
   });
 
+  it('returns user-defined function loop expression results', () => {
+    const result = runCompatScript(`
+indicator("UDF loop returns")
+lastNumeric(limit) =>
+    for i = 0 to limit
+        i
+lastCollection() =>
+    for value in array.from(1, 2, 3)
+        value * 2
+lastWhile(limit) =>
+    i = 0
+    while i < limit
+        i += 1
+        i
+plot(lastNumeric(3), title="Numeric Loop")
+plot(lastCollection(), title="Collection Loop")
+plot(lastWhile(3), title="While Loop")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Numeric Loop').values)).toEqual(Array(compatibilityBars.length).fill(3));
+    expect(roundSeries(getPlot(result, 'Collection Loop').values)).toEqual(Array(compatibilityBars.length).fill(6));
+    expect(roundSeries(getPlot(result, 'While Loop').values)).toEqual(Array(compatibilityBars.length).fill(3));
+  });
+
   it('rejects recursive user-defined function calls with a clear diagnostic', () => {
     const result = runCompatScript(`
 indicator("UDF recursion")

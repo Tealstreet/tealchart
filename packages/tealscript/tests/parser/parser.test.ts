@@ -241,6 +241,22 @@ arrayValue = [1, 2]
       }
     });
 
+    it('parses loops inside multiline user-defined functions', () => {
+      const ast = parse(`lastValue(limit) =>
+    for i = 0 to limit
+        i
+    while limit > 0
+        limit
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        expect(fn.body.map((statement) => statement.type)).toEqual(['ForStatement', 'WhileStatement']);
+      }
+    });
+
     it('parses multiline functions with multiple expression statements', () => {
       const ast = parse(`rangeSize(highValue, lowValue) =>
     range = highValue - lowValue
