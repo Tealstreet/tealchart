@@ -3299,6 +3299,7 @@ export class TealscriptEngine {
     const alertProfit = this.toOptionalString(this.getCallArg(args, namedArgs, 17, 'alert_profit'));
     const alertLoss = this.toOptionalString(this.getCallArg(args, namedArgs, 18, 'alert_loss'));
     const suffixOrders = limitPrice !== undefined && stopPrice !== undefined;
+    this.cancelObsoleteStrategyExitOrders(id, fromEntry, suffixOrders);
 
     if (limitPrice !== undefined) {
       this.submitOrReplaceStrategyExitOrder({
@@ -3333,6 +3334,28 @@ export class TealscriptEngine {
     }
 
     return undefined;
+  }
+
+  private cancelObsoleteStrategyExitOrders(id: string, fromEntry: string | undefined, suffixOrders: boolean): void {
+    const activeIds = suffixOrders
+      ? new Set([`${id} Limit`, `${id} Stop`])
+      : new Set([id]);
+
+    for (const order of this.ctx.strategyLedger.orders) {
+      if (order.status !== 'pending' || order.fromEntry !== fromEntry) {
+        continue;
+      }
+      if (order.id !== id && order.id !== `${id} Limit` && order.id !== `${id} Stop`) {
+        continue;
+      }
+      if (activeIds.has(order.id)) {
+        continue;
+      }
+
+      order.status = 'cancelled';
+      order.updatedBarIndex = this.ctx.bar_index;
+      order.updatedTime = this.ctx.time.get(0) ?? 0;
+    }
   }
 
   private submitOrReplaceStrategyExitOrder(input: Parameters<typeof submitStrategyOrder>[1]): void {

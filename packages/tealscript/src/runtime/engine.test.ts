@@ -441,6 +441,38 @@ plot(strategy.opentrades)`;
         { id: 'Target', status: 'pending', limitPrice: 103, updatedBarIndex: 2 },
       ]);
     });
+
+    it('cancels stale strategy.exit orders when switching between single and bracket exits', () => {
+      const script = `//@version=6
+strategy("Exit shape updates")
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Target", "Long", limit=102)
+if bar_index == 2
+    strategy.exit("Target", "Long", limit=103, stop=99)
+if bar_index == 3
+    strategy.exit("Target", "Long", stop=98)
+plot(strategy.opentrades)`;
+
+      const result = executeScript(parse(script), createBars(4));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        type: order.type,
+        status: order.status,
+        limitPrice: order.limitPrice,
+        stopPrice: order.stopPrice,
+        updatedBarIndex: order.updatedBarIndex,
+      }))).toEqual([
+        { id: 'Long', type: 'market', status: 'filled', limitPrice: undefined, stopPrice: undefined, updatedBarIndex: 0 },
+        { id: 'Target', type: 'limit', status: 'cancelled', limitPrice: 102, stopPrice: undefined, updatedBarIndex: 2 },
+        { id: 'Target Limit', type: 'limit', status: 'cancelled', limitPrice: 103, stopPrice: undefined, updatedBarIndex: 3 },
+        { id: 'Target Stop', type: 'stop', status: 'cancelled', limitPrice: undefined, stopPrice: 99, updatedBarIndex: 3 },
+        { id: 'Target', type: 'stop', status: 'pending', limitPrice: undefined, stopPrice: 98, updatedBarIndex: 3 },
+      ]);
+    });
   });
 
   describe('user-defined types', () => {
