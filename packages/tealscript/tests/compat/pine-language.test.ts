@@ -296,6 +296,36 @@ plot(q.value, title="Value")
     ]);
   });
 
+  it('keeps non-exported imported method overloads private externally', () => {
+    const library = parse(`
+library("PivotTools", true)
+export type Pivot
+    float value
+export method choose(Pivot this) => this
+method choose(Pivot this, float amount) =>
+    this.value += amount
+    this
+`);
+
+    const result = runCompatScript(`
+indicator("Imported private method overload")
+import TestUser/PivotTools/1 as pivots
+p = pivots.Pivot.new(close)
+q = p.choose(10)
+plot(q.value, title="Value")
+`, {
+      bars: [compatibilityBars[0]!],
+      engineOptions: {
+        libraries: new Map([['TestUser/PivotTools/1', library]]),
+      },
+    });
+
+    expect(result.errors.map((error) => error.message)).toEqual([
+      'Unknown function: p.choose',
+      'Unknown identifier: q',
+    ]);
+  });
+
   it('allows exported imported functions to call library-local methods', () => {
     const library = parse(`
 library("PivotTools", true)

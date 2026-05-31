@@ -185,7 +185,6 @@ interface ImportedLibrary {
   functions: Map<string, FunctionDeclaration>;
   exportedFunctions: Set<string>;
   methods: Map<string, FunctionDeclaration[]>;
-  exportedMethods: Set<string>;
   types: Map<string, TypeDeclaration>;
   exportedTypes: Set<string>;
 }
@@ -598,7 +597,6 @@ export class TealscriptEngine {
       const functions = new Map<string, FunctionDeclaration>();
       const exportedFunctions = new Set<string>();
       const methods = new Map<string, FunctionDeclaration[]>();
-      const exportedMethods = new Set<string>();
       const types = new Map<string, TypeDeclaration>();
       const exportedTypes = new Set<string>();
       for (const libraryStmt of libraryAst.body) {
@@ -607,9 +605,6 @@ export class TealscriptEngine {
             const overloads = methods.get(libraryStmt.name.name) ?? [];
             overloads.push(libraryStmt);
             methods.set(libraryStmt.name.name, overloads);
-            if (libraryStmt.exported) {
-              exportedMethods.add(libraryStmt.name.name);
-            }
           } else {
             functions.set(libraryStmt.name.name, libraryStmt);
             if (libraryStmt.exported) {
@@ -635,7 +630,6 @@ export class TealscriptEngine {
         functions,
         exportedFunctions,
         methods,
-        exportedMethods,
         types,
         exportedTypes,
       });
@@ -1452,9 +1446,10 @@ export class TealscriptEngine {
     if (!library || !overloads) return undefined;
 
     const isInsideSameLibrary = this.currentImportedLibrary()?.alias === alias;
-    if (!isInsideSameLibrary && !library.exportedMethods.has(methodName)) return undefined;
-
-    const method = overloads.find((candidate) => this.canCallUserFunction(candidate, args, namedArgs));
+    const method = overloads.find((candidate) => {
+      if (!isInsideSameLibrary && candidate.exported !== true) return false;
+      return this.canCallUserFunction(candidate, args, namedArgs);
+    });
     return method ? { library, method } : undefined;
   }
 
