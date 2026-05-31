@@ -139,6 +139,15 @@ The global helper pass covers `na`, `nz`, `fixnan`, and explicit primitive
 casts used by generated scripts to normalize optional source values before
 plotting or comparing them.
 
+## Core `na` And Logical Semantics Coverage
+
+The core semantics pass covers arithmetic `na` propagation, `na()` checks,
+explicit `bool(na)` conversion, Pine-compatible `false` results for comparison
+operators when either operand is an undefined variable, and short-circuiting
+`and` / `or` guard expressions. Full Pine v6 compile-time diagnostics for
+direct `na` comparisons and implicit numeric-to-bool usage remain planned under
+the qualified type-system epic.
+
 ## Common Visual Coloring Coverage
 
 The visual coloring pass covers `barcolor()` for conditional candle coloring.

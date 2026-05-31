@@ -56,7 +56,7 @@ reading the whole runtime.
 | --- | --- | --- | --- | --- |
 | Runtime | Bar-by-bar execution | Supported | `tests/runtime/runtime.test.ts`; `tests/compat/pine-basics.test.ts` | Realtime rollback semantics remain partial. |
 | Runtime | History references `x[n]` | Partial | `tests/compat/pine-language.test.ts`; `src/runtime/engine.test.ts` | Broader type diagnostics and max-bars inference are planned. |
-| Runtime | `na` value and `na(value)` | Partial | `tests/compat/pine-language.test.ts` | Pine v6 bool behavior and propagation need more coverage. |
+| Runtime | `na` value and `na(value)` | Partial | `tests/compat/pine-language.test.ts` | Arithmetic propagation, `na()` checks, explicit `bool(na)`, and `na` comparison false semantics are covered; direct `na` comparison diagnostics and full v6 bool type enforcement remain. |
 | Runtime | Built-in price series | Supported | `tests/runtime/runtime.test.ts`; `tests/compat/pine-basics.test.ts` | Host metadata injection is separate. |
 | Runtime | Calendar variables | Partial | `tests/compat/pine-control-time.test.ts` | Named IANA timezones and exchange calendars remain. |
 | Runtime | `bar_index` / `last_bar_index` | Supported | `tests/runtime/runtime.test.ts`; `tests/compat/pine-control-time.test.ts` | None known for current execution model. |
