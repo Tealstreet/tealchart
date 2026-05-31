@@ -1431,6 +1431,8 @@ export class TealscriptEngine {
     return (
       fullName === 'strategy.entry'
       || fullName === 'strategy.order'
+      || fullName === 'strategy.close'
+      || fullName === 'strategy.close_all'
       || fullName === 'strategy.cancel'
       || fullName === 'strategy.cancel_all'
     );
@@ -3191,6 +3193,8 @@ export class TealscriptEngine {
     this.builtins.set('strategy.oca.none', () => 'none');
     this.builtins.set('strategy.entry', (args, namedArgs) => this.submitStrategyOrderBuiltin(args, namedArgs));
     this.builtins.set('strategy.order', (args, namedArgs) => this.submitStrategyOrderBuiltin(args, namedArgs));
+    this.builtins.set('strategy.close', (args, namedArgs) => this.submitStrategyCloseBuiltin(args, namedArgs));
+    this.builtins.set('strategy.close_all', (args, namedArgs) => this.submitStrategyCloseAllBuiltin(args, namedArgs));
     this.builtins.set('strategy.cancel', (args, namedArgs) => {
       const id = this.toStringValue(this.getCallArg(args, namedArgs, 0, 'id', ''));
       cancelStrategyOrder(this.ctx.strategyLedger, id, this.ctx.bar_index, this.ctx.time.get(0) ?? 0);
@@ -3247,6 +3251,105 @@ export class TealscriptEngine {
     );
 
     return undefined;
+  }
+
+  private submitStrategyCloseBuiltin(args: unknown[], namedArgs: Map<string, unknown>): undefined {
+    const id = this.toStringValue(this.getCallArg(args, namedArgs, 0, 'id', ''));
+    if (id === '') {
+      throw new Error('strategy close id must not be empty');
+    }
+
+    const matchingTrades = this.ctx.strategyLedger.openTrades.filter((trade) => trade.entryOrderId === id);
+    if (matchingTrades.length === 0) {
+      return undefined;
+    }
+
+    const direction = matchingTrades[0]?.direction;
+    if (direction === undefined) {
+      return undefined;
+    }
+
+    const openQty = matchingTrades.reduce((total, trade) => total + trade.qty, 0);
+    const qty = this.resolveStrategyCloseQty(
+      openQty,
+      this.toOptionalNumber(this.getCallArg(args, namedArgs, 2, 'qty')),
+      this.toOptionalNumber(this.getCallArg(args, namedArgs, 3, 'qty_percent')),
+      'strategy close',
+    );
+    if (qty <= 0) {
+      return undefined;
+    }
+
+    this.submitFilledStrategyCloseOrder({
+      id: `Close ${id}`,
+      direction: direction === 'long' ? 'short' : 'long',
+      qty,
+      fromEntry: id,
+      comment: this.toOptionalString(this.getCallArg(args, namedArgs, 1, 'comment')),
+      alertMessage: this.toOptionalString(this.getCallArg(args, namedArgs, 4, 'alert_message')),
+    });
+    return undefined;
+  }
+
+  private submitStrategyCloseAllBuiltin(args: unknown[], namedArgs: Map<string, unknown>): undefined {
+    const position = this.ctx.strategyLedger.position;
+    if (position.direction === null || position.size === 0) {
+      return undefined;
+    }
+
+    this.submitFilledStrategyCloseOrder({
+      id: 'Close All',
+      direction: position.direction === 'long' ? 'short' : 'long',
+      qty: Math.abs(position.size),
+      comment: this.toOptionalString(this.getCallArg(args, namedArgs, 0, 'comment')),
+      alertMessage: this.toOptionalString(this.getCallArg(args, namedArgs, 1, 'alert_message')),
+    });
+    return undefined;
+  }
+
+  private resolveStrategyCloseQty(openQty: number, rawQty: number | undefined, rawQtyPercent: number | undefined, name: string): number {
+    if (rawQty !== undefined) {
+      if (!Number.isFinite(rawQty) || rawQty <= 0) {
+        throw new Error(`${name} qty must be a positive number`);
+      }
+      return Math.min(rawQty, openQty);
+    }
+    if (rawQtyPercent !== undefined) {
+      if (!Number.isFinite(rawQtyPercent) || rawQtyPercent <= 0) {
+        throw new Error(`${name} qty_percent must be a positive number`);
+      }
+      return Math.min(openQty * (rawQtyPercent / 100), openQty);
+    }
+    return openQty;
+  }
+
+  private submitFilledStrategyCloseOrder(input: {
+    id: string;
+    direction: StrategyDirection;
+    qty: number;
+    fromEntry?: string;
+    comment?: string;
+    alertMessage?: string;
+  }): void {
+    const order = submitStrategyOrder(this.ctx.strategyLedger, {
+      id: input.id,
+      direction: input.direction,
+      qty: input.qty,
+      qtyType: 'fixed',
+      qtyValue: input.qty,
+      fromEntry: input.fromEntry,
+      comment: input.comment,
+      alertMessage: input.alertMessage,
+      barIndex: this.ctx.bar_index,
+      time: this.ctx.time.get(0) ?? 0,
+    });
+    fillStrategyMarketOrder(
+      this.ctx.strategyLedger,
+      order,
+      this.ctx.close.get(0) ?? Number.NaN,
+      this.ctx.bar_index,
+      this.ctx.time.get(0) ?? 0,
+    );
   }
 
   private normalizeStrategyDirection(value: unknown): StrategyDirection {
