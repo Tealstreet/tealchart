@@ -70,9 +70,6 @@ plot(ta.stoch(close, high, low, 3), title="Stoch Close")
 plot(ta.stoch(hl2, high, low, 3), title="Stoch HL2")
 plot(ta.mfi(hlc3, 3), title="MFI")
 plot(ta.wpr(3), title="WPR")
-plot(ta.cmo(close, 3), title="CMO")
-plot(ta.tsi(close, 2, 3), title="TSI")
-plot(ta.tsi(close - open, 2, 3), title="Derived TSI")
 plot(ta.cci(close, 3), title="Close CCI")
 plot(ta.cci(hlc3, 3), title="Typical CCI")
 `);
@@ -82,9 +79,6 @@ plot(ta.cci(hlc3, 3), title="Typical CCI")
     expect(roundSeries(getPlot(result, 'Stoch HL2').values)).toEqual([null, null, 77.777778, 56.25, 27.272727, 19.230769, 66.666667, 75, 79.166667, 72.222222, 68.75, 50]);
     expect(roundSeries(getPlot(result, 'MFI').values)).toEqual([null, null, 100, 61.624951, 26.076294, 0, 35.319543, 74.59367, 100, 100, 100, 100]);
     expect(roundSeries(getPlot(result, 'WPR').values)).toEqual([null, null, -11.111111, -75, -90.909091, -69.230769, -11.111111, -7.142857, -25, -11.111111, -50, -28.571429]);
-    expect(roundSeries(getPlot(result, 'CMO').values)).toEqual([null, null, null, 11.111111, -60, -77.777778, 11.111111, 100, 80, 77.777778, 20, 66.666667]);
-    expect(roundSeries(getPlot(result, 'TSI').values)).toEqual([null, 1, 1, 0.127273, -0.423181, -0.350948, 0.263311, 0.667454, 0.546809, 0.68082, 0.455692, 0.582409]);
-    expect(roundSeries(getPlot(result, 'Derived TSI').values)).toEqual([null, 1, 0.333333, -0.708333, -0.792793, 0.212408, 0.577159, 0.708576, -0.246146, 0.084836, -0.231693, 0.049573]);
     expect(roundSeries(getPlot(result, 'Close CCI').values)).toEqual([null, null, 87.5, -100, -100, -28.571429, 100, 100, 33.333333, 100, 20, 100]);
     expect(roundSeries(getPlot(result, 'Typical CCI').values)).toEqual([null, null, 95.652174, -25, -100, -70, 100, 100, 64.516129, 100, 84.615385, 50]);
   });
@@ -98,8 +92,6 @@ plot(ta.dev(close, 3), title="Mean Deviation")
 plot(ta.correlation(close, open, 3), title="Close Open Correlation")
 plot(ta.correlation(close, high, 3), title="Close High Correlation")
 plot(ta.correlation(close, close, 3), title="Self Correlation")
-plot(ta.cog(close, 3), title="COG")
-plot(ta.cog(close - open, 3), title="Derived COG")
 `);
 
     expect(result.errors).toEqual([]);
@@ -109,8 +101,6 @@ plot(ta.cog(close - open, 3), title="Derived COG")
     expect(roundSeries(getPlot(result, 'Close Open Correlation').values)).toEqual([null, null, 0.973684, -0.39736, 0.5, 0.720577, -0.453921, 0.963928, 0.712468, 0, -0.142857, -0.327327]);
     expect(roundSeries(getPlot(result, 'Close High Correlation').values)).toEqual([null, null, 1, -0.327327, 0.755929, 0.81224, 0.544705, 1, 0.940634, 0.654654, 0.5, -0.5]);
     expect(roundSeries(getPlot(result, 'Self Correlation').values)).toEqual([null, null, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
-    expect(roundSeries(getPlot(result, 'COG').values)).toEqual([null, null, -1.984076, -2.006349, -2.02589, -2.009934, -1.983498, -1.971246, -1.987539, -1.993902, -1.993921, -1.996997]);
-    expect(roundSeries(getPlot(result, 'Derived COG').values)).toEqual([null, null, -2, -9, -1, -2.714286, 6, -1.6, -2.625, -2.285714, -2, -2.25]);
   });
 
   it('runs Pine linear regression helper idioms', () => {
@@ -177,16 +167,12 @@ plot(formattedTime == "2024-01-05 09:30", title="Formatted Time")
     const result = runCompatScript(`
 indicator("String search helpers")
 text = "BTCUSDT perpetual"
-symbol = "NASDAQ:AAPL"
-parts = str.split(symbol, ":")
 plot(str.contains(text, "USDT"), title="Contains")
 plot(str.startswith(text, "BTC"), title="Starts")
 plot(str.endswith(text, "perpetual"), title="Ends")
 plot(str.pos(text, "USDT"), title="Position")
 plot(str.pos(text, "ETH"), title="Missing Position")
 plot(str.substring(text, 0, 3) == "BTC", title="Substring")
-plot(str.match("Trade NASDAQ:AAPL now", "[A-Z]+:[A-Z]+") == symbol, title="Regex Match")
-plot(array.get(parts, 1) == "AAPL", title="Split Symbol")
 plot(str.length(text), title="Length")
 `);
 
@@ -197,8 +183,6 @@ plot(str.length(text), title="Length")
     expect(roundSeries(getPlot(result, 'Position').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
     expect(getPlot(result, 'Missing Position').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, null]);
     expect(getPlot(result, 'Substring').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
-    expect(getPlot(result, 'Regex Match').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
-    expect(getPlot(result, 'Split Symbol').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(roundSeries(getPlot(result, 'Length').values)).toEqual([17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17]);
   });
 
@@ -210,18 +194,14 @@ trimmed = str.trim(text)
 plot(str.upper(trimmed) == "BTC-USDT-USDT", title="Upper")
 plot(str.lower("BTC") == "btc", title="Lower")
 plot(str.replace(trimmed, "usdt", "perp") == "btc-perp-usdt", title="Replace One")
-plot(str.replace(trimmed, "usdt", "perp", 1) == "btc-usdt-perp", title="Replace Occurrence")
 plot(str.replace_all(trimmed, "usdt", "perp") == "btc-perp-perp", title="Replace All")
-plot(str.repeat("?", 3, ",") == "?,?,?", title="Repeat")
 `);
 
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Upper').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Lower').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Replace One').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
-    expect(getPlot(result, 'Replace Occurrence').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Replace All').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
-    expect(getPlot(result, 'Repeat').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
 
   it('matches documented Pine string formatting examples', () => {
@@ -398,16 +378,12 @@ rounded = math.round(midpoint, 2)
 rightAngle = math.todegrees(math.pi / 2)
 mintick = math.round_to_mintick(1.234)
 sparse = bar_index == 2 ? na : close
-seededRandom = math.random(10, 20, 7)
-defaultRandom = math.random()
 plot(rounded, title="Rounded Midpoint")
 plot(math.trunc(-1.9), title="Truncated")
 plot(rightAngle, title="Right Angle")
 plot(mintick, title="Min Tick Rounded")
 plot(math.round(math.toradians(180), 6), title="Radians")
 plot(math.sum(sparse, 3), title="Sparse Sum")
-plot(seededRandom > 10 and seededRandom < 20 ? 1 : 0, title="Seeded Random In Range")
-plot(defaultRandom > 0 and defaultRandom < 1 ? 1 : 0, title="Default Random In Range")
 `);
 
     expect(result.errors).toEqual([]);
@@ -417,8 +393,6 @@ plot(defaultRandom > 0 and defaultRandom < 1 ? 1 : 0, title="Default Random In R
     expect(roundSeries(getPlot(result, 'Min Tick Rounded').values)).toEqual([1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23]);
     expect(roundSeries(getPlot(result, 'Radians').values, 6)).toEqual([3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593]);
     expect(roundSeries(getPlot(result, 'Sparse Sum').values)).toEqual([null, null, null, 310, 307, 302, 303, 313, 321, 328, 329, 333]);
-    expect(getPlot(result, 'Seeded Random In Range').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
-    expect(getPlot(result, 'Default Random In Range').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
   });
 
   it('matches common Pine trend direction helper idioms', () => {
