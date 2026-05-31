@@ -98,6 +98,8 @@ plot(ta.dev(close, 3), title="Mean Deviation")
 plot(ta.correlation(close, open, 3), title="Close Open Correlation")
 plot(ta.correlation(close, high, 3), title="Close High Correlation")
 plot(ta.correlation(close, close, 3), title="Self Correlation")
+plot(ta.cog(close, 3), title="COG")
+plot(ta.cog(close - open, 3), title="Derived COG")
 `);
 
     expect(result.errors).toEqual([]);
@@ -107,6 +109,8 @@ plot(ta.correlation(close, close, 3), title="Self Correlation")
     expect(roundSeries(getPlot(result, 'Close Open Correlation').values)).toEqual([null, null, 0.973684, -0.39736, 0.5, 0.720577, -0.453921, 0.963928, 0.712468, 0, -0.142857, -0.327327]);
     expect(roundSeries(getPlot(result, 'Close High Correlation').values)).toEqual([null, null, 1, -0.327327, 0.755929, 0.81224, 0.544705, 1, 0.940634, 0.654654, 0.5, -0.5]);
     expect(roundSeries(getPlot(result, 'Self Correlation').values)).toEqual([null, null, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'COG').values)).toEqual([null, null, -1.984076, -2.006349, -2.02589, -2.009934, -1.983498, -1.971246, -1.987539, -1.993902, -1.993921, -1.996997]);
+    expect(roundSeries(getPlot(result, 'Derived COG').values)).toEqual([null, null, -2, -9, -1, -2.714286, 6, -1.6, -2.625, -2.285714, -2, -2.25]);
   });
 
   it('runs Pine linear regression helper idioms', () => {
@@ -173,12 +177,16 @@ plot(formattedTime == "2024-01-05 09:30", title="Formatted Time")
     const result = runCompatScript(`
 indicator("String search helpers")
 text = "BTCUSDT perpetual"
+symbol = "NASDAQ:AAPL"
+parts = str.split(symbol, ":")
 plot(str.contains(text, "USDT"), title="Contains")
 plot(str.startswith(text, "BTC"), title="Starts")
 plot(str.endswith(text, "perpetual"), title="Ends")
 plot(str.pos(text, "USDT"), title="Position")
 plot(str.pos(text, "ETH"), title="Missing Position")
 plot(str.substring(text, 0, 3) == "BTC", title="Substring")
+plot(str.match("Trade NASDAQ:AAPL now", "[A-Z]+:[A-Z]+") == symbol, title="Regex Match")
+plot(array.get(parts, 1) == "AAPL", title="Split Symbol")
 plot(str.length(text), title="Length")
 `);
 
@@ -189,6 +197,8 @@ plot(str.length(text), title="Length")
     expect(roundSeries(getPlot(result, 'Position').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
     expect(getPlot(result, 'Missing Position').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, null]);
     expect(getPlot(result, 'Substring').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Regex Match').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Split Symbol').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(roundSeries(getPlot(result, 'Length').values)).toEqual([17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17]);
   });
 
@@ -200,14 +210,18 @@ trimmed = str.trim(text)
 plot(str.upper(trimmed) == "BTC-USDT-USDT", title="Upper")
 plot(str.lower("BTC") == "btc", title="Lower")
 plot(str.replace(trimmed, "usdt", "perp") == "btc-perp-usdt", title="Replace One")
+plot(str.replace(trimmed, "usdt", "perp", 1) == "btc-usdt-perp", title="Replace Occurrence")
 plot(str.replace_all(trimmed, "usdt", "perp") == "btc-perp-perp", title="Replace All")
+plot(str.repeat("?", 3, ",") == "?,?,?", title="Repeat")
 `);
 
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Upper').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Lower').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Replace One').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Replace Occurrence').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Replace All').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Repeat').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
 
   it('matches documented Pine string formatting examples', () => {
