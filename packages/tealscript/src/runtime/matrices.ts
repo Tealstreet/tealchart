@@ -1,4 +1,15 @@
-import { createPineArray, getArraySize, getArrayValue, pushArrayValue, type PineArray } from './arrays';
+import {
+  avgArrayValue,
+  createPineArray,
+  getArraySize,
+  getArrayValue,
+  maxArrayValue,
+  medianArrayValue,
+  minArrayValue,
+  modeArrayValue,
+  pushArrayValue,
+  type PineArray,
+} from './arrays';
 
 export interface PineMatrix<T = unknown> {
   readonly __tealscriptMatrix: true;
@@ -160,10 +171,37 @@ export function transposeMatrix<T = unknown>(matrix: PineMatrix<T>): PineMatrix<
   return result;
 }
 
+export function avgMatrixValue(matrix: PineMatrix): number {
+  return avgArrayValue(matrixValuesAsArray(matrix));
+}
+
+export function minMatrixValue(matrix: PineMatrix): number {
+  return minArrayValue(matrixValuesAsArray(matrix));
+}
+
+export function maxMatrixValue(matrix: PineMatrix): number {
+  return maxArrayValue(matrixValuesAsArray(matrix));
+}
+
+export function medianMatrixValue(matrix: PineMatrix): number {
+  return medianArrayValue(matrixValuesAsArray(matrix));
+}
+
+export function modeMatrixValue(matrix: PineMatrix): number {
+  return modeArrayValue(matrixValuesAsArray(matrix));
+}
+
 function matrixIndex(matrix: PineMatrix, row: number, column: number): number {
   const normalizedRow = normalizeExistingIndex(row, matrix.rows, 'row');
   const normalizedColumn = normalizeExistingIndex(column, matrix.columns, 'column');
   return normalizedRow * matrix.columns + normalizedColumn;
+}
+
+function matrixValuesAsArray(matrix: PineMatrix): PineArray {
+  return {
+    __tealscriptArray: true,
+    values: [...matrix.values],
+  };
 }
 
 function pineArrayValues<T = unknown>(array: PineArray<T>): T[] {

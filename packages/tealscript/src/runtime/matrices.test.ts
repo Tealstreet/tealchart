@@ -4,6 +4,7 @@ import { createPineArray, getArrayValue, pushArrayValue } from './arrays';
 import {
   addMatrixColumn,
   addMatrixRow,
+  avgMatrixValue,
   copyMatrix,
   createPineMatrix,
   fillMatrix,
@@ -14,6 +15,10 @@ import {
   isPineMatrix,
   matrixColumn,
   matrixRow,
+  maxMatrixValue,
+  medianMatrixValue,
+  minMatrixValue,
+  modeMatrixValue,
   removeMatrixColumn,
   removeMatrixRow,
   reshapeMatrix,
@@ -121,5 +126,18 @@ describe('PineMatrix', () => {
     expect(getMatrixRows(columnMatrix)).toBe(2);
     expect(getMatrixColumns(columnMatrix)).toBe(1);
     expect(columnMatrix.values).toEqual([4, 5]);
+  });
+
+  it('summarizes numeric matrix values', () => {
+    const matrix = createPineMatrix<number>(2, 3, 0);
+    [1, 2, 2, 4, 8, Number.NaN].forEach((value, index) => {
+      matrix.values[index] = value;
+    });
+
+    expect(avgMatrixValue(matrix)).toBe(3.4);
+    expect(minMatrixValue(matrix)).toBe(1);
+    expect(maxMatrixValue(matrix)).toBe(8);
+    expect(medianMatrixValue(matrix)).toBe(2);
+    expect(modeMatrixValue(matrix)).toBe(2);
   });
 });

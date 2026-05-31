@@ -83,4 +83,29 @@ plot(colsFromArray.rows(), title="Array Column Rows")
     expect(roundSeries(getPlot(result, 'Array Row Columns').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
     expect(roundSeries(getPlot(result, 'Array Column Rows').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
   });
+
+  it('runs matrix aggregate helper idioms', () => {
+    const result = runCompatScript(`
+indicator("Matrix aggregate helpers")
+m = matrix.new_float(2, 3, 0)
+m.set(0, 0, 1)
+m.set(0, 1, 2)
+m.set(0, 2, 2)
+m.set(1, 0, 4)
+m.set(1, 1, 8)
+m.set(1, 2, 13)
+plot(matrix.avg(m), title="Average")
+plot(m.min(), title="Minimum")
+plot(m.max(), title="Maximum")
+plot(matrix.median(m), title="Median")
+plot(m.mode(), title="Mode")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Average').values)).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
+    expect(roundSeries(getPlot(result, 'Minimum').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Maximum').values)).toEqual([13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13]);
+    expect(roundSeries(getPlot(result, 'Median').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Mode').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+  });
 });

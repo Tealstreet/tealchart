@@ -93,6 +93,7 @@ import {
 import {
   addMatrixColumn,
   addMatrixRow,
+  avgMatrixValue,
   copyMatrix,
   createPineMatrix,
   fillMatrix,
@@ -103,6 +104,10 @@ import {
   isPineMatrix,
   matrixColumn,
   matrixRow,
+  maxMatrixValue,
+  medianMatrixValue,
+  minMatrixValue,
+  modeMatrixValue,
   removeMatrixColumn,
   removeMatrixRow,
   reshapeMatrix,
@@ -3571,6 +3576,11 @@ export class TealscriptEngine {
       return null;
     });
     this.builtins.set('matrix.transpose', (args) => transposeMatrix(readMatrix(args[0])));
+    this.builtins.set('matrix.avg', (args) => avgMatrixValue(readMatrix(args[0])));
+    this.builtins.set('matrix.min', (args) => minMatrixValue(readMatrix(args[0])));
+    this.builtins.set('matrix.max', (args) => maxMatrixValue(readMatrix(args[0])));
+    this.builtins.set('matrix.median', (args) => medianMatrixValue(readMatrix(args[0])));
+    this.builtins.set('matrix.mode', (args) => modeMatrixValue(readMatrix(args[0])));
     this.builtins.set('matrix.copy', (args) => copyMatrix(readMatrix(args[0])));
     this.builtins.set('matrix.row', (args) => matrixRow(readMatrix(args[0]), args[1] as number));
     this.builtins.set('matrix.col', (args) => matrixColumn(readMatrix(args[0]), args[1] as number));

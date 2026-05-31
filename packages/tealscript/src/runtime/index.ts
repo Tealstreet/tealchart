@@ -51,6 +51,11 @@ export {
   swapMatrixColumns,
   reverseMatrix,
   transposeMatrix,
+  avgMatrixValue,
+  minMatrixValue,
+  maxMatrixValue,
+  medianMatrixValue,
+  modeMatrixValue,
   type PineMatrix,
 } from './matrices';
 
