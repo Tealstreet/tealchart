@@ -685,6 +685,8 @@ plot(close)`;
       const script = `//@version=6
 indicator("Global Helpers")
 source = bar_index == 0 or bar_index == 2 ? na : close
+plot(nz(source), title="NZ Default")
+plot(nz(source, open), title="NZ Replacement")
 plot(fixnan(source), title="Fixed")
 plot(float("4.5"), title="Float")
 plot(int(4.9), title="Int")
@@ -697,12 +699,29 @@ plot(string(12.5) == "12.5", title="String Cast")`;
       const result = executeScript(ast, bars);
 
       expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'NZ Default')?.values).toEqual([0, 100.7, 0, 101.7]);
+      expect(result.plots.find((plot) => plot.title === 'NZ Replacement')?.values).toEqual([100, 100.7, 101, 101.7]);
       expect(result.plots.find((plot) => plot.title === 'Fixed')?.values).toEqual([null, 100.7, 100.7, 101.7]);
       expect(result.plots.find((plot) => plot.title === 'Float')?.values).toEqual([4.5, 4.5, 4.5, 4.5]);
       expect(result.plots.find((plot) => plot.title === 'Int')?.values).toEqual([4, 4, 4, 4]);
       expect(result.plots.find((plot) => plot.title === 'Bool True')?.values).toEqual([true, true, true, true]);
       expect(result.plots.find((plot) => plot.title === 'Bool False')?.values).toEqual([false, false, false, false]);
       expect(result.plots.find((plot) => plot.title === 'String Cast')?.values).toEqual([true, true, true, true]);
+    });
+
+    it('rejects bool arguments for v6 na replacement helpers', () => {
+      const nzScript = `//@version=6
+indicator("NZ Bool")
+plot(nz(close > open) ? 1 : 0)`;
+      const fixnanScript = `//@version=6
+indicator("Fixnan Bool")
+plot(fixnan(close > open) ? 1 : 0)`;
+
+      const nzResult = executeScript(parse(nzScript), createBars(1));
+      const fixnanResult = executeScript(parse(fixnanScript), createBars(1));
+
+      expect(nzResult.errors[0]?.message).toBe('nz() does not accept bool arguments in Pine v6');
+      expect(fixnanResult.errors[0]?.message).toBe('fixnan() does not accept bool arguments in Pine v6');
     });
 
     it('parses numeric strings with str.tonumber', () => {
