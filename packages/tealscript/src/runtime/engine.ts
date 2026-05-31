@@ -3385,6 +3385,37 @@ export class TealscriptEngine {
       const tickerId = this.toStringValue(namedArgs.get('symbol') ?? namedArgs.get('tickerid') ?? args[0] ?? '');
       return this.applyTickerChart(tickerId, 'heikinashi');
     });
+
+    this.builtins.set('ticker.renko', (args, namedArgs) => {
+      const tickerId = this.toStringValue(namedArgs.get('symbol') ?? namedArgs.get('tickerid') ?? args[0] ?? '');
+      const style = this.toStringValue(namedArgs.get('style') ?? args[1] ?? '');
+      const param = namedArgs.get('param') ?? args[2];
+      const requestWicks = namedArgs.get('request_wicks') ?? args[3];
+      const source = namedArgs.get('source') ?? args[4];
+      return this.applyTickerChart(tickerId, 'renko', [style, param, requestWicks, source]);
+    });
+
+    this.builtins.set('ticker.linebreak', (args, namedArgs) => {
+      const tickerId = this.toStringValue(namedArgs.get('symbol') ?? namedArgs.get('tickerid') ?? args[0] ?? '');
+      const numberOfLines = namedArgs.get('number_of_lines') ?? args[1];
+      return this.applyTickerChart(tickerId, 'linebreak', [numberOfLines]);
+    });
+
+    this.builtins.set('ticker.kagi', (args, namedArgs) => {
+      const tickerId = this.toStringValue(namedArgs.get('symbol') ?? namedArgs.get('tickerid') ?? args[0] ?? '');
+      const style = namedArgs.get('style') ?? args[1];
+      const param = namedArgs.get('param') ?? namedArgs.get('reversal') ?? namedArgs.get('reversal_amount') ?? args[2];
+      return this.applyTickerChart(tickerId, 'kagi', [style, param]);
+    });
+
+    this.builtins.set('ticker.pointfigure', (args, namedArgs) => {
+      const tickerId = this.toStringValue(namedArgs.get('symbol') ?? namedArgs.get('tickerid') ?? args[0] ?? '');
+      const source = this.toStringValue(namedArgs.get('source') ?? args[1] ?? '');
+      const style = this.toStringValue(namedArgs.get('style') ?? args[2] ?? '');
+      const param = namedArgs.get('param') ?? args[3];
+      const reversal = namedArgs.get('reversal') ?? args[4];
+      return this.applyTickerChart(tickerId, 'pointfigure', [source, style, param, reversal]);
+    });
   }
 
   private normalizeTickerSession(value: unknown): 'regular' | 'extended' | undefined {
@@ -3420,14 +3451,20 @@ export class TealscriptEngine {
     return `${withoutSession}|session=extended`;
   }
 
-  private applyTickerChart(tickerId: string, chart: string): string {
+  private applyTickerChart(tickerId: string, chart: string, params: unknown[] = []): string {
     const base = tickerId.trim();
     if (base === '') {
       throw new Error(`ticker.${chart} requires a non-empty ticker id`);
     }
 
     const withoutChart = base.replace(/\|chart=[^|]+/gu, '');
-    return `${withoutChart}|chart=${chart}`;
+    const normalizedParams = params
+      .filter((param) => param !== undefined && !this.isNa(param))
+      .map((param) => encodeURIComponent(this.toStringValue(param).trim()));
+    const chartModifier = normalizedParams.length === 0
+      ? chart
+      : `${chart}:${normalizedParams.join(':')}`;
+    return `${withoutChart}|chart=${chartModifier}`;
   }
 
   /**
