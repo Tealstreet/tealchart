@@ -175,9 +175,28 @@ map contents dynamically and does not yet enforce key/value templates. Map loops
 support the documented key-value tuple form, `for [key, value] in data`.
 
 Known limits: map keys are currently restricted at runtime to finite numbers,
-strings, and booleans. Full compile-time map typing, UDT values, reference-type
-rules, and nested collection restrictions belong to the future qualified
-type-system and UDT phases.
+strings, and booleans. Full compile-time map typing, reference-type rules, and
+nested collection restrictions belong to the future qualified type-system and
+UDT phases.
+
+## Common User-Defined Type Coverage
+
+The user-defined type MVP covers top-level `type` declarations, exported type
+declarations for parser compatibility, typed and untyped fields, field default
+expressions, `varip` field syntax, `<Type>.new()` constructors, positional and
+named constructor arguments, field reads, field reassignment, compound field
+assignment, reference assignment semantics, and realtime rollback for field
+mutations.
+
+Compatibility fixtures include a reduced pivot-object array idiom derived from
+TradingView's objects documentation, where scripts define a `pivotPoint` UDT,
+push `pivotPoint.new(...)` instances into an array, retrieve objects with array
+methods, and read fields from the resulting object references.
+
+Known limits: UDT field and constructor types are recorded dynamically but not
+yet enforced by the semantic checker. User-defined `method` declarations,
+`*.copy()` helpers, library export/import resolution, and full reference-type
+diagnostics remain planned in Epic 12.
 
 ## Common `color.*` Coverage
 

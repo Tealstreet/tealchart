@@ -10,6 +10,9 @@ import type {
   Statement,
   Expression,
   IndicatorDeclaration,
+  TypeDeclaration,
+  TypeFieldDeclaration,
+  TypeAnnotation,
   FunctionDeclaration,
   VariableDeclaration,
   AssignmentStatement,
@@ -121,6 +124,13 @@ import {
   type PineMatrix,
 } from './matrices';
 import {
+  createPineUdtObject,
+  getUdtField,
+  isPineUdtObject,
+  setUdtField,
+  type PineUdtObject,
+} from './objects';
+import {
   clearMap,
   containsMapKey,
   copyMap,
@@ -193,6 +203,7 @@ export class TealscriptEngine {
   private ctx: ExecutionContext;
   private scope: Scope;
   private builtins: BuiltinRegistry;
+  private typeDeclarations: Map<string, TypeDeclaration>;
   private userFunctions: Map<string, FunctionDeclaration>;
   private functionScopes: Map<string, Scope>;
   private requestDatafeed?: RequestDatafeed;
@@ -209,6 +220,7 @@ export class TealscriptEngine {
     this.ctx = new ExecutionContext();
     this.scope = createRootScope();
     this.builtins = new Map();
+    this.typeDeclarations = new Map();
     this.userFunctions = new Map();
     this.functionScopes = new Map();
     this.requestDatafeed = options.requestDatafeed;
@@ -223,6 +235,7 @@ export class TealscriptEngine {
     this.errors = [];
     this.ctx.reset();
     this.scope = createRootScope();
+    this.typeDeclarations.clear();
     this.functionScopes.clear();
     this.requestEvaluationCache.clear();
     this.requestExpressionIds = new WeakMap();
@@ -231,6 +244,7 @@ export class TealscriptEngine {
     this.indicatorDynamicRequests = true;
     this.requestContextDepth = 0;
     this.requestLocalScopeDepth = 0;
+    this.registerTypeDeclarations(ast);
     this.registerUserFunctions(ast);
 
     this.ctx.setNow(Date.now());
@@ -319,6 +333,7 @@ export class TealscriptEngine {
     // Update current bar data
     this.ctx.updateCurrentBar(bar);
     this.resetPerBarBuiltinState();
+    this.registerTypeDeclarations(ast);
     this.registerUserFunctions(ast);
 
     // Re-execute statements for current bar
@@ -366,6 +381,8 @@ export class TealscriptEngine {
     switch (stmt.type) {
       case 'IndicatorDeclaration':
         this.executeIndicator(stmt);
+        break;
+      case 'TypeDeclaration':
         break;
       case 'FunctionDeclaration':
         break;
@@ -497,6 +514,15 @@ export class TealscriptEngine {
     };
   }
 
+  private registerTypeDeclarations(ast: Program): void {
+    this.typeDeclarations.clear();
+    for (const stmt of ast.body) {
+      if (stmt.type === 'TypeDeclaration') {
+        this.typeDeclarations.set(stmt.name.name, stmt);
+      }
+    }
+  }
+
   private registerUserFunctions(ast: Program): void {
     this.userFunctions.clear();
     for (const stmt of ast.body) {
@@ -519,7 +545,7 @@ export class TealscriptEngine {
       }
       const drawingCount = this.ctx.getDrawingCount();
       const value = this.evaluateExpression(stmt.init);
-      this.scope.declare(name, kind, value, stmt.typeAnnotation?.baseType);
+      this.scope.declare(name, kind, value, this.getTypeAnnotationName(stmt.typeAnnotation));
       this.markPersistentDeclarationDrawings(kind, drawingCount);
     } else if (stmt.names.type === 'TupleDeclarator') {
       const names = stmt.names.names.map((name) => name.name);
@@ -539,6 +565,11 @@ export class TealscriptEngine {
       }
       this.markPersistentDeclarationDrawings(kind, drawingCount);
     }
+  }
+
+  private getTypeAnnotationName(typeAnnotation: TypeAnnotation | null | undefined): string | undefined {
+    if (!typeAnnotation) return undefined;
+    return typeAnnotation.baseType === 'udt' ? typeAnnotation.name : typeAnnotation.baseType;
   }
 
   private shouldSkipInitializedPersistentDeclaration(kind: string, names: string[]): boolean {
@@ -565,10 +596,19 @@ export class TealscriptEngine {
     } else if (stmt.left.type === 'IndexExpression') {
       this.executeIndexAssignment(stmt.left, value, stmt.operator);
     } else {
-      throw new Error(
-        'Member assignment is not supported yet; UDT and reference field assignment are planned for Pine parity Epic 12',
-      );
+      this.executeMemberAssignment(stmt.left, value, stmt.operator);
     }
+  }
+
+  private executeMemberAssignment(target: MemberExpression, value: unknown, operator: AssignmentStatement['operator']): void {
+    const object = this.evaluateExpression(target.object);
+    if (!isPineUdtObject(object)) {
+      throw new Error('Member assignment expects a user-defined type object');
+    }
+
+    const fieldName = target.property.name;
+    const currentValue = getUdtField(object, fieldName);
+    setUdtField(object, fieldName, this.applyAssignmentOperator(currentValue, value, operator));
   }
 
   private executeIndexAssignment(target: IndexExpression, value: unknown, operator: AssignmentStatement['operator']): void {
@@ -1080,6 +1120,10 @@ export class TealscriptEngine {
       }
     }
 
+    if (namespace && funcName === 'new' && this.typeDeclarations.has(namespace)) {
+      return this.evaluateTypeConstructor(namespace, args, namedArgs);
+    }
+
     // Look up builtin
     if (namespace && expr.callee.type === 'MemberExpression' && this.scope.has(namespace)) {
       const receiver = this.evaluateExpression(expr.callee.object);
@@ -1118,6 +1162,50 @@ export class TealscriptEngine {
     }
 
     throw new Error(`Unknown function: ${fullName}`);
+  }
+
+  private evaluateTypeConstructor(typeName: string, args: unknown[], namedArgs: Map<string, unknown>): PineUdtObject {
+    const declaration = this.typeDeclarations.get(typeName);
+    if (!declaration) {
+      throw new Error(`Unknown user-defined type: ${typeName}`);
+    }
+    if (args.length > declaration.fields.length) {
+      throw new Error(`Too many arguments for ${typeName}.new: expected ${declaration.fields.length}, got ${args.length}`);
+    }
+
+    const fieldValues = new Map<string, unknown>();
+    const varipFields = new Set<string>();
+    const fieldNames = new Set(declaration.fields.map((field) => field.name.name));
+    for (const argName of namedArgs.keys()) {
+      if (!fieldNames.has(argName)) {
+        throw new Error(`Unknown field '${argName}' for ${typeName}.new`);
+      }
+    }
+
+    declaration.fields.forEach((field, index) => {
+      const fieldName = field.name.name;
+      let value: unknown;
+      if (index < args.length) {
+        if (namedArgs.has(fieldName)) {
+          throw new Error(`Field '${fieldName}' for ${typeName}.new was supplied multiple times`);
+        }
+        value = args[index];
+      } else if (namedArgs.has(fieldName)) {
+        value = namedArgs.get(fieldName);
+      } else {
+        value = this.evaluateTypeFieldDefault(field);
+      }
+      if (field.varip) {
+        varipFields.add(fieldName);
+      }
+      fieldValues.set(fieldName, value);
+    });
+
+    return createPineUdtObject(typeName, fieldValues, varipFields);
+  }
+
+  private evaluateTypeFieldDefault(field: TypeFieldDeclaration): unknown {
+    return field.defaultValue ? this.evaluateExpression(field.defaultValue) : Number.NaN;
   }
 
   private isUnsupportedDrawingNamespace(_namespace: string): boolean {
@@ -1932,10 +2020,18 @@ export class TealscriptEngine {
         if (this.isChartPoint(value) && (prop === 'time' || prop === 'index' || prop === 'price')) {
           return value[prop] ?? Number.NaN;
         }
+        if (isPineUdtObject(value)) {
+          return getUdtField(value, prop);
+        }
       }
     }
 
-    throw new Error('Member access not supported except for namespaced constants');
+    const object = this.evaluateExpression(expr.object);
+    if (isPineUdtObject(object)) {
+      return getUdtField(object, expr.property.name);
+    }
+
+    throw new Error('Member access not supported except for namespaced constants and user-defined type fields');
   }
 
   private getMemberPath(expr: MemberExpression): string[] | null {
@@ -3418,6 +3514,7 @@ export class TealscriptEngine {
       return value;
     };
 
+    this.builtins.set('array.new', createArray);
     this.builtins.set('array.new_float', createArray);
     this.builtins.set('array.new_int', createArray);
     this.builtins.set('array.new_bool', createArray);

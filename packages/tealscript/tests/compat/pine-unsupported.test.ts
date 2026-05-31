@@ -39,15 +39,4 @@ plot(close)
     ]);
   });
 
-  it('reports planned member assignment explicitly', () => {
-    const result = runCompatScript(`
-indicator("Unsupported member assignment")
-obj.field := close
-plot(close)
-`, { bars: [compatibilityBars[0]!] });
-
-    expect(result.errors.map((error) => error.message)).toEqual([
-      'Member assignment is not supported yet; UDT and reference field assignment are planned for Pine parity Epic 12',
-    ]);
-  });
 });
