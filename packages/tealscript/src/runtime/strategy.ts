@@ -40,6 +40,8 @@ export interface StrategyOrder {
   alertMessage?: string;
   createdBarIndex: number;
   createdTime: number;
+  activationBarIndex: number;
+  activationTime: number;
   updatedBarIndex: number;
   updatedTime: number;
 }
@@ -221,6 +223,8 @@ export function createStrategyOrder(input: StrategyOrderInput): StrategyOrder {
     alertMessage: input.alertMessage,
     createdBarIndex: input.barIndex,
     createdTime: input.time,
+    activationBarIndex: input.barIndex,
+    activationTime: input.time,
     updatedBarIndex: input.barIndex,
     updatedTime: input.time,
   };
@@ -240,6 +244,42 @@ export function fillStrategyMarketOrder(
   time: number,
 ): StrategyFill | null {
   if (order.status !== 'pending' || order.type !== 'market' || order.qty === null) {
+    return null;
+  }
+  return fillStrategyOrder(ledger, order, price, barIndex, time);
+}
+
+export function fillPendingStrategyOrders(
+  ledger: StrategyLedger,
+  high: number,
+  low: number,
+  barIndex: number,
+  time: number,
+): StrategyFill[] {
+  const fills: StrategyFill[] = [];
+  for (const order of ledger.orders) {
+    const price = getPendingOrderFillPrice(order, high, low, barIndex);
+    if (price === null) {
+      continue;
+    }
+
+    const fill = fillStrategyOrder(ledger, order, price, barIndex, time);
+    if (fill) {
+      fills.push(fill);
+      cancelOcaOrders(ledger, order, barIndex, time);
+    }
+  }
+  return fills;
+}
+
+function fillStrategyOrder(
+  ledger: StrategyLedger,
+  order: StrategyOrder,
+  price: number,
+  barIndex: number,
+  time: number,
+): StrategyFill | null {
+  if (order.status !== 'pending' || order.qty === null) {
     return null;
   }
   if (!Number.isFinite(price)) {
@@ -269,6 +309,56 @@ export function fillStrategyMarketOrder(
   applyStrategyFillToTrades(ledger, fill);
   applyStrategyFillToPosition(ledger, fill);
   return fill;
+}
+
+function getPendingOrderFillPrice(order: StrategyOrder, high: number, low: number, barIndex: number): number | null {
+  if (order.status !== 'pending' || order.qty === null || order.activationBarIndex >= barIndex) {
+    return null;
+  }
+  if (!Number.isFinite(high) || !Number.isFinite(low)) {
+    return null;
+  }
+
+  if (order.type === 'limit' && order.limitPrice !== undefined) {
+    if (order.direction === 'long' && low <= order.limitPrice) {
+      return order.limitPrice;
+    }
+    if (order.direction === 'short' && high >= order.limitPrice) {
+      return order.limitPrice;
+    }
+  }
+
+  if (order.type === 'stop' && order.stopPrice !== undefined) {
+    if (order.direction === 'long' && high >= order.stopPrice) {
+      return order.stopPrice;
+    }
+    if (order.direction === 'short' && low <= order.stopPrice) {
+      return order.stopPrice;
+    }
+  }
+
+  return null;
+}
+
+function cancelOcaOrders(ledger: StrategyLedger, filledOrder: StrategyOrder, barIndex: number, time: number): void {
+  if (filledOrder.ocaName === undefined || filledOrder.ocaType !== 'cancel') {
+    return;
+  }
+
+  for (const order of ledger.orders) {
+    if (
+      order.status !== 'pending'
+      || order === filledOrder
+      || order.ocaName !== filledOrder.ocaName
+      || order.ocaType !== 'cancel'
+    ) {
+      continue;
+    }
+
+    order.status = 'cancelled';
+    order.updatedBarIndex = barIndex;
+    order.updatedTime = time;
+  }
 }
 
 export function cancelStrategyOrder(ledger: StrategyLedger, id: string, barIndex: number, time: number): boolean {
