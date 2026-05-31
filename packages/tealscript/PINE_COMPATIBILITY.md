@@ -441,7 +441,9 @@ expands opposite-direction entry transactions to reverse positions. Trailing
 stops, same-bar intrabar path modeling, and full broker-emulator semantics are
 still planned. Fill commissions are applied to fills and debited from strategy
 net profit/equity for `percent`, `cash_per_order`, and `cash_per_contract`
-commission settings.
+commission settings. Basic `strategy.opentrades.*` accessors are available for
+open trade entry id, entry price, entry bar/time, signed size, gross open
+profit, and commission.
 
 ## Common Alerts Coverage
 

@@ -161,6 +161,7 @@ import {
   type StrategyLedgerSettings,
   type StrategyOcaType,
   type StrategyQuantityType,
+  type StrategyTrade,
 } from './strategy';
 
 /**
@@ -3196,6 +3197,37 @@ export class TealscriptEngine {
     this.builtins.set('strategy.oca.cancel', () => 'cancel');
     this.builtins.set('strategy.oca.reduce', () => 'reduce');
     this.builtins.set('strategy.oca.none', () => 'none');
+    this.builtins.set('strategy.opentrades.entry_id', (args, namedArgs) => (
+      this.strategyOpenTrade(args, namedArgs)?.entryOrderId ?? ''
+    ));
+    this.builtins.set('strategy.opentrades.entry_price', (args, namedArgs) => (
+      this.strategyOpenTrade(args, namedArgs)?.entryPrice ?? Number.NaN
+    ));
+    this.builtins.set('strategy.opentrades.entry_bar_index', (args, namedArgs) => (
+      this.strategyOpenTrade(args, namedArgs)?.entryBarIndex ?? Number.NaN
+    ));
+    this.builtins.set('strategy.opentrades.entry_time', (args, namedArgs) => (
+      this.strategyOpenTrade(args, namedArgs)?.entryTime ?? Number.NaN
+    ));
+    this.builtins.set('strategy.opentrades.size', (args, namedArgs) => {
+      const trade = this.strategyOpenTrade(args, namedArgs);
+      if (!trade) {
+        return Number.NaN;
+      }
+      return trade.direction === 'long' ? trade.qty : -trade.qty;
+    });
+    this.builtins.set('strategy.opentrades.profit', (args, namedArgs) => {
+      const trade = this.strategyOpenTrade(args, namedArgs);
+      if (!trade) {
+        return Number.NaN;
+      }
+      const close = this.ctx.close.get(0) ?? Number.NaN;
+      const sign = trade.direction === 'long' ? 1 : -1;
+      return (close - trade.entryPrice) * trade.qty * sign;
+    });
+    this.builtins.set('strategy.opentrades.commission', (args, namedArgs) => (
+      this.strategyOpenTrade(args, namedArgs)?.commission ?? Number.NaN
+    ));
     this.builtins.set('strategy.entry', (args, namedArgs) => this.submitStrategyOrderBuiltin(args, namedArgs, true));
     this.builtins.set('strategy.order', (args, namedArgs) => this.submitStrategyOrderBuiltin(args, namedArgs, false));
     this.builtins.set('strategy.exit', (args, namedArgs) => this.submitStrategyExitBuiltin(args, namedArgs));
@@ -3210,6 +3242,19 @@ export class TealscriptEngine {
       cancelAllStrategyOrders(this.ctx.strategyLedger, this.ctx.bar_index, this.ctx.time.get(0) ?? 0);
       return undefined;
     });
+  }
+
+  private strategyOpenTrade(args: unknown[], namedArgs: Map<string, unknown>): StrategyTrade | undefined {
+    return this.ctx.strategyLedger.openTrades[this.strategyTradeIndex(args, namedArgs)];
+  }
+
+  private strategyTradeIndex(args: unknown[], namedArgs: Map<string, unknown>): number {
+    const value = this.getCallArg(args, namedArgs, 0, 'trade_num', 0);
+    const index = this.toOptionalNumber(value);
+    if (index === undefined || index < 0 || !Number.isInteger(index)) {
+      throw new Error('strategy trade_num must be a non-negative integer');
+    }
+    return index;
   }
 
   private submitStrategyOrderBuiltin(args: unknown[], namedArgs: Map<string, unknown>, isEntry: boolean): undefined {
