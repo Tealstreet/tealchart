@@ -56,10 +56,11 @@ Covered behavior and remaining gaps:
 - Pine-style wrapped delimiter syntax is supported for multiline
   `indicator()`/`strategy()` declarations, function calls, array literals, tuple
   destructuring, index access, and parenthesized expressions.
-- Operator line continuations are supported when the line break follows the
-  operator token, including arithmetic, comparison, logical, unary, and ternary
-  expressions. Operator-at-line-start continuation remains a planned parser
-  hardening item.
+- Operator line continuations are supported after arithmetic, comparison,
+  logical, unary, and ternary operators. Leading comparison, logical,
+  multiplicative, `+`, and ternary operators are also supported. Leading `-`
+  remains a planned indentation-aware parser item because it conflicts with
+  negative literals in indented Pine bodies.
 - User-defined function bodies can return expression results from `if` /
   `else if` / `else` branches.
 - User-defined function bodies can return the last expression result from

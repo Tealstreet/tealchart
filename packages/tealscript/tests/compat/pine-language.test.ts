@@ -92,6 +92,42 @@ plot(selected, title="Selected")
     expect(roundSeries(getPlot(result, 'Selected').values)).toEqual(Array(compatibilityBars.length).fill(7));
   });
 
+  it('runs Pine-style leading operator line continuations', () => {
+    const result = runCompatScript(`
+indicator("Leading Operator Continuation")
+value = 1
+    + 2
+    * 3
+flag = true
+    and not
+        false
+selected = flag
+    ? value
+    : 0
+plot(selected, title="Selected")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Selected').values)).toEqual(Array(compatibilityBars.length).fill(7));
+  });
+
+  it('keeps if/else branch boundaries after operator continuation support', () => {
+    const result = runCompatScript(`
+indicator("If Else Boundary")
+score(value) =>
+    if value > 0
+        1
+    else
+        0
+plot(score(close - open), title="Score")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Score').values)).toEqual(
+      compatibilityBars.map((bar) => (bar.close - bar.open > 0 ? 1 : 0))
+    );
+  });
+
   it('runs user-defined function if-branch returns', () => {
     const result = runCompatScript(`
 indicator("UDF if branch")
