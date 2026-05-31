@@ -90,6 +90,11 @@ export interface ExecutionError {
   column?: number;
 }
 
+interface RandomBuiltinState {
+  seed: number;
+  state: number;
+}
+
 const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['request', 'map', 'matrix', 'polyline', 'ticker']);
 
 /**
@@ -970,6 +975,7 @@ export class TealscriptEngine {
       case 'sum':
       case 'avg':
       case 'covariance':
+      case 'fill':
       case 'clear':
         return `array.${methodName}`;
       default:
@@ -1504,6 +1510,24 @@ export class TealscriptEngine {
     return String(value);
   }
 
+  private replaceStringOccurrence(source: string, target: string, replacement: string, occurrenceArg: unknown): string {
+    const occurrence = occurrenceArg === undefined ? 0 : Math.trunc(this.toNumber(occurrenceArg));
+    if (!Number.isFinite(occurrence) || occurrence < 0) return source;
+    if (target === '') return occurrence === 0 ? source.replace(target, replacement) : source;
+    if (occurrence === 0) return source.replace(target, replacement);
+
+    let fromIndex = 0;
+    for (let index = 0; index <= occurrence; index++) {
+      const matchIndex = source.indexOf(target, fromIndex);
+      if (matchIndex === -1) return source;
+      if (index === occurrence) {
+        return source.slice(0, matchIndex) + replacement + source.slice(matchIndex + target.length);
+      }
+      fromIndex = matchIndex + target.length;
+    }
+    return source;
+  }
+
   private toOptionalString(value: unknown): string | undefined {
     if (value === null || value === undefined || this.isNa(value)) {
       return undefined;
@@ -1650,6 +1674,33 @@ export class TealscriptEngine {
     const values = [source, ...history].filter((value) => !isNaN(value)).slice(0, length);
     this.setBuiltinState(scope, key, values);
     return values.length < length ? null : values;
+  }
+
+  private nextSeededRandom(scope: Scope, key: string, seed: number): number {
+    const state = scope.get(key) as RandomBuiltinState | undefined;
+    const current = state?.seed === seed ? state.state : this.hashRandomSeed(seed);
+    const nextState = (current + 0x6d2b79f5) >>> 0;
+    let value = nextState;
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+    this.setBuiltinState(scope, key, { seed, state: nextState });
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+  }
+
+  private hashRandomSeed(seed: number): number {
+    let value = seed >>> 0;
+    value ^= value >>> 16;
+    value = Math.imul(value, 0x7feb352d);
+    value ^= value >>> 15;
+    value = Math.imul(value, 0x846ca68b);
+    value ^= value >>> 16;
+    return value >>> 0;
+  }
+
+  private toExclusiveUnitRandom(value: number): number {
+    if (value <= 0) return Number.EPSILON;
+    if (value >= 1) return 1 - Number.EPSILON;
+    return value;
   }
 
   private getCompletePairedSourceWindows(
@@ -2240,6 +2291,23 @@ export class TealscriptEngine {
       const values = this.getCompleteNonNaSourceWindow(scope, `_math_sum_source_${callId}`, source, length);
       return values ? values.reduce((sum, value) => sum + value, 0) : Number.NaN;
     });
+    this.builtins.set('math.random', (args, namedArgs, _ctx, scope, callId) => {
+      const min = this.toNumber(namedArgs.has('min') ? namedArgs.get('min') : args[0] ?? 0);
+      const max = this.toNumber(namedArgs.has('max') ? namedArgs.get('max') : args[1] ?? 1);
+      const seedArg = namedArgs.has('seed') ? namedArgs.get('seed') : args[2];
+      if (!Number.isFinite(min) || !Number.isFinite(max) || max <= min) return Number.NaN;
+
+      let randomValue: number;
+      if (seedArg === undefined) {
+        randomValue = Math.random();
+      } else {
+        const seed = Math.trunc(this.toNumber(seedArg));
+        if (!Number.isFinite(seed)) return Number.NaN;
+        randomValue = this.nextSeededRandom(scope, `_math_random_${callId}`, seed);
+      }
+
+      return min + this.toExclusiveUnitRandom(randomValue) * (max - min);
+    });
     this.builtins.set('math.sqrt', (args) => Math.sqrt(args[0] as number));
     this.builtins.set('math.pow', (args) => Math.pow(args[0] as number, args[1] as number));
     this.builtins.set('math.log', (args) => Math.log(args[0] as number));
@@ -2349,11 +2417,31 @@ export class TealscriptEngine {
       const end = args[2] === undefined ? undefined : Math.trunc(args[2] as number);
       return source.substring(begin, end);
     });
+    this.builtins.set('str.match', (args) => {
+      const match = this.toStringValue(args[0]).match(new RegExp(this.toStringValue(args[1])));
+      return match?.[0] ?? '';
+    });
+    this.builtins.set('str.repeat', (args) => {
+      if (this.isNa(args[0])) return Number.NaN;
+      const repeat = Math.trunc(this.toNumber(args[1]));
+      if (!Number.isFinite(repeat) || repeat < 0) return Number.NaN;
+      return Array.from({ length: repeat }, () => this.toStringValue(args[0])).join(this.toStringValue(args[2] ?? ''));
+    });
+    this.builtins.set('str.split', (args) => {
+      const array = createPineArray<string>();
+      array.values.push(...this.toStringValue(args[0]).split(this.toStringValue(args[1])));
+      return array;
+    });
     this.builtins.set('str.upper', (args) => this.toStringValue(args[0]).toUpperCase());
     this.builtins.set('str.lower', (args) => this.toStringValue(args[0]).toLowerCase());
     this.builtins.set('str.trim', (args) => this.toStringValue(args[0]).trim());
     this.builtins.set('str.replace', (args) => {
-      return this.toStringValue(args[0]).replace(this.toStringValue(args[1]), this.toStringValue(args[2]));
+      return this.replaceStringOccurrence(
+        this.toStringValue(args[0]),
+        this.toStringValue(args[1]),
+        this.toStringValue(args[2]),
+        args[3],
+      );
     });
     this.builtins.set('str.replace_all', (args) => {
       return this.toStringValue(args[0]).split(this.toStringValue(args[1])).join(this.toStringValue(args[2]));
@@ -2442,6 +2530,19 @@ export class TealscriptEngine {
     this.builtins.set('array.join', (args) => joinArray(copyReadonlyArray(readArray(args[0])), args[1]));
     this.builtins.set('array.concat', (args) => concatArray(readMutableArray(args[0]), copyReadonlyArray(readArray(args[1]))));
     this.builtins.set('array.slice', (args) => sliceArray(copyReadonlyArray(readArray(args[0])), args[1] as number, args[2] as number));
+    this.builtins.set('array.fill', (args) => {
+      const array = readMutableArray(args[0]);
+      const size = getArraySize(array);
+      const from = args[2] === undefined ? 0 : Math.trunc(this.toNumber(args[2]));
+      const to = args[3] === undefined ? size : Math.trunc(this.toNumber(args[3]));
+      if (!Number.isFinite(from) || !Number.isFinite(to) || from < 0 || to > size || from > to) {
+        throw new Error('Array fill indices are out of bounds');
+      }
+      for (let index = from; index < to; index++) {
+        setArrayValue(array, index, args[1]);
+      }
+      return null;
+    });
     this.builtins.set('array.clear', (args) => {
       clearArray(readMutableArray(args[0]));
       return null;
@@ -3241,6 +3342,19 @@ export class TealscriptEngine {
       return denominator === 0 ? NaN : covariance / denominator;
     });
 
+    this.builtins.set('ta.cog', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const length = this.normalizeLookbackLength(args[1]);
+      const values = this.getCompleteSourceWindow(scope, `_ta_cog_source_${callId}`, source, length);
+      if (!values) return NaN;
+
+      const sum = values.reduce((total, value) => total + value, 0);
+      if (sum === 0) return NaN;
+
+      const weighted = values.reduce((total, value, index) => total + value * (index + 1), 0);
+      return -weighted / sum;
+    });
+
     this.builtins.set('ta.median', (args, _namedArgs, _ctx, scope, callId) => {
       const source = args[0] as number;
       const length = this.normalizeLookbackLength(args[1]);
@@ -3425,6 +3539,58 @@ export class TealscriptEngine {
 
       const range = highestHigh - lowestLow;
       return range === 0 ? NaN : ((close - highestHigh) / range) * 100;
+    });
+
+    this.builtins.set('ta.cmo', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const length = this.normalizeLookbackLength(args[1] ?? 14);
+      const values = this.getCompleteSourceWindow(scope, `_ta_cmo_source_${callId}`, source, length + 1);
+      if (!values) return NaN;
+
+      let gains = 0;
+      let losses = 0;
+      for (let index = 0; index < length; index++) {
+        const change = values[index] - values[index + 1];
+        if (change > 0) gains += change;
+        if (change < 0) losses -= change;
+      }
+
+      const total = gains + losses;
+      return total === 0 ? 0 : ((gains - losses) / total) * 100;
+    });
+
+    this.builtins.set('ta.tsi', (args, _namedArgs, _ctx, scope, callId) => {
+      const source = args[0] as number;
+      const shortLength = this.normalizeLookbackLength(args[1]);
+      const longLength = this.normalizeLookbackLength(args[2]);
+      if (isNaN(source) || shortLength < 1 || longLength < 1) return NaN;
+
+      const sourceKey = `_ta_tsi_source_${callId}`;
+      const sourceHistory = (scope.get(sourceKey) as number[] | undefined) ?? [];
+      const previousSource = sourceHistory[0];
+      this.setBuiltinState(scope, sourceKey, [source, ...sourceHistory].slice(0, 2));
+
+      if (previousSource === undefined || isNaN(previousSource)) return NaN;
+
+      const momentum = source - previousSource;
+      const absMomentum = Math.abs(momentum);
+      const longAlpha = 2 / (longLength + 1);
+      const shortAlpha = 2 / (shortLength + 1);
+
+      const ema = (key: string, value: number, alpha: number): number => {
+        const previous = scope.get(key) as number | undefined;
+        const next = previous === undefined || isNaN(previous) ? value : alpha * value + (1 - alpha) * previous;
+        this.setBuiltinState(scope, key, next);
+        return next;
+      };
+
+      const baseKey = `_ta_tsi_${callId}_${shortLength}_${longLength}`;
+      const smoothedMomentum = ema(`${baseKey}_momentum_long`, momentum, longAlpha);
+      const smoothedAbsMomentum = ema(`${baseKey}_abs_long`, absMomentum, longAlpha);
+      const doubleSmoothedMomentum = ema(`${baseKey}_momentum_short`, smoothedMomentum, shortAlpha);
+      const doubleSmoothedAbsMomentum = ema(`${baseKey}_abs_short`, smoothedAbsMomentum, shortAlpha);
+
+      return doubleSmoothedAbsMomentum === 0 ? 0 : doubleSmoothedMomentum / doubleSmoothedAbsMomentum;
     });
 
     // MOM - Momentum
