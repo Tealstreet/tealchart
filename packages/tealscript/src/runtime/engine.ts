@@ -153,6 +153,7 @@ import { currencyRateRequestKey, type RequestDataContext, type RequestDatafeed, 
 import {
   cancelAllStrategyOrders,
   cancelStrategyOrder,
+  fillStrategyMarketOrder,
   submitStrategyOrder,
   type StrategyDirection,
   type StrategyLedger,
@@ -299,6 +300,10 @@ export class TealscriptEngine {
         functionScope.advanceBar();
       }
       this.resetPerBarBuiltinState();
+      const isLastBar = this.ctx.bar_index === this.ctx.last_bar_index;
+      if (isLastBar) {
+        this.ctx.captureRealtimeRollbackState();
+      }
 
       // Execute all statements
       for (const stmt of ast.body) {
@@ -317,7 +322,6 @@ export class TealscriptEngine {
       }
 
       // Commit bar — only snapshot on the last bar (for realtime rollback)
-      const isLastBar = this.ctx.bar_index === this.ctx.last_bar_index;
       this.scope.commit(isLastBar);
       for (const functionScope of this.functionScopes.values()) {
         functionScope.commit(isLastBar);
@@ -3219,7 +3223,7 @@ export class TealscriptEngine {
       throw new Error('strategy order qty must be a positive number');
     }
 
-    submitStrategyOrder(this.ctx.strategyLedger, {
+    const order = submitStrategyOrder(this.ctx.strategyLedger, {
       id,
       direction,
       qty,
@@ -3234,6 +3238,13 @@ export class TealscriptEngine {
       barIndex: this.ctx.bar_index,
       time: this.ctx.time.get(0) ?? 0,
     });
+    fillStrategyMarketOrder(
+      this.ctx.strategyLedger,
+      order,
+      this.ctx.close.get(0) ?? Number.NaN,
+      this.ctx.bar_index,
+      this.ctx.time.get(0) ?? 0,
+    );
 
     return undefined;
   }
