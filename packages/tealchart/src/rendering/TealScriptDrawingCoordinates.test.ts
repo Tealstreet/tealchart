@@ -142,6 +142,28 @@ describe('TealScript drawing coordinates', () => {
     expect(position).toEqual({ x: 50, y: 40 });
   });
 
+  it('requires an explicit finite timestamp for bar_time labels', () => {
+    const missingTime = resolveLabelDrawingPosition(
+      makeLabel({ xloc: 'bar_time', x: null }),
+      bars,
+      viewport,
+      pane,
+      100,
+      resolvers,
+    );
+    const finiteTime = resolveLabelDrawingPosition(
+      makeLabel({ xloc: 'bar_time', x: 2_000 }),
+      bars,
+      viewport,
+      pane,
+      100,
+      resolvers,
+    );
+
+    expect(missingTime).toBeNull();
+    expect(finiteTime).toEqual({ x: 50, y: 40 });
+  });
+
   it('uses candle anchors for abovebar and belowbar labels', () => {
     const above = resolveLabelDrawingPosition(makeLabel({ yloc: 'abovebar' }), bars, viewport, pane, 100, resolvers);
     const below = resolveLabelDrawingPosition(makeLabel({ yloc: 'belowbar' }), bars, viewport, pane, 100, resolvers);

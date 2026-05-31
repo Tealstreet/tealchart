@@ -152,13 +152,20 @@ export function resolveLabelDrawingPosition(
   resolvers: DrawingCoordinateResolvers,
 ): DrawingPoint | null {
   const barIndex = Number.isFinite(label.barIndex) ? Math.trunc(label.barIndex) : -1;
-  const xValue = label.x ?? barIndex;
-  const xIndex = Number.isFinite(xValue) ? Math.trunc(xValue) : barIndex;
-  const anchorIndex = label.xloc === 'bar_time' ? barIndex : xIndex;
+  let time: number | undefined;
+  let anchorIndex = barIndex;
+
+  if (label.xloc === 'bar_time') {
+    if (label.x === null || !Number.isFinite(label.x)) return null;
+    time = label.x;
+  } else {
+    const xValue = label.x ?? barIndex;
+    const xIndex = Number.isFinite(xValue) ? Math.trunc(xValue) : barIndex;
+    anchorIndex = xIndex;
+    time = xIndex >= 0 && xIndex < bars.length ? bars[xIndex].time : undefined;
+  }
+
   const bar = anchorIndex >= 0 && anchorIndex < bars.length ? bars[anchorIndex] : undefined;
-  const time = label.xloc === 'bar_time'
-    ? xValue
-    : (xIndex >= 0 && xIndex < bars.length ? bars[xIndex].time : undefined);
   if (time === undefined || time < viewport.startTime || time > viewport.endTime) {
     return null;
   }
