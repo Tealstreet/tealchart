@@ -445,7 +445,8 @@ commission settings. Basic `strategy.opentrades.*` accessors are available for
 open trade entry id, entry price, entry bar/time, signed size, gross open
 profit, and commission. Basic `strategy.closedtrades.*` accessors are available
 for closed trade entry/exit ids, prices, bars/times, signed size, gross profit,
-and commission.
+and commission. Closed-trade outcome counters `strategy.wintrades`,
+`strategy.losstrades`, and `strategy.eventrades` are available.
 
 ## Common Alerts Coverage
 

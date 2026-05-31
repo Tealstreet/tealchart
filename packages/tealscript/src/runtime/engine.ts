@@ -2595,6 +2595,12 @@ export class TealscriptEngine {
         return ledger.openTrades.length;
       case 'closedtrades':
         return ledger.closedTrades.length;
+      case 'wintrades':
+        return ledger.closedTrades.filter((trade) => trade.profit > 0).length;
+      case 'losstrades':
+        return ledger.closedTrades.filter((trade) => trade.profit < 0).length;
+      case 'eventrades':
+        return ledger.closedTrades.filter((trade) => trade.profit === 0).length;
       case 'max_runup':
         return ledger.maxRunup;
       case 'max_drawdown':
