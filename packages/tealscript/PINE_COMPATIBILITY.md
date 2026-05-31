@@ -60,6 +60,9 @@ Covered behavior and remaining gaps:
   hardening.
 - User-defined function bodies can return expression results from `if` /
   `else if` / `else` branches.
+- User-defined function parameters support Pine-style default arguments. Default
+  expressions are evaluated at the call site when the caller omits the
+  corresponding positional or named argument.
 - Recursive user-defined function calls are rejected with an explicit diagnostic
   instead of overflowing the runtime stack.
 - Nested indented blocks inside user-defined functions expose limitations in the

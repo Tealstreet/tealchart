@@ -46,7 +46,7 @@ reading the whole runtime.
 | Parser/runtime | Ternary `?:` | Supported | `tests/runtime/runtime.test.ts`; `tests/compat/pine-visuals.test.ts` | Broader `na` truthiness fixtures are planned. |
 | Parser/runtime | `for` loops | Partial | `tests/parser/parser.test.ts`; `tests/compat/pine-control-time.test.ts` | Full loop return-expression parity remains. |
 | Parser/runtime | `while`, `break`, `continue` | Supported | `tests/parser/parser.test.ts`; `tests/compat/pine-control-time.test.ts` | Runtime limits will be hardened in the limits epic. |
-| Parser/runtime | User-defined functions | Partial | `tests/parser/parser.test.ts`; `tests/compat/pine-language.test.ts` | Nested block parsing and call-site series parity need hardening. |
+| Parser/runtime | User-defined functions | Partial | `tests/parser/parser.test.ts`; `tests/compat/pine-language.test.ts` | Single-line and multiline UDFs, named arguments, default parameters, branch returns, and recursive-call diagnostics are covered. Nested block parsing and call-site series parity need hardening. |
 | Parser/runtime | Methods, e.g. `arr.push(x)` | Partial | `tests/compat/pine-arrays.test.ts`; `src/runtime/arrays.test.ts` | Non-array methods require UDT/method parity work. |
 | Parser/runtime | `switch` | Partial | `tests/parser/parser.test.ts`; `tests/compat/pine-control-time.test.ts` | Exhaustive type diagnostics are planned. |
 | Parser/runtime | User-defined types | Unsupported | Roadmap Epic 12 | UDT parsing/runtime are planned. |
