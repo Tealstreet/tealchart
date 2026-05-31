@@ -68,7 +68,7 @@ import {
   withDrawing,
 } from './drawings/helpers';
 import { Scope, createRootScope } from './scope';
-import type { RequestDataContext, RequestDatafeed } from './requestDatafeed';
+import { currencyRateRequestKey, type RequestDataContext, type RequestDatafeed, type RequestSeriesPoint } from './requestDatafeed';
 
 /**
  * Execution result
@@ -959,6 +959,10 @@ export class TealscriptEngine {
       this.assertCanEvaluateRequest(fullName);
       return this.evaluateRequestSecurityLowerTf(expr, this.nextBuiltinCallId(fullName));
     }
+    if (fullName === 'request.currency_rate') {
+      this.assertCanEvaluateRequest(fullName);
+      return this.evaluateRequestCurrencyRate(expr);
+    }
     if (namespace === 'request') {
       throw new Error(`request.* functions are not supported yet: ${fullName}`);
     }
@@ -1122,6 +1126,43 @@ export class TealscriptEngine {
     }
 
     return this.collectLowerTimeframeValues(cached.bars, cached.values);
+  }
+
+  private evaluateRequestCurrencyRate(expr: CallExpression): unknown {
+    const fromArg = this.getCallArgument(expr, 0, 'from');
+    const toArg = this.getCallArgument(expr, 1, 'to');
+
+    if (!fromArg || !toArg) {
+      throw new Error('request.currency_rate requires from and to currency arguments');
+    }
+
+    const fromCurrency = this.normalizeOptionalRequestCurrency(this.evaluateExpression(fromArg.value));
+    const toCurrency = this.normalizeOptionalRequestCurrency(this.evaluateExpression(toArg.value));
+    const ignoreInvalidCurrency = this.isTruthy(this.evaluateOptionalCallArgument(expr, 2, 'ignore_invalid_currency') ?? false);
+
+    if (!fromCurrency || !toCurrency) {
+      if (ignoreInvalidCurrency) {
+        return Number.NaN;
+      }
+      throw new Error('request.currency_rate requires non-empty currency codes');
+    }
+    if (fromCurrency === toCurrency) {
+      return 1;
+    }
+    if (!this.requestDatafeed?.getSeries) {
+      throw new Error('request.currency_rate requires a request series datafeed');
+    }
+
+    const key = currencyRateRequestKey(fromCurrency, toCurrency);
+    const result = this.requestDatafeed.getSeries({ family: 'currency_rate', key });
+    if (!result.ok) {
+      if (ignoreInvalidCurrency && (result.code === 'invalid_currency' || result.code === 'missing_context')) {
+        return Number.NaN;
+      }
+      throw new Error(`request.currency_rate failed: ${result.message}`);
+    }
+
+    return this.mergeRequestSeriesValue(result.context.points);
   }
 
   private getCallArgument(expr: CallExpression, position: number, name: string): CallArgument | undefined {
@@ -1344,6 +1385,23 @@ export class TealscriptEngine {
     }
 
     return this.getBarCloseTime(chartStart, this.ctx.timeframe.period);
+  }
+
+  private mergeRequestSeriesValue(points: RequestSeriesPoint[]): number {
+    const chartTime = this.ctx.time.get(0);
+    if (chartTime === undefined || points.length === 0) {
+      return Number.NaN;
+    }
+
+    let value = Number.NaN;
+    for (const point of points) {
+      if (point.time <= chartTime) {
+        value = point.value;
+      } else {
+        break;
+      }
+    }
+    return value;
   }
 
   private registerDrawingBuiltins(): void {
@@ -3254,6 +3312,21 @@ export class TealscriptEngine {
     };
 
     for (const [name, value] of Object.entries(orderConstants)) {
+      this.builtins.set(name, () => value);
+    }
+
+    const currencyConstants: Record<string, string> = {
+      'currency.AUD': 'AUD',
+      'currency.CAD': 'CAD',
+      'currency.CHF': 'CHF',
+      'currency.EUR': 'EUR',
+      'currency.GBP': 'GBP',
+      'currency.JPY': 'JPY',
+      'currency.USD': 'USD',
+      'currency.USDT': 'USDT',
+    };
+
+    for (const [name, value] of Object.entries(currencyConstants)) {
       this.builtins.set(name, () => value);
     }
   }
