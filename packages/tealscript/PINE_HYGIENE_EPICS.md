@@ -4,6 +4,10 @@ This roadmap tracks structural cleanup that should happen alongside Pine Script
 parity work. The goal is to keep TealScript and Tealchart maintainable while
 feature coverage expands toward full Pine Script v6 parity.
 
+Use [`PINE_PARITY_EXECUTION_PROTOCOL.md`](./PINE_PARITY_EXECUTION_PROTOCOL.md)
+as the canonical branch, phase, review, and merge process for every hygiene and
+parity epic.
+
 Each item below is treated as an epic-sized PR. Every epic is implemented with
 the phased plan-execute cadence:
 
