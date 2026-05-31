@@ -16,11 +16,12 @@ export const DIRTY = {
   VIEWPORT: 1 << 1, // Pan/zoom — full canvas repaint
   BARS: 1 << 2, // New bar data arrived
   PLOTS: 1 << 3, // Indicator plot data changed
-  LINES: 1 << 4, // Order/position/price lines changed
-  LAYOUT: 1 << 5, // Pane layout changed
-  OPTIONS: 1 << 6, // Render options (colors, font) changed
-  DATA_LOAD: 1 << 7, // Atomic data transition (symbol/interval/reset)
-  FULL: 0xff, // Everything
+  DRAWINGS: 1 << 4, // TealScript drawing data changed
+  LINES: 1 << 5, // Order/position/price lines changed
+  LAYOUT: 1 << 6, // Pane layout changed
+  OPTIONS: 1 << 7, // Render options (colors, font) changed
+  DATA_LOAD: 1 << 8, // Atomic data transition (symbol/interval/reset)
+  FULL: 0x1ff, // Everything
 } as const;
 
 export type DirtyFlags = number;

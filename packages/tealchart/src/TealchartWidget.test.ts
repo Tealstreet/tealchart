@@ -7,15 +7,19 @@ import type {
   ResolutionString,
   TealchartWidgetOptions,
 } from './types';
+import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { DIRTY } from './rendering/RenderScheduler';
 import { clearChartStoreCache } from './state/chartState';
 import { TealchartWidget } from './TealchartWidget';
 
 // Track calls at module level (survives mockReset)
 const setSymbolCalls: { symbol: string; exchangeName?: string }[] = [];
 const setBarsCalls: Bar[][] = [];
+const setPlotsCalls: PlotOutput[][] = [];
+const setDrawingsCalls: DrawingOutput[][] = [];
 const setRenderOptionsCalls: Array<unknown> = [];
 const setExecutionLinesCalls: Array<unknown> = [];
 
@@ -25,8 +29,12 @@ vi.mock('./ui/TealchartWidgetUI', () => ({
     setBars(bars: Bar[]) {
       setBarsCalls.push([...bars]);
     }
-    setPlots() {}
-    setDrawings() {}
+    setPlots(plots: PlotOutput[]) {
+      setPlotsCalls.push([...plots]);
+    }
+    setDrawings(drawings: DrawingOutput[]) {
+      setDrawingsCalls.push([...drawings]);
+    }
     setLoading() {}
     setOrderLines() {}
     setPositionLines() {}
@@ -199,6 +207,8 @@ describe('TealchartWidget', () => {
   beforeEach(() => {
     setSymbolCalls.length = 0;
     setBarsCalls.length = 0;
+    setPlotsCalls.length = 0;
+    setDrawingsCalls.length = 0;
     setRenderOptionsCalls.length = 0;
     setExecutionLinesCalls.length = 0;
     // Return null so _renderRafId doesn't get stuck at 0 after
@@ -223,6 +233,44 @@ describe('TealchartWidget', () => {
     // Chart stores are cached for the process lifetime; clear between tests so
     // per-chartKey interval persistence doesn't leak across tests.
     clearChartStoreCache();
+  });
+
+  // ============================================================================
+  // TealScript Rendering
+  // ============================================================================
+  describe('tealscript rendering', () => {
+    it('pushes drawing-only dirty updates without resetting plots', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed);
+      setPlotsCalls.length = 0;
+      setDrawingsCalls.length = 0;
+
+      const drawing: DrawingOutput = {
+        id: 'label_1',
+        type: 'label',
+        barIndex: 1,
+        x: 1,
+        y: 100,
+        text: 'L',
+        xloc: 'bar_index',
+        yloc: 'price',
+        style: 'label.style_label_down',
+        color: '#000000',
+        textColor: '#ffffff',
+        size: 'normal',
+      };
+      const testWidget = widget as unknown as {
+        _drawings: DrawingOutput[];
+        _render(dirty: number): void;
+      };
+
+      testWidget._drawings = [drawing];
+      testWidget._render(DIRTY.DRAWINGS);
+
+      expect(setPlotsCalls).toHaveLength(0);
+      expect(setDrawingsCalls).toEqual([[drawing]]);
+    });
   });
 
   // ============================================================================
