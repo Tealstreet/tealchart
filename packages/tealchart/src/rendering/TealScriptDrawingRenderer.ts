@@ -245,10 +245,8 @@ export class TealScriptDrawingRenderer {
 
     const { ctx, options, margins } = this;
     const chartWidth = options.width - margins.left;
-    const font = `12px ${this.font}`;
 
     ctx.save();
-    ctx.font = font;
     ctx.textBaseline = 'middle';
 
     for (const label of labels) {
@@ -265,6 +263,8 @@ export class TealScriptDrawingRenderer {
       const text = label.text ?? '';
       const paddingX = 8;
       const height = 22;
+      const font = `${this.fontSizeForDrawing(label.size)}px ${this.font}`;
+      ctx.font = font;
       const width = Math.max(18, this.getTextWidth(ctx, text, font) + paddingX * 2);
       const radius = 4;
       const fillColor = label.color ?? '#1f2937';

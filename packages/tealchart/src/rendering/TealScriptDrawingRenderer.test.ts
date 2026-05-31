@@ -159,7 +159,7 @@ describe('TealScriptDrawingRenderer', () => {
       makeLine('line-1'),
       makeBox(),
       makeLinefill(),
-      makeLabel(),
+      makeLabel({ size: 'large' }),
       makeLine('line-2', { y1: 8, y2: 18 }),
     ]);
 
@@ -181,6 +181,6 @@ describe('TealScriptDrawingRenderer', () => {
     expect(firstStrokeAfterBox).toBeGreaterThan(boxIndex);
     expect(labelTextIndex).toBeGreaterThan(firstStrokeAfterBox);
     expect(clipCount).toBe(3);
-    expect(getTextWidth).toHaveBeenCalledWith(ctx, 'Label', '12px sans-serif');
+    expect(getTextWidth).toHaveBeenCalledWith(ctx, 'Label', '14px sans-serif');
   });
 });
