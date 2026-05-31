@@ -177,6 +177,7 @@ export interface AlertEvent {
   time: number;
   message: string;
   frequency: AlertFrequency;
+  isRealtime: boolean;
 }
 
 /**
@@ -784,6 +785,7 @@ export class ExecutionContext {
       time: currentBar?.time ?? this.time.get(0) ?? 0,
       message,
       frequency,
+      isRealtime: this.barstate.isrealtime,
     });
   }
 
