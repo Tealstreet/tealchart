@@ -281,6 +281,74 @@ plot(strategy.opentrades, title="Open Trades")`;
       expect(secondUpdate.find((plot) => plot.title === 'Position')?.values.at(-1)).toBe(1);
       expect(secondUpdate.find((plot) => plot.title === 'Open Trades')?.values.at(-1)).toBe(1);
     });
+
+    it('closes matching entry trades with strategy.close market orders', () => {
+      const script = `//@version=6
+strategy("Close")
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.close("Long", qty=1, comment="reduce", alert_message="close")
+plot(strategy.position_size)
+plot(strategy.opentrades)
+plot(strategy.closedtrades)
+plot(strategy.netprofit)`;
+
+      const bars = createBars(2);
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        direction: order.direction,
+        status: order.status,
+        qty: order.qty,
+        fromEntry: order.fromEntry,
+      }))).toEqual([
+        { id: 'Long', direction: 'long', status: 'filled', qty: 2, fromEntry: undefined },
+        { id: 'Close Long', direction: 'short', status: 'filled', qty: 1, fromEntry: 'Long' },
+      ]);
+      expect(result.strategy.closedTrades).toHaveLength(1);
+      expect(result.strategy.closedTrades[0]).toMatchObject({
+        entryOrderId: 'Long',
+        exitOrderId: 'Close Long',
+        qty: 1,
+        entryPrice: bars[0].close,
+        exitPrice: bars[1].close,
+        profit: bars[1].close - bars[0].close,
+      });
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [2, 1],
+        [1, 1],
+        [0, 1],
+        [0, bars[1].close - bars[0].close],
+      ]);
+    });
+
+    it('closes the full net position with strategy.close_all', () => {
+      const script = `//@version=6
+strategy("Close all")
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.close_all(comment="flat")
+plot(strategy.position_size)
+plot(strategy.opentrades)
+plot(strategy.closedtrades)`;
+
+      const result = executeScript(parse(script), createBars(2));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long', 'Close All']);
+      expect(result.strategy.position.size).toBe(0);
+      expect(result.strategy.openTrades).toEqual([]);
+      expect(result.strategy.closedTrades).toHaveLength(1);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [2, 0],
+        [1, 0],
+        [0, 1],
+      ]);
+    });
   });
 
   describe('user-defined types', () => {
