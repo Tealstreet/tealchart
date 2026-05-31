@@ -66,6 +66,7 @@ export {
   type TimeframeInfo,
   type PlotOutput,
   type PlotStyle,
+  type PlotLineStyle,
   type DrawingOutput,
   type LabelDrawingOutput,
   type LineDrawingOutput,

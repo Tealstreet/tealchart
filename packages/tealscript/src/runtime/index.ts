@@ -39,6 +39,7 @@ export {
   type TimeframeInfo,
   type PlotOutput,
   type PlotStyle,
+  type PlotLineStyle,
   type AlertEvent,
   type AlertFrequency,
   type AlertOutput,

@@ -1,4 +1,4 @@
-import type { DrawingOutput, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
+import type { DrawingOutput, PlotLineStyle, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
 import type { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
 import type { CanvasContext } from './rendering/CanvasContext';
 import type { PaneOffset } from './rendering/PaneManager';
@@ -1724,6 +1724,12 @@ export class TealchartRenderer {
       if (isOverlay || !paneLayout || paneLayout.indicatorPanes.length === 0) {
         // Render on main pane (existing behavior)
         for (const plot of scriptPlots) {
+          if (plot.type === 'fill') {
+            this.renderFill(plot, scriptPlots, bars, viewport, (value, paneHeight) => this.priceToY(value, viewport, paneHeight));
+          }
+        }
+
+        for (const plot of scriptPlots) {
           switch (plot.type) {
             case 'plot':
               this.renderLinePlot(plot, bars, viewport);
@@ -1739,7 +1745,11 @@ export class TealchartRenderer {
               this.renderBgcolor(plot, bars, viewport);
               break;
             case 'plotshape':
+            case 'plotchar':
+            case 'plotarrow':
               this.renderPlotShape(plot, bars, viewport);
+              break;
+            case 'fill':
               break;
           }
         }
@@ -2146,6 +2156,79 @@ export class TealchartRenderer {
     ctx.globalAlpha = 1;
   }
 
+  private renderFill(
+    fill: PlotOutput,
+    plots: PlotOutput[],
+    bars: Bar[],
+    viewport: Viewport,
+    valueToY: (value: number, priceHeight: number) => number,
+  ): void {
+    const { ctx, options, margins } = this;
+    const plot1 = plots.find((plot) => plot.id === fill.plot1Id);
+    const plot2 = plots.find((plot) => plot.id === fill.plot2Id);
+    if (!plot1 || !plot2) return;
+
+    const chartWidth = options.width - margins.left;
+    const chartHeight = options.height - margins.top - margins.bottom;
+    const volumeHeight = options.showVolume ? chartHeight * options.volumeHeight : 0;
+    const priceHeight = chartHeight - volumeHeight;
+    const fillgaps = fill.fillgaps ?? true;
+    const colors = Array.isArray(fill.color) ? fill.color : [];
+    const staticColor = !Array.isArray(fill.color) ? fill.color : undefined;
+
+    let previous: { x: number; y1: number; y2: number; color: string | null } | null = null;
+
+    for (let i = 0; i < bars.length; i++) {
+      const bar = bars[i];
+      if (!bar || bar.time < viewport.startTime || bar.time > viewport.endTime) {
+        continue;
+      }
+
+      const value1 = this.getFillPlotValue(plot1, i);
+      const value2 = this.getFillPlotValue(plot2, i);
+      const color = colors[i] ?? staticColor ?? null;
+
+      if (color === null) {
+        previous = null;
+        continue;
+      }
+
+      if (value1 === null || value2 === null) {
+        if (!fillgaps) previous = null;
+        continue;
+      }
+
+      const current = {
+        x: this.timeToX(bar.time, viewport, chartWidth),
+        y1: valueToY(value1, priceHeight),
+        y2: valueToY(value2, priceHeight),
+        color,
+      };
+
+      if (previous) {
+        ctx.fillStyle = current.color;
+        ctx.beginPath();
+        ctx.moveTo(previous.x, previous.y1);
+        ctx.lineTo(current.x, current.y1);
+        ctx.lineTo(current.x, current.y2);
+        ctx.lineTo(previous.x, previous.y2);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      previous = current;
+    }
+  }
+
+  private getFillPlotValue(plot: PlotOutput, index: number): number | null {
+    if (plot.type === 'hline') {
+      return typeof plot.price === 'number' && Number.isFinite(plot.price) ? plot.price : null;
+    }
+
+    const value = plot.values[index];
+    return typeof value === 'number' && Number.isFinite(value) ? value : null;
+  }
+
   /**
    * Render horizontal line (hline)
    */
@@ -2168,7 +2251,7 @@ export class TealchartRenderer {
 
     ctx.strokeStyle = color;
     ctx.lineWidth = plot.linewidth || 1;
-    ctx.setLineDash([4, 4]);
+    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'dashed'));
 
     ctx.beginPath();
     ctx.moveTo(margins.left, y);
@@ -2222,7 +2305,7 @@ export class TealchartRenderer {
   }
 
   /**
-   * Render shape markers (plotshape)
+   * Render shape markers (plotshape, plotchar, plotarrow)
    */
   private renderPlotShape(plot: PlotOutput, bars: Bar[], viewport: Viewport): void {
     const { ctx, options, margins } = this;
@@ -2231,8 +2314,10 @@ export class TealchartRenderer {
     const volumeHeight = options.showVolume ? chartHeight * options.volumeHeight : 0;
     const priceHeight = chartHeight - volumeHeight;
 
-    const { values, color, location = 'abovebar', shape = 'circle', size = 'small' } = plot;
+    const { values, color, location = 'abovebar', shape = 'circle', size = 'small', offset = 0 } = plot;
     const baseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
+    const textColor = Array.isArray(plot.textColor) ? plot.textColor[0] || '#FFFFFF' : plot.textColor || '#FFFFFF';
+    const barInterval = bars.length >= 2 ? bars[1].time - bars[0].time : 0;
 
     // Size mapping
     const sizeMap: Record<string, number> = {
@@ -2258,11 +2343,17 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(bar.time, viewport, chartWidth);
+      const x = this.timeToX(bar.time + offset * barInterval, viewport, chartWidth);
+      const effectiveLocation =
+        plot.type === 'plotarrow'
+          ? value > 0
+            ? 'belowbar'
+            : 'abovebar'
+          : location;
 
       // Determine Y position based on location
       let y: number;
-      switch (location) {
+      switch (effectiveLocation) {
         case 'abovebar':
           y = this.priceToY(bar.high, viewport, priceHeight) - markerSize - 4;
           break;
@@ -2283,10 +2374,27 @@ export class TealchartRenderer {
       }
 
       const shapeColor = Array.isArray(color) && color[i] ? color[i] : baseColor;
+      if (!shapeColor) continue;
       ctx.fillStyle = shapeColor as string;
       ctx.strokeStyle = shapeColor as string;
 
-      this.drawShape(x, y, shape || 'circle', markerSize);
+      if (plot.type === 'plotchar') {
+        ctx.font = `${Math.max(10, markerSize * 2)}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(plot.char || '●', x, y);
+      } else {
+        const markerShape = plot.type === 'plotarrow' ? (value > 0 ? 'arrowup' : 'arrowdown') : shape || 'circle';
+        this.drawShape(x, y, markerShape, markerSize);
+      }
+
+      if (plot.text) {
+        ctx.fillStyle = Array.isArray(plot.textColor) && plot.textColor[i] ? plot.textColor[i] as string : textColor;
+        ctx.font = `${Math.max(10, markerSize * 1.5)}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = effectiveLocation === 'belowbar' ? 'top' : 'bottom';
+        ctx.fillText(plot.text, x, effectiveLocation === 'belowbar' ? y + markerSize : y - markerSize);
+      }
     }
   }
 
@@ -2318,6 +2426,7 @@ export class TealchartRenderer {
         break;
 
       case 'triangleup':
+      case 'arrowup':
         ctx.beginPath();
         ctx.moveTo(x, y - size / 2);
         ctx.lineTo(x + size / 2, y + size / 2);
@@ -2327,6 +2436,7 @@ export class TealchartRenderer {
         break;
 
       case 'triangledown':
+      case 'arrowdown':
         ctx.beginPath();
         ctx.moveTo(x, y + size / 2);
         ctx.lineTo(x + size / 2, y - size / 2);
@@ -3554,7 +3664,7 @@ export class TealchartRenderer {
   /**
    * Convert LineStyle to canvas setLineDash pattern
    */
-  private lineStyleToDashPattern(lineStyle: LineStyle): number[] {
+  private lineStyleToDashPattern(lineStyle: LineStyle | PlotLineStyle): number[] {
     switch (lineStyle) {
       case 'dashed':
         return [6, 4];
@@ -4236,6 +4346,12 @@ export class TealchartRenderer {
     ctx.clip();
 
     for (const plot of plots) {
+      if (plot.type === 'fill') {
+        this.renderFill(plot, plots, bars, viewport, (value) => this.valueToPaneY(value, paneOffset));
+      }
+    }
+
+    for (const plot of plots) {
       switch (plot.type) {
         case 'plot':
           this.renderLinePlotInPane(plot, bars, viewport, paneOffset);
@@ -4248,6 +4364,8 @@ export class TealchartRenderer {
           break;
         case 'hline':
           this.renderHlineInPane(plot, paneOffset);
+          break;
+        case 'fill':
           break;
         // bgcolor and plotshape could be added later for pane support
       }
@@ -4401,7 +4519,7 @@ export class TealchartRenderer {
 
     ctx.strokeStyle = color;
     ctx.lineWidth = plot.linewidth || 1;
-    ctx.setLineDash([4, 4]);
+    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'dashed'));
 
     ctx.beginPath();
     ctx.moveTo(margins.left, y);
