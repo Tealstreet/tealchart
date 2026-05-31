@@ -433,7 +433,11 @@ The alerts pass covers `alertcondition(condition, title, message)` and
 conditional `alert(message, freq)` calls. The runtime emits alert outputs
 alongside plots, preserving per-bar alertcondition values and direct alert
 events with `alert.freq_once_per_bar`, `alert.freq_once_per_bar_close`, and
-`alert.freq_all` constants. The checkpoint fixture follows TradingView's
+`alert.freq_all` constants. Frequency handling follows Pine's alert contract:
+`freq_all` emits every call, non-`all` alerts emit only the first eligible
+execution per call site per bar, and `freq_once_per_bar_close` emits only on
+confirmed bar executions.
+The checkpoint fixture follows TradingView's
 documented trigger-condition idiom by deriving a boolean condition, registering
 it with `alertcondition()`, and firing a direct `alert()` from an `if` block.
 

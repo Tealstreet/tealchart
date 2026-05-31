@@ -745,6 +745,14 @@ export class ExecutionContext {
    * Add an alert() event for the current bar.
    */
   addAlertEvent(id: string, message: string, frequency: AlertFrequency): void {
+    if (frequency === 'once_per_bar_close' && !this.barstate.isconfirmed) {
+      return;
+    }
+
+    if (frequency !== 'all' && this.hasNonAllAlertEventForCurrentBar(id)) {
+      return;
+    }
+
     let alert = this.alerts.get(id);
     if (!alert) {
       this.registerAlert({
@@ -772,6 +780,15 @@ export class ExecutionContext {
       message,
       frequency,
     });
+  }
+
+  private hasNonAllAlertEventForCurrentBar(id: string): boolean {
+    const alert = this.alerts.get(id);
+    if (!alert || alert.type !== 'alert') {
+      return false;
+    }
+
+    return alert.events.some((event) => event.barIndex === this.bar_index && event.frequency !== 'all');
   }
 
   /**
