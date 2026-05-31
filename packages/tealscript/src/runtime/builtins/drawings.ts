@@ -5,7 +5,7 @@ import {
   withDrawing,
 } from '../drawings/helpers';
 import type { ExecutionContext } from '../context';
-import type { LineDrawingOutput } from '../drawings/types';
+import type { ChartPoint, LineDrawingOutput } from '../drawings/types';
 
 export interface DrawingBuiltinRuntime {
   isNa(value: unknown): boolean;
@@ -19,6 +19,18 @@ export interface DrawingBuiltinRuntime {
   withLine(value: unknown, ctx: ExecutionContext, fn: (line: LineDrawingOutput) => void): void;
   getLineValue<T>(value: unknown, ctx: ExecutionContext, fn: (line: LineDrawingOutput) => T): T | number;
   interpolateLinePrice(line: LineDrawingOutput, x: number): number;
+}
+
+function isChartPoint(value: unknown): value is ChartPoint {
+  return (
+    typeof value === 'object'
+    && value !== null
+    && (value as { type?: unknown }).type === 'chart.point'
+  );
+}
+
+function pointX(point: ChartPoint, xloc: string): number | null {
+  return xloc === 'bar_time' ? point.time : point.index;
 }
 
 export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
@@ -159,10 +171,23 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
 
 export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
   builtins.set('line.new', (args, namedArgs, ctx, _scope, callId) => {
-    const x1 = runtime.toNullableNumber(namedArgs.get('x1') ?? args[0]);
-    const y1 = runtime.toNullableNumber(namedArgs.get('y1') ?? args[1]);
-    const x2 = runtime.toNullableNumber(namedArgs.get('x2') ?? args[2]);
-    const y2 = runtime.toNullableNumber(namedArgs.get('y2') ?? args[3]);
+    const firstPoint = namedArgs.get('first_point') ?? args[0];
+    const secondPoint = namedArgs.get('second_point') ?? args[1];
+    const usesPointOverload = isChartPoint(firstPoint) && isChartPoint(secondPoint);
+    const pointArgOffset = usesPointOverload ? 2 : 4;
+    const xloc = runtime.toStringValue(namedArgs.get('xloc') ?? args[pointArgOffset] ?? 'bar_index');
+    const x1 = usesPointOverload
+      ? pointX(firstPoint, xloc)
+      : runtime.toNullableNumber(namedArgs.get('x1') ?? args[0]);
+    const y1 = usesPointOverload
+      ? firstPoint.price
+      : runtime.toNullableNumber(namedArgs.get('y1') ?? args[1]);
+    const x2 = usesPointOverload
+      ? pointX(secondPoint, xloc)
+      : runtime.toNullableNumber(namedArgs.get('x2') ?? args[2]);
+    const y2 = usesPointOverload
+      ? secondPoint.price
+      : runtime.toNullableNumber(namedArgs.get('y2') ?? args[3]);
     const id = `line_${callId}_${ctx.bar_index}`;
 
     ctx.addDrawing({
@@ -173,12 +198,12 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
       y1,
       x2,
       y2,
-      xloc: runtime.toStringValue(namedArgs.get('xloc') ?? args[4] ?? 'bar_index'),
-      extend: runtime.toStringValue(namedArgs.get('extend') ?? args[5] ?? 'none'),
-      color: runtime.toNullableColor(namedArgs.get('color') ?? args[6]),
-      style: runtime.toStringValue(namedArgs.get('style') ?? args[7] ?? 'solid'),
-      width: runtime.toLineWidth(namedArgs.get('width') ?? args[8]),
-      forceOverlay: Boolean(namedArgs.get('force_overlay') ?? args[9] ?? false),
+      xloc,
+      extend: runtime.toStringValue(namedArgs.get('extend') ?? args[pointArgOffset + 1] ?? 'none'),
+      color: runtime.toNullableColor(namedArgs.get('color') ?? args[pointArgOffset + 2]),
+      style: runtime.toStringValue(namedArgs.get('style') ?? args[pointArgOffset + 3] ?? 'solid'),
+      width: runtime.toLineWidth(namedArgs.get('width') ?? args[pointArgOffset + 4]),
+      forceOverlay: Boolean(namedArgs.get('force_overlay') ?? args[pointArgOffset + 5] ?? false),
     });
 
     return id;
@@ -339,24 +364,37 @@ export function registerLineFillBuiltins(builtins: BuiltinRegistry, runtime: Dra
 export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
   builtins.set('box.new', (args, namedArgs, ctx, _scope, callId) => {
     const id = `box_${callId}_${ctx.bar_index}`;
+    const topLeft = namedArgs.get('top_left') ?? args[0];
+    const bottomRight = namedArgs.get('bottom_right') ?? args[1];
+    const usesPointOverload = isChartPoint(topLeft) && isChartPoint(bottomRight);
+    const pointArgOffset = usesPointOverload ? 2 : 4;
+    const xloc = runtime.toStringValue(namedArgs.get('xloc') ?? args[pointArgOffset + 4] ?? 'bar_index');
 
     ctx.addDrawing({
       id,
       type: 'box',
       barIndex: ctx.bar_index,
-      left: runtime.toNullableNumber(namedArgs.get('left') ?? args[0]),
-      top: runtime.toNullableNumber(namedArgs.get('top') ?? args[1]),
-      right: runtime.toNullableNumber(namedArgs.get('right') ?? args[2]),
-      bottom: runtime.toNullableNumber(namedArgs.get('bottom') ?? args[3]),
-      borderColor: runtime.toNullableColor(namedArgs.get('border_color') ?? args[4]),
-      borderWidth: runtime.toLineWidth(namedArgs.get('border_width') ?? args[5]),
-      borderStyle: runtime.toStringValue(namedArgs.get('border_style') ?? args[6] ?? 'solid'),
-      extend: runtime.toStringValue(namedArgs.get('extend') ?? args[7] ?? 'none'),
-      xloc: runtime.toStringValue(namedArgs.get('xloc') ?? args[8] ?? 'bar_index'),
-      bgcolor: runtime.toNullableColor(namedArgs.get('bgcolor') ?? args[9]),
-      text: runtime.toStringValue(namedArgs.get('text') ?? args[10] ?? ''),
-      textSize: runtime.toStringValue(namedArgs.get('text_size') ?? args[11] ?? 'normal'),
-      textColor: runtime.toNullableColor(namedArgs.get('text_color') ?? args[12]),
+      left: usesPointOverload
+        ? pointX(topLeft, xloc)
+        : runtime.toNullableNumber(namedArgs.get('left') ?? args[0]),
+      top: usesPointOverload
+        ? topLeft.price
+        : runtime.toNullableNumber(namedArgs.get('top') ?? args[1]),
+      right: usesPointOverload
+        ? pointX(bottomRight, xloc)
+        : runtime.toNullableNumber(namedArgs.get('right') ?? args[2]),
+      bottom: usesPointOverload
+        ? bottomRight.price
+        : runtime.toNullableNumber(namedArgs.get('bottom') ?? args[3]),
+      borderColor: runtime.toNullableColor(namedArgs.get('border_color') ?? args[pointArgOffset]),
+      borderWidth: runtime.toLineWidth(namedArgs.get('border_width') ?? args[pointArgOffset + 1]),
+      borderStyle: runtime.toStringValue(namedArgs.get('border_style') ?? args[pointArgOffset + 2] ?? 'solid'),
+      extend: runtime.toStringValue(namedArgs.get('extend') ?? args[pointArgOffset + 3] ?? 'none'),
+      xloc,
+      bgcolor: runtime.toNullableColor(namedArgs.get('bgcolor') ?? args[pointArgOffset + 5]),
+      text: runtime.toStringValue(namedArgs.get('text') ?? args[pointArgOffset + 6] ?? ''),
+      textSize: runtime.toStringValue(namedArgs.get('text_size') ?? args[pointArgOffset + 7] ?? 'normal'),
+      textColor: runtime.toNullableColor(namedArgs.get('text_color') ?? args[pointArgOffset + 8]),
     });
 
     return id;
@@ -520,4 +558,34 @@ export function registerDrawingConstants(builtins: BuiltinRegistry): void {
   for (const [name, value] of Object.entries(DRAWING_CONSTANTS)) {
     builtins.set(name, () => value);
   }
+
+  builtins.set('chart.point.new', (args) => ({
+    type: 'chart.point',
+    time: typeof args[0] === 'number' && Number.isFinite(args[0]) ? args[0] : null,
+    index: typeof args[1] === 'number' && Number.isFinite(args[1]) ? Math.trunc(args[1]) : null,
+    price: typeof args[2] === 'number' && Number.isFinite(args[2]) ? args[2] : null,
+  }));
+  builtins.set('chart.point.now', (args, _namedArgs, ctx) => ({
+    type: 'chart.point',
+    time: ctx.time.get(0) ?? null,
+    index: ctx.bar_index,
+    price: typeof args[0] === 'number' && Number.isFinite(args[0]) ? args[0] : ctx.close.get(0) ?? null,
+  }));
+  builtins.set('chart.point.from_index', (args) => ({
+    type: 'chart.point',
+    time: null,
+    index: typeof args[0] === 'number' && Number.isFinite(args[0]) ? Math.trunc(args[0]) : null,
+    price: typeof args[1] === 'number' && Number.isFinite(args[1]) ? args[1] : null,
+  }));
+  builtins.set('chart.point.from_time', (args) => ({
+    type: 'chart.point',
+    time: typeof args[0] === 'number' && Number.isFinite(args[0]) ? args[0] : null,
+    index: null,
+    price: typeof args[1] === 'number' && Number.isFinite(args[1]) ? args[1] : null,
+  }));
+  builtins.set('chart.point.copy', (args) => {
+    const source = args[0];
+    if (!isChartPoint(source)) return Number.NaN;
+    return { ...source };
+  });
 }

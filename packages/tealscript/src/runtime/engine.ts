@@ -60,7 +60,7 @@ import {
 } from './arrays';
 import type { BuiltinFunction, BuiltinRegistry } from './builtins/registry';
 import { registerBoxBuiltins, registerDrawingConstants, registerLabelBuiltins, registerLineBuiltins, registerLineFillBuiltins, type DrawingBuiltinRuntime } from './builtins/drawings';
-import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LogLevel, type LogOutput, type PlotLineStyle, type PlotOutput, type PlotStyle } from './context';
+import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type ChartPoint, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LogLevel, type LogOutput, type PlotLineStyle, type PlotOutput, type PlotStyle } from './context';
 import {
   getDrawingValue,
   toDrawingId as toDrawingIdValue,
@@ -955,12 +955,12 @@ export class TealscriptEngine {
     if (expr.callee.type === 'Identifier') {
       funcName = expr.callee.name;
     } else if (expr.callee.type === 'MemberExpression') {
-      if (expr.callee.object.type === 'Identifier') {
-        namespace = expr.callee.object.name;
-        funcName = expr.callee.property.name;
-      } else {
+      const memberPath = this.getMemberPath(expr.callee);
+      if (!memberPath) {
         throw new Error('Nested member access in call not supported');
       }
+      namespace = memberPath.slice(0, -1).join('.');
+      funcName = memberPath[memberPath.length - 1]!;
     } else {
       throw new Error('Invalid callee type');
     }
@@ -1789,9 +1789,10 @@ export class TealscriptEngine {
 
   private evaluateMember(expr: MemberExpression): unknown {
     // Handle namespace.constant patterns (e.g., color.red)
-    if (expr.object.type === 'Identifier') {
-      const namespace = expr.object.name;
-      const prop = expr.property.name;
+    const memberPath = this.getMemberPath(expr);
+    if (memberPath) {
+      const namespace = memberPath.slice(0, -1).join('.');
+      const prop = memberPath[memberPath.length - 1]!;
       const fullName = `${namespace}.${prop}`;
 
       if (namespace === 'barstate' && prop in this.ctx.barstate) {
@@ -1810,9 +1811,35 @@ export class TealscriptEngine {
         // It's a constant, call with no args
         return builtin([], new Map(), this.ctx, this.scope, fullName);
       }
+
+      if (this.scope.has(namespace)) {
+        const value = this.scope.get(namespace);
+        if (this.isChartPoint(value) && (prop === 'time' || prop === 'index' || prop === 'price')) {
+          return value[prop] ?? Number.NaN;
+        }
+      }
     }
 
     throw new Error('Member access not supported except for namespaced constants');
+  }
+
+  private getMemberPath(expr: MemberExpression): string[] | null {
+    if (expr.object.type === 'Identifier') {
+      return [expr.object.name, expr.property.name];
+    }
+    if (expr.object.type === 'MemberExpression') {
+      const parent = this.getMemberPath(expr.object);
+      return parent ? [...parent, expr.property.name] : null;
+    }
+    return null;
+  }
+
+  private isChartPoint(value: unknown): value is ChartPoint {
+    return (
+      typeof value === 'object'
+      && value !== null
+      && (value as { type?: unknown }).type === 'chart.point'
+    );
   }
 
   private evaluateSyminfo(prop: string): unknown {

@@ -641,4 +641,79 @@ plot(array.size(box.all), title="Boxes")`;
       expect(result.plots.find((plot) => plot.title === 'Lines')?.values).toEqual([1, 1]);
       expect(result.plots.find((plot) => plot.title === 'Boxes')?.values).toEqual([1, 1]);
     });
+
+    it('supports chart.point constructors and line/box point overloads', () => {
+      const script = `//@version=6
+indicator("Chart points", overlay=true)
+current = chart.point.now(high)
+if barstate.islast
+    left = chart.point.from_index(0, close[2])
+    right = chart.point.now(high)
+    timedLeft = chart.point.from_time(time[1], low[1])
+    timedRight = chart.point.new(time, bar_index, high)
+    copied = chart.point.copy(right)
+    line.new(left, copied, color=color.green, width=2)
+    line.new(timedLeft, timedRight, xloc.bar_time, extend.none, color.red)
+    box.new(left, copied, color.blue, 1, line.style_solid, extend.none, xloc.bar_index, color.new(color.blue, 80), "zone")
+plot(current.index, title="Point Index")
+plot(current.price, title="Point Price")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'line_line.new_0_2',
+          type: 'line',
+          barIndex: 2,
+          x1: 0,
+          y1: 100.2,
+          x2: 2,
+          y2: 101.5,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: '#4CAF50',
+          style: 'solid',
+          width: 2,
+          forceOverlay: false,
+        },
+        {
+          id: 'line_line.new_1_2',
+          type: 'line',
+          barIndex: 2,
+          x1: bars[1]!.time,
+          y1: 100.2,
+          x2: bars[2]!.time,
+          y2: 101.5,
+          xloc: 'bar_time',
+          extend: 'none',
+          color: '#F44336',
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+        {
+          id: 'box_box.new_0_2',
+          type: 'box',
+          barIndex: 2,
+          left: 0,
+          top: 100.2,
+          right: 2,
+          bottom: 101.5,
+          xloc: 'bar_index',
+          extend: 'none',
+          borderColor: '#2196F3',
+          borderWidth: 1,
+          borderStyle: 'solid',
+          bgcolor: '#2196F333',
+          text: 'zone',
+          textColor: null,
+          textSize: 'normal',
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Point Index')?.values).toEqual([0, 1, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Point Price')?.values).toEqual([100.5, 101, 101.5]);
+    });
   });

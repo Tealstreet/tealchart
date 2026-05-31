@@ -84,3 +84,10 @@ export interface DrawingLimits {
   box: number;
   polyline: number;
 }
+
+export interface ChartPoint {
+  type: 'chart.point';
+  time: number | null;
+  index: number | null;
+  price: number | null;
+}

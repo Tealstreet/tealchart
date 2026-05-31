@@ -8,12 +8,13 @@
  * - Plot outputs
  */
 
-import type { BoxDrawingOutput, DrawingLimits, DrawingObjectType, DrawingOutput, LabelDrawingOutput, LineDrawingOutput } from './drawings/types';
+import type { BoxDrawingOutput, ChartPoint, DrawingLimits, DrawingObjectType, DrawingOutput, LabelDrawingOutput, LineDrawingOutput } from './drawings/types';
 import { DrawingStore } from './drawings/store';
 import { Series } from './series';
 
 export type {
   BoxDrawingOutput,
+  ChartPoint,
   DrawingOutput,
   LabelDrawingOutput,
   LineDrawingOutput,
