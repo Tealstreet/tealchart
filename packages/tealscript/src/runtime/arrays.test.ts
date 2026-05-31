@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  absArrayValue,
   avgArrayValue,
+  binarySearchArrayValue,
+  binarySearchLeftmostArrayValue,
+  binarySearchRightmostArrayValue,
   clearArray,
   concatArray,
   copyArray,
@@ -18,17 +22,27 @@ import {
   lastArrayValue,
   lastIndexOfArrayValue,
   maxArrayValue,
+  medianArrayValue,
   minArrayValue,
+  modeArrayValue,
+  percentileLinearInterpolationArrayValue,
+  percentileNearestRankArrayValue,
+  percentRankArrayValue,
   popArrayValue,
   pushArrayValue,
+  rangeArrayValue,
   removeArrayValue,
   reverseArray,
   setArrayValue,
   shiftArrayValue,
   sliceArray,
   sortArray,
+  sortIndicesArrayValue,
+  standardizeArrayValue,
+  stdevArrayValue,
   sumArrayValue,
   unshiftArrayValue,
+  varianceArrayValue,
 } from './arrays';
 
 describe('PineArray', () => {
@@ -163,6 +177,23 @@ describe('PineArray', () => {
     expect(array.values).toEqual(['{ABC}', 'a', 'A', '1', '!']);
   });
 
+  it('returns sorted indices without mutating the source array', () => {
+    const array = createPineArray<number>();
+    [5, -2, 0, 9, 1].forEach((value) => pushArrayValue(array, value));
+
+    expect(sortIndicesArrayValue(array).values).toEqual([1, 2, 4, 0, 3]);
+    expect(sortIndicesArrayValue(array, 'descending').values).toEqual([3, 0, 4, 2, 1]);
+    expect(array.values).toEqual([5, -2, 0, 9, 1]);
+  });
+
+  it('sorts indices with missing values at the end', () => {
+    const array = createPineArray<number | string>();
+    [3, Number.NaN, 1, ''].forEach((value) => pushArrayValue(array, value));
+
+    expect(sortIndicesArrayValue(array).values).toEqual([2, 0, 1, 3]);
+    expect(sortIndicesArrayValue(array, 'descending').values).toEqual([1, 3, 0, 2]);
+  });
+
   it('creates slice windows over parent arrays', () => {
     const array = createPineArray<number>();
     [0, 1, 2, 3].forEach((value) => pushArrayValue(array, value));
@@ -215,10 +246,17 @@ describe('PineArray', () => {
     const array = createPineArray<number>();
     [2, 4, 6].forEach((value) => pushArrayValue(array, value));
 
+    expect(absArrayValue(array).values).toEqual([2, 4, 6]);
     expect(minArrayValue(array)).toBe(2);
     expect(maxArrayValue(array)).toBe(6);
     expect(sumArrayValue(array)).toBe(12);
     expect(avgArrayValue(array)).toBe(4);
+    expect(rangeArrayValue(array)).toBe(4);
+    expect(medianArrayValue(array)).toBe(4);
+    expect(modeArrayValue(array)).toBe(2);
+    expect(varianceArrayValue(array)).toBeCloseTo(8 / 3);
+    expect(varianceArrayValue(array, false)).toBeCloseTo(4);
+    expect(stdevArrayValue(array)).toBeCloseTo(Math.sqrt(8 / 3));
   });
 
   it('skips NaN values in numeric summaries', () => {
@@ -266,5 +304,32 @@ describe('PineArray', () => {
     [2, 5, Number.NaN, 8].forEach((value) => pushArrayValue(right, value));
 
     expect(covarianceArrayValue(left, right)).toBeCloseTo(4.5);
+  });
+
+  it('calculates array percentile helpers', () => {
+    const array = createPineArray<number>();
+    [1, 2, 3, 4].forEach((value) => pushArrayValue(array, value));
+
+    expect(percentileNearestRankArrayValue(array, 50)).toBe(2);
+    expect(percentileLinearInterpolationArrayValue(array, 50)).toBe(2.5);
+    expect(percentRankArrayValue(array, 2)).toBe(75);
+    expect(standardizeArrayValue(array).values).toEqual([
+      -1.3416407864998738,
+      -0.4472135954999579,
+      0.4472135954999579,
+      1.3416407864998738,
+    ]);
+  });
+
+  it('searches sorted arrays with Pine binary-search variants', () => {
+    const array = createPineArray<number>();
+    [1, 2, 2, 4].forEach((value) => pushArrayValue(array, value));
+
+    expect(binarySearchArrayValue(array, 2)).toBe(1);
+    expect(binarySearchArrayValue(array, 3)).toBe(-1);
+    expect(binarySearchLeftmostArrayValue(array, 2)).toBe(1);
+    expect(binarySearchLeftmostArrayValue(array, 3)).toBe(2);
+    expect(binarySearchRightmostArrayValue(array, 2)).toBe(2);
+    expect(binarySearchRightmostArrayValue(array, 3)).toBe(3);
   });
 });

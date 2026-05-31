@@ -198,6 +198,19 @@ export function sortArray(array: PineArray, order: unknown = 'ascending'): void 
   values.forEach((value, index) => setArrayValue(array, index, value));
 }
 
+export function sortIndicesArrayValue(array: PineArray, order: unknown = 'ascending'): PineArray<number> {
+  const descending = order === 'descending';
+  const indices = getArrayValues(array).map((_value, index) => index);
+  indices.sort((leftIndex, rightIndex) => {
+    const result = compareArrayValues(getArrayValue(array, leftIndex), getArrayValue(array, rightIndex));
+    return descending ? -result : result;
+  });
+
+  const result = createPineArray<number>();
+  indices.forEach((index) => pushArrayValue(result, index));
+  return result;
+}
+
 function compareStrings(left: string, right: string): number {
   if (left < right) return -1;
   if (left > right) return 1;
@@ -246,6 +259,31 @@ function numericArrayValues(array: PineArray): number[] {
   return getArrayValues(array).map(Number).filter((value) => !Number.isNaN(value));
 }
 
+function sortedNumericArrayValues(array: PineArray): number[] {
+  return numericArrayValues(array).sort((left, right) => left - right);
+}
+
+function compareArrayValues(left: unknown, right: unknown): number {
+  const leftMissing = left === '' || (typeof left === 'number' && Number.isNaN(left));
+  const rightMissing = right === '' || (typeof right === 'number' && Number.isNaN(right));
+
+  if (leftMissing || rightMissing) {
+    if (leftMissing && rightMissing) return 0;
+    return leftMissing ? 1 : -1;
+  }
+
+  if (typeof left === 'number' && typeof right === 'number') {
+    return left - right;
+  }
+  return compareStrings(String(left), String(right));
+}
+
+export function absArrayValue(array: PineArray): PineArray<number> {
+  const result = createPineArray<number>();
+  getArrayValues(array).forEach((value) => pushArrayValue(result, Math.abs(Number(value))));
+  return result;
+}
+
 export function minArrayValue(array: PineArray): number {
   const values = numericArrayValues(array);
   return values.length === 0 ? Number.NaN : Math.min(...values);
@@ -266,6 +304,59 @@ export function avgArrayValue(array: PineArray): number {
   return values.length === 0 ? Number.NaN : values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
+export function rangeArrayValue(array: PineArray): number {
+  const values = numericArrayValues(array);
+  return values.length === 0 ? Number.NaN : Math.max(...values) - Math.min(...values);
+}
+
+export function medianArrayValue(array: PineArray): number {
+  const values = sortedNumericArrayValues(array);
+  if (values.length === 0) return Number.NaN;
+
+  const middle = Math.floor(values.length / 2);
+  return values.length % 2 === 0 ? (values[middle - 1]! + values[middle]!) / 2 : values[middle]!;
+}
+
+export function modeArrayValue(array: PineArray): number {
+  const values = sortedNumericArrayValues(array);
+  if (values.length === 0) return Number.NaN;
+
+  let bestValue = values[0]!;
+  let bestCount = 0;
+  let currentValue = values[0]!;
+  let currentCount = 0;
+
+  for (const value of values) {
+    if (Object.is(value, currentValue)) {
+      currentCount++;
+    } else {
+      if (currentCount > bestCount) {
+        bestValue = currentValue;
+        bestCount = currentCount;
+      }
+      currentValue = value;
+      currentCount = 1;
+    }
+  }
+
+  return currentCount > bestCount ? currentValue : bestValue;
+}
+
+export function varianceArrayValue(array: PineArray, biased: boolean = true): number {
+  const values = numericArrayValues(array);
+  const length = values.length;
+  if (length === 0 || (!biased && length < 2)) return Number.NaN;
+
+  const mean = values.reduce((sum, value) => sum + value, 0) / length;
+  const sumSquaredDeviation = values.reduce((sum, value) => sum + (value - mean) ** 2, 0);
+  return sumSquaredDeviation / (biased ? length : length - 1);
+}
+
+export function stdevArrayValue(array: PineArray, biased: boolean = true): number {
+  const variance = varianceArrayValue(array, biased);
+  return Number.isNaN(variance) ? Number.NaN : Math.sqrt(variance);
+}
+
 export function covarianceArrayValue(left: PineArray, right: PineArray, biased: boolean = true): number {
   const pairs = getArrayValues(left).map((leftValue, index) => [Number(leftValue), Number(getArrayValue(right, index))]);
   const numericPairs = pairs.filter(([leftValue, rightValue]) => !Number.isNaN(leftValue) && !Number.isNaN(rightValue));
@@ -281,4 +372,102 @@ export function covarianceArrayValue(left: PineArray, right: PineArray, biased: 
   }, 0);
 
   return covariance / (biased ? length : length - 1);
+}
+
+export function percentileNearestRankArrayValue(array: PineArray, percentage: number): number {
+  const values = sortedNumericArrayValues(array);
+  if (values.length === 0 || !Number.isFinite(percentage)) return Number.NaN;
+
+  const clampedPercentage = Math.min(100, Math.max(0, percentage));
+  const rank = Math.ceil((clampedPercentage / 100) * values.length);
+  return values[Math.max(0, rank - 1)]!;
+}
+
+export function percentileLinearInterpolationArrayValue(array: PineArray, percentage: number): number {
+  const values = sortedNumericArrayValues(array);
+  if (values.length === 0 || !Number.isFinite(percentage)) return Number.NaN;
+  if (values.length === 1) return values[0]!;
+
+  const clampedPercentage = Math.min(100, Math.max(0, percentage));
+  const rank = (clampedPercentage / 100) * (values.length - 1);
+  const lowerIndex = Math.floor(rank);
+  const upperIndex = Math.ceil(rank);
+  const fraction = rank - lowerIndex;
+  return values[lowerIndex]! + (values[upperIndex]! - values[lowerIndex]!) * fraction;
+}
+
+export function percentRankArrayValue(array: PineArray, index: number): number {
+  const values = numericArrayValues(array);
+  if (values.length === 0) return Number.NaN;
+
+  const reference = Number(getArrayValue(array, index));
+  if (Number.isNaN(reference)) return Number.NaN;
+
+  const lessOrEqualCount = values.filter((value) => value <= reference).length;
+  return (lessOrEqualCount / values.length) * 100;
+}
+
+export function standardizeArrayValue(array: PineArray): PineArray<number> {
+  const values = numericArrayValues(array);
+  const result = createPineArray<number>();
+  if (values.length === 0) return result;
+
+  const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+  const stdev = stdevArrayValue(array);
+  values.forEach((value) => pushArrayValue(result, stdev === 0 || Number.isNaN(stdev) ? Number.NaN : (value - mean) / stdev));
+  return result;
+}
+
+export function binarySearchArrayValue(array: PineArray, value: unknown): number {
+  const values = getArrayValues(array);
+  let low = 0;
+  let high = values.length - 1;
+
+  while (low <= high) {
+    const middle = Math.floor((low + high) / 2);
+    const comparison = compareArrayValues(values[middle], value);
+    if (comparison === 0) return middle;
+    if (comparison < 0) {
+      low = middle + 1;
+    } else {
+      high = middle - 1;
+    }
+  }
+
+  return -1;
+}
+
+export function binarySearchLeftmostArrayValue(array: PineArray, value: unknown): number {
+  const values = getArrayValues(array);
+  let low = 0;
+  let high = values.length;
+
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2);
+    if (compareArrayValues(values[middle], value) < 0) {
+      low = middle + 1;
+    } else {
+      high = middle;
+    }
+  }
+
+  return values[low] !== undefined && compareArrayValues(values[low], value) === 0 ? low : low - 1;
+}
+
+export function binarySearchRightmostArrayValue(array: PineArray, value: unknown): number {
+  const values = getArrayValues(array);
+  let low = 0;
+  let high = values.length;
+
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2);
+    if (compareArrayValues(values[middle], value) <= 0) {
+      low = middle + 1;
+    } else {
+      high = middle;
+    }
+  }
+
+  const foundIndex = low - 1;
+  return foundIndex >= 0 && compareArrayValues(values[foundIndex], value) === 0 ? foundIndex : low;
 }

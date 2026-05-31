@@ -28,7 +28,11 @@ import type {
 } from '../parser/ast';
 
 import {
+  absArrayValue,
   avgArrayValue,
+  binarySearchArrayValue,
+  binarySearchLeftmostArrayValue,
+  binarySearchRightmostArrayValue,
   clearArray,
   concatArray,
   copyArray,
@@ -45,17 +49,27 @@ import {
   lastArrayValue,
   lastIndexOfArrayValue,
   maxArrayValue,
+  medianArrayValue,
   minArrayValue,
+  modeArrayValue,
+  percentileLinearInterpolationArrayValue,
+  percentileNearestRankArrayValue,
+  percentRankArrayValue,
   popArrayValue,
   pushArrayValue,
+  rangeArrayValue,
   removeArrayValue,
   reverseArray,
   setArrayValue,
   shiftArrayValue,
   sliceArray,
   sortArray,
+  sortIndicesArrayValue,
+  standardizeArrayValue,
+  stdevArrayValue,
   sumArrayValue,
   unshiftArrayValue,
+  varianceArrayValue,
   type PineArray,
 } from './arrays';
 import type { BuiltinFunction, BuiltinRegistry } from './builtins/registry';
@@ -1512,20 +1526,36 @@ export class TealscriptEngine {
       case 'first':
       case 'last':
       case 'includes':
+      case 'every':
+      case 'some':
       case 'indexof':
       case 'lastindexof':
+      case 'binary_search':
+      case 'binary_search_leftmost':
+      case 'binary_search_rightmost':
       case 'insert':
       case 'remove':
       case 'sort':
+      case 'sort_indices':
       case 'reverse':
       case 'join':
       case 'concat':
       case 'slice':
+      case 'abs':
       case 'min':
       case 'max':
       case 'sum':
       case 'avg':
+      case 'range':
+      case 'median':
+      case 'mode':
+      case 'variance':
+      case 'stdev':
       case 'covariance':
+      case 'percentile_nearest_rank':
+      case 'percentile_linear_interpolation':
+      case 'percentrank':
+      case 'standardize':
       case 'fill':
       case 'clear':
         return `array.${methodName}`;
@@ -3312,6 +3342,13 @@ export class TealscriptEngine {
     this.builtins.set('array.new_int', createArray);
     this.builtins.set('array.new_bool', createArray);
     this.builtins.set('array.new_string', createArray);
+    this.builtins.set('array.new_color', createArray);
+    this.builtins.set('array.new_label', createArray);
+    this.builtins.set('array.new_line', createArray);
+    this.builtins.set('array.new_box', createArray);
+    this.builtins.set('array.new_linefill', createArray);
+    this.builtins.set('array.new_polyline', createArray);
+    this.builtins.set('array.new_table', createArray);
     this.builtins.set('array.from', (args) => {
       const array = createPineArray();
       array.values.push(...args);
@@ -3330,17 +3367,59 @@ export class TealscriptEngine {
     this.builtins.set('array.first', (args) => firstArrayValue(copyReadonlyArray(readArray(args[0]))));
     this.builtins.set('array.last', (args) => lastArrayValue(copyReadonlyArray(readArray(args[0]))));
     this.builtins.set('array.includes', (args) => includesArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
+    this.builtins.set('array.every', (args) => {
+      const array = copyReadonlyArray(readArray(args[0]));
+      for (let index = 0; index < getArraySize(array); index++) {
+        if (!this.isTruthy(getArrayValue(array, index))) return false;
+      }
+      return true;
+    });
+    this.builtins.set('array.some', (args) => {
+      const array = copyReadonlyArray(readArray(args[0]));
+      for (let index = 0; index < getArraySize(array); index++) {
+        if (this.isTruthy(getArrayValue(array, index))) return true;
+      }
+      return false;
+    });
     this.builtins.set('array.indexof', (args) => indexOfArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
     this.builtins.set('array.lastindexof', (args) => lastIndexOfArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
+    this.builtins.set('array.binary_search', (args) => binarySearchArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
+    this.builtins.set('array.binary_search_leftmost', (args) => binarySearchLeftmostArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
+    this.builtins.set('array.binary_search_rightmost', (args) => binarySearchRightmostArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
+    this.builtins.set('array.abs', (args) => absArrayValue(copyReadonlyArray(readArray(args[0]))));
     this.builtins.set('array.min', (args) => minArrayValue(copyReadonlyArray(readArray(args[0]))));
     this.builtins.set('array.max', (args) => maxArrayValue(copyReadonlyArray(readArray(args[0]))));
     this.builtins.set('array.sum', (args) => sumArrayValue(copyReadonlyArray(readArray(args[0]))));
     this.builtins.set('array.avg', (args) => avgArrayValue(copyReadonlyArray(readArray(args[0]))));
+    this.builtins.set('array.range', (args) => rangeArrayValue(copyReadonlyArray(readArray(args[0]))));
+    this.builtins.set('array.median', (args) => medianArrayValue(copyReadonlyArray(readArray(args[0]))));
+    this.builtins.set('array.mode', (args) => modeArrayValue(copyReadonlyArray(readArray(args[0]))));
+    this.builtins.set('array.variance', (args) => varianceArrayValue(
+      copyReadonlyArray(readArray(args[0])),
+      args[1] === undefined ? true : this.isTruthy(args[1]),
+    ));
+    this.builtins.set('array.stdev', (args) => stdevArrayValue(
+      copyReadonlyArray(readArray(args[0])),
+      args[1] === undefined ? true : this.isTruthy(args[1]),
+    ));
     this.builtins.set('array.covariance', (args) => covarianceArrayValue(
       copyReadonlyArray(readArray(args[0])),
       copyReadonlyArray(readArray(args[1])),
       args[2] === undefined ? true : this.isTruthy(args[2]),
     ));
+    this.builtins.set('array.percentile_nearest_rank', (args) => percentileNearestRankArrayValue(
+      copyReadonlyArray(readArray(args[0])),
+      this.toNumber(args[1]),
+    ));
+    this.builtins.set('array.percentile_linear_interpolation', (args) => percentileLinearInterpolationArrayValue(
+      copyReadonlyArray(readArray(args[0])),
+      this.toNumber(args[1]),
+    ));
+    this.builtins.set('array.percentrank', (args) => percentRankArrayValue(
+      copyReadonlyArray(readArray(args[0])),
+      this.toNumber(args[1]),
+    ));
+    this.builtins.set('array.standardize', (args) => standardizeArrayValue(copyReadonlyArray(readArray(args[0]))));
     this.builtins.set('array.set', (args) => {
       setArrayValue(readMutableArray(args[0]), args[1] as number, args[2]);
       return null;
@@ -3355,6 +3434,10 @@ export class TealscriptEngine {
       sortArray(readMutableArray(args[0]), namedArgs.get('order') ?? args[1]);
       return null;
     });
+    this.builtins.set('array.sort_indices', (args, namedArgs) => sortIndicesArrayValue(
+      copyReadonlyArray(readArray(args[0])),
+      namedArgs.get('order') ?? args[1],
+    ));
     this.builtins.set('array.reverse', (args) => {
       reverseArray(readMutableArray(args[0]));
       return null;
