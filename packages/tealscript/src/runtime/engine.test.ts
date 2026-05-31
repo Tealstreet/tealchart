@@ -583,6 +583,64 @@ plot(strategy.opentrades)`;
       ]);
     });
 
+    it('reverses positions when strategy.entry submits the opposite direction', () => {
+      const script = `//@version=6
+strategy("Entry reversal")
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.entry("Short", strategy.short, qty=1)
+plot(strategy.position_size)
+plot(strategy.opentrades)
+plot(strategy.closedtrades)`;
+
+      const bars = createBars(2);
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        direction: order.direction,
+        qty: order.qty,
+        status: order.status,
+      }))).toEqual([
+        { id: 'Long', direction: 'long', qty: 2, status: 'filled' },
+        { id: 'Short', direction: 'short', qty: 3, status: 'filled' },
+      ]);
+      expect(result.strategy.position).toMatchObject({
+        direction: 'short',
+        size: -1,
+        avgPrice: bars[1].close,
+      });
+      expect(result.strategy.closedTrades).toHaveLength(1);
+      expect(result.strategy.openTrades).toHaveLength(1);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [2, -1],
+        [1, 1],
+        [0, 1],
+      ]);
+    });
+
+    it('does not auto-reverse raw strategy.order calls', () => {
+      const script = `//@version=6
+strategy("Order no reversal")
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.order("Short", strategy.short, qty=1)
+plot(strategy.position_size)`;
+
+      const result = executeScript(parse(script), createBars(2));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({ id: order.id, qty: order.qty }))).toEqual([
+        { id: 'Long', qty: 2 },
+        { id: 'Short', qty: 1 },
+      ]);
+      expect(result.strategy.position.size).toBe(1);
+      expect(result.plots[0]?.values).toEqual([2, 1]);
+    });
+
     it('fills strategy.exit brackets and cancels the sibling OCA order', () => {
       const script = `//@version=6
 strategy("Exit bracket fill")

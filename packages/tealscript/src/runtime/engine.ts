@@ -3212,7 +3212,7 @@ export class TealscriptEngine {
     });
   }
 
-  private submitStrategyOrderBuiltin(args: unknown[], namedArgs: Map<string, unknown>, respectPyramiding: boolean): undefined {
+  private submitStrategyOrderBuiltin(args: unknown[], namedArgs: Map<string, unknown>, isEntry: boolean): undefined {
     const id = this.toStringValue(this.getCallArg(args, namedArgs, 0, 'id', ''));
     const direction = this.normalizeStrategyDirection(this.getCallArg(args, namedArgs, 1, 'direction'));
     const rawQty = this.toOptionalNumber(this.getCallArg(args, namedArgs, 2, 'qty'));
@@ -3231,10 +3231,11 @@ export class TealscriptEngine {
     if (!Number.isFinite(qtyValue) || qtyValue <= 0) {
       throw new Error('strategy order qty must be a positive number');
     }
-    if (respectPyramiding && !this.canSubmitStrategyEntry(direction)) {
+    if (isEntry && !this.canSubmitStrategyEntry(direction)) {
       return undefined;
     }
-    const qty = this.resolveStrategyOrderQty(qtyType, qtyValue, limitPrice, stopPrice);
+    const requestedQty = this.resolveStrategyOrderQty(qtyType, qtyValue, limitPrice, stopPrice);
+    const qty = isEntry ? this.resolveStrategyEntryTransactionQty(direction, requestedQty) : requestedQty;
 
     const order = submitStrategyOrder(this.ctx.strategyLedger, {
       id,
@@ -3265,6 +3266,14 @@ export class TealscriptEngine {
   private canSubmitStrategyEntry(direction: StrategyDirection): boolean {
     const openEntries = this.ctx.strategyLedger.openTrades.filter((trade) => trade.direction === direction).length;
     return openEntries < this.ctx.strategyLedger.settings.pyramiding + 1;
+  }
+
+  private resolveStrategyEntryTransactionQty(direction: StrategyDirection, requestedQty: number): number {
+    const position = this.ctx.strategyLedger.position;
+    if (position.direction === null || position.direction === direction) {
+      return requestedQty;
+    }
+    return Math.abs(position.size) + requestedQty;
   }
 
   private resolveStrategyOrderQty(
