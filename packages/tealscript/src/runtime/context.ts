@@ -97,6 +97,16 @@ export interface PlotOutput {
   color: string | (string | null)[];
   linewidth?: number;
   style?: PlotStyle;
+  offset?: number;
+  trackprice?: boolean;
+  histbase?: number;
+  join?: boolean;
+  editable?: boolean;
+  showLast?: number;
+  display?: number;
+  format?: string;
+  precision?: number;
+  forceOverlay?: boolean;
 
   // For plotbar/plotcandle
   openValues?: (number | null)[];

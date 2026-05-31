@@ -127,15 +127,40 @@ scaleMatches = scale.right == "right" and scale.left == "left" and scale.none ==
 plot(close, title="Break Line", style=plot.style_linebr, display=displayTarget)
 plot(open, title="Step Diamonds", style=plot.style_stepline_diamond, display=display.none)
 plot(high, title="Columns", style=plot.style_columns, histbase=100, trackprice=true, show_last=5)
+plot(low, "Positional Area", color.red, 3, plot.style_area, true, 90, -1, true, false, 4, display.price_scale, format.volume, 0, true)
 plot(formatMatches ? 1 : 0, title="Format Constants")
 plot(scaleMatches ? 1 : 0, title="Scale Constants")
 `);
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Break Line').style).toBe('linebr');
-    expect(getPlot(result, 'Step Diamonds').style).toBe('stepline_diamond');
-    expect(getPlot(result, 'Columns').style).toBe('columns');
-    expect(getPlot(result, 'Break Line').values).toHaveLength(compatibilityBars.length);
+    const breakLine = getPlot(result, 'Break Line');
+    const stepDiamonds = getPlot(result, 'Step Diamonds');
+    const columns = getPlot(result, 'Columns');
+    const positionalArea = getPlot(result, 'Positional Area');
+
+    expect(breakLine.style).toBe('linebr');
+    expect(breakLine.display).toBe(11);
+    expect(stepDiamonds.style).toBe('stepline_diamond');
+    expect(stepDiamonds.display).toBe(0);
+    expect(columns.style).toBe('columns');
+    expect(columns.histbase).toBe(100);
+    expect(columns.trackprice).toBe(true);
+    expect(columns.showLast).toBe(5);
+    expect(positionalArea).toMatchObject({
+      linewidth: 3,
+      style: 'area',
+      trackprice: true,
+      histbase: 90,
+      offset: -1,
+      join: true,
+      editable: false,
+      showLast: 4,
+      display: 8,
+      format: 'volume',
+      precision: 0,
+      forceOverlay: true,
+    });
+    expect(breakLine.values).toHaveLength(compatibilityBars.length);
     expect(getPlot(result, 'Format Constants').values).toEqual(Array(compatibilityBars.length).fill(1));
     expect(getPlot(result, 'Scale Constants').values).toEqual(Array(compatibilityBars.length).fill(1));
   });

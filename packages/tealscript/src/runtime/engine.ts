@@ -2426,14 +2426,41 @@ export class TealscriptEngine {
 
   private registerPlotBuiltins(): void {
     this.builtins.set('plot', (args, namedArgs, ctx) => {
+      const getArg = (index: number, name: string, fallback?: unknown): unknown => {
+        return namedArgs.has(name) ? namedArgs.get(name) : args[index] !== undefined ? args[index] : fallback;
+      };
+      const optionalNumber = (value: unknown): number | undefined => {
+        if (value === undefined || value === null || this.isNa(value)) return undefined;
+        const numberValue = this.toNumber(value);
+        return Number.isFinite(numberValue) ? numberValue : undefined;
+      };
+      const optionalInteger = (value: unknown): number | undefined => {
+        const numberValue = optionalNumber(value);
+        return numberValue === undefined ? undefined : Math.trunc(numberValue);
+      };
+      const optionalBoolean = (value: unknown): boolean | undefined => {
+        if (value === undefined || value === null || this.isNa(value)) return undefined;
+        return this.isTruthy(value);
+      };
+
       const value = args[0] as number;
       const callIndex = this.plotCallIndex++;
       const hasExplicitTitle = namedArgs.has('title') || args[1] !== undefined;
-      const title = (namedArgs.get('title') ?? args[1] ?? `Plot ${callIndex + 1}`) as string;
-      const colorArg = namedArgs.has('color') ? namedArgs.get('color') : args[2] !== undefined ? args[2] : '#2196F3';
+      const title = (getArg(1, 'title', `Plot ${callIndex + 1}`)) as string;
+      const colorArg = getArg(2, 'color', '#2196F3');
       const color = this.toPlotColor(colorArg);
-      const linewidth = (namedArgs.get('linewidth') ?? 1) as number;
-      const style = (namedArgs.get('style') ?? 'line') as string;
+      const linewidth = optionalInteger(getArg(3, 'linewidth', 1)) ?? 1;
+      const style = (getArg(4, 'style', 'line')) as string;
+      const trackprice = optionalBoolean(getArg(5, 'trackprice'));
+      const histbase = optionalNumber(getArg(6, 'histbase'));
+      const offset = optionalInteger(getArg(7, 'offset'));
+      const join = optionalBoolean(getArg(8, 'join'));
+      const editable = optionalBoolean(getArg(9, 'editable'));
+      const showLast = optionalInteger(getArg(10, 'show_last'));
+      const display = optionalInteger(getArg(11, 'display'));
+      const format = this.toOptionalString(getArg(12, 'format'));
+      const precision = optionalInteger(getArg(13, 'precision'));
+      const forceOverlay = optionalBoolean(getArg(14, 'force_overlay'));
 
       // Use plot call order for untitled plots so multiple plot(...) calls do
       // not collapse into one "Plot" series across every bar.
@@ -2447,6 +2474,16 @@ export class TealscriptEngine {
           color: [], // Always array for per-bar colors
           linewidth,
           style: style as PlotStyle,
+          offset,
+          trackprice,
+          histbase,
+          join,
+          editable,
+          showLast,
+          display,
+          format,
+          precision,
+          forceOverlay,
         });
       }
 
