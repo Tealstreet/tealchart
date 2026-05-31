@@ -156,7 +156,9 @@ converting a right angle between radians and degrees.
 
 The global helper pass covers `na`, `nz`, `fixnan`, and explicit primitive
 casts used by generated scripts to normalize optional source values before
-plotting or comparing them.
+plotting or comparing them. `nz()` supports default-zero and explicit
+replacement forms, `fixnan()` carries forward the previous non-`na` value per
+call site, and both helpers reject bool arguments per Pine v6 behavior.
 
 ## Core `na` And Logical Semantics Coverage
 
