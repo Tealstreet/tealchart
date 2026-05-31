@@ -16,6 +16,7 @@ export type {
   ToWorkerMessage,
   FromWorkerMessage,
   WorkerOutputBundle,
+  NormalizedWorkerOutputBundle,
   WorkerOutputMetadata,
   InitMessage,
   UpdateBarsMessage,

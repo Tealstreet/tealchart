@@ -162,6 +162,18 @@ export interface AlertOutput {
   events: AlertEvent[];
 }
 
+export type LogLevel = 'info' | 'warning' | 'error';
+
+/**
+ * Log event from a Pine log.*() call.
+ */
+export interface LogOutput {
+  level: LogLevel;
+  barIndex: number;
+  time: number;
+  message: string;
+}
+
 /**
  * Input definition from indicator
  */
@@ -283,6 +295,9 @@ export class ExecutionContext {
 
   /** Alert order */
   readonly alertOrder: string[] = [];
+
+  /** Pine log.*() events emitted during execution. */
+  readonly logs: LogOutput[] = [];
 
   // =========================================================================
   // Internal State
@@ -707,6 +722,42 @@ export class ExecutionContext {
   }
 
   // =========================================================================
+  // Log Management
+  // =========================================================================
+
+  /**
+   * Add a Pine log.*() event for the current bar.
+   */
+  addLog(level: LogLevel, message: string): void {
+    const currentBar = this.getCurrentBar();
+    this.logs.push({
+      level,
+      barIndex: this.bar_index,
+      time: currentBar?.time ?? this.time.get(0) ?? 0,
+      message,
+    });
+  }
+
+  /**
+   * Remove logs emitted from a bar index onward.
+   */
+  truncateLogs(fromBarIndex: number): void {
+    for (let index = this.logs.length - 1; index >= 0; index--) {
+      if (this.logs[index].barIndex < fromBarIndex) {
+        break;
+      }
+      this.logs.pop();
+    }
+  }
+
+  /**
+   * Get all logs as array.
+   */
+  getLogs(): LogOutput[] {
+    return this.logs.map((log) => ({ ...log }));
+  }
+
+  // =========================================================================
   // Reset
   // =========================================================================
 
@@ -720,6 +771,7 @@ export class ExecutionContext {
     this.drawingStore.clear();
     this.alerts.clear();
     this.alertOrder.length = 0;
+    this.logs.length = 0;
     this.indicatorTitle = 'Untitled';
     this.indicatorOverlay = false;
     this.indicatorPrecision = 2;

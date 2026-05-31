@@ -164,6 +164,15 @@ plotting or comparing them. `nz()` supports default-zero and explicit
 replacement forms, `fixnan()` carries forward the previous non-`na` value per
 call site, and both helpers reject bool arguments per Pine v6 behavior.
 
+## Pine Logs Coverage
+
+The Pine Logs pass covers `log.info`, `log.warning`, and `log.error` with
+message-only and format-string forms. The runtime captures log level, bar
+index, bar time, and message in `ExecutionResult.logs` and forwards them
+through worker result bundles. `log.error()` records an error-level diagnostic
+without halting execution; use `runtime.error()` for Pine-compatible runtime
+halts.
+
 ## Core `na` And Logical Semantics Coverage
 
 The core semantics pass covers arithmetic `na` propagation, `na()` checks,

@@ -4,7 +4,7 @@
  * Message types for communication between main thread and Web Worker.
  */
 
-import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition } from '../runtime/context';
+import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition, LogOutput } from '../runtime/context';
 
 /**
  * Messages sent from main thread to worker
@@ -94,8 +94,13 @@ export interface WorkerOutputBundle {
   plots: PlotOutput[];
   drawings: DrawingOutput[];
   alerts: AlertOutput[];
+  logs?: LogOutput[];
   inputs: InputDefinition[];
   metadata?: WorkerOutputMetadata;
+}
+
+export interface NormalizedWorkerOutputBundle extends Omit<WorkerOutputBundle, 'logs'> {
+  logs: LogOutput[];
 }
 
 /**
@@ -113,6 +118,7 @@ export interface ResultMessage {
   plots: PlotOutput[];
   drawings: DrawingOutput[];
   alerts: AlertOutput[];
+  logs?: LogOutput[];
   inputs: InputDefinition[];
 }
 
@@ -120,25 +126,39 @@ export interface ResultMessage {
  * Build a result message with both the atomic output bundle and legacy fields.
  */
 export function createResultMessage(scriptId: string, output: WorkerOutputBundle): ResultMessage {
+  const normalizedOutput: NormalizedWorkerOutputBundle = {
+    ...output,
+    logs: output.logs ?? [],
+  };
+
   return {
     type: 'result',
     scriptId,
-    output,
-    plots: output.plots,
-    drawings: output.drawings,
-    alerts: output.alerts,
-    inputs: output.inputs,
+    output: normalizedOutput,
+    plots: normalizedOutput.plots,
+    drawings: normalizedOutput.drawings,
+    alerts: normalizedOutput.alerts,
+    logs: normalizedOutput.logs,
+    inputs: normalizedOutput.inputs,
   };
 }
 
 /**
  * Normalize result messages from bundled or legacy workers into one payload.
  */
-export function getResultOutput(message: ResultMessage): WorkerOutputBundle {
-  return message.output ?? {
+export function getResultOutput(message: ResultMessage): NormalizedWorkerOutputBundle {
+  if (message.output) {
+    return {
+      ...message.output,
+      logs: message.output.logs ?? [],
+    };
+  }
+
+  return {
     plots: message.plots,
     drawings: message.drawings,
     alerts: message.alerts,
+    logs: message.logs ?? [],
     inputs: message.inputs,
   };
 }

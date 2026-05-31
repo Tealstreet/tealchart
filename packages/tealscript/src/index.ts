@@ -73,6 +73,8 @@ export {
   type AlertEvent,
   type AlertFrequency,
   type AlertOutput,
+  type LogLevel,
+  type LogOutput,
   type InputDefinition,
   // Series
   Series,
@@ -103,6 +105,7 @@ export {
   type ToWorkerMessage,
   type FromWorkerMessage,
   type WorkerOutputBundle,
+  type NormalizedWorkerOutputBundle,
   type WorkerOutputMetadata,
   type InitMessage,
   type UpdateBarsMessage,

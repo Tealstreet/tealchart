@@ -42,6 +42,8 @@ export {
   type AlertEvent,
   type AlertFrequency,
   type AlertOutput,
+  type LogLevel,
+  type LogOutput,
   type InputDefinition,
 } from './context';
 
