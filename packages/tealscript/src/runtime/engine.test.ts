@@ -1512,6 +1512,25 @@ plot(ta.stoch(close, high, low, 3), title="Stoch")`;
       expect(result.plots.find((plot) => plot.title === 'Stoch')?.values[2]).toBeCloseTo(88.888889);
     });
 
+    it('calculates Pine-style CCI over the provided source', () => {
+      const script = `//@version=6
+indicator("TA CCI")
+plot(ta.cci(close, 3), title="Close CCI")
+plot(ta.cci(hlc3, 3), title="Typical CCI")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 103, low: 99, close: 102, volume: 100 },
+        { time: 2, open: 102, high: 106, low: 101, close: 105, volume: 100 },
+        { time: 3, open: 105, high: 108, low: 104, close: 107, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Close CCI')?.values[2]).toBeCloseTo(87.5);
+      expect(result.plots.find((plot) => plot.title === 'Typical CCI')?.values[2]).toBeCloseTo(95.652174);
+    });
+
     it('calculates cumulative and window statistic TA helpers', () => {
       const script = `//@version=6
 indicator("TA stats")
