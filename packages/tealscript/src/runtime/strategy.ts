@@ -2,6 +2,7 @@ export type StrategyDirection = 'long' | 'short';
 export type StrategyOrderType = 'market' | 'limit' | 'stop' | 'stop_limit';
 export type StrategyOrderStatus = 'pending' | 'filled' | 'cancelled' | 'rejected';
 export type StrategyOcaType = 'cancel' | 'reduce' | 'none';
+export type StrategyQuantityType = StrategyLedgerSettings['defaultQtyType'];
 
 export interface StrategyLedgerSettings {
   title: string;
@@ -25,7 +26,9 @@ export interface StrategyOrder {
   direction: StrategyDirection;
   type: StrategyOrderType;
   status: StrategyOrderStatus;
-  qty: number;
+  qty: number | null;
+  qtyType: StrategyQuantityType;
+  qtyValue: number;
   filledQty: number;
   avgFillPrice: number | null;
   limitPrice?: number;
@@ -39,6 +42,23 @@ export interface StrategyOrder {
   createdTime: number;
   updatedBarIndex: number;
   updatedTime: number;
+}
+
+export interface StrategyOrderInput {
+  id: string;
+  direction: StrategyDirection;
+  qty: number | null;
+  qtyType: StrategyQuantityType;
+  qtyValue: number;
+  limitPrice?: number;
+  stopPrice?: number;
+  fromEntry?: string;
+  ocaName?: string;
+  ocaType?: StrategyOcaType;
+  comment?: string;
+  alertMessage?: string;
+  barIndex: number;
+  time: number;
 }
 
 export interface StrategyFill {
@@ -159,4 +179,100 @@ export function createStrategyLedger(settings: Partial<StrategyLedgerSettings> =
     maxRunup: 0,
     maxDrawdown: 0,
   };
+}
+
+export function createStrategyOrder(input: StrategyOrderInput): StrategyOrder {
+  validateStrategyOrderInput(input);
+  return {
+    id: input.id,
+    direction: input.direction,
+    type: inferStrategyOrderType(input.limitPrice, input.stopPrice),
+    status: 'pending',
+    qty: input.qty,
+    qtyType: input.qtyType,
+    qtyValue: input.qtyValue,
+    filledQty: 0,
+    avgFillPrice: null,
+    limitPrice: input.limitPrice,
+    stopPrice: input.stopPrice,
+    fromEntry: input.fromEntry,
+    ocaName: input.ocaName,
+    ocaType: input.ocaType,
+    comment: input.comment,
+    alertMessage: input.alertMessage,
+    createdBarIndex: input.barIndex,
+    createdTime: input.time,
+    updatedBarIndex: input.barIndex,
+    updatedTime: input.time,
+  };
+}
+
+export function submitStrategyOrder(ledger: StrategyLedger, input: StrategyOrderInput): StrategyOrder {
+  const order = createStrategyOrder(input);
+  ledger.orders.push(order);
+  return order;
+}
+
+export function cancelStrategyOrder(ledger: StrategyLedger, id: string, barIndex: number, time: number): boolean {
+  let cancelled = false;
+  for (let index = ledger.orders.length - 1; index >= 0; index--) {
+    const order = ledger.orders[index];
+    if (!order || order.id !== id || order.status !== 'pending') {
+      continue;
+    }
+
+    order.status = 'cancelled';
+    order.updatedBarIndex = barIndex;
+    order.updatedTime = time;
+    cancelled = true;
+  }
+  return cancelled;
+}
+
+export function cancelAllStrategyOrders(ledger: StrategyLedger, barIndex: number, time: number): number {
+  let cancelled = 0;
+  for (const order of ledger.orders) {
+    if (order.status !== 'pending') {
+      continue;
+    }
+
+    order.status = 'cancelled';
+    order.updatedBarIndex = barIndex;
+    order.updatedTime = time;
+    cancelled++;
+  }
+  return cancelled;
+}
+
+function inferStrategyOrderType(limitPrice: number | undefined, stopPrice: number | undefined): StrategyOrderType {
+  if (limitPrice !== undefined && stopPrice !== undefined) {
+    return 'stop_limit';
+  }
+  if (limitPrice !== undefined) {
+    return 'limit';
+  }
+  if (stopPrice !== undefined) {
+    return 'stop';
+  }
+  return 'market';
+}
+
+function validateStrategyOrderInput(input: StrategyOrderInput): void {
+  if (input.id.trim() === '') {
+    throw new Error('strategy order id must not be empty');
+  }
+  if (input.qty !== null && (!Number.isFinite(input.qty) || input.qty <= 0)) {
+    throw new Error('strategy order qty must be a positive number');
+  }
+  if (!Number.isFinite(input.qtyValue) || input.qtyValue <= 0) {
+    throw new Error('strategy order qtyValue must be a positive number');
+  }
+  validateOptionalPrice(input.limitPrice, 'limitPrice');
+  validateOptionalPrice(input.stopPrice, 'stopPrice');
+}
+
+function validateOptionalPrice(value: number | undefined, name: string): void {
+  if (value !== undefined && !Number.isFinite(value)) {
+    throw new Error(`strategy order ${name} must be finite`);
+  }
 }

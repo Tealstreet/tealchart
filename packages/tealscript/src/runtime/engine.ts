@@ -150,7 +150,15 @@ import {
 } from './maps';
 import { Scope, createRootScope } from './scope';
 import { currencyRateRequestKey, type RequestDataContext, type RequestDatafeed, type RequestSeriesPoint } from './requestDatafeed';
-import type { StrategyLedger, StrategyLedgerSettings } from './strategy';
+import {
+  cancelAllStrategyOrders,
+  cancelStrategyOrder,
+  submitStrategyOrder,
+  type StrategyDirection,
+  type StrategyLedger,
+  type StrategyLedgerSettings,
+  type StrategyOcaType,
+} from './strategy';
 
 /**
  * Execution result
@@ -1272,7 +1280,7 @@ export class TealscriptEngine {
 
     const fullName = namespace ? `${namespace}.${funcName}` : funcName;
 
-    if (namespace === 'strategy') {
+    if (namespace === 'strategy' && !this.isStrategyOrderFunction(fullName)) {
       throw new Error(`strategy.* functions are not supported yet: ${fullName}`);
     }
     if (namespace && this.isUnsupportedDrawingNamespace(namespace)) {
@@ -1413,6 +1421,15 @@ export class TealscriptEngine {
     }
 
     throw new Error(`Unknown function: ${fullName}`);
+  }
+
+  private isStrategyOrderFunction(fullName: string): boolean {
+    return (
+      fullName === 'strategy.entry'
+      || fullName === 'strategy.order'
+      || fullName === 'strategy.cancel'
+      || fullName === 'strategy.cancel_all'
+    );
   }
 
   private userCallableScopeKey(fn: FunctionDeclaration): string {
@@ -3165,6 +3182,77 @@ export class TealscriptEngine {
     this.builtins.set('strategy.commission.percent', () => 'percent');
     this.builtins.set('strategy.commission.cash_per_order', () => 'cash_per_order');
     this.builtins.set('strategy.commission.cash_per_contract', () => 'cash_per_contract');
+    this.builtins.set('strategy.oca.cancel', () => 'cancel');
+    this.builtins.set('strategy.oca.reduce', () => 'reduce');
+    this.builtins.set('strategy.oca.none', () => 'none');
+    this.builtins.set('strategy.entry', (args, namedArgs) => this.submitStrategyOrderBuiltin(args, namedArgs));
+    this.builtins.set('strategy.order', (args, namedArgs) => this.submitStrategyOrderBuiltin(args, namedArgs));
+    this.builtins.set('strategy.cancel', (args, namedArgs) => {
+      const id = this.toStringValue(this.getCallArg(args, namedArgs, 0, 'id', ''));
+      cancelStrategyOrder(this.ctx.strategyLedger, id, this.ctx.bar_index, this.ctx.time.get(0) ?? 0);
+      return undefined;
+    });
+    this.builtins.set('strategy.cancel_all', () => {
+      cancelAllStrategyOrders(this.ctx.strategyLedger, this.ctx.bar_index, this.ctx.time.get(0) ?? 0);
+      return undefined;
+    });
+  }
+
+  private submitStrategyOrderBuiltin(args: unknown[], namedArgs: Map<string, unknown>): undefined {
+    const id = this.toStringValue(this.getCallArg(args, namedArgs, 0, 'id', ''));
+    const direction = this.normalizeStrategyDirection(this.getCallArg(args, namedArgs, 1, 'direction'));
+    const rawQty = this.toOptionalNumber(this.getCallArg(args, namedArgs, 2, 'qty'));
+    const qtyType = rawQty === undefined ? this.ctx.strategyLedger.settings.defaultQtyType : 'fixed';
+    const qtyValue = rawQty ?? this.ctx.strategyLedger.settings.defaultQtyValue;
+    const qty = qtyType === 'fixed' ? qtyValue : null;
+    const limitPrice = this.toOptionalNumber(this.getCallArg(args, namedArgs, 3, 'limit'));
+    const stopPrice = this.toOptionalNumber(this.getCallArg(args, namedArgs, 4, 'stop'));
+    const ocaName = this.toOptionalString(this.getCallArg(args, namedArgs, 5, 'oca_name'));
+    const ocaType = this.normalizeOptionalStrategyOcaType(this.getCallArg(args, namedArgs, 6, 'oca_type'));
+    const comment = this.toOptionalString(this.getCallArg(args, namedArgs, 7, 'comment'));
+    const alertMessage = this.toOptionalString(this.getCallArg(args, namedArgs, 8, 'alert_message'));
+
+    if (id === '') {
+      throw new Error('strategy order id must not be empty');
+    }
+    if (!Number.isFinite(qtyValue) || qtyValue <= 0) {
+      throw new Error('strategy order qty must be a positive number');
+    }
+
+    submitStrategyOrder(this.ctx.strategyLedger, {
+      id,
+      direction,
+      qty,
+      qtyType,
+      qtyValue,
+      limitPrice,
+      stopPrice,
+      ocaName,
+      ocaType,
+      comment,
+      alertMessage,
+      barIndex: this.ctx.bar_index,
+      time: this.ctx.time.get(0) ?? 0,
+    });
+
+    return undefined;
+  }
+
+  private normalizeStrategyDirection(value: unknown): StrategyDirection {
+    if (value === 'long' || value === 'short') {
+      return value;
+    }
+    throw new Error(`Invalid strategy direction: ${this.toStringValue(value)}`);
+  }
+
+  private normalizeOptionalStrategyOcaType(value: unknown): StrategyOcaType | undefined {
+    if (value === undefined || value === null || this.isNa(value)) {
+      return undefined;
+    }
+    if (value === 'cancel' || value === 'reduce' || value === 'none') {
+      return value;
+    }
+    throw new Error(`Invalid strategy oca_type: ${this.toStringValue(value)}`);
   }
 
   private registerRequestBuiltins(): void {

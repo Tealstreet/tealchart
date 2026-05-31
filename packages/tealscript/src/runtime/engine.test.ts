@@ -113,14 +113,101 @@ plot(strategy.initial_capital)`;
     it('records an explicit strategy namespace diagnostic', () => {
       const script = `//@version=6
 indicator("Strategy call")
-strategy.entry("Long", strategy.long)
+strategy.exit("Long exit")
 plot(close)`;
 
       const ast = parse(script);
       const bars = createBars(1);
       const result = executeScript(ast, bars);
 
-      expect(result.errors[0]?.message).toBe('strategy.* functions are not supported yet: strategy.entry');
+      expect(result.errors[0]?.message).toBe('strategy.* functions are not supported yet: strategy.exit');
+    });
+
+    it('records strategy entry and order calls as pending ledger orders', () => {
+      const script = `//@version=6
+strategy("Orders", default_qty_value=1)
+strategy.entry("Long", strategy.long, qty=2, limit=101, stop=99, oca_name="grp", oca_type=strategy.oca.cancel, comment="breakout", alert_message="long")
+strategy.order("Short", strategy.short)
+strategy.cancel("Short")
+plot(strategy.equity)`;
+
+      const bars = createBars(1);
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders).toHaveLength(2);
+      expect(result.strategy.orders[0]).toMatchObject({
+        id: 'Long',
+        direction: 'long',
+        type: 'stop_limit',
+        status: 'pending',
+        qty: 2,
+        qtyType: 'fixed',
+        qtyValue: 2,
+        filledQty: 0,
+        avgFillPrice: null,
+        limitPrice: 101,
+        stopPrice: 99,
+        ocaName: 'grp',
+        ocaType: 'cancel',
+        comment: 'breakout',
+        alertMessage: 'long',
+        createdBarIndex: 0,
+        createdTime: bars[0].time,
+      });
+      expect(result.strategy.orders[1]).toMatchObject({
+        id: 'Short',
+        direction: 'short',
+        type: 'market',
+        status: 'cancelled',
+        qty: 1,
+        qtyType: 'fixed',
+        qtyValue: 1,
+        updatedBarIndex: 0,
+        updatedTime: bars[0].time,
+      });
+    });
+
+    it('cancels all pending strategy orders', () => {
+      const script = `//@version=6
+strategy("Orders")
+strategy.entry("Long", strategy.long)
+strategy.entry("Add", strategy.long, qty=3)
+strategy.cancel_all()`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => order.status)).toEqual(['cancelled', 'cancelled']);
+    });
+
+    it('preserves non-fixed default quantity kind on omitted order qty', () => {
+      const script = `//@version=6
+strategy("Orders", default_qty_type=strategy.percent_of_equity, default_qty_value=10)
+strategy.entry("Long", strategy.long)`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders[0]).toMatchObject({
+        id: 'Long',
+        qty: null,
+        qtyType: 'percent_of_equity',
+        qtyValue: 10,
+      });
+    });
+
+    it('cancels all pending strategy orders that reuse an id', () => {
+      const script = `//@version=6
+strategy("Orders")
+strategy.entry("Long", strategy.long)
+strategy.entry("Long", strategy.long, qty=2)
+strategy.cancel("Long")`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => order.status)).toEqual(['cancelled', 'cancelled']);
     });
   });
 
