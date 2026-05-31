@@ -639,6 +639,122 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(drawnX).toBeCloseTo(expectedX, 0);
     });
 
+    it('routes label drawings from non-overlay scripts into their indicator pane', () => {
+      const fillText = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillText,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+
+      const bars = makeBars(20);
+      const viewport = TealchartRenderer.calculateViewport(bars);
+      const layout: UnifiedPaneLayout = {
+        panes: [
+          {
+            id: 'main',
+            type: 'main',
+            heightRatio: 0.7,
+            yMin: 0,
+            yMax: 0,
+            fixedRange: false,
+          },
+          {
+            id: 'pane_1',
+            type: 'indicator',
+            heightRatio: 0.3,
+            yMin: 0,
+            yMax: 100,
+            fixedRange: true,
+            indicatorIds: ['rsi-script'],
+          },
+        ],
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+      };
+      const drawings: DrawingOutput[] = [
+        {
+          id: 'label-1',
+          type: 'label',
+          scriptId: 'rsi-script',
+          barIndex: 10,
+          x: 10,
+          y: 50,
+          text: 'Pane routed',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_left',
+          color: '#123456',
+          textColor: '#FFFFFF',
+          size: 'normal',
+        },
+      ];
+
+      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+
+      const labelCall = fillText.mock.calls.find((call) => call[0] === 'Pane routed');
+      const mainPaneBottom = (600 - TIME_AXIS_HEIGHT) * 0.7;
+      expect(labelCall).toBeDefined();
+      expect(labelCall?.[2]).toBeGreaterThan(mainPaneBottom);
+    });
+
+    it('keeps overlay label drawings in the main pane when no indicator pane owns the script', () => {
+      const fillText = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillText,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+
+      const bars = makeBars(20);
+      const viewport = TealchartRenderer.calculateViewport(bars);
+      const layout: UnifiedPaneLayout = {
+        panes: [
+          {
+            id: 'main',
+            type: 'main',
+            heightRatio: 0.7,
+            yMin: 0,
+            yMax: 0,
+            fixedRange: false,
+          },
+          {
+            id: 'pane_1',
+            type: 'indicator',
+            heightRatio: 0.3,
+            yMin: 0,
+            yMax: 100,
+            fixedRange: true,
+            indicatorIds: ['rsi-script'],
+          },
+        ],
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+      };
+      const drawings: DrawingOutput[] = [
+        {
+          id: 'label-1',
+          type: 'label',
+          scriptId: 'overlay-script',
+          barIndex: 10,
+          x: 10,
+          y: bars[10]!.close,
+          text: 'Main routed',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_left',
+          color: '#123456',
+          textColor: '#FFFFFF',
+          size: 'normal',
+        },
+      ];
+
+      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+
+      const labelCall = fillText.mock.calls.find((call) => call[0] === 'Main routed');
+      const mainPaneBottom = (600 - TIME_AXIS_HEIGHT) * 0.7;
+      expect(labelCall).toBeDefined();
+      expect(labelCall?.[2]).toBeLessThan(mainPaneBottom);
+    });
+
     it('renders line drawings in the main pane', () => {
       const moveTo = vi.fn();
       const lineTo = vi.fn();
@@ -691,6 +807,62 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(moveTo).toHaveBeenCalledWith(expect.any(Number), expect.any(Number));
       expect(lineTo.mock.calls.at(-1)?.[0]).toBe(renderer.getOptions().width - renderer.getOptions().margins.right);
       expect(stroke).toHaveBeenCalled();
+    });
+
+    it('renders forced-overlay line drawings in the main pane for non-overlay scripts', () => {
+      const strokeStyles: unknown[] = [];
+      const ctx = createMockCtx();
+      ctx.stroke = vi.fn(() => {
+        strokeStyles.push(ctx.strokeStyle);
+      });
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+
+      const bars = makeBars(20);
+      const viewport = TealchartRenderer.calculateViewport(bars);
+      const layout: UnifiedPaneLayout = {
+        panes: [
+          {
+            id: 'main',
+            type: 'main',
+            heightRatio: 0.7,
+            yMin: 0,
+            yMax: 0,
+            fixedRange: false,
+          },
+          {
+            id: 'pane_1',
+            type: 'indicator',
+            heightRatio: 0.3,
+            yMin: 0,
+            yMax: 100,
+            fixedRange: true,
+            indicatorIds: ['rsi-script'],
+          },
+        ],
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+      };
+      const drawings: DrawingOutput[] = [
+        {
+          id: 'line-1',
+          type: 'line',
+          scriptId: 'rsi-script',
+          barIndex: 12,
+          x1: 8,
+          y1: bars[8]!.close,
+          x2: 12,
+          y2: bars[12]!.close,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: '#ABCDEF',
+          style: 'solid',
+          width: 2,
+          forceOverlay: true,
+        },
+      ];
+
+      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+
+      expect(strokeStyles).toContain('#ABCDEF');
     });
 
     it('renders linefill drawings behind line drawings', () => {
