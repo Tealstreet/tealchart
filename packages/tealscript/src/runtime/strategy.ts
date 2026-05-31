@@ -213,6 +213,44 @@ export function submitStrategyOrder(ledger: StrategyLedger, input: StrategyOrder
   return order;
 }
 
+export function fillStrategyMarketOrder(
+  ledger: StrategyLedger,
+  order: StrategyOrder,
+  price: number,
+  barIndex: number,
+  time: number,
+): StrategyFill | null {
+  if (order.status !== 'pending' || order.type !== 'market' || order.qty === null) {
+    return null;
+  }
+  if (!Number.isFinite(price)) {
+    throw new Error('strategy fill price must be finite');
+  }
+
+  order.status = 'filled';
+  order.filledQty = order.qty;
+  order.avgFillPrice = price;
+  order.updatedBarIndex = barIndex;
+  order.updatedTime = time;
+
+  const fill: StrategyFill = {
+    id: `${order.id}:${ledger.fills.length}`,
+    orderId: order.id,
+    entryId: order.fromEntry,
+    direction: order.direction,
+    qty: order.qty,
+    price,
+    commission: 0,
+    slippage: 0,
+    barIndex,
+    time,
+    alertMessage: order.alertMessage,
+  };
+  ledger.fills.push(fill);
+  applyStrategyFillToPosition(ledger, fill);
+  return fill;
+}
+
 export function cancelStrategyOrder(ledger: StrategyLedger, id: string, barIndex: number, time: number): boolean {
   let cancelled = false;
   for (let index = ledger.orders.length - 1; index >= 0; index--) {
@@ -275,4 +313,24 @@ function validateOptionalPrice(value: number | undefined, name: string): void {
   if (value !== undefined && !Number.isFinite(value)) {
     throw new Error(`strategy order ${name} must be finite`);
   }
+}
+
+function applyStrategyFillToPosition(ledger: StrategyLedger, fill: StrategyFill): void {
+  const signedQty = fill.direction === 'long' ? fill.qty : -fill.qty;
+  const currentSize = ledger.position.size;
+  const nextSize = currentSize + signedQty;
+
+  if (currentSize === 0 || Math.sign(currentSize) === Math.sign(signedQty)) {
+    const currentAbs = Math.abs(currentSize);
+    const nextAbs = Math.abs(nextSize);
+    const currentAvg = ledger.position.avgPrice ?? fill.price;
+    ledger.position.avgPrice = nextAbs === 0 ? null : ((currentAvg * currentAbs) + (fill.price * fill.qty)) / nextAbs;
+  } else if (nextSize === 0) {
+    ledger.position.avgPrice = null;
+  } else if (Math.sign(nextSize) !== Math.sign(currentSize)) {
+    ledger.position.avgPrice = fill.price;
+  }
+
+  ledger.position.size = nextSize;
+  ledger.position.direction = nextSize > 0 ? 'long' : nextSize < 0 ? 'short' : null;
 }

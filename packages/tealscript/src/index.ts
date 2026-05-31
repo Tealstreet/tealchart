@@ -85,6 +85,7 @@ export {
   cancelAllStrategyOrders,
   cancelStrategyOrder,
   createStrategyOrder,
+  fillStrategyMarketOrder,
   createStrategyLedger,
   createStrategyPosition,
   submitStrategyOrder,

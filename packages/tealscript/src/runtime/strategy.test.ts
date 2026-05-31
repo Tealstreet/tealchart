@@ -6,6 +6,7 @@ import {
   createStrategyLedger,
   createStrategyOrder,
   createStrategyPosition,
+  fillStrategyMarketOrder,
   submitStrategyOrder,
 } from './strategy';
 
@@ -160,5 +161,38 @@ describe('strategy ledger model', () => {
       barIndex: 0,
       time: 1,
     })).toThrow('strategy order limitPrice must be finite');
+  });
+
+  it('fills market orders and updates position average price', () => {
+    const ledger = createStrategyLedger();
+    const first = submitStrategyOrder(ledger, {
+      id: 'Long',
+      direction: 'long',
+      qty: 2,
+      qtyType: 'fixed',
+      qtyValue: 2,
+      barIndex: 0,
+      time: 1,
+    });
+    const second = submitStrategyOrder(ledger, {
+      id: 'Add',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      barIndex: 1,
+      time: 2,
+    });
+
+    expect(fillStrategyMarketOrder(ledger, first, 100, 0, 1)).toMatchObject({ orderId: 'Long', qty: 2, price: 100 });
+    expect(fillStrategyMarketOrder(ledger, second, 103, 1, 2)).toMatchObject({ orderId: 'Add', qty: 1, price: 103 });
+
+    expect(ledger.orders.map((order) => order.status)).toEqual(['filled', 'filled']);
+    expect(ledger.fills).toHaveLength(2);
+    expect(ledger.position).toMatchObject({
+      direction: 'long',
+      size: 3,
+      avgPrice: 101,
+    });
   });
 });

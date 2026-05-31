@@ -159,20 +159,27 @@ plot(strategy.equity)`;
         id: 'Short',
         direction: 'short',
         type: 'market',
-        status: 'cancelled',
+        status: 'filled',
         qty: 1,
         qtyType: 'fixed',
         qtyValue: 1,
+        filledQty: 1,
+        avgFillPrice: bars[0].close,
         updatedBarIndex: 0,
         updatedTime: bars[0].time,
+      });
+      expect(result.strategy.position).toMatchObject({
+        direction: 'short',
+        size: -1,
+        avgPrice: bars[0].close,
       });
     });
 
     it('cancels all pending strategy orders', () => {
       const script = `//@version=6
 strategy("Orders")
-strategy.entry("Long", strategy.long)
-strategy.entry("Add", strategy.long, qty=3)
+strategy.entry("Long", strategy.long, limit=101)
+strategy.entry("Add", strategy.long, qty=3, limit=102)
 strategy.cancel_all()`;
 
       const result = executeScript(parse(script), createBars(1));
@@ -191,6 +198,7 @@ strategy.entry("Long", strategy.long)`;
       expect(result.errors).toEqual([]);
       expect(result.strategy.orders[0]).toMatchObject({
         id: 'Long',
+        status: 'pending',
         qty: null,
         qtyType: 'percent_of_equity',
         qtyValue: 10,
@@ -200,14 +208,50 @@ strategy.entry("Long", strategy.long)`;
     it('cancels all pending strategy orders that reuse an id', () => {
       const script = `//@version=6
 strategy("Orders")
-strategy.entry("Long", strategy.long)
-strategy.entry("Long", strategy.long, qty=2)
+strategy.entry("Long", strategy.long, limit=101)
+strategy.entry("Long", strategy.long, qty=2, limit=102)
 strategy.cancel("Long")`;
 
       const result = executeScript(parse(script), createBars(1));
 
       expect(result.errors).toEqual([]);
       expect(result.strategy.orders.map((order) => order.status)).toEqual(['cancelled', 'cancelled']);
+    });
+
+    it('fills fixed-size market strategy orders at the current close', () => {
+      const script = `//@version=6
+strategy("Orders")
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.order("Add", strategy.long, qty=1)
+plot(strategy.position_size)
+plot(strategy.position_avg_price)`;
+
+      const bars = createBars(2);
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => order.status)).toEqual(['filled', 'filled']);
+      expect(result.strategy.fills.map(({ orderId, direction, qty, price, barIndex }) => ({
+        orderId,
+        direction,
+        qty,
+        price,
+        barIndex,
+      }))).toEqual([
+        { orderId: 'Long', direction: 'long', qty: 2, price: bars[0].close, barIndex: 0 },
+        { orderId: 'Add', direction: 'long', qty: 1, price: bars[1].close, barIndex: 1 },
+      ]);
+      expect(result.strategy.position).toMatchObject({
+        direction: 'long',
+        size: 3,
+        avgPrice: ((bars[0].close * 2) + bars[1].close) / 3,
+      });
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [2, 3],
+        [bars[0].close, ((bars[0].close * 2) + bars[1].close) / 3],
+      ]);
     });
   });
 
