@@ -109,6 +109,7 @@ export {
   createDefaultStrategySettings,
   cancelAllStrategyOrders,
   cancelStrategyOrder,
+  cloneStrategyLedger,
   createStrategyOrder,
   fillStrategyMarketOrder,
   createStrategyLedger,

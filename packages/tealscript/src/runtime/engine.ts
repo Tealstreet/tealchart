@@ -300,6 +300,10 @@ export class TealscriptEngine {
         functionScope.advanceBar();
       }
       this.resetPerBarBuiltinState();
+      const isLastBar = this.ctx.bar_index === this.ctx.last_bar_index;
+      if (isLastBar) {
+        this.ctx.captureRealtimeRollbackState();
+      }
 
       // Execute all statements
       for (const stmt of ast.body) {
@@ -318,7 +322,6 @@ export class TealscriptEngine {
       }
 
       // Commit bar — only snapshot on the last bar (for realtime rollback)
-      const isLastBar = this.ctx.bar_index === this.ctx.last_bar_index;
       this.scope.commit(isLastBar);
       for (const functionScope of this.functionScopes.values()) {
         functionScope.commit(isLastBar);

@@ -226,7 +226,8 @@ if bar_index == 0
 if bar_index == 1
     strategy.order("Add", strategy.long, qty=1)
 plot(strategy.position_size)
-plot(strategy.position_avg_price)`;
+plot(strategy.position_avg_price)
+plot(strategy.opentrades)`;
 
       const bars = createBars(2);
       const result = executeScript(parse(script), bars);
@@ -248,10 +249,37 @@ plot(strategy.position_avg_price)`;
         size: 3,
         avgPrice: ((bars[0].close * 2) + bars[1].close) / 3,
       });
+      expect(result.strategy.openTrades).toHaveLength(2);
       expect(result.plots.map((plot) => plot.values)).toEqual([
         [2, 3],
         [bars[0].close, ((bars[0].close * 2) + bars[1].close) / 3],
+        [1, 2],
       ]);
+    });
+
+    it('rolls back strategy fills between realtime updateBar calls', () => {
+      const script = `//@version=6
+strategy("Realtime strategy")
+if barstate.islast
+    strategy.entry("Last", strategy.long, qty=1)
+plot(strategy.position_size, title="Position")
+plot(strategy.opentrades, title="Open Trades")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      const result = engine.execute(ast, bars);
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders).toHaveLength(1);
+      expect(result.strategy.fills).toHaveLength(1);
+
+      const firstUpdate = engine.updateBar(ast, { ...bars[2], close: 200 });
+      expect(firstUpdate.find((plot) => plot.title === 'Position')?.values.at(-1)).toBe(1);
+      expect(firstUpdate.find((plot) => plot.title === 'Open Trades')?.values.at(-1)).toBe(1);
+
+      const secondUpdate = engine.updateBar(ast, { ...bars[2], close: 300 });
+      expect(secondUpdate.find((plot) => plot.title === 'Position')?.values.at(-1)).toBe(1);
+      expect(secondUpdate.find((plot) => plot.title === 'Open Trades')?.values.at(-1)).toBe(1);
     });
   });
 

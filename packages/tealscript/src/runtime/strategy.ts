@@ -181,6 +181,25 @@ export function createStrategyLedger(settings: Partial<StrategyLedgerSettings> =
   };
 }
 
+export function cloneStrategyLedger(ledger: StrategyLedger): StrategyLedger {
+  return {
+    settings: { ...ledger.settings },
+    orders: ledger.orders.map((order) => ({ ...order })),
+    fills: ledger.fills.map((fill) => ({ ...fill })),
+    openTrades: ledger.openTrades.map((trade) => ({ ...trade })),
+    closedTrades: ledger.closedTrades.map((trade) => ({ ...trade })),
+    position: { ...ledger.position },
+    equityCurve: ledger.equityCurve.map((point) => ({ ...point })),
+    initialCapital: ledger.initialCapital,
+    equity: ledger.equity,
+    netProfit: ledger.netProfit,
+    grossProfit: ledger.grossProfit,
+    grossLoss: ledger.grossLoss,
+    maxRunup: ledger.maxRunup,
+    maxDrawdown: ledger.maxDrawdown,
+  };
+}
+
 export function createStrategyOrder(input: StrategyOrderInput): StrategyOrder {
   validateStrategyOrderInput(input);
   return {
@@ -247,6 +266,7 @@ export function fillStrategyMarketOrder(
     alertMessage: order.alertMessage,
   };
   ledger.fills.push(fill);
+  applyStrategyFillToTrades(ledger, fill);
   applyStrategyFillToPosition(ledger, fill);
   return fill;
 }
@@ -333,4 +353,68 @@ function applyStrategyFillToPosition(ledger: StrategyLedger, fill: StrategyFill)
 
   ledger.position.size = nextSize;
   ledger.position.direction = nextSize > 0 ? 'long' : nextSize < 0 ? 'short' : null;
+}
+
+function applyStrategyFillToTrades(ledger: StrategyLedger, fill: StrategyFill): void {
+  let remainingQty = fill.qty;
+  const oppositeDirection: StrategyDirection = fill.direction === 'long' ? 'short' : 'long';
+
+  while (remainingQty > 0) {
+    const tradeIndex = ledger.openTrades.findIndex((trade) => trade.direction === oppositeDirection);
+    if (tradeIndex === -1) {
+      break;
+    }
+
+    const trade = ledger.openTrades[tradeIndex];
+    if (!trade) {
+      break;
+    }
+
+    const closedQty = Math.min(remainingQty, trade.qty);
+    const sign = trade.direction === 'long' ? 1 : -1;
+    const profit = (fill.price - trade.entryPrice) * closedQty * sign;
+
+    ledger.closedTrades.push({
+      ...trade,
+      id: `${trade.id}:closed:${ledger.closedTrades.length}`,
+      exitOrderId: fill.orderId,
+      qty: closedQty,
+      exitPrice: fill.price,
+      exitBarIndex: fill.barIndex,
+      exitTime: fill.time,
+      profit,
+      commission: trade.commission + fill.commission,
+    });
+
+    if (closedQty === trade.qty) {
+      ledger.openTrades.splice(tradeIndex, 1);
+    } else {
+      trade.qty -= closedQty;
+    }
+
+    if (profit >= 0) {
+      ledger.grossProfit += profit;
+    } else {
+      ledger.grossLoss += profit;
+    }
+    ledger.netProfit += profit;
+    ledger.equity = ledger.initialCapital + ledger.netProfit;
+    remainingQty -= closedQty;
+  }
+
+  if (remainingQty > 0) {
+    ledger.openTrades.push({
+      id: fill.id,
+      entryOrderId: fill.orderId,
+      direction: fill.direction,
+      qty: remainingQty,
+      entryPrice: fill.price,
+      entryBarIndex: fill.barIndex,
+      entryTime: fill.time,
+      profit: 0,
+      commission: fill.commission,
+      maxRunup: 0,
+      maxDrawdown: 0,
+    });
+  }
 }

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   cancelAllStrategyOrders,
   cancelStrategyOrder,
+  cloneStrategyLedger,
   createDefaultStrategySettings,
   createStrategyLedger,
   createStrategyOrder,
@@ -189,10 +190,80 @@ describe('strategy ledger model', () => {
 
     expect(ledger.orders.map((order) => order.status)).toEqual(['filled', 'filled']);
     expect(ledger.fills).toHaveLength(2);
+    expect(ledger.openTrades.map(({ entryOrderId, direction, qty, entryPrice }) => ({
+      entryOrderId,
+      direction,
+      qty,
+      entryPrice,
+    }))).toEqual([
+      { entryOrderId: 'Long', direction: 'long', qty: 2, entryPrice: 100 },
+      { entryOrderId: 'Add', direction: 'long', qty: 1, entryPrice: 103 },
+    ]);
     expect(ledger.position).toMatchObject({
       direction: 'long',
       size: 3,
       avgPrice: 101,
     });
+  });
+
+  it('closes open trades when opposite market fills reduce exposure', () => {
+    const ledger = createStrategyLedger();
+    const entry = submitStrategyOrder(ledger, {
+      id: 'Long',
+      direction: 'long',
+      qty: 2,
+      qtyType: 'fixed',
+      qtyValue: 2,
+      barIndex: 0,
+      time: 1,
+    });
+    const exit = submitStrategyOrder(ledger, {
+      id: 'Reduce',
+      direction: 'short',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      barIndex: 1,
+      time: 2,
+    });
+
+    fillStrategyMarketOrder(ledger, entry, 100, 0, 1);
+    fillStrategyMarketOrder(ledger, exit, 105, 1, 2);
+
+    expect(ledger.position).toMatchObject({ direction: 'long', size: 1, avgPrice: 100 });
+    expect(ledger.openTrades).toHaveLength(1);
+    expect(ledger.openTrades[0]).toMatchObject({ entryOrderId: 'Long', qty: 1 });
+    expect(ledger.closedTrades).toHaveLength(1);
+    expect(ledger.closedTrades[0]).toMatchObject({
+      entryOrderId: 'Long',
+      exitOrderId: 'Reduce',
+      qty: 1,
+      entryPrice: 100,
+      exitPrice: 105,
+      profit: 5,
+    });
+  });
+
+  it('clones strategy ledgers without sharing mutable arrays', () => {
+    const ledger = createStrategyLedger();
+    const order = submitStrategyOrder(ledger, {
+      id: 'Long',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      barIndex: 0,
+      time: 1,
+    });
+    fillStrategyMarketOrder(ledger, order, 100, 0, 1);
+
+    const cloned = cloneStrategyLedger(ledger);
+    cloned.orders[0]!.status = 'cancelled';
+    cloned.openTrades[0]!.qty = 10;
+    cloned.position.size = 10;
+
+    expect(ledger.orders[0]?.status).toBe('filled');
+    expect(ledger.openTrades[0]?.qty).toBe(1);
+    expect(ledger.position.size).toBe(1);
   });
 });
