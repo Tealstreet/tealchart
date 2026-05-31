@@ -946,6 +946,53 @@ plot(close, title="Close")`;
       expect(() => engine.updateBar(ast, { ...bars[1], close: 101.5 })).toThrow('realtime stop');
     });
 
+    it('captures Pine log levels and formatted messages', () => {
+      const script = `//@version=6
+indicator("Pine Logs")
+if barstate.isfirst
+    log.info("started at {0}", close)
+if bar_index == 1
+    log.warning("bar={0} close={1:#.0}", bar_index, close)
+if barstate.islast
+    log.error(message="finished {0}", close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.logs).toEqual([
+        { level: 'info', barIndex: 0, time: bars[0].time, message: 'started at 100.2' },
+        { level: 'warning', barIndex: 1, time: bars[1].time, message: 'bar=1 close=100.7' },
+        { level: 'error', barIndex: 2, time: bars[2].time, message: 'finished 101.2' },
+      ]);
+    });
+
+    it('rolls back realtime Pine logs before re-executing the current bar', () => {
+      const script = `//@version=6
+indicator("Realtime Pine Logs")
+if barstate.isrealtime
+    log.info("tick {0}", close)
+plot(close, title="Close")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const engine = new TealscriptEngine();
+      const result = engine.execute(ast, bars);
+
+      expect(result.logs).toEqual([]);
+
+      engine.updateBar(ast, { ...bars[1], close: 101.5 });
+      expect(engine.getLogs()).toEqual([
+        { level: 'info', barIndex: 1, time: bars[1].time, message: 'tick 101.5' },
+      ]);
+
+      engine.updateBar(ast, { ...bars[1], close: 102 });
+      expect(engine.getLogs()).toEqual([
+        { level: 'info', barIndex: 1, time: bars[1].time, message: 'tick 102' },
+      ]);
+    });
+
     it('evaluates keyed switch expressions', () => {
       const script = `//@version=6
 indicator("Switch Test")

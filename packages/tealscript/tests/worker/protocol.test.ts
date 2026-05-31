@@ -20,6 +20,7 @@ describe('worker protocol output bundles', () => {
     ],
     drawings: [],
     alerts: [],
+    logs: [],
     inputs: [],
     metadata: {
       generation: 3,
@@ -37,6 +38,7 @@ describe('worker protocol output bundles', () => {
       plots: output.plots,
       drawings: output.drawings,
       alerts: output.alerts,
+      logs: output.logs,
       inputs: output.inputs,
     });
   });
@@ -47,7 +49,7 @@ describe('worker protocol output bundles', () => {
       plots: [],
     };
 
-    expect(getResultOutput(message)).toBe(output);
+    expect(getResultOutput(message)).toEqual(output);
   });
 
   it('normalizes legacy result messages without a bundled output', () => {
@@ -64,6 +66,7 @@ describe('worker protocol output bundles', () => {
       plots: output.plots,
       drawings: output.drawings,
       alerts: output.alerts,
+      logs: [],
       inputs: output.inputs,
     });
   });
