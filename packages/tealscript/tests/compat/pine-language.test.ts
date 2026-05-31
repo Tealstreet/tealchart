@@ -326,6 +326,32 @@ plot(q.value, title="Value")
     ]);
   });
 
+  it('selects imported method overloads by receiver user-defined type', () => {
+    const library = parse(`
+library("PivotTools", true)
+export type Left
+    float x
+export type Right
+    float y
+export method value(Left this) => this.x
+export method value(Right this) => this.y
+`);
+
+    const result = runCompatScript(`
+indicator("Imported receiver overload")
+import TestUser/PivotTools/1 as pivots
+p = pivots.Right.new(close)
+plot(p.value(), title="Value")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/PivotTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Value').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+  });
+
   it('allows exported imported functions to call library-local methods', () => {
     const library = parse(`
 library("PivotTools", true)

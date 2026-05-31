@@ -1438,8 +1438,8 @@ export class TealscriptEngine {
   ): { library: ImportedLibrary; method: FunctionDeclaration } | undefined {
     if (!isPineUdtObject(receiver)) return undefined;
 
-    const [alias] = receiver.typeName.split('.');
-    if (!alias) return undefined;
+    const [alias, receiverTypeName] = receiver.typeName.split('.');
+    if (!alias || !receiverTypeName) return undefined;
 
     const library = this.importedLibraries.get(alias);
     const overloads = library?.methods.get(methodName);
@@ -1447,6 +1447,8 @@ export class TealscriptEngine {
 
     const isInsideSameLibrary = this.currentImportedLibrary()?.alias === alias;
     const method = overloads.find((candidate) => {
+      const receiverAnnotation = this.getTypeAnnotationName(candidate.params[0]?.typeAnnotation);
+      if (receiverAnnotation !== receiverTypeName) return false;
       if (!isInsideSameLibrary && candidate.exported !== true) return false;
       return this.canCallUserFunction(candidate, args, namedArgs);
     });
