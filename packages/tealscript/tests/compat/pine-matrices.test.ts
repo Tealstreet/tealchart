@@ -35,4 +35,52 @@ plot(matrix.is_valid(m) ? 1 : 0, title="Valid")
     expect(roundSeries(getPlot(result, 'Square').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(roundSeries(getPlot(result, 'Valid').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
   });
+
+  it('runs matrix mutation and shape helper idioms', () => {
+    const result = runCompatScript(`
+indicator("Matrix mutation helpers")
+m = matrix.new_int(2, 2, 0)
+m.set(0, 0, 1)
+m.set(0, 1, 2)
+m.set(1, 0, 3)
+m.set(1, 1, 4)
+m.add_row(1, array.from(5, 6))
+removedCol = m.remove_col(1)
+m.add_col(1, array.from(7, 8, 9))
+removedRow = matrix.remove_row(m, 1)
+m.swap_rows(0, 1)
+m.swap_columns(0, 1)
+reversed = m.copy()
+reversed.reverse()
+reshaped = m.copy()
+reshaped.reshape(1, 4)
+transposed = m.transpose()
+filled = m.copy()
+filled.fill(9)
+rowsFromArray = matrix.new_int()
+rowsFromArray.add_row(array.from(10, 11, 12))
+colsFromArray = matrix.new_int()
+colsFromArray.add_col(array.from(13, 14))
+plot(m.get(0, 0), title="Mutated First")
+plot(array.get(removedCol, 1), title="Removed Column Middle")
+plot(array.get(removedRow, 1), title="Removed Row Second")
+plot(matrix.get(reversed, 0, 0), title="Reversed First")
+plot(reshaped.columns(), title="Reshaped Columns")
+plot(transposed.rows(), title="Transposed Rows")
+plot(filled.get(1, 1), title="Filled")
+plot(rowsFromArray.columns(), title="Array Row Columns")
+plot(colsFromArray.rows(), title="Array Column Rows")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Mutated First').values)).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
+    expect(roundSeries(getPlot(result, 'Removed Column Middle').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+    expect(roundSeries(getPlot(result, 'Removed Row Second').values)).toEqual([8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]);
+    expect(roundSeries(getPlot(result, 'Reversed First').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Reshaped Columns').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+    expect(roundSeries(getPlot(result, 'Transposed Rows').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Filled').values)).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
+    expect(roundSeries(getPlot(result, 'Array Row Columns').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Array Column Rows').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+  });
 });

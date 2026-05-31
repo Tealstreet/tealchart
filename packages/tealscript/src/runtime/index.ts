@@ -41,6 +41,16 @@ export {
   copyMatrix,
   matrixRow,
   matrixColumn,
+  fillMatrix,
+  reshapeMatrix,
+  addMatrixRow,
+  addMatrixColumn,
+  removeMatrixRow,
+  removeMatrixColumn,
+  swapMatrixRows,
+  swapMatrixColumns,
+  reverseMatrix,
+  transposeMatrix,
   type PineMatrix,
 } from './matrices';
 

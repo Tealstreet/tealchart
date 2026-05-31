@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { getArrayValue } from './arrays';
+import { createPineArray, getArrayValue, pushArrayValue } from './arrays';
 import {
+  addMatrixColumn,
+  addMatrixRow,
   copyMatrix,
   createPineMatrix,
+  fillMatrix,
   getMatrixColumns,
   getMatrixElementCount,
   getMatrixRows,
@@ -11,7 +14,14 @@ import {
   isPineMatrix,
   matrixColumn,
   matrixRow,
+  removeMatrixColumn,
+  removeMatrixRow,
+  reshapeMatrix,
+  reverseMatrix,
   setMatrixValue,
+  swapMatrixColumns,
+  swapMatrixRows,
+  transposeMatrix,
 } from './matrices';
 
 describe('PineMatrix', () => {
@@ -45,5 +55,71 @@ describe('PineMatrix', () => {
     const matrix = createPineMatrix(1, 1, 0);
     expect(() => getMatrixValue(matrix, 1, 0)).toThrow('Matrix row 1 is out of bounds. row count is 1');
     expect(() => setMatrixValue(matrix, 0, 1, 4)).toThrow('Matrix column 1 is out of bounds. column count is 1');
+  });
+
+  it('mutates rows, columns, and shape', () => {
+    const matrix = createPineMatrix<number>(2, 2, 0);
+    setMatrixValue(matrix, 0, 0, 1);
+    setMatrixValue(matrix, 0, 1, 2);
+    setMatrixValue(matrix, 1, 0, 3);
+    setMatrixValue(matrix, 1, 1, 4);
+
+    addMatrixRow(matrix, 1, matrixRow(matrix, 0));
+    expect(matrix.values).toEqual([1, 2, 1, 2, 3, 4]);
+    expect(removeMatrixColumn(matrix, 1).values).toEqual([2, 2, 4]);
+    expect(matrix.values).toEqual([1, 1, 3]);
+
+    addMatrixColumn(matrix, 1, matrixColumn(matrix, 0));
+    expect(matrix.values).toEqual([1, 1, 1, 1, 3, 3]);
+    expect(removeMatrixRow(matrix, 1).values).toEqual([1, 1]);
+    expect(matrix.values).toEqual([1, 1, 3, 3]);
+
+    swapMatrixRows(matrix, 0, 1);
+    swapMatrixColumns(matrix, 0, 1);
+    expect(matrix.values).toEqual([3, 3, 1, 1]);
+
+    reverseMatrix(matrix);
+    expect(matrix.values).toEqual([1, 1, 3, 3]);
+    reshapeMatrix(matrix, 1, 4);
+    expect(getMatrixRows(matrix)).toBe(1);
+    expect(getMatrixColumns(matrix)).toBe(4);
+  });
+
+  it('fills and transposes matrices', () => {
+    const matrix = createPineMatrix<number>(2, 3, 0);
+    setMatrixValue(matrix, 0, 1, 2);
+    setMatrixValue(matrix, 1, 2, 6);
+
+    const transposed = transposeMatrix(matrix);
+    expect(transposed.rows).toBe(3);
+    expect(transposed.columns).toBe(2);
+    expect(getMatrixValue(transposed, 1, 0)).toBe(2);
+    expect(getMatrixValue(transposed, 2, 1)).toBe(6);
+
+    fillMatrix(matrix, 9);
+    expect(matrix.values).toEqual([9, 9, 9, 9, 9, 9]);
+  });
+
+  it('sizes empty matrices from inserted arrays', () => {
+    const rowValues = createPineArray<number>();
+    pushArrayValue(rowValues, 1);
+    pushArrayValue(rowValues, 2);
+    pushArrayValue(rowValues, 3);
+    const rowMatrix = createPineMatrix<number>();
+
+    addMatrixRow(rowMatrix, undefined, rowValues);
+    expect(getMatrixRows(rowMatrix)).toBe(1);
+    expect(getMatrixColumns(rowMatrix)).toBe(3);
+    expect(rowMatrix.values).toEqual([1, 2, 3]);
+
+    const columnValues = createPineArray<number>();
+    pushArrayValue(columnValues, 4);
+    pushArrayValue(columnValues, 5);
+    const columnMatrix = createPineMatrix<number>();
+
+    addMatrixColumn(columnMatrix, undefined, columnValues);
+    expect(getMatrixRows(columnMatrix)).toBe(2);
+    expect(getMatrixColumns(columnMatrix)).toBe(1);
+    expect(columnMatrix.values).toEqual([4, 5]);
   });
 });

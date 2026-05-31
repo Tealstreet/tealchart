@@ -91,8 +91,11 @@ import {
   withDrawing,
 } from './drawings/helpers';
 import {
+  addMatrixColumn,
+  addMatrixRow,
   copyMatrix,
   createPineMatrix,
+  fillMatrix,
   getMatrixColumns,
   getMatrixElementCount,
   getMatrixRows,
@@ -100,7 +103,14 @@ import {
   isPineMatrix,
   matrixColumn,
   matrixRow,
+  removeMatrixColumn,
+  removeMatrixRow,
+  reshapeMatrix,
+  reverseMatrix,
   setMatrixValue,
+  swapMatrixColumns,
+  swapMatrixRows,
+  transposeMatrix,
   type PineMatrix,
 } from './matrices';
 import { Scope, createRootScope } from './scope';
@@ -3492,6 +3502,21 @@ export class TealscriptEngine {
       }
       return value;
     };
+    const readInsertionArgs = (args: unknown[]): [number | undefined, PineArray | undefined] => {
+      if (args[1] === undefined) {
+        return [undefined, undefined];
+      }
+      if (isPineArray(args[1])) {
+        return [undefined, args[1]];
+      }
+      if (args[2] === undefined) {
+        return [args[1] as number, undefined];
+      }
+      if (!isPineArray(args[2])) {
+        throw new Error('Expected array');
+      }
+      return [args[1] as number, args[2]];
+    };
 
     this.builtins.set('matrix.new', createMatrix);
     this.builtins.set('matrix.new_float', createMatrix);
@@ -3507,6 +3532,45 @@ export class TealscriptEngine {
       setMatrixValue(readMatrix(args[0]), args[1] as number, args[2] as number, args[3]);
       return null;
     });
+    this.builtins.set('matrix.fill', (args) => {
+      fillMatrix(readMatrix(args[0]), args[1]);
+      return null;
+    });
+    this.builtins.set('matrix.reshape', (args) => {
+      reshapeMatrix(readMatrix(args[0]), args[1] as number, args[2] as number);
+      return null;
+    });
+    this.builtins.set('matrix.add_row', (args) => {
+      const [row, values] = readInsertionArgs(args);
+      addMatrixRow(readMatrix(args[0]), row, values);
+      return null;
+    });
+    this.builtins.set('matrix.add_col', (args) => {
+      const [column, values] = readInsertionArgs(args);
+      addMatrixColumn(readMatrix(args[0]), column, values);
+      return null;
+    });
+    this.builtins.set('matrix.add_column', (args) => {
+      const [column, values] = readInsertionArgs(args);
+      addMatrixColumn(readMatrix(args[0]), column, values);
+      return null;
+    });
+    this.builtins.set('matrix.remove_row', (args) => removeMatrixRow(readMatrix(args[0]), args[1] as number));
+    this.builtins.set('matrix.remove_col', (args) => removeMatrixColumn(readMatrix(args[0]), args[1] as number));
+    this.builtins.set('matrix.remove_column', (args) => removeMatrixColumn(readMatrix(args[0]), args[1] as number));
+    this.builtins.set('matrix.swap_rows', (args) => {
+      swapMatrixRows(readMatrix(args[0]), args[1] as number, args[2] as number);
+      return null;
+    });
+    this.builtins.set('matrix.swap_columns', (args) => {
+      swapMatrixColumns(readMatrix(args[0]), args[1] as number, args[2] as number);
+      return null;
+    });
+    this.builtins.set('matrix.reverse', (args) => {
+      reverseMatrix(readMatrix(args[0]));
+      return null;
+    });
+    this.builtins.set('matrix.transpose', (args) => transposeMatrix(readMatrix(args[0])));
     this.builtins.set('matrix.copy', (args) => copyMatrix(readMatrix(args[0])));
     this.builtins.set('matrix.row', (args) => matrixRow(readMatrix(args[0]), args[1] as number));
     this.builtins.set('matrix.col', (args) => matrixColumn(readMatrix(args[0]), args[1] as number));
