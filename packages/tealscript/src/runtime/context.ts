@@ -19,6 +19,7 @@ import type {
 } from './drawings/types';
 import { DrawingStore } from './drawings/store';
 import { Series } from './series';
+import { createStrategyLedger, type StrategyLedger, type StrategyLedgerSettings } from './strategy';
 
 export type {
   BoxDrawingOutput,
@@ -334,6 +335,9 @@ export class ExecutionContext {
 
   /** Pine log.*() events emitted during execution. */
   readonly logs: LogOutput[] = [];
+
+  /** Strategy tester ledger state. */
+  strategyLedger: StrategyLedger = createStrategyLedger();
 
   // =========================================================================
   // Internal State
@@ -854,6 +858,13 @@ export class ExecutionContext {
     return this.logs.map((log) => ({ ...log }));
   }
 
+  /**
+   * Reset strategy ledger from declaration settings.
+   */
+  setStrategyLedger(settings: Partial<StrategyLedgerSettings>): void {
+    this.strategyLedger = createStrategyLedger(settings);
+  }
+
   // =========================================================================
   // Reset
   // =========================================================================
@@ -873,6 +884,7 @@ export class ExecutionContext {
     this.indicatorOverlay = false;
     this.indicatorPrecision = 2;
     this.indicatorMaxBarsBack = undefined;
+    this.strategyLedger = createStrategyLedger();
     this.timeframe = {
       period: '60',
       multiplier: 60,

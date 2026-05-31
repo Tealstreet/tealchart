@@ -68,6 +68,19 @@ export interface IndicatorDeclaration extends BaseNode {
   timeframe?: Expression;
   timeframe_gaps?: Expression;
   dynamic_requests?: Expression;
+  initial_capital?: Expression;
+  currency?: Expression;
+  default_qty_type?: Expression;
+  default_qty_value?: Expression;
+  pyramiding?: Expression;
+  commission_type?: Expression;
+  commission_value?: Expression;
+  slippage?: Expression;
+  margin_long?: Expression;
+  margin_short?: Expression;
+  calc_on_order_fills?: Expression;
+  calc_on_every_tick?: Expression;
+  process_orders_on_close?: Expression;
 }
 
 /**

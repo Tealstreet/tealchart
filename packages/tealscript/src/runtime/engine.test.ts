@@ -29,17 +29,85 @@ function roundSeries(values: Array<number | null>, digits: number = 6): Array<nu
 }
 
 describe('TealscriptEngine', () => {
-  describe('unsupported Pine strategy diagnostics', () => {
-    it('records an explicit strategy declaration diagnostic', () => {
+  describe('Pine strategy declarations', () => {
+    it('applies strategy declaration settings to the ledger', () => {
       const script = `//@version=6
-strategy("Test strategy", overlay=true)
-plot(close)`;
+strategy("Test strategy",
+    overlay=true,
+    initial_capital=25000,
+    currency="EUR",
+    default_qty_type=strategy.percent_of_equity,
+    default_qty_value=10,
+    pyramiding=2,
+    commission_type=strategy.commission.percent,
+    commission_value=0.05,
+    slippage=1,
+    margin_long=50,
+    margin_short=60,
+    calc_on_order_fills=true,
+    calc_on_every_tick=true,
+    process_orders_on_close=true)
+plot(strategy.equity)
+plot(strategy.position_size)`;
 
       const ast = parse(script);
       const bars = createBars(1);
       const result = executeScript(ast, bars);
 
-      expect(result.errors[0]?.message).toBe('strategy() declarations are not supported yet');
+      expect(result.errors).toEqual([]);
+      expect(result.indicatorTitle).toBe('Test strategy');
+      expect(result.strategy.settings).toMatchObject({
+        title: 'Test strategy',
+        initialCapital: 25000,
+        currency: 'EUR',
+        defaultQtyType: 'percent_of_equity',
+        defaultQtyValue: 10,
+        pyramiding: 2,
+        commissionType: 'percent',
+        commissionValue: 0.05,
+        slippageTicks: 1,
+        marginLong: 50,
+        marginShort: 60,
+        calcOnOrderFills: true,
+        calcOnEveryTick: true,
+        processOrdersOnClose: true,
+      });
+      expect(result.strategy.equity).toBe(25000);
+      expect(result.plots.map((plot) => plot.values)).toEqual([[25000], [0]]);
+    });
+
+    it('applies explicit zero and false strategy declaration settings', () => {
+      const script = `//@version=6
+strategy("Zero settings",
+    initial_capital=0,
+    default_qty_value=0,
+    pyramiding=0,
+    commission_value=0,
+    slippage=0,
+    margin_long=0,
+    margin_short=0,
+    calc_on_order_fills=false,
+    calc_on_every_tick=false,
+    process_orders_on_close=false)
+plot(strategy.initial_capital)`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.settings).toMatchObject({
+        initialCapital: 0,
+        defaultQtyValue: 0,
+        pyramiding: 0,
+        commissionValue: 0,
+        slippageTicks: 0,
+        marginLong: 0,
+        marginShort: 0,
+        calcOnOrderFills: false,
+        calcOnEveryTick: false,
+        processOrdersOnClose: false,
+      });
+      expect(result.strategy.equity).toBe(0);
+      expect(result.plots[0]?.values).toEqual([0]);
     });
 
     it('records an explicit strategy namespace diagnostic', () => {
