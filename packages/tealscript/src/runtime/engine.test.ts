@@ -822,12 +822,14 @@ plot(math.random(10, 20, 43), title="Other Seed")`;
       const bars = createBars(6, 100);
       const first = executeScript(ast, bars);
       const second = executeScript(ast, bars);
-      const firstSeeded = first.plots.find((plot) => plot.title === 'Seeded')?.values;
-      const secondSeeded = second.plots.find((plot) => plot.title === 'Seeded')?.values;
-      const otherSeed = first.plots.find((plot) => plot.title === 'Other Seed')?.values;
+      const firstSeeded = first.plots.find((plot) => plot.title === 'Seeded')?.values ?? [];
+      const secondSeeded = second.plots.find((plot) => plot.title === 'Seeded')?.values ?? [];
+      const otherSeed = first.plots.find((plot) => plot.title === 'Other Seed')?.values ?? [];
 
       expect(first.errors).toHaveLength(0);
       expect(second.errors).toHaveLength(0);
+      expect(firstSeeded).toHaveLength(bars.length);
+      expect(otherSeed).toHaveLength(bars.length);
       expect(firstSeeded).toEqual(secondSeeded);
       expect(new Set(firstSeeded).size).toBeGreaterThan(1);
       expect(otherSeed).not.toEqual(firstSeeded);
