@@ -272,6 +272,11 @@ Phases:
 Done means common non-standard chart scripts can request and plot synthetic
 series.
 
+Epic 9 implementation note: ticker constructors and request propagation are
+implemented for indicator calculations. Synthetic strategy/backtest behavior is
+documented as unsupported in `TICKER_DATA_DESIGN.md` and remains owned by Epic
+14's broker-emulator work.
+
 ## Epic 10: Visual Primitives And Plot Parity
 
 Goal: make Pine's non-object visual outputs render faithfully.

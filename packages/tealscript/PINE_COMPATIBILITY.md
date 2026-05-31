@@ -254,6 +254,24 @@ uses a stable execution timestamp, and realtime updates refresh it per
 re-execution. Multi-timeframe aggregation, exchange calendars, and full
 overnight-session day semantics remain planned.
 
+## Request Data And Ticker Coverage
+
+The request data pass covers `request.security()` over deterministic
+host-provided contexts, including same-symbol and other-symbol requests,
+higher-timeframe merging, common `gaps` / `lookahead` behavior,
+`ignore_invalid_symbol`, `calc_bars_count`, tuple expressions, dynamic request
+guards, `request.security_lower_tf()`, and `request.currency_rate()`.
+
+The ticker pass covers `ticker.new()`, `ticker.modify()`, `ticker.standard()`,
+`ticker.inherit()`, `ticker.heikinashi()`, `ticker.renko()`,
+`ticker.linebreak()`, `ticker.kagi()`, and `ticker.pointfigure()` for
+indicator request workflows. Session, adjustment, back-adjustment,
+settlement-as-close, and chart modifiers propagate as opaque request-datafeed
+keys. The in-memory test datafeed derives Heikin-Ashi OHLC when matching base
+bars exist; other non-standard chart contexts must be supplied by the host.
+Synthetic strategy/backtest execution remains unsupported until the strategy
+runtime and broker emulator are implemented.
+
 ## `max_bars_back` Declaration Coverage
 
 `indicator(..., max_bars_back=N)` is parsed and recorded on execution results
