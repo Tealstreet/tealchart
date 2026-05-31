@@ -160,6 +160,7 @@ import {
   type StrategyLedger,
   type StrategyLedgerSettings,
   type StrategyOcaType,
+  type StrategyQuantityType,
 } from './strategy';
 
 /**
@@ -3217,7 +3218,6 @@ export class TealscriptEngine {
     const rawQty = this.toOptionalNumber(this.getCallArg(args, namedArgs, 2, 'qty'));
     const qtyType = rawQty === undefined ? this.ctx.strategyLedger.settings.defaultQtyType : 'fixed';
     const qtyValue = rawQty ?? this.ctx.strategyLedger.settings.defaultQtyValue;
-    const qty = qtyType === 'fixed' ? qtyValue : null;
     const limitPrice = this.toOptionalNumber(this.getCallArg(args, namedArgs, 3, 'limit'));
     const stopPrice = this.toOptionalNumber(this.getCallArg(args, namedArgs, 4, 'stop'));
     const ocaName = this.toOptionalString(this.getCallArg(args, namedArgs, 5, 'oca_name'));
@@ -3231,6 +3231,7 @@ export class TealscriptEngine {
     if (!Number.isFinite(qtyValue) || qtyValue <= 0) {
       throw new Error('strategy order qty must be a positive number');
     }
+    const qty = this.resolveStrategyOrderQty(qtyType, qtyValue, limitPrice, stopPrice);
 
     const order = submitStrategyOrder(this.ctx.strategyLedger, {
       id,
@@ -3256,6 +3257,30 @@ export class TealscriptEngine {
     );
 
     return undefined;
+  }
+
+  private resolveStrategyOrderQty(
+    qtyType: StrategyQuantityType,
+    qtyValue: number,
+    limitPrice: number | undefined,
+    stopPrice: number | undefined,
+  ): number {
+    if (qtyType === 'fixed') {
+      return qtyValue;
+    }
+
+    const priceBasis = limitPrice ?? stopPrice ?? this.ctx.close.get(0) ?? Number.NaN;
+    if (!Number.isFinite(priceBasis) || priceBasis <= 0) {
+      throw new Error('strategy order price basis must be positive for cash or percent sizing');
+    }
+    if (qtyType === 'cash') {
+      return qtyValue / priceBasis;
+    }
+    const qty = (this.ctx.strategyLedger.equity * (qtyValue / 100)) / priceBasis;
+    if (!Number.isFinite(qty) || qty <= 0) {
+      throw new Error('strategy order resolved qty must be a positive number');
+    }
+    return qty;
   }
 
   private fillPendingStrategyOrdersForCurrentBar(): void {
