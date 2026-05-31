@@ -438,7 +438,9 @@ Alertcondition messages keep the static template and expose rendered per-bar
 messages for OHLCV, chart, and plot placeholders. Frequency handling follows
 Pine's alert contract: `freq_all` emits every call, non-`all` alerts emit only
 the first eligible execution per call site per bar, and
-`freq_once_per_bar_close` emits only on confirmed bar executions.
+`freq_once_per_bar_close` emits only on confirmed bar executions. Direct alert
+events include an `isRealtime` marker so consumers can distinguish historical
+calculation events from live update events.
 The checkpoint fixture follows TradingView's
 documented trigger-condition idiom by deriving a boolean condition, registering
 it with `alertcondition()`, and firing a direct `alert()` from an `if` block.
