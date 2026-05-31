@@ -1194,7 +1194,12 @@ export class TealscriptEngine {
   }
 
   private userCallableScopeKey(fn: FunctionDeclaration): string {
-    return fn.isMethod ? `method:${fn.name.name}` : fn.name.name;
+    if (!fn.isMethod) return fn.name.name;
+
+    const locKey = fn.loc
+      ? `${fn.loc.start.line}:${fn.loc.start.column}-${fn.loc.end.line}:${fn.loc.end.column}`
+      : `${fn.params.map((param) => param.typeAnnotation?.baseType ?? 'any').join(',')}#${fn.params.length}`;
+    return `method:${fn.name.name}:${locKey}`;
   }
 
   private findCallableUserMethod(
@@ -1777,9 +1782,15 @@ export class TealscriptEngine {
       if (!paramNames.has(argName)) return false;
     }
 
-    return fn.params.every((param, index) => {
+    const noDuplicateBindings = fn.params.every((param, index) => {
       const hasPositionalValue = index < args.length;
       return !(hasPositionalValue && namedArgs.has(param.name));
+    });
+    if (!noDuplicateBindings) return false;
+
+    return fn.params.every((param, index) => {
+      const hasValue = index < args.length || namedArgs.has(param.name);
+      return hasValue || param.defaultValue;
     });
   }
 
