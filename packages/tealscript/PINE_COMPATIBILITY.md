@@ -65,6 +65,9 @@ Covered behavior and remaining gaps:
   `else if` / `else` branches.
 - User-defined function bodies can return the last expression result from
   numeric `for`, collection `for ... in`, and `while` loop bodies.
+- Numeric `for`, collection `for ... in`, and `while` loops can be used as
+  expressions. The expression value is the last body expression reached,
+  including across `break` and `continue` control flow.
 - User-defined function parameters support Pine-style default arguments. Default
   expressions are evaluated at the call site when the caller omits the
   corresponding positional or named argument.

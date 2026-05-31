@@ -594,6 +594,12 @@ export class TealscriptEngine {
       case 'SwitchExpression':
         return this.evaluateSwitch(expr);
 
+      case 'ForStatement':
+        return this.evaluateLoopExpression(this.executeFunctionFor(expr));
+
+      case 'WhileStatement':
+        return this.evaluateLoopExpression(this.executeFunctionWhile(expr));
+
       case 'CallExpression':
         return this.evaluateCall(expr);
 
@@ -609,6 +615,10 @@ export class TealscriptEngine {
       default:
         throw new Error(`Unknown expression type: ${(expr as Expression).type}`);
     }
+  }
+
+  private evaluateLoopExpression(result: { hasResult: boolean; value?: unknown }): unknown {
+    return result.hasResult ? result.value : NaN;
   }
 
   private evaluateIdentifier(expr: Identifier): unknown {
