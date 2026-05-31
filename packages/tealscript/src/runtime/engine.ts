@@ -3510,6 +3510,7 @@ export class TealscriptEngine {
       return value;
     };
 
+    this.builtins.set('array.new', createArray);
     this.builtins.set('array.new_float', createArray);
     this.builtins.set('array.new_int', createArray);
     this.builtins.set('array.new_bool', createArray);
