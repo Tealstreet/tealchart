@@ -3380,6 +3380,11 @@ export class TealscriptEngine {
       const session = this.normalizeTickerSession(namedArgs.get('session') ?? args[1]);
       return this.applyTickerSession(tickerId, session);
     });
+
+    this.builtins.set('ticker.heikinashi', (args, namedArgs) => {
+      const tickerId = this.toStringValue(namedArgs.get('symbol') ?? namedArgs.get('tickerid') ?? args[0] ?? '');
+      return this.applyTickerChart(tickerId, 'heikinashi');
+    });
   }
 
   private normalizeTickerSession(value: unknown): 'regular' | 'extended' | undefined {
@@ -3413,6 +3418,16 @@ export class TealscriptEngine {
       return withoutSession;
     }
     return `${withoutSession}|session=extended`;
+  }
+
+  private applyTickerChart(tickerId: string, chart: string): string {
+    const base = tickerId.trim();
+    if (base === '') {
+      throw new Error(`ticker.${chart} requires a non-empty ticker id`);
+    }
+
+    const withoutChart = base.replace(/\|chart=[^|]+/gu, '');
+    return `${withoutChart}|chart=${chart}`;
   }
 
   /**
