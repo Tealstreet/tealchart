@@ -385,6 +385,47 @@ plot(strategy.opentrades.entry_price())`;
       expect(result.errors[0]?.message).toBe('strategy trade_num is required');
     });
 
+    it('exposes basic strategy.closedtrades accessors', () => {
+      const script = `//@version=6
+strategy("Closed access",
+    commission_type=strategy.commission.cash_per_order,
+    commission_value=2)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.close("Long")
+plot(strategy.closedtrades.entry_id(0) == "Long" ? 1 : 0, title="Entry Id")
+plot(strategy.closedtrades.exit_id(0) == "Close Long" ? 1 : 0, title="Exit Id")
+plot(strategy.closedtrades.entry_price(0), title="Entry Price")
+plot(strategy.closedtrades.exit_price(0), title="Exit Price")
+plot(strategy.closedtrades.entry_bar_index(0), title="Entry Bar")
+plot(strategy.closedtrades.exit_bar_index(0), title="Exit Bar")
+plot(strategy.closedtrades.entry_time(0), title="Entry Time")
+plot(strategy.closedtrades.exit_time(0), title="Exit Time")
+plot(strategy.closedtrades.size(0), title="Size")
+plot(strategy.closedtrades.profit(0), title="Profit")
+plot(strategy.closedtrades.commission(0), title="Commission")
+plot(strategy.closedtrades.profit(99), title="Missing")`;
+
+      const bars = createBars(2);
+      const result = executeScript(parse(script), bars);
+      const grossProfit = (bars[1].close - bars[0].close) * 2;
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Entry Id')?.values).toEqual([0, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Exit Id')?.values).toEqual([0, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Entry Price')?.values).toEqual([null, bars[0].close]);
+      expect(result.plots.find((plot) => plot.title === 'Exit Price')?.values).toEqual([null, bars[1].close]);
+      expect(result.plots.find((plot) => plot.title === 'Entry Bar')?.values).toEqual([null, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Exit Bar')?.values).toEqual([null, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Entry Time')?.values).toEqual([null, bars[0].time]);
+      expect(result.plots.find((plot) => plot.title === 'Exit Time')?.values).toEqual([null, bars[1].time]);
+      expect(result.plots.find((plot) => plot.title === 'Size')?.values).toEqual([null, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Profit')?.values).toEqual([null, grossProfit]);
+      expect(result.plots.find((plot) => plot.title === 'Commission')?.values).toEqual([null, 4]);
+      expect(result.plots.find((plot) => plot.title === 'Missing')?.values).toEqual([null, null]);
+    });
+
     it('rolls back strategy fills between realtime updateBar calls', () => {
       const script = `//@version=6
 strategy("Realtime strategy")
