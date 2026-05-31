@@ -2232,6 +2232,30 @@ plot(close, title="Close")`;
       expect(close2.values[close2.values.length - 1]).toBe(300);
     });
 
+    it('rolls back map mutations between updateBar calls', () => {
+      const script = `//@version=6
+indicator("Map Rollback")
+var m = map.new<string, float>()
+if barstate.islast
+    m.put("last", close)
+plot(m.get("last"), title="Last")`;
+
+      const ast = parse(script);
+      const bars = createBars(5, 100);
+      const engine = new TealscriptEngine();
+
+      engine.execute(ast, bars);
+
+      const plots1 = engine.updateBar(ast, { ...bars[4], close: 200 });
+      const last1 = plots1.find((p) => p.title === 'Last')!;
+      expect(last1.values[last1.values.length - 1]).toBe(200);
+
+      const plots2 = engine.updateBar(ast, { ...bars[4], close: 300 });
+      const last2 = plots2.find((p) => p.title === 'Last')!;
+      expect(last2.values.length).toBe(bars.length);
+      expect(last2.values[last2.values.length - 1]).toBe(300);
+    });
+
     it('snapshot is only taken on the last bar', () => {
       const script = `//@version=6
 indicator("Test")

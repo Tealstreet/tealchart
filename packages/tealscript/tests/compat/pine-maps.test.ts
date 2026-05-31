@@ -60,4 +60,35 @@ plot(array.get(copy.keys(), 1) == "B" ? 1 : 0, title="Existing Order")
     expect(roundSeries(getPlot(result, 'Merged New').values)).toEqual([30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30]);
     expect(roundSeries(getPlot(result, 'Existing Order').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
   });
+
+  it('runs Pine generic map constructor and declaration idioms', () => {
+    const result = runCompatScript(`
+indicator("Generic map syntax")
+var map<string, int> data = map.new<string, int>()
+data.put("Rising", bar_index)
+data.put("Falling", bar_index - 1)
+plot(data.contains("Rising") ? 1 : 0, title="Contains")
+plot(data.get("Rising") - data.get("Falling"), title="Difference")
+plot(na(data.remove("Missing")) ? 1 : 0, title="Missing Remove")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Contains').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Difference').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Missing Remove').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+  });
+
+  it('prefers scoped map receivers over the map namespace', () => {
+    const result = runCompatScript(`
+indicator("Map receiver shadowing")
+map = map.new()
+map.put("A", 7)
+plot(map.size(), title="Size")
+plot(map.get("A"), title="Value")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Size').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Value').values)).toEqual([7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]);
+  });
 });

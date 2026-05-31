@@ -387,6 +387,8 @@ export interface TypeAnnotation extends BaseNode {
   baseType: PineType;
   isArray?: boolean;
   elementType?: PineType;
+  keyType?: PineType;
+  valueType?: PineType;
 }
 
 export type PineType =
@@ -399,7 +401,9 @@ export type PineType =
   | 'simple'
   | 'const'
   | 'input'
-  | 'array';
+  | 'array'
+  | 'matrix'
+  | 'map';
 
 // ============================================================================
 // Helper Types
