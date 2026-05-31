@@ -91,4 +91,25 @@ plot(map.get("A"), title="Value")
     expect(roundSeries(getPlot(result, 'Size').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(roundSeries(getPlot(result, 'Value').values)).toEqual([7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]);
   });
+
+  it('iterates map key-value pairs in insertion order', () => {
+    const result = runCompatScript(`
+indicator("Map loops")
+m = map.new<string, int>()
+m.put("A", 1)
+m.put("B", 2)
+m.put("C", 3)
+keyScore = 0
+valueSum = 0
+for [key, value] in m
+    keyScore += key == "A" ? 100 : key == "B" ? 10 : 1
+    valueSum += value
+plot(keyScore, title="Key Score")
+plot(valueSum, title="Value Sum")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Key Score').values)).toEqual([111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111]);
+    expect(roundSeries(getPlot(result, 'Value Sum').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+  });
 });
