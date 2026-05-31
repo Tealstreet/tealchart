@@ -64,14 +64,49 @@ describe('partitionTealScriptDrawings', () => {
       style: 'label_left',
       size: 'normal',
     } satisfies DrawingOutput;
+    const polyline = {
+      type: 'polyline',
+      id: 'polyline-1',
+      scriptId: 'script-1',
+      barIndex: 0,
+      points: [
+        { type: 'chart.point', time: null, index: 0, price: 1 },
+        { type: 'chart.point', time: null, index: 1, price: 2 },
+      ],
+      curved: false,
+      closed: false,
+      xloc: 'bar_index',
+      lineColor: '#2962FF',
+      fillColor: null,
+      lineStyle: 'solid',
+      lineWidth: 1,
+    } satisfies DrawingOutput;
+    const table = {
+      type: 'table',
+      id: 'table-1',
+      scriptId: 'script-1',
+      barIndex: 0,
+      position: 'top_right',
+      columns: 1,
+      rows: 1,
+      bgcolor: null,
+      frameColor: null,
+      frameWidth: 1,
+      borderColor: null,
+      borderWidth: 1,
+      cells: [],
+      forceOverlay: true,
+    } satisfies DrawingOutput;
     const line2 = { ...line1, id: 'line-2', x1: 2, x2: 3 } satisfies DrawingOutput;
 
-    const partition = partitionTealScriptDrawings([line1, box, linefill, label, line2]);
+    const partition = partitionTealScriptDrawings([line1, box, linefill, label, polyline, table, line2]);
 
     expect(partition.lines).toEqual([line1, line2]);
     expect(partition.boxes).toEqual([box]);
     expect(partition.linefills).toEqual([linefill]);
     expect(partition.labels).toEqual([label]);
+    expect(partition.polylines).toEqual([polyline]);
+    expect(partition.tables).toEqual([table]);
     expect(partition.linesById.get('line-1')).toBe(line1);
     expect(partition.linesById.get('line-2')).toBe(line2);
   });
@@ -83,6 +118,8 @@ describe('partitionTealScriptDrawings', () => {
     expect(partition.labels).toEqual([]);
     expect(partition.lines).toEqual([]);
     expect(partition.linefills).toEqual([]);
+    expect(partition.polylines).toEqual([]);
+    expect(partition.tables).toEqual([]);
     expect(partition.linesById.size).toBe(0);
   });
 });

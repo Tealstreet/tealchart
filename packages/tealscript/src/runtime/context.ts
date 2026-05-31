@@ -10,7 +10,6 @@
 
 import type {
   BoxDrawingOutput,
-  ChartPoint,
   DrawingLimits,
   DrawingObjectType,
   DrawingOutput,
