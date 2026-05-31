@@ -56,6 +56,94 @@ plot(close)`;
     });
   });
 
+  describe('user-defined types', () => {
+    it('constructs objects and reads fields', () => {
+      const script = `//@version=6
+indicator("UDT Constructor")
+type pivotPoint
+    int x
+    float y
+    float strength = 1.5
+point = pivotPoint.new(bar_index, close)
+plot(point.x, title="X")
+plot(point.y, title="Y")
+plot(point.strength, title="Strength")`;
+
+      const result = executeScript(parse(script), createBars(3));
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'X')?.values).toEqual([0, 1, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Y')?.values).toEqual([100.2, 100.7, 101.2]);
+      expect(result.plots.find((plot) => plot.title === 'Strength')?.values).toEqual([1.5, 1.5, 1.5]);
+    });
+
+    it('supports named constructor arguments and field reassignment', () => {
+      const script = `//@version=6
+indicator("UDT Fields")
+type accumulator
+    float total = 0
+    float last = na
+var acc = accumulator.new(last=close)
+acc.total += close
+acc.last := close
+plot(acc.total, title="Total")
+plot(acc.last, title="Last")`;
+
+      const result = executeScript(parse(script), createBars(3));
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Total')?.values).toEqual([100.2, 200.9, 302.1]);
+      expect(result.plots.find((plot) => plot.title === 'Last')?.values).toEqual([100.2, 100.7, 101.2]);
+    });
+
+    it('uses reference semantics for assigned objects', () => {
+      const script = `//@version=6
+indicator("UDT References")
+type boxState
+    float value = 0
+left = boxState.new(1)
+right = left
+right.value := 5
+plot(left.value, title="Left")
+plot(right.value, title="Right")`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Left')?.values).toEqual([5]);
+      expect(result.plots.find((plot) => plot.title === 'Right')?.values).toEqual([5]);
+    });
+
+    it('rolls back realtime field mutations between updateBar calls', () => {
+      const script = `//@version=6
+indicator("UDT Rollback")
+type state
+    float last = na
+    float firstUpdate = na
+var s = state.new()
+if barstate.islast and barstate.isrealtime
+    if na(s.firstUpdate)
+        s.firstUpdate := close
+    s.last := close
+plot(s.last, title="Last")
+plot(s.firstUpdate, title="First Update")`;
+
+      const ast = parse(script);
+      const bars = createBars(5, 100);
+      const engine = new TealscriptEngine();
+      const result = engine.execute(ast, bars);
+      expect(result.errors).toEqual([]);
+
+      const plots1 = engine.updateBar(ast, { ...bars[4], close: 200 });
+      expect(plots1.find((plot) => plot.title === 'Last')?.values.at(-1)).toBe(200);
+      expect(plots1.find((plot) => plot.title === 'First Update')?.values.at(-1)).toBe(200);
+
+      const plots2 = engine.updateBar(ast, { ...bars[4], close: 300 });
+      expect(plots2.find((plot) => plot.title === 'Last')?.values.at(-1)).toBe(300);
+      expect(plots2.find((plot) => plot.title === 'First Update')?.values.at(-1)).toBe(300);
+    });
+  });
+
   describe('basic execution', () => {
     it('executes a simple script', () => {
       const script = `//@version=6
