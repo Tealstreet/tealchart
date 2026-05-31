@@ -296,8 +296,10 @@ drawing output. The label mutation pass covers persistent `var` label handles,
 `label.set_color()`, `label.set_textcolor()`, `label.set_size()`,
 `label.set_tooltip()`, matching scalar getters (`get_x`, `get_y`, `get_xloc`,
 `get_yloc`, `get_text`, `get_style`, `get_color`, `get_textcolor`,
-`get_size`, `get_tooltip`), `label.copy()`, and `label.delete()`. Rendering,
-GC limits, full style parity, and realtime rollback parity remain planned.
+`get_size`, `get_tooltip`), `label.copy()`, and `label.delete()`. Rendering
+routes labels to the script pane: overlay scripts use the main pane, non-overlay
+scripts use their indicator pane. GC limits, full style parity, and realtime
+rollback parity remain planned.
 
 The line drawing pass covers common trendline/channel idioms. `line.new()`
 accepts positional or named `x1`, `y1`, `x2`, and `y2` arguments plus common
@@ -308,13 +310,15 @@ mutation pass covers persistent `var` line handles, `line.set_x1()`,
 `line.set_xy2()`, `line.set_xloc()`, `line.set_extend()`,
 `line.set_color()`, `line.set_style()`, `line.set_width()`, scalar coordinate
 getters, `line.get_price()`, `line.copy()`, and `line.delete()`. Rendering
-covers main-pane line segments with basic color/style/width and horizontal
-extension support. `linefill.new()` records fills between two line handles;
+routes line segments to the script pane with basic color/style/width and
+horizontal extension support. `force_overlay` lines render in the main pane
+even when created by non-overlay scripts. `linefill.new()` records fills between
+two line handles;
 `linefill.set_color()`, `linefill.get_line1()`, `linefill.get_line2()`, and
-`linefill.delete()` are supported, and the renderer fills between resolved
-main-pane line segments. `linefill.new()` rejects missing or non-line handles
-without creating a drawing. `chart.point` overloads, GC limits, full arrow
-style geometry, and full realtime rollback parity remain planned.
+`linefill.delete()` are supported, and the renderer fills between resolved line
+segments in the routed script pane. `linefill.new()` rejects missing or non-line
+handles without creating a drawing. `chart.point` overloads, GC limits, full
+arrow style geometry, and full realtime rollback parity remain planned.
 
 The box drawing pass covers common supply/demand zone idioms. `box.new()`
 accepts positional or named `left`, `top`, `right`, and `bottom` arguments plus
@@ -322,9 +326,9 @@ common border, fill, text, `extend`, and `xloc` options. The runtime supports
 persistent `var` box handles, geometry setters (`set_left`, `set_right`,
 `set_top`, `set_bottom`, `set_lefttop`, `set_rightbottom`), style/text setters,
 coordinate/color/text getters, `box.copy()`, and `box.delete()`. Rendering
-covers main-pane filled rectangles with borders and a simple text label. Full
-text layout, `chart.point` overloads, GC limits, and complete Pine styling
-remain planned.
+routes filled rectangles to the script pane with borders and a simple text
+label. Full text layout, `chart.point` overloads, GC limits, and complete Pine
+styling remain planned.
 
 ## Drawing Diagnostic Coverage
 

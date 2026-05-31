@@ -197,3 +197,8 @@ Phases:
 4. Use the pane-aware path as the required base for polyline and table work.
 
 Done means future visual object parity builds on the correct rendering model.
+
+Status: Implemented. Tealchart now routes TealScript drawing outputs to the
+main pane for overlay scripts and missing pane ownership, to indicator panes for
+non-overlay scripts, and to the main pane for line drawings with
+`force_overlay`.
