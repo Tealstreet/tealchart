@@ -426,6 +426,33 @@ plot(strategy.closedtrades.profit(99), title="Missing")`;
       expect(result.plots.find((plot) => plot.title === 'Missing')?.values).toEqual([null, null]);
     });
 
+    it('exposes strategy trade outcome counters', () => {
+      const script = `//@version=6
+strategy("Trade counters")
+if bar_index == 0
+    strategy.entry("Win", strategy.long, qty=1)
+if bar_index == 1
+    strategy.close("Win")
+if bar_index == 2
+    strategy.entry("Loss", strategy.short, qty=1)
+if bar_index == 3
+    strategy.close("Loss")
+if bar_index == 4
+    strategy.entry("Even", strategy.long, qty=1)
+    strategy.close("Even")
+plot(strategy.wintrades, title="Wins")
+plot(strategy.losstrades, title="Losses")
+plot(strategy.eventrades, title="Evens")`;
+
+      const result = executeScript(parse(script), createBars(5));
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Wins')?.values).toEqual([0, 1, 1, 1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Losses')?.values).toEqual([0, 0, 0, 1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Evens')?.values).toEqual([0, 0, 0, 0, 1]);
+      expect(result.strategy.closedTrades.map((trade) => trade.profit)).toEqual([0.5, -0.5, 0]);
+    });
+
     it('rolls back strategy fills between realtime updateBar calls', () => {
       const script = `//@version=6
 strategy("Realtime strategy")
