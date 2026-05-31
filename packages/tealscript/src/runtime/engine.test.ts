@@ -1025,8 +1025,15 @@ if bar_index == 0
 if bar_index == 1
     strategy.exit("Trail", "Long", trail_points=0.5, trail_offset=0.4)
 plot(strategy.position_size)`;
+      const baseTime = Date.now() - 240000;
+      const bars: Bar[] = [
+        { time: baseTime, open: 100, high: 100.5, low: 99.5, close: 100, volume: 1000 },
+        { time: baseTime + 60000, open: 100.2, high: 100.6, low: 99.8, close: 100.4, volume: 1000 },
+        { time: baseTime + 120000, open: 101, high: 101.5, low: 100.8, close: 101.2, volume: 1000 },
+        { time: baseTime + 180000, open: 101, high: 101, low: 100.9, close: 101, volume: 1000 },
+      ];
 
-      const result = executeScript(parse(script), createBars(3));
+      const result = executeScript(parse(script), bars);
 
       expect(result.errors).toEqual([]);
       expect(result.strategy.orders.map((order) => ({
@@ -1048,22 +1055,22 @@ plot(strategy.position_size)`;
           trailOffset: undefined,
           trailingActivated: false,
           trailingStopPrice: undefined,
-          avgFillPrice: 100.2,
+          avgFillPrice: 100,
           updatedBarIndex: 0,
         },
         {
           id: 'Trail',
           type: 'trailing_stop',
           status: 'filled',
-          trailActivationPrice: 100.7,
+          trailActivationPrice: 100.5,
           trailOffset: 0.4,
           trailingActivated: true,
           trailingStopPrice: 101.1,
           avgFillPrice: 101.1,
-          updatedBarIndex: 2,
+          updatedBarIndex: 3,
         },
       ]);
-      expect(result.strategy.closedTrades[0]?.profit).toBeCloseTo(0.9);
+      expect(result.strategy.closedTrades[0]?.profit).toBeCloseTo(1.1);
     });
 
     it('fills short strategy.exit trailing stops after activation', () => {
@@ -1074,11 +1081,12 @@ if bar_index == 0
 if bar_index == 1
     strategy.exit("Trail", "Short", trail_points=0.5, trail_offset=0.25)
 plot(strategy.position_size)`;
-      const baseTime = Date.now() - 180000;
+      const baseTime = Date.now() - 240000;
       const bars: Bar[] = [
         { time: baseTime, open: 100, high: 101, low: 99, close: 100, volume: 1000 },
         { time: baseTime + 60000, open: 99.8, high: 100, low: 99, close: 99.5, volume: 1000 },
         { time: baseTime + 120000, open: 99, high: 99.4, low: 98.5, close: 99, volume: 1000 },
+        { time: baseTime + 180000, open: 98.7, high: 98.8, low: 98.6, close: 98.7, volume: 1000 },
       ];
 
       const result = executeScript(parse(script), bars);
@@ -1093,9 +1101,38 @@ plot(strategy.position_size)`;
         trailingActivated: true,
         trailingStopPrice: 98.75,
         avgFillPrice: 98.75,
-        updatedBarIndex: 2,
+        updatedBarIndex: 3,
       });
       expect(result.strategy.closedTrades[0]?.profit).toBeCloseTo(1.25);
+    });
+
+    it('uses weighted entry price for multi-fill strategy.exit trail_points activation', () => {
+      const script = `//@version=6
+strategy("Weighted trail", pyramiding=1)
+if bar_index == 0
+    strategy.entry("A", strategy.long, qty=1)
+if bar_index == 1
+    strategy.entry("B", strategy.long, qty=3)
+if bar_index == 2
+    strategy.exit("Trail", trail_points=1, trail_offset=0.5)
+plot(strategy.opentrades)`;
+      const baseTime = Date.now() - 180000;
+      const bars: Bar[] = [
+        { time: baseTime, open: 100, high: 101, low: 99, close: 100, volume: 1000 },
+        { time: baseTime + 60000, open: 102, high: 103, low: 101, close: 102, volume: 1000 },
+        { time: baseTime + 120000, open: 102, high: 102, low: 101, close: 101.5, volume: 1000 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders[2]).toMatchObject({
+        id: 'Trail',
+        type: 'trailing_stop',
+        status: 'pending',
+        trailActivationPrice: 102.5,
+        trailOffset: 0.5,
+      });
     });
   });
 

@@ -3513,7 +3513,7 @@ export class TealscriptEngine {
 
   private resolveStrategyTrailActivationPrice(
     direction: StrategyDirection,
-    trades: Array<{ entryPrice: number }>,
+    trades: Array<{ entryPrice: number; qty?: number }>,
     trailPrice: number | undefined,
     trailPoints: number | undefined,
   ): number | undefined {
@@ -3526,7 +3526,22 @@ export class TealscriptEngine {
     if (!Number.isFinite(trailPoints) || trailPoints < 0) {
       throw new Error('strategy.exit trail_points must be a non-negative number');
     }
-    const entryPrice = trades[0]?.entryPrice;
+    let weightedTotal = 0;
+    let totalQty = 0;
+    let unweightedTotal = 0;
+    for (const trade of trades) {
+      unweightedTotal += trade.entryPrice;
+      const qty = trade.qty;
+      if (qty !== undefined && Number.isFinite(qty) && qty > 0) {
+        weightedTotal += trade.entryPrice * qty;
+        totalQty += qty;
+      }
+    }
+    const entryPrice = totalQty > 0
+      ? weightedTotal / totalQty
+      : trades.length > 0
+        ? unweightedTotal / trades.length
+        : undefined;
     if (entryPrice === undefined) {
       return undefined;
     }
