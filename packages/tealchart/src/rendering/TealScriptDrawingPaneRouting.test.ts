@@ -1,9 +1,14 @@
 import type { DrawingOutput } from '@tealstreet/tealscript';
 import type { ComputedPane } from '../types';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import { routeTealScriptDrawings } from './TealScriptDrawingPaneRouting';
+
+afterEach(() => {
+  clearChartStoreCache();
+});
 
 const mainPane: ComputedPane = {
   id: 'main',
@@ -89,6 +94,15 @@ describe('routeTealScriptDrawings', () => {
 
   it('routes forced-overlay drawings to the main pane even when their script has an indicator pane', () => {
     const drawing = line({ forceOverlay: true });
+
+    const routed = routeTealScriptDrawings([drawing], [mainPane, indicatorPane]);
+
+    expect(routed.main).toEqual([drawing]);
+    expect(routed.byPaneId.size).toBe(0);
+  });
+
+  it('routes forced-overlay labels to the main pane', () => {
+    const drawing = label({ forceOverlay: true });
 
     const routed = routeTealScriptDrawings([drawing], [mainPane, indicatorPane]);
 

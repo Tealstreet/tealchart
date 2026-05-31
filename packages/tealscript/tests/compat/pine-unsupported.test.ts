@@ -41,16 +41,14 @@ plot(map.get(0))
     expect(result.plots[0]?.values).toEqual([102]);
   });
 
-  it('reports planned visual and ticker namespace calls explicitly', () => {
+  it('reports planned ticker namespace calls explicitly', () => {
     const result = runCompatScript(`
-indicator("Unsupported visuals")
-polyline.new()
+indicator("Unsupported ticker")
 ticker.rangebar(syminfo.tickerid, 10)
 plot(close)
 `, { bars: [compatibilityBars[0]!] });
 
     expect(result.errors.map((error) => error.message)).toEqual([
-      'polyline.* functions are not supported yet: polyline.new',
       'ticker.* functions are not supported yet: ticker.rangebar',
     ]);
   });

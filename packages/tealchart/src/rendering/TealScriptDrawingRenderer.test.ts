@@ -3,18 +3,25 @@ import type {
   LabelDrawingOutput,
   LineDrawingOutput,
   LineFillDrawingOutput,
+  PolylineDrawingOutput,
+  TableDrawingOutput,
 } from '@tealstreet/tealscript';
 import type { Bar, ComputedPane } from '../types';
 import type { CanvasContext } from './CanvasContext';
 
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from '../types';
+import { clearChartStoreCache } from '../state/chartState';
 import { partitionTealScriptDrawings } from './TealScriptDrawingPartition';
 import { TealScriptDrawingRenderer } from './TealScriptDrawingRenderer';
 
+afterEach(() => {
+  clearChartStoreCache();
+});
+
 function createRecordingContext(events: string[]): CanvasContext {
-  return {
+  const context: CanvasContext = {
     fillStyle: '',
     strokeStyle: '',
     lineWidth: 1,
@@ -36,7 +43,10 @@ function createRecordingContext(events: string[]): CanvasContext {
     stroke: () => events.push('stroke'),
     fillRect: (x, y, width, height) => events.push(`fillRect:${x},${y},${width},${height}`),
     strokeRect: (x, y, width, height) => events.push(`strokeRect:${x},${y},${width},${height}`),
-    fillText: (text, x, y) => events.push(`fillText:${text}:${x},${y}`),
+    fillText: (text, x, y) => {
+      events.push(`fillTextStyle:${context.textAlign},${context.textBaseline}`);
+      events.push(`fillText:${text}:${x},${y}`);
+    },
     save: () => events.push('save'),
     restore: () => events.push('restore'),
     clip: () => events.push('clip'),
@@ -46,6 +56,7 @@ function createRecordingContext(events: string[]): CanvasContext {
     getLineDash: () => [],
     measureText: (text) => ({ width: text.length * 8 }) as TextMetrics,
   };
+  return context;
 }
 
 const bars: Bar[] = [
@@ -136,6 +147,56 @@ function makeLinefill(overrides: Partial<LineFillDrawingOutput> = {}): LineFillD
   };
 }
 
+function makePolyline(overrides: Partial<PolylineDrawingOutput> = {}): PolylineDrawingOutput {
+  return {
+    id: 'polyline-1',
+    type: 'polyline',
+    barIndex: 0,
+    points: [
+      { type: 'chart.point', time: null, index: 0, price: 10 },
+      { type: 'chart.point', time: null, index: 1, price: 15 },
+      { type: 'chart.point', time: null, index: 2, price: 12 },
+    ],
+    curved: false,
+    closed: false,
+    xloc: 'bar_index',
+    lineColor: '#2962FF',
+    fillColor: null,
+    lineStyle: 'solid',
+    lineWidth: 1,
+    ...overrides,
+  };
+}
+
+function makeTable(overrides: Partial<TableDrawingOutput> = {}): TableDrawingOutput {
+  return {
+    id: 'table-1',
+    type: 'table',
+    barIndex: 0,
+    position: 'top_right',
+    columns: 1,
+    rows: 1,
+    bgcolor: null,
+    frameColor: '#111111',
+    frameWidth: 1,
+    borderColor: '#222222',
+    borderWidth: 1,
+    cells: [
+      {
+        column: 0,
+        row: 0,
+        text: 'ATR',
+        textColor: '#ffffff',
+        textSize: 'normal',
+        textHalign: 'center',
+        textValign: 'middle',
+        bgcolor: '#111827',
+      },
+    ],
+    ...overrides,
+  };
+}
+
 describe('TealScriptDrawingRenderer', () => {
   it('renders linefills, boxes, lines, then labels in pane-clipped order', () => {
     const events: string[] = [];
@@ -182,5 +243,100 @@ describe('TealScriptDrawingRenderer', () => {
     expect(labelTextIndex).toBeGreaterThan(firstStrokeAfterBox);
     expect(clipCount).toBe(3);
     expect(getTextWidth).toHaveBeenCalledWith(ctx, 'Label', '14px sans-serif');
+  });
+
+  it('renders box text using stored horizontal and vertical alignment', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeBox({
+          text: 'Box',
+          textHalign: 'right',
+          textValign: 'bottom',
+        }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).toContain('fillTextStyle:right,bottom');
+    expect(events).toContain('fillText:Box:114,124');
+  });
+
+  it('renders polyline paths with optional fill when closed', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makePolyline({ closed: true, fillColor: 'rgba(41, 98, 255, 0.18)' }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).toContain('moveTo:0,110');
+    expect(events).toContain('lineTo:60,60');
+    expect(events).toContain('lineTo:120,90');
+    expect(events).toContain('closePath');
+    expect(events).toContain('fill');
+    expect(events).toContain('stroke');
+  });
+
+  it('renders fixed-position table cells above chart drawings', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([makeTable()]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).toContain('fillRect:64,18,48,22');
+    expect(events).toContain('strokeRect:64,18,48,22');
+    expect(events).toContain('fillTextStyle:center,middle');
+    expect(events).toContain('fillText:ATR:88,29');
   });
 });

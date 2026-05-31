@@ -24,8 +24,8 @@ Keep fixtures grouped by behavior:
 - `pine-visuals.test.ts` for plots, fills, alerts, and non-object visuals.
 - `pine-control-time.test.ts` for switch, loops, barstate, chart info, calendar,
   sessions, and timeframes.
-- `pine-drawings.test.ts` for labels, lines, boxes, linefills, and future visual
-  object checkpoints.
+- `pine-drawings.test.ts` for labels, lines, boxes, linefills, polylines,
+  tables, and future visual object checkpoints.
 
 ## Fixture Rules
 
