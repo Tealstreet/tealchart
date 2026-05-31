@@ -3431,8 +3431,15 @@ export class TealscriptEngine {
 
     const limitPrice = this.toOptionalNumber(this.getCallArg(args, namedArgs, 5, 'limit'));
     const stopPrice = this.toOptionalNumber(this.getCallArg(args, namedArgs, 7, 'stop'));
-    if (limitPrice === undefined && stopPrice === undefined) {
-      throw new Error('strategy.exit requires a limit or stop price');
+    const trailPrice = this.toOptionalNumber(this.getCallArg(args, namedArgs, 8, 'trail_price'));
+    const trailPoints = this.toOptionalNumber(this.getCallArg(args, namedArgs, 9, 'trail_points'));
+    const trailOffset = this.toOptionalNumber(this.getCallArg(args, namedArgs, 10, 'trail_offset'));
+    const trailActivationPrice = this.resolveStrategyTrailActivationPrice(direction, matchingTrades, trailPrice, trailPoints);
+    if (limitPrice === undefined && stopPrice === undefined && trailActivationPrice === undefined) {
+      throw new Error('strategy.exit requires a limit, stop, or trailing stop price');
+    }
+    if (trailActivationPrice !== undefined && trailOffset === undefined) {
+      throw new Error('strategy.exit trailing stop requires trail_offset');
     }
 
     const comment = this.toOptionalString(this.getCallArg(args, namedArgs, 12, 'comment'));
@@ -3441,7 +3448,8 @@ export class TealscriptEngine {
     const alertMessage = this.toOptionalString(this.getCallArg(args, namedArgs, 16, 'alert_message'));
     const alertProfit = this.toOptionalString(this.getCallArg(args, namedArgs, 17, 'alert_profit'));
     const alertLoss = this.toOptionalString(this.getCallArg(args, namedArgs, 18, 'alert_loss'));
-    const suffixOrders = limitPrice !== undefined && stopPrice !== undefined;
+    const exitOrderCount = [limitPrice, stopPrice, trailActivationPrice].filter((value) => value !== undefined).length;
+    const suffixOrders = exitOrderCount > 1;
     const exitOcaName = suffixOrders ? this.strategyExitOcaName(id, fromEntry) : undefined;
     this.cancelObsoleteStrategyExitOrders(id, fromEntry, suffixOrders);
 
@@ -3481,7 +3489,48 @@ export class TealscriptEngine {
       });
     }
 
+    if (trailActivationPrice !== undefined && trailOffset !== undefined) {
+      this.submitOrReplaceStrategyExitOrder({
+        id: suffixOrders ? `${id} Trail` : id,
+        direction: exitDirection,
+        qty,
+        qtyType: 'fixed',
+        qtyValue: qty,
+        trailActivationPrice,
+        trailOffset,
+        fromEntry,
+        ocaName: exitOcaName,
+        ocaType: suffixOrders ? 'cancel' : undefined,
+        comment: commentLoss ?? comment,
+        alertMessage: alertLoss ?? alertMessage,
+        barIndex: this.ctx.bar_index,
+        time: this.ctx.time.get(0) ?? 0,
+      });
+    }
+
     return undefined;
+  }
+
+  private resolveStrategyTrailActivationPrice(
+    direction: StrategyDirection,
+    trades: Array<{ entryPrice: number }>,
+    trailPrice: number | undefined,
+    trailPoints: number | undefined,
+  ): number | undefined {
+    if (trailPrice !== undefined) {
+      return trailPrice;
+    }
+    if (trailPoints === undefined) {
+      return undefined;
+    }
+    if (!Number.isFinite(trailPoints) || trailPoints < 0) {
+      throw new Error('strategy.exit trail_points must be a non-negative number');
+    }
+    const entryPrice = trades[0]?.entryPrice;
+    if (entryPrice === undefined) {
+      return undefined;
+    }
+    return direction === 'long' ? entryPrice + trailPoints : entryPrice - trailPoints;
   }
 
   private strategyExitOcaName(id: string, fromEntry: string | undefined): string {
@@ -3490,14 +3539,14 @@ export class TealscriptEngine {
 
   private cancelObsoleteStrategyExitOrders(id: string, fromEntry: string | undefined, suffixOrders: boolean): void {
     const activeIds = suffixOrders
-      ? new Set([`${id} Limit`, `${id} Stop`])
+      ? new Set([`${id} Limit`, `${id} Stop`, `${id} Trail`])
       : new Set([id]);
 
     for (const order of this.ctx.strategyLedger.orders) {
       if (order.status !== 'pending' || order.fromEntry !== fromEntry) {
         continue;
       }
-      if (order.id !== id && order.id !== `${id} Limit` && order.id !== `${id} Stop`) {
+      if (order.id !== id && order.id !== `${id} Limit` && order.id !== `${id} Stop` && order.id !== `${id} Trail`) {
         continue;
       }
       if (activeIds.has(order.id)) {
@@ -3521,9 +3570,14 @@ export class TealscriptEngine {
       return;
     }
 
-    const triggerChanged = existingOrder.limitPrice !== input.limitPrice || existingOrder.stopPrice !== input.stopPrice;
+    const triggerChanged = existingOrder.limitPrice !== input.limitPrice
+      || existingOrder.stopPrice !== input.stopPrice
+      || existingOrder.trailActivationPrice !== input.trailActivationPrice
+      || existingOrder.trailOffset !== input.trailOffset;
     existingOrder.direction = input.direction;
-    if (input.limitPrice !== undefined && input.stopPrice !== undefined) {
+    if (input.trailActivationPrice !== undefined || input.trailOffset !== undefined) {
+      existingOrder.type = 'trailing_stop';
+    } else if (input.limitPrice !== undefined && input.stopPrice !== undefined) {
       existingOrder.type = 'stop_limit';
     } else if (input.limitPrice !== undefined) {
       existingOrder.type = 'limit';
@@ -3537,6 +3591,8 @@ export class TealscriptEngine {
     existingOrder.qtyValue = input.qtyValue;
     existingOrder.limitPrice = input.limitPrice;
     existingOrder.stopPrice = input.stopPrice;
+    existingOrder.trailActivationPrice = input.trailActivationPrice;
+    existingOrder.trailOffset = input.trailOffset;
     existingOrder.fromEntry = input.fromEntry;
     existingOrder.ocaName = input.ocaName;
     existingOrder.ocaType = input.ocaType;
@@ -3546,6 +3602,11 @@ export class TealscriptEngine {
       existingOrder.stopLimitActivated = false;
       existingOrder.stopLimitActivatedBarIndex = null;
       existingOrder.stopLimitActivatedTime = null;
+      existingOrder.trailingActivated = false;
+      existingOrder.trailingActivatedBarIndex = null;
+      existingOrder.trailingActivatedTime = null;
+      existingOrder.trailingBestPrice = undefined;
+      existingOrder.trailingStopPrice = undefined;
       existingOrder.activationBarIndex = input.barIndex;
       existingOrder.activationTime = input.time;
     }
