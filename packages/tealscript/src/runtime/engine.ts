@@ -10,6 +10,8 @@ import type {
   Statement,
   Expression,
   IndicatorDeclaration,
+  LibraryDeclaration,
+  ImportDeclaration,
   TypeDeclaration,
   TypeFieldDeclaration,
   TypeAnnotation,
@@ -384,6 +386,12 @@ export class TealscriptEngine {
       case 'IndicatorDeclaration':
         this.executeIndicator(stmt);
         break;
+      case 'LibraryDeclaration':
+        this.executeLibrary(stmt);
+        break;
+      case 'ImportDeclaration':
+        this.executeImport(stmt);
+        break;
       case 'TypeDeclaration':
         break;
       case 'FunctionDeclaration':
@@ -443,6 +451,15 @@ export class TealscriptEngine {
     if (stmt.dynamic_requests) {
       this.indicatorDynamicRequests = this.isTruthy(this.evaluateExpression(stmt.dynamic_requests));
     }
+  }
+
+  private executeLibrary(_stmt: LibraryDeclaration): void {
+    // Local library scripts can execute their global demo code in this runtime.
+    // Published-library import resolution is still intentionally unsupported.
+  }
+
+  private executeImport(stmt: ImportDeclaration): void {
+    throw new Error(`import declarations are not supported yet: ${stmt.path} as ${stmt.alias.name}`);
   }
 
   private normalizeMaxBarsBack(value: unknown): number {

@@ -39,4 +39,16 @@ plot(close)
     ]);
   });
 
+  it('reports planned published library imports explicitly', () => {
+    const result = runCompatScript(`
+indicator("Unsupported import")
+import TradingView/PivotLabels/1 as dpl
+plot(close)
+`, { bars: [compatibilityBars[0]!] });
+
+    expect(result.errors.map((error) => error.message)).toEqual([
+      'import declarations are not supported yet: TradingView/PivotLabels/1 as dpl',
+    ]);
+  });
+
 });
