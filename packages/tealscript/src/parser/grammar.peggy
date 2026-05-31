@@ -111,8 +111,13 @@ FunctionDeclaration
     }
 
 ParameterList
-  = head:Identifier tail:(__ "," __ Identifier)* {
+  = head:Parameter tail:(__ "," __ Parameter)* {
       return [head, ...tail.map(t => t[3])];
+    }
+
+Parameter
+  = name:Identifier defaultValue:(__ "=" __ Expression)? {
+      return defaultValue ? { ...name, defaultValue: defaultValue[3] } : name;
     }
 
 // Variable declaration: var float x = 0.0 or just x = 0.0
