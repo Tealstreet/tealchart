@@ -7,10 +7,13 @@ on TradingView, a live exchange, or Tealchart networking during CI.
 ## Current Scope
 
 The contract supports deterministic fixtures, same-symbol or host-provided
-other-symbol `request.security()` requests, and the current
-`request.security_lower_tf()` intrabar-array MVP. Dynamic/nested requests,
-synthetic tickers, and external request families remain out of scope until later
-Epic 8 and Epic 9 phases.
+other-symbol `request.security()` requests,
+`request.security_lower_tf()` intrabar arrays, and Pine v6 dynamic request
+behavior for supported `request.security*` calls. The dynamic MVP enables local
+scope and nested supported requests by default, while rejecting those forms when
+scripts explicitly set `dynamic_requests=false`. Full simple/series qualifier
+analysis, synthetic tickers, and external request families remain out of scope
+until later Epic 8, Epic 9, and qualified type-system phases.
 
 ## Contract
 
