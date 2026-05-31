@@ -153,6 +153,7 @@ import { currencyRateRequestKey, type RequestDataContext, type RequestDatafeed, 
 import {
   cancelAllStrategyOrders,
   cancelStrategyOrder,
+  fillPendingStrategyOrders,
   fillStrategyMarketOrder,
   submitStrategyOrder,
   type StrategyDirection,
@@ -320,6 +321,7 @@ export class TealscriptEngine {
           }
         }
       }
+      this.fillPendingStrategyOrdersForCurrentBar();
 
       // Commit bar — only snapshot on the last bar (for realtime rollback)
       this.scope.commit(isLastBar);
@@ -387,6 +389,7 @@ export class TealscriptEngine {
         console.error('Execution error:', error);
       }
     }
+    this.fillPendingStrategyOrdersForCurrentBar();
 
     return this.ctx.getPlots();
   }
@@ -3255,6 +3258,16 @@ export class TealscriptEngine {
     return undefined;
   }
 
+  private fillPendingStrategyOrdersForCurrentBar(): void {
+    fillPendingStrategyOrders(
+      this.ctx.strategyLedger,
+      this.ctx.high.get(0) ?? Number.NaN,
+      this.ctx.low.get(0) ?? Number.NaN,
+      this.ctx.bar_index,
+      this.ctx.time.get(0) ?? 0,
+    );
+  }
+
   private submitStrategyExitBuiltin(args: unknown[], namedArgs: Map<string, unknown>): undefined {
     const id = this.toStringValue(this.getCallArg(args, namedArgs, 0, 'id', ''));
     if (id === '') {
@@ -3310,6 +3323,8 @@ export class TealscriptEngine {
         qtyValue: qty,
         limitPrice,
         fromEntry,
+        ocaName: suffixOrders ? id : undefined,
+        ocaType: suffixOrders ? 'cancel' : undefined,
         comment: commentProfit ?? comment,
         alertMessage: alertProfit ?? alertMessage,
         barIndex: this.ctx.bar_index,
@@ -3326,6 +3341,8 @@ export class TealscriptEngine {
         qtyValue: qty,
         stopPrice,
         fromEntry,
+        ocaName: suffixOrders ? id : undefined,
+        ocaType: suffixOrders ? 'cancel' : undefined,
         comment: commentLoss ?? comment,
         alertMessage: alertLoss ?? alertMessage,
         barIndex: this.ctx.bar_index,

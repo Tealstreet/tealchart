@@ -473,6 +473,69 @@ plot(strategy.opentrades)`;
         { id: 'Target', type: 'stop', status: 'pending', limitPrice: undefined, stopPrice: 98, updatedBarIndex: 3 },
       ]);
     });
+
+    it('fills pending limit entry orders on later bars when price crosses', () => {
+      const script = `//@version=6
+strategy("Limit fill")
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1, limit=100.3)
+plot(strategy.position_size)`;
+
+      const result = executeScript(parse(script), createBars(3));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders[0]).toMatchObject({
+        id: 'Long',
+        type: 'limit',
+        status: 'filled',
+        avgFillPrice: 100.3,
+        updatedBarIndex: 1,
+      });
+      expect(result.strategy.position).toMatchObject({
+        direction: 'long',
+        size: 1,
+        avgPrice: 100.3,
+      });
+      expect(result.plots[0]?.values).toEqual([0, 0, 1]);
+    });
+
+    it('fills strategy.exit brackets and cancels the sibling OCA order', () => {
+      const script = `//@version=6
+strategy("Exit bracket fill")
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Bracket", "Long", limit=101.4, stop=99)
+plot(strategy.position_size)
+plot(strategy.closedtrades)`;
+
+      const result = executeScript(parse(script), createBars(3));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        type: order.type,
+        status: order.status,
+        avgFillPrice: order.avgFillPrice,
+        updatedBarIndex: order.updatedBarIndex,
+      }))).toEqual([
+        { id: 'Long', type: 'market', status: 'filled', avgFillPrice: 100.2, updatedBarIndex: 0 },
+        { id: 'Bracket Limit', type: 'limit', status: 'filled', avgFillPrice: 101.4, updatedBarIndex: 2 },
+        { id: 'Bracket Stop', type: 'stop', status: 'cancelled', avgFillPrice: null, updatedBarIndex: 2 },
+      ]);
+      expect(result.strategy.position.size).toBe(0);
+      expect(result.strategy.closedTrades[0]).toMatchObject({
+        entryOrderId: 'Long',
+        exitOrderId: 'Bracket Limit',
+        entryPrice: 100.2,
+        exitPrice: 101.4,
+      });
+      expect(result.strategy.closedTrades[0]?.profit).toBeCloseTo(1.2);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [1, 1, 1],
+        [0, 0, 0],
+      ]);
+    });
   });
 
   describe('user-defined types', () => {

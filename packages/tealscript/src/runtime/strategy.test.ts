@@ -7,6 +7,7 @@ import {
   createStrategyLedger,
   createStrategyOrder,
   createStrategyPosition,
+  fillPendingStrategyOrders,
   fillStrategyMarketOrder,
   submitStrategyOrder,
 } from './strategy';
@@ -265,5 +266,37 @@ describe('strategy ledger model', () => {
     expect(ledger.orders[0]?.status).toBe('filled');
     expect(ledger.openTrades[0]?.qty).toBe(1);
     expect(ledger.position.size).toBe(1);
+  });
+
+  it('fills eligible pending limit and stop orders after their creation bar', () => {
+    const ledger = createStrategyLedger();
+    const limit = submitStrategyOrder(ledger, {
+      id: 'Long limit',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      limitPrice: 100,
+      barIndex: 0,
+      time: 1,
+    });
+    const stop = submitStrategyOrder(ledger, {
+      id: 'Short stop',
+      direction: 'short',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      stopPrice: 98,
+      barIndex: 0,
+      time: 1,
+    });
+
+    expect(fillPendingStrategyOrders(ledger, 101, 99, 0, 1)).toEqual([]);
+    expect(fillPendingStrategyOrders(ledger, 101, 97, 1, 2).map((fill) => fill.orderId)).toEqual([
+      'Long limit',
+      'Short stop',
+    ]);
+    expect(limit).toMatchObject({ status: 'filled', avgFillPrice: 100 });
+    expect(stop).toMatchObject({ status: 'filled', avgFillPrice: 98 });
   });
 });
