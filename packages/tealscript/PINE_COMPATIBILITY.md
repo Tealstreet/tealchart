@@ -204,6 +204,20 @@ overload resolution, `*.copy()` helpers, library export/import resolution, and
 full reference-type diagnostics remain planned in Epic 12 and the qualified
 type-system epic.
 
+## Common Library Syntax Coverage
+
+The library syntax MVP parses `library(...)` declarations, `export` on UDFs,
+typed and qualified exported parameters such as `simple string prefix`, and
+`import publisher/Library/version as alias` declarations. Local library-style
+scripts can execute exported helper functions in the same file, which supports
+deterministic compatibility fixtures based on TradingView's documented
+all-time-high/all-time-low library idiom.
+
+Published-library resolution is not implemented yet. `import` declarations
+therefore parse but emit an explicit unsupported diagnostic at runtime until
+Epic 12 adds a module registry, versioned resolution, exported namespace
+binding, and library diagnostics.
+
 ## Common `color.*` Coverage
 
 The common color helper pass covers `color.rgb`, `color.new`, `color.r`,
