@@ -197,8 +197,9 @@ upperPlot = plot(upper, title="Upper", color=color.green)
 lowerPlot = plot(lower, title="Lower", color=color.red)
 topLine = hline(110, title="Top")
 bottomLine = hline(100, title="Bottom")
-fill(upperPlot, lowerPlot, color=color.new(color.green, 80), title="Band Fill")
-fill(topLine, bottomLine, color=color.new(color.blue, 90), title="Range Fill")
+fillColor = bar_index == 1 ? na : color.new(color.green, 80)
+fill(upperPlot, lowerPlot, color=fillColor, title="Band Fill", editable=false, show_last=6, fillgaps=false, display=display.price_scale)
+fill(topLine, bottomLine, color.new(color.blue, 90), "Range Fill", true, 4, true, display.none)
 `);
 
     expect(result.errors).toEqual([]);
@@ -208,12 +209,33 @@ fill(topLine, bottomLine, color=color.new(color.blue, 90), title="Range Fill")
     expect(bandFill.type).toBe('fill');
     expect(bandFill.plot1Id).toBe('plot_Upper');
     expect(bandFill.plot2Id).toBe('plot_Lower');
-    expect(bandFill.color).toEqual(Array(compatibilityBars.length).fill('#4CAF5033'));
+    expect(bandFill.color).toEqual([
+      '#4CAF5033',
+      null,
+      '#4CAF5033',
+      '#4CAF5033',
+      '#4CAF5033',
+      '#4CAF5033',
+      '#4CAF5033',
+      '#4CAF5033',
+      '#4CAF5033',
+      '#4CAF5033',
+      '#4CAF5033',
+      '#4CAF5033',
+    ]);
+    expect(bandFill.editable).toBe(false);
+    expect(bandFill.showLast).toBe(6);
+    expect(bandFill.fillgaps).toBe(false);
+    expect(bandFill.display).toBe(8);
 
     expect(rangeFill.type).toBe('fill');
     expect(rangeFill.plot1Id).toBe('hline_Top');
     expect(rangeFill.plot2Id).toBe('hline_Bottom');
     expect(rangeFill.color).toEqual(Array(compatibilityBars.length).fill('#2196F31A'));
+    expect(rangeFill.editable).toBe(true);
+    expect(rangeFill.showLast).toBe(4);
+    expect(rangeFill.fillgaps).toBe(true);
+    expect(rangeFill.display).toBe(0);
   });
 
   it('preserves legacy fill title references before plot registration', () => {

@@ -1724,6 +1724,12 @@ export class TealchartRenderer {
       if (isOverlay || !paneLayout || paneLayout.indicatorPanes.length === 0) {
         // Render on main pane (existing behavior)
         for (const plot of scriptPlots) {
+          if (plot.type === 'fill') {
+            this.renderFill(plot, scriptPlots, bars, viewport, (value, paneHeight) => this.priceToY(value, viewport, paneHeight));
+          }
+        }
+
+        for (const plot of scriptPlots) {
           switch (plot.type) {
             case 'plot':
               this.renderLinePlot(plot, bars, viewport);
@@ -1740,6 +1746,8 @@ export class TealchartRenderer {
               break;
             case 'plotshape':
               this.renderPlotShape(plot, bars, viewport);
+              break;
+            case 'fill':
               break;
           }
         }
@@ -2144,6 +2152,79 @@ export class TealchartRenderer {
     }
 
     ctx.globalAlpha = 1;
+  }
+
+  private renderFill(
+    fill: PlotOutput,
+    plots: PlotOutput[],
+    bars: Bar[],
+    viewport: Viewport,
+    valueToY: (value: number, priceHeight: number) => number,
+  ): void {
+    const { ctx, options, margins } = this;
+    const plot1 = plots.find((plot) => plot.id === fill.plot1Id);
+    const plot2 = plots.find((plot) => plot.id === fill.plot2Id);
+    if (!plot1 || !plot2) return;
+
+    const chartWidth = options.width - margins.left;
+    const chartHeight = options.height - margins.top - margins.bottom;
+    const volumeHeight = options.showVolume ? chartHeight * options.volumeHeight : 0;
+    const priceHeight = chartHeight - volumeHeight;
+    const fillgaps = fill.fillgaps ?? true;
+    const colors = Array.isArray(fill.color) ? fill.color : [];
+    const staticColor = !Array.isArray(fill.color) ? fill.color : undefined;
+
+    let previous: { x: number; y1: number; y2: number; color: string | null } | null = null;
+
+    for (let i = 0; i < bars.length; i++) {
+      const bar = bars[i];
+      if (!bar || bar.time < viewport.startTime || bar.time > viewport.endTime) {
+        continue;
+      }
+
+      const value1 = this.getFillPlotValue(plot1, i);
+      const value2 = this.getFillPlotValue(plot2, i);
+      const color = colors[i] ?? staticColor ?? null;
+
+      if (color === null) {
+        previous = null;
+        continue;
+      }
+
+      if (value1 === null || value2 === null) {
+        if (!fillgaps) previous = null;
+        continue;
+      }
+
+      const current = {
+        x: this.timeToX(bar.time, viewport, chartWidth),
+        y1: valueToY(value1, priceHeight),
+        y2: valueToY(value2, priceHeight),
+        color,
+      };
+
+      if (previous) {
+        ctx.fillStyle = current.color;
+        ctx.beginPath();
+        ctx.moveTo(previous.x, previous.y1);
+        ctx.lineTo(current.x, current.y1);
+        ctx.lineTo(current.x, current.y2);
+        ctx.lineTo(previous.x, previous.y2);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      previous = current;
+    }
+  }
+
+  private getFillPlotValue(plot: PlotOutput, index: number): number | null {
+    if (plot.type === 'hline') {
+      return typeof plot.price === 'number' && Number.isFinite(plot.price) ? plot.price : null;
+    }
+
+    const value = plot.values[index];
+    return typeof value === 'number' && Number.isFinite(value) ? value : null;
   }
 
   /**
@@ -4236,6 +4317,12 @@ export class TealchartRenderer {
     ctx.clip();
 
     for (const plot of plots) {
+      if (plot.type === 'fill') {
+        this.renderFill(plot, plots, bars, viewport, (value) => this.valueToPaneY(value, paneOffset));
+      }
+    }
+
+    for (const plot of plots) {
       switch (plot.type) {
         case 'plot':
           this.renderLinePlotInPane(plot, bars, viewport, paneOffset);
@@ -4248,6 +4335,8 @@ export class TealchartRenderer {
           break;
         case 'hline':
           this.renderHlineInPane(plot, paneOffset);
+          break;
+        case 'fill':
           break;
         // bgcolor and plotshape could be added later for pane support
       }

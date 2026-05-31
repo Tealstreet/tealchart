@@ -134,6 +134,7 @@ export interface PlotOutput {
   // For fill
   plot1Id?: string;
   plot2Id?: string;
+  fillgaps?: boolean;
 }
 
 export type PlotStyle =

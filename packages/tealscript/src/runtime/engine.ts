@@ -2806,8 +2806,12 @@ export class TealscriptEngine {
     this.builtins.set('fill', (args, namedArgs, ctx) => {
       const plot1Id = this.resolveFillPlotId(args[0], ctx);
       const plot2Id = this.resolveFillPlotId(args[1], ctx);
-      const color = (namedArgs.get('color') ?? args[2] ?? 'rgba(33, 150, 243, 0.2)') as string;
-      const title = (namedArgs.get('title') ?? 'Fill') as string;
+      const color = this.toPlotColor(this.getCallArg(args, namedArgs, 2, 'color', 'rgba(33, 150, 243, 0.2)'));
+      const title = (this.getCallArg(args, namedArgs, 3, 'title', 'Fill')) as string;
+      const editable = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 4, 'editable'));
+      const showLast = this.toOptionalInteger(this.getCallArg(args, namedArgs, 5, 'show_last'));
+      const fillgaps = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 6, 'fillgaps'));
+      const display = this.toOptionalInteger(this.getCallArg(args, namedArgs, 7, 'display'));
 
       const id = `fill_${title}`;
 
@@ -2819,6 +2823,10 @@ export class TealscriptEngine {
           color: [],
           plot1Id,
           plot2Id,
+          editable,
+          showLast,
+          fillgaps,
+          display,
         });
       }
 

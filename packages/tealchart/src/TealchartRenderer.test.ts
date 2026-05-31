@@ -440,6 +440,61 @@ describe('TealchartRenderer coordinate transforms', () => {
     });
   });
 
+  describe('fill rendering', () => {
+    it('bridges plot gaps only when fillgaps is enabled', () => {
+      const fill = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fill,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 0,
+        priceMax: 10,
+      };
+      const upper: PlotOutput = {
+        id: 'plot_Upper',
+        type: 'plot',
+        title: 'Upper',
+        values: [4, null, 6],
+        color: '#2196F3',
+      };
+      const lower: PlotOutput = {
+        id: 'plot_Lower',
+        type: 'plot',
+        title: 'Lower',
+        values: [2, null, 3],
+        color: '#F44336',
+      };
+      const gapFill: PlotOutput = {
+        id: 'fill_Gap',
+        type: 'fill',
+        title: 'Gap',
+        values: [],
+        color: ['#4CAF5033', '#4CAF5033', '#4CAF5033'],
+        plot1Id: 'plot_Upper',
+        plot2Id: 'plot_Lower',
+        fillgaps: false,
+      };
+      const bridgeFill: PlotOutput = {
+        ...gapFill,
+        id: 'fill_Bridge',
+        title: 'Bridge',
+        fillgaps: true,
+      };
+
+      (renderer as any).renderFill(gapFill, [upper, lower, gapFill], bars, viewport, (value: number) => value);
+      expect(fill).not.toHaveBeenCalled();
+
+      (renderer as any).renderFill(bridgeFill, [upper, lower, bridgeFill], bars, viewport, (value: number) => value);
+      expect(fill).toHaveBeenCalledOnce();
+      expect(ctx.fillStyle).toBe('#4CAF5033');
+    });
+  });
+
   describe('calculateViewport', () => {
     it('returns sensible defaults for empty bars', () => {
       const vp = TealchartRenderer.calculateViewport([]);
