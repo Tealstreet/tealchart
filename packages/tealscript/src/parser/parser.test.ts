@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parse, validate, TealscriptParseError, formatParseError } from './parser';
+import { isExpression } from './ast';
 import type { Expression, Statement } from './ast';
 
 describe('Tealscript Parser', () => {
@@ -11,6 +12,20 @@ describe('Tealscript Parser', () => {
 
         expect(expression.type).toBe('BinaryExpression');
         expect(statement.type).toBe('ExpressionStatement');
+      });
+
+      it('recognizes loop expression nodes in expression guards', () => {
+        const forExpression = parse(`for i = 0 to 1
+    i
+`, { startRule: 'Expression' });
+        const whileExpression = parse(`while false
+    1
+`, { startRule: 'Expression' });
+
+        expect(forExpression.type).toBe('ForStatement');
+        expect(whileExpression.type).toBe('WhileStatement');
+        expect(isExpression(forExpression)).toBe(true);
+        expect(isExpression(whileExpression)).toBe(true);
       });
 
       it('parses version 6 directive', () => {

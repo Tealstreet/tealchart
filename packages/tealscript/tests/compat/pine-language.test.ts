@@ -299,6 +299,53 @@ plot(lastWhile(3), title="While Loop")
     expect(roundSeries(getPlot(result, 'While Loop').values)).toEqual(Array(compatibilityBars.length).fill(3));
   });
 
+  it('runs numeric for and while loop expressions', () => {
+    const result = runCompatScript(`
+indicator("Loop expressions")
+numericValue = for i = 0 to 3
+    i * 2
+i = 0
+whileValue = while i < 3
+    i += 1
+    i * 3
+plot(numericValue, title="Numeric Loop Expression")
+plot(whileValue, title="While Loop Expression")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Numeric Loop Expression').values)).toEqual(
+      Array(compatibilityBars.length).fill(6)
+    );
+    expect(roundSeries(getPlot(result, 'While Loop Expression').values)).toEqual(
+      Array(compatibilityBars.length).fill(9)
+    );
+  });
+
+  it('runs collection loop expressions with break and continue', () => {
+    const result = runCompatScript(`
+indicator("Collection loop expressions")
+values = array.from(1, 2, 3, 4)
+value = for item in values
+    if item == 2
+        continue
+    if item == 4
+        break
+    item * 10
+indexed = for [index, item] in values
+    index + item
+plot(value, title="Collection Loop Expression")
+plot(indexed, title="Indexed Collection Loop Expression")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Collection Loop Expression').values)).toEqual(
+      Array(compatibilityBars.length).fill(30)
+    );
+    expect(roundSeries(getPlot(result, 'Indexed Collection Loop Expression').values)).toEqual(
+      Array(compatibilityBars.length).fill(7)
+    );
+  });
+
   it('rejects recursive user-defined function calls with a clear diagnostic', () => {
     const result = runCompatScript(`
 indicator("UDF recursion")
