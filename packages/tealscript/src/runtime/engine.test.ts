@@ -167,6 +167,31 @@ plot(hour(timestamp("GMT+2", 2024, 1, 5, 9, 30), "GMT+2"), title="Timestamp Hour
       expect(result.plots.find((plot) => plot.title === 'Timestamp Hour')?.values).toEqual([9]);
     });
 
+    it('supports IANA timezones in calendar, timestamp, and format helpers', () => {
+      const script = `//@version=6
+indicator("IANA Timezones")
+nyStamp = timestamp("America/New_York", 2024, 1, 5, 9, 30)
+summerStamp = timestamp("America/New_York", 2024, 7, 5, 9, 30)
+plot(hour(time, "America/New_York"), title="NY Hour")
+plot(hour(nyStamp, "America/New_York"), title="NY Timestamp Hour")
+plot(nyStamp, title="NY Timestamp")
+plot(summerStamp, title="NY Summer Timestamp")
+plot(str.format_time(time, "yyyy-MM-dd HH:mm:ss", "America/New_York") == "2024-01-05 09:30:00" ? 1 : 0, title="Formatted NY")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: Date.UTC(2024, 0, 5, 14, 30), open: 1, high: 2, low: 1, close: 2, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'NY Hour')?.values).toEqual([9]);
+      expect(result.plots.find((plot) => plot.title === 'NY Timestamp Hour')?.values).toEqual([9]);
+      expect(result.plots.find((plot) => plot.title === 'NY Timestamp')?.values).toEqual([Date.UTC(2024, 0, 5, 14, 30)]);
+      expect(result.plots.find((plot) => plot.title === 'NY Summer Timestamp')?.values).toEqual([Date.UTC(2024, 6, 5, 13, 30)]);
+      expect(result.plots.find((plot) => plot.title === 'Formatted NY')?.values).toEqual([1]);
+    });
+
     it('exposes timenow as a runtime timestamp series', () => {
       const script = `//@version=6
 indicator("Time Now")

@@ -234,6 +234,27 @@ plot(minuteGate ? 1 : 0, title="Minute Gate")
     expect(getPlot(result, 'Minute Gate').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
   });
 
+  it('matches common Pine named timezone idioms', () => {
+    const result = runCompatScript(`
+indicator("Named timezone docs smoke")
+nyHour = hour(time, "America/New_York")
+nyOpen = timestamp("America/New_York", 2023, 11, 14, 17, 20, 20)
+formatted = str.format_time(nyOpen, "yyyy-MM-dd HH:mm", "America/New_York")
+inNySession = not na(time(timeframe.period, "1718-1724", "America/New_York"))
+
+plot(nyHour, title="NY Hour")
+plot(nyOpen == time ? 1 : 0, title="NY Timestamp Match")
+plot(formatted == "2023-11-14 17:20" ? 1 : 0, title="NY Formatted")
+plot(inNySession ? 1 : 0, title="NY Session")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'NY Hour').values).toEqual([17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17]);
+    expect(getPlot(result, 'NY Timestamp Match').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]);
+    expect(getPlot(result, 'NY Formatted').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'NY Session').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0]);
+  });
+
   it('matches common Pine session filter idioms', () => {
     const result = runCompatScript(`
 indicator("Session docs smoke")
