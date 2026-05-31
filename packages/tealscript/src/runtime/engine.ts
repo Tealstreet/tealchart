@@ -120,6 +120,22 @@ import {
   transposeMatrix,
   type PineMatrix,
 } from './matrices';
+import {
+  clearMap,
+  containsMapKey,
+  copyMap,
+  createPineMap,
+  getMapSize,
+  getMapValue,
+  isPineMap,
+  mapEntries,
+  mapKeys,
+  mapValues,
+  putAllMapValues,
+  putMapValue,
+  removeMapValue,
+  type PineMap,
+} from './maps';
 import { Scope, createRootScope } from './scope';
 import { currencyRateRequestKey, type RequestDataContext, type RequestDatafeed, type RequestSeriesPoint } from './requestDatafeed';
 
@@ -165,7 +181,7 @@ interface TickerModifierParts {
   modifiers: string[];
 }
 
-const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['map', 'ticker']);
+const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['ticker']);
 
 /**
  * Tealscript Engine - executes AST bar-by-bar
@@ -676,13 +692,18 @@ export class TealscriptEngine {
   private executeForIn(stmt: Extract<ForStatement, { kind: 'collection' }>): void {
     const iterable = this.evaluateExpression(stmt.iterable);
     let values: unknown[];
+    let keys: unknown[] | null = null;
 
     if (Array.isArray(iterable)) {
       values = iterable;
     } else if (isPineArray(iterable)) {
       values = Array.from({ length: getArraySize(iterable) }, (_, index) => getArrayValue(iterable, index));
+    } else if (isPineMap(iterable)) {
+      const entries = mapEntries(iterable);
+      keys = entries.map(([key]) => key);
+      values = entries.map(([, value]) => value);
     } else {
-      throw new Error('For-in loop expects an array');
+      throw new Error('For-in loop expects an array or map');
     }
 
     const childScope = this.scope.createChild();
@@ -700,7 +721,7 @@ export class TealscriptEngine {
 
         const value = values[index];
         if (stmt.indexCounter) {
-          this.scope.declare(stmt.indexCounter.name, 'none', index);
+          this.scope.declare(stmt.indexCounter.name, 'none', keys ? keys[index] : index);
         }
         this.scope.declare(stmt.counter.name, 'none', value);
 
@@ -1062,7 +1083,7 @@ export class TealscriptEngine {
     // Look up builtin
     if (namespace && expr.callee.type === 'MemberExpression' && this.scope.has(namespace)) {
       const receiver = this.evaluateExpression(expr.callee.object);
-      if (isPineArray(receiver) || isPineMatrix(receiver)) {
+      if (isPineArray(receiver) || isPineMatrix(receiver) || isPineMap(receiver)) {
         const methodBuiltinName = this.getMethodBuiltinName(funcName, receiver);
         const methodBuiltin = this.builtins.get(methodBuiltinName);
         if (methodBuiltin) {
@@ -1558,6 +1579,9 @@ export class TealscriptEngine {
     if (isPineMatrix(receiver)) {
       return `matrix.${methodName}`;
     }
+    if (isPineMap(receiver)) {
+      return `map.${methodName}`;
+    }
 
     switch (methodName) {
       case 'size':
@@ -1749,13 +1773,18 @@ export class TealscriptEngine {
   ): { hasResult: boolean; value?: unknown } {
     const iterable = this.evaluateExpression(stmt.iterable);
     let values: unknown[];
+    let keys: unknown[] | null = null;
 
     if (Array.isArray(iterable)) {
       values = iterable;
     } else if (isPineArray(iterable)) {
       values = Array.from({ length: getArraySize(iterable) }, (_, index) => getArrayValue(iterable, index));
+    } else if (isPineMap(iterable)) {
+      const entries = mapEntries(iterable);
+      keys = entries.map(([key]) => key);
+      values = entries.map(([, value]) => value);
     } else {
-      throw new Error('For-in loop expects an array');
+      throw new Error('For-in loop expects an array or map');
     }
 
     const childScope = this.scope.createChild();
@@ -1773,7 +1802,7 @@ export class TealscriptEngine {
 
         const value = values[index];
         if (stmt.indexCounter) {
-          this.scope.declare(stmt.indexCounter.name, 'none', index);
+          this.scope.declare(stmt.indexCounter.name, 'none', keys ? keys[index] : index);
         }
         this.scope.declare(stmt.counter.name, 'none', value);
 
@@ -2514,6 +2543,9 @@ export class TealscriptEngine {
 
     // Matrix functions
     this.registerMatrixBuiltins();
+
+    // Map functions
+    this.registerMapBuiltins();
 
     // Color constants
     this.registerColorBuiltins();
@@ -3602,6 +3634,36 @@ export class TealscriptEngine {
       return isSquareMatrix(readMatrix(args[0]));
     });
     this.builtins.set('matrix.is_valid', (args) => isValidMatrix(args[0]));
+  }
+
+  private registerMapBuiltins(): void {
+    const readMap = (value: unknown): PineMap => {
+      if (!isPineMap(value)) {
+        throw new Error('Expected map');
+      }
+      return value;
+    };
+
+    this.builtins.set('map.new', () => createPineMap());
+    this.builtins.set('map.size', (args) => getMapSize(readMap(args[0])));
+    this.builtins.set('map.put', (args) => {
+      putMapValue(readMap(args[0]), args[1], args[2]);
+      return null;
+    });
+    this.builtins.set('map.get', (args) => getMapValue(readMap(args[0]), args[1]));
+    this.builtins.set('map.contains', (args) => containsMapKey(readMap(args[0]), args[1]));
+    this.builtins.set('map.remove', (args) => removeMapValue(readMap(args[0]), args[1]));
+    this.builtins.set('map.clear', (args) => {
+      clearMap(readMap(args[0]));
+      return null;
+    });
+    this.builtins.set('map.copy', (args) => copyMap(readMap(args[0])));
+    this.builtins.set('map.keys', (args) => mapKeys(readMap(args[0])));
+    this.builtins.set('map.values', (args) => mapValues(readMap(args[0])));
+    this.builtins.set('map.put_all', (args) => {
+      putAllMapValues(readMap(args[0]), readMap(args[1]));
+      return null;
+    });
   }
 
   private registerColorBuiltins(): void {

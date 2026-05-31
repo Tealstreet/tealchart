@@ -160,6 +160,18 @@ arrayValue = [1, 2]
       }));
     });
 
+    it('parses map type annotations', () => {
+      const ast = parse('map<string, float> values = na\n');
+      const decl = ast.body[0] as VariableDeclaration;
+
+      expect(decl.typeAnnotation).toEqual(expect.objectContaining({
+        type: 'TypeAnnotation',
+        baseType: 'map',
+        keyType: 'string',
+        valueType: 'float',
+      }));
+    });
+
     it('parses tuple destructuring', () => {
       const ast = parse('[a, b, c] = someFunc()\n');
       const decl = ast.body[0] as VariableDeclaration;
@@ -621,6 +633,27 @@ arrayValue = [1, 2]
         expect(call.callee).toEqual(expect.objectContaining({
           type: 'MemberExpression',
         }));
+      });
+
+      it('parses generic Pine call type arguments', () => {
+        const ast = parse('x = map.new<string, float>()\n');
+        const decl = ast.body[0] as VariableDeclaration;
+        const call = decl.init as CallExpression;
+
+        expect(call.type).toBe('CallExpression');
+        expect(call.callee).toEqual(expect.objectContaining({
+          type: 'MemberExpression',
+        }));
+        expect(call.arguments).toHaveLength(0);
+      });
+
+      it('parses single generic Pine call type arguments', () => {
+        const ast = parse('x = array.new<float>()\n');
+        const decl = ast.body[0] as VariableDeclaration;
+        const call = decl.init as CallExpression;
+
+        expect(call.type).toBe('CallExpression');
+        expect(call.arguments).toHaveLength(0);
       });
     });
 
