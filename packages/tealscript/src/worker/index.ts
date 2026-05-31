@@ -15,6 +15,8 @@ export {
 export type {
   ToWorkerMessage,
   FromWorkerMessage,
+  WorkerOutputBundle,
+  WorkerOutputMetadata,
   InitMessage,
   UpdateBarsMessage,
   UpdateBarMessage,
@@ -25,3 +27,5 @@ export type {
   ErrorMessage,
   ParseErrorMessage,
 } from './protocol';
+
+export { createResultMessage, getResultOutput } from './protocol';

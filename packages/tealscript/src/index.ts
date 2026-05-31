@@ -102,6 +102,8 @@ export {
   // Protocol types
   type ToWorkerMessage,
   type FromWorkerMessage,
+  type WorkerOutputBundle,
+  type WorkerOutputMetadata,
   type InitMessage,
   type UpdateBarsMessage,
   type UpdateBarMessage,
@@ -111,4 +113,6 @@ export {
   type ResultMessage,
   type ErrorMessage,
   type ParseErrorMessage,
+  createResultMessage,
+  getResultOutput,
 } from './worker';

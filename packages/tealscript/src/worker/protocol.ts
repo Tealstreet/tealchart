@@ -75,15 +75,68 @@ export interface ReadyMessage {
 }
 
 /**
+ * Optional metadata that lets callers reason about result freshness without
+ * coupling plot, drawing, alert, and input payloads to separate channels.
+ */
+export interface WorkerOutputMetadata {
+  generation?: number;
+  requestId?: number;
+}
+
+/**
+ * Atomic output produced by one TealScript execution.
+ */
+export interface WorkerOutputBundle {
+  plots: PlotOutput[];
+  drawings: DrawingOutput[];
+  alerts: AlertOutput[];
+  inputs: InputDefinition[];
+  metadata?: WorkerOutputMetadata;
+}
+
+/**
  * Execution completed successfully
  */
 export interface ResultMessage {
   type: 'result';
   scriptId: string;
+  output?: WorkerOutputBundle;
+
+  /**
+   * Legacy top-level fields kept while Tealchart consumers migrate to
+   * ResultMessage.output.
+   */
   plots: PlotOutput[];
   drawings: DrawingOutput[];
   alerts: AlertOutput[];
   inputs: InputDefinition[];
+}
+
+/**
+ * Build a result message with both the atomic output bundle and legacy fields.
+ */
+export function createResultMessage(scriptId: string, output: WorkerOutputBundle): ResultMessage {
+  return {
+    type: 'result',
+    scriptId,
+    output,
+    plots: output.plots,
+    drawings: output.drawings,
+    alerts: output.alerts,
+    inputs: output.inputs,
+  };
+}
+
+/**
+ * Normalize result messages from bundled or legacy workers into one payload.
+ */
+export function getResultOutput(message: ResultMessage): WorkerOutputBundle {
+  return message.output ?? {
+    plots: message.plots,
+    drawings: message.drawings,
+    alerts: message.alerts,
+    inputs: message.inputs,
+  };
 }
 
 /**
