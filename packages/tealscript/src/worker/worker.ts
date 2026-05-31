@@ -11,7 +11,8 @@ import { parse, TealscriptParseError } from '../parser';
 import { TealscriptEngine } from '../runtime/engine';
 import type { Program } from '../parser/ast';
 import type { Bar, InputDefinition } from '../runtime/context';
-import type { ToWorkerMessage, FromWorkerMessage, ResultMessage, ErrorMessage, ParseErrorMessage } from './protocol';
+import { createResultMessage } from './protocol';
+import type { ToWorkerMessage, FromWorkerMessage, ErrorMessage, ParseErrorMessage } from './protocol';
 
 /**
  * Worker state for a single script
@@ -141,14 +142,12 @@ function handleUpdateBar(bar: Bar): void {
     // Same bar update (intrabar tick) — rollback + re-execute just this bar
     state.bars[state.bars.length - 1] = bar;
     const plots = state.engine.updateBar(state.ast, bar);
-    postResult({
-      type: 'result',
-      scriptId: state.scriptId,
+    postResult(createResultMessage(state.scriptId, {
       plots,
       drawings: state.engine.getDrawings(),
       alerts: state.engine.getAlerts(),
       inputs: state.lastInputs, // send cached inputs from last full execution
-    });
+    }));
   } else {
     // New bar — need full execute to process the new bar through all statements
     state.bars.push(bar);
@@ -210,14 +209,12 @@ function executeAndSendResults(): void {
     state.lastInputs = inputs;
 
     // Send results
-    const resultMessage: ResultMessage = {
-      type: 'result',
-      scriptId: state.scriptId,
+    const resultMessage = createResultMessage(state.scriptId, {
       plots: result.plots,
       drawings: result.drawings,
       alerts: result.alerts,
       inputs,
-    };
+    });
     postResult(resultMessage);
   } catch (error) {
     handleError(error);

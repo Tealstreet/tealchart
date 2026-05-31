@@ -5,6 +5,7 @@
  * an interface for the chart to push bar data and receive plot outputs.
  */
 
+import { getResultOutput } from '@tealstreet/tealscript';
 import type {
   TealscriptWorker,
   TealscriptWorkerOptions,
@@ -15,6 +16,7 @@ import type {
   AlertOutput,
   InputDefinition,
   Bar,
+  FromWorkerMessage,
 } from '@tealstreet/tealscript';
 
 /**
@@ -104,7 +106,7 @@ class TealscriptWorkerWrapper {
     };
   }
 
-  private handleMessage(message: { type: string; [key: string]: unknown }): void {
+  private handleMessage(message: FromWorkerMessage): void {
     switch (message.type) {
       case 'ready':
         this.isReady = true;
@@ -113,12 +115,7 @@ class TealscriptWorkerWrapper {
         break;
 
       case 'result':
-        this.options.onResult?.({
-          plots: message.plots as PlotOutput[],
-          drawings: (message.drawings as DrawingOutput[] | undefined) ?? [],
-          alerts: (message.alerts as AlertOutput[] | undefined) ?? [],
-          inputs: message.inputs as InputDefinition[],
-        });
+        this.options.onResult?.(getResultOutput(message));
         break;
 
       case 'error':

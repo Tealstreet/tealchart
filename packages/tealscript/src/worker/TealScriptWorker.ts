@@ -6,6 +6,7 @@
  */
 
 import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition } from '../runtime/context';
+import { getResultOutput } from './protocol';
 import type {
   ToWorkerMessage,
   FromWorkerMessage,
@@ -181,12 +182,7 @@ export class TealscriptWorker {
    * Handle successful execution result
    */
   private handleResult(message: ResultMessage): void {
-    this.onResult?.({
-      plots: message.plots,
-      drawings: message.drawings,
-      alerts: message.alerts,
-      inputs: message.inputs,
-    });
+    this.onResult?.(getResultOutput(message));
   }
 
   /**
