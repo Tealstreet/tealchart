@@ -133,6 +133,40 @@ plot(lookaheadGaps, title="Lookahead Gaps")
     expect(getPlot(result, 'Lookahead Gaps').values).toEqual([10, null, 20, null, 30, null]);
   });
 
+  it('locks the official repaint-safe higher-timeframe offset idiom', () => {
+    const result = runCompatScript(`
+indicator("HTF repaint-safe request")
+futureLeak = request.security(syminfo.tickerid, "2", close, lookahead=barmerge.lookahead_on)
+confirmedOnly = request.security(syminfo.tickerid, "2", close[1], lookahead=barmerge.lookahead_on)
+plot(futureLeak, title="Future Leak")
+plot(confirmedOnly, title="Confirmed Only")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: requestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Future Leak').values).toEqual([10, 10, 20, 20, 30, 30]);
+    expect(getPlot(result, 'Confirmed Only').values).toEqual([null, null, 10, 10, 20, 20]);
+  });
+
+  it('supports repaint-safe higher-timeframe requests with derived source offsets', () => {
+    const result = runCompatScript(`
+indicator("HTF repaint-safe derived request")
+futureLeakSource = request.security(syminfo.tickerid, "2", hl2, lookahead=barmerge.lookahead_on)
+confirmedSource = request.security(syminfo.tickerid, "2", hl2[1], lookahead=barmerge.lookahead_on)
+plot(futureLeakSource, title="Future Leak Source")
+plot(confirmedSource, title="Confirmed Source")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: requestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Future Leak Source').values).toEqual([12, 12, 22, 22, 32, 32]);
+    expect(getPlot(result, 'Confirmed Source').values).toEqual([null, null, 12, 12, 22, 22]);
+  });
+
   it('evaluates request expressions inside the requested context', () => {
     const result = runCompatScript(`
 indicator("HTF expression")
