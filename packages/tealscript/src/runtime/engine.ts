@@ -1640,7 +1640,7 @@ export class TealscriptEngine {
     const value = this.toNumber(timestamp);
     if (!Number.isFinite(value)) return 'NaN';
 
-    const offsetMs = this.parseTimezoneOffsetMinutes(timezone) * 60_000;
+    const offsetMs = this.getTimezoneOffsetMinutes(timezone, value) * 60_000;
     const date = new Date(value + offsetMs);
     const pad = (part: number, length = 2): string => String(part).padStart(length, '0');
 
@@ -4380,8 +4380,9 @@ export class TealscriptEngine {
       if (duration === null || currentTime === undefined || !Number.isFinite(currentTime)) return false;
       if (previousTime === undefined || !Number.isFinite(previousTime)) return true;
 
-      const timezoneOffsetMs = this.parseTimezoneOffsetMinutes(this.ctx.syminfo.timezone) * 60_000;
-      return Math.floor((currentTime + timezoneOffsetMs) / duration) !== Math.floor((previousTime + timezoneOffsetMs) / duration);
+      const currentTimezoneOffsetMs = this.getTimezoneOffsetMinutes(this.ctx.syminfo.timezone, currentTime) * 60_000;
+      const previousTimezoneOffsetMs = this.getTimezoneOffsetMinutes(this.ctx.syminfo.timezone, previousTime) * 60_000;
+      return Math.floor((currentTime + currentTimezoneOffsetMs) / duration) !== Math.floor((previousTime + previousTimezoneOffsetMs) / duration);
     });
 
     for (const part of ['year', 'month', 'weekofyear', 'dayofmonth', 'dayofweek', 'hour', 'minute', 'second']) {
@@ -4459,15 +4460,34 @@ export class TealscriptEngine {
       return Number.NaN;
     }
 
-    const timezoneOffset = this.parseTimezoneOffsetMinutes(timezone);
-    return Date.UTC(Math.trunc(year), Math.trunc(month) - 1, Math.trunc(day), Math.trunc(hour), Math.trunc(minute), Math.trunc(second)) - timezoneOffset * 60000;
+    const utcGuess = Date.UTC(Math.trunc(year), Math.trunc(month) - 1, Math.trunc(day), Math.trunc(hour), Math.trunc(minute), Math.trunc(second));
+    const initialOffset = this.getTimezoneOffsetMinutes(timezone, utcGuess);
+    const resolvedTimestamp = utcGuess - initialOffset * 60000;
+    const resolvedOffset = this.getTimezoneOffsetMinutes(timezone, resolvedTimestamp);
+    const finalTimestamp = utcGuess - resolvedOffset * 60000;
+    const finalOffset = this.getTimezoneOffsetMinutes(timezone, finalTimestamp);
+
+    const localDate = new Date(finalTimestamp + finalOffset * 60000);
+    const roundTrips =
+      localDate.getUTCFullYear() === Math.trunc(year) &&
+      localDate.getUTCMonth() === Math.trunc(month) - 1 &&
+      localDate.getUTCDate() === Math.trunc(day) &&
+      localDate.getUTCHours() === Math.trunc(hour) &&
+      localDate.getUTCMinutes() === Math.trunc(minute) &&
+      localDate.getUTCSeconds() === Math.trunc(second);
+
+    if (!roundTrips && resolvedOffset !== initialOffset) {
+      return finalTimestamp + (resolvedOffset - initialOffset) * 60000;
+    }
+
+    return finalTimestamp;
   }
 
   private getCalendarPart(part: string, timestamp: unknown, timezone: string): number {
     const value = this.toNumber(timestamp);
     if (!Number.isFinite(value)) return Number.NaN;
 
-    const date = new Date(value + this.parseTimezoneOffsetMinutes(timezone) * 60000);
+    const date = new Date(value + this.getTimezoneOffsetMinutes(timezone, value) * 60000);
     switch (part) {
       case 'year':
         return date.getUTCFullYear();
@@ -4556,20 +4576,60 @@ export class TealscriptEngine {
     return hour * 60 + minute;
   }
 
-  private parseTimezoneOffsetMinutes(timezone: string): number {
+  private getTimezoneOffsetMinutes(timezone: string, timestamp: number): number {
+    const fixedOffset = this.parseFixedTimezoneOffsetMinutes(timezone);
+    if (fixedOffset !== null) {
+      return fixedOffset;
+    }
+    return this.getIanaTimezoneOffsetMinutes(timezone, timestamp) ?? 0;
+  }
+
+  private parseFixedTimezoneOffsetMinutes(timezone: string): number | null {
     if (timezone === 'UTC' || timezone === 'GMT' || timezone === 'Etc/UTC') {
       return 0;
     }
 
     const match = /^(?:UTC|GMT)([+-])(\d{1,2})(?::?(\d{2}))?$/.exec(timezone);
     if (!match) {
-      return 0;
+      return null;
     }
 
     const sign = match[1] === '+' ? 1 : -1;
     const hours = Number(match[2]);
     const minutes = match[3] === undefined ? 0 : Number(match[3]);
     return sign * (hours * 60 + minutes);
+  }
+
+  private getIanaTimezoneOffsetMinutes(timezone: string, timestamp: number): number | null {
+    if (!Number.isFinite(timestamp)) return null;
+
+    try {
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: timezone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hourCycle: 'h23',
+      }).formatToParts(new Date(timestamp));
+      const values = new Map(parts.map((part) => [part.type, part.value]));
+      const year = Number(values.get('year'));
+      const month = Number(values.get('month'));
+      const day = Number(values.get('day'));
+      const hour = Number(values.get('hour'));
+      const minute = Number(values.get('minute'));
+      const second = Number(values.get('second'));
+      if ([year, month, day, hour, minute, second].some((value) => !Number.isFinite(value))) {
+        return null;
+      }
+
+      const zonedAsUtc = Date.UTC(year, month - 1, day, hour, minute, second);
+      return Math.round((zonedAsUtc - timestamp) / 60000);
+    } catch {
+      return null;
+    }
   }
 
   private getIsoWeek(date: Date): number {
