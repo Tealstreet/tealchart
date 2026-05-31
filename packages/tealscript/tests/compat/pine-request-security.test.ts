@@ -29,6 +29,35 @@ function requestDatafeed(calcBarsCount?: number): InMemoryRequestDatafeed {
   ]);
 }
 
+function multiSymbolRequestDatafeed(): InMemoryRequestDatafeed {
+  return new InMemoryRequestDatafeed([
+    {
+      symbol: 'BTCUSDT',
+      timeframe: '2',
+      bars: requestedBars,
+      syminfo: { ticker: 'BTCUSDT', timezone: 'Etc/UTC' },
+    },
+    {
+      symbol: 'NASDAQ:AAPL',
+      timeframe: '2',
+      bars: [
+        { time: 1_700_000_000_000, open: 180, high: 184, low: 179, close: 181, volume: 10_000 },
+        { time: 1_700_000_120_000, open: 181, high: 186, low: 180, close: 185, volume: 11_000 },
+        { time: 1_700_000_240_000, open: 185, high: 190, low: 184, close: 188, volume: 12_000 },
+      ],
+      currency: 'USD',
+      syminfo: {
+        ticker: 'NASDAQ:AAPL',
+        description: 'Apple Inc.',
+        type: 'stock',
+        currency: 'USD',
+        basecurrency: 'AAPL',
+        timezone: 'America/New_York',
+      },
+    },
+  ]);
+}
+
 describe('Pine request.security compatibility', () => {
   it('merges same-symbol higher timeframe values with default confirmed lookahead-off semantics', () => {
     const result = runCompatScript(`
@@ -106,6 +135,29 @@ plot(htfClose, title="HTF Close")
 
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'HTF Close').values).toEqual([null, null, null, null, 20, 20]);
+  });
+
+  it('evaluates other-symbol metadata inside the requested context', () => {
+    const result = runCompatScript(`
+indicator("Other symbol request")
+aaplClose = request.security("NASDAQ:AAPL", "2", close, lookahead=barmerge.lookahead_on)
+aaplTickerLen = request.security("NASDAQ:AAPL", "2", str.length(syminfo.tickerid), lookahead=barmerge.lookahead_on)
+aaplCurrencyLen = request.security("NASDAQ:AAPL", "2", str.length(syminfo.currency), currency="EUR", lookahead=barmerge.lookahead_on)
+aaplPeriodLen = request.security("NASDAQ:AAPL", "2", str.length(timeframe.period), lookahead=barmerge.lookahead_on)
+plot(aaplClose, title="AAPL Close")
+plot(aaplTickerLen, title="AAPL Ticker Len")
+plot(aaplCurrencyLen, title="AAPL Currency Len")
+plot(aaplPeriodLen, title="AAPL Period Len")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: multiSymbolRequestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'AAPL Close').values).toEqual([181, 181, 185, 185, 188, 188]);
+    expect(getPlot(result, 'AAPL Ticker Len').values).toEqual([11, 11, 11, 11, 11, 11]);
+    expect(getPlot(result, 'AAPL Currency Len').values).toEqual([3, 3, 3, 3, 3, 3]);
+    expect(getPlot(result, 'AAPL Period Len').values).toEqual([1, 1, 1, 1, 1, 1]);
   });
 
   it('supports ignore_invalid_symbol for missing fixture contexts', () => {
