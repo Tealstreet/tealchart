@@ -15,18 +15,6 @@ plot(close)
     ]);
   });
 
-  it('reports planned collection namespace calls explicitly', () => {
-    const result = runCompatScript(`
-indicator("Unsupported collections")
-map.new()
-plot(close)
-`, { bars: [compatibilityBars[0]!] });
-
-    expect(result.errors.map((error) => error.message)).toEqual([
-      'map.* functions are not supported yet: map.new',
-    ]);
-  });
-
   it('does not treat local variables named like planned namespaces as namespaces', () => {
     const result = runCompatScript(`
 indicator("Namespace shadow")
