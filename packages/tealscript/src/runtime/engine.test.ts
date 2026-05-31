@@ -1531,6 +1531,27 @@ plot(ta.cci(hlc3, 3), title="Typical CCI")`;
       expect(result.plots.find((plot) => plot.title === 'Typical CCI')?.values[2]).toBeCloseTo(95.652174);
     });
 
+    it('preserves source history when TA lookback length grows', () => {
+      const script = `//@version=6
+indicator("Growing lookback")
+length = bar_index < 3 ? 2 : 4
+plot(ta.linreg(close, length, 0), title="LinReg")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: 2, open: 101, high: 103, low: 100, close: 102, volume: 100 },
+        { time: 3, open: 102, high: 106, low: 101, close: 105, volume: 100 },
+        { time: 4, open: 105, high: 106, low: 102, close: 103, volume: 100 },
+        { time: 5, open: 103, high: 108, low: 103, close: 107, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'LinReg')?.values[3]).toBeCloseTo(104.3);
+      expect(result.plots.find((plot) => plot.title === 'LinReg')?.values[4]).toBeCloseTo(106.2);
+    });
+
     it('calculates cumulative and window statistic TA helpers', () => {
       const script = `//@version=6
 indicator("TA stats")

@@ -1621,16 +1621,22 @@ export class TealscriptEngine {
 
   private updateBuiltinSourceHistory(scope: Scope, key: string, source: number, keep: number): number[] {
     const history = (scope.get(key) as number[] | undefined) ?? [];
-    const nextHistory = [source, ...history].slice(0, keep);
+    const nextHistory = [source, ...history];
     this.setBuiltinState(scope, key, nextHistory);
-    return nextHistory;
+    return nextHistory.slice(0, keep);
   }
 
   private getCompleteSourceWindow(scope: Scope, key: string, source: number, length: number): number[] | null {
     if (isNaN(source) || length < 1) return null;
-    const values = this.updateBuiltinSourceHistory(scope, key, source, length);
-    if (values.length < length || values.some((value) => isNaN(value))) return null;
-    return values;
+    const maxLengthKey = `${key}_max_length`;
+    const previousMaxLength = scope.get(maxLengthKey) as number | undefined;
+    const maxLength = Math.max(length, previousMaxLength ?? 0);
+    this.setBuiltinState(scope, maxLengthKey, maxLength);
+
+    const values = this.updateBuiltinSourceHistory(scope, key, source, maxLength);
+    const window = values.slice(0, length);
+    if (window.length < length || window.some((value) => isNaN(value))) return null;
+    return window;
   }
 
   private getCompleteNonNaSourceWindow(scope: Scope, key: string, source: number, length: number): number[] | null {
