@@ -68,11 +68,15 @@ plot(directionChanged2 ? 1 : 0, title="Direction Changed 2")
 indicator("Oscillator helpers")
 plot(ta.stoch(close, high, low, 3), title="Stoch Close")
 plot(ta.stoch(hl2, high, low, 3), title="Stoch HL2")
+plot(ta.mfi(hlc3, 3), title="MFI")
+plot(ta.wpr(3), title="WPR")
 `);
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Stoch Close').values)).toEqual([null, null, 88.888889, 25, 9.090909, 30.769231, 88.888889, 92.857143, 75, 88.888889, 50, 71.428571]);
     expect(roundSeries(getPlot(result, 'Stoch HL2').values)).toEqual([null, null, 77.777778, 56.25, 27.272727, 19.230769, 66.666667, 75, 79.166667, 72.222222, 68.75, 50]);
+    expect(roundSeries(getPlot(result, 'MFI').values)).toEqual([null, null, 100, 61.624951, 26.076294, 0, 35.319543, 74.59367, 100, 100, 100, 100]);
+    expect(roundSeries(getPlot(result, 'WPR').values)).toEqual([null, null, -11.111111, -75, -90.909091, -69.230769, -11.111111, -7.142857, -25, -11.111111, -50, -28.571429]);
   });
 
   it('runs cumulative and dispersion TA helpers', () => {

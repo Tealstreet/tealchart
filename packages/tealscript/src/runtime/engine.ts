@@ -3366,6 +3366,57 @@ export class TealscriptEngine {
       return range === 0 ? NaN : ((source - lowestLow) / range) * 100;
     });
 
+    this.builtins.set('ta.mfi', (args, _namedArgs, ctx, scope, callId) => {
+      const source = args[0] as number;
+      const length = this.normalizeLookbackLength(args[1] ?? 14);
+      const volume = ctx.volume.get(0);
+      const sourceKey = `_ta_mfi_source_${callId}`;
+      const positiveKey = `_ta_mfi_positive_${callId}`;
+      const negativeKey = `_ta_mfi_negative_${callId}`;
+      const sourceHistory = (scope.get(sourceKey) as number[] | undefined) ?? [];
+      const previousSource = sourceHistory[0];
+      this.setBuiltinState(scope, sourceKey, [source, ...sourceHistory].slice(0, length + 1));
+
+      if (length < 1 || isNaN(source) || volume === undefined || isNaN(volume)) return NaN;
+
+      let positiveFlow = 0;
+      let negativeFlow = 0;
+      if (previousSource !== undefined && !isNaN(previousSource)) {
+        const rawFlow = source * volume;
+        if (source > previousSource) positiveFlow = rawFlow;
+        if (source < previousSource) negativeFlow = rawFlow;
+      }
+
+      const positiveFlows = this.updateBuiltinSourceHistory(scope, positiveKey, positiveFlow, length);
+      const negativeFlows = this.updateBuiltinSourceHistory(scope, negativeKey, negativeFlow, length);
+      if (positiveFlows.length < length || negativeFlows.length < length) return NaN;
+
+      const positiveSum = positiveFlows.reduce((sum, value) => sum + value, 0);
+      const negativeSum = negativeFlows.reduce((sum, value) => sum + value, 0);
+      if (negativeSum === 0) return positiveSum === 0 ? 50 : 100;
+      if (positiveSum === 0) return 0;
+      return 100 - 100 / (1 + positiveSum / negativeSum);
+    });
+
+    this.builtins.set('ta.wpr', (args, _namedArgs, ctx) => {
+      const length = this.normalizeLookbackLength(args[0] ?? 14);
+      const close = ctx.close.get(0);
+      if (length < 1 || close === undefined || isNaN(close)) return NaN;
+
+      let highestHigh = -Infinity;
+      let lowestLow = Infinity;
+      for (let offset = 0; offset < length; offset++) {
+        const high = ctx.high.get(offset);
+        const low = ctx.low.get(offset);
+        if (high === undefined || low === undefined || isNaN(high) || isNaN(low)) return NaN;
+        if (high > highestHigh) highestHigh = high;
+        if (low < lowestLow) lowestLow = low;
+      }
+
+      const range = highestHigh - lowestLow;
+      return range === 0 ? NaN : ((close - highestHigh) / range) * 100;
+    });
+
     // MOM - Momentum
     this.builtins.set('ta.mom', (args, _namedArgs, ctx) => {
       const source = args[0] as number;
