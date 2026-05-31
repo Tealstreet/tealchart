@@ -425,8 +425,9 @@ The strategy pass accepts `strategy(...)` declarations and maps common settings
 into the exported ledger primitives for settings, orders, fills, trades,
 positions, and equity snapshots. Read-only `strategy.*` state variables such as
 `strategy.equity`, `strategy.position_size`, and trade counters are available
-for scripts. Order functions such as `strategy.entry()` still emit explicit
-unsupported runtime diagnostics until broker-emulator semantics land.
+for scripts. `strategy.entry()`, `strategy.order()`, `strategy.cancel()`, and
+`strategy.cancel_all()` record and cancel pending ledger orders; fills,
+positions, exits, closes, and broker-emulator semantics are still planned.
 
 ## Common Alerts Coverage
 

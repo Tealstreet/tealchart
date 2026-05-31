@@ -107,8 +107,12 @@ export {
 
 export {
   createDefaultStrategySettings,
+  cancelAllStrategyOrders,
+  cancelStrategyOrder,
+  createStrategyOrder,
   createStrategyLedger,
   createStrategyPosition,
+  submitStrategyOrder,
   type StrategyDirection,
   type StrategyEquityPoint,
   type StrategyFill,
@@ -116,9 +120,11 @@ export {
   type StrategyLedgerSettings,
   type StrategyOcaType,
   type StrategyOrder,
+  type StrategyOrderInput,
   type StrategyOrderStatus,
   type StrategyOrderType,
   type StrategyPosition,
+  type StrategyQuantityType,
   type StrategyTrade,
 } from './strategy';
 
