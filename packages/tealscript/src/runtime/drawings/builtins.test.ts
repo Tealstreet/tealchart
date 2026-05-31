@@ -614,4 +614,31 @@ plot(close)`;
         textColor: '#000000',
       });
     });
+
+    it('applies declaration object limits and exposes all-id arrays', () => {
+      const script = `//@version=6
+indicator("Drawing limits", overlay=true, max_labels_count=2, max_lines_count=1, max_boxes_count=1)
+label.new(bar_index, close, text="old")
+line.new(bar_index - 1, low, bar_index, high)
+box.new(bar_index - 1, high, bar_index, low)
+if barstate.islast
+    label.new(bar_index, high, text="mid")
+    label.new(bar_index, low, text="new")
+    line.new(bar_index - 1, close, bar_index, close)
+    box.new(bar_index - 1, high + 1, bar_index, low - 1)
+plot(array.size(label.all), title="Labels")
+plot(array.size(line.all), title="Lines")
+plot(array.size(box.all), title="Boxes")`;
+
+      const ast = parse(script);
+      const bars = createBars(2);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings.map((drawing) => drawing.type)).toEqual(['label', 'label', 'line', 'box']);
+      expect(result.drawings.filter((drawing) => drawing.type === 'label').map((drawing) => drawing.text)).toEqual(['mid', 'new']);
+      expect(result.plots.find((plot) => plot.title === 'Labels')?.values).toEqual([1, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Lines')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Boxes')?.values).toEqual([1, 1]);
+    });
   });

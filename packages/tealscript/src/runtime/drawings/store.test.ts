@@ -81,6 +81,34 @@ describe('DrawingStore', () => {
     expect(store.all()).toEqual([second]);
   });
 
+  it('enforces oldest-first limits per drawing type', () => {
+    const store = new DrawingStore();
+    store.setLimit('label', 2);
+    store.setLimit('line', 1);
+
+    store.add(label({ id: 'label_0' }));
+    store.add(line({ id: 'line_0' }));
+    store.add(label({ id: 'label_1' }));
+    store.add(line({ id: 'line_1' }));
+    store.add(label({ id: 'label_2' }));
+    store.add(box({ id: 'box_0' }));
+
+    expect(store.getIds('label')).toEqual(['label_1', 'label_2']);
+    expect(store.getIds('line')).toEqual(['line_1']);
+    expect(store.getIds('box')).toEqual(['box_0']);
+    expect(store.all().map((drawing) => drawing.id)).toEqual(['label_1', 'line_1', 'label_2', 'box_0']);
+  });
+
+  it('enforces limits when copying drawings', () => {
+    const store = new DrawingStore();
+    store.setLimit('label', 1);
+    store.add(label({ id: 'label_0' }));
+
+    expect(store.copyLabel('label_0', 'label_1', 4)).toMatchObject({ id: 'label_1' });
+    expect(store.get('label_0')).toBeUndefined();
+    expect(store.getIds('label')).toEqual(['label_1']);
+  });
+
   it('marks drawings from an index onward as persistent', () => {
     const store = new DrawingStore();
     const first = label({ id: 'label_0' });

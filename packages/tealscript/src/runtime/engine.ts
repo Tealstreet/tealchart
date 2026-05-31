@@ -345,6 +345,10 @@ export class TealscriptEngine {
     if (stmt.max_bars_back) {
       this.ctx.indicatorMaxBarsBack = this.normalizeMaxBarsBack(this.evaluateExpression(stmt.max_bars_back));
     }
+    this.applyDrawingLimit(stmt.max_labels_count, 'label', 'max_labels_count');
+    this.applyDrawingLimit(stmt.max_lines_count, 'line', 'max_lines_count');
+    this.applyDrawingLimit(stmt.max_boxes_count, 'box', 'max_boxes_count');
+    this.applyDrawingLimit(stmt.max_polylines_count, 'polyline', 'max_polylines_count');
     if (stmt.timeframe) {
       this.applyIndicatorTimeframe(this.evaluateExpression(stmt.timeframe));
     }
@@ -358,6 +362,19 @@ export class TealscriptEngine {
       throw new Error('indicator max_bars_back must be a non-negative integer');
     }
     return value;
+  }
+
+  private applyDrawingLimit(
+    expression: Expression | undefined,
+    type: 'label' | 'line' | 'box' | 'polyline',
+    name: string,
+  ): void {
+    if (!expression) return;
+    const value = this.evaluateExpression(expression);
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || !Number.isInteger(value)) {
+      throw new Error(`indicator ${name} must be a non-negative integer`);
+    }
+    this.ctx.setDrawingLimit(type, value);
   }
 
   private applyIndicatorTimeframe(value: unknown): void {

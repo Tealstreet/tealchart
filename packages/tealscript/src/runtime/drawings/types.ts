@@ -75,3 +75,12 @@ export interface BoxDrawingOutput {
 }
 
 export type DrawingOutput = LabelDrawingOutput | LineDrawingOutput | LineFillDrawingOutput | BoxDrawingOutput;
+
+export type DrawingObjectType = DrawingOutput['type'];
+
+export interface DrawingLimits {
+  label: number;
+  line: number;
+  box: number;
+  polyline: number;
+}

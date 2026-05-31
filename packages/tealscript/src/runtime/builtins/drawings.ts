@@ -154,6 +154,7 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
   builtins.set('label.get_textcolor', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.textColor ?? Number.NaN));
   builtins.set('label.get_size', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.size));
   builtins.set('label.get_tooltip', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.tooltip ?? ''));
+  builtins.set('label.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('label'));
 }
 
 export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
@@ -293,6 +294,7 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
     const x = runtime.toNumber(args[1]);
     return runtime.getLineValue(args[0], ctx, (line) => runtime.interpolateLinePrice(line, x));
   });
+  builtins.set('line.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('line'));
 }
 
 export function registerLineFillBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
@@ -331,6 +333,7 @@ export function registerLineFillBuiltins(builtins: BuiltinRegistry, runtime: Dra
 
   builtins.set('linefill.get_line1', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'linefill', runtime.isNa, (linefill) => linefill.line1));
   builtins.set('linefill.get_line2', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'linefill', runtime.isNa, (linefill) => linefill.line2));
+  builtins.set('linefill.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('linefill'));
 }
 
 export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
@@ -473,6 +476,7 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
   builtins.set('box.get_bgcolor', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.bgcolor ?? Number.NaN));
   builtins.set('box.get_border_color', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.borderColor ?? Number.NaN));
   builtins.set('box.get_text', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.text));
+  builtins.set('box.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('box'));
 }
 
 const DRAWING_CONSTANTS: Record<string, string> = {

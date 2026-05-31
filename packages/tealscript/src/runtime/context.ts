@@ -8,7 +8,7 @@
  * - Plot outputs
  */
 
-import type { BoxDrawingOutput, DrawingOutput, LabelDrawingOutput, LineDrawingOutput } from './drawings/types';
+import type { BoxDrawingOutput, DrawingLimits, DrawingObjectType, DrawingOutput, LabelDrawingOutput, LineDrawingOutput } from './drawings/types';
 import { DrawingStore } from './drawings/store';
 import { Series } from './series';
 
@@ -18,6 +18,7 @@ export type {
   LabelDrawingOutput,
   LineDrawingOutput,
   LineFillDrawingOutput,
+  DrawingLimits,
 } from './drawings/types';
 
 /**
@@ -614,6 +615,17 @@ export class ExecutionContext {
   }
 
   /**
+   * Configure the maximum number of drawings retained per object type.
+   */
+  setDrawingLimit(type: keyof DrawingLimits, value: number): void {
+    this.drawingStore.setLimit(type, value);
+  }
+
+  getDrawingLimit(type: keyof DrawingLimits): number {
+    return this.drawingStore.getLimit(type);
+  }
+
+  /**
    * Current number of drawing outputs.
    */
   getDrawingCount(): number {
@@ -632,6 +644,10 @@ export class ExecutionContext {
    */
   getDrawing(id: string): DrawingOutput | undefined {
     return this.drawingStore.get(id);
+  }
+
+  getDrawingIds(type: DrawingObjectType): string[] {
+    return this.drawingStore.getIds(type);
   }
 
   /**
