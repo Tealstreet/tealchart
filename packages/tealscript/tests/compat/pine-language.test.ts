@@ -190,6 +190,35 @@ plot(average(length=2), title="Length Override")
     ]);
   });
 
+  it('reports invalid user-defined function call arguments', () => {
+    const unknown = runCompatScript(`
+indicator("UDF unknown arg")
+scale(value, factor=2) => value * factor
+plot(scale(close, multiplier=3), title="Scaled")
+`);
+    expect(unknown.errors[0]?.message).toBe("Unknown argument 'multiplier' for function scale");
+
+    const duplicateBinding = runCompatScript(`
+indicator("UDF duplicate binding")
+scale(value, factor=2) => value * factor
+plot(scale(close, value=open), title="Scaled")
+`);
+    expect(duplicateBinding.errors[0]?.message).toBe("Argument 'value' for function scale was supplied multiple times");
+
+    const tooMany = runCompatScript(`
+indicator("UDF too many args")
+scale(value, factor=2) => value * factor
+plot(scale(close, 2, 3), title="Scaled")
+`);
+    expect(tooMany.errors[0]?.message).toBe('Too many arguments for function scale: expected 2, got 3');
+
+    const duplicateNamed = runCompatScript(`
+indicator("Duplicate named args")
+plot(close, title="Close", title="Duplicate")
+`);
+    expect(duplicateNamed.errors[0]?.message).toBe('Duplicate named argument: title');
+  });
+
   it('rejects recursive user-defined function calls with a clear diagnostic', () => {
     const result = runCompatScript(`
 indicator("UDF recursion")
