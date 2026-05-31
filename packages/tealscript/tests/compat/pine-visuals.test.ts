@@ -71,8 +71,8 @@ upColor = color.silver
 downColor = color.blue
 bodyColor = c >= o ? upColor : downColor
 wickColor = color.new(bodyColor, 70)
-plotcandle(o, h, l, c, title="Custom candles", color=bodyColor, wickcolor=wickColor, bordercolor=bodyColor)
-plotbar(o, h + 1, l - 1, c, title="Custom bars", color=bodyColor)
+plotcandle(o, h, l, c, title="Custom candles", color=bodyColor, wickcolor=wickColor, bordercolor=bodyColor, editable=true, show_last=5, display=display.price_scale)
+plotbar(o, h + 1, l - 1, c, "Custom bars", bodyColor, false, 6, display.none)
 `);
 
     expect(result.errors).toEqual([]);
@@ -110,12 +110,44 @@ plotbar(o, h + 1, l - 1, c, title="Custom bars", color=bodyColor)
       '#2196F34D',
       '#B2B5BE4D',
     ]);
+    expect(candles.editable).toBe(true);
+    expect(candles.showLast).toBe(5);
+    expect(candles.display).toBe(8);
 
     const bars = getPlot(result, 'Custom bars');
     expect(bars.type).toBe('plotbar');
     expect(bars.highValues).toEqual([null, 107, 109, 110, 105, 102, 106, 111, 112, 113, 115, 114]);
     expect(bars.lowValues).toEqual([null, 100, 103, 101, 97, 95, 98, 102, 105, 106, 108, 107]);
     expect(bars.color).toEqual(candles.color);
+    expect(bars.editable).toBe(false);
+    expect(bars.showLast).toBe(6);
+    expect(bars.display).toBe(0);
+  });
+
+  it('captures background and bar color visual parameters', () => {
+    const result = runCompatScript(`
+indicator("Bar background smoke", overlay=true)
+bgcolor(bar_index == 0 ? color.blue : na, 1, false, 4, "Session", true)
+barcolor(bar_index == 0 ? color.red : na, 1, true, 5, "Bar Tint", display.none)
+`);
+
+    expect(result.errors).toEqual([]);
+    const background = getPlot(result, 'Session');
+    expect(background.type).toBe('bgcolor');
+    expect(background.color).toEqual([null, '#2196F3', ...Array(compatibilityBars.length - 1).fill(null)]);
+    expect(background.values).toEqual([null, 1, ...Array(compatibilityBars.length - 1).fill(null)]);
+    expect(background.offset).toBe(1);
+    expect(background.editable).toBe(false);
+    expect(background.showLast).toBe(4);
+    expect(background.forceOverlay).toBe(true);
+
+    const barTint = getPlot(result, 'Bar Tint');
+    expect(barTint.type).toBe('barcolor');
+    expect(barTint.color).toEqual([null, '#F44336', ...Array(compatibilityBars.length - 1).fill(null)]);
+    expect(barTint.offset).toBe(1);
+    expect(barTint.editable).toBe(true);
+    expect(barTint.showLast).toBe(5);
+    expect(barTint.display).toBe(0);
   });
 
   it('accepts common Pine visual declaration and plot constants', () => {

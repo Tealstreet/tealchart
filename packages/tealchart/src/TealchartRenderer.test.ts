@@ -531,6 +531,36 @@ describe('TealchartRenderer coordinate transforms', () => {
     });
   });
 
+  describe('background rendering', () => {
+    it('renders bgcolor only for active bars', () => {
+      const fillRect = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillRect,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plot: PlotOutput = {
+        id: 'bgcolor_Session',
+        type: 'bgcolor',
+        title: 'Session',
+        values: [null, 1],
+        color: [null, '#2196F333'],
+      };
+
+      (renderer as any).renderBgcolor(plot, bars, viewport);
+
+      expect(fillRect).toHaveBeenCalledOnce();
+      expect(ctx.fillStyle).toBe('#2196F333');
+    });
+  });
+
   describe('calculateViewport', () => {
     it('returns sensible defaults for empty bars', () => {
       const vp = TealchartRenderer.calculateViewport([]);
