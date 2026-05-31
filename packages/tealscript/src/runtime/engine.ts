@@ -358,7 +358,7 @@ export class TealscriptEngine {
       isdaily: unit === 'D',
       isweekly: unit === 'W',
       ismonthly: unit === 'M',
-      isintraday: unit === 'S',
+      isintraday: unit === 'S' || unit === 'T',
       isseconds: unit === 'S',
       isticks: unit === 'T',
     };
