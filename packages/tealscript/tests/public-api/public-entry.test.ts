@@ -8,7 +8,9 @@ import {
   executeScript,
   createResultMessage,
   getResultOutput,
+  InMemoryRequestDatafeed,
   parse,
+  requestDatafeedKey,
   TealscriptEngine,
   TealscriptWorker,
   validate,
@@ -19,6 +21,7 @@ import {
   type Statement,
   type ToWorkerMessage,
   type NormalizedWorkerOutputBundle,
+  type RequestDatafeed,
   type WorkerOutputBundle,
 } from '../../src';
 
@@ -32,6 +35,7 @@ describe('public package entrypoints', () => {
     const startRule: ParseStartRule = 'Program';
     const message: ToWorkerMessage = { type: 'dispose' };
     const output: WorkerOutputBundle = { plots: [], drawings: [], alerts: [], logs: [], inputs: [] };
+    const datafeed: RequestDatafeed = new InMemoryRequestDatafeed();
     const resultMessage = createResultMessage('script-1', output);
     const normalizedOutput: NormalizedWorkerOutputBundle = getResultOutput(resultMessage);
 
@@ -40,6 +44,9 @@ describe('public package entrypoints', () => {
     expect(typeof executeScript).toBe('function');
     expect(typeof TealscriptEngine).toBe('function');
     expect(typeof TealscriptWorker).toBe('function');
+    expect(typeof InMemoryRequestDatafeed).toBe('function');
+    expect(requestDatafeedKey('A', '1D')).toBe('A\u00001D');
+    expect(datafeed.getBars({ symbol: 'A', timeframe: '1D' }).ok).toBe(false);
     expect(normalizedOutput).toEqual(output);
     expect((expression as Expression).type).toBe('BinaryExpression');
     expect(statement.type).toBe('ExpressionStatement');
