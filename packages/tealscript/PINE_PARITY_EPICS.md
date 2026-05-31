@@ -10,6 +10,9 @@ Structural cleanup that supports this parity work is tracked in
 engineering guardrail for large parser, runtime, worker, renderer, test, and
 documentation changes.
 
+Execute every epic and phase using the branch, review, merge, and checkpoint
+rules in [`PINE_PARITY_EXECUTION_PROTOCOL.md`](./PINE_PARITY_EXECUTION_PROTOCOL.md).
+
 Primary source references:
 
 - [TradingView Pine Script User Manual](https://www.tradingview.com/pine-script-docs/)
