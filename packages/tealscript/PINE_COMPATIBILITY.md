@@ -98,8 +98,9 @@ that supports the parity work.
 The common TA helper pass covers event helpers (`ta.barssince`,
 `ta.valuewhen`), cumulative/window helpers (`ta.cum`, `ta.dev`,
 `ta.variance`, `ta.vwma`, `ta.swma`, `ta.alma`, `ta.highestbars`,
-`ta.lowestbars`), and compatibility aliases/helpers (`ta.cross`, `ta.range`,
-`ta.rising`, and `ta.falling`). The statistical helper pass covers `ta.median`, `ta.mode`,
+`ta.lowestbars`), and compatibility aliases/helpers (`ta.change` numeric and
+boolean forms, `ta.cross`, `ta.range`, `ta.rising`, and `ta.falling`). The
+statistical helper pass covers `ta.median`, `ta.mode`,
 `ta.percentile_nearest_rank`, `ta.percentile_linear_interpolation`, and
 `ta.percentrank`. These are covered in the golden compatibility harness.
 
@@ -128,13 +129,13 @@ The array pass covers typed constructors (`array.new_float`, `array.new_int`,
 `array.from`, `array.copy`, `array.first`, `array.last`, `array.includes`,
 `array.indexof`, `array.lastindexof`, `array.insert`, `array.remove`,
 `array.min`, `array.max`, `array.sum`, `array.avg`, `array.sort`,
-`array.reverse`, `array.join`, `array.concat`, and `array.slice` window
-semantics. Common Pine method
+`array.covariance`, `array.reverse`, `array.join`, `array.concat`, and
+`array.slice` window semantics. Common Pine method
 syntax now lowers to the same runtime built-ins for calls such as
 `values.push(close)`, `values.size()`, `values.get(index)`, and
 `values.avg()`. The checkpoint fixtures follow rolling-window indicator idioms
 and constant-array helper idioms where arrays are copied, searched, summarized,
-ordered, sliced, joined, concatenated, and mutated.
+ordered, sliced, joined, concatenated, mutated, and compared for covariance.
 
 ## Common `color.*` Coverage
 

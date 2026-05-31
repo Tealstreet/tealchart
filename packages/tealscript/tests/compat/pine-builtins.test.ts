@@ -48,13 +48,19 @@ plot(ta.lowestbars(low, 4), title="Lowest Offset")
   it('runs ta.cross and ta.range compatibility helpers', () => {
     const result = runCompatScript(`
 indicator("TA cross range")
+directionChanged = ta.change(close > open)
+directionChanged2 = ta.change(close > open, 2)
 plot(ta.cross(close, 104), title="Cross Threshold")
 plot(ta.range(close, 4), title="Close Range")
+plot(directionChanged ? 1 : 0, title="Direction Changed")
+plot(directionChanged2 ? 1 : 0, title="Direction Changed 2")
 `);
 
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Cross Threshold').values).toEqual([false, true, false, true, false, false, false, true, false, false, false, false]);
     expect(roundSeries(getPlot(result, 'Close Range').values)).toEqual([0, 3, 5, 5, 8, 8, 5, 10, 9, 7, 3, 4]);
+    expect(getPlot(result, 'Direction Changed').values).toEqual([0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Direction Changed 2').values).toEqual([0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0]);
   });
 
   it('runs cumulative and dispersion TA helpers', () => {
@@ -69,6 +75,25 @@ plot(ta.dev(close, 3), title="Mean Deviation")
     expect(roundSeries(getPlot(result, 'Cum Close').values)).toEqual([102, 207, 314, 417, 516, 616, 720, 829, 937, 1048, 1158, 1270]);
     expect(roundSeries(getPlot(result, 'Variance').values)).toEqual([null, null, 4.222222, 2.666667, 10.666667, 2.888889, 4.666667, 13.555556, 4.666667, 1.555556, 1.555556, 0.666667]);
     expect(roundSeries(getPlot(result, 'Mean Deviation').values)).toEqual([null, null, 1.777778, 1.333333, 2.666667, 1.555556, 2, 3.111111, 2, 1.111111, 1.111111, 0.666667]);
+  });
+
+  it('runs array covariance helper idioms', () => {
+    const result = runCompatScript(`
+indicator("Array covariance docs smoke")
+left = array.new_float(0)
+right = array.new_float(0)
+for i = 0 to bar_index
+    array.push(left, close[i])
+    array.push(right, open[i])
+plot(array.covariance(left, right), title="Biased Covariance")
+plot(array.covariance(left, right, false), title="Unbiased Covariance")
+plot(left.covariance(right), title="Method Covariance")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Biased Covariance').values)).toEqual([0, 1.5, 4.111111, 1.625, 1.72, 3.388889, 2.469388, 3.3125, 5.753086, 8.14, 10.53719, 12.555556]);
+    expect(roundSeries(getPlot(result, 'Unbiased Covariance').values)).toEqual([null, 3, 6.166667, 2.166667, 2.15, 4.066667, 2.880952, 3.785714, 6.472222, 9.044444, 11.590909, 13.69697]);
+    expect(roundSeries(getPlot(result, 'Method Covariance').values)).toEqual(roundSeries(getPlot(result, 'Biased Covariance').values));
   });
 
   it('runs string conversion and formatting helpers', () => {
