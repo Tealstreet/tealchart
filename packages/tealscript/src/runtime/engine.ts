@@ -2359,6 +2359,9 @@ export class TealscriptEngine {
     // Request helpers and constants
     this.registerRequestBuiltins();
 
+    // Ticker constructors and constants
+    this.registerTickerBuiltins();
+
     // Pine Logs helpers
     this.registerLogBuiltins();
   }
@@ -3359,6 +3362,57 @@ export class TealscriptEngine {
     for (const [name, value] of Object.entries(currencyConstants)) {
       this.builtins.set(name, () => value);
     }
+  }
+
+  private registerTickerBuiltins(): void {
+    this.builtins.set('session.regular', () => 'regular');
+    this.builtins.set('session.extended', () => 'extended');
+
+    this.builtins.set('ticker.new', (args, namedArgs) => {
+      const prefix = this.toStringValue(namedArgs.get('prefix') ?? args[0] ?? '');
+      const ticker = this.toStringValue(namedArgs.get('ticker') ?? args[1] ?? '');
+      const session = this.normalizeTickerSession(namedArgs.get('session') ?? args[2]);
+      return this.buildTickerId(prefix, ticker, session);
+    });
+
+    this.builtins.set('ticker.modify', (args, namedArgs) => {
+      const tickerId = this.toStringValue(namedArgs.get('tickerid') ?? args[0] ?? '');
+      const session = this.normalizeTickerSession(namedArgs.get('session') ?? args[1]);
+      return this.applyTickerSession(tickerId, session);
+    });
+  }
+
+  private normalizeTickerSession(value: unknown): 'regular' | 'extended' | undefined {
+    if (value === undefined || this.isNa(value)) {
+      return undefined;
+    }
+
+    const session = this.toStringValue(value).trim().toLowerCase();
+    if (session === '' || session === 'regular' || session === 'session.regular') {
+      return 'regular';
+    }
+    if (session === 'extended' || session === 'session.extended') {
+      return 'extended';
+    }
+    throw new Error(`Unsupported ticker session: ${session}`);
+  }
+
+  private buildTickerId(prefix: string, ticker: string, session: 'regular' | 'extended' | undefined): string {
+    const base = prefix.trim() === '' ? ticker.trim() : `${prefix.trim()}:${ticker.trim()}`;
+    return this.applyTickerSession(base, session);
+  }
+
+  private applyTickerSession(tickerId: string, session: 'regular' | 'extended' | undefined): string {
+    const base = tickerId.trim();
+    if (base === '') {
+      throw new Error('ticker.new/ticker.modify requires a non-empty ticker id');
+    }
+
+    const withoutSession = base.replace(/\|session=(regular|extended)$/u, '');
+    if (session === undefined || session === 'regular') {
+      return withoutSession;
+    }
+    return `${withoutSession}|session=extended`;
   }
 
   /**
