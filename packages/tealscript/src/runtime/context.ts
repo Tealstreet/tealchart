@@ -77,6 +77,8 @@ export interface TimeframeInfo {
   isweekly: boolean;
   ismonthly: boolean;
   isintraday: boolean;
+  isseconds: boolean;
+  isticks: boolean;
 }
 
 /**
@@ -238,6 +240,8 @@ export class ExecutionContext {
     isweekly: false,
     ismonthly: false,
     isintraday: true,
+    isseconds: false,
+    isticks: false,
   };
 
   // =========================================================================
@@ -719,6 +723,17 @@ export class ExecutionContext {
     this.indicatorOverlay = false;
     this.indicatorPrecision = 2;
     this.indicatorMaxBarsBack = undefined;
+    this.timeframe = {
+      period: '60',
+      multiplier: 60,
+      isminutes: true,
+      isdaily: false,
+      isweekly: false,
+      ismonthly: false,
+      isintraday: true,
+      isseconds: false,
+      isticks: false,
+    };
     // Clear input definitions - they get re-registered on bar_index === 0
     this.inputDefinitions.length = 0;
 
