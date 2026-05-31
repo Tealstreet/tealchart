@@ -31,6 +31,7 @@ import {
   clearArray,
   concatArray,
   copyArray,
+  covarianceArrayValue,
   createPineArray,
   firstArrayValue,
   getArraySize,
@@ -967,6 +968,7 @@ export class TealscriptEngine {
       case 'max':
       case 'sum':
       case 'avg':
+      case 'covariance':
       case 'clear':
         return `array.${methodName}`;
       default:
@@ -2367,6 +2369,11 @@ export class TealscriptEngine {
     this.builtins.set('array.max', (args) => maxArrayValue(copyReadonlyArray(readArray(args[0]))));
     this.builtins.set('array.sum', (args) => sumArrayValue(copyReadonlyArray(readArray(args[0]))));
     this.builtins.set('array.avg', (args) => avgArrayValue(copyReadonlyArray(readArray(args[0]))));
+    this.builtins.set('array.covariance', (args) => covarianceArrayValue(
+      copyReadonlyArray(readArray(args[0])),
+      copyReadonlyArray(readArray(args[1])),
+      args[2] === undefined ? true : this.isTruthy(args[2]),
+    ));
     this.builtins.set('array.set', (args) => {
       setArrayValue(readMutableArray(args[0]), args[1] as number, args[2]);
       return null;
@@ -2749,9 +2756,19 @@ export class TealscriptEngine {
     });
 
     // Change - difference from N bars ago
-    this.builtins.set('ta.change', (args, _namedArgs, ctx) => {
-      const source = args[0] as number;
-      const length = (args[1] ?? 1) as number;
+    this.builtins.set('ta.change', (args, _namedArgs, ctx, scope, callId) => {
+      const rawSource = args[0];
+      const length = Math.max(1, Math.trunc((args[1] ?? 1) as number));
+
+      if (typeof rawSource === 'boolean') {
+        const key = `_change_bool_${callId}`;
+        const history = (scope.get(key) as boolean[] | undefined) ?? [];
+        const previous = history[length - 1];
+        this.setBuiltinState(scope, key, [rawSource, ...history].slice(0, length));
+        return previous === undefined ? false : rawSource !== previous;
+      }
+
+      const source = rawSource as number;
 
       // Get the series for the source value
       const series = this.getSeriesForSource(source, ctx);

@@ -1436,6 +1436,30 @@ plot(x)`;
       expect(result.plots[0].values[4]).not.toBeNaN();
     });
 
+    it('calculates ta.change for boolean sources', () => {
+      const script = `//@version=6
+indicator("TA change bool")
+flag = bar_index >= 2
+plot(ta.change(flag) ? 1 : 0, title="Changed")
+plot(ta.change(flag, 2) ? 1 : 0, title="Changed 2")
+plot(ta.change(close), title="Close Change")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: 2, open: 101, high: 103, low: 100, close: 102, volume: 100 },
+        { time: 3, open: 102, high: 106, low: 101, close: 105, volume: 100 },
+        { time: 4, open: 105, high: 106, low: 102, close: 103, volume: 100 },
+        { time: 5, open: 103, high: 108, low: 103, close: 107, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Changed')?.values).toEqual([0, 0, 1, 0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Changed 2')?.values).toEqual([0, 0, 1, 1, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Close Change')?.values).toEqual([null, 2, 3, -2, 4]);
+    });
+
     it('calculates ta.lowest', () => {
       const script = `//@version=6
 indicator("Test")
