@@ -561,6 +561,94 @@ describe('TealchartRenderer coordinate transforms', () => {
     });
   });
 
+  describe('visual primitive integration', () => {
+    it('routes fills, hlines, markers, and backgrounds through renderPlots', () => {
+      const fillRect = vi.fn();
+      const fill = vi.fn();
+      const fillText = vi.fn();
+      const stroke = vi.fn();
+      const arc = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillRect,
+        fill,
+        fillText,
+        stroke,
+        arc,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plots: PlotOutput[] = [
+        {
+          id: 'bgcolor_Session',
+          type: 'bgcolor',
+          title: 'Session',
+          values: [1, null, null],
+          color: ['#2196F333', null, null],
+        },
+        {
+          id: 'plot_Basis',
+          type: 'plot',
+          title: 'Basis',
+          values: [100, 110, 120],
+          color: ['#2196F3', '#2196F3', '#2196F3'],
+        },
+        {
+          id: 'hline_Level',
+          type: 'hline',
+          title: 'Level',
+          values: [],
+          color: '#787B86',
+          price: 90,
+          lineStyle: 'dotted',
+        },
+        {
+          id: 'fill_Band',
+          type: 'fill',
+          title: 'Band',
+          values: [],
+          color: ['#4CAF5033', '#4CAF5033', '#4CAF5033'],
+          plot1Id: 'plot_Basis',
+          plot2Id: 'hline_Level',
+        },
+        {
+          id: 'plotshape_Mark',
+          type: 'plotshape',
+          title: 'Mark',
+          values: [1, null, 1],
+          color: ['#F44336', null, '#F44336'],
+          shape: 'circle',
+          location: 'abovebar',
+          text: 'M',
+        },
+        {
+          id: 'plotchar_Char',
+          type: 'plotchar',
+          title: 'Char',
+          values: [null, 1, null],
+          color: [null, '#FFEB3B', null],
+          char: 'C',
+          location: 'belowbar',
+        },
+      ];
+
+      renderer.renderPlots(plots, bars, viewport);
+
+      expect(fillRect).toHaveBeenCalled();
+      expect(fill).toHaveBeenCalled();
+      expect(fillText).toHaveBeenCalledWith('M', expect.any(Number), expect.any(Number));
+      expect(fillText).toHaveBeenCalledWith('C', expect.any(Number), expect.any(Number));
+      expect(stroke).toHaveBeenCalled();
+      expect(arc).toHaveBeenCalled();
+    });
+  });
+
   describe('calculateViewport', () => {
     it('returns sensible defaults for empty bars', () => {
       const vp = TealchartRenderer.calculateViewport([]);
