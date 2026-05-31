@@ -169,6 +169,23 @@ TypeAnnotation
         loc: loc()
       };
     }
+  / "matrix" !IdentifierPart _ "<" _ elementType:TypeName _ ">" {
+      return {
+        type: 'TypeAnnotation',
+        baseType: 'matrix',
+        elementType,
+        loc: loc()
+      };
+    }
+  / "map" !IdentifierPart _ "<" _ keyType:TypeName _ "," _ valueType:TypeName _ ">" {
+      return {
+        type: 'TypeAnnotation',
+        baseType: 'map',
+        keyType,
+        valueType,
+        loc: loc()
+      };
+    }
   / baseType:TypeName {
       return {
         type: 'TypeAnnotation',
@@ -790,6 +807,7 @@ NotOperator
 PostfixExpression
   = head:PrimaryExpression tail:(
       _ "(" __ args:ArgumentList? __ ")" { return { type: 'call', args: args || [] }; }
+    / _ GenericTypeArguments { return { type: 'typeArgs' }; }
     / _ "." _ prop:IdentifierName { return { type: 'member', prop }; }
     / _ "[" __ index:Expression __ "]" { return { type: 'index', index }; }
   )* {
@@ -819,6 +837,9 @@ PostfixExpression
         return obj;
       }, head);
     }
+
+GenericTypeArguments
+  = "<" _ TypeName (_ "," _ TypeName)* _ ">"
 
 // Primary expressions
 PrimaryExpression

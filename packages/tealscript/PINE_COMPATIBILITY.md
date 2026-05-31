@@ -160,6 +160,25 @@ Common Pine method syntax lowers to the same runtime built-ins for calls such as
 `values.set(row, column, close)`, `values.add_row(array.from(...))`,
 `values.transpose()`, and `values.avg()`.
 
+## Common `map.*` Coverage
+
+The map pass covers `map.new`, `map.size`, `map.put`, `map.get`,
+`map.contains`, `map.remove`, `map.clear`, `map.copy`, `map.keys`,
+`map.values`, and `map.put_all`, including method-call forms such as
+`data.put(key, value)` and `data.get(key)`. Missing `get` and `remove` calls
+return `na`, replacing an existing key preserves insertion order, and
+`map.keys()` / `map.values()` return copied Pine arrays ordered by map insertion.
+
+The parser accepts Pine-style `map<key, value>` declarations and generic
+constructor calls such as `map.new<string, float>()`; the current runtime records
+map contents dynamically and does not yet enforce key/value templates. Map loops
+support the documented key-value tuple form, `for [key, value] in data`.
+
+Known limits: map keys are currently restricted at runtime to finite numbers,
+strings, and booleans. Full compile-time map typing, UDT values, reference-type
+rules, and nested collection restrictions belong to the future qualified
+type-system and UDT phases.
+
 ## Common `color.*` Coverage
 
 The common color helper pass covers `color.rgb`, `color.new`, `color.r`,

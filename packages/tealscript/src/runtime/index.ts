@@ -62,6 +62,23 @@ export {
 } from './matrices';
 
 export {
+  createPineMap,
+  isPineMap,
+  getMapSize,
+  putMapValue,
+  getMapValue,
+  containsMapKey,
+  removeMapValue,
+  clearMap,
+  copyMap,
+  mapKeys,
+  mapValues,
+  putAllMapValues,
+  mapEntries,
+  type PineMap,
+} from './maps';
+
+export {
   ExecutionContext,
   createContext,
   type Bar,

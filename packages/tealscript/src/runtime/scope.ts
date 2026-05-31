@@ -11,6 +11,7 @@
 import { Series, type SeriesSnapshot } from './series';
 import { copyArray, isPineArray } from './arrays';
 import { copyMatrix, isPineMatrix } from './matrices';
+import { copyMap, isPineMap } from './maps';
 
 /**
  * Variable declaration kind
@@ -388,7 +389,10 @@ function cloneSnapshotValue(value: unknown): unknown {
   if (isPineArray(value)) {
     return copyArray(value);
   }
-  return isPineMatrix(value) ? copyMatrix(value) : value;
+  if (isPineMatrix(value)) {
+    return copyMatrix(value);
+  }
+  return isPineMap(value) ? copyMap(value) : value;
 }
 
 function cloneSeriesSnapshot(snapshot: SeriesSnapshot<unknown>): SeriesSnapshot<unknown> {
