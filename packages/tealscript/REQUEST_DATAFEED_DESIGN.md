@@ -13,9 +13,9 @@ behavior for supported `request.security*` calls. It also supports the current
 `request.currency_rate()` fixture-backed series MVP. The dynamic MVP enables
 local scope and nested supported requests by default, while rejecting those
 forms when scripts explicitly set `dynamic_requests=false`. Full simple/series
-qualifier analysis, synthetic tickers, and the remaining external request
-families remain out of scope until later Epic 8, Epic 9, and qualified
-type-system phases.
+qualifier analysis and the remaining external request families remain out of
+scope until later Epic 8 and qualified type-system phases. Synthetic ticker
+identifiers from Epic 9 flow through this same request key contract.
 
 ## Contract
 
@@ -52,6 +52,11 @@ Supported error codes are:
 The in-memory fixture implementation clones bars on write and read so tests
 cannot accidentally share mutable bar state across contexts.
 It also clones scalar series points for external request fixtures.
+
+For synthetic ticker fixtures, the in-memory datafeed derives Heikin-Ashi bars
+when a matching base context exists. Other non-standard chart contexts, such as
+Renko, Line Break, Kagi, and Point & Figure, must be provided by the host or
+test fixture under the constructed ticker ID.
 
 ## `request.security()` MVP
 
@@ -116,9 +121,10 @@ series supplied by the request datafeed.
 
 ## Integration Path
 
-The engine can accept an optional `RequestDatafeed` in a future PR. Tealchart can
-then provide request contexts from its chart datafeed/cache while tests continue
-to use `InMemoryRequestDatafeed`.
+The engine accepts an optional `RequestDatafeed` through
+`TealscriptEngineOptions`. Tealchart or another host can provide request
+contexts from its chart datafeed/cache while tests continue to use
+`InMemoryRequestDatafeed`.
 
 Worker protocol changes are intentionally deferred. Once runtime behavior is
 stable, the worker can carry request metadata or host-provided datafeed handles
@@ -128,8 +134,8 @@ without changing the fixture-level contract.
 
 This contract does not yet cover full simple/series qualifier diagnostics,
 corporate actions, economic data, financial data, seeded data, footprint data,
-or synthetic ticker construction. Those belong to later Epic 8 and Epic 9
-phases.
+or strategy/backtest execution over synthetic ticker data. Those belong to
+later Epic 8, Epic 14, and qualified type-system phases.
 
 ## Test Strategy
 
