@@ -808,9 +808,6 @@ export class TealscriptEngine {
     if (namespace === 'strategy') {
       throw new Error(`strategy.* functions are not supported yet: ${fullName}`);
     }
-    if (namespace && this.isPlannedUnsupportedNamespace(namespace)) {
-      throw new Error(`${namespace}.* functions are not supported yet: ${fullName}`);
-    }
     if (namespace && this.isUnsupportedDrawingNamespace(namespace)) {
       throw new Error(`${namespace}.* functions are not supported yet: ${fullName}`);
     }
@@ -841,6 +838,10 @@ export class TealscriptEngine {
         const receiver = this.evaluateExpression(expr.callee.object);
         return methodBuiltin([receiver, ...args], namedArgs, this.ctx, this.scope, this.nextBuiltinCallId(methodBuiltinName));
       }
+    }
+
+    if (namespace && !this.scope.has(namespace) && this.isPlannedUnsupportedNamespace(namespace)) {
+      throw new Error(`${namespace}.* functions are not supported yet: ${fullName}`);
     }
 
     if (!namespace) {

@@ -29,10 +29,22 @@ plot(close)
     ]);
   });
 
+  it('does not treat local variables named like planned namespaces as namespaces', () => {
+    const result = runCompatScript(`
+indicator("Namespace shadow")
+map = array.new_float()
+map.push(close)
+plot(map.get(0))
+`, { bars: [compatibilityBars[0]!] });
+
+    expect(result.errors).toEqual([]);
+    expect(result.plots[0]?.values).toEqual([102]);
+  });
+
   it('reports planned visual and ticker namespace calls explicitly', () => {
     const result = runCompatScript(`
 indicator("Unsupported visuals")
-polyline.new(array.from(chart.point.now(close)))
+polyline.new()
 ticker.heikinashi(syminfo.tickerid)
 plot(close)
 `, { bars: [compatibilityBars[0]!] });
