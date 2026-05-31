@@ -434,8 +434,9 @@ change exposure. Price-based `strategy.exit()` limit/stop brackets are recorded
 as pending exit orders. Pending limit/stop orders fill on later bars when OHLC
 crosses their trigger price, and bracket siblings cancel through OCA. Fixed,
 cash, and percent-of-equity sizing resolve to concrete order quantities at
-submission time; trailing stops, same-bar intrabar path modeling, and full
-broker-emulator semantics are still planned.
+submission time, and `strategy.entry()` enforces same-direction pyramiding
+limits. Trailing stops, same-bar intrabar path modeling, and full broker-emulator
+semantics are still planned.
 
 ## Common Alerts Coverage
 

@@ -3196,8 +3196,8 @@ export class TealscriptEngine {
     this.builtins.set('strategy.oca.cancel', () => 'cancel');
     this.builtins.set('strategy.oca.reduce', () => 'reduce');
     this.builtins.set('strategy.oca.none', () => 'none');
-    this.builtins.set('strategy.entry', (args, namedArgs) => this.submitStrategyOrderBuiltin(args, namedArgs));
-    this.builtins.set('strategy.order', (args, namedArgs) => this.submitStrategyOrderBuiltin(args, namedArgs));
+    this.builtins.set('strategy.entry', (args, namedArgs) => this.submitStrategyOrderBuiltin(args, namedArgs, true));
+    this.builtins.set('strategy.order', (args, namedArgs) => this.submitStrategyOrderBuiltin(args, namedArgs, false));
     this.builtins.set('strategy.exit', (args, namedArgs) => this.submitStrategyExitBuiltin(args, namedArgs));
     this.builtins.set('strategy.close', (args, namedArgs) => this.submitStrategyCloseBuiltin(args, namedArgs));
     this.builtins.set('strategy.close_all', (args, namedArgs) => this.submitStrategyCloseAllBuiltin(args, namedArgs));
@@ -3212,7 +3212,7 @@ export class TealscriptEngine {
     });
   }
 
-  private submitStrategyOrderBuiltin(args: unknown[], namedArgs: Map<string, unknown>): undefined {
+  private submitStrategyOrderBuiltin(args: unknown[], namedArgs: Map<string, unknown>, respectPyramiding: boolean): undefined {
     const id = this.toStringValue(this.getCallArg(args, namedArgs, 0, 'id', ''));
     const direction = this.normalizeStrategyDirection(this.getCallArg(args, namedArgs, 1, 'direction'));
     const rawQty = this.toOptionalNumber(this.getCallArg(args, namedArgs, 2, 'qty'));
@@ -3230,6 +3230,9 @@ export class TealscriptEngine {
     }
     if (!Number.isFinite(qtyValue) || qtyValue <= 0) {
       throw new Error('strategy order qty must be a positive number');
+    }
+    if (respectPyramiding && !this.canSubmitStrategyEntry(direction)) {
+      return undefined;
     }
     const qty = this.resolveStrategyOrderQty(qtyType, qtyValue, limitPrice, stopPrice);
 
@@ -3257,6 +3260,11 @@ export class TealscriptEngine {
     );
 
     return undefined;
+  }
+
+  private canSubmitStrategyEntry(direction: StrategyDirection): boolean {
+    const openEntries = this.ctx.strategyLedger.openTrades.filter((trade) => trade.direction === direction).length;
+    return openEntries < this.ctx.strategyLedger.settings.pyramiding + 1;
   }
 
   private resolveStrategyOrderQty(

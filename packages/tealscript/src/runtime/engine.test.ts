@@ -539,6 +539,50 @@ plot(strategy.position_size)`;
       ]);
     });
 
+    it('blocks same-direction strategy.entry calls above the pyramiding limit', () => {
+      const script = `//@version=6
+strategy("Pyramiding default")
+if bar_index == 0
+    strategy.entry("First", strategy.long, qty=1)
+if bar_index == 1
+    strategy.entry("Second", strategy.long, qty=1)
+plot(strategy.position_size)
+plot(strategy.opentrades)`;
+
+      const result = executeScript(parse(script), createBars(2));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => order.id)).toEqual(['First']);
+      expect(result.strategy.position.size).toBe(1);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [1, 1],
+        [1, 1],
+      ]);
+    });
+
+    it('allows additional strategy.entry calls up to the pyramiding setting', () => {
+      const script = `//@version=6
+strategy("Pyramiding allowed", pyramiding=1)
+if bar_index == 0
+    strategy.entry("First", strategy.long, qty=1)
+if bar_index == 1
+    strategy.entry("Second", strategy.long, qty=1)
+if bar_index == 2
+    strategy.entry("Third", strategy.long, qty=1)
+plot(strategy.position_size)
+plot(strategy.opentrades)`;
+
+      const result = executeScript(parse(script), createBars(3));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => order.id)).toEqual(['First', 'Second']);
+      expect(result.strategy.position.size).toBe(2);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [1, 2, 2],
+        [1, 2, 2],
+      ]);
+    });
+
     it('fills strategy.exit brackets and cancels the sibling OCA order', () => {
       const script = `//@version=6
 strategy("Exit bracket fill")
@@ -579,7 +623,7 @@ plot(strategy.closedtrades)`;
 
     it('keeps strategy.exit OCA cancellation scoped to from_entry', () => {
       const script = `//@version=6
-strategy("OCA scope")
+strategy("OCA scope", pyramiding=1)
 if bar_index == 0
     strategy.entry("A", strategy.long, qty=1)
     strategy.entry("B", strategy.long, qty=1)
