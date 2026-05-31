@@ -3448,6 +3448,9 @@ export class TealscriptEngine {
     existingOrder.comment = input.comment;
     existingOrder.alertMessage = input.alertMessage;
     if (triggerChanged) {
+      existingOrder.stopLimitActivated = false;
+      existingOrder.stopLimitActivatedBarIndex = null;
+      existingOrder.stopLimitActivatedTime = null;
       existingOrder.activationBarIndex = input.barIndex;
       existingOrder.activationTime = input.time;
     }
