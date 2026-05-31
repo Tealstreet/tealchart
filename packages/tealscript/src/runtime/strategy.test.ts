@@ -163,6 +163,17 @@ describe('strategy ledger model', () => {
       barIndex: 0,
       time: 1,
     })).toThrow('strategy order limitPrice must be finite');
+
+    expect(() => createStrategyOrder({
+      id: 'Bad requested qty',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      requestedQty: Number.NaN,
+      barIndex: 0,
+      time: 1,
+    })).toThrow('strategy order requestedQty must be a positive number');
   });
 
   it('fills market orders and updates position average price', () => {

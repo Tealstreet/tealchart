@@ -432,6 +432,13 @@ function validateStrategyOrderInput(input: StrategyOrderInput): void {
   if (input.qty !== null && (!Number.isFinite(input.qty) || input.qty <= 0)) {
     throw new Error('strategy order qty must be a positive number');
   }
+  if (
+    input.requestedQty !== undefined
+    && input.requestedQty !== null
+    && (!Number.isFinite(input.requestedQty) || input.requestedQty <= 0)
+  ) {
+    throw new Error('strategy order requestedQty must be a positive number');
+  }
   if (!Number.isFinite(input.qtyValue) || input.qtyValue <= 0) {
     throw new Error('strategy order qtyValue must be a positive number');
   }
