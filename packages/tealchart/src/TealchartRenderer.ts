@@ -2,9 +2,15 @@ import type { BoxDrawingOutput, DrawingOutput, LabelDrawingOutput, LineDrawingOu
 import type { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
 import type { CanvasContext } from './rendering/CanvasContext';
 import type { PaneOffset } from './rendering/PaneManager';
+import type { DrawingCoordinateResolvers } from './rendering/TealScriptDrawingCoordinates';
 import type { TealScriptDrawingPartition } from './rendering/TealScriptDrawingPartition';
 
 import { computeCandleCoordinates } from './jailbreak/computeCandleCoordinates';
+import {
+  resolveBoxDrawingRect,
+  resolveLabelDrawingPosition,
+  resolveLineDrawingSegment,
+} from './rendering/TealScriptDrawingCoordinates';
 import { partitionTealScriptDrawings } from './rendering/TealScriptDrawingPartition';
 import { getDecimalPlacesFromPrecision, LineStyle, PlotStyleOverride } from './state/chartState';
 import {
@@ -164,6 +170,13 @@ export class TealchartRenderer {
       return 'sans-serif';
     }
     return fontFamily;
+  }
+
+  private getDrawingCoordinateResolvers(): DrawingCoordinateResolvers {
+    return {
+      timeToX: (time, viewport, chartWidth) => this.timeToX(time, viewport, chartWidth),
+      valueToY: (value, pane) => this.valueToY(value, pane),
+    };
   }
 
   /**
@@ -3152,6 +3165,7 @@ export class TealchartRenderer {
     const chartWidth = options.width - margins.left;
     const minX = margins.left;
     const maxX = options.width - margins.right;
+    const coordinateResolvers = this.getDrawingCoordinateResolvers();
 
     ctx.save();
     ctx.beginPath();
@@ -3159,7 +3173,7 @@ export class TealchartRenderer {
     ctx.clip();
 
     for (const box of boxes) {
-      const rect = this.resolveBoxDrawingRect(box, bars, viewport, pane, chartWidth, minX, maxX);
+      const rect = resolveBoxDrawingRect(box, bars, viewport, pane, chartWidth, minX, maxX, coordinateResolvers);
       if (!rect) continue;
 
       if (box.bgcolor) {
@@ -3192,49 +3206,6 @@ export class TealchartRenderer {
     ctx.restore();
   }
 
-  private resolveBoxDrawingRect(
-    box: BoxDrawingOutput,
-    bars: Bar[],
-    viewport: Viewport,
-    pane: ComputedPane,
-    chartWidth: number,
-    minX: number,
-    maxX: number,
-  ): { x: number; y: number; width: number; height: number } | null {
-    if (
-      box.left === null
-      || box.right === null
-      || box.top === null
-      || box.bottom === null
-      || !Number.isFinite(box.left)
-      || !Number.isFinite(box.right)
-      || !Number.isFinite(box.top)
-      || !Number.isFinite(box.bottom)
-    ) {
-      return null;
-    }
-
-    const leftTime = box.xloc === 'bar_time' ? box.left : this.barIndexToTime(box.left, bars);
-    const rightTime = box.xloc === 'bar_time' ? box.right : this.barIndexToTime(box.right, bars);
-    if (leftTime === null || rightTime === null) return null;
-
-    let leftX = this.timeToX(leftTime, viewport, chartWidth);
-    let rightX = this.timeToX(rightTime, viewport, chartWidth);
-    if (box.extend === 'left' || box.extend === 'both') leftX = minX;
-    if (box.extend === 'right' || box.extend === 'both') rightX = maxX;
-
-    const topY = this.valueToY(box.top, pane);
-    const bottomY = this.valueToY(box.bottom, pane);
-    const x = Math.min(leftX, rightX);
-    const y = Math.min(topY, bottomY);
-    return {
-      x,
-      y,
-      width: Math.abs(rightX - leftX),
-      height: Math.abs(bottomY - topY),
-    };
-  }
-
   private fontSizeForDrawing(size: string): number {
     switch (size) {
       case 'tiny':
@@ -3265,6 +3236,7 @@ export class TealchartRenderer {
     const chartWidth = options.width - margins.left;
     const minX = margins.left;
     const maxX = options.width - margins.right;
+    const coordinateResolvers = this.getDrawingCoordinateResolvers();
 
     ctx.save();
     ctx.beginPath();
@@ -3276,8 +3248,8 @@ export class TealchartRenderer {
       const line2 = linesById.get(linefill.line2);
       if (!line1 || !line2) continue;
 
-      const line1Segment = this.resolveLineDrawingSegment(line1, bars, viewport, pane, chartWidth, minX, maxX);
-      const line2Segment = this.resolveLineDrawingSegment(line2, bars, viewport, pane, chartWidth, minX, maxX);
+      const line1Segment = resolveLineDrawingSegment(line1, bars, viewport, pane, chartWidth, minX, maxX, coordinateResolvers);
+      const line2Segment = resolveLineDrawingSegment(line2, bars, viewport, pane, chartWidth, minX, maxX, coordinateResolvers);
       if (!line1Segment || !line2Segment) continue;
 
       ctx.fillStyle = linefill.color ?? 'rgba(41, 98, 255, 0.18)';
@@ -3305,6 +3277,7 @@ export class TealchartRenderer {
     const chartWidth = options.width - margins.left;
     const minX = margins.left;
     const maxX = options.width - margins.right;
+    const coordinateResolvers = this.getDrawingCoordinateResolvers();
 
     ctx.save();
     ctx.beginPath();
@@ -3312,7 +3285,7 @@ export class TealchartRenderer {
     ctx.clip();
 
     for (const line of lines) {
-      const extended = this.resolveLineDrawingSegment(line, bars, viewport, pane, chartWidth, minX, maxX);
+      const extended = resolveLineDrawingSegment(line, bars, viewport, pane, chartWidth, minX, maxX, coordinateResolvers);
       if (!extended) continue;
 
       ctx.strokeStyle = line.color ?? '#2962FF';
@@ -3334,80 +3307,6 @@ export class TealchartRenderer {
     ctx.restore();
   }
 
-  private resolveLineDrawingSegment(
-    line: LineDrawingOutput,
-    bars: Bar[],
-    viewport: Viewport,
-    pane: ComputedPane,
-    chartWidth: number,
-    minX: number,
-    maxX: number,
-  ): { start: { x: number; y: number }; end: { x: number; y: number } } | null {
-    const start = this.resolveLineDrawingPoint(line.x1, line.y1, line.xloc, bars, viewport, pane, chartWidth);
-    const end = this.resolveLineDrawingPoint(line.x2, line.y2, line.xloc, bars, viewport, pane, chartWidth);
-    if (!start || !end) return null;
-    return this.resolveExtendedLineSegment(start, end, line.extend, minX, maxX);
-  }
-
-  private resolveLineDrawingPoint(
-    xValue: number | null,
-    yValue: number | null,
-    xloc: string,
-    bars: Bar[],
-    viewport: Viewport,
-    pane: ComputedPane,
-    chartWidth: number,
-  ): { x: number; y: number } | null {
-    if (xValue === null || yValue === null || !Number.isFinite(xValue) || !Number.isFinite(yValue)) {
-      return null;
-    }
-
-    const time = xloc === 'bar_time' ? xValue : this.barIndexToTime(xValue, bars);
-    if (time === null) return null;
-
-    const x = this.timeToX(time, viewport, chartWidth);
-    const y = this.valueToY(yValue, pane);
-    return { x, y };
-  }
-
-  private barIndexToTime(index: number, bars: Bar[]): number | null {
-    if (bars.length === 0 || !Number.isFinite(index)) return null;
-
-    const roundedIndex = Math.trunc(index);
-    if (roundedIndex >= 0 && roundedIndex < bars.length) {
-      return bars[roundedIndex]?.time ?? null;
-    }
-
-    const interval = bars.length > 1 ? bars[1]!.time - bars[0]!.time : 60_000;
-    return bars[0]!.time + roundedIndex * interval;
-  }
-
-  private resolveExtendedLineSegment(
-    start: { x: number; y: number },
-    end: { x: number; y: number },
-    extend: string,
-    minX: number,
-    maxX: number,
-  ): { start: { x: number; y: number }; end: { x: number; y: number } } {
-    if (start.x === end.x) {
-      return { start, end };
-    }
-
-    const slope = (end.y - start.y) / (end.x - start.x);
-    const yAt = (x: number): number => start.y + slope * (x - start.x);
-    let nextStart = start;
-    let nextEnd = end;
-
-    if (extend === 'left' || extend === 'both') {
-      nextStart = { x: minX, y: yAt(minX) };
-    }
-    if (extend === 'right' || extend === 'both') {
-      nextEnd = { x: maxX, y: yAt(maxX) };
-    }
-
-    return { start: nextStart, end: nextEnd };
-  }
-
   private renderLabelDrawings(
     labels: LabelDrawingOutput[],
     bars: Bar[],
@@ -3419,13 +3318,14 @@ export class TealchartRenderer {
     const { ctx, options, margins } = this;
     const chartWidth = options.width - margins.left;
     const font = `12px ${this.font}`;
+    const coordinateResolvers = this.getDrawingCoordinateResolvers();
 
     ctx.save();
     ctx.font = font;
     ctx.textBaseline = 'middle';
 
     for (const label of labels) {
-      const position = this.resolveLabelDrawingPosition(label, bars, viewport, pane, chartWidth);
+      const position = resolveLabelDrawingPosition(label, bars, viewport, pane, chartWidth, coordinateResolvers);
       if (!position) continue;
 
       const text = label.text ?? '';
@@ -3471,43 +3371,6 @@ export class TealchartRenderer {
     }
 
     ctx.restore();
-  }
-
-  private resolveLabelDrawingPosition(
-    label: LabelDrawingOutput,
-    bars: Bar[],
-    viewport: Viewport,
-    pane: ComputedPane,
-    chartWidth: number,
-  ): { x: number; y: number } | null {
-    const barIndex = Number.isFinite(label.barIndex) ? Math.trunc(label.barIndex) : -1;
-    const xValue = label.x ?? barIndex;
-    const xIndex = Number.isFinite(xValue) ? Math.trunc(xValue) : barIndex;
-    const anchorIndex = label.xloc === 'bar_time' ? barIndex : xIndex;
-    const bar = anchorIndex >= 0 && anchorIndex < bars.length ? bars[anchorIndex] : undefined;
-    const time = label.xloc === 'bar_time'
-      ? xValue
-      : (xIndex >= 0 && xIndex < bars.length ? bars[xIndex].time : undefined);
-    if (time === undefined || time < viewport.startTime || time > viewport.endTime) {
-      return null;
-    }
-
-    const x = this.timeToX(time, viewport, chartWidth);
-    let y: number;
-
-    if (label.yloc === 'abovebar') {
-      if (!bar) return null;
-      y = this.valueToY(bar.high, pane) - 6;
-    } else if (label.yloc === 'belowbar') {
-      if (!bar) return null;
-      y = this.valueToY(bar.low, pane) + 6;
-    } else {
-      if (label.y === null || !Number.isFinite(label.y)) return null;
-      if (label.y < pane.yMin || label.y > pane.yMax) return null;
-      y = this.valueToY(label.y, pane);
-    }
-
-    return { x, y };
   }
 
   /**
