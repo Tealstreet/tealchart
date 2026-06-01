@@ -70,6 +70,8 @@ describe('PineMap', () => {
     const map = createPineMap();
 
     expect(() => putMapValue(map, Number.NaN, 1)).toThrow('Map keys must be finite value types');
+    expect(() => putMapValue(map, Number.POSITIVE_INFINITY, 1)).toThrow('Map keys must be finite value types');
+    expect(() => putMapValue(map, Number.NEGATIVE_INFINITY, 1)).toThrow('Map keys must be finite value types');
     expect(() => putMapValue(map, {}, 1)).toThrow('Map keys must be value types');
   });
 
