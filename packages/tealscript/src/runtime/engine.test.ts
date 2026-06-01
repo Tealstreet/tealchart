@@ -2421,6 +2421,7 @@ plot(str.format_time(stamp, "yyyy-MM-dd HH:mm:ss", "GMT+2") == "2024-01-05 09:30
 plot(str.format_time(stamp, "yy/MM/dd HH:mm", "UTC") == "24/01/05 07:30", title="UTC")
 plot(str.format_time(time=stamp, timezone="GMT+2") == "2024-01-05T09:30:15+0200", title="Named Default")
 plot(str.format_time(stamp, "M/d/yyyy H:m:s 'UTC'Z", "UTC") == "1/5/2024 7:30:15 UTC+0000", title="Single Tokens")
+plot(str.format_time(stamp, "yyyy'T''Z'HH", "UTC") == "2024T'Z07", title="Escaped Quote")
 plot(str.format_time(na, "yyyy-MM-dd", "UTC") == "NaN", title="Missing")`;
 
       const ast = parse(script);
@@ -2432,6 +2433,7 @@ plot(str.format_time(na, "yyyy-MM-dd", "UTC") == "NaN", title="Missing")`;
       expect(result.plots.find((plot) => plot.title === 'UTC')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Named Default')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Single Tokens')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Escaped Quote')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Missing')?.values).toEqual([true, true]);
     });
 

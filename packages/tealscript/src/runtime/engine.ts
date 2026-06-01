@@ -3156,19 +3156,20 @@ export class TealscriptEngine {
     let result = '';
     for (let index = 0; index < format.length;) {
       if (format[index] === "'") {
-        if (format[index + 1] === "'") {
-          result += "'";
-          index += 2;
-          continue;
+        index += 1;
+        while (index < format.length) {
+          if (format[index] === "'") {
+            if (format[index + 1] === "'") {
+              result += "'";
+              index += 2;
+              continue;
+            }
+            index += 1;
+            break;
+          }
+          result += format[index];
+          index += 1;
         }
-
-        const end = format.indexOf("'", index + 1);
-        if (end === -1) {
-          result += format.slice(index + 1);
-          break;
-        }
-        result += format.slice(index + 1, end);
-        index = end + 1;
         continue;
       }
 
