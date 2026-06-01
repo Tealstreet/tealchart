@@ -435,7 +435,8 @@ at CI time.
 Phases:
 
 1. Curate source-linked reduced fixtures from official docs for each major
-   concept.
+   concept. Initial checkpoints cover official built-ins namespace, barstate
+   plus dynamic array growth, and inside/outside `barcolor()` idioms.
 2. Curate source-linked reduced fixtures from public common idioms: MTF trend
    filters, divergence scripts, liquidity zones, session filters, labels,
    tables, and simple strategies.
