@@ -353,7 +353,8 @@ Phases:
    hiding, and pane coordinates for the current output shape.
 3. Finish `fill()` for plot/hline handles, fill gaps, title/editable/display,
    and color series behavior.
-   Initial renderer parity now applies `show_last` windows to filled regions.
+   Renderer coverage now applies plot/hline handles, gap handling, color
+   series, display hiding, and `show_last` windows for the current output shape.
 4. Finish `plotshape`, `plotchar`, and `plotarrow` text, location, size,
    offset, display, and color behavior. Initial parity work now captures
    runtime metadata for common marker parameters and normalizes `plotarrow`

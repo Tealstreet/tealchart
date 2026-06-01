@@ -300,7 +300,8 @@ Hline renderer coverage applies Pine `hline()` color, linewidth, linestyle,
 display hiding, and pane-coordinate behavior for the current output shape.
 
 Fill renderer coverage applies `show_last` windows to filled regions while
-preserving existing gap handling and per-bar fill colors.
+preserving existing gap handling, per-bar fill colors, display hiding, and
+plot/hline handle fills.
 The same renderer bar-window handling now applies to common `plot()`,
 `bgcolor()`, `barcolor()`, `plotbar()`, `plotcandle()`, `plotshape()`,
 `plotchar()`, and `plotarrow()` outputs.
