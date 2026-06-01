@@ -832,6 +832,34 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     });
     return undefined;
   });
+  builtins.set('table.cell_set_width', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      const cell = ensureCell(table, args[1], args[2]);
+      cell.width = runtime.toNullableNumber(args[3]);
+    });
+    return undefined;
+  });
+  builtins.set('table.cell_set_height', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      const cell = ensureCell(table, args[1], args[2]);
+      cell.height = runtime.toNullableNumber(args[3]);
+    });
+    return undefined;
+  });
+  builtins.set('table.cell_set_text_halign', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      const cell = ensureCell(table, args[1], args[2]);
+      cell.textHalign = runtime.toStringValue(args[3]);
+    });
+    return undefined;
+  });
+  builtins.set('table.cell_set_text_valign', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      const cell = ensureCell(table, args[1], args[2]);
+      cell.textValign = runtime.toStringValue(args[3]);
+    });
+    return undefined;
+  });
 }
 
 const DRAWING_CONSTANTS: Record<string, string> = {
