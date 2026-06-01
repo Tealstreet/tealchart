@@ -199,10 +199,41 @@ export function modeMatrixValue(matrix: PineMatrix): number {
   return modeArrayValue(matrixValuesAsArray(matrix));
 }
 
+export function sumMatrixValue(matrix: PineMatrix, other: PineMatrix | number): PineMatrix<number> {
+  return mapMatrixArithmetic(matrix, other, (left, right) => left + right);
+}
+
+export function diffMatrixValue(matrix: PineMatrix, other: PineMatrix | number): PineMatrix<number> {
+  return mapMatrixArithmetic(matrix, other, (left, right) => left - right);
+}
+
 function matrixIndex(matrix: PineMatrix, row: number, column: number): number {
   const normalizedRow = normalizeExistingIndex(row, matrix.rows, 'row');
   const normalizedColumn = normalizeExistingIndex(column, matrix.columns, 'column');
   return normalizedRow * matrix.columns + normalizedColumn;
+}
+
+function mapMatrixArithmetic(
+  matrix: PineMatrix,
+  other: PineMatrix | number,
+  operation: (left: number, right: number) => number,
+): PineMatrix<number> {
+  const result = createPineMatrix<number>(matrix.rows, matrix.columns);
+  if (isPineMatrix(other)) {
+    assertSameShape(matrix, other);
+    result.values = matrix.values.map((value, index) => operation(Number(value), Number(other.values[index])));
+    return result;
+  }
+
+  const scalar = Number(other);
+  result.values = matrix.values.map((value) => operation(Number(value), scalar));
+  return result;
+}
+
+function assertSameShape(left: PineMatrix, right: PineMatrix): void {
+  if (left.rows !== right.rows || left.columns !== right.columns) {
+    throw new Error(`Matrix dimensions must match. Left is ${left.rows}x${left.columns}, right is ${right.rows}x${right.columns}`);
+  }
 }
 
 function matrixValuesAsArray(matrix: PineMatrix): PineArray {

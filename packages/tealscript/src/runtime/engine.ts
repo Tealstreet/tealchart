@@ -101,6 +101,7 @@ import {
   avgMatrixValue,
   copyMatrix,
   createPineMatrix,
+  diffMatrixValue,
   fillMatrix,
   getMatrixColumns,
   getMatrixElementCount,
@@ -120,6 +121,7 @@ import {
   reshapeMatrix,
   reverseMatrix,
   setMatrixValue,
+  sumMatrixValue,
   swapMatrixColumns,
   swapMatrixRows,
   transposeMatrix,
@@ -5595,6 +5597,9 @@ export class TealscriptEngine {
       }
       return value;
     };
+    const readMatrixArithmeticOperand = (value: unknown): PineMatrix | number => {
+      return isPineMatrix(value) ? value : this.toNumber(value);
+    };
     const readInsertionArgs = (args: unknown[]): [number | undefined, PineArray | undefined] => {
       if (args[1] === undefined) {
         return [undefined, undefined];
@@ -5669,6 +5674,8 @@ export class TealscriptEngine {
     this.builtins.set('matrix.max', (args) => maxMatrixValue(readMatrix(args[0])));
     this.builtins.set('matrix.median', (args) => medianMatrixValue(readMatrix(args[0])));
     this.builtins.set('matrix.mode', (args) => modeMatrixValue(readMatrix(args[0])));
+    this.builtins.set('matrix.sum', (args) => sumMatrixValue(readMatrix(args[0]), readMatrixArithmeticOperand(args[1])));
+    this.builtins.set('matrix.diff', (args) => diffMatrixValue(readMatrix(args[0]), readMatrixArithmeticOperand(args[1])));
     this.builtins.set('matrix.copy', (args) => copyMatrix(readMatrix(args[0])));
     this.builtins.set('matrix.row', (args) => matrixRow(readMatrix(args[0]), args[1] as number));
     this.builtins.set('matrix.col', (args) => matrixColumn(readMatrix(args[0]), args[1] as number));
