@@ -137,7 +137,9 @@ everything dynamically.
 Phases:
 
 1. Build a semantic checker pass over the AST with symbol tables, declarations,
-   UDF signatures, and source locations.
+   UDF signatures, and source locations. Initial checker coverage provides a
+   standalone symbol-table pass with duplicate symbol, duplicate parameter/tuple,
+   unknown identifier, and unknown assignment diagnostics.
 2. Implement value/reference types: `int`, `float`, `bool`, `color`, `string`,
    `void`, arrays, matrices, maps, drawing object IDs, `chart.point`, and UDTs.
 3. Implement qualifiers: `const`, `input`, `simple`, and `series`, including
