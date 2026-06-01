@@ -10,6 +10,7 @@ import {
   detMatrixValue,
   diffMatrixValue,
   eigenvaluesMatrixValue,
+  eigenvectorsMatrixValue,
   fillMatrix,
   getMatrixColumns,
   getMatrixElementCount,
@@ -375,6 +376,23 @@ describe('PineMatrix', () => {
     expect(symmetric.values).toEqual([2, 1, 0, 1, 2, 0, 0, 0, 3]);
   });
 
+  it('computes real eigenvectors as matrix columns', () => {
+    const diagonal = createPineMatrix<number>(2, 2, 0);
+    diagonal.values = [2, 0, 0, 3];
+    expectMatrixValuesCloseTo(eigenvectorsMatrixValue(diagonal), [0, 1, 1, 0]);
+
+    const values = createPineMatrix<number>(2, 2, 0);
+    values.values = [2, 4, 6, 8];
+    const eigenvalues = eigenvaluesMatrixValue(values).values;
+    const eigenvectors = eigenvectorsMatrixValue(values);
+
+    expect(eigenvectors.rows).toBe(2);
+    expect(eigenvectors.columns).toBe(2);
+    assertEigenvector(values, eigenvectors, 0, eigenvalues[0]);
+    assertEigenvector(values, eigenvectors, 1, eigenvalues[1]);
+    expect(values.values).toEqual([2, 4, 6, 8]);
+  });
+
   it('rejects eigenvalues for non-square matrices or complex roots', () => {
     expect(() => eigenvaluesMatrixValue(createPineMatrix<number>(2, 3, 1))).toThrow('Matrix eigenvalues requires a square matrix. Matrix is 2x3');
 
@@ -385,6 +403,7 @@ describe('PineMatrix', () => {
     const blockRotation = createPineMatrix<number>(3, 3, 0);
     blockRotation.values = [0, -1, 0, 1, 0, 0, 0, 0, 2];
     expect(() => eigenvaluesMatrixValue(blockRotation)).toThrow('Matrix eigenvalues are complex or QR iteration did not converge to real diagonal values');
+    expect(() => eigenvectorsMatrixValue(blockRotation)).toThrow('Matrix eigenvalues are complex or QR iteration did not converge to real diagonal values');
   });
 
   it('rejects matrix inverses for non-square or singular matrices', () => {
@@ -443,5 +462,15 @@ function expectArrayValuesCloseTo(values: number[], expected: number[]): void {
   expect(values).toHaveLength(expected.length);
   values.forEach((value, index) => {
     expect(value).toBeCloseTo(expected[index], 5);
+  });
+}
+
+function assertEigenvector(matrix: { values: number[]; rows: number; columns: number }, eigenvectors: { values: number[]; rows: number; columns: number }, column: number, eigenvalue: number): void {
+  const vector = Array.from({ length: eigenvectors.rows }, (_value, row) => eigenvectors.values[row * eigenvectors.columns + column]);
+  const product = Array.from({ length: matrix.rows }, (_value, row) => {
+    return vector.reduce((total, value, vectorIndex) => total + matrix.values[row * matrix.columns + vectorIndex] * value, 0);
+  });
+  product.forEach((value, index) => {
+    expect(value).toBeCloseTo(eigenvalue * vector[index], 5);
   });
 }

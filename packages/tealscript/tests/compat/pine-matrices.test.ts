@@ -163,6 +163,30 @@ plot(array.get(eigen, 1), title="Second")
     expect(roundSeries(getPlot(result, 'Second').values)).toEqual([-0.744563, -0.744563, -0.744563, -0.744563, -0.744563, -0.744563, -0.744563, -0.744563, -0.744563, -0.744563, -0.744563, -0.744563]);
   });
 
+  it('runs matrix eigenvector idioms', () => {
+    const result = runCompatScript(`
+indicator("Matrix eigenvectors")
+values = matrix.new_float(2, 2, 0)
+values.set(0, 0, 2)
+values.set(1, 1, 3)
+vectors = matrix.eigenvectors(values)
+plot(vectors.rows(), title="Rows")
+plot(vectors.columns(), title="Columns")
+plot(vectors.get(0, 0), title="First X")
+plot(vectors.get(1, 0), title="First Y")
+plot(vectors.get(0, 1), title="Second X")
+plot(vectors.get(1, 1), title="Second Y")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Rows').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Columns').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'First X').values)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    expect(roundSeries(getPlot(result, 'First Y').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Second X').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Second Y').values)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  });
+
   it('prefers scoped matrix receivers over the matrix namespace', () => {
     const result = runCompatScript(`
 indicator("Matrix receiver shadowing")
