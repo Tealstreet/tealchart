@@ -3133,6 +3133,15 @@ export class TealscriptEngine {
     return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
   }
 
+  private hashRandomCallId(callId: string): number {
+    let value = 0x811c9dc5;
+    for (let index = 0; index < callId.length; index += 1) {
+      value ^= callId.charCodeAt(index);
+      value = Math.imul(value, 0x01000193);
+    }
+    return value >>> 0;
+  }
+
   private hashRandomSeed(seed: number): number {
     let value = seed >>> 0;
     value ^= value >>> 16;
@@ -3846,7 +3855,7 @@ export class TealscriptEngine {
   }
 
   private builtinCallId(name: string, expr: CallExpression): string {
-    if (name === 'alert' && expr.loc) {
+    if ((name === 'alert' || name === 'math.random') && expr.loc) {
       return `${name}_${expr.loc.start.line}_${expr.loc.start.column}`;
     }
 
@@ -4519,7 +4528,7 @@ export class TealscriptEngine {
 
       let randomValue: number;
       if (seedArg === undefined) {
-        randomValue = Math.random();
+        randomValue = this.nextSeededRandom(scope, `_math_random_${callId}`, this.hashRandomCallId(callId));
       } else {
         const seed = Math.trunc(this.toNumber(seedArg));
         if (!Number.isFinite(seed)) return Number.NaN;

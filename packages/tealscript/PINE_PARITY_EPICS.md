@@ -418,7 +418,9 @@ Phases:
    worker on bar-set and input changes, with generation guards so late callbacks
    from terminated workers cannot update chart state.
 5. Harden runtime isolation: no host access, deterministic randomness where
-   needed, safe errors, and no unbounded allocation.
+   needed, safe errors, and no unbounded allocation. Runtime `math.random()`
+   now uses per-call-site deterministic PRNG state instead of host entropy when
+   the script does not provide a seed.
 6. Add profiling hooks useful during compatibility work.
 
 Done means hostile or accidentally expensive scripts cannot degrade the chart.
