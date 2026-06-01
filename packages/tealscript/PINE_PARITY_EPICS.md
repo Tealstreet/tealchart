@@ -449,7 +449,8 @@ Phases:
    `tests/compat/PINE_CHECKPOINTS.md` now defines the manual visual comparison
    checklist and milestone areas.
 5. Keep large public scripts out of the repo unless licensing is explicit;
-   preserve only reduced semantic fixtures.
+   preserve only reduced semantic fixtures. Public-script licensing and
+   reduction guardrails are documented in `tests/compat/PINE_CHECKPOINTS.md`.
 
 Done means every parity epic has regression tests that reflect real Pine usage.
 

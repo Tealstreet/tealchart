@@ -38,6 +38,8 @@ Keep fixtures grouped by behavior:
   public idioms.
 - Preserve the semantic shape of the Pine idiom, but remove unrelated UI,
   styling, and large-script scaffolding.
+- Do not commit large public scripts unless licensing explicitly allows
+  redistribution; use reduced fixtures and source links instead.
 - Add a short source comment or link when it clarifies the behavior being
   modeled.
 - Assert concrete plots, drawings, alerts, inputs, or diagnostics.
