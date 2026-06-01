@@ -2755,6 +2755,54 @@ plot(sum.get(0, 0))`;
       expect(result.errors[0]?.message).toBe('Matrix dimensions must match. Left is 2x2, right is 1x4');
     });
 
+    it('executes matrix multiplication with matrix, array, and scalar operands', () => {
+      const script = `//@version=6
+indicator("Matrix Multiplication")
+left = matrix.new_float(2, 3, 0)
+left.set(0, 0, 1)
+left.set(0, 1, 2)
+left.set(0, 2, 3)
+left.set(1, 0, 4)
+left.set(1, 1, 5)
+left.set(1, 2, 6)
+right = matrix.new_float(3, 2, 0)
+right.set(0, 0, 7)
+right.set(0, 1, 8)
+right.set(1, 0, 9)
+right.set(1, 1, 10)
+right.set(2, 0, 11)
+right.set(2, 1, 12)
+vector = array.from(10, 20, 30)
+matrixProduct = matrix.mult(left, right)
+vectorProduct = left.mult(vector)
+scalarProduct = left.mult(2)
+plot(matrixProduct.get(1, 1), title="Matrix")
+plot(vectorProduct.get(1), title="Vector")
+plot(scalarProduct.get(0, 2), title="Scalar")
+plot(left.get(0, 2), title="Original")`;
+
+      const result = executeScript(parse(script), createBars(2, 100));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Matrix')?.values).toEqual([154, 154]);
+      expect(result.plots.find((plot) => plot.title === 'Vector')?.values).toEqual([320, 320]);
+      expect(result.plots.find((plot) => plot.title === 'Scalar')?.values).toEqual([6, 6]);
+      expect(result.plots.find((plot) => plot.title === 'Original')?.values).toEqual([3, 3]);
+    });
+
+    it('reports matrix multiplication dimension mismatches', () => {
+      const script = `//@version=6
+indicator("Matrix Multiplication Mismatch")
+left = matrix.new_float(2, 3, 1)
+right = matrix.new_float(2, 2, 1)
+product = matrix.mult(left, right)
+plot(product.get(0, 0))`;
+
+      const result = executeScript(parse(script), createBars(1, 100));
+
+      expect(result.errors[0]?.message).toBe('Matrix multiplication requires left columns to match right rows. Left is 2x3, right is 2x2');
+    });
+
     it('returns expression results from user function if branches', () => {
       const script = `//@version=6
 indicator("Function If")

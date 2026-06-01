@@ -22,6 +22,7 @@ import {
   medianMatrixValue,
   minMatrixValue,
   modeMatrixValue,
+  multMatrixValue,
   removeMatrixColumn,
   removeMatrixRow,
   reshapeMatrix,
@@ -182,5 +183,40 @@ describe('PineMatrix', () => {
 
     expect(() => sumMatrixValue(left, right)).toThrow('Matrix dimensions must match. Left is 2x2, right is 1x4');
     expect(() => diffMatrixValue(left, right)).toThrow('Matrix dimensions must match. Left is 2x2, right is 1x4');
+  });
+
+  it('multiplies matrices, arrays, and scalar values without mutating inputs', () => {
+    const left = createPineMatrix<number>(2, 3, 0);
+    left.values = [1, 2, 3, 4, 5, 6];
+    const right = createPineMatrix<number>(3, 2, 0);
+    right.values = [7, 8, 9, 10, 11, 12];
+
+    const matrixProduct = multMatrixValue(left, right);
+    expect(isPineMatrix(matrixProduct)).toBe(true);
+    expect((matrixProduct as typeof left).rows).toBe(2);
+    expect((matrixProduct as typeof left).columns).toBe(2);
+    expect((matrixProduct as typeof left).values).toEqual([58, 64, 139, 154]);
+
+    const vector = createPineArray<number>();
+    pushArrayValue(vector, 10);
+    pushArrayValue(vector, 20);
+    pushArrayValue(vector, 30);
+    expect(multMatrixValue(left, vector).values).toEqual([140, 320]);
+    expect(multMatrixValue(left, 2).values).toEqual([2, 4, 6, 8, 10, 12]);
+    expect(left.values).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(right.values).toEqual([7, 8, 9, 10, 11, 12]);
+  });
+
+  it('rejects matrix multiplication dimension mismatches', () => {
+    expect(() => multMatrixValue(createPineMatrix<number>(2, 3, 1), createPineMatrix<number>(2, 2, 1))).toThrow(
+      'Matrix multiplication requires left columns to match right rows. Left is 2x3, right is 2x2',
+    );
+
+    const vector = createPineArray<number>();
+    pushArrayValue(vector, 1);
+    pushArrayValue(vector, 2);
+    expect(() => multMatrixValue(createPineMatrix<number>(2, 3, 1), vector)).toThrow(
+      'Matrix-vector multiplication requires matrix columns to match array size. Matrix is 2x3, array size is 2',
+    );
   });
 });
