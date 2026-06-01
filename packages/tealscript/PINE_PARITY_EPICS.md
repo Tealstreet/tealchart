@@ -186,6 +186,9 @@ Phases:
    array indexes separate, and runtime profiles report the inferred maximum
    history offset.
 5. Harden `barstate.*` across historical, realtime, and replay-style updates.
+   Regression coverage now verifies stable `barstate` transitions for
+   historical calculation, realtime replay ticks, confirmed close replay, and
+   the next open realtime bar.
 6. Add repaint-focused fixtures for confirmed/unconfirmed data behavior.
 
 Done means indicator values do not drift between historical calculation and live

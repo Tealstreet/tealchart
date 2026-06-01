@@ -4056,6 +4056,52 @@ plot(barstate.isconfirmed ? close : na, title="Confirmed Close")`;
       ]);
     });
 
+    it('keeps barstate transitions stable across realtime replay and close', () => {
+      const script = `//@version=6
+indicator("Barstate Transitions")
+plot(barstate.islast ? 1 : 0, title="Last")
+plot(barstate.ishistory ? 1 : 0, title="History")
+plot(barstate.isrealtime ? 1 : 0, title="Realtime")
+plot(barstate.isnew ? 1 : 0, title="New")
+plot(barstate.isconfirmed ? 1 : 0, title="Confirmed")
+plot(barstate.islastconfirmedhistory ? 1 : 0, title="Last Confirmed History")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+
+      engine.execute(ast, bars);
+      const realtimeBar = {
+        ...bars[2],
+        time: bars[2].time + 60_000,
+        open: 102,
+        high: 102.5,
+        low: 101.8,
+        close: 102.25,
+      };
+      engine.updateBar(ast, realtimeBar);
+      const replayPlots = engine.updateBar(ast, { ...realtimeBar, close: 102.75 });
+      const replayNew = [...replayPlots.find((plot) => plot.title === 'New')!.values];
+      const replayConfirmed = [...replayPlots.find((plot) => plot.title === 'Confirmed')!.values];
+      const nextBarPlots = engine.updateBar(ast, {
+        ...realtimeBar,
+        time: realtimeBar.time + 60_000,
+        open: 103,
+        high: 103.5,
+        low: 102.8,
+        close: 103.25,
+      });
+
+      expect(replayNew).toEqual([1, 1, 1, 0]);
+      expect(replayConfirmed).toEqual([1, 1, 1, 0]);
+      expect(nextBarPlots.find((plot) => plot.title === 'Last')?.values).toEqual([0, 0, 1, 1, 1]);
+      expect(nextBarPlots.find((plot) => plot.title === 'History')?.values).toEqual([1, 1, 1, 0, 0]);
+      expect(nextBarPlots.find((plot) => plot.title === 'Realtime')?.values).toEqual([0, 0, 0, 1, 1]);
+      expect(nextBarPlots.find((plot) => plot.title === 'New')?.values).toEqual([1, 1, 1, 0, 1]);
+      expect(nextBarPlots.find((plot) => plot.title === 'Confirmed')?.values).toEqual([1, 1, 1, 1, 0]);
+      expect(nextBarPlots.find((plot) => plot.title === 'Last Confirmed History')?.values).toEqual([0, 0, 1, 0, 0]);
+    });
+
     it('rolls back map mutations between updateBar calls', () => {
       const script = `//@version=6
 indicator("Map Rollback")
