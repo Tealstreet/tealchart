@@ -683,6 +683,113 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(lineTo).toHaveBeenCalledWith(opts.width - opts.margins.right, trackY);
       expect(lineTo).not.toHaveBeenCalledWith(opts.width - opts.margins.right, renderer.valueToY(40, pane));
     });
+
+    it('joins circle plot markers when join metadata is enabled', () => {
+      const arc = vi.fn();
+      const lineTo = vi.fn();
+      const stroke = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        arc,
+        lineTo,
+        stroke,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const plots: PlotOutput[] = [
+        {
+          id: 'plot_JoinedCircles',
+          type: 'plot',
+          title: 'JoinedCircles',
+          values: [100, 110, 120],
+          color: '#2196F3',
+          style: 'circles',
+          join: true,
+        },
+      ];
+
+      renderer.renderPlots(plots, bars, viewport);
+
+      expect(arc).toHaveBeenCalledTimes(3);
+      expect(lineTo).toHaveBeenCalled();
+      expect(stroke).toHaveBeenCalled();
+    });
+
+    it('renders point markers in indicator panes', () => {
+      const arc = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        arc,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const pane: ComputedPane = {
+        id: 'indicator',
+        type: 'indicator',
+        heightRatio: 1,
+        yMin: 0,
+        yMax: 100,
+        fixedRange: false,
+        top: 0,
+        height: 500,
+        bottom: 500,
+      };
+      const plot: PlotOutput = {
+        id: 'plot_PaneCircles',
+        type: 'plot',
+        title: 'PaneCircles',
+        values: [25, 75],
+        color: '#2196F3',
+        style: 'circles',
+      };
+
+      (renderer as any).renderPlotInPane(plot, bars, viewport, pane);
+
+      expect(arc).toHaveBeenCalledWith(expect.any(Number), renderer.valueToY(25, pane), expect.any(Number), 0, Math.PI * 2);
+      expect(arc).toHaveBeenCalledWith(expect.any(Number), renderer.valueToY(75, pane), expect.any(Number), 0, Math.PI * 2);
+    });
+
+    it('falls back to the base color for joined point segments without per-bar colors', () => {
+      const stroke = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        stroke,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const plot: PlotOutput = {
+        id: 'plot_JoinedColorFallback',
+        type: 'plot',
+        title: 'JoinedColorFallback',
+        values: [100, 110, 120],
+        color: [null, '#ff0000', null],
+        style: 'circles',
+        join: true,
+      };
+
+      (renderer as any).renderJoinedPointLine(plot, bars, viewport, (value: number) => value, '#2196F3');
+
+      expect(stroke).toHaveBeenCalled();
+      expect(ctx.strokeStyle).toBe('#2196F3');
+    });
   });
 
   describe('Pine OHLC plot rendering', () => {
