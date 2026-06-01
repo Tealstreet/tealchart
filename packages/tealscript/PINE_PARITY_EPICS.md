@@ -208,7 +208,9 @@ Phases:
    official source links, local runtime registration counts, and namespace
    follow-up ownership.
 2. Finish `ta.*`: correlation, oscillator variants, smoothing variants,
-   edge-case parity, tuple returns, and exact `na` handling.
+   edge-case parity, tuple returns, and exact `na` handling. Initial parity
+   work now covers named arguments, default-source extrema, derived-source
+   windows, unbiased dispersion, and stable EMA/RMA smoothing state.
 3. Finish `math.*`: random behavior, mintick rounding, overloads, and exact
    integer/float behavior.
 4. Finish `str.*`: `str.tonumber`, `str.format_time`, formatting edge cases,

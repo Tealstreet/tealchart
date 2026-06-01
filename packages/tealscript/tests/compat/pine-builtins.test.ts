@@ -94,6 +94,8 @@ plot(ta.cci(hlc3, 3), title="Typical CCI")
 indicator("Cumulative TA docs smoke")
 plot(ta.cum(close), title="Cum Close")
 plot(ta.variance(close, 3), title="Variance")
+plot(ta.variance(source=close, length=3, biased=false), title="Unbiased Variance")
+plot(ta.stdev(source=close, length=3, biased=false), title="Unbiased Stdev")
 plot(ta.dev(close, 3), title="Mean Deviation")
 plot(ta.correlation(close, open, 3), title="Close Open Correlation")
 plot(ta.correlation(close, high, 3), title="Close High Correlation")
@@ -105,6 +107,8 @@ plot(ta.cog(close - open, 3), title="Derived COG")
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Cum Close').values)).toEqual([102, 207, 314, 417, 516, 616, 720, 829, 937, 1048, 1158, 1270]);
     expect(roundSeries(getPlot(result, 'Variance').values)).toEqual([null, null, 4.222222, 2.666667, 10.666667, 2.888889, 4.666667, 13.555556, 4.666667, 1.555556, 1.555556, 0.666667]);
+    expect(roundSeries(getPlot(result, 'Unbiased Variance').values)).toEqual([null, null, 6.333333, 4, 16, 4.333333, 7, 20.333333, 7, 2.333333, 2.333333, 1]);
+    expect(roundSeries(getPlot(result, 'Unbiased Stdev').values)).toEqual([null, null, 2.516611, 2, 4, 2.081666, 2.645751, 4.50925, 2.645751, 1.527525, 1.527525, 1]);
     expect(roundSeries(getPlot(result, 'Mean Deviation').values)).toEqual([null, null, 1.777778, 1.333333, 2.666667, 1.555556, 2, 3.111111, 2, 1.111111, 1.111111, 0.666667]);
     expect(roundSeries(getPlot(result, 'Close Open Correlation').values)).toEqual([null, null, 0.973684, -0.39736, 0.5, 0.720577, -0.453921, 0.963928, 0.712468, 0, -0.142857, -0.327327]);
     expect(roundSeries(getPlot(result, 'Close High Correlation').values)).toEqual([null, null, 1, -0.327327, 0.755929, 0.81224, 0.544705, 1, 0.940634, 0.654654, 0.5, -0.5]);
@@ -517,5 +521,67 @@ plot(ta.alma(close, 5, 0.85, 6), title="ALMA")
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'SWMA').values)).toEqual([null, null, null, 104.833333, 104, 101.833333, 100.833333, 102.666667, 105.666667, 108.166667, 109.5, 110.333333]);
     expect(roundSeries(getPlot(result, 'ALMA').values)).toEqual([null, null, null, null, 101.918274, 99.97516, 101.504063, 105.458142, 107.88929, 109.296928, 110.200868, 110.912922]);
+  });
+
+  it('matches common Pine TA named-argument and default-source idioms', () => {
+    const result = runCompatScript(`
+indicator("TA named args smoke")
+plot(ta.sma(source=close, length=3), title="Named SMA")
+plot(ta.change(source=close, length=2), title="Named Change")
+plot(ta.highest(length=3), title="Default Highest")
+plot(ta.lowest(length=3), title="Default Lowest")
+plot(ta.highestbars(length=3), title="Default Highest Offset")
+plot(ta.lowestbars(length=3), title="Default Lowest Offset")
+plot(ta.rising(source=close, length=2), title="Named Rising")
+plot(ta.falling(source=close, length=2), title="Named Falling")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Named SMA').values)).toEqual([null, null, 104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111]);
+    expect(roundSeries(getPlot(result, 'Named Change').values)).toEqual([null, null, 5, -2, -8, -3, 5, 9, 4, 2, 2, 1]);
+    expect(roundSeries(getPlot(result, 'Default Highest').values)).toEqual([103, 106, 108, 109, 109, 109, 105, 110, 111, 112, 114, 114]);
+    expect(roundSeries(getPlot(result, 'Default Lowest').values)).toEqual([99, 99, 99, 101, 98, 96, 96, 96, 99, 103, 106, 107]);
+    expect(getPlot(result, 'Default Highest Offset').values).toEqual([0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1]);
+    expect(getPlot(result, 'Default Lowest Offset').values).toEqual([0, 1, 2, 2, 0, 0, 1, 2, 2, 2, 2, 2]);
+    expect(getPlot(result, 'Named Rising').values).toEqual([false, false, true, false, false, false, true, true, false, true, false, true]);
+    expect(getPlot(result, 'Named Falling').values).toEqual([false, false, false, true, true, false, false, false, false, false, false, false]);
+  });
+
+  it('matches Pine TA windows over derived source expressions', () => {
+    const result = runCompatScript(`
+indicator("TA derived source smoke")
+spread = close - open
+plot(ta.sma(spread, 3), title="Spread SMA")
+plot(ta.ema(spread, 3), title="Spread EMA")
+plot(ta.rma(spread, 3), title="Spread RMA")
+plot(ta.wma(spread, 3), title="Spread WMA")
+plot(ta.highest(spread, 3), title="Spread Highest")
+plot(ta.lowest(spread, 3), title="Spread Lowest")
+plot(ta.range(spread, 3), title="Spread Range")
+plot(ta.mom(spread, 2), title="Spread Momentum")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Spread SMA').values)).toEqual([null, null, 2.333333, 0.333333, -2, -2.333333, 0.333333, 3.333333, 2.666667, 2.333333, 0.333333, 1.333333]);
+    expect(roundSeries(getPlot(result, 'Spread EMA').values)).toEqual([2, 2.5, 2.25, -0.875, -2.4375, -0.71875, 1.640625, 3.320313, 1.160156, 2.080078, 0.540039, 1.27002]);
+    expect(roundSeries(getPlot(result, 'Spread RMA').values)).toEqual([2, 2.333333, 2.222222, 0.148148, -1.234568, -0.489712, 1.006859, 2.337906, 1.225271, 1.816847, 0.877898, 1.251932]);
+    expect(roundSeries(getPlot(result, 'Spread WMA').values)).toEqual([null, null, 2.333333, -0.833333, -3, -1.5, 1.666667, 4, 1.833333, 2, 0.333333, 1.166667]);
+    expect(roundSeries(getPlot(result, 'Spread Highest').values)).toEqual([2, 3, 3, 3, 2, 1, 4, 5, 5, 5, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Spread Lowest').values)).toEqual([2, 2, 2, -4, -4, -4, -4, 1, -1, -1, -1, -1]);
+    expect(roundSeries(getPlot(result, 'Spread Range').values)).toEqual([0, 1, 1, 7, 6, 5, 8, 4, 6, 6, 4, 4]);
+    expect(roundSeries(getPlot(result, 'Spread Momentum').values)).toEqual([null, null, 0, -7, -6, 5, 8, 4, -5, -2, 0, -1]);
+  });
+
+  it('preserves real bar offsets through na values for TA offset helpers', () => {
+    const result = runCompatScript(`
+indicator("TA offset na smoke")
+source = bar_index == 1 ? na : close
+plot(ta.highestbars(source, 3), title="Highest Offset")
+plot(ta.lowestbars(source, 3), title="Lowest Offset")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Highest Offset').values.slice(0, 5)).toEqual([0, 1, 0, 1, 2]);
+    expect(getPlot(result, 'Lowest Offset').values.slice(0, 5)).toEqual([0, 1, 2, 0, 0]);
   });
 });
