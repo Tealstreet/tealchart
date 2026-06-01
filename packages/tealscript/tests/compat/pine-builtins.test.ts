@@ -381,7 +381,13 @@ plot(namedPrice == 101.25, title="Named Price")
     const result = runCompatScript(`
 indicator("Input metadata")
 mode = input.string("EMA", "Mode", options=["SMA", "EMA"], tooltip="Average type", group="Calculation", inline="ma", confirm=true)
+fast = input.int(10, "Fast", 1, 20, 1, "Fast length", "len", "Calculation", false, display.data_window, true)
+mult = input.float(2.5, "Multiplier", [1.5, 2.5, 3.5], "Band multiplier", "band", "Bands", true, display.status_line, false)
+tf = input.timeframe("60", "Timeframe", ["15", "60"], "Higher timeframe", "tf", "Calculation", true, display.none, true)
 plot(mode == "EMA", title="Mode")
+plot(fast == 10, title="Fast")
+plot(mult == 2.5, title="Multiplier")
+plot(tf == "60", title="Timeframe")
 `);
 
     expect(result.errors).toEqual([]);
@@ -397,8 +403,52 @@ plot(mode == "EMA", title="Mode")
         inline: 'ma',
         confirm: true,
       },
+      {
+        id: 'input_Fast',
+        type: 'int',
+        title: 'Fast',
+        defval: 10,
+        minval: 1,
+        maxval: 20,
+        step: 1,
+        tooltip: 'Fast length',
+        inline: 'len',
+        group: 'Calculation',
+        confirm: false,
+        display: 2,
+        active: true,
+      },
+      {
+        id: 'input_Multiplier',
+        type: 'float',
+        title: 'Multiplier',
+        defval: 2.5,
+        options: [1.5, 2.5, 3.5],
+        tooltip: 'Band multiplier',
+        inline: 'band',
+        group: 'Bands',
+        confirm: true,
+        display: 4,
+        active: false,
+      },
+      {
+        id: 'input_Timeframe',
+        type: 'timeframe',
+        title: 'Timeframe',
+        defval: '60',
+        options: ['15', '60'],
+        tooltip: 'Higher timeframe',
+        inline: 'tf',
+        group: 'Calculation',
+        confirm: true,
+        display: 0,
+        active: true,
+      },
     ]);
     expect(getPlot(result, 'Mode').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Fast').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Multiplier').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Timeframe').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
 
   it('runs price input and active metadata idioms', () => {
@@ -432,7 +482,7 @@ plot(level, title="Level")
   it('registers Pine source input metadata', () => {
     const result = runCompatScript(`
 indicator("Source input")
-source = input.source(defval=close, title="Source", tooltip="Select source")
+source = input.source(close, "Source", "Select source", "src", "Data", true, display.data_window, true)
 plot(source, title="Source")
 `);
 
@@ -444,6 +494,11 @@ plot(source, title="Source")
         title: 'Source',
         defval: 102,
         tooltip: 'Select source',
+        inline: 'src',
+        group: 'Data',
+        confirm: true,
+        display: 2,
+        active: true,
       },
     ]);
     expect(roundSeries(getPlot(result, 'Source').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
