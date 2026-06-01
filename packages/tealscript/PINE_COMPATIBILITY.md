@@ -130,9 +130,10 @@ definitions.
 
 ## Common `array.*` Coverage
 
-The array pass covers typed constructors (`array.new_float`, `array.new_int`,
-`array.new_bool`, `array.new_string`, `array.new_color`, and drawing-object
-array constructors), `array.size`, `array.get`, `array.set`, `array.push`,
+The array pass covers the generic constructor (`array.new<T>`), typed
+constructors (`array.new_float`, `array.new_int`, `array.new_bool`,
+`array.new_string`, `array.new_color`, and drawing-object array constructors),
+`array.size`, `array.get`, `array.set`, `array.push`,
 `array.pop`, `array.shift`, `array.unshift`, `array.clear`, `array.from`,
 `array.copy`, `array.first`, `array.last`, `array.includes`, `array.every`,
 `array.some`, `array.indexof`, `array.lastindexof`, binary-search helpers,
