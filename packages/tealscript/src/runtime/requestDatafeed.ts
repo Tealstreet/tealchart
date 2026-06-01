@@ -23,7 +23,13 @@ export interface RequestDataContext extends RequestDatafeedKey {
   currency?: string;
 }
 
-export type RequestSeriesFamily = 'currency_rate';
+export type RequestSeriesFamily =
+  | 'currency_rate'
+  | 'dividends'
+  | 'earnings'
+  | 'splits'
+  | 'financial'
+  | 'economic';
 
 export interface RequestSeriesPoint {
   time: number;
@@ -74,6 +80,22 @@ export function requestSeriesKey(family: RequestSeriesFamily, key: string): stri
 
 export function currencyRateRequestKey(fromCurrency: string, toCurrency: string): string {
   return `${fromCurrency}\u0000${toCurrency}`;
+}
+
+export function corporateActionRequestKey(ticker: string, field: string, currency?: string): string {
+  return [ticker, field, currency ?? ''].join('\u0000');
+}
+
+export function financialRequestKey(symbol: string, financialId: string, period: string, currency?: string): string {
+  return [symbol, financialId, period, currency ?? ''].join('\u0000');
+}
+
+export function economicRequestKey(countryCode: string, field: string): string {
+  return `${countryCode}\u0000${field}`;
+}
+
+export function seedRequestSymbol(source: string, symbol: string): string {
+  return `seed\u0000${source}\u0000${symbol}`;
 }
 
 function splitTickerModifiers(symbol: string): { base: string; modifiers: string[] } {

@@ -3,15 +3,15 @@ import { describe, expect, it } from 'vitest';
 import { compatibilityBars, runCompatScript } from './fixtures';
 
 describe('Pine compatibility unsupported diagnostics', () => {
-  it('reports planned economic data namespace calls explicitly', () => {
+  it('reports planned request namespaces that remain outside the deterministic datafeed contract', () => {
     const result = runCompatScript(`
-indicator("Unsupported economic request")
-request.economic("US", "GDP")
+indicator("Unsupported footprint request")
+request.footprint(syminfo.tickerid)
 plot(close)
 `, { bars: [compatibilityBars[0]!] });
 
     expect(result.errors.map((error) => error.message)).toEqual([
-      'request.* functions are not supported yet: request.economic',
+      'request.* functions are not supported yet: request.footprint',
     ]);
   });
 

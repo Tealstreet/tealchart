@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { currencyRateRequestKey, InMemoryRequestDatafeed, type Bar } from '../../src/runtime';
+import {
+  corporateActionRequestKey,
+  currencyRateRequestKey,
+  economicRequestKey,
+  financialRequestKey,
+  InMemoryRequestDatafeed,
+  seedRequestSymbol,
+  type Bar,
+} from '../../src/runtime';
 import { getPlot, runCompatScript } from './fixtures';
 
 const chartBars: Bar[] = [
@@ -94,6 +102,68 @@ function currencyRateDatafeed(): InMemoryRequestDatafeed {
         { time: 1_700_000_120_000, value: 0.82 },
         { time: 1_700_000_240_000, value: 0.85 },
       ],
+    },
+  ]);
+}
+
+function pointSeriesDatafeed(): InMemoryRequestDatafeed {
+  return new InMemoryRequestDatafeed([], [
+    {
+      family: 'dividends',
+      key: corporateActionRequestKey('NASDAQ:AAPL', 'dividends.gross', 'USD'),
+      points: [
+        { time: 1_700_000_120_000, value: 0.24 },
+        { time: 1_700_000_240_000, value: 0.25 },
+      ],
+    },
+    {
+      family: 'earnings',
+      key: corporateActionRequestKey('NASDAQ:AAPL', 'earnings.actual', 'USD'),
+      points: [
+        { time: 1_700_000_000_000, value: 1.5 },
+        { time: 1_700_000_240_000, value: 1.8 },
+      ],
+    },
+    {
+      family: 'splits',
+      key: corporateActionRequestKey('NASDAQ:AAPL', 'splits.denominator'),
+      points: [
+        { time: 1_700_000_180_000, value: 4 },
+      ],
+    },
+    {
+      family: 'financial',
+      key: financialRequestKey('NASDAQ:AAPL', 'TOTAL_REVENUE', 'FQ', 'USD'),
+      points: [
+        { time: 1_700_000_000_000, value: 1000 },
+        { time: 1_700_000_240_000, value: 1100 },
+      ],
+    },
+    {
+      family: 'economic',
+      key: economicRequestKey('US', 'GDP'),
+      points: [
+        { time: 1_700_000_120_000, value: 3.1 },
+      ],
+    },
+  ]);
+}
+
+function seedDatafeed(calcBarsCount?: number): InMemoryRequestDatafeed {
+  const seedBars: Bar[] = [
+    { time: 1_700_000_000_000, open: 1, high: 2, low: 1, close: 10, volume: 100 },
+    { time: 1_700_000_120_000, open: 2, high: 4, low: 2, close: 20, volume: 200 },
+    { time: 1_700_000_240_000, open: 3, high: 6, low: 3, close: 30, volume: 300 },
+  ];
+  return new InMemoryRequestDatafeed([
+    {
+      symbol: seedRequestSymbol('tradingview-pine-seeds/demo', 'BTC_DEV'),
+      timeframe: '60',
+      bars: calcBarsCount === undefined ? seedBars : seedBars.slice(-calcBarsCount),
+      syminfo: {
+        ticker: 'BTC_DEV',
+        timezone: 'Etc/UTC',
+      },
     },
   ]);
 }
@@ -600,6 +670,157 @@ ${requestPlots}
 
     expect(result.errors.map((error) => error.message)).toEqual([
       'Too many unique request.* contexts: maximum is 40',
+    ]);
+  });
+});
+
+describe('Pine optional request series compatibility', () => {
+  it('merges dividends, earnings, splits, financial, and economic series from the request datafeed', () => {
+    const result = runCompatScript(`
+indicator("Point request families")
+dividend = request.dividends("NASDAQ:AAPL", dividends.gross, currency=currency.USD)
+earnings = request.earnings("NASDAQ:AAPL", earnings.actual, currency="USD")
+split = request.splits("NASDAQ:AAPL", splits.denominator)
+revenue = request.financial("NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", currency="USD")
+gdp = request.economic("US", "GDP")
+plot(dividend, title="Dividend")
+plot(earnings, title="Earnings")
+plot(split, title="Split")
+plot(revenue, title="Revenue")
+plot(gdp, title="GDP")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: pointSeriesDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Dividend').values).toEqual([null, null, 0.24, 0.24, 0.25, 0.25]);
+    expect(getPlot(result, 'Earnings').values).toEqual([1.5, 1.5, 1.5, 1.5, 1.8, 1.8]);
+    expect(getPlot(result, 'Split').values).toEqual([null, null, null, 4, 4, 4]);
+    expect(getPlot(result, 'Revenue').values).toEqual([1000, 1000, 1000, 1000, 1100, 1100]);
+    expect(getPlot(result, 'GDP').values).toEqual([null, null, 3.1, 3.1, 3.1, 3.1]);
+  });
+
+  it('supports gaps_on for sparse point request families', () => {
+    const result = runCompatScript(`
+indicator("Point request gaps")
+dividend = request.dividends("NASDAQ:AAPL", dividends.gross, gaps=barmerge.gaps_on, currency="USD")
+plot(dividend, title="Dividend")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: pointSeriesDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Dividend').values).toEqual([null, null, 0.24, null, 0.25, null]);
+  });
+
+  it('rejects unsupported lookahead_on for sparse point request families', () => {
+    const result = runCompatScript(`
+indicator("Point request lookahead")
+plot(request.dividends("NASDAQ:AAPL", dividends.gross, lookahead=barmerge.lookahead_on, currency="USD"), title="Dividend")
+`, {
+      bars: [chartBars[0]!],
+      engineOptions: { requestDatafeed: pointSeriesDatafeed() },
+    });
+
+    expect(result.errors.map((error) => error.message)).toEqual([
+      'request.dividends with lookahead_on is not implemented yet',
+    ]);
+  });
+
+  it('supports ignore_invalid_symbol for missing optional request series', () => {
+    const result = runCompatScript(`
+indicator("Missing optional requests")
+dividend = request.dividends("MISSING", dividends.gross, ignore_invalid_symbol=true)
+financial = request.financial("MISSING", "TOTAL_REVENUE", "FQ", ignore_invalid_symbol=true)
+economic = request.economic("ZZ", "GDP", ignore_invalid_symbol=true)
+plot(dividend, title="Dividend")
+plot(financial, title="Financial")
+plot(economic, title="Economic")
+`, {
+      bars: [chartBars[0]!],
+      engineOptions: { requestDatafeed: pointSeriesDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Dividend').values).toEqual([null]);
+    expect(getPlot(result, 'Financial').values).toEqual([null]);
+    expect(getPlot(result, 'Economic').values).toEqual([null]);
+  });
+
+  it('reports missing optional request series when ignore_invalid_symbol is false', () => {
+    const result = runCompatScript(`
+indicator("Missing optional request error")
+plot(request.economic("ZZ", "GDP"), title="Economic")
+`, {
+      bars: [chartBars[0]!],
+      engineOptions: { requestDatafeed: pointSeriesDatafeed() },
+    });
+
+    expect(result.errors.map((error) => error.message)).toEqual([
+      'request.economic failed: No request series context for economic ZZ\u0000GDP',
+    ]);
+  });
+});
+
+describe('Pine request.seed compatibility', () => {
+  it('evaluates seed expressions in deterministic seed data contexts', () => {
+    const result = runCompatScript(`
+indicator("Seed request")
+seedClose = request.seed("tradingview-pine-seeds/demo", "BTC_DEV", close)
+seedAverage = request.seed("tradingview-pine-seeds/demo", "BTC_DEV", ta.sma(close, 2))
+plot(seedClose, title="Seed Close")
+plot(seedAverage, title="Seed Average")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: seedDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Seed Close').values).toEqual([null, null, 10, 10, 20, 20]);
+    expect(getPlot(result, 'Seed Average').values).toEqual([null, null, null, null, 15, 15]);
+  });
+
+  it('passes calc_bars_count to request.seed contexts', () => {
+    const result = runCompatScript(`
+indicator("Seed calc bars")
+seedClose = request.seed("tradingview-pine-seeds/demo", "BTC_DEV", close, calc_bars_count=2)
+plot(seedClose, title="Seed Close")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: seedDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Seed Close').values).toEqual([null, null, null, null, 20, 20]);
+  });
+
+  it('supports ignore_invalid_symbol for missing seed contexts', () => {
+    const result = runCompatScript(`
+indicator("Seed missing ignored")
+missing = request.seed("missing/repo", "MISSING", close, ignore_invalid_symbol=true)
+plot(missing, title="Missing")
+`, {
+      bars: [chartBars[0]!],
+      engineOptions: { requestDatafeed: seedDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Missing').values).toEqual([null]);
+  });
+
+  it('reports missing seed contexts when ignore_invalid_symbol is false', () => {
+    const result = runCompatScript(`
+indicator("Seed missing error")
+plot(request.seed("missing/repo", "MISSING", close), title="Missing")
+`, {
+      bars: [chartBars[0]!],
+      engineOptions: { requestDatafeed: seedDatafeed() },
+    });
+
+    expect(result.errors.map((error) => error.message)).toEqual([
+      'request.seed failed: No request data context for seed\u0000missing/repo\u0000MISSING 60',
     ]);
   });
 });

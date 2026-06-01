@@ -149,7 +149,17 @@ import {
   type PineMap,
 } from './maps';
 import { Scope, createRootScope } from './scope';
-import { currencyRateRequestKey, type RequestDataContext, type RequestDatafeed, type RequestSeriesPoint } from './requestDatafeed';
+import {
+  corporateActionRequestKey,
+  currencyRateRequestKey,
+  economicRequestKey,
+  financialRequestKey,
+  seedRequestSymbol,
+  type RequestDataContext,
+  type RequestDatafeed,
+  type RequestSeriesFamily,
+  type RequestSeriesPoint,
+} from './requestDatafeed';
 import {
   cancelAllStrategyOrders,
   cancelStrategyOrder,
@@ -1552,6 +1562,30 @@ export class TealscriptEngine {
       this.assertCanEvaluateRequest(fullName);
       return this.evaluateRequestCurrencyRate(expr);
     }
+    if (fullName === 'request.dividends') {
+      this.assertCanEvaluateRequest(fullName);
+      return this.evaluateRequestCorporateAction(expr, 'dividends', 'dividends.gross', true);
+    }
+    if (fullName === 'request.earnings') {
+      this.assertCanEvaluateRequest(fullName);
+      return this.evaluateRequestCorporateAction(expr, 'earnings', 'earnings.actual', true);
+    }
+    if (fullName === 'request.splits') {
+      this.assertCanEvaluateRequest(fullName);
+      return this.evaluateRequestCorporateAction(expr, 'splits', 'splits.denominator', false);
+    }
+    if (fullName === 'request.financial') {
+      this.assertCanEvaluateRequest(fullName);
+      return this.evaluateRequestFinancial(expr);
+    }
+    if (fullName === 'request.economic') {
+      this.assertCanEvaluateRequest(fullName);
+      return this.evaluateRequestEconomic(expr);
+    }
+    if (fullName === 'request.seed') {
+      this.assertCanEvaluateRequest(fullName);
+      return this.evaluateRequestSeed(expr, this.nextBuiltinCallId(fullName));
+    }
     if (namespace === 'request') {
       throw new Error(`request.* functions are not supported yet: ${fullName}`);
     }
@@ -2026,6 +2060,152 @@ export class TealscriptEngine {
     return this.mergeRequestSeriesValue(result.context.points);
   }
 
+  private evaluateRequestCorporateAction(expr: CallExpression, family: 'dividends' | 'earnings' | 'splits', defaultField: string, supportsCurrency: boolean): unknown {
+    const tickerArg = this.getCallArgument(expr, 0, 'ticker');
+    if (!tickerArg) {
+      throw new Error(`request.${family} requires a ticker argument`);
+    }
+
+    const ticker = this.normalizeRequestSymbol(this.evaluateExpression(tickerArg.value));
+    const field = this.normalizeRequestSeriesField(this.evaluateOptionalCallArgument(expr, 1, 'field'), defaultField);
+    const gaps = this.normalizeBarmergeGaps(this.evaluateOptionalCallArgument(expr, 2, 'gaps') ?? 'barmerge.gaps_off');
+    const lookahead = this.normalizeBarmergeLookahead(
+      this.evaluateOptionalCallArgument(expr, 3, 'lookahead') ?? 'barmerge.lookahead_off',
+    );
+    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalCallArgument(expr, 4, 'ignore_invalid_symbol') ?? false);
+    const currency = supportsCurrency
+      ? this.normalizeOptionalRequestCurrency(this.evaluateOptionalCallArgument(expr, 5, 'currency'))
+      : undefined;
+    const key = corporateActionRequestKey(ticker, field, currency);
+
+    return this.evaluateRequestPointSeries({
+      family,
+      key,
+      functionName: `request.${family}`,
+      gaps,
+      lookahead,
+      ignoreInvalid: ignoreInvalidSymbol,
+    });
+  }
+
+  private evaluateRequestFinancial(expr: CallExpression): unknown {
+    const symbolArg = this.getCallArgument(expr, 0, 'symbol');
+    const financialIdArg = this.getCallArgument(expr, 1, 'financial_id');
+    const periodArg = this.getCallArgument(expr, 2, 'period');
+    if (!symbolArg || !financialIdArg || !periodArg) {
+      throw new Error('request.financial requires symbol, financial_id, and period arguments');
+    }
+
+    const symbol = this.normalizeRequestSymbol(this.evaluateExpression(symbolArg.value));
+    const financialId = this.toStringValue(this.evaluateExpression(financialIdArg.value)).trim();
+    const period = this.toStringValue(this.evaluateExpression(periodArg.value)).trim().toUpperCase();
+    const gaps = this.normalizeBarmergeGaps(this.evaluateOptionalCallArgument(expr, 3, 'gaps') ?? 'barmerge.gaps_off');
+    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalCallArgument(expr, 4, 'ignore_invalid_symbol') ?? false);
+    const currency = this.normalizeOptionalRequestCurrency(this.evaluateOptionalCallArgument(expr, 5, 'currency'));
+
+    return this.evaluateRequestPointSeries({
+      family: 'financial',
+      key: financialRequestKey(symbol, financialId, period, currency),
+      functionName: 'request.financial',
+      gaps,
+      lookahead: 'barmerge.lookahead_off',
+      ignoreInvalid: ignoreInvalidSymbol,
+    });
+  }
+
+  private evaluateRequestEconomic(expr: CallExpression): unknown {
+    const countryCodeArg = this.getCallArgument(expr, 0, 'country_code');
+    const fieldArg = this.getCallArgument(expr, 1, 'field');
+    if (!countryCodeArg || !fieldArg) {
+      throw new Error('request.economic requires country_code and field arguments');
+    }
+
+    const countryCode = this.toStringValue(this.evaluateExpression(countryCodeArg.value)).trim().toUpperCase();
+    const field = this.toStringValue(this.evaluateExpression(fieldArg.value)).trim();
+    const gaps = this.normalizeBarmergeGaps(this.evaluateOptionalCallArgument(expr, 2, 'gaps') ?? 'barmerge.gaps_off');
+    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalCallArgument(expr, 3, 'ignore_invalid_symbol') ?? false);
+
+    return this.evaluateRequestPointSeries({
+      family: 'economic',
+      key: economicRequestKey(countryCode, field),
+      functionName: 'request.economic',
+      gaps,
+      lookahead: 'barmerge.lookahead_off',
+      ignoreInvalid: ignoreInvalidSymbol,
+    });
+  }
+
+  private evaluateRequestSeed(expr: CallExpression, callId: string): unknown {
+    const sourceArg = this.getCallArgument(expr, 0, 'source');
+    const symbolArg = this.getCallArgument(expr, 1, 'symbol');
+    const expressionArg = this.getCallArgument(expr, 2, 'expression');
+
+    if (!sourceArg || !symbolArg || !expressionArg) {
+      throw new Error('request.seed requires source, symbol, and expression arguments');
+    }
+    if (!this.requestDatafeed) {
+      throw new Error('request.seed requires a request datafeed');
+    }
+
+    const source = this.toStringValue(this.evaluateExpression(sourceArg.value)).trim();
+    const symbol = this.toStringValue(this.evaluateExpression(symbolArg.value)).trim();
+    const requestSymbol = seedRequestSymbol(source, symbol);
+    const timeframe = this.ctx.timeframe.period;
+    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalCallArgument(expr, 3, 'ignore_invalid_symbol') ?? false);
+    const calcBarsCount = this.normalizeOptionalPositiveInteger(this.evaluateOptionalCallArgument(expr, 4, 'calc_bars_count'));
+    const expressionId = this.requestExpressionCacheId(expressionArg.value);
+    this.trackRequestContext(
+      this.requestLimitKey('request.seed', expressionId, requestSymbol, timeframe, undefined, calcBarsCount),
+    );
+
+    const result = this.requestDatafeed.getBars({ symbol: requestSymbol, timeframe, calcBarsCount });
+    if (!result.ok) {
+      if (ignoreInvalidSymbol && (result.code === 'invalid_symbol' || result.code === 'missing_context')) {
+        return Number.NaN;
+      }
+      throw new Error(`request.seed failed: ${result.message}`);
+    }
+
+    const cacheKey = this.requestEvaluationCacheKey(callId, expressionId, requestSymbol, timeframe, undefined, calcBarsCount);
+    let cached = this.requestEvaluationCache.get(cacheKey);
+    if (!cached) {
+      cached = {
+        bars: result.context.bars,
+        values: this.evaluateRequestExpressionSeries(expressionArg.value, result.context),
+      };
+      this.requestEvaluationCache.set(cacheKey, cached);
+    }
+
+    return this.mergeRequestedValue(cached.bars, cached.values, 'barmerge.gaps_off', 'barmerge.lookahead_off');
+  }
+
+  private evaluateRequestPointSeries(options: {
+    family: RequestSeriesFamily;
+    key: string;
+    functionName: string;
+    gaps: 'barmerge.gaps_off' | 'barmerge.gaps_on';
+    lookahead: 'barmerge.lookahead_off' | 'barmerge.lookahead_on';
+    ignoreInvalid: boolean;
+  }): number {
+    this.trackRequestContext(`${options.functionName}\u0000${options.key}`);
+    if (options.lookahead !== 'barmerge.lookahead_off') {
+      throw new Error(`${options.functionName} with lookahead_on is not implemented yet`);
+    }
+    if (!this.requestDatafeed?.getSeries) {
+      throw new Error(`${options.functionName} requires a request series datafeed`);
+    }
+
+    const result = this.requestDatafeed.getSeries({ family: options.family, key: options.key });
+    if (!result.ok) {
+      if (options.ignoreInvalid && (result.code === 'invalid_symbol' || result.code === 'missing_context' || result.code === 'unsupported_context')) {
+        return Number.NaN;
+      }
+      throw new Error(`${options.functionName} failed: ${result.message}`);
+    }
+
+    return this.mergeRequestSeriesValue(result.context.points, options.gaps);
+  }
+
   private getCallArgument(expr: CallExpression, position: number, name: string): CallArgument | undefined {
     return expr.arguments.find((arg) => arg.name?.name === name) ?? expr.arguments.filter((arg) => !arg.name)[position];
   }
@@ -2063,6 +2243,15 @@ export class TealscriptEngine {
     if (normalized === 'barmerge.lookahead_on') return 'barmerge.lookahead_on';
     if (normalized === 'barmerge.lookahead_off') return 'barmerge.lookahead_off';
     throw new Error(`Unsupported request.security lookahead mode: ${normalized}`);
+  }
+
+  private normalizeRequestSeriesField(value: unknown, defaultField: string): string {
+    if (value === undefined || this.isNa(value)) {
+      return defaultField;
+    }
+
+    const field = this.toStringValue(value).trim();
+    return field === '' ? defaultField : field;
   }
 
   private normalizeOptionalPositiveInteger(value: unknown): number | undefined {
@@ -2296,7 +2485,10 @@ export class TealscriptEngine {
     return this.getBarCloseTime(chartStart, this.ctx.timeframe.period);
   }
 
-  private mergeRequestSeriesValue(points: RequestSeriesPoint[]): number {
+  private mergeRequestSeriesValue(
+    points: RequestSeriesPoint[],
+    gaps: 'barmerge.gaps_off' | 'barmerge.gaps_on' = 'barmerge.gaps_off',
+  ): number {
     const chartTime = this.ctx.time.get(0);
     if (chartTime === undefined || points.length === 0) {
       return Number.NaN;
@@ -2304,12 +2496,19 @@ export class TealscriptEngine {
 
     const sortedPoints = [...points].sort((left, right) => left.time - right.time);
     let value = Number.NaN;
+    let valueTime = Number.NaN;
     for (const point of sortedPoints) {
       if (point.time <= chartTime) {
         value = point.value;
+        valueTime = point.time;
       } else {
         break;
       }
+    }
+    if (gaps === 'barmerge.gaps_on') {
+      return Number.isFinite(value) && this.isFirstChartBarAtOrAfter(valueTime)
+        ? value
+        : Number.NaN;
     }
     return value;
   }
@@ -4200,6 +4399,13 @@ export class TealscriptEngine {
     this.builtins.set('barmerge.gaps_on', () => 'barmerge.gaps_on');
     this.builtins.set('barmerge.lookahead_off', () => 'barmerge.lookahead_off');
     this.builtins.set('barmerge.lookahead_on', () => 'barmerge.lookahead_on');
+    this.builtins.set('dividends.gross', () => 'dividends.gross');
+    this.builtins.set('dividends.net', () => 'dividends.net');
+    this.builtins.set('earnings.actual', () => 'earnings.actual');
+    this.builtins.set('earnings.estimate', () => 'earnings.estimate');
+    this.builtins.set('earnings.standardized', () => 'earnings.standardized');
+    this.builtins.set('splits.denominator', () => 'splits.denominator');
+    this.builtins.set('splits.numerator', () => 'splits.numerator');
   }
 
   private registerLogBuiltins(): void {
