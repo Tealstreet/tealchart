@@ -53,6 +53,29 @@ function createMockCtx(): any {
   };
 }
 
+function createTraceCtx(): { ctx: any; trace: string[] } {
+  const trace: string[] = [];
+  const ctx = createMockCtx();
+
+  ctx.fillRect = vi.fn(() => {
+    trace.push(`fillRect:${ctx.fillStyle}`);
+  });
+  ctx.setLineDash = vi.fn((pattern: number[]) => {
+    trace.push(`dash:${pattern.join(',')}`);
+  });
+  ctx.stroke = vi.fn(() => {
+    trace.push(`stroke:${ctx.strokeStyle}:${ctx.lineWidth}`);
+  });
+  ctx.arc = vi.fn(() => {
+    trace.push(`arc:${ctx.fillStyle}`);
+  });
+  ctx.fill = vi.fn(() => {
+    trace.push(`fill:${ctx.fillStyle}`);
+  });
+
+  return { ctx, trace };
+}
+
 function makeBars(count: number, startTime = 1000000, interval = 60000, basePrice = 50000): Bar[] {
   return Array.from({ length: count }, (_, i) => ({
     time: startTime + i * interval,
@@ -1408,6 +1431,72 @@ describe('TealchartRenderer coordinate transforms', () => {
   });
 
   describe('visual primitive integration', () => {
+    it('emits a stable render trace for common Pine visual primitives', () => {
+      const { ctx, trace } = createTraceCtx();
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const upper: PlotOutput = {
+        id: 'plot_Upper',
+        type: 'plot',
+        title: 'Upper',
+        values: [110, 120, 130],
+        color: '#2196F3',
+      };
+      const lower: PlotOutput = {
+        id: 'hline_Lower',
+        type: 'hline',
+        title: 'Lower',
+        values: [],
+        color: '#787B86',
+        lineStyle: 'dashed',
+        price: 90,
+      };
+      const fillPlot: PlotOutput = {
+        id: 'fill_Band',
+        type: 'fill',
+        title: 'Band',
+        values: [],
+        color: '#4CAF5033',
+        plot1Id: upper.id,
+        plot2Id: lower.id,
+      };
+      const marker: PlotOutput = {
+        id: 'plotshape_Signal',
+        type: 'plotshape',
+        title: 'Signal',
+        values: [1, null, null],
+        color: ['#E91E63', null, null],
+        shape: 'circle',
+        location: 'abovebar',
+      };
+      const background: PlotOutput = {
+        id: 'bgcolor_Session',
+        type: 'bgcolor',
+        title: 'Session',
+        values: [1, null, null],
+        color: ['#2196F333', null, null],
+      };
+
+      renderer.renderPlots([background, upper, lower, fillPlot, marker], bars, viewport);
+
+      expect(trace).toEqual(
+        expect.arrayContaining([
+          'fillRect:#2196F333',
+          'dash:6,4',
+          'stroke:#787B86:1',
+          'fill:#4CAF5033',
+          'arc:#E91E63',
+          'fill:#E91E63',
+        ])
+      );
+    });
+
     it('skips rendering plots with display.none while keeping them available as fill sources', () => {
       const fill = vi.fn();
       const stroke = vi.fn();

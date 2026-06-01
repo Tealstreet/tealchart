@@ -367,6 +367,9 @@ Phases:
    Renderer coverage now applies `bgcolor` display hiding and `barcolor`
    display/show-last windows.
 6. Add renderer-level screenshot or pixel tests where practical.
+   The jsdom test environment does not expose native screenshot buffers without
+   extra canvas dependencies, so current coverage uses a stable renderer command
+   trace for a common visual primitive mix.
 
 Done means visual-only indicators retain their main chart appearance.
 
