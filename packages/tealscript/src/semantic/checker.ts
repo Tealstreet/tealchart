@@ -912,7 +912,8 @@ class SemanticChecker {
       case 'VariableDeclaration':
         return this.expressionReferencesAnyName(statement.init, names);
       case 'AssignmentStatement':
-        return this.expressionReferencesAnyName(statement.right, names);
+        return this.expressionReferencesAnyName(statement.left, names)
+          || this.expressionReferencesAnyName(statement.right, names);
       case 'ExpressionStatement':
         return this.expressionReferencesAnyName(statement.expression, names);
       case 'IfStatement':
