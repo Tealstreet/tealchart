@@ -169,6 +169,28 @@ plot(p.y, title="Y")
     expect(roundSeries(getPlot(result, 'Y').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
   });
 
+  it('stores and mutates collection fields on user-defined types', () => {
+    const result = runCompatScript(`
+indicator("UDT collection fields")
+type Cache
+    array<float> values = array.new<float>()
+    map<string, float> prices = map.new<string, float>()
+    matrix<int> grid = matrix.new<int>(1, 1, 0)
+var cache = Cache.new()
+cache.values.push(close)
+cache.prices.put("last", close)
+cache.grid.set(0, 0, bar_index)
+plot(cache.values.size(), title="Size")
+plot(cache.prices.get("last"), title="Last")
+plot(cache.grid.get(0, 0), title="Index")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Size').values)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(roundSeries(getPlot(result, 'Last').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+    expect(roundSeries(getPlot(result, 'Index').values)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+  });
+
   it('keeps non-exported imported library user-defined types private externally', () => {
     const library = parse(`
 library("PivotTools", true)

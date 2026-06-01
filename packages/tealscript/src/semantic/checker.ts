@@ -224,6 +224,7 @@ const COLLECTION_TYPE_NAMES = new Set(['array', 'matrix', 'map']);
 const MAP_KEY_TYPE_NAMES = new Set(['int', 'float', 'bool', 'string', 'color']);
 const PRIMITIVE_TYPE_KINDS = new Set<SemanticTypeKind>(['bool', 'color', 'float', 'int', 'string']);
 const COLLECTION_TEMPLATE_TYPE_PATTERN = /^(array|matrix|map)</;
+const UNKNOWN_SEMANTIC_TYPE: SemanticType = { kind: 'unknown' };
 
 interface BuiltinSignature {
   params: string[];
@@ -1150,7 +1151,7 @@ class SemanticChecker {
 
     this.addDiagnostic(
       'type-mismatch',
-      `Cannot assign ${sourceType.kind} value to ${targetType.kind} field ${typeName}.${field.name.name}`,
+      `Cannot assign ${this.formatSemanticType(sourceType)} value to ${this.formatSemanticType(targetType)} field ${typeName}.${field.name.name}`,
       value.loc,
     );
   }
@@ -1676,6 +1677,8 @@ class SemanticChecker {
     if (arrayHelperType) return arrayHelperType;
     const matrixElementReadType = this.inferMatrixElementReadCallType(expression, scope);
     if (matrixElementReadType) return matrixElementReadType;
+    const mapValueReadType = this.inferMapValueReadCallType(expression, scope);
+    if (mapValueReadType) return mapValueReadType;
     if (calleePath.join('.') === 'array.from') {
       return {
         kind: 'array',
@@ -1841,6 +1844,13 @@ class SemanticChecker {
     return this.inferExpressionType(expression.callee.object, scope);
   }
 
+  private inferMapValueReadCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
+    if (expression.callee.type !== 'MemberExpression' || expression.callee.property.name !== 'get') return undefined;
+
+    const mapCall = this.resolveMapCall(expression, scope);
+    return mapCall?.operation === 'get' && mapCall.mapType.kind === 'map' ? mapCall.mapType.valueType : undefined;
+  }
+
   private inferIndexExpressionType(expression: IndexExpression, scope: SemanticScope): SemanticType {
     const objectType = this.inferExpressionType(expression.object, scope);
     if (objectType.kind === 'array' && objectType.elementType) return objectType.elementType;
@@ -1958,9 +1968,41 @@ class SemanticChecker {
   private isAssignableType(targetType: SemanticType, sourceType: SemanticType): boolean {
     if (targetType.kind === 'unknown' || sourceType.kind === 'unknown') return true;
 
+    if (targetType.kind === 'array' && sourceType.kind === 'array') {
+      return this.isAssignableType(targetType.elementType ?? UNKNOWN_SEMANTIC_TYPE, sourceType.elementType ?? UNKNOWN_SEMANTIC_TYPE);
+    }
+
+    if (targetType.kind === 'matrix' && sourceType.kind === 'matrix') {
+      return this.isAssignableType(targetType.elementType ?? UNKNOWN_SEMANTIC_TYPE, sourceType.elementType ?? UNKNOWN_SEMANTIC_TYPE);
+    }
+
+    if (targetType.kind === 'map' && sourceType.kind === 'map') {
+      return this.isAssignableType(targetType.keyType ?? UNKNOWN_SEMANTIC_TYPE, sourceType.keyType ?? UNKNOWN_SEMANTIC_TYPE)
+        && this.isAssignableType(targetType.valueType ?? UNKNOWN_SEMANTIC_TYPE, sourceType.valueType ?? UNKNOWN_SEMANTIC_TYPE);
+    }
+
+    if (targetType.kind === 'udt' && sourceType.kind === 'udt') {
+      return targetType.name === sourceType.name;
+    }
+
     if (!PRIMITIVE_TYPE_KINDS.has(targetType.kind) || !PRIMITIVE_TYPE_KINDS.has(sourceType.kind)) return true;
 
     return targetType.kind === sourceType.kind || (targetType.kind === 'float' && sourceType.kind === 'int');
+  }
+
+  private formatSemanticType(type: SemanticType): string {
+    switch (type.kind) {
+      case 'array':
+        return `array<${this.formatSemanticType(type.elementType ?? UNKNOWN_SEMANTIC_TYPE)}>`;
+      case 'matrix':
+        return `matrix<${this.formatSemanticType(type.elementType ?? UNKNOWN_SEMANTIC_TYPE)}>`;
+      case 'map':
+        return `map<${this.formatSemanticType(type.keyType ?? UNKNOWN_SEMANTIC_TYPE)}, ${this.formatSemanticType(type.valueType ?? UNKNOWN_SEMANTIC_TYPE)}>`;
+      case 'udt':
+        return type.name ?? 'udt';
+      default:
+        return type.kind;
+    }
   }
 
   private declare(scope: SemanticScope, symbol: SemanticSymbol): void {

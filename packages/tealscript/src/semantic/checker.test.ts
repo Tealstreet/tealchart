@@ -811,6 +811,49 @@ pivot.tag := "not checked"
     ]);
   });
 
+  it('validates user-defined type collection field references', () => {
+    const valid = checkProgram(parse(`
+indicator("UDT Collection Fields")
+type Cache
+    array<float> values
+    map<string, float> prices
+    matrix<int> grid
+cache = Cache.new(array.new<float>(), map.new<string, float>(), matrix.new<int>())
+cache.values := array.new<float>()
+cache.prices := map.new<string, float>()
+cache.grid := matrix.new<int>()
+value = cache.values.get(0)
+price = cache.prices.get("BTC")
+cell = cache.grid.get(0, 0)
+`));
+
+    const invalid = checkProgram(parse(`
+indicator("Bad UDT Collection Fields")
+type Cache
+    array<float> values
+    map<string, float> prices
+    matrix<int> grid
+badCtor = Cache.new(array.new<string>(), map.new<int, float>(), matrix.new<float>())
+cache = Cache.new(array.new<float>(), map.new<string, float>(), matrix.new<int>())
+cache.values := array.new<string>()
+cache.prices := map.new<string, string>()
+cache.grid := matrix.new<float>()
+`));
+
+    expect(valid.diagnostics).toEqual([]);
+    expect(valid.symbols.find((symbol) => symbol.name === 'value')?.type).toMatchObject({ kind: 'float' });
+    expect(valid.symbols.find((symbol) => symbol.name === 'price')?.type).toMatchObject({ kind: 'float' });
+    expect(valid.symbols.find((symbol) => symbol.name === 'cell')?.type).toMatchObject({ kind: 'int' });
+    expect(invalid.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign array<string> value to array<float> field Cache.values',
+      'Cannot assign map<int, float> value to map<string, float> field Cache.prices',
+      'Cannot assign matrix<float> value to matrix<int> field Cache.grid',
+      'Cannot assign array<string> value to array<float> field Cache.values',
+      'Cannot assign map<string, string> value to map<string, float> field Cache.prices',
+      'Cannot assign matrix<float> value to matrix<int> field Cache.grid',
+    ]);
+  });
+
   it('rejects mixed Pine input range and options overload arguments', () => {
     const result = checkProgram(parse(`
 indicator("Mixed Input Overloads")

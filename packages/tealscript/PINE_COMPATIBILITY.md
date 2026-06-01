@@ -235,8 +235,8 @@ explicit semantic diagnostics because Pine does not allow collections to
 directly contain other collection types.
 
 Known limits: map keys are currently restricted at runtime to finite numbers,
-strings, and booleans. Complete reference-type rules, including collection
-fields on UDTs, belong to the future qualified type-system and UDT phases.
+strings, and booleans. Complete reference-type rules belong to the future
+qualified type-system and UDT phases.
 
 ## Common User-Defined Type Coverage
 
@@ -248,6 +248,10 @@ assignment, reference assignment semantics, and realtime rollback for field
 mutations. UDT copy coverage supports Pine's shallow `Type.copy(object)` and
 `object.copy()` forms, so copied UDT fields that contain reference values still
 point at the same nested instances until scripts explicitly deep-copy them.
+UDTs can hold collection fields such as `array<float>`, `map<string, float>`,
+and `matrix<int>`; compatibility coverage mutates those fields through Pine
+method syntax, and semantic coverage reports conservative collection-reference
+mismatches in local constructors and field assignments.
 
 Compatibility fixtures include a reduced pivot-object array idiom derived from
 TradingView's objects documentation, where scripts define a `pivotPoint` UDT,
@@ -264,8 +268,8 @@ Known limits: UDT field and method receiver types are recorded dynamically but
 not yet fully enforced by the semantic checker. Semantic diagnostics cover
 unknown local UDT field reads/assignments, constructor unknown field names,
 duplicate bindings, excess positional arguments, invalid argument order between
-named and positional arguments, and conservative primitive field type
-mismatches in local UDT constructors and field assignments. Library
+named and positional arguments, and conservative primitive/collection field
+type mismatches in local UDT constructors and field assignments. Library
 export/import diagnostics and full reference-type diagnostics remain planned in
 Epic 12 and the qualified type-system epic.
 
