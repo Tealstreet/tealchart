@@ -149,7 +149,9 @@ Phases:
    metadata, infers common qualifier sources, and reports invalid demotions.
 4. Add overload validation for built-ins and helpful diagnostics for bad
    argument names, bad argument order, unsupported mixed positional/named forms,
-   and bad return usage.
+   and bad return usage. The semantic checker now validates a curated set of
+   high-impact built-in signatures for argument names, counts, ordering, and
+   duplicate positional/named bindings.
 5. Add type templates such as `array<float>`, `matrix<int>`, and
    `map<string, float>`.
 6. Surface diagnostics through the worker/editor path.

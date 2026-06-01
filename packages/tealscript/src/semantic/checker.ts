@@ -1,5 +1,6 @@
 import type {
   AssignmentStatement,
+  CallArgument,
   CallExpression,
   Expression,
   ForStatement,
@@ -188,6 +189,101 @@ const QUALIFIER_RANK: Record<SemanticQualifier, number> = {
   simple: 2,
   series: 3,
 };
+
+interface BuiltinSignature {
+  params: string[];
+  minArgs?: number;
+  maxArgs?: number;
+  allowExtraNamed?: boolean;
+}
+
+const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
+  ['alert', { params: ['message', 'freq'], minArgs: 1 }],
+  ['alertcondition', { params: ['condition', 'title', 'message'], minArgs: 1 }],
+  ['barcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display'], minArgs: 1 }],
+  ['bgcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display'], minArgs: 1 }],
+  ['color.new', { params: ['color', 'transp'], minArgs: 2, maxArgs: 2 }],
+  ['fill', { params: ['hline1', 'hline2', 'color', 'title', 'editable', 'show_last', 'fillgaps', 'display'], minArgs: 3 }],
+  ['fixnan', { params: ['source'], minArgs: 1, maxArgs: 1 }],
+  ['hline', { params: ['price', 'title', 'color', 'linestyle', 'linewidth', 'editable', 'display'], minArgs: 1 }],
+  [
+    'indicator',
+    {
+      params: [
+        'title',
+        'shorttitle',
+        'overlay',
+        'format',
+        'precision',
+        'scale',
+        'max_bars_back',
+        'timeframe',
+        'timeframe_gaps',
+        'explicit_plot_zorder',
+        'max_lines_count',
+        'max_labels_count',
+        'max_boxes_count',
+        'calc_bars_count',
+        'max_polylines_count',
+        'dynamic_requests',
+      ],
+      minArgs: 1,
+    },
+  ],
+  [
+    'input.int',
+    {
+      params: ['defval', 'title', 'minval', 'maxval', 'step', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'],
+      minArgs: 1,
+    },
+  ],
+  [
+    'input.float',
+    {
+      params: ['defval', 'title', 'minval', 'maxval', 'step', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'],
+      minArgs: 1,
+    },
+  ],
+  ['input.bool', { params: ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1 }],
+  ['input.string', { params: ['defval', 'title', 'options', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1 }],
+  ['na', { params: ['x'], minArgs: 1, maxArgs: 1 }],
+  ['nz', { params: ['source', 'replacement'], minArgs: 1, maxArgs: 2 }],
+  [
+    'plot',
+    {
+      params: [
+        'series',
+        'title',
+        'color',
+        'linewidth',
+        'style',
+        'trackprice',
+        'histbase',
+        'offset',
+        'join',
+        'editable',
+        'show_last',
+        'display',
+        'format',
+        'precision',
+        'force_overlay',
+      ],
+      minArgs: 1,
+    },
+  ],
+  ['request.security', { params: ['symbol', 'timeframe', 'expression', 'gaps', 'lookahead', 'ignore_invalid_symbol', 'currency', 'calc_bars_count'], minArgs: 3 }],
+  ['request.security_lower_tf', { params: ['symbol', 'timeframe', 'expression', 'ignore_invalid_symbol', 'currency', 'ignore_invalid_timeframe', 'calc_bars_count'], minArgs: 3 }],
+  ['runtime.error', { params: ['message'], minArgs: 1, maxArgs: 1 }],
+  ['ta.atr', { params: ['length'], minArgs: 1, maxArgs: 1 }],
+  ['ta.ema', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
+  ['ta.rsi', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
+  ['ta.sma', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
+  ['ta.stdev', { params: ['source', 'length', 'biased'], minArgs: 2, maxArgs: 3 }],
+  ['ta.vwap', { params: ['source', 'anchor', 'stdev_mult'], minArgs: 1, maxArgs: 3 }],
+  ['time', { params: ['timeframe', 'session', 'timezone'], minArgs: 0, maxArgs: 3 }],
+  ['time_close', { params: ['timeframe', 'session', 'timezone'], minArgs: 0, maxArgs: 3 }],
+  ['timestamp', { params: ['timezone', 'year', 'month', 'day', 'hour', 'minute', 'second'], minArgs: 1, maxArgs: 7 }],
+]);
 
 export function checkProgram(program: Program): SemanticCheckResult {
   return new SemanticChecker().check(program);
@@ -467,6 +563,7 @@ class SemanticChecker {
 
   private checkCallExpression(expression: CallExpression, scope: SemanticScope): void {
     this.checkCallee(expression.callee, scope);
+    this.checkBuiltinSignature(expression);
     for (const argument of expression.arguments) {
       this.checkExpression(argument.value, scope);
     }
@@ -493,6 +590,85 @@ class SemanticChecker {
   private checkIndexExpression(expression: IndexExpression, scope: SemanticScope): void {
     this.checkExpression(expression.object, scope);
     this.checkExpression(expression.index, scope);
+  }
+
+  private checkBuiltinSignature(expression: CallExpression): void {
+    const displayName = this.memberPath(expression.callee).join('.');
+    const signature = BUILTIN_SIGNATURES.get(displayName);
+    if (!signature) return;
+
+    this.checkArgumentOrder(expression.arguments, displayName);
+    this.checkArgumentNames(expression.arguments, signature, displayName);
+    this.checkArgumentCount(expression.arguments, signature, displayName);
+    this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName);
+  }
+
+  private checkArgumentOrder(args: CallArgument[], displayName: string): void {
+    let hasNamedArgument = false;
+    for (const arg of args) {
+      if (arg.name) {
+        hasNamedArgument = true;
+        continue;
+      }
+      if (hasNamedArgument) {
+        this.addDiagnostic('argument-order', `${displayName}() cannot use positional arguments after named arguments`, arg.loc);
+      }
+    }
+  }
+
+  private checkArgumentNames(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
+    if (signature.allowExtraNamed) return;
+    const allowed = new Set(signature.params);
+    for (const arg of args) {
+      if (arg.name && !allowed.has(arg.name.name)) {
+        this.addDiagnostic('unknown-argument', `Unknown argument '${arg.name.name}' for ${displayName}()`, arg.name.loc);
+      }
+    }
+  }
+
+  private checkArgumentCount(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
+    const positionalCount = this.leadingPositionalCount(args);
+    const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [arg.name.name] : [])));
+    const boundParamCount = signature.params.filter((param, index) => index < positionalCount || suppliedNames.has(param)).length;
+    const minArgs = signature.minArgs ?? 0;
+    const maxArgs = signature.maxArgs ?? signature.params.length;
+
+    if (boundParamCount < minArgs) {
+      this.addDiagnostic('argument-count', `${displayName}() expects at least ${minArgs} argument${minArgs === 1 ? '' : 's'}`, args[0]?.loc);
+    }
+    if (positionalCount > maxArgs) {
+      this.addDiagnostic('argument-count', `${displayName}() expects at most ${maxArgs} argument${maxArgs === 1 ? '' : 's'}`, args[maxArgs]?.loc);
+    }
+  }
+
+  private checkDuplicateArgumentBindings(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
+    const positionalCount = this.leadingPositionalCount(args);
+    const seenNames = new Set<string>();
+
+    for (const arg of args) {
+      if (!arg.name) continue;
+
+      const name = arg.name.name;
+      if (seenNames.has(name)) {
+        this.addDiagnostic('duplicate-argument', `Argument '${name}' for ${displayName}() was supplied multiple times`, arg.name.loc);
+        continue;
+      }
+      seenNames.add(name);
+
+      const positionalIndex = signature.params.indexOf(name);
+      if (positionalIndex !== -1 && positionalIndex < positionalCount) {
+        this.addDiagnostic('duplicate-argument', `Argument '${name}' for ${displayName}() was supplied multiple times`, arg.name.loc);
+      }
+    }
+  }
+
+  private leadingPositionalCount(args: CallArgument[]): number {
+    let count = 0;
+    for (const arg of args) {
+      if (arg.name) return count;
+      count += 1;
+    }
+    return count;
   }
 
   private checkIdentifier(identifier: Identifier, scope: SemanticScope): void {
