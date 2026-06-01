@@ -1207,6 +1207,37 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(fillText).toHaveBeenCalledWith('D', expect.any(Number), expect.any(Number));
       expect(fillText).toHaveBeenCalledWith('Down', expect.any(Number), expect.any(Number));
     });
+
+    it('scales plotarrow markers between minHeight and maxHeight and skips zero values', () => {
+      const fill = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fill,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plot: PlotOutput = {
+        id: 'plotarrow_Move',
+        type: 'plotarrow',
+        title: 'Move',
+        values: [0, 5, -10],
+        color: [null, '#4CAF50', '#F44336'],
+        minHeight: 5,
+        maxHeight: 20,
+      };
+
+      (renderer as any).renderPlotShape(plot, bars, viewport);
+
+      expect(fill).toHaveBeenCalledTimes(2);
+      expect((renderer as any).getPlotArrowMarkerSize(plot, 5, 10, 6)).toBeCloseTo(12.5);
+      expect((renderer as any).getPlotArrowMarkerSize(plot, 10, 10, 6)).toBe(20);
+    });
   });
 
   describe('background rendering', () => {
