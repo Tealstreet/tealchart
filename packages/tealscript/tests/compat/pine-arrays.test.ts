@@ -122,6 +122,26 @@ plot(values.size(), title="Size")
     expect(roundSeries(getPlot(result, 'Size').values)).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
   });
 
+  it('runs array UDT sort field idioms', () => {
+    const result = runCompatScript(`
+indicator("Array UDT sort fields")
+type Ranked
+    float score
+    string name
+values = array.from(Ranked.new(3, "C"), Ranked.new(1, "A"), Ranked.new(2, "B"))
+values.sort(order.ascending, "score")
+firstByScore = values.get(0)
+array.sort(values, order=order.descending, sort_field=1)
+firstByName = values.get(0)
+plot(firstByScore.score, title="First Score")
+plot(firstByName.score, title="First Name Score")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'First Score').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'First Name Score').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+  });
+
   it('matches documented Pine array slice window idioms', () => {
     const result = runCompatScript(`
 indicator("Array slice window")

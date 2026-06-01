@@ -44,6 +44,7 @@ import {
   unshiftArrayValue,
   varianceArrayValue,
 } from './arrays';
+import { createPineUdtObject } from './objects';
 
 describe('PineArray', () => {
   it('creates mutable arrays with an initial size and value', () => {
@@ -175,6 +176,31 @@ describe('PineArray', () => {
 
     sortArray(array, 'descending');
     expect(array.values).toEqual(['{ABC}', 'a', 'A', '1', '!']);
+  });
+
+  it('sorts user-defined type arrays by field name or index', () => {
+    const array = createPineArray();
+    pushArrayValue(array, createPineUdtObject('Ranked', [['score', 3], ['name', 'C']]));
+    pushArrayValue(array, createPineUdtObject('Ranked', [['score', 1], ['name', 'A']]));
+    pushArrayValue(array, createPineUdtObject('Ranked', [['score', 2], ['name', 'B']]));
+
+    sortArray(array, 'ascending', 'score');
+    expect((getArrayValue(array, 0) as ReturnType<typeof createPineUdtObject>).fields.get('score')).toBe(1);
+    expect((getArrayValue(array, 2) as ReturnType<typeof createPineUdtObject>).fields.get('score')).toBe(3);
+
+    sortArray(array, 'descending', 1);
+    expect((getArrayValue(array, 0) as ReturnType<typeof createPineUdtObject>).fields.get('name')).toBe('C');
+    expect((getArrayValue(array, 2) as ReturnType<typeof createPineUdtObject>).fields.get('name')).toBe('A');
+  });
+
+  it('rejects invalid array sort fields', () => {
+    const array = createPineArray();
+    pushArrayValue(array, createPineUdtObject('Ranked', [['score', 3]]));
+    pushArrayValue(array, createPineUdtObject('Ranked', [['score', 1]]));
+
+    expect(() => sortArray(array, 'ascending', 1)).toThrow('Array sort_field index 1 is out of bounds for type Ranked');
+    expect(() => sortArray(createPineArray(2, 1), 'ascending', 'score')).toThrow('Array sort_field requires user-defined type values');
+    expect(() => sortArray(array, 'ascending', true)).toThrow('Array sort_field must be a field name or field index');
   });
 
   it('returns sorted indices without mutating the source array', () => {
