@@ -11,6 +11,7 @@ import {
   pushArrayValue,
   type PineArray,
 } from './arrays';
+import { getUdtField, isPineUdtObject, type PineUdtObject } from './objects';
 
 export interface PineMatrix<T = unknown> {
   readonly __tealscriptMatrix: true;
@@ -546,12 +547,16 @@ export function kronMatrixValue(left: PineMatrix, right: PineMatrix): PineMatrix
   return result;
 }
 
-export function sortMatrixRows(matrix: PineMatrix, column: number = 0, order: unknown = 'ascending'): void {
+export function sortMatrixRows(matrix: PineMatrix, column: number = 0, order: unknown = 'ascending', sortField?: unknown): void {
   const columnIndex = normalizeExistingIndex(column, matrix.columns, 'column');
   const descending = order === 'descending';
   const rows = Array.from({ length: matrix.rows }, (_value, row) => matrix.values.slice(row * matrix.columns, (row + 1) * matrix.columns));
+  const shouldSortByField = sortField !== undefined || rows.some((row) => isPineUdtObject(row[columnIndex]));
   rows.sort((left, right) => {
-    const result = compareMatrixValues(left[columnIndex], right[columnIndex]);
+    const result = compareMatrixValues(
+      comparableMatrixSortValue(left[columnIndex], sortField, shouldSortByField),
+      comparableMatrixSortValue(right[columnIndex], sortField, shouldSortByField),
+    );
     return descending ? -result : result;
   });
   matrix.values = rows.flat();
@@ -845,6 +850,31 @@ function compareMatrixValues(left: unknown, right: unknown): number {
     return left - right;
   }
   return String(left).localeCompare(String(right));
+}
+
+function comparableMatrixSortValue(value: unknown, sortField: unknown, byField: boolean): unknown {
+  if (!byField) return value;
+  if (!isPineUdtObject(value)) {
+    throw new Error('Matrix sort_field requires user-defined type values in the selected column');
+  }
+  if (sortField === undefined) {
+    return getUdtFieldByIndex(value, 0);
+  }
+  if (typeof sortField === 'string') {
+    return getUdtField(value, sortField);
+  }
+  if (typeof sortField === 'number') {
+    return getUdtFieldByIndex(value, sortField);
+  }
+  throw new Error('Matrix sort_field must be a field name or field index');
+}
+
+function getUdtFieldByIndex(object: PineUdtObject, fieldIndex: number): unknown {
+  const normalizedIndex = Math.trunc(Number(fieldIndex));
+  if (!Number.isFinite(normalizedIndex) || normalizedIndex < 0 || normalizedIndex >= object.fields.size) {
+    throw new Error(`Matrix sort_field index ${normalizedIndex} is out of bounds for type ${object.typeName}`);
+  }
+  return Array.from(object.fields.values())[normalizedIndex];
 }
 
 function normalizeRange(from: number, to: number, size: number, label: string): { from: number; to: number } {
