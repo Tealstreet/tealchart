@@ -443,6 +443,8 @@ Phases:
    invalid generic constructor templates.
    Semantic coverage now propagates `matrix.get()` element types and reports
    conservative `matrix.set()`/`matrix.fill()` element mismatches.
+   Semantic coverage now enforces const int/string `matrix.sort()` `sort_field`
+   arguments for UDT row sorting.
 3. Implement `map.*` with key/value typing, insertion, lookup, removal, keys,
    values, copy, and iteration.
    Runtime and compatibility coverage now includes the map MVP: constructors,
