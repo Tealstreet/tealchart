@@ -321,6 +321,41 @@ badOrder = Pivot.new(x=1, 2.0)
     ]);
   });
 
+  it('reports unknown user-defined type fields on reads and assignments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad UDT Fields")
+type Pivot
+    int x
+    float y
+pivot = Pivot.new(1, close)
+valid = pivot.x
+missing = pivot.z
+pivot.other := 1
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown field 'z' on type Pivot",
+      "Unknown field 'other' on type Pivot",
+    ]);
+    expect(result.symbols.find((symbol) => symbol.name === 'valid')?.type).toMatchObject({ kind: 'int' });
+  });
+
+  it('does not treat user-defined method calls as field reads', () => {
+    const result = checkProgram(parse(`
+indicator("UDT Methods")
+type Pivot
+    float y
+method lift(Pivot this, float amount) =>
+    this.y += amount
+    this
+pivot = Pivot.new(close)
+lifted = pivot.lift(1)
+plot(lifted.y)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
   it('rejects mixed Pine input range and options overload arguments', () => {
     const result = checkProgram(parse(`
 indicator("Mixed Input Overloads")

@@ -18,6 +18,7 @@ import type {
   TupleDeclarator,
   TypeAnnotation,
   TypeDeclaration,
+  TypeFieldDeclaration,
   VariableDeclaration,
   WhileStatement,
 } from '../parser/ast';
@@ -729,6 +730,11 @@ class SemanticChecker {
       return;
     }
 
+    if (callee.type === 'MemberExpression') {
+      this.checkExpression(callee.object, scope);
+      return;
+    }
+
     this.checkExpression(callee, scope);
   }
 
@@ -736,7 +742,25 @@ class SemanticChecker {
     if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
       return;
     }
+    if (expression.object.type === 'Identifier') {
+      const objectSymbol = scope.lookup(expression.object.name);
+      if (objectSymbol?.kind === 'type' || objectSymbol?.kind === 'import') {
+        return;
+      }
+    }
     this.checkExpression(expression.object, scope);
+
+    const objectType = this.inferExpressionType(expression.object, scope);
+    if (objectType.kind !== 'udt' || !objectType.name || !this.typeDeclarations.has(objectType.name)) {
+      return;
+    }
+    if (!this.findUdtField(objectType.name, expression.property.name)) {
+      this.addDiagnostic(
+        'unknown-field',
+        `Unknown field '${expression.property.name}' on type ${objectType.name}`,
+        expression.property.loc,
+      );
+    }
   }
 
   private checkIndexExpression(expression: IndexExpression, scope: SemanticScope): void {
@@ -976,7 +1000,7 @@ class SemanticChecker {
         if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
           return { kind: 'unknown', qualifier: 'const' };
         }
-        return this.inferExpressionType(expression.object, scope);
+        return this.inferMemberExpressionType(expression, scope);
       case 'IndexExpression':
         return { kind: 'unknown', qualifier: 'series' };
       default:
@@ -1006,13 +1030,28 @@ class SemanticChecker {
     if (calleePath.join('.') === 'timeframe.from_seconds') return { kind: 'string', qualifier: 'simple' };
     if (CALENDAR_FUNCTION_NAMES.has(calleePath.join('.'))) return { kind: 'int', qualifier: 'series' };
     if (calleePath.join('.') === 'timestamp') return { kind: 'int', qualifier: 'const' };
+    if (calleePath.length === 2 && calleePath[1] === 'new' && calleePath[0] && this.typeDeclarations.has(calleePath[0])) {
+      return { kind: 'udt', name: calleePath[0] };
+    }
     return { kind: 'unknown', qualifier: this.inferMaxQualifier(expression.arguments.map((argument) => argument.value), scope) };
+  }
+
+  private inferMemberExpressionType(expression: MemberExpression, scope: SemanticScope): SemanticType {
+    const objectType = this.inferExpressionType(expression.object, scope);
+    if (objectType.kind !== 'udt' || !objectType.name) return objectType;
+
+    const field = this.findUdtField(objectType.name, expression.property.name);
+    return this.typeFromAnnotation(field?.typeAnnotation ?? undefined) ?? { kind: 'unknown', qualifier: objectType.qualifier };
   }
 
   private memberPath(expression: Expression): string[] {
     if (expression.type === 'Identifier') return [expression.name];
     if (expression.type !== 'MemberExpression') return [];
     return [...this.memberPath(expression.object), expression.property.name];
+  }
+
+  private findUdtField(typeName: string, fieldName: string): TypeFieldDeclaration | undefined {
+    return this.typeDeclarations.get(typeName)?.fields.find((field) => field.name.name === fieldName);
   }
 
   private inferMaxQualifier(expressions: Expression[], scope: SemanticScope): SemanticQualifier | undefined {
