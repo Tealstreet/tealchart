@@ -2634,6 +2634,35 @@ if bar_index > 0
       expect(candles?.color).toEqual([null, '#4CAF50', '#4CAF50']);
     });
 
+    it('caps plot outputs at the Pine 64-output limit', () => {
+      const plotCalls = Array.from({ length: 65 }, (_, index) => `plot(close, title="P${index}")`).join('\n');
+      const script = `//@version=6
+indicator("Plot limit")
+${plotCalls}`;
+
+      const ast = parse(script);
+      const result = executeScript(ast, createBars(1));
+
+      expect(result.errors.map((error) => error.message)).toEqual(['Too many plot outputs: maximum is 64']);
+      expect(result.plots).toHaveLength(64);
+    });
+
+    it('does not count hline outputs against the Pine plot-output limit', () => {
+      const plotCalls = Array.from({ length: 64 }, (_, index) => `plot(close, title="P${index}")`).join('\n');
+      const hlineCalls = Array.from({ length: 3 }, (_, index) => `hline(${index}, title="H${index}")`).join('\n');
+      const script = `//@version=6
+indicator("Plot limit with hlines")
+${plotCalls}
+${hlineCalls}`;
+
+      const ast = parse(script);
+      const result = executeScript(ast, createBars(1));
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots).toHaveLength(67);
+      expect(result.plots.filter((plot) => plot.type === 'hline')).toHaveLength(3);
+    });
+
     it('handles empty bar data', () => {
       const script = `//@version=6
 indicator("Test")
