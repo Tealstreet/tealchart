@@ -972,6 +972,7 @@ class SemanticChecker {
     this.checkUdtConstructorSignature(expression, scope);
     this.checkArrayConstructorTypeArguments(expression);
     this.checkMapConstructorTypeArguments(expression);
+    this.checkArrayCallTypes(expression, scope);
     this.checkMapCallTypes(expression, scope);
     for (const argument of expression.arguments) {
       this.checkExpression(argument.value, scope);
@@ -1136,6 +1137,56 @@ class SemanticChecker {
     }
   }
 
+  private checkArrayCallTypes(expression: CallExpression, scope: SemanticScope): void {
+    const arrayCall = this.resolveArrayMutationCall(expression, scope);
+    if (!arrayCall?.arrayType.elementType || !arrayCall.valueArgument) return;
+
+    const actualType = this.inferExpressionType(arrayCall.valueArgument, scope);
+    if (this.isAssignableType(arrayCall.arrayType.elementType, actualType)) return;
+
+    this.addDiagnostic(
+      'type-mismatch',
+      `Cannot use ${actualType.kind} value as ${arrayCall.arrayType.elementType.kind} array element`,
+      arrayCall.valueArgument.loc,
+    );
+  }
+
+  private resolveArrayMutationCall(
+    expression: CallExpression,
+    scope: SemanticScope,
+  ): { operation: 'fill' | 'insert' | 'push' | 'set' | 'unshift'; arrayType: SemanticType; valueArgument?: Expression } | null {
+    if (expression.callee.type !== 'MemberExpression') return null;
+
+    const methodName = expression.callee.property.name;
+    if (!this.isCheckedArrayMutationOperation(methodName)) return null;
+
+    const receiverType = this.inferExpressionType(expression.callee.object, scope);
+    if (receiverType.kind === 'array') {
+      return {
+        operation: methodName,
+        arrayType: receiverType,
+        valueArgument: this.getCallArgument(expression.arguments, 'value', methodName === 'insert' || methodName === 'set' ? 1 : 0),
+      };
+    }
+
+    if (expression.callee.object.type !== 'Identifier' || expression.callee.object.name !== 'array') return null;
+
+    const arrayArgument = this.getCallArgument(expression.arguments, 'id', 0);
+    if (!arrayArgument) return null;
+    const arrayType = this.inferExpressionType(arrayArgument, scope);
+    if (arrayType.kind !== 'array') return null;
+
+    return {
+      operation: methodName,
+      arrayType,
+      valueArgument: this.getCallArgument(expression.arguments, 'value', methodName === 'insert' || methodName === 'set' ? 2 : 1),
+    };
+  }
+
+  private isCheckedArrayMutationOperation(operation: string): operation is 'fill' | 'insert' | 'push' | 'set' | 'unshift' {
+    return operation === 'fill' || operation === 'insert' || operation === 'push' || operation === 'set' || operation === 'unshift';
+  }
+
   private checkMapConstructorTypeArguments(expression: CallExpression): void {
     if (this.memberPath(expression.callee).join('.') !== 'map.new' || !expression.typeArguments) return;
     if (expression.typeArguments.length !== 2) {
@@ -1210,6 +1261,10 @@ class SemanticChecker {
       `Cannot use ${actualType.kind} value as ${expectedType.kind} ${role}`,
       argument.loc,
     );
+  }
+
+  private getCallArgument(args: CallArgument[], name: string, positionalIndex: number): Expression | undefined {
+    return args.find((argument) => argument.name?.name === name)?.value ?? args[positionalIndex]?.value;
   }
 
   private checkArgumentOrder(args: CallArgument[], displayName: string): void {
