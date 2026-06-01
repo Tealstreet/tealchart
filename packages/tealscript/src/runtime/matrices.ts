@@ -259,6 +259,10 @@ export function detMatrixValue(matrix: PineMatrix): number {
 
   for (let pivotIndex = 0; pivotIndex < matrix.rows; pivotIndex++) {
     let pivotRow = pivotIndex;
+    let columnScale = 0;
+    for (let row = pivotIndex; row < matrix.rows; row++) {
+      columnScale = Math.max(columnScale, Math.abs(rows[row][pivotIndex]));
+    }
     for (let row = pivotIndex + 1; row < matrix.rows; row++) {
       if (Math.abs(rows[row][pivotIndex]) > Math.abs(rows[pivotRow][pivotIndex])) {
         pivotRow = row;
@@ -266,7 +270,7 @@ export function detMatrixValue(matrix: PineMatrix): number {
     }
 
     const pivot = rows[pivotRow][pivotIndex];
-    if (Math.abs(pivot) <= MATRIX_EPSILON) {
+    if (isEffectivelyZero(pivot, columnScale)) {
       return 0;
     }
 
@@ -285,7 +289,7 @@ export function detMatrixValue(matrix: PineMatrix): number {
   }
 
   const value = determinant * sign;
-  return Math.abs(value) <= MATRIX_EPSILON ? 0 : value;
+  return Object.is(value, -0) ? 0 : value;
 }
 
 export function rankMatrixValue(matrix: PineMatrix): number {
@@ -294,13 +298,17 @@ export function rankMatrixValue(matrix: PineMatrix): number {
 
   for (let column = 0; column < matrix.columns && rank < matrix.rows; column++) {
     let pivotRow = rank;
+    let columnScale = 0;
+    for (let row = rank; row < matrix.rows; row++) {
+      columnScale = Math.max(columnScale, Math.abs(rows[row][column]));
+    }
     for (let row = rank + 1; row < matrix.rows; row++) {
       if (Math.abs(rows[row][column]) > Math.abs(rows[pivotRow][column])) {
         pivotRow = row;
       }
     }
 
-    if (Math.abs(rows[pivotRow][column]) <= MATRIX_EPSILON) {
+    if (isEffectivelyZero(rows[pivotRow][column], columnScale)) {
       continue;
     }
 
@@ -371,6 +379,13 @@ function numericRows(matrix: PineMatrix): number[][] {
       return Number(matrix.values[row * matrix.columns + column]);
     });
   });
+}
+
+function isEffectivelyZero(value: number, scale: number): boolean {
+  if (scale === 0) {
+    return value === 0;
+  }
+  return Math.abs(value) <= scale * MATRIX_EPSILON;
 }
 
 function multiplyMatrices(left: PineMatrix, right: PineMatrix): PineMatrix<number> {

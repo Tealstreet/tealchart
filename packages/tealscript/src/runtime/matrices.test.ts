@@ -260,6 +260,14 @@ describe('PineMatrix', () => {
     expect(rankMatrixValue(rectangular)).toBe(2);
   });
 
+  it('preserves small but valid determinant and rank pivots', () => {
+    const matrix = createPineMatrix<number>(2, 2, 0);
+    matrix.values = [1e-12, 0, 0, 1];
+
+    expect(detMatrixValue(matrix)).toBeCloseTo(1e-12);
+    expect(rankMatrixValue(matrix)).toBe(2);
+  });
+
   it('rejects determinants for non-square matrices', () => {
     expect(() => detMatrixValue(createPineMatrix<number>(2, 3, 1))).toThrow('Matrix determinant requires a square matrix. Matrix is 2x3');
   });
