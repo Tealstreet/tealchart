@@ -121,6 +121,30 @@ export type Pivot
     ]);
   });
 
+  it('reports exported library signatures that expose non-exported user-defined types', () => {
+    const result = checkProgram(parse(`
+library("Exported UDT Contracts")
+type Hidden
+    float value
+export type Visible
+    Hidden direct
+    array<Hidden> list
+    map<string, Hidden> lookup
+export consume(Hidden direct, array<Hidden> list, map<string, Hidden> lookup) => direct.value
+export method lifted(Hidden this, float amount) => this
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Exported field direct in Visible uses non-exported user-defined type: Hidden',
+      'Exported field list in Visible uses non-exported user-defined type: Hidden',
+      'Exported field lookup in Visible uses non-exported user-defined type: Hidden',
+      'Exported function parameter direct in consume uses non-exported user-defined type: Hidden',
+      'Exported function parameter list in consume uses non-exported user-defined type: Hidden',
+      'Exported function parameter lookup in consume uses non-exported user-defined type: Hidden',
+      'Exported method parameter this in lifted uses non-exported user-defined type: Hidden',
+    ]);
+  });
+
   it('reports invalid exported library function scopes', () => {
     const result = checkProgram(parse(`
 library("Export Scope")

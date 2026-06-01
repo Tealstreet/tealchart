@@ -503,6 +503,25 @@ class SemanticChecker {
       return;
     }
 
+    const typeDeclarations = new Map(
+      statements
+        .filter((statement): statement is TypeDeclaration => statement.type === 'TypeDeclaration')
+        .map((statement) => [statement.name.name, statement]),
+    );
+    const exportedTypeNames = new Set(
+      [...typeDeclarations.values()]
+        .filter((declaration) => declaration.exported)
+        .map((declaration) => declaration.name.name),
+    );
+
+    for (const declaration of exportedDeclarations) {
+      if (declaration.type === 'TypeDeclaration') {
+        this.checkExportedTypeFields(declaration, typeDeclarations, exportedTypeNames);
+      } else {
+        this.checkExportedCallableTypeReferences(declaration, typeDeclarations, exportedTypeNames);
+      }
+    }
+
     for (const declaration of exportedDeclarations) {
       if (declaration.type !== 'FunctionDeclaration') continue;
       this.checkExportedFunctionParameters(declaration);
@@ -513,6 +532,69 @@ class SemanticChecker {
       if (declaration.type !== 'FunctionDeclaration') continue;
       this.checkExportedFunctionScope(declaration, globalVariableQualifiers);
     }
+  }
+
+  private checkExportedTypeFields(
+    declaration: TypeDeclaration,
+    typeDeclarations: Map<string, TypeDeclaration>,
+    exportedTypeNames: Set<string>,
+  ): void {
+    for (const field of declaration.fields) {
+      this.checkExportedTypeAnnotation(
+        declaration.name.name,
+        `field ${field.name.name}`,
+        field.typeAnnotation ?? undefined,
+        typeDeclarations,
+        exportedTypeNames,
+        field.name.loc,
+      );
+    }
+  }
+
+  private checkExportedCallableTypeReferences(
+    declaration: FunctionDeclaration,
+    typeDeclarations: Map<string, TypeDeclaration>,
+    exportedTypeNames: Set<string>,
+  ): void {
+    const declarationKind = declaration.isMethod ? 'method' : 'function';
+    for (const parameter of declaration.params) {
+      this.checkExportedTypeAnnotation(
+        declaration.name.name,
+        `${declarationKind} parameter ${parameter.name}`,
+        parameter.typeAnnotation ?? undefined,
+        typeDeclarations,
+        exportedTypeNames,
+        parameter.loc,
+      );
+    }
+  }
+
+  private checkExportedTypeAnnotation(
+    declarationName: string,
+    usage: string,
+    annotation: TypeAnnotation | undefined | null,
+    typeDeclarations: Map<string, TypeDeclaration>,
+    exportedTypeNames: Set<string>,
+    loc?: SourceLocation,
+  ): void {
+    if (!annotation) return;
+
+    const typeNames = this.referencedAnnotationTypeNames(annotation);
+    for (const typeName of typeNames) {
+      if (!typeDeclarations.has(typeName) || exportedTypeNames.has(typeName)) continue;
+      this.addDiagnostic(
+        'library-export',
+        `Exported ${usage} in ${declarationName} uses non-exported user-defined type: ${typeName}`,
+        loc,
+      );
+    }
+  }
+
+  private referencedAnnotationTypeNames(annotation: TypeAnnotation): string[] {
+    if (annotation.baseType === 'udt') return [annotation.name];
+    if (annotation.baseType === 'array' || annotation.baseType === 'matrix') return [annotation.elementType];
+    if (annotation.baseType === 'map') return [annotation.keyType, annotation.valueType];
+    return [];
   }
 
   private checkExportedFunctionParameters(declaration: FunctionDeclaration): void {
