@@ -213,7 +213,8 @@ Phases:
    windows, unbiased dispersion, and stable EMA/RMA smoothing state.
 3. Finish `math.*`: random behavior, mintick rounding, overloads, and exact
    integer/float behavior. Initial parity work now covers named arguments for
-   common scalar helpers and `math.sum`.
+   common scalar helpers and `math.sum`, plus normalized `math.round_to_mintick`
+   precision.
 4. Finish `str.*`: `str.tonumber`, `str.format_time`, formatting edge cases,
    Unicode/string escape behavior, and placeholder compatibility.
 5. Finish `color.*`: exact constants, transparency, channel extraction,
