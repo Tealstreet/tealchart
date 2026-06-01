@@ -1411,6 +1411,40 @@ plot(close)`;
       expect(result.indicatorScale).toBe('right');
     });
 
+    it('records advanced indicator declaration metadata', () => {
+      const script = `//@version=6
+indicator(
+  "Advanced Metadata",
+  timeframe="15",
+  timeframe_gaps=false,
+  explicit_plot_zorder=true,
+  max_labels_count=2,
+  max_lines_count=3,
+  max_boxes_count=4,
+  max_polylines_count=5,
+  calc_bars_count=250,
+  dynamic_requests=false
+)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.indicatorTimeframe).toBe('15');
+      expect(result.indicatorTimeframeGaps).toBe(false);
+      expect(result.indicatorExplicitPlotZOrder).toBe(true);
+      expect(result.indicatorCalcBarsCount).toBe(250);
+      expect(result.indicatorDynamicRequests).toBe(false);
+      expect(result.indicatorDrawingLimits).toEqual({
+        label: 2,
+        line: 3,
+        box: 4,
+        polyline: 5,
+      });
+    });
+
     it('records indicator shorttitle metadata', () => {
       const script = `//@version=6
 indicator("Long Declaration Title", shorttitle="Short")
