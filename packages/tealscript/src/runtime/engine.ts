@@ -174,6 +174,7 @@ export interface ExecutionResult {
   alerts: AlertOutput[];
   logs: LogOutput[];
   inputs: InputDefinition[];
+  declaration: IndicatorDeclarationMetadata;
   indicatorTitle: string;
   indicatorShortTitle?: string;
   indicatorOverlay: boolean;
@@ -196,6 +197,28 @@ export interface ExecutionResult {
   strategy: StrategyLedger;
   errors: ExecutionError[];
   profile: RuntimeProfile;
+}
+
+export interface IndicatorDeclarationMetadata {
+  title: string;
+  shortTitle?: string;
+  overlay: boolean;
+  precision: number;
+  format?: string;
+  scale?: string;
+  timeframe?: string;
+  timeframeGaps?: boolean;
+  explicitPlotZOrder?: boolean;
+  behindChart?: boolean;
+  calcBarsCount?: number;
+  maxBarsBack?: number;
+  dynamicRequests: boolean;
+  drawingLimits: {
+    label: number;
+    line: number;
+    box: number;
+    polyline: number;
+  };
 }
 
 export interface RuntimeProfile {
@@ -386,31 +409,29 @@ export class TealscriptEngine {
   }
 
   private createExecutionResult(): ExecutionResult {
+    const declaration = this.createDeclarationMetadata();
+
     return {
       plots: this.ctx.getPlots(),
       drawings: this.ctx.getDrawings(),
       alerts: this.ctx.getAlerts(),
       logs: this.ctx.getLogs(),
       inputs: this.ctx.inputDefinitions.map((def) => ({ ...def })),
-      indicatorTitle: this.ctx.indicatorTitle,
-      indicatorShortTitle: this.ctx.indicatorShortTitle,
-      indicatorOverlay: this.ctx.indicatorOverlay,
-      indicatorPrecision: this.ctx.indicatorPrecision,
-      indicatorFormat: this.ctx.indicatorFormat,
-      indicatorScale: this.ctx.indicatorScale,
-      indicatorTimeframe: this.ctx.indicatorTimeframe,
-      indicatorTimeframeGaps: this.ctx.indicatorTimeframeGaps,
-      indicatorExplicitPlotZOrder: this.ctx.indicatorExplicitPlotZOrder,
-      indicatorBehindChart: this.ctx.indicatorBehindChart,
-      indicatorCalcBarsCount: this.ctx.indicatorCalcBarsCount,
-      indicatorMaxBarsBack: this.ctx.indicatorMaxBarsBack,
-      indicatorDynamicRequests: this.indicatorDynamicRequests,
-      indicatorDrawingLimits: {
-        label: this.ctx.getDrawingLimit('label'),
-        line: this.ctx.getDrawingLimit('line'),
-        box: this.ctx.getDrawingLimit('box'),
-        polyline: this.ctx.getDrawingLimit('polyline'),
-      },
+      declaration,
+      indicatorTitle: declaration.title,
+      indicatorShortTitle: declaration.shortTitle,
+      indicatorOverlay: declaration.overlay,
+      indicatorPrecision: declaration.precision,
+      indicatorFormat: declaration.format,
+      indicatorScale: declaration.scale,
+      indicatorTimeframe: declaration.timeframe,
+      indicatorTimeframeGaps: declaration.timeframeGaps,
+      indicatorExplicitPlotZOrder: declaration.explicitPlotZOrder,
+      indicatorBehindChart: declaration.behindChart,
+      indicatorCalcBarsCount: declaration.calcBarsCount,
+      indicatorMaxBarsBack: declaration.maxBarsBack,
+      indicatorDynamicRequests: declaration.dynamicRequests,
+      indicatorDrawingLimits: declaration.drawingLimits,
       strategy: this.ctx.strategyLedger,
       errors: this.errors,
       profile: {
@@ -422,6 +443,30 @@ export class TealscriptEngine {
         requestContexts: this.requestContextKeys.size,
         maxBarsBack: this.inferredMaxBarsBack,
         errors: this.errors.length,
+      },
+    };
+  }
+
+  private createDeclarationMetadata(): IndicatorDeclarationMetadata {
+    return {
+      title: this.ctx.indicatorTitle,
+      shortTitle: this.ctx.indicatorShortTitle,
+      overlay: this.ctx.indicatorOverlay,
+      precision: this.ctx.indicatorPrecision,
+      format: this.ctx.indicatorFormat,
+      scale: this.ctx.indicatorScale,
+      timeframe: this.ctx.indicatorTimeframe,
+      timeframeGaps: this.ctx.indicatorTimeframeGaps,
+      explicitPlotZOrder: this.ctx.indicatorExplicitPlotZOrder,
+      behindChart: this.ctx.indicatorBehindChart,
+      calcBarsCount: this.ctx.indicatorCalcBarsCount,
+      maxBarsBack: this.ctx.indicatorMaxBarsBack,
+      dynamicRequests: this.indicatorDynamicRequests,
+      drawingLimits: {
+        label: this.ctx.getDrawingLimit('label'),
+        line: this.ctx.getDrawingLimit('line'),
+        box: this.ctx.getDrawingLimit('box'),
+        polyline: this.ctx.getDrawingLimit('polyline'),
       },
     };
   }
@@ -4907,8 +4952,36 @@ export class TealscriptEngine {
 
       const inputValue = ctx.getInput(id);
       const registeredDefault = ctx.inputDefinitions.find((input) => input.id === id)?.defval;
-      return inputValue === undefined || inputValue === registeredDefault ? defval : inputValue;
+      if (inputValue === undefined || inputValue === registeredDefault) {
+        return defval;
+      }
+      return this.resolveInputSourceValue(inputValue, ctx);
     });
+  }
+
+  private resolveInputSourceValue(value: unknown, ctx: ExecutionContext): unknown {
+    if (typeof value !== 'string') return value;
+
+    switch (value) {
+      case 'open':
+        return ctx.open.get(0);
+      case 'high':
+        return ctx.high.get(0);
+      case 'low':
+        return ctx.low.get(0);
+      case 'close':
+        return ctx.close.get(0);
+      case 'hl2':
+        return ctx.hl2;
+      case 'hlc3':
+        return ctx.hlc3;
+      case 'ohlc4':
+        return ctx.ohlc4;
+      case 'hlcc4':
+        return ctx.hlcc4;
+      default:
+        return value;
+    }
   }
 
   private registerMathBuiltins(): void {
@@ -5885,6 +5958,15 @@ export class TealscriptEngine {
           return o !== undefined && h !== undefined && l !== undefined && c !== undefined
             ? (o + h + l + c) / 4
             : undefined;
+        },
+      };
+    if (source === ctx.hlcc4)
+      return {
+        get: (i) => {
+          const h = ctx.high.get(i);
+          const l = ctx.low.get(i);
+          const c = ctx.close.get(i);
+          return h !== undefined && l !== undefined && c !== undefined ? (h + l + c + c) / 4 : undefined;
         },
       };
     // Default: fallback to close (most common case)

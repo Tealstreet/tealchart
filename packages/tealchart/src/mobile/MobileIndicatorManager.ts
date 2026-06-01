@@ -19,7 +19,7 @@
  * }, []);
  * ```
  */
-import type { InputDefinition, PlotOutput, Program, WorkerError } from '@tealstreet/tealscript';
+import type { IndicatorDeclarationMetadata, InputDefinition, PlotOutput, Program, WorkerError } from '@tealstreet/tealscript';
 import type { PlotStyleOverride } from '../state/chartState';
 import type { Bar, UnifiedPaneLayout } from '../types';
 
@@ -43,6 +43,8 @@ export interface ActiveIndicator {
   ast?: Program;
   /** Style overrides for plots */
   styleOverrides?: PlotStyleOverride[];
+  /** Pine indicator declaration metadata discovered during execution */
+  declaration?: IndicatorDeclarationMetadata;
 }
 
 /**
@@ -91,6 +93,7 @@ export class MobileIndicatorManager {
   private _plots: PlotOutput[] = [];
   private _astCache: Map<string, Program> = new Map();
   private _inputDefsCache: Map<string, InputDefinition[]> = new Map();
+  private _declarationCache: Map<string, IndicatorDeclarationMetadata> = new Map();
   private _bars: Bar[] = [];
   private _onUpdate: (() => void) | null = null;
   private _events = new EventEmitter();
@@ -259,6 +262,7 @@ export class MobileIndicatorManager {
 
     // Clear cached input definitions
     this._inputDefsCache.delete(instanceId);
+    this._declarationCache.delete(instanceId);
     this._astCache.delete(instanceId);
     this._lastErrorKeys.delete(instanceId);
 
@@ -328,6 +332,13 @@ export class MobileIndicatorManager {
    */
   getInputDefinitions(instanceId: string): InputDefinition[] {
     return this._inputDefsCache.get(instanceId) ?? [];
+  }
+
+  /**
+   * Get declaration metadata for a given indicator instance.
+   */
+  getDeclaration(instanceId: string): IndicatorDeclarationMetadata | undefined {
+    return this._declarationCache.get(instanceId);
   }
 
   /**
@@ -441,6 +452,9 @@ export class MobileIndicatorManager {
         if (result.inputs && result.inputs.length > 0) {
           this._inputDefsCache.set(instanceId, result.inputs as InputDefinition[]);
         }
+
+        this._declarationCache.set(instanceId, result.declaration);
+        ind.declaration = result.declaration;
 
         // Tag plots with the instance ID so renderer knows which pane to use
         for (const plot of result.plots) {

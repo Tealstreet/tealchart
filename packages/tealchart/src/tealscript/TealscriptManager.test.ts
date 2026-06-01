@@ -73,11 +73,13 @@ describe('TealscriptManager', () => {
     };
     const plotUpdates: PlotOutput[][] = [];
     const drawingUpdates: DrawingOutput[][] = [];
+    const declarations: unknown[] = [];
 
     const manager = new TealscriptManager({
       createWorker: () => worker as unknown as Worker,
       onPlotsUpdated: (plots) => plotUpdates.push(plots),
       onDrawingsUpdated: (drawings) => drawingUpdates.push(drawings),
+      onDeclarationDiscovered: (_scriptId, declaration) => declarations.push(declaration),
     });
 
     const addScript = manager.addScript('study-1', 'indicator("T")');
@@ -89,6 +91,19 @@ describe('TealscriptManager', () => {
       drawings: [drawing],
       alerts: [],
       inputs: [],
+      declaration: {
+        title: 'Declaration Title',
+        shortTitle: 'Decl',
+        overlay: true,
+        precision: 4,
+        dynamicRequests: false,
+        drawingLimits: {
+          label: 50,
+          line: 50,
+          box: 50,
+          polyline: 50,
+        },
+      },
       metadata: {
         generation: 1,
         requestId: 1,
@@ -99,6 +114,12 @@ describe('TealscriptManager', () => {
     expect(drawingUpdates).toHaveLength(1);
     expect(plotUpdates[0]).toEqual([{ ...plot, scriptId: 'study-1' }]);
     expect(drawingUpdates[0]).toEqual([{ ...drawing, scriptId: 'study-1' }]);
+    expect(manager.getDeclaration('study-1')).toMatchObject({
+      title: 'Declaration Title',
+      overlay: true,
+      precision: 4,
+    });
+    expect(declarations).toHaveLength(1);
   });
 
   it('ignores stale bundled worker results without hiding unsettled init errors', async () => {

@@ -14,6 +14,7 @@ import type {
   PlotOutput,
   DrawingOutput,
   InputDefinition,
+  IndicatorDeclarationMetadata,
   Bar,
   FromWorkerMessage,
   WorkerOutputMetadata,
@@ -30,6 +31,7 @@ interface ManagedScript {
   plots: PlotOutput[];
   drawings: DrawingOutput[];
   inputs: InputDefinition[];
+  declaration?: IndicatorDeclarationMetadata;
   inputValues: Record<string, unknown>;
   isReady: boolean;
   isVisible: boolean;
@@ -73,6 +75,11 @@ export interface TealscriptManagerOptions {
    * Called when a script's input definitions are available
    */
   onInputsDiscovered?: (scriptId: string, inputs: InputDefinition[]) => void;
+
+  /**
+   * Called when a script's indicator declaration metadata is available
+   */
+  onDeclarationDiscovered?: (scriptId: string, declaration: IndicatorDeclarationMetadata) => void;
 }
 
 /**
@@ -433,6 +440,13 @@ export class TealscriptManager {
   }
 
   /**
+   * Get indicator declaration metadata for a specific script
+   */
+  getDeclaration(scriptId: string): IndicatorDeclarationMetadata | undefined {
+    return this.scripts.get(scriptId)?.declaration;
+  }
+
+  /**
    * Get all managed script IDs
    */
   getScriptIds(): string[] {
@@ -532,6 +546,11 @@ export class TealscriptManager {
     if (JSON.stringify(script.inputs) !== JSON.stringify(result.inputs)) {
       script.inputs = result.inputs;
       this.options.onInputsDiscovered?.(scriptId, result.inputs);
+    }
+
+    if (result.declaration && JSON.stringify(script.declaration) !== JSON.stringify(result.declaration)) {
+      script.declaration = result.declaration;
+      this.options.onDeclarationDiscovered?.(scriptId, result.declaration);
     }
 
     // Notify listeners

@@ -5,6 +5,7 @@
  */
 
 import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition, LogOutput } from '../runtime/context';
+import type { IndicatorDeclarationMetadata } from '../runtime/engine';
 import type { SemanticDiagnostic } from '../semantic';
 
 /**
@@ -98,6 +99,7 @@ export interface WorkerOutputBundle {
   alerts: AlertOutput[];
   logs?: LogOutput[];
   inputs: InputDefinition[];
+  declaration?: IndicatorDeclarationMetadata;
   metadata?: WorkerOutputMetadata;
 }
 
@@ -122,6 +124,7 @@ export interface ResultMessage {
   alerts: AlertOutput[];
   logs?: LogOutput[];
   inputs: InputDefinition[];
+  declaration?: IndicatorDeclarationMetadata;
 }
 
 /**
@@ -142,6 +145,7 @@ export function createResultMessage(scriptId: string, output: WorkerOutputBundle
     alerts: normalizedOutput.alerts,
     logs: normalizedOutput.logs,
     inputs: normalizedOutput.inputs,
+    declaration: normalizedOutput.declaration,
   };
 }
 
@@ -162,6 +166,7 @@ export function getResultOutput(message: ResultMessage): NormalizedWorkerOutputB
     alerts: message.alerts,
     logs: message.logs ?? [],
     inputs: message.inputs,
+    declaration: message.declaration,
   };
 }
 

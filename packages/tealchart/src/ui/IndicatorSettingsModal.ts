@@ -133,6 +133,11 @@ const contentStyles = {
     cursor: 'pointer',
   } as Partial<CSSStyleDeclaration>,
 
+  disabled: {
+    opacity: '0.45',
+    cursor: 'not-allowed',
+  } as Partial<CSSStyleDeclaration>,
+
   colorInput: {
     width: '60px',
     height: '28px',
@@ -484,8 +489,43 @@ export class IndicatorSettingsModal extends Modal {
     }
   }
 
+  private isInputActive(def: InputDefinition): boolean {
+    return def.active === undefined ? true : Boolean(def.active);
+  }
+
+  private applyDisabledState(element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement, active: boolean): void {
+    element.disabled = !active;
+    if (!active) {
+      Object.assign(element.style, contentStyles.disabled);
+    }
+  }
+
+  private renderOptionsSelect(def: InputDefinition, currentValue: unknown, active: boolean): HTMLSelectElement {
+    const select = document.createElement('select');
+    Object.assign(select.style, contentStyles.select);
+    this.applyDisabledState(select, active);
+
+    for (const opt of def.options ?? []) {
+      const option = document.createElement('option');
+      const optionValue = String(opt);
+      option.value = optionValue;
+      option.textContent = optionValue;
+      option.selected = optionValue === String(currentValue);
+      select.appendChild(option);
+    }
+
+    select.addEventListener('change', (e) => {
+      const selectedValue = (e.target as HTMLSelectElement).value;
+      const selectedOption = def.options?.find((opt) => String(opt) === selectedValue);
+      this.updateValue(def.id, selectedOption ?? selectedValue);
+    });
+
+    return select;
+  }
+
   private renderFormInput(def: InputDefinition): HTMLElement {
     const row = this.createElement('div', { style: contentStyles.formRow });
+    const active = this.isInputActive(def);
 
     // Label
     const labelContainer = document.createElement('div');
@@ -510,9 +550,15 @@ export class IndicatorSettingsModal extends Modal {
     switch (def.type) {
       case 'int':
       case 'float': {
+        if (def.options && def.options.length > 0) {
+          row.appendChild(this.renderOptionsSelect(def, currentValue, active));
+          break;
+        }
+
         const input = document.createElement('input');
         input.type = 'number';
         Object.assign(input.style, contentStyles.input);
+        this.applyDisabledState(input, active);
         input.value = String(currentValue);
         if (def.minval !== undefined) input.min = String(def.minval);
         if (def.maxval !== undefined) input.max = String(def.maxval);
@@ -532,6 +578,7 @@ export class IndicatorSettingsModal extends Modal {
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         Object.assign(checkbox.style, contentStyles.checkbox);
+        this.applyDisabledState(checkbox, active);
         checkbox.checked = Boolean(currentValue);
         checkbox.addEventListener('change', (e) => {
           this.updateValue(def.id, (e.target as HTMLInputElement).checked);
@@ -542,24 +589,12 @@ export class IndicatorSettingsModal extends Modal {
 
       case 'string': {
         if (def.options && def.options.length > 0) {
-          const select = document.createElement('select');
-          Object.assign(select.style, contentStyles.select);
-          for (const opt of def.options) {
-            const option = document.createElement('option');
-            const optionValue = String(opt);
-            option.value = optionValue;
-            option.textContent = optionValue;
-            option.selected = optionValue === String(currentValue);
-            select.appendChild(option);
-          }
-          select.addEventListener('change', (e) => {
-            this.updateValue(def.id, (e.target as HTMLSelectElement).value);
-          });
-          row.appendChild(select);
+          row.appendChild(this.renderOptionsSelect(def, currentValue, active));
         } else {
           const input = document.createElement('input');
           input.type = 'text';
           Object.assign(input.style, contentStyles.input);
+          this.applyDisabledState(input, active);
           input.value = String(currentValue);
           input.addEventListener('change', (e) => {
             this.updateValue(def.id, (e.target as HTMLInputElement).value);
@@ -569,14 +604,78 @@ export class IndicatorSettingsModal extends Modal {
         break;
       }
 
+      case 'timeframe':
+      case 'symbol':
+      case 'session': {
+        if (def.options && def.options.length > 0) {
+          row.appendChild(this.renderOptionsSelect(def, currentValue, active));
+          break;
+        }
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        Object.assign(input.style, contentStyles.input);
+        this.applyDisabledState(input, active);
+        input.value = String(currentValue);
+        input.addEventListener('change', (e) => {
+          this.updateValue(def.id, (e.target as HTMLInputElement).value);
+        });
+        row.appendChild(input);
+        break;
+      }
+
+      case 'price': {
+        const input = document.createElement('input');
+        input.type = 'number';
+        Object.assign(input.style, contentStyles.input);
+        this.applyDisabledState(input, active);
+        input.value = String(currentValue);
+        input.step = String(def.step ?? 0.01);
+        input.addEventListener('change', (e) => {
+          const val = parseFloat((e.target as HTMLInputElement).value);
+          this.updateValue(def.id, isNaN(val) ? def.defval : val);
+        });
+        row.appendChild(input);
+        break;
+      }
+
+      case 'time': {
+        const input = document.createElement('input');
+        input.type = 'datetime-local';
+        Object.assign(input.style, contentStyles.input, { width: '180px' });
+        this.applyDisabledState(input, active);
+        input.value = this.formatTimestampInput(currentValue);
+        input.addEventListener('change', (e) => {
+          const value = (e.target as HTMLInputElement).value;
+          const timestamp = value ? new Date(value).getTime() : Number.NaN;
+          this.updateValue(def.id, Number.isNaN(timestamp) ? def.defval : timestamp);
+        });
+        row.appendChild(input);
+        break;
+      }
+
+      case 'text_area': {
+        const input = document.createElement('textarea');
+        Object.assign(input.style, contentStyles.input, { minHeight: '64px', resize: 'vertical', width: '180px' });
+        this.applyDisabledState(input, active);
+        input.value = String(currentValue);
+        input.addEventListener('change', (e) => {
+          this.updateValue(def.id, (e.target as HTMLTextAreaElement).value);
+        });
+        row.appendChild(input);
+        break;
+      }
+
       case 'source': {
         const select = document.createElement('select');
         Object.assign(select.style, contentStyles.select);
+        this.applyDisabledState(select, active);
+        const selectedValue = typeof currentValue === 'string' ? currentValue : this.sourceNameFromDefault(def.defval);
         for (const opt of SOURCE_OPTIONS) {
           const option = document.createElement('option');
           option.value = opt.value;
           option.textContent = opt.label;
-          option.selected = opt.value === currentValue;
+          option.selected = opt.value === selectedValue;
           select.appendChild(option);
         }
         select.addEventListener('change', (e) => {
@@ -590,6 +689,7 @@ export class IndicatorSettingsModal extends Modal {
         const colorInput = document.createElement('input');
         colorInput.type = 'color';
         Object.assign(colorInput.style, contentStyles.colorInput);
+        this.applyDisabledState(colorInput, active);
         colorInput.value = String(currentValue);
         colorInput.addEventListener('change', (e) => {
           this.updateValue(def.id, (e.target as HTMLInputElement).value);
@@ -602,6 +702,7 @@ export class IndicatorSettingsModal extends Modal {
         const input = document.createElement('input');
         input.type = 'text';
         Object.assign(input.style, contentStyles.input);
+        this.applyDisabledState(input, active);
         input.value = String(currentValue);
         input.addEventListener('change', (e) => {
           this.updateValue(def.id, (e.target as HTMLInputElement).value);
@@ -611,6 +712,28 @@ export class IndicatorSettingsModal extends Modal {
     }
 
     return row;
+  }
+
+  private formatTimestampInput(value: unknown): string {
+    if (typeof value !== 'number' || !Number.isFinite(value)) return '';
+    const date = new Date(value);
+    const pad = (part: number) => String(part).padStart(2, '0');
+    return [
+      date.getFullYear(),
+      '-',
+      pad(date.getMonth() + 1),
+      '-',
+      pad(date.getDate()),
+      'T',
+      pad(date.getHours()),
+      ':',
+      pad(date.getMinutes()),
+    ].join('');
+  }
+
+  private sourceNameFromDefault(defval: unknown): string {
+    const close = SOURCE_OPTIONS.find((option) => option.value === 'close')?.value ?? 'close';
+    return typeof defval === 'string' ? defval : close;
   }
 
   private renderStyleTab(): void {
