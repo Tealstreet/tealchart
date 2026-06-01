@@ -330,6 +330,48 @@ export function rankMatrixValue(matrix: PineMatrix): number {
   return rank;
 }
 
+export function invMatrixValue(matrix: PineMatrix): PineMatrix<number> {
+  assertSquareMatrix(matrix, 'Matrix inverse');
+  const size = matrix.rows;
+  const rows = numericRows(matrix).map((row, rowIndex) => {
+    return [...row, ...Array.from({ length: size }, (_value, column) => (rowIndex === column ? 1 : 0))];
+  });
+
+  for (let pivotIndex = 0; pivotIndex < size; pivotIndex++) {
+    let pivotRow = pivotIndex;
+    let columnScale = 0;
+    for (let row = pivotIndex; row < size; row++) {
+      columnScale = Math.max(columnScale, Math.abs(rows[row][pivotIndex]));
+      if (Math.abs(rows[row][pivotIndex]) > Math.abs(rows[pivotRow][pivotIndex])) {
+        pivotRow = row;
+      }
+    }
+
+    const pivot = rows[pivotRow][pivotIndex];
+    if (isEffectivelyZero(pivot, columnScale)) {
+      throw new Error('Matrix is singular and cannot be inverted');
+    }
+
+    [rows[pivotIndex], rows[pivotRow]] = [rows[pivotRow], rows[pivotIndex]];
+    const normalizedPivot = rows[pivotIndex][pivotIndex];
+    for (let column = 0; column < size * 2; column++) {
+      rows[pivotIndex][column] /= normalizedPivot;
+    }
+
+    for (let row = 0; row < size; row++) {
+      if (row === pivotIndex) continue;
+      const factor = rows[row][pivotIndex];
+      for (let column = 0; column < size * 2; column++) {
+        rows[row][column] -= factor * rows[pivotIndex][column];
+      }
+    }
+  }
+
+  const result = createPineMatrix<number>(size, size, 0);
+  result.values = rows.flatMap((row) => row.slice(size));
+  return result;
+}
+
 function matrixIndex(matrix: PineMatrix, row: number, column: number): number {
   const normalizedRow = normalizeExistingIndex(row, matrix.rows, 'row');
   const normalizedColumn = normalizeExistingIndex(column, matrix.columns, 'column');

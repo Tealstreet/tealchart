@@ -108,6 +108,7 @@ import {
   getMatrixElementCount,
   getMatrixRows,
   getMatrixValue,
+  invMatrixValue,
   isPineMatrix,
   isSquareMatrix,
   isValidMatrix,
@@ -5692,6 +5693,7 @@ export class TealscriptEngine {
     this.builtins.set('matrix.trace', (args) => traceMatrixValue(readMatrix(args[0])));
     this.builtins.set('matrix.det', (args) => detMatrixValue(readMatrix(args[0])));
     this.builtins.set('matrix.rank', (args) => rankMatrixValue(readMatrix(args[0])));
+    this.builtins.set('matrix.inv', (args) => invMatrixValue(readMatrix(args[0])));
     this.builtins.set('matrix.copy', (args) => copyMatrix(readMatrix(args[0])));
     this.builtins.set('matrix.row', (args) => matrixRow(readMatrix(args[0]), args[1] as number));
     this.builtins.set('matrix.col', (args) => matrixColumn(readMatrix(args[0]), args[1] as number));
