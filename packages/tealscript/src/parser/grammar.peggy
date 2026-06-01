@@ -994,19 +994,28 @@ NotOperator
 PostfixExpression
   = head:PrimaryExpression tail:(
       _ "(" __ args:ArgumentList? __ ")" { return { type: 'call', args: args || [] }; }
-    / _ GenericTypeArguments { return { type: 'typeArgs' }; }
+    / _ typeArguments:GenericTypeArguments { return { type: 'typeArgs', typeArguments }; }
     / _ "." _ prop:IdentifierName { return { type: 'member', prop }; }
     / _ "[" __ index:Expression __ "]" { return { type: 'index', index }; }
   )* {
+      let pendingTypeArguments = null;
       return tail.reduce((obj, op) => {
+        if (op.type === 'typeArgs') {
+          pendingTypeArguments = op.typeArguments;
+          return obj;
+        }
         if (op.type === 'call') {
+          const typeArguments = pendingTypeArguments;
+          pendingTypeArguments = null;
           return {
             type: 'CallExpression',
             callee: obj,
             arguments: op.args,
+            ...(typeArguments ? { typeArguments } : {}),
             loc: loc()
           };
         } else if (op.type === 'member') {
+          pendingTypeArguments = null;
           return {
             type: 'MemberExpression',
             object: obj,
@@ -1014,6 +1023,7 @@ PostfixExpression
             loc: loc()
           };
         } else if (op.type === 'index') {
+          pendingTypeArguments = null;
           return {
             type: 'IndexExpression',
             object: obj,
@@ -1026,7 +1036,9 @@ PostfixExpression
     }
 
 GenericTypeArguments
-  = "<" _ TypeName (_ "," _ TypeName)* _ ">"
+  = "<" _ first:TypeName rest:(_ "," _ TypeName)* _ ">" {
+      return [first, ...rest.map(t => t[3])];
+    }
 
 // Primary expressions
 PrimaryExpression

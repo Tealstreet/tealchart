@@ -193,14 +193,12 @@ The parser accepts Pine-style `map<key, value>` declarations and generic
 constructor calls such as `map.new<string, float>()`. Semantic diagnostics
 enforce obvious primitive key/value mismatches for known `map<K, V>` variables
 on `map.put`, `map.get`, `map.contains`, and `map.remove`, including receiver
-method-call forms. Map loops support the documented key-value tuple form,
-`for [key, value] in data`.
+method-call forms and unannotated `map.new<K, V>()` constructor inference. Map
+loops support the documented key-value tuple form, `for [key, value] in data`.
 
 Known limits: map keys are currently restricted at runtime to finite numbers,
-strings, and booleans. Generic constructor type arguments are parsed but not yet
-retained in the AST for unannotated inference, and full reference-type rules and
-nested collection restrictions belong to the future qualified type-system and
-UDT phases.
+strings, and booleans. Full reference-type rules and nested collection
+restrictions belong to the future qualified type-system and UDT phases.
 
 ## Common User-Defined Type Coverage
 

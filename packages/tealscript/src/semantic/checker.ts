@@ -956,6 +956,7 @@ class SemanticChecker {
     this.checkCallee(expression.callee, scope);
     this.checkBuiltinSignature(expression);
     this.checkUdtConstructorSignature(expression, scope);
+    this.checkMapConstructorTypeArguments(expression);
     this.checkMapCallTypes(expression, scope);
     for (const argument of expression.arguments) {
       this.checkExpression(argument.value, scope);
@@ -1117,6 +1118,21 @@ class SemanticChecker {
       case 'remove':
         this.checkMapArgumentType(mapCall.mapType.keyType, mapCall.keyArgument, 'map key', scope);
         break;
+    }
+  }
+
+  private checkMapConstructorTypeArguments(expression: CallExpression): void {
+    if (this.memberPath(expression.callee).join('.') !== 'map.new' || !expression.typeArguments) return;
+    if (expression.typeArguments.length !== 2) {
+      this.addDiagnostic('invalid-type-template', 'map.new() expects exactly 2 type arguments', expression.loc);
+      return;
+    }
+
+    const [keyTypeName, valueTypeName] = expression.typeArguments;
+    this.checkTemplateTypeName(keyTypeName, 'map key', expression.loc);
+    this.checkTemplateTypeName(valueTypeName, 'map value', expression.loc);
+    if (!TYPE_QUALIFIER_NAMES.has(keyTypeName) && !MAP_KEY_TYPE_NAMES.has(keyTypeName)) {
+      this.addDiagnostic('invalid-type-template', 'Map key type must be int, float, bool, string, or color in map.new', expression.loc);
     }
   }
 
@@ -1380,6 +1396,13 @@ class SemanticChecker {
     if (calleePath.join('.') === 'timeframe.from_seconds') return { kind: 'string', qualifier: 'simple' };
     if (CALENDAR_FUNCTION_NAMES.has(calleePath.join('.'))) return { kind: 'int', qualifier: 'series' };
     if (calleePath.join('.') === 'timestamp') return { kind: 'int', qualifier: 'const' };
+    if (calleePath.join('.') === 'map.new' && expression.typeArguments?.length === 2) {
+      return {
+        kind: 'map',
+        keyType: this.typeFromName(expression.typeArguments[0]),
+        valueType: this.typeFromName(expression.typeArguments[1]),
+      };
+    }
     if (calleePath.length === 2 && calleePath[1] === 'new' && calleePath[0] && this.typeDeclarations.has(calleePath[0])) {
       return { kind: 'udt', name: calleePath[0] };
     }

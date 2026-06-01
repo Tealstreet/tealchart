@@ -780,6 +780,7 @@ arrayValue = [1, 2]
         expect(call.callee).toEqual(expect.objectContaining({
           type: 'MemberExpression',
         }));
+        expect(call.typeArguments).toEqual(['string', 'float']);
         expect(call.arguments).toHaveLength(0);
       });
 
@@ -789,6 +790,7 @@ arrayValue = [1, 2]
         const call = decl.init as CallExpression;
 
         expect(call.type).toBe('CallExpression');
+        expect(call.typeArguments).toEqual(['float']);
         expect(call.arguments).toHaveLength(0);
       });
     });

@@ -395,6 +395,7 @@ export interface CallExpression extends BaseNode {
   type: 'CallExpression';
   callee: Expression; // Identifier or MemberExpression
   arguments: CallArgument[];
+  typeArguments?: string[];
 }
 
 export interface CallArgument extends BaseNode {
