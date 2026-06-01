@@ -144,6 +144,8 @@ indices and numeric loop counters are tracked as integers, and map tuple loop
 keys retain their key type for diagnostics inside loop bodies.
 Array index reads and element-returning helpers such as `get`, `first`, `last`,
 `pop`, `shift`, and `remove` preserve known element types.
+Scalar-returning array helpers infer primitive return types for common boolean,
+integer, float, and string helpers such as `includes`, `size`, `avg`, and `join`.
 
 The array pass covers the generic constructor (`array.new<T>`), typed
 constructors (`array.new_float`, `array.new_int`, `array.new_bool`,
