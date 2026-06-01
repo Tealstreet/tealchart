@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { currencyRateRequestKey, InMemoryRequestDatafeed, type Bar } from '../../src/runtime';
+import {
+  corporateActionRequestKey,
+  currencyRateRequestKey,
+  economicRequestKey,
+  financialRequestKey,
+  InMemoryRequestDatafeed,
+  type Bar,
+} from '../../src/runtime';
 import { getPlot, runCompatScript } from './fixtures';
 
 const chartBars: Bar[] = [
@@ -93,6 +100,49 @@ function currencyRateDatafeed(): InMemoryRequestDatafeed {
         { time: 1_700_000_000_000, value: 0.8 },
         { time: 1_700_000_120_000, value: 0.82 },
         { time: 1_700_000_240_000, value: 0.85 },
+      ],
+    },
+  ]);
+}
+
+function pointSeriesDatafeed(): InMemoryRequestDatafeed {
+  return new InMemoryRequestDatafeed([], [
+    {
+      family: 'dividends',
+      key: corporateActionRequestKey('NASDAQ:AAPL', 'dividends.gross', 'USD'),
+      points: [
+        { time: 1_700_000_120_000, value: 0.24 },
+        { time: 1_700_000_240_000, value: 0.25 },
+      ],
+    },
+    {
+      family: 'earnings',
+      key: corporateActionRequestKey('NASDAQ:AAPL', 'earnings.actual', 'USD'),
+      points: [
+        { time: 1_700_000_000_000, value: 1.5 },
+        { time: 1_700_000_240_000, value: 1.8 },
+      ],
+    },
+    {
+      family: 'splits',
+      key: corporateActionRequestKey('NASDAQ:AAPL', 'splits.denominator'),
+      points: [
+        { time: 1_700_000_180_000, value: 4 },
+      ],
+    },
+    {
+      family: 'financial',
+      key: financialRequestKey('NASDAQ:AAPL', 'TOTAL_REVENUE', 'FQ', 'USD'),
+      points: [
+        { time: 1_700_000_000_000, value: 1000 },
+        { time: 1_700_000_240_000, value: 1100 },
+      ],
+    },
+    {
+      family: 'economic',
+      key: economicRequestKey('US', 'GDP'),
+      points: [
+        { time: 1_700_000_120_000, value: 3.1 },
       ],
     },
   ]);
@@ -600,6 +650,82 @@ ${requestPlots}
 
     expect(result.errors.map((error) => error.message)).toEqual([
       'Too many unique request.* contexts: maximum is 40',
+    ]);
+  });
+});
+
+describe('Pine optional request series compatibility', () => {
+  it('merges dividends, earnings, splits, financial, and economic series from the request datafeed', () => {
+    const result = runCompatScript(`
+indicator("Point request families")
+dividend = request.dividends("NASDAQ:AAPL", dividends.gross, currency=currency.USD)
+earnings = request.earnings("NASDAQ:AAPL", earnings.actual, currency="USD")
+split = request.splits("NASDAQ:AAPL", splits.denominator)
+revenue = request.financial("NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", currency="USD")
+gdp = request.economic("US", "GDP")
+plot(dividend, title="Dividend")
+plot(earnings, title="Earnings")
+plot(split, title="Split")
+plot(revenue, title="Revenue")
+plot(gdp, title="GDP")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: pointSeriesDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Dividend').values).toEqual([null, null, 0.24, 0.24, 0.25, 0.25]);
+    expect(getPlot(result, 'Earnings').values).toEqual([1.5, 1.5, 1.5, 1.5, 1.8, 1.8]);
+    expect(getPlot(result, 'Split').values).toEqual([null, null, null, 4, 4, 4]);
+    expect(getPlot(result, 'Revenue').values).toEqual([1000, 1000, 1000, 1000, 1100, 1100]);
+    expect(getPlot(result, 'GDP').values).toEqual([null, null, 3.1, 3.1, 3.1, 3.1]);
+  });
+
+  it('supports gaps_on for sparse point request families', () => {
+    const result = runCompatScript(`
+indicator("Point request gaps")
+dividend = request.dividends("NASDAQ:AAPL", dividends.gross, gaps=barmerge.gaps_on, currency="USD")
+plot(dividend, title="Dividend")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: pointSeriesDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Dividend').values).toEqual([null, null, 0.24, null, 0.25, null]);
+  });
+
+  it('supports ignore_invalid_symbol for missing optional request series', () => {
+    const result = runCompatScript(`
+indicator("Missing optional requests")
+dividend = request.dividends("MISSING", dividends.gross, ignore_invalid_symbol=true)
+financial = request.financial("MISSING", "TOTAL_REVENUE", "FQ", ignore_invalid_symbol=true)
+economic = request.economic("ZZ", "GDP", ignore_invalid_symbol=true)
+plot(dividend, title="Dividend")
+plot(financial, title="Financial")
+plot(economic, title="Economic")
+`, {
+      bars: [chartBars[0]!],
+      engineOptions: { requestDatafeed: pointSeriesDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Dividend').values).toEqual([null]);
+    expect(getPlot(result, 'Financial').values).toEqual([null]);
+    expect(getPlot(result, 'Economic').values).toEqual([null]);
+  });
+
+  it('reports missing optional request series when ignore_invalid_symbol is false', () => {
+    const result = runCompatScript(`
+indicator("Missing optional request error")
+plot(request.economic("ZZ", "GDP"), title="Economic")
+`, {
+      bars: [chartBars[0]!],
+      engineOptions: { requestDatafeed: pointSeriesDatafeed() },
+    });
+
+    expect(result.errors.map((error) => error.message)).toEqual([
+      'request.economic failed: No request series context for economic ZZ\u0000GDP',
     ]);
   });
 });
