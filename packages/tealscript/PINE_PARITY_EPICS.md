@@ -170,7 +170,8 @@ realtime indicators behave predictably.
 Phases:
 
 1. Audit historical bar execution, series commitment, rollback, and expression
-   history storage.
+   history storage. The runtime now stores history for indexed non-array
+   expressions such as `(close + 1)[1]` across historical and realtime updates.
 2. Implement realtime tick execution and rollback semantics for open bars.
 3. Complete `var` and `varip`, including intrabar persistence differences.
 4. Implement `max_bars_back` inference/enforcement and clearer unavailable

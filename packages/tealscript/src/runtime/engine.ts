@@ -230,6 +230,11 @@ interface TickerModifierParts {
   modifiers: string[];
 }
 
+interface ExpressionHistoryEntry {
+  barIndex: number;
+  values: unknown[];
+}
+
 const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['ticker']);
 
 /**
@@ -253,6 +258,7 @@ export class TealscriptEngine {
   private requestEvaluationCache = new Map<string, RequestEvaluationCacheEntry>();
   private requestContextKeys = new Set<string>();
   private requestExpressionIds = new WeakMap<Expression, number>();
+  private expressionHistory = new WeakMap<Expression, ExpressionHistoryEntry>();
   private nextRequestExpressionId = 0;
   private userFunctionCallStack: string[] = [];
   private importedLibraryCallStack: string[] = [];
@@ -294,6 +300,7 @@ export class TealscriptEngine {
     this.requestEvaluationCache.clear();
     this.requestContextKeys.clear();
     this.requestExpressionIds = new WeakMap();
+    this.expressionHistory = new WeakMap();
     this.nextRequestExpressionId = 0;
     this.userFunctionCallStack = [];
     this.importedLibraryCallStack = [];
@@ -2744,7 +2751,21 @@ export class TealscriptEngine {
       return this.naIfMissing(this.readArrayElement(obj, offset));
     }
 
-    throw new Error('Index access on non-array/non-series');
+    return this.naIfMissing(this.readExpressionHistory(expr.object, obj, offset));
+  }
+
+  private readExpressionHistory(expression: Expression, currentValue: unknown, offset: number): unknown {
+    let entry = this.expressionHistory.get(expression);
+    if (!entry) {
+      entry = { barIndex: -1, values: [] };
+      this.expressionHistory.set(expression, entry);
+    }
+
+    entry.barIndex = this.ctx.bar_index;
+    entry.values[this.ctx.bar_index] = currentValue;
+
+    const targetIndex = this.ctx.bar_index - offset;
+    return targetIndex < 0 ? undefined : entry.values[targetIndex];
   }
 
   private getHl2(offset: number): number {
