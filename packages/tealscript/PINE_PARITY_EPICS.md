@@ -405,7 +405,8 @@ Phases:
 1. Implement loop, execution-time, memory, object-count, plot-count,
    request-count, and table-cell limits. Request-count coverage currently
    enforces 40 unique `request.*` contexts per script pass, and plot-count
-   coverage enforces 64 non-`hline()` plot outputs per script.
+   coverage enforces 64 non-`hline()` plot outputs per script. Table-cell
+   coverage enforces a 10,000-cell TealScript sandbox cap across live tables.
 2. Add script-size and parser-depth protections.
 3. Optimize hot built-ins and series storage for long histories.
 4. Add cancellation/yielding in worker execution for expensive scripts.

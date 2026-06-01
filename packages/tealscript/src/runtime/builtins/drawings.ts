@@ -80,6 +80,8 @@ function tableCellKey(column: number, row: number): string {
   return `${column}:${row}`;
 }
 
+const MAX_TABLE_CELLS = 10000;
+
 function normalizeTableColumn(runtime: DrawingBuiltinRuntime, value: unknown): number {
   return Math.max(0, Math.trunc(runtime.toNumber(value)));
 }
@@ -661,6 +663,21 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
   const withTable = (value: unknown, ctx: ExecutionContext, fn: (table: TableDrawingOutput) => void): void => {
     withDrawing(value, ctx, 'table', runtime.isNa, fn);
   };
+  const tableCellCapacity = (table: Pick<TableDrawingOutput, 'columns' | 'rows'>): number => table.columns * table.rows;
+  const assertTableCellCapacity = (
+    ctx: ExecutionContext,
+    table: Pick<TableDrawingOutput, 'columns' | 'rows'>,
+  ): void => {
+    const nextCells = tableCellCapacity(table);
+    const currentCells = ctx
+      .getDrawings()
+      .filter((drawing): drawing is TableDrawingOutput => drawing.type === 'table')
+      .reduce((sum, drawing) => sum + tableCellCapacity(drawing), 0);
+
+    if (nextCells + currentCells > MAX_TABLE_CELLS) {
+      throw new Error(`Too many table cells: maximum is ${MAX_TABLE_CELLS}`);
+    }
+  };
   const createDefaultCell = (column: number, row: number): TableCellDrawingOutput => ({
     column,
     row,
@@ -720,13 +737,17 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
 
   builtins.set('table.new', (args, namedArgs, ctx, _scope, callId) => {
     const id = `table_${callId}_${ctx.bar_index}`;
+    const columns = positiveInteger(runtime, namedArgs.get('columns') ?? args[1], 1);
+    const rows = positiveInteger(runtime, namedArgs.get('rows') ?? args[2], 1);
+    assertTableCellCapacity(ctx, { columns, rows });
+
     const drawing: TableDrawingOutput = {
       id,
       type: 'table',
       barIndex: ctx.bar_index,
       position: runtime.toStringValue(namedArgs.get('position') ?? args[0] ?? 'top_right'),
-      columns: positiveInteger(runtime, namedArgs.get('columns') ?? args[1], 1),
-      rows: positiveInteger(runtime, namedArgs.get('rows') ?? args[2], 1),
+      columns,
+      rows,
       bgcolor: runtime.toNullableColor(namedArgs.get('bgcolor') ?? args[3]),
       frameColor: runtime.toNullableColor(namedArgs.get('frame_color') ?? args[4]),
       frameWidth: runtime.toLineWidth(namedArgs.get('frame_width') ?? args[5]),
