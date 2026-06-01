@@ -201,6 +201,22 @@ export lateShadow(float value) =>
     ]);
   });
 
+  it('reports exported library request expressions that depend on parameters', () => {
+    const result = checkProgram(parse(`
+library("Export Request Scope")
+export validRequest(float value) => request.security(syminfo.tickerid, "1", close)
+export invalidPositional(float value) => request.security(syminfo.tickerid, "1", value)
+export invalidNamed(float value) => request.security(syminfo.tickerid, "1", expression=value + close)
+export invalidNested(float value) => request.security(syminfo.tickerid, "1", ta.sma(value, 2))
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Exported function invalidPositional request expression cannot depend on exported parameters',
+      'Exported function invalidNamed request expression cannot depend on exported parameters',
+      'Exported function invalidNested request expression cannot depend on exported parameters',
+    ]);
+  });
+
   it('allows nested scopes to shadow outer declarations', () => {
     const result = checkProgram(parse(`
 indicator("Shadow")

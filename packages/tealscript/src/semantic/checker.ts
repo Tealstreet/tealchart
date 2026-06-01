@@ -708,7 +708,8 @@ class SemanticChecker {
   }
 
   private checkExportedFunctionScope(declaration: FunctionDeclaration, globalVariableQualifiers: Map<string, SemanticQualifier | undefined>): void {
-    const functionLocals = new Set<string>(declaration.params.map((parameter) => parameter.name));
+    const parameterNames = new Set<string>(declaration.params.map((parameter) => parameter.name));
+    const functionLocals = new Set(parameterNames);
     const reportedGlobals = new Set<string>();
     let reportedInputCall = false;
     const declarationKind = declaration.isMethod ? 'method' : 'function';
@@ -736,6 +737,16 @@ class SemanticChecker {
             `Exported ${declarationKind} ${declaration.name.name} cannot call input.*() functions`,
             expression.callee.loc,
           );
+        }
+        if (calleePath[0] === 'request') {
+          const requestExpression = this.getCallArgument(expression.arguments, 'expression', 2);
+          if (requestExpression && this.expressionReferencesAnyName(requestExpression, parameterNames)) {
+            this.addDiagnostic(
+              'library-export',
+              `Exported ${declarationKind} ${declaration.name.name} request expression cannot depend on exported parameters`,
+              requestExpression.loc,
+            );
+          }
         }
         visitExpression(expression.callee, localNames);
         for (const argument of expression.arguments) visitExpression(argument.value, localNames);
@@ -840,6 +851,92 @@ class SemanticChecker {
       if (parameter.defaultValue) visitExpression(parameter.defaultValue, functionLocals);
     }
     this.visitFunctionScopeNode(declaration.body, functionLocals, visitExpression, visitStatement);
+  }
+
+  private expressionReferencesAnyName(expression: Expression, names: Set<string>): boolean {
+    switch (expression.type) {
+      case 'Identifier':
+        return names.has(expression.name);
+      case 'NumericLiteral':
+      case 'StringLiteral':
+      case 'BooleanLiteral':
+      case 'ColorLiteral':
+      case 'NaExpression':
+        return false;
+      case 'BinaryExpression':
+        return this.expressionReferencesAnyName(expression.left, names) || this.expressionReferencesAnyName(expression.right, names);
+      case 'UnaryExpression':
+        return this.expressionReferencesAnyName(expression.argument, names);
+      case 'ConditionalExpression':
+        return this.expressionReferencesAnyName(expression.test, names)
+          || this.expressionReferencesAnyName(expression.consequent, names)
+          || this.expressionReferencesAnyName(expression.alternate, names);
+      case 'CallExpression':
+        return this.expressionReferencesAnyName(expression.callee, names)
+          || expression.arguments.some((argument) => this.expressionReferencesAnyName(argument.value, names));
+      case 'MemberExpression':
+        return this.expressionReferencesAnyName(expression.object, names);
+      case 'IndexExpression':
+        return this.expressionReferencesAnyName(expression.object, names) || this.expressionReferencesAnyName(expression.index, names);
+      case 'ArrayExpression':
+        return expression.elements.some((element) => this.expressionReferencesAnyName(element, names));
+      case 'SwitchExpression':
+        return (expression.discriminant ? this.expressionReferencesAnyName(expression.discriminant, names) : false)
+          || expression.cases.some((switchCase) =>
+            (switchCase.test ? this.expressionReferencesAnyName(switchCase.test, names) : false)
+              || this.expressionOrStatementsReferenceAnyName(switchCase.consequent, names),
+          );
+      case 'ForStatement':
+        if (expression.kind === 'collection') {
+          return this.expressionReferencesAnyName(expression.iterable, names)
+            || expression.body.some((statement) => this.statementReferencesAnyName(statement, names));
+        }
+        return this.expressionReferencesAnyName(expression.start, names)
+          || this.expressionReferencesAnyName(expression.end, names)
+          || (expression.step ? this.expressionReferencesAnyName(expression.step, names) : false)
+          || expression.body.some((statement) => this.statementReferencesAnyName(statement, names));
+      case 'WhileStatement':
+        return this.expressionReferencesAnyName(expression.test, names)
+          || expression.body.some((statement) => this.statementReferencesAnyName(statement, names));
+    }
+  }
+
+  private expressionOrStatementsReferenceAnyName(node: Expression | Statement[], names: Set<string>): boolean {
+    return Array.isArray(node)
+      ? node.some((statement) => this.statementReferencesAnyName(statement, names))
+      : this.expressionReferencesAnyName(node, names);
+  }
+
+  private statementReferencesAnyName(statement: Statement, names: Set<string>): boolean {
+    switch (statement.type) {
+      case 'VariableDeclaration':
+        return this.expressionReferencesAnyName(statement.init, names);
+      case 'AssignmentStatement':
+        return this.expressionReferencesAnyName(statement.left, names)
+          || this.expressionReferencesAnyName(statement.right, names);
+      case 'ExpressionStatement':
+        return this.expressionReferencesAnyName(statement.expression, names);
+      case 'IfStatement':
+        return this.expressionReferencesAnyName(statement.test, names)
+          || statement.consequent.some((child) => this.statementReferencesAnyName(child, names))
+          || (Array.isArray(statement.alternate)
+            ? statement.alternate.some((child) => this.statementReferencesAnyName(child, names))
+            : !!statement.alternate && this.statementReferencesAnyName(statement.alternate, names));
+      case 'ForStatement':
+        if (statement.kind === 'collection') {
+          return this.expressionReferencesAnyName(statement.iterable, names)
+            || statement.body.some((child) => this.statementReferencesAnyName(child, names));
+        }
+        return this.expressionReferencesAnyName(statement.start, names)
+          || this.expressionReferencesAnyName(statement.end, names)
+          || (statement.step ? this.expressionReferencesAnyName(statement.step, names) : false)
+          || statement.body.some((child) => this.statementReferencesAnyName(child, names));
+      case 'WhileStatement':
+        return this.expressionReferencesAnyName(statement.test, names)
+          || statement.body.some((child) => this.statementReferencesAnyName(child, names));
+      default:
+        return false;
+    }
   }
 
   private visitFunctionScopeNode(
