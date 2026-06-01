@@ -462,7 +462,7 @@ class SemanticChecker {
   check(program: Program): SemanticCheckResult {
     this.diagnostics = [];
     this.rootScope = new SemanticScope();
-    this.typeDeclarations = new Map();
+    this.typeDeclarations = this.collectTypeDeclarations(program.body);
     this.checkLibraryExportDeclarations(program.body);
     this.checkStatements(program.body, this.rootScope);
     return {
@@ -503,11 +503,7 @@ class SemanticChecker {
       return;
     }
 
-    const typeDeclarations = new Map(
-      statements
-        .filter((statement): statement is TypeDeclaration => statement.type === 'TypeDeclaration')
-        .map((statement) => [statement.name.name, statement]),
-    );
+    const typeDeclarations = this.collectTypeDeclarations(statements);
     const exportedTypeNames = new Set(
       [...typeDeclarations.values()]
         .filter((declaration) => declaration.exported)
@@ -519,6 +515,7 @@ class SemanticChecker {
         this.checkExportedTypeFields(declaration, typeDeclarations, exportedTypeNames);
       } else {
         this.checkExportedCallableTypeReferences(declaration, typeDeclarations, exportedTypeNames);
+        this.checkExportedCallableReturnType(declaration, typeDeclarations, exportedTypeNames);
       }
     }
 
@@ -569,6 +566,62 @@ class SemanticChecker {
     }
   }
 
+  private checkExportedCallableReturnType(
+    declaration: FunctionDeclaration,
+    typeDeclarations: Map<string, TypeDeclaration>,
+    exportedTypeNames: Set<string>,
+  ): void {
+    const returnType = this.inferFunctionReturnType(declaration);
+    if (!returnType) return;
+
+    const hiddenTypes = this.nonExportedUdtNamesInType(returnType, typeDeclarations, exportedTypeNames);
+    for (const typeName of hiddenTypes) {
+      this.addDiagnostic(
+        'library-export',
+        `Exported ${declaration.isMethod ? 'method' : 'function'} ${declaration.name.name} returns non-exported user-defined type: ${typeName}`,
+        declaration.name.loc,
+      );
+    }
+  }
+
+  private inferFunctionReturnType(declaration: FunctionDeclaration): SemanticType | undefined {
+    const functionScope = new SemanticScope(this.rootScope);
+    for (const parameter of declaration.params) {
+      functionScope.declare({
+        name: parameter.name,
+        kind: 'parameter',
+        type: this.typeFromAnnotation(parameter.typeAnnotation ?? undefined),
+        loc: parameter.loc,
+      });
+    }
+
+    if (!Array.isArray(declaration.body)) {
+      return this.inferExpressionType(declaration.body, functionScope);
+    }
+
+    let returnType: SemanticType | undefined;
+    for (const [index, statement] of declaration.body.entries()) {
+      const isLastStatement = index === declaration.body.length - 1;
+      if (statement.type === 'VariableDeclaration' && statement.names.type === 'VariableDeclarator') {
+        const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init, functionScope);
+        functionScope.declare({
+          name: statement.names.name.name,
+          kind: 'variable',
+          type,
+          loc: statement.names.name.loc,
+        });
+        returnType = isLastStatement ? type : undefined;
+        continue;
+      }
+      if (statement.type === 'ExpressionStatement') {
+        returnType = this.inferExpressionType(statement.expression, functionScope);
+        continue;
+      }
+      returnType = undefined;
+    }
+    return returnType;
+  }
+
   private checkExportedTypeAnnotation(
     declarationName: string,
     usage: string,
@@ -597,6 +650,31 @@ class SemanticChecker {
     return [];
   }
 
+  private nonExportedUdtNamesInType(
+    type: SemanticType,
+    typeDeclarations: Map<string, TypeDeclaration>,
+    exportedTypeNames: Set<string>,
+  ): string[] {
+    const names = new Set<string>();
+    const visit = (current: SemanticType | undefined): void => {
+      if (!current) return;
+      if (current.kind === 'udt' && current.name && typeDeclarations.has(current.name) && !exportedTypeNames.has(current.name)) {
+        names.add(current.name);
+        return;
+      }
+      if (current.kind === 'array' || current.kind === 'matrix') {
+        visit(current.elementType);
+        return;
+      }
+      if (current.kind === 'map') {
+        visit(current.keyType);
+        visit(current.valueType);
+      }
+    };
+    visit(type);
+    return [...names];
+  }
+
   private checkExportedFunctionParameters(declaration: FunctionDeclaration): void {
     const declarationKind = declaration.isMethod ? 'method' : 'function';
     for (const parameter of declaration.params) {
@@ -619,6 +697,14 @@ class SemanticChecker {
       }
     }
     return globals;
+  }
+
+  private collectTypeDeclarations(statements: Statement[]): Map<string, TypeDeclaration> {
+    return new Map(
+      statements
+        .filter((statement): statement is TypeDeclaration => statement.type === 'TypeDeclaration')
+        .map((statement) => [statement.name.name, statement]),
+    );
   }
 
   private checkExportedFunctionScope(declaration: FunctionDeclaration, globalVariableQualifiers: Map<string, SemanticQualifier | undefined>): void {
@@ -2003,6 +2089,7 @@ class SemanticChecker {
 
   private arrayElementTypeKind(type: SemanticType): SemanticType {
     if (PRIMITIVE_TYPE_KINDS.has(type.kind)) return { kind: type.kind };
+    if (type.kind === 'udt' && type.name) return { kind: 'udt', name: type.name };
     return { kind: 'unknown' };
   }
 
