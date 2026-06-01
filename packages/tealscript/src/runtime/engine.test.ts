@@ -3794,6 +3794,30 @@ plot(length)`;
 
       expect(result.plots[0].values).toEqual([20, 20, 20]);
     });
+
+    it('registers source input metadata and accepts overrides', () => {
+      const script = `//@version=6
+indicator("Source Input")
+source = input.source(defval=close, title="Source", tooltip="Select source")
+plot(source)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+      const overrideResult = executeScript(ast, bars, new Map([['input_Source', 42]]));
+
+      expect(result.inputs).toEqual([
+        {
+          id: 'input_Source',
+          type: 'source',
+          title: 'Source',
+          defval: 100.2,
+          tooltip: 'Select source',
+        },
+      ]);
+      expect(result.plots[0].values).toEqual([100.2, 100.7, 101.2]);
+      expect(overrideResult.plots[0].values).toEqual([42, 42, 42]);
+    });
   });
 
   describe('color functions', () => {

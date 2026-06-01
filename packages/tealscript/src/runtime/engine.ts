@@ -4730,13 +4730,28 @@ export class TealscriptEngine {
     this.builtins.set('input.text_area', createInputFunc('text_area'));
 
     // input.source is special - it returns a series
-    this.builtins.set('input.source', (args, namedArgs, _ctx) => {
+    this.builtins.set('input.source', (args, namedArgs, ctx) => {
       const defval = this.getCallArg(args, namedArgs, 0, 'defval'); // Should be a series like 'close'
-      const _title = this.toStringValue(this.getCallArg(args, namedArgs, 1, 'title', 'Source'));
+      const title = this.toStringValue(this.getCallArg(args, namedArgs, 1, 'title', 'Source'));
+      const id = `input_${title}`;
 
-      // For now, just return the default value
-      // In full implementation, this would allow user to select which series
-      return defval;
+      if (ctx.bar_index === 0) {
+        ctx.registerInput({
+          id,
+          type: 'source',
+          title,
+          defval,
+          tooltip: namedArgs.get('tooltip') as string | undefined,
+          group: namedArgs.get('group') as string | undefined,
+          inline: namedArgs.get('inline') as string | undefined,
+          display: namedArgs.get('display'),
+          active: namedArgs.get('active'),
+        });
+      }
+
+      const inputValue = ctx.getInput(id);
+      const registeredDefault = ctx.inputDefinitions.find((input) => input.id === id)?.defval;
+      return inputValue === undefined || inputValue === registeredDefault ? defval : inputValue;
     });
   }
 

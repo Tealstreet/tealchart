@@ -132,6 +132,8 @@ Current `input.*` progress:
 
 - Generic and typed input helpers accept Pine-style `defval=` and `title=`
   named arguments while preserving existing input IDs and metadata.
+- `input.source()` registers source metadata and returns host-provided overrides
+  when present.
 
 ## Out-Of-Scope Namespaces For Epic 5
 

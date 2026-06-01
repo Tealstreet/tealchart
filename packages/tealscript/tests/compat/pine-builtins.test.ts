@@ -429,6 +429,26 @@ plot(level, title="Level")
     expect(getPlot(result, 'Level').values).toEqual([101.5, 101.5, 101.5, 101.5, 101.5, 101.5, 101.5, 101.5, 101.5, 101.5, 101.5, 101.5]);
   });
 
+  it('registers Pine source input metadata', () => {
+    const result = runCompatScript(`
+indicator("Source input")
+source = input.source(defval=close, title="Source", tooltip="Select source")
+plot(source, title="Source")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.inputs).toEqual([
+      {
+        id: 'input_Source',
+        type: 'source',
+        title: 'Source',
+        defval: 102,
+        tooltip: 'Select source',
+      },
+    ]);
+    expect(roundSeries(getPlot(result, 'Source').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+  });
+
   it('matches documented Pine input helper idioms', () => {
     const result = runCompatScript(`
 indicator("Input docs smoke")
