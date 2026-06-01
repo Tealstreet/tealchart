@@ -489,8 +489,10 @@ setters, and common cell setters for text, color, background, size, width,
 height, text alignment, font family, and bold/italic text formatting. Rendering
 lays out fixed tables in the script pane with measured cell sizes, cell
 backgrounds, borders, frame borders, text alignment, default/monospace
-font-family metadata, and bold/italic font styling. Remaining gaps are the full
-Pine table setter surface and TradingView-exact sizing.
+font-family metadata, and bold/italic font styling. Runtime coverage also
+guards persistent table handles and transient polylines across realtime
+rollback. Remaining gaps are the full Pine table setter surface and
+TradingView-exact sizing.
 
 ## Strategy Diagnostic Coverage
 
