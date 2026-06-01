@@ -462,6 +462,11 @@ plot(rightAngle, title="Right Angle")
 plot(mintick, title="Min Tick Rounded")
 plot(math.round(math.toradians(180), 6), title="Radians")
 plot(math.sum(sparse, 3), title="Sparse Sum")
+plot(math.round(number=math.pi, precision=3), title="Named Round")
+plot(math.pow(base=2, exponent=3), title="Named Pow")
+plot(math.sqrt(number=16), title="Named Sqrt")
+plot(math.sum(source=sparse, length=3), title="Named Sparse Sum")
+plot(math.floor(number=-1.2) + math.ceil(number=1.2) + math.sign(number=-5), title="Named Unary")
 plot(seededRandom > 10 and seededRandom < 20 ? 1 : 0, title="Seeded Random In Range")
 plot(defaultRandom > 0 and defaultRandom < 1 ? 1 : 0, title="Default Random In Range")
 `);
@@ -473,6 +478,11 @@ plot(defaultRandom > 0 and defaultRandom < 1 ? 1 : 0, title="Default Random In R
     expect(roundSeries(getPlot(result, 'Min Tick Rounded').values)).toEqual([1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23]);
     expect(roundSeries(getPlot(result, 'Radians').values, 6)).toEqual([3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593]);
     expect(roundSeries(getPlot(result, 'Sparse Sum').values)).toEqual([null, null, null, 310, 307, 302, 303, 313, 321, 328, 329, 333]);
+    expect(roundSeries(getPlot(result, 'Named Round').values)).toEqual([3.142, 3.142, 3.142, 3.142, 3.142, 3.142, 3.142, 3.142, 3.142, 3.142, 3.142, 3.142]);
+    expect(roundSeries(getPlot(result, 'Named Pow').values)).toEqual([8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]);
+    expect(roundSeries(getPlot(result, 'Named Sqrt').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+    expect(roundSeries(getPlot(result, 'Named Sparse Sum').values)).toEqual(roundSeries(getPlot(result, 'Sparse Sum').values));
+    expect(roundSeries(getPlot(result, 'Named Unary').values)).toEqual([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
     expect(getPlot(result, 'Seeded Random In Range').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(getPlot(result, 'Default Random In Range').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
   });
