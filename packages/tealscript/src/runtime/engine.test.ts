@@ -2973,6 +2973,48 @@ plot(left.get(1, 1), title="Original")`;
       expect(result.plots.find((plot) => plot.title === 'Original')?.values).toEqual([4, 4]);
     });
 
+    it('executes matrix row sorting and submatrix extraction', () => {
+      const script = `//@version=6
+indicator("Matrix Sort Submatrix")
+values = matrix.new_float(3, 3, 0)
+values.set(0, 0, 3)
+values.set(0, 1, 9)
+values.set(0, 2, 1)
+values.set(1, 0, 1)
+values.set(1, 1, 5)
+values.set(1, 2, 2)
+values.set(2, 0, 2)
+values.set(2, 1, 7)
+values.set(2, 2, 3)
+values.sort(1, order.descending)
+slice = values.submatrix(0, 2, 1, 3)
+slice.set(0, 0, 100)
+plot(values.get(0, 0), title="Sorted First")
+plot(values.get(2, 1), title="Sorted Last")
+plot(slice.get(0, 1), title="Slice")
+plot(values.get(0, 1), title="Original")`;
+
+      const result = executeScript(parse(script), createBars(2, 100));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Sorted First')?.values).toEqual([3, 3]);
+      expect(result.plots.find((plot) => plot.title === 'Sorted Last')?.values).toEqual([5, 5]);
+      expect(result.plots.find((plot) => plot.title === 'Slice')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Original')?.values).toEqual([9, 9]);
+    });
+
+    it('reports matrix submatrix range errors', () => {
+      const script = `//@version=6
+indicator("Matrix Submatrix Error")
+values = matrix.new_float(2, 2, 1)
+slice = values.submatrix(1, 3, 0, 1)
+plot(slice.rows())`;
+
+      const result = executeScript(parse(script), createBars(1, 100));
+
+      expect(result.errors[0]?.message).toBe('Matrix row range 1..3 is out of bounds. row count is 2');
+    });
+
     it('returns expression results from user function if branches', () => {
       const script = `//@version=6
 indicator("Function If")

@@ -392,6 +392,35 @@ export function kronMatrixValue(left: PineMatrix, right: PineMatrix): PineMatrix
   return result;
 }
 
+export function sortMatrixRows(matrix: PineMatrix, column: number = 0, order: unknown = 'ascending'): void {
+  const columnIndex = normalizeExistingIndex(column, matrix.columns, 'column');
+  const descending = order === 'descending';
+  const rows = Array.from({ length: matrix.rows }, (_value, row) => matrix.values.slice(row * matrix.columns, (row + 1) * matrix.columns));
+  rows.sort((left, right) => {
+    const result = compareMatrixValues(left[columnIndex], right[columnIndex]);
+    return descending ? -result : result;
+  });
+  matrix.values = rows.flat();
+}
+
+export function submatrixValue<T = unknown>(
+  matrix: PineMatrix<T>,
+  fromRow: number = 0,
+  toRow: number = matrix.rows,
+  fromColumn: number = 0,
+  toColumn: number = matrix.columns,
+): PineMatrix<T> {
+  const rowRange = normalizeRange(fromRow, toRow, matrix.rows, 'row');
+  const columnRange = normalizeRange(fromColumn, toColumn, matrix.columns, 'column');
+  const result = createPineMatrix<T>(rowRange.to - rowRange.from, columnRange.to - columnRange.from);
+  for (let row = rowRange.from; row < rowRange.to; row++) {
+    for (let column = columnRange.from; column < columnRange.to; column++) {
+      setMatrixValue(result, row - rowRange.from, column - columnRange.from, getMatrixValue(matrix, row, column) as T);
+    }
+  }
+  return result;
+}
+
 function matrixIndex(matrix: PineMatrix, row: number, column: number): number {
   const normalizedRow = normalizeExistingIndex(row, matrix.rows, 'row');
   const normalizedColumn = normalizeExistingIndex(column, matrix.columns, 'column');
@@ -448,6 +477,32 @@ function isEffectivelyZero(value: number, scale: number): boolean {
     return value === 0;
   }
   return Math.abs(value) <= scale * MATRIX_EPSILON;
+}
+
+function compareMatrixValues(left: unknown, right: unknown): number {
+  const leftMissing = left === '' || (typeof left === 'number' && Number.isNaN(left));
+  const rightMissing = right === '' || (typeof right === 'number' && Number.isNaN(right));
+  if (leftMissing || rightMissing) {
+    if (leftMissing && rightMissing) return 0;
+    return leftMissing ? 1 : -1;
+  }
+
+  if (typeof left === 'number' && typeof right === 'number') {
+    return left - right;
+  }
+  return String(left).localeCompare(String(right));
+}
+
+function normalizeRange(from: number, to: number, size: number, label: string): { from: number; to: number } {
+  const normalizedFrom = Math.trunc(Number(from));
+  const normalizedTo = Math.trunc(Number(to));
+  if (!Number.isFinite(normalizedFrom) || !Number.isFinite(normalizedTo)) {
+    throw new Error(`Matrix ${label} range must use finite numbers`);
+  }
+  if (normalizedFrom < 0 || normalizedTo > size || normalizedFrom > normalizedTo) {
+    throw new Error(`Matrix ${label} range ${normalizedFrom}..${normalizedTo} is out of bounds. ${label} count is ${size}`);
+  }
+  return { from: normalizedFrom, to: normalizedTo };
 }
 
 function multiplyMatrices(left: PineMatrix, right: PineMatrix): PineMatrix<number> {
