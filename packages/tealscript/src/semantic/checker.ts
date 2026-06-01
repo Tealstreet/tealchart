@@ -223,6 +223,7 @@ const TYPE_QUALIFIER_NAMES = new Set(['const', 'input', 'simple', 'series']);
 const COLLECTION_TYPE_NAMES = new Set(['array', 'matrix', 'map']);
 const MAP_KEY_TYPE_NAMES = new Set(['int', 'float', 'bool', 'string', 'color']);
 const PRIMITIVE_TYPE_KINDS = new Set<SemanticTypeKind>(['bool', 'color', 'float', 'int', 'string']);
+const COLLECTION_TEMPLATE_TYPE_PATTERN = /^(array|matrix|map)</;
 
 interface BuiltinSignature {
   params: string[];
@@ -1360,7 +1361,7 @@ class SemanticChecker {
     const [keyTypeName, valueTypeName] = expression.typeArguments;
     this.checkTemplateTypeName(keyTypeName, 'map key', expression.loc);
     this.checkTemplateTypeName(valueTypeName, 'map value', expression.loc);
-    if (!TYPE_QUALIFIER_NAMES.has(keyTypeName) && !MAP_KEY_TYPE_NAMES.has(keyTypeName)) {
+    if (!this.isInvalidTemplateTypeName(keyTypeName) && !MAP_KEY_TYPE_NAMES.has(keyTypeName)) {
       this.addDiagnostic('invalid-type-template', 'Map key type must be int, float, bool, string, or color in map.new', expression.loc);
     }
   }
@@ -1538,7 +1539,7 @@ class SemanticChecker {
     if (annotation.baseType === 'map') {
       this.checkTemplateTypeName(annotation.keyType, 'map key', loc ?? annotation.loc);
       this.checkTemplateTypeName(annotation.valueType, 'map value', loc ?? annotation.loc);
-      if (!TYPE_QUALIFIER_NAMES.has(annotation.keyType) && !MAP_KEY_TYPE_NAMES.has(annotation.keyType)) {
+      if (!this.isInvalidTemplateTypeName(annotation.keyType) && !MAP_KEY_TYPE_NAMES.has(annotation.keyType)) {
         this.addDiagnostic('invalid-type-template', `Map key type must be int, float, bool, string, or color in ${owner}`, loc ?? annotation.loc);
       }
     }
@@ -1551,6 +1552,17 @@ class SemanticChecker {
     if (COLLECTION_TYPE_NAMES.has(typeName)) {
       this.addDiagnostic('invalid-type-template', `Invalid ${role} type '${typeName}'; collection template types must include their element templates`, loc);
     }
+    if (this.isNestedCollectionTemplateTypeName(typeName)) {
+      this.addDiagnostic('invalid-type-template', `Invalid ${role} type '${typeName}'; collections cannot directly contain collection types`, loc);
+    }
+  }
+
+  private isInvalidTemplateTypeName(typeName: string): boolean {
+    return TYPE_QUALIFIER_NAMES.has(typeName) || COLLECTION_TYPE_NAMES.has(typeName) || this.isNestedCollectionTemplateTypeName(typeName);
+  }
+
+  private isNestedCollectionTemplateTypeName(typeName: string): boolean {
+    return COLLECTION_TEMPLATE_TYPE_PATTERN.test(typeName);
   }
 
   private checkExpressions(scope: SemanticScope, expressions: Array<Expression | undefined>): void {
@@ -1899,6 +1911,8 @@ class SemanticChecker {
   }
 
   private typeFromName(name: string, qualifier?: SemanticQualifier): SemanticType {
+    if (this.isNestedCollectionTemplateTypeName(name)) return { kind: 'unknown', qualifier };
+
     switch (name) {
       case 'int':
       case 'float':

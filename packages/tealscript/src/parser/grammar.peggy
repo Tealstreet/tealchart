@@ -33,6 +33,10 @@
       loc: loc()
     }), head);
   }
+
+  function formatTemplateType(name, args) {
+    return `${name}<${args.join(', ')}>`;
+  }
 }
 
 // ============================================================================
@@ -332,7 +336,7 @@ TypeAnnotation
   / TypeAnnotationBase
 
 TypeAnnotationBase
-  = "array" !IdentifierPart _ "<" _ elementType:TypeName _ ">" {
+  = "array" !IdentifierPart _ "<" _ elementType:TypeReferenceName _ ">" {
       return {
         type: 'TypeAnnotation',
         baseType: 'array',
@@ -341,7 +345,7 @@ TypeAnnotationBase
         loc: loc()
       };
     }
-  / "matrix" !IdentifierPart _ "<" _ elementType:TypeName _ ">" {
+  / "matrix" !IdentifierPart _ "<" _ elementType:TypeReferenceName _ ">" {
       return {
         type: 'TypeAnnotation',
         baseType: 'matrix',
@@ -349,7 +353,7 @@ TypeAnnotationBase
         loc: loc()
       };
     }
-  / "map" !IdentifierPart _ "<" _ keyType:TypeName _ "," _ valueType:TypeName _ ">" {
+  / "map" !IdentifierPart _ "<" _ keyType:TypeReferenceName _ "," _ valueType:TypeReferenceName _ ">" {
       return {
         type: 'TypeAnnotation',
         baseType: 'map',
@@ -391,6 +395,18 @@ TypeName
   / "string" !IdentifierPart { return 'string'; }
   / "color" !IdentifierPart { return 'color'; }
   / name:IdentifierName { return name; }
+
+TypeReferenceName
+  = "array" !IdentifierPart _ "<" _ elementType:TypeReferenceName _ ">" {
+      return formatTemplateType('array', [elementType]);
+    }
+  / "matrix" !IdentifierPart _ "<" _ elementType:TypeReferenceName _ ">" {
+      return formatTemplateType('matrix', [elementType]);
+    }
+  / "map" !IdentifierPart _ "<" _ keyType:TypeReferenceName _ "," _ valueType:TypeReferenceName _ ">" {
+      return formatTemplateType('map', [keyType, valueType]);
+    }
+  / TypeName
 
 // Assignment: x := value
 // Left side can be an identifier, member access, or index access
@@ -1036,7 +1052,7 @@ PostfixExpression
     }
 
 GenericTypeArguments
-  = "<" _ first:TypeName rest:(_ "," _ TypeName)* _ ">" {
+  = "<" _ first:TypeReferenceName rest:(_ "," _ TypeReferenceName)* _ ">" {
       return [first, ...rest.map(t => t[3])];
     }
 
