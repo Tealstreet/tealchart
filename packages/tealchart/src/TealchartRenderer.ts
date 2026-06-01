@@ -1827,6 +1827,8 @@ export class TealchartRenderer {
       const value = values[i];
       const plotTime = this.getPlotTime(plot, bars, i);
 
+      if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
+
       // Skip bars outside viewport
       if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
         continue;
@@ -1916,6 +1918,8 @@ export class TealchartRenderer {
       const value = values[i];
       const plotTime = this.getPlotTime(plot, bars, i);
 
+      if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
+
       if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
         continue;
       }
@@ -1955,6 +1959,8 @@ export class TealchartRenderer {
     for (let i = 0; i < bars.length && i < values.length; i++) {
       const value = values[i];
       const plotTime = this.getPlotTime(plot, bars, i);
+
+      if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
 
       if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
         continue;
@@ -2051,6 +2057,7 @@ export class TealchartRenderer {
     const scanEnd = Math.min(bars.length, openValues.length, highValues.length, lowValues.length, closeValues.length);
     for (let i = 0; i < scanEnd; i++) {
       const bar = bars[i];
+      if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
       if (bar.time < viewport.startTime || bar.time > viewport.endTime) continue;
 
       const open = openValues[i];
@@ -2137,6 +2144,8 @@ export class TealchartRenderer {
     for (let i = 0; i < bars.length && i < values.length; i++) {
       const value = values[i];
       const plotTime = this.getPlotTime(plot, bars, i);
+
+      if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
 
       if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
         continue;
@@ -2299,6 +2308,8 @@ export class TealchartRenderer {
       const bar = bars[i];
       const value = values[i];
 
+      if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
+
       if (bar.time < viewport.startTime || bar.time > viewport.endTime) {
         continue;
       }
@@ -2348,6 +2359,8 @@ export class TealchartRenderer {
       const bar = bars[i];
       const value = values[i];
       const plotTime = this.getPlotTime(plot, bars, i);
+
+      if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
 
       if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
         continue;
@@ -3573,12 +3586,13 @@ export class TealchartRenderer {
   /**
    * Draw candles within a specific pane
    */
-  private resolveBarColorOverride(plots: PlotOutput[] | undefined, barIndex: number): string | null {
+  private resolveBarColorOverride(plots: PlotOutput[] | undefined, barIndex: number, barCount: number): string | null {
     if (!plots) return null;
 
     let override: string | null = null;
     for (const plot of plots) {
       if (plot.type !== 'barcolor' || !Array.isArray(plot.color)) continue;
+      if (!this.shouldRenderPlot(plot) || !this.shouldRenderPlotBar(plot, { length: barCount }, barIndex)) continue;
       const color = plot.color[barIndex];
       if (color) {
         override = color;
@@ -3609,7 +3623,7 @@ export class TealchartRenderer {
 
       const x = this.timeToX(bar.time, viewport, chartWidth);
       const isUp = bar.close >= bar.open;
-      const color = this.resolveBarColorOverride(plots, barIndex) ?? (isUp ? options.upColor : options.downColor);
+      const color = this.resolveBarColorOverride(plots, barIndex, bars.length) ?? (isUp ? options.upColor : options.downColor);
 
       // Wick
       const highY = this.valueToY(bar.high, pane);
@@ -3695,7 +3709,7 @@ export class TealchartRenderer {
     return plot.display !== 0;
   }
 
-  private shouldRenderPlotBar(plot: Pick<PlotOutput, 'showLast'>, bars: Bar[], index: number): boolean {
+  private shouldRenderPlotBar(plot: Pick<PlotOutput, 'showLast'>, bars: { length: number }, index: number): boolean {
     if (plot.showLast === undefined) return true;
     if (plot.showLast <= 0) return false;
     return index >= Math.max(0, bars.length - plot.showLast);
@@ -3768,6 +3782,8 @@ export class TealchartRenderer {
     for (let i = 0; i < bars.length && i < values.length; i++) {
       const value = values[i];
       const plotTime = this.getPlotTime(plot, bars, i);
+
+      if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
 
       if (plotTime < viewport.startTime || plotTime > viewport.endTime) continue;
 
@@ -3866,6 +3882,8 @@ export class TealchartRenderer {
     for (let i = 0; i < bars.length && i < values.length; i++) {
       const value = values[i];
       const plotTime = this.getPlotTime(plot, bars, i);
+
+      if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
 
       if (plotTime < viewport.startTime || plotTime > viewport.endTime) continue;
       if (value === null || value === undefined || isNaN(value)) continue;
@@ -4435,6 +4453,8 @@ export class TealchartRenderer {
       const value = values[i];
       const plotTime = this.getPlotTime(plot, bars, i);
 
+      if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
+
       if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
         continue;
       }
@@ -4509,6 +4529,8 @@ export class TealchartRenderer {
     for (let i = 0; i < bars.length && i < values.length; i++) {
       const value = values[i];
       const plotTime = this.getPlotTime(plot, bars, i);
+
+      if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
 
       if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
         continue;

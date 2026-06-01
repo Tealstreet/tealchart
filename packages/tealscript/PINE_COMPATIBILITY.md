@@ -295,6 +295,9 @@ for dependent fills.
 
 Fill renderer coverage applies `show_last` windows to filled regions while
 preserving existing gap handling and per-bar fill colors.
+The same renderer bar-window handling now applies to common `plot()`,
+`bgcolor()`, `barcolor()`, `plotbar()`, `plotcandle()`, `plotshape()`,
+`plotchar()`, and `plotarrow()` outputs.
 
 ## Common OHLC Plot Coverage
 

@@ -344,7 +344,8 @@ Phases:
    z-order. Initial parity work now captures runtime metadata for common v6
    plot style/display/format/precision/force-overlay fields plus
    `plot.linestyle_*` constants, and Tealchart renderer coverage now applies
-   line styles plus common plot offsets and `display.none` hiding.
+   line styles plus common plot offsets, `display.none` hiding, and
+   `show_last` windows.
 2. Finish `hline()` handles and visual settings.
 3. Finish `fill()` for plot/hline handles, fill gaps, title/editable/display,
    and color series behavior.
