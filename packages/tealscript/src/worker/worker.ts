@@ -256,6 +256,7 @@ function executeAndSendResults(metadata?: WorkerOutputMetadata): void {
       alerts: result.alerts,
       logs: result.logs,
       inputs,
+      declaration: result.declaration,
       metadata,
     });
     postResult(resultMessage);

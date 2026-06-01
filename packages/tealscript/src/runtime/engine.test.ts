@@ -1395,6 +1395,11 @@ plot(close)`;
       expect(result.errors).toHaveLength(0);
       expect(result.indicatorOverlay).toBe(true);
       expect(result.indicatorPrecision).toBe(4);
+      expect(result.declaration).toMatchObject({
+        title: 'Overlay Precision',
+        overlay: true,
+        precision: 4,
+      });
     });
 
     it('records indicator format and scale metadata', () => {
@@ -1444,6 +1449,23 @@ plot(close)`;
         line: 3,
         box: 4,
         polyline: 5,
+      });
+      expect(result.declaration).toMatchObject({
+        title: 'Advanced Metadata',
+        overlay: false,
+        precision: 2,
+        timeframe: '15',
+        timeframeGaps: false,
+        explicitPlotZOrder: true,
+        behindChart: false,
+        calcBarsCount: 250,
+        dynamicRequests: false,
+        drawingLimits: {
+          label: 2,
+          line: 3,
+          box: 4,
+          polyline: 5,
+        },
       });
     });
 

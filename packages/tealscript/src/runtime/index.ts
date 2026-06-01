@@ -149,6 +149,7 @@ export {
   executeScript,
   type ExecutionResult,
   type ExecutionError,
+  type IndicatorDeclarationMetadata,
   type TealscriptEngineOptions,
 } from './engine';
 
