@@ -486,10 +486,11 @@ The `table.*` drawing pass covers fixed-position table handles, declared row and
 column sizing, background/frame/border metadata, `table.delete()`,
 `table.clear()`, `table.cell()`, table-level position/background/frame/border
 setters, and common cell setters for text, color, background, size, width,
-height, text alignment, and font family. Rendering lays out fixed tables in the
-script pane with measured cell sizes, cell backgrounds, borders, frame borders,
-text alignment, and default/monospace font-family metadata. Remaining gaps are
-the full Pine table setter surface and TradingView-exact sizing.
+height, text alignment, font family, and bold/italic text formatting. Rendering
+lays out fixed tables in the script pane with measured cell sizes, cell
+backgrounds, borders, frame borders, text alignment, default/monospace
+font-family metadata, and bold/italic font styling. Remaining gaps are the full
+Pine table setter surface and TradingView-exact sizing.
 
 ## Strategy Diagnostic Coverage
 

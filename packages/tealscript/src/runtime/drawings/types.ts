@@ -110,6 +110,7 @@ export interface TableCellDrawingOutput {
   textHalign: string;
   textValign: string;
   textFontFamily?: string;
+  textFormatting?: string;
   bgcolor: string | null;
 }
 
