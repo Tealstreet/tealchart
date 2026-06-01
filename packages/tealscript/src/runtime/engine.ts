@@ -1339,7 +1339,7 @@ export class TealscriptEngine {
       case 'time':
         return this.ctx.time.get(0);
       case 'time_tradingday':
-        return this.getTradingDayTime(this.ctx.time.get(0));
+        return this.getTradingDayTime(this.ctx.time.get(0), this.ctx.syminfo.timezone);
       case 'timenow':
         return this.ctx.timenow.get(0);
       case 'time_close':
@@ -2930,7 +2930,7 @@ export class TealscriptEngine {
           return this.naIfMissing(this.ctx.time.get(offset));
         case 'time_tradingday':
           this.checkHistoryOffset(offset);
-          return this.naIfMissing(this.getTradingDayTime(this.ctx.time.get(offset)));
+          return this.naIfMissing(this.getTradingDayTime(this.ctx.time.get(offset), this.ctx.syminfo.timezone));
         case 'timenow':
           this.checkHistoryOffset(offset);
           return this.naIfMissing(this.ctx.timenow.get(offset));
@@ -5678,9 +5678,9 @@ export class TealscriptEngine {
   private registerTickerBuiltins(): void {
     this.builtins.set('session.regular', () => 'regular');
     this.builtins.set('session.extended', () => 'extended');
-    this.builtins.set('session.ismarket', () => true);
-    this.builtins.set('session.ispremarket', () => false);
-    this.builtins.set('session.ispostmarket', () => false);
+    this.builtins.set('session.ismarket', () => this.unsupportedSessionState('session.ismarket'));
+    this.builtins.set('session.ispremarket', () => this.unsupportedSessionState('session.ispremarket'));
+    this.builtins.set('session.ispostmarket', () => this.unsupportedSessionState('session.ispostmarket'));
     this.builtins.set('adjustment.none', () => 'none');
     this.builtins.set('adjustment.splits', () => 'splits');
     this.builtins.set('adjustment.dividends', () => 'dividends');
@@ -5826,6 +5826,10 @@ export class TealscriptEngine {
       return 'extended';
     }
     throw new Error(`Unsupported ticker session: ${session}`);
+  }
+
+  private unsupportedSessionState(name: string): never {
+    throw new RuntimeErrorException(`${name} requires exchange session classification, which is not available in this runtime`);
   }
 
   private normalizeTickerModifier(
@@ -7516,11 +7520,13 @@ export class TealscriptEngine {
     return finalTimestamp;
   }
 
-  private getTradingDayTime(timestamp: unknown): number {
+  private getTradingDayTime(timestamp: unknown, timezone: string): number {
     const value = this.toNumber(timestamp);
     if (!Number.isFinite(value)) return Number.NaN;
-    const date = new Date(value);
-    return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+    const year = this.getCalendarPart('year', value, timezone);
+    const month = this.getCalendarPart('month', value, timezone);
+    const day = this.getCalendarPart('dayofmonth', value, timezone);
+    return this.resolveLocalTimestamp(timezone, year, month, day, 0, 0, 0);
   }
 
   private getCalendarPart(part: string, timestamp: unknown, timezone: string): number {
@@ -7608,6 +7614,14 @@ export class TealscriptEngine {
       const year = this.getCalendarPart('year', openTime, timezone);
       const month = this.getCalendarPart('month', openTime, timezone);
       return this.resolveLocalTimestamp(timezone, year, month + spec.multiplier, 1, 0, 0, 0);
+    }
+
+    if (spec.unit === 'week' || spec.unit === 'day') {
+      const year = this.getCalendarPart('year', openTime, timezone);
+      const month = this.getCalendarPart('month', openTime, timezone);
+      const day = this.getCalendarPart('dayofmonth', openTime, timezone);
+      const days = spec.unit === 'week' ? spec.multiplier * 7 : spec.multiplier;
+      return this.resolveLocalTimestamp(timezone, year, month, day + days, 0, 0, 0);
     }
 
     const duration = this.getTimeframeDurationMs(timeframe);

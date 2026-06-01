@@ -1836,10 +1836,7 @@ plot(na(time("60", "1700-0500:2", "UTC")) ? 0 : 1, title="Overnight Monday")
 plot(na(time("60", "1700-1700:2", "UTC")) ? 0 : 1, title="Full Overnight Monday")
 plot(na(time("60", "0900-1000,1400-1500", "UTC")) ? 0 : 1, title="Multi Segment")
 plot(na(time("60", "24x7", "UTC")) ? 0 : 1, title="Always")
-plot(na(time("60", session.regular, "UTC")) ? 0 : 1, title="Regular Session")
-plot(session.ismarket ? 1 : 0, title="Market State")
-plot(session.ispremarket ? 1 : 0, title="Premarket State")
-plot(session.ispostmarket ? 1 : 0, title="Postmarket State")`;
+plot(na(time("60", session.regular, "UTC")) ? 0 : 1, title="Regular Session")`;
 
       const ast = parse(script);
       const bars: Bar[] = [
@@ -1862,9 +1859,46 @@ plot(session.ispostmarket ? 1 : 0, title="Postmarket State")`;
       expect(result.plots.find((plot) => plot.title === 'Multi Segment')?.values).toEqual([0, 0, 0, 1, 1, 0, 0, 0, 0]);
       expect(result.plots.find((plot) => plot.title === 'Always')?.values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1]);
       expect(result.plots.find((plot) => plot.title === 'Regular Session')?.values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1]);
-      expect(result.plots.find((plot) => plot.title === 'Market State')?.values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1]);
-      expect(result.plots.find((plot) => plot.title === 'Premarket State')?.values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0]);
-      expect(result.plots.find((plot) => plot.title === 'Postmarket State')?.values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    });
+
+    it('fails fast for session state helpers until exchange session classification is available', () => {
+      const script = `//@version=6
+indicator("Session State")
+plot(session.ismarket ? 1 : 0, title="Market State")`;
+
+      const ast = parse(script);
+      const result = executeScript(ast, createBars(3));
+
+      expect(result.errors).toEqual([
+        expect.objectContaining({
+          message: expect.stringContaining('session.ismarket requires exchange session classification'),
+        }),
+      ]);
+    });
+
+    it('computes time_tradingday from the exchange timezone', () => {
+      const script = `//@version=6
+indicator("Trading Day Timezone")
+plot(time_tradingday, title="Trading Day")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: Date.UTC(2024, 0, 5, 1), open: 1, high: 2, low: 1, close: 2, volume: 100 },
+        { time: Date.UTC(2024, 0, 5, 15), open: 2, high: 3, low: 2, close: 3, volume: 100 },
+      ];
+      const result = executeScript(ast, bars, undefined, {
+        runtime: {
+          syminfo: {
+            timezone: 'America/New_York',
+          },
+        },
+      });
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Trading Day')?.values).toEqual([
+        Date.UTC(2024, 0, 4, 5),
+        Date.UTC(2024, 0, 5, 5),
+      ]);
     });
 
     it('exposes Pine syminfo and timeframe values through member access', () => {
@@ -1993,7 +2027,8 @@ plot(time("D"), title="Daily Open")
 plot(time_close("D"), title="Daily Close")
 plot(time("W"), title="Weekly Open")
 plot(time("M"), title="Monthly Open")
-plot(time("D", timezone="America/New_York"), title="NY Daily Open")`;
+plot(time("D", timezone="America/New_York"), title="NY Daily Open")
+plot(time_close("D", timezone="America/New_York"), title="NY Daily Close")`;
 
       const ast = parse(script);
       const bars: Bar[] = [
@@ -2060,6 +2095,60 @@ plot(time("D", timezone="America/New_York"), title="NY Daily Open")`;
         Date.UTC(2024, 0, 4, 5),
         Date.UTC(2024, 0, 5, 5),
         Date.UTC(2024, 0, 5, 5),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'NY Daily Close')?.values).toEqual([
+        Date.UTC(2024, 0, 5, 5),
+        Date.UTC(2024, 0, 5, 5),
+        Date.UTC(2024, 0, 6, 5),
+        Date.UTC(2024, 0, 6, 5),
+      ]);
+    });
+
+    it('keeps day and week time_close boundaries timezone-aware across DST', () => {
+      const script = `//@version=6
+indicator("DST Time Close")
+plot(time("D", timezone="America/New_York"), title="NY Daily Open")
+plot(time_close("D", timezone="America/New_York"), title="NY Daily Close")
+plot(time("W", timezone="America/New_York"), title="NY Weekly Open")
+plot(time_close("W", timezone="America/New_York"), title="NY Weekly Close")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: Date.UTC(2024, 2, 10, 12), open: 1, high: 2, low: 1, close: 2, volume: 100 },
+        { time: Date.UTC(2024, 10, 3, 12), open: 2, high: 3, low: 2, close: 3, volume: 100 },
+      ];
+      const result = executeScript(ast, bars, undefined, {
+        runtime: {
+          timeframe: {
+            period: '60',
+            multiplier: 60,
+            isminutes: true,
+            isdaily: false,
+            isweekly: false,
+            ismonthly: false,
+            isintraday: true,
+            isseconds: false,
+            isticks: false,
+          },
+        },
+      });
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'NY Daily Open')?.values).toEqual([
+        Date.UTC(2024, 2, 10, 5),
+        Date.UTC(2024, 10, 3, 4),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'NY Daily Close')?.values).toEqual([
+        Date.UTC(2024, 2, 11, 4),
+        Date.UTC(2024, 10, 4, 5),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'NY Weekly Open')?.values).toEqual([
+        Date.UTC(2024, 2, 4, 5),
+        Date.UTC(2024, 9, 28, 4),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'NY Weekly Close')?.values).toEqual([
+        Date.UTC(2024, 2, 11, 4),
+        Date.UTC(2024, 10, 4, 5),
       ]);
     });
 
