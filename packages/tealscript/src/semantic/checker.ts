@@ -621,7 +621,7 @@ class SemanticChecker {
             visitStatement(statement.alternate, new Set(localNames));
           }
           return;
-        case 'ForStatement':
+        case 'ForStatement': {
           if (statement.kind === 'collection') {
             visitExpression(statement.iterable, localNames);
           } else {
@@ -634,6 +634,7 @@ class SemanticChecker {
           if (statement.kind === 'collection' && statement.indexCounter) forLocals.add(statement.indexCounter.name);
           this.visitFunctionScopeNode(statement.body, forLocals, visitExpression, visitStatement);
           return;
+        }
         case 'WhileStatement':
           visitExpression(statement.test, localNames);
           this.visitFunctionScopeNode(statement.body, new Set(localNames), visitExpression, visitStatement);
@@ -673,6 +674,10 @@ class SemanticChecker {
     localNames: Set<string>,
     visitExpression: (expression: Expression, localNames: Set<string>) => void,
   ): void {
+    if (target.type === 'Identifier') {
+      visitExpression(target, localNames);
+      return;
+    }
     if (target.type === 'MemberExpression') {
       visitExpression(target.object, localNames);
       return;

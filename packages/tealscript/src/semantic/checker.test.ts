@@ -130,6 +130,9 @@ globalPrice = close
 export usesGlobals(float value) =>
     localScale = allowed
     value * scale + globalPrice + localScale
+export assignsGlobal(float value) =>
+    scale := value
+    value
 export usesInput(float value) =>
     length = input.int(14)
     value + length
@@ -143,6 +146,7 @@ export lateShadow(float value) =>
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Exported function usesGlobals cannot use non-const global variable: scale',
       'Exported function usesGlobals cannot use non-const global variable: globalPrice',
+      'Exported function assignsGlobal cannot use non-const global variable: scale',
       'Exported function usesInput cannot call input.*() functions',
       'Exported function lateShadow cannot use non-const global variable: scale',
     ]);
