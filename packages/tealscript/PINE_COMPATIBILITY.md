@@ -242,12 +242,13 @@ qualified type-system and UDT phases.
 
 The user-defined type MVP covers top-level `type` declarations, exported type
 declarations for parser compatibility, typed and untyped fields, field default
-expressions, `varip` field syntax, `<Type>.new()` constructors, positional and
-named constructor arguments, field reads, field reassignment, compound field
-assignment, reference assignment semantics, and realtime rollback for field
-mutations. UDT copy coverage supports Pine's shallow `Type.copy(object)` and
-`object.copy()` forms, so copied UDT fields that contain reference values still
-point at the same nested instances until scripts explicitly deep-copy them.
+expressions, Pine-compatible missing `bool` field defaults, `varip` field
+syntax, `<Type>.new()` constructors, positional and named constructor arguments,
+field reads, field reassignment, compound field assignment, reference assignment
+semantics, and realtime rollback for field mutations. UDT copy coverage supports
+Pine's shallow `Type.copy(object)` and `object.copy()` forms, so copied UDT
+fields that contain reference values still point at the same nested instances
+until scripts explicitly deep-copy them.
 UDTs can hold collection fields such as `array<float>`, `map<string, float>`,
 and `matrix<int>`; compatibility coverage mutates those fields through Pine
 method syntax, and semantic coverage reports conservative collection-reference
@@ -269,9 +270,9 @@ not yet fully enforced by the semantic checker. Semantic diagnostics cover
 unknown local UDT field reads/assignments, constructor unknown field names,
 duplicate bindings, excess positional arguments, invalid argument order between
 named and positional arguments, and conservative primitive/reference field type
-mismatches in local UDT constructors and field assignments. Library
-export/import diagnostics and full reference-type diagnostics remain planned in
-Epic 12 and the qualified type-system epic.
+mismatches in local UDT field defaults, constructors, and field assignments.
+Library export/import diagnostics and full reference-type diagnostics remain
+planned in Epic 12 and the qualified type-system epic.
 
 ## Common Library Syntax Coverage
 

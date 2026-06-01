@@ -813,14 +813,42 @@ pivot.tag := "not checked"
     ]);
   });
 
+  it('reports user-defined type field default value mismatches', () => {
+    const result = checkProgram(parse(`
+indicator("Bad UDT Field Defaults")
+type Pivot
+    int x = "bad"
+    float y = "also bad"
+    bool active = 1
+    string name = 3
+    color tint = "not color"
+    label tag = "not checked"
+    array<float> values = array.new<string>()
+    map<string, float> prices = map.new<int, float>()
+    matrix<int> grid = matrix.new<float>()
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to int field Pivot.x',
+      'Cannot assign string value to float field Pivot.y',
+      'Cannot assign int value to bool field Pivot.active',
+      'Cannot assign int value to string field Pivot.name',
+      'Cannot assign string value to color field Pivot.tint',
+      'Cannot assign string value to label field Pivot.tag',
+      'Cannot assign array<string> value to array<float> field Pivot.values',
+      'Cannot assign map<int, float> value to map<string, float> field Pivot.prices',
+      'Cannot assign matrix<float> value to matrix<int> field Pivot.grid',
+    ]);
+  });
+
   it('validates user-defined type collection field references', () => {
     const valid = checkProgram(parse(`
 indicator("UDT Collection Fields")
 type Cache
-    array<float> values
-    map<string, float> prices
-    matrix<int> grid
-cache = Cache.new(array.new<float>(), map.new<string, float>(), matrix.new<int>())
+    array<float> values = array.new<float>()
+    map<string, float> prices = map.new<string, float>()
+    matrix<int> grid = matrix.new<int>()
+cache = Cache.new()
 cache.values := array.new<float>()
 cache.prices := map.new<string, float>()
 cache.grid := matrix.new<int>()

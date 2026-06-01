@@ -801,7 +801,10 @@ class SemanticChecker {
         type: this.typeFromAnnotation(field.typeAnnotation ?? undefined),
         loc: field.name.loc,
       });
-      if (field.defaultValue) this.checkExpression(field.defaultValue, typeScope);
+      if (field.defaultValue) {
+        this.checkExpression(field.defaultValue, typeScope);
+        this.checkUdtFieldValueType(statement.name.name, field, field.defaultValue, typeScope);
+      }
     }
   }
 
