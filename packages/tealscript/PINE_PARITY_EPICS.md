@@ -449,6 +449,8 @@ Phases:
    reference semantics.
    Runtime coverage now includes shallow UDT copies through Pine's
    `Type.copy(object)` and `object.copy()` forms.
+   Semantic coverage now reports invalid local UDT constructor field names,
+   duplicate field bindings, and excess positional arguments before runtime.
 5. Implement method declarations and method dispatch beyond array method sugar.
    Runtime coverage now selects local and imported UDT method overloads by
    receiver type.

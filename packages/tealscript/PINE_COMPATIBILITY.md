@@ -221,8 +221,9 @@ references. The runtime uses the receiver as the method's first argument, in
 line with Pine's documented method-call equivalence, and selects local UDT
 method overloads by receiver type.
 
-Known limits: UDT field, constructor, and method receiver types are recorded
-dynamically but not yet enforced by the semantic checker. Library
+Known limits: UDT field and method receiver types are recorded dynamically but
+not yet fully enforced by the semantic checker. Constructor argument diagnostics
+cover local UDT field names, duplicate bindings, and argument counts. Library
 export/import diagnostics and full reference-type diagnostics remain planned in
 Epic 12 and the qualified type-system epic.
 

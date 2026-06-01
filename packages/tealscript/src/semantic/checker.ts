@@ -437,10 +437,12 @@ export function checkProgram(program: Program): SemanticCheckResult {
 class SemanticChecker {
   private diagnostics: SemanticDiagnostic[] = [];
   private rootScope = new SemanticScope();
+  private typeDeclarations = new Map<string, TypeDeclaration>();
 
   check(program: Program): SemanticCheckResult {
     this.diagnostics = [];
     this.rootScope = new SemanticScope();
+    this.typeDeclarations = new Map();
     this.checkStatements(program.body, this.rootScope);
     return {
       diagnostics: this.diagnostics,
@@ -534,6 +536,7 @@ class SemanticChecker {
       type: { kind: 'udt', name: statement.name.name },
       loc: statement.name.loc,
     });
+    this.typeDeclarations.set(statement.name.name, statement);
     const typeScope = new SemanticScope(scope);
     for (const field of statement.fields) {
       this.checkTypeAnnotation(statement.name.name, field.typeAnnotation ?? undefined, field.name.loc);
@@ -712,6 +715,7 @@ class SemanticChecker {
   private checkCallExpression(expression: CallExpression, scope: SemanticScope): void {
     this.checkCallee(expression.callee, scope);
     this.checkBuiltinSignature(expression);
+    this.checkUdtConstructorSignature(expression);
     for (const argument of expression.arguments) {
       this.checkExpression(argument.value, scope);
     }
@@ -749,6 +753,48 @@ class SemanticChecker {
     this.checkArgumentNames(expression.arguments, signature, displayName);
     this.checkArgumentCount(expression.arguments, signature, displayName);
     this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName);
+  }
+
+  private checkUdtConstructorSignature(expression: CallExpression): void {
+    const calleePath = this.memberPath(expression.callee);
+    if (calleePath.length !== 2 || calleePath[1] !== 'new') return;
+
+    const typeName = calleePath[0];
+    if (!typeName) return;
+    const declaration = this.typeDeclarations.get(typeName);
+    if (!declaration) return;
+
+    const displayName = `${typeName}.new`;
+    const fields = declaration.fields.map((field) => field.name.name);
+    const positionalCount = this.leadingPositionalCount(expression.arguments);
+
+    this.checkArgumentOrder(expression.arguments, displayName);
+
+    if (positionalCount > fields.length) {
+      this.addDiagnostic(
+        'argument-count',
+        `${displayName}() expects at most ${fields.length} argument${fields.length === 1 ? '' : 's'}`,
+        expression.arguments[fields.length]?.loc,
+      );
+    }
+
+    const seenNames = new Set<string>();
+    for (const argument of expression.arguments) {
+      if (!argument.name) continue;
+
+      const fieldName = argument.name.name;
+      if (!fields.includes(fieldName)) {
+        this.addDiagnostic('unknown-field', `Unknown field '${fieldName}' for ${displayName}()`, argument.name.loc);
+        continue;
+      }
+
+      if (seenNames.has(fieldName) || fields.indexOf(fieldName) < positionalCount) {
+        this.addDiagnostic('duplicate-argument', `Field '${fieldName}' for ${displayName}() was supplied multiple times`, argument.name.loc);
+        continue;
+      }
+
+      seenNames.add(fieldName);
+    }
   }
 
   private checkArgumentOrder(args: CallArgument[], displayName: string): void {
