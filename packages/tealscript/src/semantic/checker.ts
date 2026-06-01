@@ -1122,7 +1122,11 @@ class SemanticChecker {
   }
 
   private checkMapConstructorTypeArguments(expression: CallExpression): void {
-    if (this.memberPath(expression.callee).join('.') !== 'map.new' || expression.typeArguments?.length !== 2) return;
+    if (this.memberPath(expression.callee).join('.') !== 'map.new' || !expression.typeArguments) return;
+    if (expression.typeArguments.length !== 2) {
+      this.addDiagnostic('invalid-type-template', 'map.new() expects exactly 2 type arguments', expression.loc);
+      return;
+    }
 
     const [keyTypeName, valueTypeName] = expression.typeArguments;
     this.checkTemplateTypeName(keyTypeName, 'map key', expression.loc);
