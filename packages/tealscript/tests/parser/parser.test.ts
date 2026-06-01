@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { parse, validate, TealscriptParseError, formatParseError } from '../../src/parser';
+import { parse, validate, TealscriptParseError, TealscriptParseLimitError, formatParseError } from '../../src/parser';
 import type {
   Program,
   FunctionDeclaration,
@@ -1085,6 +1085,16 @@ hline(30, "Oversold", color=color.green)
   describe('Error handling', () => {
     it('throws TealscriptParseError on syntax error', () => {
       expect(() => parse('x = \n')).toThrow(TealscriptParseError);
+    });
+
+    it('rejects source that exceeds the configured parser source-size limit', () => {
+      expect(() => parse('x = 1\n', { maxSourceLength: 5 })).toThrow(TealscriptParseLimitError);
+      expect(() => parse('x = 1\n', { maxSourceLength: 5 })).toThrow('Script source is too large: maximum length is 5');
+    });
+
+    it('rejects ASTs that exceed the configured parser depth limit', () => {
+      expect(() => parse('x = 1\n', { maxAstDepth: 2 })).toThrow(TealscriptParseLimitError);
+      expect(() => parse('x = 1\n', { maxAstDepth: 2 })).toThrow('Script AST is too deep: maximum depth is 2');
     });
 
     it('provides location in error', () => {

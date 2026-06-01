@@ -4,8 +4,11 @@
  * Wraps the Peggy-generated parser with a nice TypeScript interface.
  */
 
-import type { Expression, Program, SourceLocation, Statement } from './ast';
+import type { AnyNode, Expression, Program, SourceLocation, Statement } from './ast';
 import * as generatedParser from './generated';
+
+const DEFAULT_MAX_SOURCE_LENGTH = 1_000_000;
+const DEFAULT_MAX_AST_DEPTH = 1000;
 
 /**
  * Parse error with location information
@@ -29,6 +32,13 @@ export class TealscriptParseError extends Error {
   }
 }
 
+export class TealscriptParseLimitError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'TealscriptParseLimitError';
+  }
+}
+
 /**
  * Parser options
  */
@@ -44,6 +54,10 @@ export interface ParseOptions<T extends ParseStartRule = 'Program'> {
   startRule?: T;
   /** Source name for error messages */
   grammarSource?: string;
+  /** Maximum source length in UTF-16 code units */
+  maxSourceLength?: number;
+  /** Maximum AST node nesting depth after parsing */
+  maxAstDepth?: number;
 }
 
 /**
@@ -68,12 +82,15 @@ export function parse(source: string, options: ParseOptions<'Expression'>): Expr
 export function parse(source: string, options: ParseOptions<'Statement'>): Statement;
 export function parse<T extends ParseStartRule>(source: string, options: ParseOptions<T>): ParseResult<T>;
 export function parse(source: string, options: ParseOptions<ParseStartRule> = {}): Program | Expression | Statement {
+  assertSourceLength(source, options.maxSourceLength ?? DEFAULT_MAX_SOURCE_LENGTH);
+
   try {
     const result = generatedParser.parse(source, {
       startRule: options.startRule || 'Program',
       grammarSource: options.grammarSource || 'input',
     });
 
+    assertAstDepth(result as AnyNode, options.maxAstDepth ?? DEFAULT_MAX_AST_DEPTH);
     return result as Program | Expression | Statement;
   } catch (error) {
     if (isPeggyError(error)) {
@@ -97,6 +114,62 @@ export function parse(source: string, options: ParseOptions<ParseStartRule> = {}
     }
     throw error;
   }
+}
+
+function assertSourceLength(source: string, maxSourceLength: number): void {
+  const limit = normalizePositiveLimit(maxSourceLength, 'source length');
+  if (source.length > limit) {
+    throw new TealscriptParseLimitError(`Script source is too large: maximum length is ${limit}`);
+  }
+}
+
+function assertAstDepth(root: AnyNode, maxAstDepth: number): void {
+  const limit = normalizePositiveLimit(maxAstDepth, 'AST depth');
+  const stack: Array<{ value: unknown; depth: number }> = [{ value: root, depth: 1 }];
+  const seen = new Set<object>();
+
+  while (stack.length > 0) {
+    const current = stack.pop();
+    if (!current) continue;
+    const { value, depth } = current;
+    if (!isObjectLike(value)) continue;
+    if (seen.has(value)) continue;
+    seen.add(value);
+
+    const isNode = isAstNode(value);
+    const nodeDepth = isNode ? depth : Math.max(1, depth - 1);
+    if (isNode && nodeDepth > limit) {
+      throw new TealscriptParseLimitError(`Script AST is too deep: maximum depth is ${limit}`);
+    }
+
+    if (Array.isArray(value)) {
+      for (const child of value) {
+        stack.push({ value: child, depth });
+      }
+      continue;
+    }
+
+    for (const [key, child] of Object.entries(value)) {
+      if (key === 'loc') continue;
+      stack.push({ value: child, depth: isNode ? nodeDepth + 1 : depth });
+    }
+  }
+}
+
+function normalizePositiveLimit(value: number, label: string): number {
+  const limit = Math.trunc(value);
+  if (!Number.isFinite(limit) || limit <= 0) {
+    throw new TealscriptParseLimitError(`Invalid ${label} limit: ${value}`);
+  }
+  return limit;
+}
+
+function isObjectLike(value: unknown): value is object {
+  return typeof value === 'object' && value !== null;
+}
+
+function isAstNode(value: object): value is AnyNode {
+  return typeof (value as { type?: unknown }).type === 'string';
 }
 
 /**
