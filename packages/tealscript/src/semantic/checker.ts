@@ -1543,6 +1543,8 @@ class SemanticChecker {
     if (calleePath.join('.') === 'timestamp') return { kind: 'int', qualifier: 'const' };
     const arrayElementReadType = this.inferArrayElementReadCallType(expression, scope);
     if (arrayElementReadType) return arrayElementReadType;
+    const arrayScalarType = this.inferArrayScalarCallType(expression, scope);
+    if (arrayScalarType) return arrayScalarType;
     const arrayHelperType = this.inferArrayHelperCallType(expression, scope);
     if (arrayHelperType) return arrayHelperType;
     if (calleePath.join('.') === 'map.new' && expression.typeArguments?.length === 2) {
@@ -1590,6 +1592,50 @@ class SemanticChecker {
       || operation === 'pop'
       || operation === 'remove'
       || operation === 'shift';
+  }
+
+  private inferArrayScalarCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
+    if (expression.callee.type !== 'MemberExpression') return undefined;
+
+    const methodName = expression.callee.property.name;
+    const receiverType = this.inferArrayHelperReceiverType(expression, scope);
+    if (receiverType?.kind !== 'array') return undefined;
+
+    if (this.isArrayBooleanOperation(methodName)) return { kind: 'bool' };
+    if (methodName === 'join') return { kind: 'string' };
+    if (this.isArrayIntegerOperation(methodName)) return { kind: 'int' };
+    if (this.isArrayFloatOperation(methodName)) return { kind: 'float' };
+
+    return undefined;
+  }
+
+  private isArrayBooleanOperation(operation: string): boolean {
+    return operation === 'every' || operation === 'includes' || operation === 'some';
+  }
+
+  private isArrayIntegerOperation(operation: string): boolean {
+    return operation === 'binary_search'
+      || operation === 'binary_search_leftmost'
+      || operation === 'binary_search_rightmost'
+      || operation === 'indexof'
+      || operation === 'lastindexof'
+      || operation === 'size';
+  }
+
+  private isArrayFloatOperation(operation: string): boolean {
+    return operation === 'avg'
+      || operation === 'covariance'
+      || operation === 'max'
+      || operation === 'median'
+      || operation === 'min'
+      || operation === 'mode'
+      || operation === 'percentile_linear_interpolation'
+      || operation === 'percentile_nearest_rank'
+      || operation === 'percentrank'
+      || operation === 'range'
+      || operation === 'stdev'
+      || operation === 'sum'
+      || operation === 'variance';
   }
 
   private inferArrayHelperCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
