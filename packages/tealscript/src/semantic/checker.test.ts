@@ -179,4 +179,32 @@ input float badAverage = ta.sma(close, 3)
       'Cannot assign series value to input float',
     ]);
   });
+
+  it('reports invalid built-in argument names, counts, and ordering', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Builtins")
+one = ta.sma(close)
+two = ta.rsi(source=close, length=14, bad=14)
+three = plot(series=close, "bad order")
+four = color.new(color.red, 10, 20)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'ta.sma() expects at least 2 arguments',
+      "Unknown argument 'bad' for ta.rsi()",
+      'plot() cannot use positional arguments after named arguments',
+      'color.new() expects at most 2 arguments',
+    ]);
+  });
+
+  it('reports duplicate built-in bindings from positional and named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Duplicate Builtin Args")
+value = ta.sma(close, source=open, length=14)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Argument 'source' for ta.sma() was supplied multiple times",
+    ]);
+  });
 });
