@@ -33,3 +33,28 @@ smallest fixture that proves the semantic contract.
    diagnostics.
 5. Keep the expected output hand-checked and stable. Do not call TradingView,
    fetch live data, or depend on network access in CI.
+
+## Manual Visual Comparison Notes
+
+Some Pine parity work cannot be fully validated through numeric fixtures because
+the user-facing contract is visual placement, layering, object lifetime, or
+chart interaction. Keep those checks manual and repeatable:
+
+1. Pick a milestone script that is already represented by a reduced fixture.
+2. Run it on the fixed local bars or on an explicitly named manual chart.
+3. Compare TradingView and Tealchart screenshots for the visual contract below.
+4. Record any mismatch as a new reduced fixture or as a planned unsupported
+   diagnostic. Do not use live TradingView output as a CI oracle.
+
+| Milestone Area | Existing Reduced Fixture | Manual Comparison Focus |
+| --- | --- | --- |
+| Candle tinting | `Official Barcolor Checkpoint` | Bar color priority, `na` gaps, and overlay behavior. |
+| Higher-timeframe overlays | `Public MTF Trend Checkpoint` | Confirmed HTF merge timing, stair-step shape, and repaint-safe offsets. |
+| Divergence markers | `Public Divergence Checkpoint` | Pivot delay, marker bar alignment, and repeated-signal suppression. |
+| Session filters | `Public Session Filter Checkpoint` | Session boundary inclusion, exchange timezone assumptions, and masked signals. |
+| Drawing objects | `pine-drawings.test.ts` label/line/box/table fixtures | Object creation bar, update behavior, z-order, and text/color fidelity. |
+| Strategies | `engine.test.ts` and strategy compat fixtures | Entry/exit bar alignment, fills, position sizing, and ledger values. |
+
+Manual notes should stay short and link to the issue or PR where the comparison
+was performed. If a comparison exposes behavior that can be checked
+deterministically, add a reduced fixture instead of expanding this section.

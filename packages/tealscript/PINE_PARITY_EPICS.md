@@ -446,6 +446,8 @@ Phases:
    reductions, and expected-output policy are tracked in
    `tests/compat/PINE_CHECKPOINTS.md`.
 4. Add manual comparison notes for milestone scripts where visual parity matters.
+   `tests/compat/PINE_CHECKPOINTS.md` now defines the manual visual comparison
+   checklist and milestone areas.
 5. Keep large public scripts out of the repo unless licensing is explicit;
    preserve only reduced semantic fixtures.
 
