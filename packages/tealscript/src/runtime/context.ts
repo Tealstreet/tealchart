@@ -367,6 +367,7 @@ export class ExecutionContext {
   indicatorTimeframe?: string;
   indicatorTimeframeGaps?: boolean;
   indicatorExplicitPlotZOrder?: boolean;
+  indicatorBehindChart?: boolean;
   indicatorCalcBarsCount?: number;
   indicatorMaxBarsBack?: number;
 
@@ -976,6 +977,7 @@ export class ExecutionContext {
     this.indicatorTimeframe = undefined;
     this.indicatorTimeframeGaps = undefined;
     this.indicatorExplicitPlotZOrder = undefined;
+    this.indicatorBehindChart = undefined;
     this.indicatorCalcBarsCount = undefined;
     this.indicatorMaxBarsBack = undefined;
     this.strategyLedger = createStrategyLedger();

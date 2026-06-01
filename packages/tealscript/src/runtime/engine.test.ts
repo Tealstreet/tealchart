@@ -1418,6 +1418,7 @@ indicator(
   timeframe="15",
   timeframe_gaps=false,
   explicit_plot_zorder=true,
+  behind_chart=false,
   max_labels_count=2,
   max_lines_count=3,
   max_boxes_count=4,
@@ -1435,6 +1436,7 @@ plot(close)`;
       expect(result.indicatorTimeframe).toBe('15');
       expect(result.indicatorTimeframeGaps).toBe(false);
       expect(result.indicatorExplicitPlotZOrder).toBe(true);
+      expect(result.indicatorBehindChart).toBe(false);
       expect(result.indicatorCalcBarsCount).toBe(250);
       expect(result.indicatorDynamicRequests).toBe(false);
       expect(result.indicatorDrawingLimits).toEqual({

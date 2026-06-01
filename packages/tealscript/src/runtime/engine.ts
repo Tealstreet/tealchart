@@ -183,6 +183,7 @@ export interface ExecutionResult {
   indicatorTimeframe?: string;
   indicatorTimeframeGaps?: boolean;
   indicatorExplicitPlotZOrder?: boolean;
+  indicatorBehindChart?: boolean;
   indicatorCalcBarsCount?: number;
   indicatorMaxBarsBack?: number;
   indicatorDynamicRequests: boolean;
@@ -400,6 +401,7 @@ export class TealscriptEngine {
       indicatorTimeframe: this.ctx.indicatorTimeframe,
       indicatorTimeframeGaps: this.ctx.indicatorTimeframeGaps,
       indicatorExplicitPlotZOrder: this.ctx.indicatorExplicitPlotZOrder,
+      indicatorBehindChart: this.ctx.indicatorBehindChart,
       indicatorCalcBarsCount: this.ctx.indicatorCalcBarsCount,
       indicatorMaxBarsBack: this.ctx.indicatorMaxBarsBack,
       indicatorDynamicRequests: this.indicatorDynamicRequests,
@@ -642,6 +644,9 @@ export class TealscriptEngine {
     }
     if (stmt.explicit_plot_zorder) {
       this.ctx.indicatorExplicitPlotZOrder = this.isTruthy(this.evaluateExpression(stmt.explicit_plot_zorder));
+    }
+    if (stmt.behind_chart) {
+      this.ctx.indicatorBehindChart = this.isTruthy(this.evaluateExpression(stmt.behind_chart));
     }
     if (stmt.calc_bars_count) {
       this.ctx.indicatorCalcBarsCount = this.normalizeNonNegativeInteger(
