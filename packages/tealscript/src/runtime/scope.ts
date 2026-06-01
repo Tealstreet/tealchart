@@ -291,7 +291,7 @@ export class Scope {
 
     // Rollback all series
     for (const entry of this.variables.values()) {
-      if (entry.series) {
+      if (entry.kind !== 'varip' && entry.series) {
         entry.series.rollback();
       }
     }
@@ -334,6 +334,9 @@ export class Scope {
     for (const [name, snap] of snapshot.variables) {
       const entry = this.variables.get(name);
       if (entry) {
+        if (entry.kind === 'varip') {
+          continue;
+        }
         entry.value = cloneSnapshotValue(snap.value, cloneContext);
         entry.initialized = snap.initialized;
         if (entry.series && snap.seriesSnapshot) {
