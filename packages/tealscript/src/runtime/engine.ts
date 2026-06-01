@@ -4200,6 +4200,13 @@ export class TealscriptEngine {
     this.builtins.set('barmerge.gaps_on', () => 'barmerge.gaps_on');
     this.builtins.set('barmerge.lookahead_off', () => 'barmerge.lookahead_off');
     this.builtins.set('barmerge.lookahead_on', () => 'barmerge.lookahead_on');
+    this.builtins.set('dividends.gross', () => 'dividends.gross');
+    this.builtins.set('dividends.net', () => 'dividends.net');
+    this.builtins.set('earnings.actual', () => 'earnings.actual');
+    this.builtins.set('earnings.estimate', () => 'earnings.estimate');
+    this.builtins.set('earnings.standardized', () => 'earnings.standardized');
+    this.builtins.set('splits.denominator', () => 'splits.denominator');
+    this.builtins.set('splits.numerator', () => 'splits.numerator');
   }
 
   private registerLogBuiltins(): void {

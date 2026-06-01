@@ -108,7 +108,10 @@ export {
   type StrategyTrade,
   // Request datafeed
   InMemoryRequestDatafeed,
+  corporateActionRequestKey,
   currencyRateRequestKey,
+  economicRequestKey,
+  financialRequestKey,
   requestDatafeedKey,
   requestSeriesKey,
   type RequestDataContext,

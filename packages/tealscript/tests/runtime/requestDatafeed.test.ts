@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  corporateActionRequestKey,
   currencyRateRequestKey,
+  economicRequestKey,
+  financialRequestKey,
   InMemoryRequestDatafeed,
   requestDatafeedKey,
   requestSeriesKey,
@@ -19,6 +22,9 @@ describe('request datafeed contract', () => {
   it('builds stable symbol/timeframe keys', () => {
     expect(requestDatafeedKey('BINANCE:BTCUSDT', '1D')).toBe('BINANCE:BTCUSDT\u00001D');
     expect(requestSeriesKey('currency_rate', currencyRateRequestKey('USD', 'GBP'))).toBe('currency_rate\u0000USD\u0000GBP');
+    expect(requestSeriesKey('dividends', corporateActionRequestKey('NASDAQ:AAPL', 'dividends.gross', 'USD'))).toBe('dividends\u0000NASDAQ:AAPL\u0000dividends.gross\u0000USD');
+    expect(requestSeriesKey('financial', financialRequestKey('NASDAQ:AAPL', 'TOTAL_REVENUE', 'FQ'))).toBe('financial\u0000NASDAQ:AAPL\u0000TOTAL_REVENUE\u0000FQ\u0000');
+    expect(requestSeriesKey('economic', economicRequestKey('US', 'GDP'))).toBe('economic\u0000US\u0000GDP');
   });
 
   it('returns cloned bars for deterministic request fixtures', () => {
