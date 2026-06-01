@@ -71,8 +71,8 @@ upColor = color.silver
 downColor = color.blue
 bodyColor = c >= o ? upColor : downColor
 wickColor = color.new(bodyColor, 70)
-plotcandle(o, h, l, c, title="Custom candles", color=bodyColor, wickcolor=wickColor, bordercolor=bodyColor, editable=true, show_last=5, display=display.price_scale)
-plotbar(o, h + 1, l - 1, c, "Custom bars", bodyColor, false, 6, display.none)
+plotcandle(o, h, l, c, title="Custom candles", color=bodyColor, wickcolor=wickColor, bordercolor=bodyColor, editable=true, show_last=5, display=display.price_scale, format=format.price, precision=2, force_overlay=true)
+plotbar(o, h + 1, l - 1, c, "Custom bars", bodyColor, false, 6, display.none, format.volume, 0, true)
 `);
 
     expect(result.errors).toEqual([]);
@@ -113,6 +113,9 @@ plotbar(o, h + 1, l - 1, c, "Custom bars", bodyColor, false, 6, display.none)
     expect(candles.editable).toBe(true);
     expect(candles.showLast).toBe(5);
     expect(candles.display).toBe(8);
+    expect(candles.format).toBe('price');
+    expect(candles.precision).toBe(2);
+    expect(candles.forceOverlay).toBe(true);
 
     const bars = getPlot(result, 'Custom bars');
     expect(bars.type).toBe('plotbar');
@@ -122,12 +125,15 @@ plotbar(o, h + 1, l - 1, c, "Custom bars", bodyColor, false, 6, display.none)
     expect(bars.editable).toBe(false);
     expect(bars.showLast).toBe(6);
     expect(bars.display).toBe(0);
+    expect(bars.format).toBe('volume');
+    expect(bars.precision).toBe(0);
+    expect(bars.forceOverlay).toBe(true);
   });
 
   it('captures background and bar color visual parameters', () => {
     const result = runCompatScript(`
 indicator("Bar background smoke", overlay=true)
-bgcolor(bar_index == 0 ? color.blue : na, 1, false, 4, "Session", true)
+bgcolor(bar_index == 0 ? color.blue : na, 1, false, 4, "Session", display.price_scale, force_overlay=true)
 barcolor(bar_index == 0 ? color.red : na, 1, true, 5, "Bar Tint", display.none)
 `);
 
@@ -139,6 +145,7 @@ barcolor(bar_index == 0 ? color.red : na, 1, true, 5, "Bar Tint", display.none)
     expect(background.offset).toBe(1);
     expect(background.editable).toBe(false);
     expect(background.showLast).toBe(4);
+    expect(background.display).toBe(8);
     expect(background.forceOverlay).toBe(true);
 
     const barTint = getPlot(result, 'Bar Tint');
@@ -156,7 +163,7 @@ indicator("Visual constants smoke", overlay=true, format=format.price, scale=sca
 displayTarget = display.all - display.status_line
 formatMatches = format.price == "price" and format.volume == "volume" and format.percent == "percent" and format.inherit == "inherit"
 scaleMatches = scale.right == "right" and scale.left == "left" and scale.none == "none"
-plot(close, title="Break Line", style=plot.style_linebr, display=displayTarget)
+plot(close, title="Break Line", style=plot.style_linebr, display=displayTarget, linestyle=plot.linestyle_dashed)
 plot(open, title="Step Diamonds", style=plot.style_stepline_diamond, display=display.none)
 plot(high, title="Columns", style=plot.style_columns, histbase=100, trackprice=true, show_last=5)
 plot(low, "Positional Area", color.red, 3, plot.style_area, true, 90, -1, true, false, 4, display.price_scale, format.volume, 0, true)
@@ -177,6 +184,7 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
     const solidPositional = getPlot(result, 'Solid Positional');
 
     expect(breakLine.style).toBe('linebr');
+    expect(breakLine.lineStyle).toBe('dashed');
     expect(breakLine.display).toBe(11);
     expect(stepDiamonds.style).toBe('stepline_diamond');
     expect(stepDiamonds.display).toBe(0);
@@ -275,9 +283,9 @@ fill(topLine, bottomLine, color.new(color.blue, 90), "Range Fill", true, 4, true
   it('captures Pine marker visual parameters', () => {
     const result = runCompatScript(`
 indicator("Marker visuals smoke", overlay=true)
-plotshape(close > open, "Long", shape.triangleup, location.belowbar, color.green, 1, "L", color.white, false, size.large, 5, display.price_scale)
-plotchar(close < open, "Down Char", "D", location.abovebar, color.red, -1, "Down", color.yellow, true, size.small, 6, display.none)
-plotarrow(close - open, "Move Arrow", color.green, color.red, 0, 5, 20, false, 7, display.all)
+plotshape(close > open, "Long", shape.triangleup, location.belowbar, color.green, 1, "L", color.white, false, size.large, 5, display.price_scale, format.price, 2, true)
+plotchar(close < open, "Down Char", "D", location.abovebar, color.red, -1, "Down", color.yellow, true, size.small, 6, display.none, format.volume, 0, true)
+plotarrow(close - open, "Move Arrow", color.new(color.green, 50), color.new(color.red, 50), 0, 5, 20, false, 7, display.all, format.price, 2, true)
 `);
 
     expect(result.errors).toEqual([]);
@@ -292,6 +300,9 @@ plotarrow(close - open, "Move Arrow", color.green, color.red, 0, 5, 20, false, 7
       editable: false,
       showLast: 5,
       display: 8,
+      format: 'price',
+      precision: 2,
+      forceOverlay: true,
     });
     expect(getPlot(result, 'Down Char')).toMatchObject({
       type: 'plotchar',
@@ -304,17 +315,23 @@ plotarrow(close - open, "Move Arrow", color.green, color.red, 0, 5, 20, false, 7
       editable: true,
       showLast: 6,
       display: 0,
+      format: 'volume',
+      precision: 0,
+      forceOverlay: true,
     });
     expect(getPlot(result, 'Move Arrow')).toMatchObject({
       type: 'plotarrow',
-      colorup: '#4CAF50',
-      colordown: '#F44336',
+      colorup: '#4CAF5080',
+      colordown: '#F4433680',
       offset: 0,
       minHeight: 5,
       maxHeight: 20,
       editable: false,
       showLast: 7,
       display: 15,
+      format: 'price',
+      precision: 2,
+      forceOverlay: true,
     });
   });
 
