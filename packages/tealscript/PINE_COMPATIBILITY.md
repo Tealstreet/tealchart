@@ -130,6 +130,9 @@ definitions.
 
 ## Common `array.*` Coverage
 
+See `PINE_ARRAY_REFERENCE_INVENTORY.md` for the detailed local implementation
+inventory and remaining array audit items.
+
 Semantic analysis preserves array element types from `array.new<T>()` and
 common typed constructors such as `array.new_float()` and `array.new_label()`,
 which keeps downstream diagnostics aligned with Pine's constructor templates.
