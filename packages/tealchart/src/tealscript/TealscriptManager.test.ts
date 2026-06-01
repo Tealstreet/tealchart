@@ -194,6 +194,60 @@ describe('TealscriptManager', () => {
     expect(errors).toHaveLength(0);
   });
 
+  it('surfaces semantic worker diagnostics as semantic errors', async () => {
+    const worker = new FakeWorker();
+    const errors: Array<{ scriptId: string; error: WorkerError }> = [];
+
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      onError: (scriptId, error) => errors.push({ scriptId, error }),
+    });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")');
+    worker.emit({ type: 'ready' });
+    await addScript;
+
+    const [initMessage] = worker.messages as PostedWorkerMessage[];
+    worker.emit({
+      type: 'semanticError',
+      scriptId: 'study-1',
+      message: 'Unknown identifier: missing',
+      diagnostics: [
+        {
+          code: 'unknown-identifier',
+          message: 'Unknown identifier: missing',
+          severity: 'error',
+          line: 3,
+          column: 7,
+        },
+      ],
+      line: 3,
+      column: 7,
+      metadata: initMessage?.metadata,
+    });
+
+    expect(errors).toEqual([
+      {
+        scriptId: 'study-1',
+        error: {
+          type: 'semantic',
+          message: 'Unknown identifier: missing',
+          line: 3,
+          column: 7,
+          diagnostics: [
+            {
+              code: 'unknown-identifier',
+              message: 'Unknown identifier: missing',
+              severity: 'error',
+              line: 3,
+              column: 7,
+            },
+          ],
+        },
+      },
+    ]);
+  });
+
   it('restarts workers on full bar replacements and ignores stale callbacks', async () => {
     const workers: FakeWorker[] = [];
     const plotUpdates: PlotOutput[][] = [];

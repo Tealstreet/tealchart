@@ -155,7 +155,9 @@ Phases:
 5. Add type templates such as `array<float>`, `matrix<int>`, and
    `map<string, float>`. The semantic checker now validates collection
    template arguments and rejects qualifier keywords in template positions.
-6. Surface diagnostics through the worker/editor path.
+6. Surface diagnostics through the worker/editor path. Worker initialization now
+   runs the semantic checker and emits structured semantic errors with the full
+   diagnostic list before runtime execution.
 
 Done means TealScript can reject invalid Pine-like code before runtime and can
 use type information to disambiguate built-ins.

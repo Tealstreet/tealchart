@@ -6,6 +6,7 @@
  */
 
 import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition, LogOutput } from '../runtime/context';
+import type { SemanticDiagnostic } from '../semantic';
 import { getResultOutput } from './protocol';
 import type {
   ToWorkerMessage,
@@ -13,6 +14,7 @@ import type {
   ResultMessage,
   ErrorMessage,
   ParseErrorMessage,
+  SemanticErrorMessage,
   WorkerOutputMetadata,
 } from './protocol';
 
@@ -31,10 +33,11 @@ export interface WorkerResult {
  * Error from script execution
  */
 export interface WorkerError {
-  type: 'parse' | 'runtime';
+  type: 'parse' | 'semantic' | 'runtime';
   message: string;
   line?: number;
   column?: number;
+  diagnostics?: SemanticDiagnostic[];
 }
 
 /**
@@ -181,6 +184,10 @@ export class TealscriptWorker {
       case 'parseError':
         this.handleParseError(message);
         break;
+
+      case 'semanticError':
+        this.handleSemanticError(message);
+        break;
     }
   }
 
@@ -222,6 +229,22 @@ export class TealscriptWorker {
       message: message.message,
       line: message.line,
       column: message.column,
+    });
+  }
+
+  /**
+   * Handle semantic checker error
+   */
+  private handleSemanticError(message: SemanticErrorMessage): void {
+    if (this.isStaleError(message.metadata)) {
+      return;
+    }
+    this.onError?.({
+      type: 'semantic',
+      message: message.message,
+      line: message.line,
+      column: message.column,
+      diagnostics: message.diagnostics,
     });
   }
 

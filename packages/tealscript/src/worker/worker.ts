@@ -9,10 +9,18 @@
 
 import { parse, TealscriptParseError } from '../parser';
 import { TealscriptEngine } from '../runtime/engine';
+import { checkProgram } from '../semantic';
 import type { Program } from '../parser/ast';
 import type { Bar, InputDefinition } from '../runtime/context';
 import { createResultMessage } from './protocol';
-import type { ToWorkerMessage, FromWorkerMessage, WorkerOutputMetadata, ErrorMessage, ParseErrorMessage } from './protocol';
+import type {
+  ToWorkerMessage,
+  FromWorkerMessage,
+  WorkerOutputMetadata,
+  ErrorMessage,
+  ParseErrorMessage,
+  SemanticErrorMessage,
+} from './protocol';
 
 /**
  * Worker state for a single script
@@ -87,6 +95,21 @@ function handleInit(
   try {
     // Parse the script
     const ast = parse(script);
+    const semanticResult = checkProgram(ast);
+    const firstDiagnostic = semanticResult.diagnostics[0];
+    if (firstDiagnostic) {
+      const semanticError: SemanticErrorMessage = {
+        type: 'semanticError',
+        scriptId,
+        message: formatSemanticError(semanticResult.diagnostics),
+        diagnostics: semanticResult.diagnostics,
+        line: firstDiagnostic.line,
+        column: firstDiagnostic.column,
+        metadata,
+      };
+      postResult(semanticError);
+      return;
+    }
 
     // Create engine
     const engine = new TealscriptEngine();
@@ -118,6 +141,14 @@ function handleInit(
       throw error;
     }
   }
+}
+
+function formatSemanticError(diagnostics: SemanticErrorMessage['diagnostics']): string {
+  return diagnostics.map((diagnostic) => {
+    const column = diagnostic.column ? `:${diagnostic.column}` : '';
+    const location = diagnostic.line ? `line ${diagnostic.line}${column}: ` : '';
+    return `${location}${diagnostic.message}`;
+  }).join('\n');
 }
 
 /**

@@ -5,6 +5,7 @@
  */
 
 import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition, LogOutput } from '../runtime/context';
+import type { SemanticDiagnostic } from '../semantic';
 
 /**
  * Messages sent from main thread to worker
@@ -69,6 +70,7 @@ export type FromWorkerMessage =
   | ReadyMessage
   | ResultMessage
   | ErrorMessage
+  | SemanticErrorMessage
   | ParseErrorMessage;
 
 /**
@@ -170,6 +172,19 @@ export interface ErrorMessage {
   type: 'error';
   scriptId: string;
   message: string;
+  line?: number;
+  column?: number;
+  metadata?: WorkerOutputMetadata;
+}
+
+/**
+ * Semantic checker error in script
+ */
+export interface SemanticErrorMessage {
+  type: 'semanticError';
+  scriptId: string;
+  message: string;
+  diagnostics: SemanticDiagnostic[];
   line?: number;
   column?: number;
   metadata?: WorkerOutputMetadata;
