@@ -441,6 +441,10 @@ Phases:
    binary.
 3. Implement `map.*` with key/value typing, insertion, lookup, removal, keys,
    values, copy, and iteration.
+   Runtime and compatibility coverage now includes the map MVP: constructors,
+   mutation, lookup, keys/values arrays, copy/put_all, key-value loops, value-key
+   validation, and capacity checks. Remaining work is exact type-template
+   enforcement and diagnostics.
 4. Implement user-defined types (`type`), fields, constructors, methods, and
    reference semantics.
 5. Implement method declarations and method dispatch beyond array method sugar.
