@@ -484,8 +484,6 @@ values.sort(0, order.ascending, simpleField)
 values.sort(0, order.ascending, seriesIndex)
 values.sort(0, order.ascending, unqualifiedField)
 values.sort(0, order.ascending, true)
-arrayValues = array.new_float()
-arrayValues.sort(order.ascending, inputField)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -494,6 +492,42 @@ arrayValues.sort(order.ascending, inputField)
       'matrix.sort() sort_field requires const int or const string, got series int',
       'matrix.sort() sort_field requires const int or const string, got unqualified int',
       'matrix.sort() sort_field must be a const int or const string, got bool',
+    ]);
+  });
+
+  it('validates array sort_field const int and string requirements', () => {
+    const result = checkProgram(parse(`
+indicator("Array Sort Field Types")
+type Ranked
+    float score
+    string name
+values = array.new<Ranked>()
+const string scoreField = "score"
+const int nameField = 1
+array.sort(values, order.ascending, scoreField)
+values.sort(order.descending, nameField)
+values.sort(order.ascending, "score")
+array.sort(values, order.ascending, 1)
+inputField = input.string("score")
+simple string simpleField = "score"
+seriesIndex = bar_index
+int unqualifiedField = 1
+array.sort(values, order.ascending, inputField)
+values.sort(order.ascending, simpleField)
+values.sort(order.ascending, seriesIndex)
+values.sort(order.ascending, unqualifiedField)
+values.sort(order.ascending, true)
+matrixValues = matrix.new<float>()
+matrixValues.sort(0, order.ascending, inputField)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'array.sort() sort_field requires const int or const string, got input unknown',
+      'array.sort() sort_field requires const int or const string, got simple string',
+      'array.sort() sort_field requires const int or const string, got series int',
+      'array.sort() sort_field requires const int or const string, got unqualified int',
+      'array.sort() sort_field must be a const int or const string, got bool',
+      'matrix.sort() sort_field requires const int or const string, got input unknown',
     ]);
   });
 

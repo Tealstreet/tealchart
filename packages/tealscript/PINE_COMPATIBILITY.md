@@ -138,6 +138,8 @@ common typed constructors such as `array.new_float()` and `array.new_label()`,
 which keeps downstream diagnostics aligned with Pine's constructor templates.
 Known mutable arrays report conservative element-type mismatches for common
 mutation helpers such as `push`, `unshift`, `set`, `insert`, and `fill`.
+`array.sort()` supports UDT arrays sorted by const int/string `sort_field`
+arguments, with matching semantic diagnostics for non-const sort fields.
 Array-returning helpers preserve useful element types for follow-on checks,
 including `copy`, `slice`, `concat`, `abs`, `standardize`, and `sort_indices`.
 Known `concat` calls report conservative source-array element mismatches while

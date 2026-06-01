@@ -422,6 +422,8 @@ Phases:
 
 1. Finish array parity: sorting, slicing, joining, reversing, binary search,
    percentiles, standardization, covariance helpers, and edge cases.
+   Runtime coverage now includes `array.sort()` UDT sorting by `sort_field`
+   field name or index, with semantic const int/string diagnostics.
 2. Implement `matrix.*` with typed storage, arithmetic/stat helpers, row/column
    access, copy/reshape behavior, and tests.
    Runtime coverage now includes `matrix.sum()` and `matrix.diff()` for

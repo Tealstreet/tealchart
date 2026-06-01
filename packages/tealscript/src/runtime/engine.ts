@@ -5638,7 +5638,7 @@ export class TealscriptEngine {
     this.builtins.set('array.insert', (args) => insertArrayValue(readMutableArray(args[0]), args[1] as number, args[2]));
     this.builtins.set('array.remove', (args) => removeArrayValue(readMutableArray(args[0]), args[1] as number));
     this.builtins.set('array.sort', (args, namedArgs) => {
-      sortArray(readMutableArray(args[0]), namedArgs.get('order') ?? args[1]);
+      sortArray(readMutableArray(args[0]), namedArgs.get('order') ?? args[1], namedArgs.get('sort_field') ?? args[2]);
       return null;
     });
     this.builtins.set('array.sort_indices', (args, namedArgs) => sortIndicesArrayValue(

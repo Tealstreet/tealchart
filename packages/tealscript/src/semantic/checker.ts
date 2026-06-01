@@ -1003,6 +1003,7 @@ class SemanticChecker {
     this.checkMatrixConstructorTypeArguments(expression);
     this.checkMapConstructorTypeArguments(expression);
     this.checkArrayCallTypes(expression, scope);
+    this.checkArraySortFieldType(expression, scope);
     this.checkMatrixCallTypes(expression, scope);
     this.checkMatrixSortFieldType(expression, scope);
     this.checkMapCallTypes(expression, scope);
@@ -1212,11 +1213,22 @@ class SemanticChecker {
     const sortFieldArgument = this.resolveMatrixSortFieldArgument(expression, scope);
     if (!sortFieldArgument) return;
 
+    this.checkSortFieldType(sortFieldArgument, scope, 'matrix.sort');
+  }
+
+  private checkArraySortFieldType(expression: CallExpression, scope: SemanticScope): void {
+    const sortFieldArgument = this.resolveArraySortFieldArgument(expression, scope);
+    if (!sortFieldArgument) return;
+
+    this.checkSortFieldType(sortFieldArgument, scope, 'array.sort');
+  }
+
+  private checkSortFieldType(sortFieldArgument: Expression, scope: SemanticScope, displayName: string): void {
     const sortFieldType = this.inferExpressionType(sortFieldArgument, scope);
     if (sortFieldType.kind !== 'unknown' && sortFieldType.kind !== 'int' && sortFieldType.kind !== 'string') {
       this.addDiagnostic(
         'type-mismatch',
-        `matrix.sort() sort_field must be a const int or const string, got ${sortFieldType.kind}`,
+        `${displayName}() sort_field must be a const int or const string, got ${sortFieldType.kind}`,
         sortFieldArgument.loc,
       );
       return;
@@ -1226,7 +1238,7 @@ class SemanticChecker {
       const qualifierLabel = sortFieldType.qualifier ?? 'unqualified';
       this.addDiagnostic(
         'qualifier-mismatch',
-        `matrix.sort() sort_field requires const int or const string, got ${qualifierLabel} ${sortFieldType.kind}`,
+        `${displayName}() sort_field requires const int or const string, got ${qualifierLabel} ${sortFieldType.kind}`,
         sortFieldArgument.loc,
       );
     }
@@ -1323,6 +1335,18 @@ class SemanticChecker {
     if (receiverType.kind !== 'matrix') return undefined;
 
     return this.getCallArgument(expression.arguments, 'sort_field', 2);
+  }
+
+  private resolveArraySortFieldArgument(expression: CallExpression, scope: SemanticScope): Expression | undefined {
+    if (expression.callee.type !== 'MemberExpression' || expression.callee.property.name !== 'sort') return undefined;
+
+    const isNamespaceCall = expression.callee.object.type === 'Identifier' && expression.callee.object.name === 'array';
+    if (isNamespaceCall) return this.getCallArgument(expression.arguments, 'sort_field', 2);
+
+    const receiverType = this.inferExpressionType(expression.callee.object, scope);
+    if (receiverType.kind !== 'array') return undefined;
+
+    return this.getCallArgument(expression.arguments, 'sort_field', 1);
   }
 
   private checkMapConstructorTypeArguments(expression: CallExpression): void {

@@ -1,3 +1,5 @@
+import { getUdtField, isPineUdtObject, type PineUdtObject } from './objects';
+
 export interface PineArray<T = unknown> {
   readonly __tealscriptArray: true;
   values: T[];
@@ -180,19 +182,13 @@ export function removeArrayValue<T = unknown>(array: PineArray<T>, index: number
   return array.values.splice(normalizedIndex, 1)[0];
 }
 
-export function sortArray(array: PineArray, order: unknown = 'ascending'): void {
+export function sortArray(array: PineArray, order: unknown = 'ascending', sortField?: unknown): void {
   const descending = order === 'descending';
   const values = getArrayValues(array);
   values.sort((left, right) => {
-    const leftMissing = left === '' || (typeof left === 'number' && Number.isNaN(left));
-    const rightMissing = right === '' || (typeof right === 'number' && Number.isNaN(right));
-
-    if (leftMissing || rightMissing) {
-      if (leftMissing && rightMissing) return 0;
-      return leftMissing === descending ? -1 : 1;
-    }
-
-    const result = typeof left === 'number' && typeof right === 'number' ? left - right : compareStrings(String(left), String(right));
+    const leftValue = comparableArraySortValue(left, sortField);
+    const rightValue = comparableArraySortValue(right, sortField);
+    const result = compareArrayValues(leftValue, rightValue);
     return descending ? -result : result;
   });
   values.forEach((value, index) => setArrayValue(array, index, value));
@@ -276,6 +272,28 @@ function compareArrayValues(left: unknown, right: unknown): number {
     return left - right;
   }
   return compareStrings(String(left), String(right));
+}
+
+function comparableArraySortValue(value: unknown, sortField: unknown): unknown {
+  if (sortField === undefined) return value;
+  if (!isPineUdtObject(value)) {
+    throw new Error('Array sort_field requires user-defined type values');
+  }
+  if (typeof sortField === 'string') {
+    return getUdtField(value, sortField);
+  }
+  if (typeof sortField === 'number') {
+    return getUdtFieldByIndex(value, sortField);
+  }
+  throw new Error('Array sort_field must be a field name or field index');
+}
+
+function getUdtFieldByIndex(object: PineUdtObject, fieldIndex: number): unknown {
+  const normalizedIndex = Math.trunc(Number(fieldIndex));
+  if (!Number.isFinite(normalizedIndex) || normalizedIndex < 0 || normalizedIndex >= object.fields.size) {
+    throw new Error(`Array sort_field index ${normalizedIndex} is out of bounds for type ${object.typeName}`);
+  }
+  return Array.from(object.fields.values())[normalizedIndex];
 }
 
 export function absArrayValue(array: PineArray): PineArray<number> {
