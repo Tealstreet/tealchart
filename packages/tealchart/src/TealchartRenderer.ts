@@ -2511,7 +2511,8 @@ export class TealchartRenderer {
       huge: 16,
       auto: 8,
     };
-    const markerSize = sizeMap[size || 'small'] || 6;
+    const baseMarkerSize = sizeMap[size || 'small'] || 6;
+    const arrowMaxMagnitude = plot.type === 'plotarrow' ? this.getVisiblePlotArrowMaxMagnitude(plot, bars, viewport) : 0;
 
     for (let i = 0; i < bars.length && i < values.length; i++) {
       const bar = bars[i];
@@ -2528,6 +2529,15 @@ export class TealchartRenderer {
       if (value === null || value === undefined) {
         continue;
       }
+
+      if (plot.type === 'plotarrow' && (typeof value !== 'number' || !Number.isFinite(value) || value === 0)) {
+        continue;
+      }
+
+      const markerSize =
+        plot.type === 'plotarrow'
+          ? this.getPlotArrowMarkerSize(plot, Math.abs(value as number), arrowMaxMagnitude, baseMarkerSize)
+          : baseMarkerSize;
 
       const x = this.timeToX(plotTime, viewport, chartWidth);
       const effectiveLocation =
@@ -2582,6 +2592,30 @@ export class TealchartRenderer {
         ctx.fillText(plot.text, x, effectiveLocation === 'belowbar' ? y + markerSize : y - markerSize);
       }
     }
+  }
+
+  private getVisiblePlotArrowMaxMagnitude(plot: PlotOutput, bars: Bar[], viewport: Viewport): number {
+    let maxMagnitude = 0;
+
+    for (let i = 0; i < bars.length && i < plot.values.length; i++) {
+      if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
+      const plotTime = this.getPlotTime(plot, bars, i);
+      if (plotTime < viewport.startTime || plotTime > viewport.endTime) continue;
+
+      const value = plot.values[i];
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        maxMagnitude = Math.max(maxMagnitude, Math.abs(value));
+      }
+    }
+
+    return maxMagnitude;
+  }
+
+  private getPlotArrowMarkerSize(plot: PlotOutput, magnitude: number, maxMagnitude: number, fallbackSize: number): number {
+    const minHeight = Number.isFinite(plot.minHeight) ? Math.max(1, plot.minHeight!) : fallbackSize;
+    const maxHeight = Number.isFinite(plot.maxHeight) ? Math.max(minHeight, plot.maxHeight!) : Math.max(minHeight, fallbackSize);
+    if (maxMagnitude <= 0 || maxHeight === minHeight) return minHeight;
+    return minHeight + (magnitude / maxMagnitude) * (maxHeight - minHeight);
   }
 
   /**

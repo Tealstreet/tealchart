@@ -358,7 +358,8 @@ Phases:
 4. Finish `plotshape`, `plotchar`, and `plotarrow` text, location, size,
    offset, display, and color behavior. Initial parity work now captures
    runtime metadata for common marker parameters and normalizes `plotarrow`
-   colors through the shared color pipeline.
+   colors through the shared color pipeline. Renderer coverage now applies
+   `plotarrow` min/max height scaling and zero-value suppression.
 5. Finish `bgcolor`, `barcolor`, `plotbar`, and `plotcandle` edge cases.
    Initial parity work now captures `bgcolor()` display and force-overlay
    metadata plus OHLC `format`, `precision`, and `force_overlay` metadata.

@@ -302,6 +302,9 @@ display hiding, and pane-coordinate behavior for the current output shape.
 Fill renderer coverage applies `show_last` windows to filled regions while
 preserving existing gap handling, per-bar fill colors, display hiding, and
 plot/hline handle fills.
+
+Plotarrow renderer coverage scales arrows between Pine `minheight` and
+`maxheight` using the visible series magnitude and suppresses zero-value arrows.
 The same renderer bar-window handling now applies to common `plot()`,
 `bgcolor()`, `barcolor()`, `plotbar()`, `plotcandle()`, `plotshape()`,
 `plotchar()`, and `plotarrow()` outputs.
