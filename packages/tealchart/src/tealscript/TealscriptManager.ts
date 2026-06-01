@@ -26,9 +26,11 @@ interface ManagedScript {
   id: string;
   code: string;
   worker: TealscriptWorker;
+  workerGeneration: number;
   plots: PlotOutput[];
   drawings: DrawingOutput[];
   inputs: InputDefinition[];
+  inputValues: Record<string, unknown>;
   isReady: boolean;
   isVisible: boolean;
   error?: WorkerError;
@@ -249,24 +251,19 @@ export class TealscriptManager {
       this.removeScript(scriptId);
     }
 
-    // Create a new worker using the factory
-    const rawWorker = this.options.createWorker();
-
-    // Create wrapper with callbacks
-    const worker = new TealscriptWorkerWrapper(rawWorker, {
-      onResult: (result) => this.handleResult(scriptId, result),
-      onError: (error) => this.handleError(scriptId, error),
-      onReady: () => this.handleReady(scriptId),
-    });
+    const workerGeneration = 1;
+    const worker = this.createScriptWorker(scriptId, workerGeneration);
 
     // Store managed script state
     const managedScript: ManagedScript = {
       id: scriptId,
       code,
       worker: worker as unknown as TealscriptWorker,
+      workerGeneration,
       plots: [],
       drawings: [],
       inputs: [],
+      inputValues: { ...inputs },
       isReady: false,
       isVisible: true,
     };
@@ -295,10 +292,10 @@ export class TealscriptManager {
   setBars(bars: Bar[]): void {
     this.bars = bars;
 
-    // Update all workers
+    // Restart all workers so expensive stale full recalculations are cancelled.
     for (const script of this.scripts.values()) {
       if (script.isReady) {
-        script.worker.updateBars(bars);
+        this.restartScriptWorker(script);
       }
     }
   }
@@ -334,8 +331,11 @@ export class TealscriptManager {
    */
   setInputs(scriptId: string, inputs: Record<string, unknown>): void {
     const script = this.scripts.get(scriptId);
-    if (script && script.isReady) {
-      script.worker.setInputs(inputs);
+    if (script) {
+      script.inputValues = { ...inputs };
+      if (script.isReady) {
+        this.restartScriptWorker(script);
+      }
     }
   }
 
@@ -459,8 +459,38 @@ export class TealscriptManager {
   // Private handlers
   // =========================================================================
 
-  private handleResult(scriptId: string, result: WorkerResult): void {
+  private createScriptWorker(scriptId: string, workerGeneration: number): TealscriptWorker {
+    const rawWorker = this.options.createWorker();
+    return new TealscriptWorkerWrapper(rawWorker, {
+      onResult: (result) => this.handleResult(scriptId, workerGeneration, result),
+      onError: (error) => this.handleError(scriptId, workerGeneration, error),
+      onReady: () => this.handleReady(scriptId, workerGeneration),
+    }) as unknown as TealscriptWorker;
+  }
+
+  private restartScriptWorker(script: ManagedScript): void {
+    script.worker.dispose();
+    script.workerGeneration += 1;
+    const workerGeneration = script.workerGeneration;
+    script.worker = this.createScriptWorker(script.id, workerGeneration);
+    script.isReady = false;
+
+    void script.worker.init(script.id, script.code, this.bars, script.inputValues).catch((error: unknown) => {
+      this.handleError(script.id, workerGeneration, {
+        type: 'runtime',
+        message: error instanceof Error ? error.message : String(error),
+      });
+    });
+  }
+
+  private getCurrentScript(scriptId: string, workerGeneration: number): ManagedScript | undefined {
     const script = this.scripts.get(scriptId);
+    if (!script || script.workerGeneration !== workerGeneration) return undefined;
+    return script;
+  }
+
+  private handleResult(scriptId: string, workerGeneration: number, result: WorkerResult): void {
+    const script = this.getCurrentScript(scriptId, workerGeneration);
     if (!script) return;
 
     // Clear any previous error
@@ -481,8 +511,8 @@ export class TealscriptManager {
     this.notifyDrawingsUpdated();
   }
 
-  private handleError(scriptId: string, error: WorkerError): void {
-    const script = this.scripts.get(scriptId);
+  private handleError(scriptId: string, workerGeneration: number, error: WorkerError): void {
+    const script = this.getCurrentScript(scriptId, workerGeneration);
     if (!script) return;
 
     script.error = error;
@@ -494,8 +524,8 @@ export class TealscriptManager {
     this.notifyDrawingsUpdated();
   }
 
-  private handleReady(scriptId: string): void {
-    const script = this.scripts.get(scriptId);
+  private handleReady(scriptId: string, workerGeneration: number): void {
+    const script = this.getCurrentScript(scriptId, workerGeneration);
     if (script) {
       script.isReady = true;
     }

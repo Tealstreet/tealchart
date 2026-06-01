@@ -48,6 +48,12 @@ const bar: Bar = {
   volume: 10,
 };
 
+function flushWorkerInit(): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 0);
+  });
+}
+
 describe('TealscriptManager', () => {
   it('consumes bundled worker results through legacy update callbacks', async () => {
     const worker = new FakeWorker();
@@ -109,11 +115,11 @@ describe('TealscriptManager', () => {
     const addScript = manager.addScript('study-1', 'indicator("T")');
     worker.emit({ type: 'ready' });
     await addScript;
-    manager.setBars([bar]);
+    manager.updateBar(bar);
 
-    const [initMessage, updateBarsMessage] = worker.messages as PostedWorkerMessage[];
+    const [initMessage, updateBarMessage] = worker.messages as PostedWorkerMessage[];
     expect(initMessage?.metadata).toEqual({ generation: 1, requestId: 1 });
-    expect(updateBarsMessage?.metadata).toEqual({ generation: 2, requestId: 2 });
+    expect(updateBarMessage?.metadata).toEqual({ generation: 1, requestId: 2 });
 
     worker.emit(createResultMessage('study-1', {
       plots: [plot],
@@ -149,7 +155,7 @@ describe('TealscriptManager', () => {
       drawings: [],
       alerts: [],
       inputs: [],
-      metadata: updateBarsMessage?.metadata,
+      metadata: updateBarMessage?.metadata,
     }));
 
     expect(plotUpdates).toHaveLength(2);
@@ -168,15 +174,15 @@ describe('TealscriptManager', () => {
     const addScript = manager.addScript('study-1', 'indicator("T")');
     worker.emit({ type: 'ready' });
     await addScript;
-    manager.setBars([bar]);
+    manager.updateBar(bar);
 
-    const [initMessage, updateBarsMessage] = worker.messages as PostedWorkerMessage[];
+    const [initMessage, updateBarMessage] = worker.messages as PostedWorkerMessage[];
     worker.emit(createResultMessage('study-1', {
       plots: [plot],
       drawings: [],
       alerts: [],
       inputs: [],
-      metadata: updateBarsMessage?.metadata,
+      metadata: updateBarMessage?.metadata,
     }));
     worker.emit({
       type: 'error',
@@ -186,5 +192,80 @@ describe('TealscriptManager', () => {
     });
 
     expect(errors).toHaveLength(0);
+  });
+
+  it('restarts workers on full bar replacements and ignores stale callbacks', async () => {
+    const workers: FakeWorker[] = [];
+    const plotUpdates: PlotOutput[][] = [];
+    const createWorker = (): Worker => {
+      const worker = new FakeWorker();
+      workers.push(worker);
+      return worker as unknown as Worker;
+    };
+
+    const manager = new TealscriptManager({
+      createWorker,
+      onPlotsUpdated: (plots) => plotUpdates.push(plots),
+    });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")');
+    workers[0].emit({ type: 'ready' });
+    await addScript;
+
+    manager.setBars([bar]);
+    expect(workers).toHaveLength(2);
+    expect(workers[0].terminated).toBe(true);
+
+    workers[0].emit(createResultMessage('study-1', {
+      plots: [plot],
+      drawings: [],
+      alerts: [],
+      inputs: [],
+      metadata: { generation: 1, requestId: 1 },
+    }));
+    expect(plotUpdates).toHaveLength(0);
+
+    workers[1].emit({ type: 'ready' });
+    await flushWorkerInit();
+
+    const restartInit = workers[1].messages[0] as PostedWorkerMessage & { bars?: Bar[] };
+    expect(restartInit.type).toBe('init');
+    expect(restartInit.bars).toEqual([bar]);
+
+    workers[1].emit(createResultMessage('study-1', {
+      plots: [plot],
+      drawings: [],
+      alerts: [],
+      inputs: [],
+      metadata: restartInit.metadata,
+    }));
+
+    expect(plotUpdates).toEqual([[{ ...plot, scriptId: 'study-1' }]]);
+  });
+
+  it('restarts workers on input changes with the latest values', async () => {
+    const workers: FakeWorker[] = [];
+    const createWorker = (): Worker => {
+      const worker = new FakeWorker();
+      workers.push(worker);
+      return worker as unknown as Worker;
+    };
+
+    const manager = new TealscriptManager({ createWorker });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")', { length: 14 });
+    workers[0].emit({ type: 'ready' });
+    await addScript;
+
+    manager.setInputs('study-1', { length: 21 });
+    expect(workers).toHaveLength(2);
+    expect(workers[0].terminated).toBe(true);
+
+    workers[1].emit({ type: 'ready' });
+    await flushWorkerInit();
+
+    const restartInit = workers[1].messages[0] as PostedWorkerMessage & { inputs?: Record<string, unknown> };
+    expect(restartInit.type).toBe('init');
+    expect(restartInit.inputs).toEqual({ length: 21 });
   });
 });
