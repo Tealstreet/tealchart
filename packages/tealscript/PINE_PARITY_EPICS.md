@@ -436,6 +436,9 @@ Phases:
    Runtime coverage now includes `matrix.kron()` for Kronecker products.
    Runtime coverage now includes `matrix.sort()` row sorting and
    `matrix.submatrix()` copied range extraction.
+   Runtime coverage now includes matrix inspection predicates: zero, identity,
+   diagonal, antidiagonal, symmetric, antisymmetric, triangular, stochastic, and
+   binary.
 3. Implement `map.*` with key/value typing, insertion, lookup, removal, keys,
    values, copy, and iteration.
 4. Implement user-defined types (`type`), fields, constructors, methods, and

@@ -158,7 +158,10 @@ shape and access helpers (`matrix.rows`, `matrix.columns`, `matrix.elements_coun
 helpers (`matrix.fill`, `matrix.reshape`, `matrix.add_row`, `matrix.add_col`,
 `matrix.add_column`, `matrix.remove_row`, `matrix.remove_col`,
 `matrix.remove_column`, `matrix.swap_rows`, `matrix.swap_columns`,
-`matrix.reverse`, `matrix.transpose`), and numeric aggregate helpers
+`matrix.reverse`, `matrix.transpose`), inspection helpers (`matrix.is_zero`,
+`matrix.is_identity`, `matrix.is_diagonal`, `matrix.is_antidiagonal`,
+`matrix.is_symmetric`, `matrix.is_antisymmetric`, `matrix.is_triangular`,
+`matrix.is_stochastic`, `matrix.is_binary`), and numeric aggregate helpers
 (`matrix.avg`, `matrix.min`, `matrix.max`, `matrix.median`, `matrix.mode`).
 Collection operations include row sorting with `matrix.sort()` and copied range
 extraction with `matrix.submatrix()`.
@@ -174,7 +177,8 @@ same runtime built-ins for calls such as
 `values.transpose()`, `values.sort(1, order.descending)`,
 `values.submatrix(0, 2, 0, 2)`, `values.sum(other)`, `values.mult(other)`,
 `values.pow(2)`, `values.trace()`, `values.det()`, `values.inv()`,
-`values.rank()`, `values.kron(other)`, and `values.avg()`.
+`values.rank()`, `values.kron(other)`, `values.is_identity()`, and
+`values.avg()`.
 
 ## Common `map.*` Coverage
 
