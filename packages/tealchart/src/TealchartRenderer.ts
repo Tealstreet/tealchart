@@ -2685,12 +2685,69 @@ export class TealchartRenderer {
         ctx.stroke();
         break;
 
+      case 'flag':
+        ctx.lineWidth = Math.max(1, size / 8);
+        ctx.beginPath();
+        ctx.moveTo(x - size / 3, y + size / 2);
+        ctx.lineTo(x - size / 3, y - size / 2);
+        ctx.stroke();
+        ctx.fillRect(x - size / 3, y - size / 2, size * 0.8, size * 0.45);
+        break;
+
+      case 'labelup':
+        ctx.beginPath();
+        this.drawRoundedRectPath(
+          x - size * 0.7,
+          y - size * 0.45,
+          size * 1.4,
+          size * 0.9,
+          Math.max(2, size * 0.15)
+        );
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(x, y + size * 0.65);
+        ctx.lineTo(x - size * 0.25, y + size * 0.25);
+        ctx.lineTo(x + size * 0.25, y + size * 0.25);
+        ctx.closePath();
+        ctx.fill();
+        break;
+
+      case 'labeldown':
+        ctx.beginPath();
+        this.drawRoundedRectPath(
+          x - size * 0.7,
+          y - size * 0.45,
+          size * 1.4,
+          size * 0.9,
+          Math.max(2, size * 0.15)
+        );
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(x, y - size * 0.65);
+        ctx.lineTo(x - size * 0.25, y - size * 0.25);
+        ctx.lineTo(x + size * 0.25, y - size * 0.25);
+        ctx.closePath();
+        ctx.fill();
+        break;
+
       default:
         // Default to circle
         ctx.beginPath();
         ctx.arc(x, y, size / 2, 0, Math.PI * 2);
         ctx.fill();
     }
+  }
+
+  private drawRoundedRectPath(x: number, y: number, width: number, height: number, radius: number): void {
+    const { ctx } = this;
+    const maybeRoundRect = (ctx as CanvasRenderingContext2D & { roundRect?: CanvasRenderingContext2D['roundRect'] }).roundRect;
+
+    if (typeof maybeRoundRect === 'function') {
+      maybeRoundRect.call(ctx, x, y, width, height, radius);
+      return;
+    }
+
+    ctx.rect(x, y, width, height);
   }
 
   /**
