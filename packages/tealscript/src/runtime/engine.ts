@@ -4468,6 +4468,7 @@ export class TealscriptEngine {
       const format = this.toOptionalString(this.getCallArg(args, namedArgs, 12, 'format'));
       const precision = this.toOptionalInteger(this.getCallArg(args, namedArgs, 13, 'precision'));
       const forceOverlay = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 14, 'force_overlay'));
+      const lineStyle = this.toOptionalString(this.getCallArg(args, namedArgs, 15, 'linestyle')) as PlotLineStyle | undefined;
 
       // Use plot call order for untitled plots so multiple plot(...) calls do
       // not collapse into one "Plot" series across every bar.
@@ -4491,6 +4492,7 @@ export class TealscriptEngine {
           format,
           precision,
           forceOverlay,
+          lineStyle,
         });
       }
 

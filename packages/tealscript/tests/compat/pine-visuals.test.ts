@@ -156,7 +156,7 @@ indicator("Visual constants smoke", overlay=true, format=format.price, scale=sca
 displayTarget = display.all - display.status_line
 formatMatches = format.price == "price" and format.volume == "volume" and format.percent == "percent" and format.inherit == "inherit"
 scaleMatches = scale.right == "right" and scale.left == "left" and scale.none == "none"
-plot(close, title="Break Line", style=plot.style_linebr, display=displayTarget)
+plot(close, title="Break Line", style=plot.style_linebr, display=displayTarget, linestyle=hline.style_dashed)
 plot(open, title="Step Diamonds", style=plot.style_stepline_diamond, display=display.none)
 plot(high, title="Columns", style=plot.style_columns, histbase=100, trackprice=true, show_last=5)
 plot(low, "Positional Area", color.red, 3, plot.style_area, true, 90, -1, true, false, 4, display.price_scale, format.volume, 0, true)
@@ -177,6 +177,7 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
     const solidPositional = getPlot(result, 'Solid Positional');
 
     expect(breakLine.style).toBe('linebr');
+    expect(breakLine.lineStyle).toBe('dashed');
     expect(breakLine.display).toBe(11);
     expect(stepDiamonds.style).toBe('stepline_diamond');
     expect(stepDiamonds.display).toBe(0);

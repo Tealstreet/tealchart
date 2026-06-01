@@ -225,6 +225,30 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['fixnan', { params: ['source'], minArgs: 1, maxArgs: 1 }],
   ['hline', { params: ['price', 'title', 'color', 'linestyle', 'linewidth', 'editable', 'display'], minArgs: 1 }],
   [
+    'plot',
+    {
+      params: [
+        'series',
+        'title',
+        'color',
+        'linewidth',
+        'style',
+        'trackprice',
+        'histbase',
+        'offset',
+        'join',
+        'editable',
+        'show_last',
+        'display',
+        'format',
+        'precision',
+        'force_overlay',
+        'linestyle',
+      ],
+      minArgs: 1,
+    },
+  ],
+  [
     'indicator',
     {
       params: [
