@@ -188,6 +188,7 @@ export interface RuntimeProfile {
   expressions: number;
   builtinCalls: number;
   requestContexts: number;
+  maxBarsBack: number;
   errors: number;
 }
 
@@ -260,6 +261,7 @@ export class TealscriptEngine {
   private requestExpressionIds = new WeakMap<Expression, number>();
   private expressionHistory = new WeakMap<Expression, ExpressionHistoryEntry>();
   private nextRequestExpressionId = 0;
+  private inferredMaxBarsBack = 0;
   private userFunctionCallStack: string[] = [];
   private importedLibraryCallStack: string[] = [];
   private indicatorDynamicRequests = true;
@@ -302,6 +304,7 @@ export class TealscriptEngine {
     this.requestExpressionIds = new WeakMap();
     this.expressionHistory = new WeakMap();
     this.nextRequestExpressionId = 0;
+    this.inferredMaxBarsBack = 0;
     this.userFunctionCallStack = [];
     this.importedLibraryCallStack = [];
     this.indicatorDynamicRequests = true;
@@ -383,6 +386,7 @@ export class TealscriptEngine {
         expressions: this.profileExpressions,
         builtinCalls: this.profileBuiltinCalls,
         requestContexts: this.requestContextKeys.size,
+        maxBarsBack: this.inferredMaxBarsBack,
         errors: this.errors.length,
       },
     };
@@ -2773,32 +2777,44 @@ export class TealscriptEngine {
 
       switch (name) {
         case 'open':
+          this.checkHistoryOffset(offset);
           return this.naIfMissing(this.ctx.open.get(offset));
         case 'high':
+          this.checkHistoryOffset(offset);
           return this.naIfMissing(this.ctx.high.get(offset));
         case 'low':
+          this.checkHistoryOffset(offset);
           return this.naIfMissing(this.ctx.low.get(offset));
         case 'close':
+          this.checkHistoryOffset(offset);
           return this.naIfMissing(this.ctx.close.get(offset));
         case 'volume':
+          this.checkHistoryOffset(offset);
           return this.naIfMissing(this.ctx.volume.get(offset));
         case 'time':
+          this.checkHistoryOffset(offset);
           return this.naIfMissing(this.ctx.time.get(offset));
         case 'timenow':
+          this.checkHistoryOffset(offset);
           return this.naIfMissing(this.ctx.timenow.get(offset));
         case 'time_close': {
+          this.checkHistoryOffset(offset);
           const openTime = this.ctx.time.get(offset);
           return openTime === undefined ? Number.NaN : this.naIfMissing(this.getBarCloseTime(openTime, this.ctx.timeframe.period));
         }
         case 'hl2':
+          this.checkHistoryOffset(offset);
           return this.naIfMissing(this.getHl2(offset));
         case 'hlc3':
+          this.checkHistoryOffset(offset);
           return this.naIfMissing(this.getHlc3(offset));
         case 'ohlc4':
+          this.checkHistoryOffset(offset);
           return this.naIfMissing(this.getOhlc4(offset));
       }
 
       if (this.scope.has(name)) {
+        this.checkHistoryOffset(offset);
         return this.naIfMissing(this.scope.getWithOffset(name, offset));
       }
 
@@ -2811,7 +2827,16 @@ export class TealscriptEngine {
       return this.naIfMissing(this.readArrayElement(obj, offset));
     }
 
+    this.checkHistoryOffset(offset);
     return this.naIfMissing(this.readExpressionHistory(expr.object, obj, offset));
+  }
+
+  private checkHistoryOffset(offset: number): void {
+    this.inferredMaxBarsBack = Math.max(this.inferredMaxBarsBack, offset);
+    const maxBarsBack = this.ctx.indicatorMaxBarsBack;
+    if (maxBarsBack !== undefined && offset > maxBarsBack) {
+      throw new Error(`History reference [${offset}] exceeds indicator max_bars_back ${maxBarsBack}`);
+    }
   }
 
   private readExpressionHistory(expression: Expression, currentValue: unknown, offset: number): unknown {
