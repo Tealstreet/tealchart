@@ -341,13 +341,17 @@ Phases:
 
 1. Finish `plot()` parameters: style, linewidth, color, offset, trackprice,
    histbase, join, editable, display, format, precision, force overlay, and
-   z-order.
+   z-order. Initial parity work now captures runtime metadata for common v6
+   plot style/display/format/precision/force-overlay fields plus
+   `plot.linestyle_*` constants.
 2. Finish `hline()` handles and visual settings.
 3. Finish `fill()` for plot/hline handles, fill gaps, title/editable/display,
    and color series behavior.
 4. Finish `plotshape`, `plotchar`, and `plotarrow` text, location, size,
    offset, display, and color behavior.
 5. Finish `bgcolor`, `barcolor`, `plotbar`, and `plotcandle` edge cases.
+   Initial parity work now captures `bgcolor()` display metadata and OHLC
+   `format`, `precision`, and `force_overlay` metadata.
 6. Add renderer-level screenshot or pixel tests where practical.
 
 Done means visual-only indicators retain their main chart appearance.
