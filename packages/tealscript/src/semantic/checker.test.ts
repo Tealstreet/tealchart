@@ -355,6 +355,38 @@ prices.concat(unknown)
     ]);
   });
 
+  it('infers collection and numeric for-loop symbol types', () => {
+    const result = checkProgram(parse(`
+indicator("Loop Types")
+prices = array.new_float()
+ints = array.new_int()
+strings = array.new_string()
+for value in prices
+    prices.push(value)
+    ints.push(value)
+for [index, value] in prices
+    ints.push(index)
+    strings.push(index)
+m = map.new<string, float>()
+for [key, value] in m
+    strings.push(key)
+    ints.push(key)
+    prices.push(value)
+    ints.push(value)
+for i = 0 to 2
+    ints.push(i)
+    strings.push(i)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot use float value as int array element',
+      'Cannot use int value as string array element',
+      'Cannot use string value as int array element',
+      'Cannot use float value as int array element',
+      'Cannot use int value as string array element',
+    ]);
+  });
+
   it('infers simple literal and array expression types', () => {
     const result = checkProgram(parse(`
 indicator("Inferred Symbols")
