@@ -175,6 +175,7 @@ export interface ExecutionResult {
   logs: LogOutput[];
   inputs: InputDefinition[];
   indicatorTitle: string;
+  indicatorShortTitle?: string;
   indicatorMaxBarsBack?: number;
   strategy: StrategyLedger;
   errors: ExecutionError[];
@@ -376,6 +377,7 @@ export class TealscriptEngine {
       logs: this.ctx.getLogs(),
       inputs: this.ctx.inputDefinitions.map((def) => ({ ...def })),
       indicatorTitle: this.ctx.indicatorTitle,
+      indicatorShortTitle: this.ctx.indicatorShortTitle,
       indicatorMaxBarsBack: this.ctx.indicatorMaxBarsBack,
       strategy: this.ctx.strategyLedger,
       errors: this.errors,
@@ -586,6 +588,9 @@ export class TealscriptEngine {
 
     if (stmt.title) {
       this.ctx.indicatorTitle = this.evaluateExpression(stmt.title) as string;
+    }
+    if (stmt.shorttitle) {
+      this.ctx.indicatorShortTitle = this.evaluateExpression(stmt.shorttitle) as string;
     }
     if (stmt.overlay) {
       this.ctx.indicatorOverlay = this.evaluateExpression(stmt.overlay) as boolean;

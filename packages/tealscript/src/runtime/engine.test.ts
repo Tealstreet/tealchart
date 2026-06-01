@@ -1383,6 +1383,20 @@ plot(close)`;
       expect(result.errors).toHaveLength(0);
     });
 
+    it('records indicator shorttitle metadata', () => {
+      const script = `//@version=6
+indicator("Long Declaration Title", shorttitle="Short")
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.indicatorTitle).toBe('Long Declaration Title');
+      expect(result.indicatorShortTitle).toBe('Short');
+    });
+
     it('returns plot outputs', () => {
       const script = `//@version=6
 indicator("Test")
