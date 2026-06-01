@@ -417,14 +417,21 @@ plot(showSignalsInput, title="Show Signals")
 indicator("Color docs smoke", overlay=true)
 baseColor = color.rgb(255, 0, 0)
 derivedColor = color.rgb(color.r(baseColor), 128, color.b(baseColor), 50)
+namedColor = color.new(color=color.rgb(red=1, green=2, blue=3), transp=25)
 signal = ta.rsi(close, 7)
 signalColor = color.from_gradient(signal, 0, 100, color.rgb(255, 0, 0), color.rgb(0, 255, 0, 50))
+namedSignalColor = color.from_gradient(value=signal, bottom_value=0, top_value=100, bottom_color=color.rgb(255, 0, 0), top_color=color.rgb(0, 255, 0, 50))
 plot(close, title="Close", color=derivedColor)
+plot(open, title="Named", color=namedColor)
+plot(high, title="Hidden", color=color.none)
 plot(signal, title="Signal", color=signalColor)
+plot(signal, title="Named Signal", color=namedSignalColor)
 `);
 
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Close').color).toEqual(Array(compatibilityBars.length).fill('#FF800080'));
+    expect(getPlot(result, 'Named').color).toEqual(Array(compatibilityBars.length).fill('#010203BF'));
+    expect(getPlot(result, 'Hidden').color).toEqual(Array(compatibilityBars.length).fill(null));
     expect(roundSeries(getPlot(result, 'Signal').values)).toEqual([
       null,
       100,
@@ -439,6 +446,7 @@ plot(signal, title="Signal", color=signalColor)
       68.421053,
       88.235294,
     ]);
+    expect(getPlot(result, 'Named Signal').color).toEqual(getPlot(result, 'Signal').color);
     expect(getPlot(result, 'Signal').color).toEqual([
       null,
       '#00FF0080',

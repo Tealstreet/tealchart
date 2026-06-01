@@ -112,6 +112,15 @@ Current `str.*` progress:
 - `str.format_time()` uses the Pine v6 ISO-style default format and supports
   quoted literals, single date/time tokens, and numeric timezone offsets.
 
+Current `color.*` progress:
+
+- Covered color constructors and channel helpers accept Pine-style named
+  arguments.
+- `color.none` maps to the runtime's existing invisible/`na` plot color
+  representation.
+- Gradient helpers support named value, bound, and color parameters for common
+  public-script idioms.
+
 ## Out-Of-Scope Namespaces For Epic 5
 
 These namespaces are tracked here because they are built-ins, but their parity

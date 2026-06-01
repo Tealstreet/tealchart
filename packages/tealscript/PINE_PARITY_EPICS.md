@@ -220,7 +220,8 @@ Phases:
    parity work now covers strict numeric parsing, named conversion arguments,
    and ISO-style `str.format_time` defaults.
 5. Finish `color.*`: exact constants, transparency, channel extraction,
-   gradients, and theme-sensitive behavior where possible.
+   gradients, and theme-sensitive behavior where possible. Initial parity work
+   now covers named constructor/channel/gradient arguments and `color.none`.
 6. Add remaining global helpers such as `nz`, `fixnan`, and typed casts with
    Pine-compatible semantics.
 
