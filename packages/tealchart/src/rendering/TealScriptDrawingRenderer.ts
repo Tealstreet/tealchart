@@ -860,8 +860,11 @@ export class TealScriptDrawingRenderer {
 
   private fontForDrawing(size: string, fontFamily?: string, textFormatting?: string): string {
     const styleParts: string[] = [];
-    if (textFormatting?.includes('italic')) styleParts.push('italic');
-    if (textFormatting?.includes('bold')) styleParts.push('bold');
+    const formatting = (textFormatting ?? 'none').trim().toLowerCase();
+    const tokens = new Set(formatting.split(/[\s,]+/).filter(Boolean));
+    const isCombined = formatting === 'bolditalic' || formatting === 'italicbold';
+    if (tokens.has('italic') || isCombined) styleParts.push('italic');
+    if (tokens.has('bold') || isCombined) styleParts.push('bold');
     styleParts.push(`${this.fontSizeForDrawing(size)}px`);
     styleParts.push(this.fontFamilyForDrawing(fontFamily));
     return styleParts.join(' ');
