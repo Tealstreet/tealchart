@@ -334,7 +334,7 @@ prices.concat(ints)
 strings = array.new_string()
 prices.concat(strings)
 array.concat(prices, strings)
-unknown = array.from(1)
+unknown = array.from(1, "mixed")
 unknown.push("allowed")
 prices.concat(unknown)
 `));
@@ -417,6 +417,34 @@ ints.push(fromRemove)
       'Cannot use float value as int array element',
       'Cannot use float value as int array element',
       'Cannot use float value as int array element',
+    ]);
+  });
+
+  it('infers homogeneous array literal and array.from element types', () => {
+    const result = checkProgram(parse(`
+indicator("Array Literal Types")
+literalInts = [1, 2]
+literalFloats = [1, 2.5]
+fromStrings = array.from("a", "b")
+mixed = array.from(1, "b")
+ints = array.new_int()
+strings = array.new_string()
+ints.push(literalInts[0])
+ints.push(literalFloats[0])
+strings.push(array.get(fromStrings, 0))
+ints.push(array.get(fromStrings, 0))
+ints.push(mixed[0])
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(types.get('literalInts')).toMatchObject({ kind: 'array', elementType: { kind: 'int' } });
+    expect(types.get('literalFloats')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('fromStrings')).toMatchObject({ kind: 'array', elementType: { kind: 'string' } });
+    expect(types.get('mixed')).toMatchObject({ kind: 'array', elementType: { kind: 'unknown' } });
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot use float value as int array element',
+      'Cannot use string value as int array element',
     ]);
   });
 
