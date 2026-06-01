@@ -14,77 +14,73 @@ import {
   putAllMapValues,
   putMapValue,
   removeMapValue,
+  type PineMap,
 } from './maps';
 
 describe('PineMap', () => {
-  it('creates, reads, writes, and sizes maps', () => {
-    const map = createPineMap<string, number>();
+  it('stores value keys, preserves insertion order on overwrite, and extracts copied arrays', () => {
+    const map = createPineMap();
 
     expect(isPineMap(map)).toBe(true);
     expect(getMapSize(map)).toBe(0);
 
-    putMapValue(map, 'alpha', 1);
-    putMapValue(map, 'beta', 2);
-    putMapValue(map, 'alpha', 3);
+    putMapValue(map, 'A', 1);
+    putMapValue(map, 'B', 2);
+    putMapValue(map, 'A', 10);
 
     expect(getMapSize(map)).toBe(2);
-    expect(getMapValue(map, 'alpha')).toBe(3);
-    expect(getMapValue(map, 'missing')).toBeNaN();
-    expect(containsMapKey(map, 'beta')).toBe(true);
+    expect(containsMapKey(map, 'A')).toBe(true);
+    expect(getMapValue(map, 'A')).toBe(10);
+    expect(getArrayValue(mapKeys(map), 0)).toBe('A');
+    expect(getArrayValue(mapValues(map), 0)).toBe(10);
   });
 
-  it('removes, clears, and returns na for missing removals', () => {
-    const map = createPineMap<string, number>();
+  it('returns na for missing get and remove calls', () => {
+    const map = createPineMap();
 
-    putMapValue(map, 'alpha', 1);
-    putMapValue(map, 'beta', 2);
-
-    expect(removeMapValue(map, 'alpha')).toBe(1);
-    expect(removeMapValue(map, 'alpha')).toBeNaN();
-    expect(getMapSize(map)).toBe(1);
-
-    clearMap(map);
+    putMapValue(map, 'A', 1);
+    expect(removeMapValue(map, 'A')).toBe(1);
     expect(getMapSize(map)).toBe(0);
+    expect(Number.isNaN(getMapValue(map, 'Missing'))).toBe(true);
+    expect(Number.isNaN(removeMapValue(map, 'Missing'))).toBe(true);
   });
 
-  it('copies maps and preserves insertion order for keys and values', () => {
-    const map = createPineMap<string, number>();
+  it('copies, merges, and clears maps without aliasing entries', () => {
+    const left = createPineMap();
+    putMapValue(left, 'A', 1);
+    putMapValue(left, 'B', 2);
+    const right = createPineMap();
+    putMapValue(right, 'B', 20);
+    putMapValue(right, 'C', 30);
 
-    putMapValue(map, 'first', 1);
-    putMapValue(map, 'second', 2);
-    putMapValue(map, 'third', 3);
-    putMapValue(map, 'second', 22);
+    const copy = copyMap(left);
+    putAllMapValues(copy, right);
+    clearMap(left);
 
-    const copy = copyMap(map);
-    putMapValue(copy, 'fourth', 4);
-
-    expect(getMapSize(map)).toBe(3);
-    expect(getMapSize(copy)).toBe(4);
-    expect(getArrayValue(mapKeys(map), 1)).toBe('second');
-    expect(getArrayValue(mapValues(map), 1)).toBe(22);
+    expect(getMapSize(left)).toBe(0);
+    expect(getMapSize(copy)).toBe(3);
+    expect(getArrayValue(mapKeys(copy), 0)).toBe('A');
+    expect(getArrayValue(mapKeys(copy), 1)).toBe('B');
+    expect(getArrayValue(mapKeys(copy), 2)).toBe('C');
+    expect(getMapValue(copy, 'B')).toBe(20);
+    expect(getMapValue(copy, 'C')).toBe(30);
   });
 
-  it('puts all source pairs into the target in source insertion order', () => {
-    const target = createPineMap<string, number>();
-    const source = createPineMap<string, number>();
-
-    putMapValue(target, 'a', 1);
-    putMapValue(target, 'b', 2);
-    putMapValue(source, 'b', 20);
-    putMapValue(source, 'c', 30);
-    putAllMapValues(target, source);
-
-    expect(getMapSize(target)).toBe(3);
-    expect(getArrayValue(mapKeys(target), 0)).toBe('a');
-    expect(getArrayValue(mapKeys(target), 1)).toBe('b');
-    expect(getArrayValue(mapKeys(target), 2)).toBe('c');
-    expect(getArrayValue(mapValues(target), 1)).toBe(20);
-  });
-
-  it('rejects unsupported map keys', () => {
+  it('rejects non-value and non-finite keys', () => {
     const map = createPineMap();
 
     expect(() => putMapValue(map, Number.NaN, 1)).toThrow('Map keys must be finite value types');
     expect(() => putMapValue(map, {}, 1)).toThrow('Map keys must be value types');
+  });
+
+  it('enforces the Pine map capacity limit for new keys', () => {
+    const map: PineMap<string, number> = {
+      __tealscriptMap: true,
+      entries: new Map(Array.from({ length: 50_000 }, (_value, index) => [`K${index}`, index])),
+    };
+
+    putMapValue(map, 'K1', 100);
+    expect(getMapValue(map, 'K1')).toBe(100);
+    expect(() => putMapValue(map, 'Overflow', 1)).toThrow('Map cannot contain more than 50000 key-value pairs');
   });
 });
