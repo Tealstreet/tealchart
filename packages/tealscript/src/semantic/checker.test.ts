@@ -307,6 +307,34 @@ inferred.put("ADA", "bad")
     ]);
   });
 
+  it('reports array element template mismatches for known mutable arrays', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Array Types")
+array<float> prices = array.new_float()
+array.push(prices, 1)
+prices.push(2.5)
+array.push(prices, "bad")
+prices.unshift(true)
+prices.set(0, "bad")
+array.insert(prices, 0, "bad")
+array.fill(prices, "bad")
+typed = array.new_int()
+typed.push(1)
+typed.push("bad")
+unknown = array.from(1)
+unknown.push("allowed")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot use string value as float array element',
+      'Cannot use bool value as float array element',
+      'Cannot use string value as float array element',
+      'Cannot use string value as float array element',
+      'Cannot use string value as float array element',
+      'Cannot use string value as int array element',
+    ]);
+  });
+
   it('infers simple literal and array expression types', () => {
     const result = checkProgram(parse(`
 indicator("Inferred Symbols")
