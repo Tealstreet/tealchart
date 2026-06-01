@@ -411,6 +411,8 @@ Phases:
    Source-size coverage rejects scripts above 1,000,000 UTF-16 code units, and
    parser-depth coverage rejects ASTs deeper than 1,000 nodes.
 3. Optimize hot built-ins and series storage for long histories.
+   Runtime TA helper state now uses bounded in-place history updates instead of
+   per-bar spread/slice allocation for common source windows.
 4. Add cancellation/yielding in worker execution for expensive scripts.
 5. Harden runtime isolation: no host access, deterministic randomness where
    needed, safe errors, and no unbounded allocation.
