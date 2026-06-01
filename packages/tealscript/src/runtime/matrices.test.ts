@@ -7,6 +7,7 @@ import {
   avgMatrixValue,
   copyMatrix,
   createPineMatrix,
+  detMatrixValue,
   diffMatrixValue,
   fillMatrix,
   getMatrixColumns,
@@ -24,6 +25,7 @@ import {
   modeMatrixValue,
   multMatrixValue,
   powMatrixValue,
+  rankMatrixValue,
   removeMatrixColumn,
   removeMatrixRow,
   reshapeMatrix,
@@ -240,5 +242,33 @@ describe('PineMatrix', () => {
     expect(() => powMatrixValue(rectangular, 2)).toThrow('Matrix power requires a square matrix. Matrix is 2x3');
     expect(() => powMatrixValue(createPineMatrix<number>(2, 2, 1), -1)).toThrow('Matrix power must be a non-negative integer');
     expect(() => powMatrixValue(createPineMatrix<number>(2, 2, 1), 1.5)).toThrow('Matrix power must be a non-negative integer');
+  });
+
+  it('computes determinants and ranks for square and rectangular matrices', () => {
+    const fullRank = createPineMatrix<number>(3, 3, 0);
+    fullRank.values = [3, 2, 3, 4, 6, 6, 7, 4, 9];
+    expect(detMatrixValue(fullRank)).toBeCloseTo(24);
+    expect(rankMatrixValue(fullRank)).toBe(3);
+
+    const deficient = createPineMatrix<number>(3, 3, 0);
+    deficient.values = [1, 2, 3, 2, 4, 6, 3, 6, 9];
+    expect(detMatrixValue(deficient)).toBe(0);
+    expect(rankMatrixValue(deficient)).toBe(1);
+
+    const rectangular = createPineMatrix<number>(2, 3, 0);
+    rectangular.values = [1, 2, 3, 4, 5, 6];
+    expect(rankMatrixValue(rectangular)).toBe(2);
+  });
+
+  it('preserves small but valid determinant and rank pivots', () => {
+    const matrix = createPineMatrix<number>(2, 2, 0);
+    matrix.values = [1e-12, 0, 0, 1];
+
+    expect(detMatrixValue(matrix)).toBe(1e-12);
+    expect(rankMatrixValue(matrix)).toBe(2);
+  });
+
+  it('rejects determinants for non-square matrices', () => {
+    expect(() => detMatrixValue(createPineMatrix<number>(2, 3, 1))).toThrow('Matrix determinant requires a square matrix. Matrix is 2x3');
   });
 });

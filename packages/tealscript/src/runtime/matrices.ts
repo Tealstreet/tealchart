@@ -19,6 +19,8 @@ export interface PineMatrix<T = unknown> {
   values: T[];
 }
 
+const MATRIX_EPSILON = 1e-10;
+
 export function createPineMatrix<T = unknown>(rows: number = 0, columns: number = 0, initialValue?: T): PineMatrix<T> {
   const safeRows = normalizeDimension(rows, 'rows');
   const safeColumns = normalizeDimension(columns, 'columns');
@@ -249,6 +251,85 @@ export function traceMatrixValue(matrix: PineMatrix): number {
   return total;
 }
 
+export function detMatrixValue(matrix: PineMatrix): number {
+  assertSquareMatrix(matrix, 'Matrix determinant');
+  const rows = numericRows(matrix);
+  let determinant = 1;
+  let sign = 1;
+
+  for (let pivotIndex = 0; pivotIndex < matrix.rows; pivotIndex++) {
+    let pivotRow = pivotIndex;
+    let columnScale = 0;
+    for (let row = pivotIndex; row < matrix.rows; row++) {
+      columnScale = Math.max(columnScale, Math.abs(rows[row][pivotIndex]));
+    }
+    for (let row = pivotIndex + 1; row < matrix.rows; row++) {
+      if (Math.abs(rows[row][pivotIndex]) > Math.abs(rows[pivotRow][pivotIndex])) {
+        pivotRow = row;
+      }
+    }
+
+    const pivot = rows[pivotRow][pivotIndex];
+    if (isEffectivelyZero(pivot, columnScale)) {
+      return 0;
+    }
+
+    if (pivotRow !== pivotIndex) {
+      [rows[pivotIndex], rows[pivotRow]] = [rows[pivotRow], rows[pivotIndex]];
+      sign *= -1;
+    }
+
+    determinant *= rows[pivotIndex][pivotIndex];
+    for (let row = pivotIndex + 1; row < matrix.rows; row++) {
+      const factor = rows[row][pivotIndex] / rows[pivotIndex][pivotIndex];
+      for (let column = pivotIndex; column < matrix.columns; column++) {
+        rows[row][column] -= factor * rows[pivotIndex][column];
+      }
+    }
+  }
+
+  const value = determinant * sign;
+  return Object.is(value, -0) ? 0 : value;
+}
+
+export function rankMatrixValue(matrix: PineMatrix): number {
+  const rows = numericRows(matrix);
+  let rank = 0;
+
+  for (let column = 0; column < matrix.columns && rank < matrix.rows; column++) {
+    let pivotRow = rank;
+    let columnScale = 0;
+    for (let row = rank; row < matrix.rows; row++) {
+      columnScale = Math.max(columnScale, Math.abs(rows[row][column]));
+    }
+    for (let row = rank + 1; row < matrix.rows; row++) {
+      if (Math.abs(rows[row][column]) > Math.abs(rows[pivotRow][column])) {
+        pivotRow = row;
+      }
+    }
+
+    if (isEffectivelyZero(rows[pivotRow][column], columnScale)) {
+      continue;
+    }
+
+    [rows[rank], rows[pivotRow]] = [rows[pivotRow], rows[rank]];
+    const pivot = rows[rank][column];
+    for (let currentColumn = column; currentColumn < matrix.columns; currentColumn++) {
+      rows[rank][currentColumn] /= pivot;
+    }
+    for (let row = 0; row < matrix.rows; row++) {
+      if (row === rank) continue;
+      const factor = rows[row][column];
+      for (let currentColumn = column; currentColumn < matrix.columns; currentColumn++) {
+        rows[row][currentColumn] -= factor * rows[rank][currentColumn];
+      }
+    }
+    rank += 1;
+  }
+
+  return rank;
+}
+
 function matrixIndex(matrix: PineMatrix, row: number, column: number): number {
   const normalizedRow = normalizeExistingIndex(row, matrix.rows, 'row');
   const normalizedColumn = normalizeExistingIndex(column, matrix.columns, 'column');
@@ -290,6 +371,21 @@ function identityMatrix(size: number): PineMatrix<number> {
     setMatrixValue(result, index, index, 1);
   }
   return result;
+}
+
+function numericRows(matrix: PineMatrix): number[][] {
+  return Array.from({ length: matrix.rows }, (_rowValue, row) => {
+    return Array.from({ length: matrix.columns }, (_columnValue, column) => {
+      return Number(matrix.values[row * matrix.columns + column]);
+    });
+  });
+}
+
+function isEffectivelyZero(value: number, scale: number): boolean {
+  if (scale === 0) {
+    return value === 0;
+  }
+  return Math.abs(value) <= scale * MATRIX_EPSILON;
 }
 
 function multiplyMatrices(left: PineMatrix, right: PineMatrix): PineMatrix<number> {
