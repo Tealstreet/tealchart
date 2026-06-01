@@ -3792,6 +3792,46 @@ plot(close, title="Close")`;
       expect(close2.values[close2.values.length - 1]).toBe(300);
     });
 
+    it('stores history for indexed expressions during historical execution', () => {
+      const script = `//@version=6
+indicator("Expression History")
+plot((close + 1)[1], title="Shifted")`;
+
+      const result = executeScript(parse(script), createBars(4, 100));
+      const shifted = result.plots.find((plot) => plot.title === 'Shifted')!;
+
+      expect(result.errors).toEqual([]);
+      expect(shifted.values).toEqual([
+        null,
+        101.2,
+        101.7,
+        102.2,
+      ]);
+    });
+
+    it('replaces indexed expression history on realtime bar updates', () => {
+      const script = `//@version=6
+indicator("Realtime Expression History")
+plot((close + 1)[0], title="Current")
+plot((close + 1)[1], title="Previous")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+
+      engine.execute(ast, bars);
+      engine.updateBar(ast, { ...bars[2], close: 200 });
+      const plots = engine.updateBar(ast, { ...bars[2], close: 300 });
+
+      const current = plots.find((plot) => plot.title === 'Current')!;
+      const previous = plots.find((plot) => plot.title === 'Previous')!;
+
+      expect(current.values.length).toBe(bars.length);
+      expect(previous.values.length).toBe(bars.length);
+      expect(current.values[current.values.length - 1]).toBe(301);
+      expect(previous.values[previous.values.length - 1]).toBe(101.7);
+    });
+
     it('rolls back map mutations between updateBar calls', () => {
       const script = `//@version=6
 indicator("Map Rollback")
