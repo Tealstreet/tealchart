@@ -804,6 +804,50 @@ plot(array.size(polyline.all), title="Polylines")`;
       expect(result.plots.find((plot) => plot.title === 'Polylines')?.values).toEqual([1]);
     });
 
+    it('does not duplicate transient polyline drawings during realtime rollback', () => {
+      const script = `//@version=6
+indicator("Realtime polyline", overlay=true)
+if barstate.islast
+    points = array.from(chart.point.from_index(bar_index - 1, low), chart.point.from_index(bar_index, close))
+    polyline.new(points, line_color=color.green)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      engine.updateBar(ast, {
+        ...bars[2],
+        low: 190,
+        close: 200,
+      });
+      engine.updateBar(ast, {
+        ...bars[2],
+        low: 280,
+        close: 300,
+      });
+
+      expect(engine.getDrawings()).toEqual([
+        {
+          id: 'polyline_polyline.new_0_2',
+          type: 'polyline',
+          barIndex: 2,
+          points: [
+            { type: 'chart.point', time: null, index: 1, price: 280 },
+            { type: 'chart.point', time: null, index: 2, price: 300 },
+          ],
+          curved: false,
+          closed: false,
+          xloc: 'bar_index',
+          lineColor: '#4CAF50',
+          fillColor: null,
+          lineStyle: 'solid',
+          lineWidth: 1,
+        },
+      ]);
+    });
+
     it('records table cells and common cell setters', () => {
       const script = `//@version=6
 indicator("Tables", overlay=true)
@@ -886,6 +930,60 @@ plot(close)`;
               textValign: 'middle',
               textSize: 'normal',
               bgcolor: null,
+            },
+          ],
+        },
+      ]);
+    });
+
+    it('preserves persistent table handles during realtime rollback', () => {
+      const script = `//@version=6
+indicator("Realtime table", overlay=true)
+var stats = table.new(position.top_right, 1, 1, bgcolor=color.blue)
+if barstate.islast
+    table.set_position(stats, position.bottom_left)
+    table.set_bgcolor(stats, color.green)
+    table.cell(stats, 0, 0, str.tostring(close), width=close, height=high - low, text_color=color.white, bgcolor=color.red)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      engine.updateBar(ast, {
+        ...bars[2],
+        high: 310,
+        low: 290,
+        close: 300,
+      });
+
+      expect(engine.getDrawings()).toEqual([
+        {
+          id: 'table_table.new_0_0',
+          type: 'table',
+          persistent: true,
+          barIndex: 0,
+          position: 'bottom_left',
+          columns: 1,
+          rows: 1,
+          bgcolor: '#4CAF50',
+          frameColor: null,
+          frameWidth: 1,
+          borderColor: null,
+          borderWidth: 1,
+          cells: [
+            {
+              column: 0,
+              row: 0,
+              text: '300',
+              width: 300,
+              height: 20,
+              textColor: '#FFFFFF',
+              textHalign: 'center',
+              textValign: 'middle',
+              textSize: 'normal',
+              bgcolor: '#F44336',
             },
           ],
         },

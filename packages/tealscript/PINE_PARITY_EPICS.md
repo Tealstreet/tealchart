@@ -409,6 +409,8 @@ Phases:
    metadata.
 7. Add lifecycle tests for mutation, deletion, copying, GC limits, and realtime
    rollback.
+   Runtime coverage now includes persistent table rollback and transient
+   polyline same-bar rollback guards.
 
 Done means label/table/line-heavy public scripts display usable overlays.
 
