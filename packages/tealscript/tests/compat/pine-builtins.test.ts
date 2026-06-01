@@ -461,6 +461,18 @@ plot(close, title="Close")
     expect(roundSeries(getPlot(result, 'Close').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
   });
 
+  it('surfaces Pine declaration overlay and precision metadata', () => {
+    const result = runCompatScript(`
+indicator("Overlay precision settings", overlay=true, precision=5)
+plot(close, title="Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorOverlay).toBe(true);
+    expect(result.indicatorPrecision).toBe(5);
+    expect(roundSeries(getPlot(result, 'Close').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+  });
+
   it('matches documented Pine input helper idioms', () => {
     const result = runCompatScript(`
 indicator("Input docs smoke")

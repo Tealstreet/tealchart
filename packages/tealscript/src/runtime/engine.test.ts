@@ -1383,6 +1383,20 @@ plot(close)`;
       expect(result.errors).toHaveLength(0);
     });
 
+    it('records indicator overlay and precision metadata', () => {
+      const script = `//@version=6
+indicator("Overlay Precision", overlay=true, precision=4)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.indicatorOverlay).toBe(true);
+      expect(result.indicatorPrecision).toBe(4);
+    });
+
     it('records indicator shorttitle metadata', () => {
       const script = `//@version=6
 indicator("Long Declaration Title", shorttitle="Short")
