@@ -439,7 +439,8 @@ Phases:
    plus dynamic array growth, and inside/outside `barcolor()` idioms.
 2. Curate source-linked reduced fixtures from public common idioms: MTF trend
    filters, divergence scripts, liquidity zones, session filters, labels,
-   tables, and simple strategies.
+   tables, and simple strategies. Initial public-idiom checkpoints cover MTF
+   trend filtering, pivot divergence, and session-gated signal filters.
 3. For each fixture, use deterministic local bars and hand-checked expected
    outputs, not live TradingView execution in CI.
 4. Add manual comparison notes for milestone scripts where visual parity matters.

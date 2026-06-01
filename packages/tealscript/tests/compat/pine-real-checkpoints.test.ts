@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Bar } from '../../src/runtime';
+import { InMemoryRequestDatafeed, type Bar } from '../../src/runtime';
 import { compatibilityBars, getPlot, roundSeries, runCompatScript } from './fixtures';
 
 describe('Pine real idiom checkpoints', () => {
@@ -75,5 +75,96 @@ barcolor(isInside ? color.yellow : isOutsideUp ? color.aqua : isOutsideDown ? co
       '#FFEB3B',
       '#9C27B0',
     ]);
+  });
+
+  it('locks a reduced public MTF trend-filter idiom', () => {
+    // Public idiom reference: MTF trend filters commonly combine local price
+    // with higher-timeframe moving averages from request.security().
+    // Source search: https://www.tradingview.com/scripts/search/mtf%20trend%20filter/
+    const chartBars: Bar[] = [
+      { time: 1_700_000_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_000_060_000, open: 100, high: 102, low: 99, close: 101, volume: 110 },
+      { time: 1_700_000_120_000, open: 101, high: 103, low: 100, close: 102, volume: 120 },
+      { time: 1_700_000_180_000, open: 102, high: 104, low: 101, close: 103, volume: 130 },
+      { time: 1_700_000_240_000, open: 103, high: 105, low: 102, close: 104, volume: 140 },
+      { time: 1_700_000_300_000, open: 104, high: 106, low: 103, close: 105, volume: 150 },
+    ];
+    const requestDatafeed = new InMemoryRequestDatafeed([
+      {
+        symbol: 'BTCUSDT',
+        timeframe: '2',
+        bars: [
+          { time: 1_700_000_000_000, open: 11, high: 15, low: 9, close: 10, volume: 1_000 },
+          { time: 1_700_000_120_000, open: 21, high: 25, low: 19, close: 20, volume: 1_100 },
+          { time: 1_700_000_240_000, open: 31, high: 35, low: 29, close: 30, volume: 1_200 },
+        ],
+        syminfo: { ticker: 'BTCUSDT', timezone: 'Etc/UTC' },
+      },
+    ]);
+    const result = runCompatScript(`
+indicator("Public MTF Trend Checkpoint")
+htfAverage = request.security(syminfo.tickerid, "2", ta.sma(close, 2), lookahead=barmerge.lookahead_on)
+trendOk = close > htfAverage
+plot(htfAverage, title="HTF Average")
+plot(trendOk ? 1 : 0, title="Trend OK")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'HTF Average').values).toEqual([null, null, 15, 15, 25, 25]);
+    expect(getPlot(result, 'Trend OK').values).toEqual([0, 0, 1, 1, 1, 1]);
+  });
+
+  it('locks a reduced public pivot-divergence idiom', () => {
+    // Public idiom reference: divergence scripts compare sequential price
+    // pivots against lower oscillator pivots.
+    // Source search: https://www.tradingview.com/scripts/search/rsi%20divergence/
+    const bars: Bar[] = [
+      { time: 1_700_000_000_000, open: 9, high: 10, low: 8, close: 10, volume: 100 },
+      { time: 1_700_000_060_000, open: 7, high: 15, low: 6, close: 15, volume: 110 },
+      { time: 1_700_000_120_000, open: 10, high: 12, low: 9, close: 12, volume: 120 },
+      { time: 1_700_000_180_000, open: 13, high: 18, low: 12, close: 18, volume: 130 },
+      { time: 1_700_000_240_000, open: 13, high: 14, low: 12, close: 14, volume: 140 },
+    ];
+    const result = runCompatScript(`
+indicator("Public Divergence Checkpoint")
+oscillator = close - open
+pricePivot = ta.pivothigh(high, 1, 1)
+oscPivot = bar_index == 2 ? 8 : bar_index == 4 ? 5 : na
+var lastPricePivot = na
+var lastOscPivot = na
+bearish = false
+if not na(pricePivot) and not na(oscPivot)
+    bearish := not na(lastPricePivot) and pricePivot > lastPricePivot and oscPivot < lastOscPivot
+    lastPricePivot := pricePivot
+    lastOscPivot := oscPivot
+plot(pricePivot, title="Price Pivot")
+plot(oscPivot, title="Osc Pivot")
+plot(bearish ? 1 : 0, title="Bearish Divergence")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Price Pivot').values).toEqual([null, null, 15, null, 18]);
+    expect(getPlot(result, 'Osc Pivot').values).toEqual([null, null, 8, null, 5]);
+    expect(getPlot(result, 'Bearish Divergence').values).toEqual([0, 0, 0, 0, 1]);
+  });
+
+  it('locks a reduced public session-gated signal idiom', () => {
+    // Public idiom reference: intraday scripts frequently gate signals with a
+    // user/session time filter.
+    // Source search: https://www.tradingview.com/scripts/search/session%20filter/
+    const result = runCompatScript(`
+indicator("Public Session Filter Checkpoint")
+inSession = not na(time("1", "2218-2224"))
+rawSignal = close > open
+plot(inSession ? 1 : 0, title="In Session")
+plot(inSession and rawSignal ? 1 : 0, title="Filtered Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'In Session').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0]);
+    expect(getPlot(result, 'Filtered Signal').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0]);
   });
 });
