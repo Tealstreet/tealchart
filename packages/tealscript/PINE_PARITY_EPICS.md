@@ -347,7 +347,7 @@ Phases:
    line styles plus common plot offsets, `display.none` hiding, and
    `show_last` windows plus `histbase` baselines for histogram/columns and
    area styles. Renderer coverage also draws `trackprice` lines; price-scale
-   labels remain future work.
+   labels remain future work. Point marker rendering now honors `join=true`.
 2. Finish `hline()` handles and visual settings.
 3. Finish `fill()` for plot/hline handles, fill gaps, title/editable/display,
    and color series behavior.

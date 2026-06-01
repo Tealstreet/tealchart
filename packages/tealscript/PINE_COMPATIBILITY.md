@@ -293,7 +293,8 @@ renders common plot offsets for line, marker, histogram, and area plot styles.
 Renderer coverage also honors `display.none` while retaining hidden plot values
 for dependent fills, and applies `histbase` baselines to histogram/columns and
 area plot rendering when supplied. Plot renderer coverage also draws
-`trackprice` lines at the latest finite rendered plot value.
+`trackprice` lines at the latest finite rendered plot value and joins
+circle/cross plot markers when `join=true`.
 
 Fill renderer coverage applies `show_last` windows to filled regions while
 preserving existing gap handling and per-bar fill colors.
