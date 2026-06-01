@@ -219,7 +219,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['alert', { params: ['message', 'freq'], minArgs: 1 }],
   ['alertcondition', { params: ['condition', 'title', 'message'], minArgs: 1 }],
   ['barcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display'], minArgs: 1 }],
-  ['bgcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display'], minArgs: 1 }],
+  ['bgcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay'], minArgs: 1 }],
   ['color.new', { params: ['color', 'transp'], minArgs: 2, maxArgs: 2 }],
   ['fill', { params: ['hline1', 'hline2', 'color', 'title', 'editable', 'show_last', 'fillgaps', 'display'], minArgs: 3 }],
   ['fixnan', { params: ['source'], minArgs: 1, maxArgs: 1 }],

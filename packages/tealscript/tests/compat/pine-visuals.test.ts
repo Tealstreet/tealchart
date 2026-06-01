@@ -127,7 +127,7 @@ plotbar(o, h + 1, l - 1, c, "Custom bars", bodyColor, false, 6, display.none)
   it('captures background and bar color visual parameters', () => {
     const result = runCompatScript(`
 indicator("Bar background smoke", overlay=true)
-bgcolor(bar_index == 0 ? color.blue : na, 1, false, 4, "Session", true)
+bgcolor(bar_index == 0 ? color.blue : na, 1, false, 4, "Session", display.price_scale, force_overlay=true)
 barcolor(bar_index == 0 ? color.red : na, 1, true, 5, "Bar Tint", display.none)
 `);
 
@@ -139,6 +139,7 @@ barcolor(bar_index == 0 ? color.red : na, 1, true, 5, "Bar Tint", display.none)
     expect(background.offset).toBe(1);
     expect(background.editable).toBe(false);
     expect(background.showLast).toBe(4);
+    expect(background.display).toBe(8);
     expect(background.forceOverlay).toBe(true);
 
     const barTint = getPlot(result, 'Bar Tint');

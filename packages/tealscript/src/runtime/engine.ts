@@ -4540,7 +4540,8 @@ export class TealscriptEngine {
       const editable = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 2, 'editable'));
       const showLast = this.toOptionalInteger(this.getCallArg(args, namedArgs, 3, 'show_last'));
       const title = (this.getCallArg(args, namedArgs, 4, 'title', 'bgcolor')) as string;
-      const forceOverlay = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 5, 'force_overlay'));
+      const display = this.toOptionalInteger(this.getCallArg(args, namedArgs, 5, 'display'));
+      const forceOverlay = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 6, 'force_overlay'));
 
       const id = `bgcolor_${title}`;
 
@@ -4553,6 +4554,7 @@ export class TealscriptEngine {
           offset,
           editable,
           showLast,
+          display,
           forceOverlay,
         });
       }
