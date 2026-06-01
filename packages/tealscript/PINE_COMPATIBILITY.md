@@ -480,11 +480,15 @@ routes filled rectangles to the script pane with borders, text alignment,
 TradingView text pixel parity, `chart.point` overloads, and remaining edge-case
 styling remain planned.
 
-## Drawing Diagnostic Coverage
+## Table Drawing Coverage
 
-The `table.*` drawing namespace is accepted as parsed member calls and fails
-with explicit unsupported runtime diagnostics. Table handles, lifecycle
-operations, and rendering are still planned.
+The `table.*` drawing pass covers fixed-position table handles, declared row and
+column sizing, background/frame/border metadata, `table.delete()`,
+`table.clear()`, `table.cell()`, and common cell setters for text, color,
+background, size, width, height, and text alignment. Rendering lays out fixed
+tables in the script pane with measured cell sizes, cell backgrounds, borders,
+frame borders, and text alignment. Remaining gaps are the full Pine table setter
+surface and TradingView-exact sizing.
 
 ## Strategy Diagnostic Coverage
 
