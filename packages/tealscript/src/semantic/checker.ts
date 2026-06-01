@@ -1489,7 +1489,11 @@ class SemanticChecker {
       case 'NaExpression':
         return { kind: 'unknown' };
       case 'ArrayExpression':
-        return { kind: 'array', qualifier: this.inferMaxQualifier(expression.elements, scope), elementType: { kind: 'unknown' } };
+        return {
+          kind: 'array',
+          qualifier: this.inferMaxQualifier(expression.elements, scope),
+          elementType: this.inferArrayElementType(expression.elements, scope),
+        };
       case 'Identifier':
         return this.inferIdentifierType(expression, scope);
       case 'BinaryExpression':
@@ -1547,6 +1551,12 @@ class SemanticChecker {
     if (arrayScalarType) return arrayScalarType;
     const arrayHelperType = this.inferArrayHelperCallType(expression, scope);
     if (arrayHelperType) return arrayHelperType;
+    if (calleePath.join('.') === 'array.from') {
+      return {
+        kind: 'array',
+        elementType: this.inferArrayElementType(expression.arguments.map((argument) => argument.value), scope),
+      };
+    }
     if (calleePath.join('.') === 'map.new' && expression.typeArguments?.length === 2) {
       return {
         kind: 'map',
@@ -1684,6 +1694,36 @@ class SemanticChecker {
     const objectType = this.inferExpressionType(expression.object, scope);
     if (objectType.kind === 'array' && objectType.elementType) return objectType.elementType;
     return { kind: 'unknown', qualifier: 'series' };
+  }
+
+  private inferArrayElementType(elements: Expression[], scope: SemanticScope): SemanticType {
+    let elementType: SemanticType | undefined;
+
+    for (const element of elements) {
+      const currentType = this.inferExpressionType(element, scope);
+      elementType = this.mergeArrayElementTypes(elementType, currentType);
+      if (elementType.kind === 'unknown') return elementType;
+    }
+
+    return elementType ?? { kind: 'unknown' };
+  }
+
+  private mergeArrayElementTypes(left: SemanticType | undefined, right: SemanticType): SemanticType {
+    if (!left) return this.arrayElementTypeKind(right);
+
+    const normalizedRight = this.arrayElementTypeKind(right);
+    if (left.kind === 'unknown' || normalizedRight.kind === 'unknown') return { kind: 'unknown' };
+    if (left.kind === normalizedRight.kind) return left;
+    if ((left.kind === 'int' && normalizedRight.kind === 'float') || (left.kind === 'float' && normalizedRight.kind === 'int')) {
+      return { kind: 'float' };
+    }
+
+    return { kind: 'unknown' };
+  }
+
+  private arrayElementTypeKind(type: SemanticType): SemanticType {
+    if (PRIMITIVE_TYPE_KINDS.has(type.kind)) return { kind: type.kind };
+    return { kind: 'unknown' };
   }
 
   private inferMemberExpressionType(expression: MemberExpression, scope: SemanticScope): SemanticType {

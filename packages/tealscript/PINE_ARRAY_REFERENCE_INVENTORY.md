@@ -81,6 +81,8 @@ Implemented:
 
 - `array.new<T>()` generic constructor arity and qualifier diagnostics.
 - Element type inference for `array.new<T>()` and typed constructors.
+- Element type inference for homogeneous array literals and `array.from(...)`,
+  including numeric `int` to `float` widening.
 - Element type propagation through `array.copy`, `array.slice`, `array.concat`,
   `array.abs`, `array.standardize`, and `array.sort_indices`.
 - Element type propagation through index reads and element-returning helpers:
