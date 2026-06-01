@@ -236,6 +236,8 @@ export interface InputDefinition {
  * Execution Context - the runtime environment for a Tealscript
  */
 export class ExecutionContext {
+  private static readonly MAX_PLOT_OUTPUTS = 64;
+
   // =========================================================================
   // Built-in Series (OHLCV)
   // =========================================================================
@@ -595,6 +597,11 @@ export class ExecutionContext {
    * Register a plot
    */
   registerPlot(plot: Omit<PlotOutput, 'values'>): void {
+    const isLimitedPlot = plot.type !== 'hline';
+    if (!this.plots.has(plot.id) && isLimitedPlot && this.countLimitedPlots() >= ExecutionContext.MAX_PLOT_OUTPUTS) {
+      throw new Error(`Too many plot outputs: maximum is ${ExecutionContext.MAX_PLOT_OUTPUTS}`);
+    }
+
     const fullPlot: PlotOutput = {
       ...plot,
       values: [],
@@ -638,6 +645,16 @@ export class ExecutionContext {
    */
   getPlots(): PlotOutput[] {
     return this.plotOrder.map((id) => this.plots.get(id)!).filter(Boolean);
+  }
+
+  private countLimitedPlots(): number {
+    let count = 0;
+    for (const plot of this.plots.values()) {
+      if (plot.type !== 'hline') {
+        count++;
+      }
+    }
+    return count;
   }
 
   /**
