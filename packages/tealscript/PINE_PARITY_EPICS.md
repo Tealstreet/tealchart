@@ -443,8 +443,10 @@ Phases:
    values, copy, and iteration.
    Runtime and compatibility coverage now includes the map MVP: constructors,
    mutation, lookup, keys/values arrays, copy/put_all, key-value loops, value-key
-   validation, and capacity checks. Remaining work is exact type-template
-   enforcement and diagnostics.
+   validation, and capacity checks. Semantic coverage now reports conservative
+   key/value mismatches for known `map<K, V>` variables. Remaining work is
+   unannotated generic constructor inference and full reference/nested
+   type-template enforcement.
 4. Implement user-defined types (`type`), fields, constructors, methods, and
    reference semantics.
    Runtime coverage now includes shallow UDT copies through Pine's

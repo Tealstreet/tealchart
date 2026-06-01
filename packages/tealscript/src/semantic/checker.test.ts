@@ -259,6 +259,31 @@ map<const, float> qualifierKey = map.new<string, float>()
     ]);
   });
 
+  it('reports map key and value template mismatches', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Map Types")
+map<string, float> prices = map.new<string, float>()
+map.put(prices, "BTC", 1)
+prices.put("ETH", 2.5)
+map.get(prices, 1)
+prices.contains(true)
+prices.remove(2)
+map.put(prices, 3, 4)
+prices.put("SOL", "bad")
+string symbol = "DOGE"
+float price = 3
+prices.put(symbol, price)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot use int value as string map key',
+      'Cannot use bool value as string map key',
+      'Cannot use int value as string map key',
+      'Cannot use int value as string map key',
+      'Cannot use string value as float map value',
+    ]);
+  });
+
   it('infers simple literal and array expression types', () => {
     const result = checkProgram(parse(`
 indicator("Inferred Symbols")
