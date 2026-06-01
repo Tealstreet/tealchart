@@ -223,6 +223,7 @@ const TYPE_QUALIFIER_NAMES = new Set(['const', 'input', 'simple', 'series']);
 const COLLECTION_TYPE_NAMES = new Set(['array', 'matrix', 'map']);
 const MAP_KEY_TYPE_NAMES = new Set(['int', 'float', 'bool', 'string', 'color']);
 const PRIMITIVE_TYPE_KINDS = new Set<SemanticTypeKind>(['bool', 'color', 'float', 'int', 'string']);
+const REFERENCE_TYPE_KINDS = new Set<SemanticTypeKind>(['box', 'chart.point', 'hline', 'label', 'line', 'linefill', 'plot', 'polyline', 'table']);
 const STRUCTURED_TYPE_KINDS = new Set<SemanticTypeKind>(['array', 'matrix', 'map', 'udt']);
 const COLLECTION_TEMPLATE_TYPE_PATTERN = /^(array|matrix|map)</;
 const UNKNOWN_SEMANTIC_TYPE: SemanticType = { kind: 'unknown' };
@@ -1896,7 +1897,7 @@ class SemanticChecker {
     }
 
     if (annotation.baseType === 'udt') {
-      return { kind: 'udt', qualifier, name: annotation.name };
+      return this.typeFromName(annotation.name, qualifier);
     }
 
     return this.typeFromName(annotation.baseType, qualifier);
@@ -2186,6 +2187,7 @@ class SemanticChecker {
 
   private arrayElementTypeKind(type: SemanticType): SemanticType {
     if (PRIMITIVE_TYPE_KINDS.has(type.kind)) return { kind: type.kind };
+    if (REFERENCE_TYPE_KINDS.has(type.kind)) return { kind: type.kind };
     if (type.kind === 'udt' && type.name) return { kind: 'udt', name: type.name };
     return { kind: 'unknown' };
   }
@@ -2290,6 +2292,10 @@ class SemanticChecker {
 
     if (STRUCTURED_TYPE_KINDS.has(targetType.kind) || STRUCTURED_TYPE_KINDS.has(sourceType.kind)) {
       return false;
+    }
+
+    if (REFERENCE_TYPE_KINDS.has(targetType.kind) || REFERENCE_TYPE_KINDS.has(sourceType.kind)) {
+      return targetType.kind === sourceType.kind;
     }
 
     if (!PRIMITIVE_TYPE_KINDS.has(targetType.kind) || !PRIMITIVE_TYPE_KINDS.has(sourceType.kind)) return true;

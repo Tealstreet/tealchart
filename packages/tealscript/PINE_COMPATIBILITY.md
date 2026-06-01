@@ -151,9 +151,9 @@ Array index reads and element-returning helpers such as `get`, `first`, `last`,
 `pop`, `shift`, and `remove` preserve known element types.
 Scalar-returning array helpers infer primitive return types for common boolean,
 integer, float, and string helpers such as `includes`, `size`, `avg`, and `join`.
-Homogeneous array literals and `array.from(...)` infer primitive element types,
-including `int` to `float` widening for numeric mixes; mixed primitive arrays
-fall back to unknown element types.
+Homogeneous array literals and `array.from(...)` infer primitive, reference, and
+UDT element types, including `int` to `float` widening for numeric mixes; mixed
+arrays fall back to unknown element types.
 
 The array pass covers the generic constructor (`array.new<T>`), typed
 constructors (`array.new_float`, `array.new_int`, `array.new_bool`,

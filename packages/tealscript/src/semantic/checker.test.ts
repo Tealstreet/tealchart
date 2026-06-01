@@ -631,11 +631,16 @@ literalInts = [1, 2]
 literalFloats = [1, 2.5]
 fromStrings = array.from("a", "b")
 mixed = array.from(1, "b")
+label labelId = na
+fromLabels = array.from(labelId)
 ints = array.new_int()
 strings = array.new_string()
+labels = array.new_label()
 ints.push(literalInts[0])
 ints.push(literalFloats[0])
 strings.push(array.get(fromStrings, 0))
+labels.push(array.get(fromLabels, 0))
+labels.push("bad")
 ints.push(array.get(fromStrings, 0))
 ints.push(mixed[0])
 `));
@@ -645,9 +650,11 @@ ints.push(mixed[0])
     expect(types.get('literalInts')).toMatchObject({ kind: 'array', elementType: { kind: 'int' } });
     expect(types.get('literalFloats')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('fromStrings')).toMatchObject({ kind: 'array', elementType: { kind: 'string' } });
+    expect(types.get('fromLabels')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
     expect(types.get('mixed')).toMatchObject({ kind: 'array', elementType: { kind: 'unknown' } });
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot use float value as int array element',
+      'Cannot use string value as label array element',
       'Cannot use string value as int array element',
     ]);
   });
