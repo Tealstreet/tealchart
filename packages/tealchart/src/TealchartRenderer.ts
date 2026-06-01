@@ -1945,15 +1945,29 @@ export class TealchartRenderer {
    * Render point markers (cross or circle style)
    */
   private renderPointMarkers(plot: PlotOutput, bars: Bar[], viewport: Viewport, style: PlotStyle): void {
-    const { ctx, options, margins } = this;
-    const chartWidth = options.width - margins.left;
+    const { options, margins } = this;
     const chartHeight = options.height - margins.top - margins.bottom;
     const volumeHeight = options.showVolume ? chartHeight * options.volumeHeight : 0;
     const priceHeight = chartHeight - volumeHeight;
 
+    this.renderPointMarkersWithY(plot, bars, viewport, style, (value) => this.priceToY(value, viewport, priceHeight));
+  }
+
+  private renderPointMarkersWithY(
+    plot: PlotOutput,
+    bars: Bar[],
+    viewport: Viewport,
+    style: PlotStyle,
+    valueToY: (value: number) => number,
+  ): void {
+    const { ctx, options, margins } = this;
+    const chartWidth = options.width - margins.left;
+
     const { values, color, linewidth = 1 } = plot;
     const baseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
     const markerSize = Math.max(3, linewidth * 2);
+
+    this.renderJoinedPointLine(plot, bars, viewport, valueToY, baseColor);
 
     for (let i = 0; i < bars.length && i < values.length; i++) {
       const value = values[i];
@@ -1970,7 +1984,7 @@ export class TealchartRenderer {
       }
 
       const x = this.timeToX(plotTime, viewport, chartWidth);
-      const y = this.priceToY(value, viewport, priceHeight);
+      const y = valueToY(value);
       const markerColor = Array.isArray(color) && color[i] ? color[i] : baseColor;
 
       ctx.strokeStyle = markerColor as string;
@@ -1992,6 +2006,77 @@ export class TealchartRenderer {
         ctx.fill();
       }
     }
+  }
+
+  private renderJoinedPointLine(
+    plot: PlotOutput,
+    bars: Bar[],
+    viewport: Viewport,
+    valueToY: (value: number) => number,
+    baseColor: string,
+  ): void {
+    if (!plot.join) return;
+
+    const { ctx, options, margins } = this;
+    const chartWidth = options.width - margins.left;
+    const { values, color, linewidth = 1 } = plot;
+
+    ctx.strokeStyle = baseColor;
+    ctx.lineWidth = linewidth;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'solid'));
+    ctx.beginPath();
+
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    for (let i = 0; i < bars.length && i < values.length; i++) {
+      const value = values[i];
+      const plotTime = this.getPlotTime(plot, bars, i);
+
+      if (!this.shouldRenderPlotBar(plot, bars, i) || plotTime < viewport.startTime || plotTime > viewport.endTime) {
+        continue;
+      }
+
+      if (value === null || value === undefined || isNaN(value)) {
+        if (isDrawing) {
+          ctx.stroke();
+          ctx.beginPath();
+          isDrawing = false;
+        }
+        continue;
+      }
+
+      const x = this.timeToX(plotTime, viewport, chartWidth);
+      const y = valueToY(value);
+
+      if (Array.isArray(color)) {
+        if (isDrawing) {
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(lastX, lastY);
+        }
+        ctx.strokeStyle = color[i] || baseColor;
+      }
+
+      if (!isDrawing) {
+        ctx.moveTo(x, y);
+        isDrawing = true;
+      } else {
+        ctx.lineTo(x, y);
+      }
+
+      lastX = x;
+      lastY = y;
+    }
+
+    if (isDrawing) {
+      ctx.stroke();
+    }
+
+    ctx.setLineDash([]);
   }
 
   private getPerBarColor(
@@ -3816,6 +3901,12 @@ export class TealchartRenderer {
       return;
     }
 
+    if (style === 'cross' || style === 'circles') {
+      this.renderPointMarkersWithY(plot, bars, viewport, style, (value) => this.valueToY(value, pane));
+      this.renderPlotTrackPriceInComputedPane(plot, bars, viewport, pane);
+      return;
+    }
+
     // Get base color from plot
     const plotBaseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
 
@@ -4508,6 +4599,11 @@ export class TealchartRenderer {
     // Handle histogram style
     if (style === 'histogram' || style === 'columns') {
       this.renderHistogramInPane(plot, bars, viewport, paneOffset);
+      return;
+    }
+
+    if (style === 'cross' || style === 'circles') {
+      this.renderPointMarkersWithY(plot, bars, viewport, style, (value) => this.valueToPaneY(value, paneOffset));
       return;
     }
 
