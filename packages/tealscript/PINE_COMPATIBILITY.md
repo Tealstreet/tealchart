@@ -206,7 +206,9 @@ declarations for parser compatibility, typed and untyped fields, field default
 expressions, `varip` field syntax, `<Type>.new()` constructors, positional and
 named constructor arguments, field reads, field reassignment, compound field
 assignment, reference assignment semantics, and realtime rollback for field
-mutations.
+mutations. UDT copy coverage supports Pine's shallow `Type.copy(object)` and
+`object.copy()` forms, so copied UDT fields that contain reference values still
+point at the same nested instances until scripts explicitly deep-copy them.
 
 Compatibility fixtures include a reduced pivot-object array idiom derived from
 TradingView's objects documentation, where scripts define a `pivotPoint` UDT,
@@ -220,9 +222,8 @@ line with Pine's documented method-call equivalence.
 
 Known limits: UDT field, constructor, and method receiver types are recorded
 dynamically but not yet enforced by the semantic checker. Type-based method
-overload resolution, `*.copy()` helpers, library export/import resolution, and
-full reference-type diagnostics remain planned in Epic 12 and the qualified
-type-system epic.
+overload resolution, library export/import resolution, and full reference-type
+diagnostics remain planned in Epic 12 and the qualified type-system epic.
 
 ## Common Library Syntax Coverage
 

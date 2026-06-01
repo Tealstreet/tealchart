@@ -146,6 +146,7 @@ import {
   type PineMatrix,
 } from './matrices';
 import {
+  copyUdtObject,
   createPineUdtObject,
   getUdtField,
   isPineUdtObject,
@@ -1644,6 +1645,23 @@ export class TealscriptEngine {
       }
     }
 
+    if (namespace && funcName === 'copy') {
+      const currentLibraryType = this.findCurrentLibraryType(namespace);
+      if (currentLibraryType) {
+        return this.evaluateTypeCopy(`${currentLibraryType.library.alias}.${currentLibraryType.declaration.name.name}`, args, namedArgs);
+      }
+      if (this.typeDeclarations.has(namespace)) {
+        return this.evaluateTypeCopy(namespace, args, namedArgs);
+      }
+      const importedType = this.findImportedType(namespace);
+      if (importedType && importedType.exported) {
+        return this.evaluateTypeCopy(`${importedType.library.alias}.${importedType.declaration.name.name}`, args, namedArgs);
+      }
+      if (importedType) {
+        throw new Error(`Unknown library type: ${namespace}`);
+      }
+    }
+
     if (namespace && this.importedLibraries.has(namespace)) {
       return this.evaluateImportedFunction(namespace, funcName, args, namedArgs);
     }
@@ -1675,6 +1693,10 @@ export class TealscriptEngine {
         if (methodBuiltin) {
           return methodBuiltin([receiver, ...args], namedArgs, this.ctx, this.scope, this.nextBuiltinCallId(methodBuiltinName));
         }
+      }
+      if (funcName === 'copy' && isPineUdtObject(receiver)) {
+        this.assertNoArguments('copy', args, namedArgs);
+        return copyUdtObject(receiver);
       }
     }
 
@@ -1712,6 +1734,10 @@ export class TealscriptEngine {
       const methodBuiltin = this.builtins.get(methodBuiltinName);
       if (methodBuiltin) {
         return methodBuiltin([receiver, ...args], namedArgs, this.ctx, this.scope, this.nextBuiltinCallId(methodBuiltinName));
+      }
+      if (funcName === 'copy' && isPineUdtObject(receiver)) {
+        this.assertNoArguments('copy', args, namedArgs);
+        return copyUdtObject(receiver);
       }
     }
 
@@ -1839,6 +1865,20 @@ export class TealscriptEngine {
     }
   }
 
+  private evaluateTypeCopy(typeName: string, args: unknown[], namedArgs: Map<string, unknown>): PineUdtObject {
+    const source = this.getCallArg(args, namedArgs, 0, 'id');
+    if (!isPineUdtObject(source)) {
+      throw new Error(`${typeName}.copy expects a user-defined type object`);
+    }
+    if (source.typeName !== typeName) {
+      throw new Error(`${typeName}.copy expects ${typeName}, got ${source.typeName}`);
+    }
+    if (args.length > 1 || namedArgs.size > (namedArgs.has('id') ? 1 : 0)) {
+      throw new Error(`${typeName}.copy expects one object argument`);
+    }
+    return copyUdtObject(source);
+  }
+
   private findCallableUserMethod(
     methodName: string,
     args: unknown[],
@@ -1919,6 +1959,12 @@ export class TealscriptEngine {
 
   private evaluateTypeFieldDefault(field: TypeFieldDeclaration): unknown {
     return field.defaultValue ? this.evaluateExpression(field.defaultValue) : Number.NaN;
+  }
+
+  private assertNoArguments(name: string, args: unknown[], namedArgs: Map<string, unknown>): void {
+    if (args.length > 0 || namedArgs.size > 0) {
+      throw new Error(`${name} expects no arguments`);
+    }
   }
 
   private isUnsupportedDrawingNamespace(_namespace: string): boolean {
