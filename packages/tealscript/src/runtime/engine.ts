@@ -180,7 +180,18 @@ export interface ExecutionResult {
   indicatorPrecision: number;
   indicatorFormat?: string;
   indicatorScale?: string;
+  indicatorTimeframe?: string;
+  indicatorTimeframeGaps?: boolean;
+  indicatorExplicitPlotZOrder?: boolean;
+  indicatorCalcBarsCount?: number;
   indicatorMaxBarsBack?: number;
+  indicatorDynamicRequests: boolean;
+  indicatorDrawingLimits: {
+    label: number;
+    line: number;
+    box: number;
+    polyline: number;
+  };
   strategy: StrategyLedger;
   errors: ExecutionError[];
   profile: RuntimeProfile;
@@ -386,7 +397,18 @@ export class TealscriptEngine {
       indicatorPrecision: this.ctx.indicatorPrecision,
       indicatorFormat: this.ctx.indicatorFormat,
       indicatorScale: this.ctx.indicatorScale,
+      indicatorTimeframe: this.ctx.indicatorTimeframe,
+      indicatorTimeframeGaps: this.ctx.indicatorTimeframeGaps,
+      indicatorExplicitPlotZOrder: this.ctx.indicatorExplicitPlotZOrder,
+      indicatorCalcBarsCount: this.ctx.indicatorCalcBarsCount,
       indicatorMaxBarsBack: this.ctx.indicatorMaxBarsBack,
+      indicatorDynamicRequests: this.indicatorDynamicRequests,
+      indicatorDrawingLimits: {
+        label: this.ctx.getDrawingLimit('label'),
+        line: this.ctx.getDrawingLimit('line'),
+        box: this.ctx.getDrawingLimit('box'),
+        polyline: this.ctx.getDrawingLimit('polyline'),
+      },
       strategy: this.ctx.strategyLedger,
       errors: this.errors,
       profile: {
@@ -615,6 +637,18 @@ export class TealscriptEngine {
     if (stmt.max_bars_back) {
       this.ctx.indicatorMaxBarsBack = this.normalizeMaxBarsBack(this.evaluateExpression(stmt.max_bars_back));
     }
+    if (stmt.timeframe_gaps) {
+      this.ctx.indicatorTimeframeGaps = this.isTruthy(this.evaluateExpression(stmt.timeframe_gaps));
+    }
+    if (stmt.explicit_plot_zorder) {
+      this.ctx.indicatorExplicitPlotZOrder = this.isTruthy(this.evaluateExpression(stmt.explicit_plot_zorder));
+    }
+    if (stmt.calc_bars_count) {
+      this.ctx.indicatorCalcBarsCount = this.normalizeNonNegativeInteger(
+        this.evaluateExpression(stmt.calc_bars_count),
+        'indicator calc_bars_count',
+      );
+    }
     this.applyDrawingLimit(stmt.max_labels_count, 'label', 'max_labels_count');
     this.applyDrawingLimit(stmt.max_lines_count, 'line', 'max_lines_count');
     this.applyDrawingLimit(stmt.max_boxes_count, 'box', 'max_boxes_count');
@@ -762,6 +796,7 @@ export class TealscriptEngine {
     }
 
     this.ctx.timeframe = info;
+    this.ctx.indicatorTimeframe = info.period;
   }
 
   private getTimeframeInfo(period: string): ExecutionContext['timeframe'] | null {

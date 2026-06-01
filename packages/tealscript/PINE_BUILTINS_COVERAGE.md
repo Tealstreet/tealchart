@@ -140,6 +140,9 @@ Current `input.*` progress:
   as `indicatorOverlay` and `indicatorPrecision`.
 - `indicator(..., format=..., scale=...)` is exposed on execution results as
   `indicatorFormat` and `indicatorScale`.
+- Advanced `indicator()` declaration settings for timeframe, gap handling,
+  object limits, explicit plot z-order, calc bars count, and dynamic request
+  mode are exposed on execution results.
 
 ## Out-Of-Scope Namespaces For Epic 5
 

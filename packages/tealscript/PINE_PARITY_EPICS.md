@@ -239,7 +239,9 @@ Phases:
    `precision`, `scale`, `timeframe`, `timeframe_gaps`, object limits,
    `explicit_plot_zorder`, `dynamic_requests`, and `behind_chart`. Initial
    parity work now exposes named `shorttitle`, `overlay`, `precision`,
-   `format`, and `scale` metadata on execution results.
+   `format`, `scale`, `timeframe`, `timeframe_gaps`, object limits,
+   `explicit_plot_zorder`, `calc_bars_count`, and `dynamic_requests` metadata
+   on execution results.
 2. Complete typed `input.*` definitions: min/max/step, options, confirm,
    tooltip, group, inline, display, active, and default validation. Initial
    parity work now covers `defval=` and `title=` named arguments for generic

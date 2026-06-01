@@ -473,6 +473,27 @@ plot(close, title="Close")
     expect(roundSeries(getPlot(result, 'Close').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
   });
 
+  it('surfaces advanced Pine declaration metadata', () => {
+    const result = runCompatScript(`
+indicator("Advanced settings", timeframe="15", timeframe_gaps=false, explicit_plot_zorder=true, max_labels_count=2, max_lines_count=3, max_boxes_count=4, max_polylines_count=5, calc_bars_count=250, dynamic_requests=false)
+plot(close, title="Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTimeframe).toBe('15');
+    expect(result.indicatorTimeframeGaps).toBe(false);
+    expect(result.indicatorExplicitPlotZOrder).toBe(true);
+    expect(result.indicatorCalcBarsCount).toBe(250);
+    expect(result.indicatorDynamicRequests).toBe(false);
+    expect(result.indicatorDrawingLimits).toEqual({
+      label: 2,
+      line: 3,
+      box: 4,
+      polyline: 5,
+    });
+    expect(roundSeries(getPlot(result, 'Close').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+  });
+
   it('matches documented Pine input helper idioms', () => {
     const result = runCompatScript(`
 indicator("Input docs smoke")
