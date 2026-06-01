@@ -29,6 +29,56 @@ function roundSeries(values: Array<number | null>, digits: number = 6): Array<nu
 }
 
 describe('TealscriptEngine', () => {
+  describe('runtime profile', () => {
+    it('reports execution counters for compatibility profiling', () => {
+      const script = `//@version=6
+indicator("Profile")
+basis = ta.sma(close, 2)
+plot(basis, title="Basis")`;
+
+      const result = executeScript(parse(script), createBars(3));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.bars).toBe(3);
+      expect(result.profile.statements).toBeGreaterThanOrEqual(9);
+      expect(result.profile.expressions).toBeGreaterThan(0);
+      expect(result.profile.builtinCalls).toBeGreaterThan(0);
+      expect(result.profile.requestContexts).toBe(0);
+      expect(result.profile.errors).toBe(0);
+      expect(result.profile.elapsedMs).toBeGreaterThanOrEqual(0);
+    });
+
+    it('includes runtime errors in the execution profile', () => {
+      const script = `//@version=6
+indicator("Profile Error")
+if bar_index == 1
+    runtime.error("stop")
+plot(close)`;
+
+      const result = executeScript(parse(script), createBars(3));
+
+      expect(result.errors[0]?.message).toBe('stop');
+      expect(result.profile.bars).toBe(2);
+      expect(result.profile.errors).toBe(1);
+    });
+
+    it('counts statements executed inside function bodies', () => {
+      const script = `//@version=6
+indicator("Function Profile")
+adjust(value) =>
+    shifted = value + 1
+    if shifted > 0
+        shifted := shifted + 1
+    shifted
+plot(adjust(close))`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.statements).toBeGreaterThan(3);
+    });
+  });
+
   describe('Pine strategy declarations', () => {
     it('applies strategy declaration settings to the ledger', () => {
       const script = `//@version=6

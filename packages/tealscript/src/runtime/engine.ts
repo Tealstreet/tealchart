@@ -178,6 +178,17 @@ export interface ExecutionResult {
   indicatorMaxBarsBack?: number;
   strategy: StrategyLedger;
   errors: ExecutionError[];
+  profile: RuntimeProfile;
+}
+
+export interface RuntimeProfile {
+  elapsedMs: number;
+  bars: number;
+  statements: number;
+  expressions: number;
+  builtinCalls: number;
+  requestContexts: number;
+  errors: number;
 }
 
 /**
@@ -249,6 +260,11 @@ export class TealscriptEngine {
   private requestContextDepth = 0;
   private requestLocalScopeDepth = 0;
   private errors: ExecutionError[] = [];
+  private profileStartMs = 0;
+  private profileBars = 0;
+  private profileStatements = 0;
+  private profileExpressions = 0;
+  private profileBuiltinCalls = 0;
 
   constructor(options: TealscriptEngineOptions = {}) {
     this.ctx = new ExecutionContext();
@@ -269,6 +285,7 @@ export class TealscriptEngine {
    */
   execute(ast: Program, bars: Bar[], inputs?: Map<string, unknown>): ExecutionResult {
     this.errors = [];
+    this.resetProfile();
     this.ctx.reset();
     this.scope = createRootScope();
     this.typeDeclarations.clear();
@@ -301,6 +318,7 @@ export class TealscriptEngine {
 
     // Execute bar by bar
     while (this.ctx.advanceBar()) {
+      this.profileBars += 1;
       // Advance scope to new bar
       this.scope.advanceBar();
       for (const functionScope of this.functionScopes.values()) {
@@ -351,7 +369,24 @@ export class TealscriptEngine {
       indicatorMaxBarsBack: this.ctx.indicatorMaxBarsBack,
       strategy: this.ctx.strategyLedger,
       errors: this.errors,
+      profile: {
+        elapsedMs: Date.now() - this.profileStartMs,
+        bars: this.profileBars,
+        statements: this.profileStatements,
+        expressions: this.profileExpressions,
+        builtinCalls: this.profileBuiltinCalls,
+        requestContexts: this.requestContextKeys.size,
+        errors: this.errors.length,
+      },
     };
+  }
+
+  private resetProfile(): void {
+    this.profileStartMs = Date.now();
+    this.profileBars = 0;
+    this.profileStatements = 0;
+    this.profileExpressions = 0;
+    this.profileBuiltinCalls = 0;
   }
 
   /**
@@ -427,6 +462,14 @@ export class TealscriptEngine {
   // ===========================================================================
 
   private executeStatement(stmt: Statement): void {
+    this.executeStatementInternal(stmt, true);
+  }
+
+  private executeStatementInternal(stmt: Statement, countProfile: boolean): void {
+    if (countProfile) {
+      this.profileStatements += 1;
+    }
+
     switch (stmt.type) {
       case 'IndicatorDeclaration':
         this.executeIndicator(stmt);
@@ -1029,6 +1072,7 @@ export class TealscriptEngine {
   // ===========================================================================
 
   private evaluateExpression(expr: Expression): unknown {
+    this.profileExpressions += 1;
     switch (expr.type) {
       case 'NumericLiteral':
         return expr.value;
@@ -2283,6 +2327,8 @@ export class TealscriptEngine {
   }
 
   private executeFunctionStatement(stmt: Statement): { hasResult: boolean; value?: unknown } {
+    this.profileStatements += 1;
+
     if (stmt.type === 'ExpressionStatement') {
       return { hasResult: true, value: this.evaluateExpression(stmt.expression) };
     }
@@ -2299,7 +2345,7 @@ export class TealscriptEngine {
       return this.executeFunctionWhile(stmt);
     }
 
-    this.executeStatement(stmt);
+    this.executeStatementInternal(stmt, false);
     return { hasResult: false };
   }
 
@@ -3849,6 +3895,7 @@ export class TealscriptEngine {
   }
 
   private nextBuiltinCallId(name: string): string {
+    this.profileBuiltinCalls += 1;
     const index = this.builtinCallCounts.get(name) ?? 0;
     this.builtinCallCounts.set(name, index + 1);
     return `${name}_${index}`;
@@ -3856,6 +3903,7 @@ export class TealscriptEngine {
 
   private builtinCallId(name: string, expr: CallExpression): string {
     if ((name === 'alert' || name === 'math.random') && expr.loc) {
+      this.profileBuiltinCalls += 1;
       return `${name}_${expr.loc.start.line}_${expr.loc.start.column}`;
     }
 
