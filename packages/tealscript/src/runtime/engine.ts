@@ -4815,17 +4815,17 @@ export class TealscriptEngine {
     unaryMath('math.todegrees', (number) => number * (180 / Math.PI));
 
     // nz - replace na with value
-    this.builtins.set('nz', (args) => {
-      this.rejectBoolNaHelperArgs('nz', args);
-      const value = args[0];
-      const replacement = args[1] ?? 0;
+    this.builtins.set('nz', (args, namedArgs) => {
+      const value = this.getCallArg(args, namedArgs, 0, 'source');
+      const replacement = this.getCallArg(args, namedArgs, 1, 'replacement', 0);
+      this.rejectBoolNaHelperArgs('nz', [value, replacement]);
       return this.isNa(value) ? replacement : value;
     });
 
-    this.builtins.set('fixnan', (args, _namedArgs, _ctx, scope, callId) => {
-      this.rejectBoolNaHelperArgs('fixnan', args);
+    this.builtins.set('fixnan', (args, namedArgs, _ctx, scope, callId) => {
+      const value = this.getCallArg(args, namedArgs, 0, 'source');
+      this.rejectBoolNaHelperArgs('fixnan', [value]);
       const key = `_fixnan_${callId}`;
-      const value = args[0];
       if (this.isNa(value)) {
         return scope.has(key) ? scope.get(key) : Number.NaN;
       }
@@ -4833,18 +4833,18 @@ export class TealscriptEngine {
       return value;
     });
 
-    this.builtins.set('float', (args) => this.toNumber(args[0]));
-    this.builtins.set('int', (args) => {
-      const value = this.toNumber(args[0]);
+    this.builtins.set('float', (args, namedArgs) => this.toNumber(this.getCallArg(args, namedArgs, 0, 'x')));
+    this.builtins.set('int', (args, namedArgs) => {
+      const value = this.toNumber(this.getCallArg(args, namedArgs, 0, 'x'));
       return Number.isNaN(value) ? Number.NaN : Math.trunc(value);
     });
-    this.builtins.set('bool', (args) => this.isTruthy(args[0]));
-    this.builtins.set('string', (args) => this.toStringValue(args[0]));
+    this.builtins.set('bool', (args, namedArgs) => this.isTruthy(this.getCallArg(args, namedArgs, 0, 'x')));
+    this.builtins.set('string', (args, namedArgs) => this.toStringValue(this.getCallArg(args, namedArgs, 0, 'x')));
 
     // na function
-    this.builtins.set('na', (args) => {
-      if (args.length === 0) return NaN;
-      const value = args[0];
+    this.builtins.set('na', (args, namedArgs) => {
+      if (args.length === 0 && !namedArgs.has('x')) return NaN;
+      const value = this.getCallArg(args, namedArgs, 0, 'x');
       return typeof value === 'number' && isNaN(value);
     });
   }

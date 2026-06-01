@@ -223,7 +223,8 @@ Phases:
    gradients, and theme-sensitive behavior where possible. Initial parity work
    now covers named constructor/channel/gradient arguments and `color.none`.
 6. Add remaining global helpers such as `nz`, `fixnan`, and typed casts with
-   Pine-compatible semantics.
+   Pine-compatible semantics. Initial parity work now covers named helper
+   arguments and named bool rejection for `nz` / `fixnan`.
 
 Done means missing built-ins are tracked as explicit unsupported items, not
 surprises.

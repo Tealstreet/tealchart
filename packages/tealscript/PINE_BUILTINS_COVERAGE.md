@@ -121,6 +121,13 @@ Current `color.*` progress:
 - Gradient helpers support named value, bound, and color parameters for common
   public-script idioms.
 
+Current global-helper progress:
+
+- `nz`, `fixnan`, `na`, and primitive casts accept Pine-style named arguments
+  for covered parameters.
+- v6 bool rejection for `nz` and `fixnan` now applies to named arguments as
+  well as positional arguments.
+
 ## Out-Of-Scope Namespaces For Epic 5
 
 These namespaces are tracked here because they are built-ins, but their parity
