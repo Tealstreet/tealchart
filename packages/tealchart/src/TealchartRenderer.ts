@@ -1911,8 +1911,7 @@ export class TealchartRenderer {
     const slotWidth = barInterval * pixelsPerMs;
     const barWidth = Math.max(2, slotWidth * 0.6);
 
-    // Zero line Y coordinate
-    const zeroY = this.priceToY(0, viewport, priceHeight);
+    const baselineY = this.priceToY(this.getPlotHistbase(plot), viewport, priceHeight);
 
     for (let i = 0; i < bars.length && i < values.length; i++) {
       const value = values[i];
@@ -1935,9 +1934,8 @@ export class TealchartRenderer {
       const barColor = Array.isArray(color) && color[i] ? color[i] : baseColor;
       ctx.fillStyle = barColor as string;
 
-      // Draw bar from zero line to value
-      const barTop = Math.min(y, zeroY);
-      const barHeight = Math.abs(y - zeroY);
+      const barTop = Math.min(y, baselineY);
+      const barHeight = Math.abs(y - baselineY);
       ctx.fillRect(x - barWidth / 2, barTop, barWidth, Math.max(1, barHeight));
     }
   }
@@ -2026,6 +2024,14 @@ export class TealchartRenderer {
     const offset = plot.offset ?? 0;
     if (offset === 0 || bars.length < 2) return bar.time;
     return bar.time + offset * (bars[1].time - bars[0].time);
+  }
+
+  private getPlotHistbase(plot: Pick<PlotOutput, 'histbase'>): number {
+    return Number.isFinite(plot.histbase) ? plot.histbase! : 0;
+  }
+
+  private hasPlotHistbase(plot: Pick<PlotOutput, 'histbase'>): boolean {
+    return Number.isFinite(plot.histbase);
   }
 
   private renderOhlcPlotInLegacyMainPane(plot: PlotOutput, bars: Bar[], viewport: Viewport): void {
@@ -2134,7 +2140,11 @@ export class TealchartRenderer {
     ctx.fillStyle = baseColor;
     ctx.globalAlpha = 0.2;
 
-    const baselineY = fillFromTop ? margins.top : margins.top + priceHeight;
+    const baselineY = this.hasPlotHistbase(plot)
+      ? this.priceToY(this.getPlotHistbase(plot), viewport, priceHeight)
+      : fillFromTop
+        ? margins.top
+        : margins.top + priceHeight;
 
     ctx.beginPath();
     let started = false;
@@ -3877,7 +3887,7 @@ export class TealchartRenderer {
     const slotWidth = barInterval * pixelsPerMs;
     const barWidth = Math.max(1, slotWidth * 0.6);
 
-    const zeroY = this.valueToY(0, pane);
+    const baselineY = this.valueToY(this.getPlotHistbase(plot), pane);
 
     for (let i = 0; i < bars.length && i < values.length; i++) {
       const value = values[i];
@@ -3914,10 +3924,10 @@ export class TealchartRenderer {
       }
 
       ctx.fillStyle = barColor;
-      if (value >= 0) {
-        ctx.fillRect(x - barWidth / 2, y, barWidth, zeroY - y);
+      if (value >= this.getPlotHistbase(plot)) {
+        ctx.fillRect(x - barWidth / 2, y, barWidth, baselineY - y);
       } else {
-        ctx.fillRect(x - barWidth / 2, zeroY, barWidth, y - zeroY);
+        ctx.fillRect(x - barWidth / 2, baselineY, barWidth, y - baselineY);
       }
     }
   }
@@ -4523,8 +4533,7 @@ export class TealchartRenderer {
     const slotWidth = barInterval * pixelsPerMs;
     const barWidth = Math.max(2, slotWidth * 0.6);
 
-    // Zero line Y coordinate in pane
-    const zeroY = this.valueToPaneY(0, paneOffset);
+    const baselineY = this.valueToPaneY(this.getPlotHistbase(plot), paneOffset);
 
     for (let i = 0; i < bars.length && i < values.length; i++) {
       const value = values[i];
@@ -4546,8 +4555,8 @@ export class TealchartRenderer {
       const barColor = Array.isArray(color) && color[i] ? color[i] : baseColor;
       ctx.fillStyle = barColor as string;
 
-      const barTop = Math.min(y, zeroY);
-      const barHeight = Math.abs(y - zeroY);
+      const barTop = Math.min(y, baselineY);
+      const barHeight = Math.abs(y - baselineY);
       ctx.fillRect(x - barWidth / 2, barTop, barWidth, Math.max(1, barHeight));
     }
   }

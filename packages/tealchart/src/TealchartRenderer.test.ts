@@ -494,6 +494,80 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(moveTo).not.toHaveBeenCalledWith(hiddenX, expect.any(Number));
       expect(moveTo).toHaveBeenCalledWith(firstVisibleX, expect.any(Number));
     });
+
+    it('uses plot histbase metadata as the histogram baseline', () => {
+      const fillRect = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillRect,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const plots: PlotOutput[] = [
+        {
+          id: 'plot_Histbase',
+          type: 'plot',
+          title: 'Histbase',
+          values: [90, 110],
+          color: '#2196F3',
+          style: 'histogram',
+          histbase: 100,
+        },
+      ];
+
+      renderer.renderPlots(plots, bars, viewport);
+
+      const baselineY = renderer.publicPriceToY(100, viewport);
+      const valueY = renderer.publicPriceToY(110, viewport);
+      expect(fillRect).toHaveBeenCalledTimes(2);
+      expect(fillRect.mock.calls[0]![1]).toBeCloseTo(baselineY);
+      expect(fillRect.mock.calls[1]![1]).toBeCloseTo(valueY);
+      expect(fillRect.mock.calls[1]![3]).toBeCloseTo(baselineY - valueY);
+    });
+
+    it('uses plot histbase metadata as the area baseline when provided', () => {
+      const moveTo = vi.fn();
+      const lineTo = vi.fn();
+      const fill = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        moveTo,
+        lineTo,
+        fill,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const plots: PlotOutput[] = [
+        {
+          id: 'plot_AreaHistbase',
+          type: 'plot',
+          title: 'AreaHistbase',
+          values: [110, 120],
+          color: '#2196F3',
+          style: 'area',
+          histbase: 100,
+        },
+      ];
+
+      renderer.renderPlots(plots, bars, viewport);
+
+      const baselineY = renderer.publicPriceToY(100, viewport);
+      expect(moveTo).toHaveBeenCalledWith(expect.any(Number), baselineY);
+      expect(lineTo).toHaveBeenCalledWith(expect.any(Number), baselineY);
+      expect(fill).toHaveBeenCalled();
+    });
   });
 
   describe('Pine OHLC plot rendering', () => {
