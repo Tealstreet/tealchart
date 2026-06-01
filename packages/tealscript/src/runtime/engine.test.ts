@@ -2714,6 +2714,47 @@ plot(indexed, title="Indexed")`;
       expect(result.plots.find((plot) => plot.title === 'Indexed')?.values).toEqual([6, 6]);
     });
 
+    it('executes matrix sum and diff helpers with matrix and scalar operands', () => {
+      const script = `//@version=6
+indicator("Matrix Arithmetic")
+left = matrix.new_float(2, 2, 0)
+left.set(0, 0, 1)
+left.set(0, 1, 2)
+left.set(1, 0, 3)
+left.set(1, 1, 4)
+right = matrix.new_float(2, 2, 10)
+sum = matrix.sum(left, right)
+diff = right.diff(left)
+scaled = left.sum(5)
+plot(sum.get(1, 1), title="Sum")
+plot(diff.get(1, 0), title="Diff")
+plot(scaled.get(0, 1), title="Scalar")
+plot(left.get(0, 1), title="Original")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Sum')?.values).toEqual([14, 14]);
+      expect(result.plots.find((plot) => plot.title === 'Diff')?.values).toEqual([7, 7]);
+      expect(result.plots.find((plot) => plot.title === 'Scalar')?.values).toEqual([7, 7]);
+      expect(result.plots.find((plot) => plot.title === 'Original')?.values).toEqual([2, 2]);
+    });
+
+    it('reports matrix sum and diff shape mismatches', () => {
+      const script = `//@version=6
+indicator("Matrix Shape Mismatch")
+left = matrix.new_float(2, 2, 1)
+right = matrix.new_float(1, 4, 1)
+sum = matrix.sum(left, right)
+plot(sum.get(0, 0))`;
+
+      const result = executeScript(parse(script), createBars(1, 100));
+
+      expect(result.errors[0]?.message).toBe('Matrix dimensions must match. Left is 2x2, right is 1x4');
+    });
+
     it('returns expression results from user function if branches', () => {
       const script = `//@version=6
 indicator("Function If")

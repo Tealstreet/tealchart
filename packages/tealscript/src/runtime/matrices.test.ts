@@ -7,6 +7,7 @@ import {
   avgMatrixValue,
   copyMatrix,
   createPineMatrix,
+  diffMatrixValue,
   fillMatrix,
   getMatrixColumns,
   getMatrixElementCount,
@@ -26,6 +27,7 @@ import {
   reshapeMatrix,
   reverseMatrix,
   setMatrixValue,
+  sumMatrixValue,
   swapMatrixColumns,
   swapMatrixRows,
   transposeMatrix,
@@ -151,5 +153,34 @@ describe('PineMatrix', () => {
     expect(maxMatrixValue(matrix)).toBe(8);
     expect(medianMatrixValue(matrix)).toBe(2);
     expect(modeMatrixValue(matrix)).toBe(2);
+  });
+
+  it('adds and subtracts matrices and scalar values without mutating inputs', () => {
+    const left = createPineMatrix<number>(2, 2, 0);
+    setMatrixValue(left, 0, 0, 1);
+    setMatrixValue(left, 0, 1, 2);
+    setMatrixValue(left, 1, 0, 3);
+    setMatrixValue(left, 1, 1, 4);
+
+    const right = createPineMatrix<number>(2, 2, 0);
+    setMatrixValue(right, 0, 0, 10);
+    setMatrixValue(right, 0, 1, 20);
+    setMatrixValue(right, 1, 0, 30);
+    setMatrixValue(right, 1, 1, 40);
+
+    expect(sumMatrixValue(left, right).values).toEqual([11, 22, 33, 44]);
+    expect(diffMatrixValue(right, left).values).toEqual([9, 18, 27, 36]);
+    expect(sumMatrixValue(left, 5).values).toEqual([6, 7, 8, 9]);
+    expect(diffMatrixValue(left, 1).values).toEqual([0, 1, 2, 3]);
+    expect(left.values).toEqual([1, 2, 3, 4]);
+    expect(right.values).toEqual([10, 20, 30, 40]);
+  });
+
+  it('rejects matrix arithmetic with mismatched shapes', () => {
+    const left = createPineMatrix<number>(2, 2, 1);
+    const right = createPineMatrix<number>(1, 4, 1);
+
+    expect(() => sumMatrixValue(left, right)).toThrow('Matrix dimensions must match. Left is 2x2, right is 1x4');
+    expect(() => diffMatrixValue(left, right)).toThrow('Matrix dimensions must match. Left is 2x2, right is 1x4');
   });
 });
