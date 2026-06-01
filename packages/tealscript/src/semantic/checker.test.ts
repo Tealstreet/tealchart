@@ -321,6 +321,14 @@ array.fill(prices, "bad")
 typed = array.new_int()
 typed.push(1)
 typed.push("bad")
+copied = prices.copy()
+copied.push("bad")
+window = array.slice(prices, 0, 1)
+window.push("bad")
+indices = prices.sort_indices()
+indices.push("bad")
+absolute = array.abs(prices)
+absolute.push("bad")
 unknown = array.from(1)
 unknown.push("allowed")
 `));
@@ -332,6 +340,10 @@ unknown.push("allowed")
       'Cannot use string value as float array element',
       'Cannot use string value as float array element',
       'Cannot use string value as int array element',
+      'Cannot use string value as float array element',
+      'Cannot use string value as float array element',
+      'Cannot use string value as int array element',
+      'Cannot use string value as float array element',
     ]);
   });
 
@@ -344,6 +356,12 @@ enabled = true
 name = "BTC"
 tint = #ff00ff
 values = [1, 2]
+floatValues = array.new_float()
+copied = floatValues.copy()
+sliced = array.slice(floatValues, 0, 1)
+absolute = array.abs(floatValues)
+standardized = floatValues.standardize()
+indices = floatValues.sort_indices()
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -355,6 +373,11 @@ values = [1, 2]
     expect(types.get('name')).toMatchObject({ kind: 'string' });
     expect(types.get('tint')).toMatchObject({ kind: 'color' });
     expect(types.get('values')).toMatchObject({ kind: 'array' });
+    expect(types.get('copied')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('sliced')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('absolute')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('standardized')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('indices')).toMatchObject({ kind: 'array', elementType: { kind: 'int' } });
   });
 
   it('records explicit qualifiers and infers common qualifier sources', () => {

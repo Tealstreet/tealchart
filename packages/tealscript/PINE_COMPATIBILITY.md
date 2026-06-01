@@ -135,6 +135,8 @@ common typed constructors such as `array.new_float()` and `array.new_label()`,
 which keeps downstream diagnostics aligned with Pine's constructor templates.
 Known mutable arrays report conservative element-type mismatches for common
 mutation helpers such as `push`, `unshift`, `set`, `insert`, and `fill`.
+Array-returning helpers preserve useful element types for follow-on checks,
+including `copy`, `slice`, `concat`, `abs`, `standardize`, and `sort_indices`.
 
 The array pass covers the generic constructor (`array.new<T>`), typed
 constructors (`array.new_float`, `array.new_int`, `array.new_bool`,
