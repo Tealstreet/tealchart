@@ -112,7 +112,9 @@ const BUILTIN_GLOBALS = new Set([
   'open',
   'time',
   'time_close',
+  'time_tradingday',
   'timenow',
+  'last_bar_time',
   'volume',
 ]);
 
@@ -837,7 +839,7 @@ class SemanticChecker {
   }
 
   private inferIdentifierType(identifier: Identifier, scope: SemanticScope): SemanticType {
-    if (['close', 'high', 'hl2', 'hlc3', 'low', 'ohlc4', 'open', 'time', 'time_close', 'timenow', 'volume'].includes(identifier.name)) {
+    if (['close', 'high', 'hl2', 'hlc3', 'low', 'ohlc4', 'open', 'time', 'time_close', 'time_tradingday', 'timenow', 'last_bar_time', 'volume'].includes(identifier.name)) {
       return { kind: 'unknown', qualifier: 'series' };
     }
     if (['bar_index', 'last_bar_index'].includes(identifier.name)) {

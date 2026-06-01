@@ -1352,6 +1352,8 @@ export class TealscriptEngine {
         return this.ctx.volume.get(0);
       case 'time':
         return this.ctx.time.get(0);
+      case 'time_tradingday':
+        return this.getTradingDayTime(this.ctx.time.get(0));
       case 'timenow':
         return this.ctx.timenow.get(0);
       case 'time_close':
@@ -2940,6 +2942,9 @@ export class TealscriptEngine {
         case 'time':
           this.checkHistoryOffset(offset);
           return this.naIfMissing(this.ctx.time.get(offset));
+        case 'time_tradingday':
+          this.checkHistoryOffset(offset);
+          return this.naIfMissing(this.getTradingDayTime(this.ctx.time.get(offset)));
         case 'timenow':
           this.checkHistoryOffset(offset);
           return this.naIfMissing(this.ctx.timenow.get(offset));
@@ -2948,6 +2953,9 @@ export class TealscriptEngine {
           const openTime = this.ctx.time.get(offset);
           return openTime === undefined ? Number.NaN : this.naIfMissing(this.getBarCloseTime(openTime, this.ctx.timeframe.period));
         }
+        case 'last_bar_time':
+          this.checkHistoryOffset(offset);
+          return offset > this.ctx.bar_index ? Number.NaN : this.naIfMissing(this.ctx.getBar(this.ctx.last_bar_index)?.time);
         case 'hl2':
           this.checkHistoryOffset(offset);
           return this.naIfMissing(this.getHl2(offset));
@@ -7378,9 +7386,9 @@ export class TealscriptEngine {
   }
 
   private registerTimeBuiltins(): void {
-    this.builtins.set('timestamp', (args) => this.evaluateTimestamp(args));
-    this.builtins.set('time', (args) => this.evaluateTimeFilter(args, false));
-    this.builtins.set('time_close', (args) => this.evaluateTimeFilter(args, true));
+    this.builtins.set('timestamp', (args, namedArgs) => this.evaluateTimestamp(args, namedArgs));
+    this.builtins.set('time', (args, namedArgs) => this.evaluateTimeFilter(args, namedArgs, false));
+    this.builtins.set('time_close', (args, namedArgs) => this.evaluateTimeFilter(args, namedArgs, true));
     this.builtins.set('timeframe.in_seconds', (args) => {
       const timeframe = args[0] === undefined || args[0] === '' ? this.ctx.timeframe.period : this.toStringValue(args[0]);
       const duration = this.getTimeframeDurationMs(timeframe);
@@ -7444,11 +7452,14 @@ export class TealscriptEngine {
     return `${Math.min(12, Math.ceil(roundedSeconds / 2_592_000))}M`;
   }
 
-  private evaluateTimeFilter(args: unknown[], closeTime: boolean): number {
+  private evaluateTimeFilter(args: unknown[], namedArgs: Map<string, unknown>, closeTime: boolean): number {
     const timestamp = this.ctx.time.get(0) ?? Number.NaN;
-    const timeframe = args[0] === undefined || args[0] === '' ? this.ctx.timeframe.period : this.toStringValue(args[0]);
-    const session = args[1] === undefined || args[1] === '' ? undefined : this.toStringValue(args[1]);
-    const timezone = args[2] === undefined || args[2] === '' ? this.ctx.syminfo.timezone : this.toStringValue(args[2]);
+    const timeframeArg = this.getCallArg(args, namedArgs, 0, 'timeframe', this.ctx.timeframe.period);
+    const sessionArg = this.getCallArg(args, namedArgs, 1, 'session');
+    const timezoneArg = this.getCallArg(args, namedArgs, 2, 'timezone', this.ctx.syminfo.timezone);
+    const timeframe = timeframeArg === undefined || timeframeArg === '' ? this.ctx.timeframe.period : this.toStringValue(timeframeArg);
+    const session = sessionArg === undefined || sessionArg === '' ? undefined : this.toStringValue(sessionArg);
+    const timezone = timezoneArg === undefined || timezoneArg === '' ? this.ctx.syminfo.timezone : this.toStringValue(timezoneArg);
 
     if (!Number.isFinite(timestamp)) return Number.NaN;
     if (session && !this.isTimestampInSession(timestamp, session, timezone)) {
@@ -7458,22 +7469,29 @@ export class TealscriptEngine {
     return closeTime ? this.getBarCloseTime(timestamp, timeframe) : timestamp;
   }
 
-  private evaluateTimestamp(args: unknown[]): number {
-    if (args.length === 0) return Number.NaN;
+  private evaluateTimestamp(args: unknown[], namedArgs: Map<string, unknown>): number {
+    if (args.length === 0 && namedArgs.size === 0) return Number.NaN;
+
+    if (namedArgs.size === 0 && args.length === 1 && typeof args[0] === 'string') {
+      const parsed = Date.parse(args[0]);
+      return Number.isFinite(parsed) ? parsed : Number.NaN;
+    }
 
     let timezone = this.ctx.syminfo.timezone;
     let offset = 0;
-    if (typeof args[0] === 'string') {
+    if (namedArgs.has('timezone')) {
+      timezone = this.toStringValue(namedArgs.get('timezone'));
+    } else if (typeof args[0] === 'string') {
       timezone = this.toStringValue(args[0]);
       offset = 1;
     }
 
-    const year = this.toNumber(args[offset]);
-    const month = this.toNumber(args[offset + 1]);
-    const day = this.toNumber(args[offset + 2]);
-    const hour = this.toNumber(args[offset + 3] ?? 0);
-    const minute = this.toNumber(args[offset + 4] ?? 0);
-    const second = this.toNumber(args[offset + 5] ?? 0);
+    const year = this.toNumber(namedArgs.has('year') ? namedArgs.get('year') : args[offset]);
+    const month = this.toNumber(namedArgs.has('month') ? namedArgs.get('month') : args[offset + 1]);
+    const day = this.toNumber(namedArgs.has('day') ? namedArgs.get('day') : args[offset + 2]);
+    const hour = this.toNumber(namedArgs.has('hour') ? namedArgs.get('hour') : args[offset + 3] ?? 0);
+    const minute = this.toNumber(namedArgs.has('minute') ? namedArgs.get('minute') : args[offset + 4] ?? 0);
+    const second = this.toNumber(namedArgs.has('second') ? namedArgs.get('second') : args[offset + 5] ?? 0);
 
     if ([year, month, day, hour, minute, second].some((value) => !Number.isFinite(value))) {
       return Number.NaN;
@@ -7500,6 +7518,13 @@ export class TealscriptEngine {
     }
 
     return finalTimestamp;
+  }
+
+  private getTradingDayTime(timestamp: unknown): number {
+    const value = this.toNumber(timestamp);
+    if (!Number.isFinite(value)) return Number.NaN;
+    const date = new Date(value);
+    return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
   }
 
   private getCalendarPart(part: string, timestamp: unknown, timezone: string): number {

@@ -1755,12 +1755,16 @@ plot(timenow, title="Now")`;
       const script = `//@version=6
 indicator("Sessions")
 plot(time, title="Open Time")
+plot(time_tradingday, title="Trading Day")
 plot(time_close, title="Close Time")
 plot(last_bar_time, title="Last Bar Time")
+plot(last_bar_time[1], title="Previous Last Bar Time")
 plot(time_close[1], title="Previous Close Time")
 plot(time("60", "1430-1600") == time ? 1 : 0, title="In Session")
 plot(na(time("60", "1600-1700")) ? 1 : 0, title="Out Session")
-plot(time_close("30", "1430-1600"), title="Filtered Close")`;
+plot(time_close("30", "1430-1600"), title="Filtered Close")
+plot(time(timeframe="60", session="1430-1600", timezone="UTC") == time ? 1 : 0, title="Named Time")
+plot(time_close(timeframe="30", session="1430-1600", timezone="UTC"), title="Named Close")`;
 
       const ast = parse(script);
       const bars: Bar[] = [
@@ -1781,8 +1785,18 @@ plot(time_close("30", "1430-1600"), title="Filtered Close")`;
         Date.UTC(2024, 0, 5, 15, 30),
         Date.UTC(2024, 0, 5, 17, 0),
       ]);
+      expect(result.plots.find((plot) => plot.title === 'Trading Day')?.values).toEqual([
+        Date.UTC(2024, 0, 5),
+        Date.UTC(2024, 0, 5),
+        Date.UTC(2024, 0, 5),
+      ]);
       expect(result.plots.find((plot) => plot.title === 'Last Bar Time')?.values).toEqual([
         Date.UTC(2024, 0, 5, 16, 0),
+        Date.UTC(2024, 0, 5, 16, 0),
+        Date.UTC(2024, 0, 5, 16, 0),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Previous Last Bar Time')?.values).toEqual([
+        null,
         Date.UTC(2024, 0, 5, 16, 0),
         Date.UTC(2024, 0, 5, 16, 0),
       ]);
@@ -1794,6 +1808,24 @@ plot(time_close("30", "1430-1600"), title="Filtered Close")`;
       expect(result.plots.find((plot) => plot.title === 'In Session')?.values).toEqual([0, 1, 0]);
       expect(result.plots.find((plot) => plot.title === 'Out Session')?.values).toEqual([1, 1, 0]);
       expect(result.plots.find((plot) => plot.title === 'Filtered Close')?.values).toEqual([null, Date.UTC(2024, 0, 5, 15, 0), null]);
+      expect(result.plots.find((plot) => plot.title === 'Named Time')?.values).toEqual([0, 1, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Named Close')?.values).toEqual([null, Date.UTC(2024, 0, 5, 15, 0), null]);
+    });
+
+    it('supports timestamp named arguments and date strings', () => {
+      const script = `//@version=6
+indicator("Timestamp Variants")
+namedStamp = timestamp(timezone="America/New_York", year=2024, month=1, day=5, hour=9, minute=30)
+dateStamp = timestamp("20 Aug 2024 00:00:00 +0000")
+plot(namedStamp, title="Named Timestamp")
+plot(dateStamp, title="Date String")`;
+
+      const ast = parse(script);
+      const result = executeScript(ast, createBars(1));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Named Timestamp')?.values).toEqual([Date.UTC(2024, 0, 5, 14, 30)]);
+      expect(result.plots.find((plot) => plot.title === 'Date String')?.values).toEqual([Date.UTC(2024, 7, 20)]);
     });
 
     it('exposes Pine syminfo and timeframe values through member access', () => {
