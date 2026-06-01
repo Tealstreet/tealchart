@@ -277,8 +277,8 @@ the qualified type-system epic.
 
 The visual coloring pass covers `barcolor()` for conditional candle coloring.
 The runtime emits per-bar color outputs and the main-pane renderer applies them
-as candle body/wick overrides, leaving `na` bars on the chart's default up/down
-colors.
+as candle body/wick overrides, honoring `display.none` and `show_last` while
+leaving `na` bars on the chart's default up/down colors.
 
 ## Common Plot Metadata Coverage
 
@@ -309,7 +309,8 @@ Plotshape renderer coverage now draws Pine flag and label marker bodies in
 addition to the existing basic geometric marker shapes.
 The same renderer bar-window handling now applies to common `plot()`,
 `bgcolor()`, `barcolor()`, `plotbar()`, `plotcandle()`, `plotshape()`,
-`plotchar()`, and `plotarrow()` outputs.
+`plotchar()`, and `plotarrow()` outputs. Background renderer coverage applies
+`display.none` hiding through the main visual routing path.
 
 ## Common OHLC Plot Coverage
 
