@@ -217,6 +217,7 @@ bool enabled = true
 string labelText = "hi"
 color tint = color.red
 array<float> values = array.new_float()
+genericValues = array.new<float>()
 matrix<int> grid = matrix.new<int>(1, 1, 0)
 map<string, float> lookup = map.new<string, float>()
 pivotPoint pivot = na
@@ -231,6 +232,7 @@ pivotPoint pivot = na
     expect(types.get('labelText')).toMatchObject({ kind: 'string' });
     expect(types.get('tint')).toMatchObject({ kind: 'color' });
     expect(types.get('values')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('genericValues')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('grid')).toMatchObject({ kind: 'matrix', elementType: { kind: 'int' } });
     expect(types.get('lookup')).toMatchObject({
       kind: 'map',
@@ -244,6 +246,8 @@ pivotPoint pivot = na
     const result = checkProgram(parse(`
 indicator("Bad Templates")
 array<series> invalidArray = array.new_float()
+invalidArrayCtorElement = array.new<series>()
+invalidArrayCtorArity = array.new<float, int>()
 matrix<input> invalidMatrix = matrix.new_int()
 map<label, float> invalidKey = map.new<string, float>()
 map<string, series> invalidValue = map.new<string, float>()
@@ -255,6 +259,8 @@ invalidCtorArity = map.new<string>()
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       "Invalid array element type 'series'; qualifiers cannot be used as template types",
+      "Invalid array element type 'series'; qualifiers cannot be used as template types",
+      'array.new() expects exactly 1 type argument',
       "Invalid matrix element type 'input'; qualifiers cannot be used as template types",
       'Map key type must be int, float, bool, string, or color in variable declaration',
       "Invalid map value type 'series'; qualifiers cannot be used as template types",
