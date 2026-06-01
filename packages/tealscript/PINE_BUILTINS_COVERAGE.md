@@ -141,8 +141,8 @@ Current `input.*` progress:
 - `indicator(..., format=..., scale=...)` is exposed on execution results as
   `indicatorFormat` and `indicatorScale`.
 - Advanced `indicator()` declaration settings for timeframe, gap handling,
-  object limits, explicit plot z-order, calc bars count, and dynamic request
-  mode are exposed on execution results.
+  object limits, explicit plot z-order, behind-chart mode, calc bars count, and
+  dynamic request mode are exposed on execution results.
 
 ## Out-Of-Scope Namespaces For Epic 5
 

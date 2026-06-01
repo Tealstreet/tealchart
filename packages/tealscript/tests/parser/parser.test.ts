@@ -43,7 +43,7 @@ describe('Tealscript Parser', () => {
     });
 
     it('parses indicator with named arguments', () => {
-      const ast = parse('indicator("Test", overlay=true, precision=2, dynamic_requests=false)\n');
+      const ast = parse('indicator("Test", overlay=true, precision=2, dynamic_requests=false, behind_chart=false)\n');
       const indicator = ast.body[0] as IndicatorDeclaration;
       expect(indicator.type).toBe('IndicatorDeclaration');
       expect(indicator.overlay).toEqual(expect.objectContaining({
@@ -55,6 +55,10 @@ describe('Tealscript Parser', () => {
         value: 2,
       }));
       expect(indicator.dynamic_requests).toEqual(expect.objectContaining({
+        type: 'BooleanLiteral',
+        value: false,
+      }));
+      expect(indicator.behind_chart).toEqual(expect.objectContaining({
         type: 'BooleanLiteral',
         value: false,
       }));

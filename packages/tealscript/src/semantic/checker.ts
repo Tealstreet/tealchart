@@ -223,6 +223,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'timeframe',
         'timeframe_gaps',
         'explicit_plot_zorder',
+        'behind_chart',
         'max_lines_count',
         'max_labels_count',
         'max_boxes_count',
