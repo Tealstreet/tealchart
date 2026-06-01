@@ -3934,6 +3934,19 @@ plot(source)`;
       expect(sourceOverrideResult.plots[0].values).toEqual([100, 100.5, 101]);
     });
 
+    it('uses derived source input history for TA functions', () => {
+      const script = `//@version=6
+indicator("Source Input History")
+source = input.source(defval=close, title="Source")
+plot(ta.sma(source, 2))`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars, new Map([['input_Source', 'hlcc4']]));
+
+      expect(roundSeries(result.plots[0].values, 4)).toEqual([null, 100.4, 100.9]);
+    });
+
     it('reports invalid Pine input defaults', () => {
       const script = `//@version=6
 indicator("Invalid input")

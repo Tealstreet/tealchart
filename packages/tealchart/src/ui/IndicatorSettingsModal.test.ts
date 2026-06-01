@@ -3,11 +3,13 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import type { InputDefinition } from '@tealstreet/tealscript';
 
+import { clearChartStoreCache } from '../state/chartState';
 import { IndicatorSettingsModal } from './IndicatorSettingsModal';
 
 describe('IndicatorSettingsModal', () => {
   afterEach(() => {
     document.body.innerHTML = '';
+    clearChartStoreCache();
   });
 
   it('renders Pine input metadata controls and saves typed values', () => {

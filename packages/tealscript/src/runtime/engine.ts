@@ -5960,6 +5960,15 @@ export class TealscriptEngine {
             : undefined;
         },
       };
+    if (source === ctx.hlcc4)
+      return {
+        get: (i) => {
+          const h = ctx.high.get(i);
+          const l = ctx.low.get(i);
+          const c = ctx.close.get(i);
+          return h !== undefined && l !== undefined && c !== undefined ? (h + l + c + c) / 4 : undefined;
+        },
+      };
     // Default: fallback to close (most common case)
     return ctx.close;
   }
