@@ -181,7 +181,10 @@ Phases:
    runtime now preserves primitive `varip` variables between realtime ticks
    while regular `var` variables continue to roll back to the open-bar snapshot.
 4. Implement `max_bars_back` inference/enforcement and clearer unavailable
-   history behavior.
+   history behavior. Explicit `max_bars_back` declarations now reject series
+   and expression-history references beyond the declared buffer while leaving
+   array indexes separate, and runtime profiles report the inferred maximum
+   history offset.
 5. Harden `barstate.*` across historical, realtime, and replay-style updates.
 6. Add repaint-focused fixtures for confirmed/unconfirmed data behavior.
 
