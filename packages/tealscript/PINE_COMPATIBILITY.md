@@ -137,6 +137,8 @@ Known mutable arrays report conservative element-type mismatches for common
 mutation helpers such as `push`, `unshift`, `set`, `insert`, and `fill`.
 Array-returning helpers preserve useful element types for follow-on checks,
 including `copy`, `slice`, `concat`, `abs`, `standardize`, and `sort_indices`.
+Known `concat` calls report conservative source-array element mismatches while
+allowing Pine-style numeric widening such as `array<int>` into `array<float>`.
 
 The array pass covers the generic constructor (`array.new<T>`), typed
 constructors (`array.new_float`, `array.new_int`, `array.new_bool`,

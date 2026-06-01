@@ -1139,15 +1139,26 @@ class SemanticChecker {
 
   private checkArrayCallTypes(expression: CallExpression, scope: SemanticScope): void {
     const arrayCall = this.resolveArrayMutationCall(expression, scope);
-    if (!arrayCall?.arrayType.elementType || !arrayCall.valueArgument) return;
+    if (arrayCall?.arrayType.elementType && arrayCall.valueArgument) {
+      const actualType = this.inferExpressionType(arrayCall.valueArgument, scope);
+      if (!this.isAssignableType(arrayCall.arrayType.elementType, actualType)) {
+        this.addDiagnostic(
+          'type-mismatch',
+          `Cannot use ${actualType.kind} value as ${arrayCall.arrayType.elementType.kind} array element`,
+          arrayCall.valueArgument.loc,
+        );
+      }
+    }
 
-    const actualType = this.inferExpressionType(arrayCall.valueArgument, scope);
-    if (this.isAssignableType(arrayCall.arrayType.elementType, actualType)) return;
+    const concatCall = this.resolveArrayConcatCall(expression, scope);
+    if (!concatCall?.targetType.elementType || !concatCall.sourceType.elementType) return;
+
+    if (this.isAssignableType(concatCall.targetType.elementType, concatCall.sourceType.elementType)) return;
 
     this.addDiagnostic(
       'type-mismatch',
-      `Cannot use ${actualType.kind} value as ${arrayCall.arrayType.elementType.kind} array element`,
-      arrayCall.valueArgument.loc,
+      `Cannot concatenate ${concatCall.sourceType.elementType.kind} array into ${concatCall.targetType.elementType.kind} array`,
+      concatCall.sourceArgument.loc,
     );
   }
 
@@ -1185,6 +1196,31 @@ class SemanticChecker {
 
   private isCheckedArrayMutationOperation(operation: string): operation is 'fill' | 'insert' | 'push' | 'set' | 'unshift' {
     return operation === 'fill' || operation === 'insert' || operation === 'push' || operation === 'set' || operation === 'unshift';
+  }
+
+  private resolveArrayConcatCall(
+    expression: CallExpression,
+    scope: SemanticScope,
+  ): { targetType: SemanticType; sourceType: SemanticType; sourceArgument: Expression } | null {
+    if (expression.callee.type !== 'MemberExpression' || expression.callee.property.name !== 'concat') return null;
+
+    const isNamespaceCall = expression.callee.object.type === 'Identifier' && expression.callee.object.name === 'array';
+    const sourceArgument = this.getCallArgument(expression.arguments, 'array_id', isNamespaceCall ? 1 : 0);
+    if (!sourceArgument) return null;
+
+    let targetType: SemanticType;
+    if (isNamespaceCall) {
+      const targetArgument = this.getCallArgument(expression.arguments, 'id', 0);
+      if (!targetArgument) return null;
+      targetType = this.inferExpressionType(targetArgument, scope);
+    } else {
+      targetType = this.inferExpressionType(expression.callee.object, scope);
+    }
+
+    const sourceType = this.inferExpressionType(sourceArgument, scope);
+    if (targetType.kind !== 'array' || sourceType.kind !== 'array') return null;
+
+    return { targetType, sourceType, sourceArgument };
   }
 
   private checkMapConstructorTypeArguments(expression: CallExpression): void {
