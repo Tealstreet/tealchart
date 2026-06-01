@@ -33,6 +33,7 @@ export {
 export {
   createPineMatrix,
   eigenvaluesMatrixValue,
+  eigenvectorsMatrixValue,
   isPineMatrix,
   isValidMatrix,
   isSquareMatrix,

@@ -104,6 +104,7 @@ import {
   detMatrixValue,
   diffMatrixValue,
   eigenvaluesMatrixValue,
+  eigenvectorsMatrixValue,
   fillMatrix,
   getMatrixColumns,
   getMatrixElementCount,
@@ -5771,6 +5772,7 @@ export class TealscriptEngine {
     this.builtins.set('matrix.inv', (args) => invMatrixValue(readMatrix(args[0])));
     this.builtins.set('matrix.pinv', (args) => pinvMatrixValue(readMatrix(args[0])));
     this.builtins.set('matrix.eigenvalues', (args) => eigenvaluesMatrixValue(readMatrix(args[0])));
+    this.builtins.set('matrix.eigenvectors', (args) => eigenvectorsMatrixValue(readMatrix(args[0])));
     this.builtins.set('matrix.kron', (args) => kronMatrixValue(readMatrix(args[0]), readMatrix(args[1])));
     this.builtins.set('matrix.sort', (args) => {
       sortMatrixRows(readMatrix(args[0]), args[1] as number | undefined, args[2]);

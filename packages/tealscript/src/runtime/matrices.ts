@@ -513,6 +513,19 @@ export function eigenvaluesMatrixValue(matrix: PineMatrix): PineArray<number> {
   return values;
 }
 
+export function eigenvectorsMatrixValue(matrix: PineMatrix): PineMatrix<number> {
+  assertSquareMatrix(matrix, 'Matrix eigenvectors');
+  const eigenvalues = computeEigenvalues(matrix);
+  const result = createPineMatrix<number>(matrix.rows, matrix.columns, 0);
+
+  eigenvalues.forEach((eigenvalue, column) => {
+    const vector = eigenvectorForValue(matrix, eigenvalue, column);
+    vector.forEach((value, row) => setMatrixValue(result, row, column, value));
+  });
+
+  return result;
+}
+
 export function kronMatrixValue(left: PineMatrix, right: PineMatrix): PineMatrix<number> {
   const result = createPineMatrix<number>(left.rows * right.rows, left.columns * right.columns, 0);
   for (let leftRow = 0; leftRow < left.rows; leftRow++) {
@@ -647,6 +660,82 @@ function computeTwoByTwoEigenvalues(matrix: PineMatrix): number[] {
   }
   const root = Math.sqrt(Math.max(0, discriminant));
   return [cleanMatrixNumber((trace + root) / 2), cleanMatrixNumber((trace - root) / 2)];
+}
+
+function eigenvectorForValue(matrix: PineMatrix, eigenvalue: number, preferredFreeColumn: number): number[] {
+  const rows = numericRows(matrix).map((row, rowIndex) => {
+    return row.map((value, columnIndex) => value - (rowIndex === columnIndex ? eigenvalue : 0));
+  });
+  const { reduced, pivotColumns } = reducedRowEchelon(rows);
+  const freeColumn = chooseFreeColumn(matrix.columns, pivotColumns, preferredFreeColumn);
+  const vector = Array.from({ length: matrix.columns }, () => 0);
+  vector[freeColumn] = 1;
+
+  for (let row = pivotColumns.length - 1; row >= 0; row--) {
+    const pivotColumn = pivotColumns[row];
+    let total = 0;
+    for (let column = pivotColumn + 1; column < matrix.columns; column++) {
+      total += reduced[row][column] * vector[column];
+    }
+    vector[pivotColumn] = -total;
+  }
+
+  return normalizeEigenvector(vector);
+}
+
+function reducedRowEchelon(rows: number[][]): { reduced: number[][]; pivotColumns: number[] } {
+  const reduced = rows.map((row) => [...row]);
+  const pivotColumns: number[] = [];
+  let pivotRow = 0;
+
+  for (let column = 0; column < reduced[0].length && pivotRow < reduced.length; column++) {
+    let bestRow = pivotRow;
+    for (let row = pivotRow + 1; row < reduced.length; row++) {
+      if (Math.abs(reduced[row][column]) > Math.abs(reduced[bestRow][column])) {
+        bestRow = row;
+      }
+    }
+    if (Math.abs(reduced[bestRow][column]) <= MATRIX_EPSILON) continue;
+
+    [reduced[pivotRow], reduced[bestRow]] = [reduced[bestRow], reduced[pivotRow]];
+    const pivot = reduced[pivotRow][column];
+    for (let currentColumn = column; currentColumn < reduced[pivotRow].length; currentColumn++) {
+      reduced[pivotRow][currentColumn] /= pivot;
+    }
+
+    for (let row = 0; row < reduced.length; row++) {
+      if (row === pivotRow) continue;
+      const factor = reduced[row][column];
+      for (let currentColumn = column; currentColumn < reduced[row].length; currentColumn++) {
+        reduced[row][currentColumn] -= factor * reduced[pivotRow][currentColumn];
+      }
+    }
+
+    pivotColumns.push(column);
+    pivotRow += 1;
+  }
+
+  return { reduced, pivotColumns };
+}
+
+function chooseFreeColumn(size: number, pivotColumns: number[], preferredFreeColumn: number): number {
+  const pivots = new Set(pivotColumns);
+  const preferred = preferredFreeColumn % size;
+  if (!pivots.has(preferred)) return preferred;
+  for (let column = size - 1; column >= 0; column--) {
+    if (!pivots.has(column)) return column;
+  }
+  return size - 1;
+}
+
+function normalizeEigenvector(vector: number[]): number[] {
+  const norm = Math.sqrt(dotVector(vector, vector));
+  const normalized = norm <= MATRIX_EPSILON ? unitVector(vector.length, 0) : vector.map((value) => cleanMatrixNumber(value / norm));
+  const firstNonZero = normalized.find((value) => Math.abs(value) > MATRIX_EPSILON);
+  if (firstNonZero !== undefined && firstNonZero < 0) {
+    return normalized.map((value) => cleanMatrixNumber(-value));
+  }
+  return normalized;
 }
 
 function qrDecomposition(matrix: number[][]): { q: number[][]; r: number[][] } {
