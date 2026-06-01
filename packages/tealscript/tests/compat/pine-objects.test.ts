@@ -142,4 +142,37 @@ plot(close.choose(), title="Selected")
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Selected').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
   });
+
+  it('selects local method overloads by UDT receiver type', () => {
+    const result = runCompatScript(`
+indicator("Local receiver overload")
+type Left
+    float x
+type Right
+    float y
+method value(Left this) => this.x
+method value(Right this) => this.y
+method bump(Left this) =>
+    this.x += 10
+    this
+method bump(Right this) =>
+    this.y += 20
+    this
+
+left = Left.new(open)
+right = Right.new(close)
+plot(left.value(), title="Left Value")
+plot(right.value(), title="Right Value")
+leftOut = left.bump()
+rightOut = right.bump()
+plot(leftOut.x, title="Left Bump")
+plot(rightOut.y, title="Right Bump")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Left Value').values)).toEqual([100, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110]);
+    expect(roundSeries(getPlot(result, 'Right Value').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+    expect(roundSeries(getPlot(result, 'Left Bump').values)).toEqual([110, 112, 115, 117, 113, 109, 110, 114, 119, 118, 121, 120]);
+    expect(roundSeries(getPlot(result, 'Right Bump').values)).toEqual([122, 125, 127, 123, 119, 120, 124, 129, 128, 131, 130, 132]);
+  });
 });
