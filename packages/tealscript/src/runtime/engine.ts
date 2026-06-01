@@ -101,6 +101,7 @@ import {
   avgMatrixValue,
   copyMatrix,
   createPineMatrix,
+  detMatrixValue,
   diffMatrixValue,
   fillMatrix,
   getMatrixColumns,
@@ -118,6 +119,7 @@ import {
   modeMatrixValue,
   multMatrixValue,
   powMatrixValue,
+  rankMatrixValue,
   removeMatrixColumn,
   removeMatrixRow,
   reshapeMatrix,
@@ -5688,6 +5690,8 @@ export class TealscriptEngine {
     this.builtins.set('matrix.mult', (args) => multMatrixValue(readMatrix(args[0]), readMatrixMultOperand(args[1])));
     this.builtins.set('matrix.pow', (args) => powMatrixValue(readMatrix(args[0]), this.toNumber(args[1])));
     this.builtins.set('matrix.trace', (args) => traceMatrixValue(readMatrix(args[0])));
+    this.builtins.set('matrix.det', (args) => detMatrixValue(readMatrix(args[0])));
+    this.builtins.set('matrix.rank', (args) => rankMatrixValue(readMatrix(args[0])));
     this.builtins.set('matrix.copy', (args) => copyMatrix(readMatrix(args[0])));
     this.builtins.set('matrix.row', (args) => matrixRow(readMatrix(args[0]), args[1] as number));
     this.builtins.set('matrix.col', (args) => matrixColumn(readMatrix(args[0]), args[1] as number));

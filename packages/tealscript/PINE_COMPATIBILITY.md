@@ -164,10 +164,13 @@ Matrix arithmetic coverage includes `matrix.sum()` and `matrix.diff()` with
 same-shape matrix operands and scalar operands, `matrix.mult()` for
 matrix-by-matrix, matrix-by-array, and matrix-by-scalar multiplication,
 `matrix.pow()` for non-negative integer powers, and `matrix.trace()` for square
-matrices. Common Pine method syntax lowers to the same runtime built-ins for calls such as
+matrices. Linear algebra coverage includes `matrix.det()` for square matrices
+and `matrix.rank()` for square or rectangular matrices. Common Pine method
+syntax lowers to the same runtime built-ins for calls such as
 `values.set(row, column, close)`, `values.add_row(array.from(...))`,
 `values.transpose()`, `values.sum(other)`, `values.mult(other)`,
-`values.pow(2)`, `values.trace()`, and `values.avg()`.
+`values.pow(2)`, `values.trace()`, `values.det()`, `values.rank()`, and
+`values.avg()`.
 
 ## Common `map.*` Coverage
 

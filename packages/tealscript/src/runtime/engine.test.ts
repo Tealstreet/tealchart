@@ -2846,6 +2846,61 @@ plot(powered.get(0, 0))`;
       expect(powerResult.errors[0]?.message).toBe('Matrix power must be a non-negative integer');
     });
 
+    it('executes matrix determinant and rank helpers', () => {
+      const script = `//@version=6
+indicator("Matrix Determinant Rank")
+fullRank = matrix.new_float(3, 3, 0)
+fullRank.set(0, 0, 3)
+fullRank.set(0, 1, 2)
+fullRank.set(0, 2, 3)
+fullRank.set(1, 0, 4)
+fullRank.set(1, 1, 6)
+fullRank.set(1, 2, 6)
+fullRank.set(2, 0, 7)
+fullRank.set(2, 1, 4)
+fullRank.set(2, 2, 9)
+deficient = matrix.new_float(3, 3, 0)
+deficient.set(0, 0, 1)
+deficient.set(0, 1, 2)
+deficient.set(0, 2, 3)
+deficient.set(1, 0, 2)
+deficient.set(1, 1, 4)
+deficient.set(1, 2, 6)
+deficient.set(2, 0, 3)
+deficient.set(2, 1, 6)
+deficient.set(2, 2, 9)
+wide = matrix.new_float(2, 3, 0)
+wide.set(0, 0, 1)
+wide.set(0, 1, 2)
+wide.set(0, 2, 3)
+wide.set(1, 0, 4)
+wide.set(1, 1, 5)
+wide.set(1, 2, 6)
+plot(matrix.det(fullRank), title="Det")
+plot(fullRank.rank(), title="Rank")
+plot(deficient.det(), title="Singular")
+plot(wide.rank(), title="Wide Rank")`;
+
+      const result = executeScript(parse(script), createBars(2, 100));
+
+      expect(result.errors).toHaveLength(0);
+      result.plots.find((plot) => plot.title === 'Det')?.values.forEach((value) => expect(value).toBeCloseTo(24));
+      expect(result.plots.find((plot) => plot.title === 'Rank')?.values).toEqual([3, 3]);
+      expect(result.plots.find((plot) => plot.title === 'Singular')?.values).toEqual([0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Wide Rank')?.values).toEqual([2, 2]);
+    });
+
+    it('reports matrix determinant dimension errors', () => {
+      const script = `//@version=6
+indicator("Matrix Determinant Error")
+values = matrix.new_float(2, 3, 1)
+plot(values.det())`;
+
+      const result = executeScript(parse(script), createBars(1, 100));
+
+      expect(result.errors[0]?.message).toBe('Matrix determinant requires a square matrix. Matrix is 2x3');
+    });
+
     it('returns expression results from user function if branches', () => {
       const script = `//@version=6
 indicator("Function If")
