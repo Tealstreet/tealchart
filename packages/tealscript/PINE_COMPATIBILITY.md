@@ -437,12 +437,14 @@ crosses their trigger price, and bracket siblings cancel through OCA.
 stop price is crossed, then fill as limit orders on later bars. Fixed, cash, and
 percent-of-equity sizing resolve to concrete order quantities at submission
 time, and `strategy.entry()` enforces same-direction pyramiding limits and
-expands opposite-direction entry transactions to reverse positions. Trailing
-stops submitted through `strategy.exit(..., trail_price/trail_points,
-trail_offset)` activate on later bars and ratchet against OHLC highs/lows using
-price-unit offsets. Same-bar intrabar path modeling and full broker-emulator
-semantics are still planned. Fill commissions are applied to fills and debited
-from strategy net profit/equity for `percent`, `cash_per_order`, and
+expands opposite-direction entry transactions to reverse positions. This is a
+deterministic OHLC broker emulator: same-bar intrabar path modeling, bar
+magnifier, and lower-timeframe fill simulation remain deferred until the runtime
+has an explicit intrabar data model. Trailing stops submitted through
+`strategy.exit(..., trail_price/trail_points, trail_offset)` activate on later
+bars and ratchet against OHLC highs/lows using price-unit offsets. Fill
+commissions are applied to fills and debited from strategy net profit/equity for
+`percent`, `cash_per_order`, and
 `cash_per_contract` commission settings. Basic `strategy.opentrades.*`
 accessors are available for open trade entry id, entry price, entry bar/time,
 signed size, gross open profit, and commission. Basic
