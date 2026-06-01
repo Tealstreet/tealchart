@@ -33,6 +33,8 @@ import {
   reshapeMatrix,
   reverseMatrix,
   setMatrixValue,
+  sortMatrixRows,
+  submatrixValue,
   sumMatrixValue,
   swapMatrixColumns,
   swapMatrixRows,
@@ -310,5 +312,29 @@ describe('PineMatrix', () => {
     expect(product.values).toEqual([0, 5, 0, 10, 6, 7, 12, 14, 0, 15, 0, 20, 18, 21, 24, 28]);
     expect(left.values).toEqual([1, 2, 3, 4]);
     expect(right.values).toEqual([0, 5, 6, 7]);
+  });
+
+  it('sorts rows by a selected column and extracts copied submatrices', () => {
+    const matrix = createPineMatrix<number>(3, 3, 0);
+    matrix.values = [3, 9, 1, 1, 5, 2, 2, 7, 3];
+
+    sortMatrixRows(matrix, 1, 'descending');
+    expect(matrix.values).toEqual([3, 9, 1, 2, 7, 3, 1, 5, 2]);
+
+    const submatrix = submatrixValue(matrix, 0, 2, 1, 3);
+    expect(submatrix.rows).toBe(2);
+    expect(submatrix.columns).toBe(2);
+    expect(submatrix.values).toEqual([9, 1, 7, 3]);
+
+    setMatrixValue(submatrix, 0, 0, 100);
+    expect(matrix.values).toEqual([3, 9, 1, 2, 7, 3, 1, 5, 2]);
+  });
+
+  it('rejects invalid matrix sort columns and submatrix ranges', () => {
+    const matrix = createPineMatrix<number>(2, 2, 1);
+
+    expect(() => sortMatrixRows(matrix, 2)).toThrow('Matrix column 2 is out of bounds. column count is 2');
+    expect(() => submatrixValue(matrix, 1, 3, 0, 1)).toThrow('Matrix row range 1..3 is out of bounds. row count is 2');
+    expect(() => submatrixValue(matrix, 0, 1, 2, 1)).toThrow('Matrix column range 2..1 is out of bounds. column count is 2');
   });
 });
