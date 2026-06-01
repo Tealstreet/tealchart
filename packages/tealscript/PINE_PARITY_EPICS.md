@@ -464,6 +464,8 @@ Phases:
    Semantic coverage now reports exports outside libraries, empty libraries
    without parsed exportable declarations, and untyped parameters on exported
    functions/methods.
+   Semantic coverage now reports exported function/method bodies that call
+   `input.*()` or reference non-`const` library globals.
 
 Done means library-heavy Pine v5/v6 scripts can be reduced and run without
 large rewrites.
