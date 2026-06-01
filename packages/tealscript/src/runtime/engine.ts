@@ -4703,6 +4703,9 @@ export class TealscriptEngine {
     this.builtins.set('plot.style_columns', () => 'columns');
     this.builtins.set('plot.style_area', () => 'area');
     this.builtins.set('plot.style_areabr', () => 'areabr');
+    this.builtins.set('plot.linestyle_solid', () => 'solid');
+    this.builtins.set('plot.linestyle_dotted', () => 'dotted');
+    this.builtins.set('plot.linestyle_dashed', () => 'dashed');
     this.builtins.set('hline.style_solid', () => 'solid');
     this.builtins.set('hline.style_dotted', () => 'dotted');
     this.builtins.set('hline.style_dashed', () => 'dashed');
