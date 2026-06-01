@@ -177,7 +177,9 @@ Phases:
    `barstate` flags for those open bars, and rolls regular variable mutations
    back between same-bar ticks while committing the closed realtime bar when the
    next bar opens.
-3. Complete `var` and `varip`, including intrabar persistence differences.
+3. Complete `var` and `varip`, including intrabar persistence differences. The
+   runtime now preserves primitive `varip` variables between realtime ticks
+   while regular `var` variables continue to roll back to the open-bar snapshot.
 4. Implement `max_bars_back` inference/enforcement and clearer unavailable
    history behavior.
 5. Harden `barstate.*` across historical, realtime, and replay-style updates.
