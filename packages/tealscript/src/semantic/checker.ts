@@ -323,6 +323,9 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['ta.vwap', { params: ['source', 'anchor', 'stdev_mult'], minArgs: 1, maxArgs: 3 }],
   ['time', { params: ['timeframe', 'session', 'timezone'], minArgs: 0, maxArgs: 3 }],
   ['time_close', { params: ['timeframe', 'session', 'timezone'], minArgs: 0, maxArgs: 3 }],
+  ['timeframe.change', { params: ['timeframe'], minArgs: 0, maxArgs: 1 }],
+  ['timeframe.from_seconds', { params: ['seconds'], minArgs: 1, maxArgs: 1 }],
+  ['timeframe.in_seconds', { params: ['timeframe'], minArgs: 0, maxArgs: 1 }],
   ['timestamp', { params: ['timezone', 'year', 'month', 'day', 'hour', 'minute', 'second'], minArgs: 1, maxArgs: 7 }],
 ]);
 
@@ -853,9 +856,11 @@ class SemanticChecker {
     const calleePath = this.memberPath(expression.callee);
     const namespace = calleePath[0];
     if (namespace === 'input') return { kind: 'unknown', qualifier: 'input' };
-    if (namespace === 'request' || namespace === 'ta' || namespace === 'time' || namespace === 'time_close') {
+    if (namespace === 'request' || namespace === 'ta' || namespace === 'time' || namespace === 'time_close' || calleePath.join('.') === 'timeframe.change') {
       return { kind: 'unknown', qualifier: 'series' };
     }
+    if (calleePath.join('.') === 'timeframe.in_seconds') return { kind: 'int', qualifier: 'simple' };
+    if (calleePath.join('.') === 'timeframe.from_seconds') return { kind: 'string', qualifier: 'simple' };
     if (CALENDAR_FUNCTION_NAMES.has(calleePath.join('.'))) return { kind: 'int', qualifier: 'series' };
     if (calleePath.join('.') === 'timestamp') return { kind: 'int', qualifier: 'const' };
     return { kind: 'unknown', qualifier: this.inferMaxQualifier(expression.arguments.map((argument) => argument.value), scope) };

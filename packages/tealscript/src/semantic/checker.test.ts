@@ -54,6 +54,18 @@ plot(stamp + dateStamp)
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('accepts timeframe utility functions with named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Timeframe Utilities")
+isLower = timeframe.in_seconds(timeframe="15") < timeframe.in_seconds("1D")
+rounded = timeframe.from_seconds(seconds=44)
+changed = timeframe.change(timeframe="60")
+plot(isLower and changed ? 1 : 0)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
   it('reports duplicate declarations in the same scope', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate")

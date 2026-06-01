@@ -1953,6 +1953,37 @@ plot(close)`), createBars(1));
       }
     });
 
+    it('supports timeframe utility conversions and change comparisons', () => {
+      const script = `//@version=6
+indicator("Timeframe Utilities")
+plot(timeframe.in_seconds(timeframe="45S"), title="Seconds")
+plot(timeframe.in_seconds("2W"), title="Weeks")
+plot(timeframe.in_seconds("3M"), title="Months")
+plot(timeframe.in_seconds("1T"), title="Ticks")
+plot(timeframe.from_seconds(seconds=44) == "45S" ? 1 : 0, title="From Seconds")
+plot(timeframe.from_seconds(3601) == "61" ? 1 : 0, title="From Minutes")
+plot(timeframe.change(timeframe="60") ? 1 : 0, title="Hourly Change")
+plot(timeframe.in_seconds("15") < timeframe.in_seconds("1D") ? 1 : 0, title="Comparison")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: Date.UTC(2024, 0, 5, 0, 0), open: 1, high: 2, low: 1, close: 2, volume: 100 },
+        { time: Date.UTC(2024, 0, 5, 0, 30), open: 2, high: 3, low: 2, close: 3, volume: 100 },
+        { time: Date.UTC(2024, 0, 5, 1, 0), open: 3, high: 4, low: 3, close: 4, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Seconds')?.values).toEqual([45, 45, 45]);
+      expect(result.plots.find((plot) => plot.title === 'Weeks')?.values).toEqual([1_209_600, 1_209_600, 1_209_600]);
+      expect(result.plots.find((plot) => plot.title === 'Months')?.values).toEqual([7_776_000, 7_776_000, 7_776_000]);
+      expect(result.plots.find((plot) => plot.title === 'Ticks')?.values).toEqual([null, null, null]);
+      expect(result.plots.find((plot) => plot.title === 'From Seconds')?.values).toEqual([1, 1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'From Minutes')?.values).toEqual([1, 1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Hourly Change')?.values).toEqual([1, 0, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Comparison')?.values).toEqual([1, 1, 1]);
+    });
+
     it('keeps multiple untitled plots as separate series', () => {
       const script = `//@version=6
 indicator("Test")

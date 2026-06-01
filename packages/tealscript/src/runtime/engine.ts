@@ -7378,16 +7378,18 @@ export class TealscriptEngine {
     this.builtins.set('timestamp', (args, namedArgs) => this.evaluateTimestamp(args, namedArgs));
     this.builtins.set('time', (args, namedArgs) => this.evaluateTimeFilter(args, namedArgs, false));
     this.builtins.set('time_close', (args, namedArgs) => this.evaluateTimeFilter(args, namedArgs, true));
-    this.builtins.set('timeframe.in_seconds', (args) => {
-      const timeframe = args[0] === undefined || args[0] === '' ? this.ctx.timeframe.period : this.toStringValue(args[0]);
+    this.builtins.set('timeframe.in_seconds', (args, namedArgs) => {
+      const timeframeArg = this.getCallArg(args, namedArgs, 0, 'timeframe', this.ctx.timeframe.period);
+      const timeframe = timeframeArg === undefined || timeframeArg === '' ? this.ctx.timeframe.period : this.toStringValue(timeframeArg);
       const duration = this.getTimeframeDurationMs(timeframe);
       return duration === null ? Number.NaN : duration / 1000;
     });
-    this.builtins.set('timeframe.from_seconds', (args) => {
-      return this.timeframeFromSeconds(this.toNumber(args[0]));
+    this.builtins.set('timeframe.from_seconds', (args, namedArgs) => {
+      return this.timeframeFromSeconds(this.toNumber(this.getCallArg(args, namedArgs, 0, 'seconds')));
     });
-    this.builtins.set('timeframe.change', (args) => {
-      const timeframe = args[0] === undefined || args[0] === '' ? this.ctx.timeframe.period : this.toStringValue(args[0]);
+    this.builtins.set('timeframe.change', (args, namedArgs) => {
+      const timeframeArg = this.getCallArg(args, namedArgs, 0, 'timeframe', this.ctx.timeframe.period);
+      const timeframe = timeframeArg === undefined || timeframeArg === '' ? this.ctx.timeframe.period : this.toStringValue(timeframeArg);
       const duration = this.getTimeframeDurationMs(timeframe);
       const currentTime = this.ctx.time.get(0);
       const previousTime = this.ctx.time.get(1);
