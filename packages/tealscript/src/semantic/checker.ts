@@ -32,6 +32,7 @@ export interface SemanticDiagnostic {
 }
 
 export type SemanticSymbolKind = 'variable' | 'function' | 'parameter' | 'type' | 'import' | 'loop';
+export type SemanticQualifier = 'const' | 'input' | 'simple' | 'series';
 
 export type SemanticTypeKind =
   | 'array'
@@ -57,7 +58,7 @@ export type SemanticTypeKind =
 
 export interface SemanticType {
   kind: SemanticTypeKind;
-  qualifier?: string;
+  qualifier?: SemanticQualifier;
   name?: string;
   elementType?: SemanticType;
   keyType?: SemanticType;
@@ -180,6 +181,13 @@ const BUILTIN_NAMESPACES = new Set([
   'xloc',
   'yloc',
 ]);
+
+const QUALIFIER_RANK: Record<SemanticQualifier, number> = {
+  const: 0,
+  input: 1,
+  simple: 2,
+  series: 3,
+};
 
 export function checkProgram(program: Program): SemanticCheckResult {
   return new SemanticChecker().check(program);
@@ -320,6 +328,7 @@ class SemanticChecker {
 
   private checkVariableDeclaration(statement: VariableDeclaration, scope: SemanticScope): void {
     this.checkExpression(statement.init, scope);
+    this.checkTypeCompatibility(statement.typeAnnotation, statement.init, scope, statement.loc);
     if (statement.names.type === 'TupleDeclarator') {
       this.declareTuple(statement.names, scope);
       return;
@@ -328,7 +337,7 @@ class SemanticChecker {
     this.declare(scope, {
       name: statement.names.name.name,
       kind: 'variable',
-      type: this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init),
+      type: this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init, scope),
       loc: statement.names.name.loc,
     });
   }
@@ -525,26 +534,93 @@ class SemanticChecker {
     return this.typeFromName(annotation.baseType, qualifier);
   }
 
-  private inferExpressionType(expression: Expression): SemanticType {
+  private inferExpressionType(expression: Expression, scope: SemanticScope = this.rootScope): SemanticType {
     switch (expression.type) {
       case 'NumericLiteral':
-        return Number.isInteger(expression.value) ? { kind: 'int' } : { kind: 'float' };
+        return Number.isInteger(expression.value) ? { kind: 'int', qualifier: 'const' } : { kind: 'float', qualifier: 'const' };
       case 'StringLiteral':
-        return { kind: 'string' };
+        return { kind: 'string', qualifier: 'const' };
       case 'BooleanLiteral':
-        return { kind: 'bool' };
+        return { kind: 'bool', qualifier: 'const' };
       case 'ColorLiteral':
-        return { kind: 'color' };
+        return { kind: 'color', qualifier: 'const' };
       case 'NaExpression':
         return { kind: 'unknown' };
       case 'ArrayExpression':
-        return { kind: 'array', elementType: { kind: 'unknown' } };
+        return { kind: 'array', qualifier: this.inferMaxQualifier(expression.elements, scope), elementType: { kind: 'unknown' } };
+      case 'Identifier':
+        return this.inferIdentifierType(expression, scope);
+      case 'BinaryExpression':
+        return { kind: 'unknown', qualifier: this.maxQualifier(this.inferExpressionType(expression.left, scope), this.inferExpressionType(expression.right, scope)) };
+      case 'UnaryExpression':
+        return { kind: 'unknown', qualifier: this.inferExpressionType(expression.argument, scope).qualifier };
+      case 'ConditionalExpression':
+        return {
+          kind: 'unknown',
+          qualifier: this.maxQualifier(
+            this.inferExpressionType(expression.test, scope),
+            this.inferExpressionType(expression.consequent, scope),
+            this.inferExpressionType(expression.alternate, scope),
+          ),
+        };
+      case 'CallExpression':
+        return this.inferCallType(expression, scope);
+      case 'MemberExpression':
+        if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
+          return { kind: 'unknown', qualifier: 'const' };
+        }
+        return this.inferExpressionType(expression.object, scope);
+      case 'IndexExpression':
+        return { kind: 'unknown', qualifier: 'series' };
       default:
         return { kind: 'unknown' };
     }
   }
 
-  private typeFromName(name: string, qualifier?: string): SemanticType {
+  private inferIdentifierType(identifier: Identifier, scope: SemanticScope): SemanticType {
+    if (['close', 'high', 'hl2', 'hlc3', 'low', 'ohlc4', 'open', 'time', 'time_close', 'timenow', 'volume'].includes(identifier.name)) {
+      return { kind: 'unknown', qualifier: 'series' };
+    }
+    if (['bar_index', 'last_bar_index'].includes(identifier.name)) {
+      return { kind: 'int', qualifier: 'series' };
+    }
+    const symbol = scope.lookup(identifier.name);
+    return symbol?.type ?? { kind: 'unknown' };
+  }
+
+  private inferCallType(expression: CallExpression, scope: SemanticScope): SemanticType {
+    const calleePath = this.memberPath(expression.callee);
+    const namespace = calleePath[0];
+    if (namespace === 'input') return { kind: 'unknown', qualifier: 'input' };
+    if (namespace === 'request' || namespace === 'ta' || namespace === 'time' || namespace === 'time_close') {
+      return { kind: 'unknown', qualifier: 'series' };
+    }
+    if (calleePath.join('.') === 'timestamp') return { kind: 'int', qualifier: 'const' };
+    return { kind: 'unknown', qualifier: this.inferMaxQualifier(expression.arguments.map((argument) => argument.value), scope) };
+  }
+
+  private memberPath(expression: Expression): string[] {
+    if (expression.type === 'Identifier') return [expression.name];
+    if (expression.type !== 'MemberExpression') return [];
+    return [...this.memberPath(expression.object), expression.property.name];
+  }
+
+  private inferMaxQualifier(expressions: Expression[], scope: SemanticScope): SemanticQualifier | undefined {
+    return this.maxQualifier(...expressions.map((expression) => this.inferExpressionType(expression, scope)));
+  }
+
+  private maxQualifier(...types: SemanticType[]): SemanticQualifier | undefined {
+    let max: SemanticQualifier | undefined;
+    for (const type of types) {
+      if (!type.qualifier) continue;
+      if (!max || QUALIFIER_RANK[type.qualifier] > QUALIFIER_RANK[max]) {
+        max = type.qualifier;
+      }
+    }
+    return max;
+  }
+
+  private typeFromName(name: string, qualifier?: SemanticQualifier): SemanticType {
     switch (name) {
       case 'int':
       case 'float':
@@ -568,6 +644,22 @@ class SemanticChecker {
         return { kind: name, qualifier };
       default:
         return { kind: 'udt', qualifier, name };
+    }
+  }
+
+  private checkTypeCompatibility(annotation: TypeAnnotation | undefined | null, init: Expression, scope: SemanticScope, loc?: SourceLocation): void {
+    const targetType = this.typeFromAnnotation(annotation);
+    if (!targetType?.qualifier) return;
+
+    const initType = this.inferExpressionType(init, scope);
+    if (!initType.qualifier) return;
+
+    if (QUALIFIER_RANK[initType.qualifier] > QUALIFIER_RANK[targetType.qualifier]) {
+      this.addDiagnostic(
+        'qualifier-mismatch',
+        `Cannot assign ${initType.qualifier} value to ${targetType.qualifier} ${targetType.kind}`,
+        loc,
+      );
     }
   }
 
