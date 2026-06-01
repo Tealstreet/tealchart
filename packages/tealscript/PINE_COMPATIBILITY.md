@@ -350,7 +350,8 @@ higher-timeframe merging, common `gaps` / `lookahead` behavior,
 guards, `request.security_lower_tf()`, and `request.currency_rate()`.
 Runtime execution enforces a Pine-style limit of 40 unique `request.*`
 contexts per script pass so dynamic request scripts cannot create unbounded
-host datafeed work.
+host datafeed work. Visual output registration enforces Pine's 64 plot-output
+limit while exempting `hline()` outputs.
 
 The ticker pass covers `ticker.new()`, `ticker.modify()`, `ticker.standard()`,
 `ticker.inherit()`, `ticker.heikinashi()`, `ticker.renko()`,
