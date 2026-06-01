@@ -112,6 +112,7 @@ import {
   isPineMatrix,
   isSquareMatrix,
   isValidMatrix,
+  kronMatrixValue,
   matrixColumn,
   matrixRow,
   maxMatrixValue,
@@ -5694,6 +5695,7 @@ export class TealscriptEngine {
     this.builtins.set('matrix.det', (args) => detMatrixValue(readMatrix(args[0])));
     this.builtins.set('matrix.rank', (args) => rankMatrixValue(readMatrix(args[0])));
     this.builtins.set('matrix.inv', (args) => invMatrixValue(readMatrix(args[0])));
+    this.builtins.set('matrix.kron', (args) => kronMatrixValue(readMatrix(args[0]), readMatrix(args[1])));
     this.builtins.set('matrix.copy', (args) => copyMatrix(readMatrix(args[0])));
     this.builtins.set('matrix.row', (args) => matrixRow(readMatrix(args[0]), args[1] as number));
     this.builtins.set('matrix.col', (args) => matrixColumn(readMatrix(args[0]), args[1] as number));
