@@ -3225,6 +3225,12 @@ export class TealscriptEngine {
     return window;
   }
 
+  private getAvailableSourceWindow(scope: Scope, key: string, source: number, length: number): number[] {
+    if (isNaN(source) || length < 1) return [];
+    const values = this.updateBuiltinSourceHistory(scope, key, source, length);
+    return values.slice(0, length).filter((value) => !isNaN(value));
+  }
+
   private getCompleteNonNaSourceWindow(scope: Scope, key: string, source: number, length: number): number[] | null {
     if (length < 1) return null;
     const history = (scope.get(key) as number[] | undefined) ?? [];
@@ -5637,30 +5643,19 @@ export class TealscriptEngine {
 
   private registerTaBuiltins(): void {
     // SMA - Simple Moving Average
-    this.builtins.set('ta.sma', (args, namedArgs, ctx) => {
+    this.builtins.set('ta.sma', (args, namedArgs, _ctx, scope, callId) => {
       const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
-
-      // Get the series for the source value
-      const series = this.getSeriesForSource(source, ctx);
+      const values = this.getCompleteSourceWindow(scope, `_ta_sma_source_${callId}`, source, length);
+      if (!values) return NaN;
 
       // Calculate SMA using history
       let sum = 0;
-      let count = 0;
-
-      for (let i = 0; i < length; i++) {
-        const val = series.get(i);
-        if (val !== undefined && !isNaN(val)) {
-          sum += val;
-          count++;
-        }
+      for (const value of values) {
+        sum += value;
       }
 
-      if (count < length) {
-        return NaN; // Not enough data
-      }
-
-      return sum / count;
+      return sum / length;
     });
 
     // EMA - Exponential Moving Average
@@ -5884,17 +5879,15 @@ export class TealscriptEngine {
     });
 
     // Highest - returns highest value of source over length bars
-    this.builtins.set('ta.highest', (args, namedArgs, ctx) => {
+    this.builtins.set('ta.highest', (args, namedArgs, ctx, scope, callId) => {
       const [source, length] = this.getTaSourceLengthArgs(args, namedArgs, ctx, 'high');
-
-      // Get the series for the source value (defaults to high if source matches high)
-      const series = this.getSeriesForSource(source, ctx);
+      const values = this.getAvailableSourceWindow(scope, `_ta_highest_source_${callId}`, source, length);
+      if (values.length === 0) return NaN;
 
       let highest = -Infinity;
-      for (let i = 0; i < length; i++) {
-        const val = series.get(i);
-        if (val !== undefined && !isNaN(val) && val > highest) {
-          highest = val;
+      for (const value of values) {
+        if (value > highest) {
+          highest = value;
         }
       }
 
@@ -5902,36 +5895,31 @@ export class TealscriptEngine {
     });
 
     // Lowest - returns lowest value of source over length bars
-    this.builtins.set('ta.lowest', (args, namedArgs, ctx) => {
+    this.builtins.set('ta.lowest', (args, namedArgs, ctx, scope, callId) => {
       const [source, length] = this.getTaSourceLengthArgs(args, namedArgs, ctx, 'low');
-
-      // Get the series for the source value (defaults to low if source matches low)
-      const series = this.getSeriesForSource(source, ctx);
+      const values = this.getAvailableSourceWindow(scope, `_ta_lowest_source_${callId}`, source, length);
+      if (values.length === 0) return NaN;
 
       let lowest = Infinity;
-      for (let i = 0; i < length; i++) {
-        const val = series.get(i);
-        if (val !== undefined && !isNaN(val) && val < lowest) {
-          lowest = val;
+      for (const value of values) {
+        if (value < lowest) {
+          lowest = value;
         }
       }
 
       return lowest === Infinity ? NaN : lowest;
     });
 
-    this.builtins.set('ta.range', (args, namedArgs, ctx) => {
+    this.builtins.set('ta.range', (args, namedArgs, _ctx, scope, callId) => {
       const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
-      const series = this.getSeriesForSource(source, ctx);
+      const values = this.getAvailableSourceWindow(scope, `_ta_range_source_${callId}`, source, length);
 
       let highest = -Infinity;
       let lowest = Infinity;
-      for (let i = 0; i < length; i++) {
-        const value = series.get(i);
-        if (value !== undefined && !isNaN(value)) {
-          if (value > highest) highest = value;
-          if (value < lowest) lowest = value;
-        }
+      for (const value of values) {
+        if (value > highest) highest = value;
+        if (value < lowest) lowest = value;
       }
 
       return highest === -Infinity || lowest === Infinity ? NaN : highest - lowest;
@@ -5973,59 +5961,58 @@ export class TealscriptEngine {
       return true;
     });
 
-    this.builtins.set('ta.highestbars', (args, namedArgs, ctx) => {
+    this.builtins.set('ta.highestbars', (args, namedArgs, ctx, scope, callId) => {
       const [source, length] = this.getTaSourceLengthArgs(args, namedArgs, ctx, 'high');
-      const series = this.getSeriesForSource(source, ctx);
+      const values = this.getAvailableSourceWindow(scope, `_ta_highestbars_source_${callId}`, source, length);
 
       let highest = -Infinity;
       let offset = NaN;
-      for (let i = 0; i < length; i++) {
-        const val = series.get(i);
-        if (val !== undefined && !isNaN(val) && val > highest) {
-          highest = val;
-          offset = i;
+      for (let index = 0; index < values.length; index++) {
+        const value = values[index]!;
+        if (value > highest) {
+          highest = value;
+          offset = index;
         }
       }
 
       return offset;
     });
 
-    this.builtins.set('ta.lowestbars', (args, namedArgs, ctx) => {
+    this.builtins.set('ta.lowestbars', (args, namedArgs, ctx, scope, callId) => {
       const [source, length] = this.getTaSourceLengthArgs(args, namedArgs, ctx, 'low');
-      const series = this.getSeriesForSource(source, ctx);
+      const values = this.getAvailableSourceWindow(scope, `_ta_lowestbars_source_${callId}`, source, length);
 
       let lowest = Infinity;
       let offset = NaN;
-      for (let i = 0; i < length; i++) {
-        const val = series.get(i);
-        if (val !== undefined && !isNaN(val) && val < lowest) {
-          lowest = val;
-          offset = i;
+      for (let index = 0; index < values.length; index++) {
+        const value = values[index]!;
+        if (value < lowest) {
+          lowest = value;
+          offset = index;
         }
       }
 
       return offset;
     });
 
-    this.builtins.set('ta.vwma', (args, namedArgs, ctx) => {
+    this.builtins.set('ta.vwma', (args, namedArgs, ctx, scope, callId) => {
       const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
-      const series = this.getSeriesForSource(source, ctx);
+      const values = this.getCompleteSourceWindow(scope, `_ta_vwma_source_${callId}`, source, length);
+      if (!values) return NaN;
 
       let weightedSum = 0;
       let volumeSum = 0;
-      let count = 0;
       for (let i = 0; i < length; i++) {
-        const value = series.get(i);
+        const value = values[i]!;
         const volume = ctx.volume.get(i);
         if (value !== undefined && volume !== undefined && !isNaN(value) && !isNaN(volume)) {
           weightedSum += value * volume;
           volumeSum += volume;
-          count++;
         }
       }
 
-      return count < length || volumeSum === 0 ? NaN : weightedSum / volumeSum;
+      return volumeSum === 0 ? NaN : weightedSum / volumeSum;
     });
 
     // ATR - Average True Range
@@ -6111,26 +6098,12 @@ export class TealscriptEngine {
     });
 
     // STDEV - Standard Deviation
-    this.builtins.set('ta.stdev', (args, namedArgs, ctx) => {
+    this.builtins.set('ta.stdev', (args, namedArgs, _ctx, scope, callId) => {
       const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
       const biased = this.isTruthy(this.getCallArg(args, namedArgs, 2, 'biased', true));
-
-      // Get the series for the source value
-      const series = this.getSeriesForSource(source, ctx);
-
-      // Collect values
-      const values: number[] = [];
-      for (let i = 0; i < length; i++) {
-        const val = series.get(i);
-        if (val !== undefined && !isNaN(val)) {
-          values.push(val);
-        }
-      }
-
-      if (values.length < length) {
-        return NaN; // Not enough data
-      }
+      const values = this.getCompleteSourceWindow(scope, `_ta_stdev_source_${callId}`, source, length);
+      if (!values) return NaN;
 
       // Calculate mean
       const mean = values.reduce((a, b) => a + b, 0) / values.length;
@@ -6144,21 +6117,12 @@ export class TealscriptEngine {
       return Math.sqrt(variance);
     });
 
-    this.builtins.set('ta.variance', (args, namedArgs, ctx) => {
+    this.builtins.set('ta.variance', (args, namedArgs, _ctx, scope, callId) => {
       const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
       const biased = this.isTruthy(this.getCallArg(args, namedArgs, 2, 'biased', true));
-      const series = this.getSeriesForSource(source, ctx);
-
-      const values: number[] = [];
-      for (let i = 0; i < length; i++) {
-        const value = series.get(i);
-        if (value !== undefined && !isNaN(value)) {
-          values.push(value);
-        }
-      }
-
-      if (values.length < length) return NaN;
+      const values = this.getCompleteSourceWindow(scope, `_ta_variance_source_${callId}`, source, length);
+      if (!values) return NaN;
 
       const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
       const divisor = biased ? values.length : values.length - 1;
@@ -6166,20 +6130,11 @@ export class TealscriptEngine {
       return values.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / divisor;
     });
 
-    this.builtins.set('ta.dev', (args, namedArgs, ctx) => {
+    this.builtins.set('ta.dev', (args, namedArgs, _ctx, scope, callId) => {
       const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
-      const series = this.getSeriesForSource(source, ctx);
-
-      const values: number[] = [];
-      for (let i = 0; i < length; i++) {
-        const value = series.get(i);
-        if (value !== undefined && !isNaN(value)) {
-          values.push(value);
-        }
-      }
-
-      if (values.length < length) return NaN;
+      const values = this.getCompleteSourceWindow(scope, `_ta_dev_source_${callId}`, source, length);
+      if (!values) return NaN;
 
       const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
       return values.reduce((sum, value) => sum + Math.abs(value - mean), 0) / values.length;
@@ -6493,13 +6448,11 @@ export class TealscriptEngine {
     });
 
     // MOM - Momentum
-    this.builtins.set('ta.mom', (args, namedArgs, ctx) => {
+    this.builtins.set('ta.mom', (args, namedArgs, _ctx, scope, callId) => {
       const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length', 10));
-
-      // Get the series for the source value
-      const series = this.getSeriesForSource(source, ctx);
-      const prev = series.get(length);
+      const values = this.getCompleteSourceWindow(scope, `_ta_mom_source_${callId}`, source, length + 1);
+      const prev = values?.[length];
 
       if (prev === undefined) return NaN;
 
@@ -6578,18 +6531,17 @@ export class TealscriptEngine {
 
     // WMA - Weighted Moving Average
     // Formula: wma = sum(source[i] * weight[i]) / sum(weights) where weight = length - i
-    this.builtins.set('ta.wma', (args, namedArgs, ctx) => {
+    this.builtins.set('ta.wma', (args, namedArgs, _ctx, scope, callId) => {
       const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
-
-      const series = this.getSeriesForSource(source, ctx);
+      const values = this.getCompleteSourceWindow(scope, `_ta_wma_source_${callId}`, source, length);
+      if (!values) return NaN;
 
       let weightedSum = 0;
       let weightSum = 0;
 
       for (let i = 0; i < length; i++) {
-        const val = series.get(i);
-        if (val === undefined || isNaN(val)) return NaN;
+        const val = values[i]!;
 
         const weight = length - i; // Most recent has highest weight
         weightedSum += val * weight;
@@ -6690,22 +6642,15 @@ export class TealscriptEngine {
 
     // BB - Bollinger Bands
     // Returns [middle, upper, lower]
-    this.builtins.set('ta.bb', (args, namedArgs, ctx) => {
+    this.builtins.set('ta.bb', (args, namedArgs, _ctx, scope, callId) => {
       const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'series'));
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
       const mult = this.toNumber(this.getCallArg(args, namedArgs, 2, 'mult', 2.0));
-
-      const series = this.getSeriesForSource(source, ctx);
+      const values = this.getCompleteSourceWindow(scope, `_ta_bb_source_${callId}`, source, length);
+      if (!values) return [NaN, NaN, NaN];
 
       // Calculate SMA (middle)
-      let sum = 0;
-      const values: number[] = [];
-      for (let i = 0; i < length; i++) {
-        const val = series.get(i);
-        if (val === undefined || isNaN(val)) return [NaN, NaN, NaN];
-        sum += val;
-        values.push(val);
-      }
+      const sum = values.reduce((total, value) => total + value, 0);
 
       const middle = sum / length;
 
@@ -6736,12 +6681,11 @@ export class TealscriptEngine {
 
     // ROC - Rate of Change (percentage)
     // Formula: (current - previous) / previous * 100
-    this.builtins.set('ta.roc', (args, namedArgs, ctx) => {
+    this.builtins.set('ta.roc', (args, namedArgs, _ctx, scope, callId) => {
       const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length', 1));
-
-      const series = this.getSeriesForSource(source, ctx);
-      const prev = series.get(length);
+      const values = this.getCompleteSourceWindow(scope, `_ta_roc_source_${callId}`, source, length + 1);
+      const prev = values?.[length];
 
       if (prev === undefined || prev === 0) return NaN;
 

@@ -546,4 +546,25 @@ plot(ta.falling(source=close, length=2), title="Named Falling")
     expect(getPlot(result, 'Named Rising').values).toEqual([false, false, true, false, false, false, true, true, false, true, false, true]);
     expect(getPlot(result, 'Named Falling').values).toEqual([false, false, false, true, true, false, false, false, false, false, false, false]);
   });
+
+  it('matches Pine TA windows over derived source expressions', () => {
+    const result = runCompatScript(`
+indicator("TA derived source smoke")
+spread = close - open
+plot(ta.sma(spread, 3), title="Spread SMA")
+plot(ta.wma(spread, 3), title="Spread WMA")
+plot(ta.highest(spread, 3), title="Spread Highest")
+plot(ta.lowest(spread, 3), title="Spread Lowest")
+plot(ta.range(spread, 3), title="Spread Range")
+plot(ta.mom(spread, 2), title="Spread Momentum")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Spread SMA').values)).toEqual([null, null, 2.333333, 0.333333, -2, -2.333333, 0.333333, 3.333333, 2.666667, 2.333333, 0.333333, 1.333333]);
+    expect(roundSeries(getPlot(result, 'Spread WMA').values)).toEqual([null, null, 2.333333, -0.833333, -3, -1.5, 1.666667, 4, 1.833333, 2, 0.333333, 1.166667]);
+    expect(roundSeries(getPlot(result, 'Spread Highest').values)).toEqual([2, 3, 3, 3, 2, 1, 4, 5, 5, 5, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Spread Lowest').values)).toEqual([2, 2, 2, -4, -4, -4, -4, 1, -1, -1, -1, -1]);
+    expect(roundSeries(getPlot(result, 'Spread Range').values)).toEqual([0, 1, 1, 7, 6, 5, 8, 4, 6, 6, 4, 4]);
+    expect(roundSeries(getPlot(result, 'Spread Momentum').values)).toEqual([null, null, 0, -7, -6, 5, 8, 4, -5, -2, 0, -1]);
+  });
 });
