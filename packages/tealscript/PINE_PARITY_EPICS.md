@@ -492,6 +492,9 @@ Phases:
    Semantic coverage now reports exported UDT fields and exported function or
    method parameters that expose non-exported local UDTs, including collection
    templates containing those UDTs.
+   Semantic coverage now reports exported function/method returns that expose
+   non-exported local UDTs in expression bodies and simple final-expression
+   block bodies.
 
 Done means library-heavy Pine v5/v6 scripts can be reduced and run without
 large rewrites.
