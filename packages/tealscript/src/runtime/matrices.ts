@@ -372,6 +372,26 @@ export function invMatrixValue(matrix: PineMatrix): PineMatrix<number> {
   return result;
 }
 
+export function kronMatrixValue(left: PineMatrix, right: PineMatrix): PineMatrix<number> {
+  const result = createPineMatrix<number>(left.rows * right.rows, left.columns * right.columns, 0);
+  for (let leftRow = 0; leftRow < left.rows; leftRow++) {
+    for (let leftColumn = 0; leftColumn < left.columns; leftColumn++) {
+      const factor = Number(getMatrixValue(left, leftRow, leftColumn));
+      for (let rightRow = 0; rightRow < right.rows; rightRow++) {
+        for (let rightColumn = 0; rightColumn < right.columns; rightColumn++) {
+          setMatrixValue(
+            result,
+            leftRow * right.rows + rightRow,
+            leftColumn * right.columns + rightColumn,
+            factor * Number(getMatrixValue(right, rightRow, rightColumn)),
+          );
+        }
+      }
+    }
+  }
+  return result;
+}
+
 function matrixIndex(matrix: PineMatrix, row: number, column: number): number {
   const normalizedRow = normalizeExistingIndex(row, matrix.rows, 'row');
   const normalizedColumn = normalizeExistingIndex(column, matrix.columns, 'column');

@@ -433,6 +433,7 @@ Phases:
    Runtime coverage now includes `matrix.det()` for square matrices and
    `matrix.rank()` for square or rectangular matrices.
    Runtime coverage now includes `matrix.inv()` for square nonsingular matrices.
+   Runtime coverage now includes `matrix.kron()` for Kronecker products.
 3. Implement `map.*` with key/value typing, insertion, lookup, removal, keys,
    values, copy, and iteration.
 4. Implement user-defined types (`type`), fields, constructors, methods, and
