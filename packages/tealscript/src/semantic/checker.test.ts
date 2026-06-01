@@ -218,6 +218,9 @@ string labelText = "hi"
 color tint = color.red
 array<float> values = array.new_float()
 genericValues = array.new<float>()
+floatValues = array.new_float()
+intValues = array.new_int()
+labelValues = array.new_label()
 matrix<int> grid = matrix.new<int>(1, 1, 0)
 map<string, float> lookup = map.new<string, float>()
 pivotPoint pivot = na
@@ -233,6 +236,9 @@ pivotPoint pivot = na
     expect(types.get('tint')).toMatchObject({ kind: 'color' });
     expect(types.get('values')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('genericValues')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('floatValues')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('intValues')).toMatchObject({ kind: 'array', elementType: { kind: 'int' } });
+    expect(types.get('labelValues')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
     expect(types.get('grid')).toMatchObject({ kind: 'matrix', elementType: { kind: 'int' } });
     expect(types.get('lookup')).toMatchObject({
       kind: 'map',

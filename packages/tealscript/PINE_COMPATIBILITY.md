@@ -130,6 +130,10 @@ definitions.
 
 ## Common `array.*` Coverage
 
+Semantic analysis preserves array element types from `array.new<T>()` and
+common typed constructors such as `array.new_float()` and `array.new_label()`,
+which keeps downstream diagnostics aligned with Pine's constructor templates.
+
 The array pass covers the generic constructor (`array.new<T>`), typed
 constructors (`array.new_float`, `array.new_int`, `array.new_bool`,
 `array.new_string`, `array.new_color`, and drawing-object array constructors),
