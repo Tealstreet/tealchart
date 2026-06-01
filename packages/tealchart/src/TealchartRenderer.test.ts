@@ -459,6 +459,41 @@ describe('TealchartRenderer coordinate transforms', () => {
       const expectedX = opts.margins.left + ((bars[1]!.time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth;
       expect(arc).toHaveBeenCalledWith(expectedX, expect.any(Number), expect.any(Number), 0, Math.PI * 2);
     });
+
+    it('limits line plots to showLast bars', () => {
+      const moveTo = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        moveTo,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(4, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[3]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const plots: PlotOutput[] = [
+        {
+          id: 'plot_ShowLast',
+          type: 'plot',
+          title: 'ShowLast',
+          values: [100, 110, 120, 130],
+          color: '#2196F3',
+          showLast: 2,
+        },
+      ];
+
+      renderer.renderPlots(plots, bars, viewport);
+
+      const opts = renderer.getOptions();
+      const chartWidth = opts.width - opts.margins.left;
+      const hiddenX = opts.margins.left;
+      const firstVisibleX = opts.margins.left + ((bars[2]!.time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth;
+      expect(moveTo).not.toHaveBeenCalledWith(hiddenX, expect.any(Number));
+      expect(moveTo).toHaveBeenCalledWith(firstVisibleX, expect.any(Number));
+    });
   });
 
   describe('Pine OHLC plot rendering', () => {
