@@ -89,13 +89,13 @@ reading the whole runtime.
 
 | Area | Feature | Status | Evidence | Remaining gaps |
 | --- | --- | --- | --- | --- |
-| Visuals | `plot` | Partial | `tests/compat/pine-basics.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | Full style/z-order/display parity remains. |
+| Visuals | `plot` | Partial | `tests/compat/pine-basics.test.ts`; `tests/compat/pine-visuals.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | Runtime captures common v6 style/display/format/precision/force-overlay/line-style metadata. Full z-order and renderer pixel parity remain. |
 | Visuals | `hline` | Partial | `tests/compat/pine-visuals.test.ts` | Full settings and display parity remain. |
 | Visuals | `fill` | Partial | `tests/compat/pine-visuals.test.ts` | Advanced parameters and color series behavior remain. |
-| Visuals | `bgcolor` | Supported | `tests/compat/pine-visuals.test.ts` | None known for current output shape. |
-| Visuals | `plotshape`, `plotchar`, `plotarrow` | Partial | `tests/compat/pine-visuals.test.ts` | Styling/location/display parity remains. |
+| Visuals | `bgcolor` | Supported | `tests/compat/pine-visuals.test.ts` | Runtime captures display and force-overlay metadata. None known for current output shape. |
+| Visuals | `plotshape`, `plotchar`, `plotarrow` | Partial | `tests/compat/pine-visuals.test.ts` | Runtime captures common style/location/display/format/precision/force-overlay metadata and normalized arrow colors. Renderer pixel parity remains. |
 | Visuals | `barcolor` | Supported | `tests/compat/pine-visuals.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | None known for current output shape. |
-| Visuals | `plotbar`, `plotcandle` | Supported | `tests/compat/pine-visuals.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | Edge-case parity will continue under visual epic. |
+| Visuals | `plotbar`, `plotcandle` | Supported | `tests/compat/pine-visuals.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | Runtime captures format, precision, and force-overlay metadata. Edge-case parity will continue under visual epic. |
 | Drawings | `label.*` | Partial | `src/runtime/drawings/builtins.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | GC limits, full style parity, and realtime rollback remain. |
 | Drawings | `line.*` | Partial | `src/runtime/drawings/builtins.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | `chart.point`, GC limits, full style geometry, realtime rollback remain. |
 | Drawings | `linefill.*` | Partial | `src/runtime/drawings/builtins.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | Full line coordinate/object parity remains. |
