@@ -714,6 +714,54 @@ describe('TealchartRenderer coordinate transforms', () => {
   });
 
   describe('visual primitive integration', () => {
+    it('skips rendering plots with display.none while keeping them available as fill sources', () => {
+      const fill = vi.fn();
+      const stroke = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fill,
+        stroke,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 0,
+        priceMax: 20,
+      };
+      const hiddenUpper: PlotOutput = {
+        id: 'plot_HiddenUpper',
+        type: 'plot',
+        title: 'HiddenUpper',
+        values: [10, 12, 14],
+        color: '#2196F3',
+        display: 0,
+      };
+      const hiddenLower: PlotOutput = {
+        id: 'plot_HiddenLower',
+        type: 'plot',
+        title: 'HiddenLower',
+        values: [5, 6, 7],
+        color: '#F44336',
+        display: 0,
+      };
+      const fillPlot: PlotOutput = {
+        id: 'fill_Band',
+        type: 'fill',
+        title: 'Band',
+        values: [],
+        color: '#4CAF5033',
+        plot1Id: hiddenUpper.id,
+        plot2Id: hiddenLower.id,
+      };
+
+      renderer.renderPlots([hiddenUpper, hiddenLower, fillPlot], bars, viewport);
+
+      expect(stroke).not.toHaveBeenCalled();
+      expect(fill).toHaveBeenCalled();
+    });
+
     it('routes fills, hlines, markers, and backgrounds through renderPlots', () => {
       const fillRect = vi.fn();
       const fill = vi.fn();

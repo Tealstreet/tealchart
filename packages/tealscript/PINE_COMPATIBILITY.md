@@ -290,6 +290,8 @@ compatibility fixture covers named and positional argument forms plus the
 `plot.linestyle_*` constants used by Pine v6 line plots. Tealchart renderer
 coverage applies plot line-style metadata in main and indicator panes and
 renders common plot offsets for line, marker, histogram, and area plot styles.
+Renderer coverage also honors `display.none` while retaining hidden plot values
+for dependent fills.
 
 ## Common OHLC Plot Coverage
 
