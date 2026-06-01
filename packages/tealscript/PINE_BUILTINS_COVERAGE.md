@@ -81,6 +81,18 @@ approximate coverage to tested Pine-compatible behavior.
 | `color.*` | 7 registrations covering RGB construction, channel extraction, transparency, and gradients | Named constants, transparency range behavior, channel precision, theme-sensitive behavior where possible |
 | Global helpers | 23 mixed global registrations including casts, `na`, `nz`, `fixnan`, time helpers, and visual functions | Typed casts, `na`/`nz`/`fixnan` parity across types, and separation of visual/data helpers into later epics |
 
+Current `ta.*` progress:
+
+- Common `ta.*` helpers accept Pine-style named arguments for covered
+  parameters.
+- `ta.highest`, `ta.lowest`, `ta.highestbars`, and `ta.lowestbars` support the
+  one-argument default-source forms.
+- Common windowed helpers now track derived source expressions such as
+  `ta.sma(close - open, length)` using call-local history instead of falling
+  back to chart `close`.
+- `ta.stdev` and `ta.variance` support the `biased` parameter.
+- `ta.ema` and `ta.rma` use stable call-site state for recursive smoothing.
+
 ## Out-Of-Scope Namespaces For Epic 5
 
 These namespaces are tracked here because they are built-ins, but their parity

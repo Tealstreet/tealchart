@@ -32,17 +32,17 @@ plot(direction, title="Direction")
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Selected MA').values)).toEqual([
       102,
-      104.25,
-      105.833333,
-      104,
-      101,
-      100.333333,
-      102.5,
-      106.666667,
-      107.5,
-      110.166667,
-      109.833333,
-      111.5,
+      103.5,
+      105.25,
+      104.125,
+      101.5625,
+      100.78125,
+      102.390625,
+      105.695313,
+      106.847656,
+      108.923828,
+      109.461914,
+      110.730957,
     ]);
     expect(roundSeries(getPlot(result, 'Block Selected MA').values)).toEqual([
       103,

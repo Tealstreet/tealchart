@@ -40,7 +40,7 @@ plot(rsi, title="RSI")
 
     expect(result.errors).toEqual([]);
     expect(result.plots.map((plot) => plot.title)).toEqual(['Fast EMA', 'Slow SMA', 'RSI']);
-    expect(roundSeries(getPlot(result, 'Fast EMA').values)).toEqual([102, 104.25, 105.833333, 104, 101, 100.333333, 102.5, 106.666667, 107.5, 110.166667, 109.833333, 111.5]);
+    expect(roundSeries(getPlot(result, 'Fast EMA').values)).toEqual([102, 103.5, 105.25, 104.125, 101.5625, 100.78125, 102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957]);
     expect(roundSeries(getPlot(result, 'Slow SMA').values)).toEqual([null, null, null, null, 103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110]);
     expect(getPlot(result, 'RSI').values).toHaveLength(compatibilityBars.length);
   });
