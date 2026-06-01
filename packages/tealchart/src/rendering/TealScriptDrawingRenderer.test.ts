@@ -191,6 +191,7 @@ function makeTable(overrides: Partial<TableDrawingOutput> = {}): TableDrawingOut
         textSize: 'normal',
         textHalign: 'center',
         textValign: 'middle',
+        textFontFamily: 'monospace',
         bgcolor: '#111827',
       },
     ],
@@ -448,6 +449,7 @@ describe('TealScriptDrawingRenderer', () => {
 
     expect(events).toContain('fillRect:64,18,48,22');
     expect(events).toContain('strokeRect:64,18,48,22');
+    expect(events).toContain('font:12px monospace');
     expect(events).toContain('fillTextStyle:center,middle');
     expect(events).toContain('fillText:ATR:88,29');
   });

@@ -732,7 +732,7 @@ export class TealScriptDrawingRenderer {
           if (cell?.text) {
             const textPosition = this.resolveTableCellTextPosition(cell.textHalign, cell.textValign, x, y, width, height);
             ctx.fillStyle = cell.textColor ?? '#FFFFFF';
-            ctx.font = `${this.fontSizeForDrawing(cell.textSize)}px ${this.font}`;
+            ctx.font = `${this.fontSizeForDrawing(cell.textSize)}px ${this.fontFamilyForDrawing(cell.textFontFamily)}`;
             ctx.textAlign = textPosition.align;
             ctx.textBaseline = textPosition.baseline;
             ctx.fillText(cell.text, textPosition.x, textPosition.y);
@@ -767,7 +767,11 @@ export class TealScriptDrawingRenderer {
     for (const cell of table.cells) {
       if (cell.column < 0 || cell.column >= table.columns || cell.row < 0 || cell.row >= table.rows) continue;
       const measuredText = cell.text
-        ? this.getTextWidth(this.ctx, cell.text, `${this.fontSizeForDrawing(cell.textSize)}px ${this.font}`) + 12
+        ? this.getTextWidth(
+          this.ctx,
+          cell.text,
+          `${this.fontSizeForDrawing(cell.textSize)}px ${this.fontFamilyForDrawing(cell.textFontFamily)}`,
+        ) + 12
         : defaultColumnWidth;
       columnWidths[cell.column] = Math.max(columnWidths[cell.column]!, cell.width ?? measuredText);
       rowHeights[cell.row] = Math.max(rowHeights[cell.row]!, cell.height ?? defaultRowHeight);
