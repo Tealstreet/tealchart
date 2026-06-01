@@ -54,7 +54,7 @@ Implemented search, predicate, and ordering helpers:
 - `array.lastindexof`
 - `array.reverse`
 - `array.some`
-- `array.sort`
+- `array.sort` including UDT `sort_field` sorting by const field name or index
 - `array.sort_indices`
 
 Implemented numeric/statistical helpers:
