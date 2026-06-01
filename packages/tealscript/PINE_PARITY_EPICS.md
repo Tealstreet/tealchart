@@ -56,8 +56,8 @@ Known structural gaps:
 
 - Pine's qualified type system (`const < input < simple < series`) is not
   modeled as a first-class compiler/runtime contract.
-- `request.*`, `map.*`, `matrix.*`, `polyline.*`, `table.*`, libraries, and
-  strategy execution are not implemented.
+- `request.footprint()`, `polyline.*`, `table.*`, and full-parity work across
+  maps, matrices, libraries, and strategy execution remain tracked below.
 - Some parser/runtime docs are stale relative to recent compatibility work.
 - Some semantics are approximate, especially source-series inference, `na`
   propagation, realtime `varip`, named timezones, sessions, and higher-timeframe
@@ -285,16 +285,28 @@ external data contexts.
 Phases:
 
 1. Design the runtime datafeed contract for deterministic offline tests and
-   Tealchart live integration.
+   Tealchart live integration. The runtime now exposes a deterministic
+   `RequestDatafeed` contract plus in-memory fixture datafeed for bars and
+   point series.
 2. Implement `request.security()` for same-symbol higher timeframe with
-   `gaps`, `lookahead`, `ignore_invalid_symbol`, and `calc_bars_count`.
+   `gaps`, `lookahead`, `ignore_invalid_symbol`, and `calc_bars_count`. Covered
+   for deterministic same-symbol higher-timeframe contexts.
 3. Add other-symbol requests and metadata/currency routing.
+   Other-symbol request contexts now carry requested `syminfo` and currency
+   metadata.
 4. Implement `request.security_lower_tf()` returning arrays of intrabar values.
+   Lower-timeframe requests now return ordered Pine arrays for each chart bar.
 5. Support dynamic requests and nested request restrictions/parity.
+   Dynamic request guards now allow nested/local requests by default and reject
+   them when `dynamic_requests=false`.
 6. Add optional request families: `currency_rate`, `dividends`, `splits`,
    `earnings`, `financial`, `economic`, `seed`, and `footprint`, gated by
-   available data.
+   available data. Deterministic datafeed-backed support now covers all listed
+   families except `request.footprint()`, which remains planned until an
+   explicit footprint/intrabar-volume model exists.
 7. Add repaint-safe HTF fixtures based on official patterns.
+   Repaint-safe higher-timeframe fixtures now cover the official offset plus
+   `barmerge.lookahead_on` idiom.
 
 Done means MTF trend filters, other-symbol overlays, and lower-timeframe tools
 can run deterministically.
