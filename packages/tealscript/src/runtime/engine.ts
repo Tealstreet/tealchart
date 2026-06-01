@@ -3127,32 +3127,62 @@ export class TealscriptEngine {
     const value = this.toNumber(timestamp);
     if (!Number.isFinite(value)) return 'NaN';
 
-    const offsetMs = this.getTimezoneOffsetMinutes(timezone, value) * 60_000;
+    const offsetMinutes = this.getTimezoneOffsetMinutes(timezone, value);
+    const offsetMs = offsetMinutes * 60_000;
     const date = new Date(value + offsetMs);
     const pad = (part: number, length = 2): string => String(part).padStart(length, '0');
+    const formatOffset = (): string => {
+      const sign = offsetMinutes >= 0 ? '+' : '-';
+      const absolute = Math.abs(offsetMinutes);
+      return `${sign}${pad(Math.trunc(absolute / 60))}${pad(absolute % 60)}`;
+    };
+    const tokens: Array<[string, string]> = [
+      ['yyyy', String(date.getUTCFullYear())],
+      ['yy', pad(date.getUTCFullYear() % 100)],
+      ['MM', pad(date.getUTCMonth() + 1)],
+      ['M', String(date.getUTCMonth() + 1)],
+      ['dd', pad(date.getUTCDate())],
+      ['d', String(date.getUTCDate())],
+      ['HH', pad(date.getUTCHours())],
+      ['H', String(date.getUTCHours())],
+      ['mm', pad(date.getUTCMinutes())],
+      ['m', String(date.getUTCMinutes())],
+      ['ss', pad(date.getUTCSeconds())],
+      ['s', String(date.getUTCSeconds())],
+      ['SSS', pad(date.getUTCMilliseconds(), 3)],
+      ['Z', formatOffset()],
+    ];
 
-    return format.replace(/yyyy|yy|MM|dd|HH|mm|ss|SSS/g, (token) => {
-      switch (token) {
-        case 'yyyy':
-          return String(date.getUTCFullYear());
-        case 'yy':
-          return pad(date.getUTCFullYear() % 100);
-        case 'MM':
-          return pad(date.getUTCMonth() + 1);
-        case 'dd':
-          return pad(date.getUTCDate());
-        case 'HH':
-          return pad(date.getUTCHours());
-        case 'mm':
-          return pad(date.getUTCMinutes());
-        case 'ss':
-          return pad(date.getUTCSeconds());
-        case 'SSS':
-          return pad(date.getUTCMilliseconds(), 3);
-        default:
-          return token;
+    let result = '';
+    for (let index = 0; index < format.length;) {
+      if (format[index] === "'") {
+        index += 1;
+        while (index < format.length) {
+          if (format[index] === "'") {
+            if (format[index + 1] === "'") {
+              result += "'";
+              index += 2;
+              continue;
+            }
+            index += 1;
+            break;
+          }
+          result += format[index];
+          index += 1;
+        }
+        continue;
       }
-    });
+
+      const token = tokens.find(([candidate]) => format.startsWith(candidate, index));
+      if (token) {
+        result += token[1];
+        index += token[0].length;
+      } else {
+        result += format[index];
+        index += 1;
+      }
+    }
+    return result;
   }
 
   private parseColor(value: unknown): { red: number; green: number; blue: number; alpha: number } | null {
@@ -3183,6 +3213,17 @@ export class TealscriptEngine {
   private toNullableNumber(value: unknown): number | null {
     const numberValue = this.toNumber(value);
     return Number.isFinite(numberValue) ? numberValue : null;
+  }
+
+  private parsePineStringNumber(source: string): number {
+    const trimmed = source.trim();
+    if (trimmed.length === 0) return Number.NaN;
+    if (!/^[+-]?(?:(?:\d+(?:\.\d*)?)|(?:\.\d+))(?:[eE][+-]?\d+)?$/.test(trimmed)) {
+      return Number.NaN;
+    }
+
+    const value = Number(trimmed);
+    return Number.isFinite(value) ? value : Number.NaN;
   }
 
   private roundToMintick(value: number, tick: number): number {
@@ -4815,19 +4856,22 @@ export class TealscriptEngine {
   }
 
   private registerStringBuiltins(): void {
-    this.builtins.set('str.tostring', (args) => {
-      return this.toStringValue(args[0], args[1] as string | undefined);
+    this.builtins.set('str.tostring', (args, namedArgs) => {
+      const value = this.getCallArg(args, namedArgs, 0, 'value');
+      const format = this.getCallArg(args, namedArgs, 1, 'format') as string | undefined;
+      return this.toStringValue(value, format);
     });
-    this.builtins.set('str.tonumber', (args) => {
-      const source = this.toStringValue(args[0]).trim();
-      if (source.length === 0) return Number.NaN;
-      const value = Number(source);
-      return Number.isFinite(value) ? value : Number.NaN;
+    this.builtins.set('str.tonumber', (args, namedArgs) => {
+      const source = this.toStringValue(this.getCallArg(args, namedArgs, 0, 'string'));
+      return this.parsePineStringNumber(source);
     });
-    this.builtins.set('str.format_time', (args) => {
-      const timestamp = args[0] === undefined ? this.ctx.time.get(0) : this.toNumber(args[0]);
-      const format = args[1] === undefined || args[1] === '' ? 'yyyy-MM-dd HH:mm:ss' : this.toStringValue(args[1]);
-      const timezone = args[2] === undefined || args[2] === '' ? this.ctx.syminfo.timezone : this.toStringValue(args[2]);
+    this.builtins.set('str.format_time', (args, namedArgs) => {
+      const timestampArg = this.getCallArg(args, namedArgs, 0, 'time', this.ctx.time.get(0));
+      const formatArg = this.getCallArg(args, namedArgs, 1, 'format');
+      const timezoneArg = this.getCallArg(args, namedArgs, 2, 'timezone');
+      const timestamp = this.toNumber(timestampArg);
+      const format = formatArg === undefined || formatArg === '' ? "yyyy-MM-dd'T'HH:mm:ssZ" : this.toStringValue(formatArg);
+      const timezone = timezoneArg === undefined || timezoneArg === '' ? this.ctx.syminfo.timezone : this.toStringValue(timezoneArg);
       return this.formatTimestamp(timestamp, format, timezone);
     });
 
