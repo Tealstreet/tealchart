@@ -89,7 +89,7 @@ reading the whole runtime.
 
 | Area | Feature | Status | Evidence | Remaining gaps |
 | --- | --- | --- | --- | --- |
-| Visuals | `plot` | Partial | `tests/compat/pine-basics.test.ts`; `tests/compat/pine-visuals.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | Runtime captures common v6 style/display/format/precision/force-overlay/line-style/show-last/histbase metadata, and renderer coverage applies line styles, common offsets, display-none hiding, show-last windows, and histbase baselines. Full z-order and renderer pixel parity remain. |
+| Visuals | `plot` | Partial | `tests/compat/pine-basics.test.ts`; `tests/compat/pine-visuals.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | Runtime captures common v6 style/display/format/precision/force-overlay/line-style/show-last/histbase/trackprice metadata, and renderer coverage applies line styles, common offsets, display-none hiding, show-last windows, histbase baselines, and trackprice lines. Full z-order, price-scale labels, and renderer pixel parity remain. |
 | Visuals | `hline` | Partial | `tests/compat/pine-visuals.test.ts` | Full settings and display parity remain. |
 | Visuals | `fill` | Partial | `tests/compat/pine-visuals.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | Runtime captures common fill metadata and renderer coverage applies gap, display, color-series, and show-last behavior. Full pixel parity remains. |
 | Visuals | `bgcolor` | Supported | `tests/compat/pine-visuals.test.ts` | Runtime captures display and force-overlay metadata. None known for current output shape. |

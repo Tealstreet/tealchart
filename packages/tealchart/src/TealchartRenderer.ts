@@ -1735,6 +1735,7 @@ export class TealchartRenderer {
           switch (plot.type) {
             case 'plot':
               this.renderLinePlot(plot, bars, viewport);
+              this.renderPlotTrackPriceInMainPane(plot, bars, viewport);
               break;
             case 'plotbar':
             case 'plotcandle':
@@ -2032,6 +2033,68 @@ export class TealchartRenderer {
 
   private hasPlotHistbase(plot: Pick<PlotOutput, 'histbase'>): boolean {
     return Number.isFinite(plot.histbase);
+  }
+
+  private getLatestRenderablePlotValue(plot: PlotOutput, bars: Bar[], viewport: Viewport): { index: number; value: number } | null {
+    const scanEnd = Math.min(bars.length, plot.values.length);
+    for (let i = scanEnd - 1; i >= 0; i--) {
+      const value = plot.values[i];
+      if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
+      const plotTime = this.getPlotTime(plot, bars, i);
+      if (plotTime < viewport.startTime || plotTime > viewport.endTime) continue;
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        return { index: i, value };
+      }
+    }
+    return null;
+  }
+
+  private renderPlotTrackPrice(
+    plot: PlotOutput,
+    bars: Bar[],
+    viewport: Viewport,
+    yMin: number,
+    yMax: number,
+    valueToY: (value: number) => number,
+  ): void {
+    if (plot.type !== 'plot' || !plot.trackprice) return;
+
+    const latest = this.getLatestRenderablePlotValue(plot, bars, viewport);
+    if (!latest || latest.value < yMin || latest.value > yMax) return;
+
+    const { ctx, options, margins } = this;
+    const fallbackColor = Array.isArray(plot.color) ? plot.color.find(Boolean) || '#2196F3' : plot.color || '#2196F3';
+    const color = this.getPerBarColor(plot.color, latest.index, fallbackColor);
+    const y = valueToY(latest.value);
+
+    ctx.strokeStyle = color;
+    ctx.lineWidth = plot.linewidth || 1;
+    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'dotted'));
+    ctx.beginPath();
+    ctx.moveTo(margins.left, y);
+    ctx.lineTo(options.width - margins.right, y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  private renderPlotTrackPriceInMainPane(plot: PlotOutput, bars: Bar[], viewport: Viewport): void {
+    const { options, margins } = this;
+    const chartHeight = options.height - margins.top - margins.bottom;
+    const volumeHeight = options.showVolume ? chartHeight * options.volumeHeight : 0;
+    const priceHeight = chartHeight - volumeHeight;
+    this.renderPlotTrackPrice(plot, bars, viewport, viewport.priceMin, viewport.priceMax, (value) =>
+      this.priceToY(value, viewport, priceHeight),
+    );
+  }
+
+  private renderPlotTrackPriceInComputedPane(plot: PlotOutput, bars: Bar[], viewport: Viewport, pane: ComputedPane): void {
+    this.renderPlotTrackPrice(plot, bars, viewport, pane.yMin, pane.yMax, (value) => this.valueToY(value, pane));
+  }
+
+  private renderPlotTrackPriceInPaneOffset(plot: PlotOutput, bars: Bar[], viewport: Viewport, paneOffset: PaneOffset): void {
+    this.renderPlotTrackPrice(plot, bars, viewport, paneOffset.yMin, paneOffset.yMax, (value) =>
+      this.valueToPaneY(value, paneOffset),
+    );
   }
 
   private renderOhlcPlotInLegacyMainPane(plot: PlotOutput, bars: Bar[], viewport: Viewport): void {
@@ -3749,6 +3812,7 @@ export class TealchartRenderer {
     // Handle histogram style
     if (style === 'histogram' || style === 'columns') {
       this.renderHistogramInPaneUnified(plot, bars, viewport, pane, plotStyleOverrides);
+      this.renderPlotTrackPriceInComputedPane(plot, bars, viewport, pane);
       return;
     }
 
@@ -3849,6 +3913,8 @@ export class TealchartRenderer {
     if (isDrawing) {
       ctx.stroke();
     }
+
+    this.renderPlotTrackPriceInComputedPane(plot, bars, viewport, pane);
 
     // Reset line dash
     ctx.setLineDash([]);
@@ -4410,6 +4476,7 @@ export class TealchartRenderer {
       switch (plot.type) {
         case 'plot':
           this.renderLinePlotInPane(plot, bars, viewport, paneOffset);
+          this.renderPlotTrackPriceInPaneOffset(plot, bars, viewport, paneOffset);
           break;
         case 'plotbar':
         case 'plotcandle':
