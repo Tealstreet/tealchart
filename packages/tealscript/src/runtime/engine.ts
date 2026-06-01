@@ -1976,7 +1976,8 @@ export class TealscriptEngine {
   }
 
   private evaluateTypeFieldDefault(field: TypeFieldDeclaration): unknown {
-    return field.defaultValue ? this.evaluateExpression(field.defaultValue) : Number.NaN;
+    if (field.defaultValue) return this.evaluateExpression(field.defaultValue);
+    return field.typeAnnotation?.baseType === 'bool' ? false : Number.NaN;
   }
 
   private assertNoArguments(name: string, args: unknown[], namedArgs: Map<string, unknown>): void {

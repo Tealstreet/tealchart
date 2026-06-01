@@ -1270,6 +1270,23 @@ plot(acc.last, title="Last")`;
       expect(result.plots.find((plot) => plot.title === 'Last')?.values).toEqual([100.2, 100.7, 101.2]);
     });
 
+    it('defaults missing bool fields to false and other fields to na', () => {
+      const script = `//@version=6
+indicator("UDT Defaults")
+type state
+    bool active
+    float price
+state s = state.new()
+plot(s.active ? 1 : 0, title="Active")
+plot(na(s.price) ? 1 : 0, title="Price Is NA")`;
+
+      const result = executeScript(parse(script), createBars(3));
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Active')?.values).toEqual([0, 0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Price Is NA')?.values).toEqual([1, 1, 1]);
+    });
+
     it('uses reference semantics for assigned objects', () => {
       const script = `//@version=6
 indicator("UDT References")

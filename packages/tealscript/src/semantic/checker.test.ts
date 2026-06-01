@@ -813,6 +813,58 @@ pivot.tag := "not checked"
     ]);
   });
 
+  it('reports user-defined type field default value mismatches', () => {
+    const result = checkProgram(parse(`
+indicator("Bad UDT Field Defaults")
+type Pivot
+    int x = "bad"
+    float y = "also bad"
+    bool active = 1
+    string name = 3
+    color tint = "not color"
+    label tag = "not checked"
+    array<float> values = array.new<string>()
+    map<string, float> prices = map.new<int, float>()
+    matrix<int> grid = matrix.new<float>()
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to int field Pivot.x',
+      'Cannot assign string value to float field Pivot.y',
+      'Cannot assign int value to bool field Pivot.active',
+      'Cannot assign int value to string field Pivot.name',
+      'Cannot assign string value to color field Pivot.tint',
+      'Cannot assign string value to label field Pivot.tag',
+      'Default value for field Pivot.values must be a literal value or compatible built-in variable',
+      'Default value for field Pivot.prices must be a literal value or compatible built-in variable',
+      'Default value for field Pivot.grid must be a literal value or compatible built-in variable',
+    ]);
+  });
+
+  it('reports computed user-defined type field defaults', () => {
+    const result = checkProgram(parse(`
+indicator("Bad UDT Default Expressions")
+period = 3
+type Pivot
+    int validNegative = -1
+    float validSource = close
+    string validBuiltin = xloc.bar_time
+    int fromUser = period
+    float fromCall = math.max(open, close)
+    float fromBinary = close + 1
+    bool fromCondition = close > open ? true : false
+    array<float> values = array.new<float>()
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Default value for field Pivot.fromUser must be a literal value or compatible built-in variable',
+      'Default value for field Pivot.fromCall must be a literal value or compatible built-in variable',
+      'Default value for field Pivot.fromBinary must be a literal value or compatible built-in variable',
+      'Default value for field Pivot.fromCondition must be a literal value or compatible built-in variable',
+      'Default value for field Pivot.values must be a literal value or compatible built-in variable',
+    ]);
+  });
+
   it('validates user-defined type collection field references', () => {
     const valid = checkProgram(parse(`
 indicator("UDT Collection Fields")
