@@ -571,4 +571,17 @@ plot(ta.mom(spread, 2), title="Spread Momentum")
     expect(roundSeries(getPlot(result, 'Spread Range').values)).toEqual([0, 1, 1, 7, 6, 5, 8, 4, 6, 6, 4, 4]);
     expect(roundSeries(getPlot(result, 'Spread Momentum').values)).toEqual([null, null, 0, -7, -6, 5, 8, 4, -5, -2, 0, -1]);
   });
+
+  it('preserves real bar offsets through na values for TA offset helpers', () => {
+    const result = runCompatScript(`
+indicator("TA offset na smoke")
+source = bar_index == 1 ? na : close
+plot(ta.highestbars(source, 3), title="Highest Offset")
+plot(ta.lowestbars(source, 3), title="Lowest Offset")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Highest Offset').values.slice(0, 5)).toEqual([0, 1, 0, 1, 2]);
+    expect(getPlot(result, 'Lowest Offset').values.slice(0, 5)).toEqual([0, 1, 2, 0, 0]);
+  });
 });

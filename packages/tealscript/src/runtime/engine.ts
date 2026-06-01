@@ -5936,12 +5936,14 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.highestbars', (args, namedArgs, ctx, scope, callId) => {
       const [source, length] = this.getTaSourceLengthArgs(args, namedArgs, ctx, 'high');
-      const values = this.getAvailableSourceWindow(scope, `_ta_highestbars_source_${callId}`, source, length);
+      if (length < 1) return NaN;
+      const values = this.updateBuiltinSourceHistory(scope, `_ta_highestbars_source_${callId}`, source, length);
 
       let highest = -Infinity;
       let offset = NaN;
       for (let index = 0; index < values.length; index++) {
         const value = values[index]!;
+        if (isNaN(value)) continue;
         if (value > highest) {
           highest = value;
           offset = index;
@@ -5953,12 +5955,14 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.lowestbars', (args, namedArgs, ctx, scope, callId) => {
       const [source, length] = this.getTaSourceLengthArgs(args, namedArgs, ctx, 'low');
-      const values = this.getAvailableSourceWindow(scope, `_ta_lowestbars_source_${callId}`, source, length);
+      if (length < 1) return NaN;
+      const values = this.updateBuiltinSourceHistory(scope, `_ta_lowestbars_source_${callId}`, source, length);
 
       let lowest = Infinity;
       let offset = NaN;
       for (let index = 0; index < values.length; index++) {
         const value = values[index]!;
+        if (isNaN(value)) continue;
         if (value < lowest) {
           lowest = value;
           offset = index;
