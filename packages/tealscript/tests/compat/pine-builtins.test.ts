@@ -318,6 +318,29 @@ plot(label == "BTC", title="Label")
     expect(getPlot(result, 'Label').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
 
+  it('matches common Pine global helper named-argument idioms', () => {
+    const result = runCompatScript(`
+indicator("Global helper docs smoke")
+source = bar_index % 3 == 0 ? na : close
+plot(nz(source=source, replacement=open), title="Named NZ")
+plot(fixnan(source=source), title="Named Fix")
+plot(float(x="4.5"), title="Named Float")
+plot(int(x=4.9), title="Named Int")
+plot(bool(x=1), title="Named Bool")
+plot(string(x=12.5) == "12.5", title="Named String")
+plot(na(x=source), title="Named NA")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Named NZ').values)).toEqual([100, 105, 107, 107, 99, 100, 100, 109, 108, 108, 110, 112]);
+    expect(roundSeries(getPlot(result, 'Named Fix').values)).toEqual([null, 105, 107, 107, 99, 100, 100, 109, 108, 108, 110, 112]);
+    expect(getPlot(result, 'Named Float').values).toEqual(Array(compatibilityBars.length).fill(4.5));
+    expect(getPlot(result, 'Named Int').values).toEqual(Array(compatibilityBars.length).fill(4));
+    expect(getPlot(result, 'Named Bool').values).toEqual(Array(compatibilityBars.length).fill(true));
+    expect(getPlot(result, 'Named String').values).toEqual(Array(compatibilityBars.length).fill(true));
+    expect(getPlot(result, 'Named NA').values).toEqual([true, false, false, true, false, false, true, false, false, true, false, false]);
+  });
+
   it('runs common typed input helpers', () => {
     const result = runCompatScript(`
 indicator("Typed inputs")
