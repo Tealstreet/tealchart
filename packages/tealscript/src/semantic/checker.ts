@@ -801,7 +801,12 @@ class SemanticChecker {
         type: this.typeFromAnnotation(field.typeAnnotation ?? undefined),
         loc: field.name.loc,
       });
-      if (field.defaultValue) this.checkExpression(field.defaultValue, typeScope);
+      if (field.defaultValue) {
+        this.checkExpression(field.defaultValue, typeScope);
+        if (this.checkUdtFieldDefaultValue(statement.name.name, field)) {
+          this.checkUdtFieldValueType(statement.name.name, field, field.defaultValue, typeScope);
+        }
+      }
     }
   }
 
@@ -1155,6 +1160,37 @@ class SemanticChecker {
       `Cannot assign ${this.formatSemanticType(sourceType)} value to ${this.formatSemanticType(targetType)} field ${typeName}.${field.name.name}`,
       value.loc,
     );
+  }
+
+  private checkUdtFieldDefaultValue(typeName: string, field: TypeFieldDeclaration): boolean {
+    const value = field.defaultValue;
+    if (!value || this.isAllowedUdtFieldDefaultValue(value)) return true;
+
+    this.addDiagnostic(
+      'invalid-field-default',
+      `Default value for field ${typeName}.${field.name.name} must be a literal value or compatible built-in variable`,
+      value.loc,
+    );
+    return false;
+  }
+
+  private isAllowedUdtFieldDefaultValue(value: Expression): boolean {
+    switch (value.type) {
+      case 'NumericLiteral':
+      case 'StringLiteral':
+      case 'BooleanLiteral':
+      case 'ColorLiteral':
+      case 'NaExpression':
+        return true;
+      case 'Identifier':
+        return BUILTIN_GLOBALS.has(value.name);
+      case 'MemberExpression':
+        return BUILTIN_NAMESPACES.has(this.memberPath(value)[0]);
+      case 'UnaryExpression':
+        return (value.operator === '-' || value.operator === '+') && value.argument.type === 'NumericLiteral';
+      default:
+        return false;
+    }
   }
 
   private checkMapCallTypes(expression: CallExpression, scope: SemanticScope): void {
