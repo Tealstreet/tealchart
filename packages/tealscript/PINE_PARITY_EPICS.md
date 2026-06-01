@@ -450,6 +450,8 @@ Phases:
    Runtime coverage now includes shallow UDT copies through Pine's
    `Type.copy(object)` and `object.copy()` forms.
 5. Implement method declarations and method dispatch beyond array method sugar.
+   Runtime coverage now selects local and imported UDT method overloads by
+   receiver type.
 6. Implement `library()`, `export`, `import`, versioned module resolution, and
    library diagnostics.
 

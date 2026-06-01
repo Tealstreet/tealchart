@@ -218,12 +218,13 @@ methods, and read fields from the resulting object references.
 User-defined `method` declarations now parse and dispatch for primitive and
 UDT receiver values, including method calls that mutate and return UDT
 references. The runtime uses the receiver as the method's first argument, in
-line with Pine's documented method-call equivalence.
+line with Pine's documented method-call equivalence, and selects local UDT
+method overloads by receiver type.
 
 Known limits: UDT field, constructor, and method receiver types are recorded
-dynamically but not yet enforced by the semantic checker. Type-based method
-overload resolution, library export/import resolution, and full reference-type
-diagnostics remain planned in Epic 12 and the qualified type-system epic.
+dynamically but not yet enforced by the semantic checker. Library
+export/import diagnostics and full reference-type diagnostics remain planned in
+Epic 12 and the qualified type-system epic.
 
 ## Common Library Syntax Coverage
 

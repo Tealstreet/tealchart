@@ -1668,7 +1668,7 @@ export class TealscriptEngine {
 
     if (namespace && expr.callee.type === 'MemberExpression' && this.scope.has(namespace)) {
       const receiver = this.evaluateExpression(expr.callee.object);
-      const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs);
+      const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs, receiver);
       if (userMethod) {
         return this.evaluateUserFunction(
           userMethod,
@@ -1711,7 +1711,7 @@ export class TealscriptEngine {
 
     if (namespace && expr.callee.type === 'MemberExpression') {
       const receiver = this.evaluateExpression(expr.callee.object);
-      const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs);
+      const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs, receiver);
       if (userMethod) {
         return this.evaluateUserFunction(
           userMethod,
@@ -1883,9 +1883,24 @@ export class TealscriptEngine {
     methodName: string,
     args: unknown[],
     namedArgs: Map<string, unknown>,
+    receiver: unknown,
   ): FunctionDeclaration | undefined {
     const overloads = this.userMethods.get(methodName);
-    return overloads?.find((method) => this.canCallUserFunction(method, args, namedArgs));
+    return overloads?.find((method) => (
+      this.methodReceiverMatches(method, receiver)
+      && this.canCallUserFunction(method, args, namedArgs)
+    ));
+  }
+
+  private methodReceiverMatches(method: FunctionDeclaration, receiver: unknown): boolean {
+    const annotation = this.getTypeAnnotationName(method.params[0]?.typeAnnotation);
+    if (!annotation) return true;
+
+    if (isPineUdtObject(receiver)) {
+      return annotation === receiver.typeName;
+    }
+
+    return !this.typeDeclarations.has(annotation);
   }
 
   private findCallableImportedMethod(
