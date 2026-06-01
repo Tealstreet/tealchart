@@ -1004,6 +1004,7 @@ class SemanticChecker {
     this.checkMapConstructorTypeArguments(expression);
     this.checkArrayCallTypes(expression, scope);
     this.checkMatrixCallTypes(expression, scope);
+    this.checkMatrixSortFieldType(expression, scope);
     this.checkMapCallTypes(expression, scope);
     for (const argument of expression.arguments) {
       this.checkExpression(argument.value, scope);
@@ -1207,6 +1208,29 @@ class SemanticChecker {
     );
   }
 
+  private checkMatrixSortFieldType(expression: CallExpression, scope: SemanticScope): void {
+    const sortFieldArgument = this.resolveMatrixSortFieldArgument(expression, scope);
+    if (!sortFieldArgument) return;
+
+    const sortFieldType = this.inferExpressionType(sortFieldArgument, scope);
+    if (sortFieldType.kind !== 'unknown' && sortFieldType.kind !== 'int' && sortFieldType.kind !== 'string') {
+      this.addDiagnostic(
+        'type-mismatch',
+        `matrix.sort() sort_field must be a const int or const string, got ${sortFieldType.kind}`,
+        sortFieldArgument.loc,
+      );
+      return;
+    }
+
+    if (sortFieldType.qualifier && sortFieldType.qualifier !== 'const') {
+      this.addDiagnostic(
+        'qualifier-mismatch',
+        `matrix.sort() sort_field requires const int or const string, got ${sortFieldType.qualifier} ${sortFieldType.kind}`,
+        sortFieldArgument.loc,
+      );
+    }
+  }
+
   private resolveArrayMutationCall(
     expression: CallExpression,
     scope: SemanticScope,
@@ -1286,6 +1310,18 @@ class SemanticChecker {
       matrixType: receiverType,
       valueArgument: this.getCallArgument(expression.arguments, 'value', methodName === 'set' ? (isNamespaceCall ? 3 : 2) : (isNamespaceCall ? 1 : 0)),
     };
+  }
+
+  private resolveMatrixSortFieldArgument(expression: CallExpression, scope: SemanticScope): Expression | undefined {
+    if (expression.callee.type !== 'MemberExpression' || expression.callee.property.name !== 'sort') return undefined;
+
+    const isNamespaceCall = expression.callee.object.type === 'Identifier' && expression.callee.object.name === 'matrix';
+    if (isNamespaceCall) return this.getCallArgument(expression.arguments, 'sort_field', 3);
+
+    const receiverType = this.inferExpressionType(expression.callee.object, scope);
+    if (receiverType.kind !== 'matrix') return undefined;
+
+    return this.getCallArgument(expression.arguments, 'sort_field', 2);
   }
 
   private checkMapConstructorTypeArguments(expression: CallExpression): void {
