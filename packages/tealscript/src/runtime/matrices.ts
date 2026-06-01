@@ -725,7 +725,7 @@ function chooseFreeColumn(size: number, pivotColumns: number[], preferredFreeCol
   for (let column = size - 1; column >= 0; column--) {
     if (!pivots.has(column)) return column;
   }
-  return size - 1;
+  throw new Error('Failed to compute eigenvector basis: no free variable found for eigenvalue');
 }
 
 function normalizeEigenvector(vector: number[]): number[] {
