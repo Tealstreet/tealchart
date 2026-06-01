@@ -78,6 +78,10 @@ Covered behavior and remaining gaps:
   instead of overflowing the runtime stack.
 - Nested indented blocks inside user-defined functions expose limitations in the
   simplified indentation grammar and need continued hardening.
+- The parser wrapper rejects scripts larger than 1,000,000 UTF-16 code units
+  and parsed ASTs deeper than 1,000 nodes. These are TealScript sandbox limits
+  intended to keep generated or hostile scripts from exhausting parser
+  resources.
 
 ## Common History Reference Coverage
 

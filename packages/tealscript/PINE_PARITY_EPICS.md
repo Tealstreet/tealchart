@@ -408,6 +408,8 @@ Phases:
    coverage enforces 64 non-`hline()` plot outputs per script. Table-cell
    coverage enforces a 10,000-cell TealScript sandbox cap across live tables.
 2. Add script-size and parser-depth protections.
+   Source-size coverage rejects scripts above 1,000,000 UTF-16 code units, and
+   parser-depth coverage rejects ASTs deeper than 1,000 nodes.
 3. Optimize hot built-ins and series storage for long histories.
 4. Add cancellation/yielding in worker execution for expensive scripts.
 5. Harden runtime isolation: no host access, deterministic randomness where
