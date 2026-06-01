@@ -91,7 +91,7 @@ reading the whole runtime.
 | --- | --- | --- | --- | --- |
 | Visuals | `plot` | Partial | `tests/compat/pine-basics.test.ts`; `tests/compat/pine-visuals.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | Runtime captures common v6 style/display/format/precision/force-overlay/line-style metadata, and renderer coverage applies line styles, common offsets, and display-none hiding. Full z-order and renderer pixel parity remain. |
 | Visuals | `hline` | Partial | `tests/compat/pine-visuals.test.ts` | Full settings and display parity remain. |
-| Visuals | `fill` | Partial | `tests/compat/pine-visuals.test.ts` | Advanced parameters and color series behavior remain. |
+| Visuals | `fill` | Partial | `tests/compat/pine-visuals.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | Runtime captures common fill metadata and renderer coverage applies gap, display, color-series, and show-last behavior. Full pixel parity remains. |
 | Visuals | `bgcolor` | Supported | `tests/compat/pine-visuals.test.ts` | Runtime captures display and force-overlay metadata. None known for current output shape. |
 | Visuals | `plotshape`, `plotchar`, `plotarrow` | Partial | `tests/compat/pine-visuals.test.ts` | Runtime captures common style/location/display/format/precision/force-overlay metadata and normalized arrow colors. Renderer pixel parity remains. |
 | Visuals | `barcolor` | Supported | `tests/compat/pine-visuals.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | None known for current output shape. |
