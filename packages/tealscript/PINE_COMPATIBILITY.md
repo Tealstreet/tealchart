@@ -174,9 +174,10 @@ joined, concatenated, mutated, and compared for covariance.
 
 ## Common `matrix.*` Coverage
 
-The matrix pass covers typed constructors (`matrix.new`, `matrix.new_float`,
+The matrix pass covers typed constructors (`matrix.new<type>`, `matrix.new_float`,
 `matrix.new_int`, `matrix.new_bool`, `matrix.new_string`, `matrix.new_color`),
-shape and access helpers (`matrix.rows`, `matrix.columns`, `matrix.elements_count`,
+semantic inference/diagnostics for generic constructor templates plus known
+`matrix.get`, `matrix.set`, and `matrix.fill` element types, shape and access helpers (`matrix.rows`, `matrix.columns`, `matrix.elements_count`,
 `matrix.get`, `matrix.set`, `matrix.copy`, `matrix.row`, `matrix.col`,
 `matrix.column`, `matrix.is_square`, `matrix.is_valid`), mutation and shape
 helpers (`matrix.fill`, `matrix.reshape`, `matrix.add_row`, `matrix.add_col`,

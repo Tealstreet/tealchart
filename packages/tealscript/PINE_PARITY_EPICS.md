@@ -439,6 +439,10 @@ Phases:
    Runtime coverage now includes matrix inspection predicates: zero, identity,
    diagonal, antidiagonal, symmetric, antisymmetric, triangular, stochastic, and
    binary.
+   Semantic coverage now infers `matrix.new<T>()` element types and reports
+   invalid generic constructor templates.
+   Semantic coverage now propagates `matrix.get()` element types and reports
+   conservative `matrix.set()`/`matrix.fill()` element mismatches.
 3. Implement `map.*` with key/value typing, insertion, lookup, removal, keys,
    values, copy, and iteration.
    Runtime and compatibility coverage now includes the map MVP: constructors,

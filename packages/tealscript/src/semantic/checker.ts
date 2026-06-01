@@ -1000,8 +1000,10 @@ class SemanticChecker {
     this.checkBuiltinSignature(expression);
     this.checkUdtConstructorSignature(expression, scope);
     this.checkArrayConstructorTypeArguments(expression);
+    this.checkMatrixConstructorTypeArguments(expression);
     this.checkMapConstructorTypeArguments(expression);
     this.checkArrayCallTypes(expression, scope);
+    this.checkMatrixCallTypes(expression, scope);
     this.checkMapCallTypes(expression, scope);
     for (const argument of expression.arguments) {
       this.checkExpression(argument.value, scope);
@@ -1191,6 +1193,20 @@ class SemanticChecker {
     );
   }
 
+  private checkMatrixCallTypes(expression: CallExpression, scope: SemanticScope): void {
+    const matrixCall = this.resolveMatrixMutationCall(expression, scope);
+    if (!matrixCall?.matrixType.elementType || !matrixCall.valueArgument) return;
+
+    const actualType = this.inferExpressionType(matrixCall.valueArgument, scope);
+    if (this.isAssignableType(matrixCall.matrixType.elementType, actualType)) return;
+
+    this.addDiagnostic(
+      'type-mismatch',
+      `Cannot use ${actualType.kind} value as ${matrixCall.matrixType.elementType.kind} matrix element`,
+      matrixCall.valueArgument.loc,
+    );
+  }
+
   private resolveArrayMutationCall(
     expression: CallExpression,
     scope: SemanticScope,
@@ -1252,6 +1268,26 @@ class SemanticChecker {
     return { targetType, sourceType, sourceArgument };
   }
 
+  private resolveMatrixMutationCall(
+    expression: CallExpression,
+    scope: SemanticScope,
+  ): { operation: 'fill' | 'set'; matrixType: SemanticType; valueArgument?: Expression } | null {
+    if (expression.callee.type !== 'MemberExpression') return null;
+
+    const methodName = expression.callee.property.name;
+    if (methodName !== 'fill' && methodName !== 'set') return null;
+
+    const receiverType = this.inferMatrixHelperReceiverType(expression, scope);
+    if (receiverType?.kind !== 'matrix') return null;
+
+    const isNamespaceCall = expression.callee.object.type === 'Identifier' && expression.callee.object.name === 'matrix';
+    return {
+      operation: methodName,
+      matrixType: receiverType,
+      valueArgument: this.getCallArgument(expression.arguments, 'value', methodName === 'set' ? (isNamespaceCall ? 3 : 2) : (isNamespaceCall ? 1 : 0)),
+    };
+  }
+
   private checkMapConstructorTypeArguments(expression: CallExpression): void {
     if (this.memberPath(expression.callee).join('.') !== 'map.new' || !expression.typeArguments) return;
     if (expression.typeArguments.length !== 2) {
@@ -1275,6 +1311,16 @@ class SemanticChecker {
     }
 
     this.checkTemplateTypeName(expression.typeArguments[0], 'array element', expression.loc);
+  }
+
+  private checkMatrixConstructorTypeArguments(expression: CallExpression): void {
+    if (this.memberPath(expression.callee).join('.') !== 'matrix.new' || !expression.typeArguments) return;
+    if (expression.typeArguments.length !== 1) {
+      this.addDiagnostic('invalid-type-template', 'matrix.new() expects exactly 1 type argument', expression.loc);
+      return;
+    }
+
+    this.checkTemplateTypeName(expression.typeArguments[0], 'matrix element', expression.loc);
   }
 
   private resolveMapCall(
@@ -1551,6 +1597,8 @@ class SemanticChecker {
     if (arrayScalarType) return arrayScalarType;
     const arrayHelperType = this.inferArrayHelperCallType(expression, scope);
     if (arrayHelperType) return arrayHelperType;
+    const matrixElementReadType = this.inferMatrixElementReadCallType(expression, scope);
+    if (matrixElementReadType) return matrixElementReadType;
     if (calleePath.join('.') === 'array.from') {
       return {
         kind: 'array',
@@ -1567,6 +1615,12 @@ class SemanticChecker {
     if (calleePath.join('.') === 'array.new' && expression.typeArguments?.length === 1) {
       return {
         kind: 'array',
+        elementType: this.typeFromName(expression.typeArguments[0]),
+      };
+    }
+    if (calleePath.join('.') === 'matrix.new' && expression.typeArguments?.length === 1) {
+      return {
+        kind: 'matrix',
         elementType: this.typeFromName(expression.typeArguments[0]),
       };
     }
@@ -1685,6 +1739,26 @@ class SemanticChecker {
     if (expression.callee.object.type === 'Identifier' && expression.callee.object.name === 'array') {
       const arrayArgument = this.getCallArgument(expression.arguments, 'id', 0);
       return arrayArgument ? this.inferExpressionType(arrayArgument, scope) : undefined;
+    }
+
+    return this.inferExpressionType(expression.callee.object, scope);
+  }
+
+  private inferMatrixElementReadCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
+    if (expression.callee.type !== 'MemberExpression' || expression.callee.property.name !== 'get') return undefined;
+
+    const receiverType = this.inferMatrixHelperReceiverType(expression, scope);
+    if (receiverType?.kind !== 'matrix') return undefined;
+
+    return receiverType.elementType;
+  }
+
+  private inferMatrixHelperReceiverType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
+    if (expression.callee.type !== 'MemberExpression') return undefined;
+
+    if (expression.callee.object.type === 'Identifier' && expression.callee.object.name === 'matrix') {
+      const matrixArgument = this.getCallArgument(expression.arguments, 'id', 0);
+      return matrixArgument ? this.inferExpressionType(matrixArgument, scope) : undefined;
     }
 
     return this.inferExpressionType(expression.callee.object, scope);
