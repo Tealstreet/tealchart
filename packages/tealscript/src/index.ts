@@ -139,6 +139,16 @@ export {
   type ScopeSnapshot,
 } from './runtime';
 
+// Semantic checker
+export {
+  checkProgram,
+  type SemanticCheckResult,
+  type SemanticDiagnostic,
+  type SemanticDiagnosticSeverity,
+  type SemanticSymbol,
+  type SemanticSymbolKind,
+} from './semantic';
+
 // Worker
 export {
   TealscriptWorker,
