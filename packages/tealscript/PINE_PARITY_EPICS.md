@@ -245,7 +245,8 @@ Phases:
 3. Implement `input.price()` and interactive time/price point inputs if needed
    for chart UX parity.
 4. Support source inputs that can reference another plot or host-provided source
-   catalog.
+   catalog. Initial parity work now registers `input.source` metadata and
+   supports host-provided overrides.
 5. Implement reload/re-execution semantics when input values change.
 6. Thread declaration/input metadata to Tealchart UI consistently.
 
