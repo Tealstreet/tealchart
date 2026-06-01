@@ -518,4 +518,28 @@ plot(ta.alma(close, 5, 0.85, 6), title="ALMA")
     expect(roundSeries(getPlot(result, 'SWMA').values)).toEqual([null, null, null, 104.833333, 104, 101.833333, 100.833333, 102.666667, 105.666667, 108.166667, 109.5, 110.333333]);
     expect(roundSeries(getPlot(result, 'ALMA').values)).toEqual([null, null, null, null, 101.918274, 99.97516, 101.504063, 105.458142, 107.88929, 109.296928, 110.200868, 110.912922]);
   });
+
+  it('matches common Pine TA named-argument and default-source idioms', () => {
+    const result = runCompatScript(`
+indicator("TA named args smoke")
+plot(ta.sma(source=close, length=3), title="Named SMA")
+plot(ta.change(source=close, length=2), title="Named Change")
+plot(ta.highest(length=3), title="Default Highest")
+plot(ta.lowest(length=3), title="Default Lowest")
+plot(ta.highestbars(length=3), title="Default Highest Offset")
+plot(ta.lowestbars(length=3), title="Default Lowest Offset")
+plot(ta.rising(source=close, length=2), title="Named Rising")
+plot(ta.falling(source=close, length=2), title="Named Falling")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Named SMA').values)).toEqual([null, null, 104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111]);
+    expect(roundSeries(getPlot(result, 'Named Change').values)).toEqual([null, null, 5, -2, -8, -3, 5, 9, 4, 2, 2, 1]);
+    expect(roundSeries(getPlot(result, 'Default Highest').values)).toEqual([103, 106, 108, 109, 109, 109, 105, 110, 111, 112, 114, 114]);
+    expect(roundSeries(getPlot(result, 'Default Lowest').values)).toEqual([99, 99, 99, 101, 98, 96, 96, 96, 99, 103, 106, 107]);
+    expect(getPlot(result, 'Default Highest Offset').values).toEqual([0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1]);
+    expect(getPlot(result, 'Default Lowest Offset').values).toEqual([0, 1, 2, 2, 0, 0, 1, 2, 2, 2, 2, 2]);
+    expect(getPlot(result, 'Named Rising').values).toEqual([false, false, true, false, false, false, true, true, false, true, false, true]);
+    expect(getPlot(result, 'Named Falling').values).toEqual([false, false, false, true, true, false, false, false, false, false, false, false]);
+  });
 });
