@@ -362,6 +362,8 @@ export class ExecutionContext {
   /** Indicator settings */
   indicatorOverlay: boolean = false;
   indicatorPrecision: number = 2;
+  indicatorFormat?: string;
+  indicatorScale?: string;
   indicatorMaxBarsBack?: number;
 
   constructor() {
@@ -965,6 +967,8 @@ export class ExecutionContext {
     this.indicatorShortTitle = undefined;
     this.indicatorOverlay = false;
     this.indicatorPrecision = 2;
+    this.indicatorFormat = undefined;
+    this.indicatorScale = undefined;
     this.indicatorMaxBarsBack = undefined;
     this.strategyLedger = createStrategyLedger();
     this.captureRealtimeRollbackState();

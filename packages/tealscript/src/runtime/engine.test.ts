@@ -1397,6 +1397,20 @@ plot(close)`;
       expect(result.indicatorPrecision).toBe(4);
     });
 
+    it('records indicator format and scale metadata', () => {
+      const script = `//@version=6
+indicator("Format Scale", format=format.price, scale=scale.right)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.indicatorFormat).toBe('price');
+      expect(result.indicatorScale).toBe('right');
+    });
+
     it('records indicator shorttitle metadata', () => {
       const script = `//@version=6
 indicator("Long Declaration Title", shorttitle="Short")

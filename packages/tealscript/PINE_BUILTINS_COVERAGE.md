@@ -138,6 +138,8 @@ Current `input.*` progress:
   `indicatorShortTitle` for chart/settings consumers.
 - `indicator(..., overlay=..., precision=...)` is exposed on execution results
   as `indicatorOverlay` and `indicatorPrecision`.
+- `indicator(..., format=..., scale=...)` is exposed on execution results as
+  `indicatorFormat` and `indicatorScale`.
 
 ## Out-Of-Scope Namespaces For Epic 5
 
