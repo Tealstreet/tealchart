@@ -67,6 +67,8 @@ export interface IndicatorDeclaration extends BaseNode {
   max_polylines_count?: Expression;
   timeframe?: Expression;
   timeframe_gaps?: Expression;
+  explicit_plot_zorder?: Expression;
+  calc_bars_count?: Expression;
   dynamic_requests?: Expression;
   initial_capital?: Expression;
   currency?: Expression;

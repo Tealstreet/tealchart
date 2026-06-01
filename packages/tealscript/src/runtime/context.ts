@@ -364,6 +364,10 @@ export class ExecutionContext {
   indicatorPrecision: number = 2;
   indicatorFormat?: string;
   indicatorScale?: string;
+  indicatorTimeframe?: string;
+  indicatorTimeframeGaps?: boolean;
+  indicatorExplicitPlotZOrder?: boolean;
+  indicatorCalcBarsCount?: number;
   indicatorMaxBarsBack?: number;
 
   constructor() {
@@ -969,6 +973,10 @@ export class ExecutionContext {
     this.indicatorPrecision = 2;
     this.indicatorFormat = undefined;
     this.indicatorScale = undefined;
+    this.indicatorTimeframe = undefined;
+    this.indicatorTimeframeGaps = undefined;
+    this.indicatorExplicitPlotZOrder = undefined;
+    this.indicatorCalcBarsCount = undefined;
     this.indicatorMaxBarsBack = undefined;
     this.strategyLedger = createStrategyLedger();
     this.captureRealtimeRollbackState();
