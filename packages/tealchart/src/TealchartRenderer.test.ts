@@ -645,6 +645,50 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(fill).toHaveBeenCalledOnce();
       expect(ctx.fillStyle).toBe('#4CAF5033');
     });
+
+    it('limits filled regions to showLast bars', () => {
+      const fill = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fill,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(4, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[3]!.time,
+        priceMin: 0,
+        priceMax: 20,
+      };
+      const upper: PlotOutput = {
+        id: 'plot_Upper',
+        type: 'plot',
+        title: 'Upper',
+        values: [10, 11, 12, 13],
+        color: '#2196F3',
+      };
+      const lower: PlotOutput = {
+        id: 'plot_Lower',
+        type: 'plot',
+        title: 'Lower',
+        values: [5, 6, 7, 8],
+        color: '#F44336',
+      };
+      const fillPlot: PlotOutput = {
+        id: 'fill_ShowLast',
+        type: 'fill',
+        title: 'ShowLast',
+        values: [],
+        color: '#4CAF5033',
+        plot1Id: upper.id,
+        plot2Id: lower.id,
+        showLast: 2,
+      };
+
+      (renderer as any).renderFill(fillPlot, [upper, lower, fillPlot], bars, viewport, (value: number) => value);
+
+      expect(fill).toHaveBeenCalledOnce();
+    });
   });
 
   describe('marker rendering', () => {

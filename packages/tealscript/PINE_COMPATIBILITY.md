@@ -293,6 +293,9 @@ renders common plot offsets for line, marker, histogram, and area plot styles.
 Renderer coverage also honors `display.none` while retaining hidden plot values
 for dependent fills.
 
+Fill renderer coverage applies `show_last` windows to filled regions while
+preserving existing gap handling and per-bar fill colors.
+
 ## Common OHLC Plot Coverage
 
 The OHLC plot pass covers `plotbar()` and `plotcandle()` for custom bar and

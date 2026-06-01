@@ -348,6 +348,7 @@ Phases:
 2. Finish `hline()` handles and visual settings.
 3. Finish `fill()` for plot/hline handles, fill gaps, title/editable/display,
    and color series behavior.
+   Initial renderer parity now applies `show_last` windows to filled regions.
 4. Finish `plotshape`, `plotchar`, and `plotarrow` text, location, size,
    offset, display, and color behavior. Initial parity work now captures
    runtime metadata for common marker parameters and normalizes `plotarrow`

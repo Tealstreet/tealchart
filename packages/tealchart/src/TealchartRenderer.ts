@@ -2194,7 +2194,8 @@ export class TealchartRenderer {
 
     for (let i = 0; i < bars.length; i++) {
       const bar = bars[i];
-      if (!bar || bar.time < viewport.startTime || bar.time > viewport.endTime) {
+      if (!bar || !this.shouldRenderPlotBar(fill, bars, i) || bar.time < viewport.startTime || bar.time > viewport.endTime) {
+        previous = null;
         continue;
       }
 
@@ -3692,6 +3693,12 @@ export class TealchartRenderer {
 
   private shouldRenderPlot(plot: Pick<PlotOutput, 'display'>): boolean {
     return plot.display !== 0;
+  }
+
+  private shouldRenderPlotBar(plot: Pick<PlotOutput, 'showLast'>, bars: Bar[], index: number): boolean {
+    if (plot.showLast === undefined) return true;
+    if (plot.showLast <= 0) return false;
+    return index >= Math.max(0, bars.length - plot.showLast);
   }
 
   /**
