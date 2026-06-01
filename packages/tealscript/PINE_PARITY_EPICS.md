@@ -352,8 +352,8 @@ Phases:
    runtime metadata for common marker parameters and normalizes `plotarrow`
    colors through the shared color pipeline.
 5. Finish `bgcolor`, `barcolor`, `plotbar`, and `plotcandle` edge cases.
-   Initial parity work now captures `bgcolor()` display metadata and OHLC
-   `format`, `precision`, and `force_overlay` metadata.
+   Initial parity work now captures `bgcolor()` display and force-overlay
+   metadata plus OHLC `format`, `precision`, and `force_overlay` metadata.
 6. Add renderer-level screenshot or pixel tests where practical.
 
 Done means visual-only indicators retain their main chart appearance.
