@@ -461,6 +461,9 @@ Phases:
    receiver type.
 6. Implement `library()`, `export`, `import`, versioned module resolution, and
    library diagnostics.
+   Semantic coverage now reports exports outside libraries, empty libraries
+   without parsed exportable declarations, and untyped parameters on exported
+   functions/methods.
 
 Done means library-heavy Pine v5/v6 scripts can be reduced and run without
 large rewrites.
