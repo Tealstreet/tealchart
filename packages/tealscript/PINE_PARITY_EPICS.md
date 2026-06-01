@@ -204,7 +204,9 @@ Goal: close the common built-in namespace gaps systematically.
 Phases:
 
 1. Build a generated/manual inventory of v6 built-ins from the Reference Manual
-   into tracked coverage tables.
+   into tracked coverage tables. `PINE_BUILTINS_COVERAGE.md` now records the
+   official source links, local runtime registration counts, and namespace
+   follow-up ownership.
 2. Finish `ta.*`: correlation, oscillator variants, smoothing variants,
    edge-case parity, tuple returns, and exact `na` handling.
 3. Finish `math.*`: random behavior, mintick rounding, overloads, and exact
