@@ -44,6 +44,7 @@ plot(basis, title="Basis")`;
       expect(result.profile.expressions).toBeGreaterThan(0);
       expect(result.profile.builtinCalls).toBeGreaterThan(0);
       expect(result.profile.requestContexts).toBe(0);
+      expect(result.profile.maxBarsBack).toBe(0);
       expect(result.profile.errors).toBe(0);
       expect(result.profile.elapsedMs).toBeGreaterThanOrEqual(0);
     });
@@ -3655,6 +3656,59 @@ plot(na(tooFar) ? 1 : 0, title="Too Far Is NA")`;
       expect(result.plots.find((plot) => plot.title === 'Too Far')?.values).toEqual([null, null, null]);
       expect(result.plots.find((plot) => plot.title === 'Future Is NA')?.values).toEqual([1, 1, 1]);
       expect(result.plots.find((plot) => plot.title === 'Too Far Is NA')?.values).toEqual([1, 1, 1]);
+    });
+
+    it('reports history references beyond explicit max_bars_back', () => {
+      const script = `//@version=6
+indicator("Limited History", max_bars_back=2)
+plot(close[3], title="Too Far")`;
+
+      const result = executeScript(parse(script), createBars(5, 100));
+
+      expect(result.errors.map((error) => error.message)).toEqual([
+        'History reference [3] exceeds indicator max_bars_back 2',
+        'History reference [3] exceeds indicator max_bars_back 2',
+        'History reference [3] exceeds indicator max_bars_back 2',
+        'History reference [3] exceeds indicator max_bars_back 2',
+        'History reference [3] exceeds indicator max_bars_back 2',
+      ]);
+    });
+
+    it('keeps array indexes separate from max_bars_back enforcement', () => {
+      const script = `//@version=6
+indicator("Array Index", max_bars_back=1)
+values = array.from(10, 20, 30)
+plot(values[2], title="Array Value")`;
+
+      const result = executeScript(parse(script), createBars(2, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Array Value')?.values).toEqual([30, 30]);
+    });
+
+    it('applies max_bars_back to indexed expressions', () => {
+      const script = `//@version=6
+indicator("Expression History Limit", max_bars_back=1)
+plot((close + 1)[2], title="Too Far")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors.map((error) => error.message)).toEqual([
+        'History reference [2] exceeds indicator max_bars_back 1',
+        'History reference [2] exceeds indicator max_bars_back 1',
+        'History reference [2] exceeds indicator max_bars_back 1',
+      ]);
+    });
+
+    it('reports the inferred max history offset in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Inferred History")
+plot(close[2], title="Close")`;
+
+      const result = executeScript(parse(script), createBars(4, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(2);
     });
   });
 
