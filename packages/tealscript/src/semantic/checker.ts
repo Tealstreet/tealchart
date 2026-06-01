@@ -956,6 +956,7 @@ class SemanticChecker {
     this.checkCallee(expression.callee, scope);
     this.checkBuiltinSignature(expression);
     this.checkUdtConstructorSignature(expression, scope);
+    this.checkMapCallTypes(expression, scope);
     for (const argument of expression.arguments) {
       this.checkExpression(argument.value, scope);
     }
@@ -1099,6 +1100,74 @@ class SemanticChecker {
       'type-mismatch',
       `Cannot assign ${sourceType.kind} value to ${targetType.kind} field ${typeName}.${field.name.name}`,
       value.loc,
+    );
+  }
+
+  private checkMapCallTypes(expression: CallExpression, scope: SemanticScope): void {
+    const mapCall = this.resolveMapCall(expression, scope);
+    if (!mapCall) return;
+
+    switch (mapCall.operation) {
+      case 'put':
+        this.checkMapArgumentType(mapCall.mapType.keyType, mapCall.keyArgument, 'map key', scope);
+        this.checkMapArgumentType(mapCall.mapType.valueType, mapCall.valueArgument, 'map value', scope);
+        break;
+      case 'get':
+      case 'contains':
+      case 'remove':
+        this.checkMapArgumentType(mapCall.mapType.keyType, mapCall.keyArgument, 'map key', scope);
+        break;
+    }
+  }
+
+  private resolveMapCall(
+    expression: CallExpression,
+    scope: SemanticScope,
+  ): { operation: 'contains' | 'get' | 'put' | 'remove'; mapType: SemanticType; keyArgument?: Expression; valueArgument?: Expression } | null {
+    if (expression.callee.type !== 'MemberExpression') return null;
+
+    const methodName = expression.callee.property.name;
+    if (!this.isCheckedMapOperation(methodName)) return null;
+
+    const receiverType = this.inferExpressionType(expression.callee.object, scope);
+    if (receiverType.kind === 'map') {
+      return {
+        operation: methodName,
+        mapType: receiverType,
+        keyArgument: expression.arguments[0]?.value,
+        valueArgument: expression.arguments[1]?.value,
+      };
+    }
+
+    if (expression.callee.object.type !== 'Identifier' || expression.callee.object.name !== 'map') return null;
+
+    const mapArgument = expression.arguments[0]?.value;
+    if (!mapArgument) return null;
+    const mapType = this.inferExpressionType(mapArgument, scope);
+    if (mapType.kind !== 'map') return null;
+
+    return {
+      operation: methodName,
+      mapType,
+      keyArgument: expression.arguments[1]?.value,
+      valueArgument: expression.arguments[2]?.value,
+    };
+  }
+
+  private isCheckedMapOperation(operation: string): operation is 'contains' | 'get' | 'put' | 'remove' {
+    return operation === 'contains' || operation === 'get' || operation === 'put' || operation === 'remove';
+  }
+
+  private checkMapArgumentType(expectedType: SemanticType | undefined, argument: Expression | undefined, role: 'map key' | 'map value', scope: SemanticScope): void {
+    if (!expectedType || !argument) return;
+
+    const actualType = this.inferExpressionType(argument, scope);
+    if (this.isAssignableType(expectedType, actualType)) return;
+
+    this.addDiagnostic(
+      'type-mismatch',
+      `Cannot use ${actualType.kind} value as ${expectedType.kind} ${role}`,
+      argument.loc,
     );
   }
 
