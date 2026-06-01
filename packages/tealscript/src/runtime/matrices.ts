@@ -476,6 +476,36 @@ export function invMatrixValue(matrix: PineMatrix): PineMatrix<number> {
   return result;
 }
 
+export function pinvMatrixValue(matrix: PineMatrix): PineMatrix<number> {
+  if (matrix.rows === 0 || matrix.columns === 0) {
+    return createPineMatrix<number>(matrix.columns, matrix.rows, 0);
+  }
+
+  const columns = matrixColumns(matrix);
+  let inverse = initialPseudoinverse(columns[0]);
+  const basisColumns = [columns[0]];
+
+  for (let columnIndex = 1; columnIndex < columns.length; columnIndex++) {
+    const column = columns[columnIndex];
+    const projection = multiplyMatrixByVector(inverse, column);
+    const residual = subtractVectors(column, multiplyColumnsByVector(basisColumns, projection));
+    const residualNormSquared = dotVector(residual, residual);
+    const correction = residualNormSquared > MATRIX_EPSILON
+      ? residual.map((value) => value / residualNormSquared)
+      : multiplyTransposeMatrixByVector(inverse, projection).map((value) => value / (1 + dotVector(projection, projection)));
+
+    inverse = [
+      ...inverse.map((row, rowIndex) => subtractVectors(row, correction.map((value) => projection[rowIndex] * value))),
+      correction,
+    ];
+    basisColumns.push(column);
+  }
+
+  const result = createPineMatrix<number>(matrix.columns, matrix.rows, 0);
+  result.values = inverse.flat();
+  return result;
+}
+
 export function kronMatrixValue(left: PineMatrix, right: PineMatrix): PineMatrix<number> {
   const result = createPineMatrix<number>(left.rows * right.rows, left.columns * right.columns, 0);
   for (let leftRow = 0; leftRow < left.rows; leftRow++) {
@@ -574,6 +604,46 @@ function numericRows(matrix: PineMatrix): number[][] {
       return Number(matrix.values[row * matrix.columns + column]);
     });
   });
+}
+
+function matrixColumns(matrix: PineMatrix): number[][] {
+  return Array.from({ length: matrix.columns }, (_columnValue, column) => {
+    return Array.from({ length: matrix.rows }, (_rowValue, row) => Number(getMatrixValue(matrix, row, column)));
+  });
+}
+
+function initialPseudoinverse(column: number[]): number[][] {
+  const normSquared = dotVector(column, column);
+  if (normSquared <= MATRIX_EPSILON) {
+    return [Array.from({ length: column.length }, () => 0)];
+  }
+  return [column.map((value) => value / normSquared)];
+}
+
+function multiplyMatrixByVector(matrix: number[][], vector: number[]): number[] {
+  return matrix.map((row) => dotVector(row, vector));
+}
+
+function multiplyTransposeMatrixByVector(matrix: number[][], vector: number[]): number[] {
+  if (matrix.length === 0) return [];
+  return Array.from({ length: matrix[0].length }, (_value, column) => {
+    return matrix.reduce((total, row, rowIndex) => total + row[column] * vector[rowIndex], 0);
+  });
+}
+
+function multiplyColumnsByVector(columns: number[][], vector: number[]): number[] {
+  if (columns.length === 0) return [];
+  return Array.from({ length: columns[0].length }, (_value, row) => {
+    return columns.reduce((total, column, columnIndex) => total + column[row] * vector[columnIndex], 0);
+  });
+}
+
+function subtractVectors(left: number[], right: number[]): number[] {
+  return left.map((value, index) => value - right[index]);
+}
+
+function dotVector(left: number[], right: number[]): number {
+  return left.reduce((total, value, index) => total + value * right[index], 0);
 }
 
 function isEffectivelyZero(value: number, scale: number): boolean {

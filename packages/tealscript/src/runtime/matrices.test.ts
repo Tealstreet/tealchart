@@ -35,6 +35,7 @@ import {
   minMatrixValue,
   modeMatrixValue,
   multMatrixValue,
+  pinvMatrixValue,
   powMatrixValue,
   rankMatrixValue,
   removeMatrixColumn,
@@ -343,6 +344,25 @@ describe('PineMatrix', () => {
     expect(matrix.values).toEqual([4, 7, 2, 6]);
   });
 
+  it('computes pseudoinverses for rectangular and rank-deficient matrices', () => {
+    const rectangular = createPineMatrix<number>(2, 3, 0);
+    rectangular.values = [1, 2, 3, 4, 5, 6];
+
+    const rectangularPinv = pinvMatrixValue(rectangular);
+    expect(rectangularPinv.rows).toBe(3);
+    expect(rectangularPinv.columns).toBe(2);
+    expectMatrixValuesCloseTo(rectangularPinv, [-0.944444, 0.444444, -0.111111, 0.111111, 0.722222, -0.222222]);
+    expectMatrixValuesCloseTo(multMatrixValue(multMatrixValue(rectangular, rectangularPinv) as typeof rectangular, rectangular) as typeof rectangular, [1, 2, 3, 4, 5, 6]);
+
+    const deficient = createPineMatrix<number>(2, 2, 0);
+    deficient.values = [1, 2, 2, 4];
+
+    const deficientPinv = pinvMatrixValue(deficient);
+    expectMatrixValuesCloseTo(deficientPinv, [0.04, 0.08, 0.08, 0.16]);
+    expectMatrixValuesCloseTo(multMatrixValue(multMatrixValue(deficient, deficientPinv) as typeof deficient, deficient) as typeof deficient, [1, 2, 2, 4]);
+    expect(deficient.values).toEqual([1, 2, 2, 4]);
+  });
+
   it('rejects matrix inverses for non-square or singular matrices', () => {
     expect(() => invMatrixValue(createPineMatrix<number>(2, 3, 1))).toThrow('Matrix inverse requires a square matrix. Matrix is 2x3');
 
@@ -390,3 +410,10 @@ describe('PineMatrix', () => {
     expect(() => submatrixValue(matrix, 0, 1, 2, 1)).toThrow('Matrix column range 2..1 is out of bounds. column count is 2');
   });
 });
+
+function expectMatrixValuesCloseTo(matrix: { values: number[] }, expected: number[]): void {
+  expect(matrix.values).toHaveLength(expected.length);
+  matrix.values.forEach((value, index) => {
+    expect(value).toBeCloseTo(expected[index], 5);
+  });
+}

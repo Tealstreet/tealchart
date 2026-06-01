@@ -194,14 +194,15 @@ same-shape matrix operands and scalar operands, `matrix.mult()` for
 matrix-by-matrix, matrix-by-array, and matrix-by-scalar multiplication,
 `matrix.pow()` for non-negative integer powers, and `matrix.trace()` for square
 matrices. Linear algebra coverage includes `matrix.det()` and `matrix.inv()` for
-square matrices, `matrix.rank()` for square or rectangular matrices, and
-`matrix.kron()` for Kronecker products. Common Pine method syntax lowers to the
+square matrices, `matrix.pinv()` for rectangular or rank-deficient matrices,
+`matrix.rank()` for square or rectangular matrices, and `matrix.kron()` for
+Kronecker products. Common Pine method syntax lowers to the
 same runtime built-ins for calls such as
 `values.set(row, column, close)`, `values.add_row(array.from(...))`,
 `values.transpose()`, `values.sort(1, order.descending)`,
 `values.submatrix(0, 2, 0, 2)`, `values.sum(other)`, `values.mult(other)`,
 `values.pow(2)`, `values.trace()`, `values.det()`, `values.inv()`,
-`values.rank()`, `values.kron(other)`, `values.is_identity()`, and
+`values.pinv()`, `values.rank()`, `values.kron(other)`, `values.is_identity()`, and
 `values.avg()`.
 
 ## Common `map.*` Coverage

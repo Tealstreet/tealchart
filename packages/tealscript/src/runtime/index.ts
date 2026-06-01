@@ -58,6 +58,7 @@ export {
   maxMatrixValue,
   medianMatrixValue,
   modeMatrixValue,
+  pinvMatrixValue,
   type PineMatrix,
 } from './matrices';
 
