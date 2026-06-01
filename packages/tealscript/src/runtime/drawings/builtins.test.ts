@@ -892,4 +892,18 @@ plot(close)`;
 
       expect(result.errors[0]?.message).toBe('Table cell coordinates out of bounds: column 1, row 0');
     });
+
+    it('caps declared table cell capacity across live tables', () => {
+      const script = `//@version=6
+indicator("Table cell limit", overlay=true)
+first = table.new(position.top_left, 100, 100)
+second = table.new(position.top_right, 1, 1)
+plot(close)`;
+
+      const ast = parse(script);
+      const result = executeScript(ast, createBars(1));
+
+      expect(result.errors.map((error) => error.message)).toEqual(['Too many table cells: maximum is 10000']);
+      expect(result.drawings.filter((drawing) => drawing.type === 'table')).toHaveLength(1);
+    });
   });
