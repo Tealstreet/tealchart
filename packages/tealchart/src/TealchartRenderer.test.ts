@@ -1083,6 +1083,94 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       expect(fill).toHaveBeenCalledOnce();
     });
+
+    it('skips fills with display.none through renderPlots', () => {
+      const fill = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fill,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 0,
+        priceMax: 20,
+      };
+      const upper: PlotOutput = {
+        id: 'plot_Upper',
+        type: 'plot',
+        title: 'Upper',
+        values: [10, 11],
+        color: '#2196F3',
+      };
+      const lower: PlotOutput = {
+        id: 'plot_Lower',
+        type: 'plot',
+        title: 'Lower',
+        values: [5, 6],
+        color: '#F44336',
+      };
+      const fillPlot: PlotOutput = {
+        id: 'fill_Hidden',
+        type: 'fill',
+        title: 'Hidden',
+        values: [],
+        color: '#4CAF5033',
+        plot1Id: upper.id,
+        plot2Id: lower.id,
+        display: 0,
+      };
+
+      renderer.renderPlots([upper, lower, fillPlot], bars, viewport);
+
+      expect(fill).not.toHaveBeenCalled();
+    });
+
+    it('fills between plot and hline handles through renderPlots', () => {
+      const fill = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fill,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 0,
+        priceMax: 20,
+      };
+      const plot: PlotOutput = {
+        id: 'plot_Basis',
+        type: 'plot',
+        title: 'Basis',
+        values: [10, 11],
+        color: '#2196F3',
+      };
+      const hline: PlotOutput = {
+        id: 'hline_Level',
+        type: 'hline',
+        title: 'Level',
+        values: [],
+        color: '#787B86',
+        price: 5,
+      };
+      const fillPlot: PlotOutput = {
+        id: 'fill_PlotHline',
+        type: 'fill',
+        title: 'PlotHline',
+        values: [],
+        color: '#4CAF5033',
+        plot1Id: plot.id,
+        plot2Id: hline.id,
+      };
+
+      renderer.renderPlots([plot, hline, fillPlot], bars, viewport);
+
+      expect(fill).toHaveBeenCalled();
+    });
   });
 
   describe('marker rendering', () => {
