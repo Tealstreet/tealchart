@@ -331,16 +331,19 @@ describe('TealScriptDrawingRenderer', () => {
       partitionTealScriptDrawings([
         makeLabel({ style: 'label_up', text: 'Up' }),
         makeLabel({ id: 'label-2', style: 'label_right', text: 'Right' }),
+        makeLabel({ id: 'label-3', style: 'label_upper_left', text: 'Upper' }),
       ]),
       bars,
       { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
       pane,
     );
 
-    expect(events.filter((event) => event.startsWith('roundRect:'))).toHaveLength(2);
-    expect(events.filter((event) => event === 'closePath')).toHaveLength(2);
+    expect(events.filter((event) => event.startsWith('roundRect:'))).toHaveLength(3);
+    expect(events.filter((event) => event === 'closePath')).toHaveLength(3);
+    expect(events).toContain('moveTo:82,34');
     expect(events.some((event) => event.startsWith('fillText:Up:'))).toBe(true);
     expect(events.some((event) => event.startsWith('fillText:Right:'))).toBe(true);
+    expect(events.some((event) => event.startsWith('fillText:Upper:'))).toBe(true);
   });
 
   it('renders Pine symbol label styles and keeps style_none text-only', () => {

@@ -514,13 +514,15 @@ export class TealScriptDrawingRenderer {
     const centerX = layout.bodyX + layout.bodyWidth / 2;
     const centerY = layout.bodyY + layout.bodyHeight / 2;
     const pointerSize = 6;
+    const pointsUp = style === 'label_up' || style.includes('lower') || style === 'arrowup';
+    const pointsDown = style === 'label_down' || style.includes('upper') || style === 'arrowdown';
 
     ctx.beginPath();
-    if (style.includes('up')) {
+    if (pointsUp) {
       ctx.moveTo(centerX - pointerSize, layout.bodyY);
       ctx.lineTo(centerX + pointerSize, layout.bodyY);
       ctx.lineTo(anchor.x, anchor.y);
-    } else if (style.includes('down')) {
+    } else if (pointsDown) {
       ctx.moveTo(centerX - pointerSize, layout.bodyY + layout.bodyHeight);
       ctx.lineTo(centerX + pointerSize, layout.bodyY + layout.bodyHeight);
       ctx.lineTo(anchor.x, anchor.y);
