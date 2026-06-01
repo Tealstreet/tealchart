@@ -4611,6 +4611,9 @@ export class TealscriptEngine {
       const editable = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 6, 'editable'));
       const showLast = this.toOptionalInteger(this.getCallArg(args, namedArgs, 7, 'show_last'));
       const display = this.toOptionalInteger(this.getCallArg(args, namedArgs, 8, 'display'));
+      const format = this.toOptionalString(this.getCallArg(args, namedArgs, 9, 'format'));
+      const precision = this.toOptionalInteger(this.getCallArg(args, namedArgs, 10, 'precision'));
+      const forceOverlay = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 11, 'force_overlay'));
       const id = `plotbar_${title}`;
 
       let plot = ctx.plots.get(id);
@@ -4627,6 +4630,9 @@ export class TealscriptEngine {
           editable,
           showLast,
           display,
+          format,
+          precision,
+          forceOverlay,
         });
         plot = ctx.plots.get(id);
       }
@@ -4654,6 +4660,9 @@ export class TealscriptEngine {
         namedArgs.has('bordercolor') ? namedArgs.get('bordercolor') : args[9] !== undefined ? args[9] : color,
       );
       const display = this.toOptionalInteger(this.getCallArg(args, namedArgs, 10, 'display'));
+      const format = this.toOptionalString(this.getCallArg(args, namedArgs, 11, 'format'));
+      const precision = this.toOptionalInteger(this.getCallArg(args, namedArgs, 12, 'precision'));
+      const forceOverlay = this.toOptionalBoolean(this.getCallArg(args, namedArgs, 13, 'force_overlay'));
       const id = `plotcandle_${title}`;
 
       let plot = ctx.plots.get(id);
@@ -4672,6 +4681,9 @@ export class TealscriptEngine {
           editable,
           showLast,
           display,
+          format,
+          precision,
+          forceOverlay,
         });
         plot = ctx.plots.get(id);
       }

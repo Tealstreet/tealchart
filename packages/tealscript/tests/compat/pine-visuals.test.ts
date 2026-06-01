@@ -71,8 +71,8 @@ upColor = color.silver
 downColor = color.blue
 bodyColor = c >= o ? upColor : downColor
 wickColor = color.new(bodyColor, 70)
-plotcandle(o, h, l, c, title="Custom candles", color=bodyColor, wickcolor=wickColor, bordercolor=bodyColor, editable=true, show_last=5, display=display.price_scale)
-plotbar(o, h + 1, l - 1, c, "Custom bars", bodyColor, false, 6, display.none)
+plotcandle(o, h, l, c, title="Custom candles", color=bodyColor, wickcolor=wickColor, bordercolor=bodyColor, editable=true, show_last=5, display=display.price_scale, format=format.price, precision=2, force_overlay=true)
+plotbar(o, h + 1, l - 1, c, "Custom bars", bodyColor, false, 6, display.none, format.volume, 0, true)
 `);
 
     expect(result.errors).toEqual([]);
@@ -113,6 +113,9 @@ plotbar(o, h + 1, l - 1, c, "Custom bars", bodyColor, false, 6, display.none)
     expect(candles.editable).toBe(true);
     expect(candles.showLast).toBe(5);
     expect(candles.display).toBe(8);
+    expect(candles.format).toBe('price');
+    expect(candles.precision).toBe(2);
+    expect(candles.forceOverlay).toBe(true);
 
     const bars = getPlot(result, 'Custom bars');
     expect(bars.type).toBe('plotbar');
@@ -122,6 +125,9 @@ plotbar(o, h + 1, l - 1, c, "Custom bars", bodyColor, false, 6, display.none)
     expect(bars.editable).toBe(false);
     expect(bars.showLast).toBe(6);
     expect(bars.display).toBe(0);
+    expect(bars.format).toBe('volume');
+    expect(bars.precision).toBe(0);
+    expect(bars.forceOverlay).toBe(true);
   });
 
   it('captures background and bar color visual parameters', () => {

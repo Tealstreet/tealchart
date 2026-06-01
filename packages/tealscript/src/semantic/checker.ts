@@ -249,6 +249,35 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
     },
   ],
   [
+    'plotbar',
+    {
+      params: ['open', 'high', 'low', 'close', 'title', 'color', 'editable', 'show_last', 'display', 'format', 'precision', 'force_overlay'],
+      minArgs: 4,
+    },
+  ],
+  [
+    'plotcandle',
+    {
+      params: [
+        'open',
+        'high',
+        'low',
+        'close',
+        'title',
+        'color',
+        'wickcolor',
+        'editable',
+        'show_last',
+        'bordercolor',
+        'display',
+        'format',
+        'precision',
+        'force_overlay',
+      ],
+      minArgs: 4,
+    },
+  ],
+  [
     'indicator',
     {
       params: [
