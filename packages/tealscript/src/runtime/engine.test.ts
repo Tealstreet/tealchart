@@ -2362,7 +2362,11 @@ plot(fixnan(sourceB), title="Fixed B")`;
 indicator("String To Number")
 plot(str.tonumber("42.5"), title="Decimal")
 plot(str.tonumber("  -3e2  "), title="Scientific")
+plot(str.tonumber(string="+.5"), title="Named Fraction")
+plot(str.tonumber("1."), title="Trailing Dot")
 plot(str.tonumber("bad"), title="Invalid")
+plot(str.tonumber("0x10"), title="Hex Invalid")
+plot(str.tonumber("Infinity"), title="Infinity Invalid")
 plot(na(str.tonumber("")) ? 1 : 0, title="Empty Is NA")`;
 
       const ast = parse(script);
@@ -2372,7 +2376,11 @@ plot(na(str.tonumber("")) ? 1 : 0, title="Empty Is NA")`;
       expect(result.errors).toHaveLength(0);
       expect(result.plots.find((plot) => plot.title === 'Decimal')?.values).toEqual([42.5, 42.5]);
       expect(result.plots.find((plot) => plot.title === 'Scientific')?.values).toEqual([-300, -300]);
+      expect(result.plots.find((plot) => plot.title === 'Named Fraction')?.values).toEqual([0.5, 0.5]);
+      expect(result.plots.find((plot) => plot.title === 'Trailing Dot')?.values).toEqual([1, 1]);
       expect(result.plots.find((plot) => plot.title === 'Invalid')?.values).toEqual([null, null]);
+      expect(result.plots.find((plot) => plot.title === 'Hex Invalid')?.values).toEqual([null, null]);
+      expect(result.plots.find((plot) => plot.title === 'Infinity Invalid')?.values).toEqual([null, null]);
       expect(result.plots.find((plot) => plot.title === 'Empty Is NA')?.values).toEqual([1, 1]);
     });
 
@@ -2411,6 +2419,8 @@ indicator("String Format Time")
 stamp = timestamp("GMT+2", 2024, 1, 5, 9, 30, 15)
 plot(str.format_time(stamp, "yyyy-MM-dd HH:mm:ss", "GMT+2") == "2024-01-05 09:30:15", title="Offset")
 plot(str.format_time(stamp, "yy/MM/dd HH:mm", "UTC") == "24/01/05 07:30", title="UTC")
+plot(str.format_time(time=stamp, timezone="GMT+2") == "2024-01-05T09:30:15+0200", title="Named Default")
+plot(str.format_time(stamp, "M/d/yyyy H:m:s 'UTC'Z", "UTC") == "1/5/2024 7:30:15 UTC+0000", title="Single Tokens")
 plot(str.format_time(na, "yyyy-MM-dd", "UTC") == "NaN", title="Missing")`;
 
       const ast = parse(script);
@@ -2420,6 +2430,8 @@ plot(str.format_time(na, "yyyy-MM-dd", "UTC") == "NaN", title="Missing")`;
       expect(result.errors).toHaveLength(0);
       expect(result.plots.find((plot) => plot.title === 'Offset')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'UTC')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Named Default')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Single Tokens')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Missing')?.values).toEqual([true, true]);
     });
 
