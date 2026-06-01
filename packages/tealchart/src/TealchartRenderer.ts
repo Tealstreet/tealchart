@@ -1724,12 +1724,14 @@ export class TealchartRenderer {
       if (isOverlay || !paneLayout || paneLayout.indicatorPanes.length === 0) {
         // Render on main pane (existing behavior)
         for (const plot of scriptPlots) {
-          if (plot.type === 'fill') {
+          if (plot.type === 'fill' && this.shouldRenderPlot(plot)) {
             this.renderFill(plot, scriptPlots, bars, viewport, (value, paneHeight) => this.priceToY(value, viewport, paneHeight));
           }
         }
 
         for (const plot of scriptPlots) {
+          if (!this.shouldRenderPlot(plot)) continue;
+
           switch (plot.type) {
             case 'plot':
               this.renderLinePlot(plot, bars, viewport);
@@ -3688,6 +3690,10 @@ export class TealchartRenderer {
     }
   }
 
+  private shouldRenderPlot(plot: Pick<PlotOutput, 'display'>): boolean {
+    return plot.display !== 0;
+  }
+
   /**
    * Render a single plot within a pane (used for both main and indicator panes)
    */
@@ -4358,12 +4364,14 @@ export class TealchartRenderer {
     ctx.clip();
 
     for (const plot of plots) {
-      if (plot.type === 'fill') {
+      if (plot.type === 'fill' && this.shouldRenderPlot(plot)) {
         this.renderFill(plot, plots, bars, viewport, (value) => this.valueToPaneY(value, paneOffset));
       }
     }
 
     for (const plot of plots) {
+      if (!this.shouldRenderPlot(plot)) continue;
+
       switch (plot.type) {
         case 'plot':
           this.renderLinePlotInPane(plot, bars, viewport, paneOffset);
