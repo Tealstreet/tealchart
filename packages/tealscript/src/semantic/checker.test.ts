@@ -329,8 +329,14 @@ indices = prices.sort_indices()
 indices.push("bad")
 absolute = array.abs(prices)
 absolute.push("bad")
+ints = array.new_int()
+prices.concat(ints)
+strings = array.new_string()
+prices.concat(strings)
+array.concat(prices, strings)
 unknown = array.from(1)
 unknown.push("allowed")
+prices.concat(unknown)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -344,6 +350,8 @@ unknown.push("allowed")
       'Cannot use string value as float array element',
       'Cannot use string value as int array element',
       'Cannot use string value as float array element',
+      'Cannot concatenate string array into float array',
+      'Cannot concatenate string array into float array',
     ]);
   });
 
