@@ -1476,6 +1476,8 @@ class SemanticChecker {
     if (calleePath.join('.') === 'timeframe.from_seconds') return { kind: 'string', qualifier: 'simple' };
     if (CALENDAR_FUNCTION_NAMES.has(calleePath.join('.'))) return { kind: 'int', qualifier: 'series' };
     if (calleePath.join('.') === 'timestamp') return { kind: 'int', qualifier: 'const' };
+    const arrayHelperType = this.inferArrayHelperCallType(expression, scope);
+    if (arrayHelperType) return arrayHelperType;
     if (calleePath.join('.') === 'map.new' && expression.typeArguments?.length === 2) {
       return {
         kind: 'map',
@@ -1500,6 +1502,48 @@ class SemanticChecker {
       return { kind: 'udt', name: calleePath[0] };
     }
     return { kind: 'unknown', qualifier: this.inferMaxQualifier(expression.arguments.map((argument) => argument.value), scope) };
+  }
+
+  private inferArrayHelperCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
+    if (expression.callee.type !== 'MemberExpression') return undefined;
+
+    const methodName = expression.callee.property.name;
+    const receiverType = this.inferArrayHelperReceiverType(expression, scope);
+    if (receiverType?.kind !== 'array') return undefined;
+
+    switch (methodName) {
+      case 'concat':
+      case 'copy':
+      case 'slice':
+        return {
+          kind: 'array',
+          elementType: receiverType.elementType,
+        };
+      case 'abs':
+      case 'standardize':
+        return {
+          kind: 'array',
+          elementType: { kind: 'float' },
+        };
+      case 'sort_indices':
+        return {
+          kind: 'array',
+          elementType: { kind: 'int' },
+        };
+      default:
+        return undefined;
+    }
+  }
+
+  private inferArrayHelperReceiverType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
+    if (expression.callee.type !== 'MemberExpression') return undefined;
+
+    if (expression.callee.object.type === 'Identifier' && expression.callee.object.name === 'array') {
+      const arrayArgument = this.getCallArgument(expression.arguments, 'id', 0);
+      return arrayArgument ? this.inferExpressionType(arrayArgument, scope) : undefined;
+    }
+
+    return this.inferExpressionType(expression.callee.object, scope);
   }
 
   private inferMemberExpressionType(expression: MemberExpression, scope: SemanticScope): SemanticType {
