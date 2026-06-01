@@ -405,6 +405,8 @@ Phases:
    Runtime coverage now includes table-level position/background/frame/border
    setters.
    Runtime and renderer coverage now include table cell font-family metadata.
+   Runtime and renderer coverage now include table cell bold/italic formatting
+   metadata.
 7. Add lifecycle tests for mutation, deletion, copying, GC limits, and realtime
    rollback.
 

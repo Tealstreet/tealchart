@@ -822,6 +822,7 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     withTable(namedArgs.get('table_id') ?? args[0], ctx, (table) => {
       const { column, row } = normalizeCellCoordinates(table, namedArgs.get('column') ?? args[1], namedArgs.get('row') ?? args[2]);
       const textFontFamily = optionalString(runtime, namedArgs.get('text_font_family') ?? args[11]);
+      const textFormatting = optionalString(runtime, namedArgs.get('text_formatting') ?? args[12]);
       const cell: TableCellDrawingOutput = {
         column,
         row,
@@ -839,6 +840,7 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
         bgcolor: runtime.toNullableColor(namedArgs.get('bgcolor') ?? args[10]),
       };
       if (textFontFamily !== undefined) cell.textFontFamily = textFontFamily;
+      if (textFormatting !== undefined) cell.textFormatting = textFormatting;
       upsertCell(table, cell);
     });
     return undefined;
@@ -907,6 +909,13 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     });
     return undefined;
   });
+  builtins.set('table.cell_set_text_formatting', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      const cell = ensureCell(table, args[1], args[2]);
+      cell.textFormatting = runtime.toStringValue(args[3]);
+    });
+    return undefined;
+  });
 }
 
 const DRAWING_CONSTANTS: Record<string, string> = {
@@ -952,6 +961,9 @@ const DRAWING_CONSTANTS: Record<string, string> = {
   'text.align_bottom': 'bottom',
   'text.wrap_none': 'none',
   'text.wrap_auto': 'auto',
+  'text.format_none': 'none',
+  'text.format_bold': 'bold',
+  'text.format_italic': 'italic',
   'font.family_default': 'default',
   'font.family_monospace': 'monospace',
   'position.top_left': 'top_left',
