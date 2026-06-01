@@ -143,6 +143,26 @@ plot(singularPinv.get(1, 1), title="Singular Last")
     expect(roundSeries(getPlot(result, 'Singular Last').values)).toEqual([0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16]);
   });
 
+  it('runs matrix eigenvalue idioms', () => {
+    const result = runCompatScript(`
+indicator("Matrix eigenvalues")
+values = matrix.new_float(2, 2, 0)
+values.set(0, 0, 2)
+values.set(0, 1, 4)
+values.set(1, 0, 6)
+values.set(1, 1, 8)
+eigen = matrix.eigenvalues(values)
+plot(array.size(eigen), title="Count")
+plot(array.get(eigen, 0), title="First")
+plot(array.get(eigen, 1), title="Second")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Count').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'First').values)).toEqual([10.744563, 10.744563, 10.744563, 10.744563, 10.744563, 10.744563, 10.744563, 10.744563, 10.744563, 10.744563, 10.744563, 10.744563]);
+    expect(roundSeries(getPlot(result, 'Second').values)).toEqual([-0.744563, -0.744563, -0.744563, -0.744563, -0.744563, -0.744563, -0.744563, -0.744563, -0.744563, -0.744563, -0.744563, -0.744563]);
+  });
+
   it('prefers scoped matrix receivers over the matrix namespace', () => {
     const result = runCompatScript(`
 indicator("Matrix receiver shadowing")
