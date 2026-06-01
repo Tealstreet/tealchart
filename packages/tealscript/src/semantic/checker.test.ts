@@ -835,9 +835,33 @@ type Pivot
       'Cannot assign int value to string field Pivot.name',
       'Cannot assign string value to color field Pivot.tint',
       'Cannot assign string value to label field Pivot.tag',
-      'Cannot assign array<string> value to array<float> field Pivot.values',
-      'Cannot assign map<int, float> value to map<string, float> field Pivot.prices',
-      'Cannot assign matrix<float> value to matrix<int> field Pivot.grid',
+      'Default value for field Pivot.values must be a literal value or compatible built-in variable',
+      'Default value for field Pivot.prices must be a literal value or compatible built-in variable',
+      'Default value for field Pivot.grid must be a literal value or compatible built-in variable',
+    ]);
+  });
+
+  it('reports computed user-defined type field defaults', () => {
+    const result = checkProgram(parse(`
+indicator("Bad UDT Default Expressions")
+period = 3
+type Pivot
+    int validNegative = -1
+    float validSource = close
+    string validBuiltin = xloc.bar_time
+    int fromUser = period
+    float fromCall = math.max(open, close)
+    float fromBinary = close + 1
+    bool fromCondition = close > open ? true : false
+    array<float> values = array.new<float>()
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Default value for field Pivot.fromUser must be a literal value or compatible built-in variable',
+      'Default value for field Pivot.fromCall must be a literal value or compatible built-in variable',
+      'Default value for field Pivot.fromBinary must be a literal value or compatible built-in variable',
+      'Default value for field Pivot.fromCondition must be a literal value or compatible built-in variable',
+      'Default value for field Pivot.values must be a literal value or compatible built-in variable',
     ]);
   });
 
@@ -845,10 +869,10 @@ type Pivot
     const valid = checkProgram(parse(`
 indicator("UDT Collection Fields")
 type Cache
-    array<float> values = array.new<float>()
-    map<string, float> prices = map.new<string, float>()
-    matrix<int> grid = matrix.new<int>()
-cache = Cache.new()
+    array<float> values
+    map<string, float> prices
+    matrix<int> grid
+cache = Cache.new(array.new<float>(), map.new<string, float>(), matrix.new<int>())
 cache.values := array.new<float>()
 cache.prices := map.new<string, float>()
 cache.grid := matrix.new<int>()

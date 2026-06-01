@@ -477,6 +477,8 @@ Phases:
    array/map/matrix fields through Pine method syntax.
    Runtime coverage now defaults missing UDT `bool` fields to `false`, matching
    Pine's special-case default.
+   Semantic coverage now rejects UDT field defaults that are function calls or
+   computed expressions instead of Pine-compatible literals or built-in values.
 5. Implement method declarations and method dispatch beyond array method sugar.
    Runtime coverage now selects local and imported UDT method overloads by
    receiver type.

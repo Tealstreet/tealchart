@@ -249,6 +249,9 @@ semantics, and realtime rollback for field mutations. UDT copy coverage supports
 Pine's shallow `Type.copy(object)` and `object.copy()` forms, so copied UDT
 fields that contain reference values still point at the same nested instances
 until scripts explicitly deep-copy them.
+UDT field defaults are restricted to Pine-compatible literal values or
+compatible built-in variables; function calls and computed expressions are
+reported before runtime.
 UDTs can hold collection fields such as `array<float>`, `map<string, float>`,
 and `matrix<int>`; compatibility coverage mutates those fields through Pine
 method syntax, and semantic coverage reports conservative collection-reference
