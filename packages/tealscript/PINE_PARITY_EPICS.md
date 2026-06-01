@@ -489,6 +489,8 @@ Phases:
    functions/methods.
    Semantic coverage now reports exported function/method bodies that call
    `input.*()` or reference non-`const` library globals.
+   Semantic coverage now reports exported function/method `request.*()`
+   expression arguments that directly depend on exported parameters.
    Semantic coverage now reports exported UDT fields and exported function or
    method parameters that expose non-exported local UDTs, including collection
    templates containing those UDTs.

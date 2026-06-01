@@ -293,7 +293,8 @@ Semantic diagnostics require `export` declarations to live in library scripts,
 require library scripts to export at least one parsed exportable declaration,
 require exported function/method parameters to declare types, and report
 exported function/method bodies that call `input.*()` or reference non-`const`
-library globals.
+library globals. Exported function/method scope diagnostics also report
+`request.*()` expression arguments that directly depend on exported parameters.
 
 The runtime can also bind imported libraries from a deterministic host-provided
 registry keyed by Pine import path. This supports `alias.exportedFunction(...)`
