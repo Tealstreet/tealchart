@@ -309,6 +309,42 @@ describe('TealchartRenderer coordinate transforms', () => {
     });
   });
 
+  describe('Pine line plot rendering', () => {
+    it('applies plot lineStyle metadata on main-pane line plots', () => {
+      const setLineDash = vi.fn();
+      const stroke = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        setLineDash,
+        stroke,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const plots: PlotOutput[] = [
+        {
+          id: 'plot_Dashed',
+          type: 'plot',
+          title: 'Dashed',
+          values: [100, 110, 120],
+          color: ['#2196F3', '#2196F3', '#2196F3'],
+          lineStyle: 'dashed',
+        },
+      ];
+
+      renderer.renderPlots(plots, bars, viewport);
+
+      expect(setLineDash).toHaveBeenCalledWith([6, 4]);
+      expect(setLineDash).toHaveBeenLastCalledWith([]);
+      expect(stroke).toHaveBeenCalled();
+    });
+  });
+
   describe('Pine OHLC plot rendering', () => {
     it('renders plotcandle outputs with body, wick, and border colors', () => {
       const fillRect = vi.fn();

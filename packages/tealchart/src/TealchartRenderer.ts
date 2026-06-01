@@ -1801,6 +1801,7 @@ export class TealchartRenderer {
     ctx.lineWidth = linewidth;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
+    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'solid'));
 
     const isStepLine = style === 'stepline' || style === 'stepline_diamond';
 
@@ -1878,6 +1879,8 @@ export class TealchartRenderer {
     if (style === 'area' || style === 'areabr') {
       this.renderAreaFill(plot, bars, viewport, style === 'areabr');
     }
+
+    ctx.setLineDash([]);
   }
 
   /**
