@@ -227,6 +227,7 @@ const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['ticker']);
 export class TealscriptEngine {
   private static readonly MAX_LOOP_ITERATIONS = 10000;
   private static readonly MAX_BUILTIN_SOURCE_HISTORY = 10000;
+  private static readonly MAX_UNIQUE_REQUEST_CONTEXTS = 40;
 
   private ctx: ExecutionContext;
   private scope: Scope;
@@ -239,6 +240,7 @@ export class TealscriptEngine {
   private libraries: Map<string, Program>;
   private importedLibraries = new Map<string, ImportedLibrary>();
   private requestEvaluationCache = new Map<string, RequestEvaluationCacheEntry>();
+  private requestContextKeys = new Set<string>();
   private requestExpressionIds = new WeakMap<Expression, number>();
   private nextRequestExpressionId = 0;
   private userFunctionCallStack: string[] = [];
@@ -273,6 +275,7 @@ export class TealscriptEngine {
     this.functionScopes.clear();
     this.importedLibraries.clear();
     this.requestEvaluationCache.clear();
+    this.requestContextKeys.clear();
     this.requestExpressionIds = new WeakMap();
     this.nextRequestExpressionId = 0;
     this.userFunctionCallStack = [];
@@ -364,6 +367,7 @@ export class TealscriptEngine {
     this.ctx.bar_index = this.ctx.last_bar_index;
     this.ctx.setNow(Date.now());
     this.requestEvaluationCache.clear();
+    this.requestContextKeys.clear();
 
     // Truncate plot arrays to remove the last bar's appended values
     // so re-execution can re-append them cleanly without duplication
@@ -1664,6 +1668,10 @@ export class TealscriptEngine {
     const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalCallArgument(expr, 5, 'ignore_invalid_symbol') ?? false);
     const currency = this.normalizeOptionalRequestCurrency(this.evaluateOptionalCallArgument(expr, 6, 'currency'));
     const calcBarsCount = this.normalizeOptionalPositiveInteger(this.evaluateOptionalCallArgument(expr, 7, 'calc_bars_count'));
+    const expressionId = this.requestExpressionCacheId(expressionArg.value);
+    this.trackRequestContext(
+      this.requestLimitKey('request.security', expressionId, symbol, timeframe, currency, calcBarsCount),
+    );
 
     const result = this.requestDatafeed.getBars({ symbol, timeframe, calcBarsCount, currency });
     if (!result.ok) {
@@ -1673,7 +1681,6 @@ export class TealscriptEngine {
       throw new Error(`request.security failed: ${result.message}`);
     }
 
-    const expressionId = this.requestExpressionCacheId(expressionArg.value);
     const cacheKey = this.requestEvaluationCacheKey(callId, expressionId, symbol, timeframe, currency, calcBarsCount);
     let cached = this.requestEvaluationCache.get(cacheKey);
     if (!cached) {
@@ -1705,6 +1712,10 @@ export class TealscriptEngine {
     const currency = this.normalizeOptionalRequestCurrency(this.evaluateOptionalCallArgument(expr, 4, 'currency'));
     const ignoreInvalidTimeframe = this.isTruthy(this.evaluateOptionalCallArgument(expr, 5, 'ignore_invalid_timeframe') ?? false);
     const calcBarsCount = this.normalizeOptionalPositiveInteger(this.evaluateOptionalCallArgument(expr, 6, 'calc_bars_count'));
+    const expressionId = this.requestExpressionCacheId(expressionArg.value);
+    this.trackRequestContext(
+      this.requestLimitKey('request.security_lower_tf', expressionId, symbol, timeframe, currency, calcBarsCount),
+    );
 
     if (!this.isLowerRequestTimeframe(timeframe)) {
       if (ignoreInvalidTimeframe) {
@@ -1724,7 +1735,6 @@ export class TealscriptEngine {
       throw new Error(`request.security_lower_tf failed: ${result.message}`);
     }
 
-    const expressionId = this.requestExpressionCacheId(expressionArg.value);
     const cacheKey = this.requestEvaluationCacheKey(callId, expressionId, symbol, timeframe, currency, calcBarsCount);
     let cached = this.requestEvaluationCache.get(cacheKey);
     if (!cached) {
@@ -1764,6 +1774,7 @@ export class TealscriptEngine {
     }
 
     const key = currencyRateRequestKey(fromCurrency, toCurrency);
+    this.trackRequestContext(`request.currency_rate\u0000${key}`);
     const result = this.requestDatafeed.getSeries({ family: 'currency_rate', key });
     if (!result.ok) {
       if (ignoreInvalidCurrency && (result.code === 'invalid_currency' || result.code === 'missing_context')) {
@@ -1849,6 +1860,26 @@ export class TealscriptEngine {
     return `${callId}\u0000${expressionId}\u0000${symbol}\u0000${timeframe}\u0000${currency ?? ''}\u0000${calcBarsCount ?? ''}`;
   }
 
+  private requestLimitKey(
+    functionName: string,
+    expressionId: string,
+    symbol: string,
+    timeframe: string,
+    currency: string | undefined,
+    calcBarsCount: number | undefined,
+  ): string {
+    return `${functionName}\u0000${expressionId}\u0000${symbol}\u0000${timeframe}\u0000${currency ?? ''}\u0000${calcBarsCount ?? ''}`;
+  }
+
+  private trackRequestContext(key: string): void {
+    this.requestContextKeys.add(key);
+    if (this.requestContextKeys.size > TealscriptEngine.MAX_UNIQUE_REQUEST_CONTEXTS) {
+      throw new Error(
+        `Too many unique request.* contexts: maximum is ${TealscriptEngine.MAX_UNIQUE_REQUEST_CONTEXTS}`,
+      );
+    }
+  }
+
   private requestExpressionCacheId(expression: Expression): string {
     if (expression.loc) {
       return `${expression.loc.start.line}:${expression.loc.start.column}-${expression.loc.end.line}:${expression.loc.end.column}`;
@@ -1869,6 +1900,7 @@ export class TealscriptEngine {
     engine.importedLibraryCallStack = [...this.importedLibraryCallStack];
     engine.indicatorDynamicRequests = this.indicatorDynamicRequests;
     engine.requestContextDepth = this.requestContextDepth + 1;
+    engine.requestContextKeys = this.requestContextKeys;
     engine.ctx.setNow(this.ctx.now);
     engine.ctx.syminfo = {
       ...engine.ctx.syminfo,
