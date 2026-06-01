@@ -256,14 +256,20 @@ indicator("Bad Templates")
 array<series> invalidArray = array.new_float()
 invalidArrayCtorElement = array.new<series>()
 invalidArrayCtorArity = array.new<float, int>()
+array<array> invalidNestedArray = array.new_float()
+invalidArrayCtorCollection = array.new<array>()
 matrix<input> invalidMatrix = matrix.new_int()
 invalidMatrixCtorElement = matrix.new<series>()
 invalidMatrixCtorArity = matrix.new<float, int>()
+matrix<map> invalidNestedMatrix = matrix.new_float()
+invalidMatrixCtorCollection = matrix.new<map>()
 map<label, float> invalidKey = map.new<string, float>()
 map<string, series> invalidValue = map.new<string, float>()
+map<string, array> invalidCollectionValue = map.new<string, float>()
 map<const, float> qualifierKey = map.new<string, float>()
 invalidCtorKey = map.new<label, float>()
 invalidCtorValue = map.new<string, series>()
+invalidCtorCollectionValue = map.new<string, matrix>()
 invalidCtorArity = map.new<string>()
 `));
 
@@ -271,14 +277,20 @@ invalidCtorArity = map.new<string>()
       "Invalid array element type 'series'; qualifiers cannot be used as template types",
       "Invalid array element type 'series'; qualifiers cannot be used as template types",
       'array.new() expects exactly 1 type argument',
+      "Invalid array element type 'array'; collection template types must include their element templates",
+      "Invalid array element type 'array'; collection template types must include their element templates",
       "Invalid matrix element type 'input'; qualifiers cannot be used as template types",
       "Invalid matrix element type 'series'; qualifiers cannot be used as template types",
       'matrix.new() expects exactly 1 type argument',
+      "Invalid matrix element type 'map'; collection template types must include their element templates",
+      "Invalid matrix element type 'map'; collection template types must include their element templates",
       'Map key type must be int, float, bool, string, or color in variable declaration',
       "Invalid map value type 'series'; qualifiers cannot be used as template types",
+      "Invalid map value type 'array'; collection template types must include their element templates",
       "Invalid map key type 'const'; qualifiers cannot be used as template types",
       'Map key type must be int, float, bool, string, or color in map.new',
       "Invalid map value type 'series'; qualifiers cannot be used as template types",
+      "Invalid map value type 'matrix'; collection template types must include their element templates",
       'map.new() expects exactly 2 type arguments',
     ]);
   });
