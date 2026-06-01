@@ -130,6 +130,20 @@ const CALENDAR_FUNCTION_NAMES = new Set([
   'second',
 ]);
 
+const ARRAY_CONSTRUCTOR_ELEMENT_TYPES = new Map<string, SemanticTypeKind>([
+  ['array.new_bool', 'bool'],
+  ['array.new_box', 'box'],
+  ['array.new_color', 'color'],
+  ['array.new_float', 'float'],
+  ['array.new_int', 'int'],
+  ['array.new_label', 'label'],
+  ['array.new_line', 'line'],
+  ['array.new_linefill', 'linefill'],
+  ['array.new_polyline', 'polyline'],
+  ['array.new_string', 'string'],
+  ['array.new_table', 'table'],
+]);
+
 const BUILTIN_FUNCTIONS = new Set([
   'alert',
   'alertcondition',
@@ -1418,6 +1432,13 @@ class SemanticChecker {
       return {
         kind: 'array',
         elementType: this.typeFromName(expression.typeArguments[0]),
+      };
+    }
+    const arrayElementType = ARRAY_CONSTRUCTOR_ELEMENT_TYPES.get(calleePath.join('.'));
+    if (arrayElementType) {
+      return {
+        kind: 'array',
+        elementType: { kind: arrayElementType },
       };
     }
     if (calleePath.length === 2 && calleePath[1] === 'new' && calleePath[0] && this.typeDeclarations.has(calleePath[0])) {
