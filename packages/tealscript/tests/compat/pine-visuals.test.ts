@@ -167,6 +167,8 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
 `);
 
     expect(result.errors).toEqual([]);
+    expect(result.indicatorFormat).toBe('price');
+    expect(result.indicatorScale).toBe('right');
     const breakLine = getPlot(result, 'Break Line');
     const stepDiamonds = getPlot(result, 'Step Diamonds');
     const columns = getPlot(result, 'Columns');
