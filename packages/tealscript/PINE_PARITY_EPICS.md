@@ -387,6 +387,8 @@ Phases:
 3. Complete `label.*`: GC limits, full style parity, realtime rollback parity,
    and remaining renderer details after the current constructor, mutation,
    copy/delete, and basic renderer support.
+   Renderer coverage now handles text-only, directional label, and common symbol
+   label styles.
 4. Complete `line.*` and `linefill.*`: `chart.point` overloads, full line style
    geometry, GC limits, realtime rollback parity, and remaining renderer details
    after the current constructor, mutation, copy/delete, handle validation, and

@@ -311,6 +311,75 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events).toContain('stroke');
   });
 
+  it('renders Pine label pointer styles instead of plain rounded pills', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeLabel({ style: 'label_up', text: 'Up' }),
+        makeLabel({ id: 'label-2', style: 'label_right', text: 'Right' }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events.filter((event) => event.startsWith('roundRect:'))).toHaveLength(2);
+    expect(events.filter((event) => event === 'closePath')).toHaveLength(2);
+    expect(events.some((event) => event.startsWith('fillText:Up:'))).toBe(true);
+    expect(events.some((event) => event.startsWith('fillText:Right:'))).toBe(true);
+  });
+
+  it('renders Pine symbol label styles and keeps style_none text-only', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeLabel({ style: 'circle', text: 'Circle' }),
+        makeLabel({ id: 'label-2', style: 'diamond', text: 'Diamond' }),
+        makeLabel({ id: 'label-3', style: 'xcross', text: 'Cross' }),
+        makeLabel({ id: 'label-4', style: 'none', text: 'Text' }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).toContain('arc');
+    expect(events).toContain('stroke');
+    expect(events.filter((event) => event.startsWith('roundRect:'))).toHaveLength(0);
+    expect(events.some((event) => event.startsWith('fillText:Circle:'))).toBe(true);
+    expect(events.some((event) => event.startsWith('fillText:Diamond:'))).toBe(true);
+    expect(events.some((event) => event.startsWith('fillText:Cross:'))).toBe(true);
+    expect(events).toContain('fillText:Text:60,40');
+  });
+
   it('renders fixed-position table cells above chart drawings', () => {
     const events: string[] = [];
     const renderer = new TealScriptDrawingRenderer({
