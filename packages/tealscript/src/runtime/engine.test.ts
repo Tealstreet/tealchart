@@ -2431,6 +2431,51 @@ plot(math.random(10, 20, 43), title="Other Seed")`;
       expect(otherSeed).not.toEqual(firstSeeded);
     });
 
+    it('keeps unseeded math.random deterministic per call site', () => {
+      const script = `//@version=6
+indicator("Deterministic Random")
+plot(math.random(), title="First")
+plot(math.random(), title="Second")`;
+
+      const ast = parse(script);
+      const bars = createBars(6, 100);
+      const first = executeScript(ast, bars);
+      const second = executeScript(ast, bars);
+      const firstValues = first.plots.find((plot) => plot.title === 'First')?.values ?? [];
+      const secondValues = first.plots.find((plot) => plot.title === 'Second')?.values ?? [];
+
+      expect(first.errors).toHaveLength(0);
+      expect(second.errors).toHaveLength(0);
+      expect(firstValues).toEqual(second.plots.find((plot) => plot.title === 'First')?.values);
+      expect(secondValues).toEqual(second.plots.find((plot) => plot.title === 'Second')?.values);
+      expect(new Set(firstValues).size).toBeGreaterThan(1);
+      expect(secondValues).not.toEqual(firstValues);
+    });
+
+    it('does not perturb unseeded math.random with conditional call order', () => {
+      const conditionalLead = `//@version=6
+indicator("Conditional Random")
+if bar_index == 0
+    lead = math.random()
+main = math.random()
+plot(main, title="Main")`;
+      const skippedLead = `//@version=6
+indicator("Conditional Random")
+if false
+    lead = math.random()
+main = math.random()
+plot(main, title="Main")`;
+
+      const bars = createBars(6, 100);
+      const conditionalResult = executeScript(parse(conditionalLead), bars);
+      const skippedResult = executeScript(parse(skippedLead), bars);
+
+      expect(conditionalResult.errors).toHaveLength(0);
+      expect(skippedResult.errors).toHaveLength(0);
+      expect(conditionalResult.plots.find((plot) => plot.title === 'Main')?.values)
+        .toEqual(skippedResult.plots.find((plot) => plot.title === 'Main')?.values);
+    });
+
     it('halts realtime updateBar execution on runtime.error', () => {
       const script = `//@version=6
 indicator("Realtime Runtime Error")
