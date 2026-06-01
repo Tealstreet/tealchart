@@ -146,4 +146,37 @@ values = [1, 2]
     expect(types.get('tint')).toMatchObject({ kind: 'color' });
     expect(types.get('values')).toMatchObject({ kind: 'array' });
   });
+
+  it('records explicit qualifiers and infers common qualifier sources', () => {
+    const result = checkProgram(parse(`
+indicator("Qualifiers")
+const int literal = 3
+input int configured = input.int(14)
+simple int promoted = configured
+series float price = close
+series float average = ta.sma(close, configured)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('literal')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('configured')).toMatchObject({ kind: 'int', qualifier: 'input' });
+    expect(types.get('promoted')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+    expect(types.get('price')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('average')).toMatchObject({ kind: 'float', qualifier: 'series' });
+  });
+
+  it('reports invalid qualifier demotions', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Qualifier")
+simple float badPrice = close
+input float badAverage = ta.sma(close, 3)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign series value to simple float',
+      'Cannot assign series value to input float',
+    ]);
+  });
 });

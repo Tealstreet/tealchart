@@ -3,6 +3,7 @@ export {
   type SemanticCheckResult,
   type SemanticDiagnostic,
   type SemanticDiagnosticSeverity,
+  type SemanticQualifier,
   type SemanticSymbol,
   type SemanticSymbolKind,
   type SemanticType,
