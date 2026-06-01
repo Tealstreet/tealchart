@@ -130,7 +130,7 @@ class TealscriptWorkerWrapper {
 
       case 'error':
       case 'parseError':
-      case 'semanticError':
+      case 'semanticError': {
         if (this.isStaleError(message.metadata)) {
           return;
         }
@@ -143,6 +143,7 @@ class TealscriptWorkerWrapper {
           diagnostics: message.type === 'semanticError' ? message.diagnostics : undefined,
         });
         break;
+      }
     }
   }
 
