@@ -3015,6 +3015,44 @@ plot(slice.rows())`;
       expect(result.errors[0]?.message).toBe('Matrix row range 1..3 is out of bounds. row count is 2');
     });
 
+    it('executes matrix inspection predicates', () => {
+      const script = `//@version=6
+indicator("Matrix Inspection")
+identity = matrix.new_float(3, 3, 0)
+identity.set(0, 0, 1)
+identity.set(1, 1, 1)
+identity.set(2, 2, 1)
+anti = matrix.new_float(2, 2, 0)
+anti.set(0, 1, 4)
+anti.set(1, 0, -4)
+stochastic = matrix.new_float(2, 2, 0)
+stochastic.set(0, 0, 0.25)
+stochastic.set(0, 1, 0.75)
+stochastic.set(1, 0, 0.4)
+stochastic.set(1, 1, 0.6)
+rect = matrix.new_float(2, 3, 0)
+plot(identity.is_identity() ? 1 : 0, title="Identity")
+plot(identity.is_diagonal() ? 1 : 0, title="Diagonal")
+plot(identity.is_triangular() ? 1 : 0, title="Triangular")
+plot(identity.is_binary() ? 1 : 0, title="Binary")
+plot(matrix.is_zero(rect) ? 1 : 0, title="Zero")
+plot(anti.is_antisymmetric() ? 1 : 0, title="Antisymmetric")
+plot(stochastic.is_stochastic() ? 1 : 0, title="Stochastic")
+plot(rect.is_symmetric() ? 1 : 0, title="Rect Symmetric")`;
+
+      const result = executeScript(parse(script), createBars(2, 100));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Identity')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Diagonal')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Triangular')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Binary')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Zero')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Antisymmetric')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Stochastic')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Rect Symmetric')?.values).toEqual([0, 0]);
+    });
+
     it('returns expression results from user function if branches', () => {
       const script = `//@version=6
 indicator("Function If")
