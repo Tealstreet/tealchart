@@ -223,6 +223,7 @@ const TYPE_QUALIFIER_NAMES = new Set(['const', 'input', 'simple', 'series']);
 const COLLECTION_TYPE_NAMES = new Set(['array', 'matrix', 'map']);
 const MAP_KEY_TYPE_NAMES = new Set(['int', 'float', 'bool', 'string', 'color']);
 const PRIMITIVE_TYPE_KINDS = new Set<SemanticTypeKind>(['bool', 'color', 'float', 'int', 'string']);
+const STRUCTURED_TYPE_KINDS = new Set<SemanticTypeKind>(['array', 'matrix', 'map', 'udt']);
 const COLLECTION_TEMPLATE_TYPE_PATTERN = /^(array|matrix|map)</;
 const UNKNOWN_SEMANTIC_TYPE: SemanticType = { kind: 'unknown' };
 
@@ -1983,6 +1984,10 @@ class SemanticChecker {
 
     if (targetType.kind === 'udt' && sourceType.kind === 'udt') {
       return targetType.name === sourceType.name;
+    }
+
+    if (STRUCTURED_TYPE_KINDS.has(targetType.kind) || STRUCTURED_TYPE_KINDS.has(sourceType.kind)) {
+      return false;
     }
 
     if (!PRIMITIVE_TYPE_KINDS.has(targetType.kind) || !PRIMITIVE_TYPE_KINDS.has(sourceType.kind)) return true;

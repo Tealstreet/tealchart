@@ -803,11 +803,13 @@ pivot.tag := "not checked"
       'Cannot assign string value to bool field Pivot.active',
       'Cannot assign int value to string field Pivot.name',
       'Cannot assign string value to color field Pivot.tint',
+      'Cannot assign string value to label field Pivot.tag',
       'Cannot assign string value to int field Pivot.x',
       'Cannot assign string value to float field Pivot.y',
       'Cannot assign int value to bool field Pivot.active',
       'Cannot assign int value to string field Pivot.name',
       'Cannot assign string value to color field Pivot.tint',
+      'Cannot assign string value to label field Pivot.tag',
     ]);
   });
 
@@ -833,11 +835,20 @@ type Cache
     array<float> values
     map<string, float> prices
     matrix<int> grid
+type Pivot
+    float price
+type Other
+    float price
+type HasPivot
+    Pivot pivot
 badCtor = Cache.new(array.new<string>(), map.new<int, float>(), matrix.new<float>())
 cache = Cache.new(array.new<float>(), map.new<string, float>(), matrix.new<int>())
 cache.values := array.new<string>()
+cache.values := map.new<string, float>()
 cache.prices := map.new<string, string>()
+cache.prices := array.new<float>()
 cache.grid := matrix.new<float>()
+pivotHolder = HasPivot.new(Other.new(close))
 `));
 
     expect(valid.diagnostics).toEqual([]);
@@ -849,8 +860,11 @@ cache.grid := matrix.new<float>()
       'Cannot assign map<int, float> value to map<string, float> field Cache.prices',
       'Cannot assign matrix<float> value to matrix<int> field Cache.grid',
       'Cannot assign array<string> value to array<float> field Cache.values',
+      'Cannot assign map<string, float> value to array<float> field Cache.values',
       'Cannot assign map<string, string> value to map<string, float> field Cache.prices',
+      'Cannot assign array<float> value to map<string, float> field Cache.prices',
       'Cannot assign matrix<float> value to matrix<int> field Cache.grid',
+      'Cannot assign Other value to Pivot field HasPivot.pivot',
     ]);
   });
 

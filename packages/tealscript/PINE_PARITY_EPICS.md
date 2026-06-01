@@ -471,7 +471,7 @@ Phases:
    order between named and positional arguments before runtime.
    Semantic coverage now reports unknown local UDT fields on reads and
    assignments before runtime.
-   Semantic coverage now reports conservative primitive and collection field
+   Semantic coverage now reports conservative primitive and reference field
    type mismatches in local UDT constructors and field assignments, and runtime
    compatibility coverage mutates UDT-held array/map/matrix fields through Pine
    method syntax.
