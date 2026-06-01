@@ -15,9 +15,18 @@ import {
   getMatrixRows,
   getMatrixValue,
   invMatrixValue,
+  isAntidiagonalMatrix,
+  isAntisymmetricMatrix,
+  isBinaryMatrix,
+  isDiagonalMatrix,
+  isIdentityMatrix,
   isPineMatrix,
   isSquareMatrix,
+  isStochasticMatrix,
+  isSymmetricMatrix,
+  isTriangularMatrix,
   isValidMatrix,
+  isZeroMatrix,
   kronMatrixValue,
   matrixColumn,
   matrixRow,
@@ -80,6 +89,49 @@ describe('PineMatrix', () => {
     expect(isValidMatrix(null)).toBe(false);
     expect(isSquareMatrix(createPineMatrix(2, 2))).toBe(true);
     expect(isSquareMatrix(createPineMatrix(2, 3))).toBe(false);
+  });
+
+  it('inspects matrix value patterns', () => {
+    const identity = createPineMatrix<number>(3, 3, 0);
+    identity.values = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+    expect(isIdentityMatrix(identity)).toBe(true);
+    expect(isDiagonalMatrix(identity)).toBe(true);
+    expect(isTriangularMatrix(identity)).toBe(true);
+    expect(isBinaryMatrix(identity)).toBe(true);
+
+    const zero = createPineMatrix<number>(2, 3, 0);
+    expect(isZeroMatrix(zero)).toBe(true);
+
+    const antidiagonal = createPineMatrix<number>(3, 3, 0);
+    antidiagonal.values = [0, 0, 1, 0, 2, 0, 3, 0, 0];
+    expect(isAntidiagonalMatrix(antidiagonal)).toBe(true);
+
+    const symmetric = createPineMatrix<number>(2, 2, 0);
+    symmetric.values = [1, 2, 2, 3];
+    expect(isSymmetricMatrix(symmetric)).toBe(true);
+    expect(isAntisymmetricMatrix(symmetric)).toBe(false);
+
+    const antisymmetric = createPineMatrix<number>(2, 2, 0);
+    antisymmetric.values = [0, 4, -4, 0];
+    expect(isAntisymmetricMatrix(antisymmetric)).toBe(true);
+    expect(isSymmetricMatrix(antisymmetric)).toBe(false);
+
+    const stochastic = createPineMatrix<number>(2, 2, 0);
+    stochastic.values = [0.25, 0.75, 0.4, 0.6];
+    expect(isStochasticMatrix(stochastic)).toBe(true);
+    setMatrixValue(stochastic, 1, 1, -0.6);
+    expect(isStochasticMatrix(stochastic)).toBe(false);
+  });
+
+  it('returns false for square-only inspections on rectangular matrices', () => {
+    const rectangular = createPineMatrix<number>(2, 3, 0);
+
+    expect(isIdentityMatrix(rectangular)).toBe(false);
+    expect(isDiagonalMatrix(rectangular)).toBe(false);
+    expect(isAntidiagonalMatrix(rectangular)).toBe(false);
+    expect(isSymmetricMatrix(rectangular)).toBe(false);
+    expect(isAntisymmetricMatrix(rectangular)).toBe(false);
+    expect(isTriangularMatrix(rectangular)).toBe(false);
   });
 
   it('mutates rows, columns, and shape', () => {

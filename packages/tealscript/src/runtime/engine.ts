@@ -109,9 +109,18 @@ import {
   getMatrixRows,
   getMatrixValue,
   invMatrixValue,
+  isAntidiagonalMatrix,
+  isAntisymmetricMatrix,
+  isBinaryMatrix,
+  isDiagonalMatrix,
+  isIdentityMatrix,
   isPineMatrix,
   isSquareMatrix,
+  isStochasticMatrix,
+  isSymmetricMatrix,
+  isTriangularMatrix,
   isValidMatrix,
+  isZeroMatrix,
   kronMatrixValue,
   matrixColumn,
   matrixRow,
@@ -5720,6 +5729,15 @@ export class TealscriptEngine {
       return isSquareMatrix(readMatrix(args[0]));
     });
     this.builtins.set('matrix.is_valid', (args) => isValidMatrix(args[0]));
+    this.builtins.set('matrix.is_zero', (args) => isZeroMatrix(readMatrix(args[0])));
+    this.builtins.set('matrix.is_binary', (args) => isBinaryMatrix(readMatrix(args[0])));
+    this.builtins.set('matrix.is_identity', (args) => isIdentityMatrix(readMatrix(args[0])));
+    this.builtins.set('matrix.is_diagonal', (args) => isDiagonalMatrix(readMatrix(args[0])));
+    this.builtins.set('matrix.is_antidiagonal', (args) => isAntidiagonalMatrix(readMatrix(args[0])));
+    this.builtins.set('matrix.is_symmetric', (args) => isSymmetricMatrix(readMatrix(args[0])));
+    this.builtins.set('matrix.is_antisymmetric', (args) => isAntisymmetricMatrix(readMatrix(args[0])));
+    this.builtins.set('matrix.is_triangular', (args) => isTriangularMatrix(readMatrix(args[0])));
+    this.builtins.set('matrix.is_stochastic', (args) => isStochasticMatrix(readMatrix(args[0])));
   }
 
   private registerMapBuiltins(): void {

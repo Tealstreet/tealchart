@@ -44,6 +44,110 @@ export function isSquareMatrix(matrix: PineMatrix): boolean {
   return matrix.rows === matrix.columns;
 }
 
+export function isZeroMatrix(matrix: PineMatrix): boolean {
+  return matrix.values.every((value) => isEffectivelyZero(Number(value), 1));
+}
+
+export function isBinaryMatrix(matrix: PineMatrix): boolean {
+  return matrix.values.every((value) => approxEqual(Number(value), 0) || approxEqual(Number(value), 1));
+}
+
+export function isIdentityMatrix(matrix: PineMatrix): boolean {
+  if (!isSquareMatrix(matrix)) return false;
+  for (let row = 0; row < matrix.rows; row++) {
+    for (let column = 0; column < matrix.columns; column++) {
+      const expected = row === column ? 1 : 0;
+      if (!approxEqual(Number(getMatrixValue(matrix, row, column)), expected)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+export function isDiagonalMatrix(matrix: PineMatrix): boolean {
+  if (!isSquareMatrix(matrix)) return false;
+  for (let row = 0; row < matrix.rows; row++) {
+    for (let column = 0; column < matrix.columns; column++) {
+      if (row !== column && !approxEqual(Number(getMatrixValue(matrix, row, column)), 0)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+export function isAntidiagonalMatrix(matrix: PineMatrix): boolean {
+  if (!isSquareMatrix(matrix)) return false;
+  for (let row = 0; row < matrix.rows; row++) {
+    for (let column = 0; column < matrix.columns; column++) {
+      if (row + column !== matrix.columns - 1 && !approxEqual(Number(getMatrixValue(matrix, row, column)), 0)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+export function isSymmetricMatrix(matrix: PineMatrix): boolean {
+  if (!isSquareMatrix(matrix)) return false;
+  for (let row = 0; row < matrix.rows; row++) {
+    for (let column = row + 1; column < matrix.columns; column++) {
+      if (!approxEqual(Number(getMatrixValue(matrix, row, column)), Number(getMatrixValue(matrix, column, row)))) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+export function isAntisymmetricMatrix(matrix: PineMatrix): boolean {
+  if (!isSquareMatrix(matrix)) return false;
+  for (let row = 0; row < matrix.rows; row++) {
+    for (let column = 0; column < matrix.columns; column++) {
+      if (!approxEqual(Number(getMatrixValue(matrix, row, column)), -Number(getMatrixValue(matrix, column, row)))) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+export function isTriangularMatrix(matrix: PineMatrix): boolean {
+  if (!isSquareMatrix(matrix)) return false;
+  let upper = true;
+  let lower = true;
+  for (let row = 0; row < matrix.rows; row++) {
+    for (let column = 0; column < matrix.columns; column++) {
+      const value = Number(getMatrixValue(matrix, row, column));
+      if (row > column && !approxEqual(value, 0)) {
+        upper = false;
+      }
+      if (row < column && !approxEqual(value, 0)) {
+        lower = false;
+      }
+    }
+  }
+  return upper || lower;
+}
+
+export function isStochasticMatrix(matrix: PineMatrix): boolean {
+  for (let row = 0; row < matrix.rows; row++) {
+    let total = 0;
+    for (let column = 0; column < matrix.columns; column++) {
+      const value = Number(getMatrixValue(matrix, row, column));
+      if (value < 0) {
+        return false;
+      }
+      total += value;
+    }
+    if (!approxEqual(total, 1)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export function getMatrixRows(matrix: PineMatrix): number {
   return matrix.rows;
 }
@@ -477,6 +581,10 @@ function isEffectivelyZero(value: number, scale: number): boolean {
     return value === 0;
   }
   return Math.abs(value) <= scale * MATRIX_EPSILON;
+}
+
+function approxEqual(left: number, right: number): boolean {
+  return Math.abs(left - right) <= Math.max(1, Math.abs(left), Math.abs(right)) * MATRIX_EPSILON;
 }
 
 function compareMatrixValues(left: unknown, right: unknown): number {
