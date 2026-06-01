@@ -893,6 +893,61 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(lineTo).toHaveBeenCalledTimes(6);
       expect(ctx.strokeStyle).toBe('#ff0000');
     });
+
+    it('applies barcolor candle overrides only when display and show_last allow them', () => {
+      const candleBodyColors: string[] = [];
+      const ctx = {
+        ...createMockCtx(),
+        fillRect: vi.fn(() => {
+          candleBodyColors.push(ctx.fillStyle);
+        }),
+      };
+      const renderer = new TealchartRenderer(ctx, {
+        width: 800,
+        height: 600,
+        showVolume: false,
+        upColor: '#aaaaaa',
+        downColor: '#bbbbbb',
+      });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0].time,
+        endTime: bars[1].time,
+        priceMin: 40,
+        priceMax: 180,
+      };
+      const pane: ComputedPane = {
+        id: 'main',
+        type: 'main',
+        heightRatio: 1,
+        yMin: 40,
+        yMax: 180,
+        fixedRange: false,
+        top: 0,
+        height: 570,
+        bottom: 570,
+      };
+      const hiddenTint: PlotOutput = {
+        id: 'barcolor_Hidden',
+        type: 'barcolor',
+        title: 'Hidden',
+        values: [1, 1],
+        color: ['#ff0000', '#ff0000'],
+        display: 0,
+      };
+      const lastBarTint: PlotOutput = {
+        id: 'barcolor_LastOnly',
+        type: 'barcolor',
+        title: 'LastOnly',
+        values: [1, 1],
+        color: ['#00ff00', '#00ff00'],
+        showLast: 1,
+      };
+
+      (renderer as any).drawCandlesInPane(bars, viewport, pane, [hiddenTint, lastBarTint]);
+
+      expect(candleBodyColors).toEqual(['#aaaaaa', '#00ff00']);
+    });
   });
 
   describe('hline rendering', () => {
@@ -1321,6 +1376,34 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       expect(fillRect).toHaveBeenCalledOnce();
       expect(ctx.fillStyle).toBe('#2196F333');
+    });
+
+    it('skips bgcolor outputs with display.none through renderPlots', () => {
+      const fillRect = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillRect,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(1, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[0]!.time + 60_000,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plot: PlotOutput = {
+        id: 'bgcolor_Hidden',
+        type: 'bgcolor',
+        title: 'Hidden',
+        values: [1],
+        color: ['#2196F333'],
+        display: 0,
+      };
+
+      renderer.renderPlots([plot], bars, viewport);
+
+      expect(fillRect).not.toHaveBeenCalled();
     });
   });
 

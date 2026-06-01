@@ -364,6 +364,8 @@ Phases:
 5. Finish `bgcolor`, `barcolor`, `plotbar`, and `plotcandle` edge cases.
    Initial parity work now captures `bgcolor()` display and force-overlay
    metadata plus OHLC `format`, `precision`, and `force_overlay` metadata.
+   Renderer coverage now applies `bgcolor` display hiding and `barcolor`
+   display/show-last windows.
 6. Add renderer-level screenshot or pixel tests where practical.
 
 Done means visual-only indicators retain their main chart appearance.
