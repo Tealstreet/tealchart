@@ -116,6 +116,7 @@ import {
   medianMatrixValue,
   minMatrixValue,
   modeMatrixValue,
+  multMatrixValue,
   removeMatrixColumn,
   removeMatrixRow,
   reshapeMatrix,
@@ -5600,6 +5601,12 @@ export class TealscriptEngine {
     const readMatrixArithmeticOperand = (value: unknown): PineMatrix | number => {
       return isPineMatrix(value) ? value : this.toNumber(value);
     };
+    const readMatrixMultOperand = (value: unknown): PineMatrix | PineArray | number => {
+      if (isPineMatrix(value) || isPineArray(value)) {
+        return value;
+      }
+      return this.toNumber(value);
+    };
     const readInsertionArgs = (args: unknown[]): [number | undefined, PineArray | undefined] => {
       if (args[1] === undefined) {
         return [undefined, undefined];
@@ -5676,6 +5683,7 @@ export class TealscriptEngine {
     this.builtins.set('matrix.mode', (args) => modeMatrixValue(readMatrix(args[0])));
     this.builtins.set('matrix.sum', (args) => sumMatrixValue(readMatrix(args[0]), readMatrixArithmeticOperand(args[1])));
     this.builtins.set('matrix.diff', (args) => diffMatrixValue(readMatrix(args[0]), readMatrixArithmeticOperand(args[1])));
+    this.builtins.set('matrix.mult', (args) => multMatrixValue(readMatrix(args[0]), readMatrixMultOperand(args[1])));
     this.builtins.set('matrix.copy', (args) => copyMatrix(readMatrix(args[0])));
     this.builtins.set('matrix.row', (args) => matrixRow(readMatrix(args[0]), args[1] as number));
     this.builtins.set('matrix.col', (args) => matrixColumn(readMatrix(args[0]), args[1] as number));

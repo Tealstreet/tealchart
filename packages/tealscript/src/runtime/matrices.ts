@@ -3,6 +3,7 @@ import {
   createPineArray,
   getArraySize,
   getArrayValue,
+  isPineArray,
   maxArrayValue,
   medianArrayValue,
   minArrayValue,
@@ -207,6 +208,16 @@ export function diffMatrixValue(matrix: PineMatrix, other: PineMatrix | number):
   return mapMatrixArithmetic(matrix, other, (left, right) => left - right);
 }
 
+export function multMatrixValue(matrix: PineMatrix, other: PineMatrix | PineArray | number): PineMatrix<number> | PineArray<number> {
+  if (isPineMatrix(other)) {
+    return multiplyMatrices(matrix, other);
+  }
+  if (isPineArray(other)) {
+    return multiplyMatrixByArray(matrix, other);
+  }
+  return mapMatrixArithmetic(matrix, Number(other), (left, right) => left * right);
+}
+
 function matrixIndex(matrix: PineMatrix, row: number, column: number): number {
   const normalizedRow = normalizeExistingIndex(row, matrix.rows, 'row');
   const normalizedColumn = normalizeExistingIndex(column, matrix.columns, 'column');
@@ -234,6 +245,41 @@ function assertSameShape(left: PineMatrix, right: PineMatrix): void {
   if (left.rows !== right.rows || left.columns !== right.columns) {
     throw new Error(`Matrix dimensions must match. Left is ${left.rows}x${left.columns}, right is ${right.rows}x${right.columns}`);
   }
+}
+
+function multiplyMatrices(left: PineMatrix, right: PineMatrix): PineMatrix<number> {
+  if (left.columns !== right.rows) {
+    throw new Error(`Matrix multiplication requires left columns to match right rows. Left is ${left.rows}x${left.columns}, right is ${right.rows}x${right.columns}`);
+  }
+
+  const result = createPineMatrix<number>(left.rows, right.columns, 0);
+  for (let row = 0; row < left.rows; row++) {
+    for (let column = 0; column < right.columns; column++) {
+      let total = 0;
+      for (let index = 0; index < left.columns; index++) {
+        total += Number(left.values[row * left.columns + index]) * Number(right.values[index * right.columns + column]);
+      }
+      setMatrixValue(result, row, column, total);
+    }
+  }
+  return result;
+}
+
+function multiplyMatrixByArray(matrix: PineMatrix, array: PineArray): PineArray<number> {
+  const values = pineArrayValues(array);
+  if (matrix.columns !== values.length) {
+    throw new Error(`Matrix-vector multiplication requires matrix columns to match array size. Matrix is ${matrix.rows}x${matrix.columns}, array size is ${values.length}`);
+  }
+
+  const result = createPineArray<number>();
+  for (let row = 0; row < matrix.rows; row++) {
+    let total = 0;
+    for (let column = 0; column < matrix.columns; column++) {
+      total += Number(matrix.values[row * matrix.columns + column]) * Number(values[column]);
+    }
+    pushArrayValue(result, total);
+  }
+  return result;
 }
 
 function matrixValuesAsArray(matrix: PineMatrix): PineArray {
