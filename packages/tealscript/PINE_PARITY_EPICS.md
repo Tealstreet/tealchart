@@ -172,7 +172,11 @@ Phases:
 1. Audit historical bar execution, series commitment, rollback, and expression
    history storage. The runtime now stores history for indexed non-array
    expressions such as `(close + 1)[1]` across historical and realtime updates.
-2. Implement realtime tick execution and rollback semantics for open bars.
+2. Implement realtime tick execution and rollback semantics for open bars. The
+   runtime now appends advanced-timestamp realtime bars, exposes Pine
+   `barstate` flags for those open bars, and rolls regular variable mutations
+   back between same-bar ticks while committing the closed realtime bar when the
+   next bar opens.
 3. Complete `var` and `varip`, including intrabar persistence differences.
 4. Implement `max_bars_back` inference/enforcement and clearer unavailable
    history behavior.
