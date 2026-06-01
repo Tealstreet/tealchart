@@ -116,6 +116,17 @@ const BUILTIN_GLOBALS = new Set([
   'volume',
 ]);
 
+const CALENDAR_FUNCTION_NAMES = new Set([
+  'year',
+  'month',
+  'weekofyear',
+  'dayofmonth',
+  'dayofweek',
+  'hour',
+  'minute',
+  'second',
+]);
+
 const BUILTIN_FUNCTIONS = new Set([
   'alert',
   'alertcondition',
@@ -139,6 +150,7 @@ const BUILTIN_FUNCTIONS = new Set([
   'time',
   'time_close',
   'timestamp',
+  ...CALENDAR_FUNCTION_NAMES,
 ]);
 
 const BUILTIN_NAMESPACES = new Set([
@@ -311,6 +323,10 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['time_close', { params: ['timeframe', 'session', 'timezone'], minArgs: 0, maxArgs: 3 }],
   ['timestamp', { params: ['timezone', 'year', 'month', 'day', 'hour', 'minute', 'second'], minArgs: 1, maxArgs: 7 }],
 ]);
+
+for (const name of CALENDAR_FUNCTION_NAMES) {
+  BUILTIN_SIGNATURES.set(name, { params: ['time', 'timezone'], minArgs: 1, maxArgs: 2 });
+}
 
 export function checkProgram(program: Program): SemanticCheckResult {
   return new SemanticChecker().check(program);
@@ -838,6 +854,7 @@ class SemanticChecker {
     if (namespace === 'request' || namespace === 'ta' || namespace === 'time' || namespace === 'time_close') {
       return { kind: 'unknown', qualifier: 'series' };
     }
+    if (CALENDAR_FUNCTION_NAMES.has(calleePath.join('.'))) return { kind: 'int', qualifier: 'series' };
     if (calleePath.join('.') === 'timestamp') return { kind: 'int', qualifier: 'const' };
     return { kind: 'unknown', qualifier: this.inferMaxQualifier(expression.arguments.map((argument) => argument.value), scope) };
   }

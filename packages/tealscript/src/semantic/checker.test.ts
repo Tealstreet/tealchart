@@ -22,6 +22,23 @@ plot(not na(time("1", "0930-1600")) ? 1 : 0, title="Session")
     ]);
   });
 
+  it('accepts calendar functions with named time and timezone arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Calendar Functions")
+stamp = timestamp("Asia/Singapore", 2024, 1, 6, 0, 5, 7)
+plot(year(time=stamp, timezone="Asia/Singapore"))
+plot(month(time=stamp, timezone="Asia/Singapore"))
+plot(weekofyear(time=stamp, timezone="Asia/Singapore"))
+plot(dayofmonth(time=stamp, timezone="Asia/Singapore"))
+plot(dayofweek(time=stamp, timezone="Asia/Singapore"))
+plot(hour(time=stamp, timezone="Asia/Singapore"))
+plot(minute(time=stamp, timezone="Asia/Singapore"))
+plot(second(time=stamp, timezone="Asia/Singapore"))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
   it('reports duplicate declarations in the same scope', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate")

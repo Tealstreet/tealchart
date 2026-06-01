@@ -1678,6 +1678,33 @@ plot(timeframe.period == "1D" ? 1 : 0, title="Period")`;
       expect(result.plots.find((plot) => plot.title === 'Period')?.values).toEqual([1]);
     });
 
+    it('accepts named time and timezone arguments on calendar functions', () => {
+      const script = `//@version=6
+indicator("Named Calendar Args")
+stamp = timestamp("Asia/Singapore", 2024, 1, 6, 0, 5, 7)
+plot(year(time=stamp, timezone="Asia/Singapore"), title="Year")
+plot(month(time=stamp, timezone="Asia/Singapore"), title="Month")
+plot(weekofyear(time=stamp, timezone="Asia/Singapore"), title="Week")
+plot(dayofmonth(time=stamp, timezone="Asia/Singapore"), title="Day")
+plot(dayofweek(time=stamp, timezone="Asia/Singapore"), title="DOW")
+plot(hour(time=stamp, timezone="Asia/Singapore"), title="Hour")
+plot(minute(time=stamp, timezone="Asia/Singapore"), title="Minute")
+plot(second(time=stamp, timezone="Asia/Singapore"), title="Second")`;
+
+      const ast = parse(script);
+      const result = executeScript(ast, createBars(1));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Year')?.values).toEqual([2024]);
+      expect(result.plots.find((plot) => plot.title === 'Month')?.values).toEqual([1]);
+      expect(result.plots.find((plot) => plot.title === 'Week')?.values).toEqual([1]);
+      expect(result.plots.find((plot) => plot.title === 'Day')?.values).toEqual([6]);
+      expect(result.plots.find((plot) => plot.title === 'DOW')?.values).toEqual([7]);
+      expect(result.plots.find((plot) => plot.title === 'Hour')?.values).toEqual([0]);
+      expect(result.plots.find((plot) => plot.title === 'Minute')?.values).toEqual([5]);
+      expect(result.plots.find((plot) => plot.title === 'Second')?.values).toEqual([7]);
+    });
+
     it('exposes timenow as a runtime timestamp series', () => {
       const script = `//@version=6
 indicator("Time Now")

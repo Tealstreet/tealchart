@@ -7403,9 +7403,11 @@ export class TealscriptEngine {
     });
 
     for (const part of ['year', 'month', 'weekofyear', 'dayofmonth', 'dayofweek', 'hour', 'minute', 'second']) {
-      this.builtins.set(part, (args) => {
-        const timestamp = args[0] === undefined ? this.ctx.time.get(0) : this.toNumber(args[0]);
-        const timezone = args[1] === undefined ? this.ctx.syminfo.timezone : this.toStringValue(args[1]);
+      this.builtins.set(part, (args, namedArgs) => {
+        const timestampArg = this.getCallArg(args, namedArgs, 0, 'time', this.ctx.time.get(0));
+        const timezoneArg = this.getCallArg(args, namedArgs, 1, 'timezone', this.ctx.syminfo.timezone);
+        const timestamp = this.toNumber(timestampArg);
+        const timezone = timezoneArg === undefined || timezoneArg === '' ? this.ctx.syminfo.timezone : this.toStringValue(timezoneArg);
         return this.getCalendarPart(part, timestamp, timezone);
       });
     }
