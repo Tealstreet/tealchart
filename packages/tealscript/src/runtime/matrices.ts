@@ -226,8 +226,16 @@ export function powMatrixValue(matrix: PineMatrix, power: number): PineMatrix<nu
   }
 
   let result = identityMatrix(matrix.rows);
-  for (let index = 0; index < normalizedPower; index++) {
-    result = multiplyMatrices(result, matrix);
+  let base = copyMatrix(matrix);
+  let exponent = normalizedPower;
+  while (exponent > 0) {
+    if (exponent % 2 === 1) {
+      result = multiplyMatrices(result, base);
+    }
+    exponent = Math.floor(exponent / 2);
+    if (exponent > 0) {
+      base = multiplyMatrices(base, base);
+    }
   }
   return result;
 }
