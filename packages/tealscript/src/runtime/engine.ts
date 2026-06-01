@@ -4683,8 +4683,11 @@ export class TealscriptEngine {
     this.builtins.set('math.pi', () => Math.PI);
     this.builtins.set('math.e', () => Math.E);
     this.builtins.set('math.phi', () => (1 + Math.sqrt(5)) / 2);
+    const unaryMath = (name: string, fn: (value: number) => number): void => {
+      this.builtins.set(name, (args, namedArgs) => fn(this.toNumber(this.getCallArg(args, namedArgs, 0, 'number'))));
+    };
 
-    this.builtins.set('math.abs', (args) => Math.abs(args[0] as number));
+    unaryMath('math.abs', Math.abs);
     this.builtins.set('math.max', (args) => Math.max(...(args as number[])));
     this.builtins.set('math.min', (args) => Math.min(...(args as number[])));
     this.builtins.set('math.avg', (args) => {
@@ -4693,9 +4696,9 @@ export class TealscriptEngine {
       if (values.some((value) => Number.isNaN(value))) return Number.NaN;
       return values.reduce((sum, value) => sum + value, 0) / values.length;
     });
-    this.builtins.set('math.sum', (args, _namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(args[0]);
-      const length = this.normalizeLookbackLength(args[1]);
+    this.builtins.set('math.sum', (args, namedArgs, _ctx, scope, callId) => {
+      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
+      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
       const values = this.getCompleteNonNaSourceWindow(scope, `_math_sum_source_${callId}`, source, length);
       return values ? values.reduce((sum, value) => sum + value, 0) : Number.NaN;
     });
@@ -4716,35 +4719,40 @@ export class TealscriptEngine {
 
       return min + this.toExclusiveUnitRandom(randomValue) * (max - min);
     });
-    this.builtins.set('math.sqrt', (args) => Math.sqrt(args[0] as number));
-    this.builtins.set('math.pow', (args) => Math.pow(args[0] as number, args[1] as number));
-    this.builtins.set('math.log', (args) => Math.log(args[0] as number));
-    this.builtins.set('math.log10', (args) => Math.log10(args[0] as number));
-    this.builtins.set('math.exp', (args) => Math.exp(args[0] as number));
-    this.builtins.set('math.round', (args) => {
-      const value = this.toNumber(args[0]);
-      const precision = args[1] === undefined ? 0 : Math.trunc(this.toNumber(args[1]));
+    unaryMath('math.sqrt', Math.sqrt);
+    this.builtins.set('math.pow', (args, namedArgs) => {
+      const base = this.toNumber(this.getCallArg(args, namedArgs, 0, 'base'));
+      const exponent = this.toNumber(this.getCallArg(args, namedArgs, 1, 'exponent'));
+      return Math.pow(base, exponent);
+    });
+    unaryMath('math.log', Math.log);
+    unaryMath('math.log10', Math.log10);
+    unaryMath('math.exp', Math.exp);
+    this.builtins.set('math.round', (args, namedArgs) => {
+      const value = this.toNumber(this.getCallArg(args, namedArgs, 0, 'number'));
+      const precisionArg = this.getCallArg(args, namedArgs, 1, 'precision');
+      const precision = precisionArg === undefined ? 0 : Math.trunc(this.toNumber(precisionArg));
       const factor = 10 ** precision;
       return Math.round(value * factor) / factor;
     });
-    this.builtins.set('math.round_to_mintick', (args) => {
-      const value = this.toNumber(args[0]);
+    this.builtins.set('math.round_to_mintick', (args, namedArgs) => {
+      const value = this.toNumber(this.getCallArg(args, namedArgs, 0, 'number'));
       const tick = this.ctx.syminfo.mintick;
       if (!Number.isFinite(value) || !Number.isFinite(tick) || tick <= 0) return Number.NaN;
       return Math.round(value / tick) * tick;
     });
-    this.builtins.set('math.trunc', (args) => Math.trunc(this.toNumber(args[0])));
-    this.builtins.set('math.floor', (args) => Math.floor(args[0] as number));
-    this.builtins.set('math.ceil', (args) => Math.ceil(args[0] as number));
-    this.builtins.set('math.sign', (args) => Math.sign(args[0] as number));
-    this.builtins.set('math.sin', (args) => Math.sin(args[0] as number));
-    this.builtins.set('math.cos', (args) => Math.cos(args[0] as number));
-    this.builtins.set('math.tan', (args) => Math.tan(args[0] as number));
-    this.builtins.set('math.asin', (args) => Math.asin(args[0] as number));
-    this.builtins.set('math.acos', (args) => Math.acos(args[0] as number));
-    this.builtins.set('math.atan', (args) => Math.atan(args[0] as number));
-    this.builtins.set('math.toradians', (args) => this.toNumber(args[0]) * (Math.PI / 180));
-    this.builtins.set('math.todegrees', (args) => this.toNumber(args[0]) * (180 / Math.PI));
+    unaryMath('math.trunc', Math.trunc);
+    unaryMath('math.floor', Math.floor);
+    unaryMath('math.ceil', Math.ceil);
+    unaryMath('math.sign', Math.sign);
+    unaryMath('math.sin', Math.sin);
+    unaryMath('math.cos', Math.cos);
+    unaryMath('math.tan', Math.tan);
+    unaryMath('math.asin', Math.asin);
+    unaryMath('math.acos', Math.acos);
+    unaryMath('math.atan', Math.atan);
+    unaryMath('math.toradians', (number) => number * (Math.PI / 180));
+    unaryMath('math.todegrees', (number) => number * (180 / Math.PI));
 
     // nz - replace na with value
     this.builtins.set('nz', (args) => {

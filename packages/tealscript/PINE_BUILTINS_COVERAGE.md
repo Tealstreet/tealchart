@@ -81,6 +81,14 @@ approximate coverage to tested Pine-compatible behavior.
 | `color.*` | 7 registrations covering RGB construction, channel extraction, transparency, and gradients | Named constants, transparency range behavior, channel precision, theme-sensitive behavior where possible |
 | Global helpers | 23 mixed global registrations including casts, `na`, `nz`, `fixnan`, time helpers, and visual functions | Typed casts, `na`/`nz`/`fixnan` parity across types, and separation of visual/data helpers into later epics |
 
+Current `math.*` progress:
+
+- Common scalar helpers support Pine-style named arguments, including
+  `number=`, `base=`, `exponent=`, and `precision=`.
+- `math.sum()` supports `source=` and `length=` named arguments while preserving
+  the existing latest non-`na` window behavior.
+- `math.random()` already supports named `min=`, `max=`, and `seed=`.
+
 Current `ta.*` progress:
 
 - Common `ta.*` helpers accept Pine-style named arguments for covered
