@@ -426,6 +426,8 @@ Phases:
    access, copy/reshape behavior, and tests.
    Runtime coverage now includes `matrix.sum()` and `matrix.diff()` for
    same-shape matrix operands and scalar operands.
+   Runtime coverage now includes `matrix.mult()` for matrix, array, and scalar
+   operands.
 3. Implement `map.*` with key/value typing, insertion, lookup, removal, keys,
    values, copy, and iteration.
 4. Implement user-defined types (`type`), fields, constructors, methods, and

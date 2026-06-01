@@ -161,10 +161,12 @@ helpers (`matrix.fill`, `matrix.reshape`, `matrix.add_row`, `matrix.add_col`,
 `matrix.reverse`, `matrix.transpose`), and numeric aggregate helpers
 (`matrix.avg`, `matrix.min`, `matrix.max`, `matrix.median`, `matrix.mode`).
 Matrix arithmetic coverage includes `matrix.sum()` and `matrix.diff()` with
-same-shape matrix operands and scalar operands. Common Pine method syntax lowers
-to the same runtime built-ins for calls such as `values.set(row, column, close)`,
-`values.add_row(array.from(...))`, `values.transpose()`, `values.sum(other)`,
-and `values.avg()`.
+same-shape matrix operands and scalar operands, plus `matrix.mult()` for
+matrix-by-matrix, matrix-by-array, and matrix-by-scalar multiplication. Common
+Pine method syntax lowers to the same runtime built-ins for calls such as
+`values.set(row, column, close)`, `values.add_row(array.from(...))`,
+`values.transpose()`, `values.sum(other)`, `values.mult(other)`, and
+`values.avg()`.
 
 ## Common `map.*` Coverage
 
