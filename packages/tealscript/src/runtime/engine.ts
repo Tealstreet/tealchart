@@ -6114,6 +6114,7 @@ export class TealscriptEngine {
     this.builtins.set('ta.stdev', (args, namedArgs, ctx) => {
       const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const biased = this.isTruthy(this.getCallArg(args, namedArgs, 2, 'biased', true));
 
       // Get the series for the source value
       const series = this.getSeriesForSource(source, ctx);
@@ -6136,7 +6137,9 @@ export class TealscriptEngine {
 
       // Calculate variance (population standard deviation)
       const squaredDiffs = values.map((v) => Math.pow(v - mean, 2));
-      const variance = squaredDiffs.reduce((a, b) => a + b, 0) / values.length;
+      const divisor = biased ? values.length : values.length - 1;
+      if (divisor <= 0) return NaN;
+      const variance = squaredDiffs.reduce((a, b) => a + b, 0) / divisor;
 
       return Math.sqrt(variance);
     });
@@ -6144,6 +6147,7 @@ export class TealscriptEngine {
     this.builtins.set('ta.variance', (args, namedArgs, ctx) => {
       const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const biased = this.isTruthy(this.getCallArg(args, namedArgs, 2, 'biased', true));
       const series = this.getSeriesForSource(source, ctx);
 
       const values: number[] = [];
@@ -6157,7 +6161,9 @@ export class TealscriptEngine {
       if (values.length < length) return NaN;
 
       const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
-      return values.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / values.length;
+      const divisor = biased ? values.length : values.length - 1;
+      if (divisor <= 0) return NaN;
+      return values.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / divisor;
     });
 
     this.builtins.set('ta.dev', (args, namedArgs, ctx) => {
