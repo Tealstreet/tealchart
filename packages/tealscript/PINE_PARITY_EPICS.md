@@ -458,7 +458,10 @@ Phases:
    unannotated `map.new<K, V>()` constructors, including invalid map constructor
    template and generic arity diagnostics.
    Semantic coverage now rejects bare collection container names in template
-   positions until nested template parsing is available.
+   positions. Parser coverage now accepts nested collection template syntax in
+   annotations and generic constructor calls, while semantic coverage rejects it
+   with explicit diagnostics because Pine does not allow direct collection
+   elements inside collections.
 4. Implement user-defined types (`type`), fields, constructors, methods, and
    reference semantics.
    Runtime coverage now includes shallow UDT copies through Pine's

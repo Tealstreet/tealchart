@@ -209,6 +209,30 @@ arrayValue = [1, 2]
       }));
     });
 
+    it('parses nested collection type reference syntax in annotations', () => {
+      const ast = parse(`array<array<float>> rows = na
+map<string, array<float>> lookup = na
+matrix<map<string, float>> grid = na
+`);
+      const rows = ast.body[0] as VariableDeclaration;
+      const lookup = ast.body[1] as VariableDeclaration;
+      const grid = ast.body[2] as VariableDeclaration;
+
+      expect(rows.typeAnnotation).toEqual(expect.objectContaining({
+        baseType: 'array',
+        elementType: 'array<float>',
+      }));
+      expect(lookup.typeAnnotation).toEqual(expect.objectContaining({
+        baseType: 'map',
+        keyType: 'string',
+        valueType: 'array<float>',
+      }));
+      expect(grid.typeAnnotation).toEqual(expect.objectContaining({
+        baseType: 'matrix',
+        elementType: 'map<string, float>',
+      }));
+    });
+
     it('parses user-defined type annotations', () => {
       const ast = parse('pivotPoint found = na\n');
       const decl = ast.body[0] as VariableDeclaration;
@@ -792,6 +816,19 @@ arrayValue = [1, 2]
         expect(call.type).toBe('CallExpression');
         expect(call.typeArguments).toEqual(['float']);
         expect(call.arguments).toHaveLength(0);
+      });
+
+      it('parses nested generic Pine call type arguments', () => {
+        const ast = parse(`rows = array.new<array<float>>()
+lookup = map.new<string, array<float>>()
+`);
+        const rows = ast.body[0] as VariableDeclaration;
+        const lookup = ast.body[1] as VariableDeclaration;
+        const rowsCall = rows.init as CallExpression;
+        const lookupCall = lookup.init as CallExpression;
+
+        expect(rowsCall.typeArguments).toEqual(['array<float>']);
+        expect(lookupCall.typeArguments).toEqual(['string', 'array<float>']);
       });
     });
 
