@@ -1000,6 +1000,7 @@ class SemanticChecker {
     this.checkBuiltinSignature(expression);
     this.checkUdtConstructorSignature(expression, scope);
     this.checkArrayConstructorTypeArguments(expression);
+    this.checkMatrixConstructorTypeArguments(expression);
     this.checkMapConstructorTypeArguments(expression);
     this.checkArrayCallTypes(expression, scope);
     this.checkMapCallTypes(expression, scope);
@@ -1275,6 +1276,16 @@ class SemanticChecker {
     }
 
     this.checkTemplateTypeName(expression.typeArguments[0], 'array element', expression.loc);
+  }
+
+  private checkMatrixConstructorTypeArguments(expression: CallExpression): void {
+    if (this.memberPath(expression.callee).join('.') !== 'matrix.new' || !expression.typeArguments) return;
+    if (expression.typeArguments.length !== 1) {
+      this.addDiagnostic('invalid-type-template', 'matrix.new() expects exactly 1 type argument', expression.loc);
+      return;
+    }
+
+    this.checkTemplateTypeName(expression.typeArguments[0], 'matrix element', expression.loc);
   }
 
   private resolveMapCall(
@@ -1567,6 +1578,12 @@ class SemanticChecker {
     if (calleePath.join('.') === 'array.new' && expression.typeArguments?.length === 1) {
       return {
         kind: 'array',
+        elementType: this.typeFromName(expression.typeArguments[0]),
+      };
+    }
+    if (calleePath.join('.') === 'matrix.new' && expression.typeArguments?.length === 1) {
+      return {
+        kind: 'matrix',
         elementType: this.typeFromName(expression.typeArguments[0]),
       };
     }

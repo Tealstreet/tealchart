@@ -218,6 +218,7 @@ string labelText = "hi"
 color tint = color.red
 array<float> values = array.new_float()
 genericValues = array.new<float>()
+genericGrid = matrix.new<float>(1, 1, 0)
 floatValues = array.new_float()
 intValues = array.new_int()
 labelValues = array.new_label()
@@ -236,6 +237,7 @@ pivotPoint pivot = na
     expect(types.get('tint')).toMatchObject({ kind: 'color' });
     expect(types.get('values')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('genericValues')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('genericGrid')).toMatchObject({ kind: 'matrix', elementType: { kind: 'float' } });
     expect(types.get('floatValues')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('intValues')).toMatchObject({ kind: 'array', elementType: { kind: 'int' } });
     expect(types.get('labelValues')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
@@ -255,6 +257,8 @@ array<series> invalidArray = array.new_float()
 invalidArrayCtorElement = array.new<series>()
 invalidArrayCtorArity = array.new<float, int>()
 matrix<input> invalidMatrix = matrix.new_int()
+invalidMatrixCtorElement = matrix.new<series>()
+invalidMatrixCtorArity = matrix.new<float, int>()
 map<label, float> invalidKey = map.new<string, float>()
 map<string, series> invalidValue = map.new<string, float>()
 map<const, float> qualifierKey = map.new<string, float>()
@@ -268,6 +272,8 @@ invalidCtorArity = map.new<string>()
       "Invalid array element type 'series'; qualifiers cannot be used as template types",
       'array.new() expects exactly 1 type argument',
       "Invalid matrix element type 'input'; qualifiers cannot be used as template types",
+      "Invalid matrix element type 'series'; qualifiers cannot be used as template types",
+      'matrix.new() expects exactly 1 type argument',
       'Map key type must be int, float, bool, string, or color in variable declaration',
       "Invalid map value type 'series'; qualifiers cannot be used as template types",
       "Invalid map key type 'const'; qualifiers cannot be used as template types",
