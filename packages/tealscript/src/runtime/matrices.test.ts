@@ -264,7 +264,7 @@ describe('PineMatrix', () => {
     const matrix = createPineMatrix<number>(2, 2, 0);
     matrix.values = [1e-12, 0, 0, 1];
 
-    expect(detMatrixValue(matrix)).toBeCloseTo(1e-12);
+    expect(detMatrixValue(matrix)).toBe(1e-12);
     expect(rankMatrixValue(matrix)).toBe(2);
   });
 
