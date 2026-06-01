@@ -541,9 +541,14 @@ indicator("Test")
 base = color.rgb(10, 20, 30)
 transparent = color.rgb(255, 128, 0, 50)
 updated = color.new(color.blue, 25)
+named = color.rgb(red=1, green=2, blue=3, transp=25)
+namedUpdated = color.new(color=named, transp=40)
 plot(close, "Base", color=base)
 plot(open, "Transparent", color=transparent)
 plot(high, "Updated", color=updated)
+plot(low, "Named", color=named)
+plot(volume, "Named Updated", color=namedUpdated)
+plot(close, "None", color=color.none)
 `;
       const ast = parse(code);
       const result = executeScript(ast, bars);
@@ -552,6 +557,9 @@ plot(high, "Updated", color=updated)
       expect(result.plots[0].color).toEqual(Array(bars.length).fill('#0A141EFF'));
       expect(result.plots[1].color).toEqual(Array(bars.length).fill('#FF800080'));
       expect(result.plots[2].color).toEqual(Array(bars.length).fill('#2196F3BF'));
+      expect(result.plots[3].color).toEqual(Array(bars.length).fill('#010203BF'));
+      expect(result.plots[4].color).toEqual(Array(bars.length).fill('#01020399'));
+      expect(result.plots[5].color).toEqual(Array(bars.length).fill(null));
     });
 
     it('extracts color channels and transparency', () => {
@@ -562,7 +570,9 @@ plot(color.r(sample), "Red")
 plot(color.g(sample), "Green")
 plot(color.b(sample), "Blue")
 plot(color.t(sample), "Transparency")
-plot(color.r(color.blue), "Named Red")
+plot(color.r(color=sample), "Named Red")
+plot(color.t(color=sample), "Named Transparency")
+plot(color.r(color.blue), "Blue Red")
 `;
       const ast = parse(code);
       const result = executeScript(ast, bars);
@@ -572,7 +582,9 @@ plot(color.r(color.blue), "Named Red")
       expect(result.plots[1].values).toEqual(Array(bars.length).fill(20));
       expect(result.plots[2].values).toEqual(Array(bars.length).fill(30));
       expect(result.plots[3].values).toEqual(Array(bars.length).fill(40));
-      expect(result.plots[4].values).toEqual(Array(bars.length).fill(33));
+      expect(result.plots[4].values).toEqual(Array(bars.length).fill(10));
+      expect(result.plots[5].values).toEqual(Array(bars.length).fill(40));
+      expect(result.plots[6].values).toEqual(Array(bars.length).fill(33));
     });
 
     it('creates colors from gradients', () => {
@@ -581,9 +593,11 @@ indicator("Test")
 lowColor = color.from_gradient(-10, 0, 100, color.red, color.green)
 midColor = color.from_gradient(50, 0, 100, color.rgb(255, 0, 0), color.rgb(0, 255, 0, 50))
 highColor = color.from_gradient(120, 0, 100, color.red, color.green)
+namedColor = color.from_gradient(value=25, bottom_value=0, top_value=100, bottom_color=color.rgb(0, 0, 0), top_color=color.rgb(100, 100, 100))
 plot(close, "Low", color=lowColor)
 plot(open, "Mid", color=midColor)
 plot(high, "High", color=highColor)
+plot(low, "Named", color=namedColor)
 `;
       const ast = parse(code);
       const result = executeScript(ast, bars);
@@ -592,6 +606,7 @@ plot(high, "High", color=highColor)
       expect(result.plots[0].color).toEqual(Array(bars.length).fill('#F44336FF'));
       expect(result.plots[1].color).toEqual(Array(bars.length).fill('#808000BF'));
       expect(result.plots[2].color).toEqual(Array(bars.length).fill('#4CAF50FF'));
+      expect(result.plots[3].color).toEqual(Array(bars.length).fill('#191919FF'));
     });
 
     it('creates hline', () => {
