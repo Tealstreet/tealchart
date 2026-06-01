@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { createPineArray, getArrayValue, pushArrayValue } from './arrays';
+import { createPineUdtObject } from './objects';
 import {
   addMatrixColumn,
   addMatrixRow,
@@ -443,6 +444,43 @@ describe('PineMatrix', () => {
 
     setMatrixValue(submatrix, 0, 0, 100);
     expect(matrix.values).toEqual([3, 9, 1, 2, 7, 3, 1, 5, 2]);
+  });
+
+  it('sorts user-defined type rows by field name and index', () => {
+    const matrix = createPineMatrix(3, 2);
+    matrix.values = [
+      createPineUdtObject('Ranked', [['score', 3], ['name', 'C']]),
+      createPineUdtObject('Ranked', [['score', 30], ['name', 'cc']]),
+      createPineUdtObject('Ranked', [['score', 1], ['name', 'A']]),
+      createPineUdtObject('Ranked', [['score', 10], ['name', 'aa']]),
+      createPineUdtObject('Ranked', [['score', 2], ['name', 'B']]),
+      createPineUdtObject('Ranked', [['score', 20], ['name', 'bb']]),
+    ];
+
+    sortMatrixRows(matrix, 0, 'ascending', 'score');
+    expect((getMatrixValue(matrix, 0, 0) as ReturnType<typeof createPineUdtObject>).fields.get('score')).toBe(1);
+    expect((getMatrixValue(matrix, 2, 0) as ReturnType<typeof createPineUdtObject>).fields.get('score')).toBe(3);
+
+    sortMatrixRows(matrix, 1, 'descending', 1);
+    expect((getMatrixValue(matrix, 0, 1) as ReturnType<typeof createPineUdtObject>).fields.get('name')).toBe('cc');
+    expect((getMatrixValue(matrix, 2, 1) as ReturnType<typeof createPineUdtObject>).fields.get('name')).toBe('aa');
+
+    sortMatrixRows(matrix, 0);
+    expect((getMatrixValue(matrix, 0, 0) as ReturnType<typeof createPineUdtObject>).fields.get('score')).toBe(1);
+  });
+
+  it('rejects invalid matrix sort fields', () => {
+    const matrix = createPineMatrix(2, 1);
+    matrix.values = [
+      createPineUdtObject('Ranked', [['score', 3]]),
+      createPineUdtObject('Ranked', [['score', 1]]),
+    ];
+
+    expect(() => sortMatrixRows(matrix, 0, 'ascending', 'missing')).toThrow("Unknown field 'missing' on type Ranked");
+    expect(() => sortMatrixRows(matrix, 0, 'ascending', 1)).toThrow('Matrix sort_field index 1 is out of bounds for type Ranked');
+
+    const mixed = createPineMatrix(2, 1, 7);
+    expect(() => sortMatrixRows(mixed, 0, 'ascending', 'score')).toThrow('Matrix sort_field requires user-defined type values in the selected column');
   });
 
   it('rejects invalid matrix sort columns and submatrix ranges', () => {

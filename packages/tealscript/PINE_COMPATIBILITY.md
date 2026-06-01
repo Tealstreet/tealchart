@@ -187,8 +187,9 @@ helpers (`matrix.fill`, `matrix.reshape`, `matrix.add_row`, `matrix.add_col`,
 `matrix.is_symmetric`, `matrix.is_antisymmetric`, `matrix.is_triangular`,
 `matrix.is_stochastic`, `matrix.is_binary`), and numeric aggregate helpers
 (`matrix.avg`, `matrix.min`, `matrix.max`, `matrix.median`, `matrix.mode`).
-Collection operations include row sorting with `matrix.sort()` and copied range
-extraction with `matrix.submatrix()`.
+Collection operations include row sorting with `matrix.sort()` (including UDT
+row sorting by `sort_field` field name or index) and copied range extraction
+with `matrix.submatrix()`.
 Matrix arithmetic coverage includes `matrix.sum()` and `matrix.diff()` with
 same-shape matrix operands and scalar operands, `matrix.mult()` for
 matrix-by-matrix, matrix-by-array, and matrix-by-scalar multiplication,
