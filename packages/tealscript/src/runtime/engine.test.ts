@@ -4102,6 +4102,52 @@ plot(barstate.islastconfirmedhistory ? 1 : 0, title="Last Confirmed History")`;
       expect(nextBarPlots.find((plot) => plot.title === 'Last Confirmed History')?.values).toEqual([0, 0, 1, 0, 0]);
     });
 
+    it('keeps confirmed-gated values stable until the realtime bar closes', () => {
+      const script = `//@version=6
+indicator("Confirmed Repaint Fixture")
+live = close
+confirmedOnly = barstate.isconfirmed ? close : close[1]
+plot(live, title="Live")
+plot(confirmedOnly, title="Confirmed Only")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+
+      engine.execute(ast, bars);
+      const realtimeBar = {
+        ...bars[2],
+        time: bars[2].time + 60_000,
+        open: 102,
+        high: 102.5,
+        low: 101.8,
+        close: 102.25,
+      };
+      engine.updateBar(ast, realtimeBar);
+      const replayPlots = engine.updateBar(ast, { ...realtimeBar, close: 102.75 });
+      const replayLive = [...replayPlots.find((plot) => plot.title === 'Live')!.values];
+      const replayConfirmed = [...replayPlots.find((plot) => plot.title === 'Confirmed Only')!.values];
+      const nextBarPlots = engine.updateBar(ast, {
+        ...realtimeBar,
+        time: realtimeBar.time + 60_000,
+        open: 103,
+        high: 103.5,
+        low: 102.8,
+        close: 103.25,
+      });
+
+      expect(replayLive).toEqual([100.2, 100.7, 101.2, 102.75]);
+      expect(replayConfirmed).toEqual([100.2, 100.7, 101.2, 101.2]);
+      expect(nextBarPlots.find((plot) => plot.title === 'Live')?.values).toEqual([100.2, 100.7, 101.2, 102.75, 103.25]);
+      expect(nextBarPlots.find((plot) => plot.title === 'Confirmed Only')?.values).toEqual([
+        100.2,
+        100.7,
+        101.2,
+        102.75,
+        102.75,
+      ]);
+    });
+
     it('rolls back map mutations between updateBar calls', () => {
       const script = `//@version=6
 indicator("Map Rollback")
