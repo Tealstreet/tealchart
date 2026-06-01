@@ -5229,34 +5229,42 @@ export class TealscriptEngine {
     for (const [name, value] of Object.entries(colors)) {
       this.builtins.set(name, () => value);
     }
+    this.builtins.set('color.none', () => Number.NaN);
 
-    this.builtins.set('color.new', (args) => {
-      const parsedColor = this.parseColor(args[0]);
+    this.builtins.set('color.new', (args, namedArgs) => {
+      const color = this.getCallArg(args, namedArgs, 0, 'color');
+      const transparency = namedArgs.get('transp') ?? namedArgs.get('transparency') ?? args[1] ?? 0;
+      const parsedColor = this.parseColor(color);
       if (!parsedColor) {
-        return args[0];
+        return color;
       }
 
-      return this.formatColor(parsedColor.red, parsedColor.green, parsedColor.blue, args[1]);
+      return this.formatColor(parsedColor.red, parsedColor.green, parsedColor.blue, transparency);
     });
 
     this.builtins.set('color.rgb', (args, namedArgs) =>
-      this.formatColor(args[0], args[1], args[2], namedArgs.get('transp') ?? namedArgs.get('transparency') ?? args[3] ?? 0),
+      this.formatColor(
+        this.getCallArg(args, namedArgs, 0, 'red'),
+        this.getCallArg(args, namedArgs, 1, 'green'),
+        this.getCallArg(args, namedArgs, 2, 'blue'),
+        namedArgs.get('transp') ?? namedArgs.get('transparency') ?? args[3] ?? 0,
+      ),
     );
 
-    this.builtins.set('color.r', (args) => this.parseColor(args[0])?.red ?? Number.NaN);
-    this.builtins.set('color.g', (args) => this.parseColor(args[0])?.green ?? Number.NaN);
-    this.builtins.set('color.b', (args) => this.parseColor(args[0])?.blue ?? Number.NaN);
-    this.builtins.set('color.t', (args) => {
-      const parsedColor = this.parseColor(args[0]);
+    this.builtins.set('color.r', (args, namedArgs) => this.parseColor(this.getCallArg(args, namedArgs, 0, 'color'))?.red ?? Number.NaN);
+    this.builtins.set('color.g', (args, namedArgs) => this.parseColor(this.getCallArg(args, namedArgs, 0, 'color'))?.green ?? Number.NaN);
+    this.builtins.set('color.b', (args, namedArgs) => this.parseColor(this.getCallArg(args, namedArgs, 0, 'color'))?.blue ?? Number.NaN);
+    this.builtins.set('color.t', (args, namedArgs) => {
+      const parsedColor = this.parseColor(this.getCallArg(args, namedArgs, 0, 'color'));
       return parsedColor ? this.alphaToTransparency(parsedColor.alpha) : Number.NaN;
     });
 
-    this.builtins.set('color.from_gradient', (args) => {
-      const value = args[0];
-      const bottomValue = args[1];
-      const topValue = args[2];
-      const bottomColor = this.parseColor(args[3]);
-      const topColor = this.parseColor(args[4]);
+    this.builtins.set('color.from_gradient', (args, namedArgs) => {
+      const value = this.getCallArg(args, namedArgs, 0, 'value');
+      const bottomValue = this.getCallArg(args, namedArgs, 1, 'bottom_value');
+      const topValue = this.getCallArg(args, namedArgs, 2, 'top_value');
+      const bottomColor = this.parseColor(this.getCallArg(args, namedArgs, 3, 'bottom_color'));
+      const topColor = this.parseColor(this.getCallArg(args, namedArgs, 4, 'top_color'));
 
       if (!this.isFiniteNumber(value) || !this.isFiniteNumber(bottomValue) || !this.isFiniteNumber(topValue) || !bottomColor || !topColor) {
         return Number.NaN;
