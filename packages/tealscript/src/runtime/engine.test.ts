@@ -2943,6 +2943,36 @@ plot(inverse.get(0, 0))`;
       expect(result.errors[0]?.message).toBe('Matrix is singular and cannot be inverted');
     });
 
+    it('executes matrix Kronecker products', () => {
+      const script = `//@version=6
+indicator("Matrix Kron")
+left = matrix.new_float(2, 2, 0)
+left.set(0, 0, 1)
+left.set(0, 1, 2)
+left.set(1, 0, 3)
+left.set(1, 1, 4)
+right = matrix.new_float(2, 2, 0)
+right.set(0, 0, 0)
+right.set(0, 1, 5)
+right.set(1, 0, 6)
+right.set(1, 1, 7)
+product = left.kron(right)
+plot(product.rows(), title="Rows")
+plot(product.columns(), title="Columns")
+plot(product.get(0, 3), title="Top")
+plot(product.get(3, 3), title="Bottom")
+plot(left.get(1, 1), title="Original")`;
+
+      const result = executeScript(parse(script), createBars(2, 100));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Rows')?.values).toEqual([4, 4]);
+      expect(result.plots.find((plot) => plot.title === 'Columns')?.values).toEqual([4, 4]);
+      expect(result.plots.find((plot) => plot.title === 'Top')?.values).toEqual([10, 10]);
+      expect(result.plots.find((plot) => plot.title === 'Bottom')?.values).toEqual([28, 28]);
+      expect(result.plots.find((plot) => plot.title === 'Original')?.values).toEqual([4, 4]);
+    });
+
     it('returns expression results from user function if branches', () => {
       const script = `//@version=6
 indicator("Function If")

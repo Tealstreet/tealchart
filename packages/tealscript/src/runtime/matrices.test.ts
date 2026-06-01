@@ -18,6 +18,7 @@ import {
   isPineMatrix,
   isSquareMatrix,
   isValidMatrix,
+  kronMatrixValue,
   matrixColumn,
   matrixRow,
   maxMatrixValue,
@@ -294,5 +295,20 @@ describe('PineMatrix', () => {
     const singular = createPineMatrix<number>(2, 2, 0);
     singular.values = [1, 2, 2, 4];
     expect(() => invMatrixValue(singular)).toThrow('Matrix is singular and cannot be inverted');
+  });
+
+  it('computes Kronecker products without mutating inputs', () => {
+    const left = createPineMatrix<number>(2, 2, 0);
+    left.values = [1, 2, 3, 4];
+    const right = createPineMatrix<number>(2, 2, 0);
+    right.values = [0, 5, 6, 7];
+
+    const product = kronMatrixValue(left, right);
+
+    expect(product.rows).toBe(4);
+    expect(product.columns).toBe(4);
+    expect(product.values).toEqual([0, 5, 0, 10, 6, 7, 12, 14, 0, 15, 0, 20, 18, 21, 24, 28]);
+    expect(left.values).toEqual([1, 2, 3, 4]);
+    expect(right.values).toEqual([0, 5, 6, 7]);
   });
 });
