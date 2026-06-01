@@ -3832,6 +3832,83 @@ plot((close + 1)[1], title="Previous")`;
       expect(previous.values[previous.values.length - 1]).toBe(101.7);
     });
 
+    it('appends a new realtime bar with Pine barstate flags', () => {
+      const script = `//@version=6
+indicator("Realtime New Bar")
+var ticks = 0
+ticks := ticks + (barstate.isrealtime ? 1 : 0)
+plot(ticks, title="Ticks")
+plot(barstate.isnew ? 1 : 0, title="New")
+plot(barstate.isrealtime ? 1 : 0, title="Realtime")
+plot(barstate.isconfirmed ? 1 : 0, title="Confirmed")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+
+      const result = engine.execute(ast, bars);
+      expect(result.plots.find((plot) => plot.title === 'Ticks')?.values).toEqual([0, 0, 0]);
+      const realtimeBar = {
+        ...bars[2],
+        time: bars[2].time + 60_000,
+        open: 102,
+        high: 102.5,
+        low: 101.8,
+        close: 102.25,
+      };
+      const plots = engine.updateBar(ast, realtimeBar);
+
+      const ticks = plots.find((plot) => plot.title === 'Ticks')!;
+      const isNew = plots.find((plot) => plot.title === 'New')!;
+      const realtime = plots.find((plot) => plot.title === 'Realtime')!;
+      const confirmed = plots.find((plot) => plot.title === 'Confirmed')!;
+
+      expect(ticks.values).toEqual([0, 0, 0, 1]);
+      expect(isNew.values).toEqual([1, 1, 1, 1]);
+      expect(realtime.values).toEqual([0, 0, 0, 1]);
+      expect(confirmed.values).toEqual([1, 1, 1, 0]);
+    });
+
+    it('rolls back regular variables between realtime ticks on an appended bar', () => {
+      const script = `//@version=6
+indicator("Realtime Rollback")
+var ticks = 0
+ticks := ticks + (barstate.isrealtime ? 1 : 0)
+plot(ticks, title="Ticks")
+plot(barstate.isnew ? 1 : 0, title="New")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+
+      engine.execute(ast, bars);
+      const realtimeBar = {
+        ...bars[2],
+        time: bars[2].time + 60_000,
+        open: 102,
+        high: 102.5,
+        low: 101.8,
+        close: 102.25,
+      };
+      engine.updateBar(ast, realtimeBar);
+      const sameBarPlots = engine.updateBar(ast, { ...realtimeBar, close: 102.75 });
+      const sameBarTicks = [...sameBarPlots.find((plot) => plot.title === 'Ticks')!.values];
+      const sameBarNew = [...sameBarPlots.find((plot) => plot.title === 'New')!.values];
+      const nextBarPlots = engine.updateBar(ast, {
+        ...realtimeBar,
+        time: realtimeBar.time + 60_000,
+        open: 103,
+        high: 103.5,
+        low: 102.8,
+        close: 103.25,
+      });
+
+      expect(sameBarTicks).toEqual([0, 0, 0, 1]);
+      expect(sameBarNew).toEqual([1, 1, 1, 0]);
+      expect(nextBarPlots.find((plot) => plot.title === 'Ticks')?.values).toEqual([0, 0, 0, 1, 2]);
+      expect(nextBarPlots.find((plot) => plot.title === 'New')?.values).toEqual([1, 1, 1, 0, 1]);
+    });
+
     it('rolls back map mutations between updateBar calls', () => {
       const script = `//@version=6
 indicator("Map Rollback")

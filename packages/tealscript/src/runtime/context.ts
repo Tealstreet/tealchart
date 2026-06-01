@@ -482,15 +482,51 @@ export class ExecutionContext {
    * Update current bar with new data (realtime)
    */
   updateCurrentBar(bar: Bar): void {
+    this.bars[this.bar_index] = bar;
+    this.open.set(bar.open);
     this.high.set(bar.high);
     this.low.set(bar.low);
     this.close.set(bar.close);
     this.volume.set(bar.volume);
+    this.time.set(bar.time);
     this.timenow.set(this.now);
 
     this.barstate.isnew = false;
     this.barstate.isrealtime = true;
     this.barstate.ishistory = false;
+    this.barstate.isconfirmed = false;
+    this.barstate.islastconfirmedhistory = false;
+  }
+
+  /**
+   * Start a new unconfirmed realtime bar.
+   */
+  startRealtimeBar(bar: Bar): void {
+    this.bars.push(bar);
+    this.last_bar_index = this.bars.length - 1;
+    this.bar_index = this.last_bar_index;
+
+    this.open.advance();
+    this.high.advance();
+    this.low.advance();
+    this.close.advance();
+    this.volume.advance();
+    this.time.advance();
+    this.timenow.advance();
+
+    this.open.set(bar.open);
+    this.high.set(bar.high);
+    this.low.set(bar.low);
+    this.close.set(bar.close);
+    this.volume.set(bar.volume);
+    this.time.set(bar.time);
+    this.timenow.set(this.now);
+
+    this.barstate.isfirst = this.bar_index === 0;
+    this.barstate.islast = true;
+    this.barstate.ishistory = false;
+    this.barstate.isrealtime = true;
+    this.barstate.isnew = true;
     this.barstate.isconfirmed = false;
     this.barstate.islastconfirmedhistory = false;
   }

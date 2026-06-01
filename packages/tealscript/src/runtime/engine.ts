@@ -400,6 +400,48 @@ export class TealscriptEngine {
    * Execute for realtime bar update
    */
   updateBar(ast: Program, bar: Bar): PlotOutput[] {
+    const currentBar = this.ctx.getBar(this.ctx.last_bar_index);
+    if (currentBar && bar.time > currentBar.time) {
+      this.scope.commit(false);
+      for (const functionScope of this.functionScopes.values()) {
+        functionScope.commit(false);
+      }
+      this.ctx.commitBar();
+
+      this.scope.advanceBar();
+      for (const functionScope of this.functionScopes.values()) {
+        functionScope.advanceBar();
+      }
+      this.ctx.setNow(Date.now());
+      this.ctx.startRealtimeBar(bar);
+      this.scope.commit(true);
+      for (const functionScope of this.functionScopes.values()) {
+        functionScope.commit(true);
+      }
+      this.ctx.captureRealtimeRollbackState();
+      this.requestEvaluationCache.clear();
+      this.requestContextKeys.clear();
+      this.resetPerBarBuiltinState();
+      this.registerTypeDeclarations(ast);
+      this.registerUserFunctions(ast);
+      this.importedLibraries.clear();
+      this.registerLibraryImports(ast);
+
+      for (const stmt of ast.body) {
+        try {
+          this.executeStatement(stmt);
+        } catch (error) {
+          if (error instanceof RuntimeErrorException) {
+            throw error;
+          }
+          console.error('Execution error:', error);
+        }
+      }
+      this.fillPendingStrategyOrdersForCurrentBar();
+
+      return this.ctx.getPlots();
+    }
+
     // Rollback to last committed state
     this.scope.rollback();
     for (const functionScope of this.functionScopes.values()) {
