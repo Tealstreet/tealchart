@@ -239,7 +239,9 @@ Phases:
    `precision`, `scale`, `timeframe`, `timeframe_gaps`, object limits,
    `explicit_plot_zorder`, `dynamic_requests`, and `behind_chart`.
 2. Complete typed `input.*` definitions: min/max/step, options, confirm,
-   tooltip, group, inline, display, active, and default validation.
+   tooltip, group, inline, display, active, and default validation. Initial
+   parity work now covers `defval=` and `title=` named arguments for generic
+   and typed inputs.
 3. Implement `input.price()` and interactive time/price point inputs if needed
    for chart UX parity.
 4. Support source inputs that can reference another plot or host-provided source

@@ -287,9 +287,11 @@ indicator("Generic inputs")
 length = input(3, "Length")
 enabled = input(true, "Enabled")
 label = input("BTC", "Label")
+namedGeneric = input(defval=4, title="Named Generic")
 plot(ta.sma(close, length), title="Basis")
 plot(enabled, title="Enabled")
 plot(label == "BTC", title="Label")
+plot(namedGeneric == 4, title="Named Generic")
 `);
 
     expect(result.errors).toEqual([]);
@@ -312,10 +314,17 @@ plot(label == "BTC", title="Label")
         title: 'Label',
         defval: 'BTC',
       },
+      {
+        id: 'input_Named Generic',
+        type: 'int',
+        title: 'Named Generic',
+        defval: 4,
+      },
     ]);
     expect(roundSeries(getPlot(result, 'Basis').values)).toEqual([null, null, 104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111]);
     expect(getPlot(result, 'Enabled').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Label').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Named Generic').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
 
   it('matches common Pine global helper named-argument idioms', () => {
@@ -349,20 +358,23 @@ tf = input.timeframe("60", "Timeframe")
 symbol = input.symbol("BINANCE:BTCUSDT", "Symbol")
 session = input.session("0930-1600", "Session")
 memo = input.text_area("watch breakout", "Notes")
+namedPrice = input.price(defval=101.25, title="Named Price")
 plot(start == 1700000000000, title="Time")
 plot(tf == "60", title="Timeframe")
 plot(symbol == "BINANCE:BTCUSDT", title="Symbol")
 plot(session == "0930-1600", title="Session")
 plot(str.contains(memo, "breakout"), title="Text Area")
+plot(namedPrice == 101.25, title="Named Price")
 `);
 
     expect(result.errors).toEqual([]);
-    expect(result.inputs.map((input) => input.type)).toEqual(['time', 'timeframe', 'symbol', 'session', 'text_area']);
+    expect(result.inputs.map((input) => input.type)).toEqual(['time', 'timeframe', 'symbol', 'session', 'text_area', 'price']);
     expect(getPlot(result, 'Time').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Timeframe').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Symbol').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Session').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Text Area').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Named Price').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
 
   it('preserves common input metadata', () => {
