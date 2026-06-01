@@ -888,16 +888,45 @@ class SemanticChecker {
 
   private checkFor(statement: ForStatement, scope: SemanticScope): void {
     const loopScope = new SemanticScope(scope);
-    this.declare(loopScope, { name: statement.counter.name, kind: 'loop', loc: statement.counter.loc });
     if (statement.kind === 'collection') {
+      const iterableType = this.inferExpressionType(statement.iterable, scope);
+      this.declare(loopScope, {
+        name: statement.counter.name,
+        kind: 'loop',
+        type: this.collectionValueType(iterableType),
+        loc: statement.counter.loc,
+      });
       if (statement.indexCounter) {
-        this.declare(loopScope, { name: statement.indexCounter.name, kind: 'loop', loc: statement.indexCounter.loc });
+        this.declare(loopScope, {
+          name: statement.indexCounter.name,
+          kind: 'loop',
+          type: this.collectionIndexType(iterableType),
+          loc: statement.indexCounter.loc,
+        });
       }
       this.checkExpression(statement.iterable, scope);
     } else {
+      this.declare(loopScope, {
+        name: statement.counter.name,
+        kind: 'loop',
+        type: { kind: 'int', qualifier: 'series' },
+        loc: statement.counter.loc,
+      });
       this.checkExpressions(scope, [statement.start, statement.end, statement.step]);
     }
     this.checkStatements(statement.body, loopScope);
+  }
+
+  private collectionValueType(iterableType: SemanticType): SemanticType | undefined {
+    if (iterableType.kind === 'array') return iterableType.elementType;
+    if (iterableType.kind === 'map') return iterableType.valueType;
+    return undefined;
+  }
+
+  private collectionIndexType(iterableType: SemanticType): SemanticType | undefined {
+    if (iterableType.kind === 'array') return { kind: 'int', qualifier: 'series' };
+    if (iterableType.kind === 'map') return iterableType.keyType;
+    return undefined;
   }
 
   private checkWhile(statement: WhileStatement, scope: SemanticScope): void {
