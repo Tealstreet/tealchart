@@ -3123,7 +3123,10 @@ plot(x)`;
 indicator("Math Sum")
 source = bar_index == 2 ? na : close
 plot(math.sum(close, 3), title="Close Sum")
-plot(math.sum(source, 3), title="Sparse Sum")`;
+plot(math.sum(source, 3), title="Sparse Sum")
+dynamicSource = bar_index == 4 ? na : close
+dynamicLength = bar_index < 4 ? 3 : 2
+plot(math.sum(dynamicSource, dynamicLength), title="Dynamic Sparse Sum")`;
 
       const ast = parse(script);
       const bars: Bar[] = [
@@ -3138,6 +3141,13 @@ plot(math.sum(source, 3), title="Sparse Sum")`;
       expect(result.errors).toHaveLength(0);
       expect(result.plots.find((plot) => plot.title === 'Close Sum')?.values).toEqual([null, null, 307, 310, 315]);
       expect(result.plots.find((plot) => plot.title === 'Sparse Sum')?.values).toEqual([null, null, null, 305, 312]);
+      expect(result.plots.find((plot) => plot.title === 'Dynamic Sparse Sum')?.values).toEqual([
+        null,
+        null,
+        307,
+        310,
+        208,
+      ]);
     });
   });
 

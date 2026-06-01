@@ -3059,6 +3059,8 @@ export class TealscriptEngine {
     const history = (scope.get(key) as number[] | undefined) ?? [];
     if (!isNaN(source)) {
       this.prependBoundedHistory(history, source, length);
+    } else if (history.length > length) {
+      history.length = length;
     }
     this.setBuiltinState(scope, key, history);
     return history.length < length ? null : history;
