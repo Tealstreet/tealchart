@@ -44,6 +44,7 @@ function createRecordingContext(events: string[]): CanvasContext {
     fillRect: (x, y, width, height) => events.push(`fillRect:${x},${y},${width},${height}`),
     strokeRect: (x, y, width, height) => events.push(`strokeRect:${x},${y},${width},${height}`),
     fillText: (text, x, y) => {
+      events.push(`font:${context.font}`);
       events.push(`fillTextStyle:${context.textAlign},${context.textBaseline}`);
       events.push(`fillText:${text}:${x},${y}`);
     },
@@ -276,6 +277,45 @@ describe('TealScriptDrawingRenderer', () => {
 
     expect(events).toContain('fillTextStyle:right,bottom');
     expect(events).toContain('fillText:Box:114,124');
+  });
+
+  it('wraps Pine box text with stored alignment and font metadata', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeBox({
+          right: 1,
+          text: 'Alpha Beta Gamma',
+          textHalign: 'center',
+          textValign: 'middle',
+          textWrap: 'auto',
+          textFontFamily: 'monospace',
+        }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).toContain('font:12px monospace');
+    expect(events).toContain('fillTextStyle:center,top');
+    expect(events.some((event) => event.startsWith('fillText:Alpha:'))).toBe(true);
+    expect(events.some((event) => event.startsWith('fillText:Beta:'))).toBe(true);
+    expect(events.some((event) => event.startsWith('fillText:Gamma:'))).toBe(true);
   });
 
   it('renders polyline paths with optional fill when closed', () => {
