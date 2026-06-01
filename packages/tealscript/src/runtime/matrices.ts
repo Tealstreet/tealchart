@@ -627,6 +627,10 @@ function computeEigenvalues(matrix: PineMatrix): number[] {
     if (offDiagonalNorm(rows) <= MATRIX_EPSILON) break;
   }
 
+  if (offDiagonalNorm(rows) > MATRIX_EPSILON) {
+    throw new Error('Matrix eigenvalues are complex or QR iteration did not converge to real diagonal values');
+  }
+
   return rows.map((row, index) => cleanMatrixNumber(row[index]));
 }
 

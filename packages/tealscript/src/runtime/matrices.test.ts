@@ -381,6 +381,10 @@ describe('PineMatrix', () => {
     const rotation = createPineMatrix<number>(2, 2, 0);
     rotation.values = [0, -1, 1, 0];
     expect(() => eigenvaluesMatrixValue(rotation)).toThrow('Matrix eigenvalues are complex and cannot be represented as real values');
+
+    const blockRotation = createPineMatrix<number>(3, 3, 0);
+    blockRotation.values = [0, -1, 0, 1, 0, 0, 0, 0, 2];
+    expect(() => eigenvaluesMatrixValue(blockRotation)).toThrow('Matrix eigenvalues are complex or QR iteration did not converge to real diagonal values');
   });
 
   it('rejects matrix inverses for non-square or singular matrices', () => {
