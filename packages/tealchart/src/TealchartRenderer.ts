@@ -1822,11 +1822,11 @@ export class TealchartRenderer {
     let lastY = 0;
 
     for (let i = 0; i < bars.length && i < values.length; i++) {
-      const bar = bars[i];
       const value = values[i];
+      const plotTime = this.getPlotTime(plot, bars, i);
 
       // Skip bars outside viewport
-      if (bar.time < viewport.startTime || bar.time > viewport.endTime) {
+      if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
         continue;
       }
 
@@ -1841,7 +1841,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(bar.time, viewport, chartWidth);
+      const x = this.timeToX(plotTime, viewport, chartWidth);
       const y = this.priceToY(value, viewport, priceHeight);
 
       // Handle per-bar color if available
@@ -1911,10 +1911,10 @@ export class TealchartRenderer {
     const zeroY = this.priceToY(0, viewport, priceHeight);
 
     for (let i = 0; i < bars.length && i < values.length; i++) {
-      const bar = bars[i];
       const value = values[i];
+      const plotTime = this.getPlotTime(plot, bars, i);
 
-      if (bar.time < viewport.startTime || bar.time > viewport.endTime) {
+      if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
         continue;
       }
 
@@ -1922,7 +1922,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(bar.time, viewport, chartWidth);
+      const x = this.timeToX(plotTime, viewport, chartWidth);
       const y = this.priceToY(value, viewport, priceHeight);
 
       // Use per-bar color if available
@@ -1951,10 +1951,10 @@ export class TealchartRenderer {
     const markerSize = Math.max(3, linewidth * 2);
 
     for (let i = 0; i < bars.length && i < values.length; i++) {
-      const bar = bars[i];
       const value = values[i];
+      const plotTime = this.getPlotTime(plot, bars, i);
 
-      if (bar.time < viewport.startTime || bar.time > viewport.endTime) {
+      if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
         continue;
       }
 
@@ -1962,7 +1962,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(bar.time, viewport, chartWidth);
+      const x = this.timeToX(plotTime, viewport, chartWidth);
       const y = this.priceToY(value, viewport, priceHeight);
       const markerColor = Array.isArray(color) && color[i] ? color[i] : baseColor;
 
@@ -2010,6 +2010,14 @@ export class TealchartRenderer {
     }
     const slotWidth = barInterval * (chartWidth / viewportTimeRange);
     return Number.isFinite(slotWidth) && slotWidth > 0 ? slotWidth : fallbackWidth;
+  }
+
+  private getPlotTime(plot: Pick<PlotOutput, 'offset'>, bars: Bar[], index: number): number {
+    const bar = bars[index];
+    if (!bar) return NaN;
+    const offset = plot.offset ?? 0;
+    if (offset === 0 || bars.length < 2) return bar.time;
+    return bar.time + offset * (bars[1].time - bars[0].time);
   }
 
   private renderOhlcPlotInLegacyMainPane(plot: PlotOutput, bars: Bar[], viewport: Viewport): void {
@@ -2125,10 +2133,10 @@ export class TealchartRenderer {
     let lastX = 0;
 
     for (let i = 0; i < bars.length && i < values.length; i++) {
-      const bar = bars[i];
       const value = values[i];
+      const plotTime = this.getPlotTime(plot, bars, i);
 
-      if (bar.time < viewport.startTime || bar.time > viewport.endTime) {
+      if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
         continue;
       }
 
@@ -2136,7 +2144,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(bar.time, viewport, chartWidth);
+      const x = this.timeToX(plotTime, viewport, chartWidth);
       const y = this.priceToY(value, viewport, priceHeight);
 
       if (!started) {
@@ -2318,10 +2326,9 @@ export class TealchartRenderer {
     const volumeHeight = options.showVolume ? chartHeight * options.volumeHeight : 0;
     const priceHeight = chartHeight - volumeHeight;
 
-    const { values, color, location = 'abovebar', shape = 'circle', size = 'small', offset = 0 } = plot;
+    const { values, color, location = 'abovebar', shape = 'circle', size = 'small' } = plot;
     const baseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
     const textColor = Array.isArray(plot.textColor) ? plot.textColor[0] || '#FFFFFF' : plot.textColor || '#FFFFFF';
-    const barInterval = bars.length >= 2 ? bars[1].time - bars[0].time : 0;
 
     // Size mapping
     const sizeMap: Record<string, number> = {
@@ -2337,8 +2344,9 @@ export class TealchartRenderer {
     for (let i = 0; i < bars.length && i < values.length; i++) {
       const bar = bars[i];
       const value = values[i];
+      const plotTime = this.getPlotTime(plot, bars, i);
 
-      if (bar.time < viewport.startTime || bar.time > viewport.endTime) {
+      if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
         continue;
       }
 
@@ -2347,7 +2355,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(bar.time + offset * barInterval, viewport, chartWidth);
+      const x = this.timeToX(plotTime, viewport, chartWidth);
       const effectiveLocation =
         plot.type === 'plotarrow'
           ? value > 0
@@ -3745,10 +3753,10 @@ export class TealchartRenderer {
     let lastY = 0;
 
     for (let i = 0; i < bars.length && i < values.length; i++) {
-      const bar = bars[i];
       const value = values[i];
+      const plotTime = this.getPlotTime(plot, bars, i);
 
-      if (bar.time < viewport.startTime || bar.time > viewport.endTime) continue;
+      if (plotTime < viewport.startTime || plotTime > viewport.endTime) continue;
 
       if (value === null || value === undefined || isNaN(value)) {
         if (isDrawing) {
@@ -3759,7 +3767,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(bar.time, viewport, chartWidth);
+      const x = this.timeToX(plotTime, viewport, chartWidth);
       const y = this.valueToY(value, pane);
 
       // Handle per-bar colors (only if no override is set)
@@ -3843,13 +3851,13 @@ export class TealchartRenderer {
     const zeroY = this.valueToY(0, pane);
 
     for (let i = 0; i < bars.length && i < values.length; i++) {
-      const bar = bars[i];
       const value = values[i];
+      const plotTime = this.getPlotTime(plot, bars, i);
 
-      if (bar.time < viewport.startTime || bar.time > viewport.endTime) continue;
+      if (plotTime < viewport.startTime || plotTime > viewport.endTime) continue;
       if (value === null || value === undefined || isNaN(value)) continue;
 
-      const x = this.timeToX(bar.time, viewport, chartWidth);
+      const x = this.timeToX(plotTime, viewport, chartWidth);
       const y = this.valueToY(value, pane);
 
       // Get color - prefer override, then per-bar color, then base color
@@ -4409,10 +4417,10 @@ export class TealchartRenderer {
     let lastY = 0;
 
     for (let i = 0; i < bars.length && i < values.length; i++) {
-      const bar = bars[i];
       const value = values[i];
+      const plotTime = this.getPlotTime(plot, bars, i);
 
-      if (bar.time < viewport.startTime || bar.time > viewport.endTime) {
+      if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
         continue;
       }
 
@@ -4425,7 +4433,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(bar.time, viewport, chartWidth);
+      const x = this.timeToX(plotTime, viewport, chartWidth);
       const y = this.valueToPaneY(value, paneOffset);
 
       if (Array.isArray(color) && color[i]) {
@@ -4484,10 +4492,10 @@ export class TealchartRenderer {
     const zeroY = this.valueToPaneY(0, paneOffset);
 
     for (let i = 0; i < bars.length && i < values.length; i++) {
-      const bar = bars[i];
       const value = values[i];
+      const plotTime = this.getPlotTime(plot, bars, i);
 
-      if (bar.time < viewport.startTime || bar.time > viewport.endTime) {
+      if (plotTime < viewport.startTime || plotTime > viewport.endTime) {
         continue;
       }
 
@@ -4495,7 +4503,7 @@ export class TealchartRenderer {
         continue;
       }
 
-      const x = this.timeToX(bar.time, viewport, chartWidth);
+      const x = this.timeToX(plotTime, viewport, chartWidth);
       const y = this.valueToPaneY(value, paneOffset);
 
       const barColor = Array.isArray(color) && color[i] ? color[i] : baseColor;

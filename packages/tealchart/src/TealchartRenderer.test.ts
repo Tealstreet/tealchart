@@ -392,6 +392,73 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(setLineDash).toHaveBeenLastCalledWith([]);
       expect(stroke).toHaveBeenCalled();
     });
+
+    it('applies plot offset metadata on line plot x positions', () => {
+      const moveTo = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        moveTo,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const plots: PlotOutput[] = [
+        {
+          id: 'plot_Offset',
+          type: 'plot',
+          title: 'Offset',
+          values: [100, 110, 120],
+          color: '#2196F3',
+          offset: 1,
+        },
+      ];
+
+      renderer.renderPlots(plots, bars, viewport);
+
+      const opts = renderer.getOptions();
+      const chartWidth = opts.width - opts.margins.left;
+      const expectedX = opts.margins.left + ((bars[1]!.time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth;
+      expect(moveTo).toHaveBeenCalledWith(expectedX, expect.any(Number));
+    });
+
+    it('applies plot offset metadata on point marker positions', () => {
+      const arc = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        arc,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const plots: PlotOutput[] = [
+        {
+          id: 'plot_Circles',
+          type: 'plot',
+          title: 'Circles',
+          values: [100, null, null],
+          color: '#2196F3',
+          style: 'circles',
+          offset: 1,
+        },
+      ];
+
+      renderer.renderPlots(plots, bars, viewport);
+
+      const opts = renderer.getOptions();
+      const chartWidth = opts.width - opts.margins.left;
+      const expectedX = opts.margins.left + ((bars[1]!.time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth;
+      expect(arc).toHaveBeenCalledWith(expectedX, expect.any(Number), expect.any(Number), 0, Math.PI * 2);
+    });
   });
 
   describe('Pine OHLC plot rendering', () => {
