@@ -814,6 +814,10 @@ if barstate.islast
     table.cell_set_text(stats, 1, 0, "last")
     table.cell_set_bgcolor(stats, 1, 0, color.green)
     table.cell_set_text_color(stats, 1, 0, color.black)
+    table.cell_set_width(stats, 1, 0, 72)
+    table.cell_set_height(stats, 1, 0, 28)
+    table.cell_set_text_halign(stats, 1, 0, text.align_center)
+    table.cell_set_text_valign(stats, 1, 0, text.align_bottom)
     table.cell_set_text(stats, 0, 1, "created")
 plot(close)`;
 
@@ -853,11 +857,11 @@ plot(close)`;
               column: 1,
               row: 0,
               text: 'last',
-              width: undefined,
-              height: undefined,
+              width: 72,
+              height: 28,
               textColor: '#000000',
-              textHalign: 'right',
-              textValign: 'middle',
+              textHalign: 'center',
+              textValign: 'bottom',
               textSize: 'large',
               bgcolor: '#4CAF50',
             },
