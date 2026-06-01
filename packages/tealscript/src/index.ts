@@ -147,6 +147,8 @@ export {
   type SemanticDiagnosticSeverity,
   type SemanticSymbol,
   type SemanticSymbolKind,
+  type SemanticType,
+  type SemanticTypeKind,
 } from './semantic';
 
 // Worker
