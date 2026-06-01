@@ -693,7 +693,7 @@ class SemanticChecker {
     if (annotation.baseType === 'map') {
       this.checkTemplateTypeName(annotation.keyType, 'map key', loc ?? annotation.loc);
       this.checkTemplateTypeName(annotation.valueType, 'map value', loc ?? annotation.loc);
-      if (!MAP_KEY_TYPE_NAMES.has(annotation.keyType)) {
+      if (!TYPE_QUALIFIER_NAMES.has(annotation.keyType) && !MAP_KEY_TYPE_NAMES.has(annotation.keyType)) {
         this.addDiagnostic('invalid-type-template', `Map key type must be int, float, bool, string, or color in ${owner}`, loc ?? annotation.loc);
       }
     }

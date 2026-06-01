@@ -132,6 +132,7 @@ array<series> invalidArray = array.new_float()
 matrix<input> invalidMatrix = matrix.new_int()
 map<label, float> invalidKey = map.new<label, float>()
 map<string, series> invalidValue = map.new<string, float>()
+map<const, float> qualifierKey = map.new<string, float>()
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -139,6 +140,7 @@ map<string, series> invalidValue = map.new<string, float>()
       "Invalid matrix element type 'input'; qualifiers cannot be used as template types",
       'Map key type must be int, float, bool, string, or color in variable declaration',
       "Invalid map value type 'series'; qualifiers cannot be used as template types",
+      "Invalid map key type 'const'; qualifiers cannot be used as template types",
     ]);
   });
 
