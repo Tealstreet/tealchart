@@ -402,6 +402,10 @@ export class TealscriptEngine {
   updateBar(ast: Program, bar: Bar): PlotOutput[] {
     const currentBar = this.ctx.getBar(this.ctx.last_bar_index);
     if (currentBar && bar.time > currentBar.time) {
+      if (this.ctx.barstate.isrealtime && !this.ctx.barstate.isconfirmed) {
+        this.executeConfirmedRealtimeClose(ast, currentBar);
+      }
+
       this.scope.commit(false);
       for (const functionScope of this.functionScopes.values()) {
         functionScope.commit(false);
@@ -419,27 +423,13 @@ export class TealscriptEngine {
         functionScope.commit(true);
       }
       this.ctx.captureRealtimeRollbackState();
-      this.requestEvaluationCache.clear();
-      this.requestContextKeys.clear();
-      this.resetPerBarBuiltinState();
-      this.registerTypeDeclarations(ast);
-      this.registerUserFunctions(ast);
-      this.importedLibraries.clear();
-      this.registerLibraryImports(ast);
-
-      for (const stmt of ast.body) {
-        try {
-          this.executeStatement(stmt);
-        } catch (error) {
-          if (error instanceof RuntimeErrorException) {
-            throw error;
-          }
-          console.error('Execution error:', error);
-        }
-      }
-      this.fillPendingStrategyOrdersForCurrentBar();
+      this.prepareRealtimeExecution(ast);
+      this.executeRealtimeStatements(ast);
 
       return this.ctx.getPlots();
+    }
+    if (currentBar && bar.time < currentBar.time) {
+      throw new Error(`Out-of-order bar update: ${bar.time} < ${currentBar.time}`);
     }
 
     // Rollback to last committed state
@@ -462,13 +452,43 @@ export class TealscriptEngine {
 
     // Update current bar data
     this.ctx.updateCurrentBar(bar);
+    this.prepareRealtimeExecution(ast);
+
+    // Re-execute statements for current bar
+    this.executeRealtimeStatements(ast);
+
+    return this.ctx.getPlots();
+  }
+
+  private executeConfirmedRealtimeClose(ast: Program, bar: Bar): void {
+    this.scope.rollback();
+    for (const functionScope of this.functionScopes.values()) {
+      functionScope.rollback();
+    }
+    this.ctx.rollbackBar();
+    this.ctx.bar_index = this.ctx.last_bar_index;
+    this.ctx.setNow(Date.now());
+    this.ctx.truncatePlots(this.ctx.last_bar_index);
+    this.ctx.truncateDrawings(this.ctx.last_bar_index);
+    this.ctx.truncateAlerts(this.ctx.last_bar_index);
+    this.ctx.truncateLogs(this.ctx.last_bar_index);
+    this.ctx.updateCurrentBar(bar);
+    this.ctx.confirmCurrentRealtimeBar();
+    this.prepareRealtimeExecution(ast);
+    this.executeRealtimeStatements(ast);
+  }
+
+  private prepareRealtimeExecution(ast: Program): void {
+    this.requestEvaluationCache.clear();
+    this.requestContextKeys.clear();
     this.resetPerBarBuiltinState();
     this.registerTypeDeclarations(ast);
     this.registerUserFunctions(ast);
     this.importedLibraries.clear();
     this.registerLibraryImports(ast);
+  }
 
-    // Re-execute statements for current bar
+  private executeRealtimeStatements(ast: Program): void {
     for (const stmt of ast.body) {
       try {
         this.executeStatement(stmt);
@@ -481,8 +501,6 @@ export class TealscriptEngine {
       }
     }
     this.fillPendingStrategyOrdersForCurrentBar();
-
-    return this.ctx.getPlots();
   }
 
   /**

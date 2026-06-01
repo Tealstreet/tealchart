@@ -499,6 +499,17 @@ export class ExecutionContext {
   }
 
   /**
+   * Mark the current realtime bar as confirmed for its closing update.
+   */
+  confirmCurrentRealtimeBar(): void {
+    this.barstate.isnew = false;
+    this.barstate.isrealtime = true;
+    this.barstate.ishistory = false;
+    this.barstate.isconfirmed = true;
+    this.barstate.islastconfirmedhistory = false;
+  }
+
+  /**
    * Start a new unconfirmed realtime bar.
    */
   startRealtimeBar(bar: Bar): void {

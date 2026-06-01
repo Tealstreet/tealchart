@@ -3909,6 +3909,57 @@ plot(barstate.isnew ? 1 : 0, title="New")`;
       expect(nextBarPlots.find((plot) => plot.title === 'New')?.values).toEqual([1, 1, 1, 0, 1]);
     });
 
+    it('rejects out-of-order realtime bars', () => {
+      const script = `//@version=6
+indicator("Out Of Order")
+plot(close, title="Close")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+
+      engine.execute(ast, bars);
+
+      expect(() => engine.updateBar(ast, { ...bars[1], close: 999 })).toThrow('Out-of-order bar update');
+    });
+
+    it('evaluates a closing realtime bar as confirmed before opening the next bar', () => {
+      const script = `//@version=6
+indicator("Realtime Close")
+plot(barstate.isconfirmed ? close : na, title="Confirmed Close")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+
+      engine.execute(ast, bars);
+      const realtimeBar = {
+        ...bars[2],
+        time: bars[2].time + 60_000,
+        open: 102,
+        high: 102.5,
+        low: 101.8,
+        close: 102.25,
+      };
+      engine.updateBar(ast, realtimeBar);
+      const plots = engine.updateBar(ast, {
+        ...realtimeBar,
+        time: realtimeBar.time + 60_000,
+        open: 103,
+        high: 103.5,
+        low: 102.8,
+        close: 103.25,
+      });
+
+      expect(plots.find((plot) => plot.title === 'Confirmed Close')?.values).toEqual([
+        100.2,
+        100.7,
+        101.2,
+        102.25,
+        null,
+      ]);
+    });
+
     it('rolls back map mutations between updateBar calls', () => {
       const script = `//@version=6
 indicator("Map Rollback")
