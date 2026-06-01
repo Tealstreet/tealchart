@@ -445,6 +445,7 @@ class SemanticChecker {
     this.diagnostics = [];
     this.rootScope = new SemanticScope();
     this.typeDeclarations = new Map();
+    this.checkLibraryExportDeclarations(program.body);
     this.checkStatements(program.body, this.rootScope);
     return {
       diagnostics: this.diagnostics,
@@ -455,6 +456,50 @@ class SemanticChecker {
   private checkStatements(statements: Statement[], scope: SemanticScope): void {
     for (const statement of statements) {
       this.checkStatement(statement, scope);
+    }
+  }
+
+  private checkLibraryExportDeclarations(statements: Statement[]): void {
+    const libraryDeclaration = statements.find((statement) => statement.type === 'LibraryDeclaration');
+    const exportedDeclarations = statements.filter(
+      (statement): statement is FunctionDeclaration | TypeDeclaration =>
+        (statement.type === 'FunctionDeclaration' || statement.type === 'TypeDeclaration') && !!statement.exported,
+    );
+
+    if (libraryDeclaration && exportedDeclarations.length === 0) {
+      this.addDiagnostic(
+        'library-export',
+        'Library scripts must export at least one function, method, or user-defined type',
+        libraryDeclaration.loc,
+      );
+    }
+
+    if (!libraryDeclaration) {
+      for (const declaration of exportedDeclarations) {
+        this.addDiagnostic(
+          'library-export',
+          `Exported declarations are only allowed in library scripts: ${declaration.name.name}`,
+          declaration.name.loc,
+        );
+      }
+      return;
+    }
+
+    for (const declaration of exportedDeclarations) {
+      if (declaration.type !== 'FunctionDeclaration') continue;
+      this.checkExportedFunctionParameters(declaration);
+    }
+  }
+
+  private checkExportedFunctionParameters(declaration: FunctionDeclaration): void {
+    const declarationKind = declaration.isMethod ? 'method' : 'function';
+    for (const parameter of declaration.params) {
+      if (parameter.typeAnnotation) continue;
+      this.addDiagnostic(
+        'library-export',
+        `Exported ${declarationKind} ${declaration.name.name} parameter ${parameter.name} must declare a type`,
+        parameter.loc,
+      );
     }
   }
 
