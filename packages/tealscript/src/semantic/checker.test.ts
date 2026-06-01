@@ -387,6 +387,39 @@ for i = 0 to 2
     ]);
   });
 
+  it('infers array element read types', () => {
+    const result = checkProgram(parse(`
+indicator("Array Read Types")
+prices = array.new_float()
+ints = array.new_int()
+fromIndex = prices[0]
+fromGet = prices.get(0)
+fromFirst = array.first(prices)
+fromLast = prices.last()
+fromRemove = prices.remove(0)
+ints.push(fromIndex)
+ints.push(fromGet)
+ints.push(fromFirst)
+ints.push(fromLast)
+ints.push(fromRemove)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(types.get('fromIndex')).toMatchObject({ kind: 'float' });
+    expect(types.get('fromGet')).toMatchObject({ kind: 'float' });
+    expect(types.get('fromFirst')).toMatchObject({ kind: 'float' });
+    expect(types.get('fromLast')).toMatchObject({ kind: 'float' });
+    expect(types.get('fromRemove')).toMatchObject({ kind: 'float' });
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot use float value as int array element',
+      'Cannot use float value as int array element',
+      'Cannot use float value as int array element',
+      'Cannot use float value as int array element',
+      'Cannot use float value as int array element',
+    ]);
+  });
+
   it('infers simple literal and array expression types', () => {
     const result = checkProgram(parse(`
 indicator("Inferred Symbols")
