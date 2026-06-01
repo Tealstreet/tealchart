@@ -264,10 +264,49 @@ export class TealScriptDrawingRenderer {
       ctx.moveTo(extended.start.x, extended.start.y);
       ctx.lineTo(extended.end.x, extended.end.y);
       ctx.stroke();
+
+      if (line.style === 'arrow_left' || line.style === 'arrow_both') {
+        ctx.setLineDash([]);
+        this.drawLineArrowhead(extended.start, extended.end, Math.max(1, line.width), line.color ?? '#2962FF');
+      }
+      if (line.style === 'arrow_right' || line.style === 'arrow_both') {
+        ctx.setLineDash([]);
+        this.drawLineArrowhead(extended.end, extended.start, Math.max(1, line.width), line.color ?? '#2962FF');
+      }
     }
 
     ctx.setLineDash([]);
     ctx.restore();
+  }
+
+  private drawLineArrowhead(
+    tip: { x: number; y: number },
+    tail: { x: number; y: number },
+    width: number,
+    color: string,
+  ): void {
+    const dx = tip.x - tail.x;
+    const dy = tip.y - tail.y;
+    const length = Math.hypot(dx, dy);
+    if (length === 0) return;
+
+    const unitX = dx / length;
+    const unitY = dy / length;
+    const size = Math.max(8, width * 4);
+    const halfWidth = size * 0.42;
+    const baseX = tip.x - unitX * size;
+    const baseY = tip.y - unitY * size;
+    const perpX = -unitY;
+    const perpY = unitX;
+
+    const { ctx } = this;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(tip.x, tip.y);
+    ctx.lineTo(baseX + perpX * halfWidth, baseY + perpY * halfWidth);
+    ctx.lineTo(baseX - perpX * halfWidth, baseY - perpY * halfWidth);
+    ctx.closePath();
+    ctx.fill();
   }
 
   private renderPolylineDrawings(

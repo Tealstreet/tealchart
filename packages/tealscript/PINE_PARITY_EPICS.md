@@ -391,6 +391,7 @@ Phases:
    geometry, GC limits, realtime rollback parity, and remaining renderer details
    after the current constructor, mutation, copy/delete, handle validation, and
    basic renderer support.
+   Renderer coverage now draws Pine line arrowhead styles.
 5. Complete `box.*` and implement `polyline.*`: finish box text/layout,
    `chart.point` overloads, GC limits, realtime rollback parity, and add
    polyline lifecycle plus renderer support.
