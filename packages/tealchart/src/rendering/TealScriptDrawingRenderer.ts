@@ -19,6 +19,16 @@ export interface TealScriptDrawingRendererOptions {
   getTextWidth(ctx: CanvasContext, text: string, font: string): number;
 }
 
+interface ResolvedLabelLayout {
+  bodyX: number;
+  bodyY: number;
+  bodyWidth: number;
+  bodyHeight: number;
+  textX: number;
+  textY: number;
+  textAlign: CanvasTextAlign;
+}
+
 export class TealScriptDrawingRenderer {
   private ctx: CanvasContext;
   private options: RenderOptions;
@@ -395,45 +405,210 @@ export class TealScriptDrawingRenderer {
       const font = `${this.fontSizeForDrawing(label.size)}px ${this.font}`;
       ctx.font = font;
       const width = Math.max(18, this.getTextWidth(ctx, text, font) + paddingX * 2);
-      const radius = 4;
       const fillColor = label.color ?? '#1f2937';
       const textColor = label.textColor ?? '#FFFFFF';
 
-      let x = position.x;
-      let y = position.y;
+      const layout = this.resolveLabelLayout(label.style, position, width, height, margins.left, options.width - margins.right, pane);
 
-      if (label.style.includes('right')) {
-        x -= width;
-      } else if (!label.style.includes('left')) {
-        x -= width / 2;
+      if (label.style !== 'none') {
+        ctx.fillStyle = fillColor;
+        this.drawLabelBody(label.style, layout, position);
       }
-
-      if (label.style.includes('down') || label.yloc === 'abovebar') {
-        y -= height + 6;
-      } else if (label.style.includes('up') || label.yloc === 'belowbar') {
-        y += 6;
-      } else {
-        y -= height / 2;
-      }
-
-      const minX = margins.left;
-      const maxX = options.width - margins.right - width;
-      const minY = pane.top;
-      const maxY = pane.bottom - height;
-      x = Math.min(maxX, Math.max(minX, x));
-      y = Math.min(maxY, Math.max(minY, y));
-
-      ctx.fillStyle = fillColor;
-      ctx.beginPath();
-      ctx.roundRect(x, y, width, height, radius);
-      ctx.fill();
 
       ctx.fillStyle = textColor;
-      ctx.textAlign = 'left';
-      ctx.fillText(text, x + paddingX, y + height / 2);
+      ctx.textAlign = layout.textAlign;
+      ctx.fillText(text, layout.textX, layout.textY);
     }
 
     ctx.restore();
+  }
+
+  private resolveLabelLayout(
+    style: string,
+    anchor: { x: number; y: number },
+    width: number,
+    height: number,
+    minX: number,
+    maxX: number,
+    pane: ComputedPane,
+  ): ResolvedLabelLayout {
+    const paddingX = 8;
+    const gap = 6;
+    const isSymbol = this.isSymbolLabelStyle(style);
+    const bodyWidth = isSymbol ? height : width;
+    let bodyX = anchor.x;
+    let bodyY = anchor.y;
+
+    if (style.includes('right')) {
+      bodyX -= bodyWidth;
+    } else if (!style.includes('left')) {
+      bodyX -= bodyWidth / 2;
+    }
+
+    if (style.includes('down') || style.includes('upper') || style === 'arrowdown' || anchor.y <= pane.top) {
+      bodyY -= height + gap;
+    } else if (style.includes('up') || style.includes('lower') || style === 'arrowup') {
+      bodyY += gap;
+    } else {
+      bodyY -= height / 2;
+    }
+
+    bodyX = Math.min(maxX - bodyWidth, Math.max(minX, bodyX));
+    bodyY = Math.min(pane.bottom - height, Math.max(pane.top, bodyY));
+
+    if (isSymbol) {
+      return {
+        bodyX,
+        bodyY,
+        bodyWidth,
+        bodyHeight: height,
+        textX: style === 'none' ? anchor.x : bodyX + bodyWidth + paddingX,
+        textY: bodyY + height / 2,
+        textAlign: 'left',
+      };
+    }
+
+    return {
+      bodyX,
+      bodyY,
+      bodyWidth,
+      bodyHeight: height,
+      textX: style === 'none' ? anchor.x : bodyX + paddingX,
+      textY: style === 'none' ? anchor.y : bodyY + height / 2,
+      textAlign: 'left',
+    };
+  }
+
+  private isSymbolLabelStyle(style: string): boolean {
+    return [
+      'circle',
+      'square',
+      'diamond',
+      'cross',
+      'xcross',
+      'triangleup',
+      'triangledown',
+      'flag',
+      'arrowup',
+      'arrowdown',
+    ].includes(style);
+  }
+
+  private drawLabelBody(style: string, layout: ResolvedLabelLayout, anchor: { x: number; y: number }): void {
+    if (this.isSymbolLabelStyle(style)) {
+      this.drawSymbolLabelBody(style, layout);
+      return;
+    }
+
+    const { ctx } = this;
+    const radius = 4;
+    ctx.beginPath();
+    ctx.roundRect(layout.bodyX, layout.bodyY, layout.bodyWidth, layout.bodyHeight, radius);
+    ctx.fill();
+
+    this.drawLabelPointer(style, layout, anchor);
+  }
+
+  private drawLabelPointer(style: string, layout: ResolvedLabelLayout, anchor: { x: number; y: number }): void {
+    const { ctx } = this;
+    const centerX = layout.bodyX + layout.bodyWidth / 2;
+    const centerY = layout.bodyY + layout.bodyHeight / 2;
+    const pointerSize = 6;
+    const pointsUp = style === 'label_up' || style.includes('lower') || style === 'arrowup';
+    const pointsDown = style === 'label_down' || style.includes('upper') || style === 'arrowdown';
+
+    ctx.beginPath();
+    if (pointsUp) {
+      ctx.moveTo(centerX - pointerSize, layout.bodyY);
+      ctx.lineTo(centerX + pointerSize, layout.bodyY);
+      ctx.lineTo(anchor.x, anchor.y);
+    } else if (pointsDown) {
+      ctx.moveTo(centerX - pointerSize, layout.bodyY + layout.bodyHeight);
+      ctx.lineTo(centerX + pointerSize, layout.bodyY + layout.bodyHeight);
+      ctx.lineTo(anchor.x, anchor.y);
+    } else if (style.includes('left')) {
+      ctx.moveTo(layout.bodyX + layout.bodyWidth, centerY - pointerSize);
+      ctx.lineTo(layout.bodyX + layout.bodyWidth, centerY + pointerSize);
+      ctx.lineTo(anchor.x, anchor.y);
+    } else if (style.includes('right')) {
+      ctx.moveTo(layout.bodyX, centerY - pointerSize);
+      ctx.lineTo(layout.bodyX, centerY + pointerSize);
+      ctx.lineTo(anchor.x, anchor.y);
+    } else {
+      return;
+    }
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  private drawSymbolLabelBody(style: string, layout: ResolvedLabelLayout): void {
+    const { ctx } = this;
+    const centerX = layout.bodyX + layout.bodyWidth / 2;
+    const centerY = layout.bodyY + layout.bodyHeight / 2;
+    const size = Math.min(layout.bodyWidth, layout.bodyHeight);
+    const radius = size / 2;
+
+    ctx.strokeStyle = `${ctx.fillStyle}`;
+    ctx.lineWidth = Math.max(1, size * 0.14);
+    ctx.beginPath();
+    switch (style) {
+      case 'circle':
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.fill();
+        return;
+      case 'square':
+        ctx.rect(layout.bodyX, layout.bodyY, size, size);
+        ctx.fill();
+        return;
+      case 'diamond':
+        ctx.moveTo(centerX, layout.bodyY);
+        ctx.lineTo(layout.bodyX + size, centerY);
+        ctx.lineTo(centerX, layout.bodyY + size);
+        ctx.lineTo(layout.bodyX, centerY);
+        ctx.closePath();
+        ctx.fill();
+        return;
+      case 'triangleup':
+      case 'arrowup':
+        ctx.moveTo(centerX, layout.bodyY);
+        ctx.lineTo(layout.bodyX + size, layout.bodyY + size);
+        ctx.lineTo(layout.bodyX, layout.bodyY + size);
+        ctx.closePath();
+        ctx.fill();
+        return;
+      case 'triangledown':
+      case 'arrowdown':
+        ctx.moveTo(layout.bodyX, layout.bodyY);
+        ctx.lineTo(layout.bodyX + size, layout.bodyY);
+        ctx.lineTo(centerX, layout.bodyY + size);
+        ctx.closePath();
+        ctx.fill();
+        return;
+      case 'flag':
+        ctx.rect(layout.bodyX, layout.bodyY, size * 0.75, size * 0.55);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.rect(layout.bodyX, layout.bodyY, Math.max(1, size * 0.12), size);
+        ctx.fill();
+        return;
+      case 'cross':
+        ctx.moveTo(centerX, layout.bodyY);
+        ctx.lineTo(centerX, layout.bodyY + size);
+        ctx.moveTo(layout.bodyX, centerY);
+        ctx.lineTo(layout.bodyX + size, centerY);
+        ctx.stroke();
+        return;
+      case 'xcross':
+        ctx.moveTo(layout.bodyX, layout.bodyY);
+        ctx.lineTo(layout.bodyX + size, layout.bodyY + size);
+        ctx.moveTo(layout.bodyX + size, layout.bodyY);
+        ctx.lineTo(layout.bodyX, layout.bodyY + size);
+        ctx.stroke();
+        return;
+      default:
+        ctx.roundRect(layout.bodyX, layout.bodyY, layout.bodyWidth, layout.bodyHeight, 4);
+        ctx.fill();
+    }
   }
 
   private renderTableDrawings(tables: TealScriptDrawingPartition['tables'], pane: ComputedPane): void {

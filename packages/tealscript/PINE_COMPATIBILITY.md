@@ -320,9 +320,10 @@ heavier canvas dependency.
 The drawing object pass covers shared runtime storage, handle IDs, per-type
 limits, oldest-first garbage collection, realtime rollback for persistent
 objects, `chart.point` constructors, and core `label`, `line`, `linefill`,
-`box`, `polyline`, and `table` lifecycles. Line renderer coverage now draws Pine
-`line.style_arrow_left`, `line.style_arrow_right`, and `line.style_arrow_both`
-arrowheads.
+`box`, `polyline`, and `table` lifecycles. Label renderer coverage now handles
+Pine text-only, directional label, and symbol label styles. Line renderer
+coverage now draws Pine `line.style_arrow_left`, `line.style_arrow_right`, and
+`line.style_arrow_both` arrowheads.
 
 ## Common OHLC Plot Coverage
 
@@ -443,8 +444,11 @@ drawing output. The label mutation pass covers persistent `var` label handles,
 `get_yloc`, `get_text`, `get_style`, `get_color`, `get_textcolor`,
 `get_size`, `get_tooltip`), `label.copy()`, and `label.delete()`. Rendering
 routes labels to the script pane: overlay scripts use the main pane, non-overlay
-scripts use their indicator pane. GC limits, full style parity, and realtime
-rollback parity remain planned.
+scripts use their indicator pane. Renderer coverage handles text-only
+`label.style_none`, directional label bodies, and common symbol bodies including
+circle, square, diamond, cross, xcross, triangle, flag, and arrow styles. GC
+limits and realtime rollback parity are covered by the shared drawing store;
+remaining gaps are TradingView-exact pixel geometry and edge-case style parity.
 
 The line drawing pass covers common trendline/channel idioms. `line.new()`
 accepts positional or named `x1`, `y1`, `x2`, and `y2` arguments plus common
