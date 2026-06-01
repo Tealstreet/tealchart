@@ -489,6 +489,12 @@ class SemanticChecker {
       if (declaration.type !== 'FunctionDeclaration') continue;
       this.checkExportedFunctionParameters(declaration);
     }
+
+    const globalVariableQualifiers = this.collectGlobalVariableQualifiers(statements);
+    for (const declaration of exportedDeclarations) {
+      if (declaration.type !== 'FunctionDeclaration') continue;
+      this.checkExportedFunctionScope(declaration, globalVariableQualifiers);
+    }
   }
 
   private checkExportedFunctionParameters(declaration: FunctionDeclaration): void {
@@ -501,6 +507,190 @@ class SemanticChecker {
         parameter.loc,
       );
     }
+  }
+
+  private collectGlobalVariableQualifiers(statements: Statement[]): Map<string, SemanticQualifier | undefined> {
+    const globals = new Map<string, SemanticQualifier | undefined>();
+    for (const statement of statements) {
+      if (statement.type !== 'VariableDeclaration') continue;
+      const type = this.typeFromAnnotation(statement.typeAnnotation);
+      for (const name of this.declaredNames(statement)) {
+        globals.set(name, type?.qualifier);
+      }
+    }
+    return globals;
+  }
+
+  private checkExportedFunctionScope(declaration: FunctionDeclaration, globalVariableQualifiers: Map<string, SemanticQualifier | undefined>): void {
+    const functionLocals = new Set<string>(declaration.params.map((parameter) => parameter.name));
+    const reportedGlobals = new Set<string>();
+    let reportedInputCall = false;
+    const declarationKind = declaration.isMethod ? 'method' : 'function';
+
+    const visitExpression = (expression: Expression, localNames: Set<string>): void => {
+      if (expression.type === 'Identifier') {
+        const qualifier = globalVariableQualifiers.get(expression.name);
+        if (globalVariableQualifiers.has(expression.name) && qualifier !== 'const' && !localNames.has(expression.name) && !reportedGlobals.has(expression.name)) {
+          reportedGlobals.add(expression.name);
+          this.addDiagnostic(
+            'library-export',
+            `Exported ${declarationKind} ${declaration.name.name} cannot use non-const global variable: ${expression.name}`,
+            expression.loc,
+          );
+        }
+        return;
+      }
+
+      if (expression.type === 'CallExpression') {
+        const calleePath = this.memberPath(expression.callee);
+        if (calleePath[0] === 'input' && !reportedInputCall) {
+          reportedInputCall = true;
+          this.addDiagnostic(
+            'library-export',
+            `Exported ${declarationKind} ${declaration.name.name} cannot call input.*() functions`,
+            expression.callee.loc,
+          );
+        }
+        visitExpression(expression.callee, localNames);
+        for (const argument of expression.arguments) visitExpression(argument.value, localNames);
+        return;
+      }
+
+      switch (expression.type) {
+        case 'NumericLiteral':
+        case 'StringLiteral':
+        case 'BooleanLiteral':
+        case 'ColorLiteral':
+        case 'NaExpression':
+          return;
+        case 'BinaryExpression':
+          visitExpression(expression.left, localNames);
+          visitExpression(expression.right, localNames);
+          return;
+        case 'UnaryExpression':
+          visitExpression(expression.argument, localNames);
+          return;
+        case 'ConditionalExpression':
+          visitExpression(expression.test, localNames);
+          visitExpression(expression.consequent, localNames);
+          visitExpression(expression.alternate, localNames);
+          return;
+        case 'SwitchExpression':
+          if (expression.discriminant) visitExpression(expression.discriminant, localNames);
+          for (const switchCase of expression.cases) {
+            if (switchCase.test) visitExpression(switchCase.test, localNames);
+            this.visitFunctionScopeNode(switchCase.consequent, new Set(localNames), visitExpression, visitStatement);
+          }
+          return;
+        case 'ForStatement':
+        case 'WhileStatement':
+          visitStatement(expression, localNames);
+          return;
+        case 'MemberExpression':
+          visitExpression(expression.object, localNames);
+          return;
+        case 'IndexExpression':
+          visitExpression(expression.object, localNames);
+          visitExpression(expression.index, localNames);
+          return;
+        case 'ArrayExpression':
+          for (const element of expression.elements) visitExpression(element, localNames);
+          return;
+      }
+    };
+
+    const visitStatement = (statement: Statement, localNames: Set<string>): void => {
+      switch (statement.type) {
+        case 'VariableDeclaration':
+          visitExpression(statement.init, localNames);
+          for (const name of this.declaredNames(statement)) localNames.add(name);
+          return;
+        case 'AssignmentStatement':
+          this.visitAssignmentTargetExpression(statement.left, localNames, visitExpression);
+          visitExpression(statement.right, localNames);
+          return;
+        case 'ExpressionStatement':
+          visitExpression(statement.expression, localNames);
+          return;
+        case 'IfStatement':
+          visitExpression(statement.test, localNames);
+          this.visitFunctionScopeNode(statement.consequent, new Set(localNames), visitExpression, visitStatement);
+          if (Array.isArray(statement.alternate)) {
+            this.visitFunctionScopeNode(statement.alternate, new Set(localNames), visitExpression, visitStatement);
+          } else if (statement.alternate) {
+            visitStatement(statement.alternate, new Set(localNames));
+          }
+          return;
+        case 'ForStatement': {
+          if (statement.kind === 'collection') {
+            visitExpression(statement.iterable, localNames);
+          } else {
+            visitExpression(statement.start, localNames);
+            visitExpression(statement.end, localNames);
+            if (statement.step) visitExpression(statement.step, localNames);
+          }
+          const forLocals = new Set(localNames);
+          forLocals.add(statement.counter.name);
+          if (statement.kind === 'collection' && statement.indexCounter) forLocals.add(statement.indexCounter.name);
+          this.visitFunctionScopeNode(statement.body, forLocals, visitExpression, visitStatement);
+          return;
+        }
+        case 'WhileStatement':
+          visitExpression(statement.test, localNames);
+          this.visitFunctionScopeNode(statement.body, new Set(localNames), visitExpression, visitStatement);
+          return;
+        case 'FunctionDeclaration':
+        case 'TypeDeclaration':
+        case 'IndicatorDeclaration':
+        case 'LibraryDeclaration':
+        case 'ImportDeclaration':
+        case 'BreakStatement':
+        case 'ContinueStatement':
+          return;
+      }
+    };
+
+    for (const parameter of declaration.params) {
+      if (parameter.defaultValue) visitExpression(parameter.defaultValue, functionLocals);
+    }
+    this.visitFunctionScopeNode(declaration.body, functionLocals, visitExpression, visitStatement);
+  }
+
+  private visitFunctionScopeNode(
+    node: Expression | Statement[],
+    localNames: Set<string>,
+    visitExpression: (expression: Expression, localNames: Set<string>) => void,
+    visitStatement: (statement: Statement, localNames: Set<string>) => void,
+  ): void {
+    if (Array.isArray(node)) {
+      for (const statement of node) visitStatement(statement, localNames);
+    } else {
+      visitExpression(node, localNames);
+    }
+  }
+
+  private visitAssignmentTargetExpression(
+    target: AssignmentStatement['left'],
+    localNames: Set<string>,
+    visitExpression: (expression: Expression, localNames: Set<string>) => void,
+  ): void {
+    if (target.type === 'Identifier') {
+      visitExpression(target, localNames);
+      return;
+    }
+    if (target.type === 'MemberExpression') {
+      visitExpression(target.object, localNames);
+      return;
+    }
+    if (target.type === 'IndexExpression') {
+      visitExpression(target.object, localNames);
+      visitExpression(target.index, localNames);
+    }
+  }
+
+  private declaredNames(statement: VariableDeclaration): string[] {
+    if (statement.names.type === 'TupleDeclarator') return statement.names.names.map((name) => name.name);
+    return [statement.names.name.name];
   }
 
   private checkStatement(statement: Statement, scope: SemanticScope): void {

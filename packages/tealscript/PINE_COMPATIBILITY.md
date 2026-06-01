@@ -241,7 +241,9 @@ all-time-high/all-time-low library idiom.
 
 Semantic diagnostics require `export` declarations to live in library scripts,
 require library scripts to export at least one parsed exportable declaration,
-and require exported function/method parameters to declare types.
+require exported function/method parameters to declare types, and report
+exported function/method bodies that call `input.*()` or reference non-`const`
+library globals.
 
 The runtime can also bind imported libraries from a deterministic host-provided
 registry keyed by Pine import path. This supports `alias.exportedFunction(...)`
@@ -255,7 +257,7 @@ UDTs, and use library-local methods.
 Published TradingView lookup is not implemented yet. `import` declarations
 without a matching registry entry emit an explicit unsupported diagnostic until
 Epic 12 adds versioned remote/local resolution, enum namespace binding,
-exported constants, and deeper library diagnostics.
+exported constants, and request-expression qualifier diagnostics.
 
 ## Common `color.*` Coverage
 
