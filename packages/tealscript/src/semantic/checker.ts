@@ -15,6 +15,7 @@ import type {
   SwitchCase,
   SwitchExpression,
   TupleDeclarator,
+  TypeAnnotation,
   TypeDeclaration,
   VariableDeclaration,
   WhileStatement,
@@ -32,9 +33,41 @@ export interface SemanticDiagnostic {
 
 export type SemanticSymbolKind = 'variable' | 'function' | 'parameter' | 'type' | 'import' | 'loop';
 
+export type SemanticTypeKind =
+  | 'array'
+  | 'bool'
+  | 'box'
+  | 'chart.point'
+  | 'color'
+  | 'float'
+  | 'hline'
+  | 'int'
+  | 'label'
+  | 'line'
+  | 'linefill'
+  | 'map'
+  | 'matrix'
+  | 'plot'
+  | 'polyline'
+  | 'string'
+  | 'table'
+  | 'udt'
+  | 'unknown'
+  | 'void';
+
+export interface SemanticType {
+  kind: SemanticTypeKind;
+  qualifier?: string;
+  name?: string;
+  elementType?: SemanticType;
+  keyType?: SemanticType;
+  valueType?: SemanticType;
+}
+
 export interface SemanticSymbol {
   name: string;
   kind: SemanticSymbolKind;
+  type?: SemanticType;
   loc?: SourceLocation;
 }
 
@@ -246,10 +279,20 @@ class SemanticChecker {
   }
 
   private declareType(statement: TypeDeclaration, scope: SemanticScope): void {
-    this.declare(scope, { name: statement.name.name, kind: 'type', loc: statement.name.loc });
+    this.declare(scope, {
+      name: statement.name.name,
+      kind: 'type',
+      type: { kind: 'udt', name: statement.name.name },
+      loc: statement.name.loc,
+    });
     const typeScope = new SemanticScope(scope);
     for (const field of statement.fields) {
-      this.declare(typeScope, { name: field.name.name, kind: 'variable', loc: field.name.loc });
+      this.declare(typeScope, {
+        name: field.name.name,
+        kind: 'variable',
+        type: this.typeFromAnnotation(field.typeAnnotation ?? undefined),
+        loc: field.name.loc,
+      });
       if (field.defaultValue) this.checkExpression(field.defaultValue, typeScope);
     }
   }
@@ -259,7 +302,12 @@ class SemanticChecker {
     const functionScope = new SemanticScope(scope);
 
     for (const parameter of statement.params) {
-      this.declare(functionScope, { name: parameter.name, kind: 'parameter', loc: parameter.loc });
+      this.declare(functionScope, {
+        name: parameter.name,
+        kind: 'parameter',
+        type: this.typeFromAnnotation(parameter.typeAnnotation ?? undefined),
+        loc: parameter.loc,
+      });
       if (parameter.defaultValue) this.checkExpression(parameter.defaultValue, scope);
     }
 
@@ -280,6 +328,7 @@ class SemanticChecker {
     this.declare(scope, {
       name: statement.names.name.name,
       kind: 'variable',
+      type: this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init),
       loc: statement.names.name.loc,
     });
   }
@@ -292,7 +341,7 @@ class SemanticChecker {
         continue;
       }
       seen.add(name.name);
-      this.declare(scope, { name: name.name, kind: 'variable', loc: name.loc });
+      this.declare(scope, { name: name.name, kind: 'variable', type: { kind: 'unknown' }, loc: name.loc });
     }
   }
 
@@ -445,6 +494,80 @@ class SemanticChecker {
   private checkExpressions(scope: SemanticScope, expressions: Array<Expression | undefined>): void {
     for (const expression of expressions) {
       if (expression) this.checkExpression(expression, scope);
+    }
+  }
+
+  private typeFromAnnotation(annotation?: TypeAnnotation | null): SemanticType | undefined {
+    if (!annotation) return undefined;
+
+    const qualifier = annotation.qualifier;
+    if (annotation.baseType === 'array' || annotation.baseType === 'matrix') {
+      return {
+        kind: annotation.baseType,
+        qualifier,
+        elementType: this.typeFromName(annotation.elementType),
+      };
+    }
+
+    if (annotation.baseType === 'map') {
+      return {
+        kind: 'map',
+        qualifier,
+        keyType: this.typeFromName(annotation.keyType),
+        valueType: this.typeFromName(annotation.valueType),
+      };
+    }
+
+    if (annotation.baseType === 'udt') {
+      return { kind: 'udt', qualifier, name: annotation.name };
+    }
+
+    return this.typeFromName(annotation.baseType, qualifier);
+  }
+
+  private inferExpressionType(expression: Expression): SemanticType {
+    switch (expression.type) {
+      case 'NumericLiteral':
+        return Number.isInteger(expression.value) ? { kind: 'int' } : { kind: 'float' };
+      case 'StringLiteral':
+        return { kind: 'string' };
+      case 'BooleanLiteral':
+        return { kind: 'bool' };
+      case 'ColorLiteral':
+        return { kind: 'color' };
+      case 'NaExpression':
+        return { kind: 'unknown' };
+      case 'ArrayExpression':
+        return { kind: 'array', elementType: { kind: 'unknown' } };
+      default:
+        return { kind: 'unknown' };
+    }
+  }
+
+  private typeFromName(name: string, qualifier?: string): SemanticType {
+    switch (name) {
+      case 'int':
+      case 'float':
+      case 'bool':
+      case 'string':
+      case 'color':
+        return { kind: name, qualifier };
+      case 'void':
+      case 'array':
+      case 'matrix':
+      case 'map':
+      case 'label':
+      case 'line':
+      case 'box':
+      case 'polyline':
+      case 'table':
+      case 'chart.point':
+      case 'linefill':
+      case 'plot':
+      case 'hline':
+        return { kind: name, qualifier };
+      default:
+        return { kind: 'udt', qualifier, name };
     }
   }
 
