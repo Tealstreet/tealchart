@@ -26,6 +26,8 @@ Keep fixtures grouped by behavior:
   sessions, and timeframes.
 - `pine-drawings.test.ts` for labels, lines, boxes, linefills, polylines,
   tables, and future visual object checkpoints.
+- `pine-real-checkpoints.test.ts` for source-linked, reduced fixtures derived
+  from official TradingView docs and later public idiom checkpoints.
 
 ## Fixture Rules
 
