@@ -457,6 +457,8 @@ Phases:
    Parser and semantic coverage now retain generic call type arguments and infer
    unannotated `map.new<K, V>()` constructors, including invalid map constructor
    template and generic arity diagnostics.
+   Semantic coverage now rejects bare collection container names in template
+   positions until nested template parsing is available.
 4. Implement user-defined types (`type`), fields, constructors, methods, and
    reference semantics.
    Runtime coverage now includes shallow UDT copies through Pine's

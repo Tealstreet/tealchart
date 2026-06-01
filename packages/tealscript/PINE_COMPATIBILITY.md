@@ -227,10 +227,13 @@ enforce obvious primitive key/value mismatches for known `map<K, V>` variables
 on `map.put`, `map.get`, `map.contains`, and `map.remove`, including receiver
 method-call forms and unannotated `map.new<K, V>()` constructor inference. Map
 loops support the documented key-value tuple form, `for [key, value] in data`.
+Bare collection container names in template positions, such as
+`map<string, array>`, are rejected because Pine requires nested element
+templates for those collection references.
 
 Known limits: map keys are currently restricted at runtime to finite numbers,
-strings, and booleans. Full reference-type rules and nested collection
-restrictions belong to the future qualified type-system and UDT phases.
+strings, and booleans. Full nested collection template parsing and complete
+reference-type rules belong to the future qualified type-system and UDT phases.
 
 ## Common User-Defined Type Coverage
 

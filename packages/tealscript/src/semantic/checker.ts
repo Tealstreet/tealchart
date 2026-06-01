@@ -220,6 +220,7 @@ const QUALIFIER_RANK: Record<SemanticQualifier, number> = {
 };
 
 const TYPE_QUALIFIER_NAMES = new Set(['const', 'input', 'simple', 'series']);
+const COLLECTION_TYPE_NAMES = new Set(['array', 'matrix', 'map']);
 const MAP_KEY_TYPE_NAMES = new Set(['int', 'float', 'bool', 'string', 'color']);
 const PRIMITIVE_TYPE_KINDS = new Set<SemanticTypeKind>(['bool', 'color', 'float', 'int', 'string']);
 
@@ -1546,6 +1547,9 @@ class SemanticChecker {
   private checkTemplateTypeName(typeName: string, role: string, loc?: SourceLocation): void {
     if (TYPE_QUALIFIER_NAMES.has(typeName)) {
       this.addDiagnostic('invalid-type-template', `Invalid ${role} type '${typeName}'; qualifiers cannot be used as template types`, loc);
+    }
+    if (COLLECTION_TYPE_NAMES.has(typeName)) {
+      this.addDiagnostic('invalid-type-template', `Invalid ${role} type '${typeName}'; collection template types must include their element templates`, loc);
     }
   }
 
