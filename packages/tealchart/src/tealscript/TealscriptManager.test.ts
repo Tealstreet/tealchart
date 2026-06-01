@@ -25,6 +25,7 @@ class FakeWorker {
 
 interface PostedWorkerMessage {
   type: string;
+  runtime?: unknown;
   metadata?: {
     generation?: number;
     requestId?: number;
@@ -414,5 +415,53 @@ describe('TealscriptManager', () => {
     const restartInit = workers[1].messages[0] as PostedWorkerMessage & { inputs?: Record<string, unknown> };
     expect(restartInit.type).toBe('init');
     expect(restartInit.inputs).toEqual({ length: 34 });
+  });
+
+  it('passes runtime chart metadata into worker init messages', async () => {
+    const worker = new FakeWorker();
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      getRuntimeOptions: () => ({
+        syminfo: {
+          ticker: 'NASDAQ:AAPL',
+          timezone: 'America/New_York',
+        },
+        timeframe: {
+          period: '1D',
+          multiplier: 1,
+          isminutes: false,
+          isdaily: true,
+          isweekly: false,
+          ismonthly: false,
+          isintraday: false,
+          isseconds: false,
+          isticks: false,
+        },
+      }),
+    });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")');
+    worker.emit({ type: 'ready' });
+    await addScript;
+
+    const [initMessage] = worker.messages as PostedWorkerMessage[];
+    expect(initMessage.type).toBe('init');
+    expect(initMessage.runtime).toEqual({
+      syminfo: {
+        ticker: 'NASDAQ:AAPL',
+        timezone: 'America/New_York',
+      },
+      timeframe: {
+        period: '1D',
+        multiplier: 1,
+        isminutes: false,
+        isdaily: true,
+        isweekly: false,
+        ismonthly: false,
+        isintraday: false,
+        isseconds: false,
+        isticks: false,
+      },
+    });
   });
 });

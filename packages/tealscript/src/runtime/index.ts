@@ -151,6 +151,7 @@ export {
   type ExecutionError,
   type IndicatorDeclarationMetadata,
   type TealscriptEngineOptions,
+  type TealscriptRuntimeOptions,
 } from './engine';
 
 export {

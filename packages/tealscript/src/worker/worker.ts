@@ -9,6 +9,7 @@
 
 import { parse, TealscriptParseError } from '../parser';
 import { TealscriptEngine } from '../runtime/engine';
+import type { TealscriptRuntimeOptions } from '../runtime/engine';
 import { checkProgram } from '../semantic';
 import type { Program } from '../parser/ast';
 import type { Bar, InputDefinition } from '../runtime/context';
@@ -31,6 +32,7 @@ interface ScriptState {
   engine: TealscriptEngine;
   bars: Bar[];
   inputs: Record<string, unknown>;
+  runtime?: TealscriptRuntimeOptions;
   lastInputs: InputDefinition[];
 }
 
@@ -54,7 +56,7 @@ self.onmessage = (event: MessageEvent<ToWorkerMessage>) => {
   try {
     switch (message.type) {
       case 'init':
-        handleInit(message.scriptId, message.script, message.bars, message.inputs, metadata);
+        handleInit(message.scriptId, message.script, message.bars, message.inputs, message.runtime, metadata);
         break;
 
       case 'updateBars':
@@ -90,6 +92,7 @@ function handleInit(
   script: string,
   bars: Bar[],
   inputs: Record<string, unknown>,
+  runtime?: TealscriptRuntimeOptions,
   metadata?: WorkerOutputMetadata
 ): void {
   try {
@@ -112,7 +115,7 @@ function handleInit(
     }
 
     // Create engine
-    const engine = new TealscriptEngine();
+    const engine = new TealscriptEngine({ runtime });
 
     // Store state
     state = {
@@ -121,6 +124,7 @@ function handleInit(
       engine,
       bars,
       inputs,
+      runtime,
       lastInputs: [],
     };
 

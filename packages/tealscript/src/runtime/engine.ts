@@ -88,7 +88,7 @@ import {
   registerTableBuiltins,
   type DrawingBuiltinRuntime,
 } from './builtins/drawings';
-import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type ChartPoint, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LogLevel, type LogOutput, type PlotLineStyle, type PlotOutput, type PlotStyle } from './context';
+import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type ChartPoint, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LogLevel, type LogOutput, type PlotLineStyle, type PlotOutput, type PlotStyle, type SymInfo, type TimeframeInfo } from './context';
 import {
   getDrawingValue,
   toDrawingId as toDrawingIdValue,
@@ -244,6 +244,13 @@ export interface ExecutionError {
 export interface TealscriptEngineOptions {
   requestDatafeed?: RequestDatafeed;
   libraries?: Map<string, Program>;
+  runtime?: TealscriptRuntimeOptions;
+}
+
+export interface TealscriptRuntimeOptions {
+  syminfo?: Partial<SymInfo>;
+  timeframe?: Partial<TimeframeInfo>;
+  now?: number;
 }
 
 interface ImportedLibrary {
@@ -254,6 +261,14 @@ interface ImportedLibrary {
   methods: Map<string, FunctionDeclaration[]>;
   types: Map<string, TypeDeclaration>;
   exportedTypes: Set<string>;
+}
+
+type TimeframeUnit = 'tick' | 'second' | 'minute' | 'day' | 'week' | 'month';
+
+interface TimeframeSpec {
+  period: string;
+  multiplier: number;
+  unit: TimeframeUnit;
 }
 
 interface RandomBuiltinState {
@@ -313,6 +328,7 @@ export class TealscriptEngine {
   private profileStatements = 0;
   private profileExpressions = 0;
   private profileBuiltinCalls = 0;
+  private runtimeOptions: TealscriptRuntimeOptions;
 
   constructor(options: TealscriptEngineOptions = {}) {
     this.ctx = new ExecutionContext();
@@ -324,8 +340,32 @@ export class TealscriptEngine {
     this.functionScopes = new Map();
     this.requestDatafeed = options.requestDatafeed;
     this.libraries = options.libraries ?? new Map();
+    this.runtimeOptions = options.runtime ?? {};
+    this.applyRuntimeOptions(this.runtimeOptions);
 
     this.registerBuiltins();
+  }
+
+  private applyRuntimeOptions(options: TealscriptRuntimeOptions): void {
+    if (options.syminfo) {
+      this.ctx.syminfo = {
+        ...this.ctx.syminfo,
+        ...options.syminfo,
+      };
+    }
+    if (options.timeframe) {
+      this.ctx.timeframe = {
+        ...this.ctx.timeframe,
+        ...options.timeframe,
+      };
+    }
+    if (typeof options.now === 'number' && Number.isFinite(options.now)) {
+      this.ctx.setNow(options.now);
+    }
+  }
+
+  private getRuntimeNow(): number {
+    return typeof this.runtimeOptions.now === 'number' && Number.isFinite(this.runtimeOptions.now) ? this.runtimeOptions.now : Date.now();
   }
 
   /**
@@ -350,11 +390,12 @@ export class TealscriptEngine {
     this.indicatorDynamicRequests = true;
     this.requestContextDepth = 0;
     this.requestLocalScopeDepth = 0;
+    this.applyRuntimeOptions(this.runtimeOptions);
     this.registerTypeDeclarations(ast);
     this.registerUserFunctions(ast);
     this.registerLibraryImports(ast);
 
-    this.ctx.setNow(Date.now());
+    this.ctx.setNow(this.getRuntimeNow());
 
     // Load bars into context
     this.ctx.loadBars(bars);
@@ -499,7 +540,7 @@ export class TealscriptEngine {
       for (const functionScope of this.functionScopes.values()) {
         functionScope.advanceBar();
       }
-      this.ctx.setNow(Date.now());
+      this.ctx.setNow(this.getRuntimeNow());
       this.ctx.startRealtimeBar(bar);
       this.scope.commit(true);
       for (const functionScope of this.functionScopes.values()) {
@@ -522,7 +563,7 @@ export class TealscriptEngine {
     }
     this.ctx.rollbackBar();
     this.ctx.bar_index = this.ctx.last_bar_index;
-    this.ctx.setNow(Date.now());
+    this.ctx.setNow(this.getRuntimeNow());
     this.requestEvaluationCache.clear();
     this.requestContextKeys.clear();
 
@@ -550,7 +591,7 @@ export class TealscriptEngine {
     }
     this.ctx.rollbackBar();
     this.ctx.bar_index = this.ctx.last_bar_index;
-    this.ctx.setNow(Date.now());
+    this.ctx.setNow(this.getRuntimeNow());
     this.ctx.truncatePlots(this.ctx.last_bar_index);
     this.ctx.truncateDrawings(this.ctx.last_bar_index);
     this.ctx.truncateAlerts(this.ctx.last_bar_index);
@@ -850,41 +891,19 @@ export class TealscriptEngine {
   }
 
   private getTimeframeInfo(period: string): ExecutionContext['timeframe'] | null {
-    const normalized = period.trim().toUpperCase();
-    if (normalized === '') return null;
+    const spec = this.parseTimeframeSpec(period);
+    if (!spec) return null;
 
-    const minutes = Number(normalized);
-    if (Number.isFinite(minutes) && minutes > 0) {
-      return {
-        period: normalized,
-        multiplier: minutes,
-        isminutes: true,
-        isdaily: false,
-        isweekly: false,
-        ismonthly: false,
-        isintraday: true,
-        isseconds: false,
-        isticks: false,
-      };
-    }
-
-    const match = /^(\d+)?([STWDM])$/.exec(normalized);
-    if (!match) return null;
-
-    const multiplier = match[1] === undefined ? 1 : Number(match[1]);
-    if (!Number.isFinite(multiplier) || multiplier <= 0) return null;
-
-    const unit = match[2];
     return {
-      period: normalized,
-      multiplier,
-      isminutes: false,
-      isdaily: unit === 'D',
-      isweekly: unit === 'W',
-      ismonthly: unit === 'M',
-      isintraday: unit === 'S' || unit === 'T',
-      isseconds: unit === 'S',
-      isticks: unit === 'T',
+      period: spec.period,
+      multiplier: spec.multiplier,
+      isminutes: spec.unit === 'minute',
+      isdaily: spec.unit === 'day',
+      isweekly: spec.unit === 'week',
+      ismonthly: spec.unit === 'month',
+      isintraday: spec.unit === 'minute' || spec.unit === 'second' || spec.unit === 'tick',
+      isseconds: spec.unit === 'second',
+      isticks: spec.unit === 'tick',
     };
   }
 
@@ -1319,6 +1338,8 @@ export class TealscriptEngine {
         return this.ctx.volume.get(0);
       case 'time':
         return this.ctx.time.get(0);
+      case 'time_tradingday':
+        return this.getTradingDayTime(this.ctx.time.get(0), this.ctx.syminfo.timezone);
       case 'timenow':
         return this.ctx.timenow.get(0);
       case 'time_close':
@@ -2115,7 +2136,16 @@ export class TealscriptEngine {
   }
 
   private evaluateRequestExpressionSeries(expression: Expression, requestContext: RequestDataContext): unknown[] {
-    const engine = new TealscriptEngine({ requestDatafeed: this.requestDatafeed, libraries: this.libraries });
+    const engine = new TealscriptEngine({
+      requestDatafeed: this.requestDatafeed,
+      libraries: this.libraries,
+      runtime: {
+        ...this.runtimeOptions,
+        syminfo: this.ctx.syminfo,
+        timeframe: this.ctx.timeframe,
+        now: this.ctx.now,
+      },
+    });
     engine.importedLibraryCallStack = [...this.importedLibraryCallStack];
     engine.indicatorDynamicRequests = this.indicatorDynamicRequests;
     engine.requestContextDepth = this.requestContextDepth + 1;
@@ -2898,6 +2928,9 @@ export class TealscriptEngine {
         case 'time':
           this.checkHistoryOffset(offset);
           return this.naIfMissing(this.ctx.time.get(offset));
+        case 'time_tradingday':
+          this.checkHistoryOffset(offset);
+          return this.naIfMissing(this.getTradingDayTime(this.ctx.time.get(offset), this.ctx.syminfo.timezone));
         case 'timenow':
           this.checkHistoryOffset(offset);
           return this.naIfMissing(this.ctx.timenow.get(offset));
@@ -2906,6 +2939,9 @@ export class TealscriptEngine {
           const openTime = this.ctx.time.get(offset);
           return openTime === undefined ? Number.NaN : this.naIfMissing(this.getBarCloseTime(openTime, this.ctx.timeframe.period));
         }
+        case 'last_bar_time':
+          this.checkHistoryOffset(offset);
+          return offset > this.ctx.bar_index ? Number.NaN : this.naIfMissing(this.ctx.getBar(this.ctx.last_bar_index)?.time);
         case 'hl2':
           this.checkHistoryOffset(offset);
           return this.naIfMissing(this.getHl2(offset));
@@ -5642,6 +5678,9 @@ export class TealscriptEngine {
   private registerTickerBuiltins(): void {
     this.builtins.set('session.regular', () => 'regular');
     this.builtins.set('session.extended', () => 'extended');
+    this.builtins.set('session.ismarket', () => this.unsupportedSessionState('session.ismarket'));
+    this.builtins.set('session.ispremarket', () => this.unsupportedSessionState('session.ispremarket'));
+    this.builtins.set('session.ispostmarket', () => this.unsupportedSessionState('session.ispostmarket'));
     this.builtins.set('adjustment.none', () => 'none');
     this.builtins.set('adjustment.splits', () => 'splits');
     this.builtins.set('adjustment.dividends', () => 'dividends');
@@ -5787,6 +5826,10 @@ export class TealscriptEngine {
       return 'extended';
     }
     throw new Error(`Unsupported ticker session: ${session}`);
+  }
+
+  private unsupportedSessionState(name: string): never {
+    throw new RuntimeErrorException(`${name} requires exchange session classification, which is not available in this runtime`);
   }
 
   private normalizeTickerModifier(
@@ -7336,19 +7379,21 @@ export class TealscriptEngine {
   }
 
   private registerTimeBuiltins(): void {
-    this.builtins.set('timestamp', (args) => this.evaluateTimestamp(args));
-    this.builtins.set('time', (args) => this.evaluateTimeFilter(args, false));
-    this.builtins.set('time_close', (args) => this.evaluateTimeFilter(args, true));
-    this.builtins.set('timeframe.in_seconds', (args) => {
-      const timeframe = args[0] === undefined || args[0] === '' ? this.ctx.timeframe.period : this.toStringValue(args[0]);
+    this.builtins.set('timestamp', (args, namedArgs) => this.evaluateTimestamp(args, namedArgs));
+    this.builtins.set('time', (args, namedArgs) => this.evaluateTimeFilter(args, namedArgs, false));
+    this.builtins.set('time_close', (args, namedArgs) => this.evaluateTimeFilter(args, namedArgs, true));
+    this.builtins.set('timeframe.in_seconds', (args, namedArgs) => {
+      const timeframeArg = this.getCallArg(args, namedArgs, 0, 'timeframe', this.ctx.timeframe.period);
+      const timeframe = timeframeArg === undefined || timeframeArg === '' ? this.ctx.timeframe.period : this.toStringValue(timeframeArg);
       const duration = this.getTimeframeDurationMs(timeframe);
       return duration === null ? Number.NaN : duration / 1000;
     });
-    this.builtins.set('timeframe.from_seconds', (args) => {
-      return this.timeframeFromSeconds(this.toNumber(args[0]));
+    this.builtins.set('timeframe.from_seconds', (args, namedArgs) => {
+      return this.timeframeFromSeconds(this.toNumber(this.getCallArg(args, namedArgs, 0, 'seconds')));
     });
-    this.builtins.set('timeframe.change', (args) => {
-      const timeframe = args[0] === undefined || args[0] === '' ? this.ctx.timeframe.period : this.toStringValue(args[0]);
+    this.builtins.set('timeframe.change', (args, namedArgs) => {
+      const timeframeArg = this.getCallArg(args, namedArgs, 0, 'timeframe', this.ctx.timeframe.period);
+      const timeframe = timeframeArg === undefined || timeframeArg === '' ? this.ctx.timeframe.period : this.toStringValue(timeframeArg);
       const duration = this.getTimeframeDurationMs(timeframe);
       const currentTime = this.ctx.time.get(0);
       const previousTime = this.ctx.time.get(1);
@@ -7361,9 +7406,11 @@ export class TealscriptEngine {
     });
 
     for (const part of ['year', 'month', 'weekofyear', 'dayofmonth', 'dayofweek', 'hour', 'minute', 'second']) {
-      this.builtins.set(part, (args) => {
-        const timestamp = args[0] === undefined ? this.ctx.time.get(0) : this.toNumber(args[0]);
-        const timezone = args[1] === undefined ? this.ctx.syminfo.timezone : this.toStringValue(args[1]);
+      this.builtins.set(part, (args, namedArgs) => {
+        const timestampArg = this.getCallArg(args, namedArgs, 0, 'time', this.ctx.time.get(0));
+        const timezoneArg = this.getCallArg(args, namedArgs, 1, 'timezone', this.ctx.syminfo.timezone);
+        const timestamp = this.toNumber(timestampArg);
+        const timezone = timezoneArg === undefined || timezoneArg === '' ? this.ctx.syminfo.timezone : this.toStringValue(timezoneArg);
         return this.getCalendarPart(part, timestamp, timezone);
       });
     }
@@ -7400,41 +7447,56 @@ export class TealscriptEngine {
     return `${Math.min(12, Math.ceil(roundedSeconds / 2_592_000))}M`;
   }
 
-  private evaluateTimeFilter(args: unknown[], closeTime: boolean): number {
+  private evaluateTimeFilter(args: unknown[], namedArgs: Map<string, unknown>, closeTime: boolean): number {
     const timestamp = this.ctx.time.get(0) ?? Number.NaN;
-    const timeframe = args[0] === undefined || args[0] === '' ? this.ctx.timeframe.period : this.toStringValue(args[0]);
-    const session = args[1] === undefined || args[1] === '' ? undefined : this.toStringValue(args[1]);
-    const timezone = args[2] === undefined || args[2] === '' ? this.ctx.syminfo.timezone : this.toStringValue(args[2]);
+    const timeframeArg = this.getCallArg(args, namedArgs, 0, 'timeframe', this.ctx.timeframe.period);
+    const sessionArg = this.getCallArg(args, namedArgs, 1, 'session');
+    const timezoneArg = this.getCallArg(args, namedArgs, 2, 'timezone', this.ctx.syminfo.timezone);
+    const timeframe = timeframeArg === undefined || timeframeArg === '' ? this.ctx.timeframe.period : this.toStringValue(timeframeArg);
+    const session = sessionArg === undefined || sessionArg === '' ? undefined : this.toStringValue(sessionArg);
+    const timezone = timezoneArg === undefined || timezoneArg === '' ? this.ctx.syminfo.timezone : this.toStringValue(timezoneArg);
 
     if (!Number.isFinite(timestamp)) return Number.NaN;
     if (session && !this.isTimestampInSession(timestamp, session, timezone)) {
       return Number.NaN;
     }
 
-    return closeTime ? this.getBarCloseTime(timestamp, timeframe) : timestamp;
+    const openTime = this.getTimeframeOpenTime(timestamp, timeframe, timezone);
+    return closeTime ? this.getTimeframeCloseTime(openTime, timeframe, timezone) : openTime;
   }
 
-  private evaluateTimestamp(args: unknown[]): number {
-    if (args.length === 0) return Number.NaN;
+  private evaluateTimestamp(args: unknown[], namedArgs: Map<string, unknown>): number {
+    if (args.length === 0 && namedArgs.size === 0) return Number.NaN;
+
+    if (namedArgs.size === 0 && args.length === 1 && typeof args[0] === 'string') {
+      const parsed = Date.parse(args[0]);
+      return Number.isFinite(parsed) ? parsed : Number.NaN;
+    }
 
     let timezone = this.ctx.syminfo.timezone;
     let offset = 0;
-    if (typeof args[0] === 'string') {
+    if (namedArgs.has('timezone')) {
+      timezone = this.toStringValue(namedArgs.get('timezone'));
+    } else if (typeof args[0] === 'string') {
       timezone = this.toStringValue(args[0]);
       offset = 1;
     }
 
-    const year = this.toNumber(args[offset]);
-    const month = this.toNumber(args[offset + 1]);
-    const day = this.toNumber(args[offset + 2]);
-    const hour = this.toNumber(args[offset + 3] ?? 0);
-    const minute = this.toNumber(args[offset + 4] ?? 0);
-    const second = this.toNumber(args[offset + 5] ?? 0);
+    const year = this.toNumber(namedArgs.has('year') ? namedArgs.get('year') : args[offset]);
+    const month = this.toNumber(namedArgs.has('month') ? namedArgs.get('month') : args[offset + 1]);
+    const day = this.toNumber(namedArgs.has('day') ? namedArgs.get('day') : args[offset + 2]);
+    const hour = this.toNumber(namedArgs.has('hour') ? namedArgs.get('hour') : args[offset + 3] ?? 0);
+    const minute = this.toNumber(namedArgs.has('minute') ? namedArgs.get('minute') : args[offset + 4] ?? 0);
+    const second = this.toNumber(namedArgs.has('second') ? namedArgs.get('second') : args[offset + 5] ?? 0);
 
     if ([year, month, day, hour, minute, second].some((value) => !Number.isFinite(value))) {
       return Number.NaN;
     }
 
+    return this.resolveLocalTimestamp(timezone, year, month, day, hour, minute, second);
+  }
+
+  private resolveLocalTimestamp(timezone: string, year: number, month: number, day: number, hour: number, minute: number, second: number): number {
     const utcGuess = Date.UTC(Math.trunc(year), Math.trunc(month) - 1, Math.trunc(day), Math.trunc(hour), Math.trunc(minute), Math.trunc(second));
     const initialOffset = this.getTimezoneOffsetMinutes(timezone, utcGuess);
     const resolvedTimestamp = utcGuess - initialOffset * 60000;
@@ -7456,6 +7518,15 @@ export class TealscriptEngine {
     }
 
     return finalTimestamp;
+  }
+
+  private getTradingDayTime(timestamp: unknown, timezone: string): number {
+    const value = this.toNumber(timestamp);
+    if (!Number.isFinite(value)) return Number.NaN;
+    const year = this.getCalendarPart('year', value, timezone);
+    const month = this.getCalendarPart('month', value, timezone);
+    const day = this.getCalendarPart('dayofmonth', value, timezone);
+    return this.resolveLocalTimestamp(timezone, year, month, day, 0, 0, 0);
   }
 
   private getCalendarPart(part: string, timestamp: unknown, timezone: string): number {
@@ -7492,39 +7563,146 @@ export class TealscriptEngine {
     return value + duration;
   }
 
-  private getTimeframeDurationMs(timeframe: string): number | null {
-    const normalized = timeframe.trim().toUpperCase();
-    if (normalized === '') return this.getTimeframeDurationMs(this.ctx.timeframe.period);
+  private getTimeframeOpenTime(timestamp: number, timeframe: string, timezone: string): number {
+    const spec = this.parseTimeframeSpec(timeframe);
+    if (!spec || spec.unit === 'tick') return Number.NaN;
+    if (spec.period === this.ctx.timeframe.period) return timestamp;
 
-    const numericMinutes = Number(normalized);
-    if (Number.isFinite(numericMinutes) && numericMinutes > 0) {
-      return numericMinutes * 60_000;
+    if (spec.unit === 'month') {
+      const year = this.getCalendarPart('year', timestamp, timezone);
+      const month = this.getCalendarPart('month', timestamp, timezone);
+      const monthIndex = year * 12 + (month - 1);
+      const bucketMonthIndex = Math.floor(monthIndex / spec.multiplier) * spec.multiplier;
+      const bucketYear = Math.floor(bucketMonthIndex / 12);
+      const bucketMonth = (bucketMonthIndex % 12) + 1;
+      return this.resolveLocalTimestamp(timezone, bucketYear, bucketMonth, 1, 0, 0, 0);
     }
 
-    const match = /^(\d+)?([SWDM])$/.exec(normalized);
+    if (spec.unit === 'week') {
+      const offsetMinutes = this.getTimezoneOffsetMinutes(timezone, timestamp);
+      const localDate = new Date(timestamp + offsetMinutes * 60_000);
+      const localMidnight = Date.UTC(localDate.getUTCFullYear(), localDate.getUTCMonth(), localDate.getUTCDate());
+      const mondayOffset = (localDate.getUTCDay() + 6) % 7;
+      const weekStartLocal = localMidnight - mondayOffset * 86_400_000;
+      const anchorMonday = Date.UTC(1970, 0, 5);
+      const bucketLocal = Math.floor((weekStartLocal - anchorMonday) / (spec.multiplier * 7 * 86_400_000)) * spec.multiplier * 7 * 86_400_000 + anchorMonday;
+      const bucketDate = new Date(bucketLocal);
+      return this.resolveLocalTimestamp(timezone, bucketDate.getUTCFullYear(), bucketDate.getUTCMonth() + 1, bucketDate.getUTCDate(), 0, 0, 0);
+    }
+
+    if (spec.unit === 'day') {
+      const offsetMinutes = this.getTimezoneOffsetMinutes(timezone, timestamp);
+      const localDate = new Date(timestamp + offsetMinutes * 60_000);
+      const localMidnight = Date.UTC(localDate.getUTCFullYear(), localDate.getUTCMonth(), localDate.getUTCDate());
+      const bucketLocal = Math.floor(localMidnight / (spec.multiplier * 86_400_000)) * spec.multiplier * 86_400_000;
+      const bucketDate = new Date(bucketLocal);
+      return this.resolveLocalTimestamp(timezone, bucketDate.getUTCFullYear(), bucketDate.getUTCMonth() + 1, bucketDate.getUTCDate(), 0, 0, 0);
+    }
+
+    const duration = this.getTimeframeDurationMs(timeframe);
+    if (duration === null) return Number.NaN;
+    const offsetMs = this.getTimezoneOffsetMinutes(timezone, timestamp) * 60_000;
+    return Math.floor((timestamp + offsetMs) / duration) * duration - offsetMs;
+  }
+
+  private getTimeframeCloseTime(openTime: number, timeframe: string, timezone: string): number {
+    if (!Number.isFinite(openTime)) return Number.NaN;
+    const spec = this.parseTimeframeSpec(timeframe);
+    if (!spec || spec.unit === 'tick') return Number.NaN;
+
+    if (spec.unit === 'month') {
+      const year = this.getCalendarPart('year', openTime, timezone);
+      const month = this.getCalendarPart('month', openTime, timezone);
+      return this.resolveLocalTimestamp(timezone, year, month + spec.multiplier, 1, 0, 0, 0);
+    }
+
+    if (spec.unit === 'week' || spec.unit === 'day') {
+      const year = this.getCalendarPart('year', openTime, timezone);
+      const month = this.getCalendarPart('month', openTime, timezone);
+      const day = this.getCalendarPart('dayofmonth', openTime, timezone);
+      const days = spec.unit === 'week' ? spec.multiplier * 7 : spec.multiplier;
+      return this.resolveLocalTimestamp(timezone, year, month, day + days, 0, 0, 0);
+    }
+
+    const duration = this.getTimeframeDurationMs(timeframe);
+    return duration === null ? Number.NaN : openTime + duration;
+  }
+
+  private getTimeframeDurationMs(timeframe: string): number | null {
+    const spec = this.parseTimeframeSpec(timeframe);
+    if (!spec) return null;
+
+    switch (spec.unit) {
+      case 'tick':
+        return null;
+      case 'second':
+        return spec.multiplier * 1_000;
+      case 'minute':
+        return spec.multiplier * 60_000;
+      case 'day':
+        return spec.multiplier * 86_400_000;
+      case 'week':
+        return spec.multiplier * 7 * 86_400_000;
+      case 'month':
+        return spec.multiplier * 30 * 86_400_000;
+      default:
+        return null;
+    }
+  }
+
+  private parseTimeframeSpec(timeframe: string): TimeframeSpec | null {
+    const normalized = timeframe.trim().toUpperCase();
+    if (normalized === '') return this.parseTimeframeSpec(this.ctx.timeframe.period);
+
+    if (/^\d+$/.test(normalized)) {
+      const multiplier = Number(normalized);
+      return multiplier > 0 ? { period: normalized, multiplier, unit: 'minute' } : null;
+    }
+
+    const match = /^(\d+)?([TSDWM])$/.exec(normalized);
     if (!match) return null;
 
     const multiplier = match[1] === undefined ? 1 : Number(match[1]);
-    switch (match[2]) {
+    if (!Number.isInteger(multiplier) || multiplier <= 0) return null;
+
+    const unit = match[2];
+    if (unit === 'S' && ![1, 5, 10, 15, 30, 45].includes(multiplier)) {
+      return null;
+    }
+
+    switch (unit) {
+      case 'T':
+        return { period: normalized, multiplier, unit: 'tick' };
       case 'S':
-        return multiplier * 1_000;
+        return { period: normalized, multiplier, unit: 'second' };
       case 'D':
-        return multiplier * 86_400_000;
+        return { period: normalized, multiplier, unit: 'day' };
       case 'W':
-        return multiplier * 7 * 86_400_000;
+        return { period: normalized, multiplier, unit: 'week' };
       case 'M':
-        return multiplier * 30 * 86_400_000;
+        return { period: normalized, multiplier, unit: 'month' };
       default:
         return null;
     }
   }
 
   private isTimestampInSession(timestamp: number, session: string, timezone: string): boolean {
-    return session.split(',').some((segment) => this.isTimestampInSessionSegment(timestamp, segment.trim(), timezone));
+    const normalized = session.trim().toLowerCase();
+    if (normalized === '' || normalized === 'regular' || normalized === 'extended' || normalized === 'session.regular' || normalized === 'session.extended') {
+      return true;
+    }
+    if (normalized === '24x7') {
+      return true;
+    }
+
+    const [periods, days = '1234567'] = session.split(':', 2);
+    if (!periods || !/^[1-7]+$/.test(days)) return false;
+
+    return periods.split(',').some((period) => this.isTimestampInSessionPeriod(timestamp, period.trim(), days, timezone));
   }
 
-  private isTimestampInSessionSegment(timestamp: number, segment: string, timezone: string): boolean {
-    const match = /^(\d{4})-(\d{4})(?::([1-7]+))?$/.exec(segment);
+  private isTimestampInSessionPeriod(timestamp: number, period: string, days: string, timezone: string): boolean {
+    const match = /^(\d{4})-(\d{4})$/.exec(period);
     if (!match) return false;
 
     const start = this.parseSessionMinute(match[1]);
@@ -7532,16 +7710,30 @@ export class TealscriptEngine {
     if (start === null || end === null) return false;
 
     const day = this.getCalendarPart('dayofweek', timestamp, timezone);
-    const days = match[3];
-    if (days && !days.includes(String(day))) return false;
-
-    if (start === end) return true;
-
     const hour = this.getCalendarPart('hour', timestamp, timezone);
     const minute = this.getCalendarPart('minute', timestamp, timezone);
     const minuteOfDay = hour * 60 + minute;
 
-    return start < end ? minuteOfDay >= start && minuteOfDay < end : minuteOfDay >= start || minuteOfDay < end;
+    if (start === end) {
+      const sessionDay = start === 0 || minuteOfDay < start ? day : this.nextPineDay(day);
+      return days.includes(String(sessionDay));
+    }
+
+    if (start < end) {
+      return days.includes(String(day)) && minuteOfDay >= start && minuteOfDay < end;
+    }
+
+    if (minuteOfDay >= start) {
+      return days.includes(String(this.nextPineDay(day)));
+    }
+    if (minuteOfDay < end) {
+      return days.includes(String(day));
+    }
+    return false;
+  }
+
+  private nextPineDay(day: number): number {
+    return day >= 7 ? 1 : day + 1;
   }
 
   private parseSessionMinute(value: string): number | null {
