@@ -428,6 +428,8 @@ Phases:
    same-shape matrix operands and scalar operands.
    Runtime coverage now includes `matrix.mult()` for matrix, array, and scalar
    operands.
+   Runtime coverage now includes `matrix.pow()` for non-negative integer powers
+   and `matrix.trace()` for square matrices.
 3. Implement `map.*` with key/value typing, insertion, lookup, removal, keys,
    values, copy, and iteration.
 4. Implement user-defined types (`type`), fields, constructors, methods, and

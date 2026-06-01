@@ -218,6 +218,37 @@ export function multMatrixValue(matrix: PineMatrix, other: PineMatrix | PineArra
   return mapMatrixArithmetic(matrix, Number(other), (left, right) => left * right);
 }
 
+export function powMatrixValue(matrix: PineMatrix, power: number): PineMatrix<number> {
+  assertSquareMatrix(matrix, 'Matrix power');
+  const normalizedPower = Math.trunc(Number(power));
+  if (!Number.isFinite(normalizedPower) || normalizedPower < 0 || normalizedPower !== Number(power)) {
+    throw new Error('Matrix power must be a non-negative integer');
+  }
+
+  let result = identityMatrix(matrix.rows);
+  let base = copyMatrix(matrix);
+  let exponent = normalizedPower;
+  while (exponent > 0) {
+    if (exponent % 2 === 1) {
+      result = multiplyMatrices(result, base);
+    }
+    exponent = Math.floor(exponent / 2);
+    if (exponent > 0) {
+      base = multiplyMatrices(base, base);
+    }
+  }
+  return result;
+}
+
+export function traceMatrixValue(matrix: PineMatrix): number {
+  assertSquareMatrix(matrix, 'Matrix trace');
+  let total = 0;
+  for (let index = 0; index < matrix.rows; index++) {
+    total += Number(getMatrixValue(matrix, index, index));
+  }
+  return total;
+}
+
 function matrixIndex(matrix: PineMatrix, row: number, column: number): number {
   const normalizedRow = normalizeExistingIndex(row, matrix.rows, 'row');
   const normalizedColumn = normalizeExistingIndex(column, matrix.columns, 'column');
@@ -245,6 +276,20 @@ function assertSameShape(left: PineMatrix, right: PineMatrix): void {
   if (left.rows !== right.rows || left.columns !== right.columns) {
     throw new Error(`Matrix dimensions must match. Left is ${left.rows}x${left.columns}, right is ${right.rows}x${right.columns}`);
   }
+}
+
+function assertSquareMatrix(matrix: PineMatrix, operation: string): void {
+  if (!isSquareMatrix(matrix)) {
+    throw new Error(`${operation} requires a square matrix. Matrix is ${matrix.rows}x${matrix.columns}`);
+  }
+}
+
+function identityMatrix(size: number): PineMatrix<number> {
+  const result = createPineMatrix<number>(size, size, 0);
+  for (let index = 0; index < size; index++) {
+    setMatrixValue(result, index, index, 1);
+  }
+  return result;
 }
 
 function multiplyMatrices(left: PineMatrix, right: PineMatrix): PineMatrix<number> {

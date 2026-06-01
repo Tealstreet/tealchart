@@ -23,6 +23,7 @@ import {
   minMatrixValue,
   modeMatrixValue,
   multMatrixValue,
+  powMatrixValue,
   removeMatrixColumn,
   removeMatrixRow,
   reshapeMatrix,
@@ -31,6 +32,7 @@ import {
   sumMatrixValue,
   swapMatrixColumns,
   swapMatrixRows,
+  traceMatrixValue,
   transposeMatrix,
 } from './matrices';
 
@@ -218,5 +220,25 @@ describe('PineMatrix', () => {
     expect(() => multMatrixValue(createPineMatrix<number>(2, 3, 1), vector)).toThrow(
       'Matrix-vector multiplication requires matrix columns to match array size. Matrix is 2x3, array size is 2',
     );
+  });
+
+  it('raises square matrices to integer powers and computes trace without mutating inputs', () => {
+    const matrix = createPineMatrix<number>(2, 2, 0);
+    matrix.values = [1, 2, 3, 4];
+
+    expect(traceMatrixValue(matrix)).toBe(5);
+    expect(powMatrixValue(matrix, 0).values).toEqual([1, 0, 0, 1]);
+    expect(powMatrixValue(matrix, 1).values).toEqual([1, 2, 3, 4]);
+    expect(powMatrixValue(matrix, 2).values).toEqual([7, 10, 15, 22]);
+    expect(matrix.values).toEqual([1, 2, 3, 4]);
+  });
+
+  it('rejects matrix powers and traces for invalid dimensions or powers', () => {
+    const rectangular = createPineMatrix<number>(2, 3, 1);
+
+    expect(() => traceMatrixValue(rectangular)).toThrow('Matrix trace requires a square matrix. Matrix is 2x3');
+    expect(() => powMatrixValue(rectangular, 2)).toThrow('Matrix power requires a square matrix. Matrix is 2x3');
+    expect(() => powMatrixValue(createPineMatrix<number>(2, 2, 1), -1)).toThrow('Matrix power must be a non-negative integer');
+    expect(() => powMatrixValue(createPineMatrix<number>(2, 2, 1), 1.5)).toThrow('Matrix power must be a non-negative integer');
   });
 });
