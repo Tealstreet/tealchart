@@ -449,6 +449,18 @@ plot(source, title="Source")
     expect(roundSeries(getPlot(result, 'Source').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
   });
 
+  it('surfaces Pine declaration shorttitle metadata', () => {
+    const result = runCompatScript(`
+indicator("Long settings title", shorttitle="Short settings title")
+plot(close, title="Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Long settings title');
+    expect(result.indicatorShortTitle).toBe('Short settings title');
+    expect(roundSeries(getPlot(result, 'Close').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+  });
+
   it('matches documented Pine input helper idioms', () => {
     const result = runCompatScript(`
 indicator("Input docs smoke")

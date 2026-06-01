@@ -357,6 +357,7 @@ export class ExecutionContext {
 
   /** Indicator title */
   indicatorTitle: string = 'Untitled';
+  indicatorShortTitle?: string;
 
   /** Indicator settings */
   indicatorOverlay: boolean = false;
@@ -961,6 +962,7 @@ export class ExecutionContext {
     this.alertOrder.length = 0;
     this.logs.length = 0;
     this.indicatorTitle = 'Untitled';
+    this.indicatorShortTitle = undefined;
     this.indicatorOverlay = false;
     this.indicatorPrecision = 2;
     this.indicatorMaxBarsBack = undefined;
