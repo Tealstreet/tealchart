@@ -154,6 +154,7 @@ import {
   currencyRateRequestKey,
   economicRequestKey,
   financialRequestKey,
+  seedRequestSymbol,
   type RequestDataContext,
   type RequestDatafeed,
   type RequestSeriesFamily,
@@ -1581,6 +1582,10 @@ export class TealscriptEngine {
       this.assertCanEvaluateRequest(fullName);
       return this.evaluateRequestEconomic(expr);
     }
+    if (fullName === 'request.seed') {
+      this.assertCanEvaluateRequest(fullName);
+      return this.evaluateRequestSeed(expr, this.nextBuiltinCallId(fullName));
+    }
     if (namespace === 'request') {
       throw new Error(`request.* functions are not supported yet: ${fullName}`);
     }
@@ -2128,6 +2133,50 @@ export class TealscriptEngine {
       lookahead: 'barmerge.lookahead_off',
       ignoreInvalid: ignoreInvalidSymbol,
     });
+  }
+
+  private evaluateRequestSeed(expr: CallExpression, callId: string): unknown {
+    const sourceArg = this.getCallArgument(expr, 0, 'source');
+    const symbolArg = this.getCallArgument(expr, 1, 'symbol');
+    const expressionArg = this.getCallArgument(expr, 2, 'expression');
+
+    if (!sourceArg || !symbolArg || !expressionArg) {
+      throw new Error('request.seed requires source, symbol, and expression arguments');
+    }
+    if (!this.requestDatafeed) {
+      throw new Error('request.seed requires a request datafeed');
+    }
+
+    const source = this.toStringValue(this.evaluateExpression(sourceArg.value)).trim();
+    const symbol = this.toStringValue(this.evaluateExpression(symbolArg.value)).trim();
+    const requestSymbol = seedRequestSymbol(source, symbol);
+    const timeframe = this.ctx.timeframe.period;
+    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalCallArgument(expr, 3, 'ignore_invalid_symbol') ?? false);
+    const calcBarsCount = this.normalizeOptionalPositiveInteger(this.evaluateOptionalCallArgument(expr, 4, 'calc_bars_count'));
+    const expressionId = this.requestExpressionCacheId(expressionArg.value);
+    this.trackRequestContext(
+      this.requestLimitKey('request.seed', expressionId, requestSymbol, timeframe, undefined, calcBarsCount),
+    );
+
+    const result = this.requestDatafeed.getBars({ symbol: requestSymbol, timeframe, calcBarsCount });
+    if (!result.ok) {
+      if (ignoreInvalidSymbol && (result.code === 'invalid_symbol' || result.code === 'missing_context')) {
+        return Number.NaN;
+      }
+      throw new Error(`request.seed failed: ${result.message}`);
+    }
+
+    const cacheKey = this.requestEvaluationCacheKey(callId, expressionId, requestSymbol, timeframe, undefined, calcBarsCount);
+    let cached = this.requestEvaluationCache.get(cacheKey);
+    if (!cached) {
+      cached = {
+        bars: result.context.bars,
+        values: this.evaluateRequestExpressionSeries(expressionArg.value, result.context),
+      };
+      this.requestEvaluationCache.set(cacheKey, cached);
+    }
+
+    return this.mergeRequestedValue(cached.bars, cached.values, 'barmerge.gaps_off', 'barmerge.lookahead_off');
   }
 
   private evaluateRequestPointSeries(options: {

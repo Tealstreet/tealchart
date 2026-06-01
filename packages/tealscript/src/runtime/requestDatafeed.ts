@@ -94,6 +94,10 @@ export function economicRequestKey(countryCode: string, field: string): string {
   return `${countryCode}\u0000${field}`;
 }
 
+export function seedRequestSymbol(source: string, symbol: string): string {
+  return `seed\u0000${source}\u0000${symbol}`;
+}
+
 function splitTickerModifiers(symbol: string): { base: string; modifiers: string[] } {
   const [base = '', ...modifiers] = symbol.split('|');
   return { base, modifiers };

@@ -114,6 +114,7 @@ export {
   financialRequestKey,
   requestDatafeedKey,
   requestSeriesKey,
+  seedRequestSymbol,
   type RequestDataContext,
   type RequestDatafeed,
   type RequestDatafeedErrorCode,

@@ -8,6 +8,7 @@ import {
   InMemoryRequestDatafeed,
   requestDatafeedKey,
   requestSeriesKey,
+  seedRequestSymbol,
   type Bar,
   type RequestDataContext,
 } from '../../src/runtime';
@@ -25,6 +26,7 @@ describe('request datafeed contract', () => {
     expect(requestSeriesKey('dividends', corporateActionRequestKey('NASDAQ:AAPL', 'dividends.gross', 'USD'))).toBe('dividends\u0000NASDAQ:AAPL\u0000dividends.gross\u0000USD');
     expect(requestSeriesKey('financial', financialRequestKey('NASDAQ:AAPL', 'TOTAL_REVENUE', 'FQ'))).toBe('financial\u0000NASDAQ:AAPL\u0000TOTAL_REVENUE\u0000FQ\u0000');
     expect(requestSeriesKey('economic', economicRequestKey('US', 'GDP'))).toBe('economic\u0000US\u0000GDP');
+    expect(requestDatafeedKey(seedRequestSymbol('user/repo', 'BTC_DEV'), '1D')).toBe('seed\u0000user/repo\u0000BTC_DEV\u00001D');
   });
 
   it('returns cloned bars for deterministic request fixtures', () => {
