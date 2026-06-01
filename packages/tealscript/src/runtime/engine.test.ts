@@ -3754,15 +3754,18 @@ plot(close[2], title="Close")`;
       const script = `//@version=6
 indicator("Test")
 length = input.int(14, title="Length")
+namedLength = input.int(defval=21, title="Named Length")
 plot(length)`;
 
       const ast = parse(script);
       const bars = createBars(3);
       const result = executeScript(ast, bars);
 
-      expect(result.inputs.length).toBe(1);
+      expect(result.inputs.length).toBe(2);
       expect(result.inputs[0].title).toBe('Length');
       expect(result.inputs[0].defval).toBe(14);
+      expect(result.inputs[1].title).toBe('Named Length');
+      expect(result.inputs[1].defval).toBe(21);
     });
 
     it('uses default input value', () => {

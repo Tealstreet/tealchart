@@ -128,6 +128,11 @@ Current global-helper progress:
 - v6 bool rejection for `nz` and `fixnan` now applies to named arguments as
   well as positional arguments.
 
+Current `input.*` progress:
+
+- Generic and typed input helpers accept Pine-style `defval=` and `title=`
+  named arguments while preserving existing input IDs and metadata.
+
 ## Out-Of-Scope Namespaces For Epic 5
 
 These namespaces are tracked here because they are built-ins, but their parity

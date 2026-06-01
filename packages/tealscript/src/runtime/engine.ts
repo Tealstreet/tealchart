@@ -4685,8 +4685,8 @@ export class TealscriptEngine {
 
     const createInputFunc = (type: string) => {
       return (args: unknown[], namedArgs: Map<string, unknown>, ctx: ExecutionContext) => {
-        const defval = args[0];
-        const title = (namedArgs.get('title') ?? args[1] ?? type) as string;
+        const defval = this.getCallArg(args, namedArgs, 0, 'defval');
+        const title = this.toStringValue(this.getCallArg(args, namedArgs, 1, 'title', type));
 
         const id = `input_${title}`;
 
@@ -4714,7 +4714,7 @@ export class TealscriptEngine {
     };
 
     this.builtins.set('input', (args, namedArgs, ctx) => {
-      const defval = args[0];
+      const defval = this.getCallArg(args, namedArgs, 0, 'defval');
       return createInputFunc(inferInputType(defval))(args, namedArgs, ctx);
     });
     this.builtins.set('input.int', createInputFunc('int'));
@@ -4731,8 +4731,8 @@ export class TealscriptEngine {
 
     // input.source is special - it returns a series
     this.builtins.set('input.source', (args, namedArgs, _ctx) => {
-      const defval = args[0]; // Should be a series like 'close'
-      const _title = (namedArgs.get('title') ?? args[1] ?? 'Source') as string;
+      const defval = this.getCallArg(args, namedArgs, 0, 'defval'); // Should be a series like 'close'
+      const _title = this.toStringValue(this.getCallArg(args, namedArgs, 1, 'title', 'Source'));
 
       // For now, just return the default value
       // In full implementation, this would allow user to select which series
