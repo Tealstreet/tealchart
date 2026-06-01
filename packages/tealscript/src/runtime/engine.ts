@@ -7457,7 +7457,8 @@ export class TealscriptEngine {
       return Number.NaN;
     }
 
-    return closeTime ? this.getBarCloseTime(timestamp, timeframe) : timestamp;
+    const openTime = this.getTimeframeOpenTime(timestamp, timeframe, timezone);
+    return closeTime ? this.getTimeframeCloseTime(openTime, timeframe, timezone) : openTime;
   }
 
   private evaluateTimestamp(args: unknown[], namedArgs: Map<string, unknown>): number {
@@ -7488,6 +7489,10 @@ export class TealscriptEngine {
       return Number.NaN;
     }
 
+    return this.resolveLocalTimestamp(timezone, year, month, day, hour, minute, second);
+  }
+
+  private resolveLocalTimestamp(timezone: string, year: number, month: number, day: number, hour: number, minute: number, second: number): number {
     const utcGuess = Date.UTC(Math.trunc(year), Math.trunc(month) - 1, Math.trunc(day), Math.trunc(hour), Math.trunc(minute), Math.trunc(second));
     const initialOffset = this.getTimezoneOffsetMinutes(timezone, utcGuess);
     const resolvedTimestamp = utcGuess - initialOffset * 60000;
@@ -7550,6 +7555,63 @@ export class TealscriptEngine {
     const duration = this.getTimeframeDurationMs(timeframe);
     if (!Number.isFinite(value) || duration === null) return Number.NaN;
     return value + duration;
+  }
+
+  private getTimeframeOpenTime(timestamp: number, timeframe: string, timezone: string): number {
+    const spec = this.parseTimeframeSpec(timeframe);
+    if (!spec || spec.unit === 'tick') return Number.NaN;
+    if (spec.period === this.ctx.timeframe.period) return timestamp;
+
+    if (spec.unit === 'month') {
+      const year = this.getCalendarPart('year', timestamp, timezone);
+      const month = this.getCalendarPart('month', timestamp, timezone);
+      const monthIndex = year * 12 + (month - 1);
+      const bucketMonthIndex = Math.floor(monthIndex / spec.multiplier) * spec.multiplier;
+      const bucketYear = Math.floor(bucketMonthIndex / 12);
+      const bucketMonth = (bucketMonthIndex % 12) + 1;
+      return this.resolveLocalTimestamp(timezone, bucketYear, bucketMonth, 1, 0, 0, 0);
+    }
+
+    if (spec.unit === 'week') {
+      const offsetMinutes = this.getTimezoneOffsetMinutes(timezone, timestamp);
+      const localDate = new Date(timestamp + offsetMinutes * 60_000);
+      const localMidnight = Date.UTC(localDate.getUTCFullYear(), localDate.getUTCMonth(), localDate.getUTCDate());
+      const mondayOffset = (localDate.getUTCDay() + 6) % 7;
+      const weekStartLocal = localMidnight - mondayOffset * 86_400_000;
+      const anchorMonday = Date.UTC(1970, 0, 5);
+      const bucketLocal = Math.floor((weekStartLocal - anchorMonday) / (spec.multiplier * 7 * 86_400_000)) * spec.multiplier * 7 * 86_400_000 + anchorMonday;
+      const bucketDate = new Date(bucketLocal);
+      return this.resolveLocalTimestamp(timezone, bucketDate.getUTCFullYear(), bucketDate.getUTCMonth() + 1, bucketDate.getUTCDate(), 0, 0, 0);
+    }
+
+    if (spec.unit === 'day') {
+      const offsetMinutes = this.getTimezoneOffsetMinutes(timezone, timestamp);
+      const localDate = new Date(timestamp + offsetMinutes * 60_000);
+      const localMidnight = Date.UTC(localDate.getUTCFullYear(), localDate.getUTCMonth(), localDate.getUTCDate());
+      const bucketLocal = Math.floor(localMidnight / (spec.multiplier * 86_400_000)) * spec.multiplier * 86_400_000;
+      const bucketDate = new Date(bucketLocal);
+      return this.resolveLocalTimestamp(timezone, bucketDate.getUTCFullYear(), bucketDate.getUTCMonth() + 1, bucketDate.getUTCDate(), 0, 0, 0);
+    }
+
+    const duration = this.getTimeframeDurationMs(timeframe);
+    if (duration === null) return Number.NaN;
+    const offsetMs = this.getTimezoneOffsetMinutes(timezone, timestamp) * 60_000;
+    return Math.floor((timestamp + offsetMs) / duration) * duration - offsetMs;
+  }
+
+  private getTimeframeCloseTime(openTime: number, timeframe: string, timezone: string): number {
+    if (!Number.isFinite(openTime)) return Number.NaN;
+    const spec = this.parseTimeframeSpec(timeframe);
+    if (!spec || spec.unit === 'tick') return Number.NaN;
+
+    if (spec.unit === 'month') {
+      const year = this.getCalendarPart('year', openTime, timezone);
+      const month = this.getCalendarPart('month', openTime, timezone);
+      return this.resolveLocalTimestamp(timezone, year, month + spec.multiplier, 1, 0, 0, 0);
+    }
+
+    const duration = this.getTimeframeDurationMs(timeframe);
+    return duration === null ? Number.NaN : openTime + duration;
   }
 
   private getTimeframeDurationMs(timeframe: string): number | null {

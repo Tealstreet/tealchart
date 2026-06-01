@@ -1984,6 +1984,85 @@ plot(timeframe.in_seconds("15") < timeframe.in_seconds("1D") ? 1 : 0, title="Com
       expect(result.plots.find((plot) => plot.title === 'Comparison')?.values).toEqual([1, 1, 1]);
     });
 
+    it('aggregates time and time_close to requested higher timeframe buckets', () => {
+      const script = `//@version=6
+indicator("Higher Timeframe Time")
+plot(time("60"), title="Hourly Open")
+plot(time_close("60"), title="Hourly Close")
+plot(time("D"), title="Daily Open")
+plot(time_close("D"), title="Daily Close")
+plot(time("W"), title="Weekly Open")
+plot(time("M"), title="Monthly Open")
+plot(time("D", timezone="America/New_York"), title="NY Daily Open")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: Date.UTC(2024, 0, 5, 0, 15), open: 1, high: 2, low: 1, close: 2, volume: 100 },
+        { time: Date.UTC(2024, 0, 5, 1, 15), open: 2, high: 3, low: 2, close: 3, volume: 100 },
+        { time: Date.UTC(2024, 0, 5, 23, 15), open: 3, high: 4, low: 3, close: 4, volume: 100 },
+        { time: Date.UTC(2024, 0, 6, 0, 15), open: 4, high: 5, low: 4, close: 5, volume: 100 },
+      ];
+      const result = executeScript(ast, bars, undefined, {
+        runtime: {
+          timeframe: {
+            period: '15',
+            multiplier: 15,
+            isminutes: true,
+            isdaily: false,
+            isweekly: false,
+            ismonthly: false,
+            isintraday: true,
+            isseconds: false,
+            isticks: false,
+          },
+        },
+      });
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Hourly Open')?.values).toEqual([
+        Date.UTC(2024, 0, 5, 0, 0),
+        Date.UTC(2024, 0, 5, 1, 0),
+        Date.UTC(2024, 0, 5, 23, 0),
+        Date.UTC(2024, 0, 6, 0, 0),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Hourly Close')?.values).toEqual([
+        Date.UTC(2024, 0, 5, 1, 0),
+        Date.UTC(2024, 0, 5, 2, 0),
+        Date.UTC(2024, 0, 6, 0, 0),
+        Date.UTC(2024, 0, 6, 1, 0),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Daily Open')?.values).toEqual([
+        Date.UTC(2024, 0, 5),
+        Date.UTC(2024, 0, 5),
+        Date.UTC(2024, 0, 5),
+        Date.UTC(2024, 0, 6),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Daily Close')?.values).toEqual([
+        Date.UTC(2024, 0, 6),
+        Date.UTC(2024, 0, 6),
+        Date.UTC(2024, 0, 6),
+        Date.UTC(2024, 0, 7),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Weekly Open')?.values).toEqual([
+        Date.UTC(2024, 0, 1),
+        Date.UTC(2024, 0, 1),
+        Date.UTC(2024, 0, 1),
+        Date.UTC(2024, 0, 1),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Monthly Open')?.values).toEqual([
+        Date.UTC(2024, 0, 1),
+        Date.UTC(2024, 0, 1),
+        Date.UTC(2024, 0, 1),
+        Date.UTC(2024, 0, 1),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'NY Daily Open')?.values).toEqual([
+        Date.UTC(2024, 0, 4, 5),
+        Date.UTC(2024, 0, 4, 5),
+        Date.UTC(2024, 0, 5, 5),
+        Date.UTC(2024, 0, 5, 5),
+      ]);
+    });
+
     it('keeps multiple untitled plots as separate series', () => {
       const script = `//@version=6
 indicator("Test")
