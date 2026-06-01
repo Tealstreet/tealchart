@@ -5659,39 +5659,12 @@ export class TealscriptEngine {
     });
 
     // EMA - Exponential Moving Average
-    this.builtins.set('ta.ema', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.ema', (args, namedArgs, _ctx, scope, callId) => {
       const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
 
-      // Get the series for the source value
-      const series = this.getSeriesForSource(source, ctx);
-
-      const alpha = 2 / (length + 1);
-
-      // Get previous EMA - use unique key based on source series
-      const emaKey = `_ema_${length}_${source}`;
-      let prevEma = scope.get(emaKey) as number | undefined;
-
-      if (prevEma === undefined || isNaN(prevEma)) {
-        // Initialize with SMA
-        let sum = 0;
-        let count = 0;
-        for (let i = 0; i < length; i++) {
-          const val = series.get(i);
-          if (val !== undefined && !isNaN(val)) {
-            sum += val;
-            count++;
-          }
-        }
-        prevEma = count > 0 ? sum / count : source;
-      }
-
-      const ema = alpha * source + (1 - alpha) * prevEma;
-
-      // Store for next bar
-      scope.declare(emaKey, 'var', ema);
-
-      return ema;
+      if (isNaN(source) || length < 1) return NaN;
+      return this.updateBuiltinEmaState(scope, `_ta_ema_${callId}_${length}`, source, length);
     });
 
     // RSI - Relative Strength Index
@@ -6499,33 +6472,16 @@ export class TealscriptEngine {
 
     // RMA - Wilder's Smoothed Moving Average (also known as SMMA)
     // Formula: alpha = 1/length, rma = alpha * source + (1 - alpha) * prev_rma
-    this.builtins.set('ta.rma', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.rma', (args, namedArgs, _ctx, scope, callId) => {
       const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
-
-      const series = this.getSeriesForSource(source, ctx);
+      if (isNaN(source) || length < 1) return NaN;
       const alpha = 1 / length;
 
-      const rmaKey = `_rma_${length}_${source}`;
-      let prevRma = scope.get(rmaKey) as number | undefined;
-
-      if (prevRma === undefined || isNaN(prevRma)) {
-        // Initialize with SMA
-        let sum = 0;
-        let count = 0;
-        for (let i = 0; i < length; i++) {
-          const val = series.get(i);
-          if (val !== undefined && !isNaN(val)) {
-            sum += val;
-            count++;
-          }
-        }
-        prevRma = count > 0 ? sum / count : source;
-      }
-
-      const rma = alpha * source + (1 - alpha) * prevRma;
-      scope.declare(rmaKey, 'var', rma);
-
+      const rmaKey = `_ta_rma_${callId}_${length}`;
+      const previous = scope.get(rmaKey) as number | undefined;
+      const rma = previous === undefined || isNaN(previous) ? source : alpha * source + (1 - alpha) * previous;
+      this.setBuiltinState(scope, rmaKey, rma);
       return rma;
     });
 

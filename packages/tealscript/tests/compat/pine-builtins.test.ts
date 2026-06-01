@@ -552,6 +552,8 @@ plot(ta.falling(source=close, length=2), title="Named Falling")
 indicator("TA derived source smoke")
 spread = close - open
 plot(ta.sma(spread, 3), title="Spread SMA")
+plot(ta.ema(spread, 3), title="Spread EMA")
+plot(ta.rma(spread, 3), title="Spread RMA")
 plot(ta.wma(spread, 3), title="Spread WMA")
 plot(ta.highest(spread, 3), title="Spread Highest")
 plot(ta.lowest(spread, 3), title="Spread Lowest")
@@ -561,6 +563,8 @@ plot(ta.mom(spread, 2), title="Spread Momentum")
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Spread SMA').values)).toEqual([null, null, 2.333333, 0.333333, -2, -2.333333, 0.333333, 3.333333, 2.666667, 2.333333, 0.333333, 1.333333]);
+    expect(roundSeries(getPlot(result, 'Spread EMA').values)).toEqual([2, 2.5, 2.25, -0.875, -2.4375, -0.71875, 1.640625, 3.320313, 1.160156, 2.080078, 0.540039, 1.27002]);
+    expect(roundSeries(getPlot(result, 'Spread RMA').values)).toEqual([2, 2.333333, 2.222222, 0.148148, -1.234568, -0.489712, 1.006859, 2.337906, 1.225271, 1.816847, 0.877898, 1.251932]);
     expect(roundSeries(getPlot(result, 'Spread WMA').values)).toEqual([null, null, 2.333333, -0.833333, -3, -1.5, 1.666667, 4, 1.833333, 2, 0.333333, 1.166667]);
     expect(roundSeries(getPlot(result, 'Spread Highest').values)).toEqual([2, 3, 3, 3, 2, 1, 4, 5, 5, 5, 3, 3]);
     expect(roundSeries(getPlot(result, 'Spread Lowest').values)).toEqual([2, 2, 2, -4, -4, -4, -4, 1, -1, -1, -1, -1]);
