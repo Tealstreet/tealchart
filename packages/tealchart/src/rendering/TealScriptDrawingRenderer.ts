@@ -732,7 +732,7 @@ export class TealScriptDrawingRenderer {
           if (cell?.text) {
             const textPosition = this.resolveTableCellTextPosition(cell.textHalign, cell.textValign, x, y, width, height);
             ctx.fillStyle = cell.textColor ?? '#FFFFFF';
-            ctx.font = `${this.fontSizeForDrawing(cell.textSize)}px ${this.fontFamilyForDrawing(cell.textFontFamily)}`;
+            ctx.font = this.fontForDrawing(cell.textSize, cell.textFontFamily, cell.textFormatting);
             ctx.textAlign = textPosition.align;
             ctx.textBaseline = textPosition.baseline;
             ctx.fillText(cell.text, textPosition.x, textPosition.y);
@@ -770,7 +770,7 @@ export class TealScriptDrawingRenderer {
         ? this.getTextWidth(
           this.ctx,
           cell.text,
-          `${this.fontSizeForDrawing(cell.textSize)}px ${this.fontFamilyForDrawing(cell.textFontFamily)}`,
+          this.fontForDrawing(cell.textSize, cell.textFontFamily, cell.textFormatting),
         ) + 12
         : defaultColumnWidth;
       columnWidths[cell.column] = Math.max(columnWidths[cell.column]!, cell.width ?? measuredText);
@@ -856,5 +856,17 @@ export class TealScriptDrawingRenderer {
     }
 
     return { x: textX, y: textY, align, baseline };
+  }
+
+  private fontForDrawing(size: string, fontFamily?: string, textFormatting?: string): string {
+    const styleParts: string[] = [];
+    const formatting = (textFormatting ?? 'none').trim().toLowerCase();
+    const tokens = new Set(formatting.split(/[\s,]+/).filter(Boolean));
+    const isCombined = formatting === 'bolditalic' || formatting === 'italicbold';
+    if (tokens.has('italic') || isCombined) styleParts.push('italic');
+    if (tokens.has('bold') || isCombined) styleParts.push('bold');
+    styleParts.push(`${this.fontSizeForDrawing(size)}px`);
+    styleParts.push(this.fontFamilyForDrawing(fontFamily));
+    return styleParts.join(' ');
   }
 }
