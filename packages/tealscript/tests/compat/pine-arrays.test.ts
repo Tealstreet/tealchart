@@ -177,6 +177,20 @@ plot(array.size(values), title="Literal Size")
     expect(roundSeries(getPlot(result, 'Literal Size').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
   });
 
+  it('runs generic array constructor idioms', () => {
+    const result = runCompatScript(`
+indicator("Generic array constructor")
+values = array.new<float>(2, 1.5)
+values.push(close)
+plot(values.get(0), title="Initial")
+plot(values.size(), title="Size")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Initial').values)).toEqual([1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5]);
+    expect(roundSeries(getPlot(result, 'Size').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+  });
+
   it('matches documented Pine array statistical helpers', () => {
     const result = runCompatScript(`
 indicator("Array statistical helpers")

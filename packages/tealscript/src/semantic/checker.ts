@@ -956,6 +956,7 @@ class SemanticChecker {
     this.checkCallee(expression.callee, scope);
     this.checkBuiltinSignature(expression);
     this.checkUdtConstructorSignature(expression, scope);
+    this.checkArrayConstructorTypeArguments(expression);
     this.checkMapConstructorTypeArguments(expression);
     this.checkMapCallTypes(expression, scope);
     for (const argument of expression.arguments) {
@@ -1134,6 +1135,16 @@ class SemanticChecker {
     if (!TYPE_QUALIFIER_NAMES.has(keyTypeName) && !MAP_KEY_TYPE_NAMES.has(keyTypeName)) {
       this.addDiagnostic('invalid-type-template', 'Map key type must be int, float, bool, string, or color in map.new', expression.loc);
     }
+  }
+
+  private checkArrayConstructorTypeArguments(expression: CallExpression): void {
+    if (this.memberPath(expression.callee).join('.') !== 'array.new' || !expression.typeArguments) return;
+    if (expression.typeArguments.length !== 1) {
+      this.addDiagnostic('invalid-type-template', 'array.new() expects exactly 1 type argument', expression.loc);
+      return;
+    }
+
+    this.checkTemplateTypeName(expression.typeArguments[0], 'array element', expression.loc);
   }
 
   private resolveMapCall(
@@ -1401,6 +1412,12 @@ class SemanticChecker {
         kind: 'map',
         keyType: this.typeFromName(expression.typeArguments[0]),
         valueType: this.typeFromName(expression.typeArguments[1]),
+      };
+    }
+    if (calleePath.join('.') === 'array.new' && expression.typeArguments?.length === 1) {
+      return {
+        kind: 'array',
+        elementType: this.typeFromName(expression.typeArguments[0]),
       };
     }
     if (calleePath.length === 2 && calleePath[1] === 'new' && calleePath[0] && this.typeDeclarations.has(calleePath[0])) {
