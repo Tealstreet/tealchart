@@ -921,6 +921,69 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(setLineDash).toHaveBeenCalledWith([2, 3]);
       expect(stroke).toHaveBeenCalled();
     });
+
+    it('skips hlines with display.none through renderPlots', () => {
+      const stroke = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        stroke,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 50,
+        priceMax: 150,
+      };
+      const plot: PlotOutput = {
+        id: 'hline_Hidden',
+        type: 'hline',
+        title: 'Hidden',
+        values: [],
+        color: '#2196F3',
+        price: 100,
+        display: 0,
+      };
+
+      renderer.renderPlots([plot], bars, viewport);
+
+      expect(stroke).not.toHaveBeenCalled();
+    });
+
+    it('renders pane hlines with configured style and width', () => {
+      const setLineDash = vi.fn();
+      const stroke = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        setLineDash,
+        stroke,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const paneOffset = {
+        top: 100,
+        height: 200,
+        yMin: 0,
+        yMax: 100,
+      };
+      const plot: PlotOutput = {
+        id: 'hline_Pane',
+        type: 'hline',
+        title: 'Pane',
+        values: [],
+        color: '#ff0000',
+        linewidth: 3,
+        lineStyle: 'dashed',
+        price: 50,
+      };
+
+      (renderer as any).renderHlineInPane(plot, paneOffset);
+
+      expect(setLineDash).toHaveBeenCalledWith([6, 4]);
+      expect(stroke).toHaveBeenCalled();
+      expect(ctx.strokeStyle).toBe('#ff0000');
+      expect(ctx.lineWidth).toBe(3);
+    });
   });
 
   describe('fill rendering', () => {
