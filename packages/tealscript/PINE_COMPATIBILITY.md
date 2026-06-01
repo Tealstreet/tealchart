@@ -305,6 +305,8 @@ plot/hline handle fills.
 
 Plotarrow renderer coverage scales arrows between Pine `minheight` and
 `maxheight` using the visible series magnitude and suppresses zero-value arrows.
+Plotshape renderer coverage now draws Pine flag and label marker bodies in
+addition to the existing basic geometric marker shapes.
 The same renderer bar-window handling now applies to common `plot()`,
 `bgcolor()`, `barcolor()`, `plotbar()`, `plotcandle()`, `plotshape()`,
 `plotchar()`, and `plotarrow()` outputs.

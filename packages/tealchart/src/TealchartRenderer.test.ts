@@ -1238,6 +1238,60 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect((renderer as any).getPlotArrowMarkerSize(plot, 5, 10, 6)).toBeCloseTo(12.5);
       expect((renderer as any).getPlotArrowMarkerSize(plot, 10, 10, 6)).toBe(20);
     });
+
+    it('draws Pine flag marker shapes with a pole and banner', () => {
+      const fillRect = vi.fn();
+      const stroke = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillRect,
+        stroke,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+
+      (renderer as any).drawShape(100, 120, 'flag', 16);
+
+      expect(stroke).toHaveBeenCalledTimes(1);
+      expect(fillRect).toHaveBeenCalledWith(expect.any(Number), expect.any(Number), 12.8, 7.2);
+    });
+
+    it('draws Pine label marker shapes with rounded bodies and directional pointers', () => {
+      const fill = vi.fn();
+      const moveTo = vi.fn();
+      const roundRect = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fill,
+        moveTo,
+        roundRect,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+
+      (renderer as any).drawShape(100, 120, 'labelup', 20);
+      (renderer as any).drawShape(140, 160, 'labeldown', 20);
+
+      expect(roundRect).toHaveBeenCalledTimes(2);
+      expect(fill).toHaveBeenCalledTimes(4);
+      expect(moveTo).toHaveBeenCalledWith(100, 133);
+      expect(moveTo).toHaveBeenCalledWith(140, 147);
+    });
+
+    it('falls back to rectangular label bodies when roundRect is unavailable', () => {
+      const fill = vi.fn();
+      const rect = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fill,
+        rect,
+        roundRect: undefined,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+
+      (renderer as any).drawShape(100, 120, 'labelup', 20);
+
+      expect(rect).toHaveBeenCalledWith(86, 111, 28, 18);
+      expect(fill).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe('background rendering', () => {
