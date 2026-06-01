@@ -121,6 +121,33 @@ export type Pivot
     ]);
   });
 
+  it('reports invalid exported library function scopes', () => {
+    const result = checkProgram(parse(`
+library("Export Scope")
+const int allowed = 2
+scale = input.int(2)
+globalPrice = close
+export usesGlobals(float value) =>
+    localScale = allowed
+    value * scale + globalPrice + localScale
+export usesInput(float value) =>
+    length = input.int(14)
+    value + length
+export shadowsGlobal(float scale) => scale + allowed
+export lateShadow(float value) =>
+    before = value + scale
+    scale = 1
+    before + scale
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Exported function usesGlobals cannot use non-const global variable: scale',
+      'Exported function usesGlobals cannot use non-const global variable: globalPrice',
+      'Exported function usesInput cannot call input.*() functions',
+      'Exported function lateShadow cannot use non-const global variable: scale',
+    ]);
+  });
+
   it('allows nested scopes to shadow outer declarations', () => {
     const result = checkProgram(parse(`
 indicator("Shadow")
