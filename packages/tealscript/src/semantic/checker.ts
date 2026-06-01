@@ -808,8 +808,13 @@ class SemanticChecker {
 
     const seenNames = new Set<string>();
     let positionalIndex = 0;
+    let hasNamedArgument = false;
     for (const argument of expression.arguments) {
       if (!argument.name) {
+        if (hasNamedArgument) {
+          positionalIndex += 1;
+          continue;
+        }
         const field = declaration.fields[positionalIndex];
         if (field) {
           this.checkUdtFieldValueType(typeName, field, argument.value, scope);
@@ -818,6 +823,7 @@ class SemanticChecker {
         continue;
       }
 
+      hasNamedArgument = true;
       const fieldName = argument.name.name;
       const field = this.findUdtField(typeName, fieldName);
       if (!field) {

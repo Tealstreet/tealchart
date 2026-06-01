@@ -309,7 +309,7 @@ tooMany = Pivot.new(1, 2.0, 3.0)
 unknown = Pivot.new(z=1)
 duplicate = Pivot.new(1, x=2)
 duplicateNamed = Pivot.new(y=1, y=2)
-badOrder = Pivot.new(x=1, 2.0)
+badOrder = Pivot.new(x=1, "bad")
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
