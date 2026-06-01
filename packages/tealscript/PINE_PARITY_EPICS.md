@@ -432,6 +432,7 @@ Phases:
    and `matrix.trace()` for square matrices.
    Runtime coverage now includes `matrix.det()` for square matrices and
    `matrix.rank()` for square or rectangular matrices.
+   Runtime coverage now includes `matrix.inv()` for square nonsingular matrices.
 3. Implement `map.*` with key/value typing, insertion, lookup, removal, keys,
    values, copy, and iteration.
 4. Implement user-defined types (`type`), fields, constructors, methods, and

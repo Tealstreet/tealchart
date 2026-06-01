@@ -2901,6 +2901,48 @@ plot(values.det())`;
       expect(result.errors[0]?.message).toBe('Matrix determinant requires a square matrix. Matrix is 2x3');
     });
 
+    it('executes matrix inverse helpers', () => {
+      const script = `//@version=6
+indicator("Matrix Inverse")
+values = matrix.new_float(2, 2, 0)
+values.set(0, 0, 4)
+values.set(0, 1, 7)
+values.set(1, 0, 2)
+values.set(1, 1, 6)
+inverse = matrix.inv(values)
+identity = values.mult(inverse)
+plot(inverse.get(0, 0), title="Inv00")
+plot(inverse.get(0, 1), title="Inv01")
+plot(identity.get(0, 0), title="Identity00")
+plot(identity.get(1, 1), title="Identity11")
+plot(values.get(0, 0), title="Original")`;
+
+      const result = executeScript(parse(script), createBars(2, 100));
+
+      expect(result.errors).toHaveLength(0);
+      result.plots.find((plot) => plot.title === 'Inv00')?.values.forEach((value) => expect(value).toBeCloseTo(0.6));
+      result.plots.find((plot) => plot.title === 'Inv01')?.values.forEach((value) => expect(value).toBeCloseTo(-0.7));
+      result.plots.find((plot) => plot.title === 'Identity00')?.values.forEach((value) => expect(value).toBeCloseTo(1));
+      result.plots.find((plot) => plot.title === 'Identity11')?.values.forEach((value) => expect(value).toBeCloseTo(1));
+      expect(result.plots.find((plot) => plot.title === 'Original')?.values).toEqual([4, 4]);
+    });
+
+    it('reports matrix inverse errors', () => {
+      const script = `//@version=6
+indicator("Matrix Inverse Error")
+values = matrix.new_float(2, 2, 0)
+values.set(0, 0, 1)
+values.set(0, 1, 2)
+values.set(1, 0, 2)
+values.set(1, 1, 4)
+inverse = values.inv()
+plot(inverse.get(0, 0))`;
+
+      const result = executeScript(parse(script), createBars(1, 100));
+
+      expect(result.errors[0]?.message).toBe('Matrix is singular and cannot be inverted');
+    });
+
     it('returns expression results from user function if branches', () => {
       const script = `//@version=6
 indicator("Function If")
