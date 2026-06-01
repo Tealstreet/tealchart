@@ -283,9 +283,9 @@ fill(topLine, bottomLine, color.new(color.blue, 90), "Range Fill", true, 4, true
   it('captures Pine marker visual parameters', () => {
     const result = runCompatScript(`
 indicator("Marker visuals smoke", overlay=true)
-plotshape(close > open, "Long", shape.triangleup, location.belowbar, color.green, 1, "L", color.white, false, size.large, 5, display.price_scale)
-plotchar(close < open, "Down Char", "D", location.abovebar, color.red, -1, "Down", color.yellow, true, size.small, 6, display.none)
-plotarrow(close - open, "Move Arrow", color.green, color.red, 0, 5, 20, false, 7, display.all)
+plotshape(close > open, "Long", shape.triangleup, location.belowbar, color.green, 1, "L", color.white, false, size.large, 5, display.price_scale, format.price, 2, true)
+plotchar(close < open, "Down Char", "D", location.abovebar, color.red, -1, "Down", color.yellow, true, size.small, 6, display.none, format.volume, 0, true)
+plotarrow(close - open, "Move Arrow", color.new(color.green, 50), color.new(color.red, 50), 0, 5, 20, false, 7, display.all, format.price, 2, true)
 `);
 
     expect(result.errors).toEqual([]);
@@ -300,6 +300,9 @@ plotarrow(close - open, "Move Arrow", color.green, color.red, 0, 5, 20, false, 7
       editable: false,
       showLast: 5,
       display: 8,
+      format: 'price',
+      precision: 2,
+      forceOverlay: true,
     });
     expect(getPlot(result, 'Down Char')).toMatchObject({
       type: 'plotchar',
@@ -312,17 +315,23 @@ plotarrow(close - open, "Move Arrow", color.green, color.red, 0, 5, 20, false, 7
       editable: true,
       showLast: 6,
       display: 0,
+      format: 'volume',
+      precision: 0,
+      forceOverlay: true,
     });
     expect(getPlot(result, 'Move Arrow')).toMatchObject({
       type: 'plotarrow',
-      colorup: '#4CAF50',
-      colordown: '#F44336',
+      colorup: '#4CAF5080',
+      colordown: '#F4433680',
       offset: 0,
       minHeight: 5,
       maxHeight: 20,
       editable: false,
       showLast: 7,
       display: 15,
+      format: 'price',
+      precision: 2,
+      forceOverlay: true,
     });
   });
 

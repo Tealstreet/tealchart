@@ -4838,8 +4838,8 @@ export class TealscriptEngine {
     this.builtins.set('plotarrow', (args, namedArgs, ctx) => {
       const series = args[0] as number; // Positive = up arrow, negative = down arrow
       const title = (this.getCallArg(args, namedArgs, 1, 'title', 'Arrow')) as string;
-      const colorup = (this.getCallArg(args, namedArgs, 2, 'colorup', '#4CAF50')) as string;
-      const colordown = (this.getCallArg(args, namedArgs, 3, 'colordown', '#F44336')) as string;
+      const colorup = this.toPlotColor(this.getCallArg(args, namedArgs, 2, 'colorup', '#4CAF50'));
+      const colordown = this.toPlotColor(this.getCallArg(args, namedArgs, 3, 'colordown', '#F44336'));
       const offset = this.toOptionalInteger(this.getCallArg(args, namedArgs, 4, 'offset'));
       const minHeight = this.toOptionalInteger(this.getCallArg(args, namedArgs, 5, 'minheight'));
       const maxHeight = this.toOptionalInteger(this.getCallArg(args, namedArgs, 6, 'maxheight'));
@@ -4858,8 +4858,8 @@ export class TealscriptEngine {
           type: 'plotarrow',
           title,
           color: [],
-          colorup,
-          colordown,
+          colorup: colorup ?? undefined,
+          colordown: colordown ?? undefined,
           location: 'abovebar', // Arrows position relative to price
           offset,
           minHeight,
