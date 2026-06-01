@@ -5774,8 +5774,8 @@ export class TealscriptEngine {
     this.builtins.set('matrix.eigenvalues', (args) => eigenvaluesMatrixValue(readMatrix(args[0])));
     this.builtins.set('matrix.eigenvectors', (args) => eigenvectorsMatrixValue(readMatrix(args[0])));
     this.builtins.set('matrix.kron', (args) => kronMatrixValue(readMatrix(args[0]), readMatrix(args[1])));
-    this.builtins.set('matrix.sort', (args) => {
-      sortMatrixRows(readMatrix(args[0]), args[1] as number | undefined, args[2]);
+    this.builtins.set('matrix.sort', (args, namedArgs) => {
+      sortMatrixRows(readMatrix(args[0]), args[1] as number | undefined, args[2], namedArgs.get('sort_field') ?? args[3]);
       return null;
     });
     this.builtins.set('matrix.submatrix', (args) => {

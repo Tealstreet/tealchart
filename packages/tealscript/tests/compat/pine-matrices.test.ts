@@ -187,6 +187,29 @@ plot(vectors.get(1, 1), title="Second Y")
     expect(roundSeries(getPlot(result, 'Second Y').values)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   });
 
+  it('runs matrix UDT sort field idioms', () => {
+    const result = runCompatScript(`
+indicator("Matrix UDT sort fields")
+type Ranked
+    float score
+    string name
+values = matrix.new<Ranked>()
+values.add_row(array.from(Ranked.new(3, "C"), Ranked.new(30, "cc")))
+values.add_row(array.from(Ranked.new(1, "A"), Ranked.new(10, "aa")))
+values.add_row(array.from(Ranked.new(2, "B"), Ranked.new(20, "bb")))
+values.sort(0, order.ascending, "score")
+firstByName = values.get(0, 0)
+matrix.sort(values, 1, order.descending, 1)
+firstByIndex = values.get(0, 1)
+plot(firstByName.score, title="First Score")
+plot(firstByIndex.score, title="First Column Score")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'First Score').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'First Column Score').values)).toEqual([30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30]);
+  });
+
   it('prefers scoped matrix receivers over the matrix namespace', () => {
     const result = runCompatScript(`
 indicator("Matrix receiver shadowing")
