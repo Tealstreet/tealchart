@@ -478,9 +478,11 @@ matrix.sort(values, 0, order.ascending, 1)
 inputField = input.string("score")
 simple string simpleField = "score"
 seriesIndex = bar_index
+int unqualifiedField = 1
 matrix.sort(values, 0, order.ascending, inputField)
 values.sort(0, order.ascending, simpleField)
 values.sort(0, order.ascending, seriesIndex)
+values.sort(0, order.ascending, unqualifiedField)
 values.sort(0, order.ascending, true)
 arrayValues = array.new_float()
 arrayValues.sort(order.ascending, inputField)
@@ -490,6 +492,7 @@ arrayValues.sort(order.ascending, inputField)
       'matrix.sort() sort_field requires const int or const string, got input unknown',
       'matrix.sort() sort_field requires const int or const string, got simple string',
       'matrix.sort() sort_field requires const int or const string, got series int',
+      'matrix.sort() sort_field requires const int or const string, got unqualified int',
       'matrix.sort() sort_field must be a const int or const string, got bool',
     ]);
   });

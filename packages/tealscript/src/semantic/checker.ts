@@ -1222,10 +1222,11 @@ class SemanticChecker {
       return;
     }
 
-    if (sortFieldType.qualifier && sortFieldType.qualifier !== 'const') {
+    if (sortFieldType.qualifier ? sortFieldType.qualifier !== 'const' : sortFieldType.kind !== 'unknown') {
+      const qualifierLabel = sortFieldType.qualifier ?? 'unqualified';
       this.addDiagnostic(
         'qualifier-mismatch',
-        `matrix.sort() sort_field requires const int or const string, got ${sortFieldType.qualifier} ${sortFieldType.kind}`,
+        `matrix.sort() sort_field requires const int or const string, got ${qualifierLabel} ${sortFieldType.kind}`,
         sortFieldArgument.loc,
       );
     }
