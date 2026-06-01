@@ -93,7 +93,7 @@ reading the whole runtime.
 | Visuals | `hline` | Partial | `tests/compat/pine-visuals.test.ts` | Full settings and display parity remain. |
 | Visuals | `fill` | Partial | `tests/compat/pine-visuals.test.ts` | Advanced parameters and color series behavior remain. |
 | Visuals | `bgcolor` | Supported | `tests/compat/pine-visuals.test.ts` | Runtime captures display and force-overlay metadata. None known for current output shape. |
-| Visuals | `plotshape`, `plotchar`, `plotarrow` | Partial | `tests/compat/pine-visuals.test.ts` | Styling/location/display parity remains. |
+| Visuals | `plotshape`, `plotchar`, `plotarrow` | Partial | `tests/compat/pine-visuals.test.ts` | Runtime captures common style/location/display/format/precision/force-overlay metadata and normalized arrow colors. Renderer pixel parity remains. |
 | Visuals | `barcolor` | Supported | `tests/compat/pine-visuals.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | None known for current output shape. |
 | Visuals | `plotbar`, `plotcandle` | Supported | `tests/compat/pine-visuals.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | Runtime captures format, precision, and force-overlay metadata. Edge-case parity will continue under visual epic. |
 | Drawings | `label.*` | Partial | `src/runtime/drawings/builtins.test.ts`; `packages/tealchart/src/TealchartRenderer.test.ts` | GC limits, full style parity, and realtime rollback remain. |

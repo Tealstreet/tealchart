@@ -348,7 +348,9 @@ Phases:
 3. Finish `fill()` for plot/hline handles, fill gaps, title/editable/display,
    and color series behavior.
 4. Finish `plotshape`, `plotchar`, and `plotarrow` text, location, size,
-   offset, display, and color behavior.
+   offset, display, and color behavior. Initial parity work now captures
+   runtime metadata for common marker parameters and normalizes `plotarrow`
+   colors through the shared color pipeline.
 5. Finish `bgcolor`, `barcolor`, `plotbar`, and `plotcandle` edge cases.
    Initial parity work now captures `bgcolor()` display metadata and OHLC
    `format`, `precision`, and `force_overlay` metadata.

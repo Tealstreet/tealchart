@@ -283,11 +283,11 @@ colors.
 ## Common Plot Metadata Coverage
 
 The visual metadata pass captures common Pine v6 display/style fields on
-`plot()`, `bgcolor()`, `plotbar()`, and `plotcandle()`, including display,
-format, precision, force-overlay, and plot line-style metadata where those
-parameters exist. The compatibility fixture covers named and positional
-argument forms plus the `plot.linestyle_*` constants used by Pine v6 line
-plots.
+`plot()`, `bgcolor()`, `plotbar()`, `plotcandle()`, `plotshape()`,
+`plotchar()`, and `plotarrow()`, including display, format, precision,
+force-overlay, and plot line-style metadata where those parameters exist. The
+compatibility fixture covers named and positional argument forms plus the
+`plot.linestyle_*` constants used by Pine v6 line plots.
 
 ## Common OHLC Plot Coverage
 
