@@ -195,6 +195,7 @@ const MAP_KEY_TYPE_NAMES = new Set(['int', 'float', 'bool', 'string', 'color']);
 
 interface BuiltinSignature {
   params: string[];
+  overloads?: string[][];
   minArgs?: number;
   maxArgs?: number;
   allowExtraNamed?: boolean;
@@ -237,19 +238,41 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   [
     'input.int',
     {
-      params: ['defval', 'title', 'minval', 'maxval', 'step', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'],
+      params: ['defval', 'title', 'options', 'minval', 'maxval', 'step', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'],
+      overloads: [
+        ['defval', 'title', 'minval', 'maxval', 'step', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'],
+        ['defval', 'title', 'options', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'],
+      ],
       minArgs: 1,
     },
   ],
   [
     'input.float',
     {
-      params: ['defval', 'title', 'minval', 'maxval', 'step', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'],
+      params: ['defval', 'title', 'options', 'minval', 'maxval', 'step', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'],
+      overloads: [
+        ['defval', 'title', 'minval', 'maxval', 'step', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'],
+        ['defval', 'title', 'options', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'],
+      ],
       minArgs: 1,
     },
   ],
   ['input.bool', { params: ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1 }],
   ['input.string', { params: ['defval', 'title', 'options', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1 }],
+  ['input.color', { params: ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1 }],
+  [
+    'input.price',
+    {
+      params: ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'],
+      minArgs: 1,
+    },
+  ],
+  ['input.time', { params: ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1 }],
+  ['input.timeframe', { params: ['defval', 'title', 'options', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1 }],
+  ['input.symbol', { params: ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1 }],
+  ['input.session', { params: ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1 }],
+  ['input.text_area', { params: ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1 }],
+  ['input.source', { params: ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1 }],
   ['na', { params: ['x'], minArgs: 1, maxArgs: 1 }],
   ['nz', { params: ['source', 'replacement'], minArgs: 1, maxArgs: 2 }],
   [
@@ -625,7 +648,7 @@ class SemanticChecker {
 
   private checkArgumentNames(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
     if (signature.allowExtraNamed) return;
-    const allowed = new Set(signature.params);
+    const allowed = new Set(this.resolveSignatureParams(args, signature));
     for (const arg of args) {
       if (arg.name && !allowed.has(arg.name.name)) {
         this.addDiagnostic('unknown-argument', `Unknown argument '${arg.name.name}' for ${displayName}()`, arg.name.loc);
@@ -634,11 +657,12 @@ class SemanticChecker {
   }
 
   private checkArgumentCount(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
+    const params = this.resolveSignatureParams(args, signature);
     const positionalCount = this.leadingPositionalCount(args);
     const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [arg.name.name] : [])));
-    const boundParamCount = signature.params.filter((param, index) => index < positionalCount || suppliedNames.has(param)).length;
+    const boundParamCount = params.filter((param, index) => index < positionalCount || suppliedNames.has(param)).length;
     const minArgs = signature.minArgs ?? 0;
-    const maxArgs = signature.maxArgs ?? signature.params.length;
+    const maxArgs = signature.maxArgs ?? params.length;
 
     if (boundParamCount < minArgs) {
       this.addDiagnostic('argument-count', `${displayName}() expects at least ${minArgs} argument${minArgs === 1 ? '' : 's'}`, args[0]?.loc);
@@ -649,6 +673,7 @@ class SemanticChecker {
   }
 
   private checkDuplicateArgumentBindings(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
+    const params = this.resolveSignatureParams(args, signature);
     const positionalCount = this.leadingPositionalCount(args);
     const seenNames = new Set<string>();
 
@@ -662,11 +687,23 @@ class SemanticChecker {
       }
       seenNames.add(name);
 
-      const positionalIndex = signature.params.indexOf(name);
+      const positionalIndex = params.indexOf(name);
       if (positionalIndex !== -1 && positionalIndex < positionalCount) {
         this.addDiagnostic('duplicate-argument', `Argument '${name}' for ${displayName}() was supplied multiple times`, arg.name.loc);
       }
     }
+  }
+
+  private resolveSignatureParams(args: CallArgument[], signature: BuiltinSignature): string[] {
+    if (!signature.overloads) return signature.params;
+
+    const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [arg.name.name] : [])));
+    const thirdPositional = args.filter((arg) => !arg.name)[2]?.value;
+    const usesOptionsOverload = suppliedNames.has('options') || thirdPositional?.type === 'ArrayExpression';
+    const optionsOverload = signature.overloads.find((params) => params.includes('options'));
+    const rangeOverload = signature.overloads.find((params) => params.includes('minval'));
+
+    return (usesOptionsOverload ? optionsOverload : rangeOverload) ?? signature.params;
   }
 
   private leadingPositionalCount(args: CallArgument[]): number {

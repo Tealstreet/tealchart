@@ -132,6 +132,9 @@ Current `input.*` progress:
 
 - Generic and typed input helpers accept Pine-style `defval=` and `title=`
   named arguments while preserving existing input IDs and metadata.
+- Typed input helpers preserve common positional and named metadata, including
+  range bounds, steps, options, confirm, display, active, group, inline, and
+  tooltip. Invalid typed defaults now fail early.
 - `input.source()` registers source metadata and returns host-provided overrides
   when present.
 - `indicator(..., shorttitle=...)` is exposed on execution results as
