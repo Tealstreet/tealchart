@@ -223,7 +223,8 @@ method overloads by receiver type.
 
 Known limits: UDT field and method receiver types are recorded dynamically but
 not yet fully enforced by the semantic checker. Constructor argument diagnostics
-cover local UDT field names, duplicate bindings, and argument counts. Library
+cover unknown field names, duplicate bindings, excess positional arguments, and
+invalid argument order between named and positional arguments. Library
 export/import diagnostics and full reference-type diagnostics remain planned in
 Epic 12 and the qualified type-system epic.
 
