@@ -453,6 +453,8 @@ midpoint = math.avg(open, high, low, close)
 rounded = math.round(midpoint, 2)
 rightAngle = math.todegrees(math.pi / 2)
 mintick = math.round_to_mintick(1.234)
+halfTick = math.round_to_mintick(number=1.005)
+residueTick = math.round_to_mintick(1.2000000000000002)
 sparse = bar_index == 2 ? na : close
 seededRandom = math.random(10, 20, 7)
 defaultRandom = math.random()
@@ -460,6 +462,8 @@ plot(rounded, title="Rounded Midpoint")
 plot(math.trunc(-1.9), title="Truncated")
 plot(rightAngle, title="Right Angle")
 plot(mintick, title="Min Tick Rounded")
+plot(halfTick, title="Named Half Tick")
+plot(residueTick, title="Residue Tick")
 plot(math.round(math.toradians(180), 6), title="Radians")
 plot(math.sum(sparse, 3), title="Sparse Sum")
 plot(math.round(number=math.pi, precision=3), title="Named Round")
@@ -476,6 +480,8 @@ plot(defaultRandom > 0 and defaultRandom < 1 ? 1 : 0, title="Default Random In R
     expect(roundSeries(getPlot(result, 'Truncated').values)).toEqual([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
     expect(roundSeries(getPlot(result, 'Right Angle').values)).toEqual([90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90]);
     expect(roundSeries(getPlot(result, 'Min Tick Rounded').values)).toEqual([1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23]);
+    expect(roundSeries(getPlot(result, 'Named Half Tick').values)).toEqual([1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01]);
+    expect(roundSeries(getPlot(result, 'Residue Tick').values)).toEqual([1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2]);
     expect(roundSeries(getPlot(result, 'Radians').values, 6)).toEqual([3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593]);
     expect(roundSeries(getPlot(result, 'Sparse Sum').values)).toEqual([null, null, null, 310, 307, 302, 303, 313, 321, 328, 329, 333]);
     expect(roundSeries(getPlot(result, 'Named Round').values)).toEqual([3.142, 3.142, 3.142, 3.142, 3.142, 3.142, 3.142, 3.142, 3.142, 3.142, 3.142, 3.142]);
