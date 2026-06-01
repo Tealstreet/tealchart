@@ -2803,6 +2803,49 @@ plot(product.get(0, 0))`;
       expect(result.errors[0]?.message).toBe('Matrix multiplication requires left columns to match right rows. Left is 2x3, right is 2x2');
     });
 
+    it('executes matrix power and trace helpers', () => {
+      const script = `//@version=6
+indicator("Matrix Power Trace")
+values = matrix.new_float(2, 2, 0)
+values.set(0, 0, 1)
+values.set(0, 1, 2)
+values.set(1, 0, 3)
+values.set(1, 1, 4)
+squared = matrix.pow(values, 2)
+identity = values.pow(0)
+plot(values.trace(), title="Trace")
+plot(squared.get(1, 1), title="Power")
+plot(identity.get(0, 0), title="Identity")
+plot(values.get(0, 1), title="Original")`;
+
+      const result = executeScript(parse(script), createBars(2, 100));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Trace')?.values).toEqual([5, 5]);
+      expect(result.plots.find((plot) => plot.title === 'Power')?.values).toEqual([22, 22]);
+      expect(result.plots.find((plot) => plot.title === 'Identity')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Original')?.values).toEqual([2, 2]);
+    });
+
+    it('reports matrix power and trace errors', () => {
+      const script = `//@version=6
+indicator("Matrix Power Trace Errors")
+values = matrix.new_float(2, 3, 1)
+plot(values.trace())`;
+
+      const traceResult = executeScript(parse(script), createBars(1, 100));
+      expect(traceResult.errors[0]?.message).toBe('Matrix trace requires a square matrix. Matrix is 2x3');
+
+      const powerScript = `//@version=6
+indicator("Matrix Power Errors")
+values = matrix.new_float(2, 2, 1)
+powered = matrix.pow(values, 1.5)
+plot(powered.get(0, 0))`;
+
+      const powerResult = executeScript(parse(powerScript), createBars(1, 100));
+      expect(powerResult.errors[0]?.message).toBe('Matrix power must be a non-negative integer');
+    });
+
     it('returns expression results from user function if branches', () => {
       const script = `//@version=6
 indicator("Function If")
