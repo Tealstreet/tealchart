@@ -239,6 +239,10 @@ scripts can execute exported helper functions in the same file, which supports
 deterministic compatibility fixtures based on TradingView's documented
 all-time-high/all-time-low library idiom.
 
+Semantic diagnostics require `export` declarations to live in library scripts,
+require library scripts to export at least one parsed exportable declaration,
+and require exported function/method parameters to declare types.
+
 The runtime can also bind imported libraries from a deterministic host-provided
 registry keyed by Pine import path. This supports `alias.exportedFunction(...)`
 calls and exported user-defined type constructors such as `alias.Type.new(...)`
@@ -250,8 +254,8 @@ UDTs, and use library-local methods.
 
 Published TradingView lookup is not implemented yet. `import` declarations
 without a matching registry entry emit an explicit unsupported diagnostic until
-Epic 12 adds versioned remote/local resolution, enum namespace binding, and full
-library diagnostics.
+Epic 12 adds versioned remote/local resolution, enum namespace binding,
+exported constants, and deeper library diagnostics.
 
 ## Common `color.*` Coverage
 
