@@ -349,6 +349,8 @@ Phases:
    area styles. Renderer coverage also draws `trackprice` lines; price-scale
    labels remain future work. Point marker rendering now honors `join=true`.
 2. Finish `hline()` handles and visual settings.
+   Renderer coverage now applies hline color, linewidth, line style, display
+   hiding, and pane coordinates for the current output shape.
 3. Finish `fill()` for plot/hline handles, fill gaps, title/editable/display,
    and color series behavior.
    Initial renderer parity now applies `show_last` windows to filled regions.

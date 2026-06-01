@@ -296,6 +296,9 @@ area plot rendering when supplied. Plot renderer coverage also draws
 `trackprice` lines at the latest finite rendered plot value and joins
 circle/cross plot markers when `join=true`.
 
+Hline renderer coverage applies Pine `hline()` color, linewidth, linestyle,
+display hiding, and pane-coordinate behavior for the current output shape.
+
 Fill renderer coverage applies `show_last` windows to filled regions while
 preserving existing gap handling and per-bar fill colors.
 The same renderer bar-window handling now applies to common `plot()`,
