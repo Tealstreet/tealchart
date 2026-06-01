@@ -153,7 +153,8 @@ Phases:
    high-impact built-in signatures for argument names, counts, ordering, and
    duplicate positional/named bindings.
 5. Add type templates such as `array<float>`, `matrix<int>`, and
-   `map<string, float>`.
+   `map<string, float>`. The semantic checker now validates collection
+   template arguments and rejects qualifier keywords in template positions.
 6. Surface diagnostics through the worker/editor path.
 
 Done means TealScript can reject invalid Pine-like code before runtime and can

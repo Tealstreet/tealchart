@@ -190,6 +190,9 @@ const QUALIFIER_RANK: Record<SemanticQualifier, number> = {
   series: 3,
 };
 
+const TYPE_QUALIFIER_NAMES = new Set(['const', 'input', 'simple', 'series']);
+const MAP_KEY_TYPE_NAMES = new Set(['int', 'float', 'bool', 'string', 'color']);
+
 interface BuiltinSignature {
   params: string[];
   minArgs?: number;
@@ -391,6 +394,7 @@ class SemanticChecker {
     });
     const typeScope = new SemanticScope(scope);
     for (const field of statement.fields) {
+      this.checkTypeAnnotation(statement.name.name, field.typeAnnotation ?? undefined, field.name.loc);
       this.declare(typeScope, {
         name: field.name.name,
         kind: 'variable',
@@ -406,6 +410,7 @@ class SemanticChecker {
     const functionScope = new SemanticScope(scope);
 
     for (const parameter of statement.params) {
+      this.checkTypeAnnotation(statement.name.name, parameter.typeAnnotation ?? undefined, parameter.loc);
       this.declare(functionScope, {
         name: parameter.name,
         kind: 'parameter',
@@ -424,6 +429,7 @@ class SemanticChecker {
 
   private checkVariableDeclaration(statement: VariableDeclaration, scope: SemanticScope): void {
     this.checkExpression(statement.init, scope);
+    this.checkTypeAnnotation('variable declaration', statement.typeAnnotation, statement.loc);
     this.checkTypeCompatibility(statement.typeAnnotation, statement.init, scope, statement.loc);
     if (statement.names.type === 'TupleDeclarator') {
       this.declareTuple(statement.names, scope);
@@ -674,6 +680,29 @@ class SemanticChecker {
   private checkIdentifier(identifier: Identifier, scope: SemanticScope): void {
     if (this.isKnownIdentifier(identifier.name) || scope.lookup(identifier.name)) return;
     this.addDiagnostic('unknown-identifier', `Unknown identifier: ${identifier.name}`, identifier.loc);
+  }
+
+  private checkTypeAnnotation(owner: string, annotation?: TypeAnnotation | null, loc?: SourceLocation): void {
+    if (!annotation) return;
+
+    if (annotation.baseType === 'array' || annotation.baseType === 'matrix') {
+      this.checkTemplateTypeName(annotation.elementType, `${annotation.baseType} element`, loc ?? annotation.loc);
+      return;
+    }
+
+    if (annotation.baseType === 'map') {
+      this.checkTemplateTypeName(annotation.keyType, 'map key', loc ?? annotation.loc);
+      this.checkTemplateTypeName(annotation.valueType, 'map value', loc ?? annotation.loc);
+      if (!TYPE_QUALIFIER_NAMES.has(annotation.keyType) && !MAP_KEY_TYPE_NAMES.has(annotation.keyType)) {
+        this.addDiagnostic('invalid-type-template', `Map key type must be int, float, bool, string, or color in ${owner}`, loc ?? annotation.loc);
+      }
+    }
+  }
+
+  private checkTemplateTypeName(typeName: string, role: string, loc?: SourceLocation): void {
+    if (TYPE_QUALIFIER_NAMES.has(typeName)) {
+      this.addDiagnostic('invalid-type-template', `Invalid ${role} type '${typeName}'; qualifiers cannot be used as template types`, loc);
+    }
   }
 
   private checkExpressions(scope: SemanticScope, expressions: Array<Expression | undefined>): void {
