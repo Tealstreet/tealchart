@@ -821,7 +821,8 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
   builtins.set('table.cell', (args, namedArgs, ctx) => {
     withTable(namedArgs.get('table_id') ?? args[0], ctx, (table) => {
       const { column, row } = normalizeCellCoordinates(table, namedArgs.get('column') ?? args[1], namedArgs.get('row') ?? args[2]);
-      upsertCell(table, {
+      const textFontFamily = optionalString(runtime, namedArgs.get('text_font_family') ?? args[11]);
+      const cell: TableCellDrawingOutput = {
         column,
         row,
         text: runtime.toStringValue(namedArgs.get('text') ?? args[3] ?? ''),
@@ -836,7 +837,9 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
         textValign: runtime.toStringValue(namedArgs.get('text_valign') ?? args[8] ?? 'middle'),
         textSize: runtime.toStringValue(namedArgs.get('text_size') ?? args[9] ?? 'normal'),
         bgcolor: runtime.toNullableColor(namedArgs.get('bgcolor') ?? args[10]),
-      });
+      };
+      if (textFontFamily !== undefined) cell.textFontFamily = textFontFamily;
+      upsertCell(table, cell);
     });
     return undefined;
   });
@@ -894,6 +897,13 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     withTable(args[0], ctx, (table) => {
       const cell = ensureCell(table, args[1], args[2]);
       cell.textValign = runtime.toStringValue(args[3]);
+    });
+    return undefined;
+  });
+  builtins.set('table.cell_set_text_font_family', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      const cell = ensureCell(table, args[1], args[2]);
+      cell.textFontFamily = runtime.toStringValue(args[3]);
     });
     return undefined;
   });

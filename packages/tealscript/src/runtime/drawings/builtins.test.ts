@@ -824,6 +824,7 @@ if barstate.islast
     table.cell_set_height(stats, 1, 0, 28)
     table.cell_set_text_halign(stats, 1, 0, text.align_center)
     table.cell_set_text_valign(stats, 1, 0, text.align_bottom)
+    table.cell_set_text_font_family(stats, 1, 0, font.family_monospace)
     table.cell_set_text(stats, 0, 1, "created")
 plot(close)`;
 
@@ -868,6 +869,7 @@ plot(close)`;
               textColor: '#000000',
               textHalign: 'center',
               textValign: 'bottom',
+              textFontFamily: 'monospace',
               textSize: 'large',
               bgcolor: '#4CAF50',
             },
