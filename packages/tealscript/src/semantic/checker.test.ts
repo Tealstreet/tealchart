@@ -245,9 +245,11 @@ pivotPoint pivot = na
 indicator("Bad Templates")
 array<series> invalidArray = array.new_float()
 matrix<input> invalidMatrix = matrix.new_int()
-map<label, float> invalidKey = map.new<label, float>()
+map<label, float> invalidKey = map.new<string, float>()
 map<string, series> invalidValue = map.new<string, float>()
 map<const, float> qualifierKey = map.new<string, float>()
+invalidCtorKey = map.new<label, float>()
+invalidCtorValue = map.new<string, series>()
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -256,6 +258,8 @@ map<const, float> qualifierKey = map.new<string, float>()
       'Map key type must be int, float, bool, string, or color in variable declaration',
       "Invalid map value type 'series'; qualifiers cannot be used as template types",
       "Invalid map key type 'const'; qualifiers cannot be used as template types",
+      'Map key type must be int, float, bool, string, or color in map.new',
+      "Invalid map value type 'series'; qualifiers cannot be used as template types",
     ]);
   });
 

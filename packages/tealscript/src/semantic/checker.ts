@@ -956,6 +956,7 @@ class SemanticChecker {
     this.checkCallee(expression.callee, scope);
     this.checkBuiltinSignature(expression);
     this.checkUdtConstructorSignature(expression, scope);
+    this.checkMapConstructorTypeArguments(expression);
     this.checkMapCallTypes(expression, scope);
     for (const argument of expression.arguments) {
       this.checkExpression(argument.value, scope);
@@ -1117,6 +1118,17 @@ class SemanticChecker {
       case 'remove':
         this.checkMapArgumentType(mapCall.mapType.keyType, mapCall.keyArgument, 'map key', scope);
         break;
+    }
+  }
+
+  private checkMapConstructorTypeArguments(expression: CallExpression): void {
+    if (this.memberPath(expression.callee).join('.') !== 'map.new' || expression.typeArguments?.length !== 2) return;
+
+    const [keyTypeName, valueTypeName] = expression.typeArguments;
+    this.checkTemplateTypeName(keyTypeName, 'map key', expression.loc);
+    this.checkTemplateTypeName(valueTypeName, 'map value', expression.loc);
+    if (!TYPE_QUALIFIER_NAMES.has(keyTypeName) && !MAP_KEY_TYPE_NAMES.has(keyTypeName)) {
+      this.addDiagnostic('invalid-type-template', 'Map key type must be int, float, bool, string, or color in map.new', expression.loc);
     }
   }
 
