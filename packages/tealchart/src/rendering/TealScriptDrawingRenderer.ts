@@ -29,6 +29,14 @@ interface ResolvedLabelLayout {
   textAlign: CanvasTextAlign;
 }
 
+interface ResolvedWrappedTextLayout {
+  lines: string[];
+  x: number;
+  y: number;
+  align: CanvasTextAlign;
+  lineHeight: number;
+}
+
 export class TealScriptDrawingRenderer {
   private ctx: CanvasContext;
   private options: RenderOptions;
@@ -115,11 +123,22 @@ export class TealScriptDrawingRenderer {
       if (box.text) {
         ctx.setLineDash([]);
         ctx.fillStyle = box.textColor ?? '#FFFFFF';
-        ctx.font = `${this.fontSizeForDrawing(box.textSize)}px ${this.font}`;
-        const textPosition = this.resolveBoxTextPosition(box, rect);
-        ctx.textAlign = textPosition.align;
-        ctx.textBaseline = textPosition.baseline;
-        ctx.fillText(box.text, textPosition.x, textPosition.y);
+        const fontSize = this.fontSizeForDrawing(box.textSize);
+        const font = `${fontSize}px ${this.fontFamilyForDrawing(box.textFontFamily)}`;
+        ctx.font = font;
+        if (box.textWrap === 'auto') {
+          const textLayout = this.resolveWrappedBoxTextLayout(box, rect, fontSize, font);
+          ctx.textAlign = textLayout.align;
+          ctx.textBaseline = 'top';
+          for (let index = 0; index < textLayout.lines.length; index++) {
+            ctx.fillText(textLayout.lines[index]!, textLayout.x, textLayout.y + index * textLayout.lineHeight);
+          }
+        } else {
+          const textPosition = this.resolveBoxTextPosition(box, rect);
+          ctx.textAlign = textPosition.align;
+          ctx.textBaseline = textPosition.baseline;
+          ctx.fillText(box.text, textPosition.x, textPosition.y);
+        }
       }
     }
 
@@ -140,6 +159,11 @@ export class TealScriptDrawingRenderer {
       default:
         return 12;
     }
+  }
+
+  private fontFamilyForDrawing(fontFamily?: string): string {
+    if (fontFamily === 'monospace') return 'monospace';
+    return this.font;
   }
 
   private resolveBoxTextPosition(
@@ -171,6 +195,65 @@ export class TealScriptDrawingRenderer {
     }
 
     return { x, y, align, baseline };
+  }
+
+  private resolveWrappedBoxTextLayout(
+    box: TealScriptDrawingPartition['boxes'][number],
+    rect: { x: number; y: number; width: number; height: number },
+    fontSize: number,
+    font: string,
+  ): ResolvedWrappedTextLayout {
+    const padding = 6;
+    const lineHeight = Math.ceil(fontSize * 1.25);
+    const maxTextWidth = Math.max(1, rect.width - padding * 2);
+    const lines = this.wrapDrawingText(box.text, maxTextWidth, font);
+    const totalTextHeight = lines.length * lineHeight;
+    const halign = box.textHalign ?? 'left';
+    const valign = box.textValign ?? 'top';
+
+    let x = rect.x + padding;
+    let align: CanvasTextAlign = 'left';
+    if (halign === 'center') {
+      x = rect.x + rect.width / 2;
+      align = 'center';
+    } else if (halign === 'right') {
+      x = rect.x + rect.width - padding;
+      align = 'right';
+    }
+
+    let y = rect.y + padding;
+    if (valign === 'middle' || valign === 'center') {
+      y = rect.y + rect.height / 2 - totalTextHeight / 2;
+    } else if (valign === 'bottom') {
+      y = rect.y + rect.height - padding - totalTextHeight;
+    }
+
+    return { lines, x, y, align, lineHeight };
+  }
+
+  private wrapDrawingText(text: string, maxWidth: number, font: string): string[] {
+    const wrappedLines: string[] = [];
+    for (const paragraph of text.split('\n')) {
+      const words = paragraph.split(/\s+/).filter(Boolean);
+      if (words.length === 0) {
+        wrappedLines.push('');
+        continue;
+      }
+
+      let currentLine = '';
+      for (const word of words) {
+        const candidate = currentLine ? `${currentLine} ${word}` : word;
+        if (currentLine && this.getTextWidth(this.ctx, candidate, font) > maxWidth) {
+          wrappedLines.push(currentLine);
+          currentLine = word;
+        } else {
+          currentLine = candidate;
+        }
+      }
+      wrappedLines.push(currentLine);
+    }
+
+    return wrappedLines.length > 0 ? wrappedLines : [''];
   }
 
   private renderLineFillDrawings(

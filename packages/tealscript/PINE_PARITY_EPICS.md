@@ -397,6 +397,8 @@ Phases:
 5. Complete `box.*` and implement `polyline.*`: finish box text/layout,
    `chart.point` overloads, GC limits, realtime rollback parity, and add
    polyline lifecycle plus renderer support.
+   Box renderer coverage now handles `text_wrap=auto` and default/monospace
+   font-family metadata.
 6. Implement `table.*`: fixed positioning, cells, setters, text formatting,
    sizing, background/frame/border, and renderer integration.
 7. Add lifecycle tests for mutation, deletion, copying, GC limits, and realtime

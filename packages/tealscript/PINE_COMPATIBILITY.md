@@ -475,8 +475,9 @@ common border, fill, text, `extend`, and `xloc` options. The runtime supports
 persistent `var` box handles, geometry setters (`set_left`, `set_right`,
 `set_top`, `set_bottom`, `set_lefttop`, `set_rightbottom`), style/text setters,
 coordinate/color/text getters, `box.copy()`, and `box.delete()`. Rendering
-routes filled rectangles to the script pane with borders and a simple text
-label. Full text layout, `chart.point` overloads, GC limits, and complete Pine
+routes filled rectangles to the script pane with borders, text alignment,
+`text_wrap=auto` wrapping, and default/monospace font-family metadata. Full
+TradingView text pixel parity, `chart.point` overloads, and remaining edge-case
 styling remain planned.
 
 ## Drawing Diagnostic Coverage
