@@ -568,6 +568,121 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(lineTo).toHaveBeenCalledWith(expect.any(Number), baselineY);
       expect(fill).toHaveBeenCalled();
     });
+
+    it('renders plot trackprice at the latest finite plot value', () => {
+      const lineTo = vi.fn();
+      const setLineDash = vi.fn();
+      const stroke = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        lineTo,
+        setLineDash,
+        stroke,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const plots: PlotOutput[] = [
+        {
+          id: 'plot_Track',
+          type: 'plot',
+          title: 'Track',
+          values: [100, null, 120],
+          color: ['#111111', null, '#333333'],
+          trackprice: true,
+        },
+      ];
+
+      renderer.renderPlots(plots, bars, viewport);
+
+      const opts = renderer.getOptions();
+      const trackY = renderer.publicPriceToY(120, viewport);
+      expect(lineTo).toHaveBeenCalledWith(opts.width - opts.margins.right, trackY);
+      expect(setLineDash).toHaveBeenCalledWith([2, 3]);
+      expect(stroke).toHaveBeenCalled();
+      expect(ctx.strokeStyle).toBe('#333333');
+    });
+
+    it('chooses the latest visible offset plot value for trackprice', () => {
+      const lineTo = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        lineTo,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const plots: PlotOutput[] = [
+        {
+          id: 'plot_TrackOffset',
+          type: 'plot',
+          title: 'TrackOffset',
+          values: [100, 110, 120],
+          color: '#2196F3',
+          trackprice: true,
+          offset: 1,
+        },
+      ];
+
+      renderer.renderPlots(plots, bars, viewport);
+
+      const opts = renderer.getOptions();
+      expect(lineTo).toHaveBeenCalledWith(opts.width - opts.margins.right, renderer.publicPriceToY(110, viewport));
+      expect(lineTo).not.toHaveBeenCalledWith(opts.width - opts.margins.right, renderer.publicPriceToY(120, viewport));
+    });
+
+    it('renders pane plot trackprice at the latest showLast value', () => {
+      const lineTo = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        lineTo,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const pane: ComputedPane = {
+        id: 'indicator',
+        type: 'indicator',
+        heightRatio: 1,
+        yMin: 0,
+        yMax: 100,
+        fixedRange: false,
+        top: 0,
+        height: 500,
+        bottom: 500,
+      };
+      const plot: PlotOutput = {
+        id: 'plot_PaneTrack',
+        type: 'plot',
+        title: 'PaneTrack',
+        values: [30, 40, 50],
+        color: '#2196F3',
+        trackprice: true,
+        showLast: 1,
+      };
+
+      (renderer as any).renderPlotInPane(plot, bars, viewport, pane);
+
+      const opts = renderer.getOptions();
+      const trackY = renderer.valueToY(50, pane);
+      expect(lineTo).toHaveBeenCalledWith(opts.width - opts.margins.right, trackY);
+      expect(lineTo).not.toHaveBeenCalledWith(opts.width - opts.margins.right, renderer.valueToY(40, pane));
+    });
   });
 
   describe('Pine OHLC plot rendering', () => {
