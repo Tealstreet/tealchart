@@ -3185,6 +3185,26 @@ export class TealscriptEngine {
     return Number.isFinite(numberValue) ? numberValue : null;
   }
 
+  private roundToMintick(value: number, tick: number): number {
+    if (!Number.isFinite(value) || !Number.isFinite(tick) || tick <= 0) return Number.NaN;
+
+    const quotient = value / tick;
+    const epsilon = Number.EPSILON * Math.max(1, Math.abs(quotient));
+    const rounded = Math.round(quotient + epsilon) * tick;
+    const decimals = this.decimalPlacesForTick(tick);
+    return Number(rounded.toFixed(decimals));
+  }
+
+  private decimalPlacesForTick(tick: number): number {
+    const text = tick.toString().toLowerCase();
+    if (text.includes('e-')) {
+      return Math.min(12, Math.max(0, Number(text.split('e-')[1]) || 0));
+    }
+
+    const fraction = text.split('.')[1] ?? '';
+    return Math.min(12, fraction.replace(/0+$/, '').length);
+  }
+
   private toNullableColor(value: unknown): string | null {
     return typeof value === 'string' ? value : null;
   }
@@ -4738,8 +4758,7 @@ export class TealscriptEngine {
     this.builtins.set('math.round_to_mintick', (args, namedArgs) => {
       const value = this.toNumber(this.getCallArg(args, namedArgs, 0, 'number'));
       const tick = this.ctx.syminfo.mintick;
-      if (!Number.isFinite(value) || !Number.isFinite(tick) || tick <= 0) return Number.NaN;
-      return Math.round(value / tick) * tick;
+      return this.roundToMintick(value, tick);
     });
     unaryMath('math.trunc', Math.trunc);
     unaryMath('math.floor', Math.floor);

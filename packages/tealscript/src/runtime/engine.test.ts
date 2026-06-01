@@ -2428,6 +2428,8 @@ plot(str.format_time(na, "yyyy-MM-dd", "UTC") == "NaN", title="Missing")`;
 indicator("Round To Min Tick")
 plot(math.round_to_mintick(1.234), title="Down")
 plot(math.round_to_mintick(1.235), title="Up")
+plot(math.round_to_mintick(number=1.005), title="Named Half Up")
+plot(math.round_to_mintick(1.2000000000000002), title="Residue")
 plot(math.round_to_mintick(na), title="Missing")`;
 
       const ast = parse(script);
@@ -2437,6 +2439,8 @@ plot(math.round_to_mintick(na), title="Missing")`;
       expect(result.errors).toHaveLength(0);
       expect(result.plots.find((plot) => plot.title === 'Down')?.values).toEqual([1.23, 1.23]);
       expect(result.plots.find((plot) => plot.title === 'Up')?.values).toEqual([1.24, 1.24]);
+      expect(result.plots.find((plot) => plot.title === 'Named Half Up')?.values).toEqual([1.01, 1.01]);
+      expect(result.plots.find((plot) => plot.title === 'Residue')?.values).toEqual([1.2, 1.2]);
       expect(result.plots.find((plot) => plot.title === 'Missing')?.values).toEqual([null, null]);
     });
 
