@@ -109,6 +109,40 @@ plot(m.mode(), title="Mode")
     expect(roundSeries(getPlot(result, 'Mode').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
   });
 
+  it('runs matrix pseudoinverse idioms', () => {
+    const result = runCompatScript(`
+indicator("Matrix pseudoinverse")
+wide = matrix.new_float(2, 3, 0)
+wide.set(0, 0, 1)
+wide.set(0, 1, 2)
+wide.set(0, 2, 3)
+wide.set(1, 0, 4)
+wide.set(1, 1, 5)
+wide.set(1, 2, 6)
+widePinv = matrix.pinv(wide)
+singular = matrix.new_float(2, 2, 0)
+singular.set(0, 0, 1)
+singular.set(0, 1, 2)
+singular.set(1, 0, 2)
+singular.set(1, 1, 4)
+singularPinv = singular.pinv()
+plot(widePinv.rows(), title="Wide Rows")
+plot(widePinv.columns(), title="Wide Columns")
+plot(widePinv.get(0, 0), title="Wide First")
+plot(widePinv.get(2, 1), title="Wide Last")
+plot(singularPinv.get(0, 0), title="Singular First")
+plot(singularPinv.get(1, 1), title="Singular Last")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Wide Rows').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Wide Columns').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Wide First').values)).toEqual([-0.944444, -0.944444, -0.944444, -0.944444, -0.944444, -0.944444, -0.944444, -0.944444, -0.944444, -0.944444, -0.944444, -0.944444]);
+    expect(roundSeries(getPlot(result, 'Wide Last').values)).toEqual([-0.222222, -0.222222, -0.222222, -0.222222, -0.222222, -0.222222, -0.222222, -0.222222, -0.222222, -0.222222, -0.222222, -0.222222]);
+    expect(roundSeries(getPlot(result, 'Singular First').values)).toEqual([0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04]);
+    expect(roundSeries(getPlot(result, 'Singular Last').values)).toEqual([0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16]);
+  });
+
   it('prefers scoped matrix receivers over the matrix namespace', () => {
     const result = runCompatScript(`
 indicator("Matrix receiver shadowing")
