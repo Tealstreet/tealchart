@@ -3032,9 +3032,9 @@ export class TealscriptEngine {
 
   private updateBuiltinSourceHistory(scope: Scope, key: string, source: number, keep: number): number[] {
     const history = (scope.get(key) as number[] | undefined) ?? [];
-    const nextHistory = [source, ...history].slice(0, keep);
-    this.setBuiltinState(scope, key, nextHistory);
-    return nextHistory;
+    this.prependBoundedHistory(history, source, keep);
+    this.setBuiltinState(scope, key, history);
+    return history;
   }
 
   private getCompleteSourceWindow(scope: Scope, key: string, source: number, length: number): number[] | null {
@@ -3057,9 +3057,27 @@ export class TealscriptEngine {
   private getCompleteNonNaSourceWindow(scope: Scope, key: string, source: number, length: number): number[] | null {
     if (length < 1) return null;
     const history = (scope.get(key) as number[] | undefined) ?? [];
-    const values = [source, ...history].filter((value) => !isNaN(value)).slice(0, length);
-    this.setBuiltinState(scope, key, values);
-    return values.length < length ? null : values;
+    if (!isNaN(source)) {
+      this.prependBoundedHistory(history, source, length);
+    } else if (history.length > length) {
+      history.length = length;
+    }
+    this.setBuiltinState(scope, key, history);
+    return history.length < length ? null : history;
+  }
+
+  private prependBoundedHistory<T>(history: T[], source: T, keep: number): void {
+    const truncatedLimit = Math.trunc(keep);
+    const limit = Number.isFinite(truncatedLimit) ? Math.max(0, truncatedLimit) : 0;
+    if (limit === 0) {
+      history.length = 0;
+      return;
+    }
+
+    history.unshift(source);
+    if (history.length > limit) {
+      history.length = limit;
+    }
   }
 
   private updateBuiltinEmaState(scope: Scope, key: string, value: number, length: number): number {
@@ -5585,7 +5603,8 @@ export class TealscriptEngine {
         const key = `_change_bool_${callId}`;
         const history = (scope.get(key) as boolean[] | undefined) ?? [];
         const previous = history[length - 1];
-        this.setBuiltinState(scope, key, [rawSource, ...history].slice(0, length));
+        this.prependBoundedHistory(history, rawSource, length);
+        this.setBuiltinState(scope, key, history);
         return previous === undefined ? false : rawSource !== previous;
       }
 
@@ -6172,7 +6191,8 @@ export class TealscriptEngine {
       const negativeKey = `_ta_mfi_negative_${callId}`;
       const sourceHistory = (scope.get(sourceKey) as number[] | undefined) ?? [];
       const previousSource = sourceHistory[0];
-      this.setBuiltinState(scope, sourceKey, [source, ...sourceHistory].slice(0, length + 1));
+      this.prependBoundedHistory(sourceHistory, source, length + 1);
+      this.setBuiltinState(scope, sourceKey, sourceHistory);
 
       if (length < 1 || isNaN(source) || volume === undefined || isNaN(volume)) return NaN;
 
@@ -6241,7 +6261,8 @@ export class TealscriptEngine {
       const sourceKey = `_ta_tsi_source_${callId}`;
       const sourceHistory = (scope.get(sourceKey) as number[] | undefined) ?? [];
       const previousSource = sourceHistory[0];
-      this.setBuiltinState(scope, sourceKey, [source, ...sourceHistory].slice(0, 2));
+      this.prependBoundedHistory(sourceHistory, source, 2);
+      this.setBuiltinState(scope, sourceKey, sourceHistory);
 
       if (previousSource === undefined || isNaN(previousSource)) return NaN;
 
