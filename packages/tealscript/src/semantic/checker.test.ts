@@ -426,6 +426,42 @@ ints.push(fromRemove)
     ]);
   });
 
+  it('infers matrix element reads and reports mutable element mismatches', () => {
+    const result = checkProgram(parse(`
+indicator("Matrix Types")
+matrix<float> prices = matrix.new<float>(1, 1, 0)
+matrix.set(prices, 0, 0, 1)
+prices.set(0, 0, 2.5)
+matrix.fill(prices, 3)
+prices.fill(4.5)
+matrix.set(prices, 0, 0, "bad")
+prices.set(0, 0, true)
+matrix.fill(prices, "bad")
+prices.fill(true)
+typed = matrix.new<int>(1, 1, 0)
+typed.set(0, 0, 1)
+typed.set(0, 0, "bad")
+value = prices.get(0, 0)
+ints = array.new_int()
+ints.push(value)
+namespaceValue = matrix.get(typed, 0, 0)
+float widened = namespaceValue
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(types.get('value')).toMatchObject({ kind: 'float' });
+    expect(types.get('namespaceValue')).toMatchObject({ kind: 'int' });
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot use string value as float matrix element',
+      'Cannot use bool value as float matrix element',
+      'Cannot use string value as float matrix element',
+      'Cannot use bool value as float matrix element',
+      'Cannot use string value as int matrix element',
+      'Cannot use float value as int array element',
+    ]);
+  });
+
   it('infers homogeneous array literal and array.from element types', () => {
     const result = checkProgram(parse(`
 indicator("Array Literal Types")
