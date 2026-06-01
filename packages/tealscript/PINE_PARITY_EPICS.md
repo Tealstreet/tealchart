@@ -414,6 +414,9 @@ Phases:
    Runtime TA helper state now uses bounded in-place history updates instead of
    per-bar spread/slice allocation for common source windows.
 4. Add cancellation/yielding in worker execution for expensive scripts.
+   Tealchart now cancels stale full recalculations by restarting a script's
+   worker on bar-set and input changes, with generation guards so late callbacks
+   from terminated workers cannot update chart state.
 5. Harden runtime isolation: no host access, deterministic randomness where
    needed, safe errors, and no unbounded allocation.
 6. Add profiling hooks useful during compatibility work.
