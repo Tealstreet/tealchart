@@ -1622,6 +1622,62 @@ plot(str.format_time(time, "yyyy-MM-dd HH:mm:ss", "America/New_York") == "2024-0
       expect(result.plots.find((plot) => plot.title === 'Formatted NY')?.values).toEqual([1]);
     });
 
+    it('uses runtime syminfo timezone as the default exchange timezone', () => {
+      const script = `//@version=6
+indicator("Runtime Timezone")
+plot(hour, title="Default Hour")
+plot(timestamp(2024, 1, 5, 9, 30), title="Default Timestamp")
+plot(syminfo.timezone == "America/New_York" ? 1 : 0, title="Injected Timezone")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: Date.UTC(2024, 0, 5, 14, 30), open: 1, high: 2, low: 1, close: 2, volume: 100 },
+      ];
+      const result = executeScript(ast, bars, undefined, {
+        runtime: {
+          syminfo: {
+            timezone: 'America/New_York',
+          },
+        },
+      });
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Default Hour')?.values).toEqual([9]);
+      expect(result.plots.find((plot) => plot.title === 'Default Timestamp')?.values).toEqual([Date.UTC(2024, 0, 5, 14, 30)]);
+      expect(result.plots.find((plot) => plot.title === 'Injected Timezone')?.values).toEqual([1]);
+    });
+
+    it('uses runtime timeframe metadata for timeframe built-ins', () => {
+      const script = `//@version=6
+indicator("Runtime Timeframe")
+plot(timeframe.isdaily ? 1 : 0, title="Daily")
+plot(timeframe.isintraday ? 1 : 0, title="Intraday")
+plot(timeframe.period == "1D" ? 1 : 0, title="Period")`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars, undefined, {
+        runtime: {
+          timeframe: {
+            period: '1D',
+            multiplier: 1,
+            isminutes: false,
+            isdaily: true,
+            isweekly: false,
+            ismonthly: false,
+            isintraday: false,
+            isseconds: false,
+            isticks: false,
+          },
+        },
+      });
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Daily')?.values).toEqual([1]);
+      expect(result.plots.find((plot) => plot.title === 'Intraday')?.values).toEqual([0]);
+      expect(result.plots.find((plot) => plot.title === 'Period')?.values).toEqual([1]);
+    });
+
     it('exposes timenow as a runtime timestamp series', () => {
       const script = `//@version=6
 indicator("Time Now")

@@ -3,7 +3,7 @@
  * Mirrors TradingView's IChartingLibraryWidget for drop-in replacement
  */
 
-import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
+import type { DrawingOutput, PlotOutput, TealscriptRuntimeOptions } from '@tealstreet/tealscript';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { DirtyFlags } from './rendering/RenderScheduler';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
@@ -259,6 +259,7 @@ export class TealchartWidget {
             }
           }
         },
+        getRuntimeOptions: () => this._getTealscriptRuntimeOptions(),
       });
 
       // Set up study creation callback
@@ -1567,6 +1568,61 @@ export class TealchartWidget {
     if (!builtin?.jailbreak) return [];
 
     return jailbreakInputsToInputDefinitions(builtin.jailbreak.inputs);
+  }
+
+  private _getTealscriptRuntimeOptions(): TealscriptRuntimeOptions {
+    const symbolInfo = this._symbolInfo;
+    const pricescale = symbolInfo?.pricescale && symbolInfo.pricescale > 0 ? symbolInfo.pricescale : undefined;
+    const minmov = symbolInfo?.minmov && symbolInfo.minmov > 0 ? symbolInfo.minmov : 1;
+
+    return {
+      syminfo: {
+        ticker: symbolInfo?.ticker ?? symbolInfo?.name ?? this._symbol,
+        description: symbolInfo?.description ?? symbolInfo?.name ?? this._symbol,
+        type: symbolInfo?.type ?? undefined,
+        timezone: symbolInfo?.timezone ?? 'UTC',
+        ...(pricescale !== undefined
+          ? {
+              pricescale,
+              mintick: minmov / pricescale,
+            }
+          : {}),
+      },
+      timeframe: this._getTealscriptTimeframeInfo(this._interval),
+    };
+  }
+
+  private _getTealscriptTimeframeInfo(period: ResolutionString): TealscriptRuntimeOptions['timeframe'] {
+    const normalized = String(period).trim().toUpperCase();
+    const numericMinutes = Number(normalized);
+    if (Number.isFinite(numericMinutes) && numericMinutes > 0) {
+      return {
+        period: String(period),
+        multiplier: numericMinutes,
+        isminutes: true,
+        isdaily: false,
+        isweekly: false,
+        ismonthly: false,
+        isintraday: true,
+        isseconds: false,
+        isticks: false,
+      };
+    }
+
+    const match = /^(\d+)?([STDWM])$/.exec(normalized);
+    const multiplier = match?.[1] === undefined ? 1 : Number(match[1]);
+    const unit = match?.[2];
+    return {
+      period: String(period),
+      multiplier: Number.isFinite(multiplier) ? multiplier : 1,
+      isminutes: false,
+      isdaily: unit === 'D',
+      isweekly: unit === 'W',
+      ismonthly: unit === 'M',
+      isintraday: unit === 'S' || unit === 'T',
+      isseconds: unit === 'S',
+      isticks: unit === 'T',
+    };
   }
 
   /**

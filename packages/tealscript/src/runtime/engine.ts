@@ -88,7 +88,7 @@ import {
   registerTableBuiltins,
   type DrawingBuiltinRuntime,
 } from './builtins/drawings';
-import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type ChartPoint, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LogLevel, type LogOutput, type PlotLineStyle, type PlotOutput, type PlotStyle } from './context';
+import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type ChartPoint, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LogLevel, type LogOutput, type PlotLineStyle, type PlotOutput, type PlotStyle, type SymInfo, type TimeframeInfo } from './context';
 import {
   getDrawingValue,
   toDrawingId as toDrawingIdValue,
@@ -244,6 +244,13 @@ export interface ExecutionError {
 export interface TealscriptEngineOptions {
   requestDatafeed?: RequestDatafeed;
   libraries?: Map<string, Program>;
+  runtime?: TealscriptRuntimeOptions;
+}
+
+export interface TealscriptRuntimeOptions {
+  syminfo?: Partial<SymInfo>;
+  timeframe?: Partial<TimeframeInfo>;
+  now?: number;
 }
 
 interface ImportedLibrary {
@@ -313,6 +320,7 @@ export class TealscriptEngine {
   private profileStatements = 0;
   private profileExpressions = 0;
   private profileBuiltinCalls = 0;
+  private runtimeOptions: TealscriptRuntimeOptions;
 
   constructor(options: TealscriptEngineOptions = {}) {
     this.ctx = new ExecutionContext();
@@ -324,8 +332,32 @@ export class TealscriptEngine {
     this.functionScopes = new Map();
     this.requestDatafeed = options.requestDatafeed;
     this.libraries = options.libraries ?? new Map();
+    this.runtimeOptions = options.runtime ?? {};
+    this.applyRuntimeOptions(this.runtimeOptions);
 
     this.registerBuiltins();
+  }
+
+  private applyRuntimeOptions(options: TealscriptRuntimeOptions): void {
+    if (options.syminfo) {
+      this.ctx.syminfo = {
+        ...this.ctx.syminfo,
+        ...options.syminfo,
+      };
+    }
+    if (options.timeframe) {
+      this.ctx.timeframe = {
+        ...this.ctx.timeframe,
+        ...options.timeframe,
+      };
+    }
+    if (typeof options.now === 'number' && Number.isFinite(options.now)) {
+      this.ctx.setNow(options.now);
+    }
+  }
+
+  private getRuntimeNow(): number {
+    return typeof this.runtimeOptions.now === 'number' && Number.isFinite(this.runtimeOptions.now) ? this.runtimeOptions.now : Date.now();
   }
 
   /**
@@ -350,11 +382,12 @@ export class TealscriptEngine {
     this.indicatorDynamicRequests = true;
     this.requestContextDepth = 0;
     this.requestLocalScopeDepth = 0;
+    this.applyRuntimeOptions(this.runtimeOptions);
     this.registerTypeDeclarations(ast);
     this.registerUserFunctions(ast);
     this.registerLibraryImports(ast);
 
-    this.ctx.setNow(Date.now());
+    this.ctx.setNow(this.getRuntimeNow());
 
     // Load bars into context
     this.ctx.loadBars(bars);
@@ -499,7 +532,7 @@ export class TealscriptEngine {
       for (const functionScope of this.functionScopes.values()) {
         functionScope.advanceBar();
       }
-      this.ctx.setNow(Date.now());
+      this.ctx.setNow(this.getRuntimeNow());
       this.ctx.startRealtimeBar(bar);
       this.scope.commit(true);
       for (const functionScope of this.functionScopes.values()) {
@@ -522,7 +555,7 @@ export class TealscriptEngine {
     }
     this.ctx.rollbackBar();
     this.ctx.bar_index = this.ctx.last_bar_index;
-    this.ctx.setNow(Date.now());
+    this.ctx.setNow(this.getRuntimeNow());
     this.requestEvaluationCache.clear();
     this.requestContextKeys.clear();
 
@@ -550,7 +583,7 @@ export class TealscriptEngine {
     }
     this.ctx.rollbackBar();
     this.ctx.bar_index = this.ctx.last_bar_index;
-    this.ctx.setNow(Date.now());
+    this.ctx.setNow(this.getRuntimeNow());
     this.ctx.truncatePlots(this.ctx.last_bar_index);
     this.ctx.truncateDrawings(this.ctx.last_bar_index);
     this.ctx.truncateAlerts(this.ctx.last_bar_index);
@@ -2115,7 +2148,16 @@ export class TealscriptEngine {
   }
 
   private evaluateRequestExpressionSeries(expression: Expression, requestContext: RequestDataContext): unknown[] {
-    const engine = new TealscriptEngine({ requestDatafeed: this.requestDatafeed, libraries: this.libraries });
+    const engine = new TealscriptEngine({
+      requestDatafeed: this.requestDatafeed,
+      libraries: this.libraries,
+      runtime: {
+        ...this.runtimeOptions,
+        syminfo: this.ctx.syminfo,
+        timeframe: this.ctx.timeframe,
+        now: this.ctx.now,
+      },
+    });
     engine.importedLibraryCallStack = [...this.importedLibraryCallStack];
     engine.indicatorDynamicRequests = this.indicatorDynamicRequests;
     engine.requestContextDepth = this.requestContextDepth + 1;

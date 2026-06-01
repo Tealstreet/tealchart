@@ -5,7 +5,7 @@
  */
 
 import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition, LogOutput } from '../runtime/context';
-import type { IndicatorDeclarationMetadata } from '../runtime/engine';
+import type { IndicatorDeclarationMetadata, TealscriptRuntimeOptions } from '../runtime/engine';
 import type { SemanticDiagnostic } from '../semantic';
 
 /**
@@ -27,6 +27,7 @@ export interface InitMessage {
   script: string;
   bars: Bar[];
   inputs: Record<string, unknown>;
+  runtime?: TealscriptRuntimeOptions;
   metadata?: WorkerOutputMetadata;
 }
 
