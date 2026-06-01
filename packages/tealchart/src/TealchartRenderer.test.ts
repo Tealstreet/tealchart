@@ -2029,6 +2029,105 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(stroke).toHaveBeenCalled();
     });
 
+    it('renders Pine line arrowhead styles at the requested endpoints', () => {
+      const fillStyles: unknown[] = [];
+      const fill = vi.fn();
+      const stroke = vi.fn();
+      const ctx = createMockCtx();
+      ctx.fill = vi.fn(() => {
+        fillStyles.push(ctx.fillStyle);
+        fill();
+      });
+      ctx.stroke = stroke;
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+
+      const bars = makeBars(20);
+      const viewport = TealchartRenderer.calculateViewport(bars);
+      const layout: UnifiedPaneLayout = {
+        panes: [
+          {
+            id: 'main',
+            type: 'main',
+            heightRatio: 1,
+            yMin: 0,
+            yMax: 0,
+            fixedRange: false,
+          },
+        ],
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+      };
+      const drawings: DrawingOutput[] = [
+        {
+          id: 'line-1',
+          type: 'line',
+          barIndex: 12,
+          x1: 8,
+          y1: bars[8]!.close,
+          x2: 12,
+          y2: bars[12]!.close,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: '#00FF00',
+          style: 'arrow_both',
+          width: 2,
+        },
+      ];
+
+      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+
+      expect(stroke).toHaveBeenCalled();
+      expect(fill).toHaveBeenCalledTimes(2);
+      expect(fillStyles).toEqual(['#00FF00', '#00FF00']);
+    });
+
+    it('skips Pine line arrowheads for zero-length drawing segments', () => {
+      const fill = vi.fn();
+      const stroke = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fill,
+        stroke,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+
+      const bars = makeBars(20);
+      const viewport = TealchartRenderer.calculateViewport(bars);
+      const layout: UnifiedPaneLayout = {
+        panes: [
+          {
+            id: 'main',
+            type: 'main',
+            heightRatio: 1,
+            yMin: 0,
+            yMax: 0,
+            fixedRange: false,
+          },
+        ],
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+      };
+      const drawings: DrawingOutput[] = [
+        {
+          id: 'line-1',
+          type: 'line',
+          barIndex: 12,
+          x1: 8,
+          y1: bars[8]!.close,
+          x2: 8,
+          y2: bars[8]!.close,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: '#00FF00',
+          style: 'arrow_right',
+          width: 2,
+        },
+      ];
+
+      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+
+      expect(stroke).toHaveBeenCalled();
+      expect(fill).not.toHaveBeenCalled();
+    });
+
     it('renders forced-overlay line drawings in the main pane for non-overlay scripts', () => {
       const strokeStyles: unknown[] = [];
       const ctx = createMockCtx();

@@ -315,6 +315,15 @@ Renderer-level command-trace coverage locks a common visual primitive mix in
 jsdom, where native screenshot/pixel buffers are not available without adding a
 heavier canvas dependency.
 
+## Common Drawing Object Coverage
+
+The drawing object pass covers shared runtime storage, handle IDs, per-type
+limits, oldest-first garbage collection, realtime rollback for persistent
+objects, `chart.point` constructors, and core `label`, `line`, `linefill`,
+`box`, `polyline`, and `table` lifecycles. Line renderer coverage now draws Pine
+`line.style_arrow_left`, `line.style_arrow_right`, and `line.style_arrow_both`
+arrowheads.
+
 ## Common OHLC Plot Coverage
 
 The OHLC plot pass covers `plotbar()` and `plotcandle()` for custom bar and
