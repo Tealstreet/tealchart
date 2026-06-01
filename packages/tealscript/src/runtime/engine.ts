@@ -4907,8 +4907,36 @@ export class TealscriptEngine {
 
       const inputValue = ctx.getInput(id);
       const registeredDefault = ctx.inputDefinitions.find((input) => input.id === id)?.defval;
-      return inputValue === undefined || inputValue === registeredDefault ? defval : inputValue;
+      if (inputValue === undefined || inputValue === registeredDefault) {
+        return defval;
+      }
+      return this.resolveInputSourceValue(inputValue, ctx);
     });
+  }
+
+  private resolveInputSourceValue(value: unknown, ctx: ExecutionContext): unknown {
+    if (typeof value !== 'string') return value;
+
+    switch (value) {
+      case 'open':
+        return ctx.open.get(0);
+      case 'high':
+        return ctx.high.get(0);
+      case 'low':
+        return ctx.low.get(0);
+      case 'close':
+        return ctx.close.get(0);
+      case 'hl2':
+        return ctx.hl2;
+      case 'hlc3':
+        return ctx.hlc3;
+      case 'ohlc4':
+        return ctx.ohlc4;
+      case 'hlcc4':
+        return ctx.hlcc4;
+      default:
+        return value;
+    }
   }
 
   private registerMathBuiltins(): void {

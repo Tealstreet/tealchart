@@ -3896,6 +3896,7 @@ plot(source)`;
       const bars = createBars(3);
       const result = executeScript(ast, bars);
       const overrideResult = executeScript(ast, bars, new Map([['input_Source', 42]]));
+      const sourceOverrideResult = executeScript(ast, bars, new Map([['input_Source', 'open']]));
 
       expect(result.inputs).toEqual([
         {
@@ -3908,6 +3909,7 @@ plot(source)`;
       ]);
       expect(result.plots[0].values).toEqual([100.2, 100.7, 101.2]);
       expect(overrideResult.plots[0].values).toEqual([42, 42, 42]);
+      expect(sourceOverrideResult.plots[0].values).toEqual([100, 100.5, 101]);
     });
 
     it('reports invalid Pine input defaults', () => {
