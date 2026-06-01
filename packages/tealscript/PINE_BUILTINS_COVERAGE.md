@@ -103,6 +103,15 @@ Current `ta.*` progress:
 - `ta.stdev` and `ta.variance` support the `biased` parameter.
 - `ta.ema` and `ta.rma` use stable call-site state for recursive smoothing.
 
+Current `str.*` progress:
+
+- `str.tonumber()` uses strict decimal/scientific parsing so JavaScript-only
+  forms such as hexadecimal and infinity return `na`.
+- Formatting helpers accept Pine-style named arguments for covered conversion
+  and time-formatting parameters.
+- `str.format_time()` uses the Pine v6 ISO-style default format and supports
+  quoted literals, single date/time tokens, and numeric timezone offsets.
+
 ## Out-Of-Scope Namespaces For Epic 5
 
 These namespaces are tracked here because they are built-ins, but their parity

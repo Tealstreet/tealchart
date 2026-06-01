@@ -259,8 +259,13 @@ plot(str.tostring(1.25) == "1.25", title="Default Number")
 plot(str.tostring(1.25, "#") == "1", title="Rounded Integer")
 plot(str.tostring(1.25, "#.#") == "1.3", title="One Decimal")
 plot(str.tostring(1.25, "#.0000") == "1.2500", title="Trailing Zeros")
+plot(str.tostring(value=1.25, format="#.0") == "1.3", title="Named To String")
 plot(str.tostring(true) == "true", title="Bool True")
 plot(str.tostring(5 == 3) == "false", title="Bool False")
+plot(str.tonumber(string="+.5") == 0.5, title="Named To Number")
+plot(na(str.tonumber("0x10")), title="Hex Invalid")
+stamp = timestamp("GMT+2", 2024, 1, 5, 9, 30)
+plot(str.format_time(time=stamp, timezone="GMT+2") == "2024-01-05T09:30:00+0200", title="Named Time")
 `);
 
     expect(result.errors).toEqual([]);
@@ -268,8 +273,12 @@ plot(str.tostring(5 == 3) == "false", title="Bool False")
     expect(getPlot(result, 'Rounded Integer').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'One Decimal').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Trailing Zeros').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Named To String').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Bool True').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Bool False').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Named To Number').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Hex Invalid').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Named Time').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
 
   it('runs generic input helpers with inferred types', () => {

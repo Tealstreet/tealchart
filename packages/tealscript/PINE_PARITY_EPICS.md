@@ -216,7 +216,9 @@ Phases:
    common scalar helpers and `math.sum`, plus normalized `math.round_to_mintick`
    precision.
 4. Finish `str.*`: `str.tonumber`, `str.format_time`, formatting edge cases,
-   Unicode/string escape behavior, and placeholder compatibility.
+   Unicode/string escape behavior, and placeholder compatibility. Initial
+   parity work now covers strict numeric parsing, named conversion arguments,
+   and ISO-style `str.format_time` defaults.
 5. Finish `color.*`: exact constants, transparency, channel extraction,
    gradients, and theme-sensitive behavior where possible.
 6. Add remaining global helpers such as `nz`, `fixnan`, and typed casts with
