@@ -233,6 +233,7 @@ export class TealscriptManager {
   private scripts: Map<string, ManagedScript> = new Map();
   private bars: Bar[] = [];
   private options: TealscriptManagerOptions;
+  private nextWorkerGeneration = 0;
 
   constructor(options: TealscriptManagerOptions) {
     this.options = options;
@@ -251,7 +252,7 @@ export class TealscriptManager {
       this.removeScript(scriptId);
     }
 
-    const workerGeneration = 1;
+    const workerGeneration = ++this.nextWorkerGeneration;
     const worker = this.createScriptWorker(scriptId, workerGeneration);
 
     // Store managed script state
@@ -269,8 +270,8 @@ export class TealscriptManager {
     };
     this.scripts.set(scriptId, managedScript);
 
-    // Initialize worker with script and current bars
-    await worker.init(scriptId, code, this.bars, inputs);
+    // Initialize worker with the latest bars and inputs once the worker is ready.
+    await this.initializeCurrentWorker(scriptId, workerGeneration);
   }
 
   /**
@@ -470,17 +471,34 @@ export class TealscriptManager {
 
   private restartScriptWorker(script: ManagedScript): void {
     script.worker.dispose();
-    script.workerGeneration += 1;
-    const workerGeneration = script.workerGeneration;
+    const workerGeneration = ++this.nextWorkerGeneration;
+    script.workerGeneration = workerGeneration;
     script.worker = this.createScriptWorker(script.id, workerGeneration);
     script.isReady = false;
 
-    void script.worker.init(script.id, script.code, this.bars, script.inputValues).catch((error: unknown) => {
+    void this.initializeCurrentWorker(script.id, workerGeneration).catch((error: unknown) => {
       this.handleError(script.id, workerGeneration, {
         type: 'runtime',
         message: error instanceof Error ? error.message : String(error),
       });
     });
+  }
+
+  private async initializeCurrentWorker(scriptId: string, workerGeneration: number): Promise<void> {
+    const script = this.getCurrentScript(scriptId, workerGeneration);
+    if (!script) return;
+
+    await script.worker.waitForReady();
+
+    const currentScript = this.getCurrentScript(scriptId, workerGeneration);
+    if (!currentScript) return;
+
+    await currentScript.worker.init(
+      currentScript.id,
+      currentScript.code,
+      this.bars,
+      currentScript.inputValues,
+    );
   }
 
   private getCurrentScript(scriptId: string, workerGeneration: number): ManagedScript | undefined {

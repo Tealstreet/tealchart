@@ -243,6 +243,77 @@ describe('TealscriptManager', () => {
     expect(plotUpdates).toEqual([[{ ...plot, scriptId: 'study-1' }]]);
   });
 
+  it('uses fresh bars when updates arrive before restarted workers are ready', async () => {
+    const workers: FakeWorker[] = [];
+    const createWorker = (): Worker => {
+      const worker = new FakeWorker();
+      workers.push(worker);
+      return worker as unknown as Worker;
+    };
+    const latestBar: Bar = { ...bar, time: 2, close: 104 };
+
+    const manager = new TealscriptManager({ createWorker });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")');
+    workers[0].emit({ type: 'ready' });
+    await addScript;
+
+    manager.setBars([bar]);
+    manager.setBars([latestBar]);
+    expect(workers).toHaveLength(2);
+
+    workers[1].emit({ type: 'ready' });
+    await flushWorkerInit();
+
+    const restartInit = workers[1].messages[0] as PostedWorkerMessage & { bars?: Bar[] };
+    expect(restartInit.type).toBe('init');
+    expect(restartInit.bars).toEqual([latestBar]);
+  });
+
+  it('ignores stale callbacks after removing and re-adding the same script id', async () => {
+    const workers: FakeWorker[] = [];
+    const plotUpdates: PlotOutput[][] = [];
+    const createWorker = (): Worker => {
+      const worker = new FakeWorker();
+      workers.push(worker);
+      return worker as unknown as Worker;
+    };
+
+    const manager = new TealscriptManager({
+      createWorker,
+      onPlotsUpdated: (plots) => plotUpdates.push(plots),
+    });
+
+    const firstAdd = manager.addScript('study-1', 'indicator("Old")');
+    workers[0].emit({ type: 'ready' });
+    await firstAdd;
+    manager.removeScript('study-1');
+
+    const secondAdd = manager.addScript('study-1', 'indicator("New")');
+    workers[1].emit({ type: 'ready' });
+    await secondAdd;
+    plotUpdates.length = 0;
+
+    workers[0].emit(createResultMessage('study-1', {
+      plots: [plot],
+      drawings: [],
+      alerts: [],
+      inputs: [],
+      metadata: { generation: 1, requestId: 1 },
+    }));
+    expect(plotUpdates).toHaveLength(0);
+
+    const newInit = workers[1].messages[0] as PostedWorkerMessage;
+    workers[1].emit(createResultMessage('study-1', {
+      plots: [plot],
+      drawings: [],
+      alerts: [],
+      inputs: [],
+      metadata: newInit.metadata,
+    }));
+    expect(plotUpdates).toEqual([[{ ...plot, scriptId: 'study-1' }]]);
+  });
+
   it('restarts workers on input changes with the latest values', async () => {
     const workers: FakeWorker[] = [];
     const createWorker = (): Worker => {
@@ -258,6 +329,7 @@ describe('TealscriptManager', () => {
     await addScript;
 
     manager.setInputs('study-1', { length: 21 });
+    manager.setInputs('study-1', { length: 34 });
     expect(workers).toHaveLength(2);
     expect(workers[0].terminated).toBe(true);
 
@@ -266,6 +338,6 @@ describe('TealscriptManager', () => {
 
     const restartInit = workers[1].messages[0] as PostedWorkerMessage & { inputs?: Record<string, unknown> };
     expect(restartInit.type).toBe('init');
-    expect(restartInit.inputs).toEqual({ length: 21 });
+    expect(restartInit.inputs).toEqual({ length: 34 });
   });
 });
