@@ -506,6 +506,13 @@ export function pinvMatrixValue(matrix: PineMatrix): PineMatrix<number> {
   return result;
 }
 
+export function eigenvaluesMatrixValue(matrix: PineMatrix): PineArray<number> {
+  assertSquareMatrix(matrix, 'Matrix eigenvalues');
+  const values = createPineArray<number>();
+  computeEigenvalues(matrix).forEach((value) => pushArrayValue(values, value));
+  return values;
+}
+
 export function kronMatrixValue(left: PineMatrix, right: PineMatrix): PineMatrix<number> {
   const result = createPineMatrix<number>(left.rows * right.rows, left.columns * right.columns, 0);
   for (let leftRow = 0; leftRow < left.rows; leftRow++) {
@@ -604,6 +611,82 @@ function numericRows(matrix: PineMatrix): number[][] {
       return Number(matrix.values[row * matrix.columns + column]);
     });
   });
+}
+
+function computeEigenvalues(matrix: PineMatrix): number[] {
+  if (matrix.rows === 0) return [];
+  if (matrix.rows === 1) return [Number(getMatrixValue(matrix, 0, 0))];
+  if (matrix.rows === 2) return computeTwoByTwoEigenvalues(matrix);
+
+  const rows = numericRows(matrix);
+  const iterations = 128;
+  for (let iteration = 0; iteration < iterations; iteration++) {
+    const { q, r } = qrDecomposition(rows);
+    const nextRows = multiplyNumericMatrices(r, q);
+    rows.splice(0, rows.length, ...nextRows);
+    if (offDiagonalNorm(rows) <= MATRIX_EPSILON) break;
+  }
+
+  return rows.map((row, index) => cleanMatrixNumber(row[index]));
+}
+
+function computeTwoByTwoEigenvalues(matrix: PineMatrix): number[] {
+  const a = Number(getMatrixValue(matrix, 0, 0));
+  const b = Number(getMatrixValue(matrix, 0, 1));
+  const c = Number(getMatrixValue(matrix, 1, 0));
+  const d = Number(getMatrixValue(matrix, 1, 1));
+  const trace = a + d;
+  const determinant = a * d - b * c;
+  const discriminant = trace * trace - 4 * determinant;
+  if (discriminant < -MATRIX_EPSILON) {
+    throw new Error('Matrix eigenvalues are complex and cannot be represented as real values');
+  }
+  const root = Math.sqrt(Math.max(0, discriminant));
+  return [cleanMatrixNumber((trace + root) / 2), cleanMatrixNumber((trace - root) / 2)];
+}
+
+function qrDecomposition(matrix: number[][]): { q: number[][]; r: number[][] } {
+  const size = matrix.length;
+  const qColumns: number[][] = [];
+  const r = Array.from({ length: size }, () => Array.from({ length: size }, () => 0));
+
+  for (let column = 0; column < size; column++) {
+    let vector = matrix.map((row) => row[column]);
+    for (let basis = 0; basis < qColumns.length; basis++) {
+      const projection = dotVector(qColumns[basis], vector);
+      r[basis][column] = projection;
+      vector = subtractVectors(vector, qColumns[basis].map((value) => projection * value));
+    }
+
+    const norm = Math.sqrt(dotVector(vector, vector));
+    r[column][column] = norm;
+    qColumns.push(norm <= MATRIX_EPSILON ? unitVector(size, column) : vector.map((value) => value / norm));
+  }
+
+  const q = Array.from({ length: size }, (_rowValue, row) => qColumns.map((column) => column[row]));
+  return { q, r };
+}
+
+function multiplyNumericMatrices(left: number[][], right: number[][]): number[][] {
+  return left.map((row, rowIndex) => {
+    return right[0].map((_value, columnIndex) => {
+      return row.reduce((total, _leftValue, innerIndex) => total + left[rowIndex][innerIndex] * right[innerIndex][columnIndex], 0);
+    });
+  });
+}
+
+function offDiagonalNorm(matrix: number[][]): number {
+  return matrix.reduce((total, row, rowIndex) => {
+    return total + row.reduce((rowTotal, value, columnIndex) => rowTotal + (rowIndex === columnIndex ? 0 : Math.abs(value)), 0);
+  }, 0);
+}
+
+function unitVector(size: number, index: number): number[] {
+  return Array.from({ length: size }, (_value, currentIndex) => (currentIndex === index ? 1 : 0));
+}
+
+function cleanMatrixNumber(value: number): number {
+  return Math.abs(value) <= MATRIX_EPSILON ? 0 : value;
 }
 
 function matrixColumns(matrix: PineMatrix): number[][] {

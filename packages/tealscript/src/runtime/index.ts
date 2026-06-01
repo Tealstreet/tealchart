@@ -32,6 +32,7 @@ export {
 
 export {
   createPineMatrix,
+  eigenvaluesMatrixValue,
   isPineMatrix,
   isValidMatrix,
   isSquareMatrix,
