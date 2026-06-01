@@ -254,4 +254,17 @@ optionLength = input.int(14, "Length", [7, 14, 21], options=[14, 21])
       "Argument 'options' for input.int() was supplied multiple times",
     ]);
   });
+
+  it('rejects mixed Pine input range and options overload arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Mixed Input Overloads")
+length = input.int(14, "Length", options=[7, 14, 21], minval=1)
+multiplier = input.float(2.0, "Multiplier", options=[1.0, 2.0], step=0.5)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'minval' for input.int()",
+      "Unknown argument 'step' for input.float()",
+    ]);
+  });
 });

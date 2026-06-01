@@ -648,7 +648,7 @@ class SemanticChecker {
 
   private checkArgumentNames(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
     if (signature.allowExtraNamed) return;
-    const allowed = new Set([signature.params, ...(signature.overloads ?? [])].flat());
+    const allowed = new Set(this.resolveSignatureParams(args, signature));
     for (const arg of args) {
       if (arg.name && !allowed.has(arg.name.name)) {
         this.addDiagnostic('unknown-argument', `Unknown argument '${arg.name.name}' for ${displayName}()`, arg.name.loc);
