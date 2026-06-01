@@ -1513,7 +1513,7 @@ class SemanticChecker {
         }
         return this.inferMemberExpressionType(expression, scope);
       case 'IndexExpression':
-        return { kind: 'unknown', qualifier: 'series' };
+        return this.inferIndexExpressionType(expression, scope);
       default:
         return { kind: 'unknown' };
     }
@@ -1541,6 +1541,8 @@ class SemanticChecker {
     if (calleePath.join('.') === 'timeframe.from_seconds') return { kind: 'string', qualifier: 'simple' };
     if (CALENDAR_FUNCTION_NAMES.has(calleePath.join('.'))) return { kind: 'int', qualifier: 'series' };
     if (calleePath.join('.') === 'timestamp') return { kind: 'int', qualifier: 'const' };
+    const arrayElementReadType = this.inferArrayElementReadCallType(expression, scope);
+    if (arrayElementReadType) return arrayElementReadType;
     const arrayHelperType = this.inferArrayHelperCallType(expression, scope);
     if (arrayHelperType) return arrayHelperType;
     if (calleePath.join('.') === 'map.new' && expression.typeArguments?.length === 2) {
@@ -1567,6 +1569,27 @@ class SemanticChecker {
       return { kind: 'udt', name: calleePath[0] };
     }
     return { kind: 'unknown', qualifier: this.inferMaxQualifier(expression.arguments.map((argument) => argument.value), scope) };
+  }
+
+  private inferArrayElementReadCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
+    if (expression.callee.type !== 'MemberExpression') return undefined;
+
+    const methodName = expression.callee.property.name;
+    if (!this.isArrayElementReadOperation(methodName)) return undefined;
+
+    const receiverType = this.inferArrayHelperReceiverType(expression, scope);
+    if (receiverType?.kind !== 'array') return undefined;
+
+    return receiverType.elementType;
+  }
+
+  private isArrayElementReadOperation(operation: string): boolean {
+    return operation === 'first'
+      || operation === 'get'
+      || operation === 'last'
+      || operation === 'pop'
+      || operation === 'remove'
+      || operation === 'shift';
   }
 
   private inferArrayHelperCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
@@ -1609,6 +1632,12 @@ class SemanticChecker {
     }
 
     return this.inferExpressionType(expression.callee.object, scope);
+  }
+
+  private inferIndexExpressionType(expression: IndexExpression, scope: SemanticScope): SemanticType {
+    const objectType = this.inferExpressionType(expression.object, scope);
+    if (objectType.kind === 'array' && objectType.elementType) return objectType.elementType;
+    return { kind: 'unknown', qualifier: 'series' };
   }
 
   private inferMemberExpressionType(expression: MemberExpression, scope: SemanticScope): SemanticType {
