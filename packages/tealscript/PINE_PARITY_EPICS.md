@@ -367,6 +367,16 @@ Done means scripts can produce trustworthy runtime events, not just plots.
 Goal: implement Pine strategy execution and enough Strategy Tester state for
 backtesting workflows.
 
+Status: implemented for the deterministic OHLC broker emulator. The runtime now
+exports strategy settings, orders, fills, open/closed trades, position state,
+equity snapshots, commissions, runup/drawdown, strategy namespace variables,
+trade accessors, order-fill alerts, and deterministic fixtures. Market, limit,
+stop, stop-limit, bracket, trailing-stop, partial-exit, OCA-cancel,
+pyramiding, and reversal flows are covered. Full TradingView intrabar path
+parity, bar magnifier, and lower-timeframe fill simulation remain deferred
+future work because they require an explicit intrabar data model rather than the
+current OHLC-only execution model.
+
 Phases:
 
 1. Design strategy ledger types: orders, fills, positions, trades, equity,
@@ -383,8 +393,8 @@ Phases:
 6. Implement `strategy.opentrades.*` and `strategy.closedtrades.*` accessors.
 7. Add strategy visuals, alerts, and deterministic backtest fixtures.
 
-Done means strategy scripts can be backtested with documented broker-emulator
-semantics.
+Done means strategy scripts can be backtested with documented OHLC
+broker-emulator semantics.
 
 ## Epic 15: Limits, Performance, And Sandboxing
 
