@@ -276,8 +276,9 @@ named and positional arguments, and conservative primitive/reference field type
 mismatches in local UDT field defaults, constructors, and field assignments.
 Library diagnostics also report exported UDT fields and exported function or
 method parameters that expose non-exported local UDTs, including through
-collection templates. Full reference-type diagnostics remain planned in Epic 12
-and the qualified type-system epic.
+collection templates, and exported callables that return non-exported local
+UDTs. Full reference-type diagnostics remain planned in Epic 12 and the
+qualified type-system epic.
 
 ## Common Library Syntax Coverage
 
@@ -303,7 +304,8 @@ library functions, methods, and types remain private to their source module, but
 exported library functions can call private helpers, construct library-local
 UDTs, and use library-local methods.
 Semantic export diagnostics cover Pine's requirement that any UDT exposed
-through exported fields or callable parameters is also exported by the library.
+through exported fields, callable parameters, or inferred callable return values
+is also exported by the library.
 
 Published TradingView lookup is not implemented yet. `import` declarations
 without a matching registry entry emit an explicit unsupported diagnostic until
