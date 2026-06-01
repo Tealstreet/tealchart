@@ -1,5 +1,5 @@
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
-import type { Bar, ComputedPane, ExecutionLineRenderData, PriceLine, UnifiedPaneLayout, Viewport } from './types';
+import type { Bar, ComputedPane, ExecutionLineRenderData, PaneLayout, PriceLine, UnifiedPaneLayout, Viewport } from './types';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -340,6 +340,55 @@ describe('TealchartRenderer coordinate transforms', () => {
       renderer.renderPlots(plots, bars, viewport);
 
       expect(setLineDash).toHaveBeenCalledWith([6, 4]);
+      expect(setLineDash).toHaveBeenLastCalledWith([]);
+      expect(stroke).toHaveBeenCalled();
+    });
+
+    it('applies plot lineStyle metadata on indicator-pane line plots', () => {
+      const setLineDash = vi.fn();
+      const stroke = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        setLineDash,
+        stroke,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const paneLayout: PaneLayout = {
+        mainPaneHeight: 0.7,
+        volumePaneHeight: 0,
+        indicatorPanes: [
+          {
+            id: 'indicator_rsi',
+            indicatorIds: ['script-1'],
+            heightRatio: 0.3,
+            yMin: 0,
+            yMax: 100,
+            fixedRange: false,
+          },
+        ],
+      };
+      const plots: PlotOutput[] = [
+        {
+          id: 'plot_Dotted',
+          scriptId: 'script-1',
+          type: 'plot',
+          title: 'Dotted',
+          values: [30, 40, 50],
+          color: ['#2196F3', '#2196F3', '#2196F3'],
+          lineStyle: 'dotted',
+        },
+      ];
+
+      renderer.renderPlots(plots, bars, viewport, paneLayout, { 'script-1': { overlay: false } });
+
+      expect(setLineDash).toHaveBeenCalledWith([2, 3]);
       expect(setLineDash).toHaveBeenLastCalledWith([]);
       expect(stroke).toHaveBeenCalled();
     });

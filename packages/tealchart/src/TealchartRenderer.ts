@@ -1801,7 +1801,6 @@ export class TealchartRenderer {
     ctx.lineWidth = linewidth;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'solid'));
 
     const isStepLine = style === 'stepline' || style === 'stepline_diamond';
 
@@ -1813,6 +1812,8 @@ export class TealchartRenderer {
       this.renderPointMarkers(plot, bars, viewport, style);
       return;
     }
+
+    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'solid'));
 
     // Draw the line
     ctx.beginPath();
@@ -3713,7 +3714,7 @@ export class TealchartRenderer {
     const override = plotStyleOverrides?.get(plot.id);
     const effectiveColor = override?.color ?? plotBaseColor;
     const effectiveLinewidth = override?.linewidth ?? linewidth;
-    const effectiveLineStyle = override?.lineStyle ?? 'solid';
+    const effectiveLineStyle = override?.lineStyle ?? plot.lineStyle ?? 'solid';
     const effectiveOpacity = override?.opacity ?? 100;
 
     // Apply opacity to color if needed
@@ -4398,6 +4399,7 @@ export class TealchartRenderer {
     ctx.lineWidth = linewidth;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
+    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'solid'));
 
     const isStepLine = style === 'stepline' || style === 'stepline_diamond';
 
@@ -4454,6 +4456,8 @@ export class TealchartRenderer {
     if (isDrawing) {
       ctx.stroke();
     }
+
+    ctx.setLineDash([]);
   }
 
   /**
