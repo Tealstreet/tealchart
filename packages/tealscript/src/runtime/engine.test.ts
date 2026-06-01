@@ -1397,6 +1397,19 @@ plot(close)`;
       expect(result.indicatorShortTitle).toBe('Short');
     });
 
+    it('normalizes indicator shorttitle metadata to a string', () => {
+      const script = `//@version=6
+indicator("Long Declaration Title", shorttitle=42)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.indicatorShortTitle).toBe('42');
+    });
+
     it('returns plot outputs', () => {
       const script = `//@version=6
 indicator("Test")

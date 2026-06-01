@@ -590,7 +590,7 @@ export class TealscriptEngine {
       this.ctx.indicatorTitle = this.evaluateExpression(stmt.title) as string;
     }
     if (stmt.shorttitle) {
-      this.ctx.indicatorShortTitle = this.evaluateExpression(stmt.shorttitle) as string;
+      this.ctx.indicatorShortTitle = this.toStringValue(this.evaluateExpression(stmt.shorttitle));
     }
     if (stmt.overlay) {
       this.ctx.indicatorOverlay = this.evaluateExpression(stmt.overlay) as boolean;
