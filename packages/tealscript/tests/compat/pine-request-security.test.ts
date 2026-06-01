@@ -366,6 +366,24 @@ plot(request.security("MISSING", "2", close), title="Missing")
       'request.security failed: No request data context for MISSING 2',
     ]);
   });
+
+  it('caps unique request.security contexts before querying the host datafeed', () => {
+    const requestPlots = Array.from(
+      { length: 41 },
+      (_, index) => `plot(request.security("MISSING${index}", "2", close, ignore_invalid_symbol=true), title="R${index}")`,
+    ).join('\n');
+    const result = runCompatScript(`
+indicator("HTF request cap")
+${requestPlots}
+`, {
+      bars: [chartBars[0]!],
+      engineOptions: { requestDatafeed: requestDatafeed() },
+    });
+
+    expect(result.errors.map((error) => error.message)).toEqual([
+      'Too many unique request.* contexts: maximum is 40',
+    ]);
+  });
 });
 
 describe('Pine request.security_lower_tf compatibility', () => {
@@ -471,6 +489,24 @@ plot(array.size(values), title="Count")
     expect(ignored.errors).toEqual([]);
     expect(getPlot(ignored, 'Count').values).toEqual([0]);
   });
+
+  it('caps unique request.security_lower_tf contexts', () => {
+    const requestPlots = Array.from(
+      { length: 41 },
+      (_, index) => `plot(array.size(request.security_lower_tf("MISSING${index}", "1", close, ignore_invalid_symbol=true)), title="R${index}")`,
+    ).join('\n');
+    const result = runCompatScript(`
+indicator("Lower TF request cap", timeframe="2")
+${requestPlots}
+`, {
+      bars: [lowerChartBars[0]!],
+      engineOptions: { requestDatafeed: lowerTimeframeRequestDatafeed() },
+    });
+
+    expect(result.errors.map((error) => error.message)).toEqual([
+      'Too many unique request.* contexts: maximum is 40',
+    ]);
+  });
 });
 
 describe('Pine request.currency_rate compatibility', () => {
@@ -546,6 +582,24 @@ plot(request.currency_rate("USD", "EUR"), title="Missing")
 
     expect(result.errors.map((error) => error.message)).toEqual([
       'request.currency_rate failed: No request series context for currency_rate USD\u0000EUR',
+    ]);
+  });
+
+  it('caps unique request.currency_rate contexts', () => {
+    const requestPlots = Array.from(
+      { length: 41 },
+      (_, index) => `plot(request.currency_rate("USD", "C${index}", ignore_invalid_currency=true), title="R${index}")`,
+    ).join('\n');
+    const result = runCompatScript(`
+indicator("Currency request cap")
+${requestPlots}
+`, {
+      bars: [chartBars[0]!],
+      engineOptions: { requestDatafeed: currencyRateDatafeed() },
+    });
+
+    expect(result.errors.map((error) => error.message)).toEqual([
+      'Too many unique request.* contexts: maximum is 40',
     ]);
   });
 });
