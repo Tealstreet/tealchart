@@ -58,6 +58,7 @@ export {
   type ExecutionError,
   type IndicatorDeclarationMetadata,
   type TealscriptEngineOptions,
+  type TealscriptRuntimeOptions,
   // Context
   ExecutionContext,
   createContext,

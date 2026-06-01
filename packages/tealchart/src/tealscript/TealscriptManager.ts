@@ -15,6 +15,7 @@ import type {
   DrawingOutput,
   InputDefinition,
   IndicatorDeclarationMetadata,
+  TealscriptRuntimeOptions,
   Bar,
   FromWorkerMessage,
   WorkerOutputMetadata,
@@ -80,6 +81,11 @@ export interface TealscriptManagerOptions {
    * Called when a script's indicator declaration metadata is available
    */
   onDeclarationDiscovered?: (scriptId: string, declaration: IndicatorDeclarationMetadata) => void;
+
+  /**
+   * Provides the current chart runtime context for newly initialized scripts.
+   */
+  getRuntimeOptions?: () => TealscriptRuntimeOptions;
 }
 
 /**
@@ -168,7 +174,8 @@ class TealscriptWorkerWrapper {
     scriptId: string,
     script: string,
     bars: Bar[],
-    inputs: Record<string, unknown> = {}
+    inputs: Record<string, unknown> = {},
+    runtime?: TealscriptRuntimeOptions,
   ): Promise<void> {
     await this.waitForReady();
     this.scriptId = scriptId;
@@ -178,6 +185,7 @@ class TealscriptWorkerWrapper {
       script,
       bars,
       inputs,
+      runtime,
       metadata: this.nextRequestMetadata(true),
     });
   }
@@ -522,6 +530,7 @@ export class TealscriptManager {
       currentScript.code,
       this.bars,
       currentScript.inputValues,
+      this.options.getRuntimeOptions?.(),
     );
   }
 

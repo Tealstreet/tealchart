@@ -12,6 +12,8 @@ basis = ta.sma(close, length)
 spread(source) => source - basis
 plot(spread(high), title="Spread")
 plot(not na(time("1", "0930-1600")) ? 1 : 0, title="Session")
+plot(time_tradingday, title="Trading Day")
+plot(last_bar_time, title="Last Bar Time")
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -20,6 +22,48 @@ plot(not na(time("1", "0930-1600")) ? 1 : 0, title="Session")
       'variable:basis',
       'function:spread',
     ]);
+  });
+
+  it('accepts calendar functions with named time and timezone arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Calendar Functions")
+stamp = timestamp("Asia/Singapore", 2024, 1, 6, 0, 5, 7)
+plot(year(time=stamp, timezone="Asia/Singapore"))
+plot(month(time=stamp, timezone="Asia/Singapore"))
+plot(weekofyear(time=stamp, timezone="Asia/Singapore"))
+plot(dayofmonth(time=stamp, timezone="Asia/Singapore"))
+plot(dayofweek(time=stamp, timezone="Asia/Singapore"))
+plot(hour(time=stamp, timezone="Asia/Singapore"))
+plot(minute(time=stamp, timezone="Asia/Singapore"))
+plot(second(time=stamp, timezone="Asia/Singapore"))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('accepts named timestamp and time filter arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Time Variants")
+stamp = timestamp(timezone="America/New_York", year=2024, month=1, day=5, hour=9, minute=30)
+dateStamp = timestamp("20 Aug 2024 00:00:00 +0000")
+plot(time(timeframe="60", session="0930-1600", timezone="America/New_York"))
+plot(time_close(timeframe="60", session="0930-1600", timezone="America/New_York"))
+plot(stamp + dateStamp)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('accepts timeframe utility functions with named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Timeframe Utilities")
+isLower = timeframe.in_seconds(timeframe="15") < timeframe.in_seconds("1D")
+rounded = timeframe.from_seconds(seconds=44)
+changed = timeframe.change(timeframe="60")
+plot(isLower and changed ? 1 : 0)
+`));
+
+    expect(result.diagnostics).toEqual([]);
   });
 
   it('reports duplicate declarations in the same scope', () => {
