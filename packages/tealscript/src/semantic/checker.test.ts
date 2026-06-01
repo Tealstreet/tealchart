@@ -89,4 +89,61 @@ plot(customFn(value))
       'Unknown function: customFn',
     ]);
   });
+
+  it('records value and reference types from annotations', () => {
+    const result = checkProgram(parse(`
+indicator("Typed Symbols")
+type pivotPoint
+    int x
+    float y
+int length = 3
+float basis = 1.5
+bool enabled = true
+string labelText = "hi"
+color tint = color.red
+array<float> values = array.new_float()
+matrix<int> grid = matrix.new<int>(1, 1, 0)
+map<string, float> lookup = map.new<string, float>()
+pivotPoint pivot = na
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('length')).toMatchObject({ kind: 'int' });
+    expect(types.get('basis')).toMatchObject({ kind: 'float' });
+    expect(types.get('enabled')).toMatchObject({ kind: 'bool' });
+    expect(types.get('labelText')).toMatchObject({ kind: 'string' });
+    expect(types.get('tint')).toMatchObject({ kind: 'color' });
+    expect(types.get('values')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('grid')).toMatchObject({ kind: 'matrix', elementType: { kind: 'int' } });
+    expect(types.get('lookup')).toMatchObject({
+      kind: 'map',
+      keyType: { kind: 'string' },
+      valueType: { kind: 'float' },
+    });
+    expect(types.get('pivot')).toMatchObject({ kind: 'udt', name: 'pivotPoint' });
+  });
+
+  it('infers simple literal and array expression types', () => {
+    const result = checkProgram(parse(`
+indicator("Inferred Symbols")
+count = 3
+ratio = 1.5
+enabled = true
+name = "BTC"
+tint = #ff00ff
+values = [1, 2]
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('count')).toMatchObject({ kind: 'int' });
+    expect(types.get('ratio')).toMatchObject({ kind: 'float' });
+    expect(types.get('enabled')).toMatchObject({ kind: 'bool' });
+    expect(types.get('name')).toMatchObject({ kind: 'string' });
+    expect(types.get('tint')).toMatchObject({ kind: 'color' });
+    expect(types.get('values')).toMatchObject({ kind: 'array' });
+  });
 });

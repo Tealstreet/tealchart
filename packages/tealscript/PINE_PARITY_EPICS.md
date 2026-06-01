@@ -142,6 +142,8 @@ Phases:
    unknown identifier, and unknown assignment diagnostics.
 2. Implement value/reference types: `int`, `float`, `bool`, `color`, `string`,
    `void`, arrays, matrices, maps, drawing object IDs, `chart.point`, and UDTs.
+   The semantic checker now records value/reference type metadata from
+   annotations and simple literals on symbols.
 3. Implement qualifiers: `const`, `input`, `simple`, and `series`, including
    qualifier promotion rules.
 4. Add overload validation for built-ins and helpful diagnostics for bad
