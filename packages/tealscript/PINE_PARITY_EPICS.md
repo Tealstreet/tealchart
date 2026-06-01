@@ -145,7 +145,8 @@ Phases:
    The semantic checker now records value/reference type metadata from
    annotations and simple literals on symbols.
 3. Implement qualifiers: `const`, `input`, `simple`, and `series`, including
-   qualifier promotion rules.
+   qualifier promotion rules. The semantic checker now records qualifier
+   metadata, infers common qualifier sources, and reports invalid demotions.
 4. Add overload validation for built-ins and helpful diagnostics for bad
    argument names, bad argument order, unsupported mixed positional/named forms,
    and bad return usage.
