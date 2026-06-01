@@ -299,6 +299,28 @@ optionLength = input.int(14, "Length", [7, 14, 21], options=[14, 21])
     ]);
   });
 
+  it('reports invalid user-defined type constructor arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad UDT Constructor")
+type Pivot
+    int x
+    float y
+tooMany = Pivot.new(1, 2.0, 3.0)
+unknown = Pivot.new(z=1)
+duplicate = Pivot.new(1, x=2)
+duplicateNamed = Pivot.new(y=1, y=2)
+badOrder = Pivot.new(x=1, 2.0)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Pivot.new() expects at most 2 arguments',
+      "Unknown field 'z' for Pivot.new()",
+      "Field 'x' for Pivot.new() was supplied multiple times",
+      "Field 'y' for Pivot.new() was supplied multiple times",
+      'Pivot.new() cannot use positional arguments after named arguments',
+    ]);
+  });
+
   it('rejects mixed Pine input range and options overload arguments', () => {
     const result = checkProgram(parse(`
 indicator("Mixed Input Overloads")
