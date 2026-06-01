@@ -442,7 +442,9 @@ Phases:
    tables, and simple strategies. Initial public-idiom checkpoints cover MTF
    trend filtering, pivot divergence, and session-gated signal filters.
 3. For each fixture, use deterministic local bars and hand-checked expected
-   outputs, not live TradingView execution in CI.
+   outputs, not live TradingView execution in CI. Checkpoint source provenance,
+   reductions, and expected-output policy are tracked in
+   `tests/compat/PINE_CHECKPOINTS.md`.
 4. Add manual comparison notes for milestone scripts where visual parity matters.
 5. Keep large public scripts out of the repo unless licensing is explicit;
    preserve only reduced semantic fixtures.

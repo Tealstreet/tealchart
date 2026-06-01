@@ -5,6 +5,9 @@ They should be small enough to review directly and stable enough to run in CI
 without TradingView, network access, live market data, or public scripts at test
 time.
 
+Source-linked real Pine checkpoint provenance is tracked in
+[`PINE_CHECKPOINTS.md`](./PINE_CHECKPOINTS.md).
+
 Use `fixtures.ts` helpers by default:
 
 - `compatibilityBars` for fixed OHLCV input.
