@@ -130,17 +130,26 @@ class TealscriptWorkerWrapper {
 
       case 'error':
       case 'parseError':
+      case 'semanticError':
         if (this.isStaleError(message.metadata)) {
           return;
         }
+        const type = this.toWorkerErrorType(message.type);
         this.options.onError?.({
-          type: message.type === 'parseError' ? 'parse' : 'runtime',
+          type,
           message: message.message as string,
           line: message.line as number | undefined,
           column: message.column as number | undefined,
+          diagnostics: message.type === 'semanticError' ? message.diagnostics : undefined,
         });
         break;
     }
+  }
+
+  private toWorkerErrorType(messageType: 'error' | 'parseError' | 'semanticError'): WorkerError['type'] {
+    if (messageType === 'parseError') return 'parse';
+    if (messageType === 'semanticError') return 'semantic';
+    return 'runtime';
   }
 
   async waitForReady(): Promise<void> {
