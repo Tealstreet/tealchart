@@ -176,6 +176,8 @@ export interface ExecutionResult {
   inputs: InputDefinition[];
   indicatorTitle: string;
   indicatorShortTitle?: string;
+  indicatorOverlay: boolean;
+  indicatorPrecision: number;
   indicatorMaxBarsBack?: number;
   strategy: StrategyLedger;
   errors: ExecutionError[];
@@ -378,6 +380,8 @@ export class TealscriptEngine {
       inputs: this.ctx.inputDefinitions.map((def) => ({ ...def })),
       indicatorTitle: this.ctx.indicatorTitle,
       indicatorShortTitle: this.ctx.indicatorShortTitle,
+      indicatorOverlay: this.ctx.indicatorOverlay,
+      indicatorPrecision: this.ctx.indicatorPrecision,
       indicatorMaxBarsBack: this.ctx.indicatorMaxBarsBack,
       strategy: this.ctx.strategyLedger,
       errors: this.errors,
@@ -593,10 +597,10 @@ export class TealscriptEngine {
       this.ctx.indicatorShortTitle = this.toStringValue(this.evaluateExpression(stmt.shorttitle));
     }
     if (stmt.overlay) {
-      this.ctx.indicatorOverlay = this.evaluateExpression(stmt.overlay) as boolean;
+      this.ctx.indicatorOverlay = this.isTruthy(this.evaluateExpression(stmt.overlay));
     }
     if (stmt.precision) {
-      this.ctx.indicatorPrecision = this.evaluateExpression(stmt.precision) as number;
+      this.ctx.indicatorPrecision = Math.trunc(this.toNumber(this.evaluateExpression(stmt.precision)));
     }
     if (stmt.max_bars_back) {
       this.ctx.indicatorMaxBarsBack = this.normalizeMaxBarsBack(this.evaluateExpression(stmt.max_bars_back));
