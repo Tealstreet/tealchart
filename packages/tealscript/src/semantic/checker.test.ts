@@ -273,12 +273,17 @@ prices.put("SOL", "bad")
 string symbol = "DOGE"
 float price = 3
 prices.put(symbol, price)
+inferred = map.new<string, float>()
+inferred.put(1, 1)
+inferred.put("ADA", "bad")
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot use int value as string map key',
       'Cannot use bool value as string map key',
       'Cannot use int value as string map key',
+      'Cannot use int value as string map key',
+      'Cannot use string value as float map value',
       'Cannot use int value as string map key',
       'Cannot use string value as float map value',
     ]);

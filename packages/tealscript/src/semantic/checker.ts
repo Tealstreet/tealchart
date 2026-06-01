@@ -1380,6 +1380,13 @@ class SemanticChecker {
     if (calleePath.join('.') === 'timeframe.from_seconds') return { kind: 'string', qualifier: 'simple' };
     if (CALENDAR_FUNCTION_NAMES.has(calleePath.join('.'))) return { kind: 'int', qualifier: 'series' };
     if (calleePath.join('.') === 'timestamp') return { kind: 'int', qualifier: 'const' };
+    if (calleePath.join('.') === 'map.new' && expression.typeArguments?.length === 2) {
+      return {
+        kind: 'map',
+        keyType: this.typeFromName(expression.typeArguments[0]),
+        valueType: this.typeFromName(expression.typeArguments[1]),
+      };
+    }
     if (calleePath.length === 2 && calleePath[1] === 'new' && calleePath[0] && this.typeDeclarations.has(calleePath[0])) {
       return { kind: 'udt', name: calleePath[0] };
     }

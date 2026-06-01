@@ -445,8 +445,9 @@ Phases:
    mutation, lookup, keys/values arrays, copy/put_all, key-value loops, value-key
    validation, and capacity checks. Semantic coverage now reports conservative
    key/value mismatches for known `map<K, V>` variables. Remaining work is
-   unannotated generic constructor inference and full reference/nested
-   type-template enforcement.
+   full reference/nested type-template enforcement.
+   Parser and semantic coverage now retain generic call type arguments and infer
+   unannotated `map.new<K, V>()` constructors.
 4. Implement user-defined types (`type`), fields, constructors, methods, and
    reference semantics.
    Runtime coverage now includes shallow UDT copies through Pine's
