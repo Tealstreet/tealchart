@@ -4793,7 +4793,7 @@ export class TealscriptEngine {
         ...commonMetadata(args, namedArgs, hasOptions ? 3 : 5),
       };
 
-      if (!hasOptions && (type === 'int' || type === 'float' || type === 'price')) {
+      if (!hasOptions && (type === 'int' || type === 'float')) {
         metadata.minval = optionalNumberArg(args, namedArgs, 2, 'minval');
         metadata.maxval = optionalNumberArg(args, namedArgs, 3, 'maxval');
         metadata.step = optionalNumberArg(args, namedArgs, 4, 'step');
@@ -4803,10 +4803,13 @@ export class TealscriptEngine {
     };
 
     const metadataForInput = (type: InputType, args: unknown[], namedArgs: Map<string, unknown>): InputMetadata => {
-      if (type === 'int' || type === 'float' || type === 'price') {
+      if (type === 'int' || type === 'float') {
         return rangeMetadata(args, namedArgs, type);
       }
-      if (type === 'string') {
+      if (type === 'price') {
+        return commonMetadata(args, namedArgs, 2);
+      }
+      if (type === 'string' || type === 'timeframe') {
         return {
           options: optionsArg(args, namedArgs, 2),
           ...commonMetadata(args, namedArgs, 3),
@@ -4887,8 +4890,9 @@ export class TealscriptEngine {
         tooltip: optionalStringArg(args, namedArgs, 2, 'tooltip'),
         inline: optionalStringArg(args, namedArgs, 3, 'inline'),
         group: optionalStringArg(args, namedArgs, 4, 'group'),
-        display: this.getCallArg(args, namedArgs, 5, 'display'),
-        active: this.getCallArg(args, namedArgs, 6, 'active'),
+        confirm: optionalBoolArg(args, namedArgs, 5, 'confirm'),
+        display: this.getCallArg(args, namedArgs, 6, 'display'),
+        active: this.getCallArg(args, namedArgs, 7, 'active'),
       };
 
       if (ctx.bar_index === 0) {

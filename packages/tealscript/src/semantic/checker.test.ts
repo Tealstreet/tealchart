@@ -226,4 +226,32 @@ value = ta.sma(close, source=open, length=14)
       "Argument 'source' for ta.sma() was supplied multiple times",
     ]);
   });
+
+  it('resolves Pine input overload bindings for range and options calls', () => {
+    const result = checkProgram(parse(`
+indicator("Input Overloads")
+rangeLength = input.int(14, "Length", 1, 50, 1, "Range tooltip")
+optionLength = input.int(14, "Length", [7, 14, 21], "Options tooltip")
+rangeFloat = input.float(2.0, "Multiplier", minval=1.0, maxval=4.0)
+optionFloat = input.float(2.0, "Multiplier", options=[1.0, 2.0, 3.0])
+tf = input.timeframe("60", "Timeframe", ["15", "60"], "TF tooltip")
+source = input.source(close, "Source", "Source tooltip", "src", "Data", true)
+price = input.price(101.25, "Level", "Drag level")
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports duplicate Pine input bindings against the selected overload', () => {
+    const result = checkProgram(parse(`
+indicator("Duplicate Input Args")
+rangeLength = input.int(14, "Length", 1, 50, 1, minval=2)
+optionLength = input.int(14, "Length", [7, 14, 21], options=[14, 21])
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Argument 'minval' for input.int() was supplied multiple times",
+      "Argument 'options' for input.int() was supplied multiple times",
+    ]);
+  });
 });

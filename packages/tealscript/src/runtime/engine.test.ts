@@ -3922,6 +3922,19 @@ plot(length)`;
 
       expect(result.errors[0]?.message).toBe('input.int defval must be an integer');
     });
+
+    it('reports timeframe defaults outside declared options', () => {
+      const script = `//@version=6
+indicator("Invalid timeframe input")
+tf = input.timeframe("240", "Timeframe", ["15", "60"])
+plot(tf == "240")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors[0]?.message).toBe('input.timeframe defval must be one of options');
+    });
   });
 
   describe('color functions', () => {
