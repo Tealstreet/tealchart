@@ -422,6 +422,8 @@ Phases:
    now uses per-call-site deterministic PRNG state instead of host entropy when
    the script does not provide a seed.
 6. Add profiling hooks useful during compatibility work.
+   Execution results now include runtime profile counters for elapsed time, bars,
+   statements, expressions, built-in calls, request contexts, and errors.
 
 Done means hostile or accidentally expensive scripts cannot degrade the chart.
 
