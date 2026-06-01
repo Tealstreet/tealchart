@@ -5233,7 +5233,7 @@ export class TealscriptEngine {
 
     this.builtins.set('color.new', (args, namedArgs) => {
       const color = this.getCallArg(args, namedArgs, 0, 'color');
-      const transparency = this.getCallArg(args, namedArgs, 1, 'transp', 0);
+      const transparency = namedArgs.get('transp') ?? namedArgs.get('transparency') ?? args[1] ?? 0;
       const parsedColor = this.parseColor(color);
       if (!parsedColor) {
         return color;

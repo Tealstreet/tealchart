@@ -543,11 +543,13 @@ transparent = color.rgb(255, 128, 0, 50)
 updated = color.new(color.blue, 25)
 named = color.rgb(red=1, green=2, blue=3, transp=25)
 namedUpdated = color.new(color=named, transp=40)
+namedAlias = color.new(color=named, transparency=50)
 plot(close, "Base", color=base)
 plot(open, "Transparent", color=transparent)
 plot(high, "Updated", color=updated)
 plot(low, "Named", color=named)
 plot(volume, "Named Updated", color=namedUpdated)
+plot(open, "Named Alias", color=namedAlias)
 plot(close, "None", color=color.none)
 `;
       const ast = parse(code);
@@ -559,7 +561,8 @@ plot(close, "None", color=color.none)
       expect(result.plots[2].color).toEqual(Array(bars.length).fill('#2196F3BF'));
       expect(result.plots[3].color).toEqual(Array(bars.length).fill('#010203BF'));
       expect(result.plots[4].color).toEqual(Array(bars.length).fill('#01020399'));
-      expect(result.plots[5].color).toEqual(Array(bars.length).fill(null));
+      expect(result.plots[5].color).toEqual(Array(bars.length).fill('#01020380'));
+      expect(result.plots[6].color).toEqual(Array(bars.length).fill(null));
     });
 
     it('extracts color channels and transparency', () => {
