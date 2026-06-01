@@ -1828,6 +1828,45 @@ plot(dateStamp, title="Date String")`;
       expect(result.plots.find((plot) => plot.title === 'Date String')?.values).toEqual([Date.UTC(2024, 7, 20)]);
     });
 
+    it('handles Pine session day masks, overnight periods, and multi-segment sessions', () => {
+      const script = `//@version=6
+indicator("Session Strings")
+plot(na(time("60", "0930-1000:2", "UTC")) ? 0 : 1, title="Monday Mask")
+plot(na(time("60", "1700-0500:2", "UTC")) ? 0 : 1, title="Overnight Monday")
+plot(na(time("60", "1700-1700:2", "UTC")) ? 0 : 1, title="Full Overnight Monday")
+plot(na(time("60", "0900-1000,1400-1500", "UTC")) ? 0 : 1, title="Multi Segment")
+plot(na(time("60", "24x7", "UTC")) ? 0 : 1, title="Always")
+plot(na(time("60", session.regular, "UTC")) ? 0 : 1, title="Regular Session")
+plot(session.ismarket ? 1 : 0, title="Market State")
+plot(session.ispremarket ? 1 : 0, title="Premarket State")
+plot(session.ispostmarket ? 1 : 0, title="Postmarket State")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: Date.UTC(2024, 0, 7, 18, 0), open: 0, high: 1, low: 0, close: 1, volume: 100 },
+        { time: Date.UTC(2024, 0, 8, 3, 0), open: 0, high: 1, low: 0, close: 1, volume: 100 },
+        { time: Date.UTC(2024, 0, 8, 6, 0), open: 0, high: 1, low: 0, close: 1, volume: 100 },
+        { time: Date.UTC(2024, 0, 8, 9, 30), open: 1, high: 2, low: 1, close: 2, volume: 100 },
+        { time: Date.UTC(2024, 0, 8, 14, 30), open: 2, high: 3, low: 2, close: 3, volume: 100 },
+        { time: Date.UTC(2024, 0, 8, 18, 0), open: 3, high: 4, low: 3, close: 4, volume: 100 },
+        { time: Date.UTC(2024, 0, 9, 3, 0), open: 4, high: 5, low: 4, close: 5, volume: 100 },
+        { time: Date.UTC(2024, 0, 9, 6, 0), open: 5, high: 6, low: 5, close: 6, volume: 100 },
+        { time: Date.UTC(2024, 0, 9, 18, 0), open: 6, high: 7, low: 6, close: 7, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Monday Mask')?.values).toEqual([0, 0, 0, 1, 0, 0, 0, 0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Overnight Monday')?.values).toEqual([1, 1, 0, 0, 0, 0, 0, 0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Full Overnight Monday')?.values).toEqual([1, 1, 1, 1, 1, 0, 0, 0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Multi Segment')?.values).toEqual([0, 0, 0, 1, 1, 0, 0, 0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Always')?.values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Regular Session')?.values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Market State')?.values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Premarket State')?.values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Postmarket State')?.values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    });
+
     it('exposes Pine syminfo and timeframe values through member access', () => {
       const script = `//@version=6
 indicator("Chart Info")

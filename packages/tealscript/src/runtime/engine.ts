@@ -5692,6 +5692,9 @@ export class TealscriptEngine {
   private registerTickerBuiltins(): void {
     this.builtins.set('session.regular', () => 'regular');
     this.builtins.set('session.extended', () => 'extended');
+    this.builtins.set('session.ismarket', () => true);
+    this.builtins.set('session.ispremarket', () => false);
+    this.builtins.set('session.ispostmarket', () => false);
     this.builtins.set('adjustment.none', () => 'none');
     this.builtins.set('adjustment.splits', () => 'splits');
     this.builtins.set('adjustment.dividends', () => 'dividends');
@@ -7589,11 +7592,22 @@ export class TealscriptEngine {
   }
 
   private isTimestampInSession(timestamp: number, session: string, timezone: string): boolean {
-    return session.split(',').some((segment) => this.isTimestampInSessionSegment(timestamp, segment.trim(), timezone));
+    const normalized = session.trim().toLowerCase();
+    if (normalized === '' || normalized === 'regular' || normalized === 'extended' || normalized === 'session.regular' || normalized === 'session.extended') {
+      return true;
+    }
+    if (normalized === '24x7') {
+      return true;
+    }
+
+    const [periods, days = '1234567'] = session.split(':', 2);
+    if (!periods || !/^[1-7]+$/.test(days)) return false;
+
+    return periods.split(',').some((period) => this.isTimestampInSessionPeriod(timestamp, period.trim(), days, timezone));
   }
 
-  private isTimestampInSessionSegment(timestamp: number, segment: string, timezone: string): boolean {
-    const match = /^(\d{4})-(\d{4})(?::([1-7]+))?$/.exec(segment);
+  private isTimestampInSessionPeriod(timestamp: number, period: string, days: string, timezone: string): boolean {
+    const match = /^(\d{4})-(\d{4})$/.exec(period);
     if (!match) return false;
 
     const start = this.parseSessionMinute(match[1]);
@@ -7601,16 +7615,30 @@ export class TealscriptEngine {
     if (start === null || end === null) return false;
 
     const day = this.getCalendarPart('dayofweek', timestamp, timezone);
-    const days = match[3];
-    if (days && !days.includes(String(day))) return false;
-
-    if (start === end) return true;
-
     const hour = this.getCalendarPart('hour', timestamp, timezone);
     const minute = this.getCalendarPart('minute', timestamp, timezone);
     const minuteOfDay = hour * 60 + minute;
 
-    return start < end ? minuteOfDay >= start && minuteOfDay < end : minuteOfDay >= start || minuteOfDay < end;
+    if (start === end) {
+      const sessionDay = start === 0 || minuteOfDay < start ? day : this.nextPineDay(day);
+      return days.includes(String(sessionDay));
+    }
+
+    if (start < end) {
+      return days.includes(String(day)) && minuteOfDay >= start && minuteOfDay < end;
+    }
+
+    if (minuteOfDay >= start) {
+      return days.includes(String(this.nextPineDay(day)));
+    }
+    if (minuteOfDay < end) {
+      return days.includes(String(day));
+    }
+    return false;
+  }
+
+  private nextPineDay(day: number): number {
+    return day >= 7 ? 1 : day + 1;
   }
 
   private parseSessionMinute(value: string): number | null {
