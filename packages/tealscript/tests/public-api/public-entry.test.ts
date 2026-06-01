@@ -7,12 +7,16 @@ import { describe, expect, it } from 'vitest';
 import {
   executeScript,
   createResultMessage,
+  corporateActionRequestKey,
   currencyRateRequestKey,
+  economicRequestKey,
+  financialRequestKey,
   getResultOutput,
   InMemoryRequestDatafeed,
   parse,
   requestDatafeedKey,
   requestSeriesKey,
+  seedRequestSymbol,
   TealscriptEngine,
   TealscriptWorker,
   validate,
@@ -51,6 +55,10 @@ describe('public package entrypoints', () => {
     expect(typeof InMemoryRequestDatafeed).toBe('function');
     expect(requestDatafeedKey('A', '1D')).toBe('A\u00001D');
     expect(requestSeriesKey('currency_rate', currencyRateRequestKey('USD', 'EUR'))).toBe('currency_rate\u0000USD\u0000EUR');
+    expect(requestSeriesKey('earnings', corporateActionRequestKey('A', 'earnings.actual'))).toBe('earnings\u0000A\u0000earnings.actual\u0000');
+    expect(requestSeriesKey('financial', financialRequestKey('A', 'TOTAL_REVENUE', 'FY', 'USD'))).toBe('financial\u0000A\u0000TOTAL_REVENUE\u0000FY\u0000USD');
+    expect(requestSeriesKey('economic', economicRequestKey('US', 'GDP'))).toBe('economic\u0000US\u0000GDP');
+    expect(requestDatafeedKey(seedRequestSymbol('seed/repo', 'DATA'), '1D')).toBe('seed\u0000seed/repo\u0000DATA\u00001D');
     expect(engineOptions.requestDatafeed).toBe(datafeed);
     expect(datafeed.getBars({ symbol: 'A', timeframe: '1D' }).ok).toBe(false);
     expect(normalizedOutput).toEqual(output);

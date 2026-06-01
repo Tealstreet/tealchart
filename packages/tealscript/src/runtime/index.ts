@@ -156,9 +156,13 @@ export {
 
 export {
   InMemoryRequestDatafeed,
+  corporateActionRequestKey,
   currencyRateRequestKey,
+  economicRequestKey,
+  financialRequestKey,
   requestDatafeedKey,
   requestSeriesKey,
+  seedRequestSymbol,
   type RequestDataContext,
   type RequestDatafeed,
   type RequestDatafeedErrorCode,

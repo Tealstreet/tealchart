@@ -82,7 +82,7 @@ reading the whole runtime.
 | Built-ins | Global helpers | Partial | `src/runtime/engine.test.ts`; `tests/compat/pine-language.test.ts` | `na`, `nz`, `fixnan`, and primitive casts are covered for common numeric/source idioms; broader type-system diagnostics and exact color overload parity are planned. |
 | Built-ins | `map.*` | Planned | `tests/compat/pine-unsupported.test.ts`; Roadmap Epic 12 | Namespace emits unsupported diagnostics; runtime/storage/type support is not implemented. |
 | Built-ins | `matrix.*` | Planned | `tests/compat/pine-unsupported.test.ts`; Roadmap Epic 12 | Namespace emits unsupported diagnostics; runtime/storage/type support is not implemented. |
-| Data | `request.*` | Partial | `tests/compat/pine-request-security.test.ts`; `tests/runtime/requestDatafeed.test.ts`; Roadmap Epic 8 | Common `request.security()`, lower-timeframe arrays, currency rates, and deterministic datafeed routing are covered; optional economic/corporate data families remain planned. |
+| Data | `request.*` | Partial | `tests/compat/pine-request-security.test.ts`; `tests/runtime/requestDatafeed.test.ts`; Roadmap Epic 8 | `request.security()`, `request.security_lower_tf()`, `request.currency_rate()`, point-series families (`dividends`, `earnings`, `splits`, `financial`, `economic`), `request.seed()`, dynamic request guards, limits, and deterministic datafeed routing are covered. Data availability remains host/provider-gated, point-series lookahead is conservative, and `request.footprint()` remains planned. |
 | Data | `ticker.*` | Partial | `tests/compat/pine-ticker.test.ts`; `tests/compat/pine-unsupported.test.ts`; Roadmap Epic 9 | Common ticker constructors and non-standard chart request IDs are covered for indicator workflows; synthetic strategy/backtest behavior remains planned for Epic 14. |
 
 ### Visual Outputs
@@ -109,8 +109,8 @@ reading the whole runtime.
 | --- | --- | --- | --- | --- |
 | Alerts | `alertcondition` / `alert` | Partial | `tests/compat/pine-control-time.test.ts`; `src/runtime/engine.test.ts` | UI integration and full throttling parity remain. |
 | Strategies | `strategy.*` | Partial | `src/parser/parser.test.ts`; `src/runtime/engine.test.ts` | Broker emulator, ledger, fills, positions, and tester state are planned. |
-| Data | Multi-timeframe requests | Planned | Roadmap Epic 8 | Requires deterministic gap/lookahead semantics. |
-| Data | Other-symbol requests | Planned | Roadmap Epic 8 | Requires chart datafeed contract and caching strategy. |
+| Data | Multi-timeframe requests | Supported | `tests/compat/pine-request-security.test.ts`; Roadmap Epic 8 | Deterministic higher-timeframe `request.security()` gap/lookahead behavior is covered; live host data availability is outside TealScript runtime scope. |
+| Data | Other-symbol requests | Supported | `tests/compat/pine-request-security.test.ts`; `tests/runtime/requestDatafeed.test.ts`; Roadmap Epic 8 | Other-symbol metadata/currency routing is covered through host-provided request contexts. |
 
 ## Parity PR Checklist
 

@@ -352,11 +352,20 @@ host-provided contexts, including same-symbol and other-symbol requests,
 higher-timeframe merging, common `gaps` / `lookahead` behavior,
 `ignore_invalid_symbol`, `calc_bars_count`, tuple expressions, dynamic request
 guards, `request.security_lower_tf()`, and `request.currency_rate()`.
+Host-provided point-series contexts cover `request.dividends()`,
+`request.earnings()`, `request.splits()`, `request.financial()`, and
+`request.economic()`. `request.seed()` evaluates expressions against
+deterministic seed contexts keyed by source and symbol; it does not fetch
+GitHub data at runtime.
 Runtime execution enforces a Pine-style limit of 40 unique `request.*`
 contexts per script pass so dynamic request scripts cannot create unbounded
 host datafeed work. Visual output registration enforces Pine's 64 plot-output
 limit while exempting `hline()` outputs. Table creation enforces a conservative
 TealScript sandbox cap of 10,000 declared table cells across live tables.
+
+Known limits: request data availability is host/provider-gated, point-series
+lookahead is conservative, and `request.footprint()` remains unsupported until
+the runtime has an explicit footprint/intrabar volume model.
 
 The ticker pass covers `ticker.new()`, `ticker.modify()`, `ticker.standard()`,
 `ticker.inherit()`, `ticker.heikinashi()`, `ticker.renko()`,
