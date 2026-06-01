@@ -190,6 +190,9 @@ Phases:
    historical calculation, realtime replay ticks, confirmed close replay, and
    the next open realtime bar.
 6. Add repaint-focused fixtures for confirmed/unconfirmed data behavior.
+   Confirmed-gated values are now covered against same-bar replay so they stay
+   stable while live values update, then move forward only when the realtime bar
+   closes.
 
 Done means indicator values do not drift between historical calculation and live
 updates for supported constructs.
