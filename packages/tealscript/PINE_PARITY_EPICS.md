@@ -454,6 +454,8 @@ Phases:
    order between named and positional arguments before runtime.
    Semantic coverage now reports unknown local UDT fields on reads and
    assignments before runtime.
+   Semantic coverage now reports conservative primitive field type mismatches
+   in local UDT constructors and field assignments.
 5. Implement method declarations and method dispatch beyond array method sugar.
    Runtime coverage now selects local and imported UDT method overloads by
    receiver type.

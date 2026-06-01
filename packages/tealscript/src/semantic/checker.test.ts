@@ -356,6 +356,41 @@ plot(lifted.y)
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('reports conservative user-defined type field value mismatches', () => {
+    const result = checkProgram(parse(`
+indicator("Bad UDT Field Types")
+type Pivot
+    int x
+    float y
+    bool active
+    string name
+    color tint
+    label tag
+valid = Pivot.new(1, 2, true, "pivot", #ff00ff, na)
+badCtor = Pivot.new("bad", "also bad", "yes", 3, "not color", "not checked")
+pivot = Pivot.new(1, 2.0, true, "pivot", #00ffff, na)
+pivot.x := "bad"
+pivot.y := "bad"
+pivot.active := 1
+pivot.name := 3
+pivot.tint := "not color"
+pivot.tag := "not checked"
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to int field Pivot.x',
+      'Cannot assign string value to float field Pivot.y',
+      'Cannot assign string value to bool field Pivot.active',
+      'Cannot assign int value to string field Pivot.name',
+      'Cannot assign string value to color field Pivot.tint',
+      'Cannot assign string value to int field Pivot.x',
+      'Cannot assign string value to float field Pivot.y',
+      'Cannot assign int value to bool field Pivot.active',
+      'Cannot assign int value to string field Pivot.name',
+      'Cannot assign string value to color field Pivot.tint',
+    ]);
+  });
+
   it('rejects mixed Pine input range and options overload arguments', () => {
     const result = checkProgram(parse(`
 indicator("Mixed Input Overloads")

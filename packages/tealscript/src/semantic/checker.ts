@@ -207,6 +207,7 @@ const QUALIFIER_RANK: Record<SemanticQualifier, number> = {
 
 const TYPE_QUALIFIER_NAMES = new Set(['const', 'input', 'simple', 'series']);
 const MAP_KEY_TYPE_NAMES = new Set(['int', 'float', 'bool', 'string', 'color']);
+const PRIMITIVE_TYPE_KINDS = new Set<SemanticTypeKind>(['bool', 'color', 'float', 'int', 'string']);
 
 interface BuiltinSignature {
   params: string[];
@@ -605,6 +606,9 @@ class SemanticChecker {
   private checkAssignment(statement: AssignmentStatement, scope: SemanticScope): void {
     this.checkExpression(statement.right, scope);
     this.checkAssignmentTarget(statement, scope);
+    if (statement.left.type === 'MemberExpression') {
+      this.checkUdtFieldAssignmentType(statement.left, statement.right, scope);
+    }
   }
 
   private checkAssignmentTarget(statement: AssignmentStatement, scope: SemanticScope): void {
@@ -716,7 +720,7 @@ class SemanticChecker {
   private checkCallExpression(expression: CallExpression, scope: SemanticScope): void {
     this.checkCallee(expression.callee, scope);
     this.checkBuiltinSignature(expression);
-    this.checkUdtConstructorSignature(expression);
+    this.checkUdtConstructorSignature(expression, scope);
     for (const argument of expression.arguments) {
       this.checkExpression(argument.value, scope);
     }
@@ -779,7 +783,7 @@ class SemanticChecker {
     this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName);
   }
 
-  private checkUdtConstructorSignature(expression: CallExpression): void {
+  private checkUdtConstructorSignature(expression: CallExpression, scope: SemanticScope): void {
     const calleePath = this.memberPath(expression.callee);
     if (calleePath.length !== 2 || calleePath[1] !== 'new') return;
 
@@ -803,11 +807,20 @@ class SemanticChecker {
     }
 
     const seenNames = new Set<string>();
+    let positionalIndex = 0;
     for (const argument of expression.arguments) {
-      if (!argument.name) continue;
+      if (!argument.name) {
+        const field = declaration.fields[positionalIndex];
+        if (field) {
+          this.checkUdtFieldValueType(typeName, field, argument.value, scope);
+        }
+        positionalIndex += 1;
+        continue;
+      }
 
       const fieldName = argument.name.name;
-      if (!fields.includes(fieldName)) {
+      const field = this.findUdtField(typeName, fieldName);
+      if (!field) {
         this.addDiagnostic('unknown-field', `Unknown field '${fieldName}' for ${displayName}()`, argument.name.loc);
         continue;
       }
@@ -818,7 +831,34 @@ class SemanticChecker {
       }
 
       seenNames.add(fieldName);
+      this.checkUdtFieldValueType(typeName, field, argument.value, scope);
     }
+  }
+
+  private checkUdtFieldAssignmentType(target: MemberExpression, value: Expression, scope: SemanticScope): void {
+    const objectType = this.inferExpressionType(target.object, scope);
+    if (objectType.kind !== 'udt' || !objectType.name || !this.typeDeclarations.has(objectType.name)) {
+      return;
+    }
+
+    const field = this.findUdtField(objectType.name, target.property.name);
+    if (!field) return;
+
+    this.checkUdtFieldValueType(objectType.name, field, value, scope);
+  }
+
+  private checkUdtFieldValueType(typeName: string, field: TypeFieldDeclaration, value: Expression, scope: SemanticScope): void {
+    const targetType = this.typeFromAnnotation(field.typeAnnotation ?? undefined);
+    if (!targetType) return;
+
+    const sourceType = this.inferExpressionType(value, scope);
+    if (this.isAssignableType(targetType, sourceType)) return;
+
+    this.addDiagnostic(
+      'type-mismatch',
+      `Cannot assign ${sourceType.kind} value to ${targetType.kind} field ${typeName}.${field.name.name}`,
+      value.loc,
+    );
   }
 
   private checkArgumentOrder(args: CallArgument[], displayName: string): void {
@@ -1110,6 +1150,14 @@ class SemanticChecker {
         loc,
       );
     }
+  }
+
+  private isAssignableType(targetType: SemanticType, sourceType: SemanticType): boolean {
+    if (targetType.kind === 'unknown' || sourceType.kind === 'unknown') return true;
+
+    if (!PRIMITIVE_TYPE_KINDS.has(targetType.kind) || !PRIMITIVE_TYPE_KINDS.has(sourceType.kind)) return true;
+
+    return targetType.kind === sourceType.kind || (targetType.kind === 'float' && sourceType.kind === 'int');
   }
 
   private declare(scope: SemanticScope, symbol: SemanticSymbol): void {
