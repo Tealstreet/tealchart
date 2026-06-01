@@ -435,6 +435,11 @@ sliced = array.slice(floatValues, 0, 1)
 absolute = array.abs(floatValues)
 standardized = floatValues.standardize()
 indices = floatValues.sort_indices()
+sizeValue = floatValues.size()
+hasValue = array.includes(floatValues, 1.5)
+indexValue = floatValues.indexof(1.5)
+averageValue = array.avg(floatValues)
+joinedValue = floatValues.join(",")
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -451,6 +456,11 @@ indices = floatValues.sort_indices()
     expect(types.get('absolute')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('standardized')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('indices')).toMatchObject({ kind: 'array', elementType: { kind: 'int' } });
+    expect(types.get('sizeValue')).toMatchObject({ kind: 'int' });
+    expect(types.get('hasValue')).toMatchObject({ kind: 'bool' });
+    expect(types.get('indexValue')).toMatchObject({ kind: 'int' });
+    expect(types.get('averageValue')).toMatchObject({ kind: 'float' });
+    expect(types.get('joinedValue')).toMatchObject({ kind: 'string' });
   });
 
   it('records explicit qualifiers and infers common qualifier sources', () => {
