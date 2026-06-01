@@ -781,6 +781,43 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     return undefined;
   });
 
+  builtins.set('table.set_position', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      table.position = runtime.toStringValue(args[1]);
+    });
+    return undefined;
+  });
+  builtins.set('table.set_bgcolor', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      table.bgcolor = runtime.toNullableColor(args[1]);
+    });
+    return undefined;
+  });
+  builtins.set('table.set_frame_color', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      table.frameColor = runtime.toNullableColor(args[1]);
+    });
+    return undefined;
+  });
+  builtins.set('table.set_frame_width', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      table.frameWidth = runtime.toLineWidth(args[1]);
+    });
+    return undefined;
+  });
+  builtins.set('table.set_border_color', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      table.borderColor = runtime.toNullableColor(args[1]);
+    });
+    return undefined;
+  });
+  builtins.set('table.set_border_width', (args, _namedArgs, ctx) => {
+    withTable(args[0], ctx, (table) => {
+      table.borderWidth = runtime.toLineWidth(args[1]);
+    });
+    return undefined;
+  });
+
   builtins.set('table.cell', (args, namedArgs, ctx) => {
     withTable(namedArgs.get('table_id') ?? args[0], ctx, (table) => {
       const { column, row } = normalizeCellCoordinates(table, namedArgs.get('column') ?? args[1], namedArgs.get('row') ?? args[2]);

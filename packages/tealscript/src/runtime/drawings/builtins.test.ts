@@ -809,6 +809,12 @@ plot(array.size(polyline.all), title="Polylines")`;
 indicator("Tables", overlay=true)
 var stats = table.new(position.bottom_right, 2, 2, bgcolor=color.new(color.black, 80), frame_color=color.white, frame_width=2, border_color=color.blue, border_width=1)
 if barstate.islast
+    table.set_position(stats, position.top_left)
+    table.set_bgcolor(stats, color.new(color.red, 70))
+    table.set_frame_color(stats, color.green)
+    table.set_frame_width(stats, 3)
+    table.set_border_color(stats, color.white)
+    table.set_border_width(stats, 2)
     table.cell(stats, 0, 0, "ATR", text_color=color.white, bgcolor=color.blue)
     table.cell(stats, 1, 0, str.tostring(close), text_halign=text.align_right, text_size=size.large)
     table.cell_set_text(stats, 1, 0, "last")
@@ -832,14 +838,14 @@ plot(close)`;
           type: 'table',
           persistent: true,
           barIndex: 0,
-          position: 'bottom_right',
+          position: 'top_left',
           columns: 2,
           rows: 2,
-          bgcolor: '#00000033',
-          frameColor: '#FFFFFF',
-          frameWidth: 2,
-          borderColor: '#2196F3',
-          borderWidth: 1,
+          bgcolor: '#F443364D',
+          frameColor: '#4CAF50',
+          frameWidth: 3,
+          borderColor: '#FFFFFF',
+          borderWidth: 2,
           cells: [
             {
               column: 0,

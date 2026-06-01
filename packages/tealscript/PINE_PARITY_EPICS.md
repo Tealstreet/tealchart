@@ -402,6 +402,8 @@ Phases:
 6. Implement `table.*`: fixed positioning, cells, setters, text formatting,
    sizing, background/frame/border, and renderer integration.
    Runtime coverage now includes cell width/height and text alignment setters.
+   Runtime coverage now includes table-level position/background/frame/border
+   setters.
 7. Add lifecycle tests for mutation, deletion, copying, GC limits, and realtime
    rollback.
 
