@@ -348,6 +348,9 @@ host-provided contexts, including same-symbol and other-symbol requests,
 higher-timeframe merging, common `gaps` / `lookahead` behavior,
 `ignore_invalid_symbol`, `calc_bars_count`, tuple expressions, dynamic request
 guards, `request.security_lower_tf()`, and `request.currency_rate()`.
+Runtime execution enforces a Pine-style limit of 40 unique `request.*`
+contexts per script pass so dynamic request scripts cannot create unbounded
+host datafeed work.
 
 The ticker pass covers `ticker.new()`, `ticker.modify()`, `ticker.standard()`,
 `ticker.inherit()`, `ticker.heikinashi()`, `ticker.renko()`,
