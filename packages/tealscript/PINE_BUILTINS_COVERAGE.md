@@ -134,6 +134,8 @@ Current `input.*` progress:
   named arguments while preserving existing input IDs and metadata.
 - `input.source()` registers source metadata and returns host-provided overrides
   when present.
+- `indicator(..., shorttitle=...)` is exposed on execution results as
+  `indicatorShortTitle` for chart/settings consumers.
 
 ## Out-Of-Scope Namespaces For Epic 5
 
