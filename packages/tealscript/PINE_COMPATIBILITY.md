@@ -224,10 +224,11 @@ method overloads by receiver type.
 Known limits: UDT field and method receiver types are recorded dynamically but
 not yet fully enforced by the semantic checker. Semantic diagnostics cover
 unknown local UDT field reads/assignments, constructor unknown field names,
-duplicate bindings, excess positional arguments, and invalid argument order
-between named and positional arguments. Library export/import diagnostics and
-full reference-type diagnostics remain planned in Epic 12 and the qualified
-type-system epic.
+duplicate bindings, excess positional arguments, invalid argument order between
+named and positional arguments, and conservative primitive field type
+mismatches in local UDT constructors and field assignments. Library
+export/import diagnostics and full reference-type diagnostics remain planned in
+Epic 12 and the qualified type-system epic.
 
 ## Common Library Syntax Coverage
 
