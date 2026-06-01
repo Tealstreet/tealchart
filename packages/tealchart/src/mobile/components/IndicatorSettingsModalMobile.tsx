@@ -255,18 +255,51 @@ interface FormInputProps {
 
 const FormInput: React.FC<FormInputProps> = memo(({ definition, value, onUpdate }) => {
   const def = definition;
+  const active = def.active === undefined ? true : Boolean(def.active);
+
+  const label = (
+    <View style={styles.labelContainer}>
+      <Text style={[styles.label, !active && styles.disabledText]}>{def.title}</Text>
+      {def.tooltip ? <Text style={styles.tooltip}>{def.tooltip}</Text> : null}
+    </View>
+  );
+
+  const renderOptionGroup = (options: unknown[], selectedValue: unknown) => (
+    <View style={styles.optionGroup}>
+      {options.map((opt) => {
+        const optionValue = String(opt);
+        const selected = optionValue === String(selectedValue);
+        return (
+          <Pressable
+            key={optionValue}
+            disabled={!active}
+            style={[styles.optionBtn, selected && styles.optionBtnActive, !active && styles.disabledControl]}
+            onPress={() => onUpdate(def.id, opt)}
+          >
+            <Text style={[styles.optionBtnText, selected && styles.optionBtnTextActive]}>{optionValue}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
 
   switch (def.type) {
     case 'int':
     case 'float':
+      if (def.options && def.options.length > 0) {
+        return (
+          <View style={styles.formRow}>
+            {label}
+            {renderOptionGroup(def.options, value)}
+          </View>
+        );
+      }
       return (
         <View style={styles.formRow}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.label}>{def.title}</Text>
-            {def.tooltip ? <Text style={styles.tooltip}>{def.tooltip}</Text> : null}
-          </View>
+          {label}
           <TextInput
-            style={styles.numberInput}
+            style={[styles.numberInput, !active && styles.disabledControl]}
+            editable={active}
             value={String(value)}
             keyboardType="numeric"
             onChangeText={(text) => {
@@ -280,11 +313,9 @@ const FormInput: React.FC<FormInputProps> = memo(({ definition, value, onUpdate 
     case 'bool':
       return (
         <View style={styles.formRow}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.label}>{def.title}</Text>
-            {def.tooltip ? <Text style={styles.tooltip}>{def.tooltip}</Text> : null}
-          </View>
+          {label}
           <Switch
+            disabled={!active}
             value={Boolean(value)}
             onValueChange={(val) => onUpdate(def.id, val)}
             trackColor={{ false: '#363a45', true: '#26a69a' }}
@@ -297,49 +328,108 @@ const FormInput: React.FC<FormInputProps> = memo(({ definition, value, onUpdate 
       if (def.options && def.options.length > 0) {
         return (
           <View style={styles.formRow}>
-            <View style={styles.labelContainer}>
-              <Text style={styles.label}>{def.title}</Text>
-              {def.tooltip ? <Text style={styles.tooltip}>{def.tooltip}</Text> : null}
-            </View>
-            <View style={styles.optionGroup}>
-              {def.options.map((opt) => (
-                <Pressable
-                  key={opt}
-                  style={[styles.optionBtn, opt === value && styles.optionBtnActive]}
-                  onPress={() => onUpdate(def.id, opt)}
-                >
-                  <Text style={[styles.optionBtnText, opt === value && styles.optionBtnTextActive]}>{opt}</Text>
-                </Pressable>
-              ))}
-            </View>
+            {label}
+            {renderOptionGroup(def.options, value)}
           </View>
         );
       }
       return (
         <View style={styles.formRow}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.label}>{def.title}</Text>
-            {def.tooltip ? <Text style={styles.tooltip}>{def.tooltip}</Text> : null}
-          </View>
-          <TextInput style={styles.textInput} value={String(value)} onChangeText={(text) => onUpdate(def.id, text)} />
+          {label}
+          <TextInput
+            style={[styles.textInput, !active && styles.disabledControl]}
+            editable={active}
+            value={String(value)}
+            onChangeText={(text) => onUpdate(def.id, text)}
+          />
+        </View>
+      );
+
+    case 'timeframe':
+    case 'symbol':
+    case 'session':
+      return (
+        <View style={styles.formRow}>
+          {label}
+          {def.options && def.options.length > 0 ? (
+            renderOptionGroup(def.options, value)
+          ) : (
+            <TextInput
+              style={[styles.textInput, !active && styles.disabledControl]}
+              editable={active}
+              value={String(value)}
+              onChangeText={(text) => onUpdate(def.id, text)}
+            />
+          )}
+        </View>
+      );
+
+    case 'price':
+      return (
+        <View style={styles.formRow}>
+          {label}
+          <TextInput
+            style={[styles.numberInput, !active && styles.disabledControl]}
+            editable={active}
+            value={String(value)}
+            keyboardType="numeric"
+            onChangeText={(text) => {
+              const val = parseFloat(text);
+              onUpdate(def.id, isNaN(val) ? def.defval : val);
+            }}
+          />
+        </View>
+      );
+
+    case 'time':
+      return (
+        <View style={styles.formRow}>
+          {label}
+          <TextInput
+            style={[styles.numberInput, !active && styles.disabledControl]}
+            editable={active}
+            value={String(value)}
+            keyboardType="numeric"
+            onChangeText={(text) => {
+              const val = parseInt(text, 10);
+              onUpdate(def.id, isNaN(val) ? def.defval : val);
+            }}
+          />
+        </View>
+      );
+
+    case 'text_area':
+      return (
+        <View style={styles.formRow}>
+          {label}
+          <TextInput
+            style={[styles.textInput, styles.textAreaInput, !active && styles.disabledControl]}
+            editable={active}
+            multiline
+            value={String(value)}
+            onChangeText={(text) => onUpdate(def.id, text)}
+          />
         </View>
       );
 
     case 'source':
+      const selectedSource = typeof value === 'string' ? value : 'close';
       return (
         <View style={styles.formRow}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.label}>{def.title}</Text>
-            {def.tooltip ? <Text style={styles.tooltip}>{def.tooltip}</Text> : null}
-          </View>
+          {label}
           <View style={styles.optionGroup}>
             {SOURCE_OPTIONS.map((opt) => (
               <Pressable
                 key={opt.value}
-                style={[styles.optionBtn, opt.value === value && styles.optionBtnActive]}
+                disabled={!active}
+                style={[
+                  styles.optionBtn,
+                  opt.value === selectedSource && styles.optionBtnActive,
+                  !active && styles.disabledControl,
+                ]}
                 onPress={() => onUpdate(def.id, opt.value)}
               >
-                <Text style={[styles.optionBtnText, opt.value === value && styles.optionBtnTextActive]}>
+                <Text style={[styles.optionBtnText, opt.value === selectedSource && styles.optionBtnTextActive]}>
                   {opt.label}
                 </Text>
               </Pressable>
@@ -351,21 +441,21 @@ const FormInput: React.FC<FormInputProps> = memo(({ definition, value, onUpdate 
     case 'color':
       return (
         <View style={styles.formRow}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.label}>{def.title}</Text>
-            {def.tooltip ? <Text style={styles.tooltip}>{def.tooltip}</Text> : null}
-          </View>
-          <View style={[styles.colorSwatch, { backgroundColor: String(value) }]} />
+          {label}
+          <View style={[styles.colorSwatch, { backgroundColor: String(value) }, !active && styles.disabledControl]} />
         </View>
       );
 
     default:
       return (
         <View style={styles.formRow}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.label}>{def.title}</Text>
-          </View>
-          <TextInput style={styles.textInput} value={String(value)} onChangeText={(text) => onUpdate(def.id, text)} />
+          {label}
+          <TextInput
+            style={[styles.textInput, !active && styles.disabledControl]}
+            editable={active}
+            value={String(value)}
+            onChangeText={(text) => onUpdate(def.id, text)}
+          />
         </View>
       );
   }
@@ -638,6 +728,9 @@ const styles = StyleSheet.create({
     color: '#d1d4dc',
     fontSize: 12,
   },
+  disabledText: {
+    color: '#5d606b',
+  },
   tooltip: {
     color: '#5d606b',
     fontSize: 10,
@@ -665,6 +758,13 @@ const styles = StyleSheet.create({
     color: '#d1d4dc',
     fontSize: 12,
     width: 120,
+  },
+  textAreaInput: {
+    minHeight: 64,
+    textAlignVertical: 'top',
+  },
+  disabledControl: {
+    opacity: 0.45,
   },
   colorSwatch: {
     width: 40,

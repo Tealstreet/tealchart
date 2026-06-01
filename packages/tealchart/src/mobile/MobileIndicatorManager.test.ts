@@ -45,6 +45,14 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
       type: 'plot',
     });
     expect(manager.getPlots()[0].values).toEqual([101, 102, 103]);
+    expect(manager.getDeclaration(instanceId)).toMatchObject({
+      title: 'AI WMA',
+      overlay: true,
+    });
+    expect(manager.getIndicator(instanceId)?.declaration).toMatchObject({
+      title: 'AI WMA',
+      overlay: true,
+    });
   });
 
   it('removes custom Tealscript plots and pane metadata by instance ID', () => {

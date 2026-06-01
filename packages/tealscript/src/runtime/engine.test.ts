@@ -1395,6 +1395,11 @@ plot(close)`;
       expect(result.errors).toHaveLength(0);
       expect(result.indicatorOverlay).toBe(true);
       expect(result.indicatorPrecision).toBe(4);
+      expect(result.declaration).toMatchObject({
+        title: 'Overlay Precision',
+        overlay: true,
+        precision: 4,
+      });
     });
 
     it('records indicator format and scale metadata', () => {
@@ -1444,6 +1449,23 @@ plot(close)`;
         line: 3,
         box: 4,
         polyline: 5,
+      });
+      expect(result.declaration).toMatchObject({
+        title: 'Advanced Metadata',
+        overlay: false,
+        precision: 2,
+        timeframe: '15',
+        timeframeGaps: false,
+        explicitPlotZOrder: true,
+        behindChart: false,
+        calcBarsCount: 250,
+        dynamicRequests: false,
+        drawingLimits: {
+          label: 2,
+          line: 3,
+          box: 4,
+          polyline: 5,
+        },
       });
     });
 
@@ -3896,6 +3918,7 @@ plot(source)`;
       const bars = createBars(3);
       const result = executeScript(ast, bars);
       const overrideResult = executeScript(ast, bars, new Map([['input_Source', 42]]));
+      const sourceOverrideResult = executeScript(ast, bars, new Map([['input_Source', 'open']]));
 
       expect(result.inputs).toEqual([
         {
@@ -3908,6 +3931,20 @@ plot(source)`;
       ]);
       expect(result.plots[0].values).toEqual([100.2, 100.7, 101.2]);
       expect(overrideResult.plots[0].values).toEqual([42, 42, 42]);
+      expect(sourceOverrideResult.plots[0].values).toEqual([100, 100.5, 101]);
+    });
+
+    it('uses derived source input history for TA functions', () => {
+      const script = `//@version=6
+indicator("Source Input History")
+source = input.source(defval=close, title="Source")
+plot(ta.sma(source, 2))`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars, new Map([['input_Source', 'hlcc4']]));
+
+      expect(roundSeries(result.plots[0].values, 4)).toEqual([null, 100.4, 100.9]);
     });
 
     it('reports invalid Pine input defaults', () => {

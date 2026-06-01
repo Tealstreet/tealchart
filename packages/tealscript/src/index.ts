@@ -56,6 +56,7 @@ export {
   executeScript,
   type ExecutionResult,
   type ExecutionError,
+  type IndicatorDeclarationMetadata,
   type TealscriptEngineOptions,
   // Context
   ExecutionContext,

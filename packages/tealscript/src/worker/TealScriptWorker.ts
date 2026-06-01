@@ -6,6 +6,7 @@
  */
 
 import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition, LogOutput } from '../runtime/context';
+import type { IndicatorDeclarationMetadata } from '../runtime/engine';
 import type { SemanticDiagnostic } from '../semantic';
 import { getResultOutput } from './protocol';
 import type {
@@ -27,6 +28,7 @@ export interface WorkerResult {
   alerts: AlertOutput[];
   logs: LogOutput[];
   inputs: InputDefinition[];
+  declaration?: IndicatorDeclarationMetadata;
 }
 
 /**
