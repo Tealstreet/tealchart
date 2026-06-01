@@ -9,6 +9,7 @@ import {
   createPineMatrix,
   detMatrixValue,
   diffMatrixValue,
+  eigenvaluesMatrixValue,
   fillMatrix,
   getMatrixColumns,
   getMatrixElementCount,
@@ -363,6 +364,29 @@ describe('PineMatrix', () => {
     expect(deficient.values).toEqual([1, 2, 2, 4]);
   });
 
+  it('computes real eigenvalues for square numeric matrices', () => {
+    const twoByTwo = createPineMatrix<number>(2, 2, 0);
+    twoByTwo.values = [2, 4, 6, 8];
+    expectArrayValuesCloseTo(eigenvaluesMatrixValue(twoByTwo).values, [10.744562, -0.744562]);
+
+    const symmetric = createPineMatrix<number>(3, 3, 0);
+    symmetric.values = [2, 1, 0, 1, 2, 0, 0, 0, 3];
+    expectArrayValuesCloseTo([...eigenvaluesMatrixValue(symmetric).values].sort((left, right) => left - right), [1, 3, 3]);
+    expect(symmetric.values).toEqual([2, 1, 0, 1, 2, 0, 0, 0, 3]);
+  });
+
+  it('rejects eigenvalues for non-square matrices or complex roots', () => {
+    expect(() => eigenvaluesMatrixValue(createPineMatrix<number>(2, 3, 1))).toThrow('Matrix eigenvalues requires a square matrix. Matrix is 2x3');
+
+    const rotation = createPineMatrix<number>(2, 2, 0);
+    rotation.values = [0, -1, 1, 0];
+    expect(() => eigenvaluesMatrixValue(rotation)).toThrow('Matrix eigenvalues are complex and cannot be represented as real values');
+
+    const blockRotation = createPineMatrix<number>(3, 3, 0);
+    blockRotation.values = [0, -1, 0, 1, 0, 0, 0, 0, 2];
+    expect(() => eigenvaluesMatrixValue(blockRotation)).toThrow('Matrix eigenvalues are complex or QR iteration did not converge to real diagonal values');
+  });
+
   it('rejects matrix inverses for non-square or singular matrices', () => {
     expect(() => invMatrixValue(createPineMatrix<number>(2, 3, 1))).toThrow('Matrix inverse requires a square matrix. Matrix is 2x3');
 
@@ -412,8 +436,12 @@ describe('PineMatrix', () => {
 });
 
 function expectMatrixValuesCloseTo(matrix: { values: number[] }, expected: number[]): void {
-  expect(matrix.values).toHaveLength(expected.length);
-  matrix.values.forEach((value, index) => {
+  expectArrayValuesCloseTo(matrix.values, expected);
+}
+
+function expectArrayValuesCloseTo(values: number[], expected: number[]): void {
+  expect(values).toHaveLength(expected.length);
+  values.forEach((value, index) => {
     expect(value).toBeCloseTo(expected[index], 5);
   });
 }
