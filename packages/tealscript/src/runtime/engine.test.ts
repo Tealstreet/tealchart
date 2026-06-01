@@ -3909,6 +3909,48 @@ plot(barstate.isnew ? 1 : 0, title="New")`;
       expect(nextBarPlots.find((plot) => plot.title === 'New')?.values).toEqual([1, 1, 1, 0, 1]);
     });
 
+    it('preserves primitive varip variables between realtime ticks', () => {
+      const script = `//@version=6
+indicator("Primitive Varip")
+varip ticks = 0
+if barstate.isnew
+    ticks := 0
+if barstate.isrealtime
+    ticks := ticks + 1
+plot(ticks, title="Ticks")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+
+      engine.execute(ast, bars);
+      const realtimeBar = {
+        ...bars[2],
+        time: bars[2].time + 60_000,
+        open: 102,
+        high: 102.5,
+        low: 101.8,
+        close: 102.25,
+      };
+
+      const firstTick = engine.updateBar(ast, realtimeBar);
+      const firstTickValue = firstTick.find((plot) => plot.title === 'Ticks')!.values.at(-1);
+      const secondTick = engine.updateBar(ast, { ...realtimeBar, close: 102.75 });
+      const secondTickValues = [...secondTick.find((plot) => plot.title === 'Ticks')!.values];
+      const nextBar = engine.updateBar(ast, {
+        ...realtimeBar,
+        time: realtimeBar.time + 60_000,
+        open: 103,
+        high: 103.5,
+        low: 102.8,
+        close: 103.25,
+      });
+
+      expect(firstTickValue).toBe(1);
+      expect(secondTickValues).toEqual([0, 0, 0, 2]);
+      expect(nextBar.find((plot) => plot.title === 'Ticks')?.values).toEqual([0, 0, 0, 3, 1]);
+    });
+
     it('rejects out-of-order realtime bars', () => {
       const script = `//@version=6
 indicator("Out Of Order")
