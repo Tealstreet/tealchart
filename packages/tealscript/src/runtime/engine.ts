@@ -4735,36 +4735,126 @@ export class TealscriptEngine {
   }
 
   private registerInputBuiltins(): void {
-    const inferInputType = (value: unknown): string => {
+    type InputType = InputDefinition['type'];
+    type InputMetadata = Omit<InputDefinition, 'id' | 'type' | 'title' | 'defval'>;
+
+    const inferInputType = (value: unknown): InputType => {
       if (typeof value === 'number') return Number.isInteger(value) ? 'int' : 'float';
       if (typeof value === 'boolean') return 'bool';
       if (typeof value === 'string') return 'string';
       return 'source';
     };
 
-    const createInputFunc = (type: string) => {
+    const optionalNumberArg = (args: unknown[], namedArgs: Map<string, unknown>, index: number, name: string): number | undefined => {
+      const value = this.getCallArg(args, namedArgs, index, name);
+      if (value === undefined) return undefined;
+      const number = this.toNumber(value);
+      return Number.isFinite(number) ? number : undefined;
+    };
+
+    const optionalStringArg = (args: unknown[], namedArgs: Map<string, unknown>, index: number, name: string): string | undefined => {
+      return this.toOptionalString(this.getCallArg(args, namedArgs, index, name));
+    };
+
+    const optionalBoolArg = (args: unknown[], namedArgs: Map<string, unknown>, index: number, name: string): boolean | undefined => {
+      const value = this.getCallArg(args, namedArgs, index, name);
+      return value === undefined ? undefined : this.isTruthy(value);
+    };
+
+    const optionsArg = (args: unknown[], namedArgs: Map<string, unknown>, index: number): unknown[] | undefined => {
+      const value = this.getCallArg(args, namedArgs, index, 'options');
+      return Array.isArray(value) ? value : undefined;
+    };
+
+    const commonMetadata = (
+      args: unknown[],
+      namedArgs: Map<string, unknown>,
+      startIndex: number,
+      includeConfirm = true,
+    ): InputMetadata => {
+      const metadata: InputMetadata = {
+        tooltip: optionalStringArg(args, namedArgs, startIndex, 'tooltip'),
+        inline: optionalStringArg(args, namedArgs, startIndex + 1, 'inline'),
+        group: optionalStringArg(args, namedArgs, startIndex + 2, 'group'),
+        display: this.getCallArg(args, namedArgs, startIndex + (includeConfirm ? 4 : 3), 'display'),
+        active: this.getCallArg(args, namedArgs, startIndex + (includeConfirm ? 5 : 4), 'active'),
+      };
+      if (includeConfirm) {
+        metadata.confirm = optionalBoolArg(args, namedArgs, startIndex + 3, 'confirm');
+      }
+      return metadata;
+    };
+
+    const rangeMetadata = (args: unknown[], namedArgs: Map<string, unknown>, type: InputType): InputMetadata => {
+      const positionalOptions = Array.isArray(args[2]);
+      const hasOptions = namedArgs.has('options') || positionalOptions;
+      const metadata: InputMetadata = {
+        options: optionsArg(args, namedArgs, 2),
+        ...commonMetadata(args, namedArgs, hasOptions ? 3 : 5),
+      };
+
+      if (!hasOptions && (type === 'int' || type === 'float' || type === 'price')) {
+        metadata.minval = optionalNumberArg(args, namedArgs, 2, 'minval');
+        metadata.maxval = optionalNumberArg(args, namedArgs, 3, 'maxval');
+        metadata.step = optionalNumberArg(args, namedArgs, 4, 'step');
+      }
+
+      return metadata;
+    };
+
+    const metadataForInput = (type: InputType, args: unknown[], namedArgs: Map<string, unknown>): InputMetadata => {
+      if (type === 'int' || type === 'float' || type === 'price') {
+        return rangeMetadata(args, namedArgs, type);
+      }
+      if (type === 'string') {
+        return {
+          options: optionsArg(args, namedArgs, 2),
+          ...commonMetadata(args, namedArgs, 3),
+        };
+      }
+      return commonMetadata(args, namedArgs, 2);
+    };
+
+    const validateInputDefault = (type: InputType, defval: unknown, metadata: InputMetadata): void => {
+      if ((type === 'int' || type === 'float' || type === 'price' || type === 'time') && typeof defval !== 'number') {
+        throw new Error(`input.${type} defval must be a number`);
+      }
+      if (type === 'int' && !Number.isInteger(defval)) {
+        throw new Error('input.int defval must be an integer');
+      }
+      if (type === 'bool' && typeof defval !== 'boolean') {
+        throw new Error('input.bool defval must be a boolean');
+      }
+      if ((type === 'string' || type === 'timeframe' || type === 'symbol' || type === 'session' || type === 'text_area') && typeof defval !== 'string') {
+        throw new Error(`input.${type} defval must be a string`);
+      }
+      if (metadata.minval !== undefined && typeof defval === 'number' && defval < metadata.minval) {
+        throw new Error(`input.${type} defval must be greater than or equal to minval`);
+      }
+      if (metadata.maxval !== undefined && typeof defval === 'number' && defval > metadata.maxval) {
+        throw new Error(`input.${type} defval must be less than or equal to maxval`);
+      }
+      if (metadata.options !== undefined && !metadata.options.some((option) => Object.is(option, defval))) {
+        throw new Error(`input.${type} defval must be one of options`);
+      }
+    };
+
+    const createInputFunc = (type: InputType) => {
       return (args: unknown[], namedArgs: Map<string, unknown>, ctx: ExecutionContext) => {
         const defval = this.getCallArg(args, namedArgs, 0, 'defval');
         const title = this.toStringValue(this.getCallArg(args, namedArgs, 1, 'title', type));
+        const metadata = metadataForInput(type, args, namedArgs);
 
         const id = `input_${title}`;
 
         if (ctx.bar_index === 0) {
+          validateInputDefault(type, defval, metadata);
           ctx.registerInput({
             id,
-            type: type as 'int' | 'float' | 'bool' | 'string' | 'source' | 'color' | 'price' | 'time' | 'timeframe' | 'symbol' | 'session' | 'text_area',
+            type,
             title,
             defval,
-            minval: namedArgs.get('minval') as number | undefined,
-            maxval: namedArgs.get('maxval') as number | undefined,
-            step: namedArgs.get('step') as number | undefined,
-            options: namedArgs.get('options') as unknown[] | undefined,
-            tooltip: namedArgs.get('tooltip') as string | undefined,
-            group: namedArgs.get('group') as string | undefined,
-            inline: namedArgs.get('inline') as string | undefined,
-            confirm: namedArgs.get('confirm') as boolean | undefined,
-            display: namedArgs.get('display'),
-            active: namedArgs.get('active'),
+            ...metadata,
           });
         }
 
@@ -4793,6 +4883,13 @@ export class TealscriptEngine {
       const defval = this.getCallArg(args, namedArgs, 0, 'defval'); // Should be a series like 'close'
       const title = this.toStringValue(this.getCallArg(args, namedArgs, 1, 'title', 'Source'));
       const id = `input_${title}`;
+      const metadata = {
+        tooltip: optionalStringArg(args, namedArgs, 2, 'tooltip'),
+        inline: optionalStringArg(args, namedArgs, 3, 'inline'),
+        group: optionalStringArg(args, namedArgs, 4, 'group'),
+        display: this.getCallArg(args, namedArgs, 5, 'display'),
+        active: this.getCallArg(args, namedArgs, 6, 'active'),
+      };
 
       if (ctx.bar_index === 0) {
         ctx.registerInput({
@@ -4800,11 +4897,7 @@ export class TealscriptEngine {
           type: 'source',
           title,
           defval,
-          tooltip: namedArgs.get('tooltip') as string | undefined,
-          group: namedArgs.get('group') as string | undefined,
-          inline: namedArgs.get('inline') as string | undefined,
-          display: namedArgs.get('display'),
-          active: namedArgs.get('active'),
+          ...metadata,
         });
       }
 

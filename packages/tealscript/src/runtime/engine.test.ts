@@ -3909,6 +3909,19 @@ plot(source)`;
       expect(result.plots[0].values).toEqual([100.2, 100.7, 101.2]);
       expect(overrideResult.plots[0].values).toEqual([42, 42, 42]);
     });
+
+    it('reports invalid Pine input defaults', () => {
+      const script = `//@version=6
+indicator("Invalid input")
+length = input.int(3.5, "Length")
+plot(length)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors[0]?.message).toBe('input.int defval must be an integer');
+    });
   });
 
   describe('color functions', () => {
