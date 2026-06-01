@@ -14,6 +14,7 @@ import {
   getMatrixElementCount,
   getMatrixRows,
   getMatrixValue,
+  invMatrixValue,
   isPineMatrix,
   isSquareMatrix,
   isValidMatrix,
@@ -270,5 +271,28 @@ describe('PineMatrix', () => {
 
   it('rejects determinants for non-square matrices', () => {
     expect(() => detMatrixValue(createPineMatrix<number>(2, 3, 1))).toThrow('Matrix determinant requires a square matrix. Matrix is 2x3');
+  });
+
+  it('inverts square nonsingular matrices without mutating inputs', () => {
+    const matrix = createPineMatrix<number>(2, 2, 0);
+    matrix.values = [4, 7, 2, 6];
+
+    const inverse = invMatrixValue(matrix);
+    expect(inverse.values[0]).toBeCloseTo(0.6);
+    expect(inverse.values[1]).toBeCloseTo(-0.7);
+    expect(inverse.values[2]).toBeCloseTo(-0.2);
+    expect(inverse.values[3]).toBeCloseTo(0.4);
+    multMatrixValue(matrix, inverse).values.forEach((value, index) => {
+      expect(value).toBeCloseTo(index === 0 || index === 3 ? 1 : 0);
+    });
+    expect(matrix.values).toEqual([4, 7, 2, 6]);
+  });
+
+  it('rejects matrix inverses for non-square or singular matrices', () => {
+    expect(() => invMatrixValue(createPineMatrix<number>(2, 3, 1))).toThrow('Matrix inverse requires a square matrix. Matrix is 2x3');
+
+    const singular = createPineMatrix<number>(2, 2, 0);
+    singular.values = [1, 2, 2, 4];
+    expect(() => invMatrixValue(singular)).toThrow('Matrix is singular and cannot be inverted');
   });
 });
