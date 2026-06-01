@@ -1906,6 +1906,53 @@ plot(timeframe.in_seconds("bad"), title="Invalid Seconds")`;
       expect(result.plots.find((plot) => plot.title === 'Invalid Seconds')?.values).toEqual([null, null]);
     });
 
+    it('parses and validates Pine timeframe string specifications', () => {
+      const validCases: Array<{
+        timeframe: string;
+        multiplier: number;
+        flags: Partial<Record<'isticks' | 'isseconds' | 'isminutes' | 'isdaily' | 'isweekly' | 'ismonthly' | 'isintraday', boolean>>;
+      }> = [
+        { timeframe: '1T', multiplier: 1, flags: { isticks: true, isintraday: true } },
+        { timeframe: '45S', multiplier: 45, flags: { isseconds: true, isintraday: true } },
+        { timeframe: '15', multiplier: 15, flags: { isminutes: true, isintraday: true } },
+        { timeframe: 'D', multiplier: 1, flags: { isdaily: true } },
+        { timeframe: '2W', multiplier: 2, flags: { isweekly: true } },
+        { timeframe: '3M', multiplier: 3, flags: { ismonthly: true } },
+      ];
+
+      for (const testCase of validCases) {
+        const script = `//@version=6
+indicator("Valid Timeframe", timeframe="${testCase.timeframe}")
+plot(timeframe.multiplier, title="Multiplier")
+plot(timeframe.isticks ? 1 : 0, title="Ticks")
+plot(timeframe.isseconds ? 1 : 0, title="Seconds")
+plot(timeframe.isminutes ? 1 : 0, title="Minutes")
+plot(timeframe.isdaily ? 1 : 0, title="Daily")
+plot(timeframe.isweekly ? 1 : 0, title="Weekly")
+plot(timeframe.ismonthly ? 1 : 0, title="Monthly")
+plot(timeframe.isintraday ? 1 : 0, title="Intraday")`;
+        const result = executeScript(parse(script), createBars(1));
+
+        expect(result.errors).toHaveLength(0);
+        expect(result.plots.find((plot) => plot.title === 'Multiplier')?.values).toEqual([testCase.multiplier]);
+        expect(result.plots.find((plot) => plot.title === 'Ticks')?.values).toEqual([testCase.flags.isticks ? 1 : 0]);
+        expect(result.plots.find((plot) => plot.title === 'Seconds')?.values).toEqual([testCase.flags.isseconds ? 1 : 0]);
+        expect(result.plots.find((plot) => plot.title === 'Minutes')?.values).toEqual([testCase.flags.isminutes ? 1 : 0]);
+        expect(result.plots.find((plot) => plot.title === 'Daily')?.values).toEqual([testCase.flags.isdaily ? 1 : 0]);
+        expect(result.plots.find((plot) => plot.title === 'Weekly')?.values).toEqual([testCase.flags.isweekly ? 1 : 0]);
+        expect(result.plots.find((plot) => plot.title === 'Monthly')?.values).toEqual([testCase.flags.ismonthly ? 1 : 0]);
+        expect(result.plots.find((plot) => plot.title === 'Intraday')?.values).toEqual([testCase.flags.isintraday ? 1 : 0]);
+      }
+
+      for (const timeframe of ['0', '2S', '1H', '1.5', '-1', 'bad']) {
+        const result = executeScript(parse(`//@version=6
+indicator("Invalid Timeframe", timeframe="${timeframe}")
+plot(close)`), createBars(1));
+
+        expect(result.errors[0]?.message).toBe(`Invalid indicator timeframe: ${timeframe.toUpperCase()}`);
+      }
+    });
+
     it('keeps multiple untitled plots as separate series', () => {
       const script = `//@version=6
 indicator("Test")

@@ -263,6 +263,14 @@ interface ImportedLibrary {
   exportedTypes: Set<string>;
 }
 
+type TimeframeUnit = 'tick' | 'second' | 'minute' | 'day' | 'week' | 'month';
+
+interface TimeframeSpec {
+  period: string;
+  multiplier: number;
+  unit: TimeframeUnit;
+}
+
 interface RandomBuiltinState {
   seed: number;
   state: number;
@@ -883,41 +891,19 @@ export class TealscriptEngine {
   }
 
   private getTimeframeInfo(period: string): ExecutionContext['timeframe'] | null {
-    const normalized = period.trim().toUpperCase();
-    if (normalized === '') return null;
+    const spec = this.parseTimeframeSpec(period);
+    if (!spec) return null;
 
-    const minutes = Number(normalized);
-    if (Number.isFinite(minutes) && minutes > 0) {
-      return {
-        period: normalized,
-        multiplier: minutes,
-        isminutes: true,
-        isdaily: false,
-        isweekly: false,
-        ismonthly: false,
-        isintraday: true,
-        isseconds: false,
-        isticks: false,
-      };
-    }
-
-    const match = /^(\d+)?([STWDM])$/.exec(normalized);
-    if (!match) return null;
-
-    const multiplier = match[1] === undefined ? 1 : Number(match[1]);
-    if (!Number.isFinite(multiplier) || multiplier <= 0) return null;
-
-    const unit = match[2];
     return {
-      period: normalized,
-      multiplier,
-      isminutes: false,
-      isdaily: unit === 'D',
-      isweekly: unit === 'W',
-      ismonthly: unit === 'M',
-      isintraday: unit === 'S' || unit === 'T',
-      isseconds: unit === 'S',
-      isticks: unit === 'T',
+      period: spec.period,
+      multiplier: spec.multiplier,
+      isminutes: spec.unit === 'minute',
+      isdaily: spec.unit === 'day',
+      isweekly: spec.unit === 'week',
+      ismonthly: spec.unit === 'month',
+      isintraday: spec.unit === 'minute' || spec.unit === 'second' || spec.unit === 'tick',
+      isseconds: spec.unit === 'second',
+      isticks: spec.unit === 'tick',
     };
   }
 
@@ -7565,27 +7551,58 @@ export class TealscriptEngine {
   }
 
   private getTimeframeDurationMs(timeframe: string): number | null {
-    const normalized = timeframe.trim().toUpperCase();
-    if (normalized === '') return this.getTimeframeDurationMs(this.ctx.timeframe.period);
+    const spec = this.parseTimeframeSpec(timeframe);
+    if (!spec) return null;
 
-    const numericMinutes = Number(normalized);
-    if (Number.isFinite(numericMinutes) && numericMinutes > 0) {
-      return numericMinutes * 60_000;
+    switch (spec.unit) {
+      case 'tick':
+        return null;
+      case 'second':
+        return spec.multiplier * 1_000;
+      case 'minute':
+        return spec.multiplier * 60_000;
+      case 'day':
+        return spec.multiplier * 86_400_000;
+      case 'week':
+        return spec.multiplier * 7 * 86_400_000;
+      case 'month':
+        return spec.multiplier * 30 * 86_400_000;
+      default:
+        return null;
+    }
+  }
+
+  private parseTimeframeSpec(timeframe: string): TimeframeSpec | null {
+    const normalized = timeframe.trim().toUpperCase();
+    if (normalized === '') return this.parseTimeframeSpec(this.ctx.timeframe.period);
+
+    if (/^\d+$/.test(normalized)) {
+      const multiplier = Number(normalized);
+      return multiplier > 0 ? { period: normalized, multiplier, unit: 'minute' } : null;
     }
 
-    const match = /^(\d+)?([SWDM])$/.exec(normalized);
+    const match = /^(\d+)?([TSDWM])$/.exec(normalized);
     if (!match) return null;
 
     const multiplier = match[1] === undefined ? 1 : Number(match[1]);
-    switch (match[2]) {
+    if (!Number.isInteger(multiplier) || multiplier <= 0) return null;
+
+    const unit = match[2];
+    if (unit === 'S' && ![1, 5, 10, 15, 30, 45].includes(multiplier)) {
+      return null;
+    }
+
+    switch (unit) {
+      case 'T':
+        return { period: normalized, multiplier, unit: 'tick' };
       case 'S':
-        return multiplier * 1_000;
+        return { period: normalized, multiplier, unit: 'second' };
       case 'D':
-        return multiplier * 86_400_000;
+        return { period: normalized, multiplier, unit: 'day' };
       case 'W':
-        return multiplier * 7 * 86_400_000;
+        return { period: normalized, multiplier, unit: 'week' };
       case 'M':
-        return multiplier * 30 * 86_400_000;
+        return { period: normalized, multiplier, unit: 'month' };
       default:
         return null;
     }
