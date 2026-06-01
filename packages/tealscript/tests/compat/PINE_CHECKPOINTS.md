@@ -8,6 +8,22 @@ Do not paste large public scripts into this repository. Preserve the behavior
 shape, cite the source or source-search context, and reduce the script to the
 smallest fixture that proves the semantic contract.
 
+## Public Script Guardrails
+
+Public Pine scripts are useful for discovering idioms, but they are not test
+fixtures by default.
+
+- Prefer semantic reductions that are written for this repository.
+- Do not commit a public script body unless its license explicitly allows
+  redistribution in this repo.
+- If a licensed public script is ever committed, include the license, author,
+  source URL, retrieval date, and the reason a reduced fixture is insufficient.
+- Keep source-search links when the exact script body is not needed.
+- Treat screenshots and manual TradingView observations as notes, not CI
+  oracles.
+- If a reduced fixture grows large, split it by behavior instead of preserving
+  the original script shape.
+
 ## Official Documentation Checkpoints
 
 | Fixture | Source | Reduced Contract | Expected Outputs |
