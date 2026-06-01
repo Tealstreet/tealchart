@@ -80,6 +80,35 @@ plot(samePoint.level, title="Lifted Level")
     expect(roundSeries(getPlot(result, 'Lifted Level').values)).toEqual([105, 108, 110, 106, 102, 103, 107, 112, 111, 114, 113, 115]);
   });
 
+  it('runs reduced shallow UDT copy idioms from the official objects docs', () => {
+    const result = runCompatScript(`
+indicator("Object copy")
+type childState
+    float level = 0
+type pivotPoint
+    int openTime
+    float level
+    childState child = na
+
+parent = pivotPoint.new(time, close, childState.new(close))
+staticCopy = pivotPoint.copy(parent)
+methodCopy = parent.copy()
+staticCopy.level += 10
+methodCopy.level += 20
+staticCopy.child.level += 1
+plot(parent.level, title="Parent Level")
+plot(staticCopy.level, title="Static Copy Level")
+plot(methodCopy.level, title="Method Copy Level")
+plot(parent.child.level, title="Shared Child Level")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Parent Level').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+    expect(roundSeries(getPlot(result, 'Static Copy Level').values)).toEqual([112, 115, 117, 113, 109, 110, 114, 119, 118, 121, 120, 122]);
+    expect(roundSeries(getPlot(result, 'Method Copy Level').values)).toEqual([122, 125, 127, 123, 119, 120, 124, 129, 128, 131, 130, 132]);
+    expect(roundSeries(getPlot(result, 'Shared Child Level').values)).toEqual([103, 106, 108, 104, 100, 101, 105, 110, 109, 112, 111, 113]);
+  });
+
   it('keeps overloaded user-defined method scopes isolated', () => {
     const result = runCompatScript(`
 indicator("Method overload scopes")

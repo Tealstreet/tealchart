@@ -1288,6 +1288,34 @@ plot(right.value, title="Right")`;
       expect(result.plots.find((plot) => plot.title === 'Right')?.values).toEqual([5]);
     });
 
+    it('copies user-defined objects by value with shallow field references', () => {
+      const script = `//@version=6
+indicator("UDT Copy")
+type nestedState
+    float value = 0
+type boxState
+    float value = 0
+    nestedState nested = na
+left = boxState.new(1, nestedState.new(10))
+right = boxState.copy(left)
+methodCopy = left.copy()
+right.value := 5
+methodCopy.value := 7
+right.nested.value := 20
+plot(left.value, title="Left")
+plot(right.value, title="Right")
+plot(methodCopy.value, title="Method Copy")
+plot(left.nested.value, title="Shared Nested")`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Left')?.values).toEqual([1]);
+      expect(result.plots.find((plot) => plot.title === 'Right')?.values).toEqual([5]);
+      expect(result.plots.find((plot) => plot.title === 'Method Copy')?.values).toEqual([7]);
+      expect(result.plots.find((plot) => plot.title === 'Shared Nested')?.values).toEqual([20]);
+    });
+
     it('rolls back realtime field mutations between updateBar calls', () => {
       const script = `//@version=6
 indicator("UDT Rollback")
