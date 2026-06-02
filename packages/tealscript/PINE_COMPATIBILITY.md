@@ -193,6 +193,8 @@ joined, concatenated, mutated, and compared for covariance.
 Core array constructors, accessors, mutators, window helpers, and ordering
 helpers accept Pine-style named arguments such as `size`, `initial_value`, `id`,
 `index`, `value`, `index_from`, `index_to`, `order`, and `sort_field`.
+Statistical and percentile helpers also accept `id1`, `id2`, `biased`, and
+`percentage` where those parameters apply.
 Direct array index assignment such as `values[0] := close` is supported.
 Semantic diagnostics reject obvious non-array index assignment targets,
 non-numeric array assignment indexes, and mismatched values for arrays with
