@@ -150,6 +150,13 @@ row = matrix.row(id=m, row=1)
 column = matrix.column(id=m, column=0)
 tail = matrix.new_int(rows=1, columns=2, initial_value=5)
 matrix.concat(id=m, id2=tail)
+mixed = matrix.new_int(rows=2, columns=2, initial_value=0)
+matrix.set(id=mixed, 0, 1, 2)
+matrix.add_row(id=mixed, array.from(3, 4))
+matrix.fill(id=mixed, 6, 0, 1, 0, 1)
+mixedSlice = matrix.submatrix(id=mixed, 0, 2, 0, 2)
+mixedTail = matrix.new_int(rows=1, columns=2, initial_value=13)
+matrix.concat(id=mixed, mixedTail)
 plot(rows, title="Rows")
 plot(columns, title="Columns")
 plot(elements, title="Elements")
@@ -163,6 +170,12 @@ plot(array.get(row, 1), title="Row Value")
 plot(array.get(column, 2), title="Column Value")
 plot(m.rows(), title="Concat Rows")
 plot(m.get(row=3, column=1), title="Concat Value")
+plot(matrix.get(id=mixed, 0, 1), title="Mixed Get")
+plot(matrix.get(id=mixed, 2, 1), title="Mixed Add Row")
+plot(matrix.get(id=mixed, 0, 0), title="Mixed Fill")
+plot(mixedSlice.get(0, 1), title="Mixed Slice")
+plot(mixed.rows(), title="Mixed Concat Rows")
+plot(mixed.get(3, 0), title="Mixed Concat Value")
 plot(matrix.is_valid(id=m) ? 1 : 0, title="Valid")
 plot(m.is_square() ? 1 : 0, title="Square")
 `);
@@ -181,6 +194,12 @@ plot(m.is_square() ? 1 : 0, title="Square")
     expect(roundSeries(getPlot(result, 'Column Value').values)).toEqual([10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]);
     expect(roundSeries(getPlot(result, 'Concat Rows').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
     expect(roundSeries(getPlot(result, 'Concat Value').values)).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
+    expect(roundSeries(getPlot(result, 'Mixed Get').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Mixed Add Row').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+    expect(roundSeries(getPlot(result, 'Mixed Fill').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+    expect(roundSeries(getPlot(result, 'Mixed Slice').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Mixed Concat Rows').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+    expect(roundSeries(getPlot(result, 'Mixed Concat Value').values)).toEqual([13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13]);
     expect(roundSeries(getPlot(result, 'Valid').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(roundSeries(getPlot(result, 'Square').values)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   });

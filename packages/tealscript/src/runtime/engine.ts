@@ -6085,9 +6085,23 @@ export class TealscriptEngine {
       }
       return this.toNumber(value);
     };
+    const matrixCallArg = (
+      args: unknown[],
+      namedArgs: Map<string, unknown>,
+      index: number,
+      name: string,
+      fallback?: unknown,
+    ): unknown => {
+      const positionalIndex = namedArgs.has('id') && !isPineMatrix(args[0]) ? index - 1 : index;
+      return this.getCallArg(args, namedArgs, positionalIndex, name, fallback);
+    };
+    const optionalMatrixCallRangeArg = (args: unknown[], namedArgs: Map<string, unknown>, index: number, name: string): number | undefined => {
+      const value = matrixCallArg(args, namedArgs, index, name);
+      return value === undefined ? undefined : this.toNumber(value);
+    };
     const readInsertionArgs = (args: unknown[], namedArgs: Map<string, unknown>, indexName: 'row' | 'column'): [number | undefined, PineArray | undefined] => {
-      const indexArg = this.getCallArg(args, namedArgs, 1, indexName);
-      const arrayArg = this.getCallArg(args, namedArgs, 2, 'array_id');
+      const indexArg = matrixCallArg(args, namedArgs, 1, indexName);
+      const arrayArg = matrixCallArg(args, namedArgs, 2, 'array_id');
       if (indexArg === undefined) {
         if (arrayArg !== undefined && !isPineArray(arrayArg)) {
           throw new Error('Expected array');
@@ -6117,34 +6131,34 @@ export class TealscriptEngine {
     this.builtins.set('matrix.elements_count', (args, namedArgs) => getMatrixElementCount(readMatrix(this.matrixReceiverArg(args, namedArgs))));
     this.builtins.set('matrix.get', (args, namedArgs) => getMatrixValue(
       readMatrix(this.matrixReceiverArg(args, namedArgs)),
-      this.getCallArg(args, namedArgs, 1, 'row') as number,
-      this.getCallArg(args, namedArgs, 2, 'column') as number,
+      matrixCallArg(args, namedArgs, 1, 'row') as number,
+      matrixCallArg(args, namedArgs, 2, 'column') as number,
     ));
     this.builtins.set('matrix.set', (args, namedArgs) => {
       setMatrixValue(
         readMatrix(this.matrixReceiverArg(args, namedArgs)),
-        this.getCallArg(args, namedArgs, 1, 'row') as number,
-        this.getCallArg(args, namedArgs, 2, 'column') as number,
-        this.getCallArg(args, namedArgs, 3, 'value'),
+        matrixCallArg(args, namedArgs, 1, 'row') as number,
+        matrixCallArg(args, namedArgs, 2, 'column') as number,
+        matrixCallArg(args, namedArgs, 3, 'value'),
       );
       return null;
     });
     this.builtins.set('matrix.fill', (args, namedArgs) => {
       fillMatrix(
         readMatrix(this.matrixReceiverArg(args, namedArgs)),
-        this.getCallArg(args, namedArgs, 1, 'value'),
-        this.optionalMatrixRangeArg(args, namedArgs, 2, 'from_row'),
-        this.optionalMatrixRangeArg(args, namedArgs, 3, 'to_row'),
-        this.optionalMatrixRangeArg(args, namedArgs, 4, 'from_column'),
-        this.optionalMatrixRangeArg(args, namedArgs, 5, 'to_column'),
+        matrixCallArg(args, namedArgs, 1, 'value'),
+        optionalMatrixCallRangeArg(args, namedArgs, 2, 'from_row'),
+        optionalMatrixCallRangeArg(args, namedArgs, 3, 'to_row'),
+        optionalMatrixCallRangeArg(args, namedArgs, 4, 'from_column'),
+        optionalMatrixCallRangeArg(args, namedArgs, 5, 'to_column'),
       );
       return null;
     });
     this.builtins.set('matrix.reshape', (args, namedArgs) => {
       reshapeMatrix(
         readMatrix(this.matrixReceiverArg(args, namedArgs)),
-        this.getCallArg(args, namedArgs, 1, 'rows') as number,
-        this.getCallArg(args, namedArgs, 2, 'columns') as number,
+        matrixCallArg(args, namedArgs, 1, 'rows') as number,
+        matrixCallArg(args, namedArgs, 2, 'columns') as number,
       );
       return null;
     });
@@ -6165,29 +6179,29 @@ export class TealscriptEngine {
     });
     this.builtins.set('matrix.remove_row', (args, namedArgs) => removeMatrixRow(
       readMatrix(this.matrixReceiverArg(args, namedArgs)),
-      this.getCallArg(args, namedArgs, 1, 'row') as number,
+      matrixCallArg(args, namedArgs, 1, 'row') as number,
     ));
     this.builtins.set('matrix.remove_col', (args, namedArgs) => removeMatrixColumn(
       readMatrix(this.matrixReceiverArg(args, namedArgs)),
-      this.getCallArg(args, namedArgs, 1, 'column') as number,
+      matrixCallArg(args, namedArgs, 1, 'column') as number,
     ));
     this.builtins.set('matrix.remove_column', (args, namedArgs) => removeMatrixColumn(
       readMatrix(this.matrixReceiverArg(args, namedArgs)),
-      this.getCallArg(args, namedArgs, 1, 'column') as number,
+      matrixCallArg(args, namedArgs, 1, 'column') as number,
     ));
     this.builtins.set('matrix.swap_rows', (args, namedArgs) => {
       swapMatrixRows(
         readMatrix(this.matrixReceiverArg(args, namedArgs)),
-        this.getCallArg(args, namedArgs, 1, 'row1') as number,
-        this.getCallArg(args, namedArgs, 2, 'row2') as number,
+        matrixCallArg(args, namedArgs, 1, 'row1') as number,
+        matrixCallArg(args, namedArgs, 2, 'row2') as number,
       );
       return null;
     });
     this.builtins.set('matrix.swap_columns', (args, namedArgs) => {
       swapMatrixColumns(
         readMatrix(this.matrixReceiverArg(args, namedArgs)),
-        this.getCallArg(args, namedArgs, 1, 'column1') as number,
-        this.getCallArg(args, namedArgs, 2, 'column2') as number,
+        matrixCallArg(args, namedArgs, 1, 'column1') as number,
+        matrixCallArg(args, namedArgs, 2, 'column2') as number,
       );
       return null;
     });
@@ -6221,20 +6235,22 @@ export class TealscriptEngine {
       const matrix = readMatrix(this.matrixReceiverArg(args, namedArgs));
       return submatrixValue(
         matrix,
-        this.optionalMatrixRangeArg(args, namedArgs, 1, 'from_row'),
-        this.optionalMatrixRangeArg(args, namedArgs, 2, 'to_row'),
-        this.optionalMatrixRangeArg(args, namedArgs, 3, 'from_column'),
-        this.optionalMatrixRangeArg(args, namedArgs, 4, 'to_column'),
+        optionalMatrixCallRangeArg(args, namedArgs, 1, 'from_row'),
+        optionalMatrixCallRangeArg(args, namedArgs, 2, 'to_row'),
+        optionalMatrixCallRangeArg(args, namedArgs, 3, 'from_column'),
+        optionalMatrixCallRangeArg(args, namedArgs, 4, 'to_column'),
       );
     });
     this.builtins.set('matrix.concat', (args, namedArgs) => {
-      concatMatrix(readMatrix(this.matrixReceiverArg(args, namedArgs)), readMatrix(this.getCallArg(args, namedArgs, 1, 'id2')));
+      const matrix = namedArgs.has('id') ? readMatrix(namedArgs.get('id')) : readMatrix(this.matrixReceiverArg(args, namedArgs));
+      const other = namedArgs.has('id') ? this.getCallArg(args, namedArgs, 0, 'id2') : matrixCallArg(args, namedArgs, 1, 'id2');
+      concatMatrix(matrix, readMatrix(other));
       return null;
     });
     this.builtins.set('matrix.copy', (args, namedArgs) => copyMatrix(readMatrix(this.matrixReceiverArg(args, namedArgs))));
-    this.builtins.set('matrix.row', (args, namedArgs) => matrixRow(readMatrix(this.matrixReceiverArg(args, namedArgs)), this.getCallArg(args, namedArgs, 1, 'row') as number));
-    this.builtins.set('matrix.col', (args, namedArgs) => matrixColumn(readMatrix(this.matrixReceiverArg(args, namedArgs)), this.getCallArg(args, namedArgs, 1, 'column') as number));
-    this.builtins.set('matrix.column', (args, namedArgs) => matrixColumn(readMatrix(this.matrixReceiverArg(args, namedArgs)), this.getCallArg(args, namedArgs, 1, 'column') as number));
+    this.builtins.set('matrix.row', (args, namedArgs) => matrixRow(readMatrix(this.matrixReceiverArg(args, namedArgs)), matrixCallArg(args, namedArgs, 1, 'row') as number));
+    this.builtins.set('matrix.col', (args, namedArgs) => matrixColumn(readMatrix(this.matrixReceiverArg(args, namedArgs)), matrixCallArg(args, namedArgs, 1, 'column') as number));
+    this.builtins.set('matrix.column', (args, namedArgs) => matrixColumn(readMatrix(this.matrixReceiverArg(args, namedArgs)), matrixCallArg(args, namedArgs, 1, 'column') as number));
     this.builtins.set('matrix.is_square', (args, namedArgs) => {
       return isSquareMatrix(readMatrix(this.matrixReceiverArg(args, namedArgs)));
     });
@@ -6256,7 +6272,7 @@ export class TealscriptEngine {
   }
 
   private matrixReceiverArg(args: unknown[], namedArgs: Map<string, unknown>): unknown {
-    return args[0] !== undefined ? args[0] : namedArgs.get('id');
+    return isPineMatrix(args[0]) ? args[0] : namedArgs.has('id') ? namedArgs.get('id') : args[0];
   }
 
   private registerMapBuiltins(): void {
