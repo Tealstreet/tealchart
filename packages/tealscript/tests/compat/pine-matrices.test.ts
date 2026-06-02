@@ -126,6 +126,98 @@ plot(receiverSlice.get(0, 0), title="Receiver Slice")
     expect(roundSeries(getPlot(result, 'Receiver Slice').values)).toEqual([8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]);
   });
 
+  it('runs named matrix constructor and core helper idioms', () => {
+    const result = runCompatScript(`
+indicator("Matrix named core helpers")
+m = matrix.new_int(rows=2, columns=2, initial_value=1)
+matrix.set(id=m, row=0, column=1, value=4)
+m.set(row=1, column=0, value=7)
+rows = matrix.rows(id=m)
+columns = matrix.columns(id=m)
+elements = m.elements_count()
+first = matrix.get(id=m, row=0, column=1)
+secondValue = m.get(row=1, column=0)
+matrix.add_row(id=m, row=1, array_id=array.from(8, 9))
+removed = m.remove_column(column=1)
+m.add_column(column=1, array_id=array.from(10, 11, 12))
+m.swap_rows(row1=0, row2=2)
+m.swap_columns(column1=0, column2=1)
+copy = matrix.copy(id=m)
+copy.reshape(rows=1, columns=6)
+reversed = m.copy()
+matrix.reverse(id=reversed)
+row = matrix.row(id=m, row=1)
+column = matrix.column(id=m, column=0)
+tail = matrix.new_int(rows=1, columns=2, initial_value=5)
+matrix.concat(id=m, id2=tail)
+mixed = matrix.new_int(rows=2, columns=2, initial_value=0)
+matrix.set(id=mixed, 0, 1, 2)
+matrix.add_row(id=mixed, array.from(3, 4))
+matrix.fill(id=mixed, 6, 0, 1, 0, 1)
+mixedSlice = matrix.submatrix(id=mixed, 0, 2, 0, 2)
+mixedTail = matrix.new_int(rows=1, columns=2, initial_value=13)
+matrix.concat(id=mixed, mixedTail)
+partial = matrix.new_int(rows=2, columns=3, initial_value=0)
+matrix.set(id=partial, row=1, 2, 99)
+partialGet = matrix.get(id=partial, row=1, 2)
+matrix.fill(id=partial, value=5, 0, 1, 0, 1)
+partialSlice = matrix.submatrix(id=partial, from_row=1, 2, 2, 3)
+matrix.reshape(id=partial, rows=1, 6)
+plot(rows, title="Rows")
+plot(columns, title="Columns")
+plot(elements, title="Elements")
+plot(first, title="First")
+plot(secondValue, title="Second")
+plot(array.get(removed, 1), title="Removed")
+plot(m.get(row=0, column=0), title="Swapped First")
+plot(copy.columns(), title="Copy Columns")
+plot(reversed.get(row=0, column=0), title="Reversed First")
+plot(array.get(row, 1), title="Row Value")
+plot(array.get(column, 2), title="Column Value")
+plot(m.rows(), title="Concat Rows")
+plot(m.get(row=3, column=1), title="Concat Value")
+plot(matrix.get(id=mixed, 0, 1), title="Mixed Get")
+plot(matrix.get(id=mixed, 2, 1), title="Mixed Add Row")
+plot(matrix.get(id=mixed, 0, 0), title="Mixed Fill")
+plot(mixedSlice.get(0, 1), title="Mixed Slice")
+plot(mixed.rows(), title="Mixed Concat Rows")
+plot(mixed.get(3, 0), title="Mixed Concat Value")
+plot(partialGet, title="Partial Get")
+plot(matrix.get(id=partial, 0, 0), title="Partial Fill")
+plot(partialSlice.get(0, 0), title="Partial Slice")
+plot(partial.columns(), title="Partial Reshape")
+plot(matrix.is_valid(id=m) ? 1 : 0, title="Valid")
+plot(m.is_square() ? 1 : 0, title="Square")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Rows').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Columns').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Elements').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+    expect(roundSeries(getPlot(result, 'First').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+    expect(roundSeries(getPlot(result, 'Second').values)).toEqual([7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]);
+    expect(roundSeries(getPlot(result, 'Removed').values)).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
+    expect(roundSeries(getPlot(result, 'Swapped First').values)).toEqual([12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12]);
+    expect(roundSeries(getPlot(result, 'Copy Columns').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+    expect(roundSeries(getPlot(result, 'Reversed First').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Row Value').values)).toEqual([8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]);
+    expect(roundSeries(getPlot(result, 'Column Value').values)).toEqual([10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]);
+    expect(roundSeries(getPlot(result, 'Concat Rows').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+    expect(roundSeries(getPlot(result, 'Concat Value').values)).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
+    expect(roundSeries(getPlot(result, 'Mixed Get').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Mixed Add Row').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+    expect(roundSeries(getPlot(result, 'Mixed Fill').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+    expect(roundSeries(getPlot(result, 'Mixed Slice').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Mixed Concat Rows').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+    expect(roundSeries(getPlot(result, 'Mixed Concat Value').values)).toEqual([13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13]);
+    expect(roundSeries(getPlot(result, 'Partial Get').values)).toEqual([99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99]);
+    expect(roundSeries(getPlot(result, 'Partial Fill').values)).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
+    expect(roundSeries(getPlot(result, 'Partial Slice').values)).toEqual([99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99]);
+    expect(roundSeries(getPlot(result, 'Partial Reshape').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+    expect(roundSeries(getPlot(result, 'Valid').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Square').values)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  });
+
   it('runs documented matrix row iteration idioms', () => {
     const result = runCompatScript(`
 indicator("Matrix row iteration")

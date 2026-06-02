@@ -214,7 +214,10 @@ helpers (`matrix.fill` for full-matrix and ranged fills, `matrix.reshape`, `matr
 Collection operations include row sorting with `matrix.sort()` (including UDT
 row sorting by const int/string `sort_field` field name or index) and copied
 range extraction with `matrix.submatrix()`, including named
-`from_row`/`to_row`/`from_column`/`to_column` arguments. Matrix concatenation coverage
+`from_row`/`to_row`/`from_column`/`to_column` arguments. Common matrix
+constructors and core helpers accept Pine-style named arguments such as `rows`,
+`columns`, `initial_value`, `id`, `row`, `column`, `value`, `array_id`, `row1`,
+`row2`, `column1`, `column2`, and `id2`. Matrix concatenation coverage
 includes `matrix.concat()` and method-form row appends into the left-hand
 matrix. Matrix row iteration coverage includes `for row in values` and
 `for [index, row] in values`, where each row is exposed as an array copy.
