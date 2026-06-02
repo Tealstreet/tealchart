@@ -7935,7 +7935,7 @@ export class TealscriptEngine {
 
     // HMA - Hull Moving Average
     // Formula: wma(2 * wma(src, len/2) - wma(src, len), sqrt(len))
-    this.builtins.set('ta.hma', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.hma', (args, namedArgs, ctx, scope, callId) => {
       const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
 
@@ -7962,7 +7962,7 @@ export class TealscriptEngine {
       const sqrtLen = Math.round(Math.sqrt(length));
 
       // Calculate WMA(src, len/2) and WMA(src, len) for current and past bars
-      const hmaRawKey = `_hma_raw_${length}`;
+      const hmaRawKey = `_ta_hma_raw_${callId}_${length}`;
       let hmaRawHistory = (scope.get(hmaRawKey) as number[]) ?? [];
 
       const wmaHalf = calcWma(halfLen);

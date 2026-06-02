@@ -28,6 +28,7 @@ plot(ta.valuewhen(condition=condition, source=close, occurrence=1), title="Named
     const result = runCompatScript(`
 indicator("TA window helpers")
 plot(ta.vwma(close, 3), title="VWMA")
+plot(ta.vwma(source=close, length=3), title="Named VWMA")
 plot(ta.highestbars(high, 4), title="Highest Offset")
 plot(ta.lowestbars(low, 4), title="Lowest Offset")
 `);
@@ -47,6 +48,7 @@ plot(ta.lowestbars(low, 4), title="Lowest Offset")
       109.777778,
       111.023256,
     ]);
+    expect(roundSeries(getPlot(result, 'Named VWMA').values)).toEqual(roundSeries(getPlot(result, 'VWMA').values));
     expect(roundSeries(getPlot(result, 'Highest Offset').values)).toEqual([0, 0, 0, 0, 1, 2, 3, 0, 0, 0, 0, 1]);
     expect(roundSeries(getPlot(result, 'Lowest Offset').values)).toEqual([0, 1, 2, 3, 0, 0, 1, 2, 3, 3, 3, 3]);
   });
@@ -891,11 +893,18 @@ plot(ta.percentrank(source=close, length=length), title="Named Percent Rank")
 indicator("Moving average smoke")
 plot(ta.swma(close), title="SWMA")
 plot(ta.alma(close, 5, 0.85, 6), title="ALMA")
+plot(ta.hma(close, 5), title="HMA")
+plot(ta.swma(source=close), title="Named SWMA")
+plot(ta.alma(series=close, length=5, offset=0.85, sigma=6), title="Named ALMA")
+plot(ta.hma(source=close, length=5), title="Named HMA")
 `);
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'SWMA').values)).toEqual([null, null, null, 104.833333, 104, 101.833333, 100.833333, 102.666667, 105.666667, 108.166667, 109.5, 110.333333]);
     expect(roundSeries(getPlot(result, 'ALMA').values)).toEqual([null, null, null, null, 101.918274, 99.97516, 101.504063, 105.458142, 107.88929, 109.296928, 110.200868, 110.912922]);
+    expect(roundSeries(getPlot(result, 'Named SWMA').values)).toEqual(roundSeries(getPlot(result, 'SWMA').values));
+    expect(roundSeries(getPlot(result, 'Named ALMA').values)).toEqual(roundSeries(getPlot(result, 'ALMA').values));
+    expect(roundSeries(getPlot(result, 'Named HMA').values)).toEqual(roundSeries(getPlot(result, 'HMA').values));
   });
 
   it('matches common Pine TA named-argument and default-source idioms', () => {
@@ -930,10 +939,15 @@ plot(ta.sma(spread, 3), title="Spread SMA")
 plot(ta.ema(spread, 3), title="Spread EMA")
 plot(ta.rma(spread, 3), title="Spread RMA")
 plot(ta.wma(spread, 3), title="Spread WMA")
+plot(ta.rma(source=spread, length=3), title="Named Spread RMA")
+plot(ta.wma(source=spread, length=3), title="Named Spread WMA")
 plot(ta.highest(spread, 3), title="Spread Highest")
 plot(ta.lowest(spread, 3), title="Spread Lowest")
 plot(ta.range(spread, 3), title="Spread Range")
 plot(ta.mom(spread, 2), title="Spread Momentum")
+plot(ta.mom(source=spread, length=2), title="Named Spread Momentum")
+plot(ta.roc(spread, 2), title="Spread ROC")
+plot(ta.roc(source=spread, length=2), title="Named Spread ROC")
 `);
 
     expect(result.errors).toEqual([]);
@@ -941,10 +955,14 @@ plot(ta.mom(spread, 2), title="Spread Momentum")
     expect(roundSeries(getPlot(result, 'Spread EMA').values)).toEqual([2, 2.5, 2.25, -0.875, -2.4375, -0.71875, 1.640625, 3.320313, 1.160156, 2.080078, 0.540039, 1.27002]);
     expect(roundSeries(getPlot(result, 'Spread RMA').values)).toEqual([2, 2.333333, 2.222222, 0.148148, -1.234568, -0.489712, 1.006859, 2.337906, 1.225271, 1.816847, 0.877898, 1.251932]);
     expect(roundSeries(getPlot(result, 'Spread WMA').values)).toEqual([null, null, 2.333333, -0.833333, -3, -1.5, 1.666667, 4, 1.833333, 2, 0.333333, 1.166667]);
+    expect(roundSeries(getPlot(result, 'Named Spread RMA').values)).toEqual(roundSeries(getPlot(result, 'Spread RMA').values));
+    expect(roundSeries(getPlot(result, 'Named Spread WMA').values)).toEqual(roundSeries(getPlot(result, 'Spread WMA').values));
     expect(roundSeries(getPlot(result, 'Spread Highest').values)).toEqual([2, 3, 3, 3, 2, 1, 4, 5, 5, 5, 3, 3]);
     expect(roundSeries(getPlot(result, 'Spread Lowest').values)).toEqual([2, 2, 2, -4, -4, -4, -4, 1, -1, -1, -1, -1]);
     expect(roundSeries(getPlot(result, 'Spread Range').values)).toEqual([0, 1, 1, 7, 6, 5, 8, 4, 6, 6, 4, 4]);
     expect(roundSeries(getPlot(result, 'Spread Momentum').values)).toEqual([null, null, 0, -7, -6, 5, 8, 4, -5, -2, 0, -1]);
+    expect(roundSeries(getPlot(result, 'Named Spread Momentum').values)).toEqual(roundSeries(getPlot(result, 'Spread Momentum').values));
+    expect(roundSeries(getPlot(result, 'Named Spread ROC').values)).toEqual(roundSeries(getPlot(result, 'Spread ROC').values));
   });
 
   it('preserves real bar offsets through na values for TA offset helpers', () => {
