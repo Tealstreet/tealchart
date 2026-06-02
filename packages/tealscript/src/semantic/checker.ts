@@ -2034,12 +2034,11 @@ class SemanticChecker {
 
     if (boundParamCount < minArgs) {
       this.addDiagnostic('argument-count', `${displayName}() expects at least ${minArgs} argument${minArgs === 1 ? '' : 's'}`, args[0]?.loc);
-    } else {
-      for (let index = 0; index < minArgs; index += 1) {
-        const param = params[index];
-        if (!param || index < positionalCount || suppliedNames.has(param)) continue;
-        this.addDiagnostic('argument-count', `${displayName}() missing required argument '${param}'`, args[0]?.loc);
-      }
+    }
+    for (let index = 0; index < minArgs; index += 1) {
+      const param = params[index];
+      if (!param || index < positionalCount || suppliedNames.has(param)) continue;
+      this.addDiagnostic('argument-count', `${displayName}() missing required argument '${param}'`, args[0]?.loc);
     }
     if (positionalCount > maxArgs) {
       this.addDiagnostic('argument-count', `${displayName}() expects at most ${maxArgs} argument${maxArgs === 1 ? '' : 's'}`, args[maxArgs]?.loc);

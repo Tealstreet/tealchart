@@ -149,12 +149,20 @@ log.trace("unsupported")
         message: 'log.info() expects at least 1 argument',
       }),
       expect.objectContaining({
+        code: 'argument-count',
+        message: "log.info() missing required argument 'message'",
+      }),
+      expect.objectContaining({
         code: 'unknown-argument',
         message: "Unknown argument 'text' for log.warning()",
       }),
       expect.objectContaining({
         code: 'argument-count',
         message: 'log.warning() expects at least 1 argument',
+      }),
+      expect.objectContaining({
+        code: 'argument-count',
+        message: "log.warning() missing required argument 'message'",
       }),
       expect.objectContaining({
         code: 'unknown-function',
@@ -186,6 +194,7 @@ alertcondition(true, title="A", message="M", freq=alert.freq_all)
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'alert() expects at least 1 argument',
+      "alert() missing required argument 'message'",
       'alert() expects at most 2 arguments',
       "Unknown argument 'freq' for alertcondition()",
     ]);
@@ -220,9 +229,11 @@ strategy.exit("Exit", from_entry="Long", unknown=1)
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'strategy.entry() expects at least 2 arguments',
+      "strategy.entry() missing required argument 'direction'",
       'strategy.cancel_all() expects at most 0 arguments',
       'Unknown function: strategy.entri',
       'strategy.opentrades.entry_price() expects at least 1 argument',
+      "strategy.opentrades.entry_price() missing required argument 'trade_num'",
       "Unknown argument 'unknown' for strategy.exit()",
     ]);
   });
@@ -987,6 +998,7 @@ four = color.new(color.red, 10, 20)
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'ta.sma() expects at least 2 arguments',
+      "ta.sma() missing required argument 'length'",
       "Unknown argument 'bad' for ta.rsi()",
       'plot() cannot use positional arguments after named arguments',
       'color.new() expects at most 2 arguments',
@@ -1030,6 +1042,7 @@ gradientShort = color.from_gradient(close, 0, 100, color.red)
       "Unknown argument 'alpha' for color.rgb()",
       "Unknown argument 'source' for color.r()",
       'color.from_gradient() expects at least 5 arguments',
+      "color.from_gradient() missing required argument 'top_color'",
     ]);
   });
 
@@ -1065,6 +1078,7 @@ missingModifyTicker = ticker.modify(session=session.extended)
       "Argument 'prefix' for ticker.new() was supplied multiple times",
       "Unknown argument 'bad' for ticker.modify()",
       'ticker.renko() expects at least 3 arguments',
+      "ticker.renko() missing required argument 'param'",
       "Unknown argument 'request_wicks' for ticker.pointfigure()",
       "ticker.new() missing required argument 'prefix'",
       "ticker.modify() missing required argument 'tickerid'",
