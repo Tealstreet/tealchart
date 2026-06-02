@@ -30,16 +30,18 @@ should be reduced into deterministic local fixtures when they are useful
 checkpoints. Tests must not depend on TradingView, network access, or random
 public scripts at runtime.
 
-## Epic And PR Rules
+## Epic, PR, And Phase Rules
 
-Treat each PR as one epic.
+Treat each epic as an outcome-sized roadmap item. Large epics may require
+multiple PRs. Treat each PR as one coherent phase or subphase of the active
+epic.
 
 1. Start from latest `master`.
-2. Cut one branch for the current epic.
-3. Split the epic into coherent phases.
-4. Keep each phase small enough to verify and commit independently.
-5. Do not batch unrelated epics into one PR.
-6. Do not start a dependent epic from a stale branch when the previous epic must
+2. Cut one branch for the current PR-sized phase.
+3. Split the PR into coherent commits when useful.
+4. Keep each phase small enough to verify and review independently.
+5. Do not batch unrelated epic phases into one PR.
+6. Do not start a dependent phase from a stale branch when the previous phase must
    land first.
 7. Update the roadmap or compatibility inventory when behavior, scope, or known
    gaps change.
@@ -55,8 +57,7 @@ just done <branch>
 
 ## Required Phase Cadence
 
-Use the plan-execute cadence for every phase inside every epic. Do not skip
-gates.
+Use the plan-execute cadence for every PR-sized phase. Do not skip gates.
 
 1. Plan the phase.
    - List files to create or modify.
@@ -100,7 +101,7 @@ must state that the change is docs-only.
 
 ## Review And Merge Loop
 
-When the epic branch is ready:
+When the PR branch is ready:
 
 1. Push the branch and open one PR.
 2. Run the CodeRabbit review loop.
@@ -108,7 +109,7 @@ When the epic branch is ready:
 4. Wait for CI and CodeRabbit to be green.
 5. Merge with maintainer/admin privileges once the gates are green.
 6. Delete the merged branch.
-7. Return to latest `master` and cut the next epic branch.
+7. Return to latest `master` and cut the next phase branch.
 
 CodeRabbit review may run in a background agent when the next work is genuinely
 non-blocking and branch-safe. If the next epic depends on the current PR, wait
@@ -116,9 +117,9 @@ for the PR to merge before continuing.
 
 ## Branch Safety
 
-Use one active implementation branch per epic unless a maintainer explicitly
-approves parallel branches. Parallel work must have disjoint write scopes and
-must not require rebasing through unresolved review changes.
+Use one active implementation branch per PR-sized phase unless a maintainer
+explicitly approves parallel branches. Parallel work must have disjoint write
+scopes and must not require rebasing through unresolved review changes.
 
 Before cutting the next branch:
 
@@ -146,9 +147,9 @@ For Pine parity checkpoints:
 
 ## Completion Criteria
 
-An epic is complete when:
+An epic phase is complete when:
 
-- planned phases are committed,
+- planned work is committed,
 - focused and full verification gates pass,
 - docs and compatibility inventory are updated where relevant,
 - CI and CodeRabbit are green,
