@@ -6500,14 +6500,23 @@ export class TealscriptEngine {
     this.builtins.set('map.size', (args, namedArgs) => getMapSize(readMap(this.mapReceiverArg(args, namedArgs))));
     this.builtins.set('map.put', (args, namedArgs) => {
       return putMapValue(
-        readMap(this.mapReceiverArg(args, namedArgs)),
-        this.getCallArg(args, namedArgs, 1, 'key'),
-        this.getCallArg(args, namedArgs, 2, 'value'),
+        readMap(this.mapReceiverArg(args, namedArgs, ['key', 'value'])),
+        this.getMapCallArg(args, namedArgs, 1, 'key', undefined, ['id']),
+        this.getMapCallArg(args, namedArgs, 2, 'value', undefined, ['id', 'key']),
       );
     });
-    this.builtins.set('map.get', (args, namedArgs) => getMapValue(readMap(this.mapReceiverArg(args, namedArgs)), this.getCallArg(args, namedArgs, 1, 'key')));
-    this.builtins.set('map.contains', (args, namedArgs) => containsMapKey(readMap(this.mapReceiverArg(args, namedArgs)), this.getCallArg(args, namedArgs, 1, 'key')));
-    this.builtins.set('map.remove', (args, namedArgs) => removeMapValue(readMap(this.mapReceiverArg(args, namedArgs)), this.getCallArg(args, namedArgs, 1, 'key')));
+    this.builtins.set('map.get', (args, namedArgs) => getMapValue(
+      readMap(this.mapReceiverArg(args, namedArgs, ['key'])),
+      this.getMapCallArg(args, namedArgs, 1, 'key', undefined, ['id']),
+    ));
+    this.builtins.set('map.contains', (args, namedArgs) => containsMapKey(
+      readMap(this.mapReceiverArg(args, namedArgs, ['key'])),
+      this.getMapCallArg(args, namedArgs, 1, 'key', undefined, ['id']),
+    ));
+    this.builtins.set('map.remove', (args, namedArgs) => removeMapValue(
+      readMap(this.mapReceiverArg(args, namedArgs, ['key'])),
+      this.getMapCallArg(args, namedArgs, 1, 'key', undefined, ['id']),
+    ));
     this.builtins.set('map.clear', (args, namedArgs) => {
       clearMap(readMap(this.mapReceiverArg(args, namedArgs)));
       return null;
@@ -6516,13 +6525,41 @@ export class TealscriptEngine {
     this.builtins.set('map.keys', (args, namedArgs) => mapKeys(readMap(this.mapReceiverArg(args, namedArgs))));
     this.builtins.set('map.values', (args, namedArgs) => mapValues(readMap(this.mapReceiverArg(args, namedArgs))));
     this.builtins.set('map.put_all', (args, namedArgs) => {
-      putAllMapValues(readMap(this.mapReceiverArg(args, namedArgs)), readMap(this.getCallArg(args, namedArgs, 1, 'id2')));
+      putAllMapValues(
+        readMap(this.mapReceiverArg(args, namedArgs, ['id2'])),
+        readMap(this.getMapCallArg(args, namedArgs, 1, 'id2', undefined, ['id'])),
+      );
       return null;
     });
   }
 
-  private mapReceiverArg(args: unknown[], namedArgs: Map<string, unknown>): unknown {
-    return args[0] !== undefined ? args[0] : namedArgs.get('id');
+  private mapReceiverArg(args: unknown[], namedArgs: Map<string, unknown>, tailNames: readonly string[] = []): unknown {
+    if (this.mapUsesPositionalReceiver(args, namedArgs, tailNames) && namedArgs.has('id')) {
+      throw new Error("map call receiver was supplied multiple times (positional and named 'id')");
+    }
+    return this.mapUsesPositionalReceiver(args, namedArgs, tailNames) ? args[0] : namedArgs.has('id') ? namedArgs.get('id') : args[0];
+  }
+
+  private mapUsesPositionalReceiver(args: unknown[], namedArgs: Map<string, unknown>, tailNames: readonly string[] = []): boolean {
+    if (!isPineMap(args[0])) return false;
+    if (!namedArgs.has('id')) return true;
+
+    const missingTailCount = tailNames.filter((tailName) => !namedArgs.has(tailName)).length;
+    return missingTailCount === 0 || args.length > missingTailCount;
+  }
+
+  private getMapCallArg(
+    args: unknown[],
+    namedArgs: Map<string, unknown>,
+    index: number,
+    name: string,
+    fallback?: unknown,
+    priorNames: readonly string[] = [],
+  ): unknown {
+    const tailNames = [name, ...priorNames.filter((priorName) => priorName !== 'id' && priorName !== name)];
+    const hasPositionalReceiver = this.mapUsesPositionalReceiver(args, namedArgs, tailNames);
+    const positionalIndex = index - priorNames.filter((priorName) => namedArgs.has(priorName) && (priorName !== 'id' || !hasPositionalReceiver)).length;
+    return this.getCallArg(args, namedArgs, positionalIndex, name, fallback);
   }
 
   private registerColorBuiltins(): void {

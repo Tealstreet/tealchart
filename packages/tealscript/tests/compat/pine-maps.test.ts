@@ -65,24 +65,31 @@ plot(array.get(copy.keys(), 1) == "B" ? 1 : 0, title="Existing Order")
     expect(roundSeries(getPlot(result, 'Existing Order').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
   });
 
-  it('runs named map argument and receiver precedence idioms', () => {
+  it('runs named map argument and prefix-tail idioms', () => {
     const result = runCompatScript(`
 indicator("Map named arguments")
 left = map.new<string, int>()
 right = map.new<string, int>()
 map.put(id=left, key="A", value=1)
+map.put(id=left, "C", 5)
 left.put(key="B", value=2)
 right.put("A", 100)
-previous = left.put(id=right, key="A", value=3)
+previous = left.put(key="A", value=3)
+prefixPrevious = map.put(id=left, "A", 4)
+prefixValue = map.get(id=left, "C")
+prefixContains = map.contains(id=left, "C") ? 1 : 0
 leftContains = left.contains(key="A") ? 1 : 0
 rightContains = map.contains(id=right, key="A") ? 1 : 0
 copied = map.copy(id=left)
-map.put_all(id=copied, id2=right)
+map.put_all(id=copied, right)
 removed = copied.remove(key="A")
 leftKeys = left.keys()
 copiedValues = map.values(id=copied)
-right.clear(id=left)
+map.clear(id=right)
 plot(previous, title="Previous")
+plot(prefixPrevious, title="Prefix Previous")
+plot(prefixValue, title="Prefix Value")
+plot(prefixContains, title="Prefix Contains")
 plot(left.get(key="A"), title="Receiver Value")
 plot(na(right.get(key="A")) ? 1 : 0, title="Other Missing")
 plot(leftContains, title="Left Contains")
@@ -96,15 +103,30 @@ plot(map.size(id=right), title="Right Size")
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Previous').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
-    expect(roundSeries(getPlot(result, 'Receiver Value').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Prefix Previous').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Prefix Value').values)).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
+    expect(roundSeries(getPlot(result, 'Prefix Contains').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Receiver Value').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
     expect(roundSeries(getPlot(result, 'Other Missing').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(roundSeries(getPlot(result, 'Left Contains').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(roundSeries(getPlot(result, 'Right Contains').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(roundSeries(getPlot(result, 'Named Keys').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(roundSeries(getPlot(result, 'Named Remove').values)).toEqual([100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]);
-    expect(roundSeries(getPlot(result, 'Named Values').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
-    expect(roundSeries(getPlot(result, 'Left Size').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Named Values').values)).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
+    expect(roundSeries(getPlot(result, 'Left Size').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
     expect(roundSeries(getPlot(result, 'Right Size').values)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('reports duplicate map receiver bindings at runtime', () => {
+    const result = runCompatScript(`
+indicator("Duplicate map receiver")
+left = map.new<string, int>()
+right = map.new<string, int>()
+map.put(left, id=right, key="A", value=1)
+plot(map.size(left), title="Left Size")
+`);
+
+    expect(result.errors.map((error) => error.message)).toContain("map call receiver was supplied multiple times (positional and named 'id')");
   });
 
   it('runs Pine generic map constructor and declaration idioms', () => {
