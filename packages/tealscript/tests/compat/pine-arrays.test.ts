@@ -146,6 +146,9 @@ popped = array.pop(id=queue)
 array.clear(id=queue)
 nested = array.new<array<int>>(size=0)
 array.push(id=nested, value=array.from(1, 2))
+methodReceiver = array.new_int(size=0)
+otherReceiver = array.new_int(size=0)
+methodReceiver.push(id=otherReceiver, value=5)
 plot(array.size(id=values), title="Size")
 plot(array.sum(id=mixedCtor), title="Mixed Constructor")
 plot(array.get(id=values, index=2), title="Get")
@@ -163,6 +166,8 @@ plot(shifted, title="Shifted")
 plot(popped, title="Popped")
 plot(array.size(id=queue), title="Cleared")
 plot(array.get(id=array.get(id=nested, index=0), index=1), title="Nested")
+plot(methodReceiver.size(), title="Method Receiver")
+plot(otherReceiver.size(), title="Other Receiver")
 `);
 
     expect(result.errors).toEqual([]);
@@ -183,6 +188,8 @@ plot(array.get(id=array.get(id=nested, index=0), index=1), title="Nested")
     expect(roundSeries(getPlot(result, 'Popped').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
     expect(roundSeries(getPlot(result, 'Cleared').values)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     expect(roundSeries(getPlot(result, 'Nested').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Method Receiver').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Other Receiver').values)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   });
 
   it('matches documented Pine array ordering and joining idioms', () => {

@@ -5942,8 +5942,9 @@ export class TealscriptEngine {
       }
       return value;
     };
+    const isArrayLike = (value: unknown): boolean => Array.isArray(value) || isPineArray(value);
     const arrayReceiverArg = (args: unknown[], namedArgs: Map<string, unknown>): unknown => {
-      return namedArgs.has('id') ? namedArgs.get('id') : args[0];
+      return isArrayLike(args[0]) ? args[0] : namedArgs.has('id') ? namedArgs.get('id') : args[0];
     };
     const arrayCallArg = (
       args: unknown[],
