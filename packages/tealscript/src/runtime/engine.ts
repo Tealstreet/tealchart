@@ -5942,8 +5942,7 @@ export class TealscriptEngine {
     this.builtins.set('map.new', () => createPineMap());
     this.builtins.set('map.size', (args) => getMapSize(readMap(args[0])));
     this.builtins.set('map.put', (args) => {
-      putMapValue(readMap(args[0]), args[1], args[2]);
-      return null;
+      return putMapValue(readMap(args[0]), args[1], args[2]);
     });
     this.builtins.set('map.get', (args) => getMapValue(readMap(args[0]), args[1]));
     this.builtins.set('map.contains', (args) => containsMapKey(readMap(args[0]), args[1]));

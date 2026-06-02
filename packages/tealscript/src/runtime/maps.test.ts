@@ -24,9 +24,9 @@ describe('PineMap', () => {
     expect(isPineMap(map)).toBe(true);
     expect(getMapSize(map)).toBe(0);
 
-    putMapValue(map, 'A', 1);
+    expect(Number.isNaN(putMapValue(map, 'A', 1))).toBe(true);
     putMapValue(map, 'B', 2);
-    putMapValue(map, 'A', 10);
+    expect(putMapValue(map, 'A', 10)).toBe(1);
 
     expect(getMapSize(map)).toBe(2);
     expect(containsMapKey(map, 'A')).toBe(true);

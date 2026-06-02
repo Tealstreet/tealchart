@@ -477,6 +477,8 @@ Phases:
    key/value mismatches for known `map<K, V>` variables. Deeper
    qualifier-sensitive template enforcement belongs to the qualified type-system
    epic.
+   Runtime coverage now returns the previous value from `map.put()` when a key
+   is replaced, or `na` for new keys.
    Parser and semantic coverage now retain generic call type arguments and infer
    unannotated `map.new<K, V>()` constructors, including invalid map constructor
    template and generic arity diagnostics.

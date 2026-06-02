@@ -7,14 +7,16 @@ describe('Pine map compatibility', () => {
     const result = runCompatScript(`
 indicator("Map basics")
 m = map.new()
-m.put("First", 1)
+firstInsert = m.put("First", 1)
 map.put(m, "Second", 2)
 m.put("Third", 3)
-m.put("Second", 22)
+previousSecond = m.put("Second", 22)
 keys = m.keys()
 values = map.values(m)
 missing = m.get("Missing")
 removed = map.remove(m, "First")
+plot(na(firstInsert) ? 1 : 0, title="New Put")
+plot(previousSecond, title="Previous Put")
 plot(m.size(), title="Size")
 plot(m.get("Second"), title="Second")
 plot(array.get(keys, 1) == "Second" ? 1 : 0, title="Key Order")
@@ -26,6 +28,8 @@ plot(map.size(m), title="Cleared")
 `);
 
     expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'New Put').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Previous Put').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
     expect(roundSeries(getPlot(result, 'Size').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
     expect(roundSeries(getPlot(result, 'Second').values)).toEqual([22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22]);
     expect(roundSeries(getPlot(result, 'Key Order').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
