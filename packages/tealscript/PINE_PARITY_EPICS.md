@@ -481,6 +481,8 @@ Phases:
    is replaced, or `na` for new keys.
    Runtime coverage now accepts named `map.*` reference arguments while
    preserving method receiver precedence over named `id`.
+   Runtime coverage now supports map variable history references for documented
+   scope idioms such as `previous = data[1]`.
    Parser and semantic coverage now retain generic call type arguments and infer
    unannotated `map.new<K, V>()` constructors, including invalid map constructor
    template and generic arity diagnostics.

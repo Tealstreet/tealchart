@@ -178,4 +178,29 @@ plot(sum, title="Accumulated")
     expect(roundSeries(getPlot(result, 'Last Result').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
     expect(roundSeries(getPlot(result, 'Accumulated').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
   });
+
+  it('runs documented map history and scope idioms', () => {
+    const result = runCompatScript(`
+indicator("Map history scope")
+globalData = map.new<int, float>()
+update() =>
+    previous = globalData[1]
+    if na(previous)
+        for i = 1 to 3
+            globalData.put(i, close)
+    else
+        for [key, value] in previous
+            globalData.put(key, value + key)
+update()
+values = globalData.values()
+plot(globalData.get(1), title="One")
+plot(values.max(), title="Max")
+plot(values.min(), title="Min")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'One').values)).toEqual([102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113]);
+    expect(roundSeries(getPlot(result, 'Max').values)).toEqual([102, 105, 108, 111, 114, 117, 120, 123, 126, 129, 132, 135]);
+    expect(roundSeries(getPlot(result, 'Min').values)).toEqual([102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113]);
+  });
 });
