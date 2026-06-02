@@ -192,7 +192,7 @@ plot(strategy.initial_capital)`;
 
     it('requires strategy.exit to specify a supported exit price', () => {
       const script = `//@version=6
-strategy("Strategy call")
+strategy("Strategy call", process_orders_on_close=true)
 strategy.entry("Long", strategy.long)
 strategy.exit("Long exit", "Long")
 plot(close)`;
@@ -204,9 +204,59 @@ plot(close)`;
       expect(result.errors[0]?.message).toBe('strategy.exit requires a limit, stop, or trailing stop price');
     });
 
+    it('fills default market strategy orders at the next bar open', () => {
+      const script = `//@version=6
+strategy("Default market timing")
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+plot(strategy.position_size)`;
+      const bars: Bar[] = [
+        { time: 1_700_000_000_000, open: 10, high: 13, low: 9, close: 12, volume: 100 },
+        { time: 1_700_000_060_000, open: 20, high: 22, low: 19, close: 21, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.fills.map(({ orderId, price, barIndex }) => ({ orderId, price, barIndex }))).toEqual([
+        { orderId: 'Long', price: 20, barIndex: 1 },
+      ]);
+      expect(result.strategy.openTrades[0]).toMatchObject({
+        entryOrderId: 'Long',
+        entryPrice: 20,
+        entryBarIndex: 1,
+      });
+      expect(result.plots[0]?.values).toEqual([0, 2]);
+    });
+
+    it('fills process-on-close market strategy orders at the signal bar close', () => {
+      const script = `//@version=6
+strategy("Close market timing", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+plot(strategy.position_size)`;
+      const bars: Bar[] = [
+        { time: 1_700_000_000_000, open: 10, high: 13, low: 9, close: 12, volume: 100 },
+        { time: 1_700_000_060_000, open: 20, high: 22, low: 19, close: 21, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.fills.map(({ orderId, price, barIndex }) => ({ orderId, price, barIndex }))).toEqual([
+        { orderId: 'Long', price: 12, barIndex: 0 },
+      ]);
+      expect(result.strategy.openTrades[0]).toMatchObject({
+        entryOrderId: 'Long',
+        entryPrice: 12,
+        entryBarIndex: 0,
+      });
+      expect(result.plots[0]?.values).toEqual([2, 2]);
+    });
+
     it('records strategy entry and order calls as pending ledger orders', () => {
       const script = `//@version=6
-strategy("Orders", default_qty_value=1)
+strategy("Orders", default_qty_value=1, process_orders_on_close=true)
 strategy.entry("Long", strategy.long, qty=2, limit=101, stop=99, oca_name="grp", oca_type=strategy.oca.cancel, comment="breakout", alert_message="long")
 strategy.order("Short", strategy.short)
 strategy.cancel("Short")
@@ -258,7 +308,7 @@ plot(strategy.equity)`;
 
     it('cancels all pending strategy orders', () => {
       const script = `//@version=6
-strategy("Orders")
+strategy("Orders", process_orders_on_close=true)
 strategy.entry("Long", strategy.long, limit=101)
 strategy.entry("Add", strategy.long, qty=3, limit=102)
 strategy.cancel_all()`;
@@ -271,7 +321,7 @@ strategy.cancel_all()`;
 
     it('resolves percent-of-equity default quantity on omitted order qty', () => {
       const script = `//@version=6
-strategy("Orders", default_qty_type=strategy.percent_of_equity, default_qty_value=10)
+strategy("Orders", default_qty_type=strategy.percent_of_equity, default_qty_value=10, process_orders_on_close=true)
 strategy.entry("Long", strategy.long)`;
 
       const bars = createBars(1);
@@ -291,7 +341,7 @@ strategy.entry("Long", strategy.long)`;
 
     it('rejects percent-of-equity orders when equity cannot produce a positive quantity', () => {
       const script = `//@version=6
-strategy("No equity", initial_capital=0, default_qty_type=strategy.percent_of_equity, default_qty_value=10)
+strategy("No equity", initial_capital=0, default_qty_type=strategy.percent_of_equity, default_qty_value=10, process_orders_on_close=true)
 strategy.entry("Long", strategy.long)`;
 
       const result = executeScript(parse(script), createBars(1));
@@ -302,7 +352,7 @@ strategy.entry("Long", strategy.long)`;
 
     it('cancels all pending strategy orders that reuse an id', () => {
       const script = `//@version=6
-strategy("Orders")
+strategy("Orders", process_orders_on_close=true)
 strategy.entry("Long", strategy.long, limit=101)
 strategy.entry("Long", strategy.long, qty=2, limit=102)
 strategy.cancel("Long")`;
@@ -315,7 +365,7 @@ strategy.cancel("Long")`;
 
     it('fills fixed-size market strategy orders at the current close', () => {
       const script = `//@version=6
-strategy("Orders")
+strategy("Orders", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=2)
 if bar_index == 1
@@ -355,6 +405,7 @@ plot(strategy.opentrades)`;
     it('applies percent strategy commissions to fills and net profit', () => {
       const script = `//@version=6
 strategy("Percent commission",
+    process_orders_on_close=true,
     initial_capital=1000,
     commission_type=strategy.commission.percent,
     commission_value=0.1)
@@ -390,6 +441,7 @@ plot(strategy.equity)`;
     it('applies cash per order and cash per contract strategy commissions', () => {
       const perOrder = executeScript(parse(`//@version=6
 strategy("Cash per order",
+    process_orders_on_close=true,
     initial_capital=1000,
     commission_type=strategy.commission.cash_per_order,
     commission_value=2)
@@ -398,6 +450,7 @@ plot(strategy.equity)`), createBars(1));
 
       const perContract = executeScript(parse(`//@version=6
 strategy("Cash per contract",
+    process_orders_on_close=true,
     initial_capital=1000,
     commission_type=strategy.commission.cash_per_contract,
     commission_value=2)
@@ -418,6 +471,7 @@ plot(strategy.equity)`), createBars(1));
     it('exposes basic strategy.opentrades accessors', () => {
       const script = `//@version=6
 strategy("Open access",
+    process_orders_on_close=true,
     pyramiding=1,
     commission_type=strategy.commission.cash_per_contract,
     commission_value=1)
@@ -456,7 +510,7 @@ plot(strategy.opentrades.size(99), title="Missing")`;
 
     it('requires a trade number for strategy.opentrades accessors', () => {
       const script = `//@version=6
-strategy("Missing trade num")
+strategy("Missing trade num", process_orders_on_close=true)
 strategy.entry("Long", strategy.long, qty=1)
 plot(strategy.opentrades.entry_price())`;
 
@@ -468,6 +522,7 @@ plot(strategy.opentrades.entry_price())`;
     it('exposes basic strategy.closedtrades accessors', () => {
       const script = `//@version=6
 strategy("Closed access",
+    process_orders_on_close=true,
     commission_type=strategy.commission.cash_per_order,
     commission_value=2)
 if bar_index == 0
@@ -508,7 +563,7 @@ plot(strategy.closedtrades.profit(99), title="Missing")`;
 
     it('exposes strategy trade outcome counters', () => {
       const script = `//@version=6
-strategy("Trade counters")
+strategy("Trade counters", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Win", strategy.long, qty=1)
 if bar_index == 1
@@ -535,7 +590,7 @@ plot(strategy.eventrades, title="Evens")`;
 
     it('rolls back strategy fills between realtime updateBar calls', () => {
       const script = `//@version=6
-strategy("Realtime strategy")
+strategy("Realtime strategy", process_orders_on_close=true)
 if barstate.islast
     strategy.entry("Last", strategy.long, qty=1)
 plot(strategy.position_size, title="Position")
@@ -560,7 +615,7 @@ plot(strategy.opentrades, title="Open Trades")`;
 
     it('closes matching entry trades with strategy.close market orders', () => {
       const script = `//@version=6
-strategy("Close")
+strategy("Close", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=2)
 if bar_index == 1
@@ -603,7 +658,7 @@ plot(strategy.netprofit)`;
 
     it('emits strategy order-fill alerts from alert_message fields', () => {
       const script = `//@version=6
-strategy("Fill alerts")
+strategy("Fill alerts", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=1, alert_message="entry filled")
 if bar_index == 1
@@ -631,7 +686,7 @@ plot(strategy.closedtrades)`;
 
     it('does not emit strategy order-fill alerts without alert_message fields', () => {
       const script = `//@version=6
-strategy("No fill alerts")
+strategy("No fill alerts", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=1)
 if bar_index == 1
@@ -646,7 +701,7 @@ plot(strategy.closedtrades)`;
 
     it('closes the full net position with strategy.close_all', () => {
       const script = `//@version=6
-strategy("Close all")
+strategy("Close all", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=2)
 if bar_index == 1
@@ -671,7 +726,7 @@ plot(strategy.closedtrades)`;
 
     it('records strategy.exit limit and stop brackets as pending exit orders', () => {
       const script = `//@version=6
-strategy("Exit brackets")
+strategy("Exit brackets", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=2)
 if bar_index == 1
@@ -737,7 +792,7 @@ plot(strategy.closedtrades)`;
 
     it('updates an existing pending strategy.exit order with the same id', () => {
       const script = `//@version=6
-strategy("Exit updates")
+strategy("Exit updates", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=1)
 if bar_index == 1
@@ -762,7 +817,7 @@ plot(strategy.opentrades)`;
 
     it('cancels stale strategy.exit orders when switching between single and bracket exits', () => {
       const script = `//@version=6
-strategy("Exit shape updates")
+strategy("Exit shape updates", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=1)
 if bar_index == 1
@@ -794,7 +849,7 @@ plot(strategy.opentrades)`;
 
     it('fills pending limit entry orders on later bars when price crosses', () => {
       const script = `//@version=6
-strategy("Limit fill")
+strategy("Limit fill", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=1, limit=100.3)
 plot(strategy.position_size)`;
@@ -819,7 +874,7 @@ plot(strategy.position_size)`;
 
     it('resolves cash default quantity using limit order price basis', () => {
       const script = `//@version=6
-strategy("Cash sizing", default_qty_type=strategy.cash, default_qty_value=1000)
+strategy("Cash sizing", default_qty_type=strategy.cash, default_qty_value=1000, process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, limit=100.3)
 plot(strategy.position_size)`;
@@ -845,7 +900,7 @@ plot(strategy.position_size)`;
 
     it('activates and fills long stop-limit entry orders on later bars', () => {
       const script = `//@version=6
-strategy("Long stop-limit")
+strategy("Long stop-limit", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=1, stop=101, limit=100.7)
 plot(strategy.position_size)`;
@@ -875,7 +930,7 @@ plot(strategy.position_size)`;
 
     it('activates and fills short stop-limit strategy.order calls on later bars', () => {
       const script = `//@version=6
-strategy("Short stop-limit")
+strategy("Short stop-limit", process_orders_on_close=true)
 if bar_index == 0
     strategy.order("Short", strategy.short, qty=1, stop=100.2, limit=101)
 plot(strategy.position_size)`;
@@ -905,7 +960,7 @@ plot(strategy.position_size)`;
 
     it('blocks same-direction strategy.entry calls above the pyramiding limit', () => {
       const script = `//@version=6
-strategy("Pyramiding default")
+strategy("Pyramiding default", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("First", strategy.long, qty=1)
 if bar_index == 1
@@ -926,7 +981,7 @@ plot(strategy.opentrades)`;
 
     it('allows additional strategy.entry calls up to the pyramiding setting', () => {
       const script = `//@version=6
-strategy("Pyramiding allowed", pyramiding=1)
+strategy("Pyramiding allowed", pyramiding=1, process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("First", strategy.long, qty=1)
 if bar_index == 1
@@ -949,7 +1004,7 @@ plot(strategy.opentrades)`;
 
     it('reverses positions when strategy.entry submits the opposite direction', () => {
       const script = `//@version=6
-strategy("Entry reversal")
+strategy("Entry reversal", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=2)
 if bar_index == 1
@@ -988,7 +1043,7 @@ plot(strategy.closedtrades)`;
 
     it('sizes pending strategy.entry reversals from the live position at fill time', () => {
       const script = `//@version=6
-strategy("Pending entry reversal")
+strategy("Pending entry reversal", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=2)
 if bar_index == 1
@@ -1028,7 +1083,7 @@ plot(strategy.closedtrades)`;
 
     it('does not auto-reverse raw strategy.order calls', () => {
       const script = `//@version=6
-strategy("Order no reversal")
+strategy("Order no reversal", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=2)
 if bar_index == 1
@@ -1048,7 +1103,7 @@ plot(strategy.position_size)`;
 
     it('fills strategy.exit brackets and cancels the sibling OCA order', () => {
       const script = `//@version=6
-strategy("Exit bracket fill")
+strategy("Exit bracket fill", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=1)
 if bar_index == 1
@@ -1086,7 +1141,7 @@ plot(strategy.closedtrades)`;
 
     it('keeps strategy.exit OCA cancellation scoped to from_entry', () => {
       const script = `//@version=6
-strategy("OCA scope", pyramiding=1)
+strategy("OCA scope", pyramiding=1, process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("A", strategy.long, qty=1)
     strategy.entry("B", strategy.long, qty=1)
@@ -1115,7 +1170,7 @@ plot(strategy.position_size)`;
 
     it('does not fill updated strategy.exit prices until a later bar', () => {
       const script = `//@version=6
-strategy("Exit activation")
+strategy("Exit activation", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=1)
 if bar_index == 1
@@ -1142,7 +1197,7 @@ plot(strategy.position_size)`;
 
     it('fills long strategy.exit trailing stops after activation', () => {
       const script = `//@version=6
-strategy("Long trail")
+strategy("Long trail", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=1)
 if bar_index == 1
@@ -1198,7 +1253,7 @@ plot(strategy.position_size)`;
 
     it('fills short strategy.exit trailing stops after activation', () => {
       const script = `//@version=6
-strategy("Short trail")
+strategy("Short trail", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Short", strategy.short, qty=1)
 if bar_index == 1
@@ -1231,7 +1286,7 @@ plot(strategy.position_size)`;
 
     it('uses weighted entry price for multi-fill strategy.exit trail_points activation', () => {
       const script = `//@version=6
-strategy("Weighted trail", pyramiding=1)
+strategy("Weighted trail", pyramiding=1, process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("A", strategy.long, qty=1)
 if bar_index == 1

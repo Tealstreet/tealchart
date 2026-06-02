@@ -188,6 +188,7 @@ import {
 import {
   cancelAllStrategyOrders,
   cancelStrategyOrder,
+  fillPendingStrategyMarketOrders,
   fillPendingStrategyOrders,
   fillStrategyMarketOrder,
   submitStrategyOrder,
@@ -456,6 +457,7 @@ export class TealscriptEngine {
       if (isLastBar) {
         this.ctx.captureRealtimeRollbackState();
       }
+      this.fillPendingStrategyMarketOrdersForCurrentBar();
 
       // Execute all statements
       for (const stmt of ast.body) {
@@ -4145,14 +4147,16 @@ export class TealscriptEngine {
       barIndex: this.ctx.bar_index,
       time: this.ctx.time.get(0) ?? 0,
     });
-    const fill = fillStrategyMarketOrder(
-      this.ctx.strategyLedger,
-      order,
-      this.ctx.close.get(0) ?? Number.NaN,
-      this.ctx.bar_index,
-      this.ctx.time.get(0) ?? 0,
-    );
-    this.emitStrategyFillAlerts(fill ? [fill] : []);
+    if (this.ctx.strategyLedger.settings.processOrdersOnClose) {
+      const fill = fillStrategyMarketOrder(
+        this.ctx.strategyLedger,
+        order,
+        this.ctx.close.get(0) ?? Number.NaN,
+        this.ctx.bar_index,
+        this.ctx.time.get(0) ?? 0,
+      );
+      this.emitStrategyFillAlerts(fill ? [fill] : []);
+    }
 
     return undefined;
   }
@@ -4191,6 +4195,16 @@ export class TealscriptEngine {
       this.ctx.strategyLedger,
       this.ctx.high.get(0) ?? Number.NaN,
       this.ctx.low.get(0) ?? Number.NaN,
+      this.ctx.bar_index,
+      this.ctx.time.get(0) ?? 0,
+    );
+    this.emitStrategyFillAlerts(fills);
+  }
+
+  private fillPendingStrategyMarketOrdersForCurrentBar(): void {
+    const fills = fillPendingStrategyMarketOrders(
+      this.ctx.strategyLedger,
+      this.ctx.open.get(0) ?? Number.NaN,
       this.ctx.bar_index,
       this.ctx.time.get(0) ?? 0,
     );
@@ -4527,14 +4541,16 @@ export class TealscriptEngine {
       barIndex: this.ctx.bar_index,
       time: this.ctx.time.get(0) ?? 0,
     });
-    const fill = fillStrategyMarketOrder(
-      this.ctx.strategyLedger,
-      order,
-      this.ctx.close.get(0) ?? Number.NaN,
-      this.ctx.bar_index,
-      this.ctx.time.get(0) ?? 0,
-    );
-    this.emitStrategyFillAlerts(fill ? [fill] : []);
+    if (this.ctx.strategyLedger.settings.processOrdersOnClose) {
+      const fill = fillStrategyMarketOrder(
+        this.ctx.strategyLedger,
+        order,
+        this.ctx.close.get(0) ?? Number.NaN,
+        this.ctx.bar_index,
+        this.ctx.time.get(0) ?? 0,
+      );
+      this.emitStrategyFillAlerts(fill ? [fill] : []);
+    }
   }
 
   private normalizeStrategyDirection(value: unknown): StrategyDirection {
