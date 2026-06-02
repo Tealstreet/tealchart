@@ -587,6 +587,24 @@ plot(previousClose, title="Previous Close")
     expect(roundSeries(getPlot(result, 'Previous Close').values)).toEqual([null, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110]);
   });
 
+  it('runs Pine-style leading postfix continuations in assignment targets', () => {
+    const result = runCompatScript(`
+indicator("Assignment Postfix Continuation")
+type Holder
+    float level
+var holder = Holder.new(0)
+var values = array.new<float>(1, 0)
+holder
+    .level := close + 1
+values
+    [0] := holder.level
+plot(values[0], title="Assigned")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Assigned').values)).toEqual([103, 106, 108, 104, 100, 101, 105, 110, 109, 112, 111, 113]);
+  });
+
   it('runs Pine-style operator line continuations', () => {
     const result = runCompatScript(`
 indicator("Operator Continuation")
