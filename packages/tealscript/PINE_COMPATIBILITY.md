@@ -194,7 +194,7 @@ semantic inference/diagnostics for generic constructor templates plus known
 `matrix.get`, `matrix.set`, and `matrix.fill` element types, shape and access helpers (`matrix.rows`, `matrix.columns`, `matrix.elements_count`,
 `matrix.get`, `matrix.set`, `matrix.copy`, `matrix.row`, `matrix.col`,
 `matrix.column`, `matrix.is_square`, `matrix.is_valid`), mutation and shape
-helpers (`matrix.fill`, `matrix.reshape`, `matrix.add_row`, `matrix.add_col`,
+helpers (`matrix.fill` for full-matrix and ranged fills, `matrix.reshape`, `matrix.add_row`, `matrix.add_col`,
 `matrix.add_column`, `matrix.remove_row`, `matrix.remove_col`,
 `matrix.remove_column`, `matrix.swap_rows`, `matrix.swap_columns`,
 `matrix.reverse`, `matrix.transpose`), inspection helpers (`matrix.is_zero`,
@@ -204,7 +204,11 @@ helpers (`matrix.fill`, `matrix.reshape`, `matrix.add_row`, `matrix.add_col`,
 (`matrix.avg`, `matrix.min`, `matrix.max`, `matrix.median`, `matrix.mode`).
 Collection operations include row sorting with `matrix.sort()` (including UDT
 row sorting by const int/string `sort_field` field name or index) and copied
-range extraction with `matrix.submatrix()`.
+range extraction with `matrix.submatrix()`, including named
+`from_row`/`to_row`/`from_column`/`to_column` arguments. Matrix concatenation coverage
+includes `matrix.concat()` and method-form row appends into the left-hand
+matrix. Matrix row iteration coverage includes `for row in values` and
+`for [index, row] in values`, where each row is exposed as an array copy.
 Matrix arithmetic coverage includes `matrix.sum()` and `matrix.diff()` with
 same-shape matrix operands and scalar operands, `matrix.mult()` for
 matrix-by-matrix, matrix-by-array, and matrix-by-scalar multiplication,
@@ -218,7 +222,8 @@ method syntax lowers to the
 same runtime built-ins for calls such as
 `values.set(row, column, close)`, `values.add_row(array.from(...))`,
 `values.transpose()`, `values.sort(1, order.descending)`,
-`values.submatrix(0, 2, 0, 2)`, `values.sum(other)`, `values.mult(other)`,
+`values.submatrix(0, 2, 0, 2)`, `values.fill(9, 0, 1, 1, 3)`,
+`values.concat(other)`, `values.sum(other)`, `values.mult(other)`,
 `values.pow(2)`, `values.trace()`, `values.det()`, `values.inv()`,
 `values.pinv()`, `values.rank()`, `values.eigenvalues()`,
 `values.eigenvectors()`, `values.kron(other)`, `values.is_identity()`, and

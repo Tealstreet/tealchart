@@ -178,6 +178,19 @@ export function copyMatrix<T = unknown>(matrix: PineMatrix<T>): PineMatrix<T> {
   };
 }
 
+export function concatMatrix<T = unknown>(matrix: PineMatrix<T>, other: PineMatrix<T>): PineMatrix<T> {
+  if (other.rows === 0) return matrix;
+  if (matrix.rows === 0 && matrix.columns === 0) {
+    matrix.columns = other.columns;
+  } else if (matrix.columns !== other.columns) {
+    throw new Error(`Matrix concat requires matching column counts. Left has ${matrix.columns}, right has ${other.columns}`);
+  }
+
+  matrix.values.push(...other.values);
+  matrix.rows += other.rows;
+  return matrix;
+}
+
 export function matrixRow<T = unknown>(matrix: PineMatrix<T>, row: number): PineArray<T> {
   const normalizedRow = normalizeExistingIndex(row, matrix.rows, 'row');
   const result = createPineArray<T>();
@@ -196,8 +209,21 @@ export function matrixColumn<T = unknown>(matrix: PineMatrix<T>, column: number)
   return result;
 }
 
-export function fillMatrix<T = unknown>(matrix: PineMatrix<T>, value: T): void {
-  matrix.values.fill(value);
+export function fillMatrix<T = unknown>(
+  matrix: PineMatrix<T>,
+  value: T,
+  fromRow: number = 0,
+  toRow: number = matrix.rows,
+  fromColumn: number = 0,
+  toColumn: number = matrix.columns,
+): void {
+  const rowRange = normalizeRange(fromRow, toRow, matrix.rows, 'row');
+  const columnRange = normalizeRange(fromColumn, toColumn, matrix.columns, 'column');
+  for (let row = rowRange.from; row < rowRange.to; row++) {
+    for (let column = columnRange.from; column < columnRange.to; column++) {
+      setMatrixValue(matrix, row, column, value);
+    }
+  }
 }
 
 export function reshapeMatrix(matrix: PineMatrix, rows: number, columns: number): void {

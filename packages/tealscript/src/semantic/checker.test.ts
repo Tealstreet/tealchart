@@ -687,6 +687,12 @@ for [key, value] in m
     ints.push(key)
     prices.push(value)
     ints.push(value)
+grid = matrix.new<float>(2, 2, 0)
+for [rowIndex, rowValues] in grid
+    ints.push(rowIndex)
+    strings.push(rowIndex)
+    prices.push(rowValues.get(0))
+    ints.push(rowValues.get(0))
 for i = 0 to 2
     ints.push(i)
     strings.push(i)
@@ -696,6 +702,8 @@ for i = 0 to 2
       'Cannot use float value as int array element',
       'Cannot use int value as string array element',
       'Cannot use string value as int array element',
+      'Cannot use float value as int array element',
+      'Cannot use int value as string array element',
       'Cannot use float value as int array element',
       'Cannot use int value as string array element',
     ]);

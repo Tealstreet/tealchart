@@ -454,6 +454,12 @@ Phases:
    Runtime coverage now includes `matrix.kron()` for Kronecker products.
    Runtime coverage now includes `matrix.sort()` row sorting and
    `matrix.submatrix()` copied range extraction.
+   Runtime coverage now includes `matrix.concat()` row appends for namespace
+   and method-call forms.
+   Runtime coverage now includes `matrix.fill()` optional range arguments and
+   named range arguments for `matrix.fill()`/`matrix.submatrix()`.
+   Runtime coverage now includes documented matrix row iteration with
+   `for row in matrix` and `for [index, row] in matrix`.
    Runtime coverage now includes matrix inspection predicates: zero, identity,
    diagonal, antidiagonal, symmetric, antisymmetric, triangular, stochastic, and
    binary.
