@@ -717,6 +717,13 @@ for (const name of [
   BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1 });
 }
 
+for (const name of ['matrix.diff', 'matrix.kron', 'matrix.mult', 'matrix.sum']) {
+  BUILTIN_SIGNATURES.set(name, { params: ['id1', 'id2'], aliases: { id: 'id1' }, minArgs: 2, maxArgs: 2 });
+}
+
+BUILTIN_SIGNATURES.set('matrix.pow', { params: ['id', 'power'], minArgs: 2, maxArgs: 2 });
+BUILTIN_SIGNATURES.set('matrix.sort', { params: ['id', 'column', 'order', 'sort_field'], minArgs: 1, maxArgs: 4 });
+
 export function checkProgram(program: Program): SemanticCheckResult {
   return new SemanticChecker().check(program);
 }

@@ -1098,6 +1098,59 @@ tooManyInv = matrix.inv(m, m)
     ]);
   });
 
+  it('resolves matrix calculation helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Matrix Calculation Signatures")
+a = matrix.new_float(rows=2, columns=2, initial_value=1)
+b = matrix.new_float(rows=2, columns=2, initial_value=2)
+sumNamed = matrix.sum(id1=a, id2=b)
+sumAlias = matrix.sum(id=a, id2=b)
+diffNamed = matrix.diff(id1=a, id2=b)
+multNamed = matrix.mult(id1=a, id2=b)
+kronNamed = matrix.kron(id1=a, id2=b)
+powNamed = matrix.pow(id=a, power=2)
+matrix.sort(id=a, column=1, order=order.descending, sort_field=0)
+plot(matrix.rows(id=sumNamed) + matrix.rows(id=sumAlias) + matrix.rows(id=diffNamed) + matrix.rows(id=multNamed) + matrix.rows(id=kronNamed) + matrix.rows(id=powNamed))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid matrix calculation helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Matrix Calculation Signatures")
+a = matrix.new_float(rows=2, columns=2, initial_value=1)
+b = matrix.new_float(rows=2, columns=2, initial_value=2)
+missingSum = matrix.sum(id1=a)
+duplicateDiff = matrix.diff(a, id=a)
+unknownMult = matrix.mult(left=a, id2=b)
+tooManyKron = matrix.kron(a, b, a)
+missingPow = matrix.pow(id=a)
+unknownPow = matrix.pow(id=a, exponent=2)
+tooManySort = matrix.sort(a, 1, order.ascending, 0, 1)
+unknownSort = matrix.sort(id=a, direction=order.ascending)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'matrix.sum() expects at least 2 arguments',
+      "matrix.sum() missing required argument 'id2'",
+      'matrix.diff() expects at least 2 arguments',
+      "matrix.diff() missing required argument 'id2'",
+      "Argument 'id' for matrix.diff() was supplied multiple times",
+      "Unknown argument 'left' for matrix.mult()",
+      'matrix.mult() expects at least 2 arguments',
+      "matrix.mult() missing required argument 'id1'",
+      'matrix.kron() expects at most 2 arguments',
+      'matrix.pow() expects at least 2 arguments',
+      "matrix.pow() missing required argument 'power'",
+      "Unknown argument 'exponent' for matrix.pow()",
+      'matrix.pow() expects at least 2 arguments',
+      "matrix.pow() missing required argument 'power'",
+      'matrix.sort() expects at most 4 arguments',
+      "Unknown argument 'direction' for matrix.sort()",
+    ]);
+  });
+
   it('reports array element template mismatches for known mutable arrays', () => {
     const result = checkProgram(parse(`
 indicator("Bad Array Types")
