@@ -1016,6 +1016,47 @@ value = ta.sma(close, source=open, length=14)
     ]);
   });
 
+  it('resolves core TA helper named and default-source arguments', () => {
+    const result = checkProgram(parse(`
+indicator("TA Core Signatures")
+condition = close > open
+since = ta.barssince(condition=condition)
+last = ta.valuewhen(condition=condition, source=close, occurrence=0)
+changed = ta.change(source=close, length=2)
+crossed = ta.crossover(source1=close, source2=open) or ta.crossunder(source1=close, source2=open) or ta.cross(source1=close, source2=open)
+highest = ta.highest(length=3)
+lowest = ta.lowest(length=3)
+highestOffset = ta.highestbars(length=3)
+lowestOffset = ta.lowestbars(length=3)
+singleLengthHighest = ta.highest(3)
+spread = ta.range(source=close, length=3)
+trend = ta.rising(source=close, length=2) or ta.falling(source=close, length=2)
+plot(since + last + changed + highest + lowest + highestOffset + lowestOffset + singleLengthHighest + spread + (crossed ? 1 : 0) + (trend ? 1 : 0))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid core TA helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad TA Core Signatures")
+duplicateValuewhen = ta.valuewhen(close > open, condition=false, source=close, occurrence=0)
+unknownCross = ta.cross(source1=close, source2=open, threshold=0)
+missingHighestLength = ta.highest(source=high)
+shortRange = ta.range(source=close)
+tooManyBarsSince = ta.barssince(close > open, true)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Argument 'condition' for ta.valuewhen() was supplied multiple times",
+      "Unknown argument 'threshold' for ta.cross()",
+      "ta.highest() missing required argument 'length'",
+      "ta.range() expects at least 2 arguments",
+      "ta.range() missing required argument 'length'",
+      'ta.barssince() expects at most 1 argument',
+    ]);
+  });
+
   it('resolves color helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Color Signatures")
