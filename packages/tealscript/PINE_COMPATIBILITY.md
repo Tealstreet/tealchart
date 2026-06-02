@@ -480,15 +480,17 @@ minute threshold, and named exchange timezone.
 
 ## Common Session Time Coverage
 
-The session-time pass covers `time_close`, `last_bar_time`, `timenow`, and
-same-timeframe `time()` / `time_close()` calls with optional session strings
-such as `"0930-1600"` or `"0930-1600:23456"`. Matching bars return their open
-or close UNIX timestamp; non-matching bars return `na`. Historical `timenow`
-uses a stable execution timestamp, and realtime updates refresh it per
-re-execution. `session.ismarket`, `session.ispremarket`, and
+The session-time pass covers `time_close`, `last_bar_time`, `timenow`,
+`time_tradingday`, and `time()` / `time_close()` calls with optional session
+strings such as `"0930-1600"` or `"0930-1600:23456"`. Matching bars return
+their open or close UNIX timestamp; non-matching bars return `na`. Historical
+`timenow` uses a stable execution timestamp, and realtime updates refresh it
+per re-execution. `session.ismarket`, `session.ispremarket`, and
 `session.ispostmarket` are supported when the host runtime provides exchange
-session classification windows. Multi-timeframe aggregation and exchange
-calendar holiday handling remain planned.
+session classification windows. Higher-timeframe `time()` / `time_close()`
+aggregation is covered for intraday, daily, and weekly buckets, including
+timezone-aware DST boundaries. Exchange calendar holiday handling and broader
+dynamic-session checkpoint coverage remain planned.
 
 ## Request Data And Ticker Coverage
 
