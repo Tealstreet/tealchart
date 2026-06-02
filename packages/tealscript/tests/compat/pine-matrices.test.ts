@@ -84,6 +84,40 @@ plot(colsFromArray.rows(), title="Array Column Rows")
     expect(roundSeries(getPlot(result, 'Array Column Rows').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
   });
 
+  it('runs matrix range fill and named range extraction idioms', () => {
+    const result = runCompatScript(`
+indicator("Matrix range helpers")
+m = matrix.new_int(2, 3, 0)
+m.set(0, 0, 1)
+m.set(0, 1, 2)
+m.set(0, 2, 3)
+m.set(1, 0, 4)
+m.set(1, 1, 5)
+m.set(1, 2, 6)
+m.fill(9, 0, 1, 1, 3)
+slice = m.submatrix(from_row=0, to_row=1, from_column=1, to_column=3)
+matrix.fill(id=m, value=7, from_row=1, to_row=2, from_column=0, to_column=2)
+plot(m.get(0, 0), title="Unchanged")
+plot(m.get(0, 1), title="Method Filled")
+plot(m.get(1, 0), title="Named Filled")
+plot(m.get(1, 2), title="Named Unchanged")
+plot(slice.rows(), title="Slice Rows")
+plot(slice.columns(), title="Slice Columns")
+plot(slice.get(0, 0), title="Slice First")
+plot(slice.get(0, 1), title="Slice Second")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Unchanged').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Method Filled').values)).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
+    expect(roundSeries(getPlot(result, 'Named Filled').values)).toEqual([7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]);
+    expect(roundSeries(getPlot(result, 'Named Unchanged').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+    expect(roundSeries(getPlot(result, 'Slice Rows').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Slice Columns').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Slice First').values)).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
+    expect(roundSeries(getPlot(result, 'Slice Second').values)).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
+  });
+
   it('runs documented matrix concatenation idioms', () => {
     const result = runCompatScript(`
 indicator("Matrix concat")

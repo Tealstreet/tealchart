@@ -205,6 +205,9 @@ describe('PineMatrix', () => {
 
     fillMatrix(matrix, 9);
     expect(matrix.values).toEqual([9, 9, 9, 9, 9, 9]);
+
+    fillMatrix(matrix, 5, 0, 1, 1, 3);
+    expect(matrix.values).toEqual([9, 5, 5, 9, 9, 9]);
   });
 
   it('sizes empty matrices from inserted arrays', () => {
@@ -513,6 +516,7 @@ describe('PineMatrix', () => {
     const matrix = createPineMatrix<number>(2, 2, 1);
 
     expect(() => sortMatrixRows(matrix, 2)).toThrow('Matrix column 2 is out of bounds. column count is 2');
+    expect(() => fillMatrix(matrix, 7, 0, 3, 0, 1)).toThrow('Matrix row range 0..3 is out of bounds. row count is 2');
     expect(() => submatrixValue(matrix, 1, 3, 0, 1)).toThrow('Matrix row range 1..3 is out of bounds. row count is 2');
     expect(() => submatrixValue(matrix, 0, 1, 2, 1)).toThrow('Matrix column range 2..1 is out of bounds. column count is 2');
   });

@@ -209,8 +209,21 @@ export function matrixColumn<T = unknown>(matrix: PineMatrix<T>, column: number)
   return result;
 }
 
-export function fillMatrix<T = unknown>(matrix: PineMatrix<T>, value: T): void {
-  matrix.values.fill(value);
+export function fillMatrix<T = unknown>(
+  matrix: PineMatrix<T>,
+  value: T,
+  fromRow: number = 0,
+  toRow: number = matrix.rows,
+  fromColumn: number = 0,
+  toColumn: number = matrix.columns,
+): void {
+  const rowRange = normalizeRange(fromRow, toRow, matrix.rows, 'row');
+  const columnRange = normalizeRange(fromColumn, toColumn, matrix.columns, 'column');
+  for (let row = rowRange.from; row < rowRange.to; row++) {
+    for (let column = columnRange.from; column < columnRange.to; column++) {
+      setMatrixValue(matrix, row, column, value);
+    }
+  }
 }
 
 export function reshapeMatrix(matrix: PineMatrix, rows: number, columns: number): void {
