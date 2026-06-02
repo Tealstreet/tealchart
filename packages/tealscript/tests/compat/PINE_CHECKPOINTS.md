@@ -43,6 +43,27 @@ fixtures by default.
 | `Public Divergence Checkpoint` | https://www.tradingview.com/scripts/search/rsi%20divergence/ | Sequential price pivots compared with lower oscillator pivots to flag bearish divergence. | Pivot series and one bearish divergence signal over local bars. |
 | `Public Session Filter Checkpoint` | https://www.tradingview.com/scripts/search/session%20filter/ | Session membership gates a raw signal. | Session mask and filtered signal over `compatibilityBars`. |
 
+## Checkpoint Coverage Index
+
+This index maps source-linked checkpoints to the major parity areas they guard.
+Lower-level compatibility tests still carry most edge-case coverage; checkpoint
+fixtures are the real-idiom smoke layer that should grow whenever a parity epic
+adds a new user-visible concept.
+
+| Parity Area | Checkpoint Fixture | Primary Evidence |
+| --- | --- | --- |
+| Built-ins and series comparisons | `Official Built-ins Checkpoint` | `pine-real-checkpoints.test.ts` |
+| Barstate, persistent arrays, and first-bar initialization | `Official Array Checkpoint` | `pine-real-checkpoints.test.ts` |
+| Visual candle tinting | `Official Barcolor Checkpoint` | `pine-real-checkpoints.test.ts` |
+| Multi-timeframe data requests | `Public MTF Trend Checkpoint`; repaint-safe HTF fixture in `pine-request-security.test.ts` | `pine-real-checkpoints.test.ts`; `pine-request-security.test.ts` |
+| Pivot/divergence idioms | `Public Divergence Checkpoint` | `pine-real-checkpoints.test.ts` |
+| Session-gated signals | `Public Session Filter Checkpoint` | `pine-real-checkpoints.test.ts` |
+| Alerts and alert conditions | `Official Alert Checkpoint`; alert crossover fixture in `pine-visuals.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts` |
+| Strategy broker flows | `Official Strategy Checkpoint` | `pine-real-checkpoints.test.ts` |
+| Limits and request-context reuse | `Official Request Limit Checkpoint` | `pine-real-checkpoints.test.ts` |
+| User-defined objects | Reduced official object idioms | `pine-objects.test.ts` |
+| Drawings and tables | Manual comparison milestones plus reduced drawing fixtures | `PINE_CHECKPOINTS.md`; `pine-drawings.test.ts` |
+
 ## Adding A Checkpoint
 
 1. Link the source page or source-search context.
