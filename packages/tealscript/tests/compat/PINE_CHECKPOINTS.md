@@ -52,6 +52,12 @@ Lower-level compatibility tests still carry most edge-case coverage; checkpoint
 fixtures are the real-idiom smoke layer that should grow whenever a parity epic
 adds a new user-visible concept.
 
+`pine-corpus.test.ts` mirrors the source-linked checkpoints below as
+`PineScriptLedgerEntry` metadata and runs them through the offline corpus
+reporter. Keep that corpus in sync with this table when adding or retiring
+checkpoint fixtures so pass-rate reporting continues to reflect real Pine
+idioms rather than isolated unit coverage.
+
 | Parity Area | Checkpoint Fixture | Primary Evidence |
 | --- | --- | --- |
 | Built-ins and series comparisons | `Official Built-ins Checkpoint` | `pine-real-checkpoints.test.ts` |
