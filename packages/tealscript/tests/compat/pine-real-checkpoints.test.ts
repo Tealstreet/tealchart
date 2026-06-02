@@ -203,7 +203,7 @@ plot(trigger ? 1 : 0, title="Trigger")
   it('locks the official strategy entry and bracket-exit idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const result = runCompatScript(`
-strategy("Official Strategy Checkpoint", initial_capital=1000)
+strategy("Official Strategy Checkpoint", initial_capital=1000, process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=1)
 if bar_index == 1
