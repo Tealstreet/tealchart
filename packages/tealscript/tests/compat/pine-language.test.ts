@@ -49,6 +49,42 @@ plot(rt.mid(high, low), title="Mid")
     expect(roundSeries(getPlot(result, 'Mid').values)).toEqual([101, 103.5, 106, 105.5, 101, 98.5, 102, 106.5, 108.5, 109.5, 111.5, 110.5]);
   });
 
+  it('runs imported exported library constants from a deterministic registry', () => {
+    const library = parse(`
+library("Constants", true)
+export const int fast = 2
+export const float multiplier = 1.5
+export color bull = color.green
+export float empty = na
+export string ticker = syminfo.ticker
+export string period = timeframe.period
+`);
+
+    const result = runCompatScript(`
+indicator("Imported constants")
+import TestUser/Constants/1 as c
+plot(c.fast, title="Fast")
+plot(c.multiplier, title="Multiplier")
+plot(c.bull == color.green ? 1 : 0, title="Bull")
+plot(na(c.empty) ? 1 : 0, title="Empty")
+plot(c.ticker == syminfo.ticker ? 1 : 0, title="Ticker")
+plot(c.period == timeframe.period ? 1 : 0, title="Period")
+`, {
+      bars: [compatibilityBars[0]!],
+      engineOptions: {
+        libraries: new Map([['TestUser/Constants/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Fast').values).toEqual([2]);
+    expect(getPlot(result, 'Multiplier').values).toEqual([1.5]);
+    expect(getPlot(result, 'Bull').values).toEqual([1]);
+    expect(getPlot(result, 'Empty').values).toEqual([1]);
+    expect(getPlot(result, 'Ticker').values).toEqual([1]);
+    expect(getPlot(result, 'Period').values).toEqual([1]);
+  });
+
   it('reports non-exported imported library functions as unknown', () => {
     const library = parse(`
 library("RangeTools", true)

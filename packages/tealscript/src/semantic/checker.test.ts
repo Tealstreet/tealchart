@@ -109,7 +109,7 @@ export type Pivot
 
     expect(validLibrary.diagnostics).toEqual([]);
     expect(emptyLibrary.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Library scripts must export at least one function, method, or user-defined type',
+      'Library scripts must export at least one function, method, user-defined type, or constant',
     ]);
     expect(exportedInIndicator.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Exported declarations are only allowed in library scripts: scale',
@@ -118,6 +118,48 @@ export type Pivot
     expect(untypedExport.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Exported function scale parameter value must declare a type',
       'Exported method lifted parameter amount must declare a type',
+    ]);
+  });
+
+  it('validates exported library constants', () => {
+    const valid = checkProgram(parse(`
+library("Constants")
+export const int length = 14
+export color bull = color.green
+export float ratio = math.pi
+export string period = timeframe.period
+export string ticker = syminfo.ticker
+export prefix(simple string value) => value
+`));
+
+    const outsideLibrary = checkProgram(parse(`
+export const int outside = 1
+indicator("Outside")
+plot(close)
+`));
+
+    const invalid = checkProgram(parse(`
+library("Bad Constants")
+export value = 1
+export const float seriesValue = close
+export const int functionReference = ta.sma
+export const string requestReference = request.security
+export [a, b] = array.from(1, 2)
+`));
+
+    expect(valid.diagnostics).toEqual([]);
+    expect(outsideLibrary.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Exported declarations are only allowed in library scripts: outside',
+    ]);
+    expect(invalid.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Exported constants must declare a type',
+      'Exported constants must be literal values or compatible built-in variables',
+      'Exported constants must be literal values or compatible built-in variables',
+      'Exported constants must be literal values or compatible built-in variables',
+      'Exported constants cannot use tuple declarations',
+      'Exported constants must declare a type',
+      'Exported constants must be literal values or compatible built-in variables',
+      'Cannot assign series value to const float',
     ]);
   });
 
@@ -380,13 +422,23 @@ invalidCtorArity = map.new<string>()
     const result = checkProgram(parse(`
 indicator("Bad Map Types")
 map<string, float> prices = map.new<string, float>()
+map<string, label> labels = map.new<string, label>()
+type Pivot
+    float price
+type Other
+    float price
+map<string, Pivot> pivots = map.new<string, Pivot>()
 map.put(prices, "BTC", 1)
 prices.put("ETH", 2.5)
+labels.put("entry", label.new(bar_index, close))
+pivots.put("high", Pivot.new(high))
 map.get(prices, 1)
 prices.contains(true)
 prices.remove(2)
 map.put(prices, 3, 4)
 prices.put("SOL", "bad")
+labels.put("bad", line.new(bar_index, low, bar_index, high))
+pivots.put("bad", Other.new(low))
 string symbol = "DOGE"
 float price = 3
 prices.put(symbol, price)
@@ -401,6 +453,8 @@ inferred.put("ADA", "bad")
       'Cannot use int value as string map key',
       'Cannot use int value as string map key',
       'Cannot use string value as float map value',
+      'Cannot use line value as label map value',
+      'Cannot use Other value as Pivot map value',
       'Cannot use int value as string map key',
       'Cannot use string value as float map value',
     ]);
@@ -856,6 +910,60 @@ plot(lifted.y)
 `));
 
     expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports user-defined method receiver mismatches', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Method Receivers")
+type Pivot
+    float y
+type Other
+    float y
+method lift(Pivot this, float amount) =>
+    this.y += amount
+    this
+method scale(float this, float amount) => this * amount
+pivot = Pivot.new(close)
+other = Other.new(close)
+count = 1
+validPivot = pivot.lift(1)
+validFloat = close.scale(2)
+badUdt = other.lift(1)
+badPrimitive = count.lift(1)
+badScale = pivot.scale(2)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'No method lift() overload accepts Other receiver',
+      'No method lift() overload accepts int receiver',
+      'No method scale() overload accepts Pivot receiver',
+    ]);
+  });
+
+  it('does not report user method receiver mismatches for builtin collection member calls', () => {
+    const result = checkProgram(parse(`
+indicator("Builtin Method Names")
+method size(float this) => this
+values = array.new_float()
+count = values.size()
+plot(count)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('honors qualifiers for user-defined method receiver diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Qualified Method Receivers")
+method smooth(simple float this) => this
+literal = 1.0
+valid = literal.smooth()
+invalid = close.smooth()
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'No method smooth() overload accepts float receiver',
+    ]);
   });
 
   it('reports conservative user-defined type field value mismatches', () => {

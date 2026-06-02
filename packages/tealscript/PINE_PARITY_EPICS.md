@@ -454,8 +454,9 @@ Phases:
    Runtime and compatibility coverage now includes the map MVP: constructors,
    mutation, lookup, keys/values arrays, copy/put_all, key-value loops, value-key
    validation, and capacity checks. Semantic coverage now reports conservative
-   key/value mismatches for known `map<K, V>` variables. Remaining work is
-   full reference/nested type-template enforcement.
+   key/value mismatches for known `map<K, V>` variables. Deeper
+   qualifier-sensitive template enforcement belongs to the qualified type-system
+   epic.
    Parser and semantic coverage now retain generic call type arguments and infer
    unannotated `map.new<K, V>()` constructors, including invalid map constructor
    template and generic arity diagnostics.
@@ -464,6 +465,9 @@ Phases:
    annotations and generic constructor calls, while semantic coverage rejects it
    with explicit diagnostics because Pine does not allow direct collection
    elements inside collections.
+   Semantic coverage now reports conservative reference and UDT map value
+   mismatches for known `map<K, V>` variables.
+   Runtime coverage now includes color constants as Pine map keys.
 4. Implement user-defined types (`type`), fields, constructors, methods, and
    reference semantics.
    Runtime coverage now includes shallow UDT copies through Pine's
@@ -484,8 +488,10 @@ Phases:
 5. Implement method declarations and method dispatch beyond array method sugar.
    Runtime coverage now selects local and imported UDT method overloads by
    receiver type.
-6. Implement `library()`, `export`, `import`, versioned module resolution, and
-   library diagnostics.
+   Semantic coverage now reports known local method receiver mismatches before
+   runtime.
+6. Implement `library()`, `export`, `import` through a deterministic
+   host-provided registry, and library diagnostics.
    Semantic coverage now reports exports outside libraries, empty libraries
    without parsed exportable declarations, and untyped parameters on exported
    functions/methods.
@@ -499,6 +505,8 @@ Phases:
    Semantic coverage now reports exported function/method returns that expose
    non-exported local UDTs in expression bodies and simple final-expression
    block bodies.
+   Runtime coverage now imports exported literal/builtin constants from the
+   deterministic library registry.
 
 Done means library-heavy Pine v5/v6 scripts can be reduced and run without
 large rewrites.
