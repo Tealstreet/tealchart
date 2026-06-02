@@ -612,6 +612,11 @@ routes filled rectangles to the script pane with borders, text alignment,
 TradingView text pixel parity, `chart.point` overloads, and remaining edge-case
 styling remain planned.
 
+The `polyline.*` drawing pass supports `polyline.new()` with named point/style
+arguments, `polyline.copy()`, `polyline.delete()`, and `polyline.all`.
+`polyline.copy()` and `polyline.delete()` accept Pine-style named `id`
+arguments.
+
 ## Table Drawing Coverage
 
 The `table.*` drawing pass covers fixed-position table handles, declared row and
