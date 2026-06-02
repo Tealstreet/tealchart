@@ -494,6 +494,9 @@ color tint = color.red
 array<float> values = array.new_float()
 genericValues = array.new<float>()
 genericGrid = matrix.new<float>(1, 1, 0)
+nestedValues = array.new<array<float>>()
+nestedGrid = matrix.new<map<string, float>>(1, 1)
+nestedLookup = map.new<string, array<float>>()
 floatValues = array.new_float()
 intValues = array.new_int()
 labelValues = array.new_label()
@@ -513,6 +516,16 @@ pivotPoint pivot = na
     expect(types.get('values')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('genericValues')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('genericGrid')).toMatchObject({ kind: 'matrix', elementType: { kind: 'float' } });
+    expect(types.get('nestedValues')).toMatchObject({ kind: 'array', elementType: { kind: 'array', elementType: { kind: 'float' } } });
+    expect(types.get('nestedGrid')).toMatchObject({
+      kind: 'matrix',
+      elementType: { kind: 'map', keyType: { kind: 'string' }, valueType: { kind: 'float' } },
+    });
+    expect(types.get('nestedLookup')).toMatchObject({
+      kind: 'map',
+      keyType: { kind: 'string' },
+      valueType: { kind: 'array', elementType: { kind: 'float' } },
+    });
     expect(types.get('floatValues')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('intValues')).toMatchObject({ kind: 'array', elementType: { kind: 'int' } });
     expect(types.get('labelValues')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
@@ -533,26 +546,20 @@ invalidArrayCtorElement = array.new<series>()
 invalidArrayCtorArity = array.new<float, int>()
 array<array> invalidNestedArray = array.new_float()
 invalidArrayCtorCollection = array.new<array>()
-array<array<float>> unsupportedNestedArray = array.new_float()
-invalidArrayCtorNestedCollection = array.new<array<float>>()
 matrix<input> invalidMatrix = matrix.new_int()
 invalidMatrixCtorElement = matrix.new<series>()
 invalidMatrixCtorArity = matrix.new<float, int>()
 matrix<map> invalidNestedMatrix = matrix.new_float()
 invalidMatrixCtorCollection = matrix.new<map>()
-matrix<map<string, float>> unsupportedNestedMatrix = matrix.new_float()
-invalidMatrixCtorNestedCollection = matrix.new<map<string, float>>()
 map<label, float> invalidKey = map.new<string, float>()
 map<array<float>, float> invalidNestedKey = map.new<string, float>()
 map<string, series> invalidValue = map.new<string, float>()
 map<string, array> invalidCollectionValue = map.new<string, float>()
-map<string, array<float>> unsupportedNestedValue = map.new<string, float>()
 map<const, float> qualifierKey = map.new<string, float>()
 invalidCtorKey = map.new<label, float>()
 invalidCtorNestedKey = map.new<array<float>, float>()
 invalidCtorValue = map.new<string, series>()
 invalidCtorCollectionValue = map.new<string, matrix>()
-invalidCtorNestedValue = map.new<string, matrix<float>>()
 invalidCtorArity = map.new<string>()
 `));
 
@@ -562,26 +569,20 @@ invalidCtorArity = map.new<string>()
       'array.new() expects exactly 1 type argument',
       "Invalid array element type 'array'; collection template types must include their element templates",
       "Invalid array element type 'array'; collection template types must include their element templates",
-      "Invalid array element type 'array<float>'; collections cannot directly contain collection types",
-      "Invalid array element type 'array<float>'; collections cannot directly contain collection types",
       "Invalid matrix element type 'input'; qualifiers cannot be used as template types",
       "Invalid matrix element type 'series'; qualifiers cannot be used as template types",
       'matrix.new() expects exactly 1 type argument',
       "Invalid matrix element type 'map'; collection template types must include their element templates",
       "Invalid matrix element type 'map'; collection template types must include their element templates",
-      "Invalid matrix element type 'map<string, float>'; collections cannot directly contain collection types",
-      "Invalid matrix element type 'map<string, float>'; collections cannot directly contain collection types",
       'Map key type must be int, float, bool, string, or color in variable declaration',
-      "Invalid map key type 'array<float>'; collections cannot directly contain collection types",
+      'Map key type must be int, float, bool, string, or color in variable declaration',
       "Invalid map value type 'series'; qualifiers cannot be used as template types",
       "Invalid map value type 'array'; collection template types must include their element templates",
-      "Invalid map value type 'array<float>'; collections cannot directly contain collection types",
       "Invalid map key type 'const'; qualifiers cannot be used as template types",
       'Map key type must be int, float, bool, string, or color in map.new',
-      "Invalid map key type 'array<float>'; collections cannot directly contain collection types",
+      'Map key type must be int, float, bool, string, or color in map.new',
       "Invalid map value type 'series'; qualifiers cannot be used as template types",
       "Invalid map value type 'matrix'; collection template types must include their element templates",
-      "Invalid map value type 'matrix<float>'; collections cannot directly contain collection types",
       'map.new() expects exactly 2 type arguments',
     ]);
   });

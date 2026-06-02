@@ -62,6 +62,32 @@ plot(window.size(), title="Window Size")
     expect(roundSeries(getPlot(result, 'Window Size').values)).toEqual([1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
   });
 
+  it('runs nested collection constructor idioms', () => {
+    const result = runCompatScript(`
+indicator("Nested Collections")
+var array<array<float>> rows = array.new<array<float>>()
+var matrix<array<float>> grid = matrix.new<array<float>>(1, 1)
+var map<string, array<float>> lookup = map.new<string, array<float>>()
+row = array.from(close, high)
+rows.push(row)
+grid.set(0, 0, row)
+lookup.put("last", row)
+lastRow = rows.last()
+gridRow = grid.get(0, 0)
+lookupRow = lookup.get("last")
+plot(rows.size(), title="Rows")
+plot(lastRow.get(0), title="Row Close")
+plot(gridRow.get(1), title="Grid High")
+plot(lookupRow.size(), title="Lookup Size")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Rows').values)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(roundSeries(getPlot(result, 'Row Close').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+    expect(roundSeries(getPlot(result, 'Grid High').values)).toEqual([103, 106, 108, 109, 104, 101, 105, 110, 111, 112, 114, 113]);
+    expect(roundSeries(getPlot(result, 'Lookup Size').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+  });
+
   it('runs extended array helper idioms', () => {
     const result = runCompatScript(`
 indicator("Array extended helpers")
