@@ -306,6 +306,61 @@ plot(strategy.closedtrades)`;
       });
     });
 
+    it('recalculates historical bars after order fills when calc_on_order_fills is enabled', () => {
+      const baseTime = Date.now() - 120000;
+      const bars: Bar[] = [
+        { time: baseTime, open: 100, high: 100.5, low: 99.5, close: 100.2, volume: 1000 },
+        { time: baseTime + 60000, open: 100, high: 100.5, low: 99.6, close: 100.4, volume: 1000 },
+      ];
+      const script = `//@version=6
+strategy("Order fill recalc", calc_on_order_fills=true, process_orders_on_close=true)
+var recalculations = 0
+recalculations += 1
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1, limit=99.8, alert_message="entry filled")
+if strategy.position_size > 0
+    strategy.close("Long")
+plot(strategy.position_size)
+plot(strategy.closedtrades)
+plot(recalculations)`;
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        avgFillPrice: order.avgFillPrice,
+        updatedBarIndex: order.updatedBarIndex,
+        updatedTime: order.updatedTime,
+      }))).toEqual([
+        { id: 'Long', status: 'filled', avgFillPrice: 99.8, updatedBarIndex: 1, updatedTime: bars[1].time },
+        { id: 'Close Long', status: 'filled', avgFillPrice: 100.4, updatedBarIndex: 1, updatedTime: bars[1].time },
+      ]);
+      expect(result.strategy.position.size).toBe(0);
+      expect(result.strategy.closedTrades[0]).toMatchObject({
+        entryOrderId: 'Long',
+        exitOrderId: 'Close Long',
+        entryBarIndex: 1,
+        exitBarIndex: 1,
+      });
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [0, 0],
+        [0, 1],
+        [1, 2],
+      ]);
+      expect(result.alerts.find((alert) => alert.id === 'strategy_order_fills')?.events).toEqual([
+        {
+          barIndex: 1,
+          time: bars[1].time,
+          message: 'entry filled',
+          frequency: 'all',
+          isRealtime: false,
+        },
+      ]);
+      expect(result.strategy.intrabarContexts).toHaveLength(2);
+    });
+
     it('does not record intrabar metadata when the strategy declaration fails', () => {
       const script = `//@version=6
 strategy("Invalid", initial_capital=-1, use_bar_magnifier=true)
