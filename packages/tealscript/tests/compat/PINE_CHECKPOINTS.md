@@ -31,6 +31,9 @@ fixtures by default.
 | `Official Built-ins Checkpoint` | https://www.tradingview.com/pine-script-docs/language/built-ins/ | Namespace access through `ta.sma()` and comparison against a derived average. | Hand-checked SMA and boolean trend series over `compatibilityBars`. |
 | `Official Array Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/bar-states/ and https://www.tradingview.com/pine-script-docs/language/arrays/ | `barstate.isfirst` guarded array initialization plus per-bar dynamic growth. | First close remains stable; array size increments deterministically. |
 | `Official Barcolor Checkpoint` | https://www.tradingview.com/pine-script-docs/visuals/bar-coloring/ | Inside/outside candle classification drives `barcolor()` output. | Explicit four-bar color sequence over local OHLC bars. |
+| `Official Alert Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/alerts/ | Rising-close condition registers an `alertcondition()` and emits direct `alert()` calls from an `if` block. | Trigger plot, alertcondition values, and direct alert events over `compatibilityBars`. |
+| `Official Strategy Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/strategies/ | Explicit `process_orders_on_close=true` market entry followed by a bracket `strategy.exit()` limit/stop order. | Position, closed-trade count, net profit, and closed trade ledger fields over four local bars. |
+| `Official Request Limit Checkpoint` | https://www.tradingview.com/pine-script-docs/writing/limitations/ | Repeated identical `request.security()` calls inside a loop reuse one unique request context. | No runtime error, one request context in the runtime profile, and a deterministic zero request-sum plot. |
 
 ## Public Idiom Checkpoints
 
@@ -39,6 +42,27 @@ fixtures by default.
 | `Public MTF Trend Checkpoint` | https://www.tradingview.com/scripts/search/mtf%20trend%20filter/ | Local price filtered by a higher-timeframe moving average requested with `request.security()`. | HTF average merge series and local trend gate over local/request bars. |
 | `Public Divergence Checkpoint` | https://www.tradingview.com/scripts/search/rsi%20divergence/ | Sequential price pivots compared with lower oscillator pivots to flag bearish divergence. | Pivot series and one bearish divergence signal over local bars. |
 | `Public Session Filter Checkpoint` | https://www.tradingview.com/scripts/search/session%20filter/ | Session membership gates a raw signal. | Session mask and filtered signal over `compatibilityBars`. |
+
+## Checkpoint Coverage Index
+
+This index maps source-linked checkpoints to the major parity areas they guard.
+Lower-level compatibility tests still carry most edge-case coverage; checkpoint
+fixtures are the real-idiom smoke layer that should grow whenever a parity epic
+adds a new user-visible concept.
+
+| Parity Area | Checkpoint Fixture | Primary Evidence |
+| --- | --- | --- |
+| Built-ins and series comparisons | `Official Built-ins Checkpoint` | `pine-real-checkpoints.test.ts` |
+| Barstate, persistent arrays, and first-bar initialization | `Official Array Checkpoint` | `pine-real-checkpoints.test.ts` |
+| Visual candle tinting | `Official Barcolor Checkpoint` | `pine-real-checkpoints.test.ts` |
+| Multi-timeframe data requests | `Public MTF Trend Checkpoint`; repaint-safe HTF fixture in `pine-request-security.test.ts` | `pine-real-checkpoints.test.ts`; `pine-request-security.test.ts` |
+| Pivot/divergence idioms | `Public Divergence Checkpoint` | `pine-real-checkpoints.test.ts` |
+| Session-gated signals | `Public Session Filter Checkpoint` | `pine-real-checkpoints.test.ts` |
+| Alerts and alert conditions | `Official Alert Checkpoint`; alert crossover fixture in `pine-visuals.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts` |
+| Strategy broker flows | `Official Strategy Checkpoint` | `pine-real-checkpoints.test.ts` |
+| Limits and request-context reuse | `Official Request Limit Checkpoint` | `pine-real-checkpoints.test.ts` |
+| User-defined objects | Reduced official object idioms | `pine-objects.test.ts` |
+| Drawings and tables | Manual comparison milestones plus reduced drawing fixtures | `PINE_CHECKPOINTS.md`; `pine-drawings.test.ts` |
 
 ## Adding A Checkpoint
 
