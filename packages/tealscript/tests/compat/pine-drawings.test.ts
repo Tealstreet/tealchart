@@ -192,6 +192,47 @@ plot(line.get_price(upper, bar_index), title="Upper Price")
     expect(getPlot(result, 'Upper Price').values).toEqual([103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 113]);
   });
 
+  it('updates and reads a persistent line with Pine named setter idioms', () => {
+    const result = runCompatScript(`
+indicator("Named Persistent Line", overlay=true)
+var trend = line.new(x1=na, y1=na, x2=na, y2=na)
+if barstate.islast
+    line.set_xloc(id=trend, x1=bar_index - 2, x2=bar_index, xloc=xloc.bar_index)
+    line.set_y1(id=trend, y=low[2])
+    line.set_y2(id=trend, y=high)
+    line.set_extend(id=trend, extend=extend.right)
+    line.set_color(id=trend, color=color.new(color.yellow, 40))
+    line.set_style(id=trend, style=line.style_dashed)
+    line.set_width(id=trend, width=3)
+plot(line.get_x1(id=trend), title="Named Line X1")
+plot(line.get_y2(id=trend), title="Named Line Y2")
+plot(line.get_price(id=trend, x=bar_index - 1), title="Named Line Price")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'line_line.new_0_0',
+        type: 'line',
+        persistent: true,
+        barIndex: 11,
+        x1: 9,
+        y1: 107,
+        x2: 11,
+        y2: 113,
+        xloc: 'bar_index',
+        extend: 'right',
+        color: '#FFEB3B99',
+        style: 'dashed',
+        width: 3,
+        forceOverlay: false,
+      },
+    ]);
+    expect(getPlot(result, 'Named Line X1').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 9]);
+    expect(getPlot(result, 'Named Line Y2').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 113]);
+    expect(getPlot(result, 'Named Line Price').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 110]);
+  });
+
   it('emits polylines from chart.point arrays', () => {
     const result = runCompatScript(`
 indicator("Polyline docs smoke", overlay=true, max_polylines_count=1)

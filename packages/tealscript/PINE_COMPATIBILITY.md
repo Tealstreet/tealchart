@@ -587,7 +587,8 @@ mutation pass covers persistent `var` line handles, `line.set_x1()`,
 `line.set_x2()`, `line.set_y1()`, `line.set_y2()`, `line.set_xy1()`,
 `line.set_xy2()`, `line.set_xloc()`, `line.set_extend()`,
 `line.set_color()`, `line.set_style()`, `line.set_width()`, scalar coordinate
-getters, `line.get_price()`, `line.copy()`, and `line.delete()`. Rendering
+getters, `line.get_price()`, `line.copy()`, and `line.delete()`. Line mutators
+and getters accept Pine-style named `id` and value arguments. Rendering
 routes line segments to the script pane with basic color/style/width and
 horizontal extension support. `force_overlay` lines render in the main pane
 even when created by non-overlay scripts. `linefill.new()` records fills between
