@@ -380,13 +380,23 @@ invalidCtorArity = map.new<string>()
     const result = checkProgram(parse(`
 indicator("Bad Map Types")
 map<string, float> prices = map.new<string, float>()
+map<string, label> labels = map.new<string, label>()
+type Pivot
+    float price
+type Other
+    float price
+map<string, Pivot> pivots = map.new<string, Pivot>()
 map.put(prices, "BTC", 1)
 prices.put("ETH", 2.5)
+labels.put("entry", label.new(bar_index, close))
+pivots.put("high", Pivot.new(high))
 map.get(prices, 1)
 prices.contains(true)
 prices.remove(2)
 map.put(prices, 3, 4)
 prices.put("SOL", "bad")
+labels.put("bad", line.new(bar_index, low, bar_index, high))
+pivots.put("bad", Other.new(low))
 string symbol = "DOGE"
 float price = 3
 prices.put(symbol, price)
@@ -401,6 +411,8 @@ inferred.put("ADA", "bad")
       'Cannot use int value as string map key',
       'Cannot use int value as string map key',
       'Cannot use string value as float map value',
+      'Cannot use line value as label map value',
+      'Cannot use Other value as Pivot map value',
       'Cannot use int value as string map key',
       'Cannot use string value as float map value',
     ]);

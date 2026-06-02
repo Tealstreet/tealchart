@@ -464,6 +464,8 @@ Phases:
    annotations and generic constructor calls, while semantic coverage rejects it
    with explicit diagnostics because Pine does not allow direct collection
    elements inside collections.
+   Semantic coverage now reports conservative reference and UDT map value
+   mismatches for known `map<K, V>` variables.
 4. Implement user-defined types (`type`), fields, constructors, methods, and
    reference semantics.
    Runtime coverage now includes shallow UDT copies through Pine's

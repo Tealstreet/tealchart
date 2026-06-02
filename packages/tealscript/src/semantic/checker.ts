@@ -1754,7 +1754,7 @@ class SemanticChecker {
 
     this.addDiagnostic(
       'type-mismatch',
-      `Cannot use ${actualType.kind} value as ${expectedType.kind} ${role}`,
+      `Cannot use ${this.formatSemanticType(actualType)} value as ${this.formatSemanticType(expectedType)} ${role}`,
       argument.loc,
     );
   }
