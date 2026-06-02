@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { TealscriptEngine, executeScript } from './engine';
 import { parse } from '../parser/parser';
+import { InMemoryStrategyIntrabarDatafeed } from './strategy';
 import type { Bar } from './context';
 
 // Helper to create test bars
@@ -192,6 +193,72 @@ plot(strategy.initial_capital)`;
       });
       expect(result.strategy.equity).toBe(0);
       expect(result.plots[0]?.values).toEqual([0]);
+    });
+
+    it('records lower-timeframe strategy execution paths when bar magnifier data is available', () => {
+      const bars = createBars(1);
+      const script = `//@version=6
+strategy("Magnifier", use_bar_magnifier=true)
+plot(strategy.equity)`;
+      const datafeed = new InMemoryStrategyIntrabarDatafeed([{
+        symbol: 'BTCUSDT',
+        timeframe: '60',
+        chartBarTime: bars[0].time,
+        chartBarIndex: 0,
+        chartBar: bars[0],
+        source: 'lower_timeframe',
+        ticks: [
+          { time: bars[0].time, price: bars[0].open, kind: 'intrabar_open', sequence: 0 },
+          { time: bars[0].time + 15_000, price: bars[0].high, kind: 'intrabar_high', sequence: 1 },
+          { time: bars[0].time + 30_000, price: bars[0].low, kind: 'intrabar_low', sequence: 2 },
+          { time: bars[0].time + 45_000, price: bars[0].close, kind: 'intrabar_close', sequence: 3 },
+        ],
+      }]);
+
+      const result = executeScript(parse(script), bars, undefined, { strategyIntrabarDatafeed: datafeed });
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.intrabarContexts).toHaveLength(1);
+      expect(result.strategy.intrabarContexts[0]).toMatchObject({
+        source: 'lower_timeframe',
+        chartBarIndex: 0,
+      });
+      expect(result.strategy.intrabarContexts[0]?.unavailableReason).toBeUndefined();
+      expect(result.strategy.intrabarContexts[0]?.ticks.map((tick) => tick.kind)).toEqual([
+        'intrabar_open',
+        'intrabar_high',
+        'intrabar_low',
+        'intrabar_close',
+      ]);
+    });
+
+    it('records chart OHLC fallback metadata when bar magnifier data is unavailable', () => {
+      const bars = createBars(1);
+      const script = `//@version=6
+strategy("Magnifier", use_bar_magnifier=true)
+plot(strategy.equity)`;
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.intrabarContexts).toHaveLength(1);
+      expect(result.strategy.intrabarContexts[0]).toMatchObject({
+        source: 'chart_ohlc',
+        unavailableReason: 'missing_context',
+        chartBarIndex: 0,
+      });
+      expect(result.strategy.intrabarContexts[0]?.ticks.map((tick) => tick.kind)).toEqual(['open', 'low', 'high', 'close']);
+    });
+
+    it('does not record intrabar metadata when the strategy declaration fails', () => {
+      const script = `//@version=6
+strategy("Invalid", initial_capital=-1, use_bar_magnifier=true)
+plot(close)`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors[0]?.message).toBe('strategy initial_capital must be a non-negative number');
+      expect(result.strategy.intrabarContexts).toEqual([]);
     });
 
     it('requires strategy.exit to specify a supported exit price', () => {

@@ -12,6 +12,7 @@ import {
   fillPendingStrategyOrders,
   fillStrategyMarketOrder,
   InMemoryStrategyIntrabarDatafeed,
+  selectStrategyIntrabarContext,
   strategyIntrabarContextKey,
   submitStrategyOrder,
   type StrategyIntrabarContext,
@@ -124,6 +125,97 @@ describe('strategy ledger model', () => {
     });
 
     expect(equalDistance.ticks.map((tick) => tick.kind)).toEqual(['open', 'low', 'high', 'close']);
+  });
+
+  it('selects chart OHLC paths when bar magnifier is disabled', () => {
+    const chartBar = { time: 1_700_000_000_000, open: 100, high: 110, low: 95, close: 105, volume: 1_000 };
+    const context = selectStrategyIntrabarContext({
+      useBarMagnifier: false,
+      datafeed: new InMemoryStrategyIntrabarDatafeed(),
+      request: {
+        symbol: 'BINANCE:BTCUSDT',
+        timeframe: '1D',
+        chartBarTime: chartBar.time,
+        chartBarIndex: 3,
+        chartBar,
+      },
+    });
+
+    expect(context.source).toBe('chart_ohlc');
+    expect(context.unavailableReason).toBeUndefined();
+    expect(context.ticks.map((tick) => tick.kind)).toEqual(['open', 'low', 'high', 'close']);
+  });
+
+  it('falls back to chart OHLC paths with explicit metadata when magnifier data is unavailable', () => {
+    const chartBar = { time: 1_700_000_000_000, open: 100, high: 110, low: 95, close: 105, volume: 1_000 };
+    const request = {
+      symbol: 'BINANCE:BTCUSDT',
+      timeframe: '1D',
+      chartBarTime: chartBar.time,
+      chartBarIndex: 3,
+      chartBar,
+    };
+
+    const noDatafeed = selectStrategyIntrabarContext({
+      useBarMagnifier: true,
+      request,
+    });
+    const missingFixture = selectStrategyIntrabarContext({
+      useBarMagnifier: true,
+      datafeed: new InMemoryStrategyIntrabarDatafeed(),
+      request,
+    });
+
+    expect(noDatafeed.source).toBe('chart_ohlc');
+    expect(noDatafeed.unavailableReason).toBe('missing_context');
+    expect(missingFixture.source).toBe('chart_ohlc');
+    expect(missingFixture.unavailableReason).toBe('missing_context');
+  });
+
+  it('selects lower-timeframe paths when bar magnifier data is available', () => {
+    const chartBar = { time: 1_700_000_000_000, open: 100, high: 110, low: 95, close: 105, volume: 1_000 };
+    const datafeed = new InMemoryStrategyIntrabarDatafeed([{
+      symbol: 'BINANCE:BTCUSDT',
+      timeframe: '1D',
+      chartBarTime: chartBar.time,
+      chartBarIndex: 3,
+      chartBar,
+      source: 'lower_timeframe',
+      ticks: [
+        { time: chartBar.time, price: 100, kind: 'intrabar_open', sequence: 0 },
+        { time: chartBar.time + 60_000, price: 109, kind: 'intrabar_high', sequence: 1 },
+        { time: chartBar.time + 120_000, price: 98, kind: 'intrabar_low', sequence: 2 },
+        { time: chartBar.time + 180_000, price: 105, kind: 'intrabar_close', sequence: 3 },
+      ],
+    }]);
+
+    const context = selectStrategyIntrabarContext({
+      useBarMagnifier: true,
+      datafeed,
+      request: {
+        symbol: 'BINANCE:BTCUSDT',
+        timeframe: '1D',
+        chartBarTime: chartBar.time,
+        chartBarIndex: 3,
+        chartBar,
+      },
+    });
+
+    expect(context.source).toBe('lower_timeframe');
+    expect(context.unavailableReason).toBeUndefined();
+    expect(context.ticks.map((tick) => tick.kind)).toEqual(['intrabar_open', 'intrabar_high', 'intrabar_low', 'intrabar_close']);
+
+    context.ticks[0].price = 999;
+    const second = datafeed.getStrategyIntrabars({
+      symbol: 'BINANCE:BTCUSDT',
+      timeframe: '1D',
+      chartBarTime: chartBar.time,
+      chartBarIndex: 3,
+      chartBar,
+    });
+    expect(second.ok).toBe(true);
+    if (!second.ok) throw new Error(second.message);
+    expect(second.context.ticks[0].price).toBe(100);
   });
 
   it('creates Pine-like default strategy settings with overrides', () => {

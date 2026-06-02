@@ -20,8 +20,10 @@ import type {
 import { DrawingStore } from './drawings/store';
 import { Series } from './series';
 import {
+  cloneStrategyIntrabarContext,
   cloneStrategyLedger,
   createStrategyLedger,
+  type StrategyIntrabarContext,
   type StrategyLedger,
   type StrategyLedgerSettings,
 } from './strategy';
@@ -372,6 +374,7 @@ export class ExecutionContext {
 
   /** Strategy tester ledger state. */
   strategyLedger: StrategyLedger = createStrategyLedger();
+  private strategyIntrabarContextIndexes = new Map<number, number>();
 
   private realtimeStrategyLedgerSnapshot: StrategyLedger = createStrategyLedger();
 
@@ -605,6 +608,7 @@ export class ExecutionContext {
     this.time.rollback();
     this.timenow.rollback();
     this.strategyLedger = cloneStrategyLedger(this.realtimeStrategyLedgerSnapshot);
+    this.rebuildStrategyIntrabarContextIndexes();
   }
 
   /**
@@ -977,7 +981,29 @@ export class ExecutionContext {
    */
   setStrategyLedger(settings: Partial<StrategyLedgerSettings>): void {
     this.strategyLedger = createStrategyLedger(settings);
+    this.strategyIntrabarContextIndexes.clear();
     this.captureRealtimeRollbackState();
+  }
+
+  /**
+   * Record the selected strategy execution path for the current chart bar.
+   */
+  recordStrategyIntrabarContext(context: StrategyIntrabarContext): void {
+    const existingIndex = this.strategyIntrabarContextIndexes.get(context.chartBarIndex);
+    const cloned = cloneStrategyIntrabarContext(context);
+    if (existingIndex !== undefined) {
+      this.strategyLedger.intrabarContexts[existingIndex] = cloned;
+    } else {
+      this.strategyLedger.intrabarContexts.push(cloned);
+      this.strategyIntrabarContextIndexes.set(context.chartBarIndex, this.strategyLedger.intrabarContexts.length - 1);
+    }
+  }
+
+  private rebuildStrategyIntrabarContextIndexes(): void {
+    this.strategyIntrabarContextIndexes.clear();
+    this.strategyLedger.intrabarContexts.forEach((context, index) => {
+      this.strategyIntrabarContextIndexes.set(context.chartBarIndex, index);
+    });
   }
 
   // =========================================================================
@@ -1008,6 +1034,7 @@ export class ExecutionContext {
     this.indicatorCalcBarsCount = undefined;
     this.indicatorMaxBarsBack = undefined;
     this.strategyLedger = createStrategyLedger();
+    this.strategyIntrabarContextIndexes.clear();
     this.captureRealtimeRollbackState();
     this.timeframe = {
       period: '60',
