@@ -237,6 +237,11 @@ defaultPivotLow = ta.pivotlow(2, 2)
 mixedPivotHigh = ta.pivothigh(2, rightbars=2)
 mixedPivotLow = ta.pivotlow(2, rightbars=2)
 linreg = ta.linreg(close, 3, 1)
+[macdLine, signalLine, histLine] = ta.macd(close, 3, 6, 2)
+legacyObv = ta.obv(close, volume)
+currentObv = ta.obv
+trFunction = ta.tr(true)
+trSeries = ta.tr
 plot(supertrend, title="Supertrend")
 plot(direction, title="Supertrend Direction")
 plot(diPlus, title="DI Plus")
@@ -250,6 +255,13 @@ plot(defaultPivotLow, title="Default Pivot Low")
 plot(mixedPivotHigh, title="Mixed Pivot High")
 plot(mixedPivotLow, title="Mixed Pivot Low")
 plot(linreg, title="LinReg")
+plot(macdLine, title="MACD")
+plot(signalLine, title="Signal")
+plot(histLine, title="Hist")
+plot(legacyObv, title="Legacy OBV")
+plot(currentObv, title="OBV")
+plot(trFunction, title="TR Function")
+plot(trSeries, title="TR Series")
 `);
     const named = runCompatScript(`
 indicator("Tail TA named helpers")
@@ -263,6 +275,11 @@ defaultPivotLow = ta.pivotlow(leftbars=2, rightbars=2)
 mixedPivotHigh = ta.pivothigh(2, rightbars=2)
 mixedPivotLow = ta.pivotlow(2, rightbars=2)
 linreg = ta.linreg(source=close, length=3, offset=1)
+[macdLine, signalLine, histLine] = ta.macd(source=close, fastlen=3, slowlen=6, siglen=2)
+legacyObv = ta.obv(source=close, volume=volume)
+currentObv = ta.obv
+trFunction = ta.tr(handle_na=true)
+trSeries = ta.tr
 plot(supertrend, title="Supertrend")
 plot(direction, title="Supertrend Direction")
 plot(diPlus, title="DI Plus")
@@ -276,6 +293,13 @@ plot(defaultPivotLow, title="Default Pivot Low")
 plot(mixedPivotHigh, title="Mixed Pivot High")
 plot(mixedPivotLow, title="Mixed Pivot Low")
 plot(linreg, title="LinReg")
+plot(macdLine, title="MACD")
+plot(signalLine, title="Signal")
+plot(histLine, title="Hist")
+plot(legacyObv, title="Legacy OBV")
+plot(currentObv, title="OBV")
+plot(trFunction, title="TR Function")
+plot(trSeries, title="TR Series")
 `);
 
     expect(positional.errors).toEqual([]);
@@ -285,6 +309,13 @@ plot(linreg, title="LinReg")
     }
     expect(roundSeries(getPlot(positional, 'Supertrend').values)).toEqual([103.666667, 98.388889, 110.444444, 111.944444, 103.666667, 103.611111, 98.333333, 112.944444, 113.611111, 114.611111, 116.611111, 115.611111]);
     expect(getPlot(positional, 'Supertrend Direction').values).toEqual([-1, 1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1]);
+    expect(roundSeries(getPlot(positional, 'MACD').values)).toEqual([0, 0.642857, 1.209184, 0.38156, -0.825672, -0.924587, 0.029313, 1.437232, 1.520456, 1.975828, 1.641914, 1.716671]);
+    expect(roundSeries(getPlot(positional, 'Signal').values)).toEqual([0, 0.428571, 0.94898, 0.5707, -0.360214, -0.736463, -0.225946, 0.88284, 1.307917, 1.753191, 1.679006, 1.704116]);
+    expect(roundSeries(getPlot(positional, 'Hist').values)).toEqual([0, 0.214286, 0.260204, -0.18914, -0.465457, -0.188124, 0.255259, 0.554393, 0.212539, 0.222637, -0.037092, 0.012555]);
+    expect(getPlot(positional, 'OBV').values).toEqual([0, 1100, 2000, 750, -650, 400, 1700, 3300, 2100, 3600, 2250, 3700]);
+    expect(getPlot(positional, 'Legacy OBV').values).toEqual(getPlot(positional, 'OBV').values);
+    expect(getPlot(positional, 'TR Function').values).toEqual([4, 5, 4, 7, 6, 5, 6, 7, 5, 5, 5, 5]);
+    expect(getPlot(positional, 'TR Series').values).toEqual([null, 5, 4, 7, 6, 5, 6, 7, 5, 5, 5, 5]);
     expect(roundSeries(getPlot(named, 'DI Plus').values)).toEqual([
       0,
       23.076923,
@@ -331,6 +362,36 @@ plot(linreg, title="LinReg")
     expect(roundSeries(getPlot(named, 'Mixed Pivot High').values)).toEqual(roundSeries(getPlot(named, 'Default Pivot High').values));
     expect(roundSeries(getPlot(named, 'Mixed Pivot Low').values)).toEqual(roundSeries(getPlot(named, 'Default Pivot Low').values));
     expect(roundSeries(getPlot(named, 'LinReg').values)).toEqual([null, null, 104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111]);
+  });
+
+  it('keeps remaining TA helper state per call site', () => {
+    const result = runCompatScript(`
+indicator("Remaining TA call-site state")
+first = close > open ? ta.obv(close, volume) : na
+openObv = ta.obv(open, volume)
+plot(first, title="Conditional OBV")
+plot(openObv, title="Open OBV")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Open OBV').values).toEqual([0, 1100, 2000, 3250, 1850, 800, 2100, 3700, 4900, 3400, 4750, 3300]);
+  });
+
+  it('handles na previous close in ta.tr handle_na mode', () => {
+    const result = runCompatScript(`
+indicator("TR handle na")
+plot(ta.tr(handle_na=true), title="TR Handle")
+plot(ta.tr, title="TR Series")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: Number.NaN, volume: 100 },
+        { time: 2, open: 11, high: 15, low: 10, close: 12, volume: 110 },
+      ],
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'TR Handle').values).toEqual([4, 5]);
+    expect(getPlot(result, 'TR Series').values).toEqual([null, null]);
   });
 
   it('runs array covariance helper idioms', () => {
