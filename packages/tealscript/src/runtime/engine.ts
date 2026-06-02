@@ -639,7 +639,7 @@ export class TealscriptEngine {
       } else {
         this.fillPendingStrategyOrdersForCurrentBar();
       }
-      this.recalculateRealtimeStrategyOrderFills(ast);
+      this.handleRealtimeStrategyOrderFillRecalculation(ast);
 
       return this.ctx.getPlots();
     }
@@ -677,7 +677,7 @@ export class TealscriptEngine {
     } else {
       this.fillPendingStrategyOrdersForCurrentBar();
     }
-    this.recalculateRealtimeStrategyOrderFills(ast);
+    this.handleRealtimeStrategyOrderFillRecalculation(ast);
 
     return this.ctx.getPlots();
   }
@@ -700,7 +700,7 @@ export class TealscriptEngine {
     this.captureOrderFillRecalculationState();
     this.strategyOrderFillRecalculationRequested = false;
     this.executeRealtimeStatements(ast);
-    this.recalculateRealtimeStrategyOrderFills(ast);
+    this.handleRealtimeStrategyOrderFillRecalculation(ast);
   }
 
   private prepareRealtimeExecution(ast: Program): void {
@@ -795,6 +795,26 @@ export class TealscriptEngine {
     return false;
   }
 
+  private handleRealtimeStrategyOrderFillRecalculation(ast: Program): void {
+    if (!this.recalculateRealtimeStrategyOrderFills(ast)) {
+      return;
+    }
+
+    this.rollbackRealtimeExecution();
+    const message = this.errors.at(-1)?.message ?? 'strategy calc_on_order_fills realtime recalculation failed';
+    throw new Error(message);
+  }
+
+  private rollbackRealtimeExecution(): void {
+    this.scope.rollback();
+    for (const functionScope of this.functionScopes.values()) {
+      functionScope.rollback();
+    }
+    this.ctx.rollbackBar();
+    this.ctx.bar_index = this.ctx.last_bar_index;
+    this.currentStrategyIntrabarContext = null;
+  }
+
   private captureOrderFillRecalculationState(): void {
     this.orderFillScopeSnapshot = this.scope.snapshot();
     this.orderFillFunctionScopeSnapshots = new Map();
@@ -826,6 +846,7 @@ export class TealscriptEngine {
     }
     this.ctx.truncatePlots(this.ctx.bar_index);
     this.ctx.truncateDrawings(this.ctx.bar_index);
+    this.ctx.truncateAlerts(this.ctx.bar_index, { preserveStrategyFillAlerts: true });
     this.ctx.truncateLogs(this.ctx.bar_index);
     this.prepareRealtimeExecution(ast);
   }
@@ -834,7 +855,12 @@ export class TealscriptEngine {
    * Get current alert outputs.
    */
   getAlerts(): AlertOutput[] {
-    return this.ctx.getAlerts();
+    return this.ctx.getAlerts().map((alert) => ({
+      ...alert,
+      values: [...alert.values],
+      renderedMessages: alert.renderedMessages ? [...alert.renderedMessages] : undefined,
+      events: alert.events.map((event) => ({ ...event })),
+    }));
   }
 
   /**
