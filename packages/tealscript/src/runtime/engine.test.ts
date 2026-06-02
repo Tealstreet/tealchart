@@ -1195,6 +1195,148 @@ plot(strategy.closedtrades)`;
       ]);
     });
 
+    it('resolves mixed named and positional strategy arguments in Pine order', () => {
+      const script = `//@version=6
+strategy("Mixed strategy args", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry(id="Long", strategy.long, 2, na, na, "entry-group", strategy.oca.cancel, "entry comment", "entry alert")
+    strategy.order(id="ShortLimit", strategy.short, 1, 999, na, "short-group", strategy.oca.reduce, "order comment", "order alert")
+if bar_index == 1
+    strategy.exit(id="Bracket", "Long", na, 50, na, 103, na, 97, na, na, na, na, "exit comment", "tp comment", "sl comment")
+    strategy.close(id="Long", "reduce comment", 1, na, "close alert")
+if bar_index == 2
+    strategy.close_all(comment="flat comment", "flat alert")
+plot(strategy.closedtrades)`;
+
+      const result = executeScript(parse(script), createBars(3));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        direction: order.direction,
+        type: order.type,
+        status: order.status,
+        qty: order.qty,
+        limitPrice: order.limitPrice,
+        stopPrice: order.stopPrice,
+        ocaName: order.ocaName,
+        ocaType: order.ocaType,
+        fromEntry: order.fromEntry,
+        comment: order.comment,
+        alertMessage: order.alertMessage,
+      }))).toEqual([
+        {
+          id: 'Long',
+          direction: 'long',
+          type: 'market',
+          status: 'filled',
+          qty: 2,
+          limitPrice: undefined,
+          stopPrice: undefined,
+          ocaName: 'entry-group',
+          ocaType: 'cancel',
+          fromEntry: undefined,
+          comment: 'entry comment',
+          alertMessage: 'entry alert',
+        },
+        {
+          id: 'ShortLimit',
+          direction: 'short',
+          type: 'limit',
+          status: 'pending',
+          qty: 1,
+          limitPrice: 999,
+          stopPrice: undefined,
+          ocaName: 'short-group',
+          ocaType: 'reduce',
+          fromEntry: undefined,
+          comment: 'order comment',
+          alertMessage: 'order alert',
+        },
+        {
+          id: 'Bracket Limit',
+          direction: 'short',
+          type: 'limit',
+          status: 'pending',
+          qty: 1,
+          limitPrice: 103,
+          stopPrice: undefined,
+          ocaName: 'Long:Bracket',
+          ocaType: 'cancel',
+          fromEntry: 'Long',
+          comment: 'tp comment',
+          alertMessage: undefined,
+        },
+        {
+          id: 'Bracket Stop',
+          direction: 'short',
+          type: 'stop',
+          status: 'pending',
+          qty: 1,
+          limitPrice: undefined,
+          stopPrice: 97,
+          ocaName: 'Long:Bracket',
+          ocaType: 'cancel',
+          fromEntry: 'Long',
+          comment: 'sl comment',
+          alertMessage: undefined,
+        },
+        {
+          id: 'Close Long',
+          direction: 'short',
+          type: 'market',
+          status: 'filled',
+          qty: 1,
+          limitPrice: undefined,
+          stopPrice: undefined,
+          ocaName: undefined,
+          ocaType: undefined,
+          fromEntry: 'Long',
+          comment: 'reduce comment',
+          alertMessage: 'close alert',
+        },
+        {
+          id: 'Close All',
+          direction: 'short',
+          type: 'market',
+          status: 'filled',
+          qty: 1,
+          limitPrice: undefined,
+          stopPrice: undefined,
+          ocaName: undefined,
+          ocaType: undefined,
+          fromEntry: undefined,
+          comment: 'flat comment',
+          alertMessage: 'flat alert',
+        },
+      ]);
+      expect(result.strategy.position.size).toBe(0);
+      expect(result.strategy.closedTrades).toHaveLength(2);
+    });
+
+    it('uses trailing-specific strategy.exit metadata with mixed arguments', () => {
+      const script = `//@version=6
+strategy("Mixed trailing exit", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit(id="Trail", "Long", na, na, na, na, na, na, na, 0.5, 0.25, na, "base comment", na, na, "trail comment", "base alert", na, na, "trail alert")
+plot(strategy.opentrades)`;
+
+      const result = executeScript(parse(script), createBars(2));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders[1]).toMatchObject({
+        id: 'Trail',
+        type: 'trailing_stop',
+        status: 'pending',
+        fromEntry: 'Long',
+        trailOffset: 0.25,
+        comment: 'trail comment',
+        alertMessage: 'trail alert',
+      });
+    });
+
     it('records strategy.exit limit and stop brackets as pending exit orders', () => {
       const script = `//@version=6
 strategy("Exit brackets", process_orders_on_close=true)
