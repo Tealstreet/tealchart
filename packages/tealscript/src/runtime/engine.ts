@@ -4581,9 +4581,11 @@ export class TealscriptEngine {
     const comment = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 12));
     const commentProfit = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 13));
     const commentLoss = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 14));
+    const commentTrailing = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 15));
     const alertMessage = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 16));
     const alertProfit = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 17));
     const alertLoss = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 18));
+    const alertTrailing = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 19));
     const exitOrderCount = [limitPrice, stopPrice, trailActivationPrice].filter((value) => value !== undefined).length;
     const suffixOrders = exitOrderCount > 1;
     const exitOcaName = suffixOrders ? this.strategyExitOcaName(id, fromEntry) : undefined;
@@ -4637,8 +4639,8 @@ export class TealscriptEngine {
         fromEntry,
         ocaName: exitOcaName,
         ocaType: suffixOrders ? 'cancel' : undefined,
-        comment: commentLoss ?? comment,
-        alertMessage: alertLoss ?? alertMessage,
+        comment: commentTrailing ?? comment,
+        alertMessage: alertTrailing ?? alertMessage,
         barIndex: this.ctx.bar_index,
         time: this.ctx.time.get(0) ?? 0,
       });

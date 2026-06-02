@@ -1204,6 +1204,7 @@ if bar_index == 0
 if bar_index == 1
     strategy.exit(id="Bracket", "Long", na, 50, na, 103, na, 97, na, na, na, na, "exit comment", "tp comment", "sl comment")
     strategy.close(id="Long", "reduce comment", 1, na, "close alert")
+    strategy.cancel(id="ShortLimit")
 if bar_index == 2
     strategy.close_all(comment="flat comment", "flat alert")
 plot(strategy.closedtrades)`;
@@ -1243,7 +1244,7 @@ plot(strategy.closedtrades)`;
           id: 'ShortLimit',
           direction: 'short',
           type: 'limit',
-          status: 'pending',
+          status: 'cancelled',
           qty: 1,
           limitPrice: 999,
           stopPrice: undefined,
@@ -1312,6 +1313,29 @@ plot(strategy.closedtrades)`;
       ]);
       expect(result.strategy.position.size).toBe(0);
       expect(result.strategy.closedTrades).toHaveLength(2);
+    });
+
+    it('uses trailing-specific strategy.exit metadata with mixed arguments', () => {
+      const script = `//@version=6
+strategy("Mixed trailing exit", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit(id="Trail", "Long", na, na, na, na, na, na, na, 0.5, 0.25, na, "base comment", na, na, "trail comment", "base alert", na, na, "trail alert")
+plot(strategy.opentrades)`;
+
+      const result = executeScript(parse(script), createBars(2));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders[1]).toMatchObject({
+        id: 'Trail',
+        type: 'trailing_stop',
+        status: 'pending',
+        fromEntry: 'Long',
+        trailOffset: 0.25,
+        comment: 'trail comment',
+        alertMessage: 'trail alert',
+      });
     });
 
     it('records strategy.exit limit and stop brackets as pending exit orders', () => {
