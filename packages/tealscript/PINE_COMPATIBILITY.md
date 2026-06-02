@@ -598,8 +598,9 @@ and trade-accessor call shapes before runtime. `strategy.entry()`,
 `strategy.order()`, `strategy.close()`,
 `strategy.close_all()`, `strategy.exit()`, `strategy.cancel()`, and
 `strategy.cancel_all()` record or cancel ledger orders. Fixed-size market orders
-fill immediately at the current close and update position size and average
-price. Basic open/closed trade counters are maintained as fixed-size market fills
+fill at the next bar open by default, or at the signal bar close when
+`process_orders_on_close=true`, then update position size and average price.
+Basic open/closed trade counters are maintained as fixed-size market fills
 change exposure. Price-based `strategy.exit()` limit/stop brackets are recorded
 as pending exit orders. Pending limit/stop orders fill on later bars when OHLC
 crosses their trigger price, and bracket siblings cancel through OCA.
