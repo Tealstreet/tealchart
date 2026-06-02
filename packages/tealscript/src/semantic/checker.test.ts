@@ -1057,6 +1057,8 @@ duplicatePrefix = ticker.new("NASDAQ", "AAPL", prefix="NYSE")
 unknownModifier = ticker.modify("NASDAQ:AAPL", bad=session.extended)
 shortRenko = ticker.renko("NASDAQ:AAPL", "ATR")
 unknownChart = ticker.pointfigure("NASDAQ:AAPL", "hl", "ATR", 14, 3, request_wicks=true)
+missingNewPrefix = ticker.new(ticker="AAPL", session=session.extended)
+missingModifyTicker = ticker.modify(session=session.extended)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -1064,6 +1066,8 @@ unknownChart = ticker.pointfigure("NASDAQ:AAPL", "hl", "ATR", 14, 3, request_wic
       "Unknown argument 'bad' for ticker.modify()",
       'ticker.renko() expects at least 3 arguments',
       "Unknown argument 'request_wicks' for ticker.pointfigure()",
+      "ticker.new() missing required argument 'prefix'",
+      "ticker.modify() missing required argument 'tickerid'",
     ]);
   });
 
