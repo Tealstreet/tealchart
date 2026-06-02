@@ -1049,6 +1049,55 @@ tooManyCol = matrix.col(m, 0, 1)
     ]);
   });
 
+  it('resolves matrix unary helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Matrix Unary Signatures")
+m = matrix.new_float(rows=2, columns=2, initial_value=1)
+average = matrix.avg(id=m)
+minimum = matrix.min(id=m)
+maximum = matrix.max(id=m)
+middle = matrix.median(id=m)
+common = matrix.mode(id=m)
+trace = matrix.trace(id=m)
+det = matrix.det(id=m)
+rank = matrix.rank(id=m)
+inverse = matrix.inv(id=m)
+pinverse = matrix.pinv(id=m)
+eigen = matrix.eigenvalues(id=m)
+vectors = matrix.eigenvectors(id=m)
+plot(average + minimum + maximum + middle + common + trace + det + rank + matrix.rows(id=inverse) + matrix.rows(id=pinverse) + array.size(eigen) + matrix.rows(id=vectors))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid matrix unary helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Matrix Unary Signatures")
+m = matrix.new_float(rows=2, columns=2, initial_value=1)
+unknownAvg = matrix.avg(value=m)
+tooManyTrace = matrix.trace(m, m)
+missingDet = matrix.det()
+duplicateRank = matrix.rank(m, id=m)
+unknownEigen = matrix.eigenvalues(matrix=m)
+tooManyInv = matrix.inv(m, m)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'value' for matrix.avg()",
+      'matrix.avg() expects at least 1 argument',
+      "matrix.avg() missing required argument 'id'",
+      'matrix.trace() expects at most 1 argument',
+      'matrix.det() expects at least 1 argument',
+      "matrix.det() missing required argument 'id'",
+      "Argument 'id' for matrix.rank() was supplied multiple times",
+      "Unknown argument 'matrix' for matrix.eigenvalues()",
+      'matrix.eigenvalues() expects at least 1 argument',
+      "matrix.eigenvalues() missing required argument 'id'",
+      'matrix.inv() expects at most 1 argument',
+    ]);
+  });
+
   it('reports array element template mismatches for known mutable arrays', () => {
     const result = checkProgram(parse(`
 indicator("Bad Array Types")
