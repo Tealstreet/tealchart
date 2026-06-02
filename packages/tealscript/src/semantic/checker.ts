@@ -645,6 +645,21 @@ BUILTIN_SIGNATURES.set('array.slice', { params: ['id', 'index_from', 'index_to']
 BUILTIN_SIGNATURES.set('array.sort', { params: ['id', 'order', 'sort_field'], minArgs: 1, maxArgs: 3 });
 BUILTIN_SIGNATURES.set('array.sort_indices', { params: ['id', 'order'], minArgs: 1, maxArgs: 2 });
 
+for (const name of ['array.abs', 'array.avg', 'array.max', 'array.median', 'array.min', 'array.mode', 'array.range', 'array.standardize', 'array.sum']) {
+  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1 });
+}
+
+for (const name of ['array.stdev', 'array.variance']) {
+  BUILTIN_SIGNATURES.set(name, { params: ['id', 'biased'], minArgs: 1, maxArgs: 2 });
+}
+
+for (const name of ['array.percentile_linear_interpolation', 'array.percentile_nearest_rank']) {
+  BUILTIN_SIGNATURES.set(name, { params: ['id', 'percentage'], minArgs: 2, maxArgs: 2 });
+}
+
+BUILTIN_SIGNATURES.set('array.covariance', { params: ['id1', 'id2', 'biased'], aliases: { id: 'id1' }, minArgs: 2, maxArgs: 3 });
+BUILTIN_SIGNATURES.set('array.percentrank', { params: ['id', 'value'], minArgs: 2, maxArgs: 2 });
+
 BUILTIN_SIGNATURES.set('array.from', { params: [], minArgs: 0, allowExtraPositional: true });
 
 export function checkProgram(program: Program): SemanticCheckResult {
