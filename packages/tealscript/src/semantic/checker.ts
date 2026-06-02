@@ -672,6 +672,22 @@ for (const name of ['matrix.columns', 'matrix.elements_count', 'matrix.is_valid'
 
 BUILTIN_SIGNATURES.set('matrix.get', { params: ['id', 'row', 'column'], minArgs: 3, maxArgs: 3 });
 BUILTIN_SIGNATURES.set('matrix.set', { params: ['id', 'row', 'column', 'value'], minArgs: 4, maxArgs: 4 });
+BUILTIN_SIGNATURES.set('matrix.fill', { params: ['id', 'value', 'from_row', 'to_row', 'from_column', 'to_column'], minArgs: 2, maxArgs: 6 });
+BUILTIN_SIGNATURES.set('matrix.reshape', { params: ['id', 'rows', 'columns'], minArgs: 3, maxArgs: 3 });
+BUILTIN_SIGNATURES.set('matrix.reverse', { params: ['id'], minArgs: 1, maxArgs: 1 });
+
+BUILTIN_SIGNATURES.set('matrix.add_row', { params: ['id', 'row', 'array_id'], minArgs: 1, maxArgs: 3 });
+for (const name of ['matrix.add_col', 'matrix.add_column']) {
+  BUILTIN_SIGNATURES.set(name, { params: ['id', 'column', 'array_id'], minArgs: 1, maxArgs: 3 });
+}
+
+BUILTIN_SIGNATURES.set('matrix.remove_row', { params: ['id', 'row'], minArgs: 2, maxArgs: 2 });
+for (const name of ['matrix.remove_col', 'matrix.remove_column']) {
+  BUILTIN_SIGNATURES.set(name, { params: ['id', 'column'], minArgs: 2, maxArgs: 2 });
+}
+
+BUILTIN_SIGNATURES.set('matrix.swap_rows', { params: ['id', 'row1', 'row2'], minArgs: 3, maxArgs: 3 });
+BUILTIN_SIGNATURES.set('matrix.swap_columns', { params: ['id', 'column1', 'column2'], minArgs: 3, maxArgs: 3 });
 
 export function checkProgram(program: Program): SemanticCheckResult {
   return new SemanticChecker().check(program);
