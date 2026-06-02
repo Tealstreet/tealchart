@@ -1926,6 +1926,10 @@ indicator("Color Signatures")
 base = color.rgb(red=1, green=2, blue=3, transp=25)
 derived = color.rgb(color.r(color=base), color.g(color=base), color.b(color=base), color.t(color=base))
 gradient = color.from_gradient(value=close, bottom_value=0, top_value=100, bottom_color=base, top_color=derived)
+prefixBase = color.rgb(red=4, 5, 6)
+prefixAlpha = color.rgb(red=7, green=8, 9, 10)
+prefixNew = color.new(color=prefixBase, 35)
+prefixGradient = color.from_gradient(value=close, 0, 100, prefixNew, prefixAlpha)
 plot(close, color=gradient)
 `));
 
