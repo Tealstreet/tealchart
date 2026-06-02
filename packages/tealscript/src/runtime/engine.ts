@@ -6126,6 +6126,12 @@ export class TealscriptEngine {
       }
       return [indexArg as number, arrayArg];
     };
+    const matrixPairFirstArg = (args: unknown[], namedArgs: Map<string, unknown>): unknown => {
+      return isPineMatrix(args[0]) ? args[0] : this.getCallArgAny(args, namedArgs, 0, ['id1', 'id']);
+    };
+    const matrixPairSecondArg = (args: unknown[], namedArgs: Map<string, unknown>): unknown => {
+      return matrixCallArg(args, namedArgs, 1, 'id2', undefined, ['id1', 'id']);
+    };
 
     this.builtins.set('matrix.new', createMatrix);
     this.builtins.set('matrix.new_float', createMatrix);
@@ -6222,20 +6228,25 @@ export class TealscriptEngine {
     this.builtins.set('matrix.max', (args, namedArgs) => maxMatrixValue(readMatrix(this.matrixReceiverArg(args, namedArgs))));
     this.builtins.set('matrix.median', (args, namedArgs) => medianMatrixValue(readMatrix(this.matrixReceiverArg(args, namedArgs))));
     this.builtins.set('matrix.mode', (args, namedArgs) => modeMatrixValue(readMatrix(this.matrixReceiverArg(args, namedArgs))));
-    this.builtins.set('matrix.sum', (args) => sumMatrixValue(readMatrix(args[0]), readMatrixArithmeticOperand(args[1])));
-    this.builtins.set('matrix.diff', (args) => diffMatrixValue(readMatrix(args[0]), readMatrixArithmeticOperand(args[1])));
-    this.builtins.set('matrix.mult', (args) => multMatrixValue(readMatrix(args[0]), readMatrixMultOperand(args[1])));
-    this.builtins.set('matrix.pow', (args) => powMatrixValue(readMatrix(args[0]), this.toNumber(args[1])));
-    this.builtins.set('matrix.trace', (args) => traceMatrixValue(readMatrix(args[0])));
-    this.builtins.set('matrix.det', (args) => detMatrixValue(readMatrix(args[0])));
-    this.builtins.set('matrix.rank', (args) => rankMatrixValue(readMatrix(args[0])));
-    this.builtins.set('matrix.inv', (args) => invMatrixValue(readMatrix(args[0])));
-    this.builtins.set('matrix.pinv', (args) => pinvMatrixValue(readMatrix(args[0])));
-    this.builtins.set('matrix.eigenvalues', (args) => eigenvaluesMatrixValue(readMatrix(args[0])));
-    this.builtins.set('matrix.eigenvectors', (args) => eigenvectorsMatrixValue(readMatrix(args[0])));
-    this.builtins.set('matrix.kron', (args) => kronMatrixValue(readMatrix(args[0]), readMatrix(args[1])));
+    this.builtins.set('matrix.sum', (args, namedArgs) => sumMatrixValue(readMatrix(matrixPairFirstArg(args, namedArgs)), readMatrixArithmeticOperand(matrixPairSecondArg(args, namedArgs))));
+    this.builtins.set('matrix.diff', (args, namedArgs) => diffMatrixValue(readMatrix(matrixPairFirstArg(args, namedArgs)), readMatrixArithmeticOperand(matrixPairSecondArg(args, namedArgs))));
+    this.builtins.set('matrix.mult', (args, namedArgs) => multMatrixValue(readMatrix(matrixPairFirstArg(args, namedArgs)), readMatrixMultOperand(matrixPairSecondArg(args, namedArgs))));
+    this.builtins.set('matrix.pow', (args, namedArgs) => powMatrixValue(readMatrix(this.matrixReceiverArg(args, namedArgs)), this.toNumber(matrixCallArg(args, namedArgs, 1, 'power'))));
+    this.builtins.set('matrix.trace', (args, namedArgs) => traceMatrixValue(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.det', (args, namedArgs) => detMatrixValue(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.rank', (args, namedArgs) => rankMatrixValue(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.inv', (args, namedArgs) => invMatrixValue(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.pinv', (args, namedArgs) => pinvMatrixValue(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.eigenvalues', (args, namedArgs) => eigenvaluesMatrixValue(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.eigenvectors', (args, namedArgs) => eigenvectorsMatrixValue(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.kron', (args, namedArgs) => kronMatrixValue(readMatrix(matrixPairFirstArg(args, namedArgs)), readMatrix(matrixPairSecondArg(args, namedArgs))));
     this.builtins.set('matrix.sort', (args, namedArgs) => {
-      sortMatrixRows(readMatrix(args[0]), args[1] as number | undefined, args[2], namedArgs.get('sort_field') ?? args[3]);
+      sortMatrixRows(
+        readMatrix(this.matrixReceiverArg(args, namedArgs)),
+        matrixCallArg(args, namedArgs, 1, 'column') as number | undefined,
+        matrixCallArg(args, namedArgs, 2, 'order', undefined, ['id', 'column']),
+        matrixCallArg(args, namedArgs, 3, 'sort_field', undefined, ['id', 'column', 'order']),
+      );
       return null;
     });
     this.builtins.set('matrix.submatrix', (args, namedArgs) => {
@@ -6249,8 +6260,8 @@ export class TealscriptEngine {
       );
     });
     this.builtins.set('matrix.concat', (args, namedArgs) => {
-      const matrix = namedArgs.has('id') ? readMatrix(namedArgs.get('id')) : readMatrix(this.matrixReceiverArg(args, namedArgs));
-      const other = namedArgs.has('id') ? this.getCallArg(args, namedArgs, 0, 'id2') : matrixCallArg(args, namedArgs, 1, 'id2');
+      const matrix = namedArgs.has('id') || namedArgs.has('id1') ? readMatrix(this.getCallArgAny(args, namedArgs, 0, ['id1', 'id'])) : readMatrix(this.matrixReceiverArg(args, namedArgs));
+      const other = namedArgs.has('id') || namedArgs.has('id1') ? this.getCallArg(args, namedArgs, 0, 'id2') : matrixCallArg(args, namedArgs, 1, 'id2', undefined, ['id1', 'id']);
       concatMatrix(matrix, readMatrix(other));
       return null;
     });
