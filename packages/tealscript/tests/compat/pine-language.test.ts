@@ -85,6 +85,63 @@ plot(c.period == timeframe.period ? 1 : 0, title="Period")
     expect(getPlot(result, 'Period').values).toEqual([1]);
   });
 
+  it('runs imported exported library enum members from a deterministic registry', () => {
+    const library = parse(`
+library("Signal", true)
+export enum State
+    long = "Long"
+    short = "Short"
+    neutral = "Neutral"
+`);
+
+    const result = runCompatScript(`
+indicator("Imported enum")
+import TestUser/Signal/1 as sig
+sig.State signal = switch
+    close > 108 => sig.State.long
+    close < 101 => sig.State.short
+    => sig.State.neutral
+plot(signal == sig.State.long ? 1 : 0, title="Long")
+plot(signal == sig.State.short ? 1 : 0, title="Short")
+plot(signal == sig.State.neutral ? 1 : 0, title="Neutral")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/Signal/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Long').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1]);
+    expect(getPlot(result, 'Short').values).toEqual([0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Neutral').values).toEqual([1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0]);
+  });
+
+  it('keeps imported enum identities stable across aliases', () => {
+    const library = parse(`
+library("Signal", true)
+export enum State
+    long = "Long"
+    short = "Short"
+`);
+
+    const result = runCompatScript(`
+indicator("Imported enum aliases")
+import TestUser/Signal/1 as first
+import TestUser/Signal/1 as second
+plot(first.State.long == second.State.long ? 1 : 0, title="Same")
+plot(first.State.short == second.State.long ? 1 : 0, title="Different")
+`, {
+      bars: [compatibilityBars[0]!],
+      engineOptions: {
+        libraries: new Map([['TestUser/Signal/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Same').values).toEqual([1]);
+    expect(getPlot(result, 'Different').values).toEqual([0]);
+  });
+
   it('reports non-exported imported library functions as unknown', () => {
     const library = parse(`
 library("RangeTools", true)
