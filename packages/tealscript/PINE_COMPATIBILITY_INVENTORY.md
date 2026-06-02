@@ -119,6 +119,8 @@ reading the whole runtime.
 Every feature-parity PR should include the relevant items below. If an item is
 not relevant, call that out in the PR description.
 
+- Copy-paste parse/execute checkpoint when the change targets a public Pine
+  idiom.
 - Parser fixture for new syntax or grammar shape.
 - Runtime fixture over deterministic local bars for new execution behavior.
 - Reduced Pine idiom checkpoint for public or documented Pine patterns.
