@@ -56,8 +56,8 @@ Known structural gaps:
 
 - Pine's qualified type system (`const < input < simple < series`) is not
   modeled as a first-class compiler/runtime contract.
-- `request.footprint()`, `polyline.*`, `table.*`, and full-parity work across
-  maps, matrices, libraries, and strategy execution remain tracked below.
+- `request.footprint()` and full-parity work across drawing edge cases, maps,
+  matrices, libraries, and strategy execution remain tracked below.
 - Some parser/runtime docs are stale relative to recent compatibility work.
 - Some semantics are approximate, especially source-series inference, `na`
   propagation, realtime `varip`, named timezones, sessions, and higher-timeframe
@@ -662,9 +662,9 @@ this list focused on gaps that are not already covered by the epic notes above.
 4. Request data follow-up: `request.footprint()` has an explicit host-data
    model and deferral plan; implement it only after footprint/intrabar-volume
    data is available from the host.
-5. Label object output and renderer MVP.
-6. Table object MVP.
-7. Named timezone/session completion.
-8. `matrix.*` MVP.
-9. `map.*` MVP.
-10. Library import/export MVP.
+5. Named timezone/session completion.
+6. `matrix.*` reference reconciliation.
+7. `map.*` reference reconciliation.
+8. Library import/export MVP.
+9. Strategy intrabar/bar-magnifier design.
+10. Real Pine checkpoint expansion for drawing-heavy public idioms.
