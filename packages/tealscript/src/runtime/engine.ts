@@ -295,6 +295,7 @@ interface ImportedLibrary {
   methods: Map<string, FunctionDeclaration[]>;
   types: Map<string, TypeDeclaration>;
   exportedTypes: Set<string>;
+  constants: Map<string, unknown>;
 }
 
 type TimeframeUnit = 'tick' | 'second' | 'minute' | 'day' | 'week' | 'month';
@@ -982,6 +983,7 @@ export class TealscriptEngine {
       const methods = new Map<string, FunctionDeclaration[]>();
       const types = new Map<string, TypeDeclaration>();
       const exportedTypes = new Set<string>();
+      const constants = new Map<string, unknown>();
       for (const libraryStmt of libraryAst.body) {
         if (libraryStmt.type === 'FunctionDeclaration') {
           if (libraryStmt.isMethod) {
@@ -1005,6 +1007,12 @@ export class TealscriptEngine {
             exportedTypes.add(libraryStmt.name.name);
           }
         }
+        if (libraryStmt.type === 'VariableDeclaration' && libraryStmt.exported && libraryStmt.names.type === 'VariableDeclarator') {
+          const value = this.evaluateLibraryConstantExpression(libraryStmt.init);
+          if (value !== undefined) {
+            constants.set(libraryStmt.names.name.name, value);
+          }
+        }
       }
 
       this.importedLibraries.set(stmt.alias.name, {
@@ -1015,7 +1023,32 @@ export class TealscriptEngine {
         methods,
         types,
         exportedTypes,
+        constants,
       });
+    }
+  }
+
+  private evaluateLibraryConstantExpression(expression: Expression): unknown {
+    switch (expression.type) {
+      case 'NumericLiteral':
+      case 'StringLiteral':
+      case 'BooleanLiteral':
+      case 'ColorLiteral':
+        return expression.value;
+      case 'NaExpression':
+        return Number.NaN;
+      case 'UnaryExpression': {
+        if (expression.argument.type !== 'NumericLiteral') return undefined;
+        return expression.operator === '-' ? -expression.argument.value : expression.argument.value;
+      }
+      case 'MemberExpression': {
+        const memberPath = this.getMemberPath(expression);
+        if (!memberPath) return undefined;
+        const builtin = this.builtins.get(memberPath.join('.'));
+        return builtin ? builtin([], new Map(), this.ctx, this.scope, memberPath.join('.')) : undefined;
+      }
+      default:
+        return undefined;
     }
   }
 
@@ -3035,6 +3068,10 @@ export class TealscriptEngine {
       }
       if (namespace === 'strategy') {
         return this.evaluateStrategy(prop);
+      }
+      const importedLibrary = this.importedLibraries.get(namespace);
+      if (importedLibrary?.constants.has(prop)) {
+        return importedLibrary.constants.get(prop);
       }
 
       // Check builtins

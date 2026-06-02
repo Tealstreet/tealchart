@@ -109,7 +109,7 @@ export type Pivot
 
     expect(validLibrary.diagnostics).toEqual([]);
     expect(emptyLibrary.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Library scripts must export at least one function, method, or user-defined type',
+      'Library scripts must export at least one function, method, user-defined type, or constant',
     ]);
     expect(exportedInIndicator.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Exported declarations are only allowed in library scripts: scale',
@@ -118,6 +118,41 @@ export type Pivot
     expect(untypedExport.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Exported function scale parameter value must declare a type',
       'Exported method lifted parameter amount must declare a type',
+    ]);
+  });
+
+  it('validates exported library constants', () => {
+    const valid = checkProgram(parse(`
+library("Constants")
+export const int length = 14
+export color bull = color.green
+export prefix(simple string value) => value
+`));
+
+    const outsideLibrary = checkProgram(parse(`
+export const int outside = 1
+indicator("Outside")
+plot(close)
+`));
+
+    const invalid = checkProgram(parse(`
+library("Bad Constants")
+export value = 1
+export const float seriesValue = close
+export [a, b] = array.from(1, 2)
+`));
+
+    expect(valid.diagnostics).toEqual([]);
+    expect(outsideLibrary.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Exported declarations are only allowed in library scripts: outside',
+    ]);
+    expect(invalid.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Exported constants must declare a type',
+      'Exported constants must be literal values or compatible built-in variables',
+      'Exported constants cannot use tuple declarations',
+      'Exported constants must declare a type',
+      'Exported constants must be literal values or compatible built-in variables',
+      'Cannot assign series value to const float',
     ]);
   });
 

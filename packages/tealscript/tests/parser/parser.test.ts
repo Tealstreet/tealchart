@@ -106,6 +106,18 @@ describe('Tealscript Parser', () => {
       expect(declaration.path).toBe('TradingView/PivotLabels/1');
       expect(declaration.alias.name).toBe('dpl');
     });
+
+    it('parses exported library constants', () => {
+      const ast = parse('export const int length = 14\n');
+      const declaration = ast.body[0] as VariableDeclaration;
+      expect(declaration.type).toBe('VariableDeclaration');
+      expect(declaration.exported).toBe(true);
+      expect(declaration.names.type).toBe('VariableDeclarator');
+      expect(declaration.typeAnnotation).toEqual(expect.objectContaining({
+        baseType: 'int',
+        qualifier: 'const',
+      }));
+    });
   });
 
   describe('Variable declarations', () => {

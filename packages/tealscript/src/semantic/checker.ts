@@ -501,14 +501,18 @@ class SemanticChecker {
   private checkLibraryExportDeclarations(statements: Statement[]): void {
     const libraryDeclaration = statements.find((statement) => statement.type === 'LibraryDeclaration');
     const exportedDeclarations = statements.filter(
-      (statement): statement is FunctionDeclaration | TypeDeclaration =>
-        (statement.type === 'FunctionDeclaration' || statement.type === 'TypeDeclaration') && !!statement.exported,
+      (statement): statement is FunctionDeclaration | TypeDeclaration | VariableDeclaration =>
+        (
+          statement.type === 'FunctionDeclaration'
+          || statement.type === 'TypeDeclaration'
+          || statement.type === 'VariableDeclaration'
+        ) && !!statement.exported,
     );
 
     if (libraryDeclaration && exportedDeclarations.length === 0) {
       this.addDiagnostic(
         'library-export',
-        'Library scripts must export at least one function, method, or user-defined type',
+        'Library scripts must export at least one function, method, user-defined type, or constant',
         libraryDeclaration.loc,
       );
     }
@@ -517,8 +521,8 @@ class SemanticChecker {
       for (const declaration of exportedDeclarations) {
         this.addDiagnostic(
           'library-export',
-          `Exported declarations are only allowed in library scripts: ${declaration.name.name}`,
-          declaration.name.loc,
+          `Exported declarations are only allowed in library scripts: ${this.exportedDeclarationName(declaration)}`,
+          this.exportedDeclarationLoc(declaration),
         );
       }
       return;
@@ -534,9 +538,11 @@ class SemanticChecker {
     for (const declaration of exportedDeclarations) {
       if (declaration.type === 'TypeDeclaration') {
         this.checkExportedTypeFields(declaration, typeDeclarations, exportedTypeNames);
-      } else {
+      } else if (declaration.type === 'FunctionDeclaration') {
         this.checkExportedCallableTypeReferences(declaration, typeDeclarations, exportedTypeNames);
         this.checkExportedCallableReturnType(declaration, typeDeclarations, exportedTypeNames);
+      } else {
+        this.checkExportedVariable(declaration);
       }
     }
 
@@ -567,6 +573,17 @@ class SemanticChecker {
         field.name.loc,
       );
     }
+  }
+
+  private exportedDeclarationName(declaration: FunctionDeclaration | TypeDeclaration | VariableDeclaration): string {
+    if (declaration.type !== 'VariableDeclaration') return declaration.name.name;
+    if (declaration.names.type === 'VariableDeclarator') return declaration.names.name.name;
+    return 'tuple declaration';
+  }
+
+  private exportedDeclarationLoc(declaration: FunctionDeclaration | TypeDeclaration | VariableDeclaration): SourceLocation | undefined {
+    if (declaration.type !== 'VariableDeclaration') return declaration.name.loc;
+    return declaration.names.loc;
   }
 
   private checkExportedCallableTypeReferences(
@@ -705,6 +722,47 @@ class SemanticChecker {
         `Exported ${declarationKind} ${declaration.name.name} parameter ${parameter.name} must declare a type`,
         parameter.loc,
       );
+    }
+  }
+
+  private checkExportedVariable(declaration: VariableDeclaration): void {
+    if (declaration.names.type === 'TupleDeclarator') {
+      this.addDiagnostic(
+        'library-export',
+        'Exported constants cannot use tuple declarations',
+        declaration.names.loc,
+      );
+    }
+    if (!declaration.typeAnnotation) {
+      this.addDiagnostic(
+        'library-export',
+        'Exported constants must declare a type',
+        declaration.loc,
+      );
+    }
+    if (!this.isAllowedExportedConstantValue(declaration.init)) {
+      this.addDiagnostic(
+        'library-export',
+        'Exported constants must be literal values or compatible built-in variables',
+        declaration.init.loc,
+      );
+    }
+  }
+
+  private isAllowedExportedConstantValue(value: Expression): boolean {
+    switch (value.type) {
+      case 'NumericLiteral':
+      case 'StringLiteral':
+      case 'BooleanLiteral':
+      case 'ColorLiteral':
+      case 'NaExpression':
+        return true;
+      case 'MemberExpression':
+        return BUILTIN_NAMESPACES.has(this.memberPath(value)[0]);
+      case 'UnaryExpression':
+        return (value.operator === '-' || value.operator === '+') && value.argument.type === 'NumericLiteral';
+      default:
+        return false;
     }
   }
 

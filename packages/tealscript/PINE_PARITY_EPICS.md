@@ -489,8 +489,8 @@ Phases:
    receiver type.
    Semantic coverage now reports known local method receiver mismatches before
    runtime.
-6. Implement `library()`, `export`, `import`, versioned module resolution, and
-   library diagnostics.
+6. Implement `library()`, `export`, `import` through a deterministic
+   host-provided registry, and library diagnostics.
    Semantic coverage now reports exports outside libraries, empty libraries
    without parsed exportable declarations, and untyped parameters on exported
    functions/methods.
@@ -504,6 +504,8 @@ Phases:
    Semantic coverage now reports exported function/method returns that expose
    non-exported local UDTs in expression bodies and simple final-expression
    block bodies.
+   Runtime coverage now imports exported literal/builtin constants from the
+   deterministic library registry.
 
 Done means library-heavy Pine v5/v6 scripts can be reduced and run without
 large rewrites.
