@@ -7926,6 +7926,9 @@ export class TealscriptEngine {
     this.builtins.set('ta.dmi', (args, namedArgs, ctx, scope) => {
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 0, 'diLength', 14));
       const adxSmoothing = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'adxSmoothing', 14));
+      if (length < 1 || adxSmoothing < 1) {
+        return [NaN, NaN, NaN];
+      }
 
       const high = ctx.high.get(0)!;
       const low = ctx.low.get(0)!;
@@ -8076,7 +8079,7 @@ export class TealscriptEngine {
     // PivotHigh - Detect pivot highs
     // Returns the pivot high price or na
     this.builtins.set('ta.pivothigh', (args, namedArgs, ctx) => {
-      const hasSource = namedArgs.has('source') || args.length > 2 || (args.length === 1 && namedArgs.size > 0);
+      const hasSource = namedArgs.has('source') || args.length >= 3 || (args.length === 1 && namedArgs.size === 0);
       const sourceArg = hasSource ? this.getCallArg(args, namedArgs, 0, 'source') : ctx.high.get(0)!;
       const leftIndex = hasSource ? 1 : 0;
       const rightIndex = hasSource ? 2 : 1;
@@ -8109,7 +8112,7 @@ export class TealscriptEngine {
     // PivotLow - Detect pivot lows
     // Returns the pivot low price or na
     this.builtins.set('ta.pivotlow', (args, namedArgs, ctx) => {
-      const hasSource = namedArgs.has('source') || args.length > 2 || (args.length === 1 && namedArgs.size > 0);
+      const hasSource = namedArgs.has('source') || args.length >= 3 || (args.length === 1 && namedArgs.size === 0);
       const sourceArg = hasSource ? this.getCallArg(args, namedArgs, 0, 'source') : ctx.low.get(0)!;
       const leftIndex = hasSource ? 1 : 0;
       const rightIndex = hasSource ? 2 : 1;

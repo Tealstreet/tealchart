@@ -165,6 +165,8 @@ pivotHigh = ta.pivothigh(high, 2, 2)
 pivotLow = ta.pivotlow(low, 2, 2)
 defaultPivotHigh = ta.pivothigh(2, 2)
 defaultPivotLow = ta.pivotlow(2, 2)
+mixedPivotHigh = ta.pivothigh(2, rightbars=2)
+mixedPivotLow = ta.pivotlow(2, rightbars=2)
 linreg = ta.linreg(close, 3, 1)
 plot(diPlus, title="DI Plus")
 plot(diMinus, title="DI Minus")
@@ -174,6 +176,8 @@ plot(pivotHigh, title="Pivot High")
 plot(pivotLow, title="Pivot Low")
 plot(defaultPivotHigh, title="Default Pivot High")
 plot(defaultPivotLow, title="Default Pivot Low")
+plot(mixedPivotHigh, title="Mixed Pivot High")
+plot(mixedPivotLow, title="Mixed Pivot Low")
 plot(linreg, title="LinReg")
 `);
     const named = runCompatScript(`
@@ -184,6 +188,8 @@ pivotHigh = ta.pivothigh(source=high, leftbars=2, rightbars=2)
 pivotLow = ta.pivotlow(source=low, leftbars=2, rightbars=2)
 defaultPivotHigh = ta.pivothigh(leftbars=2, rightbars=2)
 defaultPivotLow = ta.pivotlow(leftbars=2, rightbars=2)
+mixedPivotHigh = ta.pivothigh(2, rightbars=2)
+mixedPivotLow = ta.pivotlow(2, rightbars=2)
 linreg = ta.linreg(source=close, length=3, offset=1)
 plot(diPlus, title="DI Plus")
 plot(diMinus, title="DI Minus")
@@ -193,6 +199,8 @@ plot(pivotHigh, title="Pivot High")
 plot(pivotLow, title="Pivot Low")
 plot(defaultPivotHigh, title="Default Pivot High")
 plot(defaultPivotLow, title="Default Pivot Low")
+plot(mixedPivotHigh, title="Mixed Pivot High")
+plot(mixedPivotLow, title="Mixed Pivot Low")
 plot(linreg, title="LinReg")
 `);
 
@@ -201,6 +209,52 @@ plot(linreg, title="LinReg")
     for (const title of positional.plots.map((plot) => plot.title)) {
       expect(roundSeries(getPlot(named, title).values)).toEqual(roundSeries(getPlot(positional, title).values));
     }
+    expect(roundSeries(getPlot(named, 'DI Plus').values)).toEqual([
+      0,
+      23.076923,
+      16.666667,
+      0,
+      0,
+      0,
+      28.571429,
+      33.333333,
+      7.692308,
+      7.692308,
+      15.384615,
+      0,
+    ]);
+    expect(roundSeries(getPlot(named, 'SAR').values)).toEqual([103, 99, 99, 99, 109, 109, 99, 99, 99, 99, 99, 114]);
+    expect(roundSeries(getPlot(named, 'Pivot High').values)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      109,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+    ]);
+    expect(roundSeries(getPlot(named, 'Pivot Low').values)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      96,
+      null,
+      null,
+      null,
+      null,
+    ]);
+    expect(roundSeries(getPlot(named, 'Mixed Pivot High').values)).toEqual(roundSeries(getPlot(named, 'Default Pivot High').values));
+    expect(roundSeries(getPlot(named, 'Mixed Pivot Low').values)).toEqual(roundSeries(getPlot(named, 'Default Pivot Low').values));
+    expect(roundSeries(getPlot(named, 'LinReg').values)).toEqual([null, null, 104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111]);
   });
 
   it('runs array covariance helper idioms', () => {
