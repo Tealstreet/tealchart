@@ -57,7 +57,6 @@ export {
   type ExecutionResult,
   type ExecutionError,
   type IndicatorDeclarationMetadata,
-  type SessionClassificationInfo,
   type TealscriptEngineOptions,
   type TealscriptRuntimeOptions,
   // Context
@@ -65,6 +64,7 @@ export {
   createContext,
   type Bar,
   type BarState,
+  type SessionClassificationInfo,
   type SymInfo,
   type TimeframeInfo,
   type PlotOutput,

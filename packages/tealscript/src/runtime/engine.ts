@@ -89,7 +89,7 @@ import {
   registerTableBuiltins,
   type DrawingBuiltinRuntime,
 } from './builtins/drawings';
-import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type ChartPoint, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LogLevel, type LogOutput, type PlotLineStyle, type PlotOutput, type PlotStyle, type SymInfo, type TimeframeInfo } from './context';
+import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type ChartPoint, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LogLevel, type LogOutput, type PlotLineStyle, type PlotOutput, type PlotStyle, type SessionClassificationInfo, type SymInfo, type TimeframeInfo } from './context';
 import {
   getDrawingValue,
   toDrawingId as toDrawingIdValue,
@@ -307,13 +307,6 @@ interface TimeframeSpec {
   period: string;
   multiplier: number;
   unit: TimeframeUnit;
-}
-
-export interface SessionClassificationInfo {
-  regular: string;
-  premarket: string;
-  postmarket: string;
-  timezone: string;
 }
 
 interface RandomBuiltinState {
@@ -2497,6 +2490,7 @@ export class TealscriptEngine {
       libraries: this.libraries,
       runtime: {
         ...this.runtimeOptions,
+        session: requestContext.session,
         syminfo: this.ctx.syminfo,
         timeframe: this.ctx.timeframe,
         now: this.ctx.now,
@@ -6291,8 +6285,8 @@ export class TealscriptEngine {
     const timestamp = this.ctx.time.get(0);
     if (timestamp === undefined || !Number.isFinite(timestamp)) return false;
 
-    const timezone = this.runtimeOptions.session?.timezone
-      ?? this.ctx.syminfo.timezone;
+    const timezone = this.runtimeOptions.session?.timezone?.trim()
+      || this.ctx.syminfo.timezone;
     return this.isTimestampInSession(timestamp, session, timezone);
   }
 

@@ -2074,6 +2074,9 @@ class SemanticChecker {
       case 'CallExpression':
         return this.inferCallType(expression, scope);
       case 'MemberExpression':
+        if (expression.object.type === 'Identifier' && expression.object.name === 'session') {
+          return this.inferMemberExpressionType(expression, scope);
+        }
         if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
           return { kind: 'unknown', qualifier: 'const' };
         }
