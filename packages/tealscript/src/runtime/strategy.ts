@@ -1,8 +1,103 @@
+import type { Bar } from './context';
+
 export type StrategyDirection = 'long' | 'short';
 export type StrategyOrderType = 'market' | 'limit' | 'stop' | 'stop_limit' | 'trailing_stop';
 export type StrategyOrderStatus = 'pending' | 'filled' | 'cancelled' | 'rejected';
 export type StrategyOcaType = 'cancel' | 'reduce' | 'none';
 export type StrategyQuantityType = StrategyLedgerSettings['defaultQtyType'];
+export type StrategyExecutionTickKind =
+  | 'open'
+  | 'high'
+  | 'low'
+  | 'close'
+  | 'intrabar_open'
+  | 'intrabar_high'
+  | 'intrabar_low'
+  | 'intrabar_close';
+export type StrategyIntrabarSource = 'chart_ohlc' | 'lower_timeframe';
+export type StrategyIntrabarUnavailableReason = 'missing_context' | 'invalid_timeframe' | 'host_limit';
+
+export interface StrategyExecutionTick {
+  time: number;
+  price: number;
+  kind: StrategyExecutionTickKind;
+  sequence: number;
+  sourceBarTime?: number;
+  sourceBarIndex?: number;
+}
+
+export interface StrategyIntrabarRequest {
+  symbol: string;
+  timeframe: string;
+  chartBarTime: number;
+  chartBarIndex: number;
+  chartBar: Bar;
+}
+
+export interface StrategyIntrabarContext extends StrategyIntrabarRequest {
+  ticks: StrategyExecutionTick[];
+  source: StrategyIntrabarSource;
+  unavailableReason?: StrategyIntrabarUnavailableReason;
+}
+
+export interface StrategyIntrabarSuccess {
+  ok: true;
+  context: StrategyIntrabarContext;
+}
+
+export interface StrategyIntrabarFailure {
+  ok: false;
+  code: StrategyIntrabarUnavailableReason;
+  message: string;
+}
+
+export type StrategyIntrabarResult = StrategyIntrabarSuccess | StrategyIntrabarFailure;
+
+export interface StrategyIntrabarDatafeed {
+  getStrategyIntrabars(request: StrategyIntrabarRequest): StrategyIntrabarResult;
+}
+
+export function strategyIntrabarContextKey(symbol: string, timeframe: string, chartBarTime: number): string {
+  return `${symbol}\u0000${timeframe}\u0000${chartBarTime}`;
+}
+
+export class InMemoryStrategyIntrabarDatafeed implements StrategyIntrabarDatafeed {
+  private readonly contexts = new Map<string, StrategyIntrabarContext>();
+
+  constructor(contexts: StrategyIntrabarContext[] = []) {
+    for (const context of contexts) {
+      this.setContext(context);
+    }
+  }
+
+  setContext(context: StrategyIntrabarContext): void {
+    this.contexts.set(strategyIntrabarContextKey(context.symbol, context.timeframe, context.chartBarTime), cloneStrategyIntrabarContext(context));
+  }
+
+  getStrategyIntrabars(request: StrategyIntrabarRequest): StrategyIntrabarResult {
+    const context = this.contexts.get(strategyIntrabarContextKey(request.symbol, request.timeframe, request.chartBarTime));
+    if (!context) {
+      return {
+        ok: false,
+        code: 'missing_context',
+        message: `No strategy intrabar context for ${request.symbol} ${request.timeframe} ${request.chartBarTime}`,
+      };
+    }
+
+    return {
+      ok: true,
+      context: cloneStrategyIntrabarContext(context),
+    };
+  }
+}
+
+export function cloneStrategyIntrabarContext(context: StrategyIntrabarContext): StrategyIntrabarContext {
+  return {
+    ...context,
+    chartBar: { ...context.chartBar },
+    ticks: context.ticks.map((tick) => ({ ...tick })),
+  };
+}
 
 export interface StrategyLedgerSettings {
   title: string;
