@@ -935,7 +935,7 @@ badScale = pivot.scale(2)
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'No method lift() overload accepts Other receiver',
-      'No method lift() overload accepts int receiver',
+      'No method lift() overload accepts const int receiver',
       'No method scale() overload accepts Pivot receiver',
     ]);
   });
@@ -962,7 +962,7 @@ invalid = close.smooth()
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'No method smooth() overload accepts float receiver',
+      'No method smooth() overload accepts series float receiver',
     ]);
   });
 

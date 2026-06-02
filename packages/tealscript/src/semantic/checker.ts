@@ -22,6 +22,14 @@ import type {
   VariableDeclaration,
   WhileStatement,
 } from '../parser/ast';
+import {
+  BUILTIN_COLLECTION_MEMBER_METHODS,
+  BUILTIN_GLOBALS,
+  BUILTIN_GLOBAL_TYPES,
+  BUILTIN_NAMESPACES,
+  CALENDAR_FUNCTION_NAMES,
+  isExportableBuiltinConstantPath,
+} from '../builtinMetadata';
 
 export type SemanticDiagnosticSeverity = 'error' | 'warning';
 
@@ -100,54 +108,6 @@ class SemanticScope {
   }
 }
 
-const BUILTIN_GLOBALS = new Set([
-  'bar_index',
-  'close',
-  'hl2',
-  'hlc3',
-  'high',
-  'last_bar_index',
-  'low',
-  'na',
-  'ohlc4',
-  'open',
-  'time',
-  'time_close',
-  'time_tradingday',
-  'timenow',
-  'last_bar_time',
-  'volume',
-]);
-
-const BUILTIN_GLOBAL_TYPES = new Map<string, SemanticType>([
-  ['bar_index', { kind: 'int', qualifier: 'series' }],
-  ['close', { kind: 'float', qualifier: 'series' }],
-  ['high', { kind: 'float', qualifier: 'series' }],
-  ['hl2', { kind: 'float', qualifier: 'series' }],
-  ['hlc3', { kind: 'float', qualifier: 'series' }],
-  ['last_bar_index', { kind: 'int', qualifier: 'series' }],
-  ['last_bar_time', { kind: 'int', qualifier: 'series' }],
-  ['low', { kind: 'float', qualifier: 'series' }],
-  ['ohlc4', { kind: 'float', qualifier: 'series' }],
-  ['open', { kind: 'float', qualifier: 'series' }],
-  ['time', { kind: 'int', qualifier: 'series' }],
-  ['time_close', { kind: 'int', qualifier: 'series' }],
-  ['time_tradingday', { kind: 'int', qualifier: 'series' }],
-  ['timenow', { kind: 'int', qualifier: 'series' }],
-  ['volume', { kind: 'float', qualifier: 'series' }],
-]);
-
-const CALENDAR_FUNCTION_NAMES = new Set([
-  'year',
-  'month',
-  'weekofyear',
-  'dayofmonth',
-  'dayofweek',
-  'hour',
-  'minute',
-  'second',
-]);
-
 const ARRAY_CONSTRUCTOR_ELEMENT_TYPES = new Map<string, SemanticTypeKind>([
   ['array.new_bool', 'bool'],
   ['array.new_box', 'box'],
@@ -204,220 +164,6 @@ const BUILTIN_FUNCTIONS = new Set([
   'time_close',
   'timestamp',
   ...CALENDAR_FUNCTION_NAMES,
-]);
-
-const BUILTIN_NAMESPACES = new Set([
-  'adjustment',
-  'array',
-  'barmerge',
-  'barstate',
-  'box',
-  'chart',
-  'color',
-  'currency',
-  'display',
-  'extend',
-  'format',
-  'hline',
-  'input',
-  'label',
-  'line',
-  'linefill',
-  'location',
-  'map',
-  'math',
-  'matrix',
-  'order',
-  'plot',
-  'polyline',
-  'position',
-  'request',
-  'runtime',
-  'scale',
-  'session',
-  'shape',
-  'size',
-  'str',
-  'strategy',
-  'syminfo',
-  'ta',
-  'table',
-  'ticker',
-  'timeframe',
-  'xloc',
-  'yloc',
-]);
-
-const EXPORTABLE_BUILTIN_CONSTANTS = new Set([
-  'alert.freq_all',
-  'alert.freq_once_per_bar',
-  'alert.freq_once_per_bar_close',
-  'barmerge.gaps_off',
-  'barmerge.gaps_on',
-  'barmerge.lookahead_off',
-  'barmerge.lookahead_on',
-  'color.aqua',
-  'color.black',
-  'color.blue',
-  'color.fuchsia',
-  'color.gray',
-  'color.green',
-  'color.lime',
-  'color.maroon',
-  'color.navy',
-  'color.none',
-  'color.olive',
-  'color.orange',
-  'color.purple',
-  'color.red',
-  'color.silver',
-  'color.teal',
-  'color.white',
-  'color.yellow',
-  'dividends.gross',
-  'dividends.net',
-  'earnings.actual',
-  'earnings.estimate',
-  'earnings.standardized',
-  'hline.style_dashed',
-  'hline.style_dotted',
-  'hline.style_solid',
-  'math.e',
-  'math.phi',
-  'math.pi',
-  'plot.linestyle_dashed',
-  'plot.linestyle_dotted',
-  'plot.linestyle_solid',
-  'plot.style_area',
-  'plot.style_areabr',
-  'plot.style_circles',
-  'plot.style_columns',
-  'plot.style_cross',
-  'plot.style_histogram',
-  'plot.style_line',
-  'plot.style_linebr',
-  'plot.style_stepline',
-  'plot.style_stepline_diamond',
-  'splits.denominator',
-  'splits.numerator',
-  'strategy.cash',
-  'strategy.commission.cash_per_contract',
-  'strategy.commission.cash_per_order',
-  'strategy.commission.percent',
-  'strategy.fixed',
-  'strategy.long',
-  'strategy.oca.cancel',
-  'strategy.oca.none',
-  'strategy.oca.reduce',
-  'strategy.percent_of_equity',
-  'strategy.short',
-]);
-
-const EXPORTABLE_CONTEXT_MEMBER_CONSTANTS = new Map<string, Set<string>>([
-  ['barstate', new Set(['isconfirmed', 'isfirst', 'ishistory', 'islast', 'islastconfirmedhistory', 'isnew', 'isrealtime'])],
-  ['syminfo', new Set(['basecurrency', 'currency', 'description', 'main_tickerid', 'mintick', 'minmove', 'prefix', 'pricescale', 'root', 'session', 'ticker', 'tickerid', 'timezone', 'type'])],
-  ['timeframe', new Set(['isdaily', 'isdwm', 'isintraday', 'isminutes', 'ismonthly', 'isseconds', 'isticks', 'isweekly', 'main_period', 'multiplier', 'period'])],
-]);
-
-const BUILTIN_COLLECTION_MEMBER_METHODS = new Map<SemanticTypeKind, Set<string>>([
-  ['array', new Set([
-    'abs',
-    'avg',
-    'binary_search',
-    'binary_search_leftmost',
-    'binary_search_rightmost',
-    'clear',
-    'concat',
-    'copy',
-    'covariance',
-    'every',
-    'fill',
-    'first',
-    'get',
-    'includes',
-    'indexof',
-    'insert',
-    'join',
-    'last',
-    'lastindexof',
-    'max',
-    'median',
-    'min',
-    'mode',
-    'percentrank',
-    'percentile_linear_interpolation',
-    'percentile_nearest_rank',
-    'pop',
-    'push',
-    'range',
-    'remove',
-    'reverse',
-    'set',
-    'shift',
-    'size',
-    'slice',
-    'some',
-    'sort',
-    'sort_indices',
-    'standardize',
-    'stdev',
-    'sum',
-    'unshift',
-    'variance',
-  ])],
-  ['map', new Set(['clear', 'contains', 'copy', 'get', 'keys', 'put', 'put_all', 'remove', 'size', 'values'])],
-  ['matrix', new Set([
-    'add_col',
-    'add_column',
-    'add_row',
-    'avg',
-    'col',
-    'column',
-    'columns',
-    'copy',
-    'det',
-    'diff',
-    'eigenvalues',
-    'eigenvectors',
-    'elements_count',
-    'fill',
-    'get',
-    'inv',
-    'is_antidiagonal',
-    'is_binary',
-    'is_diagonal',
-    'is_identity',
-    'is_square',
-    'is_stochastic',
-    'is_symmetric',
-    'is_triangular',
-    'is_valid',
-    'is_zero',
-    'kron',
-    'max',
-    'median',
-    'min',
-    'mode',
-    'mult',
-    'pinv',
-    'pow',
-    'rank',
-    'remove_col',
-    'remove_column',
-    'remove_row',
-    'reshape',
-    'reverse',
-    'row',
-    'rows',
-    'set',
-    'sort',
-    'submatrix',
-    'sum',
-    'swap_columns',
-    'swap_rows',
-    'trace',
-    'transpose',
-  ])],
 ]);
 
 const QUALIFIER_RANK: Record<SemanticQualifier, number> = {
@@ -957,14 +703,7 @@ class SemanticChecker {
   }
 
   private isExportableBuiltinConstant(value: MemberExpression): boolean {
-    const path = this.memberPath(value);
-    if (path.length < 2) return false;
-
-    const namespace = path.slice(0, -1).join('.');
-    const property = path[path.length - 1]!;
-    if (EXPORTABLE_BUILTIN_CONSTANTS.has(path.join('.'))) return true;
-
-    return path.length === 2 && (EXPORTABLE_CONTEXT_MEMBER_CONSTANTS.get(namespace)?.has(property) ?? false);
+    return isExportableBuiltinConstantPath(this.memberPath(value));
   }
 
   private collectGlobalVariableQualifiers(statements: Statement[]): Map<string, SemanticQualifier | undefined> {
@@ -2040,7 +1779,7 @@ class SemanticChecker {
 
     this.addDiagnostic(
       'method-receiver-type',
-      `No method ${expression.callee.property.name}() overload accepts ${this.formatSemanticType(receiverType)} receiver`,
+      `No method ${expression.callee.property.name}() overload accepts ${this.formatSemanticTypeWithQualifier(receiverType)} receiver`,
       expression.callee.property.loc,
     );
   }
@@ -2643,6 +2382,11 @@ class SemanticChecker {
       default:
         return type.kind;
     }
+  }
+
+  private formatSemanticTypeWithQualifier(type: SemanticType): string {
+    const formattedType = this.formatSemanticType(type);
+    return type.qualifier ? `${type.qualifier} ${formattedType}` : formattedType;
   }
 
   private declare(scope: SemanticScope, symbol: SemanticSymbol): void {
