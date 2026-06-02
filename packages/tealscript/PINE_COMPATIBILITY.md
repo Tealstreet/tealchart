@@ -23,13 +23,15 @@ Status values:
 
 ## Target Order
 
-1. Public Pine scripts parse without rewrites.
-2. Parsed scripts execute over deterministic bars without runtime failures.
-3. Common public-script idioms produce usable plots, drawings, alerts, logs, or
+1. Measure public-script failures with a corpus runner and failure taxonomy.
+2. Public Pine scripts parse without rewrites.
+3. Parsed scripts execute over deterministic bars without runtime failures.
+4. Common public-script idioms produce usable plots, drawings, alerts, logs, or
    strategy metadata.
-4. The most-used built-in namespaces and overload shapes unblock broad script
+5. The most-used built-in namespaces and overload shapes unblock broad script
    coverage.
-5. Rendering and TradingView-exact edge cases tighten after execution
+6. Basic renderer routing makes emitted outputs visible and usable.
+7. Rendering and TradingView-exact edge cases tighten after execution
    compatibility is broad.
 
 For each major compatibility epic, add deterministic golden fixtures for the
