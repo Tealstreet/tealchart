@@ -175,6 +175,8 @@ must stay offline and deterministic.
    and path provider.
    Ledger setting plumbing is done; path-provider selection remains in step 4.
 4. Implement lower-timeframe path selection with explicit fallback metadata.
+   Done. Selected contexts are recorded on the strategy ledger; order fills
+   still use the existing OHLC broker path until step 5.
 5. Refactor order filling to consume execution ticks instead of a single
    per-bar OHLC fill point.
 6. Implement bounded `calc_on_order_fills` recalculation.

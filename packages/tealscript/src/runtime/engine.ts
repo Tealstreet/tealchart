@@ -193,9 +193,11 @@ import {
   fillPendingStrategyMarketOrders,
   fillPendingStrategyOrders,
   fillStrategyMarketOrder,
+  selectStrategyIntrabarContext,
   submitStrategyOrder,
   type StrategyDirection,
   type StrategyFill,
+  type StrategyIntrabarDatafeed,
   type StrategyLedger,
   type StrategyLedgerSettings,
   type StrategyOcaType,
@@ -281,6 +283,7 @@ export interface ExecutionError {
 
 export interface TealscriptEngineOptions {
   requestDatafeed?: RequestDatafeed;
+  strategyIntrabarDatafeed?: StrategyIntrabarDatafeed;
   libraries?: Map<string, Program>;
   runtime?: TealscriptRuntimeOptions;
 }
@@ -351,6 +354,7 @@ export class TealscriptEngine {
   private userMethods: Map<string, FunctionDeclaration[]>;
   private functionScopes: Map<string, Scope>;
   private requestDatafeed?: RequestDatafeed;
+  private strategyIntrabarDatafeed?: StrategyIntrabarDatafeed;
   private libraries: Map<string, Program>;
   private importedLibraries = new Map<string, ImportedLibrary>();
   private requestEvaluationCache = new Map<string, RequestEvaluationCacheEntry>();
@@ -371,6 +375,7 @@ export class TealscriptEngine {
   private profileExpressions = 0;
   private profileBuiltinCalls = 0;
   private runtimeOptions: TealscriptRuntimeOptions;
+  private hasStrategyDeclaration = false;
 
   constructor(options: TealscriptEngineOptions = {}) {
     this.ctx = new ExecutionContext();
@@ -381,6 +386,7 @@ export class TealscriptEngine {
     this.userMethods = new Map();
     this.functionScopes = new Map();
     this.requestDatafeed = options.requestDatafeed;
+    this.strategyIntrabarDatafeed = options.strategyIntrabarDatafeed;
     this.libraries = options.libraries ?? new Map();
     this.runtimeOptions = options.runtime ?? {};
     this.applyRuntimeOptions(this.runtimeOptions);
@@ -430,6 +436,7 @@ export class TealscriptEngine {
     this.userFunctionCallStack = [];
     this.importedLibraryCallStack = [];
     this.indicatorDynamicRequests = true;
+    this.hasStrategyDeclaration = false;
     this.requestContextDepth = 0;
     this.requestLocalScopeDepth = 0;
     this.applyRuntimeOptions(this.runtimeOptions);
@@ -480,6 +487,7 @@ export class TealscriptEngine {
         }
       }
       this.fillPendingStrategyOrdersForCurrentBar();
+      this.recordStrategyIntrabarContextForCurrentBar();
 
       // Commit bar — only snapshot on the last bar (for realtime rollback)
       this.scope.commit(isLastBar);
@@ -681,6 +689,7 @@ export class TealscriptEngine {
       }
     }
     this.fillPendingStrategyOrdersForCurrentBar();
+    this.recordStrategyIntrabarContextForCurrentBar();
   }
 
   /**
@@ -808,7 +817,32 @@ export class TealscriptEngine {
     }
     if (stmt.declarationKind === 'strategy') {
       this.applyStrategyDeclaration(stmt);
+      this.hasStrategyDeclaration = true;
     }
+  }
+
+  private recordStrategyIntrabarContextForCurrentBar(): void {
+    if (!this.hasStrategyDeclaration) {
+      return;
+    }
+
+    const chartBar = this.ctx.getCurrentBar();
+    if (!chartBar) {
+      return;
+    }
+
+    const context = selectStrategyIntrabarContext({
+      useBarMagnifier: this.ctx.strategyLedger.settings.useBarMagnifier,
+      datafeed: this.strategyIntrabarDatafeed,
+      request: {
+        symbol: this.ctx.syminfo.ticker,
+        timeframe: this.ctx.timeframe.period,
+        chartBarTime: chartBar.time,
+        chartBarIndex: this.ctx.bar_index,
+        chartBar,
+      },
+    });
+    this.ctx.recordStrategyIntrabarContext(context);
   }
 
   private applyStrategyDeclaration(stmt: IndicatorDeclaration): void {

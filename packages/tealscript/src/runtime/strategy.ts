@@ -57,6 +57,12 @@ export interface StrategyIntrabarDatafeed {
   getStrategyIntrabars(request: StrategyIntrabarRequest): StrategyIntrabarResult;
 }
 
+export interface StrategyIntrabarSelectionOptions {
+  request: StrategyIntrabarRequest;
+  useBarMagnifier: boolean;
+  datafeed?: StrategyIntrabarDatafeed;
+}
+
 export function strategyIntrabarContextKey(symbol: string, timeframe: string, chartBarTime: number): string {
   return `${symbol}\u0000${timeframe}\u0000${chartBarTime}`;
 }
@@ -118,6 +124,28 @@ export function createDefaultStrategyOhlcIntrabarContext(request: StrategyIntrab
       sourceBarIndex: request.chartBarIndex,
     })),
   };
+}
+
+export function selectStrategyIntrabarContext(options: StrategyIntrabarSelectionOptions): StrategyIntrabarContext {
+  const fallback = (unavailableReason?: StrategyIntrabarUnavailableReason): StrategyIntrabarContext => ({
+    ...createDefaultStrategyOhlcIntrabarContext(options.request),
+    unavailableReason,
+  });
+
+  if (!options.useBarMagnifier) {
+    return fallback();
+  }
+
+  if (!options.datafeed) {
+    return fallback('missing_context');
+  }
+
+  const result = options.datafeed.getStrategyIntrabars(options.request);
+  if (!result.ok) {
+    return fallback(result.code);
+  }
+
+  return cloneStrategyIntrabarContext(result.context);
 }
 
 export interface StrategyLedgerSettings {
@@ -253,6 +281,7 @@ export interface StrategyLedger {
   fills: StrategyFill[];
   openTrades: StrategyTrade[];
   closedTrades: StrategyTrade[];
+  intrabarContexts: StrategyIntrabarContext[];
   position: StrategyPosition;
   equityCurve: StrategyEquityPoint[];
   initialCapital: number;
@@ -305,6 +334,7 @@ export function createStrategyLedger(settings: Partial<StrategyLedgerSettings> =
     fills: [],
     openTrades: [],
     closedTrades: [],
+    intrabarContexts: [],
     position: createStrategyPosition(),
     equityCurve: [],
     initialCapital: resolvedSettings.initialCapital,
@@ -324,6 +354,7 @@ export function cloneStrategyLedger(ledger: StrategyLedger): StrategyLedger {
     fills: ledger.fills.map((fill) => ({ ...fill })),
     openTrades: ledger.openTrades.map((trade) => ({ ...trade })),
     closedTrades: ledger.closedTrades.map((trade) => ({ ...trade })),
+    intrabarContexts: ledger.intrabarContexts.map((context) => cloneStrategyIntrabarContext(context)),
     position: { ...ledger.position },
     equityCurve: ledger.equityCurve.map((point) => ({ ...point })),
     initialCapital: ledger.initialCapital,
