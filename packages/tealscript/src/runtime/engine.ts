@@ -5620,6 +5620,9 @@ export class TealscriptEngine {
     const rangeMetadata = (args: unknown[], namedArgs: Map<string, unknown>, type: InputType): InputMetadata => {
       const positionalOptions = Array.isArray(inputArg(args, namedArgs, inputOptionsArgs, 2));
       const hasOptions = namedArgs.has('options') || positionalOptions;
+      if (hasOptions && (namedArgs.has('minval') || namedArgs.has('maxval') || namedArgs.has('step'))) {
+        throw new Error(`input.${type} cannot use options together with minval/maxval/step`);
+      }
       const names = hasOptions ? inputOptionsArgs : inputRangeArgs;
       const metadata: InputMetadata = {
         options: optionsArg(args, namedArgs, names),

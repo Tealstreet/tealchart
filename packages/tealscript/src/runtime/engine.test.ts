@@ -5518,6 +5518,7 @@ plot(rangeLength + (optionMode == "EMA" ? 1 : 0) + (generic ? 1 : 0) + source)`;
           inline: 'len',
           group: 'Inputs',
           confirm: true,
+          display: 2,
           active: false,
         },
         {
@@ -5530,6 +5531,7 @@ plot(rangeLength + (optionMode == "EMA" ? 1 : 0) + (generic ? 1 : 0) + source)`;
           inline: 'mode',
           group: 'Inputs',
           confirm: false,
+          display: 4,
           active: true,
         },
         {
@@ -5541,6 +5543,7 @@ plot(rangeLength + (optionMode == "EMA" ? 1 : 0) + (generic ? 1 : 0) + source)`;
           inline: 'gen',
           group: 'Inputs',
           confirm: false,
+          display: 0,
           active: true,
         },
         {
@@ -5552,6 +5555,7 @@ plot(rangeLength + (optionMode == "EMA" ? 1 : 0) + (generic ? 1 : 0) + source)`;
           inline: 'src',
           group: 'Inputs',
           confirm: true,
+          display: 2,
           active: true,
         },
       ]);
@@ -5648,6 +5652,17 @@ plot(tf == "240")`;
       const result = executeScript(ast, bars);
 
       expect(result.errors[0]?.message).toBe('input.timeframe defval must be one of options');
+    });
+
+    it('rejects input range metadata together with options', () => {
+      const script = `//@version=6
+indicator("Invalid input overload")
+length = input.int(14, "Length", options=[7, 14, 21], minval=1)
+plot(length)`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors[0]?.message).toBe('input.int cannot use options together with minval/maxval/step');
     });
   });
 
