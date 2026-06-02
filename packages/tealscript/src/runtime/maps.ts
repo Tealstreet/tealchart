@@ -22,9 +22,12 @@ export function getMapSize(map: PineMap): number {
   return map.entries.size;
 }
 
-export function putMapValue<K extends PineMapKey = PineMapKey, V = unknown>(map: PineMap<K, V>, key: unknown, value: V): void {
+export function putMapValue<K extends PineMapKey = PineMapKey, V = unknown>(map: PineMap<K, V>, key: unknown, value: V): V | number {
   assertMapCapacity(map, key);
-  map.entries.set(normalizeMapKey(key) as K, value);
+  const normalizedKey = normalizeMapKey(key) as K;
+  const previousValue = map.entries.has(normalizedKey) ? (map.entries.get(normalizedKey) as V) : Number.NaN;
+  map.entries.set(normalizedKey, value);
+  return previousValue;
 }
 
 export function getMapValue<V = unknown>(map: PineMap<PineMapKey, V>, key: unknown): V | number {

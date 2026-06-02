@@ -7,14 +7,16 @@ describe('Pine map compatibility', () => {
     const result = runCompatScript(`
 indicator("Map basics")
 m = map.new()
-m.put("First", 1)
+firstInsert = m.put("First", 1)
 map.put(m, "Second", 2)
 m.put("Third", 3)
-m.put("Second", 22)
+previousSecond = m.put("Second", 22)
 keys = m.keys()
 values = map.values(m)
 missing = m.get("Missing")
 removed = map.remove(m, "First")
+plot(na(firstInsert) ? 1 : 0, title="New Put")
+plot(previousSecond, title="Previous Put")
 plot(m.size(), title="Size")
 plot(m.get("Second"), title="Second")
 plot(array.get(keys, 1) == "Second" ? 1 : 0, title="Key Order")
@@ -26,6 +28,8 @@ plot(map.size(m), title="Cleared")
 `);
 
     expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'New Put').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Previous Put').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
     expect(roundSeries(getPlot(result, 'Size').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
     expect(roundSeries(getPlot(result, 'Second').values)).toEqual([22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22]);
     expect(roundSeries(getPlot(result, 'Key Order').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
@@ -59,6 +63,48 @@ plot(array.get(copy.keys(), 1) == "B" ? 1 : 0, title="Existing Order")
     expect(roundSeries(getPlot(result, 'Merged Existing').values)).toEqual([20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]);
     expect(roundSeries(getPlot(result, 'Merged New').values)).toEqual([30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30]);
     expect(roundSeries(getPlot(result, 'Existing Order').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+  });
+
+  it('runs named map argument and receiver precedence idioms', () => {
+    const result = runCompatScript(`
+indicator("Map named arguments")
+left = map.new<string, int>()
+right = map.new<string, int>()
+map.put(id=left, key="A", value=1)
+left.put(key="B", value=2)
+right.put("A", 100)
+previous = left.put(id=right, key="A", value=3)
+leftContains = left.contains(key="A") ? 1 : 0
+rightContains = map.contains(id=right, key="A") ? 1 : 0
+copied = map.copy(id=left)
+map.put_all(id=copied, id2=right)
+removed = copied.remove(key="A")
+leftKeys = left.keys()
+copiedValues = map.values(id=copied)
+right.clear(id=left)
+plot(previous, title="Previous")
+plot(left.get(key="A"), title="Receiver Value")
+plot(na(right.get(key="A")) ? 1 : 0, title="Other Missing")
+plot(leftContains, title="Left Contains")
+plot(rightContains, title="Right Contains")
+plot(array.get(leftKeys, 0) == "A" ? 1 : 0, title="Named Keys")
+plot(removed, title="Named Remove")
+plot(array.get(copiedValues, 0), title="Named Values")
+plot(left.size(), title="Left Size")
+plot(map.size(id=right), title="Right Size")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Previous').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Receiver Value').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Other Missing').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Left Contains').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Right Contains').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Named Keys').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Named Remove').values)).toEqual([100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]);
+    expect(roundSeries(getPlot(result, 'Named Values').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Left Size').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Right Size').values)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   });
 
   it('runs Pine generic map constructor and declaration idioms', () => {
@@ -131,5 +177,30 @@ plot(sum, title="Accumulated")
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Last Result').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
     expect(roundSeries(getPlot(result, 'Accumulated').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+  });
+
+  it('runs documented map history and scope idioms', () => {
+    const result = runCompatScript(`
+indicator("Map history scope")
+globalData = map.new<int, float>()
+update() =>
+    previous = globalData[1]
+    if na(previous)
+        for i = 1 to 3
+            globalData.put(i, close)
+    else
+        for [key, value] in previous
+            globalData.put(key, value + key)
+update()
+values = globalData.values()
+plot(globalData.get(1), title="One")
+plot(values.max(), title="Max")
+plot(values.min(), title="Min")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'One').values)).toEqual([102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113]);
+    expect(roundSeries(getPlot(result, 'Max').values)).toEqual([102, 105, 108, 111, 114, 117, 120, 123, 126, 129, 132, 135]);
+    expect(roundSeries(getPlot(result, 'Min').values)).toEqual([102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113]);
   });
 });

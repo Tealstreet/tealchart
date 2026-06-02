@@ -109,11 +109,13 @@ export class Scope {
   }
 
   /**
-   * Check if a value should be wrapped in a series
-   * Currently: numbers become series for history access
+   * Check if a value should be wrapped in a series.
+   *
+   * Arrays are intentionally excluded because this runtime currently treats
+   * `arrayVar[index]` as element access, while map history uses `mapVar[n]`.
    */
   private shouldBecomeSeries(value: unknown): boolean {
-    return typeof value === 'number';
+    return typeof value === 'number' || isPineMap(value);
   }
 
   // =========================================================================
