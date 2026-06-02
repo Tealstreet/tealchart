@@ -145,10 +145,13 @@ const BUILTIN_FUNCTIONS = new Set([
   'alertcondition',
   'barcolor',
   'bgcolor',
+  'bool',
   'fill',
   'fixnan',
+  'float',
   'hline',
   'indicator',
+  'int',
   'label',
   'line',
   'na',
@@ -159,6 +162,7 @@ const BUILTIN_FUNCTIONS = new Set([
   'plotchar',
   'plotshape',
   'runtime',
+  'string',
   'strategy',
   'time',
   'time_close',
@@ -237,10 +241,13 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['alertcondition', { params: ['condition', 'title', 'message'], minArgs: 1 }],
   ['barcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display'], minArgs: 1 }],
   ['bgcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay'], minArgs: 1 }],
+  ['bool', { params: ['x'], minArgs: 1, maxArgs: 1 }],
   ['color.new', { params: ['color', 'transp'], minArgs: 2, maxArgs: 2 }],
   ['fill', { params: ['hline1', 'hline2', 'color', 'title', 'editable', 'show_last', 'fillgaps', 'display'], minArgs: 3 }],
   ['fixnan', { params: ['source'], minArgs: 1, maxArgs: 1 }],
+  ['float', { params: ['x'], minArgs: 1, maxArgs: 1 }],
   ['hline', { params: ['price', 'title', 'color', 'linestyle', 'linewidth', 'editable', 'display'], minArgs: 1 }],
+  ['int', { params: ['x'], minArgs: 1, maxArgs: 1 }],
   [
     'plot',
     {
@@ -432,6 +439,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['request.security', { params: ['symbol', 'timeframe', 'expression', 'gaps', 'lookahead', 'ignore_invalid_symbol', 'currency', 'calc_bars_count'], minArgs: 3 }],
   ['request.security_lower_tf', { params: ['symbol', 'timeframe', 'expression', 'ignore_invalid_symbol', 'currency', 'ignore_invalid_timeframe', 'calc_bars_count'], minArgs: 3 }],
   ['runtime.error', { params: ['message'], minArgs: 1, maxArgs: 1 }],
+  ['string', { params: ['x'], minArgs: 1, maxArgs: 1 }],
   ['strategy.cancel', { params: ['id'], minArgs: 1, maxArgs: 1 }],
   ['strategy.cancel_all', { params: [], minArgs: 0, maxArgs: 0 }],
   ['strategy.close', { params: ['id', 'comment', 'qty', 'qty_percent', 'alert_message', 'immediately', 'disable_alert'], minArgs: 1 }],
@@ -1242,6 +1250,7 @@ class SemanticChecker {
 
   private checkIf(statement: IfStatement, scope: SemanticScope): void {
     this.checkExpression(statement.test, scope);
+    this.checkBooleanContext(statement.test, scope);
     this.checkStatements(statement.consequent, new SemanticScope(scope));
     if (Array.isArray(statement.alternate)) {
       this.checkStatements(statement.alternate, new SemanticScope(scope));
@@ -1295,7 +1304,41 @@ class SemanticChecker {
 
   private checkWhile(statement: WhileStatement, scope: SemanticScope): void {
     this.checkExpression(statement.test, scope);
+    this.checkBooleanContext(statement.test, scope);
     this.checkStatements(statement.body, new SemanticScope(scope));
+  }
+
+  private checkDirectNaComparison(expression: Expression): void {
+    if (expression.type !== 'BinaryExpression' || (expression.operator !== '==' && expression.operator !== '!=')) return;
+    if (!this.isNaLiteralExpression(expression.left) && !this.isNaLiteralExpression(expression.right)) return;
+
+    this.addDiagnostic(
+      'invalid-na-comparison',
+      'Do not compare directly to na; use na(value) instead',
+      expression.loc,
+    );
+  }
+
+  private checkLogicalOperands(expression: Expression, scope: SemanticScope): void {
+    if (expression.type !== 'BinaryExpression' || (expression.operator !== 'and' && expression.operator !== 'or')) return;
+
+    this.checkBooleanContext(expression.left, scope);
+    this.checkBooleanContext(expression.right, scope);
+  }
+
+  private checkBooleanContext(expression: Expression, scope: SemanticScope): void {
+    const type = this.inferExpressionType(expression, scope);
+    if (!this.isNumericType(type)) return;
+
+    this.addDiagnostic(
+      'implicit-numeric-bool',
+      `Numeric ${type.kind} expression cannot be used as a boolean; compare it explicitly or wrap it in bool(...)`,
+      expression.loc,
+    );
+  }
+
+  private isNaLiteralExpression(expression: Expression): boolean {
+    return expression.type === 'NaExpression';
   }
 
   private checkExpression(expression: Expression, scope: SemanticScope): void {
@@ -1312,12 +1355,16 @@ class SemanticChecker {
       case 'BinaryExpression':
         this.checkExpression(expression.left, scope);
         this.checkExpression(expression.right, scope);
+        this.checkDirectNaComparison(expression);
+        this.checkLogicalOperands(expression, scope);
         break;
       case 'UnaryExpression':
         this.checkExpression(expression.argument, scope);
         break;
       case 'ConditionalExpression':
-        this.checkExpressions(scope, [expression.test, expression.consequent, expression.alternate]);
+        this.checkExpression(expression.test, scope);
+        this.checkBooleanContext(expression.test, scope);
+        this.checkExpressions(scope, [expression.consequent, expression.alternate]);
         break;
       case 'SwitchExpression':
         this.checkSwitchExpression(expression, scope);
@@ -2059,7 +2106,7 @@ class SemanticChecker {
       case 'Identifier':
         return this.inferIdentifierType(expression, scope);
       case 'BinaryExpression':
-        return { kind: 'unknown', qualifier: this.maxQualifier(this.inferExpressionType(expression.left, scope), this.inferExpressionType(expression.right, scope)) };
+        return this.inferBinaryExpressionType(expression, scope);
       case 'UnaryExpression':
         return { kind: 'unknown', qualifier: this.inferExpressionType(expression.argument, scope).qualifier };
       case 'ConditionalExpression':
@@ -2088,6 +2135,44 @@ class SemanticChecker {
     }
   }
 
+  private inferBinaryExpressionType(expression: Expression, scope: SemanticScope): SemanticType {
+    if (expression.type !== 'BinaryExpression') return { kind: 'unknown' };
+
+    const leftType = this.inferExpressionType(expression.left, scope);
+    const rightType = this.inferExpressionType(expression.right, scope);
+    const qualifier = this.maxQualifier(leftType, rightType);
+
+    if (
+      expression.operator === '=='
+      || expression.operator === '!='
+      || expression.operator === '<'
+      || expression.operator === '>'
+      || expression.operator === '<='
+      || expression.operator === '>='
+      || expression.operator === 'and'
+      || expression.operator === 'or'
+    ) {
+      return { kind: 'bool', qualifier };
+    }
+
+    if (
+      expression.operator === '+'
+      || expression.operator === '-'
+      || expression.operator === '*'
+      || expression.operator === '/'
+      || expression.operator === '%'
+    ) {
+      if (this.isNumericType(leftType) && this.isNumericType(rightType)) {
+        return {
+          kind: leftType.kind === 'float' || rightType.kind === 'float' || expression.operator === '/' ? 'float' : 'int',
+          qualifier,
+        };
+      }
+    }
+
+    return { kind: 'unknown', qualifier };
+  }
+
   private inferIdentifierType(identifier: Identifier, scope: SemanticScope): SemanticType {
     const builtinType = BUILTIN_GLOBAL_TYPES.get(identifier.name);
     if (builtinType) return builtinType;
@@ -2107,6 +2192,10 @@ class SemanticChecker {
     if (namespace === 'request' || namespace === 'ta' || namespace === 'time' || namespace === 'time_close' || calleePath.join('.') === 'timeframe.change') {
       return { kind: 'unknown', qualifier: 'series' };
     }
+    if (calleePath.join('.') === 'bool') return { kind: 'bool', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+    if (calleePath.join('.') === 'float') return { kind: 'float', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+    if (calleePath.join('.') === 'int') return { kind: 'int', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+    if (calleePath.join('.') === 'string') return { kind: 'string', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
     if (calleePath.join('.') === 'timeframe.in_seconds') return { kind: 'int', qualifier: 'simple' };
     if (calleePath.join('.') === 'timeframe.from_seconds') return { kind: 'string', qualifier: 'simple' };
     if (CALENDAR_FUNCTION_NAMES.has(calleePath.join('.'))) return { kind: 'int', qualifier: 'series' };
@@ -2324,6 +2413,10 @@ class SemanticChecker {
     return { kind: 'unknown' };
   }
 
+  private inferCallArgumentMaxQualifier(expression: CallExpression, scope: SemanticScope): SemanticQualifier | undefined {
+    return this.maxQualifier(...expression.arguments.map((argument) => this.inferExpressionType(argument.value, scope)));
+  }
+
   private arrayElementTypeKind(type: SemanticType): SemanticType {
     if (PRIMITIVE_TYPE_KINDS.has(type.kind)) return { kind: type.kind };
     if (REFERENCE_TYPE_KINDS.has(type.kind)) return { kind: type.kind };
@@ -2469,6 +2562,10 @@ class SemanticChecker {
   private formatSemanticTypeWithQualifier(type: SemanticType): string {
     const formattedType = this.formatSemanticType(type);
     return type.qualifier ? `${type.qualifier} ${formattedType}` : formattedType;
+  }
+
+  private isNumericType(type: SemanticType): type is SemanticType & { kind: 'int' | 'float' } {
+    return type.kind === 'int' || type.kind === 'float';
   }
 
   private declare(scope: SemanticScope, symbol: SemanticSymbol): void {

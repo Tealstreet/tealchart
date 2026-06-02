@@ -650,7 +650,9 @@ unblocked:
 
 1. Source-of-truth cleanup: fix stale `PINE_COMPATIBILITY.md` claims and link
    this roadmap.
-2. Core semantics: `na`, truthiness, cast, and equality parity fixtures.
+2. Core semantics: `na`, truthiness, cast, and equality parity fixtures. The
+   direct `na` comparison and known numeric-to-bool diagnostic slice is covered;
+   continue expanding runtime fixtures as new edge cases appear.
 3. Member/index assignment: make parsed assignment targets work or emit precise
    diagnostics.
 4. `request.security()` design doc plus deterministic datafeed fixture harness.

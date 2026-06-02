@@ -65,6 +65,52 @@ plot(na(time("60", session.regular)) ? 0 : 1)
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('accepts explicit Pine boolean and na guard idioms', () => {
+    const result = checkProgram(parse(`
+indicator("Boolean Guards")
+isGreen = close > open
+gap = close[100]
+if isGreen and not na(gap)
+    plot(bool(gap), title="Gap")
+plot(na(gap) ? 0 : 1, title="Present")
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports direct na comparisons', () => {
+    const result = checkProgram(parse(`
+indicator("Direct NA")
+gap = close[100]
+plot(gap == na ? 1 : 0)
+plot(na != gap ? 1 : 0)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Do not compare directly to na; use na(value) instead',
+      'Do not compare directly to na; use na(value) instead',
+    ]);
+  });
+
+  it('reports numeric expressions used as booleans', () => {
+    const result = checkProgram(parse(`
+indicator("Numeric Bool")
+if close
+    plot(close)
+plot(volume ? 1 : 0)
+while bar_index
+    break
+plot((close > open) and volume ? 1 : 0)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Numeric float expression cannot be used as a boolean; compare it explicitly or wrap it in bool(...)',
+      'Numeric float expression cannot be used as a boolean; compare it explicitly or wrap it in bool(...)',
+      'Numeric int expression cannot be used as a boolean; compare it explicitly or wrap it in bool(...)',
+      'Numeric float expression cannot be used as a boolean; compare it explicitly or wrap it in bool(...)',
+    ]);
+  });
+
   it('accepts timeframe utility functions with named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Timeframe Utilities")
