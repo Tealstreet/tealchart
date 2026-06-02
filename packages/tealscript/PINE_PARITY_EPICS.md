@@ -519,12 +519,25 @@ Phases:
 
 1. Complete `alert()` frequency behavior: all calls, once per bar, and once per
    bar close.
+   Runtime coverage now emits `freq_all`, `freq_once_per_bar`, and
+   `freq_once_per_bar_close` events with per-call-site throttling and
+   confirmed-bar suppression.
 2. Complete `alertcondition()` static title/message behavior and placeholder
    handling.
+   Runtime coverage now preserves static title/message templates and rendered
+   OHLCV, chart, and plot placeholders per triggered bar.
 3. Add strategy order-fill alert message support after strategy runtime starts.
+   Runtime coverage now emits `strategy_order_fills` events from
+   `alert_message` fields when strategy orders fill.
 4. Implement `log.*` levels and UI/worker plumbing for Pine Logs-style output.
+   Runtime and worker coverage now returns `log.info`, `log.warning`, and
+   `log.error` outputs with level, bar index, bar time, and formatted message.
+   Semantic coverage now recognizes the `log` namespace and validates the
+   variadic `message` signature before runtime.
 5. Add realtime alert tests so historical calculation does not emit false live
    alerts.
+   Realtime coverage now truncates alerts/logs before same-timestamp
+   re-execution and marks direct alert events with `isRealtime`.
 
 Done means scripts can produce trustworthy runtime events, not just plots.
 
