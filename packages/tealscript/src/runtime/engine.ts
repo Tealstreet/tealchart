@@ -31,6 +31,7 @@ import type {
   MemberExpression,
   IndexExpression,
 } from '../parser/ast';
+import { isExportableBuiltinConstantPath } from '../builtinMetadata';
 
 import {
   absArrayValue,
@@ -1043,7 +1044,7 @@ export class TealscriptEngine {
       }
       case 'MemberExpression': {
         const memberPath = this.getMemberPath(expression);
-        if (!memberPath) return undefined;
+        if (!memberPath || !isExportableBuiltinConstantPath(memberPath)) return undefined;
         return this.evaluateBuiltinMemberConstant(memberPath);
       }
       default:
