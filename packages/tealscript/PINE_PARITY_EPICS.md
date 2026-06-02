@@ -698,4 +698,7 @@ this list focused on gaps that are not already covered by the epic notes above.
    `STRATEGY_INTRABAR_DESIGN.md` now records the host data contract, default
    OHLC path fallback, Bar Magnifier requirements, recalculation knobs, and
    implementation sequence for this gap.
+   The first implementation step now exports inert strategy intrabar context
+   types and an in-memory fixture datafeed so later fill-path PRs can stay
+   deterministic.
 10. Real Pine checkpoint expansion for drawing-heavy public idioms.
