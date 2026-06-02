@@ -1779,7 +1779,7 @@ class SemanticChecker {
 
     this.addDiagnostic(
       'method-receiver-type',
-      `No method ${expression.callee.property.name}() overload accepts ${this.formatSemanticType(receiverType)} receiver`,
+      `No method ${expression.callee.property.name}() overload accepts ${this.formatSemanticTypeWithQualifier(receiverType)} receiver`,
       expression.callee.property.loc,
     );
   }
@@ -2382,6 +2382,11 @@ class SemanticChecker {
       default:
         return type.kind;
     }
+  }
+
+  private formatSemanticTypeWithQualifier(type: SemanticType): string {
+    const formattedType = this.formatSemanticType(type);
+    return type.qualifier ? `${type.qualifier} ${formattedType}` : formattedType;
   }
 
   private declare(scope: SemanticScope, symbol: SemanticSymbol): void {
