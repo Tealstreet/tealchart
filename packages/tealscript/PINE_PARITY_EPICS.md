@@ -554,7 +554,8 @@ stop, stop-limit, bracket, trailing-stop, partial-exit, OCA-cancel,
 pyramiding, and reversal flows are covered. Full TradingView intrabar path
 parity, bar magnifier, and lower-timeframe fill simulation remain deferred
 future work because they require an explicit intrabar data model rather than the
-current OHLC-only execution model.
+current OHLC-only execution model. Semantic coverage now validates common
+strategy order, close/cancel, and trade-accessor call shapes before runtime.
 
 Phases:
 

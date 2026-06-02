@@ -182,6 +182,47 @@ const STRUCTURED_TYPE_KINDS = new Set<SemanticTypeKind>(['array', 'matrix', 'map
 const COLLECTION_TEMPLATE_TYPE_PATTERN = /^(array|matrix|map)</;
 const UNKNOWN_SEMANTIC_TYPE: SemanticType = { kind: 'unknown' };
 
+const STRATEGY_ORDER_PARAMS = ['id', 'direction', 'qty', 'limit', 'stop', 'oca_name', 'oca_type', 'comment', 'alert_message', 'disable_alert'];
+const STRATEGY_EXIT_PARAMS = [
+  'id',
+  'from_entry',
+  'qty',
+  'qty_percent',
+  'profit',
+  'limit',
+  'loss',
+  'stop',
+  'trail_price',
+  'trail_points',
+  'trail_offset',
+  'oca_name',
+  'comment',
+  'comment_profit',
+  'comment_loss',
+  'comment_trailing',
+  'alert_message',
+  'alert_profit',
+  'alert_loss',
+  'alert_trailing',
+  'disable_alert',
+];
+const STRATEGY_TRADE_ACCESSORS = [
+  'entry_id',
+  'entry_price',
+  'entry_bar_index',
+  'entry_time',
+  'size',
+  'profit',
+  'commission',
+];
+const STRATEGY_CLOSED_TRADE_ACCESSORS = [
+  ...STRATEGY_TRADE_ACCESSORS,
+  'exit_id',
+  'exit_price',
+  'exit_bar_index',
+  'exit_time',
+];
+
 interface BuiltinSignature {
   params: string[];
   overloads?: string[][];
@@ -391,6 +432,13 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['request.security', { params: ['symbol', 'timeframe', 'expression', 'gaps', 'lookahead', 'ignore_invalid_symbol', 'currency', 'calc_bars_count'], minArgs: 3 }],
   ['request.security_lower_tf', { params: ['symbol', 'timeframe', 'expression', 'ignore_invalid_symbol', 'currency', 'ignore_invalid_timeframe', 'calc_bars_count'], minArgs: 3 }],
   ['runtime.error', { params: ['message'], minArgs: 1, maxArgs: 1 }],
+  ['strategy.cancel', { params: ['id'], minArgs: 1, maxArgs: 1 }],
+  ['strategy.cancel_all', { params: [], minArgs: 0, maxArgs: 0 }],
+  ['strategy.close', { params: ['id', 'comment', 'qty', 'qty_percent', 'alert_message', 'immediately', 'disable_alert'], minArgs: 1 }],
+  ['strategy.close_all', { params: ['comment', 'alert_message', 'immediately', 'disable_alert'], minArgs: 0 }],
+  ['strategy.entry', { params: STRATEGY_ORDER_PARAMS, minArgs: 2 }],
+  ['strategy.exit', { params: STRATEGY_EXIT_PARAMS, minArgs: 1 }],
+  ['strategy.order', { params: STRATEGY_ORDER_PARAMS, minArgs: 2 }],
   ['ta.atr', { params: ['length'], minArgs: 1, maxArgs: 1 }],
   ['ta.ema', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
   ['ta.rsi', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
@@ -407,6 +455,14 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
 
 for (const name of CALENDAR_FUNCTION_NAMES) {
   BUILTIN_SIGNATURES.set(name, { params: ['time', 'timezone'], minArgs: 1, maxArgs: 2 });
+}
+
+for (const name of STRATEGY_TRADE_ACCESSORS) {
+  BUILTIN_SIGNATURES.set(`strategy.opentrades.${name}`, { params: ['trade_num'], minArgs: 1, maxArgs: 1 });
+}
+
+for (const name of STRATEGY_CLOSED_TRADE_ACCESSORS) {
+  BUILTIN_SIGNATURES.set(`strategy.closedtrades.${name}`, { params: ['trade_num'], minArgs: 1, maxArgs: 1 });
 }
 
 export function checkProgram(program: Program): SemanticCheckResult {
@@ -1371,7 +1427,7 @@ class SemanticChecker {
     const displayName = this.memberPath(expression.callee).join('.');
     const signature = BUILTIN_SIGNATURES.get(displayName);
     if (!signature) {
-      this.checkUnsupportedLogCall(expression, displayName);
+      this.checkUnsupportedBuiltinNamespaceCall(expression, displayName);
       return;
     }
 
@@ -1381,9 +1437,10 @@ class SemanticChecker {
     this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName);
   }
 
-  private checkUnsupportedLogCall(expression: CallExpression, displayName: string): void {
+  private checkUnsupportedBuiltinNamespaceCall(expression: CallExpression, displayName: string): void {
     if (expression.callee.type !== 'MemberExpression') return;
-    if (expression.callee.object.type !== 'Identifier' || expression.callee.object.name !== 'log') return;
+    const namespace = this.memberPath(expression.callee)[0];
+    if (namespace !== 'log' && namespace !== 'strategy') return;
     this.addDiagnostic('unknown-function', `Unknown function: ${displayName}`, expression.callee.loc);
   }
 
