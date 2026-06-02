@@ -105,6 +105,26 @@ export interface SessionClassificationInfo {
   premarket: string;
   postmarket: string;
   timezone: string;
+  /**
+   * Exchange-local closed dates in zero-padded YYYY-MM-DD format. The engine
+   * computes this date with the runtime/builtin timezone rules and matches by
+   * trim() plus strict equality, so format and timezone alignment must be exact.
+   */
+  closedDates?: string[];
+  closures?: SessionClosureInfo[];
+}
+
+export type SessionClosureKind = 'premarket' | 'regular' | 'postmarket' | 'extended' | 'all';
+
+export interface SessionClosureInfo {
+  /**
+   * Exchange-local closure date in zero-padded YYYY-MM-DD format. The engine
+   * computes this date with the runtime/builtin timezone rules and matches by
+   * trim() plus strict equality, so format and timezone alignment must be exact.
+   */
+  date: string;
+  sessions?: SessionClosureKind[];
+  reason?: string;
 }
 
 /**

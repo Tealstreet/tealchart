@@ -89,7 +89,7 @@ import {
   registerTableBuiltins,
   type DrawingBuiltinRuntime,
 } from './builtins/drawings';
-import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type ChartPoint, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LogLevel, type LogOutput, type PlotLineStyle, type PlotOutput, type PlotStyle, type SessionClassificationInfo, type SymInfo, type TimeframeInfo } from './context';
+import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type ChartPoint, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LogLevel, type LogOutput, type PlotLineStyle, type PlotOutput, type PlotStyle, type SessionClassificationInfo, type SessionClosureKind, type SymInfo, type TimeframeInfo } from './context';
 import {
   getDrawingValue,
   toDrawingId as toDrawingIdValue,
@@ -302,6 +302,7 @@ interface ImportedLibrary {
 }
 
 type TimeframeUnit = 'tick' | 'second' | 'minute' | 'day' | 'week' | 'month';
+type RuntimeSessionKind = Extract<SessionClosureKind, 'premarket' | 'regular' | 'postmarket' | 'extended'>;
 
 interface TimeframeSpec {
   period: string;
@@ -6292,6 +6293,9 @@ export class TealscriptEngine {
 
     const timezone = this.runtimeOptions.session?.timezone?.trim()
       || this.ctx.syminfo.timezone;
+    if (this.isExchangeSessionClosed(timestamp, timezone, kind)) {
+      return false;
+    }
     return this.isTimestampInSession(timestamp, session, timezone);
   }
 
@@ -7920,6 +7924,9 @@ export class TealscriptEngine {
     const timezone = timezoneArg === undefined || timezoneArg === '' ? this.ctx.syminfo.timezone : this.toStringValue(timezoneArg);
 
     if (!Number.isFinite(timestamp)) return Number.NaN;
+    if (session && this.isExchangeSessionClosed(timestamp, timezone, this.getRuntimeSessionKind(session, timestamp, timezone))) {
+      return Number.NaN;
+    }
     if (session && !this.isTimestampInSession(timestamp, session, timezone)) {
       return Number.NaN;
     }
@@ -8162,6 +8169,61 @@ export class TealscriptEngine {
     if (!periods || !/^[1-7]+$/.test(days)) return false;
 
     return periods.split(',').some((period) => this.isTimestampInSessionPeriod(timestamp, period.trim(), days, timezone));
+  }
+
+  private isExchangeSessionClosed(timestamp: number, timezone: string, kind?: RuntimeSessionKind): boolean {
+    const session = this.runtimeOptions.session;
+    if (!session) return false;
+
+    const localDate = this.getExchangeCalendarDate(timestamp, timezone);
+    if (session.closedDates?.some((date) => date.trim() === localDate)) {
+      return true;
+    }
+
+    return session.closures?.some((closure) => {
+      if (closure.date.trim() !== localDate) return false;
+      const sessions = closure.sessions;
+      if (!sessions || sessions.length === 0 || sessions.includes('all')) return true;
+      if (!kind) return false;
+      if (sessions.includes(kind)) return true;
+      if (kind === 'extended') {
+        return this.isClosedExtendedSessionSegment(timestamp, timezone, sessions);
+      }
+      return sessions.includes('extended');
+    }) ?? false;
+  }
+
+  private getRuntimeSessionKind(session: string, timestamp: number, timezone: string): RuntimeSessionKind | undefined {
+    const normalized = session.trim().toLowerCase();
+    if (normalized === 'regular' || normalized === 'session.regular') return 'regular';
+    if (normalized === 'extended' || normalized === 'session.extended') return 'extended';
+
+    for (const kind of ['premarket', 'regular', 'postmarket'] as const) {
+      if (this.isRuntimeSessionSegmentActive(timestamp, kind, timezone) && this.isTimestampInSession(timestamp, session, timezone)) {
+        return kind;
+      }
+    }
+    return undefined;
+  }
+
+  private isClosedExtendedSessionSegment(timestamp: number, timezone: string, sessions: SessionClosureKind[]): boolean {
+    return (['premarket', 'regular', 'postmarket'] as const).some((kind) => (
+      sessions.includes(kind) && this.isRuntimeSessionSegmentActive(timestamp, kind, timezone)
+    ));
+  }
+
+  private isRuntimeSessionSegmentActive(timestamp: number, kind: 'premarket' | 'regular' | 'postmarket', timezone: string): boolean {
+    const session = this.runtimeOptions.session?.[kind];
+    if (session === undefined || session === '') return false;
+    const sessionTimezone = this.runtimeOptions.session?.timezone?.trim() || timezone;
+    return this.isTimestampInSession(timestamp, session, sessionTimezone);
+  }
+
+  private getExchangeCalendarDate(timestamp: number, timezone: string): string {
+    const year = this.getCalendarPart('year', timestamp, timezone);
+    const month = this.getCalendarPart('month', timestamp, timezone);
+    const day = this.getCalendarPart('dayofmonth', timestamp, timezone);
+    return `${year.toString().padStart(4, '0')}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
   }
 
   private isTimestampInSessionPeriod(timestamp: number, period: string, days: string, timezone: string): boolean {

@@ -283,9 +283,11 @@ Phases:
    intraday, day, and week buckets, including timezone-aware DST boundaries.
 
 Done means session filters and MTF time gates behave like Pine across common
-markets. Remaining follow-up belongs to exchange-specific calendar holiday
-models, host-provided live chart metadata/session injection, and additional
-dynamic-session checkpoint fixtures from real Pine scripts.
+markets. Host-provided exchange closures can now suppress session-filtered
+`time()` calls and session-state helpers for all-day holidays or
+session-scoped closures. Remaining follow-up belongs to exchange calendar
+catalog ingestion in the host, live chart metadata/session injection, and
+additional dynamic-session checkpoint fixtures from real Pine scripts.
 
 ## Epic 8: `request.*` And Multi-Context Data Engine
 
@@ -669,8 +671,9 @@ this list focused on gaps that are not already covered by the epic notes above.
 4. Request data follow-up: `request.footprint()` has an explicit host-data
    model and deferral plan; implement it only after footprint/intrabar-volume
    data is available from the host.
-5. Exchange calendar/session model: holiday-aware sessions, host-provided live
-   chart metadata/session injection, and dynamic-session checkpoint expansion.
+5. Host integration for exchange calendars: ingest exchange calendar catalogs,
+   live chart metadata/session injection, and dynamic-session checkpoint
+   expansion.
 6. `matrix.*` reference reconciliation.
 7. `map.*` reference reconciliation.
 8. Library import/export MVP.
