@@ -746,6 +746,56 @@ badFrom = array.from(value=1)
     ]);
   });
 
+  it('resolves extended array helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Array Extended Signatures")
+values = array.from(3, 1, 2)
+other = array.from(4, 5)
+array.fill(id=values, value=7, index_from=0, index_to=1)
+window = array.slice(id=values, index_from=0, index_to=2)
+array.reverse(id=window)
+array.concat(id=values, id2=other)
+array.sort(id=values, order=order.ascending)
+array.sort(id=values, order=order.descending, sort_field=0)
+indices = array.sort_indices(id=values, order=order.descending)
+joined = array.join(id=window, separator=",")
+plain = array.join(id=window)
+plot(array.size(values) + array.size(window) + array.size(indices) + str.length(joined) + str.length(plain))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid extended array helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Array Extended Signatures")
+values = array.from(3, 1, 2)
+other = array.from(4, 5)
+duplicateConcat = array.concat(values, id=other)
+unknownFill = array.fill(id=values, item=1)
+missingSlice = array.slice(id=values, index_from=0)
+tooManyReverse = array.reverse(values, other)
+tooManyJoin = array.join(values, ",", ";")
+unknownSort = array.sort(id=values, direction=order.ascending)
+tooManySortIndices = array.sort_indices(values, order.ascending, 1)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'array.concat() expects at least 2 arguments',
+      "array.concat() missing required argument 'id2'",
+      "Argument 'id' for array.concat() was supplied multiple times",
+      "Unknown argument 'item' for array.fill()",
+      'array.fill() expects at least 2 arguments',
+      "array.fill() missing required argument 'value'",
+      'array.slice() expects at least 3 arguments',
+      "array.slice() missing required argument 'index_to'",
+      'array.reverse() expects at most 1 argument',
+      'array.join() expects at most 2 arguments',
+      "Unknown argument 'direction' for array.sort()",
+      'array.sort_indices() expects at most 2 arguments',
+    ]);
+  });
+
   it('reports array element template mismatches for known mutable arrays', () => {
     const result = checkProgram(parse(`
 indicator("Bad Array Types")

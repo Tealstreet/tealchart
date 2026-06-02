@@ -622,6 +622,14 @@ for (const name of ['array.insert', 'array.set']) {
   BUILTIN_SIGNATURES.set(name, { params: ['id', 'index', 'value'], minArgs: 3, maxArgs: 3 });
 }
 
+BUILTIN_SIGNATURES.set('array.concat', { params: ['id', 'id2'], minArgs: 2, maxArgs: 2 });
+BUILTIN_SIGNATURES.set('array.fill', { params: ['id', 'value', 'index_from', 'index_to'], minArgs: 2, maxArgs: 4 });
+BUILTIN_SIGNATURES.set('array.join', { params: ['id', 'separator'], minArgs: 1, maxArgs: 2 });
+BUILTIN_SIGNATURES.set('array.reverse', { params: ['id'], minArgs: 1, maxArgs: 1 });
+BUILTIN_SIGNATURES.set('array.slice', { params: ['id', 'index_from', 'index_to'], minArgs: 3, maxArgs: 3 });
+BUILTIN_SIGNATURES.set('array.sort', { params: ['id', 'order', 'sort_field'], minArgs: 1, maxArgs: 3 });
+BUILTIN_SIGNATURES.set('array.sort_indices', { params: ['id', 'order'], minArgs: 1, maxArgs: 2 });
+
 BUILTIN_SIGNATURES.set('array.from', { params: [], minArgs: 0, allowExtraPositional: true });
 
 export function checkProgram(program: Program): SemanticCheckResult {
