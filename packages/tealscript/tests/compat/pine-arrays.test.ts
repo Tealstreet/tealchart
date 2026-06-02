@@ -310,16 +310,18 @@ plot(values.size(), title="Size")
     const result = runCompatScript(`
 indicator("Array statistical helpers")
 values = array.from(1, 2, 3, 4)
-absValues = array.abs(array.from(-2, 3))
-standardized = values.standardize()
+other = array.from(2, 4, 6, 8)
+absValues = array.abs(id=array.from(-2, 3))
+standardized = array.standardize(id=values)
 plot(array.range(values), title="Range")
 plot(array.median(values), title="Median")
 plot(array.mode(array.from(2, 1, 2, 3)), title="Mode")
-plot(array.variance(values), title="Variance")
-plot(array.stdev(values, false), title="Unbiased Stdev")
-plot(array.percentile_nearest_rank(values, 50), title="Nearest Rank")
-plot(array.percentile_linear_interpolation(values, 50), title="Linear Percentile")
-plot(array.percentrank(values, 2), title="Percent Rank")
+plot(array.variance(id=values), title="Variance")
+plot(array.stdev(id=values, biased=false), title="Unbiased Stdev")
+plot(array.covariance(id1=values, other, biased=true), title="Covariance")
+plot(array.percentile_nearest_rank(id=values, percentage=50), title="Nearest Rank")
+plot(array.percentile_linear_interpolation(id=values, percentage=50), title="Linear Percentile")
+plot(array.percentrank(id=values, value=2), title="Percent Rank")
 plot(array.get(standardized, 0), title="Standardized First")
 plot(array.get(absValues, 0), title="Abs First")
 `);
@@ -330,6 +332,7 @@ plot(array.get(absValues, 0), title="Abs First")
     expect(roundSeries(getPlot(result, 'Mode').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
     expect(roundSeries(getPlot(result, 'Variance').values)).toEqual([1.25, 1.25, 1.25, 1.25, 1.25, 1.25, 1.25, 1.25, 1.25, 1.25, 1.25, 1.25]);
     expect(roundSeries(getPlot(result, 'Unbiased Stdev').values)).toEqual([1.290994, 1.290994, 1.290994, 1.290994, 1.290994, 1.290994, 1.290994, 1.290994, 1.290994, 1.290994, 1.290994, 1.290994]);
+    expect(roundSeries(getPlot(result, 'Covariance').values)).toEqual([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5]);
     expect(roundSeries(getPlot(result, 'Nearest Rank').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
     expect(roundSeries(getPlot(result, 'Linear Percentile').values)).toEqual([2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5]);
     expect(roundSeries(getPlot(result, 'Percent Rank').values)).toEqual([75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75]);
