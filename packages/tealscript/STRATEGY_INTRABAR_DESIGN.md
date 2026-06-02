@@ -100,6 +100,8 @@ export interface StrategyIntrabarDatafeed {
 export class InMemoryStrategyIntrabarDatafeed implements StrategyIntrabarDatafeed {
   getStrategyIntrabars(request: StrategyIntrabarRequest): StrategyIntrabarResult;
 }
+
+export function createDefaultStrategyOhlcIntrabarContext(request: StrategyIntrabarRequest): StrategyIntrabarContext;
 ```
 
 The host must return ticks ordered by execution sequence. The runtime should not
@@ -165,8 +167,10 @@ must stay offline and deterministic.
 ## Implementation Sequence
 
 1. Add exported strategy intrabar data types and an in-memory fixture datafeed.
+   Done.
 2. Add chart-OHLC execution-path generation and tests for Pine's default path
    assumptions.
+   Done.
 3. Thread `use_bar_magnifier` from `strategy()` settings to the runtime ledger
    and path provider.
 4. Implement lower-timeframe path selection with explicit fallback metadata.

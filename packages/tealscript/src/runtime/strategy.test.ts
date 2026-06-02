@@ -5,6 +5,7 @@ import {
   cloneStrategyIntrabarContext,
   cloneStrategyLedger,
   createDefaultStrategySettings,
+  createDefaultStrategyOhlcIntrabarContext,
   createStrategyLedger,
   createStrategyOrder,
   createStrategyPosition,
@@ -86,6 +87,43 @@ describe('strategy ledger model', () => {
       code: 'missing_context',
       message: 'No strategy intrabar context for BINANCE:ETHUSDT 1D 1700000000000',
     });
+  });
+
+  it('builds Pine default OHLC execution paths for chart bars', () => {
+    const highFirst = createDefaultStrategyOhlcIntrabarContext({
+      symbol: 'BINANCE:BTCUSDT',
+      timeframe: '1D',
+      chartBarTime: 1_700_000_000_000,
+      chartBarIndex: 7,
+      chartBar: { time: 1_700_000_000_000, open: 108, high: 110, low: 95, close: 101, volume: 1_000 },
+    });
+
+    expect(highFirst.source).toBe('chart_ohlc');
+    expect(highFirst.ticks.map((tick) => tick.kind)).toEqual(['open', 'high', 'low', 'close']);
+    expect(highFirst.ticks.map((tick) => tick.price)).toEqual([108, 110, 95, 101]);
+    expect(highFirst.ticks.map((tick) => tick.sequence)).toEqual([0, 1, 2, 3]);
+    expect(highFirst.ticks.every((tick) => tick.sourceBarIndex === 7)).toBe(true);
+
+    const lowFirst = createDefaultStrategyOhlcIntrabarContext({
+      symbol: 'BINANCE:BTCUSDT',
+      timeframe: '1D',
+      chartBarTime: 1_700_086_400_000,
+      chartBarIndex: 8,
+      chartBar: { time: 1_700_086_400_000, open: 97, high: 110, low: 95, close: 104, volume: 1_100 },
+    });
+
+    expect(lowFirst.ticks.map((tick) => tick.kind)).toEqual(['open', 'low', 'high', 'close']);
+    expect(lowFirst.ticks.map((tick) => tick.price)).toEqual([97, 95, 110, 104]);
+
+    const equalDistance = createDefaultStrategyOhlcIntrabarContext({
+      symbol: 'BINANCE:BTCUSDT',
+      timeframe: '1D',
+      chartBarTime: 1_700_172_800_000,
+      chartBarIndex: 9,
+      chartBar: { time: 1_700_172_800_000, open: 100, high: 105, low: 95, close: 102, volume: 1_200 },
+    });
+
+    expect(equalDistance.ticks.map((tick) => tick.kind)).toEqual(['open', 'low', 'high', 'close']);
   });
 
   it('creates Pine-like default strategy settings with overrides', () => {

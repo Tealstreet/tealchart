@@ -701,4 +701,6 @@ this list focused on gaps that are not already covered by the epic notes above.
    The first implementation step now exports inert strategy intrabar context
    types and an in-memory fixture datafeed so later fill-path PRs can stay
    deterministic.
+   Default chart-OHLC execution-path generation is now covered for Pine's
+   high-first and low-first fallback assumptions.
 10. Real Pine checkpoint expansion for drawing-heavy public idioms.

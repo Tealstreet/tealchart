@@ -97,6 +97,7 @@ export {
   cancelStrategyOrder,
   cloneStrategyIntrabarContext,
   cloneStrategyLedger,
+  createDefaultStrategyOhlcIntrabarContext,
   createStrategyOrder,
   fillStrategyMarketOrder,
   fillPendingStrategyOrders,
