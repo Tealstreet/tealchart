@@ -94,14 +94,45 @@ function callArg(args: unknown[], namedArgs: Map<string, unknown>, index: number
   return namedArgs.has(name) ? namedArgs.get(name) : args[index] !== undefined ? args[index] : fallback;
 }
 
+function orderedCallArg(
+  args: unknown[],
+  namedArgs: Map<string, unknown>,
+  names: readonly string[],
+  index: number,
+  fallback?: unknown,
+): unknown {
+  const name = names[index];
+  const positionalIndex = index - names.slice(0, index).filter((priorName) => namedArgs.has(priorName)).length;
+  return name && namedArgs.has(name)
+    ? namedArgs.get(name)
+    : args[positionalIndex] !== undefined
+      ? args[positionalIndex]
+      : fallback;
+}
+
 export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
+  const labelNewArgs = [
+    'x',
+    'y',
+    'text',
+    'xloc',
+    'yloc',
+    'color',
+    'style',
+    'textcolor',
+    'size',
+    'textalign',
+    'tooltip',
+    'force_overlay',
+  ] as const;
+
   builtins.set('label.new', (args, namedArgs, ctx, _scope, callId) => {
-    const x = runtime.toNullableNumber(namedArgs.get('x') ?? args[0]);
-    const y = runtime.toNullableNumber(namedArgs.get('y') ?? args[1]);
-    const text = runtime.toStringValue(namedArgs.get('text') ?? args[2] ?? '');
+    const x = runtime.toNullableNumber(orderedCallArg(args, namedArgs, labelNewArgs, 0));
+    const y = runtime.toNullableNumber(orderedCallArg(args, namedArgs, labelNewArgs, 1));
+    const text = runtime.toStringValue(orderedCallArg(args, namedArgs, labelNewArgs, 2, ''));
     const id = `label_${callId}_${ctx.bar_index}`;
 
-    const forceOverlay = optionalBoolean(namedArgs.get('force_overlay') ?? args[11]);
+    const forceOverlay = optionalBoolean(orderedCallArg(args, namedArgs, labelNewArgs, 11));
     const drawing: LabelDrawingOutput = {
       id,
       type: 'label',
@@ -109,13 +140,13 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       x,
       y,
       text,
-      xloc: runtime.toStringValue(namedArgs.get('xloc') ?? 'bar_index'),
-      yloc: runtime.toStringValue(namedArgs.get('yloc') ?? 'price'),
-      style: runtime.toStringValue(namedArgs.get('style') ?? 'label_left'),
-      color: runtime.toNullableColor(namedArgs.get('color')),
-      textColor: runtime.toNullableColor(namedArgs.get('textcolor')),
-      size: runtime.toStringValue(namedArgs.get('size') ?? 'normal'),
-      tooltip: runtime.toOptionalString(namedArgs.get('tooltip') ?? args[10]),
+      xloc: runtime.toStringValue(orderedCallArg(args, namedArgs, labelNewArgs, 3, 'bar_index')),
+      yloc: runtime.toStringValue(orderedCallArg(args, namedArgs, labelNewArgs, 4, 'price')),
+      style: runtime.toStringValue(orderedCallArg(args, namedArgs, labelNewArgs, 6, 'label_left')),
+      color: runtime.toNullableColor(orderedCallArg(args, namedArgs, labelNewArgs, 5)),
+      textColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, labelNewArgs, 7)),
+      size: runtime.toStringValue(orderedCallArg(args, namedArgs, labelNewArgs, 8, 'normal')),
+      tooltip: runtime.toOptionalString(orderedCallArg(args, namedArgs, labelNewArgs, 10)),
     };
     if (forceOverlay !== undefined) drawing.forceOverlay = forceOverlay;
 
@@ -235,24 +266,28 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
 }
 
 export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
+  const lineNewPointArgs = ['first_point', 'second_point', 'xloc', 'extend', 'color', 'style', 'width', 'force_overlay'] as const;
+  const lineNewCoordinateArgs = ['x1', 'y1', 'x2', 'y2', 'xloc', 'extend', 'color', 'style', 'width', 'force_overlay'] as const;
+
   builtins.set('line.new', (args, namedArgs, ctx, _scope, callId) => {
-    const firstPoint = namedArgs.get('first_point') ?? args[0];
-    const secondPoint = namedArgs.get('second_point') ?? args[1];
-    const usesPointOverload = isChartPoint(firstPoint) && isChartPoint(secondPoint);
-    const pointArgOffset = usesPointOverload ? 2 : 4;
-    const xloc = runtime.toStringValue(namedArgs.get('xloc') ?? args[pointArgOffset] ?? 'bar_index');
+    const hasCoordinateArgs = lineNewCoordinateArgs.slice(0, 4).some((name) => namedArgs.has(name));
+    const firstPoint = hasCoordinateArgs ? undefined : orderedCallArg(args, namedArgs, lineNewPointArgs, 0);
+    const secondPoint = hasCoordinateArgs ? undefined : orderedCallArg(args, namedArgs, lineNewPointArgs, 1);
+    const usesPointOverload = !hasCoordinateArgs && isChartPoint(firstPoint) && isChartPoint(secondPoint);
+    const parameterNames = usesPointOverload ? lineNewPointArgs : lineNewCoordinateArgs;
+    const xloc = runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 2 : 4, 'bar_index'));
     const x1 = usesPointOverload
       ? pointX(firstPoint, xloc)
-      : runtime.toNullableNumber(namedArgs.get('x1') ?? args[0]);
+      : runtime.toNullableNumber(orderedCallArg(args, namedArgs, lineNewCoordinateArgs, 0));
     const y1 = usesPointOverload
       ? firstPoint.price
-      : runtime.toNullableNumber(namedArgs.get('y1') ?? args[1]);
+      : runtime.toNullableNumber(orderedCallArg(args, namedArgs, lineNewCoordinateArgs, 1));
     const x2 = usesPointOverload
       ? pointX(secondPoint, xloc)
-      : runtime.toNullableNumber(namedArgs.get('x2') ?? args[2]);
+      : runtime.toNullableNumber(orderedCallArg(args, namedArgs, lineNewCoordinateArgs, 2));
     const y2 = usesPointOverload
       ? secondPoint.price
-      : runtime.toNullableNumber(namedArgs.get('y2') ?? args[3]);
+      : runtime.toNullableNumber(orderedCallArg(args, namedArgs, lineNewCoordinateArgs, 3));
     const id = `line_${callId}_${ctx.bar_index}`;
 
     ctx.addDrawing({
@@ -264,11 +299,11 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
       x2,
       y2,
       xloc,
-      extend: runtime.toStringValue(namedArgs.get('extend') ?? args[pointArgOffset + 1] ?? 'none'),
-      color: runtime.toNullableColor(namedArgs.get('color') ?? args[pointArgOffset + 2]),
-      style: runtime.toStringValue(namedArgs.get('style') ?? args[pointArgOffset + 3] ?? 'solid'),
-      width: runtime.toLineWidth(namedArgs.get('width') ?? args[pointArgOffset + 4]),
-      forceOverlay: Boolean(namedArgs.get('force_overlay') ?? args[pointArgOffset + 5] ?? false),
+      extend: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 3 : 5, 'none')),
+      color: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 4 : 6)),
+      style: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 5 : 7, 'solid')),
+      width: runtime.toLineWidth(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 6 : 8)),
+      forceOverlay: Boolean(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 7 : 9, false)),
     });
 
     return id;
@@ -388,9 +423,11 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
 }
 
 export function registerLineFillBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
+  const lineFillNewArgs = ['line1', 'line2', 'color'] as const;
+
   builtins.set('linefill.new', (args, namedArgs, ctx, _scope, callId) => {
-    const line1 = runtime.toDrawingId(namedArgs.get('line1') ?? args[0]);
-    const line2 = runtime.toDrawingId(namedArgs.get('line2') ?? args[1]);
+    const line1 = runtime.toDrawingId(orderedCallArg(args, namedArgs, lineFillNewArgs, 0));
+    const line2 = runtime.toDrawingId(orderedCallArg(args, namedArgs, lineFillNewArgs, 1));
     if (!line1 || !line2) return Number.NaN;
     if (ctx.getDrawing(line1)?.type !== 'line' || ctx.getDrawing(line2)?.type !== 'line') {
       return Number.NaN;
@@ -403,7 +440,7 @@ export function registerLineFillBuiltins(builtins: BuiltinRegistry, runtime: Dra
       barIndex: ctx.bar_index,
       line1,
       line2,
-      color: runtime.toNullableColor(namedArgs.get('color') ?? args[2]),
+      color: runtime.toNullableColor(orderedCallArg(args, namedArgs, lineFillNewArgs, 2)),
     });
 
     return id;
@@ -427,44 +464,84 @@ export function registerLineFillBuiltins(builtins: BuiltinRegistry, runtime: Dra
 }
 
 export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
+  const boxNewPointArgs = [
+    'top_left',
+    'bottom_right',
+    'border_color',
+    'border_width',
+    'border_style',
+    'extend',
+    'xloc',
+    'bgcolor',
+    'text',
+    'text_size',
+    'text_color',
+    'text_halign',
+    'text_valign',
+    'text_wrap',
+    'text_font_family',
+    'force_overlay',
+  ] as const;
+  const boxNewCoordinateArgs = [
+    'left',
+    'top',
+    'right',
+    'bottom',
+    'border_color',
+    'border_width',
+    'border_style',
+    'extend',
+    'xloc',
+    'bgcolor',
+    'text',
+    'text_size',
+    'text_color',
+    'text_halign',
+    'text_valign',
+    'text_wrap',
+    'text_font_family',
+    'force_overlay',
+  ] as const;
+
   builtins.set('box.new', (args, namedArgs, ctx, _scope, callId) => {
     const id = `box_${callId}_${ctx.bar_index}`;
-    const topLeft = namedArgs.get('top_left') ?? args[0];
-    const bottomRight = namedArgs.get('bottom_right') ?? args[1];
-    const usesPointOverload = isChartPoint(topLeft) && isChartPoint(bottomRight);
-    const pointArgOffset = usesPointOverload ? 2 : 4;
-    const xloc = runtime.toStringValue(namedArgs.get('xloc') ?? args[pointArgOffset + 4] ?? 'bar_index');
+    const hasCoordinateArgs = boxNewCoordinateArgs.slice(0, 4).some((name) => namedArgs.has(name));
+    const topLeft = hasCoordinateArgs ? undefined : orderedCallArg(args, namedArgs, boxNewPointArgs, 0);
+    const bottomRight = hasCoordinateArgs ? undefined : orderedCallArg(args, namedArgs, boxNewPointArgs, 1);
+    const usesPointOverload = !hasCoordinateArgs && isChartPoint(topLeft) && isChartPoint(bottomRight);
+    const parameterNames = usesPointOverload ? boxNewPointArgs : boxNewCoordinateArgs;
+    const xloc = runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 6 : 8, 'bar_index'));
 
-    const textHalign = optionalString(runtime, namedArgs.get('text_halign') ?? args[pointArgOffset + 9]);
-    const textValign = optionalString(runtime, namedArgs.get('text_valign') ?? args[pointArgOffset + 10]);
-    const textWrap = optionalString(runtime, namedArgs.get('text_wrap') ?? args[pointArgOffset + 11]);
-    const textFontFamily = optionalString(runtime, namedArgs.get('text_font_family') ?? args[pointArgOffset + 12]);
-    const forceOverlay = optionalBoolean(namedArgs.get('force_overlay') ?? args[pointArgOffset + 13]);
+    const textHalign = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 11 : 13));
+    const textValign = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 12 : 14));
+    const textWrap = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 13 : 15));
+    const textFontFamily = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 14 : 16));
+    const forceOverlay = optionalBoolean(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 15 : 17));
     const drawing: BoxDrawingOutput = {
       id,
       type: 'box',
       barIndex: ctx.bar_index,
       left: usesPointOverload
         ? pointX(topLeft, xloc)
-        : runtime.toNullableNumber(namedArgs.get('left') ?? args[0]),
+        : runtime.toNullableNumber(orderedCallArg(args, namedArgs, boxNewCoordinateArgs, 0)),
       top: usesPointOverload
         ? topLeft.price
-        : runtime.toNullableNumber(namedArgs.get('top') ?? args[1]),
+        : runtime.toNullableNumber(orderedCallArg(args, namedArgs, boxNewCoordinateArgs, 1)),
       right: usesPointOverload
         ? pointX(bottomRight, xloc)
-        : runtime.toNullableNumber(namedArgs.get('right') ?? args[2]),
+        : runtime.toNullableNumber(orderedCallArg(args, namedArgs, boxNewCoordinateArgs, 2)),
       bottom: usesPointOverload
         ? bottomRight.price
-        : runtime.toNullableNumber(namedArgs.get('bottom') ?? args[3]),
-      borderColor: runtime.toNullableColor(namedArgs.get('border_color') ?? args[pointArgOffset]),
-      borderWidth: runtime.toLineWidth(namedArgs.get('border_width') ?? args[pointArgOffset + 1]),
-      borderStyle: runtime.toStringValue(namedArgs.get('border_style') ?? args[pointArgOffset + 2] ?? 'solid'),
-      extend: runtime.toStringValue(namedArgs.get('extend') ?? args[pointArgOffset + 3] ?? 'none'),
+        : runtime.toNullableNumber(orderedCallArg(args, namedArgs, boxNewCoordinateArgs, 3)),
+      borderColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 2 : 4)),
+      borderWidth: runtime.toLineWidth(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 3 : 5)),
+      borderStyle: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 4 : 6, 'solid')),
+      extend: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 5 : 7, 'none')),
       xloc,
-      bgcolor: runtime.toNullableColor(namedArgs.get('bgcolor') ?? args[pointArgOffset + 5]),
-      text: runtime.toStringValue(namedArgs.get('text') ?? args[pointArgOffset + 6] ?? ''),
-      textSize: runtime.toStringValue(namedArgs.get('text_size') ?? args[pointArgOffset + 7] ?? 'normal'),
-      textColor: runtime.toNullableColor(namedArgs.get('text_color') ?? args[pointArgOffset + 8]),
+      bgcolor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 7 : 9)),
+      text: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 8 : 10, '')),
+      textSize: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 9 : 11, 'normal')),
+      textColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 10 : 12)),
     };
     if (textHalign !== undefined) drawing.textHalign = textHalign;
     if (textValign !== undefined) drawing.textValign = textValign;
@@ -621,24 +698,36 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
 }
 
 export function registerPolylineBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
+  const polylineNewArgs = [
+    'points',
+    'curved',
+    'closed',
+    'xloc',
+    'line_color',
+    'fill_color',
+    'line_style',
+    'line_width',
+    'force_overlay',
+  ] as const;
+
   builtins.set('polyline.new', (args, namedArgs, ctx, _scope, callId) => {
-    const points = chartPointArrayValues(namedArgs.get('points') ?? args[0]);
+    const points = chartPointArrayValues(orderedCallArg(args, namedArgs, polylineNewArgs, 0));
     if (points.length === 0) return Number.NaN;
 
     const id = `polyline_${callId}_${ctx.bar_index}`;
-    const forceOverlay = optionalBoolean(namedArgs.get('force_overlay') ?? args[8]);
+    const forceOverlay = optionalBoolean(orderedCallArg(args, namedArgs, polylineNewArgs, 8));
     const drawing: PolylineDrawingOutput = {
       id,
       type: 'polyline',
       barIndex: ctx.bar_index,
       points,
-      curved: Boolean(namedArgs.get('curved') ?? args[1] ?? false),
-      closed: Boolean(namedArgs.get('closed') ?? args[2] ?? false),
-      xloc: runtime.toStringValue(namedArgs.get('xloc') ?? args[3] ?? 'bar_index'),
-      lineColor: runtime.toNullableColor(namedArgs.get('line_color') ?? args[4]),
-      fillColor: runtime.toNullableColor(namedArgs.get('fill_color') ?? args[5]),
-      lineStyle: runtime.toStringValue(namedArgs.get('line_style') ?? args[6] ?? 'solid'),
-      lineWidth: runtime.toLineWidth(namedArgs.get('line_width') ?? args[7]),
+      curved: Boolean(orderedCallArg(args, namedArgs, polylineNewArgs, 1, false)),
+      closed: Boolean(orderedCallArg(args, namedArgs, polylineNewArgs, 2, false)),
+      xloc: runtime.toStringValue(orderedCallArg(args, namedArgs, polylineNewArgs, 3, 'bar_index')),
+      lineColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, polylineNewArgs, 4)),
+      fillColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, polylineNewArgs, 5)),
+      lineStyle: runtime.toStringValue(orderedCallArg(args, namedArgs, polylineNewArgs, 6, 'solid')),
+      lineWidth: runtime.toLineWidth(orderedCallArg(args, namedArgs, polylineNewArgs, 7)),
     };
     if (forceOverlay !== undefined) drawing.forceOverlay = forceOverlay;
 
@@ -664,6 +753,31 @@ export function registerPolylineBuiltins(builtins: BuiltinRegistry, runtime: Dra
 }
 
 export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
+  const tableNewArgs = [
+    'position',
+    'columns',
+    'rows',
+    'bgcolor',
+    'frame_color',
+    'frame_width',
+    'border_color',
+    'border_width',
+  ] as const;
+  const tableCellArgs = [
+    'table_id',
+    'column',
+    'row',
+    'text',
+    'width',
+    'height',
+    'text_color',
+    'text_halign',
+    'text_valign',
+    'text_size',
+    'bgcolor',
+    'text_font_family',
+    'text_formatting',
+  ] as const;
   const withTable = (value: unknown, ctx: ExecutionContext, fn: (table: TableDrawingOutput) => void): void => {
     withDrawing(value, ctx, 'table', runtime.isNa, fn);
   };
@@ -741,22 +855,22 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
 
   builtins.set('table.new', (args, namedArgs, ctx, _scope, callId) => {
     const id = `table_${callId}_${ctx.bar_index}`;
-    const columns = positiveInteger(runtime, namedArgs.get('columns') ?? args[1], 1);
-    const rows = positiveInteger(runtime, namedArgs.get('rows') ?? args[2], 1);
+    const columns = positiveInteger(runtime, orderedCallArg(args, namedArgs, tableNewArgs, 1), 1);
+    const rows = positiveInteger(runtime, orderedCallArg(args, namedArgs, tableNewArgs, 2), 1);
     assertTableCellCapacity(ctx, { columns, rows });
 
     const drawing: TableDrawingOutput = {
       id,
       type: 'table',
       barIndex: ctx.bar_index,
-      position: runtime.toStringValue(namedArgs.get('position') ?? args[0] ?? 'top_right'),
+      position: runtime.toStringValue(orderedCallArg(args, namedArgs, tableNewArgs, 0, 'top_right')),
       columns,
       rows,
-      bgcolor: runtime.toNullableColor(namedArgs.get('bgcolor') ?? args[3]),
-      frameColor: runtime.toNullableColor(namedArgs.get('frame_color') ?? args[4]),
-      frameWidth: runtime.toLineWidth(namedArgs.get('frame_width') ?? args[5]),
-      borderColor: runtime.toNullableColor(namedArgs.get('border_color') ?? args[6]),
-      borderWidth: runtime.toLineWidth(namedArgs.get('border_width') ?? args[7]),
+      bgcolor: runtime.toNullableColor(orderedCallArg(args, namedArgs, tableNewArgs, 3)),
+      frameColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, tableNewArgs, 4)),
+      frameWidth: runtime.toLineWidth(orderedCallArg(args, namedArgs, tableNewArgs, 5)),
+      borderColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, tableNewArgs, 6)),
+      borderWidth: runtime.toLineWidth(orderedCallArg(args, namedArgs, tableNewArgs, 7)),
       cells: [],
     };
 
@@ -827,25 +941,29 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
   });
 
   builtins.set('table.cell', (args, namedArgs, ctx) => {
-    withTable(namedArgs.get('table_id') ?? args[0], ctx, (table) => {
-      const { column, row } = normalizeCellCoordinates(table, namedArgs.get('column') ?? args[1], namedArgs.get('row') ?? args[2]);
-      const textFontFamily = optionalString(runtime, namedArgs.get('text_font_family') ?? args[11]);
-      const textFormatting = optionalString(runtime, namedArgs.get('text_formatting') ?? args[12]);
+    withTable(orderedCallArg(args, namedArgs, tableCellArgs, 0), ctx, (table) => {
+      const { column, row } = normalizeCellCoordinates(
+        table,
+        orderedCallArg(args, namedArgs, tableCellArgs, 1),
+        orderedCallArg(args, namedArgs, tableCellArgs, 2),
+      );
+      const textFontFamily = optionalString(runtime, orderedCallArg(args, namedArgs, tableCellArgs, 11));
+      const textFormatting = optionalString(runtime, orderedCallArg(args, namedArgs, tableCellArgs, 12));
       const cell: TableCellDrawingOutput = {
         column,
         row,
-        text: runtime.toStringValue(namedArgs.get('text') ?? args[3] ?? ''),
-        width: namedArgs.has('width') || args[4] !== undefined
-          ? runtime.toNullableNumber(namedArgs.get('width') ?? args[4])
+        text: runtime.toStringValue(orderedCallArg(args, namedArgs, tableCellArgs, 3, '')),
+        width: namedArgs.has('width') || orderedCallArg(args, namedArgs, tableCellArgs, 4) !== undefined
+          ? runtime.toNullableNumber(orderedCallArg(args, namedArgs, tableCellArgs, 4))
           : undefined,
-        height: namedArgs.has('height') || args[5] !== undefined
-          ? runtime.toNullableNumber(namedArgs.get('height') ?? args[5])
+        height: namedArgs.has('height') || orderedCallArg(args, namedArgs, tableCellArgs, 5) !== undefined
+          ? runtime.toNullableNumber(orderedCallArg(args, namedArgs, tableCellArgs, 5))
           : undefined,
-        textColor: runtime.toNullableColor(namedArgs.get('text_color') ?? args[6]),
-        textHalign: runtime.toStringValue(namedArgs.get('text_halign') ?? args[7] ?? 'center'),
-        textValign: runtime.toStringValue(namedArgs.get('text_valign') ?? args[8] ?? 'middle'),
-        textSize: runtime.toStringValue(namedArgs.get('text_size') ?? args[9] ?? 'normal'),
-        bgcolor: runtime.toNullableColor(namedArgs.get('bgcolor') ?? args[10]),
+        textColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, tableCellArgs, 6)),
+        textHalign: runtime.toStringValue(orderedCallArg(args, namedArgs, tableCellArgs, 7, 'center')),
+        textValign: runtime.toStringValue(orderedCallArg(args, namedArgs, tableCellArgs, 8, 'middle')),
+        textSize: runtime.toStringValue(orderedCallArg(args, namedArgs, tableCellArgs, 9, 'normal')),
+        bgcolor: runtime.toNullableColor(orderedCallArg(args, namedArgs, tableCellArgs, 10)),
       };
       if (textFontFamily !== undefined) cell.textFontFamily = textFontFamily;
       if (textFormatting !== undefined) cell.textFormatting = textFormatting;
