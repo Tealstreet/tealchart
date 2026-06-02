@@ -816,8 +816,8 @@ export class TealscriptEngine {
       this.indicatorDynamicRequests = this.isTruthy(this.evaluateExpression(stmt.dynamic_requests));
     }
     if (stmt.declarationKind === 'strategy') {
-      this.hasStrategyDeclaration = true;
       this.applyStrategyDeclaration(stmt);
+      this.hasStrategyDeclaration = true;
     }
   }
 

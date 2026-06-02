@@ -250,6 +250,17 @@ plot(strategy.equity)`;
       expect(result.strategy.intrabarContexts[0]?.ticks.map((tick) => tick.kind)).toEqual(['open', 'low', 'high', 'close']);
     });
 
+    it('does not record intrabar metadata when the strategy declaration fails', () => {
+      const script = `//@version=6
+strategy("Invalid", initial_capital=-1, use_bar_magnifier=true)
+plot(close)`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors[0]?.message).toBe('strategy initial_capital must be a non-negative number');
+      expect(result.strategy.intrabarContexts).toEqual([]);
+    });
+
     it('requires strategy.exit to specify a supported exit price', () => {
       const script = `//@version=6
 strategy("Strategy call", process_orders_on_close=true)
