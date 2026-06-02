@@ -5,7 +5,7 @@
  */
 
 import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition, LogOutput } from '../runtime/context';
-import type { IndicatorDeclarationMetadata, TealscriptRuntimeOptions } from '../runtime/engine';
+import type { IndicatorDeclarationMetadata, RuntimeProfile, TealscriptRuntimeOptions } from '../runtime/engine';
 import type { SemanticDiagnostic } from '../semantic';
 
 /**
@@ -101,6 +101,7 @@ export interface WorkerOutputBundle {
   logs?: LogOutput[];
   inputs: InputDefinition[];
   declaration?: IndicatorDeclarationMetadata;
+  profile?: RuntimeProfile;
   metadata?: WorkerOutputMetadata;
 }
 
@@ -126,6 +127,7 @@ export interface ResultMessage {
   logs?: LogOutput[];
   inputs: InputDefinition[];
   declaration?: IndicatorDeclarationMetadata;
+  profile?: RuntimeProfile;
 }
 
 /**
@@ -147,6 +149,7 @@ export function createResultMessage(scriptId: string, output: WorkerOutputBundle
     logs: normalizedOutput.logs,
     inputs: normalizedOutput.inputs,
     declaration: normalizedOutput.declaration,
+    profile: normalizedOutput.profile,
   };
 }
 
@@ -168,6 +171,7 @@ export function getResultOutput(message: ResultMessage): NormalizedWorkerOutputB
     logs: message.logs ?? [],
     inputs: message.inputs,
     declaration: message.declaration,
+    profile: message.profile,
   };
 }
 

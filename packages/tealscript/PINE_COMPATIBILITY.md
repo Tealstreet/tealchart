@@ -82,6 +82,11 @@ Covered behavior and remaining gaps:
   and parsed ASTs deeper than 1,000 nodes. These are TealScript sandbox limits
   intended to keep generated or hostile scripts from exhausting parser
   resources.
+- Runtime execution results include profile counters for elapsed time, bars,
+  statements, expressions, built-in calls, unique request contexts, inferred
+  history depth, and runtime errors. Worker result bundles carry the same
+  profile so host charts can inspect expensive scripts without running them on
+  the main thread.
 
 ## Common History Reference Coverage
 

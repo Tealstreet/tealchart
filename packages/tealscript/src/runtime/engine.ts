@@ -511,16 +511,20 @@ export class TealscriptEngine {
       indicatorDrawingLimits: declaration.drawingLimits,
       strategy: this.ctx.strategyLedger,
       errors: this.errors,
-      profile: {
-        elapsedMs: Date.now() - this.profileStartMs,
-        bars: this.profileBars,
-        statements: this.profileStatements,
-        expressions: this.profileExpressions,
-        builtinCalls: this.profileBuiltinCalls,
-        requestContexts: this.requestContextKeys.size,
-        maxBarsBack: this.inferredMaxBarsBack,
-        errors: this.errors.length,
-      },
+      profile: this.getProfile(),
+    };
+  }
+
+  getProfile(): RuntimeProfile {
+    return {
+      elapsedMs: Date.now() - this.profileStartMs,
+      bars: this.profileBars,
+      statements: this.profileStatements,
+      expressions: this.profileExpressions,
+      builtinCalls: this.profileBuiltinCalls,
+      requestContexts: this.requestContextKeys.size,
+      maxBarsBack: this.inferredMaxBarsBack,
+      errors: this.errors.length,
     };
   }
 
@@ -560,6 +564,8 @@ export class TealscriptEngine {
    * Execute for realtime bar update
    */
   updateBar(ast: Program, bar: Bar): PlotOutput[] {
+    this.errors = [];
+    this.resetProfile();
     const currentBar = this.ctx.getBar(this.ctx.last_bar_index);
     if (currentBar && bar.time > currentBar.time) {
       if (this.ctx.barstate.isrealtime && !this.ctx.barstate.isconfirmed) {
@@ -649,10 +655,16 @@ export class TealscriptEngine {
   }
 
   private executeRealtimeStatements(ast: Program): void {
+    this.profileBars += 1;
     for (const stmt of ast.body) {
       try {
         this.executeStatement(stmt);
       } catch (error) {
+        this.errors.push({
+          message: error instanceof Error ? error.message : String(error),
+          line: stmt.loc?.start.line,
+          column: stmt.loc?.start.column,
+        });
         if (error instanceof RuntimeErrorException) {
           throw error;
         }

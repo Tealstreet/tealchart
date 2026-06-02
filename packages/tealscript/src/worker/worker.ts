@@ -191,6 +191,7 @@ function handleUpdateBar(bar: Bar, metadata?: WorkerOutputMetadata): void {
       alerts: state.engine.getAlerts(),
       logs: state.engine.getLogs(),
       inputs: state.lastInputs, // send cached inputs from last full execution
+      profile: state.engine.getProfile(),
       metadata,
     }));
   } else {
@@ -261,6 +262,7 @@ function executeAndSendResults(metadata?: WorkerOutputMetadata): void {
       logs: result.logs,
       inputs,
       declaration: result.declaration,
+      profile: result.profile,
       metadata,
     });
     postResult(resultMessage);

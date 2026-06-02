@@ -6,7 +6,7 @@
  */
 
 import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition, LogOutput } from '../runtime/context';
-import type { IndicatorDeclarationMetadata, TealscriptRuntimeOptions } from '../runtime/engine';
+import type { IndicatorDeclarationMetadata, RuntimeProfile, TealscriptRuntimeOptions } from '../runtime/engine';
 import type { SemanticDiagnostic } from '../semantic';
 import { getResultOutput } from './protocol';
 import type {
@@ -29,6 +29,7 @@ export interface WorkerResult {
   logs: LogOutput[];
   inputs: InputDefinition[];
   declaration?: IndicatorDeclarationMetadata;
+  profile?: RuntimeProfile;
 }
 
 /**
