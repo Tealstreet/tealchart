@@ -604,6 +604,8 @@ Phases:
 6. Add profiling hooks useful during compatibility work.
    Execution results now include runtime profile counters for elapsed time, bars,
    statements, expressions, built-in calls, request contexts, and errors.
+   Worker result bundles also propagate the runtime profile for full
+   recalculations and realtime updates.
 
 Done means hostile or accidentally expensive scripts cannot degrade the chart.
 

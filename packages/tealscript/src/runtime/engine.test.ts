@@ -78,6 +78,35 @@ plot(adjust(close))`;
       expect(result.errors).toEqual([]);
       expect(result.profile.statements).toBeGreaterThan(3);
     });
+
+    it('reports fresh profile counters for realtime updates', () => {
+      const script = `//@version=6
+indicator("Realtime Profile")
+basis = ta.sma(close, 2)
+plot(basis, title="Basis")`;
+
+      const ast = parse(script);
+      const engine = new TealscriptEngine();
+      const bars = createBars(3);
+      const result = engine.execute(ast, bars);
+
+      expect(result.profile.bars).toBe(3);
+
+      engine.updateBar(ast, { ...bars[2], close: 200 });
+      const firstProfile = engine.getProfile();
+
+      engine.updateBar(ast, { ...bars[2], close: 300 });
+      const secondProfile = engine.getProfile();
+
+      expect(firstProfile.bars).toBe(1);
+      expect(firstProfile.statements).toBeGreaterThan(0);
+      expect(firstProfile.expressions).toBeGreaterThan(0);
+      expect(firstProfile.builtinCalls).toBeGreaterThan(0);
+      expect(firstProfile.errors).toBe(0);
+      expect(secondProfile.bars).toBe(1);
+      expect(secondProfile.statements).toBe(firstProfile.statements);
+      expect(secondProfile.errors).toBe(0);
+    });
   });
 
   describe('Pine strategy declarations', () => {

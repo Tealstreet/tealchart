@@ -34,7 +34,7 @@ reading the whole runtime.
 | Parser | `//@version=6` annotation | Supported | `tests/parser/parser.test.ts`; `tests/compat/pine-basics.test.ts` | No version-specific runtime branches yet. |
 | Parser | `//@version=5` annotation | Partial | `tests/parser/parser.test.ts` | Accepted as numeric version only. |
 | Parser/runtime | `indicator(...)` | Partial | `tests/compat/pine-basics.test.ts`; `src/runtime/engine.test.ts` | Many declaration options are parsed but not fully applied. |
-| Parser/runtime | `strategy(...)` | Partial | `src/parser/parser.test.ts`; `src/runtime/engine.test.ts` | Strategy execution and broker emulator are planned. |
+| Parser/runtime | `strategy(...)` | Partial | `src/parser/parser.test.ts`; `src/runtime/engine.test.ts`; `src/semantic/checker.test.ts`; Roadmap Epic 14 | Declaration settings, broker-emulator state, orders/fills, trade accessors, and semantic call-shape diagnostics are covered. Full TradingView intrabar path parity, bar magnifier, and lower-timeframe fill simulation remain deferred until TealScript has an explicit intrabar data model. |
 | Parser/runtime | `library(...)` / `import` | Partial | `tests/parser/parser.test.ts`; `tests/compat/pine-language.test.ts`; `tests/compat/pine-unsupported.test.ts`; Public API guardrails in `tests/public-api/public-entry.test.ts`; `src/semantic/checker.test.ts` | `library(...)`, exported local helpers, typed/qualified exported parameters, import syntax, host-provided registry dispatch for `alias.exportedFunction(...)`, exported imported UDT constructors via `alias.Type.new(...)`, exported imported methods on imported UDT instances, export-shape diagnostics, and exported function scope diagnostics are covered. Published TradingView lookup, enum namespace binding, exported constants, version selection, and request-expression qualifier diagnostics remain planned. |
 | Parser/runtime | Variable declarations | Supported | `tests/parser/parser.test.ts`; `tests/runtime/runtime.test.ts` | Qualified type checking is planned. |
 | Parser/runtime | `var` / `varip` | Partial | `tests/compat/pine-language.test.ts`; `src/runtime/engine.test.ts` | Intrabar `varip` parity and nested-scope edge cases remain. |
@@ -66,6 +66,7 @@ reading the whole runtime.
 | Runtime | `timeframe.*` | Partial | `tests/compat/pine-control-time.test.ts` | Live chart timeframe injection and comparison helpers remain. |
 | Runtime | Function-local series state | Partial | `tests/compat/pine-language.test.ts` | Nested block and call-site series parity need hardening. |
 | Runtime | `max_bars_back` | Partial | `tests/compat/pine-language.test.ts`; `src/runtime/engine.test.ts` | Runtime buffer enforcement/inference is not implemented. |
+| Runtime | Limits, sandboxing, and profiling | Partial | `src/runtime/engine.test.ts`; `src/runtime/drawings/builtins.test.ts`; `tests/parser/parser.test.ts`; `tests/compat/pine-request-security.test.ts`; `tests/worker/protocol.test.ts`; Roadmap Epic 15 | Implemented guardrails cover loop iteration caps, 64 non-`hline()` plot outputs, 40 unique `request.*` contexts per pass, 10,000 live table cells, parser source/depth limits, deterministic `math.random()`, runtime profile counters, and worker profile propagation. Broader hard wall-clock and memory quotas remain planned as host/runtime sandbox hardening. |
 
 ### Built-Ins
 
