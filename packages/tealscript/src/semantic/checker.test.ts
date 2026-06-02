@@ -252,6 +252,7 @@ export method lifted(Pivot this, float amount) => this
 export enum Direction
     up = "Up"
     down = "Down"
+export pick() => Direction.up
 `));
     const emptyLibrary = checkProgram(parse(`
 library("Empty")

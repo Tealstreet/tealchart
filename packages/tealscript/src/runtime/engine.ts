@@ -1030,7 +1030,7 @@ export class TealscriptEngine {
           }
         }
         if (libraryStmt.type === 'EnumDeclaration' && libraryStmt.exported) {
-          enums.set(libraryStmt.name.name, this.createImportedEnumValues(stmt.alias.name, libraryStmt));
+          enums.set(libraryStmt.name.name, this.createImportedEnumValues(stmt.path, libraryStmt));
         }
         if (libraryStmt.type === 'VariableDeclaration' && libraryStmt.exported && libraryStmt.names.type === 'VariableDeclarator') {
           const value = this.evaluateLibraryConstantExpression(libraryStmt.init);
@@ -1054,10 +1054,10 @@ export class TealscriptEngine {
     }
   }
 
-  private createImportedEnumValues(alias: string, declaration: EnumDeclaration): Map<string, string> {
+  private createImportedEnumValues(libraryPath: string, declaration: EnumDeclaration): Map<string, string> {
     const values = new Map<string, string>();
     for (const field of declaration.fields) {
-      values.set(field.name.name, `${alias}.${declaration.name.name}.${field.name.name}`);
+      values.set(field.name.name, `${libraryPath}.${declaration.name.name}.${field.name.name}`);
     }
     return values;
   }

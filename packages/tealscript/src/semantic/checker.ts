@@ -1120,6 +1120,9 @@ class SemanticChecker {
       case 'TypeDeclaration':
         this.declareType(statement, scope);
         break;
+      case 'EnumDeclaration':
+        this.declareEnum(statement, scope);
+        break;
       case 'FunctionDeclaration':
         this.declareFunction(statement, scope);
         break;
@@ -1175,6 +1178,15 @@ class SemanticChecker {
         }
       }
     }
+  }
+
+  private declareEnum(statement: EnumDeclaration, scope: SemanticScope): void {
+    this.declare(scope, {
+      name: statement.name.name,
+      kind: 'type',
+      type: { kind: 'udt', name: statement.name.name },
+      loc: statement.name.loc,
+    });
   }
 
   private declareFunction(statement: FunctionDeclaration, scope: SemanticScope): void {
