@@ -6065,7 +6065,11 @@ export class TealscriptEngine {
   }
 
   private registerMatrixBuiltins(): void {
-    const createMatrix = (args: unknown[]) => createPineMatrix(args[0] as number | undefined, args[1] as number | undefined, args[2]);
+    const createMatrix = (args: unknown[], namedArgs: Map<string, unknown>) => createPineMatrix(
+      this.getCallArg(args, namedArgs, 0, 'rows') as number | undefined,
+      this.getCallArg(args, namedArgs, 1, 'columns') as number | undefined,
+      this.getCallArg(args, namedArgs, 2, 'initial_value'),
+    );
     const readMatrix = (value: unknown): PineMatrix => {
       if (!isPineMatrix(value)) {
         throw new Error('Expected matrix');
@@ -6081,20 +6085,25 @@ export class TealscriptEngine {
       }
       return this.toNumber(value);
     };
-    const readInsertionArgs = (args: unknown[]): [number | undefined, PineArray | undefined] => {
-      if (args[1] === undefined) {
-        return [undefined, undefined];
+    const readInsertionArgs = (args: unknown[], namedArgs: Map<string, unknown>, indexName: 'row' | 'column'): [number | undefined, PineArray | undefined] => {
+      const indexArg = this.getCallArg(args, namedArgs, 1, indexName);
+      const arrayArg = this.getCallArg(args, namedArgs, 2, 'array_id');
+      if (indexArg === undefined) {
+        if (arrayArg !== undefined && !isPineArray(arrayArg)) {
+          throw new Error('Expected array');
+        }
+        return [undefined, arrayArg];
       }
-      if (isPineArray(args[1])) {
-        return [undefined, args[1]];
+      if (isPineArray(indexArg) && !namedArgs.has(indexName)) {
+        return [undefined, indexArg];
       }
-      if (args[2] === undefined) {
-        return [args[1] as number, undefined];
+      if (arrayArg === undefined) {
+        return [indexArg as number, undefined];
       }
-      if (!isPineArray(args[2])) {
+      if (!isPineArray(arrayArg)) {
         throw new Error('Expected array');
       }
-      return [args[1] as number, args[2]];
+      return [indexArg as number, arrayArg];
     };
 
     this.builtins.set('matrix.new', createMatrix);
@@ -6103,18 +6112,26 @@ export class TealscriptEngine {
     this.builtins.set('matrix.new_bool', createMatrix);
     this.builtins.set('matrix.new_string', createMatrix);
     this.builtins.set('matrix.new_color', createMatrix);
-    this.builtins.set('matrix.rows', (args) => getMatrixRows(readMatrix(args[0])));
-    this.builtins.set('matrix.columns', (args) => getMatrixColumns(readMatrix(args[0])));
-    this.builtins.set('matrix.elements_count', (args) => getMatrixElementCount(readMatrix(args[0])));
-    this.builtins.set('matrix.get', (args) => getMatrixValue(readMatrix(args[0]), args[1] as number, args[2] as number));
-    this.builtins.set('matrix.set', (args) => {
-      setMatrixValue(readMatrix(args[0]), args[1] as number, args[2] as number, args[3]);
+    this.builtins.set('matrix.rows', (args, namedArgs) => getMatrixRows(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.columns', (args, namedArgs) => getMatrixColumns(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.elements_count', (args, namedArgs) => getMatrixElementCount(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.get', (args, namedArgs) => getMatrixValue(
+      readMatrix(this.matrixReceiverArg(args, namedArgs)),
+      this.getCallArg(args, namedArgs, 1, 'row') as number,
+      this.getCallArg(args, namedArgs, 2, 'column') as number,
+    ));
+    this.builtins.set('matrix.set', (args, namedArgs) => {
+      setMatrixValue(
+        readMatrix(this.matrixReceiverArg(args, namedArgs)),
+        this.getCallArg(args, namedArgs, 1, 'row') as number,
+        this.getCallArg(args, namedArgs, 2, 'column') as number,
+        this.getCallArg(args, namedArgs, 3, 'value'),
+      );
       return null;
     });
     this.builtins.set('matrix.fill', (args, namedArgs) => {
-      const matrixArg = args[0] !== undefined ? args[0] : namedArgs.get('id');
       fillMatrix(
-        readMatrix(matrixArg),
+        readMatrix(this.matrixReceiverArg(args, namedArgs)),
         this.getCallArg(args, namedArgs, 1, 'value'),
         this.optionalMatrixRangeArg(args, namedArgs, 2, 'from_row'),
         this.optionalMatrixRangeArg(args, namedArgs, 3, 'to_row'),
@@ -6123,46 +6140,67 @@ export class TealscriptEngine {
       );
       return null;
     });
-    this.builtins.set('matrix.reshape', (args) => {
-      reshapeMatrix(readMatrix(args[0]), args[1] as number, args[2] as number);
+    this.builtins.set('matrix.reshape', (args, namedArgs) => {
+      reshapeMatrix(
+        readMatrix(this.matrixReceiverArg(args, namedArgs)),
+        this.getCallArg(args, namedArgs, 1, 'rows') as number,
+        this.getCallArg(args, namedArgs, 2, 'columns') as number,
+      );
       return null;
     });
-    this.builtins.set('matrix.add_row', (args) => {
-      const [row, values] = readInsertionArgs(args);
-      addMatrixRow(readMatrix(args[0]), row, values);
+    this.builtins.set('matrix.add_row', (args, namedArgs) => {
+      const [row, values] = readInsertionArgs(args, namedArgs, 'row');
+      addMatrixRow(readMatrix(this.matrixReceiverArg(args, namedArgs)), row, values);
       return null;
     });
-    this.builtins.set('matrix.add_col', (args) => {
-      const [column, values] = readInsertionArgs(args);
-      addMatrixColumn(readMatrix(args[0]), column, values);
+    this.builtins.set('matrix.add_col', (args, namedArgs) => {
+      const [column, values] = readInsertionArgs(args, namedArgs, 'column');
+      addMatrixColumn(readMatrix(this.matrixReceiverArg(args, namedArgs)), column, values);
       return null;
     });
-    this.builtins.set('matrix.add_column', (args) => {
-      const [column, values] = readInsertionArgs(args);
-      addMatrixColumn(readMatrix(args[0]), column, values);
+    this.builtins.set('matrix.add_column', (args, namedArgs) => {
+      const [column, values] = readInsertionArgs(args, namedArgs, 'column');
+      addMatrixColumn(readMatrix(this.matrixReceiverArg(args, namedArgs)), column, values);
       return null;
     });
-    this.builtins.set('matrix.remove_row', (args) => removeMatrixRow(readMatrix(args[0]), args[1] as number));
-    this.builtins.set('matrix.remove_col', (args) => removeMatrixColumn(readMatrix(args[0]), args[1] as number));
-    this.builtins.set('matrix.remove_column', (args) => removeMatrixColumn(readMatrix(args[0]), args[1] as number));
-    this.builtins.set('matrix.swap_rows', (args) => {
-      swapMatrixRows(readMatrix(args[0]), args[1] as number, args[2] as number);
+    this.builtins.set('matrix.remove_row', (args, namedArgs) => removeMatrixRow(
+      readMatrix(this.matrixReceiverArg(args, namedArgs)),
+      this.getCallArg(args, namedArgs, 1, 'row') as number,
+    ));
+    this.builtins.set('matrix.remove_col', (args, namedArgs) => removeMatrixColumn(
+      readMatrix(this.matrixReceiverArg(args, namedArgs)),
+      this.getCallArg(args, namedArgs, 1, 'column') as number,
+    ));
+    this.builtins.set('matrix.remove_column', (args, namedArgs) => removeMatrixColumn(
+      readMatrix(this.matrixReceiverArg(args, namedArgs)),
+      this.getCallArg(args, namedArgs, 1, 'column') as number,
+    ));
+    this.builtins.set('matrix.swap_rows', (args, namedArgs) => {
+      swapMatrixRows(
+        readMatrix(this.matrixReceiverArg(args, namedArgs)),
+        this.getCallArg(args, namedArgs, 1, 'row1') as number,
+        this.getCallArg(args, namedArgs, 2, 'row2') as number,
+      );
       return null;
     });
-    this.builtins.set('matrix.swap_columns', (args) => {
-      swapMatrixColumns(readMatrix(args[0]), args[1] as number, args[2] as number);
+    this.builtins.set('matrix.swap_columns', (args, namedArgs) => {
+      swapMatrixColumns(
+        readMatrix(this.matrixReceiverArg(args, namedArgs)),
+        this.getCallArg(args, namedArgs, 1, 'column1') as number,
+        this.getCallArg(args, namedArgs, 2, 'column2') as number,
+      );
       return null;
     });
-    this.builtins.set('matrix.reverse', (args) => {
-      reverseMatrix(readMatrix(args[0]));
+    this.builtins.set('matrix.reverse', (args, namedArgs) => {
+      reverseMatrix(readMatrix(this.matrixReceiverArg(args, namedArgs)));
       return null;
     });
-    this.builtins.set('matrix.transpose', (args) => transposeMatrix(readMatrix(args[0])));
-    this.builtins.set('matrix.avg', (args) => avgMatrixValue(readMatrix(args[0])));
-    this.builtins.set('matrix.min', (args) => minMatrixValue(readMatrix(args[0])));
-    this.builtins.set('matrix.max', (args) => maxMatrixValue(readMatrix(args[0])));
-    this.builtins.set('matrix.median', (args) => medianMatrixValue(readMatrix(args[0])));
-    this.builtins.set('matrix.mode', (args) => modeMatrixValue(readMatrix(args[0])));
+    this.builtins.set('matrix.transpose', (args, namedArgs) => transposeMatrix(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.avg', (args, namedArgs) => avgMatrixValue(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.min', (args, namedArgs) => minMatrixValue(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.max', (args, namedArgs) => maxMatrixValue(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.median', (args, namedArgs) => medianMatrixValue(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.mode', (args, namedArgs) => modeMatrixValue(readMatrix(this.matrixReceiverArg(args, namedArgs))));
     this.builtins.set('matrix.sum', (args) => sumMatrixValue(readMatrix(args[0]), readMatrixArithmeticOperand(args[1])));
     this.builtins.set('matrix.diff', (args) => diffMatrixValue(readMatrix(args[0]), readMatrixArithmeticOperand(args[1])));
     this.builtins.set('matrix.mult', (args) => multMatrixValue(readMatrix(args[0]), readMatrixMultOperand(args[1])));
@@ -6180,8 +6218,7 @@ export class TealscriptEngine {
       return null;
     });
     this.builtins.set('matrix.submatrix', (args, namedArgs) => {
-      const matrixArg = args[0] !== undefined ? args[0] : namedArgs.get('id');
-      const matrix = readMatrix(matrixArg);
+      const matrix = readMatrix(this.matrixReceiverArg(args, namedArgs));
       return submatrixValue(
         matrix,
         this.optionalMatrixRangeArg(args, namedArgs, 1, 'from_row'),
@@ -6190,32 +6227,36 @@ export class TealscriptEngine {
         this.optionalMatrixRangeArg(args, namedArgs, 4, 'to_column'),
       );
     });
-    this.builtins.set('matrix.concat', (args) => {
-      concatMatrix(readMatrix(args[0]), readMatrix(args[1]));
+    this.builtins.set('matrix.concat', (args, namedArgs) => {
+      concatMatrix(readMatrix(this.matrixReceiverArg(args, namedArgs)), readMatrix(this.getCallArg(args, namedArgs, 1, 'id2')));
       return null;
     });
-    this.builtins.set('matrix.copy', (args) => copyMatrix(readMatrix(args[0])));
-    this.builtins.set('matrix.row', (args) => matrixRow(readMatrix(args[0]), args[1] as number));
-    this.builtins.set('matrix.col', (args) => matrixColumn(readMatrix(args[0]), args[1] as number));
-    this.builtins.set('matrix.column', (args) => matrixColumn(readMatrix(args[0]), args[1] as number));
-    this.builtins.set('matrix.is_square', (args) => {
-      return isSquareMatrix(readMatrix(args[0]));
+    this.builtins.set('matrix.copy', (args, namedArgs) => copyMatrix(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.row', (args, namedArgs) => matrixRow(readMatrix(this.matrixReceiverArg(args, namedArgs)), this.getCallArg(args, namedArgs, 1, 'row') as number));
+    this.builtins.set('matrix.col', (args, namedArgs) => matrixColumn(readMatrix(this.matrixReceiverArg(args, namedArgs)), this.getCallArg(args, namedArgs, 1, 'column') as number));
+    this.builtins.set('matrix.column', (args, namedArgs) => matrixColumn(readMatrix(this.matrixReceiverArg(args, namedArgs)), this.getCallArg(args, namedArgs, 1, 'column') as number));
+    this.builtins.set('matrix.is_square', (args, namedArgs) => {
+      return isSquareMatrix(readMatrix(this.matrixReceiverArg(args, namedArgs)));
     });
-    this.builtins.set('matrix.is_valid', (args) => isValidMatrix(args[0]));
-    this.builtins.set('matrix.is_zero', (args) => isZeroMatrix(readMatrix(args[0])));
-    this.builtins.set('matrix.is_binary', (args) => isBinaryMatrix(readMatrix(args[0])));
-    this.builtins.set('matrix.is_identity', (args) => isIdentityMatrix(readMatrix(args[0])));
-    this.builtins.set('matrix.is_diagonal', (args) => isDiagonalMatrix(readMatrix(args[0])));
-    this.builtins.set('matrix.is_antidiagonal', (args) => isAntidiagonalMatrix(readMatrix(args[0])));
-    this.builtins.set('matrix.is_symmetric', (args) => isSymmetricMatrix(readMatrix(args[0])));
-    this.builtins.set('matrix.is_antisymmetric', (args) => isAntisymmetricMatrix(readMatrix(args[0])));
-    this.builtins.set('matrix.is_triangular', (args) => isTriangularMatrix(readMatrix(args[0])));
-    this.builtins.set('matrix.is_stochastic', (args) => isStochasticMatrix(readMatrix(args[0])));
+    this.builtins.set('matrix.is_valid', (args, namedArgs) => isValidMatrix(this.matrixReceiverArg(args, namedArgs)));
+    this.builtins.set('matrix.is_zero', (args, namedArgs) => isZeroMatrix(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.is_binary', (args, namedArgs) => isBinaryMatrix(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.is_identity', (args, namedArgs) => isIdentityMatrix(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.is_diagonal', (args, namedArgs) => isDiagonalMatrix(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.is_antidiagonal', (args, namedArgs) => isAntidiagonalMatrix(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.is_symmetric', (args, namedArgs) => isSymmetricMatrix(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.is_antisymmetric', (args, namedArgs) => isAntisymmetricMatrix(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.is_triangular', (args, namedArgs) => isTriangularMatrix(readMatrix(this.matrixReceiverArg(args, namedArgs))));
+    this.builtins.set('matrix.is_stochastic', (args, namedArgs) => isStochasticMatrix(readMatrix(this.matrixReceiverArg(args, namedArgs))));
   }
 
   private optionalMatrixRangeArg(args: unknown[], namedArgs: Map<string, unknown>, index: number, name: string): number | undefined {
     const value = this.getCallArg(args, namedArgs, index, name);
     return value === undefined ? undefined : this.toNumber(value);
+  }
+
+  private matrixReceiverArg(args: unknown[], namedArgs: Map<string, unknown>): unknown {
+    return args[0] !== undefined ? args[0] : namedArgs.get('id');
   }
 
   private registerMapBuiltins(): void {
