@@ -83,6 +83,7 @@ plot(close)
 indicator("Bad Logs")
 log.info()
 log.warning(text="bad")
+log.trace("unsupported")
 `));
 
     expect(result.diagnostics).toEqual([
@@ -97,6 +98,10 @@ log.warning(text="bad")
       expect.objectContaining({
         code: 'argument-count',
         message: 'log.warning() expects at least 1 argument',
+      }),
+      expect.objectContaining({
+        code: 'unknown-function',
+        message: 'Unknown function: log.trace',
       }),
     ]);
   });

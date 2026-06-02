@@ -1370,12 +1370,21 @@ class SemanticChecker {
   private checkBuiltinSignature(expression: CallExpression): void {
     const displayName = this.memberPath(expression.callee).join('.');
     const signature = BUILTIN_SIGNATURES.get(displayName);
-    if (!signature) return;
+    if (!signature) {
+      this.checkUnsupportedLogCall(expression, displayName);
+      return;
+    }
 
     this.checkArgumentOrder(expression.arguments, displayName);
     this.checkArgumentNames(expression.arguments, signature, displayName);
     this.checkArgumentCount(expression.arguments, signature, displayName);
     this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName);
+  }
+
+  private checkUnsupportedLogCall(expression: CallExpression, displayName: string): void {
+    if (expression.callee.type !== 'MemberExpression') return;
+    if (expression.callee.object.type !== 'Identifier' || expression.callee.object.name !== 'log') return;
+    this.addDiagnostic('unknown-function', `Unknown function: ${displayName}`, expression.callee.loc);
   }
 
   private checkUdtConstructorSignature(expression: CallExpression, scope: SemanticScope): void {

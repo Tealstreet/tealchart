@@ -345,8 +345,9 @@ message-only and format-string forms. The runtime captures log level, bar
 index, bar time, and message in `ExecutionResult.logs` and forwards them
 through worker result bundles. The semantic checker recognizes the `log`
 namespace and validates the variadic `message` signature before runtime.
-`log.error()` records an error-level diagnostic without halting execution; use
-`runtime.error()` for Pine-compatible runtime halts.
+`log.error()` records an error-level log entry in `ExecutionResult.logs`
+without halting execution; use `runtime.error()` for Pine-compatible runtime
+halts.
 
 ## Core `na` And Logical Semantics Coverage
 
