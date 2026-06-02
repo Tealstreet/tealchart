@@ -1004,6 +1004,35 @@ value = ta.sma(close, source=open, length=14)
     ]);
   });
 
+  it('resolves color helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Color Signatures")
+base = color.rgb(red=1, green=2, blue=3, transp=25)
+derived = color.rgb(color.r(color=base), color.g(color=base), color.b(color=base), color.t(color=base))
+gradient = color.from_gradient(value=close, bottom_value=0, top_value=100, bottom_color=base, top_color=derived)
+plot(close, color=gradient)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid color helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Color Signatures")
+rgbDuplicate = color.rgb(1, 2, 3, red=4)
+rgbUnknown = color.rgb(1, 2, 3, alpha=25)
+channelUnknown = color.r(color.red, source=color.blue)
+gradientShort = color.from_gradient(close, 0, 100, color.red)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Argument 'red' for color.rgb() was supplied multiple times",
+      "Unknown argument 'alpha' for color.rgb()",
+      "Unknown argument 'source' for color.r()",
+      'color.from_gradient() expects at least 5 arguments',
+    ]);
+  });
+
   it('resolves request helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Request Signatures")
