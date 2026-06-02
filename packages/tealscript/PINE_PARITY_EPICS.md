@@ -60,8 +60,8 @@ Known structural gaps:
   matrices, libraries, and strategy execution remain tracked below.
 - Some parser/runtime docs are stale relative to recent compatibility work.
 - Some semantics are approximate, especially source-series inference, `na`
-  propagation, realtime `varip`, named timezones, sessions, and higher-timeframe
-  behavior.
+  propagation, realtime `varip`, exchange calendar holidays, and live host
+  metadata injection.
 
 ## Epic Order
 
@@ -263,22 +263,29 @@ Goal: make time-dependent Pine scripts reliable.
 
 Phases:
 
-1. Add named IANA timezone support and exchange timezone injection.
-2. Complete calendar functions and variables across timezone arguments.
-3. Complete `timestamp()`, `time`, `time_close`, `timenow`, and
-   `last_bar_time` variants.
-4. Complete session strings: day masks, overnight sessions, multi-segment
-   sessions, regular/extended session behavior, and session-state helpers.
-   Runtime coverage now evaluates `session.ismarket`,
-   `session.ispremarket`, and `session.ispostmarket` when the host provides
-   exchange session classification windows.
-5. Add timeframe parsing and validation for ticks, seconds, minutes, days,
+1. Named IANA timezone support and exchange timezone injection are covered by
+   runtime and compatibility tests.
+2. Calendar functions and variables accept timezone arguments across the common
+   Pine forms.
+3. `timestamp()`, `time`, `time_close`, `timenow`, `last_bar_time`, and
+   `time_tradingday` variants are covered for common indicator usage.
+4. Session strings cover day masks, overnight sessions, multi-segment sessions,
+   `session.regular`, 24x7 forms, and session-state helpers. Runtime coverage
+   evaluates `session.ismarket`, `session.ispremarket`, and
+   `session.ispostmarket` when the host provides exchange session
+   classification windows.
+5. Timeframe parsing and validation covers ticks, seconds, minutes, days,
    weeks, and months.
-6. Implement `timeframe.in_seconds()` and timeframe comparison helpers.
-7. Add higher-timeframe `time()` / `time_close()` aggregation semantics.
+6. `timeframe.in_seconds()`, `timeframe.from_seconds()`,
+   `timeframe.change()`, and category helpers are covered for common
+   comparison idioms.
+7. Higher-timeframe `time()` / `time_close()` aggregation is covered for
+   intraday, day, and week buckets, including timezone-aware DST boundaries.
 
 Done means session filters and MTF time gates behave like Pine across common
-markets.
+markets. Remaining follow-up belongs to exchange-specific calendar holiday
+models, host-provided live chart metadata/session injection, and additional
+dynamic-session checkpoint fixtures from real Pine scripts.
 
 ## Epic 8: `request.*` And Multi-Context Data Engine
 
@@ -662,7 +669,8 @@ this list focused on gaps that are not already covered by the epic notes above.
 4. Request data follow-up: `request.footprint()` has an explicit host-data
    model and deferral plan; implement it only after footprint/intrabar-volume
    data is available from the host.
-5. Named timezone/session completion.
+5. Exchange calendar/session model: holiday-aware sessions, host-provided live
+   chart metadata/session injection, and dynamic-session checkpoint expansion.
 6. `matrix.*` reference reconciliation.
 7. `map.*` reference reconciliation.
 8. Library import/export MVP.
