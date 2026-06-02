@@ -5825,8 +5825,9 @@ export class TealscriptEngine {
       return null;
     });
     this.builtins.set('matrix.fill', (args, namedArgs) => {
+      const matrixArg = args[0] !== undefined ? args[0] : namedArgs.get('id');
       fillMatrix(
-        readMatrix(this.getCallArg(args, namedArgs, 0, 'id')),
+        readMatrix(matrixArg),
         this.getCallArg(args, namedArgs, 1, 'value'),
         this.optionalMatrixRangeArg(args, namedArgs, 2, 'from_row'),
         this.optionalMatrixRangeArg(args, namedArgs, 3, 'to_row'),
@@ -5892,7 +5893,8 @@ export class TealscriptEngine {
       return null;
     });
     this.builtins.set('matrix.submatrix', (args, namedArgs) => {
-      const matrix = readMatrix(this.getCallArg(args, namedArgs, 0, 'id'));
+      const matrixArg = args[0] !== undefined ? args[0] : namedArgs.get('id');
+      const matrix = readMatrix(matrixArg);
       return submatrixValue(
         matrix,
         this.optionalMatrixRangeArg(args, namedArgs, 1, 'from_row'),

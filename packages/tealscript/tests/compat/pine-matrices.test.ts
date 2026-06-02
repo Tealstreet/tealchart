@@ -97,7 +97,11 @@ m.set(1, 2, 6)
 m.fill(9, 0, 1, 1, 3)
 slice = m.submatrix(from_row=0, to_row=1, from_column=1, to_column=3)
 matrix.fill(id=m, value=7, from_row=1, to_row=2, from_column=0, to_column=2)
-plot(m.get(0, 0), title="Unchanged")
+other = matrix.new_int(2, 3, 0)
+other.fill(100)
+m.fill(id=other, value=8, from_row=0, to_row=1, from_column=0, to_column=1)
+receiverSlice = m.submatrix(id=other, from_row=0, to_row=1, from_column=0, to_column=1)
+plot(m.get(0, 0), title="Receiver Filled")
 plot(m.get(0, 1), title="Method Filled")
 plot(m.get(1, 0), title="Named Filled")
 plot(m.get(1, 2), title="Named Unchanged")
@@ -105,10 +109,12 @@ plot(slice.rows(), title="Slice Rows")
 plot(slice.columns(), title="Slice Columns")
 plot(slice.get(0, 0), title="Slice First")
 plot(slice.get(0, 1), title="Slice Second")
+plot(other.get(0, 0), title="Other Unchanged")
+plot(receiverSlice.get(0, 0), title="Receiver Slice")
 `);
 
     expect(result.errors).toEqual([]);
-    expect(roundSeries(getPlot(result, 'Unchanged').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Receiver Filled').values)).toEqual([8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]);
     expect(roundSeries(getPlot(result, 'Method Filled').values)).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
     expect(roundSeries(getPlot(result, 'Named Filled').values)).toEqual([7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]);
     expect(roundSeries(getPlot(result, 'Named Unchanged').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
@@ -116,6 +122,8 @@ plot(slice.get(0, 1), title="Slice Second")
     expect(roundSeries(getPlot(result, 'Slice Columns').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
     expect(roundSeries(getPlot(result, 'Slice First').values)).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
     expect(roundSeries(getPlot(result, 'Slice Second').values)).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
+    expect(roundSeries(getPlot(result, 'Other Unchanged').values)).toEqual([100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]);
+    expect(roundSeries(getPlot(result, 'Receiver Slice').values)).toEqual([8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]);
   });
 
   it('runs documented matrix row iteration idioms', () => {
