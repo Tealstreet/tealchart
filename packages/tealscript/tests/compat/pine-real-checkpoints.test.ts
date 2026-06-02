@@ -167,4 +167,80 @@ plot(inSession and rawSignal ? 1 : 0, title="Filtered Signal")
     expect(getPlot(result, 'In Session').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0]);
     expect(getPlot(result, 'Filtered Signal').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0]);
   });
+
+  it('locks the official alert trigger idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/alerts/
+    const result = runCompatScript(`
+indicator("Official Alert Checkpoint")
+trigger = close > close[1]
+alertcondition(trigger, title="Close Rising", message="Close rose above the previous close")
+if trigger
+    alert("Close rising", alert.freq_once_per_bar_close)
+plot(trigger ? 1 : 0, title="Trigger")
+`);
+
+    const condition = result.alerts.find((alert) => alert.type === 'alertcondition');
+    const directAlert = result.alerts.find((alert) => alert.type === 'alert');
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Trigger').values).toEqual([0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
+    expect(condition?.values).toEqual([null, true, true, null, null, true, true, true, null, true, null, true]);
+    expect(directAlert?.events.map((event) => ({
+      barIndex: event.barIndex,
+      frequency: event.frequency,
+      message: event.message,
+    }))).toEqual([
+      { barIndex: 1, frequency: 'once_per_bar_close', message: 'Close rising' },
+      { barIndex: 2, frequency: 'once_per_bar_close', message: 'Close rising' },
+      { barIndex: 5, frequency: 'once_per_bar_close', message: 'Close rising' },
+      { barIndex: 6, frequency: 'once_per_bar_close', message: 'Close rising' },
+      { barIndex: 7, frequency: 'once_per_bar_close', message: 'Close rising' },
+      { barIndex: 9, frequency: 'once_per_bar_close', message: 'Close rising' },
+      { barIndex: 11, frequency: 'once_per_bar_close', message: 'Close rising' },
+    ]);
+  });
+
+  it('locks the official strategy entry and bracket-exit idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
+    const result = runCompatScript(`
+strategy("Official Strategy Checkpoint", initial_capital=1000, process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Bracket", "Long", limit=106, stop=99)
+plot(strategy.position_size, title="Position")
+plot(strategy.closedtrades, title="Closed Trades")
+plot(strategy.netprofit, title="Net Profit")
+`, { bars: compatibilityBars.slice(0, 4) });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Position').values).toEqual([1, 1, 1, 0]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 0, 0, 1]);
+    expect(getPlot(result, 'Net Profit').values).toEqual([0, 0, 0, 4]);
+    expect(result.strategy.closedTrades[0]).toMatchObject({
+      entryOrderId: 'Long',
+      exitOrderId: 'Bracket Limit',
+      entryPrice: 102,
+      exitPrice: 106,
+      profit: 4,
+    });
+  });
+
+  it('locks the official repeated request-call limit idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/writing/limitations/
+    const result = runCompatScript(`
+indicator("Official Request Limit Checkpoint")
+reqSum = 0.0
+for i = 1 to 50
+    reqSum := reqSum + nz(request.security("MISSING", "2", close, ignore_invalid_symbol=true), 0)
+plot(reqSum, title="Request Sum")
+`, {
+      bars: [compatibilityBars[0]!],
+      engineOptions: { requestDatafeed: new InMemoryRequestDatafeed([]) },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.requestContexts).toBe(1);
+    expect(getPlot(result, 'Request Sum').values).toEqual([0]);
+  });
 });

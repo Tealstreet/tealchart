@@ -618,7 +618,9 @@ Phases:
 
 1. Curate source-linked reduced fixtures from official docs for each major
    concept. Initial checkpoints cover official built-ins namespace, barstate
-   plus dynamic array growth, and inside/outside `barcolor()` idioms.
+   plus dynamic array growth, inside/outside `barcolor()` idioms, alert trigger
+   idioms, strategy entry/bracket-exit flows, and repeated request-call limit
+   idioms.
 2. Curate source-linked reduced fixtures from public common idioms: MTF trend
    filters, divergence scripts, liquidity zones, session filters, labels,
    tables, and simple strategies. Initial public-idiom checkpoints cover MTF
@@ -626,7 +628,8 @@ Phases:
 3. For each fixture, use deterministic local bars and hand-checked expected
    outputs, not live TradingView execution in CI. Checkpoint source provenance,
    reductions, and expected-output policy are tracked in
-   `tests/compat/PINE_CHECKPOINTS.md`.
+   `tests/compat/PINE_CHECKPOINTS.md`, which also includes a coverage index
+   mapping checkpoint fixtures to major parity areas.
 4. Add manual comparison notes for milestone scripts where visual parity matters.
    `tests/compat/PINE_CHECKPOINTS.md` now defines the manual visual comparison
    checklist and milestone areas.
