@@ -1151,6 +1151,47 @@ unknownSort = matrix.sort(id=a, direction=order.ascending)
     ]);
   });
 
+  it('resolves matrix predicate helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Matrix Predicate Signatures")
+m = matrix.new_float(rows=2, columns=2, initial_value=1)
+square = matrix.is_square(id=m)
+zero = matrix.is_zero(id=m)
+binary = matrix.is_binary(id=m)
+identity = matrix.is_identity(id=m)
+diagonal = matrix.is_diagonal(id=m)
+antidiagonal = matrix.is_antidiagonal(id=m)
+symmetric = matrix.is_symmetric(id=m)
+antisymmetric = matrix.is_antisymmetric(id=m)
+triangular = matrix.is_triangular(id=m)
+stochastic = matrix.is_stochastic(id=m)
+plot((square ? 1 : 0) + (zero ? 1 : 0) + (binary ? 1 : 0) + (identity ? 1 : 0) + (diagonal ? 1 : 0) + (antidiagonal ? 1 : 0) + (symmetric ? 1 : 0) + (antisymmetric ? 1 : 0) + (triangular ? 1 : 0) + (stochastic ? 1 : 0))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid matrix predicate helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Matrix Predicate Signatures")
+m = matrix.new_float(rows=2, columns=2, initial_value=1)
+unknownSquare = matrix.is_square(matrix=m)
+tooManyZero = matrix.is_zero(m, m)
+missingBinary = matrix.is_binary()
+duplicateIdentity = matrix.is_identity(m, id=m)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'matrix' for matrix.is_square()",
+      'matrix.is_square() expects at least 1 argument',
+      "matrix.is_square() missing required argument 'id'",
+      'matrix.is_zero() expects at most 1 argument',
+      'matrix.is_binary() expects at least 1 argument',
+      "matrix.is_binary() missing required argument 'id'",
+      "Argument 'id' for matrix.is_identity() was supplied multiple times",
+    ]);
+  });
+
   it('reports array element template mismatches for known mutable arrays', () => {
     const result = checkProgram(parse(`
 indicator("Bad Array Types")
