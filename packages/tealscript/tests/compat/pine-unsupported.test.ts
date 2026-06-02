@@ -11,7 +11,7 @@ plot(close)
 `, { bars: [compatibilityBars[0]!] });
 
     expect(result.errors.map((error) => error.message)).toEqual([
-      'request.* functions are not supported yet: request.footprint',
+      'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
     ]);
   });
 
