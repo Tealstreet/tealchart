@@ -20,8 +20,10 @@ import type {
 import { DrawingStore } from './drawings/store';
 import { Series } from './series';
 import {
+  cloneStrategyIntrabarContext,
   cloneStrategyLedger,
   createStrategyLedger,
+  type StrategyIntrabarContext,
   type StrategyLedger,
   type StrategyLedgerSettings,
 } from './strategy';
@@ -977,6 +979,22 @@ export class ExecutionContext {
    */
   setStrategyLedger(settings: Partial<StrategyLedgerSettings>): void {
     this.strategyLedger = createStrategyLedger(settings);
+    this.captureRealtimeRollbackState();
+  }
+
+  /**
+   * Record the selected strategy execution path for the current chart bar.
+   */
+  recordStrategyIntrabarContext(context: StrategyIntrabarContext): void {
+    const existingIndex = this.strategyLedger.intrabarContexts.findIndex(
+      (existing) => existing.chartBarIndex === context.chartBarIndex,
+    );
+    const cloned = cloneStrategyIntrabarContext(context);
+    if (existingIndex >= 0) {
+      this.strategyLedger.intrabarContexts[existingIndex] = cloned;
+    } else {
+      this.strategyLedger.intrabarContexts.push(cloned);
+    }
     this.captureRealtimeRollbackState();
   }
 

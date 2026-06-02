@@ -281,6 +281,7 @@ export interface StrategyLedger {
   fills: StrategyFill[];
   openTrades: StrategyTrade[];
   closedTrades: StrategyTrade[];
+  intrabarContexts: StrategyIntrabarContext[];
   position: StrategyPosition;
   equityCurve: StrategyEquityPoint[];
   initialCapital: number;
@@ -333,6 +334,7 @@ export function createStrategyLedger(settings: Partial<StrategyLedgerSettings> =
     fills: [],
     openTrades: [],
     closedTrades: [],
+    intrabarContexts: [],
     position: createStrategyPosition(),
     equityCurve: [],
     initialCapital: resolvedSettings.initialCapital,
@@ -352,6 +354,7 @@ export function cloneStrategyLedger(ledger: StrategyLedger): StrategyLedger {
     fills: ledger.fills.map((fill) => ({ ...fill })),
     openTrades: ledger.openTrades.map((trade) => ({ ...trade })),
     closedTrades: ledger.closedTrades.map((trade) => ({ ...trade })),
+    intrabarContexts: ledger.intrabarContexts.map((context) => cloneStrategyIntrabarContext(context)),
     position: { ...ledger.position },
     equityCurve: ledger.equityCurve.map((point) => ({ ...point })),
     initialCapital: ledger.initialCapital,
