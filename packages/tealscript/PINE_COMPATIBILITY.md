@@ -32,6 +32,9 @@ Status values:
 For each major compatibility epic, add deterministic golden fixtures for the
 new behavior and, at checkpoint boundaries, add reduced smoke fixtures inspired
 by real Pine examples from official docs or public indicator idioms.
+The current real-idiom checkpoint suite covers official built-ins, barstate plus
+arrays, bar coloring, alerts, strategy entry/exit flows, request-limit reuse,
+and public MTF, divergence, and session-filter idioms.
 
 ## Current Matrix
 
