@@ -1685,6 +1685,11 @@ export class TealscriptEngine {
       this.assertCanEvaluateRequest(fullName);
       return this.evaluateRequestSeed(expr, this.nextBuiltinCallId(fullName));
     }
+    if (fullName === 'request.footprint') {
+      throw new Error(
+        'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+      );
+    }
     if (namespace === 'request') {
       throw new Error(`request.* functions are not supported yet: ${fullName}`);
     }

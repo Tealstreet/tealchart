@@ -510,7 +510,8 @@ TealScript sandbox cap of 10,000 declared table cells across live tables.
 
 Known limits: request data availability is host/provider-gated, point-series
 lookahead is conservative, and `request.footprint()` remains unsupported until
-the runtime has an explicit footprint/intrabar volume model.
+the host can provide the footprint/intrabar volume model described in
+[`FOOTPRINT_REQUEST_DESIGN.md`](./FOOTPRINT_REQUEST_DESIGN.md).
 
 The ticker pass covers `ticker.new()`, `ticker.modify()`, `ticker.standard()`,
 `ticker.inherit()`, `ticker.heikinashi()`, `ticker.renko()`,
