@@ -144,6 +144,24 @@ const ARRAY_CONSTRUCTOR_ELEMENT_TYPES = new Map<string, SemanticTypeKind>([
   ['array.new_table', 'table'],
 ]);
 
+const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
+  ['box.copy', 'box'],
+  ['box.new', 'box'],
+  ['chart.point.copy', 'chart.point'],
+  ['chart.point.from_index', 'chart.point'],
+  ['chart.point.from_time', 'chart.point'],
+  ['chart.point.new', 'chart.point'],
+  ['chart.point.now', 'chart.point'],
+  ['label.copy', 'label'],
+  ['label.new', 'label'],
+  ['line.copy', 'line'],
+  ['line.new', 'line'],
+  ['linefill.new', 'linefill'],
+  ['polyline.copy', 'polyline'],
+  ['polyline.new', 'polyline'],
+  ['table.new', 'table'],
+]);
+
 const BUILTIN_FUNCTIONS = new Set([
   'alert',
   'alertcondition',
@@ -223,6 +241,7 @@ const TYPE_QUALIFIER_NAMES = new Set(['const', 'input', 'simple', 'series']);
 const COLLECTION_TYPE_NAMES = new Set(['array', 'matrix', 'map']);
 const MAP_KEY_TYPE_NAMES = new Set(['int', 'float', 'bool', 'string', 'color']);
 const PRIMITIVE_TYPE_KINDS = new Set<SemanticTypeKind>(['bool', 'color', 'float', 'int', 'string']);
+const REFERENCE_TYPE_KINDS = new Set<SemanticTypeKind>(['box', 'chart.point', 'hline', 'label', 'line', 'linefill', 'plot', 'polyline', 'table']);
 const STRUCTURED_TYPE_KINDS = new Set<SemanticTypeKind>(['array', 'matrix', 'map', 'udt']);
 const COLLECTION_TEMPLATE_TYPE_PATTERN = /^(array|matrix|map)</;
 const UNKNOWN_SEMANTIC_TYPE: SemanticType = { kind: 'unknown' };
@@ -1896,7 +1915,7 @@ class SemanticChecker {
     }
 
     if (annotation.baseType === 'udt') {
-      return { kind: 'udt', qualifier, name: annotation.name };
+      return this.typeFromName(annotation.name, qualifier);
     }
 
     return this.typeFromName(annotation.baseType, qualifier);
@@ -1962,6 +1981,10 @@ class SemanticChecker {
 
   private inferCallType(expression: CallExpression, scope: SemanticScope): SemanticType {
     const calleePath = this.memberPath(expression.callee);
+    const calleeName = calleePath.join('.');
+    const referenceReturnType = REFERENCE_CONSTRUCTOR_RETURN_TYPES.get(calleeName);
+    if (referenceReturnType) return { kind: referenceReturnType };
+
     const namespace = calleePath[0];
     if (namespace === 'input') return { kind: 'unknown', qualifier: 'input' };
     if (namespace === 'request' || namespace === 'ta' || namespace === 'time' || namespace === 'time_close' || calleePath.join('.') === 'timeframe.change') {
@@ -2186,6 +2209,7 @@ class SemanticChecker {
 
   private arrayElementTypeKind(type: SemanticType): SemanticType {
     if (PRIMITIVE_TYPE_KINDS.has(type.kind)) return { kind: type.kind };
+    if (REFERENCE_TYPE_KINDS.has(type.kind)) return { kind: type.kind };
     if (type.kind === 'udt' && type.name) return { kind: 'udt', name: type.name };
     return { kind: 'unknown' };
   }
@@ -2290,6 +2314,10 @@ class SemanticChecker {
 
     if (STRUCTURED_TYPE_KINDS.has(targetType.kind) || STRUCTURED_TYPE_KINDS.has(sourceType.kind)) {
       return false;
+    }
+
+    if (REFERENCE_TYPE_KINDS.has(targetType.kind) || REFERENCE_TYPE_KINDS.has(sourceType.kind)) {
+      return targetType.kind === sourceType.kind;
     }
 
     if (!PRIMITIVE_TYPE_KINDS.has(targetType.kind) || !PRIMITIVE_TYPE_KINDS.has(sourceType.kind)) return true;
