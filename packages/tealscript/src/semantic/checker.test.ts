@@ -1046,6 +1046,53 @@ gradientShort = color.from_gradient(close, 0, 100, color.red)
     ]);
   });
 
+  it('resolves string helper named arguments and aliases', () => {
+    const result = checkProgram(parse(`
+indicator("String Signatures")
+text = "BTC-USDT-USDT"
+formatted = str.tostring(value=close, format="#.0")
+parsed = str.tonumber(string="42.5")
+timeText = str.format_time(time=time, format="yyyy-MM-dd", timezone=syminfo.timezone)
+message = str.format(format="close")
+hasUsdt = str.contains(string=text, substring="USDT")
+starts = str.startswith(source=text, target="BTC")
+ends = str.endswith(source=text, str="USDT")
+position = str.pos(source=text, str="USDT")
+prefix = str.substring(string=text, begin_pos=0, end_pos=3)
+match = str.match(source="Trade NASDAQ:AAPL", pattern="[A-Z]+:[A-Z]+")
+repeated = str.repeat(string="?", repeat_count=3, separator=",")
+parts = str.split(string=text, separator="-")
+upper = str.upper(string=text)
+lower = str.lower(string=text)
+trimmed = str.trim(string=" BTC ")
+replaceOne = str.replace(string=text, substring="USDT", replacement="PERP", occurrence=1)
+replaceAll = str.replace_all(source=text, str="USDT", replacement="PERP")
+plot(parsed + position + str.length(string=formatted + timeText + message + prefix + match + repeated + upper + lower + trimmed + replaceOne + replaceAll))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid string helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad String Signatures")
+duplicateSource = str.contains("BTC", source="ETH", str="T")
+duplicateAlias = str.replace(source="BTC", target="T", substring="B", replacement="X")
+unknownArg = str.substring(source="BTC", start=0)
+shortReplace = str.replace(source="BTC", target="B")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Argument 'source' for str.contains() was supplied multiple times",
+      "Argument 'substring' for str.replace() was supplied multiple times",
+      "Unknown argument 'start' for str.substring()",
+      "str.substring() expects at least 2 arguments",
+      "str.substring() missing required argument 'begin_pos'",
+      "str.replace() expects at least 3 arguments",
+      "str.replace() missing required argument 'replacement'",
+    ]);
+  });
+
   it('resolves ticker helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Ticker Signatures")
