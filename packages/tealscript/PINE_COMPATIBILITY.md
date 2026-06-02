@@ -123,8 +123,9 @@ statistical helper pass covers `ta.median`, `ta.mode`,
 `ta.percentile_nearest_rank`, `ta.percentile_linear_interpolation`, and
 `ta.percentrank`. Covered DMI, SAR, pivot, and linear regression helpers accept
 common Pine named arguments, and pivot helpers support default-source
-two-argument calls. Event and cross helpers accept named condition/source
-arguments. These are covered in the golden compatibility harness.
+two-argument calls. Event and cross helpers accept named `condition`/`source`
+arguments and cross helper `source1`/`source2` arguments. These are covered in
+the golden compatibility harness.
 
 ## Common `str.*` Coverage
 

@@ -6750,7 +6750,7 @@ export class TealscriptEngine {
    * Get a series accessor for a given source value.
    * Maps current bar values back to their source series.
    */
-  private getSeriesForSource(source: number, ctx: ExecutionContext): { get: (offset: number) => number | undefined } {
+  private getKnownSeriesForSource(source: number, ctx: ExecutionContext): { get: (offset: number) => number | undefined } | undefined {
     // Check if source matches any built-in series at offset 0
     if (source === ctx.close.get(0)) return ctx.close;
     if (source === ctx.high.get(0)) return ctx.high;
@@ -6796,8 +6796,12 @@ export class TealscriptEngine {
           return h !== undefined && l !== undefined && c !== undefined ? (h + l + c + c) / 4 : undefined;
         },
       };
+    return undefined;
+  }
+
+  private getSeriesForSource(source: number, ctx: ExecutionContext): { get: (offset: number) => number | undefined } {
     // Default: fallback to close (most common case)
-    return ctx.close;
+    return this.getKnownSeriesForSource(source, ctx) ?? ctx.close;
   }
 
   private registerTaBuiltins(): void {
@@ -6995,10 +6999,14 @@ export class TealscriptEngine {
     this.builtins.set('ta.cross', (args, namedArgs, ctx, scope, callId) => {
       const source1 = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source1'));
       const source2 = this.toNumber(this.getCallArg(args, namedArgs, 1, 'source2'));
+      const series1 = this.getKnownSeriesForSource(source1, ctx);
+      const series2 = this.getKnownSeriesForSource(source2, ctx);
       const trackKey1 = `_cross_any_src1_${callId}`;
       const trackKey2 = `_cross_any_src2_${callId}`;
-      const previous1 = scope.get(trackKey1) as number | undefined;
-      const previous2 = scope.get(trackKey2) as number | undefined;
+      const stored1 = scope.get(trackKey1) as number | undefined;
+      const stored2 = scope.get(trackKey2) as number | undefined;
+      const previous1 = stored1 !== undefined && stored1 !== source1 ? (series1?.get(1) ?? stored1) : stored1;
+      const previous2 = stored2 !== undefined && stored2 !== source2 ? (series2?.get(1) ?? stored2) : stored2;
 
       this.setBuiltinState(scope, trackKey1, source1);
       this.setBuiltinState(scope, trackKey2, source2);
