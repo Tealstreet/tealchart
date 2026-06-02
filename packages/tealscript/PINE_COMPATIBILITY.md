@@ -480,8 +480,10 @@ same-timeframe `time()` / `time_close()` calls with optional session strings
 such as `"0930-1600"` or `"0930-1600:23456"`. Matching bars return their open
 or close UNIX timestamp; non-matching bars return `na`. Historical `timenow`
 uses a stable execution timestamp, and realtime updates refresh it per
-re-execution. Multi-timeframe aggregation, exchange calendars, and full
-overnight-session day semantics remain planned.
+re-execution. `session.ismarket`, `session.ispremarket`, and
+`session.ispostmarket` are supported when the host runtime provides exchange
+session classification windows. Multi-timeframe aggregation and exchange
+calendar holiday handling remain planned.
 
 ## Request Data And Ticker Coverage
 

@@ -2040,6 +2040,37 @@ plot(session.ismarket ? 1 : 0, title="Market State")`;
       ]);
     });
 
+    it('evaluates session state helpers from runtime exchange session windows', () => {
+      const script = `//@version=6
+indicator("Session State")
+plot(session.ispremarket ? 1 : 0, title="Premarket")
+plot(session.ismarket ? 1 : 0, title="Market")
+plot(session.ispostmarket ? 1 : 0, title="Postmarket")`;
+
+      const bars: Bar[] = [
+        { time: Date.UTC(2024, 0, 5, 13, 0), open: 1, high: 1, low: 1, close: 1, volume: 1 },
+        { time: Date.UTC(2024, 0, 5, 15, 0), open: 1, high: 1, low: 1, close: 1, volume: 1 },
+        { time: Date.UTC(2024, 0, 5, 22, 0), open: 1, high: 1, low: 1, close: 1, volume: 1 },
+        { time: Date.UTC(2024, 0, 6, 2, 0), open: 1, high: 1, low: 1, close: 1, volume: 1 },
+      ];
+
+      const result = executeScript(parse(script), bars, undefined, {
+        runtime: {
+          session: {
+            timezone: 'America/New_York',
+            premarket: '0400-0930:23456',
+            regular: '0930-1600:23456',
+            postmarket: '1600-2000:23456',
+          },
+        },
+      });
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Premarket')?.values).toEqual([1, 0, 0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Market')?.values).toEqual([0, 1, 0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Postmarket')?.values).toEqual([0, 0, 1, 0]);
+    });
+
     it('computes time_tradingday from the exchange timezone', () => {
       const script = `//@version=6
 indicator("Trading Day Timezone")

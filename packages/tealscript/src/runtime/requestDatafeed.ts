@@ -1,4 +1,4 @@
-import type { Bar, SymInfo } from './context';
+import type { Bar, SessionClassificationInfo, SymInfo } from './context';
 
 export type RequestDatafeedErrorCode =
   | 'invalid_currency'
@@ -20,6 +20,7 @@ export interface RequestDatafeedQuery extends RequestDatafeedKey {
 export interface RequestDataContext extends RequestDatafeedKey {
   bars: Bar[];
   syminfo?: Partial<SymInfo>;
+  session?: Partial<SessionClassificationInfo>;
   currency?: string;
 }
 
@@ -140,6 +141,7 @@ export class InMemoryRequestDatafeed implements RequestDatafeed {
       ...context,
       bars: context.bars.map((bar) => ({ ...bar })),
       syminfo: context.syminfo === undefined ? undefined : { ...context.syminfo },
+      session: context.session === undefined ? undefined : { ...context.session },
     });
   }
 
@@ -170,6 +172,7 @@ export class InMemoryRequestDatafeed implements RequestDatafeed {
         currency: query.currency ?? context.currency,
         bars: bars.map((bar) => ({ ...bar })),
         syminfo: context.syminfo === undefined ? undefined : { ...context.syminfo },
+        session: context.session === undefined ? undefined : { ...context.session },
       },
     };
   }

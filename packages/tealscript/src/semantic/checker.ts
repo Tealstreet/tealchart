@@ -2074,6 +2074,9 @@ class SemanticChecker {
       case 'CallExpression':
         return this.inferCallType(expression, scope);
       case 'MemberExpression':
+        if (expression.object.type === 'Identifier' && expression.object.name === 'session') {
+          return this.inferMemberExpressionType(expression, scope);
+        }
         if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
           return { kind: 'unknown', qualifier: 'const' };
         }
@@ -2329,6 +2332,15 @@ class SemanticChecker {
   }
 
   private inferMemberExpressionType(expression: MemberExpression, scope: SemanticScope): SemanticType {
+    const path = this.memberPath(expression);
+    const memberName = path.join('.');
+    if (memberName === 'session.ismarket' || memberName === 'session.ispremarket' || memberName === 'session.ispostmarket') {
+      return { kind: 'bool', qualifier: 'series' };
+    }
+    if (memberName === 'session.regular' || memberName === 'session.extended') {
+      return { kind: 'string', qualifier: 'const' };
+    }
+
     const objectType = this.inferExpressionType(expression.object, scope);
     if (objectType.kind !== 'udt' || !objectType.name) return objectType;
 

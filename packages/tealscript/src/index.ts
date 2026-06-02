@@ -64,6 +64,7 @@ export {
   createContext,
   type Bar,
   type BarState,
+  type SessionClassificationInfo,
   type SymInfo,
   type TimeframeInfo,
   type PlotOutput,

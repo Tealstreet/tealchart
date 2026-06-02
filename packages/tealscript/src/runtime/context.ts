@@ -100,6 +100,13 @@ export interface TimeframeInfo {
   isticks: boolean;
 }
 
+export interface SessionClassificationInfo {
+  regular: string;
+  premarket: string;
+  postmarket: string;
+  timezone: string;
+}
+
 /**
  * Plot output from a script
  */

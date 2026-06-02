@@ -269,6 +269,9 @@ Phases:
    `last_bar_time` variants.
 4. Complete session strings: day masks, overnight sessions, multi-segment
    sessions, regular/extended session behavior, and session-state helpers.
+   Runtime coverage now evaluates `session.ismarket`,
+   `session.ispremarket`, and `session.ispostmarket` when the host provides
+   exchange session classification windows.
 5. Add timeframe parsing and validation for ticks, seconds, minutes, days,
    weeks, and months.
 6. Implement `timeframe.in_seconds()` and timeframe comparison helpers.
