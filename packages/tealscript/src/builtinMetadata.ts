@@ -226,6 +226,7 @@ export const BUILTIN_COLLECTION_MEMBER_METHODS = new Map<string, Set<string>>([
     'col',
     'column',
     'columns',
+    'concat',
     'copy',
     'det',
     'diff',

@@ -6,6 +6,7 @@ import {
   addMatrixColumn,
   addMatrixRow,
   avgMatrixValue,
+  concatMatrix,
   copyMatrix,
   createPineMatrix,
   detMatrixValue,
@@ -78,6 +79,31 @@ describe('PineMatrix', () => {
     expect(getMatrixValue(copy, 0, 1)).toBe(9);
     expect(getArrayValue(matrixRow(matrix, 1), 0)).toBe(5);
     expect(getArrayValue(matrixColumn(matrix, 1), 0)).toBe(3);
+  });
+
+  it('concatenates matrices by appending rows', () => {
+    const left = createPineMatrix<number>(2, 2, 0);
+    left.values = [1, 2, 3, 4];
+    const right = createPineMatrix<number>(1, 2, 0);
+    right.values = [5, 6];
+
+    expect(concatMatrix(left, right)).toBe(left);
+    expect(left.rows).toBe(3);
+    expect(left.columns).toBe(2);
+    expect(left.values).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(right.values).toEqual([5, 6]);
+
+    const empty = createPineMatrix<number>();
+    concatMatrix(empty, right);
+    expect(empty.rows).toBe(1);
+    expect(empty.columns).toBe(2);
+    expect(empty.values).toEqual([5, 6]);
+  });
+
+  it('rejects matrix concat with mismatched columns', () => {
+    expect(() => concatMatrix(createPineMatrix<number>(1, 2, 0), createPineMatrix<number>(1, 3, 0))).toThrow(
+      'Matrix concat requires matching column counts. Left has 2, right has 3',
+    );
   });
 
   it('throws on invalid dimensions or coordinates', () => {
@@ -179,6 +205,9 @@ describe('PineMatrix', () => {
 
     fillMatrix(matrix, 9);
     expect(matrix.values).toEqual([9, 9, 9, 9, 9, 9]);
+
+    fillMatrix(matrix, 5, 0, 1, 1, 3);
+    expect(matrix.values).toEqual([9, 5, 5, 9, 9, 9]);
   });
 
   it('sizes empty matrices from inserted arrays', () => {
@@ -487,6 +516,7 @@ describe('PineMatrix', () => {
     const matrix = createPineMatrix<number>(2, 2, 1);
 
     expect(() => sortMatrixRows(matrix, 2)).toThrow('Matrix column 2 is out of bounds. column count is 2');
+    expect(() => fillMatrix(matrix, 7, 0, 3, 0, 1)).toThrow('Matrix row range 0..3 is out of bounds. row count is 2');
     expect(() => submatrixValue(matrix, 1, 3, 0, 1)).toThrow('Matrix row range 1..3 is out of bounds. row count is 2');
     expect(() => submatrixValue(matrix, 0, 1, 2, 1)).toThrow('Matrix column range 2..1 is out of bounds. column count is 2');
   });

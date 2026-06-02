@@ -1295,11 +1295,12 @@ class SemanticChecker {
   private collectionValueType(iterableType: SemanticType): SemanticType | undefined {
     if (iterableType.kind === 'array') return iterableType.elementType;
     if (iterableType.kind === 'map') return iterableType.valueType;
+    if (iterableType.kind === 'matrix') return { kind: 'array', elementType: iterableType.elementType };
     return undefined;
   }
 
   private collectionIndexType(iterableType: SemanticType): SemanticType | undefined {
-    if (iterableType.kind === 'array') return { kind: 'int', qualifier: 'series' };
+    if (iterableType.kind === 'array' || iterableType.kind === 'matrix') return { kind: 'int', qualifier: 'series' };
     if (iterableType.kind === 'map') return iterableType.keyType;
     return undefined;
   }

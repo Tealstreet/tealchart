@@ -100,6 +100,7 @@ import {
   addMatrixColumn,
   addMatrixRow,
   avgMatrixValue,
+  concatMatrix,
   copyMatrix,
   createPineMatrix,
   detMatrixValue,
@@ -1302,8 +1303,10 @@ export class TealscriptEngine {
       const entries = mapEntries(iterable);
       keys = entries.map(([key]) => key);
       values = entries.map(([, value]) => value);
+    } else if (isPineMatrix(iterable)) {
+      values = Array.from({ length: iterable.rows }, (_, row) => matrixRow(iterable, row));
     } else {
-      throw new Error('For-in loop expects an array or map');
+      throw new Error('For-in loop expects an array, map, or matrix');
     }
 
     const childScope = this.scope.createChild();
@@ -2979,8 +2982,10 @@ export class TealscriptEngine {
       const entries = mapEntries(iterable);
       keys = entries.map(([key]) => key);
       values = entries.map(([, value]) => value);
+    } else if (isPineMatrix(iterable)) {
+      values = Array.from({ length: iterable.rows }, (_, row) => matrixRow(iterable, row));
     } else {
-      throw new Error('For-in loop expects an array or map');
+      throw new Error('For-in loop expects an array, map, or matrix');
     }
 
     const childScope = this.scope.createChild();
@@ -5819,8 +5824,16 @@ export class TealscriptEngine {
       setMatrixValue(readMatrix(args[0]), args[1] as number, args[2] as number, args[3]);
       return null;
     });
-    this.builtins.set('matrix.fill', (args) => {
-      fillMatrix(readMatrix(args[0]), args[1]);
+    this.builtins.set('matrix.fill', (args, namedArgs) => {
+      const matrixArg = args[0] !== undefined ? args[0] : namedArgs.get('id');
+      fillMatrix(
+        readMatrix(matrixArg),
+        this.getCallArg(args, namedArgs, 1, 'value'),
+        this.optionalMatrixRangeArg(args, namedArgs, 2, 'from_row'),
+        this.optionalMatrixRangeArg(args, namedArgs, 3, 'to_row'),
+        this.optionalMatrixRangeArg(args, namedArgs, 4, 'from_column'),
+        this.optionalMatrixRangeArg(args, namedArgs, 5, 'to_column'),
+      );
       return null;
     });
     this.builtins.set('matrix.reshape', (args) => {
@@ -5879,15 +5892,20 @@ export class TealscriptEngine {
       sortMatrixRows(readMatrix(args[0]), args[1] as number | undefined, args[2], namedArgs.get('sort_field') ?? args[3]);
       return null;
     });
-    this.builtins.set('matrix.submatrix', (args) => {
-      const matrix = readMatrix(args[0]);
+    this.builtins.set('matrix.submatrix', (args, namedArgs) => {
+      const matrixArg = args[0] !== undefined ? args[0] : namedArgs.get('id');
+      const matrix = readMatrix(matrixArg);
       return submatrixValue(
         matrix,
-        args[1] as number | undefined,
-        args[2] as number | undefined,
-        args[3] as number | undefined,
-        args[4] as number | undefined,
+        this.optionalMatrixRangeArg(args, namedArgs, 1, 'from_row'),
+        this.optionalMatrixRangeArg(args, namedArgs, 2, 'to_row'),
+        this.optionalMatrixRangeArg(args, namedArgs, 3, 'from_column'),
+        this.optionalMatrixRangeArg(args, namedArgs, 4, 'to_column'),
       );
+    });
+    this.builtins.set('matrix.concat', (args) => {
+      concatMatrix(readMatrix(args[0]), readMatrix(args[1]));
+      return null;
     });
     this.builtins.set('matrix.copy', (args) => copyMatrix(readMatrix(args[0])));
     this.builtins.set('matrix.row', (args) => matrixRow(readMatrix(args[0]), args[1] as number));
@@ -5906,6 +5924,11 @@ export class TealscriptEngine {
     this.builtins.set('matrix.is_antisymmetric', (args) => isAntisymmetricMatrix(readMatrix(args[0])));
     this.builtins.set('matrix.is_triangular', (args) => isTriangularMatrix(readMatrix(args[0])));
     this.builtins.set('matrix.is_stochastic', (args) => isStochasticMatrix(readMatrix(args[0])));
+  }
+
+  private optionalMatrixRangeArg(args: unknown[], namedArgs: Map<string, unknown>, index: number, name: string): number | undefined {
+    const value = this.getCallArg(args, namedArgs, index, name);
+    return value === undefined ? undefined : this.toNumber(value);
   }
 
   private registerMapBuiltins(): void {

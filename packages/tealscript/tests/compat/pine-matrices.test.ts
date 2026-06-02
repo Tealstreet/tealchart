@@ -84,6 +84,108 @@ plot(colsFromArray.rows(), title="Array Column Rows")
     expect(roundSeries(getPlot(result, 'Array Column Rows').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
   });
 
+  it('runs matrix range fill and named range extraction idioms', () => {
+    const result = runCompatScript(`
+indicator("Matrix range helpers")
+m = matrix.new_int(2, 3, 0)
+m.set(0, 0, 1)
+m.set(0, 1, 2)
+m.set(0, 2, 3)
+m.set(1, 0, 4)
+m.set(1, 1, 5)
+m.set(1, 2, 6)
+m.fill(9, 0, 1, 1, 3)
+slice = m.submatrix(from_row=0, to_row=1, from_column=1, to_column=3)
+matrix.fill(id=m, value=7, from_row=1, to_row=2, from_column=0, to_column=2)
+other = matrix.new_int(2, 3, 0)
+other.fill(100)
+m.fill(id=other, value=8, from_row=0, to_row=1, from_column=0, to_column=1)
+receiverSlice = m.submatrix(id=other, from_row=0, to_row=1, from_column=0, to_column=1)
+plot(m.get(0, 0), title="Receiver Filled")
+plot(m.get(0, 1), title="Method Filled")
+plot(m.get(1, 0), title="Named Filled")
+plot(m.get(1, 2), title="Named Unchanged")
+plot(slice.rows(), title="Slice Rows")
+plot(slice.columns(), title="Slice Columns")
+plot(slice.get(0, 0), title="Slice First")
+plot(slice.get(0, 1), title="Slice Second")
+plot(other.get(0, 0), title="Other Unchanged")
+plot(receiverSlice.get(0, 0), title="Receiver Slice")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Receiver Filled').values)).toEqual([8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]);
+    expect(roundSeries(getPlot(result, 'Method Filled').values)).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
+    expect(roundSeries(getPlot(result, 'Named Filled').values)).toEqual([7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]);
+    expect(roundSeries(getPlot(result, 'Named Unchanged').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+    expect(roundSeries(getPlot(result, 'Slice Rows').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Slice Columns').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Slice First').values)).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
+    expect(roundSeries(getPlot(result, 'Slice Second').values)).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
+    expect(roundSeries(getPlot(result, 'Other Unchanged').values)).toEqual([100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]);
+    expect(roundSeries(getPlot(result, 'Receiver Slice').values)).toEqual([8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]);
+  });
+
+  it('runs documented matrix row iteration idioms', () => {
+    const result = runCompatScript(`
+indicator("Matrix row iteration")
+m = matrix.new_int(2, 3, 0)
+m.set(0, 0, 1)
+m.set(0, 1, 2)
+m.set(0, 2, 3)
+m.set(1, 0, 4)
+m.set(1, 1, 5)
+m.set(1, 2, 6)
+rowTotal = 0
+for row in m
+    rowTotal += array.sum(row)
+weighted = 0
+for [index, row] in m
+    weighted += (index + 1) * array.get(row, 0)
+returned = for [index, row] in m
+    array.get(row, index)
+plot(rowTotal, title="Row Total")
+plot(weighted, title="Weighted Rows")
+plot(returned, title="Returned")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Row Total').values)).toEqual([21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21]);
+    expect(roundSeries(getPlot(result, 'Weighted Rows').values)).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
+    expect(roundSeries(getPlot(result, 'Returned').values)).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
+  });
+
+  it('runs documented matrix concatenation idioms', () => {
+    const result = runCompatScript(`
+indicator("Matrix concat")
+left = matrix.new_int(2, 2, 0)
+left.set(0, 0, 1)
+left.set(0, 1, 2)
+left.set(1, 0, 3)
+left.set(1, 1, 4)
+right = matrix.new_int(1, 2, 0)
+right.set(0, 0, 5)
+right.set(0, 1, 6)
+left.concat(right)
+namespace = matrix.new_int()
+matrix.concat(namespace, right)
+plot(left.rows(), title="Rows")
+plot(left.get(2, 0), title="Appended First")
+plot(left.get(2, 1), title="Appended Second")
+plot(right.rows(), title="Right Rows")
+plot(namespace.rows(), title="Namespace Rows")
+plot(namespace.get(0, 1), title="Namespace Value")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Rows').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Appended First').values)).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
+    expect(roundSeries(getPlot(result, 'Appended Second').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+    expect(roundSeries(getPlot(result, 'Right Rows').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Namespace Rows').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Namespace Value').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+  });
+
   it('runs matrix aggregate helper idioms', () => {
     const result = runCompatScript(`
 indicator("Matrix aggregate helpers")
