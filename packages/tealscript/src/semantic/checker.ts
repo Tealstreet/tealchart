@@ -700,6 +700,23 @@ for (const name of ['matrix.col', 'matrix.column']) {
   BUILTIN_SIGNATURES.set(name, { params: ['id', 'column'], minArgs: 2, maxArgs: 2 });
 }
 
+for (const name of [
+  'matrix.avg',
+  'matrix.det',
+  'matrix.eigenvalues',
+  'matrix.eigenvectors',
+  'matrix.inv',
+  'matrix.max',
+  'matrix.median',
+  'matrix.min',
+  'matrix.mode',
+  'matrix.pinv',
+  'matrix.rank',
+  'matrix.trace',
+]) {
+  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1 });
+}
+
 export function checkProgram(program: Program): SemanticCheckResult {
   return new SemanticChecker().check(program);
 }
