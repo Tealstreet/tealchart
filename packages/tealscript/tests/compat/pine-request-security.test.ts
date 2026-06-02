@@ -92,6 +92,21 @@ function multiSymbolRequestDatafeed(): InMemoryRequestDatafeed {
   ]);
 }
 
+function requestSessionDatafeed(): InMemoryRequestDatafeed {
+  return new InMemoryRequestDatafeed([
+    {
+      symbol: 'NASDAQ:AAPL',
+      timeframe: '2',
+      bars: requestedBars,
+      syminfo: { ticker: 'NASDAQ:AAPL', timezone: 'Etc/UTC' },
+      session: {
+        timezone: 'Etc/UTC',
+        regular: '0000-2359:1234567',
+      },
+    },
+  ]);
+}
+
 function currencyRateDatafeed(): InMemoryRequestDatafeed {
   return new InMemoryRequestDatafeed([], [
     {
@@ -302,6 +317,28 @@ plot(aaplPeriodLen, title="AAPL Period Len")
     expect(getPlot(result, 'AAPL Ticker Len').values).toEqual([11, 11, 11, 11, 11, 11]);
     expect(getPlot(result, 'AAPL Currency Len').values).toEqual([3, 3, 3, 3, 3, 3]);
     expect(getPlot(result, 'AAPL Period Len').values).toEqual([1, 1, 1, 1, 1, 1]);
+  });
+
+  it('evaluates session state helpers from the requested context', () => {
+    const result = runCompatScript(`
+indicator("Request session state")
+aaplMarket = request.security("NASDAQ:AAPL", "2", session.ismarket ? 1 : 0, lookahead=barmerge.lookahead_on)
+plot(aaplMarket, title="AAPL Market")
+`, {
+      bars: chartBars,
+      engineOptions: {
+        requestDatafeed: requestSessionDatafeed(),
+        runtime: {
+          session: {
+            timezone: 'Etc/UTC',
+            regular: '0000-0001:1234567',
+          },
+        },
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'AAPL Market').values).toEqual([1, 1, 1, 1, 1, 1]);
   });
 
   it('allows global static requests when dynamic_requests is false', () => {
