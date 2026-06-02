@@ -6,7 +6,10 @@ import { describe, expect, it } from 'vitest';
 
 import {
   executeScript,
+  compatibilityFailureClasses,
+  compatibilityStages,
   createResultMessage,
+  createCompatibilityRunOutcome,
   corporateActionRequestKey,
   currencyRateRequestKey,
   economicRequestKey,
@@ -20,10 +23,13 @@ import {
   TealscriptEngine,
   TealscriptWorker,
   validate,
+  validatePineScriptLedgerEntry,
   type Expression,
+  type CompatibilityRunOutcome,
   type ParseOptions,
   type ParseResult,
   type ParseStartRule,
+  type PineScriptLedgerEntry,
   type Statement,
   type TealscriptEngineOptions,
   type ToWorkerMessage,
@@ -46,10 +52,27 @@ describe('public package entrypoints', () => {
     const engineOptions: TealscriptEngineOptions = { requestDatafeed: datafeed };
     const resultMessage = createResultMessage('script-1', output);
     const normalizedOutput: NormalizedWorkerOutputBundle = getResultOutput(resultMessage);
+    const compatibilityOutcome: CompatibilityRunOutcome = createCompatibilityRunOutcome({
+      scriptId: 'manual-fixture',
+      stages: [{ stage: 'parse', status: 'passed' }],
+    });
+    const ledgerEntry: PineScriptLedgerEntry = {
+      id: 'manual-fixture',
+      title: 'Manual fixture',
+      pineVersion: 'unknown',
+      category: 'unknown',
+      source: { kind: 'manual_fixture', licenseStatus: 'internal_fixture' },
+      featureTags: ['smoke'],
+      storagePolicy: 'reduced_fixture_only',
+    };
 
     expect(typeof parse).toBe('function');
     expect(typeof validate).toBe('function');
     expect(typeof executeScript).toBe('function');
+    expect(compatibilityStages).toContain('parse');
+    expect(compatibilityFailureClasses).toContain('runtime_gap');
+    expect(compatibilityOutcome.summary.passed).toBe(true);
+    expect(validatePineScriptLedgerEntry(ledgerEntry)).toEqual([]);
     expect(typeof TealscriptEngine).toBe('function');
     expect(typeof TealscriptWorker).toBe('function');
     expect(typeof InMemoryRequestDatafeed).toBe('function');
