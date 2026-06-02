@@ -1271,6 +1271,30 @@ pivotHolder = HasPivot.new(Other.new(close))
     ]);
   });
 
+  it('validates array index assignment targets and values', () => {
+    const valid = checkProgram(parse(`
+indicator("Index Assignment")
+values = array.new<float>()
+values[0] := close
+values[1] += 2
+`));
+
+    const invalid = checkProgram(parse(`
+indicator("Bad Index Assignment")
+values = array.new<int>()
+values["first"] := 1
+values[0] := "bad"
+close[0] := 1
+`));
+
+    expect(valid.diagnostics).toEqual([]);
+    expect(invalid.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Array assignment index must be numeric, got string',
+      'Cannot assign string value to int array element',
+      'Index assignment target must be an array, got float',
+    ]);
+  });
+
   it('rejects mixed Pine input range and options overload arguments', () => {
     const result = checkProgram(parse(`
 indicator("Mixed Input Overloads")
