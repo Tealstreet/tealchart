@@ -870,6 +870,34 @@ plot(lifted.y)
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('reports user-defined method receiver mismatches', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Method Receivers")
+type Pivot
+    float y
+type Other
+    float y
+method lift(Pivot this, float amount) =>
+    this.y += amount
+    this
+method scale(float this, float amount) => this * amount
+pivot = Pivot.new(close)
+other = Other.new(close)
+count = 1
+validPivot = pivot.lift(1)
+validFloat = close.scale(2)
+badUdt = other.lift(1)
+badPrimitive = count.lift(1)
+badScale = pivot.scale(2)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'No method lift() overload accepts Other receiver',
+      'No method lift() overload accepts int receiver',
+      'No method scale() overload accepts Pivot receiver',
+    ]);
+  });
+
   it('reports conservative user-defined type field value mismatches', () => {
     const result = checkProgram(parse(`
 indicator("Bad UDT Field Types")

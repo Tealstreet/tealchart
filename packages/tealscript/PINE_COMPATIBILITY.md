@@ -265,19 +265,20 @@ User-defined `method` declarations now parse and dispatch for primitive and
 UDT receiver values, including method calls that mutate and return UDT
 references. The runtime uses the receiver as the method's first argument, in
 line with Pine's documented method-call equivalence, and selects local UDT
-method overloads by receiver type.
+method overloads by receiver type. Semantic diagnostics report calls where a
+known receiver type does not match any local method receiver annotation.
 
-Known limits: UDT field and method receiver types are recorded dynamically but
-not yet fully enforced by the semantic checker. Semantic diagnostics cover
-unknown local UDT field reads/assignments, constructor unknown field names,
-duplicate bindings, excess positional arguments, invalid argument order between
-named and positional arguments, and conservative primitive/reference field type
-mismatches in local UDT field defaults, constructors, and field assignments.
-Library diagnostics also report exported UDT fields and exported function or
-method parameters that expose non-exported local UDTs, including through
-collection templates, and exported callables that return non-exported local
-UDTs. Full reference-type diagnostics remain planned in Epic 12 and the
-qualified type-system epic.
+Known limits: UDT field types are recorded dynamically but not yet fully
+enforced by the semantic checker outside the local constructor/assignment paths.
+Semantic diagnostics cover unknown local UDT field reads/assignments,
+constructor unknown field names, duplicate bindings, excess positional
+arguments, invalid argument order between named and positional arguments, and
+conservative primitive/reference field type mismatches in local UDT field
+defaults, constructors, and field assignments. Library diagnostics also report
+exported UDT fields and exported function or method parameters that expose
+non-exported local UDTs, including through collection templates, and exported
+callables that return non-exported local UDTs. Full reference-type diagnostics
+remain planned in Epic 12 and the qualified type-system epic.
 
 ## Common Library Syntax Coverage
 

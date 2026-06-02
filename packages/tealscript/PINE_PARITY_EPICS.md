@@ -487,6 +487,8 @@ Phases:
 5. Implement method declarations and method dispatch beyond array method sugar.
    Runtime coverage now selects local and imported UDT method overloads by
    receiver type.
+   Semantic coverage now reports known local method receiver mismatches before
+   runtime.
 6. Implement `library()`, `export`, `import`, versioned module resolution, and
    library diagnostics.
    Semantic coverage now reports exports outside libraries, empty libraries

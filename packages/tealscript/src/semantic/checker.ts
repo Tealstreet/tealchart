@@ -477,11 +477,13 @@ class SemanticChecker {
   private diagnostics: SemanticDiagnostic[] = [];
   private rootScope = new SemanticScope();
   private typeDeclarations = new Map<string, TypeDeclaration>();
+  private methodDeclarations = new Map<string, FunctionDeclaration[]>();
 
   check(program: Program): SemanticCheckResult {
     this.diagnostics = [];
     this.rootScope = new SemanticScope();
     this.typeDeclarations = this.collectTypeDeclarations(program.body);
+    this.methodDeclarations = this.collectMethodDeclarations(program.body);
     this.checkLibraryExportDeclarations(program.body);
     this.checkStatements(program.body, this.rootScope);
     return {
@@ -724,6 +726,17 @@ class SemanticChecker {
         .filter((statement): statement is TypeDeclaration => statement.type === 'TypeDeclaration')
         .map((statement) => [statement.name.name, statement]),
     );
+  }
+
+  private collectMethodDeclarations(statements: Statement[]): Map<string, FunctionDeclaration[]> {
+    const declarations = new Map<string, FunctionDeclaration[]>();
+    for (const statement of statements) {
+      if (statement.type !== 'FunctionDeclaration' || !statement.isMethod) continue;
+      const methods = declarations.get(statement.name.name) ?? [];
+      methods.push(statement);
+      declarations.set(statement.name.name, methods);
+    }
+    return declarations;
   }
 
   private checkExportedFunctionScope(declaration: FunctionDeclaration, globalVariableQualifiers: Map<string, SemanticQualifier | undefined>): void {
@@ -1300,6 +1313,7 @@ class SemanticChecker {
     this.checkMatrixCallTypes(expression, scope);
     this.checkMatrixSortFieldType(expression, scope);
     this.checkMapCallTypes(expression, scope);
+    this.checkUserMethodReceiverType(expression, scope);
     for (const argument of expression.arguments) {
       this.checkExpression(argument.value, scope);
     }
@@ -1744,6 +1758,28 @@ class SemanticChecker {
 
   private isCheckedMapOperation(operation: string): operation is 'contains' | 'get' | 'put' | 'remove' {
     return operation === 'contains' || operation === 'get' || operation === 'put' || operation === 'remove';
+  }
+
+  private checkUserMethodReceiverType(expression: CallExpression, scope: SemanticScope): void {
+    if (expression.callee.type !== 'MemberExpression') return;
+
+    const methods = this.methodDeclarations.get(expression.callee.property.name);
+    if (!methods?.length) return;
+
+    const receiverType = this.inferExpressionType(expression.callee.object, scope);
+    if (receiverType.kind === 'unknown') return;
+
+    const annotatedReceivers = methods
+      .map((method) => this.typeFromAnnotation(method.params[0]?.typeAnnotation ?? undefined))
+      .filter((type): type is SemanticType => !!type);
+    if (annotatedReceivers.length === 0) return;
+    if (annotatedReceivers.some((methodReceiverType) => this.isAssignableType(methodReceiverType, receiverType))) return;
+
+    this.addDiagnostic(
+      'method-receiver-type',
+      `No method ${expression.callee.property.name}() overload accepts ${this.formatSemanticType(receiverType)} receiver`,
+      expression.callee.property.loc,
+    );
   }
 
   private checkMapArgumentType(expectedType: SemanticType | undefined, argument: Expression | undefined, role: 'map key' | 'map value', scope: SemanticScope): void {
