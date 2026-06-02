@@ -303,6 +303,69 @@ plot(m.mode(), title="Mode")
     expect(roundSeries(getPlot(result, 'Mode').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
   });
 
+  it('runs named matrix arithmetic, sort, and linear algebra idioms', () => {
+    const result = runCompatScript(`
+indicator("Matrix named calculations")
+a = matrix.new_float(rows=2, columns=2, initial_value=0)
+a.set(0, 0, 1)
+a.set(0, 1, 2)
+a.set(1, 0, 3)
+a.set(1, 1, 4)
+b = matrix.new_float(rows=2, columns=2, initial_value=0)
+b.set(0, 0, 5)
+b.set(0, 1, 6)
+b.set(1, 0, 7)
+b.set(1, 1, 8)
+sumNamed = matrix.sum(id1=a, id2=b)
+diffMixed = matrix.diff(id1=sumNamed, 1)
+multNamed = matrix.mult(id1=a, id2=b)
+powNamed = matrix.pow(id=a, power=2)
+invNamed = matrix.inv(id=a)
+pinvNamed = matrix.pinv(id=a)
+eigen = matrix.eigenvalues(id=a)
+vectors = matrix.eigenvectors(id=a)
+kronNamed = matrix.kron(id1=a, id2=b)
+sortable = matrix.new_int(rows=3, columns=2, initial_value=0)
+sortable.set(0, 0, 3)
+sortable.set(0, 1, 1)
+sortable.set(1, 0, 1)
+sortable.set(1, 1, 9)
+sortable.set(2, 0, 2)
+sortable.set(2, 1, 6)
+matrix.sort(id=sortable, column=1, order=order.descending)
+plot(sumNamed.get(0, 0), title="Sum")
+plot(diffMixed.get(0, 0), title="Diff")
+plot(multNamed.get(0, 0), title="Mult")
+plot(powNamed.get(1, 1), title="Pow")
+plot(matrix.trace(id=a), title="Trace")
+plot(matrix.det(id=a), title="Det")
+plot(matrix.rank(id=a), title="Rank")
+plot(invNamed.get(0, 0), title="Inv")
+plot(pinvNamed.get(0, 0), title="Pinv")
+plot(array.size(eigen), title="Eigen Count")
+plot(vectors.rows(), title="Eigen Rows")
+plot(kronNamed.rows(), title="Kron Rows")
+plot(kronNamed.get(1, 1), title="Kron Value")
+plot(sortable.get(0, 0), title="Sort First")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Sum').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+    expect(roundSeries(getPlot(result, 'Diff').values)).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
+    expect(roundSeries(getPlot(result, 'Mult').values)).toEqual([19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19]);
+    expect(roundSeries(getPlot(result, 'Pow').values)).toEqual([22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22]);
+    expect(roundSeries(getPlot(result, 'Trace').values)).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
+    expect(roundSeries(getPlot(result, 'Det').values)).toEqual([-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2]);
+    expect(roundSeries(getPlot(result, 'Rank').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Inv').values)).toEqual([-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2]);
+    expect(roundSeries(getPlot(result, 'Pinv').values)).toEqual([-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2]);
+    expect(roundSeries(getPlot(result, 'Eigen Count').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Eigen Rows').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Kron Rows').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+    expect(roundSeries(getPlot(result, 'Kron Value').values)).toEqual([8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]);
+    expect(roundSeries(getPlot(result, 'Sort First').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+  });
+
   it('runs matrix pseudoinverse idioms', () => {
     const result = runCompatScript(`
 indicator("Matrix pseudoinverse")
@@ -393,7 +456,7 @@ values.add_row(array.from(Ranked.new(1, "A"), Ranked.new(10, "aa")))
 values.add_row(array.from(Ranked.new(2, "B"), Ranked.new(20, "bb")))
 values.sort(0, order.ascending, "score")
 firstByName = values.get(0, 0)
-matrix.sort(values, 1, order.descending, 1)
+matrix.sort(id=values, column=1, order=order.descending, sort_field=1)
 firstByIndex = values.get(0, 1)
 plot(firstByName.score, title="First Score")
 plot(firstByIndex.score, title="First Column Score")
