@@ -164,8 +164,9 @@ without changing the fixture-level contract.
 
 This contract does not yet cover full simple/series qualifier diagnostics,
 provider-side fetching for host data, `request.footprint()` data, or
-strategy/backtest execution over synthetic ticker data. Those belong to the
-qualified type-system epic, the footprint design, and Epic 14.
+strategy intrabar/backtest execution over synthetic ticker data. Those belong to
+the qualified type-system epic, the footprint design, and
+[`STRATEGY_INTRABAR_DESIGN.md`](./STRATEGY_INTRABAR_DESIGN.md).
 
 ## Test Strategy
 

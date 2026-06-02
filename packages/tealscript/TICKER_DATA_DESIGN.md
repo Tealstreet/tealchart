@@ -57,11 +57,12 @@ market-data contexts keyed by the constructed ticker ID.
 
 ## Synthetic Strategy And Backtest Caveats
 
-Epic 9 supports indicator-style synthetic data requests. It does not implement
-Pine strategy backtesting on synthetic chart feeds. Until strategy parity lands:
+Epic 9 supports indicator-style synthetic data requests. The strategy broker
+emulator is chart-OHLC based and does not yet implement synthetic/intrabar
+execution feeds. Until the intrabar strategy contract lands:
 
 - `strategy.*` order placement, fills, positions, trades, and broker-emulator
-  outputs remain unsupported regardless of ticker type.
+  outputs should not treat derived synthetic bars as executable market ticks.
 - `ticker.heikinashi()`, `ticker.renko()`, `ticker.linebreak()`,
   `ticker.kagi()`, and `ticker.pointfigure()` are safe for deterministic
   indicator calculations only when the request datafeed can provide the

@@ -584,8 +584,10 @@ pyramiding, reversal, default next-open market fills, and explicit
 `process_orders_on_close` market fills are covered. Full TradingView intrabar
 path parity, bar magnifier, and lower-timeframe fill simulation remain deferred
 future work because they require an explicit intrabar data model rather than the
-current OHLC-only execution model. Semantic coverage now validates common
-strategy order, close/cancel, and trade-accessor call shapes before runtime.
+current OHLC-only execution model. The intrabar/bar-magnifier contract is
+specified in [`STRATEGY_INTRABAR_DESIGN.md`](./STRATEGY_INTRABAR_DESIGN.md).
+Semantic coverage now validates common strategy order, close/cancel, and
+trade-accessor call shapes before runtime.
 
 Phases:
 
@@ -693,4 +695,7 @@ this list focused on gaps that are not already covered by the epic notes above.
 7. `map.*` reference reconciliation.
 8. Library import/export MVP.
 9. Strategy intrabar/bar-magnifier design.
+   `STRATEGY_INTRABAR_DESIGN.md` now records the host data contract, default
+   OHLC path fallback, Bar Magnifier requirements, recalculation knobs, and
+   implementation sequence for this gap.
 10. Real Pine checkpoint expansion for drawing-heavy public idioms.
