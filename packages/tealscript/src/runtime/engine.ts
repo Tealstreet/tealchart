@@ -3814,11 +3814,14 @@ export class TealscriptEngine {
     index: number,
     names: string[],
     fallback?: unknown,
+    label = names.join('/'),
   ): unknown {
-    for (const name of names) {
-      if (namedArgs.has(name)) {
-        return namedArgs.get(name);
-      }
+    const matches = names.filter((name) => namedArgs.has(name));
+    if (matches.length > 1) {
+      throw new Error(`Argument ${label} was supplied multiple times: ${matches.join(', ')}`);
+    }
+    if (matches.length === 1) {
+      return namedArgs.get(matches[0]);
     }
     return args[index] !== undefined ? args[index] : fallback;
   }
@@ -5832,9 +5835,9 @@ export class TealscriptEngine {
     });
 
     const stringSourceArg = (args: unknown[], namedArgs: Map<string, unknown>, index = 0) =>
-      this.getCallArgAny(args, namedArgs, index, ['source', 'string']);
+      this.getCallArgAny(args, namedArgs, index, ['source', 'string'], undefined, 'str source/string');
     const stringPatternArg = (args: unknown[], namedArgs: Map<string, unknown>, index = 1) =>
-      this.getCallArgAny(args, namedArgs, index, ['str', 'substring', 'target']);
+      this.getCallArgAny(args, namedArgs, index, ['str', 'substring', 'target'], undefined, 'str pattern');
 
     this.builtins.set('str.length', (args, namedArgs) => this.toStringValue(stringSourceArg(args, namedArgs)).length);
     this.builtins.set('str.contains', (args, namedArgs) =>
@@ -5854,30 +5857,32 @@ export class TealscriptEngine {
     });
     this.builtins.set('str.substring', (args, namedArgs) => {
       const source = this.toStringValue(stringSourceArg(args, namedArgs));
-      const beginArg = this.getCallArgAny(args, namedArgs, 1, ['begin_pos'], 0);
-      const endArg = this.getCallArgAny(args, namedArgs, 2, ['end_pos']);
+      const beginArg = this.getCallArgAny(args, namedArgs, 1, ['begin_pos'], 0, 'str.substring begin_pos');
+      const endArg = this.getCallArgAny(args, namedArgs, 2, ['end_pos'], undefined, 'str.substring end_pos');
       const begin = Math.trunc(this.toNumber(beginArg));
       const end = endArg === undefined ? undefined : Math.trunc(this.toNumber(endArg));
       return source.substring(begin, end);
     });
     this.builtins.set('str.match', (args, namedArgs) => {
-      const regexArg = this.getCallArgAny(args, namedArgs, 1, ['regex', 'pattern']);
+      const regexArg = this.getCallArgAny(args, namedArgs, 1, ['regex', 'pattern'], undefined, 'str.match regex');
       const match = this.toStringValue(stringSourceArg(args, namedArgs)).match(new RegExp(this.toStringValue(regexArg)));
       return match?.[0] ?? '';
     });
     this.builtins.set('str.repeat', (args, namedArgs) => {
       const sourceArg = stringSourceArg(args, namedArgs);
       if (this.isNa(sourceArg)) return Number.NaN;
-      const repeat = Math.trunc(this.toNumber(this.getCallArgAny(args, namedArgs, 1, ['count', 'repeat_count'])));
+      const repeat = Math.trunc(
+        this.toNumber(this.getCallArgAny(args, namedArgs, 1, ['count', 'repeat_count'], undefined, 'str.repeat count')),
+      );
       if (!Number.isFinite(repeat) || repeat < 0) return Number.NaN;
-      const separator = this.getCallArgAny(args, namedArgs, 2, ['separator'], '');
+      const separator = this.getCallArgAny(args, namedArgs, 2, ['separator'], '', 'str.repeat separator');
       return Array.from({ length: repeat }, () => this.toStringValue(sourceArg)).join(this.toStringValue(separator));
     });
     this.builtins.set('str.split', (args, namedArgs) => {
       const array = createPineArray<string>();
       array.values.push(
         ...this.toStringValue(stringSourceArg(args, namedArgs)).split(
-          this.toStringValue(this.getCallArgAny(args, namedArgs, 1, ['separator'])),
+          this.toStringValue(this.getCallArgAny(args, namedArgs, 1, ['separator'], undefined, 'str.split separator')),
         ),
       );
       return array;
@@ -5889,14 +5894,18 @@ export class TealscriptEngine {
       return this.replaceStringOccurrence(
         this.toStringValue(stringSourceArg(args, namedArgs)),
         this.toStringValue(stringPatternArg(args, namedArgs)),
-        this.toStringValue(this.getCallArgAny(args, namedArgs, 2, ['replacement'])),
-        this.getCallArgAny(args, namedArgs, 3, ['occurrence']),
+        this.toStringValue(this.getCallArgAny(args, namedArgs, 2, ['replacement'], undefined, 'str.replace replacement')),
+        this.getCallArgAny(args, namedArgs, 3, ['occurrence'], undefined, 'str.replace occurrence'),
       );
     });
     this.builtins.set('str.replace_all', (args, namedArgs) => {
       return this.toStringValue(stringSourceArg(args, namedArgs))
         .split(this.toStringValue(stringPatternArg(args, namedArgs)))
-        .join(this.toStringValue(this.getCallArgAny(args, namedArgs, 2, ['replacement'])));
+        .join(
+          this.toStringValue(
+            this.getCallArgAny(args, namedArgs, 2, ['replacement'], undefined, 'str.replace_all replacement'),
+          ),
+        );
     });
   }
 
