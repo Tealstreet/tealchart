@@ -688,6 +688,17 @@ for (const name of ['matrix.remove_col', 'matrix.remove_column']) {
 
 BUILTIN_SIGNATURES.set('matrix.swap_rows', { params: ['id', 'row1', 'row2'], minArgs: 3, maxArgs: 3 });
 BUILTIN_SIGNATURES.set('matrix.swap_columns', { params: ['id', 'column1', 'column2'], minArgs: 3, maxArgs: 3 });
+BUILTIN_SIGNATURES.set('matrix.concat', { params: ['id1', 'id2'], aliases: { id: 'id1' }, minArgs: 2, maxArgs: 2 });
+BUILTIN_SIGNATURES.set('matrix.submatrix', { params: ['id', 'from_row', 'to_row', 'from_column', 'to_column'], minArgs: 1, maxArgs: 5 });
+
+for (const name of ['matrix.copy', 'matrix.transpose']) {
+  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1 });
+}
+
+BUILTIN_SIGNATURES.set('matrix.row', { params: ['id', 'row'], minArgs: 2, maxArgs: 2 });
+for (const name of ['matrix.col', 'matrix.column']) {
+  BUILTIN_SIGNATURES.set(name, { params: ['id', 'column'], minArgs: 2, maxArgs: 2 });
+}
 
 export function checkProgram(program: Program): SemanticCheckResult {
   return new SemanticChecker().check(program);
