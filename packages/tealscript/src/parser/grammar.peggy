@@ -163,7 +163,7 @@ TypeDeclaration
     }
 
 TypeIndentedBlock
-  = fields:TypeIndentedField+ {
+  = fields:(BlockIgnorableLine / TypeIndentedField)+ {
       return fields.filter(field => field !== null);
     }
 
@@ -216,7 +216,7 @@ EnumDeclaration
     }
 
 EnumIndentedBlock
-  = fields:EnumIndentedField+ {
+  = fields:(BlockIgnorableLine / EnumIndentedField)+ {
       return fields.filter(field => field !== null);
     }
 
@@ -600,7 +600,7 @@ ContinueStatement
 
 // Indented block (simplified: just look for indented lines)
 IndentedBlock
-  = statements:IndentedStatement+ {
+  = statements:(BlockIgnorableLine / IndentedStatement)+ {
       return statements.filter(s => s !== null);
     }
 
@@ -610,7 +610,7 @@ IndentedStatement
     }
 
 FunctionIndentedBlock
-  = statements:FunctionIndentedStatement+ {
+  = statements:(BlockIgnorableLine / FunctionIndentedStatement)+ {
       return statements.filter(s => s !== null);
     }
 
@@ -689,7 +689,7 @@ FunctionWhileStatement
     }
 
 FunctionNestedBlock
-  = statements:FunctionNestedStatement+ {
+  = statements:(BlockIgnorableLine / FunctionNestedStatement)+ {
       return statements.filter(s => s !== null);
     }
 
@@ -759,7 +759,7 @@ FunctionNestedWhileStatement
     }
 
 FunctionDeepNestedBlock
-  = statements:FunctionDeepNestedStatement+ {
+  = statements:(BlockIgnorableLine / FunctionDeepNestedStatement)+ {
       return statements.filter(s => s !== null);
     }
 
@@ -829,7 +829,7 @@ FunctionDeepNestedWhileStatement
     }
 
 FunctionVeryDeepNestedBlock
-  = statements:FunctionVeryDeepNestedStatement+ {
+  = statements:(BlockIgnorableLine / FunctionVeryDeepNestedStatement)+ {
       return statements.filter(s => s !== null);
     }
 
@@ -888,6 +888,11 @@ SingleLineBody
 Indent
   = "    " // 4 spaces
   / "\t"   // or tab
+
+BlockIgnorableLine
+  = _ (LineTerminator / Comment) {
+      return null;
+    }
 
 // ============================================================================
 // Expressions (with precedence)
