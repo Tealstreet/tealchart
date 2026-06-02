@@ -844,6 +844,64 @@ tooManyRight = array.binary_search_rightmost(values, 2, 3)
     ]);
   });
 
+  it('resolves array statistic helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Array Statistic Signatures")
+values = array.from(1, 2, 3, 4)
+other = array.from(2, 4, 6, 8)
+absolute = array.abs(id=values)
+standardized = array.standardize(id=values)
+total = array.sum(id=values)
+average = array.avg(id=values)
+minimum = array.min(id=values)
+maximum = array.max(id=values)
+spread = array.range(id=values)
+middle = array.median(id=values)
+common = array.mode(id=values)
+variance = array.variance(id=values)
+deviation = array.stdev(id=values, biased=false)
+covariance = array.covariance(id1=values, id2=other, biased=true)
+covarianceAlias = array.covariance(id=values, id2=other)
+nearest = array.percentile_nearest_rank(id=values, percentage=50)
+linear = array.percentile_linear_interpolation(id=values, percentage=50)
+rank = array.percentrank(id=values, value=2)
+plot(total + average + minimum + maximum + spread + middle + common + variance + deviation + covariance + covarianceAlias + nearest + linear + rank + array.size(absolute) + array.size(standardized))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid array statistic helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Array Statistic Signatures")
+values = array.from(1, 2, 3)
+other = array.from(2, 4, 6)
+unknownSum = array.sum(values=values)
+tooManyAbs = array.abs(values, other)
+missingPercentile = array.percentile_nearest_rank(id=values)
+unknownStdev = array.stdev(id=values, sample=false)
+duplicateCovariance = array.covariance(values, id1=other)
+missingRank = array.percentrank(id=values)
+tooManyVariance = array.variance(values, true, false)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'values' for array.sum()",
+      'array.sum() expects at least 1 argument',
+      "array.sum() missing required argument 'id'",
+      'array.abs() expects at most 1 argument',
+      'array.percentile_nearest_rank() expects at least 2 arguments',
+      "array.percentile_nearest_rank() missing required argument 'percentage'",
+      "Unknown argument 'sample' for array.stdev()",
+      'array.covariance() expects at least 2 arguments',
+      "array.covariance() missing required argument 'id2'",
+      "Argument 'id1' for array.covariance() was supplied multiple times",
+      'array.percentrank() expects at least 2 arguments',
+      "array.percentrank() missing required argument 'value'",
+      'array.variance() expects at most 2 arguments',
+    ]);
+  });
+
   it('reports array element template mismatches for known mutable arrays', () => {
     const result = checkProgram(parse(`
 indicator("Bad Array Types")
