@@ -1131,11 +1131,15 @@ export function registerDrawingConstants(builtins: BuiltinRegistry): void {
   });
   builtins.set('chart.point.now', (args, namedArgs, ctx) => {
     const price = callArg(args, namedArgs, 0, 'price');
+    const currentTime = ctx.time.get(0);
+    const closeValue = ctx.close.get(0);
     return {
       type: 'chart.point',
-      time: ctx.time.get(0) ?? null,
+      time: typeof currentTime === 'number' && Number.isFinite(currentTime) ? currentTime : null,
       index: ctx.bar_index,
-      price: typeof price === 'number' && Number.isFinite(price) ? price : ctx.close.get(0) ?? null,
+      price: typeof price === 'number' && Number.isFinite(price)
+        ? price
+        : typeof closeValue === 'number' && Number.isFinite(closeValue) ? closeValue : null,
     };
   });
   builtins.set('chart.point.from_index', (args, namedArgs) => {
