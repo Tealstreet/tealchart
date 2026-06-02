@@ -646,13 +646,13 @@ export function registerPolylineBuiltins(builtins: BuiltinRegistry, runtime: Dra
     return id;
   });
 
-  builtins.set('polyline.delete', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'polyline', runtime.isNa, (polyline) => ctx.deleteDrawing(polyline.id));
+  builtins.set('polyline.delete', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'polyline', runtime.isNa, (polyline) => ctx.deleteDrawing(polyline.id));
     return undefined;
   });
 
-  builtins.set('polyline.copy', (args, _namedArgs, ctx, _scope, callId) => {
-    const polylineId = runtime.toDrawingId(args[0]);
+  builtins.set('polyline.copy', (args, namedArgs, ctx, _scope, callId) => {
+    const polylineId = runtime.toDrawingId(callArg(args, namedArgs, 0, 'id'));
     if (!polylineId) return Number.NaN;
 
     const newId = `polyline_${callId}_${ctx.bar_index}`;

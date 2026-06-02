@@ -384,6 +384,41 @@ if barstate.islast
     ]);
   });
 
+  it('copies and deletes polylines with Pine named lifecycle idioms', () => {
+    const result = runCompatScript(`
+indicator("Named Polyline Lifecycle", overlay=true, max_polylines_count=2)
+if barstate.islast
+    points = array.from(chart.point.from_index(bar_index - 2, low[2]), chart.point.from_index(bar_index - 1, high[1]), chart.point.now(close))
+    poly = polyline.new(points=points, closed=true, line_color=color.green, line_width=2)
+    clone = polyline.copy(id=poly)
+    polyline.delete(id=poly)
+plot(array.size(polyline.all), title="Named Polyline Count")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'polyline_polyline.copy_0_11',
+        type: 'polyline',
+        persistent: false,
+        barIndex: 11,
+        points: [
+          { type: 'chart.point', time: null, index: 9, price: 107 },
+          { type: 'chart.point', time: null, index: 10, price: 114 },
+          { type: 'chart.point', time: compatibilityBars[11]!.time, index: 11, price: 112 },
+        ],
+        curved: false,
+        closed: true,
+        xloc: 'bar_index',
+        lineColor: '#4CAF50',
+        fillColor: null,
+        lineStyle: 'solid',
+        lineWidth: 2,
+      },
+    ]);
+    expect(getPlot(result, 'Named Polyline Count').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+  });
+
   it('emits table cells from common last-bar dashboard idioms', () => {
     const result = runCompatScript(`
 indicator("Table docs smoke", overlay=true)
