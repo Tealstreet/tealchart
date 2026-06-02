@@ -233,6 +233,8 @@ interface BuiltinSignature {
   aliases?: Record<string, string>;
   overloads?: string[][];
   minArgs?: number;
+  requiredParams?: string[];
+  singlePositionalParam?: string;
   maxArgs?: number;
   allowExtraNamed?: boolean;
   allowExtraPositional?: boolean;
@@ -504,7 +506,20 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['strategy.exit', { params: STRATEGY_EXIT_PARAMS, minArgs: 1 }],
   ['strategy.order', { params: STRATEGY_ORDER_PARAMS, minArgs: 2 }],
   ['ta.atr', { params: ['length'], minArgs: 1, maxArgs: 1 }],
+  ['ta.barssince', { params: ['condition'], minArgs: 1, maxArgs: 1 }],
+  ['ta.valuewhen', { params: ['condition', 'source', 'occurrence'], minArgs: 3, maxArgs: 3 }],
+  ['ta.change', { params: ['source', 'length'], minArgs: 1, maxArgs: 2 }],
+  ['ta.crossover', { params: ['source1', 'source2'], minArgs: 2, maxArgs: 2 }],
+  ['ta.crossunder', { params: ['source1', 'source2'], minArgs: 2, maxArgs: 2 }],
+  ['ta.cross', { params: ['source1', 'source2'], minArgs: 2, maxArgs: 2 }],
   ['ta.ema', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
+  ['ta.highest', { params: ['source', 'length'], minArgs: 1, requiredParams: ['length'], singlePositionalParam: 'length', maxArgs: 2 }],
+  ['ta.lowest', { params: ['source', 'length'], minArgs: 1, requiredParams: ['length'], singlePositionalParam: 'length', maxArgs: 2 }],
+  ['ta.highestbars', { params: ['source', 'length'], minArgs: 1, requiredParams: ['length'], singlePositionalParam: 'length', maxArgs: 2 }],
+  ['ta.lowestbars', { params: ['source', 'length'], minArgs: 1, requiredParams: ['length'], singlePositionalParam: 'length', maxArgs: 2 }],
+  ['ta.range', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
+  ['ta.rising', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
+  ['ta.falling', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
   ['ta.rsi', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
   ['ta.sma', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
   ['ta.stdev', { params: ['source', 'length', 'biased'], minArgs: 2, maxArgs: 3 }],
@@ -2079,9 +2094,14 @@ class SemanticChecker {
     if (boundParamCount < minArgs) {
       this.addDiagnostic('argument-count', `${displayName}() expects at least ${minArgs} argument${minArgs === 1 ? '' : 's'}`, args[0]?.loc);
     }
-    for (let index = 0; index < minArgs; index += 1) {
-      const param = params[index];
-      if (!param || index < positionalCount || suppliedNames.has(param)) continue;
+    const requiredParams = signature.requiredParams ?? params.slice(0, minArgs);
+    for (const param of requiredParams) {
+      // Default-source helpers can let a lone positional value bind to singlePositionalParam
+      // instead of the first params entry while requiredParams still tracks required coverage.
+      if (args.length === 1 && positionalCount === 1 && signature.singlePositionalParam === param) continue;
+      const positionalIndex = params.indexOf(param);
+      if (positionalIndex !== -1 && positionalIndex < positionalCount) continue;
+      if (suppliedNames.has(param)) continue;
       this.addDiagnostic('argument-count', `${displayName}() missing required argument '${param}'`, args[0]?.loc);
     }
     if (positionalCount > maxArgs) {
