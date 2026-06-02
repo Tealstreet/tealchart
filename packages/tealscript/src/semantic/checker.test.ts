@@ -1192,6 +1192,28 @@ duplicateIdentity = matrix.is_identity(m, id=m)
     ]);
   });
 
+  it('resolves matrix named prefix positional tail arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Matrix Mixed Tail Signatures")
+m = matrix.new_int(rows=2, columns=2, initial_value=0)
+tail = matrix.new_int(rows=1, columns=2, initial_value=5)
+matrix.set(id=m, 0, 1, 2)
+first = matrix.get(id=m, 0, 1)
+matrix.fill(id=m, 6, 0, 1, 0, 1)
+slice = matrix.submatrix(id=m, 0, 2, 0, 2)
+matrix.reshape(id=m, rows=1, 4)
+matrix.add_row(id=m, array.from(3, 4))
+matrix.concat(id=m, tail)
+diff = matrix.diff(id1=m, 1)
+matrix.sort(id=m, 1, order.descending)
+row = matrix.row(id=m, 0)
+column = matrix.column(id=m, 0)
+plot(first + matrix.rows(id=slice) + matrix.rows(id=diff) + array.size(row) + array.size(column))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
   it('reports array element template mismatches for known mutable arrays', () => {
     const result = checkProgram(parse(`
 indicator("Bad Array Types")

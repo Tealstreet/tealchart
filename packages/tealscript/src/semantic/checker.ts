@@ -663,41 +663,41 @@ BUILTIN_SIGNATURES.set('array.percentrank', { params: ['id', 'value'], minArgs: 
 BUILTIN_SIGNATURES.set('array.from', { params: [], minArgs: 0, allowExtraPositional: true });
 
 for (const name of ['matrix.new', 'matrix.new_bool', 'matrix.new_color', 'matrix.new_float', 'matrix.new_int', 'matrix.new_string']) {
-  BUILTIN_SIGNATURES.set(name, { params: ['rows', 'columns', 'initial_value'], minArgs: 0, maxArgs: 3 });
+  BUILTIN_SIGNATURES.set(name, { params: ['rows', 'columns', 'initial_value'], minArgs: 0, maxArgs: 3, allowNamedPrefixWithPositional: true });
 }
 
 for (const name of ['matrix.columns', 'matrix.elements_count', 'matrix.is_valid', 'matrix.rows']) {
-  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1 });
+  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true });
 }
 
-BUILTIN_SIGNATURES.set('matrix.get', { params: ['id', 'row', 'column'], minArgs: 3, maxArgs: 3 });
-BUILTIN_SIGNATURES.set('matrix.set', { params: ['id', 'row', 'column', 'value'], minArgs: 4, maxArgs: 4 });
-BUILTIN_SIGNATURES.set('matrix.fill', { params: ['id', 'value', 'from_row', 'to_row', 'from_column', 'to_column'], minArgs: 2, maxArgs: 6 });
-BUILTIN_SIGNATURES.set('matrix.reshape', { params: ['id', 'rows', 'columns'], minArgs: 3, maxArgs: 3 });
-BUILTIN_SIGNATURES.set('matrix.reverse', { params: ['id'], minArgs: 1, maxArgs: 1 });
+BUILTIN_SIGNATURES.set('matrix.get', { params: ['id', 'row', 'column'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true });
+BUILTIN_SIGNATURES.set('matrix.set', { params: ['id', 'row', 'column', 'value'], minArgs: 4, maxArgs: 4, allowNamedPrefixWithPositional: true });
+BUILTIN_SIGNATURES.set('matrix.fill', { params: ['id', 'value', 'from_row', 'to_row', 'from_column', 'to_column'], minArgs: 2, maxArgs: 6, allowNamedPrefixWithPositional: true });
+BUILTIN_SIGNATURES.set('matrix.reshape', { params: ['id', 'rows', 'columns'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true });
+BUILTIN_SIGNATURES.set('matrix.reverse', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true });
 
-BUILTIN_SIGNATURES.set('matrix.add_row', { params: ['id', 'row', 'array_id'], minArgs: 1, maxArgs: 3 });
+BUILTIN_SIGNATURES.set('matrix.add_row', { params: ['id', 'row', 'array_id'], minArgs: 1, maxArgs: 3, allowNamedPrefixWithPositional: true });
 for (const name of ['matrix.add_col', 'matrix.add_column']) {
-  BUILTIN_SIGNATURES.set(name, { params: ['id', 'column', 'array_id'], minArgs: 1, maxArgs: 3 });
+  BUILTIN_SIGNATURES.set(name, { params: ['id', 'column', 'array_id'], minArgs: 1, maxArgs: 3, allowNamedPrefixWithPositional: true });
 }
 
-BUILTIN_SIGNATURES.set('matrix.remove_row', { params: ['id', 'row'], minArgs: 2, maxArgs: 2 });
+BUILTIN_SIGNATURES.set('matrix.remove_row', { params: ['id', 'row'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true });
 for (const name of ['matrix.remove_col', 'matrix.remove_column']) {
-  BUILTIN_SIGNATURES.set(name, { params: ['id', 'column'], minArgs: 2, maxArgs: 2 });
+  BUILTIN_SIGNATURES.set(name, { params: ['id', 'column'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true });
 }
 
-BUILTIN_SIGNATURES.set('matrix.swap_rows', { params: ['id', 'row1', 'row2'], minArgs: 3, maxArgs: 3 });
-BUILTIN_SIGNATURES.set('matrix.swap_columns', { params: ['id', 'column1', 'column2'], minArgs: 3, maxArgs: 3 });
-BUILTIN_SIGNATURES.set('matrix.concat', { params: ['id1', 'id2'], aliases: { id: 'id1' }, minArgs: 2, maxArgs: 2 });
-BUILTIN_SIGNATURES.set('matrix.submatrix', { params: ['id', 'from_row', 'to_row', 'from_column', 'to_column'], minArgs: 1, maxArgs: 5 });
+BUILTIN_SIGNATURES.set('matrix.swap_rows', { params: ['id', 'row1', 'row2'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true });
+BUILTIN_SIGNATURES.set('matrix.swap_columns', { params: ['id', 'column1', 'column2'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true });
+BUILTIN_SIGNATURES.set('matrix.concat', { params: ['id1', 'id2'], aliases: { id: 'id1' }, minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true });
+BUILTIN_SIGNATURES.set('matrix.submatrix', { params: ['id', 'from_row', 'to_row', 'from_column', 'to_column'], minArgs: 1, maxArgs: 5, allowNamedPrefixWithPositional: true });
 
 for (const name of ['matrix.copy', 'matrix.transpose']) {
-  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1 });
+  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true });
 }
 
-BUILTIN_SIGNATURES.set('matrix.row', { params: ['id', 'row'], minArgs: 2, maxArgs: 2 });
+BUILTIN_SIGNATURES.set('matrix.row', { params: ['id', 'row'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true });
 for (const name of ['matrix.col', 'matrix.column']) {
-  BUILTIN_SIGNATURES.set(name, { params: ['id', 'column'], minArgs: 2, maxArgs: 2 });
+  BUILTIN_SIGNATURES.set(name, { params: ['id', 'column'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true });
 }
 
 for (const name of [
@@ -714,15 +714,15 @@ for (const name of [
   'matrix.rank',
   'matrix.trace',
 ]) {
-  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1 });
+  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true });
 }
 
 for (const name of ['matrix.diff', 'matrix.kron', 'matrix.mult', 'matrix.sum']) {
-  BUILTIN_SIGNATURES.set(name, { params: ['id1', 'id2'], aliases: { id: 'id1' }, minArgs: 2, maxArgs: 2 });
+  BUILTIN_SIGNATURES.set(name, { params: ['id1', 'id2'], aliases: { id: 'id1' }, minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true });
 }
 
-BUILTIN_SIGNATURES.set('matrix.pow', { params: ['id', 'power'], minArgs: 2, maxArgs: 2 });
-BUILTIN_SIGNATURES.set('matrix.sort', { params: ['id', 'column', 'order', 'sort_field'], minArgs: 1, maxArgs: 4 });
+BUILTIN_SIGNATURES.set('matrix.pow', { params: ['id', 'power'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true });
+BUILTIN_SIGNATURES.set('matrix.sort', { params: ['id', 'column', 'order', 'sort_field'], minArgs: 1, maxArgs: 4, allowNamedPrefixWithPositional: true });
 
 for (const name of [
   'matrix.is_antidiagonal',
@@ -736,7 +736,7 @@ for (const name of [
   'matrix.is_triangular',
   'matrix.is_zero',
 ]) {
-  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1 });
+  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true });
 }
 
 export function checkProgram(program: Program): SemanticCheckResult {
@@ -2271,10 +2271,11 @@ class SemanticChecker {
 
   private checkArgumentCount(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
     const params = this.resolveSignatureParams(args, signature);
+    const binding = signature.allowNamedPrefixWithPositional ? this.bindSignatureArguments(args, signature, params) : undefined;
     const positionalCount = this.leadingPositionalCount(args);
-    const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
+    const suppliedNames = binding?.boundParams ?? new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
     const omitsOptionalLeadingParam = this.omitsOptionalLeadingParam(params, positionalCount, suppliedNames, signature);
-    const boundParamCount = params.filter((param, index) => {
+    const boundParamCount = binding?.boundParams.size ?? params.filter((param, index) => {
       const positionalIndex = this.effectivePositionalIndex(index, omitsOptionalLeadingParam);
       return (positionalIndex !== -1 && positionalIndex < positionalCount) || suppliedNames.has(param);
     }).length;
@@ -2289,18 +2290,51 @@ class SemanticChecker {
       // Default-source helpers can let a lone positional value bind to singlePositionalParam
       // instead of the first params entry while requiredParams still tracks required coverage.
       if (args.length === 1 && positionalCount === 1 && signature.singlePositionalParam === param) continue;
-      const positionalIndex = this.effectivePositionalIndex(params.indexOf(param), omitsOptionalLeadingParam);
-      if (positionalIndex !== -1 && positionalIndex < positionalCount) continue;
+      if (binding) {
+        if (binding.boundParams.has(param)) continue;
+      } else {
+        const positionalIndex = this.effectivePositionalIndex(params.indexOf(param), omitsOptionalLeadingParam);
+        if (positionalIndex !== -1 && positionalIndex < positionalCount) continue;
+      }
       if (suppliedNames.has(param)) continue;
       this.addDiagnostic('argument-count', `${displayName}() missing required argument '${param}'`, args[0]?.loc);
     }
-    if (positionalCount > maxArgs) {
+    if (binding && binding.overflowArgs.length > 0 && !signature.allowExtraPositional) {
+      this.addDiagnostic('argument-count', `${displayName}() expects at most ${maxArgs} argument${maxArgs === 1 ? '' : 's'}`, binding.overflowArgs[0]?.loc);
+    } else if (positionalCount > maxArgs) {
       this.addDiagnostic('argument-count', `${displayName}() expects at most ${maxArgs} argument${maxArgs === 1 ? '' : 's'}`, args[maxArgs]?.loc);
     }
   }
 
   private checkDuplicateArgumentBindings(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
     const params = this.resolveSignatureParams(args, signature);
+    if (signature.allowNamedPrefixWithPositional) {
+      const boundParams = new Set<string>();
+      const positionalBoundParams = new Set<string>();
+      const seenNames = new Set<string>();
+
+      for (const arg of args) {
+        if (!arg.name) {
+          const positionalParam = params.find((param) => !boundParams.has(param));
+          if (positionalParam) {
+            boundParams.add(positionalParam);
+            positionalBoundParams.add(positionalParam);
+          }
+          continue;
+        }
+
+        const canonicalName = this.canonicalSignatureArgumentName(arg.name.name, signature);
+        if (!params.includes(canonicalName)) continue;
+        if (seenNames.has(canonicalName) || positionalBoundParams.has(canonicalName)) {
+          this.addDiagnostic('duplicate-argument', `Argument '${arg.name.name}' for ${displayName}() was supplied multiple times`, arg.name.loc);
+          continue;
+        }
+        seenNames.add(canonicalName);
+        boundParams.add(canonicalName);
+      }
+      return;
+    }
+
     const positionalCount = this.leadingPositionalCount(args);
     const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
     const omitsOptionalLeadingParam = this.omitsOptionalLeadingParam(params, positionalCount, suppliedNames, signature);
@@ -2337,6 +2371,34 @@ class SemanticChecker {
     if (paramIndex === -1) return -1;
     if (!omitsOptionalLeadingParam) return paramIndex;
     return paramIndex === 0 ? -1 : paramIndex - 1;
+  }
+
+  private bindSignatureArguments(
+    args: CallArgument[],
+    signature: BuiltinSignature,
+    params: string[],
+  ): { boundParams: Set<string>; overflowArgs: CallArgument[] } {
+    const boundParams = new Set<string>();
+    const overflowArgs: CallArgument[] = [];
+
+    for (const arg of args) {
+      if (arg.name) {
+        const canonicalName = this.canonicalSignatureArgumentName(arg.name.name, signature);
+        if (params.includes(canonicalName)) {
+          boundParams.add(canonicalName);
+        }
+        continue;
+      }
+
+      const positionalParam = params.find((param) => !boundParams.has(param));
+      if (positionalParam) {
+        boundParams.add(positionalParam);
+      } else {
+        overflowArgs.push(arg);
+      }
+    }
+
+    return { boundParams, overflowArgs };
   }
 
   private canonicalSignatureArgumentName(name: string, signature: BuiltinSignature): string {
