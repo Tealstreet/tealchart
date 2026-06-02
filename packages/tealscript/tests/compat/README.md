@@ -19,6 +19,11 @@ real-script intake metadata or corpus summaries:
   `parse_gap`, `semantic_gap`, `unsupported_planned`, `runtime_gap`,
   `data_gap`, `output_gap`, `render_gap`, `oracle_gap`, and
   `licensing_blocked`.
+- `runPineCompatibilityCorpus()` converts ledger entries plus deterministic
+  stage outcomes into an offline report with pass/fail counts, first-failure
+  buckets, feature tag summaries, and validation errors.
+- `formatPineCompatibilityCorpusMarkdown()` renders the report for PR notes or
+  generated artifacts without adding network or TradingView dependencies to CI.
 
 Use `fixtures.ts` helpers by default:
 
