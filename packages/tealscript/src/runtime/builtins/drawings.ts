@@ -409,20 +409,20 @@ export function registerLineFillBuiltins(builtins: BuiltinRegistry, runtime: Dra
     return id;
   });
 
-  builtins.set('linefill.delete', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'linefill', runtime.isNa, (linefill) => ctx.deleteDrawing(linefill.id));
+  builtins.set('linefill.delete', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'linefill', runtime.isNa, (linefill) => ctx.deleteDrawing(linefill.id));
     return undefined;
   });
 
-  builtins.set('linefill.set_color', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'linefill', runtime.isNa, (linefill) => {
-      linefill.color = runtime.toNullableColor(args[1]);
+  builtins.set('linefill.set_color', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'linefill', runtime.isNa, (linefill) => {
+      linefill.color = runtime.toNullableColor(callArg(args, namedArgs, 1, 'color'));
     });
     return undefined;
   });
 
-  builtins.set('linefill.get_line1', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'linefill', runtime.isNa, (linefill) => linefill.line1));
-  builtins.set('linefill.get_line2', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'linefill', runtime.isNa, (linefill) => linefill.line2));
+  builtins.set('linefill.get_line1', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'linefill', runtime.isNa, (linefill) => linefill.line1));
+  builtins.set('linefill.get_line2', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'linefill', runtime.isNa, (linefill) => linefill.line2));
   builtins.set('linefill.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('linefill'));
 }
 

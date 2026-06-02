@@ -594,10 +594,11 @@ horizontal extension support. `force_overlay` lines render in the main pane
 even when created by non-overlay scripts. `linefill.new()` records fills between
 two line handles;
 `linefill.set_color()`, `linefill.get_line1()`, `linefill.get_line2()`, and
-`linefill.delete()` are supported, and the renderer fills between resolved line
-segments in the routed script pane. `linefill.new()` rejects missing or non-line
-handles without creating a drawing. `chart.point` overloads, GC limits, full
-arrow style geometry, and full realtime rollback parity remain planned.
+`linefill.delete()` are supported with Pine-style named `id` and `color`
+arguments, and the renderer fills between resolved line segments in the routed
+script pane. `linefill.new()` rejects missing or non-line handles without
+creating a drawing. `chart.point` overloads, GC limits, full arrow style
+geometry, and full realtime rollback parity remain planned.
 
 The box drawing pass covers common supply/demand zone idioms. `box.new()`
 accepts positional or named `left`, `top`, `right`, and `bottom` arguments plus

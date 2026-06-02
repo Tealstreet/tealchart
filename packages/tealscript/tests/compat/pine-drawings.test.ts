@@ -233,6 +233,68 @@ plot(line.get_price(id=trend, x=bar_index - 1), title="Named Line Price")
     expect(getPlot(result, 'Named Line Price').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 110]);
   });
 
+  it('updates, reads, and deletes linefills with Pine named setter idioms', () => {
+    const result = runCompatScript(`
+indicator("Named Linefill", overlay=true)
+var upper = na
+var lower = na
+var channel = na
+if barstate.islast
+    upper := line.new(x1=bar_index - 1, y1=high[1], x2=bar_index, y2=high)
+    lower := line.new(x1=bar_index - 1, y1=low[1], x2=bar_index, y2=low)
+    channel := linefill.new(line1=upper, line2=lower, color=color.red)
+    stale = linefill.new(line1=upper, line2=lower, color=color.blue)
+    linefill.set_color(id=channel, color=color.new(color.orange, 60))
+    linefill.delete(id=stale)
+plot(linefill.get_line1(id=channel) == upper, title="Named Linefill Line1")
+plot(linefill.get_line2(id=channel) == lower, title="Named Linefill Line2")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'line_line.new_0_11',
+        type: 'line',
+        barIndex: 11,
+        x1: 10,
+        y1: 114,
+        x2: 11,
+        y2: 113,
+        xloc: 'bar_index',
+        extend: 'none',
+        color: null,
+        style: 'solid',
+        width: 1,
+        forceOverlay: false,
+      },
+      {
+        id: 'line_line.new_1_11',
+        type: 'line',
+        barIndex: 11,
+        x1: 10,
+        y1: 109,
+        x2: 11,
+        y2: 108,
+        xloc: 'bar_index',
+        extend: 'none',
+        color: null,
+        style: 'solid',
+        width: 1,
+        forceOverlay: false,
+      },
+      {
+        id: 'linefill_linefill.new_0_11',
+        type: 'linefill',
+        barIndex: 11,
+        line1: 'line_line.new_0_11',
+        line2: 'line_line.new_1_11',
+        color: '#FF980066',
+      },
+    ]);
+    expect(getPlot(result, 'Named Linefill Line1').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, true]);
+    expect(getPlot(result, 'Named Linefill Line2').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, true]);
+  });
+
   it('updates and reads a persistent box with Pine named setter idioms', () => {
     const result = runCompatScript(`
 indicator("Named Persistent Box", overlay=true)
