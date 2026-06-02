@@ -6534,6 +6534,9 @@ export class TealscriptEngine {
   }
 
   private mapReceiverArg(args: unknown[], namedArgs: Map<string, unknown>, tailNames: readonly string[] = []): unknown {
+    if (this.mapUsesPositionalReceiver(args, namedArgs, tailNames) && namedArgs.has('id')) {
+      throw new Error("map call receiver was supplied multiple times (positional and named 'id')");
+    }
     return this.mapUsesPositionalReceiver(args, namedArgs, tailNames) ? args[0] : namedArgs.has('id') ? namedArgs.get('id') : args[0];
   }
 
