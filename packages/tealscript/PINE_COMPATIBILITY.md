@@ -204,7 +204,9 @@ helpers (`matrix.fill`, `matrix.reshape`, `matrix.add_row`, `matrix.add_col`,
 (`matrix.avg`, `matrix.min`, `matrix.max`, `matrix.median`, `matrix.mode`).
 Collection operations include row sorting with `matrix.sort()` (including UDT
 row sorting by const int/string `sort_field` field name or index) and copied
-range extraction with `matrix.submatrix()`.
+range extraction with `matrix.submatrix()`. Matrix concatenation coverage
+includes `matrix.concat()` and method-form row appends into the left-hand
+matrix.
 Matrix arithmetic coverage includes `matrix.sum()` and `matrix.diff()` with
 same-shape matrix operands and scalar operands, `matrix.mult()` for
 matrix-by-matrix, matrix-by-array, and matrix-by-scalar multiplication,
@@ -218,7 +220,7 @@ method syntax lowers to the
 same runtime built-ins for calls such as
 `values.set(row, column, close)`, `values.add_row(array.from(...))`,
 `values.transpose()`, `values.sort(1, order.descending)`,
-`values.submatrix(0, 2, 0, 2)`, `values.sum(other)`, `values.mult(other)`,
+`values.submatrix(0, 2, 0, 2)`, `values.concat(other)`, `values.sum(other)`, `values.mult(other)`,
 `values.pow(2)`, `values.trace()`, `values.det()`, `values.inv()`,
 `values.pinv()`, `values.rank()`, `values.eigenvalues()`,
 `values.eigenvectors()`, `values.kron(other)`, `values.is_identity()`, and

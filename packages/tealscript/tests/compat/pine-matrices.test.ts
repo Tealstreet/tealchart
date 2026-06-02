@@ -84,6 +84,37 @@ plot(colsFromArray.rows(), title="Array Column Rows")
     expect(roundSeries(getPlot(result, 'Array Column Rows').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
   });
 
+  it('runs documented matrix concatenation idioms', () => {
+    const result = runCompatScript(`
+indicator("Matrix concat")
+left = matrix.new_int(2, 2, 0)
+left.set(0, 0, 1)
+left.set(0, 1, 2)
+left.set(1, 0, 3)
+left.set(1, 1, 4)
+right = matrix.new_int(1, 2, 0)
+right.set(0, 0, 5)
+right.set(0, 1, 6)
+left.concat(right)
+namespace = matrix.new_int()
+matrix.concat(namespace, right)
+plot(left.rows(), title="Rows")
+plot(left.get(2, 0), title="Appended First")
+plot(left.get(2, 1), title="Appended Second")
+plot(right.rows(), title="Right Rows")
+plot(namespace.rows(), title="Namespace Rows")
+plot(namespace.get(0, 1), title="Namespace Value")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Rows').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Appended First').values)).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
+    expect(roundSeries(getPlot(result, 'Appended Second').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+    expect(roundSeries(getPlot(result, 'Right Rows').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Namespace Rows').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Namespace Value').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+  });
+
   it('runs matrix aggregate helper idioms', () => {
     const result = runCompatScript(`
 indicator("Matrix aggregate helpers")

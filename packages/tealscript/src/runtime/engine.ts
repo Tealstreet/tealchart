@@ -100,6 +100,7 @@ import {
   addMatrixColumn,
   addMatrixRow,
   avgMatrixValue,
+  concatMatrix,
   copyMatrix,
   createPineMatrix,
   detMatrixValue,
@@ -5888,6 +5889,10 @@ export class TealscriptEngine {
         args[3] as number | undefined,
         args[4] as number | undefined,
       );
+    });
+    this.builtins.set('matrix.concat', (args) => {
+      concatMatrix(readMatrix(args[0]), readMatrix(args[1]));
+      return null;
     });
     this.builtins.set('matrix.copy', (args) => copyMatrix(readMatrix(args[0])));
     this.builtins.set('matrix.row', (args) => matrixRow(readMatrix(args[0]), args[1] as number));
