@@ -191,12 +191,13 @@ import {
   cancelAllStrategyOrders,
   cancelStrategyOrder,
   fillPendingStrategyMarketOrders,
-  fillPendingStrategyOrders,
+  fillPendingStrategyOrdersOnTicks,
   fillStrategyMarketOrder,
   selectStrategyIntrabarContext,
   submitStrategyOrder,
   type StrategyDirection,
   type StrategyFill,
+  type StrategyIntrabarContext,
   type StrategyIntrabarDatafeed,
   type StrategyLedger,
   type StrategyLedgerSettings,
@@ -487,7 +488,6 @@ export class TealscriptEngine {
         }
       }
       this.fillPendingStrategyOrdersForCurrentBar();
-      this.recordStrategyIntrabarContextForCurrentBar();
 
       // Commit bar — only snapshot on the last bar (for realtime rollback)
       this.scope.commit(isLastBar);
@@ -689,7 +689,6 @@ export class TealscriptEngine {
       }
     }
     this.fillPendingStrategyOrdersForCurrentBar();
-    this.recordStrategyIntrabarContextForCurrentBar();
   }
 
   /**
@@ -821,14 +820,14 @@ export class TealscriptEngine {
     }
   }
 
-  private recordStrategyIntrabarContextForCurrentBar(): void {
+  private selectStrategyIntrabarContextForCurrentBar(): StrategyIntrabarContext | null {
     if (!this.hasStrategyDeclaration) {
-      return;
+      return null;
     }
 
     const chartBar = this.ctx.getCurrentBar();
     if (!chartBar) {
-      return;
+      return null;
     }
 
     const context = selectStrategyIntrabarContext({
@@ -843,6 +842,7 @@ export class TealscriptEngine {
       },
     });
     this.ctx.recordStrategyIntrabarContext(context);
+    return context;
   }
 
   private applyStrategyDeclaration(stmt: IndicatorDeclaration): void {
@@ -4264,13 +4264,12 @@ export class TealscriptEngine {
   }
 
   private fillPendingStrategyOrdersForCurrentBar(): void {
-    const fills = fillPendingStrategyOrders(
-      this.ctx.strategyLedger,
-      this.ctx.high.get(0) ?? Number.NaN,
-      this.ctx.low.get(0) ?? Number.NaN,
-      this.ctx.bar_index,
-      this.ctx.time.get(0) ?? 0,
-    );
+    const context = this.selectStrategyIntrabarContextForCurrentBar();
+    if (!context) {
+      return;
+    }
+
+    const fills = fillPendingStrategyOrdersOnTicks(this.ctx.strategyLedger, context.ticks, this.ctx.bar_index);
     this.emitStrategyFillAlerts(fills);
   }
 

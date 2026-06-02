@@ -179,6 +179,9 @@ must stay offline and deterministic.
    still use the existing OHLC broker path until step 5.
 5. Refactor order filling to consume execution ticks instead of a single
    per-bar OHLC fill point.
+   Done. Pending price orders now consume the selected ordered execution path;
+   lower-timeframe paths can change which OCA/bracket leg fills first. Market
+   order recalculation remains in the later `calc_on_order_fills` step.
 6. Implement bounded `calc_on_order_fills` recalculation.
 7. Add reduced Pine checkpoint tests for Bar Magnifier and recalculation
    examples.

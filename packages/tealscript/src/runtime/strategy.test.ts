@@ -10,6 +10,7 @@ import {
   createStrategyOrder,
   createStrategyPosition,
   fillPendingStrategyOrders,
+  fillPendingStrategyOrdersOnTicks,
   fillStrategyMarketOrder,
   InMemoryStrategyIntrabarDatafeed,
   selectStrategyIntrabarContext,
@@ -515,5 +516,72 @@ describe('strategy ledger model', () => {
     ]);
     expect(limit).toMatchObject({ status: 'filled', avgFillPrice: 100 });
     expect(stop).toMatchObject({ status: 'filled', avgFillPrice: 98 });
+  });
+
+  it('fills only the first OCA order crossed by the ordered execution ticks', () => {
+    const ledger = createStrategyLedger();
+    const stop = submitStrategyOrder(ledger, {
+      id: 'Long stop',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      stopPrice: 105,
+      ocaName: 'entry',
+      ocaType: 'cancel',
+      barIndex: 0,
+      time: 1,
+    });
+    const limit = submitStrategyOrder(ledger, {
+      id: 'Long limit',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      limitPrice: 95,
+      ocaName: 'entry',
+      ocaType: 'cancel',
+      barIndex: 0,
+      time: 1,
+    });
+
+    const fills = fillPendingStrategyOrdersOnTicks(ledger, [
+      { time: 2, price: 100, kind: 'open', sequence: 0 },
+      { time: 3, price: 110, kind: 'high', sequence: 1 },
+      { time: 4, price: 90, kind: 'low', sequence: 2 },
+      { time: 5, price: 100, kind: 'close', sequence: 3 },
+    ], 1);
+
+    expect(fills.map((fill) => ({ orderId: fill.orderId, price: fill.price, time: fill.time }))).toEqual([
+      { orderId: 'Long stop', price: 105, time: 3 },
+    ]);
+    expect(stop).toMatchObject({ status: 'filled', avgFillPrice: 105, updatedTime: 3 });
+    expect(limit).toMatchObject({ status: 'cancelled', avgFillPrice: null, updatedTime: 3 });
+  });
+
+  it('fills opening gap crosses at the current open price', () => {
+    const ledger = createStrategyLedger();
+    const order = submitStrategyOrder(ledger, {
+      id: 'Gap long limit',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      limitPrice: 100,
+      barIndex: 0,
+      time: 1,
+    });
+
+    const fills = fillPendingStrategyOrdersOnTicks(ledger, [
+      { time: 2, price: 98, kind: 'open', sequence: 0 },
+      { time: 3, price: 101, kind: 'high', sequence: 1 },
+      { time: 4, price: 97, kind: 'low', sequence: 2 },
+      { time: 5, price: 99, kind: 'close', sequence: 3 },
+    ], 1);
+
+    expect(fills.map((fill) => ({ orderId: fill.orderId, price: fill.price, time: fill.time }))).toEqual([
+      { orderId: 'Gap long limit', price: 98, time: 2 },
+    ]);
+    expect(order).toMatchObject({ status: 'filled', avgFillPrice: 98 });
   });
 });

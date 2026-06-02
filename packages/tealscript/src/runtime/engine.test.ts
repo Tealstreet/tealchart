@@ -250,6 +250,62 @@ plot(strategy.equity)`;
       expect(result.strategy.intrabarContexts[0]?.ticks.map((tick) => tick.kind)).toEqual(['open', 'low', 'high', 'close']);
     });
 
+    it('fills price orders using lower-timeframe tick order when bar magnifier data is available', () => {
+      const baseTime = Date.now() - 180000;
+      const bars: Bar[] = [
+        { time: baseTime, open: 100, high: 101, low: 99, close: 100, volume: 1000 },
+        { time: baseTime + 60000, open: 100, high: 100.5, low: 99.5, close: 100, volume: 1000 },
+        { time: baseTime + 120000, open: 100, high: 105, low: 95, close: 100, volume: 1000 },
+      ];
+      const script = `//@version=6
+strategy("Magnifier fills", use_bar_magnifier=true, process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Bracket", "Long", limit=103, stop=97)
+plot(strategy.closedtrades)`;
+      const datafeed = new InMemoryStrategyIntrabarDatafeed([{
+        symbol: 'BTCUSDT',
+        timeframe: '60',
+        chartBarTime: bars[2].time,
+        chartBarIndex: 2,
+        chartBar: bars[2],
+        source: 'lower_timeframe',
+        ticks: [
+          { time: bars[2].time, price: 100, kind: 'intrabar_open', sequence: 0 },
+          { time: bars[2].time + 15_000, price: 104, kind: 'intrabar_high', sequence: 1 },
+          { time: bars[2].time + 30_000, price: 96, kind: 'intrabar_low', sequence: 2 },
+          { time: bars[2].time + 45_000, price: 100, kind: 'intrabar_close', sequence: 3 },
+        ],
+      }]);
+
+      const result = executeScript(parse(script), bars, undefined, { strategyIntrabarDatafeed: datafeed });
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.intrabarContexts.map((context) => context.source)).toEqual([
+        'chart_ohlc',
+        'chart_ohlc',
+        'lower_timeframe',
+      ]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        avgFillPrice: order.avgFillPrice,
+        updatedBarIndex: order.updatedBarIndex,
+        updatedTime: order.updatedTime,
+      }))).toEqual([
+        { id: 'Long', status: 'filled', avgFillPrice: 100, updatedBarIndex: 0, updatedTime: bars[0].time },
+        { id: 'Bracket Limit', status: 'filled', avgFillPrice: 103, updatedBarIndex: 2, updatedTime: bars[2].time + 15_000 },
+        { id: 'Bracket Stop', status: 'cancelled', avgFillPrice: null, updatedBarIndex: 2, updatedTime: bars[2].time + 15_000 },
+      ]);
+      expect(result.strategy.closedTrades[0]).toMatchObject({
+        exitOrderId: 'Bracket Limit',
+        exitPrice: 103,
+        exitBarIndex: 2,
+        exitTime: bars[2].time + 15_000,
+      });
+    });
+
     it('does not record intrabar metadata when the strategy declaration fails', () => {
       const script = `//@version=6
 strategy("Invalid", initial_capital=-1, use_bar_magnifier=true)
@@ -1383,11 +1439,11 @@ plot(strategy.position_size)`;
         trailActivationPrice: 99.5,
         trailOffset: 0.25,
         trailingActivated: true,
-        trailingStopPrice: 98.75,
-        avgFillPrice: 98.75,
-        updatedBarIndex: 3,
+        trailingStopPrice: 99.25,
+        avgFillPrice: 99.25,
+        updatedBarIndex: 2,
       });
-      expect(result.strategy.closedTrades[0]?.profit).toBeCloseTo(1.25);
+      expect(result.strategy.closedTrades[0]?.profit).toBeCloseTo(0.75);
     });
 
     it('uses weighted entry price for multi-fill strategy.exit trail_points activation', () => {
