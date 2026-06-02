@@ -645,8 +645,8 @@ Done means every parity epic has regression tests that reflect real Pine usage.
 
 ## Near-Term Candidate PR Sequence
 
-These PRs are the most useful next steps after the current visual-object work is
-unblocked:
+These PRs are the most useful next steps from the current parity baseline. Keep
+this list focused on gaps that are not already covered by the epic notes above.
 
 1. Source-of-truth cleanup: fix stale `PINE_COMPATIBILITY.md` claims and link
    this roadmap.
@@ -657,10 +657,12 @@ unblocked:
    now execute, and obvious invalid index assignment targets emit semantic
    diagnostics. Continue expanding collection-specific assignment checks as new
    syntax lands.
-4. `request.security()` design doc plus deterministic datafeed fixture harness.
-5. `request.security()` same-symbol higher-timeframe MVP.
-6. Label object output and renderer MVP.
-7. Table object MVP.
-8. Named timezone/session completion.
-9. `matrix.*` MVP.
-10. `map.*` MVP.
+4. Request data follow-up: either define the remaining `request.footprint()`
+   model or defer it explicitly until footprint/intrabar-volume data is
+   available from the host.
+5. Label object output and renderer MVP.
+6. Table object MVP.
+7. Named timezone/session completion.
+8. `matrix.*` MVP.
+9. `map.*` MVP.
+10. Library import/export MVP.
