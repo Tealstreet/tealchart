@@ -102,6 +102,9 @@ Current `ta.*` progress:
   back to chart `close`.
 - `ta.stdev` and `ta.variance` support the `biased` parameter.
 - `ta.ema` and `ta.rma` use stable call-site state for recursive smoothing.
+- `ta.dmi`, `ta.sar`, `ta.pivothigh`, `ta.pivotlow`, and `ta.linreg`
+  accept Pine-style named arguments; pivot helpers also support default-source
+  two-argument forms.
 
 Current `str.*` progress:
 

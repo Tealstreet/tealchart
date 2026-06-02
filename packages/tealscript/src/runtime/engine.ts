@@ -7923,9 +7923,12 @@ export class TealscriptEngine {
 
     // DMI - Directional Movement Index
     // Returns [diPlus, diMinus, adx]
-    this.builtins.set('ta.dmi', (args, _namedArgs, ctx, scope) => {
-      const length = (args[0] ?? 14) as number;
-      const adxSmoothing = (args[1] ?? 14) as number;
+    this.builtins.set('ta.dmi', (args, namedArgs, ctx, scope) => {
+      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 0, 'diLength', 14));
+      const adxSmoothing = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'adxSmoothing', 14));
+      if (length < 1 || adxSmoothing < 1) {
+        return [NaN, NaN, NaN];
+      }
 
       const high = ctx.high.get(0)!;
       const low = ctx.low.get(0)!;
@@ -7994,10 +7997,10 @@ export class TealscriptEngine {
     });
 
     // SAR - Parabolic Stop and Reverse
-    this.builtins.set('ta.sar', (args, _namedArgs, ctx, scope) => {
-      const start = (args[0] ?? 0.02) as number;
-      const increment = (args[1] ?? 0.02) as number;
-      const maximum = (args[2] ?? 0.2) as number;
+    this.builtins.set('ta.sar', (args, namedArgs, ctx, scope) => {
+      const start = this.toNumber(this.getCallArg(args, namedArgs, 0, 'start', 0.02));
+      const increment = this.toNumber(this.getCallArg(args, namedArgs, 1, 'inc', 0.02));
+      const maximum = this.toNumber(this.getCallArg(args, namedArgs, 2, 'max', 0.2));
 
       const high = ctx.high.get(0)!;
       const low = ctx.low.get(0)!;
@@ -8075,10 +8078,14 @@ export class TealscriptEngine {
 
     // PivotHigh - Detect pivot highs
     // Returns the pivot high price or na
-    this.builtins.set('ta.pivothigh', (args, _namedArgs, ctx) => {
-      const source = args[0] as number;
-      const leftBars = (args[1] ?? 5) as number;
-      const rightBars = (args[2] ?? 5) as number;
+    this.builtins.set('ta.pivothigh', (args, namedArgs, ctx) => {
+      const hasSource = namedArgs.has('source') || args.length >= 3 || (args.length === 1 && namedArgs.size === 0);
+      const sourceArg = hasSource ? this.getCallArg(args, namedArgs, 0, 'source') : ctx.high.get(0)!;
+      const leftIndex = hasSource ? 1 : 0;
+      const rightIndex = hasSource ? 2 : 1;
+      const source = this.toNumber(sourceArg);
+      const leftBars = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, leftIndex, 'leftbars', 5));
+      const rightBars = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, rightIndex, 'rightbars', 5));
 
       const series = this.getSeriesForSource(source, ctx);
 
@@ -8104,10 +8111,14 @@ export class TealscriptEngine {
 
     // PivotLow - Detect pivot lows
     // Returns the pivot low price or na
-    this.builtins.set('ta.pivotlow', (args, _namedArgs, ctx) => {
-      const source = args[0] as number;
-      const leftBars = (args[1] ?? 5) as number;
-      const rightBars = (args[2] ?? 5) as number;
+    this.builtins.set('ta.pivotlow', (args, namedArgs, ctx) => {
+      const hasSource = namedArgs.has('source') || args.length >= 3 || (args.length === 1 && namedArgs.size === 0);
+      const sourceArg = hasSource ? this.getCallArg(args, namedArgs, 0, 'source') : ctx.low.get(0)!;
+      const leftIndex = hasSource ? 1 : 0;
+      const rightIndex = hasSource ? 2 : 1;
+      const source = this.toNumber(sourceArg);
+      const leftBars = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, leftIndex, 'leftbars', 5));
+      const rightBars = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, rightIndex, 'rightbars', 5));
 
       const series = this.getSeriesForSource(source, ctx);
 
@@ -8130,10 +8141,10 @@ export class TealscriptEngine {
       return pivotValue;
     });
 
-    this.builtins.set('ta.linreg', (args, _namedArgs, _ctx, scope, callId) => {
-      const source = args[0] as number;
-      const length = this.normalizeLookbackLength(args[1]);
-      const offset = this.toNumber(args[2] ?? 0);
+    this.builtins.set('ta.linreg', (args, namedArgs, _ctx, scope, callId) => {
+      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
+      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const offset = this.toNumber(this.getCallArg(args, namedArgs, 2, 'offset', 0));
       const values = this.getCompleteSourceWindow(scope, `_ta_linreg_source_${callId}`, source, length);
       if (!values || isNaN(offset)) return NaN;
 
