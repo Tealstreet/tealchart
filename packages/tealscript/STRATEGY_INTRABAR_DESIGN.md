@@ -183,6 +183,9 @@ must stay offline and deterministic.
    lower-timeframe paths can change which OCA/bracket leg fills first. Market
    order recalculation remains in the later `calc_on_order_fills` step.
 6. Implement bounded `calc_on_order_fills` recalculation.
+   Done for historical order-fill recalculation. The runtime reruns the current
+   bar after fills with a bounded loop and truncates current-bar outputs before
+   re-appending final values. Realtime `calc_on_every_tick` remains separate.
 7. Add reduced Pine checkpoint tests for Bar Magnifier and recalculation
    examples.
 

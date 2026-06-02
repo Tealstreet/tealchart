@@ -175,7 +175,7 @@ import {
   removeMapValue,
   type PineMap,
 } from './maps';
-import { Scope, createRootScope } from './scope';
+import { Scope, createRootScope, type ScopeSnapshot } from './scope';
 import {
   corporateActionRequestKey,
   currencyRateRequestKey,
@@ -346,6 +346,7 @@ export class TealscriptEngine {
   private static readonly MAX_LOOP_ITERATIONS = 10000;
   private static readonly MAX_BUILTIN_SOURCE_HISTORY = 10000;
   private static readonly MAX_UNIQUE_REQUEST_CONTEXTS = 40;
+  private static readonly MAX_STRATEGY_ORDER_FILL_RECALCULATIONS = 20;
 
   private ctx: ExecutionContext;
   private scope: Scope;
@@ -377,6 +378,10 @@ export class TealscriptEngine {
   private profileBuiltinCalls = 0;
   private runtimeOptions: TealscriptRuntimeOptions;
   private hasStrategyDeclaration = false;
+  private strategyOrderFillRecalculationRequested = false;
+  private currentStrategyIntrabarContext: StrategyIntrabarContext | null = null;
+  private historicalOrderFillScopeSnapshot: ScopeSnapshot | null = null;
+  private historicalOrderFillFunctionScopeSnapshots = new Map<string, ScopeSnapshot>();
 
   constructor(options: TealscriptEngineOptions = {}) {
     this.ctx = new ExecutionContext();
@@ -438,6 +443,10 @@ export class TealscriptEngine {
     this.importedLibraryCallStack = [];
     this.indicatorDynamicRequests = true;
     this.hasStrategyDeclaration = false;
+    this.strategyOrderFillRecalculationRequested = false;
+    this.currentStrategyIntrabarContext = null;
+    this.historicalOrderFillScopeSnapshot = null;
+    this.historicalOrderFillFunctionScopeSnapshots.clear();
     this.requestContextDepth = 0;
     this.requestLocalScopeDepth = 0;
     this.applyRuntimeOptions(this.runtimeOptions);
@@ -466,28 +475,22 @@ export class TealscriptEngine {
         functionScope.advanceBar();
       }
       this.resetPerBarBuiltinState();
+      this.currentStrategyIntrabarContext = null;
+      this.captureHistoricalOrderFillRecalculationState();
       const isLastBar = this.ctx.bar_index === this.ctx.last_bar_index;
       if (isLastBar) {
         this.ctx.captureRealtimeRollbackState();
       }
       this.fillPendingStrategyMarketOrdersForCurrentBar();
+      this.strategyOrderFillRecalculationRequested = false;
 
-      // Execute all statements
-      for (const stmt of ast.body) {
-        try {
-          this.executeStatement(stmt);
-        } catch (error) {
-          this.errors.push({
-            message: error instanceof Error ? error.message : String(error),
-            line: stmt.loc?.start.line,
-            column: stmt.loc?.start.column,
-          });
-          if (error instanceof RuntimeErrorException) {
-            return this.createExecutionResult();
-          }
-        }
+      if (this.executeHistoricalStatements(ast)) {
+        return this.createExecutionResult();
       }
       this.fillPendingStrategyOrdersForCurrentBar();
+      if (this.recalculateHistoricalStrategyOrderFills(ast)) {
+        return this.createExecutionResult();
+      }
 
       // Commit bar — only snapshot on the last bar (for realtime rollback)
       this.scope.commit(isLastBar);
@@ -498,6 +501,24 @@ export class TealscriptEngine {
     }
 
     return this.createExecutionResult();
+  }
+
+  private executeHistoricalStatements(ast: Program): boolean {
+    for (const stmt of ast.body) {
+      try {
+        this.executeStatement(stmt);
+      } catch (error) {
+        this.errors.push({
+          message: error instanceof Error ? error.message : String(error),
+          line: stmt.loc?.start.line,
+          column: stmt.loc?.start.column,
+        });
+        if (error instanceof RuntimeErrorException) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   private createExecutionResult(): ExecutionResult {
@@ -691,6 +712,56 @@ export class TealscriptEngine {
     this.fillPendingStrategyOrdersForCurrentBar();
   }
 
+  private recalculateHistoricalStrategyOrderFills(ast: Program): boolean {
+    if (!this.ctx.strategyLedger.settings.calcOnOrderFills) {
+      this.strategyOrderFillRecalculationRequested = false;
+      return false;
+    }
+
+    let recalculations = 0;
+    while (this.strategyOrderFillRecalculationRequested) {
+      recalculations += 1;
+      if (recalculations > TealscriptEngine.MAX_STRATEGY_ORDER_FILL_RECALCULATIONS) {
+        this.errors.push({
+          message: `strategy calc_on_order_fills exceeded ${TealscriptEngine.MAX_STRATEGY_ORDER_FILL_RECALCULATIONS} recalculations on bar ${this.ctx.bar_index}`,
+        });
+        this.strategyOrderFillRecalculationRequested = false;
+        return true;
+      }
+
+      this.strategyOrderFillRecalculationRequested = false;
+      this.prepareHistoricalOrderFillRecalculation();
+      if (this.executeHistoricalStatements(ast)) {
+        return true;
+      }
+      this.fillPendingStrategyOrdersForCurrentBar();
+    }
+
+    return false;
+  }
+
+  private captureHistoricalOrderFillRecalculationState(): void {
+    this.historicalOrderFillScopeSnapshot = this.scope.snapshot();
+    this.historicalOrderFillFunctionScopeSnapshots = new Map();
+    for (const [key, functionScope] of this.functionScopes) {
+      this.historicalOrderFillFunctionScopeSnapshots.set(key, functionScope.snapshot());
+    }
+  }
+
+  private prepareHistoricalOrderFillRecalculation(): void {
+    if (this.historicalOrderFillScopeSnapshot) {
+      this.scope.restore(this.historicalOrderFillScopeSnapshot);
+    }
+    for (const [key, snapshot] of this.historicalOrderFillFunctionScopeSnapshots) {
+      this.functionScopes.get(key)?.restore(snapshot);
+    }
+    this.requestEvaluationCache.clear();
+    this.resetPerBarBuiltinState();
+    this.ctx.truncatePlots(this.ctx.bar_index);
+    this.ctx.truncateDrawings(this.ctx.bar_index);
+    this.ctx.truncateLogs(this.ctx.bar_index);
+  }
+
   /**
    * Get current alert outputs.
    */
@@ -821,6 +892,10 @@ export class TealscriptEngine {
   }
 
   private selectStrategyIntrabarContextForCurrentBar(): StrategyIntrabarContext | null {
+    if (this.currentStrategyIntrabarContext) {
+      return this.currentStrategyIntrabarContext;
+    }
+
     if (!this.hasStrategyDeclaration) {
       return null;
     }
@@ -842,6 +917,7 @@ export class TealscriptEngine {
       },
     });
     this.ctx.recordStrategyIntrabarContext(context);
+    this.currentStrategyIntrabarContext = context;
     return context;
   }
 
@@ -4284,6 +4360,10 @@ export class TealscriptEngine {
   }
 
   private emitStrategyFillAlerts(fills: StrategyFill[]): void {
+    if (fills.length > 0 && this.ctx.strategyLedger.settings.calcOnOrderFills) {
+      this.strategyOrderFillRecalculationRequested = true;
+    }
+
     for (const fill of fills) {
       if (fill.alertMessage === undefined || fill.alertMessage === '') {
         continue;
