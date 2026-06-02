@@ -467,8 +467,8 @@ AssignmentStatement
 // Valid assignment targets
 AssignmentTarget
   = head:Identifier tail:(
-      _ "." _ prop:IdentifierName { return { type: 'member', prop }; }
-    / _ "[" _ index:Expression _ "]" { return { type: 'index', index }; }
+      PostfixContinuationSpace "." _ prop:IdentifierName { return { type: 'member', prop }; }
+    / PostfixContinuationSpace "[" _ index:Expression _ "]" { return { type: 'index', index }; }
   )* {
       return tail.reduce((obj, op) => {
         if (op.type === 'member') {
