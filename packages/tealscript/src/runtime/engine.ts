@@ -381,8 +381,8 @@ export class TealscriptEngine {
   private hasStrategyDeclaration = false;
   private strategyOrderFillRecalculationRequested = false;
   private currentStrategyIntrabarContext: StrategyIntrabarContext | null = null;
-  private historicalOrderFillScopeSnapshot: ScopeSnapshot | null = null;
-  private historicalOrderFillFunctionScopeSnapshots = new Map<string, ScopeSnapshot>();
+  private orderFillScopeSnapshot: ScopeSnapshot | null = null;
+  private orderFillFunctionScopeSnapshots = new Map<string, ScopeSnapshot>();
 
   constructor(options: TealscriptEngineOptions = {}) {
     this.ctx = new ExecutionContext();
@@ -446,8 +446,8 @@ export class TealscriptEngine {
     this.hasStrategyDeclaration = false;
     this.strategyOrderFillRecalculationRequested = false;
     this.currentStrategyIntrabarContext = null;
-    this.historicalOrderFillScopeSnapshot = null;
-    this.historicalOrderFillFunctionScopeSnapshots.clear();
+    this.orderFillScopeSnapshot = null;
+    this.orderFillFunctionScopeSnapshots.clear();
     this.requestContextDepth = 0;
     this.requestLocalScopeDepth = 0;
     this.applyRuntimeOptions(this.runtimeOptions);
@@ -477,7 +477,7 @@ export class TealscriptEngine {
       }
       this.resetPerBarBuiltinState();
       this.currentStrategyIntrabarContext = null;
-      this.captureHistoricalOrderFillRecalculationState();
+      this.captureOrderFillRecalculationState();
       const isLastBar = this.ctx.bar_index === this.ctx.last_bar_index;
       if (isLastBar) {
         this.ctx.captureRealtimeRollbackState();
@@ -625,6 +625,8 @@ export class TealscriptEngine {
       }
       this.ctx.setNow(this.getRuntimeNow());
       this.ctx.startRealtimeBar(bar);
+      this.captureOrderFillRecalculationState();
+      this.strategyOrderFillRecalculationRequested = false;
       this.fillPendingStrategyMarketOrdersForCurrentBar();
       this.scope.commit(true);
       for (const functionScope of this.functionScopes.values()) {
@@ -637,6 +639,7 @@ export class TealscriptEngine {
       } else {
         this.fillPendingStrategyOrdersForCurrentBar();
       }
+      this.recalculateRealtimeStrategyOrderFills(ast);
 
       return this.ctx.getPlots();
     }
@@ -665,6 +668,8 @@ export class TealscriptEngine {
     // Update current bar data
     this.ctx.updateCurrentBar(bar);
     this.prepareRealtimeExecution(ast);
+    this.captureOrderFillRecalculationState();
+    this.strategyOrderFillRecalculationRequested = false;
 
     // Re-execute statements for current bar when Pine strategy settings allow it.
     if (this.shouldExecuteRealtimeStatements()) {
@@ -672,6 +677,7 @@ export class TealscriptEngine {
     } else {
       this.fillPendingStrategyOrdersForCurrentBar();
     }
+    this.recalculateRealtimeStrategyOrderFills(ast);
 
     return this.ctx.getPlots();
   }
@@ -691,7 +697,10 @@ export class TealscriptEngine {
     this.ctx.updateCurrentBar(bar);
     this.ctx.confirmCurrentRealtimeBar();
     this.prepareRealtimeExecution(ast);
+    this.captureOrderFillRecalculationState();
+    this.strategyOrderFillRecalculationRequested = false;
     this.executeRealtimeStatements(ast);
+    this.recalculateRealtimeStrategyOrderFills(ast);
   }
 
   private prepareRealtimeExecution(ast: Program): void {
@@ -761,19 +770,44 @@ export class TealscriptEngine {
     return false;
   }
 
-  private captureHistoricalOrderFillRecalculationState(): void {
-    this.historicalOrderFillScopeSnapshot = this.scope.snapshot();
-    this.historicalOrderFillFunctionScopeSnapshots = new Map();
+  private recalculateRealtimeStrategyOrderFills(ast: Program): boolean {
+    if (!this.ctx.strategyLedger.settings.calcOnOrderFills) {
+      this.strategyOrderFillRecalculationRequested = false;
+      return false;
+    }
+
+    let recalculations = 0;
+    while (this.strategyOrderFillRecalculationRequested) {
+      recalculations += 1;
+      if (recalculations > TealscriptEngine.MAX_STRATEGY_ORDER_FILL_RECALCULATIONS) {
+        this.errors.push({
+          message: `strategy calc_on_order_fills exceeded ${TealscriptEngine.MAX_STRATEGY_ORDER_FILL_RECALCULATIONS} recalculations on bar ${this.ctx.bar_index}`,
+        });
+        this.strategyOrderFillRecalculationRequested = false;
+        return true;
+      }
+
+      this.strategyOrderFillRecalculationRequested = false;
+      this.prepareRealtimeOrderFillRecalculation(ast);
+      this.executeRealtimeStatements(ast);
+    }
+
+    return false;
+  }
+
+  private captureOrderFillRecalculationState(): void {
+    this.orderFillScopeSnapshot = this.scope.snapshot();
+    this.orderFillFunctionScopeSnapshots = new Map();
     for (const [key, functionScope] of this.functionScopes) {
-      this.historicalOrderFillFunctionScopeSnapshots.set(key, functionScope.snapshot());
+      this.orderFillFunctionScopeSnapshots.set(key, functionScope.snapshot());
     }
   }
 
   private prepareHistoricalOrderFillRecalculation(): void {
-    if (this.historicalOrderFillScopeSnapshot) {
-      this.scope.restore(this.historicalOrderFillScopeSnapshot);
+    if (this.orderFillScopeSnapshot) {
+      this.scope.restore(this.orderFillScopeSnapshot);
     }
-    for (const [key, snapshot] of this.historicalOrderFillFunctionScopeSnapshots) {
+    for (const [key, snapshot] of this.orderFillFunctionScopeSnapshots) {
       this.functionScopes.get(key)?.restore(snapshot);
     }
     this.requestEvaluationCache.clear();
@@ -781,6 +815,19 @@ export class TealscriptEngine {
     this.ctx.truncatePlots(this.ctx.bar_index);
     this.ctx.truncateDrawings(this.ctx.bar_index);
     this.ctx.truncateLogs(this.ctx.bar_index);
+  }
+
+  private prepareRealtimeOrderFillRecalculation(ast: Program): void {
+    if (this.orderFillScopeSnapshot) {
+      this.scope.restore(this.orderFillScopeSnapshot);
+    }
+    for (const [key, snapshot] of this.orderFillFunctionScopeSnapshots) {
+      this.functionScopes.get(key)?.restore(snapshot);
+    }
+    this.ctx.truncatePlots(this.ctx.bar_index);
+    this.ctx.truncateDrawings(this.ctx.bar_index);
+    this.ctx.truncateLogs(this.ctx.bar_index);
+    this.prepareRealtimeExecution(ast);
   }
 
   /**

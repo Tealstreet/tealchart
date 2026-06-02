@@ -194,5 +194,10 @@ must stay offline and deterministic.
    Done. Default strategies keep broker fills active on realtime updates but
    defer script recalculation until the realtime bar is confirmed; strategies
    with `calc_on_every_tick=true` recalculate on unconfirmed realtime ticks.
+9. Implement realtime `calc_on_order_fills` strategy behavior.
+   Done. Realtime order fills use the same bounded recalculation guard as
+   historical fills. The runtime restores pre-update scope snapshots before
+   each recalculation, preserves emitted order-fill alerts, and truncates
+   current-bar outputs before appending the final recalculated values.
 
 Each step should be a separate PR unless the diff is very small.
