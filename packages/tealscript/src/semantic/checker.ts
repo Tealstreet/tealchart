@@ -1229,6 +1229,8 @@ class SemanticChecker {
     this.checkAssignmentTarget(statement, scope);
     if (statement.left.type === 'MemberExpression') {
       this.checkUdtFieldAssignmentType(statement.left, statement.right, scope);
+    } else if (statement.left.type === 'IndexExpression') {
+      this.checkIndexAssignmentType(statement.left, statement.right, scope);
     }
   }
 
@@ -1468,6 +1470,38 @@ class SemanticChecker {
   private checkIndexExpression(expression: IndexExpression, scope: SemanticScope): void {
     this.checkExpression(expression.object, scope);
     this.checkExpression(expression.index, scope);
+  }
+
+  private checkIndexAssignmentType(target: IndexExpression, value: Expression, scope: SemanticScope): void {
+    const objectType = this.inferExpressionType(target.object, scope);
+    if (objectType.kind !== 'unknown' && objectType.kind !== 'array') {
+      this.addDiagnostic(
+        'type-mismatch',
+        `Index assignment target must be an array, got ${this.formatSemanticType(objectType)}`,
+        target.object.loc,
+      );
+      return;
+    }
+
+    const indexType = this.inferExpressionType(target.index, scope);
+    if (indexType.kind !== 'unknown' && !this.isNumericType(indexType)) {
+      this.addDiagnostic(
+        'type-mismatch',
+        `Array assignment index must be numeric, got ${this.formatSemanticType(indexType)}`,
+        target.index.loc,
+      );
+    }
+
+    if (objectType.kind !== 'array' || !objectType.elementType) return;
+
+    const valueType = this.inferExpressionType(value, scope);
+    if (this.isAssignableType(objectType.elementType, valueType)) return;
+
+    this.addDiagnostic(
+      'type-mismatch',
+      `Cannot assign ${this.formatSemanticType(valueType)} value to ${this.formatSemanticType(objectType.elementType)} array element`,
+      value.loc,
+    );
   }
 
   private checkBuiltinSignature(expression: CallExpression): void {
