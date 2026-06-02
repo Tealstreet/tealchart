@@ -55,6 +55,7 @@ export const CALENDAR_FUNCTION_NAMES = new Set([
 
 export const BUILTIN_NAMESPACES = new Set([
   'adjustment',
+  'alert',
   'array',
   'barmerge',
   'barstate',
@@ -62,7 +63,9 @@ export const BUILTIN_NAMESPACES = new Set([
   'chart',
   'color',
   'currency',
+  'dividends',
   'display',
+  'earnings',
   'extend',
   'format',
   'hline',
@@ -84,6 +87,7 @@ export const BUILTIN_NAMESPACES = new Set([
   'session',
   'shape',
   'size',
+  'splits',
   'str',
   'strategy',
   'syminfo',
