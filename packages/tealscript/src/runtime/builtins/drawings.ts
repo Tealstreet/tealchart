@@ -477,13 +477,13 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
     return id;
   });
 
-  builtins.set('box.delete', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => ctx.deleteDrawing(box.id));
+  builtins.set('box.delete', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => ctx.deleteDrawing(box.id));
     return undefined;
   });
 
-  builtins.set('box.copy', (args, _namedArgs, ctx, _scope, callId) => {
-    const boxId = runtime.toDrawingId(args[0]);
+  builtins.set('box.copy', (args, namedArgs, ctx, _scope, callId) => {
+    const boxId = runtime.toDrawingId(callArg(args, namedArgs, 0, 'id'));
     if (!boxId) return Number.NaN;
 
     const newId = `box_${callId}_${ctx.bar_index}`;
@@ -491,132 +491,132 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
     return copy ? newId : Number.NaN;
   });
 
-  builtins.set('box.set_left', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
-      box.left = runtime.toNullableNumber(args[1]);
+  builtins.set('box.set_left', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.left = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'left'));
       box.barIndex = ctx.bar_index;
     });
     return undefined;
   });
-  builtins.set('box.set_right', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
-      box.right = runtime.toNullableNumber(args[1]);
+  builtins.set('box.set_right', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.right = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'right'));
       box.barIndex = ctx.bar_index;
     });
     return undefined;
   });
-  builtins.set('box.set_top', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
-      box.top = runtime.toNullableNumber(args[1]);
+  builtins.set('box.set_top', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.top = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'top'));
       box.barIndex = ctx.bar_index;
     });
     return undefined;
   });
-  builtins.set('box.set_bottom', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
-      box.bottom = runtime.toNullableNumber(args[1]);
+  builtins.set('box.set_bottom', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.bottom = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'bottom'));
       box.barIndex = ctx.bar_index;
     });
     return undefined;
   });
-  builtins.set('box.set_lefttop', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
-      box.left = runtime.toNullableNumber(args[1]);
-      box.top = runtime.toNullableNumber(args[2]);
+  builtins.set('box.set_lefttop', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.left = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'left'));
+      box.top = runtime.toNullableNumber(callArg(args, namedArgs, 2, 'top'));
       box.barIndex = ctx.bar_index;
     });
     return undefined;
   });
-  builtins.set('box.set_rightbottom', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
-      box.right = runtime.toNullableNumber(args[1]);
-      box.bottom = runtime.toNullableNumber(args[2]);
+  builtins.set('box.set_rightbottom', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.right = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'right'));
+      box.bottom = runtime.toNullableNumber(callArg(args, namedArgs, 2, 'bottom'));
       box.barIndex = ctx.bar_index;
     });
     return undefined;
   });
-  builtins.set('box.set_bgcolor', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
-      box.bgcolor = runtime.toNullableColor(args[1]);
+  builtins.set('box.set_bgcolor', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.bgcolor = runtime.toNullableColor(callArg(args, namedArgs, 1, 'color'));
     });
     return undefined;
   });
-  builtins.set('box.set_border_color', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
-      box.borderColor = runtime.toNullableColor(args[1]);
+  builtins.set('box.set_border_color', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.borderColor = runtime.toNullableColor(callArg(args, namedArgs, 1, 'color'));
     });
     return undefined;
   });
-  builtins.set('box.set_border_width', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
-      box.borderWidth = runtime.toLineWidth(args[1]);
+  builtins.set('box.set_border_width', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.borderWidth = runtime.toLineWidth(callArg(args, namedArgs, 1, 'width'));
     });
     return undefined;
   });
-  builtins.set('box.set_border_style', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
-      box.borderStyle = runtime.toStringValue(args[1]);
+  builtins.set('box.set_border_style', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.borderStyle = runtime.toStringValue(callArg(args, namedArgs, 1, 'style'));
     });
     return undefined;
   });
-  builtins.set('box.set_extend', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
-      box.extend = runtime.toStringValue(args[1]);
+  builtins.set('box.set_extend', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.extend = runtime.toStringValue(callArg(args, namedArgs, 1, 'extend'));
     });
     return undefined;
   });
-  builtins.set('box.set_text', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
-      box.text = runtime.toStringValue(args[1] ?? '');
+  builtins.set('box.set_text', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.text = runtime.toStringValue(callArg(args, namedArgs, 1, 'text', ''));
     });
     return undefined;
   });
-  builtins.set('box.set_text_color', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
-      box.textColor = runtime.toNullableColor(args[1]);
+  builtins.set('box.set_text_color', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.textColor = runtime.toNullableColor(callArg(args, namedArgs, 1, 'text_color'));
     });
     return undefined;
   });
-  builtins.set('box.set_text_size', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
-      box.textSize = runtime.toStringValue(args[1]);
+  builtins.set('box.set_text_size', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.textSize = runtime.toStringValue(callArg(args, namedArgs, 1, 'size'));
     });
     return undefined;
   });
-  builtins.set('box.set_text_halign', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
-      box.textHalign = runtime.toStringValue(args[1]);
+  builtins.set('box.set_text_halign', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.textHalign = runtime.toStringValue(callArg(args, namedArgs, 1, 'text_halign'));
     });
     return undefined;
   });
-  builtins.set('box.set_text_valign', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
-      box.textValign = runtime.toStringValue(args[1]);
+  builtins.set('box.set_text_valign', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.textValign = runtime.toStringValue(callArg(args, namedArgs, 1, 'text_valign'));
     });
     return undefined;
   });
-  builtins.set('box.set_text_wrap', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
-      box.textWrap = runtime.toStringValue(args[1]);
+  builtins.set('box.set_text_wrap', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.textWrap = runtime.toStringValue(callArg(args, namedArgs, 1, 'text_wrap'));
     });
     return undefined;
   });
-  builtins.set('box.set_text_font_family', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'box', runtime.isNa, (box) => {
-      box.textFontFamily = runtime.toStringValue(args[1]);
+  builtins.set('box.set_text_font_family', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.textFontFamily = runtime.toStringValue(callArg(args, namedArgs, 1, 'text_font_family'));
     });
     return undefined;
   });
 
-  builtins.set('box.get_left', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.left ?? Number.NaN));
-  builtins.set('box.get_right', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.right ?? Number.NaN));
-  builtins.set('box.get_top', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.top ?? Number.NaN));
-  builtins.set('box.get_bottom', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.bottom ?? Number.NaN));
-  builtins.set('box.get_bgcolor', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.bgcolor ?? Number.NaN));
-  builtins.set('box.get_border_color', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.borderColor ?? Number.NaN));
-  builtins.set('box.get_text', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.text));
-  builtins.set('box.get_text_halign', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.textHalign ?? 'left'));
-  builtins.set('box.get_text_valign', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'box', runtime.isNa, (box) => box.textValign ?? 'top'));
+  builtins.set('box.get_left', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.left ?? Number.NaN));
+  builtins.set('box.get_right', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.right ?? Number.NaN));
+  builtins.set('box.get_top', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.top ?? Number.NaN));
+  builtins.set('box.get_bottom', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.bottom ?? Number.NaN));
+  builtins.set('box.get_bgcolor', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.bgcolor ?? Number.NaN));
+  builtins.set('box.get_border_color', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.borderColor ?? Number.NaN));
+  builtins.set('box.get_text', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.text));
+  builtins.set('box.get_text_halign', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.textHalign ?? 'left'));
+  builtins.set('box.get_text_valign', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.textValign ?? 'top'));
   builtins.set('box.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('box'));
 }
 
