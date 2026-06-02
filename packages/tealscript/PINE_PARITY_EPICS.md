@@ -306,7 +306,9 @@ Phases:
    `earnings`, `financial`, `economic`, `seed`, and `footprint`, gated by
    available data. Deterministic datafeed-backed support now covers all listed
    families except `request.footprint()`, which remains planned until an
-   explicit footprint/intrabar-volume model exists.
+   explicit footprint/intrabar-volume model exists. The footprint deferral
+   boundary and implementation phases are tracked in
+   [`FOOTPRINT_REQUEST_DESIGN.md`](./FOOTPRINT_REQUEST_DESIGN.md).
 7. Add repaint-safe HTF fixtures based on official patterns.
    Repaint-safe higher-timeframe fixtures now cover the official offset plus
    `barmerge.lookahead_on` idiom.
@@ -657,9 +659,9 @@ this list focused on gaps that are not already covered by the epic notes above.
    now execute, and obvious invalid index assignment targets emit semantic
    diagnostics. Continue expanding collection-specific assignment checks as new
    syntax lands.
-4. Request data follow-up: either define the remaining `request.footprint()`
-   model or defer it explicitly until footprint/intrabar-volume data is
-   available from the host.
+4. Request data follow-up: `request.footprint()` has an explicit host-data
+   model and deferral plan; implement it only after footprint/intrabar-volume
+   data is available from the host.
 5. Label object output and renderer MVP.
 6. Table object MVP.
 7. Named timezone/session completion.

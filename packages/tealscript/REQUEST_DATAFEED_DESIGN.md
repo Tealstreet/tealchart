@@ -3,6 +3,9 @@
 This contract is the deterministic bridge for Pine `request.*` parity work. It
 lets runtime tests provide alternate symbol/timeframe contexts without depending
 on TradingView, a live exchange, or Tealchart networking during CI.
+`request.footprint()` is tracked separately in
+[`FOOTPRINT_REQUEST_DESIGN.md`](./FOOTPRINT_REQUEST_DESIGN.md) because it
+requires intrabar volume-row data rather than OHLC/request-series fixtures.
 
 ## Current Scope
 
@@ -162,7 +165,7 @@ without changing the fixture-level contract.
 This contract does not yet cover full simple/series qualifier diagnostics,
 provider-side fetching for host data, `request.footprint()` data, or
 strategy/backtest execution over synthetic ticker data. Those belong to the
-qualified type-system epic, the remaining request-footprint work, and Epic 14.
+qualified type-system epic, the footprint design, and Epic 14.
 
 ## Test Strategy
 
