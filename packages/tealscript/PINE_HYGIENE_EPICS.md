@@ -8,38 +8,39 @@ Use [`PINE_PARITY_EXECUTION_PROTOCOL.md`](./PINE_PARITY_EXECUTION_PROTOCOL.md)
 as the canonical branch, phase, review, and merge process for every hygiene and
 parity epic.
 
-Each item below is treated as an epic-sized PR. Every epic is implemented with
-the phased plan-execute cadence:
+Each item below is treated as an outcome-sized epic. Large epics may require
+multiple PRs. Each PR should be phase-sized, coherent, reviewable, and
+independently verified with the phased plan-execute cadence:
 
 1. Plan the phase.
 2. Audit the plan before editing.
 3. Implement and verify the phase.
 4. Audit the implementation, fix findings, and commit the coherent phase.
 
-After an epic PR is ready, run CodeRabbit review, fix or reply to every review
+After a phase PR is ready, run CodeRabbit review, fix or reply to every review
 thread, wait for CI and CodeRabbit to be green, merge, and cut the next branch
 from latest `master`.
 
 ## Execution Protocol
 
-Use this protocol for every hygiene epic until the roadmap is complete or the
-work is blocked:
+Use this protocol for every hygiene PR-sized phase until the roadmap is
+complete or the work is blocked:
 
-1. Cut one branch from latest `master` for the current epic.
-2. Treat every phase inside the epic as a coherent, committable unit.
+1. Cut one branch from latest `master` for the current phase.
+2. Treat every phase as a coherent, committable unit.
 3. For every phase, run all four required gates without skipping:
    - write the implementation plan
    - audit the plan before editing
    - implement and verify the phase
    - audit the implementation, fix findings, and commit
-4. Open one PR for the completed epic.
+4. Open one PR for the completed phase.
 5. Run CodeRabbit review, resolve or reply to every review thread, and wait for
    CI and CodeRabbit to be green.
 6. Merge the PR with maintainer/admin privileges when review gates are green.
-7. Cut the next branch from updated `master` and continue with the next epic.
+7. Cut the next branch from updated `master` and continue with the next phase.
 
-Do not batch unrelated epics into one PR. Do not start a dependent epic from a
-stale branch when the previous epic must land first.
+Do not batch unrelated epic phases into one PR. Do not start a dependent phase
+from a stale branch when the previous phase must land first.
 
 ## Why This Exists
 
