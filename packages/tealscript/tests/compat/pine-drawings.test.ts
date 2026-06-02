@@ -233,6 +233,65 @@ plot(line.get_price(id=trend, x=bar_index - 1), title="Named Line Price")
     expect(getPlot(result, 'Named Line Price').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 110]);
   });
 
+  it('updates and reads a persistent box with Pine named setter idioms', () => {
+    const result = runCompatScript(`
+indicator("Named Persistent Box", overlay=true)
+var zone = box.new(left=na, top=na, right=na, bottom=na, text="")
+if barstate.islast
+    box.set_lefttop(id=zone, left=bar_index - 3, top=high)
+    box.set_rightbottom(id=zone, right=bar_index, bottom=low)
+    box.set_bgcolor(id=zone, color=color.new(color.aqua, 75))
+    box.set_border_color(id=zone, color=color.purple)
+    box.set_border_width(id=zone, width=2)
+    box.set_border_style(id=zone, style=line.style_dotted)
+    box.set_extend(id=zone, extend=extend.both)
+    box.set_text(id=zone, text="Named zone")
+    box.set_text_color(id=zone, text_color=color.black)
+    box.set_text_size(id=zone, size=size.small)
+    box.set_text_halign(id=zone, text_halign=text.align_center)
+    box.set_text_valign(id=zone, text_valign=text.align_bottom)
+    box.set_text_wrap(id=zone, text_wrap=text.wrap_auto)
+    box.set_text_font_family(id=zone, text_font_family=font.family_monospace)
+plot(box.get_left(id=zone), title="Named Box Left")
+plot(box.get_bottom(id=zone), title="Named Box Bottom")
+plot(box.get_text(id=zone) == "Named zone", title="Named Box Text")
+plot(box.get_text_halign(id=zone) == "center", title="Named Box HAlign")
+plot(box.get_text_valign(id=zone) == "bottom", title="Named Box VAlign")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'box_box.new_0_0',
+        type: 'box',
+        persistent: true,
+        barIndex: 11,
+        left: 8,
+        top: 113,
+        right: 11,
+        bottom: 108,
+        xloc: 'bar_index',
+        extend: 'both',
+        borderColor: '#9C27B0',
+        borderWidth: 2,
+        borderStyle: 'dotted',
+        bgcolor: '#00BCD440',
+        text: 'Named zone',
+        textColor: '#000000',
+        textSize: 'small',
+        textHalign: 'center',
+        textValign: 'bottom',
+        textWrap: 'auto',
+        textFontFamily: 'monospace',
+      },
+    ]);
+    expect(getPlot(result, 'Named Box Left').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 8]);
+    expect(getPlot(result, 'Named Box Bottom').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 108]);
+    expect(getPlot(result, 'Named Box Text').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, true]);
+    expect(getPlot(result, 'Named Box HAlign').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, true]);
+    expect(getPlot(result, 'Named Box VAlign').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, true]);
+  });
+
   it('emits polylines from chart.point arrays', () => {
     const result = runCompatScript(`
 indicator("Polyline docs smoke", overlay=true, max_polylines_count=1)
