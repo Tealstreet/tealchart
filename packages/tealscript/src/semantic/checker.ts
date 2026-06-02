@@ -622,6 +622,21 @@ for (const name of ['array.insert', 'array.set']) {
   BUILTIN_SIGNATURES.set(name, { params: ['id', 'index', 'value'], minArgs: 3, maxArgs: 3 });
 }
 
+for (const name of ['array.every', 'array.some']) {
+  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1 });
+}
+
+for (const name of [
+  'array.binary_search',
+  'array.binary_search_leftmost',
+  'array.binary_search_rightmost',
+  'array.includes',
+  'array.indexof',
+  'array.lastindexof',
+]) {
+  BUILTIN_SIGNATURES.set(name, { params: ['id', 'value'], minArgs: 2, maxArgs: 2 });
+}
+
 BUILTIN_SIGNATURES.set('array.concat', { params: ['id', 'id2'], minArgs: 2, maxArgs: 2 });
 BUILTIN_SIGNATURES.set('array.fill', { params: ['id', 'value', 'index_from', 'index_to'], minArgs: 2, maxArgs: 4 });
 BUILTIN_SIGNATURES.set('array.join', { params: ['id', 'separator'], minArgs: 1, maxArgs: 2 });
