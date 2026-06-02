@@ -796,6 +796,54 @@ tooManySortIndices = array.sort_indices(values, order.ascending, 1)
     ]);
   });
 
+  it('resolves array search helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Array Search Signatures")
+values = array.from(1, 2, 3)
+flags = array.from(true, true)
+hasValue = array.includes(id=values, value=2)
+index = array.indexof(id=values, value=2)
+lastIndex = array.lastindexof(id=values, value=2)
+binary = array.binary_search(id=values, value=2)
+left = array.binary_search_leftmost(id=values, value=2)
+right = array.binary_search_rightmost(id=values, value=2)
+allFlags = array.every(id=flags)
+someFlags = array.some(id=flags)
+plot(index + lastIndex + binary + left + right + (hasValue ? 1 : 0) + (allFlags ? 1 : 0) + (someFlags ? 1 : 0))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid array search helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Array Search Signatures")
+values = array.from(1, 2, 3)
+duplicateIndex = array.indexof(values, id=values)
+unknownIncludes = array.includes(id=values, item=2)
+missingBinary = array.binary_search(id=values)
+tooManyEvery = array.every(values, values)
+unknownSome = array.some(items=values)
+tooManyRight = array.binary_search_rightmost(values, 2, 3)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'array.indexof() expects at least 2 arguments',
+      "array.indexof() missing required argument 'value'",
+      "Argument 'id' for array.indexof() was supplied multiple times",
+      "Unknown argument 'item' for array.includes()",
+      'array.includes() expects at least 2 arguments',
+      "array.includes() missing required argument 'value'",
+      'array.binary_search() expects at least 2 arguments',
+      "array.binary_search() missing required argument 'value'",
+      'array.every() expects at most 1 argument',
+      "Unknown argument 'items' for array.some()",
+      'array.some() expects at least 1 argument',
+      "array.some() missing required argument 'id'",
+      'array.binary_search_rightmost() expects at most 2 arguments',
+    ]);
+  });
+
   it('reports array element template mismatches for known mutable arrays', () => {
     const result = checkProgram(parse(`
 indicator("Bad Array Types")
