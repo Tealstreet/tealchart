@@ -90,6 +90,10 @@ function normalizeTableRow(runtime: DrawingBuiltinRuntime, value: unknown): numb
   return Math.max(0, Math.trunc(runtime.toNumber(value)));
 }
 
+function callArg(args: unknown[], namedArgs: Map<string, unknown>, index: number, name: string, fallback?: unknown): unknown {
+  return namedArgs.has(name) ? namedArgs.get(name) : args[index] !== undefined ? args[index] : fallback;
+}
+
 export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
   builtins.set('label.new', (args, namedArgs, ctx, _scope, callId) => {
     const x = runtime.toNullableNumber(namedArgs.get('x') ?? args[0]);
@@ -120,13 +124,13 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     return id;
   });
 
-  builtins.set('label.delete', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'label', runtime.isNa, (label) => ctx.deleteDrawing(label.id));
+  builtins.set('label.delete', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => ctx.deleteDrawing(label.id));
     return undefined;
   });
 
-  builtins.set('label.copy', (args, _namedArgs, ctx, _scope, callId) => {
-    const labelId = toDrawingId(args[0], runtime.isNa);
+  builtins.set('label.copy', (args, namedArgs, ctx, _scope, callId) => {
+    const labelId = toDrawingId(callArg(args, namedArgs, 0, 'id'), runtime.isNa);
     if (!labelId) return Number.NaN;
 
     const newId = `label_${callId}_${ctx.bar_index}`;
@@ -134,99 +138,99 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     return copy ? newId : Number.NaN;
   });
 
-  builtins.set('label.set_x', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'label', runtime.isNa, (label) => {
-      label.x = runtime.toNullableNumber(args[1]);
+  builtins.set('label.set_x', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
+      label.x = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x'));
       label.barIndex = ctx.bar_index;
     });
     return undefined;
   });
 
-  builtins.set('label.set_y', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'label', runtime.isNa, (label) => {
-      label.y = runtime.toNullableNumber(args[1]);
+  builtins.set('label.set_y', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
+      label.y = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'y'));
       label.barIndex = ctx.bar_index;
     });
     return undefined;
   });
 
-  builtins.set('label.set_xy', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'label', runtime.isNa, (label) => {
-      label.x = runtime.toNullableNumber(args[1]);
-      label.y = runtime.toNullableNumber(args[2]);
+  builtins.set('label.set_xy', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
+      label.x = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x'));
+      label.y = runtime.toNullableNumber(callArg(args, namedArgs, 2, 'y'));
       label.barIndex = ctx.bar_index;
     });
     return undefined;
   });
 
-  builtins.set('label.set_text', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'label', runtime.isNa, (label) => {
-      label.text = runtime.toStringValue(args[1] ?? '');
+  builtins.set('label.set_text', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
+      label.text = runtime.toStringValue(callArg(args, namedArgs, 1, 'text', ''));
     });
     return undefined;
   });
 
-  builtins.set('label.set_xloc', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'label', runtime.isNa, (label) => {
-      label.x = runtime.toNullableNumber(args[1]);
-      label.xloc = runtime.toStringValue(args[2]);
+  builtins.set('label.set_xloc', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
+      label.x = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x'));
+      label.xloc = runtime.toStringValue(callArg(args, namedArgs, 2, 'xloc'));
       label.barIndex = ctx.bar_index;
     });
     return undefined;
   });
 
-  builtins.set('label.set_yloc', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'label', runtime.isNa, (label) => {
-      label.yloc = runtime.toStringValue(args[1]);
+  builtins.set('label.set_yloc', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
+      label.yloc = runtime.toStringValue(callArg(args, namedArgs, 1, 'yloc'));
     });
     return undefined;
   });
 
-  builtins.set('label.set_style', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'label', runtime.isNa, (label) => {
-      label.style = runtime.toStringValue(args[1]);
+  builtins.set('label.set_style', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
+      label.style = runtime.toStringValue(callArg(args, namedArgs, 1, 'style'));
     });
     return undefined;
   });
 
-  builtins.set('label.set_color', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'label', runtime.isNa, (label) => {
-      label.color = runtime.toNullableColor(args[1]);
+  builtins.set('label.set_color', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
+      label.color = runtime.toNullableColor(callArg(args, namedArgs, 1, 'color'));
     });
     return undefined;
   });
 
-  builtins.set('label.set_textcolor', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'label', runtime.isNa, (label) => {
-      label.textColor = runtime.toNullableColor(args[1]);
+  builtins.set('label.set_textcolor', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
+      label.textColor = runtime.toNullableColor(callArg(args, namedArgs, 1, 'textcolor'));
     });
     return undefined;
   });
 
-  builtins.set('label.set_size', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'label', runtime.isNa, (label) => {
-      label.size = runtime.toStringValue(args[1]);
+  builtins.set('label.set_size', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
+      label.size = runtime.toStringValue(callArg(args, namedArgs, 1, 'size'));
     });
     return undefined;
   });
 
-  builtins.set('label.set_tooltip', (args, _namedArgs, ctx) => {
-    withDrawing(args[0], ctx, 'label', runtime.isNa, (label) => {
-      label.tooltip = runtime.toOptionalString(args[1]);
+  builtins.set('label.set_tooltip', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
+      label.tooltip = runtime.toOptionalString(callArg(args, namedArgs, 1, 'tooltip'));
     });
     return undefined;
   });
 
-  builtins.set('label.get_x', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.x ?? Number.NaN));
-  builtins.set('label.get_y', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.y ?? Number.NaN));
-  builtins.set('label.get_text', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.text));
-  builtins.set('label.get_xloc', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.xloc));
-  builtins.set('label.get_yloc', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.yloc));
-  builtins.set('label.get_style', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.style));
-  builtins.set('label.get_color', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.color ?? Number.NaN));
-  builtins.set('label.get_textcolor', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.textColor ?? Number.NaN));
-  builtins.set('label.get_size', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.size));
-  builtins.set('label.get_tooltip', (args, _namedArgs, ctx) => getDrawingValue(args[0], ctx, 'label', runtime.isNa, (label) => label.tooltip ?? ''));
+  builtins.set('label.get_x', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.x ?? Number.NaN));
+  builtins.set('label.get_y', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.y ?? Number.NaN));
+  builtins.set('label.get_text', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.text));
+  builtins.set('label.get_xloc', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.xloc));
+  builtins.set('label.get_yloc', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.yloc));
+  builtins.set('label.get_style', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.style));
+  builtins.set('label.get_color', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.color ?? Number.NaN));
+  builtins.set('label.get_textcolor', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.textColor ?? Number.NaN));
+  builtins.set('label.get_size', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.size));
+  builtins.set('label.get_tooltip', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => label.tooltip ?? ''));
   builtins.set('label.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('label'));
 }
 
