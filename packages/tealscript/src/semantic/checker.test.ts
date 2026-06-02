@@ -633,6 +633,9 @@ fromStrings = array.from("a", "b")
 mixed = array.from(1, "b")
 label labelId = na
 fromLabels = array.from(labelId)
+fromConstructedLabels = array.from(label.new(bar_index, close))
+literalLabels = [label.new(bar_index, close)]
+fromPoints = array.from(chart.point.from_index(bar_index, close))
 ints = array.new_int()
 strings = array.new_string()
 labels = array.new_label()
@@ -640,7 +643,10 @@ ints.push(literalInts[0])
 ints.push(literalFloats[0])
 strings.push(array.get(fromStrings, 0))
 labels.push(array.get(fromLabels, 0))
+labels.push(array.get(fromConstructedLabels, 0))
+labels.push(literalLabels[0])
 labels.push("bad")
+fromPoints.push(label.new(bar_index, close))
 ints.push(array.get(fromStrings, 0))
 ints.push(mixed[0])
 `));
@@ -651,10 +657,14 @@ ints.push(mixed[0])
     expect(types.get('literalFloats')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('fromStrings')).toMatchObject({ kind: 'array', elementType: { kind: 'string' } });
     expect(types.get('fromLabels')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
+    expect(types.get('fromConstructedLabels')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
+    expect(types.get('literalLabels')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
+    expect(types.get('fromPoints')).toMatchObject({ kind: 'array', elementType: { kind: 'chart.point' } });
     expect(types.get('mixed')).toMatchObject({ kind: 'array', elementType: { kind: 'unknown' } });
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot use float value as int array element',
       'Cannot use string value as label array element',
+      'Cannot use label value as chart.point array element',
       'Cannot use string value as int array element',
     ]);
   });

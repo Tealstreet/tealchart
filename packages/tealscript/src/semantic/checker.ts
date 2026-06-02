@@ -144,6 +144,24 @@ const ARRAY_CONSTRUCTOR_ELEMENT_TYPES = new Map<string, SemanticTypeKind>([
   ['array.new_table', 'table'],
 ]);
 
+const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
+  ['box.copy', 'box'],
+  ['box.new', 'box'],
+  ['chart.point.copy', 'chart.point'],
+  ['chart.point.from_index', 'chart.point'],
+  ['chart.point.from_time', 'chart.point'],
+  ['chart.point.new', 'chart.point'],
+  ['chart.point.now', 'chart.point'],
+  ['label.copy', 'label'],
+  ['label.new', 'label'],
+  ['line.copy', 'line'],
+  ['line.new', 'line'],
+  ['linefill.new', 'linefill'],
+  ['polyline.copy', 'polyline'],
+  ['polyline.new', 'polyline'],
+  ['table.new', 'table'],
+]);
+
 const BUILTIN_FUNCTIONS = new Set([
   'alert',
   'alertcondition',
@@ -1963,6 +1981,10 @@ class SemanticChecker {
 
   private inferCallType(expression: CallExpression, scope: SemanticScope): SemanticType {
     const calleePath = this.memberPath(expression.callee);
+    const calleeName = calleePath.join('.');
+    const referenceReturnType = REFERENCE_CONSTRUCTOR_RETURN_TYPES.get(calleeName);
+    if (referenceReturnType) return { kind: referenceReturnType };
+
     const namespace = calleePath[0];
     if (namespace === 'input') return { kind: 'unknown', qualifier: 'input' };
     if (namespace === 'request' || namespace === 'ta' || namespace === 'time' || namespace === 'time_close' || calleePath.join('.') === 'timeframe.change') {
