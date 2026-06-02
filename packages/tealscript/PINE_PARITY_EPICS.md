@@ -551,8 +551,9 @@ exports strategy settings, orders, fills, open/closed trades, position state,
 equity snapshots, commissions, runup/drawdown, strategy namespace variables,
 trade accessors, order-fill alerts, and deterministic fixtures. Market, limit,
 stop, stop-limit, bracket, trailing-stop, partial-exit, OCA-cancel,
-pyramiding, and reversal flows are covered. Full TradingView intrabar path
-parity, bar magnifier, and lower-timeframe fill simulation remain deferred
+pyramiding, reversal, default next-open market fills, and explicit
+`process_orders_on_close` market fills are covered. Full TradingView intrabar
+path parity, bar magnifier, and lower-timeframe fill simulation remain deferred
 future work because they require an explicit intrabar data model rather than the
 current OHLC-only execution model. Semantic coverage now validates common
 strategy order, close/cancel, and trade-accessor call shapes before runtime.

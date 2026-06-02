@@ -202,27 +202,33 @@ plot(trigger ? 1 : 0, title="Trigger")
 
   it('locks the official strategy entry and bracket-exit idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
+    const bars: Bar[] = [
+      { time: 1_700_000_000_000, open: 100, high: 103, low: 99, close: 102, volume: 100 },
+      { time: 1_700_000_060_000, open: 105, high: 107, low: 104, close: 106, volume: 100 },
+      { time: 1_700_000_120_000, open: 106, high: 110, low: 105, close: 108, volume: 100 },
+      { time: 1_700_000_180_000, open: 108, high: 109, low: 103, close: 104, volume: 100 },
+    ];
     const result = runCompatScript(`
-strategy("Official Strategy Checkpoint", initial_capital=1000, process_orders_on_close=true)
+strategy("Official Strategy Checkpoint", initial_capital=1000)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=1)
 if bar_index == 1
-    strategy.exit("Bracket", "Long", limit=106, stop=99)
+    strategy.exit("Bracket", "Long", limit=108, stop=99)
 plot(strategy.position_size, title="Position")
 plot(strategy.closedtrades, title="Closed Trades")
 plot(strategy.netprofit, title="Net Profit")
-`, { bars: compatibilityBars.slice(0, 4) });
+`, { bars });
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Position').values).toEqual([1, 1, 1, 0]);
+    expect(getPlot(result, 'Position').values).toEqual([0, 1, 1, 0]);
     expect(getPlot(result, 'Closed Trades').values).toEqual([0, 0, 0, 1]);
-    expect(getPlot(result, 'Net Profit').values).toEqual([0, 0, 0, 4]);
+    expect(getPlot(result, 'Net Profit').values).toEqual([0, 0, 0, 3]);
     expect(result.strategy.closedTrades[0]).toMatchObject({
       entryOrderId: 'Long',
       exitOrderId: 'Bracket Limit',
-      entryPrice: 102,
-      exitPrice: 106,
-      profit: 4,
+      entryPrice: 105,
+      exitPrice: 108,
+      profit: 3,
     });
   });
 

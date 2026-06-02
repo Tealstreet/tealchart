@@ -282,6 +282,26 @@ export function fillStrategyMarketOrder(
   return fillStrategyOrder(ledger, order, price, barIndex, time);
 }
 
+export function fillPendingStrategyMarketOrders(
+  ledger: StrategyLedger,
+  open: number,
+  barIndex: number,
+  time: number,
+): StrategyFill[] {
+  const fills: StrategyFill[] = [];
+  for (const order of ledger.orders) {
+    if (order.status !== 'pending' || order.type !== 'market' || order.activationBarIndex >= barIndex) {
+      continue;
+    }
+    const fill = fillStrategyMarketOrder(ledger, order, open, barIndex, time);
+    if (fill) {
+      fills.push(fill);
+      cancelOcaOrders(ledger, order, barIndex, time);
+    }
+  }
+  return fills;
+}
+
 export function fillPendingStrategyOrders(
   ledger: StrategyLedger,
   high: number,
