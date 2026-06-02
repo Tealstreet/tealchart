@@ -847,21 +847,27 @@ baseColor = color.rgb(255, 0, 0)
 derivedColor = color.rgb(color.r(baseColor), 128, color.b(baseColor), 50)
 namedColor = color.new(color=color.rgb(red=1, green=2, blue=3), transp=25)
 namedChannelColor = color.rgb(red=color.r(color=baseColor), green=color.g(color=namedColor), blue=color.b(color=namedColor), transp=color.t(color=derivedColor))
+prefixBaseColor = color.rgb(red=10, 20, 30)
+prefixDerivedColor = color.new(color=prefixBaseColor, 40)
 signal = ta.rsi(close, 7)
 signalColor = color.from_gradient(signal, 0, 100, color.rgb(255, 0, 0), color.rgb(0, 255, 0, 50))
 namedSignalColor = color.from_gradient(value=signal, bottom_value=0, top_value=100, bottom_color=color.rgb(255, 0, 0), top_color=color.rgb(0, 255, 0, 50))
+prefixSignalColor = color.from_gradient(value=signal, 0, 100, prefixBaseColor, prefixDerivedColor)
 plot(close, title="Close", color=derivedColor)
 plot(open, title="Named", color=namedColor)
 plot(low, title="Named Channels", color=namedChannelColor)
+plot(high, title="Prefix Named", color=prefixDerivedColor)
 plot(high, title="Hidden", color=color.none)
 plot(signal, title="Signal", color=signalColor)
 plot(signal, title="Named Signal", color=namedSignalColor)
+plot(signal, title="Prefix Signal", color=prefixSignalColor)
 `);
 
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Close').color).toEqual(Array(compatibilityBars.length).fill('#FF800080'));
     expect(getPlot(result, 'Named').color).toEqual(Array(compatibilityBars.length).fill('#010203BF'));
     expect(getPlot(result, 'Named Channels').color).toEqual(Array(compatibilityBars.length).fill('#FF020380'));
+    expect(getPlot(result, 'Prefix Named').color).toEqual(Array(compatibilityBars.length).fill('#0A141E99'));
     expect(getPlot(result, 'Hidden').color).toEqual(Array(compatibilityBars.length).fill(null));
     expect(roundSeries(getPlot(result, 'Signal').values)).toEqual([
       null,
@@ -878,6 +884,20 @@ plot(signal, title="Named Signal", color=namedSignalColor)
       88.235294,
     ]);
     expect(getPlot(result, 'Named Signal').color).toEqual(getPlot(result, 'Signal').color);
+    expect(getPlot(result, 'Prefix Signal').color).toEqual([
+      null,
+      '#0A141E99',
+      '#0A141E99',
+      '#0A141EC7',
+      '#0A141ED9',
+      '#0A141ED4',
+      '#0A141EC7',
+      '#0A141EBD',
+      '#0A141EC4',
+      '#0A141EC2',
+      '#0A141EBA',
+      '#0A141EA6',
+    ]);
     expect(getPlot(result, 'Signal').color).toEqual([
       null,
       '#00FF0080',

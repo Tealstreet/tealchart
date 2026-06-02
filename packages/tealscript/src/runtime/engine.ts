@@ -6563,6 +6563,11 @@ export class TealscriptEngine {
   }
 
   private registerColorBuiltins(): void {
+    const colorNewArgs = ['color', 'transp'] as const;
+    const colorRgbArgs = ['red', 'green', 'blue', 'transp'] as const;
+    const colorChannelArgs = ['color'] as const;
+    const colorGradientArgs = ['value', 'bottom_value', 'top_value', 'bottom_color', 'top_color'] as const;
+
     // Color constants
     const colors: Record<string, string> = {
       'color.red': '#F44336',
@@ -6590,8 +6595,12 @@ export class TealscriptEngine {
     this.builtins.set('color.none', () => Number.NaN);
 
     this.builtins.set('color.new', (args, namedArgs) => {
-      const color = this.getCallArg(args, namedArgs, 0, 'color');
-      const transparency = namedArgs.get('transp') ?? namedArgs.get('transparency') ?? args[1] ?? 0;
+      const color = this.getOrderedCallArg(args, namedArgs, colorNewArgs, 0);
+      const transparency = namedArgs.has('transp')
+        ? namedArgs.get('transp')
+        : namedArgs.has('transparency')
+          ? namedArgs.get('transparency')
+          : this.getOrderedCallArg(args, namedArgs, colorNewArgs, 1, 0);
       const parsedColor = this.parseColor(color);
       if (!parsedColor) {
         return color;
@@ -6602,27 +6611,31 @@ export class TealscriptEngine {
 
     this.builtins.set('color.rgb', (args, namedArgs) =>
       this.formatColor(
-        this.getCallArg(args, namedArgs, 0, 'red'),
-        this.getCallArg(args, namedArgs, 1, 'green'),
-        this.getCallArg(args, namedArgs, 2, 'blue'),
-        namedArgs.get('transp') ?? namedArgs.get('transparency') ?? args[3] ?? 0,
+        this.getOrderedCallArg(args, namedArgs, colorRgbArgs, 0),
+        this.getOrderedCallArg(args, namedArgs, colorRgbArgs, 1),
+        this.getOrderedCallArg(args, namedArgs, colorRgbArgs, 2),
+        namedArgs.has('transp')
+          ? namedArgs.get('transp')
+          : namedArgs.has('transparency')
+            ? namedArgs.get('transparency')
+            : this.getOrderedCallArg(args, namedArgs, colorRgbArgs, 3, 0),
       ),
     );
 
-    this.builtins.set('color.r', (args, namedArgs) => this.parseColor(this.getCallArg(args, namedArgs, 0, 'color'))?.red ?? Number.NaN);
-    this.builtins.set('color.g', (args, namedArgs) => this.parseColor(this.getCallArg(args, namedArgs, 0, 'color'))?.green ?? Number.NaN);
-    this.builtins.set('color.b', (args, namedArgs) => this.parseColor(this.getCallArg(args, namedArgs, 0, 'color'))?.blue ?? Number.NaN);
+    this.builtins.set('color.r', (args, namedArgs) => this.parseColor(this.getOrderedCallArg(args, namedArgs, colorChannelArgs, 0))?.red ?? Number.NaN);
+    this.builtins.set('color.g', (args, namedArgs) => this.parseColor(this.getOrderedCallArg(args, namedArgs, colorChannelArgs, 0))?.green ?? Number.NaN);
+    this.builtins.set('color.b', (args, namedArgs) => this.parseColor(this.getOrderedCallArg(args, namedArgs, colorChannelArgs, 0))?.blue ?? Number.NaN);
     this.builtins.set('color.t', (args, namedArgs) => {
-      const parsedColor = this.parseColor(this.getCallArg(args, namedArgs, 0, 'color'));
+      const parsedColor = this.parseColor(this.getOrderedCallArg(args, namedArgs, colorChannelArgs, 0));
       return parsedColor ? this.alphaToTransparency(parsedColor.alpha) : Number.NaN;
     });
 
     this.builtins.set('color.from_gradient', (args, namedArgs) => {
-      const value = this.getCallArg(args, namedArgs, 0, 'value');
-      const bottomValue = this.getCallArg(args, namedArgs, 1, 'bottom_value');
-      const topValue = this.getCallArg(args, namedArgs, 2, 'top_value');
-      const bottomColor = this.parseColor(this.getCallArg(args, namedArgs, 3, 'bottom_color'));
-      const topColor = this.parseColor(this.getCallArg(args, namedArgs, 4, 'top_color'));
+      const value = this.getOrderedCallArg(args, namedArgs, colorGradientArgs, 0);
+      const bottomValue = this.getOrderedCallArg(args, namedArgs, colorGradientArgs, 1);
+      const topValue = this.getOrderedCallArg(args, namedArgs, colorGradientArgs, 2);
+      const bottomColor = this.parseColor(this.getOrderedCallArg(args, namedArgs, colorGradientArgs, 3));
+      const topColor = this.parseColor(this.getOrderedCallArg(args, namedArgs, colorGradientArgs, 4));
 
       if (!this.isFiniteNumber(value) || !this.isFiniteNumber(bottomValue) || !this.isFiniteNumber(topValue) || !bottomColor || !topColor) {
         return Number.NaN;
