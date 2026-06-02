@@ -300,6 +300,27 @@ plot(last_bar_time, title="Last Bar Time")
     ]);
   });
 
+  it('matches documented Pine dynamic session string idioms', () => {
+    const result = runCompatScript(`
+indicator("Dynamic session docs smoke")
+// Reduced from TradingView's dynamic session and session input examples.
+weekdaySessionInput = input.session("2218-2224", "Weekday Session")
+weekendSessionInput = input.session("0000-0001", "Weekend Session")
+daysInput = input.string("23456", "Weekdays")
+weekdaySession = weekdaySessionInput + ":" + daysInput
+weekendSession = weekendSessionInput + ":17"
+dynamicSession = dayofweek >= dayofweek.monday and dayofweek <= dayofweek.friday ? weekdaySession : weekendSession
+inDynamicSession = not na(time(timeframe.period, dynamicSession))
+
+plot(inDynamicSession ? 1 : 0, title="Dynamic Session")
+plot(str.length(dynamicSession), title="Session Length")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Dynamic Session').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0]);
+    expect(getPlot(result, 'Session Length').values).toEqual([15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15]);
+  });
+
   it('matches common Pine timenow idioms', () => {
     const now = Date.UTC(2024, 0, 5, 8, 15);
     const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(now);

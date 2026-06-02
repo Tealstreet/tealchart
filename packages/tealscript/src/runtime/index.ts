@@ -96,6 +96,8 @@ export {
   type Bar,
   type BarState,
   type SessionClassificationInfo,
+  type SessionClosureInfo,
+  type SessionClosureKind,
   type SymInfo,
   type TimeframeInfo,
   type PlotOutput,

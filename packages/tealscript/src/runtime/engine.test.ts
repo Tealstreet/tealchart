@@ -2071,6 +2071,106 @@ plot(session.ispostmarket ? 1 : 0, title="Postmarket")`;
       expect(result.plots.find((plot) => plot.title === 'Postmarket')?.values).toEqual([0, 0, 1, 0]);
     });
 
+    it('applies host-provided closed dates to session-filtered time calls', () => {
+      const script = `//@version=6
+indicator("Exchange Calendar Closures")
+plot(na(time("60", "0930-1600", "America/New_York")) ? 0 : 1, title="Explicit Session")
+plot(na(time("60", session.regular, "America/New_York")) ? 0 : 1, title="Regular Session")
+plot(na(time("60")) ? 0 : 1, title="Unfiltered Time")`;
+
+      const bars: Bar[] = [
+        { time: Date.UTC(2024, 6, 4, 14, 0), open: 1, high: 1, low: 1, close: 1, volume: 1 },
+        { time: Date.UTC(2024, 6, 5, 14, 0), open: 1, high: 1, low: 1, close: 1, volume: 1 },
+      ];
+
+      const result = executeScript(parse(script), bars, undefined, {
+        runtime: {
+          session: {
+            timezone: 'America/New_York',
+            closedDates: ['2024-07-04'],
+          },
+        },
+      });
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Explicit Session')?.values).toEqual([0, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Regular Session')?.values).toEqual([0, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Unfiltered Time')?.values).toEqual([1, 1]);
+    });
+
+    it('applies host-provided partial session closures to session state helpers', () => {
+      const script = `//@version=6
+indicator("Partial Session Closures")
+plot(session.ispremarket ? 1 : 0, title="Premarket")
+plot(session.ismarket ? 1 : 0, title="Market")
+plot(session.ispostmarket ? 1 : 0, title="Postmarket")`;
+
+      const bars: Bar[] = [
+        { time: Date.UTC(2024, 10, 29, 13, 0), open: 1, high: 1, low: 1, close: 1, volume: 1 },
+        { time: Date.UTC(2024, 10, 29, 15, 0), open: 1, high: 1, low: 1, close: 1, volume: 1 },
+        { time: Date.UTC(2024, 10, 29, 22, 0), open: 1, high: 1, low: 1, close: 1, volume: 1 },
+      ];
+
+      const result = executeScript(parse(script), bars, undefined, {
+        runtime: {
+          session: {
+            timezone: 'America/New_York',
+            premarket: '0400-0930:23456',
+            regular: '0930-1600:23456',
+            postmarket: '1600-2000:23456',
+            closures: [
+              {
+                date: '2024-11-29',
+                sessions: ['regular'],
+                reason: 'early close fixture',
+              },
+            ],
+          },
+        },
+      });
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Premarket')?.values).toEqual([1, 0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Market')?.values).toEqual([0, 0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Postmarket')?.values).toEqual([0, 0, 1]);
+    });
+
+    it('applies partial closures to literal sessions and session.extended', () => {
+      const script = `//@version=6
+indicator("Literal Session Closures")
+plot(na(time("60", "0400-0930", "America/New_York")) ? 0 : 1, title="Literal Premarket")
+plot(na(time("60", session.extended, "America/New_York")) ? 0 : 1, title="Extended")
+plot(na(time("60", "0930-1600", "America/New_York")) ? 0 : 1, title="Literal Regular")`;
+
+      const bars: Bar[] = [
+        { time: Date.UTC(2024, 10, 29, 13, 0), open: 1, high: 1, low: 1, close: 1, volume: 1 },
+        { time: Date.UTC(2024, 10, 29, 15, 0), open: 1, high: 1, low: 1, close: 1, volume: 1 },
+        { time: Date.UTC(2024, 10, 29, 22, 0), open: 1, high: 1, low: 1, close: 1, volume: 1 },
+      ];
+
+      const result = executeScript(parse(script), bars, undefined, {
+        runtime: {
+          session: {
+            timezone: 'America/New_York',
+            premarket: '0400-0930:23456',
+            regular: '0930-1600:23456',
+            postmarket: '1600-2000:23456',
+            closures: [
+              {
+                date: '2024-11-29',
+                sessions: ['premarket'],
+              },
+            ],
+          },
+        },
+      });
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Literal Premarket')?.values).toEqual([0, 0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Extended')?.values).toEqual([0, 1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Literal Regular')?.values).toEqual([0, 1, 0]);
+    });
+
     it('computes time_tradingday from the exchange timezone', () => {
       const script = `//@version=6
 indicator("Trading Day Timezone")
