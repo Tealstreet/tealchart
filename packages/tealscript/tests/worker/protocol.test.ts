@@ -22,6 +22,16 @@ describe('worker protocol output bundles', () => {
     alerts: [],
     logs: [],
     inputs: [],
+    profile: {
+      elapsedMs: 12,
+      bars: 2,
+      statements: 8,
+      expressions: 13,
+      builtinCalls: 3,
+      requestContexts: 1,
+      maxBarsBack: 5,
+      errors: 0,
+    },
     metadata: {
       generation: 3,
       requestId: 7,
@@ -40,6 +50,7 @@ describe('worker protocol output bundles', () => {
       alerts: output.alerts,
       logs: output.logs,
       inputs: output.inputs,
+      profile: output.profile,
     });
   });
 
@@ -68,6 +79,7 @@ describe('worker protocol output bundles', () => {
       alerts: output.alerts,
       logs: [],
       inputs: output.inputs,
+      profile: undefined,
     });
   });
 });

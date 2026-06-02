@@ -511,16 +511,20 @@ export class TealscriptEngine {
       indicatorDrawingLimits: declaration.drawingLimits,
       strategy: this.ctx.strategyLedger,
       errors: this.errors,
-      profile: {
-        elapsedMs: Date.now() - this.profileStartMs,
-        bars: this.profileBars,
-        statements: this.profileStatements,
-        expressions: this.profileExpressions,
-        builtinCalls: this.profileBuiltinCalls,
-        requestContexts: this.requestContextKeys.size,
-        maxBarsBack: this.inferredMaxBarsBack,
-        errors: this.errors.length,
-      },
+      profile: this.getProfile(),
+    };
+  }
+
+  getProfile(): RuntimeProfile {
+    return {
+      elapsedMs: Date.now() - this.profileStartMs,
+      bars: this.profileBars,
+      statements: this.profileStatements,
+      expressions: this.profileExpressions,
+      builtinCalls: this.profileBuiltinCalls,
+      requestContexts: this.requestContextKeys.size,
+      maxBarsBack: this.inferredMaxBarsBack,
+      errors: this.errors.length,
     };
   }
 
