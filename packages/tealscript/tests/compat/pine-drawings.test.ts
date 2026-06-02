@@ -65,6 +65,48 @@ plot(label.get_x(marker), title="Marker X")
     expect(getPlot(result, 'Marker X').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 11]);
   });
 
+  it('updates and reads a persistent label with Pine named setter idioms', () => {
+    const result = runCompatScript(`
+indicator("Named Persistent Label", overlay=true)
+var marker = label.new(x=na, y=na, text="")
+if barstate.islast
+    label.set_x(id=marker, x=bar_index)
+    label.set_y(id=marker, y=close)
+    label.set_text(id=marker, text=str.format("Named {0}", close))
+    label.set_style(id=marker, style=label.style_label_right)
+    label.set_color(id=marker, color=color.new(color.green, 30))
+    label.set_textcolor(id=marker, textcolor=color.white)
+    label.set_size(id=marker, size=size.large)
+    label.set_tooltip(id=marker, tooltip="named setter")
+plot(label.get_x(id=marker), title="Named Marker X")
+plot(label.get_y(id=marker), title="Named Marker Y")
+plot(label.get_text(id=marker) == "Named 112", title="Named Marker Text")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'label_label.new_0_0',
+        type: 'label',
+        persistent: true,
+        barIndex: 11,
+        x: 11,
+        y: 112,
+        text: 'Named 112',
+        xloc: 'bar_index',
+        yloc: 'price',
+        style: 'label_right',
+        color: '#4CAF50B3',
+        textColor: '#FFFFFF',
+        size: 'large',
+        tooltip: 'named setter',
+      },
+    ]);
+    expect(getPlot(result, 'Named Marker X').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 11]);
+    expect(getPlot(result, 'Named Marker Y').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 112]);
+    expect(getPlot(result, 'Named Marker Text').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, true]);
+  });
+
   it('updates channel lines, linefills, and boxes from common drawing idioms', () => {
     const result = runCompatScript(`
 indicator("Channel and zone drawings", overlay=true)
