@@ -1165,6 +1165,39 @@ tooManyKcw = ta.kcw(close, 3, 1.25, true, false)
     ]);
   });
 
+  it('resolves TA oscillator helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("TA Oscillator Signatures")
+stoch = ta.stoch(source=close, high=high, low=low, length=3)
+mfi = ta.mfi(series=hlc3, length=3)
+wpr = ta.wpr(length=3)
+cmo = ta.cmo(source=close, length=3)
+tsi = ta.tsi(source=close, short_length=2, long_length=3)
+cci = ta.cci(source=hlc3, length=3)
+plot(stoch + mfi + wpr + cmo + tsi + cci)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid TA oscillator helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad TA Oscillator Signatures")
+duplicateStoch = ta.stoch(close, source=open, high=high, low=low, length=3)
+unknownMfi = ta.mfi(series=hlc3, length=3, volume=volume)
+shortTsi = ta.tsi(source=close, short_length=2)
+tooManyWpr = ta.wpr(3, 4)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Argument 'source' for ta.stoch() was supplied multiple times",
+      "Unknown argument 'volume' for ta.mfi()",
+      'ta.tsi() expects at least 3 arguments',
+      "ta.tsi() missing required argument 'long_length'",
+      'ta.wpr() expects at most 1 argument',
+    ]);
+  });
+
   it('resolves color helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Color Signatures")
