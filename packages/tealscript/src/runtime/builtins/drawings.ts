@@ -764,17 +764,21 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     return id;
   });
 
-  builtins.set('table.delete', (args, _namedArgs, ctx) => {
-    withTable(args[0], ctx, (table) => ctx.deleteDrawing(table.id));
+  builtins.set('table.delete', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => ctx.deleteDrawing(table.id));
     return undefined;
   });
 
-  builtins.set('table.clear', (args, _namedArgs, ctx) => {
-    withTable(args[0], ctx, (table) => {
-      const startColumn = normalizeTableColumn(runtime, args[1] ?? 0);
-      const startRow = normalizeTableRow(runtime, args[2] ?? 0);
-      const endColumn = args[3] === undefined ? table.columns - 1 : normalizeTableColumn(runtime, args[3]);
-      const endRow = args[4] === undefined ? table.rows - 1 : normalizeTableRow(runtime, args[4]);
+  builtins.set('table.clear', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      const startColumn = normalizeTableColumn(runtime, callArg(args, namedArgs, 1, 'start_column', 0));
+      const startRow = normalizeTableRow(runtime, callArg(args, namedArgs, 2, 'start_row', 0));
+      const endColumn = (namedArgs.has('end_column') || args[3] !== undefined)
+        ? normalizeTableColumn(runtime, callArg(args, namedArgs, 3, 'end_column'))
+        : table.columns - 1;
+      const endRow = (namedArgs.has('end_row') || args[4] !== undefined)
+        ? normalizeTableRow(runtime, callArg(args, namedArgs, 4, 'end_row'))
+        : table.rows - 1;
       table.cells = table.cells.filter((cell) => (
         cell.column < startColumn
         || cell.column > endColumn
@@ -785,39 +789,39 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     return undefined;
   });
 
-  builtins.set('table.set_position', (args, _namedArgs, ctx) => {
-    withTable(args[0], ctx, (table) => {
-      table.position = runtime.toStringValue(args[1]);
+  builtins.set('table.set_position', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      table.position = runtime.toStringValue(callArg(args, namedArgs, 1, 'position'));
     });
     return undefined;
   });
-  builtins.set('table.set_bgcolor', (args, _namedArgs, ctx) => {
-    withTable(args[0], ctx, (table) => {
-      table.bgcolor = runtime.toNullableColor(args[1]);
+  builtins.set('table.set_bgcolor', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      table.bgcolor = runtime.toNullableColor(callArg(args, namedArgs, 1, 'bgcolor'));
     });
     return undefined;
   });
-  builtins.set('table.set_frame_color', (args, _namedArgs, ctx) => {
-    withTable(args[0], ctx, (table) => {
-      table.frameColor = runtime.toNullableColor(args[1]);
+  builtins.set('table.set_frame_color', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      table.frameColor = runtime.toNullableColor(callArg(args, namedArgs, 1, 'frame_color'));
     });
     return undefined;
   });
-  builtins.set('table.set_frame_width', (args, _namedArgs, ctx) => {
-    withTable(args[0], ctx, (table) => {
-      table.frameWidth = runtime.toLineWidth(args[1]);
+  builtins.set('table.set_frame_width', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      table.frameWidth = runtime.toLineWidth(callArg(args, namedArgs, 1, 'frame_width'));
     });
     return undefined;
   });
-  builtins.set('table.set_border_color', (args, _namedArgs, ctx) => {
-    withTable(args[0], ctx, (table) => {
-      table.borderColor = runtime.toNullableColor(args[1]);
+  builtins.set('table.set_border_color', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      table.borderColor = runtime.toNullableColor(callArg(args, namedArgs, 1, 'border_color'));
     });
     return undefined;
   });
-  builtins.set('table.set_border_width', (args, _namedArgs, ctx) => {
-    withTable(args[0], ctx, (table) => {
-      table.borderWidth = runtime.toLineWidth(args[1]);
+  builtins.set('table.set_border_width', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      table.borderWidth = runtime.toLineWidth(callArg(args, namedArgs, 1, 'border_width'));
     });
     return undefined;
   });
@@ -850,73 +854,73 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     return undefined;
   });
 
-  builtins.set('table.cell_set_text', (args, _namedArgs, ctx) => {
-    withTable(args[0], ctx, (table) => {
-      const cell = ensureCell(table, args[1], args[2]);
-      cell.text = runtime.toStringValue(args[3] ?? '');
+  builtins.set('table.cell_set_text', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      const cell = ensureCell(table, callArg(args, namedArgs, 1, 'column'), callArg(args, namedArgs, 2, 'row'));
+      cell.text = runtime.toStringValue(callArg(args, namedArgs, 3, 'text', ''));
     });
     return undefined;
   });
-  builtins.set('table.cell_set_bgcolor', (args, _namedArgs, ctx) => {
-    withTable(args[0], ctx, (table) => {
-      const cell = ensureCell(table, args[1], args[2]);
-      cell.bgcolor = runtime.toNullableColor(args[3]);
+  builtins.set('table.cell_set_bgcolor', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      const cell = ensureCell(table, callArg(args, namedArgs, 1, 'column'), callArg(args, namedArgs, 2, 'row'));
+      cell.bgcolor = runtime.toNullableColor(callArg(args, namedArgs, 3, 'bgcolor'));
     });
     return undefined;
   });
-  builtins.set('table.cell_set_text_color', (args, _namedArgs, ctx) => {
-    withTable(args[0], ctx, (table) => {
-      const cell = ensureCell(table, args[1], args[2]);
-      cell.textColor = runtime.toNullableColor(args[3]);
+  builtins.set('table.cell_set_text_color', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      const cell = ensureCell(table, callArg(args, namedArgs, 1, 'column'), callArg(args, namedArgs, 2, 'row'));
+      cell.textColor = runtime.toNullableColor(callArg(args, namedArgs, 3, 'text_color'));
     });
     return undefined;
   });
-  builtins.set('table.cell_set_text_size', (args, _namedArgs, ctx) => {
-    withTable(args[0], ctx, (table) => {
-      const cell = ensureCell(table, args[1], args[2]);
-      cell.textSize = runtime.toStringValue(args[3]);
+  builtins.set('table.cell_set_text_size', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      const cell = ensureCell(table, callArg(args, namedArgs, 1, 'column'), callArg(args, namedArgs, 2, 'row'));
+      cell.textSize = runtime.toStringValue(callArg(args, namedArgs, 3, 'text_size'));
     });
     return undefined;
   });
-  builtins.set('table.cell_set_width', (args, _namedArgs, ctx) => {
-    withTable(args[0], ctx, (table) => {
-      const cell = ensureCell(table, args[1], args[2]);
-      cell.width = runtime.toNullableNumber(args[3]);
+  builtins.set('table.cell_set_width', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      const cell = ensureCell(table, callArg(args, namedArgs, 1, 'column'), callArg(args, namedArgs, 2, 'row'));
+      cell.width = runtime.toNullableNumber(callArg(args, namedArgs, 3, 'width'));
     });
     return undefined;
   });
-  builtins.set('table.cell_set_height', (args, _namedArgs, ctx) => {
-    withTable(args[0], ctx, (table) => {
-      const cell = ensureCell(table, args[1], args[2]);
-      cell.height = runtime.toNullableNumber(args[3]);
+  builtins.set('table.cell_set_height', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      const cell = ensureCell(table, callArg(args, namedArgs, 1, 'column'), callArg(args, namedArgs, 2, 'row'));
+      cell.height = runtime.toNullableNumber(callArg(args, namedArgs, 3, 'height'));
     });
     return undefined;
   });
-  builtins.set('table.cell_set_text_halign', (args, _namedArgs, ctx) => {
-    withTable(args[0], ctx, (table) => {
-      const cell = ensureCell(table, args[1], args[2]);
-      cell.textHalign = runtime.toStringValue(args[3]);
+  builtins.set('table.cell_set_text_halign', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      const cell = ensureCell(table, callArg(args, namedArgs, 1, 'column'), callArg(args, namedArgs, 2, 'row'));
+      cell.textHalign = runtime.toStringValue(callArg(args, namedArgs, 3, 'text_halign'));
     });
     return undefined;
   });
-  builtins.set('table.cell_set_text_valign', (args, _namedArgs, ctx) => {
-    withTable(args[0], ctx, (table) => {
-      const cell = ensureCell(table, args[1], args[2]);
-      cell.textValign = runtime.toStringValue(args[3]);
+  builtins.set('table.cell_set_text_valign', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      const cell = ensureCell(table, callArg(args, namedArgs, 1, 'column'), callArg(args, namedArgs, 2, 'row'));
+      cell.textValign = runtime.toStringValue(callArg(args, namedArgs, 3, 'text_valign'));
     });
     return undefined;
   });
-  builtins.set('table.cell_set_text_font_family', (args, _namedArgs, ctx) => {
-    withTable(args[0], ctx, (table) => {
-      const cell = ensureCell(table, args[1], args[2]);
-      cell.textFontFamily = runtime.toStringValue(args[3]);
+  builtins.set('table.cell_set_text_font_family', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      const cell = ensureCell(table, callArg(args, namedArgs, 1, 'column'), callArg(args, namedArgs, 2, 'row'));
+      cell.textFontFamily = runtime.toStringValue(callArg(args, namedArgs, 3, 'text_font_family'));
     });
     return undefined;
   });
-  builtins.set('table.cell_set_text_formatting', (args, _namedArgs, ctx) => {
-    withTable(args[0], ctx, (table) => {
-      const cell = ensureCell(table, args[1], args[2]);
-      cell.textFormatting = runtime.toStringValue(args[3]);
+  builtins.set('table.cell_set_text_formatting', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      const cell = ensureCell(table, callArg(args, namedArgs, 1, 'column'), callArg(args, namedArgs, 2, 'row'));
+      cell.textFormatting = runtime.toStringValue(callArg(args, namedArgs, 3, 'text_formatting'));
     });
     return undefined;
   });

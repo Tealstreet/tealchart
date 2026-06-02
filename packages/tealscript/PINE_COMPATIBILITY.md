@@ -618,7 +618,9 @@ The `table.*` drawing pass covers fixed-position table handles, declared row and
 column sizing, background/frame/border metadata, `table.delete()`,
 `table.clear()`, `table.cell()`, table-level position/background/frame/border
 setters, and common cell setters for text, color, background, size, width,
-height, text alignment, font family, and bold/italic text formatting. Rendering
+height, text alignment, font family, and bold/italic text formatting. Table
+lifecycle helpers and setters accept Pine-style named `table_id`, coordinate,
+and value arguments where those parameters exist. Rendering
 lays out fixed tables in the script pane with measured cell sizes, cell
 backgrounds, borders, frame borders, text alignment, default/monospace
 font-family metadata, and bold/italic font styling. Runtime coverage also
