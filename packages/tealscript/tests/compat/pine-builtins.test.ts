@@ -162,6 +162,8 @@ plot(ta.cog(source=close, length=3), title="Named COG")
 indicator("Channel helpers")
 [basis, upper, lower] = ta.kc(close, 3, 1.25)
 [hlBasis, hlUpper, hlLower] = ta.kc(close, 3, 1.25, false)
+[namedBasis, namedUpper, namedLower] = ta.kc(series=close, length=3, mult=1.25)
+[namedHlBasis, namedHlUpper, namedHlLower] = ta.kc(series=close, length=3, mult=1.25, useTrueRange=false)
 plot(basis, title="KC Basis")
 plot(upper, title="KC Upper")
 plot(lower, title="KC Lower")
@@ -169,6 +171,13 @@ plot(ta.kcw(close, 3, 1.25), title="KC Width")
 plot(hlUpper, title="HL Upper")
 plot(ta.kcw(close, 3, 1.25, false), title="HL Width")
 plot(ta.bbw(close, 3, 2.0), title="BB Width")
+plot(namedBasis, title="Named KC Basis")
+plot(namedUpper, title="Named KC Upper")
+plot(namedLower, title="Named KC Lower")
+plot(namedHlUpper, title="Named HL Upper")
+plot(ta.kcw(series=close, length=3, mult=1.25), title="Named KC Width")
+plot(ta.kcw(series=close, length=3, mult=1.25, useTrueRange=false), title="Named HL Width")
+plot(ta.bbw(series=close, length=3, mult=2.0), title="Named BB Width")
 `);
 
     expect(result.errors).toEqual([]);
@@ -179,6 +188,13 @@ plot(ta.bbw(close, 3, 2.0), title="BB Width")
     expect(roundSeries(getPlot(result, 'HL Upper').values)).toEqual(roundSeries(getPlot(result, 'KC Upper').values));
     expect(roundSeries(getPlot(result, 'HL Width').values)).toEqual(roundSeries(getPlot(result, 'KC Width').values));
     expect(roundSeries(getPlot(result, 'BB Width').values)).toEqual([null, null, 0.078528, 0.062209, 0.126834, 0.067537, 0.085554, 0.141155, 0.080757, 0.04563, 0.045491, 0.029423]);
+    expect(roundSeries(getPlot(result, 'Named KC Basis').values)).toEqual(roundSeries(getPlot(result, 'KC Basis').values));
+    expect(roundSeries(getPlot(result, 'Named KC Upper').values)).toEqual(roundSeries(getPlot(result, 'KC Upper').values));
+    expect(roundSeries(getPlot(result, 'Named KC Lower').values)).toEqual(roundSeries(getPlot(result, 'KC Lower').values));
+    expect(roundSeries(getPlot(result, 'Named HL Upper').values)).toEqual(roundSeries(getPlot(result, 'HL Upper').values));
+    expect(roundSeries(getPlot(result, 'Named KC Width').values)).toEqual(roundSeries(getPlot(result, 'KC Width').values));
+    expect(roundSeries(getPlot(result, 'Named HL Width').values)).toEqual(roundSeries(getPlot(result, 'HL Width').values));
+    expect(roundSeries(getPlot(result, 'Named BB Width').values)).toEqual(roundSeries(getPlot(result, 'BB Width').values));
   });
 
   it('runs Pine linear regression helper idioms', () => {
