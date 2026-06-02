@@ -7924,7 +7924,7 @@ export class TealscriptEngine {
     const timezone = timezoneArg === undefined || timezoneArg === '' ? this.ctx.syminfo.timezone : this.toStringValue(timezoneArg);
 
     if (!Number.isFinite(timestamp)) return Number.NaN;
-    if (session && this.isExchangeSessionClosed(timestamp, timezone, this.getRuntimeSessionKind(session))) {
+    if (session && this.isExchangeSessionClosed(timestamp, timezone, this.getRuntimeSessionKind(session, timestamp, timezone))) {
       return Number.NaN;
     }
     if (session && !this.isTimestampInSession(timestamp, session, timezone)) {
@@ -8186,15 +8186,37 @@ export class TealscriptEngine {
       if (!sessions || sessions.length === 0 || sessions.includes('all')) return true;
       if (!kind) return false;
       if (sessions.includes(kind)) return true;
-      return kind !== 'regular' && sessions.includes('extended');
+      if (kind === 'extended') {
+        return this.isClosedExtendedSessionSegment(timestamp, timezone, sessions);
+      }
+      return sessions.includes('extended');
     }) ?? false;
   }
 
-  private getRuntimeSessionKind(session: string): RuntimeSessionKind | undefined {
+  private getRuntimeSessionKind(session: string, timestamp: number, timezone: string): RuntimeSessionKind | undefined {
     const normalized = session.trim().toLowerCase();
     if (normalized === 'regular' || normalized === 'session.regular') return 'regular';
     if (normalized === 'extended' || normalized === 'session.extended') return 'extended';
+
+    for (const kind of ['premarket', 'regular', 'postmarket'] as const) {
+      if (this.isRuntimeSessionSegmentActive(timestamp, kind, timezone) && this.isTimestampInSession(timestamp, session, timezone)) {
+        return kind;
+      }
+    }
     return undefined;
+  }
+
+  private isClosedExtendedSessionSegment(timestamp: number, timezone: string, sessions: SessionClosureKind[]): boolean {
+    return (['premarket', 'regular', 'postmarket'] as const).some((kind) => (
+      sessions.includes(kind) && this.isRuntimeSessionSegmentActive(timestamp, kind, timezone)
+    ));
+  }
+
+  private isRuntimeSessionSegmentActive(timestamp: number, kind: 'premarket' | 'regular' | 'postmarket', timezone: string): boolean {
+    const session = this.runtimeOptions.session?.[kind];
+    if (session === undefined || session === '') return false;
+    const sessionTimezone = this.runtimeOptions.session?.timezone?.trim() || timezone;
+    return this.isTimestampInSession(timestamp, session, sessionTimezone);
   }
 
   private getExchangeCalendarDate(timestamp: number, timezone: string): string {
