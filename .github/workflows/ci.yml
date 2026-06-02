@@ -21,8 +21,8 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 22
-      # No committed lockfile yet, so no yarn cache and no --frozen-lockfile.
-      - run: yarn install --network-timeout 600000
+          cache: yarn
+      - run: yarn install --frozen-lockfile --network-timeout 600000
       - run: yarn typecheck
       - run: yarn lint
       - run: yarn test
