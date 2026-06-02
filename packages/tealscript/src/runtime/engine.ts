@@ -1741,6 +1741,10 @@ export class TealscriptEngine {
         return this.ctx.hlc3;
       case 'ohlc4':
         return this.ctx.ohlc4;
+      case 'ta.obv':
+        return this.updateObv(this.ctx.close.get(0)!, this.ctx.close.get(1), this.ctx.volume.get(0)!, this.scope, '_ta_obv_value');
+      case 'ta.tr':
+        return this.currentTrueRange(false);
     }
 
     // Check scope
@@ -3602,6 +3606,13 @@ export class TealscriptEngine {
         case 'ohlc4':
           this.checkHistoryOffset(offset);
           return this.naIfMissing(this.getOhlc4(offset));
+        case 'ta.obv':
+          this.checkHistoryOffset(offset);
+          this.updateObv(this.ctx.close.get(0)!, this.ctx.close.get(1), this.ctx.volume.get(0)!, this.scope, '_ta_obv_value');
+          return this.naIfMissing(this.scope.getWithOffset('_ta_obv_value', offset));
+        case 'ta.tr':
+          this.checkHistoryOffset(offset);
+          return this.naIfMissing(this.trueRange(offset, false));
       }
 
       if (this.scope.has(name)) {
@@ -3665,6 +3676,41 @@ export class TealscriptEngine {
     return open === undefined || high === undefined || low === undefined || close === undefined
       ? Number.NaN
       : (open + high + low + close) / 4;
+  }
+
+  private currentTrueRange(handleNa: boolean): number {
+    return this.trueRange(0, handleNa);
+  }
+
+  private trueRange(offset: number, handleNa: boolean): number {
+    const high = this.ctx.high.get(offset);
+    const low = this.ctx.low.get(offset);
+    const prevClose = this.ctx.close.get(offset + 1);
+    if (high === undefined || low === undefined || Number.isNaN(high) || Number.isNaN(low)) return Number.NaN;
+    if (prevClose === undefined || Number.isNaN(prevClose)) {
+      return handleNa ? high - low : Number.NaN;
+    }
+    return Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose));
+  }
+
+  private updateObv(source: number, previousSource: number | undefined, volume: number, scope: Scope, key: string): number {
+    const barKey = `${key}_bar_index`;
+    const existing = scope.get(key) as number | undefined;
+    if (scope.get(barKey) === this.ctx.bar_index && existing !== undefined) {
+      return existing;
+    }
+
+    let obv = (scope.get(key) as number) ?? 0;
+    if (previousSource !== undefined) {
+      if (source > previousSource) {
+        obv += volume;
+      } else if (source < previousSource) {
+        obv -= volume;
+      }
+    }
+    this.setBuiltinState(scope, key, obv);
+    this.setBuiltinState(scope, barKey, this.ctx.bar_index);
+    return obv;
   }
 
   private readArrayElement(array: unknown, index: number): unknown {
@@ -4945,7 +4991,7 @@ export class TealscriptEngine {
   }
 
   private builtinCallId(name: string, expr: CallExpression): string {
-    if ((name === 'alert' || name === 'math.random') && expr.loc) {
+    if ((name === 'alert' || name === 'math.random' || name === 'ta.macd' || name === 'ta.obv') && expr.loc) {
       this.profileBuiltinCalls += 1;
       return `${name}_${expr.loc.start.line}_${expr.loc.start.column}`;
     }
@@ -7430,7 +7476,7 @@ export class TealscriptEngine {
     });
 
     // MACD - returns [macdLine, signalLine, histogram]
-    this.builtins.set('ta.macd', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.macd', (args, namedArgs, ctx, scope, callId) => {
       const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
       const fastLen = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'fastlen', 12));
       const slowLen = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 2, 'slowlen', 26));
@@ -7441,9 +7487,9 @@ export class TealscriptEngine {
       const slowAlpha = 2 / (slowLen + 1);
       const signalAlpha = 2 / (signalLen + 1);
 
-      const fastKey = `_macd_fast_${fastLen}`;
-      const slowKey = `_macd_slow_${slowLen}`;
-      const signalKey = `_macd_signal_${signalLen}`;
+      const fastKey = `_ta_macd_fast_${callId}_${fastLen}`;
+      const slowKey = `_ta_macd_slow_${callId}_${slowLen}`;
+      const signalKey = `_ta_macd_signal_${callId}_${signalLen}`;
 
       let fastEma = (scope.get(fastKey) as number) ?? source;
       let slowEma = (scope.get(slowKey) as number) ?? source;
@@ -7458,9 +7504,9 @@ export class TealscriptEngine {
 
       const histogram = macdLine - signalLine;
 
-      scope.declare(fastKey, 'var', fastEma);
-      scope.declare(slowKey, 'var', slowEma);
-      scope.declare(signalKey, 'var', signalLine);
+      this.setBuiltinState(scope, fastKey, fastEma);
+      this.setBuiltinState(scope, slowKey, slowEma);
+      this.setBuiltinState(scope, signalKey, signalLine);
 
       return [macdLine, signalLine, histogram];
     });
@@ -7840,25 +7886,11 @@ export class TealscriptEngine {
     });
 
     // OBV - On-Balance Volume
-    this.builtins.set('ta.obv', (_args, _namedArgs, ctx, scope) => {
-      const close = ctx.close.get(0)!;
-      const prevClose = ctx.close.get(1);
-      const volume = ctx.volume.get(0)!;
-
-      const obvKey = '_obv_value';
-      let obv = (scope.get(obvKey) as number) ?? 0;
-
-      if (prevClose !== undefined) {
-        if (close > prevClose) {
-          obv += volume;
-        } else if (close < prevClose) {
-          obv -= volume;
-        }
-        // If close == prevClose, OBV stays the same
-      }
-
-      scope.declare(obvKey, 'var', obv);
-      return obv;
+    this.builtins.set('ta.obv', (args, namedArgs, ctx, scope, callId) => {
+      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source', ctx.close.get(0)));
+      const volume = this.toNumber(this.getCallArg(args, namedArgs, 1, 'volume', ctx.volume.get(0)));
+      const previousSource = this.getCompleteSourceWindow(scope, `_ta_obv_source_${callId}`, source, 2)?.[1];
+      return this.updateObv(source, previousSource, volume, scope, `_ta_obv_value_${callId}`);
     });
 
     // =========================================================================
@@ -8044,16 +8076,8 @@ export class TealscriptEngine {
     });
 
     // TR - True Range (as a function, can also be accessed as variable)
-    this.builtins.set('ta.tr', (_args, _namedArgs, ctx) => {
-      const high = ctx.high.get(0)!;
-      const low = ctx.low.get(0)!;
-      const prevClose = ctx.close.get(1);
-
-      if (prevClose === undefined) {
-        return high - low;
-      }
-
-      return Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose));
+    this.builtins.set('ta.tr', (args, namedArgs) => {
+      return this.currentTrueRange(this.isTruthy(this.getCallArg(args, namedArgs, 0, 'handle_na', false)));
     });
 
     // SuperTrend - ATR-based trend indicator
