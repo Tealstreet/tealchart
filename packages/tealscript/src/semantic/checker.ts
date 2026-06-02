@@ -1109,6 +1109,7 @@ class SemanticChecker {
           statement.calc_on_order_fills,
           statement.calc_on_every_tick,
           statement.process_orders_on_close,
+          statement.use_bar_magnifier,
         ]);
         break;
       case 'LibraryDeclaration':

@@ -173,6 +173,7 @@ must stay offline and deterministic.
    Done.
 3. Thread `use_bar_magnifier` from `strategy()` settings to the runtime ledger
    and path provider.
+   Ledger setting plumbing is done; path-provider selection remains in step 4.
 4. Implement lower-timeframe path selection with explicit fallback metadata.
 5. Refactor order filling to consume execution ticks instead of a single
    per-bar OHLC fill point.

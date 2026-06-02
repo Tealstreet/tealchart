@@ -865,6 +865,9 @@ export class TealscriptEngine {
     if (stmt.process_orders_on_close !== undefined) {
       settings.processOrdersOnClose = this.isTruthy(this.evaluateExpression(stmt.process_orders_on_close));
     }
+    if (stmt.use_bar_magnifier !== undefined) {
+      settings.useBarMagnifier = this.isTruthy(this.evaluateExpression(stmt.use_bar_magnifier));
+    }
 
     this.ctx.setStrategyLedger(settings);
   }
