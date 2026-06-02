@@ -190,6 +190,9 @@ for calls such as `values.push(close)`, `values.size()`, `values.get(index)`,
 checkpoint fixtures follow rolling-window indicator idioms and constant-array
 helper idioms where arrays are copied, searched, summarized, ordered, sliced,
 joined, concatenated, mutated, and compared for covariance.
+Core array constructors, accessors, mutators, window helpers, and ordering
+helpers accept Pine-style named arguments such as `size`, `initial_value`, `id`,
+`index`, `value`, `index_from`, `index_to`, `order`, and `sort_field`.
 Direct array index assignment such as `values[0] := close` is supported.
 Semantic diagnostics reject obvious non-array index assignment targets,
 non-numeric array assignment indexes, and mismatched values for arrays with

@@ -5910,7 +5910,13 @@ export class TealscriptEngine {
   }
 
   private registerArrayBuiltins(): void {
-    const createArray = (args: unknown[]) => createPineArray(args[0] as number | undefined, args[1]);
+    const createArray = (args: unknown[], namedArgs: Map<string, unknown>) => {
+      const size = this.getCallArg(args, namedArgs, 0, 'size') as number | undefined;
+      const initialValue = namedArgs.has('initial_value')
+        ? namedArgs.get('initial_value')
+        : args[namedArgs.has('size') ? 0 : 1];
+      return createPineArray(size, initialValue);
+    };
     const readArray = (value: unknown): PineArray | unknown[] => {
       if (Array.isArray(value)) {
         return value;
@@ -5936,6 +5942,27 @@ export class TealscriptEngine {
       }
       return value;
     };
+    const isArrayLike = (value: unknown): boolean => Array.isArray(value) || isPineArray(value);
+    const arrayReceiverArg = (args: unknown[], namedArgs: Map<string, unknown>): unknown => {
+      return isArrayLike(args[0]) ? args[0] : namedArgs.has('id') ? namedArgs.get('id') : args[0];
+    };
+    const arrayCallArg = (
+      args: unknown[],
+      namedArgs: Map<string, unknown>,
+      index: number,
+      name: string,
+      fallback?: unknown,
+      priorNames: string[] = index > 0 ? ['id'] : [],
+    ): unknown => {
+      const positionalIndex = index - priorNames.filter((priorName) => namedArgs.has(priorName)).length;
+      return this.getCallArg(args, namedArgs, positionalIndex, name, fallback);
+    };
+    const readArrayFromCall = (args: unknown[], namedArgs: Map<string, unknown>): PineArray | unknown[] => {
+      return readArray(arrayReceiverArg(args, namedArgs));
+    };
+    const readMutableArrayFromCall = (args: unknown[], namedArgs: Map<string, unknown>): PineArray => {
+      return readMutableArray(arrayReceiverArg(args, namedArgs));
+    };
 
     this.builtins.set('array.new', createArray);
     this.builtins.set('array.new_float', createArray);
@@ -5954,46 +5981,47 @@ export class TealscriptEngine {
       array.values.push(...args);
       return array;
     });
-    this.builtins.set('array.copy', (args) => copyArray(copyReadonlyArray(readArray(args[0]))));
+    this.builtins.set('array.copy', (args, namedArgs) => copyArray(copyReadonlyArray(readArrayFromCall(args, namedArgs))));
 
-    this.builtins.set('array.size', (args) => {
-      const array = readArray(args[0]);
+    this.builtins.set('array.size', (args, namedArgs) => {
+      const array = readArrayFromCall(args, namedArgs);
       return Array.isArray(array) ? array.length : getArraySize(array);
     });
-    this.builtins.set('array.get', (args) => {
-      const array = readArray(args[0]);
-      return Array.isArray(array) ? array[Math.trunc(args[1] as number)] : getArrayValue(array, args[1] as number);
+    this.builtins.set('array.get', (args, namedArgs) => {
+      const array = readArrayFromCall(args, namedArgs);
+      const index = arrayCallArg(args, namedArgs, 1, 'index') as number;
+      return Array.isArray(array) ? array[Math.trunc(index)] : getArrayValue(array, index);
     });
-    this.builtins.set('array.first', (args) => firstArrayValue(copyReadonlyArray(readArray(args[0]))));
-    this.builtins.set('array.last', (args) => lastArrayValue(copyReadonlyArray(readArray(args[0]))));
-    this.builtins.set('array.includes', (args) => includesArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
-    this.builtins.set('array.every', (args) => {
-      const array = copyReadonlyArray(readArray(args[0]));
+    this.builtins.set('array.first', (args, namedArgs) => firstArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs))));
+    this.builtins.set('array.last', (args, namedArgs) => lastArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs))));
+    this.builtins.set('array.includes', (args, namedArgs) => includesArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs)), arrayCallArg(args, namedArgs, 1, 'value')));
+    this.builtins.set('array.every', (args, namedArgs) => {
+      const array = copyReadonlyArray(readArrayFromCall(args, namedArgs));
       for (let index = 0; index < getArraySize(array); index++) {
         if (!this.isTruthy(getArrayValue(array, index))) return false;
       }
       return true;
     });
-    this.builtins.set('array.some', (args) => {
-      const array = copyReadonlyArray(readArray(args[0]));
+    this.builtins.set('array.some', (args, namedArgs) => {
+      const array = copyReadonlyArray(readArrayFromCall(args, namedArgs));
       for (let index = 0; index < getArraySize(array); index++) {
         if (this.isTruthy(getArrayValue(array, index))) return true;
       }
       return false;
     });
-    this.builtins.set('array.indexof', (args) => indexOfArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
-    this.builtins.set('array.lastindexof', (args) => lastIndexOfArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
-    this.builtins.set('array.binary_search', (args) => binarySearchArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
-    this.builtins.set('array.binary_search_leftmost', (args) => binarySearchLeftmostArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
-    this.builtins.set('array.binary_search_rightmost', (args) => binarySearchRightmostArrayValue(copyReadonlyArray(readArray(args[0])), args[1]));
-    this.builtins.set('array.abs', (args) => absArrayValue(copyReadonlyArray(readArray(args[0]))));
-    this.builtins.set('array.min', (args) => minArrayValue(copyReadonlyArray(readArray(args[0]))));
-    this.builtins.set('array.max', (args) => maxArrayValue(copyReadonlyArray(readArray(args[0]))));
-    this.builtins.set('array.sum', (args) => sumArrayValue(copyReadonlyArray(readArray(args[0]))));
-    this.builtins.set('array.avg', (args) => avgArrayValue(copyReadonlyArray(readArray(args[0]))));
-    this.builtins.set('array.range', (args) => rangeArrayValue(copyReadonlyArray(readArray(args[0]))));
-    this.builtins.set('array.median', (args) => medianArrayValue(copyReadonlyArray(readArray(args[0]))));
-    this.builtins.set('array.mode', (args) => modeArrayValue(copyReadonlyArray(readArray(args[0]))));
+    this.builtins.set('array.indexof', (args, namedArgs) => indexOfArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs)), arrayCallArg(args, namedArgs, 1, 'value')));
+    this.builtins.set('array.lastindexof', (args, namedArgs) => lastIndexOfArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs)), arrayCallArg(args, namedArgs, 1, 'value')));
+    this.builtins.set('array.binary_search', (args, namedArgs) => binarySearchArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs)), arrayCallArg(args, namedArgs, 1, 'value')));
+    this.builtins.set('array.binary_search_leftmost', (args, namedArgs) => binarySearchLeftmostArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs)), arrayCallArg(args, namedArgs, 1, 'value')));
+    this.builtins.set('array.binary_search_rightmost', (args, namedArgs) => binarySearchRightmostArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs)), arrayCallArg(args, namedArgs, 1, 'value')));
+    this.builtins.set('array.abs', (args, namedArgs) => absArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs))));
+    this.builtins.set('array.min', (args, namedArgs) => minArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs))));
+    this.builtins.set('array.max', (args, namedArgs) => maxArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs))));
+    this.builtins.set('array.sum', (args, namedArgs) => sumArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs))));
+    this.builtins.set('array.avg', (args, namedArgs) => avgArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs))));
+    this.builtins.set('array.range', (args, namedArgs) => rangeArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs))));
+    this.builtins.set('array.median', (args, namedArgs) => medianArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs))));
+    this.builtins.set('array.mode', (args, namedArgs) => modeArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs))));
     this.builtins.set('array.variance', (args) => varianceArrayValue(
       copyReadonlyArray(readArray(args[0])),
       args[1] === undefined ? true : this.isTruthy(args[1]),
@@ -6020,46 +6048,64 @@ export class TealscriptEngine {
       this.toNumber(args[1]),
     ));
     this.builtins.set('array.standardize', (args) => standardizeArrayValue(copyReadonlyArray(readArray(args[0]))));
-    this.builtins.set('array.set', (args) => {
-      setArrayValue(readMutableArray(args[0]), args[1] as number, args[2]);
+    this.builtins.set('array.set', (args, namedArgs) => {
+      setArrayValue(
+        readMutableArrayFromCall(args, namedArgs),
+        arrayCallArg(args, namedArgs, 1, 'index') as number,
+        arrayCallArg(args, namedArgs, 2, 'value', undefined, ['id', 'index']),
+      );
       return null;
     });
-    this.builtins.set('array.push', (args) => pushArrayValue(readMutableArray(args[0]), args[1]));
-    this.builtins.set('array.pop', (args) => popArrayValue(readMutableArray(args[0])));
-    this.builtins.set('array.shift', (args) => shiftArrayValue(readMutableArray(args[0])));
-    this.builtins.set('array.unshift', (args) => unshiftArrayValue(readMutableArray(args[0]), args[1]));
-    this.builtins.set('array.insert', (args) => insertArrayValue(readMutableArray(args[0]), args[1] as number, args[2]));
-    this.builtins.set('array.remove', (args) => removeArrayValue(readMutableArray(args[0]), args[1] as number));
+    this.builtins.set('array.push', (args, namedArgs) => pushArrayValue(readMutableArrayFromCall(args, namedArgs), arrayCallArg(args, namedArgs, 1, 'value')));
+    this.builtins.set('array.pop', (args, namedArgs) => popArrayValue(readMutableArrayFromCall(args, namedArgs)));
+    this.builtins.set('array.shift', (args, namedArgs) => shiftArrayValue(readMutableArrayFromCall(args, namedArgs)));
+    this.builtins.set('array.unshift', (args, namedArgs) => unshiftArrayValue(readMutableArrayFromCall(args, namedArgs), arrayCallArg(args, namedArgs, 1, 'value')));
+    this.builtins.set('array.insert', (args, namedArgs) => insertArrayValue(
+      readMutableArrayFromCall(args, namedArgs),
+      arrayCallArg(args, namedArgs, 1, 'index') as number,
+      arrayCallArg(args, namedArgs, 2, 'value', undefined, ['id', 'index']),
+    ));
+    this.builtins.set('array.remove', (args, namedArgs) => removeArrayValue(readMutableArrayFromCall(args, namedArgs), arrayCallArg(args, namedArgs, 1, 'index') as number));
     this.builtins.set('array.sort', (args, namedArgs) => {
-      sortArray(readMutableArray(args[0]), namedArgs.get('order') ?? args[1], namedArgs.get('sort_field') ?? args[2]);
+      sortArray(
+        readMutableArrayFromCall(args, namedArgs),
+        arrayCallArg(args, namedArgs, 1, 'order'),
+        arrayCallArg(args, namedArgs, 2, 'sort_field', undefined, ['id', 'order']),
+      );
       return null;
     });
     this.builtins.set('array.sort_indices', (args, namedArgs) => sortIndicesArrayValue(
-      copyReadonlyArray(readArray(args[0])),
-      namedArgs.get('order') ?? args[1],
+      copyReadonlyArray(readArrayFromCall(args, namedArgs)),
+      arrayCallArg(args, namedArgs, 1, 'order'),
     ));
-    this.builtins.set('array.reverse', (args) => {
-      reverseArray(readMutableArray(args[0]));
+    this.builtins.set('array.reverse', (args, namedArgs) => {
+      reverseArray(readMutableArrayFromCall(args, namedArgs));
       return null;
     });
-    this.builtins.set('array.join', (args) => joinArray(copyReadonlyArray(readArray(args[0])), args[1]));
-    this.builtins.set('array.concat', (args) => concatArray(readMutableArray(args[0]), copyReadonlyArray(readArray(args[1]))));
-    this.builtins.set('array.slice', (args) => sliceArray(copyReadonlyArray(readArray(args[0])), args[1] as number, args[2] as number));
-    this.builtins.set('array.fill', (args) => {
-      const array = readMutableArray(args[0]);
+    this.builtins.set('array.join', (args, namedArgs) => joinArray(copyReadonlyArray(readArrayFromCall(args, namedArgs)), arrayCallArg(args, namedArgs, 1, 'separator')));
+    this.builtins.set('array.concat', (args, namedArgs) => concatArray(readMutableArrayFromCall(args, namedArgs), copyReadonlyArray(readArray(arrayCallArg(args, namedArgs, 1, 'id2')))));
+    this.builtins.set('array.slice', (args, namedArgs) => sliceArray(
+      copyReadonlyArray(readArrayFromCall(args, namedArgs)),
+      arrayCallArg(args, namedArgs, 1, 'index_from') as number,
+      arrayCallArg(args, namedArgs, 2, 'index_to', undefined, ['id', 'index_from']) as number,
+    ));
+    this.builtins.set('array.fill', (args, namedArgs) => {
+      const array = readMutableArrayFromCall(args, namedArgs);
       const size = getArraySize(array);
-      const from = args[2] === undefined ? 0 : Math.trunc(this.toNumber(args[2]));
-      const to = args[3] === undefined ? size : Math.trunc(this.toNumber(args[3]));
+      const indexFromArg = arrayCallArg(args, namedArgs, 2, 'index_from', undefined, ['id', 'value']);
+      const indexToArg = arrayCallArg(args, namedArgs, 3, 'index_to', undefined, ['id', 'value', 'index_from']);
+      const from = indexFromArg === undefined ? 0 : Math.trunc(this.toNumber(indexFromArg));
+      const to = indexToArg === undefined ? size : Math.trunc(this.toNumber(indexToArg));
       if (!Number.isFinite(from) || !Number.isFinite(to) || from < 0 || to > size || from > to) {
         throw new Error('Array fill indices are out of bounds');
       }
       for (let index = from; index < to; index++) {
-        setArrayValue(array, index, args[1]);
+        setArrayValue(array, index, arrayCallArg(args, namedArgs, 1, 'value'));
       }
       return null;
     });
-    this.builtins.set('array.clear', (args) => {
-      clearArray(readMutableArray(args[0]));
+    this.builtins.set('array.clear', (args, namedArgs) => {
+      clearArray(readMutableArrayFromCall(args, namedArgs));
       return null;
     });
   }
