@@ -1097,6 +1097,43 @@ tooManyCum = ta.cum(close, open)
     ]);
   });
 
+  it('resolves TA moving-average and momentum helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("TA MA Momentum Signatures")
+vwma = ta.vwma(source=close, length=3)
+rma = ta.rma(source=close, length=3)
+wma = ta.wma(source=close, length=3)
+swma = ta.swma(source=close)
+alma = ta.alma(series=close, length=5, offset=0.85, sigma=6, floor=false)
+hma = ta.hma(source=close, length=5)
+momentum = ta.mom(source=close, length=2)
+rate = ta.roc(source=close, length=2)
+plot(vwma + rma + wma + swma + alma + hma + momentum + rate)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid TA moving-average and momentum helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad TA MA Momentum Signatures")
+duplicateVwma = ta.vwma(close, source=open, length=3)
+unknownAlma = ta.alma(series=close, length=5, offset=0.85, sigma=6, biased=false)
+shortWma = ta.wma(source=close)
+tooManySwma = ta.swma(close, open)
+tooManyMom = ta.mom(close, 2, 3)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Argument 'source' for ta.vwma() was supplied multiple times",
+      "Unknown argument 'biased' for ta.alma()",
+      'ta.wma() expects at least 2 arguments',
+      "ta.wma() missing required argument 'length'",
+      'ta.swma() expects at most 1 argument',
+      'ta.mom() expects at most 2 arguments',
+    ]);
+  });
+
   it('resolves color helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Color Signatures")
