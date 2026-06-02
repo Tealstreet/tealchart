@@ -1118,32 +1118,48 @@ export function registerDrawingConstants(builtins: BuiltinRegistry): void {
     builtins.set(name, () => value);
   }
 
-  builtins.set('chart.point.new', (args) => ({
-    type: 'chart.point',
-    time: typeof args[0] === 'number' && Number.isFinite(args[0]) ? args[0] : null,
-    index: typeof args[1] === 'number' && Number.isFinite(args[1]) ? Math.trunc(args[1]) : null,
-    price: typeof args[2] === 'number' && Number.isFinite(args[2]) ? args[2] : null,
-  }));
-  builtins.set('chart.point.now', (args, _namedArgs, ctx) => ({
-    type: 'chart.point',
-    time: ctx.time.get(0) ?? null,
-    index: ctx.bar_index,
-    price: typeof args[0] === 'number' && Number.isFinite(args[0]) ? args[0] : ctx.close.get(0) ?? null,
-  }));
-  builtins.set('chart.point.from_index', (args) => ({
-    type: 'chart.point',
-    time: null,
-    index: typeof args[0] === 'number' && Number.isFinite(args[0]) ? Math.trunc(args[0]) : null,
-    price: typeof args[1] === 'number' && Number.isFinite(args[1]) ? args[1] : null,
-  }));
-  builtins.set('chart.point.from_time', (args) => ({
-    type: 'chart.point',
-    time: typeof args[0] === 'number' && Number.isFinite(args[0]) ? args[0] : null,
-    index: null,
-    price: typeof args[1] === 'number' && Number.isFinite(args[1]) ? args[1] : null,
-  }));
-  builtins.set('chart.point.copy', (args) => {
-    const source = args[0];
+  builtins.set('chart.point.new', (args, namedArgs) => {
+    const time = callArg(args, namedArgs, 0, 'time');
+    const index = callArg(args, namedArgs, 1, 'index', undefined, ['time']);
+    const price = callArg(args, namedArgs, 2, 'price', undefined, ['time', 'index']);
+    return {
+      type: 'chart.point',
+      time: typeof time === 'number' && Number.isFinite(time) ? time : null,
+      index: typeof index === 'number' && Number.isFinite(index) ? Math.trunc(index) : null,
+      price: typeof price === 'number' && Number.isFinite(price) ? price : null,
+    };
+  });
+  builtins.set('chart.point.now', (args, namedArgs, ctx) => {
+    const price = callArg(args, namedArgs, 0, 'price');
+    return {
+      type: 'chart.point',
+      time: ctx.time.get(0) ?? null,
+      index: ctx.bar_index,
+      price: typeof price === 'number' && Number.isFinite(price) ? price : ctx.close.get(0) ?? null,
+    };
+  });
+  builtins.set('chart.point.from_index', (args, namedArgs) => {
+    const index = callArg(args, namedArgs, 0, 'index');
+    const price = callArg(args, namedArgs, 1, 'price', undefined, ['index']);
+    return {
+      type: 'chart.point',
+      time: null,
+      index: typeof index === 'number' && Number.isFinite(index) ? Math.trunc(index) : null,
+      price: typeof price === 'number' && Number.isFinite(price) ? price : null,
+    };
+  });
+  builtins.set('chart.point.from_time', (args, namedArgs) => {
+    const time = callArg(args, namedArgs, 0, 'time');
+    const price = callArg(args, namedArgs, 1, 'price', undefined, ['time']);
+    return {
+      type: 'chart.point',
+      time: typeof time === 'number' && Number.isFinite(time) ? time : null,
+      index: null,
+      price: typeof price === 'number' && Number.isFinite(price) ? price : null,
+    };
+  });
+  builtins.set('chart.point.copy', (args, namedArgs) => {
+    const source = callArg(args, namedArgs, 0, 'id');
     if (!isChartPoint(source)) return Number.NaN;
     return { ...source };
   });

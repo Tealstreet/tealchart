@@ -1462,6 +1462,54 @@ matrixValues.sort(0, order.ascending, inputField)
     ]);
   });
 
+  it('resolves chart point helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Chart Point Signatures")
+point = chart.point.new(time=time, index=bar_index, price=close)
+mixed = chart.point.new(time=time, bar_index, high)
+current = chart.point.now(price=close)
+fromIndex = chart.point.from_index(index=bar_index, price=close)
+fromIndexMixed = chart.point.from_index(index=bar_index, high)
+fromTime = chart.point.from_time(time=time, price=close)
+copied = chart.point.copy(id=fromIndex)
+points = array.from(point, mixed, current, fromIndex, fromIndexMixed, fromTime, copied)
+plot(array.size(points))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('point')).toMatchObject({ kind: 'chart.point' });
+    expect(types.get('mixed')).toMatchObject({ kind: 'chart.point' });
+    expect(types.get('current')).toMatchObject({ kind: 'chart.point' });
+    expect(types.get('fromIndex')).toMatchObject({ kind: 'chart.point' });
+    expect(types.get('fromIndexMixed')).toMatchObject({ kind: 'chart.point' });
+    expect(types.get('fromTime')).toMatchObject({ kind: 'chart.point' });
+    expect(types.get('copied')).toMatchObject({ kind: 'chart.point' });
+    expect(types.get('points')).toMatchObject({ kind: 'array', elementType: { kind: 'chart.point' } });
+  });
+
+  it('reports invalid chart point helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Chart Point Signatures")
+point = chart.point.from_index(bar_index, close)
+unknownNew = chart.point.new(timestamp=time, index=bar_index, price=close)
+missingPrice = chart.point.from_index(index=bar_index)
+tooManyNow = chart.point.now(close, high)
+duplicateCopy = chart.point.copy(point, id=point)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'timestamp' for chart.point.new()",
+      'chart.point.new() expects at least 3 arguments',
+      "chart.point.new() missing required argument 'time'",
+      'chart.point.from_index() expects at least 2 arguments',
+      "chart.point.from_index() missing required argument 'price'",
+      'chart.point.now() expects at most 1 argument',
+      "Argument 'id' for chart.point.copy() was supplied multiple times",
+    ]);
+  });
+
   it('infers homogeneous array literal and array.from element types', () => {
     const result = checkProgram(parse(`
 indicator("Array Literal Types")
