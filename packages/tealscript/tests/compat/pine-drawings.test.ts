@@ -557,7 +557,7 @@ if barstate.islast
     linefill.new(line1=upper, lower, color.new(color.green, 70))
     box.new(left=bar_index - 2, high, right=bar_index, low, bgcolor=color.new(color.orange, 80), text="mixed box")
     points = array.from(chart.point.from_index(bar_index - 2, low[2]), chart.point.from_index(bar_index - 1, high[1]), chart.point.now(close))
-    polyline.new(points=points, closed=true, line_color=color.purple, line_width=3)
+    polyline.new(points=points, false, true, line_color=color.purple, line_width=3)
     dashboard = table.new(position=position.top_right, 2, rows=1, border_color=color.white, border_width=1)
     table.cell(table_id=dashboard, column=0, 0, "Mixed", text_color=color.white)
     table.cell(table_id=dashboard, column=1, 0, str.tostring(close), bgcolor=color.green)
