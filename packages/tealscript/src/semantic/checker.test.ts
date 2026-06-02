@@ -945,6 +945,58 @@ tooManyGet = matrix.get(m, 0, 0, 0)
     ]);
   });
 
+  it('resolves matrix structural helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Matrix Structural Signatures")
+m = matrix.new_int(rows=3, columns=2, initial_value=1)
+matrix.fill(id=m, value=7, from_row=1, to_row=2, from_column=0, to_column=2)
+matrix.reshape(id=m, rows=2, columns=3)
+matrix.add_row(id=m, row=1, array_id=array.from(1, 2, 3))
+matrix.add_col(id=m, column=1, array_id=array.from(4, 5, 6))
+matrix.add_column(id=m, column=2, array_id=array.from(7, 8, 9))
+removedRow = matrix.remove_row(id=m, row=0)
+removedCol = matrix.remove_col(id=m, column=0)
+removedColumn = matrix.remove_column(id=m, column=0)
+matrix.swap_rows(id=m, row1=0, row2=1)
+matrix.swap_columns(id=m, column1=0, column2=1)
+matrix.reverse(id=m)
+plot(matrix.rows(id=m) + matrix.columns(id=m) + array.size(removedRow) + array.size(removedCol) + array.size(removedColumn))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid matrix structural helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Matrix Structural Signatures")
+m = matrix.new_int(rows=2, columns=2, initial_value=1)
+unknownFill = matrix.fill(id=m, item=1)
+missingReshape = matrix.reshape(id=m, rows=1)
+tooManyReverse = matrix.reverse(m, m)
+duplicateAddRow = matrix.add_row(m, id=m)
+unknownAddCol = matrix.add_col(id=m, row=0)
+missingRemove = matrix.remove_column(id=m)
+tooManySwap = matrix.swap_rows(m, 0, 1, 2)
+missingSwapColumn = matrix.swap_columns(id=m, column1=0)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'item' for matrix.fill()",
+      'matrix.fill() expects at least 2 arguments',
+      "matrix.fill() missing required argument 'value'",
+      'matrix.reshape() expects at least 3 arguments',
+      "matrix.reshape() missing required argument 'columns'",
+      'matrix.reverse() expects at most 1 argument',
+      "Argument 'id' for matrix.add_row() was supplied multiple times",
+      "Unknown argument 'row' for matrix.add_col()",
+      'matrix.remove_column() expects at least 2 arguments',
+      "matrix.remove_column() missing required argument 'column'",
+      'matrix.swap_rows() expects at most 3 arguments',
+      'matrix.swap_columns() expects at least 3 arguments',
+      "matrix.swap_columns() missing required argument 'column2'",
+    ]);
+  });
+
   it('reports array element template mismatches for known mutable arrays', () => {
     const result = checkProgram(parse(`
 indicator("Bad Array Types")
