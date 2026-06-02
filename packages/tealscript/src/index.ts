@@ -6,6 +6,30 @@
 
 // Parser
 export {
+  compatibilityFailureClasses,
+  compatibilityStages,
+  createCompatibilityRunOutcome,
+  PINE_COMPATIBILITY_SCHEMA_VERSION,
+  summarizeCompatibilityOutcome,
+  validateCompatibilityStageOutcome,
+  validatePineScriptLedgerEntry,
+  type CompatibilityDiagnostic,
+  type CompatibilityFailureClass,
+  type CompatibilityRunOutcome,
+  type CompatibilityRunSummary,
+  type CompatibilityStage,
+  type CompatibilityStageOutcome,
+  type CompatibilityStageStatus,
+  type PineScriptCategory,
+  type PineScriptLedgerEntry,
+  type PineScriptLedgerSource,
+  type PineScriptLicenseStatus,
+  type PineScriptSourceKind,
+  type PineScriptStoragePolicy,
+  type PineVersion,
+} from './compat';
+
+export {
   // Parser functions
   parse,
   validate,
