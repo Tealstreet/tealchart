@@ -31,6 +31,9 @@ fixtures by default.
 | `Official Built-ins Checkpoint` | https://www.tradingview.com/pine-script-docs/language/built-ins/ | Namespace access through `ta.sma()` and comparison against a derived average. | Hand-checked SMA and boolean trend series over `compatibilityBars`. |
 | `Official Array Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/bar-states/ and https://www.tradingview.com/pine-script-docs/language/arrays/ | `barstate.isfirst` guarded array initialization plus per-bar dynamic growth. | First close remains stable; array size increments deterministically. |
 | `Official Barcolor Checkpoint` | https://www.tradingview.com/pine-script-docs/visuals/bar-coloring/ | Inside/outside candle classification drives `barcolor()` output. | Explicit four-bar color sequence over local OHLC bars. |
+| `Official Alert Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/alerts/ | Rising-close condition registers an `alertcondition()` and emits direct `alert()` calls from an `if` block. | Trigger plot, alertcondition values, and direct alert events over `compatibilityBars`. |
+| `Official Strategy Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/strategies/ | Market entry followed by a bracket `strategy.exit()` limit/stop order. | Position, closed-trade count, net profit, and closed trade ledger fields over four local bars. |
+| `Official Request Limit Checkpoint` | https://www.tradingview.com/pine-script-docs/writing/limitations/ | Repeated identical `request.security()` calls inside a loop reuse one unique request context. | No runtime error, one request context in the runtime profile, and a deterministic zero request-sum plot. |
 
 ## Public Idiom Checkpoints
 
