@@ -677,10 +677,17 @@ function isOpeningGapFill(order: StrategyOrder, openPrice: number): boolean {
       : openPrice < order.stopPrice;
   }
 
-  if (order.type === 'stop_limit' && order.stopPrice !== undefined) {
-    return order.direction === 'long'
-      ? openPrice > order.stopPrice
-      : openPrice < order.stopPrice;
+  if (order.type === 'stop_limit') {
+    if (order.stopLimitActivated && order.limitPrice !== undefined) {
+      return order.direction === 'long'
+        ? openPrice < order.limitPrice
+        : openPrice > order.limitPrice;
+    }
+    if (order.stopPrice !== undefined) {
+      return order.direction === 'long'
+        ? openPrice > order.stopPrice
+        : openPrice < order.stopPrice;
+    }
   }
 
   return false;

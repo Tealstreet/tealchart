@@ -584,4 +584,43 @@ describe('strategy ledger model', () => {
     ]);
     expect(order).toMatchObject({ status: 'filled', avgFillPrice: 98 });
   });
+
+  it('fills activated stop-limit opening gaps against the limit price', () => {
+    const ledger = createStrategyLedger();
+    const order = submitStrategyOrder(ledger, {
+      id: 'Stop limit',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      stopPrice: 102,
+      limitPrice: 100,
+      barIndex: 0,
+      time: 1,
+    });
+
+    expect(fillPendingStrategyOrdersOnTicks(ledger, [
+      { time: 2, price: 101, kind: 'open', sequence: 0 },
+      { time: 3, price: 103, kind: 'high', sequence: 1 },
+      { time: 4, price: 101, kind: 'low', sequence: 2 },
+      { time: 5, price: 101, kind: 'close', sequence: 3 },
+    ], 1)).toEqual([]);
+    expect(order).toMatchObject({
+      status: 'pending',
+      stopLimitActivated: true,
+      stopLimitActivatedBarIndex: 1,
+    });
+
+    const fills = fillPendingStrategyOrdersOnTicks(ledger, [
+      { time: 6, price: 98, kind: 'open', sequence: 0 },
+      { time: 7, price: 101, kind: 'high', sequence: 1 },
+      { time: 8, price: 97, kind: 'low', sequence: 2 },
+      { time: 9, price: 99, kind: 'close', sequence: 3 },
+    ], 2);
+
+    expect(fills.map((fill) => ({ orderId: fill.orderId, price: fill.price, time: fill.time }))).toEqual([
+      { orderId: 'Stop limit', price: 98, time: 6 },
+    ]);
+    expect(order).toMatchObject({ status: 'filled', avgFillPrice: 98 });
+  });
 });
