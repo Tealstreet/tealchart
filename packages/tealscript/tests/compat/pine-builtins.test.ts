@@ -156,6 +156,107 @@ plot(ta.linreg(change, 3, 0), title="Change LinReg")
     expect(roundSeries(getPlot(result, 'Change LinReg').values)).toEqual([null, null, null, -3.166667, -5, 0.166667, 4.333333, 5.333333, 0.166667, 1.333333, 0.333333, 0.833333]);
   });
 
+  it('runs tail ta helper named argument idioms', () => {
+    const positional = runCompatScript(`
+indicator("Tail TA positional helpers")
+[diPlus, diMinus, adx] = ta.dmi(3, 3)
+sar = ta.sar(0.02, 0.02, 0.2)
+pivotHigh = ta.pivothigh(high, 2, 2)
+pivotLow = ta.pivotlow(low, 2, 2)
+defaultPivotHigh = ta.pivothigh(2, 2)
+defaultPivotLow = ta.pivotlow(2, 2)
+mixedPivotHigh = ta.pivothigh(2, rightbars=2)
+mixedPivotLow = ta.pivotlow(2, rightbars=2)
+linreg = ta.linreg(close, 3, 1)
+plot(diPlus, title="DI Plus")
+plot(diMinus, title="DI Minus")
+plot(adx, title="ADX")
+plot(sar, title="SAR")
+plot(pivotHigh, title="Pivot High")
+plot(pivotLow, title="Pivot Low")
+plot(defaultPivotHigh, title="Default Pivot High")
+plot(defaultPivotLow, title="Default Pivot Low")
+plot(mixedPivotHigh, title="Mixed Pivot High")
+plot(mixedPivotLow, title="Mixed Pivot Low")
+plot(linreg, title="LinReg")
+`);
+    const named = runCompatScript(`
+indicator("Tail TA named helpers")
+[diPlus, diMinus, adx] = ta.dmi(diLength=3, adxSmoothing=3)
+sar = ta.sar(start=0.02, inc=0.02, max=0.2)
+pivotHigh = ta.pivothigh(source=high, leftbars=2, rightbars=2)
+pivotLow = ta.pivotlow(source=low, leftbars=2, rightbars=2)
+defaultPivotHigh = ta.pivothigh(leftbars=2, rightbars=2)
+defaultPivotLow = ta.pivotlow(leftbars=2, rightbars=2)
+mixedPivotHigh = ta.pivothigh(2, rightbars=2)
+mixedPivotLow = ta.pivotlow(2, rightbars=2)
+linreg = ta.linreg(source=close, length=3, offset=1)
+plot(diPlus, title="DI Plus")
+plot(diMinus, title="DI Minus")
+plot(adx, title="ADX")
+plot(sar, title="SAR")
+plot(pivotHigh, title="Pivot High")
+plot(pivotLow, title="Pivot Low")
+plot(defaultPivotHigh, title="Default Pivot High")
+plot(defaultPivotLow, title="Default Pivot Low")
+plot(mixedPivotHigh, title="Mixed Pivot High")
+plot(mixedPivotLow, title="Mixed Pivot Low")
+plot(linreg, title="LinReg")
+`);
+
+    expect(positional.errors).toEqual([]);
+    expect(named.errors).toEqual([]);
+    for (const title of positional.plots.map((plot) => plot.title)) {
+      expect(roundSeries(getPlot(named, title).values)).toEqual(roundSeries(getPlot(positional, title).values));
+    }
+    expect(roundSeries(getPlot(named, 'DI Plus').values)).toEqual([
+      0,
+      23.076923,
+      16.666667,
+      0,
+      0,
+      0,
+      28.571429,
+      33.333333,
+      7.692308,
+      7.692308,
+      15.384615,
+      0,
+    ]);
+    expect(roundSeries(getPlot(named, 'SAR').values)).toEqual([103, 99, 99, 99, 109, 109, 99, 99, 99, 99, 99, 114]);
+    expect(roundSeries(getPlot(named, 'Pivot High').values)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      109,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+    ]);
+    expect(roundSeries(getPlot(named, 'Pivot Low').values)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      96,
+      null,
+      null,
+      null,
+      null,
+    ]);
+    expect(roundSeries(getPlot(named, 'Mixed Pivot High').values)).toEqual(roundSeries(getPlot(named, 'Default Pivot High').values));
+    expect(roundSeries(getPlot(named, 'Mixed Pivot Low').values)).toEqual(roundSeries(getPlot(named, 'Default Pivot Low').values));
+    expect(roundSeries(getPlot(named, 'LinReg').values)).toEqual([null, null, 104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111]);
+  });
+
   it('runs array covariance helper idioms', () => {
     const result = runCompatScript(`
 indicator("Array covariance docs smoke")

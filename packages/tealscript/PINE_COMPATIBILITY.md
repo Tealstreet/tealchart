@@ -121,7 +121,9 @@ aliases/helpers (`ta.change` numeric and boolean forms, `ta.cross`, `ta.range`,
 `ta.rising`, and `ta.falling`). The
 statistical helper pass covers `ta.median`, `ta.mode`,
 `ta.percentile_nearest_rank`, `ta.percentile_linear_interpolation`, and
-`ta.percentrank`. These are covered in the golden compatibility harness.
+`ta.percentrank`. Covered DMI, SAR, pivot, and linear regression helpers accept
+common Pine named arguments, and pivot helpers support default-source
+two-argument calls. These are covered in the golden compatibility harness.
 
 ## Common `str.*` Coverage
 
