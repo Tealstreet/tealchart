@@ -225,18 +225,17 @@ The parser accepts Pine-style `map<key, value>` declarations and generic
 constructor calls such as `map.new<string, float>()`. Semantic diagnostics
 enforce obvious primitive key/value mismatches for known `map<K, V>` variables
 on `map.put`, `map.get`, `map.contains`, and `map.remove`, including receiver
-method-call forms and unannotated `map.new<K, V>()` constructor inference. Map
-loops support the documented key-value tuple form, `for [key, value] in data`.
+method-call forms and unannotated `map.new<K, V>()` constructor inference.
+Reference and UDT map values are also checked conservatively, so
+`map<string, label>` and `map<string, MyType>` reject mismatched values. Runtime
+coverage includes Pine value keys, including color constants. Map loops support
+the documented key-value tuple form, `for [key, value] in data`.
 Bare collection container names in template positions, such as
 `map<string, array>`, are rejected because bare collection types are incomplete
 type identifiers. Nested collection template syntax such as
 `array<array<float>>` and `map<string, array<float>>` now parses and receives
 explicit semantic diagnostics because Pine does not allow collections to
 directly contain other collection types.
-
-Known limits: map keys are currently restricted at runtime to finite numbers,
-strings, and booleans. Complete reference-type rules belong to the future
-qualified type-system and UDT phases.
 
 ## Common User-Defined Type Coverage
 
@@ -266,19 +265,20 @@ User-defined `method` declarations now parse and dispatch for primitive and
 UDT receiver values, including method calls that mutate and return UDT
 references. The runtime uses the receiver as the method's first argument, in
 line with Pine's documented method-call equivalence, and selects local UDT
-method overloads by receiver type.
+method overloads by receiver type. Semantic diagnostics report calls where a
+known receiver type does not match any local method receiver annotation.
 
-Known limits: UDT field and method receiver types are recorded dynamically but
-not yet fully enforced by the semantic checker. Semantic diagnostics cover
-unknown local UDT field reads/assignments, constructor unknown field names,
-duplicate bindings, excess positional arguments, invalid argument order between
-named and positional arguments, and conservative primitive/reference field type
-mismatches in local UDT field defaults, constructors, and field assignments.
-Library diagnostics also report exported UDT fields and exported function or
-method parameters that expose non-exported local UDTs, including through
-collection templates, and exported callables that return non-exported local
-UDTs. Full reference-type diagnostics remain planned in Epic 12 and the
-qualified type-system epic.
+Known limits: UDT field types are recorded dynamically but not yet fully
+enforced by the semantic checker outside the local constructor/assignment paths.
+Semantic diagnostics cover unknown local UDT field reads/assignments,
+constructor unknown field names, duplicate bindings, excess positional
+arguments, invalid argument order between named and positional arguments, and
+conservative primitive/reference field type mismatches in local UDT field
+defaults, constructors, and field assignments. Library diagnostics also report
+exported UDT fields and exported function or method parameters that expose
+non-exported local UDTs, including through collection templates, and exported
+callables that return non-exported local UDTs. Full qualifier-sensitive
+reference diagnostics remain planned in the qualified type-system epic.
 
 ## Common Library Syntax Coverage
 
@@ -299,6 +299,7 @@ library globals. Exported function/method scope diagnostics also report
 The runtime can also bind imported libraries from a deterministic host-provided
 registry keyed by Pine import path. This supports `alias.exportedFunction(...)`
 calls and exported user-defined type constructors such as `alias.Type.new(...)`
+and exported literal/builtin constants such as `alias.length` or `alias.color`
 in offline tests and chart integrations that pre-resolve library source.
 Exported imported methods dispatch on imported UDT instances. Non-exported
 library functions, methods, and types remain private to their source module, but
@@ -309,9 +310,9 @@ through exported fields, callable parameters, or inferred callable return values
 is also exported by the library.
 
 Published TradingView lookup is not implemented yet. `import` declarations
-without a matching registry entry emit an explicit unsupported diagnostic until
-Epic 12 adds versioned remote/local resolution, enum namespace binding,
-exported constants, and request-expression qualifier diagnostics.
+without a matching registry entry emit an explicit unsupported diagnostic.
+Versioned remote/local source resolution is host integration work for callers
+that want to resolve libraries outside the deterministic registry.
 
 ## Common `color.*` Coverage
 

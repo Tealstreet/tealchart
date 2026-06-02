@@ -160,6 +160,7 @@ export interface VariableDeclaration extends BaseNode {
   names: VariableDeclarator | TupleDeclarator;
   typeAnnotation?: TypeAnnotation | null;
   init: Expression;
+  exported?: boolean;
 }
 
 export interface VariableDeclarator extends BaseNode {

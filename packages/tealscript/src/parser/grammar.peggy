@@ -280,25 +280,27 @@ VariableDeclaration
   / UntypedVariableDeclaration
 
 TypedVariableDeclaration
-  = kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" _ init:Expression _ LineTerminator? {
+  = exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" _ init:Expression _ LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
         names: pattern,
         typeAnnotation: type,
         init,
+        exported: !!exported,
         loc: loc()
       };
     }
 
 UntypedVariableDeclaration
-  = kind:VarKind? _ pattern:DeclarationPattern _ "=" _ init:Expression _ LineTerminator? {
+  = exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" _ init:Expression _ LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
         names: pattern,
         typeAnnotation: null,
         init,
+        exported: !!exported,
         loc: loc()
       };
     }
