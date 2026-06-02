@@ -537,8 +537,10 @@ settlement-as-close, and chart modifiers propagate as opaque request-datafeed
 keys. The in-memory test datafeed derives Heikin-Ashi OHLC when matching base
 bars exist, with tests covering the `ticker.heikinashi()` modifier. Renko, Line
 Break, Kagi, and Point & Figure contexts must be supplied by the host.
-Synthetic strategy/backtest execution remains unsupported until the strategy
-runtime and broker emulator are implemented.
+Synthetic strategy/backtest execution remains deferred until the strategy
+intrabar execution contract is implemented. The current broker emulator is
+chart-OHLC based; lower-timeframe Bar Magnifier behavior and synthetic execution
+feeds are tracked in [`STRATEGY_INTRABAR_DESIGN.md`](./STRATEGY_INTRABAR_DESIGN.md).
 
 ## `max_bars_back` Declaration Coverage
 
