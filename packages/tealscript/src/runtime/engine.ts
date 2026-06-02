@@ -195,6 +195,7 @@ import {
   fillStrategyMarketOrder,
   selectStrategyIntrabarContext,
   submitStrategyOrder,
+  cloneStrategyLedger,
   type StrategyDirection,
   type StrategyFill,
   type StrategyIntrabarContext,
@@ -564,6 +565,10 @@ export class TealscriptEngine {
     };
   }
 
+  getStrategyLedger(): StrategyLedger {
+    return cloneStrategyLedger(this.ctx.strategyLedger);
+  }
+
   private createDeclarationMetadata(): IndicatorDeclarationMetadata {
     return {
       title: this.ctx.indicatorTitle,
@@ -627,7 +632,11 @@ export class TealscriptEngine {
       }
       this.ctx.captureRealtimeRollbackState();
       this.prepareRealtimeExecution(ast);
-      this.executeRealtimeStatements(ast);
+      if (this.shouldExecuteRealtimeStatements()) {
+        this.executeRealtimeStatements(ast);
+      } else {
+        this.fillPendingStrategyOrdersForCurrentBar();
+      }
 
       return this.ctx.getPlots();
     }
@@ -657,8 +666,12 @@ export class TealscriptEngine {
     this.ctx.updateCurrentBar(bar);
     this.prepareRealtimeExecution(ast);
 
-    // Re-execute statements for current bar
-    this.executeRealtimeStatements(ast);
+    // Re-execute statements for current bar when Pine strategy settings allow it.
+    if (this.shouldExecuteRealtimeStatements()) {
+      this.executeRealtimeStatements(ast);
+    } else {
+      this.fillPendingStrategyOrdersForCurrentBar();
+    }
 
     return this.ctx.getPlots();
   }
@@ -685,10 +698,18 @@ export class TealscriptEngine {
     this.requestEvaluationCache.clear();
     this.requestContextKeys.clear();
     this.resetPerBarBuiltinState();
+    this.currentStrategyIntrabarContext = null;
     this.registerTypeDeclarations(ast);
     this.registerUserFunctions(ast);
     this.importedLibraries.clear();
     this.registerLibraryImports(ast);
+  }
+
+  private shouldExecuteRealtimeStatements(): boolean {
+    if (!this.hasStrategyDeclaration) {
+      return true;
+    }
+    return this.ctx.strategyLedger.settings.calcOnEveryTick || this.ctx.barstate.isconfirmed;
   }
 
   private executeRealtimeStatements(ast: Program): void {

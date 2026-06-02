@@ -772,7 +772,7 @@ plot(strategy.eventrades, title="Evens")`;
 
     it('rolls back strategy fills between realtime updateBar calls', () => {
       const script = `//@version=6
-strategy("Realtime strategy", process_orders_on_close=true)
+strategy("Realtime strategy", process_orders_on_close=true, calc_on_every_tick=true)
 if barstate.islast
     strategy.entry("Last", strategy.long, qty=1)
 plot(strategy.position_size, title="Position")
@@ -824,10 +824,128 @@ plot(strategy.position_avg_price, title="Average Price")`;
       const firstUpdate = engine.updateBar(ast, realtimeBar);
       const secondUpdate = engine.updateBar(ast, { ...realtimeBar, close: 150.75 });
 
-      expect(firstUpdate.find((plot) => plot.title === 'Position')?.values).toEqual([0, 0, 0, 1]);
-      expect(firstUpdate.find((plot) => plot.title === 'Average Price')?.values).toEqual([null, null, null, 150]);
-      expect(secondUpdate.find((plot) => plot.title === 'Position')?.values).toEqual([0, 0, 0, 1]);
-      expect(secondUpdate.find((plot) => plot.title === 'Average Price')?.values).toEqual([null, null, null, 150]);
+      expect(firstUpdate.find((plot) => plot.title === 'Position')?.values).toEqual([0, 0, 0]);
+      expect(firstUpdate.find((plot) => plot.title === 'Average Price')?.values).toEqual([null, null, null]);
+      expect(secondUpdate.find((plot) => plot.title === 'Position')?.values).toEqual([0, 0, 0]);
+      expect(secondUpdate.find((plot) => plot.title === 'Average Price')?.values).toEqual([null, null, null]);
+      expect(engine.getStrategyLedger().position).toMatchObject({
+        size: 1,
+        avgPrice: 150,
+      });
+    });
+
+    it('does not recalculate default strategies on unconfirmed realtime ticks', () => {
+      const script = `//@version=6
+strategy("Realtime default calculation", process_orders_on_close=true, calc_on_every_tick=false)
+var executions = 0
+if barstate.isrealtime
+    executions := executions + 1
+    strategy.entry("Realtime", strategy.long, qty=1)
+plot(executions, title="Executions")
+plot(strategy.position_size, title="Position")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      const result = engine.execute(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Executions')?.values).toEqual([0, 0, 0]);
+
+      const realtimeBar = {
+        ...bars[2],
+        time: bars[2].time + 60_000,
+        open: 150,
+        high: 151,
+        low: 149,
+        close: 150.5,
+      };
+      const firstTick = engine.updateBar(ast, realtimeBar);
+      const secondTick = engine.updateBar(ast, { ...realtimeBar, high: 152, close: 151.5 });
+
+      expect(firstTick.find((plot) => plot.title === 'Executions')?.values).toEqual([0, 0, 0]);
+      expect(secondTick.find((plot) => plot.title === 'Executions')?.values).toEqual([0, 0, 0]);
+      expect(engine.getStrategyLedger().orders).toHaveLength(0);
+
+      const nextBar = engine.updateBar(ast, {
+        ...realtimeBar,
+        time: realtimeBar.time + 60_000,
+        open: 152,
+        high: 153,
+        low: 151,
+        close: 152.5,
+      });
+
+      expect(nextBar.find((plot) => plot.title === 'Executions')?.values).toEqual([0, 0, 0, 1]);
+      expect(nextBar.find((plot) => plot.title === 'Position')?.values).toEqual([0, 0, 0, 1]);
+      expect(engine.getStrategyLedger().orders).toHaveLength(1);
+      expect(engine.getStrategyLedger().fills).toHaveLength(1);
+    });
+
+    it('recalculates calc_on_every_tick strategies on unconfirmed realtime ticks', () => {
+      const script = `//@version=6
+strategy("Realtime every tick", calc_on_every_tick=true)
+varip executions = 0
+if barstate.isrealtime
+    executions := executions + 1
+plot(executions, title="Executions")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+
+      engine.execute(ast, bars);
+      const realtimeBar = {
+        ...bars[2],
+        time: bars[2].time + 60_000,
+        open: 150,
+        high: 151,
+        low: 149,
+        close: 150.5,
+      };
+      const firstTick = engine.updateBar(ast, realtimeBar);
+      const firstValues = [...firstTick.find((plot) => plot.title === 'Executions')!.values];
+      const secondTick = engine.updateBar(ast, { ...realtimeBar, high: 152, close: 151.5 });
+      const secondValues = [...secondTick.find((plot) => plot.title === 'Executions')!.values];
+
+      expect(firstValues).toEqual([0, 0, 0, 1]);
+      expect(secondValues).toEqual([0, 0, 0, 2]);
+    });
+
+    it('refreshes strategy execution paths between realtime ticks', () => {
+      const script = `//@version=6
+strategy("Realtime refreshed paths")
+if bar_index == 2
+    strategy.entry("Buy", strategy.long, limit=90, qty=1)
+plot(strategy.position_size, title="Position")
+plot(strategy.opentrades, title="Open Trades")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      const realtimeBar = {
+        ...bars[2],
+        time: bars[2].time + 60_000,
+        open: 105,
+        high: 106,
+        low: 104,
+        close: 105.5,
+      };
+      const firstTick = engine.updateBar(ast, realtimeBar);
+      const secondTick = engine.updateBar(ast, { ...realtimeBar, low: 89, close: 90.5 });
+
+      expect(firstTick.find((plot) => plot.title === 'Position')?.values).toEqual([0, 0, 0]);
+      expect(firstTick.find((plot) => plot.title === 'Open Trades')?.values).toEqual([0, 0, 0]);
+      expect(secondTick.find((plot) => plot.title === 'Position')?.values).toEqual([0, 0, 0]);
+      expect(secondTick.find((plot) => plot.title === 'Open Trades')?.values).toEqual([0, 0, 0]);
+      expect(engine.getStrategyLedger().fills).toHaveLength(1);
+      expect(engine.getStrategyLedger().fills[0]).toMatchObject({
+        orderId: 'Buy',
+        price: 90,
+      });
     });
 
     it('closes matching entry trades with strategy.close market orders', () => {

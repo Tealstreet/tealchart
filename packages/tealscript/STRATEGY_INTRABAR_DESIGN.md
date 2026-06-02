@@ -188,5 +188,11 @@ must stay offline and deterministic.
    re-appending final values. Realtime `calc_on_every_tick` remains separate.
 7. Add reduced Pine checkpoint tests for Bar Magnifier and recalculation
    examples.
+   Done. The compatibility checkpoints include reduced official strategy
+   examples for Bar Magnifier and recalculation-after-fill behavior.
+8. Implement realtime `calc_on_every_tick` strategy behavior.
+   Done. Default strategies keep broker fills active on realtime updates but
+   defer script recalculation until the realtime bar is confirmed; strategies
+   with `calc_on_every_tick=true` recalculate on unconfirmed realtime ticks.
 
 Each step should be a separate PR unless the diff is very small.
