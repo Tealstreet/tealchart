@@ -157,6 +157,12 @@ matrix.fill(id=mixed, 6, 0, 1, 0, 1)
 mixedSlice = matrix.submatrix(id=mixed, 0, 2, 0, 2)
 mixedTail = matrix.new_int(rows=1, columns=2, initial_value=13)
 matrix.concat(id=mixed, mixedTail)
+partial = matrix.new_int(rows=2, columns=3, initial_value=0)
+matrix.set(id=partial, row=1, 2, 99)
+partialGet = matrix.get(id=partial, row=1, 2)
+matrix.fill(id=partial, value=5, 0, 1, 0, 1)
+partialSlice = matrix.submatrix(id=partial, from_row=1, 2, 2, 3)
+matrix.reshape(id=partial, rows=1, 6)
 plot(rows, title="Rows")
 plot(columns, title="Columns")
 plot(elements, title="Elements")
@@ -176,6 +182,10 @@ plot(matrix.get(id=mixed, 0, 0), title="Mixed Fill")
 plot(mixedSlice.get(0, 1), title="Mixed Slice")
 plot(mixed.rows(), title="Mixed Concat Rows")
 plot(mixed.get(3, 0), title="Mixed Concat Value")
+plot(partialGet, title="Partial Get")
+plot(matrix.get(id=partial, 0, 0), title="Partial Fill")
+plot(partialSlice.get(0, 0), title="Partial Slice")
+plot(partial.columns(), title="Partial Reshape")
 plot(matrix.is_valid(id=m) ? 1 : 0, title="Valid")
 plot(m.is_square() ? 1 : 0, title="Square")
 `);
@@ -200,6 +210,10 @@ plot(m.is_square() ? 1 : 0, title="Square")
     expect(roundSeries(getPlot(result, 'Mixed Slice').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
     expect(roundSeries(getPlot(result, 'Mixed Concat Rows').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
     expect(roundSeries(getPlot(result, 'Mixed Concat Value').values)).toEqual([13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13]);
+    expect(roundSeries(getPlot(result, 'Partial Get').values)).toEqual([99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99]);
+    expect(roundSeries(getPlot(result, 'Partial Fill').values)).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
+    expect(roundSeries(getPlot(result, 'Partial Slice').values)).toEqual([99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99]);
+    expect(roundSeries(getPlot(result, 'Partial Reshape').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
     expect(roundSeries(getPlot(result, 'Valid').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(roundSeries(getPlot(result, 'Square').values)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   });

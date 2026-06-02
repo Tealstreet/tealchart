@@ -6091,17 +6091,24 @@ export class TealscriptEngine {
       index: number,
       name: string,
       fallback?: unknown,
+      priorNames: string[] = index > 0 ? ['id'] : [],
     ): unknown => {
-      const positionalIndex = namedArgs.has('id') && !isPineMatrix(args[0]) ? index - 1 : index;
+      const positionalIndex = index - priorNames.filter((priorName) => namedArgs.has(priorName)).length;
       return this.getCallArg(args, namedArgs, positionalIndex, name, fallback);
     };
-    const optionalMatrixCallRangeArg = (args: unknown[], namedArgs: Map<string, unknown>, index: number, name: string): number | undefined => {
-      const value = matrixCallArg(args, namedArgs, index, name);
+    const optionalMatrixCallRangeArg = (
+      args: unknown[],
+      namedArgs: Map<string, unknown>,
+      index: number,
+      name: string,
+      priorNames?: string[],
+    ): number | undefined => {
+      const value = matrixCallArg(args, namedArgs, index, name, undefined, priorNames);
       return value === undefined ? undefined : this.toNumber(value);
     };
     const readInsertionArgs = (args: unknown[], namedArgs: Map<string, unknown>, indexName: 'row' | 'column'): [number | undefined, PineArray | undefined] => {
       const indexArg = matrixCallArg(args, namedArgs, 1, indexName);
-      const arrayArg = matrixCallArg(args, namedArgs, 2, 'array_id');
+      const arrayArg = matrixCallArg(args, namedArgs, 2, 'array_id', undefined, ['id', indexName]);
       if (indexArg === undefined) {
         if (arrayArg !== undefined && !isPineArray(arrayArg)) {
           throw new Error('Expected array');
@@ -6132,14 +6139,14 @@ export class TealscriptEngine {
     this.builtins.set('matrix.get', (args, namedArgs) => getMatrixValue(
       readMatrix(this.matrixReceiverArg(args, namedArgs)),
       matrixCallArg(args, namedArgs, 1, 'row') as number,
-      matrixCallArg(args, namedArgs, 2, 'column') as number,
+      matrixCallArg(args, namedArgs, 2, 'column', undefined, ['id', 'row']) as number,
     ));
     this.builtins.set('matrix.set', (args, namedArgs) => {
       setMatrixValue(
         readMatrix(this.matrixReceiverArg(args, namedArgs)),
         matrixCallArg(args, namedArgs, 1, 'row') as number,
-        matrixCallArg(args, namedArgs, 2, 'column') as number,
-        matrixCallArg(args, namedArgs, 3, 'value'),
+        matrixCallArg(args, namedArgs, 2, 'column', undefined, ['id', 'row']) as number,
+        matrixCallArg(args, namedArgs, 3, 'value', undefined, ['id', 'row', 'column']),
       );
       return null;
     });
@@ -6147,10 +6154,10 @@ export class TealscriptEngine {
       fillMatrix(
         readMatrix(this.matrixReceiverArg(args, namedArgs)),
         matrixCallArg(args, namedArgs, 1, 'value'),
-        optionalMatrixCallRangeArg(args, namedArgs, 2, 'from_row'),
-        optionalMatrixCallRangeArg(args, namedArgs, 3, 'to_row'),
-        optionalMatrixCallRangeArg(args, namedArgs, 4, 'from_column'),
-        optionalMatrixCallRangeArg(args, namedArgs, 5, 'to_column'),
+        optionalMatrixCallRangeArg(args, namedArgs, 2, 'from_row', ['id', 'value']),
+        optionalMatrixCallRangeArg(args, namedArgs, 3, 'to_row', ['id', 'value', 'from_row']),
+        optionalMatrixCallRangeArg(args, namedArgs, 4, 'from_column', ['id', 'value', 'from_row', 'to_row']),
+        optionalMatrixCallRangeArg(args, namedArgs, 5, 'to_column', ['id', 'value', 'from_row', 'to_row', 'from_column']),
       );
       return null;
     });
@@ -6158,7 +6165,7 @@ export class TealscriptEngine {
       reshapeMatrix(
         readMatrix(this.matrixReceiverArg(args, namedArgs)),
         matrixCallArg(args, namedArgs, 1, 'rows') as number,
-        matrixCallArg(args, namedArgs, 2, 'columns') as number,
+        matrixCallArg(args, namedArgs, 2, 'columns', undefined, ['id', 'rows']) as number,
       );
       return null;
     });
@@ -6193,7 +6200,7 @@ export class TealscriptEngine {
       swapMatrixRows(
         readMatrix(this.matrixReceiverArg(args, namedArgs)),
         matrixCallArg(args, namedArgs, 1, 'row1') as number,
-        matrixCallArg(args, namedArgs, 2, 'row2') as number,
+        matrixCallArg(args, namedArgs, 2, 'row2', undefined, ['id', 'row1']) as number,
       );
       return null;
     });
@@ -6201,7 +6208,7 @@ export class TealscriptEngine {
       swapMatrixColumns(
         readMatrix(this.matrixReceiverArg(args, namedArgs)),
         matrixCallArg(args, namedArgs, 1, 'column1') as number,
-        matrixCallArg(args, namedArgs, 2, 'column2') as number,
+        matrixCallArg(args, namedArgs, 2, 'column2', undefined, ['id', 'column1']) as number,
       );
       return null;
     });
@@ -6236,9 +6243,9 @@ export class TealscriptEngine {
       return submatrixValue(
         matrix,
         optionalMatrixCallRangeArg(args, namedArgs, 1, 'from_row'),
-        optionalMatrixCallRangeArg(args, namedArgs, 2, 'to_row'),
-        optionalMatrixCallRangeArg(args, namedArgs, 3, 'from_column'),
-        optionalMatrixCallRangeArg(args, namedArgs, 4, 'to_column'),
+        optionalMatrixCallRangeArg(args, namedArgs, 2, 'to_row', ['id', 'from_row']),
+        optionalMatrixCallRangeArg(args, namedArgs, 3, 'from_column', ['id', 'from_row', 'to_row']),
+        optionalMatrixCallRangeArg(args, namedArgs, 4, 'to_column', ['id', 'from_row', 'to_row', 'from_column']),
       );
     });
     this.builtins.set('matrix.concat', (args, namedArgs) => {
