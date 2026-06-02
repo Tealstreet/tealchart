@@ -1053,7 +1053,7 @@ text = "BTC-USDT-USDT"
 formatted = str.tostring(value=close, format="#.0")
 parsed = str.tonumber(string="42.5")
 timeText = str.format_time(time=time, format="yyyy-MM-dd", timezone=syminfo.timezone)
-message = str.format(format="close")
+message = str.format(format="close={0}", close)
 hasUsdt = str.contains(string=text, substring="USDT")
 starts = str.startswith(source=text, target="BTC")
 ends = str.endswith(source=text, str="USDT")

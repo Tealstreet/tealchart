@@ -236,6 +236,7 @@ interface BuiltinSignature {
   maxArgs?: number;
   allowExtraNamed?: boolean;
   allowExtraPositional?: boolean;
+  allowNamedPrefixWithPositional?: boolean;
 }
 
 const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
@@ -458,7 +459,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['str.tostring', { params: ['value', 'format'], minArgs: 1, maxArgs: 2 }],
   ['str.tonumber', { params: ['string'], minArgs: 1, maxArgs: 1 }],
   ['str.format_time', { params: ['time', 'format', 'timezone'], minArgs: 0, maxArgs: 3 }],
-  ['str.format', { params: ['format'], minArgs: 1, allowExtraPositional: true }],
+  ['str.format', { params: ['format'], minArgs: 1, allowExtraPositional: true, allowNamedPrefixWithPositional: true }],
   ['str.length', { params: ['source'], aliases: { string: 'source' }, minArgs: 1, maxArgs: 1 }],
   ['str.contains', { params: ['source', 'str'], aliases: { string: 'source', substring: 'str', target: 'str' }, minArgs: 2, maxArgs: 2 }],
   ['str.startswith', { params: ['source', 'str'], aliases: { string: 'source', substring: 'str', target: 'str' }, minArgs: 2, maxArgs: 2 }],
@@ -1571,7 +1572,7 @@ class SemanticChecker {
       return;
     }
 
-    this.checkArgumentOrder(expression.arguments, displayName);
+    this.checkArgumentOrder(expression.arguments, displayName, signature);
     this.checkArgumentNames(expression.arguments, signature, displayName);
     this.checkArgumentCount(expression.arguments, signature, displayName);
     this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName);
@@ -2020,7 +2021,9 @@ class SemanticChecker {
     return args.find((argument) => argument.name?.name === name)?.value ?? args[positionalIndex]?.value;
   }
 
-  private checkArgumentOrder(args: CallArgument[], displayName: string): void {
+  private checkArgumentOrder(args: CallArgument[], displayName: string, signature?: BuiltinSignature): void {
+    if (signature?.allowNamedPrefixWithPositional) return;
+
     let hasNamedArgument = false;
     for (const arg of args) {
       if (arg.name) {
