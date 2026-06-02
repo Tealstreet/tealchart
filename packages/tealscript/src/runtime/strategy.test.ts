@@ -147,6 +147,7 @@ describe('strategy ledger model', () => {
       commissionValue: 0.05,
       slippageTicks: 0,
       processOrdersOnClose: false,
+      useBarMagnifier: false,
     });
   });
 

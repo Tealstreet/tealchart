@@ -135,6 +135,7 @@ export interface StrategyLedgerSettings {
   calcOnOrderFills: boolean;
   calcOnEveryTick: boolean;
   processOrdersOnClose: boolean;
+  useBarMagnifier: boolean;
 }
 
 export interface StrategyOrder {
@@ -279,6 +280,7 @@ export function createDefaultStrategySettings(settings: Partial<StrategyLedgerSe
     calcOnOrderFills: false,
     calcOnEveryTick: false,
     processOrdersOnClose: false,
+    useBarMagnifier: false,
     ...settings,
   };
 }
