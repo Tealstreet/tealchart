@@ -454,8 +454,9 @@ Phases:
    Runtime and compatibility coverage now includes the map MVP: constructors,
    mutation, lookup, keys/values arrays, copy/put_all, key-value loops, value-key
    validation, and capacity checks. Semantic coverage now reports conservative
-   key/value mismatches for known `map<K, V>` variables. Remaining work is
-   full reference/nested type-template enforcement.
+   key/value mismatches for known `map<K, V>` variables. Deeper
+   qualifier-sensitive template enforcement belongs to the qualified type-system
+   epic.
    Parser and semantic coverage now retain generic call type arguments and infer
    unannotated `map.new<K, V>()` constructors, including invalid map constructor
    template and generic arity diagnostics.

@@ -277,8 +277,8 @@ conservative primitive/reference field type mismatches in local UDT field
 defaults, constructors, and field assignments. Library diagnostics also report
 exported UDT fields and exported function or method parameters that expose
 non-exported local UDTs, including through collection templates, and exported
-callables that return non-exported local UDTs. Full reference-type diagnostics
-remain planned in Epic 12 and the qualified type-system epic.
+callables that return non-exported local UDTs. Full qualifier-sensitive
+reference diagnostics remain planned in the qualified type-system epic.
 
 ## Common Library Syntax Coverage
 
