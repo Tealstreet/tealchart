@@ -4387,7 +4387,7 @@ export class TealscriptEngine {
     this.builtins.set('strategy.close', (args, namedArgs) => this.submitStrategyCloseBuiltin(args, namedArgs));
     this.builtins.set('strategy.close_all', (args, namedArgs) => this.submitStrategyCloseAllBuiltin(args, namedArgs));
     this.builtins.set('strategy.cancel', (args, namedArgs) => {
-      const id = this.toStringValue(this.getOrderedCallArg(args, namedArgs, ['id'], 0, ''));
+      const id = this.toStringValue(this.getCallArg(args, namedArgs, 0, 'id', ''));
       cancelStrategyOrder(this.ctx.strategyLedger, id, this.ctx.bar_index, this.ctx.time.get(0) ?? 0);
       return undefined;
     });

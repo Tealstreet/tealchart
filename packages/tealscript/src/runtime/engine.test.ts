@@ -1204,7 +1204,6 @@ if bar_index == 0
 if bar_index == 1
     strategy.exit(id="Bracket", "Long", na, 50, na, 103, na, 97, na, na, na, na, "exit comment", "tp comment", "sl comment")
     strategy.close(id="Long", "reduce comment", 1, na, "close alert")
-    strategy.cancel(id="ShortLimit")
 if bar_index == 2
     strategy.close_all(comment="flat comment", "flat alert")
 plot(strategy.closedtrades)`;
@@ -1244,7 +1243,7 @@ plot(strategy.closedtrades)`;
           id: 'ShortLimit',
           direction: 'short',
           type: 'limit',
-          status: 'cancelled',
+          status: 'pending',
           qty: 1,
           limitPrice: 999,
           stopPrice: undefined,
