@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   cancelAllStrategyOrders,
   cancelStrategyOrder,
+  cloneStrategyIntrabarContext,
   cloneStrategyLedger,
   createDefaultStrategySettings,
   createStrategyLedger,
@@ -9,10 +10,84 @@ import {
   createStrategyPosition,
   fillPendingStrategyOrders,
   fillStrategyMarketOrder,
+  InMemoryStrategyIntrabarDatafeed,
+  strategyIntrabarContextKey,
   submitStrategyOrder,
+  type StrategyIntrabarContext,
 } from './strategy';
 
 describe('strategy ledger model', () => {
+  it('stores deterministic strategy intrabar fixture contexts', () => {
+    const chartBar = { time: 1_700_000_000_000, open: 100, high: 110, low: 95, close: 105, volume: 1_000 };
+    const context: StrategyIntrabarContext = {
+      symbol: 'BINANCE:BTCUSDT',
+      timeframe: '1D',
+      chartBarTime: chartBar.time,
+      chartBarIndex: 4,
+      chartBar,
+      source: 'lower_timeframe',
+      ticks: [
+        { time: chartBar.time, price: 100, kind: 'intrabar_open', sequence: 0, sourceBarTime: chartBar.time },
+        { time: chartBar.time + 60_000, price: 108, kind: 'intrabar_high', sequence: 1, sourceBarTime: chartBar.time },
+        { time: chartBar.time + 120_000, price: 99, kind: 'intrabar_low', sequence: 2, sourceBarTime: chartBar.time },
+        { time: chartBar.time + 180_000, price: 105, kind: 'intrabar_close', sequence: 3, sourceBarTime: chartBar.time },
+      ],
+    };
+
+    expect(strategyIntrabarContextKey('BINANCE:BTCUSDT', '1D', chartBar.time)).toBe('BINANCE:BTCUSDT\u00001D\u00001700000000000');
+
+    const cloned = cloneStrategyIntrabarContext(context);
+    cloned.chartBar.close = 999;
+    cloned.ticks[0].price = 999;
+    expect(context.chartBar.close).toBe(105);
+    expect(context.ticks[0].price).toBe(100);
+
+    const datafeed = new InMemoryStrategyIntrabarDatafeed([context]);
+    context.ticks[0].price = 777;
+
+    const result = datafeed.getStrategyIntrabars({
+      symbol: 'BINANCE:BTCUSDT',
+      timeframe: '1D',
+      chartBarTime: chartBar.time,
+      chartBarIndex: 4,
+      chartBar,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) throw new Error(result.message);
+    expect(result.context.ticks[0].price).toBe(100);
+
+    result.context.ticks[0].price = 888;
+    const second = datafeed.getStrategyIntrabars({
+      symbol: 'BINANCE:BTCUSDT',
+      timeframe: '1D',
+      chartBarTime: chartBar.time,
+      chartBarIndex: 4,
+      chartBar,
+    });
+
+    expect(second.ok).toBe(true);
+    if (!second.ok) throw new Error(second.message);
+    expect(second.context.ticks[0].price).toBe(100);
+  });
+
+  it('reports missing strategy intrabar fixture contexts without throwing', () => {
+    const chartBar = { time: 1_700_000_000_000, open: 100, high: 110, low: 95, close: 105, volume: 1_000 };
+    const datafeed = new InMemoryStrategyIntrabarDatafeed();
+
+    expect(datafeed.getStrategyIntrabars({
+      symbol: 'BINANCE:ETHUSDT',
+      timeframe: '1D',
+      chartBarTime: chartBar.time,
+      chartBarIndex: 0,
+      chartBar,
+    })).toEqual({
+      ok: false,
+      code: 'missing_context',
+      message: 'No strategy intrabar context for BINANCE:ETHUSDT 1D 1700000000000',
+    });
+  });
+
   it('creates Pine-like default strategy settings with overrides', () => {
     const settings = createDefaultStrategySettings({
       title: 'Breakout',

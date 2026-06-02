@@ -70,7 +70,7 @@ Strategy intrabar data should reuse the request-datafeed concept but remain a
 separate runtime contract because order fills need ordered executable ticks, not
 Pine arrays returned to script code.
 
-Proposed types:
+Initial exported types and deterministic fixture helper:
 
 ```ts
 export interface StrategyIntrabarContext {
@@ -90,9 +90,14 @@ export interface StrategyExecutionTick {
   kind: 'open' | 'high' | 'low' | 'close' | 'intrabar_open' | 'intrabar_high' | 'intrabar_low' | 'intrabar_close';
   sequence: number;
   sourceBarTime?: number;
+  sourceBarIndex?: number;
 }
 
 export interface StrategyIntrabarDatafeed {
+  getStrategyIntrabars(request: StrategyIntrabarRequest): StrategyIntrabarResult;
+}
+
+export class InMemoryStrategyIntrabarDatafeed implements StrategyIntrabarDatafeed {
   getStrategyIntrabars(request: StrategyIntrabarRequest): StrategyIntrabarResult;
 }
 ```
