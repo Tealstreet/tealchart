@@ -5493,6 +5493,75 @@ plot(length)`;
       expect(result.inputs[1].defval).toBe(21);
     });
 
+    it('resolves mixed named and positional input arguments in Pine order', () => {
+      const script = `//@version=6
+indicator("Mixed Inputs")
+rangeLength = input.int(defval=14, "Range Length", 1, 50, 1, "Range tooltip", "len", "Inputs", true, display.data_window, false)
+optionMode = input.string(defval="EMA", "Mode", ["SMA", "EMA"], "Mode tooltip", "mode", "Inputs", false, display.status_line, true)
+generic = input(defval=true, "Generic Enabled", "Generic tooltip", "gen", "Inputs", false, display.none, true)
+source = input.source(defval=close, "Mixed Source", "Source tooltip", "src", "Inputs", true, display.data_window, true)
+plot(rangeLength + (optionMode == "EMA" ? 1 : 0) + (generic ? 1 : 0) + source)`;
+
+      const result = executeScript(parse(script), createBars(2));
+
+      expect(result.errors).toEqual([]);
+      expect(result.inputs).toMatchObject([
+        {
+          id: 'input_Range Length',
+          type: 'int',
+          title: 'Range Length',
+          defval: 14,
+          minval: 1,
+          maxval: 50,
+          step: 1,
+          tooltip: 'Range tooltip',
+          inline: 'len',
+          group: 'Inputs',
+          confirm: true,
+          display: 2,
+          active: false,
+        },
+        {
+          id: 'input_Mode',
+          type: 'string',
+          title: 'Mode',
+          defval: 'EMA',
+          options: ['SMA', 'EMA'],
+          tooltip: 'Mode tooltip',
+          inline: 'mode',
+          group: 'Inputs',
+          confirm: false,
+          display: 4,
+          active: true,
+        },
+        {
+          id: 'input_Generic Enabled',
+          type: 'bool',
+          title: 'Generic Enabled',
+          defval: true,
+          tooltip: 'Generic tooltip',
+          inline: 'gen',
+          group: 'Inputs',
+          confirm: false,
+          display: 0,
+          active: true,
+        },
+        {
+          id: 'input_Mixed Source',
+          type: 'source',
+          title: 'Mixed Source',
+          defval: 100.2,
+          tooltip: 'Source tooltip',
+          inline: 'src',
+          group: 'Inputs',
+          confirm: true,
+          display: 2,
+          active: true,
+        },
+      ]);
+      expect(result.plots[0].values).toEqual([116.2, 116.7]);
+    });
+
     it('uses default input value', () => {
       const script = `//@version=6
 indicator("Test")
@@ -5583,6 +5652,17 @@ plot(tf == "240")`;
       const result = executeScript(ast, bars);
 
       expect(result.errors[0]?.message).toBe('input.timeframe defval must be one of options');
+    });
+
+    it('rejects input range metadata together with options', () => {
+      const script = `//@version=6
+indicator("Invalid input overload")
+length = input.int(14, "Length", options=[7, 14, 21], minval=1)
+plot(length)`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors[0]?.message).toBe('input.int cannot use options together with minval/maxval/step');
     });
   });
 

@@ -5542,6 +5542,9 @@ export class TealscriptEngine {
   private registerInputBuiltins(): void {
     type InputType = InputDefinition['type'];
     type InputMetadata = Omit<InputDefinition, 'id' | 'type' | 'title' | 'defval'>;
+    const inputRangeArgs = ['defval', 'title', 'minval', 'maxval', 'step', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'] as const;
+    const inputOptionsArgs = ['defval', 'title', 'options', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'] as const;
+    const inputSimpleArgs = ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'] as const;
 
     const inferInputType = (value: unknown): InputType => {
       if (typeof value === 'number') return Number.isInteger(value) ? 'int' : 'float';
@@ -5550,58 +5553,86 @@ export class TealscriptEngine {
       return 'source';
     };
 
-    const optionalNumberArg = (args: unknown[], namedArgs: Map<string, unknown>, index: number, name: string): number | undefined => {
-      const value = this.getCallArg(args, namedArgs, index, name);
+    const inputArg = (
+      args: unknown[],
+      namedArgs: Map<string, unknown>,
+      names: readonly string[],
+      index: number,
+      fallback?: unknown,
+    ): unknown => this.getOrderedCallArg(args, namedArgs, names, index, fallback);
+
+    const optionalNumberArg = (
+      args: unknown[],
+      namedArgs: Map<string, unknown>,
+      names: readonly string[],
+      index: number,
+    ): number | undefined => {
+      const value = inputArg(args, namedArgs, names, index);
       if (value === undefined) return undefined;
       const number = this.toNumber(value);
       return Number.isFinite(number) ? number : undefined;
     };
 
-    const optionalStringArg = (args: unknown[], namedArgs: Map<string, unknown>, index: number, name: string): string | undefined => {
-      return this.toOptionalString(this.getCallArg(args, namedArgs, index, name));
+    const optionalStringArg = (
+      args: unknown[],
+      namedArgs: Map<string, unknown>,
+      names: readonly string[],
+      index: number,
+    ): string | undefined => {
+      return this.toOptionalString(inputArg(args, namedArgs, names, index));
     };
 
-    const optionalBoolArg = (args: unknown[], namedArgs: Map<string, unknown>, index: number, name: string): boolean | undefined => {
-      const value = this.getCallArg(args, namedArgs, index, name);
+    const optionalBoolArg = (
+      args: unknown[],
+      namedArgs: Map<string, unknown>,
+      names: readonly string[],
+      index: number,
+    ): boolean | undefined => {
+      const value = inputArg(args, namedArgs, names, index);
       return value === undefined ? undefined : this.isTruthy(value);
     };
 
-    const optionsArg = (args: unknown[], namedArgs: Map<string, unknown>, index: number): unknown[] | undefined => {
-      const value = this.getCallArg(args, namedArgs, index, 'options');
+    const optionsArg = (args: unknown[], namedArgs: Map<string, unknown>, names: readonly string[]): unknown[] | undefined => {
+      const value = inputArg(args, namedArgs, names, 2);
       return Array.isArray(value) ? value : undefined;
     };
 
     const commonMetadata = (
       args: unknown[],
       namedArgs: Map<string, unknown>,
+      names: readonly string[],
       startIndex: number,
       includeConfirm = true,
     ): InputMetadata => {
       const metadata: InputMetadata = {
-        tooltip: optionalStringArg(args, namedArgs, startIndex, 'tooltip'),
-        inline: optionalStringArg(args, namedArgs, startIndex + 1, 'inline'),
-        group: optionalStringArg(args, namedArgs, startIndex + 2, 'group'),
-        display: this.getCallArg(args, namedArgs, startIndex + (includeConfirm ? 4 : 3), 'display'),
-        active: this.getCallArg(args, namedArgs, startIndex + (includeConfirm ? 5 : 4), 'active'),
+        tooltip: optionalStringArg(args, namedArgs, names, startIndex),
+        inline: optionalStringArg(args, namedArgs, names, startIndex + 1),
+        group: optionalStringArg(args, namedArgs, names, startIndex + 2),
+        display: inputArg(args, namedArgs, names, startIndex + (includeConfirm ? 4 : 3)),
+        active: inputArg(args, namedArgs, names, startIndex + (includeConfirm ? 5 : 4)),
       };
       if (includeConfirm) {
-        metadata.confirm = optionalBoolArg(args, namedArgs, startIndex + 3, 'confirm');
+        metadata.confirm = optionalBoolArg(args, namedArgs, names, startIndex + 3);
       }
       return metadata;
     };
 
     const rangeMetadata = (args: unknown[], namedArgs: Map<string, unknown>, type: InputType): InputMetadata => {
-      const positionalOptions = Array.isArray(args[2]);
+      const positionalOptions = Array.isArray(inputArg(args, namedArgs, inputOptionsArgs, 2));
       const hasOptions = namedArgs.has('options') || positionalOptions;
+      if (hasOptions && (namedArgs.has('minval') || namedArgs.has('maxval') || namedArgs.has('step'))) {
+        throw new Error(`input.${type} cannot use options together with minval/maxval/step`);
+      }
+      const names = hasOptions ? inputOptionsArgs : inputRangeArgs;
       const metadata: InputMetadata = {
-        options: optionsArg(args, namedArgs, 2),
-        ...commonMetadata(args, namedArgs, hasOptions ? 3 : 5),
+        options: optionsArg(args, namedArgs, names),
+        ...commonMetadata(args, namedArgs, names, hasOptions ? 3 : 5),
       };
 
       if (!hasOptions && (type === 'int' || type === 'float')) {
-        metadata.minval = optionalNumberArg(args, namedArgs, 2, 'minval');
-        metadata.maxval = optionalNumberArg(args, namedArgs, 3, 'maxval');
-        metadata.step = optionalNumberArg(args, namedArgs, 4, 'step');
+        metadata.minval = optionalNumberArg(args, namedArgs, names, 2);
+        metadata.maxval = optionalNumberArg(args, namedArgs, names, 3);
+        metadata.step = optionalNumberArg(args, namedArgs, names, 4);
       }
 
       return metadata;
@@ -5612,15 +5643,15 @@ export class TealscriptEngine {
         return rangeMetadata(args, namedArgs, type);
       }
       if (type === 'price') {
-        return commonMetadata(args, namedArgs, 2);
+        return commonMetadata(args, namedArgs, inputSimpleArgs, 2);
       }
       if (type === 'string' || type === 'timeframe') {
         return {
-          options: optionsArg(args, namedArgs, 2),
-          ...commonMetadata(args, namedArgs, 3),
+          options: optionsArg(args, namedArgs, inputOptionsArgs),
+          ...commonMetadata(args, namedArgs, inputOptionsArgs, 3),
         };
       }
-      return commonMetadata(args, namedArgs, 2);
+      return commonMetadata(args, namedArgs, inputSimpleArgs, 2);
     };
 
     const validateInputDefault = (type: InputType, defval: unknown, metadata: InputMetadata): void => {
@@ -5649,8 +5680,8 @@ export class TealscriptEngine {
 
     const createInputFunc = (type: InputType) => {
       return (args: unknown[], namedArgs: Map<string, unknown>, ctx: ExecutionContext) => {
-        const defval = this.getCallArg(args, namedArgs, 0, 'defval');
-        const title = this.toStringValue(this.getCallArg(args, namedArgs, 1, 'title', type));
+        const defval = inputArg(args, namedArgs, inputSimpleArgs, 0);
+        const title = this.toStringValue(inputArg(args, namedArgs, inputSimpleArgs, 1, type));
         const metadata = metadataForInput(type, args, namedArgs);
 
         const id = `input_${title}`;
@@ -5671,7 +5702,7 @@ export class TealscriptEngine {
     };
 
     this.builtins.set('input', (args, namedArgs, ctx) => {
-      const defval = this.getCallArg(args, namedArgs, 0, 'defval');
+      const defval = inputArg(args, namedArgs, inputSimpleArgs, 0);
       return createInputFunc(inferInputType(defval))(args, namedArgs, ctx);
     });
     this.builtins.set('input.int', createInputFunc('int'));
@@ -5688,16 +5719,16 @@ export class TealscriptEngine {
 
     // input.source is special - it returns a series
     this.builtins.set('input.source', (args, namedArgs, ctx) => {
-      const defval = this.getCallArg(args, namedArgs, 0, 'defval'); // Should be a series like 'close'
-      const title = this.toStringValue(this.getCallArg(args, namedArgs, 1, 'title', 'Source'));
+      const defval = inputArg(args, namedArgs, inputSimpleArgs, 0); // Should be a series like 'close'
+      const title = this.toStringValue(inputArg(args, namedArgs, inputSimpleArgs, 1, 'Source'));
       const id = `input_${title}`;
       const metadata = {
-        tooltip: optionalStringArg(args, namedArgs, 2, 'tooltip'),
-        inline: optionalStringArg(args, namedArgs, 3, 'inline'),
-        group: optionalStringArg(args, namedArgs, 4, 'group'),
-        confirm: optionalBoolArg(args, namedArgs, 5, 'confirm'),
-        display: this.getCallArg(args, namedArgs, 6, 'display'),
-        active: this.getCallArg(args, namedArgs, 7, 'active'),
+        tooltip: optionalStringArg(args, namedArgs, inputSimpleArgs, 2),
+        inline: optionalStringArg(args, namedArgs, inputSimpleArgs, 3),
+        group: optionalStringArg(args, namedArgs, inputSimpleArgs, 4),
+        confirm: optionalBoolArg(args, namedArgs, inputSimpleArgs, 5),
+        display: inputArg(args, namedArgs, inputSimpleArgs, 6),
+        active: inputArg(args, namedArgs, inputSimpleArgs, 7),
       };
 
       if (ctx.bar_index === 0) {
