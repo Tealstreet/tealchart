@@ -137,6 +137,33 @@ varip x = 0`);
       });
     });
 
+    describe('declaration blocks', () => {
+      it('parses blank and comment-only lines inside type and enum blocks', () => {
+        const ast = parse(`//@version=6
+indicator("Block Spacing")
+type Pivot
+    // X coordinate.
+    int x
+
+    // Y coordinate.
+    float y
+
+enum Direction
+    // Up trend.
+    up = "Up"
+
+    // Down trend.
+    down = "Down"
+`);
+
+        const typeDeclaration = ast.body.find((statement) => statement.type === 'TypeDeclaration');
+        const enumDeclaration = ast.body.find((statement) => statement.type === 'EnumDeclaration');
+
+        expect(typeDeclaration?.type === 'TypeDeclaration' ? typeDeclaration.fields.map((field) => field.name.name) : []).toEqual(['x', 'y']);
+        expect(enumDeclaration?.type === 'EnumDeclaration' ? enumDeclaration.fields.map((field) => field.name.name) : []).toEqual(['up', 'down']);
+      });
+    });
+
     describe('literals', () => {
       it('parses numeric literals', () => {
         const ast = parse(`//@version=6
