@@ -28,8 +28,7 @@ import {
   BUILTIN_GLOBAL_TYPES,
   BUILTIN_NAMESPACES,
   CALENDAR_FUNCTION_NAMES,
-  EXPORTABLE_BUILTIN_CONSTANTS,
-  EXPORTABLE_CONTEXT_MEMBER_CONSTANTS,
+  isExportableBuiltinConstantPath,
 } from '../builtinMetadata';
 
 export type SemanticDiagnosticSeverity = 'error' | 'warning';
@@ -704,14 +703,7 @@ class SemanticChecker {
   }
 
   private isExportableBuiltinConstant(value: MemberExpression): boolean {
-    const path = this.memberPath(value);
-    if (path.length < 2) return false;
-
-    const namespace = path.slice(0, -1).join('.');
-    const property = path[path.length - 1]!;
-    if (EXPORTABLE_BUILTIN_CONSTANTS.has(path.join('.'))) return true;
-
-    return path.length === 2 && (EXPORTABLE_CONTEXT_MEMBER_CONSTANTS.get(namespace)?.has(property) ?? false);
+    return isExportableBuiltinConstantPath(this.memberPath(value));
   }
 
   private collectGlobalVariableQualifiers(statements: Statement[]): Map<string, SemanticQualifier | undefined> {

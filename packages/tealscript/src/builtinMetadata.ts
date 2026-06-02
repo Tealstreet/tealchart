@@ -266,3 +266,13 @@ export const BUILTIN_COLLECTION_MEMBER_METHODS = new Map<string, Set<string>>([
     'transpose',
   ])],
 ]);
+
+export function isExportableBuiltinConstantPath(path: string[]): boolean {
+  if (path.length < 2) return false;
+
+  const namespace = path.slice(0, -1).join('.');
+  const property = path[path.length - 1]!;
+  if (EXPORTABLE_BUILTIN_CONSTANTS.has(path.join('.'))) return true;
+
+  return path.length === 2 && (EXPORTABLE_CONTEXT_MEMBER_CONSTANTS.get(namespace)?.has(property) ?? false);
+}
