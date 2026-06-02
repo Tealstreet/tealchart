@@ -586,6 +586,8 @@ path parity, bar magnifier, and lower-timeframe fill simulation remain deferred
 future work because they require an explicit intrabar data model rather than the
 current OHLC-only execution model. The intrabar/bar-magnifier contract is
 specified in [`STRATEGY_INTRABAR_DESIGN.md`](./STRATEGY_INTRABAR_DESIGN.md).
+`strategy(..., use_bar_magnifier=...)` is now recorded in ledger settings but
+does not yet alter fill-path selection.
 Semantic coverage now validates common strategy order, close/cancel, and
 trade-accessor call shapes before runtime.
 

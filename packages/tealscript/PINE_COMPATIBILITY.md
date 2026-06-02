@@ -637,7 +637,9 @@ time, and `strategy.entry()` enforces same-direction pyramiding limits and
 expands opposite-direction entry transactions to reverse positions. This is a
 deterministic OHLC broker emulator: same-bar intrabar path modeling, bar
 magnifier, and lower-timeframe fill simulation remain deferred until the runtime
-has an explicit intrabar data model. Trailing stops submitted through
+has an explicit intrabar data model. The `use_bar_magnifier` strategy setting is
+stored in the ledger but does not yet select lower-timeframe execution paths.
+Trailing stops submitted through
 `strategy.exit(..., trail_price/trail_points, trail_offset)` activate on later
 bars and ratchet against OHLC highs/lows using price-unit offsets. Fill
 commissions are applied to fills and debited from strategy net profit/equity for

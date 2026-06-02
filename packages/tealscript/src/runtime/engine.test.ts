@@ -126,7 +126,8 @@ strategy("Test strategy",
     margin_short=60,
     calc_on_order_fills=true,
     calc_on_every_tick=true,
-    process_orders_on_close=true)
+    process_orders_on_close=true,
+    use_bar_magnifier=true)
 plot(strategy.equity)
 plot(strategy.position_size)`;
 
@@ -151,6 +152,7 @@ plot(strategy.position_size)`;
         calcOnOrderFills: true,
         calcOnEveryTick: true,
         processOrdersOnClose: true,
+        useBarMagnifier: true,
       });
       expect(result.strategy.equity).toBe(25000);
       expect(result.plots.map((plot) => plot.values)).toEqual([[25000], [0]]);
@@ -168,7 +170,8 @@ strategy("Zero settings",
     margin_short=0,
     calc_on_order_fills=false,
     calc_on_every_tick=false,
-    process_orders_on_close=false)
+    process_orders_on_close=false,
+    use_bar_magnifier=false)
 plot(strategy.initial_capital)`;
 
       const result = executeScript(parse(script), createBars(1));
@@ -185,6 +188,7 @@ plot(strategy.initial_capital)`;
         calcOnOrderFills: false,
         calcOnEveryTick: false,
         processOrdersOnClose: false,
+        useBarMagnifier: false,
       });
       expect(result.strategy.equity).toBe(0);
       expect(result.plots[0]?.values).toEqual([0]);
