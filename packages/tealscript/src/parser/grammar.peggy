@@ -1059,8 +1059,8 @@ PostfixExpression
   = head:PrimaryExpression tail:(
       _ "(" __ args:ArgumentList? __ ")" { return { type: 'call', args: args || [] }; }
     / _ typeArguments:GenericTypeArguments { return { type: 'typeArgs', typeArguments }; }
-    / _ "." _ prop:IdentifierName { return { type: 'member', prop }; }
-    / _ "[" __ index:Expression __ "]" { return { type: 'index', index }; }
+    / PostfixContinuationSpace "." _ prop:IdentifierName { return { type: 'member', prop }; }
+    / PostfixContinuationSpace "[" __ index:Expression __ "]" { return { type: 'index', index }; }
   )* {
       let pendingTypeArguments = null;
       return tail.reduce((obj, op) => {
@@ -1321,6 +1321,10 @@ BeforeMultiplicativeOperator
 
 OpSpace
   = (WhiteSpace / MultiLineComment / LineTerminator)*
+
+PostfixContinuationSpace
+  = &( __ ("." / "[")) __
+  / _
 
 WhiteSpace
   = [ \t]
