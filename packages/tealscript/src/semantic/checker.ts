@@ -662,6 +662,17 @@ BUILTIN_SIGNATURES.set('array.percentrank', { params: ['id', 'value'], minArgs: 
 
 BUILTIN_SIGNATURES.set('array.from', { params: [], minArgs: 0, allowExtraPositional: true });
 
+for (const name of ['matrix.new', 'matrix.new_bool', 'matrix.new_color', 'matrix.new_float', 'matrix.new_int', 'matrix.new_string']) {
+  BUILTIN_SIGNATURES.set(name, { params: ['rows', 'columns', 'initial_value'], minArgs: 0, maxArgs: 3 });
+}
+
+for (const name of ['matrix.columns', 'matrix.elements_count', 'matrix.is_valid', 'matrix.rows']) {
+  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1 });
+}
+
+BUILTIN_SIGNATURES.set('matrix.get', { params: ['id', 'row', 'column'], minArgs: 3, maxArgs: 3 });
+BUILTIN_SIGNATURES.set('matrix.set', { params: ['id', 'row', 'column', 'value'], minArgs: 4, maxArgs: 4 });
+
 export function checkProgram(program: Program): SemanticCheckResult {
   return new SemanticChecker().check(program);
 }

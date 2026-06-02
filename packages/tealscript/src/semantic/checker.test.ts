@@ -902,6 +902,49 @@ tooManyVariance = array.variance(values, true, false)
     ]);
   });
 
+  it('resolves matrix core helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Matrix Core Signatures")
+m = matrix.new_int(rows=2, columns=2, initial_value=1)
+generic = matrix.new<float>(rows=1, columns=1, initial_value=0)
+flags = matrix.new_bool()
+matrix.set(id=m, row=0, column=1, value=4)
+rows = matrix.rows(id=m)
+columns = matrix.columns(id=m)
+elements = matrix.elements_count(id=m)
+first = matrix.get(id=m, row=0, column=1)
+valid = matrix.is_valid(id=m)
+plot(rows + columns + elements + first + matrix.rows(id=generic) + matrix.rows(id=flags) + (valid ? 1 : 0))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid matrix core helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Matrix Core Signatures")
+m = matrix.new_int(rows=2, columns=2, initial_value=1)
+badNew = matrix.new_int(rows=1, columns=1, initial_value=0, extra=1)
+duplicateRows = matrix.rows(m, id=m)
+unknownGet = matrix.get(id=m, column=0, item=0)
+missingValue = matrix.set(id=m, row=0, column=0)
+tooManyRows = matrix.rows(m, m)
+tooManyGet = matrix.get(m, 0, 0, 0)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'extra' for matrix.new_int()",
+      "Argument 'id' for matrix.rows() was supplied multiple times",
+      "Unknown argument 'item' for matrix.get()",
+      'matrix.get() expects at least 3 arguments',
+      "matrix.get() missing required argument 'row'",
+      'matrix.set() expects at least 4 arguments',
+      "matrix.set() missing required argument 'value'",
+      'matrix.rows() expects at most 1 argument',
+      'matrix.get() expects at most 3 arguments',
+    ]);
+  });
+
   it('reports array element template mismatches for known mutable arrays', () => {
     const result = checkProgram(parse(`
 indicator("Bad Array Types")
