@@ -2329,6 +2329,15 @@ class SemanticChecker {
   }
 
   private inferMemberExpressionType(expression: MemberExpression, scope: SemanticScope): SemanticType {
+    const path = this.memberPath(expression);
+    const memberName = path.join('.');
+    if (memberName === 'session.ismarket' || memberName === 'session.ispremarket' || memberName === 'session.ispostmarket') {
+      return { kind: 'bool', qualifier: 'series' };
+    }
+    if (memberName === 'session.regular' || memberName === 'session.extended') {
+      return { kind: 'string', qualifier: 'const' };
+    }
+
     const objectType = this.inferExpressionType(expression.object, scope);
     if (objectType.kind !== 'udt' || !objectType.name) return objectType;
 

@@ -54,6 +54,17 @@ plot(stamp + dateStamp)
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('accepts session state helpers and session constants', () => {
+    const result = checkProgram(parse(`
+indicator("Session State")
+active = session.ismarket or session.ispremarket or session.ispostmarket
+plot(active ? 1 : 0)
+plot(na(time("60", session.regular)) ? 0 : 1)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
   it('accepts timeframe utility functions with named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Timeframe Utilities")
