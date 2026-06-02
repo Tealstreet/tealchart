@@ -230,11 +230,13 @@ const STRATEGY_CLOSED_TRADE_ACCESSORS = [
 
 interface BuiltinSignature {
   params: string[];
+  aliases?: Record<string, string>;
   overloads?: string[][];
   minArgs?: number;
   maxArgs?: number;
   allowExtraNamed?: boolean;
   allowExtraPositional?: boolean;
+  allowNamedPrefixWithPositional?: boolean;
 }
 
 const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
@@ -454,6 +456,24 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['request.seed', { params: ['source', 'symbol', 'expression', 'ignore_invalid_symbol', 'calc_bars_count'], minArgs: 3 }],
   ['runtime.error', { params: ['message'], minArgs: 1, maxArgs: 1 }],
   ['string', { params: ['x'], minArgs: 1, maxArgs: 1 }],
+  ['str.tostring', { params: ['value', 'format'], minArgs: 1, maxArgs: 2 }],
+  ['str.tonumber', { params: ['string'], minArgs: 1, maxArgs: 1 }],
+  ['str.format_time', { params: ['time', 'format', 'timezone'], minArgs: 0, maxArgs: 3 }],
+  ['str.format', { params: ['format'], minArgs: 1, allowExtraPositional: true, allowNamedPrefixWithPositional: true }],
+  ['str.length', { params: ['source'], aliases: { string: 'source' }, minArgs: 1, maxArgs: 1 }],
+  ['str.contains', { params: ['source', 'str'], aliases: { string: 'source', substring: 'str', target: 'str' }, minArgs: 2, maxArgs: 2 }],
+  ['str.startswith', { params: ['source', 'str'], aliases: { string: 'source', substring: 'str', target: 'str' }, minArgs: 2, maxArgs: 2 }],
+  ['str.endswith', { params: ['source', 'str'], aliases: { string: 'source', substring: 'str', target: 'str' }, minArgs: 2, maxArgs: 2 }],
+  ['str.pos', { params: ['source', 'str'], aliases: { string: 'source', substring: 'str', target: 'str' }, minArgs: 2, maxArgs: 2 }],
+  ['str.substring', { params: ['source', 'begin_pos', 'end_pos'], aliases: { string: 'source' }, minArgs: 2, maxArgs: 3 }],
+  ['str.match', { params: ['source', 'regex'], aliases: { string: 'source', pattern: 'regex' }, minArgs: 2, maxArgs: 2 }],
+  ['str.repeat', { params: ['source', 'count', 'separator'], aliases: { string: 'source', repeat_count: 'count' }, minArgs: 2, maxArgs: 3 }],
+  ['str.split', { params: ['source', 'separator'], aliases: { string: 'source' }, minArgs: 2, maxArgs: 2 }],
+  ['str.upper', { params: ['source'], aliases: { string: 'source' }, minArgs: 1, maxArgs: 1 }],
+  ['str.lower', { params: ['source'], aliases: { string: 'source' }, minArgs: 1, maxArgs: 1 }],
+  ['str.trim', { params: ['source'], aliases: { string: 'source' }, minArgs: 1, maxArgs: 1 }],
+  ['str.replace', { params: ['source', 'target', 'replacement', 'occurrence'], aliases: { string: 'source', str: 'target', substring: 'target' }, minArgs: 3, maxArgs: 4 }],
+  ['str.replace_all', { params: ['source', 'target', 'replacement'], aliases: { string: 'source', str: 'target', substring: 'target' }, minArgs: 3, maxArgs: 3 }],
   ['strategy.cancel', { params: ['id'], minArgs: 1, maxArgs: 1 }],
   ['strategy.cancel_all', { params: [], minArgs: 0, maxArgs: 0 }],
   ['strategy.close', { params: ['id', 'comment', 'qty', 'qty_percent', 'alert_message', 'immediately', 'disable_alert'], minArgs: 1 }],
@@ -1552,7 +1572,7 @@ class SemanticChecker {
       return;
     }
 
-    this.checkArgumentOrder(expression.arguments, displayName);
+    this.checkArgumentOrder(expression.arguments, displayName, signature);
     this.checkArgumentNames(expression.arguments, signature, displayName);
     this.checkArgumentCount(expression.arguments, signature, displayName);
     this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName);
@@ -2001,7 +2021,9 @@ class SemanticChecker {
     return args.find((argument) => argument.name?.name === name)?.value ?? args[positionalIndex]?.value;
   }
 
-  private checkArgumentOrder(args: CallArgument[], displayName: string): void {
+  private checkArgumentOrder(args: CallArgument[], displayName: string, signature?: BuiltinSignature): void {
+    if (signature?.allowNamedPrefixWithPositional) return;
+
     let hasNamedArgument = false;
     for (const arg of args) {
       if (arg.name) {
@@ -2018,7 +2040,7 @@ class SemanticChecker {
     if (signature.allowExtraNamed) return;
     const allowed = new Set(this.resolveSignatureParams(args, signature));
     for (const arg of args) {
-      if (arg.name && !allowed.has(arg.name.name)) {
+      if (arg.name && !allowed.has(this.canonicalSignatureArgumentName(arg.name.name, signature))) {
         this.addDiagnostic('unknown-argument', `Unknown argument '${arg.name.name}' for ${displayName}()`, arg.name.loc);
       }
     }
@@ -2027,7 +2049,7 @@ class SemanticChecker {
   private checkArgumentCount(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
     const params = this.resolveSignatureParams(args, signature);
     const positionalCount = this.leadingPositionalCount(args);
-    const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [arg.name.name] : [])));
+    const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
     const boundParamCount = params.filter((param, index) => index < positionalCount || suppliedNames.has(param)).length;
     const minArgs = signature.minArgs ?? 0;
     const maxArgs = signature.allowExtraPositional ? Infinity : (signature.maxArgs ?? params.length);
@@ -2054,23 +2076,28 @@ class SemanticChecker {
       if (!arg.name) continue;
 
       const name = arg.name.name;
-      if (seenNames.has(name)) {
+      const canonicalName = this.canonicalSignatureArgumentName(name, signature);
+      if (seenNames.has(canonicalName)) {
         this.addDiagnostic('duplicate-argument', `Argument '${name}' for ${displayName}() was supplied multiple times`, arg.name.loc);
         continue;
       }
-      seenNames.add(name);
+      seenNames.add(canonicalName);
 
-      const positionalIndex = params.indexOf(name);
+      const positionalIndex = params.indexOf(canonicalName);
       if (positionalIndex !== -1 && positionalIndex < positionalCount) {
         this.addDiagnostic('duplicate-argument', `Argument '${name}' for ${displayName}() was supplied multiple times`, arg.name.loc);
       }
     }
   }
 
+  private canonicalSignatureArgumentName(name: string, signature: BuiltinSignature): string {
+    return signature.aliases?.[name] ?? name;
+  }
+
   private resolveSignatureParams(args: CallArgument[], signature: BuiltinSignature): string[] {
     if (!signature.overloads) return signature.params;
 
-    const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [arg.name.name] : [])));
+    const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
     const thirdPositional = args.filter((arg) => !arg.name)[2]?.value;
     const usesOptionsOverload = suppliedNames.has('options') || thirdPositional?.type === 'ArrayExpression';
     const optionsOverload = signature.overloads.find((params) => params.includes('options'));
