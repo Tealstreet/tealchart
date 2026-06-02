@@ -474,6 +474,40 @@ export function fillPendingStrategyOrders(
   return fills;
 }
 
+export function fillPendingStrategyOrdersOnTicks(
+  ledger: StrategyLedger,
+  ticks: StrategyExecutionTick[],
+  barIndex: number,
+): StrategyFill[] {
+  const fills: StrategyFill[] = [];
+  const orderedTicks = ticks
+    .filter((tick) => Number.isFinite(tick.price))
+    .sort((left, right) => left.sequence - right.sequence);
+
+  let previousTick: StrategyExecutionTick | undefined;
+  for (const tick of orderedTicks) {
+    const high = previousTick === undefined ? tick.price : Math.max(previousTick.price, tick.price);
+    const low = previousTick === undefined ? tick.price : Math.min(previousTick.price, tick.price);
+
+    for (const order of ledger.orders) {
+      const price = getPendingOrderFillPriceForTick(order, high, low, tick, barIndex, previousTick === undefined);
+      if (price === null) {
+        continue;
+      }
+
+      const fill = fillStrategyOrder(ledger, order, price, barIndex, tick.time);
+      if (fill) {
+        fills.push(fill);
+        cancelOcaOrders(ledger, order, barIndex, tick.time);
+      }
+    }
+
+    previousTick = tick;
+  }
+
+  return fills;
+}
+
 function fillStrategyOrder(
   ledger: StrategyLedger,
   order: StrategyOrder,
@@ -608,6 +642,55 @@ function getPendingOrderFillPrice(
   }
 
   return null;
+}
+
+function getPendingOrderFillPriceForTick(
+  order: StrategyOrder,
+  high: number,
+  low: number,
+  tick: StrategyExecutionTick,
+  barIndex: number,
+  isOpeningTick: boolean,
+): number | null {
+  const price = getPendingOrderFillPrice(order, high, low, barIndex, tick.time);
+  if (price === null || !isOpeningTick || order.type === 'trailing_stop') {
+    return price;
+  }
+
+  return isOpeningGapFill(order, tick.price) ? tick.price : price;
+}
+
+function isOpeningGapFill(order: StrategyOrder, openPrice: number): boolean {
+  if (!Number.isFinite(openPrice)) {
+    return false;
+  }
+
+  if (order.type === 'limit' && order.limitPrice !== undefined) {
+    return order.direction === 'long'
+      ? openPrice < order.limitPrice
+      : openPrice > order.limitPrice;
+  }
+
+  if (order.type === 'stop' && order.stopPrice !== undefined) {
+    return order.direction === 'long'
+      ? openPrice > order.stopPrice
+      : openPrice < order.stopPrice;
+  }
+
+  if (order.type === 'stop_limit') {
+    if (order.stopLimitActivated && order.limitPrice !== undefined) {
+      return order.direction === 'long'
+        ? openPrice < order.limitPrice
+        : openPrice > order.limitPrice;
+    }
+    if (order.stopPrice !== undefined) {
+      return order.direction === 'long'
+        ? openPrice > order.stopPrice
+        : openPrice < order.stopPrice;
+    }
+  }
+
+  return false;
 }
 
 function getLimitOrderFillPrice(order: StrategyOrder, high: number, low: number): number | null {

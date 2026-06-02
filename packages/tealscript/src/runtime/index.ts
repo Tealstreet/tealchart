@@ -121,6 +121,7 @@ export {
   createStrategyOrder,
   fillStrategyMarketOrder,
   fillPendingStrategyOrders,
+  fillPendingStrategyOrdersOnTicks,
   createStrategyLedger,
   createStrategyPosition,
   InMemoryStrategyIntrabarDatafeed,
