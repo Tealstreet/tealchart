@@ -274,13 +274,13 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
     return id;
   });
 
-  builtins.set('line.delete', (args, _namedArgs, ctx) => {
-    runtime.withLine(args[0], ctx, (line) => ctx.deleteDrawing(line.id));
+  builtins.set('line.delete', (args, namedArgs, ctx) => {
+    runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => ctx.deleteDrawing(line.id));
     return undefined;
   });
 
-  builtins.set('line.copy', (args, _namedArgs, ctx, _scope, callId) => {
-    const lineId = runtime.toDrawingId(args[0]);
+  builtins.set('line.copy', (args, namedArgs, ctx, _scope, callId) => {
+    const lineId = runtime.toDrawingId(callArg(args, namedArgs, 0, 'id'));
     if (!lineId) return Number.NaN;
 
     const newId = `line_${callId}_${ctx.bar_index}`;
@@ -288,101 +288,101 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
     return copy ? newId : Number.NaN;
   });
 
-  builtins.set('line.set_x1', (args, _namedArgs, ctx) => {
-    runtime.withLine(args[0], ctx, (line) => {
-      line.x1 = runtime.toNullableNumber(args[1]);
+  builtins.set('line.set_x1', (args, namedArgs, ctx) => {
+    runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
+      line.x1 = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x'));
       line.barIndex = ctx.bar_index;
     });
     return undefined;
   });
 
-  builtins.set('line.set_x2', (args, _namedArgs, ctx) => {
-    runtime.withLine(args[0], ctx, (line) => {
-      line.x2 = runtime.toNullableNumber(args[1]);
+  builtins.set('line.set_x2', (args, namedArgs, ctx) => {
+    runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
+      line.x2 = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x'));
       line.barIndex = ctx.bar_index;
     });
     return undefined;
   });
 
-  builtins.set('line.set_y1', (args, _namedArgs, ctx) => {
-    runtime.withLine(args[0], ctx, (line) => {
-      line.y1 = runtime.toNullableNumber(args[1]);
+  builtins.set('line.set_y1', (args, namedArgs, ctx) => {
+    runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
+      line.y1 = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'y'));
       line.barIndex = ctx.bar_index;
     });
     return undefined;
   });
 
-  builtins.set('line.set_y2', (args, _namedArgs, ctx) => {
-    runtime.withLine(args[0], ctx, (line) => {
-      line.y2 = runtime.toNullableNumber(args[1]);
+  builtins.set('line.set_y2', (args, namedArgs, ctx) => {
+    runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
+      line.y2 = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'y'));
       line.barIndex = ctx.bar_index;
     });
     return undefined;
   });
 
-  builtins.set('line.set_xy1', (args, _namedArgs, ctx) => {
-    runtime.withLine(args[0], ctx, (line) => {
-      line.x1 = runtime.toNullableNumber(args[1]);
-      line.y1 = runtime.toNullableNumber(args[2]);
+  builtins.set('line.set_xy1', (args, namedArgs, ctx) => {
+    runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
+      line.x1 = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x'));
+      line.y1 = runtime.toNullableNumber(callArg(args, namedArgs, 2, 'y'));
       line.barIndex = ctx.bar_index;
     });
     return undefined;
   });
 
-  builtins.set('line.set_xy2', (args, _namedArgs, ctx) => {
-    runtime.withLine(args[0], ctx, (line) => {
-      line.x2 = runtime.toNullableNumber(args[1]);
-      line.y2 = runtime.toNullableNumber(args[2]);
+  builtins.set('line.set_xy2', (args, namedArgs, ctx) => {
+    runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
+      line.x2 = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x'));
+      line.y2 = runtime.toNullableNumber(callArg(args, namedArgs, 2, 'y'));
       line.barIndex = ctx.bar_index;
     });
     return undefined;
   });
 
-  builtins.set('line.set_xloc', (args, _namedArgs, ctx) => {
-    runtime.withLine(args[0], ctx, (line) => {
-      line.x1 = runtime.toNullableNumber(args[1]);
-      line.x2 = runtime.toNullableNumber(args[2]);
-      line.xloc = runtime.toStringValue(args[3]);
+  builtins.set('line.set_xloc', (args, namedArgs, ctx) => {
+    runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
+      line.x1 = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x1'));
+      line.x2 = runtime.toNullableNumber(callArg(args, namedArgs, 2, 'x2'));
+      line.xloc = runtime.toStringValue(callArg(args, namedArgs, 3, 'xloc'));
       line.barIndex = ctx.bar_index;
     });
     return undefined;
   });
 
-  builtins.set('line.set_extend', (args, _namedArgs, ctx) => {
-    runtime.withLine(args[0], ctx, (line) => {
-      line.extend = runtime.toStringValue(args[1]);
+  builtins.set('line.set_extend', (args, namedArgs, ctx) => {
+    runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
+      line.extend = runtime.toStringValue(callArg(args, namedArgs, 1, 'extend'));
     });
     return undefined;
   });
 
-  builtins.set('line.set_color', (args, _namedArgs, ctx) => {
-    runtime.withLine(args[0], ctx, (line) => {
-      line.color = runtime.toNullableColor(args[1]);
+  builtins.set('line.set_color', (args, namedArgs, ctx) => {
+    runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
+      line.color = runtime.toNullableColor(callArg(args, namedArgs, 1, 'color'));
     });
     return undefined;
   });
 
-  builtins.set('line.set_style', (args, _namedArgs, ctx) => {
-    runtime.withLine(args[0], ctx, (line) => {
-      line.style = runtime.toStringValue(args[1]);
+  builtins.set('line.set_style', (args, namedArgs, ctx) => {
+    runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
+      line.style = runtime.toStringValue(callArg(args, namedArgs, 1, 'style'));
     });
     return undefined;
   });
 
-  builtins.set('line.set_width', (args, _namedArgs, ctx) => {
-    runtime.withLine(args[0], ctx, (line) => {
-      line.width = runtime.toLineWidth(args[1]);
+  builtins.set('line.set_width', (args, namedArgs, ctx) => {
+    runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
+      line.width = runtime.toLineWidth(callArg(args, namedArgs, 1, 'width'));
     });
     return undefined;
   });
 
-  builtins.set('line.get_x1', (args, _namedArgs, ctx) => runtime.getLineValue(args[0], ctx, (line) => line.x1 ?? Number.NaN));
-  builtins.set('line.get_x2', (args, _namedArgs, ctx) => runtime.getLineValue(args[0], ctx, (line) => line.x2 ?? Number.NaN));
-  builtins.set('line.get_y1', (args, _namedArgs, ctx) => runtime.getLineValue(args[0], ctx, (line) => line.y1 ?? Number.NaN));
-  builtins.set('line.get_y2', (args, _namedArgs, ctx) => runtime.getLineValue(args[0], ctx, (line) => line.y2 ?? Number.NaN));
-  builtins.set('line.get_price', (args, _namedArgs, ctx) => {
-    const x = runtime.toNumber(args[1]);
-    return runtime.getLineValue(args[0], ctx, (line) => runtime.interpolateLinePrice(line, x));
+  builtins.set('line.get_x1', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.x1 ?? Number.NaN));
+  builtins.set('line.get_x2', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.x2 ?? Number.NaN));
+  builtins.set('line.get_y1', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.y1 ?? Number.NaN));
+  builtins.set('line.get_y2', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.y2 ?? Number.NaN));
+  builtins.set('line.get_price', (args, namedArgs, ctx) => {
+    const x = runtime.toNumber(callArg(args, namedArgs, 1, 'x'));
+    return runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => runtime.interpolateLinePrice(line, x));
   });
   builtins.set('line.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('line'));
 }
