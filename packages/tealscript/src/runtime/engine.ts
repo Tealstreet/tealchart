@@ -756,11 +756,9 @@ export class TealscriptEngine {
       this.functionScopes.get(key)?.restore(snapshot);
     }
     this.requestEvaluationCache.clear();
-    this.requestContextKeys.clear();
     this.resetPerBarBuiltinState();
     this.ctx.truncatePlots(this.ctx.bar_index);
     this.ctx.truncateDrawings(this.ctx.bar_index);
-    this.ctx.truncateAlerts(this.ctx.bar_index);
     this.ctx.truncateLogs(this.ctx.bar_index);
   }
 

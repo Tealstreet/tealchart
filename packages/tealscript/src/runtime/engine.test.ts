@@ -317,7 +317,7 @@ strategy("Order fill recalc", calc_on_order_fills=true, process_orders_on_close=
 var recalculations = 0
 recalculations += 1
 if bar_index == 0
-    strategy.entry("Long", strategy.long, qty=1, limit=99.8)
+    strategy.entry("Long", strategy.long, qty=1, limit=99.8, alert_message="entry filled")
 if strategy.position_size > 0
     strategy.close("Long")
 plot(strategy.position_size)
@@ -348,6 +348,15 @@ plot(recalculations)`;
         [0, 0],
         [0, 1],
         [1, 2],
+      ]);
+      expect(result.alerts.find((alert) => alert.id === 'strategy_order_fills')?.events).toEqual([
+        {
+          barIndex: 1,
+          time: bars[1].time,
+          message: 'entry filled',
+          frequency: 'all',
+          isRealtime: false,
+        },
       ]);
       expect(result.strategy.intrabarContexts).toHaveLength(2);
     });
