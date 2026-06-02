@@ -249,6 +249,10 @@ export type Pivot
     float y
 export scale(float value, simple float multiplier) => value * multiplier
 export method lifted(Pivot this, float amount) => this
+export enum Direction
+    up = "Up"
+    down = "Down"
+export pick() => Direction.up
 `));
     const emptyLibrary = checkProgram(parse(`
 library("Empty")
@@ -259,6 +263,8 @@ indicator("Export Outside Library")
 export scale(float value) => value * 2
 export type Pivot
     float y
+export enum Direction
+    up = "Up"
 `));
     const untypedExport = checkProgram(parse(`
 library("Untyped Export")
@@ -270,11 +276,12 @@ export type Pivot
 
     expect(validLibrary.diagnostics).toEqual([]);
     expect(emptyLibrary.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Library scripts must export at least one function, method, user-defined type, or constant',
+      'Library scripts must export at least one function, method, user-defined type, enum, or constant',
     ]);
     expect(exportedInIndicator.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Exported declarations are only allowed in library scripts: scale',
       'Exported declarations are only allowed in library scripts: Pivot',
+      'Exported declarations are only allowed in library scripts: Direction',
     ]);
     expect(untypedExport.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Exported function scale parameter value must declare a type',

@@ -13,6 +13,7 @@ import type {
   LibraryDeclaration,
   ImportDeclaration,
   TypeDeclaration,
+  EnumDeclaration,
   TypeFieldDeclaration,
   TypeAnnotation,
   FunctionDeclaration,
@@ -299,6 +300,7 @@ interface ImportedLibrary {
   methods: Map<string, FunctionDeclaration[]>;
   types: Map<string, TypeDeclaration>;
   exportedTypes: Set<string>;
+  enums: Map<string, Map<string, string>>;
   constants: Map<string, unknown>;
 }
 
@@ -1002,6 +1004,7 @@ export class TealscriptEngine {
       const methods = new Map<string, FunctionDeclaration[]>();
       const types = new Map<string, TypeDeclaration>();
       const exportedTypes = new Set<string>();
+      const enums = new Map<string, Map<string, string>>();
       const constants = new Map<string, unknown>();
       for (const libraryStmt of libraryAst.body) {
         if (libraryStmt.type === 'FunctionDeclaration') {
@@ -1026,6 +1029,9 @@ export class TealscriptEngine {
             exportedTypes.add(libraryStmt.name.name);
           }
         }
+        if (libraryStmt.type === 'EnumDeclaration' && libraryStmt.exported) {
+          enums.set(libraryStmt.name.name, this.createImportedEnumValues(stmt.path, libraryStmt));
+        }
         if (libraryStmt.type === 'VariableDeclaration' && libraryStmt.exported && libraryStmt.names.type === 'VariableDeclarator') {
           const value = this.evaluateLibraryConstantExpression(libraryStmt.init);
           if (value !== undefined) {
@@ -1042,9 +1048,18 @@ export class TealscriptEngine {
         methods,
         types,
         exportedTypes,
+        enums,
         constants,
       });
     }
+  }
+
+  private createImportedEnumValues(libraryPath: string, declaration: EnumDeclaration): Map<string, string> {
+    const values = new Map<string, string>();
+    for (const field of declaration.fields) {
+      values.set(field.name.name, `${libraryPath}.${declaration.name.name}.${field.name.name}`);
+    }
+    return values;
   }
 
   private evaluateLibraryConstantExpression(expression: Expression): unknown {
@@ -3126,6 +3141,13 @@ export class TealscriptEngine {
       const importedLibrary = this.importedLibraries.get(namespace);
       if (importedLibrary?.constants.has(prop)) {
         return importedLibrary.constants.get(prop);
+      }
+      if (memberPath.length === 3) {
+        const [alias, enumName, fieldName] = memberPath;
+        const enumValues = alias && enumName ? this.importedLibraries.get(alias)?.enums.get(enumName) : undefined;
+        if (fieldName && enumValues?.has(fieldName)) {
+          return enumValues.get(fieldName);
+        }
       }
 
       // Check builtins

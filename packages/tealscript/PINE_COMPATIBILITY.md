@@ -305,11 +305,11 @@ reference diagnostics remain planned in the qualified type-system epic.
 ## Common Library Syntax Coverage
 
 The library syntax MVP parses `library(...)` declarations, `export` on UDFs,
-typed and qualified exported parameters such as `simple string prefix`, and
-`import publisher/Library/version as alias` declarations. Local library-style
-scripts can execute exported helper functions in the same file, which supports
-deterministic compatibility fixtures based on TradingView's documented
-all-time-high/all-time-low library idiom.
+typed and qualified exported parameters such as `simple string prefix`,
+exported enums, and `import publisher/Library/version as alias` declarations.
+Local library-style scripts can execute exported helper functions in the same
+file, which supports deterministic compatibility fixtures based on TradingView's
+documented all-time-high/all-time-low library idiom.
 
 Semantic diagnostics require `export` declarations to live in library scripts,
 require library scripts to export at least one parsed exportable declaration,
@@ -320,9 +320,11 @@ library globals. Exported function/method scope diagnostics also report
 
 The runtime can also bind imported libraries from a deterministic host-provided
 registry keyed by Pine import path. This supports `alias.exportedFunction(...)`
-calls and exported user-defined type constructors such as `alias.Type.new(...)`
-and exported literal/builtin constants such as `alias.length` or `alias.color`
-in offline tests and chart integrations that pre-resolve library source.
+calls, exported user-defined type constructors such as `alias.Type.new(...)`,
+exported enum members such as `alias.State.long` with dotted annotations such
+as `alias.State signal`, and exported literal/builtin constants such as
+`alias.length` or `alias.color` in offline tests and chart integrations that
+pre-resolve library source.
 Exported imported methods dispatch on imported UDT instances. Non-exported
 library functions, methods, and types remain private to their source module, but
 exported library functions can call private helpers, construct library-local

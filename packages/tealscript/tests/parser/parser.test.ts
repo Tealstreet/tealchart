@@ -8,6 +8,7 @@ import { parse, validate, TealscriptParseError, TealscriptParseLimitError, forma
 import type {
   Program,
   FunctionDeclaration,
+  EnumDeclaration,
   ImportDeclaration,
   IndicatorDeclaration,
   LibraryDeclaration,
@@ -117,6 +118,28 @@ describe('Tealscript Parser', () => {
         baseType: 'int',
         qualifier: 'const',
       }));
+    });
+
+    it('parses exported library enums', () => {
+      const ast = parse(`export enum State
+    long = "Long"
+    short = "Short"
+    neutral
+`);
+      const declaration = ast.body[0] as EnumDeclaration;
+      expect(declaration.type).toBe('EnumDeclaration');
+      expect(declaration.exported).toBe(true);
+      expect(declaration.name.name).toBe('State');
+      expect(declaration.fields.map((field) => field.name.name)).toEqual(['long', 'short', 'neutral']);
+      expect(declaration.fields[0]?.title).toEqual(expect.objectContaining({
+        type: 'StringLiteral',
+        value: 'Long',
+      }));
+      expect(declaration.fields[1]?.title).toEqual(expect.objectContaining({
+        type: 'StringLiteral',
+        value: 'Short',
+      }));
+      expect(declaration.fields[2]?.title).toBeNull();
     });
   });
 
@@ -253,6 +276,34 @@ matrix<map<string, float>> grid = na
         type: 'TypeAnnotation',
         baseType: 'udt',
         name: 'pivotPoint',
+      }));
+    });
+
+    it('parses dotted imported type annotations', () => {
+      const ast = parse(`import TestUser/Signal/1 as sig
+sig.State signal = sig.State.long
+array<sig.State> states = na
+map<string, sig.State> stateBySymbol = na
+`);
+      const signal = ast.body[1] as VariableDeclaration;
+      const states = ast.body[2] as VariableDeclaration;
+      const stateBySymbol = ast.body[3] as VariableDeclaration;
+
+      expect(signal.typeAnnotation).toEqual(expect.objectContaining({
+        type: 'TypeAnnotation',
+        baseType: 'udt',
+        name: 'sig.State',
+      }));
+      expect(states.typeAnnotation).toEqual(expect.objectContaining({
+        type: 'TypeAnnotation',
+        baseType: 'array',
+        elementType: 'sig.State',
+      }));
+      expect(stateBySymbol.typeAnnotation).toEqual(expect.objectContaining({
+        type: 'TypeAnnotation',
+        baseType: 'map',
+        keyType: 'string',
+        valueType: 'sig.State',
       }));
     });
 

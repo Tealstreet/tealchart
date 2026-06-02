@@ -533,6 +533,9 @@ Phases:
    block bodies.
    Runtime coverage now imports exported literal/builtin constants from the
    deterministic library registry.
+   Parser and runtime coverage now handles exported enums from imported
+   libraries, including Pine's dotted enum member and type annotation idiom
+   such as `alias.State.long` and `alias.State signal`.
 
 Done means library-heavy Pine v5/v6 scripts can be reduced and run without
 large rewrites.

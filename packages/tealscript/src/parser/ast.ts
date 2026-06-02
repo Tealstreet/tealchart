@@ -38,6 +38,7 @@ export type Statement =
   | LibraryDeclaration
   | ImportDeclaration
   | TypeDeclaration
+  | EnumDeclaration
   | FunctionDeclaration
   | VariableDeclaration
   | AssignmentStatement
@@ -126,6 +127,26 @@ export interface TypeFieldDeclaration extends BaseNode {
   typeAnnotation?: TypeAnnotation | null;
   defaultValue?: Expression | null;
   varip?: boolean;
+}
+
+/**
+ * User-defined enum declaration.
+ *
+ * enum State
+ *     long = "Long"
+ *     short = "Short"
+ */
+export interface EnumDeclaration extends BaseNode {
+  type: 'EnumDeclaration';
+  name: Identifier;
+  fields: EnumFieldDeclaration[];
+  exported?: boolean;
+}
+
+export interface EnumFieldDeclaration extends BaseNode {
+  type: 'EnumFieldDeclaration';
+  name: Identifier;
+  title?: StringLiteral | null;
 }
 
 /**
@@ -506,7 +527,7 @@ export type PineType =
 // Helper Types
 // ============================================================================
 
-export type AnyNode = Program | Statement | Expression | TypeAnnotation | TypeFieldDeclaration | CallArgument;
+export type AnyNode = Program | Statement | Expression | TypeAnnotation | TypeFieldDeclaration | EnumFieldDeclaration | CallArgument;
 
 /**
  * Type guard functions
@@ -537,6 +558,7 @@ export function isStatement(node: AnyNode): node is Statement {
     'LibraryDeclaration',
     'ImportDeclaration',
     'TypeDeclaration',
+    'EnumDeclaration',
     'FunctionDeclaration',
     'VariableDeclaration',
     'AssignmentStatement',
