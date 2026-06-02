@@ -1057,6 +1057,46 @@ tooManyBarsSince = ta.barssince(close > open, true)
     ]);
   });
 
+  it('resolves TA statistics helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("TA Stats Signatures")
+variance = ta.variance(source=close, length=3, biased=false)
+deviation = ta.dev(source=close, length=3)
+correlation = ta.correlation(source1=close, source2=open, length=3)
+cog = ta.cog(source=close, length=3)
+median = ta.median(source=close, length=3)
+mode = ta.mode(source=close, length=3)
+nearest = ta.percentile_nearest_rank(source=close, length=3, percentage=75)
+linear = ta.percentile_linear_interpolation(source=close, length=3, percentage=75)
+rank = ta.percentrank(source=close, length=3)
+total = ta.cum(source=close)
+plot(variance + deviation + correlation + cog + median + mode + nearest + linear + rank + total)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid TA statistics helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad TA Stats Signatures")
+duplicateVariance = ta.variance(close, source=open, length=3)
+unknownDeviation = ta.dev(source=close, length=3, average=2)
+missingCorrelation = ta.correlation(source1=close, source2=open)
+shortPercentile = ta.percentile_nearest_rank(source=close, length=3)
+tooManyCum = ta.cum(close, open)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Argument 'source' for ta.variance() was supplied multiple times",
+      "Unknown argument 'average' for ta.dev()",
+      'ta.correlation() expects at least 3 arguments',
+      "ta.correlation() missing required argument 'length'",
+      'ta.percentile_nearest_rank() expects at least 3 arguments',
+      "ta.percentile_nearest_rank() missing required argument 'percentage'",
+      'ta.cum() expects at most 1 argument',
+    ]);
+  });
+
   it('resolves color helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Color Signatures")

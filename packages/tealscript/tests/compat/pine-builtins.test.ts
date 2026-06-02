@@ -132,6 +132,10 @@ plot(ta.correlation(close, high, 3), title="Close High Correlation")
 plot(ta.correlation(close, close, 3), title="Self Correlation")
 plot(ta.cog(close, 3), title="COG")
 plot(ta.cog(close - open, 3), title="Derived COG")
+plot(ta.cum(source=close), title="Named Cum Close")
+plot(ta.dev(source=close, length=3), title="Named Mean Deviation")
+plot(ta.correlation(source1=close, source2=open, length=3), title="Named Close Open Correlation")
+plot(ta.cog(source=close, length=3), title="Named COG")
 `);
 
     expect(result.errors).toEqual([]);
@@ -145,6 +149,10 @@ plot(ta.cog(close - open, 3), title="Derived COG")
     expect(roundSeries(getPlot(result, 'Self Correlation').values)).toEqual([null, null, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(roundSeries(getPlot(result, 'COG').values)).toEqual([null, null, -1.984076, -2.006349, -2.02589, -2.009934, -1.983498, -1.971246, -1.987539, -1.993902, -1.993921, -1.996997]);
     expect(roundSeries(getPlot(result, 'Derived COG').values)).toEqual([null, null, -2, -9, -1, -2.714286, 6, -1.6, -2.625, -2.285714, -2, -2.25]);
+    expect(roundSeries(getPlot(result, 'Named Cum Close').values)).toEqual(roundSeries(getPlot(result, 'Cum Close').values));
+    expect(roundSeries(getPlot(result, 'Named Mean Deviation').values)).toEqual(roundSeries(getPlot(result, 'Mean Deviation').values));
+    expect(roundSeries(getPlot(result, 'Named Close Open Correlation').values)).toEqual(roundSeries(getPlot(result, 'Close Open Correlation').values));
+    expect(roundSeries(getPlot(result, 'Named COG').values)).toEqual(roundSeries(getPlot(result, 'COG').values));
   });
 
   it('runs Pine channel helper idioms', () => {
@@ -858,6 +866,11 @@ plot(ta.mode(close, length), title="Mode")
 plot(ta.percentile_nearest_rank(close, length, 75), title="Nearest")
 plot(ta.percentile_linear_interpolation(close, length, 75), title="Linear")
 plot(ta.percentrank(close, length), title="Percent Rank")
+plot(ta.median(source=close, length=length), title="Named Median")
+plot(ta.mode(source=close, length=length), title="Named Mode")
+plot(ta.percentile_nearest_rank(source=close, length=length, percentage=75), title="Named Nearest")
+plot(ta.percentile_linear_interpolation(source=close, length=length, percentage=75), title="Named Linear")
+plot(ta.percentrank(source=close, length=length), title="Named Percent Rank")
 `);
 
     expect(result.errors).toEqual([]);
@@ -866,6 +879,11 @@ plot(ta.percentrank(close, length), title="Percent Rank")
     expect(getPlot(result, 'Nearest').values).toEqual([null, null, 107, 107, 107, 103, 104, 109, 109, 111, 111, 112]);
     expect(getPlot(result, 'Linear').values).toEqual([null, null, 106, 106, 105, 101.5, 102, 106.5, 108.5, 110, 110.5, 111.5]);
     expect(roundSeries(getPlot(result, 'Percent Rank').values)).toEqual([null, null, 100, 33.333333, 33.333333, 66.666667, 100, 100, 66.666667, 100, 66.666667, 100]);
+    expect(getPlot(result, 'Named Median').values).toEqual(getPlot(result, 'Median').values);
+    expect(getPlot(result, 'Named Mode').values).toEqual(getPlot(result, 'Mode').values);
+    expect(getPlot(result, 'Named Nearest').values).toEqual(getPlot(result, 'Nearest').values);
+    expect(getPlot(result, 'Named Linear').values).toEqual(getPlot(result, 'Linear').values);
+    expect(roundSeries(getPlot(result, 'Named Percent Rank').values)).toEqual(roundSeries(getPlot(result, 'Percent Rank').values));
   });
 
   it('matches common Pine moving-average helper idioms', () => {
