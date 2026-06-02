@@ -1,9 +1,12 @@
 # Pine Script Parity Epic Roadmap
 
-This roadmap tracks the work required to move TealScript from a Pine-inspired
-indicator subset toward full Pine Script v6 feature parity. It is intentionally
-broader than the current compatibility matrix: every epic is expected to be a
-multi-phase effort implemented through small, tested PRs.
+This roadmap tracks the work required to make public TradingView Pine scripts
+copy-paste compatible with the TealScript runtime. The first success bar is
+that common published Pine Script v5/v6 code parses, semantically validates,
+and executes without manual rewrites. TradingView-identical visual rendering is
+the final goal, but early phases may accept approximate rendering when the
+script itself runs and exposes usable plots, drawings, alerts, logs, or
+strategy metadata.
 
 Structural cleanup that supports this parity work is tracked in
 [`PINE_HYGIENE_EPICS.md`](./PINE_HYGIENE_EPICS.md). Treat that roadmap as the
@@ -31,6 +34,29 @@ Primary source references:
 - [Non-standard charts data](https://www.tradingview.com/pine-script-docs/concepts/non-standard-charts-data/)
 - [Libraries](https://www.tradingview.com/pine-script-docs/concepts/libraries/)
 - [Limitations](https://www.tradingview.com/pine-script-docs/writing/limitations/)
+
+## North Star
+
+The product goal is copy-paste compatibility for scripts published on
+TradingView: a user should be able to paste PineScript into TealScript and have
+it parse and run. Rendering should become increasingly equivalent over time,
+but the roadmap should not chase pixel-perfect visual details before the
+language, built-in, request, runtime, and strategy semantics needed by common
+public scripts are in place.
+
+Use this priority order when choosing or scoping epics:
+
+1. Copy-paste syntax compatibility for public PineScript.
+2. Runtime execution for common public-script idioms.
+3. Built-in namespace breadth and overload shapes that unblock many scripts.
+4. Deterministic semantic fixtures reduced from official docs and public idioms.
+5. Rendering fidelity and TradingView-exact edge cases once they affect common
+   scripts or block user-visible correctness.
+
+Avoid rabbit holes by requiring evidence before deep work on rare semantics:
+the feature should appear in official docs, common public scripts, or be a
+dependency for a broader compatibility epic. Prefer small compatibility wins
+that unlock many scripts over local implementation neatness.
 
 ## Current Baseline
 
@@ -65,8 +91,8 @@ Known structural gaps:
 
 ## Epic Order
 
-The recommended order prioritizes the features that unlock the most public Pine
-scripts and reduce later rework:
+The recommended order prioritizes copy-paste execution of public Pine scripts
+and reduces later rework:
 
 1. Compatibility harness and source-of-truth cleanup.
 2. Core language and semantic hardening.
@@ -77,13 +103,13 @@ scripts and reduce later rework:
 7. Time, sessions, and timeframe completion.
 8. `request.*` and multi-context data engine.
 9. Ticker and non-standard chart data.
-10. Visual primitives and plot parity.
+10. Visual primitives and plot execution coverage.
 11. Drawing object model.
 12. Collections, UDTs, methods, and libraries.
 13. Alerts and logs.
 14. Strategy broker emulator.
 15. Limits, performance, and sandboxing.
-16. Real Pine checkpoint suite.
+16. Real Pine copy-paste checkpoint suite.
 
 ## Epic 1: Compatibility Harness And Source Of Truth
 
@@ -647,8 +673,8 @@ Done means hostile or accidentally expensive scripts cannot degrade the chart.
 
 ## Epic 16: Real Pine Checkpoint Suite
 
-Goal: validate parity against real Pine idioms without depending on TradingView
-at CI time.
+Goal: validate copy-paste compatibility against real Pine idioms without
+depending on TradingView at CI time.
 
 Phases:
 
@@ -673,7 +699,8 @@ Phases:
    preserve only reduced semantic fixtures. Public-script licensing and
    reduction guardrails are documented in `tests/compat/PINE_CHECKPOINTS.md`.
 
-Done means every parity epic has regression tests that reflect real Pine usage.
+Done means every parity epic has regression tests that reflect real Pine usage,
+and milestone public scripts have reduced fixtures proving they parse and run.
 
 ## Near-Term Candidate PR Sequence
 

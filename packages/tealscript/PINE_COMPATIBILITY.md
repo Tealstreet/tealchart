@@ -1,8 +1,11 @@
 # TealScript Pine Compatibility Matrix
 
-TealScript is Pine-inspired, not a drop-in Pine runtime. This matrix tracks the
-subset needed for AI-generated chart indicators to behave like common Pine
-Script v5/v6 indicators.
+TealScript's north star is copy-paste compatibility with public TradingView
+Pine scripts: pasted PineScript should parse and run in the TealScript runtime
+without manual rewrites. This matrix tracks current support, partial behavior,
+and known gaps on the path to that goal. TradingView-identical rendering is the
+final target, but early compatibility status can be useful when script
+execution is correct and visual output is approximate.
 
 For the broader full-parity plan, see
 [`PINE_PARITY_EPICS.md`](./PINE_PARITY_EPICS.md).
@@ -20,14 +23,14 @@ Status values:
 
 ## Target Order
 
-1. Common indicator snippets compile and render: moving averages, oscillators,
-   volatility bands, pivots, and divergence helpers.
-2. User-defined functions and function-local series state behave predictably.
-3. Mutable data structures cover common Pine array patterns.
-4. The most-used `ta.*`, `math.*`, `str.*`, `input.*`, and visual built-ins are
-   available with Pine-compatible names and argument shapes.
-5. Multi-timeframe data, drawings, alerts, and strategies follow after the core
-   indicator subset is stable.
+1. Public Pine scripts parse without rewrites.
+2. Parsed scripts execute over deterministic bars without runtime failures.
+3. Common public-script idioms produce usable plots, drawings, alerts, logs, or
+   strategy metadata.
+4. The most-used built-in namespaces and overload shapes unblock broad script
+   coverage.
+5. Rendering and TradingView-exact edge cases tighten after execution
+   compatibility is broad.
 
 For each major compatibility epic, add deterministic golden fixtures for the
 new behavior and, at checkpoint boundaries, add reduced smoke fixtures inspired
