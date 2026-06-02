@@ -74,6 +74,7 @@ export const BUILTIN_NAMESPACES = new Set([
   'line',
   'linefill',
   'location',
+  'log',
   'map',
   'math',
   'matrix',
