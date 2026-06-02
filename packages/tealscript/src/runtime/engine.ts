@@ -286,6 +286,7 @@ export interface TealscriptEngineOptions {
 export interface TealscriptRuntimeOptions {
   syminfo?: Partial<SymInfo>;
   timeframe?: Partial<TimeframeInfo>;
+  session?: Partial<SessionClassificationInfo>;
   now?: number;
 }
 
@@ -306,6 +307,13 @@ interface TimeframeSpec {
   period: string;
   multiplier: number;
   unit: TimeframeUnit;
+}
+
+export interface SessionClassificationInfo {
+  regular: string;
+  premarket: string;
+  postmarket: string;
+  timezone: string;
 }
 
 interface RandomBuiltinState {
@@ -6124,9 +6132,9 @@ export class TealscriptEngine {
   private registerTickerBuiltins(): void {
     this.builtins.set('session.regular', () => 'regular');
     this.builtins.set('session.extended', () => 'extended');
-    this.builtins.set('session.ismarket', () => this.unsupportedSessionState('session.ismarket'));
-    this.builtins.set('session.ispremarket', () => this.unsupportedSessionState('session.ispremarket'));
-    this.builtins.set('session.ispostmarket', () => this.unsupportedSessionState('session.ispostmarket'));
+    this.builtins.set('session.ismarket', () => this.evaluateSessionState('regular', 'session.ismarket'));
+    this.builtins.set('session.ispremarket', () => this.evaluateSessionState('premarket', 'session.ispremarket'));
+    this.builtins.set('session.ispostmarket', () => this.evaluateSessionState('postmarket', 'session.ispostmarket'));
     this.builtins.set('adjustment.none', () => 'none');
     this.builtins.set('adjustment.splits', () => 'splits');
     this.builtins.set('adjustment.dividends', () => 'dividends');
@@ -6274,8 +6282,18 @@ export class TealscriptEngine {
     throw new Error(`Unsupported ticker session: ${session}`);
   }
 
-  private unsupportedSessionState(name: string): never {
-    throw new RuntimeErrorException(`${name} requires exchange session classification, which is not available in this runtime`);
+  private evaluateSessionState(kind: 'regular' | 'premarket' | 'postmarket', name: string): boolean {
+    const session = this.runtimeOptions.session?.[kind];
+    if (session === undefined || session === '') {
+      throw new RuntimeErrorException(`${name} requires exchange session classification, which is not available in this runtime`);
+    }
+
+    const timestamp = this.ctx.time.get(0);
+    if (timestamp === undefined || !Number.isFinite(timestamp)) return false;
+
+    const timezone = this.runtimeOptions.session?.timezone
+      ?? this.ctx.syminfo.timezone;
+    return this.isTimestampInSession(timestamp, session, timezone);
   }
 
   private normalizeTickerModifier(

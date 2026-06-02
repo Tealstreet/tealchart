@@ -153,6 +153,7 @@ export {
   type ExecutionResult,
   type ExecutionError,
   type IndicatorDeclarationMetadata,
+  type SessionClassificationInfo,
   type TealscriptEngineOptions,
   type TealscriptRuntimeOptions,
 } from './engine';
