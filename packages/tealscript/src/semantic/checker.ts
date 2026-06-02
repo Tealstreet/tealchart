@@ -467,6 +467,15 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['ta.sma', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
   ['ta.stdev', { params: ['source', 'length', 'biased'], minArgs: 2, maxArgs: 3 }],
   ['ta.vwap', { params: ['source', 'anchor', 'stdev_mult'], minArgs: 1, maxArgs: 3 }],
+  ['ticker.new', { params: ['prefix', 'ticker', 'session', 'adjustment', 'backadjustment', 'settlement_as_close'], minArgs: 2, maxArgs: 6 }],
+  ['ticker.modify', { params: ['tickerid', 'session', 'adjustment', 'backadjustment', 'settlement_as_close'], minArgs: 1, maxArgs: 5 }],
+  ['ticker.standard', { params: ['symbol'], minArgs: 1, maxArgs: 1 }],
+  ['ticker.inherit', { params: ['from_tickerid', 'symbol'], minArgs: 2, maxArgs: 2 }],
+  ['ticker.heikinashi', { params: ['symbol'], minArgs: 1, maxArgs: 1 }],
+  ['ticker.renko', { params: ['symbol', 'style', 'param', 'request_wicks', 'source'], minArgs: 3, maxArgs: 5 }],
+  ['ticker.linebreak', { params: ['symbol', 'number_of_lines'], minArgs: 2, maxArgs: 2 }],
+  ['ticker.kagi', { params: ['symbol', 'style', 'param'], minArgs: 3, maxArgs: 3 }],
+  ['ticker.pointfigure', { params: ['symbol', 'source', 'style', 'param', 'reversal'], minArgs: 5, maxArgs: 5 }],
   ['time', { params: ['timeframe', 'session', 'timezone'], minArgs: 0, maxArgs: 3 }],
   ['time_close', { params: ['timeframe', 'session', 'timezone'], minArgs: 0, maxArgs: 3 }],
   ['timeframe.change', { params: ['timeframe'], minArgs: 0, maxArgs: 1 }],
@@ -2025,6 +2034,11 @@ class SemanticChecker {
 
     if (boundParamCount < minArgs) {
       this.addDiagnostic('argument-count', `${displayName}() expects at least ${minArgs} argument${minArgs === 1 ? '' : 's'}`, args[0]?.loc);
+    }
+    for (let index = 0; index < minArgs; index += 1) {
+      const param = params[index];
+      if (!param || index < positionalCount || suppliedNames.has(param)) continue;
+      this.addDiagnostic('argument-count', `${displayName}() missing required argument '${param}'`, args[0]?.loc);
     }
     if (positionalCount > maxArgs) {
       this.addDiagnostic('argument-count', `${displayName}() expects at most ${maxArgs} argument${maxArgs === 1 ? '' : 's'}`, args[maxArgs]?.loc);

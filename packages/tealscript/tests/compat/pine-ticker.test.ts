@@ -264,4 +264,40 @@ plot(pnfClose, title="PnF Close")
     expect(getPlot(result, 'PnF Open').values).toEqual([230, 235, 240]);
     expect(getPlot(result, 'PnF Close').values).toEqual([235, 240, 235]);
   });
+
+  it('resolves named ticker helper arguments for request contexts', () => {
+    const result = runCompatScript(`
+indicator("Named ticker helper requests")
+baseTicker = ticker.new(prefix="NASDAQ", ticker="AAPL", session=session.extended)
+modifiedTicker = ticker.modify(tickerid=baseTicker, adjustment=adjustment.splits, backadjustment=backadjustment.on, settlement_as_close=settlement_as_close.off)
+haTicker = ticker.heikinashi(symbol=baseTicker)
+renkoTicker = ticker.renko(symbol="NASDAQ:AAPL", style="ATR", param=10)
+lineBreakTicker = ticker.linebreak(symbol="NASDAQ:AAPL", number_of_lines=3)
+kagiTicker = ticker.kagi(symbol="NASDAQ:AAPL", style="ATR", param=10)
+pnfTicker = ticker.pointfigure(symbol="NASDAQ:AAPL", source="hl", style="ATR", param=14, reversal=3)
+modifiedClose = request.security(modifiedTicker, "1", close, lookahead=barmerge.lookahead_on)
+haClose = request.security(haTicker, "1", close, lookahead=barmerge.lookahead_on)
+renkoClose = request.security(renkoTicker, "1", close, lookahead=barmerge.lookahead_on)
+lineBreakClose = request.security(lineBreakTicker, "1", close, lookahead=barmerge.lookahead_on)
+kagiClose = request.security(kagiTicker, "1", close, lookahead=barmerge.lookahead_on)
+pnfClose = request.security(pnfTicker, "1", close, lookahead=barmerge.lookahead_on)
+plot(modifiedClose, title="Named Modified Close")
+plot(haClose, title="Named HA Close")
+plot(renkoClose, title="Named Renko Close")
+plot(lineBreakClose, title="Named Line Break Close")
+plot(kagiClose, title="Named Kagi Close")
+plot(pnfClose, title="Named PnF Close")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: sessionRequestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Named Modified Close').values).toEqual([301, 302, 303]);
+    expect(getPlot(result, 'Named HA Close').values).toEqual([200.5, 201.5, 202.5]);
+    expect(getPlot(result, 'Named Renko Close').values).toEqual([182, 184, 182]);
+    expect(getPlot(result, 'Named Line Break Close').values).toEqual([211, 212, 213]);
+    expect(getPlot(result, 'Named Kagi Close').values).toEqual([222, 224, 223]);
+    expect(getPlot(result, 'Named PnF Close').values).toEqual([235, 240, 235]);
+  });
 });
