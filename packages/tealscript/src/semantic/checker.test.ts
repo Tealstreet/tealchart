@@ -1033,6 +1033,40 @@ gradientShort = color.from_gradient(close, 0, 100, color.red)
     ]);
   });
 
+  it('resolves ticker helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Ticker Signatures")
+base = ticker.new(prefix="NASDAQ", ticker="AAPL", session=session.extended, adjustment=adjustment.splits, backadjustment=backadjustment.on, settlement_as_close=settlement_as_close.off)
+modified = ticker.modify(tickerid=base, session=session.regular, adjustment=adjustment.dividends, backadjustment=backadjustment.inherit, settlement_as_close=settlement_as_close.inherit)
+standard = ticker.standard(symbol=modified)
+inherited = ticker.inherit(from_tickerid=ticker.heikinashi(symbol=modified), symbol="NASDAQ:MSFT")
+renko = ticker.renko(symbol="NASDAQ:AAPL", style="ATR", param=10, request_wicks=true, source="Close")
+lineBreak = ticker.linebreak(symbol="NASDAQ:AAPL", number_of_lines=3)
+kagi = ticker.kagi(symbol="NASDAQ:AAPL", style="ATR", param=10)
+pointFigure = ticker.pointfigure(symbol="NASDAQ:AAPL", source="hl", style="ATR", param=14, reversal=3)
+plot(str.length(standard + inherited + renko + lineBreak + kagi + pointFigure))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid ticker helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Ticker Signatures")
+duplicatePrefix = ticker.new("NASDAQ", "AAPL", prefix="NYSE")
+unknownModifier = ticker.modify("NASDAQ:AAPL", bad=session.extended)
+shortRenko = ticker.renko("NASDAQ:AAPL", "ATR")
+unknownChart = ticker.pointfigure("NASDAQ:AAPL", "hl", "ATR", 14, 3, request_wicks=true)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Argument 'prefix' for ticker.new() was supplied multiple times",
+      "Unknown argument 'bad' for ticker.modify()",
+      'ticker.renko() expects at least 3 arguments',
+      "Unknown argument 'request_wicks' for ticker.pointfigure()",
+    ]);
+  });
+
   it('resolves request helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Request Signatures")
