@@ -546,4 +546,151 @@ if barstate.islast
       },
     ]);
   });
+
+  it('resolves mixed named and positional drawing constructor arguments in Pine order', () => {
+    const result = runCompatScript(`
+indicator("Mixed Drawing Constructors", overlay=true)
+if barstate.islast
+    label.new(x=bar_index, close, "mixed label", color=color.red, style=label.style_label_down, textcolor=color.white)
+    upper = line.new(x1=bar_index - 1, high[1], x2=bar_index, high, color=color.green, width=2)
+    lower = line.new(x1=bar_index - 1, low[1], x2=bar_index, low, color=color.blue)
+    linefill.new(line1=upper, lower, color.new(color.green, 70))
+    box.new(left=bar_index - 2, high, right=bar_index, low, bgcolor=color.new(color.orange, 80), text="mixed box")
+    points = array.from(chart.point.from_index(bar_index - 2, low[2]), chart.point.from_index(bar_index - 1, high[1]), chart.point.now(close))
+    polyline.new(points=points, closed=true, line_color=color.purple, line_width=3)
+    dashboard = table.new(position=position.top_right, 2, rows=1, border_color=color.white, border_width=1)
+    table.cell(table_id=dashboard, column=0, 0, "Mixed", text_color=color.white)
+    table.cell(table_id=dashboard, column=1, 0, str.tostring(close), bgcolor=color.green)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'label_label.new_0_11',
+        type: 'label',
+        barIndex: 11,
+        x: 11,
+        y: 112,
+        text: 'mixed label',
+        xloc: 'bar_index',
+        yloc: 'price',
+        style: 'label_down',
+        color: '#F44336',
+        textColor: '#FFFFFF',
+        size: 'normal',
+      },
+      {
+        id: 'line_line.new_0_11',
+        type: 'line',
+        barIndex: 11,
+        x1: 10,
+        y1: 114,
+        x2: 11,
+        y2: 113,
+        xloc: 'bar_index',
+        extend: 'none',
+        color: '#4CAF50',
+        style: 'solid',
+        width: 2,
+        forceOverlay: false,
+      },
+      {
+        id: 'line_line.new_1_11',
+        type: 'line',
+        barIndex: 11,
+        x1: 10,
+        y1: 109,
+        x2: 11,
+        y2: 108,
+        xloc: 'bar_index',
+        extend: 'none',
+        color: '#2196F3',
+        style: 'solid',
+        width: 1,
+        forceOverlay: false,
+      },
+      {
+        id: 'linefill_linefill.new_0_11',
+        type: 'linefill',
+        barIndex: 11,
+        line1: 'line_line.new_0_11',
+        line2: 'line_line.new_1_11',
+        color: '#4CAF504D',
+      },
+      {
+        id: 'box_box.new_0_11',
+        type: 'box',
+        barIndex: 11,
+        left: 9,
+        top: 113,
+        right: 11,
+        bottom: 108,
+        xloc: 'bar_index',
+        extend: 'none',
+        borderColor: null,
+        borderWidth: 1,
+        borderStyle: 'solid',
+        bgcolor: '#FF980033',
+        text: 'mixed box',
+        textColor: null,
+        textSize: 'normal',
+      },
+      {
+        id: 'polyline_polyline.new_0_11',
+        type: 'polyline',
+        barIndex: 11,
+        points: [
+          { type: 'chart.point', time: null, index: 9, price: 107 },
+          { type: 'chart.point', time: null, index: 10, price: 114 },
+          { type: 'chart.point', time: compatibilityBars[11]!.time, index: 11, price: 112 },
+        ],
+        curved: false,
+        closed: true,
+        xloc: 'bar_index',
+        lineColor: '#9C27B0',
+        fillColor: null,
+        lineStyle: 'solid',
+        lineWidth: 3,
+      },
+      {
+        id: 'table_table.new_0_11',
+        type: 'table',
+        barIndex: 11,
+        position: 'top_right',
+        columns: 2,
+        rows: 1,
+        bgcolor: null,
+        frameColor: null,
+        frameWidth: 1,
+        borderColor: '#FFFFFF',
+        borderWidth: 1,
+        cells: [
+          {
+            column: 0,
+            row: 0,
+            text: 'Mixed',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: null,
+          },
+          {
+            column: 1,
+            row: 0,
+            text: '112',
+            width: undefined,
+            height: undefined,
+            textColor: null,
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#4CAF50',
+          },
+        ],
+      },
+    ]);
+  });
 });
