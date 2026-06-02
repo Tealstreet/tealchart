@@ -653,8 +653,10 @@ unblocked:
 2. Core semantics: `na`, truthiness, cast, and equality parity fixtures. The
    direct `na` comparison and known numeric-to-bool diagnostic slice is covered;
    continue expanding runtime fixtures as new edge cases appear.
-3. Member/index assignment: make parsed assignment targets work or emit precise
-   diagnostics.
+3. Member/index assignment: parsed UDT field and array index assignment targets
+   now execute, and obvious invalid index assignment targets emit semantic
+   diagnostics. Continue expanding collection-specific assignment checks as new
+   syntax lands.
 4. `request.security()` design doc plus deterministic datafeed fixture harness.
 5. `request.security()` same-symbol higher-timeframe MVP.
 6. Label object output and renderer MVP.
