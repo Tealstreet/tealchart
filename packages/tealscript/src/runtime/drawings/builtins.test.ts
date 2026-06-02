@@ -766,6 +766,65 @@ plot(current.price, title="Point Price")`;
       expect(result.plots.find((plot) => plot.title === 'Point Price')?.values).toEqual([100.5, 101, 101.5]);
     });
 
+    it('supports named chart.point constructors', () => {
+      const script = `//@version=6
+indicator("Named chart points", overlay=true)
+current = chart.point.now(price=high)
+timed = chart.point.new(time=time, index=bar_index, price=close)
+mixedTime = chart.point.from_time(time=time[1], close)
+if barstate.islast
+    left = chart.point.from_index(index=bar_index - 1, price=low)
+    right = chart.point.now(price=high)
+    prefix = chart.point.new(time=time, bar_index - 2, low)
+    copied = chart.point.copy(id=right)
+    line.new(left, copied)
+    line.new(prefix, mixedTime, xloc=xloc.bar_time)
+plot(current.index, title="Named Point Index")
+plot(timed.price, title="Named New Price")
+plot(mixedTime.price, title="Mixed Time Price")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'line_line.new_0_2',
+          type: 'line',
+          barIndex: 2,
+          x1: 1,
+          y1: 100.7,
+          x2: 2,
+          y2: 101.5,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: null,
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+        {
+          id: 'line_line.new_1_2',
+          type: 'line',
+          barIndex: 2,
+          x1: bars[2]!.time,
+          y1: 100.7,
+          x2: bars[1]!.time,
+          y2: 101.2,
+          xloc: 'bar_time',
+          extend: 'none',
+          color: null,
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Named Point Index')?.values).toEqual([0, 1, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Named New Price')?.values).toEqual([100.2, 100.7, 101.2]);
+      expect(result.plots.find((plot) => plot.title === 'Mixed Time Price')?.values).toEqual([100.2, 100.7, 101.2]);
+    });
+
     it('records, copies, deletes, limits, and exposes polyline drawings', () => {
       const script = `//@version=6
 indicator("Polylines", overlay=true, max_polylines_count=1)
