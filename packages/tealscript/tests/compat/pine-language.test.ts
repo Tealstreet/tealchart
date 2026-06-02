@@ -97,7 +97,7 @@ export enum State
     const result = runCompatScript(`
 indicator("Imported enum")
 import TestUser/Signal/1 as sig
-signal = switch
+sig.State signal = switch
     close > 108 => sig.State.long
     close < 101 => sig.State.short
     => sig.State.neutral

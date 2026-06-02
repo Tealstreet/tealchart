@@ -432,7 +432,12 @@ TypeName
   / "bool" !IdentifierPart { return 'bool'; }
   / "string" !IdentifierPart { return 'string'; }
   / "color" !IdentifierPart { return 'color'; }
-  / name:IdentifierName { return name; }
+  / name:QualifiedTypeName { return name; }
+
+QualifiedTypeName
+  = head:IdentifierName tail:(_ "." _ IdentifierName)* {
+      return [head, ...tail.map(t => t[3])].join('.');
+    }
 
 TypeReferenceName
   = "array" !IdentifierPart _ "<" _ elementType:TypeReferenceName _ ">" {
@@ -1232,7 +1237,7 @@ IdentifierPart
 ReservedWord
   = ("if" / "else" / "for" / "while" / "break" / "continue" / "var" / "varip"
     / "true" / "false" / "na" / "and" / "or" / "not" / "to" / "by"
-    / "switch" / "type" / "method"
+    / "switch" / "type" / "method" / "enum"
     / "indicator" / "library" / "import" / "export"
     ) !IdentifierPart
 

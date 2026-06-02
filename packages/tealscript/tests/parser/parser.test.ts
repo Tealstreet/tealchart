@@ -279,6 +279,34 @@ matrix<map<string, float>> grid = na
       }));
     });
 
+    it('parses dotted imported type annotations', () => {
+      const ast = parse(`import TestUser/Signal/1 as sig
+sig.State signal = sig.State.long
+array<sig.State> states = na
+map<string, sig.State> stateBySymbol = na
+`);
+      const signal = ast.body[1] as VariableDeclaration;
+      const states = ast.body[2] as VariableDeclaration;
+      const stateBySymbol = ast.body[3] as VariableDeclaration;
+
+      expect(signal.typeAnnotation).toEqual(expect.objectContaining({
+        type: 'TypeAnnotation',
+        baseType: 'udt',
+        name: 'sig.State',
+      }));
+      expect(states.typeAnnotation).toEqual(expect.objectContaining({
+        type: 'TypeAnnotation',
+        baseType: 'array',
+        elementType: 'sig.State',
+      }));
+      expect(stateBySymbol.typeAnnotation).toEqual(expect.objectContaining({
+        type: 'TypeAnnotation',
+        baseType: 'map',
+        keyType: 'string',
+        valueType: 'sig.State',
+      }));
+    });
+
     it('parses tuple destructuring', () => {
       const ast = parse('[a, b, c] = someFunc()\n');
       const decl = ast.body[0] as VariableDeclaration;
