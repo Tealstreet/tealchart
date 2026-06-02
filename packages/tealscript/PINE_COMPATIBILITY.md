@@ -238,6 +238,9 @@ The map pass covers `map.new`, `map.size`, `map.put`, `map.get`,
 return `na`, `map.put()` returns the prior value for an existing key or `na`
 for a new key, replacing an existing key preserves insertion order, and
 `map.keys()` / `map.values()` return copied Pine arrays ordered by map insertion.
+Map built-ins accept named reference arguments (`id`, `key`, `value`, `id2`)
+for namespace and method forms, with the implicit method receiver taking
+precedence over any named `id`.
 
 The parser accepts Pine-style `map<key, value>` declarations and generic
 constructor calls such as `map.new<string, float>()`. Semantic diagnostics

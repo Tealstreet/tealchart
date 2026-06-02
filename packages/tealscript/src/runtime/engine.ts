@@ -5940,24 +5940,32 @@ export class TealscriptEngine {
     };
 
     this.builtins.set('map.new', () => createPineMap());
-    this.builtins.set('map.size', (args) => getMapSize(readMap(args[0])));
-    this.builtins.set('map.put', (args) => {
-      return putMapValue(readMap(args[0]), args[1], args[2]);
+    this.builtins.set('map.size', (args, namedArgs) => getMapSize(readMap(this.mapReceiverArg(args, namedArgs))));
+    this.builtins.set('map.put', (args, namedArgs) => {
+      return putMapValue(
+        readMap(this.mapReceiverArg(args, namedArgs)),
+        this.getCallArg(args, namedArgs, 1, 'key'),
+        this.getCallArg(args, namedArgs, 2, 'value'),
+      );
     });
-    this.builtins.set('map.get', (args) => getMapValue(readMap(args[0]), args[1]));
-    this.builtins.set('map.contains', (args) => containsMapKey(readMap(args[0]), args[1]));
-    this.builtins.set('map.remove', (args) => removeMapValue(readMap(args[0]), args[1]));
-    this.builtins.set('map.clear', (args) => {
-      clearMap(readMap(args[0]));
+    this.builtins.set('map.get', (args, namedArgs) => getMapValue(readMap(this.mapReceiverArg(args, namedArgs)), this.getCallArg(args, namedArgs, 1, 'key')));
+    this.builtins.set('map.contains', (args, namedArgs) => containsMapKey(readMap(this.mapReceiverArg(args, namedArgs)), this.getCallArg(args, namedArgs, 1, 'key')));
+    this.builtins.set('map.remove', (args, namedArgs) => removeMapValue(readMap(this.mapReceiverArg(args, namedArgs)), this.getCallArg(args, namedArgs, 1, 'key')));
+    this.builtins.set('map.clear', (args, namedArgs) => {
+      clearMap(readMap(this.mapReceiverArg(args, namedArgs)));
       return null;
     });
-    this.builtins.set('map.copy', (args) => copyMap(readMap(args[0])));
-    this.builtins.set('map.keys', (args) => mapKeys(readMap(args[0])));
-    this.builtins.set('map.values', (args) => mapValues(readMap(args[0])));
-    this.builtins.set('map.put_all', (args) => {
-      putAllMapValues(readMap(args[0]), readMap(args[1]));
+    this.builtins.set('map.copy', (args, namedArgs) => copyMap(readMap(this.mapReceiverArg(args, namedArgs))));
+    this.builtins.set('map.keys', (args, namedArgs) => mapKeys(readMap(this.mapReceiverArg(args, namedArgs))));
+    this.builtins.set('map.values', (args, namedArgs) => mapValues(readMap(this.mapReceiverArg(args, namedArgs))));
+    this.builtins.set('map.put_all', (args, namedArgs) => {
+      putAllMapValues(readMap(this.mapReceiverArg(args, namedArgs)), readMap(this.getCallArg(args, namedArgs, 1, 'id2')));
       return null;
     });
+  }
+
+  private mapReceiverArg(args: unknown[], namedArgs: Map<string, unknown>): unknown {
+    return args[0] !== undefined ? args[0] : namedArgs.get('id');
   }
 
   private registerColorBuiltins(): void {

@@ -479,6 +479,8 @@ Phases:
    epic.
    Runtime coverage now returns the previous value from `map.put()` when a key
    is replaced, or `na` for new keys.
+   Runtime coverage now accepts named `map.*` reference arguments while
+   preserving method receiver precedence over named `id`.
    Parser and semantic coverage now retain generic call type arguments and infer
    unannotated `map.new<K, V>()` constructors, including invalid map constructor
    template and generic arity diagnostics.
