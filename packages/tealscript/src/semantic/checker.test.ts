@@ -101,6 +101,34 @@ log.warning(text="bad")
     ]);
   });
 
+  it('accepts Pine alert calls and alertcondition declarations', () => {
+    const result = checkProgram(parse(`
+indicator("Alerts")
+isUp = close > open
+alertcondition(isUp, title="Green", message="Close {{close}}")
+if isUp
+    alert("Green", alert.freq_once_per_bar_close)
+plot(close)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid Pine alert arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Alerts")
+alert()
+alert("ok", alert.freq_all, true)
+alertcondition(true, title="A", message="M", freq=alert.freq_all)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'alert() expects at least 1 argument',
+      'alert() expects at most 2 arguments',
+      "Unknown argument 'freq' for alertcondition()",
+    ]);
+  });
+
   it('reports duplicate declarations in the same scope', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate")
