@@ -640,6 +640,55 @@ inferred.put("ADA", "bad")
     ]);
   });
 
+  it('resolves map helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Map Signatures")
+map<string, float> left = map.new<string, float>()
+map<string, float> right = map.new<string, float>()
+previous = map.put(id=left, key="BTC", value=1.0)
+value = map.get(id=left, key="BTC")
+exists = map.contains(id=left, key="BTC")
+removed = map.remove(id=left, key="BTC")
+map.put(id=right, key="ETH", value=2.0)
+map.put_all(id=left, id2=right)
+copied = map.copy(id=left)
+keys = map.keys(id=copied)
+values = map.values(id=copied)
+size = map.size(id=copied)
+map.clear(id=right)
+plot(previous + value + removed + size + array.size(keys) + array.size(values) + (exists ? 1 : 0))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid map helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Map Signatures")
+map<string, float> prices = map.new<string, float>()
+duplicateSize = map.size(prices, id=prices)
+unknownGet = map.get(id=prices, name="BTC")
+missingKey = map.contains(id=prices)
+tooManyClear = map.clear(prices, prices)
+badNew = map.new<string, float>(1)
+badPutAll = map.put_all(id=prices, other=prices)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Argument 'id' for map.size() was supplied multiple times",
+      "Unknown argument 'name' for map.get()",
+      'map.get() expects at least 2 arguments',
+      "map.get() missing required argument 'key'",
+      'map.contains() expects at least 2 arguments',
+      "map.contains() missing required argument 'key'",
+      'map.clear() expects at most 1 argument',
+      'map.new() expects at most 0 arguments',
+      "Unknown argument 'other' for map.put_all()",
+      'map.put_all() expects at least 2 arguments',
+      "map.put_all() missing required argument 'id2'",
+    ]);
+  });
+
   it('reports array element template mismatches for known mutable arrays', () => {
     const result = checkProgram(parse(`
 indicator("Bad Array Types")
