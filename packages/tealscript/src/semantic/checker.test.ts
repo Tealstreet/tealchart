@@ -1134,6 +1134,37 @@ tooManyMom = ta.mom(close, 2, 3)
     ]);
   });
 
+  it('resolves TA channel helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("TA Channel Signatures")
+[bbBasis, bbUpper, bbLower] = ta.bb(series=close, length=3, mult=2.0)
+bbw = ta.bbw(series=close, length=3, mult=2.0)
+[kcBasis, kcUpper, kcLower] = ta.kc(series=close, length=3, mult=1.25, useTrueRange=false)
+kcw = ta.kcw(series=close, length=3, mult=1.25, useTrueRange=false)
+plot(bbBasis + bbUpper + bbLower + bbw + kcBasis + kcUpper + kcLower + kcw)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid TA channel helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad TA Channel Signatures")
+duplicateBb = ta.bbw(close, series=open, length=3, mult=2.0)
+unknownKc = ta.kc(series=close, length=3, mult=1.25, tr=false)
+shortBb = ta.bb(series=close, length=3)
+tooManyKcw = ta.kcw(close, 3, 1.25, true, false)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Argument 'series' for ta.bbw() was supplied multiple times",
+      "Unknown argument 'tr' for ta.kc()",
+      'ta.bb() expects at least 3 arguments',
+      "ta.bb() missing required argument 'mult'",
+      'ta.kcw() expects at most 4 arguments',
+    ]);
+  });
+
   it('resolves color helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Color Signatures")
