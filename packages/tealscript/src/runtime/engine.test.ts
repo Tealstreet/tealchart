@@ -5179,6 +5179,28 @@ plot(na(m.get("200")) ? 1 : 0, title="First Update Missing")`;
       expect(firstMissing2.values[firstMissing2.values.length - 1]).toBe(1);
     });
 
+    it('supports color map keys through namespace constants', () => {
+      const script = `//@version=6
+indicator("Color Map Keys")
+var m = map.new<color, string>()
+if barstate.isfirst
+    m.put(color.red, "sell")
+    m.put(color.green, "buy")
+    m.put(color.red, "exit")
+keys = m.keys()
+removed = m.remove(color.green)
+plot(m.contains(color.red) ? 1 : 0, title="Has Red")
+plot(m.get(color.red) == "exit" ? 1 : 0, title="Red Value")
+plot(removed == "buy" ? 1 : 0, title="Removed Green")
+plot(m.contains(color.green) ? 1 : 0, title="Has Green")
+plot(array.get(keys, 0) == color.red ? 1 : 0, title="First Key")`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.map((plot) => plot.values)).toEqual([[1], [1], [1], [0], [1]]);
+    });
+
     it('snapshot is only taken on the last bar', () => {
       const script = `//@version=6
 indicator("Test")

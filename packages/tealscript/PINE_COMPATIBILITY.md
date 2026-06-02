@@ -227,17 +227,15 @@ enforce obvious primitive key/value mismatches for known `map<K, V>` variables
 on `map.put`, `map.get`, `map.contains`, and `map.remove`, including receiver
 method-call forms and unannotated `map.new<K, V>()` constructor inference.
 Reference and UDT map values are also checked conservatively, so
-`map<string, label>` and `map<string, MyType>` reject mismatched values. Map loops
-support the documented key-value tuple form, `for [key, value] in data`.
+`map<string, label>` and `map<string, MyType>` reject mismatched values. Runtime
+coverage includes Pine value keys, including color constants. Map loops support
+the documented key-value tuple form, `for [key, value] in data`.
 Bare collection container names in template positions, such as
 `map<string, array>`, are rejected because bare collection types are incomplete
 type identifiers. Nested collection template syntax such as
 `array<array<float>>` and `map<string, array<float>>` now parses and receives
 explicit semantic diagnostics because Pine does not allow collections to
 directly contain other collection types.
-
-Known limits: map keys are currently restricted at runtime to finite numbers,
-strings, and booleans.
 
 ## Common User-Defined Type Coverage
 
