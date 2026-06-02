@@ -1858,11 +1858,10 @@ export class TealscriptEngine {
       funcName = expr.callee.name;
     } else if (expr.callee.type === 'MemberExpression') {
       const memberPath = this.getMemberPath(expr.callee);
-      if (!memberPath) {
-        throw new Error('Nested member access in call not supported');
+      if (memberPath) {
+        namespace = memberPath.slice(0, -1).join('.');
       }
-      namespace = memberPath.slice(0, -1).join('.');
-      funcName = memberPath[memberPath.length - 1]!;
+      funcName = expr.callee.property.name;
     } else {
       throw new Error('Invalid callee type');
     }
@@ -2018,8 +2017,16 @@ export class TealscriptEngine {
       throw new Error(`${namespace}.* functions are not supported yet: ${fullName}`);
     }
 
-    if (namespace && expr.callee.type === 'MemberExpression') {
-      const receiver = this.evaluateExpression(expr.callee.object);
+    if (expr.callee.type === 'MemberExpression') {
+      let receiver: unknown;
+      try {
+        receiver = this.evaluateExpression(expr.callee.object);
+      } catch (error) {
+        if (expr.callee.object.type !== 'CallExpression') {
+          throw new Error(`Unknown function: ${fullName}`);
+        }
+        throw error;
+      }
       const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs, receiver);
       if (userMethod) {
         return this.evaluateUserFunction(

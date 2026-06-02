@@ -72,13 +72,10 @@ row = array.from(close, high)
 rows.push(row)
 grid.set(0, 0, row)
 lookup.put("last", row)
-lastRow = rows.last()
-gridRow = grid.get(0, 0)
-lookupRow = lookup.get("last")
 plot(rows.size(), title="Rows")
-plot(lastRow.get(0), title="Row Close")
-plot(gridRow.get(1), title="Grid High")
-plot(lookupRow.size(), title="Lookup Size")
+plot(rows.last().get(0), title="Row Close")
+plot(grid.get(0, 0).get(1), title="Grid High")
+plot(lookup.get("last").size(), title="Lookup Size")
 `);
 
     expect(result.errors).toEqual([]);
