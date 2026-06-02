@@ -99,6 +99,27 @@ export function cloneStrategyIntrabarContext(context: StrategyIntrabarContext): 
   };
 }
 
+export function createDefaultStrategyOhlcIntrabarContext(request: StrategyIntrabarRequest): StrategyIntrabarContext {
+  const { chartBar } = request;
+  const highFirst = Math.abs(chartBar.open - chartBar.high) < Math.abs(chartBar.open - chartBar.low);
+  const middleKinds: Array<'high' | 'low'> = highFirst ? ['high', 'low'] : ['low', 'high'];
+  const kinds: Array<'open' | 'high' | 'low' | 'close'> = ['open', ...middleKinds, 'close'];
+
+  return {
+    ...request,
+    chartBar: { ...chartBar },
+    source: 'chart_ohlc',
+    ticks: kinds.map((kind, sequence) => ({
+      time: chartBar.time,
+      price: chartBar[kind],
+      kind,
+      sequence,
+      sourceBarTime: chartBar.time,
+      sourceBarIndex: request.chartBarIndex,
+    })),
+  };
+}
+
 export interface StrategyLedgerSettings {
   title: string;
   initialCapital: number;
