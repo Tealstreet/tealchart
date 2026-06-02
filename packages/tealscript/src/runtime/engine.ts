@@ -1303,8 +1303,10 @@ export class TealscriptEngine {
       const entries = mapEntries(iterable);
       keys = entries.map(([key]) => key);
       values = entries.map(([, value]) => value);
+    } else if (isPineMatrix(iterable)) {
+      values = Array.from({ length: iterable.rows }, (_, row) => matrixRow(iterable, row));
     } else {
-      throw new Error('For-in loop expects an array or map');
+      throw new Error('For-in loop expects an array, map, or matrix');
     }
 
     const childScope = this.scope.createChild();
@@ -2980,8 +2982,10 @@ export class TealscriptEngine {
       const entries = mapEntries(iterable);
       keys = entries.map(([key]) => key);
       values = entries.map(([, value]) => value);
+    } else if (isPineMatrix(iterable)) {
+      values = Array.from({ length: iterable.rows }, (_, row) => matrixRow(iterable, row));
     } else {
-      throw new Error('For-in loop expects an array or map');
+      throw new Error('For-in loop expects an array, map, or matrix');
     }
 
     const childScope = this.scope.createChild();

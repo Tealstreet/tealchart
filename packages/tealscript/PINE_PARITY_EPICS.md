@@ -458,6 +458,8 @@ Phases:
    and method-call forms.
    Runtime coverage now includes `matrix.fill()` optional range arguments and
    named range arguments for `matrix.fill()`/`matrix.submatrix()`.
+   Runtime coverage now includes documented matrix row iteration with
+   `for row in matrix` and `for [index, row] in matrix`.
    Runtime coverage now includes matrix inspection predicates: zero, identity,
    diagonal, antidiagonal, symmetric, antisymmetric, triangular, stochastic, and
    binary.

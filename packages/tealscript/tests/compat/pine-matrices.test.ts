@@ -118,6 +118,35 @@ plot(slice.get(0, 1), title="Slice Second")
     expect(roundSeries(getPlot(result, 'Slice Second').values)).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
   });
 
+  it('runs documented matrix row iteration idioms', () => {
+    const result = runCompatScript(`
+indicator("Matrix row iteration")
+m = matrix.new_int(2, 3, 0)
+m.set(0, 0, 1)
+m.set(0, 1, 2)
+m.set(0, 2, 3)
+m.set(1, 0, 4)
+m.set(1, 1, 5)
+m.set(1, 2, 6)
+rowTotal = 0
+for row in m
+    rowTotal += array.sum(row)
+weighted = 0
+for [index, row] in m
+    weighted += (index + 1) * array.get(row, 0)
+returned = for [index, row] in m
+    array.get(row, index)
+plot(rowTotal, title="Row Total")
+plot(weighted, title="Weighted Rows")
+plot(returned, title="Returned")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Row Total').values)).toEqual([21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21]);
+    expect(roundSeries(getPlot(result, 'Weighted Rows').values)).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
+    expect(roundSeries(getPlot(result, 'Returned').values)).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
+  });
+
   it('runs documented matrix concatenation idioms', () => {
     const result = runCompatScript(`
 indicator("Matrix concat")
