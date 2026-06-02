@@ -1093,6 +1093,45 @@ shortReplace = str.replace(source="BTC", target="B")
     ]);
   });
 
+  it('resolves math helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Math Signatures")
+rounded = math.round(number=math.pi, precision=3)
+powered = math.pow(base=2, exponent=3)
+root = math.sqrt(number=16)
+logged = math.log(number=math.e) + math.log10(number=100) + math.exp(number=1)
+trig = math.sin(number=0) + math.cos(number=0) + math.tan(number=0) + math.asin(number=0) + math.acos(number=1) + math.atan(number=1)
+converted = math.toradians(number=180) + math.todegrees(number=math.pi)
+unary = math.abs(number=-5) + math.trunc(number=-1.9) + math.floor(number=-1.2) + math.ceil(number=1.2) + math.sign(number=-5)
+seriesSum = math.sum(source=close, length=3)
+tick = math.round_to_mintick(number=1.005)
+rand = math.random(min=10, max=20, seed=7)
+plot(rounded + powered + root + logged + trig + converted + unary + seriesSum + tick + rand)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid math helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Math Signatures")
+duplicateRound = math.round(math.pi, number=1, precision=2)
+unknownPow = math.pow(base=2, power=3)
+shortSum = math.sum(source=close)
+tooManyMintick = math.round_to_mintick(1.0, 2)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Argument 'number' for math.round() was supplied multiple times",
+      "Unknown argument 'power' for math.pow()",
+      "math.pow() expects at least 2 arguments",
+      "math.pow() missing required argument 'exponent'",
+      "math.sum() expects at least 2 arguments",
+      "math.sum() missing required argument 'length'",
+      'math.round_to_mintick() expects at most 1 argument',
+    ]);
+  });
+
   it('resolves ticker helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Ticker Signatures")
