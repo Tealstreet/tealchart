@@ -693,4 +693,144 @@ if barstate.islast
       },
     ]);
   });
+
+  it('resolves mixed named and positional drawing mutator arguments in Pine order', () => {
+    const result = runCompatScript(`
+indicator("Mixed Drawing Mutators", overlay=true)
+var mixedPrice = na
+if barstate.islast
+    marker = label.new(na, na, "")
+    label.set_xy(id=marker, bar_index, close)
+    label.set_text(id=marker, "mixed label")
+    label.set_color(id=marker, color.red)
+    label.set_textcolor(id=marker, color.white)
+    upper = line.new(bar_index - 1, high[1], bar_index, high)
+    line.set_xy1(id=upper, bar_index - 2, low[2])
+    line.set_xy2(id=upper, bar_index, high)
+    line.set_color(id=upper, color.green)
+    line.set_width(id=upper, 2)
+    lower = line.new(bar_index - 1, low[1], bar_index, low)
+    channel = linefill.new(upper, lower)
+    linefill.set_color(id=channel, color.new(color.orange, 60))
+    zone = box.new(na, na, na, na)
+    box.set_lefttop(id=zone, bar_index - 2, high)
+    box.set_rightbottom(id=zone, bar_index, low)
+    box.set_text(id=zone, "mixed box")
+    box.set_bgcolor(id=zone, color.new(color.blue, 80))
+    dashboard = table.new(position.top_right, 2, 1)
+    table.set_position(table_id=dashboard, position.bottom_right)
+    table.set_bgcolor(table_id=dashboard, color.new(color.gray, 80))
+    table.cell(table_id=dashboard, column=0, 0, "Seed")
+    table.cell(table_id=dashboard, column=1, 0, "Clear me")
+    table.cell_set_text(table_id=dashboard, column=0, 0, "Mixed")
+    table.cell_set_bgcolor(table_id=dashboard, column=0, 0, color.green)
+    table.cell_set_text_color(table_id=dashboard, column=0, 0, color.white)
+    table.cell_set_width(table_id=dashboard, column=0, 0, 42)
+    table.clear(table_id=dashboard, 1, 0, 1, 0)
+    mixedPrice := line.get_price(id=upper, bar_index)
+plot(mixedPrice, title="Mixed Line Price")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'label_label.new_0_11',
+        type: 'label',
+        barIndex: 11,
+        x: 11,
+        y: 112,
+        text: 'mixed label',
+        xloc: 'bar_index',
+        yloc: 'price',
+        style: 'label_left',
+        color: '#F44336',
+        textColor: '#FFFFFF',
+        size: 'normal',
+      },
+      {
+        id: 'line_line.new_0_11',
+        type: 'line',
+        barIndex: 11,
+        x1: 9,
+        y1: 107,
+        x2: 11,
+        y2: 113,
+        xloc: 'bar_index',
+        extend: 'none',
+        color: '#4CAF50',
+        style: 'solid',
+        width: 2,
+        forceOverlay: false,
+      },
+      {
+        id: 'line_line.new_1_11',
+        type: 'line',
+        barIndex: 11,
+        x1: 10,
+        y1: 109,
+        x2: 11,
+        y2: 108,
+        xloc: 'bar_index',
+        extend: 'none',
+        color: null,
+        style: 'solid',
+        width: 1,
+        forceOverlay: false,
+      },
+      {
+        id: 'linefill_linefill.new_0_11',
+        type: 'linefill',
+        barIndex: 11,
+        line1: 'line_line.new_0_11',
+        line2: 'line_line.new_1_11',
+        color: '#FF980066',
+      },
+      {
+        id: 'box_box.new_0_11',
+        type: 'box',
+        barIndex: 11,
+        left: 9,
+        top: 113,
+        right: 11,
+        bottom: 108,
+        xloc: 'bar_index',
+        extend: 'none',
+        borderColor: null,
+        borderWidth: 1,
+        borderStyle: 'solid',
+        bgcolor: '#2196F333',
+        text: 'mixed box',
+        textColor: null,
+        textSize: 'normal',
+      },
+      {
+        id: 'table_table.new_0_11',
+        type: 'table',
+        barIndex: 11,
+        position: 'bottom_right',
+        columns: 2,
+        rows: 1,
+        bgcolor: '#9E9E9E33',
+        frameColor: null,
+        frameWidth: 1,
+        borderColor: null,
+        borderWidth: 1,
+        cells: [
+          {
+            column: 0,
+            row: 0,
+            text: 'Mixed',
+            width: 42,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#4CAF50',
+          },
+        ],
+      },
+    ]);
+    expect(getPlot(result, 'Mixed Line Price').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 113]);
+  });
 });
