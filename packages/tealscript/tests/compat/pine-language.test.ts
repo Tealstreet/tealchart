@@ -565,6 +565,28 @@ plot(
     ]);
   });
 
+  it('runs Pine-style leading postfix continuations', () => {
+    const result = runCompatScript(`
+indicator("Postfix Continuation")
+var values = array.new<float>()
+values
+    .push(close)
+basis = ta
+    .sma(close, 3)
+previousClose = close
+    [1]
+plot(values
+    .size(), title="Size")
+plot(basis, title="Basis")
+plot(previousClose, title="Previous Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Size').values).toEqual(compatibilityBars.map((_, index) => index + 1));
+    expect(roundSeries(getPlot(result, 'Basis').values)).toEqual([null, null, 104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111]);
+    expect(roundSeries(getPlot(result, 'Previous Close').values)).toEqual([null, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110]);
+  });
+
   it('runs Pine-style operator line continuations', () => {
     const result = runCompatScript(`
 indicator("Operator Continuation")
