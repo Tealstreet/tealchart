@@ -424,6 +424,8 @@ Phases:
    percentiles, standardization, covariance helpers, and edge cases.
    Runtime coverage now includes `array.sort()` UDT sorting by `sort_field`
    field name or index, with semantic const int/string diagnostics.
+   Semantic coverage now preserves primitive, reference, and UDT element types
+   from homogeneous array literals and `array.from(...)`.
 2. Implement `matrix.*` with typed storage, arithmetic/stat helpers, row/column
    access, copy/reshape behavior, and tests.
    Runtime coverage now includes `matrix.sum()` and `matrix.diff()` for
