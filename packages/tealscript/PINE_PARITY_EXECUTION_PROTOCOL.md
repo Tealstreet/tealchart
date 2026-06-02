@@ -15,9 +15,15 @@ source of truth for what to build:
 
 ## North Star
 
-The goal is full Pine Script v6 feature parity where practical for Tealchart.
-Every epic should move the implementation, tests, and documentation toward that
-goal without letting parser, runtime, renderer, worker, or docs behavior drift.
+The goal is copy-paste compatibility for public TradingView Pine scripts: pasted
+PineScript should parse and run in the TealScript runtime without manual
+rewrites. TradingView-identical rendering remains the final goal, but early
+epics should prioritize parser, semantic, built-in, request, runtime, and
+strategy behavior that lets more real scripts execute.
+
+Choose work by compatibility impact. Do not go deep on rare visual or semantic
+edge cases unless they appear in official docs, common public scripts, or block
+a broader copy-paste compatibility milestone.
 
 Real PineScript examples from official TradingView docs and common public idioms
 should be reduced into deterministic local fixtures when they are useful
