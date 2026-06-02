@@ -8,6 +8,7 @@ import { parse, validate, TealscriptParseError, TealscriptParseLimitError, forma
 import type {
   Program,
   FunctionDeclaration,
+  EnumDeclaration,
   ImportDeclaration,
   IndicatorDeclaration,
   LibraryDeclaration,
@@ -117,6 +118,28 @@ describe('Tealscript Parser', () => {
         baseType: 'int',
         qualifier: 'const',
       }));
+    });
+
+    it('parses exported library enums', () => {
+      const ast = parse(`export enum State
+    long = "Long"
+    short = "Short"
+    neutral
+`);
+      const declaration = ast.body[0] as EnumDeclaration;
+      expect(declaration.type).toBe('EnumDeclaration');
+      expect(declaration.exported).toBe(true);
+      expect(declaration.name.name).toBe('State');
+      expect(declaration.fields.map((field) => field.name.name)).toEqual(['long', 'short', 'neutral']);
+      expect(declaration.fields[0]?.title).toEqual(expect.objectContaining({
+        type: 'StringLiteral',
+        value: 'Long',
+      }));
+      expect(declaration.fields[1]?.title).toEqual(expect.objectContaining({
+        type: 'StringLiteral',
+        value: 'Short',
+      }));
+      expect(declaration.fields[2]?.title).toBeNull();
     });
   });
 

@@ -72,6 +72,7 @@ Statement
   / LibraryDeclaration
   / ImportDeclaration
   / TypeDeclaration
+  / EnumDeclaration
   / MethodDeclaration
   / FunctionDeclaration
   / IfStatement
@@ -195,6 +196,41 @@ UntypedTypeFieldDeclaration
         typeAnnotation: null,
         defaultValue: defaultValue ? defaultValue[3] : null,
         varip: !!varip,
+        loc: loc()
+      };
+    }
+
+// User-defined enum:
+// enum State
+//     long = "Long"
+//     short = "Short"
+EnumDeclaration
+  = exported:("export" _)? "enum" !IdentifierPart _ name:Identifier _ LineTerminator fields:EnumIndentedBlock {
+      return {
+        type: 'EnumDeclaration',
+        name,
+        fields,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+
+EnumIndentedBlock
+  = fields:EnumIndentedField+ {
+      return fields.filter(field => field !== null);
+    }
+
+EnumIndentedField
+  = &Indent Indent field:EnumFieldDeclaration {
+      return field;
+    }
+
+EnumFieldDeclaration
+  = name:Identifier title:(_ "=" _ StringLiteral)? _ LineTerminator? {
+      return {
+        type: 'EnumFieldDeclaration',
+        name,
+        title: title ? title[3] : null,
         loc: loc()
       };
     }
