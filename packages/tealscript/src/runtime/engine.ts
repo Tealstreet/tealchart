@@ -1044,11 +1044,36 @@ export class TealscriptEngine {
       case 'MemberExpression': {
         const memberPath = this.getMemberPath(expression);
         if (!memberPath) return undefined;
-        const builtin = this.builtins.get(memberPath.join('.'));
-        return builtin ? builtin([], new Map(), this.ctx, this.scope, memberPath.join('.')) : undefined;
+        return this.evaluateBuiltinMemberConstant(memberPath);
       }
       default:
         return undefined;
+    }
+  }
+
+  private evaluateBuiltinMemberConstant(memberPath: string[]): unknown {
+    const namespace = memberPath.slice(0, -1).join('.');
+    const prop = memberPath[memberPath.length - 1]!;
+    const fullName = memberPath.join('.');
+
+    try {
+      if (namespace === 'barstate' && prop in this.ctx.barstate) {
+        return this.ctx.barstate[prop as keyof typeof this.ctx.barstate];
+      }
+      if (namespace === 'syminfo') {
+        return this.evaluateSyminfo(prop);
+      }
+      if (namespace === 'timeframe') {
+        return this.evaluateTimeframe(prop);
+      }
+      if (namespace === 'strategy') {
+        return this.evaluateStrategy(prop);
+      }
+
+      const builtin = this.builtins.get(fullName);
+      return builtin ? builtin([], new Map(), this.ctx, this.scope, fullName) : undefined;
+    } catch {
+      return undefined;
     }
   }
 

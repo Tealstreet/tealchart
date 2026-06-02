@@ -56,6 +56,8 @@ export const int fast = 2
 export const float multiplier = 1.5
 export color bull = color.green
 export float empty = na
+export string ticker = syminfo.ticker
+export string period = timeframe.period
 `);
 
     const result = runCompatScript(`
@@ -65,6 +67,8 @@ plot(c.fast, title="Fast")
 plot(c.multiplier, title="Multiplier")
 plot(c.bull == color.green ? 1 : 0, title="Bull")
 plot(na(c.empty) ? 1 : 0, title="Empty")
+plot(c.ticker == syminfo.ticker ? 1 : 0, title="Ticker")
+plot(c.period == timeframe.period ? 1 : 0, title="Period")
 `, {
       bars: [compatibilityBars[0]!],
       engineOptions: {
@@ -77,6 +81,8 @@ plot(na(c.empty) ? 1 : 0, title="Empty")
     expect(getPlot(result, 'Multiplier').values).toEqual([1.5]);
     expect(getPlot(result, 'Bull').values).toEqual([1]);
     expect(getPlot(result, 'Empty').values).toEqual([1]);
+    expect(getPlot(result, 'Ticker').values).toEqual([1]);
+    expect(getPlot(result, 'Period').values).toEqual([1]);
   });
 
   it('reports non-exported imported library functions as unknown', () => {

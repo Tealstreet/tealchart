@@ -126,6 +126,9 @@ export type Pivot
 library("Constants")
 export const int length = 14
 export color bull = color.green
+export float ratio = math.pi
+export string period = timeframe.period
+export string ticker = syminfo.ticker
 export prefix(simple string value) => value
 `));
 
@@ -139,6 +142,8 @@ plot(close)
 library("Bad Constants")
 export value = 1
 export const float seriesValue = close
+export const int functionReference = ta.sma
+export const string requestReference = request.security
 export [a, b] = array.from(1, 2)
 `));
 
@@ -148,6 +153,8 @@ export [a, b] = array.from(1, 2)
     ]);
     expect(invalid.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Exported constants must declare a type',
+      'Exported constants must be literal values or compatible built-in variables',
+      'Exported constants must be literal values or compatible built-in variables',
       'Exported constants must be literal values or compatible built-in variables',
       'Exported constants cannot use tuple declarations',
       'Exported constants must declare a type',
@@ -930,6 +937,32 @@ badScale = pivot.scale(2)
       'No method lift() overload accepts Other receiver',
       'No method lift() overload accepts int receiver',
       'No method scale() overload accepts Pivot receiver',
+    ]);
+  });
+
+  it('does not report user method receiver mismatches for builtin collection member calls', () => {
+    const result = checkProgram(parse(`
+indicator("Builtin Method Names")
+method size(float this) => this
+values = array.new_float()
+count = values.size()
+plot(count)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('honors qualifiers for user-defined method receiver diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Qualified Method Receivers")
+method smooth(simple float this) => this
+literal = 1.0
+valid = literal.smooth()
+invalid = close.smooth()
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'No method smooth() overload accepts float receiver',
     ]);
   });
 
