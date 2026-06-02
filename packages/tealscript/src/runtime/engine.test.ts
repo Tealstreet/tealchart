@@ -613,6 +613,41 @@ plot(strategy.opentrades, title="Open Trades")`;
       expect(secondUpdate.find((plot) => plot.title === 'Open Trades')?.values.at(-1)).toBe(1);
     });
 
+    it('fills default strategy market orders when a realtime bar starts', () => {
+      const script = `//@version=6
+strategy("Realtime default market timing")
+if bar_index == 2
+    strategy.entry("Last", strategy.long, qty=1)
+plot(strategy.position_size, title="Position")
+plot(strategy.position_avg_price, title="Average Price")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      const result = engine.execute(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders).toHaveLength(1);
+      expect(result.strategy.fills).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Position')?.values).toEqual([0, 0, 0]);
+
+      const realtimeBar = {
+        ...bars[2],
+        time: bars[2].time + 60_000,
+        open: 150,
+        high: 151,
+        low: 149,
+        close: 150.5,
+      };
+      const firstUpdate = engine.updateBar(ast, realtimeBar);
+      const secondUpdate = engine.updateBar(ast, { ...realtimeBar, close: 150.75 });
+
+      expect(firstUpdate.find((plot) => plot.title === 'Position')?.values).toEqual([0, 0, 0, 1]);
+      expect(firstUpdate.find((plot) => plot.title === 'Average Price')?.values).toEqual([null, null, null, 150]);
+      expect(secondUpdate.find((plot) => plot.title === 'Position')?.values).toEqual([0, 0, 0, 1]);
+      expect(secondUpdate.find((plot) => plot.title === 'Average Price')?.values).toEqual([null, null, null, 150]);
+    });
+
     it('closes matching entry trades with strategy.close market orders', () => {
       const script = `//@version=6
 strategy("Close", process_orders_on_close=true)

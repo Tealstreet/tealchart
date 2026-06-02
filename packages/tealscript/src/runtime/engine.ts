@@ -586,6 +586,7 @@ export class TealscriptEngine {
       }
       this.ctx.setNow(this.getRuntimeNow());
       this.ctx.startRealtimeBar(bar);
+      this.fillPendingStrategyMarketOrdersForCurrentBar();
       this.scope.commit(true);
       for (const functionScope of this.functionScopes.values()) {
         functionScope.commit(true);
