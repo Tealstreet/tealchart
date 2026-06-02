@@ -620,6 +620,29 @@ plot(score(close - open), title="Score")
     );
   });
 
+  it('keeps blank and comment-only lines inside function blocks', () => {
+    const result = runCompatScript(`
+indicator("Function Block Spacing")
+score(value) =>
+    // Public Pine scripts often leave comments inside UDF bodies.
+    shifted = value + 1
+
+    if shifted > 0
+        // Nested branch comments should not close the block.
+        shifted
+
+    else
+        0
+
+plot(score(close - open), title="Score")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Score').values)).toEqual(
+      compatibilityBars.map((bar) => Math.max(bar.close - bar.open + 1, 0))
+    );
+  });
+
   it('runs user-defined function if-branch returns', () => {
     const result = runCompatScript(`
 indicator("UDF if branch")
