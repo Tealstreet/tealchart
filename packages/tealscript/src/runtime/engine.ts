@@ -241,6 +241,33 @@ export interface ExecutionResult {
   profile: RuntimeProfile;
 }
 
+const STRATEGY_ORDER_ARGS = ['id', 'direction', 'qty', 'limit', 'stop', 'oca_name', 'oca_type', 'comment', 'alert_message', 'disable_alert'] as const;
+const STRATEGY_EXIT_ARGS = [
+  'id',
+  'from_entry',
+  'qty',
+  'qty_percent',
+  'profit',
+  'limit',
+  'loss',
+  'stop',
+  'trail_price',
+  'trail_points',
+  'trail_offset',
+  'oca_name',
+  'comment',
+  'comment_profit',
+  'comment_loss',
+  'comment_trailing',
+  'alert_message',
+  'alert_profit',
+  'alert_loss',
+  'alert_trailing',
+  'disable_alert',
+] as const;
+const STRATEGY_CLOSE_ARGS = ['id', 'comment', 'qty', 'qty_percent', 'alert_message', 'immediately', 'disable_alert'] as const;
+const STRATEGY_CLOSE_ALL_ARGS = ['comment', 'alert_message', 'immediately', 'disable_alert'] as const;
+
 export interface IndicatorDeclarationMetadata {
   title: string;
   shortTitle?: string;
@@ -4391,17 +4418,17 @@ export class TealscriptEngine {
   }
 
   private submitStrategyOrderBuiltin(args: unknown[], namedArgs: Map<string, unknown>, isEntry: boolean): undefined {
-    const id = this.toStringValue(this.getCallArg(args, namedArgs, 0, 'id', ''));
-    const direction = this.normalizeStrategyDirection(this.getCallArg(args, namedArgs, 1, 'direction'));
-    const rawQty = this.toOptionalNumber(this.getCallArg(args, namedArgs, 2, 'qty'));
+    const id = this.toStringValue(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 0, ''));
+    const direction = this.normalizeStrategyDirection(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 1));
+    const rawQty = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 2));
     const qtyType = rawQty === undefined ? this.ctx.strategyLedger.settings.defaultQtyType : 'fixed';
     const qtyValue = rawQty ?? this.ctx.strategyLedger.settings.defaultQtyValue;
-    const limitPrice = this.toOptionalNumber(this.getCallArg(args, namedArgs, 3, 'limit'));
-    const stopPrice = this.toOptionalNumber(this.getCallArg(args, namedArgs, 4, 'stop'));
-    const ocaName = this.toOptionalString(this.getCallArg(args, namedArgs, 5, 'oca_name'));
-    const ocaType = this.normalizeOptionalStrategyOcaType(this.getCallArg(args, namedArgs, 6, 'oca_type'));
-    const comment = this.toOptionalString(this.getCallArg(args, namedArgs, 7, 'comment'));
-    const alertMessage = this.toOptionalString(this.getCallArg(args, namedArgs, 8, 'alert_message'));
+    const limitPrice = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 3));
+    const stopPrice = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 4));
+    const ocaName = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 5));
+    const ocaType = this.normalizeOptionalStrategyOcaType(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 6));
+    const comment = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 7));
+    const alertMessage = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 8));
 
     if (id === '') {
       throw new Error('strategy order id must not be empty');
@@ -4508,12 +4535,12 @@ export class TealscriptEngine {
   }
 
   private submitStrategyExitBuiltin(args: unknown[], namedArgs: Map<string, unknown>): undefined {
-    const id = this.toStringValue(this.getCallArg(args, namedArgs, 0, 'id', ''));
+    const id = this.toStringValue(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 0, ''));
     if (id === '') {
       throw new Error('strategy exit id must not be empty');
     }
 
-    const fromEntry = this.toOptionalString(this.getCallArg(args, namedArgs, 1, 'from_entry'));
+    const fromEntry = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 1));
     const matchingTrades = this.ctx.strategyLedger.openTrades.filter((trade) => (
       fromEntry === undefined ? true : trade.entryOrderId === fromEntry
     ));
@@ -4530,19 +4557,19 @@ export class TealscriptEngine {
     const openQty = matchingTrades.reduce((total, trade) => total + trade.qty, 0);
     const qty = this.resolveStrategyCloseQty(
       openQty,
-      this.toOptionalNumber(this.getCallArg(args, namedArgs, 2, 'qty')),
-      this.toOptionalNumber(this.getCallArg(args, namedArgs, 3, 'qty_percent')),
+      this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 2)),
+      this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 3)),
       'strategy exit',
     );
     if (qty <= 0) {
       return undefined;
     }
 
-    const limitPrice = this.toOptionalNumber(this.getCallArg(args, namedArgs, 5, 'limit'));
-    const stopPrice = this.toOptionalNumber(this.getCallArg(args, namedArgs, 7, 'stop'));
-    const trailPrice = this.toOptionalNumber(this.getCallArg(args, namedArgs, 8, 'trail_price'));
-    const trailPoints = this.toOptionalNumber(this.getCallArg(args, namedArgs, 9, 'trail_points'));
-    const trailOffset = this.toOptionalNumber(this.getCallArg(args, namedArgs, 10, 'trail_offset'));
+    const limitPrice = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 5));
+    const stopPrice = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 7));
+    const trailPrice = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 8));
+    const trailPoints = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 9));
+    const trailOffset = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 10));
     const trailActivationPrice = this.resolveStrategyTrailActivationPrice(direction, matchingTrades, trailPrice, trailPoints);
     if (limitPrice === undefined && stopPrice === undefined && trailActivationPrice === undefined) {
       throw new Error('strategy.exit requires a limit, stop, or trailing stop price');
@@ -4551,12 +4578,14 @@ export class TealscriptEngine {
       throw new Error('strategy.exit trailing stop requires trail_offset');
     }
 
-    const comment = this.toOptionalString(this.getCallArg(args, namedArgs, 12, 'comment'));
-    const commentProfit = this.toOptionalString(this.getCallArg(args, namedArgs, 13, 'comment_profit'));
-    const commentLoss = this.toOptionalString(this.getCallArg(args, namedArgs, 14, 'comment_loss'));
-    const alertMessage = this.toOptionalString(this.getCallArg(args, namedArgs, 16, 'alert_message'));
-    const alertProfit = this.toOptionalString(this.getCallArg(args, namedArgs, 17, 'alert_profit'));
-    const alertLoss = this.toOptionalString(this.getCallArg(args, namedArgs, 18, 'alert_loss'));
+    const comment = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 12));
+    const commentProfit = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 13));
+    const commentLoss = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 14));
+    const commentTrailing = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 15));
+    const alertMessage = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 16));
+    const alertProfit = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 17));
+    const alertLoss = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 18));
+    const alertTrailing = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 19));
     const exitOrderCount = [limitPrice, stopPrice, trailActivationPrice].filter((value) => value !== undefined).length;
     const suffixOrders = exitOrderCount > 1;
     const exitOcaName = suffixOrders ? this.strategyExitOcaName(id, fromEntry) : undefined;
@@ -4610,8 +4639,8 @@ export class TealscriptEngine {
         fromEntry,
         ocaName: exitOcaName,
         ocaType: suffixOrders ? 'cancel' : undefined,
-        comment: commentLoss ?? comment,
-        alertMessage: alertLoss ?? alertMessage,
+        comment: commentTrailing ?? comment,
+        alertMessage: alertTrailing ?? alertMessage,
         barIndex: this.ctx.bar_index,
         time: this.ctx.time.get(0) ?? 0,
       });
@@ -4739,7 +4768,7 @@ export class TealscriptEngine {
   }
 
   private submitStrategyCloseBuiltin(args: unknown[], namedArgs: Map<string, unknown>): undefined {
-    const id = this.toStringValue(this.getCallArg(args, namedArgs, 0, 'id', ''));
+    const id = this.toStringValue(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ARGS, 0, ''));
     if (id === '') {
       throw new Error('strategy close id must not be empty');
     }
@@ -4757,8 +4786,8 @@ export class TealscriptEngine {
     const openQty = matchingTrades.reduce((total, trade) => total + trade.qty, 0);
     const qty = this.resolveStrategyCloseQty(
       openQty,
-      this.toOptionalNumber(this.getCallArg(args, namedArgs, 2, 'qty')),
-      this.toOptionalNumber(this.getCallArg(args, namedArgs, 3, 'qty_percent')),
+      this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ARGS, 2)),
+      this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ARGS, 3)),
       'strategy close',
     );
     if (qty <= 0) {
@@ -4770,8 +4799,8 @@ export class TealscriptEngine {
       direction: direction === 'long' ? 'short' : 'long',
       qty,
       fromEntry: id,
-      comment: this.toOptionalString(this.getCallArg(args, namedArgs, 1, 'comment')),
-      alertMessage: this.toOptionalString(this.getCallArg(args, namedArgs, 4, 'alert_message')),
+      comment: this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ARGS, 1)),
+      alertMessage: this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ARGS, 4)),
     });
     return undefined;
   }
@@ -4786,8 +4815,8 @@ export class TealscriptEngine {
       id: 'Close All',
       direction: position.direction === 'long' ? 'short' : 'long',
       qty: Math.abs(position.size),
-      comment: this.toOptionalString(this.getCallArg(args, namedArgs, 0, 'comment')),
-      alertMessage: this.toOptionalString(this.getCallArg(args, namedArgs, 1, 'alert_message')),
+      comment: this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ALL_ARGS, 0)),
+      alertMessage: this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ALL_ARGS, 1)),
     });
     return undefined;
   }
