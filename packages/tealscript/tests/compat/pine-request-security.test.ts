@@ -218,6 +218,20 @@ plot(lookaheadGaps, title="Lookahead Gaps")
     expect(getPlot(result, 'Lookahead Gaps').values).toEqual([10, null, 20, null, 30, null]);
   });
 
+  it('resolves mixed named and positional request.security arguments in Pine order', () => {
+    const result = runCompatScript(`
+indicator("Mixed HTF request")
+mixed = request.security(symbol=syminfo.tickerid, "2", close, barmerge.gaps_on, barmerge.lookahead_on)
+plot(mixed, title="Mixed")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: requestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Mixed').values).toEqual([10, null, 20, null, 30, null]);
+  });
+
   it('locks the official repaint-safe higher-timeframe offset idiom', () => {
     const result = runCompatScript(`
 indicator("HTF repaint-safe request")
@@ -532,6 +546,20 @@ plot(array.get(ranges, 1), title="Second Range")
     const result = runCompatScript(`
 indicator("Lower TF calc bars", timeframe="2")
 intrabars = request.security_lower_tf(syminfo.tickerid, "1", close, calc_bars_count=2)
+plot(array.size(intrabars), title="Count")
+`, {
+      bars: lowerChartBars,
+      engineOptions: { requestDatafeed: lowerTimeframeRequestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Count').values).toEqual([0, 0, 2]);
+  });
+
+  it('resolves mixed named and positional request.security_lower_tf arguments in Pine order', () => {
+    const result = runCompatScript(`
+indicator("Mixed Lower TF request", timeframe="2")
+intrabars = request.security_lower_tf(symbol=syminfo.tickerid, "1", close, false, na, false, 2)
 plot(array.size(intrabars), title="Count")
 `, {
       bars: lowerChartBars,

@@ -1004,6 +1004,37 @@ value = ta.sma(close, source=open, length=14)
     ]);
   });
 
+  it('resolves request helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Request Signatures")
+rate = request.currency_rate(currency.USD, "GBP", ignore_invalid_currency=true)
+dividend = request.dividends("NASDAQ:AAPL", dividends.gross, barmerge.gaps_on, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false, currency=currency.USD)
+earning = request.earnings("NASDAQ:AAPL", earnings.actual, barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false, currency="USD")
+split = request.splits("NASDAQ:AAPL", splits.denominator, barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false)
+revenue = request.financial("NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", gaps=barmerge.gaps_off, ignore_invalid_symbol=false, currency="USD")
+econ = request.economic("US", "GDP", gaps=barmerge.gaps_off, ignore_invalid_symbol=false)
+seeded = request.seed("seed", "SYM", close, ignore_invalid_symbol=false, calc_bars_count=2)
+plot(rate + dividend + earning + split + revenue + econ + seeded)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid request helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Request Signatures")
+rate = request.currency_rate("USD", "GBP", from="EUR")
+split = request.splits("NASDAQ:AAPL", splits.denominator, currency="USD")
+econ = request.economic("US", "GDP", unexpected=1)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Argument 'from' for request.currency_rate() was supplied multiple times",
+      "Unknown argument 'currency' for request.splits()",
+      "Unknown argument 'unexpected' for request.economic()",
+    ]);
+  });
+
   it('resolves Pine input overload bindings for range and options calls', () => {
     const result = checkProgram(parse(`
 indicator("Input Overloads")

@@ -267,6 +267,13 @@ const STRATEGY_EXIT_ARGS = [
 ] as const;
 const STRATEGY_CLOSE_ARGS = ['id', 'comment', 'qty', 'qty_percent', 'alert_message', 'immediately', 'disable_alert'] as const;
 const STRATEGY_CLOSE_ALL_ARGS = ['comment', 'alert_message', 'immediately', 'disable_alert'] as const;
+const REQUEST_SECURITY_ARGS = ['symbol', 'timeframe', 'expression', 'gaps', 'lookahead', 'ignore_invalid_symbol', 'currency', 'calc_bars_count'] as const;
+const REQUEST_SECURITY_LOWER_TF_ARGS = ['symbol', 'timeframe', 'expression', 'ignore_invalid_symbol', 'currency', 'ignore_invalid_timeframe', 'calc_bars_count'] as const;
+const REQUEST_CURRENCY_RATE_ARGS = ['from', 'to', 'ignore_invalid_currency'] as const;
+const REQUEST_SERIES_ARGS = ['ticker', 'field', 'gaps', 'lookahead', 'ignore_invalid_symbol', 'currency'] as const;
+const REQUEST_FINANCIAL_ARGS = ['symbol', 'financial_id', 'period', 'gaps', 'ignore_invalid_symbol', 'currency'] as const;
+const REQUEST_ECONOMIC_ARGS = ['country_code', 'field', 'gaps', 'ignore_invalid_symbol'] as const;
+const REQUEST_SEED_ARGS = ['source', 'symbol', 'expression', 'ignore_invalid_symbol', 'calc_bars_count'] as const;
 
 export interface IndicatorDeclarationMetadata {
   title: string;
@@ -2347,9 +2354,9 @@ export class TealscriptEngine {
   }
 
   private evaluateRequestSecurity(expr: CallExpression, callId: string): unknown {
-    const symbolArg = this.getCallArgument(expr, 0, 'symbol');
-    const timeframeArg = this.getCallArgument(expr, 1, 'timeframe');
-    const expressionArg = this.getCallArgument(expr, 2, 'expression');
+    const symbolArg = this.getOrderedCallArgument(expr, REQUEST_SECURITY_ARGS, 0);
+    const timeframeArg = this.getOrderedCallArgument(expr, REQUEST_SECURITY_ARGS, 1);
+    const expressionArg = this.getOrderedCallArgument(expr, REQUEST_SECURITY_ARGS, 2);
 
     if (!symbolArg || !timeframeArg || !expressionArg) {
       throw new Error('request.security requires symbol, timeframe, and expression arguments');
@@ -2360,13 +2367,13 @@ export class TealscriptEngine {
 
     const symbol = this.normalizeRequestSymbol(this.evaluateExpression(symbolArg.value));
     const timeframe = this.normalizeRequestTimeframe(this.evaluateExpression(timeframeArg.value));
-    const gaps = this.normalizeBarmergeGaps(this.evaluateOptionalCallArgument(expr, 3, 'gaps') ?? 'barmerge.gaps_off');
+    const gaps = this.normalizeBarmergeGaps(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SECURITY_ARGS, 3) ?? 'barmerge.gaps_off');
     const lookahead = this.normalizeBarmergeLookahead(
-      this.evaluateOptionalCallArgument(expr, 4, 'lookahead') ?? 'barmerge.lookahead_off',
+      this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SECURITY_ARGS, 4) ?? 'barmerge.lookahead_off',
     );
-    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalCallArgument(expr, 5, 'ignore_invalid_symbol') ?? false);
-    const currency = this.normalizeOptionalRequestCurrency(this.evaluateOptionalCallArgument(expr, 6, 'currency'));
-    const calcBarsCount = this.normalizeOptionalPositiveInteger(this.evaluateOptionalCallArgument(expr, 7, 'calc_bars_count'));
+    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SECURITY_ARGS, 5) ?? false);
+    const currency = this.normalizeOptionalRequestCurrency(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SECURITY_ARGS, 6));
+    const calcBarsCount = this.normalizeOptionalPositiveInteger(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SECURITY_ARGS, 7));
     const expressionId = this.requestExpressionCacheId(expressionArg.value);
     this.trackRequestContext(
       this.requestLimitKey('request.security', expressionId, symbol, timeframe, currency, calcBarsCount),
@@ -2394,9 +2401,9 @@ export class TealscriptEngine {
   }
 
   private evaluateRequestSecurityLowerTf(expr: CallExpression, callId: string): PineArray {
-    const symbolArg = this.getCallArgument(expr, 0, 'symbol');
-    const timeframeArg = this.getCallArgument(expr, 1, 'timeframe');
-    const expressionArg = this.getCallArgument(expr, 2, 'expression');
+    const symbolArg = this.getOrderedCallArgument(expr, REQUEST_SECURITY_LOWER_TF_ARGS, 0);
+    const timeframeArg = this.getOrderedCallArgument(expr, REQUEST_SECURITY_LOWER_TF_ARGS, 1);
+    const expressionArg = this.getOrderedCallArgument(expr, REQUEST_SECURITY_LOWER_TF_ARGS, 2);
 
     if (!symbolArg || !timeframeArg || !expressionArg) {
       throw new Error('request.security_lower_tf requires symbol, timeframe, and expression arguments');
@@ -2407,10 +2414,10 @@ export class TealscriptEngine {
 
     const symbol = this.normalizeRequestSymbol(this.evaluateExpression(symbolArg.value));
     const timeframe = this.normalizeRequestTimeframe(this.evaluateExpression(timeframeArg.value));
-    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalCallArgument(expr, 3, 'ignore_invalid_symbol') ?? false);
-    const currency = this.normalizeOptionalRequestCurrency(this.evaluateOptionalCallArgument(expr, 4, 'currency'));
-    const ignoreInvalidTimeframe = this.isTruthy(this.evaluateOptionalCallArgument(expr, 5, 'ignore_invalid_timeframe') ?? false);
-    const calcBarsCount = this.normalizeOptionalPositiveInteger(this.evaluateOptionalCallArgument(expr, 6, 'calc_bars_count'));
+    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SECURITY_LOWER_TF_ARGS, 3) ?? false);
+    const currency = this.normalizeOptionalRequestCurrency(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SECURITY_LOWER_TF_ARGS, 4));
+    const ignoreInvalidTimeframe = this.isTruthy(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SECURITY_LOWER_TF_ARGS, 5) ?? false);
+    const calcBarsCount = this.normalizeOptionalPositiveInteger(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SECURITY_LOWER_TF_ARGS, 6));
     const expressionId = this.requestExpressionCacheId(expressionArg.value);
     this.trackRequestContext(
       this.requestLimitKey('request.security_lower_tf', expressionId, symbol, timeframe, currency, calcBarsCount),
@@ -2448,8 +2455,8 @@ export class TealscriptEngine {
   }
 
   private evaluateRequestCurrencyRate(expr: CallExpression): unknown {
-    const fromArg = this.getCallArgument(expr, 0, 'from');
-    const toArg = this.getCallArgument(expr, 1, 'to');
+    const fromArg = this.getOrderedCallArgument(expr, REQUEST_CURRENCY_RATE_ARGS, 0);
+    const toArg = this.getOrderedCallArgument(expr, REQUEST_CURRENCY_RATE_ARGS, 1);
 
     if (!fromArg || !toArg) {
       throw new Error('request.currency_rate requires from and to currency arguments');
@@ -2457,7 +2464,7 @@ export class TealscriptEngine {
 
     const fromCurrency = this.normalizeOptionalRequestCurrency(this.evaluateExpression(fromArg.value));
     const toCurrency = this.normalizeOptionalRequestCurrency(this.evaluateExpression(toArg.value));
-    const ignoreInvalidCurrency = this.isTruthy(this.evaluateOptionalCallArgument(expr, 2, 'ignore_invalid_currency') ?? false);
+    const ignoreInvalidCurrency = this.isTruthy(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_CURRENCY_RATE_ARGS, 2) ?? false);
 
     if (!fromCurrency || !toCurrency) {
       if (ignoreInvalidCurrency) {
@@ -2486,20 +2493,20 @@ export class TealscriptEngine {
   }
 
   private evaluateRequestCorporateAction(expr: CallExpression, family: 'dividends' | 'earnings' | 'splits', defaultField: string, supportsCurrency: boolean): unknown {
-    const tickerArg = this.getCallArgument(expr, 0, 'ticker');
+    const tickerArg = this.getOrderedCallArgument(expr, REQUEST_SERIES_ARGS, 0);
     if (!tickerArg) {
       throw new Error(`request.${family} requires a ticker argument`);
     }
 
     const ticker = this.normalizeRequestSymbol(this.evaluateExpression(tickerArg.value));
-    const field = this.normalizeRequestSeriesField(this.evaluateOptionalCallArgument(expr, 1, 'field'), defaultField);
-    const gaps = this.normalizeBarmergeGaps(this.evaluateOptionalCallArgument(expr, 2, 'gaps') ?? 'barmerge.gaps_off');
+    const field = this.normalizeRequestSeriesField(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SERIES_ARGS, 1), defaultField);
+    const gaps = this.normalizeBarmergeGaps(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SERIES_ARGS, 2) ?? 'barmerge.gaps_off');
     const lookahead = this.normalizeBarmergeLookahead(
-      this.evaluateOptionalCallArgument(expr, 3, 'lookahead') ?? 'barmerge.lookahead_off',
+      this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SERIES_ARGS, 3) ?? 'barmerge.lookahead_off',
     );
-    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalCallArgument(expr, 4, 'ignore_invalid_symbol') ?? false);
+    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SERIES_ARGS, 4) ?? false);
     const currency = supportsCurrency
-      ? this.normalizeOptionalRequestCurrency(this.evaluateOptionalCallArgument(expr, 5, 'currency'))
+      ? this.normalizeOptionalRequestCurrency(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SERIES_ARGS, 5))
       : undefined;
     const key = corporateActionRequestKey(ticker, field, currency);
 
@@ -2514,9 +2521,9 @@ export class TealscriptEngine {
   }
 
   private evaluateRequestFinancial(expr: CallExpression): unknown {
-    const symbolArg = this.getCallArgument(expr, 0, 'symbol');
-    const financialIdArg = this.getCallArgument(expr, 1, 'financial_id');
-    const periodArg = this.getCallArgument(expr, 2, 'period');
+    const symbolArg = this.getOrderedCallArgument(expr, REQUEST_FINANCIAL_ARGS, 0);
+    const financialIdArg = this.getOrderedCallArgument(expr, REQUEST_FINANCIAL_ARGS, 1);
+    const periodArg = this.getOrderedCallArgument(expr, REQUEST_FINANCIAL_ARGS, 2);
     if (!symbolArg || !financialIdArg || !periodArg) {
       throw new Error('request.financial requires symbol, financial_id, and period arguments');
     }
@@ -2524,9 +2531,9 @@ export class TealscriptEngine {
     const symbol = this.normalizeRequestSymbol(this.evaluateExpression(symbolArg.value));
     const financialId = this.toStringValue(this.evaluateExpression(financialIdArg.value)).trim();
     const period = this.toStringValue(this.evaluateExpression(periodArg.value)).trim().toUpperCase();
-    const gaps = this.normalizeBarmergeGaps(this.evaluateOptionalCallArgument(expr, 3, 'gaps') ?? 'barmerge.gaps_off');
-    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalCallArgument(expr, 4, 'ignore_invalid_symbol') ?? false);
-    const currency = this.normalizeOptionalRequestCurrency(this.evaluateOptionalCallArgument(expr, 5, 'currency'));
+    const gaps = this.normalizeBarmergeGaps(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_FINANCIAL_ARGS, 3) ?? 'barmerge.gaps_off');
+    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_FINANCIAL_ARGS, 4) ?? false);
+    const currency = this.normalizeOptionalRequestCurrency(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_FINANCIAL_ARGS, 5));
 
     return this.evaluateRequestPointSeries({
       family: 'financial',
@@ -2539,16 +2546,16 @@ export class TealscriptEngine {
   }
 
   private evaluateRequestEconomic(expr: CallExpression): unknown {
-    const countryCodeArg = this.getCallArgument(expr, 0, 'country_code');
-    const fieldArg = this.getCallArgument(expr, 1, 'field');
+    const countryCodeArg = this.getOrderedCallArgument(expr, REQUEST_ECONOMIC_ARGS, 0);
+    const fieldArg = this.getOrderedCallArgument(expr, REQUEST_ECONOMIC_ARGS, 1);
     if (!countryCodeArg || !fieldArg) {
       throw new Error('request.economic requires country_code and field arguments');
     }
 
     const countryCode = this.toStringValue(this.evaluateExpression(countryCodeArg.value)).trim().toUpperCase();
     const field = this.toStringValue(this.evaluateExpression(fieldArg.value)).trim();
-    const gaps = this.normalizeBarmergeGaps(this.evaluateOptionalCallArgument(expr, 2, 'gaps') ?? 'barmerge.gaps_off');
-    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalCallArgument(expr, 3, 'ignore_invalid_symbol') ?? false);
+    const gaps = this.normalizeBarmergeGaps(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_ECONOMIC_ARGS, 2) ?? 'barmerge.gaps_off');
+    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_ECONOMIC_ARGS, 3) ?? false);
 
     return this.evaluateRequestPointSeries({
       family: 'economic',
@@ -2561,9 +2568,9 @@ export class TealscriptEngine {
   }
 
   private evaluateRequestSeed(expr: CallExpression, callId: string): unknown {
-    const sourceArg = this.getCallArgument(expr, 0, 'source');
-    const symbolArg = this.getCallArgument(expr, 1, 'symbol');
-    const expressionArg = this.getCallArgument(expr, 2, 'expression');
+    const sourceArg = this.getOrderedCallArgument(expr, REQUEST_SEED_ARGS, 0);
+    const symbolArg = this.getOrderedCallArgument(expr, REQUEST_SEED_ARGS, 1);
+    const expressionArg = this.getOrderedCallArgument(expr, REQUEST_SEED_ARGS, 2);
 
     if (!sourceArg || !symbolArg || !expressionArg) {
       throw new Error('request.seed requires source, symbol, and expression arguments');
@@ -2576,8 +2583,8 @@ export class TealscriptEngine {
     const symbol = this.toStringValue(this.evaluateExpression(symbolArg.value)).trim();
     const requestSymbol = seedRequestSymbol(source, symbol);
     const timeframe = this.ctx.timeframe.period;
-    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalCallArgument(expr, 3, 'ignore_invalid_symbol') ?? false);
-    const calcBarsCount = this.normalizeOptionalPositiveInteger(this.evaluateOptionalCallArgument(expr, 4, 'calc_bars_count'));
+    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SEED_ARGS, 3) ?? false);
+    const calcBarsCount = this.normalizeOptionalPositiveInteger(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SEED_ARGS, 4));
     const expressionId = this.requestExpressionCacheId(expressionArg.value);
     this.trackRequestContext(
       this.requestLimitKey('request.seed', expressionId, requestSymbol, timeframe, undefined, calcBarsCount),
@@ -2631,12 +2638,18 @@ export class TealscriptEngine {
     return this.mergeRequestSeriesValue(result.context.points, options.gaps);
   }
 
-  private getCallArgument(expr: CallExpression, position: number, name: string): CallArgument | undefined {
-    return expr.arguments.find((arg) => arg.name?.name === name) ?? expr.arguments.filter((arg) => !arg.name)[position];
+  private getOrderedCallArgument(expr: CallExpression, names: readonly string[], position: number): CallArgument | undefined {
+    const name = names[position];
+    const positionalPosition = position - names.slice(0, position).filter((priorName) => (
+      expr.arguments.some((arg) => arg.name?.name === priorName)
+    )).length;
+    return name
+      ? expr.arguments.find((arg) => arg.name?.name === name) ?? expr.arguments.filter((arg) => !arg.name)[positionalPosition]
+      : undefined;
   }
 
-  private evaluateOptionalCallArgument(expr: CallExpression, position: number, name: string): unknown {
-    const arg = this.getCallArgument(expr, position, name);
+  private evaluateOptionalOrderedCallArgument(expr: CallExpression, names: readonly string[], position: number): unknown {
+    const arg = this.getOrderedCallArgument(expr, names, position);
     return arg ? this.evaluateExpression(arg.value) : undefined;
   }
 
