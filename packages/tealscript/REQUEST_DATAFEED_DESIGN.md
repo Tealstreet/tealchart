@@ -9,13 +9,14 @@ on TradingView, a live exchange, or Tealchart networking during CI.
 The contract supports deterministic fixtures, same-symbol or host-provided
 other-symbol `request.security()` requests,
 `request.security_lower_tf()` intrabar arrays, and Pine v6 dynamic request
-behavior for supported `request.security*` calls. It also supports the current
-`request.currency_rate()` fixture-backed series MVP. The dynamic MVP enables
-local scope and nested supported requests by default, while rejecting those
-forms when scripts explicitly set `dynamic_requests=false`. Full simple/series
-qualifier analysis and the remaining external request families remain out of
-scope until later Epic 8 and qualified type-system phases. Synthetic ticker
-identifiers from Epic 9 flow through this same request key contract.
+behavior for supported `request.security*` calls. It also supports
+fixture-backed `request.currency_rate()`, corporate action point series,
+financial/economic point series, and deterministic `request.seed()` contexts.
+The dynamic MVP enables local scope and nested supported requests by default,
+while rejecting those forms when scripts explicitly set
+`dynamic_requests=false`. Full simple/series qualifier analysis remains owned
+by the qualified type-system epic. Synthetic ticker identifiers from Epic 9
+flow through this same request key contract.
 
 ## Contract
 
@@ -105,10 +106,19 @@ for supported `request.security*` calls. When scripts explicitly set
 This MVP does not yet implement Pine's full simple/series qualifier analysis for
 request parameters. That belongs to the qualified type-system epic.
 
-## `request.currency_rate()` MVP
+## Point-Series Request MVP
 
-The current runtime implementation supports deterministic currency conversion
-series supplied by the request datafeed.
+The current runtime implementation supports deterministic point series supplied
+by the request datafeed for:
+
+- `request.currency_rate()`
+- `request.dividends()`
+- `request.earnings()`
+- `request.splits()`
+- `request.financial()`
+- `request.economic()`
+
+Currency conversion series use the following behavior:
 
 1. Resolve `{ from, to }` currency codes and return `1` when both currencies
    match.
@@ -118,6 +128,23 @@ series supplied by the request datafeed.
 4. Support `ignore_invalid_currency=true` for missing or invalid fixture
    contexts.
 5. Provide common `currency.*` constants used by public Pine examples.
+
+Corporate action, financial, and economic series use stable family-specific
+keys and the same latest-point merge rule. `gaps=barmerge.gaps_on` keeps point
+events sparse, while the default mode carries the latest known value forward.
+`lookahead_on` is still rejected for these point-series families because Pine's
+future event behavior needs a dedicated repaint-safety pass.
+
+## `request.seed()` MVP
+
+The current runtime implementation supports deterministic seed contexts without
+fetching GitHub data at runtime.
+
+1. Resolve `{ source, symbol }` into an opaque seed-backed request symbol.
+2. Evaluate the expression against host-provided seed bars using the same
+   isolated request-context execution path as `request.security()`.
+3. Support `ignore_invalid_symbol` and `calc_bars_count` with deterministic
+   fixtures.
 
 ## Integration Path
 
@@ -133,9 +160,9 @@ without changing the fixture-level contract.
 ## Non-Goals
 
 This contract does not yet cover full simple/series qualifier diagnostics,
-corporate actions, economic data, financial data, seeded data, footprint data,
-or strategy/backtest execution over synthetic ticker data. Those belong to
-later Epic 8, Epic 14, and qualified type-system phases.
+provider-side fetching for host data, `request.footprint()` data, or
+strategy/backtest execution over synthetic ticker data. Those belong to the
+qualified type-system epic, the remaining request-footprint work, and Epic 14.
 
 ## Test Strategy
 
