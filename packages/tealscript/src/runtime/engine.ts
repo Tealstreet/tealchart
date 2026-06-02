@@ -3808,6 +3808,21 @@ export class TealscriptEngine {
     return namedArgs.has(name) ? namedArgs.get(name) : args[index] !== undefined ? args[index] : fallback;
   }
 
+  private getCallArgAny(
+    args: unknown[],
+    namedArgs: Map<string, unknown>,
+    index: number,
+    names: string[],
+    fallback?: unknown,
+  ): unknown {
+    for (const name of names) {
+      if (namedArgs.has(name)) {
+        return namedArgs.get(name);
+      }
+    }
+    return args[index] !== undefined ? args[index] : fallback;
+  }
+
   private getTaSourceLengthArgs(
     args: unknown[],
     namedArgs: Map<string, unknown>,
@@ -5816,48 +5831,72 @@ export class TealscriptEngine {
       });
     });
 
-    this.builtins.set('str.length', (args) => this.toStringValue(args[0]).length);
-    this.builtins.set('str.contains', (args) => this.toStringValue(args[0]).includes(this.toStringValue(args[1])));
-    this.builtins.set('str.startswith', (args) => this.toStringValue(args[0]).startsWith(this.toStringValue(args[1])));
-    this.builtins.set('str.endswith', (args) => this.toStringValue(args[0]).endsWith(this.toStringValue(args[1])));
-    this.builtins.set('str.pos', (args) => {
-      const index = this.toStringValue(args[0]).indexOf(this.toStringValue(args[1]));
+    const stringSourceArg = (args: unknown[], namedArgs: Map<string, unknown>, index = 0) =>
+      this.getCallArgAny(args, namedArgs, index, ['source', 'string']);
+    const stringPatternArg = (args: unknown[], namedArgs: Map<string, unknown>, index = 1) =>
+      this.getCallArgAny(args, namedArgs, index, ['str', 'substring', 'target']);
+
+    this.builtins.set('str.length', (args, namedArgs) => this.toStringValue(stringSourceArg(args, namedArgs)).length);
+    this.builtins.set('str.contains', (args, namedArgs) =>
+      this.toStringValue(stringSourceArg(args, namedArgs)).includes(this.toStringValue(stringPatternArg(args, namedArgs))),
+    );
+    this.builtins.set('str.startswith', (args, namedArgs) =>
+      this.toStringValue(stringSourceArg(args, namedArgs)).startsWith(this.toStringValue(stringPatternArg(args, namedArgs))),
+    );
+    this.builtins.set('str.endswith', (args, namedArgs) =>
+      this.toStringValue(stringSourceArg(args, namedArgs)).endsWith(this.toStringValue(stringPatternArg(args, namedArgs))),
+    );
+    this.builtins.set('str.pos', (args, namedArgs) => {
+      const index = this.toStringValue(stringSourceArg(args, namedArgs)).indexOf(
+        this.toStringValue(stringPatternArg(args, namedArgs)),
+      );
       return index === -1 ? NaN : index;
     });
-    this.builtins.set('str.substring', (args) => {
-      const source = this.toStringValue(args[0]);
-      const begin = Math.trunc((args[1] as number | undefined) ?? 0);
-      const end = args[2] === undefined ? undefined : Math.trunc(args[2] as number);
+    this.builtins.set('str.substring', (args, namedArgs) => {
+      const source = this.toStringValue(stringSourceArg(args, namedArgs));
+      const beginArg = this.getCallArgAny(args, namedArgs, 1, ['begin_pos'], 0);
+      const endArg = this.getCallArgAny(args, namedArgs, 2, ['end_pos']);
+      const begin = Math.trunc(this.toNumber(beginArg));
+      const end = endArg === undefined ? undefined : Math.trunc(this.toNumber(endArg));
       return source.substring(begin, end);
     });
-    this.builtins.set('str.match', (args) => {
-      const match = this.toStringValue(args[0]).match(new RegExp(this.toStringValue(args[1])));
+    this.builtins.set('str.match', (args, namedArgs) => {
+      const regexArg = this.getCallArgAny(args, namedArgs, 1, ['regex', 'pattern']);
+      const match = this.toStringValue(stringSourceArg(args, namedArgs)).match(new RegExp(this.toStringValue(regexArg)));
       return match?.[0] ?? '';
     });
-    this.builtins.set('str.repeat', (args) => {
-      if (this.isNa(args[0])) return Number.NaN;
-      const repeat = Math.trunc(this.toNumber(args[1]));
+    this.builtins.set('str.repeat', (args, namedArgs) => {
+      const sourceArg = stringSourceArg(args, namedArgs);
+      if (this.isNa(sourceArg)) return Number.NaN;
+      const repeat = Math.trunc(this.toNumber(this.getCallArgAny(args, namedArgs, 1, ['count', 'repeat_count'])));
       if (!Number.isFinite(repeat) || repeat < 0) return Number.NaN;
-      return Array.from({ length: repeat }, () => this.toStringValue(args[0])).join(this.toStringValue(args[2] ?? ''));
+      const separator = this.getCallArgAny(args, namedArgs, 2, ['separator'], '');
+      return Array.from({ length: repeat }, () => this.toStringValue(sourceArg)).join(this.toStringValue(separator));
     });
-    this.builtins.set('str.split', (args) => {
+    this.builtins.set('str.split', (args, namedArgs) => {
       const array = createPineArray<string>();
-      array.values.push(...this.toStringValue(args[0]).split(this.toStringValue(args[1])));
+      array.values.push(
+        ...this.toStringValue(stringSourceArg(args, namedArgs)).split(
+          this.toStringValue(this.getCallArgAny(args, namedArgs, 1, ['separator'])),
+        ),
+      );
       return array;
     });
-    this.builtins.set('str.upper', (args) => this.toStringValue(args[0]).toUpperCase());
-    this.builtins.set('str.lower', (args) => this.toStringValue(args[0]).toLowerCase());
-    this.builtins.set('str.trim', (args) => this.toStringValue(args[0]).trim());
-    this.builtins.set('str.replace', (args) => {
+    this.builtins.set('str.upper', (args, namedArgs) => this.toStringValue(stringSourceArg(args, namedArgs)).toUpperCase());
+    this.builtins.set('str.lower', (args, namedArgs) => this.toStringValue(stringSourceArg(args, namedArgs)).toLowerCase());
+    this.builtins.set('str.trim', (args, namedArgs) => this.toStringValue(stringSourceArg(args, namedArgs)).trim());
+    this.builtins.set('str.replace', (args, namedArgs) => {
       return this.replaceStringOccurrence(
-        this.toStringValue(args[0]),
-        this.toStringValue(args[1]),
-        this.toStringValue(args[2]),
-        args[3],
+        this.toStringValue(stringSourceArg(args, namedArgs)),
+        this.toStringValue(stringPatternArg(args, namedArgs)),
+        this.toStringValue(this.getCallArgAny(args, namedArgs, 2, ['replacement'])),
+        this.getCallArgAny(args, namedArgs, 3, ['occurrence']),
       );
     });
-    this.builtins.set('str.replace_all', (args) => {
-      return this.toStringValue(args[0]).split(this.toStringValue(args[1])).join(this.toStringValue(args[2]));
+    this.builtins.set('str.replace_all', (args, namedArgs) => {
+      return this.toStringValue(stringSourceArg(args, namedArgs))
+        .split(this.toStringValue(stringPatternArg(args, namedArgs)))
+        .join(this.toStringValue(this.getCallArgAny(args, namedArgs, 2, ['replacement'])));
     });
   }
 
