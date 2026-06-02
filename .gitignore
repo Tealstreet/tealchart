@@ -1,7 +1,15 @@
 node_modules/
 dist/
+build/
 coverage/
+.cache/
 .turbo/
+.yarn/install-state.gz
+.env
+.env*.local
+.next/
+out/
 *.tsbuildinfo
+*.bun-build
 .DS_Store
 *.log
