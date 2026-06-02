@@ -184,7 +184,7 @@ const MAP_KEY_TYPE_NAMES = new Set(['int', 'float', 'bool', 'string', 'color']);
 const PRIMITIVE_TYPE_KINDS = new Set<SemanticTypeKind>(['bool', 'color', 'float', 'int', 'string']);
 const REFERENCE_TYPE_KINDS = new Set<SemanticTypeKind>(['box', 'chart.point', 'hline', 'label', 'line', 'linefill', 'plot', 'polyline', 'table']);
 const STRUCTURED_TYPE_KINDS = new Set<SemanticTypeKind>(['array', 'matrix', 'map', 'udt']);
-const COLLECTION_TEMPLATE_TYPE_PATTERN = /^(array|matrix|map)</;
+const COLLECTION_TEMPLATE_TYPE_PATTERN = /^(array|matrix|map)<(.+)>$/;
 const UNKNOWN_SEMANTIC_TYPE: SemanticType = { kind: 'unknown' };
 
 const STRATEGY_ORDER_PARAMS = ['id', 'direction', 'qty', 'limit', 'stop', 'oca_name', 'oca_type', 'comment', 'alert_message', 'disable_alert'];
@@ -2090,17 +2090,28 @@ class SemanticChecker {
     if (COLLECTION_TYPE_NAMES.has(typeName)) {
       this.addDiagnostic('invalid-type-template', `Invalid ${role} type '${typeName}'; collection template types must include their element templates`, loc);
     }
-    if (this.isNestedCollectionTemplateTypeName(typeName)) {
-      this.addDiagnostic('invalid-type-template', `Invalid ${role} type '${typeName}'; collections cannot directly contain collection types`, loc);
+    const templateType = this.parseTemplateTypeName(typeName);
+    if (!templateType) return;
+
+    if (templateType.kind === 'array' || templateType.kind === 'matrix') {
+      this.checkTemplateTypeName(templateType.args[0] ?? '', `${role} element`, loc);
+      return;
+    }
+
+    const [keyTypeName, valueTypeName] = templateType.args;
+    if (keyTypeName) {
+      this.checkTemplateTypeName(keyTypeName, `${role} key`, loc);
+      if (!this.isInvalidTemplateTypeName(keyTypeName) && !MAP_KEY_TYPE_NAMES.has(keyTypeName)) {
+        this.addDiagnostic('invalid-type-template', `Map key type must be int, float, bool, string, or color in ${role}`, loc);
+      }
+    }
+    if (valueTypeName) {
+      this.checkTemplateTypeName(valueTypeName, `${role} value`, loc);
     }
   }
 
   private isInvalidTemplateTypeName(typeName: string): boolean {
-    return TYPE_QUALIFIER_NAMES.has(typeName) || COLLECTION_TYPE_NAMES.has(typeName) || this.isNestedCollectionTemplateTypeName(typeName);
-  }
-
-  private isNestedCollectionTemplateTypeName(typeName: string): boolean {
-    return COLLECTION_TEMPLATE_TYPE_PATTERN.test(typeName);
+    return TYPE_QUALIFIER_NAMES.has(typeName) || COLLECTION_TYPE_NAMES.has(typeName);
   }
 
   private checkExpressions(scope: SemanticScope, expressions: Array<Expression | undefined>): void {
@@ -2519,7 +2530,22 @@ class SemanticChecker {
   }
 
   private typeFromName(name: string, qualifier?: SemanticQualifier): SemanticType {
-    if (this.isNestedCollectionTemplateTypeName(name)) return { kind: 'unknown', qualifier };
+    const templateType = this.parseTemplateTypeName(name);
+    if (templateType?.kind === 'array' || templateType?.kind === 'matrix') {
+      return {
+        kind: templateType.kind,
+        qualifier,
+        elementType: this.typeFromName(templateType.args[0] ?? 'unknown'),
+      };
+    }
+    if (templateType?.kind === 'map') {
+      return {
+        kind: 'map',
+        qualifier,
+        keyType: this.typeFromName(templateType.args[0] ?? 'unknown'),
+        valueType: this.typeFromName(templateType.args[1] ?? 'unknown'),
+      };
+    }
 
     switch (name) {
       case 'int':
@@ -2545,6 +2571,36 @@ class SemanticChecker {
       default:
         return { kind: 'udt', qualifier, name };
     }
+  }
+
+  private parseTemplateTypeName(typeName: string): { kind: 'array' | 'matrix' | 'map'; args: string[] } | null {
+    const match = COLLECTION_TEMPLATE_TYPE_PATTERN.exec(typeName);
+    if (!match) return null;
+
+    const kind = match[1] as 'array' | 'matrix' | 'map';
+    const args = this.splitTemplateTypeArguments(match[2] ?? '');
+    if ((kind === 'array' || kind === 'matrix') && args.length !== 1) return null;
+    if (kind === 'map' && args.length !== 2) return null;
+    return { kind, args };
+  }
+
+  private splitTemplateTypeArguments(args: string): string[] {
+    const result: string[] = [];
+    let depth = 0;
+    let start = 0;
+
+    for (let index = 0; index < args.length; index += 1) {
+      const char = args[index];
+      if (char === '<') depth += 1;
+      if (char === '>') depth -= 1;
+      if (char === ',' && depth === 0) {
+        result.push(args.slice(start, index).trim());
+        start = index + 1;
+      }
+    }
+
+    result.push(args.slice(start).trim());
+    return result.filter((arg) => arg.length > 0);
   }
 
   private checkTypeCompatibility(annotation: TypeAnnotation | undefined | null, init: Expression, scope: SemanticScope, loc?: SourceLocation): void {
