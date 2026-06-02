@@ -134,6 +134,42 @@ alertcondition(true, title="A", message="M", freq=alert.freq_all)
     ]);
   });
 
+  it('accepts Pine strategy order and trade accessor calls', () => {
+    const result = checkProgram(parse(`
+strategy("Strategy", initial_capital=1000, pyramiding=1, default_qty_type=strategy.fixed, default_qty_value=1)
+strategy.entry("Long", strategy.long, qty=1, limit=close, oca_type=strategy.oca.cancel, alert_message="entry")
+strategy.order(id="Add", direction=strategy.long, qty=1)
+strategy.exit("Exit", from_entry="Long", qty_percent=50, limit=close + 1, stop=close - 1)
+strategy.close("Long", qty=1, alert_message="close")
+strategy.close_all(comment="flat")
+strategy.cancel("Add")
+strategy.cancel_all()
+plot(strategy.opentrades.entry_price(0))
+plot(strategy.closedtrades.exit_price(trade_num=0))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid Pine strategy call arguments', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy")
+strategy.entry("Long")
+strategy.cancel_all("unexpected")
+strategy.entri("Long", strategy.long)
+strategy.opentrades.entry_price()
+strategy.exit("Exit", from_entry="Long", unknown=1)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy.entry() expects at least 2 arguments',
+      'strategy.cancel_all() expects at most 0 arguments',
+      'Unknown function: strategy.entri',
+      'strategy.opentrades.entry_price() expects at least 1 argument',
+      "Unknown argument 'unknown' for strategy.exit()",
+    ]);
+  });
+
   it('reports duplicate declarations in the same scope', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate")
