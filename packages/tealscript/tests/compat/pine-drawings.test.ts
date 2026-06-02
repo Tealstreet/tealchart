@@ -437,4 +437,78 @@ if barstate.islast
       },
     ]);
   });
+
+  it('updates table and cell state with Pine named setter idioms', () => {
+    const result = runCompatScript(`
+indicator("Named Table", overlay=true)
+var dashboard = table.new(position=position.top_right, columns=2, rows=2, bgcolor=color.blue, border_width=1)
+if barstate.islast
+    table.set_position(table_id=dashboard, position=position.bottom_right)
+    table.set_bgcolor(table_id=dashboard, bgcolor=color.new(color.gray, 80))
+    table.set_frame_color(table_id=dashboard, frame_color=color.white)
+    table.set_frame_width(table_id=dashboard, frame_width=2)
+    table.set_border_color(table_id=dashboard, border_color=color.black)
+    table.set_border_width(table_id=dashboard, border_width=3)
+    table.cell(table_id=dashboard, column=0, row=0, text="Label", text_color=color.white, bgcolor=color.blue)
+    table.cell(table_id=dashboard, column=1, row=0, text="")
+    table.cell_set_text(table_id=dashboard, column=1, row=0, text="Close")
+    table.cell_set_bgcolor(table_id=dashboard, column=1, row=0, bgcolor=color.green)
+    table.cell_set_text_color(table_id=dashboard, column=1, row=0, text_color=color.black)
+    table.cell_set_text_size(table_id=dashboard, column=1, row=0, text_size=size.large)
+    table.cell_set_width(table_id=dashboard, column=1, row=0, width=64)
+    table.cell_set_height(table_id=dashboard, column=1, row=0, height=24)
+    table.cell_set_text_halign(table_id=dashboard, column=1, row=0, text_halign=text.align_right)
+    table.cell_set_text_valign(table_id=dashboard, column=1, row=0, text_valign=text.align_bottom)
+    table.cell_set_text_font_family(table_id=dashboard, column=1, row=0, text_font_family=font.family_monospace)
+    table.cell_set_text_formatting(table_id=dashboard, column=1, row=0, text_formatting=text.format_bold)
+    table.cell(table_id=dashboard, column=0, row=1, text="cleared")
+    table.clear(table_id=dashboard, start_column=0, start_row=1, end_column=0, end_row=1)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'table_table.new_0_0',
+        type: 'table',
+        persistent: true,
+        barIndex: 0,
+        position: 'bottom_right',
+        columns: 2,
+        rows: 2,
+        bgcolor: '#9E9E9E33',
+        frameColor: '#FFFFFF',
+        frameWidth: 2,
+        borderColor: '#000000',
+        borderWidth: 3,
+        cells: [
+          {
+            column: 0,
+            row: 0,
+            text: 'Label',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#2196F3',
+          },
+          {
+            column: 1,
+            row: 0,
+            text: 'Close',
+            width: 64,
+            height: 24,
+            textColor: '#000000',
+            textHalign: 'right',
+            textValign: 'bottom',
+            textSize: 'large',
+            bgcolor: '#4CAF50',
+            textFontFamily: 'monospace',
+            textFormatting: 'bold',
+          },
+        ],
+      },
+    ]);
+  });
 });
