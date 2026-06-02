@@ -602,6 +602,28 @@ for (const name of STRATEGY_CLOSED_TRADE_ACCESSORS) {
   BUILTIN_SIGNATURES.set(`strategy.closedtrades.${name}`, { params: ['trade_num'], minArgs: 1, maxArgs: 1 });
 }
 
+for (const name of ['array.new', ...ARRAY_CONSTRUCTOR_ELEMENT_TYPES.keys()]) {
+  BUILTIN_SIGNATURES.set(name, { params: ['size', 'initial_value'], minArgs: 0, maxArgs: 2 });
+}
+
+for (const name of ['array.clear', 'array.copy', 'array.first', 'array.last', 'array.pop', 'array.shift', 'array.size']) {
+  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1 });
+}
+
+for (const name of ['array.get', 'array.remove']) {
+  BUILTIN_SIGNATURES.set(name, { params: ['id', 'index'], minArgs: 2, maxArgs: 2 });
+}
+
+for (const name of ['array.push', 'array.unshift']) {
+  BUILTIN_SIGNATURES.set(name, { params: ['id', 'value'], minArgs: 2, maxArgs: 2 });
+}
+
+for (const name of ['array.insert', 'array.set']) {
+  BUILTIN_SIGNATURES.set(name, { params: ['id', 'index', 'value'], minArgs: 3, maxArgs: 3 });
+}
+
+BUILTIN_SIGNATURES.set('array.from', { params: [], minArgs: 0, allowExtraPositional: true });
+
 export function checkProgram(program: Program): SemanticCheckResult {
   return new SemanticChecker().check(program);
 }

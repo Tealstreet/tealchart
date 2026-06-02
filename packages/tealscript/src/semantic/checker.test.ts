@@ -689,6 +689,63 @@ badPutAll = map.put_all(id=prices, other=prices)
     ]);
   });
 
+  it('resolves core array helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Array Core Signatures")
+values = array.new_int(size=2, initial_value=1)
+mixed = array.new_float(2, initial_value=2.5)
+fromValues = array.from(1, 2, 3)
+array.push(id=values, value=3)
+array.unshift(id=values, value=0)
+array.set(id=values, index=1, value=5)
+removed = array.remove(id=values, index=2)
+array.insert(id=values, index=2, value=9)
+first = array.first(id=values)
+last = array.last(id=values)
+value = array.get(id=values, index=1)
+copied = array.copy(id=values)
+popped = array.pop(id=copied)
+shifted = array.shift(id=copied)
+size = array.size(id=copied)
+array.clear(id=copied)
+plot(first + last + value + removed + popped + shifted + size + array.size(fromValues) + array.size(mixed))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid core array helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Array Core Signatures")
+values = array.new_int(size=2, initial_value=1)
+duplicateSize = array.size(values, id=values)
+unknownGet = array.get(id=values, item=0)
+missingIndex = array.remove(id=values)
+tooManyClear = array.clear(values, values)
+badNew = array.new_int(size=1, initial_value=0, extra=1)
+shortSet = array.set(id=values, index=0)
+unknownPush = array.push(id=values, item=1)
+badFrom = array.from(value=1)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Argument 'id' for array.size() was supplied multiple times",
+      "Unknown argument 'item' for array.get()",
+      'array.get() expects at least 2 arguments',
+      "array.get() missing required argument 'index'",
+      'array.remove() expects at least 2 arguments',
+      "array.remove() missing required argument 'index'",
+      'array.clear() expects at most 1 argument',
+      "Unknown argument 'extra' for array.new_int()",
+      'array.set() expects at least 3 arguments',
+      "array.set() missing required argument 'value'",
+      "Unknown argument 'item' for array.push()",
+      'array.push() expects at least 2 arguments',
+      "array.push() missing required argument 'value'",
+      "Unknown argument 'value' for array.from()",
+    ]);
+  });
+
   it('reports array element template mismatches for known mutable arrays', () => {
     const result = checkProgram(parse(`
 indicator("Bad Array Types")
