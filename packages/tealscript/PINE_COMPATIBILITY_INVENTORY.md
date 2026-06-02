@@ -107,7 +107,8 @@ reading the whole runtime.
 
 | Area | Feature | Status | Evidence | Remaining gaps |
 | --- | --- | --- | --- | --- |
-| Alerts | `alertcondition` / `alert` | Partial | `tests/compat/pine-control-time.test.ts`; `src/runtime/engine.test.ts` | UI integration and full throttling parity remain. |
+| Alerts | `alertcondition` / `alert` | Supported | `tests/compat/pine-control-time.test.ts`; `src/runtime/engine.test.ts`; `src/semantic/checker.test.ts`; Roadmap Epic 13 | TealScript emits runtime/worker alert outputs with placeholders, frequencies, strategy fill messages, realtime markers, and semantic call-shape diagnostics. Host-product UI presentation is outside this package. |
+| Runtime | Pine Logs `log.*` | Supported | `src/runtime/engine.test.ts`; `src/semantic/checker.test.ts`; Roadmap Epic 13 | TealScript emits runtime/worker log outputs with levels and formatted messages. Host-product UI presentation is outside this package. |
 | Strategies | `strategy.*` | Partial | `src/parser/parser.test.ts`; `src/runtime/engine.test.ts` | Broker emulator, ledger, fills, positions, and tester state are planned. |
 | Data | Multi-timeframe requests | Supported | `tests/compat/pine-request-security.test.ts`; Roadmap Epic 8 | Deterministic higher-timeframe `request.security()` gap/lookahead behavior is covered; live host data availability is outside TealScript runtime scope. |
 | Data | Other-symbol requests | Supported | `tests/compat/pine-request-security.test.ts`; `tests/runtime/requestDatafeed.test.ts`; Roadmap Epic 8 | Other-symbol metadata/currency routing is covered through host-provided request contexts. |

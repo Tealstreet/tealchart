@@ -343,9 +343,10 @@ call site, and both helpers reject bool arguments per Pine v6 behavior.
 The Pine Logs pass covers `log.info`, `log.warning`, and `log.error` with
 message-only and format-string forms. The runtime captures log level, bar
 index, bar time, and message in `ExecutionResult.logs` and forwards them
-through worker result bundles. `log.error()` records an error-level diagnostic
-without halting execution; use `runtime.error()` for Pine-compatible runtime
-halts.
+through worker result bundles. The semantic checker recognizes the `log`
+namespace and validates the variadic `message` signature before runtime.
+`log.error()` records an error-level diagnostic without halting execution; use
+`runtime.error()` for Pine-compatible runtime halts.
 
 ## Core `na` And Logical Semantics Coverage
 
@@ -629,6 +630,8 @@ calculation events from live update events.
 The checkpoint fixture follows TradingView's
 documented trigger-condition idiom by deriving a boolean condition, registering
 it with `alertcondition()`, and firing a direct `alert()` from an `if` block.
+The semantic checker validates common `alert()` and `alertcondition()` call
+shapes before runtime.
 
 ## Common Loop Coverage
 
