@@ -1237,6 +1237,39 @@ shortLinreg = ta.linreg(source=close, length=3)
     ]);
   });
 
+  it('resolves remaining TA helper named arguments and series globals', () => {
+    const result = checkProgram(parse(`
+indicator("Remaining TA Signatures")
+[line, signal, hist] = ta.macd(source=close, fastlen=12, slowlen=26, siglen=9)
+legacyObv = ta.obv(source=close, volume=volume)
+currentObv = ta.obv
+range = ta.tr(handle_na=true)
+rawRange = ta.tr
+plot(line + signal + hist + legacyObv + currentObv + range + rawRange)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid remaining TA helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Remaining TA Signatures")
+duplicateMacd = ta.macd(close, source=open, fastlen=12, slowlen=26, siglen=9)
+unknownMacd = ta.macd(source=close, fastlen=12, slowlen=26, signal=9)
+tooManyObv = ta.obv(close, volume, open)
+unknownTr = ta.tr(handle_na=true, fallback=true)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Argument 'source' for ta.macd() was supplied multiple times",
+      "Unknown argument 'signal' for ta.macd()",
+      'ta.macd() expects at least 4 arguments',
+      "ta.macd() missing required argument 'siglen'",
+      'ta.obv() expects at most 2 arguments',
+      "Unknown argument 'fallback' for ta.tr()",
+    ]);
+  });
+
   it('resolves color helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Color Signatures")
