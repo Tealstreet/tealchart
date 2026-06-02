@@ -948,6 +948,142 @@ plot(strategy.opentrades, title="Open Trades")`;
       });
     });
 
+    it('recalculates default realtime strategies after order fills when calc_on_order_fills is enabled', () => {
+      const script = `//@version=6
+strategy("Realtime fill recalc", calc_on_order_fills=true, calc_on_every_tick=false, process_orders_on_close=true)
+var recalculations = 0
+if barstate.isrealtime
+    recalculations += 1
+    alert("user realtime alert", alert.freq_all)
+if bar_index == 2 and barstate.ishistory
+    strategy.entry("Buy", strategy.long, limit=99, qty=1, alert_message="entry filled")
+if strategy.position_size > 0
+    strategy.close("Buy")
+plot(strategy.position_size, title="Position")
+plot(strategy.closedtrades, title="Closed Trades")
+plot(recalculations, title="Recalculations")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+      const result = engine.execute(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => order.status)).toEqual(['pending']);
+      expect(result.plots.find((plot) => plot.title === 'Recalculations')?.values).toEqual([0, 0, 0]);
+
+      const realtimeBar = {
+        ...bars[2],
+        time: bars[2].time + 60_000,
+        open: 105,
+        high: 106,
+        low: 98,
+        close: 104,
+      };
+      const plots = engine.updateBar(ast, realtimeBar);
+      const ledger = engine.getStrategyLedger();
+      const alerts = engine.getAlerts();
+
+      expect(plots.find((plot) => plot.title === 'Position')?.values).toEqual([0, 0, 0, 0]);
+      expect(plots.find((plot) => plot.title === 'Closed Trades')?.values).toEqual([0, 0, 0, 1]);
+      expect(plots.find((plot) => plot.title === 'Recalculations')?.values).toEqual([0, 0, 0, 1]);
+      expect(engine.getProfile().bars).toBe(2);
+      expect(ledger.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        avgFillPrice: order.avgFillPrice,
+      }))).toEqual([
+        { id: 'Buy', status: 'filled', avgFillPrice: 99 },
+        { id: 'Close Buy', status: 'filled', avgFillPrice: 104 },
+      ]);
+      expect(ledger.closedTrades[0]).toMatchObject({
+        entryOrderId: 'Buy',
+        exitOrderId: 'Close Buy',
+        entryBarIndex: 3,
+        exitBarIndex: 3,
+      });
+      expect(alerts.find((alert) => alert.type === 'alert' && alert.message === 'user realtime alert')?.events.map((event) => ({
+        barIndex: event.barIndex,
+        message: event.message,
+        frequency: event.frequency,
+      }))).toEqual([
+        { barIndex: 3, message: 'user realtime alert', frequency: 'all' },
+      ]);
+      expect(alerts.find((alert) => alert.id === 'strategy_order_fills')?.events.map((event) => ({
+        barIndex: event.barIndex,
+        message: event.message,
+        frequency: event.frequency,
+      }))).toEqual([
+        { barIndex: 3, message: 'entry filled', frequency: 'all' },
+      ]);
+    });
+
+    it('recalculates after pending market orders fill at a new realtime bar open', () => {
+      const script = `//@version=6
+strategy("Realtime open fill recalc", calc_on_order_fills=true, calc_on_every_tick=false)
+if bar_index == 2 and barstate.ishistory
+    strategy.entry("Open Buy", strategy.long, qty=1)
+plot(strategy.position_size, title="Position")
+plot(strategy.opentrades, title="Open Trades")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+      const result = engine.execute(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => order.status)).toEqual(['pending']);
+
+      const realtimeBar = {
+        ...bars[2],
+        time: bars[2].time + 60_000,
+        open: 105,
+        high: 106,
+        low: 104,
+        close: 105.5,
+      };
+      const plots = engine.updateBar(ast, realtimeBar);
+      const ledger = engine.getStrategyLedger();
+
+      expect(plots.find((plot) => plot.title === 'Position')?.values).toEqual([0, 0, 0, 1]);
+      expect(plots.find((plot) => plot.title === 'Open Trades')?.values).toEqual([0, 0, 0, 1]);
+      expect(engine.getProfile().bars).toBe(1);
+      expect(ledger.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        avgFillPrice: order.avgFillPrice,
+      }))).toEqual([
+        { id: 'Open Buy', status: 'filled', avgFillPrice: 105 },
+      ]);
+    });
+
+    it('throws when realtime order-fill recalculation exceeds the loop guard', () => {
+      const script = `//@version=6
+strategy("Realtime recalc loop",
+    calc_on_order_fills=true,
+    calc_on_every_tick=true,
+    process_orders_on_close=true,
+    pyramiding=100)
+if barstate.isrealtime
+    strategy.entry("Loop", strategy.long, qty=1)
+plot(strategy.position_size, title="Position")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+      const result = engine.execute(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(() => engine.updateBar(ast, {
+        ...bars[2],
+        time: bars[2].time + 60_000,
+        open: 105,
+        high: 106,
+        low: 104,
+        close: 105.5,
+      })).toThrow('strategy calc_on_order_fills exceeded 20 recalculations on bar 3');
+    });
+
     it('closes matching entry trades with strategy.close market orders', () => {
       const script = `//@version=6
 strategy("Close", process_orders_on_close=true)

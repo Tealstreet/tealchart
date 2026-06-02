@@ -923,13 +923,16 @@ export class ExecutionContext {
   /**
    * Truncate all alert arrays and events to the given length.
    */
-  truncateAlerts(length: number): void {
+  truncateAlerts(length: number, options: { preserveStrategyFillAlerts?: boolean } = {}): void {
     for (const alert of this.alerts.values()) {
       alert.values.length = length;
       if (alert.renderedMessages) {
         alert.renderedMessages.length = length;
       }
-      alert.events = alert.events.filter((event) => event.barIndex < length);
+      alert.events = alert.events.filter((event) => (
+        event.barIndex < length
+        || (options.preserveStrategyFillAlerts === true && alert.id === 'strategy_order_fills')
+      ));
     }
   }
 
