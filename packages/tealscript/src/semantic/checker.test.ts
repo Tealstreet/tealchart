@@ -997,6 +997,58 @@ missingSwapColumn = matrix.swap_columns(id=m, column1=0)
     ]);
   });
 
+  it('resolves matrix extraction helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Matrix Extraction Signatures")
+m = matrix.new_int(rows=2, columns=2, initial_value=1)
+tail = matrix.new_int(rows=1, columns=2, initial_value=5)
+copy = matrix.copy(id=m)
+transposed = matrix.transpose(id=m)
+row = matrix.row(id=m, row=1)
+col = matrix.col(id=m, column=0)
+column = matrix.column(id=m, column=1)
+slice = matrix.submatrix(id=m, from_row=0, to_row=2, from_column=0, to_column=1)
+whole = matrix.submatrix(id=m)
+matrix.concat(id=m, id2=tail)
+matrix.concat(id1=copy, id2=tail)
+plot(matrix.rows(id=m) + matrix.rows(id=transposed) + matrix.rows(id=slice) + matrix.rows(id=whole) + array.size(row) + array.size(col) + array.size(column))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid matrix extraction helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Matrix Extraction Signatures")
+m = matrix.new_int(rows=2, columns=2, initial_value=1)
+duplicateConcat = matrix.concat(m, id=m)
+missingConcat = matrix.concat(id=m)
+unknownSubmatrix = matrix.submatrix(id=m, start_row=0)
+tooManySubmatrix = matrix.submatrix(m, 0, 1, 0, 1, 2)
+tooManyCopy = matrix.copy(m, m)
+missingRow = matrix.row(id=m)
+unknownColumn = matrix.column(id=m, row=0)
+tooManyCol = matrix.col(m, 0, 1)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'matrix.concat() expects at least 2 arguments',
+      "matrix.concat() missing required argument 'id2'",
+      "Argument 'id' for matrix.concat() was supplied multiple times",
+      'matrix.concat() expects at least 2 arguments',
+      "matrix.concat() missing required argument 'id2'",
+      "Unknown argument 'start_row' for matrix.submatrix()",
+      'matrix.submatrix() expects at most 5 arguments',
+      'matrix.copy() expects at most 1 argument',
+      'matrix.row() expects at least 2 arguments',
+      "matrix.row() missing required argument 'row'",
+      "Unknown argument 'row' for matrix.column()",
+      'matrix.column() expects at least 2 arguments',
+      "matrix.column() missing required argument 'column'",
+      'matrix.col() expects at most 2 arguments',
+    ]);
+  });
+
   it('reports array element template mismatches for known mutable arrays', () => {
     const result = checkProgram(parse(`
 indicator("Bad Array Types")
