@@ -6879,8 +6879,8 @@ export class TealscriptEngine {
       return 100 - 100 / (1 + rs);
     });
 
-    this.builtins.set('ta.barssince', (args, _namedArgs, _ctx, scope, callId) => {
-      const condition = this.isTruthy(args[0]);
+    this.builtins.set('ta.barssince', (args, namedArgs, _ctx, scope, callId) => {
+      const condition = this.isTruthy(this.getCallArg(args, namedArgs, 0, 'condition'));
       const key = `_barssince_${callId}`;
       const previous = scope.get(key) as number | undefined;
       const value = condition ? 0 : previous === undefined || isNaN(previous) ? NaN : previous + 1;
@@ -6888,10 +6888,10 @@ export class TealscriptEngine {
       return value;
     });
 
-    this.builtins.set('ta.valuewhen', (args, _namedArgs, _ctx, scope, callId) => {
-      const condition = this.isTruthy(args[0]);
-      const source = args[1] as number;
-      const occurrence = Math.max(0, Math.trunc((args[2] as number | undefined) ?? 0));
+    this.builtins.set('ta.valuewhen', (args, namedArgs, _ctx, scope, callId) => {
+      const condition = this.isTruthy(this.getCallArg(args, namedArgs, 0, 'condition'));
+      const source = this.getCallArg(args, namedArgs, 1, 'source') as number;
+      const occurrence = Math.max(0, Math.trunc(this.toNumber(this.getCallArg(args, namedArgs, 2, 'occurrence', 0))));
       const key = `_valuewhen_${callId}`;
       const values = (scope.get(key) as unknown[] | undefined) ?? [];
 
@@ -6929,9 +6929,9 @@ export class TealscriptEngine {
 
     // Crossover - source1 crosses above source2
     // Uses scope to track previous values of both arguments
-    this.builtins.set('ta.crossover', (args, _namedArgs, ctx, scope) => {
-      const source1 = args[0] as number;
-      const source2 = args[1] as number;
+    this.builtins.set('ta.crossover', (args, namedArgs, ctx, scope) => {
+      const source1 = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source1'));
+      const source2 = this.toNumber(this.getCallArg(args, namedArgs, 1, 'source2'));
 
       // Try to get series for source1 (if it's a built-in series)
       const series1 = this.getSeriesForSource(source1, ctx);
@@ -6961,9 +6961,9 @@ export class TealscriptEngine {
     });
 
     // Crossunder - source1 crosses below source2
-    this.builtins.set('ta.crossunder', (args, _namedArgs, ctx, scope) => {
-      const source1 = args[0] as number;
-      const source2 = args[1] as number;
+    this.builtins.set('ta.crossunder', (args, namedArgs, ctx, scope) => {
+      const source1 = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source1'));
+      const source2 = this.toNumber(this.getCallArg(args, namedArgs, 1, 'source2'));
 
       // Try to get series for source1 (if it's a built-in series)
       const series1 = this.getSeriesForSource(source1, ctx);
@@ -6992,9 +6992,9 @@ export class TealscriptEngine {
       return source1 < source2 && trackedPrev1 >= trackedPrev2;
     });
 
-    this.builtins.set('ta.cross', (args, _namedArgs, ctx, scope, callId) => {
-      const source1 = args[0] as number;
-      const source2 = args[1] as number;
+    this.builtins.set('ta.cross', (args, namedArgs, ctx, scope, callId) => {
+      const source1 = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source1'));
+      const source2 = this.toNumber(this.getCallArg(args, namedArgs, 1, 'source2'));
       const trackKey1 = `_cross_any_src1_${callId}`;
       const trackKey2 = `_cross_any_src2_${callId}`;
       const previous1 = scope.get(trackKey1) as number | undefined;
