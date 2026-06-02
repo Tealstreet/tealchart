@@ -5923,10 +5923,11 @@ export class TealscriptEngine {
       return this.formatTimestamp(timestamp, format, timezone);
     });
 
-    this.builtins.set('str.format', (args) => {
-      const template = this.toStringValue(args[0]);
+    this.builtins.set('str.format', (args, namedArgs) => {
+      const template = this.toStringValue(namedArgs.get('format') ?? args[0]);
+      const valueOffset = namedArgs.has('format') ? 0 : 1;
       return template.replace(/\{(\d+)(?:,[^}:]+)?(?::([^}]+))?\}/g, (_match, index: string, format: string | undefined) => {
-        return this.toStringValue(args[Number(index) + 1], format);
+        return this.toStringValue(args[Number(index) + valueOffset], format);
       });
     });
 
