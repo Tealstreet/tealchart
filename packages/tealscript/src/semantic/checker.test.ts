@@ -1198,6 +1198,45 @@ tooManyWpr = ta.wpr(3, 4)
     ]);
   });
 
+  it('resolves TA trend and pivot helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("TA Trend Pivot Signatures")
+[trend, direction] = ta.supertrend(factor=2.0, atrPeriod=3)
+[diPlus, diMinus, adx] = ta.dmi(diLength=3, adxSmoothing=3)
+sar = ta.sar(start=0.02, inc=0.02, max=0.2)
+pivotHigh = ta.pivothigh(source=high, leftbars=2, rightbars=2)
+pivotLow = ta.pivotlow(source=low, leftbars=2, rightbars=2)
+defaultPivotHigh = ta.pivothigh(leftbars=2, rightbars=2)
+defaultPivotLow = ta.pivotlow(leftbars=2, rightbars=2)
+mixedPivotHigh = ta.pivothigh(2, rightbars=2)
+mixedPivotLow = ta.pivotlow(2, rightbars=2)
+linreg = ta.linreg(source=close, length=3, offset=1)
+plot(trend + direction + diPlus + diMinus + adx + sar + pivotHigh + pivotLow + defaultPivotHigh + defaultPivotLow + mixedPivotHigh + mixedPivotLow + linreg)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid TA trend and pivot helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad TA Trend Pivot Signatures")
+duplicateDmi = ta.dmi(3, diLength=3, adxSmoothing=3)
+unknownSar = ta.sar(start=0.02, inc=0.02, max=0.2, step=0.01)
+shortPivot = ta.pivothigh(source=high, leftbars=2)
+duplicatePivot = ta.pivotlow(2, leftbars=2, rightbars=2)
+shortLinreg = ta.linreg(source=close, length=3)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Argument 'diLength' for ta.dmi() was supplied multiple times",
+      "Unknown argument 'step' for ta.sar()",
+      "ta.pivothigh() missing required argument 'rightbars'",
+      "Argument 'leftbars' for ta.pivotlow() was supplied multiple times",
+      'ta.linreg() expects at least 3 arguments',
+      "ta.linreg() missing required argument 'offset'",
+    ]);
+  });
+
   it('resolves color helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Color Signatures")

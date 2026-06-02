@@ -235,6 +235,7 @@ interface BuiltinSignature {
   minArgs?: number;
   requiredParams?: string[];
   singlePositionalParam?: string;
+  optionalLeadingParam?: string;
   maxArgs?: number;
   allowExtraNamed?: boolean;
   allowExtraPositional?: boolean;
@@ -521,6 +522,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['ta.correlation', { params: ['source1', 'source2', 'length'], minArgs: 3, maxArgs: 3 }],
   ['ta.cog', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
   ['ta.dev', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
+  ['ta.dmi', { params: ['diLength', 'adxSmoothing'], minArgs: 2, maxArgs: 2 }],
   ['ta.ema', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
   ['ta.hma', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
   ['ta.highest', { params: ['source', 'length'], minArgs: 1, requiredParams: ['length'], singlePositionalParam: 'length', maxArgs: 2 }],
@@ -535,6 +537,8 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['ta.percentile_nearest_rank', { params: ['source', 'length', 'percentage'], minArgs: 3, maxArgs: 3 }],
   ['ta.percentile_linear_interpolation', { params: ['source', 'length', 'percentage'], minArgs: 3, maxArgs: 3 }],
   ['ta.percentrank', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
+  ['ta.pivothigh', { params: ['source', 'leftbars', 'rightbars'], minArgs: 2, requiredParams: ['leftbars', 'rightbars'], optionalLeadingParam: 'source', maxArgs: 3 }],
+  ['ta.pivotlow', { params: ['source', 'leftbars', 'rightbars'], minArgs: 2, requiredParams: ['leftbars', 'rightbars'], optionalLeadingParam: 'source', maxArgs: 3 }],
   ['ta.mom', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
   ['ta.range', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
   ['ta.rising', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
@@ -542,14 +546,17 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['ta.rma', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
   ['ta.roc', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
   ['ta.rsi', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
+  ['ta.sar', { params: ['start', 'inc', 'max'], minArgs: 3, maxArgs: 3 }],
   ['ta.sma', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
   ['ta.stdev', { params: ['source', 'length', 'biased'], minArgs: 2, maxArgs: 3 }],
   ['ta.stoch', { params: ['source', 'high', 'low', 'length'], minArgs: 4, maxArgs: 4 }],
+  ['ta.supertrend', { params: ['factor', 'atrPeriod'], minArgs: 2, maxArgs: 2 }],
   ['ta.swma', { params: ['source'], minArgs: 1, maxArgs: 1 }],
   ['ta.tsi', { params: ['source', 'short_length', 'long_length'], minArgs: 3, maxArgs: 3 }],
   ['ta.variance', { params: ['source', 'length', 'biased'], minArgs: 2, maxArgs: 3 }],
   ['ta.vwap', { params: ['source', 'anchor', 'stdev_mult'], minArgs: 1, maxArgs: 3 }],
   ['ta.vwma', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
+  ['ta.linreg', { params: ['source', 'length', 'offset'], minArgs: 3, maxArgs: 3 }],
   ['ta.wma', { params: ['source', 'length'], minArgs: 2, maxArgs: 2 }],
   ['ta.wpr', { params: ['length'], minArgs: 1, maxArgs: 1 }],
   ['ticker.new', { params: ['prefix', 'ticker', 'session', 'adjustment', 'backadjustment', 'settlement_as_close'], minArgs: 2, maxArgs: 6 }],
@@ -2115,7 +2122,11 @@ class SemanticChecker {
     const params = this.resolveSignatureParams(args, signature);
     const positionalCount = this.leadingPositionalCount(args);
     const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
-    const boundParamCount = params.filter((param, index) => index < positionalCount || suppliedNames.has(param)).length;
+    const omitsOptionalLeadingParam = this.omitsOptionalLeadingParam(params, positionalCount, suppliedNames, signature);
+    const boundParamCount = params.filter((param, index) => {
+      const positionalIndex = this.effectivePositionalIndex(index, omitsOptionalLeadingParam);
+      return (positionalIndex !== -1 && positionalIndex < positionalCount) || suppliedNames.has(param);
+    }).length;
     const minArgs = signature.minArgs ?? 0;
     const maxArgs = signature.allowExtraPositional ? Infinity : (signature.maxArgs ?? params.length);
 
@@ -2127,7 +2138,7 @@ class SemanticChecker {
       // Default-source helpers can let a lone positional value bind to singlePositionalParam
       // instead of the first params entry while requiredParams still tracks required coverage.
       if (args.length === 1 && positionalCount === 1 && signature.singlePositionalParam === param) continue;
-      const positionalIndex = params.indexOf(param);
+      const positionalIndex = this.effectivePositionalIndex(params.indexOf(param), omitsOptionalLeadingParam);
       if (positionalIndex !== -1 && positionalIndex < positionalCount) continue;
       if (suppliedNames.has(param)) continue;
       this.addDiagnostic('argument-count', `${displayName}() missing required argument '${param}'`, args[0]?.loc);
@@ -2140,6 +2151,8 @@ class SemanticChecker {
   private checkDuplicateArgumentBindings(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
     const params = this.resolveSignatureParams(args, signature);
     const positionalCount = this.leadingPositionalCount(args);
+    const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
+    const omitsOptionalLeadingParam = this.omitsOptionalLeadingParam(params, positionalCount, suppliedNames, signature);
     const seenNames = new Set<string>();
 
     for (const arg of args) {
@@ -2153,11 +2166,26 @@ class SemanticChecker {
       }
       seenNames.add(canonicalName);
 
-      const positionalIndex = params.indexOf(canonicalName);
+      const positionalIndex = this.effectivePositionalIndex(params.indexOf(canonicalName), omitsOptionalLeadingParam);
       if (positionalIndex !== -1 && positionalIndex < positionalCount) {
         this.addDiagnostic('duplicate-argument', `Argument '${name}' for ${displayName}() was supplied multiple times`, arg.name.loc);
       }
     }
+  }
+
+  private omitsOptionalLeadingParam(params: string[], positionalCount: number, suppliedNames: Set<string>, signature: BuiltinSignature): boolean {
+    return Boolean(
+      signature.optionalLeadingParam
+        && params[0] === signature.optionalLeadingParam
+        && !suppliedNames.has(signature.optionalLeadingParam)
+        && positionalCount < params.length,
+    );
+  }
+
+  private effectivePositionalIndex(paramIndex: number, omitsOptionalLeadingParam: boolean): number {
+    if (paramIndex === -1) return -1;
+    if (!omitsOptionalLeadingParam) return paramIndex;
+    return paramIndex === 0 ? -1 : paramIndex - 1;
   }
 
   private canonicalSignatureArgumentName(name: string, signature: BuiltinSignature): string {
