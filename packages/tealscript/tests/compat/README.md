@@ -8,6 +8,18 @@ time.
 Source-linked real Pine checkpoint provenance is tracked in
 [`PINE_CHECKPOINTS.md`](./PINE_CHECKPOINTS.md).
 
+The compatibility steering contract lives in `src/compat`. Use it when adding
+real-script intake metadata or corpus summaries:
+
+- `PineScriptLedgerEntry` records source URL/search context, license status,
+  Pine version, script category, feature tags, and raw-source storage policy.
+- `CompatibilityRunOutcome` records parse, semantic, runtime, datafeed, output,
+  and render stage results for a script.
+- `CompatibilityFailureClass` keeps failure buckets stable across reports:
+  `parse_gap`, `semantic_gap`, `unsupported_planned`, `runtime_gap`,
+  `data_gap`, `output_gap`, `render_gap`, `oracle_gap`, and
+  `licensing_blocked`.
+
 Use `fixtures.ts` helpers by default:
 
 - `compatibilityBars` for fixed OHLCV input.
