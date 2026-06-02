@@ -229,7 +229,10 @@ matrices. Linear algebra coverage includes `matrix.det()` and `matrix.inv()` for
 square matrices, `matrix.pinv()` for rectangular or rank-deficient matrices,
 `matrix.rank()` for square or rectangular matrices, `matrix.eigenvalues()` for
 real eigenvalues of square numeric matrices, `matrix.eigenvectors()` for real
-eigenvector columns, and `matrix.kron()` for Kronecker products. Common Pine
+eigenvector columns, and `matrix.kron()` for Kronecker products. Matrix
+arithmetic, sorting, and linear algebra helpers accept Pine-style named
+arguments such as `id1`, `id2`, `power`, `column`, `order`, and `sort_field`.
+Common Pine
 method syntax lowers to the
 same runtime built-ins for calls such as
 `values.set(row, column, close)`, `values.add_row(array.from(...))`,
