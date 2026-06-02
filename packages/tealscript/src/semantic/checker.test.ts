@@ -66,6 +66,74 @@ plot(isLower and changed ? 1 : 0)
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('accepts Pine log calls with format arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Logs")
+log.info("close={0}", close)
+log.warning("bar {0}", bar_index)
+log.error("done")
+plot(close)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid Pine log call arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Logs")
+log.info()
+log.warning(text="bad")
+log.trace("unsupported")
+`));
+
+    expect(result.diagnostics).toEqual([
+      expect.objectContaining({
+        code: 'argument-count',
+        message: 'log.info() expects at least 1 argument',
+      }),
+      expect.objectContaining({
+        code: 'unknown-argument',
+        message: "Unknown argument 'text' for log.warning()",
+      }),
+      expect.objectContaining({
+        code: 'argument-count',
+        message: 'log.warning() expects at least 1 argument',
+      }),
+      expect.objectContaining({
+        code: 'unknown-function',
+        message: 'Unknown function: log.trace',
+      }),
+    ]);
+  });
+
+  it('accepts Pine alert calls and alertcondition declarations', () => {
+    const result = checkProgram(parse(`
+indicator("Alerts")
+isUp = close > open
+alertcondition(isUp, title="Green", message="Close {{close}}")
+if isUp
+    alert("Green", alert.freq_once_per_bar_close)
+plot(close)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid Pine alert arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Alerts")
+alert()
+alert("ok", alert.freq_all, true)
+alertcondition(true, title="A", message="M", freq=alert.freq_all)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'alert() expects at least 1 argument',
+      'alert() expects at most 2 arguments',
+      "Unknown argument 'freq' for alertcondition()",
+    ]);
+  });
+
   it('reports duplicate declarations in the same scope', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate")

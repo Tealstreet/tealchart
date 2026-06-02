@@ -188,6 +188,7 @@ interface BuiltinSignature {
   minArgs?: number;
   maxArgs?: number;
   allowExtraNamed?: boolean;
+  allowExtraPositional?: boolean;
 }
 
 const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
@@ -382,6 +383,9 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['input.session', { params: ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1 }],
   ['input.text_area', { params: ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1 }],
   ['input.source', { params: ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1 }],
+  ['log.error', { params: ['message'], minArgs: 1, allowExtraPositional: true }],
+  ['log.info', { params: ['message'], minArgs: 1, allowExtraPositional: true }],
+  ['log.warning', { params: ['message'], minArgs: 1, allowExtraPositional: true }],
   ['na', { params: ['x'], minArgs: 1, maxArgs: 1 }],
   ['nz', { params: ['source', 'replacement'], minArgs: 1, maxArgs: 2 }],
   ['request.security', { params: ['symbol', 'timeframe', 'expression', 'gaps', 'lookahead', 'ignore_invalid_symbol', 'currency', 'calc_bars_count'], minArgs: 3 }],
@@ -1366,12 +1370,21 @@ class SemanticChecker {
   private checkBuiltinSignature(expression: CallExpression): void {
     const displayName = this.memberPath(expression.callee).join('.');
     const signature = BUILTIN_SIGNATURES.get(displayName);
-    if (!signature) return;
+    if (!signature) {
+      this.checkUnsupportedLogCall(expression, displayName);
+      return;
+    }
 
     this.checkArgumentOrder(expression.arguments, displayName);
     this.checkArgumentNames(expression.arguments, signature, displayName);
     this.checkArgumentCount(expression.arguments, signature, displayName);
     this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName);
+  }
+
+  private checkUnsupportedLogCall(expression: CallExpression, displayName: string): void {
+    if (expression.callee.type !== 'MemberExpression') return;
+    if (expression.callee.object.type !== 'Identifier' || expression.callee.object.name !== 'log') return;
+    this.addDiagnostic('unknown-function', `Unknown function: ${displayName}`, expression.callee.loc);
   }
 
   private checkUdtConstructorSignature(expression: CallExpression, scope: SemanticScope): void {
@@ -1839,7 +1852,7 @@ class SemanticChecker {
     const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [arg.name.name] : [])));
     const boundParamCount = params.filter((param, index) => index < positionalCount || suppliedNames.has(param)).length;
     const minArgs = signature.minArgs ?? 0;
-    const maxArgs = signature.maxArgs ?? params.length;
+    const maxArgs = signature.allowExtraPositional ? Infinity : (signature.maxArgs ?? params.length);
 
     if (boundParamCount < minArgs) {
       this.addDiagnostic('argument-count', `${displayName}() expects at least ${minArgs} argument${minArgs === 1 ? '' : 's'}`, args[0]?.loc);
