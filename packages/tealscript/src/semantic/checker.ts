@@ -2,6 +2,7 @@ import type {
   AssignmentStatement,
   CallArgument,
   CallExpression,
+  EnumDeclaration,
   Expression,
   ForStatement,
   FunctionDeclaration,
@@ -505,10 +506,11 @@ class SemanticChecker {
   private checkLibraryExportDeclarations(statements: Statement[]): void {
     const libraryDeclaration = statements.find((statement) => statement.type === 'LibraryDeclaration');
     const exportedDeclarations = statements.filter(
-      (statement): statement is FunctionDeclaration | TypeDeclaration | VariableDeclaration =>
+      (statement): statement is FunctionDeclaration | TypeDeclaration | VariableDeclaration | EnumDeclaration =>
         (
           statement.type === 'FunctionDeclaration'
           || statement.type === 'TypeDeclaration'
+          || statement.type === 'EnumDeclaration'
           || statement.type === 'VariableDeclaration'
         ) && !!statement.exported,
     );
@@ -516,7 +518,7 @@ class SemanticChecker {
     if (libraryDeclaration && exportedDeclarations.length === 0) {
       this.addDiagnostic(
         'library-export',
-        'Library scripts must export at least one function, method, user-defined type, or constant',
+        'Library scripts must export at least one function, method, user-defined type, enum, or constant',
         libraryDeclaration.loc,
       );
     }
@@ -545,6 +547,8 @@ class SemanticChecker {
       } else if (declaration.type === 'FunctionDeclaration') {
         this.checkExportedCallableTypeReferences(declaration, typeDeclarations, exportedTypeNames);
         this.checkExportedCallableReturnType(declaration, typeDeclarations, exportedTypeNames);
+      } else if (declaration.type === 'EnumDeclaration') {
+        continue;
       } else {
         this.checkExportedVariable(declaration);
       }
@@ -579,13 +583,13 @@ class SemanticChecker {
     }
   }
 
-  private exportedDeclarationName(declaration: FunctionDeclaration | TypeDeclaration | VariableDeclaration): string {
+  private exportedDeclarationName(declaration: FunctionDeclaration | TypeDeclaration | VariableDeclaration | EnumDeclaration): string {
     if (declaration.type !== 'VariableDeclaration') return declaration.name.name;
     if (declaration.names.type === 'VariableDeclarator') return declaration.names.name.name;
     return 'tuple declaration';
   }
 
-  private exportedDeclarationLoc(declaration: FunctionDeclaration | TypeDeclaration | VariableDeclaration): SourceLocation | undefined {
+  private exportedDeclarationLoc(declaration: FunctionDeclaration | TypeDeclaration | VariableDeclaration | EnumDeclaration): SourceLocation | undefined {
     if (declaration.type !== 'VariableDeclaration') return declaration.name.loc;
     return declaration.names.loc;
   }
