@@ -5963,6 +5963,12 @@ export class TealscriptEngine {
     const readMutableArrayFromCall = (args: unknown[], namedArgs: Map<string, unknown>): PineArray => {
       return readMutableArray(arrayReceiverArg(args, namedArgs));
     };
+    const arrayPairFirstArg = (args: unknown[], namedArgs: Map<string, unknown>): unknown => {
+      return namedArgs.has('id1') || namedArgs.has('id') ? this.getCallArgAny(args, namedArgs, 0, ['id1', 'id']) : args[0];
+    };
+    const arrayPairSecondArg = (args: unknown[], namedArgs: Map<string, unknown>): unknown => {
+      return arrayCallArg(args, namedArgs, 1, 'id2', undefined, ['id1', 'id']);
+    };
 
     this.builtins.set('array.new', createArray);
     this.builtins.set('array.new_float', createArray);
@@ -6022,32 +6028,32 @@ export class TealscriptEngine {
     this.builtins.set('array.range', (args, namedArgs) => rangeArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs))));
     this.builtins.set('array.median', (args, namedArgs) => medianArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs))));
     this.builtins.set('array.mode', (args, namedArgs) => modeArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs))));
-    this.builtins.set('array.variance', (args) => varianceArrayValue(
-      copyReadonlyArray(readArray(args[0])),
-      args[1] === undefined ? true : this.isTruthy(args[1]),
+    this.builtins.set('array.variance', (args, namedArgs) => varianceArrayValue(
+      copyReadonlyArray(readArrayFromCall(args, namedArgs)),
+      this.isTruthy(arrayCallArg(args, namedArgs, 1, 'biased', true)),
     ));
-    this.builtins.set('array.stdev', (args) => stdevArrayValue(
-      copyReadonlyArray(readArray(args[0])),
-      args[1] === undefined ? true : this.isTruthy(args[1]),
+    this.builtins.set('array.stdev', (args, namedArgs) => stdevArrayValue(
+      copyReadonlyArray(readArrayFromCall(args, namedArgs)),
+      this.isTruthy(arrayCallArg(args, namedArgs, 1, 'biased', true)),
     ));
-    this.builtins.set('array.covariance', (args) => covarianceArrayValue(
-      copyReadonlyArray(readArray(args[0])),
-      copyReadonlyArray(readArray(args[1])),
-      args[2] === undefined ? true : this.isTruthy(args[2]),
+    this.builtins.set('array.covariance', (args, namedArgs) => covarianceArrayValue(
+      copyReadonlyArray(readArray(arrayPairFirstArg(args, namedArgs))),
+      copyReadonlyArray(readArray(arrayPairSecondArg(args, namedArgs))),
+      this.isTruthy(arrayCallArg(args, namedArgs, 2, 'biased', true, ['id1', 'id', 'id2'])),
     ));
-    this.builtins.set('array.percentile_nearest_rank', (args) => percentileNearestRankArrayValue(
-      copyReadonlyArray(readArray(args[0])),
-      this.toNumber(args[1]),
+    this.builtins.set('array.percentile_nearest_rank', (args, namedArgs) => percentileNearestRankArrayValue(
+      copyReadonlyArray(readArrayFromCall(args, namedArgs)),
+      this.toNumber(arrayCallArg(args, namedArgs, 1, 'percentage')),
     ));
-    this.builtins.set('array.percentile_linear_interpolation', (args) => percentileLinearInterpolationArrayValue(
-      copyReadonlyArray(readArray(args[0])),
-      this.toNumber(args[1]),
+    this.builtins.set('array.percentile_linear_interpolation', (args, namedArgs) => percentileLinearInterpolationArrayValue(
+      copyReadonlyArray(readArrayFromCall(args, namedArgs)),
+      this.toNumber(arrayCallArg(args, namedArgs, 1, 'percentage')),
     ));
-    this.builtins.set('array.percentrank', (args) => percentRankArrayValue(
-      copyReadonlyArray(readArray(args[0])),
-      this.toNumber(args[1]),
+    this.builtins.set('array.percentrank', (args, namedArgs) => percentRankArrayValue(
+      copyReadonlyArray(readArrayFromCall(args, namedArgs)),
+      this.toNumber(arrayCallArg(args, namedArgs, 1, 'value')),
     ));
-    this.builtins.set('array.standardize', (args) => standardizeArrayValue(copyReadonlyArray(readArray(args[0]))));
+    this.builtins.set('array.standardize', (args, namedArgs) => standardizeArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs))));
     this.builtins.set('array.set', (args, namedArgs) => {
       setArrayValue(
         readMutableArrayFromCall(args, namedArgs),
