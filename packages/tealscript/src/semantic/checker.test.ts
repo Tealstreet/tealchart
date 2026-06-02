@@ -902,6 +902,28 @@ tooManyVariance = array.variance(values, true, false)
     ]);
   });
 
+  it('resolves array named prefix positional tail arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Array Mixed Tail Signatures")
+values = array.new_int(size=2, 6)
+array.set(id=values, 0, 7)
+value = array.get(id=values, 0)
+array.fill(id=values, 4, 0, 1)
+window = array.slice(id=values, 0, 2)
+array.concat(id=values, array.from(8, 9))
+array.sort(id=values, order.descending)
+indices = array.sort_indices(id=values, order.ascending)
+joined = array.join(id=window, ",")
+deviation = array.stdev(id=values, false)
+covariance = array.covariance(id1=values, array.from(1, 2), false)
+nearest = array.percentile_nearest_rank(id=values, 50)
+rank = array.percentrank(id=values, 7)
+plot(value + array.size(window) + array.size(indices) + str.length(joined) + deviation + covariance + nearest + rank)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
   it('resolves matrix core helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Matrix Core Signatures")

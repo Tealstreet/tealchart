@@ -603,27 +603,27 @@ for (const name of STRATEGY_CLOSED_TRADE_ACCESSORS) {
 }
 
 for (const name of ['array.new', ...ARRAY_CONSTRUCTOR_ELEMENT_TYPES.keys()]) {
-  BUILTIN_SIGNATURES.set(name, { params: ['size', 'initial_value'], minArgs: 0, maxArgs: 2 });
+  BUILTIN_SIGNATURES.set(name, { params: ['size', 'initial_value'], minArgs: 0, maxArgs: 2, allowNamedPrefixWithPositional: true });
 }
 
 for (const name of ['array.clear', 'array.copy', 'array.first', 'array.last', 'array.pop', 'array.shift', 'array.size']) {
-  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1 });
+  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true });
 }
 
 for (const name of ['array.get', 'array.remove']) {
-  BUILTIN_SIGNATURES.set(name, { params: ['id', 'index'], minArgs: 2, maxArgs: 2 });
+  BUILTIN_SIGNATURES.set(name, { params: ['id', 'index'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true });
 }
 
 for (const name of ['array.push', 'array.unshift']) {
-  BUILTIN_SIGNATURES.set(name, { params: ['id', 'value'], minArgs: 2, maxArgs: 2 });
+  BUILTIN_SIGNATURES.set(name, { params: ['id', 'value'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true });
 }
 
 for (const name of ['array.insert', 'array.set']) {
-  BUILTIN_SIGNATURES.set(name, { params: ['id', 'index', 'value'], minArgs: 3, maxArgs: 3 });
+  BUILTIN_SIGNATURES.set(name, { params: ['id', 'index', 'value'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true });
 }
 
 for (const name of ['array.every', 'array.some']) {
-  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1 });
+  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true });
 }
 
 for (const name of [
@@ -634,31 +634,31 @@ for (const name of [
   'array.indexof',
   'array.lastindexof',
 ]) {
-  BUILTIN_SIGNATURES.set(name, { params: ['id', 'value'], minArgs: 2, maxArgs: 2 });
+  BUILTIN_SIGNATURES.set(name, { params: ['id', 'value'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true });
 }
 
-BUILTIN_SIGNATURES.set('array.concat', { params: ['id', 'id2'], minArgs: 2, maxArgs: 2 });
-BUILTIN_SIGNATURES.set('array.fill', { params: ['id', 'value', 'index_from', 'index_to'], minArgs: 2, maxArgs: 4 });
-BUILTIN_SIGNATURES.set('array.join', { params: ['id', 'separator'], minArgs: 1, maxArgs: 2 });
-BUILTIN_SIGNATURES.set('array.reverse', { params: ['id'], minArgs: 1, maxArgs: 1 });
-BUILTIN_SIGNATURES.set('array.slice', { params: ['id', 'index_from', 'index_to'], minArgs: 3, maxArgs: 3 });
-BUILTIN_SIGNATURES.set('array.sort', { params: ['id', 'order', 'sort_field'], minArgs: 1, maxArgs: 3 });
-BUILTIN_SIGNATURES.set('array.sort_indices', { params: ['id', 'order'], minArgs: 1, maxArgs: 2 });
+BUILTIN_SIGNATURES.set('array.concat', { params: ['id', 'id2'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true });
+BUILTIN_SIGNATURES.set('array.fill', { params: ['id', 'value', 'index_from', 'index_to'], minArgs: 2, maxArgs: 4, allowNamedPrefixWithPositional: true });
+BUILTIN_SIGNATURES.set('array.join', { params: ['id', 'separator'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true });
+BUILTIN_SIGNATURES.set('array.reverse', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true });
+BUILTIN_SIGNATURES.set('array.slice', { params: ['id', 'index_from', 'index_to'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true });
+BUILTIN_SIGNATURES.set('array.sort', { params: ['id', 'order', 'sort_field'], minArgs: 1, maxArgs: 3, allowNamedPrefixWithPositional: true });
+BUILTIN_SIGNATURES.set('array.sort_indices', { params: ['id', 'order'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true });
 
 for (const name of ['array.abs', 'array.avg', 'array.max', 'array.median', 'array.min', 'array.mode', 'array.range', 'array.standardize', 'array.sum']) {
-  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1 });
+  BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true });
 }
 
 for (const name of ['array.stdev', 'array.variance']) {
-  BUILTIN_SIGNATURES.set(name, { params: ['id', 'biased'], minArgs: 1, maxArgs: 2 });
+  BUILTIN_SIGNATURES.set(name, { params: ['id', 'biased'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true });
 }
 
 for (const name of ['array.percentile_linear_interpolation', 'array.percentile_nearest_rank']) {
-  BUILTIN_SIGNATURES.set(name, { params: ['id', 'percentage'], minArgs: 2, maxArgs: 2 });
+  BUILTIN_SIGNATURES.set(name, { params: ['id', 'percentage'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true });
 }
 
-BUILTIN_SIGNATURES.set('array.covariance', { params: ['id1', 'id2', 'biased'], aliases: { id: 'id1' }, minArgs: 2, maxArgs: 3 });
-BUILTIN_SIGNATURES.set('array.percentrank', { params: ['id', 'value'], minArgs: 2, maxArgs: 2 });
+BUILTIN_SIGNATURES.set('array.covariance', { params: ['id1', 'id2', 'biased'], aliases: { id: 'id1' }, minArgs: 2, maxArgs: 3, allowNamedPrefixWithPositional: true });
+BUILTIN_SIGNATURES.set('array.percentrank', { params: ['id', 'value'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true });
 
 BUILTIN_SIGNATURES.set('array.from', { params: [], minArgs: 0, allowExtraPositional: true });
 
