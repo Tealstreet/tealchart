@@ -105,6 +105,16 @@ export interface SessionClassificationInfo {
   premarket: string;
   postmarket: string;
   timezone: string;
+  closedDates?: string[];
+  closures?: SessionClosureInfo[];
+}
+
+export type SessionClosureKind = 'premarket' | 'regular' | 'postmarket' | 'extended' | 'all';
+
+export interface SessionClosureInfo {
+  date: string;
+  sessions?: SessionClosureKind[];
+  reason?: string;
 }
 
 /**

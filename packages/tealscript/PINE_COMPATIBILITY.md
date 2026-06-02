@@ -489,8 +489,10 @@ per re-execution. `session.ismarket`, `session.ispremarket`, and
 `session.ispostmarket` are supported when the host runtime provides exchange
 session classification windows. Higher-timeframe `time()` / `time_close()`
 aggregation is covered for intraday, daily, and weekly buckets, including
-timezone-aware DST boundaries. Exchange calendar holiday handling and broader
-dynamic-session checkpoint coverage remain planned.
+timezone-aware DST boundaries. Host-provided `closedDates` and closure entries
+can suppress session-filtered `time()` calls and session-state helpers for
+exchange calendar holidays or partial-session closures. Broader dynamic-session
+checkpoint coverage remains planned.
 
 ## Request Data And Ticker Coverage
 
