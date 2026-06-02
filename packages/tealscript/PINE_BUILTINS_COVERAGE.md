@@ -95,6 +95,9 @@ Current `ta.*` progress:
 
 - Common `ta.*` helpers accept Pine-style named arguments for covered
   parameters.
+- Event and cross helpers accept Pine-style named arguments for covered
+  `condition`/`source` parameters and cross helper `source1`/`source2`
+  parameters.
 - `ta.highest`, `ta.lowest`, `ta.highestbars`, and `ta.lowestbars` support the
   one-argument default-source forms.
 - Common windowed helpers now track derived source expressions such as

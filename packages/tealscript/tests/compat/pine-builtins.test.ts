@@ -8,14 +8,20 @@ describe('Pine compatibility golden harness', () => {
 indicator("TA event helpers")
 condition = close > open
 plot(ta.barssince(condition), title="Bars Since Green")
+plot(ta.barssince(condition=condition), title="Named Bars Since Green")
 plot(ta.valuewhen(condition, close, 0), title="Last Green Close")
+plot(ta.valuewhen(condition=condition, source=close, occurrence=0), title="Named Last Green Close")
 plot(ta.valuewhen(condition, close, 1), title="Previous Green Close")
+plot(ta.valuewhen(condition=condition, source=close, occurrence=1), title="Named Previous Green Close")
 `);
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Bars Since Green').values)).toEqual([0, 0, 0, 1, 2, 0, 0, 0, 1, 0, 1, 0]);
+    expect(roundSeries(getPlot(result, 'Named Bars Since Green').values)).toEqual([0, 0, 0, 1, 2, 0, 0, 0, 1, 0, 1, 0]);
     expect(roundSeries(getPlot(result, 'Last Green Close').values)).toEqual([102, 105, 107, 107, 107, 100, 104, 109, 109, 111, 111, 112]);
+    expect(roundSeries(getPlot(result, 'Named Last Green Close').values)).toEqual([102, 105, 107, 107, 107, 100, 104, 109, 109, 111, 111, 112]);
     expect(roundSeries(getPlot(result, 'Previous Green Close').values)).toEqual([null, 102, 105, 105, 105, 107, 100, 104, 104, 109, 109, 111]);
+    expect(roundSeries(getPlot(result, 'Named Previous Green Close').values)).toEqual([null, 102, 105, 105, 105, 107, 100, 104, 104, 109, 109, 111]);
   });
 
   it('runs ta.vwma and bar-offset window helpers', () => {
@@ -61,6 +67,30 @@ plot(directionChanged2 ? 1 : 0, title="Direction Changed 2")
     expect(roundSeries(getPlot(result, 'Close Range').values)).toEqual([0, 3, 5, 5, 8, 8, 5, 10, 9, 7, 3, 4]);
     expect(getPlot(result, 'Direction Changed').values).toEqual([0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1]);
     expect(getPlot(result, 'Direction Changed 2').values).toEqual([0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0]);
+  });
+
+  it('runs ta cross helpers with named arguments', () => {
+    const positional = runCompatScript(`
+indicator("TA cross positional")
+plot(ta.crossover(close, open), title="Crossover")
+plot(ta.crossunder(close, open), title="Crossunder")
+plot(ta.cross(close, open), title="Cross")
+`);
+    const named = runCompatScript(`
+indicator("TA cross named")
+plot(ta.crossover(source1=close, source2=open), title="Crossover")
+plot(ta.crossunder(source1=close, source2=open), title="Crossunder")
+plot(ta.cross(source1=close, source2=open), title="Cross")
+`);
+
+    expect(positional.errors).toEqual([]);
+    expect(named.errors).toEqual([]);
+    for (const title of positional.plots.map((plot) => plot.title)) {
+      expect(getPlot(named, title).values).toEqual(getPlot(positional, title).values);
+    }
+    expect(getPlot(named, 'Crossover').values).toEqual([false, false, false, false, false, true, false, false, false, true, false, true]);
+    expect(getPlot(named, 'Crossunder').values).toEqual([false, false, false, true, false, false, false, false, true, false, true, false]);
+    expect(getPlot(named, 'Cross').values).toEqual([false, false, false, true, false, true, false, false, true, true, true, true]);
   });
 
   it('runs Pine oscillator helper idioms', () => {
