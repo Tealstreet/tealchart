@@ -120,6 +120,71 @@ plot(array.size(base), title="Original Size")
     expect(roundSeries(getPlot(result, 'Original Size').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
   });
 
+  it('runs named core array helper idioms', () => {
+    const result = runCompatScript(`
+indicator("Array named core helpers")
+values = array.new_int(size=3, initial_value=1)
+mixedCtor = array.new_int(size=2, 6)
+array.set(id=values, index=1, value=5)
+array.push(id=values, value=7)
+array.unshift(id=values, value=0)
+removed = array.remove(id=values, index=2)
+array.insert(id=values, index=2, value=9)
+array.fill(id=values, value=4, index_from=1, index_to=3)
+window = array.slice(id=values, index_from=1, index_to=4)
+copy = array.copy(id=values)
+array.reverse(id=copy)
+array.concat(id=values, id2=array.from(8, 9))
+array.sort(id=copy, order=order.ascending)
+indices = array.sort_indices(id=values, order=order.descending)
+joined = array.join(id=window, separator=",")
+queue = array.new_int(size=0)
+array.push(id=queue, value=2)
+array.push(id=queue, value=3)
+shifted = array.shift(id=queue)
+popped = array.pop(id=queue)
+array.clear(id=queue)
+nested = array.new<array<int>>(size=0)
+array.push(id=nested, value=array.from(1, 2))
+plot(array.size(id=values), title="Size")
+plot(array.sum(id=mixedCtor), title="Mixed Constructor")
+plot(array.get(id=values, index=2), title="Get")
+plot(array.first(id=values), title="First")
+plot(array.last(id=values), title="Last")
+plot(array.includes(id=values, value=7) ? 1 : 0, title="Includes")
+plot(array.indexof(id=values, value=4), title="Index")
+plot(array.lastindexof(id=values, value=4), title="Last Index")
+plot(removed, title="Removed")
+plot(array.get(id=window, index=2), title="Slice")
+plot(array.get(id=copy, index=0), title="Sorted Copy")
+plot(array.get(id=indices, index=0), title="Sort Index")
+plot(joined == "4,4,1" ? 1 : 0, title="Joined")
+plot(shifted, title="Shifted")
+plot(popped, title="Popped")
+plot(array.size(id=queue), title="Cleared")
+plot(array.get(id=array.get(id=nested, index=0), index=1), title="Nested")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Size').values)).toEqual([7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]);
+    expect(roundSeries(getPlot(result, 'Mixed Constructor').values)).toEqual([12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12]);
+    expect(roundSeries(getPlot(result, 'Get').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+    expect(roundSeries(getPlot(result, 'First').values)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    expect(roundSeries(getPlot(result, 'Last').values)).toEqual([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
+    expect(roundSeries(getPlot(result, 'Includes').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Index').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Last Index').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Removed').values)).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
+    expect(roundSeries(getPlot(result, 'Slice').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Sorted Copy').values)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    expect(roundSeries(getPlot(result, 'Sort Index').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+    expect(roundSeries(getPlot(result, 'Joined').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Shifted').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Popped').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Cleared').values)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    expect(roundSeries(getPlot(result, 'Nested').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+  });
+
   it('matches documented Pine array ordering and joining idioms', () => {
     const result = runCompatScript(`
 indicator("Array ordering helpers")
