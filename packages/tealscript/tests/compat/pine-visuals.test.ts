@@ -369,4 +369,99 @@ fill(middle, lower, color=color.new(color.red, 80))
     expect(fills.map((plot) => plot.plot1Id)).toEqual(['plot_untitled_0', 'plot_untitled_1']);
     expect(fills.map((plot) => plot.plot2Id)).toEqual(['plot_untitled_1', 'plot_untitled_2']);
   });
+
+  it('resolves mixed named and positional visual output arguments in Pine order', () => {
+    const result = runCompatScript(`
+indicator("Mixed Visual Outputs", overlay=true)
+o = bar_index == 0 ? na : open
+h = bar_index == 0 ? na : high
+l = bar_index == 0 ? na : low
+c = bar_index == 0 ? na : close
+upper = plot(series=high, "Fill Upper", color.green)
+lower = plot(series=low, "Fill Lower", color.red)
+plot(series=close, "Mixed Plot", color.blue, 2, plot.style_columns)
+hline(price=100, "Mixed HLine", color.orange, hline.style_dashed, 2)
+bgcolor(color=bar_index == 0 ? color.blue : na, 1, false, 3, "Mixed Bg")
+barcolor(color=bar_index == 0 ? color.red : na, 1, true, 4, "Mixed Bar")
+plotbar(open=o, h, l, c, "Mixed Bars", color.purple, false, 5, display.none)
+plotcandle(open=o, h, l, c, "Mixed Candles", color.silver, color.yellow, false, 6, color.black)
+plotshape(series=close > open, "Mixed Shape", shape.triangleup, location.belowbar, color.green, 0, "S")
+plotchar(series=close < open, "Mixed Char", "C", location.abovebar, color.red, 0, "C")
+plotarrow(series=close - open, "Mixed Arrow", color.green, color.red, 0, 5, 15)
+fill(plot1=upper, lower, color.new(color.orange, 80), "Mixed Fill", false, 6)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Mixed Plot')).toMatchObject({
+      type: 'plot',
+      linewidth: 2,
+      style: 'columns',
+    });
+    expect(getPlot(result, 'Mixed Plot').color).toEqual(Array(compatibilityBars.length).fill('#2196F3'));
+
+    expect(getPlot(result, 'Mixed HLine')).toMatchObject({
+      type: 'hline',
+      price: 100,
+      color: '#FF9800',
+      lineStyle: 'dashed',
+      linewidth: 2,
+    });
+
+    const mixedBg = getPlot(result, 'Mixed Bg');
+    expect(mixedBg.type).toBe('bgcolor');
+    expect(mixedBg.color).toEqual([null, '#2196F3', ...Array(compatibilityBars.length - 1).fill(null)]);
+    expect(mixedBg.offset).toBe(1);
+    expect(mixedBg.editable).toBe(false);
+    expect(mixedBg.showLast).toBe(3);
+
+    const mixedBar = getPlot(result, 'Mixed Bar');
+    expect(mixedBar.type).toBe('barcolor');
+    expect(mixedBar.color).toEqual([null, '#F44336', ...Array(compatibilityBars.length - 1).fill(null)]);
+    expect(mixedBar.offset).toBe(1);
+    expect(mixedBar.editable).toBe(true);
+    expect(mixedBar.showLast).toBe(4);
+
+    expect(getPlot(result, 'Mixed Bars')).toMatchObject({
+      type: 'plotbar',
+      color: [null, ...Array(compatibilityBars.length - 1).fill('#9C27B0')],
+      editable: false,
+      showLast: 5,
+      display: 0,
+    });
+    expect(getPlot(result, 'Mixed Candles')).toMatchObject({
+      type: 'plotcandle',
+      color: [null, ...Array(compatibilityBars.length - 1).fill('#B2B5BE')],
+      wickColor: [null, ...Array(compatibilityBars.length - 1).fill('#FFEB3B')],
+      borderColor: [null, ...Array(compatibilityBars.length - 1).fill('#000000')],
+      editable: false,
+      showLast: 6,
+    });
+    expect(getPlot(result, 'Mixed Shape')).toMatchObject({
+      type: 'plotshape',
+      shape: 'triangleup',
+      location: 'belowbar',
+      text: 'S',
+    });
+    expect(getPlot(result, 'Mixed Char')).toMatchObject({
+      type: 'plotchar',
+      char: 'C',
+      location: 'abovebar',
+      text: 'C',
+    });
+    expect(getPlot(result, 'Mixed Arrow')).toMatchObject({
+      type: 'plotarrow',
+      colorup: '#4CAF50',
+      colordown: '#F44336',
+      minHeight: 5,
+      maxHeight: 15,
+    });
+    expect(getPlot(result, 'Mixed Fill')).toMatchObject({
+      type: 'fill',
+      plot1Id: 'plot_Fill Upper',
+      plot2Id: 'plot_Fill Lower',
+      editable: false,
+      showLast: 6,
+    });
+    expect(getPlot(result, 'Mixed Fill').color).toEqual(Array(compatibilityBars.length).fill('#FF980033'));
+  });
 });
