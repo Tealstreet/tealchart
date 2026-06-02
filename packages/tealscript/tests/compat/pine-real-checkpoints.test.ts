@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { InMemoryRequestDatafeed, type Bar } from '../../src/runtime';
+import { InMemoryRequestDatafeed, InMemoryStrategyIntrabarDatafeed, type Bar } from '../../src/runtime';
 import { compatibilityBars, getPlot, roundSeries, runCompatScript } from './fixtures';
 
 describe('Pine real idiom checkpoints', () => {
@@ -230,6 +230,95 @@ plot(strategy.netprofit, title="Net Profit")
       exitPrice: 108,
       profit: 3,
     });
+  });
+
+  it('locks a reduced official strategy bar-magnifier idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
+    const baseTime = 1_700_100_000_000;
+    const bars: Bar[] = [
+      { time: baseTime, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: baseTime + 60_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: baseTime + 120_000, open: 100, high: 105, low: 95, close: 100, volume: 100 },
+      { time: baseTime + 180_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+    ];
+    const intrabars = new InMemoryStrategyIntrabarDatafeed([{
+      symbol: 'BTCUSDT',
+      timeframe: '60',
+      chartBarTime: bars[2].time,
+      chartBarIndex: 2,
+      chartBar: bars[2],
+      source: 'lower_timeframe',
+      ticks: [
+        { time: bars[2].time, price: 100, kind: 'intrabar_open', sequence: 0 },
+        { time: bars[2].time + 15_000, price: 104, kind: 'intrabar_high', sequence: 1 },
+        { time: bars[2].time + 30_000, price: 96, kind: 'intrabar_low', sequence: 2 },
+        { time: bars[2].time + 45_000, price: 100, kind: 'intrabar_close', sequence: 3 },
+      ],
+    }]);
+    const result = runCompatScript(`
+strategy("Official Bar Magnifier Checkpoint", use_bar_magnifier=true, process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Bracket", "Long", limit=103, stop=97)
+plot(strategy.closedtrades, title="Closed Trades")
+plot(strategy.netprofit, title="Net Profit")
+`, {
+      bars,
+      engineOptions: { strategyIntrabarDatafeed: intrabars },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 0, 0, 1]);
+    expect(getPlot(result, 'Net Profit').values).toEqual([0, 0, 0, 3]);
+    expect(result.strategy.intrabarContexts.map((context) => context.source)).toEqual([
+      'chart_ohlc',
+      'chart_ohlc',
+      'lower_timeframe',
+      'chart_ohlc',
+    ]);
+    expect(result.strategy.closedTrades[0]).toMatchObject({
+      entryOrderId: 'Long',
+      exitOrderId: 'Bracket Limit',
+      entryPrice: 100,
+      exitPrice: 103,
+      exitTime: bars[2].time + 15_000,
+      profit: 3,
+    });
+  });
+
+  it('locks a reduced official strategy calc-on-order-fills idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
+    const bars: Bar[] = [
+      { time: 1_700_200_000_000, open: 100, high: 100.5, low: 99.5, close: 100.2, volume: 100 },
+      { time: 1_700_200_060_000, open: 100, high: 100.5, low: 99.6, close: 100.4, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Official Recalculate After Fill Checkpoint", calc_on_order_fills=true, process_orders_on_close=true)
+var recalculations = 0
+recalculations += 1
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1, limit=99.8, alert_message="entry filled")
+if strategy.position_size > 0
+    strategy.close("Long")
+plot(strategy.position_size, title="Position")
+plot(strategy.closedtrades, title="Closed Trades")
+plot(recalculations, title="Recalculations")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Position').values).toEqual([0, 0]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 1]);
+    expect(getPlot(result, 'Recalculations').values).toEqual([1, 2]);
+    expect(result.strategy.closedTrades[0]).toMatchObject({
+      entryOrderId: 'Long',
+      exitOrderId: 'Close Long',
+      entryBarIndex: 1,
+      exitBarIndex: 1,
+    });
+    expect(result.alerts.find((alert) => alert.id === 'strategy_order_fills')?.events.map((event) => event.message)).toEqual([
+      'entry filled',
+    ]);
   });
 
   it('locks the official repeated request-call limit idiom', () => {
