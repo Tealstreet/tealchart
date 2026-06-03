@@ -1802,6 +1802,46 @@ tooMany = box.set_extend(region, "right", "left")
     ]);
   });
 
+  it('resolves box text named arguments and positional tails', () => {
+    const result = checkProgram(parse(`
+indicator("Box Text Signatures")
+region = box.new(bar_index, high, bar_index + 1, low)
+box.set_text(id=region, "Updated")
+box.set_text_color(region, text_color=color.white)
+box.set_text_size(id=region, size.small)
+box.set_text_halign(region, text_halign="left")
+box.set_text_valign(id=region, "top")
+box.set_text_wrap(region, text_wrap="auto")
+box.set_text_font_family(id=region, "monospace")
+plot(1)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid box text argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Box Text Signatures")
+region = box.new(bar_index, high, bar_index + 1, low)
+unknown = box.set_text(region, "Updated", tooltip="tip")
+missing = box.set_text_color(id=region)
+duplicate = box.set_text_size(region, size.small, id=region)
+tooMany = box.set_text_wrap(region, "auto", "none")
+badName = box.set_text_size(region, text_size=size.small)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'tooltip' for box.set_text()",
+      'box.set_text_color() expects at least 2 arguments',
+      "box.set_text_color() missing required argument 'text_color'",
+      "Argument 'id' for box.set_text_size() was supplied multiple times",
+      'box.set_text_wrap() expects at most 2 arguments',
+      "Unknown argument 'text_size' for box.set_text_size()",
+      'box.set_text_size() expects at least 2 arguments',
+      "box.set_text_size() missing required argument 'size'",
+    ]);
+  });
+
   it('resolves linefill.new named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Linefill Signatures")
