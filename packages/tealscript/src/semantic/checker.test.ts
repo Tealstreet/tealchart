@@ -660,6 +660,60 @@ plot(numericValue + collectionValue + whileValue)
     expect(types.get('whileTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
   });
 
+  it('infers tuple destructuring element types from user function switch tuple returns', () => {
+    const result = checkProgram(parse(`
+indicator("Switch Tuple Types")
+keyedPair(float value, string mode) => switch mode
+    "price" => [value, "price"]
+    "wide" => [1, "wide"]
+    => [value + 1, "default"]
+conditionPair(float value) => switch
+    value > open => [value, "up"]
+    => [value + 1, "down"]
+blockPair(float value, string mode) => switch mode
+    "basis" =>
+        basis = value + 1
+        [basis, "basis"]
+    =>
+        [value, "fallback"]
+mixedShapePair(float value, string mode) => switch mode
+    "price" => [value, "price"]
+    => value
+[keyedValue, keyedTitle] = keyedPair(close, "wide")
+[conditionValue, conditionTitle] = conditionPair(close)
+[blockValue, blockTitle] = blockPair(close, "basis")
+[unknownValue, unknownTitle] = mixedShapePair(close, "price")
+keyedValue := "bad"
+keyedTitle := 1
+conditionValue := "bad"
+conditionTitle := 2
+blockValue := "bad"
+blockTitle := 3
+unknownValue := "still unknown"
+unknownTitle := 4
+plot(keyedValue + conditionValue + blockValue)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable keyedValue',
+      'Cannot assign int value to string variable keyedTitle',
+      'Cannot assign string value to float variable conditionValue',
+      'Cannot assign int value to string variable conditionTitle',
+      'Cannot assign string value to float variable blockValue',
+      'Cannot assign int value to string variable blockTitle',
+    ]);
+    expect(types.get('keyedValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('keyedTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('conditionValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('conditionTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('blockValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('blockTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('unknownValue')).toMatchObject({ kind: 'unknown' });
+    expect(types.get('unknownTitle')).toMatchObject({ kind: 'unknown' });
+  });
+
   it('infers tuple destructuring element types from direct user method tuple returns', () => {
     const result = checkProgram(parse(`
 indicator("Method Tuple Types")
