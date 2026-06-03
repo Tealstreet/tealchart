@@ -962,7 +962,7 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       );
       const textFontFamily = optionalString(runtime, orderedCallArg(args, namedArgs, tableCellArgs, 11));
       const textFormatting = optionalString(runtime, orderedCallArg(args, namedArgs, tableCellArgs, 12));
-      const tooltip = optionalString(runtime, orderedCallArg(args, namedArgs, tableCellArgs, 13));
+      const tooltip = runtime.toOptionalString(orderedCallArg(args, namedArgs, tableCellArgs, 13));
       const cell: TableCellDrawingOutput = {
         column,
         row,
@@ -1060,7 +1060,7 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
   builtins.set('table.cell_set_tooltip', (args, namedArgs, ctx) => {
     withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
       const cell = ensureCell(table, callArg(args, namedArgs, 1, 'column', undefined, ['table_id']), callArg(args, namedArgs, 2, 'row', undefined, ['table_id', 'column']));
-      cell.tooltip = runtime.toStringValue(callArg(args, namedArgs, 3, 'tooltip', undefined, ['table_id', 'column', 'row']));
+      cell.tooltip = runtime.toOptionalString(callArg(args, namedArgs, 3, 'tooltip', undefined, ['table_id', 'column', 'row']));
     });
     return undefined;
   });

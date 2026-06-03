@@ -933,6 +933,8 @@ if barstate.islast
     table.cell_set_text_font_family(stats, 1, 0, font.family_monospace)
     table.cell_set_text_formatting(stats, 1, 0, text.format_bold + text.format_italic)
     table.cell_set_tooltip(stats, 1, 0, "Close details")
+    table.cell_set_tooltip(stats, 0, 1, "Created details")
+    table.cell_set_tooltip(stats, 0, 1, na)
     table.cell_set_text(stats, 0, 1, "created")
     table.delete(stale)
 plot(close)
@@ -997,6 +999,7 @@ plot(array.size(table.all), title="Tables")`;
               textHalign: 'center',
               textValign: 'middle',
               textSize: 'normal',
+              tooltip: undefined,
               bgcolor: null,
             },
           ],
