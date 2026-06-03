@@ -635,6 +635,44 @@ plot(customFn(value))
     ]);
   });
 
+  it('reports invalid user-defined function and method arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad User Calls")
+type Pivot
+    float y
+scale(float value, float factor = 2) => value * factor
+method lift(Pivot this, float amount, float extra = 1) => this
+pivot = Pivot.new(close)
+validDefault = scale(close)
+validNamed = scale(value=close, factor=2)
+validMethod = pivot.lift(1)
+missing = scale()
+tooMany = scale(close, 2, 3)
+unknown = scale(close, bad=1)
+duplicate = scale(close, value=1)
+badOrder = scale(value=close, 2)
+missingMethod = pivot.lift()
+tooManyMethod = pivot.lift(1, 2, 3)
+unknownMethod = pivot.lift(1, bad=2)
+duplicateMethod = pivot.lift(1, amount=2)
+plot(validDefault + validNamed + validMethod.y)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'scale() expects at least 1 argument',
+      "scale() missing required argument 'value'",
+      'scale() expects at most 2 arguments',
+      "Unknown argument 'bad' for scale()",
+      "Argument 'value' for scale() was supplied multiple times",
+      'scale() cannot use positional arguments after named arguments',
+      'lift() expects at least 1 argument',
+      "lift() missing required argument 'amount'",
+      'lift() expects at most 2 arguments',
+      "Unknown argument 'bad' for lift()",
+      "Argument 'amount' for lift() was supplied multiple times",
+    ]);
+  });
+
   it('records value and reference types from annotations', () => {
     const result = checkProgram(parse(`
 indicator("Typed Symbols")
