@@ -1671,6 +1671,46 @@ tooMany = linefill.new(upper, lower, color.blue, color.red)
     ]);
   });
 
+  it('resolves linefill method named arguments and positional tails', () => {
+    const result = checkProgram(parse(`
+indicator("Linefill Method Signatures")
+upper = line.new(bar_index, high, bar_index + 1, high)
+lower = line.new(bar_index, low, bar_index + 1, low)
+filled = linefill.new(upper, lower)
+linefill.set_color(id=filled, color.orange)
+firstLine = linefill.get_line1(id=filled)
+secondLine = linefill.get_line2(filled)
+linefill.delete(id=filled)
+plot(1)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid linefill method argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Linefill Method Signatures")
+upper = line.new(bar_index, high, bar_index + 1, high)
+lower = line.new(bar_index, low, bar_index + 1, low)
+filled = linefill.new(upper, lower)
+unknown = linefill.set_color(filled, color.blue, opacity=80)
+missing = linefill.set_color(id=filled)
+duplicate = linefill.delete(filled, id=filled)
+tooMany = linefill.get_line1(filled, filled)
+missingGetter = linefill.get_line2()
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'opacity' for linefill.set_color()",
+      'linefill.set_color() expects at least 2 arguments',
+      "linefill.set_color() missing required argument 'color'",
+      "Argument 'id' for linefill.delete() was supplied multiple times",
+      'linefill.get_line1() expects at most 1 argument',
+      'linefill.get_line2() expects at least 1 argument',
+      "linefill.get_line2() missing required argument 'id'",
+    ]);
+  });
+
   it('resolves table.new named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Table Signatures")
