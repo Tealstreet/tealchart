@@ -2964,6 +2964,9 @@ class SemanticChecker {
         if (expression.object.type === 'Identifier' && expression.object.name === 'session') {
           return this.inferMemberExpressionType(expression, scope);
         }
+        if (BUILTIN_GLOBAL_TYPES.has(this.memberPath(expression).join('.'))) {
+          return this.inferMemberExpressionType(expression, scope);
+        }
         if (this.isDrawingAllMemberExpression(expression)) {
           return this.inferMemberExpressionType(expression, scope);
         }
@@ -3293,6 +3296,9 @@ class SemanticChecker {
   private inferMemberExpressionType(expression: MemberExpression, scope: SemanticScope): SemanticType {
     const path = this.memberPath(expression);
     const memberName = path.join('.');
+    const builtinType = BUILTIN_GLOBAL_TYPES.get(memberName);
+    if (builtinType) return builtinType;
+
     const drawingAllElementType = DRAWING_ALL_MEMBER_TYPES.get(memberName);
     if (drawingAllElementType) {
       return { kind: 'array', elementType: { kind: drawingAllElementType }, qualifier: 'series' };
