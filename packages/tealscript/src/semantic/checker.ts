@@ -1151,27 +1151,7 @@ class SemanticChecker {
         return this.inferExpressionType(declaration.body, functionScope);
       }
 
-      let returnType: SemanticType | undefined;
-      for (const [index, statement] of declaration.body.entries()) {
-        const isLastStatement = index === declaration.body.length - 1;
-        if (statement.type === 'VariableDeclaration' && statement.names.type === 'VariableDeclarator') {
-          const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init, functionScope);
-          functionScope.declare({
-            name: statement.names.name.name,
-            kind: 'variable',
-            type,
-            loc: statement.names.name.loc,
-          });
-          returnType = isLastStatement ? type : undefined;
-          continue;
-        }
-        if (statement.type === 'ExpressionStatement') {
-          returnType = this.inferExpressionType(statement.expression, functionScope);
-          continue;
-        }
-        returnType = undefined;
-      }
-      return returnType;
+      return this.inferExpressionTypeFromStatements(declaration.body, functionScope);
     } finally {
       this.activeReturnInferences.delete(declaration);
     }
@@ -1784,9 +1764,15 @@ class SemanticChecker {
     this.declare(scope, {
       name: statement.names.name.name,
       kind: 'variable',
-      type: this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init, scope),
+      type: this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferVariableInitializerType(statement.init, scope),
       loc: statement.names.name.loc,
     });
+  }
+
+  private inferVariableInitializerType(init: Expression | IfStatement, scope: SemanticScope): SemanticType {
+    return init.type === 'IfStatement'
+      ? this.inferIfExpressionType(init, scope)
+      : this.inferExpressionType(init, scope);
   }
 
   private declareTuple(tuple: TupleDeclarator, init: Expression, scope: SemanticScope): void {
@@ -1831,7 +1817,7 @@ class SemanticChecker {
     let returnTypes: SemanticType[] | undefined;
     for (const statement of statements) {
       if (statement.type === 'VariableDeclaration' && statement.names.type === 'VariableDeclarator') {
-        const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init, scope);
+        const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferVariableInitializerType(statement.init, scope);
         scope.declare({
           name: statement.names.name.name,
           kind: 'variable',
@@ -3281,9 +3267,71 @@ class SemanticChecker {
         returnType = this.inferExpressionType(statement.expression, scope);
         continue;
       }
+      if (statement.type === 'IfStatement') {
+        returnType = this.inferIfExpressionType(statement, scope);
+        continue;
+      }
       returnType = undefined;
     }
     return returnType;
+  }
+
+  private inferIfExpressionType(statement: IfStatement, scope: SemanticScope): SemanticType {
+    if (!statement.alternate) return { kind: 'unknown', qualifier: this.inferExpressionType(statement.test, scope).qualifier };
+
+    const consequentType = this.inferExpressionTypeFromStatements(statement.consequent, new SemanticScope(scope));
+    const alternateType = Array.isArray(statement.alternate)
+      ? this.inferExpressionTypeFromStatements(statement.alternate, new SemanticScope(scope))
+      : this.inferIfExpressionType(statement.alternate, new SemanticScope(scope));
+
+    if (!consequentType || !alternateType) {
+      return { kind: 'unknown', qualifier: this.inferIfExpressionQualifier(statement, scope) };
+    }
+
+    const mergedType = this.mergeCompatibleType(consequentType, alternateType);
+    return {
+      ...mergedType,
+      qualifier: this.maxQualifier(
+        mergedType,
+        { kind: 'unknown', qualifier: this.inferExpressionType(statement.test, scope).qualifier },
+      ),
+    };
+  }
+
+  private inferIfExpressionQualifier(statement: IfStatement, scope: SemanticScope): SemanticQualifier | undefined {
+    return this.maxQualifier(
+      this.inferExpressionType(statement.test, scope),
+      ...this.inferExpressionTypesFromStatements(statement.consequent, new SemanticScope(scope)),
+      ...(Array.isArray(statement.alternate)
+        ? this.inferExpressionTypesFromStatements(statement.alternate, new SemanticScope(scope))
+        : statement.alternate
+          ? [this.inferIfExpressionType(statement.alternate, new SemanticScope(scope))]
+          : []),
+    );
+  }
+
+  private inferExpressionTypesFromStatements(statements: Statement[], scope: SemanticScope): SemanticType[] {
+    const types: SemanticType[] = [];
+    for (const statement of statements) {
+      if (statement.type === 'VariableDeclaration' && statement.names.type === 'VariableDeclarator') {
+        const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferVariableInitializerType(statement.init, scope);
+        scope.declare({
+          name: statement.names.name.name,
+          kind: 'variable',
+          type,
+          loc: statement.names.name.loc,
+        });
+        continue;
+      }
+      if (statement.type === 'ExpressionStatement') {
+        types.push(this.inferExpressionType(statement.expression, scope));
+        continue;
+      }
+      if (statement.type === 'IfStatement') {
+        types.push(this.inferIfExpressionType(statement, scope));
+      }
+    }
+    return types;
   }
 
   private inferSwitchExpressionQualifier(expression: SwitchExpression, scope: SemanticScope): SemanticQualifier | undefined {
