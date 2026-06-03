@@ -323,13 +323,13 @@ Semantic diagnostics cover unknown local UDT field reads/assignments,
 constructor unknown field names, duplicate bindings, excess positional
 arguments, invalid argument order between named and positional arguments, and
 conservative primitive/reference field type mismatches in local UDT field
-defaults, constructors, and field assignments. Annotated local UDT and enum
-variables also reject mismatched UDT/enum values. Library diagnostics also
+defaults, constructors, and field assignments. Annotated local variables also
+reject mismatched primitive, reference, collection, UDT, and enum initializer
+values when both sides have usable semantic types. Library diagnostics also
 report exported UDT fields and exported function or method parameters that
 expose non-exported local UDTs, including through collection templates, and
 exported callables that return non-exported local UDTs. Full qualifier-sensitive
-reference diagnostics and broader primitive/collection variable type checks
-remain planned in the qualified type-system epic.
+reference diagnostics remain planned in the qualified type-system epic.
 
 ## Common Library Syntax Coverage
 
