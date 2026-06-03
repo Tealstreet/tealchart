@@ -1812,6 +1812,9 @@ class SemanticChecker {
     if (init.type === 'WhileStatement') {
       return this.inferWhileTupleElementTypes(init, scope);
     }
+    if (init.type === 'SwitchExpression') {
+      return this.inferSwitchTupleElementTypes(init, scope);
+    }
 
     if (init.type === 'ArrayExpression') {
       return init.elements.map((element) => this.inferExpressionType(element, scope));
@@ -1903,6 +1906,23 @@ class SemanticChecker {
 
   private inferWhileTupleElementTypes(statement: WhileStatement, scope: SemanticScope): SemanticType[] | undefined {
     return this.inferTupleElementTypesFromStatements(statement.body, new SemanticScope(scope));
+  }
+
+  private inferSwitchTupleElementTypes(expression: SwitchExpression, scope: SemanticScope): SemanticType[] | undefined {
+    if (!expression.cases.some((switchCase) => !switchCase.test)) return undefined;
+
+    let mergedTypes: SemanticType[] | undefined;
+    for (const switchCase of expression.cases) {
+      const caseScope = new SemanticScope(scope);
+      const caseTypes = Array.isArray(switchCase.consequent)
+        ? this.inferTupleElementTypesFromStatements(switchCase.consequent, caseScope)
+        : this.inferTupleElementTypes(switchCase.consequent, caseScope);
+      if (!caseTypes) return undefined;
+      mergedTypes = mergedTypes ? this.mergeTupleElementTypes(mergedTypes, caseTypes) : caseTypes;
+      if (!mergedTypes) return undefined;
+    }
+
+    return mergedTypes;
   }
 
   private mergeTupleElementTypes(
