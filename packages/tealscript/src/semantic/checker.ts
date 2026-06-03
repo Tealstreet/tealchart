@@ -190,6 +190,44 @@ const STRING_RETURN_NAMES = new Set([
 const STRING_BOOL_RETURN_NAMES = new Set(['str.contains', 'str.startswith', 'str.endswith']);
 const STRING_INT_RETURN_NAMES = new Set(['str.length', 'str.pos']);
 
+const TA_BOOL_RETURN_NAMES = new Set(['ta.cross', 'ta.crossover', 'ta.crossunder', 'ta.rising', 'ta.falling']);
+const TA_INT_RETURN_NAMES = new Set(['ta.barssince', 'ta.highestbars', 'ta.lowestbars']);
+const TA_FLOAT_RETURN_NAMES = new Set([
+  'ta.alma',
+  'ta.atr',
+  'ta.bbw',
+  'ta.cci',
+  'ta.cmo',
+  'ta.cog',
+  'ta.correlation',
+  'ta.cum',
+  'ta.dev',
+  'ta.ema',
+  'ta.hma',
+  'ta.linreg',
+  'ta.mfi',
+  'ta.obv',
+  'ta.percentile_linear_interpolation',
+  'ta.percentile_nearest_rank',
+  'ta.percentrank',
+  'ta.rma',
+  'ta.roc',
+  'ta.rsi',
+  'ta.sar',
+  'ta.sma',
+  'ta.stdev',
+  'ta.stoch',
+  'ta.swma',
+  'ta.tr',
+  'ta.tsi',
+  'ta.variance',
+  'ta.vwma',
+  'ta.wma',
+  'ta.wpr',
+]);
+const TA_SOURCE_RETURN_NAMES = new Set(['ta.range', 'ta.median', 'ta.mode', 'ta.mom']);
+const TA_DEFAULT_SOURCE_RETURN_NAMES = new Set(['ta.highest', 'ta.lowest']);
+
 const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['box.copy', 'box'],
   ['box.new', 'box'],
@@ -3755,6 +3793,8 @@ class SemanticChecker {
     if (mathType) return mathType;
     const stringType = this.inferStringCallType(expression, scope, calleePath);
     if (stringType) return stringType;
+    const taType = this.inferTaCallType(expression, scope, calleePath);
+    if (taType) return taType;
     if (namespace === 'input') return { kind: 'unknown', qualifier: 'input' };
     if (namespace === 'request' || namespace === 'ta' || namespace === 'time' || namespace === 'time_close' || calleePath.join('.') === 'timeframe.change') {
       return { kind: 'unknown', qualifier: 'series' };
@@ -3891,6 +3931,38 @@ class SemanticChecker {
       };
     }
     return undefined;
+  }
+
+  private inferTaCallType(expression: CallExpression, scope: SemanticScope, calleePath: string[]): SemanticType | undefined {
+    const calleeName = calleePath.join('.');
+    if (TA_BOOL_RETURN_NAMES.has(calleeName)) return { kind: 'bool', qualifier: 'series' };
+    if (TA_INT_RETURN_NAMES.has(calleeName)) return { kind: 'int', qualifier: 'series' };
+    if (TA_FLOAT_RETURN_NAMES.has(calleeName)) return { kind: 'float', qualifier: 'series' };
+    if (TA_SOURCE_RETURN_NAMES.has(calleeName)) {
+      return this.inferTaSourceReturnType(expression, scope, ['source', 'length'], 0);
+    }
+    if (TA_DEFAULT_SOURCE_RETURN_NAMES.has(calleeName)) {
+      return this.inferTaOptionalSourceReturnType(expression, scope);
+    }
+    if (calleeName === 'ta.change') {
+      return this.inferTaSourceReturnType(expression, scope, ['source', 'length'], 0);
+    }
+    if (calleeName === 'ta.valuewhen') {
+      return this.inferTaSourceReturnType(expression, scope, ['condition', 'source', 'occurrence'], 1);
+    }
+    return undefined;
+  }
+
+  private inferTaSourceReturnType(expression: CallExpression, scope: SemanticScope, parameterNames: string[], index: number): SemanticType {
+    const source = this.inferCallArgumentType(expression, scope, parameterNames, index);
+    return source ? { ...source, qualifier: 'series' } : { kind: 'unknown', qualifier: 'series' };
+  }
+
+  private inferTaOptionalSourceReturnType(expression: CallExpression, scope: SemanticScope): SemanticType {
+    const namedSource = this.inferCallArgumentType(expression, scope, ['source', 'length'], 0);
+    const positionalArguments = expression.arguments.filter((argument) => !argument.name);
+    const source = expression.arguments.some((argument) => argument.name?.name === 'source') || positionalArguments.length > 1 ? namedSource : undefined;
+    return source ? { ...source, qualifier: 'series' } : { kind: 'float', qualifier: 'series' };
   }
 
   private inferFixnanCallType(expression: CallExpression, scope: SemanticScope): SemanticType {
