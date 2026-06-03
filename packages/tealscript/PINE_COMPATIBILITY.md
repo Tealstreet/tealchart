@@ -66,8 +66,9 @@ Covered behavior and remaining gaps:
   destructuring, index access, and parenthesized expressions.
 - Tuple destructuring preserves known positional types from literal tuple
   expressions, direct and compatible if/else user-function tuple returns, direct
-  user-method tuple returns, and supported tuple-returning TA calls, so
-  downstream assignment diagnostics can use destructured names.
+  user-function loop tuple returns, direct user-method tuple returns, and
+  supported tuple-returning TA calls, so downstream assignment diagnostics can
+  use destructured names.
 - Operator line continuations are supported after arithmetic, comparison,
   logical, unary, and ternary operators. Leading comparison, logical,
   multiplicative, `+`, and ternary operators are also supported. Leading `-`
