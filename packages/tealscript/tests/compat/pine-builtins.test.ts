@@ -201,6 +201,8 @@ indicator("Channel helpers")
 [hlBasis, hlUpper, hlLower] = ta.kc(close, 3, 1.25, false)
 [namedBasis, namedUpper, namedLower] = ta.kc(series=close, length=3, mult=1.25)
 [namedHlBasis, namedHlUpper, namedHlLower] = ta.kc(series=close, length=3, mult=1.25, useTrueRange=false)
+[mixedBasis, mixedUpper, mixedLower] = ta.kc(series=close, 3, 1.25)
+[mixedHlBasis, mixedHlUpper, mixedHlLower] = ta.kc(series=close, 3, 1.25, false)
 plot(basis, title="KC Basis")
 plot(upper, title="KC Upper")
 plot(lower, title="KC Lower")
@@ -212,9 +214,16 @@ plot(namedBasis, title="Named KC Basis")
 plot(namedUpper, title="Named KC Upper")
 plot(namedLower, title="Named KC Lower")
 plot(namedHlUpper, title="Named HL Upper")
+plot(mixedBasis, title="Mixed KC Basis")
+plot(mixedUpper, title="Mixed KC Upper")
+plot(mixedLower, title="Mixed KC Lower")
+plot(mixedHlUpper, title="Mixed HL Upper")
 plot(ta.kcw(series=close, length=3, mult=1.25), title="Named KC Width")
 plot(ta.kcw(series=close, length=3, mult=1.25, useTrueRange=false), title="Named HL Width")
+plot(ta.kcw(series=close, 3, 1.25), title="Mixed KC Width")
+plot(ta.kcw(series=close, 3, 1.25, false), title="Mixed HL Width")
 plot(ta.bbw(series=close, length=3, mult=2.0), title="Named BB Width")
+plot(ta.bbw(series=close, 3, 2.0), title="Mixed BB Width")
 `);
 
     expect(result.errors).toEqual([]);
@@ -229,9 +238,16 @@ plot(ta.bbw(series=close, length=3, mult=2.0), title="Named BB Width")
     expect(roundSeries(getPlot(result, 'Named KC Upper').values)).toEqual(roundSeries(getPlot(result, 'KC Upper').values));
     expect(roundSeries(getPlot(result, 'Named KC Lower').values)).toEqual(roundSeries(getPlot(result, 'KC Lower').values));
     expect(roundSeries(getPlot(result, 'Named HL Upper').values)).toEqual(roundSeries(getPlot(result, 'HL Upper').values));
+    expect(roundSeries(getPlot(result, 'Mixed KC Basis').values)).toEqual(roundSeries(getPlot(result, 'KC Basis').values));
+    expect(roundSeries(getPlot(result, 'Mixed KC Upper').values)).toEqual(roundSeries(getPlot(result, 'KC Upper').values));
+    expect(roundSeries(getPlot(result, 'Mixed KC Lower').values)).toEqual(roundSeries(getPlot(result, 'KC Lower').values));
+    expect(roundSeries(getPlot(result, 'Mixed HL Upper').values)).toEqual(roundSeries(getPlot(result, 'HL Upper').values));
     expect(roundSeries(getPlot(result, 'Named KC Width').values)).toEqual(roundSeries(getPlot(result, 'KC Width').values));
     expect(roundSeries(getPlot(result, 'Named HL Width').values)).toEqual(roundSeries(getPlot(result, 'HL Width').values));
+    expect(roundSeries(getPlot(result, 'Mixed KC Width').values)).toEqual(roundSeries(getPlot(result, 'KC Width').values));
+    expect(roundSeries(getPlot(result, 'Mixed HL Width').values)).toEqual(roundSeries(getPlot(result, 'HL Width').values));
     expect(roundSeries(getPlot(result, 'Named BB Width').values)).toEqual(roundSeries(getPlot(result, 'BB Width').values));
+    expect(roundSeries(getPlot(result, 'Mixed BB Width').values)).toEqual(roundSeries(getPlot(result, 'BB Width').values));
   });
 
   it('runs Pine linear regression helper idioms', () => {
