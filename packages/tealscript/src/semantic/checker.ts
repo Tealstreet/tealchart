@@ -2991,9 +2991,10 @@ class SemanticChecker {
     const candidates = receiverMatches
       .map((method) => ({
         method,
-        score: this.userCallableSpecificityScore(method, expression, 1, scope),
+        score: this.userMethodReceiverSpecificityScore(method, receiverType)
+          + (this.userCallableSpecificityScore(method, expression, 1, scope) ?? Number.NEGATIVE_INFINITY),
       }))
-      .filter((candidate): candidate is { method: FunctionDeclaration; score: number } => candidate.score !== undefined);
+      .filter((candidate) => Number.isFinite(candidate.score));
     if (candidates.length === 0) return undefined;
 
     const bestScore = Math.max(...candidates.map((candidate) => candidate.score));
@@ -3006,6 +3007,15 @@ class SemanticChecker {
     return !!methodReceiverType
       && this.isAssignableType(methodReceiverType, receiverType)
       && this.isAssignableQualifier(methodReceiverType.qualifier, receiverType.qualifier);
+  }
+
+  private userMethodReceiverSpecificityScore(method: FunctionDeclaration, receiverType: SemanticType): number {
+    const methodReceiverType = this.typeFromAnnotation(method.params[0]?.typeAnnotation ?? undefined);
+    if (!methodReceiverType) return 0;
+
+    let score = this.typeSpecificityScore(methodReceiverType, receiverType);
+    if (methodReceiverType.qualifier === receiverType.qualifier) score += 2;
+    return score;
   }
 
   private userCallableSpecificityScore(
