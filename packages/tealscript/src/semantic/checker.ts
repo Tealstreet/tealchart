@@ -269,6 +269,20 @@ const TICKER_STRING_RETURN_FUNCTIONS = new Set([
   'ticker.standard',
 ]);
 
+const MATRIX_BOOLEAN_RETURN_FUNCTIONS = new Set([
+  'matrix.is_antidiagonal',
+  'matrix.is_antisymmetric',
+  'matrix.is_binary',
+  'matrix.is_diagonal',
+  'matrix.is_identity',
+  'matrix.is_square',
+  'matrix.is_stochastic',
+  'matrix.is_symmetric',
+  'matrix.is_triangular',
+  'matrix.is_valid',
+  'matrix.is_zero',
+]);
+
 const FLOAT_RETURN_FUNCTIONS = new Set([
   'ta.alma',
   'ta.atr',
@@ -3202,6 +3216,7 @@ class SemanticChecker {
     }
     if (REQUEST_FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: 'series' };
     if (TICKER_STRING_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'string', qualifier: 'simple' };
+    if (MATRIX_BOOLEAN_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'bool', qualifier: 'series' };
     if (FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: 'series' };
     if (calleeName === 'label.get_x') return { kind: 'int', qualifier: 'series' };
     if (calleeName === 'label.get_y') return { kind: 'float', qualifier: 'series' };
