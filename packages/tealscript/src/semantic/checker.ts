@@ -3231,10 +3231,6 @@ class SemanticChecker {
   }
 
   private inferSwitchExpressionType(expression: SwitchExpression, scope: SemanticScope): SemanticType {
-    if (!expression.cases.some((switchCase) => !switchCase.test)) {
-      return { kind: 'unknown', qualifier: this.inferSwitchExpressionQualifier(expression, scope) };
-    }
-
     let mergedType: SemanticType | undefined;
     for (const switchCase of expression.cases) {
       const caseScope = new SemanticScope(scope);
