@@ -2944,6 +2944,39 @@ plot(price + y1 + y2)
     expect(types.get('price')).toMatchObject({ kind: 'float' });
   });
 
+  it('infers line getter return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Line Getter Return Types")
+trend = line.new(bar_index, close, bar_index + 1, close)
+x1 = line.get_x1(id=trend)
+x2 = line.get_x2(trend)
+y1 = line.get_y1(id=trend)
+y2 = line.get_y2(trend)
+price = line.get_price(id=trend, bar_index)
+x1 := "bad"
+x2 := "bad"
+y1 := "bad"
+y2 := "bad"
+price := "bad"
+plot(x1 + x2 + y1 + y2 + price)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to int variable x1',
+      'Cannot assign string value to int variable x2',
+      'Cannot assign string value to float variable y1',
+      'Cannot assign string value to float variable y2',
+      'Cannot assign string value to float variable price',
+    ]);
+    expect(types.get('x1')).toMatchObject({ kind: 'int' });
+    expect(types.get('x2')).toMatchObject({ kind: 'int' });
+    expect(types.get('y1')).toMatchObject({ kind: 'float' });
+    expect(types.get('y2')).toMatchObject({ kind: 'float' });
+    expect(types.get('price')).toMatchObject({ kind: 'float' });
+  });
+
   it('reports invalid line getter argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Bad Line Getter Signatures")
@@ -3113,6 +3146,55 @@ plot(leftValue + rightValue + topValue + bottomValue)
     expect(types.get('valignValue')).toMatchObject({ kind: 'string' });
   });
 
+  it('infers box getter return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Box Getter Return Types")
+region = box.new(bar_index, high, bar_index + 1, low)
+leftValue = box.get_left(id=region)
+rightValue = box.get_right(region)
+topValue = box.get_top(id=region)
+bottomValue = box.get_bottom(region)
+bgValue = box.get_bgcolor(id=region)
+borderValue = box.get_border_color(region)
+textValue = box.get_text(id=region)
+halignValue = box.get_text_halign(region)
+valignValue = box.get_text_valign(id=region)
+leftValue := "bad"
+rightValue := "bad"
+topValue := "bad"
+bottomValue := "bad"
+bgValue := "bad"
+borderValue := "bad"
+textValue := 1
+halignValue := 2
+valignValue := 3
+plot(leftValue + rightValue + topValue + bottomValue + str.length(textValue + halignValue + valignValue))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to int variable leftValue',
+      'Cannot assign string value to int variable rightValue',
+      'Cannot assign string value to float variable topValue',
+      'Cannot assign string value to float variable bottomValue',
+      'Cannot assign string value to color variable bgValue',
+      'Cannot assign string value to color variable borderValue',
+      'Cannot assign int value to string variable textValue',
+      'Cannot assign int value to string variable halignValue',
+      'Cannot assign int value to string variable valignValue',
+    ]);
+    expect(types.get('leftValue')).toMatchObject({ kind: 'int' });
+    expect(types.get('rightValue')).toMatchObject({ kind: 'int' });
+    expect(types.get('topValue')).toMatchObject({ kind: 'float' });
+    expect(types.get('bottomValue')).toMatchObject({ kind: 'float' });
+    expect(types.get('bgValue')).toMatchObject({ kind: 'color' });
+    expect(types.get('borderValue')).toMatchObject({ kind: 'color' });
+    expect(types.get('textValue')).toMatchObject({ kind: 'string' });
+    expect(types.get('halignValue')).toMatchObject({ kind: 'string' });
+    expect(types.get('valignValue')).toMatchObject({ kind: 'string' });
+  });
+
   it('reports invalid box getter argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Bad Box Getter Signatures")
@@ -3237,6 +3319,29 @@ plot(1)
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('firstLine')).toMatchObject({ kind: 'line' });
+    expect(types.get('secondLine')).toMatchObject({ kind: 'line' });
+  });
+
+  it('infers linefill getter return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Linefill Getter Return Types")
+upper = line.new(bar_index, high, bar_index + 1, high)
+lower = line.new(bar_index, low, bar_index + 1, low)
+filled = linefill.new(upper, lower)
+firstLine = linefill.get_line1(id=filled)
+secondLine = linefill.get_line2(filled)
+firstLine := filled
+secondLine := filled
+plot(1)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign linefill value to line variable firstLine',
+      'Cannot assign linefill value to line variable secondLine',
+    ]);
     expect(types.get('firstLine')).toMatchObject({ kind: 'line' });
     expect(types.get('secondLine')).toMatchObject({ kind: 'line' });
   });

@@ -653,17 +653,19 @@ mutation pass covers persistent `var` line handles, `line.set_x1()`,
 `line.set_xy2()`, `line.set_xloc()`, `line.set_extend()`,
 `line.set_color()`, `line.set_style()`, `line.set_width()`, scalar coordinate
 getters, `line.get_price()`, `line.copy()`, and `line.delete()`. Line mutators
-and getters accept Pine-style named `id` and value arguments. Rendering
+and getters accept Pine-style named `id` and value arguments. Semantic analysis
+preserves known line getter return types for downstream diagnostics. Rendering
 routes line segments to the script pane with basic color/style/width and
 horizontal extension support. `force_overlay` lines render in the main pane
 even when created by non-overlay scripts. `linefill.new()` records fills between
 two line handles;
 `linefill.set_color()` supports Pine-style named `id` and `color` arguments,
 while `linefill.get_line1()`, `linefill.get_line2()`, and `linefill.delete()`
-support named `id` arguments. The renderer fills between resolved line segments
-in the routed script pane. `linefill.new()` rejects missing or non-line handles
-without creating a drawing. `chart.point` overloads, GC limits, full arrow style
-geometry, and full realtime rollback parity remain planned.
+support named `id` arguments. Semantic analysis preserves linefill getter line
+handle returns for downstream diagnostics. The renderer fills between resolved
+line segments in the routed script pane. `linefill.new()` rejects missing or
+non-line handles without creating a drawing. `chart.point` overloads, GC limits,
+full arrow style geometry, and full realtime rollback parity remain planned.
 
 The box drawing pass covers common supply/demand zone idioms. `box.new()`
 accepts positional or named `left`, `top`, `right`, and `bottom` arguments plus
@@ -671,7 +673,8 @@ common border, fill, text, `extend`, and `xloc` options. The runtime supports
 persistent `var` box handles, geometry setters (`set_left`, `set_right`,
 `set_top`, `set_bottom`, `set_lefttop`, `set_rightbottom`), style/text setters,
 coordinate/color/text getters, `box.copy()`, and `box.delete()`. Box mutators
-and getters accept Pine-style named `id` and value arguments. Rendering
+and getters accept Pine-style named `id` and value arguments. Semantic analysis
+preserves known box getter return types for downstream diagnostics. Rendering
 routes filled rectangles to the script pane with borders, text alignment,
 `text_wrap=auto` wrapping, and default/monospace font-family metadata. Full
 TradingView text pixel parity, `chart.point` overloads, and remaining edge-case
