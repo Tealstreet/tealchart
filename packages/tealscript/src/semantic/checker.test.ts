@@ -1638,9 +1638,10 @@ indicator("Line Constructor Signatures")
 firstPoint = chart.point.from_index(bar_index, high)
 secondPoint = chart.point.from_index(bar_index + 1, low)
 pointLine = line.new(first_point=firstPoint, secondPoint, xloc.bar_index, "right", color.blue, "solid", 2, true)
+sharedNamedPointLine = line.new(first_point=firstPoint, second_point=secondPoint, color=color.red, xloc=xloc.bar_index)
 coordinateLine = line.new(x1=bar_index, y1=high, x2=bar_index + 1, y2=low, color=color.orange)
 positionalPointLine = line.new(firstPoint, secondPoint)
-lines = array.from(pointLine, coordinateLine, positionalPointLine)
+lines = array.from(pointLine, sharedNamedPointLine, coordinateLine, positionalPointLine)
 plot(array.size(lines))
 `));
 
@@ -1648,6 +1649,7 @@ plot(array.size(lines))
 
     expect(result.diagnostics).toEqual([]);
     expect(types.get('pointLine')).toMatchObject({ kind: 'line' });
+    expect(types.get('sharedNamedPointLine')).toMatchObject({ kind: 'line' });
     expect(types.get('coordinateLine')).toMatchObject({ kind: 'line' });
     expect(types.get('positionalPointLine')).toMatchObject({ kind: 'line' });
     expect(types.get('lines')).toMatchObject({ kind: 'array', elementType: { kind: 'line' } });

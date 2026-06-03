@@ -2660,8 +2660,10 @@ class SemanticChecker {
     const pointOverload = signature.overloads.find((params) => params.includes('first_point'));
     const coordinateOverload = signature.overloads.find((params) => params.includes('x1'));
     if (pointOverload && coordinateOverload) {
-      if ([...suppliedNames].some((name) => coordinateOverload.includes(name))) return coordinateOverload;
-      if ([...suppliedNames].some((name) => pointOverload.includes(name))) return pointOverload;
+      const pointOnlyParams = pointOverload.filter((name) => !coordinateOverload.includes(name));
+      const coordinateOnlyParams = coordinateOverload.filter((name) => !pointOverload.includes(name));
+      if ([...suppliedNames].some((name) => coordinateOnlyParams.includes(name))) return coordinateOverload;
+      if ([...suppliedNames].some((name) => pointOnlyParams.includes(name))) return pointOverload;
       const positionalArgs = args.filter((arg) => !arg.name);
       const firstTwoArePoints = scope && positionalArgs.length >= 2 && positionalArgs.slice(0, 2).every((arg) => (
         this.inferExpressionType(arg.value, scope).kind === 'chart.point'
