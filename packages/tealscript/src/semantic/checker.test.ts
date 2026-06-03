@@ -575,6 +575,9 @@ wideningPair(float value, bool enabled) =>
         [1, "one"]
     else
         [value, "float"]
+partialPair(float value, bool enabled) =>
+    if enabled
+        [value, "partial"]
 conflictingPair(bool enabled) =>
     if enabled
         [1, "one"]
@@ -583,6 +586,7 @@ conflictingPair(bool enabled) =>
 [branchValue, branchTitle] = branchPair(close, close > open)
 [layeredValue, layeredTitle] = layeredPair(close, 2)
 [widenedValue, widenedTitle] = wideningPair(close, close > open)
+[partialValue, partialTitle] = partialPair(close, close > open)
 [unknownValue, unknownTitle] = conflictingPair(close > open)
 branchValue := "bad"
 branchTitle := 1
@@ -590,9 +594,11 @@ layeredValue := "bad"
 layeredTitle := 2
 widenedValue := "bad"
 widenedTitle := 3
+partialValue := "bad"
+partialTitle := 4
 unknownValue := "still unknown"
 unknownTitle := 3
-plot(branchValue + layeredValue + widenedValue)
+plot(branchValue + layeredValue + widenedValue + partialValue)
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -604,6 +610,8 @@ plot(branchValue + layeredValue + widenedValue)
       'Cannot assign int value to string variable layeredTitle',
       'Cannot assign string value to float variable widenedValue',
       'Cannot assign int value to string variable widenedTitle',
+      'Cannot assign string value to float variable partialValue',
+      'Cannot assign int value to string variable partialTitle',
     ]);
     expect(types.get('branchValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('branchTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
@@ -611,6 +619,8 @@ plot(branchValue + layeredValue + widenedValue)
     expect(types.get('layeredTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
     expect(types.get('widenedValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('widenedTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('partialValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('partialTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
     expect(types.get('unknownValue')).toMatchObject({ kind: 'unknown' });
     expect(types.get('unknownTitle')).toMatchObject({ kind: 'unknown' });
   });
