@@ -3293,6 +3293,7 @@ class SemanticChecker {
         kind: 'map',
         keyType: this.typeFromName(expression.typeArguments[0]),
         valueType: this.typeFromName(expression.typeArguments[1]),
+        qualifier: 'series',
       };
     }
     if (calleePath.join('.') === 'array.new' && expression.typeArguments?.length === 1) {
@@ -3494,16 +3495,19 @@ class SemanticChecker {
           kind: 'map',
           keyType: receiverType.keyType,
           valueType: receiverType.valueType,
+          qualifier: 'series',
         };
       case 'keys':
         return {
           kind: 'array',
           elementType: receiverType.keyType,
+          qualifier: 'series',
         };
       case 'values':
         return {
           kind: 'array',
           elementType: receiverType.valueType,
+          qualifier: 'series',
         };
       case 'size':
         return { kind: 'int', qualifier: 'series' };

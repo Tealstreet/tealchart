@@ -679,6 +679,7 @@ inferred.put("ADA", "bad")
 indicator("Map Signatures")
 map<string, float> left = map.new<string, float>()
 map<string, float> right = map.new<string, float>()
+created = map.new<string, float>()
 previous = map.put(id=left, key="BTC", value=1.0)
 value = map.get(id=left, key="BTC")
 exists = map.contains(id=left, key="BTC")
@@ -707,9 +708,12 @@ plot(previous + value + removed + prefixPrevious + prefixValue + prefixRemoved +
     expect(types.get('prefixRemoved')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('exists')).toMatchObject({ kind: 'bool', qualifier: 'series' });
     expect(types.get('prefixExists')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('copied')).toMatchObject({ kind: 'map', keyType: { kind: 'string' }, valueType: { kind: 'float' } });
-    expect(types.get('keys')).toMatchObject({ kind: 'array', elementType: { kind: 'string' } });
-    expect(types.get('values')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('left')).toMatchObject({ kind: 'map', keyType: { kind: 'string' }, valueType: { kind: 'float' } });
+    expect(types.get('right')).toMatchObject({ kind: 'map', keyType: { kind: 'string' }, valueType: { kind: 'float' } });
+    expect(types.get('created')).toMatchObject({ kind: 'map', qualifier: 'series', keyType: { kind: 'string' }, valueType: { kind: 'float' } });
+    expect(types.get('copied')).toMatchObject({ kind: 'map', qualifier: 'series', keyType: { kind: 'string' }, valueType: { kind: 'float' } });
+    expect(types.get('keys')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'string' } });
+    expect(types.get('values')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
     expect(types.get('size')).toMatchObject({ kind: 'int', qualifier: 'series' });
   });
 
