@@ -3511,6 +3511,24 @@ badOrder = Pivot.new(x=1, "bad")
     ]);
   });
 
+  it('infers series qualifiers for user-defined type constructors', () => {
+    const result = checkProgram(parse(`
+indicator("UDT Constructor Qualifiers")
+type Pivot
+    int x
+    float y
+pivot = Pivot.new(1, close)
+named = Pivot.new(x=2, y=high)
+plot(pivot.y + named.y)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('pivot')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
+    expect(types.get('named')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
+  });
+
   it('reports unknown user-defined type fields on reads and assignments', () => {
     const result = checkProgram(parse(`
 indicator("Bad UDT Fields")
@@ -3568,9 +3586,9 @@ badScale = pivot.scale(2)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'No method lift() overload accepts Other receiver',
+      'No method lift() overload accepts series Other receiver',
       'No method lift() overload accepts const int receiver',
-      'No method scale() overload accepts Pivot receiver',
+      'No method scale() overload accepts series Pivot receiver',
     ]);
   });
 
