@@ -1645,6 +1645,37 @@ tooMany = table.new(position.top_right, 2, 3, color.black, color.gray, 1, color.
     ]);
   });
 
+  it('resolves table.cell named arguments and positional tails', () => {
+    const result = checkProgram(parse(`
+indicator("Table Cell Signatures")
+dashboard = table.new(columns=2, rows=2)
+table.cell(table_id=dashboard, 0, 0, "Entry", 10, 2, color.white, "left", "top", size.small, color.blue)
+table.cell(dashboard, column=1, row=0, text="Exit", bgcolor=color.orange)
+plot(1)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid table.cell argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Table Cell Signatures")
+dashboard = table.new(columns=2, rows=2)
+unknown = table.cell(dashboard, 0, 0, label="Entry")
+missing = table.cell(table_id=dashboard, column=1)
+duplicate = table.cell(dashboard, 0, 0, table_id=dashboard)
+tooMany = table.cell(dashboard, 0, 0, "A", 1, 1, color.white, "left", "top", size.small, color.blue, "mono", "bold", 1)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'label' for table.cell()",
+      'table.cell() expects at least 3 arguments',
+      "table.cell() missing required argument 'row'",
+      "Argument 'table_id' for table.cell() was supplied multiple times",
+      'table.cell() expects at most 13 arguments',
+    ]);
+  });
+
   it('infers homogeneous array literal and array.from element types', () => {
     const result = checkProgram(parse(`
 indicator("Array Literal Types")
