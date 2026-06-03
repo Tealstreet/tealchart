@@ -1849,9 +1849,9 @@ class SemanticChecker {
   }
 
   private inferIfTupleElementTypes(statement: IfStatement, scope: SemanticScope): SemanticType[] | undefined {
-    if (!statement.alternate) return undefined;
-
     const consequentTypes = this.inferTupleElementTypesFromStatements(statement.consequent, new SemanticScope(scope));
+    if (!statement.alternate) return consequentTypes;
+
     const alternateTypes = Array.isArray(statement.alternate)
       ? this.inferTupleElementTypesFromStatements(statement.alternate, new SemanticScope(scope))
       : this.inferIfTupleElementTypes(statement.alternate, new SemanticScope(scope));
