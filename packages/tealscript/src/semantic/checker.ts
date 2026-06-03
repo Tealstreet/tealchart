@@ -1969,7 +1969,11 @@ class SemanticChecker {
     }
     if (expression.object.type === 'Identifier') {
       const objectSymbol = scope.lookup(expression.object.name);
-      if (objectSymbol?.kind === 'type' || objectSymbol?.kind === 'import') {
+      if (objectSymbol?.kind === 'type') {
+        this.checkEnumMemberExpression(expression);
+        return;
+      }
+      if (objectSymbol?.kind === 'import') {
         return;
       }
     }
@@ -1986,6 +1990,20 @@ class SemanticChecker {
         expression.property.loc,
       );
     }
+  }
+
+  private checkEnumMemberExpression(expression: MemberExpression): void {
+    if (expression.object.type !== 'Identifier') return;
+
+    const enumDeclaration = this.enumDeclarations.get(expression.object.name);
+    if (!enumDeclaration) return;
+    if (enumDeclaration.fields.some((field) => field.name.name === expression.property.name)) return;
+
+    this.addDiagnostic(
+      'unknown-enum-member',
+      `Unknown enum member '${expression.property.name}' on enum ${enumDeclaration.name.name}`,
+      expression.property.loc,
+    );
   }
 
   private checkIndexExpression(expression: IndexExpression, scope: SemanticScope): void {

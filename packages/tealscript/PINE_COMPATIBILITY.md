@@ -314,7 +314,8 @@ known receiver type does not match any local method receiver annotation.
 Semantic coverage accepts local method overload declarations, and method return
 inference selects local overloads by receiver specificity and annotated argument
 signatures. Local enum member expressions and import-qualified enum member
-expressions infer their enum receiver type for semantic user-method selection.
+expressions infer their enum receiver type for semantic user-method selection,
+and semantic diagnostics report unknown local enum members.
 
 Known limits: UDT field types are recorded dynamically but not yet fully
 enforced by the semantic checker outside the local constructor/assignment paths.
