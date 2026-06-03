@@ -150,6 +150,22 @@ const INPUT_RETURN_TYPES = new Map<string, SemanticTypeKind>([
 const COLOR_CONSTRUCTOR_NAMES = new Set(['color.new', 'color.rgb']);
 const COLOR_CHANNEL_NAMES = new Set(['color.r', 'color.g', 'color.b', 'color.t']);
 
+const STRING_RETURN_NAMES = new Set([
+  'str.tostring',
+  'str.format_time',
+  'str.format',
+  'str.substring',
+  'str.match',
+  'str.repeat',
+  'str.upper',
+  'str.lower',
+  'str.trim',
+  'str.replace',
+  'str.replace_all',
+]);
+const STRING_BOOL_RETURN_NAMES = new Set(['str.contains', 'str.startswith', 'str.endswith']);
+const STRING_INT_RETURN_NAMES = new Set(['str.length', 'str.pos']);
+
 const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['box.copy', 'box'],
   ['box.new', 'box'],
@@ -3707,6 +3723,8 @@ class SemanticChecker {
     if (inputType) return inputType;
     const colorType = this.inferColorCallType(expression, scope, calleePath);
     if (colorType) return colorType;
+    const stringType = this.inferStringCallType(expression, scope, calleePath);
+    if (stringType) return stringType;
     if (namespace === 'input') return { kind: 'unknown', qualifier: 'input' };
     if (namespace === 'request' || namespace === 'ta' || namespace === 'time' || namespace === 'time_close' || calleePath.join('.') === 'timeframe.change') {
       return { kind: 'unknown', qualifier: 'series' };
@@ -3793,6 +3811,22 @@ class SemanticChecker {
     if (calleeName === 'color.from_gradient') return { kind: 'color', qualifier: 'series' };
     if (COLOR_CHANNEL_NAMES.has(calleeName)) {
       return { kind: 'float', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+    }
+    return undefined;
+  }
+
+  private inferStringCallType(expression: CallExpression, scope: SemanticScope, calleePath: string[]): SemanticType | undefined {
+    const calleeName = calleePath.join('.');
+    const qualifier = this.inferCallArgumentMaxQualifier(expression, scope);
+    if (STRING_RETURN_NAMES.has(calleeName)) return { kind: 'string', qualifier };
+    if (calleeName === 'str.tonumber') return { kind: 'float', qualifier };
+    if (STRING_BOOL_RETURN_NAMES.has(calleeName)) return { kind: 'bool', qualifier };
+    if (STRING_INT_RETURN_NAMES.has(calleeName)) return { kind: 'int', qualifier };
+    if (calleeName === 'str.split') {
+      return {
+        kind: 'array',
+        elementType: { kind: 'string' },
+      };
     }
     return undefined;
   }
