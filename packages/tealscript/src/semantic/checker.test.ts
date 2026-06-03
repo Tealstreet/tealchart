@@ -131,6 +131,58 @@ plot(isLower and changed ? 1 : 0)
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('infers time and timeframe return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Time Return Types")
+period = timeframe.period
+mainPeriod = timeframe.main_period
+multiplier = timeframe.multiplier
+intraday = timeframe.isintraday
+secondsValue = timeframe.in_seconds()
+rounded = timeframe.from_seconds(seconds=60)
+changed = timeframe.change(timeframe="1D")
+sessionOpen = time(timeframe="60")
+sessionClose = time_close(timeframe="60")
+stamp = timestamp(timezone="UTC", year=2024, month=1, day=5, hour=9, minute=30)
+period := 1
+mainPeriod := 2
+multiplier := "bad"
+intraday := 1
+secondsValue := "bad"
+rounded := 3
+changed := 1
+sessionOpen := "bad"
+sessionClose := "bad"
+stamp := "bad"
+plot(multiplier + secondsValue + sessionOpen + sessionClose + stamp + (intraday ? 1 : 0) + (changed ? 1 : 0))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign int value to string variable period',
+      'Cannot assign int value to string variable mainPeriod',
+      'Cannot assign string value to int variable multiplier',
+      'Cannot assign int value to bool variable intraday',
+      'Cannot assign string value to int variable secondsValue',
+      'Cannot assign int value to string variable rounded',
+      'Cannot assign int value to bool variable changed',
+      'Cannot assign string value to int variable sessionOpen',
+      'Cannot assign string value to int variable sessionClose',
+      'Cannot assign string value to int variable stamp',
+    ]);
+    expect(types.get('period')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('mainPeriod')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('multiplier')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+    expect(types.get('intraday')).toMatchObject({ kind: 'bool', qualifier: 'simple' });
+    expect(types.get('secondsValue')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+    expect(types.get('rounded')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('changed')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('sessionOpen')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('sessionClose')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('stamp')).toMatchObject({ kind: 'int', qualifier: 'const' });
+  });
+
   it('accepts Pine log calls with format arguments', () => {
     const result = checkProgram(parse(`
 indicator("Logs")

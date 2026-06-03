@@ -228,6 +228,18 @@ const TA_FLOAT_RETURN_NAMES = new Set([
 const TA_SOURCE_RETURN_NAMES = new Set(['ta.range', 'ta.median', 'ta.mode', 'ta.mom']);
 const TA_DEFAULT_SOURCE_RETURN_NAMES = new Set(['ta.highest', 'ta.lowest']);
 
+const TIMEFRAME_BOOL_MEMBER_NAMES = new Set([
+  'timeframe.isdaily',
+  'timeframe.isdwm',
+  'timeframe.isintraday',
+  'timeframe.isminutes',
+  'timeframe.ismonthly',
+  'timeframe.isseconds',
+  'timeframe.isticks',
+  'timeframe.isweekly',
+]);
+const TIMEFRAME_STRING_MEMBER_NAMES = new Set(['timeframe.main_period', 'timeframe.period']);
+
 const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['box.copy', 'box'],
   ['box.new', 'box'],
@@ -3495,6 +3507,10 @@ class SemanticChecker {
           const mathConstantType = this.inferMathConstantType(expression);
           if (mathConstantType) return mathConstantType;
         }
+        if (expression.object.type === 'Identifier' && expression.object.name === 'timeframe') {
+          const timeframeType = this.inferTimeframeMemberType(expression);
+          if (timeframeType) return timeframeType;
+        }
         if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
           return { kind: 'unknown', qualifier: 'const' };
         }
@@ -3795,6 +3811,8 @@ class SemanticChecker {
     if (stringType) return stringType;
     const taType = this.inferTaCallType(expression, scope, calleePath);
     if (taType) return taType;
+    const timeType = this.inferTimeCallType(calleePath);
+    if (timeType) return timeType;
     if (namespace === 'input') return { kind: 'unknown', qualifier: 'input' };
     if (namespace === 'request' || namespace === 'ta' || namespace === 'time' || namespace === 'time_close' || calleePath.join('.') === 'timeframe.change') {
       return { kind: 'unknown', qualifier: 'series' };
@@ -3805,10 +3823,7 @@ class SemanticChecker {
     if (calleePath.join('.') === 'string') return { kind: 'string', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
     if (calleePath.join('.') === 'fixnan') return this.inferFixnanCallType(expression, scope);
     if (calleePath.join('.') === 'nz') return this.inferNzCallType(expression, scope);
-    if (calleePath.join('.') === 'timeframe.in_seconds') return { kind: 'int', qualifier: 'simple' };
-    if (calleePath.join('.') === 'timeframe.from_seconds') return { kind: 'string', qualifier: 'simple' };
     if (CALENDAR_FUNCTION_NAMES.has(calleePath.join('.'))) return { kind: 'int', qualifier: 'series' };
-    if (calleePath.join('.') === 'timestamp') return { kind: 'int', qualifier: 'const' };
     const arrayElementReadType = this.inferArrayElementReadCallType(expression, scope);
     if (arrayElementReadType) return arrayElementReadType;
     const arrayScalarType = this.inferArrayScalarCallType(expression, scope);
@@ -3963,6 +3978,16 @@ class SemanticChecker {
     const positionalArguments = expression.arguments.filter((argument) => !argument.name);
     const source = expression.arguments.some((argument) => argument.name?.name === 'source') || positionalArguments.length > 1 ? namedSource : undefined;
     return source ? { ...source, qualifier: 'series' } : { kind: 'float', qualifier: 'series' };
+  }
+
+  private inferTimeCallType(calleePath: string[]): SemanticType | undefined {
+    const calleeName = calleePath.join('.');
+    if (calleeName === 'time' || calleeName === 'time_close') return { kind: 'int', qualifier: 'series' };
+    if (calleeName === 'timeframe.change') return { kind: 'bool', qualifier: 'series' };
+    if (calleeName === 'timeframe.in_seconds') return { kind: 'int', qualifier: 'simple' };
+    if (calleeName === 'timeframe.from_seconds') return { kind: 'string', qualifier: 'simple' };
+    if (calleeName === 'timestamp') return { kind: 'int', qualifier: 'const' };
+    return undefined;
   }
 
   private inferFixnanCallType(expression: CallExpression, scope: SemanticScope): SemanticType {
@@ -4381,6 +4406,8 @@ class SemanticChecker {
     if (memberName === 'session.regular' || memberName === 'session.extended') {
       return { kind: 'string', qualifier: 'const' };
     }
+    const timeframeType = this.inferTimeframeMemberType(expression);
+    if (timeframeType) return timeframeType;
     const enumType = this.inferEnumMemberType(expression, scope);
     if (enumType) return enumType;
 
@@ -4389,6 +4416,14 @@ class SemanticChecker {
 
     const field = this.findUdtField(objectType.name, expression.property.name);
     return this.typeFromAnnotation(field?.typeAnnotation ?? undefined) ?? { kind: 'unknown', qualifier: objectType.qualifier };
+  }
+
+  private inferTimeframeMemberType(expression: MemberExpression): SemanticType | undefined {
+    const memberName = this.memberPath(expression).join('.');
+    if (TIMEFRAME_BOOL_MEMBER_NAMES.has(memberName)) return { kind: 'bool', qualifier: 'simple' };
+    if (TIMEFRAME_STRING_MEMBER_NAMES.has(memberName)) return { kind: 'string', qualifier: 'simple' };
+    if (memberName === 'timeframe.multiplier') return { kind: 'int', qualifier: 'simple' };
+    return undefined;
   }
 
   private inferEnumMemberType(expression: MemberExpression, scope: SemanticScope): SemanticType | undefined {
