@@ -3354,9 +3354,11 @@ class SemanticChecker {
 
   private inferForExpressionType(statement: ForStatement, scope: SemanticScope): SemanticType | undefined {
     const loopScope = new SemanticScope(scope);
+    let controlQualifier: SemanticQualifier | undefined;
 
     if (statement.kind === 'collection') {
       const iterableType = this.inferExpressionType(statement.iterable, scope);
+      controlQualifier = iterableType.qualifier;
       loopScope.declare({
         name: statement.counter.name,
         kind: 'loop',
@@ -3372,6 +3374,11 @@ class SemanticChecker {
         });
       }
     } else {
+      controlQualifier = this.maxQualifier(
+        this.inferExpressionType(statement.start, scope),
+        this.inferExpressionType(statement.end, scope),
+        ...(statement.step ? [this.inferExpressionType(statement.step, scope)] : []),
+      );
       loopScope.declare({
         name: statement.counter.name,
         kind: 'loop',
@@ -3380,11 +3387,23 @@ class SemanticChecker {
       });
     }
 
-    return this.inferExpressionTypeFromStatements(statement.body, loopScope);
+    const bodyType = this.inferExpressionTypeFromStatements(statement.body, loopScope);
+    if (!bodyType) return bodyType;
+
+    return {
+      ...bodyType,
+      qualifier: this.maxQualifier(bodyType, { kind: 'unknown', qualifier: controlQualifier }),
+    };
   }
 
   private inferWhileExpressionType(statement: WhileStatement, scope: SemanticScope): SemanticType | undefined {
-    return this.inferExpressionTypeFromStatements(statement.body, new SemanticScope(scope));
+    const bodyType = this.inferExpressionTypeFromStatements(statement.body, new SemanticScope(scope));
+    if (!bodyType) return bodyType;
+
+    return {
+      ...bodyType,
+      qualifier: this.maxQualifier(bodyType, this.inferExpressionType(statement.test, scope)),
+    };
   }
 
   private inferSwitchExpressionQualifier(expression: SwitchExpression, scope: SemanticScope): SemanticQualifier | undefined {
@@ -3496,6 +3515,7 @@ class SemanticChecker {
     if (calleePath.join('.') === 'array.from') {
       return {
         kind: 'array',
+        qualifier: this.inferCallArgumentMaxQualifier(expression, scope),
         elementType: this.inferArrayElementType(expression.arguments.map((argument) => argument.value), scope),
       };
     }
