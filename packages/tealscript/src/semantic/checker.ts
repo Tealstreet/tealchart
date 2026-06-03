@@ -323,6 +323,11 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['line.set_color', { params: ['id', 'color'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['line.set_style', { params: ['id', 'style'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['line.set_width', { params: ['id', 'width'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['line.get_x1', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['line.get_x2', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['line.get_y1', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['line.get_y2', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['line.get_price', { params: ['id', 'x'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['linefill.new', { params: ['line1', 'line2', 'color'], minArgs: 2, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['linefill.delete', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['linefill.set_color', { params: ['id', 'color'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
@@ -2795,6 +2800,8 @@ class SemanticChecker {
     const calleeName = calleePath.join('.');
     const referenceReturnType = REFERENCE_CONSTRUCTOR_RETURN_TYPES.get(calleeName);
     if (referenceReturnType) return { kind: referenceReturnType };
+    if (calleeName === 'line.get_x1' || calleeName === 'line.get_x2') return { kind: 'int' };
+    if (calleeName === 'line.get_y1' || calleeName === 'line.get_y2' || calleeName === 'line.get_price') return { kind: 'float' };
     if (calleeName === 'linefill.get_line1' || calleeName === 'linefill.get_line2') return { kind: 'line' };
 
     const namespace = calleePath[0];
