@@ -615,6 +615,51 @@ plot(branchValue + layeredValue + widenedValue)
     expect(types.get('unknownTitle')).toMatchObject({ kind: 'unknown' });
   });
 
+  it('infers tuple destructuring element types from user function loop tuple returns', () => {
+    const result = checkProgram(parse(`
+indicator("Loop Tuple Types")
+numericPair(float value, int limit) =>
+    for i = 0 to limit
+        [value + i, "numeric"]
+collectionPair(float value) =>
+    values = array.from(value, value + 1)
+    for [index, item] in values
+        [item + index, "collection"]
+whilePair(float value, int limit) =>
+    i = 0
+    while i < limit
+        i += 1
+        [value + i, "while"]
+[numericValue, numericTitle] = numericPair(close, 2)
+[collectionValue, collectionTitle] = collectionPair(close)
+[whileValue, whileTitle] = whilePair(close, 2)
+numericValue := "bad"
+numericTitle := 1
+collectionValue := "bad"
+collectionTitle := 2
+whileValue := "bad"
+whileTitle := 3
+plot(numericValue + collectionValue + whileValue)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable numericValue',
+      'Cannot assign int value to string variable numericTitle',
+      'Cannot assign string value to float variable collectionValue',
+      'Cannot assign int value to string variable collectionTitle',
+      'Cannot assign string value to float variable whileValue',
+      'Cannot assign int value to string variable whileTitle',
+    ]);
+    expect(types.get('numericValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('numericTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('collectionValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('collectionTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('whileValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('whileTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+  });
+
   it('infers tuple destructuring element types from direct user method tuple returns', () => {
     const result = checkProgram(parse(`
 indicator("Method Tuple Types")

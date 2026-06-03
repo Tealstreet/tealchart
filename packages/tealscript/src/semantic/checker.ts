@@ -1806,6 +1806,12 @@ class SemanticChecker {
     if (init.type === 'IfStatement') {
       return this.inferIfTupleElementTypes(init, scope);
     }
+    if (init.type === 'ForStatement') {
+      return this.inferForTupleElementTypes(init, scope);
+    }
+    if (init.type === 'WhileStatement') {
+      return this.inferWhileTupleElementTypes(init, scope);
+    }
 
     if (init.type === 'ArrayExpression') {
       return init.elements.map((element) => this.inferExpressionType(element, scope));
@@ -1840,6 +1846,14 @@ class SemanticChecker {
         returnTypes = this.inferIfTupleElementTypes(statement, scope);
         continue;
       }
+      if (statement.type === 'ForStatement') {
+        returnTypes = this.inferForTupleElementTypes(statement, scope);
+        continue;
+      }
+      if (statement.type === 'WhileStatement') {
+        returnTypes = this.inferWhileTupleElementTypes(statement, scope);
+        continue;
+      }
       returnTypes = undefined;
     }
     return returnTypes;
@@ -1854,6 +1868,41 @@ class SemanticChecker {
       : this.inferIfTupleElementTypes(statement.alternate, new SemanticScope(scope));
 
     return this.mergeTupleElementTypes(consequentTypes, alternateTypes);
+  }
+
+  private inferForTupleElementTypes(statement: ForStatement, scope: SemanticScope): SemanticType[] | undefined {
+    const loopScope = new SemanticScope(scope);
+
+    if (statement.kind === 'collection') {
+      const iterableType = this.inferExpressionType(statement.iterable, scope);
+      loopScope.declare({
+        name: statement.counter.name,
+        kind: 'loop',
+        type: this.collectionValueType(iterableType),
+        loc: statement.counter.loc,
+      });
+      if (statement.indexCounter) {
+        loopScope.declare({
+          name: statement.indexCounter.name,
+          kind: 'loop',
+          type: this.collectionIndexType(iterableType),
+          loc: statement.indexCounter.loc,
+        });
+      }
+    } else {
+      loopScope.declare({
+        name: statement.counter.name,
+        kind: 'loop',
+        type: { kind: 'int', qualifier: 'series' },
+        loc: statement.counter.loc,
+      });
+    }
+
+    return this.inferTupleElementTypesFromStatements(statement.body, loopScope);
+  }
+
+  private inferWhileTupleElementTypes(statement: WhileStatement, scope: SemanticScope): SemanticType[] | undefined {
+    return this.inferTupleElementTypesFromStatements(statement.body, new SemanticScope(scope));
   }
 
   private mergeTupleElementTypes(
