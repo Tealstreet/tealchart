@@ -319,8 +319,10 @@ method overloads by receiver type. Semantic diagnostics report calls where a
 known receiver type does not match any local method receiver annotation.
 Semantic coverage accepts local method overload declarations, and method return
 inference selects local overloads by receiver specificity and annotated argument
-signatures. Local enum member expressions and import-qualified enum member
-expressions infer their enum receiver type for semantic user-method selection,
+signatures. Full and partial branch/switch plus loop control-flow method returns
+infer scalar and tuple types for downstream diagnostics. Local enum member
+expressions and import-qualified enum member expressions infer their enum
+receiver type for semantic user-method selection,
 and semantic diagnostics report unknown local enum members.
 
 Known limits: UDT field types are recorded dynamically but not yet fully
