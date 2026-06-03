@@ -1278,7 +1278,9 @@ class SemanticChecker {
     }
   }
 
-  private isAllowedExportedConstantValue(value: Expression): boolean {
+  private isAllowedExportedConstantValue(value: Expression | IfStatement): boolean {
+    if (value.type === 'IfStatement') return false;
+
     switch (value.type) {
       case 'NumericLiteral':
       case 'StringLiteral':
@@ -1344,6 +1346,14 @@ class SemanticChecker {
     const reportedGlobals = new Set<string>();
     let reportedInputCall = false;
     const declarationKind = declaration.isMethod ? 'method' : 'function';
+
+    const visitInitializer = (init: Expression | IfStatement, localNames: Set<string>): void => {
+      if (init.type === 'IfStatement') {
+        visitStatement(init, localNames);
+        return;
+      }
+      visitExpression(init, localNames);
+    };
 
     const visitExpression = (expression: Expression, localNames: Set<string>): void => {
       if (expression.type === 'Identifier') {
@@ -1430,7 +1440,7 @@ class SemanticChecker {
     const visitStatement = (statement: Statement, localNames: Set<string>): void => {
       switch (statement.type) {
         case 'VariableDeclaration':
-          visitExpression(statement.init, localNames);
+          visitInitializer(statement.init, localNames);
           for (const name of this.declaredNames(statement)) localNames.add(name);
           return;
         case 'AssignmentStatement':
@@ -1538,10 +1548,16 @@ class SemanticChecker {
       : this.expressionReferencesAnyName(node, names);
   }
 
+  private initializerReferencesAnyName(init: Expression | IfStatement, names: Set<string>): boolean {
+    return init.type === 'IfStatement'
+      ? this.statementReferencesAnyName(init, names)
+      : this.expressionReferencesAnyName(init, names);
+  }
+
   private statementReferencesAnyName(statement: Statement, names: Set<string>): boolean {
     switch (statement.type) {
       case 'VariableDeclaration':
-        return this.expressionReferencesAnyName(statement.init, names);
+        return this.initializerReferencesAnyName(statement.init, names);
       case 'AssignmentStatement':
         return this.expressionReferencesAnyName(statement.left, names)
           || this.expressionReferencesAnyName(statement.right, names);
@@ -1753,7 +1769,7 @@ class SemanticChecker {
   }
 
   private checkVariableDeclaration(statement: VariableDeclaration, scope: SemanticScope): void {
-    this.checkExpression(statement.init, scope);
+    this.checkVariableInitializer(statement.init, scope);
     this.checkTypeAnnotation('variable declaration', statement.typeAnnotation, statement.loc);
     this.checkTypeCompatibility(statement.typeAnnotation, statement.init, scope, statement.loc);
     if (statement.names.type === 'TupleDeclarator') {
@@ -1775,7 +1791,15 @@ class SemanticChecker {
       : this.inferExpressionType(init, scope);
   }
 
-  private declareTuple(tuple: TupleDeclarator, init: Expression, scope: SemanticScope): void {
+  private checkVariableInitializer(init: Expression | IfStatement, scope: SemanticScope): void {
+    if (init.type === 'IfStatement') {
+      this.checkIf(init, scope);
+      return;
+    }
+    this.checkExpression(init, scope);
+  }
+
+  private declareTuple(tuple: TupleDeclarator, init: Expression | IfStatement, scope: SemanticScope): void {
     const seen = new Set<string>();
     const elementTypes = this.inferTupleElementTypes(init, scope);
     for (const [index, name] of tuple.names.entries()) {
@@ -3251,7 +3275,7 @@ class SemanticChecker {
     let returnType: SemanticType | undefined;
     for (const statement of statements) {
       if (statement.type === 'VariableDeclaration' && statement.names.type === 'VariableDeclarator') {
-        const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init, scope);
+        const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferVariableInitializerType(statement.init, scope);
         scope.declare({
           name: statement.names.name.name,
           kind: 'variable',

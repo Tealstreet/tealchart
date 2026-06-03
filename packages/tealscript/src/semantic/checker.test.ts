@@ -902,10 +902,15 @@ float ternaryValue = close > open ? close : "bad"
 float switchValue = switch mode
     "price" => close
     => "bad"
+float ifValue = if close > open
+    close
+else
+    "bad"
 plot(close)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable',
       'Cannot assign string value to float variable',
       'Cannot assign string value to float variable',
     ]);
