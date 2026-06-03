@@ -1094,13 +1094,13 @@ class SemanticChecker {
     }
   }
 
-  private inferFunctionReturnType(declaration: FunctionDeclaration): SemanticType | undefined {
+  private inferFunctionReturnType(declaration: FunctionDeclaration, parameterTypes = new Map<string, SemanticType>()): SemanticType | undefined {
     const functionScope = new SemanticScope(this.rootScope);
     for (const parameter of declaration.params) {
       functionScope.declare({
         name: parameter.name,
         kind: 'parameter',
-        type: this.typeFromAnnotation(parameter.typeAnnotation ?? undefined),
+        type: parameterTypes.get(parameter.name) ?? this.typeFromAnnotation(parameter.typeAnnotation ?? undefined),
         loc: parameter.loc,
       });
     }
@@ -1655,7 +1655,9 @@ class SemanticChecker {
   }
 
   private declareFunction(statement: FunctionDeclaration, scope: SemanticScope): void {
-    this.declare(scope, { name: statement.name.name, kind: 'function', loc: statement.name.loc });
+    if (!statement.isMethod || !scope.lookup(statement.name.name)) {
+      this.declare(scope, { name: statement.name.name, kind: 'function', loc: statement.name.loc });
+    }
     const functionScope = new SemanticScope(scope);
 
     for (const parameter of statement.params) {
@@ -2871,6 +2873,8 @@ class SemanticChecker {
     if (matrixElementReadType) return matrixElementReadType;
     const mapValueReadType = this.inferMapValueReadCallType(expression, scope);
     if (mapValueReadType) return mapValueReadType;
+    const userMethodType = this.inferUserMethodCallType(expression, scope);
+    if (userMethodType) return userMethodType;
     if (calleePath.join('.') === 'array.from') {
       return {
         kind: 'array',
@@ -2907,6 +2911,129 @@ class SemanticChecker {
       return { kind: 'udt', name: calleePath[0] };
     }
     return { kind: 'unknown', qualifier: this.inferMaxQualifier(expression.arguments.map((argument) => argument.value), scope) };
+  }
+
+  private inferUserMethodCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
+    if (expression.callee.type !== 'MemberExpression') return undefined;
+
+    const receiverType = this.inferExpressionType(expression.callee.object, scope);
+    if (receiverType.kind === 'unknown') return undefined;
+    if (this.isBuiltinCollectionMemberMethod(receiverType, expression.callee.property.name)) return undefined;
+
+    const method = this.findUserMethodDeclaration(expression.callee.property.name, receiverType, expression, scope);
+    if (!method) return undefined;
+
+    return this.inferFunctionReturnType(method, this.inferCallableParameterTypes(method, expression.arguments, scope, receiverType));
+  }
+
+  private findUserMethodDeclaration(
+    methodName: string,
+    receiverType: SemanticType,
+    expression?: CallExpression,
+    scope?: SemanticScope,
+  ): FunctionDeclaration | undefined {
+    const methods = this.methodDeclarations.get(methodName);
+    if (!methods?.length) return undefined;
+
+    const receiverMatches = methods.filter((method) => this.userMethodReceiverMatches(method, receiverType));
+    if (!expression || !scope) return receiverMatches[0];
+
+    return receiverMatches.find((method) => this.userCallableCallFits(method, expression, 1, scope)) ?? receiverMatches[0];
+  }
+
+  private userMethodReceiverMatches(method: FunctionDeclaration, receiverType: SemanticType): boolean {
+    const methodReceiverType = this.typeFromAnnotation(method.params[0]?.typeAnnotation ?? undefined);
+    return !!methodReceiverType
+      && this.isAssignableType(methodReceiverType, receiverType)
+      && this.isAssignableQualifier(methodReceiverType.qualifier, receiverType.qualifier);
+  }
+
+  private userCallableCallFits(
+    declaration: FunctionDeclaration,
+    expression: CallExpression,
+    parameterOffset: number,
+    scope: SemanticScope,
+  ): boolean {
+    if (!this.callArgumentsFitParameters(expression.arguments, declaration.params.slice(parameterOffset))) return false;
+
+    for (const [index, parameter] of declaration.params.entries()) {
+      if (index < parameterOffset) continue;
+
+      const expectedType = this.typeFromAnnotation(parameter.typeAnnotation ?? undefined);
+      if (!expectedType) continue;
+
+      const argument = this.getCallArgument(expression.arguments, parameter.name, index - parameterOffset);
+      if (!argument) continue;
+
+      const actualType = this.inferExpressionType(argument, scope);
+      if (!this.isAssignableType(expectedType, actualType)) return false;
+      if (!this.isAssignableQualifier(expectedType.qualifier, actualType.qualifier)) return false;
+    }
+
+    return true;
+  }
+
+  private callArgumentsFitParameters(args: CallArgument[], parameters: FunctionDeclaration['params']): boolean {
+    let hasNamedArgument = false;
+    for (const arg of args) {
+      if (arg.name) {
+        hasNamedArgument = true;
+        continue;
+      }
+      if (hasNamedArgument) return false;
+    }
+
+    const parameterNames = parameters.map((parameter) => parameter.name);
+    const positionalCount = this.leadingPositionalCount(args);
+    if (positionalCount > parameters.length) return false;
+
+    const suppliedNames = new Set<string>();
+    for (const arg of args) {
+      if (!arg.name) continue;
+      if (!parameterNames.includes(arg.name.name)) return false;
+      if (suppliedNames.has(arg.name.name)) return false;
+      suppliedNames.add(arg.name.name);
+    }
+
+    for (const [index, parameter] of parameters.entries()) {
+      if (index < positionalCount && suppliedNames.has(parameter.name)) return false;
+    }
+
+    return parameters.every((parameter, index) => (
+      index < positionalCount
+      || suppliedNames.has(parameter.name)
+      || !!parameter.defaultValue
+    ));
+  }
+
+  private inferCallableParameterTypes(
+    declaration: FunctionDeclaration,
+    args: CallArgument[],
+    scope: SemanticScope,
+    receiverType: SemanticType,
+  ): Map<string, SemanticType> {
+    const parameterTypes = new Map<string, SemanticType>();
+    for (const [index, parameter] of declaration.params.entries()) {
+      if (index === 0) {
+        parameterTypes.set(parameter.name, this.typeFromParameterArgument(parameter, receiverType));
+        continue;
+      }
+
+      const argument = this.getCallArgument(args, parameter.name, index - 1);
+      if (!argument) continue;
+
+      parameterTypes.set(parameter.name, this.typeFromParameterArgument(parameter, this.inferExpressionType(argument, scope)));
+    }
+    return parameterTypes;
+  }
+
+  private typeFromParameterArgument(parameter: FunctionDeclaration['params'][number], argumentType: SemanticType): SemanticType {
+    const annotationType = this.typeFromAnnotation(parameter.typeAnnotation ?? undefined);
+    if (!annotationType) return argumentType;
+    return {
+      ...annotationType,
+      qualifier: annotationType.qualifier ?? argumentType.qualifier,
+    };
   }
 
   private inferArrayElementReadCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
