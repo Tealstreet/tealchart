@@ -7200,8 +7200,9 @@ export class TealscriptEngine {
   private registerTaBuiltins(): void {
     // SMA - Simple Moving Average
     this.builtins.set('ta.sma', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const taSourceLengthArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_sma_source_${callId}`, source, length);
       if (!values) return NaN;
 
@@ -7216,8 +7217,9 @@ export class TealscriptEngine {
 
     // EMA - Exponential Moving Average
     this.builtins.set('ta.ema', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const taSourceLengthArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
 
       if (isNaN(source) || length < 1) return NaN;
       return this.updateBuiltinEmaState(scope, `_ta_ema_${callId}_${length}`, source, length);
@@ -7539,8 +7541,9 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.vwma', (args, namedArgs, ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const taSourceLengthArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_vwma_source_${callId}`, source, length);
       if (!values) return NaN;
 
@@ -8003,8 +8006,9 @@ export class TealscriptEngine {
 
     // MOM - Momentum
     this.builtins.set('ta.mom', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length', 10));
+      const taSourceLengthArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1, 10));
       const values = this.getCompleteSourceWindow(scope, `_ta_mom_source_${callId}`, source, length + 1);
       const prev = values?.[length];
 
@@ -8041,8 +8045,9 @@ export class TealscriptEngine {
     // RMA - Wilder's Smoothed Moving Average (also known as SMMA)
     // Formula: alpha = 1/length, rma = alpha * source + (1 - alpha) * prev_rma
     this.builtins.set('ta.rma', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const taSourceLengthArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
       if (isNaN(source) || length < 1) return NaN;
       const alpha = 1 / length;
 
@@ -8056,8 +8061,9 @@ export class TealscriptEngine {
     // WMA - Weighted Moving Average
     // Formula: wma = sum(source[i] * weight[i]) / sum(weights) where weight = length - i
     this.builtins.set('ta.wma', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const taSourceLengthArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_wma_source_${callId}`, source, length);
       if (!values) return NaN;
 
@@ -8076,7 +8082,8 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.swma', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
+      const taSwmaArgs = ['source'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSwmaArgs, 0));
       const values = this.getCompleteSourceWindow(scope, `_ta_swma_source_${callId}`, source, 4);
       if (!values) return NaN;
 
@@ -8084,11 +8091,12 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.alma', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'series'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
-      const offset = this.toNumber(this.getCallArg(args, namedArgs, 2, 'offset'));
-      const sigma = this.toNumber(this.getCallArg(args, namedArgs, 3, 'sigma'));
-      const useFlooredOffset = this.isTruthy(this.getCallArg(args, namedArgs, 4, 'floor'));
+      const taAlmaArgs = ['series', 'length', 'offset', 'sigma', 'floor'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 1));
+      const offset = this.toNumber(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 2));
+      const sigma = this.toNumber(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 3));
+      const useFlooredOffset = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 4));
       const values = this.getCompleteSourceWindow(scope, `_ta_alma_source_${callId}`, source, length);
       if (!values || isNaN(offset) || !Number.isFinite(sigma) || sigma === 0) return NaN;
 
@@ -8109,8 +8117,9 @@ export class TealscriptEngine {
     // HMA - Hull Moving Average
     // Formula: wma(2 * wma(src, len/2) - wma(src, len), sqrt(len))
     this.builtins.set('ta.hma', (args, namedArgs, ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const taSourceLengthArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
 
       const series = this.getSeriesForSource(source, ctx);
 
@@ -8206,8 +8215,9 @@ export class TealscriptEngine {
     // ROC - Rate of Change (percentage)
     // Formula: (current - previous) / previous * 100
     this.builtins.set('ta.roc', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length', 1));
+      const taSourceLengthArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_roc_source_${callId}`, source, length + 1);
       const prev = values?.[length];
 

@@ -1800,14 +1800,21 @@ tooManyCum = ta.cum(close, open)
     const result = checkProgram(parse(`
 indicator("TA MA Momentum Signatures")
 vwma = ta.vwma(source=close, length=3)
+vwmaMixed = ta.vwma(source=close, 3)
 rma = ta.rma(source=close, length=3)
+rmaMixed = ta.rma(source=close, 3)
 wma = ta.wma(source=close, length=3)
+wmaMixed = ta.wma(source=close, 3)
 swma = ta.swma(source=close)
 alma = ta.alma(series=close, length=5, offset=0.85, sigma=6, floor=false)
+almaMixed = ta.alma(series=close, 5, 0.85, 6, false)
 hma = ta.hma(source=close, length=5)
+hmaMixed = ta.hma(source=close, 5)
 momentum = ta.mom(source=close, length=2)
+momentumMixed = ta.mom(source=close, 2)
 rate = ta.roc(source=close, length=2)
-plot(vwma + rma + wma + swma + alma + hma + momentum + rate)
+rateMixed = ta.roc(source=close, 2)
+plot(vwma + vwmaMixed + rma + rmaMixed + wma + wmaMixed + swma + alma + almaMixed + hma + hmaMixed + momentum + momentumMixed + rate + rateMixed)
 `));
 
     expect(result.diagnostics).toEqual([]);
