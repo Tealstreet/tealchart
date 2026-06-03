@@ -3603,7 +3603,7 @@ class SemanticChecker {
     const objectType = this.inferExpressionType(expression.object, scope);
     if (objectType.kind === 'chart.point') {
       const fieldType = CHART_POINT_FIELD_TYPES.get(expression.property.name);
-      return fieldType ? { kind: fieldType, qualifier: objectType.qualifier } : { kind: 'unknown', qualifier: objectType.qualifier };
+      return fieldType ? { kind: fieldType, qualifier: 'series' } : { kind: 'unknown', qualifier: objectType.qualifier };
     }
     if (objectType.kind !== 'udt' || !objectType.name) return objectType;
 

@@ -1570,9 +1570,9 @@ plot(pointPrice)
     expect(types.get('fromTime')).toMatchObject({ kind: 'chart.point' });
     expect(types.get('copied')).toMatchObject({ kind: 'chart.point' });
     expect(types.get('points')).toMatchObject({ kind: 'array', elementType: { kind: 'chart.point' } });
-    expect(types.get('pointIndex')).toMatchObject({ kind: 'int' });
-    expect(types.get('pointTime')).toMatchObject({ kind: 'int' });
-    expect(types.get('pointPrice')).toMatchObject({ kind: 'float' });
+    expect(types.get('pointIndex')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('pointTime')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('pointPrice')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid chart point helper named arguments', () => {
