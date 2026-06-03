@@ -1063,6 +1063,34 @@ plot(numericResult + collectionResult + whileResult)
     expect(types.get('mixedResult')).toMatchObject({ kind: 'unknown', qualifier: 'series' });
   });
 
+  it('infers direct loop expression types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Direct Loop Expression Types")
+numericResult = for i = 0 to 2
+    close + i
+i = 0
+whileResult = while i < 3
+    i += 1
+    i
+simple int simpleWhile = while bar_index < 3
+    1
+numericResult := "bad"
+whileResult := "bad"
+plot(numericResult + whileResult + simpleWhile)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign series value to simple int',
+      'Cannot assign string value to float variable numericResult',
+      'Cannot assign string value to int variable whileResult',
+    ]);
+    expect(types.get('numericResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('whileResult')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('simpleWhile')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+  });
+
   it('infers compatible ternary expression types for downstream diagnostics', () => {
     const result = checkProgram(parse(`
 indicator("Ternary Expression Types")
