@@ -746,6 +746,50 @@ plot(priceValue + pivotValue)
     expect(types.get('pivotTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
   });
 
+  it('infers tuple destructuring element types from user method control-flow tuple returns', () => {
+    const result = checkProgram(parse(`
+indicator("Method Control Tuple Types")
+method branchPair(float this, bool enabled) =>
+    if enabled
+        [this, "up"]
+    else
+        [this + 1, "down"]
+method loopPair(float this, int limit) =>
+    for i = 0 to limit
+        [this + i, "loop"]
+method switchPair(float this, string mode) => switch mode
+    "wide" => [1, "wide"]
+    => [this, "default"]
+[branchValue, branchTitle] = close.branchPair(close > open)
+[loopValue, loopTitle] = close.loopPair(2)
+[switchValue, switchTitle] = close.switchPair("wide")
+branchValue := "bad"
+branchTitle := 1
+loopValue := "bad"
+loopTitle := 2
+switchValue := "bad"
+switchTitle := 3
+plot(branchValue + loopValue + switchValue)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable branchValue',
+      'Cannot assign int value to string variable branchTitle',
+      'Cannot assign string value to float variable loopValue',
+      'Cannot assign int value to string variable loopTitle',
+      'Cannot assign string value to float variable switchValue',
+      'Cannot assign int value to string variable switchTitle',
+    ]);
+    expect(types.get('branchValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('branchTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('loopValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('loopTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('switchValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('switchTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+  });
+
   it('reports assignments to undeclared identifiers', () => {
     const result = checkProgram(parse(`
 indicator("Unknown Assignment")
