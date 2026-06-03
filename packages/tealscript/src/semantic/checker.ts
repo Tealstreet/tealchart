@@ -636,9 +636,9 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   [
     'table.cell',
     {
-      params: ['table_id', 'column', 'row', 'text', 'width', 'height', 'text_color', 'text_halign', 'text_valign', 'text_size', 'bgcolor', 'text_font_family', 'text_formatting'],
+      params: ['table_id', 'column', 'row', 'text', 'width', 'height', 'text_color', 'text_halign', 'text_valign', 'text_size', 'bgcolor', 'text_font_family', 'text_formatting', 'tooltip'],
       minArgs: 3,
-      maxArgs: 13,
+      maxArgs: 14,
       allowNamedPrefixWithPositional: true,
     },
   ],
@@ -652,6 +652,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['table.cell_set_text_valign', { params: ['table_id', 'column', 'row', 'text_valign'], minArgs: 4, maxArgs: 4, allowNamedPrefixWithPositional: true }],
   ['table.cell_set_text_font_family', { params: ['table_id', 'column', 'row', 'text_font_family'], minArgs: 4, maxArgs: 4, allowNamedPrefixWithPositional: true }],
   ['table.cell_set_text_formatting', { params: ['table_id', 'column', 'row', 'text_formatting'], minArgs: 4, maxArgs: 4, allowNamedPrefixWithPositional: true }],
+  ['table.cell_set_tooltip', { params: ['table_id', 'column', 'row', 'tooltip'], minArgs: 4, maxArgs: 4, allowNamedPrefixWithPositional: true }],
   [
     'plot',
     {

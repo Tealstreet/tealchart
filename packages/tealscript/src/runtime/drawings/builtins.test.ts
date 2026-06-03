@@ -921,7 +921,7 @@ if barstate.islast
     table.set_frame_width(stats, 3)
     table.set_border_color(stats, color.white)
     table.set_border_width(stats, 2)
-    table.cell(stats, 0, 0, "ATR", text_color=color.white, bgcolor=color.blue)
+    table.cell(stats, 0, 0, "ATR", text_color=color.white, bgcolor=color.blue, tooltip="ATR details")
     table.cell(stats, 1, 0, str.tostring(close), text_halign=text.align_right, text_size=size.large)
     table.cell_set_text(stats, 1, 0, "last")
     table.cell_set_bgcolor(stats, 1, 0, color.green)
@@ -932,6 +932,9 @@ if barstate.islast
     table.cell_set_text_valign(stats, 1, 0, text.align_bottom)
     table.cell_set_text_font_family(stats, 1, 0, font.family_monospace)
     table.cell_set_text_formatting(stats, 1, 0, text.format_bold + text.format_italic)
+    table.cell_set_tooltip(stats, 1, 0, "Close details")
+    table.cell_set_tooltip(stats, 0, 1, "Created details")
+    table.cell_set_tooltip(stats, 0, 1, na)
     table.cell_set_text(stats, 0, 1, "created")
     table.delete(stale)
 plot(close)
@@ -968,6 +971,7 @@ plot(array.size(table.all), title="Tables")`;
               textHalign: 'center',
               textValign: 'middle',
               textSize: 'normal',
+              tooltip: 'ATR details',
               bgcolor: '#2196F3',
             },
             {
@@ -982,6 +986,7 @@ plot(array.size(table.all), title="Tables")`;
               textFontFamily: 'monospace',
               textFormatting: 'bolditalic',
               textSize: 'large',
+              tooltip: 'Close details',
               bgcolor: '#4CAF50',
             },
             {
@@ -994,6 +999,7 @@ plot(array.size(table.all), title="Tables")`;
               textHalign: 'center',
               textValign: 'middle',
               textSize: 'normal',
+              tooltip: undefined,
               bgcolor: null,
             },
           ],

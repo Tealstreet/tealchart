@@ -111,6 +111,7 @@ export interface TableCellDrawingOutput {
   textValign: string;
   textFontFamily?: string;
   textFormatting?: string;
+  tooltip?: string;
   bgcolor: string | null;
 }
 
