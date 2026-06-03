@@ -6821,22 +6821,51 @@ export class TealscriptEngine {
     this.builtins.set('settlement_as_close.off', () => 'off');
     this.builtins.set('settlement_as_close.inherit', () => 'inherit');
 
+    const tickerNewArgs = [['prefix'], ['ticker'], ['session'], ['adjustment'], ['backadjustment'], ['settlement_as_close']] as const;
+    const tickerModifyArgs = [['tickerid'], ['session'], ['adjustment'], ['backadjustment'], ['settlement_as_close']] as const;
+    const tickerSymbolArgs = [['symbol', 'tickerid']] as const;
+    const tickerInheritArgs = [['from_tickerid'], ['symbol']] as const;
+    const tickerRenkoArgs = [['symbol', 'tickerid'], ['style'], ['param'], ['request_wicks'], ['source']] as const;
+    const tickerLinebreakArgs = [['symbol', 'tickerid'], ['number_of_lines']] as const;
+    const tickerKagiArgs = [['symbol', 'tickerid'], ['style'], ['param', 'reversal', 'reversal_amount']] as const;
+    const tickerPointfigureArgs = [['symbol', 'tickerid'], ['source'], ['style'], ['param'], ['reversal']] as const;
+    const getOrderedTickerArg = (
+      args: unknown[],
+      namedArgs: Map<string, unknown>,
+      params: readonly (readonly string[])[],
+      index: number,
+      fallback?: unknown,
+    ): unknown => {
+      const names = params[index] ?? [];
+      const matches = names.filter((name) => namedArgs.has(name));
+      if (matches.length > 1) {
+        throw new Error(`Ticker argument was supplied multiple times: ${matches.join(', ')}`);
+      }
+      if (matches.length === 1) return namedArgs.get(matches[0]);
+
+      const priorNamedCount = params
+        .slice(0, index)
+        .filter((priorNames) => priorNames.some((name) => namedArgs.has(name))).length;
+      const positionalIndex = index - priorNamedCount;
+      return args[positionalIndex] !== undefined ? args[positionalIndex] : fallback;
+    };
+
     this.builtins.set('ticker.new', (args, namedArgs) => {
-      const prefix = this.toStringValue(namedArgs.get('prefix') ?? args[0] ?? '');
-      const ticker = this.toStringValue(namedArgs.get('ticker') ?? args[1] ?? '');
-      const session = this.normalizeTickerSession(namedArgs.get('session') ?? args[2]);
+      const prefix = this.toStringValue(getOrderedTickerArg(args, namedArgs, tickerNewArgs, 0, ''));
+      const ticker = this.toStringValue(getOrderedTickerArg(args, namedArgs, tickerNewArgs, 1, ''));
+      const session = this.normalizeTickerSession(getOrderedTickerArg(args, namedArgs, tickerNewArgs, 2));
       const adjustment = this.normalizeTickerModifier(
-        namedArgs.get('adjustment') ?? args[3],
+        getOrderedTickerArg(args, namedArgs, tickerNewArgs, 3),
         'adjustment',
         ['none', 'splits', 'dividends'],
       );
       const backadjustment = this.normalizeTickerModifier(
-        namedArgs.get('backadjustment') ?? args[4],
+        getOrderedTickerArg(args, namedArgs, tickerNewArgs, 4),
         'backadjustment',
         ['on', 'off', 'inherit'],
       );
       const settlementAsClose = this.normalizeTickerModifier(
-        namedArgs.get('settlement_as_close') ?? args[5],
+        getOrderedTickerArg(args, namedArgs, tickerNewArgs, 5),
         'settlement_as_close',
         ['on', 'off', 'inherit'],
       );
@@ -6849,34 +6878,38 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ticker.modify', (args, namedArgs) => {
-      const tickerId = this.toStringValue(namedArgs.get('tickerid') ?? args[0] ?? '');
+      const tickerId = this.toStringValue(getOrderedTickerArg(args, namedArgs, tickerModifyArgs, 0, ''));
       const current = this.parseTickerModifierMap(
         this.parseTickerModifierParts(tickerId, 'ticker.modify').modifiers,
       );
-      const hasSession = namedArgs.has('session') || args[1] !== undefined;
-      const hasAdjustment = namedArgs.has('adjustment') || args[2] !== undefined;
-      const hasBackadjustment = namedArgs.has('backadjustment') || args[3] !== undefined;
-      const hasSettlementAsClose = namedArgs.has('settlement_as_close') || args[4] !== undefined;
+      const sessionArg = getOrderedTickerArg(args, namedArgs, tickerModifyArgs, 1);
+      const adjustmentArg = getOrderedTickerArg(args, namedArgs, tickerModifyArgs, 2);
+      const backadjustmentArg = getOrderedTickerArg(args, namedArgs, tickerModifyArgs, 3);
+      const settlementAsCloseArg = getOrderedTickerArg(args, namedArgs, tickerModifyArgs, 4);
+      const hasSession = sessionArg !== undefined;
+      const hasAdjustment = adjustmentArg !== undefined;
+      const hasBackadjustment = backadjustmentArg !== undefined;
+      const hasSettlementAsClose = settlementAsCloseArg !== undefined;
       const session = hasSession
-        ? this.normalizeTickerSession(namedArgs.get('session') ?? args[1])
+        ? this.normalizeTickerSession(sessionArg)
         : this.normalizeTickerSession(current.get('session'));
       const adjustment = hasAdjustment
         ? this.normalizeTickerModifier(
-          namedArgs.get('adjustment') ?? args[2],
+          adjustmentArg,
           'adjustment',
           ['none', 'splits', 'dividends'],
         )
         : this.normalizeTickerModifier(current.get('adjustment'), 'adjustment', ['none', 'splits', 'dividends']);
       const backadjustment = hasBackadjustment
         ? this.normalizeTickerModifier(
-          namedArgs.get('backadjustment') ?? args[3],
+          backadjustmentArg,
           'backadjustment',
           ['on', 'off', 'inherit'],
         )
         : this.normalizeTickerModifier(current.get('backadjustment'), 'backadjustment', ['on', 'off', 'inherit']);
       const settlementAsClose = hasSettlementAsClose
         ? this.normalizeTickerModifier(
-          namedArgs.get('settlement_as_close') ?? args[4],
+          settlementAsCloseArg,
           'settlement_as_close',
           ['on', 'off', 'inherit'],
         )
@@ -6894,51 +6927,51 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ticker.standard', (args, namedArgs) => {
-      const tickerId = this.toStringValue(namedArgs.get('symbol') ?? namedArgs.get('tickerid') ?? args[0] ?? '');
+      const tickerId = this.toStringValue(getOrderedTickerArg(args, namedArgs, tickerSymbolArgs, 0, ''));
       return this.parseTickerModifierParts(tickerId, 'ticker.standard').base;
     });
 
     this.builtins.set('ticker.inherit', (args, namedArgs) => {
-      const fromTickerId = this.toStringValue(namedArgs.get('from_tickerid') ?? args[0] ?? '');
-      const symbol = this.toStringValue(namedArgs.get('symbol') ?? args[1] ?? '');
+      const fromTickerId = this.toStringValue(getOrderedTickerArg(args, namedArgs, tickerInheritArgs, 0, ''));
+      const symbol = this.toStringValue(getOrderedTickerArg(args, namedArgs, tickerInheritArgs, 1, ''));
       const source = this.parseTickerModifierParts(fromTickerId, 'ticker.inherit');
       const target = this.parseTickerModifierParts(symbol, 'ticker.inherit');
       return source.modifiers.length === 0 ? target.base : `${target.base}|${source.modifiers.join('|')}`;
     });
 
     this.builtins.set('ticker.heikinashi', (args, namedArgs) => {
-      const tickerId = this.toStringValue(namedArgs.get('symbol') ?? namedArgs.get('tickerid') ?? args[0] ?? '');
+      const tickerId = this.toStringValue(getOrderedTickerArg(args, namedArgs, tickerSymbolArgs, 0, ''));
       return this.applyTickerChart(tickerId, 'heikinashi');
     });
 
     this.builtins.set('ticker.renko', (args, namedArgs) => {
-      const tickerId = this.toStringValue(namedArgs.get('symbol') ?? namedArgs.get('tickerid') ?? args[0] ?? '');
-      const style = this.toStringValue(namedArgs.get('style') ?? args[1] ?? '');
-      const param = namedArgs.get('param') ?? args[2];
-      const requestWicks = namedArgs.get('request_wicks') ?? args[3];
-      const source = namedArgs.get('source') ?? args[4];
+      const tickerId = this.toStringValue(getOrderedTickerArg(args, namedArgs, tickerRenkoArgs, 0, ''));
+      const style = this.toStringValue(getOrderedTickerArg(args, namedArgs, tickerRenkoArgs, 1, ''));
+      const param = getOrderedTickerArg(args, namedArgs, tickerRenkoArgs, 2);
+      const requestWicks = getOrderedTickerArg(args, namedArgs, tickerRenkoArgs, 3);
+      const source = getOrderedTickerArg(args, namedArgs, tickerRenkoArgs, 4);
       return this.applyTickerChart(tickerId, 'renko', [style, param, requestWicks, source]);
     });
 
     this.builtins.set('ticker.linebreak', (args, namedArgs) => {
-      const tickerId = this.toStringValue(namedArgs.get('symbol') ?? namedArgs.get('tickerid') ?? args[0] ?? '');
-      const numberOfLines = namedArgs.get('number_of_lines') ?? args[1];
+      const tickerId = this.toStringValue(getOrderedTickerArg(args, namedArgs, tickerLinebreakArgs, 0, ''));
+      const numberOfLines = getOrderedTickerArg(args, namedArgs, tickerLinebreakArgs, 1);
       return this.applyTickerChart(tickerId, 'linebreak', [numberOfLines]);
     });
 
     this.builtins.set('ticker.kagi', (args, namedArgs) => {
-      const tickerId = this.toStringValue(namedArgs.get('symbol') ?? namedArgs.get('tickerid') ?? args[0] ?? '');
-      const style = namedArgs.get('style') ?? args[1];
-      const param = namedArgs.get('param') ?? namedArgs.get('reversal') ?? namedArgs.get('reversal_amount') ?? args[2];
+      const tickerId = this.toStringValue(getOrderedTickerArg(args, namedArgs, tickerKagiArgs, 0, ''));
+      const style = getOrderedTickerArg(args, namedArgs, tickerKagiArgs, 1);
+      const param = getOrderedTickerArg(args, namedArgs, tickerKagiArgs, 2);
       return this.applyTickerChart(tickerId, 'kagi', [style, param]);
     });
 
     this.builtins.set('ticker.pointfigure', (args, namedArgs) => {
-      const tickerId = this.toStringValue(namedArgs.get('symbol') ?? namedArgs.get('tickerid') ?? args[0] ?? '');
-      const source = this.toStringValue(namedArgs.get('source') ?? args[1] ?? '');
-      const style = this.toStringValue(namedArgs.get('style') ?? args[2] ?? '');
-      const param = namedArgs.get('param') ?? args[3];
-      const reversal = namedArgs.get('reversal') ?? args[4];
+      const tickerId = this.toStringValue(getOrderedTickerArg(args, namedArgs, tickerPointfigureArgs, 0, ''));
+      const source = this.toStringValue(getOrderedTickerArg(args, namedArgs, tickerPointfigureArgs, 1, ''));
+      const style = this.toStringValue(getOrderedTickerArg(args, namedArgs, tickerPointfigureArgs, 2, ''));
+      const param = getOrderedTickerArg(args, namedArgs, tickerPointfigureArgs, 3);
+      const reversal = getOrderedTickerArg(args, namedArgs, tickerPointfigureArgs, 4);
       return this.applyTickerChart(tickerId, 'pointfigure', [source, style, param, reversal]);
     });
   }

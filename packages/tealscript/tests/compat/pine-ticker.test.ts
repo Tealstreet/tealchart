@@ -269,24 +269,40 @@ plot(pnfClose, title="PnF Close")
     const result = runCompatScript(`
 indicator("Named ticker helper requests")
 baseTicker = ticker.new(prefix="NASDAQ", ticker="AAPL", session=session.extended)
+prefixBaseTicker = ticker.new(prefix="NASDAQ", "AAPL", session.extended)
 modifiedTicker = ticker.modify(tickerid=baseTicker, adjustment=adjustment.splits, backadjustment=backadjustment.on, settlement_as_close=settlement_as_close.off)
+prefixModifiedTicker = ticker.modify(tickerid=prefixBaseTicker, session.extended, adjustment.splits, backadjustment.on, settlement_as_close.off)
 haTicker = ticker.heikinashi(symbol=baseTicker)
 renkoTicker = ticker.renko(symbol="NASDAQ:AAPL", style="ATR", param=10)
+prefixRenkoTicker = ticker.renko(symbol="NASDAQ:AAPL", "ATR", 10)
 lineBreakTicker = ticker.linebreak(symbol="NASDAQ:AAPL", number_of_lines=3)
+prefixLineBreakTicker = ticker.linebreak(symbol="NASDAQ:AAPL", 3)
 kagiTicker = ticker.kagi(symbol="NASDAQ:AAPL", style="ATR", param=10)
+prefixKagiTicker = ticker.kagi(symbol="NASDAQ:AAPL", "ATR", 10)
 pnfTicker = ticker.pointfigure(symbol="NASDAQ:AAPL", source="hl", style="ATR", param=14, reversal=3)
+prefixPnfTicker = ticker.pointfigure(symbol="NASDAQ:AAPL", "hl", "ATR", 14, 3)
 modifiedClose = request.security(modifiedTicker, "1", close, lookahead=barmerge.lookahead_on)
+prefixModifiedClose = request.security(prefixModifiedTicker, "1", close, lookahead=barmerge.lookahead_on)
 haClose = request.security(haTicker, "1", close, lookahead=barmerge.lookahead_on)
 renkoClose = request.security(renkoTicker, "1", close, lookahead=barmerge.lookahead_on)
+prefixRenkoClose = request.security(prefixRenkoTicker, "1", close, lookahead=barmerge.lookahead_on)
 lineBreakClose = request.security(lineBreakTicker, "1", close, lookahead=barmerge.lookahead_on)
+prefixLineBreakClose = request.security(prefixLineBreakTicker, "1", close, lookahead=barmerge.lookahead_on)
 kagiClose = request.security(kagiTicker, "1", close, lookahead=barmerge.lookahead_on)
+prefixKagiClose = request.security(prefixKagiTicker, "1", close, lookahead=barmerge.lookahead_on)
 pnfClose = request.security(pnfTicker, "1", close, lookahead=barmerge.lookahead_on)
+prefixPnfClose = request.security(prefixPnfTicker, "1", close, lookahead=barmerge.lookahead_on)
 plot(modifiedClose, title="Named Modified Close")
+plot(prefixModifiedClose, title="Prefix Modified Close")
 plot(haClose, title="Named HA Close")
 plot(renkoClose, title="Named Renko Close")
+plot(prefixRenkoClose, title="Prefix Renko Close")
 plot(lineBreakClose, title="Named Line Break Close")
+plot(prefixLineBreakClose, title="Prefix Line Break Close")
 plot(kagiClose, title="Named Kagi Close")
+plot(prefixKagiClose, title="Prefix Kagi Close")
 plot(pnfClose, title="Named PnF Close")
+plot(prefixPnfClose, title="Prefix PnF Close")
 `, {
       bars: chartBars,
       engineOptions: { requestDatafeed: sessionRequestDatafeed() },
@@ -294,10 +310,15 @@ plot(pnfClose, title="Named PnF Close")
 
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Named Modified Close').values).toEqual([301, 302, 303]);
+    expect(getPlot(result, 'Prefix Modified Close').values).toEqual([301, 302, 303]);
     expect(getPlot(result, 'Named HA Close').values).toEqual([200.5, 201.5, 202.5]);
     expect(getPlot(result, 'Named Renko Close').values).toEqual([182, 184, 182]);
+    expect(getPlot(result, 'Prefix Renko Close').values).toEqual([182, 184, 182]);
     expect(getPlot(result, 'Named Line Break Close').values).toEqual([211, 212, 213]);
+    expect(getPlot(result, 'Prefix Line Break Close').values).toEqual([211, 212, 213]);
     expect(getPlot(result, 'Named Kagi Close').values).toEqual([222, 224, 223]);
+    expect(getPlot(result, 'Prefix Kagi Close').values).toEqual([222, 224, 223]);
     expect(getPlot(result, 'Named PnF Close').values).toEqual([235, 240, 235]);
+    expect(getPlot(result, 'Prefix PnF Close').values).toEqual([235, 240, 235]);
   });
 });
