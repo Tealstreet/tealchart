@@ -69,8 +69,9 @@ Covered behavior and remaining gaps:
   and compatible if/else plus partial-if user-function tuple returns, direct
   user-function loop and defaulted or partial switch tuple returns, compatible
   user-method tuple returns, and supported tuple-returning TA calls, so
-  downstream assignment diagnostics can use destructured names. Direct control
-  initializer tuple arms diagnose obvious non-tuple and arity mismatches.
+  downstream assignment diagnostics can use destructured names. Direct tuple
+  initializers and direct control initializer tuple arms diagnose obvious
+  non-tuple and arity mismatches.
 - Operator line continuations are supported after arithmetic, comparison,
   logical, unary, and ternary operators. Leading comparison, logical,
   multiplicative, `+`, and ternary operators are also supported. Leading `-`

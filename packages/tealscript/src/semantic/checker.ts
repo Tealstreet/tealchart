@@ -1819,7 +1819,8 @@ class SemanticChecker {
   }
 
   private checkTupleInitializerShape(tuple: TupleDeclarator, init: Expression | IfStatement): void {
-    const armShapes = this.tupleInitializerArmShapes(init);
+    const armShapes = this.tupleInitializerArmShapes(init)
+      ?? (init.type === 'IfStatement' ? undefined : [this.tupleInitializerShapeFromExpression(init)]);
     if (!armShapes) return;
 
     const expectedArity = tuple.names.length;
