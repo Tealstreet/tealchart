@@ -868,11 +868,17 @@ mixedValue = switch mode
     => "bad"
 partialValue = switch mode
     "price" => close
+partialBlockValue = switch mode
+    "price" =>
+        basis = close + 1
+        basis
+simple float simpleValue = 1
 keyedValue := "bad"
 conditionTitle := 1
 blockValue := "bad"
 mixedValue := "still unknown"
 partialValue := "still unknown"
+simpleValue := partialBlockValue
 plot(keyedValue + blockValue)
 `));
 
@@ -882,12 +888,14 @@ plot(keyedValue + blockValue)
       'Cannot assign string value to float variable keyedValue',
       'Cannot assign int value to string variable conditionTitle',
       'Cannot assign string value to float variable blockValue',
+      'Cannot assign series value to simple float variable simpleValue',
     ]);
     expect(types.get('keyedValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('conditionTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('blockValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('mixedValue')).toMatchObject({ kind: 'unknown' });
     expect(types.get('partialValue')).toMatchObject({ kind: 'unknown' });
+    expect(types.get('partialBlockValue')).toMatchObject({ kind: 'unknown', qualifier: 'series' });
   });
 
   it('reports plain identifier reassignment qualifier mismatches', () => {

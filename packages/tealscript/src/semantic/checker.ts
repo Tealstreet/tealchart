@@ -3283,9 +3283,11 @@ class SemanticChecker {
     return this.maxQualifier(
       { kind: 'unknown', qualifier: this.inferSwitchControlQualifier(expression, scope) },
       ...expression.cases.flatMap((switchCase) => {
-        const caseTypes: SemanticType[] = [];
-        if (!Array.isArray(switchCase.consequent)) caseTypes.push(this.inferExpressionType(switchCase.consequent, scope));
-        return caseTypes;
+        const caseScope = new SemanticScope(scope);
+        const caseType = Array.isArray(switchCase.consequent)
+          ? this.inferExpressionTypeFromStatements(switchCase.consequent, caseScope)
+          : this.inferExpressionType(switchCase.consequent, caseScope);
+        return caseType ? [caseType] : [];
       }),
     );
   }
