@@ -555,6 +555,66 @@ plot(markerValue)
     expect(types.get('unknownTitle')).toMatchObject({ kind: 'unknown' });
   });
 
+  it('infers tuple destructuring element types from compatible user function branch tuple returns', () => {
+    const result = checkProgram(parse(`
+indicator("Branch Tuple Types")
+branchPair(float value, bool enabled) =>
+    if enabled
+        [value, "up"]
+    else
+        [value + 1, "down"]
+layeredPair(float value, int mode) =>
+    if mode == 1
+        [value, "one"]
+    else if mode == 2
+        [value + 1, "two"]
+    else
+        [value + 2, "other"]
+wideningPair(float value, bool enabled) =>
+    if enabled
+        [1, "one"]
+    else
+        [value, "float"]
+conflictingPair(bool enabled) =>
+    if enabled
+        [1, "one"]
+    else
+        ["bad", 2]
+[branchValue, branchTitle] = branchPair(close, close > open)
+[layeredValue, layeredTitle] = layeredPair(close, 2)
+[widenedValue, widenedTitle] = wideningPair(close, close > open)
+[unknownValue, unknownTitle] = conflictingPair(close > open)
+branchValue := "bad"
+branchTitle := 1
+layeredValue := "bad"
+layeredTitle := 2
+widenedValue := "bad"
+widenedTitle := 3
+unknownValue := "still unknown"
+unknownTitle := 3
+plot(branchValue + layeredValue + widenedValue)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable branchValue',
+      'Cannot assign int value to string variable branchTitle',
+      'Cannot assign string value to float variable layeredValue',
+      'Cannot assign int value to string variable layeredTitle',
+      'Cannot assign string value to float variable widenedValue',
+      'Cannot assign int value to string variable widenedTitle',
+    ]);
+    expect(types.get('branchValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('branchTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('layeredValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('layeredTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('widenedValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('widenedTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('unknownValue')).toMatchObject({ kind: 'unknown' });
+    expect(types.get('unknownTitle')).toMatchObject({ kind: 'unknown' });
+  });
+
   it('infers tuple destructuring element types from direct user method tuple returns', () => {
     const result = checkProgram(parse(`
 indicator("Method Tuple Types")
