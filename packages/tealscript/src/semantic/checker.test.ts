@@ -898,6 +898,65 @@ plot(keyedValue + blockValue)
     expect(types.get('partialBlockValue')).toMatchObject({ kind: 'unknown', qualifier: 'series' });
   });
 
+  it('infers compatible user function if expression types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("If Expression Types")
+branchValue(float value, bool enabled) =>
+    if enabled
+        value
+    else
+        1
+layeredTitle(bool up, bool down) =>
+    if up
+        "up"
+    else if down
+        "down"
+    else
+        "flat"
+blockValue(float value, bool enabled) =>
+    if enabled
+        basis = value + 1
+        basis
+    else
+        value
+mixedValue(float value, bool enabled) =>
+    if enabled
+        value
+    else
+        "bad"
+partialValue(float value, bool enabled) =>
+    if enabled
+        value
+priceValue = branchValue(close, close > open)
+title = layeredTitle(close > open, close < open)
+blockResult = blockValue(close, close > open)
+mixedResult = mixedValue(close, close > open)
+partialResult = partialValue(close, close > open)
+simple float simpleValue = 1
+priceValue := "bad"
+title := 1
+blockResult := "bad"
+mixedResult := "still unknown"
+partialResult := "still unknown"
+simpleValue := partialResult
+plot(priceValue + blockResult)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable priceValue',
+      'Cannot assign int value to string variable title',
+      'Cannot assign string value to float variable blockResult',
+      'Cannot assign series value to simple float variable simpleValue',
+    ]);
+    expect(types.get('priceValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('title')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('blockResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedResult')).toMatchObject({ kind: 'unknown' });
+    expect(types.get('partialResult')).toMatchObject({ kind: 'unknown', qualifier: 'series' });
+  });
+
   it('infers compatible ternary expression types for downstream diagnostics', () => {
     const result = checkProgram(parse(`
 indicator("Ternary Expression Types")
