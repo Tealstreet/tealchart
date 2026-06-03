@@ -152,7 +152,8 @@ The common string helper pass covers `str.tostring`, `str.tonumber`,
 `str.substring`, `str.match`, `str.split`, `str.upper`, `str.lower`,
 `str.trim`, `str.replace`, `str.replace_all`, and `str.repeat`. These helpers
 support generated indicators that assemble labels, table text, and debug
-strings.
+strings. Semantic analysis preserves known string helper return types for
+downstream assignment diagnostics, including `str.split()` array element types.
 
 ## Common `input.*` Coverage
 

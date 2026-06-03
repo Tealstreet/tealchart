@@ -3781,6 +3781,70 @@ plot(parsed + position + prefixPosition + str.length(string=formatted + prefixFo
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('infers string helper return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("String Return Types")
+text = "BTC-USDT"
+seriesText = str.tostring(close)
+formatted = str.format(format="close={0}", close)
+timeText = str.format_time(time=time)
+parsed = str.tonumber("42.5")
+length = str.length(text)
+position = str.pos(source=text, str="USDT")
+hasUsdt = str.contains(source=text, str="USDT")
+starts = str.startswith(source=text, str="BTC")
+prefix = str.substring(source=text, begin_pos=0, end_pos=3)
+matched = str.match(source="Trade NASDAQ:AAPL", regex="[A-Z]+:[A-Z]+")
+repeated = str.repeat(source="?", repeat_count=3, separator=",")
+upper = str.upper(text)
+parts = str.split(source=text, separator="-")
+seriesText := 1
+formatted := 2
+timeText := 3
+parsed := "bad"
+length := "bad"
+position := "bad"
+hasUsdt := 1
+starts := 2
+prefix := 4
+matched := 5
+repeated := 6
+upper := 7
+plot(parsed + length + position + array.size(parts))
+plot(hasUsdt and starts ? 1 : 0)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign int value to string variable seriesText',
+      'Cannot assign int value to string variable formatted',
+      'Cannot assign int value to string variable timeText',
+      'Cannot assign string value to float variable parsed',
+      'Cannot assign string value to int variable length',
+      'Cannot assign string value to int variable position',
+      'Cannot assign int value to bool variable hasUsdt',
+      'Cannot assign int value to bool variable starts',
+      'Cannot assign int value to string variable prefix',
+      'Cannot assign int value to string variable matched',
+      'Cannot assign int value to string variable repeated',
+      'Cannot assign int value to string variable upper',
+    ]);
+    expect(types.get('seriesText')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('formatted')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('timeText')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('parsed')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('length')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('position')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('hasUsdt')).toMatchObject({ kind: 'bool', qualifier: 'const' });
+    expect(types.get('starts')).toMatchObject({ kind: 'bool', qualifier: 'const' });
+    expect(types.get('prefix')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('matched')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('repeated')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('upper')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('parts')).toMatchObject({ kind: 'array', qualifier: 'const', elementType: { kind: 'string' } });
+  });
+
   it('reports invalid string helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Bad String Signatures")
