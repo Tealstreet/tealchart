@@ -954,6 +954,7 @@ halfTick = math.round_to_mintick(number=1.005)
 residueTick = math.round_to_mintick(1.2000000000000002)
 sparse = bar_index == 2 ? na : close
 seededRandom = math.random(10, 20, 7)
+prefixSeededRandom = math.random(min=10, 20, 7)
 defaultRandom = math.random()
 plot(rounded, title="Rounded Midpoint")
 plot(math.trunc(-1.9), title="Truncated")
@@ -964,11 +965,15 @@ plot(residueTick, title="Residue Tick")
 plot(math.round(math.toradians(180), 6), title="Radians")
 plot(math.sum(sparse, 3), title="Sparse Sum")
 plot(math.round(number=math.pi, precision=3), title="Named Round")
+plot(math.round(number=math.pi, 3), title="Prefix Round")
 plot(math.pow(base=2, exponent=3), title="Named Pow")
+plot(math.pow(base=2, 3), title="Prefix Pow")
 plot(math.sqrt(number=16), title="Named Sqrt")
 plot(math.sum(source=sparse, length=3), title="Named Sparse Sum")
+plot(math.sum(source=sparse, 3), title="Prefix Sparse Sum")
 plot(math.floor(number=-1.2) + math.ceil(number=1.2) + math.sign(number=-5), title="Named Unary")
 plot(seededRandom > 10 and seededRandom < 20 ? 1 : 0, title="Seeded Random In Range")
+plot(prefixSeededRandom > 10 and prefixSeededRandom < 20 ? 1 : 0, title="Prefix Seeded Random In Range")
 plot(defaultRandom > 0 and defaultRandom < 1 ? 1 : 0, title="Default Random In Range")
 `);
 
@@ -982,11 +987,15 @@ plot(defaultRandom > 0 and defaultRandom < 1 ? 1 : 0, title="Default Random In R
     expect(roundSeries(getPlot(result, 'Radians').values, 6)).toEqual([3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593, 3.141593]);
     expect(roundSeries(getPlot(result, 'Sparse Sum').values)).toEqual([null, null, null, 310, 307, 302, 303, 313, 321, 328, 329, 333]);
     expect(roundSeries(getPlot(result, 'Named Round').values)).toEqual([3.142, 3.142, 3.142, 3.142, 3.142, 3.142, 3.142, 3.142, 3.142, 3.142, 3.142, 3.142]);
+    expect(roundSeries(getPlot(result, 'Prefix Round').values)).toEqual(Array(compatibilityBars.length).fill(3.142));
     expect(roundSeries(getPlot(result, 'Named Pow').values)).toEqual([8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]);
+    expect(roundSeries(getPlot(result, 'Prefix Pow').values)).toEqual(Array(compatibilityBars.length).fill(8));
     expect(roundSeries(getPlot(result, 'Named Sqrt').values)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
     expect(roundSeries(getPlot(result, 'Named Sparse Sum').values)).toEqual(roundSeries(getPlot(result, 'Sparse Sum').values));
+    expect(roundSeries(getPlot(result, 'Prefix Sparse Sum').values)).toEqual(roundSeries(getPlot(result, 'Sparse Sum').values));
     expect(roundSeries(getPlot(result, 'Named Unary').values)).toEqual([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
     expect(getPlot(result, 'Seeded Random In Range').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Prefix Seeded Random In Range').values).toEqual(Array(compatibilityBars.length).fill(1));
     expect(getPlot(result, 'Default Random In Range').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
   });
 
