@@ -211,6 +211,20 @@ const STRING_INTEGER_RETURN_FUNCTIONS = new Set([
   'str.pos',
 ]);
 
+const INPUT_RETURN_TYPES = new Map<string, SemanticTypeKind>([
+  ['input.bool', 'bool'],
+  ['input.color', 'color'],
+  ['input.float', 'float'],
+  ['input.int', 'int'],
+  ['input.price', 'float'],
+  ['input.session', 'string'],
+  ['input.string', 'string'],
+  ['input.symbol', 'string'],
+  ['input.text_area', 'string'],
+  ['input.time', 'int'],
+  ['input.timeframe', 'string'],
+]);
+
 const FLOAT_RETURN_FUNCTIONS = new Set([
   'ta.alma',
   'ta.atr',
@@ -3103,6 +3117,13 @@ class SemanticChecker {
     if (STRING_INTEGER_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'int', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
     if (calleeName === 'str.split') {
       return { kind: 'array', elementType: { kind: 'string' }, qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+    }
+    const inputReturnType = INPUT_RETURN_TYPES.get(calleeName);
+    if (inputReturnType) return { kind: inputReturnType, qualifier: 'input' };
+    if (calleeName === 'input.source') {
+      const sourceArgument = this.getCallArgument(expression.arguments, 'defval', 0);
+      const sourceType = sourceArgument ? this.inferExpressionType(sourceArgument, scope) : { kind: 'unknown' as const };
+      return { ...sourceType, qualifier: 'series' };
     }
     if (FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: 'series' };
     if (calleeName === 'label.get_x') return { kind: 'int' };
