@@ -1239,12 +1239,16 @@ class SemanticChecker {
   private rootScope = new SemanticScope();
   private typeDeclarations = new Map<string, TypeDeclaration>();
   private methodDeclarations = new Map<string, FunctionDeclaration[]>();
+  private functionParentScopes = new WeakMap<FunctionDeclaration, SemanticScope>();
+  private functionSymbolDeclarations = new WeakMap<SemanticSymbol, FunctionDeclaration>();
 
   check(program: Program): SemanticCheckResult {
     this.diagnostics = [];
     this.rootScope = new SemanticScope();
     this.typeDeclarations = this.collectTypeDeclarations(program.body);
     this.methodDeclarations = this.collectMethodDeclarations(program.body);
+    this.functionParentScopes = new WeakMap();
+    this.functionSymbolDeclarations = new WeakMap();
     this.checkLibraryExportDeclarations(program.body);
     this.checkStatements(program.body, this.rootScope);
     return {
@@ -1386,13 +1390,17 @@ class SemanticChecker {
     }
   }
 
-  private inferFunctionReturnType(declaration: FunctionDeclaration, parentScope: SemanticScope = this.rootScope): SemanticType | undefined {
+  private inferFunctionReturnType(
+    declaration: FunctionDeclaration,
+    parentScope: SemanticScope = this.rootScope,
+    parameterTypes = new Map<string, SemanticType>(),
+  ): SemanticType | undefined {
     const functionScope = new SemanticScope(parentScope);
     for (const parameter of declaration.params) {
       functionScope.declare({
         name: parameter.name,
         kind: 'parameter',
-        type: this.typeFromAnnotation(parameter.typeAnnotation ?? undefined),
+        type: parameterTypes.get(parameter.name) ?? this.typeFromAnnotation(parameter.typeAnnotation ?? undefined),
         loc: parameter.loc,
       });
     }
@@ -1947,13 +1955,16 @@ class SemanticChecker {
   }
 
   private declareFunction(statement: FunctionDeclaration, scope: SemanticScope): void {
-    this.declare(scope, {
+    this.functionParentScopes.set(statement, scope);
+    const symbol: SemanticSymbol = {
       name: statement.name.name,
       kind: 'function',
       isMethod: statement.isMethod,
       type: statement.isMethod ? undefined : this.inferFunctionReturnType(statement, scope),
       loc: statement.name.loc,
-    });
+    };
+    this.functionSymbolDeclarations.set(symbol, statement);
+    this.declare(scope, symbol);
     const functionScope = new SemanticScope(scope);
 
     for (const parameter of statement.params) {
@@ -2731,7 +2742,13 @@ class SemanticChecker {
     if (this.isBuiltinCollectionMemberMethod(receiverType, expression.callee.property.name)) return undefined;
 
     const method = this.findUserMethodDeclaration(expression.callee.property.name, receiverType);
-    return method ? this.inferFunctionReturnType(method) : undefined;
+    if (!method) return undefined;
+
+    return this.inferFunctionReturnType(
+      method,
+      this.functionParentScopes.get(method) ?? this.rootScope,
+      this.inferCallableParameterTypes(method, expression.arguments, scope, receiverType),
+    );
   }
 
   private findUserMethodDeclaration(methodName: string, receiverType: SemanticType): FunctionDeclaration | undefined {
@@ -2753,6 +2770,37 @@ class SemanticChecker {
   private isAssignableQualifier(targetQualifier: SemanticQualifier | undefined, sourceQualifier: SemanticQualifier | undefined): boolean {
     if (!targetQualifier || !sourceQualifier) return true;
     return QUALIFIER_RANK[sourceQualifier] <= QUALIFIER_RANK[targetQualifier];
+  }
+
+  private inferCallableParameterTypes(
+    declaration: FunctionDeclaration,
+    args: CallArgument[],
+    scope: SemanticScope,
+    receiverType?: SemanticType,
+  ): Map<string, SemanticType> {
+    const parameterTypes = new Map<string, SemanticType>();
+    for (const [index, parameter] of declaration.params.entries()) {
+      if (receiverType && index === 0) {
+        parameterTypes.set(parameter.name, this.typeFromParameterArgument(parameter, receiverType));
+        continue;
+      }
+
+      const positionalIndex = receiverType ? index - 1 : index;
+      const argument = this.getCallArgument(args, parameter.name, positionalIndex);
+      if (!argument) continue;
+
+      parameterTypes.set(parameter.name, this.typeFromParameterArgument(parameter, this.inferExpressionType(argument, scope)));
+    }
+    return parameterTypes;
+  }
+
+  private typeFromParameterArgument(parameter: FunctionDeclaration['params'][number], argumentType: SemanticType): SemanticType {
+    const annotationType = this.typeFromAnnotation(parameter.typeAnnotation ?? undefined);
+    if (!annotationType) return argumentType;
+    return {
+      ...annotationType,
+      qualifier: annotationType.qualifier ?? argumentType.qualifier,
+    };
   }
 
   private checkMapArgumentType(expectedType: SemanticType | undefined, argument: Expression | undefined, role: 'map key' | 'map value', scope: SemanticScope): void {
@@ -3490,6 +3538,14 @@ class SemanticChecker {
     if (userMethodType) return userMethodType;
     if (expression.callee.type === 'Identifier') {
       const symbol = scope.lookup(expression.callee.name);
+      const declaration = symbol ? this.functionSymbolDeclarations.get(symbol) : undefined;
+      if (symbol?.kind === 'function' && declaration) {
+        return this.inferFunctionReturnType(
+          declaration,
+          this.functionParentScopes.get(declaration) ?? scope,
+          this.inferCallableParameterTypes(declaration, expression.arguments, scope),
+        ) ?? symbol.type ?? { kind: 'unknown' };
+      }
       if (symbol?.kind === 'function' && symbol.type) return symbol.type;
     }
     return { kind: 'unknown', qualifier: this.inferMaxQualifier(expression.arguments.map((argument) => argument.value), scope) };
