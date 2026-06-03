@@ -898,6 +898,36 @@ plot(keyedValue + blockValue)
     expect(types.get('partialBlockValue')).toMatchObject({ kind: 'unknown', qualifier: 'series' });
   });
 
+  it('infers compatible ternary expression types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Ternary Expression Types")
+priceValue = close > open ? close : 1
+title = close > open ? "up" : "down"
+constValue = true ? 1 : 2.5
+mixedValue = close > open ? close : "bad"
+simple float simpleValue = 1
+priceValue := "bad"
+title := 1
+constValue := "bad"
+mixedValue := "still unknown"
+simpleValue := mixedValue
+plot(priceValue + constValue)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable priceValue',
+      'Cannot assign int value to string variable title',
+      'Cannot assign string value to float variable constValue',
+      'Cannot assign series value to simple float variable simpleValue',
+    ]);
+    expect(types.get('priceValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('title')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('constValue')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('mixedValue')).toMatchObject({ kind: 'unknown', qualifier: 'series' });
+  });
+
   it('reports plain identifier reassignment qualifier mismatches', () => {
     const result = checkProgram(parse(`
 indicator("Assignment Qualifier Mismatches")
