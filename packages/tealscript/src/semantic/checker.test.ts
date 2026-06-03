@@ -1065,7 +1065,11 @@ matrix.reverse(id=m)
 plot(matrix.rows(id=m) + matrix.columns(id=m) + array.size(removedRow) + array.size(removedCol) + array.size(removedColumn))
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('removedRow')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
+    expect(types.get('removedCol')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
+    expect(types.get('removedColumn')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
   });
 
   it('reports invalid matrix structural helper named arguments', () => {
@@ -1116,7 +1120,15 @@ matrix.concat(id1=copy, id2=tail)
 plot(matrix.rows(id=m) + matrix.rows(id=transposed) + matrix.rows(id=slice) + matrix.rows(id=whole) + array.size(row) + array.size(col) + array.size(column))
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('copy')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'int' } });
+    expect(types.get('transposed')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'int' } });
+    expect(types.get('row')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
+    expect(types.get('col')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
+    expect(types.get('column')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
+    expect(types.get('slice')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'int' } });
+    expect(types.get('whole')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'int' } });
   });
 
   it('reports invalid matrix extraction helper named arguments', () => {
@@ -1170,7 +1182,20 @@ vectors = matrix.eigenvectors(id=m)
 plot(average + minimum + maximum + middle + common + trace + det + rank + matrix.rows(id=inverse) + matrix.rows(id=pinverse) + array.size(eigen) + matrix.rows(id=vectors))
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('average')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('minimum')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('maximum')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('middle')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('common')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('trace')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('det')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('rank')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('inverse')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('pinverse')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('eigen')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('vectors')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
   });
 
   it('reports invalid matrix unary helper named arguments', () => {
@@ -1211,11 +1236,20 @@ diffNamed = matrix.diff(id1=a, id2=b)
 multNamed = matrix.mult(id1=a, id2=b)
 kronNamed = matrix.kron(id1=a, id2=b)
 powNamed = matrix.pow(id=a, power=2)
+multArray = matrix.mult(id1=a, id2=array.from(1.0, 2.0))
 matrix.sort(id=a, column=1, order=order.descending, sort_field=0)
-plot(matrix.rows(id=sumNamed) + matrix.rows(id=sumAlias) + matrix.rows(id=diffNamed) + matrix.rows(id=multNamed) + matrix.rows(id=kronNamed) + matrix.rows(id=powNamed))
+plot(matrix.rows(id=sumNamed) + matrix.rows(id=sumAlias) + matrix.rows(id=diffNamed) + matrix.rows(id=multNamed) + matrix.rows(id=kronNamed) + matrix.rows(id=powNamed) + array.size(multArray))
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('sumNamed')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('sumAlias')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('diffNamed')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('multNamed')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('kronNamed')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('powNamed')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('multArray')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
   });
 
   it('reports invalid matrix calculation helper named arguments', () => {

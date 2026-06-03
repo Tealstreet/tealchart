@@ -3291,6 +3291,8 @@ class SemanticChecker {
     if (arrayHelperType) return arrayHelperType;
     const matrixElementReadType = this.inferMatrixElementReadCallType(expression, scope);
     if (matrixElementReadType) return matrixElementReadType;
+    const matrixHelperType = this.inferMatrixHelperCallType(expression, scope);
+    if (matrixHelperType) return matrixHelperType;
     const mapValueReadType = this.inferMapValueReadCallType(expression, scope);
     if (mapValueReadType) return mapValueReadType;
     const mapHelperType = this.inferMapHelperCallType(expression, scope);
@@ -3474,6 +3476,74 @@ class SemanticChecker {
     }
 
     return this.inferExpressionType(expression.callee.object, scope);
+  }
+
+  private inferMatrixHelperCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
+    if (expression.callee.type !== 'MemberExpression') return undefined;
+
+    const methodName = expression.callee.property.name;
+    const receiverType = this.inferMatrixHelperReceiverType(expression, scope);
+    if (receiverType?.kind !== 'matrix') return undefined;
+
+    if (methodName === 'mult') {
+      const rightArgumentIndex = expression.callee.object.type === 'Identifier' && expression.callee.object.name === 'matrix' ? 1 : 0;
+      const rightArgument = this.getCallArgument(expression.arguments, 'id2', rightArgumentIndex);
+      const rightType = rightArgument ? this.inferExpressionType(rightArgument, scope) : undefined;
+      if (rightType?.kind === 'array') {
+        return {
+          kind: 'array',
+          elementType: receiverType.elementType,
+          qualifier: 'series',
+        };
+      }
+      return {
+        kind: 'matrix',
+        elementType: receiverType.elementType,
+        qualifier: 'series',
+      };
+    }
+
+    switch (methodName) {
+      case 'copy':
+      case 'submatrix':
+      case 'transpose':
+      case 'inv':
+      case 'pinv':
+      case 'eigenvectors':
+      case 'diff':
+      case 'kron':
+      case 'pow':
+      case 'sum':
+        return {
+          kind: 'matrix',
+          elementType: receiverType.elementType,
+          qualifier: 'series',
+        };
+      case 'row':
+      case 'col':
+      case 'column':
+      case 'remove_row':
+      case 'remove_col':
+      case 'remove_column':
+      case 'eigenvalues':
+        return {
+          kind: 'array',
+          elementType: receiverType.elementType,
+          qualifier: 'series',
+        };
+      case 'avg':
+      case 'det':
+      case 'max':
+      case 'median':
+      case 'min':
+      case 'mode':
+      case 'trace':
+        return { kind: 'float', qualifier: 'series' };
+      case 'rank':
+        return { kind: 'int', qualifier: 'series' };
+      default:
+        return undefined;
+    }
   }
 
   private inferMapValueReadCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
