@@ -3108,6 +3108,24 @@ plot(str.length(directionLabel) + str.length(priceLabel) + directionScore)
     expect(types.get('directionScore')).toMatchObject({ kind: 'int' });
   });
 
+  it('selects user-defined method overloads by receiver specificity', () => {
+    const result = checkProgram(parse(`
+indicator("Method Receiver Specificity")
+method kind(float this) => "float"
+method kind(int this) => 1
+count = 1
+intKind = count.kind()
+floatKind = close.kind()
+plot(intKind + str.length(floatKind))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('intKind')).toMatchObject({ kind: 'int' });
+    expect(types.get('floatKind')).toMatchObject({ kind: 'string' });
+  });
+
   it('selects user-defined imported enum receiver methods', () => {
     const result = checkProgram(parse(`
 indicator("Imported Enum Method Receivers")
