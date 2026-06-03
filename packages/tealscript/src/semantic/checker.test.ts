@@ -3687,6 +3687,44 @@ plot(close, color=gradient)
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('infers color helper return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Color Return Types")
+base = color.rgb(red=1, green=2, blue=3, transp=25)
+inputTint = input.color(color.red)
+derived = color.new(color=inputTint, 35)
+gradient = color.from_gradient(value=close, bottom_value=0, top_value=100, bottom_color=base, top_color=derived)
+redChannel = color.r(color=base)
+inputTransparency = color.t(color=derived)
+seriesBlue = color.b(color=gradient)
+base := 1
+derived := 2
+gradient := 3
+redChannel := "bad"
+inputTransparency := "bad"
+seriesBlue := "bad"
+plot(close, color=gradient)
+plot(redChannel + inputTransparency + seriesBlue)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign int value to color variable base',
+      'Cannot assign int value to color variable derived',
+      'Cannot assign int value to color variable gradient',
+      'Cannot assign string value to float variable redChannel',
+      'Cannot assign string value to float variable inputTransparency',
+      'Cannot assign string value to float variable seriesBlue',
+    ]);
+    expect(types.get('base')).toMatchObject({ kind: 'color', qualifier: 'const' });
+    expect(types.get('derived')).toMatchObject({ kind: 'color', qualifier: 'input' });
+    expect(types.get('gradient')).toMatchObject({ kind: 'color', qualifier: 'series' });
+    expect(types.get('redChannel')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('inputTransparency')).toMatchObject({ kind: 'float', qualifier: 'input' });
+    expect(types.get('seriesBlue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+  });
+
   it('reports invalid color helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Bad Color Signatures")

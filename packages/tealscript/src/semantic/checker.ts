@@ -147,6 +147,9 @@ const INPUT_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['input.timeframe', 'string'],
 ]);
 
+const COLOR_CONSTRUCTOR_NAMES = new Set(['color.new', 'color.rgb']);
+const COLOR_CHANNEL_NAMES = new Set(['color.r', 'color.g', 'color.b', 'color.t']);
+
 const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['box.copy', 'box'],
   ['box.new', 'box'],
@@ -3702,6 +3705,8 @@ class SemanticChecker {
     const namespace = calleePath[0];
     const inputType = this.inferInputCallType(expression, scope, calleePath);
     if (inputType) return inputType;
+    const colorType = this.inferColorCallType(expression, scope, calleePath);
+    if (colorType) return colorType;
     if (namespace === 'input') return { kind: 'unknown', qualifier: 'input' };
     if (namespace === 'request' || namespace === 'ta' || namespace === 'time' || namespace === 'time_close' || calleePath.join('.') === 'timeframe.change') {
       return { kind: 'unknown', qualifier: 'series' };
@@ -3778,6 +3783,18 @@ class SemanticChecker {
 
     const kind = INPUT_RETURN_TYPES.get(calleeName);
     return kind ? { kind, qualifier: 'input' } : undefined;
+  }
+
+  private inferColorCallType(expression: CallExpression, scope: SemanticScope, calleePath: string[]): SemanticType | undefined {
+    const calleeName = calleePath.join('.');
+    if (COLOR_CONSTRUCTOR_NAMES.has(calleeName)) {
+      return { kind: 'color', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+    }
+    if (calleeName === 'color.from_gradient') return { kind: 'color', qualifier: 'series' };
+    if (COLOR_CHANNEL_NAMES.has(calleeName)) {
+      return { kind: 'float', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+    }
+    return undefined;
   }
 
   private inferFixnanCallType(expression: CallExpression, scope: SemanticScope): SemanticType {
