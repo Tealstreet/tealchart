@@ -2111,13 +2111,22 @@ missingModifyTicker = ticker.modify(session=session.extended)
   it('resolves request helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Request Signatures")
+htf = request.security(symbol=syminfo.tickerid, "2", close, barmerge.gaps_on, barmerge.lookahead_on)
+ltf = request.security_lower_tf(symbol=syminfo.tickerid, "1", close, false, na, false, 2)
 rate = request.currency_rate(currency.USD, "GBP", ignore_invalid_currency=true)
+prefixRate = request.currency_rate(from=currency.USD, "GBP", true)
 dividend = request.dividends("NASDAQ:AAPL", dividends.gross, barmerge.gaps_on, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false, currency=currency.USD)
+prefixDividend = request.dividends(ticker="NASDAQ:AAPL", dividends.gross, barmerge.gaps_on, barmerge.lookahead_off, false, currency.USD)
 earning = request.earnings("NASDAQ:AAPL", earnings.actual, barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false, currency="USD")
+prefixEarning = request.earnings(ticker="NASDAQ:AAPL", earnings.actual, barmerge.gaps_off, barmerge.lookahead_off, false, "USD")
 split = request.splits("NASDAQ:AAPL", splits.denominator, barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false)
+prefixSplit = request.splits(ticker="NASDAQ:AAPL", splits.denominator, barmerge.gaps_off, barmerge.lookahead_off, false)
 revenue = request.financial("NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", gaps=barmerge.gaps_off, ignore_invalid_symbol=false, currency="USD")
+prefixRevenue = request.financial(symbol="NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", barmerge.gaps_off, false, "USD")
 econ = request.economic("US", "GDP", gaps=barmerge.gaps_off, ignore_invalid_symbol=false)
+prefixEcon = request.economic(country_code="US", "GDP", barmerge.gaps_off, false)
 seeded = request.seed("seed", "SYM", close, ignore_invalid_symbol=false, calc_bars_count=2)
+prefixSeeded = request.seed(source="seed", "SYM", close, false, 2)
 plot(rate + dividend + earning + split + revenue + econ + seeded)
 `));
 
