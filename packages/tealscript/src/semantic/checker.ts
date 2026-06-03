@@ -1749,6 +1749,7 @@ class SemanticChecker {
     this.checkAssignmentTarget(statement, scope);
     if (statement.left.type === 'Identifier') {
       this.checkIdentifierAssignmentType(statement, scope);
+      this.checkIdentifierCompoundAssignmentType(statement, scope);
     } else if (statement.left.type === 'MemberExpression') {
       this.checkUdtFieldAssignmentType(statement.left, statement.right, scope);
     } else if (statement.left.type === 'IndexExpression') {
@@ -1779,6 +1780,62 @@ class SemanticChecker {
       `Cannot assign ${this.formatSemanticType(sourceType)} value to ${this.formatSemanticType(targetType)} variable ${statement.left.name}`,
       statement.loc,
     );
+  }
+
+  private checkIdentifierCompoundAssignmentType(statement: AssignmentStatement, scope: SemanticScope): void {
+    if (statement.operator === ':=' || statement.left.type !== 'Identifier') return;
+
+    const targetType = scope.lookup(statement.left.name)?.type;
+    if (!targetType || targetType.kind === 'unknown') return;
+
+    const sourceType = this.inferExpressionType(statement.right, scope);
+    if (sourceType.kind === 'unknown') return;
+
+    const resultType = this.inferCompoundAssignmentResultType(statement.operator, targetType, sourceType);
+    if (!resultType) {
+      this.addDiagnostic(
+        'type-mismatch',
+        `Compound assignment ${statement.operator} requires ${statement.operator === '+=' ? 'numeric or string' : 'numeric'} operands, got ${this.formatSemanticType(targetType)} and ${this.formatSemanticType(sourceType)}`,
+        statement.loc,
+      );
+      return;
+    }
+
+    if (!this.isAssignableQualifier(targetType.qualifier, resultType.qualifier)) {
+      this.addDiagnostic(
+        'qualifier-mismatch',
+        `Cannot assign ${resultType.qualifier} value to ${targetType.qualifier} ${this.formatSemanticType(targetType)} variable ${statement.left.name}`,
+        statement.loc,
+      );
+      return;
+    }
+
+    if (this.isAssignableType(targetType, resultType)) return;
+
+    this.addDiagnostic(
+      'type-mismatch',
+      `Cannot assign ${this.formatSemanticType(resultType)} value to ${this.formatSemanticType(targetType)} variable ${statement.left.name}`,
+      statement.loc,
+    );
+  }
+
+  private inferCompoundAssignmentResultType(
+    operator: AssignmentStatement['operator'],
+    targetType: SemanticType,
+    sourceType: SemanticType,
+  ): SemanticType | undefined {
+    const qualifier = this.maxQualifier(targetType, sourceType);
+
+    if (operator === '+=' && targetType.kind === 'string' && sourceType.kind === 'string') {
+      return { kind: 'string', qualifier };
+    }
+
+    if (!this.isNumericType(targetType) || !this.isNumericType(sourceType)) return undefined;
+
+    return {
+      kind: targetType.kind === 'float' || sourceType.kind === 'float' || operator === '/=' ? 'float' : 'int',
+      qualifier,
+    };
   }
 
   private checkAssignmentTarget(statement: AssignmentStatement, scope: SemanticScope): void {
