@@ -952,12 +952,14 @@ class SemanticChecker {
   private rootScope = new SemanticScope();
   private typeDeclarations = new Map<string, TypeDeclaration>();
   private methodDeclarations = new Map<string, FunctionDeclaration[]>();
+  private functionSymbolDeclarations = new WeakMap<SemanticSymbol, FunctionDeclaration>();
 
   check(program: Program): SemanticCheckResult {
     this.diagnostics = [];
     this.rootScope = new SemanticScope();
     this.typeDeclarations = this.collectTypeDeclarations(program.body);
     this.methodDeclarations = this.collectMethodDeclarations(program.body);
+    this.functionSymbolDeclarations = new WeakMap();
     this.checkLibraryExportDeclarations(program.body);
     this.checkStatements(program.body, this.rootScope);
     return {
@@ -1662,7 +1664,15 @@ class SemanticChecker {
   private declareFunction(statement: FunctionDeclaration, scope: SemanticScope): void {
     const existingLocal = scope.lookupLocal(statement.name.name);
     if (!statement.isMethod || !existingLocal || existingLocal.kind !== 'function' || existingLocal.isMethod !== true) {
-      this.declare(scope, { name: statement.name.name, kind: 'function', isMethod: statement.isMethod, loc: statement.name.loc });
+      const symbol: SemanticSymbol = {
+        name: statement.name.name,
+        kind: 'function',
+        isMethod: statement.isMethod,
+        loc: statement.name.loc,
+      };
+      if (this.declare(scope, symbol) && !statement.isMethod) {
+        this.functionSymbolDeclarations.set(symbol, statement);
+      }
     }
     const functionScope = new SemanticScope(scope);
 
@@ -2879,6 +2889,8 @@ class SemanticChecker {
     if (matrixElementReadType) return matrixElementReadType;
     const mapValueReadType = this.inferMapValueReadCallType(expression, scope);
     if (mapValueReadType) return mapValueReadType;
+    const userFunctionType = this.inferUserFunctionCallType(expression, scope);
+    if (userFunctionType) return userFunctionType;
     const userMethodType = this.inferUserMethodCallType(expression, scope);
     if (userMethodType) return userMethodType;
     if (calleePath.join('.') === 'array.from') {
@@ -2917,6 +2929,17 @@ class SemanticChecker {
       return { kind: 'udt', name: calleePath[0] };
     }
     return { kind: 'unknown', qualifier: this.inferMaxQualifier(expression.arguments.map((argument) => argument.value), scope) };
+  }
+
+  private inferUserFunctionCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
+    if (expression.callee.type !== 'Identifier') return undefined;
+
+    const symbol = scope.lookup(expression.callee.name);
+    const declaration =
+      symbol?.kind === 'function' && symbol.isMethod !== true ? this.functionSymbolDeclarations.get(symbol) : undefined;
+    if (!declaration) return undefined;
+
+    return this.inferFunctionReturnType(declaration, this.inferCallableParameterTypes(declaration, expression.arguments, scope));
   }
 
   private inferUserMethodCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
@@ -3039,16 +3062,17 @@ class SemanticChecker {
     declaration: FunctionDeclaration,
     args: CallArgument[],
     scope: SemanticScope,
-    receiverType: SemanticType,
+    receiverType?: SemanticType,
   ): Map<string, SemanticType> {
     const parameterTypes = new Map<string, SemanticType>();
     for (const [index, parameter] of declaration.params.entries()) {
-      if (index === 0) {
+      if (receiverType && index === 0) {
         parameterTypes.set(parameter.name, this.typeFromParameterArgument(parameter, receiverType));
         continue;
       }
 
-      const argument = this.getCallArgument(args, parameter.name, index - 1);
+      const positionalIndex = receiverType ? index - 1 : index;
+      const argument = this.getCallArgument(args, parameter.name, positionalIndex);
       if (!argument) continue;
 
       parameterTypes.set(parameter.name, this.typeFromParameterArgument(parameter, this.inferExpressionType(argument, scope)));
@@ -3430,10 +3454,11 @@ class SemanticChecker {
     return type.kind === 'int' || type.kind === 'float';
   }
 
-  private declare(scope: SemanticScope, symbol: SemanticSymbol): void {
+  private declare(scope: SemanticScope, symbol: SemanticSymbol): boolean {
     const existing = scope.declare(symbol);
-    if (!existing) return;
+    if (!existing) return true;
     this.addDiagnostic('duplicate-symbol', `Duplicate declaration: ${symbol.name}`, symbol.loc);
+    return false;
   }
 
   private isKnownIdentifier(name: string): boolean {
