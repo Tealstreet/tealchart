@@ -3938,8 +3938,9 @@ export class TealscriptEngine {
       return [this.getCurrentSeriesValue(ctx, defaultSource), this.normalizeLookbackLength(args[0])];
     }
 
-    const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source', this.getCurrentSeriesValue(ctx, defaultSource)));
-    const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+    const hasNamedSource = namedArgs.has('source');
+    const source = this.toNumber(hasNamedSource ? namedArgs.get('source') : (args[0] ?? this.getCurrentSeriesValue(ctx, defaultSource)));
+    const length = this.normalizeLookbackLength(namedArgs.has('length') ? namedArgs.get('length') : args[hasNamedSource ? 0 : 1]);
     return [source, length];
   }
 
