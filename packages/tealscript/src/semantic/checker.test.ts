@@ -840,6 +840,7 @@ plot(keyedValue + conditionValue + blockValue + partialValue + partialBlockValue
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Tuple declaration expects 2 values but initializer arm returns a non-tuple value',
       'Cannot assign string value to float variable keyedValue',
       'Cannot assign int value to string variable keyedTitle',
       'Cannot assign string value to float variable conditionValue',
@@ -916,11 +917,17 @@ method switchPair(float this, string mode) => switch mode
     => [this, "default"]
 method partialSwitchPair(float this, string mode) => switch mode
     "wide" => [this, "partial switch"]
+method mixedShapePair(float this, bool enabled) =>
+    if enabled
+        [this, "mixed"]
+    else
+        this
 [branchValue, branchTitle] = close.branchPair(close > open)
 [partialBranchValue, partialBranchTitle] = close.partialBranchPair(close > open)
 [loopValue, loopTitle] = close.loopPair(2)
 [switchValue, switchTitle] = close.switchPair("wide")
 [partialSwitchValue, partialSwitchTitle] = close.partialSwitchPair("wide")
+[mixedValue, mixedTitle] = close.mixedShapePair(close > open)
 branchValue := "bad"
 branchTitle := 1
 partialBranchValue := "bad"
@@ -931,12 +938,15 @@ switchValue := "bad"
 switchTitle := 4
 partialSwitchValue := "bad"
 partialSwitchTitle := 5
+mixedValue := "still unknown"
+mixedTitle := 6
 plot(branchValue + partialBranchValue + loopValue + switchValue + partialSwitchValue)
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Tuple declaration expects 2 values but initializer arm returns a non-tuple value',
       'Cannot assign string value to float variable branchValue',
       'Cannot assign int value to string variable branchTitle',
       'Cannot assign string value to float variable partialBranchValue',
@@ -958,6 +968,8 @@ plot(branchValue + partialBranchValue + loopValue + switchValue + partialSwitchV
     expect(types.get('switchTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
     expect(types.get('partialSwitchValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('partialSwitchTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('mixedValue')).toMatchObject({ kind: 'unknown' });
+    expect(types.get('mixedTitle')).toMatchObject({ kind: 'unknown' });
   });
 
   it('infers user method control-flow expression types for downstream diagnostics', () => {

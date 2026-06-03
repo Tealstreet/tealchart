@@ -1820,7 +1820,7 @@ class SemanticChecker {
 
   private checkTupleInitializerShape(tuple: TupleDeclarator, init: Expression | IfStatement, scope: SemanticScope): void {
     const armShapes = this.tupleInitializerArmShapes(init, scope)
-      ?? (init.type === 'IfStatement' ? undefined : [this.tupleInitializerShapeFromExpression(init, scope)]);
+      ?? (init.type === 'IfStatement' ? undefined : this.tupleInitializerShapesFromExpression(init, scope));
     if (!armShapes) return;
 
     const expectedArity = tuple.names.length;
@@ -1841,8 +1841,8 @@ class SemanticChecker {
   private tupleInitializerArmShapes(init: Expression | IfStatement, scope: SemanticScope): TupleInitializerShape[] | undefined {
     if (init.type === 'ConditionalExpression') {
       return [
-        this.tupleInitializerShapeFromExpression(init.consequent, scope),
-        this.tupleInitializerShapeFromExpression(init.alternate, scope),
+        ...this.tupleInitializerShapesFromExpression(init.consequent, scope),
+        ...this.tupleInitializerShapesFromExpression(init.alternate, scope),
       ];
     }
 
@@ -1864,7 +1864,7 @@ class SemanticChecker {
       return init.cases.flatMap((switchCase) => (
         Array.isArray(switchCase.consequent)
           ? this.normalizeTupleInitializerShapes(this.tupleInitializerShapesFromStatements(switchCase.consequent, new SemanticScope(scope)))
-          : [this.tupleInitializerShapeFromExpression(switchCase.consequent, new SemanticScope(scope))]
+          : this.tupleInitializerShapesFromExpression(switchCase.consequent, new SemanticScope(scope))
       ));
     }
 
@@ -1890,7 +1890,7 @@ class SemanticChecker {
         continue;
       }
       if (statement.type === 'ExpressionStatement') {
-        shapes = [this.tupleInitializerShapeFromExpression(statement.expression, scope)];
+        shapes = this.tupleInitializerShapesFromExpression(statement.expression, scope);
         continue;
       }
       if (
@@ -1910,17 +1910,75 @@ class SemanticChecker {
     return shapes && shapes.length > 0 ? shapes : [{ kind: 'non-tuple' }];
   }
 
-  private tupleInitializerShapeFromExpression(expression: Expression, scope: SemanticScope): TupleInitializerShape {
+  private tupleInitializerShapesFromExpression(expression: Expression, scope: SemanticScope): TupleInitializerShape[] {
     if (expression.type === 'ArrayExpression') {
-      return { kind: 'tuple', arity: expression.elements.length };
+      return [{ kind: 'tuple', arity: expression.elements.length }];
     }
     if (expression.type === 'CallExpression') {
       const tupleTypes = BUILTIN_TUPLE_RETURN_TYPES.get(this.memberPath(expression.callee).join('.'))
         ?? this.inferUserFunctionTupleElementTypes(expression, scope)
         ?? this.inferUserMethodTupleElementTypes(expression, scope);
-      return tupleTypes ? { kind: 'tuple', arity: tupleTypes.length } : { kind: 'unknown' };
+      if (tupleTypes) return [{ kind: 'tuple', arity: tupleTypes.length }];
+      return this.tupleInitializerShapesFromUserFunctionCall(expression, scope)
+        ?? this.tupleInitializerShapesFromUserMethodCall(expression, scope)
+        ?? [{ kind: 'unknown' }];
     }
-    return this.tupleInitializerArmShapes(expression, scope)?.[0] ?? { kind: 'non-tuple' };
+    return this.tupleInitializerArmShapes(expression, scope) ?? [{ kind: 'non-tuple' }];
+  }
+
+  private tupleInitializerShapesFromUserFunctionCall(
+    expression: CallExpression,
+    scope: SemanticScope,
+  ): TupleInitializerShape[] | undefined {
+    if (expression.callee.type !== 'Identifier') return undefined;
+
+    const symbol = scope.lookup(expression.callee.name);
+    const declaration =
+      symbol?.kind === 'function' && symbol.isMethod !== true ? this.functionSymbolDeclarations.get(symbol) : undefined;
+    if (!declaration) return undefined;
+
+    return this.tupleInitializerShapesFromFunctionReturn(
+      declaration,
+      this.inferCallableParameterTypes(declaration, expression.arguments, scope),
+    );
+  }
+
+  private tupleInitializerShapesFromUserMethodCall(
+    expression: CallExpression,
+    scope: SemanticScope,
+  ): TupleInitializerShape[] | undefined {
+    if (expression.callee.type !== 'MemberExpression') return undefined;
+
+    const receiverType = this.inferExpressionType(expression.callee.object, scope);
+    if (receiverType.kind === 'unknown') return undefined;
+    if (this.isBuiltinCollectionMemberMethod(receiverType, expression.callee.property.name)) return undefined;
+
+    const method = this.findUserMethodDeclaration(expression.callee.property.name, receiverType, expression, scope);
+    if (!method) return undefined;
+
+    return this.tupleInitializerShapesFromFunctionReturn(
+      method,
+      this.inferCallableParameterTypes(method, expression.arguments, scope, receiverType),
+    );
+  }
+
+  private tupleInitializerShapesFromFunctionReturn(
+    declaration: FunctionDeclaration,
+    parameterTypes: Map<string, SemanticType>,
+  ): TupleInitializerShape[] | undefined {
+    if (this.activeReturnInferences.has(declaration)) return undefined;
+
+    this.activeReturnInferences.add(declaration);
+    try {
+      const functionScope = this.createFunctionInferenceScope(declaration, parameterTypes);
+      if (!Array.isArray(declaration.body)) {
+        return this.tupleInitializerShapesFromExpression(declaration.body, functionScope);
+      }
+
+      return this.tupleInitializerShapesFromStatements(declaration.body, functionScope);
+    } finally {
+      this.activeReturnInferences.delete(declaration);
+    }
   }
 
   private inferTupleElementTypes(init: Expression | IfStatement, scope: SemanticScope): SemanticType[] | undefined {
