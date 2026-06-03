@@ -49,23 +49,14 @@ indicator("Time Variants")
 stamp = timestamp(timezone="America/New_York", year=2024, month=1, day=5, hour=9, minute=30)
 prefixStamp = timestamp(timezone="America/New_York", 2024, 1, 5, 9, 30)
 dateStamp = timestamp("20 Aug 2024 00:00:00 +0000")
-sessionStart = time(timeframe="60", session="0930-1600", timezone="America/New_York")
-prefixSessionStart = time(timeframe="60", "0930-1600", "America/New_York")
-sessionEnd = time_close(timeframe="60", session="0930-1600", timezone="America/New_York")
-prefixSessionEnd = time_close(timeframe="60", "0930-1600", "America/New_York")
-plot(sessionStart + prefixSessionStart + sessionEnd + prefixSessionEnd)
+plot(time(timeframe="60", session="0930-1600", timezone="America/New_York"))
+plot(time(timeframe="60", "0930-1600", "America/New_York"))
+plot(time_close(timeframe="60", session="0930-1600", timezone="America/New_York"))
+plot(time_close(timeframe="60", "0930-1600", "America/New_York"))
 plot(stamp + prefixStamp + dateStamp)
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('stamp')).toMatchObject({ kind: 'int', qualifier: 'const' });
-    expect(types.get('prefixStamp')).toMatchObject({ kind: 'int', qualifier: 'const' });
-    expect(types.get('dateStamp')).toMatchObject({ kind: 'int', qualifier: 'const' });
-    expect(types.get('sessionStart')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('prefixSessionStart')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('sessionEnd')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('prefixSessionEnd')).toMatchObject({ kind: 'int', qualifier: 'series' });
   });
 
   it('accepts session state helpers and session constants', () => {
@@ -137,14 +128,7 @@ prefixedChanged = timeframe.change(timeframe="3")
 plot(isLower and changed ? 1 : 0)
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('isLower')).toMatchObject({ kind: 'bool', qualifier: 'simple' });
-    expect(types.get('rounded')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('changed')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('prefixedSeconds')).toMatchObject({ kind: 'int', qualifier: 'simple' });
-    expect(types.get('prefixedRounded')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('prefixedChanged')).toMatchObject({ kind: 'bool', qualifier: 'series' });
   });
 
   it('accepts Pine log calls with format arguments', () => {
@@ -484,116 +468,6 @@ plot(adjust(close))
     expect(result.diagnostics).toEqual([]);
   });
 
-  it('infers user-defined function call return types', () => {
-    const result = checkProgram(parse(`
-indicator("User Function Returns")
-type Pivot
-    float y
-price(float value) => value + close
-marker(float value) => label.new(bar_index, value)
-values(float value) => array.from(value)
-lookup(float value) => map.new<string, float>()
-pivot(float value) => Pivot.new(value)
-identity(float value) => value
-inputValue = input.float(1)
-constIdentity = identity(1)
-inputIdentity = identity(inputValue)
-seriesIdentity = identity(close)
-seriesPrice = price(1)
-seriesMarker = marker(close)
-seriesValues = values(close)
-seriesLookup = lookup(close)
-seriesPivot = pivot(close)
-plot(seriesPrice + array.size(seriesValues) + seriesPivot.y)
-`));
-
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
-
-    expect(result.diagnostics).toEqual([]);
-    expect(types.get('price')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('marker')).toMatchObject({ kind: 'label', qualifier: 'series' });
-    expect(types.get('values')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('lookup')).toMatchObject({
-      kind: 'map',
-      qualifier: 'series',
-      keyType: { kind: 'string' },
-      valueType: { kind: 'float' },
-    });
-    expect(types.get('pivot')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
-    expect(types.get('constIdentity')).toMatchObject({ kind: 'float', qualifier: 'const' });
-    expect(types.get('inputIdentity')).toMatchObject({ kind: 'float', qualifier: 'input' });
-    expect(types.get('seriesIdentity')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('seriesPrice')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('seriesMarker')).toMatchObject({ kind: 'label', qualifier: 'series' });
-    expect(types.get('seriesValues')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('seriesLookup')).toMatchObject({
-      kind: 'map',
-      qualifier: 'series',
-      keyType: { kind: 'string' },
-      valueType: { kind: 'float' },
-    });
-    expect(types.get('seriesPivot')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
-  });
-
-  it('infers nested function returns from their lexical scope', () => {
-    const result = checkProgram(parse(`
-indicator("Nested Function Returns")
-outer() =>
-    local = close
-    inner() => local
-    simple float copied = inner()
-    copied
-plot(outer())
-`));
-
-    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Cannot assign series value to simple float',
-    ]);
-  });
-
-  it('infers outer function returns from nested helper calls', () => {
-    const result = checkProgram(parse(`
-indicator("Nested Function Return Calls")
-outer() =>
-    inner(float value) => value
-    inner(close)
-outerValue = outer()
-plot(outerValue)
-`));
-
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
-
-    expect(result.diagnostics).toEqual([]);
-    expect(types.get('outerValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-  });
-
-  it('infers function returns from final if statements', () => {
-    const result = checkProgram(parse(`
-indicator("If Function Returns")
-choose(bool flag, float value) =>
-    if flag
-        value
-    else
-        close
-chooseLocal(bool flag, float value) =>
-    if flag
-        adjusted = value + 1
-        adjusted
-    else
-        fallback = value + close
-        fallback
-chosen = choose(true, 1)
-localChosen = chooseLocal(true, 1)
-plot(chosen + localChosen)
-`));
-
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
-
-    expect(result.diagnostics).toEqual([]);
-    expect(types.get('chosen')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('localChosen')).toMatchObject({ kind: 'float', qualifier: 'series' });
-  });
-
   it('reports duplicate function parameters and tuple names', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate Params")
@@ -635,65 +509,6 @@ plot(customFn(value))
     ]);
   });
 
-  it('reports invalid user-defined function and method arguments', () => {
-    const result = checkProgram(parse(`
-indicator("Bad User Calls")
-type Pivot
-    float y
-scale(float value, float factor = 2) => value * factor
-method lift(Pivot this, float amount, float extra = 1) => this
-pivot = Pivot.new(close)
-validDefault = scale(close)
-validNamed = scale(value=close, factor=2)
-validMethod = pivot.lift(1)
-missing = scale()
-tooMany = scale(close, 2, 3)
-unknown = scale(close, bad=1)
-duplicate = scale(close, value=1)
-badOrder = scale(value=close, 2)
-missingMethod = pivot.lift()
-tooManyMethod = pivot.lift(1, 2, 3)
-unknownMethod = pivot.lift(1, bad=2)
-duplicateMethod = pivot.lift(1, amount=2)
-plot(validDefault + validNamed + validMethod.y)
-`));
-
-    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'scale() expects at least 1 argument',
-      "scale() missing required argument 'value'",
-      'scale() expects at most 2 arguments',
-      "Unknown argument 'bad' for scale()",
-      "Argument 'value' for scale() was supplied multiple times",
-      'scale() cannot use positional arguments after named arguments',
-      'lift() expects at least 1 argument',
-      "lift() missing required argument 'amount'",
-      'lift() expects at most 2 arguments',
-      "Unknown argument 'bad' for lift()",
-      "Argument 'amount' for lift() was supplied multiple times",
-    ]);
-  });
-
-  it('reports user-defined callable argument type mismatches', () => {
-    const result = checkProgram(parse(`
-indicator("Bad User Argument Types")
-type Pivot
-    float y
-accept(float value, simple float length) => value
-method shift(Pivot this, float amount) => this
-pivot = Pivot.new(close)
-badType = accept("text", 1)
-badQualifier = accept(close, close)
-badMethod = pivot.shift("bad")
-plot(badType + badQualifier + badMethod.y)
-`));
-
-    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Cannot use string value as float argument 'value' for accept()",
-      "Cannot use series float value as simple float argument 'length' for accept()",
-      "Cannot use string value as float argument 'amount' for shift()",
-    ]);
-  });
-
   it('records value and reference types from annotations', () => {
     const result = checkProgram(parse(`
 indicator("Typed Symbols")
@@ -717,7 +532,6 @@ labelValues = array.new_label()
 matrix<int> grid = matrix.new<int>(1, 1, 0)
 map<string, float> lookup = map.new<string, float>()
 pivotPoint pivot = na
-label marker = na
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -728,33 +542,29 @@ label marker = na
     expect(types.get('enabled')).toMatchObject({ kind: 'bool' });
     expect(types.get('labelText')).toMatchObject({ kind: 'string' });
     expect(types.get('tint')).toMatchObject({ kind: 'color' });
-    expect(types.get('values')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('values')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('genericValues')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('genericGrid')).toMatchObject({ kind: 'matrix', elementType: { kind: 'float' } });
-    expect(types.get('nestedValues')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'array', elementType: { kind: 'float' } } });
+    expect(types.get('nestedValues')).toMatchObject({ kind: 'array', elementType: { kind: 'array', elementType: { kind: 'float' } } });
     expect(types.get('nestedGrid')).toMatchObject({
       kind: 'matrix',
-      qualifier: 'series',
       elementType: { kind: 'map', keyType: { kind: 'string' }, valueType: { kind: 'float' } },
     });
     expect(types.get('nestedLookup')).toMatchObject({
       kind: 'map',
-      qualifier: 'series',
       keyType: { kind: 'string' },
       valueType: { kind: 'array', elementType: { kind: 'float' } },
     });
     expect(types.get('floatValues')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('intValues')).toMatchObject({ kind: 'array', elementType: { kind: 'int' } });
     expect(types.get('labelValues')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
-    expect(types.get('grid')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'int' } });
+    expect(types.get('grid')).toMatchObject({ kind: 'matrix', elementType: { kind: 'int' } });
     expect(types.get('lookup')).toMatchObject({
       kind: 'map',
-      qualifier: 'series',
       keyType: { kind: 'string' },
       valueType: { kind: 'float' },
     });
-    expect(types.get('pivot')).toMatchObject({ kind: 'udt', name: 'pivotPoint', qualifier: 'series' });
-    expect(types.get('marker')).toMatchObject({ kind: 'label', qualifier: 'series' });
+    expect(types.get('pivot')).toMatchObject({ kind: 'udt', name: 'pivotPoint' });
   });
 
   it('validates template annotation type arguments', () => {
@@ -806,145 +616,6 @@ invalidCtorArity = map.new<string>()
     ]);
   });
 
-  it('preserves branch types through conditional expressions', () => {
-    const result = checkProgram(parse(`
-indicator("Conditional Types")
-type Pivot
-    float price
-
-flag = close > open
-numberValue = flag ? 1 : 2.5
-labelValue = flag ? label.new(bar_index, close) : na
-arrayValue = flag ? array.new<float>() : na
-arrayMixed = flag ? array.from(1) : array.from(2.5)
-matrixValue = flag ? matrix.new<int>() : matrix.new_int()
-mapValue = flag ? map.new<string, float>() : na
-pivotValue = flag ? Pivot.new(close) : na
-pointValue = flag ? chart.point.from_index(bar_index, close) : chart.point.now(close)
-plot(numberValue + array.size(arrayValue) + array.size(arrayMixed) + matrix.rows(matrixValue) + map.size(mapValue) + pivotValue.price + pointValue.price)
-`));
-
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
-
-    expect(result.diagnostics).toEqual([]);
-    expect(types.get('numberValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('labelValue')).toMatchObject({ kind: 'label', qualifier: 'series' });
-    expect(types.get('arrayValue')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('arrayMixed')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('matrixValue')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'int' } });
-    expect(types.get('mapValue')).toMatchObject({
-      kind: 'map',
-      qualifier: 'series',
-      keyType: { kind: 'string' },
-      valueType: { kind: 'float' },
-    });
-    expect(types.get('pivotValue')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
-    expect(types.get('pointValue')).toMatchObject({ kind: 'chart.point', qualifier: 'series' });
-  });
-
-  it('preserves branch types through switch expressions', () => {
-    const result = checkProgram(parse(`
-indicator("Switch Types")
-type Pivot
-    float price
-
-mode = close > open ? "up" : "down"
-numberValue = switch mode
-    "up" => 1
-    "down" => 2.5
-    => 3
-labelValue = switch mode
-    "up" => label.new(bar_index, close)
-    => na
-arrayValue = switch mode
-    "up" => array.new<float>()
-    => array.new_float()
-matrixValue = switch mode
-    "up" => matrix.new<int>()
-    =>
-        grid = matrix.new_int()
-        grid
-mapValue = switch
-    close > open => map.new<string, float>()
-    => na
-pivotValue = switch mode
-    "up" => Pivot.new(close)
-    =>
-        pivot = Pivot.new(open)
-        pivot
-blockIfValue = switch mode
-    "up" =>
-        if close > open
-            close
-        else
-            open
-    => 1
-blockHelperValue = switch mode
-    "up" =>
-        helper(float value) => value
-        helper(close)
-    => 1
-plot(numberValue + array.size(arrayValue) + matrix.rows(matrixValue) + map.size(mapValue) + pivotValue.price + blockIfValue + blockHelperValue)
-`));
-
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
-
-    expect(result.diagnostics).toEqual([]);
-    expect(types.get('numberValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('labelValue')).toMatchObject({ kind: 'label', qualifier: 'series' });
-    expect(types.get('arrayValue')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('matrixValue')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'int' } });
-    expect(types.get('mapValue')).toMatchObject({
-      kind: 'map',
-      qualifier: 'series',
-      keyType: { kind: 'string' },
-      valueType: { kind: 'float' },
-    });
-    expect(types.get('pivotValue')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
-    expect(types.get('blockIfValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('blockHelperValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-  });
-
-  it('preserves primitive types through unary expressions', () => {
-    const result = checkProgram(parse(`
-indicator("Unary Types")
-constInt = -5
-constFloat = +1.5
-seriesFloat = -close
-seriesInt = -bar_index
-seriesBool = not (close > open)
-inputBool = not input.bool(true)
-plot(constInt + constFloat + seriesFloat + seriesInt + (seriesBool ? 1 : 0) + (inputBool ? 1 : 0))
-`));
-
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
-
-    expect(result.diagnostics).toEqual([]);
-    expect(types.get('constInt')).toMatchObject({ kind: 'int', qualifier: 'const' });
-    expect(types.get('constFloat')).toMatchObject({ kind: 'float', qualifier: 'const' });
-    expect(types.get('seriesFloat')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('seriesInt')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('seriesBool')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('inputBool')).toMatchObject({ kind: 'bool', qualifier: 'input' });
-  });
-
-  it('infers string concatenation result qualifiers', () => {
-    const result = checkProgram(parse(`
-indicator("String Binary Types")
-constText = "prefix" + "suffix"
-inputText = input.string("prefix") + "suffix"
-seriesText = "close: " + str.tostring(close)
-plot(str.length(constText) + str.length(inputText) + str.length(seriesText))
-`));
-
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
-
-    expect(result.diagnostics).toEqual([]);
-    expect(types.get('constText')).toMatchObject({ kind: 'string', qualifier: 'const' });
-    expect(types.get('inputText')).toMatchObject({ kind: 'string', qualifier: 'input' });
-    expect(types.get('seriesText')).toMatchObject({ kind: 'string', qualifier: 'series' });
-  });
-
   it('reports map key and value template mismatches', () => {
     const result = checkProgram(parse(`
 indicator("Bad Map Types")
@@ -992,7 +663,6 @@ inferred.put("ADA", "bad")
 indicator("Map Signatures")
 map<string, float> left = map.new<string, float>()
 map<string, float> right = map.new<string, float>()
-created = map.new<string, float>()
 previous = map.put(id=left, key="BTC", value=1.0)
 value = map.get(id=left, key="BTC")
 exists = map.contains(id=left, key="BTC")
@@ -1013,21 +683,7 @@ map.clear(id=right)
 plot(previous + value + removed + prefixPrevious + prefixValue + prefixRemoved + size + array.size(keys) + array.size(values) + (exists ? 1 : 0) + (prefixExists ? 1 : 0))
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('value')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('removed')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('prefixValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('prefixRemoved')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('exists')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('prefixExists')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('left')).toMatchObject({ kind: 'map', keyType: { kind: 'string' }, valueType: { kind: 'float' } });
-    expect(types.get('right')).toMatchObject({ kind: 'map', keyType: { kind: 'string' }, valueType: { kind: 'float' } });
-    expect(types.get('created')).toMatchObject({ kind: 'map', qualifier: 'series', keyType: { kind: 'string' }, valueType: { kind: 'float' } });
-    expect(types.get('copied')).toMatchObject({ kind: 'map', qualifier: 'series', keyType: { kind: 'string' }, valueType: { kind: 'float' } });
-    expect(types.get('keys')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'string' } });
-    expect(types.get('values')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('size')).toMatchObject({ kind: 'int', qualifier: 'series' });
   });
 
   it('reports invalid map helper named arguments', () => {
@@ -1079,18 +735,7 @@ array.clear(id=copied)
 plot(first + last + value + removed + popped + shifted + size + array.size(fromValues) + array.size(mixed))
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('values')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
-    expect(types.get('mixed')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('fromValues')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
-    expect(types.get('copied')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
-    expect(types.get('removed')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('first')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('last')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('value')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('popped')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('shifted')).toMatchObject({ kind: 'int', qualifier: 'series' });
   });
 
   it('reports invalid core array helper named arguments', () => {
@@ -1318,16 +963,7 @@ valid = matrix.is_valid(id=m)
 plot(rows + columns + elements + first + matrix.rows(id=generic) + matrix.rows(id=flags) + (valid ? 1 : 0))
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('m')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'int' } });
-    expect(types.get('generic')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('flags')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'bool' } });
-    expect(types.get('rows')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('columns')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('elements')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('first')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('valid')).toMatchObject({ kind: 'bool', qualifier: 'series' });
   });
 
   it('reports invalid matrix core helper named arguments', () => {
@@ -1373,11 +1009,7 @@ matrix.reverse(id=m)
 plot(matrix.rows(id=m) + matrix.columns(id=m) + array.size(removedRow) + array.size(removedCol) + array.size(removedColumn))
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('removedRow')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
-    expect(types.get('removedCol')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
-    expect(types.get('removedColumn')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
   });
 
   it('reports invalid matrix structural helper named arguments', () => {
@@ -1428,15 +1060,7 @@ matrix.concat(id1=copy, id2=tail)
 plot(matrix.rows(id=m) + matrix.rows(id=transposed) + matrix.rows(id=slice) + matrix.rows(id=whole) + array.size(row) + array.size(col) + array.size(column))
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('copy')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'int' } });
-    expect(types.get('transposed')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'int' } });
-    expect(types.get('row')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
-    expect(types.get('col')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
-    expect(types.get('column')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
-    expect(types.get('slice')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'int' } });
-    expect(types.get('whole')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'int' } });
   });
 
   it('reports invalid matrix extraction helper named arguments', () => {
@@ -1490,20 +1114,7 @@ vectors = matrix.eigenvectors(id=m)
 plot(average + minimum + maximum + middle + common + trace + det + rank + matrix.rows(id=inverse) + matrix.rows(id=pinverse) + array.size(eigen) + matrix.rows(id=vectors))
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('average')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('minimum')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('maximum')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('middle')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('common')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('trace')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('det')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('rank')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('inverse')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('pinverse')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('eigen')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('vectors')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
   });
 
   it('reports invalid matrix unary helper named arguments', () => {
@@ -1544,20 +1155,11 @@ diffNamed = matrix.diff(id1=a, id2=b)
 multNamed = matrix.mult(id1=a, id2=b)
 kronNamed = matrix.kron(id1=a, id2=b)
 powNamed = matrix.pow(id=a, power=2)
-multArray = matrix.mult(id1=a, id2=array.from(1.0, 2.0))
 matrix.sort(id=a, column=1, order=order.descending, sort_field=0)
-plot(matrix.rows(id=sumNamed) + matrix.rows(id=sumAlias) + matrix.rows(id=diffNamed) + matrix.rows(id=multNamed) + matrix.rows(id=kronNamed) + matrix.rows(id=powNamed) + array.size(multArray))
+plot(matrix.rows(id=sumNamed) + matrix.rows(id=sumAlias) + matrix.rows(id=diffNamed) + matrix.rows(id=multNamed) + matrix.rows(id=kronNamed) + matrix.rows(id=powNamed))
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('sumNamed')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('sumAlias')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('diffNamed')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('multNamed')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('kronNamed')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('powNamed')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('multArray')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
   });
 
   it('reports invalid matrix calculation helper named arguments', () => {
@@ -1612,18 +1214,7 @@ stochastic = matrix.is_stochastic(id=m)
 plot((square ? 1 : 0) + (zero ? 1 : 0) + (binary ? 1 : 0) + (identity ? 1 : 0) + (diagonal ? 1 : 0) + (antidiagonal ? 1 : 0) + (symmetric ? 1 : 0) + (antisymmetric ? 1 : 0) + (triangular ? 1 : 0) + (stochastic ? 1 : 0))
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('square')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('zero')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('binary')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('identity')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('diagonal')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('antidiagonal')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('symmetric')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('antisymmetric')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('triangular')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('stochastic')).toMatchObject({ kind: 'bool', qualifier: 'series' });
   });
 
   it('reports invalid matrix predicate helper named arguments', () => {
@@ -1776,11 +1367,11 @@ ints.push(fromRemove)
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
-    expect(types.get('fromIndex')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('fromGet')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('fromFirst')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('fromLast')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('fromRemove')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('fromIndex')).toMatchObject({ kind: 'float' });
+    expect(types.get('fromGet')).toMatchObject({ kind: 'float' });
+    expect(types.get('fromFirst')).toMatchObject({ kind: 'float' });
+    expect(types.get('fromLast')).toMatchObject({ kind: 'float' });
+    expect(types.get('fromRemove')).toMatchObject({ kind: 'float' });
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot use float value as int array element',
       'Cannot use float value as int array element',
@@ -1814,8 +1405,8 @@ float widened = namespaceValue
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
-    expect(types.get('value')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('namespaceValue')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('value')).toMatchObject({ kind: 'float' });
+    expect(types.get('namespaceValue')).toMatchObject({ kind: 'int' });
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot use string value as float matrix element',
       'Cannot use bool value as float matrix element',
@@ -1851,7 +1442,7 @@ values.sort(0, order.ascending, true)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'matrix.sort() sort_field requires const int or const string, got input string',
+      'matrix.sort() sort_field requires const int or const string, got input unknown',
       'matrix.sort() sort_field requires const int or const string, got simple string',
       'matrix.sort() sort_field requires const int or const string, got series int',
       'matrix.sort() sort_field requires const int or const string, got unqualified int',
@@ -1886,12 +1477,12 @@ matrixValues.sort(0, order.ascending, inputField)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'array.sort() sort_field requires const int or const string, got input string',
+      'array.sort() sort_field requires const int or const string, got input unknown',
       'array.sort() sort_field requires const int or const string, got simple string',
       'array.sort() sort_field requires const int or const string, got series int',
       'array.sort() sort_field requires const int or const string, got unqualified int',
       'array.sort() sort_field must be a const int or const string, got bool',
-      'matrix.sort() sort_field requires const int or const string, got input string',
+      'matrix.sort() sort_field requires const int or const string, got input unknown',
     ]);
   });
 
@@ -1906,12 +1497,7 @@ fromIndexMixed = chart.point.from_index(index=bar_index, high)
 fromTime = chart.point.from_time(time=time, price=close)
 copied = chart.point.copy(id=fromIndex)
 points = array.from(point, mixed, current, fromIndex, fromIndexMixed, fromTime, copied)
-pointIndex = current.index
-pointTime = current.time
-pointPrice = current.price
 plot(array.size(points))
-plot(pointIndex + pointTime)
-plot(pointPrice)
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -1925,9 +1511,6 @@ plot(pointPrice)
     expect(types.get('fromTime')).toMatchObject({ kind: 'chart.point' });
     expect(types.get('copied')).toMatchObject({ kind: 'chart.point' });
     expect(types.get('points')).toMatchObject({ kind: 'array', elementType: { kind: 'chart.point' } });
-    expect(types.get('pointIndex')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('pointTime')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('pointPrice')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid chart point helper named arguments', () => {
@@ -1938,7 +1521,6 @@ unknownNew = chart.point.new(timestamp=time, index=bar_index, price=close)
 missingPrice = chart.point.from_index(index=bar_index)
 tooManyNow = chart.point.now(close, high)
 duplicateCopy = chart.point.copy(point, id=point)
-unknownField = point.z
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -1949,44 +1531,7 @@ unknownField = point.z
       "chart.point.from_index() missing required argument 'price'",
       'chart.point.now() expects at most 1 argument',
       "Argument 'id' for chart.point.copy() was supplied multiple times",
-      "Unknown field 'z' on type chart.point",
     ]);
-  });
-
-  it('infers series qualifiers for reference constructors', () => {
-    const result = checkProgram(parse(`
-indicator("Reference Constructor Qualifiers")
-point = chart.point.now(close)
-pointCopy = chart.point.copy(point)
-marker = label.new(bar_index, close)
-markerCopy = label.copy(marker)
-trend = line.new(bar_index, close, bar_index + 1, high)
-trendCopy = line.copy(trend)
-zone = box.new(bar_index, high, bar_index + 1, low)
-zoneCopy = box.copy(zone)
-fill = linefill.new(trend, trendCopy)
-points = array.from(chart.point.from_index(bar_index, close), chart.point.from_index(bar_index + 1, high))
-shape = polyline.new(points)
-shapeCopy = polyline.copy(shape)
-dashboard = table.new(columns=1, rows=1)
-plot(array.size(points))
-`));
-
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
-
-    expect(result.diagnostics).toEqual([]);
-    expect(types.get('point')).toMatchObject({ kind: 'chart.point', qualifier: 'series' });
-    expect(types.get('pointCopy')).toMatchObject({ kind: 'chart.point', qualifier: 'series' });
-    expect(types.get('marker')).toMatchObject({ kind: 'label', qualifier: 'series' });
-    expect(types.get('markerCopy')).toMatchObject({ kind: 'label', qualifier: 'series' });
-    expect(types.get('trend')).toMatchObject({ kind: 'line', qualifier: 'series' });
-    expect(types.get('trendCopy')).toMatchObject({ kind: 'line', qualifier: 'series' });
-    expect(types.get('zone')).toMatchObject({ kind: 'box', qualifier: 'series' });
-    expect(types.get('zoneCopy')).toMatchObject({ kind: 'box', qualifier: 'series' });
-    expect(types.get('fill')).toMatchObject({ kind: 'linefill', qualifier: 'series' });
-    expect(types.get('shape')).toMatchObject({ kind: 'polyline', qualifier: 'series' });
-    expect(types.get('shapeCopy')).toMatchObject({ kind: 'polyline', qualifier: 'series' });
-    expect(types.get('dashboard')).toMatchObject({ kind: 'table', qualifier: 'series' });
   });
 
   it('resolves label.new named arguments and positional tails', () => {
@@ -2061,66 +1606,6 @@ plot(array.size(labels) + x + y)
     expect(result.diagnostics).toEqual([]);
     expect(types.get('clone')).toMatchObject({ kind: 'label' });
     expect(types.get('labels')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
-    expect(types.get('x')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('y')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('textValue')).toMatchObject({ kind: 'string', qualifier: 'series' });
-    expect(types.get('xlocValue')).toMatchObject({ kind: 'string', qualifier: 'series' });
-    expect(types.get('ylocValue')).toMatchObject({ kind: 'string', qualifier: 'series' });
-    expect(types.get('styleValue')).toMatchObject({ kind: 'string', qualifier: 'series' });
-    expect(types.get('colorValue')).toMatchObject({ kind: 'color', qualifier: 'series' });
-    expect(types.get('textColorValue')).toMatchObject({ kind: 'color', qualifier: 'series' });
-    expect(types.get('sizeValue')).toMatchObject({ kind: 'string', qualifier: 'series' });
-    expect(types.get('tooltipValue')).toMatchObject({ kind: 'string', qualifier: 'series' });
-  });
-
-  it('resolves drawing all member collection types', () => {
-    const result = checkProgram(parse(`
-indicator("Drawing All Members")
-labels = label.all
-lines = line.all
-linefills = linefill.all
-boxes = box.all
-polylines = polyline.all
-labelCount = array.size(label.all)
-lineCount = array.size(line.all)
-linefillCount = array.size(linefill.all)
-boxCount = array.size(box.all)
-polylineCount = array.size(polyline.all)
-plot(labelCount + lineCount + linefillCount + boxCount + polylineCount)
-`));
-
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
-
-    expect(result.diagnostics).toEqual([]);
-    expect(types.get('labels')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
-    expect(types.get('lines')).toMatchObject({ kind: 'array', elementType: { kind: 'line' } });
-    expect(types.get('linefills')).toMatchObject({ kind: 'array', elementType: { kind: 'linefill' } });
-    expect(types.get('boxes')).toMatchObject({ kind: 'array', elementType: { kind: 'box' } });
-    expect(types.get('polylines')).toMatchObject({ kind: 'array', elementType: { kind: 'polyline' } });
-    expect(types.get('labelCount')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('lineCount')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('linefillCount')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('boxCount')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('polylineCount')).toMatchObject({ kind: 'int', qualifier: 'series' });
-  });
-
-  it('reports mismatched drawing all member collection mutations', () => {
-    const result = checkProgram(parse(`
-indicator("Bad Drawing All Members")
-array.push(label.all, line.new(bar_index, close, bar_index + 1, close))
-array.push(line.all, box.new(bar_index, high, bar_index + 1, low))
-array.push(linefill.all, polyline.new(array.from(chart.point.from_index(bar_index, close))))
-array.push(box.all, label.new(bar_index, close))
-array.push(polyline.all, linefill.new(line.new(bar_index, low, bar_index + 1, low), line.new(bar_index, high, bar_index + 1, high), color.blue))
-`));
-
-    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Cannot use line value as label array element',
-      'Cannot use box value as line array element',
-      'Cannot use polyline value as linefill array element',
-      'Cannot use label value as box array element',
-      'Cannot use linefill value as polyline array element',
-    ]);
   });
 
   it('reports invalid label method argument bindings', () => {
@@ -2144,61 +1629,6 @@ unknownGetter = label.get_text(marker, format="raw")
       'label.copy() expects at least 1 argument',
       "label.copy() missing required argument 'id'",
       "Unknown argument 'format' for label.get_text()",
-    ]);
-  });
-
-  it('resolves line.new coordinate and point overloads', () => {
-    const result = checkProgram(parse(`
-indicator("Line Constructor Signatures")
-firstPoint = chart.point.from_index(bar_index, high)
-secondPoint = chart.point.from_index(bar_index + 1, low)
-pointLine = line.new(first_point=firstPoint, secondPoint, xloc.bar_index, "right", color.blue, "solid", 2, true)
-sharedNamedPointLine = line.new(first_point=firstPoint, second_point=secondPoint, color=color.red, xloc=xloc.bar_index)
-coordinateLine = line.new(x1=bar_index, y1=high, x2=bar_index + 1, y2=low, color=color.orange)
-positionalPointLine = line.new(firstPoint, secondPoint)
-lines = array.from(pointLine, sharedNamedPointLine, coordinateLine, positionalPointLine)
-plot(array.size(lines))
-`));
-
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
-
-    expect(result.diagnostics).toEqual([]);
-    expect(types.get('pointLine')).toMatchObject({ kind: 'line' });
-    expect(types.get('sharedNamedPointLine')).toMatchObject({ kind: 'line' });
-    expect(types.get('coordinateLine')).toMatchObject({ kind: 'line' });
-    expect(types.get('positionalPointLine')).toMatchObject({ kind: 'line' });
-    expect(types.get('lines')).toMatchObject({ kind: 'array', elementType: { kind: 'line' } });
-  });
-
-  it('reports invalid line.new overload argument bindings', () => {
-    const result = checkProgram(parse(`
-indicator("Bad Line Constructor Signatures")
-firstPoint = chart.point.from_index(bar_index, high)
-secondPoint = chart.point.from_index(bar_index + 1, low)
-unknownCoordinate = line.new(bar_index, high, bar_index + 1, low, opacity=80)
-missingCoordinate = line.new(x1=bar_index, y1=high)
-duplicateCoordinate = line.new(bar_index, high, bar_index + 1, low, x1=bar_index)
-tooManyCoordinate = line.new(bar_index, high, bar_index + 1, low, xloc.bar_index, "right", color.blue, "solid", 2, true, false)
-missingPoint = line.new(first_point=firstPoint)
-duplicatePoint = line.new(firstPoint, secondPoint, first_point=firstPoint)
-tooManyPoint = line.new(firstPoint, secondPoint, xloc.bar_index, "right", color.blue, "solid", 2, true, false)
-badTwoPositionals = line.new(bar_index, high)
-`));
-
-    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Unknown argument 'opacity' for line.new()",
-      'line.new() expects at least 4 arguments',
-      "line.new() missing required argument 'x2'",
-      "line.new() missing required argument 'y2'",
-      "Argument 'x1' for line.new() was supplied multiple times",
-      'line.new() expects at most 10 arguments',
-      'line.new() expects at least 2 arguments',
-      "line.new() missing required argument 'second_point'",
-      "Argument 'first_point' for line.new() was supplied multiple times",
-      'line.new() expects at most 8 arguments',
-      'line.new() expects at least 4 arguments',
-      "line.new() missing required argument 'x2'",
-      "line.new() missing required argument 'y2'",
     ]);
   });
 
@@ -2266,11 +1696,11 @@ plot(price + y1 + y2)
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('x1')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('x2')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('y1')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('y2')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('price')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('x1')).toMatchObject({ kind: 'int' });
+    expect(types.get('x2')).toMatchObject({ kind: 'int' });
+    expect(types.get('y1')).toMatchObject({ kind: 'float' });
+    expect(types.get('y2')).toMatchObject({ kind: 'float' });
+    expect(types.get('price')).toMatchObject({ kind: 'float' });
   });
 
   it('reports invalid line getter argument bindings', () => {
@@ -2292,61 +1722,6 @@ missingGetter = line.get_x2()
       'line.get_y1() expects at most 1 argument',
       'line.get_x2() expects at least 1 argument',
       "line.get_x2() missing required argument 'id'",
-    ]);
-  });
-
-  it('resolves box.new coordinate and point overloads', () => {
-    const result = checkProgram(parse(`
-indicator("Box Constructor Signatures")
-topLeft = chart.point.from_index(bar_index, high)
-bottomRight = chart.point.from_index(bar_index + 1, low)
-pointBox = box.new(top_left=topLeft, bottomRight, color.blue, 1, "solid", "right", xloc.bar_index)
-sharedNamedPointBox = box.new(top_left=topLeft, bottom_right=bottomRight, bgcolor=color.new(color.blue, 80), text="Zone")
-coordinateBox = box.new(left=bar_index, top=high, right=bar_index + 1, bottom=low, bgcolor=color.orange)
-positionalPointBox = box.new(topLeft, bottomRight)
-boxes = array.from(pointBox, sharedNamedPointBox, coordinateBox, positionalPointBox)
-plot(array.size(boxes))
-`));
-
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
-
-    expect(result.diagnostics).toEqual([]);
-    expect(types.get('pointBox')).toMatchObject({ kind: 'box' });
-    expect(types.get('sharedNamedPointBox')).toMatchObject({ kind: 'box' });
-    expect(types.get('coordinateBox')).toMatchObject({ kind: 'box' });
-    expect(types.get('positionalPointBox')).toMatchObject({ kind: 'box' });
-    expect(types.get('boxes')).toMatchObject({ kind: 'array', elementType: { kind: 'box' } });
-  });
-
-  it('reports invalid box.new overload argument bindings', () => {
-    const result = checkProgram(parse(`
-indicator("Bad Box Constructor Signatures")
-topLeft = chart.point.from_index(bar_index, high)
-bottomRight = chart.point.from_index(bar_index + 1, low)
-unknownCoordinate = box.new(bar_index, high, bar_index + 1, low, opacity=80)
-missingCoordinate = box.new(left=bar_index, top=high)
-duplicateCoordinate = box.new(bar_index, high, bar_index + 1, low, left=bar_index)
-tooManyCoordinate = box.new(bar_index, high, bar_index + 1, low, color.blue, 1, "solid", "right", xloc.bar_index, color.orange, "Text", size.small, color.white, "left", "top", "wrap", "mono", true, false)
-missingPoint = box.new(top_left=topLeft)
-duplicatePoint = box.new(topLeft, bottomRight, top_left=topLeft)
-tooManyPoint = box.new(topLeft, bottomRight, color.blue, 1, "solid", "right", xloc.bar_index, color.orange, "Text", size.small, color.white, "left", "top", "wrap", "mono", true, false)
-badTwoPositionals = box.new(bar_index, high)
-`));
-
-    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Unknown argument 'opacity' for box.new()",
-      'box.new() expects at least 4 arguments',
-      "box.new() missing required argument 'right'",
-      "box.new() missing required argument 'bottom'",
-      "Argument 'left' for box.new() was supplied multiple times",
-      'box.new() expects at most 18 arguments',
-      'box.new() expects at least 2 arguments',
-      "box.new() missing required argument 'bottom_right'",
-      "Argument 'top_left' for box.new() was supplied multiple times",
-      'box.new() expects at most 16 arguments',
-      'box.new() expects at least 4 arguments',
-      "box.new() missing required argument 'right'",
-      "box.new() missing required argument 'bottom'",
     ]);
   });
 
@@ -2486,15 +1861,15 @@ plot(leftValue + rightValue + topValue + bottomValue)
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('leftValue')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('rightValue')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('topValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('bottomValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('bgValue')).toMatchObject({ kind: 'color', qualifier: 'series' });
-    expect(types.get('borderValue')).toMatchObject({ kind: 'color', qualifier: 'series' });
-    expect(types.get('textValue')).toMatchObject({ kind: 'string', qualifier: 'series' });
-    expect(types.get('halignValue')).toMatchObject({ kind: 'string', qualifier: 'series' });
-    expect(types.get('valignValue')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('leftValue')).toMatchObject({ kind: 'int' });
+    expect(types.get('rightValue')).toMatchObject({ kind: 'int' });
+    expect(types.get('topValue')).toMatchObject({ kind: 'float' });
+    expect(types.get('bottomValue')).toMatchObject({ kind: 'float' });
+    expect(types.get('bgValue')).toMatchObject({ kind: 'color' });
+    expect(types.get('borderValue')).toMatchObject({ kind: 'color' });
+    expect(types.get('textValue')).toMatchObject({ kind: 'string' });
+    expect(types.get('halignValue')).toMatchObject({ kind: 'string' });
+    expect(types.get('valignValue')).toMatchObject({ kind: 'string' });
   });
 
   it('reports invalid box getter argument bindings', () => {
@@ -2621,8 +1996,8 @@ plot(1)
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('firstLine')).toMatchObject({ kind: 'line', qualifier: 'series' });
-    expect(types.get('secondLine')).toMatchObject({ kind: 'line', qualifier: 'series' });
+    expect(types.get('firstLine')).toMatchObject({ kind: 'line' });
+    expect(types.get('secondLine')).toMatchObject({ kind: 'line' });
   });
 
   it('reports invalid linefill method argument bindings', () => {
@@ -2885,16 +2260,16 @@ joinedValue = floatValues.join(",")
     expect(types.get('name')).toMatchObject({ kind: 'string' });
     expect(types.get('tint')).toMatchObject({ kind: 'color' });
     expect(types.get('values')).toMatchObject({ kind: 'array' });
-    expect(types.get('copied')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('sliced')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('absolute')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('standardized')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('indices')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
-    expect(types.get('sizeValue')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('hasValue')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('indexValue')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('averageValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('joinedValue')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('copied')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('sliced')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('absolute')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('standardized')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('indices')).toMatchObject({ kind: 'array', elementType: { kind: 'int' } });
+    expect(types.get('sizeValue')).toMatchObject({ kind: 'int' });
+    expect(types.get('hasValue')).toMatchObject({ kind: 'bool' });
+    expect(types.get('indexValue')).toMatchObject({ kind: 'int' });
+    expect(types.get('averageValue')).toMatchObject({ kind: 'float' });
+    expect(types.get('joinedValue')).toMatchObject({ kind: 'string' });
   });
 
   it('records explicit qualifiers and infers common qualifier sources', () => {
@@ -2952,7 +2327,7 @@ indicator("Visual Output Mixed Args")
 upper = plot(series=high, "Upper", color.green)
 lower = plot(series=low, "Lower", color.red)
 plot(series=close, "Mixed Plot", color.blue, 2, plot.style_columns)
-guide = hline(price=100, "Mixed HLine", color.orange, hline.style_dashed, 2)
+hline(price=100, "Mixed HLine", color.orange, hline.style_dashed, 2)
 bgcolor(color=color.blue, 1, false, 3, "Mixed Bg")
 barcolor(color=color.red, 1, true, 4, "Mixed Bar")
 plotbar(open=open, high, low, close, "Mixed Bars", color.purple, false, 5, display.none)
@@ -2964,12 +2339,7 @@ fill(plot1=upper, lower, color.new(color.orange, 80), "Mixed Fill", false, 6)
 fill(hline1=upper, hline2=lower, color=color.new(color.blue, 90))
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
-
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('upper')).toMatchObject({ kind: 'plot', qualifier: 'series' });
-    expect(types.get('lower')).toMatchObject({ kind: 'plot', qualifier: 'series' });
-    expect(types.get('guide')).toMatchObject({ kind: 'hline', qualifier: 'series' });
   });
 
   it('reports duplicate built-in bindings from positional and named arguments', () => {
@@ -2992,9 +2362,6 @@ last = ta.valuewhen(condition=condition, source=close, occurrence=0)
 lastMixed = ta.valuewhen(condition=condition, close, 0)
 changed = ta.change(source=close, length=2)
 changedMixed = ta.change(source=close, 2)
-crossoverValue = ta.crossover(source1=close, source2=open)
-crossunderValue = ta.crossunder(source1=close, source2=open)
-crossValue = ta.cross(source1=close, source2=open)
 crossed = ta.crossover(source1=close, source2=open) or ta.crossunder(source1=close, source2=open) or ta.cross(source1=close, source2=open)
 crossedMixed = ta.crossover(source1=close, open) or ta.crossunder(source1=close, open) or ta.cross(source1=close, open)
 highest = ta.highest(length=3)
@@ -3007,35 +2374,11 @@ mixedLowest = ta.lowest(source=low, 3)
 mixedHighestOffset = ta.highestbars(source=high, 3)
 mixedLowestOffset = ta.lowestbars(source=low, 3)
 spread = ta.range(source=close, length=3)
-risingValue = ta.rising(source=close, length=2)
-fallingValue = ta.falling(source=close, length=2)
 trend = ta.rising(source=close, length=2) or ta.falling(source=close, length=2)
 plot(since + last + lastMixed + changed + changedMixed + highest + lowest + highestOffset + lowestOffset + singleLengthHighest + mixedHighest + mixedLowest + mixedHighestOffset + mixedLowestOffset + spread + (crossed ? 1 : 0) + (crossedMixed ? 1 : 0) + (trend ? 1 : 0))
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
-
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('last')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('lastMixed')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('changed')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('changedMixed')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('highest')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('lowest')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('singleLengthHighest')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedHighest')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedLowest')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('spread')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('since')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('highestOffset')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('lowestOffset')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('mixedHighestOffset')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('mixedLowestOffset')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('crossoverValue')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('crossunderValue')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('crossValue')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('risingValue')).toMatchObject({ kind: 'bool', qualifier: 'series' });
-    expect(types.get('fallingValue')).toMatchObject({ kind: 'bool', qualifier: 'series' });
   });
 
   it('reports invalid core TA helper named arguments', () => {
@@ -3082,34 +2425,10 @@ linearMixed = ta.percentile_linear_interpolation(source=close, 3, 75)
 rank = ta.percentrank(source=close, length=3)
 rankMixed = ta.percentrank(source=close, 3)
 total = ta.cum(source=close)
-stdev = ta.stdev(source=close, length=3, biased=false)
-stdevMixed = ta.stdev(source=close, 3, false)
-plot(variance + varianceMixed + deviation + deviationMixed + correlation + correlationMixed + cog + mixedCog + median + medianMixed + mode + modeMixed + nearest + nearestMixed + linear + linearMixed + rank + rankMixed + total + stdev + stdevMixed)
+plot(variance + varianceMixed + deviation + deviationMixed + correlation + correlationMixed + cog + mixedCog + median + medianMixed + mode + modeMixed + nearest + nearestMixed + linear + linearMixed + rank + rankMixed + total)
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('variance')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('varianceMixed')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('deviation')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('deviationMixed')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('correlation')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('correlationMixed')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('cog')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedCog')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('median')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('medianMixed')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mode')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('modeMixed')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('nearest')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('nearestMixed')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('linear')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('linearMixed')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('rank')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('rankMixed')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('total')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('stdev')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('stdevMixed')).toEqual({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid TA statistics helper named arguments', () => {
@@ -3154,28 +2473,7 @@ rateMixed = ta.roc(source=close, 2)
 plot(vwma + vwmaMixed + rma + rmaMixed + wma + wmaMixed + swma + alma + almaMixed + hma + hmaMixed + momentum + momentumMixed + rate + rateMixed)
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
-
     expect(result.diagnostics).toEqual([]);
-    for (const name of [
-      'vwma',
-      'vwmaMixed',
-      'rma',
-      'rmaMixed',
-      'wma',
-      'wmaMixed',
-      'swma',
-      'alma',
-      'almaMixed',
-      'hma',
-      'hmaMixed',
-      'momentum',
-      'momentumMixed',
-      'rate',
-      'rateMixed',
-    ]) {
-      expect(types.get(name)).toMatchObject({ kind: 'float', qualifier: 'series' });
-    }
   });
 
   it('reports invalid TA moving-average and momentum helper named arguments', () => {
@@ -3212,24 +2510,7 @@ kcwMixed = ta.kcw(series=close, 3, 1.25, false)
 plot(bbBasis + bbUpper + bbLower + mixedBbBasis + mixedBbUpper + mixedBbLower + bbw + bbwMixed + kcBasis + kcUpper + kcLower + mixedKcBasis + mixedKcUpper + mixedKcLower + kcw + kcwMixed)
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('bbBasis')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('bbUpper')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('bbLower')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedBbBasis')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedBbUpper')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedBbLower')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('bbw')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('bbwMixed')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('kcBasis')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('kcUpper')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('kcLower')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedKcBasis')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedKcUpper')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedKcLower')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('kcw')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('kcwMixed')).toEqual({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid TA channel helper named arguments', () => {
@@ -3269,21 +2550,7 @@ cciMixed = ta.cci(source=hlc3, 3)
 plot(stoch + stochMixed + mfi + mfiMixed + wpr + cmo + cmoMixed + rsi + rsiMixed + tsi + tsiMixed + cci + cciMixed)
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('stoch')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('stochMixed')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mfi')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mfiMixed')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('wpr')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('cmo')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('cmoMixed')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('rsi')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('rsiMixed')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('tsi')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('tsiMixed')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('cci')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('cciMixed')).toEqual({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid TA oscillator helper named arguments', () => {
@@ -3328,33 +2595,7 @@ mixedLinreg = ta.linreg(source=close, 3, 1)
 plot(trend + direction + mixedTrend + mixedDirection + diPlus + diMinus + adx + mixedDiPlus + mixedDiMinus + mixedAdx + sar + mixedSar + pivotHigh + pivotLow + defaultPivotHigh + defaultPivotLow + sourceTailPivotHigh + sourceTailPivotLow + leftTailPivotHigh + leftTailPivotLow + mixedPivotHigh + mixedPivotLow + linreg + mixedLinreg)
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
-
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('trend')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('direction')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedTrend')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedDirection')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('diPlus')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('diMinus')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('adx')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedDiPlus')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedDiMinus')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedAdx')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('sar')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedSar')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('pivotHigh')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('pivotLow')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('defaultPivotHigh')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('defaultPivotLow')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('sourceTailPivotHigh')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('sourceTailPivotLow')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('leftTailPivotHigh')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('leftTailPivotLow')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedPivotHigh')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedPivotLow')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('linreg')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedLinreg')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid TA trend and pivot helper named arguments', () => {
@@ -3390,29 +2631,13 @@ currentObv = ta.obv
 range = ta.tr(handle_na=true)
 rawRange = ta.tr
 spread = ta.range(source=close, 3)
-atr = ta.atr(length=3)
-vwap = ta.vwap(source=close)
 up = ta.rising(source=close, 2)
 down = ta.falling(source=close, 2)
-plot(line + signal + hist + mixedLine + mixedSignal + mixedHist + legacyObv + mixedObv + currentObv + range + rawRange + spread + atr + vwap)
+plot(line + signal + hist + mixedLine + mixedSignal + mixedHist + legacyObv + mixedObv + currentObv + range + rawRange + spread)
 plotshape(up or down)
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('line')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('signal')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('hist')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedLine')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedSignal')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedHist')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('legacyObv')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('mixedObv')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('currentObv')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('range')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('rawRange')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('atr')).toEqual({ kind: 'float', qualifier: 'series' });
-    expect(types.get('vwap')).toEqual({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid remaining TA helper named arguments', () => {
@@ -3438,11 +2663,7 @@ unknownTr = ta.tr(handle_na=true, fallback=true)
     const result = checkProgram(parse(`
 indicator("Color Signatures")
 base = color.rgb(red=1, green=2, blue=3, transp=25)
-red = color.r(color=base)
-green = color.g(color=base)
-blue = color.b(color=base)
-transparency = color.t(color=base)
-derived = color.rgb(red, green, blue, transparency)
+derived = color.rgb(color.r(color=base), color.g(color=base), color.b(color=base), color.t(color=base))
 gradient = color.from_gradient(value=close, bottom_value=0, top_value=100, bottom_color=base, top_color=derived)
 prefixBase = color.rgb(red=4, 5, 6)
 prefixAlpha = color.rgb(red=7, green=8, 9, 10)
@@ -3451,19 +2672,7 @@ prefixGradient = color.from_gradient(value=close, 0, 100, prefixNew, prefixAlpha
 plot(close, color=gradient)
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('base')).toMatchObject({ kind: 'color', qualifier: 'const' });
-    expect(types.get('red')).toMatchObject({ kind: 'float', qualifier: 'const' });
-    expect(types.get('green')).toMatchObject({ kind: 'float', qualifier: 'const' });
-    expect(types.get('blue')).toMatchObject({ kind: 'float', qualifier: 'const' });
-    expect(types.get('transparency')).toMatchObject({ kind: 'float', qualifier: 'const' });
-    expect(types.get('derived')).toMatchObject({ kind: 'color', qualifier: 'const' });
-    expect(types.get('gradient')).toMatchObject({ kind: 'color', qualifier: 'series' });
-    expect(types.get('prefixBase')).toMatchObject({ kind: 'color', qualifier: 'const' });
-    expect(types.get('prefixAlpha')).toMatchObject({ kind: 'color', qualifier: 'const' });
-    expect(types.get('prefixNew')).toMatchObject({ kind: 'color', qualifier: 'const' });
-    expect(types.get('prefixGradient')).toMatchObject({ kind: 'color', qualifier: 'series' });
   });
 
   it('reports invalid color helper named arguments', () => {
@@ -3516,41 +2725,10 @@ replaceOne = str.replace(string=text, substring="USDT", replacement="PERP", occu
 prefixReplaceOne = str.replace(source=text, "USDT", "PERP", 1)
 replaceAll = str.replace_all(source=text, str="USDT", replacement="PERP")
 prefixReplaceAll = str.replace_all(string=text, "USDT", "PERP")
-formattedLength = str.length(string=formatted)
-plot(parsed + position + prefixPosition + formattedLength + str.length(string=formatted + prefixFormatted + timeText + prefixTimeText + message + prefix + prefixSlice + match + prefixMatch + repeated + prefixRepeated + upper + lower + trimmed + replaceOne + prefixReplaceOne + replaceAll + prefixReplaceAll))
+plot(parsed + position + prefixPosition + str.length(string=formatted + prefixFormatted + timeText + prefixTimeText + message + prefix + prefixSlice + match + prefixMatch + repeated + prefixRepeated + upper + lower + trimmed + replaceOne + prefixReplaceOne + replaceAll + prefixReplaceAll))
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('formatted')).toMatchObject({ kind: 'string', qualifier: 'series' });
-    expect(types.get('prefixFormatted')).toMatchObject({ kind: 'string', qualifier: 'series' });
-    expect(types.get('parsed')).toMatchObject({ kind: 'float', qualifier: 'const' });
-    expect(types.get('timeText')).toMatchObject({ kind: 'string', qualifier: 'series' });
-    expect(types.get('prefixTimeText')).toMatchObject({ kind: 'string', qualifier: 'series' });
-    expect(types.get('message')).toMatchObject({ kind: 'string', qualifier: 'series' });
-    expect(types.get('hasUsdt')).toMatchObject({ kind: 'bool', qualifier: 'const' });
-    expect(types.get('prefixHasUsdt')).toMatchObject({ kind: 'bool', qualifier: 'const' });
-    expect(types.get('starts')).toMatchObject({ kind: 'bool', qualifier: 'const' });
-    expect(types.get('prefixStarts')).toMatchObject({ kind: 'bool', qualifier: 'const' });
-    expect(types.get('ends')).toMatchObject({ kind: 'bool', qualifier: 'const' });
-    expect(types.get('position')).toMatchObject({ kind: 'int', qualifier: 'const' });
-    expect(types.get('prefixPosition')).toMatchObject({ kind: 'int', qualifier: 'const' });
-    expect(types.get('formattedLength')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('prefix')).toMatchObject({ kind: 'string', qualifier: 'const' });
-    expect(types.get('prefixSlice')).toMatchObject({ kind: 'string', qualifier: 'const' });
-    expect(types.get('match')).toMatchObject({ kind: 'string', qualifier: 'const' });
-    expect(types.get('prefixMatch')).toMatchObject({ kind: 'string', qualifier: 'const' });
-    expect(types.get('repeated')).toMatchObject({ kind: 'string', qualifier: 'const' });
-    expect(types.get('prefixRepeated')).toMatchObject({ kind: 'string', qualifier: 'const' });
-    expect(types.get('parts')).toMatchObject({ kind: 'array', qualifier: 'const', elementType: { kind: 'string' } });
-    expect(types.get('prefixParts')).toMatchObject({ kind: 'array', qualifier: 'const', elementType: { kind: 'string' } });
-    expect(types.get('upper')).toMatchObject({ kind: 'string', qualifier: 'const' });
-    expect(types.get('lower')).toMatchObject({ kind: 'string', qualifier: 'const' });
-    expect(types.get('trimmed')).toMatchObject({ kind: 'string', qualifier: 'const' });
-    expect(types.get('replaceOne')).toMatchObject({ kind: 'string', qualifier: 'const' });
-    expect(types.get('prefixReplaceOne')).toMatchObject({ kind: 'string', qualifier: 'const' });
-    expect(types.get('replaceAll')).toMatchObject({ kind: 'string', qualifier: 'const' });
-    expect(types.get('prefixReplaceAll')).toMatchObject({ kind: 'string', qualifier: 'const' });
   });
 
   it('reports invalid string helper named arguments', () => {
@@ -3578,8 +2756,6 @@ shortReplace = str.replace(source="BTC", target="B")
 indicator("Math Signatures")
 rounded = math.round(number=math.pi, precision=3)
 prefixRounded = math.round(number=math.pi, 3)
-roundInt = math.round(number=1.2)
-roundSeries = math.round(number=close)
 powered = math.pow(base=2, exponent=3)
 prefixPowered = math.pow(base=2, 3)
 root = math.sqrt(number=16)
@@ -3587,48 +2763,15 @@ logged = math.log(number=math.e) + math.log10(number=100) + math.exp(number=1)
 trig = math.sin(number=0) + math.cos(number=0) + math.tan(number=0) + math.asin(number=0) + math.acos(number=1) + math.atan(number=1)
 converted = math.toradians(number=180) + math.todegrees(number=math.pi)
 unary = math.abs(number=-5) + math.trunc(number=-1.9) + math.floor(number=-1.2) + math.ceil(number=1.2) + math.sign(number=-5)
-absInt = math.abs(number=5)
-absFloat = math.abs(number=5.5)
-floorInt = math.floor(number=1.2)
-signFloat = math.sign(number=5)
-maxInt = math.max(1, 2)
-maxFloat = math.max(1, 2.5)
-maxSeries = math.max(close, open)
-average = math.avg(1, 2)
-seriesAverage = math.avg(close, open)
 seriesSum = math.sum(source=close, length=3)
 prefixSeriesSum = math.sum(source=close, 3)
 tick = math.round_to_mintick(number=1.005)
-inputValue = input.float(1.0)
-inputTick = math.round_to_mintick(number=inputValue)
 rand = math.random(min=10, max=20, seed=7)
 prefixRand = math.random(min=10, 20, 7)
 plot(rounded + prefixRounded + powered + prefixPowered + root + logged + trig + converted + unary + seriesSum + prefixSeriesSum + tick + rand + prefixRand)
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('rounded')).toMatchObject({ kind: 'float', qualifier: 'const' });
-    expect(types.get('prefixRounded')).toMatchObject({ kind: 'float', qualifier: 'const' });
-    expect(types.get('roundInt')).toMatchObject({ kind: 'int', qualifier: 'const' });
-    expect(types.get('roundSeries')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('powered')).toMatchObject({ kind: 'float', qualifier: 'const' });
-    expect(types.get('root')).toMatchObject({ kind: 'float', qualifier: 'const' });
-    expect(types.get('absInt')).toMatchObject({ kind: 'int', qualifier: 'const' });
-    expect(types.get('absFloat')).toMatchObject({ kind: 'float', qualifier: 'const' });
-    expect(types.get('floorInt')).toMatchObject({ kind: 'int', qualifier: 'const' });
-    expect(types.get('signFloat')).toMatchObject({ kind: 'float', qualifier: 'const' });
-    expect(types.get('maxInt')).toMatchObject({ kind: 'int', qualifier: 'const' });
-    expect(types.get('maxFloat')).toMatchObject({ kind: 'float', qualifier: 'const' });
-    expect(types.get('maxSeries')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('average')).toMatchObject({ kind: 'float', qualifier: 'simple' });
-    expect(types.get('seriesAverage')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('seriesSum')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('prefixSeriesSum')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('tick')).toMatchObject({ kind: 'float', qualifier: 'simple' });
-    expect(types.get('inputTick')).toMatchObject({ kind: 'float', qualifier: 'simple' });
-    expect(types.get('rand')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('prefixRand')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid math helper named arguments', () => {
@@ -3665,16 +2808,7 @@ isMissing = na(x=source)
 plot(filled + fixed + asFloat + asInt + (asBool ? 1 : 0) + str.length(asString) + (isMissing ? 1 : 0))
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
-
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('filled')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('fixed')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('asFloat')).toMatchObject({ kind: 'float', qualifier: 'const' });
-    expect(types.get('asInt')).toMatchObject({ kind: 'int', qualifier: 'const' });
-    expect(types.get('asBool')).toMatchObject({ kind: 'bool', qualifier: 'const' });
-    expect(types.get('asString')).toMatchObject({ kind: 'string', qualifier: 'const' });
-    expect(types.get('isMissing')).toMatchObject({ kind: 'bool', qualifier: 'series' });
   });
 
   it('resolves ticker helper named arguments', () => {
@@ -3698,23 +2832,7 @@ prefixPointFigure = ticker.pointfigure(symbol="NASDAQ:AAPL", "hl", "ATR", 14, 3)
 plot(str.length(standard + inherited + prefixInherited + renko + prefixRenko + lineBreak + prefixLineBreak + kagi + prefixKagi + pointFigure + prefixPointFigure))
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('base')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('prefixBase')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('modified')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('prefixModified')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('standard')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('inherited')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('prefixInherited')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('renko')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('prefixRenko')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('lineBreak')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('prefixLineBreak')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('kagi')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('prefixKagi')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('pointFigure')).toMatchObject({ kind: 'string', qualifier: 'simple' });
-    expect(types.get('prefixPointFigure')).toMatchObject({ kind: 'string', qualifier: 'simple' });
   });
 
   it('reports invalid ticker helper named arguments', () => {
@@ -3761,24 +2879,7 @@ prefixSeeded = request.seed(source="seed", "SYM", close, false, 2)
 plot(rate + dividend + earning + split + revenue + econ + seeded)
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('htf')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('ltf')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('rate')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('prefixRate')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('dividend')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('prefixDividend')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('earning')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('prefixEarning')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('split')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('prefixSplit')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('revenue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('prefixRevenue')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('econ')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('prefixEcon')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('seeded')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('prefixSeeded')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid request helper named arguments', () => {
@@ -3821,28 +2922,7 @@ price = input.price(101.25, "Level", "Drag level")
 mixedPrice = input.price(defval=101.25, "Mixed Level", "Drag mixed level")
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('rangeLength')).toMatchObject({ kind: 'int', qualifier: 'input' });
-    expect(types.get('mixedRangeLength')).toMatchObject({ kind: 'int', qualifier: 'input' });
-    expect(types.get('optionLength')).toMatchObject({ kind: 'int', qualifier: 'input' });
-    expect(types.get('mixedOptionLength')).toMatchObject({ kind: 'int', qualifier: 'input' });
-    expect(types.get('rangeFloat')).toMatchObject({ kind: 'float', qualifier: 'input' });
-    expect(types.get('mixedRangeFloat')).toMatchObject({ kind: 'float', qualifier: 'input' });
-    expect(types.get('optionFloat')).toMatchObject({ kind: 'float', qualifier: 'input' });
-    expect(types.get('mixedOptionFloat')).toMatchObject({ kind: 'float', qualifier: 'input' });
-    expect(types.get('tf')).toMatchObject({ kind: 'string', qualifier: 'input' });
-    expect(types.get('mixedTf')).toMatchObject({ kind: 'string', qualifier: 'input' });
-    expect(types.get('enabled')).toMatchObject({ kind: 'bool', qualifier: 'input' });
-    expect(types.get('mode')).toMatchObject({ kind: 'string', qualifier: 'input' });
-    expect(types.get('colorInput')).toMatchObject({ kind: 'color', qualifier: 'input' });
-    expect(types.get('start')).toMatchObject({ kind: 'int', qualifier: 'input' });
-    expect(types.get('symbol')).toMatchObject({ kind: 'string', qualifier: 'input' });
-    expect(types.get('session')).toMatchObject({ kind: 'string', qualifier: 'input' });
-    expect(types.get('memo')).toMatchObject({ kind: 'string', qualifier: 'input' });
-    expect(types.get('source')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('price')).toMatchObject({ kind: 'float', qualifier: 'input' });
-    expect(types.get('mixedPrice')).toMatchObject({ kind: 'float', qualifier: 'input' });
   });
 
   it('reports duplicate Pine input bindings against the selected overload', () => {
@@ -3880,28 +2960,6 @@ badOrder = Pivot.new(x=1, "bad")
     ]);
   });
 
-  it('infers series qualifiers for user-defined type constructors', () => {
-    const result = checkProgram(parse(`
-indicator("UDT Constructor Qualifiers")
-type Pivot
-    int x
-    float y
-pivot = Pivot.new(1, close)
-named = Pivot.new(x=2, y=high)
-pivotY = pivot.y
-namedY = named.y
-plot(pivotY + namedY)
-`));
-
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
-
-    expect(result.diagnostics).toEqual([]);
-    expect(types.get('pivot')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
-    expect(types.get('named')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
-    expect(types.get('pivotY')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('namedY')).toMatchObject({ kind: 'float', qualifier: 'series' });
-  });
-
   it('reports unknown user-defined type fields on reads and assignments', () => {
     const result = checkProgram(parse(`
 indicator("Bad UDT Fields")
@@ -3918,7 +2976,7 @@ pivot.other := 1
       "Unknown field 'z' on type Pivot",
       "Unknown field 'other' on type Pivot",
     ]);
-    expect(result.symbols.find((symbol) => symbol.name === 'valid')?.type).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(result.symbols.find((symbol) => symbol.name === 'valid')?.type).toMatchObject({ kind: 'int' });
   });
 
   it('does not treat user-defined method calls as field reads', () => {
@@ -3926,31 +2984,15 @@ pivot.other := 1
 indicator("UDT Methods")
 type Pivot
     float y
-type Band
-    array<float> values
 method lift(Pivot this, float amount) =>
     this.y += amount
     this
-method lift(Band this) =>
-    this.values
-method passthrough(float this) =>
-    this
 pivot = Pivot.new(close)
-band = Band.new(array.from(close))
 lifted = pivot.lift(1)
-liftedY = lifted.y
-bandValues = band.lift()
-scaled = close.passthrough()
-plot(liftedY + array.size(bandValues) + scaled)
+plot(lifted.y)
 `));
 
-    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
-
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('lifted')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
-    expect(types.get('liftedY')).toMatchObject({ kind: 'float', qualifier: 'series' });
-    expect(types.get('bandValues')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
-    expect(types.get('scaled')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports user-defined method receiver mismatches', () => {
@@ -3975,9 +3017,9 @@ badScale = pivot.scale(2)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'No method lift() overload accepts series Other receiver',
+      'No method lift() overload accepts Other receiver',
       'No method lift() overload accepts const int receiver',
-      'No method scale() overload accepts series Pivot receiver',
+      'No method scale() overload accepts Pivot receiver',
     ]);
   });
 

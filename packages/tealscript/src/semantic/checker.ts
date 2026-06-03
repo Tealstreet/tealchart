@@ -2,7 +2,6 @@ import type {
   AssignmentStatement,
   CallArgument,
   CallExpression,
-  ConditionalExpression,
   EnumDeclaration,
   Expression,
   ForStatement,
@@ -21,7 +20,6 @@ import type {
   TypeAnnotation,
   TypeDeclaration,
   TypeFieldDeclaration,
-  UnaryExpression,
   VariableDeclaration,
   WhileStatement,
 } from '../parser/ast';
@@ -82,7 +80,6 @@ export interface SemanticSymbol {
   name: string;
   kind: SemanticSymbolKind;
   type?: SemanticType;
-  isMethod?: boolean;
   loc?: SourceLocation;
 }
 
@@ -126,14 +123,6 @@ const ARRAY_CONSTRUCTOR_ELEMENT_TYPES = new Map<string, SemanticTypeKind>([
   ['array.new_table', 'table'],
 ]);
 
-const MATRIX_CONSTRUCTOR_ELEMENT_TYPES = new Map<string, SemanticTypeKind>([
-  ['matrix.new_bool', 'bool'],
-  ['matrix.new_color', 'color'],
-  ['matrix.new_float', 'float'],
-  ['matrix.new_int', 'int'],
-  ['matrix.new_string', 'string'],
-]);
-
 const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['box.copy', 'box'],
   ['box.new', 'box'],
@@ -147,214 +136,9 @@ const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['line.copy', 'line'],
   ['line.new', 'line'],
   ['linefill.new', 'linefill'],
-  ['hline', 'hline'],
   ['polyline.copy', 'polyline'],
   ['polyline.new', 'polyline'],
-  ['plot', 'plot'],
   ['table.new', 'table'],
-]);
-
-const DRAWING_ALL_MEMBER_TYPES = new Map<string, SemanticTypeKind>([
-  ['box.all', 'box'],
-  ['label.all', 'label'],
-  ['line.all', 'line'],
-  ['linefill.all', 'linefill'],
-  ['polyline.all', 'polyline'],
-]);
-
-const CHART_POINT_FIELD_TYPES = new Map<string, SemanticTypeKind>([
-  ['index', 'int'],
-  ['price', 'float'],
-  ['time', 'int'],
-]);
-
-const BOOLEAN_RETURN_FUNCTIONS = new Set([
-  'ta.cross',
-  'ta.crossover',
-  'ta.crossunder',
-  'ta.falling',
-  'ta.rising',
-]);
-
-const INTEGER_RETURN_FUNCTIONS = new Set([
-  'ta.barssince',
-  'ta.highestbars',
-  'ta.lowestbars',
-]);
-
-const COLOR_RETURN_FUNCTIONS = new Set([
-  'color.from_gradient',
-  'color.new',
-  'color.rgb',
-]);
-
-const COLOR_CHANNEL_RETURN_FUNCTIONS = new Set([
-  'color.b',
-  'color.g',
-  'color.r',
-  'color.t',
-]);
-
-const STRING_RETURN_FUNCTIONS = new Set([
-  'str.format',
-  'str.format_time',
-  'str.lower',
-  'str.match',
-  'str.repeat',
-  'str.replace',
-  'str.replace_all',
-  'str.substring',
-  'str.tostring',
-  'str.trim',
-  'str.upper',
-]);
-
-const STRING_FLOAT_RETURN_FUNCTIONS = new Set([
-  'str.tonumber',
-]);
-
-const STRING_BOOLEAN_RETURN_FUNCTIONS = new Set([
-  'str.contains',
-  'str.endswith',
-  'str.startswith',
-]);
-
-const STRING_INTEGER_RETURN_FUNCTIONS = new Set([
-  'str.length',
-  'str.pos',
-]);
-
-const INPUT_RETURN_TYPES = new Map<string, SemanticTypeKind>([
-  ['input.bool', 'bool'],
-  ['input.color', 'color'],
-  ['input.float', 'float'],
-  ['input.int', 'int'],
-  ['input.price', 'float'],
-  ['input.session', 'string'],
-  ['input.string', 'string'],
-  ['input.symbol', 'string'],
-  ['input.text_area', 'string'],
-  ['input.time', 'int'],
-  ['input.timeframe', 'string'],
-]);
-
-const MATH_FLOAT_RETURN_FUNCTIONS = new Set([
-  'math.acos',
-  'math.asin',
-  'math.atan',
-  'math.cos',
-  'math.exp',
-  'math.log',
-  'math.log10',
-  'math.pow',
-  'math.sign',
-  'math.sin',
-  'math.sqrt',
-  'math.tan',
-  'math.todegrees',
-  'math.toradians',
-]);
-
-const MATH_INTEGER_RETURN_FUNCTIONS = new Set([
-  'math.ceil',
-  'math.floor',
-  'math.trunc',
-]);
-
-const REQUEST_FLOAT_RETURN_FUNCTIONS = new Set([
-  'request.currency_rate',
-  'request.dividends',
-  'request.earnings',
-  'request.economic',
-  'request.financial',
-  'request.splits',
-]);
-
-const TICKER_STRING_RETURN_FUNCTIONS = new Set([
-  'ticker.heikinashi',
-  'ticker.inherit',
-  'ticker.kagi',
-  'ticker.linebreak',
-  'ticker.modify',
-  'ticker.new',
-  'ticker.pointfigure',
-  'ticker.renko',
-  'ticker.standard',
-]);
-
-const MATRIX_BOOLEAN_RETURN_FUNCTIONS = new Set([
-  'matrix.is_antidiagonal',
-  'matrix.is_antisymmetric',
-  'matrix.is_binary',
-  'matrix.is_diagonal',
-  'matrix.is_identity',
-  'matrix.is_square',
-  'matrix.is_stochastic',
-  'matrix.is_symmetric',
-  'matrix.is_triangular',
-  'matrix.is_valid',
-  'matrix.is_zero',
-]);
-
-const MATRIX_INTEGER_RETURN_FUNCTIONS = new Set([
-  'matrix.columns',
-  'matrix.elements_count',
-  'matrix.rows',
-]);
-
-const FLOAT_RETURN_FUNCTIONS = new Set([
-  'ta.alma',
-  'ta.atr',
-  'ta.bbw',
-  'ta.cci',
-  'ta.change',
-  'ta.cog',
-  'ta.correlation',
-  'ta.cum',
-  'ta.cmo',
-  'ta.dev',
-  'ta.ema',
-  'ta.highest',
-  'ta.hma',
-  'ta.kcw',
-  'ta.linreg',
-  'ta.lowest',
-  'ta.median',
-  'ta.mfi',
-  'ta.mode',
-  'ta.mom',
-  'ta.obv',
-  'ta.percentile_linear_interpolation',
-  'ta.percentile_nearest_rank',
-  'ta.percentrank',
-  'ta.pivothigh',
-  'ta.pivotlow',
-  'ta.range',
-  'ta.rma',
-  'ta.roc',
-  'ta.rsi',
-  'ta.sar',
-  'ta.sma',
-  'ta.stdev',
-  'ta.stoch',
-  'ta.swma',
-  'ta.tr',
-  'ta.tsi',
-  'ta.variance',
-  'ta.vwap',
-  'ta.vwma',
-  'ta.wma',
-  'ta.wpr',
-]);
-
-const SERIES_FLOAT: SemanticType = { kind: 'float', qualifier: 'series' };
-
-const TUPLE_RETURN_FUNCTIONS = new Map<string, SemanticType[]>([
-  ['ta.bb', [SERIES_FLOAT, SERIES_FLOAT, SERIES_FLOAT]],
-  ['ta.dmi', [SERIES_FLOAT, SERIES_FLOAT, SERIES_FLOAT]],
-  ['ta.kc', [SERIES_FLOAT, SERIES_FLOAT, SERIES_FLOAT]],
-  ['ta.macd', [SERIES_FLOAT, SERIES_FLOAT, SERIES_FLOAT]],
-  ['ta.supertrend', [SERIES_FLOAT, SERIES_FLOAT]],
 ]);
 
 const BUILTIN_FUNCTIONS = new Set([
@@ -449,9 +233,6 @@ interface BuiltinSignature {
   params: string[];
   aliases?: Record<string, string>;
   overloads?: string[][];
-  overloadMinArgs?: Record<string, number>;
-  overloadMaxArgs?: Record<string, number>;
-  overloadRequiredParams?: Record<string, string[]>;
   minArgs?: number;
   requiredParams?: string[];
   singlePositionalParam?: string;
@@ -462,47 +243,6 @@ interface BuiltinSignature {
   allowNamedPrefixWithPositional?: boolean;
   namedPrefixWithPositionalParams?: string[];
 }
-
-const LINE_NEW_POINT_PARAMS = ['first_point', 'second_point', 'xloc', 'extend', 'color', 'style', 'width', 'force_overlay'];
-const LINE_NEW_COORDINATE_PARAMS = ['x1', 'y1', 'x2', 'y2', 'xloc', 'extend', 'color', 'style', 'width', 'force_overlay'];
-const BOX_NEW_POINT_PARAMS = [
-  'top_left',
-  'bottom_right',
-  'border_color',
-  'border_width',
-  'border_style',
-  'extend',
-  'xloc',
-  'bgcolor',
-  'text',
-  'text_size',
-  'text_color',
-  'text_halign',
-  'text_valign',
-  'text_wrap',
-  'text_font_family',
-  'force_overlay',
-];
-const BOX_NEW_COORDINATE_PARAMS = [
-  'left',
-  'top',
-  'right',
-  'bottom',
-  'border_color',
-  'border_width',
-  'border_style',
-  'extend',
-  'xloc',
-  'bgcolor',
-  'text',
-  'text_size',
-  'text_color',
-  'text_halign',
-  'text_valign',
-  'text_wrap',
-  'text_font_family',
-  'force_overlay',
-];
 
 const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['alert', { params: ['message', 'freq'], minArgs: 1, allowNamedPrefixWithPositional: true }],
@@ -570,22 +310,6 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['label.get_textcolor', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['label.get_size', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['label.get_tooltip', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
-  [
-    'line.new',
-    {
-      params: LINE_NEW_COORDINATE_PARAMS,
-      overloads: [LINE_NEW_POINT_PARAMS, LINE_NEW_COORDINATE_PARAMS],
-      overloadMinArgs: {
-        [LINE_NEW_POINT_PARAMS.join('\u0000')]: 2,
-        [LINE_NEW_COORDINATE_PARAMS.join('\u0000')]: 4,
-      },
-      overloadMaxArgs: {
-        [LINE_NEW_POINT_PARAMS.join('\u0000')]: 8,
-        [LINE_NEW_COORDINATE_PARAMS.join('\u0000')]: 10,
-      },
-      allowNamedPrefixWithPositional: true,
-    },
-  ],
   ['line.delete', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['line.copy', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['line.set_x1', { params: ['id', 'x'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
@@ -604,22 +328,6 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['line.get_y1', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['line.get_y2', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['line.get_price', { params: ['id', 'x'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
-  [
-    'box.new',
-    {
-      params: BOX_NEW_COORDINATE_PARAMS,
-      overloads: [BOX_NEW_POINT_PARAMS, BOX_NEW_COORDINATE_PARAMS],
-      overloadMinArgs: {
-        [BOX_NEW_POINT_PARAMS.join('\u0000')]: 2,
-        [BOX_NEW_COORDINATE_PARAMS.join('\u0000')]: 4,
-      },
-      overloadMaxArgs: {
-        [BOX_NEW_POINT_PARAMS.join('\u0000')]: 16,
-        [BOX_NEW_COORDINATE_PARAMS.join('\u0000')]: 18,
-      },
-      allowNamedPrefixWithPositional: true,
-    },
-  ],
   ['box.delete', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['box.copy', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['box.set_left', { params: ['id', 'left'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
@@ -1239,16 +947,12 @@ class SemanticChecker {
   private rootScope = new SemanticScope();
   private typeDeclarations = new Map<string, TypeDeclaration>();
   private methodDeclarations = new Map<string, FunctionDeclaration[]>();
-  private functionParentScopes = new WeakMap<FunctionDeclaration, SemanticScope>();
-  private functionSymbolDeclarations = new WeakMap<SemanticSymbol, FunctionDeclaration>();
 
   check(program: Program): SemanticCheckResult {
     this.diagnostics = [];
     this.rootScope = new SemanticScope();
     this.typeDeclarations = this.collectTypeDeclarations(program.body);
     this.methodDeclarations = this.collectMethodDeclarations(program.body);
-    this.functionParentScopes = new WeakMap();
-    this.functionSymbolDeclarations = new WeakMap();
     this.checkLibraryExportDeclarations(program.body);
     this.checkStatements(program.body, this.rootScope);
     return {
@@ -1390,17 +1094,13 @@ class SemanticChecker {
     }
   }
 
-  private inferFunctionReturnType(
-    declaration: FunctionDeclaration,
-    parentScope: SemanticScope = this.rootScope,
-    parameterTypes = new Map<string, SemanticType>(),
-  ): SemanticType | undefined {
-    const functionScope = new SemanticScope(parentScope);
+  private inferFunctionReturnType(declaration: FunctionDeclaration): SemanticType | undefined {
+    const functionScope = new SemanticScope(this.rootScope);
     for (const parameter of declaration.params) {
       functionScope.declare({
         name: parameter.name,
         kind: 'parameter',
-        type: parameterTypes.get(parameter.name) ?? this.typeFromAnnotation(parameter.typeAnnotation ?? undefined),
+        type: this.typeFromAnnotation(parameter.typeAnnotation ?? undefined),
         loc: parameter.loc,
       });
     }
@@ -1412,11 +1112,6 @@ class SemanticChecker {
     let returnType: SemanticType | undefined;
     for (const [index, statement] of declaration.body.entries()) {
       const isLastStatement = index === declaration.body.length - 1;
-      if (statement.type === 'FunctionDeclaration') {
-        this.declareFunctionForInference(statement, functionScope);
-        returnType = undefined;
-        continue;
-      }
       if (statement.type === 'VariableDeclaration' && statement.names.type === 'VariableDeclarator') {
         const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init, functionScope);
         functionScope.declare({
@@ -1432,80 +1127,9 @@ class SemanticChecker {
         returnType = this.inferExpressionType(statement.expression, functionScope);
         continue;
       }
-      if (statement.type === 'IfStatement') {
-        returnType = isLastStatement ? this.inferIfStatementReturnType(statement, functionScope) : undefined;
-        continue;
-      }
       returnType = undefined;
     }
     return returnType;
-  }
-
-  private inferStatementListReturnType(statements: Statement[], scope: SemanticScope): SemanticType {
-    const blockScope = new SemanticScope(scope);
-    let returnType: SemanticType = { kind: 'unknown' };
-    for (const [index, statement] of statements.entries()) {
-      const isLastStatement = index === statements.length - 1;
-      if (statement.type === 'FunctionDeclaration') {
-        this.declareFunctionForInference(statement, blockScope);
-        returnType = { kind: 'unknown' };
-        continue;
-      }
-      if (statement.type === 'VariableDeclaration' && statement.names.type === 'VariableDeclarator') {
-        const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init, blockScope);
-        blockScope.declare({
-          name: statement.names.name.name,
-          kind: 'variable',
-          type,
-          loc: statement.names.name.loc,
-        });
-        returnType = isLastStatement ? type : { kind: 'unknown' };
-        continue;
-      }
-      if (statement.type === 'ExpressionStatement') {
-        returnType = isLastStatement ? this.inferExpressionType(statement.expression, blockScope) : { kind: 'unknown' };
-        continue;
-      }
-      if (statement.type === 'IfStatement') {
-        returnType = isLastStatement ? this.inferIfStatementReturnType(statement, blockScope) : { kind: 'unknown' };
-        continue;
-      }
-      returnType = { kind: 'unknown' };
-    }
-    return returnType;
-  }
-
-  private inferIfStatementReturnType(statement: IfStatement, scope: SemanticScope): SemanticType {
-    const testType = this.inferExpressionType(statement.test, scope);
-    const consequentType = this.inferStatementListReturnType(statement.consequent, scope);
-    const alternateType = Array.isArray(statement.alternate)
-      ? this.inferStatementListReturnType(statement.alternate, scope)
-      : statement.alternate
-        ? this.inferIfStatementReturnType(statement.alternate, scope)
-        : UNKNOWN_SEMANTIC_TYPE;
-    const branchType = this.mergeConditionalBranchTypes(consequentType, alternateType);
-
-    return {
-      ...branchType,
-      qualifier: this.maxQualifier(testType, consequentType, alternateType),
-    };
-  }
-
-  private declareFunctionForInference(statement: FunctionDeclaration, scope: SemanticScope): void {
-    scope.declare(this.createFunctionSymbol(statement, scope));
-  }
-
-  private createFunctionSymbol(statement: FunctionDeclaration, scope: SemanticScope): SemanticSymbol {
-    this.functionParentScopes.set(statement, scope);
-    const symbol: SemanticSymbol = {
-      name: statement.name.name,
-      kind: 'function',
-      isMethod: statement.isMethod,
-      type: statement.isMethod ? undefined : this.inferFunctionReturnType(statement, scope),
-      loc: statement.name.loc,
-    };
-    this.functionSymbolDeclarations.set(symbol, statement);
-    return symbol;
   }
 
   private checkExportedTypeAnnotation(
@@ -2031,7 +1655,7 @@ class SemanticChecker {
   }
 
   private declareFunction(statement: FunctionDeclaration, scope: SemanticScope): void {
-    this.declare(scope, this.createFunctionSymbol(statement, scope));
+    this.declare(scope, { name: statement.name.name, kind: 'function', loc: statement.name.loc });
     const functionScope = new SemanticScope(scope);
 
     for (const parameter of statement.params) {
@@ -2057,7 +1681,7 @@ class SemanticChecker {
     this.checkTypeAnnotation('variable declaration', statement.typeAnnotation, statement.loc);
     this.checkTypeCompatibility(statement.typeAnnotation, statement.init, scope, statement.loc);
     if (statement.names.type === 'TupleDeclarator') {
-      this.declareTuple(statement.names, statement.init, scope);
+      this.declareTuple(statement.names, scope);
       return;
     }
 
@@ -2069,16 +1693,15 @@ class SemanticChecker {
     });
   }
 
-  private declareTuple(tuple: TupleDeclarator, init: Expression, scope: SemanticScope): void {
+  private declareTuple(tuple: TupleDeclarator, scope: SemanticScope): void {
     const seen = new Set<string>();
-    const elementTypes = init.type === 'CallExpression' ? TUPLE_RETURN_FUNCTIONS.get(this.memberPath(init.callee).join('.')) : undefined;
-    for (const [index, name] of tuple.names.entries()) {
+    for (const name of tuple.names) {
       if (seen.has(name.name)) {
         this.addDiagnostic('duplicate-symbol', `Duplicate declaration: ${name.name}`, name.loc);
         continue;
       }
       seen.add(name.name);
-      this.declare(scope, { name: name.name, kind: 'variable', type: elementTypes?.[index] ?? { kind: 'unknown' }, loc: name.loc });
+      this.declare(scope, { name: name.name, kind: 'variable', type: { kind: 'unknown' }, loc: name.loc });
     }
   }
 
@@ -2269,7 +1892,7 @@ class SemanticChecker {
 
   private checkCallExpression(expression: CallExpression, scope: SemanticScope): void {
     this.checkCallee(expression.callee, scope);
-    this.checkBuiltinSignature(expression, scope);
+    this.checkBuiltinSignature(expression);
     this.checkUdtConstructorSignature(expression, scope);
     this.checkArrayConstructorTypeArguments(expression);
     this.checkMatrixConstructorTypeArguments(expression);
@@ -2280,7 +1903,6 @@ class SemanticChecker {
     this.checkMatrixSortFieldType(expression, scope);
     this.checkMapCallTypes(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
-    this.checkUserCallableSignature(expression, scope);
     for (const argument of expression.arguments) {
       this.checkExpression(argument.value, scope);
     }
@@ -2315,16 +1937,6 @@ class SemanticChecker {
     this.checkExpression(expression.object, scope);
 
     const objectType = this.inferExpressionType(expression.object, scope);
-    if (objectType.kind === 'chart.point') {
-      if (!CHART_POINT_FIELD_TYPES.has(expression.property.name)) {
-        this.addDiagnostic(
-          'unknown-field',
-          `Unknown field '${expression.property.name}' on type chart.point`,
-          expression.property.loc,
-        );
-      }
-      return;
-    }
     if (objectType.kind !== 'udt' || !objectType.name || !this.typeDeclarations.has(objectType.name)) {
       return;
     }
@@ -2374,7 +1986,7 @@ class SemanticChecker {
     );
   }
 
-  private checkBuiltinSignature(expression: CallExpression, scope: SemanticScope): void {
+  private checkBuiltinSignature(expression: CallExpression): void {
     const displayName = this.memberPath(expression.callee).join('.');
     const signature = BUILTIN_SIGNATURES.get(displayName);
     if (!signature) {
@@ -2383,9 +1995,9 @@ class SemanticChecker {
     }
 
     this.checkArgumentOrder(expression.arguments, displayName, signature);
-    this.checkArgumentNames(expression.arguments, signature, displayName, scope);
-    this.checkArgumentCount(expression.arguments, signature, displayName, scope);
-    this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName, scope);
+    this.checkArgumentNames(expression.arguments, signature, displayName);
+    this.checkArgumentCount(expression.arguments, signature, displayName);
+    this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName);
   }
 
   private checkUnsupportedBuiltinNamespaceCall(expression: CallExpression, displayName: string): void {
@@ -2393,89 +2005,6 @@ class SemanticChecker {
     const namespace = this.memberPath(expression.callee)[0];
     if (namespace !== 'log' && namespace !== 'strategy') return;
     this.addDiagnostic('unknown-function', `Unknown function: ${displayName}`, expression.callee.loc);
-  }
-
-  private checkUserCallableSignature(expression: CallExpression, scope: SemanticScope): void {
-    if (expression.callee.type === 'Identifier') {
-      const symbol = scope.lookup(expression.callee.name);
-      const declaration = symbol ? this.functionSymbolDeclarations.get(symbol) : undefined;
-      if (!declaration || declaration.isMethod) return;
-
-      this.checkUserCallableArguments(expression, declaration, expression.callee.name, 0, scope);
-      return;
-    }
-
-    if (expression.callee.type !== 'MemberExpression') return;
-
-    const receiverType = this.inferExpressionType(expression.callee.object, scope);
-    if (receiverType.kind === 'unknown') return;
-    if (this.isBuiltinCollectionMemberMethod(receiverType, expression.callee.property.name)) return;
-
-    const method = this.findUserMethodDeclaration(expression.callee.property.name, receiverType);
-    if (!method) return;
-
-    this.checkUserCallableArguments(expression, method, expression.callee.property.name, 1, scope);
-  }
-
-  private checkUserCallableArguments(
-    expression: CallExpression,
-    declaration: FunctionDeclaration,
-    displayName: string,
-    parameterOffset: number,
-    scope: SemanticScope,
-  ): void {
-    const signature = this.userCallableSignature(declaration, parameterOffset);
-    this.checkArgumentOrder(expression.arguments, displayName, signature);
-    this.checkArgumentNames(expression.arguments, signature, displayName, scope);
-    this.checkArgumentCount(expression.arguments, signature, displayName, scope);
-    this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName, scope);
-    this.checkUserCallableArgumentTypes(expression, declaration, displayName, parameterOffset, scope);
-  }
-
-  private userCallableSignature(declaration: FunctionDeclaration, parameterOffset: number): BuiltinSignature {
-    const parameters = declaration.params.slice(parameterOffset);
-    return {
-      params: parameters.map((parameter) => parameter.name),
-      minArgs: parameters.filter((parameter) => !parameter.defaultValue).length,
-      maxArgs: parameters.length,
-      requiredParams: parameters.filter((parameter) => !parameter.defaultValue).map((parameter) => parameter.name),
-    };
-  }
-
-  private checkUserCallableArgumentTypes(
-    expression: CallExpression,
-    declaration: FunctionDeclaration,
-    displayName: string,
-    parameterOffset: number,
-    scope: SemanticScope,
-  ): void {
-    for (const [index, parameter] of declaration.params.entries()) {
-      if (index < parameterOffset) continue;
-
-      const expectedType = this.typeFromAnnotation(parameter.typeAnnotation ?? undefined);
-      if (!expectedType) continue;
-
-      const argument = this.getCallArgument(expression.arguments, parameter.name, index - parameterOffset);
-      if (!argument) continue;
-
-      const actualType = this.inferExpressionType(argument, scope);
-      if (!this.isAssignableType(expectedType, actualType)) {
-        this.addDiagnostic(
-          'type-mismatch',
-          `Cannot use ${this.formatSemanticType(actualType)} value as ${this.formatSemanticType(expectedType)} argument '${parameter.name}' for ${displayName}()`,
-          argument.loc,
-        );
-        continue;
-      }
-
-      if (!this.isAssignableQualifier(expectedType.qualifier, actualType.qualifier)) {
-        this.addDiagnostic(
-          'qualifier-mismatch',
-          `Cannot use ${this.formatSemanticTypeWithQualifier(actualType)} value as ${this.formatSemanticTypeWithQualifier(expectedType)} argument '${parameter.name}' for ${displayName}()`,
-          argument.loc,
-        );
-      }
-    }
   }
 
   private checkUdtConstructorSignature(expression: CallExpression, scope: SemanticScope): void {
@@ -2876,42 +2405,16 @@ class SemanticChecker {
       .map((method) => this.typeFromAnnotation(method.params[0]?.typeAnnotation ?? undefined))
       .filter((type): type is SemanticType => !!type);
     if (annotatedReceivers.length === 0) return;
-    if (this.findUserMethodDeclaration(expression.callee.property.name, receiverType)) return;
+    if (annotatedReceivers.some((methodReceiverType) => (
+      this.isAssignableType(methodReceiverType, receiverType)
+      && this.isAssignableQualifier(methodReceiverType.qualifier, receiverType.qualifier)
+    ))) return;
 
     this.addDiagnostic(
       'method-receiver-type',
       `No method ${expression.callee.property.name}() overload accepts ${this.formatSemanticTypeWithQualifier(receiverType)} receiver`,
       expression.callee.property.loc,
     );
-  }
-
-  private inferUserMethodCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
-    if (expression.callee.type !== 'MemberExpression') return undefined;
-
-    const receiverType = this.inferExpressionType(expression.callee.object, scope);
-    if (receiverType.kind === 'unknown') return undefined;
-    if (this.isBuiltinCollectionMemberMethod(receiverType, expression.callee.property.name)) return undefined;
-
-    const method = this.findUserMethodDeclaration(expression.callee.property.name, receiverType);
-    if (!method) return undefined;
-
-    return this.inferFunctionReturnType(
-      method,
-      this.functionParentScopes.get(method) ?? this.rootScope,
-      this.inferCallableParameterTypes(method, expression.arguments, scope, receiverType),
-    );
-  }
-
-  private findUserMethodDeclaration(methodName: string, receiverType: SemanticType): FunctionDeclaration | undefined {
-    const methods = this.methodDeclarations.get(methodName);
-    if (!methods?.length) return undefined;
-
-    return methods.find((method) => {
-      const methodReceiverType = this.typeFromAnnotation(method.params[0]?.typeAnnotation ?? undefined);
-      return !!methodReceiverType
-        && this.isAssignableType(methodReceiverType, receiverType)
-        && this.isAssignableQualifier(methodReceiverType.qualifier, receiverType.qualifier);
-    });
   }
 
   private isBuiltinCollectionMemberMethod(receiverType: SemanticType, methodName: string): boolean {
@@ -2921,37 +2424,6 @@ class SemanticChecker {
   private isAssignableQualifier(targetQualifier: SemanticQualifier | undefined, sourceQualifier: SemanticQualifier | undefined): boolean {
     if (!targetQualifier || !sourceQualifier) return true;
     return QUALIFIER_RANK[sourceQualifier] <= QUALIFIER_RANK[targetQualifier];
-  }
-
-  private inferCallableParameterTypes(
-    declaration: FunctionDeclaration,
-    args: CallArgument[],
-    scope: SemanticScope,
-    receiverType?: SemanticType,
-  ): Map<string, SemanticType> {
-    const parameterTypes = new Map<string, SemanticType>();
-    for (const [index, parameter] of declaration.params.entries()) {
-      if (receiverType && index === 0) {
-        parameterTypes.set(parameter.name, this.typeFromParameterArgument(parameter, receiverType));
-        continue;
-      }
-
-      const positionalIndex = receiverType ? index - 1 : index;
-      const argument = this.getCallArgument(args, parameter.name, positionalIndex);
-      if (!argument) continue;
-
-      parameterTypes.set(parameter.name, this.typeFromParameterArgument(parameter, this.inferExpressionType(argument, scope)));
-    }
-    return parameterTypes;
-  }
-
-  private typeFromParameterArgument(parameter: FunctionDeclaration['params'][number], argumentType: SemanticType): SemanticType {
-    const annotationType = this.typeFromAnnotation(parameter.typeAnnotation ?? undefined);
-    if (!annotationType) return argumentType;
-    return {
-      ...annotationType,
-      qualifier: annotationType.qualifier ?? argumentType.qualifier,
-    };
   }
 
   private checkMapArgumentType(expectedType: SemanticType | undefined, argument: Expression | undefined, role: 'map key' | 'map value', scope: SemanticScope): void {
@@ -3005,9 +2477,9 @@ class SemanticChecker {
     }
   }
 
-  private checkArgumentNames(args: CallArgument[], signature: BuiltinSignature, displayName: string, scope: SemanticScope): void {
+  private checkArgumentNames(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
     if (signature.allowExtraNamed) return;
-    const allowed = new Set(this.resolveSignatureParams(args, signature, scope));
+    const allowed = new Set(this.resolveSignatureParams(args, signature));
     for (const arg of args) {
       if (arg.name && !allowed.has(this.canonicalSignatureArgumentName(arg.name.name, signature))) {
         this.addDiagnostic('unknown-argument', `Unknown argument '${arg.name.name}' for ${displayName}()`, arg.name.loc);
@@ -3015,8 +2487,8 @@ class SemanticChecker {
     }
   }
 
-  private checkArgumentCount(args: CallArgument[], signature: BuiltinSignature, displayName: string, scope: SemanticScope): void {
-    const params = this.resolveSignatureParams(args, signature, scope);
+  private checkArgumentCount(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
+    const params = this.resolveSignatureParams(args, signature);
     const binding = signature.allowNamedPrefixWithPositional ? this.bindSignatureArguments(args, signature, params) : undefined;
     const positionalCount = this.leadingPositionalCount(args);
     const suppliedNames = binding?.boundParams ?? new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
@@ -3025,13 +2497,13 @@ class SemanticChecker {
       const positionalIndex = this.effectivePositionalIndex(index, omitsOptionalLeadingParam);
       return (positionalIndex !== -1 && positionalIndex < positionalCount) || suppliedNames.has(param);
     }).length;
-    const minArgs = this.resolveSignatureMinArgs(signature, params);
-    const maxArgs = signature.allowExtraPositional ? Infinity : this.resolveSignatureMaxArgs(signature, params);
+    const minArgs = signature.minArgs ?? 0;
+    const maxArgs = signature.allowExtraPositional ? Infinity : (signature.maxArgs ?? params.length);
 
     if (boundParamCount < minArgs) {
       this.addDiagnostic('argument-count', `${displayName}() expects at least ${minArgs} argument${minArgs === 1 ? '' : 's'}`, args[0]?.loc);
     }
-    const requiredParams = this.resolveSignatureRequiredParams(signature, params, minArgs);
+    const requiredParams = signature.requiredParams ?? params.slice(0, minArgs);
     for (const param of requiredParams) {
       // Default-source helpers can let a lone positional value bind to singlePositionalParam
       // instead of the first params entry while requiredParams still tracks required coverage.
@@ -3052,8 +2524,8 @@ class SemanticChecker {
     }
   }
 
-  private checkDuplicateArgumentBindings(args: CallArgument[], signature: BuiltinSignature, displayName: string, scope: SemanticScope): void {
-    const params = this.resolveSignatureParams(args, signature, scope);
+  private checkDuplicateArgumentBindings(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
+    const params = this.resolveSignatureParams(args, signature);
     if (signature.allowNamedPrefixWithPositional) {
       const boundParams = new Set<string>();
       const positionalBoundParams = new Set<string>();
@@ -3159,46 +2631,16 @@ class SemanticChecker {
     return signature.aliases?.[name] ?? name;
   }
 
-  private resolveSignatureParams(args: CallArgument[], signature: BuiltinSignature, scope?: SemanticScope): string[] {
+  private resolveSignatureParams(args: CallArgument[], signature: BuiltinSignature): string[] {
     if (!signature.overloads) return signature.params;
 
     const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
-    const pointOverload = signature.overloads.find((params) => params.includes('first_point') || params.includes('top_left'));
-    const coordinateOverload = signature.overloads.find((params) => params.includes('x1') || params.includes('left'));
-    if (pointOverload && coordinateOverload) {
-      const pointOnlyParams = pointOverload.filter((name) => !coordinateOverload.includes(name));
-      const coordinateOnlyParams = coordinateOverload.filter((name) => !pointOverload.includes(name));
-      if ([...suppliedNames].some((name) => coordinateOnlyParams.includes(name))) return coordinateOverload;
-      if ([...suppliedNames].some((name) => pointOnlyParams.includes(name))) return pointOverload;
-      const positionalArgs = args.filter((arg) => !arg.name);
-      const firstTwoArePoints = scope && positionalArgs.length >= 2 && positionalArgs.slice(0, 2).every((arg) => (
-        this.inferExpressionType(arg.value, scope).kind === 'chart.point'
-      ));
-      return firstTwoArePoints ? pointOverload : coordinateOverload;
-    }
-
     const thirdPositional = args.filter((arg) => !arg.name)[2]?.value;
     const usesOptionsOverload = suppliedNames.has('options') || thirdPositional?.type === 'ArrayExpression';
     const optionsOverload = signature.overloads.find((params) => params.includes('options'));
     const rangeOverload = signature.overloads.find((params) => params.includes('minval'));
 
     return (usesOptionsOverload ? optionsOverload : rangeOverload) ?? signature.params;
-  }
-
-  private signatureOverloadKey(params: string[]): string {
-    return params.join('\u0000');
-  }
-
-  private resolveSignatureMinArgs(signature: BuiltinSignature, params: string[]): number {
-    return signature.overloadMinArgs?.[this.signatureOverloadKey(params)] ?? signature.minArgs ?? 0;
-  }
-
-  private resolveSignatureMaxArgs(signature: BuiltinSignature, params: string[]): number {
-    return signature.overloadMaxArgs?.[this.signatureOverloadKey(params)] ?? signature.maxArgs ?? params.length;
-  }
-
-  private resolveSignatureRequiredParams(signature: BuiltinSignature, params: string[], minArgs: number): string[] {
-    return signature.overloadRequiredParams?.[this.signatureOverloadKey(params)] ?? signature.requiredParams ?? params.slice(0, minArgs);
   }
 
   private leadingPositionalCount(args: CallArgument[]): number {
@@ -3272,7 +2714,7 @@ class SemanticChecker {
   private typeFromAnnotation(annotation?: TypeAnnotation | null): SemanticType | undefined {
     if (!annotation) return undefined;
 
-    const qualifier = this.annotationQualifier(annotation);
+    const qualifier = annotation.qualifier;
     if (annotation.baseType === 'array' || annotation.baseType === 'matrix') {
       return {
         kind: annotation.baseType,
@@ -3295,20 +2737,6 @@ class SemanticChecker {
     }
 
     return this.typeFromName(annotation.baseType, qualifier);
-  }
-
-  private annotationQualifier(annotation: TypeAnnotation): SemanticQualifier | undefined {
-    if (annotation.qualifier) return annotation.qualifier;
-    if (
-      annotation.baseType === 'array'
-      || annotation.baseType === 'matrix'
-      || annotation.baseType === 'map'
-      || annotation.baseType === 'udt'
-      || REFERENCE_TYPE_KINDS.has(annotation.baseType as SemanticTypeKind)
-    ) {
-      return 'series';
-    }
-    return undefined;
   }
 
   private inferExpressionType(expression: Expression, scope: SemanticScope = this.rootScope): SemanticType {
@@ -3334,21 +2762,20 @@ class SemanticChecker {
       case 'BinaryExpression':
         return this.inferBinaryExpressionType(expression, scope);
       case 'UnaryExpression':
-        return this.inferUnaryExpressionType(expression, scope);
+        return { kind: 'unknown', qualifier: this.inferExpressionType(expression.argument, scope).qualifier };
       case 'ConditionalExpression':
-        return this.inferConditionalExpressionType(expression, scope);
-      case 'SwitchExpression':
-        return this.inferSwitchExpressionType(expression, scope);
+        return {
+          kind: 'unknown',
+          qualifier: this.maxQualifier(
+            this.inferExpressionType(expression.test, scope),
+            this.inferExpressionType(expression.consequent, scope),
+            this.inferExpressionType(expression.alternate, scope),
+          ),
+        };
       case 'CallExpression':
         return this.inferCallType(expression, scope);
       case 'MemberExpression':
         if (expression.object.type === 'Identifier' && expression.object.name === 'session') {
-          return this.inferMemberExpressionType(expression, scope);
-        }
-        if (BUILTIN_GLOBAL_TYPES.has(this.memberPath(expression).join('.'))) {
-          return this.inferMemberExpressionType(expression, scope);
-        }
-        if (this.isDrawingAllMemberExpression(expression)) {
           return this.inferMemberExpressionType(expression, scope);
         }
         if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
@@ -3359,90 +2786,6 @@ class SemanticChecker {
         return this.inferIndexExpressionType(expression, scope);
       default:
         return { kind: 'unknown' };
-    }
-  }
-
-  private inferUnaryExpressionType(expression: UnaryExpression, scope: SemanticScope): SemanticType {
-    const argumentType = this.inferExpressionType(expression.argument, scope);
-    if ((expression.operator === '-' || expression.operator === '+') && this.isNumericType(argumentType)) {
-      return { kind: argumentType.kind, qualifier: argumentType.qualifier };
-    }
-    if (expression.operator === 'not') return { kind: 'bool', qualifier: argumentType.qualifier };
-    return { kind: 'unknown', qualifier: argumentType.qualifier };
-  }
-
-  private inferConditionalExpressionType(expression: ConditionalExpression, scope: SemanticScope): SemanticType {
-    const testType = this.inferExpressionType(expression.test, scope);
-    const consequentType = this.inferExpressionType(expression.consequent, scope);
-    const alternateType = this.inferExpressionType(expression.alternate, scope);
-    const branchType = this.mergeConditionalBranchTypes(consequentType, alternateType);
-
-    return {
-      ...branchType,
-      qualifier: this.maxQualifier(testType, consequentType, alternateType),
-    };
-  }
-
-  private inferSwitchExpressionType(expression: SwitchExpression, scope: SemanticScope): SemanticType {
-    let branchType: SemanticType = { kind: 'unknown' };
-    const qualifierSources: SemanticType[] = [];
-    if (expression.discriminant) qualifierSources.push(this.inferExpressionType(expression.discriminant, scope));
-
-    for (const switchCase of expression.cases) {
-      if (switchCase.test) qualifierSources.push(this.inferExpressionType(switchCase.test, scope));
-      const consequentType = this.inferSwitchCaseConsequentType(switchCase.consequent, scope);
-      qualifierSources.push(consequentType);
-      branchType = this.mergeConditionalBranchTypes(branchType, consequentType);
-    }
-
-    return {
-      ...branchType,
-      qualifier: this.maxQualifier(...qualifierSources),
-    };
-  }
-
-  private inferSwitchCaseConsequentType(consequent: Expression | Statement[], scope: SemanticScope): SemanticType {
-    if (!Array.isArray(consequent)) return this.inferExpressionType(consequent, scope);
-    return this.inferStatementListReturnType(consequent, scope);
-  }
-
-  private mergeConditionalBranchTypes(consequentType: SemanticType, alternateType: SemanticType): SemanticType {
-    if (consequentType.kind === 'unknown') return { ...alternateType, qualifier: undefined };
-    if (alternateType.kind === 'unknown') return { ...consequentType, qualifier: undefined };
-    if (this.isNumericType(consequentType) && this.isNumericType(alternateType)) {
-      return { kind: consequentType.kind === 'float' || alternateType.kind === 'float' ? 'float' : 'int' };
-    }
-    if (consequentType.kind !== alternateType.kind) return { kind: 'unknown' };
-
-    switch (consequentType.kind) {
-      case 'array':
-        return {
-          kind: 'array',
-          elementType: this.mergeConditionalBranchTypes(
-            consequentType.elementType ?? UNKNOWN_SEMANTIC_TYPE,
-            alternateType.elementType ?? UNKNOWN_SEMANTIC_TYPE,
-          ),
-        };
-      case 'matrix':
-        return {
-          kind: 'matrix',
-          elementType: this.mergeConditionalBranchTypes(
-            consequentType.elementType ?? UNKNOWN_SEMANTIC_TYPE,
-            alternateType.elementType ?? UNKNOWN_SEMANTIC_TYPE,
-          ),
-        };
-      case 'map':
-        return this.isAssignableType(consequentType, alternateType) && this.isAssignableType(alternateType, consequentType)
-          ? {
-              kind: 'map',
-              keyType: consequentType.keyType,
-              valueType: consequentType.valueType,
-            }
-          : { kind: 'unknown' };
-      case 'udt':
-        return consequentType.name === alternateType.name ? { kind: 'udt', name: consequentType.name } : { kind: 'unknown' };
-      default:
-        return { kind: consequentType.kind };
     }
   }
 
@@ -3473,9 +2816,6 @@ class SemanticChecker {
       || expression.operator === '/'
       || expression.operator === '%'
     ) {
-      if (expression.operator === '+' && leftType.kind === 'string' && rightType.kind === 'string') {
-        return { kind: 'string', qualifier };
-      }
       if (this.isNumericType(leftType) && this.isNumericType(rightType)) {
         return {
           kind: leftType.kind === 'float' || rightType.kind === 'float' || expression.operator === '/' ? 'float' : 'int',
@@ -3499,96 +2839,18 @@ class SemanticChecker {
     const calleePath = this.memberPath(expression.callee);
     const calleeName = calleePath.join('.');
     const referenceReturnType = REFERENCE_CONSTRUCTOR_RETURN_TYPES.get(calleeName);
-    if (referenceReturnType) return { kind: referenceReturnType, qualifier: 'series' };
-    if (calleeName === 'ta.valuewhen') {
-      const sourceArgument = this.getCallArgument(expression.arguments, 'source', 1);
-      const sourceType = sourceArgument ? this.inferExpressionType(sourceArgument, scope) : { kind: 'unknown' as const };
-      return { ...sourceType, qualifier: 'series' };
-    }
-    if (calleeName === 'nz' || calleeName === 'fixnan') {
-      return this.inferNaHelperReturnType(expression, scope);
-    }
-    if (calleeName === 'na') return { kind: 'bool', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
-    if (BOOLEAN_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'bool', qualifier: 'series' };
-    if (INTEGER_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'int', qualifier: 'series' };
-    if (COLOR_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'color', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
-    if (COLOR_CHANNEL_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
-    if (STRING_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'string', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
-    if (STRING_FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
-    if (STRING_BOOLEAN_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'bool', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
-    if (STRING_INTEGER_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'int', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
-    if (calleeName === 'str.split') {
-      return { kind: 'array', elementType: { kind: 'string' }, qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
-    }
-    const inputReturnType = INPUT_RETURN_TYPES.get(calleeName);
-    if (inputReturnType) return { kind: inputReturnType, qualifier: 'input' };
-    if (calleeName === 'input.source') {
-      const sourceArgument = this.getCallArgument(expression.arguments, 'defval', 0);
-      const sourceType = sourceArgument ? this.inferExpressionType(sourceArgument, scope) : { kind: 'unknown' as const };
-      return { ...sourceType, qualifier: 'series' };
-    }
-    if (MATH_FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
-    if (MATH_INTEGER_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'int', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
-    if (calleeName === 'math.avg' || calleeName === 'math.round_to_mintick') {
-      return { kind: 'float', qualifier: this.inferCallArgumentMaxQualifierAtLeast(expression, scope, 'simple') };
-    }
-    if (calleeName === 'math.random' || calleeName === 'math.sum') return { kind: 'float', qualifier: 'series' };
-    if (calleeName === 'math.round') {
-      const precisionArgument = this.getCallArgument(expression.arguments, 'precision', 1);
-      return {
-        kind: precisionArgument ? 'float' : 'int',
-        qualifier: this.inferCallArgumentMaxQualifier(expression, scope),
-      };
-    }
-    if (calleeName === 'math.abs' || calleeName === 'math.max' || calleeName === 'math.min') {
-      return {
-        kind: this.inferNumericCallReturnKind(expression, scope),
-        qualifier: this.inferCallArgumentMaxQualifier(expression, scope),
-      };
-    }
-    if (calleeName === 'request.security' || calleeName === 'request.seed') {
-      return this.inferRequestExpressionReturnType(expression, scope);
-    }
-    if (calleeName === 'request.security_lower_tf') {
-      const expressionArgument = this.getCallArgument(expression.arguments, 'expression', 2);
-      const expressionType = expressionArgument ? this.inferExpressionType(expressionArgument, scope) : { kind: 'unknown' as const };
-      return {
-        kind: 'array',
-        elementType: this.arrayElementTypeKind(expressionType),
-        qualifier: 'series',
-      };
-    }
-    if (REQUEST_FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: 'series' };
-    if (TICKER_STRING_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'string', qualifier: 'simple' };
-    if (MATRIX_BOOLEAN_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'bool', qualifier: 'series' };
-    if (MATRIX_INTEGER_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'int', qualifier: 'series' };
-    if (FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: 'series' };
-    if (calleeName === 'label.get_x') return { kind: 'int', qualifier: 'series' };
-    if (calleeName === 'label.get_y') return { kind: 'float', qualifier: 'series' };
-    if (calleeName === 'label.get_color' || calleeName === 'label.get_textcolor') return { kind: 'color', qualifier: 'series' };
-    if (
-      calleeName === 'label.get_text'
-      || calleeName === 'label.get_xloc'
-      || calleeName === 'label.get_yloc'
-      || calleeName === 'label.get_style'
-      || calleeName === 'label.get_size'
-      || calleeName === 'label.get_tooltip'
-    ) {
-      return { kind: 'string', qualifier: 'series' };
-    }
-    if (calleeName === 'line.get_x1' || calleeName === 'line.get_x2') return { kind: 'int', qualifier: 'series' };
-    if (calleeName === 'line.get_y1' || calleeName === 'line.get_y2' || calleeName === 'line.get_price') return { kind: 'float', qualifier: 'series' };
-    if (calleeName === 'box.get_left' || calleeName === 'box.get_right') return { kind: 'int', qualifier: 'series' };
-    if (calleeName === 'box.get_top' || calleeName === 'box.get_bottom') return { kind: 'float', qualifier: 'series' };
-    if (calleeName === 'box.get_bgcolor' || calleeName === 'box.get_border_color') return { kind: 'color', qualifier: 'series' };
-    if (calleeName === 'box.get_text' || calleeName === 'box.get_text_halign' || calleeName === 'box.get_text_valign') return { kind: 'string', qualifier: 'series' };
-    if (calleeName === 'linefill.get_line1' || calleeName === 'linefill.get_line2') return { kind: 'line', qualifier: 'series' };
+    if (referenceReturnType) return { kind: referenceReturnType };
+    if (calleeName === 'line.get_x1' || calleeName === 'line.get_x2') return { kind: 'int' };
+    if (calleeName === 'line.get_y1' || calleeName === 'line.get_y2' || calleeName === 'line.get_price') return { kind: 'float' };
+    if (calleeName === 'box.get_left' || calleeName === 'box.get_right') return { kind: 'int' };
+    if (calleeName === 'box.get_top' || calleeName === 'box.get_bottom') return { kind: 'float' };
+    if (calleeName === 'box.get_bgcolor' || calleeName === 'box.get_border_color') return { kind: 'color' };
+    if (calleeName === 'box.get_text' || calleeName === 'box.get_text_halign' || calleeName === 'box.get_text_valign') return { kind: 'string' };
+    if (calleeName === 'linefill.get_line1' || calleeName === 'linefill.get_line2') return { kind: 'line' };
 
     const namespace = calleePath[0];
     if (namespace === 'input') return { kind: 'unknown', qualifier: 'input' };
-    if (calleeName === 'time' || calleeName === 'time_close') return { kind: 'int', qualifier: 'series' };
-    if (calleeName === 'timeframe.change') return { kind: 'bool', qualifier: 'series' };
-    if (namespace === 'request' || namespace === 'ta' || namespace === 'time' || namespace === 'time_close') {
+    if (namespace === 'request' || namespace === 'ta' || namespace === 'time' || namespace === 'time_close' || calleePath.join('.') === 'timeframe.change') {
       return { kind: 'unknown', qualifier: 'series' };
     }
     if (calleePath.join('.') === 'bool') return { kind: 'bool', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
@@ -3607,17 +2869,12 @@ class SemanticChecker {
     if (arrayHelperType) return arrayHelperType;
     const matrixElementReadType = this.inferMatrixElementReadCallType(expression, scope);
     if (matrixElementReadType) return matrixElementReadType;
-    const matrixHelperType = this.inferMatrixHelperCallType(expression, scope);
-    if (matrixHelperType) return matrixHelperType;
     const mapValueReadType = this.inferMapValueReadCallType(expression, scope);
     if (mapValueReadType) return mapValueReadType;
-    const mapHelperType = this.inferMapHelperCallType(expression, scope);
-    if (mapHelperType) return mapHelperType;
     if (calleePath.join('.') === 'array.from') {
       return {
         kind: 'array',
         elementType: this.inferArrayElementType(expression.arguments.map((argument) => argument.value), scope),
-        qualifier: 'series',
       };
     }
     if (calleePath.join('.') === 'map.new' && expression.typeArguments?.length === 2) {
@@ -3625,21 +2882,18 @@ class SemanticChecker {
         kind: 'map',
         keyType: this.typeFromName(expression.typeArguments[0]),
         valueType: this.typeFromName(expression.typeArguments[1]),
-        qualifier: 'series',
       };
     }
     if (calleePath.join('.') === 'array.new' && expression.typeArguments?.length === 1) {
       return {
         kind: 'array',
         elementType: this.typeFromName(expression.typeArguments[0]),
-        qualifier: 'series',
       };
     }
     if (calleePath.join('.') === 'matrix.new' && expression.typeArguments?.length === 1) {
       return {
         kind: 'matrix',
         elementType: this.typeFromName(expression.typeArguments[0]),
-        qualifier: 'series',
       };
     }
     const arrayElementType = ARRAY_CONSTRUCTOR_ELEMENT_TYPES.get(calleePath.join('.'));
@@ -3647,33 +2901,10 @@ class SemanticChecker {
       return {
         kind: 'array',
         elementType: { kind: arrayElementType },
-        qualifier: 'series',
-      };
-    }
-    const matrixElementType = MATRIX_CONSTRUCTOR_ELEMENT_TYPES.get(calleePath.join('.'));
-    if (matrixElementType) {
-      return {
-        kind: 'matrix',
-        elementType: { kind: matrixElementType },
-        qualifier: 'series',
       };
     }
     if (calleePath.length === 2 && calleePath[1] === 'new' && calleePath[0] && this.typeDeclarations.has(calleePath[0])) {
-      return { kind: 'udt', name: calleePath[0], qualifier: 'series' };
-    }
-    const userMethodType = this.inferUserMethodCallType(expression, scope);
-    if (userMethodType) return userMethodType;
-    if (expression.callee.type === 'Identifier') {
-      const symbol = scope.lookup(expression.callee.name);
-      const declaration = symbol ? this.functionSymbolDeclarations.get(symbol) : undefined;
-      if (symbol?.kind === 'function' && declaration) {
-        return this.inferFunctionReturnType(
-          declaration,
-          this.functionParentScopes.get(declaration) ?? scope,
-          this.inferCallableParameterTypes(declaration, expression.arguments, scope),
-        ) ?? symbol.type ?? { kind: 'unknown' };
-      }
-      if (symbol?.kind === 'function' && symbol.type) return symbol.type;
+      return { kind: 'udt', name: calleePath[0] };
     }
     return { kind: 'unknown', qualifier: this.inferMaxQualifier(expression.arguments.map((argument) => argument.value), scope) };
   }
@@ -3685,9 +2916,9 @@ class SemanticChecker {
     if (!this.isArrayElementReadOperation(methodName)) return undefined;
 
     const receiverType = this.inferArrayHelperReceiverType(expression, scope);
-    if (receiverType?.kind !== 'array' || !receiverType.elementType) return undefined;
+    if (receiverType?.kind !== 'array') return undefined;
 
-    return { ...receiverType.elementType, qualifier: 'series' };
+    return receiverType.elementType;
   }
 
   private isArrayElementReadOperation(operation: string): boolean {
@@ -3706,10 +2937,10 @@ class SemanticChecker {
     const receiverType = this.inferArrayHelperReceiverType(expression, scope);
     if (receiverType?.kind !== 'array') return undefined;
 
-    if (this.isArrayBooleanOperation(methodName)) return { kind: 'bool', qualifier: 'series' };
-    if (methodName === 'join') return { kind: 'string', qualifier: 'series' };
-    if (this.isArrayIntegerOperation(methodName)) return { kind: 'int', qualifier: 'series' };
-    if (this.isArrayFloatOperation(methodName)) return { kind: 'float', qualifier: 'series' };
+    if (this.isArrayBooleanOperation(methodName)) return { kind: 'bool' };
+    if (methodName === 'join') return { kind: 'string' };
+    if (this.isArrayIntegerOperation(methodName)) return { kind: 'int' };
+    if (this.isArrayFloatOperation(methodName)) return { kind: 'float' };
 
     return undefined;
   }
@@ -3757,20 +2988,17 @@ class SemanticChecker {
         return {
           kind: 'array',
           elementType: receiverType.elementType,
-          qualifier: 'series',
         };
       case 'abs':
       case 'standardize':
         return {
           kind: 'array',
           elementType: { kind: 'float' },
-          qualifier: 'series',
         };
       case 'sort_indices':
         return {
           kind: 'array',
           elementType: { kind: 'int' },
-          qualifier: 'series',
         };
       default:
         return undefined;
@@ -3792,9 +3020,9 @@ class SemanticChecker {
     if (expression.callee.type !== 'MemberExpression' || expression.callee.property.name !== 'get') return undefined;
 
     const receiverType = this.inferMatrixHelperReceiverType(expression, scope);
-    if (receiverType?.kind !== 'matrix' || !receiverType.elementType) return undefined;
+    if (receiverType?.kind !== 'matrix') return undefined;
 
-    return { ...receiverType.elementType, qualifier: 'series' };
+    return receiverType.elementType;
   }
 
   private inferMatrixHelperReceiverType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
@@ -3808,142 +3036,16 @@ class SemanticChecker {
     return this.inferExpressionType(expression.callee.object, scope);
   }
 
-  private inferMatrixHelperCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
-    if (expression.callee.type !== 'MemberExpression') return undefined;
-
-    const methodName = expression.callee.property.name;
-    const receiverType = this.inferMatrixHelperReceiverType(expression, scope);
-    if (receiverType?.kind !== 'matrix') return undefined;
-
-    if (methodName === 'mult') {
-      const rightArgumentIndex = expression.callee.object.type === 'Identifier' && expression.callee.object.name === 'matrix' ? 1 : 0;
-      const rightArgument = this.getCallArgument(expression.arguments, 'id2', rightArgumentIndex);
-      const rightType = rightArgument ? this.inferExpressionType(rightArgument, scope) : undefined;
-      if (rightType?.kind === 'array') {
-        return {
-          kind: 'array',
-          elementType: receiverType.elementType,
-          qualifier: 'series',
-        };
-      }
-      return {
-        kind: 'matrix',
-        elementType: receiverType.elementType,
-        qualifier: 'series',
-      };
-    }
-
-    switch (methodName) {
-      case 'copy':
-      case 'submatrix':
-      case 'transpose':
-      case 'inv':
-      case 'pinv':
-      case 'eigenvectors':
-      case 'diff':
-      case 'kron':
-      case 'pow':
-      case 'sum':
-        return {
-          kind: 'matrix',
-          elementType: receiverType.elementType,
-          qualifier: 'series',
-        };
-      case 'row':
-      case 'col':
-      case 'column':
-      case 'remove_row':
-      case 'remove_col':
-      case 'remove_column':
-      case 'eigenvalues':
-        return {
-          kind: 'array',
-          elementType: receiverType.elementType,
-          qualifier: 'series',
-        };
-      case 'avg':
-      case 'det':
-      case 'max':
-      case 'median':
-      case 'min':
-      case 'mode':
-      case 'trace':
-        return { kind: 'float', qualifier: 'series' };
-      case 'rank':
-        return { kind: 'int', qualifier: 'series' };
-      default:
-        return undefined;
-    }
-  }
-
   private inferMapValueReadCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
-    if (
-      expression.callee.type !== 'MemberExpression'
-      || (expression.callee.property.name !== 'get' && expression.callee.property.name !== 'remove')
-    ) {
-      return undefined;
-    }
+    if (expression.callee.type !== 'MemberExpression' || expression.callee.property.name !== 'get') return undefined;
 
     const mapCall = this.resolveMapCall(expression, scope);
-    if ((mapCall?.operation === 'get' || mapCall?.operation === 'remove') && mapCall.mapType.kind === 'map' && mapCall.mapType.valueType) {
-      return { ...mapCall.mapType.valueType, qualifier: 'series' };
-    }
-    return undefined;
-  }
-
-  private inferMapHelperCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
-    if (expression.callee.type !== 'MemberExpression') return undefined;
-
-    const methodName = expression.callee.property.name;
-    if (methodName === 'contains') {
-      const mapCall = this.resolveMapCall(expression, scope);
-      return mapCall?.operation === 'contains' && mapCall.mapType.kind === 'map' ? { kind: 'bool', qualifier: 'series' } : undefined;
-    }
-
-    const receiverType = this.inferMapHelperReceiverType(expression, scope);
-    if (receiverType?.kind !== 'map') return undefined;
-
-    switch (methodName) {
-      case 'copy':
-        return {
-          kind: 'map',
-          keyType: receiverType.keyType,
-          valueType: receiverType.valueType,
-          qualifier: 'series',
-        };
-      case 'keys':
-        return {
-          kind: 'array',
-          elementType: receiverType.keyType,
-          qualifier: 'series',
-        };
-      case 'values':
-        return {
-          kind: 'array',
-          elementType: receiverType.valueType,
-          qualifier: 'series',
-        };
-      case 'size':
-        return { kind: 'int', qualifier: 'series' };
-      default:
-        return undefined;
-    }
-  }
-
-  private inferMapHelperReceiverType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
-    if (expression.callee.type !== 'MemberExpression') return undefined;
-
-    if (expression.callee.object.type === 'Identifier' && expression.callee.object.name === 'map') {
-      const mapArgument = this.getCallArgument(expression.arguments, 'id', 0);
-      return mapArgument ? this.inferExpressionType(mapArgument, scope) : undefined;
-    }
-
-    return this.inferExpressionType(expression.callee.object, scope);
+    return mapCall?.operation === 'get' && mapCall.mapType.kind === 'map' ? mapCall.mapType.valueType : undefined;
   }
 
   private inferIndexExpressionType(expression: IndexExpression, scope: SemanticScope): SemanticType {
     const objectType = this.inferExpressionType(expression.object, scope);
-    if (objectType.kind === 'array' && objectType.elementType) return { ...objectType.elementType, qualifier: 'series' };
+    if (objectType.kind === 'array' && objectType.elementType) return objectType.elementType;
     return { kind: 'unknown', qualifier: 'series' };
   }
 
@@ -3976,41 +3078,6 @@ class SemanticChecker {
     return this.maxQualifier(...expression.arguments.map((argument) => this.inferExpressionType(argument.value, scope)));
   }
 
-  private inferCallArgumentMaxQualifierAtLeast(expression: CallExpression, scope: SemanticScope, minimumQualifier: SemanticQualifier): SemanticQualifier {
-    const qualifier = this.inferCallArgumentMaxQualifier(expression, scope);
-    if (!qualifier || QUALIFIER_RANK[qualifier] < QUALIFIER_RANK[minimumQualifier]) return minimumQualifier;
-    return qualifier;
-  }
-
-  private inferNumericCallReturnKind(expression: CallExpression, scope: SemanticScope): 'int' | 'float' | 'unknown' {
-    let sawNumber = false;
-    for (const argument of expression.arguments) {
-      const argumentType = this.inferExpressionType(argument.value, scope);
-      if (argumentType.kind === 'float') return 'float';
-      if (argumentType.kind === 'int') {
-        sawNumber = true;
-        continue;
-      }
-      return 'unknown';
-    }
-    return sawNumber ? 'int' : 'unknown';
-  }
-
-  private inferRequestExpressionReturnType(expression: CallExpression, scope: SemanticScope): SemanticType {
-    const expressionArgument = this.getCallArgument(expression.arguments, 'expression', 2);
-    const expressionType = expressionArgument ? this.inferExpressionType(expressionArgument, scope) : { kind: 'unknown' as const };
-    return { ...expressionType, qualifier: 'series' };
-  }
-
-  private inferNaHelperReturnType(expression: CallExpression, scope: SemanticScope): SemanticType {
-    const sourceArgument = this.getCallArgument(expression.arguments, 'source', 0);
-    const sourceType = sourceArgument ? this.inferExpressionType(sourceArgument, scope) : { kind: 'unknown' as const };
-    if (sourceType.kind !== 'unknown' || this.memberPath(expression.callee).join('.') !== 'nz') return sourceType;
-
-    const replacementArgument = this.getCallArgument(expression.arguments, 'replacement', 1);
-    return replacementArgument ? this.inferExpressionType(replacementArgument, scope) : sourceType;
-  }
-
   private arrayElementTypeKind(type: SemanticType): SemanticType {
     if (PRIMITIVE_TYPE_KINDS.has(type.kind)) return { kind: type.kind };
     if (REFERENCE_TYPE_KINDS.has(type.kind)) return { kind: type.kind };
@@ -4021,13 +3088,6 @@ class SemanticChecker {
   private inferMemberExpressionType(expression: MemberExpression, scope: SemanticScope): SemanticType {
     const path = this.memberPath(expression);
     const memberName = path.join('.');
-    const builtinType = BUILTIN_GLOBAL_TYPES.get(memberName);
-    if (builtinType) return builtinType;
-
-    const drawingAllElementType = DRAWING_ALL_MEMBER_TYPES.get(memberName);
-    if (drawingAllElementType) {
-      return { kind: 'array', elementType: { kind: drawingAllElementType }, qualifier: 'series' };
-    }
     if (memberName === 'session.ismarket' || memberName === 'session.ispremarket' || memberName === 'session.ispostmarket') {
       return { kind: 'bool', qualifier: 'series' };
     }
@@ -4036,20 +3096,10 @@ class SemanticChecker {
     }
 
     const objectType = this.inferExpressionType(expression.object, scope);
-    if (objectType.kind === 'chart.point') {
-      const fieldType = CHART_POINT_FIELD_TYPES.get(expression.property.name);
-      return fieldType ? { kind: fieldType, qualifier: 'series' } : { kind: 'unknown', qualifier: objectType.qualifier };
-    }
     if (objectType.kind !== 'udt' || !objectType.name) return objectType;
 
     const field = this.findUdtField(objectType.name, expression.property.name);
-    const fieldType = this.typeFromAnnotation(field?.typeAnnotation ?? undefined);
-    if (!fieldType) return { kind: 'unknown', qualifier: objectType.qualifier };
-    return { ...fieldType, qualifier: this.maxQualifier(objectType, fieldType) };
-  }
-
-  private isDrawingAllMemberExpression(expression: MemberExpression): boolean {
-    return DRAWING_ALL_MEMBER_TYPES.has(this.memberPath(expression).join('.'));
+    return this.typeFromAnnotation(field?.typeAnnotation ?? undefined) ?? { kind: 'unknown', qualifier: objectType.qualifier };
   }
 
   private memberPath(expression: Expression): string[] {
@@ -4227,7 +3277,6 @@ class SemanticChecker {
   private declare(scope: SemanticScope, symbol: SemanticSymbol): void {
     const existing = scope.declare(symbol);
     if (!existing) return;
-    if (symbol.kind === 'function' && symbol.isMethod && existing.kind === 'function' && existing.isMethod) return;
     this.addDiagnostic('duplicate-symbol', `Duplicate declaration: ${symbol.name}`, symbol.loc);
   }
 
