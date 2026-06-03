@@ -1684,7 +1684,11 @@ linefill.delete(id=filled)
 plot(1)
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('firstLine')).toMatchObject({ kind: 'line' });
+    expect(types.get('secondLine')).toMatchObject({ kind: 'line' });
   });
 
   it('reports invalid linefill method argument bindings', () => {

@@ -2782,6 +2782,7 @@ class SemanticChecker {
     const calleeName = calleePath.join('.');
     const referenceReturnType = REFERENCE_CONSTRUCTOR_RETURN_TYPES.get(calleeName);
     if (referenceReturnType) return { kind: referenceReturnType };
+    if (calleeName === 'linefill.get_line1' || calleeName === 'linefill.get_line2') return { kind: 'line' };
 
     const namespace = calleePath[0];
     if (namespace === 'input') return { kind: 'unknown', qualifier: 'input' };
