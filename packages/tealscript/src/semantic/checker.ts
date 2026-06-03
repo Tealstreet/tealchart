@@ -357,6 +357,17 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['box.get_text', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['box.get_text_halign', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['box.get_text_valign', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  [
+    'polyline.new',
+    {
+      params: ['points', 'curved', 'closed', 'xloc', 'line_color', 'fill_color', 'line_style', 'line_width', 'force_overlay'],
+      minArgs: 1,
+      maxArgs: 9,
+      allowNamedPrefixWithPositional: true,
+    },
+  ],
+  ['polyline.delete', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['polyline.copy', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['linefill.new', { params: ['line1', 'line2', 'color'], minArgs: 2, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['linefill.delete', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['linefill.set_color', { params: ['id', 'color'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
