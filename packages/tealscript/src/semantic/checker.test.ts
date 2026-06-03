@@ -981,6 +981,9 @@ plot(rows + columns + elements + first + matrix.rows(id=generic) + matrix.rows(i
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('rows')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('columns')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('elements')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('valid')).toMatchObject({ kind: 'bool', qualifier: 'series' });
   });
 
