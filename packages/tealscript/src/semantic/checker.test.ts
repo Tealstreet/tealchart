@@ -183,6 +183,62 @@ plot(multiplier + secondsValue + sessionOpen + sessionClose + stamp + (intraday 
     expect(types.get('stamp')).toMatchObject({ kind: 'int', qualifier: 'const' });
   });
 
+  it('infers syminfo member return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Syminfo Return Types")
+ticker = syminfo.ticker
+tickerId = syminfo.tickerid
+root = syminfo.root
+timezone = syminfo.timezone
+currency = syminfo.currency
+volumeType = syminfo.volumetype
+minMove = syminfo.minmove
+priceScale = syminfo.pricescale
+minTick = syminfo.mintick
+pointValue = syminfo.pointvalue
+minContract = syminfo.mincontract
+ticker := 1
+tickerId := 2
+root := 3
+timezone := 4
+currency := 5
+volumeType := 6
+minMove := "bad"
+priceScale := "bad"
+minTick := "bad"
+pointValue := "bad"
+minContract := "bad"
+plot(minMove + priceScale + minTick + pointValue + minContract)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign int value to string variable ticker',
+      'Cannot assign int value to string variable tickerId',
+      'Cannot assign int value to string variable root',
+      'Cannot assign int value to string variable timezone',
+      'Cannot assign int value to string variable currency',
+      'Cannot assign int value to string variable volumeType',
+      'Cannot assign string value to int variable minMove',
+      'Cannot assign string value to int variable priceScale',
+      'Cannot assign string value to float variable minTick',
+      'Cannot assign string value to float variable pointValue',
+      'Cannot assign string value to float variable minContract',
+    ]);
+    expect(types.get('ticker')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('tickerId')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('root')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('timezone')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('currency')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('volumeType')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('minMove')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+    expect(types.get('priceScale')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+    expect(types.get('minTick')).toMatchObject({ kind: 'float', qualifier: 'simple' });
+    expect(types.get('pointValue')).toMatchObject({ kind: 'float', qualifier: 'simple' });
+    expect(types.get('minContract')).toMatchObject({ kind: 'float', qualifier: 'simple' });
+  });
+
   it('accepts Pine log calls with format arguments', () => {
     const result = checkProgram(parse(`
 indicator("Logs")
