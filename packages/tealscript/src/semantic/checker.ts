@@ -3206,14 +3206,7 @@ class SemanticChecker {
       case 'UnaryExpression':
         return { kind: 'unknown', qualifier: this.inferExpressionType(expression.argument, scope).qualifier };
       case 'ConditionalExpression':
-        return {
-          kind: 'unknown',
-          qualifier: this.maxQualifier(
-            this.inferExpressionType(expression.test, scope),
-            this.inferExpressionType(expression.consequent, scope),
-            this.inferExpressionType(expression.alternate, scope),
-          ),
-        };
+        return this.inferConditionalExpressionType(expression, scope);
       case 'SwitchExpression':
         return this.inferSwitchExpressionType(expression, scope);
       case 'CallExpression':
@@ -3231,6 +3224,20 @@ class SemanticChecker {
       default:
         return { kind: 'unknown' };
     }
+  }
+
+  private inferConditionalExpressionType(expression: Expression, scope: SemanticScope): SemanticType {
+    if (expression.type !== 'ConditionalExpression') return { kind: 'unknown' };
+
+    const testType = this.inferExpressionType(expression.test, scope);
+    const consequentType = this.inferExpressionType(expression.consequent, scope);
+    const alternateType = this.inferExpressionType(expression.alternate, scope);
+    const mergedType = this.mergeCompatibleType(consequentType, alternateType);
+
+    return {
+      ...mergedType,
+      qualifier: this.maxQualifier(testType, mergedType),
+    };
   }
 
   private inferSwitchExpressionType(expression: SwitchExpression, scope: SemanticScope): SemanticType {
