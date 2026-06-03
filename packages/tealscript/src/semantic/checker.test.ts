@@ -3069,7 +3069,26 @@ prefixReplaceAll = str.replace_all(string=text, "USDT", "PERP")
 plot(parsed + position + prefixPosition + str.length(string=formatted + prefixFormatted + timeText + prefixTimeText + message + prefix + prefixSlice + match + prefixMatch + repeated + prefixRepeated + upper + lower + trimmed + replaceOne + prefixReplaceOne + replaceAll + prefixReplaceAll))
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('formatted')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('prefixFormatted')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('timeText')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('prefixTimeText')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('message')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('prefix')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('prefixSlice')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('match')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('prefixMatch')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('repeated')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('prefixRepeated')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('upper')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('lower')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('trimmed')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('replaceOne')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('prefixReplaceOne')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('replaceAll')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('prefixReplaceAll')).toMatchObject({ kind: 'string', qualifier: 'const' });
   });
 
   it('reports invalid string helper named arguments', () => {

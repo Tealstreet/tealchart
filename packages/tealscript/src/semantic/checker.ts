@@ -182,6 +182,20 @@ const COLOR_CHANNEL_RETURN_FUNCTIONS = new Set([
   'color.t',
 ]);
 
+const STRING_RETURN_FUNCTIONS = new Set([
+  'str.format',
+  'str.format_time',
+  'str.lower',
+  'str.match',
+  'str.repeat',
+  'str.replace',
+  'str.replace_all',
+  'str.substring',
+  'str.tostring',
+  'str.trim',
+  'str.upper',
+]);
+
 const FLOAT_RETURN_FUNCTIONS = new Set([
   'ta.alma',
   'ta.atr',
@@ -3068,6 +3082,7 @@ class SemanticChecker {
     if (INTEGER_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'int', qualifier: 'series' };
     if (COLOR_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'color', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
     if (COLOR_CHANNEL_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+    if (STRING_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'string', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
     if (FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: 'series' };
     if (calleeName === 'label.get_x') return { kind: 'int' };
     if (calleeName === 'label.get_y') return { kind: 'float' };
