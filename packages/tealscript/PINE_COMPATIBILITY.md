@@ -75,7 +75,8 @@ Covered behavior and remaining gaps:
   remains a planned indentation-aware parser item because it conflicts with
   negative literals in indented Pine bodies.
 - User-defined function bodies can return expression results from `if` /
-  `else if` / `else` branches.
+  `else if` / `else` branches, including partial `if` expressions with no
+  `else` when the present branch has an inferable value.
 - User-defined function bodies can return the last expression result from
   numeric `for`, collection `for ... in`, and `while` loop bodies.
 - Direct user-defined function calls infer semantic return types and preserve
