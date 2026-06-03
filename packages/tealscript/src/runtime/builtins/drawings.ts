@@ -45,6 +45,20 @@ function copyPoint(point: ChartPoint): ChartPoint {
   return { ...point };
 }
 
+function applyLinePoint(line: LineDrawingOutput, pointValue: unknown, endpoint: 'first' | 'second'): void {
+  const point = isChartPoint(pointValue) ? pointValue : undefined;
+  const x = point ? pointX(point, line.xloc) : null;
+  const y = point ? point.price : null;
+
+  if (endpoint === 'first') {
+    line.x1 = x;
+    line.y1 = y;
+  } else {
+    line.x2 = x;
+    line.y2 = y;
+  }
+}
+
 function isPineRuntimeArray(value: unknown): value is { values: unknown[] } {
   return (
     typeof value === 'object'
@@ -376,6 +390,22 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
     runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
       line.x2 = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'x', undefined, ['id']));
       line.y2 = runtime.toNullableNumber(callArg(args, namedArgs, 2, 'y', undefined, ['id', 'x']));
+      line.barIndex = ctx.bar_index;
+    });
+    return undefined;
+  });
+
+  builtins.set('line.set_first_point', (args, namedArgs, ctx) => {
+    runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
+      applyLinePoint(line, callArg(args, namedArgs, 1, 'first_point', undefined, ['id']), 'first');
+      line.barIndex = ctx.bar_index;
+    });
+    return undefined;
+  });
+
+  builtins.set('line.set_second_point', (args, namedArgs, ctx) => {
+    runtime.withLine(callArg(args, namedArgs, 0, 'id'), ctx, (line) => {
+      applyLinePoint(line, callArg(args, namedArgs, 1, 'second_point', undefined, ['id']), 'second');
       line.barIndex = ctx.bar_index;
     });
     return undefined;

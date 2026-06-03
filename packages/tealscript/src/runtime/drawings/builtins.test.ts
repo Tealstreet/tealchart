@@ -356,6 +356,49 @@ plot(line.get_y2(trend), title="Line Y2")`;
       expect(result.plots.find((plot) => plot.title === 'Line Y2')?.values).toEqual([100.2, 100.2, 101.5]);
     });
 
+    it('updates line endpoints from chart points', () => {
+      const script = `//@version=6
+indicator("Line point setters")
+var trend = line.new(na, na, na, na)
+if barstate.islast
+    firstPoint = chart.point.from_index(bar_index - 1, low)
+    secondPoint = chart.point.now(high)
+    line.set_first_point(id=trend, first_point=firstPoint)
+    line.set_second_point(trend, second_point=secondPoint)
+plot(line.get_x1(trend), title="Line First X")
+plot(line.get_y1(trend), title="Line First Y")
+plot(line.get_x2(trend), title="Line Second X")
+plot(line.get_y2(trend), title="Line Second Y")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'line_line.new_0_0',
+          type: 'line',
+          persistent: true,
+          barIndex: 2,
+          x1: 1,
+          y1: 100.7,
+          x2: 2,
+          y2: 101.5,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: null,
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Line First X')?.values).toEqual([null, null, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Line First Y')?.values).toEqual([null, null, 100.7]);
+      expect(result.plots.find((plot) => plot.title === 'Line Second X')?.values).toEqual([null, null, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Line Second Y')?.values).toEqual([null, null, 101.5]);
+    });
+
     it('preserves persistent line handles during realtime rollback', () => {
       const script = `//@version=6
 indicator("Realtime line")
