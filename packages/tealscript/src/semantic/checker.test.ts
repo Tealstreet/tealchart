@@ -2630,7 +2630,9 @@ linearMixed = ta.percentile_linear_interpolation(source=close, 3, 75)
 rank = ta.percentrank(source=close, length=3)
 rankMixed = ta.percentrank(source=close, 3)
 total = ta.cum(source=close)
-plot(variance + varianceMixed + deviation + deviationMixed + correlation + correlationMixed + cog + mixedCog + median + medianMixed + mode + modeMixed + nearest + nearestMixed + linear + linearMixed + rank + rankMixed + total)
+stdev = ta.stdev(source=close, length=3, biased=false)
+stdevMixed = ta.stdev(source=close, 3, false)
+plot(variance + varianceMixed + deviation + deviationMixed + correlation + correlationMixed + cog + mixedCog + median + medianMixed + mode + modeMixed + nearest + nearestMixed + linear + linearMixed + rank + rankMixed + total + stdev + stdevMixed)
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -2654,6 +2656,8 @@ plot(variance + varianceMixed + deviation + deviationMixed + correlation + corre
     expect(types.get('rank')).toEqual({ kind: 'float', qualifier: 'series' });
     expect(types.get('rankMixed')).toEqual({ kind: 'float', qualifier: 'series' });
     expect(types.get('total')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('stdev')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('stdevMixed')).toEqual({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid TA statistics helper named arguments', () => {
@@ -2756,7 +2760,12 @@ kcwMixed = ta.kcw(series=close, 3, 1.25, false)
 plot(bbBasis + bbUpper + bbLower + mixedBbBasis + mixedBbUpper + mixedBbLower + bbw + bbwMixed + kcBasis + kcUpper + kcLower + mixedKcBasis + mixedKcUpper + mixedKcLower + kcw + kcwMixed)
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('bbw')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('bbwMixed')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('kcw')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('kcwMixed')).toEqual({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid TA channel helper named arguments', () => {
@@ -2895,13 +2904,21 @@ currentObv = ta.obv
 range = ta.tr(handle_na=true)
 rawRange = ta.tr
 spread = ta.range(source=close, 3)
+atr = ta.atr(length=3)
+vwap = ta.vwap(source=close)
 up = ta.rising(source=close, 2)
 down = ta.falling(source=close, 2)
-plot(line + signal + hist + mixedLine + mixedSignal + mixedHist + legacyObv + mixedObv + currentObv + range + rawRange + spread)
+plot(line + signal + hist + mixedLine + mixedSignal + mixedHist + legacyObv + mixedObv + currentObv + range + rawRange + spread + atr + vwap)
 plotshape(up or down)
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('legacyObv')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedObv')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('range')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('atr')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('vwap')).toEqual({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid remaining TA helper named arguments', () => {
