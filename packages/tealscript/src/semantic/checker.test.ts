@@ -3888,6 +3888,58 @@ plot(rounded + prefixRounded + powered + prefixPowered + root + logged + trig + 
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('infers math helper return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Math Return Types")
+piValue = math.pi
+absInt = math.abs(bar_index)
+absFloat = math.abs(close)
+maxInt = math.max(1, 2, 3)
+maxFloat = math.max(1, close)
+avgSimple = math.avg(1, 2, 3)
+roundedInt = math.round(close)
+roundedFloat = math.round(number=close, precision=2)
+mintickSimple = math.round_to_mintick(math.pi)
+floored = math.floor(close)
+powered = math.pow(base=2, exponent=3)
+runningSum = math.sum(source=close, length=3)
+randomValue = math.random(min=0, max=1, seed=7)
+degrees = math.todegrees(math.pi)
+piValue := "bad"
+absInt := "bad"
+roundedInt := 1.5
+floored := "bad"
+powered := "bad"
+runningSum := "bad"
+plot(absFloat + maxInt + maxFloat + avgSimple + roundedFloat + mintickSimple + randomValue + degrees)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable piValue',
+      'Cannot assign string value to int variable absInt',
+      'Cannot assign float value to int variable roundedInt',
+      'Cannot assign string value to int variable floored',
+      'Cannot assign string value to float variable powered',
+      'Cannot assign string value to float variable runningSum',
+    ]);
+    expect(types.get('piValue')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('absInt')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('absFloat')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('maxInt')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('maxFloat')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('avgSimple')).toMatchObject({ kind: 'float', qualifier: 'simple' });
+    expect(types.get('roundedInt')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('roundedFloat')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mintickSimple')).toMatchObject({ kind: 'float', qualifier: 'simple' });
+    expect(types.get('floored')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('powered')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('runningSum')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('randomValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('degrees')).toMatchObject({ kind: 'float', qualifier: 'series' });
+  });
+
   it('reports invalid math helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Bad Math Signatures")

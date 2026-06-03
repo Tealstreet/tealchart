@@ -72,7 +72,7 @@ reading the whole runtime.
 
 | Area | Feature | Status | Evidence | Remaining gaps |
 | --- | --- | --- | --- | --- |
-| Built-ins | `math.*` | Partial | `tests/compat/pine-builtins.test.ts`; `src/runtime/engine.test.ts` | Random behavior, overloads, and exact int/float parity remain. |
+| Built-ins | `math.*` | Partial | `tests/compat/pine-builtins.test.ts`; `src/runtime/engine.test.ts`; `src/semantic/checker.test.ts` | Runtime covers common constants, variadic numeric helpers, rounding, sliding sum, random, and degree/radian conversions. Semantic analysis preserves known math constant and helper return types for downstream diagnostics, including common int/float overload distinctions. Random behavior and full overload parity remain. |
 | Built-ins | `ta.*` | Partial | `tests/compat/pine-basics.test.ts`; `tests/compat/pine-builtins.test.ts`; `src/runtime/engine.test.ts` | Full reference-manual inventory and edge-case parity remain. |
 | Built-ins | `input.*` | Partial | `tests/compat/pine-basics.test.ts`; `tests/compat/pine-builtins.test.ts`; `src/semantic/checker.test.ts` | Runtime covers common typed helpers and metadata. Semantic analysis preserves known `input.*` return types for downstream diagnostics, including `input.source()` defval source types. Advanced UI/display behavior and validation remain. |
 | Built-ins | Time functions | Partial | `tests/compat/pine-builtins.test.ts`; `tests/compat/pine-control-time.test.ts` | IANA timezones are covered for common timestamp/calendar/session helpers; higher-timeframe aggregation and exchange calendars remain. |
