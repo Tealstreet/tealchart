@@ -3173,7 +3173,7 @@ class SemanticChecker {
     const calleePath = this.memberPath(expression.callee);
     const calleeName = calleePath.join('.');
     const referenceReturnType = REFERENCE_CONSTRUCTOR_RETURN_TYPES.get(calleeName);
-    if (referenceReturnType) return { kind: referenceReturnType };
+    if (referenceReturnType) return { kind: referenceReturnType, qualifier: 'series' };
     if (calleeName === 'ta.valuewhen') {
       const sourceArgument = this.getCallArgument(expression.arguments, 'source', 1);
       const sourceType = sourceArgument ? this.inferExpressionType(sourceArgument, scope) : { kind: 'unknown' as const };
