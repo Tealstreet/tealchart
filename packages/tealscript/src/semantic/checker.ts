@@ -287,6 +287,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
       allowNamedPrefixWithPositional: true,
     },
   ],
+  ['linefill.new', { params: ['line1', 'line2', 'color'], minArgs: 2, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   [
     'plot',
     {

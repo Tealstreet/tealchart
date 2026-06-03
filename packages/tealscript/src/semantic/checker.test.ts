@@ -1570,6 +1570,45 @@ tooMany = label.new(bar_index, close, "A", xloc.bar_index, yloc.price, color.gre
     ]);
   });
 
+  it('resolves linefill.new named arguments and positional tails', () => {
+    const result = checkProgram(parse(`
+indicator("Linefill Signatures")
+upper = line.new(bar_index, high, bar_index + 1, high)
+lower = line.new(bar_index, low, bar_index + 1, low)
+filled = linefill.new(line1=upper, lower, color.new(color.blue, 80))
+named = linefill.new(line1=upper, line2=lower, color=color.orange)
+linefills = array.from(filled, named)
+plot(array.size(linefills))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('filled')).toMatchObject({ kind: 'linefill' });
+    expect(types.get('named')).toMatchObject({ kind: 'linefill' });
+    expect(types.get('linefills')).toMatchObject({ kind: 'array', elementType: { kind: 'linefill' } });
+  });
+
+  it('reports invalid linefill.new argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Linefill Signatures")
+upper = line.new(bar_index, high, bar_index + 1, high)
+lower = line.new(bar_index, low, bar_index + 1, low)
+unknown = linefill.new(upper, lower, opacity=80)
+missing = linefill.new(line1=upper)
+duplicate = linefill.new(upper, lower, line1=upper)
+tooMany = linefill.new(upper, lower, color.blue, color.red)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'opacity' for linefill.new()",
+      'linefill.new() expects at least 2 arguments',
+      "linefill.new() missing required argument 'line2'",
+      "Argument 'line1' for linefill.new() was supplied multiple times",
+      'linefill.new() expects at most 3 arguments',
+    ]);
+  });
+
   it('infers homogeneous array literal and array.from element types', () => {
     const result = checkProgram(parse(`
 indicator("Array Literal Types")
