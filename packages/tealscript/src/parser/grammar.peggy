@@ -352,7 +352,7 @@ VariableDeclaration
   / UntypedVariableDeclaration
 
 TypedVariableDeclaration
-  = exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" _ init:Expression _ LineTerminator? {
+  = exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" _ init:VariableInitializer _ LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -365,7 +365,7 @@ TypedVariableDeclaration
     }
 
 UntypedVariableDeclaration
-  = exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" _ init:Expression _ LineTerminator? {
+  = exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" _ init:VariableInitializer _ LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -376,6 +376,10 @@ UntypedVariableDeclaration
         loc: loc()
       };
     }
+
+VariableInitializer
+  = IfStatement
+  / Expression
 
 VarKind
   = "varip" !IdentifierPart { return 'varip'; }
@@ -651,7 +655,7 @@ FunctionIndentedBlock
     }
 
 FunctionIndentedStatement
-  = &FunctionIndent FunctionIndent stmt:(FunctionIfStatement / FunctionForStatement / FunctionWhileStatement / Statement) {
+  = &FunctionIndent FunctionIndent stmt:(FunctionIfStatement / FunctionForStatement / FunctionWhileStatement / FunctionVariableDeclaration / Statement) {
       return stmt;
     }
 
@@ -724,13 +728,47 @@ FunctionWhileStatement
       };
     }
 
+FunctionVariableDeclaration
+  = TypedFunctionVariableDeclaration
+  / UntypedFunctionVariableDeclaration
+
+TypedFunctionVariableDeclaration
+  = exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" _ init:FunctionVariableInitializer _ LineTerminator? {
+      return {
+        type: 'VariableDeclaration',
+        kind: kind || 'none',
+        names: pattern,
+        typeAnnotation: type,
+        init,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+
+UntypedFunctionVariableDeclaration
+  = exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" _ init:FunctionVariableInitializer _ LineTerminator? {
+      return {
+        type: 'VariableDeclaration',
+        kind: kind || 'none',
+        names: pattern,
+        typeAnnotation: null,
+        init,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+
+FunctionVariableInitializer
+  = FunctionIfStatement
+  / Expression
+
 FunctionNestedBlock
   = statements:(BlockIgnorableLine / FunctionNestedStatement)+ {
       return statements.filter(s => s !== null);
     }
 
 FunctionNestedStatement
-  = &FunctionNestedIndent FunctionNestedIndent stmt:(FunctionNestedIfStatement / FunctionNestedForStatement / FunctionNestedWhileStatement / Statement) {
+  = &FunctionNestedIndent FunctionNestedIndent stmt:(FunctionNestedIfStatement / FunctionNestedForStatement / FunctionNestedWhileStatement / FunctionNestedVariableDeclaration / Statement) {
       return stmt;
     }
 
@@ -794,13 +832,47 @@ FunctionNestedWhileStatement
       };
     }
 
+FunctionNestedVariableDeclaration
+  = TypedFunctionNestedVariableDeclaration
+  / UntypedFunctionNestedVariableDeclaration
+
+TypedFunctionNestedVariableDeclaration
+  = exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" _ init:FunctionNestedVariableInitializer _ LineTerminator? {
+      return {
+        type: 'VariableDeclaration',
+        kind: kind || 'none',
+        names: pattern,
+        typeAnnotation: type,
+        init,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+
+UntypedFunctionNestedVariableDeclaration
+  = exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" _ init:FunctionNestedVariableInitializer _ LineTerminator? {
+      return {
+        type: 'VariableDeclaration',
+        kind: kind || 'none',
+        names: pattern,
+        typeAnnotation: null,
+        init,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+
+FunctionNestedVariableInitializer
+  = FunctionNestedIfStatement
+  / Expression
+
 FunctionDeepNestedBlock
   = statements:(BlockIgnorableLine / FunctionDeepNestedStatement)+ {
       return statements.filter(s => s !== null);
     }
 
 FunctionDeepNestedStatement
-  = &FunctionDeepNestedIndent FunctionDeepNestedIndent stmt:(FunctionDeepNestedIfStatement / FunctionDeepNestedForStatement / FunctionDeepNestedWhileStatement / Statement) {
+  = &FunctionDeepNestedIndent FunctionDeepNestedIndent stmt:(FunctionDeepNestedIfStatement / FunctionDeepNestedForStatement / FunctionDeepNestedWhileStatement / FunctionDeepNestedVariableDeclaration / Statement) {
       return stmt;
     }
 
@@ -863,6 +935,40 @@ FunctionDeepNestedWhileStatement
         loc: loc()
       };
     }
+
+FunctionDeepNestedVariableDeclaration
+  = TypedFunctionDeepNestedVariableDeclaration
+  / UntypedFunctionDeepNestedVariableDeclaration
+
+TypedFunctionDeepNestedVariableDeclaration
+  = exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" _ init:FunctionDeepNestedVariableInitializer _ LineTerminator? {
+      return {
+        type: 'VariableDeclaration',
+        kind: kind || 'none',
+        names: pattern,
+        typeAnnotation: type,
+        init,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+
+UntypedFunctionDeepNestedVariableDeclaration
+  = exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" _ init:FunctionDeepNestedVariableInitializer _ LineTerminator? {
+      return {
+        type: 'VariableDeclaration',
+        kind: kind || 'none',
+        names: pattern,
+        typeAnnotation: null,
+        init,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+
+FunctionDeepNestedVariableInitializer
+  = FunctionDeepNestedIfStatement
+  / Expression
 
 FunctionVeryDeepNestedBlock
   = statements:(BlockIgnorableLine / FunctionVeryDeepNestedStatement)+ {

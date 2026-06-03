@@ -359,6 +359,44 @@ ma = switch mode
           expect(Array.isArray(declaration.init.cases[1].consequent)).toBe(true);
         }
       });
+
+      it('parses if expression variable initializers', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+value = if close > open
+    close
+else
+    open
+float typedValue = if close > open
+    close
+else
+    open`);
+
+        const value = ast.body.find((s) => s.type === 'VariableDeclaration' && s.names.type === 'VariableDeclarator' && s.names.name.name === 'value');
+        const typedValue = ast.body.find((s) => s.type === 'VariableDeclaration' && s.names.type === 'VariableDeclarator' && s.names.name.name === 'typedValue');
+
+        expect(value?.type === 'VariableDeclaration' ? value.init.type : null).toBe('IfStatement');
+        expect(typedValue?.type === 'VariableDeclaration' ? typedValue.init.type : null).toBe('IfStatement');
+      });
+
+      it('parses if expression variable initializers inside functions', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+choose(bool enabled) =>
+    value = if enabled
+        close
+    else
+        open
+    value
+plot(choose(close > open))`);
+
+        const fn = ast.body.find((s) => s.type === 'FunctionDeclaration');
+        const declaration = fn?.type === 'FunctionDeclaration' && Array.isArray(fn.body)
+          ? fn.body.find((s) => s.type === 'VariableDeclaration' && s.names.type === 'VariableDeclarator' && s.names.name.name === 'value')
+          : undefined;
+
+        expect(declaration?.type === 'VariableDeclaration' ? declaration.init.type : null).toBe('IfStatement');
+      });
     });
 
     describe('if statements', () => {

@@ -406,6 +406,17 @@ plot(close > open ? request.security(syminfo.tickerid, "2", close) : close, titl
       engineOptions: { requestDatafeed: requestDatafeed() },
     });
 
+    const initializer = runCompatScript(`
+indicator("Initializer request disabled", dynamic_requests=false)
+value = if close > open
+    request.security(syminfo.tickerid, "2", close)
+else
+    close
+`, {
+      bars: [chartBars[1]!],
+      engineOptions: { requestDatafeed: requestDatafeed() },
+    });
+
     const logical = runCompatScript(`
 indicator("Logical request disabled", dynamic_requests=false)
 plot(request.security(syminfo.tickerid, "2", close) and close > open ? 1 : 0, title="Logical")
@@ -418,6 +429,9 @@ plot(request.security(syminfo.tickerid, "2", close) and close > open ? 1 : 0, ti
       'request.* calls in local scopes require dynamic_requests=true: request.security',
     ]);
     expect(conditional.errors.map((error) => error.message)).toEqual([
+      'request.* calls in local scopes require dynamic_requests=true: request.security',
+    ]);
+    expect(initializer.errors.map((error) => error.message)).toEqual([
       'request.* calls in local scopes require dynamic_requests=true: request.security',
     ]);
     expect(logical.errors.map((error) => error.message)).toEqual([
