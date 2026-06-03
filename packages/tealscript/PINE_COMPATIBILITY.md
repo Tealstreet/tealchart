@@ -65,8 +65,8 @@ Covered behavior and remaining gaps:
   `indicator()`/`strategy()` declarations, function calls, array literals, tuple
   destructuring, index access, and parenthesized expressions.
 - Tuple destructuring preserves known positional types from literal tuple
-  expressions, direct declaration `if` and `switch` initializers, direct and
-  compatible if/else plus partial-if user-function tuple returns, direct
+  expressions, direct declaration `if`, `switch`, and loop initializers, direct
+  and compatible if/else plus partial-if user-function tuple returns, direct
   user-function loop and defaulted or partial switch tuple returns, compatible
   user-method tuple returns, and supported tuple-returning TA calls, so
   downstream assignment diagnostics can use destructured names.
