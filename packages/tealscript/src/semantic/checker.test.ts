@@ -3108,6 +3108,26 @@ plot(str.length(directionLabel) + str.length(priceLabel) + directionScore)
     expect(types.get('directionScore')).toMatchObject({ kind: 'int' });
   });
 
+  it('selects user-defined imported enum receiver methods', () => {
+    const result = checkProgram(parse(`
+indicator("Imported Enum Method Receivers")
+import TestUser/Signal/1 as sig
+method label(sig.State this) => "enum"
+method label(float this) => "float"
+sig.State selected = sig.State.long
+stateLabel = sig.State.short.label()
+priceLabel = close.label()
+plot(str.length(stateLabel) + str.length(priceLabel))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('selected')).toMatchObject({ kind: 'udt', name: 'sig.State' });
+    expect(types.get('stateLabel')).toMatchObject({ kind: 'string' });
+    expect(types.get('priceLabel')).toMatchObject({ kind: 'string' });
+  });
+
   it('does not report user method receiver mismatches for builtin collection member calls', () => {
     const result = checkProgram(parse(`
 indicator("Builtin Method Names")

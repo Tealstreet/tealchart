@@ -3306,6 +3306,14 @@ class SemanticChecker {
   }
 
   private inferEnumMemberType(expression: MemberExpression): SemanticType | undefined {
+    const path = this.memberPath(expression);
+    if (path.length === 3) {
+      const [alias, enumName] = path;
+      if (alias && enumName && this.rootScope.lookup(alias)?.kind === 'import') {
+        return { kind: 'udt', name: `${alias}.${enumName}`, qualifier: 'const' };
+      }
+    }
+
     if (expression.object.type !== 'Identifier') return undefined;
 
     const enumDeclaration = this.enumDeclarations.get(expression.object.name);
