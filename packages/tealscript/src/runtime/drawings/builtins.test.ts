@@ -936,6 +936,7 @@ if barstate.islast
     table.cell_set_tooltip(stats, 0, 1, "Created details")
     table.cell_set_tooltip(stats, 0, 1, na)
     table.cell_set_text(stats, 0, 1, "created")
+    table.merge_cells(stats, 0, 0, 1, 0)
     table.delete(stale)
 plot(close)
 plot(array.size(table.all), title="Tables")`;
@@ -1001,6 +1002,14 @@ plot(array.size(table.all), title="Tables")`;
               textSize: 'normal',
               tooltip: undefined,
               bgcolor: null,
+            },
+          ],
+          mergedCells: [
+            {
+              startColumn: 0,
+              startRow: 0,
+              endColumn: 1,
+              endRow: 0,
             },
           ],
         },
@@ -1074,6 +1083,22 @@ plot(close)`;
       const result = executeScript(ast, bars);
 
       expect(result.errors[0]?.message).toBe('Table cell coordinates out of bounds: column 1, row 0');
+    });
+
+    it('reports overlapping merged table cell ranges', () => {
+      const script = `//@version=6
+indicator("Table merged cell overlap", overlay=true)
+var stats = table.new(position.bottom_right, 3, 2)
+if barstate.islast
+    table.merge_cells(stats, 0, 0, 1, 0)
+    table.merge_cells(stats, 1, 0, 2, 1)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(2);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors[0]?.message).toBe('Table merged cell range overlaps existing merged cells: columns 1-2, rows 0-1');
     });
 
     it('caps declared table cell capacity across live tables', () => {

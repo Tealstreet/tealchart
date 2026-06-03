@@ -694,7 +694,7 @@ diagnostics.
 
 The `table.*` drawing pass covers fixed-position table handles, declared row and
 column sizing, background/frame/border metadata, `table.delete()`,
-`table.clear()`, `table.all`, `table.cell()`, table-level
+`table.clear()`, `table.merge_cells()`, `table.all`, `table.cell()`, table-level
 position/background/frame/border setters, and common cell setters for text,
 color, background, size, width, height, text alignment, font family, and
 bold/italic text formatting, and tooltips. Table lifecycle helpers and setters accept

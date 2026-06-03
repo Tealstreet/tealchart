@@ -499,6 +499,7 @@ if barstate.islast
     table.cell_set_text_font_family(table_id=dashboard, column=1, row=0, text_font_family=font.family_monospace)
     table.cell_set_text_formatting(table_id=dashboard, column=1, row=0, text_formatting=text.format_bold)
     table.cell_set_tooltip(table_id=dashboard, column=1, row=0, tooltip="Close details")
+    table.merge_cells(table_id=dashboard, start_column=0, start_row=0, end_column=1, end_row=0)
     table.cell(table_id=dashboard, column=0, row=1, text="cleared")
     table.clear(table_id=dashboard, start_column=0, start_row=1, end_column=0, end_row=1)
 plot(array.size(table.all), title="Named Table Count")
@@ -547,6 +548,14 @@ plot(array.size(table.all), title="Named Table Count")
             textFontFamily: 'monospace',
             textFormatting: 'bold',
             tooltip: 'Close details',
+          },
+        ],
+        mergedCells: [
+          {
+            startColumn: 0,
+            startRow: 0,
+            endColumn: 1,
+            endRow: 0,
           },
         ],
       },

@@ -861,6 +861,32 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     table.cells.push(cell);
     return cell;
   };
+  const normalizeMergedCellRange = (
+    table: TableDrawingOutput,
+    startColumn: unknown,
+    startRow: unknown,
+    endColumn: unknown,
+    endRow: unknown,
+  ): { startColumn: number; startRow: number; endColumn: number; endRow: number } => {
+    const start = normalizeCellCoordinates(table, startColumn, startRow);
+    const end = normalizeCellCoordinates(table, endColumn, endRow);
+
+    return {
+      startColumn: Math.min(start.column, end.column),
+      startRow: Math.min(start.row, end.row),
+      endColumn: Math.max(start.column, end.column),
+      endRow: Math.max(start.row, end.row),
+    };
+  };
+  const mergedCellRangesOverlap = (
+    first: { startColumn: number; startRow: number; endColumn: number; endRow: number },
+    second: { startColumn: number; startRow: number; endColumn: number; endRow: number },
+  ): boolean => (
+    first.startColumn <= second.endColumn
+    && first.endColumn >= second.startColumn
+    && first.startRow <= second.endRow
+    && first.endRow >= second.startRow
+  );
 
   builtins.set('table.new', (args, namedArgs, ctx, _scope, callId) => {
     const id = `table_${callId}_${ctx.bar_index}`;
@@ -912,6 +938,22 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
         || cell.row < startRow
         || cell.row > endRow
       ));
+    });
+    return undefined;
+  });
+  builtins.set('table.merge_cells', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      const range = normalizeMergedCellRange(
+        table,
+        callArg(args, namedArgs, 1, 'start_column', undefined, ['table_id']),
+        callArg(args, namedArgs, 2, 'start_row', undefined, ['table_id', 'start_column']),
+        callArg(args, namedArgs, 3, 'end_column', undefined, ['table_id', 'start_column', 'start_row']),
+        callArg(args, namedArgs, 4, 'end_row', undefined, ['table_id', 'start_column', 'start_row', 'end_column']),
+      );
+      if (table.mergedCells?.some((mergedCell) => mergedCellRangesOverlap(mergedCell, range))) {
+        throw new Error(`Table merged cell range overlaps existing merged cells: columns ${range.startColumn}-${range.endColumn}, rows ${range.startRow}-${range.endRow}`);
+      }
+      table.mergedCells = [...(table.mergedCells ?? []), range];
     });
     return undefined;
   });

@@ -115,6 +115,7 @@ export {
   type BoxDrawingOutput,
   type PolylineDrawingOutput,
   type TableCellDrawingOutput,
+  type TableMergedCellDrawingOutput,
   type TableDrawingOutput,
   type AlertEvent,
   type AlertFrequency,

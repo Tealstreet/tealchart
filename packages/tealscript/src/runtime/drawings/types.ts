@@ -115,6 +115,13 @@ export interface TableCellDrawingOutput {
   bgcolor: string | null;
 }
 
+export interface TableMergedCellDrawingOutput {
+  startColumn: number;
+  startRow: number;
+  endColumn: number;
+  endRow: number;
+}
+
 export interface TableDrawingOutput {
   id: string;
   type: 'table';
@@ -132,6 +139,7 @@ export interface TableDrawingOutput {
   borderColor: string | null;
   borderWidth: number;
   cells: TableCellDrawingOutput[];
+  mergedCells?: TableMergedCellDrawingOutput[];
   forceOverlay?: boolean;
 }
 

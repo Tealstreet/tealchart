@@ -3511,6 +3511,8 @@ dashboard = table.new(columns=2, rows=2)
 temporary = table.new(columns=1, rows=1)
 table.clear(table_id=dashboard, 0, 0)
 table.clear(dashboard, start_column=0, start_row=0, end_column=1, end_row=1)
+table.merge_cells(table_id=dashboard, start_column=0, start_row=0, end_column=1, end_row=0)
+table.merge_cells(dashboard, 0, 1, 1, 1)
 table.set_position(table_id=dashboard, position.bottom_left)
 table.set_bgcolor(dashboard, bgcolor=color.new(color.black, 80))
 table.set_frame_color(table_id=dashboard, color.gray)
@@ -3532,6 +3534,9 @@ unknown = table.clear(dashboard, 0, 0, width=1)
 missingClear = table.clear(table_id=dashboard, start_column=0)
 duplicateClear = table.clear(dashboard, 0, 0, table_id=dashboard)
 tooManyClear = table.clear(dashboard, 0, 0, 1, 1, 2)
+missingMerge = table.merge_cells(table_id=dashboard, start_column=0, start_row=0, end_column=1)
+duplicateMerge = table.merge_cells(dashboard, 0, 0, 1, 1, table_id=dashboard)
+tooManyMerge = table.merge_cells(dashboard, 0, 0, 1, 1, 2)
 missingSetter = table.set_position(table_id=dashboard)
 unknownSetter = table.set_bgcolor(dashboard, color.black, opacity=80)
 duplicateSetter = table.set_frame_color(dashboard, color.gray, table_id=dashboard)
@@ -3545,6 +3550,10 @@ tooManyDelete = table.delete(dashboard, dashboard)
       "table.clear() missing required argument 'start_row'",
       "Argument 'table_id' for table.clear() was supplied multiple times",
       'table.clear() expects at most 5 arguments',
+      'table.merge_cells() expects at least 5 arguments',
+      "table.merge_cells() missing required argument 'end_row'",
+      "Argument 'table_id' for table.merge_cells() was supplied multiple times",
+      'table.merge_cells() expects at most 5 arguments',
       'table.set_position() expects at least 2 arguments',
       "table.set_position() missing required argument 'position'",
       "Unknown argument 'opacity' for table.set_bgcolor()",
