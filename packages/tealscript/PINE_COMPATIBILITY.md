@@ -635,7 +635,8 @@ drawing output. The label mutation pass covers persistent `var` label handles,
 `label.set_tooltip()`, matching scalar getters (`get_x`, `get_y`, `get_xloc`,
 `get_yloc`, `get_text`, `get_style`, `get_color`, `get_textcolor`,
 `get_size`, `get_tooltip`), `label.copy()`, and `label.delete()`. Label
-mutators and getters accept Pine-style named `id` and value arguments. Rendering
+mutators and getters accept Pine-style named `id` and value arguments. Semantic
+analysis preserves known label getter return types for downstream diagnostics. Rendering
 routes labels to the script pane: overlay scripts use the main pane, non-overlay
 scripts use their indicator pane. Renderer coverage handles text-only
 `label.style_none`, directional label bodies, and common symbol bodies including
