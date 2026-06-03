@@ -257,6 +257,18 @@ const REQUEST_FLOAT_RETURN_FUNCTIONS = new Set([
   'request.splits',
 ]);
 
+const TICKER_STRING_RETURN_FUNCTIONS = new Set([
+  'ticker.heikinashi',
+  'ticker.inherit',
+  'ticker.kagi',
+  'ticker.linebreak',
+  'ticker.modify',
+  'ticker.new',
+  'ticker.pointfigure',
+  'ticker.renko',
+  'ticker.standard',
+]);
+
 const FLOAT_RETURN_FUNCTIONS = new Set([
   'ta.alma',
   'ta.atr',
@@ -3189,6 +3201,7 @@ class SemanticChecker {
       };
     }
     if (REQUEST_FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: 'series' };
+    if (TICKER_STRING_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'string', qualifier: 'simple' };
     if (FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: 'series' };
     if (calleeName === 'label.get_x') return { kind: 'int' };
     if (calleeName === 'label.get_y') return { kind: 'float' };
