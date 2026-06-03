@@ -7227,8 +7227,9 @@ export class TealscriptEngine {
 
     // RSI - Relative Strength Index
     this.builtins.set('ta.rsi', (args, namedArgs, ctx, scope) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const taSourceLengthArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
 
       // Get the series for the source value
       const series = this.getSeriesForSource(source, ctx);
@@ -7857,10 +7858,11 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.stoch', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const highSource = this.toNumber(this.getCallArg(args, namedArgs, 1, 'high'));
-      const lowSource = this.toNumber(this.getCallArg(args, namedArgs, 2, 'low'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 3, 'length', 14));
+      const taStochArgs = ['source', 'high', 'low', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taStochArgs, 0));
+      const highSource = this.toNumber(this.getOrderedCallArg(args, namedArgs, taStochArgs, 1));
+      const lowSource = this.toNumber(this.getOrderedCallArg(args, namedArgs, taStochArgs, 2));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taStochArgs, 3, 14));
       const windows = this.getCompletePairedSourceWindows(
         scope,
         `_ta_stoch_high_${callId}`,
@@ -7879,8 +7881,9 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.mfi', (args, namedArgs, ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'series'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length', 14));
+      const taMfiArgs = namedArgs.has('series') && !namedArgs.has('source') ? ['series', 'length'] : ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taMfiArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taMfiArgs, 1, 14));
       const volume = ctx.volume.get(0);
       const sourceKey = `_ta_mfi_source_${callId}`;
       const positiveKey = `_ta_mfi_positive_${callId}`;
@@ -7912,7 +7915,8 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.wpr', (args, namedArgs, ctx) => {
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 0, 'length', 14));
+      const taWprArgs = ['length'];
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taWprArgs, 0, 14));
       const close = ctx.close.get(0);
       if (length < 1 || close === undefined || isNaN(close)) return NaN;
 
@@ -7931,8 +7935,9 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.cmo', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length', 14));
+      const taSourceLengthArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1, 14));
       const values = this.getCompleteSourceWindow(scope, `_ta_cmo_source_${callId}`, source, length + 1);
       if (!values) return NaN;
 
@@ -7949,9 +7954,10 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.tsi', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const shortLength = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'short_length'));
-      const longLength = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 2, 'long_length'));
+      const taTsiArgs = ['source', 'short_length', 'long_length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taTsiArgs, 0));
+      const shortLength = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taTsiArgs, 1));
+      const longLength = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taTsiArgs, 2));
       if (isNaN(source) || shortLength < 1 || longLength < 1) return NaN;
 
       const sourceKey = `_ta_tsi_source_${callId}`;
@@ -8021,8 +8027,9 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.cci', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length', 20));
+      const taSourceLengthArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1, 20));
       const values = this.getCompleteSourceWindow(scope, `_ta_cci_source_${callId}`, source, length);
       if (!values) return NaN;
 
