@@ -118,34 +118,52 @@ plot(ta.stoch(hl2, high, low, 3), title="Stoch HL2")
 plot(ta.mfi(hlc3, 3), title="MFI")
 plot(ta.wpr(3), title="WPR")
 plot(ta.cmo(close, 3), title="CMO")
+plot(ta.rsi(close, 3), title="RSI")
 plot(ta.tsi(close, 2, 3), title="TSI")
 plot(ta.tsi(close - open, 2, 3), title="Derived TSI")
 plot(ta.cci(close, 3), title="Close CCI")
 plot(ta.cci(hlc3, 3), title="Typical CCI")
 plot(ta.stoch(source=close, high=high, low=low, length=3), title="Named Stoch Close")
-plot(ta.mfi(series=hlc3, length=3), title="Named MFI")
+plot(ta.stoch(source=close, high, low, 3), title="Mixed Stoch Close")
+plot(ta.mfi(source=hlc3, length=3), title="Named MFI")
+plot(ta.mfi(source=hlc3, 3), title="Mixed MFI")
 plot(ta.wpr(length=3), title="Named WPR")
 plot(ta.cmo(source=close, length=3), title="Named CMO")
+plot(ta.cmo(source=close, 3), title="Mixed CMO")
 plot(ta.tsi(source=close, short_length=2, long_length=3), title="Named TSI")
+plot(ta.tsi(source=close, 2, 3), title="Mixed TSI")
 plot(ta.cci(source=hlc3, length=3), title="Named Typical CCI")
+plot(ta.cci(source=hlc3, 3), title="Mixed Typical CCI")
+`);
+    const mixedRsi = runCompatScript(`
+indicator("RSI mixed helper")
+plot(ta.rsi(source=close, 3), title="RSI")
 `);
 
     expect(result.errors).toEqual([]);
+    expect(mixedRsi.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Stoch Close').values)).toEqual([null, null, 88.888889, 25, 9.090909, 30.769231, 88.888889, 92.857143, 75, 88.888889, 50, 71.428571]);
     expect(roundSeries(getPlot(result, 'Stoch HL2').values)).toEqual([null, null, 77.777778, 56.25, 27.272727, 19.230769, 66.666667, 75, 79.166667, 72.222222, 68.75, 50]);
     expect(roundSeries(getPlot(result, 'MFI').values)).toEqual([null, null, 100, 61.624951, 26.076294, 0, 35.319543, 74.59367, 100, 100, 100, 100]);
     expect(roundSeries(getPlot(result, 'WPR').values)).toEqual([null, null, -11.111111, -75, -90.909091, -69.230769, -11.111111, -7.142857, -25, -11.111111, -50, -28.571429]);
     expect(roundSeries(getPlot(result, 'CMO').values)).toEqual([null, null, null, 11.111111, -60, -77.777778, 11.111111, 100, 80, 77.777778, 20, 66.666667]);
+    expect(roundSeries(getPlot(result, 'RSI').values)).toEqual([null, 100, 100, 55.555556, 20, 11.111111, 55.555556, 100, 90, 88.888889, 60, 83.333333]);
     expect(roundSeries(getPlot(result, 'TSI').values)).toEqual([null, 1, 1, 0.127273, -0.423181, -0.350948, 0.263311, 0.667454, 0.546809, 0.68082, 0.455692, 0.582409]);
     expect(roundSeries(getPlot(result, 'Derived TSI').values)).toEqual([null, 1, 0.333333, -0.708333, -0.792793, 0.212408, 0.577159, 0.708576, -0.246146, 0.084836, -0.231693, 0.049573]);
     expect(roundSeries(getPlot(result, 'Close CCI').values)).toEqual([null, null, 87.5, -100, -100, -28.571429, 100, 100, 33.333333, 100, 20, 100]);
     expect(roundSeries(getPlot(result, 'Typical CCI').values)).toEqual([null, null, 95.652174, -25, -100, -70, 100, 100, 64.516129, 100, 84.615385, 50]);
     expect(roundSeries(getPlot(result, 'Named Stoch Close').values)).toEqual(roundSeries(getPlot(result, 'Stoch Close').values));
+    expect(roundSeries(getPlot(result, 'Mixed Stoch Close').values)).toEqual(roundSeries(getPlot(result, 'Stoch Close').values));
     expect(roundSeries(getPlot(result, 'Named MFI').values)).toEqual(roundSeries(getPlot(result, 'MFI').values));
+    expect(roundSeries(getPlot(result, 'Mixed MFI').values)).toEqual(roundSeries(getPlot(result, 'MFI').values));
     expect(roundSeries(getPlot(result, 'Named WPR').values)).toEqual(roundSeries(getPlot(result, 'WPR').values));
     expect(roundSeries(getPlot(result, 'Named CMO').values)).toEqual(roundSeries(getPlot(result, 'CMO').values));
+    expect(roundSeries(getPlot(result, 'Mixed CMO').values)).toEqual(roundSeries(getPlot(result, 'CMO').values));
+    expect(roundSeries(getPlot(mixedRsi, 'RSI').values)).toEqual(roundSeries(getPlot(result, 'RSI').values));
     expect(roundSeries(getPlot(result, 'Named TSI').values)).toEqual(roundSeries(getPlot(result, 'TSI').values));
+    expect(roundSeries(getPlot(result, 'Mixed TSI').values)).toEqual(roundSeries(getPlot(result, 'TSI').values));
     expect(roundSeries(getPlot(result, 'Named Typical CCI').values)).toEqual(roundSeries(getPlot(result, 'Typical CCI').values));
+    expect(roundSeries(getPlot(result, 'Mixed Typical CCI').values)).toEqual(roundSeries(getPlot(result, 'Typical CCI').values));
   });
 
   it('runs cumulative and dispersion TA helpers', () => {
