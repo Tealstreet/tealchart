@@ -298,6 +298,14 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
       allowNamedPrefixWithPositional: true,
     },
   ],
+  ['table.delete', { params: ['table_id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['table.clear', { params: ['table_id', 'start_column', 'start_row', 'end_column', 'end_row'], minArgs: 3, maxArgs: 5, allowNamedPrefixWithPositional: true }],
+  ['table.set_position', { params: ['table_id', 'position'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['table.set_bgcolor', { params: ['table_id', 'bgcolor'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['table.set_frame_color', { params: ['table_id', 'frame_color'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['table.set_frame_width', { params: ['table_id', 'frame_width'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['table.set_border_color', { params: ['table_id', 'border_color'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['table.set_border_width', { params: ['table_id', 'border_width'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   [
     'table.cell',
     {
