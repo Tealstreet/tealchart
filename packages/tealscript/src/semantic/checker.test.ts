@@ -637,6 +637,42 @@ invalidCtorArity = map.new<string>()
     ]);
   });
 
+  it('preserves branch types through conditional expressions', () => {
+    const result = checkProgram(parse(`
+indicator("Conditional Types")
+type Pivot
+    float price
+
+flag = close > open
+numberValue = flag ? 1 : 2.5
+labelValue = flag ? label.new(bar_index, close) : na
+arrayValue = flag ? array.new<float>() : na
+arrayMixed = flag ? array.from(1) : array.from(2.5)
+matrixValue = flag ? matrix.new<int>() : matrix.new_int()
+mapValue = flag ? map.new<string, float>() : na
+pivotValue = flag ? Pivot.new(close) : na
+pointValue = flag ? chart.point.from_index(bar_index, close) : chart.point.now(close)
+plot(numberValue + array.size(arrayValue) + array.size(arrayMixed) + matrix.rows(matrixValue) + map.size(mapValue) + pivotValue.price + pointValue.price)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('numberValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('labelValue')).toMatchObject({ kind: 'label', qualifier: 'series' });
+    expect(types.get('arrayValue')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('arrayMixed')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('matrixValue')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'int' } });
+    expect(types.get('mapValue')).toMatchObject({
+      kind: 'map',
+      qualifier: 'series',
+      keyType: { kind: 'string' },
+      valueType: { kind: 'float' },
+    });
+    expect(types.get('pivotValue')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
+    expect(types.get('pointValue')).toMatchObject({ kind: 'chart.point', qualifier: 'series' });
+  });
+
   it('reports map key and value template mismatches', () => {
     const result = checkProgram(parse(`
 indicator("Bad Map Types")

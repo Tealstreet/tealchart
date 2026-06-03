@@ -2,6 +2,7 @@ import type {
   AssignmentStatement,
   CallArgument,
   CallExpression,
+  ConditionalExpression,
   EnumDeclaration,
   Expression,
   ForStatement,
@@ -3106,14 +3107,7 @@ class SemanticChecker {
       case 'UnaryExpression':
         return { kind: 'unknown', qualifier: this.inferExpressionType(expression.argument, scope).qualifier };
       case 'ConditionalExpression':
-        return {
-          kind: 'unknown',
-          qualifier: this.maxQualifier(
-            this.inferExpressionType(expression.test, scope),
-            this.inferExpressionType(expression.consequent, scope),
-            this.inferExpressionType(expression.alternate, scope),
-          ),
-        };
+        return this.inferConditionalExpressionType(expression, scope);
       case 'CallExpression':
         return this.inferCallType(expression, scope);
       case 'MemberExpression':
@@ -3134,6 +3128,58 @@ class SemanticChecker {
         return this.inferIndexExpressionType(expression, scope);
       default:
         return { kind: 'unknown' };
+    }
+  }
+
+  private inferConditionalExpressionType(expression: ConditionalExpression, scope: SemanticScope): SemanticType {
+    const testType = this.inferExpressionType(expression.test, scope);
+    const consequentType = this.inferExpressionType(expression.consequent, scope);
+    const alternateType = this.inferExpressionType(expression.alternate, scope);
+    const branchType = this.mergeConditionalBranchTypes(consequentType, alternateType);
+
+    return {
+      ...branchType,
+      qualifier: this.maxQualifier(testType, consequentType, alternateType),
+    };
+  }
+
+  private mergeConditionalBranchTypes(consequentType: SemanticType, alternateType: SemanticType): SemanticType {
+    if (consequentType.kind === 'unknown') return { ...alternateType, qualifier: undefined };
+    if (alternateType.kind === 'unknown') return { ...consequentType, qualifier: undefined };
+    if (this.isNumericType(consequentType) && this.isNumericType(alternateType)) {
+      return { kind: consequentType.kind === 'float' || alternateType.kind === 'float' ? 'float' : 'int' };
+    }
+    if (consequentType.kind !== alternateType.kind) return { kind: 'unknown' };
+
+    switch (consequentType.kind) {
+      case 'array':
+        return {
+          kind: 'array',
+          elementType: this.mergeConditionalBranchTypes(
+            consequentType.elementType ?? UNKNOWN_SEMANTIC_TYPE,
+            alternateType.elementType ?? UNKNOWN_SEMANTIC_TYPE,
+          ),
+        };
+      case 'matrix':
+        return {
+          kind: 'matrix',
+          elementType: this.mergeConditionalBranchTypes(
+            consequentType.elementType ?? UNKNOWN_SEMANTIC_TYPE,
+            alternateType.elementType ?? UNKNOWN_SEMANTIC_TYPE,
+          ),
+        };
+      case 'map':
+        return this.isAssignableType(consequentType, alternateType) && this.isAssignableType(alternateType, consequentType)
+          ? {
+              kind: 'map',
+              keyType: consequentType.keyType,
+              valueType: consequentType.valueType,
+            }
+          : { kind: 'unknown' };
+      case 'udt':
+        return consequentType.name === alternateType.name ? { kind: 'udt', name: consequentType.name } : { kind: 'unknown' };
+      default:
+        return { kind: consequentType.kind };
     }
   }
 
