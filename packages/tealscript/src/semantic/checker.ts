@@ -3319,31 +3319,7 @@ class SemanticChecker {
 
   private inferSwitchCaseConsequentType(consequent: Expression | Statement[], scope: SemanticScope): SemanticType {
     if (!Array.isArray(consequent)) return this.inferExpressionType(consequent, scope);
-
-    const blockScope = new SemanticScope(scope);
-    let returnType: SemanticType = { kind: 'unknown' };
-    for (const [index, statement] of consequent.entries()) {
-      const isLastStatement = index === consequent.length - 1;
-      if (statement.type === 'VariableDeclaration') {
-        const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init, blockScope);
-        if (statement.names.type === 'VariableDeclarator') {
-          this.declare(blockScope, {
-            name: statement.names.name.name,
-            kind: 'variable',
-            type,
-            loc: statement.names.name.loc,
-          });
-        }
-        returnType = isLastStatement ? type : { kind: 'unknown' };
-        continue;
-      }
-      if (statement.type === 'ExpressionStatement') {
-        returnType = isLastStatement ? this.inferExpressionType(statement.expression, blockScope) : { kind: 'unknown' };
-        continue;
-      }
-      returnType = { kind: 'unknown' };
-    }
-    return returnType;
+    return this.inferStatementListReturnType(consequent, scope);
   }
 
   private mergeConditionalBranchTypes(consequentType: SemanticType, alternateType: SemanticType): SemanticType {
