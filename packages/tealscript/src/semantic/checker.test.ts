@@ -625,6 +625,36 @@ plot(branchValue + layeredValue + widenedValue + partialValue)
     expect(types.get('unknownTitle')).toMatchObject({ kind: 'unknown' });
   });
 
+  it('infers tuple destructuring element types from if initializer returns', () => {
+    const result = checkProgram(parse(`
+indicator("If Initializer Tuple Types")
+[branchValue, branchTitle] = if close > open
+    [close, "up"]
+else
+    [open, "down"]
+[partialValue, partialTitle] = if close > open
+    [close, "partial"]
+branchValue := "bad"
+branchTitle := 1
+partialValue := "bad"
+partialTitle := 2
+plot(branchValue + partialValue)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable branchValue',
+      'Cannot assign int value to string variable branchTitle',
+      'Cannot assign string value to float variable partialValue',
+      'Cannot assign int value to string variable partialTitle',
+    ]);
+    expect(types.get('branchValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('branchTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('partialValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('partialTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+  });
+
   it('infers tuple destructuring element types from user function loop tuple returns', () => {
     const result = checkProgram(parse(`
 indicator("Loop Tuple Types")
