@@ -2879,6 +2879,12 @@ plot(trend + direction + mixedTrend + mixedDirection + diPlus + diMinus + adx + 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('diPlus')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('diMinus')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('adx')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedDiPlus')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedDiMinus')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedAdx')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('linreg')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('mixedLinreg')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
@@ -2926,6 +2932,12 @@ plotshape(up or down)
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('line')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('signal')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('hist')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedLine')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedSignal')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedHist')).toEqual({ kind: 'float', qualifier: 'series' });
     expect(types.get('legacyObv')).toEqual({ kind: 'float', qualifier: 'series' });
     expect(types.get('mixedObv')).toEqual({ kind: 'float', qualifier: 'series' });
     expect(types.get('currentObv')).toEqual({ kind: 'float', qualifier: 'series' });
