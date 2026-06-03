@@ -1681,6 +1681,50 @@ missingCopy = line.copy()
     ]);
   });
 
+  it('resolves line getter named arguments and return types', () => {
+    const result = checkProgram(parse(`
+indicator("Line Getter Signatures")
+trend = line.new(bar_index, close, bar_index + 1, close)
+x1 = line.get_x1(id=trend)
+x2 = line.get_x2(trend)
+y1 = line.get_y1(id=trend)
+y2 = line.get_y2(trend)
+price = line.get_price(id=trend, bar_index)
+plot(price + y1 + y2)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('x1')).toMatchObject({ kind: 'int' });
+    expect(types.get('x2')).toMatchObject({ kind: 'int' });
+    expect(types.get('y1')).toMatchObject({ kind: 'float' });
+    expect(types.get('y2')).toMatchObject({ kind: 'float' });
+    expect(types.get('price')).toMatchObject({ kind: 'float' });
+  });
+
+  it('reports invalid line getter argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Line Getter Signatures")
+trend = line.new(bar_index, close, bar_index + 1, close)
+unknown = line.get_x1(trend, format="raw")
+missingPrice = line.get_price(id=trend)
+duplicatePrice = line.get_price(trend, bar_index, id=trend)
+tooMany = line.get_y1(trend, trend)
+missingGetter = line.get_x2()
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'format' for line.get_x1()",
+      'line.get_price() expects at least 2 arguments',
+      "line.get_price() missing required argument 'x'",
+      "Argument 'id' for line.get_price() was supplied multiple times",
+      'line.get_y1() expects at most 1 argument',
+      'line.get_x2() expects at least 1 argument',
+      "line.get_x2() missing required argument 'id'",
+    ]);
+  });
+
   it('resolves linefill.new named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Linefill Signatures")
