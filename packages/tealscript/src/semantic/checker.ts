@@ -218,6 +218,7 @@ const TUPLE_RETURN_FUNCTIONS = new Map<string, SemanticType[]>([
   ['ta.dmi', [SERIES_FLOAT, SERIES_FLOAT, SERIES_FLOAT]],
   ['ta.kc', [SERIES_FLOAT, SERIES_FLOAT, SERIES_FLOAT]],
   ['ta.macd', [SERIES_FLOAT, SERIES_FLOAT, SERIES_FLOAT]],
+  ['ta.supertrend', [SERIES_FLOAT, SERIES_FLOAT]],
 ]);
 
 const BUILTIN_FUNCTIONS = new Set([

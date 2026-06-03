@@ -2879,6 +2879,10 @@ plot(trend + direction + mixedTrend + mixedDirection + diPlus + diMinus + adx + 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('trend')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('direction')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedTrend')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedDirection')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('diPlus')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('diMinus')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('adx')).toMatchObject({ kind: 'float', qualifier: 'series' });
