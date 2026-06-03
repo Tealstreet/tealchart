@@ -701,10 +701,10 @@ plot(previous + value + removed + prefixPrevious + prefixValue + prefixRemoved +
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('value')).toMatchObject({ kind: 'float' });
-    expect(types.get('removed')).toMatchObject({ kind: 'float' });
-    expect(types.get('prefixValue')).toMatchObject({ kind: 'float' });
-    expect(types.get('prefixRemoved')).toMatchObject({ kind: 'float' });
+    expect(types.get('value')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('removed')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('prefixValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('prefixRemoved')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('exists')).toMatchObject({ kind: 'bool', qualifier: 'series' });
     expect(types.get('prefixExists')).toMatchObject({ kind: 'bool', qualifier: 'series' });
     expect(types.get('copied')).toMatchObject({ kind: 'map', keyType: { kind: 'string' }, valueType: { kind: 'float' } });
