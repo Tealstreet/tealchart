@@ -673,6 +673,27 @@ plot(validDefault + validNamed + validMethod.y)
     ]);
   });
 
+  it('reports user-defined callable argument type mismatches', () => {
+    const result = checkProgram(parse(`
+indicator("Bad User Argument Types")
+type Pivot
+    float y
+accept(float value, simple float length) => value
+method shift(Pivot this, float amount) => this
+pivot = Pivot.new(close)
+badType = accept("text", 1)
+badQualifier = accept(close, close)
+badMethod = pivot.shift("bad")
+plot(badType + badQualifier + badMethod.y)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Cannot use string value as float argument 'value' for accept()",
+      "Cannot use series float value as simple float argument 'length' for accept()",
+      "Cannot use string value as float argument 'amount' for shift()",
+    ]);
+  });
+
   it('records value and reference types from annotations', () => {
     const result = checkProgram(parse(`
 indicator("Typed Symbols")
