@@ -1769,6 +1769,7 @@ class SemanticChecker {
         `Cannot assign ${sourceType.qualifier} value to ${targetType.qualifier} ${this.formatSemanticType(targetType)} variable ${statement.left.name}`,
         statement.loc,
       );
+      return;
     }
 
     if (this.isAssignableType(targetType, sourceType)) return;
