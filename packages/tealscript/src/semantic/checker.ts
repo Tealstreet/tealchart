@@ -123,6 +123,14 @@ const ARRAY_CONSTRUCTOR_ELEMENT_TYPES = new Map<string, SemanticTypeKind>([
   ['array.new_table', 'table'],
 ]);
 
+const MATRIX_CONSTRUCTOR_ELEMENT_TYPES = new Map<string, SemanticTypeKind>([
+  ['matrix.new_bool', 'bool'],
+  ['matrix.new_color', 'color'],
+  ['matrix.new_float', 'float'],
+  ['matrix.new_int', 'int'],
+  ['matrix.new_string', 'string'],
+]);
+
 const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['box.copy', 'box'],
   ['box.new', 'box'],
@@ -3305,6 +3313,13 @@ class SemanticChecker {
         elementType: { kind: arrayElementType },
       };
     }
+    const matrixElementType = MATRIX_CONSTRUCTOR_ELEMENT_TYPES.get(calleePath.join('.'));
+    if (matrixElementType) {
+      return {
+        kind: 'matrix',
+        elementType: { kind: matrixElementType },
+      };
+    }
     if (calleePath.length === 2 && calleePath[1] === 'new' && calleePath[0] && this.typeDeclarations.has(calleePath[0])) {
       return { kind: 'udt', name: calleePath[0] };
     }
@@ -3422,9 +3437,9 @@ class SemanticChecker {
     if (expression.callee.type !== 'MemberExpression' || expression.callee.property.name !== 'get') return undefined;
 
     const receiverType = this.inferMatrixHelperReceiverType(expression, scope);
-    if (receiverType?.kind !== 'matrix') return undefined;
+    if (receiverType?.kind !== 'matrix' || !receiverType.elementType) return undefined;
 
-    return receiverType.elementType;
+    return { ...receiverType.elementType, qualifier: 'series' };
   }
 
   private inferMatrixHelperReceiverType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {

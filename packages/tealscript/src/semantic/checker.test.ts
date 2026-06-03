@@ -992,9 +992,13 @@ plot(rows + columns + elements + first + matrix.rows(id=generic) + matrix.rows(i
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('m')).toMatchObject({ kind: 'matrix', elementType: { kind: 'int' } });
+    expect(types.get('generic')).toMatchObject({ kind: 'matrix', elementType: { kind: 'float' } });
+    expect(types.get('flags')).toMatchObject({ kind: 'matrix', elementType: { kind: 'bool' } });
     expect(types.get('rows')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('columns')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('elements')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('first')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('valid')).toMatchObject({ kind: 'bool', qualifier: 'series' });
   });
 
@@ -1448,8 +1452,8 @@ float widened = namespaceValue
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
-    expect(types.get('value')).toMatchObject({ kind: 'float' });
-    expect(types.get('namespaceValue')).toMatchObject({ kind: 'int' });
+    expect(types.get('value')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('namespaceValue')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot use string value as float matrix element',
       'Cannot use bool value as float matrix element',
