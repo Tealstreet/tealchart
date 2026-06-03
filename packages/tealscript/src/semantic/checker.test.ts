@@ -509,6 +509,39 @@ plot(customFn(value))
     ]);
   });
 
+  it('infers user-defined function call return types', () => {
+    const result = checkProgram(parse(`
+indicator("User Function Returns")
+identity(float value) => value
+price(float value) => value + close
+marker(float value) => label.new(bar_index, value)
+values(float value) => array.from(value)
+recursive(float value) => recursive(value)
+inputValue = input.float(1)
+constIdentity = identity(1)
+inputIdentity = identity(inputValue)
+seriesIdentity = identity(close)
+seriesPrice = price(1)
+seriesMarker = marker(close)
+seriesValues = values(close)
+constRecursive = recursive(1)
+seriesRecursive = recursive(close)
+plot(seriesPrice + array.size(seriesValues))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('constIdentity')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('inputIdentity')).toMatchObject({ kind: 'float', qualifier: 'input' });
+    expect(types.get('seriesIdentity')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('seriesPrice')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('seriesMarker')).toMatchObject({ kind: 'label' });
+    expect(types.get('seriesValues')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('constRecursive')).toMatchObject({ kind: 'unknown', qualifier: 'const' });
+    expect(types.get('seriesRecursive')).toMatchObject({ kind: 'unknown', qualifier: 'series' });
+  });
+
   it('records value and reference types from annotations', () => {
     const result = checkProgram(parse(`
 indicator("Typed Symbols")
