@@ -745,6 +745,23 @@ plot(constInt + constFloat + seriesFloat + seriesInt + (seriesBool ? 1 : 0) + (i
     expect(types.get('inputBool')).toMatchObject({ kind: 'bool', qualifier: 'input' });
   });
 
+  it('infers string concatenation result qualifiers', () => {
+    const result = checkProgram(parse(`
+indicator("String Binary Types")
+constText = "prefix" + "suffix"
+inputText = input.string("prefix") + "suffix"
+seriesText = "close: " + str.tostring(close)
+plot(str.length(constText) + str.length(inputText) + str.length(seriesText))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('constText')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('inputText')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('seriesText')).toMatchObject({ kind: 'string', qualifier: 'series' });
+  });
+
   it('reports map key and value template mismatches', () => {
     const result = checkProgram(parse(`
 indicator("Bad Map Types")

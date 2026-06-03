@@ -3269,6 +3269,9 @@ class SemanticChecker {
       || expression.operator === '/'
       || expression.operator === '%'
     ) {
+      if (expression.operator === '+' && leftType.kind === 'string' && rightType.kind === 'string') {
+        return { kind: 'string', qualifier };
+      }
       if (this.isNumericType(leftType) && this.isNumericType(rightType)) {
         return {
           kind: leftType.kind === 'float' || rightType.kind === 'float' || expression.operator === '/' ? 'float' : 'int',
