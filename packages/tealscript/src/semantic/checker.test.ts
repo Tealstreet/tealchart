@@ -2916,7 +2916,9 @@ plotshape(up or down)
     expect(result.diagnostics).toEqual([]);
     expect(types.get('legacyObv')).toEqual({ kind: 'float', qualifier: 'series' });
     expect(types.get('mixedObv')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('currentObv')).toEqual({ kind: 'float', qualifier: 'series' });
     expect(types.get('range')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('rawRange')).toEqual({ kind: 'float', qualifier: 'series' });
     expect(types.get('atr')).toEqual({ kind: 'float', qualifier: 'series' });
     expect(types.get('vwap')).toEqual({ kind: 'float', qualifier: 'series' });
   });
