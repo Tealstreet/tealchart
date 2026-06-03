@@ -196,6 +196,21 @@ const STRING_RETURN_FUNCTIONS = new Set([
   'str.upper',
 ]);
 
+const STRING_FLOAT_RETURN_FUNCTIONS = new Set([
+  'str.tonumber',
+]);
+
+const STRING_BOOLEAN_RETURN_FUNCTIONS = new Set([
+  'str.contains',
+  'str.endswith',
+  'str.startswith',
+]);
+
+const STRING_INTEGER_RETURN_FUNCTIONS = new Set([
+  'str.length',
+  'str.pos',
+]);
+
 const FLOAT_RETURN_FUNCTIONS = new Set([
   'ta.alma',
   'ta.atr',
@@ -3083,6 +3098,12 @@ class SemanticChecker {
     if (COLOR_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'color', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
     if (COLOR_CHANNEL_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
     if (STRING_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'string', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+    if (STRING_FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+    if (STRING_BOOLEAN_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'bool', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+    if (STRING_INTEGER_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'int', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+    if (calleeName === 'str.split') {
+      return { kind: 'array', elementType: { kind: 'string' }, qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+    }
     if (FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: 'series' };
     if (calleeName === 'label.get_x') return { kind: 'int' };
     if (calleeName === 'label.get_y') return { kind: 'float' };
