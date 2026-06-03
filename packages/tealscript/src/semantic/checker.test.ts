@@ -2988,7 +2988,11 @@ unknownTr = ta.tr(handle_na=true, fallback=true)
     const result = checkProgram(parse(`
 indicator("Color Signatures")
 base = color.rgb(red=1, green=2, blue=3, transp=25)
-derived = color.rgb(color.r(color=base), color.g(color=base), color.b(color=base), color.t(color=base))
+red = color.r(color=base)
+green = color.g(color=base)
+blue = color.b(color=base)
+transparency = color.t(color=base)
+derived = color.rgb(red, green, blue, transparency)
 gradient = color.from_gradient(value=close, bottom_value=0, top_value=100, bottom_color=base, top_color=derived)
 prefixBase = color.rgb(red=4, 5, 6)
 prefixAlpha = color.rgb(red=7, green=8, 9, 10)
@@ -2997,7 +3001,19 @@ prefixGradient = color.from_gradient(value=close, 0, 100, prefixNew, prefixAlpha
 plot(close, color=gradient)
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('base')).toMatchObject({ kind: 'color' });
+    expect(types.get('red')).toMatchObject({ kind: 'float' });
+    expect(types.get('green')).toMatchObject({ kind: 'float' });
+    expect(types.get('blue')).toMatchObject({ kind: 'float' });
+    expect(types.get('transparency')).toMatchObject({ kind: 'float' });
+    expect(types.get('derived')).toMatchObject({ kind: 'color' });
+    expect(types.get('gradient')).toMatchObject({ kind: 'color' });
+    expect(types.get('prefixBase')).toMatchObject({ kind: 'color' });
+    expect(types.get('prefixAlpha')).toMatchObject({ kind: 'color' });
+    expect(types.get('prefixNew')).toMatchObject({ kind: 'color' });
+    expect(types.get('prefixGradient')).toMatchObject({ kind: 'color' });
   });
 
   it('reports invalid color helper named arguments', () => {
