@@ -299,6 +299,15 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
     },
   ],
   [
+    'table.cell',
+    {
+      params: ['table_id', 'column', 'row', 'text', 'width', 'height', 'text_color', 'text_halign', 'text_valign', 'text_size', 'bgcolor', 'text_font_family', 'text_formatting'],
+      minArgs: 3,
+      maxArgs: 13,
+      allowNamedPrefixWithPositional: true,
+    },
+  ],
+  [
     'plot',
     {
       params: [
