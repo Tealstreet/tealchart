@@ -544,7 +544,8 @@ including `syminfo.tickerid`, `syminfo.root`, `timeframe.period`,
 `timeframe.from_seconds()`, `timeframe.change()`, and timeframe category flags.
 `indicator(timeframe=...)` updates the exposed timeframe metadata for
 seconds/minutes/D/W/M and tick declaration values, including
-`timeframe.isticks`.
+`timeframe.isticks`. Semantic analysis preserves known timeframe metadata and
+time helper return types for downstream assignment diagnostics.
 
 ## Common Calendar Coverage
 
