@@ -699,7 +699,18 @@ map.clear(id=right)
 plot(previous + value + removed + prefixPrevious + prefixValue + prefixRemoved + size + array.size(keys) + array.size(values) + (exists ? 1 : 0) + (prefixExists ? 1 : 0))
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('value')).toMatchObject({ kind: 'float' });
+    expect(types.get('removed')).toMatchObject({ kind: 'float' });
+    expect(types.get('prefixValue')).toMatchObject({ kind: 'float' });
+    expect(types.get('prefixRemoved')).toMatchObject({ kind: 'float' });
+    expect(types.get('exists')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('prefixExists')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('copied')).toMatchObject({ kind: 'map', keyType: { kind: 'string' }, valueType: { kind: 'float' } });
+    expect(types.get('keys')).toMatchObject({ kind: 'array', elementType: { kind: 'string' } });
+    expect(types.get('values')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('size')).toMatchObject({ kind: 'int', qualifier: 'series' });
   });
 
   it('reports invalid map helper named arguments', () => {
