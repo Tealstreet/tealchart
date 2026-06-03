@@ -2057,15 +2057,15 @@ plot(leftValue + rightValue + topValue + bottomValue)
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('leftValue')).toMatchObject({ kind: 'int' });
-    expect(types.get('rightValue')).toMatchObject({ kind: 'int' });
-    expect(types.get('topValue')).toMatchObject({ kind: 'float' });
-    expect(types.get('bottomValue')).toMatchObject({ kind: 'float' });
-    expect(types.get('bgValue')).toMatchObject({ kind: 'color' });
-    expect(types.get('borderValue')).toMatchObject({ kind: 'color' });
-    expect(types.get('textValue')).toMatchObject({ kind: 'string' });
-    expect(types.get('halignValue')).toMatchObject({ kind: 'string' });
-    expect(types.get('valignValue')).toMatchObject({ kind: 'string' });
+    expect(types.get('leftValue')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('rightValue')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('topValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('bottomValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('bgValue')).toMatchObject({ kind: 'color', qualifier: 'series' });
+    expect(types.get('borderValue')).toMatchObject({ kind: 'color', qualifier: 'series' });
+    expect(types.get('textValue')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('halignValue')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('valignValue')).toMatchObject({ kind: 'string', qualifier: 'series' });
   });
 
   it('reports invalid box getter argument bindings', () => {
