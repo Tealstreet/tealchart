@@ -330,7 +330,8 @@ reassignments reject mismatched values and qualifier downgrades when the target
 and source have known semantic types. Plain identifier compound assignments
 reject known unsupported operand combinations and result values that cannot be
 assigned back to the target, and local UDT field compound assignments apply the
-same checks to known field types. Library diagnostics also report exported UDT
+same checks to known field types. Array element compound assignments apply the
+same checks to known element types. Library diagnostics also report exported UDT
 fields and exported function or method parameters that expose non-exported local
 UDTs, including through collection templates, and exported callables that return
 non-exported local UDTs. Full qualifier-sensitive reference diagnostics remain

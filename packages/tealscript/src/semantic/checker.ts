@@ -1753,7 +1753,7 @@ class SemanticChecker {
     } else if (statement.left.type === 'MemberExpression') {
       this.checkUdtFieldAssignmentType(statement.left, statement.right, scope, statement.operator);
     } else if (statement.left.type === 'IndexExpression') {
-      this.checkIndexAssignmentType(statement.left, statement.right, scope);
+      this.checkIndexAssignmentType(statement.left, statement.right, scope, statement.operator);
     }
   }
 
@@ -2095,7 +2095,7 @@ class SemanticChecker {
     this.checkExpression(expression.index, scope);
   }
 
-  private checkIndexAssignmentType(target: IndexExpression, value: Expression, scope: SemanticScope): void {
+  private checkIndexAssignmentType(target: IndexExpression, value: Expression, scope: SemanticScope, operator: AssignmentStatement['operator']): void {
     const objectType = this.inferExpressionType(target.object, scope);
     if (objectType.kind !== 'unknown' && objectType.kind !== 'array') {
       this.addDiagnostic(
@@ -2117,12 +2117,56 @@ class SemanticChecker {
 
     if (objectType.kind !== 'array' || !objectType.elementType) return;
 
+    if (operator !== ':=') {
+      this.checkArrayElementCompoundAssignmentType(objectType.elementType, value, scope, operator);
+      return;
+    }
+
     const valueType = this.inferExpressionType(value, scope);
     if (this.isAssignableType(objectType.elementType, valueType)) return;
 
     this.addDiagnostic(
       'type-mismatch',
       `Cannot assign ${this.formatSemanticType(valueType)} value to ${this.formatSemanticType(objectType.elementType)} array element`,
+      value.loc,
+    );
+  }
+
+  private checkArrayElementCompoundAssignmentType(
+    elementType: SemanticType,
+    value: Expression,
+    scope: SemanticScope,
+    operator: AssignmentStatement['operator'],
+  ): void {
+    if (elementType.kind === 'unknown') return;
+
+    const sourceType = this.inferExpressionType(value, scope);
+    if (sourceType.kind === 'unknown') return;
+
+    const resultType = this.inferCompoundAssignmentResultType(operator, elementType, sourceType);
+    if (!resultType) {
+      this.addDiagnostic(
+        'type-mismatch',
+        `Compound assignment ${operator} requires ${operator === '+=' ? 'numeric or string' : 'numeric'} operands, got ${this.formatSemanticType(elementType)} and ${this.formatSemanticType(sourceType)} for array element`,
+        value.loc,
+      );
+      return;
+    }
+
+    if (!this.isAssignableQualifier(elementType.qualifier, resultType.qualifier)) {
+      this.addDiagnostic(
+        'qualifier-mismatch',
+        `Cannot assign ${resultType.qualifier} value to ${elementType.qualifier} ${this.formatSemanticType(elementType)} array element`,
+        value.loc,
+      );
+      return;
+    }
+
+    if (this.isAssignableType(elementType, resultType)) return;
+
+    this.addDiagnostic(
+      'type-mismatch',
+      `Cannot assign ${this.formatSemanticType(resultType)} value to ${this.formatSemanticType(elementType)} array element`,
       value.loc,
     );
   }
