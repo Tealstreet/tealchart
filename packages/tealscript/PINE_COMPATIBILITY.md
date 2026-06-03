@@ -683,7 +683,8 @@ styling remain planned.
 The `polyline.*` drawing pass supports `polyline.new()` with named point/style
 arguments, `polyline.copy()`, `polyline.delete()`, and `polyline.all`.
 `polyline.copy()` and `polyline.delete()` accept Pine-style named `id`
-arguments.
+arguments. Semantic analysis preserves `polyline.new()` and `polyline.copy()`
+handle return types for downstream diagnostics.
 
 ## Table Drawing Coverage
 
@@ -693,8 +694,9 @@ column sizing, background/frame/border metadata, `table.delete()`,
 setters, and common cell setters for text, color, background, size, width,
 height, text alignment, font family, and bold/italic text formatting. Table
 lifecycle helpers and setters accept Pine-style named `table_id`, coordinate,
-and value arguments where those parameters exist. Rendering
-lays out fixed tables in the script pane with measured cell sizes, cell
+and value arguments where those parameters exist. Semantic analysis preserves
+`table.new()` handle return types for downstream diagnostics. Rendering lays
+out fixed tables in the script pane with measured cell sizes, cell
 backgrounds, borders, frame borders, text alignment, default/monospace
 font-family metadata, and bold/italic font styling. Runtime coverage also
 guards persistent table handles and transient polylines across realtime

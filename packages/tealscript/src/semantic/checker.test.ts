@@ -3237,6 +3237,29 @@ plot(array.size(polylines))
     expect(types.get('polylines')).toMatchObject({ kind: 'array', elementType: { kind: 'polyline' } });
   });
 
+  it('infers polyline handle return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Polyline Handle Return Types")
+firstPoint = chart.point.from_index(bar_index, high)
+secondPoint = chart.point.from_index(bar_index + 1, low)
+points = array.from(firstPoint, secondPoint)
+shape = polyline.new(points=points)
+clone = polyline.copy(id=shape)
+shape := table.new(columns=1, rows=1)
+clone := table.new(columns=1, rows=1)
+plot(1)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign table value to polyline variable shape',
+      'Cannot assign table value to polyline variable clone',
+    ]);
+    expect(types.get('shape')).toMatchObject({ kind: 'polyline' });
+    expect(types.get('clone')).toMatchObject({ kind: 'polyline' });
+  });
+
   it('reports invalid polyline argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Bad Polyline Signatures")
@@ -3387,6 +3410,30 @@ plot(array.size(tables))
     expect(types.get('compact')).toMatchObject({ kind: 'table' });
     expect(types.get('defaulted')).toMatchObject({ kind: 'table' });
     expect(types.get('tables')).toMatchObject({ kind: 'array', elementType: { kind: 'table' } });
+  });
+
+  it('infers table handle return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Table Handle Return Types")
+firstPoint = chart.point.from_index(bar_index, high)
+secondPoint = chart.point.from_index(bar_index + 1, low)
+points = array.from(firstPoint, secondPoint)
+shape = polyline.new(points=points)
+dashboard = table.new(columns=2, rows=2)
+compact = table.new(position.bottom_left, columns=1, rows=1)
+dashboard := shape
+compact := shape
+plot(1)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign polyline value to table variable dashboard',
+      'Cannot assign polyline value to table variable compact',
+    ]);
+    expect(types.get('dashboard')).toMatchObject({ kind: 'table' });
+    expect(types.get('compact')).toMatchObject({ kind: 'table' });
   });
 
   it('reports invalid table.new argument bindings', () => {
