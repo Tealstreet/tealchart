@@ -1065,6 +1065,22 @@ plot(close)
     ]);
   });
 
+  it('reports direct tuple initializer shape mismatches', () => {
+    const result = checkProgram(parse(`
+indicator("Direct Tuple Initializer Shape Diagnostics")
+[literalValue, literalTitle] = [close]
+[macdLine, signalLine] = ta.macd(close, 12, 26, 9)
+[scalarValue, scalarTitle] = close
+plot(close)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Tuple declaration expects 2 values but initializer arm returns 1',
+      'Tuple declaration expects 2 values but initializer arm returns 3',
+      'Tuple declaration expects 2 values but initializer arm returns a non-tuple value',
+    ]);
+  });
+
   it('reports assignments to undeclared identifiers', () => {
     const result = checkProgram(parse(`
 indicator("Unknown Assignment")
