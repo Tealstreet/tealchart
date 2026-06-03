@@ -3393,6 +3393,61 @@ plot(since + last + lastMixed + changed + changedMixed + highest + lowest + high
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('infers core TA helper return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("TA Return Types")
+condition = close > open
+since = ta.barssince(condition)
+lastText = ta.valuewhen(condition=condition, source="up", occurrence=0)
+changedClose = ta.change(source=close, length=2)
+changedCondition = ta.change(condition)
+crossed = ta.crossover(source1=close, source2=open)
+highestOffset = ta.highestbars(source=high, length=3)
+highestInt = ta.highest(source=bar_index, length=3)
+defaultHighest = ta.highest(3)
+average = ta.sma(source=close, length=3)
+trend = ta.rising(source=close, length=2)
+spread = ta.range(source=close, length=3)
+since := "bad"
+lastText := 1
+changedClose := "bad"
+changedCondition := 1
+crossed := 1
+highestOffset := "bad"
+highestInt := "bad"
+average := "bad"
+trend := 1
+spread := "bad"
+plot(since + highestOffset + highestInt + defaultHighest + average + spread + (changedCondition ? 1 : 0) + (crossed ? 1 : 0) + (trend ? 1 : 0))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to int variable since',
+      'Cannot assign int value to string variable lastText',
+      'Cannot assign string value to float variable changedClose',
+      'Cannot assign int value to bool variable changedCondition',
+      'Cannot assign int value to bool variable crossed',
+      'Cannot assign string value to int variable highestOffset',
+      'Cannot assign string value to int variable highestInt',
+      'Cannot assign string value to float variable average',
+      'Cannot assign int value to bool variable trend',
+      'Cannot assign string value to float variable spread',
+    ]);
+    expect(types.get('since')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('lastText')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('changedClose')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('changedCondition')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('crossed')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('highestOffset')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('highestInt')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('defaultHighest')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('average')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('trend')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('spread')).toMatchObject({ kind: 'float', qualifier: 'series' });
+  });
+
   it('reports invalid core TA helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Bad TA Core Signatures")

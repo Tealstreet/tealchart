@@ -142,7 +142,9 @@ statistical helper pass covers `ta.median`, `ta.mode`,
 common Pine named arguments, and pivot helpers support default-source
 two-argument calls. Event and cross helpers accept named `condition`/`source`
 arguments and cross helper `source1`/`source2` arguments. These are covered in
-the golden compatibility harness.
+the golden compatibility harness. Semantic analysis preserves known scalar TA
+helper return types for downstream assignment diagnostics, including
+source-preserving `ta.change()` and `ta.valuewhen()` results.
 
 ## Common `str.*` Coverage
 
