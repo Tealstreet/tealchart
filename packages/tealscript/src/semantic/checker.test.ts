@@ -1037,6 +1037,34 @@ plot(close)
     ]);
   });
 
+  it('reports tuple control initializer shape mismatches', () => {
+    const result = checkProgram(parse(`
+indicator("Tuple Control Initializer Shape Diagnostics")
+mode = "price"
+[ifValue, ifTitle] = if close > open
+    [close, "up"]
+else
+    close
+[switchValue, switchTitle] = switch mode
+    "price" => [close, "price", 1]
+    => [open, "fallback"]
+[loopValue, loopTitle] = for i = 0 to 2
+    [close + i, "loop", i]
+[emptyValue, emptyTitle] = if close > open
+    value = close
+else
+    [open, "fallback"]
+plot(close)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Tuple declaration expects 2 values but initializer arm returns a non-tuple value',
+      'Tuple declaration expects 2 values but initializer arm returns 3',
+      'Tuple declaration expects 2 values but initializer arm returns 3',
+      'Tuple declaration expects 2 values but initializer arm returns a non-tuple value',
+    ]);
+  });
+
   it('reports assignments to undeclared identifiers', () => {
     const result = checkProgram(parse(`
 indicator("Unknown Assignment")

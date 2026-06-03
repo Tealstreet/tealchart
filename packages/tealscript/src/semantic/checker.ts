@@ -89,6 +89,11 @@ export interface SemanticCheckResult {
   symbols: SemanticSymbol[];
 }
 
+type TupleInitializerShape =
+  | { kind: 'tuple'; arity: number }
+  | { kind: 'non-tuple' }
+  | { kind: 'unknown' };
+
 class SemanticScope {
   private readonly symbols = new Map<string, SemanticSymbol>();
 
@@ -1802,6 +1807,7 @@ class SemanticChecker {
   private declareTuple(tuple: TupleDeclarator, init: Expression | IfStatement, scope: SemanticScope): void {
     const seen = new Set<string>();
     const elementTypes = this.inferTupleElementTypes(init, scope);
+    this.checkTupleInitializerShape(tuple, init);
     for (const [index, name] of tuple.names.entries()) {
       if (seen.has(name.name)) {
         this.addDiagnostic('duplicate-symbol', `Duplicate declaration: ${name.name}`, name.loc);
@@ -1810,6 +1816,97 @@ class SemanticChecker {
       seen.add(name.name);
       this.declare(scope, { name: name.name, kind: 'variable', type: elementTypes?.[index] ?? UNKNOWN_SEMANTIC_TYPE, loc: name.loc });
     }
+  }
+
+  private checkTupleInitializerShape(tuple: TupleDeclarator, init: Expression | IfStatement): void {
+    const armShapes = this.tupleInitializerArmShapes(init);
+    if (!armShapes) return;
+
+    const expectedArity = tuple.names.length;
+    const reported = new Set<string>();
+    for (const shape of armShapes) {
+      if (shape.kind === 'unknown') continue;
+
+      const message = shape.kind === 'non-tuple'
+        ? `Tuple declaration expects ${expectedArity} values but initializer arm returns a non-tuple value`
+        : `Tuple declaration expects ${expectedArity} values but initializer arm returns ${shape.arity}`;
+      if (shape.kind === 'tuple' && shape.arity === expectedArity) continue;
+      if (reported.has(message)) continue;
+      reported.add(message);
+      this.addDiagnostic('tuple-shape-mismatch', message, tuple.loc);
+    }
+  }
+
+  private tupleInitializerArmShapes(init: Expression | IfStatement): TupleInitializerShape[] | undefined {
+    if (init.type === 'ConditionalExpression') {
+      return [
+        this.tupleInitializerShapeFromExpression(init.consequent),
+        this.tupleInitializerShapeFromExpression(init.alternate),
+      ];
+    }
+
+    if (init.type === 'IfStatement') {
+      const shapes = [
+        ...this.normalizeTupleInitializerShapes(this.tupleInitializerShapesFromStatements(init.consequent)),
+      ];
+      if (init.alternate) {
+        shapes.push(...(
+          Array.isArray(init.alternate)
+            ? this.normalizeTupleInitializerShapes(this.tupleInitializerShapesFromStatements(init.alternate))
+            : this.normalizeTupleInitializerShapes(this.tupleInitializerArmShapes(init.alternate))
+        ));
+      }
+      return this.normalizeTupleInitializerShapes(shapes);
+    }
+
+    if (init.type === 'SwitchExpression') {
+      return init.cases.flatMap((switchCase) => (
+        Array.isArray(switchCase.consequent)
+          ? this.normalizeTupleInitializerShapes(this.tupleInitializerShapesFromStatements(switchCase.consequent))
+          : [this.tupleInitializerShapeFromExpression(switchCase.consequent)]
+      ));
+    }
+
+    if (init.type === 'ForStatement' || init.type === 'WhileStatement') {
+      return this.normalizeTupleInitializerShapes(this.tupleInitializerShapesFromStatements(init.body));
+    }
+
+    return undefined;
+  }
+
+  private tupleInitializerShapesFromStatements(statements: Statement[]): TupleInitializerShape[] {
+    let shapes: TupleInitializerShape[] = [{ kind: 'non-tuple' }];
+    for (const statement of statements) {
+      if (statement.type === 'ExpressionStatement') {
+        shapes = [this.tupleInitializerShapeFromExpression(statement.expression)];
+        continue;
+      }
+      if (
+        statement.type === 'IfStatement'
+        || statement.type === 'ForStatement'
+        || statement.type === 'WhileStatement'
+      ) {
+        shapes = this.normalizeTupleInitializerShapes(this.tupleInitializerArmShapes(statement));
+        continue;
+      }
+      shapes = [{ kind: 'non-tuple' }];
+    }
+    return shapes;
+  }
+
+  private normalizeTupleInitializerShapes(shapes: TupleInitializerShape[] | undefined): TupleInitializerShape[] {
+    return shapes && shapes.length > 0 ? shapes : [{ kind: 'non-tuple' }];
+  }
+
+  private tupleInitializerShapeFromExpression(expression: Expression): TupleInitializerShape {
+    if (expression.type === 'ArrayExpression') {
+      return { kind: 'tuple', arity: expression.elements.length };
+    }
+    if (expression.type === 'CallExpression') {
+      const tupleTypes = BUILTIN_TUPLE_RETURN_TYPES.get(this.memberPath(expression.callee).join('.'));
+      return tupleTypes ? { kind: 'tuple', arity: tupleTypes.length } : { kind: 'unknown' };
+    }
+    return this.tupleInitializerArmShapes(expression)?.[0] ?? { kind: 'non-tuple' };
   }
 
   private inferTupleElementTypes(init: Expression | IfStatement, scope: SemanticScope): SemanticType[] | undefined {
