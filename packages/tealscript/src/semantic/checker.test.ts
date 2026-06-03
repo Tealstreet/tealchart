@@ -3128,6 +3128,8 @@ shortReplace = str.replace(source="BTC", target="B")
 indicator("Math Signatures")
 rounded = math.round(number=math.pi, precision=3)
 prefixRounded = math.round(number=math.pi, 3)
+roundInt = math.round(number=1.2)
+roundSeries = math.round(number=close)
 powered = math.pow(base=2, exponent=3)
 prefixPowered = math.pow(base=2, 3)
 root = math.sqrt(number=16)
@@ -3135,15 +3137,48 @@ logged = math.log(number=math.e) + math.log10(number=100) + math.exp(number=1)
 trig = math.sin(number=0) + math.cos(number=0) + math.tan(number=0) + math.asin(number=0) + math.acos(number=1) + math.atan(number=1)
 converted = math.toradians(number=180) + math.todegrees(number=math.pi)
 unary = math.abs(number=-5) + math.trunc(number=-1.9) + math.floor(number=-1.2) + math.ceil(number=1.2) + math.sign(number=-5)
+absInt = math.abs(number=5)
+absFloat = math.abs(number=5.5)
+floorInt = math.floor(number=1.2)
+signFloat = math.sign(number=5)
+maxInt = math.max(1, 2)
+maxFloat = math.max(1, 2.5)
+maxSeries = math.max(close, open)
+average = math.avg(1, 2)
+seriesAverage = math.avg(close, open)
 seriesSum = math.sum(source=close, length=3)
 prefixSeriesSum = math.sum(source=close, 3)
 tick = math.round_to_mintick(number=1.005)
+inputValue = input.float(1.0)
+inputTick = math.round_to_mintick(number=inputValue)
 rand = math.random(min=10, max=20, seed=7)
 prefixRand = math.random(min=10, 20, 7)
 plot(rounded + prefixRounded + powered + prefixPowered + root + logged + trig + converted + unary + seriesSum + prefixSeriesSum + tick + rand + prefixRand)
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('rounded')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('prefixRounded')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('roundInt')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('roundSeries')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('powered')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('root')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('absInt')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('absFloat')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('floorInt')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('signFloat')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('maxInt')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('maxFloat')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('maxSeries')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('average')).toMatchObject({ kind: 'float', qualifier: 'simple' });
+    expect(types.get('seriesAverage')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('seriesSum')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('prefixSeriesSum')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('tick')).toMatchObject({ kind: 'float', qualifier: 'simple' });
+    expect(types.get('inputTick')).toMatchObject({ kind: 'float', qualifier: 'simple' });
+    expect(types.get('rand')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('prefixRand')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid math helper named arguments', () => {
