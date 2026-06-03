@@ -71,8 +71,8 @@ Covered behavior and remaining gaps:
   user-method tuple returns, and supported tuple-returning TA calls, so
   downstream assignment diagnostics can use destructured names. Direct tuple
   initializers, including known local user-call tuple returns, and direct
-  control initializer tuple arms diagnose obvious non-tuple and arity
-  mismatches.
+  control initializer tuple arms, including arm-local user-call tuple returns,
+  diagnose obvious non-tuple and arity mismatches.
 - Operator line continuations are supported after arithmetic, comparison,
   logical, unary, and ternary operators. Leading comparison, logical,
   multiplicative, `+`, and ternary operators are also supported. Leading `-`

@@ -1040,11 +1040,17 @@ plot(close)
   it('reports tuple control initializer shape mismatches', () => {
     const result = checkProgram(parse(`
 indicator("Tuple Control Initializer Shape Diagnostics")
+method tripleMethod(float this) => [this, this + 1, "method"]
 mode = "price"
 [ifValue, ifTitle] = if close > open
     [close, "up"]
 else
     close
+[localMethodValue, localMethodTitle] = if close > open
+    localClose = close
+    localClose.tripleMethod()
+else
+    [open, "fallback"]
 [switchValue, switchTitle] = switch mode
     "price" => [close, "price", 1]
     => [open, "fallback"]
@@ -1059,6 +1065,7 @@ plot(close)
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Tuple declaration expects 2 values but initializer arm returns a non-tuple value',
+      'Tuple declaration expects 2 values but initializer arm returns 3',
       'Tuple declaration expects 2 values but initializer arm returns 3',
       'Tuple declaration expects 2 values but initializer arm returns 3',
       'Tuple declaration expects 2 values but initializer arm returns a non-tuple value',
