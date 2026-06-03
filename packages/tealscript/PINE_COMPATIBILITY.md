@@ -77,6 +77,9 @@ Covered behavior and remaining gaps:
 - User-defined function bodies can return expression results from `if` /
   `else if` / `else` branches, including partial `if` expressions with no
   `else` when the present branch has an inferable value.
+- Variable declarations can use `if` / `else if` / `else` initializers, including
+  typed declarations and partial `if` initializers that evaluate to `na` when no
+  branch yields a value.
 - User-defined function bodies can return the last expression result from
   numeric `for`, collection `for ... in`, and `while` loop bodies.
 - Direct user-defined function calls infer semantic return types and preserve
@@ -333,7 +336,7 @@ arguments, invalid argument order between named and positional arguments, and
 conservative primitive/reference field type mismatches in local UDT field
 defaults, constructors, and field assignments. Annotated local variables also
 reject mismatched primitive, reference, collection, UDT, enum, and known mixed
-conditional/switch initializer arm values. Plain identifier `:=` reassignments and
+conditional, `if`, and switch initializer arm values. Plain identifier `:=` reassignments and
 local UDT field `:=` assignments reject mismatched values and qualifier
 downgrades when the target and source have known semantic types.
 Plain identifier compound assignments

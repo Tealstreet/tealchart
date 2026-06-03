@@ -1303,7 +1303,9 @@ export class TealscriptEngine {
     return values;
   }
 
-  private evaluateLibraryConstantExpression(expression: Expression): unknown {
+  private evaluateLibraryConstantExpression(expression: Expression | IfStatement): unknown {
+    if (expression.type === 'IfStatement') return undefined;
+
     switch (expression.type) {
       case 'NumericLiteral':
       case 'StringLiteral':
@@ -1361,7 +1363,7 @@ export class TealscriptEngine {
         return;
       }
       const drawingCount = this.ctx.getDrawingCount();
-      const value = this.evaluateExpression(stmt.init);
+      const value = this.evaluateVariableInitializer(stmt.init);
       this.scope.declare(name, kind, value, this.getTypeAnnotationName(stmt.typeAnnotation));
       this.markPersistentDeclarationDrawings(kind, drawingCount);
     } else if (stmt.names.type === 'TupleDeclarator') {
@@ -1370,7 +1372,7 @@ export class TealscriptEngine {
         return;
       }
       const drawingCount = this.ctx.getDrawingCount();
-      const value = this.evaluateExpression(stmt.init);
+      const value = this.evaluateVariableInitializer(stmt.init);
       // Tuple destructuring
       if (!Array.isArray(value)) {
         throw new Error('Cannot destructure non-array value');
@@ -1627,6 +1629,20 @@ export class TealscriptEngine {
     } finally {
       this.requestLocalScopeDepth--;
       this.scope = savedScope;
+    }
+  }
+
+  private evaluateVariableInitializer(init: Expression | IfStatement): unknown {
+    if (init.type !== 'IfStatement') {
+      return this.evaluateExpression(init);
+    }
+
+    this.requestLocalScopeDepth++;
+    try {
+      const result = this.executeFunctionIf(init);
+      return result.hasResult ? result.value : Number.NaN;
+    } finally {
+      this.requestLocalScopeDepth--;
     }
   }
 

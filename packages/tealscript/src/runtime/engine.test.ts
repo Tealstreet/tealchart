@@ -4768,6 +4768,27 @@ plot(x)`;
   });
 
   describe('if statements', () => {
+    it('evaluates if expression variable initializers', () => {
+      const script = `//@version=6
+indicator("If Initializer")
+selected = if bar_index == 0
+    close
+else
+    open
+fallback = if bar_index < 0
+    close
+plot(selected, title="Selected")
+plot(fallback, title="Fallback")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Selected')?.values).toEqual([100.2, 100.5, 101]);
+      expect(result.plots.find((plot) => plot.title === 'Fallback')?.values).toEqual([null, null, null]);
+    });
+
     it('executes if branch', () => {
       const script = `//@version=6
 indicator("Test")

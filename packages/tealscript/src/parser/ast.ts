@@ -181,7 +181,7 @@ export interface VariableDeclaration extends BaseNode {
   kind: 'var' | 'varip' | 'none'; // 'var' persists, 'varip' persists intrabar, 'none' is regular
   names: VariableDeclarator | TupleDeclarator;
   typeAnnotation?: TypeAnnotation | null;
-  init: Expression;
+  init: Expression | IfStatement;
   exported?: boolean;
 }
 
