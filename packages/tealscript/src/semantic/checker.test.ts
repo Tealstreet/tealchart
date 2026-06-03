@@ -1632,6 +1632,55 @@ unknownGetter = label.get_text(marker, format="raw")
     ]);
   });
 
+  it('resolves line setter named arguments and positional tails', () => {
+    const result = checkProgram(parse(`
+indicator("Line Setter Signatures")
+trend = line.new(bar_index, close, bar_index + 1, close)
+clone = line.copy(id=trend)
+line.set_x1(id=trend, bar_index)
+line.set_x2(trend, x=bar_index + 2)
+line.set_y1(id=trend, high)
+line.set_y2(trend, y=low)
+line.set_xy1(id=trend, x=bar_index, y=high)
+line.set_xy2(trend, bar_index + 2, y=low)
+line.set_xloc(id=trend, bar_index, bar_index + 2, xloc.bar_index)
+line.set_extend(trend, extend="right")
+line.set_color(id=trend, color.blue)
+line.set_style(trend, style="dashed")
+line.set_width(id=trend, 2)
+line.delete(id=clone)
+plot(1)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('clone')).toMatchObject({ kind: 'line' });
+  });
+
+  it('reports invalid line setter argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Line Setter Signatures")
+trend = line.new(bar_index, close, bar_index + 1, close)
+unknown = line.set_color(trend, color.blue, opacity=80)
+missing = line.set_xloc(id=trend, x1=bar_index)
+duplicate = line.set_xy1(trend, bar_index, high, id=trend)
+tooMany = line.set_width(trend, 2, 3)
+missingCopy = line.copy()
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'opacity' for line.set_color()",
+      'line.set_xloc() expects at least 4 arguments',
+      "line.set_xloc() missing required argument 'x2'",
+      "line.set_xloc() missing required argument 'xloc'",
+      "Argument 'id' for line.set_xy1() was supplied multiple times",
+      'line.set_width() expects at most 2 arguments',
+      'line.copy() expects at least 1 argument',
+      "line.copy() missing required argument 'id'",
+    ]);
+  });
+
   it('resolves linefill.new named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Linefill Signatures")
