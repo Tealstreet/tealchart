@@ -1895,8 +1895,6 @@ class SemanticChecker {
   }
 
   private inferSwitchTupleElementTypes(expression: SwitchExpression, scope: SemanticScope): SemanticType[] | undefined {
-    if (!expression.cases.some((switchCase) => !switchCase.test)) return undefined;
-
     let mergedTypes: SemanticType[] | undefined;
     for (const switchCase of expression.cases) {
       const caseScope = new SemanticScope(scope);
