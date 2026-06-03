@@ -3150,6 +3150,30 @@ plot(validPivot.y)
     ]);
   });
 
+  it('reports annotated primitive, reference, and collection variable type mismatches', () => {
+    const result = checkProgram(parse(`
+indicator("Annotated Variable Mismatches")
+float validFloat = 1
+array<float> validValues = array.new<int>()
+string badString = 1
+bool badBool = 1
+label badLabel = line.new(bar_index, low, bar_index, high)
+array<float> badValues = array.new<string>()
+matrix<int> badGrid = matrix.new<float>()
+map<string, float> badPrices = map.new<int, float>()
+plot(validFloat)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign int value to string variable',
+      'Cannot assign int value to bool variable',
+      'Cannot assign line value to label variable',
+      'Cannot assign array<string> value to array<float> variable',
+      'Cannot assign matrix<float> value to matrix<int> variable',
+      'Cannot assign map<int, float> value to map<string, float> variable',
+    ]);
+  });
+
   it('selects user-defined method overloads by receiver specificity', () => {
     const result = checkProgram(parse(`
 indicator("Method Receiver Specificity")

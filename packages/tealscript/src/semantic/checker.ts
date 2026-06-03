@@ -3451,7 +3451,7 @@ class SemanticChecker {
 
   private checkTypeCompatibility(annotation: TypeAnnotation | undefined | null, init: Expression, scope: SemanticScope, loc?: SourceLocation): void {
     const targetType = this.typeFromAnnotation(annotation);
-    if (!targetType) return;
+    if (!targetType || !this.canCheckTypeCompatibility(annotation)) return;
 
     const initType = this.inferExpressionType(init, scope);
 
@@ -3463,13 +3463,29 @@ class SemanticChecker {
       );
     }
 
-    if (targetType.kind === 'udt' && initType.kind === 'udt' && !this.isAssignableType(targetType, initType)) {
+    if (!this.isAssignableType(targetType, initType)) {
       this.addDiagnostic(
         'type-mismatch',
         `Cannot assign ${this.formatSemanticType(initType)} value to ${this.formatSemanticType(targetType)} variable`,
         loc,
       );
     }
+  }
+
+  private canCheckTypeCompatibility(annotation: TypeAnnotation | undefined | null): boolean {
+    if (!annotation) return false;
+
+    if (annotation.baseType === 'array' || annotation.baseType === 'matrix') {
+      return !this.isInvalidTemplateTypeName(annotation.elementType);
+    }
+
+    if (annotation.baseType === 'map') {
+      return !this.isInvalidTemplateTypeName(annotation.keyType)
+        && MAP_KEY_TYPE_NAMES.has(annotation.keyType)
+        && !this.isInvalidTemplateTypeName(annotation.valueType);
+    }
+
+    return true;
   }
 
   private isAssignableType(targetType: SemanticType, sourceType: SemanticType): boolean {
