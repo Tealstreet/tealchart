@@ -951,6 +951,7 @@ class SemanticChecker {
   private diagnostics: SemanticDiagnostic[] = [];
   private rootScope = new SemanticScope();
   private typeDeclarations = new Map<string, TypeDeclaration>();
+  private enumDeclarations = new Map<string, EnumDeclaration>();
   private methodDeclarations = new Map<string, FunctionDeclaration[]>();
   private functionSymbolDeclarations = new WeakMap<SemanticSymbol, FunctionDeclaration>();
   private activeReturnInferences = new Set<FunctionDeclaration>();
@@ -959,6 +960,7 @@ class SemanticChecker {
     this.diagnostics = [];
     this.rootScope = new SemanticScope();
     this.typeDeclarations = this.collectTypeDeclarations(program.body);
+    this.enumDeclarations = this.collectEnumDeclarations(program.body);
     this.methodDeclarations = this.collectMethodDeclarations(program.body);
     this.functionSymbolDeclarations = new WeakMap();
     this.activeReturnInferences = new Set();
@@ -1276,6 +1278,14 @@ class SemanticChecker {
     return new Map(
       statements
         .filter((statement): statement is TypeDeclaration => statement.type === 'TypeDeclaration')
+        .map((statement) => [statement.name.name, statement]),
+    );
+  }
+
+  private collectEnumDeclarations(statements: Statement[]): Map<string, EnumDeclaration> {
+    return new Map(
+      statements
+        .filter((statement): statement is EnumDeclaration => statement.type === 'EnumDeclaration')
         .map((statement) => [statement.name.name, statement]),
     );
   }
@@ -3285,12 +3295,23 @@ class SemanticChecker {
     if (memberName === 'session.regular' || memberName === 'session.extended') {
       return { kind: 'string', qualifier: 'const' };
     }
+    const enumType = this.inferEnumMemberType(expression);
+    if (enumType) return enumType;
 
     const objectType = this.inferExpressionType(expression.object, scope);
     if (objectType.kind !== 'udt' || !objectType.name) return objectType;
 
     const field = this.findUdtField(objectType.name, expression.property.name);
     return this.typeFromAnnotation(field?.typeAnnotation ?? undefined) ?? { kind: 'unknown', qualifier: objectType.qualifier };
+  }
+
+  private inferEnumMemberType(expression: MemberExpression): SemanticType | undefined {
+    if (expression.object.type !== 'Identifier') return undefined;
+
+    const enumDeclaration = this.enumDeclarations.get(expression.object.name);
+    if (!enumDeclaration?.fields.some((field) => field.name.name === expression.property.name)) return undefined;
+
+    return { kind: 'udt', name: enumDeclaration.name.name, qualifier: 'const' };
   }
 
   private memberPath(expression: Expression): string[] {
