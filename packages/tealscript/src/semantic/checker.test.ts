@@ -1497,7 +1497,12 @@ fromIndexMixed = chart.point.from_index(index=bar_index, high)
 fromTime = chart.point.from_time(time=time, price=close)
 copied = chart.point.copy(id=fromIndex)
 points = array.from(point, mixed, current, fromIndex, fromIndexMixed, fromTime, copied)
+pointIndex = current.index
+pointTime = current.time
+pointPrice = current.price
 plot(array.size(points))
+plot(pointIndex + pointTime)
+plot(pointPrice)
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -1511,6 +1516,9 @@ plot(array.size(points))
     expect(types.get('fromTime')).toMatchObject({ kind: 'chart.point' });
     expect(types.get('copied')).toMatchObject({ kind: 'chart.point' });
     expect(types.get('points')).toMatchObject({ kind: 'array', elementType: { kind: 'chart.point' } });
+    expect(types.get('pointIndex')).toMatchObject({ kind: 'int' });
+    expect(types.get('pointTime')).toMatchObject({ kind: 'int' });
+    expect(types.get('pointPrice')).toMatchObject({ kind: 'float' });
   });
 
   it('reports invalid chart point helper named arguments', () => {
@@ -1521,6 +1529,7 @@ unknownNew = chart.point.new(timestamp=time, index=bar_index, price=close)
 missingPrice = chart.point.from_index(index=bar_index)
 tooManyNow = chart.point.now(close, high)
 duplicateCopy = chart.point.copy(point, id=point)
+unknownField = point.z
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -1531,6 +1540,7 @@ duplicateCopy = chart.point.copy(point, id=point)
       "chart.point.from_index() missing required argument 'price'",
       'chart.point.now() expects at most 1 argument',
       "Argument 'id' for chart.point.copy() was supplied multiple times",
+      "Unknown field 'z' on type chart.point",
     ]);
   });
 
