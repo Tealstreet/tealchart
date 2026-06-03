@@ -551,6 +551,22 @@ plot(outer())
     ]);
   });
 
+  it('infers outer function returns from nested helper calls', () => {
+    const result = checkProgram(parse(`
+indicator("Nested Function Return Calls")
+outer() =>
+    inner(float value) => value
+    inner(close)
+outerValue = outer()
+plot(outerValue)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('outerValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+  });
+
   it('reports duplicate function parameters and tuple names', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate Params")
