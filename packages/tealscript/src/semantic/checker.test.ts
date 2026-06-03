@@ -548,6 +548,7 @@ labelValues = array.new_label()
 matrix<int> grid = matrix.new<int>(1, 1, 0)
 map<string, float> lookup = map.new<string, float>()
 pivotPoint pivot = na
+label marker = na
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -558,29 +559,33 @@ pivotPoint pivot = na
     expect(types.get('enabled')).toMatchObject({ kind: 'bool' });
     expect(types.get('labelText')).toMatchObject({ kind: 'string' });
     expect(types.get('tint')).toMatchObject({ kind: 'color' });
-    expect(types.get('values')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('values')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
     expect(types.get('genericValues')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('genericGrid')).toMatchObject({ kind: 'matrix', elementType: { kind: 'float' } });
-    expect(types.get('nestedValues')).toMatchObject({ kind: 'array', elementType: { kind: 'array', elementType: { kind: 'float' } } });
+    expect(types.get('nestedValues')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'array', elementType: { kind: 'float' } } });
     expect(types.get('nestedGrid')).toMatchObject({
       kind: 'matrix',
+      qualifier: 'series',
       elementType: { kind: 'map', keyType: { kind: 'string' }, valueType: { kind: 'float' } },
     });
     expect(types.get('nestedLookup')).toMatchObject({
       kind: 'map',
+      qualifier: 'series',
       keyType: { kind: 'string' },
       valueType: { kind: 'array', elementType: { kind: 'float' } },
     });
     expect(types.get('floatValues')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('intValues')).toMatchObject({ kind: 'array', elementType: { kind: 'int' } });
     expect(types.get('labelValues')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
-    expect(types.get('grid')).toMatchObject({ kind: 'matrix', elementType: { kind: 'int' } });
+    expect(types.get('grid')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'int' } });
     expect(types.get('lookup')).toMatchObject({
       kind: 'map',
+      qualifier: 'series',
       keyType: { kind: 'string' },
       valueType: { kind: 'float' },
     });
-    expect(types.get('pivot')).toMatchObject({ kind: 'udt', name: 'pivotPoint' });
+    expect(types.get('pivot')).toMatchObject({ kind: 'udt', name: 'pivotPoint', qualifier: 'series' });
+    expect(types.get('marker')).toMatchObject({ kind: 'label', qualifier: 'series' });
   });
 
   it('validates template annotation type arguments', () => {
