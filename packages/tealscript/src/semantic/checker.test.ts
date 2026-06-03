@@ -3822,6 +3822,44 @@ plot(filled + fixed + asFloat + asInt + (asBool ? 1 : 0) + str.length(asString) 
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('infers global helper return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Global Helper Return Types")
+floatSource = close
+intSource = bar_index
+stringSource = "ready"
+filledFloat = nz(floatSource, open)
+fixedFloat = fixnan(floatSource)
+filledInt = nz(intSource, 0)
+filledString = nz(stringSource, "fallback")
+namedPrefixFloat = nz(source=floatSource, open)
+mixed = nz(floatSource, stringSource)
+filledFloat := "bad"
+fixedFloat := "bad"
+filledInt := "bad"
+filledString := 1
+namedPrefixFloat := "bad"
+mixed := "still unknown"
+plot(filledFloat + fixedFloat + filledInt)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable filledFloat',
+      'Cannot assign string value to float variable fixedFloat',
+      'Cannot assign string value to int variable filledInt',
+      'Cannot assign int value to string variable filledString',
+      'Cannot assign string value to float variable namedPrefixFloat',
+    ]);
+    expect(types.get('filledFloat')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('fixedFloat')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('filledInt')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('filledString')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('namedPrefixFloat')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixed')).toMatchObject({ kind: 'unknown' });
+  });
+
   it('resolves ticker helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Ticker Signatures")
