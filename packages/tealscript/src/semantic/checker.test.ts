@@ -1091,6 +1091,33 @@ plot(numericResult + whileResult + simpleWhile)
     expect(types.get('simpleWhile')).toMatchObject({ kind: 'int', qualifier: 'simple' });
   });
 
+  it('infers direct collection loop expression types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Direct Collection Loop Expression Types")
+values = array.from(close, open)
+itemResult = for item in values
+    item
+indexedResult = for [index, item] in array.from(close, open)
+    item + index
+simple float simpleItem = for item in values
+    1
+itemResult := "bad"
+indexedResult := "bad"
+plot(itemResult + indexedResult + simpleItem)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign series value to simple float',
+      'Cannot assign string value to float variable itemResult',
+      'Cannot assign string value to float variable indexedResult',
+    ]);
+    expect(types.get('itemResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('indexedResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('simpleItem')).toMatchObject({ kind: 'float', qualifier: 'simple' });
+  });
+
   it('infers compatible ternary expression types for downstream diagnostics', () => {
     const result = checkProgram(parse(`
 indicator("Ternary Expression Types")
