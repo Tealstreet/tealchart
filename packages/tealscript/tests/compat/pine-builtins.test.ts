@@ -11,8 +11,10 @@ plot(ta.barssince(condition), title="Bars Since Green")
 plot(ta.barssince(condition=condition), title="Named Bars Since Green")
 plot(ta.valuewhen(condition, close, 0), title="Last Green Close")
 plot(ta.valuewhen(condition=condition, source=close, occurrence=0), title="Named Last Green Close")
+plot(ta.valuewhen(condition=condition, close, 0), title="Mixed Last Green Close")
 plot(ta.valuewhen(condition, close, 1), title="Previous Green Close")
 plot(ta.valuewhen(condition=condition, source=close, occurrence=1), title="Named Previous Green Close")
+plot(ta.valuewhen(condition=condition, close, 1), title="Mixed Previous Green Close")
 `);
 
     expect(result.errors).toEqual([]);
@@ -20,8 +22,10 @@ plot(ta.valuewhen(condition=condition, source=close, occurrence=1), title="Named
     expect(roundSeries(getPlot(result, 'Named Bars Since Green').values)).toEqual([0, 0, 0, 1, 2, 0, 0, 0, 1, 0, 1, 0]);
     expect(roundSeries(getPlot(result, 'Last Green Close').values)).toEqual([102, 105, 107, 107, 107, 100, 104, 109, 109, 111, 111, 112]);
     expect(roundSeries(getPlot(result, 'Named Last Green Close').values)).toEqual([102, 105, 107, 107, 107, 100, 104, 109, 109, 111, 111, 112]);
+    expect(roundSeries(getPlot(result, 'Mixed Last Green Close').values)).toEqual([102, 105, 107, 107, 107, 100, 104, 109, 109, 111, 111, 112]);
     expect(roundSeries(getPlot(result, 'Previous Green Close').values)).toEqual([null, 102, 105, 105, 105, 107, 100, 104, 104, 109, 109, 111]);
     expect(roundSeries(getPlot(result, 'Named Previous Green Close').values)).toEqual([null, 102, 105, 105, 105, 107, 100, 104, 104, 109, 109, 111]);
+    expect(roundSeries(getPlot(result, 'Mixed Previous Green Close').values)).toEqual([null, 102, 105, 105, 105, 107, 100, 104, 104, 109, 109, 111]);
   });
 
   it('runs ta.vwma and bar-offset window helpers', () => {
@@ -58,10 +62,12 @@ plot(ta.lowestbars(low, 4), title="Lowest Offset")
 indicator("TA cross range")
 directionChanged = ta.change(close > open)
 directionChanged2 = ta.change(close > open, 2)
+directionChangedMixed = ta.change(source=close > open, 2)
 plot(ta.cross(close, 104), title="Cross Threshold")
 plot(ta.range(close, 4), title="Close Range")
 plot(directionChanged ? 1 : 0, title="Direction Changed")
 plot(directionChanged2 ? 1 : 0, title="Direction Changed 2")
+plot(directionChangedMixed ? 1 : 0, title="Direction Changed Mixed")
 `);
 
     expect(result.errors).toEqual([]);
@@ -69,6 +75,7 @@ plot(directionChanged2 ? 1 : 0, title="Direction Changed 2")
     expect(roundSeries(getPlot(result, 'Close Range').values)).toEqual([0, 3, 5, 5, 8, 8, 5, 10, 9, 7, 3, 4]);
     expect(getPlot(result, 'Direction Changed').values).toEqual([0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1]);
     expect(getPlot(result, 'Direction Changed 2').values).toEqual([0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0]);
+    expect(getPlot(result, 'Direction Changed Mixed').values).toEqual([0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0]);
   });
 
   it('runs ta cross helpers with named arguments', () => {
@@ -84,11 +91,19 @@ plot(ta.crossover(source1=close, source2=open), title="Crossover")
 plot(ta.crossunder(source1=close, source2=open), title="Crossunder")
 plot(ta.cross(source1=close, source2=open), title="Cross")
 `);
+    const mixed = runCompatScript(`
+indicator("TA cross mixed")
+plot(ta.crossover(source1=close, open), title="Crossover")
+plot(ta.crossunder(source1=close, open), title="Crossunder")
+plot(ta.cross(source1=close, open), title="Cross")
+`);
 
     expect(positional.errors).toEqual([]);
     expect(named.errors).toEqual([]);
+    expect(mixed.errors).toEqual([]);
     for (const title of positional.plots.map((plot) => plot.title)) {
       expect(getPlot(named, title).values).toEqual(getPlot(positional, title).values);
+      expect(getPlot(mixed, title).values).toEqual(getPlot(positional, title).values);
     }
     expect(getPlot(named, 'Crossover').values).toEqual([false, false, false, false, false, true, false, false, false, true, false, true]);
     expect(getPlot(named, 'Crossunder').values).toEqual([false, false, false, true, false, false, false, false, true, false, true, false]);
