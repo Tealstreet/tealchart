@@ -1829,7 +1829,8 @@ class SemanticChecker {
     if (init.type !== 'CallExpression') return undefined;
 
     return BUILTIN_TUPLE_RETURN_TYPES.get(this.memberPath(init.callee).join('.'))
-      ?? this.inferUserFunctionTupleElementTypes(init, scope);
+      ?? this.inferUserFunctionTupleElementTypes(init, scope)
+      ?? this.inferUserMethodTupleElementTypes(init, scope);
   }
 
   private checkAssignment(statement: AssignmentStatement, scope: SemanticScope): void {
@@ -3265,6 +3266,19 @@ class SemanticChecker {
     if (!method) return undefined;
 
     return this.inferFunctionReturnType(method, this.inferCallableParameterTypes(method, expression.arguments, scope, receiverType));
+  }
+
+  private inferUserMethodTupleElementTypes(expression: CallExpression, scope: SemanticScope): SemanticType[] | undefined {
+    if (expression.callee.type !== 'MemberExpression') return undefined;
+
+    const receiverType = this.inferExpressionType(expression.callee.object, scope);
+    if (receiverType.kind === 'unknown') return undefined;
+    if (this.isBuiltinCollectionMemberMethod(receiverType, expression.callee.property.name)) return undefined;
+
+    const method = this.findUserMethodDeclaration(expression.callee.property.name, receiverType, expression, scope);
+    if (!method) return undefined;
+
+    return this.inferFunctionTupleElementTypes(method, this.inferCallableParameterTypes(method, expression.arguments, scope, receiverType));
   }
 
   private findUserMethodDeclaration(

@@ -555,6 +555,38 @@ plot(markerValue)
     expect(types.get('unknownTitle')).toMatchObject({ kind: 'unknown' });
   });
 
+  it('infers tuple destructuring element types from direct user method tuple returns', () => {
+    const result = checkProgram(parse(`
+indicator("Method Tuple Types")
+type Pivot
+    float y
+method pair(float this, string title) => [this, title]
+method annotate(Pivot this, string title) =>
+    [this.y, title]
+pivot = Pivot.new(close)
+[priceValue, priceTitle] = close.pair("Close")
+[pivotValue, pivotTitle] = pivot.annotate("Pivot")
+priceValue := "bad"
+priceTitle := 1
+pivotValue := "bad"
+pivotTitle := 2
+plot(priceValue + pivotValue)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable priceValue',
+      'Cannot assign int value to string variable priceTitle',
+      'Cannot assign string value to float variable pivotValue',
+      'Cannot assign int value to string variable pivotTitle',
+    ]);
+    expect(types.get('priceValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('priceTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('pivotValue')).toMatchObject({ kind: 'float' });
+    expect(types.get('pivotTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+  });
+
   it('reports assignments to undeclared identifiers', () => {
     const result = checkProgram(parse(`
 indicator("Unknown Assignment")
