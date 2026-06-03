@@ -636,7 +636,8 @@ drawing output. The label mutation pass covers persistent `var` label handles,
 `get_yloc`, `get_text`, `get_style`, `get_color`, `get_textcolor`,
 `get_size`, `get_tooltip`), `label.copy()`, and `label.delete()`. Label
 mutators and getters accept Pine-style named `id` and value arguments. Semantic
-analysis preserves known label getter return types for downstream diagnostics. Rendering
+analysis preserves known label getter return types and `label.all` handle-array
+element types for downstream diagnostics. Rendering
 routes labels to the script pane: overlay scripts use the main pane, non-overlay
 scripts use their indicator pane. Renderer coverage handles text-only
 `label.style_none`, directional label bodies, and common symbol bodies including
@@ -654,11 +655,11 @@ mutation pass covers persistent `var` line handles, `line.set_x1()`,
 `line.set_color()`, `line.set_style()`, `line.set_width()`, scalar coordinate
 getters, `line.get_price()`, `line.copy()`, and `line.delete()`. Line mutators
 and getters accept Pine-style named `id` and value arguments. Semantic analysis
-preserves known line getter return types for downstream diagnostics. Rendering
-routes line segments to the script pane with basic color/style/width and
-horizontal extension support. `force_overlay` lines render in the main pane
-even when created by non-overlay scripts. `linefill.new()` records fills between
-two line handles;
+preserves known line getter return types and `line.all` handle-array element
+types for downstream diagnostics. Rendering routes line segments to the script
+pane with basic color/style/width and horizontal extension support.
+`force_overlay` lines render in the main pane even when created by non-overlay
+scripts. `linefill.new()` records fills between two line handles;
 `linefill.set_color()` supports Pine-style named `id` and `color` arguments,
 while `linefill.get_line1()`, `linefill.get_line2()`, and `linefill.delete()`
 support named `id` arguments. Semantic analysis preserves linefill getter line
@@ -674,9 +675,10 @@ persistent `var` box handles, geometry setters (`set_left`, `set_right`,
 `set_top`, `set_bottom`, `set_lefttop`, `set_rightbottom`), style/text setters,
 coordinate/color/text getters, `box.copy()`, and `box.delete()`. Box mutators
 and getters accept Pine-style named `id` and value arguments. Semantic analysis
-preserves known box getter return types for downstream diagnostics. Rendering
-routes filled rectangles to the script pane with borders, text alignment,
-`text_wrap=auto` wrapping, and default/monospace font-family metadata. Full
+preserves known box getter return types and `box.all` handle-array element types
+for downstream diagnostics. Rendering routes filled rectangles to the script
+pane with borders, text alignment, `text_wrap=auto` wrapping, and
+default/monospace font-family metadata. Full
 TradingView text pixel parity, `chart.point` overloads, and remaining edge-case
 styling remain planned.
 
@@ -684,7 +686,8 @@ The `polyline.*` drawing pass supports `polyline.new()` with named point/style
 arguments, `polyline.copy()`, `polyline.delete()`, and `polyline.all`.
 `polyline.copy()` and `polyline.delete()` accept Pine-style named `id`
 arguments. Semantic analysis preserves `polyline.new()` and `polyline.copy()`
-handle return types for downstream diagnostics.
+handle return types and `polyline.all` handle-array element types for downstream
+diagnostics.
 
 ## Table Drawing Coverage
 
