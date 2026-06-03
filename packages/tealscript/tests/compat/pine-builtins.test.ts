@@ -154,7 +154,9 @@ indicator("Cumulative TA docs smoke")
 plot(ta.cum(close), title="Cum Close")
 plot(ta.variance(close, 3), title="Variance")
 plot(ta.variance(source=close, length=3, biased=false), title="Unbiased Variance")
+plot(ta.variance(source=close, 3, false), title="Mixed Unbiased Variance")
 plot(ta.stdev(source=close, length=3, biased=false), title="Unbiased Stdev")
+plot(ta.stdev(source=close, 3, false), title="Mixed Unbiased Stdev")
 plot(ta.dev(close, 3), title="Mean Deviation")
 plot(ta.correlation(close, open, 3), title="Close Open Correlation")
 plot(ta.correlation(close, high, 3), title="Close High Correlation")
@@ -163,15 +165,20 @@ plot(ta.cog(close, 3), title="COG")
 plot(ta.cog(close - open, 3), title="Derived COG")
 plot(ta.cum(source=close), title="Named Cum Close")
 plot(ta.dev(source=close, length=3), title="Named Mean Deviation")
+plot(ta.dev(source=close, 3), title="Mixed Mean Deviation")
 plot(ta.correlation(source1=close, source2=open, length=3), title="Named Close Open Correlation")
+plot(ta.correlation(source1=close, open, 3), title="Mixed Close Open Correlation")
 plot(ta.cog(source=close, length=3), title="Named COG")
+plot(ta.cog(source=close, 3), title="Mixed COG")
 `);
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Cum Close').values)).toEqual([102, 207, 314, 417, 516, 616, 720, 829, 937, 1048, 1158, 1270]);
     expect(roundSeries(getPlot(result, 'Variance').values)).toEqual([null, null, 4.222222, 2.666667, 10.666667, 2.888889, 4.666667, 13.555556, 4.666667, 1.555556, 1.555556, 0.666667]);
     expect(roundSeries(getPlot(result, 'Unbiased Variance').values)).toEqual([null, null, 6.333333, 4, 16, 4.333333, 7, 20.333333, 7, 2.333333, 2.333333, 1]);
+    expect(roundSeries(getPlot(result, 'Mixed Unbiased Variance').values)).toEqual(roundSeries(getPlot(result, 'Unbiased Variance').values));
     expect(roundSeries(getPlot(result, 'Unbiased Stdev').values)).toEqual([null, null, 2.516611, 2, 4, 2.081666, 2.645751, 4.50925, 2.645751, 1.527525, 1.527525, 1]);
+    expect(roundSeries(getPlot(result, 'Mixed Unbiased Stdev').values)).toEqual(roundSeries(getPlot(result, 'Unbiased Stdev').values));
     expect(roundSeries(getPlot(result, 'Mean Deviation').values)).toEqual([null, null, 1.777778, 1.333333, 2.666667, 1.555556, 2, 3.111111, 2, 1.111111, 1.111111, 0.666667]);
     expect(roundSeries(getPlot(result, 'Close Open Correlation').values)).toEqual([null, null, 0.973684, -0.39736, 0.5, 0.720577, -0.453921, 0.963928, 0.712468, 0, -0.142857, -0.327327]);
     expect(roundSeries(getPlot(result, 'Close High Correlation').values)).toEqual([null, null, 1, -0.327327, 0.755929, 0.81224, 0.544705, 1, 0.940634, 0.654654, 0.5, -0.5]);
@@ -180,8 +187,11 @@ plot(ta.cog(source=close, length=3), title="Named COG")
     expect(roundSeries(getPlot(result, 'Derived COG').values)).toEqual([null, null, -2, -9, -1, -2.714286, 6, -1.6, -2.625, -2.285714, -2, -2.25]);
     expect(roundSeries(getPlot(result, 'Named Cum Close').values)).toEqual(roundSeries(getPlot(result, 'Cum Close').values));
     expect(roundSeries(getPlot(result, 'Named Mean Deviation').values)).toEqual(roundSeries(getPlot(result, 'Mean Deviation').values));
+    expect(roundSeries(getPlot(result, 'Mixed Mean Deviation').values)).toEqual(roundSeries(getPlot(result, 'Mean Deviation').values));
     expect(roundSeries(getPlot(result, 'Named Close Open Correlation').values)).toEqual(roundSeries(getPlot(result, 'Close Open Correlation').values));
+    expect(roundSeries(getPlot(result, 'Mixed Close Open Correlation').values)).toEqual(roundSeries(getPlot(result, 'Close Open Correlation').values));
     expect(roundSeries(getPlot(result, 'Named COG').values)).toEqual(roundSeries(getPlot(result, 'COG').values));
+    expect(roundSeries(getPlot(result, 'Mixed COG').values)).toEqual(roundSeries(getPlot(result, 'COG').values));
   });
 
   it('runs Pine channel helper idioms', () => {
@@ -254,6 +264,7 @@ mixedPivotLow = ta.pivotlow(2, rightbars=2)
 linreg = ta.linreg(close, 3, 1)
 [macdLine, signalLine, histLine] = ta.macd(close, 3, 6, 2)
 legacyObv = ta.obv(close, volume)
+mixedObv = ta.obv(source=close, volume)
 currentObv = ta.obv
 trFunction = ta.tr(true)
 trSeries = ta.tr
@@ -274,6 +285,7 @@ plot(macdLine, title="MACD")
 plot(signalLine, title="Signal")
 plot(histLine, title="Hist")
 plot(legacyObv, title="Legacy OBV")
+plot(mixedObv, title="Mixed Legacy OBV")
 plot(currentObv, title="OBV")
 plot(trFunction, title="TR Function")
 plot(trSeries, title="TR Series")
@@ -292,6 +304,7 @@ mixedPivotLow = ta.pivotlow(2, rightbars=2)
 linreg = ta.linreg(source=close, length=3, offset=1)
 [macdLine, signalLine, histLine] = ta.macd(source=close, fastlen=3, slowlen=6, siglen=2)
 legacyObv = ta.obv(source=close, volume=volume)
+mixedObv = ta.obv(source=close, volume)
 currentObv = ta.obv
 trFunction = ta.tr(handle_na=true)
 trSeries = ta.tr
@@ -312,6 +325,7 @@ plot(macdLine, title="MACD")
 plot(signalLine, title="Signal")
 plot(histLine, title="Hist")
 plot(legacyObv, title="Legacy OBV")
+plot(mixedObv, title="Mixed Legacy OBV")
 plot(currentObv, title="OBV")
 plot(trFunction, title="TR Function")
 plot(trSeries, title="TR Series")
@@ -329,6 +343,7 @@ plot(trSeries, title="TR Series")
     expect(roundSeries(getPlot(positional, 'Hist').values)).toEqual([0, 0.214286, 0.260204, -0.18914, -0.465457, -0.188124, 0.255259, 0.554393, 0.212539, 0.222637, -0.037092, 0.012555]);
     expect(getPlot(positional, 'OBV').values).toEqual([0, 1100, 2000, 750, -650, 400, 1700, 3300, 2100, 3600, 2250, 3700]);
     expect(getPlot(positional, 'Legacy OBV').values).toEqual(getPlot(positional, 'OBV').values);
+    expect(getPlot(positional, 'Mixed Legacy OBV').values).toEqual(getPlot(positional, 'OBV').values);
     expect(getPlot(positional, 'TR Function').values).toEqual([4, 5, 4, 7, 6, 5, 6, 7, 5, 5, 5, 5]);
     expect(getPlot(positional, 'TR Series').values).toEqual([null, 5, 4, 7, 6, 5, 6, 7, 5, 5, 5, 5]);
     expect(roundSeries(getPlot(named, 'DI Plus').values)).toEqual([
@@ -1041,10 +1056,15 @@ plot(ta.percentile_nearest_rank(close, length, 75), title="Nearest")
 plot(ta.percentile_linear_interpolation(close, length, 75), title="Linear")
 plot(ta.percentrank(close, length), title="Percent Rank")
 plot(ta.median(source=close, length=length), title="Named Median")
+plot(ta.median(source=close, length), title="Mixed Median")
 plot(ta.mode(source=close, length=length), title="Named Mode")
+plot(ta.mode(source=close, length), title="Mixed Mode")
 plot(ta.percentile_nearest_rank(source=close, length=length, percentage=75), title="Named Nearest")
+plot(ta.percentile_nearest_rank(source=close, length, 75), title="Mixed Nearest")
 plot(ta.percentile_linear_interpolation(source=close, length=length, percentage=75), title="Named Linear")
+plot(ta.percentile_linear_interpolation(source=close, length, 75), title="Mixed Linear")
 plot(ta.percentrank(source=close, length=length), title="Named Percent Rank")
+plot(ta.percentrank(source=close, length), title="Mixed Percent Rank")
 `);
 
     expect(result.errors).toEqual([]);
@@ -1054,10 +1074,15 @@ plot(ta.percentrank(source=close, length=length), title="Named Percent Rank")
     expect(getPlot(result, 'Linear').values).toEqual([null, null, 106, 106, 105, 101.5, 102, 106.5, 108.5, 110, 110.5, 111.5]);
     expect(roundSeries(getPlot(result, 'Percent Rank').values)).toEqual([null, null, 100, 33.333333, 33.333333, 66.666667, 100, 100, 66.666667, 100, 66.666667, 100]);
     expect(getPlot(result, 'Named Median').values).toEqual(getPlot(result, 'Median').values);
+    expect(getPlot(result, 'Mixed Median').values).toEqual(getPlot(result, 'Median').values);
     expect(getPlot(result, 'Named Mode').values).toEqual(getPlot(result, 'Mode').values);
+    expect(getPlot(result, 'Mixed Mode').values).toEqual(getPlot(result, 'Mode').values);
     expect(getPlot(result, 'Named Nearest').values).toEqual(getPlot(result, 'Nearest').values);
+    expect(getPlot(result, 'Mixed Nearest').values).toEqual(getPlot(result, 'Nearest').values);
     expect(getPlot(result, 'Named Linear').values).toEqual(getPlot(result, 'Linear').values);
+    expect(getPlot(result, 'Mixed Linear').values).toEqual(getPlot(result, 'Linear').values);
     expect(roundSeries(getPlot(result, 'Named Percent Rank').values)).toEqual(roundSeries(getPlot(result, 'Percent Rank').values));
+    expect(roundSeries(getPlot(result, 'Mixed Percent Rank').values)).toEqual(roundSeries(getPlot(result, 'Percent Rank').values));
   });
 
   it('matches common Pine moving-average helper idioms', () => {
