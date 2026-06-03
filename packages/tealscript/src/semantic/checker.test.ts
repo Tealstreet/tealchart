@@ -1632,6 +1632,59 @@ unknownGetter = label.get_text(marker, format="raw")
     ]);
   });
 
+  it('resolves line.new coordinate and point overloads', () => {
+    const result = checkProgram(parse(`
+indicator("Line Constructor Signatures")
+firstPoint = chart.point.from_index(bar_index, high)
+secondPoint = chart.point.from_index(bar_index + 1, low)
+pointLine = line.new(first_point=firstPoint, secondPoint, xloc.bar_index, "right", color.blue, "solid", 2, true)
+coordinateLine = line.new(x1=bar_index, y1=high, x2=bar_index + 1, y2=low, color=color.orange)
+positionalPointLine = line.new(firstPoint, secondPoint)
+lines = array.from(pointLine, coordinateLine, positionalPointLine)
+plot(array.size(lines))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('pointLine')).toMatchObject({ kind: 'line' });
+    expect(types.get('coordinateLine')).toMatchObject({ kind: 'line' });
+    expect(types.get('positionalPointLine')).toMatchObject({ kind: 'line' });
+    expect(types.get('lines')).toMatchObject({ kind: 'array', elementType: { kind: 'line' } });
+  });
+
+  it('reports invalid line.new overload argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Line Constructor Signatures")
+firstPoint = chart.point.from_index(bar_index, high)
+secondPoint = chart.point.from_index(bar_index + 1, low)
+unknownCoordinate = line.new(bar_index, high, bar_index + 1, low, opacity=80)
+missingCoordinate = line.new(x1=bar_index, y1=high)
+duplicateCoordinate = line.new(bar_index, high, bar_index + 1, low, x1=bar_index)
+tooManyCoordinate = line.new(bar_index, high, bar_index + 1, low, xloc.bar_index, "right", color.blue, "solid", 2, true, false)
+missingPoint = line.new(first_point=firstPoint)
+duplicatePoint = line.new(firstPoint, secondPoint, first_point=firstPoint)
+tooManyPoint = line.new(firstPoint, secondPoint, xloc.bar_index, "right", color.blue, "solid", 2, true, false)
+badTwoPositionals = line.new(bar_index, high)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'opacity' for line.new()",
+      'line.new() expects at least 4 arguments',
+      "line.new() missing required argument 'x2'",
+      "line.new() missing required argument 'y2'",
+      "Argument 'x1' for line.new() was supplied multiple times",
+      'line.new() expects at most 10 arguments',
+      'line.new() expects at least 2 arguments',
+      "line.new() missing required argument 'second_point'",
+      "Argument 'first_point' for line.new() was supplied multiple times",
+      'line.new() expects at most 8 arguments',
+      'line.new() expects at least 4 arguments',
+      "line.new() missing required argument 'x2'",
+      "line.new() missing required argument 'y2'",
+    ]);
+  });
+
   it('resolves line setter named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Line Setter Signatures")
