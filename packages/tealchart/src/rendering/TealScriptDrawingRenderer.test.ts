@@ -455,6 +455,70 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events).toContain('fillText:ATR:88,29');
   });
 
+  it('renders merged table cells as a single span', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeTable({
+          columns: 2,
+          rows: 1,
+          cells: [
+            {
+              column: 0,
+              row: 0,
+              text: 'Header',
+              textColor: '#ffffff',
+              textSize: 'normal',
+              textHalign: 'center',
+              textValign: 'middle',
+              bgcolor: '#111827',
+            },
+            {
+              column: 1,
+              row: 0,
+              text: '',
+              textColor: '#ffffff',
+              textSize: 'normal',
+              textHalign: 'center',
+              textValign: 'middle',
+              bgcolor: '#1f2937',
+            },
+          ],
+          mergedCells: [
+            {
+              startColumn: 0,
+              startRow: 0,
+              endColumn: 1,
+              endRow: 0,
+            },
+          ],
+        }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).toContain('fillRect:4,18,108,22');
+    expect(events).toContain('strokeRect:4,18,108,22');
+    expect(events).not.toContain('strokeRect:64,18,48,22');
+    expect(events).toContain('fillText:Header:58,29');
+  });
+
   it('ignores invalid table text formatting values', () => {
     const events: string[] = [];
     const renderer = new TealScriptDrawingRenderer({

@@ -711,11 +711,18 @@ export class TealScriptDrawingRenderer {
 
       for (let row = 0; row < table.rows; row++) {
         for (let column = 0; column < table.columns; column++) {
+          const mergedCell = this.findMergedTableCell(table, column, row);
+          if (mergedCell && (mergedCell.startColumn !== column || mergedCell.startRow !== row)) continue;
+
           const cell = table.cells.find((candidate) => candidate.column === column && candidate.row === row);
           const x = origin.x + metrics.columnOffsets[column]!;
           const y = origin.y + metrics.rowOffsets[row]!;
-          const width = metrics.columnWidths[column]!;
-          const height = metrics.rowHeights[row]!;
+          const width = mergedCell
+            ? this.sumTableMetricRange(metrics.columnWidths, mergedCell.startColumn, mergedCell.endColumn)
+            : metrics.columnWidths[column]!;
+          const height = mergedCell
+            ? this.sumTableMetricRange(metrics.rowHeights, mergedCell.startRow, mergedCell.endRow)
+            : metrics.rowHeights[row]!;
 
           if (cell?.bgcolor) {
             ctx.fillStyle = cell.bgcolor;
@@ -797,6 +804,27 @@ export class TealScriptDrawingRenderer {
       current += value;
     }
     return offsets;
+  }
+
+  private findMergedTableCell(
+    table: TealScriptDrawingPartition['tables'][number],
+    column: number,
+    row: number,
+  ): NonNullable<TealScriptDrawingPartition['tables'][number]['mergedCells']>[number] | undefined {
+    return table.mergedCells?.find((mergedCell) => (
+      column >= mergedCell.startColumn
+      && column <= mergedCell.endColumn
+      && row >= mergedCell.startRow
+      && row <= mergedCell.endRow
+    ));
+  }
+
+  private sumTableMetricRange(values: number[], start: number, end: number): number {
+    let total = 0;
+    for (let index = start; index <= end; index++) {
+      total += values[index] ?? 0;
+    }
+    return total;
   }
 
   private resolveTableOrigin(
