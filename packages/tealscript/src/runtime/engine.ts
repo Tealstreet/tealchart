@@ -7984,20 +7984,22 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.kc', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'series'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
-      const multiplier = this.toNumber(this.getCallArg(args, namedArgs, 2, 'mult'));
-      const useTrueRangeArg = this.getCallArg(args, namedArgs, 3, 'useTrueRange');
+      const taChannelArgs = ['series', 'length', 'mult', 'useTrueRange'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taChannelArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taChannelArgs, 1));
+      const multiplier = this.toNumber(this.getOrderedCallArg(args, namedArgs, taChannelArgs, 2));
+      const useTrueRangeArg = this.getOrderedCallArg(args, namedArgs, taChannelArgs, 3);
       const useTrueRange = useTrueRangeArg === undefined ? true : this.isTruthy(useTrueRangeArg);
 
       return this.calculateKeltnerChannel(scope, callId, source, length, multiplier, useTrueRange);
     });
 
     this.builtins.set('ta.kcw', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'series'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
-      const multiplier = this.toNumber(this.getCallArg(args, namedArgs, 2, 'mult'));
-      const useTrueRangeArg = this.getCallArg(args, namedArgs, 3, 'useTrueRange');
+      const taChannelArgs = ['series', 'length', 'mult', 'useTrueRange'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taChannelArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taChannelArgs, 1));
+      const multiplier = this.toNumber(this.getOrderedCallArg(args, namedArgs, taChannelArgs, 2));
+      const useTrueRangeArg = this.getOrderedCallArg(args, namedArgs, taChannelArgs, 3);
       const useTrueRange = useTrueRangeArg === undefined ? true : this.isTruthy(useTrueRangeArg);
       const [basis, upper, lower] = this.calculateKeltnerChannel(scope, callId, source, length, multiplier, useTrueRange);
 
@@ -8176,9 +8178,10 @@ export class TealscriptEngine {
     // BB - Bollinger Bands
     // Returns [middle, upper, lower]
     this.builtins.set('ta.bb', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'series'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
-      const mult = this.toNumber(this.getCallArg(args, namedArgs, 2, 'mult', 2.0));
+      const taBbArgs = ['series', 'length', 'mult'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taBbArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taBbArgs, 1));
+      const mult = this.toNumber(this.getOrderedCallArg(args, namedArgs, taBbArgs, 2, 2.0));
       const values = this.getCompleteSourceWindow(scope, `_ta_bb_source_${callId}`, source, length);
       if (!values) return [NaN, NaN, NaN];
 
@@ -8200,9 +8203,10 @@ export class TealscriptEngine {
 
     // BBW - Bollinger Bands Width
     this.builtins.set('ta.bbw', (args, namedArgs, ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'series'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
-      const mult = this.toNumber(this.getCallArg(args, namedArgs, 2, 'mult', 2.0));
+      const taBbArgs = ['series', 'length', 'mult'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taBbArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taBbArgs, 1));
+      const mult = this.toNumber(this.getOrderedCallArg(args, namedArgs, taBbArgs, 2, 2.0));
       const bb = this.builtins.get('ta.bb') as BuiltinFunction | undefined;
       if (!bb) return NaN;
 
