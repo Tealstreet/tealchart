@@ -486,7 +486,7 @@ if barstate.islast
     table.set_frame_width(table_id=dashboard, frame_width=2)
     table.set_border_color(table_id=dashboard, border_color=color.black)
     table.set_border_width(table_id=dashboard, border_width=3)
-    table.cell(table_id=dashboard, column=0, row=0, text="Label", text_color=color.white, bgcolor=color.blue)
+    table.cell(table_id=dashboard, column=0, row=0, text="Label", text_color=color.white, bgcolor=color.blue, tooltip="Label details")
     table.cell(table_id=dashboard, column=1, row=0, text="")
     table.cell_set_text(table_id=dashboard, column=1, row=0, text="Close")
     table.cell_set_bgcolor(table_id=dashboard, column=1, row=0, bgcolor=color.green)
@@ -498,6 +498,7 @@ if barstate.islast
     table.cell_set_text_valign(table_id=dashboard, column=1, row=0, text_valign=text.align_bottom)
     table.cell_set_text_font_family(table_id=dashboard, column=1, row=0, text_font_family=font.family_monospace)
     table.cell_set_text_formatting(table_id=dashboard, column=1, row=0, text_formatting=text.format_bold)
+    table.cell_set_tooltip(table_id=dashboard, column=1, row=0, tooltip="Close details")
     table.cell(table_id=dashboard, column=0, row=1, text="cleared")
     table.clear(table_id=dashboard, start_column=0, start_row=1, end_column=0, end_row=1)
 plot(array.size(table.all), title="Named Table Count")
@@ -529,6 +530,7 @@ plot(array.size(table.all), title="Named Table Count")
             textHalign: 'center',
             textValign: 'middle',
             textSize: 'normal',
+            tooltip: 'Label details',
             bgcolor: '#2196F3',
           },
           {
@@ -544,6 +546,7 @@ plot(array.size(table.all), title="Named Table Count")
             bgcolor: '#4CAF50',
             textFontFamily: 'monospace',
             textFormatting: 'bold',
+            tooltip: 'Close details',
           },
         ],
       },

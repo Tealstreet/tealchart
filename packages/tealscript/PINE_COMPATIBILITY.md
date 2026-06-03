@@ -697,7 +697,7 @@ column sizing, background/frame/border metadata, `table.delete()`,
 `table.clear()`, `table.all`, `table.cell()`, table-level
 position/background/frame/border setters, and common cell setters for text,
 color, background, size, width, height, text alignment, font family, and
-bold/italic text formatting. Table lifecycle helpers and setters accept
+bold/italic text formatting, and tooltips. Table lifecycle helpers and setters accept
 Pine-style named `table_id`, coordinate, and value arguments where those
 parameters exist. Semantic analysis preserves `table.new()` handle return types
 and `table.all` handle-array element types for downstream diagnostics. Rendering
