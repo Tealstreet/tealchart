@@ -2796,6 +2796,59 @@ plot(array.size(labels) + x + y)
     expect(types.get('labels')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
   });
 
+  it('infers label getter return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Label Getter Return Types")
+marker = label.new(bar_index, close, text="entry")
+x = label.get_x(id=marker)
+y = label.get_y(marker)
+textValue = label.get_text(id=marker)
+xlocValue = label.get_xloc(marker)
+ylocValue = label.get_yloc(id=marker)
+styleValue = label.get_style(marker)
+colorValue = label.get_color(id=marker)
+textColorValue = label.get_textcolor(marker)
+sizeValue = label.get_size(id=marker)
+tooltipValue = label.get_tooltip(marker)
+x := "bad"
+y := "bad"
+textValue := 1
+xlocValue := 2
+ylocValue := 3
+styleValue := 4
+colorValue := "bad"
+textColorValue := "bad"
+sizeValue := 5
+tooltipValue := 6
+plot(x + y + str.length(textValue + xlocValue + ylocValue + styleValue + sizeValue + tooltipValue))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to int variable x',
+      'Cannot assign string value to float variable y',
+      'Cannot assign int value to string variable textValue',
+      'Cannot assign int value to string variable xlocValue',
+      'Cannot assign int value to string variable ylocValue',
+      'Cannot assign int value to string variable styleValue',
+      'Cannot assign string value to color variable colorValue',
+      'Cannot assign string value to color variable textColorValue',
+      'Cannot assign int value to string variable sizeValue',
+      'Cannot assign int value to string variable tooltipValue',
+    ]);
+    expect(types.get('x')).toMatchObject({ kind: 'int' });
+    expect(types.get('y')).toMatchObject({ kind: 'float' });
+    expect(types.get('textValue')).toMatchObject({ kind: 'string' });
+    expect(types.get('xlocValue')).toMatchObject({ kind: 'string' });
+    expect(types.get('ylocValue')).toMatchObject({ kind: 'string' });
+    expect(types.get('styleValue')).toMatchObject({ kind: 'string' });
+    expect(types.get('colorValue')).toMatchObject({ kind: 'color' });
+    expect(types.get('textColorValue')).toMatchObject({ kind: 'color' });
+    expect(types.get('sizeValue')).toMatchObject({ kind: 'string' });
+    expect(types.get('tooltipValue')).toMatchObject({ kind: 'string' });
+  });
+
   it('reports invalid label method argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Bad Label Method Signatures")
