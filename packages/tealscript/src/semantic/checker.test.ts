@@ -1608,6 +1608,56 @@ plot(array.size(labels) + x + y)
     expect(types.get('labels')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
   });
 
+  it('resolves drawing all member collection types', () => {
+    const result = checkProgram(parse(`
+indicator("Drawing All Members")
+labels = label.all
+lines = line.all
+linefills = linefill.all
+boxes = box.all
+polylines = polyline.all
+labelCount = array.size(label.all)
+lineCount = array.size(line.all)
+linefillCount = array.size(linefill.all)
+boxCount = array.size(box.all)
+polylineCount = array.size(polyline.all)
+plot(labelCount + lineCount + linefillCount + boxCount + polylineCount)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('labels')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
+    expect(types.get('lines')).toMatchObject({ kind: 'array', elementType: { kind: 'line' } });
+    expect(types.get('linefills')).toMatchObject({ kind: 'array', elementType: { kind: 'linefill' } });
+    expect(types.get('boxes')).toMatchObject({ kind: 'array', elementType: { kind: 'box' } });
+    expect(types.get('polylines')).toMatchObject({ kind: 'array', elementType: { kind: 'polyline' } });
+    expect(types.get('labelCount')).toMatchObject({ kind: 'int' });
+    expect(types.get('lineCount')).toMatchObject({ kind: 'int' });
+    expect(types.get('linefillCount')).toMatchObject({ kind: 'int' });
+    expect(types.get('boxCount')).toMatchObject({ kind: 'int' });
+    expect(types.get('polylineCount')).toMatchObject({ kind: 'int' });
+  });
+
+  it('reports mismatched drawing all member collection mutations', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing All Members")
+array.push(label.all, line.new(bar_index, close, bar_index + 1, close))
+array.push(line.all, box.new(bar_index, high, bar_index + 1, low))
+array.push(linefill.all, polyline.new(array.from(chart.point.from_index(bar_index, close))))
+array.push(box.all, label.new(bar_index, close))
+array.push(polyline.all, linefill.new(line.new(bar_index, low, bar_index + 1, low), line.new(bar_index, high, bar_index + 1, high), color.blue))
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot use line value as label array element',
+      'Cannot use box value as line array element',
+      'Cannot use polyline value as linefill array element',
+      'Cannot use label value as box array element',
+      'Cannot use linefill value as polyline array element',
+    ]);
+  });
+
   it('reports invalid label method argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Bad Label Method Signatures")
