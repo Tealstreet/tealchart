@@ -3694,6 +3694,8 @@ class SemanticChecker {
     if (calleePath.join('.') === 'float') return { kind: 'float', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
     if (calleePath.join('.') === 'int') return { kind: 'int', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
     if (calleePath.join('.') === 'string') return { kind: 'string', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+    if (calleePath.join('.') === 'fixnan') return this.inferFixnanCallType(expression, scope);
+    if (calleePath.join('.') === 'nz') return this.inferNzCallType(expression, scope);
     if (calleePath.join('.') === 'timeframe.in_seconds') return { kind: 'int', qualifier: 'simple' };
     if (calleePath.join('.') === 'timeframe.from_seconds') return { kind: 'string', qualifier: 'simple' };
     if (CALENDAR_FUNCTION_NAMES.has(calleePath.join('.'))) return { kind: 'int', qualifier: 'series' };
@@ -3749,6 +3751,45 @@ class SemanticChecker {
       return { kind: 'udt', name: calleePath[0] };
     }
     return { kind: 'unknown', qualifier: this.inferMaxQualifier(expression.arguments.map((argument) => argument.value), scope) };
+  }
+
+  private inferFixnanCallType(expression: CallExpression, scope: SemanticScope): SemanticType {
+    const source = this.inferCallArgumentType(expression, scope, ['source'], 0);
+    return source ?? { kind: 'unknown', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+  }
+
+  private inferNzCallType(expression: CallExpression, scope: SemanticScope): SemanticType {
+    const parameterNames = ['source', 'replacement'];
+    const source = this.inferCallArgumentType(expression, scope, parameterNames, 0);
+    const replacement = this.inferCallArgumentType(expression, scope, parameterNames, 1);
+    if (!source) return replacement ?? { kind: 'unknown', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+    if (!replacement) return source;
+
+    const mergedType = this.mergeCompatibleType(source, replacement);
+    return {
+      ...mergedType,
+      qualifier: this.maxQualifier(source, replacement),
+    };
+  }
+
+  private inferCallArgumentType(
+    expression: CallExpression,
+    scope: SemanticScope,
+    parameterNames: string[],
+    index: number,
+  ): SemanticType | undefined {
+    const name = parameterNames[index];
+    if (!name) return undefined;
+
+    const named = expression.arguments.find((argument) => argument.name?.name === name);
+    if (named) return this.inferExpressionType(named.value, scope);
+
+    const priorNamedCount = parameterNames
+      .slice(0, index)
+      .filter((priorName) => expression.arguments.some((argument) => argument.name?.name === priorName))
+      .length;
+    const positional = expression.arguments.filter((argument) => !argument.name)[index - priorNamedCount];
+    return positional ? this.inferExpressionType(positional.value, scope) : undefined;
   }
 
   private inferUserFunctionCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {

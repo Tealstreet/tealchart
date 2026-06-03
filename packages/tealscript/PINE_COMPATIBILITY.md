@@ -414,6 +414,8 @@ casts used by generated scripts to normalize optional source values before
 plotting or comparing them. `nz()` supports default-zero and explicit
 replacement forms, `fixnan()` carries forward the previous non-`na` value per
 call site, and both helpers reject bool arguments per Pine v6 behavior.
+Semantic analysis preserves known `nz()` and `fixnan()` return types for
+downstream assignment diagnostics.
 
 ## Pine Logs Coverage
 
