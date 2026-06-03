@@ -1146,16 +1146,7 @@ class SemanticChecker {
 
     this.activeReturnInferences.add(declaration);
     try {
-      const functionScope = new SemanticScope(this.rootScope);
-      for (const parameter of declaration.params) {
-        functionScope.declare({
-          name: parameter.name,
-          kind: 'parameter',
-          type: parameterTypes.get(parameter.name) ?? this.typeFromAnnotation(parameter.typeAnnotation ?? undefined),
-          loc: parameter.loc,
-        });
-      }
-
+      const functionScope = this.createFunctionInferenceScope(declaration, parameterTypes);
       if (!Array.isArray(declaration.body)) {
         return this.inferExpressionType(declaration.body, functionScope);
       }
@@ -1184,6 +1175,57 @@ class SemanticChecker {
     } finally {
       this.activeReturnInferences.delete(declaration);
     }
+  }
+
+  private inferFunctionTupleElementTypes(
+    declaration: FunctionDeclaration,
+    parameterTypes = new Map<string, SemanticType>(),
+  ): SemanticType[] | undefined {
+    if (this.activeReturnInferences.has(declaration)) return undefined;
+
+    this.activeReturnInferences.add(declaration);
+    try {
+      const functionScope = this.createFunctionInferenceScope(declaration, parameterTypes);
+      if (!Array.isArray(declaration.body)) {
+        return this.inferTupleElementTypes(declaration.body, functionScope);
+      }
+
+      let returnTypes: SemanticType[] | undefined;
+      for (const statement of declaration.body) {
+        if (statement.type === 'VariableDeclaration' && statement.names.type === 'VariableDeclarator') {
+          const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init, functionScope);
+          functionScope.declare({
+            name: statement.names.name.name,
+            kind: 'variable',
+            type,
+            loc: statement.names.name.loc,
+          });
+          returnTypes = undefined;
+          continue;
+        }
+        if (statement.type === 'ExpressionStatement') {
+          returnTypes = this.inferTupleElementTypes(statement.expression, functionScope);
+          continue;
+        }
+        returnTypes = undefined;
+      }
+      return returnTypes;
+    } finally {
+      this.activeReturnInferences.delete(declaration);
+    }
+  }
+
+  private createFunctionInferenceScope(declaration: FunctionDeclaration, parameterTypes: Map<string, SemanticType>): SemanticScope {
+    const functionScope = new SemanticScope(this.rootScope);
+    for (const parameter of declaration.params) {
+      functionScope.declare({
+        name: parameter.name,
+        kind: 'parameter',
+        type: parameterTypes.get(parameter.name) ?? this.typeFromAnnotation(parameter.typeAnnotation ?? undefined),
+        loc: parameter.loc,
+      });
+    }
+    return functionScope;
   }
 
   private checkExportedTypeAnnotation(
@@ -1786,7 +1828,8 @@ class SemanticChecker {
 
     if (init.type !== 'CallExpression') return undefined;
 
-    return BUILTIN_TUPLE_RETURN_TYPES.get(this.memberPath(init.callee).join('.'));
+    return BUILTIN_TUPLE_RETURN_TYPES.get(this.memberPath(init.callee).join('.'))
+      ?? this.inferUserFunctionTupleElementTypes(init, scope);
   }
 
   private checkAssignment(statement: AssignmentStatement, scope: SemanticScope): void {
@@ -3198,6 +3241,17 @@ class SemanticChecker {
     if (!declaration) return undefined;
 
     return this.inferFunctionReturnType(declaration, this.inferCallableParameterTypes(declaration, expression.arguments, scope));
+  }
+
+  private inferUserFunctionTupleElementTypes(expression: CallExpression, scope: SemanticScope): SemanticType[] | undefined {
+    if (expression.callee.type !== 'Identifier') return undefined;
+
+    const symbol = scope.lookup(expression.callee.name);
+    const declaration =
+      symbol?.kind === 'function' && symbol.isMethod !== true ? this.functionSymbolDeclarations.get(symbol) : undefined;
+    if (!declaration) return undefined;
+
+    return this.inferFunctionTupleElementTypes(declaration, this.inferCallableParameterTypes(declaration, expression.arguments, scope));
   }
 
   private inferUserMethodCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {

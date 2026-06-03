@@ -522,6 +522,39 @@ plot(signalLine + hist + upper + lower + supertrend + diPlus + diMinus)
     ]);
   });
 
+  it('infers tuple destructuring element types from direct user function tuple returns', () => {
+    const result = checkProgram(parse(`
+indicator("UDF Tuple Types")
+pair(float value, string title) => [value, title]
+markerPair(float value) =>
+    marker = label.new(bar_index, value)
+    [value, marker]
+recursiveTuple(float value) => recursiveTuple(value)
+[seriesValue, constTitle] = pair(close, "Close")
+[markerValue, marker] = markerPair(close)
+[unknownValue, unknownTitle] = recursiveTuple(close)
+seriesValue := "bad"
+constTitle := 1
+marker := line.new(bar_index, low, bar_index, high)
+unknownValue := "still unknown"
+plot(markerValue)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable seriesValue',
+      'Cannot assign int value to string variable constTitle',
+      'Cannot assign line value to label variable marker',
+    ]);
+    expect(types.get('seriesValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('constTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('markerValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('marker')).toMatchObject({ kind: 'label' });
+    expect(types.get('unknownValue')).toMatchObject({ kind: 'unknown' });
+    expect(types.get('unknownTitle')).toMatchObject({ kind: 'unknown' });
+  });
+
   it('reports assignments to undeclared identifiers', () => {
     const result = checkProgram(parse(`
 indicator("Unknown Assignment")
