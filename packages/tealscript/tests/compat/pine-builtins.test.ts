@@ -780,13 +780,21 @@ plot(namedPrice == 101.25, title="Named Price")
     const result = runCompatScript(`
 indicator("Input metadata")
 mode = input.string("EMA", "Mode", options=["SMA", "EMA"], tooltip="Average type", group="Calculation", inline="ma", confirm=true)
+mixedMode = input.string(defval="EMA", "Mixed Mode", ["SMA", "EMA"], "Average type", "ma", "Calculation", true)
 fast = input.int(10, "Fast", 1, 20, 1, "Fast length", "len", "Calculation", false, display.data_window, true)
+mixedFast = input.int(defval=10, "Mixed Fast", 1, 20, 1, "Fast length", "len", "Calculation", false, display.data_window, true)
 mult = input.float(2.5, "Multiplier", [1.5, 2.5, 3.5], "Band multiplier", "band", "Bands", true, display.status_line, false)
+mixedMult = input.float(defval=2.5, "Mixed Multiplier", [1.5, 2.5, 3.5], "Band multiplier", "band", "Bands", true, display.status_line, false)
 tf = input.timeframe("60", "Timeframe", ["15", "60"], "Higher timeframe", "tf", "Calculation", true, display.none, true)
+mixedTf = input.timeframe(defval="60", "Mixed Timeframe", ["15", "60"], "Higher timeframe", "tf", "Calculation", true, display.none, true)
 plot(mode == "EMA", title="Mode")
+plot(mixedMode == mode, title="Mixed Mode")
 plot(fast == 10, title="Fast")
+plot(mixedFast == fast, title="Mixed Fast")
 plot(mult == 2.5, title="Multiplier")
+plot(mixedMult == mult, title="Mixed Multiplier")
 plot(tf == "60", title="Timeframe")
+plot(mixedTf == tf, title="Mixed Timeframe")
 `);
 
     expect(result.errors).toEqual([]);
@@ -803,9 +811,35 @@ plot(tf == "60", title="Timeframe")
         confirm: true,
       },
       {
+        id: 'input_Mixed Mode',
+        type: 'string',
+        title: 'Mixed Mode',
+        defval: 'EMA',
+        options: ['SMA', 'EMA'],
+        tooltip: 'Average type',
+        group: 'Calculation',
+        inline: 'ma',
+        confirm: true,
+      },
+      {
         id: 'input_Fast',
         type: 'int',
         title: 'Fast',
+        defval: 10,
+        minval: 1,
+        maxval: 20,
+        step: 1,
+        tooltip: 'Fast length',
+        inline: 'len',
+        group: 'Calculation',
+        confirm: false,
+        display: 2,
+        active: true,
+      },
+      {
+        id: 'input_Mixed Fast',
+        type: 'int',
+        title: 'Mixed Fast',
         defval: 10,
         minval: 1,
         maxval: 20,
@@ -831,6 +865,19 @@ plot(tf == "60", title="Timeframe")
         active: false,
       },
       {
+        id: 'input_Mixed Multiplier',
+        type: 'float',
+        title: 'Mixed Multiplier',
+        defval: 2.5,
+        options: [1.5, 2.5, 3.5],
+        tooltip: 'Band multiplier',
+        inline: 'band',
+        group: 'Bands',
+        confirm: true,
+        display: 4,
+        active: false,
+      },
+      {
         id: 'input_Timeframe',
         type: 'timeframe',
         title: 'Timeframe',
@@ -843,11 +890,28 @@ plot(tf == "60", title="Timeframe")
         display: 0,
         active: true,
       },
+      {
+        id: 'input_Mixed Timeframe',
+        type: 'timeframe',
+        title: 'Mixed Timeframe',
+        defval: '60',
+        options: ['15', '60'],
+        tooltip: 'Higher timeframe',
+        inline: 'tf',
+        group: 'Calculation',
+        confirm: true,
+        display: 0,
+        active: true,
+      },
     ]);
     expect(getPlot(result, 'Mode').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Mixed Mode').values).toEqual(getPlot(result, 'Mode').values);
     expect(getPlot(result, 'Fast').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Mixed Fast').values).toEqual(getPlot(result, 'Fast').values);
     expect(getPlot(result, 'Multiplier').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Mixed Multiplier').values).toEqual(getPlot(result, 'Multiplier').values);
     expect(getPlot(result, 'Timeframe').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Mixed Timeframe').values).toEqual(getPlot(result, 'Timeframe').values);
   });
 
   it('runs price input and active metadata idioms', () => {
