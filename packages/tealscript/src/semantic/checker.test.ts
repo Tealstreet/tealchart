@@ -1751,16 +1751,25 @@ tooManyBarsSince = ta.barssince(close > open, true)
     const result = checkProgram(parse(`
 indicator("TA Stats Signatures")
 variance = ta.variance(source=close, length=3, biased=false)
+varianceMixed = ta.variance(source=close, 3, false)
 deviation = ta.dev(source=close, length=3)
+deviationMixed = ta.dev(source=close, 3)
 correlation = ta.correlation(source1=close, source2=open, length=3)
+correlationMixed = ta.correlation(source1=close, open, 3)
 cog = ta.cog(source=close, length=3)
+mixedCog = ta.cog(source=close, 3)
 median = ta.median(source=close, length=3)
+medianMixed = ta.median(source=close, 3)
 mode = ta.mode(source=close, length=3)
+modeMixed = ta.mode(source=close, 3)
 nearest = ta.percentile_nearest_rank(source=close, length=3, percentage=75)
+nearestMixed = ta.percentile_nearest_rank(source=close, 3, 75)
 linear = ta.percentile_linear_interpolation(source=close, length=3, percentage=75)
+linearMixed = ta.percentile_linear_interpolation(source=close, 3, 75)
 rank = ta.percentrank(source=close, length=3)
+rankMixed = ta.percentrank(source=close, 3)
 total = ta.cum(source=close)
-plot(variance + deviation + correlation + cog + median + mode + nearest + linear + rank + total)
+plot(variance + varianceMixed + deviation + deviationMixed + correlation + correlationMixed + cog + mixedCog + median + medianMixed + mode + modeMixed + nearest + nearestMixed + linear + linearMixed + rank + rankMixed + total)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -1932,10 +1941,11 @@ shortLinreg = ta.linreg(source=close, length=3)
 indicator("Remaining TA Signatures")
 [line, signal, hist] = ta.macd(source=close, fastlen=12, slowlen=26, siglen=9)
 legacyObv = ta.obv(source=close, volume=volume)
+mixedObv = ta.obv(source=close, volume)
 currentObv = ta.obv
 range = ta.tr(handle_na=true)
 rawRange = ta.tr
-plot(line + signal + hist + legacyObv + currentObv + range + rawRange)
+plot(line + signal + hist + legacyObv + mixedObv + currentObv + range + rawRange)
 `));
 
     expect(result.diagnostics).toEqual([]);
