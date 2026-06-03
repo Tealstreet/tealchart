@@ -516,6 +516,7 @@ identity(float value) => value
 price(float value) => value + close
 marker(float value) => label.new(bar_index, value)
 values(float value) => array.from(value)
+recursive(float value) => recursive(value)
 inputValue = input.float(1)
 constIdentity = identity(1)
 inputIdentity = identity(inputValue)
@@ -523,6 +524,8 @@ seriesIdentity = identity(close)
 seriesPrice = price(1)
 seriesMarker = marker(close)
 seriesValues = values(close)
+constRecursive = recursive(1)
+seriesRecursive = recursive(close)
 plot(seriesPrice + array.size(seriesValues))
 `));
 
@@ -535,6 +538,8 @@ plot(seriesPrice + array.size(seriesValues))
     expect(types.get('seriesPrice')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('seriesMarker')).toMatchObject({ kind: 'label' });
     expect(types.get('seriesValues')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('constRecursive')).toMatchObject({ kind: 'unknown', qualifier: 'const' });
+    expect(types.get('seriesRecursive')).toMatchObject({ kind: 'unknown', qualifier: 'series' });
   });
 
   it('records value and reference types from annotations', () => {

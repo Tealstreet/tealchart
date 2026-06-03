@@ -953,6 +953,7 @@ class SemanticChecker {
   private typeDeclarations = new Map<string, TypeDeclaration>();
   private methodDeclarations = new Map<string, FunctionDeclaration[]>();
   private functionSymbolDeclarations = new WeakMap<SemanticSymbol, FunctionDeclaration>();
+  private activeReturnInferences = new Set<FunctionDeclaration>();
 
   check(program: Program): SemanticCheckResult {
     this.diagnostics = [];
@@ -960,6 +961,7 @@ class SemanticChecker {
     this.typeDeclarations = this.collectTypeDeclarations(program.body);
     this.methodDeclarations = this.collectMethodDeclarations(program.body);
     this.functionSymbolDeclarations = new WeakMap();
+    this.activeReturnInferences = new Set();
     this.checkLibraryExportDeclarations(program.body);
     this.checkStatements(program.body, this.rootScope);
     return {
@@ -1102,41 +1104,50 @@ class SemanticChecker {
   }
 
   private inferFunctionReturnType(declaration: FunctionDeclaration, parameterTypes = new Map<string, SemanticType>()): SemanticType | undefined {
-    const functionScope = new SemanticScope(this.rootScope);
-    for (const parameter of declaration.params) {
-      functionScope.declare({
-        name: parameter.name,
-        kind: 'parameter',
-        type: parameterTypes.get(parameter.name) ?? this.typeFromAnnotation(parameter.typeAnnotation ?? undefined),
-        loc: parameter.loc,
-      });
+    if (this.activeReturnInferences.has(declaration)) {
+      return { kind: 'unknown', qualifier: this.maxQualifier(...parameterTypes.values()) };
     }
 
-    if (!Array.isArray(declaration.body)) {
-      return this.inferExpressionType(declaration.body, functionScope);
-    }
-
-    let returnType: SemanticType | undefined;
-    for (const [index, statement] of declaration.body.entries()) {
-      const isLastStatement = index === declaration.body.length - 1;
-      if (statement.type === 'VariableDeclaration' && statement.names.type === 'VariableDeclarator') {
-        const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init, functionScope);
+    this.activeReturnInferences.add(declaration);
+    try {
+      const functionScope = new SemanticScope(this.rootScope);
+      for (const parameter of declaration.params) {
         functionScope.declare({
-          name: statement.names.name.name,
-          kind: 'variable',
-          type,
-          loc: statement.names.name.loc,
+          name: parameter.name,
+          kind: 'parameter',
+          type: parameterTypes.get(parameter.name) ?? this.typeFromAnnotation(parameter.typeAnnotation ?? undefined),
+          loc: parameter.loc,
         });
-        returnType = isLastStatement ? type : undefined;
-        continue;
       }
-      if (statement.type === 'ExpressionStatement') {
-        returnType = this.inferExpressionType(statement.expression, functionScope);
-        continue;
+
+      if (!Array.isArray(declaration.body)) {
+        return this.inferExpressionType(declaration.body, functionScope);
       }
-      returnType = undefined;
+
+      let returnType: SemanticType | undefined;
+      for (const [index, statement] of declaration.body.entries()) {
+        const isLastStatement = index === declaration.body.length - 1;
+        if (statement.type === 'VariableDeclaration' && statement.names.type === 'VariableDeclarator') {
+          const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init, functionScope);
+          functionScope.declare({
+            name: statement.names.name.name,
+            kind: 'variable',
+            type,
+            loc: statement.names.name.loc,
+          });
+          returnType = isLastStatement ? type : undefined;
+          continue;
+        }
+        if (statement.type === 'ExpressionStatement') {
+          returnType = this.inferExpressionType(statement.expression, functionScope);
+          continue;
+        }
+        returnType = undefined;
+      }
+      return returnType;
+    } finally {
+      this.activeReturnInferences.delete(declaration);
     }
-    return returnType;
   }
 
   private checkExportedTypeAnnotation(
