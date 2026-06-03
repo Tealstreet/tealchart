@@ -3519,7 +3519,9 @@ type Pivot
     float y
 pivot = Pivot.new(1, close)
 named = Pivot.new(x=2, y=high)
-plot(pivot.y + named.y)
+pivotY = pivot.y
+namedY = named.y
+plot(pivotY + namedY)
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -3527,6 +3529,8 @@ plot(pivot.y + named.y)
     expect(result.diagnostics).toEqual([]);
     expect(types.get('pivot')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
     expect(types.get('named')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
+    expect(types.get('pivotY')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('namedY')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports unknown user-defined type fields on reads and assignments', () => {
@@ -3545,7 +3549,7 @@ pivot.other := 1
       "Unknown field 'z' on type Pivot",
       "Unknown field 'other' on type Pivot",
     ]);
-    expect(result.symbols.find((symbol) => symbol.name === 'valid')?.type).toMatchObject({ kind: 'int' });
+    expect(result.symbols.find((symbol) => symbol.name === 'valid')?.type).toMatchObject({ kind: 'int', qualifier: 'series' });
   });
 
   it('does not treat user-defined method calls as field reads', () => {
