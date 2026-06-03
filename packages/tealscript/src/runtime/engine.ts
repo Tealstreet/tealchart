@@ -8245,8 +8245,9 @@ export class TealscriptEngine {
     // SuperTrend - ATR-based trend indicator
     // Returns [supertrend value, direction (1 = up, -1 = down)]
     this.builtins.set('ta.supertrend', (args, namedArgs, ctx, scope) => {
-      const factor = this.toNumber(this.getCallArg(args, namedArgs, 0, 'factor', 3.0));
-      const atrLength = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'atrPeriod', 10));
+      const taSupertrendArgs = ['factor', 'atrPeriod'];
+      const factor = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSupertrendArgs, 0, 3.0));
+      const atrLength = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSupertrendArgs, 1, 10));
 
       const high = ctx.high.get(0)!;
       const low = ctx.low.get(0)!;
@@ -8342,8 +8343,9 @@ export class TealscriptEngine {
     // DMI - Directional Movement Index
     // Returns [diPlus, diMinus, adx]
     this.builtins.set('ta.dmi', (args, namedArgs, ctx, scope) => {
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 0, 'diLength', 14));
-      const adxSmoothing = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'adxSmoothing', 14));
+      const taDmiArgs = ['diLength', 'adxSmoothing'];
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taDmiArgs, 0, 14));
+      const adxSmoothing = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taDmiArgs, 1, 14));
       if (length < 1 || adxSmoothing < 1) {
         return [NaN, NaN, NaN];
       }
@@ -8416,9 +8418,10 @@ export class TealscriptEngine {
 
     // SAR - Parabolic Stop and Reverse
     this.builtins.set('ta.sar', (args, namedArgs, ctx, scope) => {
-      const start = this.toNumber(this.getCallArg(args, namedArgs, 0, 'start', 0.02));
-      const increment = this.toNumber(this.getCallArg(args, namedArgs, 1, 'inc', 0.02));
-      const maximum = this.toNumber(this.getCallArg(args, namedArgs, 2, 'max', 0.2));
+      const taSarArgs = ['start', 'inc', 'max'];
+      const start = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSarArgs, 0, 0.02));
+      const increment = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSarArgs, 1, 0.02));
+      const maximum = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSarArgs, 2, 0.2));
 
       const high = ctx.high.get(0)!;
       const low = ctx.low.get(0)!;
@@ -8560,9 +8563,10 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.linreg', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
-      const offset = this.toNumber(this.getCallArg(args, namedArgs, 2, 'offset', 0));
+      const taLinregArgs = ['source', 'length', 'offset'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taLinregArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taLinregArgs, 1));
+      const offset = this.toNumber(this.getOrderedCallArg(args, namedArgs, taLinregArgs, 2, 0));
       const values = this.getCompleteSourceWindow(scope, `_ta_linreg_source_${callId}`, source, length);
       if (!values || isNaN(offset)) return NaN;
 
