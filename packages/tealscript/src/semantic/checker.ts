@@ -80,6 +80,7 @@ export interface SemanticSymbol {
   name: string;
   kind: SemanticSymbolKind;
   type?: SemanticType;
+  isMethod?: boolean;
   loc?: SourceLocation;
 }
 
@@ -102,6 +103,10 @@ class SemanticScope {
 
   lookup(name: string): SemanticSymbol | null {
     return this.symbols.get(name) ?? this.parent?.lookup(name) ?? null;
+  }
+
+  lookupLocal(name: string): SemanticSymbol | null {
+    return this.symbols.get(name) ?? null;
   }
 
   allSymbols(): SemanticSymbol[] {
@@ -1655,8 +1660,9 @@ class SemanticChecker {
   }
 
   private declareFunction(statement: FunctionDeclaration, scope: SemanticScope): void {
-    if (!statement.isMethod || !scope.lookup(statement.name.name)) {
-      this.declare(scope, { name: statement.name.name, kind: 'function', loc: statement.name.loc });
+    const existingLocal = scope.lookupLocal(statement.name.name);
+    if (!statement.isMethod || !existingLocal || existingLocal.kind !== 'function' || existingLocal.isMethod !== true) {
+      this.declare(scope, { name: statement.name.name, kind: 'function', isMethod: statement.isMethod, loc: statement.name.loc });
     }
     const functionScope = new SemanticScope(scope);
 
@@ -2938,7 +2944,17 @@ class SemanticChecker {
     const receiverMatches = methods.filter((method) => this.userMethodReceiverMatches(method, receiverType));
     if (!expression || !scope) return receiverMatches[0];
 
-    return receiverMatches.find((method) => this.userCallableCallFits(method, expression, 1, scope)) ?? receiverMatches[0];
+    const candidates = receiverMatches
+      .map((method) => ({
+        method,
+        score: this.userCallableSpecificityScore(method, expression, 1, scope),
+      }))
+      .filter((candidate): candidate is { method: FunctionDeclaration; score: number } => candidate.score !== undefined);
+    if (candidates.length === 0) return undefined;
+
+    const bestScore = Math.max(...candidates.map((candidate) => candidate.score));
+    const bestCandidates = candidates.filter((candidate) => candidate.score === bestScore);
+    return bestCandidates.length === 1 ? bestCandidates[0]?.method : undefined;
   }
 
   private userMethodReceiverMatches(method: FunctionDeclaration, receiverType: SemanticType): boolean {
@@ -2948,29 +2964,42 @@ class SemanticChecker {
       && this.isAssignableQualifier(methodReceiverType.qualifier, receiverType.qualifier);
   }
 
-  private userCallableCallFits(
+  private userCallableSpecificityScore(
     declaration: FunctionDeclaration,
     expression: CallExpression,
     parameterOffset: number,
     scope: SemanticScope,
-  ): boolean {
-    if (!this.callArgumentsFitParameters(expression.arguments, declaration.params.slice(parameterOffset))) return false;
+  ): number | undefined {
+    if (!this.callArgumentsFitParameters(expression.arguments, declaration.params.slice(parameterOffset))) return undefined;
 
+    let score = 0;
     for (const [index, parameter] of declaration.params.entries()) {
       if (index < parameterOffset) continue;
 
       const expectedType = this.typeFromAnnotation(parameter.typeAnnotation ?? undefined);
-      if (!expectedType) continue;
+      if (!expectedType) {
+        score += 1;
+        continue;
+      }
 
       const argument = this.getCallArgument(expression.arguments, parameter.name, index - parameterOffset);
       if (!argument) continue;
 
       const actualType = this.inferExpressionType(argument, scope);
-      if (!this.isAssignableType(expectedType, actualType)) return false;
-      if (!this.isAssignableQualifier(expectedType.qualifier, actualType.qualifier)) return false;
+      if (!this.isAssignableType(expectedType, actualType)) return undefined;
+      if (!this.isAssignableQualifier(expectedType.qualifier, actualType.qualifier)) return undefined;
+      score += this.typeSpecificityScore(expectedType, actualType);
+      score += expectedType.qualifier === actualType.qualifier ? 2 : 0;
     }
 
-    return true;
+    return score;
+  }
+
+  private typeSpecificityScore(expectedType: SemanticType, actualType: SemanticType): number {
+    if (expectedType.kind === actualType.kind) return 4;
+    if (expectedType.kind === 'float' && actualType.kind === 'int') return 2;
+    if (expectedType.kind === 'unknown' || actualType.kind === 'unknown') return 1;
+    return 0;
   }
 
   private callArgumentsFitParameters(args: CallArgument[], parameters: FunctionDeclaration['params']): boolean {

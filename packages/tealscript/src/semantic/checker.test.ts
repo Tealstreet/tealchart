@@ -3031,12 +3031,15 @@ type Pivot
 method value(Pivot this, float amount) => amount + this.y
 method value(Pivot this, string label) => label
 method value(Pivot this, bool enabled, float fallback = 1) => fallback
+method rank(Pivot this, float amount) => "float"
+method rank(Pivot this, int amount) => amount
 pivot = Pivot.new(close)
 numberValue = pivot.value(1)
 textValue = pivot.value("fast")
 namedText = pivot.value(label="slow")
 defaulted = pivot.value(true)
-plot(numberValue + str.length(textValue) + str.length(namedText) + defaulted)
+ranked = pivot.rank(1)
+plot(numberValue + str.length(textValue) + str.length(namedText) + defaulted + ranked)
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -3046,6 +3049,7 @@ plot(numberValue + str.length(textValue) + str.length(namedText) + defaulted)
     expect(types.get('textValue')).toMatchObject({ kind: 'string' });
     expect(types.get('namedText')).toMatchObject({ kind: 'string' });
     expect(types.get('defaulted')).toMatchObject({ kind: 'float' });
+    expect(types.get('ranked')).toMatchObject({ kind: 'int' });
   });
 
   it('does not report user method receiver mismatches for builtin collection member calls', () => {
