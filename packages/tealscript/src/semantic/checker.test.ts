@@ -2633,7 +2633,27 @@ total = ta.cum(source=close)
 plot(variance + varianceMixed + deviation + deviationMixed + correlation + correlationMixed + cog + mixedCog + median + medianMixed + mode + modeMixed + nearest + nearestMixed + linear + linearMixed + rank + rankMixed + total)
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('variance')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('varianceMixed')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('deviation')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('deviationMixed')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('correlation')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('correlationMixed')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('cog')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedCog')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('median')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('medianMixed')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mode')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('modeMixed')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('nearest')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('nearestMixed')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('linear')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('linearMixed')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('rank')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('rankMixed')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('total')).toEqual({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid TA statistics helper named arguments', () => {
