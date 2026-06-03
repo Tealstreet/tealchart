@@ -232,6 +232,65 @@ plot(strategy.netprofit, title="Net Profit")
     });
   });
 
+  it('runs strategy order helpers with named-prefix positional tails', () => {
+    const bars: Bar[] = [
+      { time: 1_700_000_000_000, open: 100, high: 103, low: 99, close: 102, volume: 100 },
+      { time: 1_700_000_060_000, open: 105, high: 107, low: 104, close: 106, volume: 100 },
+      { time: 1_700_000_120_000, open: 106, high: 110, low: 105, close: 108, volume: 100 },
+      { time: 1_700_000_180_000, open: 108, high: 109, low: 103, close: 104, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Strategy Prefix Args", initial_capital=1000)
+if bar_index == 0
+    strategy.entry(id="Long", strategy.long, 1)
+if bar_index == 1
+    strategy.exit(id="Bracket", "Long", na, na, na, 108, na, 99)
+plot(strategy.position_size, title="Position")
+plot(strategy.closedtrades, title="Closed Trades")
+plot(strategy.netprofit, title="Net Profit")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Position').values).toEqual([0, 1, 1, 0]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 0, 0, 1]);
+    expect(getPlot(result, 'Net Profit').values).toEqual([0, 0, 0, 3]);
+    expect(result.strategy.closedTrades[0]).toMatchObject({
+      entryOrderId: 'Long',
+      exitOrderId: 'Bracket Limit',
+      entryPrice: 105,
+      exitPrice: 108,
+      profit: 3,
+    });
+  });
+
+  it('runs strategy close helpers with named-prefix positional tails', () => {
+    const bars: Bar[] = [
+      { time: 1_700_300_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_300_060_000, open: 101, high: 102, low: 100, close: 101, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Strategy Close Prefix Args", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry(id="Long", strategy.long, 1)
+if bar_index == 1
+    strategy.close(id="Long", "close comment", 1, na, "close alert")
+plot(strategy.position_size, title="Position")
+plot(strategy.closedtrades, title="Closed Trades")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Position').values).toEqual([1, 0]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 1]);
+    expect(result.strategy.closedTrades[0]).toMatchObject({
+      entryOrderId: 'Long',
+      exitOrderId: 'Close Long',
+      exitBarIndex: 1,
+    });
+    expect(result.alerts.find((alert) => alert.id === 'strategy_order_fills')?.events.map((event) => event.message)).toEqual([
+      'close alert',
+    ]);
+  });
+
   it('locks a reduced official strategy bar-magnifier idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const baseTime = 1_700_100_000_000;
