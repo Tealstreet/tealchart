@@ -257,6 +257,18 @@ const SYMINFO_STRING_MEMBER_NAMES = new Set([
 const SYMINFO_INT_MEMBER_NAMES = new Set(['syminfo.minmove', 'syminfo.pricescale']);
 const SYMINFO_FLOAT_MEMBER_NAMES = new Set(['syminfo.mincontract', 'syminfo.mintick', 'syminfo.pointvalue']);
 
+const TICKER_STRING_RETURN_NAMES = new Set([
+  'ticker.heikinashi',
+  'ticker.inherit',
+  'ticker.kagi',
+  'ticker.linebreak',
+  'ticker.modify',
+  'ticker.new',
+  'ticker.pointfigure',
+  'ticker.renko',
+  'ticker.standard',
+]);
+
 const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['box.copy', 'box'],
   ['box.new', 'box'],
@@ -3834,6 +3846,8 @@ class SemanticChecker {
     if (taType) return taType;
     const timeType = this.inferTimeCallType(calleePath);
     if (timeType) return timeType;
+    const tickerType = this.inferTickerCallType(calleePath);
+    if (tickerType) return tickerType;
     if (namespace === 'input') return { kind: 'unknown', qualifier: 'input' };
     if (namespace === 'request' || namespace === 'ta' || namespace === 'time' || namespace === 'time_close' || calleePath.join('.') === 'timeframe.change') {
       return { kind: 'unknown', qualifier: 'series' };
@@ -4009,6 +4023,10 @@ class SemanticChecker {
     if (calleeName === 'timeframe.from_seconds') return { kind: 'string', qualifier: 'simple' };
     if (calleeName === 'timestamp') return { kind: 'int', qualifier: 'const' };
     return undefined;
+  }
+
+  private inferTickerCallType(calleePath: string[]): SemanticType | undefined {
+    return TICKER_STRING_RETURN_NAMES.has(calleePath.join('.')) ? { kind: 'string', qualifier: 'simple' } : undefined;
   }
 
   private inferFixnanCallType(expression: CallExpression, scope: SemanticScope): SemanticType {
