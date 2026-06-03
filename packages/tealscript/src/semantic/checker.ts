@@ -3066,8 +3066,8 @@ class SemanticChecker {
     }
     if (BOOLEAN_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'bool', qualifier: 'series' };
     if (INTEGER_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'int', qualifier: 'series' };
-    if (COLOR_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'color' };
-    if (COLOR_CHANNEL_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float' };
+    if (COLOR_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'color', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+    if (COLOR_CHANNEL_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
     if (FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: 'series' };
     if (calleeName === 'label.get_x') return { kind: 'int' };
     if (calleeName === 'label.get_y') return { kind: 'float' };

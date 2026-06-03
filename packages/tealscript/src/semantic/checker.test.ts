@@ -3003,17 +3003,17 @@ plot(close, color=gradient)
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('base')).toMatchObject({ kind: 'color' });
-    expect(types.get('red')).toMatchObject({ kind: 'float' });
-    expect(types.get('green')).toMatchObject({ kind: 'float' });
-    expect(types.get('blue')).toMatchObject({ kind: 'float' });
-    expect(types.get('transparency')).toMatchObject({ kind: 'float' });
-    expect(types.get('derived')).toMatchObject({ kind: 'color' });
-    expect(types.get('gradient')).toMatchObject({ kind: 'color' });
-    expect(types.get('prefixBase')).toMatchObject({ kind: 'color' });
-    expect(types.get('prefixAlpha')).toMatchObject({ kind: 'color' });
-    expect(types.get('prefixNew')).toMatchObject({ kind: 'color' });
-    expect(types.get('prefixGradient')).toMatchObject({ kind: 'color' });
+    expect(types.get('base')).toMatchObject({ kind: 'color', qualifier: 'const' });
+    expect(types.get('red')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('green')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('blue')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('transparency')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('derived')).toMatchObject({ kind: 'color', qualifier: 'const' });
+    expect(types.get('gradient')).toMatchObject({ kind: 'color', qualifier: 'series' });
+    expect(types.get('prefixBase')).toMatchObject({ kind: 'color', qualifier: 'const' });
+    expect(types.get('prefixAlpha')).toMatchObject({ kind: 'color', qualifier: 'const' });
+    expect(types.get('prefixNew')).toMatchObject({ kind: 'color', qualifier: 'const' });
+    expect(types.get('prefixGradient')).toMatchObject({ kind: 'color', qualifier: 'series' });
   });
 
   it('reports invalid color helper named arguments', () => {
