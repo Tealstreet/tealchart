@@ -411,6 +411,9 @@ variadic `math.avg`, precision-aware `math.round`, `math.round_to_mintick`,
 The checkpoint fixture follows common Pine math idioms by averaging OHLC values,
 rounding to fixed precision, converting a right angle between radians and
 degrees, summing the latest non-`na` source values, and checking random bounds.
+Semantic analysis preserves known math constant and helper return types for
+downstream assignment diagnostics, including int/float overload distinctions for
+rounding helpers and series-only math helpers.
 
 ## Common Global Helper Coverage
 

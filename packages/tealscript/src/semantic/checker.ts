@@ -150,6 +150,30 @@ const INPUT_RETURN_TYPES = new Map<string, SemanticTypeKind>([
 const COLOR_CONSTRUCTOR_NAMES = new Set(['color.new', 'color.rgb']);
 const COLOR_CHANNEL_NAMES = new Set(['color.r', 'color.g', 'color.b', 'color.t']);
 
+const MATH_CONSTANT_NAMES = new Set(['math.pi', 'math.e', 'math.phi']);
+const MATH_PRESERVE_NUMERIC_NAMES = new Set(['math.abs', 'math.max', 'math.min']);
+const MATH_FLOAT_RETURN_NAMES = new Set([
+  'math.sqrt',
+  'math.log',
+  'math.log10',
+  'math.exp',
+  'math.sign',
+  'math.sin',
+  'math.cos',
+  'math.tan',
+  'math.asin',
+  'math.acos',
+  'math.atan',
+  'math.pow',
+]);
+const MATH_INT_RETURN_NAMES = new Set(['math.trunc', 'math.floor', 'math.ceil']);
+const MATH_SERIES_FLOAT_RETURN_NAMES = new Set([
+  'math.sum',
+  'math.random',
+  'math.toradians',
+  'math.todegrees',
+]);
+
 const STRING_RETURN_NAMES = new Set([
   'str.tostring',
   'str.format_time',
@@ -3429,6 +3453,10 @@ class SemanticChecker {
         if (expression.object.type === 'Identifier' && expression.object.name === 'session') {
           return this.inferMemberExpressionType(expression, scope);
         }
+        if (expression.object.type === 'Identifier' && expression.object.name === 'math') {
+          const mathConstantType = this.inferMathConstantType(expression);
+          if (mathConstantType) return mathConstantType;
+        }
         if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
           return { kind: 'unknown', qualifier: 'const' };
         }
@@ -3723,6 +3751,8 @@ class SemanticChecker {
     if (inputType) return inputType;
     const colorType = this.inferColorCallType(expression, scope, calleePath);
     if (colorType) return colorType;
+    const mathType = this.inferMathCallType(expression, scope, calleePath);
+    if (mathType) return mathType;
     const stringType = this.inferStringCallType(expression, scope, calleePath);
     if (stringType) return stringType;
     if (namespace === 'input') return { kind: 'unknown', qualifier: 'input' };
@@ -3813,6 +3843,37 @@ class SemanticChecker {
       return { kind: 'float', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
     }
     return undefined;
+  }
+
+  private inferMathConstantType(expression: MemberExpression): SemanticType | undefined {
+    return MATH_CONSTANT_NAMES.has(this.memberPath(expression).join('.')) ? { kind: 'float', qualifier: 'const' } : undefined;
+  }
+
+  private inferMathCallType(expression: CallExpression, scope: SemanticScope, calleePath: string[]): SemanticType | undefined {
+    const calleeName = calleePath.join('.');
+    const qualifier = this.inferCallArgumentMaxQualifier(expression, scope);
+    if (MATH_PRESERVE_NUMERIC_NAMES.has(calleeName)) {
+      return { kind: this.inferAllIntArguments(expression, scope) ? 'int' : 'float', qualifier };
+    }
+    if (MATH_FLOAT_RETURN_NAMES.has(calleeName)) return { kind: 'float', qualifier };
+    if (MATH_INT_RETURN_NAMES.has(calleeName)) return { kind: 'int', qualifier };
+    if (MATH_SERIES_FLOAT_RETURN_NAMES.has(calleeName)) return { kind: 'float', qualifier: 'series' };
+    if (calleeName === 'math.avg' || calleeName === 'math.round_to_mintick') {
+      return { kind: 'float', qualifier: this.simpleOrSeriesQualifier(qualifier) };
+    }
+    if (calleeName === 'math.round') {
+      const precision = this.inferCallArgumentType(expression, scope, ['number', 'precision'], 1);
+      return { kind: precision ? 'float' : 'int', qualifier };
+    }
+    return undefined;
+  }
+
+  private inferAllIntArguments(expression: CallExpression, scope: SemanticScope): boolean {
+    return expression.arguments.length > 0 && expression.arguments.every((argument) => this.inferExpressionType(argument.value, scope).kind === 'int');
+  }
+
+  private simpleOrSeriesQualifier(qualifier: SemanticQualifier | undefined): SemanticQualifier {
+    return qualifier === 'series' ? 'series' : 'simple';
   }
 
   private inferStringCallType(expression: CallExpression, scope: SemanticScope, calleePath: string[]): SemanticType | undefined {
