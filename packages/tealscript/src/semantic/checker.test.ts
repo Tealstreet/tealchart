@@ -3239,7 +3239,23 @@ prefixPointFigure = ticker.pointfigure(symbol="NASDAQ:AAPL", "hl", "ATR", 14, 3)
 plot(str.length(standard + inherited + prefixInherited + renko + prefixRenko + lineBreak + prefixLineBreak + kagi + prefixKagi + pointFigure + prefixPointFigure))
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('base')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('prefixBase')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('modified')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('prefixModified')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('standard')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('inherited')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('prefixInherited')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('renko')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('prefixRenko')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('lineBreak')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('prefixLineBreak')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('kagi')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('prefixKagi')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('pointFigure')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('prefixPointFigure')).toMatchObject({ kind: 'string', qualifier: 'simple' });
   });
 
   it('reports invalid ticker helper named arguments', () => {
