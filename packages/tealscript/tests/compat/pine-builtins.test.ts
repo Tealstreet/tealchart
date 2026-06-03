@@ -372,6 +372,7 @@ indicator("Tail TA mixed helpers")
 [diPlus, diMinus, adx] = ta.dmi(diLength=3, 3)
 sar = ta.sar(start=0.02, 0.02, 0.2)
 linreg = ta.linreg(source=close, 3, 1)
+[macdLine, signalLine, histLine] = ta.macd(source=close, 3, 6, 2)
 plot(supertrend, title="Supertrend")
 plot(direction, title="Supertrend Direction")
 plot(diPlus, title="DI Plus")
@@ -379,6 +380,9 @@ plot(diMinus, title="DI Minus")
 plot(adx, title="ADX")
 plot(sar, title="SAR")
 plot(linreg, title="LinReg")
+plot(macdLine, title="MACD")
+plot(signalLine, title="Signal")
+plot(histLine, title="Hist")
 `);
 
     expect(positional.errors).toEqual([]);
@@ -1173,7 +1177,9 @@ plot(ta.lowest(length=3), title="Default Lowest")
 plot(ta.highestbars(length=3), title="Default Highest Offset")
 plot(ta.lowestbars(length=3), title="Default Lowest Offset")
 plot(ta.rising(source=close, length=2), title="Named Rising")
+plot(ta.rising(source=close, 2), title="Mixed Rising")
 plot(ta.falling(source=close, length=2), title="Named Falling")
+plot(ta.falling(source=close, 2), title="Mixed Falling")
 `);
 
     expect(result.errors).toEqual([]);
@@ -1185,7 +1191,9 @@ plot(ta.falling(source=close, length=2), title="Named Falling")
     expect(getPlot(result, 'Default Highest Offset').values).toEqual([0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1]);
     expect(getPlot(result, 'Default Lowest Offset').values).toEqual([0, 1, 2, 2, 0, 0, 1, 2, 2, 2, 2, 2]);
     expect(getPlot(result, 'Named Rising').values).toEqual([false, false, true, false, false, false, true, true, false, true, false, true]);
+    expect(getPlot(result, 'Mixed Rising').values).toEqual(getPlot(result, 'Named Rising').values);
     expect(getPlot(result, 'Named Falling').values).toEqual([false, false, false, true, true, false, false, false, false, false, false, false]);
+    expect(getPlot(result, 'Mixed Falling').values).toEqual(getPlot(result, 'Named Falling').values);
   });
 
   it('matches Pine TA windows over derived source expressions', () => {
@@ -1204,6 +1212,7 @@ plot(ta.wma(source=spread, 3), title="Mixed Spread WMA")
 plot(ta.highest(spread, 3), title="Spread Highest")
 plot(ta.lowest(spread, 3), title="Spread Lowest")
 plot(ta.range(spread, 3), title="Spread Range")
+plot(ta.range(source=spread, 3), title="Mixed Spread Range")
 plot(ta.mom(spread, 2), title="Spread Momentum")
 plot(ta.mom(source=spread, length=2), title="Named Spread Momentum")
 plot(ta.mom(source=spread, 2), title="Mixed Spread Momentum")
@@ -1225,6 +1234,7 @@ plot(ta.roc(source=spread, 2), title="Mixed Spread ROC")
     expect(roundSeries(getPlot(result, 'Spread Highest').values)).toEqual([2, 3, 3, 3, 2, 1, 4, 5, 5, 5, 3, 3]);
     expect(roundSeries(getPlot(result, 'Spread Lowest').values)).toEqual([2, 2, 2, -4, -4, -4, -4, 1, -1, -1, -1, -1]);
     expect(roundSeries(getPlot(result, 'Spread Range').values)).toEqual([0, 1, 1, 7, 6, 5, 8, 4, 6, 6, 4, 4]);
+    expect(roundSeries(getPlot(result, 'Mixed Spread Range').values)).toEqual(roundSeries(getPlot(result, 'Spread Range').values));
     expect(roundSeries(getPlot(result, 'Spread Momentum').values)).toEqual([null, null, 0, -7, -6, 5, 8, 4, -5, -2, 0, -1]);
     expect(roundSeries(getPlot(result, 'Named Spread Momentum').values)).toEqual(roundSeries(getPlot(result, 'Spread Momentum').values));
     expect(roundSeries(getPlot(result, 'Mixed Spread Momentum').values)).toEqual(roundSeries(getPlot(result, 'Spread Momentum').values));

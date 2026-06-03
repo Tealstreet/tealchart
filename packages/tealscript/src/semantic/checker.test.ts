@@ -1962,12 +1962,17 @@ shortLinreg = ta.linreg(source=close, length=3)
     const result = checkProgram(parse(`
 indicator("Remaining TA Signatures")
 [line, signal, hist] = ta.macd(source=close, fastlen=12, slowlen=26, siglen=9)
+[mixedLine, mixedSignal, mixedHist] = ta.macd(source=close, 12, 26, 9)
 legacyObv = ta.obv(source=close, volume=volume)
 mixedObv = ta.obv(source=close, volume)
 currentObv = ta.obv
 range = ta.tr(handle_na=true)
 rawRange = ta.tr
-plot(line + signal + hist + legacyObv + mixedObv + currentObv + range + rawRange)
+spread = ta.range(source=close, 3)
+up = ta.rising(source=close, 2)
+down = ta.falling(source=close, 2)
+plot(line + signal + hist + mixedLine + mixedSignal + mixedHist + legacyObv + mixedObv + currentObv + range + rawRange + spread)
+plotshape(up or down)
 `));
 
     expect(result.diagnostics).toEqual([]);
