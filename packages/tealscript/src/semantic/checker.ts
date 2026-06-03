@@ -146,8 +146,10 @@ const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['line.copy', 'line'],
   ['line.new', 'line'],
   ['linefill.new', 'linefill'],
+  ['hline', 'hline'],
   ['polyline.copy', 'polyline'],
   ['polyline.new', 'polyline'],
+  ['plot', 'plot'],
   ['table.new', 'table'],
 ]);
 

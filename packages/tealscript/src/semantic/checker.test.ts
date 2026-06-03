@@ -2769,7 +2769,7 @@ indicator("Visual Output Mixed Args")
 upper = plot(series=high, "Upper", color.green)
 lower = plot(series=low, "Lower", color.red)
 plot(series=close, "Mixed Plot", color.blue, 2, plot.style_columns)
-hline(price=100, "Mixed HLine", color.orange, hline.style_dashed, 2)
+guide = hline(price=100, "Mixed HLine", color.orange, hline.style_dashed, 2)
 bgcolor(color=color.blue, 1, false, 3, "Mixed Bg")
 barcolor(color=color.red, 1, true, 4, "Mixed Bar")
 plotbar(open=open, high, low, close, "Mixed Bars", color.purple, false, 5, display.none)
@@ -2781,7 +2781,12 @@ fill(plot1=upper, lower, color.new(color.orange, 80), "Mixed Fill", false, 6)
 fill(hline1=upper, hline2=lower, color=color.new(color.blue, 90))
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('upper')).toMatchObject({ kind: 'plot', qualifier: 'series' });
+    expect(types.get('lower')).toMatchObject({ kind: 'plot', qualifier: 'series' });
+    expect(types.get('guide')).toMatchObject({ kind: 'hline', qualifier: 'series' });
   });
 
   it('reports duplicate built-in bindings from positional and named arguments', () => {
