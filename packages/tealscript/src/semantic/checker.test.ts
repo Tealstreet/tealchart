@@ -686,12 +686,20 @@ blockPair(float value, string mode) => switch mode
         [basis, "basis"]
     =>
         [value, "fallback"]
+partialPair(float value, string mode) => switch mode
+    "price" => [value, "partial"]
+partialBlockPair(float value, string mode) => switch mode
+    "basis" =>
+        basis = value + 1
+        [basis, "partial block"]
 mixedShapePair(float value, string mode) => switch mode
     "price" => [value, "price"]
     => value
 [keyedValue, keyedTitle] = keyedPair(close, "wide")
 [conditionValue, conditionTitle] = conditionPair(close)
 [blockValue, blockTitle] = blockPair(close, "basis")
+[partialValue, partialTitle] = partialPair(close, "price")
+[partialBlockValue, partialBlockTitle] = partialBlockPair(close, "basis")
 [unknownValue, unknownTitle] = mixedShapePair(close, "price")
 keyedValue := "bad"
 keyedTitle := 1
@@ -699,9 +707,13 @@ conditionValue := "bad"
 conditionTitle := 2
 blockValue := "bad"
 blockTitle := 3
+partialValue := "bad"
+partialTitle := 4
+partialBlockValue := "bad"
+partialBlockTitle := 5
 unknownValue := "still unknown"
-unknownTitle := 4
-plot(keyedValue + conditionValue + blockValue)
+unknownTitle := 6
+plot(keyedValue + conditionValue + blockValue + partialValue + partialBlockValue)
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -713,6 +725,10 @@ plot(keyedValue + conditionValue + blockValue)
       'Cannot assign int value to string variable conditionTitle',
       'Cannot assign string value to float variable blockValue',
       'Cannot assign int value to string variable blockTitle',
+      'Cannot assign string value to float variable partialValue',
+      'Cannot assign int value to string variable partialTitle',
+      'Cannot assign string value to float variable partialBlockValue',
+      'Cannot assign int value to string variable partialBlockTitle',
     ]);
     expect(types.get('keyedValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('keyedTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
@@ -720,6 +736,10 @@ plot(keyedValue + conditionValue + blockValue)
     expect(types.get('conditionTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
     expect(types.get('blockValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('blockTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('partialValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('partialTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('partialBlockValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('partialBlockTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
     expect(types.get('unknownValue')).toMatchObject({ kind: 'unknown' });
     expect(types.get('unknownTitle')).toMatchObject({ kind: 'unknown' });
   });
