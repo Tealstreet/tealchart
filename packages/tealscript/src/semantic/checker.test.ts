@@ -1534,6 +1534,42 @@ duplicateCopy = chart.point.copy(point, id=point)
     ]);
   });
 
+  it('resolves label.new named arguments and positional tails', () => {
+    const result = checkProgram(parse(`
+indicator("Label Signatures")
+first = label.new(x=bar_index, close, "Entry", xloc.bar_index, yloc.price, color.green, label.style_label_up, color.white, size.small)
+second = label.new(bar_index, high, text="High", color=color.orange, style=label.style_label_down)
+labels = array.from(first, second)
+plot(array.size(labels))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('first')).toMatchObject({ kind: 'label' });
+    expect(types.get('second')).toMatchObject({ kind: 'label' });
+    expect(types.get('labels')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
+  });
+
+  it('reports invalid label.new argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Label Signatures")
+unknown = label.new(bar_index, close, caption="Bad")
+missing = label.new(text="Only Text")
+duplicate = label.new(bar_index, close, x=bar_index)
+tooMany = label.new(bar_index, close, "A", xloc.bar_index, yloc.price, color.green, label.style_label_up, color.white, size.small, "center", "tip", true, 1)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'caption' for label.new()",
+      'label.new() expects at least 2 arguments',
+      "label.new() missing required argument 'x'",
+      "label.new() missing required argument 'y'",
+      "Argument 'x' for label.new() was supplied multiple times",
+      'label.new() expects at most 12 arguments',
+    ]);
+  });
+
   it('infers homogeneous array literal and array.from element types', () => {
     const result = checkProgram(parse(`
 indicator("Array Literal Types")
