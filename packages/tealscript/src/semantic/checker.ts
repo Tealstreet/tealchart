@@ -2973,6 +2973,19 @@ class SemanticChecker {
     const calleeName = calleePath.join('.');
     const referenceReturnType = REFERENCE_CONSTRUCTOR_RETURN_TYPES.get(calleeName);
     if (referenceReturnType) return { kind: referenceReturnType };
+    if (calleeName === 'label.get_x') return { kind: 'int' };
+    if (calleeName === 'label.get_y') return { kind: 'float' };
+    if (calleeName === 'label.get_color' || calleeName === 'label.get_textcolor') return { kind: 'color' };
+    if (
+      calleeName === 'label.get_text'
+      || calleeName === 'label.get_xloc'
+      || calleeName === 'label.get_yloc'
+      || calleeName === 'label.get_style'
+      || calleeName === 'label.get_size'
+      || calleeName === 'label.get_tooltip'
+    ) {
+      return { kind: 'string' };
+    }
     if (calleeName === 'line.get_x1' || calleeName === 'line.get_x2') return { kind: 'int' };
     if (calleeName === 'line.get_y1' || calleeName === 'line.get_y2' || calleeName === 'line.get_price') return { kind: 'float' };
     if (calleeName === 'box.get_left' || calleeName === 'box.get_right') return { kind: 'int' };
