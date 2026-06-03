@@ -330,8 +330,9 @@ conservative primitive/reference field type mismatches in local UDT field
 defaults, constructors, and field assignments. Annotated local variables also
 reject mismatched primitive, reference, collection, UDT, and enum initializer
 values when both sides have usable semantic types. Plain identifier `:=`
-reassignments reject mismatched values and qualifier downgrades when the target
-and source have known semantic types. Plain identifier compound assignments
+reassignments and local UDT field `:=` assignments reject mismatched values and
+qualifier downgrades when the target and source have known semantic types.
+Plain identifier compound assignments
 reject known unsupported operand combinations and result values that cannot be
 assigned back to the target, and local UDT field compound assignments apply the
 same checks to known field types. Array element compound assignments apply the
