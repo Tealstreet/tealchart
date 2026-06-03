@@ -3842,7 +3842,7 @@ plot(hasUsdt and starts ? 1 : 0)
     expect(types.get('matched')).toMatchObject({ kind: 'string', qualifier: 'const' });
     expect(types.get('repeated')).toMatchObject({ kind: 'string', qualifier: 'const' });
     expect(types.get('upper')).toMatchObject({ kind: 'string', qualifier: 'const' });
-    expect(types.get('parts')).toMatchObject({ kind: 'array', elementType: { kind: 'string' } });
+    expect(types.get('parts')).toMatchObject({ kind: 'array', qualifier: 'const', elementType: { kind: 'string' } });
   });
 
   it('reports invalid string helper named arguments', () => {

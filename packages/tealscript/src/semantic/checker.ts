@@ -3825,6 +3825,7 @@ class SemanticChecker {
     if (calleeName === 'str.split') {
       return {
         kind: 'array',
+        qualifier,
         elementType: { kind: 'string' },
       };
     }
