@@ -764,6 +764,10 @@ plot(first + last + value + removed + popped + shifted + size + array.size(fromV
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('values')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
+    expect(types.get('mixed')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('fromValues')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
+    expect(types.get('copied')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
     expect(types.get('removed')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('first')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('last')).toMatchObject({ kind: 'int', qualifier: 'series' });
@@ -2530,11 +2534,11 @@ joinedValue = floatValues.join(",")
     expect(types.get('name')).toMatchObject({ kind: 'string' });
     expect(types.get('tint')).toMatchObject({ kind: 'color' });
     expect(types.get('values')).toMatchObject({ kind: 'array' });
-    expect(types.get('copied')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
-    expect(types.get('sliced')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
-    expect(types.get('absolute')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
-    expect(types.get('standardized')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
-    expect(types.get('indices')).toMatchObject({ kind: 'array', elementType: { kind: 'int' } });
+    expect(types.get('copied')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('sliced')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('absolute')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('standardized')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('indices')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'int' } });
     expect(types.get('sizeValue')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('hasValue')).toMatchObject({ kind: 'bool', qualifier: 'series' });
     expect(types.get('indexValue')).toMatchObject({ kind: 'int', qualifier: 'series' });
