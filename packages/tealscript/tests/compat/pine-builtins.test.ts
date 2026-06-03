@@ -633,6 +633,7 @@ plot(namedGeneric == 4, title="Named Generic")
 indicator("Global helper docs smoke")
 source = bar_index % 3 == 0 ? na : close
 plot(nz(source=source, replacement=open), title="Named NZ")
+plot(nz(source=source, open), title="Prefix NZ")
 plot(fixnan(source=source), title="Named Fix")
 plot(float(x="4.5"), title="Named Float")
 plot(int(x=4.9), title="Named Int")
@@ -643,6 +644,7 @@ plot(na(x=source), title="Named NA")
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Named NZ').values)).toEqual([100, 105, 107, 107, 99, 100, 100, 109, 108, 108, 110, 112]);
+    expect(roundSeries(getPlot(result, 'Prefix NZ').values)).toEqual([100, 105, 107, 107, 99, 100, 100, 109, 108, 108, 110, 112]);
     expect(roundSeries(getPlot(result, 'Named Fix').values)).toEqual([null, 105, 107, 107, 99, 100, 100, 109, 108, 108, 110, 112]);
     expect(getPlot(result, 'Named Float').values).toEqual(Array(compatibilityBars.length).fill(4.5));
     expect(getPlot(result, 'Named Int').values).toEqual(Array(compatibilityBars.length).fill(4));

@@ -2092,6 +2092,23 @@ tooManyMintick = math.round_to_mintick(1.0, 2)
     ]);
   });
 
+  it('resolves global helper named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Global Helper Signatures")
+source = bar_index % 3 == 0 ? na : close
+filled = nz(source=source, open)
+fixed = fixnan(source=source)
+asFloat = float(x="4.5")
+asInt = int(x=4.9)
+asBool = bool(x=1)
+asString = string(x=12.5)
+isMissing = na(x=source)
+plot(filled + fixed + asFloat + asInt + (asBool ? 1 : 0) + str.length(asString) + (isMissing ? 1 : 0))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
   it('resolves ticker helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Ticker Signatures")
