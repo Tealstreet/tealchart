@@ -766,6 +766,31 @@ plot(title == "up" ? 1 : -1, title="Direction")
     expect(roundSeries(getPlot(result, 'Direction').values)).toEqual([1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, 1]);
   });
 
+  it('destructures switch initializer tuple values', () => {
+    const result = runCompatScript(`
+indicator("Switch initializer tuple")
+mode = input.string("trend", "Mode", options=["trend", "body"])
+[selected, title] = switch mode
+    "trend" =>
+        basis = close > open ? close : open
+        [basis, "trend"]
+    "body" => [math.abs(close - open), "body"]
+    => [close, "fallback"]
+[direction, label] = switch
+    close > open => [1, "up"]
+    close < open => [-1, "down"]
+    => [0, "flat"]
+plot(selected, title="Selected")
+plot(direction, title="Direction")
+plot(title == "trend" and label != "flat" ? 1 : -1, title="Labels")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Selected').values)).toEqual([102, 105, 107, 107, 103, 100, 104, 109, 109, 111, 111, 112]);
+    expect(roundSeries(getPlot(result, 'Direction').values)).toEqual([1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, 1]);
+    expect(roundSeries(getPlot(result, 'Labels').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+  });
+
   it('supports nested user-defined functions inside indicators', () => {
     const result = runCompatScript(`
 indicator("UDF nested")
