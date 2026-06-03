@@ -171,10 +171,12 @@ const INTEGER_RETURN_FUNCTIONS = new Set([
 
 const FLOAT_RETURN_FUNCTIONS = new Set([
   'ta.alma',
+  'ta.cci',
   'ta.change',
   'ta.cog',
   'ta.correlation',
   'ta.cum',
+  'ta.cmo',
   'ta.dev',
   'ta.ema',
   'ta.highest',
@@ -182,6 +184,7 @@ const FLOAT_RETURN_FUNCTIONS = new Set([
   'ta.linreg',
   'ta.lowest',
   'ta.median',
+  'ta.mfi',
   'ta.mode',
   'ta.mom',
   'ta.percentile_linear_interpolation',
@@ -190,11 +193,15 @@ const FLOAT_RETURN_FUNCTIONS = new Set([
   'ta.range',
   'ta.rma',
   'ta.roc',
+  'ta.rsi',
   'ta.sma',
+  'ta.stoch',
   'ta.swma',
+  'ta.tsi',
   'ta.variance',
   'ta.vwma',
   'ta.wma',
+  'ta.wpr',
 ]);
 
 const BUILTIN_FUNCTIONS = new Set([

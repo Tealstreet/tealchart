@@ -2796,7 +2796,21 @@ cciMixed = ta.cci(source=hlc3, 3)
 plot(stoch + stochMixed + mfi + mfiMixed + wpr + cmo + cmoMixed + rsi + rsiMixed + tsi + tsiMixed + cci + cciMixed)
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('stoch')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('stochMixed')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mfi')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mfiMixed')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('wpr')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('cmo')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('cmoMixed')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('rsi')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('rsiMixed')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('tsi')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('tsiMixed')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('cci')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('cciMixed')).toEqual({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid TA oscillator helper named arguments', () => {
