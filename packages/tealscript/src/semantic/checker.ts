@@ -1878,6 +1878,17 @@ class SemanticChecker {
   private tupleInitializerShapesFromStatements(statements: Statement[], scope: SemanticScope): TupleInitializerShape[] {
     let shapes: TupleInitializerShape[] = [{ kind: 'non-tuple' }];
     for (const statement of statements) {
+      if (statement.type === 'VariableDeclaration' && statement.names.type === 'VariableDeclarator') {
+        const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferVariableInitializerType(statement.init, scope);
+        scope.declare({
+          name: statement.names.name.name,
+          kind: 'variable',
+          type,
+          loc: statement.names.name.loc,
+        });
+        shapes = [{ kind: 'non-tuple' }];
+        continue;
+      }
       if (statement.type === 'ExpressionStatement') {
         shapes = [this.tupleInitializerShapeFromExpression(statement.expression, scope)];
         continue;
