@@ -3807,13 +3807,13 @@ type Band
 method lift(Pivot this, float amount) =>
     this.y += amount
     this
-method values(Band this) =>
+method lift(Band this) =>
     this.values
 pivot = Pivot.new(close)
 band = Band.new(array.from(close))
 lifted = pivot.lift(1)
 liftedY = lifted.y
-bandValues = band.values()
+bandValues = band.lift()
 plot(liftedY + array.size(bandValues))
 `));
 

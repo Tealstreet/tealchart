@@ -82,6 +82,7 @@ export interface SemanticSymbol {
   name: string;
   kind: SemanticSymbolKind;
   type?: SemanticType;
+  isMethod?: boolean;
   loc?: SourceLocation;
 }
 
@@ -1949,6 +1950,7 @@ class SemanticChecker {
     this.declare(scope, {
       name: statement.name.name,
       kind: 'function',
+      isMethod: statement.isMethod,
       type: statement.isMethod ? undefined : this.inferFunctionReturnType(statement, scope),
       loc: statement.name.loc,
     });
@@ -4042,6 +4044,7 @@ class SemanticChecker {
   private declare(scope: SemanticScope, symbol: SemanticSymbol): void {
     const existing = scope.declare(symbol);
     if (!existing) return;
+    if (symbol.kind === 'function' && symbol.isMethod && existing.kind === 'function' && existing.isMethod) return;
     this.addDiagnostic('duplicate-symbol', `Duplicate declaration: ${symbol.name}`, symbol.loc);
   }
 
