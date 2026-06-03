@@ -2542,6 +2542,9 @@ last = ta.valuewhen(condition=condition, source=close, occurrence=0)
 lastMixed = ta.valuewhen(condition=condition, close, 0)
 changed = ta.change(source=close, length=2)
 changedMixed = ta.change(source=close, 2)
+crossoverValue = ta.crossover(source1=close, source2=open)
+crossunderValue = ta.crossunder(source1=close, source2=open)
+crossValue = ta.cross(source1=close, source2=open)
 crossed = ta.crossover(source1=close, source2=open) or ta.crossunder(source1=close, source2=open) or ta.cross(source1=close, source2=open)
 crossedMixed = ta.crossover(source1=close, open) or ta.crossunder(source1=close, open) or ta.cross(source1=close, open)
 highest = ta.highest(length=3)
@@ -2554,11 +2557,20 @@ mixedLowest = ta.lowest(source=low, 3)
 mixedHighestOffset = ta.highestbars(source=high, 3)
 mixedLowestOffset = ta.lowestbars(source=low, 3)
 spread = ta.range(source=close, length=3)
+risingValue = ta.rising(source=close, length=2)
+fallingValue = ta.falling(source=close, length=2)
 trend = ta.rising(source=close, length=2) or ta.falling(source=close, length=2)
 plot(since + last + lastMixed + changed + changedMixed + highest + lowest + highestOffset + lowestOffset + singleLengthHighest + mixedHighest + mixedLowest + mixedHighestOffset + mixedLowestOffset + spread + (crossed ? 1 : 0) + (crossedMixed ? 1 : 0) + (trend ? 1 : 0))
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('crossoverValue')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('crossunderValue')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('crossValue')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('risingValue')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('fallingValue')).toMatchObject({ kind: 'bool', qualifier: 'series' });
   });
 
   it('reports invalid core TA helper named arguments', () => {

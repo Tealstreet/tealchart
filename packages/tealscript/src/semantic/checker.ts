@@ -155,6 +155,14 @@ const CHART_POINT_FIELD_TYPES = new Map<string, SemanticTypeKind>([
   ['time', 'int'],
 ]);
 
+const BOOLEAN_RETURN_FUNCTIONS = new Set([
+  'ta.cross',
+  'ta.crossover',
+  'ta.crossunder',
+  'ta.falling',
+  'ta.rising',
+]);
+
 const BUILTIN_FUNCTIONS = new Set([
   'alert',
   'alertcondition',
@@ -2973,6 +2981,7 @@ class SemanticChecker {
     const calleeName = calleePath.join('.');
     const referenceReturnType = REFERENCE_CONSTRUCTOR_RETURN_TYPES.get(calleeName);
     if (referenceReturnType) return { kind: referenceReturnType };
+    if (BOOLEAN_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'bool', qualifier: 'series' };
     if (calleeName === 'label.get_x') return { kind: 'int' };
     if (calleeName === 'label.get_y') return { kind: 'float' };
     if (calleeName === 'label.get_color' || calleeName === 'label.get_textcolor') return { kind: 'color' };
