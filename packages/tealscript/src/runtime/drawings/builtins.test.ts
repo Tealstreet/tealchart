@@ -1101,6 +1101,44 @@ plot(close)`;
       expect(result.errors[0]?.message).toBe('Table merged cell range overlaps existing merged cells: columns 1-2, rows 0-1');
     });
 
+    it('clears merged table cell ranges touched by table.clear', () => {
+      const script = `//@version=6
+indicator("Table merged cell clear", overlay=true)
+var stats = table.new(position.bottom_right, 2, 1)
+if barstate.islast
+    table.cell(stats, 0, 0, "Header")
+    table.merge_cells(stats, 0, 0, 1, 0)
+    table.clear(stats, 0, 0, 1, 0)
+    table.cell(stats, 1, 0, "Value")
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(2);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        expect.objectContaining({
+          type: 'table',
+          cells: [
+            {
+              column: 1,
+              row: 0,
+              text: 'Value',
+              width: undefined,
+              height: undefined,
+              textColor: null,
+              textHalign: 'center',
+              textValign: 'middle',
+              textSize: 'normal',
+              bgcolor: null,
+            },
+          ],
+          mergedCells: [],
+        }),
+      ]);
+    });
+
     it('caps declared table cell capacity across live tables', () => {
       const script = `//@version=6
 indicator("Table cell limit", overlay=true)
