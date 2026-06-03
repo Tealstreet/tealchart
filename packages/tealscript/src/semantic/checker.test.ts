@@ -722,6 +722,29 @@ plot(numberValue + array.size(arrayValue) + matrix.rows(matrixValue) + map.size(
     expect(types.get('pivotValue')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
   });
 
+  it('preserves primitive types through unary expressions', () => {
+    const result = checkProgram(parse(`
+indicator("Unary Types")
+constInt = -5
+constFloat = +1.5
+seriesFloat = -close
+seriesInt = -bar_index
+seriesBool = not (close > open)
+inputBool = not input.bool(true)
+plot(constInt + constFloat + seriesFloat + seriesInt + (seriesBool ? 1 : 0) + (inputBool ? 1 : 0))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('constInt')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('constFloat')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('seriesFloat')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('seriesInt')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('seriesBool')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('inputBool')).toMatchObject({ kind: 'bool', qualifier: 'input' });
+  });
+
   it('reports map key and value template mismatches', () => {
     const result = checkProgram(parse(`
 indicator("Bad Map Types")
