@@ -592,8 +592,30 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['ta.percentile_nearest_rank', { params: ['source', 'length', 'percentage'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['ta.percentile_linear_interpolation', { params: ['source', 'length', 'percentage'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['ta.percentrank', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
-  ['ta.pivothigh', { params: ['source', 'leftbars', 'rightbars'], minArgs: 2, requiredParams: ['leftbars', 'rightbars'], optionalLeadingParam: 'source', maxArgs: 3 }],
-  ['ta.pivotlow', { params: ['source', 'leftbars', 'rightbars'], minArgs: 2, requiredParams: ['leftbars', 'rightbars'], optionalLeadingParam: 'source', maxArgs: 3 }],
+  [
+    'ta.pivothigh',
+    {
+      params: ['source', 'leftbars', 'rightbars'],
+      minArgs: 2,
+      requiredParams: ['leftbars', 'rightbars'],
+      optionalLeadingParam: 'source',
+      maxArgs: 3,
+      allowNamedPrefixWithPositional: true,
+      namedPrefixWithPositionalParams: ['source', 'leftbars'],
+    },
+  ],
+  [
+    'ta.pivotlow',
+    {
+      params: ['source', 'leftbars', 'rightbars'],
+      minArgs: 2,
+      requiredParams: ['leftbars', 'rightbars'],
+      optionalLeadingParam: 'source',
+      maxArgs: 3,
+      allowNamedPrefixWithPositional: true,
+      namedPrefixWithPositionalParams: ['source', 'leftbars'],
+    },
+  ],
   ['ta.mom', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ta.range', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ta.rising', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
@@ -2373,10 +2395,11 @@ class SemanticChecker {
       const boundParams = new Set<string>();
       const positionalBoundParams = new Set<string>();
       const seenNames = new Set<string>();
+      const positionalParams = this.positionalBindingParams(args, signature, params);
 
       for (const arg of args) {
         if (!arg.name) {
-          const positionalParam = params.find((param) => !boundParams.has(param));
+          const positionalParam = positionalParams.find((param) => !boundParams.has(param));
           if (positionalParam) {
             boundParams.add(positionalParam);
             positionalBoundParams.add(positionalParam);
@@ -2441,6 +2464,7 @@ class SemanticChecker {
   ): { boundParams: Set<string>; overflowArgs: CallArgument[] } {
     const boundParams = new Set<string>();
     const overflowArgs: CallArgument[] = [];
+    const positionalParams = this.positionalBindingParams(args, signature, params);
 
     for (const arg of args) {
       if (arg.name) {
@@ -2451,7 +2475,7 @@ class SemanticChecker {
         continue;
       }
 
-      const positionalParam = params.find((param) => !boundParams.has(param));
+      const positionalParam = positionalParams.find((param) => !boundParams.has(param));
       if (positionalParam) {
         boundParams.add(positionalParam);
       } else {
@@ -2460,6 +2484,12 @@ class SemanticChecker {
     }
 
     return { boundParams, overflowArgs };
+  }
+
+  private positionalBindingParams(args: CallArgument[], signature: BuiltinSignature, params: string[]): string[] {
+    const positionalCount = this.leadingPositionalCount(args);
+    const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
+    return this.omitsOptionalLeadingParam(params, positionalCount, suppliedNames, signature) ? params.slice(1) : params;
   }
 
   private canonicalSignatureArgumentName(name: string, signature: BuiltinSignature): string {

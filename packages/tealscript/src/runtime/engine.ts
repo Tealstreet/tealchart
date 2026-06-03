@@ -3948,6 +3948,28 @@ export class TealscriptEngine {
     return source === 'high' ? (ctx.high.get(0) ?? NaN) : (ctx.low.get(0) ?? NaN);
   }
 
+  private getTaPivotArgs(
+    args: unknown[],
+    namedArgs: Map<string, unknown>,
+    ctx: ExecutionContext,
+    defaultSource: 'high' | 'low',
+  ): [number, number, number] {
+    const usesExplicitSource = namedArgs.has('source') || args.length >= 3;
+    const params = usesExplicitSource ? ['source', 'leftbars', 'rightbars'] : ['leftbars', 'rightbars'];
+    const readArg = (name: string, index: number, fallback?: unknown): unknown => {
+      if (namedArgs.has(name)) return namedArgs.get(name);
+      const positionalIndex = index - params.slice(0, index).filter((param) => namedArgs.has(param)).length;
+      return args[positionalIndex] ?? fallback;
+    };
+
+    const source = usesExplicitSource ? this.toNumber(readArg('source', 0)) : this.getCurrentSeriesValue(ctx, defaultSource);
+    const leftIndex = usesExplicitSource ? 1 : 0;
+    const rightIndex = usesExplicitSource ? 2 : 1;
+    const leftBars = this.normalizeLookbackLength(readArg('leftbars', leftIndex, 5));
+    const rightBars = this.normalizeLookbackLength(readArg('rightbars', rightIndex, 5));
+    return [source, leftBars, rightBars];
+  }
+
   private toOptionalNumber(value: unknown): number | undefined {
     if (value === undefined || value === null || this.isNa(value)) return undefined;
     const numberValue = this.toNumber(value);
@@ -8508,13 +8530,7 @@ export class TealscriptEngine {
     // PivotHigh - Detect pivot highs
     // Returns the pivot high price or na
     this.builtins.set('ta.pivothigh', (args, namedArgs, ctx) => {
-      const hasSource = namedArgs.has('source') || args.length >= 3 || (args.length === 1 && namedArgs.size === 0);
-      const sourceArg = hasSource ? this.getCallArg(args, namedArgs, 0, 'source') : ctx.high.get(0)!;
-      const leftIndex = hasSource ? 1 : 0;
-      const rightIndex = hasSource ? 2 : 1;
-      const source = this.toNumber(sourceArg);
-      const leftBars = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, leftIndex, 'leftbars', 5));
-      const rightBars = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, rightIndex, 'rightbars', 5));
+      const [source, leftBars, rightBars] = this.getTaPivotArgs(args, namedArgs, ctx, 'high');
 
       const series = this.getSeriesForSource(source, ctx);
 
@@ -8541,13 +8557,7 @@ export class TealscriptEngine {
     // PivotLow - Detect pivot lows
     // Returns the pivot low price or na
     this.builtins.set('ta.pivotlow', (args, namedArgs, ctx) => {
-      const hasSource = namedArgs.has('source') || args.length >= 3 || (args.length === 1 && namedArgs.size === 0);
-      const sourceArg = hasSource ? this.getCallArg(args, namedArgs, 0, 'source') : ctx.low.get(0)!;
-      const leftIndex = hasSource ? 1 : 0;
-      const rightIndex = hasSource ? 2 : 1;
-      const source = this.toNumber(sourceArg);
-      const leftBars = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, leftIndex, 'leftbars', 5));
-      const rightBars = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, rightIndex, 'rightbars', 5));
+      const [source, leftBars, rightBars] = this.getTaPivotArgs(args, namedArgs, ctx, 'low');
 
       const series = this.getSeriesForSource(source, ctx);
 
