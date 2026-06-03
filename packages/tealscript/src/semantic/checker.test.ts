@@ -1442,7 +1442,7 @@ values.sort(0, order.ascending, true)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'matrix.sort() sort_field requires const int or const string, got input unknown',
+      'matrix.sort() sort_field requires const int or const string, got input string',
       'matrix.sort() sort_field requires const int or const string, got simple string',
       'matrix.sort() sort_field requires const int or const string, got series int',
       'matrix.sort() sort_field requires const int or const string, got unqualified int',
@@ -1477,12 +1477,12 @@ matrixValues.sort(0, order.ascending, inputField)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'array.sort() sort_field requires const int or const string, got input unknown',
+      'array.sort() sort_field requires const int or const string, got input string',
       'array.sort() sort_field requires const int or const string, got simple string',
       'array.sort() sort_field requires const int or const string, got series int',
       'array.sort() sort_field requires const int or const string, got unqualified int',
       'array.sort() sort_field must be a const int or const string, got bool',
-      'matrix.sort() sort_field requires const int or const string, got input unknown',
+      'matrix.sort() sort_field requires const int or const string, got input string',
     ]);
   });
 
@@ -3294,7 +3294,28 @@ price = input.price(101.25, "Level", "Drag level")
 mixedPrice = input.price(defval=101.25, "Mixed Level", "Drag mixed level")
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('rangeLength')).toMatchObject({ kind: 'int', qualifier: 'input' });
+    expect(types.get('mixedRangeLength')).toMatchObject({ kind: 'int', qualifier: 'input' });
+    expect(types.get('optionLength')).toMatchObject({ kind: 'int', qualifier: 'input' });
+    expect(types.get('mixedOptionLength')).toMatchObject({ kind: 'int', qualifier: 'input' });
+    expect(types.get('rangeFloat')).toMatchObject({ kind: 'float', qualifier: 'input' });
+    expect(types.get('mixedRangeFloat')).toMatchObject({ kind: 'float', qualifier: 'input' });
+    expect(types.get('optionFloat')).toMatchObject({ kind: 'float', qualifier: 'input' });
+    expect(types.get('mixedOptionFloat')).toMatchObject({ kind: 'float', qualifier: 'input' });
+    expect(types.get('tf')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('mixedTf')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('enabled')).toMatchObject({ kind: 'bool', qualifier: 'input' });
+    expect(types.get('mode')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('colorInput')).toMatchObject({ kind: 'color', qualifier: 'input' });
+    expect(types.get('start')).toMatchObject({ kind: 'int', qualifier: 'input' });
+    expect(types.get('symbol')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('session')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('memo')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('source')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('price')).toMatchObject({ kind: 'float', qualifier: 'input' });
+    expect(types.get('mixedPrice')).toMatchObject({ kind: 'float', qualifier: 'input' });
   });
 
   it('reports duplicate Pine input bindings against the selected overload', () => {
