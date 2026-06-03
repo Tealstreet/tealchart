@@ -3124,6 +3124,32 @@ plot(valid == Direction.up ? 1 : 0)
     ]);
   });
 
+  it('reports annotated enum and UDT variable type mismatches', () => {
+    const result = checkProgram(parse(`
+indicator("Annotated UDT Mismatches")
+enum Direction
+    up = "Up"
+    down = "Down"
+enum Mode
+    fast = "Fast"
+    slow = "Slow"
+type Pivot
+    float y
+type Other
+    float y
+Direction validDirection = Direction.up
+Direction badDirection = Mode.fast
+Pivot validPivot = Pivot.new(close)
+Pivot badPivot = Other.new(close)
+plot(validPivot.y)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign Mode value to Direction variable',
+      'Cannot assign Other value to Pivot variable',
+    ]);
+  });
+
   it('selects user-defined method overloads by receiver specificity', () => {
     const result = checkProgram(parse(`
 indicator("Method Receiver Specificity")

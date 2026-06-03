@@ -3451,15 +3451,22 @@ class SemanticChecker {
 
   private checkTypeCompatibility(annotation: TypeAnnotation | undefined | null, init: Expression, scope: SemanticScope, loc?: SourceLocation): void {
     const targetType = this.typeFromAnnotation(annotation);
-    if (!targetType?.qualifier) return;
+    if (!targetType) return;
 
     const initType = this.inferExpressionType(init, scope);
-    if (!initType.qualifier) return;
 
-    if (QUALIFIER_RANK[initType.qualifier] > QUALIFIER_RANK[targetType.qualifier]) {
+    if (targetType.qualifier && initType.qualifier && QUALIFIER_RANK[initType.qualifier] > QUALIFIER_RANK[targetType.qualifier]) {
       this.addDiagnostic(
         'qualifier-mismatch',
         `Cannot assign ${initType.qualifier} value to ${targetType.qualifier} ${targetType.kind}`,
+        loc,
+      );
+    }
+
+    if (targetType.kind === 'udt' && initType.kind === 'udt' && !this.isAssignableType(targetType, initType)) {
+      this.addDiagnostic(
+        'type-mismatch',
+        `Cannot assign ${this.formatSemanticType(initType)} value to ${this.formatSemanticType(targetType)} variable`,
         loc,
       );
     }
