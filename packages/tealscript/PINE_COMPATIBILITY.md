@@ -586,7 +586,9 @@ Host-provided point-series contexts cover `request.dividends()`,
 `request.earnings()`, `request.splits()`, `request.financial()`, and
 `request.economic()`. `request.seed()` evaluates expressions against
 deterministic seed contexts keyed by source and symbol; it does not fetch
-GitHub data at runtime.
+GitHub data at runtime. Semantic analysis preserves supported `request.*`
+return types for downstream diagnostics, including expression-preserving
+security/seed calls, lower-timeframe arrays, and float point-data helpers.
 Runtime execution enforces a Pine-style limit of 40 unique `request.*`
 contexts per script pass so dynamic request scripts cannot create unbounded
 host datafeed work. Visual output registration enforces Pine's 64 plot-output

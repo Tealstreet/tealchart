@@ -269,6 +269,15 @@ const TICKER_STRING_RETURN_NAMES = new Set([
   'ticker.standard',
 ]);
 
+const REQUEST_FLOAT_RETURN_NAMES = new Set([
+  'request.currency_rate',
+  'request.dividends',
+  'request.earnings',
+  'request.economic',
+  'request.financial',
+  'request.splits',
+]);
+
 const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['box.copy', 'box'],
   ['box.new', 'box'],
@@ -3844,6 +3853,8 @@ class SemanticChecker {
     if (stringType) return stringType;
     const taType = this.inferTaCallType(expression, scope, calleePath);
     if (taType) return taType;
+    const requestType = this.inferRequestCallType(expression, scope, calleePath);
+    if (requestType) return requestType;
     const timeType = this.inferTimeCallType(calleePath);
     if (timeType) return timeType;
     const tickerType = this.inferTickerCallType(calleePath);
@@ -4013,6 +4024,33 @@ class SemanticChecker {
     const positionalArguments = expression.arguments.filter((argument) => !argument.name);
     const source = expression.arguments.some((argument) => argument.name?.name === 'source') || positionalArguments.length > 1 ? namedSource : undefined;
     return source ? { ...source, qualifier: 'series' } : { kind: 'float', qualifier: 'series' };
+  }
+
+  private inferRequestCallType(expression: CallExpression, scope: SemanticScope, calleePath: string[]): SemanticType | undefined {
+    const calleeName = calleePath.join('.');
+    if (calleeName === 'request.security') {
+      const source = this.inferCallArgumentType(expression, scope, ['symbol', 'timeframe', 'expression'], 2);
+      return source ? { ...source, qualifier: 'series' } : { kind: 'unknown', qualifier: 'series' };
+    }
+    if (calleeName === 'request.security_lower_tf') {
+      const source = this.inferCallArgumentType(expression, scope, ['symbol', 'timeframe', 'expression'], 2);
+      return {
+        kind: 'array',
+        qualifier: 'series',
+        elementType: source ? this.withoutQualifier(source) : { kind: 'unknown' },
+      };
+    }
+    if (calleeName === 'request.seed') {
+      const source = this.inferCallArgumentType(expression, scope, ['source', 'symbol', 'expression'], 2);
+      return source ? { ...source, qualifier: 'series' } : { kind: 'unknown', qualifier: 'series' };
+    }
+    if (REQUEST_FLOAT_RETURN_NAMES.has(calleeName)) return { kind: 'float', qualifier: 'series' };
+    return undefined;
+  }
+
+  private withoutQualifier(type: SemanticType): SemanticType {
+    const { qualifier: _qualifier, ...rest } = type;
+    return rest;
   }
 
   private inferTimeCallType(calleePath: string[]): SemanticType | undefined {
