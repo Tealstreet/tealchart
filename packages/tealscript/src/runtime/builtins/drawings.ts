@@ -938,6 +938,8 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
         || cell.row < startRow
         || cell.row > endRow
       ));
+      const clearedRange = { startColumn, startRow, endColumn, endRow };
+      table.mergedCells = table.mergedCells?.filter((mergedCell) => !mergedCellRangesOverlap(mergedCell, clearedRange));
     });
     return undefined;
   });
