@@ -8484,20 +8484,24 @@ export class TealscriptEngine {
   }
 
   private registerTimeBuiltins(): void {
+    const timeframeArgs = ['timeframe'] as const;
+    const secondsArgs = ['seconds'] as const;
+    const calendarArgs = ['time', 'timezone'] as const;
+
     this.builtins.set('timestamp', (args, namedArgs) => this.evaluateTimestamp(args, namedArgs));
     this.builtins.set('time', (args, namedArgs) => this.evaluateTimeFilter(args, namedArgs, false));
     this.builtins.set('time_close', (args, namedArgs) => this.evaluateTimeFilter(args, namedArgs, true));
     this.builtins.set('timeframe.in_seconds', (args, namedArgs) => {
-      const timeframeArg = this.getCallArg(args, namedArgs, 0, 'timeframe', this.ctx.timeframe.period);
+      const timeframeArg = this.getOrderedCallArg(args, namedArgs, timeframeArgs, 0, this.ctx.timeframe.period);
       const timeframe = timeframeArg === undefined || timeframeArg === '' ? this.ctx.timeframe.period : this.toStringValue(timeframeArg);
       const duration = this.getTimeframeDurationMs(timeframe);
       return duration === null ? Number.NaN : duration / 1000;
     });
     this.builtins.set('timeframe.from_seconds', (args, namedArgs) => {
-      return this.timeframeFromSeconds(this.toNumber(this.getCallArg(args, namedArgs, 0, 'seconds')));
+      return this.timeframeFromSeconds(this.toNumber(this.getOrderedCallArg(args, namedArgs, secondsArgs, 0)));
     });
     this.builtins.set('timeframe.change', (args, namedArgs) => {
-      const timeframeArg = this.getCallArg(args, namedArgs, 0, 'timeframe', this.ctx.timeframe.period);
+      const timeframeArg = this.getOrderedCallArg(args, namedArgs, timeframeArgs, 0, this.ctx.timeframe.period);
       const timeframe = timeframeArg === undefined || timeframeArg === '' ? this.ctx.timeframe.period : this.toStringValue(timeframeArg);
       const duration = this.getTimeframeDurationMs(timeframe);
       const currentTime = this.ctx.time.get(0);
@@ -8512,8 +8516,8 @@ export class TealscriptEngine {
 
     for (const part of ['year', 'month', 'weekofyear', 'dayofmonth', 'dayofweek', 'hour', 'minute', 'second']) {
       this.builtins.set(part, (args, namedArgs) => {
-        const timestampArg = this.getCallArg(args, namedArgs, 0, 'time', this.ctx.time.get(0));
-        const timezoneArg = this.getCallArg(args, namedArgs, 1, 'timezone', this.ctx.syminfo.timezone);
+        const timestampArg = this.getOrderedCallArg(args, namedArgs, calendarArgs, 0, this.ctx.time.get(0));
+        const timezoneArg = this.getOrderedCallArg(args, namedArgs, calendarArgs, 1, this.ctx.syminfo.timezone);
         const timestamp = this.toNumber(timestampArg);
         const timezone = timezoneArg === undefined || timezoneArg === '' ? this.ctx.syminfo.timezone : this.toStringValue(timezoneArg);
         return this.getCalendarPart(part, timestamp, timezone);
@@ -8553,10 +8557,11 @@ export class TealscriptEngine {
   }
 
   private evaluateTimeFilter(args: unknown[], namedArgs: Map<string, unknown>, closeTime: boolean): number {
+    const timeArgs = ['timeframe', 'session', 'timezone'] as const;
     const timestamp = this.ctx.time.get(0) ?? Number.NaN;
-    const timeframeArg = this.getCallArg(args, namedArgs, 0, 'timeframe', this.ctx.timeframe.period);
-    const sessionArg = this.getCallArg(args, namedArgs, 1, 'session');
-    const timezoneArg = this.getCallArg(args, namedArgs, 2, 'timezone', this.ctx.syminfo.timezone);
+    const timeframeArg = this.getOrderedCallArg(args, namedArgs, timeArgs, 0, this.ctx.timeframe.period);
+    const sessionArg = this.getOrderedCallArg(args, namedArgs, timeArgs, 1);
+    const timezoneArg = this.getOrderedCallArg(args, namedArgs, timeArgs, 2, this.ctx.syminfo.timezone);
     const timeframe = timeframeArg === undefined || timeframeArg === '' ? this.ctx.timeframe.period : this.toStringValue(timeframeArg);
     const session = sessionArg === undefined || sessionArg === '' ? undefined : this.toStringValue(sessionArg);
     const timezone = timezoneArg === undefined || timezoneArg === '' ? this.ctx.syminfo.timezone : this.toStringValue(timezoneArg);
@@ -8574,6 +8579,7 @@ export class TealscriptEngine {
   }
 
   private evaluateTimestamp(args: unknown[], namedArgs: Map<string, unknown>): number {
+    const timestampDateArgs = ['year', 'month', 'day', 'hour', 'minute', 'second'] as const;
     if (args.length === 0 && namedArgs.size === 0) return Number.NaN;
 
     if (namedArgs.size === 0 && args.length === 1 && typeof args[0] === 'string') {
@@ -8582,20 +8588,20 @@ export class TealscriptEngine {
     }
 
     let timezone = this.ctx.syminfo.timezone;
-    let offset = 0;
+    let positionalDateArgs = args;
     if (namedArgs.has('timezone')) {
       timezone = this.toStringValue(namedArgs.get('timezone'));
     } else if (typeof args[0] === 'string') {
       timezone = this.toStringValue(args[0]);
-      offset = 1;
+      positionalDateArgs = args.slice(1);
     }
 
-    const year = this.toNumber(namedArgs.has('year') ? namedArgs.get('year') : args[offset]);
-    const month = this.toNumber(namedArgs.has('month') ? namedArgs.get('month') : args[offset + 1]);
-    const day = this.toNumber(namedArgs.has('day') ? namedArgs.get('day') : args[offset + 2]);
-    const hour = this.toNumber(namedArgs.has('hour') ? namedArgs.get('hour') : args[offset + 3] ?? 0);
-    const minute = this.toNumber(namedArgs.has('minute') ? namedArgs.get('minute') : args[offset + 4] ?? 0);
-    const second = this.toNumber(namedArgs.has('second') ? namedArgs.get('second') : args[offset + 5] ?? 0);
+    const year = this.toNumber(this.getOrderedCallArg(positionalDateArgs, namedArgs, timestampDateArgs, 0));
+    const month = this.toNumber(this.getOrderedCallArg(positionalDateArgs, namedArgs, timestampDateArgs, 1));
+    const day = this.toNumber(this.getOrderedCallArg(positionalDateArgs, namedArgs, timestampDateArgs, 2));
+    const hour = this.toNumber(this.getOrderedCallArg(positionalDateArgs, namedArgs, timestampDateArgs, 3, 0));
+    const minute = this.toNumber(this.getOrderedCallArg(positionalDateArgs, namedArgs, timestampDateArgs, 4, 0));
+    const second = this.toNumber(this.getOrderedCallArg(positionalDateArgs, namedArgs, timestampDateArgs, 5, 0));
 
     if ([year, month, day, hour, minute, second].some((value) => !Number.isFinite(value))) {
       return Number.NaN;

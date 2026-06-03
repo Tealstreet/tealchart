@@ -28,7 +28,9 @@ plot(last_bar_time, title="Last Bar Time")
     const result = checkProgram(parse(`
 indicator("Calendar Functions")
 stamp = timestamp("Asia/Singapore", 2024, 1, 6, 0, 5, 7)
+prefixStamp = timestamp(timezone="Asia/Singapore", 2024, 1, 6, 0, 5, 7)
 plot(year(time=stamp, timezone="Asia/Singapore"))
+plot(year(time=prefixStamp, "Asia/Singapore"))
 plot(month(time=stamp, timezone="Asia/Singapore"))
 plot(weekofyear(time=stamp, timezone="Asia/Singapore"))
 plot(dayofmonth(time=stamp, timezone="Asia/Singapore"))
@@ -45,10 +47,13 @@ plot(second(time=stamp, timezone="Asia/Singapore"))
     const result = checkProgram(parse(`
 indicator("Time Variants")
 stamp = timestamp(timezone="America/New_York", year=2024, month=1, day=5, hour=9, minute=30)
+prefixStamp = timestamp(timezone="America/New_York", 2024, 1, 5, 9, 30)
 dateStamp = timestamp("20 Aug 2024 00:00:00 +0000")
 plot(time(timeframe="60", session="0930-1600", timezone="America/New_York"))
+plot(time(timeframe="60", "0930-1600", "America/New_York"))
 plot(time_close(timeframe="60", session="0930-1600", timezone="America/New_York"))
-plot(stamp + dateStamp)
+plot(time_close(timeframe="60", "0930-1600", "America/New_York"))
+plot(stamp + prefixStamp + dateStamp)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -117,6 +122,9 @@ indicator("Timeframe Utilities")
 isLower = timeframe.in_seconds(timeframe="15") < timeframe.in_seconds("1D")
 rounded = timeframe.from_seconds(seconds=44)
 changed = timeframe.change(timeframe="60")
+prefixedSeconds = timeframe.in_seconds(timeframe="1D")
+prefixedRounded = timeframe.from_seconds(seconds=30)
+prefixedChanged = timeframe.change(timeframe="3")
 plot(isLower and changed ? 1 : 0)
 `));
 

@@ -239,20 +239,29 @@ plot(minuteGate ? 1 : 0, title="Minute Gate")
 indicator("Named timezone docs smoke")
 nyHour = hour(time, "America/New_York")
 nyOpen = timestamp("America/New_York", 2023, 11, 14, 17, 20, 20)
+prefixNyHour = hour(time=nyOpen, "America/New_York")
+prefixNyOpen = timestamp(timezone="America/New_York", 2023, 11, 14, 17, 20, 20)
 formatted = str.format_time(nyOpen, "yyyy-MM-dd HH:mm", "America/New_York")
 inNySession = not na(time(timeframe.period, "1718-1724", "America/New_York"))
+prefixInNySession = not na(time(timeframe=timeframe.period, "1718-1724", "America/New_York"))
 
 plot(nyHour, title="NY Hour")
 plot(nyOpen == time ? 1 : 0, title="NY Timestamp Match")
+plot(prefixNyHour, title="Prefix NY Hour")
+plot(prefixNyOpen == nyOpen ? 1 : 0, title="Prefix Timestamp Match")
 plot(formatted == "2023-11-14 17:20" ? 1 : 0, title="NY Formatted")
 plot(inNySession ? 1 : 0, title="NY Session")
+plot(prefixInNySession ? 1 : 0, title="Prefix NY Session")
 `);
 
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'NY Hour').values).toEqual([17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17]);
     expect(getPlot(result, 'NY Timestamp Match').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Prefix NY Hour').values).toEqual([17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17]);
+    expect(getPlot(result, 'Prefix Timestamp Match').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(getPlot(result, 'NY Formatted').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(getPlot(result, 'NY Session').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0]);
+    expect(getPlot(result, 'Prefix NY Session').values).toEqual(getPlot(result, 'NY Session').values);
   });
 
   it('matches common Pine session filter idioms', () => {
@@ -260,9 +269,13 @@ plot(inNySession ? 1 : 0, title="NY Session")
 indicator("Session docs smoke")
 regular = not na(time(timeframe.period, "2218-2224"))
 sessionClose = time_close("1", "2218-2224")
+prefixRegular = not na(time(timeframe=timeframe.period, "2218-2224"))
+prefixSessionClose = time_close(timeframe="1", "2218-2224")
 
 plot(regular ? 1 : 0, title="Regular Session")
 plot(na(sessionClose) ? 0 : 1, title="Session Close")
+plot(prefixRegular ? 1 : 0, title="Prefix Regular Session")
+plot(na(prefixSessionClose) ? 0 : 1, title="Prefix Session Close")
 plot(time_close - time, title="Bar Duration")
 plot(last_bar_time, title="Last Bar Time")
 `);
@@ -270,6 +283,8 @@ plot(last_bar_time, title="Last Bar Time")
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Regular Session').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0]);
     expect(getPlot(result, 'Session Close').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0]);
+    expect(getPlot(result, 'Prefix Regular Session').values).toEqual(getPlot(result, 'Regular Session').values);
+    expect(getPlot(result, 'Prefix Session Close').values).toEqual(getPlot(result, 'Session Close').values);
     expect(getPlot(result, 'Bar Duration').values).toEqual([
       3_600_000,
       3_600_000,

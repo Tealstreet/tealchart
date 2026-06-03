@@ -605,16 +605,16 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['ticker.linebreak', { params: ['symbol', 'number_of_lines'], minArgs: 2, maxArgs: 2 }],
   ['ticker.kagi', { params: ['symbol', 'style', 'param'], minArgs: 3, maxArgs: 3 }],
   ['ticker.pointfigure', { params: ['symbol', 'source', 'style', 'param', 'reversal'], minArgs: 5, maxArgs: 5 }],
-  ['time', { params: ['timeframe', 'session', 'timezone'], minArgs: 0, maxArgs: 3 }],
-  ['time_close', { params: ['timeframe', 'session', 'timezone'], minArgs: 0, maxArgs: 3 }],
-  ['timeframe.change', { params: ['timeframe'], minArgs: 0, maxArgs: 1 }],
-  ['timeframe.from_seconds', { params: ['seconds'], minArgs: 1, maxArgs: 1 }],
-  ['timeframe.in_seconds', { params: ['timeframe'], minArgs: 0, maxArgs: 1 }],
-  ['timestamp', { params: ['timezone', 'year', 'month', 'day', 'hour', 'minute', 'second'], minArgs: 1, maxArgs: 7 }],
+  ['time', { params: ['timeframe', 'session', 'timezone'], minArgs: 0, maxArgs: 3, allowNamedPrefixWithPositional: true }],
+  ['time_close', { params: ['timeframe', 'session', 'timezone'], minArgs: 0, maxArgs: 3, allowNamedPrefixWithPositional: true }],
+  ['timeframe.change', { params: ['timeframe'], minArgs: 0, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['timeframe.from_seconds', { params: ['seconds'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['timeframe.in_seconds', { params: ['timeframe'], minArgs: 0, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['timestamp', { params: ['timezone', 'year', 'month', 'day', 'hour', 'minute', 'second'], minArgs: 1, maxArgs: 7, allowNamedPrefixWithPositional: true }],
 ]);
 
 for (const name of CALENDAR_FUNCTION_NAMES) {
-  BUILTIN_SIGNATURES.set(name, { params: ['time', 'timezone'], minArgs: 1, maxArgs: 2 });
+  BUILTIN_SIGNATURES.set(name, { params: ['time', 'timezone'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true });
 }
 
 for (const name of STRATEGY_TRADE_ACCESSORS) {
