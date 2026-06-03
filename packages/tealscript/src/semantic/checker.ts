@@ -141,6 +141,14 @@ const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['table.new', 'table'],
 ]);
 
+const DRAWING_ALL_MEMBER_TYPES = new Map<string, SemanticTypeKind>([
+  ['box.all', 'box'],
+  ['label.all', 'label'],
+  ['line.all', 'line'],
+  ['linefill.all', 'linefill'],
+  ['polyline.all', 'polyline'],
+]);
+
 const BUILTIN_FUNCTIONS = new Set([
   'alert',
   'alertcondition',
@@ -2884,6 +2892,9 @@ class SemanticChecker {
         if (expression.object.type === 'Identifier' && expression.object.name === 'session') {
           return this.inferMemberExpressionType(expression, scope);
         }
+        if (this.isDrawingAllMemberExpression(expression)) {
+          return this.inferMemberExpressionType(expression, scope);
+        }
         if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
           return { kind: 'unknown', qualifier: 'const' };
         }
@@ -3194,6 +3205,10 @@ class SemanticChecker {
   private inferMemberExpressionType(expression: MemberExpression, scope: SemanticScope): SemanticType {
     const path = this.memberPath(expression);
     const memberName = path.join('.');
+    const drawingAllElementType = DRAWING_ALL_MEMBER_TYPES.get(memberName);
+    if (drawingAllElementType) {
+      return { kind: 'array', elementType: { kind: drawingAllElementType }, qualifier: 'series' };
+    }
     if (memberName === 'session.ismarket' || memberName === 'session.ispremarket' || memberName === 'session.ispostmarket') {
       return { kind: 'bool', qualifier: 'series' };
     }
@@ -3206,6 +3221,10 @@ class SemanticChecker {
 
     const field = this.findUdtField(objectType.name, expression.property.name);
     return this.typeFromAnnotation(field?.typeAnnotation ?? undefined) ?? { kind: 'unknown', qualifier: objectType.qualifier };
+  }
+
+  private isDrawingAllMemberExpression(expression: MemberExpression): boolean {
+    return DRAWING_ALL_MEMBER_TYPES.has(this.memberPath(expression).join('.'));
   }
 
   private memberPath(expression: Expression): string[] {
