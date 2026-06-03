@@ -1570,6 +1570,68 @@ tooMany = label.new(bar_index, close, "A", xloc.bar_index, yloc.price, color.gre
     ]);
   });
 
+  it('resolves label method named arguments and positional tails', () => {
+    const result = checkProgram(parse(`
+indicator("Label Method Signatures")
+marker = label.new(bar_index, close)
+clone = label.copy(id=marker)
+label.set_x(id=marker, bar_index + 1)
+label.set_y(marker, y=high)
+label.set_xy(id=marker, x=bar_index, y=low)
+label.set_text(marker, text="updated")
+label.set_xloc(id=marker, bar_index, xloc.bar_index)
+label.set_yloc(marker, yloc=yloc.abovebar)
+label.set_style(id=marker, label.style_label_down)
+label.set_color(marker, color=color.blue)
+label.set_textcolor(id=marker, color.white)
+label.set_size(marker, size=size.small)
+label.set_tooltip(id=marker, "tip")
+x = label.get_x(id=marker)
+y = label.get_y(marker)
+textValue = label.get_text(id=marker)
+xlocValue = label.get_xloc(marker)
+ylocValue = label.get_yloc(id=marker)
+styleValue = label.get_style(marker)
+colorValue = label.get_color(id=marker)
+textColorValue = label.get_textcolor(marker)
+sizeValue = label.get_size(id=marker)
+tooltipValue = label.get_tooltip(marker)
+labels = array.from(marker, clone)
+label.delete(id=clone)
+plot(array.size(labels) + x + y)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('clone')).toMatchObject({ kind: 'label' });
+    expect(types.get('labels')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
+  });
+
+  it('reports invalid label method argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Label Method Signatures")
+marker = label.new(bar_index, close)
+unknownSetter = label.set_text(marker, text="bad", caption="Bad")
+missingSetter = label.set_xy(id=marker, x=bar_index)
+duplicateSetter = label.set_color(marker, color.blue, id=marker)
+tooManyGetter = label.get_x(marker, marker)
+missingCopy = label.copy()
+unknownGetter = label.get_text(marker, format="raw")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'caption' for label.set_text()",
+      'label.set_xy() expects at least 3 arguments',
+      "label.set_xy() missing required argument 'y'",
+      "Argument 'id' for label.set_color() was supplied multiple times",
+      'label.get_x() expects at most 1 argument',
+      'label.copy() expects at least 1 argument',
+      "label.copy() missing required argument 'id'",
+      "Unknown argument 'format' for label.get_text()",
+    ]);
+  });
+
   it('resolves linefill.new named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Linefill Signatures")
