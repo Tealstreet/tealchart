@@ -49,14 +49,23 @@ indicator("Time Variants")
 stamp = timestamp(timezone="America/New_York", year=2024, month=1, day=5, hour=9, minute=30)
 prefixStamp = timestamp(timezone="America/New_York", 2024, 1, 5, 9, 30)
 dateStamp = timestamp("20 Aug 2024 00:00:00 +0000")
-plot(time(timeframe="60", session="0930-1600", timezone="America/New_York"))
-plot(time(timeframe="60", "0930-1600", "America/New_York"))
-plot(time_close(timeframe="60", session="0930-1600", timezone="America/New_York"))
-plot(time_close(timeframe="60", "0930-1600", "America/New_York"))
+sessionStart = time(timeframe="60", session="0930-1600", timezone="America/New_York")
+prefixSessionStart = time(timeframe="60", "0930-1600", "America/New_York")
+sessionEnd = time_close(timeframe="60", session="0930-1600", timezone="America/New_York")
+prefixSessionEnd = time_close(timeframe="60", "0930-1600", "America/New_York")
+plot(sessionStart + prefixSessionStart + sessionEnd + prefixSessionEnd)
 plot(stamp + prefixStamp + dateStamp)
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('stamp')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('prefixStamp')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('dateStamp')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('sessionStart')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('prefixSessionStart')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('sessionEnd')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('prefixSessionEnd')).toMatchObject({ kind: 'int', qualifier: 'series' });
   });
 
   it('accepts session state helpers and session constants', () => {
@@ -128,7 +137,14 @@ prefixedChanged = timeframe.change(timeframe="3")
 plot(isLower and changed ? 1 : 0)
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('isLower')).toMatchObject({ kind: 'bool', qualifier: 'simple' });
+    expect(types.get('rounded')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('changed')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('prefixedSeconds')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+    expect(types.get('prefixedRounded')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('prefixedChanged')).toMatchObject({ kind: 'bool', qualifier: 'series' });
   });
 
   it('accepts Pine log calls with format arguments', () => {

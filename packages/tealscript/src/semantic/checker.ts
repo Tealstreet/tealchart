@@ -3226,7 +3226,9 @@ class SemanticChecker {
 
     const namespace = calleePath[0];
     if (namespace === 'input') return { kind: 'unknown', qualifier: 'input' };
-    if (namespace === 'request' || namespace === 'ta' || namespace === 'time' || namespace === 'time_close' || calleePath.join('.') === 'timeframe.change') {
+    if (calleeName === 'time' || calleeName === 'time_close') return { kind: 'int', qualifier: 'series' };
+    if (calleeName === 'timeframe.change') return { kind: 'bool', qualifier: 'series' };
+    if (namespace === 'request' || namespace === 'ta' || namespace === 'time' || namespace === 'time_close') {
       return { kind: 'unknown', qualifier: 'series' };
     }
     if (calleePath.join('.') === 'bool') return { kind: 'bool', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
