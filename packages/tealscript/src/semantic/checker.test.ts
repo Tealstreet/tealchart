@@ -4202,6 +4202,54 @@ plot(str.length(standard + inherited + prefixInherited + renko + prefixRenko + l
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('infers ticker helper return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Ticker Return Types")
+base = ticker.new(prefix="NASDAQ", ticker="AAPL")
+modified = ticker.modify(tickerid=base, session=session.extended)
+standard = ticker.standard(symbol=modified)
+inherited = ticker.inherit(from_tickerid=ticker.heikinashi(symbol=modified), symbol="NASDAQ:MSFT")
+heikinashi = ticker.heikinashi(symbol=modified)
+renko = ticker.renko(symbol="NASDAQ:AAPL", style="ATR", param=10)
+lineBreak = ticker.linebreak(symbol="NASDAQ:AAPL", number_of_lines=3)
+kagi = ticker.kagi(symbol="NASDAQ:AAPL", style="ATR", param=10)
+pointFigure = ticker.pointfigure(symbol="NASDAQ:AAPL", source="hl", style="ATR", param=14, reversal=3)
+base := 1
+modified := 2
+standard := 3
+inherited := 4
+heikinashi := 5
+renko := 6
+lineBreak := 7
+kagi := 8
+pointFigure := 9
+plot(str.length(base + modified + standard + inherited + heikinashi + renko + lineBreak + kagi + pointFigure))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign int value to string variable base',
+      'Cannot assign int value to string variable modified',
+      'Cannot assign int value to string variable standard',
+      'Cannot assign int value to string variable inherited',
+      'Cannot assign int value to string variable heikinashi',
+      'Cannot assign int value to string variable renko',
+      'Cannot assign int value to string variable lineBreak',
+      'Cannot assign int value to string variable kagi',
+      'Cannot assign int value to string variable pointFigure',
+    ]);
+    expect(types.get('base')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('modified')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('standard')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('inherited')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('heikinashi')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('renko')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('lineBreak')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('kagi')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('pointFigure')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+  });
+
   it('reports invalid ticker helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Bad Ticker Signatures")
