@@ -5954,9 +5954,39 @@ export class TealscriptEngine {
   }
 
   private registerStringBuiltins(): void {
+    const stringSourceArgs = [['source', 'string']] as const;
+    const stringPatternArgs = [['source', 'string'], ['str', 'substring', 'target']] as const;
+    const stringSubstringArgs = [['source', 'string'], ['begin_pos'], ['end_pos']] as const;
+    const stringMatchArgs = [['source', 'string'], ['regex', 'pattern']] as const;
+    const stringRepeatArgs = [['source', 'string'], ['count', 'repeat_count'], ['separator']] as const;
+    const stringSplitArgs = [['source', 'string'], ['separator']] as const;
+    const stringReplaceArgs = [['source', 'string'], ['target', 'str', 'substring'], ['replacement'], ['occurrence']] as const;
+    const stringReplaceAllArgs = [['source', 'string'], ['target', 'str', 'substring'], ['replacement']] as const;
+    const getOrderedStringArg = (
+      args: unknown[],
+      namedArgs: Map<string, unknown>,
+      params: readonly (readonly string[])[],
+      index: number,
+      fallback?: unknown,
+      label = params[index]?.join('/') ?? `arg${index}`,
+    ): unknown => {
+      const names = params[index] ?? [];
+      const matches = names.filter((name) => namedArgs.has(name));
+      if (matches.length > 1) {
+        throw new Error(`Argument ${label} was supplied multiple times: ${matches.join(', ')}`);
+      }
+      if (matches.length === 1) return namedArgs.get(matches[0]);
+
+      const priorNamedCount = params
+        .slice(0, index)
+        .filter((priorNames) => priorNames.some((name) => namedArgs.has(name))).length;
+      const positionalIndex = index - priorNamedCount;
+      return args[positionalIndex] !== undefined ? args[positionalIndex] : fallback;
+    };
+
     this.builtins.set('str.tostring', (args, namedArgs) => {
-      const value = this.getCallArg(args, namedArgs, 0, 'value');
-      const format = this.getCallArg(args, namedArgs, 1, 'format') as string | undefined;
+      const value = this.getOrderedCallArg(args, namedArgs, ['value', 'format'], 0);
+      const format = this.getOrderedCallArg(args, namedArgs, ['value', 'format'], 1) as string | undefined;
       return this.toStringValue(value, format);
     });
     this.builtins.set('str.tonumber', (args, namedArgs) => {
@@ -5964,9 +5994,10 @@ export class TealscriptEngine {
       return this.parsePineStringNumber(source);
     });
     this.builtins.set('str.format_time', (args, namedArgs) => {
-      const timestampArg = this.getCallArg(args, namedArgs, 0, 'time', this.ctx.time.get(0));
-      const formatArg = this.getCallArg(args, namedArgs, 1, 'format');
-      const timezoneArg = this.getCallArg(args, namedArgs, 2, 'timezone');
+      const formatTimeArgs = ['time', 'format', 'timezone'];
+      const timestampArg = this.getOrderedCallArg(args, namedArgs, formatTimeArgs, 0, this.ctx.time.get(0));
+      const formatArg = this.getOrderedCallArg(args, namedArgs, formatTimeArgs, 1);
+      const timezoneArg = this.getOrderedCallArg(args, namedArgs, formatTimeArgs, 2);
       const timestamp = this.toNumber(timestampArg);
       const format = formatArg === undefined || formatArg === '' ? "yyyy-MM-dd'T'HH:mm:ssZ" : this.toStringValue(formatArg);
       const timezone = timezoneArg === undefined || timezoneArg === '' ? this.ctx.syminfo.timezone : this.toStringValue(timezoneArg);
@@ -5982,9 +6013,9 @@ export class TealscriptEngine {
     });
 
     const stringSourceArg = (args: unknown[], namedArgs: Map<string, unknown>, index = 0) =>
-      this.getCallArgAny(args, namedArgs, index, ['source', 'string'], undefined, 'str source/string');
+      getOrderedStringArg(args, namedArgs, stringSourceArgs, index, undefined, 'str source/string');
     const stringPatternArg = (args: unknown[], namedArgs: Map<string, unknown>, index = 1) =>
-      this.getCallArgAny(args, namedArgs, index, ['str', 'substring', 'target'], undefined, 'str pattern');
+      getOrderedStringArg(args, namedArgs, stringPatternArgs, index, undefined, 'str pattern');
 
     this.builtins.set('str.length', (args, namedArgs) => this.toStringValue(stringSourceArg(args, namedArgs)).length);
     this.builtins.set('str.contains', (args, namedArgs) =>
@@ -6004,14 +6035,14 @@ export class TealscriptEngine {
     });
     this.builtins.set('str.substring', (args, namedArgs) => {
       const source = this.toStringValue(stringSourceArg(args, namedArgs));
-      const beginArg = this.getCallArgAny(args, namedArgs, 1, ['begin_pos'], 0, 'str.substring begin_pos');
-      const endArg = this.getCallArgAny(args, namedArgs, 2, ['end_pos'], undefined, 'str.substring end_pos');
+      const beginArg = getOrderedStringArg(args, namedArgs, stringSubstringArgs, 1, 0, 'str.substring begin_pos');
+      const endArg = getOrderedStringArg(args, namedArgs, stringSubstringArgs, 2, undefined, 'str.substring end_pos');
       const begin = Math.trunc(this.toNumber(beginArg));
       const end = endArg === undefined ? undefined : Math.trunc(this.toNumber(endArg));
       return source.substring(begin, end);
     });
     this.builtins.set('str.match', (args, namedArgs) => {
-      const regexArg = this.getCallArgAny(args, namedArgs, 1, ['regex', 'pattern'], undefined, 'str.match regex');
+      const regexArg = getOrderedStringArg(args, namedArgs, stringMatchArgs, 1, undefined, 'str.match regex');
       const match = this.toStringValue(stringSourceArg(args, namedArgs)).match(new RegExp(this.toStringValue(regexArg)));
       return match?.[0] ?? '';
     });
@@ -6019,17 +6050,17 @@ export class TealscriptEngine {
       const sourceArg = stringSourceArg(args, namedArgs);
       if (this.isNa(sourceArg)) return Number.NaN;
       const repeat = Math.trunc(
-        this.toNumber(this.getCallArgAny(args, namedArgs, 1, ['count', 'repeat_count'], undefined, 'str.repeat count')),
+        this.toNumber(getOrderedStringArg(args, namedArgs, stringRepeatArgs, 1, undefined, 'str.repeat count')),
       );
       if (!Number.isFinite(repeat) || repeat < 0) return Number.NaN;
-      const separator = this.getCallArgAny(args, namedArgs, 2, ['separator'], '', 'str.repeat separator');
+      const separator = getOrderedStringArg(args, namedArgs, stringRepeatArgs, 2, '', 'str.repeat separator');
       return Array.from({ length: repeat }, () => this.toStringValue(sourceArg)).join(this.toStringValue(separator));
     });
     this.builtins.set('str.split', (args, namedArgs) => {
       const array = createPineArray<string>();
       array.values.push(
         ...this.toStringValue(stringSourceArg(args, namedArgs)).split(
-          this.toStringValue(this.getCallArgAny(args, namedArgs, 1, ['separator'], undefined, 'str.split separator')),
+          this.toStringValue(getOrderedStringArg(args, namedArgs, stringSplitArgs, 1, undefined, 'str.split separator')),
         ),
       );
       return array;
@@ -6041,8 +6072,8 @@ export class TealscriptEngine {
       return this.replaceStringOccurrence(
         this.toStringValue(stringSourceArg(args, namedArgs)),
         this.toStringValue(stringPatternArg(args, namedArgs)),
-        this.toStringValue(this.getCallArgAny(args, namedArgs, 2, ['replacement'], undefined, 'str.replace replacement')),
-        this.getCallArgAny(args, namedArgs, 3, ['occurrence'], undefined, 'str.replace occurrence'),
+        this.toStringValue(getOrderedStringArg(args, namedArgs, stringReplaceArgs, 2, undefined, 'str.replace replacement')),
+        getOrderedStringArg(args, namedArgs, stringReplaceArgs, 3, undefined, 'str.replace occurrence'),
       );
     });
     this.builtins.set('str.replace_all', (args, namedArgs) => {
@@ -6050,7 +6081,7 @@ export class TealscriptEngine {
         .split(this.toStringValue(stringPatternArg(args, namedArgs)))
         .join(
           this.toStringValue(
-            this.getCallArgAny(args, namedArgs, 2, ['replacement'], undefined, 'str.replace_all replacement'),
+            getOrderedStringArg(args, namedArgs, stringReplaceAllArgs, 2, undefined, 'str.replace_all replacement'),
           ),
         );
     });
