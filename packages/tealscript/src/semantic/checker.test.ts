@@ -1780,6 +1780,61 @@ missingGetter = line.get_x2()
     ]);
   });
 
+  it('resolves box.new coordinate and point overloads', () => {
+    const result = checkProgram(parse(`
+indicator("Box Constructor Signatures")
+topLeft = chart.point.from_index(bar_index, high)
+bottomRight = chart.point.from_index(bar_index + 1, low)
+pointBox = box.new(top_left=topLeft, bottomRight, color.blue, 1, "solid", "right", xloc.bar_index)
+sharedNamedPointBox = box.new(top_left=topLeft, bottom_right=bottomRight, bgcolor=color.new(color.blue, 80), text="Zone")
+coordinateBox = box.new(left=bar_index, top=high, right=bar_index + 1, bottom=low, bgcolor=color.orange)
+positionalPointBox = box.new(topLeft, bottomRight)
+boxes = array.from(pointBox, sharedNamedPointBox, coordinateBox, positionalPointBox)
+plot(array.size(boxes))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('pointBox')).toMatchObject({ kind: 'box' });
+    expect(types.get('sharedNamedPointBox')).toMatchObject({ kind: 'box' });
+    expect(types.get('coordinateBox')).toMatchObject({ kind: 'box' });
+    expect(types.get('positionalPointBox')).toMatchObject({ kind: 'box' });
+    expect(types.get('boxes')).toMatchObject({ kind: 'array', elementType: { kind: 'box' } });
+  });
+
+  it('reports invalid box.new overload argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Box Constructor Signatures")
+topLeft = chart.point.from_index(bar_index, high)
+bottomRight = chart.point.from_index(bar_index + 1, low)
+unknownCoordinate = box.new(bar_index, high, bar_index + 1, low, opacity=80)
+missingCoordinate = box.new(left=bar_index, top=high)
+duplicateCoordinate = box.new(bar_index, high, bar_index + 1, low, left=bar_index)
+tooManyCoordinate = box.new(bar_index, high, bar_index + 1, low, color.blue, 1, "solid", "right", xloc.bar_index, color.orange, "Text", size.small, color.white, "left", "top", "wrap", "mono", true, false)
+missingPoint = box.new(top_left=topLeft)
+duplicatePoint = box.new(topLeft, bottomRight, top_left=topLeft)
+tooManyPoint = box.new(topLeft, bottomRight, color.blue, 1, "solid", "right", xloc.bar_index, color.orange, "Text", size.small, color.white, "left", "top", "wrap", "mono", true, false)
+badTwoPositionals = box.new(bar_index, high)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'opacity' for box.new()",
+      'box.new() expects at least 4 arguments',
+      "box.new() missing required argument 'right'",
+      "box.new() missing required argument 'bottom'",
+      "Argument 'left' for box.new() was supplied multiple times",
+      'box.new() expects at most 18 arguments',
+      'box.new() expects at least 2 arguments',
+      "box.new() missing required argument 'bottom_right'",
+      "Argument 'top_left' for box.new() was supplied multiple times",
+      'box.new() expects at most 16 arguments',
+      'box.new() expects at least 4 arguments',
+      "box.new() missing required argument 'right'",
+      "box.new() missing required argument 'bottom'",
+    ]);
+  });
+
   it('resolves box geometry named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Box Geometry Signatures")
