@@ -3608,7 +3608,9 @@ class SemanticChecker {
     if (objectType.kind !== 'udt' || !objectType.name) return objectType;
 
     const field = this.findUdtField(objectType.name, expression.property.name);
-    return this.typeFromAnnotation(field?.typeAnnotation ?? undefined) ?? { kind: 'unknown', qualifier: objectType.qualifier };
+    const fieldType = this.typeFromAnnotation(field?.typeAnnotation ?? undefined);
+    if (!fieldType) return { kind: 'unknown', qualifier: objectType.qualifier };
+    return { ...fieldType, qualifier: this.maxQualifier(objectType, fieldType) };
   }
 
   private isDrawingAllMemberExpression(expression: MemberExpression): boolean {
