@@ -149,6 +149,12 @@ const DRAWING_ALL_MEMBER_TYPES = new Map<string, SemanticTypeKind>([
   ['polyline.all', 'polyline'],
 ]);
 
+const CHART_POINT_FIELD_TYPES = new Map<string, SemanticTypeKind>([
+  ['index', 'int'],
+  ['price', 'float'],
+  ['time', 'int'],
+]);
+
 const BUILTIN_FUNCTIONS = new Set([
   'alert',
   'alertcondition',
@@ -2021,6 +2027,16 @@ class SemanticChecker {
     this.checkExpression(expression.object, scope);
 
     const objectType = this.inferExpressionType(expression.object, scope);
+    if (objectType.kind === 'chart.point') {
+      if (!CHART_POINT_FIELD_TYPES.has(expression.property.name)) {
+        this.addDiagnostic(
+          'unknown-field',
+          `Unknown field '${expression.property.name}' on type chart.point`,
+          expression.property.loc,
+        );
+      }
+      return;
+    }
     if (objectType.kind !== 'udt' || !objectType.name || !this.typeDeclarations.has(objectType.name)) {
       return;
     }
@@ -3217,6 +3233,10 @@ class SemanticChecker {
     }
 
     const objectType = this.inferExpressionType(expression.object, scope);
+    if (objectType.kind === 'chart.point') {
+      const fieldType = CHART_POINT_FIELD_TYPES.get(expression.property.name);
+      return fieldType ? { kind: fieldType, qualifier: objectType.qualifier } : { kind: 'unknown', qualifier: objectType.qualifier };
+    }
     if (objectType.kind !== 'udt' || !objectType.name) return objectType;
 
     const field = this.findUdtField(objectType.name, expression.property.name);
