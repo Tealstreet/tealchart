@@ -21,6 +21,7 @@ import type {
   TypeAnnotation,
   TypeDeclaration,
   TypeFieldDeclaration,
+  UnaryExpression,
   VariableDeclaration,
   WhileStatement,
 } from '../parser/ast';
@@ -3105,7 +3106,7 @@ class SemanticChecker {
       case 'BinaryExpression':
         return this.inferBinaryExpressionType(expression, scope);
       case 'UnaryExpression':
-        return { kind: 'unknown', qualifier: this.inferExpressionType(expression.argument, scope).qualifier };
+        return this.inferUnaryExpressionType(expression, scope);
       case 'ConditionalExpression':
         return this.inferConditionalExpressionType(expression, scope);
       case 'SwitchExpression':
@@ -3131,6 +3132,15 @@ class SemanticChecker {
       default:
         return { kind: 'unknown' };
     }
+  }
+
+  private inferUnaryExpressionType(expression: UnaryExpression, scope: SemanticScope): SemanticType {
+    const argumentType = this.inferExpressionType(expression.argument, scope);
+    if ((expression.operator === '-' || expression.operator === '+') && this.isNumericType(argumentType)) {
+      return { kind: argumentType.kind, qualifier: argumentType.qualifier };
+    }
+    if (expression.operator === 'not') return { kind: 'bool', qualifier: argumentType.qualifier };
+    return { kind: 'unknown', qualifier: argumentType.qualifier };
   }
 
   private inferConditionalExpressionType(expression: ConditionalExpression, scope: SemanticScope): SemanticType {
