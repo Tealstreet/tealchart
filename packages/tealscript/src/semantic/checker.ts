@@ -3042,7 +3042,7 @@ class SemanticChecker {
   private typeFromAnnotation(annotation?: TypeAnnotation | null): SemanticType | undefined {
     if (!annotation) return undefined;
 
-    const qualifier = annotation.qualifier;
+    const qualifier = this.annotationQualifier(annotation);
     if (annotation.baseType === 'array' || annotation.baseType === 'matrix') {
       return {
         kind: annotation.baseType,
@@ -3065,6 +3065,20 @@ class SemanticChecker {
     }
 
     return this.typeFromName(annotation.baseType, qualifier);
+  }
+
+  private annotationQualifier(annotation: TypeAnnotation): SemanticQualifier | undefined {
+    if (annotation.qualifier) return annotation.qualifier;
+    if (
+      annotation.baseType === 'array'
+      || annotation.baseType === 'matrix'
+      || annotation.baseType === 'map'
+      || annotation.baseType === 'udt'
+      || REFERENCE_TYPE_KINDS.has(annotation.baseType as SemanticTypeKind)
+    ) {
+      return 'series';
+    }
+    return undefined;
   }
 
   private inferExpressionType(expression: Expression, scope: SemanticScope = this.rootScope): SemanticType {
