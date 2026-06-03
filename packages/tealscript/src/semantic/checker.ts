@@ -211,6 +211,13 @@ const FLOAT_RETURN_FUNCTIONS = new Set([
   'ta.wpr',
 ]);
 
+const SERIES_FLOAT: SemanticType = { kind: 'float', qualifier: 'series' };
+
+const TUPLE_RETURN_FUNCTIONS = new Map<string, SemanticType[]>([
+  ['ta.bb', [SERIES_FLOAT, SERIES_FLOAT, SERIES_FLOAT]],
+  ['ta.kc', [SERIES_FLOAT, SERIES_FLOAT, SERIES_FLOAT]],
+]);
+
 const BUILTIN_FUNCTIONS = new Set([
   'alert',
   'alertcondition',
@@ -1827,7 +1834,7 @@ class SemanticChecker {
     this.checkTypeAnnotation('variable declaration', statement.typeAnnotation, statement.loc);
     this.checkTypeCompatibility(statement.typeAnnotation, statement.init, scope, statement.loc);
     if (statement.names.type === 'TupleDeclarator') {
-      this.declareTuple(statement.names, scope);
+      this.declareTuple(statement.names, statement.init, scope);
       return;
     }
 
@@ -1839,15 +1846,16 @@ class SemanticChecker {
     });
   }
 
-  private declareTuple(tuple: TupleDeclarator, scope: SemanticScope): void {
+  private declareTuple(tuple: TupleDeclarator, init: Expression, scope: SemanticScope): void {
     const seen = new Set<string>();
-    for (const name of tuple.names) {
+    const elementTypes = init.type === 'CallExpression' ? TUPLE_RETURN_FUNCTIONS.get(this.memberPath(init.callee).join('.')) : undefined;
+    for (const [index, name] of tuple.names.entries()) {
       if (seen.has(name.name)) {
         this.addDiagnostic('duplicate-symbol', `Duplicate declaration: ${name.name}`, name.loc);
         continue;
       }
       seen.add(name.name);
-      this.declare(scope, { name: name.name, kind: 'variable', type: { kind: 'unknown' }, loc: name.loc });
+      this.declare(scope, { name: name.name, kind: 'variable', type: elementTypes?.[index] ?? { kind: 'unknown' }, loc: name.loc });
     }
   }
 
