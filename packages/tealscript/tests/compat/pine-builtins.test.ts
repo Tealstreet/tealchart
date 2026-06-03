@@ -417,29 +417,35 @@ plot(left.covariance(right), title="Method Covariance")
     const result = runCompatScript(`
 indicator("String helpers")
 formatted = str.tostring(close, "#.00")
+prefixFormatted = str.tostring(value=close, "#.00")
 message = str.format("close={0:#.0}", close)
 namedMessage = str.format(format="close={0:#.0}", close)
 joined = "symbol:" + "BTCUSDT"
 parsed = str.tonumber("42.5")
 invalid = str.tonumber("not a number")
 formattedTime = str.format_time(timestamp("GMT+2", 2024, 1, 5, 9, 30), "yyyy-MM-dd HH:mm", "GMT+2")
+prefixFormattedTime = str.format_time(time=timestamp("GMT+2", 2024, 1, 5, 9, 30), "yyyy-MM-dd HH:mm", "GMT+2")
 plot(formatted == "102.00", title="Formatted Close")
+plot(prefixFormatted == "102.00", title="Prefix Formatted Close")
 plot(message == "close=102.0", title="Format Template")
 plot(namedMessage == "close=102.0", title="Named Format Template")
 plot(joined == "symbol:BTCUSDT", title="Concatenated Symbol")
 plot(parsed, title="Parsed Number")
 plot(na(invalid) ? 1 : 0, title="Invalid Is NA")
 plot(formattedTime == "2024-01-05 09:30", title="Formatted Time")
+plot(prefixFormattedTime == "2024-01-05 09:30", title="Prefix Formatted Time")
 `);
 
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Formatted Close').values).toEqual([true, false, false, false, false, false, false, false, false, false, false, false]);
+    expect(getPlot(result, 'Prefix Formatted Close').values).toEqual([true, false, false, false, false, false, false, false, false, false, false, false]);
     expect(getPlot(result, 'Format Template').values).toEqual([true, false, false, false, false, false, false, false, false, false, false, false]);
     expect(getPlot(result, 'Named Format Template').values).toEqual([true, false, false, false, false, false, false, false, false, false, false, false]);
     expect(getPlot(result, 'Concatenated Symbol').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(roundSeries(getPlot(result, 'Parsed Number').values)).toEqual([42.5, 42.5, 42.5, 42.5, 42.5, 42.5, 42.5, 42.5, 42.5, 42.5, 42.5, 42.5]);
     expect(getPlot(result, 'Invalid Is NA').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(getPlot(result, 'Formatted Time').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
+    expect(getPlot(result, 'Prefix Formatted Time').values).toEqual(Array(compatibilityBars.length).fill(true));
   });
 
   it('runs string search and substring helpers', () => {
@@ -449,21 +455,29 @@ text = "BTCUSDT perpetual"
 symbol = "NASDAQ:AAPL"
 parts = str.split(symbol, ":")
 namedParts = str.split(string=symbol, separator=":")
+prefixParts = str.split(source=symbol, ":")
 plot(str.contains(text, "USDT"), title="Contains")
 plot(str.contains(source=text, str="USDT"), title="Named Contains")
+plot(str.contains(source=text, "USDT"), title="Prefix Contains")
 plot(str.startswith(text, "BTC"), title="Starts")
 plot(str.startswith(source=text, str="BTC"), title="Named Starts")
+plot(str.startswith(source=text, "BTC"), title="Prefix Starts")
 plot(str.endswith(text, "perpetual"), title="Ends")
 plot(str.endswith(source=text, str="perpetual"), title="Named Ends")
+plot(str.endswith(source=text, "perpetual"), title="Prefix Ends")
 plot(str.pos(text, "USDT"), title="Position")
 plot(str.pos(source=text, str="USDT"), title="Named Position")
+plot(str.pos(source=text, "USDT"), title="Prefix Position")
 plot(str.pos(text, "ETH"), title="Missing Position")
 plot(str.substring(text, 0, 3) == "BTC", title="Substring")
 plot(str.substring(source=text, begin_pos=0, end_pos=3) == "BTC", title="Named Substring")
+plot(str.substring(source=text, 0, 3) == "BTC", title="Prefix Substring")
 plot(str.match("Trade NASDAQ:AAPL now", "[A-Z]+:[A-Z]+") == symbol, title="Regex Match")
 plot(str.match(source="Trade NASDAQ:AAPL now", regex="[A-Z]+:[A-Z]+") == symbol, title="Named Regex Match")
+plot(str.match(source="Trade NASDAQ:AAPL now", "[A-Z]+:[A-Z]+") == symbol, title="Prefix Regex Match")
 plot(array.get(parts, 1) == "AAPL", title="Split Symbol")
 plot(array.get(namedParts, 1) == "AAPL", title="Named Split Symbol")
+plot(array.get(prefixParts, 1) == "AAPL", title="Prefix Split Symbol")
 plot(str.length(text), title="Length")
 plot(str.length(string=text), title="Named Length")
 `);
@@ -471,19 +485,26 @@ plot(str.length(string=text), title="Named Length")
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Contains').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Named Contains').values).toEqual(Array(compatibilityBars.length).fill(true));
+    expect(getPlot(result, 'Prefix Contains').values).toEqual(Array(compatibilityBars.length).fill(true));
     expect(getPlot(result, 'Starts').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Named Starts').values).toEqual(Array(compatibilityBars.length).fill(true));
+    expect(getPlot(result, 'Prefix Starts').values).toEqual(Array(compatibilityBars.length).fill(true));
     expect(getPlot(result, 'Ends').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Named Ends').values).toEqual(Array(compatibilityBars.length).fill(true));
+    expect(getPlot(result, 'Prefix Ends').values).toEqual(Array(compatibilityBars.length).fill(true));
     expect(roundSeries(getPlot(result, 'Position').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
     expect(roundSeries(getPlot(result, 'Named Position').values)).toEqual(Array(compatibilityBars.length).fill(3));
+    expect(roundSeries(getPlot(result, 'Prefix Position').values)).toEqual(Array(compatibilityBars.length).fill(3));
     expect(getPlot(result, 'Missing Position').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, null]);
     expect(getPlot(result, 'Substring').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Named Substring').values).toEqual(Array(compatibilityBars.length).fill(true));
+    expect(getPlot(result, 'Prefix Substring').values).toEqual(Array(compatibilityBars.length).fill(true));
     expect(getPlot(result, 'Regex Match').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Named Regex Match').values).toEqual(Array(compatibilityBars.length).fill(true));
+    expect(getPlot(result, 'Prefix Regex Match').values).toEqual(Array(compatibilityBars.length).fill(true));
     expect(getPlot(result, 'Split Symbol').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Named Split Symbol').values).toEqual(Array(compatibilityBars.length).fill(true));
+    expect(getPlot(result, 'Prefix Split Symbol').values).toEqual(Array(compatibilityBars.length).fill(true));
     expect(roundSeries(getPlot(result, 'Length').values)).toEqual([17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17]);
     expect(roundSeries(getPlot(result, 'Named Length').values)).toEqual(Array(compatibilityBars.length).fill(17));
   });
@@ -500,12 +521,16 @@ plot(str.lower(source="BTC") == "btc", title="Named Lower")
 plot(str.trim(source=text) == trimmed, title="Named Trim")
 plot(str.replace(trimmed, "usdt", "perp") == "btc-perp-usdt", title="Replace One")
 plot(str.replace(source=trimmed, target="usdt", replacement="perp") == "btc-perp-usdt", title="Named Replace One")
+plot(str.replace(source=trimmed, "usdt", "perp") == "btc-perp-usdt", title="Prefix Replace One")
 plot(str.replace(trimmed, "usdt", "perp", 1) == "btc-usdt-perp", title="Replace Occurrence")
 plot(str.replace(source=trimmed, target="usdt", replacement="perp", occurrence=1) == "btc-usdt-perp", title="Named Replace Occurrence")
+plot(str.replace(source=trimmed, "usdt", "perp", 1) == "btc-usdt-perp", title="Prefix Replace Occurrence")
 plot(str.replace_all(trimmed, "usdt", "perp") == "btc-perp-perp", title="Replace All")
 plot(str.replace_all(source=trimmed, target="usdt", replacement="perp") == "btc-perp-perp", title="Named Replace All")
+plot(str.replace_all(source=trimmed, "usdt", "perp") == "btc-perp-perp", title="Prefix Replace All")
 plot(str.repeat("?", 3, ",") == "?,?,?", title="Repeat")
 plot(str.repeat(source="?", count=3, separator=",") == "?,?,?", title="Named Repeat")
+plot(str.repeat(source="?", 3, ",") == "?,?,?", title="Prefix Repeat")
 `);
 
     expect(result.errors).toEqual([]);
@@ -516,12 +541,16 @@ plot(str.repeat(source="?", count=3, separator=",") == "?,?,?", title="Named Rep
     expect(getPlot(result, 'Named Trim').values).toEqual(Array(compatibilityBars.length).fill(true));
     expect(getPlot(result, 'Replace One').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Named Replace One').values).toEqual(Array(compatibilityBars.length).fill(true));
+    expect(getPlot(result, 'Prefix Replace One').values).toEqual(Array(compatibilityBars.length).fill(true));
     expect(getPlot(result, 'Replace Occurrence').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Named Replace Occurrence').values).toEqual(Array(compatibilityBars.length).fill(true));
+    expect(getPlot(result, 'Prefix Replace Occurrence').values).toEqual(Array(compatibilityBars.length).fill(true));
     expect(getPlot(result, 'Replace All').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Named Replace All').values).toEqual(Array(compatibilityBars.length).fill(true));
+    expect(getPlot(result, 'Prefix Replace All').values).toEqual(Array(compatibilityBars.length).fill(true));
     expect(getPlot(result, 'Repeat').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Named Repeat').values).toEqual(Array(compatibilityBars.length).fill(true));
+    expect(getPlot(result, 'Prefix Repeat').values).toEqual(Array(compatibilityBars.length).fill(true));
   });
 
   it('matches documented Pine string formatting examples', () => {
