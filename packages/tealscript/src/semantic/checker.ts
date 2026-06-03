@@ -241,6 +241,7 @@ interface BuiltinSignature {
   allowExtraNamed?: boolean;
   allowExtraPositional?: boolean;
   allowNamedPrefixWithPositional?: boolean;
+  namedPrefixWithPositionalParams?: string[];
 }
 
 const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
@@ -565,10 +566,22 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['ta.dmi', { params: ['diLength', 'adxSmoothing'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ta.ema', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ta.hma', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
-  ['ta.highest', { params: ['source', 'length'], minArgs: 1, requiredParams: ['length'], singlePositionalParam: 'length', maxArgs: 2 }],
-  ['ta.lowest', { params: ['source', 'length'], minArgs: 1, requiredParams: ['length'], singlePositionalParam: 'length', maxArgs: 2 }],
-  ['ta.highestbars', { params: ['source', 'length'], minArgs: 1, requiredParams: ['length'], singlePositionalParam: 'length', maxArgs: 2 }],
-  ['ta.lowestbars', { params: ['source', 'length'], minArgs: 1, requiredParams: ['length'], singlePositionalParam: 'length', maxArgs: 2 }],
+  [
+    'ta.highest',
+    { params: ['source', 'length'], minArgs: 1, requiredParams: ['length'], singlePositionalParam: 'length', maxArgs: 2, allowNamedPrefixWithPositional: true, namedPrefixWithPositionalParams: ['source'] },
+  ],
+  [
+    'ta.lowest',
+    { params: ['source', 'length'], minArgs: 1, requiredParams: ['length'], singlePositionalParam: 'length', maxArgs: 2, allowNamedPrefixWithPositional: true, namedPrefixWithPositionalParams: ['source'] },
+  ],
+  [
+    'ta.highestbars',
+    { params: ['source', 'length'], minArgs: 1, requiredParams: ['length'], singlePositionalParam: 'length', maxArgs: 2, allowNamedPrefixWithPositional: true, namedPrefixWithPositionalParams: ['source'] },
+  ],
+  [
+    'ta.lowestbars',
+    { params: ['source', 'length'], minArgs: 1, requiredParams: ['length'], singlePositionalParam: 'length', maxArgs: 2, allowNamedPrefixWithPositional: true, namedPrefixWithPositionalParams: ['source'] },
+  ],
   ['ta.kc', { params: ['series', 'length', 'mult', 'useTrueRange'], minArgs: 3, maxArgs: 4, allowNamedPrefixWithPositional: true }],
   ['ta.kcw', { params: ['series', 'length', 'mult', 'useTrueRange'], minArgs: 3, maxArgs: 4, allowNamedPrefixWithPositional: true }],
   ['ta.median', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
@@ -2274,7 +2287,26 @@ class SemanticChecker {
   }
 
   private checkArgumentOrder(args: CallArgument[], displayName: string, signature?: BuiltinSignature): void {
-    if (signature?.allowNamedPrefixWithPositional) return;
+    if (signature?.allowNamedPrefixWithPositional) {
+      if (!signature.namedPrefixWithPositionalParams) return;
+
+      const allowedPrefixNames = new Set(signature.namedPrefixWithPositionalParams);
+      const namedPrefixArgs: CallArgument[] = [];
+      let hasNamedArgument = false;
+      for (const arg of args) {
+        if (arg.name) {
+          hasNamedArgument = true;
+          namedPrefixArgs.push(arg);
+          continue;
+        }
+        if (!hasNamedArgument) continue;
+        const invalidPrefixArg = namedPrefixArgs.find((prefixArg) => prefixArg.name && !allowedPrefixNames.has(this.canonicalSignatureArgumentName(prefixArg.name.name, signature)));
+        if (invalidPrefixArg) {
+          this.addDiagnostic('argument-order', `${displayName}() cannot use positional arguments after named arguments`, arg.loc);
+        }
+      }
+      return;
+    }
 
     let hasNamedArgument = false;
     for (const arg of args) {
