@@ -2566,6 +2566,11 @@ plot(since + last + lastMixed + changed + changedMixed + highest + lowest + high
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('since')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('highestOffset')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('lowestOffset')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('mixedHighestOffset')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('mixedLowestOffset')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('crossoverValue')).toMatchObject({ kind: 'bool', qualifier: 'series' });
     expect(types.get('crossunderValue')).toMatchObject({ kind: 'bool', qualifier: 'series' });
     expect(types.get('crossValue')).toMatchObject({ kind: 'bool', qualifier: 'series' });

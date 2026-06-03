@@ -163,6 +163,12 @@ const BOOLEAN_RETURN_FUNCTIONS = new Set([
   'ta.rising',
 ]);
 
+const INTEGER_RETURN_FUNCTIONS = new Set([
+  'ta.barssince',
+  'ta.highestbars',
+  'ta.lowestbars',
+]);
+
 const BUILTIN_FUNCTIONS = new Set([
   'alert',
   'alertcondition',
@@ -2982,6 +2988,7 @@ class SemanticChecker {
     const referenceReturnType = REFERENCE_CONSTRUCTOR_RETURN_TYPES.get(calleeName);
     if (referenceReturnType) return { kind: referenceReturnType };
     if (BOOLEAN_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'bool', qualifier: 'series' };
+    if (INTEGER_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'int', qualifier: 'series' };
     if (calleeName === 'label.get_x') return { kind: 'int' };
     if (calleeName === 'label.get_y') return { kind: 'float' };
     if (calleeName === 'label.get_color' || calleeName === 'label.get_textcolor') return { kind: 'color' };
