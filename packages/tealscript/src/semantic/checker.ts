@@ -170,10 +170,21 @@ const INTEGER_RETURN_FUNCTIONS = new Set([
 ]);
 
 const FLOAT_RETURN_FUNCTIONS = new Set([
+  'ta.alma',
   'ta.change',
+  'ta.ema',
   'ta.highest',
+  'ta.hma',
+  'ta.linreg',
   'ta.lowest',
+  'ta.mom',
   'ta.range',
+  'ta.rma',
+  'ta.roc',
+  'ta.sma',
+  'ta.swma',
+  'ta.vwma',
+  'ta.wma',
 ]);
 
 const BUILTIN_FUNCTIONS = new Set([
