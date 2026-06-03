@@ -133,6 +133,20 @@ const ARRAY_CONSTRUCTOR_ELEMENT_TYPES = new Map<string, SemanticTypeKind>([
   ['array.new_table', 'table'],
 ]);
 
+const INPUT_RETURN_TYPES = new Map<string, SemanticTypeKind>([
+  ['input.bool', 'bool'],
+  ['input.color', 'color'],
+  ['input.float', 'float'],
+  ['input.int', 'int'],
+  ['input.price', 'float'],
+  ['input.session', 'string'],
+  ['input.string', 'string'],
+  ['input.symbol', 'string'],
+  ['input.text_area', 'string'],
+  ['input.time', 'int'],
+  ['input.timeframe', 'string'],
+]);
+
 const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['box.copy', 'box'],
   ['box.new', 'box'],
@@ -3686,6 +3700,8 @@ class SemanticChecker {
     if (calleeName === 'linefill.get_line1' || calleeName === 'linefill.get_line2') return { kind: 'line' };
 
     const namespace = calleePath[0];
+    const inputType = this.inferInputCallType(expression, scope, calleePath);
+    if (inputType) return inputType;
     if (namespace === 'input') return { kind: 'unknown', qualifier: 'input' };
     if (namespace === 'request' || namespace === 'ta' || namespace === 'time' || namespace === 'time_close' || calleePath.join('.') === 'timeframe.change') {
       return { kind: 'unknown', qualifier: 'series' };
@@ -3751,6 +3767,17 @@ class SemanticChecker {
       return { kind: 'udt', name: calleePath[0] };
     }
     return { kind: 'unknown', qualifier: this.inferMaxQualifier(expression.arguments.map((argument) => argument.value), scope) };
+  }
+
+  private inferInputCallType(expression: CallExpression, scope: SemanticScope, calleePath: string[]): SemanticType | undefined {
+    const calleeName = calleePath.join('.');
+    if (calleeName === 'input.source') {
+      const source = this.inferCallArgumentType(expression, scope, ['defval'], 0);
+      return source ? { ...source, qualifier: source.qualifier ?? 'series' } : { kind: 'unknown', qualifier: 'series' };
+    }
+
+    const kind = INPUT_RETURN_TYPES.get(calleeName);
+    return kind ? { kind, qualifier: 'input' } : undefined;
   }
 
   private inferFixnanCallType(expression: CallExpression, scope: SemanticScope): SemanticType {
