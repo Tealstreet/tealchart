@@ -2411,7 +2411,7 @@ class SemanticChecker {
     if (receiverType.kind === 'unknown') return;
     if (this.isBuiltinCollectionMemberMethod(receiverType, expression.callee.property.name)) return;
 
-    const method = this.findUserMethodDeclaration(expression.callee.property.name, receiverType);
+    const method = this.findUserMethodDeclaration(expression.callee.property.name, receiverType, expression, scope);
     if (!method) return;
 
     this.checkUserCallableArguments(expression, method, expression.callee.property.name, 1, scope);
@@ -2892,7 +2892,7 @@ class SemanticChecker {
     if (receiverType.kind === 'unknown') return undefined;
     if (this.isBuiltinCollectionMemberMethod(receiverType, expression.callee.property.name)) return undefined;
 
-    const method = this.findUserMethodDeclaration(expression.callee.property.name, receiverType);
+    const method = this.findUserMethodDeclaration(expression.callee.property.name, receiverType, expression, scope);
     if (!method) return undefined;
 
     return this.inferFunctionReturnType(
@@ -2902,20 +2902,95 @@ class SemanticChecker {
     );
   }
 
-  private findUserMethodDeclaration(methodName: string, receiverType: SemanticType): FunctionDeclaration | undefined {
+  private findUserMethodDeclaration(
+    methodName: string,
+    receiverType: SemanticType,
+    expression?: CallExpression,
+    scope?: SemanticScope,
+  ): FunctionDeclaration | undefined {
     const methods = this.methodDeclarations.get(methodName);
     if (!methods?.length) return undefined;
 
-    return methods.find((method) => {
+    const receiverMatches = methods.filter((method) => {
       const methodReceiverType = this.typeFromAnnotation(method.params[0]?.typeAnnotation ?? undefined);
       return !!methodReceiverType
         && this.isAssignableType(methodReceiverType, receiverType)
         && this.isAssignableQualifier(methodReceiverType.qualifier, receiverType.qualifier);
     });
+    if (!expression || !scope) return receiverMatches[0];
+
+    return receiverMatches.find((method) => this.userCallableCallFits(method, expression, 1, scope)) ?? receiverMatches[0];
   }
 
   private isBuiltinCollectionMemberMethod(receiverType: SemanticType, methodName: string): boolean {
     return BUILTIN_COLLECTION_MEMBER_METHODS.get(receiverType.kind)?.has(methodName) ?? false;
+  }
+
+  private userCallableCallFits(
+    declaration: FunctionDeclaration,
+    expression: CallExpression,
+    parameterOffset: number,
+    scope: SemanticScope,
+  ): boolean {
+    const signature = this.userCallableSignature(declaration, parameterOffset);
+    if (!this.callArgumentsFitSignature(expression.arguments, signature)) return false;
+
+    for (const [index, parameter] of declaration.params.entries()) {
+      if (index < parameterOffset) continue;
+
+      const expectedType = this.typeFromAnnotation(parameter.typeAnnotation ?? undefined);
+      if (!expectedType) continue;
+
+      const argument = this.getCallArgument(expression.arguments, parameter.name, index - parameterOffset);
+      if (!argument) continue;
+
+      const actualType = this.inferExpressionType(argument, scope);
+      if (!this.isAssignableType(expectedType, actualType)) return false;
+      if (!this.isAssignableQualifier(expectedType.qualifier, actualType.qualifier)) return false;
+    }
+
+    return true;
+  }
+
+  private callArgumentsFitSignature(args: CallArgument[], signature: BuiltinSignature): boolean {
+    let hasNamedArgument = false;
+    for (const arg of args) {
+      if (arg.name) {
+        hasNamedArgument = true;
+        continue;
+      }
+      if (hasNamedArgument) return false;
+    }
+
+    const params = signature.params;
+    const allowedParams = new Set(params);
+    const positionalCount = this.leadingPositionalCount(args);
+    const minArgs = signature.minArgs ?? 0;
+    const maxArgs = signature.maxArgs ?? params.length;
+    const requiredParams = signature.requiredParams ?? [];
+    if (positionalCount > maxArgs) return false;
+
+    const suppliedNames = new Set<string>();
+    for (const arg of args) {
+      if (!arg.name) continue;
+
+      const name = arg.name.name;
+      if (!allowedParams.has(name)) return false;
+      if (suppliedNames.has(name)) return false;
+      suppliedNames.add(name);
+    }
+
+    for (const [index, param] of params.entries()) {
+      if (index < positionalCount && suppliedNames.has(param)) return false;
+    }
+
+    const suppliedCount = params.filter((param, index) => index < positionalCount || suppliedNames.has(param)).length;
+    if (suppliedCount < minArgs) return false;
+
+    return requiredParams.every((param) => {
+      const paramIndex = params.indexOf(param);
+      return (paramIndex !== -1 && paramIndex < positionalCount) || suppliedNames.has(param);
+    });
   }
 
   private isAssignableQualifier(targetQualifier: SemanticQualifier | undefined, sourceQualifier: SemanticQualifier | undefined): boolean {

@@ -316,8 +316,9 @@ references. The runtime uses the receiver as the method's first argument, in
 line with Pine's documented method-call equivalence, and selects local UDT
 method overloads by receiver type. Semantic coverage reports calls where a
 known receiver type does not match any local method receiver annotation, accepts
-method overload declarations, infers method return types, and validates
-method-call argument shape, type, and qualifier constraints.
+method overload declarations, selects local overloads by annotated argument
+signatures, infers method return types, and validates method-call argument
+shape, type, and qualifier constraints.
 
 Known limits: UDT field types are recorded dynamically but not yet fully
 enforced by the semantic checker outside the local constructor/assignment paths.

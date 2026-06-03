@@ -3981,6 +3981,31 @@ badScale = pivot.scale(2)
     ]);
   });
 
+  it('selects user-defined method overloads by argument signatures', () => {
+    const result = checkProgram(parse(`
+indicator("Method Signature Overloads")
+type Pivot
+    float y
+method value(Pivot this, float amount) => amount + this.y
+method value(Pivot this, string label) => label
+method value(Pivot this, bool enabled, float fallback = 1) => fallback
+pivot = Pivot.new(close)
+numberValue = pivot.value(1)
+textValue = pivot.value("fast")
+namedText = pivot.value(label="slow")
+defaulted = pivot.value(true)
+plot(numberValue + str.length(textValue) + str.length(namedText) + defaulted)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('numberValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('textValue')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('namedText')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('defaulted')).toMatchObject({ kind: 'float' });
+  });
+
   it('does not report user method receiver mismatches for builtin collection member calls', () => {
     const result = checkProgram(parse(`
 indicator("Builtin Method Names")
