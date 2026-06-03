@@ -3268,14 +3268,17 @@ secondPoint = chart.point.from_index(bar_index + 1, low)
 points = array.from(firstPoint, secondPoint)
 labelIds = label.all
 lineIds = line.all
+linefillIds = linefill.all
 boxIds = box.all
 polylineIds = polyline.all
 firstLabel = array.get(labelIds, 0)
 firstLine = array.get(lineIds, 0)
+firstLinefill = array.get(linefillIds, 0)
 firstBox = array.get(boxIds, 0)
 firstPolyline = array.get(polylineIds, 0)
 firstLabel := line.new(bar_index, close, bar_index + 1, close)
 firstLine := label.new(bar_index, close)
+firstLinefill := line.new(bar_index, close, bar_index + 1, close)
 firstBox := polyline.new(points)
 firstPolyline := box.new(bar_index, high, bar_index + 1, low)
 plot(1)
@@ -3286,15 +3289,18 @@ plot(1)
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot assign line value to label variable firstLabel',
       'Cannot assign label value to line variable firstLine',
+      'Cannot assign line value to linefill variable firstLinefill',
       'Cannot assign polyline value to box variable firstBox',
       'Cannot assign box value to polyline variable firstPolyline',
     ]);
     expect(types.get('labelIds')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
     expect(types.get('lineIds')).toMatchObject({ kind: 'array', elementType: { kind: 'line' } });
+    expect(types.get('linefillIds')).toMatchObject({ kind: 'array', elementType: { kind: 'linefill' } });
     expect(types.get('boxIds')).toMatchObject({ kind: 'array', elementType: { kind: 'box' } });
     expect(types.get('polylineIds')).toMatchObject({ kind: 'array', elementType: { kind: 'polyline' } });
     expect(types.get('firstLabel')).toMatchObject({ kind: 'label' });
     expect(types.get('firstLine')).toMatchObject({ kind: 'line' });
+    expect(types.get('firstLinefill')).toMatchObject({ kind: 'linefill' });
     expect(types.get('firstBox')).toMatchObject({ kind: 'box' });
     expect(types.get('firstPolyline')).toMatchObject({ kind: 'polyline' });
   });
