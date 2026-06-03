@@ -3046,6 +3046,11 @@ class SemanticChecker {
     const calleeName = calleePath.join('.');
     const referenceReturnType = REFERENCE_CONSTRUCTOR_RETURN_TYPES.get(calleeName);
     if (referenceReturnType) return { kind: referenceReturnType };
+    if (calleeName === 'ta.valuewhen') {
+      const sourceArgument = this.getCallArgument(expression.arguments, 'source', 1);
+      const sourceType = sourceArgument ? this.inferExpressionType(sourceArgument, scope) : { kind: 'unknown' as const };
+      return { ...sourceType, qualifier: 'series' };
+    }
     if (BOOLEAN_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'bool', qualifier: 'series' };
     if (INTEGER_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'int', qualifier: 'series' };
     if (FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: 'series' };
