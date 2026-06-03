@@ -65,6 +65,21 @@ indicator("My Indicator", overlay=true, precision=2)`);
         expect(indicator.type).toBe('IndicatorDeclaration');
       });
 
+      it('parses indicator named-prefix positional tails', () => {
+        const ast = parse(`//@version=6
+indicator(title="Mixed Indicator", "Mixed", true, format.price, 3)`);
+
+        const indicator = ast.body[0];
+        expect(indicator.type).toBe('IndicatorDeclaration');
+        if (indicator.type === 'IndicatorDeclaration') {
+          expect(indicator.title?.type).toBe('StringLiteral');
+          expect(indicator.shorttitle?.type).toBe('StringLiteral');
+          expect(indicator.overlay?.type).toBe('BooleanLiteral');
+          expect(indicator.format?.type).toBe('MemberExpression');
+          expect(indicator.precision?.type).toBe('NumericLiteral');
+        }
+      });
+
       it('parses max_bars_back metadata', () => {
         const ast = parse(`//@version=6
 indicator("My Indicator", max_bars_back=500)`);
@@ -98,6 +113,24 @@ strategy("My Strategy", overlay=true)`);
         expect(declaration.type).toBe('IndicatorDeclaration');
         if (declaration.type === 'IndicatorDeclaration') {
           expect(declaration.declarationKind).toBe('strategy');
+        }
+      });
+
+      it('parses strategy named-prefix positional tails', () => {
+        const ast = parse(`//@version=6
+strategy(title="Mixed Strategy", "Mixed", true, format.price, 3, scale.right, 100, "60", true, false, true, 10, 20, 30, 40, 50, true, 25000, "EUR", strategy.fixed, 2, 3, strategy.commission.percent, 0.1, 1, 50, 60, true, false, true, true)`);
+
+        const declaration = ast.body[0];
+        expect(declaration.type).toBe('IndicatorDeclaration');
+        if (declaration.type === 'IndicatorDeclaration') {
+          expect(declaration.declarationKind).toBe('strategy');
+          expect(declaration.shorttitle?.type).toBe('StringLiteral');
+          expect(declaration.overlay?.type).toBe('BooleanLiteral');
+          expect(declaration.initial_capital?.type).toBe('NumericLiteral');
+          expect(declaration.currency?.type).toBe('StringLiteral');
+          expect(declaration.default_qty_type?.type).toBe('MemberExpression');
+          expect(declaration.process_orders_on_close?.type).toBe('BooleanLiteral');
+          expect(declaration.use_bar_magnifier?.type).toBe('BooleanLiteral');
         }
       });
     });
