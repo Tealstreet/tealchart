@@ -2878,12 +2878,16 @@ unknownGetter = label.get_text(marker, format="raw")
 indicator("Line Setter Signatures")
 trend = line.new(bar_index, close, bar_index + 1, close)
 clone = line.copy(id=trend)
+firstPoint = chart.point.from_index(bar_index - 1, high)
+secondPoint = chart.point.from_index(bar_index + 2, low)
 line.set_x1(id=trend, bar_index)
 line.set_x2(trend, x=bar_index + 2)
 line.set_y1(id=trend, high)
 line.set_y2(trend, y=low)
 line.set_xy1(id=trend, x=bar_index, y=high)
 line.set_xy2(trend, bar_index + 2, y=low)
+line.set_first_point(id=trend, first_point=firstPoint)
+line.set_second_point(trend, second_point=secondPoint)
 line.set_xloc(id=trend, bar_index, bar_index + 2, xloc.bar_index)
 line.set_extend(trend, extend="right")
 line.set_color(id=trend, color.blue)
@@ -2903,10 +2907,16 @@ plot(1)
     const result = checkProgram(parse(`
 indicator("Bad Line Setter Signatures")
 trend = line.new(bar_index, close, bar_index + 1, close)
+firstPoint = chart.point.from_index(bar_index, high)
+secondPoint = chart.point.from_index(bar_index + 1, low)
 unknown = line.set_color(trend, color.blue, opacity=80)
 missing = line.set_xloc(id=trend, x1=bar_index)
 duplicate = line.set_xy1(trend, bar_index, high, id=trend)
 tooMany = line.set_width(trend, 2, 3)
+missingFirstPoint = line.set_first_point(id=trend)
+duplicateSecondPoint = line.set_second_point(trend, secondPoint, id=trend)
+tooManyFirstPoint = line.set_first_point(trend, firstPoint, secondPoint)
+unknownSecondPoint = line.set_second_point(trend, point=secondPoint)
 missingCopy = line.copy()
 `));
 
@@ -2917,6 +2927,13 @@ missingCopy = line.copy()
       "line.set_xloc() missing required argument 'xloc'",
       "Argument 'id' for line.set_xy1() was supplied multiple times",
       'line.set_width() expects at most 2 arguments',
+      'line.set_first_point() expects at least 2 arguments',
+      "line.set_first_point() missing required argument 'first_point'",
+      "Argument 'id' for line.set_second_point() was supplied multiple times",
+      'line.set_first_point() expects at most 2 arguments',
+      "Unknown argument 'point' for line.set_second_point()",
+      'line.set_second_point() expects at least 2 arguments',
+      "line.set_second_point() missing required argument 'second_point'",
       'line.copy() expects at least 1 argument',
       "line.copy() missing required argument 'id'",
     ]);
