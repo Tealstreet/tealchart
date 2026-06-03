@@ -750,6 +750,22 @@ plot(selectedSource(close > open), title="Selected")
     expect(roundSeries(getPlot(result, 'Selected').values)).toEqual([102, 105, 107, 107, 103, 100, 104, 109, 109, 111, 111, 112]);
   });
 
+  it('destructures if initializer tuple values', () => {
+    const result = runCompatScript(`
+indicator("If initializer tuple")
+[selected, title] = if close > open
+    [close, "up"]
+else
+    [open, "down"]
+plot(selected, title="Selected")
+plot(title == "up" ? 1 : -1, title="Direction")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Selected').values)).toEqual([102, 105, 107, 107, 103, 100, 104, 109, 109, 111, 111, 112]);
+    expect(roundSeries(getPlot(result, 'Direction').values)).toEqual([1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, 1]);
+  });
+
   it('supports nested user-defined functions inside indicators', () => {
     const result = runCompatScript(`
 indicator("UDF nested")
