@@ -784,22 +784,33 @@ method branchPair(float this, bool enabled) =>
         [this, "up"]
     else
         [this + 1, "down"]
+method partialBranchPair(float this, bool enabled) =>
+    if enabled
+        [this, "partial branch"]
 method loopPair(float this, int limit) =>
     for i = 0 to limit
         [this + i, "loop"]
 method switchPair(float this, string mode) => switch mode
     "wide" => [1, "wide"]
     => [this, "default"]
+method partialSwitchPair(float this, string mode) => switch mode
+    "wide" => [this, "partial switch"]
 [branchValue, branchTitle] = close.branchPair(close > open)
+[partialBranchValue, partialBranchTitle] = close.partialBranchPair(close > open)
 [loopValue, loopTitle] = close.loopPair(2)
 [switchValue, switchTitle] = close.switchPair("wide")
+[partialSwitchValue, partialSwitchTitle] = close.partialSwitchPair("wide")
 branchValue := "bad"
 branchTitle := 1
+partialBranchValue := "bad"
+partialBranchTitle := 2
 loopValue := "bad"
-loopTitle := 2
+loopTitle := 3
 switchValue := "bad"
-switchTitle := 3
-plot(branchValue + loopValue + switchValue)
+switchTitle := 4
+partialSwitchValue := "bad"
+partialSwitchTitle := 5
+plot(branchValue + partialBranchValue + loopValue + switchValue + partialSwitchValue)
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -807,17 +818,25 @@ plot(branchValue + loopValue + switchValue)
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot assign string value to float variable branchValue',
       'Cannot assign int value to string variable branchTitle',
+      'Cannot assign string value to float variable partialBranchValue',
+      'Cannot assign int value to string variable partialBranchTitle',
       'Cannot assign string value to float variable loopValue',
       'Cannot assign int value to string variable loopTitle',
       'Cannot assign string value to float variable switchValue',
       'Cannot assign int value to string variable switchTitle',
+      'Cannot assign string value to float variable partialSwitchValue',
+      'Cannot assign int value to string variable partialSwitchTitle',
     ]);
     expect(types.get('branchValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('branchTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('partialBranchValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('partialBranchTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
     expect(types.get('loopValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('loopTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
     expect(types.get('switchValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('switchTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('partialSwitchValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('partialSwitchTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
   });
 
   it('infers user method control-flow expression types for downstream diagnostics', () => {
@@ -828,6 +847,9 @@ method branchValue(float this, bool enabled) =>
         this
     else
         1
+method partialBranchValue(float this, bool enabled) =>
+    if enabled
+        this
 method loopValue(float this, int limit) =>
     for i = 0 to limit
         this + i
@@ -837,29 +859,39 @@ method whileValue(float this, bool enabled) =>
 method switchValue(float this, string mode) => switch mode
     "wide" => 1
     => this
+method partialSwitchValue(float this, string mode) => switch mode
+    "wide" => this
 branchResult = close.branchValue(close > open)
+partialBranchResult = close.partialBranchValue(close > open)
 loopResult = close.loopValue(2)
 whileResult = close.whileValue(close > open)
 switchResult = close.switchValue("wide")
+partialSwitchResult = close.partialSwitchValue("wide")
 branchResult := "bad"
+partialBranchResult := "bad"
 loopResult := "bad"
 whileResult := "bad"
 switchResult := "bad"
-plot(branchResult + loopResult + whileResult + switchResult)
+partialSwitchResult := "bad"
+plot(branchResult + partialBranchResult + loopResult + whileResult + switchResult + partialSwitchResult)
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot assign string value to float variable branchResult',
+      'Cannot assign string value to float variable partialBranchResult',
       'Cannot assign string value to float variable loopResult',
       'Cannot assign string value to float variable whileResult',
       'Cannot assign string value to float variable switchResult',
+      'Cannot assign string value to float variable partialSwitchResult',
     ]);
     expect(types.get('branchResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('partialBranchResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('loopResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('whileResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('switchResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('partialSwitchResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports assignments to undeclared identifiers', () => {
