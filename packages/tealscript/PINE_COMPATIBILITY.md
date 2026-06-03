@@ -73,6 +73,8 @@ Covered behavior and remaining gaps:
   `else if` / `else` branches.
 - User-defined function bodies can return the last expression result from
   numeric `for`, collection `for ... in`, and `while` loop bodies.
+- Direct user-defined function calls infer semantic return types and preserve
+  call-site qualifiers for annotated parameters.
 - Numeric `for`, collection `for ... in`, and `while` loops can be used as
   expressions. The expression value is the last body expression reached,
   including across `break` and `continue` control flow.
