@@ -225,6 +225,29 @@ const INPUT_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['input.timeframe', 'string'],
 ]);
 
+const MATH_FLOAT_RETURN_FUNCTIONS = new Set([
+  'math.acos',
+  'math.asin',
+  'math.atan',
+  'math.cos',
+  'math.exp',
+  'math.log',
+  'math.log10',
+  'math.pow',
+  'math.sign',
+  'math.sin',
+  'math.sqrt',
+  'math.tan',
+  'math.todegrees',
+  'math.toradians',
+]);
+
+const MATH_INTEGER_RETURN_FUNCTIONS = new Set([
+  'math.ceil',
+  'math.floor',
+  'math.trunc',
+]);
+
 const FLOAT_RETURN_FUNCTIONS = new Set([
   'ta.alma',
   'ta.atr',
@@ -3125,6 +3148,25 @@ class SemanticChecker {
       const sourceType = sourceArgument ? this.inferExpressionType(sourceArgument, scope) : { kind: 'unknown' as const };
       return { ...sourceType, qualifier: 'series' };
     }
+    if (MATH_FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+    if (MATH_INTEGER_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'int', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
+    if (calleeName === 'math.avg' || calleeName === 'math.round_to_mintick') {
+      return { kind: 'float', qualifier: this.inferCallArgumentMaxQualifierAtLeast(expression, scope, 'simple') };
+    }
+    if (calleeName === 'math.random' || calleeName === 'math.sum') return { kind: 'float', qualifier: 'series' };
+    if (calleeName === 'math.round') {
+      const precisionArgument = this.getCallArgument(expression.arguments, 'precision', 1);
+      return {
+        kind: precisionArgument ? 'float' : 'int',
+        qualifier: this.inferCallArgumentMaxQualifier(expression, scope),
+      };
+    }
+    if (calleeName === 'math.abs' || calleeName === 'math.max' || calleeName === 'math.min') {
+      return {
+        kind: this.inferNumericCallReturnKind(expression, scope),
+        qualifier: this.inferCallArgumentMaxQualifier(expression, scope),
+      };
+    }
     if (FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: 'series' };
     if (calleeName === 'label.get_x') return { kind: 'int' };
     if (calleeName === 'label.get_y') return { kind: 'float' };
@@ -3375,6 +3417,26 @@ class SemanticChecker {
 
   private inferCallArgumentMaxQualifier(expression: CallExpression, scope: SemanticScope): SemanticQualifier | undefined {
     return this.maxQualifier(...expression.arguments.map((argument) => this.inferExpressionType(argument.value, scope)));
+  }
+
+  private inferCallArgumentMaxQualifierAtLeast(expression: CallExpression, scope: SemanticScope, minimumQualifier: SemanticQualifier): SemanticQualifier {
+    const qualifier = this.inferCallArgumentMaxQualifier(expression, scope);
+    if (!qualifier || QUALIFIER_RANK[qualifier] < QUALIFIER_RANK[minimumQualifier]) return minimumQualifier;
+    return qualifier;
+  }
+
+  private inferNumericCallReturnKind(expression: CallExpression, scope: SemanticScope): 'int' | 'float' | 'unknown' {
+    let sawNumber = false;
+    for (const argument of expression.arguments) {
+      const argumentType = this.inferExpressionType(argument.value, scope);
+      if (argumentType.kind === 'float') return 'float';
+      if (argumentType.kind === 'int') {
+        sawNumber = true;
+        continue;
+      }
+      return 'unknown';
+    }
+    return sawNumber ? 'int' : 'unknown';
   }
 
   private arrayElementTypeKind(type: SemanticType): SemanticType {
