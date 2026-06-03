@@ -343,6 +343,74 @@ plot(strategy.closedtrades.exit_price(trade_num=0))
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('infers Pine strategy state and trade accessor return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+strategy("Strategy Return Types", initial_capital=1000)
+equity = strategy.equity
+positionSize = strategy.position_size
+openTrades = strategy.opentrades
+closedTrades = strategy.closedtrades
+winTrades = strategy.wintrades
+entryId = strategy.opentrades.entry_id(0)
+entryBar = strategy.opentrades.entry_bar_index(0)
+entryTime = strategy.opentrades.entry_time(0)
+entryPrice = strategy.opentrades.entry_price(0)
+exitId = strategy.closedtrades.exit_id(trade_num=0)
+exitBar = strategy.closedtrades.exit_bar_index(trade_num=0)
+exitTime = strategy.closedtrades.exit_time(trade_num=0)
+exitPrice = strategy.closedtrades.exit_price(trade_num=0)
+closedProfit = strategy.closedtrades.profit(trade_num=0)
+equity := "bad"
+positionSize := "bad"
+openTrades := "bad"
+closedTrades := "bad"
+winTrades := "bad"
+entryId := 1
+entryBar := "bad"
+entryTime := "bad"
+entryPrice := "bad"
+exitId := 2
+exitBar := "bad"
+exitTime := "bad"
+exitPrice := "bad"
+closedProfit := "bad"
+plot(equity + positionSize + openTrades + closedTrades + winTrades + entryBar + entryTime + entryPrice + exitBar + exitTime + exitPrice + closedProfit + str.length(entryId) + str.length(exitId))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable equity',
+      'Cannot assign string value to float variable positionSize',
+      'Cannot assign string value to int variable openTrades',
+      'Cannot assign string value to int variable closedTrades',
+      'Cannot assign string value to int variable winTrades',
+      'Cannot assign int value to string variable entryId',
+      'Cannot assign string value to int variable entryBar',
+      'Cannot assign string value to int variable entryTime',
+      'Cannot assign string value to float variable entryPrice',
+      'Cannot assign int value to string variable exitId',
+      'Cannot assign string value to int variable exitBar',
+      'Cannot assign string value to int variable exitTime',
+      'Cannot assign string value to float variable exitPrice',
+      'Cannot assign string value to float variable closedProfit',
+    ]);
+    expect(types.get('equity')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('positionSize')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('openTrades')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('closedTrades')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('winTrades')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('entryId')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('entryBar')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('entryTime')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('entryPrice')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('exitId')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('exitBar')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('exitTime')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('exitPrice')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('closedProfit')).toMatchObject({ kind: 'float', qualifier: 'series' });
+  });
+
   it('reports invalid Pine strategy call arguments', () => {
     const result = checkProgram(parse(`
 strategy("Bad Strategy")

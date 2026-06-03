@@ -278,6 +278,50 @@ const REQUEST_FLOAT_RETURN_NAMES = new Set([
   'request.splits',
 ]);
 
+const STRATEGY_FLOAT_MEMBER_NAMES = new Set([
+  'strategy.equity',
+  'strategy.grossloss',
+  'strategy.grossprofit',
+  'strategy.initial_capital',
+  'strategy.max_drawdown',
+  'strategy.max_runup',
+  'strategy.netprofit',
+  'strategy.openprofit',
+  'strategy.position_avg_price',
+  'strategy.position_size',
+]);
+const STRATEGY_INT_MEMBER_NAMES = new Set([
+  'strategy.closedtrades',
+  'strategy.eventrades',
+  'strategy.losstrades',
+  'strategy.opentrades',
+  'strategy.wintrades',
+]);
+const STRATEGY_STRING_ACCESSOR_NAMES = new Set([
+  'strategy.closedtrades.entry_id',
+  'strategy.closedtrades.exit_id',
+  'strategy.opentrades.entry_id',
+]);
+const STRATEGY_INT_ACCESSOR_NAMES = new Set([
+  'strategy.closedtrades.entry_bar_index',
+  'strategy.closedtrades.entry_time',
+  'strategy.closedtrades.exit_bar_index',
+  'strategy.closedtrades.exit_time',
+  'strategy.opentrades.entry_bar_index',
+  'strategy.opentrades.entry_time',
+]);
+const STRATEGY_FLOAT_ACCESSOR_NAMES = new Set([
+  'strategy.closedtrades.commission',
+  'strategy.closedtrades.entry_price',
+  'strategy.closedtrades.exit_price',
+  'strategy.closedtrades.profit',
+  'strategy.closedtrades.size',
+  'strategy.opentrades.commission',
+  'strategy.opentrades.entry_price',
+  'strategy.opentrades.profit',
+  'strategy.opentrades.size',
+]);
+
 const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['box.copy', 'box'],
   ['box.new', 'box'],
@@ -3553,6 +3597,10 @@ class SemanticChecker {
           const syminfoType = this.inferSyminfoMemberType(expression);
           if (syminfoType) return syminfoType;
         }
+        if (expression.object.type === 'Identifier' && expression.object.name === 'strategy') {
+          const strategyType = this.inferStrategyMemberType(expression);
+          if (strategyType) return strategyType;
+        }
         if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
           return { kind: 'unknown', qualifier: 'const' };
         }
@@ -3859,6 +3907,8 @@ class SemanticChecker {
     if (timeType) return timeType;
     const tickerType = this.inferTickerCallType(calleePath);
     if (tickerType) return tickerType;
+    const strategyType = this.inferStrategyCallType(calleePath);
+    if (strategyType) return strategyType;
     if (namespace === 'input') return { kind: 'unknown', qualifier: 'input' };
     if (namespace === 'request' || namespace === 'ta' || namespace === 'time' || namespace === 'time_close' || calleePath.join('.') === 'timeframe.change') {
       return { kind: 'unknown', qualifier: 'series' };
@@ -4487,6 +4537,8 @@ class SemanticChecker {
     if (timeframeType) return timeframeType;
     const syminfoType = this.inferSyminfoMemberType(expression);
     if (syminfoType) return syminfoType;
+    const strategyType = this.inferStrategyMemberType(expression);
+    if (strategyType) return strategyType;
     const enumType = this.inferEnumMemberType(expression, scope);
     if (enumType) return enumType;
 
@@ -4510,6 +4562,21 @@ class SemanticChecker {
     if (SYMINFO_STRING_MEMBER_NAMES.has(memberName)) return { kind: 'string', qualifier: 'simple' };
     if (SYMINFO_INT_MEMBER_NAMES.has(memberName)) return { kind: 'int', qualifier: 'simple' };
     if (SYMINFO_FLOAT_MEMBER_NAMES.has(memberName)) return { kind: 'float', qualifier: 'simple' };
+    return undefined;
+  }
+
+  private inferStrategyMemberType(expression: MemberExpression): SemanticType | undefined {
+    const memberName = this.memberPath(expression).join('.');
+    if (STRATEGY_FLOAT_MEMBER_NAMES.has(memberName)) return { kind: 'float', qualifier: 'series' };
+    if (STRATEGY_INT_MEMBER_NAMES.has(memberName)) return { kind: 'int', qualifier: 'series' };
+    return undefined;
+  }
+
+  private inferStrategyCallType(calleePath: string[]): SemanticType | undefined {
+    const calleeName = calleePath.join('.');
+    if (STRATEGY_STRING_ACCESSOR_NAMES.has(calleeName)) return { kind: 'string', qualifier: 'series' };
+    if (STRATEGY_INT_ACCESSOR_NAMES.has(calleeName)) return { kind: 'int', qualifier: 'series' };
+    if (STRATEGY_FLOAT_ACCESSOR_NAMES.has(calleeName)) return { kind: 'float', qualifier: 'series' };
     return undefined;
   }
 
