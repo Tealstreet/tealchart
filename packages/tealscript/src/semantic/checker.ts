@@ -1747,11 +1747,29 @@ class SemanticChecker {
   private checkAssignment(statement: AssignmentStatement, scope: SemanticScope): void {
     this.checkExpression(statement.right, scope);
     this.checkAssignmentTarget(statement, scope);
-    if (statement.left.type === 'MemberExpression') {
+    if (statement.left.type === 'Identifier') {
+      this.checkIdentifierAssignmentType(statement, scope);
+    } else if (statement.left.type === 'MemberExpression') {
       this.checkUdtFieldAssignmentType(statement.left, statement.right, scope);
     } else if (statement.left.type === 'IndexExpression') {
       this.checkIndexAssignmentType(statement.left, statement.right, scope);
     }
+  }
+
+  private checkIdentifierAssignmentType(statement: AssignmentStatement, scope: SemanticScope): void {
+    if (statement.operator !== ':=' || statement.left.type !== 'Identifier') return;
+
+    const targetType = scope.lookup(statement.left.name)?.type;
+    if (!targetType) return;
+
+    const sourceType = this.inferExpressionType(statement.right, scope);
+    if (this.isAssignableType(targetType, sourceType)) return;
+
+    this.addDiagnostic(
+      'type-mismatch',
+      `Cannot assign ${this.formatSemanticType(sourceType)} value to ${this.formatSemanticType(targetType)} variable ${statement.left.name}`,
+      statement.loc,
+    );
   }
 
   private checkAssignmentTarget(statement: AssignmentStatement, scope: SemanticScope): void {

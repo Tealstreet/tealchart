@@ -496,6 +496,47 @@ missing := known + 1
     ]);
   });
 
+  it('reports plain identifier reassignment type mismatches', () => {
+    const result = checkProgram(parse(`
+indicator("Assignment Type Mismatches")
+enum Direction
+    up = "Up"
+    down = "Down"
+enum Mode
+    fast = "Fast"
+    slow = "Slow"
+type Pivot
+    float y
+type Other
+    float y
+int total = 1
+float price = 1
+string name = "fast"
+label tag = label.new(bar_index, close)
+array<float> values = array.new<float>()
+Direction direction = Direction.up
+Pivot pivot = Pivot.new(close)
+unknown = na
+total := 2
+price := total
+unknown := "later"
+name := 1
+tag := line.new(bar_index, low, bar_index, high)
+values := array.new<string>()
+direction := Mode.fast
+pivot := Other.new(close)
+plot(price)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign int value to string variable name',
+      'Cannot assign line value to label variable tag',
+      'Cannot assign array<string> value to array<float> variable values',
+      'Cannot assign Mode value to Direction variable direction',
+      'Cannot assign Other value to Pivot variable pivot',
+    ]);
+  });
+
   it('reports unknown identifiers and functions', () => {
     const result = checkProgram(parse(`
 indicator("Unknowns")
