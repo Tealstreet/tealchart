@@ -1645,6 +1645,56 @@ tooMany = table.new(position.top_right, 2, 3, color.black, color.gray, 1, color.
     ]);
   });
 
+  it('resolves table management named arguments and positional tails', () => {
+    const result = checkProgram(parse(`
+indicator("Table Management Signatures")
+dashboard = table.new(columns=2, rows=2)
+temporary = table.new(columns=1, rows=1)
+table.clear(table_id=dashboard, 0, 0)
+table.clear(dashboard, start_column=0, start_row=0, end_column=1, end_row=1)
+table.set_position(table_id=dashboard, position.bottom_left)
+table.set_bgcolor(dashboard, bgcolor=color.new(color.black, 80))
+table.set_frame_color(table_id=dashboard, color.gray)
+table.set_frame_width(dashboard, frame_width=1)
+table.set_border_color(table_id=dashboard, border_color=color.white)
+table.set_border_width(dashboard, border_width=2)
+table.delete(table_id=temporary)
+plot(1)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid table management argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Table Management Signatures")
+dashboard = table.new(columns=2, rows=2)
+unknown = table.clear(dashboard, 0, 0, width=1)
+missingClear = table.clear(table_id=dashboard, start_column=0)
+duplicateClear = table.clear(dashboard, 0, 0, table_id=dashboard)
+tooManyClear = table.clear(dashboard, 0, 0, 1, 1, 2)
+missingSetter = table.set_position(table_id=dashboard)
+unknownSetter = table.set_bgcolor(dashboard, color.black, opacity=80)
+duplicateSetter = table.set_frame_color(dashboard, color.gray, table_id=dashboard)
+tooManySetter = table.set_border_width(dashboard, 1, 2)
+tooManyDelete = table.delete(dashboard, dashboard)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'width' for table.clear()",
+      'table.clear() expects at least 3 arguments',
+      "table.clear() missing required argument 'start_row'",
+      "Argument 'table_id' for table.clear() was supplied multiple times",
+      'table.clear() expects at most 5 arguments',
+      'table.set_position() expects at least 2 arguments',
+      "table.set_position() missing required argument 'position'",
+      "Unknown argument 'opacity' for table.set_bgcolor()",
+      "Argument 'table_id' for table.set_frame_color() was supplied multiple times",
+      'table.set_border_width() expects at most 2 arguments',
+      'table.delete() expects at most 1 argument',
+    ]);
+  });
+
   it('resolves table.cell named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Table Cell Signatures")
