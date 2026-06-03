@@ -813,7 +813,19 @@ pivotValue = switch mode
     =>
         pivot = Pivot.new(open)
         pivot
-plot(numberValue + array.size(arrayValue) + matrix.rows(matrixValue) + map.size(mapValue) + pivotValue.price)
+blockIfValue = switch mode
+    "up" =>
+        if close > open
+            close
+        else
+            open
+    => 1
+blockHelperValue = switch mode
+    "up" =>
+        helper(float value) => value
+        helper(close)
+    => 1
+plot(numberValue + array.size(arrayValue) + matrix.rows(matrixValue) + map.size(mapValue) + pivotValue.price + blockIfValue + blockHelperValue)
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -830,6 +842,8 @@ plot(numberValue + array.size(arrayValue) + matrix.rows(matrixValue) + map.size(
       valueType: { kind: 'float' },
     });
     expect(types.get('pivotValue')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
+    expect(types.get('blockIfValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('blockHelperValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('preserves primitive types through unary expressions', () => {
