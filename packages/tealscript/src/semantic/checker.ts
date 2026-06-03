@@ -3271,6 +3271,8 @@ class SemanticChecker {
     if (matrixElementReadType) return matrixElementReadType;
     const mapValueReadType = this.inferMapValueReadCallType(expression, scope);
     if (mapValueReadType) return mapValueReadType;
+    const mapHelperType = this.inferMapHelperCallType(expression, scope);
+    if (mapHelperType) return mapHelperType;
     if (calleePath.join('.') === 'array.from') {
       return {
         kind: 'array',
@@ -3437,10 +3439,62 @@ class SemanticChecker {
   }
 
   private inferMapValueReadCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
-    if (expression.callee.type !== 'MemberExpression' || expression.callee.property.name !== 'get') return undefined;
+    if (
+      expression.callee.type !== 'MemberExpression'
+      || (expression.callee.property.name !== 'get' && expression.callee.property.name !== 'remove')
+    ) {
+      return undefined;
+    }
 
     const mapCall = this.resolveMapCall(expression, scope);
-    return mapCall?.operation === 'get' && mapCall.mapType.kind === 'map' ? mapCall.mapType.valueType : undefined;
+    return (mapCall?.operation === 'get' || mapCall?.operation === 'remove') && mapCall.mapType.kind === 'map' ? mapCall.mapType.valueType : undefined;
+  }
+
+  private inferMapHelperCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
+    if (expression.callee.type !== 'MemberExpression') return undefined;
+
+    const methodName = expression.callee.property.name;
+    if (methodName === 'contains') {
+      const mapCall = this.resolveMapCall(expression, scope);
+      return mapCall?.operation === 'contains' && mapCall.mapType.kind === 'map' ? { kind: 'bool', qualifier: 'series' } : undefined;
+    }
+
+    const receiverType = this.inferMapHelperReceiverType(expression, scope);
+    if (receiverType?.kind !== 'map') return undefined;
+
+    switch (methodName) {
+      case 'copy':
+        return {
+          kind: 'map',
+          keyType: receiverType.keyType,
+          valueType: receiverType.valueType,
+        };
+      case 'keys':
+        return {
+          kind: 'array',
+          elementType: receiverType.keyType,
+        };
+      case 'values':
+        return {
+          kind: 'array',
+          elementType: receiverType.valueType,
+        };
+      case 'size':
+        return { kind: 'int', qualifier: 'series' };
+      default:
+        return undefined;
+    }
+  }
+
+  private inferMapHelperReceiverType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
+    if (expression.callee.type !== 'MemberExpression') return undefined;
+
+    if (expression.callee.object.type === 'Identifier' && expression.callee.object.name === 'map') {
+      const mapArgument = this.getCallArgument(expression.arguments, 'id', 0);
+      return mapArgument ? this.inferExpressionType(mapArgument, scope) : undefined;
+    }
+
+    return this.inferExpressionType(expression.callee.object, scope);
   }
 
   private inferIndexExpressionType(expression: IndexExpression, scope: SemanticScope): SemanticType {
