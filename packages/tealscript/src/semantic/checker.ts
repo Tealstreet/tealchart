@@ -2712,16 +2712,36 @@ class SemanticChecker {
       .map((method) => this.typeFromAnnotation(method.params[0]?.typeAnnotation ?? undefined))
       .filter((type): type is SemanticType => !!type);
     if (annotatedReceivers.length === 0) return;
-    if (annotatedReceivers.some((methodReceiverType) => (
-      this.isAssignableType(methodReceiverType, receiverType)
-      && this.isAssignableQualifier(methodReceiverType.qualifier, receiverType.qualifier)
-    ))) return;
+    if (this.findUserMethodDeclaration(expression.callee.property.name, receiverType)) return;
 
     this.addDiagnostic(
       'method-receiver-type',
       `No method ${expression.callee.property.name}() overload accepts ${this.formatSemanticTypeWithQualifier(receiverType)} receiver`,
       expression.callee.property.loc,
     );
+  }
+
+  private inferUserMethodCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
+    if (expression.callee.type !== 'MemberExpression') return undefined;
+
+    const receiverType = this.inferExpressionType(expression.callee.object, scope);
+    if (receiverType.kind === 'unknown') return undefined;
+    if (this.isBuiltinCollectionMemberMethod(receiverType, expression.callee.property.name)) return undefined;
+
+    const method = this.findUserMethodDeclaration(expression.callee.property.name, receiverType);
+    return method ? this.inferFunctionReturnType(method) : undefined;
+  }
+
+  private findUserMethodDeclaration(methodName: string, receiverType: SemanticType): FunctionDeclaration | undefined {
+    const methods = this.methodDeclarations.get(methodName);
+    if (!methods?.length) return undefined;
+
+    return methods.find((method) => {
+      const methodReceiverType = this.typeFromAnnotation(method.params[0]?.typeAnnotation ?? undefined);
+      return !!methodReceiverType
+        && this.isAssignableType(methodReceiverType, receiverType)
+        && this.isAssignableQualifier(methodReceiverType.qualifier, receiverType.qualifier);
+    });
   }
 
   private isBuiltinCollectionMemberMethod(receiverType: SemanticType, methodName: string): boolean {
@@ -3464,6 +3484,8 @@ class SemanticChecker {
     if (calleePath.length === 2 && calleePath[1] === 'new' && calleePath[0] && this.typeDeclarations.has(calleePath[0])) {
       return { kind: 'udt', name: calleePath[0], qualifier: 'series' };
     }
+    const userMethodType = this.inferUserMethodCallType(expression, scope);
+    if (userMethodType) return userMethodType;
     if (expression.callee.type === 'Identifier') {
       const symbol = scope.lookup(expression.callee.name);
       if (symbol?.kind === 'function' && symbol.type) return symbol.type;
