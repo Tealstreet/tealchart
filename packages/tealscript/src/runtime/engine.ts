@@ -7277,7 +7277,8 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.barssince', (args, namedArgs, _ctx, scope, callId) => {
-      const condition = this.isTruthy(this.getCallArg(args, namedArgs, 0, 'condition'));
+      const taBarssinceArgs = ['condition'];
+      const condition = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taBarssinceArgs, 0));
       const key = `_barssince_${callId}`;
       const previous = scope.get(key) as number | undefined;
       const value = condition ? 0 : previous === undefined || isNaN(previous) ? NaN : previous + 1;
@@ -7286,9 +7287,10 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.valuewhen', (args, namedArgs, _ctx, scope, callId) => {
-      const condition = this.isTruthy(this.getCallArg(args, namedArgs, 0, 'condition'));
-      const source = this.getCallArg(args, namedArgs, 1, 'source') as number;
-      const occurrence = Math.max(0, Math.trunc(this.toNumber(this.getCallArg(args, namedArgs, 2, 'occurrence', 0))));
+      const taValuewhenArgs = ['condition', 'source', 'occurrence'];
+      const condition = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taValuewhenArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taValuewhenArgs, 1) as number;
+      const occurrence = Math.max(0, Math.trunc(this.toNumber(this.getOrderedCallArg(args, namedArgs, taValuewhenArgs, 2, 0))));
       const key = `_valuewhen_${callId}`;
       const values = (scope.get(key) as unknown[] | undefined) ?? [];
 
@@ -7302,8 +7304,9 @@ export class TealscriptEngine {
 
     // Change - difference from N bars ago
     this.builtins.set('ta.change', (args, namedArgs, ctx, scope, callId) => {
-      const rawSource = this.getCallArg(args, namedArgs, 0, 'source');
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length', 1));
+      const taChangeArgs = ['source', 'length'];
+      const rawSource = this.getOrderedCallArg(args, namedArgs, taChangeArgs, 0);
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taChangeArgs, 1, 1));
 
       if (typeof rawSource === 'boolean') {
         const key = `_change_bool_${callId}`;
@@ -7327,8 +7330,9 @@ export class TealscriptEngine {
     // Crossover - source1 crosses above source2
     // Uses scope to track previous values of both arguments
     this.builtins.set('ta.crossover', (args, namedArgs, ctx, scope) => {
-      const source1 = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source1'));
-      const source2 = this.toNumber(this.getCallArg(args, namedArgs, 1, 'source2'));
+      const taCrossArgs = ['source1', 'source2'];
+      const source1 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0));
+      const source2 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1));
 
       // Try to get series for source1 (if it's a built-in series)
       const series1 = this.getSeriesForSource(source1, ctx);
@@ -7359,8 +7363,9 @@ export class TealscriptEngine {
 
     // Crossunder - source1 crosses below source2
     this.builtins.set('ta.crossunder', (args, namedArgs, ctx, scope) => {
-      const source1 = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source1'));
-      const source2 = this.toNumber(this.getCallArg(args, namedArgs, 1, 'source2'));
+      const taCrossArgs = ['source1', 'source2'];
+      const source1 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0));
+      const source2 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1));
 
       // Try to get series for source1 (if it's a built-in series)
       const series1 = this.getSeriesForSource(source1, ctx);
@@ -7390,8 +7395,9 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.cross', (args, namedArgs, ctx, scope, callId) => {
-      const source1 = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source1'));
-      const source2 = this.toNumber(this.getCallArg(args, namedArgs, 1, 'source2'));
+      const taCrossArgs = ['source1', 'source2'];
+      const source1 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0));
+      const source2 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1));
       const series1 = this.getKnownSeriesForSource(source1, ctx);
       const series2 = this.getKnownSeriesForSource(source2, ctx);
       const trackKey1 = `_cross_any_src1_${callId}`;

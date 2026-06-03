@@ -1709,8 +1709,11 @@ indicator("TA Core Signatures")
 condition = close > open
 since = ta.barssince(condition=condition)
 last = ta.valuewhen(condition=condition, source=close, occurrence=0)
+lastMixed = ta.valuewhen(condition=condition, close, 0)
 changed = ta.change(source=close, length=2)
+changedMixed = ta.change(source=close, 2)
 crossed = ta.crossover(source1=close, source2=open) or ta.crossunder(source1=close, source2=open) or ta.cross(source1=close, source2=open)
+crossedMixed = ta.crossover(source1=close, open) or ta.crossunder(source1=close, open) or ta.cross(source1=close, open)
 highest = ta.highest(length=3)
 lowest = ta.lowest(length=3)
 highestOffset = ta.highestbars(length=3)
@@ -1718,7 +1721,7 @@ lowestOffset = ta.lowestbars(length=3)
 singleLengthHighest = ta.highest(3)
 spread = ta.range(source=close, length=3)
 trend = ta.rising(source=close, length=2) or ta.falling(source=close, length=2)
-plot(since + last + changed + highest + lowest + highestOffset + lowestOffset + singleLengthHighest + spread + (crossed ? 1 : 0) + (trend ? 1 : 0))
+plot(since + last + lastMixed + changed + changedMixed + highest + lowest + highestOffset + lowestOffset + singleLengthHighest + spread + (crossed ? 1 : 0) + (crossedMixed ? 1 : 0) + (trend ? 1 : 0))
 `));
 
     expect(result.diagnostics).toEqual([]);
