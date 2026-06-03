@@ -1946,7 +1946,12 @@ class SemanticChecker {
   }
 
   private declareFunction(statement: FunctionDeclaration, scope: SemanticScope): void {
-    this.declare(scope, { name: statement.name.name, kind: 'function', loc: statement.name.loc });
+    this.declare(scope, {
+      name: statement.name.name,
+      kind: 'function',
+      type: statement.isMethod ? undefined : this.inferFunctionReturnType(statement),
+      loc: statement.name.loc,
+    });
     const functionScope = new SemanticScope(scope);
 
     for (const parameter of statement.params) {
@@ -3458,6 +3463,10 @@ class SemanticChecker {
     }
     if (calleePath.length === 2 && calleePath[1] === 'new' && calleePath[0] && this.typeDeclarations.has(calleePath[0])) {
       return { kind: 'udt', name: calleePath[0], qualifier: 'series' };
+    }
+    if (expression.callee.type === 'Identifier') {
+      const symbol = scope.lookup(expression.callee.name);
+      if (symbol?.kind === 'function' && symbol.type) return symbol.type;
     }
     return { kind: 'unknown', qualifier: this.inferMaxQualifier(expression.arguments.map((argument) => argument.value), scope) };
   }
