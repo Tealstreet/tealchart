@@ -655,6 +655,58 @@ plot(branchValue + partialValue)
     expect(types.get('partialTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
   });
 
+  it('infers tuple destructuring element types from switch initializer returns', () => {
+    const result = checkProgram(parse(`
+indicator("Switch Initializer Tuple Types")
+mode = "wide"
+[keyedValue, keyedTitle] = switch mode
+    "price" => [close, "price"]
+    "wide" => [1, "wide"]
+    => [open, "default"]
+[conditionValue, conditionTitle] = switch
+    close > open => [close, "up"]
+    => [open, "down"]
+[blockValue, blockTitle] = switch mode
+    "basis" =>
+        basis = close + 1
+        [basis, "basis"]
+    =>
+        [open, "fallback"]
+[partialValue, partialTitle] = switch mode
+    "wide" => [close, "partial"]
+keyedValue := "bad"
+keyedTitle := 1
+conditionValue := "bad"
+conditionTitle := 2
+blockValue := "bad"
+blockTitle := 3
+partialValue := "bad"
+partialTitle := 4
+plot(keyedValue + conditionValue + blockValue + partialValue)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable keyedValue',
+      'Cannot assign int value to string variable keyedTitle',
+      'Cannot assign string value to float variable conditionValue',
+      'Cannot assign int value to string variable conditionTitle',
+      'Cannot assign string value to float variable blockValue',
+      'Cannot assign int value to string variable blockTitle',
+      'Cannot assign string value to float variable partialValue',
+      'Cannot assign int value to string variable partialTitle',
+    ]);
+    expect(types.get('keyedValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('keyedTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('conditionValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('conditionTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('blockValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('blockTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('partialValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('partialTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+  });
+
   it('infers tuple destructuring element types from user function loop tuple returns', () => {
     const result = checkProgram(parse(`
 indicator("Loop Tuple Types")
