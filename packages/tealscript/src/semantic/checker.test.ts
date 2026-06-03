@@ -3350,6 +3350,11 @@ pivot.active := 1
 pivot.name := 3
 pivot.tint := "not color"
 pivot.tag := "not checked"
+pivot.y += 1
+pivot.name += " name"
+pivot.x += 1.5
+pivot.name -= "bad"
+pivot.tag += 1
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -3365,6 +3370,9 @@ pivot.tag := "not checked"
       'Cannot assign int value to string field Pivot.name',
       'Cannot assign string value to color field Pivot.tint',
       'Cannot assign string value to label field Pivot.tag',
+      'Cannot assign float value to int field Pivot.x',
+      'Compound assignment -= requires numeric operands, got string and string for field Pivot.name',
+      'Compound assignment += requires numeric or string operands, got label and int for field Pivot.tag',
     ]);
   });
 

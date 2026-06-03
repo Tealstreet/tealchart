@@ -1751,7 +1751,7 @@ class SemanticChecker {
       this.checkIdentifierAssignmentType(statement, scope);
       this.checkIdentifierCompoundAssignmentType(statement, scope);
     } else if (statement.left.type === 'MemberExpression') {
-      this.checkUdtFieldAssignmentType(statement.left, statement.right, scope);
+      this.checkUdtFieldAssignmentType(statement.left, statement.right, scope, statement.operator);
     } else if (statement.left.type === 'IndexExpression') {
       this.checkIndexAssignmentType(statement.left, statement.right, scope);
     }
@@ -2206,7 +2206,7 @@ class SemanticChecker {
     }
   }
 
-  private checkUdtFieldAssignmentType(target: MemberExpression, value: Expression, scope: SemanticScope): void {
+  private checkUdtFieldAssignmentType(target: MemberExpression, value: Expression, scope: SemanticScope, operator: AssignmentStatement['operator']): void {
     const objectType = this.inferExpressionType(target.object, scope);
     if (objectType.kind !== 'udt' || !objectType.name || !this.typeDeclarations.has(objectType.name)) {
       return;
@@ -2215,7 +2215,53 @@ class SemanticChecker {
     const field = this.findUdtField(objectType.name, target.property.name);
     if (!field) return;
 
+    if (operator !== ':=') {
+      this.checkUdtFieldCompoundAssignmentType(objectType.name, field, value, scope, operator);
+      return;
+    }
+
     this.checkUdtFieldValueType(objectType.name, field, value, scope);
+  }
+
+  private checkUdtFieldCompoundAssignmentType(
+    typeName: string,
+    field: TypeFieldDeclaration,
+    value: Expression,
+    scope: SemanticScope,
+    operator: AssignmentStatement['operator'],
+  ): void {
+    const targetType = this.typeFromAnnotation(field.typeAnnotation ?? undefined);
+    if (!targetType || targetType.kind === 'unknown') return;
+
+    const sourceType = this.inferExpressionType(value, scope);
+    if (sourceType.kind === 'unknown') return;
+
+    const resultType = this.inferCompoundAssignmentResultType(operator, targetType, sourceType);
+    if (!resultType) {
+      this.addDiagnostic(
+        'type-mismatch',
+        `Compound assignment ${operator} requires ${operator === '+=' ? 'numeric or string' : 'numeric'} operands, got ${this.formatSemanticType(targetType)} and ${this.formatSemanticType(sourceType)} for field ${typeName}.${field.name.name}`,
+        value.loc,
+      );
+      return;
+    }
+
+    if (!this.isAssignableQualifier(targetType.qualifier, resultType.qualifier)) {
+      this.addDiagnostic(
+        'qualifier-mismatch',
+        `Cannot assign ${resultType.qualifier} value to ${targetType.qualifier} ${this.formatSemanticType(targetType)} field ${typeName}.${field.name.name}`,
+        value.loc,
+      );
+      return;
+    }
+
+    if (this.isAssignableType(targetType, resultType)) return;
+
+    this.addDiagnostic(
+      'type-mismatch',
+      `Cannot assign ${this.formatSemanticType(resultType)} value to ${this.formatSemanticType(targetType)} field ${typeName}.${field.name.name}`,
+      value.loc,
+    );
   }
 
   private checkUdtFieldValueType(typeName: string, field: TypeFieldDeclaration, value: Expression, scope: SemanticScope): void {
