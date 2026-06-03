@@ -1642,7 +1642,7 @@ input float badAverage = ta.sma(close, 3)
 indicator("Bad Builtins")
 one = ta.sma(close)
 two = ta.rsi(source=close, length=14, bad=14)
-three = plot(series=close, "bad order")
+three = alert(message="bad order", alert.freq_once_per_bar)
 four = color.new(color.red, 10, 20)
 `));
 
@@ -1650,9 +1650,30 @@ four = color.new(color.red, 10, 20)
       'ta.sma() expects at least 2 arguments',
       "ta.sma() missing required argument 'length'",
       "Unknown argument 'bad' for ta.rsi()",
-      'plot() cannot use positional arguments after named arguments',
+      'alert() cannot use positional arguments after named arguments',
       'color.new() expects at most 2 arguments',
     ]);
+  });
+
+  it('resolves visual output named-prefix positional tails', () => {
+    const result = checkProgram(parse(`
+indicator("Visual Output Mixed Args")
+upper = plot(series=high, "Upper", color.green)
+lower = plot(series=low, "Lower", color.red)
+plot(series=close, "Mixed Plot", color.blue, 2, plot.style_columns)
+hline(price=100, "Mixed HLine", color.orange, hline.style_dashed, 2)
+bgcolor(color=color.blue, 1, false, 3, "Mixed Bg")
+barcolor(color=color.red, 1, true, 4, "Mixed Bar")
+plotbar(open=open, high, low, close, "Mixed Bars", color.purple, false, 5, display.none)
+plotcandle(open=open, high, low, close, "Mixed Candles", color.silver, color.yellow, false, 6, color.black)
+plotshape(series=close > open, "Mixed Shape", shape.triangleup, location.belowbar, color.green, 0, "S")
+plotchar(series=close < open, "Mixed Char", "C", location.abovebar, color.red, 0, "C")
+plotarrow(series=close - open, "Mixed Arrow", color.green, color.red, 0, 5, 15)
+fill(plot1=upper, lower, color.new(color.orange, 80), "Mixed Fill", false, 6)
+fill(hline1=upper, hline2=lower, color=color.new(color.blue, 90))
+`));
+
+    expect(result.diagnostics).toEqual([]);
   });
 
   it('reports duplicate built-in bindings from positional and named arguments', () => {
