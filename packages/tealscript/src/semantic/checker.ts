@@ -1412,6 +1412,11 @@ class SemanticChecker {
     let returnType: SemanticType | undefined;
     for (const [index, statement] of declaration.body.entries()) {
       const isLastStatement = index === declaration.body.length - 1;
+      if (statement.type === 'FunctionDeclaration') {
+        this.declareFunctionForInference(statement, functionScope);
+        returnType = undefined;
+        continue;
+      }
       if (statement.type === 'VariableDeclaration' && statement.names.type === 'VariableDeclarator') {
         const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init, functionScope);
         functionScope.declare({
@@ -1430,6 +1435,23 @@ class SemanticChecker {
       returnType = undefined;
     }
     return returnType;
+  }
+
+  private declareFunctionForInference(statement: FunctionDeclaration, scope: SemanticScope): void {
+    scope.declare(this.createFunctionSymbol(statement, scope));
+  }
+
+  private createFunctionSymbol(statement: FunctionDeclaration, scope: SemanticScope): SemanticSymbol {
+    this.functionParentScopes.set(statement, scope);
+    const symbol: SemanticSymbol = {
+      name: statement.name.name,
+      kind: 'function',
+      isMethod: statement.isMethod,
+      type: statement.isMethod ? undefined : this.inferFunctionReturnType(statement, scope),
+      loc: statement.name.loc,
+    };
+    this.functionSymbolDeclarations.set(symbol, statement);
+    return symbol;
   }
 
   private checkExportedTypeAnnotation(
@@ -1955,16 +1977,7 @@ class SemanticChecker {
   }
 
   private declareFunction(statement: FunctionDeclaration, scope: SemanticScope): void {
-    this.functionParentScopes.set(statement, scope);
-    const symbol: SemanticSymbol = {
-      name: statement.name.name,
-      kind: 'function',
-      isMethod: statement.isMethod,
-      type: statement.isMethod ? undefined : this.inferFunctionReturnType(statement, scope),
-      loc: statement.name.loc,
-    };
-    this.functionSymbolDeclarations.set(symbol, statement);
-    this.declare(scope, symbol);
+    this.declare(scope, this.createFunctionSymbol(statement, scope));
     const functionScope = new SemanticScope(scope);
 
     for (const parameter of statement.params) {
