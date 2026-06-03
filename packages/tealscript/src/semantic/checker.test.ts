@@ -2096,14 +2096,21 @@ tooManyMintick = math.round_to_mintick(1.0, 2)
     const result = checkProgram(parse(`
 indicator("Ticker Signatures")
 base = ticker.new(prefix="NASDAQ", ticker="AAPL", session=session.extended, adjustment=adjustment.splits, backadjustment=backadjustment.on, settlement_as_close=settlement_as_close.off)
+prefixBase = ticker.new(prefix="NASDAQ", "AAPL", session.extended, adjustment.splits, backadjustment.on, settlement_as_close.off)
 modified = ticker.modify(tickerid=base, session=session.regular, adjustment=adjustment.dividends, backadjustment=backadjustment.inherit, settlement_as_close=settlement_as_close.inherit)
+prefixModified = ticker.modify(tickerid=prefixBase, session.regular, adjustment.dividends, backadjustment.inherit, settlement_as_close.inherit)
 standard = ticker.standard(symbol=modified)
 inherited = ticker.inherit(from_tickerid=ticker.heikinashi(symbol=modified), symbol="NASDAQ:MSFT")
+prefixInherited = ticker.inherit(from_tickerid=ticker.heikinashi(symbol=prefixModified), "NASDAQ:MSFT")
 renko = ticker.renko(symbol="NASDAQ:AAPL", style="ATR", param=10, request_wicks=true, source="Close")
+prefixRenko = ticker.renko(symbol="NASDAQ:AAPL", "ATR", 10, true, "Close")
 lineBreak = ticker.linebreak(symbol="NASDAQ:AAPL", number_of_lines=3)
+prefixLineBreak = ticker.linebreak(symbol="NASDAQ:AAPL", 3)
 kagi = ticker.kagi(symbol="NASDAQ:AAPL", style="ATR", param=10)
+prefixKagi = ticker.kagi(symbol="NASDAQ:AAPL", "ATR", 10)
 pointFigure = ticker.pointfigure(symbol="NASDAQ:AAPL", source="hl", style="ATR", param=14, reversal=3)
-plot(str.length(standard + inherited + renko + lineBreak + kagi + pointFigure))
+prefixPointFigure = ticker.pointfigure(symbol="NASDAQ:AAPL", "hl", "ATR", 14, 3)
+plot(str.length(standard + inherited + prefixInherited + renko + prefixRenko + lineBreak + prefixLineBreak + kagi + prefixKagi + pointFigure + prefixPointFigure))
 `));
 
     expect(result.diagnostics).toEqual([]);
