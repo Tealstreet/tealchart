@@ -315,6 +315,16 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
       allowNamedPrefixWithPositional: true,
     },
   ],
+  ['table.cell_set_text', { params: ['table_id', 'column', 'row', 'text'], minArgs: 4, maxArgs: 4, allowNamedPrefixWithPositional: true }],
+  ['table.cell_set_bgcolor', { params: ['table_id', 'column', 'row', 'bgcolor'], minArgs: 4, maxArgs: 4, allowNamedPrefixWithPositional: true }],
+  ['table.cell_set_text_color', { params: ['table_id', 'column', 'row', 'text_color'], minArgs: 4, maxArgs: 4, allowNamedPrefixWithPositional: true }],
+  ['table.cell_set_text_size', { params: ['table_id', 'column', 'row', 'text_size'], minArgs: 4, maxArgs: 4, allowNamedPrefixWithPositional: true }],
+  ['table.cell_set_width', { params: ['table_id', 'column', 'row', 'width'], minArgs: 4, maxArgs: 4, allowNamedPrefixWithPositional: true }],
+  ['table.cell_set_height', { params: ['table_id', 'column', 'row', 'height'], minArgs: 4, maxArgs: 4, allowNamedPrefixWithPositional: true }],
+  ['table.cell_set_text_halign', { params: ['table_id', 'column', 'row', 'text_halign'], minArgs: 4, maxArgs: 4, allowNamedPrefixWithPositional: true }],
+  ['table.cell_set_text_valign', { params: ['table_id', 'column', 'row', 'text_valign'], minArgs: 4, maxArgs: 4, allowNamedPrefixWithPositional: true }],
+  ['table.cell_set_text_font_family', { params: ['table_id', 'column', 'row', 'text_font_family'], minArgs: 4, maxArgs: 4, allowNamedPrefixWithPositional: true }],
+  ['table.cell_set_text_formatting', { params: ['table_id', 'column', 'row', 'text_formatting'], minArgs: 4, maxArgs: 4, allowNamedPrefixWithPositional: true }],
   [
     'plot',
     {

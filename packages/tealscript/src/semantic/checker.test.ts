@@ -1726,6 +1726,49 @@ tooMany = table.cell(dashboard, 0, 0, "A", 1, 1, color.white, "left", "top", siz
     ]);
   });
 
+  it('resolves table cell setter named arguments and positional tails', () => {
+    const result = checkProgram(parse(`
+indicator("Table Cell Setter Signatures")
+dashboard = table.new(columns=2, rows=2)
+table.cell(dashboard, 0, 0)
+table.cell_set_text(table_id=dashboard, 0, 0, "Entry")
+table.cell_set_bgcolor(dashboard, column=0, row=0, bgcolor=color.blue)
+table.cell_set_text_color(table_id=dashboard, column=0, row=0, text_color=color.white)
+table.cell_set_text_size(dashboard, 0, row=0, text_size=size.small)
+table.cell_set_width(table_id=dashboard, column=0, row=0, width=10)
+table.cell_set_height(dashboard, column=0, row=0, height=2)
+table.cell_set_text_halign(table_id=dashboard, 0, 0, "left")
+table.cell_set_text_valign(dashboard, column=0, row=0, text_valign="top")
+table.cell_set_text_font_family(table_id=dashboard, column=0, row=0, text_font_family="monospace")
+table.cell_set_text_formatting(dashboard, column=0, row=0, text_formatting="bold")
+plot(1)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid table cell setter argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Table Cell Setter Signatures")
+dashboard = table.new(columns=2, rows=2)
+unknown = table.cell_set_text(dashboard, 0, 0, "Entry", tooltip="Details")
+missing = table.cell_set_bgcolor(table_id=dashboard, column=0, row=0)
+duplicate = table.cell_set_text_color(dashboard, 0, 0, color.white, table_id=dashboard)
+tooMany = table.cell_set_width(dashboard, 0, 0, 10, 20)
+missingCoordinate = table.cell_set_height(table_id=dashboard, row=0, height=2)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'tooltip' for table.cell_set_text()",
+      'table.cell_set_bgcolor() expects at least 4 arguments',
+      "table.cell_set_bgcolor() missing required argument 'bgcolor'",
+      "Argument 'table_id' for table.cell_set_text_color() was supplied multiple times",
+      'table.cell_set_width() expects at most 4 arguments',
+      'table.cell_set_height() expects at least 4 arguments',
+      "table.cell_set_height() missing required argument 'column'",
+    ]);
+  });
+
   it('infers homogeneous array literal and array.from element types', () => {
     const result = checkProgram(parse(`
 indicator("Array Literal Types")
