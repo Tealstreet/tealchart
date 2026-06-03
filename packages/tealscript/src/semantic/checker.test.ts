@@ -1919,8 +1919,11 @@ tooManyWpr = ta.wpr(3, 4)
     const result = checkProgram(parse(`
 indicator("TA Trend Pivot Signatures")
 [trend, direction] = ta.supertrend(factor=2.0, atrPeriod=3)
+[mixedTrend, mixedDirection] = ta.supertrend(factor=2.0, 3)
 [diPlus, diMinus, adx] = ta.dmi(diLength=3, adxSmoothing=3)
+[mixedDiPlus, mixedDiMinus, mixedAdx] = ta.dmi(diLength=3, 3)
 sar = ta.sar(start=0.02, inc=0.02, max=0.2)
+mixedSar = ta.sar(start=0.02, 0.02, 0.2)
 pivotHigh = ta.pivothigh(source=high, leftbars=2, rightbars=2)
 pivotLow = ta.pivotlow(source=low, leftbars=2, rightbars=2)
 defaultPivotHigh = ta.pivothigh(leftbars=2, rightbars=2)
@@ -1928,7 +1931,8 @@ defaultPivotLow = ta.pivotlow(leftbars=2, rightbars=2)
 mixedPivotHigh = ta.pivothigh(2, rightbars=2)
 mixedPivotLow = ta.pivotlow(2, rightbars=2)
 linreg = ta.linreg(source=close, length=3, offset=1)
-plot(trend + direction + diPlus + diMinus + adx + sar + pivotHigh + pivotLow + defaultPivotHigh + defaultPivotLow + mixedPivotHigh + mixedPivotLow + linreg)
+mixedLinreg = ta.linreg(source=close, 3, 1)
+plot(trend + direction + mixedTrend + mixedDirection + diPlus + diMinus + adx + mixedDiPlus + mixedDiMinus + mixedAdx + sar + mixedSar + pivotHigh + pivotLow + defaultPivotHigh + defaultPivotLow + mixedPivotHigh + mixedPivotLow + linreg + mixedLinreg)
 `));
 
     expect(result.diagnostics).toEqual([]);
