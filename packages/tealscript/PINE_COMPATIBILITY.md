@@ -651,10 +651,11 @@ accepts positional or named `x1`, `y1`, `x2`, and `y2` arguments plus common
 runtime returns a line handle string and records a typed drawing output. The
 mutation pass covers persistent `var` line handles, `line.set_x1()`,
 `line.set_x2()`, `line.set_y1()`, `line.set_y2()`, `line.set_xy1()`,
-`line.set_xy2()`, `line.set_xloc()`, `line.set_extend()`,
-`line.set_color()`, `line.set_style()`, `line.set_width()`, scalar coordinate
-getters, `line.get_price()`, `line.copy()`, and `line.delete()`. Line mutators
-and getters accept Pine-style named `id` and value arguments. Semantic analysis
+`line.set_xy2()`, `line.set_first_point()`, `line.set_second_point()`,
+`line.set_xloc()`, `line.set_extend()`, `line.set_color()`,
+`line.set_style()`, `line.set_width()`, scalar coordinate getters,
+`line.get_price()`, `line.copy()`, and `line.delete()`. Line mutators
+and getters accept Pine-style named `id`, value, and point arguments. Semantic analysis
 preserves known line getter return types and `line.all` handle-array element
 types for downstream diagnostics. Rendering routes line segments to the script
 pane with basic color/style/width and horizontal extension support.

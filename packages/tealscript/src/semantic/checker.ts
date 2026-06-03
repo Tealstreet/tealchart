@@ -560,6 +560,8 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['line.set_y2', { params: ['id', 'y'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['line.set_xy1', { params: ['id', 'x', 'y'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['line.set_xy2', { params: ['id', 'x', 'y'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
+  ['line.set_first_point', { params: ['id', 'first_point'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['line.set_second_point', { params: ['id', 'second_point'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['line.set_xloc', { params: ['id', 'x1', 'x2', 'xloc'], minArgs: 4, maxArgs: 4, allowNamedPrefixWithPositional: true }],
   ['line.set_extend', { params: ['id', 'extend'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['line.set_color', { params: ['id', 'color'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
