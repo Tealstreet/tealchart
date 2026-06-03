@@ -7642,9 +7642,10 @@ export class TealscriptEngine {
 
     // STDEV - Standard Deviation
     this.builtins.set('ta.stdev', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
-      const biased = this.isTruthy(this.getCallArg(args, namedArgs, 2, 'biased', true));
+      const taStdevArgs = ['source', 'length', 'biased'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taStdevArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taStdevArgs, 1));
+      const biased = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taStdevArgs, 2, true));
       const values = this.getCompleteSourceWindow(scope, `_ta_stdev_source_${callId}`, source, length);
       if (!values) return NaN;
 
@@ -7661,9 +7662,10 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.variance', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
-      const biased = this.isTruthy(this.getCallArg(args, namedArgs, 2, 'biased', true));
+      const taVarianceArgs = ['source', 'length', 'biased'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taVarianceArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taVarianceArgs, 1));
+      const biased = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taVarianceArgs, 2, true));
       const values = this.getCompleteSourceWindow(scope, `_ta_variance_source_${callId}`, source, length);
       if (!values) return NaN;
 
@@ -7674,8 +7676,9 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.dev', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const taDevArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taDevArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taDevArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_dev_source_${callId}`, source, length);
       if (!values) return NaN;
 
@@ -7684,9 +7687,10 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.correlation', (args, namedArgs, _ctx, scope, callId) => {
-      const sourceA = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source1'));
-      const sourceB = this.toNumber(this.getCallArg(args, namedArgs, 1, 'source2'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 2, 'length'));
+      const taCorrelationArgs = ['source1', 'source2', 'length'];
+      const sourceA = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCorrelationArgs, 0));
+      const sourceB = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCorrelationArgs, 1));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taCorrelationArgs, 2));
       const windows = this.getCompletePairedSourceWindows(
         scope,
         `_ta_correlation_source_a_${callId}`,
@@ -7717,8 +7721,9 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.cog', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const taCogArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCogArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taCogArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_cog_source_${callId}`, source, length);
       if (!values) return NaN;
 
@@ -7730,8 +7735,9 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.median', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const taMedianArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taMedianArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taMedianArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_median_source_${callId}`, source, length);
       if (!values) return NaN;
 
@@ -7741,8 +7747,9 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.mode', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const taModeArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taModeArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taModeArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_mode_source_${callId}`, source, length);
       if (!values) return NaN;
 
@@ -7763,9 +7770,10 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.percentile_nearest_rank', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
-      const percentage = Math.min(100, Math.max(0, this.toNumber(this.getCallArg(args, namedArgs, 2, 'percentage'))));
+      const taPercentileArgs = ['source', 'length', 'percentage'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 1));
+      const percentage = Math.min(100, Math.max(0, this.toNumber(this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 2))));
       const values = this.getCompleteSourceWindow(scope, `_ta_percentile_nearest_source_${callId}`, source, length);
       if (!values || isNaN(percentage)) return NaN;
 
@@ -7775,9 +7783,10 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.percentile_linear_interpolation', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
-      const percentage = Math.min(100, Math.max(0, this.toNumber(this.getCallArg(args, namedArgs, 2, 'percentage'))));
+      const taPercentileArgs = ['source', 'length', 'percentage'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 1));
+      const percentage = Math.min(100, Math.max(0, this.toNumber(this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 2))));
       const values = this.getCompleteSourceWindow(scope, `_ta_percentile_linear_source_${callId}`, source, length);
       if (!values || isNaN(percentage)) return NaN;
 
@@ -7792,8 +7801,9 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.percentrank', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const taPercentrankArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taPercentrankArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taPercentrankArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_percentrank_source_${callId}`, source, length);
       if (!values) return NaN;
 
@@ -7802,7 +7812,8 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.cum', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
+      const taCumArgs = ['source'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCumArgs, 0));
       if (isNaN(source)) return NaN;
 
       const key = `_ta_cum_${callId}`;
@@ -8016,8 +8027,9 @@ export class TealscriptEngine {
 
     // OBV - On-Balance Volume
     this.builtins.set('ta.obv', (args, namedArgs, ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source', ctx.close.get(0)));
-      const volume = this.toNumber(this.getCallArg(args, namedArgs, 1, 'volume', ctx.volume.get(0)));
+      const taObvArgs = ['source', 'volume'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taObvArgs, 0, ctx.close.get(0)));
+      const volume = this.toNumber(this.getOrderedCallArg(args, namedArgs, taObvArgs, 1, ctx.volume.get(0)));
       const previousSource = this.getCompleteSourceWindow(scope, `_ta_obv_source_${callId}`, source, 2)?.[1];
       return this.updateObv(source, previousSource, volume, scope, `_ta_obv_value_${callId}`);
     });
