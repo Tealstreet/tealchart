@@ -5450,16 +5450,20 @@ export class TealscriptEngine {
     // fill - Fill area between two plots
     // =========================================================================
     this.builtins.set('fill', (args, namedArgs, ctx, _scope, callId) => {
-      const plot1Id = this.resolveFillPlotId(this.getOrderedCallArg(args, namedArgs, fillArgs, 0), ctx);
-      const plot2Id = this.resolveFillPlotId(this.getOrderedCallArg(args, namedArgs, fillArgs, 1), ctx);
-      const color = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, fillArgs, 2, 'rgba(33, 150, 243, 0.2)'));
-      const titleArg = this.getOrderedCallArg(args, namedArgs, fillArgs, 3);
-      const hasExplicitTitle = namedArgs.has('title') || titleArg !== undefined;
+      const canonicalNamedArgs = new Map(namedArgs);
+      if (!canonicalNamedArgs.has('plot1') && canonicalNamedArgs.has('hline1')) canonicalNamedArgs.set('plot1', canonicalNamedArgs.get('hline1'));
+      if (!canonicalNamedArgs.has('plot2') && canonicalNamedArgs.has('hline2')) canonicalNamedArgs.set('plot2', canonicalNamedArgs.get('hline2'));
+
+      const plot1Id = this.resolveFillPlotId(this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 0), ctx);
+      const plot2Id = this.resolveFillPlotId(this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 1), ctx);
+      const color = this.toPlotColor(this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 2, 'rgba(33, 150, 243, 0.2)'));
+      const titleArg = this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 3);
+      const hasExplicitTitle = canonicalNamedArgs.has('title') || titleArg !== undefined;
       const title = (titleArg ?? 'Fill') as string;
-      const editable = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, fillArgs, 4));
-      const showLast = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, fillArgs, 5));
-      const fillgaps = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, fillArgs, 6));
-      const display = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, fillArgs, 7));
+      const editable = this.toOptionalBoolean(this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 4));
+      const showLast = this.toOptionalInteger(this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 5));
+      const fillgaps = this.toOptionalBoolean(this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 6));
+      const display = this.toOptionalInteger(this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 7));
 
       const id = hasExplicitTitle ? `fill_${title}` : `fill_${callId}`;
 
