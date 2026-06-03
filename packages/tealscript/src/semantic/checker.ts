@@ -311,6 +311,10 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['label.get_size', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['label.get_tooltip', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['linefill.new', { params: ['line1', 'line2', 'color'], minArgs: 2, maxArgs: 3, allowNamedPrefixWithPositional: true }],
+  ['linefill.delete', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['linefill.set_color', { params: ['id', 'color'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['linefill.get_line1', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['linefill.get_line2', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   [
     'table.new',
     {
@@ -2778,6 +2782,7 @@ class SemanticChecker {
     const calleeName = calleePath.join('.');
     const referenceReturnType = REFERENCE_CONSTRUCTOR_RETURN_TYPES.get(calleeName);
     if (referenceReturnType) return { kind: referenceReturnType };
+    if (calleeName === 'linefill.get_line1' || calleeName === 'linefill.get_line2') return { kind: 'line' };
 
     const namespace = calleePath[0];
     if (namespace === 'input') return { kind: 'unknown', qualifier: 'input' };
