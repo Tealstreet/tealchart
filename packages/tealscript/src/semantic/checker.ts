@@ -248,6 +248,15 @@ const MATH_INTEGER_RETURN_FUNCTIONS = new Set([
   'math.trunc',
 ]);
 
+const REQUEST_FLOAT_RETURN_FUNCTIONS = new Set([
+  'request.currency_rate',
+  'request.dividends',
+  'request.earnings',
+  'request.economic',
+  'request.financial',
+  'request.splits',
+]);
+
 const FLOAT_RETURN_FUNCTIONS = new Set([
   'ta.alma',
   'ta.atr',
@@ -3167,6 +3176,19 @@ class SemanticChecker {
         qualifier: this.inferCallArgumentMaxQualifier(expression, scope),
       };
     }
+    if (calleeName === 'request.security' || calleeName === 'request.seed') {
+      return this.inferRequestExpressionReturnType(expression, scope);
+    }
+    if (calleeName === 'request.security_lower_tf') {
+      const expressionArgument = this.getCallArgument(expression.arguments, 'expression', 2);
+      const expressionType = expressionArgument ? this.inferExpressionType(expressionArgument, scope) : { kind: 'unknown' as const };
+      return {
+        kind: 'array',
+        elementType: this.arrayElementTypeKind(expressionType),
+        qualifier: 'series',
+      };
+    }
+    if (REQUEST_FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: 'series' };
     if (FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: 'series' };
     if (calleeName === 'label.get_x') return { kind: 'int' };
     if (calleeName === 'label.get_y') return { kind: 'float' };
@@ -3437,6 +3459,12 @@ class SemanticChecker {
       return 'unknown';
     }
     return sawNumber ? 'int' : 'unknown';
+  }
+
+  private inferRequestExpressionReturnType(expression: CallExpression, scope: SemanticScope): SemanticType {
+    const expressionArgument = this.getCallArgument(expression.arguments, 'expression', 2);
+    const expressionType = expressionArgument ? this.inferExpressionType(expressionArgument, scope) : { kind: 'unknown' as const };
+    return { ...expressionType, qualifier: 'series' };
   }
 
   private arrayElementTypeKind(type: SemanticType): SemanticType {

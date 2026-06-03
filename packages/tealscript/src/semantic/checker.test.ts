@@ -3286,7 +3286,24 @@ prefixSeeded = request.seed(source="seed", "SYM", close, false, 2)
 plot(rate + dividend + earning + split + revenue + econ + seeded)
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('htf')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('ltf')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('rate')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('prefixRate')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('dividend')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('prefixDividend')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('earning')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('prefixEarning')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('split')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('prefixSplit')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('revenue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('prefixRevenue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('econ')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('prefixEcon')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('seeded')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('prefixSeeded')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid request helper named arguments', () => {
