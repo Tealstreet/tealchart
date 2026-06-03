@@ -248,6 +248,7 @@ if barstate.islast
     linefill.delete(id=stale)
 plot(linefill.get_line1(id=channel) == upper, title="Named Linefill Line1")
 plot(linefill.get_line2(id=channel) == lower, title="Named Linefill Line2")
+plot(array.size(linefill.all), title="Named Linefill Count")
 `);
 
     expect(result.errors).toEqual([]);
@@ -293,6 +294,7 @@ plot(linefill.get_line2(id=channel) == lower, title="Named Linefill Line2")
     ]);
     expect(getPlot(result, 'Named Linefill Line1').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, true]);
     expect(getPlot(result, 'Named Linefill Line2').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, true]);
+    expect(getPlot(result, 'Named Linefill Count').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
   });
 
   it('updates and reads a persistent box with Pine named setter idioms', () => {

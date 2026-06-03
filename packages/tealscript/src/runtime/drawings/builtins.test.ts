@@ -412,13 +412,15 @@ if barstate.islast
     linefill.set_color(channel, color.green)
     linefill.delete(deleted)
     label.new(na, na, text=str.format("{0}|{1}", linefill.get_line1(channel), linefill.get_line2(channel)))
-plot(close)`;
+plot(close)
+plot(array.size(linefill.all), title="Linefills")`;
 
       const ast = parse(script);
       const bars = createBars(3);
       const result = executeScript(ast, bars);
 
       expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Linefills')?.values).toEqual([2, 2, 1]);
       expect(result.drawings).toEqual([
         {
           id: 'line_line.new_0_0',

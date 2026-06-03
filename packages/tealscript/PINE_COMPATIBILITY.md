@@ -663,10 +663,11 @@ scripts. `linefill.new()` records fills between two line handles;
 `linefill.set_color()` supports Pine-style named `id` and `color` arguments,
 while `linefill.get_line1()`, `linefill.get_line2()`, and `linefill.delete()`
 support named `id` arguments. Semantic analysis preserves linefill getter line
-handle returns for downstream diagnostics. The renderer fills between resolved
-line segments in the routed script pane. `linefill.new()` rejects missing or
-non-line handles without creating a drawing. `chart.point` overloads, GC limits,
-full arrow style geometry, and full realtime rollback parity remain planned.
+handle returns and `linefill.all` handle-array element types for downstream
+diagnostics. The renderer fills between resolved line segments in the routed
+script pane. `linefill.new()` rejects missing or non-line handles without
+creating a drawing. `chart.point` overloads, GC limits, full arrow style
+geometry, and full realtime rollback parity remain planned.
 
 The box drawing pass covers common supply/demand zone idioms. `box.new()`
 accepts positional or named `left`, `top`, `right`, and `bottom` arguments plus
