@@ -1668,11 +1668,11 @@ plot(labelCount + lineCount + linefillCount + boxCount + polylineCount)
     expect(types.get('linefills')).toMatchObject({ kind: 'array', elementType: { kind: 'linefill' } });
     expect(types.get('boxes')).toMatchObject({ kind: 'array', elementType: { kind: 'box' } });
     expect(types.get('polylines')).toMatchObject({ kind: 'array', elementType: { kind: 'polyline' } });
-    expect(types.get('labelCount')).toMatchObject({ kind: 'int' });
-    expect(types.get('lineCount')).toMatchObject({ kind: 'int' });
-    expect(types.get('linefillCount')).toMatchObject({ kind: 'int' });
-    expect(types.get('boxCount')).toMatchObject({ kind: 'int' });
-    expect(types.get('polylineCount')).toMatchObject({ kind: 'int' });
+    expect(types.get('labelCount')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('lineCount')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('linefillCount')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('boxCount')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('polylineCount')).toMatchObject({ kind: 'int', qualifier: 'series' });
   });
 
   it('reports mismatched drawing all member collection mutations', () => {
@@ -2461,11 +2461,11 @@ joinedValue = floatValues.join(",")
     expect(types.get('absolute')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('standardized')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('indices')).toMatchObject({ kind: 'array', elementType: { kind: 'int' } });
-    expect(types.get('sizeValue')).toMatchObject({ kind: 'int' });
-    expect(types.get('hasValue')).toMatchObject({ kind: 'bool' });
-    expect(types.get('indexValue')).toMatchObject({ kind: 'int' });
-    expect(types.get('averageValue')).toMatchObject({ kind: 'float' });
-    expect(types.get('joinedValue')).toMatchObject({ kind: 'string' });
+    expect(types.get('sizeValue')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('hasValue')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('indexValue')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('averageValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('joinedValue')).toMatchObject({ kind: 'string', qualifier: 'series' });
   });
 
   it('records explicit qualifiers and infers common qualifier sources', () => {

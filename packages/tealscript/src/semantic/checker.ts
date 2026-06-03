@@ -3315,10 +3315,10 @@ class SemanticChecker {
     const receiverType = this.inferArrayHelperReceiverType(expression, scope);
     if (receiverType?.kind !== 'array') return undefined;
 
-    if (this.isArrayBooleanOperation(methodName)) return { kind: 'bool' };
-    if (methodName === 'join') return { kind: 'string' };
-    if (this.isArrayIntegerOperation(methodName)) return { kind: 'int' };
-    if (this.isArrayFloatOperation(methodName)) return { kind: 'float' };
+    if (this.isArrayBooleanOperation(methodName)) return { kind: 'bool', qualifier: 'series' };
+    if (methodName === 'join') return { kind: 'string', qualifier: 'series' };
+    if (this.isArrayIntegerOperation(methodName)) return { kind: 'int', qualifier: 'series' };
+    if (this.isArrayFloatOperation(methodName)) return { kind: 'float', qualifier: 'series' };
 
     return undefined;
   }
