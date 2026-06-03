@@ -3802,15 +3802,27 @@ pivot.other := 1
 indicator("UDT Methods")
 type Pivot
     float y
+type Band
+    array<float> values
 method lift(Pivot this, float amount) =>
     this.y += amount
     this
+method values(Band this) =>
+    this.values
 pivot = Pivot.new(close)
+band = Band.new(array.from(close))
 lifted = pivot.lift(1)
-plot(lifted.y)
+liftedY = lifted.y
+bandValues = band.values()
+plot(liftedY + array.size(bandValues))
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('lifted')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
+    expect(types.get('liftedY')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('bandValues')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
   });
 
   it('reports user-defined method receiver mismatches', () => {
