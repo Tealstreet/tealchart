@@ -5918,8 +5918,9 @@ export class TealscriptEngine {
 
     // nz - replace na with value
     this.builtins.set('nz', (args, namedArgs) => {
-      const value = this.getCallArg(args, namedArgs, 0, 'source');
-      const replacement = this.getCallArg(args, namedArgs, 1, 'replacement', 0);
+      const nzArgs = ['source', 'replacement'];
+      const value = this.getOrderedCallArg(args, namedArgs, nzArgs, 0);
+      const replacement = this.getOrderedCallArg(args, namedArgs, nzArgs, 1, 0);
       this.rejectBoolNaHelperArgs('nz', [value, replacement]);
       return this.isNa(value) ? replacement : value;
     });
