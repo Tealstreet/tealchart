@@ -1616,6 +1616,16 @@ plot(array.size(labels) + x + y)
     expect(result.diagnostics).toEqual([]);
     expect(types.get('clone')).toMatchObject({ kind: 'label' });
     expect(types.get('labels')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
+    expect(types.get('x')).toMatchObject({ kind: 'int' });
+    expect(types.get('y')).toMatchObject({ kind: 'float' });
+    expect(types.get('textValue')).toMatchObject({ kind: 'string' });
+    expect(types.get('xlocValue')).toMatchObject({ kind: 'string' });
+    expect(types.get('ylocValue')).toMatchObject({ kind: 'string' });
+    expect(types.get('styleValue')).toMatchObject({ kind: 'string' });
+    expect(types.get('colorValue')).toMatchObject({ kind: 'color' });
+    expect(types.get('textColorValue')).toMatchObject({ kind: 'color' });
+    expect(types.get('sizeValue')).toMatchObject({ kind: 'string' });
+    expect(types.get('tooltipValue')).toMatchObject({ kind: 'string' });
   });
 
   it('resolves drawing all member collection types', () => {
