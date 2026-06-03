@@ -2762,8 +2762,20 @@ plot(bbBasis + bbUpper + bbLower + mixedBbBasis + mixedBbUpper + mixedBbLower + 
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('bbBasis')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('bbUpper')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('bbLower')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedBbBasis')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedBbUpper')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedBbLower')).toEqual({ kind: 'float', qualifier: 'series' });
     expect(types.get('bbw')).toEqual({ kind: 'float', qualifier: 'series' });
     expect(types.get('bbwMixed')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('kcBasis')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('kcUpper')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('kcLower')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedKcBasis')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedKcUpper')).toEqual({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedKcLower')).toEqual({ kind: 'float', qualifier: 'series' });
     expect(types.get('kcw')).toEqual({ kind: 'float', qualifier: 'series' });
     expect(types.get('kcwMixed')).toEqual({ kind: 'float', qualifier: 'series' });
   });
