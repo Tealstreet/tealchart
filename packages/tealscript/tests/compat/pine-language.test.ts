@@ -734,6 +734,22 @@ plot(basis, title="Global Basis")
     expect(roundSeries(getPlot(result, 'Global Basis').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
   });
 
+  it('returns function-local if initializer values', () => {
+    const result = runCompatScript(`
+indicator("UDF if initializer locals")
+selectedSource(bool enabled) =>
+    value = if enabled
+        close
+    else
+        open
+    value
+plot(selectedSource(close > open), title="Selected")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Selected').values)).toEqual([102, 105, 107, 107, 103, 100, 104, 109, 109, 111, 111, 112]);
+  });
+
   it('supports nested user-defined functions inside indicators', () => {
     const result = runCompatScript(`
 indicator("UDF nested")
