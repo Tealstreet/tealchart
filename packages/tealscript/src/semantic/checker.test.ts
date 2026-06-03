@@ -1844,10 +1844,14 @@ tooManyMom = ta.mom(close, 2, 3)
     const result = checkProgram(parse(`
 indicator("TA Channel Signatures")
 [bbBasis, bbUpper, bbLower] = ta.bb(series=close, length=3, mult=2.0)
+[mixedBbBasis, mixedBbUpper, mixedBbLower] = ta.bb(series=close, 3, 2.0)
 bbw = ta.bbw(series=close, length=3, mult=2.0)
+bbwMixed = ta.bbw(series=close, 3, 2.0)
 [kcBasis, kcUpper, kcLower] = ta.kc(series=close, length=3, mult=1.25, useTrueRange=false)
+[mixedKcBasis, mixedKcUpper, mixedKcLower] = ta.kc(series=close, 3, 1.25, false)
 kcw = ta.kcw(series=close, length=3, mult=1.25, useTrueRange=false)
-plot(bbBasis + bbUpper + bbLower + bbw + kcBasis + kcUpper + kcLower + kcw)
+kcwMixed = ta.kcw(series=close, 3, 1.25, false)
+plot(bbBasis + bbUpper + bbLower + mixedBbBasis + mixedBbUpper + mixedBbLower + bbw + bbwMixed + kcBasis + kcUpper + kcLower + mixedKcBasis + mixedKcUpper + mixedKcLower + kcw + kcwMixed)
 `));
 
     expect(result.diagnostics).toEqual([]);
