@@ -484,6 +484,65 @@ plot(adjust(close))
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('infers user-defined function call return types', () => {
+    const result = checkProgram(parse(`
+indicator("User Function Returns")
+type Pivot
+    float y
+price(float value) => value + close
+marker(float value) => label.new(bar_index, value)
+values(float value) => array.from(value)
+lookup(float value) => map.new<string, float>()
+pivot(float value) => Pivot.new(value)
+seriesPrice = price(1)
+seriesMarker = marker(close)
+seriesValues = values(close)
+seriesLookup = lookup(close)
+seriesPivot = pivot(close)
+plot(seriesPrice + array.size(seriesValues) + seriesPivot.y)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('price')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('marker')).toMatchObject({ kind: 'label', qualifier: 'series' });
+    expect(types.get('values')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('lookup')).toMatchObject({
+      kind: 'map',
+      qualifier: 'series',
+      keyType: { kind: 'string' },
+      valueType: { kind: 'float' },
+    });
+    expect(types.get('pivot')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
+    expect(types.get('seriesPrice')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('seriesMarker')).toMatchObject({ kind: 'label', qualifier: 'series' });
+    expect(types.get('seriesValues')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('seriesLookup')).toMatchObject({
+      kind: 'map',
+      qualifier: 'series',
+      keyType: { kind: 'string' },
+      valueType: { kind: 'float' },
+    });
+    expect(types.get('seriesPivot')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
+  });
+
+  it('infers nested function returns from their lexical scope', () => {
+    const result = checkProgram(parse(`
+indicator("Nested Function Returns")
+outer() =>
+    local = close
+    inner() => local
+    simple float copied = inner()
+    copied
+plot(outer())
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign series value to simple float',
+    ]);
+  });
+
   it('reports duplicate function parameters and tuple names', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate Params")
