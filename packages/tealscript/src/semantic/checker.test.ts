@@ -2889,6 +2889,18 @@ plot(trend + direction + mixedTrend + mixedDirection + diPlus + diMinus + adx + 
     expect(types.get('mixedDiPlus')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('mixedDiMinus')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('mixedAdx')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('sar')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedSar')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('pivotHigh')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('pivotLow')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('defaultPivotHigh')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('defaultPivotLow')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('sourceTailPivotHigh')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('sourceTailPivotLow')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('leftTailPivotHigh')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('leftTailPivotLow')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedPivotHigh')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedPivotLow')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('linreg')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('mixedLinreg')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
