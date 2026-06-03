@@ -494,6 +494,11 @@ marker(float value) => label.new(bar_index, value)
 values(float value) => array.from(value)
 lookup(float value) => map.new<string, float>()
 pivot(float value) => Pivot.new(value)
+identity(float value) => value
+inputValue = input.float(1)
+constIdentity = identity(1)
+inputIdentity = identity(inputValue)
+seriesIdentity = identity(close)
 seriesPrice = price(1)
 seriesMarker = marker(close)
 seriesValues = values(close)
@@ -515,6 +520,9 @@ plot(seriesPrice + array.size(seriesValues) + seriesPivot.y)
       valueType: { kind: 'float' },
     });
     expect(types.get('pivot')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
+    expect(types.get('constIdentity')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('inputIdentity')).toMatchObject({ kind: 'float', qualifier: 'input' });
+    expect(types.get('seriesIdentity')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('seriesPrice')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('seriesMarker')).toMatchObject({ kind: 'label', qualifier: 'series' });
     expect(types.get('seriesValues')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
@@ -3809,12 +3817,15 @@ method lift(Pivot this, float amount) =>
     this
 method lift(Band this) =>
     this.values
+method passthrough(float this) =>
+    this
 pivot = Pivot.new(close)
 band = Band.new(array.from(close))
 lifted = pivot.lift(1)
 liftedY = lifted.y
 bandValues = band.lift()
-plot(liftedY + array.size(bandValues))
+scaled = close.passthrough()
+plot(liftedY + array.size(bandValues) + scaled)
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -3823,6 +3834,7 @@ plot(liftedY + array.size(bandValues))
     expect(types.get('lifted')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
     expect(types.get('liftedY')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('bandValues')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('scaled')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports user-defined method receiver mismatches', () => {
