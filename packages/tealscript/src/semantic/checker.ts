@@ -346,6 +346,7 @@ const DRAWING_ALL_ELEMENT_TYPES = new Map<string, SemanticTypeKind>([
   ['line.all', 'line'],
   ['linefill.all', 'linefill'],
   ['polyline.all', 'polyline'],
+  ['table.all', 'table'],
 ]);
 
 const BUILTIN_TUPLE_RETURN_TYPES = new Map<string, SemanticType[]>([

@@ -891,6 +891,8 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     return undefined;
   });
 
+  builtins.set('table.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('table'));
+
   builtins.set('table.clear', (args, namedArgs, ctx) => {
     withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
       const startColumn = normalizeTableColumn(runtime, callArg(args, namedArgs, 1, 'start_column', 0, ['table_id']));
