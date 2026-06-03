@@ -2402,6 +2402,15 @@ class SemanticChecker {
     if (!targetType) return;
 
     const sourceType = this.inferExpressionType(value, scope);
+    if (!this.isAssignableQualifier(targetType.qualifier, sourceType.qualifier)) {
+      this.addDiagnostic(
+        'qualifier-mismatch',
+        `Cannot assign ${sourceType.qualifier} value to ${targetType.qualifier} ${this.formatSemanticType(targetType)} field ${typeName}.${field.name.name}`,
+        value.loc,
+      );
+      return;
+    }
+
     if (this.isAssignableType(targetType, sourceType)) return;
 
     this.addDiagnostic(

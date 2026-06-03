@@ -3482,6 +3482,28 @@ pivot.tag += 1
     ]);
   });
 
+  it('reports user-defined type field assignment qualifier mismatches', () => {
+    const result = checkProgram(parse(`
+indicator("UDT Field Qualifier Mismatches")
+type Pivot
+    simple float base
+    series float tracked
+simple float literal = 1
+series float price = close
+pivot = Pivot.new(1, close)
+pivot.base := literal
+pivot.tracked := literal
+pivot.base := price
+pivot.base += price
+plot(pivot.tracked)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign series value to simple float field Pivot.base',
+      'Cannot assign series value to simple float field Pivot.base',
+    ]);
+  });
+
   it('reports user-defined type field default value mismatches', () => {
     const result = checkProgram(parse(`
 indicator("Bad UDT Field Defaults")
