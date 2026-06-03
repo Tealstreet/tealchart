@@ -3285,6 +3285,7 @@ class SemanticChecker {
       return {
         kind: 'array',
         elementType: this.inferArrayElementType(expression.arguments.map((argument) => argument.value), scope),
+        qualifier: 'series',
       };
     }
     if (calleePath.join('.') === 'map.new' && expression.typeArguments?.length === 2) {
@@ -3298,6 +3299,7 @@ class SemanticChecker {
       return {
         kind: 'array',
         elementType: this.typeFromName(expression.typeArguments[0]),
+        qualifier: 'series',
       };
     }
     if (calleePath.join('.') === 'matrix.new' && expression.typeArguments?.length === 1) {
@@ -3311,6 +3313,7 @@ class SemanticChecker {
       return {
         kind: 'array',
         elementType: { kind: arrayElementType },
+        qualifier: 'series',
       };
     }
     const matrixElementType = MATRIX_CONSTRUCTOR_ELEMENT_TYPES.get(calleePath.join('.'));
@@ -3405,17 +3408,20 @@ class SemanticChecker {
         return {
           kind: 'array',
           elementType: receiverType.elementType,
+          qualifier: 'series',
         };
       case 'abs':
       case 'standardize':
         return {
           kind: 'array',
           elementType: { kind: 'float' },
+          qualifier: 'series',
         };
       case 'sort_indices':
         return {
           kind: 'array',
           elementType: { kind: 'int' },
+          qualifier: 'series',
         };
       default:
         return undefined;
