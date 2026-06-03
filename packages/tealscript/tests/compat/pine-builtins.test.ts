@@ -1176,6 +1176,10 @@ plot(ta.highest(length=3), title="Default Highest")
 plot(ta.lowest(length=3), title="Default Lowest")
 plot(ta.highestbars(length=3), title="Default Highest Offset")
 plot(ta.lowestbars(length=3), title="Default Lowest Offset")
+plot(ta.highest(source=high, 3), title="Mixed Default Highest")
+plot(ta.lowest(source=low, 3), title="Mixed Default Lowest")
+plot(ta.highestbars(source=high, 3), title="Mixed Default Highest Offset")
+plot(ta.lowestbars(source=low, 3), title="Mixed Default Lowest Offset")
 plot(ta.rising(source=close, length=2), title="Named Rising")
 plot(ta.rising(source=close, 2), title="Mixed Rising")
 plot(ta.falling(source=close, length=2), title="Named Falling")
@@ -1190,6 +1194,10 @@ plot(ta.falling(source=close, 2), title="Mixed Falling")
     expect(roundSeries(getPlot(result, 'Default Lowest').values)).toEqual([99, 99, 99, 101, 98, 96, 96, 96, 99, 103, 106, 107]);
     expect(getPlot(result, 'Default Highest Offset').values).toEqual([0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1]);
     expect(getPlot(result, 'Default Lowest Offset').values).toEqual([0, 1, 2, 2, 0, 0, 1, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Mixed Default Highest').values)).toEqual(roundSeries(getPlot(result, 'Default Highest').values));
+    expect(roundSeries(getPlot(result, 'Mixed Default Lowest').values)).toEqual(roundSeries(getPlot(result, 'Default Lowest').values));
+    expect(getPlot(result, 'Mixed Default Highest Offset').values).toEqual(getPlot(result, 'Default Highest Offset').values);
+    expect(getPlot(result, 'Mixed Default Lowest Offset').values).toEqual(getPlot(result, 'Default Lowest Offset').values);
     expect(getPlot(result, 'Named Rising').values).toEqual([false, false, true, false, false, false, true, true, false, true, false, true]);
     expect(getPlot(result, 'Mixed Rising').values).toEqual(getPlot(result, 'Named Rising').values);
     expect(getPlot(result, 'Named Falling').values).toEqual([false, false, false, true, true, false, false, false, false, false, false, false]);
@@ -1210,7 +1218,9 @@ plot(ta.rma(source=spread, 3), title="Mixed Spread RMA")
 plot(ta.wma(source=spread, length=3), title="Named Spread WMA")
 plot(ta.wma(source=spread, 3), title="Mixed Spread WMA")
 plot(ta.highest(spread, 3), title="Spread Highest")
+plot(ta.highest(source=spread, 3), title="Mixed Spread Highest")
 plot(ta.lowest(spread, 3), title="Spread Lowest")
+plot(ta.lowest(source=spread, 3), title="Mixed Spread Lowest")
 plot(ta.range(spread, 3), title="Spread Range")
 plot(ta.range(source=spread, 3), title="Mixed Spread Range")
 plot(ta.mom(spread, 2), title="Spread Momentum")
@@ -1232,7 +1242,9 @@ plot(ta.roc(source=spread, 2), title="Mixed Spread ROC")
     expect(roundSeries(getPlot(result, 'Named Spread WMA').values)).toEqual(roundSeries(getPlot(result, 'Spread WMA').values));
     expect(roundSeries(getPlot(result, 'Mixed Spread WMA').values)).toEqual(roundSeries(getPlot(result, 'Spread WMA').values));
     expect(roundSeries(getPlot(result, 'Spread Highest').values)).toEqual([2, 3, 3, 3, 2, 1, 4, 5, 5, 5, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Mixed Spread Highest').values)).toEqual(roundSeries(getPlot(result, 'Spread Highest').values));
     expect(roundSeries(getPlot(result, 'Spread Lowest').values)).toEqual([2, 2, 2, -4, -4, -4, -4, 1, -1, -1, -1, -1]);
+    expect(roundSeries(getPlot(result, 'Mixed Spread Lowest').values)).toEqual(roundSeries(getPlot(result, 'Spread Lowest').values));
     expect(roundSeries(getPlot(result, 'Spread Range').values)).toEqual([0, 1, 1, 7, 6, 5, 8, 4, 6, 6, 4, 4]);
     expect(roundSeries(getPlot(result, 'Mixed Spread Range').values)).toEqual(roundSeries(getPlot(result, 'Spread Range').values));
     expect(roundSeries(getPlot(result, 'Spread Momentum').values)).toEqual([null, null, 0, -7, -6, 5, 8, 4, -5, -2, 0, -1]);

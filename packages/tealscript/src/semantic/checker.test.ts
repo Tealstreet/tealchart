@@ -1719,9 +1719,13 @@ lowest = ta.lowest(length=3)
 highestOffset = ta.highestbars(length=3)
 lowestOffset = ta.lowestbars(length=3)
 singleLengthHighest = ta.highest(3)
+mixedHighest = ta.highest(source=high, 3)
+mixedLowest = ta.lowest(source=low, 3)
+mixedHighestOffset = ta.highestbars(source=high, 3)
+mixedLowestOffset = ta.lowestbars(source=low, 3)
 spread = ta.range(source=close, length=3)
 trend = ta.rising(source=close, length=2) or ta.falling(source=close, length=2)
-plot(since + last + lastMixed + changed + changedMixed + highest + lowest + highestOffset + lowestOffset + singleLengthHighest + spread + (crossed ? 1 : 0) + (crossedMixed ? 1 : 0) + (trend ? 1 : 0))
+plot(since + last + lastMixed + changed + changedMixed + highest + lowest + highestOffset + lowestOffset + singleLengthHighest + mixedHighest + mixedLowest + mixedHighestOffset + mixedLowestOffset + spread + (crossed ? 1 : 0) + (crossedMixed ? 1 : 0) + (trend ? 1 : 0))
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -1733,6 +1737,7 @@ indicator("Bad TA Core Signatures")
 duplicateValuewhen = ta.valuewhen(close > open, condition=false, source=close, occurrence=0)
 unknownCross = ta.cross(source1=close, source2=open, threshold=0)
 missingHighestLength = ta.highest(source=high)
+badHighestOrder = ta.highest(length=3, high)
 shortRange = ta.range(source=close)
 tooManyBarsSince = ta.barssince(close > open, true)
 `));
@@ -1741,6 +1746,7 @@ tooManyBarsSince = ta.barssince(close > open, true)
       "Argument 'condition' for ta.valuewhen() was supplied multiple times",
       "Unknown argument 'threshold' for ta.cross()",
       "ta.highest() missing required argument 'length'",
+      'ta.highest() cannot use positional arguments after named arguments',
       "ta.range() expects at least 2 arguments",
       "ta.range() missing required argument 'length'",
       'ta.barssince() expects at most 1 argument',
