@@ -1891,6 +1891,56 @@ duplicate = box.get_bgcolor(region, id=region)
     ]);
   });
 
+  it('resolves polyline named arguments and positional tails', () => {
+    const result = checkProgram(parse(`
+indicator("Polyline Signatures")
+firstPoint = chart.point.from_index(bar_index, high)
+secondPoint = chart.point.from_index(bar_index + 1, low)
+points = array.from(firstPoint, secondPoint)
+shape = polyline.new(points=points, true, false, xloc.bar_index, color.blue, color.new(color.blue, 80), "solid", 2, true)
+named = polyline.new(points, curved=true, closed=true, line_color=color.orange)
+clone = polyline.copy(id=shape)
+polylines = array.from(shape, named, clone)
+polyline.delete(id=clone)
+plot(array.size(polylines))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('shape')).toMatchObject({ kind: 'polyline' });
+    expect(types.get('named')).toMatchObject({ kind: 'polyline' });
+    expect(types.get('clone')).toMatchObject({ kind: 'polyline' });
+    expect(types.get('polylines')).toMatchObject({ kind: 'array', elementType: { kind: 'polyline' } });
+  });
+
+  it('reports invalid polyline argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Polyline Signatures")
+firstPoint = chart.point.from_index(bar_index, high)
+secondPoint = chart.point.from_index(bar_index + 1, low)
+points = array.from(firstPoint, secondPoint)
+unknown = polyline.new(points, opacity=80)
+missing = polyline.new(curved=true)
+duplicate = polyline.new(points, points=points)
+tooMany = polyline.new(points, true, false, xloc.bar_index, color.blue, color.red, "solid", 2, true, false)
+missingCopy = polyline.copy()
+unknownDelete = polyline.delete(shape=points)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'opacity' for polyline.new()",
+      "polyline.new() missing required argument 'points'",
+      "Argument 'points' for polyline.new() was supplied multiple times",
+      'polyline.new() expects at most 9 arguments',
+      'polyline.copy() expects at least 1 argument',
+      "polyline.copy() missing required argument 'id'",
+      "Unknown argument 'shape' for polyline.delete()",
+      'polyline.delete() expects at least 1 argument',
+      "polyline.delete() missing required argument 'id'",
+    ]);
+  });
+
   it('resolves linefill.new named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Linefill Signatures")
