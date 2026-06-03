@@ -160,7 +160,9 @@ The common input helper pass covers generic `input()` inference, common typed
 helpers (`input.price`, `input.time`, `input.timeframe`, `input.symbol`, `input.session`,
 `input.text_area`), and common metadata (`options`, `tooltip`, `group`,
 `inline`, `confirm`, `display`, `active`) so generated scripts retain Pine-like control
-definitions.
+definitions. Semantic analysis preserves known `input.*` return types for
+downstream assignment diagnostics, including `input.source()` defval source
+types.
 
 ## Common `array.*` Coverage
 

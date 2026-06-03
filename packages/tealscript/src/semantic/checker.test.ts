@@ -437,6 +437,7 @@ export lateShadow(float value) =>
       'Exported function assignsGlobal cannot use non-const global variable: scale',
       'Exported function usesInput cannot call input.*() functions',
       'Exported function lateShadow cannot use non-const global variable: scale',
+      'Cannot assign float value to int variable scale',
     ]);
   });
 
@@ -2453,7 +2454,7 @@ values.sort(0, order.ascending, true)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'matrix.sort() sort_field requires const int or const string, got input unknown',
+      'matrix.sort() sort_field requires const int or const string, got input string',
       'matrix.sort() sort_field requires const int or const string, got simple string',
       'matrix.sort() sort_field requires const int or const string, got series int',
       'matrix.sort() sort_field requires const int or const string, got unqualified int',
@@ -2488,12 +2489,12 @@ matrixValues.sort(0, order.ascending, inputField)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'array.sort() sort_field requires const int or const string, got input unknown',
+      'array.sort() sort_field requires const int or const string, got input string',
       'array.sort() sort_field requires const int or const string, got simple string',
       'array.sort() sort_field requires const int or const string, got series int',
       'array.sort() sort_field requires const int or const string, got unqualified int',
       'array.sort() sort_field must be a const int or const string, got bool',
-      'matrix.sort() sort_field requires const int or const string, got input unknown',
+      'matrix.sort() sort_field requires const int or const string, got input string',
     ]);
   });
 
@@ -3972,6 +3973,66 @@ mixedPrice = input.price(defval=101.25, "Mixed Level", "Drag mixed level")
 `));
 
     expect(result.diagnostics).toEqual([]);
+  });
+
+  it('infers Pine input helper return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Input Return Types")
+length = input.int(14)
+multiplier = input.float(2.0)
+enabled = input.bool(true)
+mode = input.string("EMA")
+tint = input.color(color.red)
+start = input.time(1700000000000)
+tf = input.timeframe("60")
+symbol = input.symbol("BINANCE:BTCUSDT")
+session = input.session("0930-1600")
+memo = input.text_area("notes")
+level = input.price(101.25)
+source = input.source(defval=close, "Source")
+length := "bad"
+multiplier := "bad"
+enabled := 1
+mode := 1
+tint := "bad"
+start := "bad"
+tf := 1
+symbol := 2
+session := 3
+memo := 4
+level := "bad"
+source := "bad"
+plot(source + level + multiplier + length)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to int variable length',
+      'Cannot assign string value to float variable multiplier',
+      'Cannot assign int value to bool variable enabled',
+      'Cannot assign int value to string variable mode',
+      'Cannot assign string value to color variable tint',
+      'Cannot assign string value to int variable start',
+      'Cannot assign int value to string variable tf',
+      'Cannot assign int value to string variable symbol',
+      'Cannot assign int value to string variable session',
+      'Cannot assign int value to string variable memo',
+      'Cannot assign string value to float variable level',
+      'Cannot assign string value to float variable source',
+    ]);
+    expect(types.get('length')).toMatchObject({ kind: 'int', qualifier: 'input' });
+    expect(types.get('multiplier')).toMatchObject({ kind: 'float', qualifier: 'input' });
+    expect(types.get('enabled')).toMatchObject({ kind: 'bool', qualifier: 'input' });
+    expect(types.get('mode')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('tint')).toMatchObject({ kind: 'color', qualifier: 'input' });
+    expect(types.get('start')).toMatchObject({ kind: 'int', qualifier: 'input' });
+    expect(types.get('tf')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('symbol')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('session')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('memo')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('level')).toMatchObject({ kind: 'float', qualifier: 'input' });
+    expect(types.get('source')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports duplicate Pine input bindings against the selected overload', () => {
