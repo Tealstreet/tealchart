@@ -894,6 +894,23 @@ plot(branchResult + partialBranchResult + loopResult + whileResult + switchResul
     expect(types.get('partialSwitchResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
+  it('reports annotated mixed conditional initializer arm mismatches', () => {
+    const result = checkProgram(parse(`
+indicator("Mixed Control Initializer Diagnostics")
+mode = "price"
+float ternaryValue = close > open ? close : "bad"
+float switchValue = switch mode
+    "price" => close
+    => "bad"
+plot(close)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable',
+      'Cannot assign string value to float variable',
+    ]);
+  });
+
   it('reports assignments to undeclared identifiers', () => {
     const result = checkProgram(parse(`
 indicator("Unknown Assignment")
