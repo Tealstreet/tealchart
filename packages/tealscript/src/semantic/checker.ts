@@ -3301,6 +3301,10 @@ class SemanticChecker {
       const sourceType = sourceArgument ? this.inferExpressionType(sourceArgument, scope) : { kind: 'unknown' as const };
       return { ...sourceType, qualifier: 'series' };
     }
+    if (calleeName === 'nz' || calleeName === 'fixnan') {
+      return this.inferNaHelperReturnType(expression, scope);
+    }
+    if (calleeName === 'na') return { kind: 'bool', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
     if (BOOLEAN_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'bool', qualifier: 'series' };
     if (INTEGER_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'int', qualifier: 'series' };
     if (COLOR_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'color', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
@@ -3778,6 +3782,15 @@ class SemanticChecker {
     const expressionArgument = this.getCallArgument(expression.arguments, 'expression', 2);
     const expressionType = expressionArgument ? this.inferExpressionType(expressionArgument, scope) : { kind: 'unknown' as const };
     return { ...expressionType, qualifier: 'series' };
+  }
+
+  private inferNaHelperReturnType(expression: CallExpression, scope: SemanticScope): SemanticType {
+    const sourceArgument = this.getCallArgument(expression.arguments, 'source', 0);
+    const sourceType = sourceArgument ? this.inferExpressionType(sourceArgument, scope) : { kind: 'unknown' as const };
+    if (sourceType.kind !== 'unknown' || this.memberPath(expression.callee).join('.') !== 'nz') return sourceType;
+
+    const replacementArgument = this.getCallArgument(expression.arguments, 'replacement', 1);
+    return replacementArgument ? this.inferExpressionType(replacementArgument, scope) : sourceType;
   }
 
   private arrayElementTypeKind(type: SemanticType): SemanticType {

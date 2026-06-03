@@ -3477,7 +3477,16 @@ isMissing = na(x=source)
 plot(filled + fixed + asFloat + asInt + (asBool ? 1 : 0) + str.length(asString) + (isMissing ? 1 : 0))
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('filled')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('fixed')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('asFloat')).toMatchObject({ kind: 'float', qualifier: 'const' });
+    expect(types.get('asInt')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('asBool')).toMatchObject({ kind: 'bool', qualifier: 'const' });
+    expect(types.get('asString')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('isMissing')).toMatchObject({ kind: 'bool', qualifier: 'series' });
   });
 
   it('resolves ticker helper named arguments', () => {
