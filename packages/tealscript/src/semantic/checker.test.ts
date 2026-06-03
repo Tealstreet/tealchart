@@ -3487,16 +3487,23 @@ pivotHolder = HasPivot.new(Other.new(close))
     const valid = checkProgram(parse(`
 indicator("Index Assignment")
 values = array.new<float>()
+texts = array.new<string>()
 values[0] := close
 values[1] += 2
+texts[0] += "ok"
 `));
 
     const invalid = checkProgram(parse(`
 indicator("Bad Index Assignment")
 values = array.new<int>()
+texts = array.new<string>()
+tags = array.new<label>()
 values["first"] := 1
 values[0] := "bad"
 close[0] := 1
+values[1] += 1.5
+texts[0] -= "bad"
+tags[0] += 1
 `));
 
     expect(valid.diagnostics).toEqual([]);
@@ -3504,6 +3511,9 @@ close[0] := 1
       'Array assignment index must be numeric, got string',
       'Cannot assign string value to int array element',
       'Index assignment target must be an array, got float',
+      'Cannot assign float value to int array element',
+      'Compound assignment -= requires numeric operands, got string and string for array element',
+      'Compound assignment += requires numeric or string operands, got label and int for array element',
     ]);
   });
 
