@@ -3559,7 +3559,7 @@ tooManyDelete = table.delete(dashboard, dashboard)
 indicator("Table Cell Signatures")
 dashboard = table.new(columns=2, rows=2)
 table.cell(table_id=dashboard, 0, 0, "Entry", 10, 2, color.white, "left", "top", size.small, color.blue)
-table.cell(dashboard, column=1, row=0, text="Exit", bgcolor=color.orange)
+table.cell(dashboard, column=1, row=0, text="Exit", bgcolor=color.orange, tooltip="Exit details")
 plot(1)
 `));
 
@@ -3573,7 +3573,7 @@ dashboard = table.new(columns=2, rows=2)
 unknown = table.cell(dashboard, 0, 0, label="Entry")
 missing = table.cell(table_id=dashboard, column=1)
 duplicate = table.cell(dashboard, 0, 0, table_id=dashboard)
-tooMany = table.cell(dashboard, 0, 0, "A", 1, 1, color.white, "left", "top", size.small, color.blue, "mono", "bold", 1)
+tooMany = table.cell(dashboard, 0, 0, "A", 1, 1, color.white, "left", "top", size.small, color.blue, "mono", "bold", "tip", 1)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -3581,7 +3581,7 @@ tooMany = table.cell(dashboard, 0, 0, "A", 1, 1, color.white, "left", "top", siz
       'table.cell() expects at least 3 arguments',
       "table.cell() missing required argument 'row'",
       "Argument 'table_id' for table.cell() was supplied multiple times",
-      'table.cell() expects at most 13 arguments',
+      'table.cell() expects at most 14 arguments',
     ]);
   });
 
@@ -3600,6 +3600,7 @@ table.cell_set_text_halign(table_id=dashboard, 0, 0, "left")
 table.cell_set_text_valign(dashboard, column=0, row=0, text_valign="top")
 table.cell_set_text_font_family(table_id=dashboard, column=0, row=0, text_font_family="monospace")
 table.cell_set_text_formatting(dashboard, column=0, row=0, text_formatting="bold")
+table.cell_set_tooltip(table_id=dashboard, column=0, row=0, tooltip="Details")
 plot(1)
 `));
 
@@ -3615,6 +3616,9 @@ missing = table.cell_set_bgcolor(table_id=dashboard, column=0, row=0)
 duplicate = table.cell_set_text_color(dashboard, 0, 0, color.white, table_id=dashboard)
 tooMany = table.cell_set_width(dashboard, 0, 0, 10, 20)
 missingCoordinate = table.cell_set_height(table_id=dashboard, row=0, height=2)
+missingTooltip = table.cell_set_tooltip(table_id=dashboard, column=0, row=0)
+duplicateTooltip = table.cell_set_tooltip(dashboard, 0, 0, "Tip", table_id=dashboard)
+tooManyTooltip = table.cell_set_tooltip(dashboard, 0, 0, "Tip", "Extra")
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -3625,6 +3629,10 @@ missingCoordinate = table.cell_set_height(table_id=dashboard, row=0, height=2)
       'table.cell_set_width() expects at most 4 arguments',
       'table.cell_set_height() expects at least 4 arguments',
       "table.cell_set_height() missing required argument 'column'",
+      'table.cell_set_tooltip() expects at least 4 arguments',
+      "table.cell_set_tooltip() missing required argument 'tooltip'",
+      "Argument 'table_id' for table.cell_set_tooltip() was supplied multiple times",
+      'table.cell_set_tooltip() expects at most 4 arguments',
     ]);
   });
 

@@ -785,6 +785,7 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     'bgcolor',
     'text_font_family',
     'text_formatting',
+    'tooltip',
   ] as const;
   const withTable = (value: unknown, ctx: ExecutionContext, fn: (table: TableDrawingOutput) => void): void => {
     withDrawing(value, ctx, 'table', runtime.isNa, fn);
@@ -961,6 +962,7 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       );
       const textFontFamily = optionalString(runtime, orderedCallArg(args, namedArgs, tableCellArgs, 11));
       const textFormatting = optionalString(runtime, orderedCallArg(args, namedArgs, tableCellArgs, 12));
+      const tooltip = optionalString(runtime, orderedCallArg(args, namedArgs, tableCellArgs, 13));
       const cell: TableCellDrawingOutput = {
         column,
         row,
@@ -979,6 +981,7 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       };
       if (textFontFamily !== undefined) cell.textFontFamily = textFontFamily;
       if (textFormatting !== undefined) cell.textFormatting = textFormatting;
+      if (tooltip !== undefined) cell.tooltip = tooltip;
       upsertCell(table, cell);
     });
     return undefined;
@@ -1051,6 +1054,13 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
       const cell = ensureCell(table, callArg(args, namedArgs, 1, 'column', undefined, ['table_id']), callArg(args, namedArgs, 2, 'row', undefined, ['table_id', 'column']));
       cell.textFormatting = runtime.toStringValue(callArg(args, namedArgs, 3, 'text_formatting', undefined, ['table_id', 'column', 'row']));
+    });
+    return undefined;
+  });
+  builtins.set('table.cell_set_tooltip', (args, namedArgs, ctx) => {
+    withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
+      const cell = ensureCell(table, callArg(args, namedArgs, 1, 'column', undefined, ['table_id']), callArg(args, namedArgs, 2, 'row', undefined, ['table_id', 'column']));
+      cell.tooltip = runtime.toStringValue(callArg(args, namedArgs, 3, 'tooltip', undefined, ['table_id', 'column', 'row']));
     });
     return undefined;
   });
