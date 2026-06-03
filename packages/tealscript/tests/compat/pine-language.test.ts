@@ -627,7 +627,9 @@ plot(selected, title="Selected")
   it('runs Pine-style leading operator line continuations', () => {
     const result = runCompatScript(`
 indicator("Leading Operator Continuation")
-value = 1
+subtrahend = 3
+value = 10
+    - subtrahend
     + 2
     * 3
 flag = true
@@ -640,7 +642,7 @@ plot(selected, title="Selected")
 `);
 
     expect(result.errors).toEqual([]);
-    expect(roundSeries(getPlot(result, 'Selected').values)).toEqual(Array(compatibilityBars.length).fill(7));
+    expect(roundSeries(getPlot(result, 'Selected').values)).toEqual(Array(compatibilityBars.length).fill(13));
   });
 
   it('keeps if/else branch boundaries after operator continuation support', () => {
@@ -648,7 +650,7 @@ plot(selected, title="Selected")
 indicator("If Else Boundary")
 score(value) =>
     if value > 0
-        1
+        -1
     else
         0
 plot(score(close - open), title="Score")
@@ -656,7 +658,7 @@ plot(score(close - open), title="Score")
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Score').values)).toEqual(
-      compatibilityBars.map((bar) => (bar.close - bar.open > 0 ? 1 : 0))
+      compatibilityBars.map((bar) => (bar.close - bar.open > 0 ? -1 : 0))
     );
   });
 
