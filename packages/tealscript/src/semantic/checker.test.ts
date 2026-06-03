@@ -982,7 +982,7 @@ priceValue := "bad"
 title := 1
 blockResult := "bad"
 mixedResult := "still unknown"
-partialResult := "still unknown"
+partialResult := "bad"
 simpleValue := partialResult
 plot(priceValue + blockResult)
 `));
@@ -993,13 +993,14 @@ plot(priceValue + blockResult)
       'Cannot assign string value to float variable priceValue',
       'Cannot assign int value to string variable title',
       'Cannot assign string value to float variable blockResult',
+      'Cannot assign string value to float variable partialResult',
       'Cannot assign series value to simple float variable simpleValue',
     ]);
     expect(types.get('priceValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('title')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('blockResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('mixedResult')).toMatchObject({ kind: 'unknown' });
-    expect(types.get('partialResult')).toMatchObject({ kind: 'unknown', qualifier: 'series' });
+    expect(types.get('partialResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('infers user function loop expression types for downstream diagnostics', () => {

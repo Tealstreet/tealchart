@@ -3285,9 +3285,18 @@ class SemanticChecker {
   }
 
   private inferIfExpressionType(statement: IfStatement, scope: SemanticScope): SemanticType {
-    if (!statement.alternate) return { kind: 'unknown', qualifier: this.inferExpressionType(statement.test, scope).qualifier };
-
     const consequentType = this.inferExpressionTypeFromStatements(statement.consequent, new SemanticScope(scope));
+    if (!statement.alternate) {
+      if (!consequentType) return { kind: 'unknown', qualifier: this.inferExpressionType(statement.test, scope).qualifier };
+      return {
+        ...consequentType,
+        qualifier: this.maxQualifier(
+          consequentType,
+          { kind: 'unknown', qualifier: this.inferExpressionType(statement.test, scope).qualifier },
+        ),
+      };
+    }
+
     const alternateType = Array.isArray(statement.alternate)
       ? this.inferExpressionTypeFromStatements(statement.alternate, new SemanticScope(scope))
       : this.inferIfExpressionType(statement.alternate, new SemanticScope(scope));
