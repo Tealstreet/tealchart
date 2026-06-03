@@ -3195,6 +3195,10 @@ class SemanticChecker {
         return this.inferConditionalExpressionType(expression, scope);
       case 'SwitchExpression':
         return this.inferSwitchExpressionType(expression, scope);
+      case 'ForStatement':
+        return this.inferForExpressionType(expression, scope) ?? { kind: 'unknown' };
+      case 'WhileStatement':
+        return this.inferWhileExpressionType(expression, scope) ?? { kind: 'unknown' };
       case 'CallExpression':
         return this.inferCallType(expression, scope);
       case 'MemberExpression':
