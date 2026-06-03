@@ -553,6 +553,38 @@ plot(tracked)
     ]);
   });
 
+  it('reports plain identifier compound assignment type mismatches', () => {
+    const result = checkProgram(parse(`
+indicator("Compound Assignment Mismatches")
+int count = 1
+float total = 1
+string labelText = "A"
+unknown = na
+int badCount = 1
+string badText = "A"
+label tag = label.new(bar_index, close)
+simple int simpleCount = 1
+count += 2
+total += count
+labelText += "B"
+unknown += "later"
+badCount += 1.5
+badText -= "B"
+tag += 1
+count /= 2
+simpleCount += bar_index
+plot(total)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign float value to int variable badCount',
+      'Compound assignment -= requires numeric operands, got string and string',
+      'Compound assignment += requires numeric or string operands, got label and int',
+      'Cannot assign float value to int variable count',
+      'Cannot assign series value to simple int variable simpleCount',
+    ]);
+  });
+
   it('reports unknown identifiers and functions', () => {
     const result = checkProgram(parse(`
 indicator("Unknowns")
