@@ -3108,6 +3108,8 @@ class SemanticChecker {
         return { kind: 'unknown', qualifier: this.inferExpressionType(expression.argument, scope).qualifier };
       case 'ConditionalExpression':
         return this.inferConditionalExpressionType(expression, scope);
+      case 'SwitchExpression':
+        return this.inferSwitchExpressionType(expression, scope);
       case 'CallExpression':
         return this.inferCallType(expression, scope);
       case 'MemberExpression':
@@ -3141,6 +3143,53 @@ class SemanticChecker {
       ...branchType,
       qualifier: this.maxQualifier(testType, consequentType, alternateType),
     };
+  }
+
+  private inferSwitchExpressionType(expression: SwitchExpression, scope: SemanticScope): SemanticType {
+    let branchType: SemanticType = { kind: 'unknown' };
+    const qualifierSources: SemanticType[] = [];
+    if (expression.discriminant) qualifierSources.push(this.inferExpressionType(expression.discriminant, scope));
+
+    for (const switchCase of expression.cases) {
+      if (switchCase.test) qualifierSources.push(this.inferExpressionType(switchCase.test, scope));
+      const consequentType = this.inferSwitchCaseConsequentType(switchCase.consequent, scope);
+      qualifierSources.push(consequentType);
+      branchType = this.mergeConditionalBranchTypes(branchType, consequentType);
+    }
+
+    return {
+      ...branchType,
+      qualifier: this.maxQualifier(...qualifierSources),
+    };
+  }
+
+  private inferSwitchCaseConsequentType(consequent: Expression | Statement[], scope: SemanticScope): SemanticType {
+    if (!Array.isArray(consequent)) return this.inferExpressionType(consequent, scope);
+
+    const blockScope = new SemanticScope(scope);
+    let returnType: SemanticType = { kind: 'unknown' };
+    for (const [index, statement] of consequent.entries()) {
+      const isLastStatement = index === consequent.length - 1;
+      if (statement.type === 'VariableDeclaration') {
+        const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init, blockScope);
+        if (statement.names.type === 'VariableDeclarator') {
+          this.declare(blockScope, {
+            name: statement.names.name.name,
+            kind: 'variable',
+            type,
+            loc: statement.names.name.loc,
+          });
+        }
+        returnType = isLastStatement ? type : { kind: 'unknown' };
+        continue;
+      }
+      if (statement.type === 'ExpressionStatement') {
+        returnType = isLastStatement ? this.inferExpressionType(statement.expression, blockScope) : { kind: 'unknown' };
+        continue;
+      }
+      returnType = { kind: 'unknown' };
+    }
+    return returnType;
   }
 
   private mergeConditionalBranchTypes(consequentType: SemanticType, alternateType: SemanticType): SemanticType {
