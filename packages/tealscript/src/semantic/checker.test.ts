@@ -673,6 +673,55 @@ plot(numberValue + array.size(arrayValue) + array.size(arrayMixed) + matrix.rows
     expect(types.get('pointValue')).toMatchObject({ kind: 'chart.point', qualifier: 'series' });
   });
 
+  it('preserves branch types through switch expressions', () => {
+    const result = checkProgram(parse(`
+indicator("Switch Types")
+type Pivot
+    float price
+
+mode = close > open ? "up" : "down"
+numberValue = switch mode
+    "up" => 1
+    "down" => 2.5
+    => 3
+labelValue = switch mode
+    "up" => label.new(bar_index, close)
+    => na
+arrayValue = switch mode
+    "up" => array.new<float>()
+    => array.new_float()
+matrixValue = switch mode
+    "up" => matrix.new<int>()
+    =>
+        grid = matrix.new_int()
+        grid
+mapValue = switch
+    close > open => map.new<string, float>()
+    => na
+pivotValue = switch mode
+    "up" => Pivot.new(close)
+    =>
+        pivot = Pivot.new(open)
+        pivot
+plot(numberValue + array.size(arrayValue) + matrix.rows(matrixValue) + map.size(mapValue) + pivotValue.price)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('numberValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('labelValue')).toMatchObject({ kind: 'label', qualifier: 'series' });
+    expect(types.get('arrayValue')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('matrixValue')).toMatchObject({ kind: 'matrix', qualifier: 'series', elementType: { kind: 'int' } });
+    expect(types.get('mapValue')).toMatchObject({
+      kind: 'map',
+      qualifier: 'series',
+      keyType: { kind: 'string' },
+      valueType: { kind: 'float' },
+    });
+    expect(types.get('pivotValue')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
+  });
+
   it('reports map key and value template mismatches', () => {
     const result = checkProgram(parse(`
 indicator("Bad Map Types")
