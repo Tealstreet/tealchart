@@ -340,6 +340,13 @@ const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['table.new', 'table'],
 ]);
 
+const DRAWING_ALL_ELEMENT_TYPES = new Map<string, SemanticTypeKind>([
+  ['box.all', 'box'],
+  ['label.all', 'label'],
+  ['line.all', 'line'],
+  ['polyline.all', 'polyline'],
+]);
+
 const BUILTIN_TUPLE_RETURN_TYPES = new Map<string, SemanticType[]>([
   [
     'ta.bb',
@@ -3601,6 +3608,8 @@ class SemanticChecker {
           const strategyType = this.inferStrategyMemberType(expression);
           if (strategyType) return strategyType;
         }
+        const drawingAllType = this.inferDrawingAllMemberType(expression);
+        if (drawingAllType) return drawingAllType;
         if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
           return { kind: 'unknown', qualifier: 'const' };
         }
@@ -4550,6 +4559,8 @@ class SemanticChecker {
     if (syminfoType) return syminfoType;
     const strategyType = this.inferStrategyMemberType(expression);
     if (strategyType) return strategyType;
+    const drawingAllType = this.inferDrawingAllMemberType(expression);
+    if (drawingAllType) return drawingAllType;
     const enumType = this.inferEnumMemberType(expression, scope);
     if (enumType) return enumType;
 
@@ -4558,6 +4569,11 @@ class SemanticChecker {
 
     const field = this.findUdtField(objectType.name, expression.property.name);
     return this.typeFromAnnotation(field?.typeAnnotation ?? undefined) ?? { kind: 'unknown', qualifier: objectType.qualifier };
+  }
+
+  private inferDrawingAllMemberType(expression: MemberExpression): SemanticType | undefined {
+    const elementType = DRAWING_ALL_ELEMENT_TYPES.get(this.memberPath(expression).join('.'));
+    return elementType ? { kind: 'array', elementType: { kind: elementType } } : undefined;
   }
 
   private inferTimeframeMemberType(expression: MemberExpression): SemanticType | undefined {
