@@ -3108,6 +3108,22 @@ plot(str.length(directionLabel) + str.length(priceLabel) + directionScore)
     expect(types.get('directionScore')).toMatchObject({ kind: 'int' });
   });
 
+  it('reports unknown local enum members', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Enum Member")
+enum Direction
+    up = "Up"
+    down = "Down"
+valid = Direction.up
+missing = Direction.sideways
+plot(valid == Direction.up ? 1 : 0)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown enum member 'sideways' on enum Direction",
+    ]);
+  });
+
   it('selects user-defined method overloads by receiver specificity', () => {
     const result = checkProgram(parse(`
 indicator("Method Receiver Specificity")
