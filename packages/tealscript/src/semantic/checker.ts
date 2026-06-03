@@ -1763,6 +1763,14 @@ class SemanticChecker {
     if (!targetType) return;
 
     const sourceType = this.inferExpressionType(statement.right, scope);
+    if (!this.isAssignableQualifier(targetType.qualifier, sourceType.qualifier)) {
+      this.addDiagnostic(
+        'qualifier-mismatch',
+        `Cannot assign ${sourceType.qualifier} value to ${targetType.qualifier} ${this.formatSemanticType(targetType)} variable ${statement.left.name}`,
+        statement.loc,
+      );
+    }
+
     if (this.isAssignableType(targetType, sourceType)) return;
 
     this.addDiagnostic(

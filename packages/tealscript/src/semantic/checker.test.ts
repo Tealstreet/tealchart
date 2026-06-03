@@ -537,6 +537,22 @@ plot(price)
     ]);
   });
 
+  it('reports plain identifier reassignment qualifier mismatches', () => {
+    const result = checkProgram(parse(`
+indicator("Assignment Qualifier Mismatches")
+simple float base = 1
+series float tracked = close
+base := 2
+tracked := base
+base := close
+plot(tracked)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign series value to simple float variable base',
+    ]);
+  });
+
   it('reports unknown identifiers and functions', () => {
     const result = checkProgram(parse(`
 indicator("Unknowns")
