@@ -1068,14 +1068,20 @@ plot(close)
   it('reports direct tuple initializer shape mismatches', () => {
     const result = checkProgram(parse(`
 indicator("Direct Tuple Initializer Shape Diagnostics")
+triple(float value) => [value, value + 1, "udf"]
+method tripleMethod(float this) => [this, this + 1, "method"]
 [literalValue, literalTitle] = [close]
 [macdLine, signalLine] = ta.macd(close, 12, 26, 9)
+[udfValue, udfTitle] = triple(close)
+[methodValue, methodTitle] = close.tripleMethod()
 [scalarValue, scalarTitle] = close
 plot(close)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Tuple declaration expects 2 values but initializer arm returns 1',
+      'Tuple declaration expects 2 values but initializer arm returns 3',
+      'Tuple declaration expects 2 values but initializer arm returns 3',
       'Tuple declaration expects 2 values but initializer arm returns 3',
       'Tuple declaration expects 2 values but initializer arm returns a non-tuple value',
     ]);

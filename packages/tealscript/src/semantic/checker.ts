@@ -1807,7 +1807,7 @@ class SemanticChecker {
   private declareTuple(tuple: TupleDeclarator, init: Expression | IfStatement, scope: SemanticScope): void {
     const seen = new Set<string>();
     const elementTypes = this.inferTupleElementTypes(init, scope);
-    this.checkTupleInitializerShape(tuple, init);
+    this.checkTupleInitializerShape(tuple, init, scope);
     for (const [index, name] of tuple.names.entries()) {
       if (seen.has(name.name)) {
         this.addDiagnostic('duplicate-symbol', `Duplicate declaration: ${name.name}`, name.loc);
@@ -1818,9 +1818,9 @@ class SemanticChecker {
     }
   }
 
-  private checkTupleInitializerShape(tuple: TupleDeclarator, init: Expression | IfStatement): void {
-    const armShapes = this.tupleInitializerArmShapes(init)
-      ?? (init.type === 'IfStatement' ? undefined : [this.tupleInitializerShapeFromExpression(init)]);
+  private checkTupleInitializerShape(tuple: TupleDeclarator, init: Expression | IfStatement, scope: SemanticScope): void {
+    const armShapes = this.tupleInitializerArmShapes(init, scope)
+      ?? (init.type === 'IfStatement' ? undefined : [this.tupleInitializerShapeFromExpression(init, scope)]);
     if (!armShapes) return;
 
     const expectedArity = tuple.names.length;
@@ -1838,23 +1838,23 @@ class SemanticChecker {
     }
   }
 
-  private tupleInitializerArmShapes(init: Expression | IfStatement): TupleInitializerShape[] | undefined {
+  private tupleInitializerArmShapes(init: Expression | IfStatement, scope: SemanticScope): TupleInitializerShape[] | undefined {
     if (init.type === 'ConditionalExpression') {
       return [
-        this.tupleInitializerShapeFromExpression(init.consequent),
-        this.tupleInitializerShapeFromExpression(init.alternate),
+        this.tupleInitializerShapeFromExpression(init.consequent, scope),
+        this.tupleInitializerShapeFromExpression(init.alternate, scope),
       ];
     }
 
     if (init.type === 'IfStatement') {
       const shapes = [
-        ...this.normalizeTupleInitializerShapes(this.tupleInitializerShapesFromStatements(init.consequent)),
+        ...this.normalizeTupleInitializerShapes(this.tupleInitializerShapesFromStatements(init.consequent, new SemanticScope(scope))),
       ];
       if (init.alternate) {
         shapes.push(...(
           Array.isArray(init.alternate)
-            ? this.normalizeTupleInitializerShapes(this.tupleInitializerShapesFromStatements(init.alternate))
-            : this.normalizeTupleInitializerShapes(this.tupleInitializerArmShapes(init.alternate))
+            ? this.normalizeTupleInitializerShapes(this.tupleInitializerShapesFromStatements(init.alternate, new SemanticScope(scope)))
+            : this.normalizeTupleInitializerShapes(this.tupleInitializerArmShapes(init.alternate, new SemanticScope(scope)))
         ));
       }
       return this.normalizeTupleInitializerShapes(shapes);
@@ -1863,23 +1863,23 @@ class SemanticChecker {
     if (init.type === 'SwitchExpression') {
       return init.cases.flatMap((switchCase) => (
         Array.isArray(switchCase.consequent)
-          ? this.normalizeTupleInitializerShapes(this.tupleInitializerShapesFromStatements(switchCase.consequent))
-          : [this.tupleInitializerShapeFromExpression(switchCase.consequent)]
+          ? this.normalizeTupleInitializerShapes(this.tupleInitializerShapesFromStatements(switchCase.consequent, new SemanticScope(scope)))
+          : [this.tupleInitializerShapeFromExpression(switchCase.consequent, new SemanticScope(scope))]
       ));
     }
 
     if (init.type === 'ForStatement' || init.type === 'WhileStatement') {
-      return this.normalizeTupleInitializerShapes(this.tupleInitializerShapesFromStatements(init.body));
+      return this.normalizeTupleInitializerShapes(this.tupleInitializerShapesFromStatements(init.body, new SemanticScope(scope)));
     }
 
     return undefined;
   }
 
-  private tupleInitializerShapesFromStatements(statements: Statement[]): TupleInitializerShape[] {
+  private tupleInitializerShapesFromStatements(statements: Statement[], scope: SemanticScope): TupleInitializerShape[] {
     let shapes: TupleInitializerShape[] = [{ kind: 'non-tuple' }];
     for (const statement of statements) {
       if (statement.type === 'ExpressionStatement') {
-        shapes = [this.tupleInitializerShapeFromExpression(statement.expression)];
+        shapes = [this.tupleInitializerShapeFromExpression(statement.expression, scope)];
         continue;
       }
       if (
@@ -1887,7 +1887,7 @@ class SemanticChecker {
         || statement.type === 'ForStatement'
         || statement.type === 'WhileStatement'
       ) {
-        shapes = this.normalizeTupleInitializerShapes(this.tupleInitializerArmShapes(statement));
+        shapes = this.normalizeTupleInitializerShapes(this.tupleInitializerArmShapes(statement, scope));
         continue;
       }
       shapes = [{ kind: 'non-tuple' }];
@@ -1899,15 +1899,17 @@ class SemanticChecker {
     return shapes && shapes.length > 0 ? shapes : [{ kind: 'non-tuple' }];
   }
 
-  private tupleInitializerShapeFromExpression(expression: Expression): TupleInitializerShape {
+  private tupleInitializerShapeFromExpression(expression: Expression, scope: SemanticScope): TupleInitializerShape {
     if (expression.type === 'ArrayExpression') {
       return { kind: 'tuple', arity: expression.elements.length };
     }
     if (expression.type === 'CallExpression') {
-      const tupleTypes = BUILTIN_TUPLE_RETURN_TYPES.get(this.memberPath(expression.callee).join('.'));
+      const tupleTypes = BUILTIN_TUPLE_RETURN_TYPES.get(this.memberPath(expression.callee).join('.'))
+        ?? this.inferUserFunctionTupleElementTypes(expression, scope)
+        ?? this.inferUserMethodTupleElementTypes(expression, scope);
       return tupleTypes ? { kind: 'tuple', arity: tupleTypes.length } : { kind: 'unknown' };
     }
-    return this.tupleInitializerArmShapes(expression)?.[0] ?? { kind: 'non-tuple' };
+    return this.tupleInitializerArmShapes(expression, scope)?.[0] ?? { kind: 'non-tuple' };
   }
 
   private inferTupleElementTypes(init: Expression | IfStatement, scope: SemanticScope): SemanticType[] | undefined {
