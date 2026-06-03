@@ -158,6 +158,7 @@ const BUILTIN_FUNCTIONS = new Set([
   'na',
   'nz',
   'plot',
+  'plotarrow',
   'plotbar',
   'plotcandle',
   'plotchar',
@@ -245,8 +246,8 @@ interface BuiltinSignature {
 const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['alert', { params: ['message', 'freq'], minArgs: 1 }],
   ['alertcondition', { params: ['condition', 'title', 'message'], minArgs: 1 }],
-  ['barcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display'], minArgs: 1 }],
-  ['bgcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay'], minArgs: 1 }],
+  ['barcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display'], minArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['bgcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay'], minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['bool', { params: ['x'], minArgs: 1, maxArgs: 1 }],
   ['chart.point.copy', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['chart.point.from_index', { params: ['index', 'price'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
@@ -263,10 +264,18 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
     'color.from_gradient',
     { params: ['value', 'bottom_value', 'top_value', 'bottom_color', 'top_color'], minArgs: 5, maxArgs: 5, allowNamedPrefixWithPositional: true },
   ],
-  ['fill', { params: ['hline1', 'hline2', 'color', 'title', 'editable', 'show_last', 'fillgaps', 'display'], minArgs: 3 }],
+  [
+    'fill',
+    {
+      params: ['plot1', 'plot2', 'color', 'title', 'editable', 'show_last', 'fillgaps', 'display'],
+      aliases: { hline1: 'plot1', hline2: 'plot2' },
+      minArgs: 3,
+      allowNamedPrefixWithPositional: true,
+    },
+  ],
   ['fixnan', { params: ['source'], minArgs: 1, maxArgs: 1 }],
   ['float', { params: ['x'], minArgs: 1, maxArgs: 1 }],
-  ['hline', { params: ['price', 'title', 'color', 'linestyle', 'linewidth', 'editable', 'display'], minArgs: 1 }],
+  ['hline', { params: ['price', 'title', 'color', 'linestyle', 'linewidth', 'editable', 'display'], minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['int', { params: ['x'], minArgs: 1, maxArgs: 1 }],
   [
     'plot',
@@ -290,6 +299,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'linestyle',
       ],
       minArgs: 1,
+      allowNamedPrefixWithPositional: true,
     },
   ],
   [
@@ -297,6 +307,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
     {
       params: ['open', 'high', 'low', 'close', 'title', 'color', 'editable', 'show_last', 'display', 'format', 'precision', 'force_overlay'],
       minArgs: 4,
+      allowNamedPrefixWithPositional: true,
     },
   ],
   [
@@ -319,6 +330,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'force_overlay',
       ],
       minArgs: 4,
+      allowNamedPrefixWithPositional: true,
     },
   ],
   [
@@ -342,6 +354,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'force_overlay',
       ],
       minArgs: 1,
+      allowNamedPrefixWithPositional: true,
     },
   ],
   [
@@ -365,6 +378,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'force_overlay',
       ],
       minArgs: 1,
+      allowNamedPrefixWithPositional: true,
     },
   ],
   [
@@ -386,6 +400,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'force_overlay',
       ],
       minArgs: 1,
+      allowNamedPrefixWithPositional: true,
     },
   ],
   [
