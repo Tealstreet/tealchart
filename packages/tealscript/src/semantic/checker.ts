@@ -233,6 +233,9 @@ interface BuiltinSignature {
   params: string[];
   aliases?: Record<string, string>;
   overloads?: string[][];
+  overloadMinArgs?: Record<string, number>;
+  overloadMaxArgs?: Record<string, number>;
+  overloadRequiredParams?: Record<string, string[]>;
   minArgs?: number;
   requiredParams?: string[];
   singlePositionalParam?: string;
@@ -243,6 +246,9 @@ interface BuiltinSignature {
   allowNamedPrefixWithPositional?: boolean;
   namedPrefixWithPositionalParams?: string[];
 }
+
+const LINE_NEW_POINT_PARAMS = ['first_point', 'second_point', 'xloc', 'extend', 'color', 'style', 'width', 'force_overlay'];
+const LINE_NEW_COORDINATE_PARAMS = ['x1', 'y1', 'x2', 'y2', 'xloc', 'extend', 'color', 'style', 'width', 'force_overlay'];
 
 const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['alert', { params: ['message', 'freq'], minArgs: 1, allowNamedPrefixWithPositional: true }],
@@ -310,6 +316,22 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['label.get_textcolor', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['label.get_size', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['label.get_tooltip', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  [
+    'line.new',
+    {
+      params: LINE_NEW_COORDINATE_PARAMS,
+      overloads: [LINE_NEW_POINT_PARAMS, LINE_NEW_COORDINATE_PARAMS],
+      overloadMinArgs: {
+        [LINE_NEW_POINT_PARAMS.join('\u0000')]: 2,
+        [LINE_NEW_COORDINATE_PARAMS.join('\u0000')]: 4,
+      },
+      overloadMaxArgs: {
+        [LINE_NEW_POINT_PARAMS.join('\u0000')]: 8,
+        [LINE_NEW_COORDINATE_PARAMS.join('\u0000')]: 10,
+      },
+      allowNamedPrefixWithPositional: true,
+    },
+  ],
   ['line.delete', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['line.copy', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['line.set_x1', { params: ['id', 'x'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
@@ -1892,7 +1914,7 @@ class SemanticChecker {
 
   private checkCallExpression(expression: CallExpression, scope: SemanticScope): void {
     this.checkCallee(expression.callee, scope);
-    this.checkBuiltinSignature(expression);
+    this.checkBuiltinSignature(expression, scope);
     this.checkUdtConstructorSignature(expression, scope);
     this.checkArrayConstructorTypeArguments(expression);
     this.checkMatrixConstructorTypeArguments(expression);
@@ -1986,7 +2008,7 @@ class SemanticChecker {
     );
   }
 
-  private checkBuiltinSignature(expression: CallExpression): void {
+  private checkBuiltinSignature(expression: CallExpression, scope: SemanticScope): void {
     const displayName = this.memberPath(expression.callee).join('.');
     const signature = BUILTIN_SIGNATURES.get(displayName);
     if (!signature) {
@@ -1995,9 +2017,9 @@ class SemanticChecker {
     }
 
     this.checkArgumentOrder(expression.arguments, displayName, signature);
-    this.checkArgumentNames(expression.arguments, signature, displayName);
-    this.checkArgumentCount(expression.arguments, signature, displayName);
-    this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName);
+    this.checkArgumentNames(expression.arguments, signature, displayName, scope);
+    this.checkArgumentCount(expression.arguments, signature, displayName, scope);
+    this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName, scope);
   }
 
   private checkUnsupportedBuiltinNamespaceCall(expression: CallExpression, displayName: string): void {
@@ -2477,9 +2499,9 @@ class SemanticChecker {
     }
   }
 
-  private checkArgumentNames(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
+  private checkArgumentNames(args: CallArgument[], signature: BuiltinSignature, displayName: string, scope: SemanticScope): void {
     if (signature.allowExtraNamed) return;
-    const allowed = new Set(this.resolveSignatureParams(args, signature));
+    const allowed = new Set(this.resolveSignatureParams(args, signature, scope));
     for (const arg of args) {
       if (arg.name && !allowed.has(this.canonicalSignatureArgumentName(arg.name.name, signature))) {
         this.addDiagnostic('unknown-argument', `Unknown argument '${arg.name.name}' for ${displayName}()`, arg.name.loc);
@@ -2487,8 +2509,8 @@ class SemanticChecker {
     }
   }
 
-  private checkArgumentCount(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
-    const params = this.resolveSignatureParams(args, signature);
+  private checkArgumentCount(args: CallArgument[], signature: BuiltinSignature, displayName: string, scope: SemanticScope): void {
+    const params = this.resolveSignatureParams(args, signature, scope);
     const binding = signature.allowNamedPrefixWithPositional ? this.bindSignatureArguments(args, signature, params) : undefined;
     const positionalCount = this.leadingPositionalCount(args);
     const suppliedNames = binding?.boundParams ?? new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
@@ -2497,13 +2519,13 @@ class SemanticChecker {
       const positionalIndex = this.effectivePositionalIndex(index, omitsOptionalLeadingParam);
       return (positionalIndex !== -1 && positionalIndex < positionalCount) || suppliedNames.has(param);
     }).length;
-    const minArgs = signature.minArgs ?? 0;
-    const maxArgs = signature.allowExtraPositional ? Infinity : (signature.maxArgs ?? params.length);
+    const minArgs = this.resolveSignatureMinArgs(signature, params);
+    const maxArgs = signature.allowExtraPositional ? Infinity : this.resolveSignatureMaxArgs(signature, params);
 
     if (boundParamCount < minArgs) {
       this.addDiagnostic('argument-count', `${displayName}() expects at least ${minArgs} argument${minArgs === 1 ? '' : 's'}`, args[0]?.loc);
     }
-    const requiredParams = signature.requiredParams ?? params.slice(0, minArgs);
+    const requiredParams = this.resolveSignatureRequiredParams(signature, params, minArgs);
     for (const param of requiredParams) {
       // Default-source helpers can let a lone positional value bind to singlePositionalParam
       // instead of the first params entry while requiredParams still tracks required coverage.
@@ -2524,8 +2546,8 @@ class SemanticChecker {
     }
   }
 
-  private checkDuplicateArgumentBindings(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
-    const params = this.resolveSignatureParams(args, signature);
+  private checkDuplicateArgumentBindings(args: CallArgument[], signature: BuiltinSignature, displayName: string, scope: SemanticScope): void {
+    const params = this.resolveSignatureParams(args, signature, scope);
     if (signature.allowNamedPrefixWithPositional) {
       const boundParams = new Set<string>();
       const positionalBoundParams = new Set<string>();
@@ -2631,16 +2653,46 @@ class SemanticChecker {
     return signature.aliases?.[name] ?? name;
   }
 
-  private resolveSignatureParams(args: CallArgument[], signature: BuiltinSignature): string[] {
+  private resolveSignatureParams(args: CallArgument[], signature: BuiltinSignature, scope?: SemanticScope): string[] {
     if (!signature.overloads) return signature.params;
 
     const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
+    const pointOverload = signature.overloads.find((params) => params.includes('first_point'));
+    const coordinateOverload = signature.overloads.find((params) => params.includes('x1'));
+    if (pointOverload && coordinateOverload) {
+      const pointOnlyParams = pointOverload.filter((name) => !coordinateOverload.includes(name));
+      const coordinateOnlyParams = coordinateOverload.filter((name) => !pointOverload.includes(name));
+      if ([...suppliedNames].some((name) => coordinateOnlyParams.includes(name))) return coordinateOverload;
+      if ([...suppliedNames].some((name) => pointOnlyParams.includes(name))) return pointOverload;
+      const positionalArgs = args.filter((arg) => !arg.name);
+      const firstTwoArePoints = scope && positionalArgs.length >= 2 && positionalArgs.slice(0, 2).every((arg) => (
+        this.inferExpressionType(arg.value, scope).kind === 'chart.point'
+      ));
+      return firstTwoArePoints ? pointOverload : coordinateOverload;
+    }
+
     const thirdPositional = args.filter((arg) => !arg.name)[2]?.value;
     const usesOptionsOverload = suppliedNames.has('options') || thirdPositional?.type === 'ArrayExpression';
     const optionsOverload = signature.overloads.find((params) => params.includes('options'));
     const rangeOverload = signature.overloads.find((params) => params.includes('minval'));
 
     return (usesOptionsOverload ? optionsOverload : rangeOverload) ?? signature.params;
+  }
+
+  private signatureOverloadKey(params: string[]): string {
+    return params.join('\u0000');
+  }
+
+  private resolveSignatureMinArgs(signature: BuiltinSignature, params: string[]): number {
+    return signature.overloadMinArgs?.[this.signatureOverloadKey(params)] ?? signature.minArgs ?? 0;
+  }
+
+  private resolveSignatureMaxArgs(signature: BuiltinSignature, params: string[]): number {
+    return signature.overloadMaxArgs?.[this.signatureOverloadKey(params)] ?? signature.maxArgs ?? params.length;
+  }
+
+  private resolveSignatureRequiredParams(signature: BuiltinSignature, params: string[], minArgs: number): string[] {
+    return signature.overloadRequiredParams?.[this.signatureOverloadKey(params)] ?? signature.requiredParams ?? params.slice(0, minArgs);
   }
 
   private leadingPositionalCount(args: CallArgument[]): number {
