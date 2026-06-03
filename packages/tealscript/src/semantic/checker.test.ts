@@ -4297,6 +4297,60 @@ plot(rate + dividend + earning + split + revenue + econ + seeded)
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('infers request helper return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Request Return Types")
+htfFloat = request.security(symbol=syminfo.tickerid, "2", close)
+htfString = request.security(symbol=syminfo.tickerid, "2", syminfo.ticker)
+ltf = request.security_lower_tf(symbol=syminfo.tickerid, "1", close)
+ltfFirst = array.get(ltf, 0)
+seeded = request.seed("seed", "SYM", str.length(syminfo.tickerid))
+rate = request.currency_rate(currency.USD, "GBP", ignore_invalid_currency=true)
+dividend = request.dividends("NASDAQ:AAPL", dividends.gross, currency=currency.USD)
+earning = request.earnings("NASDAQ:AAPL", earnings.actual, currency="USD")
+split = request.splits("NASDAQ:AAPL", splits.denominator)
+revenue = request.financial("NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", currency="USD")
+econ = request.economic("US", "GDP")
+htfFloat := "bad"
+htfString := 1
+ltfFirst := "bad"
+seeded := "bad"
+rate := "bad"
+dividend := "bad"
+earning := "bad"
+split := "bad"
+revenue := "bad"
+econ := "bad"
+plot(htfFloat + ltfFirst + seeded + rate + dividend + earning + split + revenue + econ + str.length(htfString))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable htfFloat',
+      'Cannot assign int value to string variable htfString',
+      'Cannot assign string value to float variable ltfFirst',
+      'Cannot assign string value to int variable seeded',
+      'Cannot assign string value to float variable rate',
+      'Cannot assign string value to float variable dividend',
+      'Cannot assign string value to float variable earning',
+      'Cannot assign string value to float variable split',
+      'Cannot assign string value to float variable revenue',
+      'Cannot assign string value to float variable econ',
+    ]);
+    expect(types.get('htfFloat')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('htfString')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('ltf')).toMatchObject({ kind: 'array', qualifier: 'series', elementType: { kind: 'float' } });
+    expect(types.get('ltfFirst')).toMatchObject({ kind: 'float' });
+    expect(types.get('seeded')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('rate')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('dividend')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('earning')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('split')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('revenue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('econ')).toMatchObject({ kind: 'float', qualifier: 'series' });
+  });
+
   it('reports invalid request helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Bad Request Signatures")
