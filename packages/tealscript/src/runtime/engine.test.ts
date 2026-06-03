@@ -159,6 +159,34 @@ plot(strategy.position_size)`;
       expect(result.plots.map((plot) => plot.values)).toEqual([[25000], [0]]);
     });
 
+    it('applies strategy named-prefix positional tail settings', () => {
+      const script = `//@version=6
+strategy(title="Mixed strategy", "Mixed", true, format.price, 3, scale.right, 100, "60", true, false, true, 10, 20, 30, 40, 50, true, 25000, "EUR", strategy.percent_of_equity, 10, 2, strategy.commission.percent, 0.05, 1, 50, 60, true, true, true, true)
+plot(strategy.equity)`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors).toEqual([]);
+      expect(result.indicatorTitle).toBe('Mixed strategy');
+      expect(result.strategy.settings).toMatchObject({
+        title: 'Mixed strategy',
+        initialCapital: 25000,
+        currency: 'EUR',
+        defaultQtyType: 'percent_of_equity',
+        defaultQtyValue: 10,
+        pyramiding: 2,
+        commissionType: 'percent',
+        commissionValue: 0.05,
+        slippageTicks: 1,
+        marginLong: 50,
+        marginShort: 60,
+        calcOnOrderFills: true,
+        calcOnEveryTick: true,
+        processOrdersOnClose: true,
+        useBarMagnifier: true,
+      });
+    });
+
     it('applies explicit zero and false strategy declaration settings', () => {
       const script = `//@version=6
 strategy("Zero settings",
@@ -2141,6 +2169,28 @@ plot(close)`;
         title: 'Overlay Precision',
         overlay: true,
         precision: 4,
+      });
+    });
+
+    it('records indicator named-prefix positional tail metadata', () => {
+      const script = `//@version=6
+indicator(title="Mixed Declaration", "Mixed", true, format.price, 3)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.indicatorTitle).toBe('Mixed Declaration');
+      expect(result.indicatorShortTitle).toBe('Mixed');
+      expect(result.indicatorOverlay).toBe(true);
+      expect(result.declaration).toMatchObject({
+        title: 'Mixed Declaration',
+        shortTitle: 'Mixed',
+        overlay: true,
+        format: 'price',
+        precision: 3,
       });
     });
 

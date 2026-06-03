@@ -99,11 +99,47 @@ IndicatorDeclaration
       };
 
       // Process arguments
+      const params = [
+        'title',
+        'shorttitle',
+        'overlay',
+        'format',
+        'precision',
+        'scale',
+        'max_bars_back',
+        'timeframe',
+        'timeframe_gaps',
+        'explicit_plot_zorder',
+        'behind_chart',
+        'max_lines_count',
+        'max_labels_count',
+        'max_boxes_count',
+        'calc_bars_count',
+        'max_polylines_count',
+        'dynamic_requests',
+        'initial_capital',
+        'currency',
+        'default_qty_type',
+        'default_qty_value',
+        'pyramiding',
+        'commission_type',
+        'commission_value',
+        'slippage',
+        'margin_long',
+        'margin_short',
+        'calc_on_order_fills',
+        'calc_on_every_tick',
+        'process_orders_on_close',
+        'use_bar_magnifier'
+      ];
       for (const arg of args) {
         if (arg.name) {
           result[arg.name.name] = arg.value;
-        } else if (!result.title) {
-          result.title = arg.value;
+        } else {
+          const param = params.find((name) => result[name] === undefined);
+          if (param) {
+            result[param] = arg.value;
+          }
         }
       }
 
