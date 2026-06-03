@@ -3447,7 +3447,10 @@ class SemanticChecker {
     }
 
     const mapCall = this.resolveMapCall(expression, scope);
-    return (mapCall?.operation === 'get' || mapCall?.operation === 'remove') && mapCall.mapType.kind === 'map' ? mapCall.mapType.valueType : undefined;
+    if ((mapCall?.operation === 'get' || mapCall?.operation === 'remove') && mapCall.mapType.kind === 'map' && mapCall.mapType.valueType) {
+      return { ...mapCall.mapType.valueType, qualifier: 'series' };
+    }
+    return undefined;
   }
 
   private inferMapHelperCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
