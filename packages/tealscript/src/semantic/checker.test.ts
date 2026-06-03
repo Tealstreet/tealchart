@@ -1609,6 +1609,42 @@ tooMany = linefill.new(upper, lower, color.blue, color.red)
     ]);
   });
 
+  it('resolves table.new named arguments and positional tails', () => {
+    const result = checkProgram(parse(`
+indicator("Table Signatures")
+dashboard = table.new(position=position.top_right, 2, 3, color.new(color.black, 80), color.gray, 1, color.white, 1)
+compact = table.new(position.bottom_left, columns=1, rows=1, bgcolor=color.blue)
+defaulted = table.new(columns=2, rows=2)
+tables = array.from(dashboard, compact, defaulted)
+plot(array.size(tables))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('dashboard')).toMatchObject({ kind: 'table' });
+    expect(types.get('compact')).toMatchObject({ kind: 'table' });
+    expect(types.get('defaulted')).toMatchObject({ kind: 'table' });
+    expect(types.get('tables')).toMatchObject({ kind: 'array', elementType: { kind: 'table' } });
+  });
+
+  it('reports invalid table.new argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Table Signatures")
+unknown = table.new(position.top_right, 2, 3, frame=1)
+missing = table.new(position=position.top_right, columns=2)
+duplicate = table.new(position.top_right, 2, 3, position=position.bottom_left)
+tooMany = table.new(position.top_right, 2, 3, color.black, color.gray, 1, color.white, 1, 0)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'frame' for table.new()",
+      "table.new() missing required argument 'rows'",
+      "Argument 'position' for table.new() was supplied multiple times",
+      'table.new() expects at most 8 arguments',
+    ]);
+  });
+
   it('infers homogeneous array literal and array.from element types', () => {
     const result = checkProgram(parse(`
 indicator("Array Literal Types")
