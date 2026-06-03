@@ -500,6 +500,7 @@ if barstate.islast
     table.cell_set_text_formatting(table_id=dashboard, column=1, row=0, text_formatting=text.format_bold)
     table.cell(table_id=dashboard, column=0, row=1, text="cleared")
     table.clear(table_id=dashboard, start_column=0, start_row=1, end_column=0, end_row=1)
+plot(array.size(table.all), title="Named Table Count")
 `);
 
     expect(result.errors).toEqual([]);
@@ -547,6 +548,7 @@ if barstate.islast
         ],
       },
     ]);
+    expect(getPlot(result, 'Named Table Count').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
   });
 
   it('resolves mixed named and positional drawing constructor arguments in Pine order', () => {

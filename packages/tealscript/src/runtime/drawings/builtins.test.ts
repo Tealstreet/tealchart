@@ -913,6 +913,7 @@ plot(close)`;
       const script = `//@version=6
 indicator("Tables", overlay=true)
 var stats = table.new(position.bottom_right, 2, 2, bgcolor=color.new(color.black, 80), frame_color=color.white, frame_width=2, border_color=color.blue, border_width=1)
+var stale = table.new(position.top_right, 1, 1)
 if barstate.islast
     table.set_position(stats, position.top_left)
     table.set_bgcolor(stats, color.new(color.red, 70))
@@ -932,13 +933,16 @@ if barstate.islast
     table.cell_set_text_font_family(stats, 1, 0, font.family_monospace)
     table.cell_set_text_formatting(stats, 1, 0, text.format_bold + text.format_italic)
     table.cell_set_text(stats, 0, 1, "created")
-plot(close)`;
+    table.delete(stale)
+plot(close)
+plot(array.size(table.all), title="Tables")`;
 
       const ast = parse(script);
       const bars = createBars(2);
       const result = executeScript(ast, bars);
 
       expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Tables')?.values).toEqual([2, 1]);
       expect(result.drawings).toEqual([
         {
           id: 'table_table.new_0_0',
