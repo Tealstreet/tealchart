@@ -7456,8 +7456,9 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.range', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const taRangeArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taRangeArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taRangeArgs, 1));
       const values = this.getAvailableSourceWindow(scope, `_ta_range_source_${callId}`, source, length);
 
       let highest = -Infinity;
@@ -7471,8 +7472,9 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.rising', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const taRisingArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taRisingArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taRisingArgs, 1));
       if (isNaN(source) || length < 1) return false;
 
       const key = `_ta_rising_source_${callId}`;
@@ -7489,8 +7491,9 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('ta.falling', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const taFallingArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taFallingArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taFallingArgs, 1));
       if (isNaN(source) || length < 1) return false;
 
       const key = `_ta_falling_source_${callId}`;
@@ -7613,10 +7616,11 @@ export class TealscriptEngine {
 
     // MACD - returns [macdLine, signalLine, histogram]
     this.builtins.set('ta.macd', (args, namedArgs, ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const fastLen = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'fastlen', 12));
-      const slowLen = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 2, 'slowlen', 26));
-      const signalLen = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 3, 'siglen', 9));
+      const taMacdArgs = ['source', 'fastlen', 'slowlen', 'siglen'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taMacdArgs, 0));
+      const fastLen = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taMacdArgs, 1, 12));
+      const slowLen = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taMacdArgs, 2, 26));
+      const signalLen = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taMacdArgs, 3, 9));
 
       // Calculate EMAs
       const fastAlpha = 2 / (fastLen + 1);
