@@ -2429,6 +2429,7 @@ class SemanticChecker {
     this.checkArgumentNames(expression.arguments, signature, displayName, scope);
     this.checkArgumentCount(expression.arguments, signature, displayName, scope);
     this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName, scope);
+    this.checkUserCallableArgumentTypes(expression, declaration, displayName, parameterOffset, scope);
   }
 
   private userCallableSignature(declaration: FunctionDeclaration, parameterOffset: number): BuiltinSignature {
@@ -2439,6 +2440,42 @@ class SemanticChecker {
       maxArgs: parameters.length,
       requiredParams: parameters.filter((parameter) => !parameter.defaultValue).map((parameter) => parameter.name),
     };
+  }
+
+  private checkUserCallableArgumentTypes(
+    expression: CallExpression,
+    declaration: FunctionDeclaration,
+    displayName: string,
+    parameterOffset: number,
+    scope: SemanticScope,
+  ): void {
+    for (const [index, parameter] of declaration.params.entries()) {
+      if (index < parameterOffset) continue;
+
+      const expectedType = this.typeFromAnnotation(parameter.typeAnnotation ?? undefined);
+      if (!expectedType) continue;
+
+      const argument = this.getCallArgument(expression.arguments, parameter.name, index - parameterOffset);
+      if (!argument) continue;
+
+      const actualType = this.inferExpressionType(argument, scope);
+      if (!this.isAssignableType(expectedType, actualType)) {
+        this.addDiagnostic(
+          'type-mismatch',
+          `Cannot use ${this.formatSemanticType(actualType)} value as ${this.formatSemanticType(expectedType)} argument '${parameter.name}' for ${displayName}()`,
+          argument.loc,
+        );
+        continue;
+      }
+
+      if (!this.isAssignableQualifier(expectedType.qualifier, actualType.qualifier)) {
+        this.addDiagnostic(
+          'qualifier-mismatch',
+          `Cannot use ${this.formatSemanticTypeWithQualifier(actualType)} value as ${this.formatSemanticTypeWithQualifier(expectedType)} argument '${parameter.name}' for ${displayName}()`,
+          argument.loc,
+        );
+      }
+    }
   }
 
   private checkUdtConstructorSignature(expression: CallExpression, scope: SemanticScope): void {
