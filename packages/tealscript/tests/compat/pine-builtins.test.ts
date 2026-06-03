@@ -274,12 +274,14 @@ indicator("Linear regression helpers")
 change = close - close[1]
 plot(ta.linreg(close, 3, 0), title="LinReg")
 plot(ta.linreg(close, 3, 1), title="LinReg Offset")
+plot(ta.linreg(source=close, 3, 1), title="Mixed LinReg Offset")
 plot(ta.linreg(change, 3, 0), title="Change LinReg")
 `);
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'LinReg').values)).toEqual([null, null, 107.166667, 104, 99, 99.166667, 103.5, 108.833333, 109, 110.333333, 110.666667, 111.5]);
     expect(roundSeries(getPlot(result, 'LinReg Offset').values)).toEqual([null, null, 104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111]);
+    expect(roundSeries(getPlot(result, 'Mixed LinReg Offset').values)).toEqual(roundSeries(getPlot(result, 'LinReg Offset').values));
     expect(roundSeries(getPlot(result, 'Change LinReg').values)).toEqual([null, null, null, -3.166667, -5, 0.166667, 4.333333, 5.333333, 0.166667, 1.333333, 0.333333, 0.833333]);
   });
 
@@ -364,11 +366,29 @@ plot(currentObv, title="OBV")
 plot(trFunction, title="TR Function")
 plot(trSeries, title="TR Series")
 `);
+    const mixed = runCompatScript(`
+indicator("Tail TA mixed helpers")
+[supertrend, direction] = ta.supertrend(factor=2.0, 3)
+[diPlus, diMinus, adx] = ta.dmi(diLength=3, 3)
+sar = ta.sar(start=0.02, 0.02, 0.2)
+linreg = ta.linreg(source=close, 3, 1)
+plot(supertrend, title="Supertrend")
+plot(direction, title="Supertrend Direction")
+plot(diPlus, title="DI Plus")
+plot(diMinus, title="DI Minus")
+plot(adx, title="ADX")
+plot(sar, title="SAR")
+plot(linreg, title="LinReg")
+`);
 
     expect(positional.errors).toEqual([]);
     expect(named.errors).toEqual([]);
+    expect(mixed.errors).toEqual([]);
     for (const title of positional.plots.map((plot) => plot.title)) {
       expect(roundSeries(getPlot(named, title).values)).toEqual(roundSeries(getPlot(positional, title).values));
+    }
+    for (const title of mixed.plots.map((plot) => plot.title)) {
+      expect(roundSeries(getPlot(mixed, title).values)).toEqual(roundSeries(getPlot(positional, title).values));
     }
     expect(roundSeries(getPlot(positional, 'Supertrend').values)).toEqual([103.666667, 98.388889, 110.444444, 111.944444, 103.666667, 103.611111, 98.333333, 112.944444, 113.611111, 114.611111, 116.611111, 115.611111]);
     expect(getPlot(positional, 'Supertrend Direction').values).toEqual([-1, 1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1]);
