@@ -2280,6 +2280,7 @@ class SemanticChecker {
     this.checkMatrixSortFieldType(expression, scope);
     this.checkMapCallTypes(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
+    this.checkUserCallableSignature(expression, scope);
     for (const argument of expression.arguments) {
       this.checkExpression(argument.value, scope);
     }
@@ -2392,6 +2393,52 @@ class SemanticChecker {
     const namespace = this.memberPath(expression.callee)[0];
     if (namespace !== 'log' && namespace !== 'strategy') return;
     this.addDiagnostic('unknown-function', `Unknown function: ${displayName}`, expression.callee.loc);
+  }
+
+  private checkUserCallableSignature(expression: CallExpression, scope: SemanticScope): void {
+    if (expression.callee.type === 'Identifier') {
+      const symbol = scope.lookup(expression.callee.name);
+      const declaration = symbol ? this.functionSymbolDeclarations.get(symbol) : undefined;
+      if (!declaration || declaration.isMethod) return;
+
+      this.checkUserCallableArguments(expression, declaration, expression.callee.name, 0, scope);
+      return;
+    }
+
+    if (expression.callee.type !== 'MemberExpression') return;
+
+    const receiverType = this.inferExpressionType(expression.callee.object, scope);
+    if (receiverType.kind === 'unknown') return;
+    if (this.isBuiltinCollectionMemberMethod(receiverType, expression.callee.property.name)) return;
+
+    const method = this.findUserMethodDeclaration(expression.callee.property.name, receiverType);
+    if (!method) return;
+
+    this.checkUserCallableArguments(expression, method, expression.callee.property.name, 1, scope);
+  }
+
+  private checkUserCallableArguments(
+    expression: CallExpression,
+    declaration: FunctionDeclaration,
+    displayName: string,
+    parameterOffset: number,
+    scope: SemanticScope,
+  ): void {
+    const signature = this.userCallableSignature(declaration, parameterOffset);
+    this.checkArgumentOrder(expression.arguments, displayName, signature);
+    this.checkArgumentNames(expression.arguments, signature, displayName, scope);
+    this.checkArgumentCount(expression.arguments, signature, displayName, scope);
+    this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName, scope);
+  }
+
+  private userCallableSignature(declaration: FunctionDeclaration, parameterOffset: number): BuiltinSignature {
+    const parameters = declaration.params.slice(parameterOffset);
+    return {
+      params: parameters.map((parameter) => parameter.name),
+      minArgs: parameters.filter((parameter) => !parameter.defaultValue).length,
+      maxArgs: parameters.length,
+      requiredParams: parameters.filter((parameter) => !parameter.defaultValue).map((parameter) => parameter.name),
+    };
   }
 
   private checkUdtConstructorSignature(expression: CallExpression, scope: SemanticScope): void {
