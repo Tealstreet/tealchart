@@ -3066,22 +3066,34 @@ replaceOne = str.replace(string=text, substring="USDT", replacement="PERP", occu
 prefixReplaceOne = str.replace(source=text, "USDT", "PERP", 1)
 replaceAll = str.replace_all(source=text, str="USDT", replacement="PERP")
 prefixReplaceAll = str.replace_all(string=text, "USDT", "PERP")
-plot(parsed + position + prefixPosition + str.length(string=formatted + prefixFormatted + timeText + prefixTimeText + message + prefix + prefixSlice + match + prefixMatch + repeated + prefixRepeated + upper + lower + trimmed + replaceOne + prefixReplaceOne + replaceAll + prefixReplaceAll))
+formattedLength = str.length(string=formatted)
+plot(parsed + position + prefixPosition + formattedLength + str.length(string=formatted + prefixFormatted + timeText + prefixTimeText + message + prefix + prefixSlice + match + prefixMatch + repeated + prefixRepeated + upper + lower + trimmed + replaceOne + prefixReplaceOne + replaceAll + prefixReplaceAll))
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
     expect(types.get('formatted')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('prefixFormatted')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('parsed')).toMatchObject({ kind: 'float', qualifier: 'const' });
     expect(types.get('timeText')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('prefixTimeText')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('message')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('hasUsdt')).toMatchObject({ kind: 'bool', qualifier: 'const' });
+    expect(types.get('prefixHasUsdt')).toMatchObject({ kind: 'bool', qualifier: 'const' });
+    expect(types.get('starts')).toMatchObject({ kind: 'bool', qualifier: 'const' });
+    expect(types.get('prefixStarts')).toMatchObject({ kind: 'bool', qualifier: 'const' });
+    expect(types.get('ends')).toMatchObject({ kind: 'bool', qualifier: 'const' });
+    expect(types.get('position')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('prefixPosition')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('formattedLength')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('prefix')).toMatchObject({ kind: 'string', qualifier: 'const' });
     expect(types.get('prefixSlice')).toMatchObject({ kind: 'string', qualifier: 'const' });
     expect(types.get('match')).toMatchObject({ kind: 'string', qualifier: 'const' });
     expect(types.get('prefixMatch')).toMatchObject({ kind: 'string', qualifier: 'const' });
     expect(types.get('repeated')).toMatchObject({ kind: 'string', qualifier: 'const' });
     expect(types.get('prefixRepeated')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('parts')).toMatchObject({ kind: 'array', qualifier: 'const', elementType: { kind: 'string' } });
+    expect(types.get('prefixParts')).toMatchObject({ kind: 'array', qualifier: 'const', elementType: { kind: 'string' } });
     expect(types.get('upper')).toMatchObject({ kind: 'string', qualifier: 'const' });
     expect(types.get('lower')).toMatchObject({ kind: 'string', qualifier: 'const' });
     expect(types.get('trimmed')).toMatchObject({ kind: 'string', qualifier: 'const' });
