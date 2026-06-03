@@ -3218,10 +3218,10 @@ class SemanticChecker {
     }
     if (calleeName === 'line.get_x1' || calleeName === 'line.get_x2') return { kind: 'int', qualifier: 'series' };
     if (calleeName === 'line.get_y1' || calleeName === 'line.get_y2' || calleeName === 'line.get_price') return { kind: 'float', qualifier: 'series' };
-    if (calleeName === 'box.get_left' || calleeName === 'box.get_right') return { kind: 'int' };
-    if (calleeName === 'box.get_top' || calleeName === 'box.get_bottom') return { kind: 'float' };
-    if (calleeName === 'box.get_bgcolor' || calleeName === 'box.get_border_color') return { kind: 'color' };
-    if (calleeName === 'box.get_text' || calleeName === 'box.get_text_halign' || calleeName === 'box.get_text_valign') return { kind: 'string' };
+    if (calleeName === 'box.get_left' || calleeName === 'box.get_right') return { kind: 'int', qualifier: 'series' };
+    if (calleeName === 'box.get_top' || calleeName === 'box.get_bottom') return { kind: 'float', qualifier: 'series' };
+    if (calleeName === 'box.get_bgcolor' || calleeName === 'box.get_border_color') return { kind: 'color', qualifier: 'series' };
+    if (calleeName === 'box.get_text' || calleeName === 'box.get_text_halign' || calleeName === 'box.get_text_valign') return { kind: 'string', qualifier: 'series' };
     if (calleeName === 'linefill.get_line1' || calleeName === 'linefill.get_line2') return { kind: 'line' };
 
     const namespace = calleePath[0];
