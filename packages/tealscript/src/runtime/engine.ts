@@ -5518,10 +5518,13 @@ export class TealscriptEngine {
   }
 
   private registerAlertBuiltins(): void {
+    const alertConditionArgs = ['condition', 'title', 'message'];
+    const alertArgs = ['message', 'freq'];
+
     this.builtins.set('alertcondition', (args, namedArgs, ctx, _scope, callId) => {
-      const condition = namedArgs.has('condition') ? namedArgs.get('condition') : args[0];
-      const title = String(namedArgs.get('title') ?? args[1] ?? callId);
-      const message = String(namedArgs.get('message') ?? args[2] ?? '');
+      const condition = this.getOrderedCallArg(args, namedArgs, alertConditionArgs, 0);
+      const title = String(this.getOrderedCallArg(args, namedArgs, alertConditionArgs, 1, callId));
+      const message = String(this.getOrderedCallArg(args, namedArgs, alertConditionArgs, 2, ''));
       const id = `alertcondition_${title}`;
       const isActive = this.isTruthy(condition);
 
@@ -5540,8 +5543,8 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('alert', (args, namedArgs, ctx, _scope, callId) => {
-      const message = String(namedArgs.get('message') ?? args[0] ?? '');
-      const frequency = this.normalizeAlertFrequency(namedArgs.get('freq') ?? args[1]);
+      const message = String(this.getOrderedCallArg(args, namedArgs, alertArgs, 0, ''));
+      const frequency = this.normalizeAlertFrequency(this.getOrderedCallArg(args, namedArgs, alertArgs, 1));
       const id = `alert_${callId}`;
 
       ctx.addAlertEvent(id, message, frequency);
