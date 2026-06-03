@@ -694,13 +694,14 @@ diagnostics.
 
 The `table.*` drawing pass covers fixed-position table handles, declared row and
 column sizing, background/frame/border metadata, `table.delete()`,
-`table.clear()`, `table.cell()`, table-level position/background/frame/border
-setters, and common cell setters for text, color, background, size, width,
-height, text alignment, font family, and bold/italic text formatting. Table
-lifecycle helpers and setters accept Pine-style named `table_id`, coordinate,
-and value arguments where those parameters exist. Semantic analysis preserves
-`table.new()` handle return types for downstream diagnostics. Rendering lays
-out fixed tables in the script pane with measured cell sizes, cell
+`table.clear()`, `table.all`, `table.cell()`, table-level
+position/background/frame/border setters, and common cell setters for text,
+color, background, size, width, height, text alignment, font family, and
+bold/italic text formatting. Table lifecycle helpers and setters accept
+Pine-style named `table_id`, coordinate, and value arguments where those
+parameters exist. Semantic analysis preserves `table.new()` handle return types
+and `table.all` handle-array element types for downstream diagnostics. Rendering
+lays out fixed tables in the script pane with measured cell sizes, cell
 backgrounds, borders, frame borders, text alignment, default/monospace
 font-family metadata, and bold/italic font styling. Runtime coverage also
 guards persistent table handles and transient polylines across realtime
