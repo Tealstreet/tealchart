@@ -3271,6 +3271,14 @@ class SemanticChecker {
         returnType = this.inferIfExpressionType(statement, scope);
         continue;
       }
+      if (statement.type === 'ForStatement') {
+        returnType = this.inferForExpressionType(statement, scope);
+        continue;
+      }
+      if (statement.type === 'WhileStatement') {
+        returnType = this.inferWhileExpressionType(statement, scope);
+        continue;
+      }
       returnType = undefined;
     }
     return returnType;
@@ -3329,9 +3337,54 @@ class SemanticChecker {
       }
       if (statement.type === 'IfStatement') {
         types.push(this.inferIfExpressionType(statement, scope));
+        continue;
+      }
+      if (statement.type === 'ForStatement') {
+        const type = this.inferForExpressionType(statement, scope);
+        if (type) types.push(type);
+        continue;
+      }
+      if (statement.type === 'WhileStatement') {
+        const type = this.inferWhileExpressionType(statement, scope);
+        if (type) types.push(type);
       }
     }
     return types;
+  }
+
+  private inferForExpressionType(statement: ForStatement, scope: SemanticScope): SemanticType | undefined {
+    const loopScope = new SemanticScope(scope);
+
+    if (statement.kind === 'collection') {
+      const iterableType = this.inferExpressionType(statement.iterable, scope);
+      loopScope.declare({
+        name: statement.counter.name,
+        kind: 'loop',
+        type: this.collectionValueType(iterableType),
+        loc: statement.counter.loc,
+      });
+      if (statement.indexCounter) {
+        loopScope.declare({
+          name: statement.indexCounter.name,
+          kind: 'loop',
+          type: this.collectionIndexType(iterableType),
+          loc: statement.indexCounter.loc,
+        });
+      }
+    } else {
+      loopScope.declare({
+        name: statement.counter.name,
+        kind: 'loop',
+        type: { kind: 'int', qualifier: 'series' },
+        loc: statement.counter.loc,
+      });
+    }
+
+    return this.inferExpressionTypeFromStatements(statement.body, loopScope);
+  }
+
+  private inferWhileExpressionType(statement: WhileStatement, scope: SemanticScope): SemanticType | undefined {
+    return this.inferExpressionTypeFromStatements(statement.body, new SemanticScope(scope));
   }
 
   private inferSwitchExpressionQualifier(expression: SwitchExpression, scope: SemanticScope): SemanticQualifier | undefined {

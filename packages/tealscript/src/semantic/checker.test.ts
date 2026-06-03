@@ -957,6 +957,51 @@ plot(priceValue + blockResult)
     expect(types.get('partialResult')).toMatchObject({ kind: 'unknown', qualifier: 'series' });
   });
 
+  it('infers user function loop expression types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Loop Expression Types")
+numericValue(float value, int limit) =>
+    for i = 0 to limit
+        value + i
+collectionValue(float value) =>
+    values = array.from(value, value + 1)
+    for [index, item] in values
+        item + index
+whileValue(float value, int limit) =>
+    i = 0
+    while i < limit
+        i += 1
+        value + i
+mixedValue(float value, int limit) =>
+    for i = 0 to limit
+        if i == 0
+            value
+        else
+            "bad"
+numericResult = numericValue(close, 2)
+collectionResult = collectionValue(close)
+whileResult = whileValue(close, 2)
+mixedResult = mixedValue(close, 2)
+numericResult := "bad"
+collectionResult := "bad"
+whileResult := "bad"
+mixedResult := "still unknown"
+plot(numericResult + collectionResult + whileResult)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable numericResult',
+      'Cannot assign string value to float variable collectionResult',
+      'Cannot assign string value to float variable whileResult',
+    ]);
+    expect(types.get('numericResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('collectionResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('whileResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedResult')).toMatchObject({ kind: 'unknown', qualifier: 'series' });
+  });
+
   it('infers compatible ternary expression types for downstream diagnostics', () => {
     const result = checkProgram(parse(`
 indicator("Ternary Expression Types")
