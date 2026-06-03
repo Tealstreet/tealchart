@@ -3203,9 +3203,9 @@ class SemanticChecker {
     if (REQUEST_FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: 'series' };
     if (TICKER_STRING_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'string', qualifier: 'simple' };
     if (FLOAT_RETURN_FUNCTIONS.has(calleeName)) return { kind: 'float', qualifier: 'series' };
-    if (calleeName === 'label.get_x') return { kind: 'int' };
-    if (calleeName === 'label.get_y') return { kind: 'float' };
-    if (calleeName === 'label.get_color' || calleeName === 'label.get_textcolor') return { kind: 'color' };
+    if (calleeName === 'label.get_x') return { kind: 'int', qualifier: 'series' };
+    if (calleeName === 'label.get_y') return { kind: 'float', qualifier: 'series' };
+    if (calleeName === 'label.get_color' || calleeName === 'label.get_textcolor') return { kind: 'color', qualifier: 'series' };
     if (
       calleeName === 'label.get_text'
       || calleeName === 'label.get_xloc'
@@ -3214,7 +3214,7 @@ class SemanticChecker {
       || calleeName === 'label.get_size'
       || calleeName === 'label.get_tooltip'
     ) {
-      return { kind: 'string' };
+      return { kind: 'string', qualifier: 'series' };
     }
     if (calleeName === 'line.get_x1' || calleeName === 'line.get_x2') return { kind: 'int' };
     if (calleeName === 'line.get_y1' || calleeName === 'line.get_y2' || calleeName === 'line.get_price') return { kind: 'float' };
