@@ -3295,7 +3295,7 @@ class SemanticChecker {
     if (memberName === 'session.regular' || memberName === 'session.extended') {
       return { kind: 'string', qualifier: 'const' };
     }
-    const enumType = this.inferEnumMemberType(expression);
+    const enumType = this.inferEnumMemberType(expression, scope);
     if (enumType) return enumType;
 
     const objectType = this.inferExpressionType(expression.object, scope);
@@ -3305,11 +3305,11 @@ class SemanticChecker {
     return this.typeFromAnnotation(field?.typeAnnotation ?? undefined) ?? { kind: 'unknown', qualifier: objectType.qualifier };
   }
 
-  private inferEnumMemberType(expression: MemberExpression): SemanticType | undefined {
+  private inferEnumMemberType(expression: MemberExpression, scope: SemanticScope): SemanticType | undefined {
     const path = this.memberPath(expression);
     if (path.length === 3) {
       const [alias, enumName] = path;
-      if (alias && enumName && this.rootScope.lookup(alias)?.kind === 'import') {
+      if (alias && enumName && scope.lookup(alias)?.kind === 'import') {
         return { kind: 'udt', name: `${alias}.${enumName}`, qualifier: 'const' };
       }
     }

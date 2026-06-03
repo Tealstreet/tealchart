@@ -3114,10 +3114,13 @@ indicator("Imported Enum Method Receivers")
 import TestUser/Signal/1 as sig
 method label(sig.State this) => "enum"
 method label(float this) => "float"
+method shadowLabel(int this) => 1
+shadow(int sig) => sig.State.long.shadowLabel()
 sig.State selected = sig.State.long
 stateLabel = sig.State.short.label()
 priceLabel = close.label()
-plot(str.length(stateLabel) + str.length(priceLabel))
+shadowValue = shadow(1)
+plot(str.length(stateLabel) + str.length(priceLabel) + shadowValue)
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -3126,6 +3129,7 @@ plot(str.length(stateLabel) + str.length(priceLabel))
     expect(types.get('selected')).toMatchObject({ kind: 'udt', name: 'sig.State' });
     expect(types.get('stateLabel')).toMatchObject({ kind: 'string' });
     expect(types.get('priceLabel')).toMatchObject({ kind: 'string' });
+    expect(types.get('shadowValue')).toMatchObject({ kind: 'int' });
   });
 
   it('does not report user method receiver mismatches for builtin collection member calls', () => {
