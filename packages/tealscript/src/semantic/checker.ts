@@ -240,6 +240,23 @@ const TIMEFRAME_BOOL_MEMBER_NAMES = new Set([
 ]);
 const TIMEFRAME_STRING_MEMBER_NAMES = new Set(['timeframe.main_period', 'timeframe.period']);
 
+const SYMINFO_STRING_MEMBER_NAMES = new Set([
+  'syminfo.basecurrency',
+  'syminfo.currency',
+  'syminfo.description',
+  'syminfo.main_tickerid',
+  'syminfo.prefix',
+  'syminfo.root',
+  'syminfo.session',
+  'syminfo.ticker',
+  'syminfo.tickerid',
+  'syminfo.timezone',
+  'syminfo.type',
+  'syminfo.volumetype',
+]);
+const SYMINFO_INT_MEMBER_NAMES = new Set(['syminfo.minmove', 'syminfo.pricescale']);
+const SYMINFO_FLOAT_MEMBER_NAMES = new Set(['syminfo.mincontract', 'syminfo.mintick', 'syminfo.pointvalue']);
+
 const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['box.copy', 'box'],
   ['box.new', 'box'],
@@ -3511,6 +3528,10 @@ class SemanticChecker {
           const timeframeType = this.inferTimeframeMemberType(expression);
           if (timeframeType) return timeframeType;
         }
+        if (expression.object.type === 'Identifier' && expression.object.name === 'syminfo') {
+          const syminfoType = this.inferSyminfoMemberType(expression);
+          if (syminfoType) return syminfoType;
+        }
         if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
           return { kind: 'unknown', qualifier: 'const' };
         }
@@ -4408,6 +4429,8 @@ class SemanticChecker {
     }
     const timeframeType = this.inferTimeframeMemberType(expression);
     if (timeframeType) return timeframeType;
+    const syminfoType = this.inferSyminfoMemberType(expression);
+    if (syminfoType) return syminfoType;
     const enumType = this.inferEnumMemberType(expression, scope);
     if (enumType) return enumType;
 
@@ -4423,6 +4446,14 @@ class SemanticChecker {
     if (TIMEFRAME_BOOL_MEMBER_NAMES.has(memberName)) return { kind: 'bool', qualifier: 'simple' };
     if (TIMEFRAME_STRING_MEMBER_NAMES.has(memberName)) return { kind: 'string', qualifier: 'simple' };
     if (memberName === 'timeframe.multiplier') return { kind: 'int', qualifier: 'simple' };
+    return undefined;
+  }
+
+  private inferSyminfoMemberType(expression: MemberExpression): SemanticType | undefined {
+    const memberName = this.memberPath(expression).join('.');
+    if (SYMINFO_STRING_MEMBER_NAMES.has(memberName)) return { kind: 'string', qualifier: 'simple' };
+    if (SYMINFO_INT_MEMBER_NAMES.has(memberName)) return { kind: 'int', qualifier: 'simple' };
+    if (SYMINFO_FLOAT_MEMBER_NAMES.has(memberName)) return { kind: 'float', qualifier: 'simple' };
     return undefined;
   }
 
