@@ -979,7 +979,9 @@ valid = matrix.is_valid(id=m)
 plot(rows + columns + elements + first + matrix.rows(id=generic) + matrix.rows(id=flags) + (valid ? 1 : 0))
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('valid')).toMatchObject({ kind: 'bool', qualifier: 'series' });
   });
 
   it('reports invalid matrix core helper named arguments', () => {
@@ -1230,7 +1232,18 @@ stochastic = matrix.is_stochastic(id=m)
 plot((square ? 1 : 0) + (zero ? 1 : 0) + (binary ? 1 : 0) + (identity ? 1 : 0) + (diagonal ? 1 : 0) + (antidiagonal ? 1 : 0) + (symmetric ? 1 : 0) + (antisymmetric ? 1 : 0) + (triangular ? 1 : 0) + (stochastic ? 1 : 0))
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('square')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('zero')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('binary')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('identity')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('diagonal')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('antidiagonal')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('symmetric')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('antisymmetric')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('triangular')).toMatchObject({ kind: 'bool', qualifier: 'series' });
+    expect(types.get('stochastic')).toMatchObject({ kind: 'bool', qualifier: 'series' });
   });
 
   it('reports invalid matrix predicate helper named arguments', () => {
