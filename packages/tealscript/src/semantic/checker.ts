@@ -1190,26 +1190,7 @@ class SemanticChecker {
         return this.inferTupleElementTypes(declaration.body, functionScope);
       }
 
-      let returnTypes: SemanticType[] | undefined;
-      for (const statement of declaration.body) {
-        if (statement.type === 'VariableDeclaration' && statement.names.type === 'VariableDeclarator') {
-          const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init, functionScope);
-          functionScope.declare({
-            name: statement.names.name.name,
-            kind: 'variable',
-            type,
-            loc: statement.names.name.loc,
-          });
-          returnTypes = undefined;
-          continue;
-        }
-        if (statement.type === 'ExpressionStatement') {
-          returnTypes = this.inferTupleElementTypes(statement.expression, functionScope);
-          continue;
-        }
-        returnTypes = undefined;
-      }
-      return returnTypes;
+      return this.inferTupleElementTypesFromStatements(declaration.body, functionScope);
     } finally {
       this.activeReturnInferences.delete(declaration);
     }
@@ -1821,7 +1802,11 @@ class SemanticChecker {
     }
   }
 
-  private inferTupleElementTypes(init: Expression, scope: SemanticScope): SemanticType[] | undefined {
+  private inferTupleElementTypes(init: Expression | IfStatement, scope: SemanticScope): SemanticType[] | undefined {
+    if (init.type === 'IfStatement') {
+      return this.inferIfTupleElementTypes(init, scope);
+    }
+
     if (init.type === 'ArrayExpression') {
       return init.elements.map((element) => this.inferExpressionType(element, scope));
     }
@@ -1831,6 +1816,65 @@ class SemanticChecker {
     return BUILTIN_TUPLE_RETURN_TYPES.get(this.memberPath(init.callee).join('.'))
       ?? this.inferUserFunctionTupleElementTypes(init, scope)
       ?? this.inferUserMethodTupleElementTypes(init, scope);
+  }
+
+  private inferTupleElementTypesFromStatements(statements: Statement[], scope: SemanticScope): SemanticType[] | undefined {
+    let returnTypes: SemanticType[] | undefined;
+    for (const statement of statements) {
+      if (statement.type === 'VariableDeclaration' && statement.names.type === 'VariableDeclarator') {
+        const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init, scope);
+        scope.declare({
+          name: statement.names.name.name,
+          kind: 'variable',
+          type,
+          loc: statement.names.name.loc,
+        });
+        returnTypes = undefined;
+        continue;
+      }
+      if (statement.type === 'ExpressionStatement') {
+        returnTypes = this.inferTupleElementTypes(statement.expression, scope);
+        continue;
+      }
+      if (statement.type === 'IfStatement') {
+        returnTypes = this.inferIfTupleElementTypes(statement, scope);
+        continue;
+      }
+      returnTypes = undefined;
+    }
+    return returnTypes;
+  }
+
+  private inferIfTupleElementTypes(statement: IfStatement, scope: SemanticScope): SemanticType[] | undefined {
+    if (!statement.alternate) return undefined;
+
+    const consequentTypes = this.inferTupleElementTypesFromStatements(statement.consequent, new SemanticScope(scope));
+    const alternateTypes = Array.isArray(statement.alternate)
+      ? this.inferTupleElementTypesFromStatements(statement.alternate, new SemanticScope(scope))
+      : this.inferIfTupleElementTypes(statement.alternate, new SemanticScope(scope));
+
+    return this.mergeTupleElementTypes(consequentTypes, alternateTypes);
+  }
+
+  private mergeTupleElementTypes(
+    leftTypes: SemanticType[] | undefined,
+    rightTypes: SemanticType[] | undefined,
+  ): SemanticType[] | undefined {
+    if (!leftTypes || !rightTypes || leftTypes.length !== rightTypes.length) return undefined;
+
+    return leftTypes.map((leftType, index) => (
+      this.mergeTupleElementType(leftType, rightTypes[index] ?? UNKNOWN_SEMANTIC_TYPE)
+    ));
+  }
+
+  private mergeTupleElementType(leftType: SemanticType, rightType: SemanticType): SemanticType {
+    const qualifier = this.maxQualifier(leftType, rightType);
+    if (leftType.kind === 'unknown' || rightType.kind === 'unknown') return { kind: 'unknown', qualifier };
+
+    if (this.isAssignableType(rightType, leftType)) return { ...rightType, qualifier };
+    if (this.isAssignableType(leftType, rightType)) return { ...leftType, qualifier };
+
+    return { kind: 'unknown', qualifier };
   }
 
   private checkAssignment(statement: AssignmentStatement, scope: SemanticScope): void {
