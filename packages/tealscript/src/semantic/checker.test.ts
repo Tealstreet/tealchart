@@ -1879,12 +1879,19 @@ tooManyKcw = ta.kcw(close, 3, 1.25, true, false)
     const result = checkProgram(parse(`
 indicator("TA Oscillator Signatures")
 stoch = ta.stoch(source=close, high=high, low=low, length=3)
-mfi = ta.mfi(series=hlc3, length=3)
+stochMixed = ta.stoch(source=close, high, low, 3)
+mfi = ta.mfi(source=hlc3, length=3)
+mfiMixed = ta.mfi(source=hlc3, 3)
 wpr = ta.wpr(length=3)
 cmo = ta.cmo(source=close, length=3)
+cmoMixed = ta.cmo(source=close, 3)
+rsi = ta.rsi(source=close, length=3)
+rsiMixed = ta.rsi(source=close, 3)
 tsi = ta.tsi(source=close, short_length=2, long_length=3)
+tsiMixed = ta.tsi(source=close, 2, 3)
 cci = ta.cci(source=hlc3, length=3)
-plot(stoch + mfi + wpr + cmo + tsi + cci)
+cciMixed = ta.cci(source=hlc3, 3)
+plot(stoch + stochMixed + mfi + mfiMixed + wpr + cmo + cmoMixed + rsi + rsiMixed + tsi + tsiMixed + cci + cciMixed)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -1894,7 +1901,7 @@ plot(stoch + mfi + wpr + cmo + tsi + cci)
     const result = checkProgram(parse(`
 indicator("Bad TA Oscillator Signatures")
 duplicateStoch = ta.stoch(close, source=open, high=high, low=low, length=3)
-unknownMfi = ta.mfi(series=hlc3, length=3, volume=volume)
+unknownMfi = ta.mfi(source=hlc3, length=3, volume=volume)
 shortTsi = ta.tsi(source=close, short_length=2)
 tooManyWpr = ta.wpr(3, 4)
 `));
