@@ -1598,6 +1598,42 @@ unknownField = point.z
     ]);
   });
 
+  it('infers series qualifiers for reference constructors', () => {
+    const result = checkProgram(parse(`
+indicator("Reference Constructor Qualifiers")
+point = chart.point.now(close)
+pointCopy = chart.point.copy(point)
+marker = label.new(bar_index, close)
+markerCopy = label.copy(marker)
+trend = line.new(bar_index, close, bar_index + 1, high)
+trendCopy = line.copy(trend)
+zone = box.new(bar_index, high, bar_index + 1, low)
+zoneCopy = box.copy(zone)
+fill = linefill.new(trend, trendCopy)
+points = array.from(chart.point.from_index(bar_index, close), chart.point.from_index(bar_index + 1, high))
+shape = polyline.new(points)
+shapeCopy = polyline.copy(shape)
+dashboard = table.new(columns=1, rows=1)
+plot(array.size(points))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('point')).toMatchObject({ kind: 'chart.point', qualifier: 'series' });
+    expect(types.get('pointCopy')).toMatchObject({ kind: 'chart.point', qualifier: 'series' });
+    expect(types.get('marker')).toMatchObject({ kind: 'label', qualifier: 'series' });
+    expect(types.get('markerCopy')).toMatchObject({ kind: 'label', qualifier: 'series' });
+    expect(types.get('trend')).toMatchObject({ kind: 'line', qualifier: 'series' });
+    expect(types.get('trendCopy')).toMatchObject({ kind: 'line', qualifier: 'series' });
+    expect(types.get('zone')).toMatchObject({ kind: 'box', qualifier: 'series' });
+    expect(types.get('zoneCopy')).toMatchObject({ kind: 'box', qualifier: 'series' });
+    expect(types.get('fill')).toMatchObject({ kind: 'linefill', qualifier: 'series' });
+    expect(types.get('shape')).toMatchObject({ kind: 'polyline', qualifier: 'series' });
+    expect(types.get('shapeCopy')).toMatchObject({ kind: 'polyline', qualifier: 'series' });
+    expect(types.get('dashboard')).toMatchObject({ kind: 'table', qualifier: 'series' });
+  });
+
   it('resolves label.new named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Label Signatures")
