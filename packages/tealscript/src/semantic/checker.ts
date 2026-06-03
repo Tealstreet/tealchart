@@ -146,6 +146,40 @@ const REFERENCE_CONSTRUCTOR_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['table.new', 'table'],
 ]);
 
+const BUILTIN_TUPLE_RETURN_TYPES = new Map<string, SemanticType[]>([
+  [
+    'ta.bb',
+    [
+      { kind: 'float', qualifier: 'series' },
+      { kind: 'float', qualifier: 'series' },
+      { kind: 'float', qualifier: 'series' },
+    ],
+  ],
+  [
+    'ta.dmi',
+    [
+      { kind: 'float', qualifier: 'series' },
+      { kind: 'float', qualifier: 'series' },
+      { kind: 'float', qualifier: 'series' },
+    ],
+  ],
+  [
+    'ta.macd',
+    [
+      { kind: 'float', qualifier: 'series' },
+      { kind: 'float', qualifier: 'series' },
+      { kind: 'float', qualifier: 'series' },
+    ],
+  ],
+  [
+    'ta.supertrend',
+    [
+      { kind: 'float', qualifier: 'series' },
+      { kind: 'int', qualifier: 'series' },
+    ],
+  ],
+]);
+
 const BUILTIN_FUNCTIONS = new Set([
   'alert',
   'alertcondition',
@@ -1720,7 +1754,7 @@ class SemanticChecker {
     this.checkTypeAnnotation('variable declaration', statement.typeAnnotation, statement.loc);
     this.checkTypeCompatibility(statement.typeAnnotation, statement.init, scope, statement.loc);
     if (statement.names.type === 'TupleDeclarator') {
-      this.declareTuple(statement.names, scope);
+      this.declareTuple(statement.names, statement.init, scope);
       return;
     }
 
@@ -1732,16 +1766,27 @@ class SemanticChecker {
     });
   }
 
-  private declareTuple(tuple: TupleDeclarator, scope: SemanticScope): void {
+  private declareTuple(tuple: TupleDeclarator, init: Expression, scope: SemanticScope): void {
     const seen = new Set<string>();
-    for (const name of tuple.names) {
+    const elementTypes = this.inferTupleElementTypes(init, scope);
+    for (const [index, name] of tuple.names.entries()) {
       if (seen.has(name.name)) {
         this.addDiagnostic('duplicate-symbol', `Duplicate declaration: ${name.name}`, name.loc);
         continue;
       }
       seen.add(name.name);
-      this.declare(scope, { name: name.name, kind: 'variable', type: { kind: 'unknown' }, loc: name.loc });
+      this.declare(scope, { name: name.name, kind: 'variable', type: elementTypes?.[index] ?? UNKNOWN_SEMANTIC_TYPE, loc: name.loc });
     }
+  }
+
+  private inferTupleElementTypes(init: Expression, scope: SemanticScope): SemanticType[] | undefined {
+    if (init.type === 'ArrayExpression') {
+      return init.elements.map((element) => this.inferExpressionType(element, scope));
+    }
+
+    if (init.type !== 'CallExpression') return undefined;
+
+    return BUILTIN_TUPLE_RETURN_TYPES.get(this.memberPath(init.callee).join('.'));
   }
 
   private checkAssignment(statement: AssignmentStatement, scope: SemanticScope): void {

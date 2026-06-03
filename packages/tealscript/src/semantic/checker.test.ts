@@ -481,6 +481,47 @@ bad(left, left) => left
     ]);
   });
 
+  it('infers tuple destructuring element types from literal expressions', () => {
+    const result = checkProgram(parse(`
+indicator("Tuple Literal Types")
+[count, title, marker, price] = [1, "A", label.new(bar_index, close), close]
+count := 1.5
+title := 2
+marker := line.new(bar_index, low, bar_index, high)
+price := "bad"
+plot(price)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign float value to int variable count',
+      'Cannot assign int value to string variable title',
+      'Cannot assign line value to label variable marker',
+      'Cannot assign string value to float variable price',
+    ]);
+  });
+
+  it('infers tuple destructuring element types from known TA tuple returns', () => {
+    const result = checkProgram(parse(`
+indicator("TA Tuple Types")
+[macdLine, signalLine, hist] = ta.macd(close, 12, 26, 9)
+[basis, upper, lower] = ta.bb(close, 20, 2)
+[supertrend, direction] = ta.supertrend(3, 10)
+[diPlus, diMinus, adx] = ta.dmi(14, 14)
+macdLine := "bad"
+basis := "bad"
+direction := "up"
+adx := "bad"
+plot(signalLine + hist + upper + lower + supertrend + diPlus + diMinus)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable macdLine',
+      'Cannot assign string value to float variable basis',
+      'Cannot assign string value to int variable direction',
+      'Cannot assign string value to float variable adx',
+    ]);
+  });
+
   it('reports assignments to undeclared identifiers', () => {
     const result = checkProgram(parse(`
 indicator("Unknown Assignment")
