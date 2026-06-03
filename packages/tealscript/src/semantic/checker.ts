@@ -344,6 +344,7 @@ const DRAWING_ALL_ELEMENT_TYPES = new Map<string, SemanticTypeKind>([
   ['box.all', 'box'],
   ['label.all', 'label'],
   ['line.all', 'line'],
+  ['linefill.all', 'linefill'],
   ['polyline.all', 'polyline'],
 ]);
 
