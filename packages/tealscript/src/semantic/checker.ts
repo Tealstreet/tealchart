@@ -3306,6 +3306,7 @@ class SemanticChecker {
       return {
         kind: 'matrix',
         elementType: this.typeFromName(expression.typeArguments[0]),
+        qualifier: 'series',
       };
     }
     const arrayElementType = ARRAY_CONSTRUCTOR_ELEMENT_TYPES.get(calleePath.join('.'));
@@ -3321,6 +3322,7 @@ class SemanticChecker {
       return {
         kind: 'matrix',
         elementType: { kind: matrixElementType },
+        qualifier: 'series',
       };
     }
     if (calleePath.length === 2 && calleePath[1] === 'new' && calleePath[0] && this.typeDeclarations.has(calleePath[0])) {
