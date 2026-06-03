@@ -279,6 +279,15 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['hline', { params: ['price', 'title', 'color', 'linestyle', 'linewidth', 'editable', 'display'], minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['int', { params: ['x'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   [
+    'label.new',
+    {
+      params: ['x', 'y', 'text', 'xloc', 'yloc', 'color', 'style', 'textcolor', 'size', 'textalign', 'tooltip', 'force_overlay'],
+      minArgs: 2,
+      maxArgs: 12,
+      allowNamedPrefixWithPositional: true,
+    },
+  ],
+  [
     'plot',
     {
       params: [
