@@ -707,6 +707,45 @@ plot(keyedValue + conditionValue + blockValue + partialValue)
     expect(types.get('partialTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
   });
 
+  it('infers tuple destructuring element types from direct loop initializer returns', () => {
+    const result = checkProgram(parse(`
+indicator("Loop Initializer Tuple Types")
+[numericValue, numericTitle] = for i = 0 to 2
+    [close + i, "numeric"]
+values = array.from(close, open)
+[collectionValue, collectionTitle] = for [index, item] in values
+    [item + index, "collection"]
+i = 0
+[whileValue, whileTitle] = while i < 2
+    i += 1
+    [close + i, "while"]
+numericValue := "bad"
+numericTitle := 1
+collectionValue := "bad"
+collectionTitle := 2
+whileValue := "bad"
+whileTitle := 3
+plot(numericValue + collectionValue + whileValue)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable numericValue',
+      'Cannot assign int value to string variable numericTitle',
+      'Cannot assign string value to float variable collectionValue',
+      'Cannot assign int value to string variable collectionTitle',
+      'Cannot assign string value to float variable whileValue',
+      'Cannot assign int value to string variable whileTitle',
+    ]);
+    expect(types.get('numericValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('numericTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('collectionValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('collectionTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+    expect(types.get('whileValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('whileTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+  });
+
   it('infers tuple destructuring element types from user function loop tuple returns', () => {
     const result = checkProgram(parse(`
 indicator("Loop Tuple Types")

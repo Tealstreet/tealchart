@@ -933,6 +933,31 @@ plot(whileValue, title="While Loop Expression")
     );
   });
 
+  it('destructures loop initializer tuple values', () => {
+    const result = runCompatScript(`
+indicator("Loop initializer tuple")
+[numericValue, numericTitle] = for i = 0 to 2
+    [close + i, "numeric"]
+values = array.from(close, open)
+[collectionValue, collectionTitle] = for [index, item] in values
+    [item + index, "collection"]
+i = 0
+[whileValue, whileTitle] = while i < 2
+    i += 1
+    [close + i, "while"]
+plot(numericValue, title="Numeric Tuple")
+plot(collectionValue, title="Collection Tuple")
+plot(whileValue, title="While Tuple")
+plot(numericTitle == "numeric" and collectionTitle == "collection" and whileTitle == "while" ? 1 : -1, title="Tuple Titles")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Numeric Tuple').values)).toEqual([104, 107, 109, 105, 101, 102, 106, 111, 110, 113, 112, 114]);
+    expect(roundSeries(getPlot(result, 'Collection Tuple').values)).toEqual([101, 103, 106, 108, 104, 100, 101, 105, 110, 109, 112, 111]);
+    expect(roundSeries(getPlot(result, 'While Tuple').values)).toEqual([104, 107, 109, 105, 101, 102, 106, 111, 110, 113, 112, 114]);
+    expect(roundSeries(getPlot(result, 'Tuple Titles').values)).toEqual(Array(compatibilityBars.length).fill(1));
+  });
+
   it('runs collection loop expressions with break and continue', () => {
     const result = runCompatScript(`
 indicator("Collection loop expressions")
