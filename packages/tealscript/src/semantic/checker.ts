@@ -289,6 +289,16 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ],
   ['linefill.new', { params: ['line1', 'line2', 'color'], minArgs: 2, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   [
+    'table.new',
+    {
+      params: ['position', 'columns', 'rows', 'bgcolor', 'frame_color', 'frame_width', 'border_color', 'border_width'],
+      minArgs: 2,
+      requiredParams: ['columns', 'rows'],
+      maxArgs: 8,
+      allowNamedPrefixWithPositional: true,
+    },
+  ],
+  [
     'plot',
     {
       params: [
