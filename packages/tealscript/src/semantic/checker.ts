@@ -3271,6 +3271,14 @@ class SemanticChecker {
         returnType = this.inferIfExpressionType(statement, scope);
         continue;
       }
+      if (statement.type === 'ForStatement') {
+        returnType = this.inferForExpressionType(statement, scope);
+        continue;
+      }
+      if (statement.type === 'WhileStatement') {
+        returnType = this.inferWhileExpressionType(statement, scope);
+        continue;
+      }
       returnType = undefined;
     }
     return returnType;
@@ -3329,9 +3337,73 @@ class SemanticChecker {
       }
       if (statement.type === 'IfStatement') {
         types.push(this.inferIfExpressionType(statement, scope));
+        continue;
+      }
+      if (statement.type === 'ForStatement') {
+        const type = this.inferForExpressionType(statement, scope);
+        if (type) types.push(type);
+        continue;
+      }
+      if (statement.type === 'WhileStatement') {
+        const type = this.inferWhileExpressionType(statement, scope);
+        if (type) types.push(type);
       }
     }
     return types;
+  }
+
+  private inferForExpressionType(statement: ForStatement, scope: SemanticScope): SemanticType | undefined {
+    const loopScope = new SemanticScope(scope);
+    let controlQualifier: SemanticQualifier | undefined;
+
+    if (statement.kind === 'collection') {
+      const iterableType = this.inferExpressionType(statement.iterable, scope);
+      controlQualifier = iterableType.qualifier;
+      loopScope.declare({
+        name: statement.counter.name,
+        kind: 'loop',
+        type: this.collectionValueType(iterableType),
+        loc: statement.counter.loc,
+      });
+      if (statement.indexCounter) {
+        loopScope.declare({
+          name: statement.indexCounter.name,
+          kind: 'loop',
+          type: this.collectionIndexType(iterableType),
+          loc: statement.indexCounter.loc,
+        });
+      }
+    } else {
+      controlQualifier = this.maxQualifier(
+        this.inferExpressionType(statement.start, scope),
+        this.inferExpressionType(statement.end, scope),
+        ...(statement.step ? [this.inferExpressionType(statement.step, scope)] : []),
+      );
+      loopScope.declare({
+        name: statement.counter.name,
+        kind: 'loop',
+        type: { kind: 'int', qualifier: 'series' },
+        loc: statement.counter.loc,
+      });
+    }
+
+    const bodyType = this.inferExpressionTypeFromStatements(statement.body, loopScope);
+    if (!bodyType) return bodyType;
+
+    return {
+      ...bodyType,
+      qualifier: this.maxQualifier(bodyType, { kind: 'unknown', qualifier: controlQualifier }),
+    };
+  }
+
+  private inferWhileExpressionType(statement: WhileStatement, scope: SemanticScope): SemanticType | undefined {
+    const bodyType = this.inferExpressionTypeFromStatements(statement.body, new SemanticScope(scope));
+    if (!bodyType) return bodyType;
+
+    return {
+      ...bodyType,
+      qualifier: this.maxQualifier(bodyType, this.inferExpressionType(statement.test, scope)),
+    };
   }
 
   private inferSwitchExpressionQualifier(expression: SwitchExpression, scope: SemanticScope): SemanticQualifier | undefined {
@@ -3443,6 +3515,7 @@ class SemanticChecker {
     if (calleePath.join('.') === 'array.from') {
       return {
         kind: 'array',
+        qualifier: this.inferCallArgumentMaxQualifier(expression, scope),
         elementType: this.inferArrayElementType(expression.arguments.map((argument) => argument.value), scope),
       };
     }

@@ -957,6 +957,70 @@ plot(priceValue + blockResult)
     expect(types.get('partialResult')).toMatchObject({ kind: 'unknown', qualifier: 'series' });
   });
 
+  it('infers user function loop expression types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Loop Expression Types")
+numericValue(float value, int limit) =>
+    for i = 0 to limit
+        value + i
+collectionValue(float value) =>
+    values = array.from(value, value + 1)
+    for [index, item] in values
+        item + index
+whileValue(float value, int limit) =>
+    i = 0
+    while i < limit
+        i += 1
+        value + i
+mixedValue(float value, int limit) =>
+    for i = 0 to limit
+        if i == 0
+            value
+        else
+            "bad"
+rangeControl(float limit) =>
+    for i = 0 to limit
+        1
+collectionControl(float value) =>
+    values = array.from(value)
+    for item in values
+        1
+whileControl(bool enabled) =>
+    while enabled
+        1
+numericResult = numericValue(close, 2)
+collectionResult = collectionValue(close)
+whileResult = whileValue(close, 2)
+mixedResult = mixedValue(close, 2)
+simple int simpleRange = 1
+simple int simpleCollection = 1
+simple int simpleWhile = 1
+numericResult := "bad"
+collectionResult := "bad"
+whileResult := "bad"
+mixedResult := "still unknown"
+simpleRange := rangeControl(close)
+simpleCollection := collectionControl(close)
+simpleWhile := whileControl(close > open)
+plot(numericResult + collectionResult + whileResult)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable numericResult',
+      'Cannot assign string value to float variable collectionResult',
+      'Cannot assign string value to float variable whileResult',
+      'Cannot assign series value to simple int variable simpleRange',
+      'Cannot assign series value to simple int variable simpleCollection',
+      'Cannot assign series value to simple int variable simpleWhile',
+    ]);
+    expect(types.get('numericResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('collectionResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('whileResult')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedResult')).toMatchObject({ kind: 'unknown', qualifier: 'series' });
+  });
+
   it('infers compatible ternary expression types for downstream diagnostics', () => {
     const result = checkProgram(parse(`
 indicator("Ternary Expression Types")
