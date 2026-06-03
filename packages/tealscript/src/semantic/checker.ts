@@ -348,6 +348,15 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['box.set_text_valign', { params: ['id', 'text_valign'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['box.set_text_wrap', { params: ['id', 'text_wrap'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['box.set_text_font_family', { params: ['id', 'text_font_family'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['box.get_left', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['box.get_right', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['box.get_top', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['box.get_bottom', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['box.get_bgcolor', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['box.get_border_color', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['box.get_text', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['box.get_text_halign', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['box.get_text_valign', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['linefill.new', { params: ['line1', 'line2', 'color'], minArgs: 2, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['linefill.delete', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['linefill.set_color', { params: ['id', 'color'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
@@ -2822,6 +2831,10 @@ class SemanticChecker {
     if (referenceReturnType) return { kind: referenceReturnType };
     if (calleeName === 'line.get_x1' || calleeName === 'line.get_x2') return { kind: 'int' };
     if (calleeName === 'line.get_y1' || calleeName === 'line.get_y2' || calleeName === 'line.get_price') return { kind: 'float' };
+    if (calleeName === 'box.get_left' || calleeName === 'box.get_right') return { kind: 'int' };
+    if (calleeName === 'box.get_top' || calleeName === 'box.get_bottom') return { kind: 'float' };
+    if (calleeName === 'box.get_bgcolor' || calleeName === 'box.get_border_color') return { kind: 'color' };
+    if (calleeName === 'box.get_text' || calleeName === 'box.get_text_halign' || calleeName === 'box.get_text_valign') return { kind: 'string' };
     if (calleeName === 'linefill.get_line1' || calleeName === 'linefill.get_line2') return { kind: 'line' };
 
     const namespace = calleePath[0];
