@@ -3085,6 +3085,29 @@ plot(numberValue + str.length(textValue) + str.length(namedText) + defaulted + r
     expect(types.get('ranked')).toMatchObject({ kind: 'int' });
   });
 
+  it('selects user-defined enum receiver methods', () => {
+    const result = checkProgram(parse(`
+indicator("Enum Method Receivers")
+enum Direction
+    up = "Up"
+    down = "Down"
+method label(Direction this) => "enum"
+method label(float this) => "float"
+method score(Direction this, int weight) => weight
+directionLabel = Direction.up.label()
+priceLabel = close.label()
+directionScore = Direction.down.score(2)
+plot(str.length(directionLabel) + str.length(priceLabel) + directionScore)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('directionLabel')).toMatchObject({ kind: 'string' });
+    expect(types.get('priceLabel')).toMatchObject({ kind: 'string' });
+    expect(types.get('directionScore')).toMatchObject({ kind: 'int' });
+  });
+
   it('does not report user method receiver mismatches for builtin collection member calls', () => {
     const result = checkProgram(parse(`
 indicator("Builtin Method Names")
