@@ -1837,11 +1837,11 @@ plot(price + y1 + y2)
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics).toEqual([]);
-    expect(types.get('x1')).toMatchObject({ kind: 'int' });
-    expect(types.get('x2')).toMatchObject({ kind: 'int' });
-    expect(types.get('y1')).toMatchObject({ kind: 'float' });
-    expect(types.get('y2')).toMatchObject({ kind: 'float' });
-    expect(types.get('price')).toMatchObject({ kind: 'float' });
+    expect(types.get('x1')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('x2')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('y1')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('y2')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('price')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid line getter argument bindings', () => {
