@@ -846,6 +846,50 @@ plot(price)
     ]);
   });
 
+  it('infers compatible switch expression types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Switch Expression Types")
+mode = "wide"
+keyedValue = switch mode
+    "price" => close
+    "wide" => 1
+    => open
+conditionTitle = switch
+    close > open => "up"
+    => "down"
+blockValue = switch mode
+    "basis" =>
+        basis = close + 1
+        basis
+    =>
+        open
+mixedValue = switch mode
+    "price" => close
+    => "bad"
+partialValue = switch mode
+    "price" => close
+keyedValue := "bad"
+conditionTitle := 1
+blockValue := "bad"
+mixedValue := "still unknown"
+partialValue := "still unknown"
+plot(keyedValue + blockValue)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable keyedValue',
+      'Cannot assign int value to string variable conditionTitle',
+      'Cannot assign string value to float variable blockValue',
+    ]);
+    expect(types.get('keyedValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('conditionTitle')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('blockValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedValue')).toMatchObject({ kind: 'unknown' });
+    expect(types.get('partialValue')).toMatchObject({ kind: 'unknown' });
+  });
+
   it('reports plain identifier reassignment qualifier mismatches', () => {
     const result = checkProgram(parse(`
 indicator("Assignment Qualifier Mismatches")

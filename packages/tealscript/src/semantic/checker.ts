@@ -1932,11 +1932,11 @@ class SemanticChecker {
     if (!leftTypes || !rightTypes || leftTypes.length !== rightTypes.length) return undefined;
 
     return leftTypes.map((leftType, index) => (
-      this.mergeTupleElementType(leftType, rightTypes[index] ?? UNKNOWN_SEMANTIC_TYPE)
+      this.mergeCompatibleType(leftType, rightTypes[index] ?? UNKNOWN_SEMANTIC_TYPE)
     ));
   }
 
-  private mergeTupleElementType(leftType: SemanticType, rightType: SemanticType): SemanticType {
+  private mergeCompatibleType(leftType: SemanticType, rightType: SemanticType): SemanticType {
     const qualifier = this.maxQualifier(leftType, rightType);
     if (leftType.kind === 'unknown' || rightType.kind === 'unknown') return { kind: 'unknown', qualifier };
 
@@ -3214,6 +3214,8 @@ class SemanticChecker {
             this.inferExpressionType(expression.alternate, scope),
           ),
         };
+      case 'SwitchExpression':
+        return this.inferSwitchExpressionType(expression, scope);
       case 'CallExpression':
         return this.inferCallType(expression, scope);
       case 'MemberExpression':
@@ -3229,6 +3231,70 @@ class SemanticChecker {
       default:
         return { kind: 'unknown' };
     }
+  }
+
+  private inferSwitchExpressionType(expression: SwitchExpression, scope: SemanticScope): SemanticType {
+    if (!expression.cases.some((switchCase) => !switchCase.test)) {
+      return { kind: 'unknown', qualifier: this.inferSwitchExpressionQualifier(expression, scope) };
+    }
+
+    let mergedType: SemanticType | undefined;
+    for (const switchCase of expression.cases) {
+      const caseScope = new SemanticScope(scope);
+      const caseType = Array.isArray(switchCase.consequent)
+        ? this.inferExpressionTypeFromStatements(switchCase.consequent, caseScope)
+        : this.inferExpressionType(switchCase.consequent, caseScope);
+      if (!caseType) return { kind: 'unknown', qualifier: this.inferSwitchExpressionQualifier(expression, scope) };
+      mergedType = mergedType ? this.mergeCompatibleType(mergedType, caseType) : caseType;
+    }
+
+    if (!mergedType) return { kind: 'unknown', qualifier: this.inferSwitchExpressionQualifier(expression, scope) };
+
+    return {
+      ...mergedType,
+      qualifier: this.maxQualifier(mergedType, { kind: 'unknown', qualifier: this.inferSwitchControlQualifier(expression, scope) }),
+    };
+  }
+
+  private inferExpressionTypeFromStatements(statements: Statement[], scope: SemanticScope): SemanticType | undefined {
+    let returnType: SemanticType | undefined;
+    for (const statement of statements) {
+      if (statement.type === 'VariableDeclaration' && statement.names.type === 'VariableDeclarator') {
+        const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init, scope);
+        scope.declare({
+          name: statement.names.name.name,
+          kind: 'variable',
+          type,
+          loc: statement.names.name.loc,
+        });
+        returnType = undefined;
+        continue;
+      }
+      if (statement.type === 'ExpressionStatement') {
+        returnType = this.inferExpressionType(statement.expression, scope);
+        continue;
+      }
+      returnType = undefined;
+    }
+    return returnType;
+  }
+
+  private inferSwitchExpressionQualifier(expression: SwitchExpression, scope: SemanticScope): SemanticQualifier | undefined {
+    return this.maxQualifier(
+      { kind: 'unknown', qualifier: this.inferSwitchControlQualifier(expression, scope) },
+      ...expression.cases.flatMap((switchCase) => {
+        const caseTypes: SemanticType[] = [];
+        if (!Array.isArray(switchCase.consequent)) caseTypes.push(this.inferExpressionType(switchCase.consequent, scope));
+        return caseTypes;
+      }),
+    );
+  }
+
+  private inferSwitchControlQualifier(expression: SwitchExpression, scope: SemanticScope): SemanticQualifier | undefined {
+    return this.maxQualifier(
+      ...(expression.discriminant ? [this.inferExpressionType(expression.discriminant, scope)] : []),
+      ...expression.cases.flatMap((switchCase) => switchCase.test ? [this.inferExpressionType(switchCase.test, scope)] : []),
+    );
   }
 
   private inferBinaryExpressionType(expression: Expression, scope: SemanticScope): SemanticType {

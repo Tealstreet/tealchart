@@ -491,7 +491,9 @@ The switch pass covers expression-form `switch` structures used for mode
 selection and conditional selection. Keyed switches compare a discriminant
 against case values and condition-only switches return the first truthy branch,
 with optional default branches. Multiline branch bodies execute local statements
-and return the last expression in the selected branch. The checkpoint fixture
+and return the last expression in the selected branch. Compatible defaulted
+switch arms infer scalar expression types for downstream diagnostics, while
+mixed-shape or no-default switches stay conservative. The checkpoint fixture
 follows TradingView's documented conditional-structure idioms by selecting a
 moving average from an `input.string(... options=...)` mode and deriving a
 directional signal.
