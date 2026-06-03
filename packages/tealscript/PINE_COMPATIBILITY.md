@@ -73,6 +73,9 @@ Covered behavior and remaining gaps:
   `else if` / `else` branches.
 - User-defined function bodies can return the last expression result from
   numeric `for`, collection `for ... in`, and `while` loop bodies.
+- Semantic return inference covers user-defined functions and methods,
+  including collection/reference/UDT returns, nested helper calls, final `if`
+  statement returns, and call-site qualifier propagation from arguments.
 - Numeric `for`, collection `for ... in`, and `while` loops can be used as
   expressions. The expression value is the last body expression reached,
   including across `break` and `continue` control flow.
@@ -82,10 +85,14 @@ Covered behavior and remaining gaps:
 - User-defined function calls report clear diagnostics for unknown named
   arguments, duplicate positional/named bindings, excess positional arguments,
   and duplicate named arguments.
+- User-defined function and method calls also report annotated argument type and
+  qualifier mismatches, including cases where a `series` value is passed to a
+  stricter `simple` parameter.
 - Recursive user-defined function calls are rejected with an explicit diagnostic
   instead of overflowing the runtime stack.
-- Nested indented blocks inside user-defined functions expose limitations in the
-  simplified indentation grammar and need continued hardening.
+- Nested indented blocks inside pasted user-defined function bodies still expose
+  limitations in the simplified indentation grammar and need continued parser
+  and runtime hardening.
 - The parser wrapper rejects scripts larger than 1,000,000 UTF-16 code units
   and parsed ASTs deeper than 1,000 nodes. These are TealScript sandbox limits
   intended to keep generated or hostile scripts from exhausting parser
@@ -307,8 +314,10 @@ User-defined `method` declarations now parse and dispatch for primitive and
 UDT receiver values, including method calls that mutate and return UDT
 references. The runtime uses the receiver as the method's first argument, in
 line with Pine's documented method-call equivalence, and selects local UDT
-method overloads by receiver type. Semantic diagnostics report calls where a
-known receiver type does not match any local method receiver annotation.
+method overloads by receiver type. Semantic coverage reports calls where a
+known receiver type does not match any local method receiver annotation, accepts
+method overload declarations, infers method return types, and validates
+method-call argument shape, type, and qualifier constraints.
 
 Known limits: UDT field types are recorded dynamically but not yet fully
 enforced by the semantic checker outside the local constructor/assignment paths.
@@ -380,7 +389,9 @@ The global helper pass covers `na`, `nz`, `fixnan`, and explicit primitive
 casts used by generated scripts to normalize optional source values before
 plotting or comparing them. `nz()` supports default-zero and explicit
 replacement forms, `fixnan()` carries forward the previous non-`na` value per
-call site, and both helpers reject bool arguments per Pine v6 behavior.
+call site, and both helpers reject bool arguments per Pine v6 behavior. The
+semantic checker preserves helper return kinds and qualifiers for common
+numeric/source call sites.
 
 ## Pine Logs Coverage
 
@@ -470,10 +481,12 @@ The switch pass covers expression-form `switch` structures used for mode
 selection and conditional selection. Keyed switches compare a discriminant
 against case values and condition-only switches return the first truthy branch,
 with optional default branches. Multiline branch bodies execute local statements
-and return the last expression in the selected branch. The checkpoint fixture
-follows TradingView's documented conditional-structure idioms by selecting a
-moving average from an `input.string(... options=...)` mode and deriving a
-directional signal.
+and return the last expression in the selected branch. Semantic coverage
+preserves branch result types across scalar, collection, reference, UDT, final
+`if`, and nested helper return forms. The checkpoint fixture follows
+TradingView's documented conditional-structure idioms by selecting a moving
+average from an `input.string(... options=...)` mode and deriving a directional
+signal.
 
 ## Common Loop Control Coverage
 
