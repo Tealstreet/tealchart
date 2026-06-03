@@ -2678,7 +2678,28 @@ rateMixed = ta.roc(source=close, 2)
 plot(vwma + vwmaMixed + rma + rmaMixed + wma + wmaMixed + swma + alma + almaMixed + hma + hmaMixed + momentum + momentumMixed + rate + rateMixed)
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
     expect(result.diagnostics).toEqual([]);
+    for (const name of [
+      'vwma',
+      'vwmaMixed',
+      'rma',
+      'rmaMixed',
+      'wma',
+      'wmaMixed',
+      'swma',
+      'alma',
+      'almaMixed',
+      'hma',
+      'hmaMixed',
+      'momentum',
+      'momentumMixed',
+      'rate',
+      'rateMixed',
+    ]) {
+      expect(types.get(name)).toMatchObject({ kind: 'float', qualifier: 'series' });
+    }
   });
 
   it('reports invalid TA moving-average and momentum helper named arguments', () => {
@@ -2800,7 +2821,11 @@ mixedLinreg = ta.linreg(source=close, 3, 1)
 plot(trend + direction + mixedTrend + mixedDirection + diPlus + diMinus + adx + mixedDiPlus + mixedDiMinus + mixedAdx + sar + mixedSar + pivotHigh + pivotLow + defaultPivotHigh + defaultPivotLow + sourceTailPivotHigh + sourceTailPivotLow + leftTailPivotHigh + leftTailPivotLow + mixedPivotHigh + mixedPivotLow + linreg + mixedLinreg)
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('linreg')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('mixedLinreg')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid TA trend and pivot helper named arguments', () => {
