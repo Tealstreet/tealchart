@@ -5856,15 +5856,17 @@ export class TealscriptEngine {
       return values.reduce((sum, value) => sum + value, 0) / values.length;
     });
     this.builtins.set('math.sum', (args, namedArgs, _ctx, scope, callId) => {
-      const source = this.toNumber(this.getCallArg(args, namedArgs, 0, 'source'));
-      const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 1, 'length'));
+      const mathSumArgs = ['source', 'length'];
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, mathSumArgs, 0));
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, mathSumArgs, 1));
       const values = this.getCompleteNonNaSourceWindow(scope, `_math_sum_source_${callId}`, source, length);
       return values ? values.reduce((sum, value) => sum + value, 0) : Number.NaN;
     });
     this.builtins.set('math.random', (args, namedArgs, _ctx, scope, callId) => {
-      const min = this.toNumber(namedArgs.has('min') ? namedArgs.get('min') : args[0] ?? 0);
-      const max = this.toNumber(namedArgs.has('max') ? namedArgs.get('max') : args[1] ?? 1);
-      const seedArg = namedArgs.has('seed') ? namedArgs.get('seed') : args[2];
+      const mathRandomArgs = ['min', 'max', 'seed'];
+      const min = this.toNumber(this.getOrderedCallArg(args, namedArgs, mathRandomArgs, 0, 0));
+      const max = this.toNumber(this.getOrderedCallArg(args, namedArgs, mathRandomArgs, 1, 1));
+      const seedArg = this.getOrderedCallArg(args, namedArgs, mathRandomArgs, 2);
       if (!Number.isFinite(min) || !Number.isFinite(max) || max <= min) return Number.NaN;
 
       let randomValue: number;
@@ -5880,16 +5882,18 @@ export class TealscriptEngine {
     });
     unaryMath('math.sqrt', Math.sqrt);
     this.builtins.set('math.pow', (args, namedArgs) => {
-      const base = this.toNumber(this.getCallArg(args, namedArgs, 0, 'base'));
-      const exponent = this.toNumber(this.getCallArg(args, namedArgs, 1, 'exponent'));
+      const mathPowArgs = ['base', 'exponent'];
+      const base = this.toNumber(this.getOrderedCallArg(args, namedArgs, mathPowArgs, 0));
+      const exponent = this.toNumber(this.getOrderedCallArg(args, namedArgs, mathPowArgs, 1));
       return Math.pow(base, exponent);
     });
     unaryMath('math.log', Math.log);
     unaryMath('math.log10', Math.log10);
     unaryMath('math.exp', Math.exp);
     this.builtins.set('math.round', (args, namedArgs) => {
-      const value = this.toNumber(this.getCallArg(args, namedArgs, 0, 'number'));
-      const precisionArg = this.getCallArg(args, namedArgs, 1, 'precision');
+      const mathRoundArgs = ['number', 'precision'];
+      const value = this.toNumber(this.getOrderedCallArg(args, namedArgs, mathRoundArgs, 0));
+      const precisionArg = this.getOrderedCallArg(args, namedArgs, mathRoundArgs, 1);
       const precision = precisionArg === undefined ? 0 : Math.trunc(this.toNumber(precisionArg));
       const factor = 10 ** precision;
       return Math.round(value * factor) / factor;
