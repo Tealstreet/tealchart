@@ -4061,11 +4061,13 @@ class SemanticChecker {
     return result.filter((arg) => arg.length > 0);
   }
 
-  private checkTypeCompatibility(annotation: TypeAnnotation | undefined | null, init: Expression, scope: SemanticScope, loc?: SourceLocation): void {
+  private checkTypeCompatibility(annotation: TypeAnnotation | undefined | null, init: Expression | IfStatement, scope: SemanticScope, loc?: SourceLocation): void {
     const targetType = this.typeFromAnnotation(annotation);
     if (!targetType || !this.canCheckTypeCompatibility(annotation)) return;
 
-    const initType = this.inferExpressionType(init, scope);
+    const initType = init.type === 'IfStatement'
+      ? this.inferIfExpressionType(init, scope)
+      : this.inferExpressionType(init, scope);
 
     if (targetType.qualifier && initType.qualifier && QUALIFIER_RANK[initType.qualifier] > QUALIFIER_RANK[targetType.qualifier]) {
       this.addDiagnostic(
@@ -4075,6 +4077,8 @@ class SemanticChecker {
       );
     }
 
+    this.checkControlInitializerArmCompatibility(targetType, init, scope, loc);
+
     if (!this.isAssignableType(targetType, initType)) {
       this.addDiagnostic(
         'type-mismatch',
@@ -4082,6 +4086,63 @@ class SemanticChecker {
         loc,
       );
     }
+  }
+
+  private checkControlInitializerArmCompatibility(
+    targetType: SemanticType,
+    init: Expression | IfStatement,
+    scope: SemanticScope,
+    loc?: SourceLocation,
+  ): void {
+    const armTypes = this.inferControlInitializerArmTypes(init, scope);
+    if (!armTypes) return;
+
+    const reportedTypes = new Set<string>();
+    for (const armType of armTypes) {
+      if (this.isAssignableType(targetType, armType)) continue;
+
+      const formattedType = this.formatSemanticType(armType);
+      if (reportedTypes.has(formattedType)) continue;
+      reportedTypes.add(formattedType);
+
+      this.addDiagnostic(
+        'type-mismatch',
+        `Cannot assign ${formattedType} value to ${this.formatSemanticType(targetType)} variable`,
+        loc,
+      );
+    }
+  }
+
+  private inferControlInitializerArmTypes(init: Expression | IfStatement, scope: SemanticScope): SemanticType[] | undefined {
+    if (init.type === 'ConditionalExpression') {
+      return [
+        this.inferExpressionType(init.consequent, scope),
+        this.inferExpressionType(init.alternate, scope),
+      ];
+    }
+
+    if (init.type === 'SwitchExpression') {
+      return init.cases
+        .map((switchCase) => {
+          const caseScope = new SemanticScope(scope);
+          return Array.isArray(switchCase.consequent)
+            ? this.inferExpressionTypeFromStatements(switchCase.consequent, caseScope)
+            : this.inferExpressionType(switchCase.consequent, caseScope);
+        })
+        .filter((type): type is SemanticType => !!type);
+    }
+
+    if (init.type === 'IfStatement') {
+      const consequentType = this.inferExpressionTypeFromStatements(init.consequent, new SemanticScope(scope));
+      const alternateType = Array.isArray(init.alternate)
+        ? this.inferExpressionTypeFromStatements(init.alternate, new SemanticScope(scope))
+        : init.alternate
+          ? this.inferIfExpressionType(init.alternate, new SemanticScope(scope))
+          : undefined;
+      return [consequentType, alternateType].filter((type): type is SemanticType => !!type);
+    }
+
+    return undefined;
   }
 
   private canCheckTypeCompatibility(annotation: TypeAnnotation | undefined | null): boolean {

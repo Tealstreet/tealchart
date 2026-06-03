@@ -332,10 +332,10 @@ constructor unknown field names, duplicate bindings, excess positional
 arguments, invalid argument order between named and positional arguments, and
 conservative primitive/reference field type mismatches in local UDT field
 defaults, constructors, and field assignments. Annotated local variables also
-reject mismatched primitive, reference, collection, UDT, and enum initializer
-values when both sides have usable semantic types. Plain identifier `:=`
-reassignments and local UDT field `:=` assignments reject mismatched values and
-qualifier downgrades when the target and source have known semantic types.
+reject mismatched primitive, reference, collection, UDT, enum, and known mixed
+conditional/switch initializer arm values. Plain identifier `:=` reassignments and
+local UDT field `:=` assignments reject mismatched values and qualifier
+downgrades when the target and source have known semantic types.
 Plain identifier compound assignments
 reject known unsupported operand combinations and result values that cannot be
 assigned back to the target, and local UDT field compound assignments apply the
