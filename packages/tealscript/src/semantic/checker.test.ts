@@ -1768,6 +1768,40 @@ missingCopy = box.copy()
     ]);
   });
 
+  it('resolves box visual named arguments and positional tails', () => {
+    const result = checkProgram(parse(`
+indicator("Box Visual Signatures")
+region = box.new(bar_index, high, bar_index + 1, low)
+box.set_bgcolor(id=region, color.new(color.blue, 80))
+box.set_border_color(region, color=color.white)
+box.set_border_width(id=region, 2)
+box.set_border_style(region, style="dashed")
+box.set_extend(id=region, "right")
+plot(1)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid box visual argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Box Visual Signatures")
+region = box.new(bar_index, high, bar_index + 1, low)
+unknown = box.set_bgcolor(region, color.blue, bgcolor=color.red)
+missing = box.set_border_color(id=region)
+duplicate = box.set_border_width(region, 2, id=region)
+tooMany = box.set_extend(region, "right", "left")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'bgcolor' for box.set_bgcolor()",
+      'box.set_border_color() expects at least 2 arguments',
+      "box.set_border_color() missing required argument 'color'",
+      "Argument 'id' for box.set_border_width() was supplied multiple times",
+      'box.set_extend() expects at most 2 arguments',
+    ]);
+  });
+
   it('resolves linefill.new named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Linefill Signatures")
