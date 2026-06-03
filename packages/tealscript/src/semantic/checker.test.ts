@@ -135,8 +135,11 @@ plot(isLower and changed ? 1 : 0)
     const result = checkProgram(parse(`
 indicator("Logs")
 log.info("close={0}", close)
+log.info(message="named close={0}", close)
 log.warning("bar {0}", bar_index)
+log.warning(message="named bar {0}", bar_index)
 log.error("done")
+log.error(message="named done {0}", close)
 plot(close)
 `));
 
