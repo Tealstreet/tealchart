@@ -3321,7 +3321,7 @@ class SemanticChecker {
       };
     }
     if (calleePath.length === 2 && calleePath[1] === 'new' && calleePath[0] && this.typeDeclarations.has(calleePath[0])) {
-      return { kind: 'udt', name: calleePath[0] };
+      return { kind: 'udt', name: calleePath[0], qualifier: 'series' };
     }
     return { kind: 'unknown', qualifier: this.inferMaxQualifier(expression.arguments.map((argument) => argument.value), scope) };
   }
