@@ -1842,6 +1842,55 @@ badName = box.set_text_size(region, text_size=size.small)
     ]);
   });
 
+  it('resolves box getter named arguments and return types', () => {
+    const result = checkProgram(parse(`
+indicator("Box Getter Signatures")
+region = box.new(bar_index, high, bar_index + 1, low)
+leftValue = box.get_left(id=region)
+rightValue = box.get_right(region)
+topValue = box.get_top(id=region)
+bottomValue = box.get_bottom(region)
+bgValue = box.get_bgcolor(id=region)
+borderValue = box.get_border_color(region)
+textValue = box.get_text(id=region)
+halignValue = box.get_text_halign(region)
+valignValue = box.get_text_valign(id=region)
+plot(leftValue + rightValue + topValue + bottomValue)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('leftValue')).toMatchObject({ kind: 'int' });
+    expect(types.get('rightValue')).toMatchObject({ kind: 'int' });
+    expect(types.get('topValue')).toMatchObject({ kind: 'float' });
+    expect(types.get('bottomValue')).toMatchObject({ kind: 'float' });
+    expect(types.get('bgValue')).toMatchObject({ kind: 'color' });
+    expect(types.get('borderValue')).toMatchObject({ kind: 'color' });
+    expect(types.get('textValue')).toMatchObject({ kind: 'string' });
+    expect(types.get('halignValue')).toMatchObject({ kind: 'string' });
+    expect(types.get('valignValue')).toMatchObject({ kind: 'string' });
+  });
+
+  it('reports invalid box getter argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Box Getter Signatures")
+region = box.new(bar_index, high, bar_index + 1, low)
+unknown = box.get_left(region, format="raw")
+tooMany = box.get_top(region, region)
+missing = box.get_text()
+duplicate = box.get_bgcolor(region, id=region)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'format' for box.get_left()",
+      'box.get_top() expects at most 1 argument',
+      'box.get_text() expects at least 1 argument',
+      "box.get_text() missing required argument 'id'",
+      "Argument 'id' for box.get_bgcolor() was supplied multiple times",
+    ]);
+  });
+
   it('resolves linefill.new named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Linefill Signatures")
