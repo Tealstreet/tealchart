@@ -65,7 +65,7 @@ Covered behavior and remaining gaps:
   `indicator()`/`strategy()` declarations, function calls, array literals, tuple
   destructuring, index access, and parenthesized expressions.
 - Tuple destructuring preserves known positional types from literal tuple
-  expressions, direct user-function tuple returns, and supported
+  expressions, direct user-function and user-method tuple returns, and supported
   tuple-returning TA calls, so downstream assignment diagnostics can use
   destructured names.
 - Operator line continuations are supported after arithmetic, comparison,
