@@ -930,10 +930,13 @@ plot(open, title="After")
 indicator("Pine logs")
 if barstate.isfirst
     log.info("loaded {0}", syminfo.ticker)
+    log.info(message="named loaded {0}", syminfo.ticker)
 if bar_index == 1
     log.warning("close {0:#.0}", close)
+    log.warning(message="named close {0:#.0}", close)
 if barstate.islast
     log.error("last bar")
+    log.error(message="named last {0}", bar_index)
 plot(close, title="Close")
 `);
 
@@ -941,8 +944,11 @@ plot(close, title="Close")
     expect(roundSeries(getPlot(result, 'Close').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
     expect(result.logs.map(({ level, barIndex, message }) => ({ level, barIndex, message }))).toEqual([
       { level: 'info', barIndex: 0, message: 'loaded BTCUSDT' },
+      { level: 'info', barIndex: 0, message: 'named loaded BTCUSDT' },
       { level: 'warning', barIndex: 1, message: 'close 105.0' },
+      { level: 'warning', barIndex: 1, message: 'named close 105.0' },
       { level: 'error', barIndex: 11, message: 'last bar' },
+      { level: 'error', barIndex: 11, message: 'named last 11' },
     ]);
   });
 
