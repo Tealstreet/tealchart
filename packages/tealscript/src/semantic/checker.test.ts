@@ -762,7 +762,14 @@ array.clear(id=copied)
 plot(first + last + value + removed + popped + shifted + size + array.size(fromValues) + array.size(mixed))
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(result.diagnostics).toEqual([]);
+    expect(types.get('removed')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('first')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('last')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('value')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('popped')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('shifted')).toMatchObject({ kind: 'int', qualifier: 'series' });
   });
 
   it('reports invalid core array helper named arguments', () => {
@@ -1414,11 +1421,11 @@ ints.push(fromRemove)
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
-    expect(types.get('fromIndex')).toMatchObject({ kind: 'float' });
-    expect(types.get('fromGet')).toMatchObject({ kind: 'float' });
-    expect(types.get('fromFirst')).toMatchObject({ kind: 'float' });
-    expect(types.get('fromLast')).toMatchObject({ kind: 'float' });
-    expect(types.get('fromRemove')).toMatchObject({ kind: 'float' });
+    expect(types.get('fromIndex')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('fromGet')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('fromFirst')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('fromLast')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('fromRemove')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot use float value as int array element',
       'Cannot use float value as int array element',

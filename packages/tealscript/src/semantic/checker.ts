@@ -3333,9 +3333,9 @@ class SemanticChecker {
     if (!this.isArrayElementReadOperation(methodName)) return undefined;
 
     const receiverType = this.inferArrayHelperReceiverType(expression, scope);
-    if (receiverType?.kind !== 'array') return undefined;
+    if (receiverType?.kind !== 'array' || !receiverType.elementType) return undefined;
 
-    return receiverType.elementType;
+    return { ...receiverType.elementType, qualifier: 'series' };
   }
 
   private isArrayElementReadOperation(operation: string): boolean {
@@ -3517,7 +3517,7 @@ class SemanticChecker {
 
   private inferIndexExpressionType(expression: IndexExpression, scope: SemanticScope): SemanticType {
     const objectType = this.inferExpressionType(expression.object, scope);
-    if (objectType.kind === 'array' && objectType.elementType) return objectType.elementType;
+    if (objectType.kind === 'array' && objectType.elementType) return { ...objectType.elementType, qualifier: 'series' };
     return { kind: 'unknown', qualifier: 'series' };
   }
 
