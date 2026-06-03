@@ -76,9 +76,10 @@ Covered behavior and remaining gaps:
   arity mismatches.
 - Operator line continuations are supported after arithmetic, comparison,
   logical, unary, and ternary operators. Leading comparison, logical,
-  multiplicative, `+`, and ternary operators are also supported. Leading `-`
-  remains a planned indentation-aware parser item because it conflicts with
-  negative literals in indented Pine bodies.
+  multiplicative, `+`, non-numeric `-`, and ternary operators are also
+  supported. Leading negative-literal continuations remain a planned
+  indentation-aware parser item because they conflict with negative literals in
+  indented Pine bodies.
 - User-defined function bodies can return expression results from `if` /
   `else if` / `else` branches, including partial `if` expressions with no
   `else` when the present branch has an inferable value.

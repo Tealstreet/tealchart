@@ -797,10 +797,17 @@ map<string, sig.State> stateBySymbol = na
         + open
     : not
         false
+y = close
+    - open
 `);
         const decl = ast.body[0] as VariableDeclaration;
+        const subtraction = ast.body[1] as VariableDeclaration;
         expect(decl.init).toEqual(expect.objectContaining({
           type: 'ConditionalExpression',
+        }));
+        expect(subtraction.init).toEqual(expect.objectContaining({
+          type: 'BinaryExpression',
+          operator: '-',
         }));
       });
     });

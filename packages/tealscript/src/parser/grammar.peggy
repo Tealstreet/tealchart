@@ -1511,6 +1511,7 @@ BeforeComparisonOperator
 BeforeAdditiveOperator
   = &(_ ("+" / "-")) _
   / &(__ "+") __
+  / &(__ "-" !([0-9] / ".")) __
 
 BeforeMultiplicativeOperator
   = &(__ ("*" / "/" / "%")) __
