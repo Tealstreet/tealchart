@@ -162,6 +162,7 @@ export type {
   BoxDrawingOutput,
   PolylineDrawingOutput,
   TableCellDrawingOutput,
+  TableMergedCellDrawingOutput,
   TableDrawingOutput,
 } from './drawings/types';
 
