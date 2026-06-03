@@ -1725,6 +1725,49 @@ missingGetter = line.get_x2()
     ]);
   });
 
+  it('resolves box geometry named arguments and positional tails', () => {
+    const result = checkProgram(parse(`
+indicator("Box Geometry Signatures")
+region = box.new(bar_index, high, bar_index + 1, low)
+clone = box.copy(id=region)
+box.set_left(id=region, bar_index - 1)
+box.set_right(region, right=bar_index + 2)
+box.set_top(id=region, high)
+box.set_bottom(region, bottom=low)
+box.set_lefttop(id=region, left=bar_index, top=high)
+box.set_rightbottom(region, bar_index + 2, bottom=low)
+box.delete(id=clone)
+plot(1)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('clone')).toMatchObject({ kind: 'box' });
+  });
+
+  it('reports invalid box geometry argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Box Geometry Signatures")
+region = box.new(bar_index, high, bar_index + 1, low)
+unknown = box.set_left(region, left=bar_index, x=bar_index)
+missing = box.set_lefttop(id=region, left=bar_index)
+duplicate = box.set_rightbottom(region, bar_index, low, id=region)
+tooMany = box.set_bottom(region, low, low)
+missingCopy = box.copy()
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'x' for box.set_left()",
+      'box.set_lefttop() expects at least 3 arguments',
+      "box.set_lefttop() missing required argument 'top'",
+      "Argument 'id' for box.set_rightbottom() was supplied multiple times",
+      'box.set_bottom() expects at most 2 arguments',
+      'box.copy() expects at least 1 argument',
+      "box.copy() missing required argument 'id'",
+    ]);
+  });
+
   it('resolves linefill.new named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Linefill Signatures")
