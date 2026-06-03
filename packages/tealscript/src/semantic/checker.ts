@@ -1385,8 +1385,8 @@ class SemanticChecker {
     }
   }
 
-  private inferFunctionReturnType(declaration: FunctionDeclaration): SemanticType | undefined {
-    const functionScope = new SemanticScope(this.rootScope);
+  private inferFunctionReturnType(declaration: FunctionDeclaration, parentScope: SemanticScope = this.rootScope): SemanticType | undefined {
+    const functionScope = new SemanticScope(parentScope);
     for (const parameter of declaration.params) {
       functionScope.declare({
         name: parameter.name,
@@ -1949,7 +1949,7 @@ class SemanticChecker {
     this.declare(scope, {
       name: statement.name.name,
       kind: 'function',
-      type: statement.isMethod ? undefined : this.inferFunctionReturnType(statement),
+      type: statement.isMethod ? undefined : this.inferFunctionReturnType(statement, scope),
       loc: statement.name.loc,
     });
     const functionScope = new SemanticScope(scope);

@@ -527,6 +527,22 @@ plot(seriesPrice + array.size(seriesValues) + seriesPivot.y)
     expect(types.get('seriesPivot')).toMatchObject({ kind: 'udt', name: 'Pivot', qualifier: 'series' });
   });
 
+  it('infers nested function returns from their lexical scope', () => {
+    const result = checkProgram(parse(`
+indicator("Nested Function Returns")
+outer() =>
+    local = close
+    inner() => local
+    simple float copied = inner()
+    copied
+plot(outer())
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign series value to simple float',
+    ]);
+  });
+
   it('reports duplicate function parameters and tuple names', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate Params")
