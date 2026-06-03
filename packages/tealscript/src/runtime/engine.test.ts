@@ -3072,14 +3072,16 @@ plot(high, title="0")`;
       const script = `//@version=6
 indicator("Alerts")
 isUp = close > open
-alertcondition(isUp, title="Green bar", message="Close is above open")`;
+alertcondition(isUp, title="Green bar", message="Close is above open")
+alertcondition(condition=isUp, "Mixed green bar", "Mixed close is above open")
+alert(message="Mixed alert", alert.freq_once_per_bar_close)`;
 
       const ast = parse(script);
       const bars = createBars(3, 100);
       const result = executeScript(ast, bars);
 
       expect(result.errors).toHaveLength(0);
-      expect(result.alerts).toHaveLength(1);
+      expect(result.alerts).toHaveLength(3);
       expect(result.alerts[0]).toMatchObject({
         id: 'alertcondition_Green bar',
         type: 'alertcondition',
@@ -3088,6 +3090,19 @@ alertcondition(isUp, title="Green bar", message="Close is above open")`;
       });
       expect(result.alerts[0].values).toEqual([true, true, true]);
       expect(result.alerts[0].events).toEqual([]);
+      expect(result.alerts[1]).toMatchObject({
+        id: 'alertcondition_Mixed green bar',
+        type: 'alertcondition',
+        title: 'Mixed green bar',
+        message: 'Mixed close is above open',
+      });
+      expect(result.alerts[1].values).toEqual([true, true, true]);
+      expect(result.alerts[2]).toMatchObject({
+        type: 'alert',
+        message: 'Mixed alert',
+        frequency: 'once_per_bar_close',
+      });
+      expect(result.alerts[2].events).toHaveLength(3);
     });
 
     it('aligns conditional alertcondition output to bar indexes', () => {

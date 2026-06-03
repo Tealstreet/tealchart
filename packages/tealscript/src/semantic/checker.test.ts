@@ -187,8 +187,10 @@ log.trace("unsupported")
 indicator("Alerts")
 isUp = close > open
 alertcondition(isUp, title="Green", message="Close {{close}}")
+alertcondition(condition=isUp, "Mixed Green", "Mixed close {{close}}")
 if isUp
     alert("Green", alert.freq_once_per_bar_close)
+    alert(message="Mixed Green", alert.freq_once_per_bar)
 plot(close)
 `));
 
@@ -1658,15 +1660,13 @@ input float badAverage = ta.sma(close, 3)
 indicator("Bad Builtins")
 one = ta.sma(close)
 two = ta.rsi(source=close, length=14, bad=14)
-three = alert(message="bad order", alert.freq_once_per_bar)
-four = color.new(color.red, 10, 20)
+three = color.new(color.red, 10, 20)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'ta.sma() expects at least 2 arguments',
       "ta.sma() missing required argument 'length'",
       "Unknown argument 'bad' for ta.rsi()",
-      'alert() cannot use positional arguments after named arguments',
       'color.new() expects at most 2 arguments',
     ]);
   });

@@ -244,8 +244,8 @@ interface BuiltinSignature {
 }
 
 const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
-  ['alert', { params: ['message', 'freq'], minArgs: 1 }],
-  ['alertcondition', { params: ['condition', 'title', 'message'], minArgs: 1 }],
+  ['alert', { params: ['message', 'freq'], minArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['alertcondition', { params: ['condition', 'title', 'message'], minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['barcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display'], minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['bgcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay'], minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['bool', { params: ['x'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
