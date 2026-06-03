@@ -249,6 +249,44 @@ interface BuiltinSignature {
 
 const LINE_NEW_POINT_PARAMS = ['first_point', 'second_point', 'xloc', 'extend', 'color', 'style', 'width', 'force_overlay'];
 const LINE_NEW_COORDINATE_PARAMS = ['x1', 'y1', 'x2', 'y2', 'xloc', 'extend', 'color', 'style', 'width', 'force_overlay'];
+const BOX_NEW_POINT_PARAMS = [
+  'top_left',
+  'bottom_right',
+  'border_color',
+  'border_width',
+  'border_style',
+  'extend',
+  'xloc',
+  'bgcolor',
+  'text',
+  'text_size',
+  'text_color',
+  'text_halign',
+  'text_valign',
+  'text_wrap',
+  'text_font_family',
+  'force_overlay',
+];
+const BOX_NEW_COORDINATE_PARAMS = [
+  'left',
+  'top',
+  'right',
+  'bottom',
+  'border_color',
+  'border_width',
+  'border_style',
+  'extend',
+  'xloc',
+  'bgcolor',
+  'text',
+  'text_size',
+  'text_color',
+  'text_halign',
+  'text_valign',
+  'text_wrap',
+  'text_font_family',
+  'force_overlay',
+];
 
 const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['alert', { params: ['message', 'freq'], minArgs: 1, allowNamedPrefixWithPositional: true }],
@@ -350,6 +388,22 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['line.get_y1', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['line.get_y2', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['line.get_price', { params: ['id', 'x'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  [
+    'box.new',
+    {
+      params: BOX_NEW_COORDINATE_PARAMS,
+      overloads: [BOX_NEW_POINT_PARAMS, BOX_NEW_COORDINATE_PARAMS],
+      overloadMinArgs: {
+        [BOX_NEW_POINT_PARAMS.join('\u0000')]: 2,
+        [BOX_NEW_COORDINATE_PARAMS.join('\u0000')]: 4,
+      },
+      overloadMaxArgs: {
+        [BOX_NEW_POINT_PARAMS.join('\u0000')]: 16,
+        [BOX_NEW_COORDINATE_PARAMS.join('\u0000')]: 18,
+      },
+      allowNamedPrefixWithPositional: true,
+    },
+  ],
   ['box.delete', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['box.copy', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['box.set_left', { params: ['id', 'left'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
@@ -2657,8 +2711,8 @@ class SemanticChecker {
     if (!signature.overloads) return signature.params;
 
     const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
-    const pointOverload = signature.overloads.find((params) => params.includes('first_point'));
-    const coordinateOverload = signature.overloads.find((params) => params.includes('x1'));
+    const pointOverload = signature.overloads.find((params) => params.includes('first_point') || params.includes('top_left'));
+    const coordinateOverload = signature.overloads.find((params) => params.includes('x1') || params.includes('left'));
     if (pointOverload && coordinateOverload) {
       const pointOnlyParams = pointOverload.filter((name) => !coordinateOverload.includes(name));
       const coordinateOnlyParams = coordinateOverload.filter((name) => !pointOverload.includes(name));
