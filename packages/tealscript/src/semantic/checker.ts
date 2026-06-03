@@ -1432,9 +1432,63 @@ class SemanticChecker {
         returnType = this.inferExpressionType(statement.expression, functionScope);
         continue;
       }
+      if (statement.type === 'IfStatement') {
+        returnType = isLastStatement ? this.inferIfStatementReturnType(statement, functionScope) : undefined;
+        continue;
+      }
       returnType = undefined;
     }
     return returnType;
+  }
+
+  private inferStatementListReturnType(statements: Statement[], scope: SemanticScope): SemanticType {
+    const blockScope = new SemanticScope(scope);
+    let returnType: SemanticType = { kind: 'unknown' };
+    for (const [index, statement] of statements.entries()) {
+      const isLastStatement = index === statements.length - 1;
+      if (statement.type === 'FunctionDeclaration') {
+        this.declareFunctionForInference(statement, blockScope);
+        returnType = { kind: 'unknown' };
+        continue;
+      }
+      if (statement.type === 'VariableDeclaration' && statement.names.type === 'VariableDeclarator') {
+        const type = this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferExpressionType(statement.init, blockScope);
+        blockScope.declare({
+          name: statement.names.name.name,
+          kind: 'variable',
+          type,
+          loc: statement.names.name.loc,
+        });
+        returnType = isLastStatement ? type : { kind: 'unknown' };
+        continue;
+      }
+      if (statement.type === 'ExpressionStatement') {
+        returnType = isLastStatement ? this.inferExpressionType(statement.expression, blockScope) : { kind: 'unknown' };
+        continue;
+      }
+      if (statement.type === 'IfStatement') {
+        returnType = isLastStatement ? this.inferIfStatementReturnType(statement, blockScope) : { kind: 'unknown' };
+        continue;
+      }
+      returnType = { kind: 'unknown' };
+    }
+    return returnType;
+  }
+
+  private inferIfStatementReturnType(statement: IfStatement, scope: SemanticScope): SemanticType {
+    const testType = this.inferExpressionType(statement.test, scope);
+    const consequentType = this.inferStatementListReturnType(statement.consequent, scope);
+    const alternateType = Array.isArray(statement.alternate)
+      ? this.inferStatementListReturnType(statement.alternate, scope)
+      : statement.alternate
+        ? this.inferIfStatementReturnType(statement.alternate, scope)
+        : UNKNOWN_SEMANTIC_TYPE;
+    const branchType = this.mergeConditionalBranchTypes(consequentType, alternateType);
+
+    return {
+      ...branchType,
+      qualifier: this.maxQualifier(testType, consequentType, alternateType),
+    };
   }
 
   private declareFunctionForInference(statement: FunctionDeclaration, scope: SemanticScope): void {

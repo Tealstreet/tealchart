@@ -567,6 +567,33 @@ plot(outerValue)
     expect(types.get('outerValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
+  it('infers function returns from final if statements', () => {
+    const result = checkProgram(parse(`
+indicator("If Function Returns")
+choose(bool flag, float value) =>
+    if flag
+        value
+    else
+        close
+chooseLocal(bool flag, float value) =>
+    if flag
+        adjusted = value + 1
+        adjusted
+    else
+        fallback = value + close
+        fallback
+chosen = choose(true, 1)
+localChosen = chooseLocal(true, 1)
+plot(chosen + localChosen)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('chosen')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('localChosen')).toMatchObject({ kind: 'float', qualifier: 'series' });
+  });
+
   it('reports duplicate function parameters and tuple names', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate Params")
