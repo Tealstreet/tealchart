@@ -398,7 +398,9 @@ that want to resolve libraries outside the deterministic registry.
 The common color helper pass covers `color.rgb`, `color.new`, `color.r`,
 `color.g`, `color.b`, `color.t`, and `color.from_gradient`. The checkpoint
 fixture follows TradingView's documented calculated-color idioms by deriving a
-variant color from RGB channels and plotting an RSI gradient.
+variant color from RGB channels and plotting an RSI gradient. Semantic analysis
+preserves known color constructor and channel return types for downstream
+assignment diagnostics.
 
 ## Common `math.*` Coverage
 
