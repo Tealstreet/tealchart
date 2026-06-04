@@ -3,7 +3,12 @@
  * Mirrors TradingView's IChartingLibraryWidget for drop-in replacement
  */
 
-import type { DrawingOutput, PlotOutput, TealscriptRuntimeOptions } from '@tealstreet/tealscript';
+import type {
+  DrawingOutput,
+  IndicatorDeclarationMetadata,
+  PlotOutput,
+  TealscriptRuntimeOptions,
+} from '@tealstreet/tealscript';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { DirtyFlags } from './rendering/RenderScheduler';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
@@ -119,6 +124,7 @@ export class TealchartWidget {
   private _paneManager: PaneManager;
   // Map from study ID to indicator config (for pane lookup)
   private _indicatorConfigMap = new Map<string, BuiltinIndicator>();
+  private _indicatorDeclarationMap = new Map<string, IndicatorDeclarationMetadata>();
   // Auto-save timer ID
   private _autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
   // Throttled crosshair emission (50ms matches TradingView's throttle in useWidgetStateManagement)
@@ -259,6 +265,10 @@ export class TealchartWidget {
             }
           }
         },
+        onDeclarationDiscovered: (scriptId, declaration) => {
+          this._indicatorDeclarationMap.set(scriptId, declaration);
+          this._scheduler.markDirty(DIRTY.PLOTS);
+        },
         getRuntimeOptions: () => this._getTealscriptRuntimeOptions(),
       });
 
@@ -285,6 +295,7 @@ export class TealchartWidget {
         if (this._tealScriptManager) {
           this._tealScriptManager.removeScript(studyId);
         }
+        this._indicatorDeclarationMap.delete(studyId);
       });
     }
 
@@ -1124,7 +1135,13 @@ export class TealchartWidget {
       // Build indicator pane info
       const indicatorPaneInfo: Record<
         string,
-        { overlay: boolean; yAxisRange?: { min: number; max: number }; name?: string; inputs?: Record<string, unknown> }
+        {
+          overlay: boolean;
+          yAxisRange?: { min: number; max: number };
+          explicitPlotZOrder?: boolean;
+          name?: string;
+          inputs?: Record<string, unknown>;
+        }
       > = {};
       for (const [studyId, config] of this._indicatorConfigMap) {
         // For jailbreak indicators, get inputs from persisted state
@@ -1133,6 +1150,7 @@ export class TealchartWidget {
           indicatorPaneInfo[studyId] = {
             overlay: config.overlay,
             yAxisRange: config.yAxisRange,
+            explicitPlotZOrder: this._indicatorDeclarationMap.get(studyId)?.explicitPlotZOrder,
             name: config.name,
             inputs: persisted?.inputs ?? {},
           };
@@ -1142,6 +1160,7 @@ export class TealchartWidget {
           indicatorPaneInfo[studyId] = {
             overlay: config.overlay,
             yAxisRange: config.yAxisRange,
+            explicitPlotZOrder: this._indicatorDeclarationMap.get(studyId)?.explicitPlotZOrder,
             name: config.name,
             inputs,
           };
@@ -1499,6 +1518,7 @@ export class TealchartWidget {
     }
     this._studyInstanceMap.delete(indicatorId);
     this._indicatorConfigMap.delete(indicatorId);
+    this._indicatorDeclarationMap.delete(indicatorId);
 
     // Remove from pane manager
     this._paneManager.removeIndicator(indicatorId);
@@ -1519,6 +1539,7 @@ export class TealchartWidget {
     this._jailbreakManager?.unregister(instanceId);
     this._jailbreakInstanceIds.delete(instanceId);
     this._indicatorConfigMap.delete(instanceId);
+    this._indicatorDeclarationMap.delete(instanceId);
 
     // Remove from persisted settings
     const currentIndicators = this._chartStore.settings.get().indicators;

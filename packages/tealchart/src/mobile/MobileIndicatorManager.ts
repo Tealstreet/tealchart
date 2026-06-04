@@ -54,6 +54,7 @@ export interface IndicatorPaneInfo {
   name: string;
   overlay: boolean;
   yAxisRange?: { min: number; max: number };
+  explicitPlotZOrder?: boolean;
   inputs?: Record<string, unknown>;
 }
 
@@ -320,6 +321,7 @@ export class MobileIndicatorManager {
         name: activeInd.indicator.name,
         overlay: activeInd.indicator.overlay,
         yAxisRange: activeInd.indicator.yAxisRange,
+        explicitPlotZOrder: activeInd.declaration?.explicitPlotZOrder,
         inputs: activeInd.inputs,
       };
     }
