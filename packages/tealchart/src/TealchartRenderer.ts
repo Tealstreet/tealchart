@@ -2697,9 +2697,33 @@ export class TealchartRenderer {
         ctx.fillStyle = Array.isArray(plot.textColor) && plot.textColor[i] ? plot.textColor[i] as string : textColor;
         ctx.font = `${Math.max(10, markerSize * 1.5)}px sans-serif`;
         ctx.textAlign = 'center';
-        ctx.textBaseline = effectiveLocation === 'belowbar' ? 'top' : 'bottom';
-        ctx.fillText(plot.text, x, effectiveLocation === 'belowbar' ? y + markerSize : y - markerSize);
+        this.drawPlotMarkerText(
+          plot.text,
+          x,
+          effectiveLocation === 'belowbar' ? y + markerSize : y - markerSize,
+          markerSize,
+          effectiveLocation,
+        );
       }
+    }
+  }
+
+  private drawPlotMarkerText(text: string, x: number, y: number, markerSize: number, location: string): void {
+    const { ctx } = this;
+    const lines = text.split(/\r?\n/);
+    const lineHeight = Math.max(10, markerSize * 1.5);
+
+    if (location === 'belowbar') {
+      ctx.textBaseline = 'top';
+      for (let index = 0; index < lines.length; index++) {
+        ctx.fillText(lines[index], x, y + index * lineHeight);
+      }
+      return;
+    }
+
+    ctx.textBaseline = 'bottom';
+    for (let index = 0; index < lines.length; index++) {
+      ctx.fillText(lines[index], x, y - (lines.length - 1 - index) * lineHeight);
     }
   }
 

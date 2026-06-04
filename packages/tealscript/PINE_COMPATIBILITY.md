@@ -478,6 +478,8 @@ When `indicator(..., explicit_plot_zorder=true)` is set, renderer coverage
 preserves visual call order across plot, hline, and fill outputs.
 Renderer coverage also routes visual outputs with `force_overlay=true` back to
 the main pane when emitted by non-overlay scripts.
+Marker text rendering supports newline-separated labels on plotshape,
+plotchar, and plotarrow outputs.
 
 Hline renderer coverage applies Pine `hline()` color, linewidth, linestyle,
 display hiding, and pane-coordinate behavior for the current output shape.

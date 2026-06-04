@@ -1592,6 +1592,68 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(fillText).toHaveBeenCalledWith('Down', expect.any(Number), expect.any(Number));
     });
 
+    it('renders multi-line marker text away from the marker', () => {
+      const fillText = vi.fn();
+      const moveTo = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillText,
+        moveTo,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const above: PlotOutput = {
+        id: 'plotshape_Above',
+        type: 'plotshape',
+        title: 'Above',
+        values: [1, null],
+        color: ['#2196F3', null],
+        text: 'Sell\nNow',
+        textColor: '#FFEB3B',
+        location: 'abovebar',
+        shape: 'triangleup',
+        size: 'small',
+      };
+      const below: PlotOutput = {
+        ...above,
+        id: 'plotshape_Below',
+        title: 'Below',
+        values: [null, 1],
+        text: 'Buy\nNow',
+        location: 'belowbar',
+      };
+
+      (renderer as any).renderPlotShape(above, bars, viewport);
+      const aboveCalls = fillText.mock.calls.slice();
+      const aboveMarkerY = moveTo.mock.calls[0][1] + 3;
+      fillText.mockClear();
+      moveTo.mockClear();
+
+      (renderer as any).renderPlotShape(below, bars, viewport);
+      const belowCalls = fillText.mock.calls.slice();
+      const belowMarkerY = moveTo.mock.calls[0][1] + 3;
+
+      const sellCall = aboveCalls.find((call) => call[0] === 'Sell');
+      const sellNowCall = aboveCalls.find((call) => call[0] === 'Now');
+      const buyCall = belowCalls.find((call) => call[0] === 'Buy');
+      const buyNowCall = belowCalls.find((call) => call[0] === 'Now');
+
+      expect(sellCall).toBeDefined();
+      expect(sellNowCall).toBeDefined();
+      expect(sellCall![2]).toBeLessThan(aboveMarkerY);
+      expect(sellCall![2]).toBeLessThan(sellNowCall![2]);
+      expect(buyCall).toBeDefined();
+      expect(buyNowCall).toBeDefined();
+      expect(buyCall![2]).toBeGreaterThan(belowMarkerY);
+      expect(buyCall![2]).toBeLessThan(buyNowCall![2]);
+    });
+
     it('scales plotarrow markers between minHeight and maxHeight and skips zero values', () => {
       const fill = vi.fn();
       const ctx = {
