@@ -456,6 +456,20 @@ export class TealScriptDrawingRenderer {
       if (polyline.lineColor) {
         ctx.strokeStyle = polyline.lineColor;
         ctx.stroke();
+
+        if (polyline.lineStyle === 'arrow_left' || polyline.lineStyle === 'arrow_both') {
+          ctx.setLineDash([]);
+          this.drawLineArrowhead(points[0]!, points[1]!, Math.max(1, polyline.lineWidth), polyline.lineColor);
+        }
+        if (polyline.lineStyle === 'arrow_right' || polyline.lineStyle === 'arrow_both') {
+          ctx.setLineDash([]);
+          this.drawLineArrowhead(
+            points[points.length - 1]!,
+            points[points.length - 2]!,
+            Math.max(1, polyline.lineWidth),
+            polyline.lineColor,
+          );
+        }
       }
     }
 

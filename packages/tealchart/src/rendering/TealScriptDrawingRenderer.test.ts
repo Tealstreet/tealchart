@@ -450,6 +450,39 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events).toContain('stroke');
   });
 
+  it('renders Pine polyline arrow styles with endpoint arrowheads', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makePolyline({ lineStyle: 'arrow_both', lineWidth: 2 }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).toContain('moveTo:0,110');
+    expect(events).toContain('lineTo:60,60');
+    expect(events).toContain('lineTo:120,90');
+    expect(events.filter((event) => event === 'stroke')).toHaveLength(1);
+    expect(events.filter((event) => event === 'fill')).toHaveLength(2);
+    expect(events.filter((event) => event === 'closePath')).toHaveLength(2);
+  });
+
   it('renders curved polyline paths with quadratic segments', () => {
     const events: string[] = [];
     const renderer = new TealScriptDrawingRenderer({
