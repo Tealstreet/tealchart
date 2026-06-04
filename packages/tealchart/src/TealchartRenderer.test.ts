@@ -872,6 +872,89 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(fillColors).toEqual(['#2196F3', '#4CAF50']);
     });
 
+    it('bridges missing values in computed panes unless plot style is linebr', () => {
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const pane: ComputedPane = {
+        id: 'main',
+        type: 'main',
+        heightRatio: 1,
+        yMin: 80,
+        yMax: 140,
+        fixedRange: false,
+        top: 0,
+        height: 500,
+        bottom: 500,
+      };
+      const basePlot: PlotOutput = {
+        id: 'plot_PaneLineGaps',
+        type: 'plot',
+        title: 'PaneLineGaps',
+        values: [100, null, 120],
+        color: '#2196F3',
+      };
+      const bridgedStroke = vi.fn();
+      const bridgedRenderer = new TealchartRenderer({
+        ...createMockCtx(),
+        stroke: bridgedStroke,
+      }, { width: 800, height: 600, showVolume: false });
+      const linebrStroke = vi.fn();
+      const linebrRenderer = new TealchartRenderer({
+        ...createMockCtx(),
+        stroke: linebrStroke,
+      }, { width: 800, height: 600, showVolume: false });
+
+      (bridgedRenderer as any).renderPlotInPane({ ...basePlot, style: 'line' }, bars, viewport, pane);
+      (linebrRenderer as any).renderPlotInPane({ ...basePlot, style: 'linebr' }, bars, viewport, pane);
+
+      expect(bridgedStroke).toHaveBeenCalledTimes(1);
+      expect(linebrStroke).toHaveBeenCalledTimes(2);
+    });
+
+    it('bridges missing values in legacy indicator panes unless plot style is linebr', () => {
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const paneOffset = {
+        top: 10,
+        height: 200,
+        yMin: 0,
+        yMax: 100,
+      };
+      const basePlot: PlotOutput = {
+        id: 'plot_LegacyPaneLineGaps',
+        type: 'plot',
+        title: 'LegacyPaneLineGaps',
+        values: [25, null, 75],
+        color: '#2196F3',
+      };
+      const bridgedStroke = vi.fn();
+      const bridgedRenderer = new TealchartRenderer({
+        ...createMockCtx(),
+        stroke: bridgedStroke,
+      }, { width: 800, height: 600, showVolume: false });
+      const linebrStroke = vi.fn();
+      const linebrRenderer = new TealchartRenderer({
+        ...createMockCtx(),
+        stroke: linebrStroke,
+      }, { width: 800, height: 600, showVolume: false });
+
+      (bridgedRenderer as any).renderLinePlotInPane({ ...basePlot, style: 'line' }, bars, viewport, paneOffset);
+      (linebrRenderer as any).renderLinePlotInPane({ ...basePlot, style: 'linebr' }, bars, viewport, paneOffset);
+
+      expect(bridgedStroke).toHaveBeenCalledTimes(1);
+      expect(linebrStroke).toHaveBeenCalledTimes(2);
+    });
+
     it('falls back to the base color for joined point segments without per-bar colors', () => {
       const stroke = vi.fn();
       const ctx = {
@@ -1440,6 +1523,40 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(stroke).toHaveBeenCalled();
       expect(closePath).toHaveBeenCalledTimes(3);
       expect(fillColors).toEqual(['#2196F3', '#4CAF50', '#F44336']);
+    });
+
+    it('bridges missing values for default line plots but breaks linebr plots', () => {
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const basePlot: PlotOutput = {
+        id: 'plot_LineGaps',
+        type: 'plot',
+        title: 'Line gaps',
+        values: [95, null, 125],
+        color: '#2196F3',
+        linewidth: 2,
+      };
+      const bridgedStroke = vi.fn();
+      const bridgedRenderer = new TealchartRenderer({
+        ...createMockCtx(),
+        stroke: bridgedStroke,
+      }, { width: 800, height: 600, showVolume: false });
+      const linebrStroke = vi.fn();
+      const linebrRenderer = new TealchartRenderer({
+        ...createMockCtx(),
+        stroke: linebrStroke,
+      }, { width: 800, height: 600, showVolume: false });
+
+      (bridgedRenderer as any).renderLinePlot({ ...basePlot, style: 'line' }, bars, viewport);
+      (linebrRenderer as any).renderLinePlot({ ...basePlot, style: 'linebr' }, bars, viewport);
+
+      expect(bridgedStroke).toHaveBeenCalledTimes(1);
+      expect(linebrStroke).toHaveBeenCalledTimes(2);
     });
 
     it('draws Pine flag marker shapes with a pole and banner', () => {

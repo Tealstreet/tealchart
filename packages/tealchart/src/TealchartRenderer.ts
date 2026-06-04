@@ -1806,6 +1806,7 @@ export class TealchartRenderer {
     ctx.lineJoin = 'round';
 
     const isStepLine = style === 'stepline' || style === 'stepline_diamond';
+    const breaksOnNa = this.plotStyleBreaksOnNa(style);
 
     // Set line style
     if (isStepLine) {
@@ -1837,8 +1838,7 @@ export class TealchartRenderer {
 
       // Skip null/NaN values
       if (value === null || value === undefined || isNaN(value)) {
-        // Break the line if we were drawing
-        if (isDrawing) {
+        if (breaksOnNa && isDrawing) {
           ctx.stroke();
           ctx.beginPath();
           isDrawing = false;
@@ -1891,6 +1891,10 @@ export class TealchartRenderer {
     }
 
     ctx.setLineDash([]);
+  }
+
+  private plotStyleBreaksOnNa(style: PlotStyle): boolean {
+    return style === 'linebr';
   }
 
   private renderStepLineDiamondMarkers(
@@ -4080,7 +4084,7 @@ export class TealchartRenderer {
       if (plotTime < viewport.startTime || plotTime > viewport.endTime) continue;
 
       if (value === null || value === undefined || isNaN(value)) {
-        if (isDrawing) {
+        if (this.plotStyleBreaksOnNa(style) && isDrawing) {
           ctx.stroke();
           ctx.beginPath();
           isDrawing = false;
@@ -4767,7 +4771,7 @@ export class TealchartRenderer {
       }
 
       if (value === null || value === undefined || isNaN(value)) {
-        if (isDrawing) {
+        if (this.plotStyleBreaksOnNa(style) && isDrawing) {
           ctx.stroke();
           ctx.beginPath();
           isDrawing = false;

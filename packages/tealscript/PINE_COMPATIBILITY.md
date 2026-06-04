@@ -470,7 +470,8 @@ for dependent fills, and applies `histbase` baselines to histogram/columns and
 area plot rendering when supplied. Plot renderer coverage also draws
 `trackprice` lines at the latest finite rendered plot value, joins
 circle/cross plot markers when `join=true`, and paints
-`plot.style_stepline_diamond` markers on stepped plots.
+`plot.style_stepline_diamond` markers on stepped plots. Default line plots
+bridge `na` values, while `plot.style_linebr` preserves gaps.
 
 Hline renderer coverage applies Pine `hline()` color, linewidth, linestyle,
 display hiding, and pane-coordinate behavior for the current output shape.
