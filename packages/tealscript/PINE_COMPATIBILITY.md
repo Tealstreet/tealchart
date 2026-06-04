@@ -474,6 +474,8 @@ circle/cross plot markers when `join=true`, and paints
 bridge `na` values, while `plot.style_linebr` preserves gaps.
 Trackprice rendering also adds a right-axis value label for the latest rendered
 plot value.
+When `indicator(..., explicit_plot_zorder=true)` is set, renderer coverage
+preserves visual call order across plot, hline, and fill outputs.
 Renderer coverage also routes visual outputs with `force_overlay=true` back to
 the main pane when emitted by non-overlay scripts.
 
