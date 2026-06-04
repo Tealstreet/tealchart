@@ -9,6 +9,7 @@ import type {
   BoxDrawingOutput,
   ChartPoint,
   LabelDrawingOutput,
+  LineFillDrawingOutput,
   LineDrawingOutput,
   PolylineDrawingOutput,
   TableCellDrawingOutput,
@@ -89,6 +90,13 @@ function chartPointArrayValues(value: unknown): ChartPoint[] {
       ? value.values
       : [];
   return values.filter(isChartPoint).map(copyPoint);
+}
+
+function isSameLineFillPair(linefill: LineFillDrawingOutput, line1: string, line2: string): boolean {
+  return (
+    (linefill.line1 === line1 && linefill.line2 === line2)
+    || (linefill.line1 === line2 && linefill.line2 === line1)
+  );
 }
 
 function optionalString(runtime: DrawingBuiltinRuntime, value: unknown): string | undefined {
@@ -553,6 +561,12 @@ export function registerLineFillBuiltins(builtins: BuiltinRegistry, runtime: Dra
     }
 
     const id = `linefill_${callId}_${ctx.bar_index}`;
+    for (const existing of ctx.getDrawings()) {
+      if (existing.type === 'linefill' && isSameLineFillPair(existing, line1, line2)) {
+        ctx.deleteDrawing(existing.id);
+      }
+    }
+
     ctx.addDrawing({
       id,
       type: 'linefill',
