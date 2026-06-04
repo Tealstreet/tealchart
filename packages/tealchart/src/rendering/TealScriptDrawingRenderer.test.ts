@@ -374,6 +374,7 @@ describe('TealScriptDrawingRenderer', () => {
     renderer.render(
       partitionTealScriptDrawings([
         makePolyline({ curved: true }),
+        makePolyline({ id: 'polyline-2', curved: true, closed: true, fillColor: 'rgba(41, 98, 255, 0.18)' }),
       ]),
       bars,
       { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
@@ -383,6 +384,8 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events).toContain('moveTo:0,110');
     expect(events).toContain('quadraticCurveTo:60,60,120,90');
     expect(events).not.toContain('lineTo:60,60');
+    expect(events).toContain('closePath');
+    expect(events).toContain('fill');
     expect(events).toContain('stroke');
   });
 

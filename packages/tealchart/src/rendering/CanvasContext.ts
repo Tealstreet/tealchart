@@ -152,6 +152,7 @@ export function isCanvasContext(ctx: unknown): ctx is CanvasContext {
   const c = ctx as Record<string, unknown>;
   return (
     typeof c.beginPath === 'function' &&
+    typeof c.quadraticCurveTo === 'function' &&
     typeof c.fill === 'function' &&
     typeof c.stroke === 'function' &&
     typeof c.fillRect === 'function' &&
