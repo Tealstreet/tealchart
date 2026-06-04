@@ -1527,14 +1527,33 @@ describe('TealchartRenderer coordinate transforms', () => {
         zOrder: 2,
       };
 
-      renderer.renderPlots([plot, hline, fillPlot], bars, viewport, undefined, {
-        'script-1': { overlay: true, explicitPlotZOrder: true },
-      });
+      renderer.renderWithLayout(
+        bars,
+        viewport,
+        {
+          panes: [
+            {
+              id: 'main',
+              type: 'main',
+              heightRatio: 1,
+              yMin: viewport.priceMin,
+              yMax: viewport.priceMax,
+              fixedRange: false,
+            },
+          ],
+          timeAxisHeight: TIME_AXIS_HEIGHT,
+        },
+        undefined,
+        [plot, hline, fillPlot],
+        { 'script-1': { overlay: true, explicitPlotZOrder: true } },
+      );
 
-      const firstStroke = trace.findIndex((entry) => entry.startsWith('stroke:#2196F3'));
-      const firstFill = trace.findIndex((entry) => entry === 'fill:#4CAF5033');
-      expect(firstStroke).toBeGreaterThanOrEqual(0);
-      expect(firstFill).toBeGreaterThan(firstStroke);
+      const plotStroke = trace.findIndex((entry) => entry.startsWith('stroke:#2196F3'));
+      const hlineStroke = trace.findIndex((entry) => entry.startsWith('stroke:#787B86'));
+      const fillIndex = trace.findIndex((entry) => entry === 'fill:#4CAF5033');
+      expect(plotStroke).toBeGreaterThanOrEqual(0);
+      expect(hlineStroke).toBeGreaterThan(plotStroke);
+      expect(fillIndex).toBeGreaterThan(hlineStroke);
     });
   });
 

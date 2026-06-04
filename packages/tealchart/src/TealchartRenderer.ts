@@ -3619,13 +3619,26 @@ export class TealchartRenderer {
 
     // Draw overlay indicator plots (plots that share main pane Y-axis)
     if (plots && indicatorPaneInfo) {
+      const overlayPlotsByScript = new Map<string, PlotOutput[]>();
       for (const plot of plots) {
         const scriptId = plot.scriptId ?? 'unknown';
         const info = indicatorPaneInfo[scriptId];
         if (info?.overlay !== false) {
-          // This is an overlay - render it on the main pane
-          this.renderPlotInPane(plot, bars, viewport, pane, plotStyleOverrides);
+          const scriptPlots = overlayPlotsByScript.get(scriptId) ?? [];
+          scriptPlots.push(plot);
+          overlayPlotsByScript.set(scriptId, scriptPlots);
         }
+      }
+      for (const [scriptId, scriptPlots] of overlayPlotsByScript) {
+        this.renderPlotsInComputedPane(
+          scriptPlots,
+          scriptPlots,
+          bars,
+          viewport,
+          pane,
+          indicatorPaneInfo[scriptId]?.explicitPlotZOrder,
+          plotStyleOverrides,
+        );
       }
     }
 
@@ -3838,12 +3851,26 @@ export class TealchartRenderer {
       // Y ranges are now computed by AutoScaleManager and set via getUnifiedLayout()
       // before rendering. No inline auto-scale needed.
 
-      // Render each plot that belongs to this pane
+      const plotsByScript = new Map<string, PlotOutput[]>();
       for (const plot of plots) {
         const scriptId = plot.scriptId ?? 'unknown';
         if (pane.indicatorIds.includes(scriptId)) {
-          this.renderPlotInPane(plot, bars, viewport, pane, plotStyleOverrides);
+          const scriptPlots = plotsByScript.get(scriptId) ?? [];
+          scriptPlots.push(plot);
+          plotsByScript.set(scriptId, scriptPlots);
         }
+      }
+
+      for (const [scriptId, scriptPlots] of plotsByScript) {
+        this.renderPlotsInComputedPane(
+          scriptPlots,
+          scriptPlots,
+          bars,
+          viewport,
+          pane,
+          indicatorPaneInfo?.[scriptId]?.explicitPlotZOrder,
+          plotStyleOverrides,
+        );
       }
     }
 
@@ -4076,6 +4103,61 @@ export class TealchartRenderer {
   /**
    * Render a single plot within a pane (used for both main and indicator panes)
    */
+  private renderPlotsInComputedPane(
+    plots: PlotOutput[],
+    referencePlots: PlotOutput[],
+    bars: Bar[],
+    viewport: Viewport,
+    pane: ComputedPane,
+    explicitPlotZOrder = false,
+    plotStyleOverrides?: Map<string, PlotStyleOverride>,
+  ): void {
+    if (!explicitPlotZOrder) {
+      for (const plot of plots) {
+        if (plot.type === 'fill' && this.shouldRenderPlot(plot)) {
+          this.renderFill(plot, referencePlots, bars, viewport, (value) => this.valueToY(value, pane));
+        }
+      }
+    }
+
+    const orderedPlots = explicitPlotZOrder ? this.sortedByZOrder(plots) : plots;
+    for (const plot of orderedPlots) {
+      if (!this.shouldRenderPlot(plot)) continue;
+      if (plot.type === 'fill') {
+        if (explicitPlotZOrder) {
+          this.renderFill(plot, referencePlots, bars, viewport, (value) => this.valueToY(value, pane));
+        }
+        continue;
+      }
+      this.renderPlotInPane(plot, bars, viewport, pane, plotStyleOverrides);
+    }
+  }
+
+  private renderHlineInComputedPane(plot: PlotOutput, pane: ComputedPane): void {
+    const { ctx, options, margins } = this;
+
+    const price = plot.price;
+    if (price === undefined) return;
+
+    if (price < pane.yMin || price > pane.yMax) {
+      return;
+    }
+
+    const y = this.valueToY(price, pane);
+    const color = Array.isArray(plot.color) ? plot.color[0] || '#787B86' : plot.color || '#787B86';
+
+    ctx.strokeStyle = color;
+    ctx.lineWidth = plot.linewidth || 1;
+    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'dashed'));
+
+    ctx.beginPath();
+    ctx.moveTo(margins.left, y);
+    ctx.lineTo(options.width - margins.right, y);
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+  }
+
   private renderPlotInPane(
     plot: PlotOutput,
     bars: Bar[],
@@ -4091,6 +4173,11 @@ export class TealchartRenderer {
 
     if (plot.type === 'bgcolor') {
       this.renderBgcolorInRegion(plot, bars, viewport, pane.top, pane.height);
+      return;
+    }
+
+    if (plot.type === 'hline') {
+      this.renderHlineInComputedPane(plot, pane);
       return;
     }
 
