@@ -110,31 +110,34 @@ export class TealScriptDrawingRenderer {
         ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
       }
 
-      ctx.strokeStyle = box.borderColor ?? '#2962FF';
-      ctx.lineWidth = Math.max(1, box.borderWidth);
-      if (box.borderStyle === 'dashed') {
-        ctx.setLineDash([6, 4]);
-      } else if (box.borderStyle === 'dotted') {
-        ctx.setLineDash([2, 4]);
-      } else {
-        ctx.setLineDash([]);
+      if (box.borderColor) {
+        ctx.strokeStyle = box.borderColor;
+        ctx.lineWidth = Math.max(1, box.borderWidth);
+        if (box.borderStyle === 'dashed') {
+          ctx.setLineDash([6, 4]);
+        } else if (box.borderStyle === 'dotted') {
+          ctx.setLineDash([2, 4]);
+        } else {
+          ctx.setLineDash([]);
+        }
+        ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
       }
-      ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
 
       if (box.text) {
         ctx.setLineDash([]);
-        ctx.fillStyle = box.textColor ?? '#FFFFFF';
         const fontSize = this.fontSizeForDrawing(box.textSize);
         const font = this.fontForDrawing(box.textSize, box.textFontFamily, box.textFormatting);
         ctx.font = font;
-        if (box.textWrap === 'auto') {
+        if (box.textColor && box.textWrap === 'auto') {
+          ctx.fillStyle = box.textColor;
           const textLayout = this.resolveWrappedBoxTextLayout(box, rect, fontSize, font);
           ctx.textAlign = textLayout.align;
           ctx.textBaseline = 'top';
           for (let index = 0; index < textLayout.lines.length; index++) {
             ctx.fillText(textLayout.lines[index]!, textLayout.x, textLayout.y + index * textLayout.lineHeight);
           }
-        } else {
+        } else if (box.textColor) {
+          ctx.fillStyle = box.textColor;
           const textLines = this.splitDrawingTextLines(box.text);
           const lineHeight = Math.ceil(fontSize * 1.25);
           const textPosition = this.resolveBoxTextPosition(box, rect);
@@ -346,8 +349,9 @@ export class TealScriptDrawingRenderer {
         this.coordinateResolvers,
       );
       if (!extended) continue;
+      if (!line.color) continue;
 
-      ctx.strokeStyle = line.color ?? '#2962FF';
+      ctx.strokeStyle = line.color;
       ctx.lineWidth = Math.max(1, line.width);
       if (line.style === 'dashed') {
         ctx.setLineDash([6, 4]);
@@ -363,11 +367,11 @@ export class TealScriptDrawingRenderer {
 
       if (line.style === 'arrow_left' || line.style === 'arrow_both') {
         ctx.setLineDash([]);
-        this.drawLineArrowhead(extended.start, extended.end, Math.max(1, line.width), line.color ?? '#2962FF');
+        this.drawLineArrowhead(extended.start, extended.end, Math.max(1, line.width), line.color);
       }
       if (line.style === 'arrow_right' || line.style === 'arrow_both') {
         ctx.setLineDash([]);
-        this.drawLineArrowhead(extended.end, extended.start, Math.max(1, line.width), line.color ?? '#2962FF');
+        this.drawLineArrowhead(extended.end, extended.start, Math.max(1, line.width), line.color);
       }
     }
 
@@ -430,7 +434,6 @@ export class TealScriptDrawingRenderer {
       );
       if (points.length < 2) continue;
 
-      ctx.strokeStyle = polyline.lineColor ?? '#2962FF';
       ctx.lineWidth = Math.max(1, polyline.lineWidth);
       if (polyline.lineStyle === 'dashed') {
         ctx.setLineDash([6, 4]);
@@ -449,7 +452,10 @@ export class TealScriptDrawingRenderer {
           ctx.fill();
         }
       }
-      ctx.stroke();
+      if (polyline.lineColor) {
+        ctx.strokeStyle = polyline.lineColor;
+        ctx.stroke();
+      }
     }
 
     ctx.setLineDash([]);

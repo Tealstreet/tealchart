@@ -113,7 +113,7 @@ function makeBox(overrides: Partial<BoxDrawingOutput> = {}): BoxDrawingOutput {
     borderStyle: 'solid',
     bgcolor: null,
     text: '',
-    textColor: null,
+    textColor: '#363A45',
     textSize: 'normal',
     ...overrides,
   };
@@ -453,6 +453,38 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events).toContain('closePath');
     expect(events).toContain('fill');
     expect(events).toContain('stroke');
+  });
+
+  it('does not draw line, box, or polyline strokes for explicit null colors', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeLine('line-null', { color: null }),
+        makeBox({ borderColor: null, bgcolor: null, text: 'Hidden', textColor: null }),
+        makePolyline({ lineColor: null, fillColor: null }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).not.toContain('stroke');
+    expect(events).not.toContain('strokeRect:0,30,120,100');
+    expect(events.some((event) => event.startsWith('fillText:Hidden:'))).toBe(false);
   });
 
   it('renders Pine label pointer styles instead of plain rounded pills', () => {
