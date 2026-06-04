@@ -15,6 +15,7 @@ export interface LabelDrawingOutput {
   color: string | null;
   textColor: string | null;
   size: string;
+  textAlign?: string;
   tooltip?: string;
   forceOverlay?: boolean;
 }

@@ -2773,6 +2773,7 @@ label.set_style(id=marker, label.style_label_down)
 label.set_color(marker, color=color.blue)
 label.set_textcolor(id=marker, color.white)
 label.set_size(marker, size=size.small)
+label.set_textalign(id=marker, "right")
 label.set_tooltip(id=marker, "tip")
 x = label.get_x(id=marker)
 y = label.get_y(marker)
@@ -2856,6 +2857,8 @@ marker = label.new(bar_index, close)
 unknownSetter = label.set_text(marker, text="bad", caption="Bad")
 missingSetter = label.set_xy(id=marker, x=bar_index)
 duplicateSetter = label.set_color(marker, color.blue, id=marker)
+missingTextAlign = label.set_textalign(id=marker)
+duplicateTextAlign = label.set_textalign(marker, "right", id=marker)
 tooManyGetter = label.get_x(marker, marker)
 missingCopy = label.copy()
 unknownGetter = label.get_text(marker, format="raw")
@@ -2866,6 +2869,9 @@ unknownGetter = label.get_text(marker, format="raw")
       'label.set_xy() expects at least 3 arguments',
       "label.set_xy() missing required argument 'y'",
       "Argument 'id' for label.set_color() was supplied multiple times",
+      'label.set_textalign() expects at least 2 arguments',
+      "label.set_textalign() missing required argument 'textalign'",
+      "Argument 'id' for label.set_textalign() was supplied multiple times",
       'label.get_x() expects at most 1 argument',
       'label.copy() expects at least 1 argument',
       "label.copy() missing required argument 'id'",
