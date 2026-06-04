@@ -503,7 +503,7 @@ export class TealScriptDrawingRenderer {
       const text = label.text ?? '';
       const paddingX = 8;
       const height = 22;
-      const font = `${this.fontSizeForDrawing(label.size)}px ${this.font}`;
+      const font = this.fontForDrawing(label.size, label.textFontFamily, label.textFormatting);
       ctx.font = font;
       const width = Math.max(18, this.getTextWidth(ctx, text, font) + paddingX * 2);
       const fillColor = label.color ?? '#1f2937';

@@ -102,6 +102,37 @@ plot(close)`;
       ]);
     });
 
+    it('preserves legacy positional label force_overlay slot', () => {
+      const script = `//@version=6
+indicator("Legacy Label Force Overlay")
+label.new(bar_index, close, "legacy", xloc.bar_index, yloc.price, color.red, label.style_label_left, color.white, size.normal, text.align_center, "tip", true)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'label_label.new_0_0',
+          type: 'label',
+          barIndex: 0,
+          x: 0,
+          y: 100.2,
+          text: 'legacy',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_left',
+          color: '#F44336',
+          textColor: '#FFFFFF',
+          size: 'normal',
+          textAlign: 'center',
+          tooltip: 'tip',
+          forceOverlay: true,
+        },
+      ]);
+    });
+
     it('mutates, reads, copies, and deletes label drawings by handle', () => {
       const script = `//@version=6
 indicator("Label mutators")
@@ -114,6 +145,8 @@ if barstate.islast
     label.set_textcolor(anchor, color.black)
     label.set_size(anchor, size.large)
     label.set_textalign(anchor, text.align_right)
+    label.set_text_font_family(anchor, font.family_monospace)
+    label.set_text_formatting(anchor, text.format_bold + text.format_italic)
     label.set_tooltip(anchor, "updated")
     clone = label.copy(anchor)
     label.set_text(clone, "copy")
@@ -142,6 +175,8 @@ plot(label.get_y(anchor), title="Label Y")`;
           textColor: '#000000',
           size: 'large',
           textAlign: 'right',
+          textFontFamily: 'monospace',
+          textFormatting: 'bolditalic',
           tooltip: 'updated',
         },
       ]);
@@ -193,7 +228,7 @@ plot(label.get_x(marker), title="Label X")`;
       const script = `//@version=6
 indicator("Label getter coverage")
 var marker = label.new(0, close, text="seed")
-var yonly = label.new(1, close, text="y", textalign=text.align_left)
+var yonly = label.new(1, close, text="y", textalign=text.align_left, text_font_family=font.family_monospace, text_formatting=text.format_bold)
 if barstate.islast
     label.set_x(marker, bar_index + 3)
     label.set_y(marker, high)
@@ -247,6 +282,8 @@ plot(label.get_y(marker), title="Label Y")`;
           textColor: null,
           size: 'normal',
           textAlign: 'left',
+          textFontFamily: 'monospace',
+          textFormatting: 'bold',
           tooltip: undefined,
         },
         {

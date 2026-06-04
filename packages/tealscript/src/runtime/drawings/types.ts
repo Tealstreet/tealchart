@@ -16,6 +16,8 @@ export interface LabelDrawingOutput {
   textColor: string | null;
   size: string;
   textAlign?: string;
+  textFontFamily?: string;
+  textFormatting?: string;
   tooltip?: string;
   forceOverlay?: boolean;
 }
