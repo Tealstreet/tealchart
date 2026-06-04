@@ -56,6 +56,9 @@ export interface CanvasContext {
   /** Draw a line to a point */
   lineTo(x: number, y: number): void;
 
+  /** Draw a quadratic curve to a point */
+  quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void;
+
   /** Draw an arc/circle */
   arc(
     x: number,
@@ -149,6 +152,7 @@ export function isCanvasContext(ctx: unknown): ctx is CanvasContext {
   const c = ctx as Record<string, unknown>;
   return (
     typeof c.beginPath === 'function' &&
+    typeof c.quadraticCurveTo === 'function' &&
     typeof c.fill === 'function' &&
     typeof c.stroke === 'function' &&
     typeof c.fillRect === 'function' &&
