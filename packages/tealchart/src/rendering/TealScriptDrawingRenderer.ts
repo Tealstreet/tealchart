@@ -135,10 +135,12 @@ export class TealScriptDrawingRenderer {
             ctx.fillText(textLayout.lines[index]!, textLayout.x, textLayout.y + index * textLayout.lineHeight);
           }
         } else {
+          const textLines = this.splitDrawingTextLines(box.text);
+          const lineHeight = Math.ceil(fontSize * 1.25);
           const textPosition = this.resolveBoxTextPosition(box, rect);
           ctx.textAlign = textPosition.align;
           ctx.textBaseline = textPosition.baseline;
-          ctx.fillText(box.text, textPosition.x, textPosition.y);
+          this.drawAlignedTextLines(textLines, textPosition, lineHeight);
         }
       }
     }
@@ -805,7 +807,7 @@ export class TealScriptDrawingRenderer {
             ctx.font = this.fontForDrawing(cell.textSize, cell.textFontFamily, cell.textFormatting);
             ctx.textAlign = textPosition.align;
             ctx.textBaseline = textPosition.baseline;
-            this.drawTableCellTextLines(textLines, textPosition, lineHeight);
+            this.drawAlignedTextLines(textLines, textPosition, lineHeight);
           }
         }
       }
@@ -978,7 +980,7 @@ export class TealScriptDrawingRenderer {
     return { x: textX, y: textY, align, baseline };
   }
 
-  private drawTableCellTextLines(
+  private drawAlignedTextLines(
     lines: string[],
     position: { x: number; y: number; align: CanvasTextAlign; baseline: CanvasTextBaseline },
     lineHeight: number,
