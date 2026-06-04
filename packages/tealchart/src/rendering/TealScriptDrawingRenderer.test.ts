@@ -524,6 +524,53 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events).toContain('fillText:ATR:88,29');
   });
 
+  it('interprets explicit table cell sizes as pane percentages', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 200, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 20, right: 20 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeTable({
+          position: 'middle_center',
+          cells: [
+            {
+              column: 0,
+              row: 0,
+              text: 'Sized',
+              width: 25,
+              height: 10,
+              textColor: '#ffffff',
+              textSize: 'normal',
+              textHalign: 'right',
+              textValign: 'bottom',
+              bgcolor: '#111827',
+            },
+          ],
+        }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).toContain('fillRect:80,100,40,20');
+    expect(events).toContain('strokeRect:80,100,40,20');
+    expect(events).toContain('fillTextStyle:right,bottom');
+    expect(events).toContain('fillText:Sized:114,114');
+  });
+
   it('renders merged table cells as a single span', () => {
     const events: string[] = [];
     const renderer = new TealScriptDrawingRenderer({

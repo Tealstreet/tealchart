@@ -709,12 +709,12 @@ bold/italic text formatting, and tooltips. Table lifecycle helpers and setters a
 Pine-style named `table_id`, coordinate, and value arguments where those
 parameters exist. Semantic analysis preserves `table.new()` handle return types
 and `table.all` handle-array element types for downstream diagnostics. Rendering
-lays out fixed tables in the script pane with measured cell sizes, merged cell
-spans, cell backgrounds, borders, frame borders, text alignment, default/monospace
-font-family metadata, and bold/italic font styling. Runtime coverage also
+lays out fixed tables in the script pane with measured automatic cell sizes,
+percentage-based explicit cell sizes, merged cell spans, cell backgrounds,
+borders, frame borders, text alignment, default/monospace font-family metadata,
+and bold/italic font styling. Runtime coverage also
 guards persistent table handles and transient polylines across realtime
-rollback. Remaining gaps are the full Pine table setter surface and
-TradingView-exact sizing.
+rollback. Remaining gaps are TradingView-exact sizing and pixel parity.
 
 ## Strategy Diagnostic Coverage
 
