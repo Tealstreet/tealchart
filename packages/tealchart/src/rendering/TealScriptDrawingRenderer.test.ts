@@ -424,6 +424,35 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events.some((event) => event.startsWith('fillText:Upper:'))).toBe(true);
   });
 
+  it('renders label text using stored text alignment', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeLabel({ text: 'Align', textAlign: 'right' }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).toContain('fillTextStyle:right,middle');
+    expect(events).toContain('fillText:Align:108,40');
+  });
+
   it('renders Pine symbol label styles and keeps style_none text-only', () => {
     const events: string[] = [];
     const renderer = new TealScriptDrawingRenderer({

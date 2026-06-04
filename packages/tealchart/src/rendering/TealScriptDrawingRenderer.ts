@@ -509,7 +509,7 @@ export class TealScriptDrawingRenderer {
       const fillColor = label.color ?? '#1f2937';
       const textColor = label.textColor ?? '#FFFFFF';
 
-      const layout = this.resolveLabelLayout(label.style, position, width, height, margins.left, options.width - margins.right, pane);
+      const layout = this.resolveLabelLayout(label.style, label.textAlign, position, width, height, margins.left, options.width - margins.right, pane);
 
       if (label.style !== 'none') {
         ctx.fillStyle = fillColor;
@@ -526,6 +526,7 @@ export class TealScriptDrawingRenderer {
 
   private resolveLabelLayout(
     style: string,
+    textAlign: string | undefined,
     anchor: { x: number; y: number },
     width: number,
     height: number,
@@ -574,10 +575,22 @@ export class TealScriptDrawingRenderer {
       bodyY,
       bodyWidth,
       bodyHeight: height,
-      textX: style === 'none' ? anchor.x : bodyX + paddingX,
+      textX: this.resolveLabelTextX(textAlign, style === 'none' ? anchor.x : bodyX, style === 'none' ? 0 : bodyWidth, paddingX),
       textY: style === 'none' ? anchor.y : bodyY + height / 2,
-      textAlign: 'left',
+      textAlign: this.canvasTextAlignForDrawing(textAlign),
     };
+  }
+
+  private canvasTextAlignForDrawing(textAlign: string | undefined): CanvasTextAlign {
+    if (textAlign === 'right') return 'right';
+    if (textAlign === 'left') return 'left';
+    return 'center';
+  }
+
+  private resolveLabelTextX(textAlign: string | undefined, x: number, width: number, padding: number): number {
+    if (textAlign === 'right') return x + Math.max(0, width - padding);
+    if (textAlign === 'left') return x + padding;
+    return x + width / 2;
   }
 
   private isSymbolLabelStyle(style: string): boolean {

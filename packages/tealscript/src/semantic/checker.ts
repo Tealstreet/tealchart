@@ -541,6 +541,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['label.set_color', { params: ['id', 'color'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['label.set_textcolor', { params: ['id', 'textcolor'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['label.set_size', { params: ['id', 'size'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['label.set_textalign', { params: ['id', 'textalign'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['label.set_tooltip', { params: ['id', 'tooltip'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['label.get_x', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['label.get_y', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
