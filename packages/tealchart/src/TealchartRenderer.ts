@@ -1898,12 +1898,14 @@ export class TealchartRenderer {
     bars: Bar[],
     viewport: Viewport,
     valueToY: (value: number) => number,
+    markerOptions?: { color?: string; linewidth?: number },
   ): void {
     const { ctx, options, margins } = this;
     const chartWidth = options.width - margins.left;
     const { values, color, linewidth = 1 } = plot;
-    const baseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
-    const markerSize = Math.max(3, linewidth * 2);
+    const baseColor = markerOptions?.color ?? (Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3');
+    const markerLinewidth = markerOptions?.linewidth ?? linewidth;
+    const markerSize = Math.max(3, markerLinewidth * 2);
 
     for (let i = 0; i < bars.length && i < values.length; i++) {
       const value = values[i];
@@ -1913,12 +1915,12 @@ export class TealchartRenderer {
       if (plotTime < viewport.startTime || plotTime > viewport.endTime) continue;
       if (value === null || value === undefined || isNaN(value)) continue;
 
-      const markerColor = Array.isArray(color) && color[i] ? color[i] : baseColor;
+      const markerColor = markerOptions?.color === undefined && Array.isArray(color) && color[i] ? color[i] : baseColor;
       if (!markerColor) continue;
 
       ctx.fillStyle = markerColor as string;
       ctx.strokeStyle = markerColor as string;
-      ctx.lineWidth = linewidth;
+      ctx.lineWidth = markerLinewidth;
       this.drawShape(this.timeToX(plotTime, viewport, chartWidth), valueToY(value), 'diamond', markerSize);
     }
   }
@@ -4130,6 +4132,13 @@ export class TealchartRenderer {
       ctx.stroke();
     }
 
+    if (style === 'stepline_diamond') {
+      this.renderStepLineDiamondMarkers(plot, bars, viewport, (value) => this.valueToY(value, pane), {
+        color: override?.color ? renderColor : undefined,
+        linewidth: effectiveLinewidth,
+      });
+    }
+
     this.renderPlotTrackPriceInComputedPane(plot, bars, viewport, pane);
 
     // Reset line dash
@@ -4796,6 +4805,10 @@ export class TealchartRenderer {
 
     if (isDrawing) {
       ctx.stroke();
+    }
+
+    if (style === 'stepline_diamond') {
+      this.renderStepLineDiamondMarkers(plot, bars, viewport, (value) => this.valueToPaneY(value, paneOffset));
     }
 
     ctx.setLineDash([]);
