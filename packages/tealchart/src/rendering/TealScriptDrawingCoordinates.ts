@@ -188,7 +188,7 @@ export function resolveLabelDrawingPosition(
     const xValue = label.x ?? barIndex;
     const xIndex = Number.isFinite(xValue) ? Math.trunc(xValue) : barIndex;
     anchorIndex = xIndex;
-    time = xIndex >= 0 && xIndex < bars.length ? bars[xIndex].time : undefined;
+    time = barIndexToTime(xIndex, bars) ?? undefined;
   }
 
   const bar = anchorIndex >= 0 && anchorIndex < bars.length ? bars[anchorIndex] : undefined;
