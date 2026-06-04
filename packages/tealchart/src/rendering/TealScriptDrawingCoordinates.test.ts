@@ -204,6 +204,50 @@ describe('TealScript drawing coordinates', () => {
     expect(finiteTime).toEqual({ x: 50, y: 40 });
   });
 
+  it('uses the timestamp candle for bar_time abovebar and belowbar labels', () => {
+    const above = resolveLabelDrawingPosition(
+      makeLabel({ barIndex: 2, xloc: 'bar_time', x: 1_000, yloc: 'abovebar' }),
+      bars,
+      viewport,
+      pane,
+      100,
+      resolvers,
+    );
+    const below = resolveLabelDrawingPosition(
+      makeLabel({ barIndex: 2, xloc: 'bar_time', x: 1_000, yloc: 'belowbar' }),
+      bars,
+      viewport,
+      pane,
+      100,
+      resolvers,
+    );
+
+    expect(above).toEqual({ x: 0, y: 54 });
+    expect(below).toEqual({ x: 0, y: 136 });
+  });
+
+  it('requires a real timestamp candle for bar_time abovebar and belowbar labels', () => {
+    const above = resolveLabelDrawingPosition(
+      makeLabel({ barIndex: 1, xloc: 'bar_time', x: 1_500, yloc: 'abovebar' }),
+      bars,
+      viewport,
+      pane,
+      100,
+      resolvers,
+    );
+    const below = resolveLabelDrawingPosition(
+      makeLabel({ barIndex: 1, xloc: 'bar_time', x: 1_500, yloc: 'belowbar' }),
+      bars,
+      viewport,
+      pane,
+      100,
+      resolvers,
+    );
+
+    expect(above).toBeNull();
+    expect(below).toBeNull();
+  });
+
   it('uses candle anchors for abovebar and belowbar labels', () => {
     const above = resolveLabelDrawingPosition(makeLabel({ yloc: 'abovebar' }), bars, viewport, pane, 100, resolvers);
     const below = resolveLabelDrawingPosition(makeLabel({ yloc: 'belowbar' }), bars, viewport, pane, 100, resolvers);
