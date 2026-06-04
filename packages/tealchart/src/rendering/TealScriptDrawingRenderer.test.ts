@@ -457,6 +457,43 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events).toContain('fillText:Bare:60,40');
   });
 
+  it('renders multiline label text with expanded body bounds', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeLabel({ text: 'Entry\nStop' }),
+        makeLabel({ id: 'label-2', style: 'none', text: 'Bare\nText', textAlign: 'left' }),
+        makeLabel({ id: 'label-3', style: 'square', text: 'Icon\nText' }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).toContain('roundRect:60,21,56,38');
+    expect(events).toContain('fillTextStyle:center,middle');
+    expect(events).toContain('fillText:Entry:88,32.5');
+    expect(events).toContain('fillText:Stop:88,47.5');
+    expect(events.filter((event) => event === 'fillText:Bare:60,32.5')).toHaveLength(1);
+    expect(events.filter((event) => event === 'fillText:Text:60,47.5')).toHaveLength(1);
+    expect(events).toContain('rect:49,29,22,22');
+    expect(events).toContain('fillText:Icon:79,32.5');
+  });
+
   it('renders Pine symbol label styles and keeps style_none text-only', () => {
     const events: string[] = [];
     const renderer = new TealScriptDrawingRenderer({
