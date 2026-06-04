@@ -1,8 +1,9 @@
 import type { BoxDrawingOutput, LabelDrawingOutput, LineDrawingOutput } from '@tealstreet/tealscript';
 import type { Bar, ComputedPane, Viewport } from '../types';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import {
   barIndexToTime,
   resolveBoxDrawingRect,
@@ -10,6 +11,10 @@ import {
   resolveLabelDrawingPosition,
   resolveLineDrawingSegment,
 } from './TealScriptDrawingCoordinates';
+
+afterEach(() => {
+  clearChartStoreCache();
+});
 
 const bars: Bar[] = [
   { time: 1_000, open: 10, high: 15, low: 8, close: 12, volume: 100 },
@@ -140,6 +145,41 @@ describe('TealScript drawing coordinates', () => {
     const position = resolveLabelDrawingPosition(makeLabel(), bars, viewport, pane, 100, resolvers);
 
     expect(position).toEqual({ x: 50, y: 40 });
+  });
+
+  it('projects price labels at future bar_index positions', () => {
+    const projected = resolveLabelDrawingPosition(
+      makeLabel({ x: 4, y: 12 }),
+      bars,
+      { ...viewport, endTime: 5_000 },
+      pane,
+      100,
+      resolvers,
+    );
+
+    expect(projected).toEqual({ x: 100, y: 90 });
+  });
+
+  it('requires a real candle for projected abovebar and belowbar labels', () => {
+    const above = resolveLabelDrawingPosition(
+      makeLabel({ x: 4, yloc: 'abovebar' }),
+      bars,
+      { ...viewport, endTime: 5_000 },
+      pane,
+      100,
+      resolvers,
+    );
+    const below = resolveLabelDrawingPosition(
+      makeLabel({ x: 4, yloc: 'belowbar' }),
+      bars,
+      { ...viewport, endTime: 5_000 },
+      pane,
+      100,
+      resolvers,
+    );
+
+    expect(above).toBeNull();
+    expect(below).toBeNull();
   });
 
   it('requires an explicit finite timestamp for bar_time labels', () => {
