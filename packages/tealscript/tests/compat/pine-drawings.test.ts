@@ -321,6 +321,7 @@ if barstate.islast
     box.set_text_valign(id=zone, text_valign=text.align_bottom)
     box.set_text_wrap(id=zone, text_wrap=text.wrap_auto)
     box.set_text_font_family(id=zone, text_font_family=font.family_monospace)
+    box.set_text_formatting(id=zone, text_formatting=text.format_bold + text.format_italic)
 plot(box.get_left(id=zone), title="Named Box Left")
 plot(box.get_bottom(id=zone), title="Named Box Bottom")
 plot(box.get_text(id=zone) == "Named zone", title="Named Box Text")
@@ -352,6 +353,7 @@ plot(box.get_text_valign(id=zone) == "bottom", title="Named Box VAlign")
         textValign: 'bottom',
         textWrap: 'auto',
         textFontFamily: 'monospace',
+        textFormatting: 'bolditalic',
       },
     ]);
     expect(getPlot(result, 'Named Box Left').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 8]);

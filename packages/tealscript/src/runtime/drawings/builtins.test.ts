@@ -556,6 +556,7 @@ if barstate.islast
     box.set_text(zone, "last")
     box.set_text_color(zone, color.black)
     box.set_text_size(zone, size.large)
+    box.set_text_formatting(zone, text.format_bold + text.format_italic)
     clone = box.copy(zone)
     box.set_text(clone, "copy")
     box.delete(clone)
@@ -588,6 +589,7 @@ if barstate.islast
           text: 'last',
           textColor: '#000000',
           textSize: 'large',
+          textFormatting: 'bolditalic',
         },
         {
           id: 'label_label.new_0_2',
@@ -743,7 +745,7 @@ plot(box.get_bottom(zone), title="Box Bottom")`;
     it('maps positional box text_size before text_color', () => {
       const script = `//@version=6
 indicator("Box positional args")
-box.new(0, high, 1, low, color.red, 1, line.style_solid, extend.none, xloc.bar_index, color.green, "txt", size.large, color.black)
+box.new(0, high, 1, low, color.red, 1, line.style_solid, extend.none, xloc.bar_index, color.green, "txt", size.large, color.black, text.align_center, text.align_middle, text.wrap_none, font.family_monospace, false, text.format_bold)
 plot(close)`;
 
       const ast = parse(script);
@@ -756,6 +758,11 @@ plot(close)`;
         text: 'txt',
         textSize: 'large',
         textColor: '#000000',
+        textHalign: 'center',
+        textValign: 'middle',
+        textWrap: 'none',
+        textFontFamily: 'monospace',
+        textFormatting: 'bold',
       });
     });
 
@@ -763,11 +770,12 @@ plot(close)`;
       const script = `//@version=6
 indicator("Drawing layout", overlay=false)
 label.new(bar_index, close, text="forced", force_overlay=true)
-zone = box.new(0, high, 1, low, text="seed", text_halign=text.align_center, text_valign=text.align_middle, text_wrap=text.wrap_auto, text_font_family=font.family_monospace, force_overlay=true)
+zone = box.new(0, high, 1, low, text="seed", text_halign=text.align_center, text_valign=text.align_middle, text_wrap=text.wrap_auto, text_font_family=font.family_monospace, force_overlay=true, text_formatting=text.format_bold)
 box.set_text_halign(zone, text.align_right)
 box.set_text_valign(zone, text.align_bottom)
 box.set_text_wrap(zone, text.wrap_none)
 box.set_text_font_family(zone, font.family_default)
+box.set_text_formatting(zone, text.format_italic)
 label.new(na, na, text=str.format("{0}|{1}", box.get_text_halign(zone), box.get_text_valign(zone)))
 plot(close)`;
 
@@ -788,6 +796,7 @@ plot(close)`;
         textValign: 'bottom',
         textWrap: 'none',
         textFontFamily: 'default',
+        textFormatting: 'italic',
         forceOverlay: true,
       });
       expect(result.drawings[2]).toMatchObject({

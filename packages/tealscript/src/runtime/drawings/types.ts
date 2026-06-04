@@ -77,6 +77,7 @@ export interface BoxDrawingOutput {
   textValign?: string;
   textWrap?: string;
   textFontFamily?: string;
+  textFormatting?: string;
   forceOverlay?: boolean;
 }
 
