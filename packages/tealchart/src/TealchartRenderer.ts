@@ -1722,45 +1722,19 @@ export class TealchartRenderer {
       const isOverlay = info?.overlay !== false; // Default to overlay if unknown
 
       if (isOverlay || !paneLayout || paneLayout.indicatorPanes.length === 0) {
-        // Render on main pane (existing behavior)
-        for (const plot of scriptPlots) {
-          if (plot.type === 'fill' && this.shouldRenderPlot(plot)) {
-            this.renderFill(plot, scriptPlots, bars, viewport, (value, paneHeight) => this.priceToY(value, viewport, paneHeight));
-          }
-        }
-
-        for (const plot of scriptPlots) {
-          if (!this.shouldRenderPlot(plot)) continue;
-
-          switch (plot.type) {
-            case 'plot':
-              this.renderLinePlot(plot, bars, viewport);
-              this.renderPlotTrackPriceInMainPane(plot, bars, viewport);
-              break;
-            case 'plotbar':
-            case 'plotcandle':
-              this.renderOhlcPlotInLegacyMainPane(plot, bars, viewport);
-              break;
-            case 'hline':
-              this.renderHline(plot, viewport);
-              break;
-            case 'bgcolor':
-              this.renderBgcolor(plot, bars, viewport);
-              break;
-            case 'plotshape':
-            case 'plotchar':
-            case 'plotarrow':
-              this.renderPlotShape(plot, bars, viewport);
-              break;
-            case 'fill':
-              break;
-          }
-        }
+        this.renderPlotsInMainPane(scriptPlots, bars, viewport);
       } else {
+        const forceOverlayPlots = scriptPlots.filter((plot) => plot.forceOverlay);
+        if (forceOverlayPlots.length > 0) {
+          this.renderPlotsInMainPane(forceOverlayPlots, bars, viewport);
+        }
+
+        const panePlots = scriptPlots.filter((plot) => !plot.forceOverlay);
+
         // Find the pane for this indicator
         const pane = paneLayout.indicatorPanes.find((p) => p.indicatorIds.includes(scriptId));
 
-        if (pane) {
+        if (pane && panePlots.length > 0) {
           const paneOffset = paneOffsets.get(pane.id);
           if (paneOffset) {
             // Y ranges are now computed by AutoScaleManager in TealchartWidget
@@ -1770,13 +1744,51 @@ export class TealchartRenderer {
             this.renderIndicatorPane(pane, paneOffset, viewport);
 
             // Render plots in this pane
-            this.renderPlotsInPane(scriptPlots, bars, viewport, paneOffset);
+            this.renderPlotsInPane(panePlots, bars, viewport, paneOffset);
           }
         }
       }
     }
 
     ctx.restore();
+  }
+
+  private renderPlotsInMainPane(scriptPlots: PlotOutput[], bars: Bar[], viewport: Viewport): void {
+    for (const plot of scriptPlots) {
+      if (plot.type === 'fill' && this.shouldRenderPlot(plot)) {
+        this.renderFill(plot, scriptPlots, bars, viewport, (value, paneHeight) =>
+          this.priceToY(value, viewport, paneHeight),
+        );
+      }
+    }
+
+    for (const plot of scriptPlots) {
+      if (!this.shouldRenderPlot(plot)) continue;
+
+      switch (plot.type) {
+        case 'plot':
+          this.renderLinePlot(plot, bars, viewport);
+          this.renderPlotTrackPriceInMainPane(plot, bars, viewport);
+          break;
+        case 'plotbar':
+        case 'plotcandle':
+          this.renderOhlcPlotInLegacyMainPane(plot, bars, viewport);
+          break;
+        case 'hline':
+          this.renderHline(plot, viewport);
+          break;
+        case 'bgcolor':
+          this.renderBgcolor(plot, bars, viewport);
+          break;
+        case 'plotshape':
+        case 'plotchar':
+        case 'plotarrow':
+          this.renderPlotShape(plot, bars, viewport);
+          break;
+        case 'fill':
+          break;
+      }
+    }
   }
 
   /**
