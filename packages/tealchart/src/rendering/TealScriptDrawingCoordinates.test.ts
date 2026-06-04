@@ -1,8 +1,9 @@
 import type { BoxDrawingOutput, LabelDrawingOutput, LineDrawingOutput } from '@tealstreet/tealscript';
 import type { Bar, ComputedPane, Viewport } from '../types';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearChartStoreCache } from '../state/chartState';
 import {
   barIndexToTime,
   resolveBoxDrawingRect,
@@ -10,6 +11,10 @@ import {
   resolveLabelDrawingPosition,
   resolveLineDrawingSegment,
 } from './TealScriptDrawingCoordinates';
+
+afterEach(() => {
+  clearChartStoreCache();
+});
 
 const bars: Bar[] = [
   { time: 1_000, open: 10, high: 15, low: 8, close: 12, volume: 100 },
