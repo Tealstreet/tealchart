@@ -170,8 +170,15 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     const text = runtime.toStringValue(orderedCallArg(args, namedArgs, labelNewArgs, 2, ''));
     const id = `label_${callId}_${ctx.bar_index}`;
 
-    const textFontFamily = optionalString(runtime, orderedCallArg(args, namedArgs, labelNewArgs, 11));
-    const forceOverlay = optionalBoolean(orderedCallArg(args, namedArgs, labelNewArgs, 12));
+    const textFontFamilyOrLegacyForceOverlay = orderedCallArg(args, namedArgs, labelNewArgs, 11);
+    const usesLegacyForceOverlaySlot = !namedArgs.has('text_font_family')
+      && !namedArgs.has('force_overlay')
+      && args.length === 12
+      && typeof textFontFamilyOrLegacyForceOverlay === 'boolean';
+    const textFontFamily = usesLegacyForceOverlaySlot ? undefined : optionalString(runtime, textFontFamilyOrLegacyForceOverlay);
+    const forceOverlay = optionalBoolean(
+      usesLegacyForceOverlaySlot ? textFontFamilyOrLegacyForceOverlay : orderedCallArg(args, namedArgs, labelNewArgs, 12),
+    );
     const textFormatting = optionalString(runtime, orderedCallArg(args, namedArgs, labelNewArgs, 13));
     const textAlign = optionalString(runtime, orderedCallArg(args, namedArgs, labelNewArgs, 9));
     const drawing: LabelDrawingOutput = {

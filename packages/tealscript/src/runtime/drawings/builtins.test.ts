@@ -102,6 +102,37 @@ plot(close)`;
       ]);
     });
 
+    it('preserves legacy positional label force_overlay slot', () => {
+      const script = `//@version=6
+indicator("Legacy Label Force Overlay")
+label.new(bar_index, close, "legacy", xloc.bar_index, yloc.price, color.red, label.style_label_left, color.white, size.normal, text.align_center, "tip", true)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'label_label.new_0_0',
+          type: 'label',
+          barIndex: 0,
+          x: 0,
+          y: 100.2,
+          text: 'legacy',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_left',
+          color: '#F44336',
+          textColor: '#FFFFFF',
+          size: 'normal',
+          textAlign: 'center',
+          tooltip: 'tip',
+          forceOverlay: true,
+        },
+      ]);
+    });
+
     it('mutates, reads, copies, and deletes label drawings by handle', () => {
       const script = `//@version=6
 indicator("Label mutators")

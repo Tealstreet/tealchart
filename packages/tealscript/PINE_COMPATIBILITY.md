@@ -627,7 +627,8 @@ history buffer sizing rules yet.
 The label drawing pass covers a first runtime payload slice for common
 last-bar label idioms. `label.new()` accepts positional or named `x`, `y`, and
 `text` arguments plus common `xloc`, `yloc`, `style`, `color`, `textcolor`,
-`size`, `textalign`, `text_font_family`, and `text_formatting` options. The runtime returns a label handle string and records a typed
+`size`, `textalign`, `text_font_family`, `force_overlay`, and
+`text_formatting` options. The runtime returns a label handle string and records a typed
 drawing output. The label mutation pass covers persistent `var` label handles,
 `label.set_x()`, `label.set_y()`, `label.set_xy()`, `label.set_xloc()`,
 `label.set_yloc()`, `label.set_text()`, `label.set_style()`,
