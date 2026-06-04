@@ -797,12 +797,15 @@ export class TealScriptDrawingRenderer {
           }
 
           if (cell?.text) {
+            const textLines = this.splitDrawingTextLines(cell.text);
+            const fontSize = this.fontSizeForDrawing(cell.textSize);
+            const lineHeight = Math.ceil(fontSize * 1.25);
             const textPosition = this.resolveTableCellTextPosition(cell.textHalign, cell.textValign, x, y, width, height);
             ctx.fillStyle = cell.textColor ?? '#FFFFFF';
             ctx.font = this.fontForDrawing(cell.textSize, cell.textFontFamily, cell.textFormatting);
             ctx.textAlign = textPosition.align;
             ctx.textBaseline = textPosition.baseline;
-            ctx.fillText(cell.text, textPosition.x, textPosition.y);
+            this.drawTableCellTextLines(textLines, textPosition, lineHeight);
           }
         }
       }
@@ -836,13 +839,18 @@ export class TealScriptDrawingRenderer {
 
     for (const cell of table.cells) {
       if (cell.column < 0 || cell.column >= table.columns || cell.row < 0 || cell.row >= table.rows) continue;
-      const measuredText = cell.text
-        ? this.getTextWidth(
-          this.ctx,
-          cell.text,
+      const textLines = cell.text ? this.splitDrawingTextLines(cell.text) : [];
+      const fontSize = this.fontSizeForDrawing(cell.textSize);
+      const lineHeight = Math.ceil(fontSize * 1.25);
+      const measuredText = textLines.length > 0
+        ? this.measureDrawingTextLines(
+          textLines,
           this.fontForDrawing(cell.textSize, cell.textFontFamily, cell.textFormatting),
         ) + 12
         : defaultColumnWidth;
+      const measuredHeight = textLines.length > 1
+        ? Math.max(defaultRowHeight, textLines.length * lineHeight + 12)
+        : defaultRowHeight;
       const explicitWidth = this.tablePercentDimension(cell.width, drawableWidth);
       const explicitHeight = this.tablePercentDimension(cell.height, pane.height);
       if (explicitWidth !== undefined) {
@@ -859,7 +867,7 @@ export class TealScriptDrawingRenderer {
           : explicitHeight;
         explicitRows[cell.row] = true;
       } else if (!explicitRows[cell.row]) {
-        rowHeights[cell.row] = Math.max(rowHeights[cell.row]!, defaultRowHeight);
+        rowHeights[cell.row] = Math.max(rowHeights[cell.row]!, measuredHeight);
       }
     }
 
@@ -968,6 +976,26 @@ export class TealScriptDrawingRenderer {
     }
 
     return { x: textX, y: textY, align, baseline };
+  }
+
+  private drawTableCellTextLines(
+    lines: string[],
+    position: { x: number; y: number; align: CanvasTextAlign; baseline: CanvasTextBaseline },
+    lineHeight: number,
+  ): void {
+    if (position.baseline === 'bottom') {
+      for (let index = 0; index < lines.length; index++) {
+        this.ctx.fillText(lines[index]!, position.x, position.y - (lines.length - 1 - index) * lineHeight);
+      }
+      return;
+    }
+
+    const startY = position.baseline === 'middle'
+      ? position.y - ((lines.length - 1) * lineHeight) / 2
+      : position.y;
+    for (let index = 0; index < lines.length; index++) {
+      this.ctx.fillText(lines[index]!, position.x, startY + index * lineHeight);
+    }
   }
 
   private fontForDrawing(size: string, fontFamily?: string, textFormatting?: string): string {
