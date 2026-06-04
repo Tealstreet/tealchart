@@ -135,7 +135,7 @@ if barstate.islast
         xloc: 'bar_index',
         yloc: 'price',
         style: 'label_up',
-        color: null,
+        color: '#2196F3',
         textColor: '#FFFFFF',
         size: 'normal',
         tooltip: undefined,
@@ -150,8 +150,35 @@ if barstate.islast
         xloc: 'bar_time',
         yloc: 'price',
         style: 'label_down',
-        color: null,
+        color: '#2196F3',
         textColor: '#FFFFFF',
+        size: 'normal',
+        tooltip: undefined,
+      },
+    ]);
+  });
+
+  it('preserves explicit na label colors on constructors', () => {
+    const result = runCompatScript(`
+indicator("Explicit na label colors", overlay=true)
+if barstate.islast
+    label.new(bar_index, close, "ghost", color=na, textcolor=na)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'label_label.new_0_11',
+        type: 'label',
+        barIndex: 11,
+        x: 11,
+        y: 112,
+        text: 'ghost',
+        xloc: 'bar_index',
+        yloc: 'price',
+        style: 'label_down',
+        color: null,
+        textColor: null,
         size: 'normal',
         tooltip: undefined,
       },
@@ -880,10 +907,11 @@ plot(mixedPrice, title="Mixed Line Price")
         text: 'mixed label',
         xloc: 'bar_index',
         yloc: 'price',
-        style: 'label_left',
+        style: 'label_down',
         color: '#F44336',
         textColor: '#FFFFFF',
         size: 'normal',
+        tooltip: undefined,
       },
       {
         id: 'line_line.new_0_11',

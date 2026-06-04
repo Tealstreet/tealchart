@@ -111,6 +111,7 @@ function tableCellKey(column: number, row: number): string {
 const MAX_TABLE_CELLS = 10000;
 const PINE_COLOR_BLUE = '#2196F3';
 const PINE_COLOR_BLACK = '#363A45';
+const PINE_COLOR_WHITE = '#FFFFFF';
 
 function normalizeTableColumn(runtime: DrawingBuiltinRuntime, value: unknown): number {
   return Math.max(0, Math.trunc(runtime.toNumber(value)));
@@ -220,9 +221,9 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       text,
       xloc,
       yloc: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 3 : 4, 'price')),
-      style: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 5 : 6, 'label_left')),
-      color: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 4 : 5)),
-      textColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 6 : 7)),
+      style: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 5 : 6, 'label_down')),
+      color: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 4 : 5, PINE_COLOR_BLUE)),
+      textColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 6 : 7, PINE_COLOR_WHITE)),
       size: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 7 : 8, 'normal')),
       tooltip: runtime.toOptionalString(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 9 : 10)),
     };

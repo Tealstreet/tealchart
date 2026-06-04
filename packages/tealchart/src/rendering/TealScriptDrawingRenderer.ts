@@ -520,19 +520,18 @@ export class TealScriptDrawingRenderer {
       const font = this.fontForDrawing(label.size, label.textFontFamily, label.textFormatting);
       ctx.font = font;
       const width = Math.max(18, this.measureDrawingTextLines(textLines, font) + paddingX * 2);
-      const fillColor = label.color ?? '#1f2937';
-      const textColor = label.textColor ?? '#FFFFFF';
-
       const layout = this.resolveLabelLayout(label.style, label.textAlign, position, width, height, lineHeight, margins.left, options.width - margins.right, pane);
 
-      if (label.style !== 'none') {
-        ctx.fillStyle = fillColor;
+      if (label.style !== 'none' && label.color) {
+        ctx.fillStyle = label.color;
         this.drawLabelBody(label.style, layout, position);
       }
 
-      ctx.fillStyle = textColor;
-      ctx.textAlign = layout.textAlign;
-      this.drawLabelTextLines(textLines, layout);
+      if (label.textColor) {
+        ctx.fillStyle = label.textColor;
+        ctx.textAlign = layout.textAlign;
+        this.drawLabelTextLines(textLines, layout);
+      }
     }
 
     ctx.restore();
