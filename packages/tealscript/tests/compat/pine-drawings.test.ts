@@ -113,6 +113,51 @@ plot(label.get_text(id=marker) == "Named 112", title="Named Marker Text")
     expect(getPlot(result, 'Named Marker Text').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, true]);
   });
 
+  it('creates labels from chart.point overloads', () => {
+    const result = runCompatScript(`
+indicator("Point Labels", overlay=true)
+if barstate.islast
+    lowPoint = chart.point.from_index(index=bar_index - 1, price=low)
+    highPoint = chart.point.now(price=high)
+    label.new(lowPoint, "low", style=label.style_label_up, textcolor=color.white)
+    label.new(highPoint, "high", xloc=xloc.bar_time, style=label.style_label_down, textcolor=color.white)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'label_label.new_0_11',
+        type: 'label',
+        barIndex: 11,
+        x: 10,
+        y: 108,
+        text: 'low',
+        xloc: 'bar_index',
+        yloc: 'price',
+        style: 'label_up',
+        color: null,
+        textColor: '#FFFFFF',
+        size: 'normal',
+        tooltip: undefined,
+      },
+      {
+        id: 'label_label.new_1_11',
+        type: 'label',
+        barIndex: 11,
+        x: compatibilityBars[11]!.time,
+        y: 113,
+        text: 'high',
+        xloc: 'bar_time',
+        yloc: 'price',
+        style: 'label_down',
+        color: null,
+        textColor: '#FFFFFF',
+        size: 'normal',
+        tooltip: undefined,
+      },
+    ]);
+  });
+
   it('updates channel lines, linefills, and boxes from common drawing idioms', () => {
     const result = runCompatScript(`
 indicator("Channel and zone drawings", overlay=true)
