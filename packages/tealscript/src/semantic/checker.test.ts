@@ -2725,7 +2725,7 @@ duplicateCopy = chart.point.copy(point, id=point)
   it('resolves label.new named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Label Signatures")
-first = label.new(x=bar_index, close, "Entry", xloc.bar_index, yloc.price, color.green, label.style_label_up, color.white, size.small)
+first = label.new(x=bar_index, close, "Entry", xloc.bar_index, yloc.price, color.green, label.style_label_up, color.white, size.small, "center", "tip", "monospace", true, "bold")
 second = label.new(bar_index, high, text="High", color=color.orange, style=label.style_label_down)
 labels = array.from(first, second)
 plot(array.size(labels))
@@ -2745,7 +2745,7 @@ indicator("Bad Label Signatures")
 unknown = label.new(bar_index, close, caption="Bad")
 missing = label.new(text="Only Text")
 duplicate = label.new(bar_index, close, x=bar_index)
-tooMany = label.new(bar_index, close, "A", xloc.bar_index, yloc.price, color.green, label.style_label_up, color.white, size.small, "center", "tip", true, 1)
+tooMany = label.new(bar_index, close, "A", xloc.bar_index, yloc.price, color.green, label.style_label_up, color.white, size.small, "center", "tip", "monospace", true, "bold", 1)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -2754,7 +2754,7 @@ tooMany = label.new(bar_index, close, "A", xloc.bar_index, yloc.price, color.gre
       "label.new() missing required argument 'x'",
       "label.new() missing required argument 'y'",
       "Argument 'x' for label.new() was supplied multiple times",
-      'label.new() expects at most 12 arguments',
+      'label.new() expects at most 14 arguments',
     ]);
   });
 
@@ -2774,6 +2774,8 @@ label.set_color(marker, color=color.blue)
 label.set_textcolor(id=marker, color.white)
 label.set_size(marker, size=size.small)
 label.set_textalign(id=marker, "right")
+label.set_text_font_family(id=marker, "monospace")
+label.set_text_formatting(marker, text_formatting="bolditalic")
 label.set_tooltip(id=marker, "tip")
 x = label.get_x(id=marker)
 y = label.get_y(marker)
@@ -2859,6 +2861,9 @@ missingSetter = label.set_xy(id=marker, x=bar_index)
 duplicateSetter = label.set_color(marker, color.blue, id=marker)
 missingTextAlign = label.set_textalign(id=marker)
 duplicateTextAlign = label.set_textalign(marker, "right", id=marker)
+missingFormatting = label.set_text_formatting(id=marker)
+duplicateFormatting = label.set_text_formatting(marker, "bold", id=marker)
+unknownFont = label.set_text_font_family(marker, font="monospace")
 tooManyGetter = label.get_x(marker, marker)
 missingCopy = label.copy()
 unknownGetter = label.get_text(marker, format="raw")
@@ -2872,6 +2877,12 @@ unknownGetter = label.get_text(marker, format="raw")
       'label.set_textalign() expects at least 2 arguments',
       "label.set_textalign() missing required argument 'textalign'",
       "Argument 'id' for label.set_textalign() was supplied multiple times",
+      'label.set_text_formatting() expects at least 2 arguments',
+      "label.set_text_formatting() missing required argument 'text_formatting'",
+      "Argument 'id' for label.set_text_formatting() was supplied multiple times",
+      "Unknown argument 'font' for label.set_text_font_family()",
+      'label.set_text_font_family() expects at least 2 arguments',
+      "label.set_text_font_family() missing required argument 'text_font_family'",
       'label.get_x() expects at most 1 argument',
       'label.copy() expects at least 1 argument',
       "label.copy() missing required argument 'id'",

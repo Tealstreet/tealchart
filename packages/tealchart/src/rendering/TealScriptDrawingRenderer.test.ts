@@ -442,7 +442,7 @@ describe('TealScriptDrawingRenderer', () => {
 
     renderer.render(
       partitionTealScriptDrawings([
-        makeLabel({ text: 'Align', textAlign: 'right' }),
+        makeLabel({ text: 'Align', textAlign: 'right', textFontFamily: 'monospace', textFormatting: 'bolditalic' }),
         makeLabel({ id: 'label-2', style: 'none', text: 'Bare', textAlign: 'left' }),
       ]),
       bars,
@@ -451,6 +451,7 @@ describe('TealScriptDrawingRenderer', () => {
     );
 
     expect(events).toContain('fillTextStyle:right,middle');
+    expect(events).toContain('font:italic bold 12px monospace');
     expect(events).toContain('fillText:Align:108,40');
     expect(events).toContain('fillTextStyle:left,middle');
     expect(events).toContain('fillText:Bare:60,40');

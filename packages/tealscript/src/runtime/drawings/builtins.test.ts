@@ -114,6 +114,8 @@ if barstate.islast
     label.set_textcolor(anchor, color.black)
     label.set_size(anchor, size.large)
     label.set_textalign(anchor, text.align_right)
+    label.set_text_font_family(anchor, font.family_monospace)
+    label.set_text_formatting(anchor, text.format_bold + text.format_italic)
     label.set_tooltip(anchor, "updated")
     clone = label.copy(anchor)
     label.set_text(clone, "copy")
@@ -142,6 +144,8 @@ plot(label.get_y(anchor), title="Label Y")`;
           textColor: '#000000',
           size: 'large',
           textAlign: 'right',
+          textFontFamily: 'monospace',
+          textFormatting: 'bolditalic',
           tooltip: 'updated',
         },
       ]);
@@ -193,7 +197,7 @@ plot(label.get_x(marker), title="Label X")`;
       const script = `//@version=6
 indicator("Label getter coverage")
 var marker = label.new(0, close, text="seed")
-var yonly = label.new(1, close, text="y", textalign=text.align_left)
+var yonly = label.new(1, close, text="y", textalign=text.align_left, text_font_family=font.family_monospace, text_formatting=text.format_bold)
 if barstate.islast
     label.set_x(marker, bar_index + 3)
     label.set_y(marker, high)
@@ -247,6 +251,8 @@ plot(label.get_y(marker), title="Label Y")`;
           textColor: null,
           size: 'normal',
           textAlign: 'left',
+          textFontFamily: 'monospace',
+          textFormatting: 'bold',
           tooltip: undefined,
         },
         {

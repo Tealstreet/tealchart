@@ -159,7 +159,9 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     'size',
     'textalign',
     'tooltip',
+    'text_font_family',
     'force_overlay',
+    'text_formatting',
   ] as const;
 
   builtins.set('label.new', (args, namedArgs, ctx, _scope, callId) => {
@@ -168,7 +170,9 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     const text = runtime.toStringValue(orderedCallArg(args, namedArgs, labelNewArgs, 2, ''));
     const id = `label_${callId}_${ctx.bar_index}`;
 
-    const forceOverlay = optionalBoolean(orderedCallArg(args, namedArgs, labelNewArgs, 11));
+    const textFontFamily = optionalString(runtime, orderedCallArg(args, namedArgs, labelNewArgs, 11));
+    const forceOverlay = optionalBoolean(orderedCallArg(args, namedArgs, labelNewArgs, 12));
+    const textFormatting = optionalString(runtime, orderedCallArg(args, namedArgs, labelNewArgs, 13));
     const textAlign = optionalString(runtime, orderedCallArg(args, namedArgs, labelNewArgs, 9));
     const drawing: LabelDrawingOutput = {
       id,
@@ -186,6 +190,8 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       tooltip: runtime.toOptionalString(orderedCallArg(args, namedArgs, labelNewArgs, 10)),
     };
     if (textAlign !== undefined) drawing.textAlign = textAlign;
+    if (textFontFamily !== undefined) drawing.textFontFamily = textFontFamily;
+    if (textFormatting !== undefined) drawing.textFormatting = textFormatting;
     if (forceOverlay !== undefined) drawing.forceOverlay = forceOverlay;
 
     ctx.addDrawing(drawing);
@@ -286,6 +292,20 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
   builtins.set('label.set_textalign', (args, namedArgs, ctx) => {
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
       label.textAlign = runtime.toStringValue(callArg(args, namedArgs, 1, 'textalign', undefined, ['id']));
+    });
+    return undefined;
+  });
+
+  builtins.set('label.set_text_font_family', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
+      label.textFontFamily = runtime.toStringValue(callArg(args, namedArgs, 1, 'text_font_family', undefined, ['id']));
+    });
+    return undefined;
+  });
+
+  builtins.set('label.set_text_formatting', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
+      label.textFormatting = runtime.toStringValue(callArg(args, namedArgs, 1, 'text_formatting', undefined, ['id']));
     });
     return undefined;
   });
