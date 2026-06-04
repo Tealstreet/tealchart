@@ -596,7 +596,7 @@ export class TealScriptDrawingRenderer {
   }
 
   private splitDrawingTextLines(text: string): string[] {
-    return text.split('\n');
+    return text.split(/\r\n|\r|\n/);
   }
 
   private measureDrawingTextLines(lines: string[], font: string): number {

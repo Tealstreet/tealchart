@@ -476,7 +476,7 @@ describe('TealScriptDrawingRenderer', () => {
     renderer.render(
       partitionTealScriptDrawings([
         makeLabel({ text: 'Entry\nStop' }),
-        makeLabel({ id: 'label-2', style: 'none', text: 'Bare\nText', textAlign: 'left' }),
+        makeLabel({ id: 'label-2', style: 'none', text: 'Bare\r\nText', textAlign: 'left' }),
         makeLabel({ id: 'label-3', style: 'square', text: 'Icon\nText' }),
       ]),
       bars,
