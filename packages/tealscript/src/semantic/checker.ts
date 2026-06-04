@@ -523,9 +523,9 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   [
     'label.new',
     {
-      params: ['x', 'y', 'text', 'xloc', 'yloc', 'color', 'style', 'textcolor', 'size', 'textalign', 'tooltip', 'force_overlay'],
+      params: ['x', 'y', 'text', 'xloc', 'yloc', 'color', 'style', 'textcolor', 'size', 'textalign', 'tooltip', 'text_font_family', 'force_overlay', 'text_formatting'],
       minArgs: 2,
-      maxArgs: 12,
+      maxArgs: 14,
       allowNamedPrefixWithPositional: true,
     },
   ],
@@ -542,6 +542,8 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['label.set_textcolor', { params: ['id', 'textcolor'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['label.set_size', { params: ['id', 'size'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['label.set_textalign', { params: ['id', 'textalign'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['label.set_text_font_family', { params: ['id', 'text_font_family'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['label.set_text_formatting', { params: ['id', 'text_formatting'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['label.set_tooltip', { params: ['id', 'tooltip'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['label.get_x', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['label.get_y', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
