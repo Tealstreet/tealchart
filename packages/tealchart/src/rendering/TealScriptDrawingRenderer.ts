@@ -737,7 +737,7 @@ export class TealScriptDrawingRenderer {
     ctx.save();
 
     for (const table of tables) {
-      const metrics = this.measureTable(table);
+      const metrics = this.measureTable(table, pane);
       const origin = this.resolveTableOrigin(table.position, metrics.width, metrics.height, options.width, margins, pane);
 
       if (table.bgcolor) {
@@ -794,7 +794,7 @@ export class TealScriptDrawingRenderer {
     ctx.restore();
   }
 
-  private measureTable(table: TealScriptDrawingPartition['tables'][number]): {
+  private measureTable(table: TealScriptDrawingPartition['tables'][number], pane: ComputedPane): {
     width: number;
     height: number;
     columnWidths: number[];
@@ -804,8 +804,11 @@ export class TealScriptDrawingRenderer {
   } {
     const defaultColumnWidth = 48;
     const defaultRowHeight = 22;
+    const drawableWidth = this.options.width - this.margins.left - this.margins.right;
     const columnWidths = Array.from({ length: table.columns }, () => defaultColumnWidth);
     const rowHeights = Array.from({ length: table.rows }, () => defaultRowHeight);
+    const explicitColumns = Array.from({ length: table.columns }, () => false);
+    const explicitRows = Array.from({ length: table.rows }, () => false);
 
     for (const cell of table.cells) {
       if (cell.column < 0 || cell.column >= table.columns || cell.row < 0 || cell.row >= table.rows) continue;
@@ -816,8 +819,24 @@ export class TealScriptDrawingRenderer {
           this.fontForDrawing(cell.textSize, cell.textFontFamily, cell.textFormatting),
         ) + 12
         : defaultColumnWidth;
-      columnWidths[cell.column] = Math.max(columnWidths[cell.column]!, cell.width ?? measuredText);
-      rowHeights[cell.row] = Math.max(rowHeights[cell.row]!, cell.height ?? defaultRowHeight);
+      const explicitWidth = this.tablePercentDimension(cell.width, drawableWidth);
+      const explicitHeight = this.tablePercentDimension(cell.height, pane.height);
+      if (explicitWidth !== undefined) {
+        columnWidths[cell.column] = explicitColumns[cell.column]
+          ? Math.max(columnWidths[cell.column]!, explicitWidth)
+          : explicitWidth;
+        explicitColumns[cell.column] = true;
+      } else if (!explicitColumns[cell.column]) {
+        columnWidths[cell.column] = Math.max(columnWidths[cell.column]!, measuredText);
+      }
+      if (explicitHeight !== undefined) {
+        rowHeights[cell.row] = explicitRows[cell.row]
+          ? Math.max(rowHeights[cell.row]!, explicitHeight)
+          : explicitHeight;
+        explicitRows[cell.row] = true;
+      } else if (!explicitRows[cell.row]) {
+        rowHeights[cell.row] = Math.max(rowHeights[cell.row]!, defaultRowHeight);
+      }
     }
 
     const columnOffsets = this.prefixOffsets(columnWidths);
@@ -830,6 +849,11 @@ export class TealScriptDrawingRenderer {
       columnOffsets,
       rowOffsets,
     };
+  }
+
+  private tablePercentDimension(value: number | null | undefined, availableSize: number): number | undefined {
+    if (value == null || !Number.isFinite(value)) return undefined;
+    return Math.max(0, (value / 100) * Math.max(0, availableSize));
   }
 
   private prefixOffsets(values: number[]): number[] {
