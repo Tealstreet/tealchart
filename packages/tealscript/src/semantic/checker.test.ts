@@ -3029,6 +3029,7 @@ box.set_top(id=region, high)
 box.set_bottom(region, bottom=low)
 box.set_lefttop(id=region, left=bar_index, top=high)
 box.set_rightbottom(region, bar_index + 2, bottom=low)
+box.set_xloc(id=region, bar_index - 1, bar_index + 2, xloc=xloc.bar_index)
 box.set_top_left_point(id=region, point=topLeft)
 box.set_bottom_right_point(region, point=bottomRight)
 box.delete(id=clone)
@@ -3051,6 +3052,9 @@ unknown = box.set_left(region, left=bar_index, x=bar_index)
 missing = box.set_lefttop(id=region, left=bar_index)
 duplicate = box.set_rightbottom(region, bar_index, low, id=region)
 tooMany = box.set_bottom(region, low, low)
+missingXloc = box.set_xloc(id=region, left=bar_index)
+duplicateXloc = box.set_xloc(region, bar_index, bar_index + 1, xloc.bar_index, id=region)
+tooManyXloc = box.set_xloc(region, bar_index, bar_index + 1, xloc.bar_index, xloc.bar_time)
 missingPoint = box.set_top_left_point(id=region)
 duplicatePoint = box.set_bottom_right_point(region, bottomRight, id=region)
 tooManyPoint = box.set_top_left_point(region, topLeft, bottomRight)
@@ -3064,6 +3068,11 @@ missingCopy = box.copy()
       "box.set_lefttop() missing required argument 'top'",
       "Argument 'id' for box.set_rightbottom() was supplied multiple times",
       'box.set_bottom() expects at most 2 arguments',
+      'box.set_xloc() expects at least 4 arguments',
+      "box.set_xloc() missing required argument 'right'",
+      "box.set_xloc() missing required argument 'xloc'",
+      "Argument 'id' for box.set_xloc() was supplied multiple times",
+      'box.set_xloc() expects at most 4 arguments',
       'box.set_top_left_point() expects at least 2 arguments',
       "box.set_top_left_point() missing required argument 'point'",
       "Argument 'id' for box.set_bottom_right_point() was supplied multiple times",

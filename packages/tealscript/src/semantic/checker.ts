@@ -580,6 +580,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['box.set_bottom', { params: ['id', 'bottom'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['box.set_lefttop', { params: ['id', 'left', 'top'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['box.set_rightbottom', { params: ['id', 'right', 'bottom'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
+  ['box.set_xloc', { params: ['id', 'left', 'right', 'xloc'], minArgs: 4, maxArgs: 4, allowNamedPrefixWithPositional: true }],
   ['box.set_top_left_point', { params: ['id', 'point'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['box.set_bottom_right_point', { params: ['id', 'point'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['box.set_bgcolor', { params: ['id', 'color'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],

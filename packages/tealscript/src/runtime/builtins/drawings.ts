@@ -664,6 +664,15 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
     });
     return undefined;
   });
+  builtins.set('box.set_xloc', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.left = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'left', undefined, ['id']));
+      box.right = runtime.toNullableNumber(callArg(args, namedArgs, 2, 'right', undefined, ['id', 'left']));
+      box.xloc = runtime.toStringValue(callArg(args, namedArgs, 3, 'xloc', undefined, ['id', 'left', 'right']));
+      box.barIndex = ctx.bar_index;
+    });
+    return undefined;
+  });
   builtins.set('box.set_top_left_point', (args, namedArgs, ctx) => {
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
       applyBoxPoint(box, callArg(args, namedArgs, 1, 'point', undefined, ['id']), 'topLeft');
