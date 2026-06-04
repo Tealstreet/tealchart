@@ -692,7 +692,8 @@ arguments, `polyline.copy()`, `polyline.delete()`, and `polyline.all`.
 `polyline.copy()` and `polyline.delete()` accept Pine-style named `id`
 arguments. Semantic analysis preserves `polyline.new()` and `polyline.copy()`
 handle return types and `polyline.all` handle-array element types for downstream
-diagnostics.
+diagnostics. Renderer coverage applies fixed path geometry, optional fill, line
+styling, and approximate curved paths when `curved=true`.
 
 ## Table Drawing Coverage
 
