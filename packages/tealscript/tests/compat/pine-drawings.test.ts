@@ -118,7 +118,7 @@ plot(label.get_text(id=marker) == "Named 112", title="Named Marker Text")
 indicator("Point Labels", overlay=true)
 if barstate.islast
     lowPoint = chart.point.from_index(index=bar_index - 1, price=low)
-    highPoint = chart.point.now(price=high)
+    highPoint = chart.point.from_time(time=time, price=high)
     label.new(lowPoint, "low", style=label.style_label_up, textcolor=color.white)
     label.new(highPoint, "high", xloc=xloc.bar_time, style=label.style_label_down, textcolor=color.white)
 `);
