@@ -472,6 +472,8 @@ area plot rendering when supplied. Plot renderer coverage also draws
 circle/cross plot markers when `join=true`, and paints
 `plot.style_stepline_diamond` markers on stepped plots. Default line plots
 bridge `na` values, while `plot.style_linebr` preserves gaps.
+Trackprice rendering also adds a right-axis value label for the latest rendered
+plot value.
 Renderer coverage also routes visual outputs with `force_overlay=true` back to
 the main pane when emitted by non-overlay scripts.
 

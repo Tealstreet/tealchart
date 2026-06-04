@@ -2212,6 +2212,9 @@ export class TealchartRenderer {
     ctx.lineTo(options.width - margins.right, y);
     ctx.stroke();
     ctx.setLineDash([]);
+
+    const labelViewport = { ...viewport, priceMin: yMin, priceMax: yMax };
+    this.drawTradingPriceLabel(y, latest.value, color, color, options.backgroundColor, labelViewport, 0);
   }
 
   private renderPlotTrackPriceInMainPane(plot: PlotOutput, bars: Bar[], viewport: Viewport): void {
