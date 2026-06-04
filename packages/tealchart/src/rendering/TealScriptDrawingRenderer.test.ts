@@ -560,6 +560,35 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events).toContain('fillText:Icon:79,32.5');
   });
 
+  it('renders price labels at projected bar_index positions', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 300, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeLabel({ x: 3, y: 12, text: 'Future' }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 5_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).toContain('roundRect:225,79,64,22');
+    expect(events).toContain('fillText:Future:257,90');
+  });
+
   it('renders Pine symbol label styles and keeps style_none text-only', () => {
     const events: string[] = [];
     const renderer = new TealScriptDrawingRenderer({
