@@ -502,6 +502,15 @@ export color bull = color.green
 export float ratio = math.pi
 export string period = timeframe.period
 export string ticker = syminfo.ticker
+export string labelStyle = label.style_label_center
+export string lineStyle = line.style_arrow_both
+export string labelXloc = xloc.bar_time
+export string labelYloc = yloc.abovebar
+export string lineExtend = extend.both
+export string tablePosition = position.bottom_right
+export string textAlignment = text.align_center
+export string fontFamily = font.family_monospace
+export string labelSize = size.small
 export prefix(simple string value) => value
 `));
 

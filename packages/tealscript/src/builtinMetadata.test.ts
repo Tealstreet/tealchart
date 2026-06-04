@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import {
   BUILTIN_NAMESPACES,
   EXPORTABLE_BUILTIN_CONSTANTS,
