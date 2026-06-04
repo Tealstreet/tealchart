@@ -487,6 +487,37 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events.some((event) => event.startsWith('fillText:Hidden:'))).toBe(false);
   });
 
+  it('does not draw linefill areas for explicit null colors', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeLine('line-1'),
+        makeLine('line-2', { y1: 8, y2: 18 }),
+        makeLinefill({ color: null }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).not.toContain('fill');
+    expect(events.filter((event) => event === 'stroke')).toHaveLength(2);
+  });
+
   it('does not draw label body or text for explicit null label colors', () => {
     const events: string[] = [];
     const renderer = new TealScriptDrawingRenderer({

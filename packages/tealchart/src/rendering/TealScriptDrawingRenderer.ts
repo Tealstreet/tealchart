@@ -282,6 +282,7 @@ export class TealScriptDrawingRenderer {
     this.clipToPane(pane);
 
     for (const linefill of linefills) {
+      if (!linefill.color) continue;
       const line1 = linesById.get(linefill.line1);
       const line2 = linesById.get(linefill.line2);
       if (!line1 || !line2) continue;
@@ -308,7 +309,7 @@ export class TealScriptDrawingRenderer {
       );
       if (!line1Segment || !line2Segment) continue;
 
-      ctx.fillStyle = linefill.color ?? 'rgba(41, 98, 255, 0.18)';
+      ctx.fillStyle = linefill.color;
       ctx.beginPath();
       ctx.moveTo(line1Segment.start.x, line1Segment.start.y);
       ctx.lineTo(line1Segment.end.x, line1Segment.end.y);
