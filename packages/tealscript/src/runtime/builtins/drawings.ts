@@ -561,10 +561,14 @@ export function registerLineFillBuiltins(builtins: BuiltinRegistry, runtime: Dra
     }
 
     const id = `linefill_${callId}_${ctx.bar_index}`;
-    for (const existing of ctx.getDrawings()) {
-      if (existing.type === 'linefill' && isSameLineFillPair(existing, line1, line2)) {
-        ctx.deleteDrawing(existing.id);
-      }
+    const duplicateIds = ctx
+      .getDrawings()
+      .filter((existing): existing is LineFillDrawingOutput => (
+        existing.type === 'linefill' && isSameLineFillPair(existing, line1, line2)
+      ))
+      .map((existing) => existing.id);
+    for (const duplicateId of duplicateIds) {
+      ctx.deleteDrawing(duplicateId);
     }
 
     ctx.addDrawing({
