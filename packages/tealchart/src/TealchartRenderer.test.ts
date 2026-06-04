@@ -784,6 +784,94 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(arc).toHaveBeenCalledWith(expect.any(Number), renderer.valueToY(75, pane), expect.any(Number), 0, Math.PI * 2);
     });
 
+    it('renders stepline diamond markers in computed panes with style overrides', () => {
+      const fillColors: string[] = [];
+      const closePath = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        closePath,
+        fill: vi.fn(() => {
+          fillColors.push(ctx.fillStyle);
+        }),
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const pane: ComputedPane = {
+        id: 'main',
+        type: 'main',
+        heightRatio: 1,
+        yMin: 80,
+        yMax: 140,
+        fixedRange: false,
+        top: 0,
+        height: 500,
+        bottom: 500,
+      };
+      const plot: PlotOutput = {
+        id: 'plot_PaneStepDiamonds',
+        type: 'plot',
+        title: 'PaneStepDiamonds',
+        values: [100, 120],
+        color: ['#2196F3', '#4CAF50'],
+        linewidth: 1,
+        style: 'stepline_diamond',
+      };
+      const overrides = new Map([[
+        plot.id,
+        { color: '#FF9800', linewidth: 3 },
+      ]]);
+
+      (renderer as any).renderPlotInPane(plot, bars, viewport, pane, overrides);
+
+      expect(closePath).toHaveBeenCalledTimes(2);
+      expect(fillColors).toEqual(['#FF9800', '#FF9800']);
+    });
+
+    it('renders stepline diamond markers in legacy indicator panes', () => {
+      const fillColors: string[] = [];
+      const closePath = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        closePath,
+        fill: vi.fn(() => {
+          fillColors.push(ctx.fillStyle);
+        }),
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const plot: PlotOutput = {
+        id: 'plot_LegacyPaneStepDiamonds',
+        type: 'plot',
+        title: 'LegacyPaneStepDiamonds',
+        values: [25, 75],
+        color: ['#2196F3', '#4CAF50'],
+        linewidth: 2,
+        style: 'stepline_diamond',
+      };
+
+      (renderer as any).renderLinePlotInPane(plot, bars, viewport, {
+        top: 10,
+        height: 200,
+        yMin: 0,
+        yMax: 100,
+      });
+
+      expect(closePath).toHaveBeenCalledTimes(2);
+      expect(fillColors).toEqual(['#2196F3', '#4CAF50']);
+    });
+
     it('falls back to the base color for joined point segments without per-bar colors', () => {
       const stroke = vi.fn();
       const ctx = {
@@ -1315,6 +1403,43 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(fill).toHaveBeenCalledTimes(2);
       expect((renderer as any).getPlotArrowMarkerSize(plot, 5, 10, 6)).toBeCloseTo(12.5);
       expect((renderer as any).getPlotArrowMarkerSize(plot, 10, 10, 6)).toBe(20);
+    });
+
+    it('renders stepline diamond plot markers on top of the step path', () => {
+      const fillColors: string[] = [];
+      const closePath = vi.fn();
+      const stroke = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        closePath,
+        fill: vi.fn(() => {
+          fillColors.push(ctx.fillStyle);
+        }),
+        stroke,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plot: PlotOutput = {
+        id: 'plot_SteplineDiamonds',
+        type: 'plot',
+        title: 'Step diamonds',
+        values: [95, 110, 125],
+        color: ['#2196F3', '#4CAF50', '#F44336'],
+        linewidth: 2,
+        style: 'stepline_diamond',
+      };
+
+      (renderer as any).renderLinePlot(plot, bars, viewport);
+
+      expect(stroke).toHaveBeenCalled();
+      expect(closePath).toHaveBeenCalledTimes(3);
+      expect(fillColors).toEqual(['#2196F3', '#4CAF50', '#F44336']);
     });
 
     it('draws Pine flag marker shapes with a pole and banner', () => {
