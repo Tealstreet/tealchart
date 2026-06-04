@@ -416,6 +416,62 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(stroke).toHaveBeenCalled();
     });
 
+    it('routes forceOverlay visual plots from non-overlay scripts to the main pane', () => {
+      const arc = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        arc,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(1, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[0]!.time + 60_000,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const paneLayout: PaneLayout = {
+        mainPaneHeight: 0.7,
+        volumePaneHeight: 0,
+        indicatorPanes: [
+          {
+            id: 'indicator_rsi',
+            indicatorIds: ['script-1'],
+            heightRatio: 0.3,
+            yMin: 0,
+            yMax: 100,
+            fixedRange: false,
+          },
+        ],
+      };
+      const plots: PlotOutput[] = [
+        {
+          id: 'plot_RSI',
+          scriptId: 'script-1',
+          type: 'plot',
+          title: 'RSI',
+          values: [50],
+          color: ['#2196F3'],
+        },
+        {
+          id: 'plotshape_Forced',
+          scriptId: 'script-1',
+          type: 'plotshape',
+          title: 'Forced',
+          values: [1],
+          color: ['#F44336'],
+          shape: 'circle',
+          location: 'top',
+          size: 'small',
+          forceOverlay: true,
+        },
+      ];
+
+      renderer.renderPlots(plots, bars, viewport, paneLayout, { 'script-1': { overlay: false } });
+
+      expect(arc).toHaveBeenCalledWith(expect.any(Number), renderer.getOptions().margins.top + 10, 3, 0, Math.PI * 2);
+    });
+
     it('applies plot offset metadata on line plot x positions', () => {
       const moveTo = vi.fn();
       const ctx = {
