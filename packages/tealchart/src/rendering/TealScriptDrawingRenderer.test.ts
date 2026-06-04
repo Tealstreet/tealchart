@@ -314,6 +314,35 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events).toContain('fillText:Box:114,124');
   });
 
+  it('renders numeric Pine box text sizes as canvas font pixels', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeBox({ text: 'Box', textSize: '18' }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).toContain('font:18px sans-serif');
+    expect(events).toContain('fillText:Box:60,80');
+  });
+
   it('renders unconfigured box text with Pine centered defaults', () => {
     const events: string[] = [];
     const renderer = new TealScriptDrawingRenderer({
@@ -845,6 +874,50 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events).toContain('strokeRect:64,18,48,22');
     expect(events).toContain('font:italic bold 12px monospace');
     expect(events).toContain('fillTextStyle:center,middle');
+    expect(events).toContain('fillText:ATR:88,29');
+  });
+
+  it('renders numeric Pine table text sizes as canvas font pixels', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeTable({
+          cells: [
+            {
+              column: 0,
+              row: 0,
+              text: 'ATR',
+              textColor: '#ffffff',
+              textSize: '21',
+              textHalign: 'center',
+              textValign: 'middle',
+              textFontFamily: 'monospace',
+              textFormatting: 'bolditalic',
+              bgcolor: '#111827',
+            },
+          ],
+        }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).toContain('font:italic bold 21px monospace');
     expect(events).toContain('fillText:ATR:88,29');
   });
 
