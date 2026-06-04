@@ -1789,6 +1789,77 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       expect(fillRect).not.toHaveBeenCalled();
     });
+
+    it('renders bgcolor in computed pane coordinates', () => {
+      const fillRect = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillRect,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(1, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[0]!.time + 60_000,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const pane: ComputedPane = {
+        id: 'oscillator',
+        type: 'indicator',
+        heightRatio: 1,
+        fixedRange: false,
+        top: 100,
+        bottom: 300,
+        height: 200,
+        yMin: 0,
+        yMax: 100,
+      };
+      const plot: PlotOutput = {
+        id: 'bgcolor_Pane',
+        type: 'bgcolor',
+        title: 'Pane',
+        values: [1],
+        color: ['#2196F333'],
+      };
+
+      (renderer as any).renderPlotInPane(plot, bars, viewport, pane);
+
+      expect(fillRect).toHaveBeenCalledWith(expect.any(Number), 100, expect.any(Number), 200);
+    });
+
+    it('renders bgcolor in legacy indicator pane coordinates', () => {
+      const fillRect = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillRect,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(1, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[0]!.time + 60_000,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const paneOffset = {
+        top: 120,
+        height: 180,
+        yMin: 0,
+        yMax: 100,
+      };
+      const plot: PlotOutput = {
+        id: 'bgcolor_Pane',
+        type: 'bgcolor',
+        title: 'Pane',
+        values: [1],
+        color: ['#2196F333'],
+      };
+
+      (renderer as any).renderPlotsInPane([plot], bars, viewport, paneOffset);
+
+      expect(fillRect).toHaveBeenCalledWith(expect.any(Number), 120, expect.any(Number), 180);
+    });
   });
 
   describe('visual primitive integration', () => {
