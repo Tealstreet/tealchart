@@ -27,6 +27,12 @@ reading the whole runtime.
 
 ## Current Matrix
 
+Rendering-related rows use `Partial` when TealScript emits and renders useful
+Pine-compatible outputs but intentionally stops short of TradingView-exact
+geometry, sizing, or pixel behavior. Those fidelity leftovers are tracked
+separately from feature gaps that block pasted scripts from parsing, running,
+or producing visible drawings.
+
 ### Syntax
 
 | Area | Feature | Status | Evidence | Remaining gaps |
