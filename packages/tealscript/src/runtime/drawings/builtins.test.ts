@@ -97,7 +97,7 @@ plot(close)`;
           borderStyle: 'solid',
           bgcolor: '#2196F3',
           text: '',
-          textColor: '#000000',
+          textColor: '#363A45',
           textSize: 'normal',
         },
       ]);
@@ -685,7 +685,7 @@ plot(box.get_right(zone), title="Box Time Right")`;
           borderStyle: 'solid',
           bgcolor: '#2196F3',
           text: '',
-          textColor: '#000000',
+          textColor: '#363A45',
           textSize: 'normal',
         },
       ]);
@@ -729,7 +729,7 @@ plot(box.get_bottom(zone), title="Box Point Bottom")`;
           borderStyle: 'solid',
           bgcolor: '#2196F3',
           text: '',
-          textColor: '#000000',
+          textColor: '#363A45',
           textSize: 'normal',
         },
       ]);
@@ -777,7 +777,7 @@ plot(box.get_bottom(zone), title="Box Bottom")`;
           borderStyle: 'solid',
           bgcolor: '#2196F3',
           text: '',
-          textColor: '#000000',
+          textColor: '#363A45',
           textSize: 'normal',
         },
       ]);
@@ -940,7 +940,7 @@ plot(current.price, title="Point Price")`;
           borderStyle: 'solid',
           bgcolor: '#2196F333',
           text: 'zone',
-          textColor: '#000000',
+          textColor: '#363A45',
           textSize: 'normal',
         },
       ]);

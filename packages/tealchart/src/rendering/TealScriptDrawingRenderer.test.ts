@@ -113,7 +113,7 @@ function makeBox(overrides: Partial<BoxDrawingOutput> = {}): BoxDrawingOutput {
     borderStyle: 'solid',
     bgcolor: null,
     text: '',
-    textColor: '#000000',
+    textColor: '#363A45',
     textSize: 'normal',
     ...overrides,
   };

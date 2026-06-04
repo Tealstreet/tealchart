@@ -110,7 +110,7 @@ function tableCellKey(column: number, row: number): string {
 
 const MAX_TABLE_CELLS = 10000;
 const PINE_COLOR_BLUE = '#2196F3';
-const PINE_COLOR_BLACK = '#000000';
+const PINE_COLOR_BLACK = '#363A45';
 
 function normalizeTableColumn(runtime: DrawingBuiltinRuntime, value: unknown): number {
   return Math.max(0, Math.trunc(runtime.toNumber(value)));

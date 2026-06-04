@@ -236,7 +236,7 @@ plot(line.get_price(upper, bar_index), title="Upper Price")
         borderStyle: 'solid',
         bgcolor: '#2196F333',
         text: 'range',
-        textColor: '#000000',
+        textColor: '#363A45',
         textSize: 'normal',
       },
     ]);
@@ -770,7 +770,7 @@ if barstate.islast
         borderStyle: 'solid',
         bgcolor: '#FF980033',
         text: 'mixed box',
-        textColor: '#000000',
+        textColor: '#363A45',
         textSize: 'normal',
       },
       {
@@ -938,7 +938,7 @@ plot(mixedPrice, title="Mixed Line Price")
         borderStyle: 'solid',
         bgcolor: '#2196F333',
         text: 'mixed box',
-        textColor: '#000000',
+        textColor: '#363A45',
         textSize: 'normal',
       },
       {
