@@ -443,6 +443,7 @@ describe('TealScriptDrawingRenderer', () => {
     renderer.render(
       partitionTealScriptDrawings([
         makeLabel({ text: 'Align', textAlign: 'right' }),
+        makeLabel({ id: 'label-2', style: 'none', text: 'Bare', textAlign: 'left' }),
       ]),
       bars,
       { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
@@ -451,6 +452,8 @@ describe('TealScriptDrawingRenderer', () => {
 
     expect(events).toContain('fillTextStyle:right,middle');
     expect(events).toContain('fillText:Align:108,40');
+    expect(events).toContain('fillTextStyle:left,middle');
+    expect(events).toContain('fillText:Bare:60,40');
   });
 
   it('renders Pine symbol label styles and keeps style_none text-only', () => {

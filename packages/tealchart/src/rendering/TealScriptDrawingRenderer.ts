@@ -575,7 +575,12 @@ export class TealScriptDrawingRenderer {
       bodyY,
       bodyWidth,
       bodyHeight: height,
-      textX: this.resolveLabelTextX(textAlign, style === 'none' ? anchor.x : bodyX, style === 'none' ? 0 : bodyWidth, paddingX),
+      textX: this.resolveLabelTextX(
+        textAlign,
+        style === 'none' ? anchor.x : bodyX,
+        style === 'none' ? 0 : bodyWidth,
+        style === 'none' ? 0 : paddingX,
+      ),
       textY: style === 'none' ? anchor.y : bodyY + height / 2,
       textAlign: this.canvasTextAlignForDrawing(textAlign),
     };
