@@ -2532,11 +2532,26 @@ export class TealchartRenderer {
    * Render shape markers (plotshape, plotchar, plotarrow)
    */
   private renderPlotShape(plot: PlotOutput, bars: Bar[], viewport: Viewport): void {
-    const { ctx, options, margins } = this;
-    const chartWidth = options.width - margins.left;
+    const { options, margins } = this;
     const chartHeight = options.height - margins.top - margins.bottom;
     const volumeHeight = options.showVolume ? chartHeight * options.volumeHeight : 0;
     const priceHeight = chartHeight - volumeHeight;
+
+    this.renderPlotShapeWithY(plot, bars, viewport, margins.top, priceHeight, (value) =>
+      this.priceToY(value, viewport, priceHeight),
+    );
+  }
+
+  private renderPlotShapeWithY(
+    plot: PlotOutput,
+    bars: Bar[],
+    viewport: Viewport,
+    paneTop: number,
+    paneHeight: number,
+    valueToY: (value: number) => number,
+  ): void {
+    const { ctx, options, margins } = this;
+    const chartWidth = options.width - margins.left;
 
     const { values, color, location = 'abovebar', shape = 'circle', size = 'small' } = plot;
     const baseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
@@ -2591,22 +2606,22 @@ export class TealchartRenderer {
       let y: number;
       switch (effectiveLocation) {
         case 'abovebar':
-          y = this.priceToY(bar.high, viewport, priceHeight) - markerSize - 4;
+          y = valueToY(bar.high) - markerSize - 4;
           break;
         case 'belowbar':
-          y = this.priceToY(bar.low, viewport, priceHeight) + markerSize + 4;
+          y = valueToY(bar.low) + markerSize + 4;
           break;
         case 'top':
-          y = margins.top + markerSize + 4;
+          y = paneTop + markerSize + 4;
           break;
         case 'bottom':
-          y = margins.top + priceHeight - markerSize - 4;
+          y = paneTop + paneHeight - markerSize - 4;
           break;
         case 'absolute':
-          y = this.priceToY(value as number, viewport, priceHeight);
+          y = valueToY(value as number);
           break;
         default:
-          y = this.priceToY(bar.close, viewport, priceHeight);
+          y = valueToY(bar.close);
       }
 
       const shapeColor = Array.isArray(color) && color[i] ? color[i] : baseColor;
@@ -4020,6 +4035,11 @@ export class TealchartRenderer {
 
     const { values, color, linewidth = 1, style = 'line' } = plot;
 
+    if (plot.type === 'plotshape' || plot.type === 'plotchar' || plot.type === 'plotarrow') {
+      this.renderPlotShapeWithY(plot, bars, viewport, pane.top, pane.height, (value) => this.valueToY(value, pane));
+      return;
+    }
+
     if (plot.type === 'plotbar' || plot.type === 'plotcandle') {
       this.renderOhlcPlot(plot, bars, viewport, chartWidth, (value) => this.valueToY(value, pane));
       return;
@@ -4716,9 +4736,16 @@ export class TealchartRenderer {
         case 'hline':
           this.renderHlineInPane(plot, paneOffset);
           break;
+        case 'plotshape':
+        case 'plotchar':
+        case 'plotarrow':
+          this.renderPlotShapeWithY(plot, bars, viewport, paneOffset.top, paneOffset.height, (value) =>
+            this.valueToPaneY(value, paneOffset),
+          );
+          break;
         case 'fill':
           break;
-        // bgcolor and plotshape could be added later for pane support
+        // bgcolor could be added later for pane support
       }
     }
 

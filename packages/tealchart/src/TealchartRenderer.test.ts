@@ -1488,6 +1488,125 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect((renderer as any).getPlotArrowMarkerSize(plot, 10, 10, 6)).toBe(20);
     });
 
+    it('renders shape markers in computed pane coordinates', () => {
+      const arc = vi.fn();
+      const fill = vi.fn();
+      const fillText = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        arc,
+        fill,
+        fillText,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(1, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[0]!.time + 60_000,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const pane: ComputedPane = {
+        id: 'rsi',
+        type: 'indicator',
+        heightRatio: 1,
+        fixedRange: false,
+        top: 100,
+        bottom: 300,
+        height: 200,
+        yMin: 0,
+        yMax: 100,
+      };
+      const topShape: PlotOutput = {
+        id: 'plotshape_Top',
+        type: 'plotshape',
+        title: 'Top',
+        values: [1],
+        color: ['#F44336'],
+        shape: 'circle',
+        location: 'top',
+        size: 'small',
+      };
+      const absoluteChar: PlotOutput = {
+        id: 'plotchar_Absolute',
+        type: 'plotchar',
+        title: 'Absolute',
+        values: [50],
+        color: ['#2196F3'],
+        char: 'A',
+        location: 'absolute',
+        size: 'small',
+      };
+      const arrow: PlotOutput = {
+        id: 'plotarrow_Move',
+        type: 'plotarrow',
+        title: 'Move',
+        values: [5],
+        color: ['#4CAF50'],
+        minHeight: 5,
+        maxHeight: 20,
+      };
+
+      (renderer as any).renderPlotInPane(topShape, bars, viewport, pane);
+      (renderer as any).renderPlotInPane(absoluteChar, bars, viewport, pane);
+      (renderer as any).renderPlotInPane(arrow, bars, viewport, pane);
+
+      expect(arc).toHaveBeenCalledWith(expect.any(Number), 110, 3, 0, Math.PI * 2);
+      expect(fillText).toHaveBeenCalledWith('A', expect.any(Number), 200);
+      expect(fill).toHaveBeenCalledTimes(2);
+    });
+
+    it('renders shape markers in legacy indicator pane coordinates', () => {
+      const arc = vi.fn();
+      const fillText = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        arc,
+        fillText,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(1, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[0]!.time + 60_000,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const paneOffset = {
+        top: 120,
+        height: 180,
+        yMin: 0,
+        yMax: 100,
+      };
+      const plots: PlotOutput[] = [
+        {
+          id: 'plotshape_Bottom',
+          type: 'plotshape',
+          title: 'Bottom',
+          values: [1],
+          color: ['#F44336'],
+          shape: 'circle',
+          location: 'bottom',
+          size: 'small',
+        },
+        {
+          id: 'plotchar_Absolute',
+          type: 'plotchar',
+          title: 'Absolute',
+          values: [75],
+          color: ['#2196F3'],
+          char: 'L',
+          location: 'absolute',
+          size: 'small',
+        },
+      ];
+
+      (renderer as any).renderPlotsInPane(plots, bars, viewport, paneOffset);
+
+      expect(arc).toHaveBeenCalledWith(expect.any(Number), 290, 3, 0, Math.PI * 2);
+      expect(fillText).toHaveBeenCalledWith('L', expect.any(Number), 165);
+    });
+
     it('renders stepline diamond plot markers on top of the step path', () => {
       const fillColors: string[] = [];
       const closePath = vi.fn();
