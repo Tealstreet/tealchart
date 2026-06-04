@@ -686,7 +686,7 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
       xloc,
       bgcolor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 7 : 9, PINE_COLOR_BLUE)),
       text: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 8 : 10, '')),
-      textSize: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 9 : 11, 'normal')),
+      textSize: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 9 : 11, 'auto')),
       textColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 10 : 12, PINE_COLOR_BLACK)),
     };
     if (textHalign !== undefined) drawing.textHalign = textHalign;

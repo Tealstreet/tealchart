@@ -98,7 +98,7 @@ plot(close)`;
           bgcolor: '#2196F3',
           text: '',
           textColor: '#363A45',
-          textSize: 'normal',
+          textSize: 'auto',
         },
       ]);
     });
@@ -763,7 +763,7 @@ plot(box.get_right(zone), title="Box Time Right")`;
           bgcolor: '#2196F3',
           text: '',
           textColor: '#363A45',
-          textSize: 'normal',
+          textSize: 'auto',
         },
       ]);
       expect(result.plots.find((plot) => plot.title === 'Box Time Left')?.values).toEqual([null, null, bars[1]!.time]);
@@ -807,7 +807,7 @@ plot(box.get_bottom(zone), title="Box Point Bottom")`;
           bgcolor: '#2196F3',
           text: '',
           textColor: '#363A45',
-          textSize: 'normal',
+          textSize: 'auto',
         },
       ]);
       expect(result.plots.find((plot) => plot.title === 'Box Point Left')?.values).toEqual([null, null, 1]);
@@ -855,7 +855,7 @@ plot(box.get_bottom(zone), title="Box Bottom")`;
           bgcolor: '#2196F3',
           text: '',
           textColor: '#363A45',
-          textSize: 'normal',
+          textSize: 'auto',
         },
       ]);
     });
@@ -1038,7 +1038,7 @@ plot(current.price, title="Point Price")`;
           bgcolor: '#2196F333',
           text: 'zone',
           textColor: '#363A45',
-          textSize: 'normal',
+          textSize: 'auto',
         },
       ]);
       expect(result.plots.find((plot) => plot.title === 'Point Index')?.values).toEqual([0, 1, 2]);
