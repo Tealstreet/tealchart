@@ -438,11 +438,7 @@ export class TealScriptDrawingRenderer {
       }
 
       ctx.beginPath();
-      ctx.moveTo(points[0]!.x, points[0]!.y);
-      for (let index = 1; index < points.length; index++) {
-        const point = points[index]!;
-        ctx.lineTo(point.x, point.y);
-      }
+      this.drawPolylinePath(points, polyline.curved);
       if (polyline.closed) {
         ctx.closePath();
         if (polyline.fillColor) {
@@ -455,6 +451,28 @@ export class TealScriptDrawingRenderer {
 
     ctx.setLineDash([]);
     ctx.restore();
+  }
+
+  private drawPolylinePath(points: Array<{ x: number; y: number }>, curved: boolean): void {
+    const { ctx } = this;
+    ctx.moveTo(points[0]!.x, points[0]!.y);
+    if (!curved || points.length < 3) {
+      for (let index = 1; index < points.length; index++) {
+        const point = points[index]!;
+        ctx.lineTo(point.x, point.y);
+      }
+      return;
+    }
+
+    for (let index = 1; index < points.length - 1; index++) {
+      const control = points[index]!;
+      const next = points[index + 1]!;
+      if (index === points.length - 2) {
+        ctx.quadraticCurveTo(control.x, control.y, next.x, next.y);
+      } else {
+        ctx.quadraticCurveTo(control.x, control.y, (control.x + next.x) / 2, (control.y + next.y) / 2);
+      }
+    }
   }
 
   private renderLabelDrawings(

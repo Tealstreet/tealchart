@@ -56,6 +56,9 @@ export interface CanvasContext {
   /** Draw a line to a point */
   lineTo(x: number, y: number): void;
 
+  /** Draw a quadratic curve to a point */
+  quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void;
+
   /** Draw an arc/circle */
   arc(
     x: number,

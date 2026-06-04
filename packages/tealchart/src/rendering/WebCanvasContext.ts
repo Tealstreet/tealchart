@@ -117,6 +117,10 @@ export class WebCanvasContext implements CanvasContext {
     this.ctx.lineTo(x, y);
   }
 
+  quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void {
+    this.ctx.quadraticCurveTo(cpx, cpy, x, y);
+  }
+
   arc(
     x: number,
     y: number,
