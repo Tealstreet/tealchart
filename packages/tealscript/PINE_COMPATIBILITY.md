@@ -489,7 +489,8 @@ outside overlay scripts.
 The same renderer bar-window handling now applies to common `plot()`,
 `bgcolor()`, `barcolor()`, `plotbar()`, `plotcandle()`, `plotshape()`,
 `plotchar()`, and `plotarrow()` outputs. Background renderer coverage applies
-`display.none` hiding through the main visual routing path.
+`display.none` hiding and routes `bgcolor()` through main and indicator pane
+coordinates.
 Renderer-level command-trace coverage locks a common visual primitive mix in
 jsdom, where native screenshot/pixel buffers are not available without adding a
 heavier canvas dependency.

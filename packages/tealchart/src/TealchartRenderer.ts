@@ -2487,9 +2487,21 @@ export class TealchartRenderer {
    * Render background color regions
    */
   private renderBgcolor(plot: PlotOutput, bars: Bar[], viewport: Viewport): void {
+    const { options, margins } = this;
+    const chartHeight = options.height - margins.top - margins.bottom;
+
+    this.renderBgcolorInRegion(plot, bars, viewport, margins.top, chartHeight);
+  }
+
+  private renderBgcolorInRegion(
+    plot: PlotOutput,
+    bars: Bar[],
+    viewport: Viewport,
+    regionTop: number,
+    regionHeight: number,
+  ): void {
     const { ctx, options, margins } = this;
     const chartWidth = options.width - margins.left;
-    const chartHeight = options.height - margins.top - margins.bottom;
 
     const { values, color } = plot;
 
@@ -2524,7 +2536,7 @@ export class TealchartRenderer {
           : (Array.isArray(color) ? color[0] : color) || 'rgba(33, 150, 243, 0.2)';
 
       ctx.fillStyle = barColor as string;
-      ctx.fillRect(x - slotWidth / 2, margins.top, slotWidth, chartHeight);
+      ctx.fillRect(x - slotWidth / 2, regionTop, slotWidth, regionHeight);
     }
   }
 
@@ -4035,6 +4047,11 @@ export class TealchartRenderer {
 
     const { values, color, linewidth = 1, style = 'line' } = plot;
 
+    if (plot.type === 'bgcolor') {
+      this.renderBgcolorInRegion(plot, bars, viewport, pane.top, pane.height);
+      return;
+    }
+
     if (plot.type === 'plotshape' || plot.type === 'plotchar' || plot.type === 'plotarrow') {
       this.renderPlotShapeWithY(plot, bars, viewport, pane.top, pane.height, (value) => this.valueToY(value, pane));
       return;
@@ -4736,6 +4753,9 @@ export class TealchartRenderer {
         case 'hline':
           this.renderHlineInPane(plot, paneOffset);
           break;
+        case 'bgcolor':
+          this.renderBgcolorInRegion(plot, bars, viewport, paneOffset.top, paneOffset.height);
+          break;
         case 'plotshape':
         case 'plotchar':
         case 'plotarrow':
@@ -4745,7 +4765,6 @@ export class TealchartRenderer {
           break;
         case 'fill':
           break;
-        // bgcolor could be added later for pane support
       }
     }
 
