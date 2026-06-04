@@ -27,6 +27,7 @@ interface ResolvedLabelLayout {
   textX: number;
   textY: number;
   textAlign: CanvasTextAlign;
+  lineHeight: number;
 }
 
 interface ResolvedWrappedTextLayout {
@@ -500,16 +501,21 @@ export class TealScriptDrawingRenderer {
       );
       if (!position) continue;
 
-      const text = label.text ?? '';
+      const textLines = this.splitDrawingTextLines(label.text ?? '');
       const paddingX = 8;
-      const height = 22;
+      const paddingY = 4;
+      const minHeight = 22;
+      const fontSize = this.fontSizeForDrawing(label.size);
+      const lineHeight = Math.ceil(fontSize * 1.25);
+      const shouldExpandBody = !this.isSymbolLabelStyle(label.style) && textLines.length > 1;
+      const height = shouldExpandBody ? Math.max(minHeight, textLines.length * lineHeight + paddingY * 2) : minHeight;
       const font = this.fontForDrawing(label.size, label.textFontFamily, label.textFormatting);
       ctx.font = font;
-      const width = Math.max(18, this.getTextWidth(ctx, text, font) + paddingX * 2);
+      const width = Math.max(18, this.measureDrawingTextLines(textLines, font) + paddingX * 2);
       const fillColor = label.color ?? '#1f2937';
       const textColor = label.textColor ?? '#FFFFFF';
 
-      const layout = this.resolveLabelLayout(label.style, label.textAlign, position, width, height, margins.left, options.width - margins.right, pane);
+      const layout = this.resolveLabelLayout(label.style, label.textAlign, position, width, height, lineHeight, margins.left, options.width - margins.right, pane);
 
       if (label.style !== 'none') {
         ctx.fillStyle = fillColor;
@@ -518,7 +524,7 @@ export class TealScriptDrawingRenderer {
 
       ctx.fillStyle = textColor;
       ctx.textAlign = layout.textAlign;
-      ctx.fillText(text, layout.textX, layout.textY);
+      this.drawLabelTextLines(textLines, layout);
     }
 
     ctx.restore();
@@ -530,6 +536,7 @@ export class TealScriptDrawingRenderer {
     anchor: { x: number; y: number },
     width: number,
     height: number,
+    lineHeight: number,
     minX: number,
     maxX: number,
     pane: ComputedPane,
@@ -567,6 +574,7 @@ export class TealScriptDrawingRenderer {
         textX: style === 'none' ? anchor.x : bodyX + bodyWidth + paddingX,
         textY: bodyY + height / 2,
         textAlign: 'left',
+        lineHeight,
       };
     }
 
@@ -583,7 +591,23 @@ export class TealScriptDrawingRenderer {
       ),
       textY: style === 'none' ? anchor.y : bodyY + height / 2,
       textAlign: this.canvasTextAlignForDrawing(textAlign),
+      lineHeight,
     };
+  }
+
+  private splitDrawingTextLines(text: string): string[] {
+    return text.split(/\r\n|\r|\n/);
+  }
+
+  private measureDrawingTextLines(lines: string[], font: string): number {
+    return lines.reduce((maxWidth, line) => Math.max(maxWidth, this.getTextWidth(this.ctx, line, font)), 0);
+  }
+
+  private drawLabelTextLines(lines: string[], layout: ResolvedLabelLayout): void {
+    const startY = layout.textY - ((lines.length - 1) * layout.lineHeight) / 2;
+    for (let index = 0; index < lines.length; index++) {
+      this.ctx.fillText(lines[index]!, layout.textX, startY + index * layout.lineHeight);
+    }
   }
 
   private canvasTextAlignForDrawing(textAlign: string | undefined): CanvasTextAlign {
