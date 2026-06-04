@@ -2727,7 +2727,9 @@ duplicateCopy = chart.point.copy(point, id=point)
 indicator("Label Signatures")
 first = label.new(x=bar_index, close, "Entry", xloc.bar_index, yloc.price, color.green, label.style_label_up, color.white, size.small, "center", "tip", "monospace", true, "bold")
 second = label.new(bar_index, high, text="High", color=color.orange, style=label.style_label_down)
-labels = array.from(first, second)
+labelPoint = chart.point.from_index(bar_index, low)
+third = label.new(labelPoint, "Point", xloc.bar_index, yloc.price, color.blue)
+labels = array.from(first, second, third)
 plot(array.size(labels))
 `));
 
@@ -2736,6 +2738,7 @@ plot(array.size(labels))
     expect(result.diagnostics).toEqual([]);
     expect(types.get('first')).toMatchObject({ kind: 'label' });
     expect(types.get('second')).toMatchObject({ kind: 'label' });
+    expect(types.get('third')).toMatchObject({ kind: 'label' });
     expect(types.get('labels')).toMatchObject({ kind: 'array', elementType: { kind: 'label' } });
   });
 
