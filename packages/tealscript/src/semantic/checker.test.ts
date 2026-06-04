@@ -3130,6 +3130,7 @@ box.set_text_halign(region, text_halign="left")
 box.set_text_valign(id=region, "top")
 box.set_text_wrap(region, text_wrap="auto")
 box.set_text_font_family(id=region, "monospace")
+box.set_text_formatting(region, text_formatting="bolditalic")
 plot(1)
 `));
 
@@ -3145,6 +3146,9 @@ missing = box.set_text_color(id=region)
 duplicate = box.set_text_size(region, size.small, id=region)
 tooMany = box.set_text_wrap(region, "auto", "none")
 badName = box.set_text_size(region, text_size=size.small)
+missingFormatting = box.set_text_formatting(id=region)
+duplicateFormatting = box.set_text_formatting(region, "bold", id=region)
+unknownFormatting = box.set_text_formatting(region, formatting="italic")
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -3156,6 +3160,12 @@ badName = box.set_text_size(region, text_size=size.small)
       "Unknown argument 'text_size' for box.set_text_size()",
       'box.set_text_size() expects at least 2 arguments',
       "box.set_text_size() missing required argument 'size'",
+      'box.set_text_formatting() expects at least 2 arguments',
+      "box.set_text_formatting() missing required argument 'text_formatting'",
+      "Argument 'id' for box.set_text_formatting() was supplied multiple times",
+      "Unknown argument 'formatting' for box.set_text_formatting()",
+      'box.set_text_formatting() expects at least 2 arguments',
+      "box.set_text_formatting() missing required argument 'text_formatting'",
     ]);
   });
 

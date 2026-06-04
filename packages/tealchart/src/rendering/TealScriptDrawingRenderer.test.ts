@@ -306,6 +306,7 @@ describe('TealScriptDrawingRenderer', () => {
           textValign: 'middle',
           textWrap: 'auto',
           textFontFamily: 'monospace',
+          textFormatting: 'bolditalic',
         }),
       ]),
       bars,
@@ -313,7 +314,7 @@ describe('TealScriptDrawingRenderer', () => {
       pane,
     );
 
-    expect(events).toContain('font:12px monospace');
+    expect(events).toContain('font:italic bold 12px monospace');
     expect(events).toContain('fillTextStyle:center,top');
     expect(events.some((event) => event.startsWith('fillText:Alpha:'))).toBe(true);
     expect(events.some((event) => event.startsWith('fillText:Beta:'))).toBe(true);

@@ -595,6 +595,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['box.set_text_valign', { params: ['id', 'text_valign'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['box.set_text_wrap', { params: ['id', 'text_wrap'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['box.set_text_font_family', { params: ['id', 'text_font_family'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['box.set_text_formatting', { params: ['id', 'text_formatting'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['box.get_left', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['box.get_right', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['box.get_top', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],

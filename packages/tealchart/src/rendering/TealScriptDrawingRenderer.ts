@@ -124,7 +124,7 @@ export class TealScriptDrawingRenderer {
         ctx.setLineDash([]);
         ctx.fillStyle = box.textColor ?? '#FFFFFF';
         const fontSize = this.fontSizeForDrawing(box.textSize);
-        const font = `${fontSize}px ${this.fontFamilyForDrawing(box.textFontFamily)}`;
+        const font = this.fontForDrawing(box.textSize, box.textFontFamily, box.textFormatting);
         ctx.font = font;
         if (box.textWrap === 'auto') {
           const textLayout = this.resolveWrappedBoxTextLayout(box, rect, fontSize, font);

@@ -676,13 +676,14 @@ common border, fill, text, `extend`, and `xloc` options, including
 `chart.point` top-left/bottom-right overloads. The runtime supports persistent
 `var` box handles, geometry setters (`set_left`, `set_right`, `set_top`,
 `set_bottom`, `set_lefttop`, `set_rightbottom`, `set_xloc`,
-`set_top_left_point`, `set_bottom_right_point`), style/text setters,
-coordinate/color/text getters, `box.copy()`, and `box.delete()`. Box mutators
-and getters accept Pine-style named `id`, value, and point arguments. Semantic analysis
+`set_top_left_point`, `set_bottom_right_point`), style/text setters including
+`set_text_formatting`, coordinate/color/text getters, `box.copy()`, and
+`box.delete()`. Box mutators and getters accept Pine-style named `id`, value,
+and point arguments. Semantic analysis
 preserves known box getter return types and `box.all` handle-array element types
 for downstream diagnostics. Rendering routes filled rectangles to the script
-pane with borders, text alignment, `text_wrap=auto` wrapping, and
-default/monospace font-family metadata. Full
+pane with borders, text alignment, `text_wrap=auto` wrapping,
+default/monospace font-family metadata, and bold/italic text formatting. Full
 TradingView text pixel parity and remaining edge-case
 styling remain planned.
 
