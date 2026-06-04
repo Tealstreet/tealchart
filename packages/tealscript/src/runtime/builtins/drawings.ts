@@ -109,6 +109,8 @@ function tableCellKey(column: number, row: number): string {
 }
 
 const MAX_TABLE_CELLS = 10000;
+const PINE_COLOR_BLUE = '#2196F3';
+const PINE_COLOR_BLACK = '#363A45';
 
 function normalizeTableColumn(runtime: DrawingBuiltinRuntime, value: unknown): number {
   return Math.max(0, Math.trunc(runtime.toNumber(value)));
@@ -400,7 +402,7 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
       y2,
       xloc,
       extend: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 3 : 5, 'none')),
-      color: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 4 : 6)),
+      color: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 4 : 6, PINE_COLOR_BLUE)),
       style: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 5 : 7, 'solid')),
       width: runtime.toLineWidth(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 6 : 8)),
       forceOverlay: Boolean(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 7 : 9, false)),
@@ -652,15 +654,15 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
       bottom: usesPointOverload
         ? bottomRight.price
         : runtime.toNullableNumber(orderedCallArg(args, namedArgs, boxNewCoordinateArgs, 3)),
-      borderColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 2 : 4)),
+      borderColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 2 : 4, PINE_COLOR_BLUE)),
       borderWidth: runtime.toLineWidth(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 3 : 5)),
       borderStyle: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 4 : 6, 'solid')),
       extend: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 5 : 7, 'none')),
       xloc,
-      bgcolor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 7 : 9)),
+      bgcolor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 7 : 9, PINE_COLOR_BLUE)),
       text: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 8 : 10, '')),
       textSize: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 9 : 11, 'normal')),
-      textColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 10 : 12)),
+      textColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 10 : 12, PINE_COLOR_BLACK)),
     };
     if (textHalign !== undefined) drawing.textHalign = textHalign;
     if (textValign !== undefined) drawing.textValign = textValign;
@@ -873,7 +875,7 @@ export function registerPolylineBuiltins(builtins: BuiltinRegistry, runtime: Dra
       curved: Boolean(orderedCallArg(args, namedArgs, polylineNewArgs, 1, false)),
       closed: Boolean(orderedCallArg(args, namedArgs, polylineNewArgs, 2, false)),
       xloc: runtime.toStringValue(orderedCallArg(args, namedArgs, polylineNewArgs, 3, 'bar_index')),
-      lineColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, polylineNewArgs, 4)),
+      lineColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, polylineNewArgs, 4, PINE_COLOR_BLUE)),
       fillColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, polylineNewArgs, 5)),
       lineStyle: runtime.toStringValue(orderedCallArg(args, namedArgs, polylineNewArgs, 6, 'solid')),
       lineWidth: runtime.toLineWidth(orderedCallArg(args, namedArgs, polylineNewArgs, 7)),

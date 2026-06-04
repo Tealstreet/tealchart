@@ -190,7 +190,7 @@ plot(line.get_price(upper, bar_index), title="Upper Price")
         y2: 113,
         xloc: 'bar_index',
         extend: 'none',
-        color: null,
+        color: '#2196F3',
         style: 'solid',
         width: 1,
         forceOverlay: false,
@@ -206,7 +206,7 @@ plot(line.get_price(upper, bar_index), title="Upper Price")
         y2: 108,
         xloc: 'bar_index',
         extend: 'none',
-        color: null,
+        color: '#2196F3',
         style: 'solid',
         width: 1,
         forceOverlay: false,
@@ -236,11 +236,75 @@ plot(line.get_price(upper, bar_index), title="Upper Price")
         borderStyle: 'solid',
         bgcolor: '#2196F333',
         text: 'range',
-        textColor: null,
+        textColor: '#363A45',
         textSize: 'normal',
       },
     ]);
     expect(getPlot(result, 'Upper Price').values).toEqual([103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 113]);
+  });
+
+  it('preserves explicit na drawing colors on constructors', () => {
+    const result = runCompatScript(`
+indicator("Explicit na drawing colors", overlay=true)
+if barstate.islast
+    line.new(bar_index - 1, high[1], bar_index, high, color=na)
+    box.new(bar_index - 1, high, bar_index, low, border_color=na, bgcolor=na, text="hidden", text_color=na)
+    points = array.from(chart.point.from_index(bar_index - 1, low[1]), chart.point.now(close))
+    polyline.new(points, line_color=na, fill_color=na)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'line_line.new_0_11',
+        type: 'line',
+        barIndex: 11,
+        x1: 10,
+        y1: 114,
+        x2: 11,
+        y2: 113,
+        xloc: 'bar_index',
+        extend: 'none',
+        color: null,
+        style: 'solid',
+        width: 1,
+        forceOverlay: false,
+      },
+      {
+        id: 'box_box.new_0_11',
+        type: 'box',
+        barIndex: 11,
+        left: 10,
+        top: 113,
+        right: 11,
+        bottom: 108,
+        xloc: 'bar_index',
+        extend: 'none',
+        borderColor: null,
+        borderWidth: 1,
+        borderStyle: 'solid',
+        bgcolor: null,
+        text: 'hidden',
+        textColor: null,
+        textSize: 'normal',
+      },
+      {
+        id: 'polyline_polyline.new_0_11',
+        type: 'polyline',
+        barIndex: 11,
+        points: [
+          { type: 'chart.point', time: null, index: 10, price: 109 },
+          { type: 'chart.point', time: compatibilityBars[11]!.time, index: 11, price: 112 },
+        ],
+        curved: false,
+        closed: false,
+        xloc: 'bar_index',
+        lineColor: null,
+        fillColor: null,
+        lineStyle: 'solid',
+        lineWidth: 1,
+      },
+    ]);
   });
 
   it('updates and reads a persistent line with Pine named setter idioms', () => {
@@ -316,7 +380,7 @@ plot(array.size(linefill.all), title="Named Linefill Count")
         y2: 113,
         xloc: 'bar_index',
         extend: 'none',
-        color: null,
+        color: '#2196F3',
         style: 'solid',
         width: 1,
         forceOverlay: false,
@@ -331,7 +395,7 @@ plot(array.size(linefill.all), title="Named Linefill Count")
         y2: 108,
         xloc: 'bar_index',
         extend: 'none',
-        color: null,
+        color: '#2196F3',
         style: 'solid',
         width: 1,
         forceOverlay: false,
@@ -701,12 +765,12 @@ if barstate.islast
         bottom: 108,
         xloc: 'bar_index',
         extend: 'none',
-        borderColor: null,
+        borderColor: '#2196F3',
         borderWidth: 1,
         borderStyle: 'solid',
         bgcolor: '#FF980033',
         text: 'mixed box',
-        textColor: null,
+        textColor: '#363A45',
         textSize: 'normal',
       },
       {
@@ -846,7 +910,7 @@ plot(mixedPrice, title="Mixed Line Price")
         y2: 108,
         xloc: 'bar_index',
         extend: 'none',
-        color: null,
+        color: '#2196F3',
         style: 'solid',
         width: 1,
         forceOverlay: false,
@@ -869,12 +933,12 @@ plot(mixedPrice, title="Mixed Line Price")
         bottom: 108,
         xloc: 'bar_index',
         extend: 'none',
-        borderColor: null,
+        borderColor: '#2196F3',
         borderWidth: 1,
         borderStyle: 'solid',
         bgcolor: '#2196F333',
         text: 'mixed box',
-        textColor: null,
+        textColor: '#363A45',
         textSize: 'normal',
       },
       {
