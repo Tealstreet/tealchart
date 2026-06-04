@@ -608,7 +608,7 @@ if barstate.islast
         rows: 1,
         bgcolor: null,
         frameColor: null,
-        frameWidth: 1,
+        frameWidth: 0,
         borderColor: '#FFFFFF',
         borderWidth: 1,
         cells: [
@@ -760,6 +760,7 @@ if barstate.islast
         color: '#F44336',
         textColor: '#FFFFFF',
         size: 'normal',
+        tooltip: undefined,
       },
       {
         id: 'line_line.new_0_11',
@@ -843,7 +844,7 @@ if barstate.islast
         rows: 1,
         bgcolor: null,
         frameColor: null,
-        frameWidth: 1,
+        frameWidth: 0,
         borderColor: '#FFFFFF',
         borderWidth: 1,
         cells: [
@@ -995,9 +996,9 @@ plot(mixedPrice, title="Mixed Line Price")
         rows: 1,
         bgcolor: '#9E9E9E33',
         frameColor: null,
-        frameWidth: 1,
+        frameWidth: 0,
         borderColor: null,
-        borderWidth: 1,
+        borderWidth: 0,
         cells: [
           {
             column: 0,
@@ -1012,6 +1013,7 @@ plot(mixedPrice, title="Mixed Line Price")
             bgcolor: '#4CAF50',
           },
         ],
+        mergedCells: undefined,
       },
     ]);
     expect(getPlot(result, 'Mixed Line Price').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 113]);
