@@ -1594,9 +1594,11 @@ describe('TealchartRenderer coordinate transforms', () => {
 
     it('renders multi-line marker text away from the marker', () => {
       const fillText = vi.fn();
+      const moveTo = vi.fn();
       const ctx = {
         ...createMockCtx(),
         fillText,
+        moveTo,
       };
       const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
       const bars = makeBars(2, 1_000_000, 60_000, 100);
@@ -1629,10 +1631,13 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       (renderer as any).renderPlotShape(above, bars, viewport);
       const aboveCalls = fillText.mock.calls.slice();
+      const aboveMarkerY = moveTo.mock.calls[0][1] + 3;
       fillText.mockClear();
+      moveTo.mockClear();
 
       (renderer as any).renderPlotShape(below, bars, viewport);
       const belowCalls = fillText.mock.calls.slice();
+      const belowMarkerY = moveTo.mock.calls[0][1] + 3;
 
       const sellCall = aboveCalls.find((call) => call[0] === 'Sell');
       const sellNowCall = aboveCalls.find((call) => call[0] === 'Now');
@@ -1641,9 +1646,11 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       expect(sellCall).toBeDefined();
       expect(sellNowCall).toBeDefined();
+      expect(sellCall![2]).toBeLessThan(aboveMarkerY);
       expect(sellCall![2]).toBeLessThan(sellNowCall![2]);
       expect(buyCall).toBeDefined();
       expect(buyNowCall).toBeDefined();
+      expect(buyCall![2]).toBeGreaterThan(belowMarkerY);
       expect(buyCall![2]).toBeLessThan(buyNowCall![2]);
     });
 
