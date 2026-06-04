@@ -650,11 +650,15 @@ describe('TealchartRenderer coordinate transforms', () => {
 
     it('renders plot trackprice at the latest finite plot value', () => {
       const lineTo = vi.fn();
+      const roundRect = vi.fn();
+      const fillText = vi.fn();
       const setLineDash = vi.fn();
       const stroke = vi.fn();
       const ctx = {
         ...createMockCtx(),
         lineTo,
+        roundRect,
+        fillText,
         setLineDash,
         stroke,
       };
@@ -684,6 +688,8 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(lineTo).toHaveBeenCalledWith(opts.width - opts.margins.right, trackY);
       expect(setLineDash).toHaveBeenCalledWith([2, 3]);
       expect(stroke).toHaveBeenCalled();
+      expect(roundRect).toHaveBeenCalledWith(opts.width - opts.margins.right + 2, trackY - 8, expect.any(Number), 16, 2);
+      expect(fillText).toHaveBeenCalledWith('120', expect.any(Number), trackY);
       expect(ctx.strokeStyle).toBe('#333333');
     });
 
@@ -722,9 +728,11 @@ describe('TealchartRenderer coordinate transforms', () => {
 
     it('renders pane plot trackprice at the latest showLast value', () => {
       const lineTo = vi.fn();
+      const fillText = vi.fn();
       const ctx = {
         ...createMockCtx(),
         lineTo,
+        fillText,
       };
       const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
       const bars = makeBars(3, 1_000_000, 60_000, 100);
@@ -761,6 +769,7 @@ describe('TealchartRenderer coordinate transforms', () => {
       const trackY = renderer.valueToY(50, pane);
       expect(lineTo).toHaveBeenCalledWith(opts.width - opts.margins.right, trackY);
       expect(lineTo).not.toHaveBeenCalledWith(opts.width - opts.margins.right, renderer.valueToY(40, pane));
+      expect(fillText).toHaveBeenCalledWith('50', expect.any(Number), trackY);
     });
 
     it('joins circle plot markers when join metadata is enabled', () => {
