@@ -518,7 +518,7 @@ plot(box.get_text_valign(id=zone) == "bottom", title="Named Box VAlign")
     expect(getPlot(result, 'Named Box Left').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 8]);
     expect(getPlot(result, 'Named Box Bottom').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 108]);
     expect(getPlot(result, 'Named Box Text').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, true]);
-    expect(getPlot(result, 'Named Box HAlign').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, true]);
+    expect(getPlot(result, 'Named Box HAlign').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Named Box VAlign').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, true]);
   });
 

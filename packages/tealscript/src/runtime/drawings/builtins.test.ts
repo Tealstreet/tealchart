@@ -884,6 +884,26 @@ plot(close)`;
       });
     });
 
+    it('uses Pine centered defaults for box text alignment getters', () => {
+      const script = `//@version=6
+indicator("Box text defaults")
+zone = box.new(0, high, 1, low, text="seed")
+label.new(na, na, text=str.format("{0}|{1}", box.get_text_halign(zone), box.get_text_valign(zone)))
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings[0]).not.toHaveProperty('textHalign');
+      expect(result.drawings[0]).not.toHaveProperty('textValign');
+      expect(result.drawings[1]).toMatchObject({
+        type: 'label',
+        text: 'center|center',
+      });
+    });
+
     it('records force-overlay labels and box text layout metadata', () => {
       const script = `//@version=6
 indicator("Drawing layout", overlay=false)

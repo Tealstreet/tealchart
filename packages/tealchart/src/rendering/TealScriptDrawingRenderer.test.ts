@@ -314,6 +314,35 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events).toContain('fillText:Box:114,124');
   });
 
+  it('renders unconfigured box text with Pine centered defaults', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeBox({ text: 'Box' }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).toContain('fillTextStyle:center,middle');
+    expect(events).toContain('fillText:Box:60,80');
+  });
+
   it('renders multiline non-wrapped box text using stored alignment', () => {
     const events: string[] = [];
     const renderer = new TealScriptDrawingRenderer({

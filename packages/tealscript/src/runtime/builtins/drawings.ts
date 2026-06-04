@@ -868,8 +868,8 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
   builtins.set('box.get_bgcolor', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.bgcolor ?? Number.NaN));
   builtins.set('box.get_border_color', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.borderColor ?? Number.NaN));
   builtins.set('box.get_text', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.text));
-  builtins.set('box.get_text_halign', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.textHalign ?? 'left'));
-  builtins.set('box.get_text_valign', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.textValign ?? 'top'));
+  builtins.set('box.get_text_halign', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.textHalign ?? 'center'));
+  builtins.set('box.get_text_valign', (args, namedArgs, ctx) => getDrawingValue(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => box.textValign ?? 'center'));
   builtins.set('box.all', (_args, _namedArgs, ctx) => ctx.getDrawingIds('box'));
 }
 
