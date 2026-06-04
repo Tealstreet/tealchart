@@ -129,9 +129,9 @@ function makeLabel(overrides: Partial<LabelDrawingOutput> = {}): LabelDrawingOut
     text: 'Label',
     xloc: 'bar_index',
     yloc: 'price',
-    style: 'label_left',
-    color: '#1f2937',
-    textColor: '#ffffff',
+    style: 'label_down',
+    color: '#2196F3',
+    textColor: '#FFFFFF',
     size: 'normal',
     ...overrides,
   };
@@ -487,6 +487,35 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events.some((event) => event.startsWith('fillText:Hidden:'))).toBe(false);
   });
 
+  it('does not draw label body or text for explicit null label colors', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeLabel({ color: null, text: 'Hidden', textColor: null }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).not.toContain('fill');
+    expect(events.some((event) => event.startsWith('fillText:Hidden:'))).toBe(false);
+  });
+
   it('renders Pine label pointer styles instead of plain rounded pills', () => {
     const events: string[] = [];
     const renderer = new TealScriptDrawingRenderer({
@@ -540,7 +569,7 @@ describe('TealScriptDrawingRenderer', () => {
 
     renderer.render(
       partitionTealScriptDrawings([
-        makeLabel({ text: 'Align', textAlign: 'right', textFontFamily: 'monospace', textFormatting: 'bolditalic' }),
+        makeLabel({ style: 'label_left', text: 'Align', textAlign: 'right', textFontFamily: 'monospace', textFormatting: 'bolditalic' }),
         makeLabel({ id: 'label-2', style: 'none', text: 'Bare', textAlign: 'left' }),
       ]),
       bars,
@@ -573,7 +602,7 @@ describe('TealScriptDrawingRenderer', () => {
 
     renderer.render(
       partitionTealScriptDrawings([
-        makeLabel({ text: 'Entry\nStop' }),
+        makeLabel({ style: 'label_left', text: 'Entry\nStop' }),
         makeLabel({ id: 'label-2', style: 'none', text: 'Bare\r\nText', textAlign: 'left' }),
         makeLabel({ id: 'label-3', style: 'square', text: 'Icon\nText' }),
       ]),
@@ -610,7 +639,7 @@ describe('TealScriptDrawingRenderer', () => {
 
     renderer.render(
       partitionTealScriptDrawings([
-        makeLabel({ x: 3, y: 12, text: 'Future' }),
+        makeLabel({ style: 'label_left', x: 3, y: 12, text: 'Future' }),
       ]),
       bars,
       { startTime: 1_000, endTime: 5_000, priceMin: 0, priceMax: 20 },
@@ -644,6 +673,7 @@ describe('TealScriptDrawingRenderer', () => {
           xloc: 'bar_time',
           x: 1_000,
           yloc: 'abovebar',
+          style: 'label_left',
           text: 'Historical',
         }),
       ]),
