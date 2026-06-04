@@ -1317,6 +1317,43 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect((renderer as any).getPlotArrowMarkerSize(plot, 10, 10, 6)).toBe(20);
     });
 
+    it('renders stepline diamond plot markers on top of the step path', () => {
+      const fillColors: string[] = [];
+      const closePath = vi.fn();
+      const stroke = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        closePath,
+        fill: vi.fn(() => {
+          fillColors.push(ctx.fillStyle);
+        }),
+        stroke,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plot: PlotOutput = {
+        id: 'plot_SteplineDiamonds',
+        type: 'plot',
+        title: 'Step diamonds',
+        values: [95, 110, 125],
+        color: ['#2196F3', '#4CAF50', '#F44336'],
+        linewidth: 2,
+        style: 'stepline_diamond',
+      };
+
+      (renderer as any).renderLinePlot(plot, bars, viewport);
+
+      expect(stroke).toHaveBeenCalled();
+      expect(closePath).toHaveBeenCalledTimes(3);
+      expect(fillColors).toEqual(['#2196F3', '#4CAF50', '#F44336']);
+    });
+
     it('draws Pine flag marker shapes with a pole and banner', () => {
       const fillRect = vi.fn();
       const stroke = vi.fn();
