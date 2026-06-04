@@ -112,6 +112,12 @@ function positiveInteger(runtime: DrawingBuiltinRuntime, value: unknown, fallbac
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
+function tableBorderWidth(runtime: DrawingBuiltinRuntime, value: unknown): number {
+  if (value === undefined || runtime.isNa(value)) return 0;
+  const parsed = Math.trunc(runtime.toNumber(value));
+  return Number.isFinite(parsed) ? Math.min(100, Math.max(0, parsed)) : 0;
+}
+
 function tableCellKey(column: number, row: number): string {
   return `${column}:${row}`;
 }
@@ -1065,9 +1071,9 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       rows,
       bgcolor: runtime.toNullableColor(orderedCallArg(args, namedArgs, tableNewArgs, 3)),
       frameColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, tableNewArgs, 4)),
-      frameWidth: runtime.toLineWidth(orderedCallArg(args, namedArgs, tableNewArgs, 5)),
+      frameWidth: tableBorderWidth(runtime, orderedCallArg(args, namedArgs, tableNewArgs, 5)),
       borderColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, tableNewArgs, 6)),
-      borderWidth: runtime.toLineWidth(orderedCallArg(args, namedArgs, tableNewArgs, 7)),
+      borderWidth: tableBorderWidth(runtime, orderedCallArg(args, namedArgs, tableNewArgs, 7)),
       cells: [],
     };
 
@@ -1142,7 +1148,7 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
   });
   builtins.set('table.set_frame_width', (args, namedArgs, ctx) => {
     withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
-      table.frameWidth = runtime.toLineWidth(callArg(args, namedArgs, 1, 'frame_width', undefined, ['table_id']));
+      table.frameWidth = tableBorderWidth(runtime, callArg(args, namedArgs, 1, 'frame_width', undefined, ['table_id']));
     });
     return undefined;
   });
@@ -1154,7 +1160,7 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
   });
   builtins.set('table.set_border_width', (args, namedArgs, ctx) => {
     withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
-      table.borderWidth = runtime.toLineWidth(callArg(args, namedArgs, 1, 'border_width', undefined, ['table_id']));
+      table.borderWidth = tableBorderWidth(runtime, callArg(args, namedArgs, 1, 'border_width', undefined, ['table_id']));
     });
     return undefined;
   });
