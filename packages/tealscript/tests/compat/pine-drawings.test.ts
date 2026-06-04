@@ -304,6 +304,7 @@ plot(array.size(linefill.all), title="Named Linefill Count")
 indicator("Named Persistent Box", overlay=true)
 var zone = box.new(left=na, top=na, right=na, bottom=na, text="")
 if barstate.islast
+    box.set_xloc(id=zone, left=bar_index - 3, right=bar_index, xloc=xloc.bar_index)
     topLeft = chart.point.from_index(index=bar_index - 3, price=high)
     bottomRight = chart.point.now(price=low)
     box.set_top_left_point(id=zone, point=topLeft)

@@ -609,6 +609,47 @@ if barstate.islast
       expect(result.plots.find((plot) => plot.title === 'Box Top')?.values).toEqual([100.5, 100.5, 101.5]);
     });
 
+    it('updates box xloc and horizontal coordinates', () => {
+      const script = `//@version=6
+indicator("Box xloc")
+var zone = box.new(na, na, na, na)
+if barstate.islast
+    box.set_xloc(id=zone, left=time[1], right=time, xloc=xloc.bar_time)
+    box.set_top(zone, high)
+    box.set_bottom(zone, low)
+plot(box.get_left(zone), title="Box Time Left")
+plot(box.get_right(zone), title="Box Time Right")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'box_box.new_0_0',
+          type: 'box',
+          persistent: true,
+          barIndex: 2,
+          left: bars[1]!.time,
+          top: 101.5,
+          right: bars[2]!.time,
+          bottom: 100.7,
+          xloc: 'bar_time',
+          extend: 'none',
+          borderColor: null,
+          borderWidth: 1,
+          borderStyle: 'solid',
+          bgcolor: null,
+          text: '',
+          textColor: null,
+          textSize: 'normal',
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Box Time Left')?.values).toEqual([null, null, bars[1]!.time]);
+      expect(result.plots.find((plot) => plot.title === 'Box Time Right')?.values).toEqual([null, null, bars[2]!.time]);
+    });
+
     it('updates box corners from chart points', () => {
       const script = `//@version=6
 indicator("Box point setters")
