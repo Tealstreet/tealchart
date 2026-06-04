@@ -533,6 +533,7 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
     'text_wrap',
     'text_font_family',
     'force_overlay',
+    'text_formatting',
   ] as const;
   const boxNewCoordinateArgs = [
     'left',
@@ -553,6 +554,7 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
     'text_wrap',
     'text_font_family',
     'force_overlay',
+    'text_formatting',
   ] as const;
 
   builtins.set('box.new', (args, namedArgs, ctx, _scope, callId) => {
@@ -569,6 +571,7 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
     const textWrap = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 13 : 15));
     const textFontFamily = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 14 : 16));
     const forceOverlay = optionalBoolean(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 15 : 17));
+    const textFormatting = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 16 : 18));
     const drawing: BoxDrawingOutput = {
       id,
       type: 'box',
@@ -599,6 +602,7 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
     if (textValign !== undefined) drawing.textValign = textValign;
     if (textWrap !== undefined) drawing.textWrap = textWrap;
     if (textFontFamily !== undefined) drawing.textFontFamily = textFontFamily;
+    if (textFormatting !== undefined) drawing.textFormatting = textFormatting;
     if (forceOverlay !== undefined) drawing.forceOverlay = forceOverlay;
 
     ctx.addDrawing(drawing);
@@ -756,6 +760,12 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
   builtins.set('box.set_text_font_family', (args, namedArgs, ctx) => {
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
       box.textFontFamily = runtime.toStringValue(callArg(args, namedArgs, 1, 'text_font_family', undefined, ['id']));
+    });
+    return undefined;
+  });
+  builtins.set('box.set_text_formatting', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      box.textFormatting = runtime.toStringValue(callArg(args, namedArgs, 1, 'text_formatting', undefined, ['id']));
     });
     return undefined;
   });
