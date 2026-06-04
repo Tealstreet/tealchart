@@ -6,7 +6,7 @@ import type {
   PolylineDrawingOutput,
   TableDrawingOutput,
 } from '@tealstreet/tealscript';
-import type { Bar, ComputedPane } from '../types';
+import type { Bar, ChartMargins, ComputedPane, RenderOptions } from '../types';
 import type { CanvasContext } from './CanvasContext';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -59,6 +59,39 @@ function createRecordingContext(events: string[]): CanvasContext {
     measureText: (text) => ({ width: text.length * 8 }) as TextMetrics,
   };
   return context;
+}
+
+interface DrawingRendererHarnessOptions {
+  options?: Partial<RenderOptions>;
+  margins?: Partial<ChartMargins>;
+  getTextWidth?: (ctx: CanvasContext, text: string, font: string) => number;
+}
+
+function createDrawingRenderer(
+  events: string[],
+  harnessOptions: DrawingRendererHarnessOptions = {},
+): {
+  ctx: CanvasContext;
+  getTextWidth: (ctx: CanvasContext, text: string, font: string) => number;
+  renderer: TealScriptDrawingRenderer;
+} {
+  const ctx = createRecordingContext(events);
+  const getTextWidth = harnessOptions.getTextWidth ?? ((activeCtx, text) => activeCtx.measureText(text).width);
+  const renderer = new TealScriptDrawingRenderer({
+    ctx,
+    options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240, ...harnessOptions.options },
+    margins: { ...DEFAULT_MARGINS, left: 0, right: 0, ...harnessOptions.margins },
+    font: 'sans-serif',
+    coordinateResolvers: {
+      timeToX: (time, viewport, chartWidth) =>
+        ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+      valueToY: (value, activePane) =>
+        activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+    },
+    getTextWidth,
+  });
+
+  return { ctx, getTextWidth, renderer };
 }
 
 const bars: Bar[] = [
@@ -204,21 +237,8 @@ function makeTable(overrides: Partial<TableDrawingOutput> = {}): TableDrawingOut
 describe('TealScriptDrawingRenderer', () => {
   it('renders linefills, boxes, lines, then labels in pane-clipped order', () => {
     const events: string[] = [];
-    const ctx = createRecordingContext(events);
     const getTextWidth = vi.fn((activeCtx: CanvasContext, text: string, font: string) => activeCtx.measureText(text).width);
-    const renderer = new TealScriptDrawingRenderer({
-      ctx,
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth,
-    });
+    const { ctx, renderer } = createDrawingRenderer(events, { getTextWidth });
 
     const drawings = partitionTealScriptDrawings([
       makeLine('line-1'),
@@ -251,19 +271,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('renders Pine line arrow styles with endpoint arrowheads', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -283,19 +291,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('renders box text using stored horizontal and vertical alignment', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -316,19 +312,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('renders numeric Pine box text sizes as canvas font pixels', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -345,19 +329,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('renders unconfigured box text with Pine centered defaults', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -374,19 +346,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('renders multiline non-wrapped box text using stored alignment', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -408,19 +368,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('wraps Pine box text with stored alignment and font metadata', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -448,19 +396,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('renders polyline paths with optional fill when closed', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -481,19 +417,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('renders Pine polyline arrow styles with endpoint arrowheads', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -514,19 +438,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('renders curved polyline paths with quadratic segments', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -548,19 +460,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('does not draw line, box, or polyline strokes for explicit null colors', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -580,19 +480,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('does not draw linefill areas for explicit null colors', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -611,19 +499,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('does not draw label body or text for explicit null label colors', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -640,19 +516,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('renders Pine label pointer styles instead of plain rounded pills', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -677,19 +541,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('renders label text using stored text alignment', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -710,19 +562,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('renders multiline label text with expanded body bounds', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -747,19 +587,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('renders price labels at projected bar_index positions', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 300, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events, { options: { width: 300 } });
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -776,19 +604,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('renders bar_time abovebar labels at their timestamp candle anchor', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -812,19 +628,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('renders Pine symbol label styles and keeps style_none text-only', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -849,19 +653,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('renders fixed-position table cells above chart drawings', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([makeTable()]),
@@ -879,19 +671,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('renders numeric Pine table text sizes as canvas font pixels', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -923,19 +703,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('does not draw table borders or frames for explicit null colors', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -958,19 +726,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('renders multiline table cell text with expanded auto row height', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -1003,18 +759,9 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('interprets explicit table cell sizes as pane percentages', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 200, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 20, right: 20 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    const { renderer } = createDrawingRenderer(events, {
+      options: { width: 200 },
+      margins: { left: 20, right: 20 },
     });
 
     renderer.render(
@@ -1050,19 +797,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('renders merged table cells as a single span', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
@@ -1114,19 +849,7 @@ describe('TealScriptDrawingRenderer', () => {
 
   it('ignores invalid table text formatting values', () => {
     const events: string[] = [];
-    const renderer = new TealScriptDrawingRenderer({
-      ctx: createRecordingContext(events),
-      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
-      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
-      font: 'sans-serif',
-      coordinateResolvers: {
-        timeToX: (time, viewport, chartWidth) =>
-          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
-        valueToY: (value, activePane) =>
-          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
-      },
-      getTextWidth: (ctx, text) => ctx.measureText(text).width,
-    });
+    const { renderer } = createDrawingRenderer(events);
 
     renderer.render(
       partitionTealScriptDrawings([
