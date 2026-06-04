@@ -3021,12 +3021,16 @@ missingGetter = line.get_x2()
 indicator("Box Geometry Signatures")
 region = box.new(bar_index, high, bar_index + 1, low)
 clone = box.copy(id=region)
+topLeft = chart.point.from_index(bar_index - 1, high)
+bottomRight = chart.point.from_index(bar_index + 2, low)
 box.set_left(id=region, bar_index - 1)
 box.set_right(region, right=bar_index + 2)
 box.set_top(id=region, high)
 box.set_bottom(region, bottom=low)
 box.set_lefttop(id=region, left=bar_index, top=high)
 box.set_rightbottom(region, bar_index + 2, bottom=low)
+box.set_top_left_point(id=region, point=topLeft)
+box.set_bottom_right_point(region, point=bottomRight)
 box.delete(id=clone)
 plot(1)
 `));
@@ -3041,10 +3045,16 @@ plot(1)
     const result = checkProgram(parse(`
 indicator("Bad Box Geometry Signatures")
 region = box.new(bar_index, high, bar_index + 1, low)
+topLeft = chart.point.from_index(bar_index, high)
+bottomRight = chart.point.from_index(bar_index + 1, low)
 unknown = box.set_left(region, left=bar_index, x=bar_index)
 missing = box.set_lefttop(id=region, left=bar_index)
 duplicate = box.set_rightbottom(region, bar_index, low, id=region)
 tooMany = box.set_bottom(region, low, low)
+missingPoint = box.set_top_left_point(id=region)
+duplicatePoint = box.set_bottom_right_point(region, bottomRight, id=region)
+tooManyPoint = box.set_top_left_point(region, topLeft, bottomRight)
+unknownPoint = box.set_bottom_right_point(region, top_left=topLeft)
 missingCopy = box.copy()
 `));
 
@@ -3054,6 +3064,13 @@ missingCopy = box.copy()
       "box.set_lefttop() missing required argument 'top'",
       "Argument 'id' for box.set_rightbottom() was supplied multiple times",
       'box.set_bottom() expects at most 2 arguments',
+      'box.set_top_left_point() expects at least 2 arguments',
+      "box.set_top_left_point() missing required argument 'point'",
+      "Argument 'id' for box.set_bottom_right_point() was supplied multiple times",
+      'box.set_top_left_point() expects at most 2 arguments',
+      "Unknown argument 'top_left' for box.set_bottom_right_point()",
+      'box.set_bottom_right_point() expects at least 2 arguments',
+      "box.set_bottom_right_point() missing required argument 'point'",
       'box.copy() expects at least 1 argument',
       "box.copy() missing required argument 'id'",
     ]);

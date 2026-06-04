@@ -59,6 +59,20 @@ function applyLinePoint(line: LineDrawingOutput, pointValue: unknown, endpoint: 
   }
 }
 
+function applyBoxPoint(box: BoxDrawingOutput, pointValue: unknown, corner: 'topLeft' | 'bottomRight'): void {
+  const point = isChartPoint(pointValue) ? pointValue : undefined;
+  const x = point ? pointX(point, box.xloc) : null;
+  const y = point ? point.price : null;
+
+  if (corner === 'topLeft') {
+    box.left = x;
+    box.top = y;
+  } else {
+    box.right = x;
+    box.bottom = y;
+  }
+}
+
 function isPineRuntimeArray(value: unknown): value is { values: unknown[] } {
   return (
     typeof value === 'object'
@@ -646,6 +660,20 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
       box.right = runtime.toNullableNumber(callArg(args, namedArgs, 1, 'right', undefined, ['id']));
       box.bottom = runtime.toNullableNumber(callArg(args, namedArgs, 2, 'bottom', undefined, ['id', 'right']));
+      box.barIndex = ctx.bar_index;
+    });
+    return undefined;
+  });
+  builtins.set('box.set_top_left_point', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      applyBoxPoint(box, callArg(args, namedArgs, 1, 'point', undefined, ['id']), 'topLeft');
+      box.barIndex = ctx.bar_index;
+    });
+    return undefined;
+  });
+  builtins.set('box.set_bottom_right_point', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'box', runtime.isNa, (box) => {
+      applyBoxPoint(box, callArg(args, namedArgs, 1, 'point', undefined, ['id']), 'bottomRight');
       box.barIndex = ctx.bar_index;
     });
     return undefined;

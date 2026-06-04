@@ -609,6 +609,52 @@ if barstate.islast
       expect(result.plots.find((plot) => plot.title === 'Box Top')?.values).toEqual([100.5, 100.5, 101.5]);
     });
 
+    it('updates box corners from chart points', () => {
+      const script = `//@version=6
+indicator("Box point setters")
+var zone = box.new(na, na, na, na)
+if barstate.islast
+    topLeft = chart.point.from_index(bar_index - 1, high)
+    bottomRight = chart.point.now(low)
+    box.set_top_left_point(id=zone, point=topLeft)
+    box.set_bottom_right_point(zone, point=bottomRight)
+plot(box.get_left(zone), title="Box Point Left")
+plot(box.get_top(zone), title="Box Point Top")
+plot(box.get_right(zone), title="Box Point Right")
+plot(box.get_bottom(zone), title="Box Point Bottom")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'box_box.new_0_0',
+          type: 'box',
+          persistent: true,
+          barIndex: 2,
+          left: 1,
+          top: 101.5,
+          right: 2,
+          bottom: 100.7,
+          xloc: 'bar_index',
+          extend: 'none',
+          borderColor: null,
+          borderWidth: 1,
+          borderStyle: 'solid',
+          bgcolor: null,
+          text: '',
+          textColor: null,
+          textSize: 'normal',
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Box Point Left')?.values).toEqual([null, null, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Box Point Top')?.values).toEqual([null, null, 101.5]);
+      expect(result.plots.find((plot) => plot.title === 'Box Point Right')?.values).toEqual([null, null, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Box Point Bottom')?.values).toEqual([null, null, 100.7]);
+    });
+
     it('preserves persistent box handles during realtime rollback', () => {
       const script = `//@version=6
 indicator("Realtime box")
