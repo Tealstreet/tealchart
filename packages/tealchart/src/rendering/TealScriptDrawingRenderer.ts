@@ -153,6 +153,10 @@ export class TealScriptDrawingRenderer {
   }
 
   private fontSizeForDrawing(size: string): number {
+    if (/^[1-9]\d*$/.test(size)) {
+      return Number.parseInt(size, 10);
+    }
+
     switch (size) {
       case 'tiny':
         return 9;
