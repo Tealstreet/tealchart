@@ -645,7 +645,7 @@ describe('TealchartRenderer coordinate transforms', () => {
       const baselineY = renderer.publicPriceToY(100, viewport);
       expect(moveTo).toHaveBeenCalledWith(expect.any(Number), baselineY);
       expect(lineTo).toHaveBeenCalledWith(expect.any(Number), baselineY);
-      expect(fill).toHaveBeenCalled();
+      expect(fill).toHaveBeenCalledTimes(1);
     });
 
     it('renders plot trackprice at the latest finite plot value', () => {
@@ -1484,6 +1484,76 @@ describe('TealchartRenderer coordinate transforms', () => {
       renderer.renderPlots([plot, hline, fillPlot], bars, viewport);
 
       expect(fill).toHaveBeenCalled();
+    });
+
+    it('honors explicit plot z-order for fill outputs', () => {
+      const { ctx, trace } = createTraceCtx();
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 0,
+        priceMax: 20,
+      };
+      const plot: PlotOutput = {
+        id: 'plot_Basis',
+        type: 'plot',
+        title: 'Basis',
+        values: [10, 11],
+        color: '#2196F3',
+        scriptId: 'script-1',
+        zOrder: 0,
+      };
+      const hline: PlotOutput = {
+        id: 'hline_Level',
+        type: 'hline',
+        title: 'Level',
+        values: [],
+        color: '#787B86',
+        price: 5,
+        scriptId: 'script-1',
+        zOrder: 1,
+      };
+      const fillPlot: PlotOutput = {
+        id: 'fill_PlotHline',
+        type: 'fill',
+        title: 'PlotHline',
+        values: [],
+        color: '#4CAF5033',
+        plot1Id: plot.id,
+        plot2Id: hline.id,
+        scriptId: 'script-1',
+        zOrder: 2,
+      };
+
+      renderer.renderWithLayout(
+        bars,
+        viewport,
+        {
+          panes: [
+            {
+              id: 'main',
+              type: 'main',
+              heightRatio: 1,
+              yMin: viewport.priceMin,
+              yMax: viewport.priceMax,
+              fixedRange: false,
+            },
+          ],
+          timeAxisHeight: TIME_AXIS_HEIGHT,
+        },
+        undefined,
+        [plot, hline, fillPlot],
+        { 'script-1': { overlay: true, explicitPlotZOrder: true } },
+      );
+
+      const plotStroke = trace.findIndex((entry) => entry.startsWith('stroke:#2196F3'));
+      const hlineStroke = trace.findIndex((entry) => entry.startsWith('stroke:#787B86'));
+      const fillIndex = trace.findIndex((entry) => entry === 'fill:#4CAF5033');
+      expect(plotStroke).toBeGreaterThanOrEqual(0);
+      expect(hlineStroke).toBeGreaterThan(plotStroke);
+      expect(fillIndex).toBeGreaterThan(hlineStroke);
     });
   });
 

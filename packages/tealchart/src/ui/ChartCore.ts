@@ -55,6 +55,7 @@ import { button, div, icons } from './dom';
 export interface IndicatorPaneInfo {
   overlay: boolean;
   yAxisRange?: { min: number; max: number };
+  explicitPlotZOrder?: boolean;
   name?: string;
   inputs?: Record<string, unknown>;
 }

@@ -137,6 +137,7 @@ export interface PlotOutput {
   type: 'plot' | 'hline' | 'bgcolor' | 'barcolor' | 'plotbar' | 'plotcandle' | 'plotshape' | 'plotchar' | 'plotarrow' | 'fill';
   title: string;
   values: (number | null)[];
+  zOrder?: number;
 
   /** Script ID that produced this plot (set by TealscriptManager) */
   scriptId?: string;
@@ -690,6 +691,7 @@ export class ExecutionContext {
 
     const fullPlot: PlotOutput = {
       ...plot,
+      zOrder: this.plotOrder.length,
       values: [],
     };
     this.plots.set(plot.id, fullPlot);

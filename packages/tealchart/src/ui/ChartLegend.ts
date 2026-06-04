@@ -28,6 +28,7 @@ export interface ActiveIndicator {
 export interface IndicatorPaneInfo {
   overlay: boolean;
   yAxisRange?: { min: number; max: number };
+  explicitPlotZOrder?: boolean;
   name?: string;
   inputs?: Record<string, unknown>;
 }

@@ -159,7 +159,7 @@ barcolor(bar_index == 0 ? color.red : na, 1, true, 5, "Bar Tint", display.none)
 
   it('accepts common Pine visual declaration and plot constants', () => {
     const result = runCompatScript(`
-indicator("Visual constants smoke", overlay=true, format=format.price, scale=scale.right)
+indicator("Visual constants smoke", overlay=true, format=format.price, scale=scale.right, explicit_plot_zorder=true)
 displayTarget = display.all - display.status_line
 formatMatches = format.price == "price" and format.volume == "volume" and format.percent == "percent" and format.inherit == "inherit"
 scaleMatches = scale.right == "right" and scale.left == "left" and scale.none == "none"
@@ -176,6 +176,7 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
     expect(result.errors).toEqual([]);
     expect(result.indicatorFormat).toBe('price');
     expect(result.indicatorScale).toBe('right');
+    expect(result.indicatorExplicitPlotZOrder).toBe(true);
     const breakLine = getPlot(result, 'Break Line');
     const stepDiamonds = getPlot(result, 'Step Diamonds');
     const columns = getPlot(result, 'Columns');
@@ -224,6 +225,16 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
       editable: true,
       display: 0,
     });
+    expect(result.plots.map((plot) => [plot.title, plot.zOrder])).toEqual([
+      ['Break Line', 0],
+      ['Step Diamonds', 1],
+      ['Columns', 2],
+      ['Positional Area', 3],
+      ['Midline', 4],
+      ['Solid Positional', 5],
+      ['Format Constants', 6],
+      ['Scale Constants', 7],
+    ]);
     expect(breakLine.values).toHaveLength(compatibilityBars.length);
     expect(getPlot(result, 'Format Constants').values).toEqual(Array(compatibilityBars.length).fill(1));
     expect(getPlot(result, 'Scale Constants').values).toEqual(Array(compatibilityBars.length).fill(1));

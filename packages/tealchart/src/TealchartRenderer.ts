@@ -44,6 +44,7 @@ import { resolveLabelCollisions } from './utils/labelCollision';
 interface IndicatorPaneInfo {
   overlay: boolean;
   yAxisRange?: { min: number; max: number };
+  explicitPlotZOrder?: boolean;
   /** Indicator name for pane label */
   name?: string;
   /** Input values for pane label display */
@@ -1722,11 +1723,11 @@ export class TealchartRenderer {
       const isOverlay = info?.overlay !== false; // Default to overlay if unknown
 
       if (isOverlay || !paneLayout || paneLayout.indicatorPanes.length === 0) {
-        this.renderPlotsInMainPane(scriptPlots, bars, viewport);
+        this.renderPlotsInMainPane(scriptPlots, bars, viewport, info?.explicitPlotZOrder);
       } else {
         const forceOverlayPlots = scriptPlots.filter((plot) => plot.forceOverlay);
         if (forceOverlayPlots.length > 0) {
-          this.renderPlotsInMainPane(forceOverlayPlots, bars, viewport);
+          this.renderPlotsInMainPane(forceOverlayPlots, bars, viewport, info?.explicitPlotZOrder);
         }
 
         const panePlots = scriptPlots.filter((plot) => !plot.forceOverlay);
@@ -1744,7 +1745,7 @@ export class TealchartRenderer {
             this.renderIndicatorPane(pane, paneOffset, viewport);
 
             // Render plots in this pane
-            this.renderPlotsInPane(panePlots, bars, viewport, paneOffset);
+            this.renderPlotsInPane(panePlots, bars, viewport, paneOffset, info?.explicitPlotZOrder);
           }
         }
       }
@@ -1753,7 +1754,21 @@ export class TealchartRenderer {
     ctx.restore();
   }
 
-  private renderPlotsInMainPane(scriptPlots: PlotOutput[], bars: Bar[], viewport: Viewport): void {
+  private renderPlotsInMainPane(
+    scriptPlots: PlotOutput[],
+    bars: Bar[],
+    viewport: Viewport,
+    explicitPlotZOrder = false,
+  ): void {
+    if (explicitPlotZOrder) {
+      for (const plot of this.sortedByZOrder(scriptPlots)) {
+        if (this.shouldRenderPlot(plot)) {
+          this.renderPlotInMainPane(plot, scriptPlots, bars, viewport);
+        }
+      }
+      return;
+    }
+
     for (const plot of scriptPlots) {
       if (plot.type === 'fill' && this.shouldRenderPlot(plot)) {
         this.renderFill(plot, scriptPlots, bars, viewport, (value, paneHeight) =>
@@ -1764,30 +1779,42 @@ export class TealchartRenderer {
 
     for (const plot of scriptPlots) {
       if (!this.shouldRenderPlot(plot)) continue;
+      if (plot.type === 'fill') continue;
 
-      switch (plot.type) {
-        case 'plot':
-          this.renderLinePlot(plot, bars, viewport);
-          this.renderPlotTrackPriceInMainPane(plot, bars, viewport);
-          break;
-        case 'plotbar':
-        case 'plotcandle':
-          this.renderOhlcPlotInLegacyMainPane(plot, bars, viewport);
-          break;
-        case 'hline':
-          this.renderHline(plot, viewport);
-          break;
-        case 'bgcolor':
-          this.renderBgcolor(plot, bars, viewport);
-          break;
-        case 'plotshape':
-        case 'plotchar':
-        case 'plotarrow':
-          this.renderPlotShape(plot, bars, viewport);
-          break;
-        case 'fill':
-          break;
-      }
+      this.renderPlotInMainPane(plot, scriptPlots, bars, viewport);
+    }
+  }
+
+  private sortedByZOrder(plots: PlotOutput[]): PlotOutput[] {
+    return [...plots].sort((a, b) => (a.zOrder ?? 0) - (b.zOrder ?? 0));
+  }
+
+  private renderPlotInMainPane(plot: PlotOutput, scriptPlots: PlotOutput[], bars: Bar[], viewport: Viewport): void {
+    switch (plot.type) {
+      case 'plot':
+        this.renderLinePlot(plot, bars, viewport);
+        this.renderPlotTrackPriceInMainPane(plot, bars, viewport);
+        break;
+      case 'plotbar':
+      case 'plotcandle':
+        this.renderOhlcPlotInLegacyMainPane(plot, bars, viewport);
+        break;
+      case 'hline':
+        this.renderHline(plot, viewport);
+        break;
+      case 'bgcolor':
+        this.renderBgcolor(plot, bars, viewport);
+        break;
+      case 'plotshape':
+      case 'plotchar':
+      case 'plotarrow':
+        this.renderPlotShape(plot, bars, viewport);
+        break;
+      case 'fill':
+        this.renderFill(plot, scriptPlots, bars, viewport, (value, paneHeight) =>
+          this.priceToY(value, viewport, paneHeight),
+        );
+        break;
     }
   }
 
@@ -3592,13 +3619,26 @@ export class TealchartRenderer {
 
     // Draw overlay indicator plots (plots that share main pane Y-axis)
     if (plots && indicatorPaneInfo) {
+      const overlayPlotsByScript = new Map<string, PlotOutput[]>();
       for (const plot of plots) {
         const scriptId = plot.scriptId ?? 'unknown';
         const info = indicatorPaneInfo[scriptId];
         if (info?.overlay !== false) {
-          // This is an overlay - render it on the main pane
-          this.renderPlotInPane(plot, bars, viewport, pane, plotStyleOverrides);
+          const scriptPlots = overlayPlotsByScript.get(scriptId) ?? [];
+          scriptPlots.push(plot);
+          overlayPlotsByScript.set(scriptId, scriptPlots);
         }
+      }
+      for (const [scriptId, scriptPlots] of overlayPlotsByScript) {
+        this.renderPlotsInComputedPane(
+          scriptPlots,
+          scriptPlots,
+          bars,
+          viewport,
+          pane,
+          indicatorPaneInfo[scriptId]?.explicitPlotZOrder,
+          plotStyleOverrides,
+        );
       }
     }
 
@@ -3811,12 +3851,26 @@ export class TealchartRenderer {
       // Y ranges are now computed by AutoScaleManager and set via getUnifiedLayout()
       // before rendering. No inline auto-scale needed.
 
-      // Render each plot that belongs to this pane
+      const plotsByScript = new Map<string, PlotOutput[]>();
       for (const plot of plots) {
         const scriptId = plot.scriptId ?? 'unknown';
         if (pane.indicatorIds.includes(scriptId)) {
-          this.renderPlotInPane(plot, bars, viewport, pane, plotStyleOverrides);
+          const scriptPlots = plotsByScript.get(scriptId) ?? [];
+          scriptPlots.push(plot);
+          plotsByScript.set(scriptId, scriptPlots);
         }
+      }
+
+      for (const [scriptId, scriptPlots] of plotsByScript) {
+        this.renderPlotsInComputedPane(
+          scriptPlots,
+          scriptPlots,
+          bars,
+          viewport,
+          pane,
+          indicatorPaneInfo?.[scriptId]?.explicitPlotZOrder,
+          plotStyleOverrides,
+        );
       }
     }
 
@@ -4049,6 +4103,61 @@ export class TealchartRenderer {
   /**
    * Render a single plot within a pane (used for both main and indicator panes)
    */
+  private renderPlotsInComputedPane(
+    plots: PlotOutput[],
+    referencePlots: PlotOutput[],
+    bars: Bar[],
+    viewport: Viewport,
+    pane: ComputedPane,
+    explicitPlotZOrder = false,
+    plotStyleOverrides?: Map<string, PlotStyleOverride>,
+  ): void {
+    if (!explicitPlotZOrder) {
+      for (const plot of plots) {
+        if (plot.type === 'fill' && this.shouldRenderPlot(plot)) {
+          this.renderFill(plot, referencePlots, bars, viewport, (value) => this.valueToY(value, pane));
+        }
+      }
+    }
+
+    const orderedPlots = explicitPlotZOrder ? this.sortedByZOrder(plots) : plots;
+    for (const plot of orderedPlots) {
+      if (!this.shouldRenderPlot(plot)) continue;
+      if (plot.type === 'fill') {
+        if (explicitPlotZOrder) {
+          this.renderFill(plot, referencePlots, bars, viewport, (value) => this.valueToY(value, pane));
+        }
+        continue;
+      }
+      this.renderPlotInPane(plot, bars, viewport, pane, plotStyleOverrides);
+    }
+  }
+
+  private renderHlineInComputedPane(plot: PlotOutput, pane: ComputedPane): void {
+    const { ctx, options, margins } = this;
+
+    const price = plot.price;
+    if (price === undefined) return;
+
+    if (price < pane.yMin || price > pane.yMax) {
+      return;
+    }
+
+    const y = this.valueToY(price, pane);
+    const color = Array.isArray(plot.color) ? plot.color[0] || '#787B86' : plot.color || '#787B86';
+
+    ctx.strokeStyle = color;
+    ctx.lineWidth = plot.linewidth || 1;
+    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'dashed'));
+
+    ctx.beginPath();
+    ctx.moveTo(margins.left, y);
+    ctx.lineTo(options.width - margins.right, y);
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+  }
+
   private renderPlotInPane(
     plot: PlotOutput,
     bars: Bar[],
@@ -4064,6 +4173,11 @@ export class TealchartRenderer {
 
     if (plot.type === 'bgcolor') {
       this.renderBgcolorInRegion(plot, bars, viewport, pane.top, pane.height);
+      return;
+    }
+
+    if (plot.type === 'hline') {
+      this.renderHlineInComputedPane(plot, pane);
       return;
     }
 
@@ -4732,7 +4846,13 @@ export class TealchartRenderer {
   /**
    * Render plots into a specific indicator pane
    */
-  renderPlotsInPane(plots: PlotOutput[], bars: Bar[], viewport: Viewport, paneOffset: PaneOffset): void {
+  renderPlotsInPane(
+    plots: PlotOutput[],
+    bars: Bar[],
+    viewport: Viewport,
+    paneOffset: PaneOffset,
+    explicitPlotZOrder = false,
+  ): void {
     if (plots.length === 0 || bars.length === 0) return;
 
     const { ctx, options, margins } = this;
@@ -4745,13 +4865,16 @@ export class TealchartRenderer {
     ctx.rect(margins.left, paneOffset.top, options.width - margins.left, paneOffset.height);
     ctx.clip();
 
-    for (const plot of plots) {
-      if (plot.type === 'fill' && this.shouldRenderPlot(plot)) {
-        this.renderFill(plot, plots, bars, viewport, (value) => this.valueToPaneY(value, paneOffset));
+    if (!explicitPlotZOrder) {
+      for (const plot of plots) {
+        if (plot.type === 'fill' && this.shouldRenderPlot(plot)) {
+          this.renderFill(plot, plots, bars, viewport, (value) => this.valueToPaneY(value, paneOffset));
+        }
       }
     }
 
-    for (const plot of plots) {
+    const orderedPlots = explicitPlotZOrder ? this.sortedByZOrder(plots) : plots;
+    for (const plot of orderedPlots) {
       if (!this.shouldRenderPlot(plot)) continue;
 
       switch (plot.type) {
@@ -4779,6 +4902,9 @@ export class TealchartRenderer {
           );
           break;
         case 'fill':
+          if (explicitPlotZOrder) {
+            this.renderFill(plot, plots, bars, viewport, (value) => this.valueToPaneY(value, paneOffset));
+          }
           break;
       }
     }
