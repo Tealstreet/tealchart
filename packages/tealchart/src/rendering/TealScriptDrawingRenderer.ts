@@ -177,8 +177,8 @@ export class TealScriptDrawingRenderer {
     rect: { x: number; y: number; width: number; height: number },
   ): { x: number; y: number; align: CanvasTextAlign; baseline: CanvasTextBaseline } {
     const padding = 6;
-    const halign = box.textHalign ?? 'left';
-    const valign = box.textValign ?? 'top';
+    const halign = box.textHalign ?? 'center';
+    const valign = box.textValign ?? 'center';
 
     let x = rect.x + padding;
     let align: CanvasTextAlign = 'left';
@@ -214,8 +214,8 @@ export class TealScriptDrawingRenderer {
     const maxTextWidth = Math.max(1, rect.width - padding * 2);
     const lines = this.wrapDrawingText(box.text, maxTextWidth, font);
     const totalTextHeight = lines.length * lineHeight;
-    const halign = box.textHalign ?? 'left';
-    const valign = box.textValign ?? 'top';
+    const halign = box.textHalign ?? 'center';
+    const valign = box.textValign ?? 'center';
 
     let x = rect.x + padding;
     let align: CanvasTextAlign = 'left';
