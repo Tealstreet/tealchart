@@ -77,9 +77,9 @@ plot(close)`;
           rows: 1,
           bgcolor: null,
           frameColor: null,
-          frameWidth: 1,
+          frameWidth: 0,
           borderColor: null,
-          borderWidth: 1,
+          borderWidth: 0,
           cells: [],
         },
         {
@@ -1325,9 +1325,9 @@ plot(close)`;
           rows: 1,
           bgcolor: '#4CAF50',
           frameColor: null,
-          frameWidth: 1,
+          frameWidth: 0,
           borderColor: null,
-          borderWidth: 1,
+          borderWidth: 0,
           cells: [
             {
               column: 0,

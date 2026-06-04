@@ -797,8 +797,8 @@ export class TealScriptDrawingRenderer {
             ctx.fillRect(x, y, width, height);
           }
 
-          if (table.borderWidth > 0) {
-            ctx.strokeStyle = table.borderColor ?? '#4B5563';
+          if (table.borderWidth > 0 && table.borderColor) {
+            ctx.strokeStyle = table.borderColor;
             ctx.lineWidth = table.borderWidth;
             ctx.setLineDash([]);
             ctx.strokeRect(x, y, width, height);
@@ -818,8 +818,8 @@ export class TealScriptDrawingRenderer {
         }
       }
 
-      if (table.frameWidth > 0) {
-        ctx.strokeStyle = table.frameColor ?? table.borderColor ?? '#4B5563';
+      if (table.frameWidth > 0 && table.frameColor) {
+        ctx.strokeStyle = table.frameColor;
         ctx.lineWidth = table.frameWidth;
         ctx.setLineDash([]);
         ctx.strokeRect(origin.x, origin.y, metrics.width, metrics.height);
