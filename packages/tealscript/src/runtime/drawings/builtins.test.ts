@@ -947,6 +947,55 @@ plot(current.price, title="Point Price")`;
       expect(result.plots.find((plot) => plot.title === 'Point Price')?.values).toEqual([100.5, 101, 101.5]);
     });
 
+    it('supports label.new chart.point overloads', () => {
+      const script = `//@version=6
+indicator("Label chart points", overlay=true)
+if barstate.islast
+    indexPoint = chart.point.from_index(bar_index - 1, low)
+    timePoint = chart.point.now(high)
+    label.new(indexPoint, "index", style=label.style_label_up, textcolor=color.white)
+    label.new(timePoint, "time", xloc.bar_time, yloc.price, color.blue, label.style_label_down, color.white, size.small, text.align_right, "tip")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'label_label.new_0_2',
+          type: 'label',
+          barIndex: 2,
+          x: 1,
+          y: 100.7,
+          text: 'index',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_up',
+          color: null,
+          textColor: '#FFFFFF',
+          size: 'normal',
+          tooltip: undefined,
+        },
+        {
+          id: 'label_label.new_1_2',
+          type: 'label',
+          barIndex: 2,
+          x: bars[2]!.time,
+          y: 101.5,
+          text: 'time',
+          xloc: 'bar_time',
+          yloc: 'price',
+          style: 'label_down',
+          color: '#2196F3',
+          textColor: '#FFFFFF',
+          size: 'small',
+          textAlign: 'right',
+          tooltip: 'tip',
+        },
+      ]);
+    });
+
     it('supports named chart.point constructors', () => {
       const script = `//@version=6
 indicator("Named chart points", overlay=true)

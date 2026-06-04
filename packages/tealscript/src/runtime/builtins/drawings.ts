@@ -147,7 +147,22 @@ function orderedCallArg(
 }
 
 export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: DrawingBuiltinRuntime): void {
-  const labelNewArgs = [
+  const labelNewPointArgs = [
+    'point',
+    'text',
+    'xloc',
+    'yloc',
+    'color',
+    'style',
+    'textcolor',
+    'size',
+    'textalign',
+    'tooltip',
+    'text_font_family',
+    'force_overlay',
+    'text_formatting',
+  ] as const;
+  const labelNewCoordinateArgs = [
     'x',
     'y',
     'text',
@@ -165,22 +180,35 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
   ] as const;
 
   builtins.set('label.new', (args, namedArgs, ctx, _scope, callId) => {
-    const x = runtime.toNullableNumber(orderedCallArg(args, namedArgs, labelNewArgs, 0));
-    const y = runtime.toNullableNumber(orderedCallArg(args, namedArgs, labelNewArgs, 1));
-    const text = runtime.toStringValue(orderedCallArg(args, namedArgs, labelNewArgs, 2, ''));
+    const hasCoordinateArgs = labelNewCoordinateArgs.slice(0, 2).some((name) => namedArgs.has(name));
+    const point = hasCoordinateArgs ? undefined : orderedCallArg(args, namedArgs, labelNewPointArgs, 0);
+    const usesPointOverload = !hasCoordinateArgs && isChartPoint(point);
+    const parameterNames = usesPointOverload ? labelNewPointArgs : labelNewCoordinateArgs;
+    const xloc = runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 2 : 3, 'bar_index'));
+    const x = usesPointOverload
+      ? pointX(point, xloc)
+      : runtime.toNullableNumber(orderedCallArg(args, namedArgs, labelNewCoordinateArgs, 0));
+    const y = usesPointOverload
+      ? point.price
+      : runtime.toNullableNumber(orderedCallArg(args, namedArgs, labelNewCoordinateArgs, 1));
+    const text = runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 1 : 2, ''));
     const id = `label_${callId}_${ctx.bar_index}`;
 
-    const textFontFamilyOrLegacyForceOverlay = orderedCallArg(args, namedArgs, labelNewArgs, 11);
+    const textFontFamilyIndex = usesPointOverload ? 10 : 11;
+    const forceOverlayIndex = usesPointOverload ? 11 : 12;
+    const textFormattingIndex = usesPointOverload ? 12 : 13;
+    const textFontFamilyOrLegacyForceOverlay = orderedCallArg(args, namedArgs, parameterNames, textFontFamilyIndex);
     const usesLegacyForceOverlaySlot = !namedArgs.has('text_font_family')
       && !namedArgs.has('force_overlay')
+      && !usesPointOverload
       && args.length === 12
       && typeof textFontFamilyOrLegacyForceOverlay === 'boolean';
     const textFontFamily = usesLegacyForceOverlaySlot ? undefined : optionalString(runtime, textFontFamilyOrLegacyForceOverlay);
     const forceOverlay = optionalBoolean(
-      usesLegacyForceOverlaySlot ? textFontFamilyOrLegacyForceOverlay : orderedCallArg(args, namedArgs, labelNewArgs, 12),
+      usesLegacyForceOverlaySlot ? textFontFamilyOrLegacyForceOverlay : orderedCallArg(args, namedArgs, parameterNames, forceOverlayIndex),
     );
-    const textFormatting = optionalString(runtime, orderedCallArg(args, namedArgs, labelNewArgs, 13));
-    const textAlign = optionalString(runtime, orderedCallArg(args, namedArgs, labelNewArgs, 9));
+    const textFormatting = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, textFormattingIndex));
+    const textAlign = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 8 : 9));
     const drawing: LabelDrawingOutput = {
       id,
       type: 'label',
@@ -188,13 +216,13 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       x,
       y,
       text,
-      xloc: runtime.toStringValue(orderedCallArg(args, namedArgs, labelNewArgs, 3, 'bar_index')),
-      yloc: runtime.toStringValue(orderedCallArg(args, namedArgs, labelNewArgs, 4, 'price')),
-      style: runtime.toStringValue(orderedCallArg(args, namedArgs, labelNewArgs, 6, 'label_left')),
-      color: runtime.toNullableColor(orderedCallArg(args, namedArgs, labelNewArgs, 5)),
-      textColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, labelNewArgs, 7)),
-      size: runtime.toStringValue(orderedCallArg(args, namedArgs, labelNewArgs, 8, 'normal')),
-      tooltip: runtime.toOptionalString(orderedCallArg(args, namedArgs, labelNewArgs, 10)),
+      xloc,
+      yloc: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 3 : 4, 'price')),
+      style: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 5 : 6, 'label_left')),
+      color: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 4 : 5)),
+      textColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 6 : 7)),
+      size: runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 7 : 8, 'normal')),
+      tooltip: runtime.toOptionalString(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 9 : 10)),
     };
     if (textAlign !== undefined) drawing.textAlign = textAlign;
     if (textFontFamily !== undefined) drawing.textFontFamily = textFontFamily;
