@@ -674,7 +674,9 @@ mutation pass covers persistent `var` line handles, `line.set_x1()`,
 and getters accept Pine-style named `id`, value, and point arguments. Semantic analysis
 preserves known line getter return types and `line.all` handle-array element
 types for downstream diagnostics. Rendering routes line segments to the script
-pane with basic color/style/width and horizontal extension support.
+pane with color/style/width, horizontal extension support, and Pine
+`line.style_arrow_left`, `line.style_arrow_right`, and `line.style_arrow_both`
+arrowheads.
 `force_overlay` lines render in the main pane even when created by non-overlay
 scripts. `linefill.new()` records fills between two line handles;
 `linefill.set_color()` supports Pine-style named `id` and `color` arguments,
@@ -683,8 +685,8 @@ support named `id` arguments. Semantic analysis preserves linefill getter line
 handle returns and `linefill.all` handle-array element types for downstream
 diagnostics. The renderer fills between resolved line segments in the routed
 script pane. `linefill.new()` rejects missing or non-line handles without
-creating a drawing. `chart.point` overloads, GC limits, full arrow style
-geometry, and full realtime rollback parity remain planned.
+creating a drawing. `chart.point` overloads, GC limits, and full realtime
+rollback parity remain planned.
 
 The box drawing pass covers common supply/demand zone idioms. `box.new()`
 accepts positional or named `left`, `top`, `right`, and `bottom` arguments plus
