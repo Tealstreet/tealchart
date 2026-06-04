@@ -264,7 +264,7 @@ plot(line.get_price(upper, bar_index), title="Upper Price")
         bgcolor: '#2196F333',
         text: 'range',
         textColor: '#363A45',
-        textSize: 'normal',
+        textSize: 'auto',
       },
     ]);
     expect(getPlot(result, 'Upper Price').values).toEqual([103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 103, 113]);
@@ -313,7 +313,7 @@ if barstate.islast
         bgcolor: null,
         text: 'hidden',
         textColor: null,
-        textSize: 'normal',
+        textSize: 'auto',
       },
       {
         id: 'polyline_polyline.new_0_11',
@@ -816,7 +816,7 @@ if barstate.islast
         bgcolor: '#FF980033',
         text: 'mixed box',
         textColor: '#363A45',
-        textSize: 'normal',
+        textSize: 'auto',
       },
       {
         id: 'polyline_polyline.new_0_11',
@@ -985,7 +985,7 @@ plot(mixedPrice, title="Mixed Line Price")
         bgcolor: '#2196F333',
         text: 'mixed box',
         textColor: '#363A45',
-        textSize: 'normal',
+        textSize: 'auto',
       },
       {
         id: 'table_table.new_0_11',
