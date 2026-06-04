@@ -39,6 +39,7 @@ if barstate.islast
     label.set_style(marker, label.style_label_left)
     label.set_color(marker, color.new(color.blue, 20))
     label.set_textcolor(marker, color.white)
+    label.set_textalign(marker, text.align_right)
     label.set_tooltip(marker, "last confirmed")
 plot(label.get_x(marker), title="Marker X")
 `);
@@ -59,6 +60,7 @@ plot(label.get_x(marker), title="Marker X")
         color: '#2196F3CC',
         textColor: '#FFFFFF',
         size: 'normal',
+        textAlign: 'right',
         tooltip: 'last confirmed',
       },
     ]);

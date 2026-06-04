@@ -169,6 +169,7 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     const id = `label_${callId}_${ctx.bar_index}`;
 
     const forceOverlay = optionalBoolean(orderedCallArg(args, namedArgs, labelNewArgs, 11));
+    const textAlign = optionalString(runtime, orderedCallArg(args, namedArgs, labelNewArgs, 9));
     const drawing: LabelDrawingOutput = {
       id,
       type: 'label',
@@ -184,6 +185,7 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       size: runtime.toStringValue(orderedCallArg(args, namedArgs, labelNewArgs, 8, 'normal')),
       tooltip: runtime.toOptionalString(orderedCallArg(args, namedArgs, labelNewArgs, 10)),
     };
+    if (textAlign !== undefined) drawing.textAlign = textAlign;
     if (forceOverlay !== undefined) drawing.forceOverlay = forceOverlay;
 
     ctx.addDrawing(drawing);
@@ -277,6 +279,13 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
   builtins.set('label.set_size', (args, namedArgs, ctx) => {
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
       label.size = runtime.toStringValue(callArg(args, namedArgs, 1, 'size', undefined, ['id']));
+    });
+    return undefined;
+  });
+
+  builtins.set('label.set_textalign', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
+      label.textAlign = runtime.toStringValue(callArg(args, namedArgs, 1, 'textalign', undefined, ['id']));
     });
     return undefined;
   });
