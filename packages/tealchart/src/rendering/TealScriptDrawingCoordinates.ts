@@ -35,6 +35,10 @@ export function barIndexToTime(index: number, bars: readonly Bar[]): number | nu
   return bars[0]!.time + roundedIndex * interval;
 }
 
+function barIndexForTime(time: number, bars: readonly Bar[]): number {
+  return bars.findIndex((bar) => bar.time === time);
+}
+
 export function resolveExtendedLineSegment(
   start: DrawingPoint,
   end: DrawingPoint,
@@ -184,6 +188,7 @@ export function resolveLabelDrawingPosition(
   if (label.xloc === 'bar_time') {
     if (label.x === null || !Number.isFinite(label.x)) return null;
     time = label.x;
+    anchorIndex = barIndexForTime(time, bars);
   } else {
     const xValue = label.x ?? barIndex;
     const xIndex = Number.isFinite(xValue) ? Math.trunc(xValue) : barIndex;

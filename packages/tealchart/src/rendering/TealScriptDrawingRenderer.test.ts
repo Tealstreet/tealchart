@@ -589,6 +589,41 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events).toContain('fillText:Future:257,90');
   });
 
+  it('renders bar_time abovebar labels at their timestamp candle anchor', () => {
+    const events: string[] = [];
+    const renderer = new TealScriptDrawingRenderer({
+      ctx: createRecordingContext(events),
+      options: { ...DEFAULT_RENDER_OPTIONS, width: 120, height: 240 },
+      margins: { ...DEFAULT_MARGINS, left: 0, right: 0 },
+      font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: (time, viewport, chartWidth) =>
+          ((time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth,
+        valueToY: (value, activePane) =>
+          activePane.top + ((activePane.yMax - value) / (activePane.yMax - activePane.yMin)) * activePane.height,
+      },
+      getTextWidth: (ctx, text) => ctx.measureText(text).width,
+    });
+
+    renderer.render(
+      partitionTealScriptDrawings([
+        makeLabel({
+          barIndex: 2,
+          xloc: 'bar_time',
+          x: 1_000,
+          yloc: 'abovebar',
+          text: 'Historical',
+        }),
+      ]),
+      bars,
+      { startTime: 1_000, endTime: 3_000, priceMin: 0, priceMax: 20 },
+      pane,
+    );
+
+    expect(events).toContain('roundRect:0,43,96,22');
+    expect(events).toContain('fillText:Historical:48,54');
+  });
+
   it('renders Pine symbol label styles and keeps style_none text-only', () => {
     const events: string[] = [];
     const renderer = new TealScriptDrawingRenderer({
