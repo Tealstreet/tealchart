@@ -134,6 +134,36 @@ label.new(bar_index, close, "legacy", xloc.bar_index, yloc.price, color.red, lab
       ]);
     });
 
+    it('supports the Pine centered label style constant', () => {
+      const script = `//@version=6
+indicator("Centered Label")
+label.new(bar_index, close, "centered", style=label.style_label_center)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'label_label.new_0_0',
+          type: 'label',
+          barIndex: 0,
+          x: 0,
+          y: 100.2,
+          text: 'centered',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_center',
+          color: '#2196F3',
+          textColor: '#FFFFFF',
+          size: 'normal',
+          tooltip: undefined,
+        },
+      ]);
+    });
+
     it('mutates, reads, copies, and deletes label drawings by handle', () => {
       const script = `//@version=6
 indicator("Label mutators")

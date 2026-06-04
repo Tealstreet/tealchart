@@ -1299,6 +1299,7 @@ const DRAWING_CONSTANTS: Record<string, string> = {
   'label.style_label_down': 'label_down',
   'label.style_label_left': 'label_left',
   'label.style_label_right': 'label_right',
+  'label.style_label_center': 'label_center',
   'label.style_label_lower_left': 'label_lower_left',
   'label.style_label_lower_right': 'label_lower_right',
   'label.style_label_upper_left': 'label_upper_left',
