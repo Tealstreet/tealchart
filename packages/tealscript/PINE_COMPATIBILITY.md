@@ -468,8 +468,9 @@ renders common plot offsets for line, marker, histogram, and area plot styles.
 Renderer coverage also honors `display.none` while retaining hidden plot values
 for dependent fills, and applies `histbase` baselines to histogram/columns and
 area plot rendering when supplied. Plot renderer coverage also draws
-`trackprice` lines at the latest finite rendered plot value and joins
-circle/cross plot markers when `join=true`.
+`trackprice` lines at the latest finite rendered plot value, joins
+circle/cross plot markers when `join=true`, and paints
+`plot.style_stepline_diamond` markers on stepped plots.
 
 Hline renderer coverage applies Pine `hline()` color, linewidth, linestyle,
 display hiding, and pane-coordinate behavior for the current output shape.
