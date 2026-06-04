@@ -486,13 +486,16 @@ plot(line.get_y2(trend), title="Line Y2")`;
 indicator("Linefill objects")
 var upper = line.new(0, high, 1, high)
 var lower = line.new(0, low, 1, low)
+var mid = line.new(0, hl2, 1, hl2)
 var channel = linefill.new(upper, lower, color=color.red)
-var deleted = linefill.new(upper, lower, color=color.blue)
+var deleted = linefill.new(upper, mid, color=color.blue)
 if barstate.islast
     line.set_xy1(upper, bar_index - 1, high[1])
     line.set_xy2(upper, bar_index, high)
     line.set_xy1(lower, bar_index - 1, low[1])
     line.set_xy2(lower, bar_index, low)
+    line.set_xy1(mid, bar_index - 1, hl2[1])
+    line.set_xy2(mid, bar_index, hl2)
     linefill.set_color(channel, color.green)
     linefill.delete(deleted)
     label.new(na, na, text=str.format("{0}|{1}", linefill.get_line1(channel), linefill.get_line2(channel)))
@@ -531,6 +534,22 @@ plot(array.size(linefill.all), title="Linefills")`;
           y1: 100.2,
           x2: 2,
           y2: 100.7,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: '#2196F3',
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+        {
+          id: 'line_line.new_2_0',
+          type: 'line',
+          persistent: true,
+          barIndex: 2,
+          x1: 1,
+          y1: 100.6,
+          x2: 2,
+          y2: 101.1,
           xloc: 'bar_index',
           extend: 'none',
           color: '#2196F3',
@@ -580,6 +599,34 @@ plot(close)`;
 
       expect(result.errors).toEqual([]);
       expect(result.drawings.map((drawing) => drawing.type)).toEqual(['label', 'line']);
+    });
+
+    it('replaces existing linefill drawings for the same line pair', () => {
+      const script = `//@version=6
+indicator("Linefill pair replacement")
+var upper = line.new(0, high, 1, high)
+var lower = line.new(0, low, 1, low)
+var first = linefill.new(upper, lower, color=color.red)
+if barstate.islast
+    linefill.new(lower, upper, color=color.green)
+plot(array.size(linefill.all), title="Linefills")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings.filter((drawing) => drawing.type === 'linefill')).toEqual([
+        {
+          id: 'linefill_linefill.new_0_2',
+          type: 'linefill',
+          barIndex: 2,
+          line1: 'line_line.new_1_0',
+          line2: 'line_line.new_0_0',
+          color: '#4CAF50',
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Linefills')?.values).toEqual([1, 1, 1]);
     });
 
     it('mutates, reads, copies, and deletes box drawings by handle', () => {

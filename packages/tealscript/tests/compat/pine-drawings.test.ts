@@ -382,12 +382,14 @@ plot(line.get_price(id=trend, x=bar_index - 1), title="Named Line Price")
 indicator("Named Linefill", overlay=true)
 var upper = na
 var lower = na
+var mid = na
 var channel = na
 if barstate.islast
     upper := line.new(x1=bar_index - 1, y1=high[1], x2=bar_index, y2=high)
     lower := line.new(x1=bar_index - 1, y1=low[1], x2=bar_index, y2=low)
+    mid := line.new(x1=bar_index - 1, y1=hl2[1], x2=bar_index, y2=hl2)
     channel := linefill.new(line1=upper, line2=lower, color=color.red)
-    stale = linefill.new(line1=upper, line2=lower, color=color.blue)
+    stale = linefill.new(line1=upper, line2=mid, color=color.blue)
     linefill.set_color(id=channel, color=color.new(color.orange, 60))
     linefill.delete(id=stale)
 plot(linefill.get_line1(id=channel) == upper, title="Named Linefill Line1")
@@ -420,6 +422,21 @@ plot(array.size(linefill.all), title="Named Linefill Count")
         y1: 109,
         x2: 11,
         y2: 108,
+        xloc: 'bar_index',
+        extend: 'none',
+        color: '#2196F3',
+        style: 'solid',
+        width: 1,
+        forceOverlay: false,
+      },
+      {
+        id: 'line_line.new_2_11',
+        type: 'line',
+        barIndex: 11,
+        x1: 10,
+        y1: 111.5,
+        x2: 11,
+        y2: 110.5,
         xloc: 'bar_index',
         extend: 'none',
         color: '#2196F3',
