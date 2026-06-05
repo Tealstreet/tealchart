@@ -223,6 +223,8 @@ const MONTH_NAMES = [
   'December',
 ] as const;
 
+const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const;
+
 /**
  * Execution result
  */
@@ -4687,11 +4689,14 @@ export class TealscriptEngine {
     const hour12 = hour24 % 12 || 12;
     const millisecond = pad(date.getUTCMilliseconds(), 3);
     const monthName = MONTH_NAMES[date.getUTCMonth()];
+    const weekdayName = WEEKDAY_NAMES[date.getUTCDay()];
     const tokens: Array<[string, string]> = [
       ['yyyy', String(date.getUTCFullYear())],
       ['yy', pad(date.getUTCFullYear() % 100)],
       ['MMMM', monthName],
       ['MMM', monthName.slice(0, 3)],
+      ['EEEE', weekdayName],
+      ['E', weekdayName.slice(0, 3)],
       ['MM', pad(date.getUTCMonth() + 1)],
       ['M', String(date.getUTCMonth() + 1)],
       ['dd', pad(date.getUTCDate())],
