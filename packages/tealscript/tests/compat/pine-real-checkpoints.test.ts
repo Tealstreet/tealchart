@@ -647,6 +647,36 @@ plot(strategy.netprofit, title="Net Profit")
     });
   });
 
+  it('locks a reduced official strategy fill-alert suppression idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
+    const bars: Bar[] = [
+      { time: 1_700_360_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_360_060_000, open: 101, high: 103, low: 100, close: 102, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Official Disable Alert Checkpoint", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1, alert_message="entry suppressed", disable_alert=true)
+if bar_index == 1
+    strategy.close("Long", alert_message="close emitted")
+plot(strategy.closedtrades, title="Closed Trades")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 1]);
+    expect(result.alerts.find((alert) => alert.id === 'strategy_order_fills')?.events.map((event) => event.message)).toEqual([
+      'close emitted',
+    ]);
+    expect(result.strategy.fills.map((fill) => ({
+      orderId: fill.orderId,
+      alertMessage: fill.alertMessage,
+      disableAlert: fill.disableAlert,
+    }))).toEqual([
+      { orderId: 'Long', alertMessage: 'entry suppressed', disableAlert: true },
+      { orderId: 'Close Long', alertMessage: 'close emitted', disableAlert: false },
+    ]);
+  });
+
   it('locks a reduced official strategy bar-magnifier idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const baseTime = 1_700_100_000_000;

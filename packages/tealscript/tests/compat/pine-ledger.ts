@@ -142,6 +142,16 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: officialDocsEntry({
+      id: 'official-disable-alert-checkpoint',
+      title: 'Official Disable Alert Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/strategies/',
+      category: 'strategy',
+      featureTags: ['strategy', 'alerts', 'orders', 'disable_alert'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
       id: 'official-recalculate-after-fill-checkpoint',
       title: 'Official Recalculate After Fill Checkpoint',
       url: 'https://www.tradingview.com/pine-script-docs/concepts/strategies/',

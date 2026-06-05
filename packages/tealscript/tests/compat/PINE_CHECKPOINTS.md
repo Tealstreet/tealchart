@@ -81,7 +81,7 @@ idioms rather than isolated unit coverage.
 | Session-gated signals | `Public Session Filter Checkpoint`; `Official Dynamic Session Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Timeframe comparisons | `Official Timeframe Comparison Checkpoint`; timeframe utility fixtures in `pine-control-time.test.ts` | `pine-real-checkpoints.test.ts`; `pine-control-time.test.ts` |
 | Alerts and alert conditions | `Official Alert Checkpoint`; alert crossover fixture in `pine-visuals.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts` |
-| Strategy broker flows | `Official Strategy Checkpoint`; `Official Broker Emulator Path Checkpoint`; `Official Bar Magnifier Checkpoint`; `Official Stop Limit Checkpoint`; `Official Immediate Close Checkpoint`; `Official Recalculate After Fill Checkpoint`; `Official Calc On Every Tick Checkpoint` | `pine-real-checkpoints.test.ts` |
+| Strategy broker flows | `Official Strategy Checkpoint`; `Official Broker Emulator Path Checkpoint`; `Official Bar Magnifier Checkpoint`; `Official Stop Limit Checkpoint`; `Official Immediate Close Checkpoint`; `Official Disable Alert Checkpoint`; `Official Recalculate After Fill Checkpoint`; `Official Calc On Every Tick Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Limits and request-context reuse | `Official Request Limit Checkpoint` | `pine-real-checkpoints.test.ts` |
 | User-defined objects | Reduced official object idioms | `pine-objects.test.ts` |
 | Drawings and tables | Manual comparison milestones plus reduced drawing fixtures | `PINE_CHECKPOINTS.md`; `pine-drawings.test.ts` |
