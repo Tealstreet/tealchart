@@ -693,6 +693,47 @@ plot(nvdaUp ? 1 : 0, title="NVDA Up")
     ]);
   });
 
+  it('locks a reduced public library helper idiom', () => {
+    // Public idiom reference: public indicators commonly import helper
+    // libraries for reusable signal calculations.
+    // Source search: https://www.tradingview.com/scripts/search/library%20helper/
+    const library = parse(`
+library("RangeTools", true)
+calcRange(float source, int length) => source - ta.sma(source, length)
+export range(float source, int length) => calcRange(source, length)
+export signal(float source, int length) => calcRange(source, length) > 0
+`);
+    const result = runCompatScript(`
+indicator("Public Library Helper Checkpoint")
+import PublicUser/RangeTools/1 as rt
+spread = rt.range(close, 3)
+isUp = rt.signal(close, 3)
+plot(spread, title="Imported Spread")
+plot(isUp ? 1 : 0, title="Imported Signal")
+`, {
+      engineOptions: {
+        libraries: new Map([['PublicUser/RangeTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Imported Spread').values)).toEqual([
+      null,
+      null,
+      2.333333,
+      -2,
+      -4,
+      -0.666667,
+      3,
+      4.666667,
+      1,
+      1.666667,
+      0.333333,
+      1,
+    ]);
+    expect(getPlot(result, 'Imported Signal').values).toEqual([0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
+  });
+
   it('locks a reduced official dynamic session idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/sessions/
     const result = runCompatScript(`

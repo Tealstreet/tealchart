@@ -93,9 +93,9 @@ The current runtime already covers a useful common-script subset:
 - Compatibility fixtures for real Pine idioms including MTF filters,
   divergence, session filters, dynamic sessions, timeframe comparisons, bar
   coloring, plot-style payloads, dashboard tables, multi-symbol screeners,
-  alerts, request-limit reuse, strategy entry/exit flows, default
-  broker-emulator path and gap-fill behavior, and common drawing/table
-  patterns.
+  imported library helpers, alerts, request-limit reuse, strategy entry/exit
+  flows, default broker-emulator path and gap-fill behavior, and common
+  drawing/table patterns.
 
 Known structural gaps:
 
@@ -157,7 +157,9 @@ Phases:
    deterministic tests, where they live, and what output oracle is required.
 6. Add a checkpoint coverage index by public-script idiom: MTF filters,
    divergence, session filters, strategy brackets, drawing/table dashboards,
-   libraries, alerts, screeners, and synthetic tickers.
+   libraries, alerts, screeners, and synthetic tickers. The current checkpoint
+   corpus includes reduced public fixtures for MTF filters, divergence,
+   session filters, dashboard tables, screeners, and library helpers.
 7. Generate a trendable pass-rate report: total scripts, parse pass, semantic
    pass, runtime pass, usable-output pass, top failure classes, and regressions.
 
