@@ -4685,6 +4685,24 @@ export class TealscriptEngine {
       const absolute = Math.abs(offsetMinutes);
       return `${sign}${pad(Math.trunc(absolute / 60))}${pad(absolute % 60)}`;
     };
+    const formatTimezoneName = (style: 'short' | 'long'): string => {
+      const fixedOffset = this.parseFixedTimezoneOffsetMinutes(timezone);
+      if (fixedOffset !== null && fixedOffset !== 0) {
+        return `GMT${formatOffset()}`;
+      }
+
+      try {
+        const part = new Intl.DateTimeFormat('en-US', {
+          timeZone: timezone,
+          timeZoneName: style,
+        }).formatToParts(new Date(value)).find((part) => part.type === 'timeZoneName');
+        return part?.value ?? (style === 'short' ? 'UTC' : timezone);
+      } catch {
+        return fixedOffset === 0
+          ? (style === 'short' ? 'UTC' : 'Coordinated Universal Time')
+          : `GMT${formatOffset()}`;
+      }
+    };
     const hour24 = date.getUTCHours();
     const hour12 = hour24 % 12 || 12;
     const millisecond = pad(date.getUTCMilliseconds(), 3);
@@ -4693,6 +4711,8 @@ export class TealscriptEngine {
     const yearStart = Date.UTC(date.getUTCFullYear(), 0, 1);
     const currentDate = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
     const dayOfYear = Math.floor((currentDate - yearStart) / 86_400_000) + 1;
+    const timezoneNameLong = format.includes('zzzz') ? formatTimezoneName('long') : '';
+    const timezoneNameShort = format.includes('z') ? formatTimezoneName('short') : '';
     const tokens: Array<[string, string]> = [
       ['yyyy', String(date.getUTCFullYear())],
       ['yy', pad(date.getUTCFullYear() % 100)],
@@ -4721,6 +4741,8 @@ export class TealscriptEngine {
       ['S', millisecond.slice(0, 1)],
       ['a', hour24 < 12 ? 'AM' : 'PM'],
       ['Z', formatOffset()],
+      ['zzzz', timezoneNameLong],
+      ['z', timezoneNameShort],
     ];
 
     let result = '';
