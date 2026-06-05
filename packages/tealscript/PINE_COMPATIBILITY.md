@@ -782,13 +782,14 @@ when OHLC crosses their trigger price, and bracket siblings cancel through OCA.
 stop price is crossed, then fill as limit orders on later bars. Fixed, cash, and
 percent-of-equity sizing resolve to concrete order quantities at submission
 time, and `strategy.entry()` enforces same-direction pyramiding limits and
-expands opposite-direction entry transactions to reverse positions. This is a
-deterministic OHLC broker emulator: same-bar intrabar path modeling, bar
-magnifier, and lower-timeframe fill simulation remain deferred until the runtime
-has an explicit intrabar data model. The `use_bar_magnifier` strategy setting is
-stored in the ledger, and selected lower-timeframe/chart-OHLC execution paths
-are exported as strategy metadata, but order fills do not yet consume those
-paths.
+expands opposite-direction entry transactions to reverse positions. The
+`strategy(..., slippage=...)` setting applies fixed tick slippage to market,
+stop, and trailing-stop fills in trade direction while preserving limit-fill
+prices. This is a deterministic broker emulator: chart-OHLC and host-provided
+lower-timeframe execution paths are consumed by pending order fills and exported
+as strategy metadata. Same-bar intrabar recalculation and TradingView-exact bar
+magnifier behavior remain deferred until the runtime has an explicit intrabar
+data model. The `use_bar_magnifier` strategy setting is stored in the ledger.
 Trailing stops submitted through
 `strategy.exit(..., trail_price/trail_points, trail_offset)` activate on later
 bars and ratchet against OHLC highs/lows using price-unit offsets. Fill

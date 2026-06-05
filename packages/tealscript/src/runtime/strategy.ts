@@ -463,11 +463,12 @@ export function fillStrategyMarketOrder(
   price: number,
   barIndex: number,
   time: number,
+  mintick: number = 0,
 ): StrategyFill | null {
   if (order.status !== 'pending' || order.type !== 'market' || order.qty === null) {
     return null;
   }
-  return fillStrategyOrder(ledger, order, price, barIndex, time);
+  return fillStrategyOrder(ledger, order, price, barIndex, time, mintick);
 }
 
 export function fillPendingStrategyMarketOrders(
@@ -475,13 +476,14 @@ export function fillPendingStrategyMarketOrders(
   open: number,
   barIndex: number,
   time: number,
+  mintick: number = 0,
 ): StrategyFill[] {
   const fills: StrategyFill[] = [];
   for (const order of ledger.orders) {
     if (order.status !== 'pending' || order.type !== 'market' || order.activationBarIndex >= barIndex) {
       continue;
     }
-    const fill = fillStrategyMarketOrder(ledger, order, open, barIndex, time);
+    const fill = fillStrategyMarketOrder(ledger, order, open, barIndex, time, mintick);
     if (fill) {
       fills.push(fill);
       cancelOcaOrders(ledger, order, barIndex, time);
@@ -496,6 +498,7 @@ export function fillPendingStrategyOrders(
   low: number,
   barIndex: number,
   time: number,
+  mintick: number = 0,
 ): StrategyFill[] {
   const fills: StrategyFill[] = [];
   for (const order of ledger.orders) {
@@ -504,7 +507,7 @@ export function fillPendingStrategyOrders(
       continue;
     }
 
-    const fill = fillStrategyOrder(ledger, order, price, barIndex, time);
+    const fill = fillStrategyOrder(ledger, order, price, barIndex, time, mintick);
     if (fill) {
       fills.push(fill);
       cancelOcaOrders(ledger, order, barIndex, time);
@@ -517,6 +520,7 @@ export function fillPendingStrategyOrdersOnTicks(
   ledger: StrategyLedger,
   ticks: StrategyExecutionTick[],
   barIndex: number,
+  mintick: number = 0,
 ): StrategyFill[] {
   const fills: StrategyFill[] = [];
   const orderedTicks = ticks
@@ -534,7 +538,7 @@ export function fillPendingStrategyOrdersOnTicks(
         continue;
       }
 
-      const fill = fillStrategyOrder(ledger, order, price, barIndex, tick.time);
+      const fill = fillStrategyOrder(ledger, order, price, barIndex, tick.time, mintick);
       if (fill) {
         fills.push(fill);
         cancelOcaOrders(ledger, order, barIndex, tick.time);
@@ -553,6 +557,7 @@ function fillStrategyOrder(
   price: number,
   barIndex: number,
   time: number,
+  mintick: number,
 ): StrategyFill | null {
   if (order.status !== 'pending' || order.qty === null) {
     return null;
@@ -560,12 +565,17 @@ function fillStrategyOrder(
   if (!Number.isFinite(price)) {
     throw new Error('strategy fill price must be finite');
   }
+  const slippage = resolveStrategyFillSlippage(ledger.settings, order, mintick);
+  const fillPrice = price + slippage;
+  if (!Number.isFinite(fillPrice)) {
+    throw new Error('strategy fill price must be finite');
+  }
   const fillQty = resolveStrategyFillQty(ledger, order);
-  const commission = resolveStrategyFillCommission(ledger.settings, fillQty, price);
+  const commission = resolveStrategyFillCommission(ledger.settings, fillQty, fillPrice);
 
   order.status = 'filled';
   order.filledQty = fillQty;
-  order.avgFillPrice = price;
+  order.avgFillPrice = fillPrice;
   order.updatedBarIndex = barIndex;
   order.updatedTime = time;
 
@@ -575,9 +585,9 @@ function fillStrategyOrder(
     entryId: order.fromEntry,
     direction: order.direction,
     qty: fillQty,
-    price,
+    price: fillPrice,
     commission,
-    slippage: 0,
+    slippage,
     barIndex,
     time,
     comment: order.comment,
@@ -588,6 +598,25 @@ function fillStrategyOrder(
   applyStrategyFillToTrades(ledger, fill);
   applyStrategyFillToPosition(ledger, fill);
   return fill;
+}
+
+function resolveStrategyFillSlippage(settings: StrategyLedgerSettings, order: StrategyOrder, mintick: number): number {
+  const slippageTicks = resolveStrategySlippageTicks(settings.slippageTicks);
+  if (slippageTicks === 0 || !Number.isFinite(mintick) || mintick <= 0) {
+    return 0;
+  }
+  if (order.type !== 'market' && order.type !== 'stop' && order.type !== 'trailing_stop') {
+    return 0;
+  }
+  const direction = order.direction === 'long' ? 1 : -1;
+  return slippageTicks * mintick * direction;
+}
+
+function resolveStrategySlippageTicks(slippageTicks: number): number {
+  if (!Number.isFinite(slippageTicks) || slippageTicks <= 0) {
+    return 0;
+  }
+  return Math.floor(slippageTicks);
 }
 
 function resolveStrategyFillCommission(settings: StrategyLedgerSettings, qty: number, price: number): number {
