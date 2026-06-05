@@ -491,7 +491,9 @@ in main, computed indicator, and legacy indicator panes. Plot renderer coverage
 also draws `trackprice` lines at the latest finite rendered plot value, joins
 circle/cross plot markers when `join=true`, and paints
 `plot.style_stepline_diamond` markers on stepped plots. Default line plots
-bridge `na` values, while `plot.style_linebr` preserves gaps.
+bridge `na` values, while `plot.style_linebr` and `plot.style_areabr`
+preserve gaps. `plot.style_area` still bridges missing bars, but
+`plot.style_areabr` breaks both stroke and fill segments at `na` values.
 Trackprice rendering also adds a right-axis value label for the latest rendered
 plot value.
 When `indicator(..., explicit_plot_zorder=true)` is set, renderer coverage
