@@ -55,6 +55,7 @@ fixtures by default.
 | `Public MTF Trend Checkpoint` | https://www.tradingview.com/scripts/search/mtf%20trend%20filter/ | Local price filtered by a higher-timeframe moving average requested with `request.security()`. | HTF average merge series and local trend gate over local/request bars. |
 | `Public Divergence Checkpoint` | https://www.tradingview.com/scripts/search/rsi%20divergence/ | Sequential price pivots compared with lower oscillator pivots to flag bearish divergence. | Pivot series and one bearish divergence signal over local bars. |
 | `Public Session Filter Checkpoint` | https://www.tradingview.com/scripts/search/session%20filter/ | Session membership gates a raw signal. | Session mask and filtered signal over `compatibilityBars`. |
+| `Public Session State Checkpoint` | https://www.tradingview.com/scripts/search/session%20ismarket/ | Exchange session-state helpers gate premarket, regular, and postmarket logic from host session metadata. | Premarket, market, postmarket, and extended-active state over local bars. |
 | `Public Object Method Checkpoint` | https://www.tradingview.com/scripts/search/market%20structure%20object/ | Persistent UDT state is updated through a user-defined method when confirmed pivot highs appear. | Pivot count, last high, and rising-pivot state over `compatibilityBars`. |
 
 ## Checkpoint Coverage Index
@@ -81,7 +82,7 @@ idioms rather than isolated unit coverage.
 | Multi-timeframe data requests | `Public MTF Trend Checkpoint`; `Official Lower TF Array Checkpoint`; repaint-safe HTF fixture in `pine-request-security.test.ts` | `pine-real-checkpoints.test.ts`; `pine-request-security.test.ts` |
 | Ticker request IDs | `Official Ticker Request Checkpoint`; ticker modifier fixtures in `pine-ticker.test.ts` | `pine-real-checkpoints.test.ts`; `pine-ticker.test.ts` |
 | Pivot/divergence idioms | `Public Divergence Checkpoint` | `pine-real-checkpoints.test.ts` |
-| Session-gated signals | `Public Session Filter Checkpoint`; `Official Dynamic Session Checkpoint` | `pine-real-checkpoints.test.ts` |
+| Session-gated signals | `Public Session Filter Checkpoint`; `Public Session State Checkpoint`; `Official Dynamic Session Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Timeframe comparisons | `Official Timeframe Comparison Checkpoint`; timeframe utility fixtures in `pine-control-time.test.ts` | `pine-real-checkpoints.test.ts`; `pine-control-time.test.ts` |
 | Alerts and alert conditions | `Official Alert Checkpoint`; alert crossover fixture in `pine-visuals.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts` |
 | Strategy broker flows | `Official Strategy Checkpoint`; `Official Broker Emulator Path Checkpoint`; `Official Bar Magnifier Checkpoint`; `Official Stop Limit Checkpoint`; `Official Immediate Close Checkpoint`; `Official Disable Alert Checkpoint`; `Official Allow Entry In Checkpoint`; `Official Recalculate After Fill Checkpoint`; `Official Calc On Every Tick Checkpoint` | `pine-real-checkpoints.test.ts` |

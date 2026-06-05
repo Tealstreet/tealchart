@@ -42,9 +42,9 @@ arrays, bar coloring, alerts, strategy entry/exit flows, request-limit reuse,
 explicit `max_bars_back` metadata, official lower-timeframe request arrays,
 official synthetic ticker requests, official dynamic sessions, official
 timeframe comparisons, official plot-style payloads, and public MTF,
-divergence, session-filter, dashboard-table, multi-symbol screener, and
-library-helper idioms. Public-source coverage also includes alert signal
-metadata, direct alert emission, and Heikin-Ashi synthetic ticker trend
+divergence, session-filter, session-state, dashboard-table, multi-symbol
+screener, and library-helper idioms. Public-source coverage also includes alert
+signal metadata, direct alert emission, and Heikin-Ashi synthetic ticker trend
 requests, plus UDT state objects updated through user-defined methods.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
@@ -654,8 +654,8 @@ aggregation is covered for intraday, daily, and weekly buckets, including
 timezone-aware DST boundaries. Host-provided `closedDates` and closure entries
 can suppress session-filtered `time()` calls and session-state helpers for
 exchange calendar holidays or partial-session closures. The checkpoint corpus
-tracks both public session-filter gating and the official dynamic-session string
-idiom.
+tracks public session-filter gating, public exchange session-state helper
+gating, and the official dynamic-session string idiom.
 
 ## Request Data And Ticker Coverage
 
