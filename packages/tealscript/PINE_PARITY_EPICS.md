@@ -93,7 +93,8 @@ The current runtime already covers a useful common-script subset:
 - Compatibility fixtures for real Pine idioms including MTF filters,
   divergence, session filters, dynamic sessions, timeframe comparisons, bar
   coloring, plot-style payloads, alerts, request-limit reuse, strategy
-  entry/exit flows, and common drawing/table patterns.
+  entry/exit flows, default broker-emulator path and gap-fill behavior, and
+  common drawing/table patterns.
 
 Known structural gaps:
 
@@ -468,9 +469,9 @@ impact.
 
 1. Roadmap remap: replace stale subsystem-first planning docs with this
    copy-paste compatibility roadmap.
-2. Strategy slippage fills: apply `strategy(..., slippage=...)` tick offsets to
-   market, stop, and trailing-stop fills while preserving limit-fill behavior.
-3. Harness incomplete outcomes: make canonical `not_run` stages fail corpus
+2. Strategy broker path checkpoint: keep official default broker-emulator OHLC
+   path and opening-gap fill assumptions covered in the source-linked corpus.
+3. Harness incomplete outcomes: keep canonical `not_run` stages failing corpus
    pass-rate summaries unless they are explicitly marked `skipped`.
 4. Pine layout parser audit fixtures: keep reduced coverage for nested dedents,
    wrapped indented expressions, wrapped function/method signatures, and shared
