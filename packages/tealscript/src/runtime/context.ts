@@ -80,6 +80,8 @@ export interface SymInfo {
   ticker: string;
   description: string;
   type: string; // 'crypto', 'stock', 'forex', etc.
+  prefix: string;
+  session: string;
   currency: string;
   basecurrency: string;
   mintick: number; // Minimum price movement
@@ -325,6 +327,8 @@ export class ExecutionContext {
     ticker: 'BTCUSDT',
     description: 'Bitcoin / Tether',
     type: 'crypto',
+    prefix: '',
+    session: 'regular',
     currency: 'USDT',
     basecurrency: 'BTC',
     mintick: 0.01,

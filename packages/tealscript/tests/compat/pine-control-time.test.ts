@@ -231,6 +231,34 @@ plot(syminfo.minmove, title="Min Move")
     expect(getPlot(result, 'Min Move').values).toEqual(allBars(1));
   });
 
+  it('exposes Pine syminfo prefix and session host metadata', () => {
+    const result = runCompatScript(`
+indicator("Syminfo Prefix Session")
+plot(str.length(syminfo.prefix), title="Prefix Length")
+plot(str.length(syminfo.session), title="Session Length")
+plot(syminfo.prefix == "NASDAQ" ? 1 : 0, title="Prefix Match")
+plot(syminfo.session == "extended" ? 1 : 0, title="Session Match")
+`, {
+      engineOptions: {
+        runtime: {
+          syminfo: {
+            ticker: 'NASDAQ:AAPL',
+            prefix: 'NASDAQ',
+            session: 'extended',
+          },
+        },
+      },
+    });
+
+    const allBars = (value: number) => Array(compatibilityBars.length).fill(value);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Prefix Length').values).toEqual(allBars(6));
+    expect(getPlot(result, 'Session Length').values).toEqual(allBars(8));
+    expect(getPlot(result, 'Prefix Match').values).toEqual(allBars(1));
+    expect(getPlot(result, 'Session Match').values).toEqual(allBars(1));
+  });
+
   it('matches indicator timeframe metadata idioms', () => {
     const secondsResult = runCompatScript(`
 indicator("Seconds metadata", timeframe="30S")
