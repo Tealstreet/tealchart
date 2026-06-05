@@ -653,7 +653,7 @@ IndentedBlock
     }
 
 IndentedStatement
-  = &Indent Indent stmt:Statement {
+  = &Indent Indent stmt:(FunctionIfStatement / FunctionForStatement / FunctionWhileStatement / FunctionVariableDeclaration / Statement) {
       return stmt;
     }
 

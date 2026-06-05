@@ -678,6 +678,32 @@ plot(score(close))
       }
     });
 
+    it('parses top-level nested block dedents with reassignment statements', () => {
+      const ast = parse(`indicator("Top Level Nested Layout")
+value = 0
+if close > open
+    if high > high[1]
+        value := 1
+    else
+        value := 2
+plot(value)
+`);
+      const outer = ast.body.find((statement) => statement.type === 'IfStatement');
+
+      expect(ast.body.map((statement) => statement.type)).toEqual([
+        'IndicatorDeclaration',
+        'VariableDeclaration',
+        'IfStatement',
+        'ExpressionStatement',
+      ]);
+      expect(outer?.type === 'IfStatement' ? outer.consequent.map((statement) => statement.type) : []).toEqual(['IfStatement']);
+      const inner = outer?.type === 'IfStatement' ? outer.consequent[0] : null;
+      expect(inner?.type === 'IfStatement' ? inner.consequent.map((statement) => statement.type) : []).toEqual(['AssignmentStatement']);
+      expect(inner?.type === 'IfStatement' && Array.isArray(inner.alternate)
+        ? inner.alternate.map((statement) => statement.type)
+        : []).toEqual(['AssignmentStatement']);
+    });
+
     it('parses wrapped calls and member chains inside indented bodies', () => {
       const ast = parse(`wrapped(source) =>
     value = array.get(
