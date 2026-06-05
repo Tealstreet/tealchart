@@ -690,6 +690,68 @@ describe('strategy ledger model', () => {
     expect(order).toMatchObject({ status: 'filled', avgFillPrice: 98 });
   });
 
+  it('fills stop-limit orders after same-bar activation when the ordered path reaches the limit', () => {
+    const ledger = createStrategyLedger();
+    const order = submitStrategyOrder(ledger, {
+      id: 'Long stop-limit',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      stopPrice: 102,
+      limitPrice: 99,
+      barIndex: 0,
+      time: 1,
+    });
+
+    const fills = fillPendingStrategyOrdersOnTicks(ledger, [
+      { time: 2, price: 100, kind: 'open', sequence: 0 },
+      { time: 3, price: 103, kind: 'high', sequence: 1 },
+      { time: 4, price: 98, kind: 'low', sequence: 2 },
+      { time: 5, price: 100, kind: 'close', sequence: 3 },
+    ], 1);
+
+    expect(fills.map((fill) => ({ orderId: fill.orderId, price: fill.price, time: fill.time }))).toEqual([
+      { orderId: 'Long stop-limit', price: 99, time: 4 },
+    ]);
+    expect(order).toMatchObject({
+      status: 'filled',
+      avgFillPrice: 99,
+      stopLimitActivated: true,
+      stopLimitActivatedBarIndex: 1,
+      stopLimitActivatedTime: 3,
+      updatedTime: 4,
+    });
+  });
+
+  it('waits after same-bar stop-limit activation when the limit was crossed earlier in the path', () => {
+    const ledger = createStrategyLedger();
+    const order = submitStrategyOrder(ledger, {
+      id: 'Long stop-limit',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      stopPrice: 102,
+      limitPrice: 99,
+      barIndex: 0,
+      time: 1,
+    });
+
+    expect(fillPendingStrategyOrdersOnTicks(ledger, [
+      { time: 2, price: 100, kind: 'open', sequence: 0 },
+      { time: 3, price: 98, kind: 'low', sequence: 1 },
+      { time: 4, price: 103, kind: 'high', sequence: 2 },
+      { time: 5, price: 100, kind: 'close', sequence: 3 },
+    ], 1)).toEqual([]);
+    expect(order).toMatchObject({
+      status: 'pending',
+      stopLimitActivated: true,
+      stopLimitActivatedBarIndex: 1,
+      stopLimitActivatedTime: 4,
+    });
+  });
+
   it('fills activated stop-limit opening gaps against the limit price', () => {
     const ledger = createStrategyLedger();
     const order = submitStrategyOrder(ledger, {
