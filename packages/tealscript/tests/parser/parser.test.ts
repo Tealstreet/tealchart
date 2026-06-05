@@ -905,6 +905,28 @@ y = close
           operator: '-',
         }));
       });
+
+      it('parses leading negative numeric line continuations', () => {
+        const ast = parse(`x = 10
+    - 3
+y = close
+    - 1.5
+`);
+        const integerSubtraction = ast.body[0] as VariableDeclaration;
+        const decimalSubtraction = ast.body[1] as VariableDeclaration;
+
+        expect(ast.body).toHaveLength(2);
+        expect(integerSubtraction.names.type === 'VariableDeclarator' ? integerSubtraction.names.name.name : null).toBe('x');
+        expect(decimalSubtraction.names.type === 'VariableDeclarator' ? decimalSubtraction.names.name.name : null).toBe('y');
+        expect(integerSubtraction.init).toEqual(expect.objectContaining({
+          type: 'BinaryExpression',
+          operator: '-',
+        }));
+        expect(decimalSubtraction.init).toEqual(expect.objectContaining({
+          type: 'BinaryExpression',
+          operator: '-',
+        }));
+      });
     });
 
     describe('Call expressions', () => {
