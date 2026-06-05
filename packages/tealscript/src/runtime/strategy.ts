@@ -152,6 +152,7 @@ export interface StrategyLedgerSettings {
   title: string;
   initialCapital: number;
   currency: string;
+  allowedEntryDirection: StrategyDirection | 'all';
   defaultQtyType: 'fixed' | 'cash' | 'percent_of_equity';
   defaultQtyValue: number;
   pyramiding: number;
@@ -304,6 +305,7 @@ export function createDefaultStrategySettings(settings: Partial<StrategyLedgerSe
     title: 'Untitled strategy',
     initialCapital: 100_000,
     currency: 'USD',
+    allowedEntryDirection: 'all',
     defaultQtyType: 'fixed',
     defaultQtyValue: 1,
     pyramiding: 0,
@@ -944,9 +946,9 @@ function validateStrategyOrderInput(input: StrategyOrderInput): void {
   if (
     input.requestedQty !== undefined
     && input.requestedQty !== null
-    && (!Number.isFinite(input.requestedQty) || input.requestedQty <= 0)
+    && (!Number.isFinite(input.requestedQty) || input.requestedQty < 0)
   ) {
-    throw new Error('strategy order requestedQty must be a positive number');
+    throw new Error('strategy order requestedQty must be a non-negative number');
   }
   if (!Number.isFinite(input.qtyValue) || input.qtyValue <= 0) {
     throw new Error('strategy order qtyValue must be a positive number');

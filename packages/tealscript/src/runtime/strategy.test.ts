@@ -380,7 +380,7 @@ describe('strategy ledger model', () => {
       requestedQty: Number.NaN,
       barIndex: 0,
       time: 1,
-    })).toThrow('strategy order requestedQty must be a positive number');
+    })).toThrow('strategy order requestedQty must be a non-negative number');
   });
 
   it('fills market orders and updates position average price', () => {
