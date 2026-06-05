@@ -15,6 +15,7 @@ import {
   currencyRateRequestKey,
   economicRequestKey,
   financialRequestKey,
+  formatPineCompatibilityCorpusJson,
   formatPineCompatibilityCorpusMarkdown,
   getResultOutput,
   InMemoryRequestDatafeed,
@@ -22,6 +23,7 @@ import {
   requestDatafeedKey,
   requestSeriesKey,
   runPineCompatibilityCorpus,
+  runPineCompatibilityLedger,
   seedRequestSymbol,
   TealscriptEngine,
   TealscriptWorker,
@@ -74,6 +76,7 @@ describe('public package entrypoints', () => {
       { ledgerEntry, stages: [{ stage: 'parse', status: 'passed' }] },
     ]);
     const ledger = createPineScriptLedger([ledgerEntry]);
+    const ledgerRun = runPineCompatibilityLedger(ledger, () => [{ stage: 'parse', status: 'passed' }]);
 
     expect(typeof parse).toBe('function');
     expect(typeof validate).toBe('function');
@@ -82,6 +85,8 @@ describe('public package entrypoints', () => {
     expect(compatibilityFailureClasses).toContain('runtime_gap');
     expect(compatibilityOutcome.summary.passed).toBe(true);
     expect(corpusRun.summary.passed).toBe(1);
+    expect(ledgerRun.summary.passed).toBe(1);
+    expect(formatPineCompatibilityCorpusJson(corpusRun)).toContain('"summary"');
     expect(formatPineCompatibilityCorpusMarkdown(corpusRun)).toContain('Pass rate: 100.0%');
     expect(validatePineScriptLedger(ledger)).toEqual({});
     expect(validatePineScriptLedgerEntry(ledgerEntry)).toEqual([]);

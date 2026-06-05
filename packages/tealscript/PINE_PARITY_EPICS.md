@@ -471,7 +471,7 @@ impact.
    result shape, canonical stage normalization, validation, and failure classes.
 4. Real-script intake ledger: add metadata-only corpus format, unique-id
    validation, and provenance rules.
-5. Corpus runner MVP: run parser and runtime where possible, emit JSON/Markdown
+5. Corpus runner MVP: run ledger-backed offline outcomes and emit JSON/Markdown
    pass-rate summaries.
 6. Pine layout parser audit/failing fixtures: collect reduced failing layout
    shapes before changing parser architecture.
