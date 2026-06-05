@@ -169,6 +169,9 @@ indicator("Chart Context")
 plot(color.r(chart.bg_color), title="Bg R")
 plot(color.g(chart.bg_color), title="Bg G")
 plot(color.b(chart.fg_color), title="Fg B")
+plot(chart.left_visible_bar_time, title="Left Visible")
+plot(chart.right_visible_bar_time, title="Right Visible")
+plot(chart.right_visible_bar_time - chart.left_visible_bar_time, title="Visible Span")
 plot(chart.is_standard ? 1 : 0, title="Standard")
 plot(chart.is_renko ? 1 : 0, title="Renko")
 plot(chart.is_heikinashi ? 1 : 0, title="Heikin Ashi")
@@ -183,6 +186,8 @@ plot(chart.is_range ? 1 : 0, title="Range")
             bgColor: '#102030',
             fgColor: '#ABCDEF',
             type: 'renko',
+            leftVisibleBarTime: compatibilityBars[2]!.time,
+            rightVisibleBarTime: compatibilityBars[8]!.time,
           },
         },
       },
@@ -194,6 +199,9 @@ plot(chart.is_range ? 1 : 0, title="Range")
     expect(getPlot(result, 'Bg R').values).toEqual(allBars(16));
     expect(getPlot(result, 'Bg G').values).toEqual(allBars(32));
     expect(getPlot(result, 'Fg B').values).toEqual(allBars(239));
+    expect(getPlot(result, 'Left Visible').values).toEqual(allBars(compatibilityBars[2]!.time));
+    expect(getPlot(result, 'Right Visible').values).toEqual(allBars(compatibilityBars[8]!.time));
+    expect(getPlot(result, 'Visible Span').values).toEqual(allBars(compatibilityBars[8]!.time - compatibilityBars[2]!.time));
     expect(getPlot(result, 'Standard').values).toEqual(allBars(0));
     expect(getPlot(result, 'Renko').values).toEqual(allBars(1));
     expect(getPlot(result, 'Heikin Ashi').values).toEqual(allBars(0));

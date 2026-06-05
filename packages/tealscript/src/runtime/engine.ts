@@ -3857,6 +3857,10 @@ export class TealscriptEngine {
         return this.ctx.chart.bgColor;
       case 'fg_color':
         return this.ctx.chart.fgColor;
+      case 'left_visible_bar_time':
+        return this.ctx.chart.leftVisibleBarTime ?? this.ctx.getBar(0)?.time ?? Number.NaN;
+      case 'right_visible_bar_time':
+        return this.ctx.chart.rightVisibleBarTime ?? this.ctx.getBar(this.ctx.last_bar_index)?.time ?? Number.NaN;
       case 'is_standard':
         return this.ctx.chart.type === 'standard';
       case 'is_heikinashi':

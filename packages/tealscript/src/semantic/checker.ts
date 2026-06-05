@@ -295,6 +295,7 @@ const CHART_BOOL_MEMBER_NAMES = new Set([
   'chart.is_renko',
 ]);
 const CHART_COLOR_MEMBER_NAMES = new Set(['chart.bg_color', 'chart.fg_color']);
+const CHART_INT_MEMBER_NAMES = new Set(['chart.left_visible_bar_time', 'chart.right_visible_bar_time']);
 
 const TICKER_STRING_RETURN_NAMES = new Set([
   'ticker.heikinashi',
@@ -4778,6 +4779,7 @@ class SemanticChecker {
     const memberName = this.memberPath(expression).join('.');
     if (CHART_BOOL_MEMBER_NAMES.has(memberName)) return { kind: 'bool', qualifier: 'simple' };
     if (CHART_COLOR_MEMBER_NAMES.has(memberName)) return { kind: 'color', qualifier: 'simple' };
+    if (CHART_INT_MEMBER_NAMES.has(memberName)) return { kind: 'int', qualifier: 'input' };
     return undefined;
   }
 

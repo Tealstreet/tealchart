@@ -121,6 +121,8 @@ export interface ChartInfo {
   bgColor: string;
   fgColor: string;
   type: ChartType;
+  leftVisibleBarTime?: number;
+  rightVisibleBarTime?: number;
 }
 
 /**
