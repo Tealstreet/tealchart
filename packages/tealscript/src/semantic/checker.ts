@@ -261,9 +261,14 @@ const SYMINFO_STRING_MEMBER_NAMES = new Set([
 ]);
 const SYMINFO_INT_MEMBER_NAMES = new Set([
   'syminfo.employees',
+  'syminfo.expiration_date',
   'syminfo.minmove',
   'syminfo.pricescale',
   'syminfo.shareholders',
+]);
+const SYMINFO_SERIES_INT_MEMBER_NAMES = new Set([
+  'syminfo.recommendations_date',
+  'syminfo.target_price_date',
 ]);
 const SYMINFO_FLOAT_MEMBER_NAMES = new Set([
   'syminfo.mincontract',
@@ -271,6 +276,13 @@ const SYMINFO_FLOAT_MEMBER_NAMES = new Set([
   'syminfo.pointvalue',
   'syminfo.shares_outstanding_float',
   'syminfo.shares_outstanding_total',
+]);
+const SYMINFO_SERIES_FLOAT_MEMBER_NAMES = new Set([
+  'syminfo.target_price_average',
+  'syminfo.target_price_estimates',
+  'syminfo.target_price_high',
+  'syminfo.target_price_low',
+  'syminfo.target_price_median',
 ]);
 
 const CHART_BOOL_MEMBER_NAMES = new Set([
@@ -4755,7 +4767,9 @@ class SemanticChecker {
     const memberName = this.memberPath(expression).join('.');
     if (SYMINFO_STRING_MEMBER_NAMES.has(memberName)) return { kind: 'string', qualifier: 'simple' };
     if (SYMINFO_INT_MEMBER_NAMES.has(memberName)) return { kind: 'int', qualifier: 'simple' };
+    if (SYMINFO_SERIES_INT_MEMBER_NAMES.has(memberName)) return { kind: 'int', qualifier: 'series' };
     if (SYMINFO_FLOAT_MEMBER_NAMES.has(memberName)) return { kind: 'float', qualifier: 'simple' };
+    if (SYMINFO_SERIES_FLOAT_MEMBER_NAMES.has(memberName)) return { kind: 'float', qualifier: 'series' };
     return undefined;
   }
 

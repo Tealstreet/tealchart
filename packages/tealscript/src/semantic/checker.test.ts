@@ -201,11 +201,19 @@ minMove = syminfo.minmove
 priceScale = syminfo.pricescale
 employees = syminfo.employees
 shareholders = syminfo.shareholders
+expirationDate = syminfo.expiration_date
+recommendationsDate = syminfo.recommendations_date
+targetPriceDate = syminfo.target_price_date
 minTick = syminfo.mintick
 pointValue = syminfo.pointvalue
 minContract = syminfo.mincontract
 floatShares = syminfo.shares_outstanding_float
 totalShares = syminfo.shares_outstanding_total
+targetAverage = syminfo.target_price_average
+targetEstimates = syminfo.target_price_estimates
+targetHigh = syminfo.target_price_high
+targetLow = syminfo.target_price_low
+targetMedian = syminfo.target_price_median
 ticker := 1
 tickerId := 2
 root := 3
@@ -221,12 +229,20 @@ minMove := "bad"
 priceScale := "bad"
 employees := "bad"
 shareholders := "bad"
+expirationDate := "bad"
+recommendationsDate := "bad"
+targetPriceDate := "bad"
 minTick := "bad"
 pointValue := "bad"
 minContract := "bad"
 floatShares := "bad"
 totalShares := "bad"
-plot(minMove + priceScale + employees + shareholders + minTick + pointValue + minContract + floatShares + totalShares)
+targetAverage := "bad"
+targetEstimates := "bad"
+targetHigh := "bad"
+targetLow := "bad"
+targetMedian := "bad"
+plot(minMove + priceScale + employees + shareholders + expirationDate + recommendationsDate + targetPriceDate + minTick + pointValue + minContract + floatShares + totalShares + targetAverage + targetEstimates + targetHigh + targetLow + targetMedian)
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -247,11 +263,19 @@ plot(minMove + priceScale + employees + shareholders + minTick + pointValue + mi
       'Cannot assign string value to int variable priceScale',
       'Cannot assign string value to int variable employees',
       'Cannot assign string value to int variable shareholders',
+      'Cannot assign string value to int variable expirationDate',
+      'Cannot assign string value to int variable recommendationsDate',
+      'Cannot assign string value to int variable targetPriceDate',
       'Cannot assign string value to float variable minTick',
       'Cannot assign string value to float variable pointValue',
       'Cannot assign string value to float variable minContract',
       'Cannot assign string value to float variable floatShares',
       'Cannot assign string value to float variable totalShares',
+      'Cannot assign string value to float variable targetAverage',
+      'Cannot assign string value to float variable targetEstimates',
+      'Cannot assign string value to float variable targetHigh',
+      'Cannot assign string value to float variable targetLow',
+      'Cannot assign string value to float variable targetMedian',
     ]);
     expect(types.get('ticker')).toMatchObject({ kind: 'string', qualifier: 'simple' });
     expect(types.get('tickerId')).toMatchObject({ kind: 'string', qualifier: 'simple' });
@@ -268,11 +292,19 @@ plot(minMove + priceScale + employees + shareholders + minTick + pointValue + mi
     expect(types.get('priceScale')).toMatchObject({ kind: 'int', qualifier: 'simple' });
     expect(types.get('employees')).toMatchObject({ kind: 'int', qualifier: 'simple' });
     expect(types.get('shareholders')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+    expect(types.get('expirationDate')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+    expect(types.get('recommendationsDate')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('targetPriceDate')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('minTick')).toMatchObject({ kind: 'float', qualifier: 'simple' });
     expect(types.get('pointValue')).toMatchObject({ kind: 'float', qualifier: 'simple' });
     expect(types.get('minContract')).toMatchObject({ kind: 'float', qualifier: 'simple' });
     expect(types.get('floatShares')).toMatchObject({ kind: 'float', qualifier: 'simple' });
     expect(types.get('totalShares')).toMatchObject({ kind: 'float', qualifier: 'simple' });
+    expect(types.get('targetAverage')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('targetEstimates')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('targetHigh')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('targetLow')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('targetMedian')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('accepts Pine log calls with format arguments', () => {
