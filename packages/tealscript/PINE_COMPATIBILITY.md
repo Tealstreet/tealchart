@@ -697,10 +697,11 @@ mutation pass covers persistent `var` line handles, `line.set_x1()`,
 `line.set_xloc()`, `line.set_extend()`, `line.set_color()`,
 `line.set_style()`, `line.set_width()`, scalar coordinate getters,
 `line.get_price()`, `line.copy()`, and `line.delete()`. Line mutators
-and getters accept Pine-style named `id`, value, and point arguments. Semantic analysis
-preserves known line getter return types and `line.all` handle-array element
-types for downstream diagnostics. Rendering routes line segments to the script
-pane with color/style/width, horizontal extension support, and Pine
+and getters accept Pine-style named `id`, value, and point arguments. Semantic
+analysis validates `line.new()` call-shape names, preserves known line getter
+return types, and preserves `line.all` handle-array element types for
+downstream diagnostics. Rendering routes line segments to the script pane with
+color/style/width, horizontal extension support, and Pine
 `line.style_arrow_left`, `line.style_arrow_right`, and `line.style_arrow_both`
 arrowheads.
 `force_overlay` lines render in the main pane even when created by non-overlay
@@ -723,10 +724,10 @@ common border, fill, text, `extend`, and `xloc` options, including
 `set_top_left_point`, `set_bottom_right_point`), style/text setters including
 `set_text_formatting`, coordinate/color/text getters, `box.copy()`, and
 `box.delete()`. Box mutators and getters accept Pine-style named `id`, value,
-and point arguments. Semantic analysis
-preserves known box getter return types and `box.all` handle-array element types
-for downstream diagnostics. Rendering routes filled rectangles to the script
-pane with borders, text alignment, `text_wrap=auto` wrapping,
+and point arguments. Semantic analysis validates `box.new()` call-shape names,
+preserves known box getter return types, and preserves `box.all` handle-array
+element types for downstream diagnostics. Rendering routes filled rectangles to
+the script pane with borders, text alignment, `text_wrap=auto` wrapping,
 default/monospace font-family metadata, and bold/italic text formatting. Full
 TradingView text pixel parity and remaining edge-case
 styling remain planned.

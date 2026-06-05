@@ -644,6 +644,46 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['line.get_y1', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['line.get_y2', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['line.get_price', { params: ['id', 'x'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  [
+    'line.new',
+    {
+      params: ['x1', 'y1', 'x2', 'y2', 'xloc', 'extend', 'color', 'style', 'width', 'force_overlay', 'first_point', 'second_point'],
+      minArgs: 2,
+      maxArgs: 10,
+      allowNamedPrefixWithPositional: true,
+    },
+  ],
+  [
+    'box.new',
+    {
+      params: [
+        'left',
+        'top',
+        'right',
+        'bottom',
+        'border_color',
+        'border_width',
+        'border_style',
+        'extend',
+        'xloc',
+        'bgcolor',
+        'text',
+        'text_size',
+        'text_color',
+        'text_halign',
+        'text_valign',
+        'text_wrap',
+        'text_font_family',
+        'force_overlay',
+        'text_formatting',
+        'top_left',
+        'bottom_right',
+      ],
+      minArgs: 2,
+      maxArgs: 19,
+      allowNamedPrefixWithPositional: true,
+    },
+  ],
   ['box.delete', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['box.copy', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['box.set_left', { params: ['id', 'left'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
@@ -1262,6 +1302,14 @@ for (const name of [
 ]) {
   BUILTIN_SIGNATURES.set(name, { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true });
 }
+
+const SIGNED_BUILTIN_CALL_NAMESPACES = new Set(
+  [...BUILTIN_SIGNATURES.keys()]
+    .flatMap((name) => {
+      const [namespace, member] = name.split('.');
+      return namespace && member && BUILTIN_NAMESPACES.has(namespace) ? [namespace] : [];
+    }),
+);
 
 export function checkProgram(program: Program): SemanticCheckResult {
   return new SemanticChecker().check(program);
@@ -2850,7 +2898,7 @@ class SemanticChecker {
   private checkUnsupportedBuiltinNamespaceCall(expression: CallExpression, displayName: string): void {
     if (expression.callee.type !== 'MemberExpression') return;
     const namespace = this.memberPath(expression.callee)[0];
-    if (namespace !== 'log' && namespace !== 'strategy') return;
+    if (!namespace || !SIGNED_BUILTIN_CALL_NAMESPACES.has(namespace)) return;
     this.addDiagnostic('unknown-function', `Unknown function: ${displayName}`, expression.callee.loc);
   }
 

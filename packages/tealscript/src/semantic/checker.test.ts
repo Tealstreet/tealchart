@@ -358,6 +358,59 @@ log.trace("unsupported")
     ]);
   });
 
+  it('reports unknown calls under signed Pine builtin namespaces', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Builtin Calls")
+request.securty(syminfo.tickerid, "1D", close)
+ta.smoothed(close, 14)
+array.fro(close)
+matrix.rota(matrix.new<float>())
+timeframe.to_seconds("1D")
+ticker.make("NASDAQ:AAPL")
+chart.point.later(close)
+plot(close)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Unknown function: request.securty',
+      'Unknown function: ta.smoothed',
+      'Unknown function: array.fro',
+      'Unknown function: matrix.rota',
+      'Unknown function: timeframe.to_seconds',
+      'Unknown function: ticker.make',
+      'Unknown function: chart.point.later',
+    ]);
+  });
+
+  it('does not report unknown builtin calls for user-defined methods', () => {
+    const result = checkProgram(parse(`
+indicator("User Methods")
+type Pivot
+    float price
+method smoothed(Pivot this, int length) => this.price
+pivot = Pivot.new(close)
+plot(pivot.smoothed(14))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid drawing constructor named arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing Constructors")
+left = chart.point.from_index(bar_index, low)
+right = chart.point.from_index(bar_index + 1, high)
+line.new(left, right, opacity=80)
+box.new(left, right, border_color=color.blue, opacity=80)
+plot(close)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'opacity' for line.new()",
+      "Unknown argument 'opacity' for box.new()",
+    ]);
+  });
+
   it('accepts Pine alert calls and alertcondition declarations', () => {
     const result = checkProgram(parse(`
 indicator("Alerts")
