@@ -164,6 +164,8 @@ Phases:
    public fixed-bracket strategy fixture.
    Alert coverage includes official docs examples plus a reduced public signal
    fixture with both `alertcondition()` metadata and direct `alert()` emission.
+   Synthetic ticker coverage includes official docs examples plus a reduced
+   public Heikin-Ashi trend request fixture.
 7. Generate a trendable pass-rate report: total scripts, parse pass, semantic
    pass, runtime pass, usable-output pass, top failure classes, and regressions.
 
