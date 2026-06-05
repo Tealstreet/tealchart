@@ -809,6 +809,10 @@ the ordered broker path reaches the limit price. Fixed, cash, and
 percent-of-equity sizing resolve to concrete order quantities at submission time,
 and `strategy.entry()` enforces same-direction pyramiding limits and expands
 opposite-direction entry transactions to reverse positions. The
+`strategy.risk.allow_entry_in(strategy.direction.*)` rule restricts
+`strategy.entry()` to the allowed direction, converting disallowed opposite
+entries into close-only market orders while leaving raw `strategy.order()` calls
+unrestricted. The
 `strategy(..., slippage=...)` setting applies fixed tick slippage to market,
 stop, and trailing-stop fills in trade direction while preserving limit-fill
 prices. `strategy.close(..., immediately=true)` and

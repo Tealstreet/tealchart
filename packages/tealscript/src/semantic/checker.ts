@@ -1047,6 +1047,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['strategy.entry', { params: STRATEGY_ORDER_PARAMS, minArgs: 2, allowNamedPrefixWithPositional: true }],
   ['strategy.exit', { params: STRATEGY_EXIT_PARAMS, minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['strategy.order', { params: STRATEGY_ORDER_PARAMS, minArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['strategy.risk.allow_entry_in', { params: ['value'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['ta.alma', { params: ['series', 'length', 'offset', 'sigma', 'floor'], minArgs: 4, maxArgs: 5, allowNamedPrefixWithPositional: true }],
   ['ta.atr', { params: ['length'], minArgs: 1, maxArgs: 1 }],
   ['ta.barssince', { params: ['condition'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
