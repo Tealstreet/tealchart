@@ -286,6 +286,7 @@ const SYMINFO_SERIES_FLOAT_MEMBER_NAMES = new Set([
 ]);
 
 const CHART_BOOL_MEMBER_NAMES = new Set([
+  'chart.is_standard',
   'chart.is_heikinashi',
   'chart.is_kagi',
   'chart.is_linebreak',

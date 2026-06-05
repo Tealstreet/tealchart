@@ -3857,6 +3857,8 @@ export class TealscriptEngine {
         return this.ctx.chart.bgColor;
       case 'fg_color':
         return this.ctx.chart.fgColor;
+      case 'is_standard':
+        return this.ctx.chart.type === 'standard';
       case 'is_heikinashi':
         return this.ctx.chart.type === 'heikinashi';
       case 'is_kagi':
