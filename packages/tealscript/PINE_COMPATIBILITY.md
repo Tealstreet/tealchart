@@ -790,7 +790,9 @@ commissions are applied to fills and debited from strategy net profit/equity for
 `cash_per_contract` commission settings. Basic `strategy.opentrades.*`
 accessors are available for open trade entry id, entry price, entry bar/time,
 entry comment, signed size, gross open profit, profit percent, commission,
-maximum run-up, and maximum drawdown with percent variants. Basic
+maximum run-up, and maximum drawdown with percent variants. The
+`strategy.opentrades.capital_held` variable reports reserved entry notional
+across open trades. Basic
 `strategy.closedtrades.*` accessors are available for closed trade entry/exit
 ids, comments, prices, bars/times, signed size, gross profit, profit percent,
 commission, maximum run-up, and maximum drawdown with percent variants.

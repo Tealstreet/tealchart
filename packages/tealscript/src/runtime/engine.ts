@@ -1521,6 +1521,9 @@ export class TealscriptEngine {
       if (namespace === 'timeframe') {
         return this.evaluateTimeframe(prop);
       }
+      if (fullName === 'strategy.opentrades.capital_held') {
+        return this.evaluateStrategyOpenTradesCapitalHeld();
+      }
       if (namespace === 'strategy') {
         return this.evaluateStrategy(prop);
       }
@@ -3756,6 +3759,9 @@ export class TealscriptEngine {
       if (namespace === 'timeframe') {
         return this.evaluateTimeframe(prop);
       }
+      if (fullName === 'strategy.opentrades.capital_held') {
+        return this.evaluateStrategyOpenTradesCapitalHeld();
+      }
       if (namespace === 'strategy') {
         return this.evaluateStrategy(prop);
       }
@@ -3967,6 +3973,12 @@ export class TealscriptEngine {
       default:
         throw new Error(`Unknown strategy property: ${prop}`);
     }
+  }
+
+  private evaluateStrategyOpenTradesCapitalHeld(): number {
+    return this.ctx.strategyLedger.openTrades.reduce((total, trade) => (
+      total + (trade.entryPrice * Math.abs(trade.qty))
+    ), 0);
   }
 
   private evaluateIndex(expr: IndexExpression): unknown {
