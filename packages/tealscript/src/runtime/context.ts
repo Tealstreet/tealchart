@@ -78,6 +78,7 @@ export interface BarState {
  */
 export interface SymInfo {
   ticker: string;
+  root: string;
   description: string;
   type: string; // 'crypto', 'stock', 'forex', etc.
   prefix: string;
@@ -342,6 +343,7 @@ export class ExecutionContext {
   /** Symbol information */
   syminfo: SymInfo = {
     ticker: 'BTCUSDT',
+    root: 'BTC',
     description: 'Bitcoin / Tether',
     type: 'crypto',
     prefix: '',
