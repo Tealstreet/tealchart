@@ -3940,6 +3940,8 @@ export class TealscriptEngine {
         return 'cash';
       case 'percent_of_equity':
         return 'percent_of_equity';
+      case 'account_currency':
+        return ledger.settings.currency;
       case 'equity':
         return ledger.equity;
       case 'initial_capital':
@@ -3956,6 +3958,8 @@ export class TealscriptEngine {
         return ledger.position.size;
       case 'position_avg_price':
         return ledger.position.avgPrice ?? Number.NaN;
+      case 'position_entry_name':
+        return ledger.openTrades[0]?.entryOrderId ?? '';
       case 'opentrades':
         return ledger.openTrades.length;
       case 'closedtrades':
