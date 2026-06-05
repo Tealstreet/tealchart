@@ -495,7 +495,8 @@ preserves visual call order across plot, hline, and fill outputs.
 Renderer coverage also routes visual outputs with `force_overlay=true` back to
 the main pane when emitted by non-overlay scripts.
 Marker text rendering supports newline-separated labels on plotshape,
-plotchar, and plotarrow outputs.
+plotchar, and plotarrow outputs, and marker payloads preserve dynamic
+`textcolor` series for per-bar rendering.
 
 Hline renderer coverage applies Pine `hline()` color, linewidth, linestyle,
 display hiding, and pane-coordinate behavior for the current output shape.

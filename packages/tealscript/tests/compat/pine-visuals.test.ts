@@ -346,6 +346,28 @@ plotarrow(close - open, "Move Arrow", color.new(color.green, 50), color.new(colo
     });
   });
 
+  it('preserves dynamic marker text colors in visual payloads', () => {
+    const result = runCompatScript(`
+indicator("Marker text color smoke", overlay=true)
+shapeText = bar_index == 0 ? color.white : bar_index == 1 ? na : color.yellow
+charText = bar_index == 0 ? na : bar_index == 1 ? color.green : color.red
+plotshape(true, title="Dynamic Shape", text="S", textcolor=shapeText)
+plotchar(true, title="Dynamic Char", char="C", text="C", textcolor=charText)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Dynamic Shape').textColor).toEqual([
+      '#FFFFFF',
+      null,
+      ...Array(compatibilityBars.length - 2).fill('#FDD835'),
+    ]);
+    expect(getPlot(result, 'Dynamic Char').textColor).toEqual([
+      null,
+      '#4CAF50',
+      ...Array(compatibilityBars.length - 2).fill('#F23645'),
+    ]);
+  });
+
   it('preserves legacy fill title references before plot registration', () => {
     const result = runCompatScript(`
 indicator("Legacy fill smoke", overlay=true)

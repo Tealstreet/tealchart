@@ -793,6 +793,7 @@ export class ExecutionContext {
       if (plot.closeValues) plot.closeValues.length = length;
       if (Array.isArray(plot.wickColor)) plot.wickColor.length = length;
       if (Array.isArray(plot.borderColor)) plot.borderColor.length = length;
+      if (Array.isArray(plot.textColor)) plot.textColor.length = length;
     }
   }
 

@@ -4442,6 +4442,30 @@ export class TealscriptEngine {
     }
   }
 
+  private setPlotTextColorValue(plot: PlotOutput | undefined, barIndex: number, color: string | null): void {
+    if (!plot || barIndex < 0) return;
+
+    if (Array.isArray(plot.textColor)) {
+      while (plot.textColor.length < barIndex) {
+        plot.textColor.push(null);
+      }
+      plot.textColor[barIndex] = color;
+      return;
+    }
+
+    if (plot.textColor === color) return;
+
+    const previousColor = plot.textColor ?? null;
+    if (barIndex === 0) {
+      plot.textColor = color ?? [];
+      if (Array.isArray(plot.textColor)) plot.textColor[0] = null;
+      return;
+    }
+
+    plot.textColor = Array.from({ length: barIndex }, () => previousColor);
+    plot.textColor[barIndex] = color;
+  }
+
   private toStringValue(value: unknown, format?: string): string {
     if (value === null || value === undefined || this.isNa(value)) {
       return 'NaN';
@@ -6119,7 +6143,7 @@ export class TealscriptEngine {
           location: location as 'abovebar' | 'belowbar' | 'top' | 'bottom' | 'absolute',
           size: size as 'tiny' | 'small' | 'normal' | 'large' | 'huge' | 'auto',
           text,
-          textColor: textColor ?? undefined,
+          textColor: textColor ?? [],
           offset,
           editable,
           showLast,
@@ -6135,6 +6159,7 @@ export class TealscriptEngine {
       if (plot && Array.isArray(plot.color)) {
         plot.color.push(color);
       }
+      this.setPlotTextColorValue(plot, ctx.bar_index, textColor);
 
       // Determine value - true/non-zero means show shape
       let value: number | null = null;
@@ -6180,7 +6205,7 @@ export class TealscriptEngine {
           location: location as 'abovebar' | 'belowbar' | 'top' | 'bottom' | 'absolute',
           size: size as 'tiny' | 'small' | 'normal' | 'large' | 'huge' | 'auto',
           text,
-          textColor: textColor ?? undefined,
+          textColor: textColor ?? [],
           offset,
           editable,
           showLast,
@@ -6196,6 +6221,7 @@ export class TealscriptEngine {
       if (plot && Array.isArray(plot.color)) {
         plot.color.push(color);
       }
+      this.setPlotTextColorValue(plot, ctx.bar_index, textColor);
 
       // Determine value
       let value: number | null = null;
