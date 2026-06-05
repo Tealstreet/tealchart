@@ -5235,6 +5235,37 @@ plot(source + level + multiplier + length)
     expect(types.get('source')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
+  it('reports invalid Pine input default value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Input Defaults")
+length = input.int(3.5)
+count = input.int("3")
+multiplier = input.float("2")
+enabled = input.bool(1)
+mode = input.string(1)
+start = input.time("1700000000000")
+tf = input.timeframe(60)
+symbol = input.symbol(1)
+session = input.session(930)
+memo = input.text_area(1)
+level = input.price("101.25")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'input.int defval must be an integer',
+      'input.int defval must be a number',
+      'input.float defval must be a number',
+      'input.bool defval must be a boolean',
+      'input.string defval must be a string',
+      'input.time defval must be a number',
+      'input.timeframe defval must be a string',
+      'input.symbol defval must be a string',
+      'input.session defval must be a string',
+      'input.text_area defval must be a string',
+      'input.price defval must be a number',
+    ]);
+  });
+
   it('reports duplicate Pine input bindings against the selected overload', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate Input Args")

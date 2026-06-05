@@ -147,6 +147,19 @@ const INPUT_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['input.timeframe', 'string'],
 ]);
 
+const INPUT_DEFAULT_TYPE_REQUIREMENTS = new Map<string, 'bool' | 'int' | 'number' | 'string'>([
+  ['input.bool', 'bool'],
+  ['input.float', 'number'],
+  ['input.int', 'int'],
+  ['input.price', 'number'],
+  ['input.session', 'string'],
+  ['input.string', 'string'],
+  ['input.symbol', 'string'],
+  ['input.text_area', 'string'],
+  ['input.time', 'number'],
+  ['input.timeframe', 'string'],
+]);
+
 const INPUT_RANGE_OPTION_OVERLOAD_NAMES = new Set(['input.float', 'input.int']);
 const INPUT_RANGE_OPTION_RANGE_PARAMS = new Set(['minval', 'maxval', 'step']);
 
@@ -2738,6 +2751,7 @@ class SemanticChecker {
     this.checkMatrixCallTypes(expression, scope);
     this.checkMatrixSortFieldType(expression, scope);
     this.checkMapCallTypes(expression, scope);
+    this.checkInputDefaultValueType(expression, scope);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
     for (const argument of expression.arguments) {
@@ -3090,6 +3104,40 @@ class SemanticChecker {
       case 'remove':
         this.checkMapArgumentType(mapCall.mapType.keyType, mapCall.keyArgument, 'map key', scope);
         break;
+    }
+  }
+
+  private checkInputDefaultValueType(expression: CallExpression, scope: SemanticScope): void {
+    const displayName = this.memberPath(expression.callee).join('.');
+    const requirement = INPUT_DEFAULT_TYPE_REQUIREMENTS.get(displayName);
+    if (!requirement) return;
+
+    const defval = this.getCallArgument(expression.arguments, 'defval', 0);
+    if (!defval) return;
+
+    const actualType = this.inferExpressionType(defval, scope);
+    if (actualType.kind === 'unknown') return;
+
+    if (requirement === 'int') {
+      if (actualType.kind === 'float') {
+        this.addDiagnostic('type-mismatch', `${displayName} defval must be an integer`, defval.loc);
+        return;
+      }
+      if (actualType.kind !== 'int') {
+        this.addDiagnostic('type-mismatch', `${displayName} defval must be a number`, defval.loc);
+      }
+      return;
+    }
+
+    if (requirement === 'number') {
+      if (actualType.kind === 'int' || actualType.kind === 'float') return;
+      this.addDiagnostic('type-mismatch', `${displayName} defval must be a number`, defval.loc);
+      return;
+    }
+
+    if (actualType.kind !== requirement) {
+      const expectedLabel = requirement === 'bool' ? 'boolean' : requirement;
+      this.addDiagnostic('type-mismatch', `${displayName} defval must be a ${expectedLabel}`, defval.loc);
     }
   }
 

@@ -183,9 +183,9 @@ helpers (`input.price`, `input.time`, `input.timeframe`, `input.symbol`, `input.
 `inline`, `confirm`, `display`, `active`) so generated scripts retain Pine-like control
 definitions. Semantic analysis preserves known `input.*` return types for
 downstream assignment diagnostics, including `input.source()` defval source
-types, and reports Pine-style overload diagnostics when `input.int()` or
-`input.float()` mixes `options` with range-only `minval`/`maxval`/`step`
-arguments.
+types. It also reports Pine-style diagnostics for typed default-value
+mismatches and for `input.int()` / `input.float()` calls that mix `options`
+with range-only `minval`/`maxval`/`step` arguments.
 
 ## Common `array.*` Coverage
 
