@@ -122,7 +122,8 @@ Current `str.*` progress:
 - Covered string search, substring, split, case, trim, replacement, and repeat
   helpers accept Pine-style named arguments while preserving positional calls.
 - `str.format_time()` uses the Pine v6 ISO-style default format and supports
-  quoted literals, single date/time tokens, and numeric timezone offsets.
+  quoted literals, single date/time tokens, 12-hour `h`/`hh` and AM/PM `a`
+  tokens, and numeric timezone offsets.
 
 Current `color.*` progress:
 

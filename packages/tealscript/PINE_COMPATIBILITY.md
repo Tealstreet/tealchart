@@ -158,8 +158,9 @@ The common string helper pass covers `str.tostring`, `str.tonumber`,
 `str.trim`, `str.replace`, `str.replace_all`, and `str.repeat`. These helpers
 support generated indicators that assemble labels, table text, and debug
 strings. `str.format()` supports Pine-style numeric placeholder modifiers for
-decimal masks, integer, currency, and percent output. Semantic analysis
-preserves known string helper return types for downstream assignment
+decimal masks, integer, currency, and percent output, while
+`str.format_time()` supports 12-hour `h`/`hh` and AM/PM `a` tokens. Semantic
+analysis preserves known string helper return types for downstream assignment
 diagnostics, including `str.split()` array element types.
 
 ## Common `input.*` Coverage

@@ -552,6 +552,7 @@ parsed = str.tonumber("42.5")
 invalid = str.tonumber("not a number")
 formattedTime = str.format_time(timestamp("GMT+2", 2024, 1, 5, 9, 30), "yyyy-MM-dd HH:mm", "GMT+2")
 prefixFormattedTime = str.format_time(time=timestamp("GMT+2", 2024, 1, 5, 9, 30), "yyyy-MM-dd HH:mm", "GMT+2")
+ampmTime = str.format_time(timestamp("UTC", 2024, 1, 5, 15, 5), "h:mm a", "UTC")
 plot(formatted == "102.00", title="Formatted Close")
 plot(prefixFormatted == "102.00", title="Prefix Formatted Close")
 plot(message == "close=102.0", title="Format Template")
@@ -564,6 +565,7 @@ plot(parsed, title="Parsed Number")
 plot(na(invalid) ? 1 : 0, title="Invalid Is NA")
 plot(formattedTime == "2024-01-05 09:30", title="Formatted Time")
 plot(prefixFormattedTime == "2024-01-05 09:30", title="Prefix Formatted Time")
+plot(ampmTime == "3:05 PM", title="AM PM Formatted Time")
 `);
 
     expect(result.errors).toEqual([]);
@@ -579,6 +581,7 @@ plot(prefixFormattedTime == "2024-01-05 09:30", title="Prefix Formatted Time")
     expect(getPlot(result, 'Invalid Is NA').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(getPlot(result, 'Formatted Time').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Prefix Formatted Time').values).toEqual(Array(compatibilityBars.length).fill(true));
+    expect(getPlot(result, 'AM PM Formatted Time').values).toEqual(Array(compatibilityBars.length).fill(true));
   });
 
   it('runs string search and substring helpers', () => {

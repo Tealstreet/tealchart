@@ -4341,10 +4341,17 @@ plot(str.format(format="value={0:#.0}", 100.2) == "value=100.2", title="Named Co
       const script = `//@version=6
 indicator("String Format Time")
 stamp = timestamp("GMT+2", 2024, 1, 5, 9, 30, 15)
+pmStamp = timestamp("UTC", 2024, 1, 5, 15, 5, 0)
+midnight = timestamp("UTC", 2024, 1, 5, 0, 0, 0)
+noon = timestamp("UTC", 2024, 1, 5, 12, 0, 0)
 plot(str.format_time(stamp, "yyyy-MM-dd HH:mm:ss", "GMT+2") == "2024-01-05 09:30:15", title="Offset")
 plot(str.format_time(stamp, "yy/MM/dd HH:mm", "UTC") == "24/01/05 07:30", title="UTC")
 plot(str.format_time(time=stamp, timezone="GMT+2") == "2024-01-05T09:30:15+0200", title="Named Default")
 plot(str.format_time(stamp, "M/d/yyyy H:m:s 'UTC'Z", "UTC") == "1/5/2024 7:30:15 UTC+0000", title="Single Tokens")
+plot(str.format_time(stamp, "h:mm a", "UTC") == "7:30 AM", title="AM Tokens")
+plot(str.format_time(pmStamp, "hh:mm a", "UTC") == "03:05 PM", title="PM Tokens")
+plot(str.format_time(midnight, "h a", "UTC") == "12 AM", title="Midnight Token")
+plot(str.format_time(noon, "h a", "UTC") == "12 PM", title="Noon Token")
 plot(str.format_time(stamp, "yyyy'T''Z'HH", "UTC") == "2024T'Z07", title="Escaped Quote")
 plot(str.format_time(na, "yyyy-MM-dd", "UTC") == "NaN", title="Missing")`;
 
@@ -4357,6 +4364,10 @@ plot(str.format_time(na, "yyyy-MM-dd", "UTC") == "NaN", title="Missing")`;
       expect(result.plots.find((plot) => plot.title === 'UTC')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Named Default')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Single Tokens')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'AM Tokens')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'PM Tokens')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Midnight Token')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Noon Token')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Escaped Quote')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Missing')?.values).toEqual([true, true]);
     });
