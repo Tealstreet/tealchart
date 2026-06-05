@@ -399,8 +399,10 @@ export class TealscriptEngine {
   private requestEvaluationCache = new Map<string, RequestEvaluationCacheEntry>();
   private requestContextKeys = new Set<string>();
   private requestExpressionIds = new WeakMap<Expression, number>();
+  private callExpressionIds = new WeakMap<CallExpression, number>();
   private expressionHistory = new WeakMap<Expression, ExpressionHistoryEntry>();
   private nextRequestExpressionId = 0;
+  private nextCallExpressionId = 0;
   private inferredMaxBarsBack = 0;
   private userFunctionCallStack: string[] = [];
   private importedLibraryCallStack: string[] = [];
@@ -477,8 +479,10 @@ export class TealscriptEngine {
     this.requestEvaluationCache.clear();
     this.requestContextKeys.clear();
     this.requestExpressionIds = new WeakMap();
+    this.callExpressionIds = new WeakMap();
     this.expressionHistory = new WeakMap();
     this.nextRequestExpressionId = 0;
+    this.nextCallExpressionId = 0;
     this.inferredMaxBarsBack = 0;
     this.userFunctionCallStack = [];
     this.importedLibraryCallStack = [];
@@ -2282,7 +2286,16 @@ export class TealscriptEngine {
 
   private callSiteFunctionScopeKey(fn: FunctionDeclaration, expr: CallExpression): string {
     const declarationKey = this.userCallableScopeKey(fn);
-    if (!expr.loc) return declarationKey;
+    if (!expr.loc) {
+      const existing = this.callExpressionIds.get(expr);
+      if (existing !== undefined) {
+        return `${declarationKey}@call:expr:${existing}`;
+      }
+
+      const id = this.nextCallExpressionId++;
+      this.callExpressionIds.set(expr, id);
+      return `${declarationKey}@call:expr:${id}`;
+    }
 
     return `${declarationKey}@call:${expr.loc.start.line}:${expr.loc.start.column}-${expr.loc.end.line}:${expr.loc.end.column}`;
   }

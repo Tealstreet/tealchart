@@ -29,6 +29,23 @@ function roundSeries(values: Array<number | null>, digits: number = 6): Array<nu
   return values.map((value) => (value === null ? null : Math.round(value * factor) / factor));
 }
 
+function stripSourceLocations<T>(node: T): T {
+  if (!node || typeof node !== 'object') return node;
+
+  delete (node as { loc?: unknown }).loc;
+  for (const value of Object.values(node)) {
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        stripSourceLocations(item);
+      }
+    } else {
+      stripSourceLocations(value);
+    }
+  }
+
+  return node;
+}
+
 describe('TealscriptEngine', () => {
   describe('runtime profile', () => {
     it('reports execution counters for compatibility profiling', () => {
@@ -78,6 +95,25 @@ plot(adjust(close))`;
 
       expect(result.errors).toEqual([]);
       expect(result.profile.statements).toBeGreaterThan(3);
+    });
+
+    it('isolates locationless function call-site state', () => {
+      const script = `//@version=6
+indicator("Locationless call sites")
+nextCount() =>
+    var counter = 0
+    counter += 1
+    counter
+first = nextCount()
+other = nextCount()
+plot(first, title="First")
+plot(other, title="Second")`;
+
+      const result = executeScript(stripSourceLocations(parse(script)), createBars(3));
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'First')?.values).toEqual([1, 2, 3]);
+      expect(result.plots.find((plot) => plot.title === 'Second')?.values).toEqual([1, 2, 3]);
     });
 
     it('reports fresh profile counters for realtime updates', () => {
