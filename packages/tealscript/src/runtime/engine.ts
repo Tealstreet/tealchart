@@ -4712,6 +4712,8 @@ export class TealscriptEngine {
     const currentDate = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
     const dayOfYear = Math.floor((currentDate - yearStart) / 86_400_000) + 1;
     const weekOfYear = this.getIsoWeek(date);
+    const firstDayOfMonth = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1)).getUTCDay();
+    const weekOfMonth = Math.ceil((date.getUTCDate() + firstDayOfMonth) / 7);
     const timezoneNameLong = format.includes('zzzz') ? formatTimezoneName('long') : '';
     const timezoneNameShort = format.includes('z') ? formatTimezoneName('short') : '';
     const tokens: Array<[string, string]> = [
@@ -4727,6 +4729,7 @@ export class TealscriptEngine {
       ['D', String(dayOfYear)],
       ['ww', pad(weekOfYear)],
       ['w', String(weekOfYear)],
+      ['W', String(weekOfMonth)],
       ['MM', pad(date.getUTCMonth() + 1)],
       ['M', String(date.getUTCMonth() + 1)],
       ['dd', pad(date.getUTCDate())],
