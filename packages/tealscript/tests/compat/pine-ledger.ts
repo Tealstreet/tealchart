@@ -282,6 +282,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-drawing-zone-checkpoint',
+      title: 'Public Drawing Zone Checkpoint',
+      searchContext: 'TradingView public scripts search: supply demand zones',
+      featureTags: ['drawings', 'boxes', 'zones', 'visuals'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-dashboard-table-checkpoint',
       title: 'Public Dashboard Table Checkpoint',
       searchContext: 'TradingView public scripts search: dashboard table',
