@@ -38,6 +38,7 @@ fixtures by default.
 | `Official Recalculate After Fill Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/strategies/ | `calc_on_order_fills=true` reruns the current historical bar after a pending fill and can submit a same-bar close order. | Final position, closed-trade count, recalc counter, closed trade ledger fields, and preserved order-fill alert event. |
 | `Official Calc On Every Tick Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/strategies/ | Default strategies skip unconfirmed realtime ticks, while `calc_on_every_tick=true` strategies recalculate on each realtime tick. | Default close plot stays historical on unconfirmed ticks; every-tick close plot appends and updates the realtime bar. |
 | `Official Request Limit Checkpoint` | https://www.tradingview.com/pine-script-docs/writing/limitations/ | Repeated identical `request.security()` calls inside a loop reuse one unique request context. | No runtime error, one request context in the runtime profile, and a deterministic zero request-sum plot. |
+| `Official Lower TF Array Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/other-timeframes-and-data/ | `request.security_lower_tf()` returns lower-timeframe expression values as ordered intrabar arrays. | Intrabar count, first value, and last value over local chart/request bars. |
 
 ## Public Idiom Checkpoints
 
@@ -66,7 +67,7 @@ idioms rather than isolated unit coverage.
 | Barstate, persistent arrays, and first-bar initialization | `Official Array Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Visual candle tinting | `Official Barcolor Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Marker output payloads | `Official Marker Payload Checkpoint`; marker color/text payload fixtures in `pine-visuals.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts` |
-| Multi-timeframe data requests | `Public MTF Trend Checkpoint`; repaint-safe HTF fixture in `pine-request-security.test.ts` | `pine-real-checkpoints.test.ts`; `pine-request-security.test.ts` |
+| Multi-timeframe data requests | `Public MTF Trend Checkpoint`; `Official Lower TF Array Checkpoint`; repaint-safe HTF fixture in `pine-request-security.test.ts` | `pine-real-checkpoints.test.ts`; `pine-request-security.test.ts` |
 | Pivot/divergence idioms | `Public Divergence Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Session-gated signals | `Public Session Filter Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Alerts and alert conditions | `Official Alert Checkpoint`; alert crossover fixture in `pine-visuals.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts` |

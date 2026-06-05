@@ -122,6 +122,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     stages: passedThroughOutput,
   },
   {
+    ledgerEntry: officialDocsEntry({
+      id: 'official-lower-tf-array-checkpoint',
+      title: 'Official Lower TF Array Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/other-timeframes-and-data/',
+      featureTags: ['request', 'lower_timeframe', 'arrays'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
     ledgerEntry: publicSearchEntry({
       id: 'public-mtf-trend-checkpoint',
       title: 'Public MTF Trend Checkpoint',

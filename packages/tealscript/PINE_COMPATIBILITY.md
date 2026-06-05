@@ -39,7 +39,8 @@ new behavior and, at checkpoint boundaries, add reduced smoke fixtures inspired
 by real Pine examples from official docs or public indicator idioms.
 The current real-idiom checkpoint suite covers official built-ins, barstate plus
 arrays, bar coloring, alerts, strategy entry/exit flows, request-limit reuse,
-and public MTF, divergence, and session-filter idioms.
+official lower-timeframe request arrays, and public MTF, divergence, and
+session-filter idioms.
 
 ## Current Matrix
 
@@ -637,6 +638,8 @@ contexts per script pass so dynamic request scripts cannot create unbounded
 host datafeed work. Visual output registration enforces Pine's 64 plot-output
 limit while exempting `hline()` outputs. Table creation enforces a conservative
 TealScript sandbox cap of 10,000 declared table cells across live tables.
+The checkpoint corpus tracks both a public MTF trend-filter request idiom and an
+official lower-timeframe array idiom.
 
 Known limits: request data availability is host/provider-gated, and
 `request.footprint()` remains unsupported until the host can provide the

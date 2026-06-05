@@ -326,8 +326,8 @@ Phases:
    financial, economic, currency rates, and seed where host data exists.
 5. Defer `request.footprint()` until host footprint/intrabar-volume data is
    available.
-6. Add corpus-driven checkpoints for MTF trend filters, lower-timeframe arrays,
-   synthetic ticker IDs, and request-limit reuse.
+6. Maintain corpus-driven checkpoints for MTF trend filters, lower-timeframe
+   arrays, and request-limit reuse; add synthetic ticker ID checkpoints next.
 
 Done means MTF and multi-symbol scripts can run against deterministic or
 host-provided data.
