@@ -45,12 +45,12 @@ timeframe comparisons, official plot-style payloads, and public MTF,
 divergence, session-filter, session-state, dashboard-table, multi-symbol
 screener, drawing-zone, custom-candle, and library-helper idioms. Public-source
 coverage also includes alert signal metadata, direct alert emission, and
-Heikin-Ashi synthetic ticker trend requests, plus UDT state objects updated
-through user-defined methods.
+Heikin-Ashi synthetic ticker trend requests, public strategy performance tables,
+plus UDT state objects updated through user-defined methods.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
 suppression, entry-direction risk rules, recalculation checkpoints, and a
-reduced public fixed-bracket strategy idiom.
+reduced public fixed-bracket strategy idiom with public stats-table output.
 
 ## Current Matrix
 
@@ -884,7 +884,10 @@ commission, maximum run-up, and maximum drawdown with percent variants.
 Closed-trade outcome counters `strategy.wintrades`, `strategy.losstrades`, and
 `strategy.eventrades` are available. Filled strategy orders with
 `alert_message` emit `strategy_order_fills` alert events unless their
-`disable_alert` argument is true.
+`disable_alert` argument is true. The checkpoint corpus also tracks a reduced
+public strategy performance-table idiom that plots `strategy.closedtrades`,
+`strategy.wintrades`, and `strategy.netprofit` while rendering the same counters
+through a last-bar `table`.
 
 ## Common Alerts Coverage
 

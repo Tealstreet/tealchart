@@ -1221,6 +1221,164 @@ plot(strategy.netprofit, title="Net Profit")
     });
   });
 
+  it('locks a reduced public strategy stats table idiom', () => {
+    // Public idiom reference: strategy performance public scripts commonly
+    // summarize closed trades, win count, and net profit in a last-bar table.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20performance%20table/
+    const bars: Bar[] = [
+      { time: 1_700_610_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_610_060_000, open: 103, high: 105, low: 102, close: 104, volume: 100 },
+      { time: 1_700_610_120_000, open: 104, high: 106, low: 103, close: 105, volume: 100 },
+      { time: 1_700_610_180_000, open: 105, high: 106, low: 104, close: 105, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Public Strategy Stats Checkpoint", overlay=true, process_orders_on_close=true)
+var stats = table.new(position.top_right, 2, 4, border_width=1, border_color=color.white)
+if bar_index == 0
+    strategy.entry("L", strategy.long, qty=1)
+if bar_index == 1
+    strategy.close("L", comment="take")
+if barstate.islast
+    table.cell(stats, 0, 0, "Metric", text_color=color.white, bgcolor=color.blue)
+    table.cell(stats, 1, 0, "Value", text_color=color.white, bgcolor=color.blue)
+    table.cell(stats, 0, 1, "Closed", text_color=color.white, bgcolor=color.gray)
+    table.cell(stats, 1, 1, str.tostring(strategy.closedtrades), text_color=color.white, bgcolor=color.green)
+    table.cell(stats, 0, 2, "Wins", text_color=color.white, bgcolor=color.gray)
+    table.cell(stats, 1, 2, str.tostring(strategy.wintrades), text_color=color.white, bgcolor=color.green)
+    table.cell(stats, 0, 3, "Net", text_color=color.white, bgcolor=color.gray)
+    table.cell(stats, 1, 3, str.tostring(strategy.netprofit, "#.##"), text_color=color.white, bgcolor=color.green)
+plot(strategy.closedtrades, title="Closed Trades")
+plot(strategy.wintrades, title="Win Trades")
+plot(strategy.netprofit, title="Net Profit")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 1, 1, 1]);
+    expect(getPlot(result, 'Win Trades').values).toEqual([0, 1, 1, 1]);
+    expect(getPlot(result, 'Net Profit').values).toEqual([0, 4, 4, 4]);
+    expect(result.strategy.closedTrades[0]).toMatchObject({
+      entryOrderId: 'L',
+      exitOrderId: 'Close L',
+      entryPrice: 100,
+      exitPrice: 104,
+      profit: 4,
+    });
+    expect(result.drawings).toEqual([
+      {
+        id: 'table_table.new_0_0',
+        type: 'table',
+        persistent: true,
+        barIndex: 0,
+        position: 'top_right',
+        columns: 2,
+        rows: 4,
+        bgcolor: null,
+        frameColor: null,
+        frameWidth: 0,
+        borderColor: '#FFFFFF',
+        borderWidth: 1,
+        cells: [
+          {
+            column: 0,
+            row: 0,
+            text: 'Metric',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#2196F3',
+          },
+          {
+            column: 1,
+            row: 0,
+            text: 'Value',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#2196F3',
+          },
+          {
+            column: 0,
+            row: 1,
+            text: 'Closed',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#787B86',
+          },
+          {
+            column: 1,
+            row: 1,
+            text: '1',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#4CAF50',
+          },
+          {
+            column: 0,
+            row: 2,
+            text: 'Wins',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#787B86',
+          },
+          {
+            column: 1,
+            row: 2,
+            text: '1',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#4CAF50',
+          },
+          {
+            column: 0,
+            row: 3,
+            text: 'Net',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#787B86',
+          },
+          {
+            column: 1,
+            row: 3,
+            text: '4.00',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#4CAF50',
+          },
+        ],
+      },
+    ]);
+  });
+
   it('locks the official strategy profit-loss exit idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const bars: Bar[] = [
