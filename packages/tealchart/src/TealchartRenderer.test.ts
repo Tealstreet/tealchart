@@ -894,6 +894,85 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(ctx.globalAlpha).toBe(1);
     });
 
+    it('breaks area fills on na values only for area-break plots', () => {
+      const bars = makeBars(5, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[4]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const basePlot: PlotOutput = {
+        id: 'plot_AreaGaps',
+        type: 'plot',
+        title: 'AreaGaps',
+        values: [100, 110, null, 120, 130],
+        color: '#2196F3',
+      };
+      const bridgedFill = vi.fn();
+      const bridgedStroke = vi.fn();
+      const bridgedRenderer = new TealchartRenderer({
+        ...createMockCtx(),
+        fill: bridgedFill,
+        stroke: bridgedStroke,
+      }, { width: 800, height: 600, showVolume: false });
+      const brokenFill = vi.fn();
+      const brokenStroke = vi.fn();
+      const brokenRenderer = new TealchartRenderer({
+        ...createMockCtx(),
+        fill: brokenFill,
+        stroke: brokenStroke,
+      }, { width: 800, height: 600, showVolume: false });
+
+      (bridgedRenderer as any).renderLinePlot({ ...basePlot, style: 'area' }, bars, viewport);
+      (brokenRenderer as any).renderLinePlot({ ...basePlot, style: 'areabr' }, bars, viewport);
+
+      expect(bridgedFill).toHaveBeenCalledTimes(1);
+      expect(bridgedStroke).toHaveBeenCalledTimes(1);
+      expect(brokenFill).toHaveBeenCalledTimes(2);
+      expect(brokenStroke).toHaveBeenCalledTimes(2);
+    });
+
+    it('breaks area fills on na values in computed indicator panes', () => {
+      const fill = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fill,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(5, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[4]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const pane: ComputedPane = {
+        id: 'indicator',
+        type: 'indicator',
+        heightRatio: 1,
+        yMin: 0,
+        yMax: 100,
+        fixedRange: false,
+        top: 20,
+        height: 300,
+        bottom: 320,
+      };
+      const plot: PlotOutput = {
+        id: 'plot_PaneAreaBreak',
+        type: 'plot',
+        title: 'PaneAreaBreak',
+        values: [25, 35, null, 65, 75],
+        color: '#2196F3',
+        style: 'areabr',
+      };
+
+      (renderer as any).renderPlotInPane(plot, bars, viewport, pane);
+
+      expect(fill).toHaveBeenCalledTimes(2);
+      expect(ctx.globalAlpha).toBe(1);
+    });
+
     it('renders area-break fills in legacy indicator panes', () => {
       const fill = vi.fn();
       const moveTo = vi.fn();
@@ -903,10 +982,10 @@ describe('TealchartRenderer coordinate transforms', () => {
         moveTo,
       };
       const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
-      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
       const viewport: Viewport = {
         startTime: bars[0]!.time,
-        endTime: bars[1]!.time,
+        endTime: bars[2]!.time,
         priceMin: 80,
         priceMax: 140,
       };
@@ -920,14 +999,14 @@ describe('TealchartRenderer coordinate transforms', () => {
         id: 'plot_LegacyPaneAreaBreak',
         type: 'plot',
         title: 'LegacyPaneAreaBreak',
-        values: [25, 75],
+        values: [25, null, 75],
         color: '#4CAF50',
         style: 'areabr',
       };
 
       (renderer as any).renderLinePlotInPane(plot, bars, viewport, paneOffset);
 
-      expect(fill).toHaveBeenCalled();
+      expect(fill).toHaveBeenCalledTimes(2);
       expect(moveTo).toHaveBeenCalledWith(expect.any(Number), paneOffset.top);
       expect(ctx.globalAlpha).toBe(1);
     });
