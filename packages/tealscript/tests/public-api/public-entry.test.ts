@@ -51,6 +51,14 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 describe('public package entrypoints', () => {
   it('keeps root parser, runtime, and worker wrapper exports available', () => {
+    const smokeStages = [
+      { stage: 'parse', status: 'passed' },
+      { stage: 'semantic', status: 'skipped', message: 'public entrypoint smoke' },
+      { stage: 'runtime', status: 'skipped', message: 'public entrypoint smoke' },
+      { stage: 'datafeed', status: 'skipped', message: 'public entrypoint smoke' },
+      { stage: 'output', status: 'skipped', message: 'public entrypoint smoke' },
+      { stage: 'render', status: 'skipped', message: 'public entrypoint smoke' },
+    ] satisfies CompatibilityRunOutcome['stages'];
     const expressionOptions: ParseOptions<'Expression'> = { startRule: 'Expression' };
     const expression: ParseResult<'Expression'> = parse('close + 1', expressionOptions);
     const statement: Statement = parse('plot(close)', { startRule: 'Statement' });
@@ -63,7 +71,7 @@ describe('public package entrypoints', () => {
     const normalizedOutput: NormalizedWorkerOutputBundle = getResultOutput(resultMessage);
     const compatibilityOutcome: CompatibilityRunOutcome = createCompatibilityRunOutcome({
       scriptId: 'manual-fixture',
-      stages: [{ stage: 'parse', status: 'passed' }],
+      stages: smokeStages,
     });
     const ledgerEntry: PineScriptLedgerEntry = {
       id: 'manual-fixture',
@@ -75,10 +83,10 @@ describe('public package entrypoints', () => {
       storagePolicy: 'reduced_fixture_only',
     };
     const corpusRun: PineCompatibilityCorpusRun = runPineCompatibilityCorpus([
-      { ledgerEntry, stages: [{ stage: 'parse', status: 'passed' }] },
+      { ledgerEntry, stages: smokeStages },
     ]);
     const ledger = createPineScriptLedger([ledgerEntry]);
-    const ledgerRun = runPineCompatibilityLedger(ledger, () => [{ stage: 'parse', status: 'passed' }]);
+    const ledgerRun = runPineCompatibilityLedger(ledger, () => smokeStages);
     const coverageIndex = createPineCompatibilityCoverageIndex(ledger);
 
     expect(typeof parse).toBe('function');
