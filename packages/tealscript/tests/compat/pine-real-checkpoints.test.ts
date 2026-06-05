@@ -346,6 +346,25 @@ plot(str.length(dynamicSession), title="Session Length")
     expect(getPlot(result, 'Session Length').values).toEqual(Array(compatibilityBars.length).fill(15));
   });
 
+  it('locks a reduced official timeframe comparison idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/timeframes/
+    const result = runCompatScript(`
+indicator("Official Timeframe Comparison Checkpoint")
+tfInput = input.timeframe(defval="240", title="Input TF")
+chartTfInMinutes = timeframe.in_seconds() / 60
+inputTfInMinutes = timeframe.in_seconds(tfInput) / 60
+validTimeframe = chartTfInMinutes <= inputTfInMinutes
+plot(chartTfInMinutes, title="Chart TF Minutes")
+plot(inputTfInMinutes, title="Input TF Minutes")
+plot(validTimeframe ? 1 : 0, title="Valid Timeframe")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Chart TF Minutes').values).toEqual(Array(compatibilityBars.length).fill(60));
+    expect(getPlot(result, 'Input TF Minutes').values).toEqual(Array(compatibilityBars.length).fill(240));
+    expect(getPlot(result, 'Valid Timeframe').values).toEqual(Array(compatibilityBars.length).fill(1));
+  });
+
   it('locks the official alert trigger idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/alerts/
     const result = runCompatScript(`

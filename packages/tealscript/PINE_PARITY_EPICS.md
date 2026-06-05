@@ -91,8 +91,9 @@ The current runtime already covers a useful common-script subset:
   visual outputs, drawing objects, tables, requests, tickers, alerts/logs, and
   strategies.
 - Compatibility fixtures for real Pine idioms including MTF filters,
-  divergence, session filters, bar coloring, alerts, request-limit reuse,
-  strategy entry/exit flows, and common drawing/table patterns.
+  divergence, session filters, dynamic sessions, timeframe comparisons, bar
+  coloring, alerts, request-limit reuse, strategy entry/exit flows, and common
+  drawing/table patterns.
 
 Known structural gaps:
 
