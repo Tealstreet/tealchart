@@ -208,6 +208,21 @@ import {
   type StrategyTrade,
 } from './strategy';
 
+const MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+] as const;
+
 /**
  * Execution result
  */
@@ -4671,9 +4686,12 @@ export class TealscriptEngine {
     const hour24 = date.getUTCHours();
     const hour12 = hour24 % 12 || 12;
     const millisecond = pad(date.getUTCMilliseconds(), 3);
+    const monthName = MONTH_NAMES[date.getUTCMonth()];
     const tokens: Array<[string, string]> = [
       ['yyyy', String(date.getUTCFullYear())],
       ['yy', pad(date.getUTCFullYear() % 100)],
+      ['MMMM', monthName],
+      ['MMM', monthName.slice(0, 3)],
       ['MM', pad(date.getUTCMonth() + 1)],
       ['M', String(date.getUTCMonth() + 1)],
       ['dd', pad(date.getUTCDate())],

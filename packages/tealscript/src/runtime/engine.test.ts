@@ -4345,6 +4345,7 @@ pmStamp = timestamp("UTC", 2024, 1, 5, 15, 5, 0)
 midnight = timestamp("UTC", 2024, 1, 5, 0, 0, 0)
 noon = timestamp("UTC", 2024, 1, 5, 12, 0, 0)
 millis = timestamp("UTC", 2024, 1, 5, 7, 30, 15) + 123
+august = timestamp("UTC", 2024, 8, 20, 0, 0, 0)
 plot(str.format_time(stamp, "yyyy-MM-dd HH:mm:ss", "GMT+2") == "2024-01-05 09:30:15", title="Offset")
 plot(str.format_time(stamp, "yy/MM/dd HH:mm", "UTC") == "24/01/05 07:30", title="UTC")
 plot(str.format_time(time=stamp, timezone="GMT+2") == "2024-01-05T09:30:15+0200", title="Named Default")
@@ -4354,6 +4355,7 @@ plot(str.format_time(pmStamp, "hh:mm a", "UTC") == "03:05 PM", title="PM Tokens"
 plot(str.format_time(midnight, "h a", "UTC") == "12 AM", title="Midnight Token")
 plot(str.format_time(noon, "h a", "UTC") == "12 PM", title="Noon Token")
 plot(str.format_time(millis, "S SS SSS", "UTC") == "1 12 123", title="Fraction Tokens")
+plot(str.format_time(august, "MMM MMMM", "UTC") == "Aug August", title="Month Name Tokens")
 plot(str.format_time(stamp, "yyyy'T''Z'HH", "UTC") == "2024T'Z07", title="Escaped Quote")
 plot(str.format_time(na, "yyyy-MM-dd", "UTC") == "NaN", title="Missing")`;
 
@@ -4371,6 +4373,7 @@ plot(str.format_time(na, "yyyy-MM-dd", "UTC") == "NaN", title="Missing")`;
       expect(result.plots.find((plot) => plot.title === 'Midnight Token')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Noon Token')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Fraction Tokens')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Month Name Tokens')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Escaped Quote')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Missing')?.values).toEqual([true, true]);
     });
