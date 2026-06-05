@@ -300,6 +300,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-zigzag-polyline-checkpoint',
+      title: 'Public Zigzag Polyline Checkpoint',
+      searchContext: 'TradingView public scripts search: zigzag polyline',
+      featureTags: ['drawings', 'polylines', 'pivots', 'visuals', 'zigzag'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-dashboard-table-checkpoint',
       title: 'Public Dashboard Table Checkpoint',
       searchContext: 'TradingView public scripts search: dashboard table',
