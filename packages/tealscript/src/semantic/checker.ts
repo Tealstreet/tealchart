@@ -3125,20 +3125,72 @@ class SemanticChecker {
       }
       if (actualType.kind !== 'int') {
         this.addDiagnostic('type-mismatch', `${displayName} defval must be a number`, defval.loc);
+        return;
       }
-      return;
     }
 
     if (requirement === 'number') {
-      if (actualType.kind === 'int' || actualType.kind === 'float') return;
-      this.addDiagnostic('type-mismatch', `${displayName} defval must be a number`, defval.loc);
+      if (actualType.kind !== 'int' && actualType.kind !== 'float') {
+        this.addDiagnostic('type-mismatch', `${displayName} defval must be a number`, defval.loc);
+        return;
+      }
+    } else if (actualType.kind !== requirement) {
+      const expectedLabel = requirement === 'bool' ? 'boolean' : requirement;
+      this.addDiagnostic('type-mismatch', `${displayName} defval must be a ${expectedLabel}`, defval.loc);
       return;
     }
 
-    if (actualType.kind !== requirement) {
-      const expectedLabel = requirement === 'bool' ? 'boolean' : requirement;
-      this.addDiagnostic('type-mismatch', `${displayName} defval must be a ${expectedLabel}`, defval.loc);
+    this.checkInputDefaultRangeConstraints(expression, displayName, defval);
+    this.checkInputDefaultOptionsConstraint(expression, displayName, defval);
+  }
+
+  private checkInputDefaultRangeConstraints(expression: CallExpression, displayName: string, defval: Expression): void {
+    if (displayName !== 'input.int' && displayName !== 'input.float') return;
+
+    const options = this.getCallArgument(expression.arguments, 'options', 2);
+    if (options?.type === 'ArrayExpression') return;
+
+    const defvalValue = this.constantLiteralValue(defval);
+    if (typeof defvalValue !== 'number') return;
+
+    const minval = this.getCallArgument(expression.arguments, 'minval', 2);
+    const minvalValue = minval ? this.constantLiteralValue(minval) : undefined;
+    if (typeof minvalValue === 'number' && defvalValue < minvalValue) {
+      this.addDiagnostic('type-mismatch', `${displayName} defval must be greater than or equal to minval`, defval.loc);
+      return;
     }
+
+    const maxval = this.getCallArgument(expression.arguments, 'maxval', 3);
+    const maxvalValue = maxval ? this.constantLiteralValue(maxval) : undefined;
+    if (typeof maxvalValue === 'number' && defvalValue > maxvalValue) {
+      this.addDiagnostic('type-mismatch', `${displayName} defval must be less than or equal to maxval`, defval.loc);
+    }
+  }
+
+  private checkInputDefaultOptionsConstraint(expression: CallExpression, displayName: string, defval: Expression): void {
+    const defvalValue = this.constantLiteralValue(defval);
+    if (defvalValue === undefined) return;
+
+    const options = this.getCallArgument(expression.arguments, 'options', 2);
+    if (!options || options.type !== 'ArrayExpression') return;
+
+    const optionValues = options.elements.map((element) => this.constantLiteralValue(element));
+    if (optionValues.some((option) => option === undefined)) return;
+
+    if (!optionValues.some((option) => Object.is(option, defvalValue))) {
+      this.addDiagnostic('type-mismatch', `${displayName} defval must be one of options`, defval.loc);
+    }
+  }
+
+  private constantLiteralValue(expression: Expression): number | string | boolean | undefined {
+    if (expression.type === 'NumericLiteral' || expression.type === 'StringLiteral' || expression.type === 'BooleanLiteral') {
+      return expression.value;
+    }
+    if (expression.type === 'UnaryExpression' && expression.argument.type === 'NumericLiteral') {
+      if (expression.operator === '-') return -expression.argument.value;
+      if (expression.operator === '+') return expression.argument.value;
+    }
+    return undefined;
   }
 
   private checkArrayCallTypes(expression: CallExpression, scope: SemanticScope): void {

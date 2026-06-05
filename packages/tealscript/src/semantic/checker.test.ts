@@ -5266,6 +5266,29 @@ level = input.price("101.25")
     ]);
   });
 
+  it('reports invalid Pine input default range and options constraints', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Input Constraints")
+shortLength = input.int(0, "Short", minval=1)
+longLength = input.int(100, "Long", maxval=50)
+multiplier = input.float(5.5, "Multiplier", maxval=5.0)
+optionLength = input.int(14, "Length", options=[7, 21])
+optionFloat = input.float(2.5, "Multiplier", options=[1.0, 2.0])
+mode = input.string("VWAP", "Mode", options=["SMA", "EMA"])
+tf = input.timeframe("240", "Timeframe", ["15", "60"])
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'input.int defval must be greater than or equal to minval',
+      'input.int defval must be less than or equal to maxval',
+      'input.float defval must be less than or equal to maxval',
+      'input.int defval must be one of options',
+      'input.float defval must be one of options',
+      'input.string defval must be one of options',
+      'input.timeframe defval must be one of options',
+    ]);
+  });
+
   it('reports duplicate Pine input bindings against the selected overload', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate Input Args")

@@ -481,9 +481,9 @@ impact.
    before deeper parser architecture changes.
 5. Call-binding diagnostics sweep: keep signed built-in namespace typo
    diagnostics, drawing constructor argument signatures, typed `input.*`
-   default diagnostics, and `input.int()` / `input.float()` range-vs-options
-   overload diagnostics covered while using corpus failures to prioritize
-   remaining named/positional overload gaps.
+   default and literal constraint diagnostics, and `input.int()` /
+   `input.float()` range-vs-options overload diagnostics covered while using
+   corpus failures to prioritize remaining named/positional overload gaps.
 6. Visual output payload audit: keep marker dynamic text-color payloads,
    hidden-marker style masking, the source-linked marker payload checkpoint,
    and other runtime visual metadata stable before investing in renderer
