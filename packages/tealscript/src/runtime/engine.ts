@@ -5308,6 +5308,7 @@ export class TealscriptEngine {
         this.ctx.close.get(0) ?? Number.NaN,
         this.ctx.bar_index,
         this.ctx.time.get(0) ?? 0,
+        this.ctx.syminfo.mintick,
       );
       if (fill) {
         this.markStrategyLedgerToMarketAtCurrentClose();
@@ -5353,7 +5354,12 @@ export class TealscriptEngine {
       return;
     }
 
-    const fills = fillPendingStrategyOrdersOnTicks(this.ctx.strategyLedger, context.ticks, this.ctx.bar_index);
+    const fills = fillPendingStrategyOrdersOnTicks(
+      this.ctx.strategyLedger,
+      context.ticks,
+      this.ctx.bar_index,
+      this.ctx.syminfo.mintick,
+    );
     this.emitStrategyFillAlerts(fills);
   }
 
@@ -5363,6 +5369,7 @@ export class TealscriptEngine {
       this.ctx.open.get(0) ?? Number.NaN,
       this.ctx.bar_index,
       this.ctx.time.get(0) ?? 0,
+      this.ctx.syminfo.mintick,
     );
     this.emitStrategyFillAlerts(fills);
   }
@@ -5732,6 +5739,7 @@ export class TealscriptEngine {
         this.ctx.close.get(0) ?? Number.NaN,
         this.ctx.bar_index,
         this.ctx.time.get(0) ?? 0,
+        this.ctx.syminfo.mintick,
       );
       if (fill) {
         this.markStrategyLedgerToMarketAtCurrentClose();

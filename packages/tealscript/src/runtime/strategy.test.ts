@@ -425,6 +425,78 @@ describe('strategy ledger model', () => {
     });
   });
 
+  it('applies configured slippage ticks to market fills in trade direction', () => {
+    const ledger = createStrategyLedger({ slippageTicks: 2 });
+    const long = submitStrategyOrder(ledger, {
+      id: 'Long',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      barIndex: 0,
+      time: 1,
+    });
+    const short = submitStrategyOrder(ledger, {
+      id: 'Short',
+      direction: 'short',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      barIndex: 1,
+      time: 2,
+    });
+
+    expect(fillStrategyMarketOrder(ledger, long, 100, 0, 1, 0.25)).toMatchObject({
+      orderId: 'Long',
+      price: 100.5,
+      slippage: 0.5,
+    });
+    expect(fillStrategyMarketOrder(ledger, short, 103, 1, 2, 0.25)).toMatchObject({
+      orderId: 'Short',
+      price: 102.5,
+      slippage: -0.5,
+    });
+    expect(ledger.closedTrades[0]).toMatchObject({
+      entryPrice: 100.5,
+      exitPrice: 102.5,
+      profit: 2,
+    });
+  });
+
+  it('normalizes direct ledger slippage settings before fill math', () => {
+    const fractionalLedger = createStrategyLedger({ slippageTicks: 1.9 });
+    const fractionalOrder = submitStrategyOrder(fractionalLedger, {
+      id: 'Fractional',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      barIndex: 0,
+      time: 1,
+    });
+
+    expect(fillStrategyMarketOrder(fractionalLedger, fractionalOrder, 100, 0, 1, 0.25)).toMatchObject({
+      price: 100.25,
+      slippage: 0.25,
+    });
+
+    const negativeLedger = createStrategyLedger({ slippageTicks: -2 });
+    const negativeOrder = submitStrategyOrder(negativeLedger, {
+      id: 'Negative',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      barIndex: 0,
+      time: 1,
+    });
+
+    expect(fillStrategyMarketOrder(negativeLedger, negativeOrder, 100, 0, 1, 0.25)).toMatchObject({
+      price: 100,
+      slippage: 0,
+    });
+  });
+
   it('closes open trades when opposite market fills reduce exposure', () => {
     const ledger = createStrategyLedger();
     const entry = submitStrategyOrder(ledger, {
@@ -484,6 +556,39 @@ describe('strategy ledger model', () => {
     expect(ledger.orders[0]?.status).toBe('filled');
     expect(ledger.openTrades[0]?.qty).toBe(1);
     expect(ledger.position.size).toBe(1);
+  });
+
+  it('applies slippage to stop fills but leaves limit fills unchanged', () => {
+    const ledger = createStrategyLedger({ slippageTicks: 2 });
+    const limit = submitStrategyOrder(ledger, {
+      id: 'Long limit',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      limitPrice: 100,
+      barIndex: 0,
+      time: 1,
+    });
+    const stop = submitStrategyOrder(ledger, {
+      id: 'Short stop',
+      direction: 'short',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      stopPrice: 98,
+      barIndex: 0,
+      time: 1,
+    });
+
+    const fills = fillPendingStrategyOrders(ledger, 101, 97, 1, 2, 0.25);
+
+    expect(fills.map((fill) => ({ orderId: fill.orderId, price: fill.price, slippage: fill.slippage }))).toEqual([
+      { orderId: 'Long limit', price: 100, slippage: 0 },
+      { orderId: 'Short stop', price: 97.5, slippage: -0.5 },
+    ]);
+    expect(limit).toMatchObject({ status: 'filled', avgFillPrice: 100 });
+    expect(stop).toMatchObject({ status: 'filled', avgFillPrice: 97.5 });
   });
 
   it('fills eligible pending limit and stop orders after their creation bar', () => {
@@ -616,7 +721,7 @@ describe('strategy ledger model', () => {
       { time: 7, price: 101, kind: 'high', sequence: 1 },
       { time: 8, price: 97, kind: 'low', sequence: 2 },
       { time: 9, price: 99, kind: 'close', sequence: 3 },
-    ], 2);
+    ], 2, 0.25);
 
     expect(fills.map((fill) => ({ orderId: fill.orderId, price: fill.price, time: fill.time }))).toEqual([
       { orderId: 'Stop limit', price: 98, time: 6 },

@@ -1499,6 +1499,37 @@ plot(strategy.closedtrades)`;
       ]);
     });
 
+    it('applies strategy slippage using syminfo mintick for market and stop fills', () => {
+      const script = `//@version=6
+strategy("Slippage fills", slippage=2, process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Stop", "Long", stop=100.8)
+plot(strategy.closedtrades)`;
+
+      const result = executeScript(parse(script), createBars(3), undefined, {
+        runtime: { syminfo: { mintick: 0.25 } },
+      });
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.fills.map((fill) => ({
+        orderId: fill.orderId,
+        price: fill.price,
+        slippage: fill.slippage,
+        barIndex: fill.barIndex,
+      }))).toEqual([
+        { orderId: 'Long', price: 100.7, slippage: 0.5, barIndex: 0 },
+        { orderId: 'Stop', price: 100.3, slippage: -0.5, barIndex: 2 },
+      ]);
+      expect(result.strategy.closedTrades[0]).toMatchObject({
+        entryPrice: 100.7,
+        exitPrice: 100.3,
+      });
+      expect(result.strategy.closedTrades[0]?.profit).toBeCloseTo(-0.4);
+      expect(result.plots[0]?.values).toEqual([0, 0, 0]);
+    });
+
     it('updates an existing pending strategy.exit order with the same id', () => {
       const script = `//@version=6
 strategy("Exit updates", process_orders_on_close=true)

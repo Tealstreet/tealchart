@@ -465,8 +465,8 @@ impact.
 
 1. Roadmap remap: replace stale subsystem-first planning docs with this
    copy-paste compatibility roadmap.
-2. Strategy tick fills: refactor broker fills to consume selected execution
-   ticks while preserving current OHLC behavior.
+2. Strategy slippage fills: apply `strategy(..., slippage=...)` tick offsets to
+   market, stop, and trailing-stop fills while preserving limit-fill behavior.
 3. Harness outcome model: define parse/semantic/runtime/data/output/render
    result shape, canonical stage normalization, validation, and failure classes.
 4. Real-script intake ledger: add metadata-only corpus format, unique-id
