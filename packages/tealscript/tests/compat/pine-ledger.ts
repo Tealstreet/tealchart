@@ -262,6 +262,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughRuntime,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'public-dashboard-table-checkpoint',
+      title: 'Public Dashboard Table Checkpoint',
+      searchContext: 'TradingView public scripts search: dashboard table',
+      featureTags: ['tables', 'dashboard', 'visuals', 'signals'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
