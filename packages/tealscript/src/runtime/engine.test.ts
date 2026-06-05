@@ -660,7 +660,10 @@ if bar_index == 0
 if bar_index == 1
     strategy.close("Long")
 plot(strategy.netprofit)
-plot(strategy.equity)`;
+plot(strategy.equity)
+plot(strategy.netprofit_percent)
+plot(strategy.grossprofit_percent)
+plot(strategy.grossloss_percent)`;
 
       const bars = createBars(2);
       const result = executeScript(parse(script), bars);
@@ -682,6 +685,9 @@ plot(strategy.equity)`;
       expect(result.strategy.equity).toBeCloseTo(1000 + netProfit);
       expect(result.plots[0]?.values[0]).toBeCloseTo(-entryCommission);
       expect(result.plots[1]?.values[1]).toBeCloseTo(1000 + netProfit);
+      expect(result.plots[2]?.values[1]).toBeCloseTo((netProfit / 1000) * 100);
+      expect(result.plots[3]?.values[1]).toBeCloseTo((grossProfit / 1000) * 100);
+      expect(result.plots[4]?.values[1]).toBe(0);
     });
 
     it('applies cash per order and cash per contract strategy commissions', () => {
@@ -730,6 +736,7 @@ plot(strategy.opentrades.entry_bar_index(0), title="Entry Bar")
 plot(strategy.opentrades.entry_time(0), title="Entry Time")
 plot(strategy.opentrades.size(0), title="Size")
 plot(strategy.opentrades.profit(0), title="Profit")
+plot(strategy.openprofit_percent, title="Open Profit Percent")
 plot(strategy.opentrades.commission(0), title="Commission")
 plot(strategy.opentrades.profit_percent(0), title="Profit Percent")
 plot(strategy.opentrades.capital_held, title="Capital Held")
@@ -756,6 +763,7 @@ plot(strategy.opentrades.size(99), title="Missing")`;
         0,
         (bars[1].close - bars[0].close) * 2,
       ]);
+      expect(roundSeries(result.plots.find((plot) => plot.title === 'Open Profit Percent')?.values ?? [])).toEqual([0, 0.001]);
       expect(result.plots.find((plot) => plot.title === 'Commission')?.values).toEqual([2, 2]);
       expect(roundSeries(result.plots.find((plot) => plot.title === 'Profit Percent')?.values ?? [])).toEqual([0, 0.499002]);
       expect(roundSeries(result.plots.find((plot) => plot.title === 'Capital Held')?.values ?? [])).toEqual([200.4, 301.1]);

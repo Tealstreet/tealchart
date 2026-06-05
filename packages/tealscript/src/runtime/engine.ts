@@ -3946,12 +3946,20 @@ export class TealscriptEngine {
         return ledger.initialCapital;
       case 'netprofit':
         return ledger.netProfit;
+      case 'netprofit_percent':
+        return this.strategyInitialCapitalPercent(ledger.netProfit);
       case 'grossprofit':
         return ledger.grossProfit;
+      case 'grossprofit_percent':
+        return this.strategyInitialCapitalPercent(ledger.grossProfit);
       case 'grossloss':
         return ledger.grossLoss;
+      case 'grossloss_percent':
+        return this.strategyInitialCapitalPercent(ledger.grossLoss);
       case 'openprofit':
         return ledger.position.openProfit;
+      case 'openprofit_percent':
+        return this.strategyRealizedEquityPercent(ledger.position.openProfit);
       case 'position_size':
         return ledger.position.size;
       case 'position_avg_price':
@@ -3979,6 +3987,19 @@ export class TealscriptEngine {
     return this.ctx.strategyLedger.openTrades.reduce((total, trade) => (
       total + (trade.entryPrice * Math.abs(trade.qty))
     ), 0);
+  }
+
+  private strategyInitialCapitalPercent(value: number): number {
+    const initialCapital = this.ctx.strategyLedger.initialCapital;
+    if (!Number.isFinite(initialCapital) || initialCapital <= 0) return Number.NaN;
+    return (value / initialCapital) * 100;
+  }
+
+  private strategyRealizedEquityPercent(value: number): number {
+    const ledger = this.ctx.strategyLedger;
+    const realizedEquity = ledger.initialCapital + ledger.netProfit;
+    if (!Number.isFinite(realizedEquity) || realizedEquity === 0) return Number.NaN;
+    return (value / realizedEquity) * 100;
   }
 
   private evaluateIndex(expr: IndexExpression): unknown {
