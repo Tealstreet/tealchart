@@ -87,6 +87,17 @@ export interface SymInfo {
   timezone: string;
 }
 
+export type ChartType = 'standard' | 'heikinashi' | 'renko' | 'linebreak' | 'kagi' | 'pnf' | 'range';
+
+/**
+ * Chart display metadata supplied by the host chart surface.
+ */
+export interface ChartInfo {
+  bgColor: string;
+  fgColor: string;
+  type: ChartType;
+}
+
 /**
  * Timeframe information
  */
@@ -316,6 +327,13 @@ export class ExecutionContext {
     mintick: 0.01,
     pricescale: 100,
     timezone: 'UTC',
+  };
+
+  /** Chart display metadata */
+  chart: ChartInfo = {
+    bgColor: '#FFFFFF',
+    fgColor: '#363A45',
+    type: 'standard',
   };
 
   /** Timeframe information */
