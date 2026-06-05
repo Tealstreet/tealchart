@@ -77,6 +77,57 @@ barcolor(isInside ? color.yellow : isOutsideUp ? color.aqua : isOutsideDown ? co
     ]);
   });
 
+  it('locks reduced official marker output payload idioms', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/visuals/text-and-shapes/
+    const result = runCompatScript(`
+indicator("Official Marker Payload Checkpoint", overlay=true)
+shapeVisible = bar_index == 0 ? true : bar_index == 1 ? false : bar_index == 2 ? na : true
+charValue = bar_index == 0 ? 2 : bar_index == 1 ? 0 : bar_index == 2 ? na : -1
+markerColor = bar_index == 0 ? color.green : color.red
+markerText = bar_index == 0 ? color.white : color.yellow
+plotshape(shapeVisible, title="Marker Shape", text="S", color=markerColor, textcolor=markerText)
+plotchar(charValue, title="Marker Char", char="C", text="C", color=markerColor, textcolor=markerText)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Marker Shape').values).toEqual([
+      1,
+      null,
+      null,
+      ...Array(compatibilityBars.length - 3).fill(1),
+    ]);
+    expect(getPlot(result, 'Marker Shape').color).toEqual([
+      '#4CAF50',
+      null,
+      null,
+      ...Array(compatibilityBars.length - 3).fill('#F23645'),
+    ]);
+    expect(getPlot(result, 'Marker Shape').textColor).toEqual([
+      '#FFFFFF',
+      null,
+      null,
+      ...Array(compatibilityBars.length - 3).fill('#FDD835'),
+    ]);
+    expect(getPlot(result, 'Marker Char').values).toEqual([
+      2,
+      null,
+      null,
+      ...Array(compatibilityBars.length - 3).fill(-1),
+    ]);
+    expect(getPlot(result, 'Marker Char').color).toEqual([
+      '#4CAF50',
+      null,
+      null,
+      ...Array(compatibilityBars.length - 3).fill('#F23645'),
+    ]);
+    expect(getPlot(result, 'Marker Char').textColor).toEqual([
+      '#FFFFFF',
+      null,
+      null,
+      ...Array(compatibilityBars.length - 3).fill('#FDD835'),
+    ]);
+  });
+
   it('locks a reduced public MTF trend-filter idiom', () => {
     // Public idiom reference: MTF trend filters commonly combine local price
     // with higher-timeframe moving averages from request.security().

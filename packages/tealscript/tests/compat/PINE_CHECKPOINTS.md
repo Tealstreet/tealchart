@@ -31,6 +31,7 @@ fixtures by default.
 | `Official Built-ins Checkpoint` | https://www.tradingview.com/pine-script-docs/language/built-ins/ | Namespace access through `ta.sma()` and comparison against a derived average. | Hand-checked SMA and boolean trend series over `compatibilityBars`. |
 | `Official Array Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/bar-states/ and https://www.tradingview.com/pine-script-docs/language/arrays/ | `barstate.isfirst` guarded array initialization plus per-bar dynamic growth. | First close remains stable; array size increments deterministically. |
 | `Official Barcolor Checkpoint` | https://www.tradingview.com/pine-script-docs/visuals/bar-coloring/ | Inside/outside candle classification drives `barcolor()` output. | Explicit four-bar color sequence over local OHLC bars. |
+| `Official Marker Payload Checkpoint` | https://www.tradingview.com/pine-script-docs/visuals/text-and-shapes/ | Conditional `plotshape()` and numeric `plotchar()` markers preserve per-bar body and text colors while masking hidden bars. | Values, body colors, and text colors over `compatibilityBars`. |
 | `Official Alert Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/alerts/ | Rising-close condition registers an `alertcondition()` and emits direct `alert()` calls from an `if` block. | Trigger plot, alertcondition values, and direct alert events over `compatibilityBars`. |
 | `Official Strategy Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/strategies/ | Default market entry filled at the next bar open, followed by a bracket `strategy.exit()` limit/stop order. | Position, closed-trade count, net profit, and closed trade ledger fields over four local bars with divergent signal-close/next-open prices. |
 | `Official Bar Magnifier Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/strategies/ | `use_bar_magnifier=true` consumes a host lower-timeframe execution path for same-chart-bar bracket ordering. | Lower-timeframe context metadata, closed-trade count, net profit, and limit-leg fill time over local bars. |
@@ -63,6 +64,7 @@ idioms rather than isolated unit coverage.
 | Built-ins and series comparisons | `Official Built-ins Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Barstate, persistent arrays, and first-bar initialization | `Official Array Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Visual candle tinting | `Official Barcolor Checkpoint` | `pine-real-checkpoints.test.ts` |
+| Marker output payloads | `Official Marker Payload Checkpoint`; marker color/text payload fixtures in `pine-visuals.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts` |
 | Multi-timeframe data requests | `Public MTF Trend Checkpoint`; repaint-safe HTF fixture in `pine-request-security.test.ts` | `pine-real-checkpoints.test.ts`; `pine-request-security.test.ts` |
 | Pivot/divergence idioms | `Public Divergence Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Session-gated signals | `Public Session Filter Checkpoint` | `pine-real-checkpoints.test.ts` |
