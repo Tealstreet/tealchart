@@ -289,6 +289,16 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'public-strategy-bracket-checkpoint',
+      title: 'Public Strategy Bracket Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy bracket',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'brackets'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
