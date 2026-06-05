@@ -112,6 +112,10 @@ Covered behavior and remaining gaps:
   unknown named arguments, duplicate positional/named bindings, positional
   arguments after named arguments, excess positional arguments, missing required
   arguments, and duplicate named arguments.
+- Known built-in calls report clear diagnostics for unknown named arguments,
+  duplicate positional/named bindings, duplicate named arguments, missing
+  required arguments, and invalid positional arguments after named arguments on
+  strict signatures.
 - Recursive user-defined function calls are rejected with an explicit diagnostic
   instead of overflowing the runtime stack.
 - Arbitrary nested indented blocks still use a simplified indentation grammar
