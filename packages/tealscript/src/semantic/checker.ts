@@ -147,6 +147,9 @@ const INPUT_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['input.timeframe', 'string'],
 ]);
 
+const INPUT_RANGE_OPTION_OVERLOAD_NAMES = new Set(['input.float', 'input.int']);
+const INPUT_RANGE_OPTION_RANGE_PARAMS = new Set(['minval', 'maxval', 'step']);
+
 const COLOR_CONSTRUCTOR_NAMES = new Set(['color.new', 'color.rgb']);
 const COLOR_CHANNEL_NAMES = new Set(['color.r', 'color.g', 'color.b', 'color.t']);
 
@@ -3551,11 +3554,41 @@ class SemanticChecker {
   private checkArgumentNames(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
     if (signature.allowExtraNamed) return;
     const allowed = new Set(this.resolveSignatureParams(args, signature));
+    const mixedInputRangeArg = this.firstMixedInputRangeOptionsArgument(args, signature, displayName);
+    if (mixedInputRangeArg?.name) {
+      this.addDiagnostic(
+        'invalid-overload',
+        `${displayName}() cannot use options together with minval/maxval/step`,
+        mixedInputRangeArg.name.loc,
+      );
+    }
     for (const arg of args) {
       if (arg.name && !allowed.has(this.canonicalSignatureArgumentName(arg.name.name, signature))) {
+        if (
+          mixedInputRangeArg
+          && INPUT_RANGE_OPTION_RANGE_PARAMS.has(this.canonicalSignatureArgumentName(arg.name.name, signature))
+        ) continue;
         this.addDiagnostic('unknown-argument', `Unknown argument '${arg.name.name}' for ${displayName}()`, arg.name.loc);
       }
     }
+  }
+
+  private firstMixedInputRangeOptionsArgument(
+    args: CallArgument[],
+    signature: BuiltinSignature,
+    displayName: string,
+  ): CallArgument | undefined {
+    if (!INPUT_RANGE_OPTION_OVERLOAD_NAMES.has(displayName) || !signature.overloads) return undefined;
+
+    const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
+    const thirdPositional = args.filter((arg) => !arg.name)[2]?.value;
+    const usesOptionsOverload = suppliedNames.has('options') || thirdPositional?.type === 'ArrayExpression';
+    if (!usesOptionsOverload) return undefined;
+
+    return args.find((arg) => {
+      if (!arg.name) return false;
+      return INPUT_RANGE_OPTION_RANGE_PARAMS.has(this.canonicalSignatureArgumentName(arg.name.name, signature));
+    });
   }
 
   private checkArgumentCount(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
