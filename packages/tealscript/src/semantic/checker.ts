@@ -2614,7 +2614,7 @@ class SemanticChecker {
     this.checkMatrixCallTypes(expression, scope);
     this.checkMatrixSortFieldType(expression, scope);
     this.checkMapCallTypes(expression, scope);
-    this.checkUserCallableArgumentOrder(expression, scope);
+    this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
     for (const argument of expression.arguments) {
       this.checkExpression(argument.value, scope);
@@ -3247,30 +3247,112 @@ class SemanticChecker {
     );
   }
 
-  private checkUserCallableArgumentOrder(expression: CallExpression, scope: SemanticScope): void {
+  private checkUserCallableArguments(expression: CallExpression, scope: SemanticScope): void {
     const offendingArgument = this.firstPositionalArgumentAfterNamed(expression.arguments);
-    if (!offendingArgument) return;
+    const callable = this.resolveLocalUserCallable(expression, scope);
+    if (!callable) return;
 
-    if (expression.callee.type === 'Identifier') {
-      const symbol = scope.lookup(expression.callee.name);
-      if (symbol?.kind === 'function' && symbol.isMethod !== true) {
-        this.addDiagnostic(
-          'argument-order',
-          `function ${expression.callee.name} cannot use positional arguments after named arguments`,
-          offendingArgument.loc,
-        );
-      }
+    if (offendingArgument) {
+      this.addDiagnostic(
+        'argument-order',
+        `${callable.displayName} cannot use positional arguments after named arguments`,
+        offendingArgument.loc,
+      );
       return;
     }
 
-    if (expression.callee.type !== 'MemberExpression') return;
-    if (!this.methodDeclarations.has(expression.callee.property.name)) return;
-
-    this.addDiagnostic(
-      'argument-order',
-      `method ${expression.callee.property.name} cannot use positional arguments after named arguments`,
-      offendingArgument.loc,
+    this.checkUserCallableArgumentBindings(
+      expression.arguments,
+      callable.declaration.params.slice(callable.parameterOffset),
+      callable.displayName,
     );
+  }
+
+  private resolveLocalUserCallable(
+    expression: CallExpression,
+    scope: SemanticScope,
+  ): { declaration: FunctionDeclaration; displayName: string; parameterOffset: number } | undefined {
+    if (expression.callee.type === 'Identifier') {
+      const symbol = scope.lookup(expression.callee.name);
+      const declaration =
+        symbol?.kind === 'function' && symbol.isMethod !== true ? this.functionSymbolDeclarations.get(symbol) : undefined;
+      return declaration
+        ? { declaration, displayName: `function ${expression.callee.name}`, parameterOffset: 0 }
+        : undefined;
+    }
+
+    if (expression.callee.type !== 'MemberExpression') return undefined;
+
+    const receiverType = this.inferExpressionType(expression.callee.object, scope);
+    if (receiverType.kind === 'unknown') return undefined;
+    if (this.isBuiltinCollectionMemberMethod(receiverType, expression.callee.property.name)) return undefined;
+
+    const callCompatibleDeclaration = this.findUserMethodDeclaration(expression.callee.property.name, receiverType, expression, scope);
+    if (callCompatibleDeclaration) {
+      return { declaration: callCompatibleDeclaration, displayName: `method ${expression.callee.property.name}`, parameterOffset: 1 };
+    }
+
+    const methods = this.methodDeclarations.get(expression.callee.property.name) ?? [];
+    const receiverMatches = methods.filter((method) => this.userMethodReceiverMatches(method, receiverType));
+    const declaration = receiverMatches
+      .sort((left, right) => (
+        this.userMethodReceiverSpecificityScore(right, receiverType)
+        - this.userMethodReceiverSpecificityScore(left, receiverType)
+      ))[0];
+    return declaration
+      ? { declaration, displayName: `method ${expression.callee.property.name}`, parameterOffset: 1 }
+      : undefined;
+  }
+
+  private checkUserCallableArgumentBindings(
+    args: CallArgument[],
+    params: FunctionDeclaration['params'],
+    displayName: string,
+  ): void {
+    const positionalCount = this.leadingPositionalCount(args);
+    if (positionalCount > params.length) {
+      this.addDiagnostic(
+        'argument-count',
+        `Too many arguments for ${displayName}: expected ${params.length}, got ${positionalCount}`,
+        args[params.length]?.loc,
+      );
+      return;
+    }
+
+    const paramNames = params.map((param) => param.name);
+    const seenNames = new Set<string>();
+    const suppliedNames = new Set<string>();
+    let hasUnknownArgument = false;
+    for (const arg of args) {
+      if (!arg.name) continue;
+
+      const name = arg.name.name;
+      if (!paramNames.includes(name)) {
+        this.addDiagnostic('unknown-argument', `Unknown argument '${name}' for ${displayName}`, arg.name.loc);
+        hasUnknownArgument = true;
+        continue;
+      }
+
+      if (seenNames.has(name)) {
+        this.addDiagnostic('duplicate-argument', `Argument '${name}' for ${displayName} was supplied multiple times`, arg.name.loc);
+        continue;
+      }
+      seenNames.add(name);
+      suppliedNames.add(name);
+
+      const parameterIndex = paramNames.indexOf(name);
+      if (parameterIndex !== -1 && parameterIndex < positionalCount) {
+        this.addDiagnostic('duplicate-argument', `Argument '${name}' for ${displayName} was supplied multiple times`, arg.name.loc);
+      }
+    }
+    if (hasUnknownArgument) return;
+
+    for (const [index, param] of params.entries()) {
+      if (index < positionalCount) continue;
+      if (suppliedNames.has(param.name)) continue;
+      if (param.defaultValue) continue;
+      this.addDiagnostic('argument-count', `${displayName} missing required argument '${param.name}'`, args[0]?.loc);
+    }
   }
 
   private firstPositionalArgumentAfterNamed(args: CallArgument[]): CallArgument | undefined {

@@ -2059,7 +2059,8 @@ export class TealscriptEngine {
 
     if (namespace && expr.callee.type === 'MemberExpression' && this.scope.has(namespace)) {
       const receiver = this.evaluateExpression(expr.callee.object);
-      const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs, receiver);
+      const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs, receiver)
+        ?? this.findReceiverMatchingUserMethod(funcName, receiver);
       if (userMethod) {
         const scopeKey = this.userCallableScopeKey(userMethod);
         return this.evaluateUserFunction(
@@ -2114,7 +2115,8 @@ export class TealscriptEngine {
         }
         throw error;
       }
-      const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs, receiver);
+      const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs, receiver)
+        ?? this.findReceiverMatchingUserMethod(funcName, receiver);
       if (userMethod) {
         const scopeKey = this.userCallableScopeKey(userMethod);
         return this.evaluateUserFunction(
@@ -2321,6 +2323,10 @@ export class TealscriptEngine {
       this.methodReceiverMatches(method, receiver)
       && this.canCallUserFunction(method, args, namedArgs)
     ));
+  }
+
+  private findReceiverMatchingUserMethod(methodName: string, receiver: unknown): FunctionDeclaration | undefined {
+    return this.userMethods.get(methodName)?.find((method) => this.methodReceiverMatches(method, receiver));
   }
 
   private methodReceiverMatches(method: FunctionDeclaration, receiver: unknown): boolean {
@@ -3194,17 +3200,27 @@ export class TealscriptEngine {
       throw new Error(`${displayName} cannot use positional arguments after named arguments`);
     }
 
-    if (args.length > fn.params.length) {
+    const bindingOffset = fn.isMethod ? 1 : 0;
+    const callArgCount = Math.max(0, args.length - bindingOffset);
+    const callableParams = fn.params.slice(bindingOffset);
+
+    if (callArgCount > callableParams.length) {
       throw new Error(
-        `Too many arguments for ${displayName}: expected ${fn.params.length}, got ${args.length}`,
+        `Too many arguments for ${displayName}: expected ${callableParams.length}, got ${callArgCount}`,
       );
     }
 
-    const paramNames = new Set(fn.params.map((param) => param.name));
+    const paramNames = new Set(callableParams.map((param) => param.name));
     for (const argName of namedArgs.keys()) {
       if (!paramNames.has(argName)) {
         throw new Error(`Unknown argument '${argName}' for ${displayName}`);
       }
+    }
+
+    for (const [index, param] of fn.params.entries()) {
+      if (index < bindingOffset) continue;
+      if (index < args.length || namedArgs.has(param.name) || param.defaultValue) continue;
+      throw new Error(`${displayName} missing required argument '${param.name}'`);
     }
 
     const parameterValues = fn.params.map((param, index) => {
