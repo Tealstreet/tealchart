@@ -299,6 +299,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'public-alert-signal-checkpoint',
+      title: 'Public Alert Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: alert signal',
+      featureTags: ['alerts', 'signals', 'ta', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(

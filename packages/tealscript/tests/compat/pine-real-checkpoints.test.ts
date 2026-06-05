@@ -805,6 +805,50 @@ plot(trigger ? 1 : 0, title="Trigger")
     ]);
   });
 
+  it('locks a reduced public alert signal idiom', () => {
+    // Public idiom reference: public signal indicators commonly expose both
+    // alertcondition() metadata and direct alert() calls for trigger bars.
+    // Source search: https://www.tradingview.com/scripts/search/alert%20signal/
+    const result = runCompatScript(`
+indicator("Public Alert Signal Checkpoint")
+average = ta.sma(close, 3)
+signal = close > average and close[1] <= average[1]
+alertcondition(signal, title="Public Signal", message="Signal crossed above average")
+if signal
+    alert("Signal crossed above average", alert.freq_once_per_bar_close)
+plot(signal ? 1 : 0, title="Signal")
+plot(average, title="Average")
+`);
+
+    const condition = result.alerts.find((alert) => alert.type === 'alertcondition' && alert.title === 'Public Signal');
+    const directAlert = result.alerts.find((alert) => alert.type === 'alert');
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Signal').values).toEqual([0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]);
+    expect(roundSeries(getPlot(result, 'Average').values)).toEqual([
+      null,
+      null,
+      104.666667,
+      105,
+      103,
+      100.666667,
+      101,
+      104.333333,
+      107,
+      109.333333,
+      109.666667,
+      111,
+    ]);
+    expect(condition?.values).toEqual([null, null, null, null, null, null, true, null, null, null, null, null]);
+    expect(directAlert?.events.map((event) => ({
+      barIndex: event.barIndex,
+      frequency: event.frequency,
+      message: event.message,
+    }))).toEqual([
+      { barIndex: 6, frequency: 'once_per_bar_close', message: 'Signal crossed above average' },
+    ]);
+  });
+
   it('locks the official strategy entry and bracket-exit idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const bars: Bar[] = [

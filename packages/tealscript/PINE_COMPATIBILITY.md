@@ -43,7 +43,8 @@ explicit `max_bars_back` metadata, official lower-timeframe request arrays,
 official synthetic ticker requests, official dynamic sessions, official
 timeframe comparisons, official plot-style payloads, and public MTF,
 divergence, session-filter, dashboard-table, multi-symbol screener, and
-library-helper idioms.
+library-helper idioms. Public-source coverage also includes alert signal
+metadata and direct alert emission.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
 suppression, entry-direction risk rules, recalculation checkpoints, and a
