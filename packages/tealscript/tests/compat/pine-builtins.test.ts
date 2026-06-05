@@ -560,6 +560,7 @@ dayOfYearTime = str.format_time(timestamp("UTC", 2024, 1, 5), "D DD DDD", "UTC")
 singleYearTime = str.format_time(timestamp("UTC", 2024, 8, 20), "MMM-d-y", "UTC")
 timezoneNameTime = str.format_time(timestamp("UTC", 2024, 1, 5), "z zzzz", "UTC")
 weekOfYearTime = str.format_time(timestamp("UTC", 2024, 1, 5), "w ww", "UTC")
+weekOfMonthTime = str.format_time(timestamp("UTC", 2024, 8, 20), "W", "UTC")
 plot(formatted == "102.00", title="Formatted Close")
 plot(prefixFormatted == "102.00", title="Prefix Formatted Close")
 plot(message == "close=102.0", title="Format Template")
@@ -580,6 +581,7 @@ plot(dayOfYearTime == "5 05 005", title="Day Of Year Formatted Time")
 plot(singleYearTime == "Aug-20-2024", title="Single Year Formatted Time")
 plot(timezoneNameTime == "UTC Coordinated Universal Time", title="Timezone Name Formatted Time")
 plot(weekOfYearTime == "1 01", title="Week Of Year Formatted Time")
+plot(weekOfMonthTime == "4", title="Week Of Month Formatted Time")
 `);
 
     expect(result.errors).toEqual([]);
