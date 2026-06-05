@@ -442,6 +442,22 @@ alertcondition(true, title="A", message="M", freq=alert.freq_all)
     ]);
   });
 
+  it('reports invalid Pine declaration arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Indicator", initial_capital=1000, typo=true)
+strategy("Bad Strategy", initial_capital=1000, typo=true)
+library("Bad Library", precision=2, dynamic_requests=true)
+export f(float x) => x
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'initial_capital' for indicator()",
+      "Unknown argument 'typo' for indicator()",
+      "Unknown argument 'typo' for strategy()",
+      "Unknown argument 'precision' for library()",
+    ]);
+  });
+
   it('accepts Pine strategy order and trade accessor calls', () => {
     const result = checkProgram(parse(`
 strategy("Strategy", initial_capital=1000, pyramiding=1, default_qty_type=strategy.fixed, default_qty_value=1)
