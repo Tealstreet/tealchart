@@ -5015,6 +5015,12 @@ export class TealscriptEngine {
     this.builtins.set('strategy.opentrades.max_drawdown', (args, namedArgs) => (
       this.strategyOpenTrade(args, namedArgs)?.maxDrawdown ?? Number.NaN
     ));
+    this.builtins.set('strategy.opentrades.max_runup_percent', (args, namedArgs) => (
+      this.strategyTradePercent(this.strategyOpenTrade(args, namedArgs), 'maxRunup')
+    ));
+    this.builtins.set('strategy.opentrades.max_drawdown_percent', (args, namedArgs) => (
+      this.strategyTradePercent(this.strategyOpenTrade(args, namedArgs), 'maxDrawdown')
+    ));
     this.builtins.set('strategy.closedtrades.entry_id', (args, namedArgs) => (
       this.strategyClosedTrade(args, namedArgs)?.entryOrderId ?? ''
     ));
@@ -5058,6 +5064,12 @@ export class TealscriptEngine {
     this.builtins.set('strategy.closedtrades.max_drawdown', (args, namedArgs) => (
       this.strategyClosedTrade(args, namedArgs)?.maxDrawdown ?? Number.NaN
     ));
+    this.builtins.set('strategy.closedtrades.max_runup_percent', (args, namedArgs) => (
+      this.strategyTradePercent(this.strategyClosedTrade(args, namedArgs), 'maxRunup')
+    ));
+    this.builtins.set('strategy.closedtrades.max_drawdown_percent', (args, namedArgs) => (
+      this.strategyTradePercent(this.strategyClosedTrade(args, namedArgs), 'maxDrawdown')
+    ));
     this.builtins.set('strategy.entry', (args, namedArgs) => this.submitStrategyOrderBuiltin(args, namedArgs, true));
     this.builtins.set('strategy.order', (args, namedArgs) => this.submitStrategyOrderBuiltin(args, namedArgs, false));
     this.builtins.set('strategy.exit', (args, namedArgs) => this.submitStrategyExitBuiltin(args, namedArgs));
@@ -5080,6 +5092,13 @@ export class TealscriptEngine {
 
   private strategyClosedTrade(args: unknown[], namedArgs: Map<string, unknown>): StrategyTrade | undefined {
     return this.ctx.strategyLedger.closedTrades[this.strategyTradeIndex(args, namedArgs)];
+  }
+
+  private strategyTradePercent(trade: StrategyTrade | undefined, field: 'maxRunup' | 'maxDrawdown'): number {
+    if (!trade) return Number.NaN;
+    const basis = trade.entryPrice * Math.abs(trade.qty);
+    if (!Number.isFinite(basis) || basis <= 0) return Number.NaN;
+    return (trade[field] / basis) * 100;
   }
 
   private strategyTradeIndex(args: unknown[], namedArgs: Map<string, unknown>): number {

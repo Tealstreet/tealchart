@@ -358,11 +358,15 @@ const STRATEGY_FLOAT_ACCESSOR_NAMES = new Set([
   'strategy.closedtrades.profit',
   'strategy.closedtrades.size',
   'strategy.closedtrades.max_drawdown',
+  'strategy.closedtrades.max_drawdown_percent',
   'strategy.closedtrades.max_runup',
+  'strategy.closedtrades.max_runup_percent',
   'strategy.opentrades.commission',
   'strategy.opentrades.entry_price',
   'strategy.opentrades.max_drawdown',
+  'strategy.opentrades.max_drawdown_percent',
   'strategy.opentrades.max_runup',
+  'strategy.opentrades.max_runup_percent',
   'strategy.opentrades.profit',
   'strategy.opentrades.size',
 ]);
@@ -509,6 +513,8 @@ const STRATEGY_TRADE_ACCESSORS = [
   'commission',
   'max_runup',
   'max_drawdown',
+  'max_runup_percent',
+  'max_drawdown_percent',
 ];
 const STRATEGY_CLOSED_TRADE_ACCESSORS = [
   ...STRATEGY_TRADE_ACCESSORS,
