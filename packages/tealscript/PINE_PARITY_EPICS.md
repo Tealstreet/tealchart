@@ -487,7 +487,7 @@ impact.
 3. Harness incomplete outcomes: keep canonical `not_run` stages failing corpus
    pass-rate summaries unless they are explicitly marked `skipped`.
 4. Pine layout parser audit fixtures: keep reduced coverage for top-level
-   nested dedents, sixth-level UDF branches, wrapped indented expressions,
+   nested dedents, seventh-level UDF branches, wrapped indented expressions,
    wrapped function/method signatures, and shared library/type/method blocks
    before deeper parser architecture changes.
 5. Call-binding diagnostics sweep: keep signed built-in namespace typo
