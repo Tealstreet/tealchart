@@ -49,6 +49,35 @@ plot(rt.mid(high, low), title="Mid")
     expect(roundSeries(getPlot(result, 'Mid').values)).toEqual([101, 103.5, 106, 105.5, 101, 98.5, 102, 106.5, 108.5, 109.5, 111.5, 110.5]);
   });
 
+  it('reports invalid imported exported library function arguments', () => {
+    const library = parse(`
+library("RangeTools", true)
+export spread(float highValue, float lowValue) => highValue - lowValue
+`);
+
+    const missingRequired = runCompatScript(`
+indicator("Imported library missing arg")
+import TestUser/RangeTools/1 as rt
+plot(rt.spread(high), title="Spread")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/RangeTools/1', library]]),
+      },
+    });
+    expect(missingRequired.errors[0]?.message).toBe("library function rt.spread missing required argument 'lowValue'");
+
+    const unknown = runCompatScript(`
+indicator("Imported library unknown arg")
+import TestUser/RangeTools/1 as rt
+plot(rt.spread(source=high), title="Spread")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/RangeTools/1', library]]),
+      },
+    });
+    expect(unknown.errors[0]?.message).toBe("Unknown argument 'source' for library function rt.spread");
+  });
+
   it('preserves versioned import path metadata while using deterministic registry lookup', () => {
     const library = parse(`
 library("RangeTools", true)
@@ -437,6 +466,45 @@ plot(q.y, title="Lifted")
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Lifted').values)).toEqual([112, 115, 117, 113, 109, 110, 114, 119, 118, 121, 120, 122]);
+  });
+
+  it('reports invalid imported exported library method arguments', () => {
+    const library = parse(`
+library("PivotTools", true)
+export type Pivot
+    float value
+export method lifted(Pivot this, float amount) =>
+    this.value += amount
+    this
+`);
+
+    const missingRequired = runCompatScript(`
+indicator("Imported library method missing arg")
+import TestUser/PivotTools/1 as pivots
+p = pivots.Pivot.new(close)
+q = p.lifted()
+plot(q.value, title="Value")
+`, {
+      bars: [compatibilityBars[0]!],
+      engineOptions: {
+        libraries: new Map([['TestUser/PivotTools/1', library]]),
+      },
+    });
+    expect(missingRequired.errors[0]?.message).toBe("library function pivots.lifted missing required argument 'amount'");
+
+    const tooMany = runCompatScript(`
+indicator("Imported library method too many args")
+import TestUser/PivotTools/1 as pivots
+p = pivots.Pivot.new(close)
+q = p.lifted(1, 2)
+plot(q.value, title="Value")
+`, {
+      bars: [compatibilityBars[0]!],
+      engineOptions: {
+        libraries: new Map([['TestUser/PivotTools/1', library]]),
+      },
+    });
+    expect(tooMany.errors[0]?.message).toBe('Too many arguments for library function pivots.lifted: expected 1, got 2');
   });
 
   it('keeps non-exported imported library methods private externally', () => {
