@@ -448,6 +448,11 @@ indicator("Invalid Built-in Bindings")
 plot(close, title="Close", title="Duplicate")
 plot(close, series=open)
 plot(close, typo=true)
+hline(100, price=200)
+hline(price=100, style=hline.style_dotted)
+fill(plot1=plot(close), hline1=plot(open), plot2=plot(high), color=color.red)
+fill(plot1=plot(high), color=color.blue)
+plotshape(series=close > open, caption="Bad")
 plot(ta.sma(source=close))
 plot(strategy.opentrades.entry_price(trade_num=0, 1))
 `));
@@ -456,6 +461,12 @@ plot(strategy.opentrades.entry_price(trade_num=0, 1))
       "Argument 'title' for plot() was supplied multiple times",
       "Argument 'series' for plot() was supplied multiple times",
       "Unknown argument 'typo' for plot()",
+      "Argument 'price' for hline() was supplied multiple times",
+      "Unknown argument 'style' for hline()",
+      "Argument 'hline1' for fill() was supplied multiple times",
+      'fill() expects at least 3 arguments',
+      "fill() missing required argument 'plot2'",
+      "Unknown argument 'caption' for plotshape()",
       'ta.sma() expects at least 2 arguments',
       "ta.sma() missing required argument 'length'",
       'strategy.opentrades.entry_price() cannot use positional arguments after named arguments',
