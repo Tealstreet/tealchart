@@ -169,6 +169,47 @@ plot(trendOk ? 1 : 0, title="Trend OK")
     expect(getPlot(result, 'Trend OK').values).toEqual([0, 0, 1, 1, 1, 1]);
   });
 
+  it('locks a reduced official lower-timeframe array idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/other-timeframes-and-data/
+    const chartBars: Bar[] = [
+      { time: 1_700_100_000_000, open: 100, high: 103, low: 99, close: 102, volume: 210 },
+      { time: 1_700_100_120_000, open: 102, high: 105, low: 101, close: 104, volume: 250 },
+      { time: 1_700_100_240_000, open: 104, high: 107, low: 103, close: 106, volume: 290 },
+    ];
+    const requestDatafeed = new InMemoryRequestDatafeed([
+      {
+        symbol: 'BTCUSDT',
+        timeframe: '1',
+        bars: [
+          { time: 1_700_100_000_000, open: 10, high: 12, low: 9, close: 11, volume: 100 },
+          { time: 1_700_100_060_000, open: 11, high: 14, low: 10, close: 13, volume: 110 },
+          { time: 1_700_100_120_000, open: 20, high: 23, low: 18, close: 21, volume: 120 },
+          { time: 1_700_100_180_000, open: 21, high: 25, low: 20, close: 24, volume: 130 },
+          { time: 1_700_100_240_000, open: 30, high: 32, low: 29, close: 31, volume: 140 },
+          { time: 1_700_100_300_000, open: 31, high: 35, low: 30, close: 34, volume: 150 },
+        ],
+        syminfo: { ticker: 'BTCUSDT', timezone: 'Etc/UTC' },
+      },
+    ]);
+    const result = runCompatScript(`
+indicator("Official Lower TF Array Checkpoint", timeframe="2")
+intrabars = request.security_lower_tf(syminfo.tickerid, "1", close)
+firstIntrabar = array.size(intrabars) > 0 ? array.get(intrabars, 0) : na
+lastIntrabar = array.size(intrabars) > 0 ? array.get(intrabars, array.size(intrabars) - 1) : na
+plot(array.size(intrabars), title="Intrabar Count")
+plot(firstIntrabar, title="First Intrabar")
+plot(lastIntrabar, title="Last Intrabar")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Intrabar Count').values).toEqual([2, 2, 2]);
+    expect(getPlot(result, 'First Intrabar').values).toEqual([11, 21, 31]);
+    expect(getPlot(result, 'Last Intrabar').values).toEqual([13, 24, 34]);
+  });
+
   it('locks a reduced public pivot-divergence idiom', () => {
     // Public idiom reference: divergence scripts compare sequential price
     // pivots against lower oscillator pivots.
