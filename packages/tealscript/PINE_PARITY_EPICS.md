@@ -472,7 +472,7 @@ impact.
 4. Real-script intake ledger: add metadata-only corpus format, unique-id
    validation, and provenance rules.
 5. Corpus runner MVP: run ledger-backed offline outcomes and emit JSON/Markdown
-   pass-rate summaries.
+   pass-rate summaries plus checkpoint coverage reports.
 6. Pine layout parser audit/failing fixtures: collect reduced failing layout
    shapes before changing parser architecture.
 7. Call-binding diagnostics sweep: use corpus failures to prioritize missing

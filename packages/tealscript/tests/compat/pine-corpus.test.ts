@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  createPineCompatibilityCoverageIndex,
+  formatPineCompatibilityCoverageMarkdown,
   formatPineCompatibilityCorpusJson,
   formatPineCompatibilityCorpusMarkdown,
   runPineCompatibilityCorpus,
@@ -54,5 +56,28 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(json).toContain('"schemaVersion": 1');
     expect(json).toContain('"scriptId": "official-builtins-checkpoint"');
     expect(json.endsWith('\n')).toBe(true);
+  });
+
+  it('builds a checkpoint coverage index from intake metadata', () => {
+    const index = createPineCompatibilityCoverageIndex(compatibilityCheckpointLedger);
+    const markdown = formatPineCompatibilityCoverageMarkdown(index);
+
+    expect(index).toMatchObject({
+      schemaVersion: 1,
+      total: 11,
+      byCategory: { indicator: 8, strategy: 3 },
+      bySourceKind: { official_docs: 8, public_script: 3 },
+      byPineVersion: { v6: 11 },
+      byStoragePolicy: { reduced_fixture_only: 11 },
+    });
+    expect(index.byFeatureTag).toMatchObject({
+      request: 2,
+      strategy: 3,
+      visuals: 2,
+    });
+    expect(markdown).toContain('# Pine Compatibility Coverage');
+    expect(markdown).toContain('Total checkpoints: 11');
+    expect(markdown).toContain('| official_docs | 8 |');
+    expect(markdown).toContain('| reduced_fixture_only | 11 |');
   });
 });

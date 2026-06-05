@@ -73,6 +73,16 @@ export interface PineCompatibilityCorpusSummary {
   validationErrors: Record<string, string[]>;
 }
 
+export interface PineCompatibilityCoverageIndex {
+  schemaVersion: typeof PINE_COMPATIBILITY_SCHEMA_VERSION;
+  total: number;
+  byCategory: Record<string, number>;
+  bySourceKind: Record<string, number>;
+  byPineVersion: Record<string, number>;
+  byStoragePolicy: Record<string, number>;
+  byFeatureTag: Record<string, number>;
+}
+
 export interface PineScriptLedger {
   schemaVersion: typeof PINE_COMPATIBILITY_SCHEMA_VERSION;
   entries: PineScriptLedgerEntry[];
@@ -275,6 +285,34 @@ export function runPineCompatibilityLedger(
   })));
 }
 
+export function createPineCompatibilityCoverageIndex(ledger: PineScriptLedger): PineCompatibilityCoverageIndex {
+  const byCategory: Record<string, number> = {};
+  const bySourceKind: Record<string, number> = {};
+  const byPineVersion: Record<string, number> = {};
+  const byStoragePolicy: Record<string, number> = {};
+  const byFeatureTag: Record<string, number> = {};
+
+  for (const entry of ledger.entries) {
+    incrementCount(byCategory, entry.category);
+    incrementCount(bySourceKind, entry.source.kind);
+    incrementCount(byPineVersion, entry.pineVersion);
+    incrementCount(byStoragePolicy, entry.storagePolicy);
+    for (const featureTag of entry.featureTags) {
+      incrementCount(byFeatureTag, featureTag);
+    }
+  }
+
+  return {
+    schemaVersion: PINE_COMPATIBILITY_SCHEMA_VERSION,
+    total: ledger.entries.length,
+    byCategory,
+    bySourceKind,
+    byPineVersion,
+    byStoragePolicy,
+    byFeatureTag,
+  };
+}
+
 export function summarizePineCompatibilityCorpus(
   cases: PineCompatibilityCorpusCase[],
   outcomes: CompatibilityRunOutcome[],
@@ -336,6 +374,30 @@ export function formatPineCompatibilityCorpusJson(run: PineCompatibilityCorpusRu
   return `${JSON.stringify(run, null, 2)}\n`;
 }
 
+export function formatPineCompatibilityCoverageMarkdown(index: PineCompatibilityCoverageIndex): string {
+  return `${[
+    '# Pine Compatibility Coverage',
+    '',
+    `Schema version: ${index.schemaVersion}`,
+    `Total checkpoints: ${index.total}`,
+    '',
+    '## Categories',
+    ...formatCountTable(index.byCategory),
+    '',
+    '## Source Kinds',
+    ...formatCountTable(index.bySourceKind),
+    '',
+    '## Pine Versions',
+    ...formatCountTable(index.byPineVersion),
+    '',
+    '## Storage Policies',
+    ...formatCountTable(index.byStoragePolicy),
+    '',
+    '## Feature Tags',
+    ...formatCountTable(index.byFeatureTag),
+  ].join('\n')}\n`;
+}
+
 function cloneCompatibilityStageOutcome(stage: CompatibilityStageOutcome): CompatibilityStageOutcome {
   return {
     ...stage,
@@ -358,6 +420,10 @@ function appendValidationErrors(
 ): void {
   if (errors.length === 0) return;
   validationErrors[key] = [...(validationErrors[key] ?? []), ...errors];
+}
+
+function incrementCount(counts: Record<string, number>, key: string): void {
+  counts[key] = (counts[key] ?? 0) + 1;
 }
 
 export function formatPineCompatibilityCorpusMarkdown(run: PineCompatibilityCorpusRun): string {
