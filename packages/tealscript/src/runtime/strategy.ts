@@ -235,6 +235,7 @@ export interface StrategyFill {
   slippage: number;
   barIndex: number;
   time: number;
+  comment?: string;
   alertMessage?: string;
 }
 
@@ -250,7 +251,9 @@ export interface StrategyPosition {
 export interface StrategyTrade {
   id: string;
   entryOrderId: string;
+  entryComment?: string;
   exitOrderId?: string;
+  exitComment?: string;
   direction: StrategyDirection;
   qty: number;
   entryPrice: number;
@@ -577,6 +580,7 @@ function fillStrategyOrder(
     slippage: 0,
     barIndex,
     time,
+    comment: order.comment,
     alertMessage: order.alertMessage,
   };
   ledger.fills.push(fill);
@@ -965,6 +969,7 @@ function applyStrategyFillToTrades(ledger: StrategyLedger, fill: StrategyFill): 
       ...trade,
       id: `${trade.id}:closed:${ledger.closedTrades.length}`,
       exitOrderId: fill.orderId,
+      exitComment: fill.comment,
       qty: closedQty,
       exitPrice: fill.price,
       exitBarIndex: fill.barIndex,
@@ -995,6 +1000,7 @@ function applyStrategyFillToTrades(ledger: StrategyLedger, fill: StrategyFill): 
     ledger.openTrades.push({
       id: fill.id,
       entryOrderId: fill.orderId,
+      entryComment: fill.comment,
       direction: fill.direction,
       qty: remainingQty,
       entryPrice: fill.price,
