@@ -285,6 +285,35 @@ plot(syminfo.root == "AAPL" ? 1 : 0, title="Root Match")
     expect(getPlot(result, 'Root Match').values).toEqual(allBars(1));
   });
 
+  it('exposes host-provided Pine syminfo ticker id metadata', () => {
+    const result = runCompatScript(`
+indicator("Syminfo Ticker IDs")
+plot(str.length(syminfo.ticker), title="Ticker Length")
+plot(str.length(syminfo.tickerid), title="Ticker ID Length")
+plot(str.length(syminfo.main_tickerid), title="Main Ticker ID Length")
+plot(syminfo.tickerid == "NASDAQ:AAPL" ? 1 : 0, title="Ticker ID Match")
+plot(syminfo.main_tickerid == "NASDAQ:AAPL" ? 1 : 0, title="Main Ticker ID Match")
+`, {
+      engineOptions: {
+        runtime: {
+          syminfo: {
+            ticker: 'AAPL',
+            tickerid: 'NASDAQ:AAPL',
+          },
+        },
+      },
+    });
+
+    const allBars = (value: number) => Array(compatibilityBars.length).fill(value);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Ticker Length').values).toEqual(allBars(4));
+    expect(getPlot(result, 'Ticker ID Length').values).toEqual(allBars(11));
+    expect(getPlot(result, 'Main Ticker ID Length').values).toEqual(allBars(11));
+    expect(getPlot(result, 'Ticker ID Match').values).toEqual(allBars(1));
+    expect(getPlot(result, 'Main Ticker ID Match').values).toEqual(allBars(1));
+  });
+
   it('exposes Pine syminfo company and security host metadata', () => {
     const result = runCompatScript(`
 indicator("Syminfo Company Metadata")

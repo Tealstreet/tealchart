@@ -3086,13 +3086,17 @@ export class TealscriptEngine {
   }
 
   private evaluateRequestExpressionSeries(expression: Expression, requestContext: RequestDataContext): unknown[] {
+    const mainTickerId = String(this.evaluateSyminfo('main_tickerid'));
     const engine = new TealscriptEngine({
       requestDatafeed: this.requestDatafeed,
       libraries: this.libraries,
       runtime: {
         ...this.runtimeOptions,
         session: requestContext.session,
-        syminfo: this.ctx.syminfo,
+        syminfo: {
+          ...this.ctx.syminfo,
+          main_tickerid: mainTickerId,
+        },
         timeframe: this.ctx.timeframe,
         now: this.ctx.now,
       },
@@ -3837,8 +3841,9 @@ export class TealscriptEngine {
       case 'timezone':
         return this.ctx.syminfo[prop];
       case 'tickerid':
+        return this.ctx.syminfo.tickerid ?? this.ctx.syminfo.ticker;
       case 'main_tickerid':
-        return this.ctx.syminfo.ticker;
+        return this.ctx.syminfo.main_tickerid ?? this.ctx.syminfo.tickerid ?? this.ctx.syminfo.ticker;
       case 'minmove':
         return this.ctx.syminfo.mintick * this.ctx.syminfo.pricescale;
       default:
