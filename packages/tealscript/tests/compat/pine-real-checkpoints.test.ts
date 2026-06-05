@@ -154,6 +154,62 @@ plotchar(charValue, title="Marker Char", char="C", text="C", color=markerColor, 
     ]);
   });
 
+  it('locks reduced official plot-style payload idioms', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/visuals/plots/
+    const result = runCompatScript(`
+indicator("Official Plot Style Checkpoint", overlay=false)
+areaBreak = bar_index == 1 ? na : low
+plot(close, title="Line", style=plot.style_line)
+plot(open, title="Step Line", style=plot.style_stepline)
+plot(high - 100, title="Histogram", style=plot.style_histogram, histbase=0)
+plot(high, title="Circles", style=plot.style_circles, join=true)
+plot(low, title="Crosses", style=plot.style_cross, join=true)
+plot(areaBreak, title="Area Break", style=plot.style_areabr, histbase=95)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Line').style).toBe('line');
+    expect(getPlot(result, 'Step Line').style).toBe('stepline');
+    expect(getPlot(result, 'Histogram')).toMatchObject({
+      style: 'histogram',
+      histbase: 0,
+    });
+    expect(getPlot(result, 'Circles')).toMatchObject({
+      style: 'circles',
+      join: true,
+    });
+    expect(getPlot(result, 'Crosses')).toMatchObject({
+      style: 'cross',
+      join: true,
+    });
+    expect(getPlot(result, 'Area Break')).toMatchObject({
+      style: 'areabr',
+      histbase: 95,
+    });
+    expect(getPlot(result, 'Area Break').values).toEqual([
+      99,
+      null,
+      104,
+      102,
+      98,
+      96,
+      99,
+      103,
+      106,
+      107,
+      109,
+      108,
+    ]);
+    expect(result.plots.map((plot) => [plot.title, plot.zOrder])).toEqual([
+      ['Line', 0],
+      ['Step Line', 1],
+      ['Histogram', 2],
+      ['Circles', 3],
+      ['Crosses', 4],
+      ['Area Break', 5],
+    ]);
+  });
+
   it('locks a reduced public MTF trend-filter idiom', () => {
     // Public idiom reference: MTF trend filters commonly combine local price
     // with higher-timeframe moving averages from request.security().

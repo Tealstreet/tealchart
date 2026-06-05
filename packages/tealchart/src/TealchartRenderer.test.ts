@@ -849,6 +849,89 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(arc).toHaveBeenCalledWith(expect.any(Number), renderer.valueToY(75, pane), expect.any(Number), 0, Math.PI * 2);
     });
 
+    it('renders area fills in computed indicator panes', () => {
+      const fill = vi.fn();
+      const lineTo = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fill,
+        lineTo,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const pane: ComputedPane = {
+        id: 'indicator',
+        type: 'indicator',
+        heightRatio: 1,
+        yMin: 0,
+        yMax: 100,
+        fixedRange: false,
+        top: 20,
+        height: 300,
+        bottom: 320,
+      };
+      const plot: PlotOutput = {
+        id: 'plot_PaneArea',
+        type: 'plot',
+        title: 'PaneArea',
+        values: [25, 75],
+        color: '#2196F3',
+        style: 'area',
+        histbase: 10,
+      };
+
+      (renderer as any).renderPlotInPane(plot, bars, viewport, pane);
+
+      expect(fill).toHaveBeenCalled();
+      expect(lineTo).toHaveBeenCalledWith(expect.any(Number), renderer.valueToY(25, pane));
+      expect(lineTo).toHaveBeenCalledWith(expect.any(Number), renderer.valueToY(10, pane));
+      expect(ctx.globalAlpha).toBe(1);
+    });
+
+    it('renders area-break fills in legacy indicator panes', () => {
+      const fill = vi.fn();
+      const moveTo = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fill,
+        moveTo,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const paneOffset = {
+        top: 10,
+        height: 200,
+        yMin: 0,
+        yMax: 100,
+      };
+      const plot: PlotOutput = {
+        id: 'plot_LegacyPaneAreaBreak',
+        type: 'plot',
+        title: 'LegacyPaneAreaBreak',
+        values: [25, 75],
+        color: '#4CAF50',
+        style: 'areabr',
+      };
+
+      (renderer as any).renderLinePlotInPane(plot, bars, viewport, paneOffset);
+
+      expect(fill).toHaveBeenCalled();
+      expect(moveTo).toHaveBeenCalledWith(expect.any(Number), paneOffset.top);
+      expect(ctx.globalAlpha).toBe(1);
+    });
+
     it('renders stepline diamond markers in computed panes with style overrides', () => {
       const fillColors: string[] = [];
       const closePath = vi.fn();
