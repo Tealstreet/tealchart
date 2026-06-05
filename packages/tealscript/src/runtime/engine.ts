@@ -2073,7 +2073,8 @@ export class TealscriptEngine {
           hasPositionalArgumentAfterNamed,
         );
       }
-      const importedMethod = this.findCallableImportedMethod(receiver, funcName, [receiver, ...args], namedArgs);
+      const importedMethod = this.findCallableImportedMethod(receiver, funcName, [receiver, ...args], namedArgs)
+        ?? this.findReceiverMatchingImportedMethod(receiver, funcName, [receiver, ...args], namedArgs);
       if (importedMethod) {
         return this.evaluateImportedLibraryFunction(
           importedMethod.library,
@@ -2129,7 +2130,8 @@ export class TealscriptEngine {
           hasPositionalArgumentAfterNamed,
         );
       }
-      const importedMethod = this.findCallableImportedMethod(receiver, funcName, [receiver, ...args], namedArgs);
+      const importedMethod = this.findCallableImportedMethod(receiver, funcName, [receiver, ...args], namedArgs)
+        ?? this.findReceiverMatchingImportedMethod(receiver, funcName, [receiver, ...args], namedArgs);
       if (importedMethod) {
         return this.evaluateImportedLibraryFunction(
           importedMethod.library,
@@ -2361,6 +2363,39 @@ export class TealscriptEngine {
       if (receiverAnnotation !== receiverTypeName) return false;
       if (!isInsideSameLibrary && candidate.exported !== true) return false;
       return this.canCallUserFunction(candidate, args, namedArgs);
+    });
+    return method ? { library, method } : undefined;
+  }
+
+  private findReceiverMatchingImportedMethod(
+    receiver: unknown,
+    methodName: string,
+    args: unknown[],
+    namedArgs: Map<string, unknown>,
+  ): { library: ImportedLibrary; method: FunctionDeclaration } | undefined {
+    if (!isPineUdtObject(receiver)) return undefined;
+
+    const [alias, receiverTypeName] = receiver.typeName.split('.');
+    if (!alias || !receiverTypeName) return undefined;
+
+    const library = this.importedLibraries.get(alias);
+    const overloads = library?.methods.get(methodName);
+    if (!library || !overloads) return undefined;
+
+    const isInsideSameLibrary = this.currentImportedLibrary()?.alias === alias;
+    const receiverMatches = overloads.filter((candidate) => {
+      const receiverAnnotation = this.getTypeAnnotationName(candidate.params[0]?.typeAnnotation);
+      return receiverAnnotation === receiverTypeName;
+    });
+    if (!isInsideSameLibrary && receiverMatches.some((candidate) => (
+      candidate.exported !== true
+      && this.canCallUserFunction(candidate, args, namedArgs)
+    ))) {
+      return undefined;
+    }
+
+    const method = receiverMatches.find((candidate) => {
+      return isInsideSameLibrary || candidate.exported === true;
     });
     return method ? { library, method } : undefined;
   }
