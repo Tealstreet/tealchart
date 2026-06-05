@@ -430,6 +430,8 @@ plot(strategy.closedtrades.max_drawdown_percent(trade_num=0))
 strategy("Strategy Return Types", initial_capital=1000)
 equity = strategy.equity
 positionSize = strategy.position_size
+accountCurrency = strategy.account_currency
+positionEntryName = strategy.position_entry_name
 openTrades = strategy.opentrades
 capitalHeld = strategy.opentrades.capital_held
 closedTrades = strategy.closedtrades
@@ -458,6 +460,8 @@ closedRunupPercent = strategy.closedtrades.max_runup_percent(0)
 closedDrawdownPercent = strategy.closedtrades.max_drawdown_percent(0)
 equity := "bad"
 positionSize := "bad"
+accountCurrency := 1
+positionEntryName := 1
 openTrades := "bad"
 capitalHeld := "bad"
 closedTrades := "bad"
@@ -484,7 +488,7 @@ closedRunup := "bad"
 closedDrawdown := "bad"
 closedRunupPercent := "bad"
 closedDrawdownPercent := "bad"
-plot(equity + positionSize + openTrades + capitalHeld + closedTrades + winTrades + entryBar + entryTime + entryPrice + openProfitPercent + openRunup + openDrawdown + openRunupPercent + openDrawdownPercent + exitBar + exitTime + exitPrice + closedProfit + closedProfitPercent + closedRunup + closedDrawdown + closedRunupPercent + closedDrawdownPercent + str.length(entryId) + str.length(entryComment) + str.length(closedEntryComment) + str.length(exitId) + str.length(exitComment))
+plot(equity + positionSize + openTrades + capitalHeld + closedTrades + winTrades + entryBar + entryTime + entryPrice + openProfitPercent + openRunup + openDrawdown + openRunupPercent + openDrawdownPercent + exitBar + exitTime + exitPrice + closedProfit + closedProfitPercent + closedRunup + closedDrawdown + closedRunupPercent + closedDrawdownPercent + str.length(accountCurrency) + str.length(positionEntryName) + str.length(entryId) + str.length(entryComment) + str.length(closedEntryComment) + str.length(exitId) + str.length(exitComment))
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -492,6 +496,8 @@ plot(equity + positionSize + openTrades + capitalHeld + closedTrades + winTrades
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot assign string value to float variable equity',
       'Cannot assign string value to float variable positionSize',
+      'Cannot assign int value to string variable accountCurrency',
+      'Cannot assign int value to string variable positionEntryName',
       'Cannot assign string value to int variable openTrades',
       'Cannot assign string value to float variable capitalHeld',
       'Cannot assign string value to int variable closedTrades',
@@ -521,6 +527,8 @@ plot(equity + positionSize + openTrades + capitalHeld + closedTrades + winTrades
     ]);
     expect(types.get('equity')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('positionSize')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('accountCurrency')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('positionEntryName')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('openTrades')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('capitalHeld')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('closedTrades')).toMatchObject({ kind: 'int', qualifier: 'series' });

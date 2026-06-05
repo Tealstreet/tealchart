@@ -733,6 +733,8 @@ plot(strategy.opentrades.profit(0), title="Profit")
 plot(strategy.opentrades.commission(0), title="Commission")
 plot(strategy.opentrades.profit_percent(0), title="Profit Percent")
 plot(strategy.opentrades.capital_held, title="Capital Held")
+plot(strategy.account_currency == "USDT" ? 1 : 0, title="Account Currency")
+plot(strategy.position_entry_name == "Long" ? 1 : 0, title="Position Entry Name")
 plot(strategy.opentrades.max_runup(0), title="Max Runup")
 plot(strategy.opentrades.max_drawdown(0), title="Max Drawdown")
 plot(strategy.opentrades.max_runup_percent(0), title="Max Runup Percent")
@@ -759,6 +761,8 @@ plot(strategy.opentrades.size(99), title="Missing")`;
       expect(result.plots.find((plot) => plot.title === 'Commission')?.values).toEqual([2, 2]);
       expect(roundSeries(result.plots.find((plot) => plot.title === 'Profit Percent')?.values ?? [])).toEqual([0, 0.499002]);
       expect(roundSeries(result.plots.find((plot) => plot.title === 'Capital Held')?.values ?? [])).toEqual([200.4, 301.1]);
+      expect(result.plots.find((plot) => plot.title === 'Account Currency')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Position Entry Name')?.values).toEqual([1, 1]);
       expect(roundSeries(result.plots.find((plot) => plot.title === 'Max Runup')?.values ?? [])).toEqual([0, 1.6]);
       expect(roundSeries(result.plots.find((plot) => plot.title === 'Max Drawdown')?.values ?? [])).toEqual([0, 0]);
       expect(roundSeries(result.plots.find((plot) => plot.title === 'Max Runup Percent')?.values ?? [])).toEqual([0, 0.798403]);

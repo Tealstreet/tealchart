@@ -339,6 +339,10 @@ const STRATEGY_INT_MEMBER_NAMES = new Set([
   'strategy.opentrades',
   'strategy.wintrades',
 ]);
+const STRATEGY_STRING_MEMBER_NAMES = new Set([
+  'strategy.account_currency',
+  'strategy.position_entry_name',
+]);
 const STRATEGY_STRING_ACCESSOR_NAMES = new Set([
   'strategy.closedtrades.entry_comment',
   'strategy.closedtrades.entry_id',
@@ -4842,6 +4846,7 @@ class SemanticChecker {
     const memberName = this.memberPath(expression).join('.');
     if (STRATEGY_FLOAT_MEMBER_NAMES.has(memberName)) return { kind: 'float', qualifier: 'series' };
     if (STRATEGY_INT_MEMBER_NAMES.has(memberName)) return { kind: 'int', qualifier: 'series' };
+    if (STRATEGY_STRING_MEMBER_NAMES.has(memberName)) return { kind: 'string', qualifier: 'series' };
     return undefined;
   }
 
