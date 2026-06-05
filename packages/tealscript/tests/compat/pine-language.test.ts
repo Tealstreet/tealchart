@@ -149,6 +149,28 @@ plot(signal == sig.State.neutral ? 1 : 0, title="Neutral")
     expect(getPlot(result, 'Neutral').values).toEqual([1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0]);
   });
 
+  it('runs local enum members with stable runtime identities', () => {
+    const result = runCompatScript(`
+indicator("Local enum")
+enum State
+    long = "Long"
+    short = "Short"
+    neutral = "Neutral"
+State signal = switch
+    close > 108 => State.long
+    close < 101 => State.short
+    => State.neutral
+plot(signal == State.long ? 1 : 0, title="Long")
+plot(signal == State.short ? 1 : 0, title="Short")
+plot(signal == State.neutral ? 1 : 0, title="Neutral")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Long').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1]);
+    expect(getPlot(result, 'Short').values).toEqual([0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Neutral').values).toEqual([1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0]);
+  });
+
   it('keeps imported enum identities stable across aliases', () => {
     const library = parse(`
 library("Signal", true)

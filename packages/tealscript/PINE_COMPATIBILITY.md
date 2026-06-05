@@ -337,7 +337,8 @@ signatures. Full and partial branch/switch plus loop control-flow method returns
 infer scalar and tuple types for downstream diagnostics. Local enum member
 expressions and import-qualified enum member expressions infer their enum
 receiver type for semantic user-method selection,
-and semantic diagnostics report unknown local enum members.
+and semantic diagnostics report unknown local enum members. Runtime evaluation
+now gives local enum members stable identities for Pine-style equality checks.
 
 Known limits: UDT field types are recorded dynamically but not yet fully
 enforced by the semantic checker outside the local constructor/assignment paths.
