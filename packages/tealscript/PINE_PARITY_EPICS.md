@@ -160,6 +160,8 @@ Phases:
    libraries, alerts, screeners, and synthetic tickers. The current checkpoint
    corpus includes reduced public fixtures for MTF filters, divergence,
    session filters, dashboard tables, screeners, and library helpers.
+   Strategy-bracket coverage includes official broker examples plus a reduced
+   public fixed-bracket strategy fixture.
 7. Generate a trendable pass-rate report: total scripts, parse pass, semantic
    pass, runtime pass, usable-output pass, top failure classes, and regressions.
 
