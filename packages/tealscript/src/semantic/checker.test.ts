@@ -442,6 +442,26 @@ alertcondition(true, title="A", message="M", freq=alert.freq_all)
     ]);
   });
 
+  it('reports invalid Pine built-in argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Built-in Bindings")
+plot(close, title="Close", title="Duplicate")
+plot(close, series=open)
+plot(close, typo=true)
+plot(ta.sma(source=close))
+plot(strategy.opentrades.entry_price(trade_num=0, 1))
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Argument 'title' for plot() was supplied multiple times",
+      "Argument 'series' for plot() was supplied multiple times",
+      "Unknown argument 'typo' for plot()",
+      'ta.sma() expects at least 2 arguments',
+      "ta.sma() missing required argument 'length'",
+      'strategy.opentrades.entry_price() cannot use positional arguments after named arguments',
+    ]);
+  });
+
   it('reports invalid Pine declaration arguments', () => {
     const result = checkProgram(parse(`
 indicator("Bad Indicator", initial_capital=1000, typo=true)
