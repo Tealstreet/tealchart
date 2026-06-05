@@ -87,7 +87,7 @@ describe('Tealscript Parser', () => {
 
   describe('Library and import declarations', () => {
     it('parses library declarations', () => {
-      const ast = parse('library("AllTimeHighLow", true)\n');
+      const ast = parse('library("AllTimeHighLow", true, false)\n');
       const declaration = ast.body[0] as LibraryDeclaration;
       expect(declaration.type).toBe('LibraryDeclaration');
       expect(declaration.title).toEqual(expect.objectContaining({
@@ -97,6 +97,10 @@ describe('Tealscript Parser', () => {
       expect(declaration.overlay).toEqual(expect.objectContaining({
         type: 'BooleanLiteral',
         value: true,
+      }));
+      expect(declaration.dynamic_requests).toEqual(expect.objectContaining({
+        type: 'BooleanLiteral',
+        value: false,
       }));
     });
 
