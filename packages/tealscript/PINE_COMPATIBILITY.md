@@ -391,9 +391,10 @@ planned in the qualified type-system epic.
 
 ## Common Library Syntax Coverage
 
-The library syntax MVP parses `library(...)` declarations, `export` on UDFs,
-typed and qualified exported parameters such as `simple string prefix`,
-exported enums, and `import publisher/Library/version as alias` declarations.
+The library syntax MVP parses `library(...)` declarations, including positional
+`overlay` and `dynamic_requests` metadata, `export` on UDFs, typed and
+qualified exported parameters such as `simple string prefix`, exported enums,
+and `import publisher/Library/version as alias` declarations.
 Local library-style scripts can execute exported helper functions in the same
 file, which supports deterministic compatibility fixtures based on TradingView's
 documented all-time-high/all-time-low library idiom.

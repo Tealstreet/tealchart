@@ -161,6 +161,8 @@ LibraryDeclaration
           result.title = arg.value;
         } else if (!result.overlay) {
           result.overlay = arg.value;
+        } else if (!result.dynamic_requests) {
+          result.dynamic_requests = arg.value;
         }
       }
 

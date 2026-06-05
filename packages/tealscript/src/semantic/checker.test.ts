@@ -478,6 +478,15 @@ export f(float x) => x
     ]);
   });
 
+  it('accepts Pine library positional dynamic requests declarations', () => {
+    const result = checkProgram(parse(`
+library("Dynamic Library", true, false)
+export f(float x) => x
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
   it('accepts Pine strategy order and trade accessor calls', () => {
     const result = checkProgram(parse(`
 strategy("Strategy", initial_capital=1000, pyramiding=1, default_qty_type=strategy.fixed, default_qty_value=1)
