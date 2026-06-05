@@ -39,6 +39,7 @@ fixtures by default.
 | `Official Calc On Every Tick Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/strategies/ | Default strategies skip unconfirmed realtime ticks, while `calc_on_every_tick=true` strategies recalculate on each realtime tick. | Default close plot stays historical on unconfirmed ticks; every-tick close plot appends and updates the realtime bar. |
 | `Official Request Limit Checkpoint` | https://www.tradingview.com/pine-script-docs/writing/limitations/ | Repeated identical `request.security()` calls inside a loop reuse one unique request context. | No runtime error, one request context in the runtime profile, and a deterministic zero request-sum plot. |
 | `Official Lower TF Array Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/other-timeframes-and-data/ | `request.security_lower_tf()` returns lower-timeframe expression values as ordered intrabar arrays. | Intrabar count, first value, and last value over local chart/request bars. |
+| `Official Ticker Request Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/non-standard-charts-data/ | Synthetic ticker IDs request extended-session and Heikin-Ashi data through `request.security()`. | Extended close, derived Heikin-Ashi close, and standardized ticker id length over local request bars. |
 
 ## Public Idiom Checkpoints
 
@@ -68,6 +69,7 @@ idioms rather than isolated unit coverage.
 | Visual candle tinting | `Official Barcolor Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Marker output payloads | `Official Marker Payload Checkpoint`; marker color/text payload fixtures in `pine-visuals.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts` |
 | Multi-timeframe data requests | `Public MTF Trend Checkpoint`; `Official Lower TF Array Checkpoint`; repaint-safe HTF fixture in `pine-request-security.test.ts` | `pine-real-checkpoints.test.ts`; `pine-request-security.test.ts` |
+| Ticker request IDs | `Official Ticker Request Checkpoint`; ticker modifier fixtures in `pine-ticker.test.ts` | `pine-real-checkpoints.test.ts`; `pine-ticker.test.ts` |
 | Pivot/divergence idioms | `Public Divergence Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Session-gated signals | `Public Session Filter Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Alerts and alert conditions | `Official Alert Checkpoint`; alert crossover fixture in `pine-visuals.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts` |

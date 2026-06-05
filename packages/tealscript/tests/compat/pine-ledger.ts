@@ -131,6 +131,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     stages: passedThroughOutput,
   },
   {
+    ledgerEntry: officialDocsEntry({
+      id: 'official-ticker-request-checkpoint',
+      title: 'Official Ticker Request Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/non-standard-charts-data/',
+      featureTags: ['ticker', 'request', 'heikin_ashi'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
     ledgerEntry: publicSearchEntry({
       id: 'public-mtf-trend-checkpoint',
       title: 'Public MTF Trend Checkpoint',
