@@ -738,6 +738,87 @@ export method shifted(Pivot this, float amount) =>
       }));
       expect(Array.isArray(method?.body)).toBe(true);
     });
+
+    it('parses wrapped user-defined function and exported method signatures', () => {
+      const ast = parse(`library("WrappedSignatures", true)
+type Pivot
+    float level
+
+calc(
+    float source,
+    int length
+) =>
+    ta.sma(source, length)
+
+export method shifted(
+    Pivot this,
+    float amount
+) =>
+    this.level += amount
+    this
+`);
+      const declarations = ast.body.filter((statement): statement is FunctionDeclaration => statement.type === 'FunctionDeclaration');
+
+      expect(ast.body.map((statement) => statement.type)).toEqual([
+        'LibraryDeclaration',
+        'TypeDeclaration',
+        'FunctionDeclaration',
+        'FunctionDeclaration',
+      ]);
+      expect(declarations.map((declaration) => ({
+        name: declaration.name.name,
+        exported: declaration.exported,
+        isMethod: declaration.isMethod === true,
+        parameterNames: declaration.params.map((param) => param.name),
+      }))).toEqual([
+        {
+          name: 'calc',
+          exported: false,
+          isMethod: false,
+          parameterNames: ['source', 'length'],
+        },
+        {
+          name: 'shifted',
+          exported: true,
+          isMethod: true,
+          parameterNames: ['this', 'amount'],
+        },
+      ]);
+    });
+
+    it('parses wrapped assignment expressions and member-chain continuations', () => {
+      const ast = parse(`indicator("Wrapped Expressions")
+method smooth(float this, int length) => ta.sma(this, length)
+
+value = close +
+    open +
+    high
+smoothed = close
+    .smooth(
+        2
+    )
+plot(value)
+plot(smoothed)
+`);
+      const declarations = ast.body.filter((statement): statement is VariableDeclaration => statement.type === 'VariableDeclaration');
+
+      expect(ast.body.map((statement) => statement.type)).toEqual([
+        'IndicatorDeclaration',
+        'FunctionDeclaration',
+        'VariableDeclaration',
+        'VariableDeclaration',
+        'ExpressionStatement',
+        'ExpressionStatement',
+      ]);
+      expect(declarations.map((declaration) => (
+        declaration.names.type === 'VariableDeclarator'
+          ? { name: declaration.names.name.name, init: declaration.init.type }
+          : null
+      ))).toEqual([
+        { name: 'value', init: 'BinaryExpression' },
+        { name: 'smoothed', init: 'CallExpression' },
+      ]);
+    });
   });
 
   describe('Expressions', () => {
