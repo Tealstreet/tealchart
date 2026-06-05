@@ -149,6 +149,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     stages: passedThroughOutput,
   },
   {
+    ledgerEntry: officialDocsEntry({
+      id: 'official-dynamic-session-checkpoint',
+      title: 'Official Dynamic Session Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/sessions/',
+      featureTags: ['sessions', 'time', 'inputs'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
     ledgerEntry: publicSearchEntry({
       id: 'public-mtf-trend-checkpoint',
       title: 'Public MTF Trend Checkpoint',
