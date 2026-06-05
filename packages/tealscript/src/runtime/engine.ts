@@ -4696,6 +4696,7 @@ export class TealscriptEngine {
     const tokens: Array<[string, string]> = [
       ['yyyy', String(date.getUTCFullYear())],
       ['yy', pad(date.getUTCFullYear() % 100)],
+      ['y', String(date.getUTCFullYear())],
       ['MMMM', monthName],
       ['MMM', monthName.slice(0, 3)],
       ['EEEE', weekdayName],
