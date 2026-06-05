@@ -1687,6 +1687,22 @@ plot(customFn(value))
     ]);
   });
 
+  it('reports positional arguments after named arguments for user callables', () => {
+    const result = checkProgram(parse(`
+indicator("User Callable Argument Order")
+scale(float value, float factor=2) => value * factor
+method add(float this, float value, float factor=1) => this + value * factor
+badFunction = scale(value=close, 3)
+badMethod = close.add(value=1, 2)
+plot(badFunction + badMethod)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'function scale cannot use positional arguments after named arguments',
+      'method add cannot use positional arguments after named arguments',
+    ]);
+  });
+
   it('infers user-defined function call return types', () => {
     const result = checkProgram(parse(`
 indicator("User Function Returns")
