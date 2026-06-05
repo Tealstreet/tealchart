@@ -193,6 +193,7 @@ import {
   fillPendingStrategyMarketOrders,
   fillPendingStrategyOrdersOnTicks,
   fillStrategyMarketOrder,
+  markStrategyLedgerToMarket,
   selectStrategyIntrabarContext,
   submitStrategyOrder,
   cloneStrategyLedger,
@@ -546,12 +547,15 @@ export class TealscriptEngine {
         this.ctx.captureRealtimeRollbackState();
       }
       this.fillPendingStrategyMarketOrdersForCurrentBar();
+      this.markStrategyLedgerToMarketForCurrentBar();
       this.strategyOrderFillRecalculationRequested = false;
 
       if (this.executeHistoricalStatements(ast)) {
         return this.createExecutionResult();
       }
+      this.markStrategyLedgerToMarketAtCurrentClose();
       this.fillPendingStrategyOrdersForCurrentBar();
+      this.markStrategyLedgerAfterPendingOrders();
       if (this.recalculateHistoricalStrategyOrderFills(ast)) {
         return this.createExecutionResult();
       }
@@ -752,6 +756,7 @@ export class TealscriptEngine {
     this.strategyOrderFillRecalculationRequested = false;
     this.executeRealtimeStatements(ast);
     this.handleRealtimeStrategyOrderFillRecalculation(ast);
+    this.markStrategyLedgerAfterPendingOrders();
   }
 
   private prepareRealtimeExecution(ast: Program): void {
@@ -790,7 +795,9 @@ export class TealscriptEngine {
         console.error('Execution error:', error);
       }
     }
+    this.markStrategyLedgerToMarketAtCurrentClose();
     this.fillPendingStrategyOrdersForCurrentBar();
+    this.markStrategyLedgerAfterPendingOrders();
   }
 
   private recalculateHistoricalStrategyOrderFills(ast: Program): boolean {
@@ -5002,6 +5009,12 @@ export class TealscriptEngine {
     this.builtins.set('strategy.opentrades.commission', (args, namedArgs) => (
       this.strategyOpenTrade(args, namedArgs)?.commission ?? Number.NaN
     ));
+    this.builtins.set('strategy.opentrades.max_runup', (args, namedArgs) => (
+      this.strategyOpenTrade(args, namedArgs)?.maxRunup ?? Number.NaN
+    ));
+    this.builtins.set('strategy.opentrades.max_drawdown', (args, namedArgs) => (
+      this.strategyOpenTrade(args, namedArgs)?.maxDrawdown ?? Number.NaN
+    ));
     this.builtins.set('strategy.closedtrades.entry_id', (args, namedArgs) => (
       this.strategyClosedTrade(args, namedArgs)?.entryOrderId ?? ''
     ));
@@ -5038,6 +5051,12 @@ export class TealscriptEngine {
     ));
     this.builtins.set('strategy.closedtrades.commission', (args, namedArgs) => (
       this.strategyClosedTrade(args, namedArgs)?.commission ?? Number.NaN
+    ));
+    this.builtins.set('strategy.closedtrades.max_runup', (args, namedArgs) => (
+      this.strategyClosedTrade(args, namedArgs)?.maxRunup ?? Number.NaN
+    ));
+    this.builtins.set('strategy.closedtrades.max_drawdown', (args, namedArgs) => (
+      this.strategyClosedTrade(args, namedArgs)?.maxDrawdown ?? Number.NaN
     ));
     this.builtins.set('strategy.entry', (args, namedArgs) => this.submitStrategyOrderBuiltin(args, namedArgs, true));
     this.builtins.set('strategy.order', (args, namedArgs) => this.submitStrategyOrderBuiltin(args, namedArgs, false));
@@ -5124,6 +5143,9 @@ export class TealscriptEngine {
         this.ctx.bar_index,
         this.ctx.time.get(0) ?? 0,
       );
+      if (fill) {
+        this.markStrategyLedgerToMarketAtCurrentClose();
+      }
       this.emitStrategyFillAlerts(fill ? [fill] : []);
     }
 
@@ -5177,6 +5199,28 @@ export class TealscriptEngine {
       this.ctx.time.get(0) ?? 0,
     );
     this.emitStrategyFillAlerts(fills);
+  }
+
+  private markStrategyLedgerToMarketForCurrentBar(): void {
+    const close = this.ctx.close.get(0) ?? Number.NaN;
+    const high = this.ctx.high.get(0) ?? close;
+    const low = this.ctx.low.get(0) ?? close;
+    if (!Number.isFinite(close)) return;
+    markStrategyLedgerToMarket(this.ctx.strategyLedger, close, high, low);
+  }
+
+  private markStrategyLedgerToMarketAtCurrentClose(): void {
+    const close = this.ctx.close.get(0) ?? Number.NaN;
+    if (!Number.isFinite(close)) return;
+    markStrategyLedgerToMarket(this.ctx.strategyLedger, close);
+  }
+
+  private markStrategyLedgerAfterPendingOrders(): void {
+    if (this.ctx.strategyLedger.settings.processOrdersOnClose) {
+      this.markStrategyLedgerToMarketAtCurrentClose();
+    } else {
+      this.markStrategyLedgerToMarketForCurrentBar();
+    }
   }
 
   private emitStrategyFillAlerts(fills: StrategyFill[]): void {
@@ -5523,6 +5567,9 @@ export class TealscriptEngine {
         this.ctx.bar_index,
         this.ctx.time.get(0) ?? 0,
       );
+      if (fill) {
+        this.markStrategyLedgerToMarketAtCurrentClose();
+      }
       this.emitStrategyFillAlerts(fill ? [fill] : []);
     }
   }
