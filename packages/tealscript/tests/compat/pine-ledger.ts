@@ -152,6 +152,16 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: officialDocsEntry({
+      id: 'official-allow-entry-in-checkpoint',
+      title: 'Official Allow Entry In Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/strategies/',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'allow_entry_in'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
       id: 'official-recalculate-after-fill-checkpoint',
       title: 'Official Recalculate After Fill Checkpoint',
       url: 'https://www.tradingview.com/pine-script-docs/concepts/strategies/',
