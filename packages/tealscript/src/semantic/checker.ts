@@ -962,7 +962,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['str.pos', { params: ['source', 'str'], aliases: { string: 'source', substring: 'str', target: 'str' }, minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['str.substring', { params: ['source', 'begin_pos', 'end_pos'], aliases: { string: 'source' }, minArgs: 2, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['str.match', { params: ['source', 'regex'], aliases: { string: 'source', pattern: 'regex' }, minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
-  ['str.repeat', { params: ['source', 'count', 'separator'], aliases: { string: 'source', repeat_count: 'count' }, minArgs: 2, maxArgs: 3, allowNamedPrefixWithPositional: true }],
+  ['str.repeat', { params: ['source', 'repeat', 'separator'], aliases: { string: 'source', count: 'repeat', repeat_count: 'repeat' }, minArgs: 2, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['str.split', { params: ['source', 'separator'], aliases: { string: 'source' }, minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['str.upper', { params: ['source'], aliases: { string: 'source' }, minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['str.lower', { params: ['source'], aliases: { string: 'source' }, minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],

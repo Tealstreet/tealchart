@@ -654,7 +654,9 @@ plot(str.replace_all(source=trimmed, target="usdt", replacement="perp") == "btc-
 plot(str.replace_all(source=trimmed, "usdt", "perp") == "btc-perp-perp", title="Prefix Replace All")
 plot(str.repeat("?", 3, ",") == "?,?,?", title="Repeat")
 plot(str.repeat(source="?", count=3, separator=",") == "?,?,?", title="Named Repeat")
+plot(str.repeat(source="?", repeat=3, separator=",") == "?,?,?", title="Official Named Repeat")
 plot(str.repeat(source="?", 3, ",") == "?,?,?", title="Prefix Repeat")
+plot(str.trim(na) == "", title="Trim NA")
 `);
 
     expect(result.errors).toEqual([]);
@@ -674,7 +676,9 @@ plot(str.repeat(source="?", 3, ",") == "?,?,?", title="Prefix Repeat")
     expect(getPlot(result, 'Prefix Replace All').values).toEqual(Array(compatibilityBars.length).fill(true));
     expect(getPlot(result, 'Repeat').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Named Repeat').values).toEqual(Array(compatibilityBars.length).fill(true));
+    expect(getPlot(result, 'Official Named Repeat').values).toEqual(Array(compatibilityBars.length).fill(true));
     expect(getPlot(result, 'Prefix Repeat').values).toEqual(Array(compatibilityBars.length).fill(true));
+    expect(getPlot(result, 'Trim NA').values).toEqual(Array(compatibilityBars.length).fill(true));
   });
 
   it('matches documented Pine string formatting examples', () => {
