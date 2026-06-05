@@ -4586,14 +4586,53 @@ export class TealscriptEngine {
   }
 
   private formatNumber(value: number, format: string): string {
-    const decimalMatch = format.match(/\.([0#]+)/);
-    if (decimalMatch) {
-      return value.toFixed(decimalMatch[1].length);
-    }
-    if (/^[#0,]+$/.test(format)) {
+    const normalizedFormat = format.trim().toLowerCase();
+    if (normalizedFormat === 'integer') {
       return Math.round(value).toString();
     }
+    if (normalizedFormat === 'currency') {
+      return value < 0 ? `-$${this.formatGroupedNumber(Math.abs(value), 2)}` : `$${this.formatGroupedNumber(value, 2)}`;
+    }
+    if (normalizedFormat === 'percent') {
+      return `${Math.round(value * 100)}%`;
+    }
+
+    const decimalMatch = format.match(/\.([0#]+)/);
+    if (decimalMatch) {
+      const formatted = value.toFixed(decimalMatch[1].length);
+      return format.includes(',') ? this.addThousandsSeparators(formatted) : formatted;
+    }
+    if (/^[#0,]+$/.test(format)) {
+      const formatted = Math.round(value).toString();
+      return format.includes(',') ? this.addThousandsSeparators(formatted) : formatted;
+    }
     return String(value);
+  }
+
+  private formatGroupedNumber(value: number, precision: number): string {
+    return this.addThousandsSeparators(value.toFixed(precision));
+  }
+
+  private addThousandsSeparators(value: string): string {
+    const sign = value.startsWith('-') ? '-' : '';
+    const unsigned = sign ? value.slice(1) : value;
+    const [integerPart, decimalPart] = unsigned.split('.');
+    const groupedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return `${sign}${groupedInteger}${decimalPart === undefined ? '' : `.${decimalPart}`}`;
+  }
+
+  private formatStringPlaceholder(value: unknown, modifier?: string, format?: string): string {
+    const normalizedModifier = modifier?.trim().toLowerCase();
+    const normalizedFormat = format?.trim();
+
+    if (normalizedModifier === undefined) {
+      return this.toStringValue(value, normalizedFormat);
+    }
+    if (normalizedModifier === 'number') {
+      if (this.isNa(value)) return this.toStringValue(value);
+      return typeof value === 'number' ? this.formatNumber(value, normalizedFormat ?? '') : this.toStringValue(value);
+    }
+    return this.toStringValue(value);
   }
 
   private clampNumber(value: unknown, min: number, max: number): number {
@@ -6728,9 +6767,11 @@ export class TealscriptEngine {
     this.builtins.set('str.format', (args, namedArgs) => {
       const template = this.toStringValue(namedArgs.get('format') ?? args[0]);
       const valueOffset = namedArgs.has('format') ? 0 : 1;
-      return template.replace(/\{(\d+)(?:,[^}:]+)?(?::([^}]+))?\}/g, (_match, index: string, format: string | undefined) => {
-        return this.toStringValue(args[Number(index) + valueOffset], format);
-      });
+      return template.replace(
+        /\{(\d+)(?::([^}]+)|\s*,\s*([^,{}]+)\s*(?:,\s*([^{}]+?)\s*)?)?\}/g,
+        (_match, index: string, colonFormat: string | undefined, modifier: string | undefined, commaFormat: string | undefined) =>
+          this.formatStringPlaceholder(args[Number(index) + valueOffset], modifier, colonFormat ?? commaFormat),
+      );
     });
 
     const stringSourceArg = (args: unknown[], namedArgs: Map<string, unknown>, index = 0) =>
