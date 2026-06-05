@@ -414,7 +414,7 @@ TypeAnnotation
   / TypeAnnotationBase
 
 TypeAnnotationBase
-  = "array" !IdentifierPart _ "<" _ elementType:TypeReferenceName _ ">" {
+  = "array" !IdentifierPart _ "<" __ elementType:TypeReferenceName __ ">" {
       return {
         type: 'TypeAnnotation',
         baseType: 'array',
@@ -423,7 +423,7 @@ TypeAnnotationBase
         loc: loc()
       };
     }
-  / "matrix" !IdentifierPart _ "<" _ elementType:TypeReferenceName _ ">" {
+  / "matrix" !IdentifierPart _ "<" __ elementType:TypeReferenceName __ ">" {
       return {
         type: 'TypeAnnotation',
         baseType: 'matrix',
@@ -431,7 +431,7 @@ TypeAnnotationBase
         loc: loc()
       };
     }
-  / "map" !IdentifierPart _ "<" _ keyType:TypeReferenceName _ "," _ valueType:TypeReferenceName _ ">" {
+  / "map" !IdentifierPart _ "<" __ keyType:TypeReferenceName __ "," __ valueType:TypeReferenceName __ ">" {
       return {
         type: 'TypeAnnotation',
         baseType: 'map',
@@ -480,13 +480,13 @@ QualifiedTypeName
     }
 
 TypeReferenceName
-  = "array" !IdentifierPart _ "<" _ elementType:TypeReferenceName _ ">" {
+  = "array" !IdentifierPart _ "<" __ elementType:TypeReferenceName __ ">" {
       return formatTemplateType('array', [elementType]);
     }
-  / "matrix" !IdentifierPart _ "<" _ elementType:TypeReferenceName _ ">" {
+  / "matrix" !IdentifierPart _ "<" __ elementType:TypeReferenceName __ ">" {
       return formatTemplateType('matrix', [elementType]);
     }
-  / "map" !IdentifierPart _ "<" _ keyType:TypeReferenceName _ "," _ valueType:TypeReferenceName _ ">" {
+  / "map" !IdentifierPart _ "<" __ keyType:TypeReferenceName __ "," __ valueType:TypeReferenceName __ ">" {
       return formatTemplateType('map', [keyType, valueType]);
     }
   / TypeName
@@ -1296,7 +1296,7 @@ PostfixExpression
     }
 
 GenericTypeArguments
-  = "<" _ first:TypeReferenceName rest:(_ "," _ TypeReferenceName)* _ ">" {
+  = "<" __ first:TypeReferenceName rest:(__ "," __ TypeReferenceName)* __ ">" {
       return [first, ...rest.map(t => t[3])];
     }
 
