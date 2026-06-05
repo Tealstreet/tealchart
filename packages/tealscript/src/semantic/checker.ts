@@ -576,6 +576,72 @@ interface BuiltinSignature {
 
 const MAX_VARIADIC_SIGNATURE_INDEX = 1000;
 
+const LINE_NEW_COORDINATE_SIGNATURE: BuiltinSignature = {
+  params: ['x1', 'y1', 'x2', 'y2', 'xloc', 'extend', 'color', 'style', 'width', 'force_overlay'],
+  minArgs: 4,
+  maxArgs: 10,
+  allowNamedPrefixWithPositional: true,
+};
+
+const LINE_NEW_POINT_SIGNATURE: BuiltinSignature = {
+  params: ['first_point', 'second_point', 'xloc', 'extend', 'color', 'style', 'width', 'force_overlay'],
+  minArgs: 2,
+  maxArgs: 8,
+  allowNamedPrefixWithPositional: true,
+};
+
+const BOX_NEW_COORDINATE_SIGNATURE: BuiltinSignature = {
+  params: [
+    'left',
+    'top',
+    'right',
+    'bottom',
+    'border_color',
+    'border_width',
+    'border_style',
+    'extend',
+    'xloc',
+    'bgcolor',
+    'text',
+    'text_size',
+    'text_color',
+    'text_halign',
+    'text_valign',
+    'text_wrap',
+    'text_font_family',
+    'force_overlay',
+    'text_formatting',
+  ],
+  minArgs: 4,
+  maxArgs: 19,
+  allowNamedPrefixWithPositional: true,
+};
+
+const BOX_NEW_POINT_SIGNATURE: BuiltinSignature = {
+  params: [
+    'top_left',
+    'bottom_right',
+    'border_color',
+    'border_width',
+    'border_style',
+    'extend',
+    'xloc',
+    'bgcolor',
+    'text',
+    'text_size',
+    'text_color',
+    'text_halign',
+    'text_valign',
+    'text_wrap',
+    'text_font_family',
+    'force_overlay',
+    'text_formatting',
+  ],
+  minArgs: 2,
+  maxArgs: 17,
+  allowNamedPrefixWithPositional: true,
+};
+
 const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['alert', { params: ['message', 'freq'], minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['alertcondition', { params: ['condition', 'title', 'message'], minArgs: 1, allowNamedPrefixWithPositional: true }],
@@ -667,43 +733,11 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['line.get_price', { params: ['id', 'x'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   [
     'line.new',
-    {
-      params: ['x1', 'y1', 'x2', 'y2', 'xloc', 'extend', 'color', 'style', 'width', 'force_overlay', 'first_point', 'second_point'],
-      minArgs: 2,
-      maxArgs: 10,
-      allowNamedPrefixWithPositional: true,
-    },
+    LINE_NEW_COORDINATE_SIGNATURE,
   ],
   [
     'box.new',
-    {
-      params: [
-        'left',
-        'top',
-        'right',
-        'bottom',
-        'border_color',
-        'border_width',
-        'border_style',
-        'extend',
-        'xloc',
-        'bgcolor',
-        'text',
-        'text_size',
-        'text_color',
-        'text_halign',
-        'text_valign',
-        'text_wrap',
-        'text_font_family',
-        'force_overlay',
-        'text_formatting',
-        'top_left',
-        'bottom_right',
-      ],
-      minArgs: 2,
-      maxArgs: 19,
-      allowNamedPrefixWithPositional: true,
-    },
+    BOX_NEW_COORDINATE_SIGNATURE,
   ],
   ['box.delete', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['box.copy', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
@@ -2827,7 +2861,7 @@ class SemanticChecker {
 
   private checkCallExpression(expression: CallExpression, scope: SemanticScope): void {
     this.checkCallee(expression.callee, scope);
-    this.checkBuiltinSignature(expression);
+    this.checkBuiltinSignature(expression, scope);
     this.checkUdtConstructorSignature(expression, scope);
     this.checkArrayConstructorTypeArguments(expression);
     this.checkMatrixConstructorTypeArguments(expression);
@@ -2986,9 +3020,9 @@ class SemanticChecker {
     );
   }
 
-  private checkBuiltinSignature(expression: CallExpression): void {
+  private checkBuiltinSignature(expression: CallExpression, scope: SemanticScope): void {
     const displayName = this.memberPath(expression.callee).join('.');
-    const signature = BUILTIN_SIGNATURES.get(displayName);
+    const signature = this.resolveBuiltinSignature(displayName, expression, scope);
     if (!signature) {
       this.checkUnsupportedBuiltinNamespaceCall(expression, displayName);
       return;
@@ -2998,6 +3032,35 @@ class SemanticChecker {
     this.checkArgumentNames(expression.arguments, signature, displayName);
     this.checkArgumentCount(expression.arguments, signature, displayName);
     this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName);
+  }
+
+  private resolveBuiltinSignature(displayName: string, expression: CallExpression, scope: SemanticScope): BuiltinSignature | undefined {
+    if (displayName === 'line.new') {
+      return this.usesLinePointOverload(expression, scope) ? LINE_NEW_POINT_SIGNATURE : LINE_NEW_COORDINATE_SIGNATURE;
+    }
+    if (displayName === 'box.new') {
+      return this.usesBoxPointOverload(expression, scope) ? BOX_NEW_POINT_SIGNATURE : BOX_NEW_COORDINATE_SIGNATURE;
+    }
+    return BUILTIN_SIGNATURES.get(displayName);
+  }
+
+  private usesLinePointOverload(expression: CallExpression, scope: SemanticScope): boolean {
+    const suppliedNames = new Set(expression.arguments.flatMap((arg) => arg.name ? [arg.name.name] : []));
+    if (suppliedNames.has('first_point') || suppliedNames.has('second_point')) return true;
+    return this.leadingArgumentTypes(expression, scope, 2).some((type) => type.kind === 'chart.point');
+  }
+
+  private usesBoxPointOverload(expression: CallExpression, scope: SemanticScope): boolean {
+    const suppliedNames = new Set(expression.arguments.flatMap((arg) => arg.name ? [arg.name.name] : []));
+    if (suppliedNames.has('top_left') || suppliedNames.has('bottom_right')) return true;
+    return this.leadingArgumentTypes(expression, scope, 2).some((type) => type.kind === 'chart.point');
+  }
+
+  private leadingArgumentTypes(expression: CallExpression, scope: SemanticScope, count: number): SemanticType[] {
+    return expression.arguments
+      .filter((arg) => !arg.name)
+      .slice(0, count)
+      .map((arg) => this.inferExpressionType(arg.value, scope));
   }
 
   private checkUnsupportedBuiltinNamespaceCall(expression: CallExpression, displayName: string): void {
