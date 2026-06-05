@@ -160,9 +160,10 @@ support generated indicators that assemble labels, table text, and debug
 strings. `str.format()` supports Pine-style numeric placeholder modifiers for
 decimal masks, integer, currency, and percent output, while
 `str.format_time()` supports month-name `MMM`/`MMMM`, weekday-name `E`/`EEEE`,
-fractional-second `S`/`SS`/`SSS`, 12-hour `h`/`hh`, and AM/PM `a` tokens.
-Semantic analysis preserves known string helper return types for downstream
-assignment diagnostics, including `str.split()` array element types.
+day-of-year `D`/`DD`/`DDD`, fractional-second `S`/`SS`/`SSS`, 12-hour
+`h`/`hh`, and AM/PM `a` tokens. Semantic analysis preserves known string helper
+return types for downstream assignment diagnostics, including `str.split()`
+array element types.
 
 ## Common `input.*` Coverage
 
