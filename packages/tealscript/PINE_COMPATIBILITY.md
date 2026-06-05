@@ -39,8 +39,9 @@ new behavior and, at checkpoint boundaries, add reduced smoke fixtures inspired
 by real Pine examples from official docs or public indicator idioms.
 The current real-idiom checkpoint suite covers official built-ins, barstate plus
 arrays, bar coloring, alerts, strategy entry/exit flows, request-limit reuse,
-official lower-timeframe request arrays, official synthetic ticker requests, and
-public MTF, divergence, and session-filter idioms.
+explicit `max_bars_back` metadata, official lower-timeframe request arrays,
+official synthetic ticker requests, and public MTF, divergence, and
+session-filter idioms.
 
 ## Current Matrix
 
@@ -665,9 +666,12 @@ feeds are tracked in [`STRATEGY_INTRABAR_DESIGN.md`](./STRATEGY_INTRABAR_DESIGN.
 ## `max_bars_back` Declaration Coverage
 
 `indicator(..., max_bars_back=N)` is parsed and recorded on execution results
-as `indicatorMaxBarsBack`. Values must be finite, non-negative integers. The
-runtime still keeps full loaded history and does not infer or enforce Pine's
-history buffer sizing rules yet.
+as `indicatorMaxBarsBack`. Values must be finite, non-negative integers.
+Explicit history references that exceed the declared bound produce runtime
+errors, while in-range references remain available over loaded history. The
+runtime still does not infer Pine's history buffer sizing rules for scripts
+without an explicit declaration. The checkpoint corpus tracks an official
+`max_bars_back` bounded-history fixture.
 
 ## Common Drawing Object Coverage
 

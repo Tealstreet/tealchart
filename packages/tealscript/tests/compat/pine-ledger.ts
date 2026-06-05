@@ -47,6 +47,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: officialDocsEntry({
+      id: 'official-max-bars-back-checkpoint',
+      title: 'Official Max Bars Back Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/error-messages/',
+      featureTags: ['runtime', 'history', 'max_bars_back'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
       id: 'official-barcolor-checkpoint',
       title: 'Official Barcolor Checkpoint',
       url: 'https://www.tradingview.com/pine-script-docs/visuals/bar-coloring/',
