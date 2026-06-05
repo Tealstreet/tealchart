@@ -57,6 +57,7 @@ fixtures by default.
 | `Public Session Filter Checkpoint` | https://www.tradingview.com/scripts/search/session%20filter/ | Session membership gates a raw signal. | Session mask and filtered signal over `compatibilityBars`. |
 | `Public Session State Checkpoint` | https://www.tradingview.com/scripts/search/session%20ismarket/ | Exchange session-state helpers gate premarket, regular, and postmarket logic from host session metadata. | Premarket, market, postmarket, and extended-active state over local bars. |
 | `Public Object Method Checkpoint` | https://www.tradingview.com/scripts/search/market%20structure%20object/ | Persistent UDT state is updated through a user-defined method when confirmed pivot highs appear. | Pivot count, last high, and rising-pivot state over `compatibilityBars`. |
+| `Public Drawing Zone Checkpoint` | https://www.tradingview.com/scripts/search/supply%20demand%20zones/ | Persistent supply/demand zone drawings update a box and midline from recent swing ranges. | Final zone bounds, midpoint plot, box payload, and right-extended midline payload over `compatibilityBars`. |
 
 ## Checkpoint Coverage Index
 
@@ -88,7 +89,7 @@ idioms rather than isolated unit coverage.
 | Strategy broker flows | `Official Strategy Checkpoint`; `Official Broker Emulator Path Checkpoint`; `Official Bar Magnifier Checkpoint`; `Official Stop Limit Checkpoint`; `Official Immediate Close Checkpoint`; `Official Disable Alert Checkpoint`; `Official Allow Entry In Checkpoint`; `Official Recalculate After Fill Checkpoint`; `Official Calc On Every Tick Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Limits and request-context reuse | `Official Request Limit Checkpoint` | `pine-real-checkpoints.test.ts` |
 | User-defined objects | `Public Object Method Checkpoint`; reduced official object idioms | `pine-real-checkpoints.test.ts`; `pine-objects.test.ts` |
-| Drawings and tables | Manual comparison milestones plus reduced drawing fixtures | `PINE_CHECKPOINTS.md`; `pine-drawings.test.ts` |
+| Drawings and tables | `Public Drawing Zone Checkpoint`; manual comparison milestones plus reduced drawing fixtures | `pine-real-checkpoints.test.ts`; `PINE_CHECKPOINTS.md`; `pine-drawings.test.ts` |
 
 ## Adding A Checkpoint
 
