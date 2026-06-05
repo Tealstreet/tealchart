@@ -1288,6 +1288,29 @@ plot(strategy.closedtrades)`;
       ]);
     });
 
+    it('suppresses strategy order-fill alerts when disable_alert is true', () => {
+      const script = `//@version=6
+strategy("Suppressed fill alerts", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1, alert_message="entry suppressed", disable_alert=true)
+if bar_index == 1
+    strategy.close("Long", alert_message="close suppressed", disable_alert=true)
+plot(strategy.closedtrades)`;
+
+      const result = executeScript(parse(script), createBars(2));
+
+      expect(result.errors).toEqual([]);
+      expect(result.alerts.find((alert) => alert.id === 'strategy_order_fills')).toBeUndefined();
+      expect(result.strategy.fills.map((fill) => ({
+        orderId: fill.orderId,
+        alertMessage: fill.alertMessage,
+        disableAlert: fill.disableAlert,
+      }))).toEqual([
+        { orderId: 'Long', alertMessage: 'entry suppressed', disableAlert: true },
+        { orderId: 'Close Long', alertMessage: 'close suppressed', disableAlert: true },
+      ]);
+    });
+
     it('does not emit strategy order-fill alerts without alert_message fields', () => {
       const script = `//@version=6
 strategy("No fill alerts", process_orders_on_close=true)

@@ -840,7 +840,8 @@ ids, comments, prices, bars/times, signed size, gross profit, profit percent,
 commission, maximum run-up, and maximum drawdown with percent variants.
 Closed-trade outcome counters `strategy.wintrades`, `strategy.losstrades`, and
 `strategy.eventrades` are available. Filled strategy orders with
-`alert_message` emit `strategy_order_fills` alert events.
+`alert_message` emit `strategy_order_fills` alert events unless their
+`disable_alert` argument is true.
 
 ## Common Alerts Coverage
 
