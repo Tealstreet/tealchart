@@ -565,6 +565,27 @@ plot(
     ]);
   });
 
+  it('runs Pine-style wrapped generic constructors', () => {
+    const result = runCompatScript(`
+indicator("Wrapped Generics")
+array<
+    float
+> values = array.new<
+    float
+>(
+    2,
+    1.5
+)
+plot(
+    array.get(values, 0) + array.get(values, 1),
+    title="Wrapped Generic Sum"
+)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Wrapped Generic Sum').values)).toEqual(Array(compatibilityBars.length).fill(3));
+  });
+
   it('runs Pine-style leading postfix continuations', () => {
     const result = runCompatScript(`
 indicator("Postfix Continuation")
