@@ -3229,6 +3229,8 @@ class SemanticChecker {
     this.checkNonEmptyLiteralStringArgument(expression, 'id', 0, 'strategy.exit id must not be empty');
     this.checkPositiveLiteralNumberArgument(expression, 'qty', 2, 'strategy.exit qty must be a positive number');
     this.checkPositiveLiteralNumberArgument(expression, 'qty_percent', 3, 'strategy.exit qty_percent must be a positive number');
+    this.checkPositiveLiteralNumberArgument(expression, 'profit', 4, 'strategy.exit profit must be a positive number');
+    this.checkPositiveLiteralNumberArgument(expression, 'loss', 6, 'strategy.exit loss must be a positive number');
     this.checkNonNegativeLiteralNumberArgument(expression, 'trail_points', 9, 'strategy.exit trail_points must be a non-negative number');
     this.checkPositiveLiteralNumberArgument(expression, 'trail_offset', 10, 'strategy.exit trailing stop offset must be positive');
   }

@@ -5497,8 +5497,12 @@ export class TealscriptEngine {
       return undefined;
     }
 
-    const limitPrice = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 5));
-    const stopPrice = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 7));
+    const profitTicks = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 4));
+    const lossTicks = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 6));
+    const limitPrice = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 5))
+      ?? this.resolveStrategyExitOffsetPrice(direction, matchingTrades, profitTicks, 'profit');
+    const stopPrice = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 7))
+      ?? this.resolveStrategyExitOffsetPrice(direction, matchingTrades, lossTicks, 'loss');
     const trailPrice = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 8));
     const trailPoints = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 9));
     const trailOffset = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 10));
@@ -5600,6 +5604,40 @@ export class TealscriptEngine {
     if (!Number.isFinite(trailPoints) || trailPoints < 0) {
       throw new Error('strategy.exit trail_points must be a non-negative number');
     }
+    const entryPrice = this.resolveStrategyWeightedEntryPrice(trades);
+    if (entryPrice === undefined) {
+      return undefined;
+    }
+    return direction === 'long' ? entryPrice + trailPoints : entryPrice - trailPoints;
+  }
+
+  private resolveStrategyExitOffsetPrice(
+    direction: StrategyDirection,
+    trades: Array<{ entryPrice: number; qty?: number }>,
+    ticks: number | undefined,
+    kind: 'profit' | 'loss',
+  ): number | undefined {
+    if (ticks === undefined) {
+      return undefined;
+    }
+    if (!Number.isFinite(ticks) || ticks <= 0) {
+      throw new Error(`strategy.exit ${kind} must be a positive number`);
+    }
+    const entryPrice = this.resolveStrategyWeightedEntryPrice(trades);
+    if (entryPrice === undefined) {
+      return undefined;
+    }
+    const offset = ticks * this.ctx.syminfo.mintick;
+    if (!Number.isFinite(offset) || offset <= 0) {
+      throw new Error(`strategy.exit ${kind} offset must be positive`);
+    }
+    if (kind === 'profit') {
+      return direction === 'long' ? entryPrice + offset : entryPrice - offset;
+    }
+    return direction === 'long' ? entryPrice - offset : entryPrice + offset;
+  }
+
+  private resolveStrategyWeightedEntryPrice(trades: Array<{ entryPrice: number; qty?: number }>): number | undefined {
     let weightedTotal = 0;
     let totalQty = 0;
     let unweightedTotal = 0;
@@ -5611,15 +5649,11 @@ export class TealscriptEngine {
         totalQty += qty;
       }
     }
-    const entryPrice = totalQty > 0
+    return totalQty > 0
       ? weightedTotal / totalQty
       : trades.length > 0
         ? unweightedTotal / trades.length
         : undefined;
-    if (entryPrice === undefined) {
-      return undefined;
-    }
-    return direction === 'long' ? entryPrice + trailPoints : entryPrice - trailPoints;
   }
 
   private strategyExitOcaName(id: string, fromEntry: string | undefined): string {

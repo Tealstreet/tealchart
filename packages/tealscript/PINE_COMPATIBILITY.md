@@ -809,8 +809,11 @@ Basic open/closed trade counters are maintained as fixed-size market fills
 change exposure. Open trades are marked to market from current OHLC, updating
 `strategy.openprofit`, `strategy.equity`, and trade-level maximum run-up and
 drawdown snapshots. Price-based `strategy.exit()` limit/stop brackets are
-recorded as pending exit orders. Pending limit/stop orders fill on later bars
-when OHLC crosses their trigger price, and bracket siblings cancel through OCA.
+recorded as pending exit orders. Profit/loss tick-distance exits are translated
+from the matching weighted entry price into limit/stop brackets, with absolute
+limit/stop prices taking precedence. Pending limit/stop orders fill on later
+bars when OHLC crosses their trigger price, and bracket siblings cancel through
+OCA.
 `strategy.entry()` and `strategy.order()` stop-limit orders activate after their
 stop price is crossed, then fill as limit orders on later execution ticks when
 the ordered broker path reaches the limit price. Fixed, cash, and
