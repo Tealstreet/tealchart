@@ -4443,17 +4443,21 @@ plot(redChannel + inputTransparency + seriesBlue)
 indicator("Chart Return Types")
 bg = chart.bg_color
 fg = chart.fg_color
+leftVisible = chart.left_visible_bar_time
+rightVisible = chart.right_visible_bar_time
 standard = chart.is_standard
 renko = chart.is_renko
 heikin = chart.is_heikinashi
 lineBreak = chart.is_linebreak
 bg := 1
 fg := 2
+leftVisible := "bad"
+rightVisible := "bad"
 standard := "bad"
 renko := "bad"
 heikin := "bad"
 lineBreak := "bad"
-plot((standard ? 1 : 0) + (renko ? 1 : 0) + (heikin ? 1 : 0) + (lineBreak ? 1 : 0))
+plot(leftVisible + rightVisible + (standard ? 1 : 0) + (renko ? 1 : 0) + (heikin ? 1 : 0) + (lineBreak ? 1 : 0))
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -4461,6 +4465,8 @@ plot((standard ? 1 : 0) + (renko ? 1 : 0) + (heikin ? 1 : 0) + (lineBreak ? 1 : 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot assign int value to color variable bg',
       'Cannot assign int value to color variable fg',
+      'Cannot assign string value to int variable leftVisible',
+      'Cannot assign string value to int variable rightVisible',
       'Cannot assign string value to bool variable standard',
       'Cannot assign string value to bool variable renko',
       'Cannot assign string value to bool variable heikin',
@@ -4468,6 +4474,8 @@ plot((standard ? 1 : 0) + (renko ? 1 : 0) + (heikin ? 1 : 0) + (lineBreak ? 1 : 
     ]);
     expect(types.get('bg')).toMatchObject({ kind: 'color', qualifier: 'simple' });
     expect(types.get('fg')).toMatchObject({ kind: 'color', qualifier: 'simple' });
+    expect(types.get('leftVisible')).toMatchObject({ kind: 'int', qualifier: 'input' });
+    expect(types.get('rightVisible')).toMatchObject({ kind: 'int', qualifier: 'input' });
     expect(types.get('standard')).toMatchObject({ kind: 'bool', qualifier: 'simple' });
     expect(types.get('renko')).toMatchObject({ kind: 'bool', qualifier: 'simple' });
     expect(types.get('heikin')).toMatchObject({ kind: 'bool', qualifier: 'simple' });
