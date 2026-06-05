@@ -1931,8 +1931,20 @@ export class TealscriptEngine {
         return this.ctx.ohlc4;
       case 'ta.obv':
         return this.updateObv(this.ctx.close.get(0)!, this.ctx.close.get(1), this.ctx.volume.get(0)!, this.scope, '_ta_obv_value');
+      case 'ta.iii':
+        return this.currentIntradayIntensityIndex();
+      case 'ta.nvi':
+        return this.updateNegativeVolumeIndex(this.scope, '_ta_nvi_value');
+      case 'ta.pvi':
+        return this.updatePositiveVolumeIndex(this.scope, '_ta_pvi_value');
+      case 'ta.pvt':
+        return this.updatePriceVolumeTrend(this.scope, '_ta_pvt_value');
       case 'ta.tr':
         return this.currentTrueRange(false);
+      case 'ta.wad':
+        return this.updateWilliamsAccumulationDistribution(this.scope, '_ta_wad_value');
+      case 'ta.wvad':
+        return this.currentWilliamsVariableAccumulationDistribution();
       case 'chart':
         return this.ctx.chart;
     }
@@ -4023,6 +4035,42 @@ export class TealscriptEngine {
       throw new Error(`Unknown identifier: ${name}`);
     }
 
+    if (expr.object.type === 'MemberExpression') {
+      const memberPath = this.getMemberPath(expr.object);
+      const name = memberPath?.join('.');
+      switch (name) {
+        case 'ta.iii':
+          this.checkHistoryOffset(offset);
+          return this.naIfMissing(this.intradayIntensityIndex(offset));
+        case 'ta.nvi':
+          this.checkHistoryOffset(offset);
+          this.updateNegativeVolumeIndex(this.scope, '_ta_nvi_value');
+          return this.naIfMissing(this.scope.getWithOffset('_ta_nvi_value', offset));
+        case 'ta.obv':
+          this.checkHistoryOffset(offset);
+          this.updateObv(this.ctx.close.get(0)!, this.ctx.close.get(1), this.ctx.volume.get(0)!, this.scope, '_ta_obv_value');
+          return this.naIfMissing(this.scope.getWithOffset('_ta_obv_value', offset));
+        case 'ta.pvi':
+          this.checkHistoryOffset(offset);
+          this.updatePositiveVolumeIndex(this.scope, '_ta_pvi_value');
+          return this.naIfMissing(this.scope.getWithOffset('_ta_pvi_value', offset));
+        case 'ta.pvt':
+          this.checkHistoryOffset(offset);
+          this.updatePriceVolumeTrend(this.scope, '_ta_pvt_value');
+          return this.naIfMissing(this.scope.getWithOffset('_ta_pvt_value', offset));
+        case 'ta.tr':
+          this.checkHistoryOffset(offset);
+          return this.naIfMissing(this.trueRange(offset, false));
+        case 'ta.wad':
+          this.checkHistoryOffset(offset);
+          this.updateWilliamsAccumulationDistribution(this.scope, '_ta_wad_value');
+          return this.naIfMissing(this.scope.getWithOffset('_ta_wad_value', offset));
+        case 'ta.wvad':
+          this.checkHistoryOffset(offset);
+          return this.naIfMissing(this.williamsVariableAccumulationDistribution(offset));
+      }
+    }
+
     // Array index access
     const obj = this.evaluateExpression(expr.object);
     if (Array.isArray(obj) || isPineArray(obj)) {
@@ -4111,6 +4159,107 @@ export class TealscriptEngine {
     this.setBuiltinState(scope, key, obv);
     this.setBuiltinState(scope, barKey, this.ctx.bar_index);
     return obv;
+  }
+
+  private updateBarCachedNumericState(scope: Scope, key: string, initialValue: number, nextValue: (previous: number) => number): number {
+    const barKey = `${key}_bar_index`;
+    const existing = scope.get(key) as number | undefined;
+    if (scope.get(barKey) === this.ctx.bar_index && existing !== undefined) {
+      return existing;
+    }
+
+    const previous = existing ?? initialValue;
+    const next = nextValue(previous);
+    this.setBuiltinState(scope, key, next);
+    this.setBuiltinState(scope, barKey, this.ctx.bar_index);
+    return next;
+  }
+
+  private currentIntradayIntensityIndex(): number {
+    return this.intradayIntensityIndex(0);
+  }
+
+  private intradayIntensityIndex(offset: number): number {
+    const high = this.ctx.high.get(offset);
+    const low = this.ctx.low.get(offset);
+    const close = this.ctx.close.get(offset);
+    const volume = this.ctx.volume.get(offset);
+    if (high === undefined || low === undefined || close === undefined || volume === undefined) return Number.NaN;
+    const range = high - low;
+    return range === 0 ? Number.NaN : ((2 * close - high - low) / range) * volume;
+  }
+
+  private currentWilliamsVariableAccumulationDistribution(): number {
+    return this.williamsVariableAccumulationDistribution(0);
+  }
+
+  private williamsVariableAccumulationDistribution(offset: number): number {
+    const open = this.ctx.open.get(offset);
+    const high = this.ctx.high.get(offset);
+    const low = this.ctx.low.get(offset);
+    const close = this.ctx.close.get(offset);
+    const volume = this.ctx.volume.get(offset);
+    if (open === undefined || high === undefined || low === undefined || close === undefined || volume === undefined) return Number.NaN;
+    const range = high - low;
+    return range === 0 ? Number.NaN : ((close - open) / range) * volume;
+  }
+
+  private updateNegativeVolumeIndex(scope: Scope, key: string): number {
+    return this.updateVolumeIndex(scope, key, (volume, previousVolume) => volume < previousVolume);
+  }
+
+  private updatePositiveVolumeIndex(scope: Scope, key: string): number {
+    return this.updateVolumeIndex(scope, key, (volume, previousVolume) => volume > previousVolume);
+  }
+
+  private updateVolumeIndex(scope: Scope, key: string, shouldUpdate: (volume: number, previousVolume: number) => boolean): number {
+    return this.updateBarCachedNumericState(scope, key, 1, (previous) => {
+      const close = this.ctx.close.get(0);
+      const previousClose = this.ctx.close.get(1);
+      const volume = this.ctx.volume.get(0);
+      const previousVolume = this.ctx.volume.get(1);
+      if (
+        close === undefined
+        || previousClose === undefined
+        || previousClose === 0
+        || volume === undefined
+        || previousVolume === undefined
+        || !shouldUpdate(volume, previousVolume)
+      ) {
+        return previous;
+      }
+      return previous + ((close - previousClose) / previousClose) * previous;
+    });
+  }
+
+  private updatePriceVolumeTrend(scope: Scope, key: string): number {
+    return this.updateBarCachedNumericState(scope, key, 0, (previous) => {
+      const close = this.ctx.close.get(0);
+      const previousClose = this.ctx.close.get(1);
+      const volume = this.ctx.volume.get(0);
+      if (close === undefined || previousClose === undefined || previousClose === 0 || volume === undefined) {
+        return previous;
+      }
+      return previous + volume * ((close - previousClose) / previousClose);
+    });
+  }
+
+  private updateWilliamsAccumulationDistribution(scope: Scope, key: string): number {
+    return this.updateBarCachedNumericState(scope, key, 0, (previous) => {
+      const high = this.ctx.high.get(0);
+      const low = this.ctx.low.get(0);
+      const close = this.ctx.close.get(0);
+      const previousClose = this.ctx.close.get(1);
+      if (high === undefined || low === undefined || close === undefined || previousClose === undefined) return previous;
+
+      let change = 0;
+      if (close > previousClose) {
+        change = close - Math.min(low, previousClose);
+      } else if (close < previousClose) {
+        change = close - Math.max(high, previousClose);
+      }
+      return previous + change;
+    });
   }
 
   private readArrayElement(array: unknown, index: number): unknown {
@@ -8256,6 +8405,13 @@ export class TealscriptEngine {
       this.setBuiltinState(scope, key, total);
       return total;
     });
+
+    this.builtins.set('ta.iii', (_args, _namedArgs, _ctx) => this.currentIntradayIntensityIndex());
+    this.builtins.set('ta.nvi', (_args, _namedArgs, _ctx, scope) => this.updateNegativeVolumeIndex(scope, '_ta_nvi_value'));
+    this.builtins.set('ta.pvi', (_args, _namedArgs, _ctx, scope) => this.updatePositiveVolumeIndex(scope, '_ta_pvi_value'));
+    this.builtins.set('ta.pvt', (_args, _namedArgs, _ctx, scope) => this.updatePriceVolumeTrend(scope, '_ta_pvt_value'));
+    this.builtins.set('ta.wad', (_args, _namedArgs, _ctx, scope) => this.updateWilliamsAccumulationDistribution(scope, '_ta_wad_value'));
+    this.builtins.set('ta.wvad', (_args, _namedArgs, _ctx) => this.currentWilliamsVariableAccumulationDistribution());
 
     // VWAP - Volume Weighted Average Price
     // Note: Simplified version - doesn't reset at session boundaries

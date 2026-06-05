@@ -227,6 +227,7 @@ const TA_FLOAT_RETURN_NAMES = new Set([
 ]);
 const TA_SOURCE_RETURN_NAMES = new Set(['ta.range', 'ta.median', 'ta.mode', 'ta.mom']);
 const TA_DEFAULT_SOURCE_RETURN_NAMES = new Set(['ta.highest', 'ta.lowest']);
+const TA_FLOAT_MEMBER_NAMES = new Set(['ta.iii', 'ta.nvi', 'ta.obv', 'ta.pvi', 'ta.pvt', 'ta.tr', 'ta.wad', 'ta.wvad']);
 
 const TIMEFRAME_BOOL_MEMBER_NAMES = new Set([
   'timeframe.isdaily',
@@ -3787,6 +3788,10 @@ class SemanticChecker {
           const strategyType = this.inferStrategyMemberType(expression);
           if (strategyType) return strategyType;
         }
+        if (expression.object.type === 'Identifier' && expression.object.name === 'ta') {
+          const taMemberType = this.inferTaMemberType(expression);
+          if (taMemberType) return taMemberType;
+        }
         const drawingAllType = this.inferDrawingAllMemberType(expression);
         if (drawingAllType) return drawingAllType;
         if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
@@ -4742,6 +4747,8 @@ class SemanticChecker {
     if (strategyType) return strategyType;
     const drawingAllType = this.inferDrawingAllMemberType(expression);
     if (drawingAllType) return drawingAllType;
+    const taMemberType = this.inferTaMemberType(expression);
+    if (taMemberType) return taMemberType;
     const enumType = this.inferEnumMemberType(expression, scope);
     if (enumType) return enumType;
 
@@ -4755,6 +4762,11 @@ class SemanticChecker {
   private inferDrawingAllMemberType(expression: MemberExpression): SemanticType | undefined {
     const elementType = DRAWING_ALL_ELEMENT_TYPES.get(this.memberPath(expression).join('.'));
     return elementType ? { kind: 'array', elementType: { kind: elementType } } : undefined;
+  }
+
+  private inferTaMemberType(expression: MemberExpression): SemanticType | undefined {
+    const memberName = this.memberPath(expression).join('.');
+    return TA_FLOAT_MEMBER_NAMES.has(memberName) ? { kind: 'float', qualifier: 'series' } : undefined;
   }
 
   private inferTimeframeMemberType(expression: MemberExpression): SemanticType | undefined {
