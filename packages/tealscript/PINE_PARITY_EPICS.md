@@ -100,8 +100,9 @@ Known structural gaps:
 
 - The harness has a real-script intake ledger, offline pass-rate summaries, and
   a stable parse/semantic/runtime/data/output/render failure taxonomy. The
-  remaining gap is scaling the ledger with more public-script metadata and
-  producing a generated dashboard artifact in CI.
+  checkpoint corpus dashboard can now be generated as JSON/Markdown artifacts
+  for CI; the remaining evidence gap is scaling the ledger with more
+  public-script metadata.
 - Layout parsing still needs a general indentation/continuation model that can
   scale to arbitrary nested pasted Pine code.
 - Pine's qualified type system (`const < input < simple < series`) is partially

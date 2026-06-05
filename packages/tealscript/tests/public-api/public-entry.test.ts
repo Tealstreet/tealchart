@@ -16,6 +16,7 @@ import {
   currencyRateRequestKey,
   economicRequestKey,
   financialRequestKey,
+  formatPineCompatibilityCoverageJson,
   formatPineCompatibilityCoverageMarkdown,
   formatPineCompatibilityCorpusJson,
   formatPineCompatibilityCorpusMarkdown,
@@ -98,6 +99,7 @@ describe('public package entrypoints', () => {
     expect(corpusRun.summary.passed).toBe(1);
     expect(ledgerRun.summary.passed).toBe(1);
     expect(formatPineCompatibilityCorpusJson(corpusRun)).toContain('"summary"');
+    expect(formatPineCompatibilityCoverageJson(coverageIndex)).toContain('"total": 1');
     expect(formatPineCompatibilityCoverageMarkdown(coverageIndex)).toContain('Total checkpoints: 1');
     expect(formatPineCompatibilityCorpusMarkdown(corpusRun)).toContain('Pass rate: 100.0%');
     expect(validatePineScriptLedger(ledger)).toEqual({});
