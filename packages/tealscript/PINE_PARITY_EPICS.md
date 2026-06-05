@@ -160,8 +160,8 @@ Phases:
    libraries, alerts, screeners, and synthetic tickers. The current checkpoint
    corpus includes reduced public fixtures for MTF filters, divergence,
    session filters, exchange session-state gates, dashboard tables, custom
-   candles, drawing zones, screeners, library helpers, and UDT object-method
-   state.
+   candles, drawing zones, screeners, library helpers, public strategy stats
+   tables, and UDT object-method state.
    Strategy-bracket coverage includes official broker examples plus a reduced
    public fixed-bracket strategy fixture.
    Alert coverage includes official docs examples plus a reduced public signal
@@ -427,8 +427,8 @@ Phases:
 4. Add lower-timeframe path fills behind explicit host-provided intrabar data.
 5. Maintain bounded `calc_on_order_fills` recalculation coverage.
 6. Maintain `calc_on_every_tick` realtime strategy checkpoint coverage.
-7. Expand reduced TradingView checkpoint fixtures for bar magnifier and
-   recalculation examples.
+7. Expand reduced TradingView checkpoint fixtures for bar magnifier,
+   recalculation examples, and public strategy performance-table idioms.
 8. Defer Strategy Tester UI, exact report parity, synthetic backtest exactness,
    and performance polish until execution semantics are sound.
 
