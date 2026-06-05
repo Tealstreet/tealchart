@@ -601,14 +601,22 @@ function fillStrategyOrder(
 }
 
 function resolveStrategyFillSlippage(settings: StrategyLedgerSettings, order: StrategyOrder, mintick: number): number {
-  if (settings.slippageTicks === 0 || !Number.isFinite(mintick) || mintick <= 0) {
+  const slippageTicks = resolveStrategySlippageTicks(settings.slippageTicks);
+  if (slippageTicks === 0 || !Number.isFinite(mintick) || mintick <= 0) {
     return 0;
   }
   if (order.type !== 'market' && order.type !== 'stop' && order.type !== 'trailing_stop') {
     return 0;
   }
   const direction = order.direction === 'long' ? 1 : -1;
-  return settings.slippageTicks * mintick * direction;
+  return slippageTicks * mintick * direction;
+}
+
+function resolveStrategySlippageTicks(slippageTicks: number): number {
+  if (!Number.isFinite(slippageTicks) || slippageTicks <= 0) {
+    return 0;
+  }
+  return Math.floor(slippageTicks);
 }
 
 function resolveStrategyFillCommission(settings: StrategyLedgerSettings, qty: number, price: number): number {

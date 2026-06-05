@@ -463,6 +463,40 @@ describe('strategy ledger model', () => {
     });
   });
 
+  it('normalizes direct ledger slippage settings before fill math', () => {
+    const fractionalLedger = createStrategyLedger({ slippageTicks: 1.9 });
+    const fractionalOrder = submitStrategyOrder(fractionalLedger, {
+      id: 'Fractional',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      barIndex: 0,
+      time: 1,
+    });
+
+    expect(fillStrategyMarketOrder(fractionalLedger, fractionalOrder, 100, 0, 1, 0.25)).toMatchObject({
+      price: 100.25,
+      slippage: 0.25,
+    });
+
+    const negativeLedger = createStrategyLedger({ slippageTicks: -2 });
+    const negativeOrder = submitStrategyOrder(negativeLedger, {
+      id: 'Negative',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      barIndex: 0,
+      time: 1,
+    });
+
+    expect(fillStrategyMarketOrder(negativeLedger, negativeOrder, 100, 0, 1, 0.25)).toMatchObject({
+      price: 100,
+      slippage: 0,
+    });
+  });
+
   it('closes open trades when opposite market fills reduce exposure', () => {
     const ledger = createStrategyLedger();
     const entry = submitStrategyOrder(ledger, {
