@@ -328,6 +328,7 @@ const STRATEGY_FLOAT_MEMBER_NAMES = new Set([
   'strategy.max_runup',
   'strategy.netprofit',
   'strategy.openprofit',
+  'strategy.opentrades.capital_held',
   'strategy.position_avg_price',
   'strategy.position_size',
 ]);
