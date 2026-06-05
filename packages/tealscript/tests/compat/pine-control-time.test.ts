@@ -169,6 +169,7 @@ indicator("Chart Context")
 plot(color.r(chart.bg_color), title="Bg R")
 plot(color.g(chart.bg_color), title="Bg G")
 plot(color.b(chart.fg_color), title="Fg B")
+plot(chart.is_standard ? 1 : 0, title="Standard")
 plot(chart.is_renko ? 1 : 0, title="Renko")
 plot(chart.is_heikinashi ? 1 : 0, title="Heikin Ashi")
 plot(chart.is_linebreak ? 1 : 0, title="Line Break")
@@ -193,6 +194,7 @@ plot(chart.is_range ? 1 : 0, title="Range")
     expect(getPlot(result, 'Bg R').values).toEqual(allBars(16));
     expect(getPlot(result, 'Bg G').values).toEqual(allBars(32));
     expect(getPlot(result, 'Fg B').values).toEqual(allBars(239));
+    expect(getPlot(result, 'Standard').values).toEqual(allBars(0));
     expect(getPlot(result, 'Renko').values).toEqual(allBars(1));
     expect(getPlot(result, 'Heikin Ashi').values).toEqual(allBars(0));
     expect(getPlot(result, 'Line Break').values).toEqual(allBars(0));

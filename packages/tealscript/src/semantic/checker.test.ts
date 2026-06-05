@@ -4443,15 +4443,17 @@ plot(redChannel + inputTransparency + seriesBlue)
 indicator("Chart Return Types")
 bg = chart.bg_color
 fg = chart.fg_color
+standard = chart.is_standard
 renko = chart.is_renko
 heikin = chart.is_heikinashi
 lineBreak = chart.is_linebreak
 bg := 1
 fg := 2
+standard := "bad"
 renko := "bad"
 heikin := "bad"
 lineBreak := "bad"
-plot((renko ? 1 : 0) + (heikin ? 1 : 0) + (lineBreak ? 1 : 0))
+plot((standard ? 1 : 0) + (renko ? 1 : 0) + (heikin ? 1 : 0) + (lineBreak ? 1 : 0))
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -4459,12 +4461,14 @@ plot((renko ? 1 : 0) + (heikin ? 1 : 0) + (lineBreak ? 1 : 0))
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot assign int value to color variable bg',
       'Cannot assign int value to color variable fg',
+      'Cannot assign string value to bool variable standard',
       'Cannot assign string value to bool variable renko',
       'Cannot assign string value to bool variable heikin',
       'Cannot assign string value to bool variable lineBreak',
     ]);
     expect(types.get('bg')).toMatchObject({ kind: 'color', qualifier: 'simple' });
     expect(types.get('fg')).toMatchObject({ kind: 'color', qualifier: 'simple' });
+    expect(types.get('standard')).toMatchObject({ kind: 'bool', qualifier: 'simple' });
     expect(types.get('renko')).toMatchObject({ kind: 'bool', qualifier: 'simple' });
     expect(types.get('heikin')).toMatchObject({ kind: 'bool', qualifier: 'simple' });
     expect(types.get('lineBreak')).toMatchObject({ kind: 'bool', qualifier: 'simple' });
