@@ -37,6 +37,9 @@ Status values:
 For each major compatibility epic, add deterministic golden fixtures for the
 new behavior and, at checkpoint boundaries, add reduced smoke fixtures inspired
 by real Pine examples from official docs or public indicator idioms.
+The corpus harness treats omitted canonical stages as `not_run` failures in
+pass-rate summaries, while explicitly marked `skipped` stages are pass-neutral
+for cases that intentionally stop before datafeed or render comparison.
 The current real-idiom checkpoint suite covers official built-ins, barstate plus
 arrays, bar coloring, alerts, strategy entry/exit flows, request-limit reuse,
 explicit `max_bars_back` metadata, official lower-timeframe request arrays,

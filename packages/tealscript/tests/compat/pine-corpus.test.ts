@@ -161,6 +161,38 @@ describe('Pine compatibility checkpoint corpus', () => {
     });
   });
 
+  it('treats explicitly skipped stages as pass-neutral compatibility outcomes', () => {
+    const entry = compatibilityCheckpointLedger.entries[0]!;
+    const run = runPineCompatibilityCorpus([
+      {
+        ledgerEntry: entry,
+        stages: [
+          { stage: 'parse', status: 'passed' },
+          { stage: 'semantic', status: 'passed' },
+          { stage: 'runtime', status: 'passed' },
+          { stage: 'datafeed', status: 'skipped', message: 'deterministic local fixture' },
+          { stage: 'output', status: 'passed' },
+          { stage: 'render', status: 'skipped', message: 'manual visual comparison' },
+        ],
+      },
+    ]);
+    const markdown = formatPineCompatibilityCorpusMarkdown(run);
+
+    expect(run.outcomes[0]?.summary).toEqual({ passed: true });
+    expect(run.summary).toMatchObject({
+      total: 1,
+      passed: 1,
+      failed: 0,
+      byFirstFailureStage: {},
+      byFirstFailureClass: {},
+    });
+    expect(run.summary.byFeatureTag).toMatchObject({
+      builtins: { total: 1, passed: 1, failed: 0 },
+    });
+    expect(markdown).toContain('Pass rate: 100.0%');
+    expect(markdown).toContain('## First Failure Stages\n- None\n\n## First Failure Classes\n- None');
+  });
+
   it('builds a checkpoint coverage index from intake metadata', () => {
     const index = createPineCompatibilityCoverageIndex(compatibilityCheckpointLedger);
     const markdown = formatPineCompatibilityCoverageMarkdown(index);
