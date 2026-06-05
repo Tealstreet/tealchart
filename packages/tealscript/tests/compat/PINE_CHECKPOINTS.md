@@ -42,6 +42,7 @@ fixtures by default.
 | `Official Lower TF Array Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/other-timeframes-and-data/ | `request.security_lower_tf()` returns lower-timeframe expression values as ordered intrabar arrays. | Intrabar count, first value, and last value over local chart/request bars. |
 | `Official Ticker Request Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/non-standard-charts-data/ | Synthetic ticker IDs request extended-session and Heikin-Ashi data through `request.security()`. | Extended close, derived Heikin-Ashi close, and standardized ticker id length over local request bars. |
 | `Official Dynamic Session Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/sessions/ | Dynamic session strings combine `input.session()` values with day masks and feed `time()`. | Dynamic session mask and session string length over `compatibilityBars`. |
+| `Official Timeframe Comparison Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/timeframes/ | `input.timeframe()` and `timeframe.in_seconds()` compare chart and selected timeframe durations. | Chart minutes, input minutes, and valid-timeframe guard over `compatibilityBars`. |
 
 ## Public Idiom Checkpoints
 
@@ -75,6 +76,7 @@ idioms rather than isolated unit coverage.
 | Ticker request IDs | `Official Ticker Request Checkpoint`; ticker modifier fixtures in `pine-ticker.test.ts` | `pine-real-checkpoints.test.ts`; `pine-ticker.test.ts` |
 | Pivot/divergence idioms | `Public Divergence Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Session-gated signals | `Public Session Filter Checkpoint`; `Official Dynamic Session Checkpoint` | `pine-real-checkpoints.test.ts` |
+| Timeframe comparisons | `Official Timeframe Comparison Checkpoint`; timeframe utility fixtures in `pine-control-time.test.ts` | `pine-real-checkpoints.test.ts`; `pine-control-time.test.ts` |
 | Alerts and alert conditions | `Official Alert Checkpoint`; alert crossover fixture in `pine-visuals.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts` |
 | Strategy broker flows | `Official Strategy Checkpoint`; `Official Bar Magnifier Checkpoint`; `Official Recalculate After Fill Checkpoint`; `Official Calc On Every Tick Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Limits and request-context reuse | `Official Request Limit Checkpoint` | `pine-real-checkpoints.test.ts` |

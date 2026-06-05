@@ -158,6 +158,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     stages: passedThroughRuntime,
   },
   {
+    ledgerEntry: officialDocsEntry({
+      id: 'official-timeframe-comparison-checkpoint',
+      title: 'Official Timeframe Comparison Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/timeframes/',
+      featureTags: ['timeframes', 'inputs'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
     ledgerEntry: publicSearchEntry({
       id: 'public-mtf-trend-checkpoint',
       title: 'Public MTF Trend Checkpoint',
