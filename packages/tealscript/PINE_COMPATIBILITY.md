@@ -790,10 +790,10 @@ commissions are applied to fills and debited from strategy net profit/equity for
 `cash_per_contract` commission settings. Basic `strategy.opentrades.*`
 accessors are available for open trade entry id, entry price, entry bar/time,
 signed size, gross open profit, commission, maximum run-up, and maximum
-drawdown. Basic
+drawdown with percent variants. Basic
 `strategy.closedtrades.*` accessors are available for closed trade entry/exit
 ids, prices, bars/times, signed size, gross profit, commission, maximum run-up,
-and maximum drawdown.
+and maximum drawdown with percent variants.
 Closed-trade outcome counters `strategy.wintrades`, `strategy.losstrades`, and
 `strategy.eventrades` are available. Filled strategy orders with
 `alert_message` emit `strategy_order_fills` alert events.
