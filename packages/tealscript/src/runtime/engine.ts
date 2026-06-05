@@ -384,6 +384,7 @@ export class TealscriptEngine {
   private static readonly MAX_STRATEGY_ORDER_FILL_RECALCULATIONS = 20;
 
   private ctx: ExecutionContext;
+  private rootScope: Scope;
   private scope: Scope;
   private builtins: BuiltinRegistry;
   private typeDeclarations: Map<string, TypeDeclaration>;
@@ -421,7 +422,8 @@ export class TealscriptEngine {
 
   constructor(options: TealscriptEngineOptions = {}) {
     this.ctx = new ExecutionContext();
-    this.scope = createRootScope();
+    this.rootScope = createRootScope();
+    this.scope = this.rootScope;
     this.builtins = new Map();
     this.typeDeclarations = new Map();
     this.enumValues = new Map();
@@ -466,7 +468,8 @@ export class TealscriptEngine {
     this.errors = [];
     this.resetProfile();
     this.ctx.reset();
-    this.scope = createRootScope();
+    this.rootScope = createRootScope();
+    this.scope = this.rootScope;
     this.typeDeclarations.clear();
     this.enumValues.clear();
     this.functionScopes.clear();
@@ -491,6 +494,7 @@ export class TealscriptEngine {
     this.registerTypeDeclarations(ast);
     this.registerUserFunctions(ast);
     this.registerLibraryImports(ast);
+    this.registerLocalCallableCallSites(ast);
 
     this.ctx.setNow(this.getRuntimeNow());
 
@@ -1244,11 +1248,64 @@ export class TealscriptEngine {
         } else {
           this.userFunctions.set(stmt.name.name, stmt);
         }
-        if (!this.functionScopes.has(scopeKey)) {
-          this.functionScopes.set(scopeKey, this.scope.createChild());
-        }
+        this.ensureFunctionScope(scopeKey);
       }
     }
+  }
+
+  private registerLocalCallableCallSites(root: unknown): void {
+    const seen = new WeakSet<object>();
+    const visit = (node: unknown): void => {
+      if (!node || typeof node !== 'object') return;
+      if (seen.has(node)) return;
+      seen.add(node);
+
+      if (this.isNodeType(node, 'CallExpression')) {
+        const expr = node as CallExpression;
+        const directName = expr.callee.type === 'Identifier' ? expr.callee.name : undefined;
+        const methodName = expr.callee.type === 'MemberExpression' && expr.callee.property.type === 'Identifier'
+          ? expr.callee.property.name
+          : undefined;
+
+        if (directName) {
+          const fn = this.userFunctions.get(directName);
+          if (fn) {
+            this.ensureFunctionScope(this.callSiteFunctionScopeKey(fn, expr));
+          }
+        }
+
+        if (methodName) {
+          for (const method of this.userMethods.get(methodName) ?? []) {
+            this.ensureFunctionScope(this.callSiteFunctionScopeKey(method, expr));
+          }
+        }
+      }
+
+      for (const value of Object.values(node)) {
+        if (Array.isArray(value)) {
+          for (const item of value) {
+            visit(item);
+          }
+        } else if (value && typeof value === 'object') {
+          visit(value);
+        }
+      }
+    };
+
+    visit(root);
+  }
+
+  private isNodeType(node: object, type: string): boolean {
+    return 'type' in node && (node as { type?: unknown }).type === type;
+  }
+
+  private ensureFunctionScope(scopeKey: string): Scope {
+    const existing = this.functionScopes.get(scopeKey);
+    if (existing) return existing;
+
+    const functionScope = this.rootScope.createChild();
+    this.functionScopes.set(scopeKey, functionScope);
+    return functionScope;
   }
 
   private registerLibraryImports(ast: Program): void {
@@ -1278,9 +1335,7 @@ export class TealscriptEngine {
             }
           }
           const scopeKey = this.importedFunctionScopeKey(stmt.alias.name, libraryStmt);
-          if (!this.functionScopes.has(scopeKey)) {
-            this.functionScopes.set(scopeKey, this.scope.createChild());
-          }
+          this.ensureFunctionScope(scopeKey);
         }
         if (libraryStmt.type === 'TypeDeclaration') {
           types.set(libraryStmt.name.name, libraryStmt);
@@ -2074,14 +2129,15 @@ export class TealscriptEngine {
       const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs, receiver)
         ?? this.findReceiverMatchingUserMethod(funcName, receiver);
       if (userMethod) {
-        const scopeKey = this.userCallableScopeKey(userMethod);
+        const recursionKey = this.userCallableScopeKey(userMethod);
+        const scopeKey = this.callSiteFunctionScopeKey(userMethod, expr);
         return this.evaluateUserFunction(
           userMethod,
           [receiver, ...args],
           namedArgs,
           `method ${funcName}`,
           scopeKey,
-          scopeKey,
+          recursionKey,
           hasPositionalArgumentAfterNamed,
         );
       }
@@ -2131,14 +2187,15 @@ export class TealscriptEngine {
       const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs, receiver)
         ?? this.findReceiverMatchingUserMethod(funcName, receiver);
       if (userMethod) {
-        const scopeKey = this.userCallableScopeKey(userMethod);
+        const recursionKey = this.userCallableScopeKey(userMethod);
+        const scopeKey = this.callSiteFunctionScopeKey(userMethod, expr);
         return this.evaluateUserFunction(
           userMethod,
           [receiver, ...args],
           namedArgs,
           `method ${funcName}`,
           scopeKey,
-          scopeKey,
+          recursionKey,
           hasPositionalArgumentAfterNamed,
         );
       }
@@ -2173,14 +2230,15 @@ export class TealscriptEngine {
 
       const userFunction = this.userFunctions.get(funcName);
       if (userFunction) {
-        const scopeKey = this.userCallableScopeKey(userFunction);
+        const recursionKey = this.userCallableScopeKey(userFunction);
+        const scopeKey = this.callSiteFunctionScopeKey(userFunction, expr);
         return this.evaluateUserFunction(
           userFunction,
           args,
           namedArgs,
           `function ${userFunction.name.name}`,
           scopeKey,
-          scopeKey,
+          recursionKey,
           hasPositionalArgumentAfterNamed,
         );
       }
@@ -2220,6 +2278,13 @@ export class TealscriptEngine {
       ? `${fn.loc.start.line}:${fn.loc.start.column}-${fn.loc.end.line}:${fn.loc.end.column}`
       : `${fn.params.map((param) => param.typeAnnotation?.baseType ?? 'any').join(',')}#${fn.params.length}`;
     return `method:${fn.name.name}:${locKey}`;
+  }
+
+  private callSiteFunctionScopeKey(fn: FunctionDeclaration, expr: CallExpression): string {
+    const declarationKey = this.userCallableScopeKey(fn);
+    if (!expr.loc) return declarationKey;
+
+    return `${declarationKey}@call:${expr.loc.start.line}:${expr.loc.start.column}-${expr.loc.end.line}:${expr.loc.end.column}`;
   }
 
   private importedFunctionScopeKey(alias: string, fn: FunctionDeclaration): string {
@@ -2943,23 +3008,24 @@ export class TealscriptEngine {
     engine.importedLibraries = new Map(this.importedLibraries);
     engine.functionScopes.clear();
     for (const fn of engine.userFunctions.values()) {
-      engine.functionScopes.set(engine.userCallableScopeKey(fn), engine.scope.createChild());
+      engine.ensureFunctionScope(engine.userCallableScopeKey(fn));
     }
     for (const methods of engine.userMethods.values()) {
       for (const method of methods) {
-        engine.functionScopes.set(engine.userCallableScopeKey(method), engine.scope.createChild());
+        engine.ensureFunctionScope(engine.userCallableScopeKey(method));
       }
     }
     for (const [alias, library] of engine.importedLibraries) {
       for (const fn of library.functions.values()) {
-        engine.functionScopes.set(engine.importedFunctionScopeKey(alias, fn), engine.scope.createChild());
+        engine.ensureFunctionScope(engine.importedFunctionScopeKey(alias, fn));
       }
       for (const methods of library.methods.values()) {
         for (const method of methods) {
-          engine.functionScopes.set(engine.importedFunctionScopeKey(alias, method), engine.scope.createChild());
+          engine.ensureFunctionScope(engine.importedFunctionScopeKey(alias, method));
         }
       }
     }
+    engine.registerLocalCallableCallSites(expression);
 
     const values: unknown[] = [];
     while (engine.ctx.advanceBar()) {
@@ -3301,7 +3367,7 @@ export class TealscriptEngine {
     });
 
     const savedScope = this.scope;
-    const functionScope = this.functionScopes.get(scopeKey) ?? this.scope.createChild();
+    const functionScope = this.ensureFunctionScope(scopeKey);
     this.scope = functionScope;
     this.userFunctionCallStack.push(recursionKey);
 

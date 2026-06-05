@@ -1400,4 +1400,22 @@ plot(countCalls(), title="Function Counter")
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Function Counter').values)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
   });
+
+  it('keeps function-local var state isolated per call site', () => {
+    const result = runCompatScript(`
+indicator("Function call-site state")
+nextCount() =>
+    var counter = 0
+    counter += 1
+    counter
+first = nextCount()
+other = nextCount()
+plot(first, title="First Counter")
+plot(other, title="Second Counter")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'First Counter').values)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(roundSeries(getPlot(result, 'Second Counter').values)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
 });

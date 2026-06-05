@@ -143,6 +143,25 @@ plot(close.hits(10), title="Binary Hits")
     expect(getPlot(result, 'Binary Hits').values).toEqual([10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120]);
   });
 
+  it('keeps user-defined method var state isolated per call site', () => {
+    const result = runCompatScript(`
+indicator("Method call-site state")
+method hits(float this) =>
+    var count = 0
+    count += 1
+    count
+
+first = close.hits()
+other = close.hits()
+plot(first, title="First Method Hits")
+plot(other, title="Second Method Hits")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'First Method Hits').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(getPlot(result, 'Second Method Hits').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
   it('uses a compatible method overload when another overload has missing required parameters', () => {
     const result = runCompatScript(`
 indicator("Method required args")
