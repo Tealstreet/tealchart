@@ -1073,7 +1073,42 @@ FunctionUltraDeepNestedBlock
     }
 
 FunctionUltraDeepNestedStatement
-  = &FunctionUltraDeepNestedIndent FunctionUltraDeepNestedIndent stmt:Statement {
+  = &FunctionUltraDeepNestedIndent FunctionUltraDeepNestedIndent stmt:(FunctionUltraDeepNestedIfStatement / Statement) {
+      return stmt;
+    }
+
+FunctionUltraDeepNestedIfStatement
+  = "if" _ test:Expression _ LineTerminator consequent:FunctionMegaDeepNestedBlock alternate:FunctionUltraDeepNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+
+FunctionUltraDeepNestedElseClause
+  = FunctionUltraDeepNestedIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionMegaDeepNestedBlock alternate:FunctionUltraDeepNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / FunctionUltraDeepNestedIndent "else" _ LineTerminator? block:FunctionMegaDeepNestedBlock {
+      return block;
+    }
+
+FunctionMegaDeepNestedBlock
+  = statements:(BlockIgnorableLine / FunctionMegaDeepNestedStatement)+ {
+      return statements.filter(s => s !== null);
+    }
+
+FunctionMegaDeepNestedStatement
+  = &FunctionMegaDeepNestedIndent FunctionMegaDeepNestedIndent stmt:Statement {
       return stmt;
     }
 
@@ -1152,6 +1187,9 @@ FunctionUltraDeepNestedIndent
   / "\t\t\t        "
   / "\t\t\t    \t"
   / "\t\t\t\t    "
+
+FunctionMegaDeepNestedIndent
+  = Indent Indent Indent Indent Indent Indent
 
 SingleLineBody
   = stmt:(VariableDeclaration / AssignmentStatement / ExpressionStatement / BreakStatement / ContinueStatement) {
