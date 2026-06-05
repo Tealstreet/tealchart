@@ -985,6 +985,33 @@ plot(classify(close - open), title="Nested Score")
     expect(roundSeries(getPlot(result, 'Nested Score').values)).toEqual([3, 4, 3, 0, 0, 3, 4, 2, 0, 4, 0, 3]);
   });
 
+  it('runs fifth-level nested user-defined function branches', () => {
+    const result = runCompatScript(`
+indicator("UDF fifth-level branch")
+classify(value) =>
+    if value > 0
+        if value > 1
+            if value > 2
+                if value > 3
+                    if value > 4
+                        5
+                    else
+                        4
+                else
+                    3
+            else
+                2
+        else
+            1
+    else
+        0
+plot(classify(close - open), title="Fifth Nested Score")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Fifth Nested Score').values)).toEqual([2, 3, 2, 0, 0, 1, 4, 5, 0, 3, 0, 2]);
+  });
+
   it('keeps function-local variables scoped to the function call', () => {
     const result = runCompatScript(`
 indicator("UDF local scope")
