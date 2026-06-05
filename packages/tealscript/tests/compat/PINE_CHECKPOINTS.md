@@ -36,6 +36,7 @@ fixtures by default.
 | `Official Strategy Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/strategies/ | Default market entry filled at the next bar open, followed by a bracket `strategy.exit()` limit/stop order. | Position, closed-trade count, net profit, and closed trade ledger fields over four local bars with divergent signal-close/next-open prices. |
 | `Official Bar Magnifier Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/strategies/ | `use_bar_magnifier=true` consumes a host lower-timeframe execution path for same-chart-bar bracket ordering. | Lower-timeframe context metadata, closed-trade count, net profit, and limit-leg fill time over local bars. |
 | `Official Recalculate After Fill Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/strategies/ | `calc_on_order_fills=true` reruns the current historical bar after a pending fill and can submit a same-bar close order. | Final position, closed-trade count, recalc counter, closed trade ledger fields, and preserved order-fill alert event. |
+| `Official Calc On Every Tick Checkpoint` | https://www.tradingview.com/pine-script-docs/concepts/strategies/ | Default strategies skip unconfirmed realtime ticks, while `calc_on_every_tick=true` strategies recalculate on each realtime tick. | Default close plot stays historical on unconfirmed ticks; every-tick close plot appends and updates the realtime bar. |
 | `Official Request Limit Checkpoint` | https://www.tradingview.com/pine-script-docs/writing/limitations/ | Repeated identical `request.security()` calls inside a loop reuse one unique request context. | No runtime error, one request context in the runtime profile, and a deterministic zero request-sum plot. |
 
 ## Public Idiom Checkpoints
@@ -69,7 +70,7 @@ idioms rather than isolated unit coverage.
 | Pivot/divergence idioms | `Public Divergence Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Session-gated signals | `Public Session Filter Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Alerts and alert conditions | `Official Alert Checkpoint`; alert crossover fixture in `pine-visuals.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts` |
-| Strategy broker flows | `Official Strategy Checkpoint`; `Official Bar Magnifier Checkpoint`; `Official Recalculate After Fill Checkpoint` | `pine-real-checkpoints.test.ts` |
+| Strategy broker flows | `Official Strategy Checkpoint`; `Official Bar Magnifier Checkpoint`; `Official Recalculate After Fill Checkpoint`; `Official Calc On Every Tick Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Limits and request-context reuse | `Official Request Limit Checkpoint` | `pine-real-checkpoints.test.ts` |
 | User-defined objects | Reduced official object idioms | `pine-objects.test.ts` |
 | Drawings and tables | Manual comparison milestones plus reduced drawing fixtures | `PINE_CHECKPOINTS.md`; `pine-drawings.test.ts` |
