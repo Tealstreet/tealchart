@@ -195,6 +195,7 @@ export interface StrategyOrder {
   ocaType?: StrategyOcaType;
   comment?: string;
   alertMessage?: string;
+  disableAlert?: boolean;
   createdBarIndex: number;
   createdTime: number;
   activationBarIndex: number;
@@ -220,6 +221,7 @@ export interface StrategyOrderInput {
   ocaType?: StrategyOcaType;
   comment?: string;
   alertMessage?: string;
+  disableAlert?: boolean;
   barIndex: number;
   time: number;
 }
@@ -237,6 +239,7 @@ export interface StrategyFill {
   time: number;
   comment?: string;
   alertMessage?: string;
+  disableAlert?: boolean;
 }
 
 export interface StrategyPosition {
@@ -442,6 +445,7 @@ export function createStrategyOrder(input: StrategyOrderInput): StrategyOrder {
     ocaType: input.ocaType,
     comment: input.comment,
     alertMessage: input.alertMessage,
+    disableAlert: input.disableAlert,
     createdBarIndex: input.barIndex,
     createdTime: input.time,
     activationBarIndex: input.barIndex,
@@ -592,6 +596,7 @@ function fillStrategyOrder(
     time,
     comment: order.comment,
     alertMessage: order.alertMessage,
+    disableAlert: order.disableAlert,
   };
   ledger.fills.push(fill);
   applyStrategyCommission(ledger, commission);
