@@ -1223,6 +1223,43 @@ plot(strategy.netprofit)`;
       ]);
     });
 
+    it('fills strategy.close immediately on the current bar when requested', () => {
+      const script = `//@version=6
+strategy("Close immediately", process_orders_on_close=false)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.close("Long", immediately=true)
+plot(strategy.position_size)
+plot(strategy.closedtrades)`;
+
+      const bars = createBars(3);
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        avgFillPrice: order.avgFillPrice,
+        updatedBarIndex: order.updatedBarIndex,
+      }))).toEqual([
+        { id: 'Long', status: 'filled', avgFillPrice: bars[1].open, updatedBarIndex: 1 },
+        { id: 'Close Long', status: 'filled', avgFillPrice: bars[1].close, updatedBarIndex: 1 },
+      ]);
+      expect(result.strategy.closedTrades[0]).toMatchObject({
+        entryOrderId: 'Long',
+        exitOrderId: 'Close Long',
+        entryBarIndex: 1,
+        exitBarIndex: 1,
+        entryPrice: bars[1].open,
+        exitPrice: bars[1].close,
+      });
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [0, 0, 0],
+        [0, 1, 1],
+      ]);
+    });
+
     it('emits strategy order-fill alerts from alert_message fields', () => {
       const script = `//@version=6
 strategy("Fill alerts", process_orders_on_close=true)
@@ -1288,6 +1325,43 @@ plot(strategy.closedtrades)`;
         [2, 0],
         [1, 0],
         [0, 1],
+      ]);
+    });
+
+    it('fills strategy.close_all immediately on the current bar when requested', () => {
+      const script = `//@version=6
+strategy("Close all immediately", process_orders_on_close=false)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.close_all(immediately=true)
+plot(strategy.position_size)
+plot(strategy.closedtrades)`;
+
+      const bars = createBars(3);
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        avgFillPrice: order.avgFillPrice,
+        updatedBarIndex: order.updatedBarIndex,
+      }))).toEqual([
+        { id: 'Long', status: 'filled', avgFillPrice: bars[1].open, updatedBarIndex: 1 },
+        { id: 'Close All', status: 'filled', avgFillPrice: bars[1].close, updatedBarIndex: 1 },
+      ]);
+      expect(result.strategy.position.size).toBe(0);
+      expect(result.strategy.closedTrades[0]).toMatchObject({
+        entryOrderId: 'Long',
+        exitOrderId: 'Close All',
+        qty: 2,
+        entryBarIndex: 1,
+        exitBarIndex: 1,
+      });
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [0, 0, 0],
+        [0, 1, 1],
       ]);
     });
 

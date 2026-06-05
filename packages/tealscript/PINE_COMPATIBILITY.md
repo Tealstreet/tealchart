@@ -810,7 +810,10 @@ and `strategy.entry()` enforces same-direction pyramiding limits and expands
 opposite-direction entry transactions to reverse positions. The
 `strategy(..., slippage=...)` setting applies fixed tick slippage to market,
 stop, and trailing-stop fills in trade direction while preserving limit-fill
-prices. This is a deterministic broker emulator: chart-OHLC and host-provided
+prices. `strategy.close(..., immediately=true)` and
+`strategy.close_all(..., immediately=true)` fill on the current bar close even
+when `process_orders_on_close=false`. This is a deterministic broker emulator:
+chart-OHLC and host-provided
 lower-timeframe execution paths are consumed by pending order fills and exported
 as strategy metadata. The chart-OHLC fallback follows the official default
 broker-emulator path assumption, choosing open-high-low-close or
