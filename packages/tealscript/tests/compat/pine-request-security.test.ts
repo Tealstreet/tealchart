@@ -333,6 +333,45 @@ plot(aaplPeriodLen, title="AAPL Period Len")
     expect(getPlot(result, 'AAPL Period Len').values).toEqual([1, 1, 1, 1, 1, 1]);
   });
 
+  it('preserves main chart ticker IDs inside requested contexts', () => {
+    const result = runCompatScript(`
+indicator("Request ticker id metadata")
+aaplTickerLen = request.security("NASDAQ:AAPL", "2", str.length(syminfo.ticker), lookahead=barmerge.lookahead_on)
+aaplTickerIdLen = request.security("NASDAQ:AAPL", "2", str.length(syminfo.tickerid), lookahead=barmerge.lookahead_on)
+mainTickerIdLen = request.security("NASDAQ:AAPL", "2", str.length(syminfo.main_tickerid), lookahead=barmerge.lookahead_on)
+plot(aaplTickerLen, title="AAPL Ticker Len")
+plot(aaplTickerIdLen, title="AAPL Ticker ID Len")
+plot(mainTickerIdLen, title="Main Ticker ID Len")
+`, {
+      bars: chartBars,
+      engineOptions: {
+        requestDatafeed: new InMemoryRequestDatafeed([
+          {
+            symbol: 'NASDAQ:AAPL',
+            timeframe: '2',
+            bars: requestedBars,
+            syminfo: {
+              ticker: 'AAPL',
+              tickerid: 'NASDAQ:AAPL',
+              timezone: 'America/New_York',
+            },
+          },
+        ]),
+        runtime: {
+          syminfo: {
+            ticker: 'BTCUSDT',
+            tickerid: 'BINANCE:BTCUSDT',
+          },
+        },
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'AAPL Ticker Len').values).toEqual([4, 4, 4, 4, 4, 4]);
+    expect(getPlot(result, 'AAPL Ticker ID Len').values).toEqual([11, 11, 11, 11, 11, 11]);
+    expect(getPlot(result, 'Main Ticker ID Len').values).toEqual([15, 15, 15, 15, 15, 15]);
+  });
+
   it('evaluates session state helpers from the requested context', () => {
     const result = runCompatScript(`
 indicator("Request session state")
