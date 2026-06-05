@@ -16,9 +16,9 @@ describe('Pine compatibility checkpoint corpus', () => {
     const run = runPineCompatibilityCorpus(compatibilityCheckpointCorpus);
 
     expect(validatePineScriptLedger(compatibilityCheckpointLedger)).toEqual({});
-    expect(compatibilityCheckpointLedger.entries).toHaveLength(24);
-    expect(run.summary.total).toBe(24);
-    expect(run.summary.passed).toBe(24);
+    expect(compatibilityCheckpointLedger.entries).toHaveLength(25);
+    expect(run.summary.total).toBe(25);
+    expect(run.summary.passed).toBe(25);
     expect(run.summary.failed).toBe(0);
     expect(run.summary.validationErrors).toEqual({});
     expect(run.summary.byFeatureTag).toMatchObject({
@@ -26,7 +26,7 @@ describe('Pine compatibility checkpoint corpus', () => {
       request: { total: 4, passed: 4, failed: 0 },
       runtime: { total: 2, passed: 2, failed: 0 },
       sessions: { total: 2, passed: 2, failed: 0 },
-      strategy: { total: 9, passed: 9, failed: 0 },
+      strategy: { total: 10, passed: 10, failed: 0 },
       time: { total: 2, passed: 2, failed: 0 },
       timeframes: { total: 1, passed: 1, failed: 0 },
       ticker: { total: 1, passed: 1, failed: 0 },
@@ -38,12 +38,12 @@ describe('Pine compatibility checkpoint corpus', () => {
   it('renders a stable checkpoint corpus report', () => {
     const markdown = formatPineCompatibilityCorpusMarkdown(runPineCompatibilityCorpus(compatibilityCheckpointCorpus));
 
-    expect(markdown).toContain('Total: 24');
+    expect(markdown).toContain('Total: 25');
     expect(markdown).toContain('Pass rate: 100.0%');
     expect(markdown).toContain('| inputs | 2 | 2 | 0 |');
     expect(markdown).toContain('| runtime | 2 | 2 | 0 |');
     expect(markdown).toContain('| sessions | 2 | 2 | 0 |');
-    expect(markdown).toContain('| strategy | 9 | 9 | 0 |');
+    expect(markdown).toContain('| strategy | 10 | 10 | 0 |');
     expect(markdown).toContain('| time | 2 | 2 | 0 |');
     expect(markdown).toContain('| timeframes | 1 | 1 | 0 |');
     expect(markdown).toContain('| request | 4 | 4 | 0 |');
@@ -62,8 +62,8 @@ describe('Pine compatibility checkpoint corpus', () => {
     );
     const json = formatPineCompatibilityCorpusJson(run);
 
-    expect(run.summary.total).toBe(24);
-    expect(run.summary.passed).toBe(24);
+    expect(run.summary.total).toBe(25);
+    expect(run.summary.passed).toBe(25);
     expect(run.summary.validationErrors).toEqual({});
     expect(json).toContain('"schemaVersion": 1');
     expect(json).toContain('"scriptId": "official-builtins-checkpoint"');
@@ -100,26 +100,26 @@ describe('Pine compatibility checkpoint corpus', () => {
 
     expect(index).toMatchObject({
       schemaVersion: 1,
-      total: 24,
-      byCategory: { indicator: 15, strategy: 9 },
-      bySourceKind: { official_docs: 21, public_script: 3 },
-      byPineVersion: { v6: 24 },
-      byStoragePolicy: { reduced_fixture_only: 24 },
+      total: 25,
+      byCategory: { indicator: 15, strategy: 10 },
+      bySourceKind: { official_docs: 22, public_script: 3 },
+      byPineVersion: { v6: 25 },
+      byStoragePolicy: { reduced_fixture_only: 25 },
     });
     expect(index.byFeatureTag).toMatchObject({
       inputs: 2,
       request: 4,
       runtime: 2,
       sessions: 2,
-      strategy: 9,
+      strategy: 10,
       time: 2,
       timeframes: 1,
       ticker: 1,
       visuals: 4,
     });
     expect(markdown).toContain('# Pine Compatibility Coverage');
-    expect(markdown).toContain('Total checkpoints: 24');
-    expect(markdown).toContain('| official_docs | 21 |');
-    expect(markdown).toContain('| reduced_fixture_only | 24 |');
+    expect(markdown).toContain('Total checkpoints: 25');
+    expect(markdown).toContain('| official_docs | 22 |');
+    expect(markdown).toContain('| reduced_fixture_only | 25 |');
   });
 });
