@@ -58,6 +58,30 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(json.endsWith('\n')).toBe(true);
   });
 
+  it('counts not-run stages as incomplete compatibility outcomes', () => {
+    const entry = compatibilityCheckpointLedger.entries[0]!;
+    const run = runPineCompatibilityCorpus([
+      {
+        ledgerEntry: entry,
+        stages: [{ stage: 'parse', status: 'passed' }],
+      },
+    ]);
+
+    expect(run.outcomes[0]?.summary).toEqual({
+      passed: false,
+      firstFailureStage: 'semantic',
+    });
+    expect(run.summary).toMatchObject({
+      total: 1,
+      passed: 0,
+      failed: 1,
+      byFirstFailureStage: { semantic: 1 },
+    });
+    expect(run.summary.byFeatureTag).toMatchObject({
+      builtins: { total: 1, passed: 0, failed: 1 },
+    });
+  });
+
   it('builds a checkpoint coverage index from intake metadata', () => {
     const index = createPineCompatibilityCoverageIndex(compatibilityCheckpointLedger);
     const markdown = formatPineCompatibilityCoverageMarkdown(index);

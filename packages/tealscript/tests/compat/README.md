@@ -19,6 +19,8 @@ real-script intake metadata or corpus summaries:
   and render stage results for a script.
 - `normalizeCompatibilityStageOutcomes()` expands partial stage lists into the
   canonical six-stage order, filling missing stages with `not_run`.
+- `not_run` marks an incomplete outcome and does not count as passing; use
+  `skipped` with a message for an intentionally out-of-scope stage.
 - `CompatibilityFailureClass` keeps failure buckets stable across reports:
   `parse_gap`, `semantic_gap`, `unsupported_planned`, `runtime_gap`,
   `data_gap`, `output_gap`, `render_gap`, `oracle_gap`, and
