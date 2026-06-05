@@ -210,6 +210,46 @@ plot(lastIntrabar, title="Last Intrabar")
     expect(getPlot(result, 'Last Intrabar').values).toEqual([13, 24, 34]);
   });
 
+  it('locks a reduced official ticker request idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/non-standard-charts-data/
+    const chartBars: Bar[] = [
+      { time: 1_700_200_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_200_060_000, open: 101, high: 102, low: 100, close: 101, volume: 110 },
+      { time: 1_700_200_120_000, open: 102, high: 103, low: 101, close: 102, volume: 120 },
+    ];
+    const requestDatafeed = new InMemoryRequestDatafeed([
+      {
+        symbol: 'NASDAQ:AAPL|session=extended',
+        timeframe: '1',
+        bars: [
+          { time: 1_700_200_000_000, open: 200, high: 202, low: 199, close: 201, volume: 1_000 },
+          { time: 1_700_200_060_000, open: 201, high: 203, low: 200, close: 202, volume: 1_100 },
+          { time: 1_700_200_120_000, open: 202, high: 204, low: 201, close: 203, volume: 1_200 },
+        ],
+        syminfo: { ticker: 'NASDAQ:AAPL|session=extended', timezone: 'Etc/UTC' },
+      },
+    ]);
+    const result = runCompatScript(`
+indicator("Official Ticker Request Checkpoint")
+extendedTicker = ticker.new("NASDAQ", "AAPL", session.extended)
+haTicker = ticker.heikinashi(extendedTicker)
+extendedClose = request.security(extendedTicker, "1", close, lookahead=barmerge.lookahead_on)
+haClose = request.security(haTicker, "1", close, lookahead=barmerge.lookahead_on)
+standardLength = str.length(ticker.standard(haTicker))
+plot(extendedClose, title="Extended Close")
+plot(haClose, title="HA Close")
+plot(standardLength, title="Standard Length")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Extended Close').values).toEqual([201, 202, 203]);
+    expect(getPlot(result, 'HA Close').values).toEqual([200.5, 201.5, 202.5]);
+    expect(getPlot(result, 'Standard Length').values).toEqual([11, 11, 11]);
+  });
+
   it('locks a reduced public pivot-divergence idiom', () => {
     // Public idiom reference: divergence scripts compare sequential price
     // pivots against lower oscillator pivots.

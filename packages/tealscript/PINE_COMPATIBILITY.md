@@ -39,8 +39,8 @@ new behavior and, at checkpoint boundaries, add reduced smoke fixtures inspired
 by real Pine examples from official docs or public indicator idioms.
 The current real-idiom checkpoint suite covers official built-ins, barstate plus
 arrays, bar coloring, alerts, strategy entry/exit flows, request-limit reuse,
-official lower-timeframe request arrays, and public MTF, divergence, and
-session-filter idioms.
+official lower-timeframe request arrays, official synthetic ticker requests, and
+public MTF, divergence, and session-filter idioms.
 
 ## Current Matrix
 
@@ -654,8 +654,9 @@ settlement-as-close, and chart modifiers propagate as opaque request-datafeed
 keys. Semantic analysis preserves supported `ticker.*` helper return types for
 downstream assignment diagnostics. The in-memory test datafeed derives
 Heikin-Ashi OHLC when matching base bars exist, with tests covering the
-`ticker.heikinashi()` modifier. Renko, Line Break, Kagi, and Point & Figure
-contexts must be supplied by the host.
+`ticker.heikinashi()` modifier. The checkpoint corpus tracks an official ticker
+request fixture for extended-session and Heikin-Ashi synthetic IDs. Renko, Line
+Break, Kagi, and Point & Figure contexts must be supplied by the host.
 Synthetic strategy/backtest execution remains deferred until the strategy
 intrabar execution contract is implemented. The current broker emulator is
 chart-OHLC based; lower-timeframe Bar Magnifier behavior and synthetic execution
