@@ -1513,10 +1513,12 @@ strategy("Mixed trailing exit", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=1)
 if bar_index == 1
-    strategy.exit(id="Trail", "Long", na, na, na, na, na, na, na, 0.5, 0.25, na, "base comment", na, na, "trail comment", "base alert", na, na, "trail alert")
+    strategy.exit(id="Trail", "Long", na, na, na, na, na, na, na, 2, 1, na, "base comment", na, na, "trail comment", "base alert", na, na, "trail alert")
 plot(strategy.opentrades)`;
 
-      const result = executeScript(parse(script), createBars(2));
+      const result = executeScript(parse(script), createBars(2), undefined, {
+        runtime: { syminfo: { mintick: 0.25 } },
+      });
 
       expect(result.errors).toEqual([]);
       expect(result.strategy.orders[1]).toMatchObject({
@@ -2243,7 +2245,7 @@ strategy("Long trail", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Long", strategy.long, qty=1)
 if bar_index == 1
-    strategy.exit("Trail", "Long", trail_points=0.5, trail_offset=0.4)
+    strategy.exit("Trail", "Long", trail_points=5, trail_offset=4)
 plot(strategy.position_size)`;
       const baseTime = Date.now() - 240000;
       const bars: Bar[] = [
@@ -2253,7 +2255,9 @@ plot(strategy.position_size)`;
         { time: baseTime + 180000, open: 101, high: 101, low: 100.9, close: 101, volume: 1000 },
       ];
 
-      const result = executeScript(parse(script), bars);
+      const result = executeScript(parse(script), bars, undefined, {
+        runtime: { syminfo: { mintick: 0.1 } },
+      });
 
       expect(result.errors).toEqual([]);
       expect(result.strategy.orders.map((order) => ({
@@ -2299,7 +2303,7 @@ strategy("Short trail", process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("Short", strategy.short, qty=1)
 if bar_index == 1
-    strategy.exit("Trail", "Short", trail_points=0.5, trail_offset=0.25)
+    strategy.exit("Trail", "Short", trail_points=2, trail_offset=1)
 plot(strategy.position_size)`;
       const baseTime = Date.now() - 240000;
       const bars: Bar[] = [
@@ -2309,7 +2313,9 @@ plot(strategy.position_size)`;
         { time: baseTime + 180000, open: 98.7, high: 98.8, low: 98.6, close: 98.7, volume: 1000 },
       ];
 
-      const result = executeScript(parse(script), bars);
+      const result = executeScript(parse(script), bars, undefined, {
+        runtime: { syminfo: { mintick: 0.25 } },
+      });
 
       expect(result.errors).toEqual([]);
       expect(result.strategy.orders[1]).toMatchObject({
@@ -2334,7 +2340,7 @@ if bar_index == 0
 if bar_index == 1
     strategy.entry("B", strategy.long, qty=3)
 if bar_index == 2
-    strategy.exit("Trail", trail_points=1, trail_offset=0.5)
+    strategy.exit("Trail", trail_points=2, trail_offset=1)
 plot(strategy.opentrades)`;
       const baseTime = Date.now() - 180000;
       const bars: Bar[] = [
@@ -2343,7 +2349,9 @@ plot(strategy.opentrades)`;
         { time: baseTime + 120000, open: 102, high: 102, low: 101, close: 101.5, volume: 1000 },
       ];
 
-      const result = executeScript(parse(script), bars);
+      const result = executeScript(parse(script), bars, undefined, {
+        runtime: { syminfo: { mintick: 0.5 } },
+      });
 
       expect(result.errors).toEqual([]);
       expect(result.strategy.orders[2]).toMatchObject({
