@@ -73,6 +73,11 @@ export interface PineCompatibilityCorpusSummary {
   validationErrors: Record<string, string[]>;
 }
 
+export interface PineScriptLedger {
+  schemaVersion: typeof PINE_COMPATIBILITY_SCHEMA_VERSION;
+  entries: PineScriptLedgerEntry[];
+}
+
 export interface PineCompatibilityCorpusRun {
   schemaVersion: typeof PINE_COMPATIBILITY_SCHEMA_VERSION;
   outcomes: CompatibilityRunOutcome[];
@@ -115,6 +120,13 @@ export interface PineScriptLedgerEntry {
   featureTags: string[];
   storagePolicy: PineScriptStoragePolicy;
   notes?: string;
+}
+
+export function createPineScriptLedger(entries: PineScriptLedgerEntry[]): PineScriptLedger {
+  return {
+    schemaVersion: PINE_COMPATIBILITY_SCHEMA_VERSION,
+    entries: entries.map(clonePineScriptLedgerEntry),
+  };
 }
 
 export function normalizeCompatibilityStageOutcomes(stages: CompatibilityStageOutcome[]): CompatibilityStageOutcome[] {
@@ -209,6 +221,31 @@ export function validatePineScriptLedgerEntry(entry: PineScriptLedgerEntry): str
   return errors;
 }
 
+export function validatePineScriptLedger(ledger: PineScriptLedger): Record<string, string[]> {
+  const validationErrors: Record<string, string[]> = {};
+  if (ledger.schemaVersion !== PINE_COMPATIBILITY_SCHEMA_VERSION) {
+    validationErrors['<ledger>'] = [
+      `unsupported Pine compatibility ledger schema version: ${ledger.schemaVersion}`,
+    ];
+  }
+
+  const seenIds = new Set<string>();
+  for (let index = 0; index < ledger.entries.length; index += 1) {
+    const entry = ledger.entries[index];
+    const entryId = entry.id.trim();
+    const key = entryId || `<entry-${index + 1}>`;
+    appendValidationErrors(validationErrors, key, validatePineScriptLedgerEntry(entry));
+    if (entryId === '') continue;
+    if (seenIds.has(entryId)) {
+      appendValidationErrors(validationErrors, '<ledger>', [`duplicate ledger entry id: ${entryId}`]);
+      continue;
+    }
+    seenIds.add(entryId);
+  }
+
+  return validationErrors;
+}
+
 export function runPineCompatibilityCorpus(cases: PineCompatibilityCorpusCase[]): PineCompatibilityCorpusRun {
   const outcomes = cases.map(({ ledgerEntry, stages }) => createCompatibilityRunOutcome({
     scriptId: ledgerEntry.id,
@@ -227,7 +264,9 @@ export function summarizePineCompatibilityCorpus(
   cases: PineCompatibilityCorpusCase[],
   outcomes: CompatibilityRunOutcome[],
 ): PineCompatibilityCorpusSummary {
-  const validationErrors: Record<string, string[]> = {};
+  const validationErrors: Record<string, string[]> = {
+    ...validatePineScriptLedger(createPineScriptLedger(cases.map((corpusCase) => corpusCase.ledgerEntry))),
+  };
   const byFirstFailureStage: Partial<Record<CompatibilityStage, number>> = {};
   const byFirstFailureClass: Partial<Record<CompatibilityFailureClass, number>> = {};
   const byFeatureTag: Record<string, { total: number; passed: number; failed: number }> = {};
@@ -238,13 +277,11 @@ export function summarizePineCompatibilityCorpus(
     const corpusCase = cases[index];
     const ledgerEntry = corpusCase?.ledgerEntry;
     if (ledgerEntry) {
-      const errors = [
-        ...validatePineScriptLedgerEntry(ledgerEntry),
-        ...validateCompatibilityStageSequence(corpusCase.stages),
-      ];
-      if (errors.length > 0) {
-        validationErrors[ledgerEntry.id || `<case-${index + 1}>`] = errors;
-      }
+      appendValidationErrors(
+        validationErrors,
+        ledgerEntry.id || `<entry-${index + 1}>`,
+        validateCompatibilityStageSequence(corpusCase.stages),
+      );
       for (const featureTag of ledgerEntry.featureTags) {
         byFeatureTag[featureTag] ??= { total: 0, passed: 0, failed: 0 };
         byFeatureTag[featureTag].total += 1;
@@ -285,6 +322,23 @@ function cloneCompatibilityStageOutcome(stage: CompatibilityStageOutcome): Compa
     ...stage,
     diagnostics: stage.diagnostics?.map((diagnostic) => ({ ...diagnostic })),
   };
+}
+
+function clonePineScriptLedgerEntry(entry: PineScriptLedgerEntry): PineScriptLedgerEntry {
+  return {
+    ...entry,
+    source: { ...entry.source },
+    featureTags: [...entry.featureTags],
+  };
+}
+
+function appendValidationErrors(
+  validationErrors: Record<string, string[]>,
+  key: string,
+  errors: string[],
+): void {
+  if (errors.length === 0) return;
+  validationErrors[key] = [...(validationErrors[key] ?? []), ...errors];
 }
 
 export function formatPineCompatibilityCorpusMarkdown(run: PineCompatibilityCorpusRun): string {

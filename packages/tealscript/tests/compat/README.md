@@ -13,6 +13,8 @@ real-script intake metadata or corpus summaries:
 
 - `PineScriptLedgerEntry` records source URL/search context, license status,
   Pine version, script category, feature tags, and raw-source storage policy.
+- `PineScriptLedger` wraps ledger entries with the compatibility schema version;
+  `validatePineScriptLedger()` validates each entry and rejects duplicate ids.
 - `CompatibilityRunOutcome` records parse, semantic, runtime, datafeed, output,
   and render stage results for a script.
 - `normalizeCompatibilityStageOutcomes()` expands partial stage lists into the

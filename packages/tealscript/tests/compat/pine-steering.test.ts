@@ -5,6 +5,7 @@ import {
   compatibilityStageStatuses,
   compatibilityStages,
   createCompatibilityRunOutcome,
+  createPineScriptLedger,
   formatPineCompatibilityCorpusMarkdown,
   normalizeCompatibilityStageOutcomes,
   PINE_COMPATIBILITY_SCHEMA_VERSION,
@@ -12,6 +13,7 @@ import {
   summarizeCompatibilityOutcome,
   validateCompatibilityStageSequence,
   validateCompatibilityStageOutcome,
+  validatePineScriptLedger,
   validatePineScriptLedgerEntry,
   type CompatibilityStageOutcome,
   type PineScriptLedgerEntry,
@@ -138,6 +140,40 @@ describe('Pine compatibility steering model', () => {
     ]);
   });
 
+  it('creates and validates metadata-only real-script intake ledgers', () => {
+    const entry = createLedgerEntry({
+      id: 'official-sma-checkpoint',
+      source: {
+        kind: 'official_docs',
+        url: 'https://www.tradingview.com/pine-script-docs/language/built-ins/',
+        retrievedAt: '2026-06-02',
+        licenseStatus: 'unknown',
+      },
+      featureTags: ['official_docs', 'ta', 'plot'],
+    });
+    const ledger = createPineScriptLedger([entry]);
+
+    entry.featureTags.push('mutated-after-create');
+
+    expect(ledger).toEqual({
+      schemaVersion: PINE_COMPATIBILITY_SCHEMA_VERSION,
+      entries: [{
+        ...entry,
+        featureTags: ['official_docs', 'ta', 'plot'],
+      }],
+    });
+    expect(validatePineScriptLedger(ledger)).toEqual({});
+    expect(validatePineScriptLedger({
+      schemaVersion: 0 as typeof PINE_COMPATIBILITY_SCHEMA_VERSION,
+      entries: [entry, { ...entry }],
+    })).toEqual({
+      '<ledger>': [
+        'unsupported Pine compatibility ledger schema version: 0',
+        'duplicate ledger entry id: official-sma-checkpoint',
+      ],
+    });
+  });
+
   it('runs an offline compatibility corpus and summarizes failures', () => {
     const passingEntry = createLedgerEntry({
       id: 'manual-sma-pass',
@@ -209,7 +245,7 @@ describe('Pine compatibility steering model', () => {
     ]);
 
     expect(run.summary.validationErrors).toEqual({
-      '<case-1>': [
+      '<entry-1>': [
         'ledger entry id must not be empty',
         'ledger entry <missing> must include at least one feature tag',
         'ledger entry <missing> source must include a url or searchContext',

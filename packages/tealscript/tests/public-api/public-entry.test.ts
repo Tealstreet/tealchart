@@ -10,6 +10,7 @@ import {
   compatibilityStages,
   createResultMessage,
   createCompatibilityRunOutcome,
+  createPineScriptLedger,
   corporateActionRequestKey,
   currencyRateRequestKey,
   economicRequestKey,
@@ -25,6 +26,7 @@ import {
   TealscriptEngine,
   TealscriptWorker,
   validate,
+  validatePineScriptLedger,
   validatePineScriptLedgerEntry,
   type Expression,
   type CompatibilityRunOutcome,
@@ -71,6 +73,7 @@ describe('public package entrypoints', () => {
     const corpusRun: PineCompatibilityCorpusRun = runPineCompatibilityCorpus([
       { ledgerEntry, stages: [{ stage: 'parse', status: 'passed' }] },
     ]);
+    const ledger = createPineScriptLedger([ledgerEntry]);
 
     expect(typeof parse).toBe('function');
     expect(typeof validate).toBe('function');
@@ -80,6 +83,7 @@ describe('public package entrypoints', () => {
     expect(compatibilityOutcome.summary.passed).toBe(true);
     expect(corpusRun.summary.passed).toBe(1);
     expect(formatPineCompatibilityCorpusMarkdown(corpusRun)).toContain('Pass rate: 100.0%');
+    expect(validatePineScriptLedger(ledger)).toEqual({});
     expect(validatePineScriptLedgerEntry(ledgerEntry)).toEqual([]);
     expect(typeof TealscriptEngine).toBe('function');
     expect(typeof TealscriptWorker).toBe('function');
