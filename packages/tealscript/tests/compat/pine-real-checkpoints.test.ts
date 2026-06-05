@@ -488,6 +488,39 @@ plot(strategy.netprofit, title="Net Profit")
     });
   });
 
+  it('locks the official strategy profit-loss exit idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
+    const bars: Bar[] = [
+      { time: 1_700_000_000_000, open: 100, high: 100.4, low: 99.8, close: 100.2, volume: 100 },
+      { time: 1_700_000_060_000, open: 100.2, high: 100.8, low: 99.9, close: 100.4, volume: 100 },
+      { time: 1_700_000_120_000, open: 100.4, high: 101.5, low: 100, close: 101, volume: 100 },
+      { time: 1_700_000_180_000, open: 101, high: 101.4, low: 100.6, close: 101.1, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Official Profit Loss Exit Checkpoint", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Bracket", "Long", profit=4, loss=2)
+plot(strategy.closedtrades, title="Closed Trades")
+plot(strategy.netprofit, title="Net Profit")
+`, {
+      bars,
+      engineOptions: { runtime: { syminfo: { mintick: 0.25 } } },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 0, 0, 1]);
+    expect(getPlot(result, 'Net Profit').values).toEqual([0, 0, 0, 1]);
+    expect(result.strategy.closedTrades[0]).toMatchObject({
+      entryOrderId: 'Long',
+      exitOrderId: 'Bracket Limit',
+      entryPrice: 100.2,
+      exitPrice: 101.2,
+      profit: 1,
+    });
+  });
+
   it('locks official default broker path and opening-gap fill assumptions', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/#broker-emulator
     const script = `

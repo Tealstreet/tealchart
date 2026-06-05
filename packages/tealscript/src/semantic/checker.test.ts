@@ -638,7 +638,7 @@ strategy("Bad Strategy")
 strategy.entry("", "up", qty=0, oca_type="bad")
 strategy.order(id="Add", direction="down", qty=-1, oca_type=strategy.oca.cancel)
 strategy.close("", qty=-1, qty_percent=0)
-strategy.exit("", qty=-1, qty_percent=0, trail_points=-1, trail_offset=0)
+strategy.exit("", qty=-1, qty_percent=0, profit=0, loss=-1, trail_points=-1, trail_offset=0)
 strategy.risk.allow_entry_in("sideways")
 `));
 
@@ -655,6 +655,8 @@ strategy.risk.allow_entry_in("sideways")
       'strategy.exit id must not be empty',
       'strategy.exit qty must be a positive number',
       'strategy.exit qty_percent must be a positive number',
+      'strategy.exit profit must be a positive number',
+      'strategy.exit loss must be a positive number',
       'strategy.exit trail_points must be a non-negative number',
       'strategy.exit trailing stop offset must be positive',
       'Invalid strategy entry direction: sideways',
