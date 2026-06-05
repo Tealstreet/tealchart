@@ -645,6 +645,23 @@ plot(selected, title="Selected")
     expect(roundSeries(getPlot(result, 'Selected').values)).toEqual(Array(compatibilityBars.length).fill(13));
   });
 
+  it('runs Pine-style leading negative numeric continuations', () => {
+    const result = runCompatScript(`
+indicator("Leading Negative Numeric Continuation")
+value = 10
+    - 3
+    - 2.5
+adjusted = close
+    - 1.5
+plot(value, title="Value")
+plot(adjusted, title="Adjusted")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Value').values)).toEqual(Array(compatibilityBars.length).fill(4.5));
+    expect(roundSeries(getPlot(result, 'Adjusted').values)).toEqual([100.5, 103.5, 105.5, 101.5, 97.5, 98.5, 102.5, 107.5, 106.5, 109.5, 108.5, 110.5]);
+  });
+
   it('keeps if/else branch boundaries after operator continuation support', () => {
     const result = runCompatScript(`
 indicator("If Else Boundary")
