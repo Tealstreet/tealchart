@@ -79,7 +79,9 @@ Covered behavior and remaining gaps:
 - Flat multiline user-defined functions return the last expression statement.
 - Pine-style wrapped delimiter syntax is supported for multiline
   `indicator()`/`strategy()` declarations, function calls, array literals, tuple
-  destructuring, index access, and parenthesized expressions.
+  destructuring, index access, and parenthesized expressions. Parser audit
+  fixtures also cover public-script-shaped wrapped `request.security()`
+  arguments with multiline ternary expressions inside nested UDF blocks.
 - Top-level nested control blocks share the deeper block parser used by
   function bodies, including nested `if` / `else` dedents with reassignment
   statements.

@@ -957,6 +957,56 @@ plot(smoothed)
         { name: 'smoothed', init: 'CallExpression' },
       ]);
     });
+
+    it('parses wrapped request and ternary expressions inside nested blocks', () => {
+      const ast = parse(`indicator("Wrapped Public Layout")
+fast = ta.sma(close, 3)
+score() =>
+    basis = request.security(
+        syminfo.tickerid,
+        "60",
+        close > open ?
+            ta.sma(close, 2) :
+            ta.ema(close, 2),
+        lookahead=barmerge.lookahead_off
+    )
+    if basis > fast
+        labelText = str.format(
+            "basis {0}",
+            basis
+        )
+        labelText
+    else
+        "flat"
+plot(str.length(score()))
+`);
+      const fn = ast.body.find((statement): statement is FunctionDeclaration => statement.type === 'FunctionDeclaration');
+
+      expect(ast.body.map((statement) => statement.type)).toEqual([
+        'IndicatorDeclaration',
+        'VariableDeclaration',
+        'FunctionDeclaration',
+        'ExpressionStatement',
+      ]);
+      expect(fn).toBeDefined();
+      expect(Array.isArray(fn?.body)).toBe(true);
+      if (fn && Array.isArray(fn.body)) {
+        expect(fn.body.map((statement) => statement.type)).toEqual([
+          'VariableDeclaration',
+          'IfStatement',
+        ]);
+        const basis = fn.body[0];
+        expect(basis.type === 'VariableDeclaration' ? basis.init.type : null).toBe('CallExpression');
+        const branch = fn.body[1];
+        expect(branch.type === 'IfStatement' ? branch.consequent.map((statement) => statement.type) : []).toEqual([
+          'VariableDeclaration',
+          'ExpressionStatement',
+        ]);
+        expect(branch.type === 'IfStatement' && Array.isArray(branch.alternate)
+          ? branch.alternate.map((statement) => statement.type)
+          : []).toEqual(['ExpressionStatement']);
+      }
+    });
   });
 
   describe('Expressions', () => {

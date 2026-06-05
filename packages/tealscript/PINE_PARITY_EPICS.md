@@ -492,8 +492,9 @@ impact.
    pass-rate summaries unless they are explicitly marked `skipped`.
 4. Pine layout parser audit fixtures: keep reduced coverage for top-level
    nested dedents, seventh-level UDF branches, wrapped indented expressions,
-   wrapped function/method signatures, and shared library/type/method blocks
-   before deeper parser architecture changes.
+   wrapped function/method signatures, wrapped request calls with multiline
+   ternary arguments, and shared library/type/method blocks before deeper
+   parser architecture changes.
 5. Call-binding diagnostics sweep: keep signed built-in namespace typo
    diagnostics, built-in duplicate/unknown/missing/order argument diagnostics,
    visual output call signatures including `hline()` and `fill()` alias
