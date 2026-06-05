@@ -392,6 +392,11 @@ export class TealscriptEngine {
   private userFunctions: Map<string, FunctionDeclaration>;
   private userMethods: Map<string, FunctionDeclaration[]>;
   private functionScopes: Map<string, Scope>;
+  private functionBlockScopes: Map<string, Scope>;
+  private scopeIds = new WeakMap<Scope, number>();
+  private nextScopeId = 0;
+  private functionBlockIds = new WeakMap<object, number>();
+  private nextFunctionBlockId = 0;
   private requestDatafeed?: RequestDatafeed;
   private strategyIntrabarDatafeed?: StrategyIntrabarDatafeed;
   private libraries: Map<string, Program>;
@@ -421,6 +426,7 @@ export class TealscriptEngine {
   private currentStrategyIntrabarContext: StrategyIntrabarContext | null = null;
   private orderFillScopeSnapshot: ScopeSnapshot | null = null;
   private orderFillFunctionScopeSnapshots = new Map<string, ScopeSnapshot>();
+  private orderFillFunctionBlockScopeSnapshots = new Map<string, ScopeSnapshot>();
 
   constructor(options: TealscriptEngineOptions = {}) {
     this.ctx = new ExecutionContext();
@@ -432,6 +438,7 @@ export class TealscriptEngine {
     this.userFunctions = new Map();
     this.userMethods = new Map();
     this.functionScopes = new Map();
+    this.functionBlockScopes = new Map();
     this.requestDatafeed = options.requestDatafeed;
     this.strategyIntrabarDatafeed = options.strategyIntrabarDatafeed;
     this.libraries = options.libraries ?? new Map();
@@ -475,6 +482,11 @@ export class TealscriptEngine {
     this.typeDeclarations.clear();
     this.enumValues.clear();
     this.functionScopes.clear();
+    this.functionBlockScopes.clear();
+    this.scopeIds = new WeakMap();
+    this.nextScopeId = 0;
+    this.functionBlockIds = new WeakMap();
+    this.nextFunctionBlockId = 0;
     this.importedLibraries.clear();
     this.requestEvaluationCache.clear();
     this.requestContextKeys.clear();
@@ -492,6 +504,7 @@ export class TealscriptEngine {
     this.currentStrategyIntrabarContext = null;
     this.orderFillScopeSnapshot = null;
     this.orderFillFunctionScopeSnapshots.clear();
+    this.orderFillFunctionBlockScopeSnapshots.clear();
     this.requestContextDepth = 0;
     this.requestLocalScopeDepth = 0;
     this.applyRuntimeOptions(this.runtimeOptions);
@@ -517,9 +530,7 @@ export class TealscriptEngine {
       this.profileBars += 1;
       // Advance scope to new bar
       this.scope.advanceBar();
-      for (const functionScope of this.functionScopes.values()) {
-        functionScope.advanceBar();
-      }
+      this.forEachFunctionRuntimeScope((scope) => scope.advanceBar());
       this.resetPerBarBuiltinState();
       this.currentStrategyIntrabarContext = null;
       this.captureOrderFillRecalculationState();
@@ -540,9 +551,7 @@ export class TealscriptEngine {
 
       // Commit bar — only snapshot on the last bar (for realtime rollback)
       this.scope.commit(isLastBar);
-      for (const functionScope of this.functionScopes.values()) {
-        functionScope.commit(isLastBar);
-      }
+      this.forEachFunctionRuntimeScope((scope) => scope.commit(isLastBar));
       this.ctx.commitBar();
     }
 
@@ -659,24 +668,18 @@ export class TealscriptEngine {
       }
 
       this.scope.commit(false);
-      for (const functionScope of this.functionScopes.values()) {
-        functionScope.commit(false);
-      }
+      this.forEachFunctionRuntimeScope((scope) => scope.commit(false));
       this.ctx.commitBar();
 
       this.scope.advanceBar();
-      for (const functionScope of this.functionScopes.values()) {
-        functionScope.advanceBar();
-      }
+      this.forEachFunctionRuntimeScope((scope) => scope.advanceBar());
       this.ctx.setNow(this.getRuntimeNow());
       this.ctx.startRealtimeBar(bar);
       this.captureOrderFillRecalculationState();
       this.strategyOrderFillRecalculationRequested = false;
       this.fillPendingStrategyMarketOrdersForCurrentBar();
       this.scope.commit(true);
-      for (const functionScope of this.functionScopes.values()) {
-        functionScope.commit(true);
-      }
+      this.forEachFunctionRuntimeScope((scope) => scope.commit(true));
       this.ctx.captureRealtimeRollbackState();
       this.prepareRealtimeExecution(ast);
       if (this.shouldExecuteRealtimeStatements()) {
@@ -694,9 +697,7 @@ export class TealscriptEngine {
 
     // Rollback to last committed state
     this.scope.rollback();
-    for (const functionScope of this.functionScopes.values()) {
-      functionScope.rollback();
-    }
+    this.forEachFunctionRuntimeScope((scope) => scope.rollback());
     this.ctx.rollbackBar();
     this.ctx.bar_index = this.ctx.last_bar_index;
     this.ctx.setNow(this.getRuntimeNow());
@@ -729,9 +730,7 @@ export class TealscriptEngine {
 
   private executeConfirmedRealtimeClose(ast: Program, bar: Bar): void {
     this.scope.rollback();
-    for (const functionScope of this.functionScopes.values()) {
-      functionScope.rollback();
-    }
+    this.forEachFunctionRuntimeScope((scope) => scope.rollback());
     this.ctx.rollbackBar();
     this.ctx.bar_index = this.ctx.last_bar_index;
     this.ctx.setNow(this.getRuntimeNow());
@@ -852,9 +851,7 @@ export class TealscriptEngine {
 
   private rollbackRealtimeExecution(): void {
     this.scope.rollback();
-    for (const functionScope of this.functionScopes.values()) {
-      functionScope.rollback();
-    }
+    this.forEachFunctionRuntimeScope((scope) => scope.rollback());
     this.ctx.rollbackBar();
     this.ctx.bar_index = this.ctx.last_bar_index;
     this.currentStrategyIntrabarContext = null;
@@ -866,6 +863,10 @@ export class TealscriptEngine {
     for (const [key, functionScope] of this.functionScopes) {
       this.orderFillFunctionScopeSnapshots.set(key, functionScope.snapshot());
     }
+    this.orderFillFunctionBlockScopeSnapshots = new Map();
+    for (const [key, blockScope] of this.functionBlockScopes) {
+      this.orderFillFunctionBlockScopeSnapshots.set(key, blockScope.snapshot());
+    }
   }
 
   private prepareHistoricalOrderFillRecalculation(): void {
@@ -874,6 +875,14 @@ export class TealscriptEngine {
     }
     for (const [key, snapshot] of this.orderFillFunctionScopeSnapshots) {
       this.functionScopes.get(key)?.restore(snapshot);
+    }
+    for (const [key, snapshot] of this.orderFillFunctionBlockScopeSnapshots) {
+      this.functionBlockScopes.get(key)?.restore(snapshot);
+    }
+    for (const key of this.functionBlockScopes.keys()) {
+      if (!this.orderFillFunctionBlockScopeSnapshots.has(key)) {
+        this.functionBlockScopes.delete(key);
+      }
     }
     this.requestEvaluationCache.clear();
     this.resetPerBarBuiltinState();
@@ -888,6 +897,14 @@ export class TealscriptEngine {
     }
     for (const [key, snapshot] of this.orderFillFunctionScopeSnapshots) {
       this.functionScopes.get(key)?.restore(snapshot);
+    }
+    for (const [key, snapshot] of this.orderFillFunctionBlockScopeSnapshots) {
+      this.functionBlockScopes.get(key)?.restore(snapshot);
+    }
+    for (const key of this.functionBlockScopes.keys()) {
+      if (!this.orderFillFunctionBlockScopeSnapshots.has(key)) {
+        this.functionBlockScopes.delete(key);
+      }
     }
     this.ctx.truncatePlots(this.ctx.bar_index);
     this.ctx.truncateDrawings(this.ctx.bar_index);
@@ -1327,6 +1344,47 @@ export class TealscriptEngine {
     const functionScope = this.rootScope.createChild();
     this.functionScopes.set(scopeKey, functionScope);
     return functionScope;
+  }
+
+  private forEachFunctionRuntimeScope(callback: (scope: Scope) => void): void {
+    for (const functionScope of this.functionScopes.values()) {
+      callback(functionScope);
+    }
+    for (const blockScope of this.functionBlockScopes.values()) {
+      callback(blockScope);
+    }
+  }
+
+  private getScopeId(scope: Scope): number {
+    const existing = this.scopeIds.get(scope);
+    if (existing !== undefined) return existing;
+
+    const id = this.nextScopeId++;
+    this.scopeIds.set(scope, id);
+    return id;
+  }
+
+  private functionBlockScope(owner: Statement | IfStatement, label: string): Scope {
+    const parentId = this.getScopeId(this.scope);
+    const ownerKey = owner.loc
+      ? `${owner.loc.start.line}:${owner.loc.start.column}-${owner.loc.end.line}:${owner.loc.end.column}`
+      : `node:${this.functionBlockNodeId(owner)}`;
+    const scopeKey = `${parentId}:${label}:${ownerKey}`;
+    const existing = this.functionBlockScopes.get(scopeKey);
+    if (existing) return existing;
+
+    const blockScope = this.scope.createChild();
+    this.functionBlockScopes.set(scopeKey, blockScope);
+    return blockScope;
+  }
+
+  private functionBlockNodeId(owner: object): number {
+    const existing = this.functionBlockIds.get(owner);
+    if (existing !== undefined) return existing;
+
+    const id = this.nextFunctionBlockId++;
+    this.functionBlockIds.set(owner, id);
+    return id;
   }
 
   private registerLibraryImports(ast: Program): void {
@@ -3073,16 +3131,12 @@ export class TealscriptEngine {
     const values: unknown[] = [];
     while (engine.ctx.advanceBar()) {
       engine.scope.advanceBar();
-      for (const functionScope of engine.functionScopes.values()) {
-        functionScope.advanceBar();
-      }
+      engine.forEachFunctionRuntimeScope((scope) => scope.advanceBar());
       engine.resetPerBarBuiltinState();
       values.push(engine.evaluateExpression(expression));
       const isLastBar = engine.ctx.bar_index === engine.ctx.last_bar_index;
       engine.scope.commit(isLastBar);
-      for (const functionScope of engine.functionScopes.values()) {
-        functionScope.commit(isLastBar);
-      }
+      engine.forEachFunctionRuntimeScope((scope) => scope.commit(isLastBar));
       engine.ctx.commitBar();
     }
 
@@ -3474,7 +3528,7 @@ export class TealscriptEngine {
       throw new Error('For loop step cannot be zero');
     }
 
-    const childScope = this.scope.createChild();
+    const childScope = this.functionBlockScope(stmt, 'for');
     const savedScope = this.scope;
     this.scope = childScope;
 
@@ -3527,7 +3581,7 @@ export class TealscriptEngine {
       throw new Error('For-in loop expects an array, map, or matrix');
     }
 
-    const childScope = this.scope.createChild();
+    const childScope = this.functionBlockScope(stmt, 'for-in');
     const savedScope = this.scope;
     this.scope = childScope;
 
@@ -3564,7 +3618,7 @@ export class TealscriptEngine {
   }
 
   private executeFunctionWhile(stmt: WhileStatement): { hasResult: boolean; value?: unknown } {
-    const childScope = this.scope.createChild();
+    const childScope = this.functionBlockScope(stmt, 'while');
     const savedScope = this.scope;
     this.scope = childScope;
 
@@ -3605,14 +3659,21 @@ export class TealscriptEngine {
     return result;
   }
 
-  private executeFunctionStatements(statements: Statement[]): { hasResult: boolean; value?: unknown } {
-    const childScope = this.scope.createChild();
+  private executeFunctionStatements(
+    ownerOrStatements: IfStatement | Statement[],
+    label?: 'consequent' | 'alternate',
+    statements?: Statement[],
+  ): { hasResult: boolean; value?: unknown } {
+    const childScope = Array.isArray(ownerOrStatements)
+      ? this.scope.createChild()
+      : this.functionBlockScope(ownerOrStatements, label ?? 'block');
+    const blockStatements = Array.isArray(ownerOrStatements) ? ownerOrStatements : (statements ?? []);
     const savedScope = this.scope;
     this.scope = childScope;
 
     try {
       let result: { hasResult: boolean; value?: unknown } = { hasResult: false };
-      for (const statement of statements) {
+      for (const statement of blockStatements) {
         const statementResult = this.executeFunctionStatement(statement);
         if (statementResult.hasResult) {
           result = statementResult;
@@ -3628,7 +3689,7 @@ export class TealscriptEngine {
     const condition = this.evaluateExpression(stmt.test);
 
     if (this.isTruthy(condition)) {
-      return this.executeFunctionStatements(stmt.consequent);
+      return this.executeFunctionStatements(stmt, 'consequent', stmt.consequent);
     }
 
     if (!stmt.alternate) {
@@ -3636,7 +3697,7 @@ export class TealscriptEngine {
     }
 
     if (Array.isArray(stmt.alternate)) {
-      return this.executeFunctionStatements(stmt.alternate);
+      return this.executeFunctionStatements(stmt, 'alternate', stmt.alternate);
     }
 
     return this.executeFunctionIf(stmt.alternate);
