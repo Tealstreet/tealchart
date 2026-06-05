@@ -213,6 +213,127 @@ plot(areaBreak, title="Area Break", style=plot.style_areabr, histbase=95)
     ]);
   });
 
+  it('locks a reduced public custom Heikin-Ashi candle idiom', () => {
+    // Public idiom reference: public overlay scripts commonly derive
+    // Heikin-Ashi OHLC values and render them with plotcandle().
+    // Source search: https://www.tradingview.com/scripts/search/heikin%20ashi%20candles/
+    const result = runCompatScript(`
+indicator("Public Custom Candle Checkpoint", overlay=true)
+haClose = (open + high + low + close) / 4
+var float haOpen = na
+haOpen := na(haOpen[1]) ? (open + close) / 2 : (haOpen[1] + haClose[1]) / 2
+haHigh = math.max(high, math.max(haOpen, haClose))
+haLow = math.min(low, math.min(haOpen, haClose))
+bodyColor = haClose >= haOpen ? color.green : color.red
+plotcandle(haOpen, haHigh, haLow, haClose, title="HA Overlay", color=bodyColor, wickcolor=color.new(bodyColor, 20), bordercolor=bodyColor, force_overlay=true)
+plot(haClose - haOpen, title="HA Body")
+`);
+
+    expect(result.errors).toEqual([]);
+    const candles = getPlot(result, 'HA Overlay');
+    expect(candles.type).toBe('plotcandle');
+    expect(roundSeries(candles.openValues ?? [])).toEqual([
+      101,
+      101,
+      102.25,
+      104.125,
+      104.6875,
+      102.84375,
+      100.921875,
+      101.460938,
+      103.980469,
+      106.240234,
+      107.870117,
+      109.435059,
+    ]);
+    expect(roundSeries(candles.highValues ?? [])).toEqual([
+      103,
+      106,
+      108,
+      109,
+      104.6875,
+      102.84375,
+      105,
+      110,
+      111,
+      112,
+      114,
+      113,
+    ]);
+    expect(roundSeries(candles.lowValues ?? [])).toEqual([
+      99,
+      101,
+      102.25,
+      102,
+      98,
+      96,
+      99,
+      101.460938,
+      103.980469,
+      106.240234,
+      107.870117,
+      108,
+    ]);
+    expect(roundSeries(candles.closeValues ?? [])).toEqual([
+      101,
+      103.5,
+      106,
+      105.25,
+      101,
+      99,
+      102,
+      106.5,
+      108.5,
+      109.5,
+      111,
+      110.75,
+    ]);
+    expect(candles.color).toEqual([
+      '#4CAF50',
+      '#4CAF50',
+      '#4CAF50',
+      '#4CAF50',
+      '#F23645',
+      '#F23645',
+      '#4CAF50',
+      '#4CAF50',
+      '#4CAF50',
+      '#4CAF50',
+      '#4CAF50',
+      '#4CAF50',
+    ]);
+    expect(candles.wickColor).toEqual([
+      '#4CAF50CC',
+      '#4CAF50CC',
+      '#4CAF50CC',
+      '#4CAF50CC',
+      '#F23645CC',
+      '#F23645CC',
+      '#4CAF50CC',
+      '#4CAF50CC',
+      '#4CAF50CC',
+      '#4CAF50CC',
+      '#4CAF50CC',
+      '#4CAF50CC',
+    ]);
+    expect(candles.borderColor).toEqual(candles.color);
+    expect(candles.forceOverlay).toBe(true);
+    expect(roundSeries(getPlot(result, 'HA Body').values)).toEqual([
+      0,
+      2.5,
+      3.75,
+      1.125,
+      -3.6875,
+      -3.84375,
+      1.078125,
+      5.039063,
+      4.519531,
+      3.259766,
+      3.129883,
+      1.314941,
+    ]);
+  });
+
   it('locks a reduced public MTF trend-filter idiom', () => {
     // Public idiom reference: MTF trend filters commonly combine local price
     // with higher-timeframe moving averages from request.security().

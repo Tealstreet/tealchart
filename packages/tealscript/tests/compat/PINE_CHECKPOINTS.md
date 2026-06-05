@@ -58,6 +58,7 @@ fixtures by default.
 | `Public Session State Checkpoint` | https://www.tradingview.com/scripts/search/session%20ismarket/ | Exchange session-state helpers gate premarket, regular, and postmarket logic from host session metadata. | Premarket, market, postmarket, and extended-active state over local bars. |
 | `Public Object Method Checkpoint` | https://www.tradingview.com/scripts/search/market%20structure%20object/ | Persistent UDT state is updated through a user-defined method when confirmed pivot highs appear. | Pivot count, last high, and rising-pivot state over `compatibilityBars`. |
 | `Public Drawing Zone Checkpoint` | https://www.tradingview.com/scripts/search/supply%20demand%20zones/ | Persistent supply/demand zone drawings update a box and midline from recent swing ranges. | Final zone bounds, midpoint plot, box payload, and right-extended midline payload over `compatibilityBars`. |
+| `Public Custom Candle Checkpoint` | https://www.tradingview.com/scripts/search/heikin%20ashi%20candles/ | Recursive Heikin-Ashi OHLC values are rendered through a custom `plotcandle()` overlay. | HA OHLC series, body/wick/border colors, force-overlay metadata, and body-delta plot over `compatibilityBars`. |
 
 ## Checkpoint Coverage Index
 
@@ -80,6 +81,7 @@ idioms rather than isolated unit coverage.
 | Visual candle tinting | `Official Barcolor Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Marker output payloads | `Official Marker Payload Checkpoint`; marker color/text payload fixtures in `pine-visuals.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts` |
 | Plot style payloads | `Official Plot Style Checkpoint`; visual constants fixture in `pine-visuals.test.ts`; renderer plot-style fixtures in `TealchartRenderer.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts`; `TealchartRenderer.test.ts` |
+| Custom candle overlays | `Public Custom Candle Checkpoint`; `plotcandle()` fixtures in `pine-visuals.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts` |
 | Multi-timeframe data requests | `Public MTF Trend Checkpoint`; `Official Lower TF Array Checkpoint`; repaint-safe HTF fixture in `pine-request-security.test.ts` | `pine-real-checkpoints.test.ts`; `pine-request-security.test.ts` |
 | Ticker request IDs | `Official Ticker Request Checkpoint`; ticker modifier fixtures in `pine-ticker.test.ts` | `pine-real-checkpoints.test.ts`; `pine-ticker.test.ts` |
 | Pivot/divergence idioms | `Public Divergence Checkpoint` | `pine-real-checkpoints.test.ts` |

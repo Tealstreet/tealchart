@@ -337,6 +337,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-custom-candle-checkpoint',
+      title: 'Public Custom Candle Checkpoint',
+      searchContext: 'TradingView public scripts search: heikin ashi candles',
+      featureTags: ['visuals', 'heikin_ashi', 'candles', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-synthetic-ticker-checkpoint',
       title: 'Public Synthetic Ticker Checkpoint',
       searchContext: 'TradingView public scripts search: heikin ashi trend',
