@@ -90,7 +90,7 @@ import {
   registerTableBuiltins,
   type DrawingBuiltinRuntime,
 } from './builtins/drawings';
-import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type ChartPoint, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LogLevel, type LogOutput, type PlotLineStyle, type PlotOutput, type PlotStyle, type SessionClassificationInfo, type SessionClosureKind, type SymInfo, type TimeframeInfo } from './context';
+import { ExecutionContext, type AlertFrequency, type AlertOutput, type Bar, type ChartInfo, type ChartPoint, type DrawingOutput, type InputDefinition, type LineDrawingOutput, type LogLevel, type LogOutput, type PlotLineStyle, type PlotOutput, type PlotStyle, type SessionClassificationInfo, type SessionClosureKind, type SymInfo, type TimeframeInfo } from './context';
 import {
   getDrawingValue,
   toDrawingId as toDrawingIdValue,
@@ -326,6 +326,7 @@ export interface TealscriptEngineOptions {
 
 export interface TealscriptRuntimeOptions {
   syminfo?: Partial<SymInfo>;
+  chart?: Partial<ChartInfo>;
   timeframe?: Partial<TimeframeInfo>;
   session?: Partial<SessionClassificationInfo>;
   now?: number;
@@ -453,6 +454,12 @@ export class TealscriptEngine {
       this.ctx.syminfo = {
         ...this.ctx.syminfo,
         ...options.syminfo,
+      };
+    }
+    if (options.chart) {
+      this.ctx.chart = {
+        ...this.ctx.chart,
+        ...options.chart,
       };
     }
     if (options.timeframe) {
@@ -1500,6 +1507,9 @@ export class TealscriptEngine {
       if (namespace === 'syminfo') {
         return this.evaluateSyminfo(prop);
       }
+      if (namespace === 'chart') {
+        return this.evaluateChart(prop);
+      }
       if (namespace === 'timeframe') {
         return this.evaluateTimeframe(prop);
       }
@@ -1923,6 +1933,8 @@ export class TealscriptEngine {
         return this.updateObv(this.ctx.close.get(0)!, this.ctx.close.get(1), this.ctx.volume.get(0)!, this.scope, '_ta_obv_value');
       case 'ta.tr':
         return this.currentTrueRange(false);
+      case 'chart':
+        return this.ctx.chart;
     }
 
     // Check scope
@@ -3761,6 +3773,9 @@ export class TealscriptEngine {
     }
 
     const object = this.evaluateExpression(expr.object);
+    if (object === this.ctx.chart) {
+      return this.evaluateChart(expr.property.name);
+    }
     if (isPineUdtObject(object)) {
       return getUdtField(object, expr.property.name);
     }
@@ -3811,6 +3826,29 @@ export class TealscriptEngine {
         return this.ctx.syminfo.mintick * this.ctx.syminfo.pricescale;
       default:
         throw new Error(`Unknown syminfo property: ${prop}`);
+    }
+  }
+
+  private evaluateChart(prop: string): unknown {
+    switch (prop) {
+      case 'bg_color':
+        return this.ctx.chart.bgColor;
+      case 'fg_color':
+        return this.ctx.chart.fgColor;
+      case 'is_heikinashi':
+        return this.ctx.chart.type === 'heikinashi';
+      case 'is_kagi':
+        return this.ctx.chart.type === 'kagi';
+      case 'is_linebreak':
+        return this.ctx.chart.type === 'linebreak';
+      case 'is_pnf':
+        return this.ctx.chart.type === 'pnf';
+      case 'is_range':
+        return this.ctx.chart.type === 'range';
+      case 'is_renko':
+        return this.ctx.chart.type === 'renko';
+      default:
+        throw new Error(`Unknown chart property: ${prop}`);
     }
   }
 
