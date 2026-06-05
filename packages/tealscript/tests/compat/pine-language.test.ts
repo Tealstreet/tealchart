@@ -346,6 +346,29 @@ plot(p.y, title="Y")
     expect(roundSeries(getPlot(result, 'Y').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
   });
 
+  it('reports invalid imported user-defined type constructor argument order', () => {
+    const library = parse(`
+library("PivotTools", true)
+export type Pivot
+    int x
+    float y
+`);
+
+    const result = runCompatScript(`
+indicator("Imported type constructor argument order")
+import TestUser/PivotTools/1 as pivots
+p = pivots.Pivot.new(x=bar_index, close)
+plot(p.y, title="Value")
+`, {
+      bars: [compatibilityBars[0]!],
+      engineOptions: {
+        libraries: new Map([['TestUser/PivotTools/1', library]]),
+      },
+    });
+
+    expect(result.errors[0]?.message).toBe('pivots.Pivot.new cannot use positional arguments after named arguments');
+  });
+
   it('stores and mutates collection fields on user-defined types', () => {
     const result = runCompatScript(`
 indicator("UDT collection fields")

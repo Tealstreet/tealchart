@@ -352,6 +352,8 @@ reject mismatched primitive, reference, collection, UDT, enum, and known mixed
 conditional, `if`, and switch initializer arm values. Plain identifier `:=` reassignments and
 local UDT field `:=` assignments reject mismatched values and qualifier
 downgrades when the target and source have known semantic types.
+Runtime UDT constructors also reject positional arguments after named arguments
+for local and imported exported UDTs.
 Plain identifier compound assignments
 reject known unsupported operand combinations and result values that cannot be
 assigned back to the target, and local UDT field compound assignments apply the
@@ -385,6 +387,8 @@ exported enum members such as `alias.State.long` with dotted annotations such
 as `alias.State signal`, and exported literal/builtin constants such as
 `alias.length` or `alias.color` in offline tests and chart integrations that
 pre-resolve library source.
+Imported exported UDT constructors reject positional arguments after named
+arguments at runtime.
 Exported imported functions and methods report runtime call-shape diagnostics
 for unknown named arguments, missing required arguments, excess positional
 arguments, and invalid argument order. Exported imported methods dispatch on

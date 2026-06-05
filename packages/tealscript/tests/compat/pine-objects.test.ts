@@ -36,6 +36,19 @@ plot(point.openTime, title="Open Time")
     ]);
   });
 
+  it('reports invalid local user-defined type constructor argument order', () => {
+    const result = runCompatScript(`
+indicator("UDT constructor argument order")
+type Pivot
+    int x
+    float y
+point = Pivot.new(x=bar_index, close)
+plot(point.y, title="Value")
+`);
+
+    expect(result.errors[0]?.message).toBe('Pivot.new cannot use positional arguments after named arguments');
+  });
+
   it('runs reduced pivot object array idioms from the official objects docs', () => {
     const result = runCompatScript(`
 indicator("Pivot object array")
