@@ -1844,7 +1844,7 @@ export class TealchartRenderer {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    const isStepLine = style === 'stepline' || style === 'stepline_diamond';
+    const isStepLine = this.plotStyleUsesStepLine(style);
     const breaksOnNa = this.plotStyleBreaksOnNa(style);
 
     // Set line style
@@ -1933,7 +1933,13 @@ export class TealchartRenderer {
   }
 
   private plotStyleBreaksOnNa(style: PlotStyle): boolean {
-    return style === 'linebr' || style === 'areabr';
+    return style === 'linebr' || style === 'areabr' || style === 'steplinebr';
+  }
+
+  private plotStyleUsesStepLine(style: PlotStyle): boolean {
+    return style === 'stepline'
+      || style === 'steplinebr'
+      || style === 'stepline_diamond';
   }
 
   private renderStepLineDiamondMarkers(
@@ -4301,7 +4307,7 @@ export class TealchartRenderer {
     ctx.lineJoin = 'round';
     ctx.setLineDash(this.lineStyleToDashPattern(effectiveLineStyle));
 
-    const isStepLine = style === 'stepline' || style === 'stepline_diamond';
+    const isStepLine = this.plotStyleUsesStepLine(style);
 
     ctx.beginPath();
     let isDrawing = false;
@@ -5024,7 +5030,7 @@ export class TealchartRenderer {
     ctx.lineJoin = 'round';
     ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'solid'));
 
-    const isStepLine = style === 'stepline' || style === 'stepline_diamond';
+    const isStepLine = this.plotStyleUsesStepLine(style);
 
     ctx.beginPath();
     let isDrawing = false;
