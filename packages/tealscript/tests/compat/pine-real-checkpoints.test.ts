@@ -326,6 +326,26 @@ plot(inSession and rawSignal ? 1 : 0, title="Filtered Signal")
     expect(getPlot(result, 'Filtered Signal').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0]);
   });
 
+  it('locks a reduced official dynamic session idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/sessions/
+    const result = runCompatScript(`
+indicator("Official Dynamic Session Checkpoint")
+weekdaySessionInput = input.session("2218-2224", "Weekday Session")
+weekendSessionInput = input.session("0000-0001", "Weekend Session")
+daysInput = input.string("23456", "Weekdays")
+weekdaySession = weekdaySessionInput + ":" + daysInput
+weekendSession = weekendSessionInput + ":17"
+dynamicSession = dayofweek >= dayofweek.monday and dayofweek <= dayofweek.friday ? weekdaySession : weekendSession
+inDynamicSession = not na(time(timeframe.period, dynamicSession))
+plot(inDynamicSession ? 1 : 0, title="Dynamic Session")
+plot(str.length(dynamicSession), title="Session Length")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Dynamic Session').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0]);
+    expect(getPlot(result, 'Session Length').values).toEqual(Array(compatibilityBars.length).fill(15));
+  });
+
   it('locks the official alert trigger idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/alerts/
     const result = runCompatScript(`
