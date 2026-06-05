@@ -4106,6 +4106,45 @@ plot(since + highestOffset + highestInt + defaultHighest + average + spread + (c
     expect(types.get('spread')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
+  it('infers TA series variable member return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("TA Variable Return Types")
+iii = ta.iii
+nvi = ta.nvi
+obv = ta.obv
+pvi = ta.pvi
+pvt = ta.pvt
+tr = ta.tr
+wad = ta.wad
+wvad = ta.wvad
+iii := "bad"
+nvi := "bad"
+obv := "bad"
+pvi := "bad"
+pvt := "bad"
+tr := "bad"
+wad := "bad"
+wvad := "bad"
+plot(iii + nvi + obv + pvi + pvt + tr + wad + wvad)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable iii',
+      'Cannot assign string value to float variable nvi',
+      'Cannot assign string value to float variable obv',
+      'Cannot assign string value to float variable pvi',
+      'Cannot assign string value to float variable pvt',
+      'Cannot assign string value to float variable tr',
+      'Cannot assign string value to float variable wad',
+      'Cannot assign string value to float variable wvad',
+    ]);
+    for (const name of ['iii', 'nvi', 'obv', 'pvi', 'pvt', 'tr', 'wad', 'wvad']) {
+      expect(types.get(name)).toMatchObject({ kind: 'float', qualifier: 'series' });
+    }
+  });
+
   it('reports invalid core TA helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Bad TA Core Signatures")

@@ -212,6 +212,34 @@ plot(ta.cog(source=close, 3), title="Mixed COG")
     expect(roundSeries(getPlot(result, 'Mixed COG').values)).toEqual(roundSeries(getPlot(result, 'COG').values));
   });
 
+  it('runs Pine TA series variables', () => {
+    const result = runCompatScript(`
+indicator("TA variable docs smoke")
+var expectedNvi = 1.0
+var expectedPvi = 1.0
+if bar_index > 0
+    expectedNvi := volume < volume[1] ? expectedNvi[1] + ((close - close[1]) / close[1]) * expectedNvi[1] : expectedNvi[1]
+    expectedPvi := volume > volume[1] ? expectedPvi[1] + ((close - close[1]) / close[1]) * expectedPvi[1] : expectedPvi[1]
+iiiExpected = high == low ? na : ((2 * close - high - low) / (high - low)) * volume
+pvtExpected = ta.cum(bar_index == 0 ? 0 : volume * ((close - close[1]) / close[1]))
+wadMove = close > close[1] ? close - math.min(low, close[1]) : close < close[1] ? close - math.max(high, close[1]) : 0
+wadExpected = ta.cum(wadMove)
+wvadExpected = high == low ? na : ((close - open) / (high - low)) * volume
+plot(math.abs(ta.iii - iiiExpected) < 0.000001, title="III")
+plot(math.abs(ta.nvi - expectedNvi) < 0.000001, title="NVI")
+plot(math.abs(ta.pvi - expectedPvi) < 0.000001, title="PVI")
+plot(math.abs(ta.pvt - pvtExpected) < 0.000001, title="PVT")
+plot(math.abs(ta.wad - wadExpected) < 0.000001, title="WAD")
+plot(math.abs(ta.wvad - wvadExpected) < 0.000001, title="WVAD")
+plot(bar_index == 0 ? na(ta.pvt[1]) : math.abs(ta.pvt[1] - pvtExpected[1]) < 0.000001, title="PVT History")
+`);
+
+    expect(result.errors).toEqual([]);
+    for (const title of ['III', 'NVI', 'PVI', 'PVT', 'WAD', 'WVAD', 'PVT History']) {
+      expect(getPlot(result, title).values).toEqual(Array(compatibilityBars.length).fill(true));
+    }
+  });
+
   it('runs Pine channel helper idioms', () => {
     const result = runCompatScript(`
 indicator("Channel helpers")
