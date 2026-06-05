@@ -540,7 +540,8 @@ plotchar, and plotarrow outputs, and marker payloads preserve dynamic
 bars now emit null body and text-color payloads so consumers do not render
 stale marker styling where Pine would show no marker. The source-linked
 checkpoint corpus tracks marker payloads and common `plot.style_*` payloads
-through official visual checkpoints.
+through official visual checkpoints plus a reduced public buy/sell marker
+signal checkpoint.
 
 Hline renderer coverage applies Pine `hline()` color, linewidth, linestyle,
 display hiding, and pane-coordinate behavior for the current output shape.

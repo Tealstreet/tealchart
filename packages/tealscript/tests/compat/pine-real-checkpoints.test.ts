@@ -154,6 +154,117 @@ plotchar(charValue, title="Marker Char", char="C", text="C", color=markerColor, 
     ]);
   });
 
+  it('locks a reduced public marker signal payload idiom', () => {
+    // Source context: https://www.tradingview.com/scripts/search/buy%20sell%20signal%20markers/
+    const result = runCompatScript(`
+indicator("Public Marker Signal Checkpoint", overlay=true)
+fast = ta.sma(close, 2)
+slow = ta.sma(close, 3)
+longSignal = fast > slow
+shortSignal = fast < slow
+signalColor = longSignal ? color.lime : shortSignal ? color.red : color.gray
+signalText = longSignal ? color.black : shortSignal ? color.white : color.gray
+arrowStrength = longSignal ? high - low : shortSignal ? -(high - low) : 0
+plotshape(longSignal, title="Buy Marker", style=shape.labelup, location=location.belowbar, text="BUY", color=signalColor, textcolor=signalText)
+plotchar(shortSignal, title="Sell Marker", char="S", location=location.abovebar, text="SELL", color=signalColor, textcolor=signalText)
+plotarrow(arrowStrength, title="Signal Arrow", colorup=color.lime, colordown=color.red, minheight=5, maxheight=20)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Buy Marker')).toMatchObject({
+      type: 'plotshape',
+      shape: 'labelup',
+      location: 'belowbar',
+      text: 'BUY',
+    });
+    expect(getPlot(result, 'Buy Marker').values).toEqual([null, null, 1, null, null, null, 1, 1, 1, 1, 1, null]);
+    expect(getPlot(result, 'Buy Marker').color).toEqual([
+      null,
+      null,
+      '#00E676',
+      null,
+      null,
+      null,
+      '#00E676',
+      '#00E676',
+      '#00E676',
+      '#00E676',
+      '#00E676',
+      null,
+    ]);
+    expect(getPlot(result, 'Buy Marker').textColor).toEqual([
+      null,
+      null,
+      '#363A45',
+      null,
+      null,
+      null,
+      '#363A45',
+      '#363A45',
+      '#363A45',
+      '#363A45',
+      '#363A45',
+      null,
+    ]);
+    expect(getPlot(result, 'Sell Marker')).toMatchObject({
+      type: 'plotchar',
+      char: 'S',
+      location: 'abovebar',
+      text: 'SELL',
+    });
+    expect(getPlot(result, 'Sell Marker').values).toEqual([null, null, null, null, 1, 1, null, null, null, null, null, null]);
+    expect(getPlot(result, 'Sell Marker').color).toEqual([
+      null,
+      null,
+      null,
+      null,
+      '#F23645',
+      '#F23645',
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+    ]);
+    expect(getPlot(result, 'Sell Marker').textColor).toEqual([
+      null,
+      null,
+      null,
+      null,
+      '#FFFFFF',
+      '#FFFFFF',
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+    ]);
+    expect(getPlot(result, 'Signal Arrow')).toMatchObject({
+      type: 'plotarrow',
+      colorup: '#00E676',
+      colordown: '#F23645',
+      minHeight: 5,
+      maxHeight: 20,
+    });
+    expect(getPlot(result, 'Signal Arrow').values).toEqual([null, null, 4, null, -6, -5, 6, 7, 5, 5, 5, null]);
+    expect(getPlot(result, 'Signal Arrow').color).toEqual([
+      null,
+      null,
+      '#00E676',
+      null,
+      '#F23645',
+      '#F23645',
+      '#00E676',
+      '#00E676',
+      '#00E676',
+      '#00E676',
+      '#00E676',
+      null,
+    ]);
+  });
+
   it('locks reduced official plot-style payload idioms', () => {
     // Source: https://www.tradingview.com/pine-script-docs/visuals/plots/
     const result = runCompatScript(`
