@@ -677,6 +677,48 @@ plot(strategy.closedtrades, title="Closed Trades")
     ]);
   });
 
+  it('locks a reduced official strategy entry-direction risk idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
+    const bars: Bar[] = [
+      { time: 1_700_370_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_370_060_000, open: 100, high: 103, low: 99, close: 102, volume: 100 },
+      { time: 1_700_370_120_000, open: 102, high: 103, low: 100, close: 101, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Official Allow Entry In Checkpoint", process_orders_on_close=true)
+strategy.risk.allow_entry_in(strategy.direction.long)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.entry("Blocked Short", strategy.short, qty=1)
+if bar_index == 2
+    strategy.order("Raw Short", strategy.short, qty=1)
+plot(strategy.position_size, title="Position")
+plot(strategy.closedtrades, title="Closed Trades")
+plot(strategy.opentrades, title="Open Trades")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Position').values).toEqual([2, 0, -1]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 1, 1]);
+    expect(getPlot(result, 'Open Trades').values).toEqual([1, 0, 1]);
+    expect(result.strategy.orders.map((order) => ({
+      id: order.id,
+      qty: order.qty,
+      requestedQty: order.requestedQty,
+      filledQty: order.filledQty,
+    }))).toEqual([
+      { id: 'Long', qty: 2, requestedQty: 2, filledQty: 2 },
+      { id: 'Blocked Short', qty: 2, requestedQty: 0, filledQty: 2 },
+      { id: 'Raw Short', qty: 1, requestedQty: 1, filledQty: 1 },
+    ]);
+    expect(result.strategy.closedTrades[0]).toMatchObject({
+      entryOrderId: 'Long',
+      exitOrderId: 'Blocked Short',
+      qty: 2,
+    });
+  });
+
   it('locks a reduced official strategy bar-magnifier idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const baseTime = 1_700_100_000_000;
