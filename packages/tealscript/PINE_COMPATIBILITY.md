@@ -564,6 +564,7 @@ The chart-info pass exposes common static `syminfo.*`, `timeframe.*`, and
 host-provided `chart.*` members used by generated indicators and
 multi-timeframe script templates, including `syminfo.tickerid`, `syminfo.root`,
 `syminfo.pointvalue`, `syminfo.mincontract`, `syminfo.volumetype`,
+`syminfo.prefix`, `syminfo.session`,
 `timeframe.period`, `timeframe.main_period`, `timeframe.multiplier`,
 `timeframe.in_seconds()`, `timeframe.from_seconds()`, `timeframe.change()`,
 timeframe category flags, `chart.bg_color`, `chart.fg_color`, and chart-type
