@@ -49,6 +49,39 @@ plot(rt.mid(high, low), title="Mid")
     expect(roundSeries(getPlot(result, 'Mid').values)).toEqual([101, 103.5, 106, 105.5, 101, 98.5, 102, 106.5, 108.5, 109.5, 111.5, 110.5]);
   });
 
+  it('preserves versioned import path metadata while using deterministic registry lookup', () => {
+    const library = parse(`
+library("RangeTools", true)
+export spread(float highValue, float lowValue) => highValue - lowValue
+`);
+    const script = `
+indicator("Versioned import")
+import TestUser/RangeTools/2 as rt
+plot(rt.spread(high, low), title="Spread")
+`;
+    const ast = parse(script);
+    const declaration = ast.body[1];
+
+    expect(declaration.type).toBe('ImportDeclaration');
+    if (declaration.type === 'ImportDeclaration') {
+      expect(declaration).toMatchObject({
+        path: 'TestUser/RangeTools/2',
+        owner: 'TestUser',
+        library: 'RangeTools',
+        version: 2,
+      });
+    }
+
+    const result = runCompatScript(script, {
+      engineOptions: {
+        libraries: new Map([['TestUser/RangeTools/2', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Spread').values)).toEqual([4, 5, 4, 7, 6, 5, 6, 7, 5, 5, 5, 5]);
+  });
+
   it('runs imported exported library constants from a deterministic registry', () => {
     const library = parse(`
 library("Constants", true)

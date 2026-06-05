@@ -104,6 +104,9 @@ export interface LibraryDeclaration extends BaseNode {
 export interface ImportDeclaration extends BaseNode {
   type: 'ImportDeclaration';
   path: string;
+  owner: string;
+  library: string;
+  version: number;
   alias: Identifier;
 }
 

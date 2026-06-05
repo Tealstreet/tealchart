@@ -135,6 +135,24 @@ strategy(title="Mixed Strategy", "Mixed", true, format.price, 3, scale.right, 10
       });
     });
 
+    describe('module declarations', () => {
+      it('parses import path metadata', () => {
+        const ast = parse(`//@version=6
+indicator("Imports")
+import TestUser/RangeTools/12 as rt`);
+
+        const declaration = ast.body[1];
+        expect(declaration.type).toBe('ImportDeclaration');
+        if (declaration.type === 'ImportDeclaration') {
+          expect(declaration.path).toBe('TestUser/RangeTools/12');
+          expect(declaration.owner).toBe('TestUser');
+          expect(declaration.library).toBe('RangeTools');
+          expect(declaration.version).toBe(12);
+          expect(declaration.alias.name).toBe('rt');
+        }
+      });
+    });
+
     describe('variable declarations', () => {
       it('parses simple variable declaration', () => {
         const ast = parse(`//@version=6

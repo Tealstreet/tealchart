@@ -168,18 +168,26 @@ LibraryDeclaration
     }
 
 ImportDeclaration
-  = "import" !IdentifierPart _ path:ImportPath _ "as" !IdentifierPart _ alias:Identifier _ LineTerminator? {
+  = "import" !IdentifierPart _ importPath:ImportPath _ "as" !IdentifierPart _ alias:Identifier _ LineTerminator? {
       return {
         type: 'ImportDeclaration',
-        path,
+        path: importPath.path,
+        owner: importPath.owner,
+        library: importPath.library,
+        version: importPath.version,
         alias,
         loc: loc()
       };
     }
 
 ImportPath
-  = parts:$(IdentifierName ("/" [a-zA-Z0-9_]+)+) {
-      return parts;
+  = owner:IdentifierName "/" library:IdentifierName "/" version:Integer {
+      return {
+        path: `${owner}/${library}/${version.value}`,
+        owner,
+        library,
+        version: version.value
+      };
     }
 
 // User-defined type:
