@@ -42,10 +42,10 @@ arrays, bar coloring, alerts, strategy entry/exit flows, request-limit reuse,
 explicit `max_bars_back` metadata, official lower-timeframe request arrays,
 official synthetic ticker requests, official dynamic sessions, official
 timeframe comparisons, official plot-style payloads, and public MTF,
-divergence, session-filter, and dashboard-table idioms. Strategy coverage
-includes source-linked entry/exit flows, broker path behavior, bar magnifier,
-stop-limit orders, selective immediate closes, fill-alert suppression,
-entry-direction risk rules, and recalculation checkpoints.
+divergence, session-filter, dashboard-table, and multi-symbol screener idioms.
+Strategy coverage includes source-linked entry/exit flows, broker path behavior,
+bar magnifier, stop-limit orders, selective immediate closes, fill-alert
+suppression, entry-direction risk rules, and recalculation checkpoints.
 
 ## Current Matrix
 
