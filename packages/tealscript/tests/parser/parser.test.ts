@@ -737,6 +737,42 @@ plot(classify(close))
       expect(current?.type).toBe('ExpressionStatement');
     });
 
+    it('parses sixth-level nested user-defined function branches', () => {
+      const ast = parse(`indicator("Sixth Level Nested Layout")
+classify(value) =>
+    if value > 0
+        if value > 1
+            if value > 2
+                if value > 3
+                    if value > 4
+                        if value > 5
+                            6
+                        else
+                            5
+                    else
+                        4
+                else
+                    3
+            else
+                2
+        else
+            1
+    else
+        0
+plot(classify(close))
+`);
+      const fn = ast.body.find((statement): statement is FunctionDeclaration => statement.type === 'FunctionDeclaration');
+
+      expect(fn).toBeDefined();
+      expect(Array.isArray(fn?.body)).toBe(true);
+      let current = Array.isArray(fn?.body) ? fn.body[0] : null;
+      for (let depth = 0; depth < 6; depth += 1) {
+        expect(current?.type).toBe('IfStatement');
+        current = current?.type === 'IfStatement' ? current.consequent[0] : null;
+      }
+      expect(current?.type).toBe('ExpressionStatement');
+    });
+
     it('parses wrapped calls and member chains inside indented bodies', () => {
       const ast = parse(`wrapped(source) =>
     value = array.get(
