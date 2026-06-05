@@ -498,7 +498,8 @@ Marker text rendering supports newline-separated labels on plotshape,
 plotchar, and plotarrow outputs, and marker payloads preserve dynamic
 `textcolor` series for per-bar rendering. Hidden `plotshape()` and `plotchar()`
 bars now emit null body and text-color payloads so consumers do not render
-stale marker styling where Pine would show no marker.
+stale marker styling where Pine would show no marker. The source-linked
+checkpoint corpus tracks this as the official marker payload checkpoint.
 
 Hline renderer coverage applies Pine `hline()` color, linewidth, linestyle,
 display hiding, and pane-coordinate behavior for the current output shape.
