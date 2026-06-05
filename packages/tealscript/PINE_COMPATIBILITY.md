@@ -756,7 +756,8 @@ rollback. Remaining gaps are TradingView-exact sizing and pixel parity.
 The strategy pass accepts `strategy(...)` declarations and maps common settings
 into the exported ledger primitives for settings, orders, fills, trades,
 positions, and equity snapshots. Read-only `strategy.*` state variables such as
-`strategy.equity`, net/gross/open profit percent variants,
+`strategy.equity`, `strategy.netprofit_percent`, `strategy.grossprofit_percent`,
+`strategy.grossloss_percent`, `strategy.openprofit_percent`,
 `strategy.position_size`, and trade counters are available for scripts. The
 semantic checker validates common strategy order, close/cancel,
 and trade-accessor call shapes before runtime, and preserves known strategy
