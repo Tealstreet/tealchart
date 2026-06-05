@@ -669,6 +669,36 @@ plot(strategy.netprofit, title="Net Profit")
     });
   });
 
+  it('locks a reduced official strategy stop-limit order idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/#order-types
+    const bars: Bar[] = [
+      { time: 1_700_150_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_150_060_000, open: 100, high: 102.5, low: 97, close: 100, volume: 100 },
+      { time: 1_700_150_120_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Official Stop Limit Checkpoint")
+if bar_index == 0
+    strategy.entry("Long stop-limit", strategy.long, qty=1, stop=102, limit=98)
+plot(strategy.position_size, title="Position")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Position').values).toEqual([0, 0, 1]);
+    expect(result.strategy.fills.map(({ orderId, price, barIndex, time }) => ({ orderId, price, barIndex, time }))).toEqual([
+      { orderId: 'Long stop-limit', price: 98, barIndex: 1, time: bars[1].time },
+    ]);
+    expect(result.strategy.orders[0]).toMatchObject({
+      id: 'Long stop-limit',
+      type: 'stop_limit',
+      status: 'filled',
+      stopLimitActivated: true,
+      stopLimitActivatedBarIndex: 1,
+      avgFillPrice: 98,
+      updatedBarIndex: 1,
+    });
+  });
+
   it('locks a reduced official strategy calc-on-order-fills idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const bars: Bar[] = [
