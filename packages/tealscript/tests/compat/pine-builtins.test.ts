@@ -544,6 +544,9 @@ formatted = str.tostring(close, "#.00")
 prefixFormatted = str.tostring(value=close, "#.00")
 message = str.format("close={0:#.0}", close)
 namedMessage = str.format(format="close={0:#.0}", close)
+decimalMessage = str.format("{0,number,#.#}", 1.34)
+currencyMessage = str.format("{0, number, currency}", 1340000)
+percentMessage = str.format("{0, number, percent} - {1, number, percent}", 0.1, 0.2)
 joined = "symbol:" + "BTCUSDT"
 parsed = str.tonumber("42.5")
 invalid = str.tonumber("not a number")
@@ -553,6 +556,9 @@ plot(formatted == "102.00", title="Formatted Close")
 plot(prefixFormatted == "102.00", title="Prefix Formatted Close")
 plot(message == "close=102.0", title="Format Template")
 plot(namedMessage == "close=102.0", title="Named Format Template")
+plot(decimalMessage == "1.3", title="Number Format Template")
+plot(currencyMessage == "$1,340,000.00", title="Currency Format Template")
+plot(percentMessage == "10% - 20%", title="Percent Format Template")
 plot(joined == "symbol:BTCUSDT", title="Concatenated Symbol")
 plot(parsed, title="Parsed Number")
 plot(na(invalid) ? 1 : 0, title="Invalid Is NA")
@@ -565,6 +571,9 @@ plot(prefixFormattedTime == "2024-01-05 09:30", title="Prefix Formatted Time")
     expect(getPlot(result, 'Prefix Formatted Close').values).toEqual([true, false, false, false, false, false, false, false, false, false, false, false]);
     expect(getPlot(result, 'Format Template').values).toEqual([true, false, false, false, false, false, false, false, false, false, false, false]);
     expect(getPlot(result, 'Named Format Template').values).toEqual([true, false, false, false, false, false, false, false, false, false, false, false]);
+    expect(getPlot(result, 'Number Format Template').values).toEqual(Array(compatibilityBars.length).fill(true));
+    expect(getPlot(result, 'Currency Format Template').values).toEqual(Array(compatibilityBars.length).fill(true));
+    expect(getPlot(result, 'Percent Format Template').values).toEqual(Array(compatibilityBars.length).fill(true));
     expect(getPlot(result, 'Concatenated Symbol').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(roundSeries(getPlot(result, 'Parsed Number').values)).toEqual([42.5, 42.5, 42.5, 42.5, 42.5, 42.5, 42.5, 42.5, 42.5, 42.5, 42.5, 42.5]);
     expect(getPlot(result, 'Invalid Is NA').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);

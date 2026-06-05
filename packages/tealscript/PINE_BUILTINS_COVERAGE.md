@@ -116,7 +116,9 @@ Current `str.*` progress:
 - `str.tonumber()` uses strict decimal/scientific parsing so JavaScript-only
   forms such as hexadecimal and infinity return `na`.
 - Formatting helpers accept Pine-style named arguments for covered conversion
-  and time-formatting parameters.
+  and time-formatting parameters. `str.format()` supports Pine-style numeric
+  placeholder modifiers for decimal masks, integer, currency, and percent
+  output.
 - Covered string search, substring, split, case, trim, replacement, and repeat
   helpers accept Pine-style named arguments while preserving positional calls.
 - `str.format_time()` uses the Pine v6 ISO-style default format and supports

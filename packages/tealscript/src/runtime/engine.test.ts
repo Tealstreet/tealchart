@@ -4310,6 +4310,33 @@ plot(str.replace("a-b-a-b", "b", "x", 1) == "a-b-a-x", title="Replace Occurrence
       expect(result.plots.find((plot) => plot.title === 'Replace Occurrence')?.values).toEqual([true, true]);
     });
 
+    it('formats numeric placeholders with str.format', () => {
+      const script = `//@version=6
+indicator("String Format Numbers")
+plot(str.format("{0,number,#.#}", 1.34) == "1.3", title="Decimal Mask")
+plot(str.format("{0, number, integer}", 1.34) == "1", title="Integer Style")
+plot(str.format("{0,number,currency}", 1340000) == "$1,340,000.00", title="Currency Style")
+plot(str.format("{0,number,currency}", -12.5) == "-$12.50", title="Negative Currency Style")
+plot(str.format("{0, number, percent} - {1, number, percent}", 0.1, 0.2) == "10% - 20%", title="Percent Style")
+plot(str.format("{0} != {0, number, #.#}", 1.34) == "1.34 != 1.3", title="Repeated Argument")
+plot(str.format("{0,number,#.#}", na) == "NaN", title="NA Number Style")
+plot(str.format(format="value={0:#.0}", 100.2) == "value=100.2", title="Named Colon Mask")`;
+
+      const ast = parse(script);
+      const bars = createBars(2, 100);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Decimal Mask')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Integer Style')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Currency Style')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Negative Currency Style')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Percent Style')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Repeated Argument')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'NA Number Style')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Named Colon Mask')?.values).toEqual([true, true]);
+    });
+
     it('formats timestamps with str.format_time', () => {
       const script = `//@version=6
 indicator("String Format Time")
