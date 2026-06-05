@@ -525,7 +525,10 @@ interface BuiltinSignature {
   allowExtraPositional?: boolean;
   allowNamedPrefixWithPositional?: boolean;
   namedPrefixWithPositionalParams?: string[];
+  variadicParamPrefix?: string;
 }
+
+const MAX_VARIADIC_SIGNATURE_INDEX = 1000;
 
 const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['alert', { params: ['message', 'freq'], minArgs: 1, allowNamedPrefixWithPositional: true }],
@@ -927,6 +930,9 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['math.atan', { params: ['number'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['math.toradians', { params: ['number'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['math.todegrees', { params: ['number'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['math.max', { params: ['number0', 'number1'], minArgs: 2, allowExtraPositional: true, allowNamedPrefixWithPositional: true, variadicParamPrefix: 'number' }],
+  ['math.min', { params: ['number0', 'number1'], minArgs: 2, allowExtraPositional: true, allowNamedPrefixWithPositional: true, variadicParamPrefix: 'number' }],
+  ['math.avg', { params: ['number0', 'number1'], minArgs: 2, allowExtraPositional: true, allowNamedPrefixWithPositional: true, variadicParamPrefix: 'number' }],
   ['math.pow', { params: ['base', 'exponent'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['math.round', { params: ['number', 'precision'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['math.round_to_mintick', { params: ['number'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
@@ -3623,6 +3629,22 @@ class SemanticChecker {
   }
 
   private resolveSignatureParams(args: CallArgument[], signature: BuiltinSignature): string[] {
+    if (signature.variadicParamPrefix) {
+      const escapedPrefix = signature.variadicParamPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const variadicNamePattern = new RegExp(`^${escapedPrefix}(\\d+)$`);
+      const positionalMaxIndex = Math.min(args.filter((arg) => !arg.name).length - 1, MAX_VARIADIC_SIGNATURE_INDEX);
+      const namedMaxIndex = args.reduce((maxIndex, arg) => {
+        const name = arg.name ? this.canonicalSignatureArgumentName(arg.name.name, signature) : undefined;
+        const match = name?.match(variadicNamePattern);
+        if (!match) return maxIndex;
+        const index = Number(match[1]);
+        if (!Number.isSafeInteger(index) || index > MAX_VARIADIC_SIGNATURE_INDEX) return maxIndex;
+        return Math.max(maxIndex, index);
+      }, -1);
+      const maxIndex = Math.max(signature.params.length - 1, positionalMaxIndex, namedMaxIndex);
+      return Array.from({ length: maxIndex + 1 }, (_, index) => `${signature.variadicParamPrefix}${index}`);
+    }
+
     if (!signature.overloads) return signature.params;
 
     const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
