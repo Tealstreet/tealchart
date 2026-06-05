@@ -339,8 +339,11 @@ const STRATEGY_INT_MEMBER_NAMES = new Set([
   'strategy.wintrades',
 ]);
 const STRATEGY_STRING_ACCESSOR_NAMES = new Set([
+  'strategy.closedtrades.entry_comment',
   'strategy.closedtrades.entry_id',
+  'strategy.closedtrades.exit_comment',
   'strategy.closedtrades.exit_id',
+  'strategy.opentrades.entry_comment',
   'strategy.opentrades.entry_id',
 ]);
 const STRATEGY_INT_ACCESSOR_NAMES = new Set([
@@ -356,6 +359,7 @@ const STRATEGY_FLOAT_ACCESSOR_NAMES = new Set([
   'strategy.closedtrades.entry_price',
   'strategy.closedtrades.exit_price',
   'strategy.closedtrades.profit',
+  'strategy.closedtrades.profit_percent',
   'strategy.closedtrades.size',
   'strategy.closedtrades.max_drawdown',
   'strategy.closedtrades.max_drawdown_percent',
@@ -368,6 +372,7 @@ const STRATEGY_FLOAT_ACCESSOR_NAMES = new Set([
   'strategy.opentrades.max_runup',
   'strategy.opentrades.max_runup_percent',
   'strategy.opentrades.profit',
+  'strategy.opentrades.profit_percent',
   'strategy.opentrades.size',
 ]);
 
@@ -505,11 +510,13 @@ const STRATEGY_EXIT_PARAMS = [
 ];
 const STRATEGY_TRADE_ACCESSORS = [
   'entry_id',
+  'entry_comment',
   'entry_price',
   'entry_bar_index',
   'entry_time',
   'size',
   'profit',
+  'profit_percent',
   'commission',
   'max_runup',
   'max_drawdown',
@@ -519,6 +526,7 @@ const STRATEGY_TRADE_ACCESSORS = [
 const STRATEGY_CLOSED_TRADE_ACCESSORS = [
   ...STRATEGY_TRADE_ACCESSORS,
   'exit_id',
+  'exit_comment',
   'exit_price',
   'exit_bar_index',
   'exit_time',

@@ -4981,6 +4981,9 @@ export class TealscriptEngine {
     this.builtins.set('strategy.opentrades.entry_id', (args, namedArgs) => (
       this.strategyOpenTrade(args, namedArgs)?.entryOrderId ?? ''
     ));
+    this.builtins.set('strategy.opentrades.entry_comment', (args, namedArgs) => (
+      this.strategyOpenTrade(args, namedArgs)?.entryComment ?? ''
+    ));
     this.builtins.set('strategy.opentrades.entry_price', (args, namedArgs) => (
       this.strategyOpenTrade(args, namedArgs)?.entryPrice ?? Number.NaN
     ));
@@ -5006,6 +5009,15 @@ export class TealscriptEngine {
       const sign = trade.direction === 'long' ? 1 : -1;
       return (close - trade.entryPrice) * trade.qty * sign;
     });
+    this.builtins.set('strategy.opentrades.profit_percent', (args, namedArgs) => {
+      const trade = this.strategyOpenTrade(args, namedArgs);
+      if (!trade) {
+        return Number.NaN;
+      }
+      const close = this.ctx.close.get(0) ?? Number.NaN;
+      const sign = trade.direction === 'long' ? 1 : -1;
+      return this.strategyTradePercentValue(trade, (close - trade.entryPrice) * trade.qty * sign);
+    });
     this.builtins.set('strategy.opentrades.commission', (args, namedArgs) => (
       this.strategyOpenTrade(args, namedArgs)?.commission ?? Number.NaN
     ));
@@ -5024,8 +5036,14 @@ export class TealscriptEngine {
     this.builtins.set('strategy.closedtrades.entry_id', (args, namedArgs) => (
       this.strategyClosedTrade(args, namedArgs)?.entryOrderId ?? ''
     ));
+    this.builtins.set('strategy.closedtrades.entry_comment', (args, namedArgs) => (
+      this.strategyClosedTrade(args, namedArgs)?.entryComment ?? ''
+    ));
     this.builtins.set('strategy.closedtrades.exit_id', (args, namedArgs) => (
       this.strategyClosedTrade(args, namedArgs)?.exitOrderId ?? ''
+    ));
+    this.builtins.set('strategy.closedtrades.exit_comment', (args, namedArgs) => (
+      this.strategyClosedTrade(args, namedArgs)?.exitComment ?? ''
     ));
     this.builtins.set('strategy.closedtrades.entry_price', (args, namedArgs) => (
       this.strategyClosedTrade(args, namedArgs)?.entryPrice ?? Number.NaN
@@ -5055,6 +5073,10 @@ export class TealscriptEngine {
     this.builtins.set('strategy.closedtrades.profit', (args, namedArgs) => (
       this.strategyClosedTrade(args, namedArgs)?.profit ?? Number.NaN
     ));
+    this.builtins.set('strategy.closedtrades.profit_percent', (args, namedArgs) => {
+      const trade = this.strategyClosedTrade(args, namedArgs);
+      return this.strategyTradePercentValue(trade, trade?.profit ?? Number.NaN);
+    });
     this.builtins.set('strategy.closedtrades.commission', (args, namedArgs) => (
       this.strategyClosedTrade(args, namedArgs)?.commission ?? Number.NaN
     ));
@@ -5095,10 +5117,14 @@ export class TealscriptEngine {
   }
 
   private strategyTradePercent(trade: StrategyTrade | undefined, field: 'maxRunup' | 'maxDrawdown'): number {
+    return this.strategyTradePercentValue(trade, trade?.[field] ?? Number.NaN);
+  }
+
+  private strategyTradePercentValue(trade: StrategyTrade | undefined, value: number): number {
     if (!trade) return Number.NaN;
     const basis = trade.entryPrice * Math.abs(trade.qty);
     if (!Number.isFinite(basis) || basis <= 0) return Number.NaN;
-    return (trade[field] / basis) * 100;
+    return (value / basis) * 100;
   }
 
   private strategyTradeIndex(args: unknown[], namedArgs: Map<string, unknown>): number {
