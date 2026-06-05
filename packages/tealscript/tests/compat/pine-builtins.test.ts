@@ -555,6 +555,7 @@ prefixFormattedTime = str.format_time(time=timestamp("GMT+2", 2024, 1, 5, 9, 30)
 ampmTime = str.format_time(timestamp("UTC", 2024, 1, 5, 15, 5), "h:mm a", "UTC")
 fractionalTime = str.format_time(timestamp("UTC", 2024, 1, 5, 15, 5) + 987, "S SS SSS", "UTC")
 monthNameTime = str.format_time(timestamp("UTC", 2024, 8, 20), "MMM MMMM", "UTC")
+weekdayNameTime = str.format_time(timestamp("UTC", 2024, 8, 20), "E EEEE", "UTC")
 plot(formatted == "102.00", title="Formatted Close")
 plot(prefixFormatted == "102.00", title="Prefix Formatted Close")
 plot(message == "close=102.0", title="Format Template")
@@ -570,6 +571,7 @@ plot(prefixFormattedTime == "2024-01-05 09:30", title="Prefix Formatted Time")
 plot(ampmTime == "3:05 PM", title="AM PM Formatted Time")
 plot(fractionalTime == "9 98 987", title="Fractional Formatted Time")
 plot(monthNameTime == "Aug August", title="Month Name Formatted Time")
+plot(weekdayNameTime == "Tue Tuesday", title="Weekday Name Formatted Time")
 `);
 
     expect(result.errors).toEqual([]);
