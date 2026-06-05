@@ -161,9 +161,10 @@ strings. `str.format()` supports Pine-style numeric placeholder modifiers for
 decimal masks, integer, currency, and percent output, while
 `str.format_time()` supports year `y`/`yy`/`yyyy`, month-name `MMM`/`MMMM`,
 weekday-name `E`/`EEEE`, day-of-year `D`/`DD`/`DDD`, fractional-second
-`S`/`SS`/`SSS`, 12-hour `h`/`hh`, AM/PM `a`, and timezone-name `z`/`zzzz`
-tokens. Semantic analysis preserves known string helper return types for
-downstream assignment diagnostics, including `str.split()` array element types.
+`S`/`SS`/`SSS`, week-of-year `w`/`ww`, 12-hour `h`/`hh`, AM/PM `a`, and
+timezone-name `z`/`zzzz` tokens. Semantic analysis preserves known string
+helper return types for downstream assignment diagnostics, including
+`str.split()` array element types.
 
 ## Common `input.*` Coverage
 
