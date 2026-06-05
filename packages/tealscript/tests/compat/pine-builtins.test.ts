@@ -1013,6 +1013,24 @@ plot(close, title="Close")
     expect(roundSeries(getPlot(result, 'Close').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
   });
 
+  it('surfaces Pine library declaration metadata', () => {
+    const result = runCompatScript(`
+library("Library settings", overlay=true, dynamic_requests=false)
+plot(close, title="Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Library settings');
+    expect(result.indicatorOverlay).toBe(true);
+    expect(result.indicatorDynamicRequests).toBe(false);
+    expect(result.declaration).toMatchObject({
+      title: 'Library settings',
+      overlay: true,
+      dynamicRequests: false,
+    });
+    expect(roundSeries(getPlot(result, 'Close').values)).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+  });
+
   it('matches documented Pine input helper idioms', () => {
     const result = runCompatScript(`
 indicator("Input docs smoke")

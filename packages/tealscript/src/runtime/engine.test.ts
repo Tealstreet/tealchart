@@ -2261,6 +2261,26 @@ plot(close)`;
       });
     });
 
+    it('records library declaration metadata', () => {
+      const script = `//@version=6
+library("Library Metadata", overlay=true, dynamic_requests=false)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.indicatorTitle).toBe('Library Metadata');
+      expect(result.indicatorOverlay).toBe(true);
+      expect(result.indicatorDynamicRequests).toBe(false);
+      expect(result.declaration).toMatchObject({
+        title: 'Library Metadata',
+        overlay: true,
+        dynamicRequests: false,
+      });
+    });
+
     it('records indicator shorttitle metadata', () => {
       const script = `//@version=6
 indicator("Long Declaration Title", shorttitle="Short")

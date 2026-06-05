@@ -1110,11 +1110,20 @@ export class TealscriptEngine {
     this.ctx.setStrategyLedger(settings);
   }
 
-  private executeLibrary(_stmt: LibraryDeclaration): void {
+  private executeLibrary(stmt: LibraryDeclaration): void {
     if (this.ctx.bar_index !== 0) return;
 
     // Local library scripts can execute their global demo code in this runtime.
     // Published-library import resolution is still intentionally unsupported.
+    if (stmt.title) {
+      this.ctx.indicatorTitle = this.evaluateExpression(stmt.title) as string;
+    }
+    if (stmt.overlay) {
+      this.ctx.indicatorOverlay = this.isTruthy(this.evaluateExpression(stmt.overlay));
+    }
+    if (stmt.dynamic_requests) {
+      this.indicatorDynamicRequests = this.isTruthy(this.evaluateExpression(stmt.dynamic_requests));
+    }
   }
 
   private executeImport(stmt: ImportDeclaration): void {
