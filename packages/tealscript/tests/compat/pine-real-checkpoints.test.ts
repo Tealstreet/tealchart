@@ -495,6 +495,73 @@ plot(extendedState ? 1 : 0, title="Extended Active")
     expect(getPlot(result, 'Extended Active').values).toEqual([1, 1, 1, 0]);
   });
 
+  it('locks a reduced public drawing zone idiom', () => {
+    // Public idiom reference: supply/demand public scripts commonly keep a
+    // persistent box zone and a midline updated from recent swing ranges.
+    // Source search: https://www.tradingview.com/scripts/search/supply%20demand%20zones/
+    const result = runCompatScript(`
+indicator("Public Drawing Zone Checkpoint", overlay=true)
+var zone = box.new(left=na, top=na, right=na, bottom=na, bgcolor=color.new(color.green, 85), border_color=color.green, text="")
+var midline = line.new(x1=na, y1=na, x2=na, y2=na, extend=extend.right, color=color.green, width=2)
+zoneTop = ta.highest(high, 3)
+zoneBottom = ta.lowest(low, 3)
+zoneMid = (zoneTop + zoneBottom) / 2
+if barstate.islast
+    box.set_lefttop(zone, bar_index - 3, zoneTop)
+    box.set_rightbottom(zone, bar_index, zoneBottom)
+    box.set_text(zone, "Demand")
+    box.set_bgcolor(zone, color.new(color.green, 85))
+    box.set_border_color(zone, color.green)
+    line.set_xy1(midline, bar_index - 3, zoneMid)
+    line.set_xy2(midline, bar_index, zoneMid)
+plot(zoneTop, title="Zone Top")
+plot(zoneBottom, title="Zone Bottom")
+plot(zoneMid, title="Zone Mid")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Zone Top').values.at(-1)).toBe(114);
+    expect(getPlot(result, 'Zone Bottom').values.at(-1)).toBe(107);
+    expect(getPlot(result, 'Zone Mid').values.at(-1)).toBe(110.5);
+    expect(result.drawings).toEqual([
+      {
+        id: 'box_box.new_0_0',
+        type: 'box',
+        persistent: true,
+        barIndex: 11,
+        left: 8,
+        top: 114,
+        right: 11,
+        bottom: 107,
+        xloc: 'bar_index',
+        extend: 'none',
+        borderColor: '#4CAF50',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        bgcolor: '#4CAF5026',
+        text: 'Demand',
+        textColor: '#363A45',
+        textSize: 'auto',
+      },
+      {
+        id: 'line_line.new_0_0',
+        type: 'line',
+        persistent: true,
+        barIndex: 11,
+        x1: 8,
+        y1: 110.5,
+        x2: 11,
+        y2: 110.5,
+        xloc: 'bar_index',
+        extend: 'right',
+        color: '#4CAF50',
+        style: 'solid',
+        width: 2,
+        forceOverlay: false,
+      },
+    ]);
+  });
+
   it('locks a reduced public dashboard table idiom', () => {
     // Public idiom reference: dashboard-style public indicators commonly
     // summarize trend and signal state in a last-bar table.
