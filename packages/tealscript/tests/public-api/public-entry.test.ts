@@ -10,11 +10,13 @@ import {
   compatibilityStages,
   createResultMessage,
   createCompatibilityRunOutcome,
+  createPineCompatibilityCoverageIndex,
   createPineScriptLedger,
   corporateActionRequestKey,
   currencyRateRequestKey,
   economicRequestKey,
   financialRequestKey,
+  formatPineCompatibilityCoverageMarkdown,
   formatPineCompatibilityCorpusJson,
   formatPineCompatibilityCorpusMarkdown,
   getResultOutput,
@@ -77,6 +79,7 @@ describe('public package entrypoints', () => {
     ]);
     const ledger = createPineScriptLedger([ledgerEntry]);
     const ledgerRun = runPineCompatibilityLedger(ledger, () => [{ stage: 'parse', status: 'passed' }]);
+    const coverageIndex = createPineCompatibilityCoverageIndex(ledger);
 
     expect(typeof parse).toBe('function');
     expect(typeof validate).toBe('function');
@@ -87,6 +90,7 @@ describe('public package entrypoints', () => {
     expect(corpusRun.summary.passed).toBe(1);
     expect(ledgerRun.summary.passed).toBe(1);
     expect(formatPineCompatibilityCorpusJson(corpusRun)).toContain('"summary"');
+    expect(formatPineCompatibilityCoverageMarkdown(coverageIndex)).toContain('Total checkpoints: 1');
     expect(formatPineCompatibilityCorpusMarkdown(corpusRun)).toContain('Pass rate: 100.0%');
     expect(validatePineScriptLedger(ledger)).toEqual({});
     expect(validatePineScriptLedgerEntry(ledgerEntry)).toEqual([]);
