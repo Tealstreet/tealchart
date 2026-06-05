@@ -72,7 +72,7 @@ barcolor(isInside ? color.yellow : isOutsideUp ? color.aqua : isOutsideDown ? co
     expect(result.plots.find((plot) => plot.type === 'barcolor')?.color).toEqual([
       null,
       '#00BCD4',
-      '#FFEB3B',
+      '#FDD835',
       '#9C27B0',
     ]);
   });
