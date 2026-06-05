@@ -387,6 +387,7 @@ export class TealscriptEngine {
   private scope: Scope;
   private builtins: BuiltinRegistry;
   private typeDeclarations: Map<string, TypeDeclaration>;
+  private enumValues: Map<string, Map<string, string>>;
   private userFunctions: Map<string, FunctionDeclaration>;
   private userMethods: Map<string, FunctionDeclaration[]>;
   private functionScopes: Map<string, Scope>;
@@ -423,6 +424,7 @@ export class TealscriptEngine {
     this.scope = createRootScope();
     this.builtins = new Map();
     this.typeDeclarations = new Map();
+    this.enumValues = new Map();
     this.userFunctions = new Map();
     this.userMethods = new Map();
     this.functionScopes = new Map();
@@ -466,6 +468,7 @@ export class TealscriptEngine {
     this.ctx.reset();
     this.scope = createRootScope();
     this.typeDeclarations.clear();
+    this.enumValues.clear();
     this.functionScopes.clear();
     this.importedLibraries.clear();
     this.requestEvaluationCache.clear();
@@ -936,6 +939,8 @@ export class TealscriptEngine {
         break;
       case 'TypeDeclaration':
         break;
+      case 'EnumDeclaration':
+        break;
       case 'FunctionDeclaration':
         break;
       case 'VariableDeclaration':
@@ -1215,9 +1220,13 @@ export class TealscriptEngine {
 
   private registerTypeDeclarations(ast: Program): void {
     this.typeDeclarations.clear();
+    this.enumValues.clear();
     for (const stmt of ast.body) {
       if (stmt.type === 'TypeDeclaration') {
         this.typeDeclarations.set(stmt.name.name, stmt);
+      }
+      if (stmt.type === 'EnumDeclaration') {
+        this.enumValues.set(stmt.name.name, this.createLocalEnumValues(stmt));
       }
     }
   }
@@ -1308,6 +1317,14 @@ export class TealscriptEngine {
     const values = new Map<string, string>();
     for (const field of declaration.fields) {
       values.set(field.name.name, `${libraryPath}.${declaration.name.name}.${field.name.name}`);
+    }
+    return values;
+  }
+
+  private createLocalEnumValues(declaration: EnumDeclaration): Map<string, string> {
+    const values = new Map<string, string>();
+    for (const field of declaration.fields) {
+      values.set(field.name.name, `${declaration.name.name}.${field.name.name}`);
     }
     return values;
   }
@@ -2823,6 +2840,7 @@ export class TealscriptEngine {
     }
     engine.ctx.timeframe = timeframeInfo;
     engine.ctx.loadBars(requestContext.bars);
+    engine.enumValues = new Map(Array.from(this.enumValues, ([name, values]) => [name, new Map(values)]));
     engine.userFunctions = new Map(this.userFunctions);
     engine.userMethods = new Map(Array.from(this.userMethods, ([name, methods]) => [name, [...methods]]));
     engine.importedLibraries = new Map(this.importedLibraries);
@@ -3430,6 +3448,13 @@ export class TealscriptEngine {
       if (memberPath.length === 3) {
         const [alias, enumName, fieldName] = memberPath;
         const enumValues = alias && enumName ? this.importedLibraries.get(alias)?.enums.get(enumName) : undefined;
+        if (fieldName && enumValues?.has(fieldName)) {
+          return enumValues.get(fieldName);
+        }
+      }
+      if (memberPath.length === 2) {
+        const [enumName, fieldName] = memberPath;
+        const enumValues = enumName ? this.enumValues.get(enumName) : undefined;
         if (fieldName && enumValues?.has(fieldName)) {
           return enumValues.get(fieldName);
         }
