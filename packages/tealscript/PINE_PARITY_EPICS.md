@@ -91,11 +91,11 @@ The current runtime already covers a useful common-script subset:
   visual outputs, drawing objects, tables, requests, tickers, alerts/logs, and
   strategies.
 - Compatibility fixtures for real Pine idioms including MTF filters,
-  divergence, session filters, dynamic sessions, timeframe comparisons, bar
-  coloring, plot-style payloads, dashboard tables, multi-symbol screeners,
-  imported library helpers, alerts, request-limit reuse, strategy entry/exit
-  flows, default broker-emulator path and gap-fill behavior, and common
-  drawing/table patterns.
+  divergence, session filters, exchange session-state gates, dynamic sessions,
+  timeframe comparisons, bar coloring, plot-style payloads, dashboard tables,
+  multi-symbol screeners, imported library helpers, alerts, request-limit reuse,
+  strategy entry/exit flows, default broker-emulator path and gap-fill behavior,
+  and common drawing/table patterns.
 
 Known structural gaps:
 
@@ -159,8 +159,8 @@ Phases:
    divergence, session filters, strategy brackets, drawing/table dashboards,
    libraries, alerts, screeners, and synthetic tickers. The current checkpoint
    corpus includes reduced public fixtures for MTF filters, divergence,
-   session filters, dashboard tables, screeners, library helpers, and UDT
-   object-method state.
+   session filters, exchange session-state gates, dashboard tables, screeners,
+   library helpers, and UDT object-method state.
    Strategy-bracket coverage includes official broker examples plus a reduced
    public fixed-bracket strategy fixture.
    Alert coverage includes official docs examples plus a reduced public signal

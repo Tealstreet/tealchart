@@ -457,6 +457,44 @@ plot(inSession and rawSignal ? 1 : 0, title="Filtered Signal")
     expect(getPlot(result, 'Filtered Signal').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0]);
   });
 
+  it('locks a reduced public exchange-session state idiom', () => {
+    // Public idiom reference: intraday public scripts commonly branch on
+    // premarket, market, and postmarket session state helpers.
+    // Source search: https://www.tradingview.com/scripts/search/session%20ismarket/
+    const sessionBars: Bar[] = [
+      { time: Date.UTC(2024, 0, 5, 13, 0), open: 1, high: 2, low: 1, close: 2, volume: 1 },
+      { time: Date.UTC(2024, 0, 5, 15, 0), open: 2, high: 3, low: 2, close: 3, volume: 1 },
+      { time: Date.UTC(2024, 0, 5, 21, 30), open: 3, high: 4, low: 3, close: 4, volume: 1 },
+      { time: Date.UTC(2024, 0, 5, 23, 30), open: 4, high: 5, low: 4, close: 5, volume: 1 },
+    ];
+    const result = runCompatScript(`
+indicator("Public Session State Checkpoint")
+extendedState = session.ispremarket or session.ismarket or session.ispostmarket
+plot(session.ispremarket ? 1 : 0, title="Premarket")
+plot(session.ismarket ? 1 : 0, title="Market")
+plot(session.ispostmarket ? 1 : 0, title="Postmarket")
+plot(extendedState ? 1 : 0, title="Extended Active")
+`, {
+      bars: sessionBars,
+      engineOptions: {
+        runtime: {
+          session: {
+            timezone: 'UTC',
+            premarket: '1200-1430:1234567',
+            regular: '1430-2100:1234567',
+            postmarket: '2100-2300:1234567',
+          },
+        },
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Premarket').values).toEqual([1, 0, 0, 0]);
+    expect(getPlot(result, 'Market').values).toEqual([0, 1, 0, 0]);
+    expect(getPlot(result, 'Postmarket').values).toEqual([0, 0, 1, 0]);
+    expect(getPlot(result, 'Extended Active').values).toEqual([1, 1, 1, 0]);
+  });
+
   it('locks a reduced public dashboard table idiom', () => {
     // Public idiom reference: dashboard-style public indicators commonly
     // summarize trend and signal state in a last-bar table.
