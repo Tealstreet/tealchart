@@ -5731,12 +5731,14 @@ tags[0] += 1
     const result = checkProgram(parse(`
 indicator("Mixed Input Overloads")
 length = input.int(14, "Length", options=[7, 14, 21], minval=1)
+capped = input.int(14, "Length", options=[7, 14, 21], maxval=50)
 multiplier = input.float(2.0, "Multiplier", options=[1.0, 2.0], step=0.5)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Unknown argument 'minval' for input.int()",
-      "Unknown argument 'step' for input.float()",
+      'input.int() cannot use options together with minval/maxval/step',
+      'input.int() cannot use options together with minval/maxval/step',
+      'input.float() cannot use options together with minval/maxval/step',
     ]);
   });
 });
