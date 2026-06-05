@@ -40,8 +40,8 @@ by real Pine examples from official docs or public indicator idioms.
 The current real-idiom checkpoint suite covers official built-ins, barstate plus
 arrays, bar coloring, alerts, strategy entry/exit flows, request-limit reuse,
 explicit `max_bars_back` metadata, official lower-timeframe request arrays,
-official synthetic ticker requests, and public MTF, divergence, and
-session-filter idioms.
+official synthetic ticker requests, official dynamic sessions, and public MTF,
+divergence, and session-filter idioms.
 
 ## Current Matrix
 
@@ -616,8 +616,9 @@ session classification windows. Higher-timeframe `time()` / `time_close()`
 aggregation is covered for intraday, daily, and weekly buckets, including
 timezone-aware DST boundaries. Host-provided `closedDates` and closure entries
 can suppress session-filtered `time()` calls and session-state helpers for
-exchange calendar holidays or partial-session closures. Broader dynamic-session
-checkpoint coverage remains planned.
+exchange calendar holidays or partial-session closures. The checkpoint corpus
+tracks both public session-filter gating and the official dynamic-session string
+idiom.
 
 ## Request Data And Ticker Coverage
 
