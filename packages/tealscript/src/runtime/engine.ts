@@ -5700,6 +5700,7 @@ export class TealscriptEngine {
       fromEntry: id,
       comment: this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ARGS, 1)),
       alertMessage: this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ARGS, 4)),
+      immediately: this.isTruthy(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ARGS, 5, false)),
     });
     return undefined;
   }
@@ -5716,6 +5717,7 @@ export class TealscriptEngine {
       qty: Math.abs(position.size),
       comment: this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ALL_ARGS, 0)),
       alertMessage: this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ALL_ARGS, 1)),
+      immediately: this.isTruthy(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ALL_ARGS, 2, false)),
     });
     return undefined;
   }
@@ -5743,6 +5745,7 @@ export class TealscriptEngine {
     fromEntry?: string;
     comment?: string;
     alertMessage?: string;
+    immediately?: boolean;
   }): void {
     const order = submitStrategyOrder(this.ctx.strategyLedger, {
       id: input.id,
@@ -5756,7 +5759,7 @@ export class TealscriptEngine {
       barIndex: this.ctx.bar_index,
       time: this.ctx.time.get(0) ?? 0,
     });
-    if (this.ctx.strategyLedger.settings.processOrdersOnClose) {
+    if (this.ctx.strategyLedger.settings.processOrdersOnClose || input.immediately === true) {
       const fill = fillStrategyMarketOrder(
         this.ctx.strategyLedger,
         order,
