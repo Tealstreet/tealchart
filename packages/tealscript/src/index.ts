@@ -12,6 +12,7 @@ export {
   createCompatibilityRunOutcome,
   createPineCompatibilityCoverageIndex,
   createPineScriptLedger,
+  formatPineCompatibilityCoverageJson,
   formatPineCompatibilityCoverageMarkdown,
   formatPineCompatibilityCorpusJson,
   formatPineCompatibilityCorpusMarkdown,
