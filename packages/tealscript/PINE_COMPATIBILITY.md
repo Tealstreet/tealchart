@@ -43,10 +43,10 @@ explicit `max_bars_back` metadata, official lower-timeframe request arrays,
 official synthetic ticker requests, official dynamic sessions, official
 timeframe comparisons, official plot-style payloads, and public MTF,
 divergence, session-filter, session-state, dashboard-table, multi-symbol
-screener, drawing-zone, and library-helper idioms. Public-source coverage also
-includes alert signal metadata, direct alert emission, and Heikin-Ashi synthetic
-ticker trend requests, plus UDT state objects updated through user-defined
-methods.
+screener, drawing-zone, custom-candle, and library-helper idioms. Public-source
+coverage also includes alert signal metadata, direct alert emission, and
+Heikin-Ashi synthetic ticker trend requests, plus UDT state objects updated
+through user-defined methods.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
 suppression, entry-direction risk rules, recalculation checkpoints, and a
@@ -557,6 +557,9 @@ The same renderer bar-window handling now applies to common `plot()`,
 `plotchar()`, and `plotarrow()` outputs. Background renderer coverage applies
 `display.none` hiding and routes `bgcolor()` through main and indicator pane
 coordinates.
+The checkpoint corpus tracks a reduced public Heikin-Ashi custom-candle overlay
+that renders recursive OHLC values through `plotcandle()` with dynamic body,
+wick, and border colors.
 Renderer-level command-trace coverage locks a common visual primitive mix in
 jsdom, where native screenshot/pixel buffers are not available without adding a
 heavier canvas dependency.
