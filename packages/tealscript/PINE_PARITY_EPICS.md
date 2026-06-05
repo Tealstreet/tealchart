@@ -470,9 +470,9 @@ impact.
    market, stop, and trailing-stop fills while preserving limit-fill behavior.
 3. Harness incomplete outcomes: make canonical `not_run` stages fail corpus
    pass-rate summaries unless they are explicitly marked `skipped`.
-4. Pine layout parser audit/failing fixtures: collect reduced layout shapes
-   for nested dedents, wrapped indented expressions, and shared library/type/
-   method blocks before changing parser architecture.
+4. Pine layout parser audit fixtures: keep reduced coverage for nested dedents,
+   wrapped indented expressions, wrapped function/method signatures, and shared
+   library/type/method blocks before changing parser architecture.
 5. Call-binding diagnostics sweep: use corpus failures to prioritize missing
    named/positional overload diagnostics.
 6. Visual output payload audit: ensure runtime payloads are stable before
