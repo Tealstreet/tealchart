@@ -104,6 +104,16 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: officialDocsEntry({
+      id: 'official-calc-on-every-tick-checkpoint',
+      title: 'Official Calc On Every Tick Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/strategies/',
+      category: 'strategy',
+      featureTags: ['strategy', 'realtime', 'recalculation'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
       id: 'official-request-limit-checkpoint',
       title: 'Official Request Limit Checkpoint',
       url: 'https://www.tradingview.com/pine-script-docs/writing/limitations/',
