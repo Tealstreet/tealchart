@@ -842,7 +842,8 @@ TradingView-exact same-bar intrabar/bar-magnifier behavior remains a fidelity
 target. The `use_bar_magnifier` strategy setting is stored in the ledger.
 Trailing stops submitted through
 `strategy.exit(..., trail_price/trail_points, trail_offset)` activate on later
-bars and ratchet against OHLC highs/lows using price-unit offsets. Fill
+bars and ratchet against OHLC highs/lows using tick-distance `trail_points` and
+`trail_offset` values. Fill
 commissions are applied to fills and debited from strategy net profit/equity for
 `percent`, `cash_per_order`, and
 `cash_per_contract` commission settings. Basic `strategy.opentrades.*`

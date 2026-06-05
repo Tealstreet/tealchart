@@ -5505,14 +5505,17 @@ export class TealscriptEngine {
       ?? this.resolveStrategyExitOffsetPrice(direction, matchingTrades, lossTicks, 'loss');
     const trailPrice = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 8));
     const trailPoints = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 9));
-    const trailOffset = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 10));
+    const trailOffsetTicks = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 10));
     const trailActivationPrice = this.resolveStrategyTrailActivationPrice(direction, matchingTrades, trailPrice, trailPoints);
     if (limitPrice === undefined && stopPrice === undefined && trailActivationPrice === undefined) {
       throw new Error('strategy.exit requires a limit, stop, or trailing stop price');
     }
-    if (trailActivationPrice !== undefined && trailOffset === undefined) {
+    if (trailActivationPrice !== undefined && trailOffsetTicks === undefined) {
       throw new Error('strategy.exit trailing stop requires trail_offset');
     }
+    const trailOffset = trailActivationPrice === undefined
+      ? undefined
+      : this.resolveStrategyTrailOffsetPrice(trailOffsetTicks);
 
     const comment = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 12));
     const commentProfit = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 13));
@@ -5608,7 +5611,26 @@ export class TealscriptEngine {
     if (entryPrice === undefined) {
       return undefined;
     }
-    return direction === 'long' ? entryPrice + trailPoints : entryPrice - trailPoints;
+    const offset = this.resolveStrategyTickDistance(trailPoints, 'trail_points', true);
+    return direction === 'long' ? entryPrice + offset : entryPrice - offset;
+  }
+
+  private resolveStrategyTrailOffsetPrice(ticks: number | undefined): number | undefined {
+    if (ticks === undefined) {
+      return undefined;
+    }
+    return this.resolveStrategyTickDistance(ticks, 'trail_offset', false);
+  }
+
+  private resolveStrategyTickDistance(ticks: number, kind: string, allowZero: boolean): number {
+    if (!Number.isFinite(ticks) || ticks < 0 || (!allowZero && ticks === 0)) {
+      throw new Error(`strategy.exit ${kind} must be ${allowZero ? 'a non-negative' : 'a positive'} number`);
+    }
+    const offset = ticks * this.ctx.syminfo.mintick;
+    if (!Number.isFinite(offset) || offset < 0 || (!allowZero && offset === 0)) {
+      throw new Error(`strategy.exit ${kind} offset must be ${allowZero ? 'non-negative' : 'positive'}`);
+    }
+    return offset;
   }
 
   private resolveStrategyExitOffsetPrice(
