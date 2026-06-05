@@ -581,6 +581,101 @@ map<string, sig.State> stateBySymbol = na
     });
   });
 
+  describe('Layout gap fixtures', () => {
+    it('parses nested block dedents separated by blank and comment-only lines', () => {
+      const ast = parse(`indicator("Nested Layout")
+score(value) =>
+    result = 0
+    if value > 0
+        // Keep the inner block separated from the nested branch.
+        if value > 10
+            result := 2
+        else
+            result := 1
+
+    result
+plot(score(close))
+`);
+      const fn = ast.body.find((statement): statement is FunctionDeclaration => statement.type === 'FunctionDeclaration');
+
+      expect(ast.body.map((statement) => statement.type)).toEqual([
+        'IndicatorDeclaration',
+        'FunctionDeclaration',
+        'ExpressionStatement',
+      ]);
+      expect(fn).toBeDefined();
+      expect(Array.isArray(fn?.body)).toBe(true);
+      if (fn && Array.isArray(fn.body)) {
+        expect(fn.body.map((statement) => statement.type)).toEqual([
+          'VariableDeclaration',
+          'IfStatement',
+          'ExpressionStatement',
+        ]);
+      }
+    });
+
+    it('parses wrapped calls and member chains inside indented bodies', () => {
+      const ast = parse(`wrapped(source) =>
+    value = array.get(
+        array.from(
+            source,
+            source[1],
+            math.max(
+                source,
+                open
+            )
+        ),
+        0
+    )
+    value
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        const declaration = fn.body[0];
+        expect(declaration.type).toBe('VariableDeclaration');
+        expect(declaration.type === 'VariableDeclaration' ? declaration.init.type : null).toBe('CallExpression');
+      }
+    });
+
+    it('parses exported library declarations with shared type and method block layout', () => {
+      const ast = parse(`library("LayoutLib", true)
+export type Pivot
+    int x
+
+    // Price field.
+    float y
+
+export method shifted(Pivot this, float amount) =>
+    copy = Pivot.new(
+        this.x,
+        this.y
+    )
+    if amount > 0
+        copy.y := copy.y + amount
+    copy
+`);
+      const typeDeclaration = ast.body.find((statement): statement is TypeDeclaration => statement.type === 'TypeDeclaration');
+      const method = ast.body.find((statement): statement is FunctionDeclaration => statement.type === 'FunctionDeclaration');
+
+      expect(ast.body.map((statement) => statement.type)).toEqual([
+        'LibraryDeclaration',
+        'TypeDeclaration',
+        'FunctionDeclaration',
+      ]);
+      expect(typeDeclaration?.exported).toBe(true);
+      expect(typeDeclaration?.fields.map((field) => field.name.name)).toEqual(['x', 'y']);
+      expect(method).toEqual(expect.objectContaining({
+        type: 'FunctionDeclaration',
+        isMethod: true,
+        exported: true,
+      }));
+      expect(Array.isArray(method?.body)).toBe(true);
+    });
+  });
+
   describe('Expressions', () => {
     describe('Literals', () => {
       it('parses integers', () => {

@@ -473,8 +473,9 @@ impact.
    validation, and provenance rules.
 5. Corpus runner MVP: run ledger-backed offline outcomes and emit JSON/Markdown
    pass-rate summaries plus checkpoint coverage reports.
-6. Pine layout parser audit/failing fixtures: collect reduced failing layout
-   shapes before changing parser architecture.
+6. Pine layout parser audit/failing fixtures: collect reduced layout shapes
+   for nested dedents, wrapped indented expressions, and shared library/type/
+   method blocks before changing parser architecture.
 7. Call-binding diagnostics sweep: use corpus failures to prioritize missing
    named/positional overload diagnostics.
 8. Visual output payload audit: ensure runtime payloads are stable before
