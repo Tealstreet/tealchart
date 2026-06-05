@@ -78,6 +78,11 @@ export interface PineScriptLedger {
   entries: PineScriptLedgerEntry[];
 }
 
+export type PineCompatibilityStageProvider = (
+  entry: PineScriptLedgerEntry,
+  index: number,
+) => CompatibilityStageOutcome[];
+
 export interface PineCompatibilityCorpusRun {
   schemaVersion: typeof PINE_COMPATIBILITY_SCHEMA_VERSION;
   outcomes: CompatibilityRunOutcome[];
@@ -260,6 +265,16 @@ export function runPineCompatibilityCorpus(cases: PineCompatibilityCorpusCase[])
   };
 }
 
+export function runPineCompatibilityLedger(
+  ledger: PineScriptLedger,
+  getStages: PineCompatibilityStageProvider,
+): PineCompatibilityCorpusRun {
+  return runPineCompatibilityCorpus(ledger.entries.map((ledgerEntry, index) => ({
+    ledgerEntry,
+    stages: getStages(ledgerEntry, index),
+  })));
+}
+
 export function summarizePineCompatibilityCorpus(
   cases: PineCompatibilityCorpusCase[],
   outcomes: CompatibilityRunOutcome[],
@@ -315,6 +330,10 @@ export function summarizePineCompatibilityCorpus(
     byFeatureTag,
     validationErrors,
   };
+}
+
+export function formatPineCompatibilityCorpusJson(run: PineCompatibilityCorpusRun): string {
+  return `${JSON.stringify(run, null, 2)}\n`;
 }
 
 function cloneCompatibilityStageOutcome(stage: CompatibilityStageOutcome): CompatibilityStageOutcome {
