@@ -408,9 +408,9 @@ Phases:
    deterministic OHLC behavior.
 3. Add gap-crossing and path-order fixtures for Pine's default broker path.
 4. Add lower-timeframe path fills behind explicit host-provided intrabar data.
-5. Implement bounded `calc_on_order_fills` recalculation.
-6. Implement `calc_on_every_tick` realtime strategy behavior.
-7. Add reduced TradingView checkpoint fixtures for bar magnifier and
+5. Maintain bounded `calc_on_order_fills` recalculation coverage.
+6. Maintain `calc_on_every_tick` realtime strategy checkpoint coverage.
+7. Expand reduced TradingView checkpoint fixtures for bar magnifier and
    recalculation examples.
 8. Defer Strategy Tester UI, exact report parity, synthetic backtest exactness,
    and performance polish until execution semantics are sound.

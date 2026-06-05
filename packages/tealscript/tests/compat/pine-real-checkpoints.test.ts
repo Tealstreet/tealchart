@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { InMemoryRequestDatafeed, InMemoryStrategyIntrabarDatafeed, type Bar } from '../../src/runtime';
+import { parse } from '../../src/parser';
+import { InMemoryRequestDatafeed, InMemoryStrategyIntrabarDatafeed, TealscriptEngine, type Bar } from '../../src/runtime';
 import { compatibilityBars, getPlot, roundSeries, runCompatScript } from './fixtures';
 
 describe('Pine real idiom checkpoints', () => {
@@ -429,6 +430,52 @@ plot(recalculations, title="Recalculations")
     expect(result.alerts.find((alert) => alert.id === 'strategy_order_fills')?.events.map((event) => event.message)).toEqual([
       'entry filled',
     ]);
+  });
+
+  it('locks a reduced official strategy calc-on-every-tick idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
+    const bars: Bar[] = [
+      { time: 1_700_300_000_000, open: 100, high: 101, low: 99, close: 100.2, volume: 100 },
+      { time: 1_700_300_060_000, open: 100.2, high: 101.2, low: 99.8, close: 100.8, volume: 100 },
+      { time: 1_700_300_120_000, open: 100.8, high: 102, low: 100.4, close: 101.6, volume: 100 },
+    ];
+    const defaultAst = parse(`//@version=6
+strategy("Official Default Realtime Strategy Checkpoint", calc_on_every_tick=false)
+plot(close, title="Realtime Close")
+`);
+    const everyTickAst = parse(`//@version=6
+strategy("Official Every Tick Strategy Checkpoint", calc_on_every_tick=true)
+plot(close, title="Realtime Close")
+`);
+    const realtimeBar: Bar = {
+      ...bars[2]!,
+      time: bars[2]!.time + 60_000,
+      open: 102,
+      high: 103,
+      low: 101.5,
+      close: 102.5,
+    };
+
+    const defaultEngine = new TealscriptEngine();
+    const defaultResult = defaultEngine.execute(defaultAst, bars);
+    const defaultFirstTick = defaultEngine.updateBar(defaultAst, realtimeBar);
+    const defaultFirstValues = [...defaultFirstTick.find((plot) => plot.title === 'Realtime Close')!.values];
+    const defaultSecondTick = defaultEngine.updateBar(defaultAst, { ...realtimeBar, close: 102.75 });
+    const defaultSecondValues = [...defaultSecondTick.find((plot) => plot.title === 'Realtime Close')!.values];
+
+    const everyTickEngine = new TealscriptEngine();
+    const everyTickResult = everyTickEngine.execute(everyTickAst, bars);
+    const everyTickFirstTick = everyTickEngine.updateBar(everyTickAst, realtimeBar);
+    const everyTickFirstValues = [...everyTickFirstTick.find((plot) => plot.title === 'Realtime Close')!.values];
+    const everyTickSecondTick = everyTickEngine.updateBar(everyTickAst, { ...realtimeBar, close: 102.75 });
+    const everyTickSecondValues = [...everyTickSecondTick.find((plot) => plot.title === 'Realtime Close')!.values];
+
+    expect(defaultResult.errors).toEqual([]);
+    expect(defaultFirstValues).toEqual([100.2, 100.8, 101.6]);
+    expect(defaultSecondValues).toEqual([100.2, 100.8, 101.6]);
+    expect(everyTickResult.errors).toEqual([]);
+    expect(everyTickFirstValues).toEqual([100.2, 100.8, 101.6, 102.5]);
+    expect(everyTickSecondValues).toEqual([100.2, 100.8, 101.6, 102.75]);
   });
 
   it('locks the official repeated request-call limit idiom', () => {

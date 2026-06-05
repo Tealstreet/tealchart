@@ -792,9 +792,11 @@ expands opposite-direction entry transactions to reverse positions. The
 stop, and trailing-stop fills in trade direction while preserving limit-fill
 prices. This is a deterministic broker emulator: chart-OHLC and host-provided
 lower-timeframe execution paths are consumed by pending order fills and exported
-as strategy metadata. Same-bar intrabar recalculation and TradingView-exact bar
-magnifier behavior remain deferred until the runtime has an explicit intrabar
-data model. The `use_bar_magnifier` strategy setting is stored in the ledger.
+as strategy metadata. Bounded `calc_on_order_fills` reruns current-bar strategy
+logic after fills, and `calc_on_every_tick=true` recalculates strategies on
+unconfirmed realtime ticks while default strategies wait for confirmed realtime
+closes. TradingView-exact same-bar intrabar/bar-magnifier behavior remains a
+fidelity target. The `use_bar_magnifier` strategy setting is stored in the ledger.
 Trailing stops submitted through
 `strategy.exit(..., trail_price/trail_points, trail_offset)` activate on later
 bars and ratchet against OHLC highs/lows using price-unit offsets. Fill
