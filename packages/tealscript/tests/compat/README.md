@@ -30,6 +30,10 @@ real-script intake metadata or corpus summaries:
   buckets, feature tag summaries, and validation errors.
 - `runPineCompatibilityLedger()` builds that same report from a
   `PineScriptLedger` plus a deterministic stage provider.
+- `createPineCompatibilityCoverageIndex()` counts checkpoint metadata by
+  category, source kind, Pine version, storage policy, and feature tag.
+- `formatPineCompatibilityCoverageMarkdown()` renders that coverage index for
+  PR notes or generated reports.
 - `formatPineCompatibilityCorpusMarkdown()` renders the report for PR notes or
   generated artifacts without adding network or TradingView dependencies to CI.
 - `formatPineCompatibilityCorpusJson()` renders the normalized run object as a
