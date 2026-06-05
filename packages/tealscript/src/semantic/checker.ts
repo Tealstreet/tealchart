@@ -8,8 +8,10 @@ import type {
   FunctionDeclaration,
   Identifier,
   IfStatement,
+  IndicatorDeclaration,
   ImportDeclaration,
   IndexExpression,
+  LibraryDeclaration,
   MemberExpression,
   Program,
   SourceLocation,
@@ -1174,6 +1176,55 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['timestamp', { params: ['timezone', 'year', 'month', 'day', 'hour', 'minute', 'second'], minArgs: 1, maxArgs: 7, allowNamedPrefixWithPositional: true }],
 ]);
 
+const INDICATOR_DECLARATION_KEYS = new Set([
+  'type',
+  'declarationKind',
+  'loc',
+  'title',
+  'shorttitle',
+  'overlay',
+  'format',
+  'precision',
+  'scale',
+  'max_bars_back',
+  'timeframe',
+  'timeframe_gaps',
+  'explicit_plot_zorder',
+  'behind_chart',
+  'max_lines_count',
+  'max_labels_count',
+  'max_boxes_count',
+  'calc_bars_count',
+  'max_polylines_count',
+  'dynamic_requests',
+]);
+
+const STRATEGY_DECLARATION_KEYS = new Set([
+  ...INDICATOR_DECLARATION_KEYS,
+  'initial_capital',
+  'currency',
+  'default_qty_type',
+  'default_qty_value',
+  'pyramiding',
+  'commission_type',
+  'commission_value',
+  'slippage',
+  'margin_long',
+  'margin_short',
+  'calc_on_order_fills',
+  'calc_on_every_tick',
+  'process_orders_on_close',
+  'use_bar_magnifier',
+]);
+
+const LIBRARY_DECLARATION_KEYS = new Set([
+  'type',
+  'loc',
+  'title',
+  'overlay',
+  'dynamic_requests',
+]);
+
 for (const name of CALENDAR_FUNCTION_NAMES) {
   BUILTIN_SIGNATURES.set(name, { params: ['time', 'timezone'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true });
 }
@@ -1980,6 +2031,7 @@ class SemanticChecker {
   private checkStatement(statement: Statement, scope: SemanticScope): void {
     switch (statement.type) {
       case 'IndicatorDeclaration':
+        this.checkIndicatorDeclarationArguments(statement);
         this.checkExpressions(scope, [
           statement.title,
           statement.shorttitle,
@@ -2012,6 +2064,7 @@ class SemanticChecker {
         ]);
         break;
       case 'LibraryDeclaration':
+        this.checkLibraryDeclarationArguments(statement);
         this.checkExpressions(scope, [statement.title, statement.overlay, statement.dynamic_requests]);
         break;
       case 'ImportDeclaration':
@@ -2048,6 +2101,36 @@ class SemanticChecker {
       case 'ContinueStatement':
         break;
     }
+  }
+
+  private checkIndicatorDeclarationArguments(statement: IndicatorDeclaration): void {
+    const displayName = `${statement.declarationKind}()`;
+    const allowedKeys = statement.declarationKind === 'strategy'
+      ? STRATEGY_DECLARATION_KEYS
+      : INDICATOR_DECLARATION_KEYS;
+    this.checkDeclarationKnownProperties(statement, allowedKeys, displayName);
+  }
+
+  private checkLibraryDeclarationArguments(statement: LibraryDeclaration): void {
+    this.checkDeclarationKnownProperties(statement, LIBRARY_DECLARATION_KEYS, 'library()');
+  }
+
+  private checkDeclarationKnownProperties(statement: object, allowedKeys: Set<string>, displayName: string): void {
+    for (const [key, value] of Object.entries(statement)) {
+      if (allowedKeys.has(key)) continue;
+      this.addDiagnostic(
+        'unknown-argument',
+        `Unknown argument '${key}' for ${displayName}`,
+        this.locFromUnknownNode(value),
+      );
+    }
+  }
+
+  private locFromUnknownNode(value: unknown): SourceLocation | undefined {
+    if (value && typeof value === 'object' && 'loc' in value) {
+      return (value as { loc?: SourceLocation }).loc;
+    }
+    return undefined;
   }
 
   private declareImport(statement: ImportDeclaration, scope: SemanticScope): void {
