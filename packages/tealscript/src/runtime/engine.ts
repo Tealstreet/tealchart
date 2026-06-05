@@ -2022,14 +2022,26 @@ export class TealscriptEngine {
     if (namespace && funcName === 'new') {
       const currentLibraryType = this.findCurrentLibraryType(namespace);
       if (currentLibraryType) {
-        return this.evaluateImportedTypeConstructor(currentLibraryType.library, currentLibraryType.declaration, args, namedArgs);
+        return this.evaluateImportedTypeConstructor(
+          currentLibraryType.library,
+          currentLibraryType.declaration,
+          args,
+          namedArgs,
+          hasPositionalArgumentAfterNamed,
+        );
       }
       if (this.typeDeclarations.has(namespace)) {
-        return this.evaluateTypeConstructor(namespace, args, namedArgs);
+        return this.evaluateTypeConstructor(namespace, args, namedArgs, undefined, hasPositionalArgumentAfterNamed);
       }
       const importedType = this.findImportedType(namespace);
       if (importedType && importedType.exported) {
-        return this.evaluateImportedTypeConstructor(importedType.library, importedType.declaration, args, namedArgs);
+        return this.evaluateImportedTypeConstructor(
+          importedType.library,
+          importedType.declaration,
+          args,
+          namedArgs,
+          hasPositionalArgumentAfterNamed,
+        );
       }
       if (importedType) {
         throw new Error(`Unknown library type: ${namespace}`);
@@ -2291,10 +2303,17 @@ export class TealscriptEngine {
     declaration: TypeDeclaration,
     args: unknown[],
     namedArgs: Map<string, unknown>,
+    hasPositionalArgumentAfterNamed = false,
   ): PineUdtObject {
     this.importedLibraryCallStack.push(library.alias);
     try {
-      return this.evaluateTypeConstructor(`${library.alias}.${declaration.name.name}`, args, namedArgs, declaration);
+      return this.evaluateTypeConstructor(
+        `${library.alias}.${declaration.name.name}`,
+        args,
+        namedArgs,
+        declaration,
+        hasPositionalArgumentAfterNamed,
+      );
     } finally {
       this.importedLibraryCallStack.pop();
     }
@@ -2405,9 +2424,13 @@ export class TealscriptEngine {
     args: unknown[],
     namedArgs: Map<string, unknown>,
     declaration = this.typeDeclarations.get(typeName),
+    hasPositionalArgumentAfterNamed = false,
   ): PineUdtObject {
     if (!declaration) {
       throw new Error(`Unknown user-defined type: ${typeName}`);
+    }
+    if (hasPositionalArgumentAfterNamed) {
+      throw new Error(`${typeName}.new cannot use positional arguments after named arguments`);
     }
     if (args.length > declaration.fields.length) {
       throw new Error(`Too many arguments for ${typeName}.new: expected ${declaration.fields.length}, got ${args.length}`);
