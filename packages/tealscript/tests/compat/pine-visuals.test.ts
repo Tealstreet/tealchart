@@ -165,6 +165,7 @@ formatMatches = format.price == "price" and format.volume == "volume" and format
 scaleMatches = scale.right == "right" and scale.left == "left" and scale.none == "none"
 plot(close, title="Break Line", style=plot.style_linebr, display=displayTarget, linestyle=plot.linestyle_dashed)
 plot(open, title="Step Diamonds", style=plot.style_stepline_diamond, display=display.none)
+plot(close, title="Step Break", style=plot.style_steplinebr)
 plot(high, title="Columns", style=plot.style_columns, histbase=100, trackprice=true, show_last=5)
 plot(low, "Positional Area", color.red, 3, plot.style_area, true, 90, -1, true, false, 4, display.price_scale, format.volume, 0, true)
 hline(50, "Midline", color=color.blue, linestyle=hline.style_dotted, linewidth=2, editable=false, display=display.price_scale)
@@ -179,6 +180,7 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
     expect(result.indicatorExplicitPlotZOrder).toBe(true);
     const breakLine = getPlot(result, 'Break Line');
     const stepDiamonds = getPlot(result, 'Step Diamonds');
+    const stepBreak = getPlot(result, 'Step Break');
     const columns = getPlot(result, 'Columns');
     const positionalArea = getPlot(result, 'Positional Area');
     const midline = getPlot(result, 'Midline');
@@ -189,6 +191,7 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
     expect(breakLine.display).toBe(11);
     expect(stepDiamonds.style).toBe('stepline_diamond');
     expect(stepDiamonds.display).toBe(0);
+    expect(stepBreak.style).toBe('steplinebr');
     expect(columns.style).toBe('columns');
     expect(columns.histbase).toBe(100);
     expect(columns.trackprice).toBe(true);
@@ -228,12 +231,13 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
     expect(result.plots.map((plot) => [plot.title, plot.zOrder])).toEqual([
       ['Break Line', 0],
       ['Step Diamonds', 1],
-      ['Columns', 2],
-      ['Positional Area', 3],
-      ['Midline', 4],
-      ['Solid Positional', 5],
-      ['Format Constants', 6],
-      ['Scale Constants', 7],
+      ['Step Break', 2],
+      ['Columns', 3],
+      ['Positional Area', 4],
+      ['Midline', 5],
+      ['Solid Positional', 6],
+      ['Format Constants', 7],
+      ['Scale Constants', 8],
     ]);
     expect(breakLine.values).toHaveLength(compatibilityBars.length);
     expect(getPlot(result, 'Format Constants').values).toEqual(Array(compatibilityBars.length).fill(1));
