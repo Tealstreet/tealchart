@@ -6538,7 +6538,7 @@ export class TealscriptEngine {
     const stringPatternArgs = [['source', 'string'], ['str', 'substring', 'target']] as const;
     const stringSubstringArgs = [['source', 'string'], ['begin_pos'], ['end_pos']] as const;
     const stringMatchArgs = [['source', 'string'], ['regex', 'pattern']] as const;
-    const stringRepeatArgs = [['source', 'string'], ['count', 'repeat_count'], ['separator']] as const;
+    const stringRepeatArgs = [['source', 'string'], ['repeat', 'count', 'repeat_count'], ['separator']] as const;
     const stringSplitArgs = [['source', 'string'], ['separator']] as const;
     const stringReplaceArgs = [['source', 'string'], ['target', 'str', 'substring'], ['replacement'], ['occurrence']] as const;
     const stringReplaceAllArgs = [['source', 'string'], ['target', 'str', 'substring'], ['replacement']] as const;
@@ -6647,7 +6647,10 @@ export class TealscriptEngine {
     });
     this.builtins.set('str.upper', (args, namedArgs) => this.toStringValue(stringSourceArg(args, namedArgs)).toUpperCase());
     this.builtins.set('str.lower', (args, namedArgs) => this.toStringValue(stringSourceArg(args, namedArgs)).toLowerCase());
-    this.builtins.set('str.trim', (args, namedArgs) => this.toStringValue(stringSourceArg(args, namedArgs)).trim());
+    this.builtins.set('str.trim', (args, namedArgs) => {
+      const source = stringSourceArg(args, namedArgs);
+      return this.isNa(source) ? '' : this.toStringValue(source).trim();
+    });
     this.builtins.set('str.replace', (args, namedArgs) => {
       return this.replaceStringOccurrence(
         this.toStringValue(stringSourceArg(args, namedArgs)),

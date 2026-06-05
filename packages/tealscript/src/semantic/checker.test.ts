@@ -4561,6 +4561,7 @@ prefixSlice = str.substring(source=text, 0, 3)
 match = str.match(source="Trade NASDAQ:AAPL", pattern="[A-Z]+:[A-Z]+")
 prefixMatch = str.match(string="Trade NASDAQ:AAPL", "[A-Z]+:[A-Z]+")
 repeated = str.repeat(string="?", repeat_count=3, separator=",")
+officialRepeated = str.repeat(source="?", repeat=3, separator=",")
 prefixRepeated = str.repeat(source="?", 3, ",")
 parts = str.split(string=text, separator="-")
 prefixParts = str.split(source=text, "-")
@@ -4571,7 +4572,7 @@ replaceOne = str.replace(string=text, substring="USDT", replacement="PERP", occu
 prefixReplaceOne = str.replace(source=text, "USDT", "PERP", 1)
 replaceAll = str.replace_all(source=text, str="USDT", replacement="PERP")
 prefixReplaceAll = str.replace_all(string=text, "USDT", "PERP")
-plot(parsed + position + prefixPosition + str.length(string=formatted + prefixFormatted + timeText + prefixTimeText + message + prefix + prefixSlice + match + prefixMatch + repeated + prefixRepeated + upper + lower + trimmed + replaceOne + prefixReplaceOne + replaceAll + prefixReplaceAll))
+plot(parsed + position + prefixPosition + str.length(string=formatted + prefixFormatted + timeText + prefixTimeText + message + prefix + prefixSlice + match + prefixMatch + repeated + officialRepeated + prefixRepeated + upper + lower + trimmed + replaceOne + prefixReplaceOne + replaceAll + prefixReplaceAll))
 `));
 
     expect(result.diagnostics).toEqual([]);
