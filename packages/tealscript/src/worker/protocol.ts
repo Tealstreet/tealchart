@@ -201,6 +201,29 @@ export interface SemanticErrorMessage {
 }
 
 /**
+ * Build a semantic error message while preserving the structured diagnostic
+ * payload expected by editor integrations.
+ */
+export function createSemanticErrorMessage(
+  scriptId: string,
+  diagnostics: SemanticDiagnostic[],
+  message: string,
+  metadata?: WorkerOutputMetadata
+): SemanticErrorMessage {
+  const firstDiagnostic = diagnostics[0];
+
+  return {
+    type: 'semanticError',
+    scriptId,
+    message,
+    diagnostics,
+    line: firstDiagnostic?.line,
+    column: firstDiagnostic?.column,
+    metadata,
+  };
+}
+
+/**
  * Parse error in script
  */
 export interface ParseErrorMessage {

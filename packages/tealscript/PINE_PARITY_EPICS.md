@@ -228,7 +228,9 @@ Phases:
 3. Prioritize curated overloads by public-script frequency before exact
    full-reference overload coverage.
 4. Surface parse/semantic/runtime diagnostic codes through worker/editor
-   result paths.
+   result paths. Semantic worker protocol coverage now preserves diagnostic
+   codes, messages, severities, source locations, and freshness metadata before
+   the wrapper forwards editor-facing callbacks.
 5. Connect diagnostics to the compatibility steering failure taxonomy.
 
 Done means call-shape issues are actionable and measurable across the real

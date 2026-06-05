@@ -13,7 +13,7 @@ import type { TealscriptRuntimeOptions } from '../runtime/engine';
 import { checkProgram } from '../semantic';
 import type { Program } from '../parser/ast';
 import type { Bar, InputDefinition } from '../runtime/context';
-import { createResultMessage } from './protocol';
+import { createResultMessage, createSemanticErrorMessage } from './protocol';
 import type {
   ToWorkerMessage,
   FromWorkerMessage,
@@ -99,18 +99,13 @@ function handleInit(
     // Parse the script
     const ast = parse(script);
     const semanticResult = checkProgram(ast);
-    const firstDiagnostic = semanticResult.diagnostics[0];
-    if (firstDiagnostic) {
-      const semanticError: SemanticErrorMessage = {
-        type: 'semanticError',
+    if (semanticResult.diagnostics[0]) {
+      postResult(createSemanticErrorMessage(
         scriptId,
-        message: formatSemanticError(semanticResult.diagnostics),
-        diagnostics: semanticResult.diagnostics,
-        line: firstDiagnostic.line,
-        column: firstDiagnostic.column,
-        metadata,
-      };
-      postResult(semanticError);
+        semanticResult.diagnostics,
+        formatSemanticError(semanticResult.diagnostics),
+        metadata
+      ));
       return;
     }
 

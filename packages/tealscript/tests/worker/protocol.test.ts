@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import {
   createResultMessage,
+  createSemanticErrorMessage,
   getResultOutput,
   type ResultMessage,
   type WorkerOutputBundle,
 } from '../../src/worker/protocol';
+import type { SemanticDiagnostic } from '../../src/semantic';
 
 describe('worker protocol output bundles', () => {
   const output: WorkerOutputBundle = {
@@ -80,6 +82,50 @@ describe('worker protocol output bundles', () => {
       logs: [],
       inputs: output.inputs,
       profile: undefined,
+    });
+  });
+});
+
+describe('worker protocol semantic diagnostics', () => {
+  it('creates semantic error messages with structured diagnostics and freshness metadata', () => {
+    const diagnostics: SemanticDiagnostic[] = [
+      {
+        code: 'unknown-argument',
+        message: "Unknown argument 'caption' for plot()",
+        severity: 'error',
+        line: 4,
+        column: 12,
+      },
+      {
+        code: 'argument-count',
+        message: 'Expected at most 2 arguments for hline() but got 3',
+        severity: 'error',
+        line: 5,
+        column: 1,
+      },
+    ];
+
+    const message = createSemanticErrorMessage(
+      'study-1',
+      diagnostics,
+      diagnostics.map((diagnostic) => diagnostic.message).join('\n'),
+      {
+        generation: 4,
+        requestId: 9,
+      }
+    );
+
+    expect(message).toEqual({
+      type: 'semanticError',
+      scriptId: 'study-1',
+      message: "Unknown argument 'caption' for plot()\nExpected at most 2 arguments for hline() but got 3",
+      diagnostics,
+      line: 4,
+      column: 12,
+      metadata: {
+        generation: 4,
+        requestId: 9,
+      },
     });
   });
 });

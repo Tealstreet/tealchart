@@ -126,9 +126,9 @@ Covered behavior and remaining gaps:
   strict signatures. Visual output diagnostics cover `plot()`, `hline()`,
   `fill()` alias bindings, and marker argument names. Drawing constructors
   distinguish coordinate and `chart.point` overload bindings for `line.new()`
-  and `box.new()`. Worker wrapper coverage preserves structured semantic
-  diagnostic codes, messages, severities, and locations for editor-facing error
-  callbacks.
+  and `box.new()`. Worker protocol and wrapper coverage preserve structured
+  semantic diagnostic codes, messages, severities, locations, and freshness
+  metadata for editor-facing error callbacks.
 - Recursive user-defined function calls are rejected with an explicit diagnostic
   instead of overflowing the runtime stack.
 - Arbitrary nested indented blocks still use a simplified indentation grammar
