@@ -2018,6 +2018,7 @@ class SemanticChecker {
     const elementTypes = this.inferTupleElementTypes(init, scope);
     this.checkTupleInitializerShape(tuple, init, scope);
     for (const [index, name] of tuple.names.entries()) {
+      if (name.name === '_') continue;
       if (seen.has(name.name)) {
         this.addDiagnostic('duplicate-symbol', `Duplicate declaration: ${name.name}`, name.loc);
         continue;

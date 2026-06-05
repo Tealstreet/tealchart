@@ -64,6 +64,20 @@ plot(lower, title="Lower")
     expect(roundSeries(getPlot(result, 'Basis').values)).toEqual([null, null, null, null, 103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110]);
   });
 
+  it('runs tuple discard placeholders in common TA snippets', () => {
+    const result = runCompatScript(`
+indicator("Tuple discards")
+[_, direction] = ta.supertrend(2.0, 3)
+[basis, _, _] = ta.bb(close, 5, 2.0)
+plot(direction, title="Direction")
+plot(basis, title="Basis")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Direction').values).toEqual([-1, 1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1]);
+    expect(roundSeries(getPlot(result, 'Basis').values)).toEqual([null, null, null, null, 103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110]);
+  });
+
   it('covers trend, volume, and pivot snippets', () => {
     const result = runCompatScript(`
 indicator("Trend volume pivots", overlay=true)
