@@ -606,7 +606,7 @@ plot(low, "Named", color=namedColor)
       const result = executeScript(ast, bars);
 
       expect(result.errors).toHaveLength(0);
-      expect(result.plots[0].color).toEqual(Array(bars.length).fill('#F44336FF'));
+      expect(result.plots[0].color).toEqual(Array(bars.length).fill('#F23645FF'));
       expect(result.plots[1].color).toEqual(Array(bars.length).fill('#808000BF'));
       expect(result.plots[2].color).toEqual(Array(bars.length).fill('#4CAF50FF'));
       expect(result.plots[3].color).toEqual(Array(bars.length).fill('#191919FF'));
@@ -653,7 +653,7 @@ if bar_index >= 2
       expect(result.errors).toHaveLength(0);
       expect(result.plots).toHaveLength(1);
       expect(result.plots[0].type).toBe('barcolor');
-      expect(result.plots[0].color).toEqual([null, null, '#F44336', '#F44336', '#F44336']);
+      expect(result.plots[0].color).toEqual([null, null, '#F23645', '#F23645', '#F23645']);
       expect(result.plots[0].values).toEqual([null, null, null, null, null]);
     });
 

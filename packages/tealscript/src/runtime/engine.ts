@@ -5740,7 +5740,7 @@ export class TealscriptEngine {
           namedArgs,
           plotbarArgs,
           5,
-          close !== null && open !== null && close >= open ? '#4CAF50' : '#F44336',
+          close !== null && open !== null && close >= open ? '#4CAF50' : '#F23645',
         ),
       );
       const editable = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, plotbarArgs, 6));
@@ -5782,7 +5782,7 @@ export class TealscriptEngine {
       const low = this.toPlotValue(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 2));
       const close = this.toPlotValue(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 3));
       const title = (this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 4, callId)) as string;
-      const defaultColor = close !== null && open !== null && close >= open ? '#4CAF50' : '#F44336';
+      const defaultColor = close !== null && open !== null && close >= open ? '#4CAF50' : '#F23645';
       const color = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 5, defaultColor));
       const wickColor = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 6, color));
       const editable = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 7));
@@ -5968,7 +5968,7 @@ export class TealscriptEngine {
       const series = this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 0) as number; // Positive = up arrow, negative = down arrow
       const title = (this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 1, 'Arrow')) as string;
       const colorup = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 2, '#4CAF50'));
-      const colordown = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 3, '#F44336'));
+      const colordown = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 3, '#F23645'));
       const offset = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 4));
       const minHeight = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 5));
       const maxHeight = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 6));
@@ -7185,23 +7185,23 @@ export class TealscriptEngine {
 
     // Color constants
     const colors: Record<string, string> = {
-      'color.red': '#F44336',
+      'color.red': '#F23645',
       'color.green': '#4CAF50',
       'color.blue': '#2196F3',
       'color.orange': '#FF9800',
-      'color.yellow': '#FFEB3B',
+      'color.yellow': '#FDD835',
       'color.purple': '#9C27B0',
       'color.white': '#FFFFFF',
-      'color.black': '#000000',
-      'color.gray': '#9E9E9E',
+      'color.black': '#363A45',
+      'color.gray': '#787B86',
       'color.silver': '#B2B5BE',
       'color.maroon': '#880E4F',
       'color.olive': '#808000',
       'color.lime': '#00E676',
       'color.aqua': '#00BCD4',
-      'color.teal': '#009688',
-      'color.navy': '#0D47A1',
-      'color.fuchsia': '#E91E63',
+      'color.teal': '#089981',
+      'color.navy': '#311B92',
+      'color.fuchsia': '#E040FB',
     };
 
     for (const [name, value] of Object.entries(colors)) {

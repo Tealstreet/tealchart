@@ -5821,7 +5821,7 @@ plot(close, color=color.red)`;
       // Color can be a string or an array of colors per bar
       const color = result.plots[0].color;
       const firstColor = Array.isArray(color) ? color[0] : color;
-      expect(firstColor).toBe('#F44336');
+      expect(firstColor).toBe('#F23645');
     });
   });
 
