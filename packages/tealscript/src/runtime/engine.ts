@@ -3811,6 +3811,9 @@ export class TealscriptEngine {
       case 'basecurrency':
       case 'mintick':
       case 'pricescale':
+      case 'pointvalue':
+      case 'mincontract':
+      case 'volumetype':
       case 'timezone':
         return this.ctx.syminfo[prop];
       case 'tickerid':

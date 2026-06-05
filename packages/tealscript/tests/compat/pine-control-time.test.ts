@@ -201,6 +201,36 @@ plot(chart.is_range ? 1 : 0, title="Range")
     expect(getPlot(result, 'Range').values).toEqual(allBars(0));
   });
 
+  it('exposes extended Pine syminfo host metadata', () => {
+    const result = runCompatScript(`
+indicator("Extended Syminfo")
+plot(syminfo.pointvalue, title="Point Value")
+plot(syminfo.mincontract, title="Min Contract")
+plot(str.length(syminfo.volumetype), title="Volume Type Length")
+plot(syminfo.minmove, title="Min Move")
+`, {
+      engineOptions: {
+        runtime: {
+          syminfo: {
+            mintick: 0.25,
+            pricescale: 4,
+            pointvalue: 50,
+            mincontract: 0.1,
+            volumetype: 'quote',
+          },
+        },
+      },
+    });
+
+    const allBars = (value: number) => Array(compatibilityBars.length).fill(value);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Point Value').values).toEqual(allBars(50));
+    expect(getPlot(result, 'Min Contract').values).toEqual(allBars(0.1));
+    expect(getPlot(result, 'Volume Type Length').values).toEqual(allBars(5));
+    expect(getPlot(result, 'Min Move').values).toEqual(allBars(1));
+  });
+
   it('matches indicator timeframe metadata idioms', () => {
     const secondsResult = runCompatScript(`
 indicator("Seconds metadata", timeframe="30S")
