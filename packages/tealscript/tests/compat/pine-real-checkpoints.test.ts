@@ -614,6 +614,39 @@ plot(strategy.closedtrades, title="Closed Trades")
     ]);
   });
 
+  it('locks a reduced official strategy immediate close idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/#strategyclose-and-strategyclose_all
+    const bars: Bar[] = [
+      { time: 1_700_350_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_350_060_000, open: 101, high: 103, low: 100, close: 102, volume: 100 },
+      { time: 1_700_350_120_000, open: 103, high: 104, low: 102, close: 103, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Official Immediate Close Checkpoint", process_orders_on_close=false)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.close("Long", immediately=true)
+plot(strategy.position_size, title="Position")
+plot(strategy.closedtrades, title="Closed Trades")
+plot(strategy.netprofit, title="Net Profit")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Position').values).toEqual([0, 0, 0]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 1, 1]);
+    expect(getPlot(result, 'Net Profit').values).toEqual([0, 1, 1]);
+    expect(result.strategy.closedTrades[0]).toMatchObject({
+      entryOrderId: 'Long',
+      exitOrderId: 'Close Long',
+      entryBarIndex: 1,
+      exitBarIndex: 1,
+      entryPrice: 101,
+      exitPrice: 102,
+      profit: 1,
+    });
+  });
+
   it('locks a reduced official strategy bar-magnifier idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const baseTime = 1_700_100_000_000;
