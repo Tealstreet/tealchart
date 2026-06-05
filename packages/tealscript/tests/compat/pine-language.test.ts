@@ -49,6 +49,33 @@ plot(rt.mid(high, low), title="Mid")
     expect(roundSeries(getPlot(result, 'Mid').values)).toEqual([101, 103.5, 106, 105.5, 101, 98.5, 102, 106.5, 108.5, 109.5, 111.5, 110.5]);
   });
 
+  it('keeps imported library function var state isolated per call site', () => {
+    const library = parse(`
+library("Counters", true)
+export nextCount() =>
+    var counter = 0
+    counter += 1
+    counter
+`);
+
+    const result = runCompatScript(`
+indicator("Imported function call-site state")
+import TestUser/Counters/1 as counters
+firstValue = counters.nextCount()
+otherValue = counters.nextCount()
+plot(firstValue, title="First Imported Counter")
+plot(otherValue, title="Second Imported Counter")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/Counters/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'First Imported Counter').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(getPlot(result, 'Second Imported Counter').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
   it('reports invalid imported exported library function arguments', () => {
     const library = parse(`
 library("RangeTools", true)
@@ -489,6 +516,36 @@ plot(q.y, title="Lifted")
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Lifted').values)).toEqual([112, 115, 117, 113, 109, 110, 114, 119, 118, 121, 120, 122]);
+  });
+
+  it('keeps imported library method var state isolated per call site', () => {
+    const library = parse(`
+library("PivotTools", true)
+export type Pivot
+    float value
+export method hits(Pivot this) =>
+    var count = 0
+    count += 1
+    count
+`);
+
+    const result = runCompatScript(`
+indicator("Imported method call-site state")
+import TestUser/PivotTools/1 as pivots
+p = pivots.Pivot.new(close)
+firstValue = p.hits()
+otherValue = p.hits()
+plot(firstValue, title="First Imported Method Hits")
+plot(otherValue, title="Second Imported Method Hits")
+`, {
+      engineOptions: {
+        libraries: new Map([['TestUser/PivotTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'First Imported Method Hits').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(getPlot(result, 'Second Imported Method Hits').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
   });
 
   it('reports invalid imported exported library method arguments', () => {

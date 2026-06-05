@@ -498,7 +498,7 @@ export class TealscriptEngine {
     this.registerTypeDeclarations(ast);
     this.registerUserFunctions(ast);
     this.registerLibraryImports(ast);
-    this.registerLocalCallableCallSites(ast);
+    this.registerCallableCallSites(ast);
 
     this.ctx.setNow(this.getRuntimeNow());
 
@@ -1257,7 +1257,7 @@ export class TealscriptEngine {
     }
   }
 
-  private registerLocalCallableCallSites(root: unknown): void {
+  private registerCallableCallSites(root: unknown): void {
     const seen = new WeakSet<object>();
     const visit = (node: unknown): void => {
       if (!node || typeof node !== 'object') return;
@@ -1270,6 +1270,9 @@ export class TealscriptEngine {
         const methodName = expr.callee.type === 'MemberExpression' && expr.callee.property.type === 'Identifier'
           ? expr.callee.property.name
           : undefined;
+        const namespace = expr.callee.type === 'MemberExpression' && expr.callee.object.type === 'Identifier'
+          ? expr.callee.object.name
+          : undefined;
 
         if (directName) {
           const fn = this.userFunctions.get(directName);
@@ -1281,6 +1284,20 @@ export class TealscriptEngine {
         if (methodName) {
           for (const method of this.userMethods.get(methodName) ?? []) {
             this.ensureFunctionScope(this.callSiteFunctionScopeKey(method, expr));
+          }
+
+          const importedLibrary = namespace ? this.importedLibraries.get(namespace) : undefined;
+          const importedFunction = importedLibrary?.functions.get(methodName);
+          if (importedLibrary && importedFunction && importedLibrary.exportedFunctions.has(methodName)) {
+            this.ensureFunctionScope(this.importedCallSiteFunctionScopeKey(importedLibrary.alias, importedFunction, expr));
+          }
+
+          for (const library of this.importedLibraries.values()) {
+            for (const method of library.methods.get(methodName) ?? []) {
+              if (method.exported) {
+                this.ensureFunctionScope(this.importedCallSiteFunctionScopeKey(library.alias, method, expr));
+              }
+            }
           }
         }
       }
@@ -2125,7 +2142,7 @@ export class TealscriptEngine {
     }
 
     if (namespace && this.importedLibraries.has(namespace)) {
-      return this.evaluateImportedFunction(namespace, funcName, args, namedArgs, hasPositionalArgumentAfterNamed);
+      return this.evaluateImportedFunction(namespace, funcName, args, namedArgs, hasPositionalArgumentAfterNamed, expr);
     }
 
     if (namespace && expr.callee.type === 'MemberExpression' && this.scope.has(namespace)) {
@@ -2154,6 +2171,7 @@ export class TealscriptEngine {
           [receiver, ...args],
           namedArgs,
           hasPositionalArgumentAfterNamed,
+          expr,
         );
       }
       if (isPineArray(receiver) || isPineMatrix(receiver) || isPineMap(receiver)) {
@@ -2212,6 +2230,7 @@ export class TealscriptEngine {
           [receiver, ...args],
           namedArgs,
           hasPositionalArgumentAfterNamed,
+          expr,
         );
       }
       const methodBuiltinName = this.getMethodBuiltinName(funcName, receiver);
@@ -2229,7 +2248,7 @@ export class TealscriptEngine {
       const importedLibrary = this.currentImportedLibrary();
       const libraryFunction = importedLibrary?.functions.get(funcName);
       if (importedLibrary && libraryFunction) {
-        return this.evaluateImportedLibraryFunction(importedLibrary, libraryFunction, args, namedArgs, hasPositionalArgumentAfterNamed);
+        return this.evaluateImportedLibraryFunction(importedLibrary, libraryFunction, args, namedArgs, hasPositionalArgumentAfterNamed, expr);
       }
 
       const userFunction = this.userFunctions.get(funcName);
@@ -2286,18 +2305,22 @@ export class TealscriptEngine {
 
   private callSiteFunctionScopeKey(fn: FunctionDeclaration, expr: CallExpression): string {
     const declarationKey = this.userCallableScopeKey(fn);
+    return `${declarationKey}${this.callSiteScopeSuffix(expr)}`;
+  }
+
+  private callSiteScopeSuffix(expr: CallExpression): string {
     if (!expr.loc) {
       const existing = this.callExpressionIds.get(expr);
       if (existing !== undefined) {
-        return `${declarationKey}@call:expr:${existing}`;
+        return `@call:expr:${existing}`;
       }
 
       const id = this.nextCallExpressionId++;
       this.callExpressionIds.set(expr, id);
-      return `${declarationKey}@call:expr:${id}`;
+      return `@call:expr:${id}`;
     }
 
-    return `${declarationKey}@call:${expr.loc.start.line}:${expr.loc.start.column}-${expr.loc.end.line}:${expr.loc.end.column}`;
+    return `@call:${expr.loc.start.line}:${expr.loc.start.column}-${expr.loc.end.line}:${expr.loc.end.column}`;
   }
 
   private importedFunctionScopeKey(alias: string, fn: FunctionDeclaration): string {
@@ -2307,19 +2330,24 @@ export class TealscriptEngine {
     return `import:${alias}:${fn.name.name}:${locKey}`;
   }
 
+  private importedCallSiteFunctionScopeKey(alias: string, fn: FunctionDeclaration, expr: CallExpression): string {
+    return `${this.importedFunctionScopeKey(alias, fn)}${this.callSiteScopeSuffix(expr)}`;
+  }
+
   private evaluateImportedFunction(
     alias: string,
     functionName: string,
     args: unknown[],
     namedArgs: Map<string, unknown>,
     hasPositionalArgumentAfterNamed = false,
+    expr?: CallExpression,
   ): unknown {
     const library = this.importedLibraries.get(alias);
     const fn = library?.functions.get(functionName);
     if (!library || !fn || !library.exportedFunctions.has(functionName)) {
       throw new Error(`Unknown library function: ${alias}.${functionName}`);
     }
-    return this.evaluateImportedLibraryFunction(library, fn, args, namedArgs, hasPositionalArgumentAfterNamed);
+    return this.evaluateImportedLibraryFunction(library, fn, args, namedArgs, hasPositionalArgumentAfterNamed, expr);
   }
 
   private currentImportedLibrary(): ImportedLibrary | undefined {
@@ -2333,8 +2361,10 @@ export class TealscriptEngine {
     args: unknown[],
     namedArgs: Map<string, unknown>,
     hasPositionalArgumentAfterNamed = false,
+    expr?: CallExpression,
   ): unknown {
-    const scopeKey = this.importedFunctionScopeKey(library.alias, fn);
+    const recursionKey = this.importedFunctionScopeKey(library.alias, fn);
+    const scopeKey = expr ? this.importedCallSiteFunctionScopeKey(library.alias, fn, expr) : recursionKey;
     this.importedLibraryCallStack.push(library.alias);
     try {
       return this.evaluateUserFunction(
@@ -2343,7 +2373,7 @@ export class TealscriptEngine {
         namedArgs,
         `library function ${library.alias}.${fn.name.name}`,
         scopeKey,
-        scopeKey,
+        recursionKey,
         hasPositionalArgumentAfterNamed,
       );
     } finally {
@@ -3038,7 +3068,7 @@ export class TealscriptEngine {
         }
       }
     }
-    engine.registerLocalCallableCallSites(expression);
+    engine.registerCallableCallSites(expression);
 
     const values: unknown[] = [];
     while (engine.ctx.advanceBar()) {
