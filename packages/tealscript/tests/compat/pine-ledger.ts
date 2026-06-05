@@ -280,6 +280,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'public-library-helper-checkpoint',
+      title: 'Public Library Helper Checkpoint',
+      searchContext: 'TradingView public scripts search: library helper',
+      featureTags: ['libraries', 'imports', 'udf', 'signals'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(

@@ -42,7 +42,8 @@ arrays, bar coloring, alerts, strategy entry/exit flows, request-limit reuse,
 explicit `max_bars_back` metadata, official lower-timeframe request arrays,
 official synthetic ticker requests, official dynamic sessions, official
 timeframe comparisons, official plot-style payloads, and public MTF,
-divergence, session-filter, dashboard-table, and multi-symbol screener idioms.
+divergence, session-filter, dashboard-table, multi-symbol screener, and
+library-helper idioms.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
 suppression, entry-direction risk rules, and recalculation checkpoints.
@@ -427,6 +428,9 @@ private helpers, construct library-local UDTs, and use library-local methods.
 Semantic export diagnostics cover Pine's requirement that any UDT exposed
 through exported fields, callable parameters, or inferred callable return values
 is also exported by the library.
+The checkpoint corpus tracks a reduced public library-helper import idiom that
+binds exported helpers through this deterministic registry and validates their
+series output.
 
 Published TradingView lookup is not implemented yet. `import` declarations
 without a matching registry entry emit an explicit missing-registry diagnostic.
@@ -667,7 +671,7 @@ host datafeed work. Visual output registration enforces Pine's 64 plot-output
 limit while exempting `hline()` outputs. Table creation enforces a conservative
 TealScript sandbox cap of 10,000 declared table cells across live tables.
 The checkpoint corpus tracks both a public MTF trend-filter request idiom and an
-official lower-timeframe array idiom.
+official lower-timeframe array idiom, plus a public multi-symbol screener idiom.
 
 Known limits: request data availability is host/provider-gated, and
 `request.footprint()` remains unsupported until the host can provide the
