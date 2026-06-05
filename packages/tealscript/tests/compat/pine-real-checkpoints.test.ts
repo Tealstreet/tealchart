@@ -385,6 +385,126 @@ plot(inSession and rawSignal ? 1 : 0, title="Filtered Signal")
     expect(getPlot(result, 'Filtered Signal').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0]);
   });
 
+  it('locks a reduced public dashboard table idiom', () => {
+    // Public idiom reference: dashboard-style public indicators commonly
+    // summarize trend and signal state in a last-bar table.
+    // Source search: https://www.tradingview.com/scripts/search/dashboard%20table/
+    const result = runCompatScript(`
+indicator("Public Dashboard Table Checkpoint", overlay=true)
+fast = ta.sma(close, 2)
+slow = ta.sma(close, 4)
+trendUp = fast > slow
+signalText = trendUp ? "Bullish" : "Bearish"
+signalColor = trendUp ? color.green : color.red
+var dashboard = table.new(position.top_right, 2, 2, border_width=1, border_color=color.white)
+if barstate.islast
+    table.cell(dashboard, 0, 0, "Trend", text_color=color.white, bgcolor=color.blue)
+    table.cell(dashboard, 1, 0, signalText, text_color=color.white, bgcolor=signalColor)
+    table.cell(dashboard, 0, 1, "Fast", text_color=color.white, bgcolor=color.gray)
+    table.cell(dashboard, 1, 1, str.tostring(fast, "#.00"), text_color=color.black, bgcolor=color.yellow)
+plot(trendUp ? 1 : 0, title="Trend Up")
+plot(fast, title="Fast Average")
+plot(slow, title="Slow Average")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Trend Up').values).toEqual([0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Fast Average').values)).toEqual([
+      null,
+      103.5,
+      106,
+      105,
+      101,
+      99.5,
+      102,
+      106.5,
+      108.5,
+      109.5,
+      110.5,
+      111,
+    ]);
+    expect(roundSeries(getPlot(result, 'Slow Average').values)).toEqual([
+      null,
+      null,
+      null,
+      104.25,
+      103.5,
+      102.25,
+      101.5,
+      103,
+      105.25,
+      108,
+      109.5,
+      110.25,
+    ]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'table_table.new_0_0',
+        type: 'table',
+        persistent: true,
+        barIndex: 0,
+        position: 'top_right',
+        columns: 2,
+        rows: 2,
+        bgcolor: null,
+        frameColor: null,
+        frameWidth: 0,
+        borderColor: '#FFFFFF',
+        borderWidth: 1,
+        cells: [
+          {
+            column: 0,
+            row: 0,
+            text: 'Trend',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#2196F3',
+          },
+          {
+            column: 1,
+            row: 0,
+            text: 'Bullish',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#4CAF50',
+          },
+          {
+            column: 0,
+            row: 1,
+            text: 'Fast',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#787B86',
+          },
+          {
+            column: 1,
+            row: 1,
+            text: '111.00',
+            width: undefined,
+            height: undefined,
+            textColor: '#363A45',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#FDD835',
+          },
+        ],
+      },
+    ]);
+  });
+
   it('locks a reduced official dynamic session idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/sessions/
     const result = runCompatScript(`
