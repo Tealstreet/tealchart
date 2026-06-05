@@ -4,7 +4,7 @@ import {
   type PineCompatibilityCorpusCase,
   type PineScriptLedger,
   type PineScriptLedgerEntry,
-} from '../../src';
+} from '../../src/compat/index.ts';
 
 const retrievedAt = '2026-06-02';
 

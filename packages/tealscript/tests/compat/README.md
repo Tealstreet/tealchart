@@ -34,6 +34,12 @@ real-script intake metadata or corpus summaries:
   `PineScriptLedger` plus a deterministic stage provider.
 - `createPineCompatibilityCoverageIndex()` counts checkpoint metadata by
   category, source kind, Pine version, storage policy, and feature tag.
+- `yarn workspace @tealstreet/tealscript pine:compat:dashboard` writes the
+  checkpoint corpus and coverage dashboard artifacts to
+  `packages/tealscript/coverage/pine-compatibility` by default. Pass
+  `--outDir <path>` to target a CI artifact directory.
+- `formatPineCompatibilityCoverageJson()` renders the coverage index as a
+  stable JSON artifact.
 - `formatPineCompatibilityCoverageMarkdown()` renders that coverage index for
   PR notes or generated reports.
 - `formatPineCompatibilityCorpusMarkdown()` renders the report for PR notes or

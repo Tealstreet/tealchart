@@ -376,6 +376,10 @@ export function formatPineCompatibilityCorpusJson(run: PineCompatibilityCorpusRu
   return `${JSON.stringify(run, null, 2)}\n`;
 }
 
+export function formatPineCompatibilityCoverageJson(index: PineCompatibilityCoverageIndex): string {
+  return `${JSON.stringify(index, null, 2)}\n`;
+}
+
 export function formatPineCompatibilityCoverageMarkdown(index: PineCompatibilityCoverageIndex): string {
   return `${[
     '# Pine Compatibility Coverage',

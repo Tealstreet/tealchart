@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
+import { execFileSync } from 'node:child_process';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 
 import {
   createPineCompatibilityCoverageIndex,
+  formatPineCompatibilityCoverageJson,
   formatPineCompatibilityCoverageMarkdown,
   formatPineCompatibilityCorpusJson,
   formatPineCompatibilityCorpusMarkdown,
@@ -121,5 +126,29 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('Total checkpoints: 25');
     expect(markdown).toContain('| official_docs | 22 |');
     expect(markdown).toContain('| reduced_fixture_only | 25 |');
+    expect(formatPineCompatibilityCoverageJson(index)).toContain('"total": 25');
+  });
+
+  it('generates deterministic dashboard artifacts for CI', () => {
+    const outDir = mkdtempSync(join(tmpdir(), 'pine-compat-dashboard-'));
+    try {
+      execFileSync(process.execPath, [
+        '--experimental-strip-types',
+        resolve(__dirname, '..', '..', 'scripts', 'generate-pine-compatibility-dashboard.ts'),
+        '--outDir',
+        outDir,
+      ], {
+        cwd: resolve(__dirname, '..', '..'),
+        encoding: 'utf8',
+        stdio: 'pipe',
+      });
+
+      expect(readFileSync(join(outDir, 'pine-compatibility-corpus.json'), 'utf8')).toContain('"passed": 25');
+      expect(readFileSync(join(outDir, 'pine-compatibility-corpus.md'), 'utf8')).toContain('Pass rate: 100.0%');
+      expect(readFileSync(join(outDir, 'pine-compatibility-coverage.json'), 'utf8')).toContain('"total": 25');
+      expect(readFileSync(join(outDir, 'pine-compatibility-coverage.md'), 'utf8')).toContain('Total checkpoints: 25');
+    } finally {
+      rmSync(outDir, { recursive: true, force: true });
+    }
   });
 });
