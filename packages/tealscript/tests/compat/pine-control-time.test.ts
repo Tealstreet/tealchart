@@ -259,6 +259,32 @@ plot(syminfo.session == "extended" ? 1 : 0, title="Session Match")
     expect(getPlot(result, 'Session Match').values).toEqual(allBars(1));
   });
 
+  it('exposes host-provided Pine syminfo root metadata', () => {
+    const result = runCompatScript(`
+indicator("Syminfo Root")
+plot(str.length(syminfo.ticker), title="Ticker Length")
+plot(str.length(syminfo.root), title="Root Length")
+plot(syminfo.root == "AAPL" ? 1 : 0, title="Root Match")
+`, {
+      engineOptions: {
+        runtime: {
+          syminfo: {
+            ticker: 'NASDAQ:AAPL',
+            root: 'AAPL',
+            basecurrency: 'USD',
+          },
+        },
+      },
+    });
+
+    const allBars = (value: number) => Array(compatibilityBars.length).fill(value);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Ticker Length').values).toEqual(allBars(11));
+    expect(getPlot(result, 'Root Length').values).toEqual(allBars(4));
+    expect(getPlot(result, 'Root Match').values).toEqual(allBars(1));
+  });
+
   it('exposes Pine syminfo company and security host metadata', () => {
     const result = runCompatScript(`
 indicator("Syminfo Company Metadata")

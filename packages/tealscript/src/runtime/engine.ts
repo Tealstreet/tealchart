@@ -3805,6 +3805,7 @@ export class TealscriptEngine {
   private evaluateSyminfo(prop: string): unknown {
     switch (prop) {
       case 'ticker':
+      case 'root':
       case 'description':
       case 'type':
       case 'currency':
@@ -3838,8 +3839,6 @@ export class TealscriptEngine {
       case 'tickerid':
       case 'main_tickerid':
         return this.ctx.syminfo.ticker;
-      case 'root':
-        return this.ctx.syminfo.basecurrency;
       case 'minmove':
         return this.ctx.syminfo.mintick * this.ctx.syminfo.pricescale;
       default:
