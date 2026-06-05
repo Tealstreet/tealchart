@@ -5527,7 +5527,19 @@ function peg$parse(input, options) {
     if (s1 !== peg$FAILED) {
       s2 = peg$parseIndent();
       if (s2 !== peg$FAILED) {
-        s3 = peg$parseStatement();
+        s3 = peg$parseFunctionIfStatement();
+        if (s3 === peg$FAILED) {
+          s3 = peg$parseFunctionForStatement();
+          if (s3 === peg$FAILED) {
+            s3 = peg$parseFunctionWhileStatement();
+            if (s3 === peg$FAILED) {
+              s3 = peg$parseFunctionVariableDeclaration();
+              if (s3 === peg$FAILED) {
+                s3 = peg$parseStatement();
+              }
+            }
+          }
+        }
         if (s3 !== peg$FAILED) {
           peg$savedPos = s0;
           s0 = peg$f71(s3);

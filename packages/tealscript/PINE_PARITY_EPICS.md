@@ -475,9 +475,10 @@ impact.
    source-linked corpus.
 3. Harness incomplete outcomes: keep canonical `not_run` stages failing corpus
    pass-rate summaries unless they are explicitly marked `skipped`.
-4. Pine layout parser audit fixtures: keep reduced coverage for nested dedents,
-   wrapped indented expressions, wrapped function/method signatures, and shared
-   library/type/method blocks before changing parser architecture.
+4. Pine layout parser audit fixtures: keep reduced coverage for top-level
+   nested dedents, wrapped indented expressions, wrapped function/method
+   signatures, and shared library/type/method blocks before deeper parser
+   architecture changes.
 5. Call-binding diagnostics sweep: keep signed built-in namespace typo
    diagnostics and drawing constructor argument signatures covered while using
    corpus failures to prioritize remaining named/positional overload gaps.

@@ -74,6 +74,9 @@ Covered behavior and remaining gaps:
 - Pine-style wrapped delimiter syntax is supported for multiline
   `indicator()`/`strategy()` declarations, function calls, array literals, tuple
   destructuring, index access, and parenthesized expressions.
+- Top-level nested control blocks share the deeper block parser used by
+  function bodies, including nested `if` / `else` dedents with reassignment
+  statements.
 - Tuple destructuring preserves known positional types from literal tuple
   expressions, direct declaration `if`, `switch`, and loop initializers, direct
   and compatible if/else plus partial-if user-function tuple returns, direct
