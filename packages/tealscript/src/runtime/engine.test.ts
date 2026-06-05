@@ -4358,6 +4358,7 @@ plot(str.format_time(millis, "S SS SSS", "UTC") == "1 12 123", title="Fraction T
 plot(str.format_time(august, "MMM MMMM", "UTC") == "Aug August", title="Month Name Tokens")
 plot(str.format_time(august, "E EEEE", "UTC") == "Tue Tuesday", title="Weekday Name Tokens")
 plot(str.format_time(stamp, "D DD DDD", "UTC") == "5 05 005", title="Day Of Year Tokens")
+plot(str.format_time(august, "MMM-d-y", "UTC") == "Aug-20-2024", title="Single Year Token")
 plot(str.format_time(stamp, "yyyy'T''Z'HH", "UTC") == "2024T'Z07", title="Escaped Quote")
 plot(str.format_time(na, "yyyy-MM-dd", "UTC") == "NaN", title="Missing")`;
 
@@ -4378,6 +4379,7 @@ plot(str.format_time(na, "yyyy-MM-dd", "UTC") == "NaN", title="Missing")`;
       expect(result.plots.find((plot) => plot.title === 'Month Name Tokens')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Weekday Name Tokens')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Day Of Year Tokens')?.values).toEqual([true, true]);
+      expect(result.plots.find((plot) => plot.title === 'Single Year Token')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Escaped Quote')?.values).toEqual([true, true]);
       expect(result.plots.find((plot) => plot.title === 'Missing')?.values).toEqual([true, true]);
     });
