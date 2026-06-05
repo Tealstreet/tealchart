@@ -186,6 +186,22 @@ varip x = 0`);
         };
         expect(varDecl.kind).toBe('varip');
       });
+
+      it('parses tuple discard placeholders with declaration modes', () => {
+        const ast = parse(`//@version=6
+indicator("Discard Tuple")
+var [_, direction, _] = [1, 2, 3]`);
+
+        const declaration = ast.body[1];
+        expect(declaration.type).toBe('VariableDeclaration');
+        if (declaration.type === 'VariableDeclaration') {
+          expect(declaration.kind).toBe('var');
+          expect(declaration.names.type).toBe('TupleDeclarator');
+          if (declaration.names.type === 'TupleDeclarator') {
+            expect(declaration.names.names.map((name) => name.name)).toEqual(['_', 'direction', '_']);
+          }
+        }
+      });
     });
 
     describe('declaration blocks', () => {

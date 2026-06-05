@@ -342,6 +342,17 @@ map<string, sig.State> stateBySymbol = na
       }
     });
 
+    it('parses tuple discard placeholders with declaration modes', () => {
+      const ast = parse('var [_, direction, _] = ta.supertrend(2.0, 3)\n');
+      const decl = ast.body[0] as VariableDeclaration;
+
+      expect(decl.kind).toBe('var');
+      expect(decl.names.type).toBe('TupleDeclarator');
+      if (decl.names.type === 'TupleDeclarator') {
+        expect(decl.names.names.map((name) => name.name)).toEqual(['_', 'direction', '_']);
+      }
+    });
+
     it('parses multiline tuple destructuring', () => {
       const ast = parse(`[
     a,

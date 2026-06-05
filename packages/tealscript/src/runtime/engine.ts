@@ -1376,7 +1376,7 @@ export class TealscriptEngine {
       this.scope.declare(name, kind, value, this.getTypeAnnotationName(stmt.typeAnnotation));
       this.markPersistentDeclarationDrawings(kind, drawingCount);
     } else if (stmt.names.type === 'TupleDeclarator') {
-      const names = stmt.names.names.map((name) => name.name);
+      const names = stmt.names.names.map((name) => name.name).filter((name) => name !== '_');
       if (this.shouldSkipInitializedPersistentDeclaration(kind, names)) {
         return;
       }
@@ -1389,6 +1389,7 @@ export class TealscriptEngine {
       const values = value as unknown[];
       for (let i = 0; i < stmt.names.names.length; i++) {
         const name = stmt.names.names[i].name;
+        if (name === '_') continue;
         this.scope.declare(name, kind, values[i]);
       }
       this.markPersistentDeclarationDrawings(kind, drawingCount);
@@ -1402,6 +1403,7 @@ export class TealscriptEngine {
 
   private shouldSkipInitializedPersistentDeclaration(kind: string, names: string[]): boolean {
     if (kind !== 'var' && kind !== 'varip') return false;
+    if (names.length === 0) return false;
     return names.every((name) => this.scope.getEntry(name)?.initialized);
   }
 

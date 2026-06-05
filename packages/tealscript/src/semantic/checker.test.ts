@@ -667,6 +667,20 @@ bad(left, left) => left
     ]);
   });
 
+  it('treats tuple underscore placeholders as discards', () => {
+    const result = checkProgram(parse(`
+indicator("Tuple Discards")
+[_, direction, _] = [1, close, "ignored"]
+direction := "bad"
+plot(direction)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable direction',
+    ]);
+    expect(result.symbols.map((symbol) => symbol.name)).not.toContain('_');
+  });
+
   it('infers tuple destructuring element types from literal expressions', () => {
     const result = checkProgram(parse(`
 indicator("Tuple Literal Types")
