@@ -4459,6 +4459,32 @@ export class TealscriptEngine {
         : fallback;
   }
 
+  private getVariadicNumberArgs(args: unknown[], namedArgs: Map<string, unknown>, prefix: string): number[] {
+    const values: number[] = [];
+    const assigned: boolean[] = [];
+    for (const [name, value] of namedArgs) {
+      if (!name.startsWith(prefix)) continue;
+      const suffix = name.slice(prefix.length);
+      if (!/^\d+$/.test(suffix)) continue;
+      const index = Number(suffix);
+      if (!Number.isSafeInteger(index)) continue;
+      values[index] = this.toNumber(value);
+      assigned[index] = true;
+    }
+    for (const arg of args) {
+      let index = 0;
+      while (assigned[index]) index += 1;
+      values[index] = this.toNumber(arg);
+      assigned[index] = true;
+    }
+    for (let index = 0; index < values.length; index += 1) {
+      if (!assigned[index]) {
+        throw new Error(`Missing variadic argument: ${prefix}${index}`);
+      }
+    }
+    return values;
+  }
+
   private getCallArgAny(
     args: unknown[],
     namedArgs: Map<string, unknown>,
@@ -6422,11 +6448,17 @@ export class TealscriptEngine {
     };
 
     unaryMath('math.abs', Math.abs);
-    this.builtins.set('math.max', (args) => Math.max(...(args as number[])));
-    this.builtins.set('math.min', (args) => Math.min(...(args as number[])));
-    this.builtins.set('math.avg', (args) => {
-      if (args.length === 0) return Number.NaN;
-      const values = args.map((arg) => this.toNumber(arg));
+    this.builtins.set('math.max', (args, namedArgs) => {
+      const values = this.getVariadicNumberArgs(args, namedArgs, 'number');
+      return values.length > 0 ? Math.max(...values) : Number.NaN;
+    });
+    this.builtins.set('math.min', (args, namedArgs) => {
+      const values = this.getVariadicNumberArgs(args, namedArgs, 'number');
+      return values.length > 0 ? Math.min(...values) : Number.NaN;
+    });
+    this.builtins.set('math.avg', (args, namedArgs) => {
+      const values = this.getVariadicNumberArgs(args, namedArgs, 'number');
+      if (values.length === 0) return Number.NaN;
       if (values.some((value) => Number.isNaN(value))) return Number.NaN;
       return values.reduce((sum, value) => sum + value, 0) / values.length;
     });

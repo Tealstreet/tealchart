@@ -85,6 +85,8 @@ Current `math.*` progress:
 
 - Common scalar helpers support Pine-style named arguments, including
   `number=`, `base=`, `exponent=`, and `precision=`.
+- Variadic `math.max()`, `math.min()`, and `math.avg()` support Pine-style
+  `number0=`, `number1=`, and later `numberN=` arguments.
 - `math.round_to_mintick()` normalizes floating-point residue to the symbol
   tick precision and supports Pine-style `number=` named arguments.
 - `math.sum()` supports `source=` and `length=` named arguments while preserving
