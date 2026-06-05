@@ -96,9 +96,10 @@ Covered behavior and remaining gaps:
 - User-defined function parameters support Pine-style default arguments. Default
   expressions are evaluated at the call site when the caller omits the
   corresponding positional or named argument.
-- User-defined function calls report clear diagnostics for unknown named
-  arguments, duplicate positional/named bindings, positional arguments after
-  named arguments, excess positional arguments, and duplicate named arguments.
+- User-defined function and local method calls report clear diagnostics for
+  unknown named arguments, duplicate positional/named bindings, positional
+  arguments after named arguments, excess positional arguments, missing required
+  arguments, and duplicate named arguments.
 - Recursive user-defined function calls are rejected with an explicit diagnostic
   instead of overflowing the runtime stack.
 - Nested indented blocks inside user-defined functions expose limitations in the

@@ -1703,6 +1703,35 @@ plot(badFunction + badMethod)
     ]);
   });
 
+  it('reports invalid user-callable argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("User Callable Argument Bindings")
+scale(float value, float factor=2) => value * factor
+required(float value, float factor) => value * factor
+method add(float this, float value, float factor=1) => this + value * factor
+badUnknown = scale(source=close)
+badDuplicate = scale(close, value=open)
+badTooMany = scale(close, 2, 3)
+badMissing = required(close)
+badMethodUnknown = close.add(source=1)
+badMethodDuplicate = close.add(1, value=2)
+badMethodTooMany = close.add(1, 2, 3)
+badMethodMissing = close.add()
+plot(badUnknown + badDuplicate + badTooMany + badMissing + badMethodUnknown + badMethodDuplicate + badMethodTooMany + badMethodMissing)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'source' for function scale",
+      "Argument 'value' for function scale was supplied multiple times",
+      'Too many arguments for function scale: expected 2, got 3',
+      "function required missing required argument 'factor'",
+      "Unknown argument 'source' for method add",
+      "Argument 'value' for method add was supplied multiple times",
+      'Too many arguments for method add: expected 2, got 3',
+      "method add missing required argument 'value'",
+    ]);
+  });
+
   it('infers user-defined function call return types', () => {
     const result = checkProgram(parse(`
 indicator("User Function Returns")

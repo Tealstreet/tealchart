@@ -1005,6 +1005,34 @@ plot(scale(close, 2, 3), title="Scaled")
 `);
     expect(tooMany.errors[0]?.message).toBe('Too many arguments for function scale: expected 2, got 3');
 
+    const missingRequired = runCompatScript(`
+indicator("UDF missing arg")
+scale(value, factor) => value * factor
+plot(scale(close), title="Scaled")
+`);
+    expect(missingRequired.errors[0]?.message).toBe("function scale missing required argument 'factor'");
+
+    const invalidMethodBinding = runCompatScript(`
+indicator("Method invalid binding")
+method add(float this, float value, float factor=1) => this + value * factor
+plot(close.add(source=1), title="Added")
+`);
+    expect(invalidMethodBinding.errors[0]?.message).toBe("Unknown argument 'source' for method add");
+
+    const tooManyMethodArgs = runCompatScript(`
+indicator("Method too many args")
+method add(float this, float value, float factor=1) => this + value * factor
+plot(close.add(1, 2, 3), title="Added")
+`);
+    expect(tooManyMethodArgs.errors[0]?.message).toBe('Too many arguments for method add: expected 2, got 3');
+
+    const missingMethodArg = runCompatScript(`
+indicator("Method missing arg")
+method add(float this, float value, float factor=1) => this + value * factor
+plot(close.add(), title="Added")
+`);
+    expect(missingMethodArg.errors[0]?.message).toBe("method add missing required argument 'value'");
+
     const duplicateNamed = runCompatScript(`
 indicator("Duplicate named args")
 plot(close, title="Close", title="Duplicate")
