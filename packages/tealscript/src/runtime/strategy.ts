@@ -721,7 +721,17 @@ function getPendingOrderFillPriceForTick(
   barIndex: number,
   isOpeningTick: boolean,
 ): number | null {
+  const wasStopLimitActivated = order.type === 'stop_limit' && order.stopLimitActivated;
   const price = getPendingOrderFillPrice(order, high, low, barIndex, tick.time);
+  if (
+    price === null
+    && wasStopLimitActivated
+    && order.stopLimitActivated
+    && order.stopLimitActivatedBarIndex === barIndex
+    && order.createdBarIndex < barIndex
+  ) {
+    return getLimitOrderFillPrice(order, high, low);
+  }
   if (price === null || !isOpeningTick || order.type === 'trailing_stop') {
     return price;
   }

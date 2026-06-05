@@ -801,10 +801,11 @@ drawdown snapshots. Price-based `strategy.exit()` limit/stop brackets are
 recorded as pending exit orders. Pending limit/stop orders fill on later bars
 when OHLC crosses their trigger price, and bracket siblings cancel through OCA.
 `strategy.entry()` and `strategy.order()` stop-limit orders activate after their
-stop price is crossed, then fill as limit orders on later bars. Fixed, cash, and
-percent-of-equity sizing resolve to concrete order quantities at submission
-time, and `strategy.entry()` enforces same-direction pyramiding limits and
-expands opposite-direction entry transactions to reverse positions. The
+stop price is crossed, then fill as limit orders on later execution ticks when
+the ordered broker path reaches the limit price. Fixed, cash, and
+percent-of-equity sizing resolve to concrete order quantities at submission time,
+and `strategy.entry()` enforces same-direction pyramiding limits and expands
+opposite-direction entry transactions to reverse positions. The
 `strategy(..., slippage=...)` setting applies fixed tick slippage to market,
 stop, and trailing-stop fills in trade direction while preserving limit-fill
 prices. This is a deterministic broker emulator: chart-OHLC and host-provided
