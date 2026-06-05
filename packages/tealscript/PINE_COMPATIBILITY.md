@@ -57,9 +57,9 @@ Resolved in the scope/series hardening PR:
   the variable entry and lost accumulated series history for derived values
   such as `dist = close - ta.sma(close, 3)` followed by `dist[1]`.
 - `var` and `varip` persistence now works at root and function-local scopes.
-  Local user-defined function and method state is isolated by written call site
-  so separate calls to the same helper do not share function-local `var`
-  variables.
+  Local and imported user-defined function and method state is isolated by
+  written call site so separate calls to the same helper do not share
+  function-local `var` variables.
 
 Covered behavior and remaining gaps:
 
