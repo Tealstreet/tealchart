@@ -15,10 +15,14 @@ real-script intake metadata or corpus summaries:
   Pine version, script category, feature tags, and raw-source storage policy.
 - `CompatibilityRunOutcome` records parse, semantic, runtime, datafeed, output,
   and render stage results for a script.
+- `normalizeCompatibilityStageOutcomes()` expands partial stage lists into the
+  canonical six-stage order, filling missing stages with `not_run`.
 - `CompatibilityFailureClass` keeps failure buckets stable across reports:
   `parse_gap`, `semantic_gap`, `unsupported_planned`, `runtime_gap`,
   `data_gap`, `output_gap`, `render_gap`, `oracle_gap`, and
   `licensing_blocked`.
+- `validateCompatibilityStageSequence()` rejects invalid stage statuses,
+  duplicate stages, and failure classes on non-failed stages.
 - `runPineCompatibilityCorpus()` converts ledger entries plus deterministic
   stage outcomes into an offline report with pass/fail counts, first-failure
   buckets, feature tag summaries, and validation errors.

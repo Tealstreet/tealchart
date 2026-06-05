@@ -468,7 +468,7 @@ impact.
 2. Strategy tick fills: refactor broker fills to consume selected execution
    ticks while preserving current OHLC behavior.
 3. Harness outcome model: define parse/semantic/runtime/data/output/render
-   result shape and failure classes.
+   result shape, canonical stage normalization, validation, and failure classes.
 4. Real-script intake ledger: add metadata-only corpus format and provenance
    rules.
 5. Corpus runner MVP: run parser and runtime where possible, emit JSON/Markdown
