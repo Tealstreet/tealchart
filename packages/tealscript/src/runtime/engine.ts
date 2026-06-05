@@ -5123,6 +5123,15 @@ export class TealscriptEngine {
     this.builtins.set('strategy.oca.cancel', () => 'cancel');
     this.builtins.set('strategy.oca.reduce', () => 'reduce');
     this.builtins.set('strategy.oca.none', () => 'none');
+    this.builtins.set('strategy.direction.all', () => 'all');
+    this.builtins.set('strategy.direction.long', () => 'long');
+    this.builtins.set('strategy.direction.short', () => 'short');
+    this.builtins.set('strategy.risk.allow_entry_in', (args, namedArgs) => {
+      this.ctx.strategyLedger.settings.allowedEntryDirection = this.normalizeStrategyAllowedEntryDirection(
+        this.getCallArg(args, namedArgs, 0, 'value', 'all'),
+      );
+      return undefined;
+    });
     this.builtins.set('strategy.opentrades.entry_id', (args, namedArgs) => (
       this.strategyOpenTrade(args, namedArgs)?.entryOrderId ?? ''
     ));
@@ -5307,12 +5316,21 @@ export class TealscriptEngine {
     if (isEntry && !this.canSubmitStrategyEntry(direction)) {
       return undefined;
     }
-    const requestedQty = this.resolveStrategyOrderQty(qtyType, qtyValue, limitPrice, stopPrice);
+    let requestedQty = this.resolveStrategyOrderQty(qtyType, qtyValue, limitPrice, stopPrice);
+    let orderQty = requestedQty;
+    if (isEntry && this.isStrategyEntryDirectionRestricted(direction)) {
+      const closeOnlyQty = this.resolveRestrictedStrategyEntryCloseQty(direction);
+      if (closeOnlyQty <= 0) {
+        return undefined;
+      }
+      requestedQty = 0;
+      orderQty = closeOnlyQty;
+    }
 
     const order = submitStrategyOrder(this.ctx.strategyLedger, {
       id,
       direction,
-      qty: requestedQty,
+      qty: orderQty,
       qtyType,
       qtyValue,
       isEntry,
@@ -5348,6 +5366,19 @@ export class TealscriptEngine {
   private canSubmitStrategyEntry(direction: StrategyDirection): boolean {
     const openEntries = this.ctx.strategyLedger.openTrades.filter((trade) => trade.direction === direction).length;
     return openEntries < this.ctx.strategyLedger.settings.pyramiding + 1;
+  }
+
+  private isStrategyEntryDirectionRestricted(direction: StrategyDirection): boolean {
+    const allowed = this.ctx.strategyLedger.settings.allowedEntryDirection;
+    return allowed !== 'all' && allowed !== direction;
+  }
+
+  private resolveRestrictedStrategyEntryCloseQty(direction: StrategyDirection): number {
+    const position = this.ctx.strategyLedger.position;
+    if (position.direction === null || position.direction === direction) {
+      return 0;
+    }
+    return Math.abs(position.size);
   }
 
   private resolveStrategyOrderQty(
@@ -5791,6 +5822,13 @@ export class TealscriptEngine {
       return value;
     }
     throw new Error(`Invalid strategy direction: ${this.toStringValue(value)}`);
+  }
+
+  private normalizeStrategyAllowedEntryDirection(value: unknown): StrategyDirection | 'all' {
+    if (value === 'all' || value === 'long' || value === 'short') {
+      return value;
+    }
+    throw new Error(`Invalid strategy entry direction: ${this.toStringValue(value)}`);
   }
 
   private normalizeOptionalStrategyOcaType(value: unknown): StrategyOcaType | undefined {

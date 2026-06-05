@@ -1918,6 +1918,47 @@ plot(strategy.closedtrades)`;
       ]);
     });
 
+    it('limits strategy.entry reversals with strategy.risk.allow_entry_in', () => {
+      const script = `//@version=6
+strategy("Entry direction risk", process_orders_on_close=true)
+strategy.risk.allow_entry_in(strategy.direction.long)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.entry("Blocked Short", strategy.short, qty=1)
+plot(strategy.position_size)
+plot(strategy.opentrades)
+plot(strategy.closedtrades)`;
+
+      const result = executeScript(parse(script), createBars(2));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.settings.allowedEntryDirection).toBe('long');
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        direction: order.direction,
+        qty: order.qty,
+        requestedQty: order.requestedQty,
+        filledQty: order.filledQty,
+        status: order.status,
+      }))).toEqual([
+        { id: 'Long', direction: 'long', qty: 2, requestedQty: 2, filledQty: 2, status: 'filled' },
+        { id: 'Blocked Short', direction: 'short', qty: 2, requestedQty: 0, filledQty: 2, status: 'filled' },
+      ]);
+      expect(result.strategy.position).toMatchObject({
+        direction: null,
+        size: 0,
+        avgPrice: null,
+      });
+      expect(result.strategy.closedTrades).toHaveLength(1);
+      expect(result.strategy.openTrades).toHaveLength(0);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [2, 0],
+        [1, 0],
+        [0, 1],
+      ]);
+    });
+
     it('does not auto-reverse raw strategy.order calls', () => {
       const script = `//@version=6
 strategy("Order no reversal", process_orders_on_close=true)
@@ -1933,6 +1974,32 @@ plot(strategy.position_size)`;
       expect(result.strategy.orders.map((order) => ({ id: order.id, qty: order.qty }))).toEqual([
         { id: 'Long', qty: 2 },
         { id: 'Short', qty: 1 },
+      ]);
+      expect(result.strategy.position.size).toBe(1);
+      expect(result.plots[0]?.values).toEqual([2, 1]);
+    });
+
+    it('does not apply strategy.risk.allow_entry_in to raw strategy.order calls', () => {
+      const script = `//@version=6
+strategy("Order ignores entry direction risk", process_orders_on_close=true)
+strategy.risk.allow_entry_in(strategy.direction.long)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.order("Short", strategy.short, qty=1)
+plot(strategy.position_size)`;
+
+      const result = executeScript(parse(script), createBars(2));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        qty: order.qty,
+        requestedQty: order.requestedQty,
+        filledQty: order.filledQty,
+      }))).toEqual([
+        { id: 'Long', qty: 2, requestedQty: 2, filledQty: 2 },
+        { id: 'Short', qty: 1, requestedQty: 1, filledQty: 1 },
       ]);
       expect(result.strategy.position.size).toBe(1);
       expect(result.plots[0]?.values).toEqual([2, 1]);

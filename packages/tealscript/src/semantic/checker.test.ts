@@ -445,6 +445,7 @@ alertcondition(true, title="A", message="M", freq=alert.freq_all)
   it('accepts Pine strategy order and trade accessor calls', () => {
     const result = checkProgram(parse(`
 strategy("Strategy", initial_capital=1000, pyramiding=1, default_qty_type=strategy.fixed, default_qty_value=1)
+strategy.risk.allow_entry_in(strategy.direction.long)
 strategy.entry("Long", strategy.long, qty=1, limit=close, oca_type=strategy.oca.cancel, alert_message="entry")
 strategy.entry(id="PrefixLong", strategy.long, 1, close, na, "EntryOca", strategy.oca.cancel, "entry comment", "entry alert")
 strategy.order(id="Add", direction=strategy.long, qty=1)
