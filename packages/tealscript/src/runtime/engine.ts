@@ -4690,6 +4690,9 @@ export class TealscriptEngine {
     const millisecond = pad(date.getUTCMilliseconds(), 3);
     const monthName = MONTH_NAMES[date.getUTCMonth()];
     const weekdayName = WEEKDAY_NAMES[date.getUTCDay()];
+    const yearStart = Date.UTC(date.getUTCFullYear(), 0, 1);
+    const currentDate = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+    const dayOfYear = Math.floor((currentDate - yearStart) / 86_400_000) + 1;
     const tokens: Array<[string, string]> = [
       ['yyyy', String(date.getUTCFullYear())],
       ['yy', pad(date.getUTCFullYear() % 100)],
@@ -4697,6 +4700,9 @@ export class TealscriptEngine {
       ['MMM', monthName.slice(0, 3)],
       ['EEEE', weekdayName],
       ['E', weekdayName.slice(0, 3)],
+      ['DDD', pad(dayOfYear, 3)],
+      ['DD', pad(dayOfYear)],
+      ['D', String(dayOfYear)],
       ['MM', pad(date.getUTCMonth() + 1)],
       ['M', String(date.getUTCMonth() + 1)],
       ['dd', pad(date.getUTCDate())],

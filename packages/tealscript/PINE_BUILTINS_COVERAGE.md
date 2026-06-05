@@ -123,8 +123,9 @@ Current `str.*` progress:
   helpers accept Pine-style named arguments while preserving positional calls.
 - `str.format_time()` uses the Pine v6 ISO-style default format and supports
   quoted literals, single date/time tokens, month-name `MMM`/`MMMM` tokens,
-  weekday-name `E`/`EEEE` tokens, fractional-second `S`/`SS`/`SSS` tokens,
-  12-hour `h`/`hh` and AM/PM `a` tokens, and numeric timezone offsets.
+  weekday-name `E`/`EEEE` tokens, day-of-year `D`/`DD`/`DDD` tokens,
+  fractional-second `S`/`SS`/`SSS` tokens, 12-hour `h`/`hh` and AM/PM `a`
+  tokens, and numeric timezone offsets.
 
 Current `color.*` progress:
 
