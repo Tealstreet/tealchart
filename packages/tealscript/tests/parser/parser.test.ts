@@ -602,6 +602,36 @@ map<string, sig.State> stateBySymbol = na
         expect(inner?.type).toBe('IfStatement');
       }
     });
+
+    it('parses fourth-level nested if branches inside multiline functions', () => {
+      const ast = parse(`classify(value, enabled, strict, confirmed) =>
+    if enabled
+        if strict
+            if confirmed
+                if value > 0
+                    1
+                else
+                    2
+            else
+                3
+        else
+            4
+    else
+        5
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        const outer = fn.body[0];
+        const second = outer.type === 'IfStatement' ? outer.consequent[0] : null;
+        const third = second?.type === 'IfStatement' ? second.consequent[0] : null;
+        const fourth = third?.type === 'IfStatement' ? third.consequent[0] : null;
+        expect(fourth?.type).toBe('IfStatement');
+        expect(fourth?.type === 'IfStatement' ? Array.isArray(fourth.alternate) : false).toBe(true);
+      }
+    });
   });
 
   describe('Layout gap fixtures', () => {
