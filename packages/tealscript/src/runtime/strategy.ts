@@ -367,6 +367,42 @@ export function cloneStrategyLedger(ledger: StrategyLedger): StrategyLedger {
   };
 }
 
+export function markStrategyLedgerToMarket(
+  ledger: StrategyLedger,
+  close: number,
+  high: number = close,
+  low: number = close,
+): void {
+  let openProfit = 0;
+  let maxRunup = ledger.maxRunup;
+  let maxDrawdown = ledger.maxDrawdown;
+
+  for (const trade of ledger.openTrades) {
+    const sign = trade.direction === 'long' ? 1 : -1;
+    const currentProfit = (close - trade.entryPrice) * trade.qty * sign;
+    const favorableProfit = trade.direction === 'long'
+      ? (high - trade.entryPrice) * trade.qty
+      : (trade.entryPrice - low) * trade.qty;
+    const adverseLoss = trade.direction === 'long'
+      ? (trade.entryPrice - low) * trade.qty
+      : (high - trade.entryPrice) * trade.qty;
+
+    trade.profit = currentProfit;
+    trade.maxRunup = Math.max(trade.maxRunup, favorableProfit, 0);
+    trade.maxDrawdown = Math.max(trade.maxDrawdown, adverseLoss, 0);
+    openProfit += currentProfit;
+    maxRunup = Math.max(maxRunup, trade.maxRunup);
+    maxDrawdown = Math.max(maxDrawdown, trade.maxDrawdown);
+  }
+
+  ledger.position.openProfit = openProfit;
+  ledger.equity = ledger.initialCapital + ledger.netProfit + openProfit;
+  ledger.position.maxRunup = Math.max(ledger.position.maxRunup, maxRunup);
+  ledger.position.maxDrawdown = Math.max(ledger.position.maxDrawdown, maxDrawdown);
+  ledger.maxRunup = maxRunup;
+  ledger.maxDrawdown = maxDrawdown;
+}
+
 export function createStrategyOrder(input: StrategyOrderInput): StrategyOrder {
   validateStrategyOrderInput(input);
   return {
@@ -923,6 +959,7 @@ function applyStrategyFillToTrades(ledger: StrategyLedger, fill: StrategyFill): 
     const closedQty = Math.min(remainingQty, trade.qty);
     const sign = trade.direction === 'long' ? 1 : -1;
     const profit = (fill.price - trade.entryPrice) * closedQty * sign;
+    const closedQtyRatio = trade.qty === 0 ? 0 : closedQty / trade.qty;
 
     ledger.closedTrades.push({
       ...trade,
@@ -934,6 +971,8 @@ function applyStrategyFillToTrades(ledger: StrategyLedger, fill: StrategyFill): 
       exitTime: fill.time,
       profit,
       commission: trade.commission + fill.commission,
+      maxRunup: trade.maxRunup * closedQtyRatio,
+      maxDrawdown: trade.maxDrawdown * closedQtyRatio,
     });
 
     if (closedQty === trade.qty) {

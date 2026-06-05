@@ -405,7 +405,11 @@ strategy.close_all(comment="flat prefix", "flat alert")
 strategy.cancel("Add")
 strategy.cancel_all()
 plot(strategy.opentrades.entry_price(0))
+plot(strategy.opentrades.max_runup(0))
+plot(strategy.opentrades.max_drawdown(trade_num=0))
 plot(strategy.closedtrades.exit_price(trade_num=0))
+plot(strategy.closedtrades.max_runup(0))
+plot(strategy.closedtrades.max_drawdown(trade_num=0))
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -423,11 +427,15 @@ entryId = strategy.opentrades.entry_id(0)
 entryBar = strategy.opentrades.entry_bar_index(0)
 entryTime = strategy.opentrades.entry_time(0)
 entryPrice = strategy.opentrades.entry_price(0)
+openRunup = strategy.opentrades.max_runup(0)
+openDrawdown = strategy.opentrades.max_drawdown(0)
 exitId = strategy.closedtrades.exit_id(trade_num=0)
 exitBar = strategy.closedtrades.exit_bar_index(trade_num=0)
 exitTime = strategy.closedtrades.exit_time(trade_num=0)
 exitPrice = strategy.closedtrades.exit_price(trade_num=0)
 closedProfit = strategy.closedtrades.profit(trade_num=0)
+closedRunup = strategy.closedtrades.max_runup(0)
+closedDrawdown = strategy.closedtrades.max_drawdown(0)
 equity := "bad"
 positionSize := "bad"
 openTrades := "bad"
@@ -437,12 +445,16 @@ entryId := 1
 entryBar := "bad"
 entryTime := "bad"
 entryPrice := "bad"
+openRunup := "bad"
+openDrawdown := "bad"
 exitId := 2
 exitBar := "bad"
 exitTime := "bad"
 exitPrice := "bad"
 closedProfit := "bad"
-plot(equity + positionSize + openTrades + closedTrades + winTrades + entryBar + entryTime + entryPrice + exitBar + exitTime + exitPrice + closedProfit + str.length(entryId) + str.length(exitId))
+closedRunup := "bad"
+closedDrawdown := "bad"
+plot(equity + positionSize + openTrades + closedTrades + winTrades + entryBar + entryTime + entryPrice + openRunup + openDrawdown + exitBar + exitTime + exitPrice + closedProfit + closedRunup + closedDrawdown + str.length(entryId) + str.length(exitId))
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -457,11 +469,15 @@ plot(equity + positionSize + openTrades + closedTrades + winTrades + entryBar + 
       'Cannot assign string value to int variable entryBar',
       'Cannot assign string value to int variable entryTime',
       'Cannot assign string value to float variable entryPrice',
+      'Cannot assign string value to float variable openRunup',
+      'Cannot assign string value to float variable openDrawdown',
       'Cannot assign int value to string variable exitId',
       'Cannot assign string value to int variable exitBar',
       'Cannot assign string value to int variable exitTime',
       'Cannot assign string value to float variable exitPrice',
       'Cannot assign string value to float variable closedProfit',
+      'Cannot assign string value to float variable closedRunup',
+      'Cannot assign string value to float variable closedDrawdown',
     ]);
     expect(types.get('equity')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('positionSize')).toMatchObject({ kind: 'float', qualifier: 'series' });
@@ -472,11 +488,15 @@ plot(equity + positionSize + openTrades + closedTrades + winTrades + entryBar + 
     expect(types.get('entryBar')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('entryTime')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('entryPrice')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('openRunup')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('openDrawdown')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('exitId')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('exitBar')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('exitTime')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('exitPrice')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('closedProfit')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('closedRunup')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('closedDrawdown')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid Pine strategy call arguments', () => {

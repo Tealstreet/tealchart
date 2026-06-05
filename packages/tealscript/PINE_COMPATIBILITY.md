@@ -766,9 +766,11 @@ state/accessor return types for downstream assignment diagnostics. `strategy.ent
 fill at the next bar open by default, or at the signal bar close when
 `process_orders_on_close=true`, then update position size and average price.
 Basic open/closed trade counters are maintained as fixed-size market fills
-change exposure. Price-based `strategy.exit()` limit/stop brackets are recorded
-as pending exit orders. Pending limit/stop orders fill on later bars when OHLC
-crosses their trigger price, and bracket siblings cancel through OCA.
+change exposure. Open trades are marked to market from current OHLC, updating
+`strategy.openprofit`, `strategy.equity`, and trade-level maximum run-up and
+drawdown snapshots. Price-based `strategy.exit()` limit/stop brackets are
+recorded as pending exit orders. Pending limit/stop orders fill on later bars
+when OHLC crosses their trigger price, and bracket siblings cancel through OCA.
 `strategy.entry()` and `strategy.order()` stop-limit orders activate after their
 stop price is crossed, then fill as limit orders on later bars. Fixed, cash, and
 percent-of-equity sizing resolve to concrete order quantities at submission
@@ -787,9 +789,11 @@ commissions are applied to fills and debited from strategy net profit/equity for
 `percent`, `cash_per_order`, and
 `cash_per_contract` commission settings. Basic `strategy.opentrades.*`
 accessors are available for open trade entry id, entry price, entry bar/time,
-signed size, gross open profit, and commission. Basic
+signed size, gross open profit, commission, maximum run-up, and maximum
+drawdown. Basic
 `strategy.closedtrades.*` accessors are available for closed trade entry/exit
-ids, prices, bars/times, signed size, gross profit, and commission.
+ids, prices, bars/times, signed size, gross profit, commission, maximum run-up,
+and maximum drawdown.
 Closed-trade outcome counters `strategy.wintrades`, `strategy.losstrades`, and
 `strategy.eventrades` are available. Filled strategy orders with
 `alert_message` emit `strategy_order_fills` alert events.
