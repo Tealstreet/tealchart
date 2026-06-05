@@ -470,7 +470,8 @@ impact.
 1. Roadmap remap: replace stale subsystem-first planning docs with this
    copy-paste compatibility roadmap.
 2. Strategy broker path checkpoint: keep official default broker-emulator OHLC
-   path and opening-gap fill assumptions covered in the source-linked corpus.
+   path, opening-gap fill assumptions, and stop-limit activation/fill behavior
+   covered in the source-linked corpus.
 3. Harness incomplete outcomes: keep canonical `not_run` stages failing corpus
    pass-rate summaries unless they are explicitly marked `skipped`.
 4. Pine layout parser audit fixtures: keep reduced coverage for nested dedents,

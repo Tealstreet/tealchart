@@ -122,6 +122,16 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: officialDocsEntry({
+      id: 'official-stop-limit-checkpoint',
+      title: 'Official Stop Limit Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/strategies/#order-types',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'stop_limit'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
       id: 'official-recalculate-after-fill-checkpoint',
       title: 'Official Recalculate After Fill Checkpoint',
       url: 'https://www.tradingview.com/pine-script-docs/concepts/strategies/',
