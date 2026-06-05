@@ -991,6 +991,13 @@ plot(scale(close, value=open), title="Scaled")
 `);
     expect(duplicateBinding.errors[0]?.message).toBe("Argument 'value' for function scale was supplied multiple times");
 
+    const invalidOrder = runCompatScript(`
+indicator("UDF invalid order")
+scale(value, factor=2) => value * factor
+plot(scale(value=close, 3), title="Scaled")
+`);
+    expect(invalidOrder.errors[0]?.message).toBe('function scale cannot use positional arguments after named arguments');
+
     const tooMany = runCompatScript(`
 indicator("UDF too many args")
 scale(value, factor=2) => value * factor

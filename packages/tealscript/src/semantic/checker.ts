@@ -2614,6 +2614,7 @@ class SemanticChecker {
     this.checkMatrixCallTypes(expression, scope);
     this.checkMatrixSortFieldType(expression, scope);
     this.checkMapCallTypes(expression, scope);
+    this.checkUserCallableArgumentOrder(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
     for (const argument of expression.arguments) {
       this.checkExpression(argument.value, scope);
@@ -3244,6 +3245,44 @@ class SemanticChecker {
       `No method ${expression.callee.property.name}() overload accepts ${this.formatSemanticTypeWithQualifier(receiverType)} receiver`,
       expression.callee.property.loc,
     );
+  }
+
+  private checkUserCallableArgumentOrder(expression: CallExpression, scope: SemanticScope): void {
+    const offendingArgument = this.firstPositionalArgumentAfterNamed(expression.arguments);
+    if (!offendingArgument) return;
+
+    if (expression.callee.type === 'Identifier') {
+      const symbol = scope.lookup(expression.callee.name);
+      if (symbol?.kind === 'function' && symbol.isMethod !== true) {
+        this.addDiagnostic(
+          'argument-order',
+          `function ${expression.callee.name} cannot use positional arguments after named arguments`,
+          offendingArgument.loc,
+        );
+      }
+      return;
+    }
+
+    if (expression.callee.type !== 'MemberExpression') return;
+    if (!this.methodDeclarations.has(expression.callee.property.name)) return;
+
+    this.addDiagnostic(
+      'argument-order',
+      `method ${expression.callee.property.name} cannot use positional arguments after named arguments`,
+      offendingArgument.loc,
+    );
+  }
+
+  private firstPositionalArgumentAfterNamed(args: CallArgument[]): CallArgument | undefined {
+    let hasNamedArgument = false;
+    for (const arg of args) {
+      if (arg.name) {
+        hasNamedArgument = true;
+      } else if (hasNamedArgument) {
+        return arg;
+      }
+    }
+    return undefined;
   }
 
   private isBuiltinCollectionMemberMethod(receiverType: SemanticType, methodName: string): boolean {

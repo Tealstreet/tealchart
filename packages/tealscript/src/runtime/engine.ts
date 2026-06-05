@@ -2004,6 +2004,7 @@ export class TealscriptEngine {
     // Evaluate arguments
     const args: unknown[] = [];
     const namedArgs = new Map<string, unknown>();
+    const hasPositionalArgumentAfterNamed = this.hasPositionalArgumentAfterNamed(expr.arguments);
 
     for (const arg of expr.arguments) {
       const value = this.evaluateExpression(arg.value);
@@ -2053,19 +2054,22 @@ export class TealscriptEngine {
     }
 
     if (namespace && this.importedLibraries.has(namespace)) {
-      return this.evaluateImportedFunction(namespace, funcName, args, namedArgs);
+      return this.evaluateImportedFunction(namespace, funcName, args, namedArgs, hasPositionalArgumentAfterNamed);
     }
 
     if (namespace && expr.callee.type === 'MemberExpression' && this.scope.has(namespace)) {
       const receiver = this.evaluateExpression(expr.callee.object);
       const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs, receiver);
       if (userMethod) {
+        const scopeKey = this.userCallableScopeKey(userMethod);
         return this.evaluateUserFunction(
           userMethod,
           [receiver, ...args],
           namedArgs,
           `method ${funcName}`,
-          this.userCallableScopeKey(userMethod),
+          scopeKey,
+          scopeKey,
+          hasPositionalArgumentAfterNamed,
         );
       }
       const importedMethod = this.findCallableImportedMethod(receiver, funcName, [receiver, ...args], namedArgs);
@@ -2075,6 +2079,7 @@ export class TealscriptEngine {
           importedMethod.method,
           [receiver, ...args],
           namedArgs,
+          hasPositionalArgumentAfterNamed,
         );
       }
       if (isPineArray(receiver) || isPineMatrix(receiver) || isPineMap(receiver)) {
@@ -2111,12 +2116,15 @@ export class TealscriptEngine {
       }
       const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs, receiver);
       if (userMethod) {
+        const scopeKey = this.userCallableScopeKey(userMethod);
         return this.evaluateUserFunction(
           userMethod,
           [receiver, ...args],
           namedArgs,
           `method ${funcName}`,
-          this.userCallableScopeKey(userMethod),
+          scopeKey,
+          scopeKey,
+          hasPositionalArgumentAfterNamed,
         );
       }
       const importedMethod = this.findCallableImportedMethod(receiver, funcName, [receiver, ...args], namedArgs);
@@ -2126,6 +2134,7 @@ export class TealscriptEngine {
           importedMethod.method,
           [receiver, ...args],
           namedArgs,
+          hasPositionalArgumentAfterNamed,
         );
       }
       const methodBuiltinName = this.getMethodBuiltinName(funcName, receiver);
@@ -2143,12 +2152,21 @@ export class TealscriptEngine {
       const importedLibrary = this.currentImportedLibrary();
       const libraryFunction = importedLibrary?.functions.get(funcName);
       if (importedLibrary && libraryFunction) {
-        return this.evaluateImportedLibraryFunction(importedLibrary, libraryFunction, args, namedArgs);
+        return this.evaluateImportedLibraryFunction(importedLibrary, libraryFunction, args, namedArgs, hasPositionalArgumentAfterNamed);
       }
 
       const userFunction = this.userFunctions.get(funcName);
       if (userFunction) {
-        return this.evaluateUserFunction(userFunction, args, namedArgs);
+        const scopeKey = this.userCallableScopeKey(userFunction);
+        return this.evaluateUserFunction(
+          userFunction,
+          args,
+          namedArgs,
+          `function ${userFunction.name.name}`,
+          scopeKey,
+          scopeKey,
+          hasPositionalArgumentAfterNamed,
+        );
       }
     }
 
@@ -2165,6 +2183,18 @@ export class TealscriptEngine {
       || fullName === 'strategy.cancel'
       || fullName === 'strategy.cancel_all'
     );
+  }
+
+  private hasPositionalArgumentAfterNamed(args: CallArgument[]): boolean {
+    let hasNamedArgument = false;
+    for (const arg of args) {
+      if (arg.name) {
+        hasNamedArgument = true;
+      } else if (hasNamedArgument) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private userCallableScopeKey(fn: FunctionDeclaration): string {
@@ -2188,13 +2218,14 @@ export class TealscriptEngine {
     functionName: string,
     args: unknown[],
     namedArgs: Map<string, unknown>,
+    hasPositionalArgumentAfterNamed = false,
   ): unknown {
     const library = this.importedLibraries.get(alias);
     const fn = library?.functions.get(functionName);
     if (!library || !fn || !library.exportedFunctions.has(functionName)) {
       throw new Error(`Unknown library function: ${alias}.${functionName}`);
     }
-    return this.evaluateImportedLibraryFunction(library, fn, args, namedArgs);
+    return this.evaluateImportedLibraryFunction(library, fn, args, namedArgs, hasPositionalArgumentAfterNamed);
   }
 
   private currentImportedLibrary(): ImportedLibrary | undefined {
@@ -2207,6 +2238,7 @@ export class TealscriptEngine {
     fn: FunctionDeclaration,
     args: unknown[],
     namedArgs: Map<string, unknown>,
+    hasPositionalArgumentAfterNamed = false,
   ): unknown {
     const scopeKey = this.importedFunctionScopeKey(library.alias, fn);
     this.importedLibraryCallStack.push(library.alias);
@@ -2218,6 +2250,7 @@ export class TealscriptEngine {
         `library function ${library.alias}.${fn.name.name}`,
         scopeKey,
         scopeKey,
+        hasPositionalArgumentAfterNamed,
       );
     } finally {
       this.importedLibraryCallStack.pop();
@@ -3149,11 +3182,16 @@ export class TealscriptEngine {
     displayName = `function ${fn.name.name}`,
     scopeKey = this.userCallableScopeKey(fn),
     recursionKey = scopeKey,
+    hasPositionalArgumentAfterNamed = false,
   ): unknown {
     const recursiveIndex = this.userFunctionCallStack.indexOf(recursionKey);
     if (recursiveIndex !== -1) {
       const cycle = [...this.userFunctionCallStack.slice(recursiveIndex), recursionKey].join(' -> ');
       throw new Error(`Recursive user function calls are not supported: ${cycle}`);
+    }
+
+    if (hasPositionalArgumentAfterNamed) {
+      throw new Error(`${displayName} cannot use positional arguments after named arguments`);
     }
 
     if (args.length > fn.params.length) {
