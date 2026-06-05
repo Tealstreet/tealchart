@@ -25,7 +25,9 @@ export const compatibilityFailureClasses = [
 
 export type CompatibilityFailureClass = typeof compatibilityFailureClasses[number];
 
-export type CompatibilityStageStatus = 'not_run' | 'passed' | 'failed' | 'skipped';
+export const compatibilityStageStatuses = ['not_run', 'passed', 'failed', 'skipped'] as const;
+
+export type CompatibilityStageStatus = typeof compatibilityStageStatuses[number];
 
 export interface CompatibilityDiagnostic {
   code: string;
@@ -115,8 +117,19 @@ export interface PineScriptLedgerEntry {
   notes?: string;
 }
 
+export function normalizeCompatibilityStageOutcomes(stages: CompatibilityStageOutcome[]): CompatibilityStageOutcome[] {
+  const byStage = new Map<CompatibilityStage, CompatibilityStageOutcome>();
+
+  for (const stage of stages) {
+    if (!compatibilityStages.includes(stage.stage) || byStage.has(stage.stage)) continue;
+    byStage.set(stage.stage, cloneCompatibilityStageOutcome(stage));
+  }
+
+  return compatibilityStages.map((stage) => byStage.get(stage) ?? { stage, status: 'not_run' });
+}
+
 export function summarizeCompatibilityOutcome(stages: CompatibilityStageOutcome[]): CompatibilityRunSummary {
-  const firstFailure = stages.find((stage) => stage.status === 'failed');
+  const firstFailure = normalizeCompatibilityStageOutcomes(stages).find((stage) => stage.status === 'failed');
   if (!firstFailure) {
     return { passed: true };
   }
@@ -133,12 +146,13 @@ export function createCompatibilityRunOutcome(input: {
   pineVersion?: PineVersion;
   stages: CompatibilityStageOutcome[];
 }): CompatibilityRunOutcome {
+  const stages = normalizeCompatibilityStageOutcomes(input.stages);
   return {
     schemaVersion: PINE_COMPATIBILITY_SCHEMA_VERSION,
     scriptId: input.scriptId,
     pineVersion: input.pineVersion ?? 'unknown',
-    stages: input.stages.map((stage) => ({ ...stage, diagnostics: stage.diagnostics?.map((diagnostic) => ({ ...diagnostic })) })),
-    summary: summarizeCompatibilityOutcome(input.stages),
+    stages,
+    summary: summarizeCompatibilityOutcome(stages),
   };
 }
 
@@ -147,12 +161,34 @@ export function validateCompatibilityStageOutcome(stage: CompatibilityStageOutco
   if (!compatibilityStages.includes(stage.stage)) {
     errors.push(`unknown compatibility stage: ${stage.stage}`);
   }
+  if (!compatibilityStageStatuses.includes(stage.status)) {
+    errors.push(`unknown compatibility stage status: ${stage.status}`);
+  }
   if (stage.status === 'failed' && stage.failureClass === undefined) {
     errors.push(`failed stage ${stage.stage} must include a failureClass`);
+  }
+  if (stage.status !== 'failed' && stage.failureClass !== undefined) {
+    errors.push(`stage ${stage.stage} must not include failureClass unless status is failed`);
   }
   if (stage.failureClass !== undefined && !compatibilityFailureClasses.includes(stage.failureClass)) {
     errors.push(`unknown compatibility failure class: ${stage.failureClass}`);
   }
+  return errors;
+}
+
+export function validateCompatibilityStageSequence(stages: CompatibilityStageOutcome[]): string[] {
+  const errors = stages.flatMap(validateCompatibilityStageOutcome);
+  const seen = new Set<CompatibilityStage>();
+
+  for (const stage of stages) {
+    if (!compatibilityStages.includes(stage.stage)) continue;
+    if (seen.has(stage.stage)) {
+      errors.push(`duplicate compatibility stage: ${stage.stage}`);
+      continue;
+    }
+    seen.add(stage.stage);
+  }
+
   return errors;
 }
 
@@ -204,7 +240,7 @@ export function summarizePineCompatibilityCorpus(
     if (ledgerEntry) {
       const errors = [
         ...validatePineScriptLedgerEntry(ledgerEntry),
-        ...corpusCase.stages.flatMap(validateCompatibilityStageOutcome),
+        ...validateCompatibilityStageSequence(corpusCase.stages),
       ];
       if (errors.length > 0) {
         validationErrors[ledgerEntry.id || `<case-${index + 1}>`] = errors;
@@ -241,6 +277,13 @@ export function summarizePineCompatibilityCorpus(
     byFirstFailureClass,
     byFeatureTag,
     validationErrors,
+  };
+}
+
+function cloneCompatibilityStageOutcome(stage: CompatibilityStageOutcome): CompatibilityStageOutcome {
+  return {
+    ...stage,
+    diagnostics: stage.diagnostics?.map((diagnostic) => ({ ...diagnostic })),
   };
 }
 

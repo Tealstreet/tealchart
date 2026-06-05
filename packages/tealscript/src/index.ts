@@ -7,13 +7,16 @@
 // Parser
 export {
   compatibilityFailureClasses,
+  compatibilityStageStatuses,
   compatibilityStages,
   createCompatibilityRunOutcome,
   formatPineCompatibilityCorpusMarkdown,
+  normalizeCompatibilityStageOutcomes,
   PINE_COMPATIBILITY_SCHEMA_VERSION,
   runPineCompatibilityCorpus,
   summarizeCompatibilityOutcome,
   summarizePineCompatibilityCorpus,
+  validateCompatibilityStageSequence,
   validateCompatibilityStageOutcome,
   validatePineScriptLedgerEntry,
   type CompatibilityDiagnostic,
