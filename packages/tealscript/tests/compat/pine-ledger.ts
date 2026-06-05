@@ -308,6 +308,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'public-synthetic-ticker-checkpoint',
+      title: 'Public Synthetic Ticker Checkpoint',
+      searchContext: 'TradingView public scripts search: heikin ashi trend',
+      featureTags: ['ticker', 'request', 'heikin_ashi', 'signals'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
