@@ -4670,6 +4670,7 @@ export class TealscriptEngine {
     };
     const hour24 = date.getUTCHours();
     const hour12 = hour24 % 12 || 12;
+    const millisecond = pad(date.getUTCMilliseconds(), 3);
     const tokens: Array<[string, string]> = [
       ['yyyy', String(date.getUTCFullYear())],
       ['yy', pad(date.getUTCFullYear() % 100)],
@@ -4685,7 +4686,9 @@ export class TealscriptEngine {
       ['m', String(date.getUTCMinutes())],
       ['ss', pad(date.getUTCSeconds())],
       ['s', String(date.getUTCSeconds())],
-      ['SSS', pad(date.getUTCMilliseconds(), 3)],
+      ['SSS', millisecond],
+      ['SS', millisecond.slice(0, 2)],
+      ['S', millisecond.slice(0, 1)],
       ['a', hour24 < 12 ? 'AM' : 'PM'],
       ['Z', formatOffset()],
     ];
