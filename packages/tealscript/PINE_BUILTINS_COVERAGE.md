@@ -124,9 +124,9 @@ Current `str.*` progress:
 - `str.format_time()` uses the Pine v6 ISO-style default format and supports
   quoted literals, single date/time tokens, year `y`/`yy`/`yyyy` tokens,
   month-name `MMM`/`MMMM` tokens, weekday-name `E`/`EEEE` tokens, day-of-year
-  `D`/`DD`/`DDD` tokens, fractional-second `S`/`SS`/`SSS` tokens, 12-hour
-  `h`/`hh` and AM/PM `a` tokens, timezone-name `z`/`zzzz` tokens, and numeric
-  timezone offsets.
+  `D`/`DD`/`DDD` tokens, week-of-year `w`/`ww` tokens, fractional-second
+  `S`/`SS`/`SSS` tokens, 12-hour `h`/`hh` and AM/PM `a` tokens, timezone-name
+  `z`/`zzzz` tokens, and numeric timezone offsets.
 
 Current `color.*` progress:
 
