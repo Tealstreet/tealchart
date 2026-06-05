@@ -59,7 +59,8 @@ Resolved in the scope/series hardening PR:
 - `var` and `varip` persistence now works at root and function-local scopes.
   Local and imported user-defined function and method state is isolated by
   written call site so separate calls to the same helper do not share
-  function-local `var` variables.
+  function-local `var` variables. Function-local `if` and loop block scopes
+  persist across bars for nested-block `var` values and regular series history.
 
 Covered behavior and remaining gaps:
 
