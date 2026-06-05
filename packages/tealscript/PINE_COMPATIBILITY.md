@@ -80,10 +80,8 @@ Covered behavior and remaining gaps:
   arity mismatches.
 - Operator line continuations are supported after arithmetic, comparison,
   logical, unary, and ternary operators. Leading comparison, logical,
-  multiplicative, `+`, non-numeric `-`, and ternary operators are also
-  supported. Leading negative-literal continuations remain a planned
-  indentation-aware parser item because they conflict with negative literals in
-  indented Pine bodies.
+  multiplicative, numeric and non-numeric `-`, `+`, and ternary operators are
+  also supported.
 - User-defined function bodies can return expression results from `if` /
   `else if` / `else` branches, including partial `if` expressions with no
   `else` when the present branch has an inferable value.
@@ -562,16 +560,18 @@ sets `islastconfirmedhistory` on the last historical bar, and switches
 
 ## Common Chart Info Coverage
 
-The chart-info pass exposes common static `syminfo.*` and `timeframe.*`
-members used by generated indicators and multi-timeframe script templates,
-including `syminfo.tickerid`, `syminfo.root`, `timeframe.period`,
-`timeframe.main_period`, `timeframe.multiplier`, `timeframe.in_seconds()`,
-`timeframe.from_seconds()`, `timeframe.change()`, and timeframe category flags.
+The chart-info pass exposes common static `syminfo.*`, `timeframe.*`, and
+host-provided `chart.*` members used by generated indicators and
+multi-timeframe script templates, including `syminfo.tickerid`, `syminfo.root`,
+`timeframe.period`, `timeframe.main_period`, `timeframe.multiplier`,
+`timeframe.in_seconds()`, `timeframe.from_seconds()`, `timeframe.change()`,
+timeframe category flags, `chart.bg_color`, `chart.fg_color`, and chart-type
+flags such as `chart.is_heikinashi` and `chart.is_renko`.
 `indicator(timeframe=...)` updates the exposed timeframe metadata for
 seconds/minutes/D/W/M and tick declaration values, including
 `timeframe.isticks`. Semantic analysis preserves known `syminfo.*` metadata,
-timeframe metadata, and time helper return types for downstream assignment
-diagnostics.
+timeframe metadata, chart metadata, and time helper return types for downstream
+assignment diagnostics.
 
 ## Common Calendar Coverage
 

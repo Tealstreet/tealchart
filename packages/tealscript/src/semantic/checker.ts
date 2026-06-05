@@ -257,6 +257,16 @@ const SYMINFO_STRING_MEMBER_NAMES = new Set([
 const SYMINFO_INT_MEMBER_NAMES = new Set(['syminfo.minmove', 'syminfo.pricescale']);
 const SYMINFO_FLOAT_MEMBER_NAMES = new Set(['syminfo.mincontract', 'syminfo.mintick', 'syminfo.pointvalue']);
 
+const CHART_BOOL_MEMBER_NAMES = new Set([
+  'chart.is_heikinashi',
+  'chart.is_kagi',
+  'chart.is_linebreak',
+  'chart.is_pnf',
+  'chart.is_range',
+  'chart.is_renko',
+]);
+const CHART_COLOR_MEMBER_NAMES = new Set(['chart.bg_color', 'chart.fg_color']);
+
 const TICKER_STRING_RETURN_NAMES = new Set([
   'ticker.heikinashi',
   'ticker.inherit',
@@ -3739,6 +3749,10 @@ class SemanticChecker {
           const syminfoType = this.inferSyminfoMemberType(expression);
           if (syminfoType) return syminfoType;
         }
+        if (expression.object.type === 'Identifier' && expression.object.name === 'chart') {
+          const chartType = this.inferChartMemberType(expression);
+          if (chartType) return chartType;
+        }
         if (expression.object.type === 'Identifier' && expression.object.name === 'strategy') {
           const strategyType = this.inferStrategyMemberType(expression);
           if (strategyType) return strategyType;
@@ -4692,6 +4706,8 @@ class SemanticChecker {
     if (timeframeType) return timeframeType;
     const syminfoType = this.inferSyminfoMemberType(expression);
     if (syminfoType) return syminfoType;
+    const chartType = this.inferChartMemberType(expression);
+    if (chartType) return chartType;
     const strategyType = this.inferStrategyMemberType(expression);
     if (strategyType) return strategyType;
     const drawingAllType = this.inferDrawingAllMemberType(expression);
@@ -4724,6 +4740,13 @@ class SemanticChecker {
     if (SYMINFO_STRING_MEMBER_NAMES.has(memberName)) return { kind: 'string', qualifier: 'simple' };
     if (SYMINFO_INT_MEMBER_NAMES.has(memberName)) return { kind: 'int', qualifier: 'simple' };
     if (SYMINFO_FLOAT_MEMBER_NAMES.has(memberName)) return { kind: 'float', qualifier: 'simple' };
+    return undefined;
+  }
+
+  private inferChartMemberType(expression: MemberExpression): SemanticType | undefined {
+    const memberName = this.memberPath(expression).join('.');
+    if (CHART_BOOL_MEMBER_NAMES.has(memberName)) return { kind: 'bool', qualifier: 'simple' };
+    if (CHART_COLOR_MEMBER_NAMES.has(memberName)) return { kind: 'color', qualifier: 'simple' };
     return undefined;
   }
 

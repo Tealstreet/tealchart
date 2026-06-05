@@ -163,6 +163,44 @@ plot(dwm, title="DWM")
     expect(getPlot(result, 'DWM').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   });
 
+  it('exposes Pine chart context colors and type flags', () => {
+    const result = runCompatScript(`
+indicator("Chart Context")
+plot(color.r(chart.bg_color), title="Bg R")
+plot(color.g(chart.bg_color), title="Bg G")
+plot(color.b(chart.fg_color), title="Fg B")
+plot(chart.is_renko ? 1 : 0, title="Renko")
+plot(chart.is_heikinashi ? 1 : 0, title="Heikin Ashi")
+plot(chart.is_linebreak ? 1 : 0, title="Line Break")
+plot(chart.is_kagi ? 1 : 0, title="Kagi")
+plot(chart.is_pnf ? 1 : 0, title="Point Figure")
+plot(chart.is_range ? 1 : 0, title="Range")
+`, {
+      engineOptions: {
+        runtime: {
+          chart: {
+            bgColor: '#102030',
+            fgColor: '#ABCDEF',
+            type: 'renko',
+          },
+        },
+      },
+    });
+
+    const allBars = (value: number) => Array(compatibilityBars.length).fill(value);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Bg R').values).toEqual(allBars(16));
+    expect(getPlot(result, 'Bg G').values).toEqual(allBars(32));
+    expect(getPlot(result, 'Fg B').values).toEqual(allBars(239));
+    expect(getPlot(result, 'Renko').values).toEqual(allBars(1));
+    expect(getPlot(result, 'Heikin Ashi').values).toEqual(allBars(0));
+    expect(getPlot(result, 'Line Break').values).toEqual(allBars(0));
+    expect(getPlot(result, 'Kagi').values).toEqual(allBars(0));
+    expect(getPlot(result, 'Point Figure').values).toEqual(allBars(0));
+    expect(getPlot(result, 'Range').values).toEqual(allBars(0));
+  });
+
   it('matches indicator timeframe metadata idioms', () => {
     const secondsResult = runCompatScript(`
 indicator("Seconds metadata", timeframe="30S")
