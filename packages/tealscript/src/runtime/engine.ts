@@ -3816,6 +3816,15 @@ export class TealscriptEngine {
       case 'volumetype':
       case 'prefix':
       case 'session':
+      case 'country':
+      case 'sector':
+      case 'industry':
+      case 'isin':
+      case 'current_contract':
+      case 'employees':
+      case 'shareholders':
+      case 'shares_outstanding_float':
+      case 'shares_outstanding_total':
       case 'timezone':
         return this.ctx.syminfo[prop];
       case 'tickerid':

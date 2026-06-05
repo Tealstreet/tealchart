@@ -82,6 +82,11 @@ export interface SymInfo {
   type: string; // 'crypto', 'stock', 'forex', etc.
   prefix: string;
   session: string;
+  country: string;
+  sector: string;
+  industry: string;
+  isin: string;
+  current_contract: string;
   currency: string;
   basecurrency: string;
   mintick: number; // Minimum price movement
@@ -89,6 +94,10 @@ export interface SymInfo {
   pointvalue: number; // Contract point value
   mincontract: number; // Minimum contract size
   volumetype: string; // 'base', 'quote', 'tick', or 'n/a'
+  employees: number;
+  shareholders: number;
+  shares_outstanding_float: number;
+  shares_outstanding_total: number;
   timezone: string;
 }
 
@@ -329,6 +338,11 @@ export class ExecutionContext {
     type: 'crypto',
     prefix: '',
     session: 'regular',
+    country: '',
+    sector: '',
+    industry: '',
+    isin: '',
+    current_contract: '',
     currency: 'USDT',
     basecurrency: 'BTC',
     mintick: 0.01,
@@ -336,6 +350,10 @@ export class ExecutionContext {
     pointvalue: 1,
     mincontract: 1,
     volumetype: 'base',
+    employees: Number.NaN,
+    shareholders: Number.NaN,
+    shares_outstanding_float: Number.NaN,
+    shares_outstanding_total: Number.NaN,
     timezone: 'UTC',
   };
 

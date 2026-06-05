@@ -192,23 +192,41 @@ root = syminfo.root
 timezone = syminfo.timezone
 currency = syminfo.currency
 volumeType = syminfo.volumetype
+country = syminfo.country
+sector = syminfo.sector
+industry = syminfo.industry
+isin = syminfo.isin
+currentContract = syminfo.current_contract
 minMove = syminfo.minmove
 priceScale = syminfo.pricescale
+employees = syminfo.employees
+shareholders = syminfo.shareholders
 minTick = syminfo.mintick
 pointValue = syminfo.pointvalue
 minContract = syminfo.mincontract
+floatShares = syminfo.shares_outstanding_float
+totalShares = syminfo.shares_outstanding_total
 ticker := 1
 tickerId := 2
 root := 3
 timezone := 4
 currency := 5
 volumeType := 6
+country := 7
+sector := 8
+industry := 9
+isin := 10
+currentContract := 11
 minMove := "bad"
 priceScale := "bad"
+employees := "bad"
+shareholders := "bad"
 minTick := "bad"
 pointValue := "bad"
 minContract := "bad"
-plot(minMove + priceScale + minTick + pointValue + minContract)
+floatShares := "bad"
+totalShares := "bad"
+plot(minMove + priceScale + employees + shareholders + minTick + pointValue + minContract + floatShares + totalShares)
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -220,11 +238,20 @@ plot(minMove + priceScale + minTick + pointValue + minContract)
       'Cannot assign int value to string variable timezone',
       'Cannot assign int value to string variable currency',
       'Cannot assign int value to string variable volumeType',
+      'Cannot assign int value to string variable country',
+      'Cannot assign int value to string variable sector',
+      'Cannot assign int value to string variable industry',
+      'Cannot assign int value to string variable isin',
+      'Cannot assign int value to string variable currentContract',
       'Cannot assign string value to int variable minMove',
       'Cannot assign string value to int variable priceScale',
+      'Cannot assign string value to int variable employees',
+      'Cannot assign string value to int variable shareholders',
       'Cannot assign string value to float variable minTick',
       'Cannot assign string value to float variable pointValue',
       'Cannot assign string value to float variable minContract',
+      'Cannot assign string value to float variable floatShares',
+      'Cannot assign string value to float variable totalShares',
     ]);
     expect(types.get('ticker')).toMatchObject({ kind: 'string', qualifier: 'simple' });
     expect(types.get('tickerId')).toMatchObject({ kind: 'string', qualifier: 'simple' });
@@ -232,11 +259,20 @@ plot(minMove + priceScale + minTick + pointValue + minContract)
     expect(types.get('timezone')).toMatchObject({ kind: 'string', qualifier: 'simple' });
     expect(types.get('currency')).toMatchObject({ kind: 'string', qualifier: 'simple' });
     expect(types.get('volumeType')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('country')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('sector')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('industry')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('isin')).toMatchObject({ kind: 'string', qualifier: 'simple' });
+    expect(types.get('currentContract')).toMatchObject({ kind: 'string', qualifier: 'simple' });
     expect(types.get('minMove')).toMatchObject({ kind: 'int', qualifier: 'simple' });
     expect(types.get('priceScale')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+    expect(types.get('employees')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+    expect(types.get('shareholders')).toMatchObject({ kind: 'int', qualifier: 'simple' });
     expect(types.get('minTick')).toMatchObject({ kind: 'float', qualifier: 'simple' });
     expect(types.get('pointValue')).toMatchObject({ kind: 'float', qualifier: 'simple' });
     expect(types.get('minContract')).toMatchObject({ kind: 'float', qualifier: 'simple' });
+    expect(types.get('floatShares')).toMatchObject({ kind: 'float', qualifier: 'simple' });
+    expect(types.get('totalShares')).toMatchObject({ kind: 'float', qualifier: 'simple' });
   });
 
   it('accepts Pine log calls with format arguments', () => {
