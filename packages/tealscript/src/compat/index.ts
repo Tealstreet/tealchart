@@ -156,7 +156,9 @@ export function normalizeCompatibilityStageOutcomes(stages: CompatibilityStageOu
 }
 
 export function summarizeCompatibilityOutcome(stages: CompatibilityStageOutcome[]): CompatibilityRunSummary {
-  const firstFailure = normalizeCompatibilityStageOutcomes(stages).find((stage) => stage.status === 'failed');
+  const firstFailure = normalizeCompatibilityStageOutcomes(stages).find((stage) => (
+    stage.status !== 'passed' && stage.status !== 'skipped'
+  ));
   if (!firstFailure) {
     return { passed: true };
   }

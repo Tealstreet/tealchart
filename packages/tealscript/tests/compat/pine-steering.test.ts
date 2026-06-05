@@ -74,6 +74,10 @@ describe('Pine compatibility steering model', () => {
       firstFailureStage: 'runtime',
       firstFailureClass: 'runtime_gap',
     });
+    expect(summarizeCompatibilityOutcome([{ stage: 'parse', status: 'passed' }])).toEqual({
+      passed: false,
+      firstFailureStage: 'semantic',
+    });
     expect(normalizeCompatibilityStageOutcomes(stages)).toEqual(normalizedStages);
     expect(createCompatibilityRunOutcome({ scriptId: 'public-rsi-001', pineVersion: 'v6', stages })).toEqual({
       schemaVersion: PINE_COMPATIBILITY_SCHEMA_VERSION,
@@ -192,11 +196,7 @@ describe('Pine compatibility steering model', () => {
     const run = runPineCompatibilityCorpus([
       {
         ledgerEntry: passingEntry,
-        stages: [
-          { stage: 'parse', status: 'passed' },
-          { stage: 'semantic', status: 'passed' },
-          { stage: 'runtime', status: 'passed' },
-        ],
+        stages: passedThroughOutputStages(),
       },
       {
         ledgerEntry: runtimeGapEntry,
@@ -259,7 +259,7 @@ describe('Pine compatibility steering model', () => {
     const run = runPineCompatibilityCorpus([
       {
         ledgerEntry: createLedgerEntry({ id: 'manual-sma-pass', featureTags: ['plot', 'ta'] }),
-        stages: [{ stage: 'parse', status: 'passed' }],
+        stages: passedThroughOutputStages(),
       },
       {
         ledgerEntry: createLedgerEntry({ id: 'manual-parser-gap', featureTags: ['syntax'] }),
@@ -294,6 +294,17 @@ Pass rate: 50.0%
 `);
   });
 });
+
+function passedThroughOutputStages(): CompatibilityStageOutcome[] {
+  return [
+    { stage: 'parse', status: 'passed' },
+    { stage: 'semantic', status: 'passed' },
+    { stage: 'runtime', status: 'passed' },
+    { stage: 'datafeed', status: 'skipped', message: 'manual compatibility fixture uses local bars' },
+    { stage: 'output', status: 'passed' },
+    { stage: 'render', status: 'skipped', message: 'numeric fixture; render comparison is manual' },
+  ];
+}
 
 function createLedgerEntry(overrides: Partial<PineScriptLedgerEntry>): PineScriptLedgerEntry {
   return {

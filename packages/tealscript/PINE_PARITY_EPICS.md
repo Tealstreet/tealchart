@@ -96,9 +96,10 @@ The current runtime already covers a useful common-script subset:
 
 Known structural gaps:
 
-- The harness does not yet have a real-script intake ledger, pass-rate
-  dashboard, or stable failure taxonomy across parse, semantic, runtime, data,
-  output, and render stages.
+- The harness has a real-script intake ledger, offline pass-rate summaries, and
+  a stable parse/semantic/runtime/data/output/render failure taxonomy. The
+  remaining gap is scaling the ledger with more public-script metadata and
+  producing a generated dashboard artifact in CI.
 - Layout parsing still needs a general indentation/continuation model that can
   scale to arbitrary nested pasted Pine code.
 - Pine's qualified type system (`const < input < simple < series`) is partially
@@ -467,16 +468,12 @@ impact.
    copy-paste compatibility roadmap.
 2. Strategy slippage fills: apply `strategy(..., slippage=...)` tick offsets to
    market, stop, and trailing-stop fills while preserving limit-fill behavior.
-3. Harness outcome model: define parse/semantic/runtime/data/output/render
-   result shape, canonical stage normalization, validation, and failure classes.
-4. Real-script intake ledger: add metadata-only corpus format, unique-id
-   validation, and provenance rules.
-5. Corpus runner MVP: run ledger-backed offline outcomes and emit JSON/Markdown
-   pass-rate summaries plus checkpoint coverage reports.
-6. Pine layout parser audit/failing fixtures: collect reduced layout shapes
+3. Harness incomplete outcomes: make canonical `not_run` stages fail corpus
+   pass-rate summaries unless they are explicitly marked `skipped`.
+4. Pine layout parser audit/failing fixtures: collect reduced layout shapes
    for nested dedents, wrapped indented expressions, and shared library/type/
    method blocks before changing parser architecture.
-7. Call-binding diagnostics sweep: use corpus failures to prioritize missing
+5. Call-binding diagnostics sweep: use corpus failures to prioritize missing
    named/positional overload diagnostics.
-8. Visual output payload audit: ensure runtime payloads are stable before
+6. Visual output payload audit: ensure runtime payloads are stable before
    investing in renderer fidelity.
