@@ -632,6 +632,35 @@ strategy.exit("Exit", from_entry="Long", unknown=1)
     ]);
   });
 
+  it('reports invalid literal Pine strategy order values', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy")
+strategy.entry("", "up", qty=0, oca_type="bad")
+strategy.order(id="Add", direction="down", qty=-1, oca_type=strategy.oca.cancel)
+strategy.close("", qty=-1, qty_percent=0)
+strategy.exit("", qty=-1, qty_percent=0, trail_points=-1, trail_offset=0)
+strategy.risk.allow_entry_in("sideways")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy.entry id must not be empty',
+      'Invalid strategy direction for strategy.entry: up',
+      'strategy.entry qty must be a positive number',
+      'Invalid strategy oca_type for strategy.entry: bad',
+      'Invalid strategy direction for strategy.order: down',
+      'strategy.order qty must be a positive number',
+      'strategy.close id must not be empty',
+      'strategy.close qty must be a positive number',
+      'strategy.close qty_percent must be a positive number',
+      'strategy.exit id must not be empty',
+      'strategy.exit qty must be a positive number',
+      'strategy.exit qty_percent must be a positive number',
+      'strategy.exit trail_points must be a non-negative number',
+      'strategy.exit trailing stop offset must be positive',
+      'Invalid strategy entry direction: sideways',
+    ]);
+  });
+
   it('reports duplicate declarations in the same scope', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate")

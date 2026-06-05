@@ -797,7 +797,8 @@ positions, and equity snapshots. Read-only `strategy.*` state variables such as
 `strategy.equity`, `strategy.account_currency`, `strategy.position_size`,
 `strategy.position_entry_name`, and trade counters are available for scripts.
 The semantic checker validates common strategy order, close/cancel,
-and trade-accessor call shapes before runtime, and preserves known strategy
+and trade-accessor call shapes before runtime, reports literal order
+id/direction/OCA/quantity diagnostics, and preserves known strategy
 state/accessor return types for downstream assignment diagnostics. `strategy.entry()`,
 `strategy.order()`, `strategy.close()`,
 `strategy.close_all()`, `strategy.exit()`, `strategy.cancel()`, and
