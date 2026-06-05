@@ -242,11 +242,16 @@ const TIMEFRAME_STRING_MEMBER_NAMES = new Set(['timeframe.main_period', 'timefra
 
 const SYMINFO_STRING_MEMBER_NAMES = new Set([
   'syminfo.basecurrency',
+  'syminfo.country',
   'syminfo.currency',
+  'syminfo.current_contract',
   'syminfo.description',
+  'syminfo.industry',
+  'syminfo.isin',
   'syminfo.main_tickerid',
   'syminfo.prefix',
   'syminfo.root',
+  'syminfo.sector',
   'syminfo.session',
   'syminfo.ticker',
   'syminfo.tickerid',
@@ -254,8 +259,19 @@ const SYMINFO_STRING_MEMBER_NAMES = new Set([
   'syminfo.type',
   'syminfo.volumetype',
 ]);
-const SYMINFO_INT_MEMBER_NAMES = new Set(['syminfo.minmove', 'syminfo.pricescale']);
-const SYMINFO_FLOAT_MEMBER_NAMES = new Set(['syminfo.mincontract', 'syminfo.mintick', 'syminfo.pointvalue']);
+const SYMINFO_INT_MEMBER_NAMES = new Set([
+  'syminfo.employees',
+  'syminfo.minmove',
+  'syminfo.pricescale',
+  'syminfo.shareholders',
+]);
+const SYMINFO_FLOAT_MEMBER_NAMES = new Set([
+  'syminfo.mincontract',
+  'syminfo.mintick',
+  'syminfo.pointvalue',
+  'syminfo.shares_outstanding_float',
+  'syminfo.shares_outstanding_total',
+]);
 
 const CHART_BOOL_MEMBER_NAMES = new Set([
   'chart.is_heikinashi',
