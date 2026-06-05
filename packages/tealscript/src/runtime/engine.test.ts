@@ -722,7 +722,7 @@ strategy("Open access",
     commission_type=strategy.commission.cash_per_contract,
     commission_value=1)
 if bar_index == 0
-    strategy.entry("Long", strategy.long, qty=2)
+    strategy.entry("Long", strategy.long, qty=2, comment="entry comment")
 if bar_index == 1
     strategy.entry("Add", strategy.long, qty=1)
 plot(strategy.opentrades.entry_price(0), title="Entry Price")
@@ -731,10 +731,12 @@ plot(strategy.opentrades.entry_time(0), title="Entry Time")
 plot(strategy.opentrades.size(0), title="Size")
 plot(strategy.opentrades.profit(0), title="Profit")
 plot(strategy.opentrades.commission(0), title="Commission")
+plot(strategy.opentrades.profit_percent(0), title="Profit Percent")
 plot(strategy.opentrades.max_runup(0), title="Max Runup")
 plot(strategy.opentrades.max_drawdown(0), title="Max Drawdown")
 plot(strategy.opentrades.max_runup_percent(0), title="Max Runup Percent")
 plot(strategy.opentrades.max_drawdown_percent(0), title="Max Drawdown Percent")
+plot(strategy.opentrades.entry_comment(0) == "entry comment" ? 1 : 0, title="Entry Comment")
 plot(strategy.opentrades.entry_id(1) == "Add" ? 1 : 0, title="Second Id")
 plot(strategy.opentrades.size(99), title="Missing")`;
 
@@ -754,10 +756,12 @@ plot(strategy.opentrades.size(99), title="Missing")`;
         (bars[1].close - bars[0].close) * 2,
       ]);
       expect(result.plots.find((plot) => plot.title === 'Commission')?.values).toEqual([2, 2]);
+      expect(roundSeries(result.plots.find((plot) => plot.title === 'Profit Percent')?.values ?? [])).toEqual([0, 0.499002]);
       expect(roundSeries(result.plots.find((plot) => plot.title === 'Max Runup')?.values ?? [])).toEqual([0, 1.6]);
       expect(roundSeries(result.plots.find((plot) => plot.title === 'Max Drawdown')?.values ?? [])).toEqual([0, 0]);
       expect(roundSeries(result.plots.find((plot) => plot.title === 'Max Runup Percent')?.values ?? [])).toEqual([0, 0.798403]);
       expect(roundSeries(result.plots.find((plot) => plot.title === 'Max Drawdown Percent')?.values ?? [])).toEqual([0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Entry Comment')?.values).toEqual([1, 1]);
       expect(result.plots.find((plot) => plot.title === 'Second Id')?.values).toEqual([0, 1]);
       expect(result.plots.find((plot) => plot.title === 'Missing')?.values).toEqual([null, null]);
     });
@@ -780,11 +784,13 @@ strategy("Closed access",
     commission_type=strategy.commission.cash_per_order,
     commission_value=2)
 if bar_index == 0
-    strategy.entry("Long", strategy.long, qty=2)
+    strategy.entry("Long", strategy.long, qty=2, comment="entry comment")
 if bar_index == 1
-    strategy.close("Long")
+    strategy.close("Long", comment="exit comment")
 plot(strategy.closedtrades.entry_id(0) == "Long" ? 1 : 0, title="Entry Id")
 plot(strategy.closedtrades.exit_id(0) == "Close Long" ? 1 : 0, title="Exit Id")
+plot(strategy.closedtrades.entry_comment(0) == "entry comment" ? 1 : 0, title="Entry Comment")
+plot(strategy.closedtrades.exit_comment(0) == "exit comment" ? 1 : 0, title="Exit Comment")
 plot(strategy.closedtrades.entry_price(0), title="Entry Price")
 plot(strategy.closedtrades.exit_price(0), title="Exit Price")
 plot(strategy.closedtrades.entry_bar_index(0), title="Entry Bar")
@@ -793,6 +799,7 @@ plot(strategy.closedtrades.entry_time(0), title="Entry Time")
 plot(strategy.closedtrades.exit_time(0), title="Exit Time")
 plot(strategy.closedtrades.size(0), title="Size")
 plot(strategy.closedtrades.profit(0), title="Profit")
+plot(strategy.closedtrades.profit_percent(0), title="Profit Percent")
 plot(strategy.closedtrades.commission(0), title="Commission")
 plot(strategy.closedtrades.max_runup(0), title="Max Runup")
 plot(strategy.closedtrades.max_drawdown(0), title="Max Drawdown")
@@ -807,6 +814,8 @@ plot(strategy.closedtrades.profit(99), title="Missing")`;
       expect(result.errors).toEqual([]);
       expect(result.plots.find((plot) => plot.title === 'Entry Id')?.values).toEqual([0, 1]);
       expect(result.plots.find((plot) => plot.title === 'Exit Id')?.values).toEqual([0, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Entry Comment')?.values).toEqual([0, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Exit Comment')?.values).toEqual([0, 1]);
       expect(result.plots.find((plot) => plot.title === 'Entry Price')?.values).toEqual([null, bars[0].close]);
       expect(result.plots.find((plot) => plot.title === 'Exit Price')?.values).toEqual([null, bars[1].close]);
       expect(result.plots.find((plot) => plot.title === 'Entry Bar')?.values).toEqual([null, 0]);
@@ -815,6 +824,7 @@ plot(strategy.closedtrades.profit(99), title="Missing")`;
       expect(result.plots.find((plot) => plot.title === 'Exit Time')?.values).toEqual([null, bars[1].time]);
       expect(result.plots.find((plot) => plot.title === 'Size')?.values).toEqual([null, 2]);
       expect(result.plots.find((plot) => plot.title === 'Profit')?.values).toEqual([null, grossProfit]);
+      expect(roundSeries(result.plots.find((plot) => plot.title === 'Profit Percent')?.values ?? [])).toEqual([null, 0.499002]);
       expect(result.plots.find((plot) => plot.title === 'Commission')?.values).toEqual([null, 4]);
       expect(roundSeries(result.plots.find((plot) => plot.title === 'Max Runup')?.values ?? [])).toEqual([null, 1.6]);
       expect(roundSeries(result.plots.find((plot) => plot.title === 'Max Drawdown')?.values ?? [])).toEqual([null, 0]);
