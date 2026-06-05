@@ -45,7 +45,7 @@ timeframe comparisons, official plot-style payloads, and public MTF,
 divergence, session-filter, dashboard-table, multi-symbol screener, and
 library-helper idioms. Public-source coverage also includes alert signal
 metadata, direct alert emission, and Heikin-Ashi synthetic ticker trend
-requests.
+requests, plus UDT state objects updated through user-defined methods.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
 suppression, entry-direction risk rules, recalculation checkpoints, and a
@@ -364,6 +364,8 @@ references. The runtime uses the receiver as the method's first argument, in
 line with Pine's documented method-call equivalence, and selects local UDT
 method overloads by receiver type. Semantic diagnostics report calls where a
 known receiver type does not match any local method receiver annotation.
+Runtime evaluation of UDT method state is covered by a reduced public
+market-structure object idiom.
 Semantic coverage accepts local method overload declarations, and method return
 inference selects local overloads by receiver specificity and annotated argument
 signatures. Full and partial branch/switch plus loop control-flow method returns

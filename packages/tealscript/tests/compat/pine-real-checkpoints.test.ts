@@ -408,6 +408,38 @@ plot(bearish ? 1 : 0, title="Bearish Divergence")
     expect(getPlot(result, 'Bearish Divergence').values).toEqual([0, 0, 0, 0, 1]);
   });
 
+  it('locks a reduced public object-method state idiom', () => {
+    // Public idiom reference: market-structure public indicators commonly keep
+    // swing state in user-defined objects and update it through methods.
+    // Source search: https://www.tradingview.com/scripts/search/market%20structure%20object/
+    const result = runCompatScript(`
+indicator("Public Object Method Checkpoint")
+type SwingState
+    int pivots = 0
+    float lastHigh = na
+    bool rising = false
+
+method record(SwingState this, float candidate) =>
+    if not na(candidate)
+        this.rising := na(this.lastHigh) ? false : candidate > this.lastHigh
+        this.lastHigh := candidate
+        this.pivots += 1
+    this
+
+var state = SwingState.new()
+pivotHigh = ta.pivothigh(high, 1, 1)
+state := state.record(pivotHigh)
+plot(state.pivots, title="Pivot Count")
+plot(state.lastHigh, title="Last High")
+plot(state.rising ? 1 : 0, title="Rising Pivot")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Pivot Count').values).toEqual([0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2]);
+    expect(getPlot(result, 'Last High').values).toEqual([null, null, null, null, 109, 109, 109, 109, 109, 109, 109, 114]);
+    expect(getPlot(result, 'Rising Pivot').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+  });
+
   it('locks a reduced public session-gated signal idiom', () => {
     // Public idiom reference: intraday scripts frequently gate signals with a
     // user/session time filter.

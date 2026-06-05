@@ -159,7 +159,8 @@ Phases:
    divergence, session filters, strategy brackets, drawing/table dashboards,
    libraries, alerts, screeners, and synthetic tickers. The current checkpoint
    corpus includes reduced public fixtures for MTF filters, divergence,
-   session filters, dashboard tables, screeners, and library helpers.
+   session filters, dashboard tables, screeners, library helpers, and UDT
+   object-method state.
    Strategy-bracket coverage includes official broker examples plus a reduced
    public fixed-bracket strategy fixture.
    Alert coverage includes official docs examples plus a reduced public signal
@@ -358,6 +359,8 @@ Phases:
    arrays, history/reference behavior, and common diagnostics.
 3. Complete UDT constructors, defaults, field access, reference assignment,
    copy semantics, rollback, nested collection fields, and `varip` field rules.
+   Keep source-linked public checkpoint coverage for persistent UDT state
+   updated through user-defined methods.
 4. Complete matrix API breadth used by public scripts; defer rare numerical
    exactness such as repeated-eigenvalue basis parity unless corpus demand
    justifies it.
