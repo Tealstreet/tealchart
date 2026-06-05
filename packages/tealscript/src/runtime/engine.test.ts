@@ -1596,6 +1596,144 @@ plot(strategy.closedtrades)`;
       ]);
     });
 
+    it('records long strategy.exit profit and loss offsets as tick-based brackets', () => {
+      const script = `//@version=6
+strategy("Exit profit loss", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.exit("Bracket", "Long", profit=4, loss=2)
+plot(strategy.opentrades)`;
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 100.4, low: 99.8, close: 100.2, volume: 1000 },
+        { time: 2, open: 100.2, high: 100.5, low: 99.8, close: 100.1, volume: 1000 },
+      ];
+
+      const result = executeScript(parse(script), bars, undefined, {
+        runtime: { syminfo: { mintick: 0.25 } },
+      });
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        direction: order.direction,
+        type: order.type,
+        status: order.status,
+        limitPrice: order.limitPrice,
+        stopPrice: order.stopPrice,
+        ocaType: order.ocaType,
+      }))).toEqual([
+        {
+          id: 'Long',
+          direction: 'long',
+          type: 'market',
+          status: 'filled',
+          limitPrice: undefined,
+          stopPrice: undefined,
+          ocaType: undefined,
+        },
+        {
+          id: 'Bracket Limit',
+          direction: 'short',
+          type: 'limit',
+          status: 'pending',
+          limitPrice: 101.2,
+          stopPrice: undefined,
+          ocaType: 'cancel',
+        },
+        {
+          id: 'Bracket Stop',
+          direction: 'short',
+          type: 'stop',
+          status: 'pending',
+          limitPrice: undefined,
+          stopPrice: 99.7,
+          ocaType: 'cancel',
+        },
+      ]);
+    });
+
+    it('records short strategy.exit profit and loss offsets as tick-based brackets', () => {
+      const script = `//@version=6
+strategy("Short exit profit loss", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Short", strategy.short, qty=1)
+if bar_index == 1
+    strategy.exit("Bracket", "Short", profit=4, loss=2)
+plot(strategy.opentrades)`;
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 100.4, low: 99.8, close: 100.2, volume: 1000 },
+        { time: 2, open: 100.2, high: 100.6, low: 99.4, close: 100.1, volume: 1000 },
+      ];
+
+      const result = executeScript(parse(script), bars, undefined, {
+        runtime: { syminfo: { mintick: 0.25 } },
+      });
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        direction: order.direction,
+        type: order.type,
+        status: order.status,
+        limitPrice: order.limitPrice,
+        stopPrice: order.stopPrice,
+      }))).toEqual([
+        {
+          id: 'Short',
+          direction: 'short',
+          type: 'market',
+          status: 'filled',
+          limitPrice: undefined,
+          stopPrice: undefined,
+        },
+        {
+          id: 'Bracket Limit',
+          direction: 'long',
+          type: 'limit',
+          status: 'pending',
+          limitPrice: 99.2,
+          stopPrice: undefined,
+        },
+        {
+          id: 'Bracket Stop',
+          direction: 'long',
+          type: 'stop',
+          status: 'pending',
+          limitPrice: undefined,
+          stopPrice: 100.7,
+        },
+      ]);
+    });
+
+    it('prefers absolute strategy.exit limit and stop prices over profit and loss offsets', () => {
+      const script = `//@version=6
+strategy("Exit absolute precedence", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Bracket", "Long", profit=4, limit=102, loss=2, stop=99)
+plot(strategy.opentrades)`;
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 100.4, low: 99.8, close: 100.2, volume: 1000 },
+        { time: 2, open: 100.2, high: 100.5, low: 99.8, close: 100.1, volume: 1000 },
+      ];
+
+      const result = executeScript(parse(script), bars, undefined, {
+        runtime: { syminfo: { mintick: 0.25 } },
+      });
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders[1]).toMatchObject({
+        id: 'Bracket Limit',
+        limitPrice: 102,
+      });
+      expect(result.strategy.orders[2]).toMatchObject({
+        id: 'Bracket Stop',
+        stopPrice: 99,
+      });
+    });
+
     it('applies strategy slippage using syminfo mintick for market and stop fills', () => {
       const script = `//@version=6
 strategy("Slippage fills", slippage=2, process_orders_on_close=true)

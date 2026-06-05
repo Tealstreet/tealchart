@@ -471,8 +471,9 @@ impact.
    copy-paste compatibility roadmap.
 2. Strategy broker path checkpoint: keep official default broker-emulator OHLC
    path, opening-gap fill assumptions, stop-limit activation/fill behavior, and
-   selective immediate close/fill-alert/entry-direction behavior covered in the
-   source-linked corpus.
+   selective immediate close/fill-alert/entry-direction behavior, plus
+   `strategy.exit()` profit/loss offset brackets, covered in the source-linked
+   corpus.
 3. Harness incomplete outcomes: keep canonical `not_run` stages failing corpus
    pass-rate summaries unless they are explicitly marked `skipped`.
 4. Pine layout parser audit fixtures: keep reduced coverage for top-level
