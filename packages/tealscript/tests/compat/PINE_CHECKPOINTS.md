@@ -59,6 +59,7 @@ fixtures by default.
 | `Public Object Method Checkpoint` | https://www.tradingview.com/scripts/search/market%20structure%20object/ | Persistent UDT state is updated through a user-defined method when confirmed pivot highs appear. | Pivot count, last high, and rising-pivot state over `compatibilityBars`. |
 | `Public Drawing Zone Checkpoint` | https://www.tradingview.com/scripts/search/supply%20demand%20zones/ | Persistent supply/demand zone drawings update a box and midline from recent swing ranges. | Final zone bounds, midpoint plot, box payload, and right-extended midline payload over `compatibilityBars`. |
 | `Public Linefill Channel Checkpoint` | https://www.tradingview.com/scripts/search/channel%20linefill/ | Persistent upper/lower channel line handles are updated on the last bar and filled by `linefill.new()`. | Channel width plot plus upper/lower line payloads and translucent linefill payload over `compatibilityBars`. |
+| `Public Zigzag Polyline Checkpoint` | https://www.tradingview.com/scripts/search/zigzag%20polyline/ | Last-bar swing chart points are collected into an array and rendered as a `polyline` path. | Point-count plot and polyline payload with four `chart.point` vertices over `compatibilityBars`. |
 | `Public Custom Candle Checkpoint` | https://www.tradingview.com/scripts/search/heikin%20ashi%20candles/ | Recursive Heikin-Ashi OHLC values are rendered through a custom `plotcandle()` overlay. | HA OHLC series, body/wick/border colors, force-overlay metadata, and body-delta plot over `compatibilityBars`. |
 | `Public Strategy Stats Checkpoint` | https://www.tradingview.com/scripts/search/strategy%20performance%20table/ | Strategy performance counters feed a last-bar summary table. | Closed-trade count, win count, net-profit plot, closed trade ledger fields, and stats table over local strategy bars. |
 
@@ -93,7 +94,7 @@ idioms rather than isolated unit coverage.
 | Strategy broker flows | `Official Strategy Checkpoint`; `Official Broker Emulator Path Checkpoint`; `Official Bar Magnifier Checkpoint`; `Official Stop Limit Checkpoint`; `Official Immediate Close Checkpoint`; `Official Disable Alert Checkpoint`; `Official Allow Entry In Checkpoint`; `Official Recalculate After Fill Checkpoint`; `Official Calc On Every Tick Checkpoint`; `Public Strategy Stats Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Limits and request-context reuse | `Official Request Limit Checkpoint` | `pine-real-checkpoints.test.ts` |
 | User-defined objects | `Public Object Method Checkpoint`; reduced official object idioms | `pine-real-checkpoints.test.ts`; `pine-objects.test.ts` |
-| Drawings and tables | `Public Drawing Zone Checkpoint`; `Public Linefill Channel Checkpoint`; manual comparison milestones plus reduced drawing fixtures | `pine-real-checkpoints.test.ts`; `PINE_CHECKPOINTS.md`; `pine-drawings.test.ts` |
+| Drawings and tables | `Public Drawing Zone Checkpoint`; `Public Linefill Channel Checkpoint`; `Public Zigzag Polyline Checkpoint`; manual comparison milestones plus reduced drawing fixtures | `pine-real-checkpoints.test.ts`; `PINE_CHECKPOINTS.md`; `pine-drawings.test.ts` |
 
 ## Adding A Checkpoint
 
