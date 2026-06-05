@@ -3267,6 +3267,48 @@ plot(1)
     expect(types.get('clone')).toMatchObject({ kind: 'line' });
   });
 
+  it('resolves line.new chart point overload argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Line Constructor Point Signatures")
+firstPoint = chart.point.from_index(bar_index - 1, high)
+secondPoint = chart.point.from_index(bar_index + 1, low)
+first = line.new(firstPoint, secondPoint, xloc.bar_index, extend.none, color.green)
+second = line.new(first_point=firstPoint, second_point=secondPoint, color=color.orange)
+third = line.new(first_point=firstPoint, secondPoint, color.blue)
+lines = array.from(first, second, third)
+plot(array.size(lines))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('first')).toMatchObject({ kind: 'line' });
+    expect(types.get('second')).toMatchObject({ kind: 'line' });
+    expect(types.get('third')).toMatchObject({ kind: 'line' });
+    expect(types.get('lines')).toMatchObject({ kind: 'array', elementType: { kind: 'line' } });
+  });
+
+  it('reports invalid line.new overload argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Line Constructor Signatures")
+firstPoint = chart.point.from_index(bar_index - 1, high)
+secondPoint = chart.point.from_index(bar_index + 1, low)
+missingCoordinates = line.new(bar_index, close)
+duplicatePoint = line.new(firstPoint, secondPoint, first_point=firstPoint)
+tooManyPoint = line.new(firstPoint, secondPoint, xloc.bar_index, extend.none, color.green, line.style_solid, 2, true, color.red)
+unknownPoint = line.new(first_point=firstPoint, second_point=secondPoint, x1=bar_index)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'line.new() expects at least 4 arguments',
+      "line.new() missing required argument 'x2'",
+      "line.new() missing required argument 'y2'",
+      "Argument 'first_point' for line.new() was supplied multiple times",
+      'line.new() expects at most 8 arguments',
+      "Unknown argument 'x1' for line.new()",
+    ]);
+  });
+
   it('reports invalid line setter argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Bad Line Setter Signatures")
@@ -3404,6 +3446,48 @@ plot(1)
 
     expect(result.diagnostics).toEqual([]);
     expect(types.get('clone')).toMatchObject({ kind: 'box' });
+  });
+
+  it('resolves box.new chart point overload argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Box Constructor Point Signatures")
+topLeft = chart.point.from_index(bar_index - 1, high)
+bottomRight = chart.point.from_index(bar_index + 1, low)
+first = box.new(topLeft, bottomRight, color.blue, 1, line.style_solid, extend.none, xloc.bar_index, color.new(color.blue, 80), "zone")
+second = box.new(top_left=topLeft, bottom_right=bottomRight, bgcolor=color.new(color.orange, 80))
+third = box.new(top_left=topLeft, bottomRight, color.green)
+boxes = array.from(first, second, third)
+plot(array.size(boxes))
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics).toEqual([]);
+    expect(types.get('first')).toMatchObject({ kind: 'box' });
+    expect(types.get('second')).toMatchObject({ kind: 'box' });
+    expect(types.get('third')).toMatchObject({ kind: 'box' });
+    expect(types.get('boxes')).toMatchObject({ kind: 'array', elementType: { kind: 'box' } });
+  });
+
+  it('reports invalid box.new overload argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Box Constructor Signatures")
+topLeft = chart.point.from_index(bar_index - 1, high)
+bottomRight = chart.point.from_index(bar_index + 1, low)
+missingCoordinates = box.new(bar_index, high)
+duplicatePoint = box.new(topLeft, bottomRight, top_left=topLeft)
+tooManyPoint = box.new(topLeft, bottomRight, color.blue, 1, line.style_solid, extend.none, xloc.bar_index, color.new(color.blue, 80), "zone", size.small, color.white, "center", "center", "wrap", "monospace", true, "bold", color.red)
+unknownPoint = box.new(top_left=topLeft, bottom_right=bottomRight, left=bar_index)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'box.new() expects at least 4 arguments',
+      "box.new() missing required argument 'right'",
+      "box.new() missing required argument 'bottom'",
+      "Argument 'top_left' for box.new() was supplied multiple times",
+      'box.new() expects at most 17 arguments',
+      "Unknown argument 'left' for box.new()",
+    ]);
   });
 
   it('reports invalid box geometry argument bindings', () => {
