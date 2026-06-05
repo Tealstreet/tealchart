@@ -102,6 +102,16 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: officialDocsEntry({
+      id: 'official-trailing-exit-checkpoint',
+      title: 'Official Trailing Exit Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/strategies/',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'trailing_stop'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
       id: 'official-broker-emulator-path-checkpoint',
       title: 'Official Broker Emulator Path Checkpoint',
       url: 'https://www.tradingview.com/pine-script-docs/concepts/strategies/#broker-emulator',
