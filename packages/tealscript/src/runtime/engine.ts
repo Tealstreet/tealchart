@@ -6154,13 +6154,6 @@ export class TealscriptEngine {
         });
       }
 
-      // Add color to array for this bar
-      const plot = ctx.plots.get(id);
-      if (plot && Array.isArray(plot.color)) {
-        plot.color.push(color);
-      }
-      this.setPlotTextColorValue(plot, ctx.bar_index, textColor);
-
       // Determine value - true/non-zero means show shape
       let value: number | null = null;
       if (typeof series === 'boolean') {
@@ -6168,6 +6161,13 @@ export class TealscriptEngine {
       } else if (typeof series === 'number') {
         value = !isNaN(series) && series !== 0 ? series : null;
       }
+
+      // Add style payloads only for visible marker bars.
+      const plot = ctx.plots.get(id);
+      if (plot && Array.isArray(plot.color)) {
+        plot.color.push(value === null ? null : color);
+      }
+      this.setPlotTextColorValue(plot, ctx.bar_index, value === null ? null : textColor);
 
       ctx.addPlotValue(id, value);
       return series;
@@ -6216,13 +6216,6 @@ export class TealscriptEngine {
         });
       }
 
-      // Add color to array for this bar
-      const plot = ctx.plots.get(id);
-      if (plot && Array.isArray(plot.color)) {
-        plot.color.push(color);
-      }
-      this.setPlotTextColorValue(plot, ctx.bar_index, textColor);
-
       // Determine value
       let value: number | null = null;
       if (typeof series === 'boolean') {
@@ -6230,6 +6223,13 @@ export class TealscriptEngine {
       } else if (typeof series === 'number') {
         value = !isNaN(series) && series !== 0 ? series : null;
       }
+
+      // Add style payloads only for visible marker bars.
+      const plot = ctx.plots.get(id);
+      if (plot && Array.isArray(plot.color)) {
+        plot.color.push(value === null ? null : color);
+      }
+      this.setPlotTextColorValue(plot, ctx.bar_index, value === null ? null : textColor);
 
       ctx.addPlotValue(id, value);
       return series;

@@ -496,7 +496,9 @@ Renderer coverage also routes visual outputs with `force_overlay=true` back to
 the main pane when emitted by non-overlay scripts.
 Marker text rendering supports newline-separated labels on plotshape,
 plotchar, and plotarrow outputs, and marker payloads preserve dynamic
-`textcolor` series for per-bar rendering.
+`textcolor` series for per-bar rendering. Hidden `plotshape()` and `plotchar()`
+bars now emit null body and text-color payloads so consumers do not render
+stale marker styling where Pine would show no marker.
 
 Hline renderer coverage applies Pine `hline()` color, linewidth, linestyle,
 display hiding, and pane-coordinate behavior for the current output shape.
