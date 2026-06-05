@@ -40,8 +40,8 @@ by real Pine examples from official docs or public indicator idioms.
 The current real-idiom checkpoint suite covers official built-ins, barstate plus
 arrays, bar coloring, alerts, strategy entry/exit flows, request-limit reuse,
 explicit `max_bars_back` metadata, official lower-timeframe request arrays,
-official synthetic ticker requests, official dynamic sessions, and public MTF,
-divergence, and session-filter idioms.
+official synthetic ticker requests, official dynamic sessions, official
+timeframe comparisons, and public MTF, divergence, and session-filter idioms.
 
 ## Current Matrix
 
@@ -585,7 +585,9 @@ multi-timeframe script templates, including `syminfo.tickerid`, `syminfo.root`,
 `timeframe.period`, `timeframe.main_period`, `timeframe.multiplier`,
 `timeframe.in_seconds()`, `timeframe.from_seconds()`, `timeframe.change()`,
 timeframe category flags, `chart.bg_color`, `chart.fg_color`, and chart-type
-flags such as `chart.is_heikinashi` and `chart.is_renko`.
+flags such as `chart.is_heikinashi` and `chart.is_renko`. The checkpoint corpus
+tracks the official timeframe-comparison idiom that converts chart and selected
+input timeframes to seconds before validating them.
 `indicator(timeframe=...)` updates the exposed timeframe metadata for
 seconds/minutes/D/W/M and tick declaration values, including
 `timeframe.isticks`. Semantic analysis preserves known `syminfo.*` metadata,
