@@ -750,6 +750,47 @@ plot(channelHigh - channelLow, title="Channel Width")
     ]);
   });
 
+  it('locks a reduced public zigzag polyline idiom', () => {
+    // Public idiom reference: zigzag-style public overlays commonly collect
+    // recent swing chart points and render them as a polyline path.
+    // Source search: https://www.tradingview.com/scripts/search/zigzag%20polyline/
+    const result = runCompatScript(`
+indicator("Public Zigzag Polyline Checkpoint", overlay=true, max_polylines_count=1)
+zigzagPoints = barstate.islast ? 4 : 0
+if barstate.islast
+    points = array.from(
+         chart.point.from_index(bar_index - 6, low[6]),
+         chart.point.from_index(bar_index - 4, high[4]),
+         chart.point.from_index(bar_index - 2, low[2]),
+         chart.point.now(close))
+    polyline.new(points=points, curved=false, closed=false, line_color=color.purple, line_width=2)
+plot(zigzagPoints, title="Zigzag Points")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Zigzag Points').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'polyline_polyline.new_0_11',
+        type: 'polyline',
+        barIndex: 11,
+        points: [
+          { type: 'chart.point', time: null, index: 5, price: 96 },
+          { type: 'chart.point', time: null, index: 7, price: 110 },
+          { type: 'chart.point', time: null, index: 9, price: 107 },
+          { type: 'chart.point', time: compatibilityBars[11]!.time, index: 11, price: 112 },
+        ],
+        curved: false,
+        closed: false,
+        xloc: 'bar_index',
+        lineColor: '#9C27B0',
+        fillColor: null,
+        lineStyle: 'solid',
+        lineWidth: 2,
+      },
+    ]);
+  });
+
   it('locks a reduced public dashboard table idiom', () => {
     // Public idiom reference: dashboard-style public indicators commonly
     // summarize trend and signal state in a last-bar table.

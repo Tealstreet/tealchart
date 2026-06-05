@@ -45,8 +45,9 @@ timeframe comparisons, official plot-style payloads, and public MTF,
 divergence, session-filter, session-state, dashboard-table, multi-symbol
 screener, drawing-zone, linefill-channel, custom-candle, and library-helper
 idioms. Public-source coverage also includes alert signal metadata, direct alert
-emission, Heikin-Ashi synthetic ticker trend requests, public strategy
-performance tables, plus UDT state objects updated through user-defined methods.
+emission, Heikin-Ashi synthetic ticker trend requests, public zigzag polylines,
+public strategy performance tables, plus UDT state objects updated through
+user-defined methods.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
 suppression, entry-direction risk rules, recalculation checkpoints, and a
@@ -796,7 +797,9 @@ arguments, `polyline.copy()`, `polyline.delete()`, and `polyline.all`.
 arguments. Semantic analysis preserves `polyline.new()` and `polyline.copy()`
 handle return types and `polyline.all` handle-array element types for downstream
 diagnostics. Renderer coverage applies fixed path geometry, optional fill, line
-styling, and approximate curved paths when `curved=true`.
+styling, and approximate curved paths when `curved=true`. The checkpoint corpus
+tracks a reduced public zigzag-polyline idiom that renders recent swing
+`chart.point` vertices as a last-bar path.
 
 ## Table Drawing Coverage
 
