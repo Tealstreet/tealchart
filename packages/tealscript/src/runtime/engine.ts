@@ -2955,9 +2955,6 @@ export class TealscriptEngine {
     ignoreInvalid: boolean;
   }): number {
     this.trackRequestContext(`${options.functionName}\u0000${options.key}`);
-    if (options.lookahead !== 'barmerge.lookahead_off') {
-      throw new Error(`${options.functionName} with lookahead_on is not implemented yet`);
-    }
     if (!this.requestDatafeed?.getSeries) {
       throw new Error(`${options.functionName} requires a request series datafeed`);
     }
@@ -2970,7 +2967,7 @@ export class TealscriptEngine {
       throw new Error(`${options.functionName} failed: ${result.message}`);
     }
 
-    return this.mergeRequestSeriesValue(result.context.points, options.gaps);
+    return this.mergeRequestSeriesValue(result.context.points, options.gaps, options.lookahead);
   }
 
   private getOrderedCallArgument(expr: CallExpression, names: readonly string[], position: number): CallArgument | undefined {
@@ -3264,12 +3261,15 @@ export class TealscriptEngine {
   private mergeRequestSeriesValue(
     points: RequestSeriesPoint[],
     gaps: 'barmerge.gaps_off' | 'barmerge.gaps_on' = 'barmerge.gaps_off',
+    _lookahead: 'barmerge.lookahead_off' | 'barmerge.lookahead_on' = 'barmerge.lookahead_off',
   ): number {
     const chartTime = this.ctx.time.get(0);
     if (chartTime === undefined || points.length === 0) {
       return Number.NaN;
     }
 
+    // Sparse point-series records are timestamped events rather than ranged
+    // bars, so both lookahead modes become available at the event timestamp.
     const sortedPoints = [...points].sort((left, right) => left.time - right.time);
     let value = Number.NaN;
     let valueTime = Number.NaN;

@@ -616,7 +616,8 @@ higher-timeframe merging, common `gaps` / `lookahead` behavior,
 guards, `request.security_lower_tf()`, and `request.currency_rate()`.
 Host-provided point-series contexts cover `request.dividends()`,
 `request.earnings()`, `request.splits()`, `request.financial()`, and
-`request.economic()`. `request.seed()` evaluates expressions against
+`request.economic()`, including `lookahead_on` for timestamped corporate-action
+events. `request.seed()` evaluates expressions against
 deterministic seed contexts keyed by source and symbol; it does not fetch
 GitHub data at runtime. Semantic analysis preserves supported `request.*`
 return types for downstream diagnostics, including expression-preserving
@@ -627,9 +628,9 @@ host datafeed work. Visual output registration enforces Pine's 64 plot-output
 limit while exempting `hline()` outputs. Table creation enforces a conservative
 TealScript sandbox cap of 10,000 declared table cells across live tables.
 
-Known limits: request data availability is host/provider-gated, point-series
-lookahead is conservative, and `request.footprint()` remains unsupported until
-the host can provide the footprint/intrabar volume model described in
+Known limits: request data availability is host/provider-gated, and
+`request.footprint()` remains unsupported until the host can provide the
+footprint/intrabar volume model described in
 [`FOOTPRINT_REQUEST_DESIGN.md`](./FOOTPRINT_REQUEST_DESIGN.md).
 
 The ticker pass covers `ticker.new()`, `ticker.modify()`, `ticker.standard()`,

@@ -833,18 +833,24 @@ plot(dividend, title="Dividend")
     expect(getPlot(result, 'Dividend').values).toEqual([null, null, 0.24, null, 0.25, null]);
   });
 
-  it('rejects unsupported lookahead_on for sparse point request families', () => {
+  it('accepts lookahead_on for sparse corporate action request families', () => {
     const result = runCompatScript(`
 indicator("Point request lookahead")
-plot(request.dividends("NASDAQ:AAPL", dividends.gross, lookahead=barmerge.lookahead_on, currency="USD"), title="Dividend")
+dividend = request.dividends("NASDAQ:AAPL", dividends.gross, lookahead=barmerge.lookahead_on, currency="USD")
+earnings = request.earnings("NASDAQ:AAPL", earnings.actual, gaps=barmerge.gaps_on, lookahead=barmerge.lookahead_on, currency="USD")
+split = request.splits("NASDAQ:AAPL", splits.denominator, gaps=barmerge.gaps_on, lookahead=barmerge.lookahead_on)
+plot(dividend, title="Dividend")
+plot(earnings, title="Earnings")
+plot(split, title="Split")
 `, {
-      bars: [chartBars[0]!],
+      bars: chartBars,
       engineOptions: { requestDatafeed: pointSeriesDatafeed() },
     });
 
-    expect(result.errors.map((error) => error.message)).toEqual([
-      'request.dividends with lookahead_on is not implemented yet',
-    ]);
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Dividend').values).toEqual([null, null, 0.24, 0.24, 0.25, 0.25]);
+    expect(getPlot(result, 'Earnings').values).toEqual([1.5, null, null, null, 1.8, null]);
+    expect(getPlot(result, 'Split').values).toEqual([null, null, null, 4, null, null]);
   });
 
   it('supports ignore_invalid_symbol for missing optional request series', () => {
