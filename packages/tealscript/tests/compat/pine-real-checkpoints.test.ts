@@ -51,6 +51,31 @@ plot(array.size(values), title="Array Size")
     expect(getPlot(result, 'Array Size').values).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
   });
 
+  it('locks a reduced official max bars back idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/error-messages/
+    const result = runCompatScript(`
+indicator("Official Max Bars Back Checkpoint", max_bars_back=2)
+plot(close[2], title="Bounded Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorMaxBarsBack).toBe(2);
+    expect(getPlot(result, 'Bounded Close').values).toEqual([
+      null,
+      null,
+      102,
+      105,
+      107,
+      103,
+      99,
+      100,
+      104,
+      109,
+      108,
+      111,
+    ]);
+  });
+
   it('locks the official inside/outside barcolor idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/visuals/bar-coloring/
     const bars: Bar[] = [
