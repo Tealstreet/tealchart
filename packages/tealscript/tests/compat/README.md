@@ -28,8 +28,12 @@ real-script intake metadata or corpus summaries:
 - `runPineCompatibilityCorpus()` converts ledger entries plus deterministic
   stage outcomes into an offline report with pass/fail counts, first-failure
   buckets, feature tag summaries, and validation errors.
+- `runPineCompatibilityLedger()` builds that same report from a
+  `PineScriptLedger` plus a deterministic stage provider.
 - `formatPineCompatibilityCorpusMarkdown()` renders the report for PR notes or
   generated artifacts without adding network or TradingView dependencies to CI.
+- `formatPineCompatibilityCorpusJson()` renders the normalized run object as a
+  stable JSON artifact.
 
 Use `fixtures.ts` helpers by default:
 
