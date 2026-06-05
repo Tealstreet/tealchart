@@ -568,6 +568,8 @@ multi-timeframe script templates, including `syminfo.tickerid`, `syminfo.root`,
 `syminfo.country`, `syminfo.sector`, `syminfo.industry`, `syminfo.isin`,
 `syminfo.current_contract`, `syminfo.employees`, `syminfo.shareholders`,
 `syminfo.shares_outstanding_float`, `syminfo.shares_outstanding_total`,
+`syminfo.expiration_date`, `syminfo.recommendations_date`, and
+`syminfo.target_price_*`,
 `timeframe.period`, `timeframe.main_period`, `timeframe.multiplier`,
 `timeframe.in_seconds()`, `timeframe.from_seconds()`, `timeframe.change()`,
 timeframe category flags, `chart.bg_color`, `chart.fg_color`, and chart-type

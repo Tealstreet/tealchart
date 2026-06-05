@@ -94,10 +94,18 @@ export interface SymInfo {
   pointvalue: number; // Contract point value
   mincontract: number; // Minimum contract size
   volumetype: string; // 'base', 'quote', 'tick', or 'n/a'
+  expiration_date: number;
   employees: number;
   shareholders: number;
   shares_outstanding_float: number;
   shares_outstanding_total: number;
+  recommendations_date: number;
+  target_price_date: number;
+  target_price_average: number;
+  target_price_estimates: number;
+  target_price_high: number;
+  target_price_low: number;
+  target_price_median: number;
   timezone: string;
 }
 
@@ -350,10 +358,18 @@ export class ExecutionContext {
     pointvalue: 1,
     mincontract: 1,
     volumetype: 'base',
+    expiration_date: Number.NaN,
     employees: Number.NaN,
     shareholders: Number.NaN,
     shares_outstanding_float: Number.NaN,
     shares_outstanding_total: Number.NaN,
+    recommendations_date: Number.NaN,
+    target_price_date: Number.NaN,
+    target_price_average: Number.NaN,
+    target_price_estimates: Number.NaN,
+    target_price_high: Number.NaN,
+    target_price_low: Number.NaN,
+    target_price_median: Number.NaN,
     timezone: 'UTC',
   };
 

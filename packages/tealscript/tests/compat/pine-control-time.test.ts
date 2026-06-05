@@ -304,6 +304,47 @@ plot(syminfo.shares_outstanding_total, title="Total Shares")
     expect(getPlot(result, 'Total Shares').values).toEqual(allBars(2.5));
   });
 
+  it('exposes Pine syminfo futures and analyst host metadata', () => {
+    const result = runCompatScript(`
+indicator("Syminfo Analyst Metadata")
+plot(syminfo.expiration_date, title="Expiration Date")
+plot(syminfo.recommendations_date, title="Recommendations Date")
+plot(syminfo.target_price_date, title="Target Date")
+plot(syminfo.target_price_average, title="Target Average")
+plot(syminfo.target_price_estimates, title="Target Estimates")
+plot(syminfo.target_price_high, title="Target High")
+plot(syminfo.target_price_low, title="Target Low")
+plot(syminfo.target_price_median, title="Target Median")
+`, {
+      engineOptions: {
+        runtime: {
+          syminfo: {
+            expiration_date: 1780272000000,
+            recommendations_date: 1777852800000,
+            target_price_date: 1777852800000,
+            target_price_average: 210.5,
+            target_price_estimates: 42,
+            target_price_high: 250,
+            target_price_low: 180,
+            target_price_median: 205,
+          },
+        },
+      },
+    });
+
+    const allBars = (value: number) => Array(compatibilityBars.length).fill(value);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Expiration Date').values).toEqual(allBars(1780272000000));
+    expect(getPlot(result, 'Recommendations Date').values).toEqual(allBars(1777852800000));
+    expect(getPlot(result, 'Target Date').values).toEqual(allBars(1777852800000));
+    expect(getPlot(result, 'Target Average').values).toEqual(allBars(210.5));
+    expect(getPlot(result, 'Target Estimates').values).toEqual(allBars(42));
+    expect(getPlot(result, 'Target High').values).toEqual(allBars(250));
+    expect(getPlot(result, 'Target Low').values).toEqual(allBars(180));
+    expect(getPlot(result, 'Target Median').values).toEqual(allBars(205));
+  });
+
   it('matches indicator timeframe metadata idioms', () => {
     const secondsResult = runCompatScript(`
 indicator("Seconds metadata", timeframe="30S")

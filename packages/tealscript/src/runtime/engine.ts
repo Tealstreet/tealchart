@@ -3821,10 +3821,18 @@ export class TealscriptEngine {
       case 'industry':
       case 'isin':
       case 'current_contract':
+      case 'expiration_date':
       case 'employees':
       case 'shareholders':
       case 'shares_outstanding_float':
       case 'shares_outstanding_total':
+      case 'recommendations_date':
+      case 'target_price_date':
+      case 'target_price_average':
+      case 'target_price_estimates':
+      case 'target_price_high':
+      case 'target_price_low':
+      case 'target_price_median':
       case 'timezone':
         return this.ctx.syminfo[prop];
       case 'tickerid':
