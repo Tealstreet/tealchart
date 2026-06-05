@@ -1151,6 +1151,52 @@ plot(signal, title="Prefix Signal", color=prefixSignalColor)
     ]);
   });
 
+  it('matches documented Pine v6 color constants', () => {
+    const result = runCompatScript(`
+indicator("Color constants smoke")
+rgbKey(c) => color.r(c) * 65536 + color.g(c) * 256 + color.b(c)
+plot(rgbKey(color.aqua), title="Aqua")
+plot(rgbKey(color.black), title="Black")
+plot(rgbKey(color.blue), title="Blue")
+plot(rgbKey(color.fuchsia), title="Fuchsia")
+plot(rgbKey(color.gray), title="Gray")
+plot(rgbKey(color.green), title="Green")
+plot(rgbKey(color.lime), title="Lime")
+plot(rgbKey(color.maroon), title="Maroon")
+plot(rgbKey(color.navy), title="Navy")
+plot(rgbKey(color.olive), title="Olive")
+plot(rgbKey(color.orange), title="Orange")
+plot(rgbKey(color.purple), title="Purple")
+plot(rgbKey(color.red), title="Red")
+plot(rgbKey(color.silver), title="Silver")
+plot(rgbKey(color.teal), title="Teal")
+plot(rgbKey(color.white), title="White")
+plot(rgbKey(color.yellow), title="Yellow")
+`);
+
+    expect(result.errors).toEqual([]);
+    const expectConstant = (title: string, value: number): void => {
+      expect(getPlot(result, title).values).toEqual(Array(compatibilityBars.length).fill(value));
+    };
+    expectConstant('Aqua', 48340);
+    expectConstant('Black', 3553861);
+    expectConstant('Blue', 2201331);
+    expectConstant('Fuchsia', 14696699);
+    expectConstant('Gray', 7895942);
+    expectConstant('Green', 5025616);
+    expectConstant('Lime', 58998);
+    expectConstant('Maroon', 8916559);
+    expectConstant('Navy', 3218322);
+    expectConstant('Olive', 8421376);
+    expectConstant('Orange', 16750592);
+    expectConstant('Purple', 10233776);
+    expectConstant('Red', 15873605);
+    expectConstant('Silver', 11711934);
+    expectConstant('Teal', 563585);
+    expectConstant('White', 16777215);
+    expectConstant('Yellow', 16635957);
+  });
+
   it('matches documented Pine math helper idioms', () => {
     const result = runCompatScript(`
 indicator("Math docs smoke")

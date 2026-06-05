@@ -16,14 +16,14 @@ barcolor(candleColor)
       null,
       '#4CAF50',
       '#4CAF50',
-      '#F44336',
-      '#F44336',
+      '#F23645',
+      '#F23645',
       '#4CAF50',
       '#4CAF50',
       '#4CAF50',
-      '#F44336',
+      '#F23645',
       '#4CAF50',
-      '#F44336',
+      '#F23645',
       '#4CAF50',
     ]);
   });
@@ -150,7 +150,7 @@ barcolor(bar_index == 0 ? color.red : na, 1, true, 5, "Bar Tint", display.none)
 
     const barTint = getPlot(result, 'Bar Tint');
     expect(barTint.type).toBe('barcolor');
-    expect(barTint.color).toEqual([null, '#F44336', ...Array(compatibilityBars.length - 1).fill(null)]);
+    expect(barTint.color).toEqual([null, '#F23645', ...Array(compatibilityBars.length - 1).fill(null)]);
     expect(barTint.offset).toBe(1);
     expect(barTint.editable).toBe(true);
     expect(barTint.showLast).toBe(5);
@@ -219,7 +219,7 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
     expect(solidPositional).toMatchObject({
       type: 'hline',
       price: 75,
-      color: '#F44336',
+      color: '#F23645',
       lineStyle: 'solid',
       linewidth: 3,
       editable: true,
@@ -321,7 +321,7 @@ plotarrow(close - open, "Move Arrow", color.new(color.green, 50), color.new(colo
       location: 'abovebar',
       size: 'small',
       text: 'Down',
-      textColor: '#FFEB3B',
+      textColor: '#FDD835',
       offset: -1,
       editable: true,
       showLast: 6,
@@ -333,7 +333,7 @@ plotarrow(close - open, "Move Arrow", color.new(color.green, 50), color.new(colo
     expect(getPlot(result, 'Move Arrow')).toMatchObject({
       type: 'plotarrow',
       colorup: '#4CAF5080',
-      colordown: '#F4433680',
+      colordown: '#F2364580',
       offset: 0,
       minHeight: 5,
       maxHeight: 20,
@@ -360,7 +360,7 @@ plot(low, title="Lower")
     expect(fillPlot.type).toBe('fill');
     expect(fillPlot.plot1Id).toBe('plot_Upper');
     expect(fillPlot.plot2Id).toBe('plot_Lower');
-    expect(fillPlot.color).toEqual(Array(compatibilityBars.length).fill('#F4433626'));
+    expect(fillPlot.color).toEqual(Array(compatibilityBars.length).fill('#F2364526'));
   });
 
   it('keeps unnamed fill calls distinct', () => {
@@ -427,7 +427,7 @@ fill(plot1=upper, lower, color.new(color.orange, 80), "Mixed Fill", false, 6)
 
     const mixedBar = getPlot(result, 'Mixed Bar');
     expect(mixedBar.type).toBe('barcolor');
-    expect(mixedBar.color).toEqual([null, '#F44336', ...Array(compatibilityBars.length - 1).fill(null)]);
+    expect(mixedBar.color).toEqual([null, '#F23645', ...Array(compatibilityBars.length - 1).fill(null)]);
     expect(mixedBar.offset).toBe(1);
     expect(mixedBar.editable).toBe(true);
     expect(mixedBar.showLast).toBe(4);
@@ -442,8 +442,8 @@ fill(plot1=upper, lower, color.new(color.orange, 80), "Mixed Fill", false, 6)
     expect(getPlot(result, 'Mixed Candles')).toMatchObject({
       type: 'plotcandle',
       color: [null, ...Array(compatibilityBars.length - 1).fill('#B2B5BE')],
-      wickColor: [null, ...Array(compatibilityBars.length - 1).fill('#FFEB3B')],
-      borderColor: [null, ...Array(compatibilityBars.length - 1).fill('#000000')],
+      wickColor: [null, ...Array(compatibilityBars.length - 1).fill('#FDD835')],
+      borderColor: [null, ...Array(compatibilityBars.length - 1).fill('#363A45')],
       editable: false,
       showLast: 6,
     });
@@ -462,7 +462,7 @@ fill(plot1=upper, lower, color.new(color.orange, 80), "Mixed Fill", false, 6)
     expect(getPlot(result, 'Mixed Arrow')).toMatchObject({
       type: 'plotarrow',
       colorup: '#4CAF50',
-      colordown: '#F44336',
+      colordown: '#F23645',
       minHeight: 5,
       maxHeight: 15,
     });
