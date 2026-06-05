@@ -488,6 +488,73 @@ plot(strategy.netprofit, title="Net Profit")
     });
   });
 
+  it('locks official default broker path and opening-gap fill assumptions', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/#broker-emulator
+    const script = `
+strategy("Official Broker Path Checkpoint", initial_capital=1000, process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Bracket", "Long", limit=103, stop=97)
+plot(strategy.closedtrades, title="Closed Trades")
+plot(strategy.netprofit, title="Net Profit")
+`;
+    const baseBars: Bar[] = [
+      { time: 1_700_000_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_000_060_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+    ];
+
+    const highFirst = runCompatScript(script, {
+      bars: [
+        ...baseBars,
+        { time: 1_700_000_120_000, open: 100, high: 104, low: 94, close: 100, volume: 100 },
+        { time: 1_700_000_180_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      ],
+    });
+    const lowFirst = runCompatScript(script, {
+      bars: [
+        ...baseBars,
+        { time: 1_700_000_120_000, open: 100, high: 106, low: 96, close: 100, volume: 100 },
+        { time: 1_700_000_180_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      ],
+    });
+    const openingGap = runCompatScript(script, {
+      bars: [
+        ...baseBars,
+        { time: 1_700_000_120_000, open: 95, high: 99, low: 94, close: 98, volume: 100 },
+        { time: 1_700_000_180_000, open: 98, high: 99, low: 97, close: 98, volume: 100 },
+      ],
+    });
+
+    expect(highFirst.errors).toEqual([]);
+    expect(lowFirst.errors).toEqual([]);
+    expect(openingGap.errors).toEqual([]);
+    expect(getPlot(highFirst, 'Closed Trades').values).toEqual([0, 0, 0, 1]);
+    expect(getPlot(lowFirst, 'Closed Trades').values).toEqual([0, 0, 0, 1]);
+    expect(getPlot(openingGap, 'Closed Trades').values).toEqual([0, 0, 0, 1]);
+    expect(getPlot(highFirst, 'Net Profit').values).toEqual([0, 0, 0, 3]);
+    expect(getPlot(lowFirst, 'Net Profit').values).toEqual([0, 0, 0, -3]);
+    expect(getPlot(openingGap, 'Net Profit').values).toEqual([0, 0, 0, -5]);
+    expect(highFirst.strategy.closedTrades[0]).toMatchObject({
+      exitOrderId: 'Bracket Limit',
+      entryPrice: 100,
+      exitPrice: 103,
+      profit: 3,
+    });
+    expect(lowFirst.strategy.closedTrades[0]).toMatchObject({
+      exitOrderId: 'Bracket Stop',
+      entryPrice: 100,
+      exitPrice: 97,
+      profit: -3,
+    });
+    expect(openingGap.strategy.closedTrades[0]).toMatchObject({
+      exitOrderId: 'Bracket Stop',
+      entryPrice: 100,
+      exitPrice: 95,
+      profit: -5,
+    });
+  });
+
   it('runs strategy order helpers with named-prefix positional tails', () => {
     const bars: Bar[] = [
       { time: 1_700_000_000_000, open: 100, high: 103, low: 99, close: 102, volume: 100 },

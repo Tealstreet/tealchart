@@ -102,6 +102,16 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: officialDocsEntry({
+      id: 'official-broker-emulator-path-checkpoint',
+      title: 'Official Broker Emulator Path Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/strategies/#broker-emulator',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'gap_fills'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
       id: 'official-bar-magnifier-checkpoint',
       title: 'Official Bar Magnifier Checkpoint',
       url: 'https://www.tradingview.com/pine-script-docs/concepts/strategies/',
