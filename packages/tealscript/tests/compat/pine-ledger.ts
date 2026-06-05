@@ -291,6 +291,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-linefill-channel-checkpoint',
+      title: 'Public Linefill Channel Checkpoint',
+      searchContext: 'TradingView public scripts search: channel linefill',
+      featureTags: ['drawings', 'linefills', 'channels', 'visuals'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-dashboard-table-checkpoint',
       title: 'Public Dashboard Table Checkpoint',
       searchContext: 'TradingView public scripts search: dashboard table',

@@ -160,8 +160,8 @@ Phases:
    libraries, alerts, screeners, and synthetic tickers. The current checkpoint
    corpus includes reduced public fixtures for MTF filters, divergence,
    session filters, exchange session-state gates, dashboard tables, custom
-   candles, drawing zones, screeners, library helpers, public strategy stats
-   tables, and UDT object-method state.
+   candles, drawing zones, linefill channels, screeners, library helpers,
+   public strategy stats tables, and UDT object-method state.
    Strategy-bracket coverage includes official broker examples plus a reduced
    public fixed-bracket strategy fixture.
    Alert coverage includes official docs examples plus a reduced public signal

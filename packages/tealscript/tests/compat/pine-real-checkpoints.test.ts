@@ -683,6 +683,73 @@ plot(zoneMid, title="Zone Mid")
     ]);
   });
 
+  it('locks a reduced public linefill channel idiom', () => {
+    // Public idiom reference: public channel indicators commonly draw upper
+    // and lower line handles and fill the area between them.
+    // Source search: https://www.tradingview.com/scripts/search/channel%20linefill/
+    const result = runCompatScript(`
+indicator("Public Linefill Channel Checkpoint", overlay=true)
+channelHigh = ta.highest(high, 4)
+channelLow = ta.lowest(low, 4)
+var upper = line.new(x1=na, y1=na, x2=na, y2=na, extend=extend.right, color=color.orange, width=2)
+var lower = line.new(x1=na, y1=na, x2=na, y2=na, extend=extend.right, color=color.orange, width=2)
+var channel = linefill.new(line1=upper, line2=lower, color=color.new(color.orange, 85))
+if barstate.islast
+    line.set_xy1(id=upper, x=bar_index - 3, y=channelHigh[3])
+    line.set_xy2(id=upper, x=bar_index, y=channelHigh)
+    line.set_xy1(id=lower, x=bar_index - 3, y=channelLow[3])
+    line.set_xy2(id=lower, x=bar_index, y=channelLow)
+    linefill.set_color(id=channel, color=color.new(color.orange, 85))
+plot(channelHigh - channelLow, title="Channel Width")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Channel Width').values).toEqual([4, 7, 9, 10, 11, 13, 13, 14, 15, 13, 11, 8]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'line_line.new_0_0',
+        type: 'line',
+        persistent: true,
+        barIndex: 11,
+        x1: 8,
+        y1: 111,
+        x2: 11,
+        y2: 114,
+        xloc: 'bar_index',
+        extend: 'right',
+        color: '#FF9800',
+        style: 'solid',
+        width: 2,
+        forceOverlay: false,
+      },
+      {
+        id: 'line_line.new_1_0',
+        type: 'line',
+        persistent: true,
+        barIndex: 11,
+        x1: 8,
+        y1: 96,
+        x2: 11,
+        y2: 106,
+        xloc: 'bar_index',
+        extend: 'right',
+        color: '#FF9800',
+        style: 'solid',
+        width: 2,
+        forceOverlay: false,
+      },
+      {
+        id: 'linefill_linefill.new_0_0',
+        type: 'linefill',
+        persistent: true,
+        barIndex: 0,
+        line1: 'line_line.new_0_0',
+        line2: 'line_line.new_1_0',
+        color: '#FF980026',
+      },
+    ]);
+  });
+
   it('locks a reduced public dashboard table idiom', () => {
     // Public idiom reference: dashboard-style public indicators commonly
     // summarize trend and signal state in a last-bar table.
