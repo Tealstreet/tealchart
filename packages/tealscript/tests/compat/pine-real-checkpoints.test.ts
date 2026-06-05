@@ -521,6 +521,40 @@ plot(strategy.netprofit, title="Net Profit")
     });
   });
 
+  it('locks the official strategy trailing exit tick idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
+    const bars: Bar[] = [
+      { time: 1_700_000_000_000, open: 100, high: 100.5, low: 99.5, close: 100, volume: 100 },
+      { time: 1_700_000_060_000, open: 100.2, high: 100.6, low: 99.8, close: 100.4, volume: 100 },
+      { time: 1_700_000_120_000, open: 101, high: 101.5, low: 100.8, close: 101.2, volume: 100 },
+      { time: 1_700_000_180_000, open: 101, high: 101, low: 100.9, close: 101, volume: 100 },
+      { time: 1_700_000_240_000, open: 101, high: 101.2, low: 100.7, close: 100.8, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Official Trailing Exit Checkpoint", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Trail", "Long", trail_points=5, trail_offset=4)
+plot(strategy.closedtrades, title="Closed Trades")
+plot(strategy.netprofit, title="Net Profit")
+`, {
+      bars,
+      engineOptions: { runtime: { syminfo: { mintick: 0.1 } } },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 0, 0, 0, 1]);
+    expect(roundSeries(getPlot(result, 'Net Profit').values)).toEqual([0, 0, 0, 0, 1.1]);
+    expect(result.strategy.closedTrades[0]).toMatchObject({
+      entryOrderId: 'Long',
+      exitOrderId: 'Trail',
+      entryPrice: 100,
+      exitPrice: 101.1,
+    });
+    expect(result.strategy.closedTrades[0]?.profit).toBeCloseTo(1.1);
+  });
+
   it('locks official default broker path and opening-gap fill assumptions', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/#broker-emulator
     const script = `
