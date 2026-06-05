@@ -473,7 +473,8 @@ impact.
 4. Pine layout parser audit fixtures: keep reduced coverage for nested dedents,
    wrapped indented expressions, wrapped function/method signatures, and shared
    library/type/method blocks before changing parser architecture.
-5. Call-binding diagnostics sweep: use corpus failures to prioritize missing
-   named/positional overload diagnostics.
+5. Call-binding diagnostics sweep: keep signed built-in namespace typo
+   diagnostics and drawing constructor argument signatures covered while using
+   corpus failures to prioritize remaining named/positional overload gaps.
 6. Visual output payload audit: ensure runtime payloads are stable before
    investing in renderer fidelity.
