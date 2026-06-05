@@ -476,5 +476,6 @@ impact.
 5. Call-binding diagnostics sweep: keep signed built-in namespace typo
    diagnostics and drawing constructor argument signatures covered while using
    corpus failures to prioritize remaining named/positional overload gaps.
-6. Visual output payload audit: keep marker dynamic text-color payloads and
-   other runtime visual metadata stable before investing in renderer fidelity.
+6. Visual output payload audit: keep marker dynamic text-color payloads,
+   hidden-marker style masking, and other runtime visual metadata stable before
+   investing in renderer fidelity.
