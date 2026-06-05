@@ -92,8 +92,8 @@ The current runtime already covers a useful common-script subset:
   strategies.
 - Compatibility fixtures for real Pine idioms including MTF filters,
   divergence, session filters, dynamic sessions, timeframe comparisons, bar
-  coloring, alerts, request-limit reuse, strategy entry/exit flows, and common
-  drawing/table patterns.
+  coloring, plot-style payloads, alerts, request-limit reuse, strategy
+  entry/exit flows, and common drawing/table patterns.
 
 Known structural gaps:
 

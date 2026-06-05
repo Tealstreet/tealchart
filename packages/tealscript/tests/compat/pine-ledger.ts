@@ -74,6 +74,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: officialDocsEntry({
+      id: 'official-plot-style-checkpoint',
+      title: 'Official Plot Style Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/visuals/plots/',
+      featureTags: ['visuals', 'plot', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
       id: 'official-alert-checkpoint',
       title: 'Official Alert Checkpoint',
       url: 'https://www.tradingview.com/pine-script-docs/concepts/alerts/',

@@ -41,7 +41,8 @@ The current real-idiom checkpoint suite covers official built-ins, barstate plus
 arrays, bar coloring, alerts, strategy entry/exit flows, request-limit reuse,
 explicit `max_bars_back` metadata, official lower-timeframe request arrays,
 official synthetic ticker requests, official dynamic sessions, official
-timeframe comparisons, and public MTF, divergence, and session-filter idioms.
+timeframe comparisons, official plot-style payloads, and public MTF,
+divergence, and session-filter idioms.
 
 ## Current Matrix
 
@@ -485,8 +486,9 @@ coverage applies plot line-style metadata in main and indicator panes and
 renders common plot offsets for line, marker, histogram, and area plot styles.
 Renderer coverage also honors `display.none` while retaining hidden plot values
 for dependent fills, and applies `histbase` baselines to histogram/columns and
-area plot rendering when supplied. Plot renderer coverage also draws
-`trackprice` lines at the latest finite rendered plot value, joins
+area plot rendering when supplied. Area-style plots now render filled regions
+in main, computed indicator, and legacy indicator panes. Plot renderer coverage
+also draws `trackprice` lines at the latest finite rendered plot value, joins
 circle/cross plot markers when `join=true`, and paints
 `plot.style_stepline_diamond` markers on stepped plots. Default line plots
 bridge `na` values, while `plot.style_linebr` preserves gaps.
@@ -501,7 +503,8 @@ plotchar, and plotarrow outputs, and marker payloads preserve dynamic
 `textcolor` series for per-bar rendering. Hidden `plotshape()` and `plotchar()`
 bars now emit null body and text-color payloads so consumers do not render
 stale marker styling where Pine would show no marker. The source-linked
-checkpoint corpus tracks this as the official marker payload checkpoint.
+checkpoint corpus tracks marker payloads and common `plot.style_*` payloads
+through official visual checkpoints.
 
 Hline renderer coverage applies Pine `hline()` color, linewidth, linestyle,
 display hiding, and pane-coordinate behavior for the current output shape.

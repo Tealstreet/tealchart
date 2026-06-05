@@ -2358,23 +2358,54 @@ export class TealchartRenderer {
    * Render area fill under/over a line
    */
   private renderAreaFill(plot: PlotOutput, bars: Bar[], viewport: Viewport, fillFromTop: boolean): void {
-    const { ctx, options, margins } = this;
-    const chartWidth = options.width - margins.left;
+    const { options, margins } = this;
     const chartHeight = options.height - margins.top - margins.bottom;
     const volumeHeight = options.showVolume ? chartHeight * options.volumeHeight : 0;
     const priceHeight = chartHeight - volumeHeight;
 
+    this.renderAreaFillWithY(
+      plot,
+      bars,
+      viewport,
+      (value) => this.priceToY(value, viewport, priceHeight),
+      this.getAreaFillBaselineY(
+        plot,
+        fillFromTop,
+        margins.top,
+        priceHeight,
+        (value) => this.priceToY(value, viewport, priceHeight),
+      ),
+    );
+  }
+
+  private getAreaFillBaselineY(
+    plot: PlotOutput,
+    fillFromTop: boolean,
+    top: number,
+    height: number,
+    valueToY: (value: number) => number,
+  ): number {
+    if (this.hasPlotHistbase(plot)) {
+      return valueToY(this.getPlotHistbase(plot));
+    }
+
+    return fillFromTop ? top : top + height;
+  }
+
+  private renderAreaFillWithY(
+    plot: PlotOutput,
+    bars: Bar[],
+    viewport: Viewport,
+    valueToY: (value: number) => number,
+    baselineY: number,
+  ): void {
+    const { ctx, options, margins } = this;
+    const chartWidth = options.width - margins.left;
     const { values, color } = plot;
     const baseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
 
     ctx.fillStyle = baseColor;
     ctx.globalAlpha = 0.2;
-
-    const baselineY = this.hasPlotHistbase(plot)
-      ? this.priceToY(this.getPlotHistbase(plot), viewport, priceHeight)
-      : fillFromTop
-        ? margins.top
-        : margins.top + priceHeight;
 
     ctx.beginPath();
     let started = false;
@@ -2396,7 +2427,7 @@ export class TealchartRenderer {
       }
 
       const x = this.timeToX(plotTime, viewport, chartWidth);
-      const y = this.priceToY(value, viewport, priceHeight);
+      const y = valueToY(value);
 
       if (!started) {
         ctx.moveTo(x, baselineY);
@@ -4333,6 +4364,22 @@ export class TealchartRenderer {
       });
     }
 
+    if (style === 'area' || style === 'areabr') {
+      this.renderAreaFillWithY(
+        plot,
+        bars,
+        viewport,
+        (value) => this.valueToY(value, pane),
+        this.getAreaFillBaselineY(
+          plot,
+          style === 'areabr',
+          pane.top,
+          pane.height,
+          (value) => this.valueToY(value, pane),
+        ),
+      );
+    }
+
     this.renderPlotTrackPriceInComputedPane(plot, bars, viewport, pane);
 
     // Reset line dash
@@ -5024,6 +5071,22 @@ export class TealchartRenderer {
 
     if (style === 'stepline_diamond') {
       this.renderStepLineDiamondMarkers(plot, bars, viewport, (value) => this.valueToPaneY(value, paneOffset));
+    }
+
+    if (style === 'area' || style === 'areabr') {
+      this.renderAreaFillWithY(
+        plot,
+        bars,
+        viewport,
+        (value) => this.valueToPaneY(value, paneOffset),
+        this.getAreaFillBaselineY(
+          plot,
+          style === 'areabr',
+          paneOffset.top,
+          paneOffset.height,
+          (value) => this.valueToPaneY(value, paneOffset),
+        ),
+      );
     }
 
     ctx.setLineDash([]);
