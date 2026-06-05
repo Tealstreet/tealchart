@@ -43,10 +43,10 @@ explicit `max_bars_back` metadata, official lower-timeframe request arrays,
 official synthetic ticker requests, official dynamic sessions, official
 timeframe comparisons, official plot-style payloads, and public MTF,
 divergence, session-filter, session-state, dashboard-table, multi-symbol
-screener, drawing-zone, custom-candle, and library-helper idioms. Public-source
-coverage also includes alert signal metadata, direct alert emission, and
-Heikin-Ashi synthetic ticker trend requests, public strategy performance tables,
-plus UDT state objects updated through user-defined methods.
+screener, drawing-zone, linefill-channel, custom-candle, and library-helper
+idioms. Public-source coverage also includes alert signal metadata, direct alert
+emission, Heikin-Ashi synthetic ticker trend requests, public strategy
+performance tables, plus UDT state objects updated through user-defined methods.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
 suppression, entry-direction risk rules, recalculation checkpoints, and a
@@ -770,7 +770,8 @@ creating a drawing. `chart.point` overloads, GC limits, and full realtime
 rollback parity remain planned.
 The checkpoint corpus tracks a reduced public supply/demand-zone drawing idiom
 that updates a persistent `box` and right-extended midline from recent swing
-ranges.
+ranges, plus a reduced public channel idiom that updates persistent upper/lower
+`line` handles and fills the band with `linefill.new()`.
 
 The box drawing pass covers common supply/demand zone idioms. `box.new()`
 accepts positional or named `left`, `top`, `right`, and `bottom` arguments plus
