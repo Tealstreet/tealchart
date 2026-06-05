@@ -259,6 +259,51 @@ plot(syminfo.session == "extended" ? 1 : 0, title="Session Match")
     expect(getPlot(result, 'Session Match').values).toEqual(allBars(1));
   });
 
+  it('exposes Pine syminfo company and security host metadata', () => {
+    const result = runCompatScript(`
+indicator("Syminfo Company Metadata")
+plot(str.length(syminfo.country), title="Country Length")
+plot(str.length(syminfo.sector), title="Sector Length")
+plot(str.length(syminfo.industry), title="Industry Length")
+plot(str.length(syminfo.isin), title="ISIN Length")
+plot(str.length(syminfo.current_contract), title="Contract Length")
+plot(syminfo.employees, title="Employees")
+plot(syminfo.shareholders, title="Shareholders")
+plot(syminfo.shares_outstanding_float, title="Float Shares")
+plot(syminfo.shares_outstanding_total, title="Total Shares")
+`, {
+      engineOptions: {
+        runtime: {
+          syminfo: {
+            ticker: 'NASDAQ:AAPL',
+            country: 'US',
+            sector: 'Tech',
+            industry: 'Software',
+            isin: 'US0378331005',
+            current_contract: 'AAPL1!',
+            employees: 164000,
+            shareholders: 1000,
+            shares_outstanding_float: 1.5,
+            shares_outstanding_total: 2.5,
+          },
+        },
+      },
+    });
+
+    const allBars = (value: number) => Array(compatibilityBars.length).fill(value);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Country Length').values).toEqual(allBars(2));
+    expect(getPlot(result, 'Sector Length').values).toEqual(allBars(4));
+    expect(getPlot(result, 'Industry Length').values).toEqual(allBars(8));
+    expect(getPlot(result, 'ISIN Length').values).toEqual(allBars(12));
+    expect(getPlot(result, 'Contract Length').values).toEqual(allBars(6));
+    expect(getPlot(result, 'Employees').values).toEqual(allBars(164000));
+    expect(getPlot(result, 'Shareholders').values).toEqual(allBars(1000));
+    expect(getPlot(result, 'Float Shares').values).toEqual(allBars(1.5));
+    expect(getPlot(result, 'Total Shares').values).toEqual(allBars(2.5));
+  });
+
   it('matches indicator timeframe metadata idioms', () => {
     const secondsResult = runCompatScript(`
 indicator("Seconds metadata", timeframe="30S")
