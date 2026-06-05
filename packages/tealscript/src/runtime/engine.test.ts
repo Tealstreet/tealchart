@@ -1638,7 +1638,7 @@ plot(strategy.position_size)`;
       ]);
     });
 
-    it('activates and fills long stop-limit entry orders on later bars', () => {
+    it('activates and fills long stop-limit entry orders on later ticks in the same bar', () => {
       const script = `//@version=6
 strategy("Long stop-limit", process_orders_on_close=true)
 if bar_index == 0
@@ -1655,20 +1655,20 @@ plot(strategy.position_size)`;
         stopLimitActivated: true,
         stopLimitActivatedBarIndex: 1,
         avgFillPrice: 100.7,
-        updatedBarIndex: 2,
+        updatedBarIndex: 1,
       });
       expect(result.strategy.fills.map(({ orderId, price, barIndex }) => ({ orderId, price, barIndex }))).toEqual([
-        { orderId: 'Long', price: 100.7, barIndex: 2 },
+        { orderId: 'Long', price: 100.7, barIndex: 1 },
       ]);
       expect(result.strategy.position).toMatchObject({
         direction: 'long',
         size: 1,
         avgPrice: 100.7,
       });
-      expect(result.plots[0]?.values).toEqual([0, 0, 0, 1]);
+      expect(result.plots[0]?.values).toEqual([0, 0, 1, 1]);
     });
 
-    it('activates and fills short stop-limit strategy.order calls on later bars', () => {
+    it('activates and fills short stop-limit strategy.order calls on later ticks in the same bar', () => {
       const script = `//@version=6
 strategy("Short stop-limit", process_orders_on_close=true)
 if bar_index == 0
@@ -1685,17 +1685,17 @@ plot(strategy.position_size)`;
         stopLimitActivated: true,
         stopLimitActivatedBarIndex: 1,
         avgFillPrice: 101,
-        updatedBarIndex: 2,
+        updatedBarIndex: 1,
       });
       expect(result.strategy.fills.map(({ orderId, price, barIndex }) => ({ orderId, price, barIndex }))).toEqual([
-        { orderId: 'Short', price: 101, barIndex: 2 },
+        { orderId: 'Short', price: 101, barIndex: 1 },
       ]);
       expect(result.strategy.position).toMatchObject({
         direction: 'short',
         size: -1,
         avgPrice: 101,
       });
-      expect(result.plots[0]?.values).toEqual([0, 0, 0, -1]);
+      expect(result.plots[0]?.values).toEqual([0, 0, -1, -1]);
     });
 
     it('blocks same-direction strategy.entry calls above the pyramiding limit', () => {
