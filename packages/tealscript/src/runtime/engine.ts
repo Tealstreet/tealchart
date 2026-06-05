@@ -1151,7 +1151,8 @@ export class TealscriptEngine {
     if (this.ctx.bar_index !== 0) return;
 
     // Local library scripts can execute their global demo code in this runtime.
-    // Published-library import resolution is still intentionally unsupported.
+    // Published-library import source resolution is delegated to the host
+    // through the deterministic library registry.
     if (stmt.title) {
       this.ctx.indicatorTitle = this.evaluateExpression(stmt.title) as string;
     }
@@ -1167,7 +1168,7 @@ export class TealscriptEngine {
     if (this.importedLibraries.has(stmt.alias.name)) return;
     if (this.ctx.bar_index !== 0) return;
 
-    throw new Error(`import declarations are not supported yet: ${stmt.path} as ${stmt.alias.name}`);
+    throw new Error(`import not found in deterministic library registry: ${stmt.path} as ${stmt.alias.name}`);
   }
 
   private normalizeMaxBarsBack(value: unknown): number {
