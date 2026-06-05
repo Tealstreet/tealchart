@@ -93,7 +93,8 @@ Covered behavior and remaining gaps:
   also supported.
 - User-defined function bodies can return expression results from `if` /
   `else if` / `else` branches, including partial `if` expressions with no
-  `else` when the present branch has an inferable value.
+  `else` when the present branch has an inferable value. Nested UDF `if`
+  branches are covered through fifth-level public-script layouts.
 - Variable declarations can use `if` / `else if` / `else` initializers, including
   typed declarations and partial `if` initializers that evaluate to `na` when no
   branch yields a value.
@@ -113,8 +114,8 @@ Covered behavior and remaining gaps:
   arguments, and duplicate named arguments.
 - Recursive user-defined function calls are rejected with an explicit diagnostic
   instead of overflowing the runtime stack.
-- Nested indented blocks inside user-defined functions expose limitations in the
-  simplified indentation grammar and need continued hardening.
+- Arbitrary nested indented blocks still use a simplified indentation grammar
+  and need continued hardening beyond the covered public-script layouts.
 - The parser wrapper rejects scripts larger than 1,000,000 UTF-16 code units
   and parsed ASTs deeper than 1,000 nodes. These are TealScript sandbox limits
   intended to keep generated or hostile scripts from exhausting parser
