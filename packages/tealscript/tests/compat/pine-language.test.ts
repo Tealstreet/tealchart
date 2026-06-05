@@ -1458,6 +1458,35 @@ plot(countCalls(), title="Function Counter")
     expect(roundSeries(getPlot(result, 'Function Counter').values)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
   });
 
+  it('preserves function nested-block regular series history', () => {
+    const result = runCompatScript(`
+indicator("Function block series history")
+previousLocalClose() =>
+    if true
+        localClose = close
+        localClose[1]
+plot(previousLocalClose(), title="Previous Local Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Previous Local Close').values)).toEqual([null, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110]);
+  });
+
+  it('persists function nested-loop var values across bars', () => {
+    const result = runCompatScript(`
+indicator("Function loop var")
+countLoopCalls() =>
+    for i = 0 to 0
+        var counter = 0
+        counter += 1
+        counter
+plot(countLoopCalls(), title="Loop Counter")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Loop Counter').values)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
   it('keeps function-local var state isolated per call site', () => {
     const result = runCompatScript(`
 indicator("Function call-site state")
