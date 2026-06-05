@@ -5296,6 +5296,7 @@ export class TealscriptEngine {
     const ocaType = this.normalizeOptionalStrategyOcaType(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 6));
     const comment = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 7));
     const alertMessage = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 8));
+    const disableAlert = this.isTruthy(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 9, false));
 
     if (id === '') {
       throw new Error('strategy order id must not be empty');
@@ -5322,6 +5323,7 @@ export class TealscriptEngine {
       ocaType,
       comment,
       alertMessage,
+      disableAlert,
       barIndex: this.ctx.bar_index,
       time: this.ctx.time.get(0) ?? 0,
     });
@@ -5426,7 +5428,7 @@ export class TealscriptEngine {
     }
 
     for (const fill of fills) {
-      if (fill.alertMessage === undefined || fill.alertMessage === '') {
+      if (fill.disableAlert === true || fill.alertMessage === undefined || fill.alertMessage === '') {
         continue;
       }
       this.ctx.addAlertEvent('strategy_order_fills', fill.alertMessage, 'all');
@@ -5485,6 +5487,7 @@ export class TealscriptEngine {
     const alertProfit = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 17));
     const alertLoss = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 18));
     const alertTrailing = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 19));
+    const disableAlert = this.isTruthy(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 20, false));
     const exitOrderCount = [limitPrice, stopPrice, trailActivationPrice].filter((value) => value !== undefined).length;
     const suffixOrders = exitOrderCount > 1;
     const exitOcaName = suffixOrders ? this.strategyExitOcaName(id, fromEntry) : undefined;
@@ -5503,6 +5506,7 @@ export class TealscriptEngine {
         ocaType: suffixOrders ? 'cancel' : undefined,
         comment: commentProfit ?? comment,
         alertMessage: alertProfit ?? alertMessage,
+        disableAlert,
         barIndex: this.ctx.bar_index,
         time: this.ctx.time.get(0) ?? 0,
       });
@@ -5521,6 +5525,7 @@ export class TealscriptEngine {
         ocaType: suffixOrders ? 'cancel' : undefined,
         comment: commentLoss ?? comment,
         alertMessage: alertLoss ?? alertMessage,
+        disableAlert,
         barIndex: this.ctx.bar_index,
         time: this.ctx.time.get(0) ?? 0,
       });
@@ -5540,6 +5545,7 @@ export class TealscriptEngine {
         ocaType: suffixOrders ? 'cancel' : undefined,
         comment: commentTrailing ?? comment,
         alertMessage: alertTrailing ?? alertMessage,
+        disableAlert,
         barIndex: this.ctx.bar_index,
         time: this.ctx.time.get(0) ?? 0,
       });
@@ -5650,6 +5656,7 @@ export class TealscriptEngine {
     existingOrder.ocaType = input.ocaType;
     existingOrder.comment = input.comment;
     existingOrder.alertMessage = input.alertMessage;
+    existingOrder.disableAlert = input.disableAlert;
     if (triggerChanged) {
       existingOrder.stopLimitActivated = false;
       existingOrder.stopLimitActivatedBarIndex = null;
@@ -5701,6 +5708,7 @@ export class TealscriptEngine {
       comment: this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ARGS, 1)),
       alertMessage: this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ARGS, 4)),
       immediately: this.isTruthy(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ARGS, 5, false)),
+      disableAlert: this.isTruthy(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ARGS, 6, false)),
     });
     return undefined;
   }
@@ -5718,6 +5726,7 @@ export class TealscriptEngine {
       comment: this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ALL_ARGS, 0)),
       alertMessage: this.toOptionalString(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ALL_ARGS, 1)),
       immediately: this.isTruthy(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ALL_ARGS, 2, false)),
+      disableAlert: this.isTruthy(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ALL_ARGS, 3, false)),
     });
     return undefined;
   }
@@ -5746,6 +5755,7 @@ export class TealscriptEngine {
     comment?: string;
     alertMessage?: string;
     immediately?: boolean;
+    disableAlert?: boolean;
   }): void {
     const order = submitStrategyOrder(this.ctx.strategyLedger, {
       id: input.id,
@@ -5756,6 +5766,7 @@ export class TealscriptEngine {
       fromEntry: input.fromEntry,
       comment: input.comment,
       alertMessage: input.alertMessage,
+      disableAlert: input.disableAlert,
       barIndex: this.ctx.bar_index,
       time: this.ctx.time.get(0) ?? 0,
     });
