@@ -2,12 +2,15 @@ import { describe, expect, it } from 'vitest';
 
 import {
   compatibilityFailureClasses,
+  compatibilityStageStatuses,
   compatibilityStages,
   createCompatibilityRunOutcome,
   formatPineCompatibilityCorpusMarkdown,
+  normalizeCompatibilityStageOutcomes,
   PINE_COMPATIBILITY_SCHEMA_VERSION,
   runPineCompatibilityCorpus,
   summarizeCompatibilityOutcome,
+  validateCompatibilityStageSequence,
   validateCompatibilityStageOutcome,
   validatePineScriptLedgerEntry,
   type CompatibilityStageOutcome,
@@ -35,9 +38,10 @@ describe('Pine compatibility steering model', () => {
       'oracle_gap',
       'licensing_blocked',
     ]);
+    expect(compatibilityStageStatuses).toEqual(['not_run', 'passed', 'failed', 'skipped']);
   });
 
-  it('summarizes the first failed compatibility stage', () => {
+  it('normalizes and summarizes the first failed compatibility stage', () => {
     const stages: CompatibilityStageOutcome[] = [
       { stage: 'parse', status: 'passed' },
       { stage: 'semantic', status: 'passed' },
@@ -49,17 +53,31 @@ describe('Pine compatibility steering model', () => {
       },
       { stage: 'output', status: 'not_run' },
     ];
+    const normalizedStages = [
+      { stage: 'parse', status: 'passed' },
+      { stage: 'semantic', status: 'passed' },
+      {
+        stage: 'runtime',
+        status: 'failed',
+        failureClass: 'runtime_gap',
+        diagnostics: [{ code: 'runtime.unknown_identifier', message: 'Unknown identifier: ta.foo' }],
+      },
+      { stage: 'datafeed', status: 'not_run' },
+      { stage: 'output', status: 'not_run' },
+      { stage: 'render', status: 'not_run' },
+    ];
 
     expect(summarizeCompatibilityOutcome(stages)).toEqual({
       passed: false,
       firstFailureStage: 'runtime',
       firstFailureClass: 'runtime_gap',
     });
+    expect(normalizeCompatibilityStageOutcomes(stages)).toEqual(normalizedStages);
     expect(createCompatibilityRunOutcome({ scriptId: 'public-rsi-001', pineVersion: 'v6', stages })).toEqual({
       schemaVersion: PINE_COMPATIBILITY_SCHEMA_VERSION,
       scriptId: 'public-rsi-001',
       pineVersion: 'v6',
-      stages,
+      stages: normalizedStages,
       summary: {
         passed: false,
         firstFailureStage: 'runtime',
@@ -68,11 +86,21 @@ describe('Pine compatibility steering model', () => {
     });
   });
 
-  it('requires failed stages to carry failure classes', () => {
+  it('validates stage statuses, failure classes, and duplicate stages', () => {
     expect(validateCompatibilityStageOutcome({ stage: 'parse', status: 'failed' })).toEqual([
       'failed stage parse must include a failureClass',
     ]);
     expect(validateCompatibilityStageOutcome({ stage: 'parse', status: 'failed', failureClass: 'parse_gap' })).toEqual([]);
+    expect(validateCompatibilityStageOutcome({ stage: 'parse', status: 'passed', failureClass: 'parse_gap' })).toEqual([
+      'stage parse must not include failureClass unless status is failed',
+    ]);
+    expect(validateCompatibilityStageOutcome({ stage: 'parse', status: 'unknown' as CompatibilityStageOutcome['status'] })).toEqual([
+      'unknown compatibility stage status: unknown',
+    ]);
+    expect(validateCompatibilityStageSequence([
+      { stage: 'parse', status: 'passed' },
+      { stage: 'parse', status: 'failed', failureClass: 'parse_gap' },
+    ])).toEqual(['duplicate compatibility stage: parse']);
   });
 
   it('validates real-script intake ledger storage policy', () => {
