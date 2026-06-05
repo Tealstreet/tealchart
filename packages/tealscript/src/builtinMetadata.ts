@@ -216,6 +216,7 @@ export const EXPORTABLE_BUILTIN_CONSTANTS = new Set([
   'plot.style_line',
   'plot.style_linebr',
   'plot.style_stepline',
+  'plot.style_steplinebr',
   'plot.style_stepline_diamond',
   'splits.denominator',
   'splits.numerator',

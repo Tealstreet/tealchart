@@ -2037,6 +2037,40 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(linebrStroke).toHaveBeenCalledTimes(2);
     });
 
+    it('breaks missing values for Pine steplinebr plots', () => {
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const basePlot: PlotOutput = {
+        id: 'plot_StepLineGaps',
+        type: 'plot',
+        title: 'Step line gaps',
+        values: [95, null, 125],
+        color: '#2196F3',
+        linewidth: 2,
+      };
+      const bridgedStroke = vi.fn();
+      const bridgedRenderer = new TealchartRenderer({
+        ...createMockCtx(),
+        stroke: bridgedStroke,
+      }, { width: 800, height: 600, showVolume: false });
+      const steplinebrStroke = vi.fn();
+      const steplinebrRenderer = new TealchartRenderer({
+        ...createMockCtx(),
+        stroke: steplinebrStroke,
+      }, { width: 800, height: 600, showVolume: false });
+
+      (bridgedRenderer as any).renderLinePlot({ ...basePlot, style: 'stepline' }, bars, viewport);
+      (steplinebrRenderer as any).renderLinePlot({ ...basePlot, style: 'steplinebr' }, bars, viewport);
+
+      expect(bridgedStroke).toHaveBeenCalledTimes(1);
+      expect(steplinebrStroke).toHaveBeenCalledTimes(2);
+    });
+
     it('draws Pine flag marker shapes with a pole and banner', () => {
       const fillRect = vi.fn();
       const stroke = vi.fn();

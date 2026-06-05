@@ -231,6 +231,7 @@ export type PlotStyle =
   | 'line'
   | 'linebr'
   | 'stepline'
+  | 'steplinebr'
   | 'stepline_diamond'
   | 'histogram'
   | 'cross'
