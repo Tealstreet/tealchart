@@ -505,6 +505,194 @@ plot(slow, title="Slow Average")
     ]);
   });
 
+  it('locks a reduced public multi-symbol screener idiom', () => {
+    // Public idiom reference: screener-style public indicators commonly use
+    // request.security() for several symbols and summarize signals in a table.
+    // Source search: https://www.tradingview.com/scripts/search/screener/
+    const bars: Bar[] = [
+      { time: 1_700_500_000_000, open: 10, high: 11, low: 9, close: 10, volume: 100 },
+      { time: 1_700_500_060_000, open: 10, high: 11, low: 9, close: 10, volume: 100 },
+      { time: 1_700_500_120_000, open: 10, high: 11, low: 9, close: 10, volume: 100 },
+      { time: 1_700_500_180_000, open: 10, high: 11, low: 9, close: 10, volume: 100 },
+    ];
+    const requestDatafeed = new InMemoryRequestDatafeed([
+      {
+        symbol: 'NASDAQ:AAPL',
+        timeframe: '1',
+        bars: [
+          { time: bars[0]!.time, open: 100, high: 102, low: 99, close: 101, volume: 1_000 },
+          { time: bars[1]!.time, open: 101, high: 103, low: 100, close: 102, volume: 1_100 },
+          { time: bars[2]!.time, open: 102, high: 103, low: 100, close: 101, volume: 1_200 },
+          { time: bars[3]!.time, open: 102, high: 104, low: 101, close: 103, volume: 1_300 },
+        ],
+        syminfo: { ticker: 'NASDAQ:AAPL', timezone: 'Etc/UTC' },
+      },
+      {
+        symbol: 'NASDAQ:MSFT',
+        timeframe: '1',
+        bars: [
+          { time: bars[0]!.time, open: 201, high: 202, low: 199, close: 200, volume: 2_000 },
+          { time: bars[1]!.time, open: 200, high: 201, low: 198, close: 199, volume: 2_100 },
+          { time: bars[2]!.time, open: 199, high: 202, low: 198, close: 201, volume: 2_200 },
+          { time: bars[3]!.time, open: 203, high: 204, low: 201, close: 202, volume: 2_300 },
+        ],
+        syminfo: { ticker: 'NASDAQ:MSFT', timezone: 'Etc/UTC' },
+      },
+      {
+        symbol: 'NASDAQ:NVDA',
+        timeframe: '1',
+        bars: [
+          { time: bars[0]!.time, open: 299, high: 302, low: 298, close: 300, volume: 3_000 },
+          { time: bars[1]!.time, open: 301, high: 303, low: 300, close: 302, volume: 3_100 },
+          { time: bars[2]!.time, open: 303, high: 305, low: 302, close: 304, volume: 3_200 },
+          { time: bars[3]!.time, open: 305, high: 307, low: 304, close: 306, volume: 3_300 },
+        ],
+        syminfo: { ticker: 'NASDAQ:NVDA', timezone: 'Etc/UTC' },
+      },
+    ]);
+    const result = runCompatScript(`
+indicator("Public Screener Checkpoint", overlay=true)
+aaplUp = request.security("NASDAQ:AAPL", "1", close > open, lookahead=barmerge.lookahead_on)
+msftUp = request.security("NASDAQ:MSFT", "1", close > open, lookahead=barmerge.lookahead_on)
+nvdaUp = request.security("NASDAQ:NVDA", "1", close > open, lookahead=barmerge.lookahead_on)
+var screener = table.new(position.top_right, 2, 4, border_width=1, border_color=color.white)
+if barstate.islast
+    table.cell(screener, 0, 0, "Symbol", text_color=color.white, bgcolor=color.blue)
+    table.cell(screener, 1, 0, "Signal", text_color=color.white, bgcolor=color.blue)
+    table.cell(screener, 0, 1, "AAPL", text_color=color.white, bgcolor=color.gray)
+    table.cell(screener, 1, 1, aaplUp ? "Bull" : "Bear", text_color=color.white, bgcolor=aaplUp ? color.green : color.red)
+    table.cell(screener, 0, 2, "MSFT", text_color=color.white, bgcolor=color.gray)
+    table.cell(screener, 1, 2, msftUp ? "Bull" : "Bear", text_color=color.white, bgcolor=msftUp ? color.green : color.red)
+    table.cell(screener, 0, 3, "NVDA", text_color=color.white, bgcolor=color.gray)
+    table.cell(screener, 1, 3, nvdaUp ? "Bull" : "Bear", text_color=color.white, bgcolor=nvdaUp ? color.green : color.red)
+plot(aaplUp ? 1 : 0, title="AAPL Up")
+plot(msftUp ? 1 : 0, title="MSFT Up")
+plot(nvdaUp ? 1 : 0, title="NVDA Up")
+`, {
+      bars,
+      engineOptions: { requestDatafeed },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'AAPL Up').values).toEqual([1, 1, 0, 1]);
+    expect(getPlot(result, 'MSFT Up').values).toEqual([0, 0, 1, 0]);
+    expect(getPlot(result, 'NVDA Up').values).toEqual([1, 1, 1, 1]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'table_table.new_0_0',
+        type: 'table',
+        persistent: true,
+        barIndex: 0,
+        position: 'top_right',
+        columns: 2,
+        rows: 4,
+        bgcolor: null,
+        frameColor: null,
+        frameWidth: 0,
+        borderColor: '#FFFFFF',
+        borderWidth: 1,
+        cells: [
+          {
+            column: 0,
+            row: 0,
+            text: 'Symbol',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#2196F3',
+          },
+          {
+            column: 1,
+            row: 0,
+            text: 'Signal',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#2196F3',
+          },
+          {
+            column: 0,
+            row: 1,
+            text: 'AAPL',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#787B86',
+          },
+          {
+            column: 1,
+            row: 1,
+            text: 'Bull',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#4CAF50',
+          },
+          {
+            column: 0,
+            row: 2,
+            text: 'MSFT',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#787B86',
+          },
+          {
+            column: 1,
+            row: 2,
+            text: 'Bear',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#F23645',
+          },
+          {
+            column: 0,
+            row: 3,
+            text: 'NVDA',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#787B86',
+          },
+          {
+            column: 1,
+            row: 3,
+            text: 'Bull',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#4CAF50',
+          },
+        ],
+      },
+    ]);
+  });
+
   it('locks a reduced official dynamic session idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/sessions/
     const result = runCompatScript(`
