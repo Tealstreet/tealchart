@@ -529,6 +529,9 @@ const STRATEGY_EXIT_PARAMS = [
   'alert_trailing',
   'disable_alert',
 ];
+const STRATEGY_DIRECTION_VALUES = new Set(['long', 'short']);
+const STRATEGY_ALLOWED_ENTRY_DIRECTION_VALUES = new Set(['all', 'long', 'short']);
+const STRATEGY_OCA_TYPE_VALUES = new Set(['cancel', 'reduce', 'none']);
 const STRATEGY_TRADE_ACCESSORS = [
   'entry_id',
   'entry_comment',
@@ -2752,6 +2755,7 @@ class SemanticChecker {
     this.checkMatrixSortFieldType(expression, scope);
     this.checkMapCallTypes(expression, scope);
     this.checkInputDefaultValueType(expression, scope);
+    this.checkStrategyLiteralArgumentConstraints(expression);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
     for (const argument of expression.arguments) {
@@ -3191,6 +3195,153 @@ class SemanticChecker {
       if (expression.operator === '+') return expression.argument.value;
     }
     return undefined;
+  }
+
+  private checkStrategyLiteralArgumentConstraints(expression: CallExpression): void {
+    const displayName = this.memberPath(expression.callee).join('.');
+    switch (displayName) {
+      case 'strategy.entry':
+      case 'strategy.order':
+        this.checkStrategyOrderLiteralArguments(expression, displayName);
+        return;
+      case 'strategy.exit':
+        this.checkStrategyExitLiteralArguments(expression);
+        return;
+      case 'strategy.close':
+        this.checkStrategyCloseLiteralArguments(expression);
+        return;
+      case 'strategy.risk.allow_entry_in':
+        this.checkStrategyAllowedEntryDirectionArgument(expression);
+        return;
+      default:
+        return;
+    }
+  }
+
+  private checkStrategyOrderLiteralArguments(expression: CallExpression, displayName: string): void {
+    this.checkNonEmptyLiteralStringArgument(expression, 'id', 0, `${displayName} id must not be empty`);
+    this.checkStrategyDirectionArgument(expression, displayName, 'direction', 1);
+    this.checkPositiveLiteralNumberArgument(expression, 'qty', 2, `${displayName} qty must be a positive number`);
+    this.checkStrategyOcaTypeArgument(expression, displayName);
+  }
+
+  private checkStrategyExitLiteralArguments(expression: CallExpression): void {
+    this.checkNonEmptyLiteralStringArgument(expression, 'id', 0, 'strategy.exit id must not be empty');
+    this.checkPositiveLiteralNumberArgument(expression, 'qty', 2, 'strategy.exit qty must be a positive number');
+    this.checkPositiveLiteralNumberArgument(expression, 'qty_percent', 3, 'strategy.exit qty_percent must be a positive number');
+    this.checkNonNegativeLiteralNumberArgument(expression, 'trail_points', 9, 'strategy.exit trail_points must be a non-negative number');
+    this.checkPositiveLiteralNumberArgument(expression, 'trail_offset', 10, 'strategy.exit trailing stop offset must be positive');
+  }
+
+  private checkStrategyCloseLiteralArguments(expression: CallExpression): void {
+    this.checkNonEmptyLiteralStringArgument(expression, 'id', 0, 'strategy.close id must not be empty');
+    this.checkPositiveLiteralNumberArgument(expression, 'qty', 2, 'strategy.close qty must be a positive number');
+    this.checkPositiveLiteralNumberArgument(expression, 'qty_percent', 3, 'strategy.close qty_percent must be a positive number');
+  }
+
+  private checkStrategyAllowedEntryDirectionArgument(expression: CallExpression): void {
+    const argument = this.getCallArgument(expression.arguments, 'value', 0);
+    if (!argument) return;
+
+    const value = this.strategyConstantStringValue(argument);
+    if (value !== undefined && !STRATEGY_ALLOWED_ENTRY_DIRECTION_VALUES.has(value)) {
+      this.addDiagnostic('type-mismatch', `Invalid strategy entry direction: ${value}`, argument.loc);
+    }
+  }
+
+  private checkStrategyDirectionArgument(
+    expression: CallExpression,
+    displayName: string,
+    name: string,
+    positionalIndex: number,
+  ): void {
+    const argument = this.getCallArgument(expression.arguments, name, positionalIndex);
+    if (!argument) return;
+
+    const value = this.strategyConstantStringValue(argument);
+    if (value !== undefined && !STRATEGY_DIRECTION_VALUES.has(value)) {
+      this.addDiagnostic('type-mismatch', `Invalid strategy direction for ${displayName}: ${value}`, argument.loc);
+    }
+  }
+
+  private checkStrategyOcaTypeArgument(expression: CallExpression, displayName: string): void {
+    const argument = this.getCallArgument(expression.arguments, 'oca_type', 6);
+    if (!argument) return;
+
+    const value = this.strategyConstantStringValue(argument);
+    if (value !== undefined && !STRATEGY_OCA_TYPE_VALUES.has(value)) {
+      this.addDiagnostic('type-mismatch', `Invalid strategy oca_type for ${displayName}: ${value}`, argument.loc);
+    }
+  }
+
+  private checkNonEmptyLiteralStringArgument(
+    expression: CallExpression,
+    name: string,
+    positionalIndex: number,
+    message: string,
+  ): void {
+    const argument = this.getCallArgument(expression.arguments, name, positionalIndex);
+    if (!argument) return;
+
+    const value = this.constantLiteralValue(argument);
+    if (value === '') {
+      this.addDiagnostic('type-mismatch', message, argument.loc);
+    }
+  }
+
+  private checkPositiveLiteralNumberArgument(
+    expression: CallExpression,
+    name: string,
+    positionalIndex: number,
+    message: string,
+  ): void {
+    const argument = this.getCallArgument(expression.arguments, name, positionalIndex);
+    if (!argument) return;
+
+    const value = this.constantLiteralValue(argument);
+    if (typeof value === 'number' && value <= 0) {
+      this.addDiagnostic('type-mismatch', message, argument.loc);
+    }
+  }
+
+  private checkNonNegativeLiteralNumberArgument(
+    expression: CallExpression,
+    name: string,
+    positionalIndex: number,
+    message: string,
+  ): void {
+    const argument = this.getCallArgument(expression.arguments, name, positionalIndex);
+    if (!argument) return;
+
+    const value = this.constantLiteralValue(argument);
+    if (typeof value === 'number' && value < 0) {
+      this.addDiagnostic('type-mismatch', message, argument.loc);
+    }
+  }
+
+  private strategyConstantStringValue(expression: Expression): string | undefined {
+    const value = this.constantLiteralValue(expression);
+    if (typeof value === 'string') return value;
+
+    const path = this.memberPath(expression).join('.');
+    switch (path) {
+      case 'strategy.long':
+      case 'strategy.direction.long':
+        return 'long';
+      case 'strategy.short':
+      case 'strategy.direction.short':
+        return 'short';
+      case 'strategy.direction.all':
+        return 'all';
+      case 'strategy.oca.cancel':
+        return 'cancel';
+      case 'strategy.oca.reduce':
+        return 'reduce';
+      case 'strategy.oca.none':
+        return 'none';
+      default:
+        return undefined;
+    }
   }
 
   private checkArrayCallTypes(expression: CallExpression, scope: SemanticScope): void {
