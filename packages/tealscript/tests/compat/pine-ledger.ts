@@ -132,6 +132,16 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: officialDocsEntry({
+      id: 'official-immediate-close-checkpoint',
+      title: 'Official Immediate Close Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/strategies/#strategyclose-and-strategyclose_all',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'close_immediately'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
       id: 'official-recalculate-after-fill-checkpoint',
       title: 'Official Recalculate After Fill Checkpoint',
       url: 'https://www.tradingview.com/pine-script-docs/concepts/strategies/',
