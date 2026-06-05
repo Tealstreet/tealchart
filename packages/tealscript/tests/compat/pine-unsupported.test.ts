@@ -39,15 +39,15 @@ plot(close)
     ]);
   });
 
-  it('reports planned published library imports explicitly', () => {
+  it('reports missing deterministic library registry entries explicitly', () => {
     const result = runCompatScript(`
-indicator("Unsupported import")
+indicator("Missing import")
 import TradingView/PivotLabels/1 as dpl
 plot(close)
 `);
 
     expect(result.errors.map((error) => error.message)).toEqual([
-      'import declarations are not supported yet: TradingView/PivotLabels/1 as dpl',
+      'import not found in deterministic library registry: TradingView/PivotLabels/1 as dpl',
     ]);
   });
 
