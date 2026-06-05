@@ -54,6 +54,7 @@ fixtures by default.
 | --- | --- | --- | --- |
 | `Public MTF Trend Checkpoint` | https://www.tradingview.com/scripts/search/mtf%20trend%20filter/ | Local price filtered by a higher-timeframe moving average requested with `request.security()`. | HTF average merge series and local trend gate over local/request bars. |
 | `Public Divergence Checkpoint` | https://www.tradingview.com/scripts/search/rsi%20divergence/ | Sequential price pivots compared with lower oscillator pivots to flag bearish divergence. | Pivot series and one bearish divergence signal over local bars. |
+| `Public Marker Signal Checkpoint` | https://www.tradingview.com/scripts/search/buy%20sell%20signal%20markers/ | Moving-average trend states drive `plotshape()`, `plotchar()`, and `plotarrow()` marker payloads. | Buy/sell marker values, body colors, text colors, and arrow sign/color payloads over `compatibilityBars`. |
 | `Public Session Filter Checkpoint` | https://www.tradingview.com/scripts/search/session%20filter/ | Session membership gates a raw signal. | Session mask and filtered signal over `compatibilityBars`. |
 | `Public Session State Checkpoint` | https://www.tradingview.com/scripts/search/session%20ismarket/ | Exchange session-state helpers gate premarket, regular, and postmarket logic from host session metadata. | Premarket, market, postmarket, and extended-active state over local bars. |
 | `Public Object Method Checkpoint` | https://www.tradingview.com/scripts/search/market%20structure%20object/ | Persistent UDT state is updated through a user-defined method when confirmed pivot highs appear. | Pivot count, last high, and rising-pivot state over `compatibilityBars`. |
@@ -82,7 +83,7 @@ idioms rather than isolated unit coverage.
 | Barstate, persistent arrays, and first-bar initialization | `Official Array Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Runtime history bounds | `Official Max Bars Back Checkpoint`; max-bars-back error fixtures in `engine.test.ts` | `pine-real-checkpoints.test.ts`; `engine.test.ts` |
 | Visual candle tinting | `Official Barcolor Checkpoint` | `pine-real-checkpoints.test.ts` |
-| Marker output payloads | `Official Marker Payload Checkpoint`; marker color/text payload fixtures in `pine-visuals.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts` |
+| Marker output payloads | `Official Marker Payload Checkpoint`; `Public Marker Signal Checkpoint`; marker color/text payload fixtures in `pine-visuals.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts` |
 | Plot style payloads | `Official Plot Style Checkpoint`; visual constants fixture in `pine-visuals.test.ts`; renderer plot-style fixtures in `TealchartRenderer.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts`; `TealchartRenderer.test.ts` |
 | Custom candle overlays | `Public Custom Candle Checkpoint`; `plotcandle()` fixtures in `pine-visuals.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts` |
 | Multi-timeframe data requests | `Public MTF Trend Checkpoint`; `Official Lower TF Array Checkpoint`; repaint-safe HTF fixture in `pine-request-security.test.ts` | `pine-real-checkpoints.test.ts`; `pine-request-security.test.ts` |
