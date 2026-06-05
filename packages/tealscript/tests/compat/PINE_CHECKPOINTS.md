@@ -55,6 +55,7 @@ fixtures by default.
 | `Public MTF Trend Checkpoint` | https://www.tradingview.com/scripts/search/mtf%20trend%20filter/ | Local price filtered by a higher-timeframe moving average requested with `request.security()`. | HTF average merge series and local trend gate over local/request bars. |
 | `Public Divergence Checkpoint` | https://www.tradingview.com/scripts/search/rsi%20divergence/ | Sequential price pivots compared with lower oscillator pivots to flag bearish divergence. | Pivot series and one bearish divergence signal over local bars. |
 | `Public Session Filter Checkpoint` | https://www.tradingview.com/scripts/search/session%20filter/ | Session membership gates a raw signal. | Session mask and filtered signal over `compatibilityBars`. |
+| `Public Object Method Checkpoint` | https://www.tradingview.com/scripts/search/market%20structure%20object/ | Persistent UDT state is updated through a user-defined method when confirmed pivot highs appear. | Pivot count, last high, and rising-pivot state over `compatibilityBars`. |
 
 ## Checkpoint Coverage Index
 
@@ -85,7 +86,7 @@ idioms rather than isolated unit coverage.
 | Alerts and alert conditions | `Official Alert Checkpoint`; alert crossover fixture in `pine-visuals.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts` |
 | Strategy broker flows | `Official Strategy Checkpoint`; `Official Broker Emulator Path Checkpoint`; `Official Bar Magnifier Checkpoint`; `Official Stop Limit Checkpoint`; `Official Immediate Close Checkpoint`; `Official Disable Alert Checkpoint`; `Official Allow Entry In Checkpoint`; `Official Recalculate After Fill Checkpoint`; `Official Calc On Every Tick Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Limits and request-context reuse | `Official Request Limit Checkpoint` | `pine-real-checkpoints.test.ts` |
-| User-defined objects | Reduced official object idioms | `pine-objects.test.ts` |
+| User-defined objects | `Public Object Method Checkpoint`; reduced official object idioms | `pine-real-checkpoints.test.ts`; `pine-objects.test.ts` |
 | Drawings and tables | Manual comparison milestones plus reduced drawing fixtures | `PINE_CHECKPOINTS.md`; `pine-drawings.test.ts` |
 
 ## Adding A Checkpoint
