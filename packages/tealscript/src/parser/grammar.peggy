@@ -1030,7 +1030,42 @@ FunctionVeryDeepNestedBlock
     }
 
 FunctionVeryDeepNestedStatement
-  = &FunctionVeryDeepNestedIndent FunctionVeryDeepNestedIndent stmt:Statement {
+  = &FunctionVeryDeepNestedIndent FunctionVeryDeepNestedIndent stmt:(FunctionVeryDeepNestedIfStatement / Statement) {
+      return stmt;
+    }
+
+FunctionVeryDeepNestedIfStatement
+  = "if" _ test:Expression _ LineTerminator consequent:FunctionUltraDeepNestedBlock alternate:FunctionVeryDeepNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+
+FunctionVeryDeepNestedElseClause
+  = FunctionVeryDeepNestedIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionUltraDeepNestedBlock alternate:FunctionVeryDeepNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / FunctionVeryDeepNestedIndent "else" _ LineTerminator? block:FunctionUltraDeepNestedBlock {
+      return block;
+    }
+
+FunctionUltraDeepNestedBlock
+  = statements:(BlockIgnorableLine / FunctionUltraDeepNestedStatement)+ {
+      return statements.filter(s => s !== null);
+    }
+
+FunctionUltraDeepNestedStatement
+  = &FunctionUltraDeepNestedIndent FunctionUltraDeepNestedIndent stmt:Statement {
       return stmt;
     }
 
@@ -1075,6 +1110,40 @@ FunctionVeryDeepNestedIndent
   / "\t\t        "
   / "\t\t    \t"
   / "\t\t\t    "
+
+FunctionUltraDeepNestedIndent
+  = "                    "
+  / "\t\t\t\t\t"
+  / "                \t"
+  / "            \t    "
+  / "            \t\t"
+  / "        \t        "
+  / "        \t    \t"
+  / "        \t\t    "
+  / "        \t\t\t"
+  / "    \t            "
+  / "    \t        \t"
+  / "    \t    \t    "
+  / "    \t    \t\t"
+  / "    \t\t        "
+  / "    \t\t    \t"
+  / "    \t\t\t    "
+  / "    \t\t\t\t"
+  / "\t                "
+  / "\t            \t"
+  / "\t        \t    "
+  / "\t        \t\t"
+  / "\t    \t        "
+  / "\t    \t    \t"
+  / "\t    \t\t    "
+  / "\t    \t\t\t"
+  / "\t\t            "
+  / "\t\t        \t"
+  / "\t\t    \t    "
+  / "\t\t    \t\t"
+  / "\t\t\t        "
+  / "\t\t\t    \t"
+  / "\t\t\t\t    "
 
 SingleLineBody
   = stmt:(VariableDeclaration / AssignmentStatement / ExpressionStatement / BreakStatement / ContinueStatement) {

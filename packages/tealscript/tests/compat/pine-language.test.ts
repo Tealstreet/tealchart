@@ -758,6 +758,30 @@ plot(classify(close - open), title="Candle Direction")
     expect(roundSeries(getPlot(result, 'Candle Direction').values)).toEqual([1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, 1]);
   });
 
+  it('runs fourth-level nested user-defined function branches', () => {
+    const result = runCompatScript(`
+indicator("UDF fourth-level branch")
+classify(value) =>
+    if value > 0
+        if value < 10
+            if value != 5
+                if value > 2
+                    4
+                else
+                    3
+            else
+                2
+        else
+            1
+    else
+        0
+plot(classify(close - open), title="Nested Score")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Nested Score').values)).toEqual([3, 4, 3, 0, 0, 3, 4, 2, 0, 4, 0, 3]);
+  });
+
   it('keeps function-local variables scoped to the function call', () => {
     const result = runCompatScript(`
 indicator("UDF local scope")
