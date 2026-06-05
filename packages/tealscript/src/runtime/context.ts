@@ -84,6 +84,9 @@ export interface SymInfo {
   basecurrency: string;
   mintick: number; // Minimum price movement
   pricescale: number; // Price precision
+  pointvalue: number; // Contract point value
+  mincontract: number; // Minimum contract size
+  volumetype: string; // 'base', 'quote', 'tick', or 'n/a'
   timezone: string;
 }
 
@@ -326,6 +329,9 @@ export class ExecutionContext {
     basecurrency: 'BTC',
     mintick: 0.01,
     pricescale: 100,
+    pointvalue: 1,
+    mincontract: 1,
+    volumetype: 'base',
     timezone: 'UTC',
   };
 
