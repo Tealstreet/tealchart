@@ -46,7 +46,8 @@ divergence, session-filter, dashboard-table, multi-symbol screener, and
 library-helper idioms.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
-suppression, entry-direction risk rules, and recalculation checkpoints.
+suppression, entry-direction risk rules, recalculation checkpoints, and a
+reduced public fixed-bracket strategy idiom.
 
 ## Current Matrix
 

@@ -837,6 +837,48 @@ plot(strategy.netprofit, title="Net Profit")
     });
   });
 
+  it('locks a reduced public strategy bracket idiom', () => {
+    // Public idiom reference: public strategy scripts commonly pair entry
+    // signals with fixed stop/target brackets.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20bracket/
+    const bars: Bar[] = [
+      { time: 1_700_600_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_600_060_000, open: 101, high: 102, low: 100, close: 101, volume: 100 },
+      { time: 1_700_600_120_000, open: 102, high: 104, low: 101, close: 103, volume: 100 },
+      { time: 1_700_600_180_000, open: 103, high: 106, low: 102, close: 105, volume: 100 },
+      { time: 1_700_600_240_000, open: 105, high: 106, low: 104, close: 105, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Public Strategy Bracket Checkpoint", initial_capital=1000, process_orders_on_close=true)
+fast = ta.sma(close, 2)
+slow = ta.sma(close, 3)
+longSignal = bar_index == 2 and fast > slow
+if longSignal
+    strategy.entry("Long", strategy.long, qty=1)
+if strategy.position_size > 0
+    target = strategy.position_avg_price + 3
+    stop = strategy.position_avg_price - 2
+    strategy.exit("Long Bracket", "Long", limit=target, stop=stop)
+plot(longSignal ? 1 : 0, title="Long Signal")
+plot(strategy.position_size, title="Position")
+plot(strategy.closedtrades, title="Closed Trades")
+plot(strategy.netprofit, title="Net Profit")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Long Signal').values).toEqual([0, 0, 1, 0, 0]);
+    expect(getPlot(result, 'Position').values).toEqual([0, 0, 1, 1, 0]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 0, 0, 0, 1]);
+    expect(getPlot(result, 'Net Profit').values).toEqual([0, 0, 0, 0, 3]);
+    expect(result.strategy.closedTrades[0]).toMatchObject({
+      entryOrderId: 'Long',
+      exitOrderId: 'Long Bracket Limit',
+      entryPrice: 103,
+      exitPrice: 106,
+      profit: 3,
+    });
+  });
+
   it('locks the official strategy profit-loss exit idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const bars: Bar[] = [
