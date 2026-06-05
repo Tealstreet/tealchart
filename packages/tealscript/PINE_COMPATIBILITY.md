@@ -402,7 +402,7 @@ through exported fields, callable parameters, or inferred callable return values
 is also exported by the library.
 
 Published TradingView lookup is not implemented yet. `import` declarations
-without a matching registry entry emit an explicit unsupported diagnostic.
+without a matching registry entry emit an explicit missing-registry diagnostic.
 Versioned remote/local source resolution is host integration work for callers
 that want to resolve libraries outside the deterministic registry.
 
