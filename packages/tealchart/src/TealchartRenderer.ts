@@ -1933,7 +1933,7 @@ export class TealchartRenderer {
   }
 
   private plotStyleBreaksOnNa(style: PlotStyle): boolean {
-    return style === 'linebr';
+    return style === 'linebr' || style === 'areabr';
   }
 
   private renderStepLineDiamondMarkers(
@@ -2375,6 +2375,7 @@ export class TealchartRenderer {
         priceHeight,
         (value) => this.priceToY(value, viewport, priceHeight),
       ),
+      fillFromTop,
     );
   }
 
@@ -2398,6 +2399,7 @@ export class TealchartRenderer {
     viewport: Viewport,
     valueToY: (value: number) => number,
     baselineY: number,
+    breaksOnNa = false,
   ): void {
     const { ctx, options, margins } = this;
     const chartWidth = options.width - margins.left;
@@ -2423,6 +2425,10 @@ export class TealchartRenderer {
       }
 
       if (value === null || value === undefined || isNaN(value)) {
+        if (breaksOnNa && started) {
+          this.closeAreaFillPath(firstX, lastX, baselineY);
+          started = false;
+        }
         continue;
       }
 
@@ -2441,13 +2447,19 @@ export class TealchartRenderer {
     }
 
     if (started) {
-      ctx.lineTo(lastX, baselineY);
-      ctx.lineTo(firstX, baselineY);
-      ctx.closePath();
-      ctx.fill();
+      this.closeAreaFillPath(firstX, lastX, baselineY);
     }
 
     ctx.globalAlpha = 1;
+  }
+
+  private closeAreaFillPath(firstX: number, lastX: number, baselineY: number): void {
+    const { ctx } = this;
+
+    ctx.lineTo(lastX, baselineY);
+    ctx.lineTo(firstX, baselineY);
+    ctx.closePath();
+    ctx.fill();
   }
 
   private renderFill(
@@ -4377,6 +4389,7 @@ export class TealchartRenderer {
           pane.height,
           (value) => this.valueToY(value, pane),
         ),
+        style === 'areabr',
       );
     }
 
@@ -5086,6 +5099,7 @@ export class TealchartRenderer {
           paneOffset.height,
           (value) => this.valueToPaneY(value, paneOffset),
         ),
+        style === 'areabr',
       );
     }
 
