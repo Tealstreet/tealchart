@@ -1205,6 +1205,9 @@ plot(rgbKey(color.yellow), title="Yellow")
     const result = runCompatScript(`
 indicator("Math docs smoke")
 midpoint = math.avg(open, high, low, close)
+namedMidpoint = math.avg(number0=open, number1=high, number2=low, number3=close)
+prefixMax = math.max(number0=open, high, close)
+namedMin = math.min(number0=open, number1=low, number2=close)
 rounded = math.round(midpoint, 2)
 rightAngle = math.todegrees(math.pi / 2)
 mintick = math.round_to_mintick(1.234)
@@ -1215,6 +1218,9 @@ seededRandom = math.random(10, 20, 7)
 prefixSeededRandom = math.random(min=10, 20, 7)
 defaultRandom = math.random()
 plot(rounded, title="Rounded Midpoint")
+plot(namedMidpoint, title="Named Midpoint")
+plot(prefixMax, title="Prefix Max")
+plot(namedMin, title="Named Min")
 plot(math.trunc(-1.9), title="Truncated")
 plot(rightAngle, title="Right Angle")
 plot(mintick, title="Min Tick Rounded")
@@ -1237,6 +1243,9 @@ plot(defaultRandom > 0 and defaultRandom < 1 ? 1 : 0, title="Default Random In R
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Rounded Midpoint').values, 2)).toEqual([101, 103.5, 106, 105.25, 101, 99, 102, 106.5, 108.5, 109.5, 111, 110.75]);
+    expect(roundSeries(getPlot(result, 'Named Midpoint').values, 2)).toEqual(roundSeries(getPlot(result, 'Rounded Midpoint').values, 2));
+    expect(roundSeries(getPlot(result, 'Prefix Max').values)).toEqual([103, 106, 108, 109, 104, 101, 105, 110, 111, 112, 114, 113]);
+    expect(roundSeries(getPlot(result, 'Named Min').values)).toEqual([99, 101, 104, 102, 98, 96, 99, 103, 106, 107, 109, 108]);
     expect(roundSeries(getPlot(result, 'Truncated').values)).toEqual([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
     expect(roundSeries(getPlot(result, 'Right Angle').values)).toEqual([90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90]);
     expect(roundSeries(getPlot(result, 'Min Tick Rounded').values)).toEqual([1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23, 1.23]);

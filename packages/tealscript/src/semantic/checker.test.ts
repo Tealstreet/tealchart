@@ -4674,12 +4674,16 @@ logged = math.log(number=math.e) + math.log10(number=100) + math.exp(number=1)
 trig = math.sin(number=0) + math.cos(number=0) + math.tan(number=0) + math.asin(number=0) + math.acos(number=1) + math.atan(number=1)
 converted = math.toradians(number=180) + math.todegrees(number=math.pi)
 unary = math.abs(number=-5) + math.trunc(number=-1.9) + math.floor(number=-1.2) + math.ceil(number=1.2) + math.sign(number=-5)
+namedMax = math.max(number0=1, number1=2, number2=3)
+namedMin = math.min(number0=1, number1=2, number2=3)
+namedAvg = math.avg(number0=1, number1=2, number2=3)
+prefixAvg = math.avg(number0=1, 2, 3)
 seriesSum = math.sum(source=close, length=3)
 prefixSeriesSum = math.sum(source=close, 3)
 tick = math.round_to_mintick(number=1.005)
 rand = math.random(min=10, max=20, seed=7)
 prefixRand = math.random(min=10, 20, 7)
-plot(rounded + prefixRounded + powered + prefixPowered + root + logged + trig + converted + unary + seriesSum + prefixSeriesSum + tick + rand + prefixRand)
+plot(rounded + prefixRounded + powered + prefixPowered + root + logged + trig + converted + unary + namedMax + namedMin + namedAvg + prefixAvg + seriesSum + prefixSeriesSum + tick + rand + prefixRand)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -4742,6 +4746,10 @@ plot(absFloat + maxInt + maxFloat + avgSimple + roundedFloat + mintickSimple + r
 indicator("Bad Math Signatures")
 duplicateRound = math.round(math.pi, number=1, precision=2)
 unknownPow = math.pow(base=2, power=3)
+shortAvg = math.avg(number0=1)
+duplicateMax = math.max(1, 2, number0=3)
+unknownMin = math.min(number0=1, value=2)
+hugeAvg = math.avg(number0=1, number1=2, number1001=3)
 shortSum = math.sum(source=close)
 tooManyMintick = math.round_to_mintick(1.0, 2)
 `));
@@ -4751,6 +4759,13 @@ tooManyMintick = math.round_to_mintick(1.0, 2)
       "Unknown argument 'power' for math.pow()",
       "math.pow() expects at least 2 arguments",
       "math.pow() missing required argument 'exponent'",
+      'math.avg() expects at least 2 arguments',
+      "math.avg() missing required argument 'number1'",
+      "Argument 'number0' for math.max() was supplied multiple times",
+      "Unknown argument 'value' for math.min()",
+      'math.min() expects at least 2 arguments',
+      "math.min() missing required argument 'number1'",
+      "Unknown argument 'number1001' for math.avg()",
       "math.sum() expects at least 2 arguments",
       "math.sum() missing required argument 'length'",
       'math.round_to_mintick() expects at most 1 argument',
