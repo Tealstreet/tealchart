@@ -306,7 +306,20 @@ plotarrow(close - open, "Move Arrow", color.new(color.green, 50), color.new(colo
       location: 'belowbar',
       size: 'large',
       text: 'L',
-      textColor: '#FFFFFF',
+      textColor: [
+        '#FFFFFF',
+        '#FFFFFF',
+        '#FFFFFF',
+        null,
+        null,
+        '#FFFFFF',
+        '#FFFFFF',
+        '#FFFFFF',
+        null,
+        '#FFFFFF',
+        null,
+        '#FFFFFF',
+      ],
       offset: 1,
       editable: false,
       showLast: 5,
@@ -321,7 +334,20 @@ plotarrow(close - open, "Move Arrow", color.new(color.green, 50), color.new(colo
       location: 'abovebar',
       size: 'small',
       text: 'Down',
-      textColor: '#FDD835',
+      textColor: [
+        null,
+        null,
+        null,
+        '#FDD835',
+        '#FDD835',
+        null,
+        null,
+        null,
+        '#FDD835',
+        null,
+        '#FDD835',
+        null,
+      ],
       offset: -1,
       editable: true,
       showLast: 6,
@@ -365,6 +391,57 @@ plotchar(true, title="Dynamic Char", char="C", text="C", textcolor=charText)
       null,
       '#4CAF50',
       ...Array(compatibilityBars.length - 2).fill('#F23645'),
+    ]);
+  });
+
+  it('masks marker colors on hidden bars in visual payloads', () => {
+    const result = runCompatScript(`
+indicator("Marker color mask smoke", overlay=true)
+shapeVisible = bar_index == 0 ? true : bar_index == 1 ? false : bar_index == 2 ? na : true
+charValue = bar_index == 0 ? 2 : bar_index == 1 ? 0 : bar_index == 2 ? na : -1
+markerColor = bar_index == 0 ? color.green : color.red
+markerText = bar_index == 0 ? color.white : color.yellow
+plotshape(shapeVisible, title="Masked Shape", text="S", color=markerColor, textcolor=markerText)
+plotchar(charValue, title="Masked Char", char="C", text="C", color=markerColor, textcolor=markerText)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Masked Shape').values).toEqual([
+      1,
+      null,
+      null,
+      ...Array(compatibilityBars.length - 3).fill(1),
+    ]);
+    expect(getPlot(result, 'Masked Shape').color).toEqual([
+      '#4CAF50',
+      null,
+      null,
+      ...Array(compatibilityBars.length - 3).fill('#F23645'),
+    ]);
+    expect(getPlot(result, 'Masked Shape').textColor).toEqual([
+      '#FFFFFF',
+      null,
+      null,
+      ...Array(compatibilityBars.length - 3).fill('#FDD835'),
+    ]);
+
+    expect(getPlot(result, 'Masked Char').values).toEqual([
+      2,
+      null,
+      null,
+      ...Array(compatibilityBars.length - 3).fill(-1),
+    ]);
+    expect(getPlot(result, 'Masked Char').color).toEqual([
+      '#4CAF50',
+      null,
+      null,
+      ...Array(compatibilityBars.length - 3).fill('#F23645'),
+    ]);
+    expect(getPlot(result, 'Masked Char').textColor).toEqual([
+      '#FFFFFF',
+      null,
+      null,
+      ...Array(compatibilityBars.length - 3).fill('#FDD835'),
     ]);
   });
 
