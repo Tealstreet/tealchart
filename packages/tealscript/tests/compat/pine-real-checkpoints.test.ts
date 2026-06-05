@@ -334,6 +334,46 @@ plot(standardLength, title="Standard Length")
     expect(getPlot(result, 'Standard Length').values).toEqual([11, 11, 11]);
   });
 
+  it('locks a reduced public synthetic ticker trend idiom', () => {
+    // Public idiom reference: public trend indicators commonly request
+    // Heikin-Ashi synthetic ticker data for smoothed direction signals.
+    // Source search: https://www.tradingview.com/scripts/search/heikin%20ashi%20trend/
+    const chartBars: Bar[] = [
+      { time: 1_700_210_000_000, open: 10, high: 11, low: 9, close: 10, volume: 100 },
+      { time: 1_700_210_060_000, open: 10, high: 11, low: 9, close: 10, volume: 100 },
+      { time: 1_700_210_120_000, open: 10, high: 11, low: 9, close: 10, volume: 100 },
+      { time: 1_700_210_180_000, open: 10, high: 11, low: 9, close: 10, volume: 100 },
+    ];
+    const requestDatafeed = new InMemoryRequestDatafeed([
+      {
+        symbol: 'NASDAQ:AAPL',
+        timeframe: '1',
+        bars: [
+          { time: 1_700_210_000_000, open: 100, high: 106, low: 99, close: 105, volume: 1_000 },
+          { time: 1_700_210_060_000, open: 105, high: 108, low: 104, close: 107, volume: 1_100 },
+          { time: 1_700_210_120_000, open: 107, high: 110, low: 106, close: 109, volume: 1_200 },
+          { time: 1_700_210_180_000, open: 109, high: 110, low: 102, close: 103, volume: 1_300 },
+        ],
+        syminfo: { ticker: 'NASDAQ:AAPL', timezone: 'Etc/UTC' },
+      },
+    ]);
+    const result = runCompatScript(`
+indicator("Public Synthetic Ticker Checkpoint")
+haTicker = ticker.heikinashi("NASDAQ:AAPL")
+haClose = request.security(haTicker, "1", close, lookahead=barmerge.lookahead_on)
+haTrend = haClose > haClose[1]
+plot(haClose, title="HA Close")
+plot(haTrend ? 1 : 0, title="HA Trend")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'HA Close').values).toEqual([102.5, 106, 108, 106]);
+    expect(getPlot(result, 'HA Trend').values).toEqual([0, 1, 1, 0]);
+  });
+
   it('locks a reduced public pivot-divergence idiom', () => {
     // Public idiom reference: divergence scripts compare sequential price
     // pivots against lower oscillator pivots.
