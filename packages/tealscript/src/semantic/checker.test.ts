@@ -5968,6 +5968,42 @@ plot(valid + kept.value + str.length(enumDescription) + missing + unknown + dupl
     expect(types.get('enumDescription')).toMatchObject({ kind: 'string' });
   });
 
+  it('binds exported imported enum members semantically', () => {
+    const library = parse(`
+library("SignalTools", true)
+export enum State
+    long = "Long"
+    short = "Short"
+enum Hidden
+    private = "Private"
+export describe(State state) => "enum"
+`);
+    const result = checkProgram(parse(`
+indicator("Imported Enum Binding")
+import TestUser/SignalTools/1 as sig
+method label(sig.State this) => "enum"
+shadow(int sig) => sig.State.sideways
+sig.State selected = sig.State.long
+validDescription = sig.describe(sig.State.short)
+validLabel = sig.State.long.label()
+missing = sig.State.sideways
+hidden = sig.Hidden.private
+plot(str.length(validDescription) + str.length(validLabel) + str.length(shadow(1)))
+`), {
+      libraries: new Map([['TestUser/SignalTools/1', library]]),
+    });
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown enum member 'sideways' on enum sig.State",
+    ]);
+    expect(types.get('selected')).toMatchObject({ kind: 'udt', name: 'sig.State' });
+    expect(types.get('validDescription')).toMatchObject({ kind: 'string' });
+    expect(types.get('validLabel')).toMatchObject({ kind: 'string' });
+    expect(types.get('hidden')).toMatchObject({ kind: 'unknown' });
+  });
+
   it('validates imported library type constructors and fields semantically', () => {
     const library = parse(`
 library("PivotTools", true)

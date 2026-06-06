@@ -104,7 +104,7 @@ interface SemanticImportedLibrary {
   alias: string;
   functions: Map<string, FunctionDeclaration>;
   types: Map<string, TypeDeclaration>;
-  enumTypeNames: Set<string>;
+  enums: Map<string, EnumDeclaration>;
   methods: Map<string, FunctionDeclaration[]>;
 }
 
@@ -1563,14 +1563,14 @@ class SemanticChecker {
       if (!libraryProgram) continue;
 
       const types = new Map<string, TypeDeclaration>();
-      const enumTypeNames = new Set<string>();
+      const enums = new Map<string, EnumDeclaration>();
       const functions = new Map<string, FunctionDeclaration>();
       const methods = new Map<string, FunctionDeclaration[]>();
       for (const libraryStatement of libraryProgram.body) {
         if (libraryStatement.type === 'TypeDeclaration' && libraryStatement.exported) {
           types.set(libraryStatement.name.name, libraryStatement);
         } else if (libraryStatement.type === 'EnumDeclaration' && libraryStatement.exported) {
-          enumTypeNames.add(libraryStatement.name.name);
+          enums.set(libraryStatement.name.name, libraryStatement);
         } else if (libraryStatement.type === 'FunctionDeclaration' && libraryStatement.isMethod && libraryStatement.exported) {
           const overloads = methods.get(libraryStatement.name.name) ?? [];
           overloads.push(libraryStatement);
@@ -1584,7 +1584,7 @@ class SemanticChecker {
         alias: statement.alias.name,
         functions,
         types,
-        enumTypeNames,
+        enums,
         methods,
       });
     }
@@ -3006,6 +3006,9 @@ class SemanticChecker {
     if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
       return;
     }
+    if (this.checkImportedEnumMemberExpression(expression, scope)) {
+      return;
+    }
     if (expression.object.type === 'Identifier') {
       const objectSymbol = scope.lookup(expression.object.name);
       if (objectSymbol?.kind === 'type') {
@@ -3043,6 +3046,25 @@ class SemanticChecker {
       `Unknown enum member '${expression.property.name}' on enum ${enumDeclaration.name.name}`,
       expression.property.loc,
     );
+  }
+
+  private checkImportedEnumMemberExpression(expression: MemberExpression, scope: SemanticScope): boolean {
+    const path = this.memberPath(expression);
+    if (path.length !== 3) return false;
+
+    const [alias, enumName, fieldName] = path;
+    if (!alias || !enumName || !fieldName || scope.lookup(alias)?.kind !== 'import') return false;
+
+    const enumDeclaration = this.importedLibraries.get(alias)?.enums.get(enumName);
+    if (!enumDeclaration) return false;
+    if (enumDeclaration.fields.some((field) => field.name.name === fieldName)) return true;
+
+    this.addDiagnostic(
+      'unknown-enum-member',
+      `Unknown enum member '${fieldName}' on enum ${alias}.${enumDeclaration.name.name}`,
+      expression.property.loc,
+    );
+    return true;
   }
 
   private checkIndexExpression(expression: IndexExpression, scope: SemanticScope): void {
@@ -5821,9 +5843,16 @@ class SemanticChecker {
   private inferEnumMemberType(expression: MemberExpression, scope: SemanticScope): SemanticType | undefined {
     const path = this.memberPath(expression);
     if (path.length === 3) {
-      const [alias, enumName] = path;
+      const [alias, enumName, fieldName] = path;
       if (alias && enumName && scope.lookup(alias)?.kind === 'import') {
-        return { kind: 'udt', name: `${alias}.${enumName}`, qualifier: 'const' };
+        const library = this.importedLibraries.get(alias);
+        if (!library) {
+          return { kind: 'udt', name: `${alias}.${enumName}`, qualifier: 'const' };
+        }
+        const enumDeclaration = library.enums.get(enumName);
+        if (enumDeclaration?.fields.some((field) => field.name.name === fieldName)) {
+          return { kind: 'udt', name: `${alias}.${enumName}`, qualifier: 'const' };
+        }
       }
     }
 
@@ -5860,7 +5889,7 @@ class SemanticChecker {
     const [alias, importedTypeName] = typeName.split('.');
     if (!alias || !importedTypeName) return false;
     const library = this.importedLibraries.get(alias);
-    return !!library && (library.types.has(importedTypeName) || library.enumTypeNames.has(importedTypeName));
+    return !!library && (library.types.has(importedTypeName) || library.enums.has(importedTypeName));
   }
 
   private importedSemanticTypeFromAnnotation(libraryAlias: string, annotation?: TypeAnnotation | null): SemanticType | undefined {
@@ -5885,7 +5914,7 @@ class SemanticChecker {
     if (type.kind !== 'udt' || !type.name || type.name.includes('.')) return type;
 
     const library = this.importedLibraries.get(libraryAlias);
-    return library && (library.types.has(type.name) || library.enumTypeNames.has(type.name))
+    return library && (library.types.has(type.name) || library.enums.has(type.name))
       ? { ...type, name: `${libraryAlias}.${type.name}` }
       : type;
   }
