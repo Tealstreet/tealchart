@@ -45,10 +45,11 @@ arrays, bar coloring, alerts, strategy entry/exit flows, request-limit reuse,
 explicit `max_bars_back` metadata, official lower-timeframe request arrays,
 official synthetic ticker requests, official dynamic sessions, official
 timeframe comparisons, official plot-style payloads, and public MTF,
-divergence, session-filter, session-state, dashboard-table, multi-symbol
-screener, currency conversion, earnings event markers, corporate-action
-overlays, financial dashboards, economic macro overlays, seed dataset overlays,
-drawing-zone, linefill-channel, custom-candle, and library-helper idioms.
+divergence, volatility-band overlays, session-filter, session-state,
+dashboard-table, multi-symbol screener, currency conversion, earnings event
+markers, corporate-action overlays, financial dashboards, economic macro
+overlays, seed dataset overlays, drawing-zone, linefill-channel, custom-candle,
+and library-helper idioms.
 Public-source coverage also includes alert signal metadata, direct alert
 emission, Heikin-Ashi synthetic ticker trend requests, public zigzag polylines,
 public strategy performance tables, plus UDT state objects updated through
@@ -547,9 +548,9 @@ plotchar, and plotarrow outputs, and marker payloads preserve dynamic
 `textcolor` series for per-bar rendering. Hidden `plotshape()` and `plotchar()`
 bars now emit null body and text-color payloads so consumers do not render
 stale marker styling where Pine would show no marker. The source-linked
-checkpoint corpus tracks marker payloads and common `plot.style_*` payloads
-through official visual checkpoints plus a reduced public buy/sell marker
-signal checkpoint.
+checkpoint corpus tracks marker payloads, common `plot.style_*` payloads,
+filled plot channels, and background masks through official visual checkpoints
+plus reduced public buy/sell marker signal and volatility-band checkpoints.
 
 Hline renderer coverage applies Pine `hline()` color, linewidth, linestyle,
 display hiding, and pane-coordinate behavior for the current output shape.
