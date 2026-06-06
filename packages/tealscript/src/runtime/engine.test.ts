@@ -7606,6 +7606,19 @@ plot(ta.tr[3], title="TR")`;
       expect(result.profile.maxBarsBack).toBe(4);
     });
 
+    it('statically reports unexecuted true-range helper lookbacks in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static TR Profile")
+if false
+    plot(ta.tr(true), title="TR")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(1);
+    });
+
     it('statically reports unexecuted MACD lookback lengths in the runtime profile', () => {
       const script = `//@version=6
 indicator("Static MACD Profile")
