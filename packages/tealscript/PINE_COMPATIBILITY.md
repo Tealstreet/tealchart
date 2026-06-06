@@ -222,7 +222,11 @@ two-argument calls. Event and cross helpers accept named `condition`/`source`
 arguments and cross helper `source1`/`source2` arguments. Numeric `ta.change()`,
 `ta.rsi()`, `ta.atr()`, `ta.hma()`, pivot helpers, and cross helpers preserve
 per-call previous values for derived source expressions. These are covered in
-the golden compatibility harness. `ta.rma()`, `ta.rsi()`, and `ta.atr()` use
+the golden compatibility harness. Common rolling helpers preserve direct
+OHLCV, quote, and derived OHLC source identity for calls such as
+`ta.sma(open, 2)`, `math.sum(open, 2)`, and `ta.correlation(open, close, 2)`,
+so equal current-bar source values no longer collapse to the wrong history
+series. `ta.rma()`, `ta.rsi()`, and `ta.atr()` use
 Pine's SMA-seeded RMA warmup before recursive smoothing; `ta.atr()` is covered
 as the RMA of `ta.tr(true)`.
 Recursive `ta.atr()` smoothing state, `ta.rsi()`
