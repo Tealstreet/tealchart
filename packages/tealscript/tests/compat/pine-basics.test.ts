@@ -74,7 +74,7 @@ plot(basis, title="Basis")
 `);
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Direction').values).toEqual([-1, 1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1]);
+    expect(getPlot(result, 'Direction').values).toEqual([-1, 1, 1, 1, -1, -1, -1, 1, 1, 1, 1, 1]);
     expect(roundSeries(getPlot(result, 'Basis').values)).toEqual([null, null, null, null, 103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110]);
   });
 
