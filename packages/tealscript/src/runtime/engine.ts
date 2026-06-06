@@ -7073,6 +7073,7 @@ export class TealscriptEngine {
         || name === 'ta.cross'
         || name === 'ta.crossover'
         || name === 'ta.crossunder'
+        || name === 'ta.atr'
         || name === 'ta.dmi'
         || name === 'ta.macd'
         || name === 'ta.obv'
@@ -9629,50 +9630,16 @@ export class TealscriptEngine {
     });
 
     // ATR - Average True Range
-    this.builtins.set('ta.atr', (args, namedArgs, ctx, scope, callId) => {
+    this.builtins.set('ta.atr', (args, namedArgs, _ctx, scope, callId) => {
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 0, 'length'));
       this.recordLookbackLength(length + 1);
-
-      // Calculate True Range
-      const high = ctx.high.get(0)!;
-      const low = ctx.low.get(0)!;
-      const prevClose = ctx.close.get(1);
-
-      let tr: number;
-      if (prevClose === undefined) {
-        tr = high - low;
-      } else {
-        tr = Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose));
-      }
-
-      // Use RMA (Wilder's smoothing) for ATR
-      const atrKey = `_ta_atr_${callId}_${length}`;
-      let prevAtr = scope.get(atrKey) as number | undefined;
-
-      let atr: number;
-      if (prevAtr === undefined || isNaN(prevAtr)) {
-        // Initialize with simple average of TR
-        let sum = 0;
-        for (let i = 0; i < length; i++) {
-          const h = ctx.high.get(i);
-          const l = ctx.low.get(i);
-          const pc = ctx.close.get(i + 1);
-          if (h === undefined || l === undefined) continue;
-
-          let t = h - l;
-          if (pc !== undefined) {
-            t = Math.max(h - l, Math.abs(h - pc), Math.abs(l - pc));
-          }
-          sum += t;
-        }
-        atr = sum / length;
-      } else {
-        // Wilder's smoothing
-        atr = (prevAtr * (length - 1) + tr) / length;
-      }
-
-      this.setBuiltinState(scope, atrKey, atr);
-      return atr;
+      return this.updateBuiltinRmaState(
+        scope,
+        `_ta_atr_${callId}_${length}`,
+        `_ta_atr_tr_source_${callId}_${length}`,
+        this.currentTrueRange(true),
+        length,
+      );
     });
 
     // MACD - returns [macdLine, signalLine, histogram]

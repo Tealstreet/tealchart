@@ -188,8 +188,8 @@ fixed/default lookback helpers such as `ta.cross()`, `ta.crossover()`,
 source-window, retained-source, recursive, and selected default-argument helpers
 such as `ta.macd(close)`, `ta.cmo(source)`, `ta.mom(source)`, `ta.roc(source)`,
 and `ta.cci(source)`, plus oscillator helpers such as `ta.stoch()`, `ta.mfi()`,
-and `ta.wpr()`, plus remaining common TA helpers such as `ta.atr()`,
-`ta.hma()`, `ta.kc()`, `ta.kcw()`, `ta.tsi()`, `ta.dmi()`,
+and `ta.wpr()`, plus common TA helpers such as `ta.atr()`, `ta.hma()`,
+`ta.kc()`, `ta.kcw()`, `ta.tsi()`, `ta.dmi()`,
 `ta.supertrend()`, `ta.sar()`, and `ta.obv()` also contribute static lookback
 requirements when their length arguments are static, including default-source
 highest/lowest lookback forms and pivot left/right windows. Runtime-observed
@@ -219,9 +219,11 @@ statistical helper pass covers `ta.median`, `ta.mode`,
 common Pine named arguments, and pivot helpers support default-source
 two-argument calls. Event and cross helpers accept named `condition`/`source`
 arguments and cross helper `source1`/`source2` arguments. Numeric `ta.change()`,
-`ta.rsi()`, `ta.hma()`, pivot helpers, and cross helpers preserve per-call
-previous values for derived source expressions. These are covered in the golden compatibility harness. `ta.rma()`
-and `ta.rsi()` use Pine's SMA-seeded RMA warmup before recursive smoothing.
+`ta.rsi()`, `ta.atr()`, `ta.hma()`, pivot helpers, and cross helpers preserve
+per-call previous values for derived source expressions. These are covered in
+the golden compatibility harness. `ta.rma()`, `ta.rsi()`, and `ta.atr()` use
+Pine's SMA-seeded RMA warmup before recursive smoothing; `ta.atr()` is covered
+as the RMA of `ta.tr(true)`.
 Recursive `ta.atr()` smoothing state, `ta.rsi()`
 smoothing state, `ta.dmi()` tuple smoothing state, `ta.supertrend()` tuple
 state, and `ta.sar()` trend state are isolated per call site so repeated
