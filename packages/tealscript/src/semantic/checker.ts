@@ -854,6 +854,7 @@ const STRATEGY_NUMERIC_PARAMETER_NAMES = new Set([
   'trail_offset',
   'contracts',
   'count',
+  'trade_num',
 ]);
 const STRATEGY_NUMERIC_VALUE_PARAMETER_CALLS = new Set([
   'strategy.risk.max_drawdown',
