@@ -239,6 +239,36 @@ plot(bar_index >= 1 ? ta.sma(st.scaled(open), 2) : na, title="Imported Scaled Av
     expect(getPlot(result, 'Imported Scaled Average').values).toEqual([null, 30, 50]);
   });
 
+  it('preserves source identity through imported same-arithmetic branch returns', () => {
+    const library = parse(`
+library("SourceTools", true)
+export conditionalMidpoint() => bar_index >= 0 ? (high + low) / 2 : (high + low) / 2
+export switchScaled(series float src) => switch
+    bar_index >= 0 => src * 2
+    => src * 2
+`);
+
+    const result = runCompatScript(`
+indicator("Imported arithmetic branch source identity")
+import TestUser/SourceTools/1 as st
+plot(bar_index >= 1 ? ta.sma(st.conditionalMidpoint(), 2) : na, title="Imported Conditional Arithmetic Average")
+plot(bar_index >= 1 ? ta.sma(st.switchScaled(open), 2) : na, title="Imported Switch Arithmetic Average")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 18, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ],
+      engineOptions: {
+        libraries: new Map([['TestUser/SourceTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Imported Conditional Arithmetic Average').values).toEqual([null, 15, 25]);
+    expect(getPlot(result, 'Imported Switch Arithmetic Average').values).toEqual([null, 30, 50]);
+  });
+
   it('keeps imported library function var state isolated per call site', () => {
     const library = parse(`
 library("Counters", true)
