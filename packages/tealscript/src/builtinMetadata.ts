@@ -7,6 +7,8 @@ export interface BuiltinGlobalTypeMetadata {
 
 export const BUILTIN_GLOBALS = new Set([
   'bar_index',
+  'ask',
+  'bid',
   'close',
   'hl2',
   'hlc3',
@@ -33,7 +35,9 @@ export const BUILTIN_GLOBALS = new Set([
 ]);
 
 export const BUILTIN_GLOBAL_TYPES = new Map<string, BuiltinGlobalTypeMetadata>([
+  ['ask', { kind: 'float', qualifier: 'series' }],
   ['bar_index', { kind: 'int', qualifier: 'series' }],
+  ['bid', { kind: 'float', qualifier: 'series' }],
   ['close', { kind: 'float', qualifier: 'series' }],
   ['high', { kind: 'float', qualifier: 'series' }],
   ['hl2', { kind: 'float', qualifier: 'series' }],
