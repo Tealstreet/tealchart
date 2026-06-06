@@ -7645,7 +7645,7 @@ export class TealscriptEngine {
       if (type === 'price') {
         return commonMetadata(args, namedArgs, inputSimpleArgs, 2);
       }
-      if (type === 'string' || type === 'timeframe') {
+      if (type === 'string' || type === 'timeframe' || type === 'enum') {
         return {
           options: optionsArg(args, namedArgs, inputOptionsArgs),
           ...commonMetadata(args, namedArgs, inputOptionsArgs, 3),
@@ -7664,7 +7664,7 @@ export class TealscriptEngine {
       if (type === 'bool' && typeof defval !== 'boolean') {
         throw new Error('input.bool defval must be a boolean');
       }
-      if ((type === 'string' || type === 'timeframe' || type === 'symbol' || type === 'session' || type === 'text_area') && typeof defval !== 'string') {
+      if ((type === 'string' || type === 'timeframe' || type === 'symbol' || type === 'session' || type === 'text_area' || type === 'enum') && typeof defval !== 'string') {
         throw new Error(`input.${type} defval must be a string`);
       }
       if (metadata.minval !== undefined && typeof defval === 'number' && defval < metadata.minval) {
@@ -7716,6 +7716,7 @@ export class TealscriptEngine {
     this.builtins.set('input.symbol', createInputFunc('symbol'));
     this.builtins.set('input.session', createInputFunc('session'));
     this.builtins.set('input.text_area', createInputFunc('text_area'));
+    this.builtins.set('input.enum', createInputFunc('enum'));
 
     // input.source is special - it returns a series
     this.builtins.set('input.source', (args, namedArgs, ctx) => {

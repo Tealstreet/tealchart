@@ -286,7 +286,7 @@ export interface LogOutput {
  */
 export interface InputDefinition {
   id: string;
-  type: 'int' | 'float' | 'bool' | 'string' | 'source' | 'color' | 'price' | 'time' | 'timeframe' | 'symbol' | 'session' | 'text_area';
+  type: 'int' | 'float' | 'bool' | 'string' | 'source' | 'color' | 'price' | 'time' | 'timeframe' | 'symbol' | 'session' | 'text_area' | 'enum';
   title: string;
   defval: unknown;
   minval?: number;
