@@ -5,7 +5,7 @@ import type { CanvasContext } from './rendering';
 import type { Bar, ChartMargins, RenderOptions, ResolutionString, Viewport } from './types';
 
 import { WebCanvasContext } from './rendering';
-import { AVAILABLE_TIMEFRAMES, getChartStore } from './state/chartState';
+import { getChartStore } from './state/chartState';
 import { TealchartRenderer } from './TealchartRenderer';
 import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from './types';
 import { ChartTopBar } from './ui/ChartTopBar';

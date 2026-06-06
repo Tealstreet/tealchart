@@ -68,7 +68,7 @@ export function fromTvFormat(chartData: TvChartData | string): TransformResult<C
         }
       }
     }
-  } catch (e) {
+  } catch (_e) {
     warnings.push('Failed to parse chart content as JSON');
     return {
       data: getDefaultSettings(),

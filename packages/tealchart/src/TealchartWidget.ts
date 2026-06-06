@@ -2082,7 +2082,7 @@ export class TealchartWidget {
   /**
    * Get chart API by index
    */
-  chart(index?: number): TealchartApi {
+  chart(_index?: number): TealchartApi {
     // Only support single chart for now
     return this._chartApi;
   }
@@ -2393,7 +2393,7 @@ export class TealchartWidget {
    * Load chart state
    * @stub Not yet implemented
    */
-  load(state: object): Promise<void> {
+  load(_state: object): Promise<void> {
     this._logger?.warn(LogCategory.Layout, 'Method not implemented: load');
     // TODO: Implement state restoration
     return Promise.resolve();
@@ -2403,7 +2403,7 @@ export class TealchartWidget {
    * Save chart to server
    * @stub Not yet implemented
    */
-  saveChartToServer(onComplete?: () => void, onFail?: () => void, options?: { chartName?: string }): void {
+  saveChartToServer(_onComplete?: () => void, onFail?: () => void, _options?: { chartName?: string }): void {
     this._logger?.warn(LogCategory.Layout, 'Method not implemented: saveChartToServer');
     onFail?.();
   }
@@ -2418,8 +2418,8 @@ export class TealchartWidget {
   private _handleLoadLayout(
     settings: ChartSettings,
     warnings: string[],
-    layoutId: string | number,
-    layoutName: string,
+    _layoutId: string | number,
+    _layoutName: string,
   ): void {
     if (warnings.length > 0) {
       this._logger?.warn(LogCategory.Layout, 'Layout load warnings', warnings);

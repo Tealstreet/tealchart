@@ -509,8 +509,6 @@ export class PriceLineManager {
     this.crosshairVertical = null;
     this.crosshairHorizontal = null;
 
-    const { width, margins, priceToY } = this.options;
-
     // Check if we need countdown timer
     const hasCountdown = this.labelBounds.some((b) => b.countdownToTime !== undefined);
     if (hasCountdown && !this.countdownTimer) {
@@ -544,7 +542,7 @@ export class PriceLineManager {
   }
 
   private renderPriceLine(bound: PriceLineLabelBounds): void {
-    const { width, height, margins, priceToY, yToPrice } = this.options;
+    const { width, margins, priceToY } = this.options;
     const lineY = priceToY(bound.price);
     const lineType = bound.type || 'price';
     const isPending = this.pendingOrders.has(bound.lineId);
@@ -692,7 +690,7 @@ export class PriceLineManager {
     priceAxisLabelY: number,
     lineDash: number[],
   ): void {
-    const { width, margins, yToPrice, priceToY } = this.options;
+    const { width, margins, yToPrice } = this.options;
     const fontFamily = this.getTextFontFamily();
     const chartLabel = bound.chartLabel;
     const isDraggable = bound.draggable ?? false;
@@ -891,7 +889,6 @@ export class PriceLineManager {
         const prevButton = orderedButtons[i - 1];
         const nextButton = orderedButtons[i + 1];
         const startsTPSLGroup = isTPSL && prevButton && prevButton.type !== 'tp' && prevButton.type !== 'sl';
-        const isFirstInline = !isTPSL && (!prevButton || prevButton.type === 'tp' || prevButton.type === 'sl');
         const isLastInline = !isTPSL && (!nextButton || nextButton.type === 'tp' || nextButton.type === 'sl');
         const isFirstTPSL = isTPSL && (!prevButton || prevButton.type !== 'tp' && prevButton.type !== 'sl');
         const isLastTPSL = isTPSL && (!nextButton || nextButton.type !== 'tp' && nextButton.type !== 'sl');

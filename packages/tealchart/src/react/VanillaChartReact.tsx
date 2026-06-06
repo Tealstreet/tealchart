@@ -29,7 +29,7 @@
 import type { SimpleChartOptions } from '../TealchartVanilla';
 import type { Bar, ResolutionString, Viewport } from '../types';
 
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 import { createSimpleChart, SimpleChart } from '../TealchartVanilla';
 

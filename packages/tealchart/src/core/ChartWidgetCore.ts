@@ -393,7 +393,7 @@ export class ChartWidgetCore {
   // Indicator Management
   // ============================================================================
 
-  addIndicator(indicator: BuiltinIndicator, inputs?: Record<string, unknown>): string | null {
+  addIndicator(_indicator: BuiltinIndicator, _inputs?: Record<string, unknown>): string | null {
     // To be implemented by subclasses that support indicators
     console.warn('[ChartWidgetCore] addIndicator not implemented');
     return null;

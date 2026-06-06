@@ -8,8 +8,6 @@
 import type {
   ChartPane,
   ComputedPane,
-  // Legacy types for backward compatibility
-  IndicatorPane,
   PaneLayout,
   UnifiedPaneLayout,
 } from '../types';
