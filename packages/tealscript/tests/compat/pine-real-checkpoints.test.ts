@@ -1329,6 +1329,116 @@ plot(slow, title="Slow Average")
     ]);
   });
 
+  it('locks a reduced public dashboard table setter idiom', () => {
+    // Public idiom reference: dashboard-style public indicators often create a
+    // persistent table and update its position, frame, cells, and tooltips only
+    // on the last bar.
+    // Source search: https://www.tradingview.com/scripts/search/dashboard%20table%20settings/
+    const result = runCompatScript(`
+indicator("Public Table Setter Checkpoint", overlay=true)
+fast = ta.sma(close, 2)
+slow = ta.sma(close, 4)
+bull = fast > slow
+score = bull ? 1 : -1
+var board = table.new(position.top_right, 3, 3, bgcolor=color.new(color.black, 90), frame_color=color.gray, frame_width=1, border_color=color.white, border_width=1)
+if barstate.islast
+    table.set_position(board, position.bottom_right)
+    table.set_bgcolor(board, color.new(color.blue, 85))
+    table.set_frame_color(board, color.green)
+    table.set_frame_width(board, 2)
+    table.set_border_color(board, color.yellow)
+    table.set_border_width(board, 2)
+    table.cell(board, 0, 0, "Signal", text_color=color.white, bgcolor=color.blue)
+    table.cell(board, 1, 0, "Value", text_color=color.white, bgcolor=color.blue)
+    table.cell(board, 2, 0, "State", text_color=color.white, bgcolor=color.blue)
+    table.merge_cells(board, 0, 0, 2, 0)
+    table.cell(board, 0, 1, "Trend", text_color=color.white, bgcolor=color.gray)
+    table.cell(board, 1, 1, str.tostring(score), text_color=color.white, bgcolor=bull ? color.green : color.red)
+    table.cell(board, 2, 1, bull ? "Bull" : "Bear", text_color=color.white, bgcolor=bull ? color.green : color.red)
+    table.cell(board, 0, 2, "Fast", text_color=color.white, bgcolor=color.gray)
+    table.cell(board, 1, 2, str.tostring(fast, "#.00"), text_color=color.black, bgcolor=color.yellow)
+    table.cell(board, 2, 2, str.tostring(slow, "#.00"), text_color=color.black, bgcolor=color.yellow)
+    table.cell_set_text(board, 0, 0, "Signal Summary")
+    table.cell_set_text_color(board, 0, 0, color.black)
+    table.cell_set_bgcolor(board, 0, 0, color.yellow)
+    table.cell_set_text_halign(board, 0, 0, text.align_center)
+    table.cell_set_text_valign(board, 0, 0, text.align_middle)
+    table.cell_set_width(board, 1, 1, 64)
+    table.cell_set_height(board, 1, 1, 24)
+    table.cell_set_tooltip(board, 2, 1, "Last signal state")
+plot(score, title="Dashboard Score")
+plot(fast, title="Fast Average")
+plot(slow, title="Slow Average")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Dashboard Score').values).toEqual([-1, -1, -1, 1, -1, -1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Fast Average').values)).toEqual([
+      null,
+      103.5,
+      106,
+      105,
+      101,
+      99.5,
+      102,
+      106.5,
+      108.5,
+      109.5,
+      110.5,
+      111,
+    ]);
+    expect(roundSeries(getPlot(result, 'Slow Average').values)).toEqual([
+      null,
+      null,
+      null,
+      104.25,
+      103.5,
+      102.25,
+      101.5,
+      103,
+      105.25,
+      108,
+      109.5,
+      110.25,
+    ]);
+    expect(result.drawings).toContainEqual(
+      expect.objectContaining({
+        type: 'table',
+        position: 'bottom_right',
+        columns: 3,
+        rows: 3,
+        bgcolor: '#2196F326',
+        frameColor: '#4CAF50',
+        frameWidth: 2,
+        borderColor: '#FDD835',
+        borderWidth: 2,
+        cells: expect.arrayContaining([
+          expect.objectContaining({
+            column: 0,
+            row: 0,
+            text: 'Signal Summary',
+            textColor: '#363A45',
+            textHalign: 'center',
+            textValign: 'middle',
+            bgcolor: '#FDD835',
+          }),
+          expect.objectContaining({ column: 1, row: 1, text: '1', width: 64, height: 24, bgcolor: '#4CAF50' }),
+          expect.objectContaining({
+            column: 2,
+            row: 1,
+            text: 'Bull',
+            textColor: '#FFFFFF',
+            bgcolor: '#4CAF50',
+            tooltip: 'Last signal state',
+          }),
+          expect.objectContaining({ column: 1, row: 2, text: '111.00', textColor: '#363A45', bgcolor: '#FDD835' }),
+          expect.objectContaining({ column: 2, row: 2, text: '110.25', textColor: '#363A45', bgcolor: '#FDD835' }),
+        ]),
+        mergedCells: [{ startColumn: 0, startRow: 0, endColumn: 2, endRow: 0 }],
+      })
+    );
+  });
+
   it('locks a reduced public matrix scoreboard idiom', () => {
     // Public idiom reference: matrix-heavy public dashboards commonly turn
     // recent price factors into score matrices and summarize the last bar in a table.

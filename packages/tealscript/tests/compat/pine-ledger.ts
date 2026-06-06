@@ -414,6 +414,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-table-setter-checkpoint',
+      title: 'Public Table Setter Checkpoint',
+      searchContext: 'TradingView public scripts search: dashboard table settings',
+      featureTags: ['tables', 'dashboard', 'visuals', 'table_setters'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-matrix-scoreboard-checkpoint',
       title: 'Public Matrix Scoreboard Checkpoint',
       searchContext: 'TradingView public scripts search: matrix dashboard',

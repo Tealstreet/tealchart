@@ -1018,7 +1018,10 @@ percentage-based explicit cell sizes, merged cell spans, cell backgrounds,
 borders, frame borders, text alignment, default/monospace font-family metadata,
 and bold/italic font styling. Runtime coverage also
 guards persistent table handles and transient polylines across realtime
-rollback. Remaining gaps are TradingView-exact sizing and pixel parity.
+rollback. Source-linked public dashboard-table setter checkpoint coverage locks
+last-bar table position/frame/border updates, merged header spans, cell
+dimension setters, alignment, colors, and tooltip payloads. Remaining gaps are
+TradingView-exact sizing and pixel parity.
 
 ## Strategy Diagnostic Coverage
 

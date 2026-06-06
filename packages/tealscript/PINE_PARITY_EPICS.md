@@ -413,7 +413,9 @@ Phases:
 3. Enforce object limits, plot limits, table-cell limits, handle validation,
    deletion/copy behavior, and realtime rollback.
 4. Keep table API work separate inside this epic because the setter surface is
-   broad and easy to let sprawl.
+   broad and easy to let sprawl. Source-linked public dashboard-table setter
+   checkpoint coverage now exercises table position/frame/border setters,
+   merged headers, cell dimensions, alignment, colors, and tooltips.
 5. Add output-oracle fixtures for public idioms that care about metadata more
    than pixels.
 
