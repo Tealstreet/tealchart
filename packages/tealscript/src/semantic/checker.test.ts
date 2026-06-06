@@ -623,6 +623,37 @@ export f(float x) => x
     ]);
   });
 
+  it('reports invalid literal Pine strategy declaration values', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy Settings",
+    initial_capital=-1,
+    default_qty_type="shares",
+    default_qty_value=-1,
+    pyramiding=-1,
+    commission_type="flat",
+    commission_value=-0.1,
+    slippage=-1,
+    margin_long=-1,
+    margin_short=-1,
+    backtest_fill_limits_assumption=-1,
+    close_entries_rule="LIFO")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy initial_capital must be a non-negative number',
+      'Invalid strategy default_qty_type: shares',
+      'strategy default_qty_value must be a non-negative number',
+      'strategy pyramiding must be a non-negative integer',
+      'Invalid strategy commission_type: flat',
+      'strategy commission_value must be a non-negative number',
+      'strategy slippage must be a non-negative integer',
+      'strategy margin_long must be a non-negative number',
+      'strategy margin_short must be a non-negative number',
+      'strategy backtest_fill_limits_assumption must be a non-negative integer',
+      'Invalid strategy close_entries_rule: LIFO',
+    ]);
+  });
+
   it('accepts Pine library positional dynamic requests declarations', () => {
     const result = checkProgram(parse(`
 library("Dynamic Library", true, false)
