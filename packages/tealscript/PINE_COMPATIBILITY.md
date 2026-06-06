@@ -945,9 +945,11 @@ strategy order fills by blocking new non-exit submissions and cancelling excess
 pending non-exit fills after the configured count is reached.
 `strategy.risk.max_cons_loss_days()` caps non-exit orders after the configured
 number of consecutive UTC losing days, based on closed-trade net PnL, and
-cancels pending non-exit fills after the cap is reached. Other common strategy
-risk guards (`max_drawdown` and `max_intraday_loss`) are accepted and stored as
-ledger metadata; exact session halt and forced-close enforcement remains a
+cancels pending non-exit fills after the cap is reached.
+`strategy.risk.max_intraday_loss()` caps non-exit orders after the same-UTC-day
+equity-curve loss from peak equity reaches the configured cash or
+percent-of-equity value. `strategy.risk.max_drawdown()` is accepted and stored
+as ledger metadata; exact session halt and forced-close enforcement remains a
 fidelity target. The
 `strategy(..., slippage=...)` setting applies fixed tick slippage to market,
 stop, and trailing-stop fills in trade direction while preserving limit-fill
