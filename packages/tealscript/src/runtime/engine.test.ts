@@ -6329,6 +6329,23 @@ plot(close, title="Close")`;
       expect(result.profile.maxBarsBack).toBe(14);
     });
 
+    it('statically reports unexecuted pivot helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Pivot Profile")
+left = input.int(defval=4, title="Left")
+if false
+    plot(ta.pivothigh(high, left, 3), title="Explicit High")
+    plot(ta.pivotlow(source=low, leftbars=2, rightbars=8), title="Named Low")
+    plot(ta.pivothigh(2, rightbars=5), title="Default High")
+    plot(ta.pivotlow(leftbars=3), title="Defaulted Right Low")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(10);
+    });
+
     it('statically reports unexecuted MACD lookback lengths in the runtime profile', () => {
       const script = `//@version=6
 indicator("Static MACD Profile")

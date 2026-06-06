@@ -1008,6 +1008,9 @@ export class TealscriptEngine {
       case 'ta.highestbars':
       case 'ta.lowestbars':
         return this.inferStaticTaSourceLengthMaxBarsBack(expression, collectionScopes);
+      case 'ta.pivothigh':
+      case 'ta.pivotlow':
+        return this.inferStaticPivotMaxBarsBack(expression, collectionScopes);
       case 'ta.change':
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1, 1);
       case 'ta.rsi':
@@ -1069,6 +1072,29 @@ export class TealscriptEngine {
     }
 
     return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes);
+  }
+
+  private inferStaticPivotMaxBarsBack(expression: CallExpression, collectionScopes: StaticCollectionScopes): number {
+    const usesExplicitSource = expression.arguments.some((argument) => argument.name?.name === 'source')
+      || expression.arguments.filter((argument) => !argument.name).length >= 3;
+    const params = usesExplicitSource ? ['source', 'leftbars', 'rightbars'] : ['leftbars', 'rightbars'];
+    const leftIndex = usesExplicitSource ? 1 : 0;
+    const rightIndex = usesExplicitSource ? 2 : 1;
+    const left = this.inferStaticPivotBarsArgument(expression, params, leftIndex, collectionScopes);
+    const right = this.inferStaticPivotBarsArgument(expression, params, rightIndex, collectionScopes);
+    return left + right;
+  }
+
+  private inferStaticPivotBarsArgument(
+    expression: CallExpression,
+    params: readonly string[],
+    index: number,
+    collectionScopes: StaticCollectionScopes,
+  ): number {
+    const argument = this.getStaticOrderedCallArgument(expression, params, index);
+    const value = argument ? this.inferStaticNumericValue(argument, collectionScopes) : 5;
+    if (value === null || !Number.isFinite(value)) return 0;
+    return Math.max(0, Math.trunc(value));
   }
 
   private inferIfAlternateMaxBarsBack(alternate: IfStatement['alternate'], collectionScopes: StaticCollectionScopes): number {
