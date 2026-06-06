@@ -5925,6 +5925,49 @@ plot(valid.value + str.length(enumDescription) + missing.value + unknown.value +
     expect(types.get('enumDescription')).toMatchObject({ kind: 'string' });
   });
 
+  it('reports imported library function argument diagnostics semantically', () => {
+    const library = parse(`
+library("RangeTools", true)
+export type Pivot
+    float value
+export enum Mode
+    fast = "Fast"
+    slow = "Slow"
+export spread(float highValue, float lowValue, float factor=1) => (highValue - lowValue) * factor
+export keep(Pivot pivot) => pivot
+export describe(Mode mode) => "enum"
+`);
+    const result = checkProgram(parse(`
+indicator("Imported Function Diagnostics")
+import TestUser/RangeTools/1 as rt
+p = rt.Pivot.new(close)
+valid = rt.spread(high, low)
+kept = rt.keep(p)
+enumDescription = rt.describe(rt.Mode.fast)
+missing = rt.spread(high)
+unknown = rt.spread(source=close)
+duplicate = rt.spread(high, low, highValue=close)
+tooMany = rt.spread(high, low, 2, 3)
+badOrder = rt.spread(highValue=high, low)
+plot(valid + kept.value + str.length(enumDescription) + missing + unknown + duplicate + tooMany + badOrder)
+`), {
+      libraries: new Map([['TestUser/RangeTools/1', library]]),
+    });
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "library function rt.spread missing required argument 'lowValue'",
+      "Unknown argument 'source' for library function rt.spread",
+      "Argument 'highValue' for library function rt.spread was supplied multiple times",
+      'Too many arguments for library function rt.spread: expected 3, got 4',
+      'library function rt.spread cannot use positional arguments after named arguments',
+    ]);
+    expect(types.get('valid')).toMatchObject({ kind: 'float' });
+    expect(types.get('kept')).toMatchObject({ kind: 'udt', name: 'rt.Pivot' });
+    expect(types.get('enumDescription')).toMatchObject({ kind: 'string' });
+  });
+
   it('validates imported library type constructors and fields semantically', () => {
     const library = parse(`
 library("PivotTools", true)
