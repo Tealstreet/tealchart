@@ -797,7 +797,8 @@ contexts per script pass so dynamic request scripts cannot create unbounded
 host datafeed work. Obvious invalid literal declaration and request
 `calc_bars_count` values, request `gaps` / `lookahead` modes, and
 point-series request field selectors are reported by semantic diagnostics
-before runtime.
+before runtime. Request `ignore_invalid_*` option flags also report non-boolean
+argument types before runtime.
 Visual output registration enforces Pine's 64 plot-output
 limit while exempting `hline()` outputs. Table creation enforces a conservative
 TealScript sandbox cap of 10,000 declared table cells across live tables.
