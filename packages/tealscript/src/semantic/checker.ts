@@ -5359,10 +5359,10 @@ class SemanticChecker {
     const callable = this.resolveImportedUserFunctionCallable(expression);
     if (!callable) return undefined;
 
-    return this.inferFunctionReturnType(
+    return this.normalizeImportedLibraryReturnType(this.inferFunctionReturnType(
       callable.declaration,
       this.inferImportedCallableParameterTypes(callable.libraryAlias, callable.declaration, expression.arguments, scope),
-    );
+    ));
   }
 
   private inferUserMethodCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
@@ -5382,10 +5382,16 @@ class SemanticChecker {
     const callable = this.resolveImportedUserMethodCallable(expression, scope);
     if (!callable?.libraryAlias) return undefined;
 
-    return this.inferFunctionReturnType(
+    return this.normalizeImportedLibraryReturnType(this.inferFunctionReturnType(
       callable.declaration,
       this.inferImportedCallableParameterTypes(callable.libraryAlias, callable.declaration, expression.arguments, scope),
-    );
+    ));
+  }
+
+  private normalizeImportedLibraryReturnType(type: SemanticType | undefined): SemanticType | undefined {
+    if (!type) return undefined;
+    if (type.qualifier !== 'const' && type.qualifier !== 'input') return type;
+    return { ...type, qualifier: 'simple' };
   }
 
   private inferUserMethodTupleElementTypes(expression: CallExpression, scope: SemanticScope): SemanticType[] | undefined {
