@@ -182,6 +182,16 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: officialDocsEntry({
+      id: 'official-bar-magnifier-recalculate-checkpoint',
+      title: 'Official Bar Magnifier Recalculate Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/strategies/',
+      category: 'strategy',
+      featureTags: ['strategy', 'bar_magnifier', 'intrabar', 'recalculation', 'orders'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
       id: 'official-calc-on-every-tick-checkpoint',
       title: 'Official Calc On Every Tick Checkpoint',
       url: 'https://www.tradingview.com/pine-script-docs/concepts/strategies/',
