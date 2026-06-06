@@ -48,7 +48,7 @@ timeframe comparisons, official plot-style payloads, and public MTF,
 divergence, volatility-band overlays, session-filter, session-state,
 dashboard-table, multi-symbol screener, currency conversion, earnings event
 markers, corporate-action overlays, financial dashboards, economic macro
-overlays, seed dataset overlays, matrix scoreboards, drawing-zone,
+overlays, seed dataset overlays, map signal dashboards, matrix scoreboards, drawing-zone,
 linefill-channel, custom-candle, and library-helper idioms.
 Public-source coverage also includes alert signal metadata, direct alert
 emission, Heikin-Ashi synthetic ticker trend requests, public zigzag polylines,
@@ -420,6 +420,9 @@ Map built-ins accept named reference arguments (`id`, `key`, `value`, `id2`)
 for namespace and method forms, with the implicit method receiver taking
 precedence over any named `id`. Map variables participate in history references
 for documented idioms such as `previous = data[1]`.
+Source-linked public checkpoint coverage also exercises persistent named signal
+state maps, previous-value updates from `put()`, copied snapshots, key-value
+iteration, missing-key checks, and table output.
 
 The parser accepts Pine-style `map<key, value>` declarations and generic
 constructor calls such as `map.new<string, float>()`. Semantic diagnostics

@@ -1322,6 +1322,99 @@ plot(shapeCode, title="Matrix Shape")
     ]);
   });
 
+  it('locks a reduced public map signal-state idiom', () => {
+    // Public idiom reference: public dashboard scripts commonly keep named
+    // signal state in maps before rendering compact last-bar summaries.
+    // Source search: https://www.tradingview.com/scripts/search/map%20dashboard/
+    const result = runCompatScript(`
+indicator("Public Map Signal Checkpoint", overlay=true)
+var map<string, float> scores = map.new<string, float>()
+trend = close > ta.sma(close, 3) ? 1.0 : -1.0
+rangeScore = high - low
+scores.put("Trend", trend)
+scores.put("Range", rangeScore)
+previousClose = scores.put("Close", close)
+snapshot = scores.copy()
+keys = snapshot.keys()
+composite = 0.0
+for [key, value] in snapshot
+    composite += key == "Close" ? value / 100.0 : value
+hasTrend = snapshot.contains("Trend") ? 1 : 0
+missingState = na(snapshot.remove("Missing")) ? 1 : 0
+keyOrder = array.get(keys, 0) == "Trend" ? 1 : 0
+var board = table.new(position.top_right, 2, 4, border_width=1, border_color=color.white)
+if barstate.islast
+    table.cell(board, 0, 0, "Signal", text_color=color.white, bgcolor=color.blue)
+    table.cell(board, 1, 0, "Value", text_color=color.white, bgcolor=color.blue)
+    table.cell(board, 0, 1, "Trend", text_color=color.white, bgcolor=color.gray)
+    table.cell(board, 1, 1, str.tostring(snapshot.get("Trend"), "#.00"), text_color=color.white, bgcolor=snapshot.get("Trend") > 0 ? color.green : color.red)
+    table.cell(board, 0, 2, "Range", text_color=color.white, bgcolor=color.gray)
+    table.cell(board, 1, 2, str.tostring(snapshot.get("Range"), "#.00"), text_color=color.white, bgcolor=color.green)
+    table.cell(board, 0, 3, "Close", text_color=color.white, bgcolor=color.gray)
+    table.cell(board, 1, 3, str.tostring(snapshot.get("Close"), "#.00"), text_color=color.black, bgcolor=color.yellow)
+plot(composite, title="Map Composite")
+plot(previousClose, title="Prior Close")
+plot(snapshot.size(), title="Map Size")
+plot(hasTrend, title="Has Trend")
+plot(missingState, title="Missing State")
+plot(keyOrder, title="Key Order")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Map Composite').values)).toEqual([
+      4.02,
+      5.05,
+      6.07,
+      7.03,
+      5.99,
+      5,
+      8.04,
+      9.09,
+      7.08,
+      7.11,
+      7.1,
+      7.12,
+    ]);
+    expect(getPlot(result, 'Prior Close').values).toEqual([
+      null,
+      102,
+      105,
+      107,
+      103,
+      99,
+      100,
+      104,
+      109,
+      108,
+      111,
+      110,
+    ]);
+    expect(getPlot(result, 'Map Size').values).toEqual(Array(compatibilityBars.length).fill(3));
+    expect(getPlot(result, 'Has Trend').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'Missing State').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'Key Order').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(result.drawings).toEqual([
+      expect.objectContaining({
+        type: 'table',
+        position: 'top_right',
+        columns: 2,
+        rows: 4,
+        borderColor: '#FFFFFF',
+        borderWidth: 1,
+        cells: [
+          expect.objectContaining({ column: 0, row: 0, text: 'Signal', textColor: '#FFFFFF', bgcolor: '#2196F3' }),
+          expect.objectContaining({ column: 1, row: 0, text: 'Value', textColor: '#FFFFFF', bgcolor: '#2196F3' }),
+          expect.objectContaining({ column: 0, row: 1, text: 'Trend', textColor: '#FFFFFF', bgcolor: '#787B86' }),
+          expect.objectContaining({ column: 1, row: 1, text: '1.00', textColor: '#FFFFFF', bgcolor: '#4CAF50' }),
+          expect.objectContaining({ column: 0, row: 2, text: 'Range', textColor: '#FFFFFF', bgcolor: '#787B86' }),
+          expect.objectContaining({ column: 1, row: 2, text: '5.00', textColor: '#FFFFFF', bgcolor: '#4CAF50' }),
+          expect.objectContaining({ column: 0, row: 3, text: 'Close', textColor: '#FFFFFF', bgcolor: '#787B86' }),
+          expect.objectContaining({ column: 1, row: 3, text: '112.00', textColor: '#363A45', bgcolor: '#FDD835' }),
+        ],
+      }),
+    ]);
+  });
+
   it('locks a reduced public multi-symbol screener idiom', () => {
     // Public idiom reference: screener-style public indicators commonly use
     // request.security() for several symbols and summarize signals in a table.
