@@ -421,6 +421,29 @@ map<string, sig.State> stateBySymbol = na
         defaultValue: expect.objectContaining({ name: 'close' }),
       }));
     });
+
+    it('parses user-defined type field defaults on continuation lines', () => {
+      const ast = parse(`type WrappedDefaults
+    float level =
+        close + open
+    varip int updates =
+        0
+    lastPrice =
+        close
+`);
+      const declaration = ast.body[0] as TypeDeclaration;
+
+      expect(declaration.type).toBe('TypeDeclaration');
+      expect(declaration.fields.map((field) => ({
+        name: field.name.name,
+        varip: field.varip,
+        defaultValue: field.defaultValue?.type,
+      }))).toEqual([
+        { name: 'level', varip: false, defaultValue: 'BinaryExpression' },
+        { name: 'updates', varip: true, defaultValue: 'NumericLiteral' },
+        { name: 'lastPrice', varip: false, defaultValue: 'Identifier' },
+      ]);
+    });
   });
 
   describe('Function declarations', () => {
