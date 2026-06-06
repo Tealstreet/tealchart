@@ -640,6 +640,23 @@ const STRATEGY_STRING_PARAMETER_NAMES = new Set([
   'alert_loss',
   'alert_trailing',
 ]);
+const STRATEGY_NUMERIC_PARAMETER_NAMES = new Set([
+  'qty',
+  'limit',
+  'stop',
+  'qty_percent',
+  'profit',
+  'loss',
+  'trail_price',
+  'trail_points',
+  'trail_offset',
+  'contracts',
+  'count',
+]);
+const STRATEGY_NUMERIC_VALUE_PARAMETER_CALLS = new Set([
+  'strategy.risk.max_drawdown',
+  'strategy.risk.max_intraday_loss',
+]);
 const STRATEGY_TRADE_ACCESSORS = [
   'entry_id',
   'entry_comment',
@@ -3444,6 +3461,7 @@ class SemanticChecker {
     this.checkStrategyLiteralArgumentConstraints(expression);
     this.checkStrategyBoolOptionArguments(expression, scope);
     this.checkStrategyStringOptionArguments(expression, scope);
+    this.checkStrategyNumericOptionArguments(expression, scope);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
     for (const argument of expression.arguments) {
@@ -4287,6 +4305,50 @@ class SemanticChecker {
         argument.loc,
       );
     }
+  }
+
+  private checkStrategyNumericOptionArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    if (!calleeName.startsWith('strategy.')) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of STRATEGY_NUMERIC_PARAMETER_NAMES) {
+      if (!signature.params.includes(parameterName)) continue;
+
+      const parameterIndex = signature.params.indexOf(parameterName);
+      this.checkStrategyNumericOptionArgument(expression, scope, signature.params, parameterName, parameterIndex, calleeName);
+    }
+
+    if (STRATEGY_NUMERIC_VALUE_PARAMETER_CALLS.has(calleeName)) {
+      const parameterIndex = signature.params.indexOf('value');
+      this.checkStrategyNumericOptionArgument(expression, scope, signature.params, 'value', parameterIndex, calleeName);
+    }
+  }
+
+  private checkStrategyNumericOptionArgument(
+    expression: CallExpression,
+    scope: SemanticScope,
+    params: string[],
+    parameterName: string,
+    parameterIndex: number,
+    calleeName: string,
+  ): void {
+    if (parameterIndex < 0) return;
+
+    const argument = this.resolveCallArgumentExpression(expression, params, parameterIndex);
+    if (!argument) return;
+
+    const argumentType = this.inferExpressionType(argument, scope);
+    if (argumentType.kind === 'unknown' || argumentType.kind === 'int' || argumentType.kind === 'float') return;
+
+    this.addDiagnostic(
+      'type-mismatch',
+      `${calleeName} ${parameterName} must be a number, got ${this.formatSemanticType(argumentType)}`,
+      argument.loc,
+    );
   }
 
   private checkAlertFrequencyLiteralArguments(expression: CallExpression): void {
