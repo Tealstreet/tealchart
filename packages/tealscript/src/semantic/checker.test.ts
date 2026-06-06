@@ -5065,6 +5065,47 @@ tooManyDelete = table.delete(dashboard, dashboard)
     ]);
   });
 
+  it('reports invalid table numeric value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Table Values")
+dashboard = table.new(columns="2", rows=true, frame_width="1", border_width=false)
+table.clear(table_id=dashboard, start_column="0", start_row=true, end_column="1", end_row=false)
+table.merge_cells(dashboard, "0", true, "1", false)
+table.set_frame_width(dashboard, frame_width="2")
+table.set_border_width(dashboard, border_width=false)
+table.cell(dashboard, column="0", row=true, text="Entry", width="10", height=false)
+table.cell_set_width(dashboard, column="0", row=true, width="10")
+table.cell_set_height(dashboard, column=true, row="0", height=false)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'table.new columns must be a number, got string',
+      'table.new rows must be a number, got bool',
+      'table.new frame_width must be a number, got string',
+      'table.new border_width must be a number, got bool',
+      'table.clear start_column must be a number, got string',
+      'table.clear start_row must be a number, got bool',
+      'table.clear end_column must be a number, got string',
+      'table.clear end_row must be a number, got bool',
+      'table.merge_cells start_column must be a number, got string',
+      'table.merge_cells start_row must be a number, got bool',
+      'table.merge_cells end_column must be a number, got string',
+      'table.merge_cells end_row must be a number, got bool',
+      'table.set_frame_width frame_width must be a number, got string',
+      'table.set_border_width border_width must be a number, got bool',
+      'table.cell column must be a number, got string',
+      'table.cell row must be a number, got bool',
+      'table.cell width must be a number, got string',
+      'table.cell height must be a number, got bool',
+      'table.cell_set_width column must be a number, got string',
+      'table.cell_set_width row must be a number, got bool',
+      'table.cell_set_width width must be a number, got string',
+      'table.cell_set_height column must be a number, got bool',
+      'table.cell_set_height row must be a number, got string',
+      'table.cell_set_height height must be a number, got bool',
+    ]);
+  });
+
   it('resolves table.cell named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Table Cell Signatures")
