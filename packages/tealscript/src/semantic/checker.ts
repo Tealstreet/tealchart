@@ -4192,7 +4192,7 @@ class SemanticChecker {
     return bestCandidates.length === 1 && bestCandidates[0]
       ? {
         declaration: bestCandidates[0].method,
-        displayName: `library function ${importedReceiver.alias}.${expression.callee.property.name}`,
+        displayName: `library method ${importedReceiver.alias}.${expression.callee.property.name}`,
         parameterOffset: 1,
         libraryAlias: importedReceiver.alias,
       }
@@ -4221,7 +4221,7 @@ class SemanticChecker {
     return declaration
       ? {
         declaration,
-        displayName: `library function ${importedReceiver.alias}.${expression.callee.property.name}`,
+        displayName: `library method ${importedReceiver.alias}.${expression.callee.property.name}`,
         parameterOffset: 1,
         libraryAlias: importedReceiver.alias,
       }

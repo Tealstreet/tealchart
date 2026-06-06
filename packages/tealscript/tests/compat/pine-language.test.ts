@@ -650,7 +650,7 @@ plot(q.value, title="Value")
         libraries: new Map([['TestUser/PivotTools/1', library]]),
       },
     });
-    expect(missingRequired.errors[0]?.message).toBe("library function pivots.lifted missing required argument 'amount'");
+    expect(missingRequired.errors[0]?.message).toBe("library method pivots.lifted missing required argument 'amount'");
 
     const tooMany = runCompatScript(`
 indicator("Imported library method too many args")
@@ -664,7 +664,7 @@ plot(q.value, title="Value")
         libraries: new Map([['TestUser/PivotTools/1', library]]),
       },
     });
-    expect(tooMany.errors[0]?.message).toBe('Too many arguments for library function pivots.lifted: expected 1, got 2');
+    expect(tooMany.errors[0]?.message).toBe('Too many arguments for library method pivots.lifted: expected 1, got 2');
   });
 
   it('keeps non-exported imported library methods private externally', () => {
