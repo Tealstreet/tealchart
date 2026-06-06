@@ -2382,7 +2382,9 @@ class SemanticChecker {
       return [{ kind: 'tuple', arity: expression.elements.length }];
     }
     if (expression.type === 'CallExpression') {
-      const tupleTypes = BUILTIN_TUPLE_RETURN_TYPES.get(this.memberPath(expression.callee).join('.'))
+      const builtinTupleShape = this.builtinTupleInitializerShape(expression, scope);
+      if (builtinTupleShape) return [builtinTupleShape];
+      const tupleTypes = this.inferBuiltinTupleElementTypes(expression, scope)
         ?? this.inferUserFunctionTupleElementTypes(expression, scope)
         ?? this.inferUserMethodTupleElementTypes(expression, scope);
       if (tupleTypes) return [{ kind: 'tuple', arity: tupleTypes.length }];
@@ -2391,6 +2393,14 @@ class SemanticChecker {
         ?? [{ kind: 'unknown' }];
     }
     return this.tupleInitializerArmShapes(expression, scope) ?? [{ kind: 'non-tuple' }];
+  }
+
+  private builtinTupleInitializerShape(expression: CallExpression, scope: SemanticScope): TupleInitializerShape | undefined {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    if (calleeName !== 'ta.vwap') return undefined;
+    return this.inferBuiltinTupleElementTypes(expression, scope)
+      ? { kind: 'tuple', arity: 3 }
+      : { kind: 'non-tuple' };
   }
 
   private tupleInitializerShapesFromUserFunctionCall(
@@ -2468,9 +2478,22 @@ class SemanticChecker {
 
     if (init.type !== 'CallExpression') return undefined;
 
-    return BUILTIN_TUPLE_RETURN_TYPES.get(this.memberPath(init.callee).join('.'))
+    return this.inferBuiltinTupleElementTypes(init, scope)
       ?? this.inferUserFunctionTupleElementTypes(init, scope)
       ?? this.inferUserMethodTupleElementTypes(init, scope);
+  }
+
+  private inferBuiltinTupleElementTypes(expression: CallExpression, scope: SemanticScope): SemanticType[] | undefined {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    if (calleeName === 'ta.vwap') {
+      const stdevMult = this.inferCallArgumentType(expression, scope, ['source', 'anchor', 'stdev_mult'], 2);
+      return stdevMult ? [
+        { kind: 'float', qualifier: 'series' },
+        { kind: 'float', qualifier: 'series' },
+        { kind: 'float', qualifier: 'series' },
+      ] : undefined;
+    }
+    return BUILTIN_TUPLE_RETURN_TYPES.get(calleeName);
   }
 
   private inferTupleElementTypesFromStatements(statements: Statement[], scope: SemanticScope): SemanticType[] | undefined {

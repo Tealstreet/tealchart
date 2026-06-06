@@ -8816,22 +8816,35 @@ export class TealscriptEngine {
       const typicalPrice = (high + low + close) / 3;
       const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taVwapArgs, 0, typicalPrice));
       const anchor = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taVwapArgs, 1, false));
+      const rawStdevMult = this.getOrderedCallArg(args, namedArgs, taVwapArgs, 2);
       if (isNaN(source) || isNaN(volume)) return NaN;
 
       const tpv = source * volume;
       const cumTpvKey = `_vwap_cum_tpv_${callId}`;
       const cumVolKey = `_vwap_cum_vol_${callId}`;
+      const cumSourceSquaredVolKey = `_vwap_cum_source_squared_vol_${callId}`;
 
       const prevCumTpv = anchor ? 0 : ((scope.get(cumTpvKey) as number) ?? 0);
       const prevCumVol = anchor ? 0 : ((scope.get(cumVolKey) as number) ?? 0);
+      const prevCumSourceSquaredVol = anchor ? 0 : ((scope.get(cumSourceSquaredVolKey) as number) ?? 0);
 
       const cumTpv = prevCumTpv + tpv;
       const cumVol = prevCumVol + volume;
+      const cumSourceSquaredVol = prevCumSourceSquaredVol + source * source * volume;
 
       this.setBuiltinState(scope, cumTpvKey, cumTpv);
       this.setBuiltinState(scope, cumVolKey, cumVol);
+      this.setBuiltinState(scope, cumSourceSquaredVolKey, cumSourceSquaredVol);
 
-      return cumVol > 0 ? cumTpv / cumVol : NaN;
+      const vwap = cumVol > 0 ? cumTpv / cumVol : NaN;
+      if (rawStdevMult === undefined) return vwap;
+
+      const stdevMult = this.toNumber(rawStdevMult);
+      if (isNaN(vwap) || isNaN(stdevMult)) return [vwap, NaN, NaN];
+
+      const weightedVariance = Math.max(cumSourceSquaredVol / cumVol - vwap * vwap, 0);
+      const stdev = Math.sqrt(weightedVariance);
+      return [vwap, vwap + stdevMult * stdev, vwap - stdevMult * stdev];
     });
 
     this.builtins.set('ta.stoch', (args, namedArgs, _ctx, scope, callId) => {
