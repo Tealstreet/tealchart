@@ -1152,6 +1152,27 @@ strategy.risk.max_cons_loss_days(-1)
     ]);
   });
 
+  it('reports invalid Pine strategy order boolean option values', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy Order Booleans")
+strategy.entry("Long", strategy.long, disable_alert="yes")
+strategy.order("Add", strategy.long, disable_alert=1)
+strategy.exit("Exit", from_entry="Long", limit=close, disable_alert="no")
+strategy.close("Long", immediately="now", disable_alert=1)
+strategy.close_all(immediately=close, disable_alert="yes")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy.entry disable_alert must be a boolean, got string',
+      'strategy.order disable_alert must be a boolean, got int',
+      'strategy.exit disable_alert must be a boolean, got string',
+      'strategy.close disable_alert must be a boolean, got int',
+      'strategy.close immediately must be a boolean, got string',
+      'strategy.close_all disable_alert must be a boolean, got string',
+      'strategy.close_all immediately must be a boolean, got float',
+    ]);
+  });
+
   it('reports duplicate declarations in the same scope', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate")
