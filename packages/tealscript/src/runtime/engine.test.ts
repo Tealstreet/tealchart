@@ -6546,6 +6546,31 @@ plot(src[1], title="Alias History")`;
       expect(result.plots.find((plot) => plot.title === 'Alias History')?.values).toEqual([null, 10, 20]);
     });
 
+    it('preserves source identity through UDF and method parameters when current values collide', () => {
+      const script = `//@version=6
+indicator("Source parameter identity")
+delayedAverage(series float src) =>
+    bar_index >= 1 ? ta.sma(src, 2) : na
+method delayedMethod(series float src) =>
+    bar_index >= 1 ? ta.sma(src, 2) : na
+plot(delayedAverage(open), title="Function Average")
+plot(delayedAverage(src=open), title="Named Function Average")
+plot(open.delayedMethod(), title="Method Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Function Average')?.values).toEqual([null, 15, 25]);
+      expect(result.plots.find((plot) => plot.title === 'Named Function Average')?.values).toEqual([null, 15, 25]);
+      expect(result.plots.find((plot) => plot.title === 'Method Average')?.values).toEqual([null, 15, 25]);
+    });
+
     it('keeps mixed named and positional source helper results numeric', () => {
       const script = `//@version=6
 indicator("Mixed source binding")

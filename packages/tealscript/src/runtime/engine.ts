@@ -382,6 +382,11 @@ interface KnownSourceValue {
   series: SeriesAccessor;
 }
 
+interface CallSourceBindings {
+  positional: Array<SeriesAccessor | undefined>;
+  named: Map<string, SeriesAccessor>;
+}
+
 type TimeframeUnit = 'tick' | 'second' | 'minute' | 'day' | 'week' | 'month';
 type RuntimeSessionKind = Extract<SessionClosureKind, 'premarket' | 'regular' | 'postmarket' | 'extended'>;
 
@@ -3188,19 +3193,23 @@ export class TealscriptEngine {
     // Evaluate arguments
     const args: unknown[] = [];
     const namedArgs = new Map<string, unknown>();
+    const sourceBindings: CallSourceBindings = { positional: [], named: new Map() };
     const hasPositionalArgumentAfterNamed = this.hasPositionalArgumentAfterNamed(expr.arguments);
     for (let argIndex = 0; argIndex < expr.arguments.length; argIndex++) {
       const arg = expr.arguments[argIndex]!;
       const value = this.shouldPreserveBuiltinSourceArgument(fullName, expr.arguments, argIndex)
         ? this.evaluateBuiltinSourceArgument(arg.value)
         : this.evaluateExpression(arg.value);
+      const sourceSeries = this.getSourceSeriesForExpression(arg.value, value);
       if (arg.name) {
         const argName = arg.name.name;
         if (namedArgs.has(argName)) {
           throw new Error(`Duplicate named argument: ${argName}`);
         }
         namedArgs.set(argName, value);
+        if (sourceSeries) sourceBindings.named.set(argName, sourceSeries);
       } else {
+        sourceBindings.positional[args.length] = sourceSeries;
         args.push(value);
       }
     }
@@ -3252,11 +3261,16 @@ export class TealscriptEngine {
     }
 
     if (namespace && this.importedLibraries.has(namespace)) {
-      return this.evaluateImportedFunction(namespace, funcName, args, namedArgs, hasPositionalArgumentAfterNamed, expr);
+      return this.evaluateImportedFunction(namespace, funcName, args, namedArgs, hasPositionalArgumentAfterNamed, expr, sourceBindings);
     }
 
     if (namespace && expr.callee.type === 'MemberExpression' && this.scope.has(namespace)) {
       const receiver = this.evaluateExpression(expr.callee.object);
+      const receiverSource = this.getSourceSeriesForExpression(expr.callee.object, receiver);
+      const methodSourceBindings: CallSourceBindings = {
+        positional: [receiverSource, ...sourceBindings.positional],
+        named: sourceBindings.named,
+      };
       const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs, receiver)
         ?? this.findReceiverMatchingUserMethod(funcName, receiver);
       if (userMethod) {
@@ -3270,6 +3284,7 @@ export class TealscriptEngine {
           scopeKey,
           recursionKey,
           hasPositionalArgumentAfterNamed,
+          methodSourceBindings,
         );
       }
       const importedMethod = this.findCallableImportedMethod(receiver, funcName, [receiver, ...args], namedArgs)
@@ -3282,6 +3297,7 @@ export class TealscriptEngine {
           namedArgs,
           hasPositionalArgumentAfterNamed,
           expr,
+          methodSourceBindings,
         );
       }
       if (isPineArray(receiver) || isPineMatrix(receiver) || isPineMap(receiver)) {
@@ -3316,6 +3332,11 @@ export class TealscriptEngine {
         }
         throw error;
       }
+      const receiverSource = this.getSourceSeriesForExpression(expr.callee.object, receiver);
+      const methodSourceBindings: CallSourceBindings = {
+        positional: [receiverSource, ...sourceBindings.positional],
+        named: sourceBindings.named,
+      };
       const userMethod = this.findCallableUserMethod(funcName, [receiver, ...args], namedArgs, receiver)
         ?? this.findReceiverMatchingUserMethod(funcName, receiver);
       if (userMethod) {
@@ -3329,6 +3350,7 @@ export class TealscriptEngine {
           scopeKey,
           recursionKey,
           hasPositionalArgumentAfterNamed,
+          methodSourceBindings,
         );
       }
       const importedMethod = this.findCallableImportedMethod(receiver, funcName, [receiver, ...args], namedArgs)
@@ -3341,6 +3363,7 @@ export class TealscriptEngine {
           namedArgs,
           hasPositionalArgumentAfterNamed,
           expr,
+          methodSourceBindings,
         );
       }
       const methodBuiltinName = this.getMethodBuiltinName(funcName, receiver);
@@ -3358,7 +3381,7 @@ export class TealscriptEngine {
       const importedLibrary = this.currentImportedLibrary();
       const libraryFunction = importedLibrary?.functions.get(funcName);
       if (importedLibrary && libraryFunction) {
-        return this.evaluateImportedLibraryFunction(importedLibrary, libraryFunction, args, namedArgs, hasPositionalArgumentAfterNamed, expr);
+        return this.evaluateImportedLibraryFunction(importedLibrary, libraryFunction, args, namedArgs, hasPositionalArgumentAfterNamed, expr, sourceBindings);
       }
 
       const userFunction = this.userFunctions.get(funcName);
@@ -3373,6 +3396,7 @@ export class TealscriptEngine {
           scopeKey,
           recursionKey,
           hasPositionalArgumentAfterNamed,
+          sourceBindings,
         );
       }
     }
@@ -3543,13 +3567,14 @@ export class TealscriptEngine {
     namedArgs: Map<string, unknown>,
     hasPositionalArgumentAfterNamed = false,
     expr?: CallExpression,
+    sourceBindings?: CallSourceBindings,
   ): unknown {
     const library = this.importedLibraries.get(alias);
     const fn = library?.functions.get(functionName);
     if (!library || !fn || !library.exportedFunctions.has(functionName)) {
       throw new Error(`Unknown library function: ${alias}.${functionName}`);
     }
-    return this.evaluateImportedLibraryFunction(library, fn, args, namedArgs, hasPositionalArgumentAfterNamed, expr);
+    return this.evaluateImportedLibraryFunction(library, fn, args, namedArgs, hasPositionalArgumentAfterNamed, expr, sourceBindings);
   }
 
   private currentImportedLibrary(): ImportedLibrary | undefined {
@@ -3564,6 +3589,7 @@ export class TealscriptEngine {
     namedArgs: Map<string, unknown>,
     hasPositionalArgumentAfterNamed = false,
     expr?: CallExpression,
+    sourceBindings?: CallSourceBindings,
   ): unknown {
     const recursionKey = this.importedFunctionScopeKey(library.alias, fn);
     const scopeKey = expr ? this.importedCallSiteFunctionScopeKey(library.alias, fn, expr) : recursionKey;
@@ -3577,6 +3603,7 @@ export class TealscriptEngine {
         scopeKey,
         recursionKey,
         hasPositionalArgumentAfterNamed,
+        sourceBindings,
       );
     } finally {
       this.importedLibraryCallStack.pop();
@@ -4558,6 +4585,7 @@ export class TealscriptEngine {
     scopeKey = this.userCallableScopeKey(fn),
     recursionKey = scopeKey,
     hasPositionalArgumentAfterNamed = false,
+    sourceBindings: CallSourceBindings = { positional: [], named: new Map() },
   ): unknown {
     const recursiveIndex = this.userFunctionCallStack.indexOf(recursionKey);
     if (recursiveIndex !== -1) {
@@ -4600,15 +4628,27 @@ export class TealscriptEngine {
             `Argument '${paramName}' for ${displayName} was supplied multiple times`,
           );
         }
-        return namedArgs.get(paramName);
+        const value = namedArgs.get(paramName);
+        return {
+          value,
+          sourceSeries: sourceBindings.named.get(paramName) ?? this.getSourceSeriesForValue(value),
+        };
       }
       if (index < args.length) {
-        return args[index];
+        const value = args[index];
+        return {
+          value,
+          sourceSeries: sourceBindings.positional[index] ?? this.getSourceSeriesForValue(value),
+        };
       }
       if (param.defaultValue) {
-        return this.evaluateExpression(param.defaultValue);
+        const value = this.evaluateExpression(param.defaultValue);
+        return {
+          value,
+          sourceSeries: this.getSourceSeriesForExpression(param.defaultValue, value),
+        };
       }
-      return undefined;
+      return { value: undefined, sourceSeries: undefined };
     });
 
     const savedScope = this.scope;
@@ -4619,8 +4659,14 @@ export class TealscriptEngine {
     try {
       for (let i = 0; i < fn.params.length; i++) {
         const paramName = fn.params[i].name;
-        const value = parameterValues[i];
-        this.scope.declare(paramName, 'none', value);
+        const parameterValue = parameterValues[i]!;
+        this.scope.declare(
+          paramName,
+          'none',
+          this.unwrapKnownSourceValue(parameterValue.value),
+          undefined,
+          parameterValue.sourceSeries,
+        );
       }
 
       if (Array.isArray(fn.body)) {
