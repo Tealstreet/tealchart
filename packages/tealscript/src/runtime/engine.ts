@@ -3502,6 +3502,14 @@ export class TealscriptEngine {
     const valueSeries = this.getSourceSeriesForValue(value);
     if (valueSeries) return valueSeries;
     if (expr.type === 'ConditionalExpression') {
+      if (
+        expr.consequent.type === 'Identifier'
+        && expr.alternate.type === 'Identifier'
+        && expr.consequent.name === expr.alternate.name
+      ) {
+        return this.getSourceSeriesForExpression(expr.consequent);
+      }
+
       const consequentSource = this.getSourceSeriesForExpression(expr.consequent);
       const alternateSource = this.getSourceSeriesForExpression(expr.alternate);
       return consequentSource && consequentSource === alternateSource ? consequentSource : undefined;
