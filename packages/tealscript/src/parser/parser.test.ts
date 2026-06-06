@@ -133,6 +133,22 @@ strategy(title="Mixed Strategy", "Mixed", true, format.price, 3, scale.right, 10
           expect(declaration.use_bar_magnifier?.type).toBe('BooleanLiteral');
         }
       });
+
+      it('parses reserved call parameter names in named arguments', () => {
+        const ast = parse(`//@version=6
+strategy("Keyword Args")
+strategy.risk.max_drawdown(value=25, type=strategy.percent_of_equity, alert_message="drawdown")`);
+
+        const statement = ast.body[1];
+        expect(statement.type).toBe('ExpressionStatement');
+        if (statement.type === 'ExpressionStatement' && statement.expression.type === 'CallExpression') {
+          expect(statement.expression.arguments.map((argument) => argument.name?.name)).toEqual([
+            'value',
+            'type',
+            'alert_message',
+          ]);
+        }
+      });
     });
 
     describe('module declarations', () => {

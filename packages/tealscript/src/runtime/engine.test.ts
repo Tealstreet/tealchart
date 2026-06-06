@@ -2429,8 +2429,8 @@ plot(strategy.position_size)`;
     it('captures common strategy.risk guard metadata', () => {
       const script = `//@version=6
 strategy("Risk metadata")
-strategy.risk.max_drawdown(25, strategy.percent_of_equity, "drawdown")
-strategy.risk.max_intraday_loss(1000, strategy.cash, "loss")
+strategy.risk.max_drawdown(value=25, type=strategy.percent_of_equity, alert_message="drawdown")
+strategy.risk.max_intraday_loss(value=1000, type=strategy.cash, alert_message="loss")
 strategy.risk.max_intraday_filled_orders(10, "fills")
 strategy.risk.max_cons_loss_days(count=3, alert_message="days")
 plot(close)`;
