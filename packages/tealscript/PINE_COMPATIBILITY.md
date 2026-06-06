@@ -237,10 +237,10 @@ helper wrappers around rolling helpers can use historical source bars on
 delayed calls, and simple UDF or method returns of those source parameters keep
 that identity for downstream delayed helper windows. Same-source ternary returns
 such as `condition ? src : src` preserve the same identity through local and
-imported helpers, as do expression-only `switch` returns whose arms all return
-the same known source and multiline block `if` helper wrappers whose branches
-return the same source. Same-source `if` initializers also retain source
-identity for downstream delayed helper windows. `ta.rma()`, `ta.rsi()`, and
+imported helpers, as do `switch` returns whose expression or multiline block
+arms all return the same known source and multiline block `if` helper wrappers
+whose branches return the same source. Same-source `if` initializers also retain
+source identity for downstream delayed helper windows. `ta.rma()`, `ta.rsi()`, and
 `ta.atr()` use
 Pine's SMA-seeded RMA warmup before recursive smoothing; `ta.atr()` is covered
 as the RMA of `ta.tr(true)`.
