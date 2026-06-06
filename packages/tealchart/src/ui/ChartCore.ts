@@ -36,7 +36,6 @@ import {
   PendingOrderUpdate,
   PositionData,
   PositionLineRenderData,
-  PRICE_AXIS_RIGHT_PADDING,
   PriceLine,
   PriceLineLabelBounds,
   RenderOptions,
@@ -44,7 +43,7 @@ import {
   UnifiedPaneLayout,
   Viewport,
 } from '../types';
-import { safeNum, safeToFixed } from '../utils/safeNumber';
+import { safeToFixed } from '../utils/safeNumber';
 import { applyAutoScale } from '../viewport/viewScale';
 import { button, div, icons } from './dom';
 
@@ -106,8 +105,6 @@ export interface ChartCoreOptions {
 // ============================================================================
 // Constants
 // ============================================================================
-
-const RESET_BUTTON_AUTO_HIDE_DELAY = 3000;
 
 /**
  * Convert legacy PaneLayout to UnifiedPaneLayout

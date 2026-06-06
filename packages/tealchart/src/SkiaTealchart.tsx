@@ -24,7 +24,6 @@ import type { LabelBounds } from './mobile/hooks/useLabelCollision';
 import type { MobileTealscriptIndicatorOptions } from './mobile/MobileIndicatorManager';
 import type { PlotStyleOverride } from './state/chartState';
 import type {
-  Bar,
   ChartMargins,
   ContextMenuItem,
   IBasicDataFeed,
@@ -32,7 +31,6 @@ import type {
   PositionLineRenderData,
   PriceLine,
   RenderOptions,
-  UnifiedPaneLayout,
   Viewport,
 } from './types';
 
@@ -91,12 +89,6 @@ import { intervalToMs } from './viewport/viewScale';
 const RESET_BUTTON_HIDE_DELAY_MS = 5000;
 const RESET_BUTTON_FADE_MS = 220;
 const RESET_BUTTON_REVEAL_THROTTLE_MS = 250;
-
-// Indicator pane info type (matches web)
-interface IndicatorPaneInfo {
-  name: string;
-  inputs?: Record<string, unknown>;
-}
 
 export type SkiaTealscriptIndicatorOptions = MobileTealscriptIndicatorOptions;
 
@@ -677,29 +669,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // Indicator settings modal state
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
   const [settingsIndicator, setSettingsIndicator] = useState<IndicatorSettingsData | null>(null);
-  const [settingsInputDefs, setSettingsInputDefs] = useState<import('@tealstreet/tealscript').InputDefinition[]>([]);
-  const [settingsPlots, setSettingsPlots] = useState<import('@tealstreet/tealscript').PlotOutput[]>([]);
-
-  const handleOpenIndicatorSettings = useCallback((instanceId: string) => {
-    const manager = indicatorManagerRef.current;
-    if (!manager) return;
-
-    const activeInd = manager.getIndicator(instanceId);
-    if (!activeInd) return;
-
-    const inputDefs = manager.getInputDefinitions(instanceId);
-    const indicatorPlots = manager.getPlots().filter((p) => p.scriptId === instanceId);
-
-    setSettingsIndicator({
-      id: activeInd.instanceId,
-      name: activeInd.indicator.name,
-      inputs: activeInd.inputs ?? {},
-      styleOverrides: activeInd.styleOverrides,
-    });
-    setSettingsInputDefs(inputDefs);
-    setSettingsPlots(indicatorPlots);
-    setSettingsModalVisible(true);
-  }, []);
+  const [settingsInputDefs] = useState<import('@tealstreet/tealscript').InputDefinition[]>([]);
+  const [settingsPlots] = useState<import('@tealstreet/tealscript').PlotOutput[]>([]);
 
   const handleSettingsModalClose = useCallback(() => {
     setSettingsModalVisible(false);
@@ -883,16 +854,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   }, [viewport, chartDimensions, orderLines, positionLines]);
 
   // Resolve collisions
-  const resolvedLabels = useLabelCollision(labelBoundsInput);
-
-  // Create map from id to adjustedY
-  const labelAdjustments = useMemo(() => {
-    const map = new Map<string, number>();
-    resolvedLabels.forEach((label) => {
-      map.set(label.id, label.adjustedY);
-    });
-    return map;
-  }, [resolvedLabels]);
+  useLabelCollision(labelBoundsInput);
 
   // ==========================================================================
   // Context Menu Handler
