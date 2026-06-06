@@ -1269,6 +1269,29 @@ strategy.cancel(1)
     ]);
   });
 
+  it('reports invalid Pine strategy enum option value types', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy Enums")
+strategy.entry("Long", 1, oca_type=2)
+strategy.order("Add", 1, oca_type=2)
+strategy.risk.allow_entry_in(1)
+strategy.risk.max_drawdown(value=10, type=1)
+strategy.risk.max_intraday_loss(10, 2)
+strategy.entry("Duplicate", 1, direction=strategy.short)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy.entry direction must be a string, got int',
+      'strategy.entry oca_type must be a string, got int',
+      'strategy.order direction must be a string, got int',
+      'strategy.order oca_type must be a string, got int',
+      'strategy.risk.allow_entry_in value must be a string, got int',
+      'strategy.risk.max_drawdown type must be a string, got int',
+      'strategy.risk.max_intraday_loss type must be a string, got int',
+      "Argument 'direction' for strategy.entry() was supplied multiple times",
+    ]);
+  });
+
   it('reports invalid Pine strategy numeric option values', () => {
     const result = checkProgram(parse(`
 strategy("Bad Strategy Numerics")

@@ -989,7 +989,8 @@ before runtime, reports literal declaration setting diagnostics plus order
 id/direction/OCA/quantity diagnostics, non-boolean, non-numeric, and non-string
 strategy declaration settings,
 non-boolean order alert/immediate flags, non-string order id/comment/alert
-arguments, non-numeric order/risk sizing arguments, and excess positional order arguments,
+arguments, non-string order/risk enum-like arguments, non-numeric order/risk sizing
+arguments, and excess positional order arguments,
 and preserves known strategy state/accessor return types for downstream
 assignment diagnostics. `strategy.entry()`,
 `strategy.order()`, `strategy.close()`,
