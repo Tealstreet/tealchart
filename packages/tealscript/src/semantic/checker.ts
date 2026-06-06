@@ -4128,6 +4128,12 @@ class SemanticChecker {
     }
 
     for (const display of candidates) {
+      const literalValue = this.constantLiteralValue(display);
+      if (typeof literalValue === 'string') {
+        this.addDiagnostic('type-mismatch', `Invalid ${calleeName} display: ${literalValue}`, display.loc);
+        continue;
+      }
+
       this.checkNamespacedConstantStringValue(
         display,
         DISPLAY_OPTION_VALUES,
