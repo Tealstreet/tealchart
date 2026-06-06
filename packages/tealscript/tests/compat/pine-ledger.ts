@@ -355,6 +355,16 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-strategy-trailing-stop-checkpoint',
+      title: 'Public Strategy Trailing Stop Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy trailing stop',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'trailing_stop'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-strategy-stats-checkpoint',
       title: 'Public Strategy Stats Checkpoint',
       searchContext: 'TradingView public scripts search: strategy performance table',
