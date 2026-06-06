@@ -1570,6 +1570,18 @@ const DISPLAY_OPTION_VALUES = new Set([
   'display.all',
 ]);
 const DISPLAY_OPTION_CONSTANT_VALUES = new Map([...DISPLAY_OPTION_VALUES].map((value) => [value, value]));
+const VISUAL_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['barcolor', ['title']],
+  ['bgcolor', ['title']],
+  ['fill', ['title']],
+  ['hline', ['title']],
+  ['plot', ['title']],
+  ['plotbar', ['title']],
+  ['plotcandle', ['title']],
+  ['plotshape', ['title', 'text']],
+  ['plotchar', ['title', 'char', 'text']],
+  ['plotarrow', ['title']],
+]);
 
 const DRAWING_XLOC_VALUES = new Set(['bar_index', 'bar_time']);
 const DRAWING_XLOC_CONSTANT_VALUES = new Map([
@@ -3512,6 +3524,7 @@ class SemanticChecker {
     this.checkVisualFormatPrecisionLiteralArguments(expression);
     this.checkMarkerStyleLocationSizeLiteralArguments(expression);
     this.checkVisualNumericOptionLiteralArguments(expression);
+    this.checkVisualStringOptionArguments(expression, scope);
     this.checkDisplayOptionLiteralArguments(expression);
     this.checkDrawingCoordinateOptionLiteralArguments(expression, scope);
     this.checkDrawingStyleOptionLiteralArguments(expression, scope);
@@ -4663,6 +4676,33 @@ class SemanticChecker {
       this.checkPositiveLiteralIntegerValue(
         maxheight,
         'plotarrow maxheight must be a positive integer',
+      );
+    }
+  }
+
+  private checkVisualStringOptionArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const parameterNames = VISUAL_STRING_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!parameterNames) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of parameterNames) {
+      if (!signature.params.includes(parameterName)) continue;
+
+      const parameterIndex = signature.params.indexOf(parameterName);
+      const argument = this.resolveCallArgumentExpression(expression, signature.params, parameterIndex);
+      if (!argument) continue;
+
+      const argumentType = this.inferExpressionType(argument, scope);
+      if (argumentType.kind === 'unknown' || argumentType.kind === 'string') continue;
+
+      this.addDiagnostic(
+        'type-mismatch',
+        `${calleeName} ${parameterName} must be a string, got ${this.formatSemanticType(argumentType)}`,
+        argument.loc,
       );
     }
   }
