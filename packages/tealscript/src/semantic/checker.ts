@@ -105,6 +105,7 @@ interface SemanticImportedLibrary {
   functions: Map<string, FunctionDeclaration>;
   types: Map<string, TypeDeclaration>;
   enums: Map<string, EnumDeclaration>;
+  constants: Map<string, VariableDeclaration>;
   methods: Map<string, FunctionDeclaration[]>;
 }
 
@@ -1564,6 +1565,7 @@ class SemanticChecker {
 
       const types = new Map<string, TypeDeclaration>();
       const enums = new Map<string, EnumDeclaration>();
+      const constants = new Map<string, VariableDeclaration>();
       const functions = new Map<string, FunctionDeclaration>();
       const methods = new Map<string, FunctionDeclaration[]>();
       for (const libraryStatement of libraryProgram.body) {
@@ -1571,6 +1573,8 @@ class SemanticChecker {
           types.set(libraryStatement.name.name, libraryStatement);
         } else if (libraryStatement.type === 'EnumDeclaration' && libraryStatement.exported) {
           enums.set(libraryStatement.name.name, libraryStatement);
+        } else if (libraryStatement.type === 'VariableDeclaration' && libraryStatement.exported && libraryStatement.names.type === 'VariableDeclarator') {
+          constants.set(libraryStatement.names.name.name, libraryStatement);
         } else if (libraryStatement.type === 'FunctionDeclaration' && libraryStatement.isMethod && libraryStatement.exported) {
           const overloads = methods.get(libraryStatement.name.name) ?? [];
           overloads.push(libraryStatement);
@@ -1585,6 +1589,7 @@ class SemanticChecker {
         functions,
         types,
         enums,
+        constants,
         methods,
       });
     }
@@ -5778,6 +5783,8 @@ class SemanticChecker {
     if (drawingAllType) return drawingAllType;
     const taMemberType = this.inferTaMemberType(expression);
     if (taMemberType) return taMemberType;
+    const importedConstantType = this.inferImportedConstantMemberType(expression, scope);
+    if (importedConstantType) return importedConstantType;
     const enumType = this.inferEnumMemberType(expression, scope);
     if (enumType) return enumType;
 
@@ -5786,6 +5793,17 @@ class SemanticChecker {
 
     const field = this.findUdtField(objectType.name, expression.property.name);
     return this.typeFromAnnotation(field?.typeAnnotation ?? undefined) ?? { kind: 'unknown', qualifier: objectType.qualifier };
+  }
+
+  private inferImportedConstantMemberType(expression: MemberExpression, scope: SemanticScope): SemanticType | undefined {
+    const path = this.memberPath(expression);
+    if (path.length !== 2) return undefined;
+
+    const [alias, constantName] = path;
+    if (!alias || !constantName || scope.lookup(alias)?.kind !== 'import') return undefined;
+
+    const constant = this.importedLibraries.get(alias)?.constants.get(constantName);
+    return this.typeFromAnnotation(constant?.typeAnnotation ?? undefined);
   }
 
   private inferDrawingAllMemberType(expression: MemberExpression): SemanticType | undefined {
