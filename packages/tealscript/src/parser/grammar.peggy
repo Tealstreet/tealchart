@@ -1685,7 +1685,10 @@ Comment
   / MultiLineComment
 
 SingleLineComment
-  = "//" (!LineTerminatorChar .)* LineTerminator?
+  = LineCommentText LineTerminator?
+
+LineCommentText
+  = "//" (!LineTerminatorChar .)*
 
 MultiLineComment
   = "/*" (!"*/" .)* "*/"
@@ -1738,7 +1741,7 @@ WhiteSpace
   = [ \t]
 
 LineTerminator
-  = SingleLineComment? LineTerminatorChar+
+  = (WhiteSpace* LineCommentText)? LineTerminatorChar+
 
 LineTerminatorChar
   = [\n\r]
