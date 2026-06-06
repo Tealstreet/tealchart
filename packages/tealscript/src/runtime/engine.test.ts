@@ -2446,6 +2446,86 @@ plot(close)`;
       });
     });
 
+    it('blocks new non-exit orders after strategy.risk.max_intraday_filled_orders is reached', () => {
+      const script = `//@version=6
+strategy("Intraday fill cap", process_orders_on_close=true)
+strategy.risk.max_intraday_filled_orders(count=1)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.order("Add", strategy.long, qty=1)
+plot(strategy.position_size)`;
+      const bars = createBars(2).map((bar, index) => ({
+        ...bar,
+        time: Date.UTC(2024, 0, 1, 9, index),
+      }));
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long']);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Long']);
+      expect(result.plots[0]?.values).toEqual([1, 1]);
+    });
+
+    it('cancels excess pending non-exit fills after strategy.risk.max_intraday_filled_orders is reached', () => {
+      const script = `//@version=6
+strategy("Pending intraday fill cap", pyramiding=2)
+strategy.risk.max_intraday_filled_orders(count=1)
+if bar_index == 0
+    strategy.entry("A", strategy.long, qty=1)
+    strategy.entry("B", strategy.long, qty=1)
+plot(strategy.position_size)`;
+      const bars = createBars(2).map((bar, index) => ({
+        ...bar,
+        time: Date.UTC(2024, 0, 1, 9, index),
+      }));
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        filledQty: order.filledQty,
+      }))).toEqual([
+        { id: 'A', status: 'filled', filledQty: 1 },
+        { id: 'B', status: 'cancelled', filledQty: 0 },
+      ]);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['A']);
+      expect(result.plots[0]?.values).toEqual([0, 1]);
+    });
+
+    it('allows restricted close-only entries after strategy.risk.max_intraday_filled_orders is reached', () => {
+      const script = `//@version=6
+strategy("Close-only after intraday cap", process_orders_on_close=true)
+strategy.risk.max_intraday_filled_orders(count=1)
+strategy.risk.allow_entry_in(strategy.direction.long)
+if bar_index == 0
+    strategy.order("RawLong", strategy.long, qty=1)
+if bar_index == 1
+    strategy.entry("CloseOnlyShort", strategy.short, qty=1)
+plot(strategy.position_size)`;
+      const bars = createBars(2).map((bar, index) => ({
+        ...bar,
+        time: Date.UTC(2024, 0, 1, 9, index),
+      }));
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['RawLong', 'CloseOnlyShort']);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        requestedQty: order.requestedQty,
+      }))).toEqual([
+        { id: 'RawLong', status: 'filled', requestedQty: 1 },
+        { id: 'CloseOnlyShort', status: 'filled', requestedQty: 0 },
+      ]);
+      expect(result.plots[0]?.values).toEqual([1, 0]);
+    });
+
     it('fills strategy.exit brackets and cancels the sibling OCA order', () => {
       const script = `//@version=6
 strategy("Exit bracket fill", process_orders_on_close=true)
