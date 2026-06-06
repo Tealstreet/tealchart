@@ -6201,6 +6201,37 @@ plot(close, title="Close")`;
       expect(result.errors).toEqual([]);
       expect(result.profile.maxBarsBack).toBe(7);
     });
+
+    it('statically reports numeric comparison conditional history offsets', () => {
+      const script = `//@version=6
+indicator("Comparison Static History")
+threshold = input.int(defval=21, title="Threshold")
+length = threshold > 20 ? 13 : 4
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(13);
+    });
+
+    it('statically reports boolean equality conditional history offsets', () => {
+      const script = `//@version=6
+indicator("Boolean Equality Static History")
+useLong = input.bool(true, title="Use Long")
+same = useLong == true
+length = same ? 9 : 3
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(9);
+    });
   });
 
   describe('inputs', () => {
