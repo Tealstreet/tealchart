@@ -867,6 +867,118 @@ plot(state.highest, title="Highest High")
     expect(getPlot(result, 'Highest High').values).toEqual([103, 106, 108, 109, 109, 109, 109, 110, 111, 112, 114, 114]);
   });
 
+  it('locks a reduced public UDT array state idiom', () => {
+    // Public idiom reference: market-structure scripts commonly store UDT
+    // pivot records in bounded arrays, read fields from the latest record, and
+    // surface the latest state in dashboards.
+    // Source search: https://www.tradingview.com/scripts/search/market%20structure%20object%20array/
+    const result = runCompatScript(`
+indicator("Public UDT Array Checkpoint", overlay=true)
+type PivotMark
+    int index = 0
+    float price = na
+    bool highPivot = false
+
+method score(PivotMark this) =>
+    this.highPivot ? this.price : -this.price
+
+var array<PivotMark> pivots = array.new<PivotMark>()
+pivotHigh = ta.pivothigh(high, 1, 1)
+pivotLow = ta.pivotlow(low, 1, 1)
+if not na(pivotHigh)
+    pivots.push(PivotMark.new(bar_index - 1, pivotHigh, true))
+if not na(pivotLow)
+    pivots.push(PivotMark.new(bar_index - 1, pivotLow, false))
+if pivots.size() > 4
+    pivots.shift()
+snapshot = pivots.copy()
+lastPivot = pivots.size() > 0 ? pivots.last() : PivotMark.new()
+snapshotLast = snapshot.size() > 0 ? snapshot.last() : PivotMark.new()
+var board = table.new(position.top_right, 2, 4, border_width=1, border_color=color.white)
+if barstate.islast
+    table.cell(board, 0, 0, "Pivot", text_color=color.white, bgcolor=color.blue)
+    table.cell(board, 1, 0, "Value", text_color=color.white, bgcolor=color.blue)
+    table.cell(board, 0, 1, "Count", text_color=color.white, bgcolor=color.gray)
+    table.cell(board, 1, 1, str.tostring(pivots.size()), text_color=color.white, bgcolor=color.green)
+    table.cell(board, 0, 2, "Index", text_color=color.white, bgcolor=color.gray)
+    table.cell(board, 1, 2, str.tostring(lastPivot.index), text_color=color.white, bgcolor=color.green)
+    table.cell(board, 0, 3, "Score", text_color=color.white, bgcolor=color.gray)
+    table.cell(board, 1, 3, str.tostring(lastPivot.score(), "#.00"), text_color=color.black, bgcolor=color.yellow)
+plot(pivots.size(), title="Pivot Count")
+plot(lastPivot.index, title="Last Pivot Index")
+plot(lastPivot.price, title="Last Pivot Price")
+plot(lastPivot.highPivot ? 1 : -1, title="Last Pivot Side")
+plot(snapshotLast.price, title="Copied Pivot Price")
+plot(lastPivot.score(), title="Pivot Score")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Pivot Count').values).toEqual([0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 3]);
+    expect(getPlot(result, 'Last Pivot Index').values).toEqual([0, 0, 0, 0, 3, 3, 5, 5, 5, 5, 5, 10]);
+    expect(getPlot(result, 'Last Pivot Price').values).toEqual([
+      null,
+      null,
+      null,
+      null,
+      109,
+      109,
+      96,
+      96,
+      96,
+      96,
+      96,
+      114,
+    ]);
+    expect(getPlot(result, 'Last Pivot Side').values).toEqual([-1, -1, -1, -1, 1, 1, -1, -1, -1, -1, -1, 1]);
+    expect(getPlot(result, 'Copied Pivot Price').values).toEqual([
+      null,
+      null,
+      null,
+      null,
+      109,
+      109,
+      96,
+      96,
+      96,
+      96,
+      96,
+      114,
+    ]);
+    expect(getPlot(result, 'Pivot Score').values).toEqual([
+      null,
+      null,
+      null,
+      null,
+      109,
+      109,
+      -96,
+      -96,
+      -96,
+      -96,
+      -96,
+      114,
+    ]);
+
+    expect(result.drawings).toContainEqual(
+      expect.objectContaining({
+        type: 'table',
+        position: 'top_right',
+        columns: 2,
+        rows: 4,
+        cells: expect.arrayContaining([
+          expect.objectContaining({ column: 0, row: 0, text: 'Pivot', textColor: '#FFFFFF', bgcolor: '#2196F3' }),
+          expect.objectContaining({ column: 1, row: 0, text: 'Value', textColor: '#FFFFFF', bgcolor: '#2196F3' }),
+          expect.objectContaining({ column: 0, row: 1, text: 'Count', textColor: '#FFFFFF', bgcolor: '#787B86' }),
+          expect.objectContaining({ column: 1, row: 1, text: '3', textColor: '#FFFFFF', bgcolor: '#4CAF50' }),
+          expect.objectContaining({ column: 0, row: 2, text: 'Index', textColor: '#FFFFFF', bgcolor: '#787B86' }),
+          expect.objectContaining({ column: 1, row: 2, text: '10', textColor: '#FFFFFF', bgcolor: '#4CAF50' }),
+          expect.objectContaining({ column: 0, row: 3, text: 'Score', textColor: '#FFFFFF', bgcolor: '#787B86' }),
+          expect.objectContaining({ column: 1, row: 3, text: '114.00', textColor: '#363A45', bgcolor: '#FDD835' }),
+        ]),
+      })
+    );
+  });
+
   it('locks a reduced public session-gated signal idiom', () => {
     // Public idiom reference: intraday scripts frequently gate signals with a
     // user/session time filter.

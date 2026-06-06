@@ -384,7 +384,9 @@ Phases:
 3. Complete UDT constructors, defaults, field access, reference assignment,
    copy semantics, rollback, nested collection fields, and `varip` field rules.
    Keep source-linked public checkpoint coverage for persistent UDT state
-   updated through user-defined methods.
+   updated through user-defined methods. Source-linked public UDT array
+   checkpoint coverage now exercises bounded pivot-record arrays, copied
+   snapshot reads, method-derived scores, and dashboard table output.
 4. Complete matrix API breadth used by public scripts; defer rare numerical
    exactness such as repeated-eigenvalue basis parity unless corpus demand
    justifies it. Source-linked matrix scoreboard checkpoint coverage now
