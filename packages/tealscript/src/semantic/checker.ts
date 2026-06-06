@@ -1547,9 +1547,10 @@ class SemanticChecker {
     }
 
     const globalVariableQualifiers = this.collectGlobalVariableQualifiers(statements);
+    const dynamicRequestsAllowed = this.libraryDynamicRequestsAllowed(libraryDeclaration);
     for (const declaration of exportedDeclarations) {
       if (declaration.type !== 'FunctionDeclaration') continue;
-      this.checkExportedFunctionScope(declaration, globalVariableQualifiers);
+      this.checkExportedFunctionScope(declaration, globalVariableQualifiers, dynamicRequestsAllowed);
     }
   }
 
@@ -1862,7 +1863,17 @@ class SemanticChecker {
     return declarations;
   }
 
-  private checkExportedFunctionScope(declaration: FunctionDeclaration, globalVariableQualifiers: Map<string, SemanticQualifier | undefined>): void {
+  private libraryDynamicRequestsAllowed(libraryDeclaration: LibraryDeclaration): boolean {
+    return libraryDeclaration.dynamic_requests?.type === 'BooleanLiteral'
+      ? libraryDeclaration.dynamic_requests.value
+      : true;
+  }
+
+  private checkExportedFunctionScope(
+    declaration: FunctionDeclaration,
+    globalVariableQualifiers: Map<string, SemanticQualifier | undefined>,
+    dynamicRequestsAllowed: boolean,
+  ): void {
     const parameterNames = new Set<string>(declaration.params.map((parameter) => parameter.name));
     const functionLocals = new Set(parameterNames);
     const reportedGlobals = new Set<string>();
@@ -1902,6 +1913,13 @@ class SemanticChecker {
           );
         }
         if (calleePath[0] === 'request') {
+          if (!dynamicRequestsAllowed) {
+            this.addDiagnostic(
+              'library-export',
+              `Exported ${declarationKind} ${declaration.name.name} cannot call request.*() functions when library dynamic_requests=false`,
+              expression.callee.loc,
+            );
+          }
           const requestExpression = this.getCallArgument(expression.arguments, 'expression', 2);
           if (requestExpression && this.expressionReferencesAnyName(requestExpression, parameterNames)) {
             this.addDiagnostic(
