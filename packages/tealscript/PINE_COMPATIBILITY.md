@@ -628,7 +628,8 @@ coverage applies plot line-style metadata in main and indicator panes and
 renders common plot offsets for line, marker, histogram, and area plot styles.
 Semantic diagnostics also reject non-string visual title/text arguments and
 non-color visual color arguments on common plot, hline, fill, color, OHLC,
-marker, and arrow outputs before runtime.
+marker, and arrow outputs, plus non-boolean visual `editable`, `trackprice`,
+`join`, `fillgaps`, and `force_overlay` values before runtime.
 Renderer coverage also honors `display.none` while retaining hidden plot values
 for dependent fills, and applies `histbase` baselines to histogram/columns and
 area plot rendering when supplied. Area-style plots now render filled regions
