@@ -48,8 +48,9 @@ timeframe comparisons, official plot-style payloads, and public MTF,
 divergence, volatility-band overlays, session-filter, session-state,
 dashboard-table, multi-symbol screener, currency conversion, earnings event
 markers, corporate-action overlays, financial dashboards, economic macro
-overlays, seed dataset overlays, map signal dashboards, matrix scoreboards, drawing-zone,
-linefill-channel, custom-candle, and library-helper idioms.
+overlays, seed dataset overlays, array signal queues, map signal dashboards,
+matrix scoreboards, drawing-zone, linefill-channel, custom-candle, and
+library-helper idioms.
 Public-source coverage also includes alert signal metadata, direct alert
 emission, Heikin-Ashi synthetic ticker trend requests, public zigzag polylines,
 public strategy performance tables, plus UDT state objects updated through
@@ -325,6 +326,9 @@ integer, float, and string helpers such as `includes`, `size`, `avg`, and `join`
 Homogeneous array literals and `array.from(...)` infer primitive, reference, and
 UDT element types, including `int` to `float` widening for numeric mixes; mixed
 arrays fall back to unknown element types.
+Source-linked public checkpoint coverage also exercises persistent bounded
+signal arrays, queue shifting, copied sorted views, aggregate helpers, and
+last-bar table output.
 
 The array pass covers the generic constructor (`array.new<T>`), typed
 constructors (`array.new_float`, `array.new_int`, `array.new_bool`,
