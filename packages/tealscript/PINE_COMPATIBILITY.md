@@ -89,6 +89,8 @@ Covered behavior and remaining gaps:
   destructuring, index access, and parenthesized expressions. Parser audit
   fixtures also cover public-script-shaped wrapped `request.security()`
   arguments with multiline ternary expressions inside nested UDF blocks.
+- Function and declaration calls support Pine named arguments, including the
+  reserved parameter key `type=` used by common strategy risk APIs.
 - Top-level nested control blocks share the deeper block parser used by
   function bodies, including nested `if` / `else` dedents with reassignment
   statements.
