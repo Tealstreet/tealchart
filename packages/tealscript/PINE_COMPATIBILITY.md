@@ -163,8 +163,9 @@ The history reference pass covers literal offsets such as `close[1]`, dynamic
 offsets such as `close[length]`, fractional offsets truncated toward zero,
 derived regular-series history, and unavailable or future offsets returning
 `na`/`null` plot values instead of throwing. Runtime profile metadata reports
-literal history offsets even when they sit behind unexecuted branches, while
-dynamic/non-literal offsets are still inferred from observed runtime access.
+literal, simple numeric-alias, and `input.int()`/`input.float()` default-derived
+history offsets even when they sit behind unexecuted branches, while truly
+dynamic series offsets are still inferred from observed runtime access.
 
 ## Roadmaps
 
@@ -741,10 +742,10 @@ as `indicatorMaxBarsBack`. Values must be finite, non-negative integers.
 Explicit history references that exceed the declared bound produce runtime
 errors, while in-range references remain available over loaded history.
 Scripts without an explicit declaration report inferred history depth in the
-runtime profile from a static literal-offset pass plus observed dynamic access.
-Full Pine-style preallocation for non-literal offsets remains a compatibility
-target. The checkpoint corpus tracks an official `max_bars_back`
-bounded-history fixture.
+runtime profile from static literal/simple numeric offset inference plus
+observed dynamic access. Full Pine-style preallocation for arbitrary series
+offsets remains a compatibility target. The checkpoint corpus tracks an
+official `max_bars_back` bounded-history fixture.
 
 ## Common Drawing Object Coverage
 
