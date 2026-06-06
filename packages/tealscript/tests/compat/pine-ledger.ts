@@ -423,6 +423,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-array-signal-checkpoint',
+      title: 'Public Array Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: array signal dashboard',
+      featureTags: ['arrays', 'tables', 'dashboard', 'signals'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-screener-checkpoint',
       title: 'Public Screener Checkpoint',
       searchContext: 'TradingView public scripts search: screener',

@@ -372,7 +372,10 @@ making rare matrix math dominate early work.
 Phases:
 
 1. Keep `array.*` core, method sugar, sorting, slicing, joining, statistical
-   helpers, and array history as the first collection priority.
+   helpers, and array history as the first collection priority. Source-linked
+   array signal checkpoint coverage now exercises persistent bounded signal
+   queues, shifted windows, copied sorted views, aggregate helpers, and table
+   output.
 2. Complete `map.*` constructors, mutation, lookup, iteration, key/value
    arrays, history/reference behavior, and common diagnostics. Source-linked
    map signal checkpoint coverage now exercises persistent named state maps,

@@ -1415,6 +1415,88 @@ plot(keyOrder, title="Key Order")
     ]);
   });
 
+  it('locks a reduced public array signal-queue idiom', () => {
+    // Public idiom reference: public signal dashboards commonly keep bounded
+    // recent-signal queues in arrays before summarizing the last bar.
+    // Source search: https://www.tradingview.com/scripts/search/array%20signal%20dashboard/
+    const result = runCompatScript(`
+indicator("Public Array Signal Checkpoint", overlay=true)
+var array<float> signals = array.new_float()
+rawSignal = close > open ? 1.0 : -1.0
+signals.push(rawSignal)
+if signals.size() > 5
+    signals.shift()
+sorted = signals.copy()
+sorted.sort(order.descending)
+queueSum = signals.sum()
+queueAverage = signals.avg()
+firstSignal = signals.first()
+lastSignal = signals.last()
+topSignal = sorted.get(0)
+var board = table.new(position.top_right, 2, 5, border_width=1, border_color=color.white)
+if barstate.islast
+    table.cell(board, 0, 0, "Queue", text_color=color.white, bgcolor=color.blue)
+    table.cell(board, 1, 0, "Value", text_color=color.white, bgcolor=color.blue)
+    table.cell(board, 0, 1, "Count", text_color=color.white, bgcolor=color.gray)
+    table.cell(board, 1, 1, str.tostring(signals.size()), text_color=color.white, bgcolor=color.green)
+    table.cell(board, 0, 2, "Sum", text_color=color.white, bgcolor=color.gray)
+    table.cell(board, 1, 2, str.tostring(queueSum, "#.00"), text_color=color.white, bgcolor=queueSum > 0 ? color.green : color.red)
+    table.cell(board, 0, 3, "Average", text_color=color.white, bgcolor=color.gray)
+    table.cell(board, 1, 3, str.tostring(queueAverage, "#.00"), text_color=color.white, bgcolor=queueAverage > 0 ? color.green : color.red)
+    table.cell(board, 0, 4, "Last", text_color=color.white, bgcolor=color.gray)
+    table.cell(board, 1, 4, str.tostring(lastSignal, "#.00"), text_color=color.black, bgcolor=color.yellow)
+plot(signals.size(), title="Queue Size")
+plot(queueSum, title="Queue Sum")
+plot(queueAverage, title="Queue Average")
+plot(firstSignal, title="First Signal")
+plot(lastSignal, title="Last Signal")
+plot(topSignal, title="Top Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Queue Size').values).toEqual([1, 2, 3, 4, 5, 5, 5, 5, 5, 5, 5, 5]);
+    expect(getPlot(result, 'Queue Sum').values).toEqual([1, 2, 3, 2, 1, 1, 1, 1, 1, 3, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Queue Average').values)).toEqual([
+      1,
+      1,
+      1,
+      0.5,
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.6,
+      0.2,
+      0.2,
+    ]);
+    expect(getPlot(result, 'First Signal').values).toEqual([1, 1, 1, 1, 1, 1, 1, -1, -1, 1, 1, 1]);
+    expect(getPlot(result, 'Last Signal').values).toEqual([1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, 1]);
+    expect(getPlot(result, 'Top Signal').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(result.drawings).toEqual([
+      expect.objectContaining({
+        type: 'table',
+        position: 'top_right',
+        columns: 2,
+        rows: 5,
+        borderColor: '#FFFFFF',
+        borderWidth: 1,
+        cells: [
+          expect.objectContaining({ column: 0, row: 0, text: 'Queue', textColor: '#FFFFFF', bgcolor: '#2196F3' }),
+          expect.objectContaining({ column: 1, row: 0, text: 'Value', textColor: '#FFFFFF', bgcolor: '#2196F3' }),
+          expect.objectContaining({ column: 0, row: 1, text: 'Count', textColor: '#FFFFFF', bgcolor: '#787B86' }),
+          expect.objectContaining({ column: 1, row: 1, text: '5', textColor: '#FFFFFF', bgcolor: '#4CAF50' }),
+          expect.objectContaining({ column: 0, row: 2, text: 'Sum', textColor: '#FFFFFF', bgcolor: '#787B86' }),
+          expect.objectContaining({ column: 1, row: 2, text: '1.00', textColor: '#FFFFFF', bgcolor: '#4CAF50' }),
+          expect.objectContaining({ column: 0, row: 3, text: 'Average', textColor: '#FFFFFF', bgcolor: '#787B86' }),
+          expect.objectContaining({ column: 1, row: 3, text: '0.20', textColor: '#FFFFFF', bgcolor: '#4CAF50' }),
+          expect.objectContaining({ column: 0, row: 4, text: 'Last', textColor: '#FFFFFF', bgcolor: '#787B86' }),
+          expect.objectContaining({ column: 1, row: 4, text: '1.00', textColor: '#363A45', bgcolor: '#FDD835' }),
+        ],
+      }),
+    ]);
+  });
+
   it('locks a reduced public multi-symbol screener idiom', () => {
     // Public idiom reference: screener-style public indicators commonly use
     // request.security() for several symbols and summarize signals in a table.
