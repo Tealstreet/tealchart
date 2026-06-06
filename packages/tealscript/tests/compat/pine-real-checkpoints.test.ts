@@ -2264,6 +2264,77 @@ plot(lastReturn, title="Last Return")
     ]);
   });
 
+  it('locks a reduced public strategy open-trade dashboard idiom', () => {
+    // Public idiom reference: strategy dashboard public scripts commonly
+    // summarize the currently open trade with `strategy.opentrades.*()` accessors.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20open%20trade%20dashboard/
+    const bars: Bar[] = [
+      { time: 1_700_616_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_616_060_000, open: 103, high: 105, low: 102, close: 104, volume: 100 },
+      { time: 1_700_616_120_000, open: 105, high: 107, low: 104, close: 106, volume: 100 },
+      { time: 1_700_616_180_000, open: 106, high: 108, low: 105, close: 106, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Public Strategy Open Trade Checkpoint", overlay=true, process_orders_on_close=true)
+var openStats = table.new(position.top_right, 2, 6, border_width=1, border_color=color.white)
+if bar_index == 0
+    strategy.entry("L", strategy.long, qty=2, comment="open seed")
+hasOpen = strategy.opentrades > 0
+lastOpen = strategy.opentrades - 1
+openEntry = hasOpen ? strategy.opentrades.entry_price(lastOpen) : na
+openSize = hasOpen ? strategy.opentrades.size(lastOpen) : na
+openProfit = hasOpen ? strategy.opentrades.profit(lastOpen) : na
+openReturn = hasOpen ? strategy.opentrades.profit_percent(lastOpen) : na
+openId = hasOpen ? strategy.opentrades.entry_id(lastOpen) : ""
+openComment = hasOpen ? strategy.opentrades.entry_comment(lastOpen) : ""
+if barstate.islast and hasOpen
+    table.cell(openStats, 0, 0, "Field", text_color=color.white, bgcolor=color.blue)
+    table.cell(openStats, 1, 0, "Open", text_color=color.white, bgcolor=color.blue)
+    table.cell(openStats, 0, 1, "Entry", text_color=color.white, bgcolor=color.gray)
+    table.cell(openStats, 1, 1, str.tostring(openEntry, "#.##"), text_color=color.white, bgcolor=color.green)
+    table.cell(openStats, 0, 2, "Size", text_color=color.white, bgcolor=color.gray)
+    table.cell(openStats, 1, 2, str.tostring(openSize, "#.##"), text_color=color.white, bgcolor=color.green)
+    table.cell(openStats, 0, 3, "Profit", text_color=color.white, bgcolor=color.gray)
+    table.cell(openStats, 1, 3, str.tostring(openProfit, "#.##"), text_color=color.white, bgcolor=color.green)
+    table.cell(openStats, 0, 4, "Entry Id", text_color=color.white, bgcolor=color.gray)
+    table.cell(openStats, 1, 4, openId, text_color=color.white, bgcolor=color.green)
+    table.cell(openStats, 0, 5, "Comment", text_color=color.white, bgcolor=color.gray)
+    table.cell(openStats, 1, 5, openComment, text_color=color.white, bgcolor=color.green)
+plot(strategy.opentrades, title="Open Trades")
+plot(openEntry, title="Open Entry")
+plot(openProfit, title="Open Profit")
+plot(openReturn, title="Open Return")
+plot(strategy.opentrades.capital_held, title="Capital Held")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Open Trades').values).toEqual([1, 1, 1, 1]);
+    expect(getPlot(result, 'Open Entry').values).toEqual([100, 100, 100, 100]);
+    expect(getPlot(result, 'Open Profit').values).toEqual([0, 8, 12, 12]);
+    expect(roundSeries(getPlot(result, 'Open Return').values)).toEqual([0, 4, 6, 6]);
+    expect(getPlot(result, 'Capital Held').values).toEqual([200, 200, 200, 200]);
+    expect(result.strategy.openTrades[0]).toMatchObject({
+      entryOrderId: 'L',
+      entryPrice: 100,
+      entryComment: 'open seed',
+    });
+    const table = result.drawings.find((drawing) => drawing.type === 'table');
+    expect(table?.type === 'table' ? table.cells.map((cell) => cell.text) : []).toEqual([
+      'Field',
+      'Open',
+      'Entry',
+      '100.00',
+      'Size',
+      '2.00',
+      'Profit',
+      '12.00',
+      'Entry Id',
+      'L',
+      'Comment',
+      'open seed',
+    ]);
+  });
+
   it('locks the official strategy profit-loss exit idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const bars: Bar[] = [
