@@ -19,6 +19,10 @@ real-script intake metadata or corpus summaries:
   and render stage results for a script.
 - `normalizeCompatibilityStageOutcomes()` expands partial stage lists into the
   canonical six-stage order, filling missing stages with `not_run`.
+- `createPineParseSemanticStageOutcomes()` runs a reduced source fixture
+  through the parser and semantic checker, returning parse/semantic stage
+  outcomes that can be combined with runtime, datafeed, output, and render
+  stages.
 - `not_run` marks an incomplete outcome and does not count as passing; use
   `skipped` with a message for an intentionally out-of-scope stage.
 - `CompatibilityFailureClass` keeps failure buckets stable across reports:
