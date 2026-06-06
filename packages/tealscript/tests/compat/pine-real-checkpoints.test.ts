@@ -1440,6 +1440,80 @@ plot(strategy.netprofit, title="Net Profit")
     });
   });
 
+  it('locks a reduced public strategy trailing stop idiom', () => {
+    // Public idiom reference: public strategy scripts commonly use ATR-style
+    // trailing exits after trend entries.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20trailing%20stop/
+    const bars: Bar[] = [
+      { time: 1_700_620_000_000, open: 100, high: 100.5, low: 99.5, close: 100, volume: 100 },
+      { time: 1_700_620_060_000, open: 100.2, high: 100.6, low: 99.8, close: 100.4, volume: 100 },
+      { time: 1_700_620_120_000, open: 101, high: 101.5, low: 100.8, close: 101.2, volume: 100 },
+      { time: 1_700_620_180_000, open: 101, high: 101, low: 100.9, close: 101, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Public Strategy Trailing Stop Checkpoint", process_orders_on_close=true)
+longSignal = bar_index == 0
+if longSignal
+    strategy.entry("Long", strategy.long, qty=1)
+if strategy.position_size > 0
+    strategy.exit("Trail", "Long", trail_points=5, trail_offset=4)
+plot(longSignal ? 1 : 0, title="Long Signal")
+plot(strategy.position_size, title="Position")
+plot(strategy.closedtrades, title="Closed Trades")
+plot(strategy.netprofit, title="Net Profit")
+`, {
+      bars,
+      engineOptions: { runtime: { syminfo: { mintick: 0.1 } } },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Long Signal').values).toEqual([1, 0, 0, 0]);
+    expect(getPlot(result, 'Position').values).toEqual([1, 1, 0, 0]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 0, 1, 1]);
+    expect(roundSeries(getPlot(result, 'Net Profit').values)).toEqual([0, 0, 0.2, 0.2]);
+    expect(result.strategy.orders.map((order) => ({
+      id: order.id,
+      type: order.type,
+      status: order.status,
+      trailActivationPrice: order.trailActivationPrice,
+      trailOffset: order.trailOffset,
+      trailingActivated: order.trailingActivated,
+      trailingStopPrice: order.trailingStopPrice == null ? order.trailingStopPrice : Math.round(order.trailingStopPrice * 10) / 10,
+      avgFillPrice: order.avgFillPrice == null ? order.avgFillPrice : Math.round(order.avgFillPrice * 10) / 10,
+      updatedBarIndex: order.updatedBarIndex,
+    }))).toEqual([
+      {
+        id: 'Long',
+        type: 'market',
+        status: 'filled',
+        trailActivationPrice: undefined,
+        trailOffset: undefined,
+        trailingActivated: false,
+        trailingStopPrice: undefined,
+        avgFillPrice: 100,
+        updatedBarIndex: 0,
+      },
+      {
+        id: 'Trail',
+        type: 'trailing_stop',
+        status: 'filled',
+        trailActivationPrice: 100.5,
+        trailOffset: 0.4,
+        trailingActivated: true,
+        trailingStopPrice: 100.2,
+        avgFillPrice: 100.2,
+        updatedBarIndex: 1,
+      },
+    ]);
+    expect(result.strategy.closedTrades[0]).toMatchObject({
+      entryOrderId: 'Long',
+      exitOrderId: 'Trail',
+      entryPrice: 100,
+    });
+    expect(result.strategy.closedTrades[0]?.exitPrice).toBeCloseTo(100.2);
+    expect(result.strategy.closedTrades[0]?.profit).toBeCloseTo(0.2);
+  });
+
   it('locks a reduced public strategy stats table idiom', () => {
     // Public idiom reference: strategy performance public scripts commonly
     // summarize closed trades, win count, and net profit in a last-bar table.

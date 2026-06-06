@@ -54,7 +54,8 @@ user-defined methods.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
 suppression, entry-direction risk rules, recalculation checkpoints, and a
-reduced public fixed-bracket strategy idiom with public stats-table output.
+reduced public fixed-bracket strategy idiom, public trailing-stop strategy
+idiom, and public stats-table output.
 
 ## Current Matrix
 
@@ -879,7 +880,9 @@ target. The `use_bar_magnifier` strategy setting is stored in the ledger.
 Trailing stops submitted through
 `strategy.exit(..., trail_price/trail_points, trail_offset)` activate on later
 bars and ratchet against OHLC highs/lows using tick-distance `trail_points` and
-`trail_offset` values. Fill
+`trail_offset` values. The checkpoint corpus tracks both the official trailing
+exit example and a reduced public trailing-stop strategy idiom with explicit
+order activation, ratchet, fill, and closed-trade assertions. Fill
 commissions are applied to fills and debited from strategy net profit/equity for
 `percent`, `cash_per_order`, and
 `cash_per_contract` commission settings. Basic `strategy.opentrades.*`
@@ -894,8 +897,9 @@ commission, maximum run-up, and maximum drawdown with percent variants.
 Closed-trade outcome counters `strategy.wintrades`, `strategy.losstrades`, and
 `strategy.eventrades` are available. Filled strategy orders with
 `alert_message` emit `strategy_order_fills` alert events unless their
-`disable_alert` argument is true. The checkpoint corpus also tracks a reduced
-public strategy performance-table idiom that plots `strategy.closedtrades`,
+`disable_alert` argument is true. The checkpoint corpus also tracks reduced
+public strategy fixed-bracket and performance-table idioms that plot
+`strategy.closedtrades`,
 `strategy.wintrades`, and `strategy.netprofit` while rendering the same counters
 through a last-bar `table`.
 
