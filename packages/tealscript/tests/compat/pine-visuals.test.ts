@@ -161,13 +161,13 @@ barcolor(bar_index == 0 ? color.red : na, 1, true, 5, "Bar Tint", display.none)
     const result = runCompatScript(`
 indicator("Visual constants smoke", overlay=true, format=format.price, scale=scale.right, explicit_plot_zorder=true)
 displayTarget = display.all - display.status_line
-formatMatches = format.price == "price" and format.volume == "volume" and format.percent == "percent" and format.inherit == "inherit"
+formatMatches = format.price == "price" and format.volume == "volume" and format.percent == "percent" and format.inherit == "inherit" and format.mintick == "mintick"
 scaleMatches = scale.right == "right" and scale.left == "left" and scale.none == "none"
 plot(close, title="Break Line", style=plot.style_linebr, display=displayTarget, linestyle=plot.linestyle_dashed)
 plot(open, title="Step Diamonds", style=plot.style_stepline_diamond, display=display.none)
 plot(close, title="Step Break", style=plot.style_steplinebr)
 plot(high, title="Columns", style=plot.style_columns, histbase=100, trackprice=true, show_last=5)
-plot(low, "Positional Area", color.red, 3, plot.style_area, true, 90, -1, true, false, 4, display.price_scale, format.volume, 0, true)
+plot(low, "Positional Area", color.red, 3, plot.style_area, true, 90, -1, true, false, 4, display.price_scale, format.mintick, 0, true)
 hline(50, "Midline", color=color.blue, linestyle=hline.style_dotted, linewidth=2, editable=false, display=display.price_scale)
 hline(75, "Solid Positional", color.red, hline.style_solid, 3, true, display.none)
 plot(formatMatches ? 1 : 0, title="Format Constants")
@@ -206,7 +206,7 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
       editable: false,
       showLast: 4,
       display: 8,
-      format: 'volume',
+      format: 'mintick',
       precision: 0,
       forceOverlay: true,
     });
