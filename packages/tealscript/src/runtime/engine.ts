@@ -1167,6 +1167,12 @@ export class TealscriptEngine {
         return this.inferStaticVariadicMathCallValue(expression, Math.max, collectionScopes);
       case 'math.min':
         return this.inferStaticVariadicMathCallValue(expression, Math.min, collectionScopes);
+      case 'math.avg':
+        return this.inferStaticVariadicMathCallValue(
+          expression,
+          (...values) => values.reduce((sum, value) => sum + value, 0) / values.length,
+          collectionScopes,
+        );
       case 'math.abs':
         return this.inferStaticUnaryMathCallValue(expression, Math.abs, collectionScopes);
       case 'math.sqrt':
