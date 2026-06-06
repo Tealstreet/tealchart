@@ -5019,6 +5019,7 @@ export class TealscriptEngine {
   }
 
   private currentTrueRange(handleNa: boolean): number {
+    this.recordLookbackLength(2);
     return this.trueRange(0, handleNa);
   }
 
@@ -9761,6 +9762,7 @@ export class TealscriptEngine {
     this.builtins.set('ta.wpr', (args, namedArgs, ctx) => {
       const taWprArgs = ['length'];
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taWprArgs, 0, 14));
+      this.recordLookbackLength(length);
       const close = ctx.close.get(0);
       if (length < 1 || close === undefined || isNaN(close)) return NaN;
 

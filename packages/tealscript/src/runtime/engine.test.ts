@@ -6176,6 +6176,19 @@ plot(histLine, title="Hist")`;
       expect(result.profile.maxBarsBack).toBe(8);
     });
 
+    it('reports direct OHLC TA lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("OHLC Profile")
+length = bar_index < 3 ? 4 : 9
+plot(ta.wpr(length), title="WPR")
+plot(ta.tr(true), title="TR")`;
+
+      const result = executeScript(parse(script), createBars(12, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(8);
+    });
+
     it('statically reports unexecuted rolling helper lookback lengths in the runtime profile', () => {
       const script = `//@version=6
 indicator("Static Rolling Profile")
