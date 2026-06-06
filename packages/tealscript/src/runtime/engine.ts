@@ -4948,6 +4948,26 @@ export class TealscriptEngine {
     return next;
   }
 
+  private updateBuiltinRmaState(
+    scope: Scope,
+    key: string,
+    sourceKey: string,
+    value: number,
+    length: number,
+  ): number {
+    if (isNaN(value) || length < 1) return NaN;
+    const seedValues = this.getCompleteSourceWindow(scope, sourceKey, value, length);
+    if (!seedValues) return NaN;
+
+    const alpha = 1 / length;
+    const previous = scope.get(key) as number | undefined;
+    const next = previous === undefined || isNaN(previous)
+      ? seedValues.reduce((sum, source) => sum + source, 0) / length
+      : alpha * value + (1 - alpha) * previous;
+    this.setBuiltinState(scope, key, next);
+    return next;
+  }
+
   private calculateKeltnerChannel(
     scope: Scope,
     callId: string,
@@ -5947,6 +5967,7 @@ export class TealscriptEngine {
       (
         name === 'alert'
         || name === 'math.random'
+        || name === 'ta.dmi'
         || name === 'ta.macd'
         || name === 'ta.obv'
         || name === 'ta.rma'
@@ -9057,19 +9078,13 @@ export class TealscriptEngine {
       const taSourceLengthArgs = ['source', 'length'];
       const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
-      if (isNaN(source) || length < 1) return NaN;
-      const alpha = 1 / length;
-
-      const rmaKey = `_ta_rma_${callId}_${length}`;
-      const seedValues = this.getCompleteSourceWindow(scope, `_ta_rma_source_${callId}_${length}`, source, length);
-      if (!seedValues) return NaN;
-
-      const previous = scope.get(rmaKey) as number | undefined;
-      const rma = previous === undefined || isNaN(previous)
-        ? seedValues.reduce((sum, value) => sum + value, 0) / length
-        : alpha * source + (1 - alpha) * previous;
-      this.setBuiltinState(scope, rmaKey, rma);
-      return rma;
+      return this.updateBuiltinRmaState(
+        scope,
+        `_ta_rma_${callId}_${length}`,
+        `_ta_rma_source_${callId}_${length}`,
+        source,
+        length,
+      );
     });
 
     // WMA - Weighted Moving Average
@@ -9347,7 +9362,7 @@ export class TealscriptEngine {
 
     // DMI - Directional Movement Index
     // Returns [diPlus, diMinus, adx]
-    this.builtins.set('ta.dmi', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.dmi', (args, namedArgs, ctx, scope, callId) => {
       const taDmiArgs = ['diLength', 'adxSmoothing'];
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taDmiArgs, 0, 14));
       const adxSmoothing = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taDmiArgs, 1, 14));
@@ -9370,12 +9385,14 @@ export class TealscriptEngine {
       }
 
       // Calculate +DM and -DM
-      let plusDM = 0;
-      let minusDM = 0;
+      let plusDM = NaN;
+      let minusDM = NaN;
 
       if (prevHigh !== undefined && prevLow !== undefined) {
         const upMove = high - prevHigh;
         const downMove = prevLow - low;
+        plusDM = 0;
+        minusDM = 0;
 
         if (upMove > downMove && upMove > 0) {
           plusDM = upMove;
@@ -9385,25 +9402,31 @@ export class TealscriptEngine {
         }
       }
 
-      // Smooth with RMA (Wilder's smoothing)
-      const alpha = 1 / length;
-
-      const smoothTrKey = `_dmi_tr_${length}`;
-      const smoothPlusDmKey = `_dmi_plusdm_${length}`;
-      const smoothMinusDmKey = `_dmi_minusdm_${length}`;
-      const smoothAdxKey = `_dmi_adx_${length}_${adxSmoothing}`;
-
-      let smoothTr = (scope.get(smoothTrKey) as number) ?? tr;
-      let smoothPlusDm = (scope.get(smoothPlusDmKey) as number) ?? plusDM;
-      let smoothMinusDm = (scope.get(smoothMinusDmKey) as number) ?? minusDM;
-
-      smoothTr = alpha * tr + (1 - alpha) * smoothTr;
-      smoothPlusDm = alpha * plusDM + (1 - alpha) * smoothPlusDm;
-      smoothMinusDm = alpha * minusDM + (1 - alpha) * smoothMinusDm;
-
-      scope.declare(smoothTrKey, 'var', smoothTr);
-      scope.declare(smoothPlusDmKey, 'var', smoothPlusDm);
-      scope.declare(smoothMinusDmKey, 'var', smoothMinusDm);
+      const stateKey = `${callId}_${length}_${adxSmoothing}`;
+      const smoothTr = this.updateBuiltinRmaState(
+        scope,
+        `_ta_dmi_tr_${stateKey}`,
+        `_ta_dmi_tr_source_${stateKey}`,
+        tr,
+        length,
+      );
+      const smoothPlusDm = this.updateBuiltinRmaState(
+        scope,
+        `_ta_dmi_plusdm_${stateKey}`,
+        `_ta_dmi_plusdm_source_${stateKey}`,
+        plusDM,
+        length,
+      );
+      const smoothMinusDm = this.updateBuiltinRmaState(
+        scope,
+        `_ta_dmi_minusdm_${stateKey}`,
+        `_ta_dmi_minusdm_source_${stateKey}`,
+        minusDM,
+        length,
+      );
+      if (isNaN(smoothTr) || isNaN(smoothPlusDm) || isNaN(smoothMinusDm)) {
+        return [NaN, NaN, NaN];
+      }
 
       // Calculate DI+ and DI-
       const diPlus = smoothTr > 0 ? (smoothPlusDm / smoothTr) * 100 : 0;
@@ -9413,10 +9436,13 @@ export class TealscriptEngine {
       const diSum = diPlus + diMinus;
       const dx = diSum > 0 ? (Math.abs(diPlus - diMinus) / diSum) * 100 : 0;
 
-      let adx = (scope.get(smoothAdxKey) as number) ?? dx;
-      const adxAlpha = 1 / adxSmoothing;
-      adx = adxAlpha * dx + (1 - adxAlpha) * adx;
-      scope.declare(smoothAdxKey, 'var', adx);
+      const adx = this.updateBuiltinRmaState(
+        scope,
+        `_ta_dmi_adx_${stateKey}`,
+        `_ta_dmi_adx_source_${stateKey}`,
+        dx,
+        adxSmoothing,
+      );
 
       return [diPlus, diMinus, adx];
     });
