@@ -1370,6 +1370,54 @@ const VISUAL_FORMAT_PRECISION_CALLS = new Set([
   'plotarrow',
 ]);
 
+const MARKER_STYLE_VALUES = new Set([
+  'triangleup',
+  'triangledown',
+  'circle',
+  'cross',
+  'diamond',
+  'arrowup',
+  'arrowdown',
+  'flag',
+  'labelup',
+  'labeldown',
+  'square',
+  'xcross',
+]);
+const MARKER_STYLE_CONSTANT_VALUES = new Map([
+  ['shape.triangleup', 'triangleup'],
+  ['shape.triangledown', 'triangledown'],
+  ['shape.circle', 'circle'],
+  ['shape.cross', 'cross'],
+  ['shape.diamond', 'diamond'],
+  ['shape.arrowup', 'arrowup'],
+  ['shape.arrowdown', 'arrowdown'],
+  ['shape.flag', 'flag'],
+  ['shape.labelup', 'labelup'],
+  ['shape.labeldown', 'labeldown'],
+  ['shape.square', 'square'],
+  ['shape.xcross', 'xcross'],
+]);
+
+const MARKER_LOCATION_VALUES = new Set(['abovebar', 'belowbar', 'top', 'bottom', 'absolute']);
+const MARKER_LOCATION_CONSTANT_VALUES = new Map([
+  ['location.abovebar', 'abovebar'],
+  ['location.belowbar', 'belowbar'],
+  ['location.top', 'top'],
+  ['location.bottom', 'bottom'],
+  ['location.absolute', 'absolute'],
+]);
+
+const VISUAL_SIZE_VALUES = new Set(['tiny', 'small', 'normal', 'large', 'huge', 'auto']);
+const VISUAL_SIZE_CONSTANT_VALUES = new Map([
+  ['size.tiny', 'tiny'],
+  ['size.small', 'small'],
+  ['size.normal', 'normal'],
+  ['size.large', 'large'],
+  ['size.huge', 'huge'],
+  ['size.auto', 'auto'],
+]);
+
 for (const name of CALENDAR_FUNCTION_NAMES) {
   BUILTIN_SIGNATURES.set(name, { params: ['time', 'timezone'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true });
 }
@@ -3174,6 +3222,7 @@ class SemanticChecker {
     this.checkRequestBarmergeModeLiteralArguments(expression);
     this.checkVisualLineStyleLiteralArguments(expression);
     this.checkVisualFormatPrecisionLiteralArguments(expression);
+    this.checkMarkerStyleLocationSizeLiteralArguments(expression);
     this.checkStrategyLiteralArgumentConstraints(expression);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
@@ -3958,6 +4007,43 @@ class SemanticChecker {
     this.checkNonNegativeLiteralIntegerValue(
       precision,
       `${calleeName} precision must be a non-negative integer`,
+    );
+  }
+
+  private checkMarkerStyleLocationSizeLiteralArguments(expression: CallExpression): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    if (calleeName !== 'plotshape' && calleeName !== 'plotchar') return;
+
+    const parameterNames = BUILTIN_SIGNATURES.get(calleeName)?.params;
+    if (!parameterNames) return;
+
+    if (calleeName === 'plotshape') {
+      const style = this.resolveCallArgumentExpression(expression, parameterNames, parameterNames.indexOf('style'));
+      this.checkNamespacedConstantStringValue(
+        style,
+        MARKER_STYLE_VALUES,
+        MARKER_STYLE_CONSTANT_VALUES,
+        'shape.',
+        'Invalid plotshape style',
+      );
+    }
+
+    const location = this.resolveCallArgumentExpression(expression, parameterNames, parameterNames.indexOf('location'));
+    this.checkNamespacedConstantStringValue(
+      location,
+      MARKER_LOCATION_VALUES,
+      MARKER_LOCATION_CONSTANT_VALUES,
+      'location.',
+      `Invalid ${calleeName} location`,
+    );
+
+    const size = this.resolveCallArgumentExpression(expression, parameterNames, parameterNames.indexOf('size'));
+    this.checkNamespacedConstantStringValue(
+      size,
+      VISUAL_SIZE_VALUES,
+      VISUAL_SIZE_CONSTANT_VALUES,
+      'size.',
+      `Invalid ${calleeName} size`,
     );
   }
 
