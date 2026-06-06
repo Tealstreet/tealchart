@@ -930,13 +930,13 @@ type Pivot
 
 calc(
     float source,
-    int length
+    int length,
 ) =>
     ta.sma(source, length)
 
 export method shifted(
     Pivot this,
-    float amount
+    float amount,
 ) =>
     this.level += amount
     this
