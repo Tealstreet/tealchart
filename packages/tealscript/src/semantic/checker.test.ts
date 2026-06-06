@@ -857,6 +857,25 @@ strategy("Bad Strategy Settings",
     ]);
   });
 
+  it('reports invalid Pine strategy declaration boolean values', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy Boolean Settings",
+    calc_on_order_fills="yes",
+    calc_on_every_tick=1,
+    process_orders_on_close="no",
+    use_bar_magnifier=close,
+    fill_orders_on_standard_ohlc="true")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy calc_on_order_fills must be a boolean, got string',
+      'strategy calc_on_every_tick must be a boolean, got int',
+      'strategy process_orders_on_close must be a boolean, got string',
+      'strategy use_bar_magnifier must be a boolean, got float',
+      'strategy fill_orders_on_standard_ohlc must be a boolean, got string',
+    ]);
+  });
+
   it('accepts Pine library positional dynamic requests declarations', () => {
     const result = checkProgram(parse(`
 library("Dynamic Library", true, false)
