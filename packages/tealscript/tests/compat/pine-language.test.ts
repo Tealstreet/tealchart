@@ -102,6 +102,33 @@ plot(bar_index >= 1 ? ta.sma(st.passthrough(open), 2) : na, title="Imported Cond
     expect(getPlot(result, 'Imported Conditional Average').values).toEqual([null, 15, 25]);
   });
 
+  it('preserves source identity through imported same-source switch returns', () => {
+    const library = parse(`
+library("SourceTools", true)
+export passthrough(series float src) => switch
+    bar_index >= 0 => src
+    => src
+`);
+
+    const result = runCompatScript(`
+indicator("Imported switch source identity")
+import TestUser/SourceTools/1 as st
+plot(bar_index >= 1 ? ta.sma(st.passthrough(open), 2) : na, title="Imported Switch Average")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ],
+      engineOptions: {
+        libraries: new Map([['TestUser/SourceTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Imported Switch Average').values).toEqual([null, 15, 25]);
+  });
+
   it('keeps imported library function var state isolated per call site', () => {
     const library = parse(`
 library("Counters", true)
