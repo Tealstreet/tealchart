@@ -170,8 +170,9 @@ Phases:
    candles, drawing zones, linefill channels, zigzag polylines, screeners,
    currency conversion, earnings event markers, corporate-action overlays,
    financial dashboards, economic macro overlays, seed dataset overlays,
-   volatility-band overlays, library helpers, public strategy stats tables, UDT
-   object-method state, and UDT state objects with wrapped field defaults.
+   volatility-band overlays, library helpers including source-preserving helper
+   wrappers, public strategy stats tables, UDT object-method state, and UDT state
+   objects with wrapped field defaults.
    Strategy-bracket coverage includes official broker examples plus a reduced
    public fixed-bracket strategy fixture, and trailing-stop coverage includes
    official and reduced public strategy fixtures.
