@@ -1173,6 +1173,35 @@ strategy.close_all(immediately=close, disable_alert="yes")
     ]);
   });
 
+  it('reports invalid Pine strategy order string option values', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy Order Strings")
+strategy.entry(1, strategy.long, comment=2, alert_message=3)
+strategy.order("Add", strategy.long, oca_name=4)
+strategy.exit(1, from_entry=2, limit=close, comment_profit=3, alert_trailing=4)
+strategy.close(1, comment=2, alert_message=3)
+strategy.close_all(comment=1, alert_message=2)
+strategy.cancel(1)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy.entry id must be a string, got int',
+      'strategy.entry comment must be a string, got int',
+      'strategy.entry alert_message must be a string, got int',
+      'strategy.order oca_name must be a string, got int',
+      'strategy.exit id must be a string, got int',
+      'strategy.exit from_entry must be a string, got int',
+      'strategy.exit comment_profit must be a string, got int',
+      'strategy.exit alert_trailing must be a string, got int',
+      'strategy.close id must be a string, got int',
+      'strategy.close comment must be a string, got int',
+      'strategy.close alert_message must be a string, got int',
+      'strategy.close_all comment must be a string, got int',
+      'strategy.close_all alert_message must be a string, got int',
+      'strategy.cancel id must be a string, got int',
+    ]);
+  });
+
   it('reports duplicate declarations in the same scope', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate")
