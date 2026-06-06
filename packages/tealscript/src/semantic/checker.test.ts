@@ -5819,6 +5819,26 @@ missingModifyTicker = ticker.modify(session=session.extended)
     ]);
   });
 
+  it('reports invalid literal ticker option values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Ticker Options")
+badConstants = ticker.new("NASDAQ", "AAPL", session=session.premarket, adjustment=adjustment.all, backadjustment=backadjustment.auto, settlement_as_close=settlement_as_close.auto)
+badStrings = ticker.modify(badConstants, session="premarket", adjustment="all", backadjustment="auto", settlement_as_close="auto")
+plot(str.length(badConstants + badStrings))
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid ticker.new session: session.premarket',
+      'Invalid ticker.new adjustment: adjustment.all',
+      'Invalid ticker.new backadjustment: backadjustment.auto',
+      'Invalid ticker.new settlement_as_close: settlement_as_close.auto',
+      'Invalid ticker.modify session: premarket',
+      'Invalid ticker.modify adjustment: all',
+      'Invalid ticker.modify backadjustment: auto',
+      'Invalid ticker.modify settlement_as_close: auto',
+    ]);
+  });
+
   it('resolves request helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Request Signatures")
