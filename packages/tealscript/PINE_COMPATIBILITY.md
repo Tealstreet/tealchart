@@ -243,7 +243,8 @@ whose branches return the same source. Same-source `if` initializers also retain
 source identity for downstream delayed helper windows. Pure arithmetic
 expressions over known OHLCV, quote, derived OHLC, and source-parameter series
 also carry source identity through helper returns for downstream delayed rolling
-windows, including equivalent arithmetic ternary and `switch` branch wrappers.
+windows, including equivalent arithmetic ternary, `switch`, and multiline block
+`if` branch wrappers plus block-local `if` initializers.
 `ta.rma()`, `ta.rsi()`, and
 `ta.atr()` use
 Pine's SMA-seeded RMA warmup before recursive smoothing; `ta.atr()` is covered
