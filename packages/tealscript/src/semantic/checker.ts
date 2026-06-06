@@ -1750,6 +1750,18 @@ const VISUAL_COLOR_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>(
   ['plotchar', ['color', 'textcolor']],
   ['plotarrow', ['colorup', 'colordown']],
 ]);
+const VISUAL_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['barcolor', ['editable']],
+  ['bgcolor', ['editable', 'force_overlay']],
+  ['fill', ['editable', 'fillgaps']],
+  ['hline', ['editable']],
+  ['plot', ['trackprice', 'join', 'editable', 'force_overlay']],
+  ['plotbar', ['editable', 'force_overlay']],
+  ['plotcandle', ['editable', 'force_overlay']],
+  ['plotshape', ['editable', 'force_overlay']],
+  ['plotchar', ['editable', 'force_overlay']],
+  ['plotarrow', ['editable', 'force_overlay']],
+]);
 
 const DRAWING_XLOC_VALUES = new Set(['bar_index', 'bar_time']);
 const DRAWING_XLOC_CONSTANT_VALUES = new Map([
@@ -3785,6 +3797,7 @@ class SemanticChecker {
     this.checkMarkerStyleLocationSizeLiteralArguments(expression);
     this.checkVisualNumericOptionLiteralArguments(expression);
     this.checkVisualStringOptionArguments(expression, scope);
+    this.checkVisualBoolOptionArguments(expression, scope);
     this.checkColorOptionArguments(expression, scope);
     this.checkDisplayOptionLiteralArguments(expression);
     this.checkDrawingCoordinateOptionLiteralArguments(expression, scope);
@@ -5182,6 +5195,20 @@ class SemanticChecker {
         `${calleeName} ${parameterName} must be a string, got ${this.formatSemanticType(argumentType)}`,
         argument.loc,
       );
+    }
+  }
+
+  private checkVisualBoolOptionArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const parameterNames = VISUAL_BOOL_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!parameterNames) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of parameterNames) {
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'boolean');
     }
   }
 

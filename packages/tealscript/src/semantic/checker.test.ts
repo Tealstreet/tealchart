@@ -823,6 +823,46 @@ plotarrow(close - open, minheight=0, maxheight=1.5)
     ]);
   });
 
+  it('reports invalid visual boolean option values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Visual Boolean Options")
+linePlot = plot(close, trackprice="yes", join=1, editable="no", force_overlay=1)
+basePlot = plot(open)
+hline(100, editable=1)
+fill(linePlot, basePlot, color.red, editable="yes", fillgaps=1)
+barcolor(color.red, editable="yes")
+bgcolor(color.blue, editable=1, force_overlay="yes")
+plotbar(open, high, low, close, editable=1, force_overlay="yes")
+plotcandle(open, high, low, close, editable="yes", force_overlay=1)
+plotshape(close > open, editable=1, force_overlay="yes")
+plotchar(close > open, editable="yes", force_overlay=1)
+plotarrow(close - open, editable=1, force_overlay="yes")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'plot trackprice must be a boolean, got string',
+      'plot join must be a boolean, got int',
+      'plot editable must be a boolean, got string',
+      'plot force_overlay must be a boolean, got int',
+      'hline editable must be a boolean, got int',
+      'fill editable must be a boolean, got string',
+      'fill fillgaps must be a boolean, got int',
+      'barcolor editable must be a boolean, got string',
+      'bgcolor editable must be a boolean, got int',
+      'bgcolor force_overlay must be a boolean, got string',
+      'plotbar editable must be a boolean, got int',
+      'plotbar force_overlay must be a boolean, got string',
+      'plotcandle editable must be a boolean, got string',
+      'plotcandle force_overlay must be a boolean, got int',
+      'plotshape editable must be a boolean, got int',
+      'plotshape force_overlay must be a boolean, got string',
+      'plotchar editable must be a boolean, got string',
+      'plotchar force_overlay must be a boolean, got int',
+      'plotarrow editable must be a boolean, got int',
+      'plotarrow force_overlay must be a boolean, got string',
+    ]);
+  });
+
   it('reports invalid visual string option values', () => {
     const result = checkProgram(parse(`
 indicator("Invalid Visual String Options")
