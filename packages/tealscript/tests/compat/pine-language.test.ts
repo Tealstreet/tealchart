@@ -49,6 +49,34 @@ plot(rt.mid(high, low), title="Mid")
     expect(roundSeries(getPlot(result, 'Mid').values)).toEqual([101, 103.5, 106, 105.5, 101, 98.5, 102, 106.5, 108.5, 109.5, 111.5, 110.5]);
   });
 
+  it('preserves source identity through imported library function parameters', () => {
+    const library = parse(`
+library("SourceTools", true)
+export delayedAverage(series float src) =>
+    bar_index >= 1 ? ta.sma(src, 2) : na
+`);
+
+    const result = runCompatScript(`
+indicator("Imported source identity")
+import TestUser/SourceTools/1 as st
+plot(st.delayedAverage(open), title="Imported Average")
+plot(st.delayedAverage(src=open), title="Named Imported Average")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ],
+      engineOptions: {
+        libraries: new Map([['TestUser/SourceTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Imported Average').values).toEqual([null, 15, 25]);
+    expect(getPlot(result, 'Named Imported Average').values).toEqual([null, 15, 25]);
+  });
+
   it('keeps imported library function var state isolated per call site', () => {
     const library = parse(`
 library("Counters", true)
