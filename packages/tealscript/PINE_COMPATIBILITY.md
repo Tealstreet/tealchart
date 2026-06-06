@@ -470,7 +470,9 @@ methods, and read fields from the resulting object references.
 The source-linked checkpoint corpus also includes a reduced public
 market-structure state idiom with wrapped UDT field defaults, first-bar
 constructor initialization, persistent object mutation, and method-dispatch
-state.
+state. Source-linked public UDT array checkpoint coverage now locks bounded
+arrays of pivot-record UDT instances, copied snapshot reads, method-derived
+scores, and last-bar dashboard table output.
 
 User-defined `method` declarations now parse and dispatch for primitive and
 UDT receiver values, including method calls that mutate and return UDT
