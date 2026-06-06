@@ -102,6 +102,67 @@ plot(ta.vwap(source=close, anchor=anchor), title="Named Anchored Close VWAP")
     expect(roundSeries(getPlot(result, 'Named Anchored Close VWAP').values)).toEqual(roundSeries(getPlot(result, 'Anchored Close VWAP').values));
   });
 
+  it('runs ta.vwap anchored band tuple overloads', () => {
+    const result = runCompatScript(`
+indicator("VWAP band tuple")
+anchor = bar_index == 0 or bar_index == 6
+[vwap, upper, lower] = ta.vwap(close, anchor, 1.5)
+[namedVwap, namedUpper, namedLower] = ta.vwap(source=close, anchor=anchor, stdev_mult=1.5)
+[mixedVwap, mixedUpper, mixedLower] = ta.vwap(source=close, anchor, 1.5)
+plot(vwap, title="VWAP")
+plot(upper, title="Upper")
+plot(lower, title="Lower")
+plot(namedUpper, title="Named Upper")
+plot(mixedLower, title="Mixed Lower")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'VWAP').values)).toEqual([
+      102,
+      103.571429,
+      104.6,
+      104.129412,
+      102.858407,
+      102.410448,
+      104,
+      106.758621,
+      107.121951,
+      108.160714,
+      108.517986,
+      109.119048,
+    ]);
+    expect(roundSeries(getPlot(result, 'Upper').values)).toEqual([
+      102,
+      105.818876,
+      107.614963,
+      106.888455,
+      106.952329,
+      106.480228,
+      104,
+      110.488501,
+      110.371259,
+      111.950964,
+      112.091053,
+      112.921571,
+    ]);
+    expect(roundSeries(getPlot(result, 'Lower').values)).toEqual([
+      102,
+      101.323981,
+      101.585037,
+      101.370369,
+      98.764485,
+      98.340667,
+      104,
+      103.02874,
+      103.872643,
+      104.370465,
+      104.944919,
+      105.316524,
+    ]);
+    expect(roundSeries(getPlot(result, 'Named Upper').values)).toEqual(roundSeries(getPlot(result, 'Upper').values));
+    expect(roundSeries(getPlot(result, 'Mixed Lower').values)).toEqual(roundSeries(getPlot(result, 'Lower').values));
+  });
+
   it('runs ta.cross and ta.range compatibility helpers', () => {
     const result = runCompatScript(`
 indicator("TA cross range")
