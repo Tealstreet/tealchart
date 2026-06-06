@@ -57,6 +57,51 @@ plot(ta.lowestbars(low, 4), title="Lowest Offset")
     expect(roundSeries(getPlot(result, 'Lowest Offset').values)).toEqual([0, 1, 2, 3, 0, 0, 1, 2, 3, 3, 3, 3]);
   });
 
+  it('runs ta.vwap default, source, anchor, and mixed argument forms', () => {
+    const result = runCompatScript(`
+indicator("VWAP call binding")
+anchor = bar_index == 0 or bar_index == 6
+plot(ta.vwap(), title="Default VWAP")
+plot(ta.vwap(hlc3), title="HLC3 VWAP")
+plot(ta.vwap(close, anchor), title="Anchored Close VWAP")
+plot(ta.vwap(source=close, anchor), title="Mixed Anchored Close VWAP")
+plot(ta.vwap(source=close, anchor=anchor), title="Named Anchored Close VWAP")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Default VWAP').values)).toEqual([
+      101.333333,
+      102.730159,
+      103.811111,
+      104.062745,
+      103.138643,
+      102.49005,
+      102.51875,
+      103.321181,
+      103.878086,
+      104.624661,
+      105.255189,
+      105.806843,
+    ]);
+    expect(roundSeries(getPlot(result, 'HLC3 VWAP').values)).toEqual(roundSeries(getPlot(result, 'Default VWAP').values));
+    expect(roundSeries(getPlot(result, 'Anchored Close VWAP').values)).toEqual([
+      102,
+      103.571429,
+      104.6,
+      104.129412,
+      102.858407,
+      102.410448,
+      104,
+      106.758621,
+      107.121951,
+      108.160714,
+      108.517986,
+      109.119048,
+    ]);
+    expect(roundSeries(getPlot(result, 'Mixed Anchored Close VWAP').values)).toEqual(roundSeries(getPlot(result, 'Anchored Close VWAP').values));
+    expect(roundSeries(getPlot(result, 'Named Anchored Close VWAP').values)).toEqual(roundSeries(getPlot(result, 'Anchored Close VWAP').values));
+  });
+
   it('runs ta.cross and ta.range compatibility helpers', () => {
     const result = runCompatScript(`
 indicator("TA cross range")

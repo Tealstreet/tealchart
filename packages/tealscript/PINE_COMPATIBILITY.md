@@ -138,6 +138,9 @@ Covered behavior and remaining gaps:
   and `box.new()`. Worker protocol and wrapper coverage preserve structured
   semantic diagnostic codes, messages, severities, locations, and freshness
   metadata for editor-facing error callbacks.
+- `ta.vwap()` accepts Pine-style default-source calls plus `source`/`anchor`
+  positional, named, and named-prefix mixed argument forms. Runtime VWAP
+  accumulators are isolated per call site and reset when `anchor` is true.
 - Recursive user-defined function calls are rejected with an explicit diagnostic
   instead of overflowing the runtime stack.
 - Arbitrary nested indented blocks still use a simplified indentation grammar
