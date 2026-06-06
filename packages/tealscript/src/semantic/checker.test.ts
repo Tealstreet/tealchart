@@ -584,6 +584,27 @@ request.seed("seed", "SYM", close, calc_bars_count=1.5)
     ]);
   });
 
+  it('reports invalid literal request barmerge modes', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Request Barmerge Modes")
+request.security(syminfo.tickerid, "1D", close, gaps="bad_gaps")
+request.security(syminfo.tickerid, "1D", close, lookahead="bad_lookahead")
+request.dividends("NASDAQ:AAPL", dividends.gross, gaps="bad_gaps")
+request.earnings("NASDAQ:AAPL", earnings.actual, lookahead="bad_lookahead")
+request.financial("NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", gaps="bad_gaps")
+request.economic("US", "GDP", gaps="bad_gaps")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid request.security gaps mode: bad_gaps',
+      'Invalid request.security lookahead mode: bad_lookahead',
+      'Invalid request.dividends gaps mode: bad_gaps',
+      'Invalid request.earnings lookahead mode: bad_lookahead',
+      'Invalid request.financial gaps mode: bad_gaps',
+      'Invalid request.economic gaps mode: bad_gaps',
+    ]);
+  });
+
   it('reports invalid OHLC visual output argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Invalid OHLC Visual Bindings")

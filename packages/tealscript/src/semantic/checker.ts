@@ -177,6 +177,16 @@ const INPUT_DEFAULT_TYPE_REQUIREMENTS = new Map<string, 'bool' | 'int' | 'number
 
 const INPUT_RANGE_OPTION_OVERLOAD_NAMES = new Set(['input.float', 'input.int']);
 const INPUT_RANGE_OPTION_RANGE_PARAMS = new Set(['minval', 'maxval', 'step']);
+const REQUEST_GAPS_MODES = new Set(['barmerge.gaps_on', 'barmerge.gaps_off']);
+const REQUEST_LOOKAHEAD_MODES = new Set(['barmerge.lookahead_on', 'barmerge.lookahead_off']);
+const REQUEST_BARMERGE_MODE_CALLS = new Set([
+  'request.security',
+  'request.dividends',
+  'request.earnings',
+  'request.splits',
+  'request.financial',
+  'request.economic',
+]);
 
 const COLOR_CONSTRUCTOR_NAMES = new Set(['color.new', 'color.rgb']);
 const COLOR_CHANNEL_NAMES = new Set(['color.r', 'color.g', 'color.b', 'color.t']);
@@ -3025,6 +3035,7 @@ class SemanticChecker {
     this.checkInputDefaultValueType(expression, scope);
     this.checkMaxBarsBackLiteralArguments(expression);
     this.checkRequestCalcBarsCountLiteralArguments(expression);
+    this.checkRequestBarmergeModeLiteralArguments(expression);
     this.checkStrategyLiteralArgumentConstraints(expression);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
@@ -3694,6 +3705,57 @@ class SemanticChecker {
         return 4;
       default:
         return undefined;
+    }
+  }
+
+  private checkRequestBarmergeModeLiteralArguments(expression: CallExpression): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const binding = this.requestBarmergeModeBinding(calleeName);
+    if (!binding) return;
+
+    if (binding.gaps !== undefined) {
+      const gaps = this.resolveCallArgumentExpression(expression, binding.parameterNames, binding.gaps);
+      this.checkRequestBarmergeModeLiteralValue(
+        gaps,
+        REQUEST_GAPS_MODES,
+        `Invalid ${calleeName} gaps mode`,
+      );
+    }
+    if (binding.lookahead !== undefined) {
+      const lookahead = this.resolveCallArgumentExpression(expression, binding.parameterNames, binding.lookahead);
+      this.checkRequestBarmergeModeLiteralValue(
+        lookahead,
+        REQUEST_LOOKAHEAD_MODES,
+        `Invalid ${calleeName} lookahead mode`,
+      );
+    }
+  }
+
+  private requestBarmergeModeBinding(calleeName: string): { parameterNames: string[]; gaps?: number; lookahead?: number } | undefined {
+    if (!REQUEST_BARMERGE_MODE_CALLS.has(calleeName)) return undefined;
+
+    const parameterNames = BUILTIN_SIGNATURES.get(calleeName)?.params;
+    if (!parameterNames) return undefined;
+
+    const gaps = parameterNames.indexOf('gaps');
+    const lookahead = parameterNames.indexOf('lookahead');
+    return {
+      parameterNames,
+      gaps: gaps === -1 ? undefined : gaps,
+      lookahead: lookahead === -1 ? undefined : lookahead,
+    };
+  }
+
+  private checkRequestBarmergeModeLiteralValue(
+    expression: Expression | undefined,
+    allowedValues: Set<string>,
+    messagePrefix: string,
+  ): void {
+    if (!expression) return;
+
+    const value = this.constantLiteralValue(expression);
+    if (typeof value === 'string' && !allowedValues.has(value)) {
+      this.addDiagnostic('type-mismatch', `${messagePrefix}: ${value}`, expression.loc);
     }
   }
 
