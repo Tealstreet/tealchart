@@ -509,10 +509,11 @@ Imported exported UDT constructors reject positional arguments after named
 arguments at runtime.
 Exported imported functions and methods report runtime call-shape diagnostics
 for unknown named arguments, missing required arguments, excess positional
-arguments, and invalid argument order. Exported imported methods dispatch on
-imported UDT instances. Non-exported library functions, methods, and types
-remain private to their source module, but exported library functions can call
-private helpers, construct library-local UDTs, and use library-local methods.
+arguments, and invalid argument order, with method calls labeled as library
+methods in semantic and runtime messages. Exported imported methods dispatch on
+imported UDT instances. Non-exported library functions, methods, and types remain
+private to their source module, but exported library functions can call private
+helpers, construct library-local UDTs, and use library-local methods.
 Semantic export diagnostics cover Pine's requirement that any UDT exposed
 through exported fields, callable parameters, or inferred callable return values
 is also exported by the library.
