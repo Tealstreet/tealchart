@@ -112,12 +112,9 @@ Known structural gaps:
   scale to arbitrary nested pasted Pine code.
 - Pine's qualified type system (`const < input < simple < series`) is partially
   modeled but not yet a complete compiler/runtime contract.
-- Some runtime semantics remain approximate, especially expression-level
-  source-series inference beyond direct built-in source arguments, simple
-  source aliases, `input.source()` selections, UDF/imported source parameters,
-  simple source-returning UDF or method calls, same-source ternary returns, and
-  same-source expression-only `switch` returns, realtime `varip`, exchange
-  calendar catalogs, full historical `max_bars_back` behavior, strategy
+- Some runtime semantics remain approximate, especially broader
+  expression-level source-series inference, realtime `varip`, exchange calendar
+  catalogs, full historical `max_bars_back` behavior, strategy
   intrabar/recalculation semantics, and live host metadata/data availability.
 - Renderer output is useful for many scripts, but TradingView-exact geometry,
   z-order, pixel sizing, and Strategy Tester UI parity are later work.
