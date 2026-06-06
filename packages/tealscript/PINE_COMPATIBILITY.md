@@ -141,6 +141,8 @@ Covered behavior and remaining gaps:
 - `ta.vwap()` accepts Pine-style default-source calls plus `source`/`anchor`
   positional, named, and named-prefix mixed argument forms. Runtime VWAP
   accumulators are isolated per call site and reset when `anchor` is true.
+  The `stdev_mult` overload returns `[vwap, upper, lower]` band tuples with
+  weighted cumulative standard-deviation bands.
 - Recursive user-defined function calls are rejected with an explicit diagnostic
   instead of overflowing the runtime stack.
 - Arbitrary nested indented blocks still use a simplified indentation grammar

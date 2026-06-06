@@ -24,6 +24,25 @@ plot(last_bar_time, title="Last Bar Time")
     ]);
   });
 
+  it('treats only ta.vwap stdev overload calls as tuple initializers', () => {
+    const valid = checkProgram(parse(`
+indicator("VWAP tuple OK")
+anchor = bar_index == 0
+[vwap, upper, lower] = ta.vwap(close, anchor, 1.5)
+plot(vwap + upper + lower)
+`));
+    const invalid = checkProgram(parse(`
+indicator("VWAP scalar tuple invalid")
+[vwap, upper, lower] = ta.vwap(close)
+plot(vwap)
+`));
+
+    expect(valid.diagnostics).toEqual([]);
+    expect(invalid.diagnostics.map((diagnostic) => diagnostic.message)).toContain(
+      'Tuple declaration expects 3 values but initializer arm returns a non-tuple value',
+    );
+  });
+
   it('accepts calendar functions with named time and timezone arguments', () => {
     const result = checkProgram(parse(`
 indicator("Calendar Functions")
