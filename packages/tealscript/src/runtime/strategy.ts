@@ -500,7 +500,7 @@ export function fillPendingStrategyMarketOrders(
     const fill = fillStrategyMarketOrder(ledger, order, open, barIndex, time, mintick);
     if (fill) {
       fills.push(fill);
-      cancelOcaOrders(ledger, order, barIndex, time);
+      applyOcaOrderEffects(ledger, order, fill.qty, barIndex, time);
     }
   }
   return fills;
@@ -525,7 +525,7 @@ export function fillPendingStrategyOrders(
     const fill = fillStrategyOrder(ledger, order, price, barIndex, time, mintick);
     if (fill) {
       fills.push(fill);
-      cancelOcaOrders(ledger, order, barIndex, time);
+      applyOcaOrderEffects(ledger, order, fill.qty, barIndex, time);
     }
   }
   return fills;
@@ -557,7 +557,7 @@ export function fillPendingStrategyOrdersOnTicks(
       const fill = fillStrategyOrder(ledger, order, price, barIndex, tick.time, mintick);
       if (fill) {
         fills.push(fill);
-        cancelOcaOrders(ledger, order, barIndex, tick.time);
+        applyOcaOrderEffects(ledger, order, fill.qty, barIndex, tick.time);
       }
     }
 
@@ -822,8 +822,14 @@ function isStopLimitTriggered(order: StrategyOrder, high: number, low: number): 
   return low <= order.stopPrice;
 }
 
-function cancelOcaOrders(ledger: StrategyLedger, filledOrder: StrategyOrder, barIndex: number, time: number): void {
-  if (filledOrder.ocaName === undefined || filledOrder.ocaType !== 'cancel') {
+function applyOcaOrderEffects(
+  ledger: StrategyLedger,
+  filledOrder: StrategyOrder,
+  filledQty: number,
+  barIndex: number,
+  time: number,
+): void {
+  if (filledOrder.ocaName === undefined || filledOrder.ocaType === undefined) {
     return;
   }
 
@@ -832,15 +838,49 @@ function cancelOcaOrders(ledger: StrategyLedger, filledOrder: StrategyOrder, bar
       order.status !== 'pending'
       || order === filledOrder
       || order.ocaName !== filledOrder.ocaName
-      || order.ocaType !== 'cancel'
+      || order.ocaType !== filledOrder.ocaType
     ) {
       continue;
     }
 
+    if (filledOrder.ocaType === 'cancel') {
+      order.status = 'cancelled';
+      order.updatedBarIndex = barIndex;
+      order.updatedTime = time;
+      continue;
+    }
+
+    reduceOcaOrderQuantity(order, filledQty, barIndex, time);
+  }
+}
+
+function reduceOcaOrderQuantity(order: StrategyOrder, filledQty: number, barIndex: number, time: number): void {
+  if (order.ocaType !== 'reduce' || order.qty === null || !Number.isFinite(filledQty) || filledQty <= 0) {
+    return;
+  }
+
+  const nextQty = order.qty - filledQty;
+  if (nextQty <= 0) {
+    order.qty = 0;
+    order.requestedQty = order.requestedQty === null ? null : 0;
+    if (order.qtyType === 'fixed') {
+      order.qtyValue = 0;
+    }
     order.status = 'cancelled';
     order.updatedBarIndex = barIndex;
     order.updatedTime = time;
+    return;
   }
+
+  order.qty = nextQty;
+  if (order.requestedQty !== null && order.requestedQty !== undefined) {
+    order.requestedQty = Math.max(0, order.requestedQty - filledQty);
+  }
+  if (order.qtyType === 'fixed') {
+    order.qtyValue = nextQty;
+  }
+  order.updatedBarIndex = barIndex;
+  order.updatedTime = time;
 }
 
 export function cancelStrategyOrder(ledger: StrategyLedger, id: string, barIndex: number, time: number): boolean {

@@ -2370,6 +2370,70 @@ plot(strategy.position_size)`;
       ]);
     });
 
+    it('reduces pending strategy.oca.reduce sibling quantities after a fill', () => {
+      const script = `//@version=6
+strategy("OCA reduce partial")
+if bar_index == 0
+    strategy.order("A", strategy.long, qty=3, limit=99, oca_name="grp", oca_type=strategy.oca.reduce)
+    strategy.order("B", strategy.long, qty=5, limit=95, oca_name="grp", oca_type=strategy.oca.reduce)
+plot(strategy.position_size)`;
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 101, low: 99.5, close: 100, volume: 1000 },
+        { time: 2, open: 100, high: 101, low: 98.5, close: 100, volume: 1000 },
+        { time: 3, open: 100, high: 101, low: 99.5, close: 100, volume: 1000 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        qty: order.qty,
+        requestedQty: order.requestedQty,
+        qtyValue: order.qtyValue,
+        avgFillPrice: order.avgFillPrice,
+        updatedBarIndex: order.updatedBarIndex,
+      }))).toEqual([
+        { id: 'A', status: 'filled', qty: 3, requestedQty: 3, qtyValue: 3, avgFillPrice: 99, updatedBarIndex: 1 },
+        { id: 'B', status: 'pending', qty: 2, requestedQty: 2, qtyValue: 2, avgFillPrice: null, updatedBarIndex: 1 },
+      ]);
+      expect(result.strategy.position.size).toBe(3);
+      expect(result.plots[0]?.values).toEqual([0, 0, 3]);
+    });
+
+    it('cancels strategy.oca.reduce siblings when a fill consumes their quantity', () => {
+      const script = `//@version=6
+strategy("OCA reduce cancel")
+if bar_index == 0
+    strategy.order("A", strategy.long, qty=3, limit=99, oca_name="grp", oca_type=strategy.oca.reduce)
+    strategy.order("B", strategy.long, qty=2, limit=95, oca_name="grp", oca_type=strategy.oca.reduce)
+plot(strategy.position_size)`;
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 101, low: 99.5, close: 100, volume: 1000 },
+        { time: 2, open: 100, high: 101, low: 98.5, close: 100, volume: 1000 },
+        { time: 3, open: 100, high: 101, low: 99.5, close: 100, volume: 1000 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        qty: order.qty,
+        requestedQty: order.requestedQty,
+        qtyValue: order.qtyValue,
+        avgFillPrice: order.avgFillPrice,
+        updatedBarIndex: order.updatedBarIndex,
+      }))).toEqual([
+        { id: 'A', status: 'filled', qty: 3, requestedQty: 3, qtyValue: 3, avgFillPrice: 99, updatedBarIndex: 1 },
+        { id: 'B', status: 'cancelled', qty: 0, requestedQty: 0, qtyValue: 0, avgFillPrice: null, updatedBarIndex: 1 },
+      ]);
+      expect(result.strategy.position.size).toBe(3);
+      expect(result.plots[0]?.values).toEqual([0, 0, 3]);
+    });
+
     it('does not fill updated strategy.exit prices until a later bar', () => {
       const script = `//@version=6
 strategy("Exit activation", process_orders_on_close=true)
