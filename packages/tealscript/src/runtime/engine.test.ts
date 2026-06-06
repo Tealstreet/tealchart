@@ -6096,6 +6096,37 @@ plot(close[2], title="Close")`;
       expect(result.errors).toEqual([]);
       expect(result.profile.maxBarsBack).toBe(2);
     });
+
+    it('statically reports literal history offsets from unexecuted branches', () => {
+      const script = `//@version=6
+indicator("Static History")
+neverUsed(value) =>
+    if false
+        value[5]
+    else
+        value
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(5);
+    });
+
+    it('keeps obvious array indexes out of static history inference', () => {
+      const script = `//@version=6
+indicator("Array Static History")
+values = array.from(10, 20, 30)
+alias = values
+literal = [40, 50, 60][2]
+plot(alias[2] + literal, title="Array Values")`;
+
+      const result = executeScript(parse(script), createBars(2, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(0);
+      expect(result.plots.find((plot) => plot.title === 'Array Values')?.values).toEqual([90, 90]);
+    });
   });
 
   describe('inputs', () => {
