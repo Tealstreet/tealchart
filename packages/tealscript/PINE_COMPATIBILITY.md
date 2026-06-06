@@ -101,8 +101,8 @@ Covered behavior and remaining gaps:
   expressions, direct declaration `if`, `switch`, and loop initializers, direct
   and compatible if/else plus partial-if user-function tuple returns, direct
   user-function loop and defaulted or partial switch tuple returns, compatible
-  user-method tuple returns, and supported tuple-returning TA calls, so
-  downstream assignment diagnostics can use destructured names. Direct tuple
+  user-method tuple returns, and supported tuple-returning TA calls including
+  `ta.kc()`, so downstream assignment diagnostics can use destructured names. Direct tuple
   initializers, including known local user-call tuple returns and mixed-shape
   user-call control returns, and direct control initializer tuple arms,
   including arm-local user-call tuple returns, diagnose obvious non-tuple and
