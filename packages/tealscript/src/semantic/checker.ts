@@ -1424,6 +1424,16 @@ const VISUAL_SIZE_CONSTANT_VALUES = new Map([
   ['size.auto', 'auto'],
 ]);
 
+const DISPLAY_OPTION_VALUES = new Set([
+  'display.none',
+  'display.pane',
+  'display.data_window',
+  'display.status_line',
+  'display.price_scale',
+  'display.all',
+]);
+const DISPLAY_OPTION_CONSTANT_VALUES = new Map([...DISPLAY_OPTION_VALUES].map((value) => [value, value]));
+
 for (const name of CALENDAR_FUNCTION_NAMES) {
   BUILTIN_SIGNATURES.set(name, { params: ['time', 'timezone'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true });
 }
@@ -3231,6 +3241,7 @@ class SemanticChecker {
     this.checkVisualFormatPrecisionLiteralArguments(expression);
     this.checkMarkerStyleLocationSizeLiteralArguments(expression);
     this.checkVisualNumericOptionLiteralArguments(expression);
+    this.checkDisplayOptionLiteralArguments(expression);
     this.checkStrategyLiteralArgumentConstraints(expression);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
@@ -4096,6 +4107,39 @@ class SemanticChecker {
       this.checkPositiveLiteralIntegerValue(
         maxheight,
         'plotarrow maxheight must be a positive integer',
+      );
+    }
+  }
+
+  private checkDisplayOptionLiteralArguments(expression: CallExpression): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const signature = BUILTIN_SIGNATURES.get(calleeName);
+    if (!signature?.params.includes('display')) return;
+
+    const candidates = new Set<Expression>();
+    const namedDisplay = expression.arguments.find((argument) => argument.name?.name === 'display')?.value;
+    if (namedDisplay) candidates.add(namedDisplay);
+
+    for (const parameterNames of [signature.params, ...(signature.overloads ?? [])]) {
+      const displayIndex = parameterNames.indexOf('display');
+      if (displayIndex === -1) continue;
+      const display = this.resolveCallArgumentExpression(expression, parameterNames, displayIndex);
+      if (display) candidates.add(display);
+    }
+
+    for (const display of candidates) {
+      const literalValue = this.constantLiteralValue(display);
+      if (typeof literalValue === 'string') {
+        this.addDiagnostic('type-mismatch', `Invalid ${calleeName} display: ${literalValue}`, display.loc);
+        continue;
+      }
+
+      this.checkNamespacedConstantStringValue(
+        display,
+        DISPLAY_OPTION_VALUES,
+        DISPLAY_OPTION_CONSTANT_VALUES,
+        'display.',
+        `Invalid ${calleeName} display`,
       );
     }
   }
