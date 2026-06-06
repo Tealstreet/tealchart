@@ -6208,6 +6208,27 @@ plot(close, title="Close")`;
       expect(result.profile.maxBarsBack).toBe(8);
     });
 
+    it('statically reports unexecuted statistical helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Statistics Profile")
+length = input.int(defval=9, title="Length")
+if false
+    plot(ta.dev(close, length), title="Deviation")
+    plot(ta.correlation(close, open, length=7), title="Correlation")
+    plot(ta.cog(source=close, length=6), title="COG")
+    plot(ta.median(close, 5), title="Median")
+    plot(ta.mode(source=close, 4), title="Mode")
+    plot(ta.percentile_nearest_rank(close, 8, 75), title="Nearest")
+    plot(ta.percentile_linear_interpolation(source=close, length=6, percentage=75), title="Linear")
+    plot(ta.percentrank(source=close, length=7), title="Percent Rank")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(8);
+    });
+
     it('statically reports unexecuted MACD lookback lengths in the runtime profile', () => {
       const script = `//@version=6
 indicator("Static MACD Profile")
