@@ -130,7 +130,8 @@ IndicatorDeclaration
         'calc_on_order_fills',
         'calc_on_every_tick',
         'process_orders_on_close',
-        'use_bar_magnifier'
+        'use_bar_magnifier',
+        'risk_free_rate'
       ];
       for (const arg of args) {
         if (arg.name) {

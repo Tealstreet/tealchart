@@ -65,6 +65,17 @@ describe('Tealscript Parser', () => {
       }));
     });
 
+    it('parses strategy risk-free-rate declaration arguments', () => {
+      const ast = parse('strategy("Risk", risk_free_rate=1.75)\n');
+      const strategy = ast.body[0] as IndicatorDeclaration;
+
+      expect(strategy.declarationKind).toBe('strategy');
+      expect(strategy.risk_free_rate).toEqual(expect.objectContaining({
+        type: 'NumericLiteral',
+        value: 1.75,
+      }));
+    });
+
     it('parses multiline indicator declarations', () => {
       const ast = parse(`indicator(
     "Wrapped Indicator",

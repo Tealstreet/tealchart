@@ -165,6 +165,7 @@ export interface StrategyLedgerSettings {
   calcOnEveryTick: boolean;
   processOrdersOnClose: boolean;
   useBarMagnifier: boolean;
+  riskFreeRate: number;
 }
 
 export interface StrategyOrder {
@@ -318,6 +319,7 @@ export function createDefaultStrategySettings(settings: Partial<StrategyLedgerSe
     calcOnEveryTick: false,
     processOrdersOnClose: false,
     useBarMagnifier: false,
+    riskFreeRate: 2,
     ...settings,
   };
 }

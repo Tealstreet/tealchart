@@ -588,7 +588,7 @@ plotarrow(close - open, series=open - close)
 
   it('reports invalid Pine declaration arguments', () => {
     const result = checkProgram(parse(`
-indicator("Bad Indicator", initial_capital=1000, typo=true)
+indicator("Bad Indicator", initial_capital=1000, risk_free_rate=2, typo=true)
 strategy("Bad Strategy", initial_capital=1000, typo=true)
 library("Bad Library", precision=2, dynamic_requests=true)
 export f(float x) => x
@@ -596,6 +596,7 @@ export f(float x) => x
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       "Unknown argument 'initial_capital' for indicator()",
+      "Unknown argument 'risk_free_rate' for indicator()",
       "Unknown argument 'typo' for indicator()",
       "Unknown argument 'typo' for strategy()",
       "Unknown argument 'precision' for library()",
@@ -613,7 +614,7 @@ export f(float x) => x
 
   it('accepts Pine strategy order and trade accessor calls', () => {
     const result = checkProgram(parse(`
-strategy("Strategy", initial_capital=1000, pyramiding=1, default_qty_type=strategy.fixed, default_qty_value=1)
+strategy("Strategy", initial_capital=1000, pyramiding=1, default_qty_type=strategy.fixed, default_qty_value=1, risk_free_rate=1.75)
 strategy.risk.allow_entry_in(strategy.direction.long)
 strategy.entry("Long", strategy.long, qty=1, limit=close, oca_type=strategy.oca.cancel, alert_message="entry")
 strategy.entry(id="PrefixLong", strategy.long, 1, close, na, "EntryOca", strategy.oca.cancel, "entry comment", "entry alert")

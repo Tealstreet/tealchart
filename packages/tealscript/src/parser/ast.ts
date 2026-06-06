@@ -86,6 +86,7 @@ export interface IndicatorDeclaration extends BaseNode {
   calc_on_every_tick?: Expression;
   process_orders_on_close?: Expression;
   use_bar_magnifier?: Expression;
+  risk_free_rate?: Expression;
 }
 
 /**
