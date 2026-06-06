@@ -285,7 +285,7 @@ plot(ta.rsi(source=close, 3), title="RSI")
     expect(roundSeries(getPlot(result, 'MFI').values)).toEqual([null, null, 100, 61.624951, 26.076294, 0, 35.319543, 74.59367, 100, 100, 100, 100]);
     expect(roundSeries(getPlot(result, 'WPR').values)).toEqual([null, null, -11.111111, -75, -90.909091, -69.230769, -11.111111, -7.142857, -25, -11.111111, -50, -28.571429]);
     expect(roundSeries(getPlot(result, 'CMO').values)).toEqual([null, null, null, 11.111111, -60, -77.777778, 11.111111, 100, 80, 77.777778, 20, 66.666667]);
-    expect(roundSeries(getPlot(result, 'RSI').values)).toEqual([null, 100, 100, 40, 21.052632, 32.960894, 64.809384, 81.388135, 71.309665, 81.57622, 69.195716, 78.83301]);
+    expect(roundSeries(getPlot(result, 'RSI').values)).toEqual([null, null, null, 55.555556, 33.333333, 42.028986, 67.479675, 82.162765, 72.361316, 82.015652, 69.821198, 79.13023]);
     expect(roundSeries(getPlot(result, 'TSI').values)).toEqual([null, 1, 1, 0.127273, -0.423181, -0.350948, 0.263311, 0.667454, 0.546809, 0.68082, 0.455692, 0.582409]);
     expect(roundSeries(getPlot(result, 'Derived TSI').values)).toEqual([null, 1, 0.333333, -0.708333, -0.792793, 0.212408, 0.577159, 0.708576, -0.246146, 0.084836, -0.231693, 0.049573]);
     expect(roundSeries(getPlot(result, 'Close CCI').values)).toEqual([null, null, 87.5, -100, -100, -28.571429, 100, 100, 33.333333, 100, 20, 100]);
@@ -318,17 +318,17 @@ plot(namedRsi, title="Named RSI")
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'First RSI').values)).toEqual([
       null,
-      100,
-      100,
-      40,
-      21.052632,
-      32.960894,
-      64.809384,
-      81.388135,
-      71.309665,
-      81.57622,
-      69.195716,
-      78.83301,
+      null,
+      null,
+      55.555556,
+      33.333333,
+      42.028986,
+      67.479675,
+      82.162765,
+      72.361316,
+      82.015652,
+      69.821198,
+      79.13023,
     ]);
     expect(roundSeries(getPlot(result, 'Second RSI').values)).toEqual(roundSeries(getPlot(result, 'First RSI').values));
     expect(roundSeries(getPlot(result, 'Named RSI').values)).toEqual(roundSeries(getPlot(result, 'First RSI').values));
@@ -345,17 +345,17 @@ plot(ta.rsi(source=spread, length=3), title="Named Spread RSI")
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Spread RSI').values)).toEqual([
       null,
-      100,
-      40,
-      6.25,
-      6.25,
-      63.691377,
-      76.596782,
-      80.128338,
-      33.979986,
-      58.10728,
-      37.532605,
-      55.327494,
+      null,
+      null,
+      12.5,
+      12.5,
+      63.636364,
+      76.170213,
+      79.673321,
+      34.296875,
+      58.138377,
+      37.647059,
+      55.351038,
     ]);
     expect(roundSeries(getPlot(result, 'Named Spread RSI').values)).toEqual(roundSeries(getPlot(result, 'Spread RSI').values));
   });
@@ -1482,46 +1482,46 @@ plot(signal, title="Prefix Signal", color=prefixSignalColor)
     expect(getPlot(result, 'Hidden').color).toEqual(Array(compatibilityBars.length).fill(null));
     expect(roundSeries(getPlot(result, 'Signal').values)).toEqual([
       null,
-      100,
-      100,
-      49.484536,
-      31.135135,
-      37.856185,
-      57.302848,
-      70.682206,
-      65.866316,
-      72.438837,
-      67.392396,
-      71.951687,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      65.217391,
+      62.068966,
+      67.551622,
+      63.956555,
+      67.937983,
     ]);
     expect(getPlot(result, 'Named Signal').color).toEqual(getPlot(result, 'Signal').color);
     expect(getPlot(result, 'Prefix Signal').color).toEqual([
       null,
-      '#0A141E99',
-      '#0A141E99',
-      '#0A141ECC',
-      '#0A141EE0',
-      '#0A141ED9',
-      '#0A141EC4',
-      '#0A141EB8',
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
       '#0A141EBD',
-      '#0A141EB5',
+      '#0A141EBF',
       '#0A141EBA',
-      '#0A141EB5',
+      '#0A141EBD',
+      '#0A141EBA',
     ]);
     expect(getPlot(result, 'Signal').color).toEqual([
       null,
-      '#00FF0080',
-      '#00FF0080',
-      '#817E00BF',
-      '#B04F00D6',
-      '#9E6100CF',
-      '#6D9200B5',
-      '#4BB400A6',
-      '#57A800AB',
-      '#46B900A3',
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      '#59A600AD',
+      '#619E00B0',
       '#53AC00A8',
-      '#48B700A3',
+      '#5CA300AD',
+      '#52AD00A8',
     ]);
   });
 
