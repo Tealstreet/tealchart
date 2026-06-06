@@ -402,6 +402,41 @@ plot(close)
     ]);
   });
 
+  it('reports planned unsupported Pine builtin calls explicitly', () => {
+    const result = checkProgram(parse(`
+indicator("Planned Unsupported Calls")
+request.footprint(syminfo.tickerid)
+ticker.rangebar(syminfo.tickerid, 10)
+plot(close)
+`));
+
+    expect(result.diagnostics).toEqual([
+      expect.objectContaining({
+        code: 'unsupported-feature',
+        message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+      }),
+      expect.objectContaining({
+        code: 'unsupported-feature',
+        message: 'ticker.* functions are not supported yet: ticker.rangebar',
+      }),
+    ]);
+  });
+
+  it('keeps unknown ticker typos distinct from planned unsupported calls', () => {
+    const result = checkProgram(parse(`
+indicator("Unknown Ticker Calls")
+ticker.make("NASDAQ:AAPL")
+plot(close)
+`));
+
+    expect(result.diagnostics).toEqual([
+      expect.objectContaining({
+        code: 'unknown-function',
+        message: 'Unknown function: ticker.make',
+      }),
+    ]);
+  });
+
   it('does not report unknown builtin calls for user-defined methods', () => {
     const result = checkProgram(parse(`
 indicator("User Methods")

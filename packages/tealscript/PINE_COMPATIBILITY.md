@@ -739,7 +739,9 @@ public multi-symbol screener idiom.
 Known limits: request data availability is host/provider-gated, and
 `request.footprint()` remains unsupported until the host can provide the
 footprint/intrabar volume model described in
-[`FOOTPRINT_REQUEST_DESIGN.md`](./FOOTPRINT_REQUEST_DESIGN.md).
+[`FOOTPRINT_REQUEST_DESIGN.md`](./FOOTPRINT_REQUEST_DESIGN.md). Semantic
+analysis reports the planned `request.footprint()` gap with the same explicit
+unsupported-feature diagnostic used by runtime execution.
 
 The ticker pass covers `ticker.new()`, `ticker.modify()`, `ticker.standard()`,
 `ticker.inherit()`, `ticker.heikinashi()`, `ticker.renko()`,
@@ -747,7 +749,9 @@ The ticker pass covers `ticker.new()`, `ticker.modify()`, `ticker.standard()`,
 indicator request workflows. Session, adjustment, back-adjustment,
 settlement-as-close, and chart modifiers propagate as opaque request-datafeed
 keys. Semantic analysis preserves supported `ticker.*` helper return types for
-downstream assignment diagnostics. The in-memory test datafeed derives
+downstream assignment diagnostics, and planned unsupported ticker constructors
+such as `ticker.rangebar()` are reported explicitly instead of as generic
+unknown functions. The in-memory test datafeed derives
 Heikin-Ashi OHLC when matching base bars exist, with tests covering the
 `ticker.heikinashi()` modifier. The checkpoint corpus tracks an official ticker
 request fixture for extended-session and Heikin-Ashi synthetic IDs. Renko, Line
