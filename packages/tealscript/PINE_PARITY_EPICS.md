@@ -506,11 +506,12 @@ impact.
    diagnostics, built-in duplicate/unknown/missing/order argument diagnostics,
    visual output call signatures including `hline()`, `fill()` alias bindings,
    and OHLC `plotbar()` / `plotcandle()` arguments, drawing constructor
-   argument signatures, typed `input.*` default and literal constraint
-   diagnostics, and `input.int()` / `input.float()` range-vs-options overload
-   diagnostics, plus literal strategy order value diagnostics and declaration
-   argument diagnostics, covered while using corpus failures to prioritize
-   remaining named/positional overload gaps.
+   argument signatures, marker `plotchar()` / `plotarrow()` missing, unknown,
+   and duplicate argument diagnostics, typed `input.*` default and literal
+   constraint diagnostics, and `input.int()` / `input.float()` range-vs-options
+   overload diagnostics, plus literal strategy order value diagnostics and
+   declaration argument diagnostics, covered while using corpus failures to
+   prioritize remaining named/positional overload gaps.
 6. Visual output payload audit: keep marker dynamic text-color payloads,
    hidden-marker style masking, the source-linked public marker signal payload
    checkpoint, and other runtime visual metadata stable before investing in
