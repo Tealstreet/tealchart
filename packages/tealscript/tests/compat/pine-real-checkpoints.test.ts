@@ -8,6 +8,7 @@ import {
   financialRequestKey,
   InMemoryRequestDatafeed,
   InMemoryStrategyIntrabarDatafeed,
+  seedRequestSymbol,
   TealscriptEngine,
   type Bar,
 } from '../../src/runtime';
@@ -1456,6 +1457,42 @@ plot(expansion ? 1 : 0, title="Expansion")
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'GDP').values).toEqual([2.8, 2.8, 3.1, 3.1]);
     expect(getPlot(result, 'Expansion').values).toEqual([0, 0, 1, 1]);
+  });
+
+  it('locks a reduced public seed dataset overlay idiom', () => {
+    // Public idiom reference: public scripts can consume curated external
+    // datasets through request.seed() and merge them onto the chart.
+    // Source search: https://www.tradingview.com/scripts/search/pine%20seeds/
+    const bars: Bar[] = [
+      { time: 1_700_530_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_530_060_000, open: 101, high: 102, low: 100, close: 101, volume: 100 },
+      { time: 1_700_530_120_000, open: 102, high: 103, low: 101, close: 102, volume: 100 },
+      { time: 1_700_530_180_000, open: 103, high: 104, low: 102, close: 103, volume: 100 },
+    ];
+    const requestDatafeed = new InMemoryRequestDatafeed([
+      {
+        symbol: seedRequestSymbol('tradingview-pine-seeds/demo', 'BTC_DEV'),
+        timeframe: '60',
+        bars: [
+          { time: bars[0]!.time, open: 10, high: 10, low: 10, close: 10, volume: 1 },
+          { time: bars[2]!.time, open: 20, high: 20, low: 20, close: 20, volume: 1 },
+        ],
+      },
+    ]);
+    const result = runCompatScript(`
+indicator("Public Seed Dataset Checkpoint")
+seedClose = request.seed("tradingview-pine-seeds/demo", "BTC_DEV", close)
+seedTrend = seedClose > seedClose[1]
+plot(seedClose, title="Seed Close")
+plot(seedTrend ? 1 : 0, title="Seed Trend")
+`, {
+      bars,
+      engineOptions: { requestDatafeed },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Seed Close').values).toEqual([null, null, 10, 10]);
+    expect(getPlot(result, 'Seed Trend').values).toEqual([0, 0, 0, 0]);
   });
 
   it('locks a reduced public library helper idiom', () => {

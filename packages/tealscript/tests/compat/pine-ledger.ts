@@ -372,6 +372,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-seed-dataset-checkpoint',
+      title: 'Public Seed Dataset Checkpoint',
+      searchContext: 'TradingView public scripts search: pine seeds',
+      featureTags: ['request', 'seed'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-library-helper-checkpoint',
       title: 'Public Library Helper Checkpoint',
       searchContext: 'TradingView public scripts search: library helper',
