@@ -4680,7 +4680,7 @@ export class TealscriptEngine {
         return result;
       }
 
-      return this.evaluateExpression(fn.body);
+      return this.evaluateSourceAwareExpression(fn.body);
     } finally {
       this.userFunctionCallStack.pop();
       this.scope = savedScope;
@@ -4691,7 +4691,7 @@ export class TealscriptEngine {
     this.profileStatements += 1;
 
     if (stmt.type === 'ExpressionStatement') {
-      return { hasResult: true, value: this.evaluateExpression(stmt.expression) };
+      return { hasResult: true, value: this.evaluateSourceAwareExpression(stmt.expression) };
     }
 
     if (stmt.type === 'IfStatement') {
@@ -4708,6 +4708,12 @@ export class TealscriptEngine {
 
     this.executeStatementInternal(stmt, false);
     return { hasResult: false };
+  }
+
+  private evaluateSourceAwareExpression(expr: Expression): unknown {
+    const value = this.evaluateExpression(expr);
+    const sourceSeries = this.getSourceSeriesForExpression(expr, value);
+    return sourceSeries ? this.toKnownSourceValue(value, sourceSeries) : value;
   }
 
   private executeFunctionFor(stmt: ForStatement): { hasResult: boolean; value?: unknown } {
