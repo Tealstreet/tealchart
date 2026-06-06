@@ -4722,6 +4722,36 @@ fill(hline1=upper, hline2=lower, color=color.new(color.blue, 90))
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('reports invalid literal display option values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Display Values")
+displayTarget = display.all - display.status_line
+plot(close, display=displayTarget)
+plot(open, display=display.sidebar)
+plot(close, display="display.none")
+plotbar(open, high, low, close, display=display.sidebar)
+plotcandle(open, high, low, close, display=display.sidebar)
+plotshape(close > open, display=display.sidebar)
+hline(100, display="hidden")
+fill(plot(close), plot(open), color.red, display=display.typo)
+input.int(10, display=display.panel)
+bgcolor(color.red, display=display.panel)
+barcolor(color.red, display=display.none)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid plot display: display.sidebar',
+      'Invalid plot display: display.none',
+      'Invalid plotbar display: display.sidebar',
+      'Invalid plotcandle display: display.sidebar',
+      'Invalid plotshape display: display.sidebar',
+      'Invalid hline display: hidden',
+      'Invalid fill display: display.typo',
+      'Invalid input.int display: display.panel',
+      'Invalid bgcolor display: display.panel',
+    ]);
+  });
+
   it('infers visual output handle return types for downstream diagnostics', () => {
     const result = checkProgram(parse(`
 indicator("Visual Handle Types")

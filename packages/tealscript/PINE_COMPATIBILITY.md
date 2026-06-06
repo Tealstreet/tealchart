@@ -288,8 +288,9 @@ definitions. Semantic analysis preserves known `input.*` return types for
 downstream assignment diagnostics, including `input.source()` defval source
 types and `input.enum()` defval enum types. It also reports Pine-style diagnostics for typed default-value
 mismatches, literal default `minval` / `maxval` / `options` constraint
-violations, and `input.int()` / `input.float()` calls that mix `options` with
-range-only `minval`/`maxval`/`step` arguments.
+violations, invalid literal `display` option values, and `input.int()` /
+`input.float()` calls that mix `options` with range-only
+`minval`/`maxval`/`step` arguments.
 
 ## Common `array.*` Coverage
 
@@ -608,7 +609,9 @@ The visual metadata pass captures common Pine v6 display/style fields on
 `plotchar()`, and `plotarrow()`, including display, format, precision,
 force-overlay, and plot line-style metadata where those parameters exist. The
 compatibility fixture covers named and positional argument forms plus the
-common `format.*` constants and `plot.linestyle_*` constants used by Pine v6 line plots. Tealchart renderer
+common `format.*` constants and `plot.linestyle_*` constants used by Pine v6 line plots.
+Semantic diagnostics reject invalid literal `display` option values while
+leaving dynamic display expressions available for Pine-style masks. Tealchart renderer
 coverage applies plot line-style metadata in main and indicator panes and
 renders common plot offsets for line, marker, histogram, and area plot styles.
 Renderer coverage also honors `display.none` while retaining hidden plot values
