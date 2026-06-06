@@ -6176,6 +6176,36 @@ plot(histLine, title="Hist")`;
       expect(result.profile.maxBarsBack).toBe(8);
     });
 
+    it('statically reports unexecuted rolling helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Rolling Profile")
+length = input.int(defval=6, title="Length")
+if false
+    plot(math.sum(close, length), title="Sum")
+    plot(ta.sma(close, 5), title="SMA")
+    plot(ta.rsi(close, 4), title="RSI")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(5);
+    });
+
+    it('statically reports unexecuted MACD lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static MACD Profile")
+if false
+    [macdLine, signalLine, histLine] = ta.macd(close, 3, 9, 5)
+    plot(macdLine, title="MACD")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(8);
+    });
+
     it('reports invalid max_bars_back function hint values', () => {
       const script = `//@version=6
 indicator("Invalid Function Max Bars Back")
