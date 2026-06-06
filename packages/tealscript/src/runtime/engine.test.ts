@@ -6702,6 +6702,65 @@ plot(bar_index >= 1 ? ta.sma(passthrough(open), 2) : na, title="Switch Return Av
       expect(result.plots.find((plot) => plot.title === 'Switch Return Average')?.values).toEqual([null, 15, 25]);
     });
 
+    it('preserves source identity through same-source block switch builtin arguments', () => {
+      const script = `//@version=6
+indicator("Block switch argument source identity")
+plot(bar_index >= 1 ? ta.sma(switch
+    bar_index >= 0 =>
+        selected = open
+        selected
+    =>
+        fallback = open
+        fallback
+, 2) : na, title="Block Switch Argument Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Block Switch Argument Average')?.values).toEqual([null, 15, 25]);
+    });
+
+    it('preserves source identity through same-source block switch UDF and method returns', () => {
+      const script = `//@version=6
+indicator("Block switch source return identity")
+passthrough(series float src) => switch
+    bar_index >= 0 =>
+        selected = src
+        selected
+    =>
+        fallback = src
+        fallback
+method passthroughMethod(series float src) => switch
+    bar_index >= 0 =>
+        selected = src
+        selected
+    =>
+        fallback = src
+        fallback
+selected = passthrough(open)
+selectedMethod = open.passthroughMethod()
+plot(bar_index >= 1 ? ta.sma(selected, 2) : na, title="Block Switch Function Average")
+plot(bar_index >= 1 ? ta.sma(selectedMethod, 2) : na, title="Block Switch Method Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Block Switch Function Average')?.values).toEqual([null, 15, 25]);
+      expect(result.plots.find((plot) => plot.title === 'Block Switch Method Average')?.values).toEqual([null, 15, 25]);
+    });
+
     it('preserves derived source identity through same-identifier switch UDF returns', () => {
       const script = `//@version=6
 indicator("Switch derived source return identity")
