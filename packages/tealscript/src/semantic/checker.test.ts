@@ -926,6 +926,23 @@ strategy("Bad Strategy Numeric Settings",
     ]);
   });
 
+  it('reports invalid Pine strategy declaration string values', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy String Settings",
+    currency=1,
+    default_qty_type=2,
+    commission_type=3,
+    close_entries_rule=4)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy currency must be a string, got int',
+      'strategy default_qty_type must be a string, got int',
+      'strategy commission_type must be a string, got int',
+      'strategy close_entries_rule must be a string, got int',
+    ]);
+  });
+
   it('accepts Pine library positional dynamic requests declarations', () => {
     const result = checkProgram(parse(`
 library("Dynamic Library", true, false)
