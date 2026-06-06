@@ -6057,6 +6057,37 @@ plot(weighted + fast + (isBull ? 1 : 0) + str.length(description))
     expect(types.get('hidden')).toMatchObject({ kind: 'unknown' });
   });
 
+  it('normalizes imported library function return qualifiers to simple or series', () => {
+    const library = parse(`
+library("Qualifiers", true)
+export type Pivot
+    float value
+export literal() => 2
+export method literalMethod(Pivot this) => 3
+`);
+    const result = checkProgram(parse(`
+indicator("Imported Return Qualifiers")
+import TestUser/Qualifiers/1 as q
+p = q.Pivot.new(close)
+simple int literalValue = q.literal()
+simple int methodValue = p.literalMethod()
+const int badLiteral = q.literal()
+const int badMethod = p.literalMethod()
+plot(literalValue + methodValue + badLiteral + badMethod)
+`), {
+      libraries: new Map([['TestUser/Qualifiers/1', library]]),
+    });
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign simple value to const int',
+      'Cannot assign simple value to const int',
+    ]);
+    expect(types.get('literalValue')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+    expect(types.get('methodValue')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+  });
+
   it('validates imported library type constructors and fields semantically', () => {
     const library = parse(`
 library("PivotTools", true)
