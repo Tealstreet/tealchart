@@ -6703,6 +6703,29 @@ plot(bar_index >= 1 ? ta.sma(scaled(open), 2) : na, title="Scaled Average")`;
       expect(result.plots.find((plot) => plot.title === 'Scaled Average')?.values).toEqual([null, 30, 50]);
     });
 
+    it('preserves source identity through same-arithmetic conditional and switch returns', () => {
+      const script = `//@version=6
+indicator("Arithmetic branch source return identity")
+conditionalMidpoint() => bar_index >= 0 ? (high + low) / 2 : (high + low) / 2
+switchScaled(series float src) => switch
+    bar_index >= 0 => src * 2
+    => src * 2
+plot(bar_index >= 1 ? ta.sma(conditionalMidpoint(), 2) : na, title="Conditional Arithmetic Average")
+plot(bar_index >= 1 ? ta.sma(switchScaled(open), 2) : na, title="Switch Arithmetic Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 18, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Conditional Arithmetic Average')?.values).toEqual([null, 15, 25]);
+      expect(result.plots.find((plot) => plot.title === 'Switch Arithmetic Average')?.values).toEqual([null, 30, 50]);
+    });
+
     it('preserves source identity through same-source switch UDF returns', () => {
       const script = `//@version=6
 indicator("Switch source return identity")

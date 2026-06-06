@@ -113,7 +113,7 @@ Known structural gaps:
 - Pine's qualified type system (`const < input < simple < series`) is partially
   modeled but not yet a complete compiler/runtime contract.
 - Some runtime semantics remain approximate, especially expression-level
-  source-series inference beyond pure arithmetic over known source series,
+  source-series inference beyond equivalent pure arithmetic over known source series,
   realtime `varip`, exchange calendar catalogs, full historical `max_bars_back`
   behavior, strategy
   intrabar/recalculation semantics, and live host metadata/data availability.
