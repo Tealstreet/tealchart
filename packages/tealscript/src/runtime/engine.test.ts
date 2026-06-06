@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { TealscriptEngine, executeScript } from './engine';
 import { parse } from '../parser/parser';
+import { InMemoryRequestDatafeed } from './requestDatafeed';
 import { InMemoryStrategyIntrabarDatafeed } from './strategy';
 import type { Bar } from './context';
 
@@ -48,6 +49,141 @@ function stripSourceLocations<T>(node: T): T {
 
 describe('TealscriptEngine', () => {
   describe('runtime profile', () => {
+    it('exposes bid and ask on 1T host bars and supports history/source mapping', () => {
+      const script = `//@version=6
+indicator("Bid Ask")
+plot(bid, title="Bid")
+plot(ask, title="Ask")
+plot(bid[1], title="Previous Bid")
+plot(ta.sma(ask, 2), title="Ask SMA")`;
+
+      const bars = createBars(3).map((bar, index) => ({
+        ...bar,
+        bid: 100 + index,
+        ask: 100.25 + index,
+      }));
+      const result = executeScript(parse(script), bars, undefined, {
+        runtime: {
+          timeframe: {
+            period: '1T',
+            multiplier: 1,
+            isminutes: false,
+            isdaily: false,
+            isweekly: false,
+            ismonthly: false,
+            isintraday: true,
+            isseconds: false,
+            isticks: true,
+          },
+        },
+      });
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Bid')?.values).toEqual([100, 101, 102]);
+      expect(result.plots.find((plot) => plot.title === 'Ask')?.values).toEqual([100.25, 101.25, 102.25]);
+      expect(result.plots.find((plot) => plot.title === 'Previous Bid')?.values).toEqual([null, 100, 101]);
+      expect(result.plots.find((plot) => plot.title === 'Ask SMA')?.values).toEqual([null, 100.75, 101.75]);
+    });
+
+    it('returns na for bid and ask outside 1T or without host-provided quotes', () => {
+      const script = `//@version=6
+indicator("Bid Ask NA")
+plot(bid, title="Bid")
+plot(ask, title="Ask")`;
+
+      const nonTickResult = executeScript(parse(script), createBars(2).map((bar, index) => ({
+        ...bar,
+        bid: 100 + index,
+        ask: 100.25 + index,
+      })));
+      const missingQuoteResult = executeScript(parse(script), createBars(2), undefined, {
+        runtime: {
+          timeframe: {
+            period: '1T',
+            multiplier: 1,
+            isminutes: false,
+            isdaily: false,
+            isweekly: false,
+            ismonthly: false,
+            isintraday: true,
+            isseconds: false,
+            isticks: true,
+          },
+        },
+      });
+
+      expect(nonTickResult.errors).toEqual([]);
+      expect(nonTickResult.plots.find((plot) => plot.title === 'Bid')?.values).toEqual([null, null]);
+      expect(nonTickResult.plots.find((plot) => plot.title === 'Ask')?.values).toEqual([null, null]);
+      expect(missingQuoteResult.errors).toEqual([]);
+      expect(missingQuoteResult.plots.find((plot) => plot.title === 'Bid')?.values).toEqual([null, null]);
+      expect(missingQuoteResult.plots.find((plot) => plot.title === 'Ask')?.values).toEqual([null, null]);
+    });
+
+    it('updates bid and ask on realtime tick replacement', () => {
+      const script = `//@version=6
+indicator("Bid Ask Realtime")
+plot(bid, title="Bid")
+plot(ask, title="Ask")`;
+      const bars = createBars(2).map((bar, index) => ({
+        ...bar,
+        bid: 100 + index,
+        ask: 100.25 + index,
+      }));
+      const engine = new TealscriptEngine({
+        runtime: {
+          timeframe: {
+            period: '1T',
+            multiplier: 1,
+            isminutes: false,
+            isdaily: false,
+            isweekly: false,
+            ismonthly: false,
+            isintraday: true,
+            isseconds: false,
+            isticks: true,
+          },
+        },
+      });
+      const ast = parse(script);
+
+      const initial = engine.execute(ast, bars);
+      const initialBidValues = [...initial.plots.find((plot) => plot.title === 'Bid')!.values];
+      const updated = engine.updateBar(ast, { ...bars[1], bid: 105, ask: 105.5 });
+
+      expect(initial.errors).toEqual([]);
+      expect(initialBidValues).toEqual([100, 101]);
+      expect(updated.find((plot) => plot.title === 'Bid')?.values).toEqual([100, 105]);
+      expect(updated.find((plot) => plot.title === 'Ask')?.values).toEqual([100.25, 105.5]);
+    });
+
+    it('evaluates bid and ask inside 1T request.security contexts', () => {
+      const script = `//@version=6
+indicator("Requested Quotes")
+requestedBid = request.security(syminfo.tickerid, "1T", bid, lookahead=barmerge.lookahead_on)
+requestedAsk = request.security(syminfo.tickerid, "1T", ask, lookahead=barmerge.lookahead_on)
+plot(requestedBid, title="Requested Bid")
+plot(requestedAsk, title="Requested Ask")`;
+      const bars = createBars(2);
+      const requestedBars = bars.map((bar, index) => ({
+        ...bar,
+        bid: 200 + index,
+        ask: 200.25 + index,
+      }));
+      const datafeed = new InMemoryRequestDatafeed([{
+        symbol: 'BTCUSDT',
+        timeframe: '1T',
+        bars: requestedBars,
+        syminfo: { ticker: 'BTCUSDT', timezone: 'Etc/UTC' },
+      }]);
+
+      const result = executeScript(parse(script), bars, undefined, { requestDatafeed: datafeed });
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Requested Bid')?.values).toEqual([200, 201]);
+      expect(result.plots.find((plot) => plot.title === 'Requested Ask')?.values).toEqual([200.25, 201.25]);
+    });
+
     it('reports execution counters for compatibility profiling', () => {
       const script = `//@version=6
 indicator("Profile")

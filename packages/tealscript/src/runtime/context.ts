@@ -51,6 +51,8 @@ export interface Bar {
   low: number;
   close: number;
   volume: number;
+  bid?: number;
+  ask?: number;
 }
 
 /**
@@ -316,6 +318,8 @@ export class ExecutionContext {
   readonly low: Series<number>;
   readonly close: Series<number>;
   readonly volume: Series<number>;
+  readonly bid: Series<number>;
+  readonly ask: Series<number>;
   readonly time: Series<number>;
   readonly timenow: Series<number>;
 
@@ -477,6 +481,8 @@ export class ExecutionContext {
     this.low = new Series<number>();
     this.close = new Series<number>();
     this.volume = new Series<number>();
+    this.bid = new Series<number>();
+    this.ask = new Series<number>();
     this.time = new Series<number>();
     this.timenow = new Series<number>();
   }
@@ -538,6 +544,8 @@ export class ExecutionContext {
     this.low.reset();
     this.close.reset();
     this.volume.reset();
+    this.bid.reset();
+    this.ask.reset();
     this.time.reset();
     this.timenow.reset();
 
@@ -562,6 +570,8 @@ export class ExecutionContext {
     this.low.advance();
     this.close.advance();
     this.volume.advance();
+    this.bid.advance();
+    this.ask.advance();
     this.time.advance();
     this.timenow.advance();
 
@@ -571,6 +581,8 @@ export class ExecutionContext {
     this.low.set(bar.low);
     this.close.set(bar.close);
     this.volume.set(bar.volume);
+    this.bid.set(this.getTickQuoteValue(bar.bid));
+    this.ask.set(this.getTickQuoteValue(bar.ask));
     this.time.set(bar.time);
     this.timenow.set(this.now);
 
@@ -596,6 +608,8 @@ export class ExecutionContext {
     this.low.set(bar.low);
     this.close.set(bar.close);
     this.volume.set(bar.volume);
+    this.bid.set(this.getTickQuoteValue(bar.bid));
+    this.ask.set(this.getTickQuoteValue(bar.ask));
     this.time.set(bar.time);
     this.timenow.set(this.now);
 
@@ -630,6 +644,8 @@ export class ExecutionContext {
     this.low.advance();
     this.close.advance();
     this.volume.advance();
+    this.bid.advance();
+    this.ask.advance();
     this.time.advance();
     this.timenow.advance();
 
@@ -638,6 +654,8 @@ export class ExecutionContext {
     this.low.set(bar.low);
     this.close.set(bar.close);
     this.volume.set(bar.volume);
+    this.bid.set(this.getTickQuoteValue(bar.bid));
+    this.ask.set(this.getTickQuoteValue(bar.ask));
     this.time.set(bar.time);
     this.timenow.set(this.now);
 
@@ -659,6 +677,8 @@ export class ExecutionContext {
     this.low.commit();
     this.close.commit();
     this.volume.commit();
+    this.bid.commit();
+    this.ask.commit();
     this.time.commit();
     this.timenow.commit();
 
@@ -675,6 +695,8 @@ export class ExecutionContext {
     this.low.rollback();
     this.close.rollback();
     this.volume.rollback();
+    this.bid.rollback();
+    this.ask.rollback();
     this.time.rollback();
     this.timenow.rollback();
     this.strategyLedger = cloneStrategyLedger(this.realtimeStrategyLedgerSnapshot);
@@ -1079,6 +1101,10 @@ export class ExecutionContext {
     this.strategyLedger.intrabarContexts.forEach((context, index) => {
       this.strategyIntrabarContextIndexes.set(context.chartBarIndex, index);
     });
+  }
+
+  private getTickQuoteValue(value: number | undefined): number {
+    return this.timeframe.period === '1T' && typeof value === 'number' && Number.isFinite(value) ? value : Number.NaN;
   }
 
   // =========================================================================

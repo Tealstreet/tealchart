@@ -11,6 +11,7 @@ length = input.int(3)
 basis = ta.sma(close, length)
 spread(source) => source - basis
 plot(spread(high), title="Spread")
+plot(bid + ask, title="Quote Spread")
 plot(not na(time("1", "0930-1600")) ? 1 : 0, title="Session")
 plot(time_tradingday, title="Trading Day")
 plot(last_bar_time, title="Last Bar Time")
