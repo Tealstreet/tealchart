@@ -1188,7 +1188,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['ta.tr', { params: ['handle_na'], minArgs: 0, maxArgs: 1 }],
   ['ta.tsi', { params: ['source', 'short_length', 'long_length'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['ta.variance', { params: ['source', 'length', 'biased'], minArgs: 2, maxArgs: 3, allowNamedPrefixWithPositional: true }],
-  ['ta.vwap', { params: ['source', 'anchor', 'stdev_mult'], minArgs: 1, maxArgs: 3 }],
+  ['ta.vwap', { params: ['source', 'anchor', 'stdev_mult'], minArgs: 0, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['ta.vwma', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ta.linreg', { params: ['source', 'length', 'offset'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['ta.wma', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],

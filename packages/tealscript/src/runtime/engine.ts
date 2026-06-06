@@ -8807,32 +8807,29 @@ export class TealscriptEngine {
     this.builtins.set('ta.wad', (_args, _namedArgs, _ctx, scope) => this.updateWilliamsAccumulationDistribution(scope, '_ta_wad_value'));
     this.builtins.set('ta.wvad', (_args, _namedArgs, _ctx) => this.currentWilliamsVariableAccumulationDistribution());
 
-    // VWAP - Volume Weighted Average Price
-    // Note: Simplified version - doesn't reset at session boundaries
-    this.builtins.set('ta.vwap', (_args, _namedArgs, ctx, scope) => {
-      // VWAP = Σ(Typical Price × Volume) / Σ(Volume)
-      // Typical Price = (High + Low + Close) / 3
-
+    this.builtins.set('ta.vwap', (args, namedArgs, ctx, scope, callId) => {
+      const taVwapArgs = ['source', 'anchor', 'stdev_mult'];
       const high = ctx.high.get(0)!;
       const low = ctx.low.get(0)!;
       const close = ctx.close.get(0)!;
       const volume = ctx.volume.get(0)!;
-
       const typicalPrice = (high + low + close) / 3;
-      const tpv = typicalPrice * volume;
+      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taVwapArgs, 0, typicalPrice));
+      const anchor = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taVwapArgs, 1, false));
+      if (isNaN(source) || isNaN(volume)) return NaN;
 
-      // Get cumulative values from scope
-      const cumTpvKey = '_vwap_cum_tpv';
-      const cumVolKey = '_vwap_cum_vol';
+      const tpv = source * volume;
+      const cumTpvKey = `_vwap_cum_tpv_${callId}`;
+      const cumVolKey = `_vwap_cum_vol_${callId}`;
 
-      const prevCumTpv = (scope.get(cumTpvKey) as number) ?? 0;
-      const prevCumVol = (scope.get(cumVolKey) as number) ?? 0;
+      const prevCumTpv = anchor ? 0 : ((scope.get(cumTpvKey) as number) ?? 0);
+      const prevCumVol = anchor ? 0 : ((scope.get(cumVolKey) as number) ?? 0);
 
       const cumTpv = prevCumTpv + tpv;
       const cumVol = prevCumVol + volume;
 
-      scope.declare(cumTpvKey, 'var', cumTpv);
-      scope.declare(cumVolKey, 'var', cumVol);
+      this.setBuiltinState(scope, cumTpvKey, cumTpv);
+      this.setBuiltinState(scope, cumVolKey, cumVol);
 
       return cumVol > 0 ? cumTpv / cumVol : NaN;
     });
