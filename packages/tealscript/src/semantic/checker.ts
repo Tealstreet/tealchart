@@ -556,6 +556,8 @@ const STRATEGY_EXIT_PARAMS = [
 const STRATEGY_DIRECTION_VALUES = new Set(['long', 'short']);
 const STRATEGY_ALLOWED_ENTRY_DIRECTION_VALUES = new Set(['all', 'long', 'short']);
 const STRATEGY_OCA_TYPE_VALUES = new Set(['cancel', 'reduce', 'none']);
+const STRATEGY_DEFAULT_QTY_TYPE_VALUES = new Set(['fixed', 'cash', 'percent_of_equity']);
+const STRATEGY_COMMISSION_TYPE_VALUES = new Set(['percent', 'cash_per_order', 'cash_per_contract']);
 const STRATEGY_CASH_OR_PERCENT_RISK_TYPE_VALUES = new Set(['cash', 'percent_of_equity']);
 const STRATEGY_TRADE_ACCESSORS = [
   'entry_id',
@@ -2256,6 +2258,9 @@ class SemanticChecker {
       ? STRATEGY_DECLARATION_KEYS
       : INDICATOR_DECLARATION_KEYS;
     this.checkDeclarationKnownProperties(statement, allowedKeys, displayName);
+    if (statement.declarationKind === 'strategy') {
+      this.checkStrategyDeclarationLiteralValueConstraints(statement);
+    }
   }
 
   private checkLibraryDeclarationArguments(statement: LibraryDeclaration): void {
@@ -3682,6 +3687,71 @@ class SemanticChecker {
     }
   }
 
+  private checkStrategyDeclarationLiteralValueConstraints(statement: IndicatorDeclaration): void {
+    this.checkNonNegativeLiteralNumberValue(
+      statement.initial_capital,
+      'strategy initial_capital must be a non-negative number',
+    );
+    this.checkStrategyDefaultQtyTypeValue(statement.default_qty_type);
+    this.checkNonNegativeLiteralNumberValue(
+      statement.default_qty_value,
+      'strategy default_qty_value must be a non-negative number',
+    );
+    this.checkNonNegativeLiteralIntegerValue(
+      statement.pyramiding,
+      'strategy pyramiding must be a non-negative integer',
+    );
+    this.checkStrategyCommissionTypeValue(statement.commission_type);
+    this.checkNonNegativeLiteralNumberValue(
+      statement.commission_value,
+      'strategy commission_value must be a non-negative number',
+    );
+    this.checkNonNegativeLiteralIntegerValue(
+      statement.slippage,
+      'strategy slippage must be a non-negative integer',
+    );
+    this.checkNonNegativeLiteralNumberValue(
+      statement.margin_long,
+      'strategy margin_long must be a non-negative number',
+    );
+    this.checkNonNegativeLiteralNumberValue(
+      statement.margin_short,
+      'strategy margin_short must be a non-negative number',
+    );
+    this.checkNonNegativeLiteralIntegerValue(
+      statement.backtest_fill_limits_assumption,
+      'strategy backtest_fill_limits_assumption must be a non-negative integer',
+    );
+    this.checkStrategyCloseEntriesRuleValue(statement.close_entries_rule);
+  }
+
+  private checkStrategyDefaultQtyTypeValue(expression: Expression | undefined): void {
+    if (!expression) return;
+
+    const value = this.strategyConstantStringValue(expression);
+    if (value !== undefined && !STRATEGY_DEFAULT_QTY_TYPE_VALUES.has(value)) {
+      this.addDiagnostic('type-mismatch', `Invalid strategy default_qty_type: ${value}`, expression.loc);
+    }
+  }
+
+  private checkStrategyCommissionTypeValue(expression: Expression | undefined): void {
+    if (!expression) return;
+
+    const value = this.strategyConstantStringValue(expression);
+    if (value !== undefined && !STRATEGY_COMMISSION_TYPE_VALUES.has(value)) {
+      this.addDiagnostic('type-mismatch', `Invalid strategy commission_type: ${value}`, expression.loc);
+    }
+  }
+
+  private checkStrategyCloseEntriesRuleValue(expression: Expression | undefined): void {
+    if (!expression) return;
+
+    const value = this.constantLiteralValue(expression);
+    if (typeof value === 'string' && value.toUpperCase() !== 'FIFO' && value.toUpperCase() !== 'ANY') {
+      this.addDiagnostic('type-mismatch', `Invalid strategy close_entries_rule: ${value}`, expression.loc);
+    }
+  }
+
   private checkStrategyCashOrPercentRiskRuleArguments(expression: CallExpression, displayName: string): void {
     this.checkPositiveLiteralNumberArgument(expression, 'value', 0, `${displayName} value must be a positive number`);
 
@@ -3764,6 +3834,24 @@ class SemanticChecker {
     }
   }
 
+  private checkNonNegativeLiteralNumberValue(expression: Expression | undefined, message: string): void {
+    if (!expression) return;
+
+    const value = this.constantLiteralValue(expression);
+    if (typeof value === 'number' && value < 0) {
+      this.addDiagnostic('type-mismatch', message, expression.loc);
+    }
+  }
+
+  private checkNonNegativeLiteralIntegerValue(expression: Expression | undefined, message: string): void {
+    if (!expression) return;
+
+    const value = this.constantLiteralValue(expression);
+    if (typeof value === 'number' && (value < 0 || !Number.isInteger(value))) {
+      this.addDiagnostic('type-mismatch', message, expression.loc);
+    }
+  }
+
   private strategyConstantStringValue(expression: Expression): string | undefined {
     const value = this.constantLiteralValue(expression);
     if (typeof value === 'string') return value;
@@ -3778,6 +3866,18 @@ class SemanticChecker {
         return 'short';
       case 'strategy.direction.all':
         return 'all';
+      case 'strategy.fixed':
+        return 'fixed';
+      case 'strategy.cash':
+        return 'cash';
+      case 'strategy.percent_of_equity':
+        return 'percent_of_equity';
+      case 'strategy.commission.percent':
+        return 'percent';
+      case 'strategy.commission.cash_per_order':
+        return 'cash_per_order';
+      case 'strategy.commission.cash_per_contract':
+        return 'cash_per_contract';
       case 'strategy.oca.cancel':
         return 'cancel';
       case 'strategy.oca.reduce':
