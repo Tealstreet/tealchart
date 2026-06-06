@@ -5638,6 +5638,7 @@ export class TealscriptEngine {
   }
 
   private getCompleteSourceWindow(scope: Scope, key: string, source: number, length: number): number[] | null {
+    this.recordLookbackLength(length);
     if (isNaN(source) || length < 1) return null;
     const maxLengthKey = `${key}_max_length`;
     const previousMaxLength = scope.get(maxLengthKey) as number | undefined;
@@ -5655,12 +5656,14 @@ export class TealscriptEngine {
   }
 
   private getAvailableSourceWindow(scope: Scope, key: string, source: number, length: number): number[] {
+    this.recordLookbackLength(length);
     if (isNaN(source) || length < 1) return [];
     const values = this.updateBuiltinSourceHistory(scope, key, source, length);
     return values.slice(0, length).filter((value) => !isNaN(value));
   }
 
   private getCompleteNonNaSourceWindow(scope: Scope, key: string, source: number, length: number): number[] | null {
+    this.recordLookbackLength(length);
     if (length < 1) return null;
     const history = (scope.get(key) as number[] | undefined) ?? [];
     if (!isNaN(source)) {
@@ -7606,7 +7609,6 @@ export class TealscriptEngine {
       const mathSumArgs = ['source', 'length'];
       const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, mathSumArgs, 0));
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, mathSumArgs, 1));
-      this.recordLookbackLength(length);
       const values = this.getCompleteNonNaSourceWindow(scope, `_math_sum_source_${callId}`, source, length);
       return values ? values.reduce((sum, value) => sum + value, 0) : Number.NaN;
     });
