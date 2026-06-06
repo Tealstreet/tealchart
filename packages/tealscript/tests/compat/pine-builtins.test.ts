@@ -560,7 +560,7 @@ plot(histLine, title="Hist")
       15.384615,
       0,
     ]);
-    expect(roundSeries(getPlot(named, 'SAR').values)).toEqual([103, 99, 99, 99, 109, 109, 99, 99, 99, 99, 99, 114]);
+    expect(roundSeries(getPlot(named, 'SAR').values)).toEqual([103, 99, 99, 99.36, 109, 109, 108.48, 96, 96.28, 96.8688, 97.776672, 99.074538]);
     expect(roundSeries(getPlot(named, 'Pivot High').values)).toEqual([
       null,
       null,
@@ -605,6 +605,12 @@ namedAtr = ta.atr(length=3)
 [firstTrend, firstDirection] = ta.supertrend(2.0, 3)
 [secondTrend, secondDirection] = ta.supertrend(2.0, 3)
 [namedTrend, namedDirection] = ta.supertrend(factor=2.0, atrPeriod=3)
+[firstDiPlus, firstDiMinus, firstAdx] = ta.dmi(3, 3)
+[secondDiPlus, secondDiMinus, secondAdx] = ta.dmi(3, 3)
+[namedDiPlus, namedDiMinus, namedAdx] = ta.dmi(diLength=3, adxSmoothing=3)
+firstSar = ta.sar(0.02, 0.02, 0.2)
+secondSar = ta.sar(0.02, 0.02, 0.2)
+namedSar = ta.sar(start=0.02, inc=0.02, max=0.2)
 plot(first, title="Conditional OBV")
 plot(openObv, title="Open OBV")
 plot(firstAtr, title="First ATR")
@@ -616,6 +622,18 @@ plot(namedTrend, title="Named Supertrend")
 plot(firstDirection, title="First Supertrend Direction")
 plot(secondDirection, title="Second Supertrend Direction")
 plot(namedDirection, title="Named Supertrend Direction")
+plot(firstDiPlus, title="First DI Plus")
+plot(secondDiPlus, title="Second DI Plus")
+plot(namedDiPlus, title="Named DI Plus")
+plot(firstDiMinus, title="First DI Minus")
+plot(secondDiMinus, title="Second DI Minus")
+plot(namedDiMinus, title="Named DI Minus")
+plot(firstAdx, title="First ADX")
+plot(secondAdx, title="Second ADX")
+plot(namedAdx, title="Named ADX")
+plot(firstSar, title="First SAR")
+plot(secondSar, title="Second SAR")
+plot(namedSar, title="Named SAR")
 `);
 
     expect(result.errors).toEqual([]);
@@ -626,6 +644,14 @@ plot(namedDirection, title="Named Supertrend Direction")
     expect(roundSeries(getPlot(result, 'Named Supertrend').values)).toEqual(roundSeries(getPlot(result, 'First Supertrend').values));
     expect(getPlot(result, 'Second Supertrend Direction').values).toEqual(getPlot(result, 'First Supertrend Direction').values);
     expect(getPlot(result, 'Named Supertrend Direction').values).toEqual(getPlot(result, 'First Supertrend Direction').values);
+    expect(roundSeries(getPlot(result, 'Second DI Plus').values)).toEqual(roundSeries(getPlot(result, 'First DI Plus').values));
+    expect(roundSeries(getPlot(result, 'Named DI Plus').values)).toEqual(roundSeries(getPlot(result, 'First DI Plus').values));
+    expect(roundSeries(getPlot(result, 'Second DI Minus').values)).toEqual(roundSeries(getPlot(result, 'First DI Minus').values));
+    expect(roundSeries(getPlot(result, 'Named DI Minus').values)).toEqual(roundSeries(getPlot(result, 'First DI Minus').values));
+    expect(roundSeries(getPlot(result, 'Second ADX').values)).toEqual(roundSeries(getPlot(result, 'First ADX').values));
+    expect(roundSeries(getPlot(result, 'Named ADX').values)).toEqual(roundSeries(getPlot(result, 'First ADX').values));
+    expect(roundSeries(getPlot(result, 'Second SAR').values)).toEqual(roundSeries(getPlot(result, 'First SAR').values));
+    expect(roundSeries(getPlot(result, 'Named SAR').values)).toEqual(roundSeries(getPlot(result, 'First SAR').values));
   });
 
   it('handles na previous close in ta.tr handle_na mode', () => {
