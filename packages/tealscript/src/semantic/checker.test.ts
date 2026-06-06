@@ -734,6 +734,26 @@ plotchar(close < open, location=location.middle, size="giant")
     ]);
   });
 
+  it('reports invalid visual numeric option values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Visual Numeric Options")
+plot(close, linewidth=0)
+plot(open, "Fractional Width", color.blue, 1.5)
+hline(100, linewidth=-1)
+hline(200, "Fractional HLine", color.red, hline.style_solid, 2.5)
+plotarrow(close - open, minheight=0, maxheight=1.5)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'plot linewidth must be a positive integer',
+      'plot linewidth must be a positive integer',
+      'hline linewidth must be a positive integer',
+      'hline linewidth must be a positive integer',
+      'plotarrow minheight must be a positive integer',
+      'plotarrow maxheight must be a positive integer',
+    ]);
+  });
+
   it('reports invalid marker visual output argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Invalid Marker Visual Bindings")
