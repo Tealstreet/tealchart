@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
 import {
+  corporateActionRequestKey,
   currencyRateRequestKey,
   InMemoryRequestDatafeed,
   InMemoryStrategyIntrabarDatafeed,
@@ -1251,6 +1252,55 @@ plot(eurValue, title="EUR Value")
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'EUR Rate').values).toEqual([0.9, 0.9, 0.92, 0.92]);
     expect(roundSeries(getPlot(result, 'EUR Value').values)).toEqual([900, 990, 1104, 1196]);
+  });
+
+  it('locks a reduced public earnings event marker idiom', () => {
+    // Public idiom reference: public earnings overlays commonly compare
+    // reported EPS with estimates and mark event bars.
+    // Source search: https://www.tradingview.com/scripts/search/earnings%20surprise/
+    const bars: Bar[] = [
+      { time: 1_700_530_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_530_060_000, open: 101, high: 102, low: 100, close: 101, volume: 100 },
+      { time: 1_700_530_120_000, open: 102, high: 103, low: 101, close: 102, volume: 100 },
+      { time: 1_700_530_180_000, open: 103, high: 104, low: 102, close: 103, volume: 100 },
+    ];
+    const requestDatafeed = new InMemoryRequestDatafeed([], [
+      {
+        family: 'earnings',
+        key: corporateActionRequestKey('NASDAQ:AAPL', 'earnings.actual', 'USD'),
+        points: [
+          { time: bars[1]!.time, value: 1.6 },
+          { time: bars[3]!.time, value: 1.2 },
+        ],
+      },
+      {
+        family: 'earnings',
+        key: corporateActionRequestKey('NASDAQ:AAPL', 'earnings.estimate', 'USD'),
+        points: [
+          { time: bars[1]!.time, value: 1.4 },
+          { time: bars[3]!.time, value: 1.3 },
+        ],
+      },
+    ]);
+    const result = runCompatScript(`
+indicator("Public Earnings Event Checkpoint", overlay=true)
+actual = request.earnings("NASDAQ:AAPL", earnings.actual, gaps=barmerge.gaps_on, currency=currency.USD)
+estimate = request.earnings("NASDAQ:AAPL", earnings.estimate, gaps=barmerge.gaps_on, currency=currency.USD)
+beat = actual > estimate
+plot(actual, title="Actual EPS")
+plot(estimate, title="Estimate EPS")
+plot(beat ? 1 : 0, title="EPS Beat")
+plotshape(beat, title="Beat Marker", text="EPS", color=color.green)
+`, {
+      bars,
+      engineOptions: { requestDatafeed },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Actual EPS').values).toEqual([null, 1.6, null, 1.2]);
+    expect(getPlot(result, 'Estimate EPS').values).toEqual([null, 1.4, null, 1.3]);
+    expect(getPlot(result, 'EPS Beat').values).toEqual([0, 1, 0, 0]);
+    expect(getPlot(result, 'Beat Marker').values).toEqual([null, 1, null, null]);
   });
 
   it('locks a reduced public library helper idiom', () => {
