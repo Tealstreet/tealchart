@@ -996,12 +996,15 @@ export class TealscriptEngine {
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source1', 'source2', 'length'], 2, collectionScopes);
       case 'ta.linreg':
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length', 'offset'], 1, collectionScopes);
+      case 'ta.swma':
+        return 3;
       case 'ta.highest':
       case 'ta.lowest':
       case 'ta.highestbars':
       case 'ta.lowestbars':
         return this.inferStaticTaSourceLengthMaxBarsBack(expression, collectionScopes);
       case 'ta.change':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1, 1);
       case 'ta.rsi':
       case 'ta.rising':
       case 'ta.falling':
@@ -1009,6 +1012,10 @@ export class TealscriptEngine {
       case 'ta.mom':
       case 'ta.roc':
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1);
+      case 'ta.crossover':
+      case 'ta.crossunder':
+      case 'ta.cross':
+        return 1;
       case 'ta.macd':
         return Math.max(
           this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'fastlen', 'slowlen', 'siglen'], 1, collectionScopes),
@@ -1026,11 +1033,10 @@ export class TealscriptEngine {
     index: number,
     collectionScopes: StaticCollectionScopes,
     extraPriorBars = 0,
+    defaultLength?: number,
   ): number {
     const argument = this.getStaticOrderedCallArgument(expression, params, index);
-    if (!argument) return 0;
-
-    const value = this.inferStaticNumericValue(argument, collectionScopes);
+    const value = argument ? this.inferStaticNumericValue(argument, collectionScopes) : defaultLength ?? null;
     if (value === null || !Number.isFinite(value)) return 0;
 
     const length = Math.max(0, Math.trunc(value));
