@@ -1202,6 +1202,32 @@ strategy.cancel(1)
     ]);
   });
 
+  it('reports invalid Pine strategy numeric option values', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy Numerics")
+strategy.entry("Long", strategy.long, qty="many", limit="high")
+strategy.order("Add", strategy.long, stop="low")
+strategy.exit("Exit", from_entry="Long", qty_percent="half", profit="win", trail_offset="offset")
+strategy.close("Long", qty="one")
+strategy.risk.max_position_size("three")
+strategy.risk.max_drawdown(value="ten", type=strategy.cash)
+strategy.risk.max_intraday_filled_orders(count="two")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy.entry qty must be a number, got string',
+      'strategy.entry limit must be a number, got string',
+      'strategy.order stop must be a number, got string',
+      'strategy.exit qty_percent must be a number, got string',
+      'strategy.exit profit must be a number, got string',
+      'strategy.exit trail_offset must be a number, got string',
+      'strategy.close qty must be a number, got string',
+      'strategy.risk.max_position_size contracts must be a number, got string',
+      'strategy.risk.max_drawdown value must be a number, got string',
+      'strategy.risk.max_intraday_filled_orders count must be a number, got string',
+    ]);
+  });
+
   it('reports duplicate declarations in the same scope', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate")
