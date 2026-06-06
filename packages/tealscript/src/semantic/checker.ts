@@ -3060,8 +3060,19 @@ class SemanticChecker {
     const [alias, enumName, fieldName] = path;
     if (!alias || !enumName || !fieldName || scope.lookup(alias)?.kind !== 'import') return false;
 
-    const enumDeclaration = this.importedLibraries.get(alias)?.enums.get(enumName);
-    if (!enumDeclaration) return false;
+    const library = this.importedLibraries.get(alias);
+    if (!library) return false;
+
+    const enumDeclaration = library.enums.get(enumName);
+    if (!enumDeclaration) {
+      if (library.types.has(enumName) || library.constants.has(enumName)) return false;
+      this.addDiagnostic(
+        'unknown-enum-member',
+        `Unknown imported enum namespace: ${alias}.${enumName}`,
+        expression.object.loc,
+      );
+      return true;
+    }
     if (enumDeclaration.fields.some((field) => field.name.name === fieldName)) return true;
 
     this.addDiagnostic(
