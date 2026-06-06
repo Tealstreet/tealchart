@@ -1069,6 +1069,19 @@ export invalidNested(float value) => request.security(syminfo.tickerid, "1", ta.
     ]);
   });
 
+  it('reports exported library request calls when dynamic requests are disabled', () => {
+    const result = checkProgram(parse(`
+library("Static Export Requests", dynamic_requests=false)
+export requested(float value) => request.security(syminfo.tickerid, "1", close)
+export method requestedMethod(float this) => request.security(syminfo.tickerid, "1", close)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Exported function requested cannot call request.*() functions when library dynamic_requests=false',
+      'Exported method requestedMethod cannot call request.*() functions when library dynamic_requests=false',
+    ]);
+  });
+
   it('allows nested scopes to shadow outer declarations', () => {
     const result = checkProgram(parse(`
 indicator("Shadow")
