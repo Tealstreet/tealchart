@@ -3552,6 +3552,30 @@ box.set_xloc(region, bar_index, bar_index + 1, xloc=xloc.session)
     ]);
   });
 
+  it('reports invalid literal drawing style option values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing Styles")
+trend = line.new(bar_index, close, bar_index + 1, open, style=line.style_curve)
+marker = label.new(bar_index, close, style=label.style_pin)
+region = box.new(bar_index, high, bar_index + 1, low, border_style=line.style_curve)
+points = array.from(chart.point.from_index(bar_index, close))
+shape = polyline.new(points, line_style=line.style_curve)
+line.set_style(trend, style=line.style_curve)
+label.set_style(marker, style=label.style_pin)
+box.set_border_style(region, style=line.style_curve)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid line.new style: line.style_curve',
+      'Invalid label.new style: label.style_pin',
+      'Invalid box.new border_style: line.style_curve',
+      'Invalid polyline.new line_style: line.style_curve',
+      'Invalid line.set_style style: line.style_curve',
+      'Invalid label.set_style style: label.style_pin',
+      'Invalid box.set_border_style style: line.style_curve',
+    ]);
+  });
+
   it('resolves label method named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Label Method Signatures")
