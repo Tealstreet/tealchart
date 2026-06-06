@@ -6286,6 +6286,40 @@ plot(close, title="Close")`;
       expect(result.profile.maxBarsBack).toBe(12);
     });
 
+    it('statically reports average math history offsets', () => {
+      const script = `//@version=6
+indicator("Math Avg Static History")
+shortLength = input.int(defval=4, title="Short")
+longLength = input.int(defval=12, title="Long")
+length = math.avg(number0=shortLength, longLength, 14)
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(10);
+    });
+
+    it('does not statically infer sparse average math history offsets', () => {
+      const script = `//@version=6
+indicator("Sparse Math Avg Static History")
+length = math.avg(number0=4, number2=14)
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors.map((error) => error.message)).toEqual([
+        'Missing variadic argument: number1',
+        'Missing variadic argument: number1',
+        'Missing variadic argument: number1',
+      ]);
+      expect(result.profile.maxBarsBack).toBe(0);
+    });
+
     it('statically reports rounded math history offsets', () => {
       const script = `//@version=6
 indicator("Rounded Math Static History")

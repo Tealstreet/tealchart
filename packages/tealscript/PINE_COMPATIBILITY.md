@@ -166,8 +166,8 @@ derived regular-series history, and unavailable or future offsets returning
 `na`/`null` plot values instead of throwing. Runtime profile metadata reports
 literal, simple numeric-alias, `input.int()`/`input.float()` default-derived,
 selected pure `math.*` helper-derived offsets including min/max, rounding,
-power, and square-root helpers, selected numeric normalization helpers, and
-input-gated simple conditional history offsets, including static numeric
+averaging, power, and square-root helpers, selected numeric normalization
+helpers, and input-gated simple conditional history offsets, including static numeric
 comparisons, even when they sit behind unexecuted branches. Truly dynamic series
 offsets are still inferred from observed runtime access.
 
@@ -749,11 +749,11 @@ produce runtime errors, while in-range references remain available over loaded
 history.
 Scripts without an explicit declaration report inferred history depth in the
 runtime profile from static literal/simple numeric offset inference,
-selected pure `math.*` helper offsets including power and square-root helpers,
-selected numeric normalization helper offsets, input-controlled simple
-conditional offsets, and observed dynamic access. Full Pine-style preallocation
-for arbitrary series offsets remains a compatibility target. The checkpoint
-corpus tracks an official `max_bars_back`
+selected pure `math.*` helper offsets including averaging, power, and
+square-root helpers, selected numeric normalization helper offsets,
+input-controlled simple conditional offsets, and observed dynamic access. Full
+Pine-style preallocation for arbitrary series offsets remains a compatibility
+target. The checkpoint corpus tracks an official `max_bars_back`
 bounded-history fixture.
 
 ## Common Drawing Object Coverage
