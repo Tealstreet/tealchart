@@ -362,7 +362,7 @@ VariableDeclaration
   / UntypedVariableDeclaration
 
 TypedVariableDeclaration
-  = exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" _ init:VariableInitializer _ LineTerminator? {
+  = exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:VariableInitializer _ LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -375,7 +375,7 @@ TypedVariableDeclaration
     }
 
 UntypedVariableDeclaration
-  = exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" _ init:VariableInitializer _ LineTerminator? {
+  = exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:VariableInitializer _ LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -504,7 +504,7 @@ TypeReferenceName
 // Assignment: x := value
 // Left side can be an identifier, member access, or index access
 AssignmentStatement
-  = left:AssignmentTarget _ op:AssignmentOperator _ right:Expression _ LineTerminator? {
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:Expression _ LineTerminator? {
       return {
         type: 'AssignmentStatement',
         operator: op,
@@ -743,7 +743,7 @@ FunctionVariableDeclaration
   / UntypedFunctionVariableDeclaration
 
 TypedFunctionVariableDeclaration
-  = exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" _ init:FunctionIfStatement {
+  = exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:FunctionIfStatement {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -754,7 +754,7 @@ TypedFunctionVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" _ init:Expression _ LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression _ LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -767,7 +767,7 @@ TypedFunctionVariableDeclaration
     }
 
 UntypedFunctionVariableDeclaration
-  = exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" _ init:FunctionIfStatement {
+  = exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:FunctionIfStatement {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -778,7 +778,7 @@ UntypedFunctionVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" _ init:Expression _ LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression _ LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -865,7 +865,7 @@ FunctionNestedVariableDeclaration
   / UntypedFunctionNestedVariableDeclaration
 
 TypedFunctionNestedVariableDeclaration
-  = exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" _ init:FunctionNestedIfStatement {
+  = exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:FunctionNestedIfStatement {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -876,7 +876,7 @@ TypedFunctionNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" _ init:Expression _ LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression _ LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -889,7 +889,7 @@ TypedFunctionNestedVariableDeclaration
     }
 
 UntypedFunctionNestedVariableDeclaration
-  = exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" _ init:FunctionNestedIfStatement {
+  = exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:FunctionNestedIfStatement {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -900,7 +900,7 @@ UntypedFunctionNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" _ init:Expression _ LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression _ LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -987,7 +987,7 @@ FunctionDeepNestedVariableDeclaration
   / UntypedFunctionDeepNestedVariableDeclaration
 
 TypedFunctionDeepNestedVariableDeclaration
-  = exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" _ init:FunctionDeepNestedIfStatement {
+  = exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:FunctionDeepNestedIfStatement {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -998,7 +998,7 @@ TypedFunctionDeepNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" _ init:Expression _ LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression _ LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -1011,7 +1011,7 @@ TypedFunctionDeepNestedVariableDeclaration
     }
 
 UntypedFunctionDeepNestedVariableDeclaration
-  = exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" _ init:FunctionDeepNestedIfStatement {
+  = exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:FunctionDeepNestedIfStatement {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -1022,7 +1022,7 @@ UntypedFunctionDeepNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" _ init:Expression _ LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression _ LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -1679,6 +1679,10 @@ MultiLineComment
 // Whitespace (no newlines - those are significant)
 _
   = (WhiteSpace / MultiLineComment)*
+
+InitializerSpace
+  = &( _ LineTerminator Indent) _ LineTerminator Indent _
+  / _
 
 // Delimited whitespace allows line continuations inside parentheses/brackets.
 __
