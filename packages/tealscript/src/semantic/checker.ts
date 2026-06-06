@@ -1306,6 +1306,22 @@ const LIBRARY_DECLARATION_KEYS = new Set([
   'dynamic_requests',
 ]);
 
+const DECLARATION_FORMAT_VALUES = new Set(['inherit', 'price', 'volume', 'percent', 'mintick']);
+const DECLARATION_FORMAT_CONSTANT_VALUES = new Map([
+  ['format.inherit', 'inherit'],
+  ['format.price', 'price'],
+  ['format.volume', 'volume'],
+  ['format.percent', 'percent'],
+  ['format.mintick', 'mintick'],
+]);
+
+const DECLARATION_SCALE_VALUES = new Set(['left', 'right', 'none']);
+const DECLARATION_SCALE_CONSTANT_VALUES = new Map([
+  ['scale.left', 'left'],
+  ['scale.right', 'right'],
+  ['scale.none', 'none'],
+]);
+
 for (const name of CALENDAR_FUNCTION_NAMES) {
   BUILTIN_SIGNATURES.set(name, { params: ['time', 'timezone'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true });
 }
@@ -2271,6 +2287,8 @@ class SemanticChecker {
       ? STRATEGY_DECLARATION_KEYS
       : INDICATOR_DECLARATION_KEYS;
     this.checkDeclarationKnownProperties(statement, allowedKeys, displayName);
+    this.checkDeclarationFormatValue(statement.format, statement.declarationKind);
+    this.checkDeclarationScaleValue(statement.scale, statement.declarationKind);
     this.checkNonNegativeLiteralIntegerValue(
       statement.max_bars_back,
       `${statement.declarationKind} max_bars_back must be a non-negative integer`,
@@ -2302,6 +2320,54 @@ class SemanticChecker {
 
   private checkLibraryDeclarationArguments(statement: LibraryDeclaration): void {
     this.checkDeclarationKnownProperties(statement, LIBRARY_DECLARATION_KEYS, 'library()');
+  }
+
+  private checkDeclarationFormatValue(expression: Expression | undefined, declarationKind: string): void {
+    this.checkDeclarationConstantStringValue(
+      expression,
+      DECLARATION_FORMAT_VALUES,
+      DECLARATION_FORMAT_CONSTANT_VALUES,
+      'format',
+      `Invalid ${declarationKind} format`,
+    );
+  }
+
+  private checkDeclarationScaleValue(expression: Expression | undefined, declarationKind: string): void {
+    this.checkDeclarationConstantStringValue(
+      expression,
+      DECLARATION_SCALE_VALUES,
+      DECLARATION_SCALE_CONSTANT_VALUES,
+      'scale',
+      `Invalid ${declarationKind} scale`,
+    );
+  }
+
+  private checkDeclarationConstantStringValue(
+    expression: Expression | undefined,
+    allowedValues: Set<string>,
+    constantValues: Map<string, string>,
+    namespace: string,
+    messagePrefix: string,
+  ): void {
+    if (!expression) return;
+
+    const value = this.declarationConstantStringValue(expression, constantValues, namespace);
+    if (value !== undefined && !allowedValues.has(value)) {
+      this.addDiagnostic('type-mismatch', `${messagePrefix}: ${value}`, expression.loc);
+    }
+  }
+
+  private declarationConstantStringValue(
+    expression: Expression,
+    constantValues: Map<string, string>,
+    namespace: string,
+  ): string | undefined {
+    const value = this.constantLiteralValue(expression);
+    if (typeof value === 'string') return value;
+
+    const path = this.memberPath(expression).join('.');
+    if (constantValues.has(path)) return constantValues.get(path);
+    return path.startsWith(`${namespace}.`) ? path : undefined;
   }
 
   private checkDeclarationKnownProperties(statement: object, allowedKeys: Set<string>, displayName: string): void {
