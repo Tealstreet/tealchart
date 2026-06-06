@@ -3523,6 +3523,35 @@ tooMany = label.new(bar_index, close, "A", xloc.bar_index, yloc.price, color.gre
     ]);
   });
 
+  it('reports invalid literal drawing coordinate option values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing Options")
+trend = line.new(bar_index, close, bar_index + 1, open, xloc=xloc.session, extend=extend.future)
+marker = label.new(bar_index, close, xloc=xloc.session, yloc=yloc.middle)
+region = box.new(bar_index, high, bar_index + 1, low, extend=extend.future, xloc=xloc.session)
+points = array.from(chart.point.from_index(bar_index, close))
+shape = polyline.new(points, xloc=xloc.session)
+line.set_xloc(trend, bar_index, bar_index + 1, xloc=xloc.session)
+line.set_extend(trend, extend=extend.future)
+label.set_yloc(marker, yloc=yloc.middle)
+box.set_xloc(region, bar_index, bar_index + 1, xloc=xloc.session)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid line.new xloc: xloc.session',
+      'Invalid line.new extend: extend.future',
+      'Invalid label.new xloc: xloc.session',
+      'Invalid label.new yloc: yloc.middle',
+      'Invalid box.new xloc: xloc.session',
+      'Invalid box.new extend: extend.future',
+      'Invalid polyline.new xloc: xloc.session',
+      'Invalid line.set_xloc xloc: xloc.session',
+      'Invalid line.set_extend extend: extend.future',
+      'Invalid label.set_yloc yloc: yloc.middle',
+      'Invalid box.set_xloc xloc: xloc.session',
+    ]);
+  });
+
   it('resolves label method named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Label Method Signatures")
