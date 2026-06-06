@@ -532,6 +532,32 @@ alert(message="bad namespace", freq=alert.freq_never)
     ]);
   });
 
+  it('reports invalid Pine alert and log argument value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Alert Types")
+alert(1, 2)
+alertcondition(1, title=2, message=3)
+log.info(1)
+log.warning(message=2)
+log.error(3)
+runtime.error(4)
+alert(1, message="ok")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'alert message must be a string, got int',
+      'alert freq must be a string, got int',
+      'alertcondition title must be a string, got int',
+      'alertcondition message must be a string, got int',
+      'alertcondition condition must be a boolean, got int',
+      'log.info message must be a string, got int',
+      'log.warning message must be a string, got int',
+      'log.error message must be a string, got int',
+      'runtime.error message must be a string, got int',
+      "Argument 'message' for alert() was supplied multiple times",
+    ]);
+  });
+
   it('reports invalid Pine built-in argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Invalid Built-in Bindings")
