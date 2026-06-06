@@ -5,7 +5,7 @@
  */
 
 import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition, LogOutput } from '../runtime/context';
-import type { IndicatorDeclarationMetadata, RuntimeProfile, TealscriptRuntimeOptions } from '../runtime/engine';
+import type { IndicatorDeclarationMetadata, RuntimeErrorCode, RuntimeErrorPayload, RuntimeProfile, TealscriptRuntimeOptions } from '../runtime/engine';
 import type { Program } from '../parser/ast';
 import type { SemanticDiagnostic } from '../semantic';
 
@@ -184,8 +184,10 @@ export interface ErrorMessage {
   type: 'error';
   scriptId: string;
   message: string;
+  code?: RuntimeErrorCode;
   line?: number;
   column?: number;
+  runtimeError?: RuntimeErrorPayload;
   metadata?: WorkerOutputMetadata;
 }
 
