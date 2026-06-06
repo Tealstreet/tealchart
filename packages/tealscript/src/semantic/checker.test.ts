@@ -45,6 +45,22 @@ plot(vwap)
     );
   });
 
+  it('infers scalar ta.vwap overloads as floats for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("VWAP scalar types")
+scalar = ta.vwap(close)
+anchored = ta.vwap(source=close, anchor=bar_index == 0)
+string badScalar = scalar
+string badAnchored = anchored
+plot(scalar + anchored)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign float value to string variable',
+      'Cannot assign float value to string variable',
+    ]);
+  });
+
   it('accepts calendar functions with named time and timezone arguments', () => {
     const result = checkProgram(parse(`
 indicator("Calendar Functions")
