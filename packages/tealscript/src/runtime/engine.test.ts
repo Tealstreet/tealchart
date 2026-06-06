@@ -425,6 +425,59 @@ plot(recalculations)`;
       expect(result.strategy.intrabarContexts).toHaveLength(2);
     });
 
+    it('does not fill recalc-created bar magnifier orders on ticks before the triggering fill', () => {
+      const baseTime = Date.now() - 180000;
+      const bars: Bar[] = [
+        { time: baseTime, open: 100, high: 101, low: 99, close: 100, volume: 1000 },
+        { time: baseTime + 60000, open: 100, high: 105, low: 96, close: 100, volume: 1000 },
+        { time: baseTime + 120000, open: 100, high: 101, low: 99, close: 100, volume: 1000 },
+      ];
+      const script = `//@version=6
+strategy("Magnifier fill recalc timeline", calc_on_order_fills=true, use_bar_magnifier=true, process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1, limit=97)
+if strategy.position_size > 0
+    strategy.exit("Take", "Long", limit=104)
+plot(strategy.position_size)
+plot(strategy.closedtrades)`;
+      const datafeed = new InMemoryStrategyIntrabarDatafeed([{
+        symbol: 'BTCUSDT',
+        timeframe: '60',
+        chartBarTime: bars[1].time,
+        chartBarIndex: 1,
+        chartBar: bars[1],
+        source: 'lower_timeframe',
+        ticks: [
+          { time: bars[1].time, price: 100, kind: 'intrabar_open', sequence: 0 },
+          { time: bars[1].time + 15_000, price: 105, kind: 'intrabar_high', sequence: 1 },
+          { time: bars[1].time + 30_000, price: 96, kind: 'intrabar_low', sequence: 2 },
+          { time: bars[1].time + 45_000, price: 100, kind: 'intrabar_close', sequence: 3 },
+        ],
+      }]);
+
+      const result = executeScript(parse(script), bars, undefined, { strategyIntrabarDatafeed: datafeed });
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.fills.map(({ orderId, price, barIndex, time }) => ({ orderId, price, barIndex, time }))).toEqual([
+        { orderId: 'Long', price: 97, barIndex: 1, time: bars[1].time + 30_000 },
+      ]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        avgFillPrice: order.avgFillPrice,
+        updatedBarIndex: order.updatedBarIndex,
+      }))).toEqual([
+        { id: 'Long', status: 'filled', avgFillPrice: 97, updatedBarIndex: 1 },
+        { id: 'Take', status: 'pending', avgFillPrice: null, updatedBarIndex: 2 },
+      ]);
+      expect(result.strategy.position.size).toBe(1);
+      expect(result.strategy.closedTrades).toEqual([]);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [0, 1, 1],
+        [0, 0, 0],
+      ]);
+    });
+
     it('does not record intrabar metadata when the strategy declaration fails', () => {
       const script = `//@version=6
 strategy("Invalid", initial_capital=-1, use_bar_magnifier=true)

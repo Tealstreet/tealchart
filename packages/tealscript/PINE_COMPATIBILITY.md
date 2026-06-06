@@ -892,7 +892,9 @@ broker-emulator path assumption, choosing open-high-low-close or
 open-low-high-close from the open's distance to the bar extremes, and fills
 price-based orders crossed in the previous-close/current-open gap at the current
 bar open. Bounded `calc_on_order_fills` reruns current-bar strategy logic after
-fills, and `calc_on_every_tick=true` recalculates strategies on unconfirmed
+fills, including a lower-timeframe bar-magnifier checkpoint that prevents
+recalc-created price exits from filling against ticks before the triggering
+fill. `calc_on_every_tick=true` recalculates strategies on unconfirmed
 realtime ticks while default strategies wait for confirmed realtime closes.
 TradingView-exact same-bar intrabar/bar-magnifier behavior remains a fidelity
 target. The `use_bar_magnifier` strategy setting is stored in the ledger.
