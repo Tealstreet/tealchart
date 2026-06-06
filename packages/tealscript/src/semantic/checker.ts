@@ -1527,6 +1527,12 @@ const DRAWING_FONT_FAMILY_CONSTANT_VALUES = new Map([
   ['font.family_default', 'default'],
   ['font.family_monospace', 'monospace'],
 ]);
+const DRAWING_TEXT_FORMATTING_VALUES = new Set(['none', 'bold', 'italic', 'bolditalic', 'italicbold']);
+const DRAWING_TEXT_FORMATTING_CONSTANT_VALUES = new Map([
+  ['text.format_none', 'none'],
+  ['text.format_bold', 'bold'],
+  ['text.format_italic', 'italic'],
+]);
 
 for (const name of CALENDAR_FUNCTION_NAMES) {
   BUILTIN_SIGNATURES.set(name, { params: ['time', 'timezone'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true });
@@ -4394,6 +4400,15 @@ class SemanticChecker {
       DRAWING_FONT_FAMILY_VALUES,
       DRAWING_FONT_FAMILY_CONSTANT_VALUES,
       'font.family_',
+    );
+    this.checkDrawingOptionLiteralArgument(
+      expression,
+      signature.params,
+      calleeName,
+      'text_formatting',
+      DRAWING_TEXT_FORMATTING_VALUES,
+      DRAWING_TEXT_FORMATTING_CONSTANT_VALUES,
+      'text.format_',
     );
   }
 

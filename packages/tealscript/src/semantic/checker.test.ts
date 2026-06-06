@@ -3579,36 +3579,44 @@ box.set_border_style(region, style=line.style_curve)
   it('reports invalid literal drawing text option values', () => {
     const result = checkProgram(parse(`
 indicator("Bad Drawing Text Options")
-marker = label.new(bar_index, close, textalign=text.align_top, text_font_family=font.family_serif)
-region = box.new(bar_index, high, bar_index + 1, low, text_halign=text.align_top, text_valign=text.align_left, text_wrap=text.wrap_clip, text_font_family=font.family_serif)
+marker = label.new(bar_index, close, textalign=text.align_top, text_font_family=font.family_serif, text_formatting=text.format_underline)
+region = box.new(bar_index, high, bar_index + 1, low, text_halign=text.align_top, text_valign=text.align_left, text_wrap=text.wrap_clip, text_font_family=font.family_serif, text_formatting="underline")
 dashboard = table.new(position.top_right, 1, 1)
 label.set_textalign(marker, textalign=text.align_top)
 label.set_text_font_family(marker, text_font_family=font.family_serif)
+label.set_text_formatting(marker, text_formatting=text.format_underline)
 box.set_text_halign(region, text_halign=text.align_top)
 box.set_text_valign(region, text_valign=text.align_left)
 box.set_text_wrap(region, text_wrap=text.wrap_clip)
 box.set_text_font_family(region, text_font_family=font.family_serif)
+box.set_text_formatting(region, text_formatting="underline")
 table.cell_set_text_halign(dashboard, 0, 0, text_halign=text.align_top)
 table.cell_set_text_valign(dashboard, 0, 0, text_valign=text.align_left)
 table.cell_set_text_font_family(dashboard, 0, 0, text_font_family=font.family_serif)
+table.cell_set_text_formatting(dashboard, 0, 0, text_formatting=text.format_underline)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Invalid label.new textalign: text.align_top',
       'Invalid label.new text_font_family: font.family_serif',
+      'Invalid label.new text_formatting: text.format_underline',
       'Invalid box.new text_halign: text.align_top',
       'Invalid box.new text_valign: text.align_left',
       'Invalid box.new text_wrap: text.wrap_clip',
       'Invalid box.new text_font_family: font.family_serif',
+      'Invalid box.new text_formatting: underline',
       'Invalid label.set_textalign textalign: text.align_top',
       'Invalid label.set_text_font_family text_font_family: font.family_serif',
+      'Invalid label.set_text_formatting text_formatting: text.format_underline',
       'Invalid box.set_text_halign text_halign: text.align_top',
       'Invalid box.set_text_valign text_valign: text.align_left',
       'Invalid box.set_text_wrap text_wrap: text.wrap_clip',
       'Invalid box.set_text_font_family text_font_family: font.family_serif',
+      'Invalid box.set_text_formatting text_formatting: underline',
       'Invalid table.cell_set_text_halign text_halign: text.align_top',
       'Invalid table.cell_set_text_valign text_valign: text.align_left',
       'Invalid table.cell_set_text_font_family text_font_family: font.family_serif',
+      'Invalid table.cell_set_text_formatting text_formatting: text.format_underline',
     ]);
   });
 
