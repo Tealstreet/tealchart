@@ -5957,6 +5957,37 @@ plot(badDividendConstant + badDividendString + badEarningsConstant + badEarnings
     ]);
   });
 
+  it('reports non-boolean request option flags', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Request Flags")
+htf = request.security("NASDAQ:AAPL", "2", close, ignore_invalid_symbol=1)
+ltf = request.security_lower_tf("NASDAQ:AAPL", "1", close, ignore_invalid_symbol="yes", ignore_invalid_timeframe=0)
+rate = request.currency_rate("USD", "GBP", ignore_invalid_currency="yes")
+dividend = request.dividends("NASDAQ:AAPL", dividends.gross, ignore_invalid_symbol=1)
+earning = request.earnings("NASDAQ:AAPL", earnings.actual, ignore_invalid_symbol="yes")
+split = request.splits("NASDAQ:AAPL", splits.denominator, ignore_invalid_symbol=1)
+revenue = request.financial("NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", ignore_invalid_symbol="yes")
+econ = request.economic("US", "GDP", ignore_invalid_symbol=1)
+seeded = request.seed("seed", "SYM", close, ignore_invalid_symbol="yes")
+duplicate = request.security("NASDAQ:AAPL", "2", close, symbol="NASDAQ:MSFT", ignore_invalid_symbol=1)
+plot(htf + array.size(ltf) + rate + dividend + earning + split + revenue + econ + seeded + duplicate)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'request.security ignore_invalid_symbol must be a boolean, got int',
+      'request.security_lower_tf ignore_invalid_symbol must be a boolean, got string',
+      'request.security_lower_tf ignore_invalid_timeframe must be a boolean, got int',
+      'request.currency_rate ignore_invalid_currency must be a boolean, got string',
+      'request.dividends ignore_invalid_symbol must be a boolean, got int',
+      'request.earnings ignore_invalid_symbol must be a boolean, got string',
+      'request.splits ignore_invalid_symbol must be a boolean, got int',
+      'request.financial ignore_invalid_symbol must be a boolean, got string',
+      'request.economic ignore_invalid_symbol must be a boolean, got int',
+      'request.seed ignore_invalid_symbol must be a boolean, got string',
+      "Argument 'symbol' for request.security() was supplied multiple times",
+    ]);
+  });
+
   it('resolves Pine input overload bindings for range and options calls', () => {
     const result = checkProgram(parse(`
 indicator("Input Overloads")
