@@ -187,20 +187,21 @@ export function createCompatibilityRunOutcome(input: {
 
 export function validateCompatibilityStageOutcome(stage: CompatibilityStageOutcome): string[] {
   const errors: string[] = [];
+  const failureClass = stage.failureClass ?? inferCompatibilityFailureClass(stage);
   if (!compatibilityStages.includes(stage.stage)) {
     errors.push(`unknown compatibility stage: ${stage.stage}`);
   }
   if (!compatibilityStageStatuses.includes(stage.status)) {
     errors.push(`unknown compatibility stage status: ${stage.status}`);
   }
-  if (stage.status === 'failed' && stage.failureClass === undefined) {
+  if (stage.status === 'failed' && failureClass === undefined) {
     errors.push(`failed stage ${stage.stage} must include a failureClass`);
   }
   if (stage.status !== 'failed' && stage.failureClass !== undefined) {
     errors.push(`stage ${stage.stage} must not include failureClass unless status is failed`);
   }
-  if (stage.failureClass !== undefined && !compatibilityFailureClasses.includes(stage.failureClass)) {
-    errors.push(`unknown compatibility failure class: ${stage.failureClass}`);
+  if (failureClass !== undefined && !compatibilityFailureClasses.includes(failureClass)) {
+    errors.push(`unknown compatibility failure class: ${failureClass}`);
   }
   return errors;
 }
@@ -405,10 +406,21 @@ export function formatPineCompatibilityCoverageMarkdown(index: PineCompatibility
 }
 
 function cloneCompatibilityStageOutcome(stage: CompatibilityStageOutcome): CompatibilityStageOutcome {
+  const failureClass = stage.failureClass ?? inferCompatibilityFailureClass(stage);
+
   return {
     ...stage,
+    ...(failureClass ? { failureClass } : {}),
     diagnostics: stage.diagnostics?.map((diagnostic) => ({ ...diagnostic })),
   };
+}
+
+function inferCompatibilityFailureClass(stage: CompatibilityStageOutcome): CompatibilityFailureClass | undefined {
+  if (stage.status !== 'failed') return undefined;
+  if (stage.diagnostics?.some((diagnostic) => diagnostic.code === 'unsupported-feature')) {
+    return 'unsupported_planned';
+  }
+  return undefined;
 }
 
 function clonePineScriptLedgerEntry(entry: PineScriptLedgerEntry): PineScriptLedgerEntry {
