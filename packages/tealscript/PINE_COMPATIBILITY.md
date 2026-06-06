@@ -114,7 +114,7 @@ Covered behavior and remaining gaps:
 - User-defined function bodies can return expression results from `if` /
   `else if` / `else` branches, including partial `if` expressions with no
   `else` when the present branch has an inferable value. Nested UDF `if`
-  branches are covered through seventh-level public-script layouts.
+  branches are covered through eighth-level public-script layouts.
 - Variable declarations can use `if` / `else if` / `else` initializers, including
   typed declarations and partial `if` initializers that evaluate to `na` when no
   branch yields a value.
