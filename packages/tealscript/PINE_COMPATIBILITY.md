@@ -56,9 +56,10 @@ public strategy performance tables, plus UDT state objects updated through
 user-defined methods.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
-suppression, entry-direction and intraday filled-order risk rules,
-recalculation checkpoints, and a reduced public fixed-bracket strategy idiom,
-public trailing-stop strategy idiom, and public stats-table output.
+suppression, entry-direction, intraday filled-order, and consecutive loss-day
+risk rules, recalculation checkpoints, and a reduced public fixed-bracket
+strategy idiom, public trailing-stop strategy idiom, and public stats-table
+output.
 
 ## Current Matrix
 
