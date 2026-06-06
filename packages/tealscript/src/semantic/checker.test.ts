@@ -499,6 +499,8 @@ plotcandle(open, high, low, close, close=close)
   it('reports invalid marker visual output argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Invalid Marker Visual Bindings")
+plotshape()
+plotshape(close > open, series=close < open)
 plotchar()
 plotchar(series=close > open, glyph="B")
 plotchar(close > open, series=close < open)
@@ -508,6 +510,9 @@ plotarrow(close - open, series=open - close)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'plotshape() expects at least 1 argument',
+      "plotshape() missing required argument 'series'",
+      "Argument 'series' for plotshape() was supplied multiple times",
       'plotchar() expects at least 1 argument',
       "plotchar() missing required argument 'series'",
       "Unknown argument 'glyph' for plotchar()",
