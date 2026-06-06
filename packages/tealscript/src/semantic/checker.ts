@@ -198,6 +198,17 @@ const REQUEST_BOOL_PARAMETER_NAMES = new Set([
   'ignore_invalid_currency',
   'ignore_invalid_timeframe',
 ]);
+const REQUEST_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['request.security', ['symbol', 'timeframe', 'currency']],
+  ['request.security_lower_tf', ['symbol', 'timeframe', 'currency']],
+  ['request.currency_rate', ['from', 'to']],
+  ['request.dividends', ['ticker', 'currency']],
+  ['request.earnings', ['ticker', 'currency']],
+  ['request.splits', ['ticker']],
+  ['request.financial', ['symbol', 'financial_id', 'period', 'currency']],
+  ['request.economic', ['country_code', 'field']],
+  ['request.seed', ['source', 'symbol']],
+]);
 const REQUEST_DIVIDENDS_FIELD_VALUES = new Set(['dividends.gross', 'dividends.net']);
 const REQUEST_DIVIDENDS_FIELD_CONSTANT_VALUES = new Map([...REQUEST_DIVIDENDS_FIELD_VALUES].map((value) => [value, value]));
 const REQUEST_EARNINGS_FIELD_VALUES = new Set(['earnings.actual', 'earnings.estimate', 'earnings.standardized']);
@@ -3476,6 +3487,7 @@ class SemanticChecker {
     this.checkRequestBarmergeModeLiteralArguments(expression);
     this.checkRequestSeriesFieldLiteralArguments(expression, scope);
     this.checkRequestBoolOptionArguments(expression, scope);
+    this.checkRequestStringOptionArguments(expression, scope);
     this.checkVisualLineStyleLiteralArguments(expression);
     this.checkVisualFormatPrecisionLiteralArguments(expression);
     this.checkMarkerStyleLocationSizeLiteralArguments(expression);
@@ -4279,6 +4291,33 @@ class SemanticChecker {
       this.addDiagnostic(
         'type-mismatch',
         `${calleeName} ${parameterName} must be a boolean, got ${this.formatSemanticType(argumentType)}`,
+        argument.loc,
+      );
+    }
+  }
+
+  private checkRequestStringOptionArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const parameterNames = REQUEST_STRING_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!parameterNames) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of parameterNames) {
+      if (!signature.params.includes(parameterName)) continue;
+
+      const parameterIndex = signature.params.indexOf(parameterName);
+      const argument = this.resolveCallArgumentExpression(expression, signature.params, parameterIndex);
+      if (!argument) continue;
+
+      const argumentType = this.inferExpressionType(argument, scope);
+      if (argumentType.kind === 'unknown' || argumentType.kind === 'string') continue;
+
+      this.addDiagnostic(
+        'type-mismatch',
+        `${calleeName} ${parameterName} must be a string, got ${this.formatSemanticType(argumentType)}`,
         argument.loc,
       );
     }
