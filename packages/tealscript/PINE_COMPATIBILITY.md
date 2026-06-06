@@ -829,9 +829,10 @@ feeds are tracked in [`STRATEGY_INTRABAR_DESIGN.md`](./STRATEGY_INTRABAR_DESIGN.
 `indicator(..., max_bars_back=N)` is parsed and recorded on execution results
 as `indicatorMaxBarsBack`. The `max_bars_back(var, num)` function is accepted as
 a Pine-compatible buffer/profile hint. Values must be finite, non-negative
-integers. Explicit history references that exceed the declared indicator bound
-produce runtime errors, while in-range references remain available over loaded
-history.
+integers, and obvious invalid literal declaration or function hint values are
+reported by semantic diagnostics before runtime. Explicit history references
+that exceed the declared indicator bound produce runtime errors, while in-range
+references remain available over loaded history.
 Scripts without an explicit declaration report inferred history depth in the
 runtime profile from static literal/simple numeric offset inference,
 selected pure `math.*` helper offsets including averaging, power, and

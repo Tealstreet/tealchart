@@ -2258,6 +2258,10 @@ class SemanticChecker {
       ? STRATEGY_DECLARATION_KEYS
       : INDICATOR_DECLARATION_KEYS;
     this.checkDeclarationKnownProperties(statement, allowedKeys, displayName);
+    this.checkNonNegativeLiteralIntegerValue(
+      statement.max_bars_back,
+      `${statement.declarationKind} max_bars_back must be a non-negative integer`,
+    );
     if (statement.declarationKind === 'strategy') {
       this.checkStrategyDeclarationLiteralValueConstraints(statement);
     }
@@ -3014,6 +3018,7 @@ class SemanticChecker {
     this.checkMatrixSortFieldType(expression, scope);
     this.checkMapCallTypes(expression, scope);
     this.checkInputDefaultValueType(expression, scope);
+    this.checkMaxBarsBackLiteralArguments(expression);
     this.checkStrategyLiteralArgumentConstraints(expression);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
@@ -3652,6 +3657,13 @@ class SemanticChecker {
       default:
         return;
     }
+  }
+
+  private checkMaxBarsBackLiteralArguments(expression: CallExpression): void {
+    if (this.memberPath(expression.callee).join('.') !== 'max_bars_back') return;
+
+    const num = this.getCallArgument(expression.arguments, 'num', 1);
+    this.checkNonNegativeLiteralIntegerValue(num, 'max_bars_back num must be a non-negative integer');
   }
 
   private checkStrategyOrderLiteralArguments(expression: CallExpression, displayName: string): void {
