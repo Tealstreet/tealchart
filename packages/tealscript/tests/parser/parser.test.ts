@@ -958,6 +958,75 @@ plot(smoothed)
       ]);
     });
 
+    it('parses declaration and assignment initializers on continuation lines', () => {
+      const ast = parse(`indicator("Continuation Initializers")
+value =
+    close + open
+float smoothed =
+    ta.sma(value, 3)
+[upper, lower] =
+    [high, low]
+value :=
+    value + high
+smoothed +=
+    1
+plot(value + smoothed + upper + lower)
+`);
+      const declarations = ast.body.filter((statement): statement is VariableDeclaration => statement.type === 'VariableDeclaration');
+      const assignments = ast.body.filter((statement) => statement.type === 'AssignmentStatement');
+
+      expect(ast.body.map((statement) => statement.type)).toEqual([
+        'IndicatorDeclaration',
+        'VariableDeclaration',
+        'VariableDeclaration',
+        'VariableDeclaration',
+        'AssignmentStatement',
+        'AssignmentStatement',
+        'ExpressionStatement',
+      ]);
+      expect(declarations.map((declaration) => declaration.init.type)).toEqual([
+        'BinaryExpression',
+        'CallExpression',
+        'ArrayExpression',
+      ]);
+      expect(assignments.map((assignment) => (
+        assignment.type === 'AssignmentStatement'
+          ? { operator: assignment.operator, right: assignment.right.type }
+          : null
+      ))).toEqual([
+        { operator: ':=', right: 'BinaryExpression' },
+        { operator: '+=', right: 'NumericLiteral' },
+      ]);
+    });
+
+    it('parses continuation-line initializers inside user-defined function bodies', () => {
+      const ast = parse(`indicator("Function Continuation Initializers")
+score(source) =>
+    value =
+        source + open
+    float basis =
+        ta.sma(value, 3)
+    value :=
+        value + basis
+    value
+plot(score(close))
+`);
+      const fn = ast.body.find((statement): statement is FunctionDeclaration => statement.type === 'FunctionDeclaration');
+
+      expect(Array.isArray(fn?.body)).toBe(true);
+      if (fn && Array.isArray(fn.body)) {
+        expect(fn.body.map((statement) => statement.type)).toEqual([
+          'VariableDeclaration',
+          'VariableDeclaration',
+          'AssignmentStatement',
+          'ExpressionStatement',
+        ]);
+        expect(fn.body[0]?.type === 'VariableDeclaration' ? fn.body[0].init.type : null).toBe('BinaryExpression');
+        expect(fn.body[1]?.type === 'VariableDeclaration' ? fn.body[1].init.type : null).toBe('CallExpression');
+        expect(fn.body[2]?.type === 'AssignmentStatement' ? fn.body[2].right.type : null).toBe('BinaryExpression');
+      }
+    });
+
     it('parses wrapped request and ternary expressions inside nested blocks', () => {
       const ast = parse(`indicator("Wrapped Public Layout")
 fast = ta.sma(close, 3)
