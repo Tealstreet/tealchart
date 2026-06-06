@@ -6301,6 +6301,36 @@ plot(close, title="Close")`;
       expect(result.profile.maxBarsBack).toBe(8);
     });
 
+    it('statically reports power math history offsets', () => {
+      const script = `//@version=6
+indicator("Power Math Static History")
+base = input.int(defval=4, title="Base")
+length = math.pow(base=base, exponent=2)
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(16);
+    });
+
+    it('statically reports square root math history offsets', () => {
+      const script = `//@version=6
+indicator("Square Root Math Static History")
+raw = input.int(defval=36, title="Raw")
+length = math.sqrt(number=raw)
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(6);
+    });
+
     it('statically reports cast-normalized history offsets', () => {
       const script = `//@version=6
 indicator("Cast Static History")
