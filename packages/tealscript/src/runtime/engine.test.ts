@@ -6141,6 +6141,35 @@ plot(close, title="Close")`;
       expect(result.errors).toEqual([]);
       expect(result.profile.maxBarsBack).toBe(4);
     });
+
+    it('statically reports input-derived history offsets from unexecuted branches', () => {
+      const script = `//@version=6
+indicator("Input Static History")
+length = input.int(defval=6, title="Length")
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(6);
+    });
+
+    it('statically reports simple numeric alias history offsets', () => {
+      const script = `//@version=6
+indicator("Alias Static History")
+base = 2
+length = base + 3
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(5);
+    });
   });
 
   describe('inputs', () => {

@@ -391,7 +391,12 @@ interface ExpressionHistoryEntry {
   values: unknown[];
 }
 
-type StaticCollectionScopes = Array<Map<string, boolean>>;
+interface StaticNameInfo {
+  isCollection: boolean;
+  numericValue: number | null;
+}
+
+type StaticCollectionScopes = Array<Map<string, StaticNameInfo>>;
 
 const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['ticker']);
 
@@ -749,7 +754,12 @@ export class TealscriptEngine {
       case 'FunctionDeclaration':
         return this.withStaticCollectionScope(collectionScopes, () => {
           for (const param of statement.params) {
-            this.setStaticCollectionName(param.name, this.isCollectionTypeAnnotation(param.typeAnnotation), collectionScopes);
+            this.setStaticNameInfo(
+              param.name,
+              this.isCollectionTypeAnnotation(param.typeAnnotation),
+              param.defaultValue ? this.inferStaticNumericValue(param.defaultValue, collectionScopes) : null,
+              collectionScopes,
+            );
           }
           return Math.max(
             this.inferOptionalExpressionsMaxBarsBack(
@@ -763,11 +773,14 @@ export class TealscriptEngine {
         const initMax = this.inferInitializerMaxBarsBack(statement.init, collectionScopes);
         const isCollection = this.isCollectionTypeAnnotation(statement.typeAnnotation)
           || (statement.init.type !== 'IfStatement' && this.expressionReturnsCollection(statement.init, collectionScopes));
+        const numericValue = statement.init.type === 'IfStatement'
+          ? null
+          : this.inferStaticNumericValue(statement.init, collectionScopes);
         if (statement.names.type === 'VariableDeclarator') {
-          this.setStaticCollectionName(statement.names.name.name, isCollection, collectionScopes);
+          this.setStaticNameInfo(statement.names.name.name, isCollection, numericValue, collectionScopes);
         } else {
           for (const name of statement.names.names) {
-            this.setStaticCollectionName(name.name, false, collectionScopes);
+            this.setStaticNameInfo(name.name, false, null, collectionScopes);
           }
         }
         return initMax;
@@ -775,9 +788,10 @@ export class TealscriptEngine {
       case 'AssignmentStatement': {
         const rightMax = this.inferExpressionMaxBarsBack(statement.right, collectionScopes);
         if (statement.left.type === 'Identifier') {
-          this.assignStaticCollectionName(
+          this.assignStaticNameInfo(
             statement.left.name,
             this.expressionReturnsCollection(statement.right, collectionScopes),
+            this.inferStaticNumericValue(statement.right, collectionScopes),
             collectionScopes,
           );
         }
@@ -802,8 +816,8 @@ export class TealscriptEngine {
           return Math.max(
             this.inferExpressionMaxBarsBack(statement.iterable, collectionScopes),
             this.withStaticCollectionScope(collectionScopes, () => {
-              this.setStaticCollectionName(statement.counter.name, false, collectionScopes);
-              if (statement.indexCounter) this.setStaticCollectionName(statement.indexCounter.name, false, collectionScopes);
+              this.setStaticNameInfo(statement.counter.name, false, null, collectionScopes);
+              if (statement.indexCounter) this.setStaticNameInfo(statement.indexCounter.name, false, null, collectionScopes);
               return this.inferStatementsMaxBarsBack(statement.body, collectionScopes);
             }),
           );
@@ -813,7 +827,7 @@ export class TealscriptEngine {
           this.inferExpressionMaxBarsBack(statement.end, collectionScopes),
           statement.step ? this.inferExpressionMaxBarsBack(statement.step, collectionScopes) : 0,
           this.withStaticCollectionScope(collectionScopes, () => {
-            this.setStaticCollectionName(statement.counter.name, false, collectionScopes);
+            this.setStaticNameInfo(statement.counter.name, false, null, collectionScopes);
             return this.inferStatementsMaxBarsBack(statement.body, collectionScopes);
           }),
         );
@@ -887,7 +901,7 @@ export class TealscriptEngine {
       case 'IndexExpression': {
         const indexMax = this.inferExpressionMaxBarsBack(expression.index, collectionScopes);
         const objectMax = this.inferExpressionMaxBarsBack(expression.object, collectionScopes);
-        const offset = this.literalHistoryOffset(expression);
+        const offset = this.staticHistoryOffset(expression.index, collectionScopes);
         if (offset === null || this.expressionReturnsCollection(expression.object, collectionScopes)) {
           return Math.max(indexMax, objectMax);
         }
@@ -969,26 +983,44 @@ export class TealscriptEngine {
     }
   }
 
-  private setStaticCollectionName(name: string, isCollection: boolean, collectionScopes: StaticCollectionScopes): void {
-    collectionScopes[collectionScopes.length - 1].set(name, isCollection);
+  private setStaticNameInfo(
+    name: string,
+    isCollection: boolean,
+    numericValue: number | null,
+    collectionScopes: StaticCollectionScopes,
+  ): void {
+    collectionScopes[collectionScopes.length - 1].set(name, { isCollection, numericValue });
   }
 
-  private assignStaticCollectionName(name: string, isCollection: boolean, collectionScopes: StaticCollectionScopes): void {
+  private assignStaticNameInfo(
+    name: string,
+    isCollection: boolean,
+    numericValue: number | null,
+    collectionScopes: StaticCollectionScopes,
+  ): void {
     for (let index = collectionScopes.length - 1; index >= 0; index--) {
       if (collectionScopes[index].has(name)) {
-        collectionScopes[index].set(name, isCollection);
+        collectionScopes[index].set(name, { isCollection, numericValue });
         return;
       }
     }
-    this.setStaticCollectionName(name, isCollection, collectionScopes);
+    this.setStaticNameInfo(name, isCollection, numericValue, collectionScopes);
   }
 
   private isStaticCollectionName(name: string, collectionScopes: StaticCollectionScopes): boolean {
+    return this.getStaticNameInfo(name, collectionScopes)?.isCollection ?? false;
+  }
+
+  private getStaticNumericName(name: string, collectionScopes: StaticCollectionScopes): number | null {
+    return this.getStaticNameInfo(name, collectionScopes)?.numericValue ?? null;
+  }
+
+  private getStaticNameInfo(name: string, collectionScopes: StaticCollectionScopes): StaticNameInfo | null {
     for (let index = collectionScopes.length - 1; index >= 0; index--) {
-      const collectionState = collectionScopes[index].get(name);
-      if (collectionState !== undefined) return collectionState;
+      const nameInfo = collectionScopes[index].get(name);
+      if (nameInfo) return nameInfo;
     }
-    return false;
+    return null;
   }
 
   private getCallExpressionName(expression: CallExpression): string | null {
@@ -999,9 +1031,88 @@ export class TealscriptEngine {
     return null;
   }
 
-  private literalHistoryOffset(expression: IndexExpression): number | null {
-    if (expression.index.type !== 'NumericLiteral') return null;
-    return this.normalizeIndexOffset(expression.index.value);
+  private staticHistoryOffset(expression: Expression, collectionScopes: StaticCollectionScopes): number | null {
+    const value = this.inferStaticNumericValue(expression, collectionScopes);
+    return value === null ? null : this.normalizeIndexOffset(value);
+  }
+
+  private inferStaticNumericValue(expression: Expression, collectionScopes: StaticCollectionScopes): number | null {
+    switch (expression.type) {
+      case 'NumericLiteral':
+        return expression.value;
+      case 'Identifier':
+        return this.getStaticNumericName(expression.name, collectionScopes);
+      case 'UnaryExpression': {
+        const value = this.inferStaticNumericValue(expression.argument, collectionScopes);
+        if (value === null) return null;
+        if (expression.operator === '-') return -value;
+        if (expression.operator === '+') return value;
+        return null;
+      }
+      case 'BinaryExpression':
+        return this.inferStaticBinaryNumericValue(expression, collectionScopes);
+      case 'ConditionalExpression': {
+        if (expression.test.type !== 'BooleanLiteral') return null;
+        return this.inferStaticNumericValue(
+          expression.test.value ? expression.consequent : expression.alternate,
+          collectionScopes,
+        );
+      }
+      case 'CallExpression':
+        return this.inferStaticNumericCallValue(expression, collectionScopes);
+      default:
+        return null;
+    }
+  }
+
+  private inferStaticBinaryNumericValue(expression: BinaryExpression, collectionScopes: StaticCollectionScopes): number | null {
+    const left = this.inferStaticNumericValue(expression.left, collectionScopes);
+    const right = this.inferStaticNumericValue(expression.right, collectionScopes);
+    if (left === null || right === null) return null;
+
+    switch (expression.operator) {
+      case '+':
+        return left + right;
+      case '-':
+        return left - right;
+      case '*':
+        return left * right;
+      case '/':
+        return right === 0 ? null : left / right;
+      case '%':
+        return right === 0 ? null : left % right;
+      default:
+        return null;
+    }
+  }
+
+  private inferStaticNumericCallValue(expression: CallExpression, collectionScopes: StaticCollectionScopes): number | null {
+    const name = this.getCallExpressionName(expression);
+    if (name !== 'input.int' && name !== 'input.float') return null;
+
+    const defval = this.getStaticCallArgument(expression, ['defval'], 0);
+    return defval ? this.inferStaticNumericValue(defval, collectionScopes) : null;
+  }
+
+  private getStaticCallArgument(
+    expression: CallExpression,
+    names: readonly string[],
+    position: number,
+  ): Expression | undefined {
+    for (const argument of expression.arguments) {
+      if (argument.name && names.includes(argument.name.name)) {
+        return argument.value;
+      }
+    }
+
+    let positionalIndex = 0;
+    for (const argument of expression.arguments) {
+      if (argument.name) continue;
+      if (positionalIndex === position) return argument.value;
+      positionalIndex += 1;
+    }
+
+    return undefined;
   }
 
   /**
