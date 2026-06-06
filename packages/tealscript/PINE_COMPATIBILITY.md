@@ -921,7 +921,8 @@ recorded as pending exit orders. Profit/loss tick-distance exits are translated
 from the matching weighted entry price into limit/stop brackets, with absolute
 limit/stop prices taking precedence. Pending limit/stop orders fill on later
 bars when OHLC crosses their trigger price, and bracket siblings cancel through
-OCA.
+OCA. `strategy.oca.reduce` groups reduce pending sibling order quantities after
+a fill and cancel siblings whose remaining quantity reaches zero.
 `strategy.entry()` and `strategy.order()` stop-limit orders activate after their
 stop price is crossed, then fill as limit orders on later execution ticks when
 the ordered broker path reaches the limit price. Fixed, cash, and
