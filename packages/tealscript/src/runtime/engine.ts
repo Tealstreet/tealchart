@@ -5949,6 +5949,7 @@ export class TealscriptEngine {
         || name === 'math.random'
         || name === 'ta.macd'
         || name === 'ta.obv'
+        || name === 'ta.rma'
         || name === 'ta.rsi'
         || name === 'ta.sar'
         || name === 'ta.supertrend'
@@ -9060,8 +9061,13 @@ export class TealscriptEngine {
       const alpha = 1 / length;
 
       const rmaKey = `_ta_rma_${callId}_${length}`;
+      const seedValues = this.getCompleteSourceWindow(scope, `_ta_rma_source_${callId}_${length}`, source, length);
+      if (!seedValues) return NaN;
+
       const previous = scope.get(rmaKey) as number | undefined;
-      const rma = previous === undefined || isNaN(previous) ? source : alpha * source + (1 - alpha) * previous;
+      const rma = previous === undefined || isNaN(previous)
+        ? seedValues.reduce((sum, value) => sum + value, 0) / length
+        : alpha * source + (1 - alpha) * previous;
       this.setBuiltinState(scope, rmaKey, rma);
       return rma;
     });

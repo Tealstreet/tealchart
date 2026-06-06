@@ -302,6 +302,33 @@ plot(namedRsi, title="Named RSI")
     expect(roundSeries(getPlot(result, 'Named RSI').values)).toEqual(roundSeries(getPlot(result, 'First RSI').values));
   });
 
+  it('seeds RMA from a complete Pine SMA window', () => {
+    const result = runCompatScript(`
+indicator("RMA seed")
+plot(ta.rma(close, 3), title="RMA")
+plot(ta.rma(source=close, length=3), title="Named RMA")
+plot(ta.rma(source=close, 3), title="Mixed RMA")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'RMA').values)).toEqual([
+      null,
+      null,
+      104.666667,
+      104.111111,
+      102.407407,
+      101.604938,
+      102.403292,
+      104.602195,
+      105.734797,
+      107.489864,
+      108.326576,
+      109.551051,
+    ]);
+    expect(roundSeries(getPlot(result, 'Named RMA').values)).toEqual(roundSeries(getPlot(result, 'RMA').values));
+    expect(roundSeries(getPlot(result, 'Mixed RMA').values)).toEqual(roundSeries(getPlot(result, 'RMA').values));
+  });
+
   it('runs cumulative and dispersion TA helpers', () => {
     const result = runCompatScript(`
 indicator("Cumulative TA docs smoke")
@@ -1623,7 +1650,7 @@ plot(ta.roc(source=spread, 2), title="Mixed Spread ROC")
     expect(roundSeries(getPlot(result, 'Spread SMA').values)).toEqual([null, null, 2.333333, 0.333333, -2, -2.333333, 0.333333, 3.333333, 2.666667, 2.333333, 0.333333, 1.333333]);
     expect(roundSeries(getPlot(result, 'Spread EMA').values)).toEqual([2, 2.5, 2.25, -0.875, -2.4375, -0.71875, 1.640625, 3.320313, 1.160156, 2.080078, 0.540039, 1.27002]);
     expect(roundSeries(getPlot(result, 'Mixed Spread EMA').values)).toEqual(roundSeries(getPlot(result, 'Spread EMA').values));
-    expect(roundSeries(getPlot(result, 'Spread RMA').values)).toEqual([2, 2.333333, 2.222222, 0.148148, -1.234568, -0.489712, 1.006859, 2.337906, 1.225271, 1.816847, 0.877898, 1.251932]);
+    expect(roundSeries(getPlot(result, 'Spread RMA').values)).toEqual([null, null, 2.333333, 0.222222, -1.185185, -0.45679, 1.028807, 2.352538, 1.235025, 1.82335, 0.882233, 1.254822]);
     expect(roundSeries(getPlot(result, 'Spread WMA').values)).toEqual([null, null, 2.333333, -0.833333, -3, -1.5, 1.666667, 4, 1.833333, 2, 0.333333, 1.166667]);
     expect(roundSeries(getPlot(result, 'Named Spread RMA').values)).toEqual(roundSeries(getPlot(result, 'Spread RMA').values));
     expect(roundSeries(getPlot(result, 'Mixed Spread RMA').values)).toEqual(roundSeries(getPlot(result, 'Spread RMA').values));
