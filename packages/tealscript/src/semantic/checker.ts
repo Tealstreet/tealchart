@@ -2279,6 +2279,22 @@ class SemanticChecker {
       statement.calc_bars_count,
       `${statement.declarationKind} calc_bars_count must be a non-negative integer`,
     );
+    this.checkNonNegativeLiteralIntegerValue(
+      statement.max_labels_count,
+      `${statement.declarationKind} max_labels_count must be a non-negative integer`,
+    );
+    this.checkNonNegativeLiteralIntegerValue(
+      statement.max_lines_count,
+      `${statement.declarationKind} max_lines_count must be a non-negative integer`,
+    );
+    this.checkNonNegativeLiteralIntegerValue(
+      statement.max_boxes_count,
+      `${statement.declarationKind} max_boxes_count must be a non-negative integer`,
+    );
+    this.checkNonNegativeLiteralIntegerValue(
+      statement.max_polylines_count,
+      `${statement.declarationKind} max_polylines_count must be a non-negative integer`,
+    );
     if (statement.declarationKind === 'strategy') {
       this.checkStrategyDeclarationLiteralValueConstraints(statement);
     }

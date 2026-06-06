@@ -566,6 +566,25 @@ max_bars_back(open, 1.5)
     ]);
   });
 
+  it('reports invalid literal declaration drawing limit values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Drawing Limits",
+  max_labels_count=-1,
+  max_lines_count=1.5,
+  max_boxes_count=-2,
+  max_polylines_count=2.5)
+strategy("Invalid Strategy Drawing Limits", max_labels_count=-3)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'indicator max_labels_count must be a non-negative integer',
+      'indicator max_lines_count must be a non-negative integer',
+      'indicator max_boxes_count must be a non-negative integer',
+      'indicator max_polylines_count must be a non-negative integer',
+      'strategy max_labels_count must be a non-negative integer',
+    ]);
+  });
+
   it('reports invalid literal calc_bars_count values', () => {
     const result = checkProgram(parse(`
 indicator("Invalid Calc Bars Count", calc_bars_count=-1)
