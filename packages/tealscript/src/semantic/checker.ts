@@ -627,6 +627,19 @@ const STRATEGY_DEFAULT_QTY_TYPE_VALUES = new Set(['fixed', 'cash', 'percent_of_e
 const STRATEGY_COMMISSION_TYPE_VALUES = new Set(['percent', 'cash_per_order', 'cash_per_contract']);
 const STRATEGY_CASH_OR_PERCENT_RISK_TYPE_VALUES = new Set(['cash', 'percent_of_equity']);
 const STRATEGY_BOOL_PARAMETER_NAMES = new Set(['disable_alert', 'immediately']);
+const STRATEGY_STRING_PARAMETER_NAMES = new Set([
+  'id',
+  'from_entry',
+  'oca_name',
+  'comment',
+  'comment_profit',
+  'comment_loss',
+  'comment_trailing',
+  'alert_message',
+  'alert_profit',
+  'alert_loss',
+  'alert_trailing',
+]);
 const STRATEGY_TRADE_ACCESSORS = [
   'entry_id',
   'entry_comment',
@@ -3430,6 +3443,7 @@ class SemanticChecker {
     this.checkTickerOptionLiteralArguments(expression, scope);
     this.checkStrategyLiteralArgumentConstraints(expression);
     this.checkStrategyBoolOptionArguments(expression, scope);
+    this.checkStrategyStringOptionArguments(expression, scope);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
     for (const argument of expression.arguments) {
@@ -4244,6 +4258,32 @@ class SemanticChecker {
       this.addDiagnostic(
         'type-mismatch',
         `${calleeName} ${parameterName} must be a boolean, got ${this.formatSemanticType(argumentType)}`,
+        argument.loc,
+      );
+    }
+  }
+
+  private checkStrategyStringOptionArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    if (!calleeName.startsWith('strategy.')) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of STRATEGY_STRING_PARAMETER_NAMES) {
+      if (!signature.params.includes(parameterName)) continue;
+
+      const parameterIndex = signature.params.indexOf(parameterName);
+      const argument = this.resolveCallArgumentExpression(expression, signature.params, parameterIndex);
+      if (!argument) continue;
+
+      const argumentType = this.inferExpressionType(argument, scope);
+      if (argumentType.kind === 'unknown' || argumentType.kind === 'string') continue;
+
+      this.addDiagnostic(
+        'type-mismatch',
+        `${calleeName} ${parameterName} must be a string, got ${this.formatSemanticType(argumentType)}`,
         argument.loc,
       );
     }
