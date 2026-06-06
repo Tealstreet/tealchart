@@ -3514,6 +3514,33 @@ export class TealscriptEngine {
       const alternateSource = this.getSourceSeriesForExpression(expr.alternate);
       return consequentSource && consequentSource === alternateSource ? consequentSource : undefined;
     }
+    if (expr.type === 'SwitchExpression') {
+      if (expr.cases.length === 0) {
+        return undefined;
+      }
+
+      const expressions: Expression[] = [];
+      for (const switchCase of expr.cases) {
+        if (Array.isArray(switchCase.consequent)) return undefined;
+        expressions.push(switchCase.consequent);
+      }
+
+      const firstExpression = expressions[0]!;
+      if (
+        firstExpression.type === 'Identifier'
+        && expressions.every((switchCase) => (
+          switchCase.type === 'Identifier' && switchCase.name === firstExpression.name
+        ))
+      ) {
+        return this.getSourceSeriesForExpression(firstExpression);
+      }
+
+      const firstSource = this.getSourceSeriesForExpression(firstExpression);
+      if (!firstSource) return undefined;
+      return expressions.slice(1).every((switchCase) => this.getSourceSeriesForExpression(switchCase) === firstSource)
+        ? firstSource
+        : undefined;
+    }
     if (expr.type !== 'Identifier') return undefined;
 
     return this.scope.getSourceSeries(expr.name) ?? this.getKnownSeriesByName(expr.name, this.ctx);
