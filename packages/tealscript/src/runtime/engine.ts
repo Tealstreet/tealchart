@@ -8246,35 +8246,10 @@ export class TealscriptEngine {
       const gain = change > 0 ? change : 0;
       const loss = change < 0 ? -change : 0;
 
-      let avgGain = scope.get(avgGainKey) as number | undefined;
-      let avgLoss = scope.get(avgLossKey) as number | undefined;
+      const avgGain = this.updateBuiltinRmaState(scope, avgGainKey, `_ta_rsi_gain_source_${callId}_${length}`, gain, length);
+      const avgLoss = this.updateBuiltinRmaState(scope, avgLossKey, `_ta_rsi_loss_source_${callId}_${length}`, loss, length);
 
-      if (avgGain === undefined || avgLoss === undefined) {
-        // Initialize
-        let totalGain = 0;
-        let totalLoss = 0;
-
-        for (let i = 0; i < length; i++) {
-          const curr = sourceHistory[i];
-          const prev = sourceHistory[i + 1];
-          if (curr === undefined || prev === undefined) continue;
-
-          const c = curr - prev;
-          if (c > 0) totalGain += c;
-          else totalLoss -= c;
-        }
-
-        avgGain = totalGain / length;
-        avgLoss = totalLoss / length;
-      } else {
-        // Smoothed average
-        avgGain = (avgGain * (length - 1) + gain) / length;
-        avgLoss = (avgLoss * (length - 1) + loss) / length;
-      }
-
-      this.setBuiltinState(scope, avgGainKey, avgGain);
-      this.setBuiltinState(scope, avgLossKey, avgLoss);
-
+      if (isNaN(avgGain) || isNaN(avgLoss)) return NaN;
       if (avgLoss === 0) return 100;
       const rs = avgGain / avgLoss;
       return 100 - 100 / (1 + rs);
