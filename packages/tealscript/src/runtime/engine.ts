@@ -996,6 +996,9 @@ export class TealscriptEngine {
       case 'ta.rsi':
       case 'ta.rising':
       case 'ta.falling':
+      case 'ta.cmo':
+      case 'ta.mom':
+      case 'ta.roc':
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1);
       case 'ta.macd':
         return Math.max(
