@@ -363,6 +363,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-economic-macro-checkpoint',
+      title: 'Public Economic Macro Checkpoint',
+      searchContext: 'TradingView public scripts search: macro economic',
+      featureTags: ['request', 'economic'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-library-helper-checkpoint',
       title: 'Public Library Helper Checkpoint',
       searchContext: 'TradingView public scripts search: library helper',
