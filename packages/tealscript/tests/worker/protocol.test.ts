@@ -128,4 +128,26 @@ describe('worker protocol semantic diagnostics', () => {
       },
     });
   });
+
+  it('preserves planned unsupported semantic diagnostic codes', () => {
+    const diagnostics: SemanticDiagnostic[] = [
+      {
+        code: 'unsupported-feature',
+        message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+        severity: 'error',
+        line: 2,
+        column: 1,
+      },
+    ];
+
+    expect(createSemanticErrorMessage('study-unsupported', diagnostics, diagnostics[0]!.message)).toEqual({
+      type: 'semanticError',
+      scriptId: 'study-unsupported',
+      message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+      diagnostics,
+      line: 2,
+      column: 1,
+      metadata: undefined,
+    });
+  });
 });
