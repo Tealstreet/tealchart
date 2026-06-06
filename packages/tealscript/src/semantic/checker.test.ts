@@ -4488,6 +4488,25 @@ fill(hline1=upper, hline2=lower, color=color.new(color.blue, 90))
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('infers visual output handle return types for downstream diagnostics', () => {
+    const result = checkProgram(parse(`
+indicator("Visual Handle Types")
+upper = plot(close)
+level = hline(100)
+upper := hline(90)
+level := plot(open)
+plot badPlot = hline(80)
+hline badLine = plot(high)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign hline value to plot variable upper',
+      'Cannot assign plot value to hline variable level',
+      'Cannot assign hline value to plot variable',
+      'Cannot assign plot value to hline variable',
+    ]);
+  });
+
   it('reports duplicate built-in bindings from positional and named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate Builtin Args")
