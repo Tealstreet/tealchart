@@ -1720,6 +1720,73 @@ describe('TealchartRenderer coordinate transforms', () => {
   });
 
   describe('marker rendering', () => {
+    it('skips marker plots hidden with display.none through the public render path', () => {
+      const arc = vi.fn();
+      const fillText = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        arc,
+        fillText,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plot: PlotOutput = {
+        id: 'plotshape_Hidden',
+        type: 'plotshape',
+        title: 'Hidden',
+        values: [1, 1],
+        color: ['#2196F3', '#2196F3'],
+        text: 'Hidden',
+        textColor: '#FFEB3B',
+        location: 'abovebar',
+        shape: 'circle',
+        size: 'small',
+        display: 0,
+      };
+
+      renderer.renderPlots([plot], bars, viewport);
+
+      expect(arc).not.toHaveBeenCalled();
+      expect(fillText).not.toHaveBeenCalled();
+    });
+
+    it('limits marker plots to show_last bars through the public render path', () => {
+      const arc = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        arc,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plot: PlotOutput = {
+        id: 'plotshape_Recent',
+        type: 'plotshape',
+        title: 'Recent',
+        values: [1, 1, 1],
+        color: ['#2196F3', '#2196F3', '#2196F3'],
+        location: 'abovebar',
+        shape: 'circle',
+        size: 'small',
+        showLast: 1,
+      };
+
+      renderer.renderPlots([plot], bars, viewport);
+
+      expect(arc).toHaveBeenCalledTimes(1);
+    });
+
     it('renders plotchar glyphs and marker text', () => {
       const fillText = vi.fn();
       const ctx = {

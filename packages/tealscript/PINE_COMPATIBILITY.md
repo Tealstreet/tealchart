@@ -613,6 +613,8 @@ stale marker styling where Pine would show no marker. The source-linked
 checkpoint corpus tracks marker payloads, common `plot.style_*` payloads,
 filled plot channels, and background masks through official visual checkpoints
 plus reduced public buy/sell marker signal and volatility-band checkpoints.
+Renderer coverage applies marker `display.none` hiding and `show_last` windows
+through the public Tealscript plot rendering path.
 
 Hline renderer coverage applies Pine `hline()` color, linewidth, linestyle,
 display hiding, and pane-coordinate behavior for the current output shape.
