@@ -12541,6 +12541,26 @@ function peg$parse(input, options) {
   }
 
   function peg$parseSingleLineComment() {
+    let s0, s1, s2;
+
+    s0 = peg$currPos;
+    s1 = peg$parseLineCommentText();
+    if (s1 !== peg$FAILED) {
+      s2 = peg$parseLineTerminator();
+      if (s2 === peg$FAILED) {
+        s2 = null;
+      }
+      s1 = [s1, s2];
+      s0 = s1;
+    } else {
+      peg$currPos = s0;
+      s0 = peg$FAILED;
+    }
+
+    return s0;
+  }
+
+  function peg$parseLineCommentText() {
     let s0, s1, s2, s3, s4, s5;
 
     s0 = peg$currPos;
@@ -12616,11 +12636,7 @@ function peg$parse(input, options) {
           s3 = peg$FAILED;
         }
       }
-      s3 = peg$parseLineTerminator();
-      if (s3 === peg$FAILED) {
-        s3 = null;
-      }
-      s1 = [s1, s2, s3];
+      s1 = [s1, s2];
       s0 = s1;
     } else {
       peg$currPos = s0;
@@ -13290,7 +13306,21 @@ function peg$parse(input, options) {
     let s0, s1, s2, s3;
 
     s0 = peg$currPos;
-    s1 = peg$parseSingleLineComment();
+    s1 = peg$currPos;
+    s2 = [];
+    s3 = peg$parseWhiteSpace();
+    while (s3 !== peg$FAILED) {
+      s2.push(s3);
+      s3 = peg$parseWhiteSpace();
+    }
+    s3 = peg$parseLineCommentText();
+    if (s3 !== peg$FAILED) {
+      s2 = [s2, s3];
+      s1 = s2;
+    } else {
+      peg$currPos = s1;
+      s1 = peg$FAILED;
+    }
     if (s1 === peg$FAILED) {
       s1 = null;
     }

@@ -89,8 +89,9 @@ Covered behavior and remaining gaps:
   `indicator()`/`strategy()` declarations, function calls, array literals, tuple
   destructuring, index access, and parenthesized expressions. Parser audit
   fixtures also cover public-script-shaped wrapped `request.security()`
-  arguments with multiline ternary expressions inside nested UDF blocks, plus
-  trailing commas in wrapped user-defined function and method signatures.
+  arguments with multiline ternary expressions inside nested UDF blocks, inline
+  comments on wrapped continuation lines, plus trailing commas in wrapped
+  user-defined function and method signatures.
 - Function and declaration calls support Pine named arguments, including the
   reserved parameter key `type=` used by common strategy risk APIs.
 - Top-level nested control blocks share the deeper block parser used by
