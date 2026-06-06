@@ -742,10 +742,11 @@ as `indicatorMaxBarsBack`. Values must be finite, non-negative integers.
 Explicit history references that exceed the declared bound produce runtime
 errors, while in-range references remain available over loaded history.
 Scripts without an explicit declaration report inferred history depth in the
-runtime profile from static literal/simple numeric offset inference plus
-observed dynamic access. Full Pine-style preallocation for arbitrary series
-offsets remains a compatibility target. The checkpoint corpus tracks an
-official `max_bars_back` bounded-history fixture.
+runtime profile from static literal/simple numeric offset inference,
+`input.bool()`-controlled simple conditional offsets, and observed dynamic
+access. Full Pine-style preallocation for arbitrary series offsets remains a
+compatibility target. The checkpoint corpus tracks an official `max_bars_back`
+bounded-history fixture.
 
 ## Common Drawing Object Coverage
 

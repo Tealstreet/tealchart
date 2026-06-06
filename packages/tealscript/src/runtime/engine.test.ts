@@ -6170,6 +6170,37 @@ plot(close, title="Close")`;
       expect(result.errors).toEqual([]);
       expect(result.profile.maxBarsBack).toBe(5);
     });
+
+    it('statically reports input bool conditional history offsets', () => {
+      const script = `//@version=6
+indicator("Conditional Static History")
+useLong = input.bool(defval=true, title="Use Long")
+length = useLong ? 8 : 3
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(8);
+    });
+
+    it('statically reports boolean alias conditional history offsets', () => {
+      const script = `//@version=6
+indicator("Boolean Alias Static History")
+useLong = input.bool(false, title="Use Long")
+enabled = not useLong
+length = enabled ? 7 : 2
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(7);
+    });
   });
 
   describe('inputs', () => {

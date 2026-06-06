@@ -394,6 +394,7 @@ interface ExpressionHistoryEntry {
 interface StaticNameInfo {
   isCollection: boolean;
   numericValue: number | null;
+  booleanValue: boolean | null;
 }
 
 type StaticCollectionScopes = Array<Map<string, StaticNameInfo>>;
@@ -758,6 +759,7 @@ export class TealscriptEngine {
               param.name,
               this.isCollectionTypeAnnotation(param.typeAnnotation),
               param.defaultValue ? this.inferStaticNumericValue(param.defaultValue, collectionScopes) : null,
+              param.defaultValue ? this.inferStaticBooleanValue(param.defaultValue, collectionScopes) : null,
               collectionScopes,
             );
           }
@@ -776,11 +778,14 @@ export class TealscriptEngine {
         const numericValue = statement.init.type === 'IfStatement'
           ? null
           : this.inferStaticNumericValue(statement.init, collectionScopes);
+        const booleanValue = statement.init.type === 'IfStatement'
+          ? null
+          : this.inferStaticBooleanValue(statement.init, collectionScopes);
         if (statement.names.type === 'VariableDeclarator') {
-          this.setStaticNameInfo(statement.names.name.name, isCollection, numericValue, collectionScopes);
+          this.setStaticNameInfo(statement.names.name.name, isCollection, numericValue, booleanValue, collectionScopes);
         } else {
           for (const name of statement.names.names) {
-            this.setStaticNameInfo(name.name, false, null, collectionScopes);
+            this.setStaticNameInfo(name.name, false, null, null, collectionScopes);
           }
         }
         return initMax;
@@ -792,6 +797,7 @@ export class TealscriptEngine {
             statement.left.name,
             this.expressionReturnsCollection(statement.right, collectionScopes),
             this.inferStaticNumericValue(statement.right, collectionScopes),
+            this.inferStaticBooleanValue(statement.right, collectionScopes),
             collectionScopes,
           );
         }
@@ -816,8 +822,8 @@ export class TealscriptEngine {
           return Math.max(
             this.inferExpressionMaxBarsBack(statement.iterable, collectionScopes),
             this.withStaticCollectionScope(collectionScopes, () => {
-              this.setStaticNameInfo(statement.counter.name, false, null, collectionScopes);
-              if (statement.indexCounter) this.setStaticNameInfo(statement.indexCounter.name, false, null, collectionScopes);
+              this.setStaticNameInfo(statement.counter.name, false, null, null, collectionScopes);
+              if (statement.indexCounter) this.setStaticNameInfo(statement.indexCounter.name, false, null, null, collectionScopes);
               return this.inferStatementsMaxBarsBack(statement.body, collectionScopes);
             }),
           );
@@ -827,7 +833,7 @@ export class TealscriptEngine {
           this.inferExpressionMaxBarsBack(statement.end, collectionScopes),
           statement.step ? this.inferExpressionMaxBarsBack(statement.step, collectionScopes) : 0,
           this.withStaticCollectionScope(collectionScopes, () => {
-            this.setStaticNameInfo(statement.counter.name, false, null, collectionScopes);
+            this.setStaticNameInfo(statement.counter.name, false, null, null, collectionScopes);
             return this.inferStatementsMaxBarsBack(statement.body, collectionScopes);
           }),
         );
@@ -987,24 +993,26 @@ export class TealscriptEngine {
     name: string,
     isCollection: boolean,
     numericValue: number | null,
+    booleanValue: boolean | null,
     collectionScopes: StaticCollectionScopes,
   ): void {
-    collectionScopes[collectionScopes.length - 1].set(name, { isCollection, numericValue });
+    collectionScopes[collectionScopes.length - 1].set(name, { isCollection, numericValue, booleanValue });
   }
 
   private assignStaticNameInfo(
     name: string,
     isCollection: boolean,
     numericValue: number | null,
+    booleanValue: boolean | null,
     collectionScopes: StaticCollectionScopes,
   ): void {
     for (let index = collectionScopes.length - 1; index >= 0; index--) {
       if (collectionScopes[index].has(name)) {
-        collectionScopes[index].set(name, { isCollection, numericValue });
+        collectionScopes[index].set(name, { isCollection, numericValue, booleanValue });
         return;
       }
     }
-    this.setStaticNameInfo(name, isCollection, numericValue, collectionScopes);
+    this.setStaticNameInfo(name, isCollection, numericValue, booleanValue, collectionScopes);
   }
 
   private isStaticCollectionName(name: string, collectionScopes: StaticCollectionScopes): boolean {
@@ -1013,6 +1021,10 @@ export class TealscriptEngine {
 
   private getStaticNumericName(name: string, collectionScopes: StaticCollectionScopes): number | null {
     return this.getStaticNameInfo(name, collectionScopes)?.numericValue ?? null;
+  }
+
+  private getStaticBooleanName(name: string, collectionScopes: StaticCollectionScopes): boolean | null {
+    return this.getStaticNameInfo(name, collectionScopes)?.booleanValue ?? null;
   }
 
   private getStaticNameInfo(name: string, collectionScopes: StaticCollectionScopes): StaticNameInfo | null {
@@ -1052,9 +1064,10 @@ export class TealscriptEngine {
       case 'BinaryExpression':
         return this.inferStaticBinaryNumericValue(expression, collectionScopes);
       case 'ConditionalExpression': {
-        if (expression.test.type !== 'BooleanLiteral') return null;
+        const test = this.inferStaticBooleanValue(expression.test, collectionScopes);
+        if (test === null) return null;
         return this.inferStaticNumericValue(
-          expression.test.value ? expression.consequent : expression.alternate,
+          test ? expression.consequent : expression.alternate,
           collectionScopes,
         );
       }
@@ -1092,6 +1105,55 @@ export class TealscriptEngine {
 
     const defval = this.getStaticCallArgument(expression, ['defval'], 0);
     return defval ? this.inferStaticNumericValue(defval, collectionScopes) : null;
+  }
+
+  private inferStaticBooleanValue(expression: Expression, collectionScopes: StaticCollectionScopes): boolean | null {
+    switch (expression.type) {
+      case 'BooleanLiteral':
+        return expression.value;
+      case 'Identifier':
+        return this.getStaticBooleanName(expression.name, collectionScopes);
+      case 'UnaryExpression': {
+        if (expression.operator !== 'not') return null;
+        const value = this.inferStaticBooleanValue(expression.argument, collectionScopes);
+        return value === null ? null : !value;
+      }
+      case 'BinaryExpression':
+        return this.inferStaticBinaryBooleanValue(expression, collectionScopes);
+      case 'ConditionalExpression': {
+        const test = this.inferStaticBooleanValue(expression.test, collectionScopes);
+        if (test === null) return null;
+        return this.inferStaticBooleanValue(test ? expression.consequent : expression.alternate, collectionScopes);
+      }
+      case 'CallExpression':
+        return this.inferStaticBooleanCallValue(expression, collectionScopes);
+      default:
+        return null;
+    }
+  }
+
+  private inferStaticBinaryBooleanValue(expression: BinaryExpression, collectionScopes: StaticCollectionScopes): boolean | null {
+    if (expression.operator !== 'and' && expression.operator !== 'or') return null;
+
+    const left = this.inferStaticBooleanValue(expression.left, collectionScopes);
+    const right = this.inferStaticBooleanValue(expression.right, collectionScopes);
+    if (expression.operator === 'and') {
+      if (left === false || right === false) return false;
+      if (left === true && right === true) return true;
+      return null;
+    }
+
+    if (left === true || right === true) return true;
+    if (left === false && right === false) return false;
+    return null;
+  }
+
+  private inferStaticBooleanCallValue(expression: CallExpression, collectionScopes: StaticCollectionScopes): boolean | null {
+    const name = this.getCallExpressionName(expression);
+    if (name !== 'input.bool') return null;
+
+    const defval = this.getStaticCallArgument(expression, ['defval'], 0);
+    return defval ? this.inferStaticBooleanValue(defval, collectionScopes) : null;
   }
 
   private getStaticCallArgument(
