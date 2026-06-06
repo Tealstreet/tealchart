@@ -474,6 +474,7 @@ const BUILTIN_FUNCTIONS = new Set([
   'int',
   'label',
   'line',
+  'max_bars_back',
   'na',
   'nz',
   'plot',
@@ -1060,6 +1061,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['math.random', { params: ['min', 'max', 'seed'], minArgs: 0, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['na', { params: ['x'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['nz', { params: ['source', 'replacement'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['max_bars_back', { params: ['var', 'num'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   [
     'request.security',
     { params: ['symbol', 'timeframe', 'expression', 'gaps', 'lookahead', 'ignore_invalid_symbol', 'currency', 'calc_bars_count'], minArgs: 3, allowNamedPrefixWithPositional: true },

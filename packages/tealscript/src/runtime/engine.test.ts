@@ -6097,6 +6097,43 @@ plot(close[2], title="Close")`;
       expect(result.profile.maxBarsBack).toBe(2);
     });
 
+    it('accepts max_bars_back function hints in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Function Max Bars Back")
+max_bars_back(close, 9)
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(9);
+      expect(result.plots.find((plot) => plot.title === 'Close')?.values).toEqual([100.2, 100.7, 101.2]);
+    });
+
+    it('accepts named max_bars_back function hints', () => {
+      const script = `//@version=6
+indicator("Named Function Max Bars Back")
+hint = input.int(defval=7, title="Hint")
+max_bars_back(close, num=hint)
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(7);
+    });
+
+    it('reports invalid max_bars_back function hint values', () => {
+      const script = `//@version=6
+indicator("Invalid Function Max Bars Back")
+max_bars_back(close, -1)
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors[0]?.message).toBe('max_bars_back num must be a non-negative integer');
+    });
+
     it('statically reports literal history offsets from unexecuted branches', () => {
       const script = `//@version=6
 indicator("Static History")
