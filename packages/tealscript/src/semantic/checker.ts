@@ -193,6 +193,11 @@ const REQUEST_BARMERGE_MODE_CALLS = new Set([
   'request.financial',
   'request.economic',
 ]);
+const REQUEST_BOOL_PARAMETER_NAMES = new Set([
+  'ignore_invalid_symbol',
+  'ignore_invalid_currency',
+  'ignore_invalid_timeframe',
+]);
 const REQUEST_DIVIDENDS_FIELD_VALUES = new Set(['dividends.gross', 'dividends.net']);
 const REQUEST_DIVIDENDS_FIELD_CONSTANT_VALUES = new Map([...REQUEST_DIVIDENDS_FIELD_VALUES].map((value) => [value, value]));
 const REQUEST_EARNINGS_FIELD_VALUES = new Set(['earnings.actual', 'earnings.estimate', 'earnings.standardized']);
@@ -3389,6 +3394,7 @@ class SemanticChecker {
     this.checkRequestCalcBarsCountLiteralArguments(expression);
     this.checkRequestBarmergeModeLiteralArguments(expression);
     this.checkRequestSeriesFieldLiteralArguments(expression, scope);
+    this.checkRequestBoolOptionArguments(expression, scope);
     this.checkVisualLineStyleLiteralArguments(expression);
     this.checkVisualFormatPrecisionLiteralArguments(expression);
     this.checkMarkerStyleLocationSizeLiteralArguments(expression);
@@ -4165,6 +4171,32 @@ class SemanticChecker {
           'splits.',
         );
         break;
+    }
+  }
+
+  private checkRequestBoolOptionArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    if (!calleeName.startsWith('request.')) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of REQUEST_BOOL_PARAMETER_NAMES) {
+      if (!signature.params.includes(parameterName)) continue;
+
+      const parameterIndex = signature.params.indexOf(parameterName);
+      const argument = this.resolveCallArgumentExpression(expression, signature.params, parameterIndex);
+      if (!argument) continue;
+
+      const argumentType = this.inferExpressionType(argument, scope);
+      if (argumentType.kind === 'unknown' || argumentType.kind === 'bool') continue;
+
+      this.addDiagnostic(
+        'type-mismatch',
+        `${calleeName} ${parameterName} must be a boolean, got ${this.formatSemanticType(argumentType)}`,
+        argument.loc,
+      );
     }
   }
 
