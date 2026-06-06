@@ -6,13 +6,17 @@ import { join, resolve } from 'node:path';
 
 import {
   createPineCompatibilityCoverageIndex,
+  createPineParseSemanticStageOutcomes,
   formatPineCompatibilityCoverageJson,
   formatPineCompatibilityCoverageMarkdown,
   formatPineCompatibilityCorpusJson,
   formatPineCompatibilityCorpusMarkdown,
+  parse,
   runPineCompatibilityCorpus,
   runPineCompatibilityLedger,
   validatePineScriptLedger,
+  type CompatibilityStageOutcome,
+  type PineCompatibilityCorpusStages,
 } from '../../src';
 import { compatibilityCheckpointCorpus, compatibilityCheckpointLedger } from './pine-ledger';
 
@@ -162,7 +166,7 @@ describe('Pine compatibility checkpoint corpus', () => {
   it('runs checkpoint ledgers through the offline corpus runner', () => {
     const stagesById = new Map(compatibilityCheckpointCorpus.map((corpusCase) => [
       corpusCase.ledgerEntry.id,
-      corpusCase.stages,
+      resolveCorpusStages(corpusCase.stages),
     ]));
     const run = runPineCompatibilityLedger(
       compatibilityCheckpointLedger,
@@ -176,6 +180,62 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(json).toContain('"schemaVersion": 1');
     expect(json).toContain('"scriptId": "official-builtins-checkpoint"');
     expect(json.endsWith('\n')).toBe(true);
+  });
+
+  it('accepts deterministic stage factories for source-backed semantic checkpoints', () => {
+    const library = parse(`
+library("SignalKit", true)
+export fast(series float source, simple int length) => ta.sma(source, length)
+`);
+    const run = runPineCompatibilityCorpus([
+      {
+        ledgerEntry: {
+          id: 'public-library-helper-stage-factory-checkpoint',
+          title: 'Public Library Helper Stage Factory Checkpoint',
+          pineVersion: 'v6',
+          category: 'indicator',
+          source: {
+            kind: 'public_script',
+            searchContext: 'TradingView public scripts search: library helper',
+            retrievedAt: '2026-06-02',
+            licenseStatus: 'unknown',
+          },
+          featureTags: ['libraries', 'imports', 'udf', 'signals'],
+          storagePolicy: 'reduced_fixture_only',
+        },
+        stages: () => [
+          ...createPineParseSemanticStageOutcomes(`
+indicator("Public Library Helper Registry Checkpoint")
+import TestUser/SignalKit/1 as signals
+plot(signals.fast(close, 2), title="Fast")
+`, {
+            libraries: new Map([['TestUser/SignalKit/1', library]]),
+          }),
+          {
+            stage: 'runtime',
+            status: 'skipped',
+            message: 'semantic registry checkpoint; runtime binding is covered by pine-language fixtures',
+          },
+          { stage: 'datafeed', status: 'skipped', message: 'semantic registry checkpoint' },
+          { stage: 'output', status: 'skipped', message: 'semantic registry checkpoint' },
+          { stage: 'render', status: 'skipped', message: 'semantic registry checkpoint' },
+        ],
+      },
+    ]);
+
+    expect(run.outcomes[0]?.summary).toEqual({ passed: true });
+    expect(run.outcomes[0]?.stages).toMatchObject([
+      { stage: 'parse', status: 'passed' },
+      { stage: 'semantic', status: 'passed' },
+      { stage: 'runtime', status: 'skipped' },
+      { stage: 'datafeed', status: 'skipped' },
+      { stage: 'output', status: 'skipped' },
+      { stage: 'render', status: 'skipped' },
+    ]);
+    expect(run.summary.byFeatureTag).toMatchObject({
+      imports: { total: 1, passed: 1, failed: 0 },
+      libraries: { total: 1, passed: 1, failed: 0 },
+    });
   });
 
   it('counts not-run stages as incomplete compatibility outcomes', () => {
@@ -326,3 +386,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     }
   });
 });
+
+function resolveCorpusStages(stages: PineCompatibilityCorpusStages): CompatibilityStageOutcome[] {
+  return typeof stages === 'function' ? stages() : stages;
+}
