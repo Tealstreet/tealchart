@@ -10543,12 +10543,14 @@ export class TealscriptEngine {
     this.builtins.set('timestamp', (args, namedArgs) => this.evaluateTimestamp(args, namedArgs));
     this.builtins.set('time', (args, namedArgs) => this.evaluateTimeFilter(args, namedArgs, false));
     this.builtins.set('time_close', (args, namedArgs) => this.evaluateTimeFilter(args, namedArgs, true));
-    this.builtins.set('timeframe.in_seconds', (args, namedArgs) => {
+    const timeframeToSeconds = (args: unknown[], namedArgs: Map<string, unknown>) => {
       const timeframeArg = this.getOrderedCallArg(args, namedArgs, timeframeArgs, 0, this.ctx.timeframe.period);
       const timeframe = timeframeArg === undefined || timeframeArg === '' ? this.ctx.timeframe.period : this.toStringValue(timeframeArg);
       const duration = this.getTimeframeDurationMs(timeframe);
       return duration === null ? Number.NaN : duration / 1000;
-    });
+    };
+    this.builtins.set('timeframe.in_seconds', timeframeToSeconds);
+    this.builtins.set('timeframe.to_seconds', timeframeToSeconds);
     this.builtins.set('timeframe.from_seconds', (args, namedArgs) => {
       return this.timeframeFromSeconds(this.toNumber(this.getOrderedCallArg(args, namedArgs, secondsArgs, 0)));
     });

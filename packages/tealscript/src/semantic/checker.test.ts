@@ -143,9 +143,10 @@ isLower = timeframe.in_seconds(timeframe="15") < timeframe.in_seconds("1D")
 rounded = timeframe.from_seconds(seconds=44)
 changed = timeframe.change(timeframe="60")
 prefixedSeconds = timeframe.in_seconds(timeframe="1D")
+legacySeconds = timeframe.to_seconds(timeframe="1D")
 prefixedRounded = timeframe.from_seconds(seconds=30)
 prefixedChanged = timeframe.change(timeframe="3")
-plot(isLower and changed ? 1 : 0)
+plot(isLower and changed and legacySeconds > 0 ? 1 : 0)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -159,6 +160,7 @@ mainPeriod = timeframe.main_period
 multiplier = timeframe.multiplier
 intraday = timeframe.isintraday
 secondsValue = timeframe.in_seconds()
+legacySecondsValue = timeframe.to_seconds("1D")
 rounded = timeframe.from_seconds(seconds=60)
 changed = timeframe.change(timeframe="1D")
 sessionOpen = time(timeframe="60")
@@ -169,12 +171,13 @@ mainPeriod := 2
 multiplier := "bad"
 intraday := 1
 secondsValue := "bad"
+legacySecondsValue := "bad"
 rounded := 3
 changed := 1
 sessionOpen := "bad"
 sessionClose := "bad"
 stamp := "bad"
-plot(multiplier + secondsValue + sessionOpen + sessionClose + stamp + (intraday ? 1 : 0) + (changed ? 1 : 0))
+plot(multiplier + secondsValue + legacySecondsValue + sessionOpen + sessionClose + stamp + (intraday ? 1 : 0) + (changed ? 1 : 0))
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -185,6 +188,7 @@ plot(multiplier + secondsValue + sessionOpen + sessionClose + stamp + (intraday 
       'Cannot assign string value to int variable multiplier',
       'Cannot assign int value to bool variable intraday',
       'Cannot assign string value to int variable secondsValue',
+      'Cannot assign string value to int variable legacySecondsValue',
       'Cannot assign int value to string variable rounded',
       'Cannot assign int value to bool variable changed',
       'Cannot assign string value to int variable sessionOpen',
@@ -196,6 +200,7 @@ plot(multiplier + secondsValue + sessionOpen + sessionClose + stamp + (intraday 
     expect(types.get('multiplier')).toMatchObject({ kind: 'int', qualifier: 'simple' });
     expect(types.get('intraday')).toMatchObject({ kind: 'bool', qualifier: 'simple' });
     expect(types.get('secondsValue')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+    expect(types.get('legacySecondsValue')).toMatchObject({ kind: 'int', qualifier: 'simple' });
     expect(types.get('rounded')).toMatchObject({ kind: 'string', qualifier: 'simple' });
     expect(types.get('changed')).toMatchObject({ kind: 'bool', qualifier: 'series' });
     expect(types.get('sessionOpen')).toMatchObject({ kind: 'int', qualifier: 'series' });
@@ -385,7 +390,7 @@ request.securty(syminfo.tickerid, "1D", close)
 ta.smoothed(close, 14)
 array.fro(close)
 matrix.rota(matrix.new<float>())
-timeframe.to_seconds("1D")
+timeframe.to_second("1D")
 ticker.make("NASDAQ:AAPL")
 chart.point.later(close)
 plot(close)
@@ -396,7 +401,7 @@ plot(close)
       'Unknown function: ta.smoothed',
       'Unknown function: array.fro',
       'Unknown function: matrix.rota',
-      'Unknown function: timeframe.to_seconds',
+      'Unknown function: timeframe.to_second',
       'Unknown function: ticker.make',
       'Unknown function: chart.point.later',
     ]);
