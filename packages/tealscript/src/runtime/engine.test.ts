@@ -6346,6 +6346,47 @@ plot(close, title="Close")`;
       expect(result.profile.maxBarsBack).toBe(10);
     });
 
+    it('statically reports unexecuted remaining TA helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Remaining TA Profile")
+length = input.int(defval=13, title="Length")
+if false
+    plot(ta.atr(length), title="ATR")
+    plot(ta.hma(source=close, length=8), title="HMA")
+    [kcBasis, kcUpper, kcLower] = ta.kc(close, 9, 1.5)
+    plot(kcBasis, title="KC")
+    plot(ta.kcw(series=close, length=4, mult=1.5, useTrueRange=false), title="KCW")
+    plot(ta.tsi(close, 3, 7), title="TSI")
+    [supertrend, direction] = ta.supertrend(factor=2.0, atrPeriod=11)
+    plot(supertrend, title="Supertrend")
+    [diPlus, diMinus, adx] = ta.dmi(diLength=10, adxSmoothing=5)
+    plot(adx, title="ADX")
+    plot(ta.sar(0.02, 0.02, 0.2), title="SAR")
+    plot(ta.obv(close, volume), title="OBV")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(13);
+    });
+
+    it('reports direct TA variable and indexed OHLC lookbacks in the runtime profile', () => {
+      const script = `//@version=6
+indicator("TA Variable Profile")
+plot(ta.obv, title="OBV")
+plot(ta.nvi, title="NVI")
+plot(ta.pvi, title="PVI")
+plot(ta.pvt, title="PVT")
+plot(ta.wad, title="WAD")
+plot(ta.tr[3], title="TR")`;
+
+      const result = executeScript(parse(script), createBars(6, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(4);
+    });
+
     it('statically reports unexecuted MACD lookback lengths in the runtime profile', () => {
       const script = `//@version=6
 indicator("Static MACD Profile")
