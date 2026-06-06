@@ -2189,6 +2189,7 @@ class SemanticChecker {
           statement.max_lines_count,
           statement.max_boxes_count,
           statement.max_polylines_count,
+          statement.calc_bars_count,
           statement.timeframe,
           statement.timeframe_gaps,
           statement.dynamic_requests,
