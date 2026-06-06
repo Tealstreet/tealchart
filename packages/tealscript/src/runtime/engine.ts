@@ -1133,7 +1133,9 @@ export class TealscriptEngine {
   }
 
   private inferStaticBinaryBooleanValue(expression: BinaryExpression, collectionScopes: StaticCollectionScopes): boolean | null {
-    if (expression.operator !== 'and' && expression.operator !== 'or') return null;
+    if (expression.operator !== 'and' && expression.operator !== 'or') {
+      return this.inferStaticComparisonBooleanValue(expression, collectionScopes);
+    }
 
     const left = this.inferStaticBooleanValue(expression.left, collectionScopes);
     const right = this.inferStaticBooleanValue(expression.right, collectionScopes);
@@ -1145,6 +1147,46 @@ export class TealscriptEngine {
 
     if (left === true || right === true) return true;
     if (left === false && right === false) return false;
+    return null;
+  }
+
+  private inferStaticComparisonBooleanValue(expression: BinaryExpression, collectionScopes: StaticCollectionScopes): boolean | null {
+    if (
+      expression.operator !== '=='
+      && expression.operator !== '!='
+      && expression.operator !== '<'
+      && expression.operator !== '<='
+      && expression.operator !== '>'
+      && expression.operator !== '>='
+    ) {
+      return null;
+    }
+
+    const numericLeft = this.inferStaticNumericValue(expression.left, collectionScopes);
+    const numericRight = this.inferStaticNumericValue(expression.right, collectionScopes);
+    if (numericLeft !== null && numericRight !== null) {
+      switch (expression.operator) {
+        case '==':
+          return numericLeft === numericRight;
+        case '!=':
+          return numericLeft !== numericRight;
+        case '<':
+          return numericLeft < numericRight;
+        case '<=':
+          return numericLeft <= numericRight;
+        case '>':
+          return numericLeft > numericRight;
+        case '>=':
+          return numericLeft >= numericRight;
+      }
+    }
+
+    const booleanLeft = this.inferStaticBooleanValue(expression.left, collectionScopes);
+    const booleanRight = this.inferStaticBooleanValue(expression.right, collectionScopes);
+    if (booleanLeft === null || booleanRight === null) return null;
+
+    if (expression.operator === '==') return booleanLeft === booleanRight;
+    if (expression.operator === '!=') return booleanLeft !== booleanRight;
     return null;
   }
 
