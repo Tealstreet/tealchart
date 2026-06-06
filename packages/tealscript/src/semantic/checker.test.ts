@@ -826,6 +826,29 @@ indicator("Bad Indicator Visual Options", explicit_plot_zorder=missingOrder, beh
     ]);
   });
 
+  it('reports invalid Pine declaration boolean values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Indicator Boolean Settings",
+    overlay="yes",
+    timeframe_gaps=1,
+    explicit_plot_zorder="true",
+    behind_chart=close,
+    dynamic_requests="no")
+library("Bad Library Boolean Settings", "yes", 1)
+export f(float x) => x
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'indicator overlay must be a boolean, got string',
+      'indicator timeframe_gaps must be a boolean, got int',
+      'indicator explicit_plot_zorder must be a boolean, got string',
+      'indicator behind_chart must be a boolean, got float',
+      'indicator dynamic_requests must be a boolean, got string',
+      'library overlay must be a boolean, got string',
+      'library dynamic_requests must be a boolean, got int',
+    ]);
+  });
+
   it('reports invalid literal Pine strategy declaration values', () => {
     const result = checkProgram(parse(`
 strategy("Bad Strategy Settings",

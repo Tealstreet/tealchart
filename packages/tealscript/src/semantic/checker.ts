@@ -204,6 +204,17 @@ const REQUEST_EARNINGS_FIELD_VALUES = new Set(['earnings.actual', 'earnings.esti
 const REQUEST_EARNINGS_FIELD_CONSTANT_VALUES = new Map([...REQUEST_EARNINGS_FIELD_VALUES].map((value) => [value, value]));
 const REQUEST_SPLITS_FIELD_VALUES = new Set(['splits.denominator', 'splits.numerator']);
 const REQUEST_SPLITS_FIELD_CONSTANT_VALUES = new Map([...REQUEST_SPLITS_FIELD_VALUES].map((value) => [value, value]));
+const INDICATOR_DECLARATION_BOOL_OPTIONS = [
+  'overlay',
+  'timeframe_gaps',
+  'explicit_plot_zorder',
+  'behind_chart',
+  'dynamic_requests',
+] as const;
+const LIBRARY_DECLARATION_BOOL_OPTIONS = [
+  'overlay',
+  'dynamic_requests',
+] as const;
 const STRATEGY_DECLARATION_BOOL_OPTIONS = [
   'calc_on_order_fills',
   'calc_on_every_tick',
@@ -2517,7 +2528,7 @@ class SemanticChecker {
         ]);
         break;
       case 'LibraryDeclaration':
-        this.checkLibraryDeclarationArguments(statement);
+        this.checkLibraryDeclarationArguments(statement, scope);
         this.checkExpressions(scope, [statement.title, statement.overlay, statement.dynamic_requests]);
         break;
       case 'ImportDeclaration':
@@ -2592,14 +2603,16 @@ class SemanticChecker {
       statement.max_polylines_count,
       `${statement.declarationKind} max_polylines_count must be a non-negative integer`,
     );
+    this.checkDeclarationBooleanOptions(statement, scope, INDICATOR_DECLARATION_BOOL_OPTIONS, statement.declarationKind);
     if (statement.declarationKind === 'strategy') {
       this.checkStrategyDeclarationLiteralValueConstraints(statement);
       this.checkStrategyDeclarationBooleanOptions(statement, scope);
     }
   }
 
-  private checkLibraryDeclarationArguments(statement: LibraryDeclaration): void {
+  private checkLibraryDeclarationArguments(statement: LibraryDeclaration, scope: SemanticScope): void {
     this.checkDeclarationKnownProperties(statement, LIBRARY_DECLARATION_KEYS, 'library()');
+    this.checkDeclarationBooleanOptions(statement, scope, LIBRARY_DECLARATION_BOOL_OPTIONS, 'library');
   }
 
   private checkDeclarationFormatValue(expression: Expression | undefined, declarationKind: string): void {
@@ -4764,8 +4777,17 @@ class SemanticChecker {
   }
 
   private checkStrategyDeclarationBooleanOptions(statement: IndicatorDeclaration, scope: SemanticScope): void {
-    for (const optionName of STRATEGY_DECLARATION_BOOL_OPTIONS) {
-      const expression = statement[optionName];
+    this.checkDeclarationBooleanOptions(statement, scope, STRATEGY_DECLARATION_BOOL_OPTIONS, 'strategy');
+  }
+
+  private checkDeclarationBooleanOptions(
+    statement: IndicatorDeclaration | LibraryDeclaration,
+    scope: SemanticScope,
+    optionNames: readonly string[],
+    declarationKind: string,
+  ): void {
+    for (const optionName of optionNames) {
+      const expression = statement[optionName as keyof typeof statement] as Expression | undefined;
       if (!expression) continue;
 
       const type = this.inferExpressionType(expression, scope);
@@ -4773,7 +4795,7 @@ class SemanticChecker {
 
       this.addDiagnostic(
         'type-mismatch',
-        `strategy ${optionName} must be a boolean, got ${this.formatSemanticType(type)}`,
+        `${declarationKind} ${optionName} must be a boolean, got ${this.formatSemanticType(type)}`,
         expression.loc,
       );
     }
