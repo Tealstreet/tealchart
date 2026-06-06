@@ -1649,7 +1649,7 @@ ArgumentList
     }
 
 Argument
-  = name:Identifier __ "=" __ value:Expression {
+  = name:ArgumentName __ "=" __ value:Expression {
       return {
         type: 'CallArgument',
         name,
@@ -1662,6 +1662,16 @@ Argument
         type: 'CallArgument',
         name: null,
         value,
+        loc: loc()
+      };
+    }
+
+ArgumentName
+  = Identifier
+  / name:"type" !IdentifierPart {
+      return {
+        type: 'Identifier',
+        name,
         loc: loc()
       };
     }
