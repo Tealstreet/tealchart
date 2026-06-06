@@ -823,6 +823,63 @@ plotarrow(close - open, minheight=0, maxheight=1.5)
     ]);
   });
 
+  it('reports invalid visual numeric option value types', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Visual Numeric Values")
+linePlot = plot(close)
+basePlot = plot(open)
+badPlot = plot(close, linewidth="2", histbase="0", offset="1", show_last="10", precision="2")
+hline(price="100", linewidth="2")
+fill(linePlot, basePlot, color.red, show_last="10")
+barcolor(color.red, offset="1", show_last=false)
+bgcolor(color.blue, offset=false, show_last="10")
+plotbar(open="o", high=true, low="l", close=false, show_last="10", precision="2")
+plotcandle(open="o", high=true, low="l", close=false, show_last="10", precision="2")
+plotshape(close > open, offset="1", show_last=false, precision="2")
+plotchar(close > open, offset=false, show_last="10", precision="2")
+plotarrow(series="spread", offset=false, minheight="5", maxheight=false, show_last="10", precision="2")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'plot linewidth must be a number, got string',
+      'plot histbase must be a number, got string',
+      'plot offset must be a number, got string',
+      'plot show_last must be a number, got string',
+      'plot precision must be a number, got string',
+      'hline price must be a number, got string',
+      'hline linewidth must be a number, got string',
+      'fill show_last must be a number, got string',
+      'barcolor offset must be a number, got string',
+      'barcolor show_last must be a number, got bool',
+      'bgcolor offset must be a number, got bool',
+      'bgcolor show_last must be a number, got string',
+      'plotbar open must be a number, got string',
+      'plotbar high must be a number, got bool',
+      'plotbar low must be a number, got string',
+      'plotbar close must be a number, got bool',
+      'plotbar show_last must be a number, got string',
+      'plotbar precision must be a number, got string',
+      'plotcandle open must be a number, got string',
+      'plotcandle high must be a number, got bool',
+      'plotcandle low must be a number, got string',
+      'plotcandle close must be a number, got bool',
+      'plotcandle show_last must be a number, got string',
+      'plotcandle precision must be a number, got string',
+      'plotshape offset must be a number, got string',
+      'plotshape show_last must be a number, got bool',
+      'plotshape precision must be a number, got string',
+      'plotchar offset must be a number, got bool',
+      'plotchar show_last must be a number, got string',
+      'plotchar precision must be a number, got string',
+      'plotarrow series must be a number, got string',
+      'plotarrow offset must be a number, got bool',
+      'plotarrow minheight must be a number, got string',
+      'plotarrow maxheight must be a number, got bool',
+      'plotarrow show_last must be a number, got string',
+      'plotarrow precision must be a number, got string',
+    ]);
+  });
+
   it('reports invalid visual boolean option values', () => {
     const result = checkProgram(parse(`
 indicator("Invalid Visual Boolean Options")
