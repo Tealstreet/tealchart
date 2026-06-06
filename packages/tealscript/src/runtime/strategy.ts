@@ -576,8 +576,39 @@ export function hasReachedStrategyConsLossDaysLimit(ledger: StrategyLedger, time
   return false;
 }
 
+export function hasReachedStrategyIntradayLossLimit(ledger: StrategyLedger, time: number): boolean {
+  const rule = ledger.settings.riskRules.maxIntradayLoss;
+  const currentDay = strategyUtcDayKey(time);
+  if (rule === null || currentDay === null) {
+    return false;
+  }
+
+  const dayPoints = ledger.equityCurve.filter((point) => strategyUtcDayKey(point.time) === currentDay);
+  if (dayPoints.length === 0) {
+    return false;
+  }
+
+  const peakEquity = Math.max(ledger.initialCapital, ...dayPoints.map((point) => point.equity));
+  const currentEquity = dayPoints[dayPoints.length - 1]?.equity ?? ledger.equity;
+  const loss = peakEquity - currentEquity;
+  if (loss <= 0) {
+    return false;
+  }
+
+  if (rule.type === 'cash') {
+    return loss >= rule.value;
+  }
+
+  if (peakEquity <= 0) {
+    return false;
+  }
+  return (loss / peakEquity) * 100 >= rule.value;
+}
+
 export function hasReachedStrategyOrderRiskLimit(ledger: StrategyLedger, time: number): boolean {
-  return hasReachedStrategyIntradayFilledOrderLimit(ledger, time) || hasReachedStrategyConsLossDaysLimit(ledger, time);
+  return hasReachedStrategyIntradayFilledOrderLimit(ledger, time)
+    || hasReachedStrategyConsLossDaysLimit(ledger, time)
+    || hasReachedStrategyIntradayLossLimit(ledger, time);
 }
 
 export function fillStrategyMarketOrder(
