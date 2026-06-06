@@ -240,7 +240,10 @@ such as `condition ? src : src` preserve the same identity through local and
 imported helpers, as do `switch` returns whose expression or multiline block
 arms all return the same known source and multiline block `if` helper wrappers
 whose branches return the same source. Same-source `if` initializers also retain
-source identity for downstream delayed helper windows. `ta.rma()`, `ta.rsi()`, and
+source identity for downstream delayed helper windows. Pure arithmetic
+expressions over known OHLCV, quote, derived OHLC, and source-parameter series
+also carry source identity through helper returns for downstream delayed rolling
+windows. `ta.rma()`, `ta.rsi()`, and
 `ta.atr()` use
 Pine's SMA-seeded RMA warmup before recursive smoothing; `ta.atr()` is covered
 as the RMA of `ta.tr(true)`.
