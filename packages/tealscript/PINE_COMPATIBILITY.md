@@ -47,11 +47,11 @@ official synthetic ticker requests, official dynamic sessions, official
 timeframe comparisons, official plot-style payloads, and public MTF,
 divergence, session-filter, session-state, dashboard-table, multi-symbol
 screener, currency conversion, earnings event markers, financial dashboards,
-economic macro overlays, drawing-zone, linefill-channel, custom-candle, and
-library-helper idioms. Public-source coverage also includes alert signal
-metadata, direct alert emission, Heikin-Ashi synthetic ticker trend requests,
-public zigzag polylines, public strategy performance tables, plus UDT state
-objects updated through user-defined methods.
+economic macro overlays, seed dataset overlays, drawing-zone, linefill-channel,
+custom-candle, and library-helper idioms. Public-source coverage also includes
+alert signal metadata, direct alert emission, Heikin-Ashi synthetic ticker trend
+requests, public zigzag polylines, public strategy performance tables, plus UDT
+state objects updated through user-defined methods.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
 suppression, entry-direction risk rules, recalculation checkpoints, and a
@@ -693,8 +693,9 @@ host datafeed work. Visual output registration enforces Pine's 64 plot-output
 limit while exempting `hline()` outputs. Table creation enforces a conservative
 TealScript sandbox cap of 10,000 declared table cells across live tables.
 The checkpoint corpus tracks public MTF trend-filter, currency-conversion,
-earnings-event, financial-dashboard, and economic-macro request idioms, an
-official lower-timeframe array idiom, plus a public multi-symbol screener idiom.
+earnings-event, financial-dashboard, economic-macro, and seed-dataset request
+idioms, an official lower-timeframe array idiom, plus a public multi-symbol
+screener idiom.
 
 Known limits: request data availability is host/provider-gated, and
 `request.footprint()` remains unsupported until the host can provide the
