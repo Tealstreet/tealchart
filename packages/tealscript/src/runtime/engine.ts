@@ -902,6 +902,7 @@ export class TealscriptEngine {
             0,
           ),
           this.inferMaxBarsBackHint(expression, collectionScopes),
+          this.inferStaticLookbackCallMaxBarsBack(expression, collectionScopes),
         );
       case 'MemberExpression':
         return this.inferExpressionMaxBarsBack(expression.object, collectionScopes);
@@ -964,6 +965,49 @@ export class TealscriptEngine {
 
     const offset = this.normalizeIndexOffset(numericValue);
     return offset ?? 0;
+  }
+
+  private inferStaticLookbackCallMaxBarsBack(expression: CallExpression, collectionScopes: StaticCollectionScopes): number {
+    const name = this.getCallExpressionName(expression);
+    switch (name) {
+      case 'math.sum':
+      case 'ta.sma':
+      case 'ta.ema':
+      case 'ta.rma':
+      case 'ta.highest':
+      case 'ta.lowest':
+      case 'ta.stdev':
+      case 'ta.variance':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes);
+      case 'ta.change':
+      case 'ta.rsi':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1);
+      case 'ta.macd':
+        return Math.max(
+          this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'fastlen', 'slowlen', 'siglen'], 1, collectionScopes),
+          this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'fastlen', 'slowlen', 'siglen'], 2, collectionScopes),
+          this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'fastlen', 'slowlen', 'siglen'], 3, collectionScopes),
+        );
+      default:
+        return 0;
+    }
+  }
+
+  private inferStaticLookbackArgumentMaxBarsBack(
+    expression: CallExpression,
+    params: readonly string[],
+    index: number,
+    collectionScopes: StaticCollectionScopes,
+    extraPriorBars = 0,
+  ): number {
+    const argument = this.getStaticOrderedCallArgument(expression, params, index);
+    if (!argument) return 0;
+
+    const value = this.inferStaticNumericValue(argument, collectionScopes);
+    if (value === null || !Number.isFinite(value)) return 0;
+
+    const length = Math.max(0, Math.trunc(value));
+    return Math.max(0, length - 1 + extraPriorBars);
   }
 
   private inferIfAlternateMaxBarsBack(alternate: IfStatement['alternate'], collectionScopes: StaticCollectionScopes): number {
