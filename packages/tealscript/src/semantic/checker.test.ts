@@ -3620,6 +3620,28 @@ table.cell_set_text_formatting(dashboard, 0, 0, text_formatting=text.format_unde
     ]);
   });
 
+  it('reports invalid literal drawing size option values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing Sizes")
+marker = label.new(bar_index, close, size=size.giant)
+region = box.new(bar_index, high, bar_index + 1, low, text_size=size.giant)
+dashboard = table.new(position.top_right, 1, 1)
+table.cell(dashboard, 0, 0, text_size=size.giant)
+label.set_size(marker, size="giant")
+box.set_text_size(region, size=size.giant)
+table.cell_set_text_size(dashboard, 0, 0, text_size="giant")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid label.new size: size.giant',
+      'Invalid box.new text_size: size.giant',
+      'Invalid table.cell text_size: size.giant',
+      'Invalid label.set_size size: giant',
+      'Invalid box.set_text_size size: size.giant',
+      'Invalid table.cell_set_text_size text_size: giant',
+    ]);
+  });
+
   it('resolves label method named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Label Method Signatures")

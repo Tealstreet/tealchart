@@ -1555,6 +1555,7 @@ const TABLE_POSITION_CONSTANT_VALUES = new Map([
   ['position.bottom_center', 'bottom_center'],
   ['position.bottom_right', 'bottom_right'],
 ]);
+const DRAWING_SIZE_PARAMETER_CALLEES = new Set(['label.new', 'label.set_size', 'box.set_text_size']);
 
 for (const name of CALENDAR_FUNCTION_NAMES) {
   BUILTIN_SIGNATURES.set(name, { params: ['time', 'timezone'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true });
@@ -3368,6 +3369,7 @@ class SemanticChecker {
     this.checkDrawingStyleOptionLiteralArguments(expression, scope);
     this.checkDrawingTextOptionLiteralArguments(expression, scope);
     this.checkTablePositionOptionLiteralArguments(expression, scope);
+    this.checkDrawingSizeOptionLiteralArguments(expression, scope);
     this.checkStrategyLiteralArgumentConstraints(expression);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
@@ -4448,6 +4450,33 @@ class SemanticChecker {
       TABLE_POSITION_VALUES,
       TABLE_POSITION_CONSTANT_VALUES,
       'position.',
+    );
+  }
+
+  private checkDrawingSizeOptionLiteralArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+
+    if (DRAWING_SIZE_PARAMETER_CALLEES.has(calleeName)) {
+      this.checkDrawingOptionLiteralArgument(
+        expression,
+        signature.params,
+        calleeName,
+        'size',
+        VISUAL_SIZE_VALUES,
+        VISUAL_SIZE_CONSTANT_VALUES,
+        'size.',
+      );
+    }
+    this.checkDrawingOptionLiteralArgument(
+      expression,
+      signature.params,
+      calleeName,
+      'text_size',
+      VISUAL_SIZE_VALUES,
+      VISUAL_SIZE_CONSTANT_VALUES,
+      'size.',
     );
   }
 
