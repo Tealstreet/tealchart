@@ -605,10 +605,34 @@ export function hasReachedStrategyIntradayLossLimit(ledger: StrategyLedger, time
   return (loss / peakEquity) * 100 >= rule.value;
 }
 
+export function hasReachedStrategyMaxDrawdownLimit(ledger: StrategyLedger): boolean {
+  const rule = ledger.settings.riskRules.maxDrawdown;
+  if (rule === null || ledger.equityCurve.length === 0) {
+    return false;
+  }
+
+  const peakEquity = Math.max(ledger.initialCapital, ...ledger.equityCurve.map((point) => point.equity));
+  const currentEquity = ledger.equityCurve[ledger.equityCurve.length - 1]?.equity ?? ledger.equity;
+  const drawdown = peakEquity - currentEquity;
+  if (drawdown <= 0) {
+    return false;
+  }
+
+  if (rule.type === 'cash') {
+    return drawdown >= rule.value;
+  }
+
+  if (peakEquity <= 0) {
+    return false;
+  }
+  return (drawdown / peakEquity) * 100 >= rule.value;
+}
+
 export function hasReachedStrategyOrderRiskLimit(ledger: StrategyLedger, time: number): boolean {
   return hasReachedStrategyIntradayFilledOrderLimit(ledger, time)
     || hasReachedStrategyConsLossDaysLimit(ledger, time)
-    || hasReachedStrategyIntradayLossLimit(ledger, time);
+    || hasReachedStrategyIntradayLossLimit(ledger, time)
+    || hasReachedStrategyMaxDrawdownLimit(ledger);
 }
 
 export function fillStrategyMarketOrder(
