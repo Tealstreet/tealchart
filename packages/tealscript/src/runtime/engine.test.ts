@@ -6266,6 +6266,23 @@ plot(close, title="Close")`;
       expect(result.profile.maxBarsBack).toBe(8);
     });
 
+    it('statically reports unexecuted fixed and default helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Fixed Profile")
+if false
+    plot(ta.cross(close, open) ? 1 : 0, title="Cross")
+    plot(ta.crossover(source1=close, source2=open) ? 1 : 0, title="Crossover")
+    plot(ta.crossunder(source1=close, open) ? 1 : 0, title="Crossunder")
+    plot(ta.change(close), title="Change")
+    plot(ta.swma(close), title="SWMA")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(3);
+    });
+
     it('statically reports unexecuted MACD lookback lengths in the runtime profile', () => {
       const script = `//@version=6
 indicator("Static MACD Profile")
