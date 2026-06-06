@@ -10,6 +10,7 @@ import {
   formatPineCompatibilityCorpusMarkdown,
   normalizeCompatibilityStageOutcomes,
   PINE_COMPATIBILITY_SCHEMA_VERSION,
+  parse,
   runPineCompatibilityCorpus,
   summarizeCompatibilityOutcome,
   validateCompatibilityStageSequence,
@@ -179,6 +180,32 @@ plot(close)
       status: 'failed',
       failureClass: 'unsupported_planned',
       diagnostics: [expect.objectContaining({ code: 'unsupported-feature' })],
+    });
+  });
+
+  it('passes semantic options through reduced source stage checks', () => {
+    const library = parse(`
+library("Signals", true)
+export const string period = "1D"
+`);
+    const source = `
+indicator("Imported Stage")
+import TestUser/Signals/1 as sig
+float badPeriod = sig.period
+plot(close)
+`;
+
+    expect(createPineParseSemanticStageOutcomes(source)).toEqual([
+      { stage: 'parse', status: 'passed' },
+      { stage: 'semantic', status: 'passed' },
+    ]);
+    expect(createPineParseSemanticStageOutcomes(source, {
+      libraries: new Map([['TestUser/Signals/1', library]]),
+    })[1]).toMatchObject({
+      stage: 'semantic',
+      status: 'failed',
+      failureClass: 'semantic_gap',
+      diagnostics: [expect.objectContaining({ code: 'type-mismatch' })],
     });
   });
 
