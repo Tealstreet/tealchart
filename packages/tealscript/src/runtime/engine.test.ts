@@ -6301,6 +6301,21 @@ plot(close, title="Close")`;
       expect(result.profile.maxBarsBack).toBe(25);
     });
 
+    it('statically reports unexecuted oscillator helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Oscillator Profile")
+if false
+    plot(ta.stoch(close, high, low), title="Stoch")
+    plot(ta.mfi(series=hlc3), title="MFI")
+    plot(ta.wpr(length=12), title="WPR")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(14);
+    });
+
     it('statically reports unexecuted MACD lookback lengths in the runtime profile', () => {
       const script = `//@version=6
 indicator("Static MACD Profile")
