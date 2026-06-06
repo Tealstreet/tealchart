@@ -184,6 +184,21 @@ plot(directionChangedMixed ? 1 : 0, title="Direction Changed Mixed")
     expect(getPlot(result, 'Direction Changed Mixed').values).toEqual([0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0]);
   });
 
+  it('tracks numeric ta.change history for derived sources', () => {
+    const result = runCompatScript(`
+indicator("Derived change")
+spread = close - open
+plot(ta.change(spread), title="Spread Change")
+plot(ta.change(spread, 2), title="Spread Change 2")
+plot(ta.change(source=spread, length=2), title="Named Spread Change 2")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Spread Change').values).toEqual([null, 1, -1, -6, 0, 5, 3, 1, -6, 4, -4, 3]);
+    expect(getPlot(result, 'Spread Change 2').values).toEqual([null, null, 0, -7, -6, 5, 8, 4, -5, -2, 0, -1]);
+    expect(getPlot(result, 'Named Spread Change 2').values).toEqual(getPlot(result, 'Spread Change 2').values);
+  });
+
   it('runs ta cross helpers with named arguments', () => {
     const positional = runCompatScript(`
 indicator("TA cross positional")
