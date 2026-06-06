@@ -345,6 +345,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-earnings-event-checkpoint',
+      title: 'Public Earnings Event Checkpoint',
+      searchContext: 'TradingView public scripts search: earnings surprise',
+      featureTags: ['request', 'earnings', 'markers', 'visuals'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-library-helper-checkpoint',
       title: 'Public Library Helper Checkpoint',
       searchContext: 'TradingView public scripts search: library helper',
