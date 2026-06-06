@@ -604,18 +604,18 @@ plot(histLine, title="Hist")
     expect(getPlot(positional, 'TR Function').values).toEqual([4, 5, 4, 7, 6, 5, 6, 7, 5, 5, 5, 5]);
     expect(getPlot(positional, 'TR Series').values).toEqual([null, 5, 4, 7, 6, 5, 6, 7, 5, 5, 5, 5]);
     expect(roundSeries(getPlot(named, 'DI Plus').values)).toEqual([
-      0,
-      23.076923,
-      16.666667,
-      0,
-      0,
-      0,
-      28.571429,
-      33.333333,
-      7.692308,
-      7.692308,
-      15.384615,
-      0,
+      null,
+      null,
+      null,
+      31.914894,
+      20.27027,
+      13.921114,
+      32.937685,
+      47.828065,
+      39.673607,
+      33.666546,
+      35.656079,
+      24.236113,
     ]);
     expect(roundSeries(getPlot(named, 'SAR').values)).toEqual([103, 99, 99, 99.36, 109, 109, 108.48, 96, 96.28, 96.8688, 97.776672, 99.074538]);
     expect(roundSeries(getPlot(named, 'Pivot High').values)).toEqual([
@@ -709,6 +709,33 @@ plot(namedSar, title="Named SAR")
     expect(roundSeries(getPlot(result, 'Named ADX').values)).toEqual(roundSeries(getPlot(result, 'First ADX').values));
     expect(roundSeries(getPlot(result, 'Second SAR').values)).toEqual(roundSeries(getPlot(result, 'First SAR').values));
     expect(roundSeries(getPlot(result, 'Named SAR').values)).toEqual(roundSeries(getPlot(result, 'First SAR').values));
+  });
+
+  it('matches DMI tuple smoothing to Pine RMA components', () => {
+    const result = runCompatScript(`
+indicator("DMI RMA parity")
+upMove = high - high[1]
+downMove = low[1] - low
+plusDm = na(upMove) ? na : upMove > downMove and upMove > 0 ? upMove : 0
+minusDm = na(downMove) ? na : downMove > upMove and downMove > 0 ? downMove : 0
+smoothTr = ta.rma(ta.tr(true), 3)
+manualPlus = 100 * ta.rma(plusDm, 3) / smoothTr
+manualMinus = 100 * ta.rma(minusDm, 3) / smoothTr
+manualSum = manualPlus + manualMinus
+manualAdx = 100 * ta.rma(math.abs(manualPlus - manualMinus) / (manualSum == 0 ? 1 : manualSum), 3)
+[diPlus, diMinus, adx] = ta.dmi(3, 3)
+plot(diPlus, title="DI Plus")
+plot(manualPlus, title="Manual DI Plus")
+plot(diMinus, title="DI Minus")
+plot(manualMinus, title="Manual DI Minus")
+plot(adx, title="ADX")
+plot(manualAdx, title="Manual ADX")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'DI Plus').values)).toEqual(roundSeries(getPlot(result, 'Manual DI Plus').values));
+    expect(roundSeries(getPlot(result, 'DI Minus').values)).toEqual(roundSeries(getPlot(result, 'Manual DI Minus').values));
+    expect(roundSeries(getPlot(result, 'ADX').values)).toEqual(roundSeries(getPlot(result, 'Manual ADX').values));
   });
 
   it('handles na previous close in ta.tr handle_na mode', () => {
