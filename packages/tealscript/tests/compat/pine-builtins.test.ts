@@ -253,7 +253,7 @@ plot(ta.rsi(source=close, 3), title="RSI")
     expect(roundSeries(getPlot(result, 'MFI').values)).toEqual([null, null, 100, 61.624951, 26.076294, 0, 35.319543, 74.59367, 100, 100, 100, 100]);
     expect(roundSeries(getPlot(result, 'WPR').values)).toEqual([null, null, -11.111111, -75, -90.909091, -69.230769, -11.111111, -7.142857, -25, -11.111111, -50, -28.571429]);
     expect(roundSeries(getPlot(result, 'CMO').values)).toEqual([null, null, null, 11.111111, -60, -77.777778, 11.111111, 100, 80, 77.777778, 20, 66.666667]);
-    expect(roundSeries(getPlot(result, 'RSI').values)).toEqual([null, 100, 100, 55.555556, 20, 11.111111, 55.555556, 100, 90, 88.888889, 60, 83.333333]);
+    expect(roundSeries(getPlot(result, 'RSI').values)).toEqual([null, 100, 100, 40, 21.052632, 32.960894, 64.809384, 81.388135, 71.309665, 81.57622, 69.195716, 78.83301]);
     expect(roundSeries(getPlot(result, 'TSI').values)).toEqual([null, 1, 1, 0.127273, -0.423181, -0.350948, 0.263311, 0.667454, 0.546809, 0.68082, 0.455692, 0.582409]);
     expect(roundSeries(getPlot(result, 'Derived TSI').values)).toEqual([null, 1, 0.333333, -0.708333, -0.792793, 0.212408, 0.577159, 0.708576, -0.246146, 0.084836, -0.231693, 0.049573]);
     expect(roundSeries(getPlot(result, 'Close CCI').values)).toEqual([null, null, 87.5, -100, -100, -28.571429, 100, 100, 33.333333, 100, 20, 100]);
@@ -270,6 +270,36 @@ plot(ta.rsi(source=close, 3), title="RSI")
     expect(roundSeries(getPlot(result, 'Mixed TSI').values)).toEqual(roundSeries(getPlot(result, 'TSI').values));
     expect(roundSeries(getPlot(result, 'Named Typical CCI').values)).toEqual(roundSeries(getPlot(result, 'Typical CCI').values));
     expect(roundSeries(getPlot(result, 'Mixed Typical CCI').values)).toEqual(roundSeries(getPlot(result, 'Typical CCI').values));
+  });
+
+  it('keeps RSI smoothing state per Pine call site', () => {
+    const result = runCompatScript(`
+indicator("RSI call-site state")
+firstRsi = ta.rsi(close, 3)
+secondRsi = ta.rsi(close, 3)
+namedRsi = ta.rsi(source=close, length=3)
+plot(firstRsi, title="First RSI")
+plot(secondRsi, title="Second RSI")
+plot(namedRsi, title="Named RSI")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'First RSI').values)).toEqual([
+      null,
+      100,
+      100,
+      40,
+      21.052632,
+      32.960894,
+      64.809384,
+      81.388135,
+      71.309665,
+      81.57622,
+      69.195716,
+      78.83301,
+    ]);
+    expect(roundSeries(getPlot(result, 'Second RSI').values)).toEqual(roundSeries(getPlot(result, 'First RSI').values));
+    expect(roundSeries(getPlot(result, 'Named RSI').values)).toEqual(roundSeries(getPlot(result, 'First RSI').values));
   });
 
   it('runs cumulative and dispersion TA helpers', () => {
@@ -1295,44 +1325,44 @@ plot(signal, title="Prefix Signal", color=prefixSignalColor)
       null,
       100,
       100,
-      55.555556,
-      38.461538,
-      42.857143,
-      55.555556,
-      65.217391,
-      57.142857,
-      59.090909,
-      68.421053,
-      88.235294,
+      49.484536,
+      31.135135,
+      37.856185,
+      57.302848,
+      70.682206,
+      65.866316,
+      72.438837,
+      67.392396,
+      71.951687,
     ]);
     expect(getPlot(result, 'Named Signal').color).toEqual(getPlot(result, 'Signal').color);
     expect(getPlot(result, 'Prefix Signal').color).toEqual([
       null,
       '#0A141E99',
       '#0A141E99',
-      '#0A141EC7',
+      '#0A141ECC',
+      '#0A141EE0',
       '#0A141ED9',
-      '#0A141ED4',
-      '#0A141EC7',
-      '#0A141EBD',
       '#0A141EC4',
-      '#0A141EC2',
+      '#0A141EB8',
+      '#0A141EBD',
+      '#0A141EB5',
       '#0A141EBA',
-      '#0A141EA6',
+      '#0A141EB5',
     ]);
     expect(getPlot(result, 'Signal').color).toEqual([
       null,
       '#00FF0080',
       '#00FF0080',
-      '#718E00B8',
-      '#9D6200CF',
-      '#926D00C9',
-      '#718E00B8',
-      '#59A600AD',
-      '#6D9200B8',
-      '#689700B5',
-      '#51AE00A8',
-      '#1EE1008F',
+      '#817E00BF',
+      '#B04F00D6',
+      '#9E6100CF',
+      '#6D9200B5',
+      '#4BB400A6',
+      '#57A800AB',
+      '#46B900A3',
+      '#53AC00A8',
+      '#48B700A3',
     ]);
   });
 

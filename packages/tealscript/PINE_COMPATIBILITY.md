@@ -187,8 +187,9 @@ common Pine named arguments, and pivot helpers support default-source
 two-argument calls. Event and cross helpers accept named `condition`/`source`
 arguments and cross helper `source1`/`source2` arguments. These are covered in
 the golden compatibility harness. Recursive `ta.atr()` smoothing state,
-`ta.supertrend()` tuple state, and `ta.sar()` trend state are isolated per call
-site so repeated same-parameter calls do not share accumulators. Semantic
+`ta.rsi()` smoothing state, `ta.supertrend()` tuple state, and `ta.sar()` trend
+state are isolated per call site so repeated same-parameter calls do not share
+accumulators. Semantic
 analysis preserves known scalar TA helper return types for downstream
 assignment diagnostics, including source-preserving `ta.change()` and
 `ta.valuewhen()` results.

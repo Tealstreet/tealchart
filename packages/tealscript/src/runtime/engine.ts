@@ -5949,6 +5949,7 @@ export class TealscriptEngine {
         || name === 'math.random'
         || name === 'ta.macd'
         || name === 'ta.obv'
+        || name === 'ta.rsi'
         || name === 'ta.sar'
         || name === 'ta.supertrend'
       ) && expr.loc
@@ -8204,7 +8205,7 @@ export class TealscriptEngine {
     });
 
     // RSI - Relative Strength Index
-    this.builtins.set('ta.rsi', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.rsi', (args, namedArgs, ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
       const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
@@ -8212,9 +8213,8 @@ export class TealscriptEngine {
       // Get the series for the source value
       const series = this.getSeriesForSource(source, ctx);
 
-      // Get previous values - use unique key based on source
-      const avgGainKey = `_rsi_gain_${length}_${source}`;
-      const avgLossKey = `_rsi_loss_${length}_${source}`;
+      const avgGainKey = `_ta_rsi_gain_${callId}_${length}`;
+      const avgLossKey = `_ta_rsi_loss_${callId}_${length}`;
 
       const prevSource = series.get(1);
       if (prevSource === undefined) return NaN;
@@ -8249,8 +8249,8 @@ export class TealscriptEngine {
         avgLoss = (avgLoss * (length - 1) + loss) / length;
       }
 
-      scope.declare(avgGainKey, 'var', avgGain);
-      scope.declare(avgLossKey, 'var', avgLoss);
+      this.setBuiltinState(scope, avgGainKey, avgGain);
+      this.setBuiltinState(scope, avgLossKey, avgLoss);
 
       if (avgLoss === 0) return 100;
       const rs = avgGain / avgLoss;
