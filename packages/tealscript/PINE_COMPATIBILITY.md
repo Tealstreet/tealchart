@@ -231,8 +231,10 @@ declarations, and `:=` reassignment to a known source preserve the same
 identity for rolling helper windows while keeping normal alias history
 references such as `src[1]` numeric. `input.source()` defaults and source-name
 overrides preserve selected source identity for the same helpers, including
-delayed calls that first execute after warmup bars. `ta.rma()`, `ta.rsi()`, and
-`ta.atr()` use
+delayed calls that first execute after warmup bars. UDF and method parameters
+also carry known source identity, so public helper wrappers around rolling
+helpers can use historical source bars on delayed calls. `ta.rma()`, `ta.rsi()`,
+and `ta.atr()` use
 Pine's SMA-seeded RMA warmup before recursive smoothing; `ta.atr()` is covered
 as the RMA of `ta.tr(true)`.
 Recursive `ta.atr()` smoothing state, `ta.rsi()`

@@ -114,9 +114,10 @@ Known structural gaps:
   modeled but not yet a complete compiler/runtime contract.
 - Some runtime semantics remain approximate, especially expression-level
   source-series inference beyond direct built-in source arguments, simple
-  source aliases, and `input.source()` selections, realtime `varip`, exchange
-  calendar catalogs, full historical `max_bars_back` behavior, strategy
-  intrabar/recalculation semantics, and live host metadata/data availability.
+  source aliases, `input.source()` selections, and UDF source parameters,
+  realtime `varip`, exchange calendar catalogs, full historical
+  `max_bars_back` behavior, strategy intrabar/recalculation semantics, and live
+  host metadata/data availability.
 - Renderer output is useful for many scripts, but TradingView-exact geometry,
   z-order, pixel sizing, and Strategy Tester UI parity are later work.
 
