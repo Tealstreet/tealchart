@@ -229,7 +229,10 @@ so equal current-bar source values no longer collapse to the wrong history
 series. Simple source aliases such as `src = open`, alias-to-alias
 declarations, and `:=` reassignment to a known source preserve the same
 identity for rolling helper windows while keeping normal alias history
-references such as `src[1]` numeric. `ta.rma()`, `ta.rsi()`, and `ta.atr()` use
+references such as `src[1]` numeric. `input.source()` defaults and source-name
+overrides preserve selected source identity for the same helpers, including
+delayed calls that first execute after warmup bars. `ta.rma()`, `ta.rsi()`, and
+`ta.atr()` use
 Pine's SMA-seeded RMA warmup before recursive smoothing; `ta.atr()` is covered
 as the RMA of `ta.tr(true)`.
 Recursive `ta.atr()` smoothing state, `ta.rsi()`
