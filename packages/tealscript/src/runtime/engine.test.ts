@@ -3399,6 +3399,8 @@ plot(timeframe.in_seconds(timeframe="45S"), title="Seconds")
 plot(timeframe.in_seconds("2W"), title="Weeks")
 plot(timeframe.in_seconds("3M"), title="Months")
 plot(timeframe.in_seconds("1T"), title="Ticks")
+plot(timeframe.to_seconds("1D"), title="Daily Alias")
+plot(timeframe.to_seconds(timeframe="45S"), title="Named Alias")
 plot(timeframe.from_seconds(seconds=44) == "45S" ? 1 : 0, title="From Seconds")
 plot(timeframe.from_seconds(3601) == "61" ? 1 : 0, title="From Minutes")
 plot(timeframe.change(timeframe="60") ? 1 : 0, title="Hourly Change")
@@ -3417,6 +3419,8 @@ plot(timeframe.in_seconds("15") < timeframe.in_seconds("1D") ? 1 : 0, title="Com
       expect(result.plots.find((plot) => plot.title === 'Weeks')?.values).toEqual([1_209_600, 1_209_600, 1_209_600]);
       expect(result.plots.find((plot) => plot.title === 'Months')?.values).toEqual([7_776_000, 7_776_000, 7_776_000]);
       expect(result.plots.find((plot) => plot.title === 'Ticks')?.values).toEqual([null, null, null]);
+      expect(result.plots.find((plot) => plot.title === 'Daily Alias')?.values).toEqual([86_400, 86_400, 86_400]);
+      expect(result.plots.find((plot) => plot.title === 'Named Alias')?.values).toEqual([45, 45, 45]);
       expect(result.plots.find((plot) => plot.title === 'From Seconds')?.values).toEqual([1, 1, 1]);
       expect(result.plots.find((plot) => plot.title === 'From Minutes')?.values).toEqual([1, 1, 1]);
       expect(result.plots.find((plot) => plot.title === 'Hourly Change')?.values).toEqual([1, 0, 1]);
