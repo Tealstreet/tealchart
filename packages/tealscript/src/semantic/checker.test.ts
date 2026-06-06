@@ -827,6 +827,43 @@ plot(close, 1, title="Duplicate")
     ]);
   });
 
+  it('reports invalid visual color option values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Visual Color Options")
+linePlot = plot(close, color=1)
+basePlot = plot(open)
+zeroLine = hline(0, color=1)
+fill(linePlot, basePlot, color=1)
+bgcolor(color=1)
+barcolor(color=1)
+plotbar(open, high, low, close, color=1)
+plotcandle(open, high, low, close, color=1, wickcolor=2, bordercolor=3)
+plotshape(close > open, color=1, textcolor=2)
+plotchar(close > open, char="x", color=1, textcolor=2)
+plotarrow(close - open, colorup=1, colordown=2)
+plot(close, 1, color=color.red, title="ok")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'plot color must be a color, got int',
+      'hline color must be a color, got int',
+      'fill color must be a color, got int',
+      'bgcolor color must be a color, got int',
+      'barcolor color must be a color, got int',
+      'plotbar color must be a color, got int',
+      'plotcandle color must be a color, got int',
+      'plotcandle wickcolor must be a color, got int',
+      'plotcandle bordercolor must be a color, got int',
+      'plotshape color must be a color, got int',
+      'plotshape textcolor must be a color, got int',
+      'plotchar color must be a color, got int',
+      'plotchar textcolor must be a color, got int',
+      'plotarrow colorup must be a color, got int',
+      'plotarrow colordown must be a color, got int',
+      "Argument 'title' for plot() was supplied multiple times",
+    ]);
+  });
+
   it('reports invalid marker visual output argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Invalid Marker Visual Bindings")
@@ -3915,6 +3952,65 @@ label.set_text(marker, 1, id=marker)
       'table.cell_set_text text must be a string, got int',
       'table.cell_set_tooltip tooltip must be a string, got int',
       "Argument 'id' for label.set_text() was supplied multiple times",
+    ]);
+  });
+
+  it('reports invalid drawing color option values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing Color Values")
+marker = label.new(bar_index, close, color=1, textcolor=2)
+trend = line.new(bar_index, high, bar_index + 1, low, color=1)
+region = box.new(bar_index, high, bar_index + 1, low, border_color=1, bgcolor=2, text_color=3)
+firstPoint = chart.point.from_index(bar_index, high)
+secondPoint = chart.point.from_index(bar_index + 1, low)
+points = array.from(firstPoint, secondPoint)
+path = polyline.new(points, line_color=1, fill_color=2)
+channel = linefill.new(trend, trend, color=1)
+dashboard = table.new(position.top_right, 1, 1, bgcolor=1, frame_color=2, border_color=3)
+label.set_color(marker, color=1)
+label.set_textcolor(marker, textcolor=2)
+line.set_color(trend, color=1)
+box.set_bgcolor(region, color=1)
+box.set_border_color(region, color=2)
+box.set_text_color(region, text_color=3)
+linefill.set_color(channel, color=1)
+table.set_bgcolor(dashboard, bgcolor=1)
+table.set_frame_color(dashboard, frame_color=2)
+table.set_border_color(dashboard, border_color=3)
+table.cell(dashboard, 0, 0, text_color=1, bgcolor=2)
+table.cell_set_bgcolor(dashboard, 0, 0, bgcolor=1)
+table.cell_set_text_color(dashboard, 0, 0, text_color=2)
+label.set_color(marker, 1, id=marker)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'label.new color must be a color, got int',
+      'label.new textcolor must be a color, got int',
+      'line.new color must be a color, got int',
+      'box.new border_color must be a color, got int',
+      'box.new bgcolor must be a color, got int',
+      'box.new text_color must be a color, got int',
+      'polyline.new line_color must be a color, got int',
+      'polyline.new fill_color must be a color, got int',
+      'linefill.new color must be a color, got int',
+      'table.new bgcolor must be a color, got int',
+      'table.new frame_color must be a color, got int',
+      'table.new border_color must be a color, got int',
+      'label.set_color color must be a color, got int',
+      'label.set_textcolor textcolor must be a color, got int',
+      'line.set_color color must be a color, got int',
+      'box.set_bgcolor color must be a color, got int',
+      'box.set_border_color color must be a color, got int',
+      'box.set_text_color text_color must be a color, got int',
+      'linefill.set_color color must be a color, got int',
+      'table.set_bgcolor bgcolor must be a color, got int',
+      'table.set_frame_color frame_color must be a color, got int',
+      'table.set_border_color border_color must be a color, got int',
+      'table.cell text_color must be a color, got int',
+      'table.cell bgcolor must be a color, got int',
+      'table.cell_set_bgcolor bgcolor must be a color, got int',
+      'table.cell_set_text_color text_color must be a color, got int',
+      "Argument 'id' for label.set_color() was supplied multiple times",
     ]);
   });
 
