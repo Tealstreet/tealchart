@@ -374,7 +374,10 @@ Phases:
 1. Keep `array.*` core, method sugar, sorting, slicing, joining, statistical
    helpers, and array history as the first collection priority.
 2. Complete `map.*` constructors, mutation, lookup, iteration, key/value
-   arrays, history/reference behavior, and common diagnostics.
+   arrays, history/reference behavior, and common diagnostics. Source-linked
+   map signal checkpoint coverage now exercises persistent named state maps,
+   previous-value updates, copied snapshots, key-value iteration, missing-key
+   checks, and table output.
 3. Complete UDT constructors, defaults, field access, reference assignment,
    copy semantics, rollback, nested collection fields, and `varip` field rules.
    Keep source-linked public checkpoint coverage for persistent UDT state
