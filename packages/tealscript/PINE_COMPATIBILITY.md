@@ -516,9 +516,10 @@ private helpers, construct library-local UDTs, and use library-local methods.
 Semantic export diagnostics cover Pine's requirement that any UDT exposed
 through exported fields, callable parameters, or inferred callable return values
 is also exported by the library.
-The checkpoint corpus tracks a reduced public library-helper import idiom that
-binds exported helpers through this deterministic registry and validates their
-series output.
+The checkpoint corpus tracks reduced public library-helper import idioms that
+bind exported helpers through this deterministic registry, validate their series
+output, and cover source-preserving helper wrappers used before delayed rolling
+calls.
 
 Published TradingView lookup is not implemented yet. `import` declarations
 without a matching registry entry emit an explicit missing-registry diagnostic.

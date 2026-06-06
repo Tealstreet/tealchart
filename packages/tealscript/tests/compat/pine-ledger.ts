@@ -477,6 +477,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-library-source-helper-checkpoint',
+      title: 'Public Library Source Helper Checkpoint',
+      searchContext: 'TradingView public scripts search: library source helper',
+      featureTags: ['libraries', 'imports', 'udf', 'signals', 'source_identity'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-strategy-bracket-checkpoint',
       title: 'Public Strategy Bracket Checkpoint',
       searchContext: 'TradingView public scripts search: strategy bracket',
