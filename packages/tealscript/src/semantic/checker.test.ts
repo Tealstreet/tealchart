@@ -6004,6 +6004,43 @@ plot(str.length(validDescription) + str.length(validLabel) + str.length(shadow(1
     expect(types.get('hidden')).toMatchObject({ kind: 'unknown' });
   });
 
+  it('infers exported imported library constant types semantically', () => {
+    const library = parse(`
+library("Constants", true)
+export const int fast = 2
+export const float multiplier = 1.5
+export color bull = color.green
+export string period = timeframe.period
+export string ticker = syminfo.ticker
+const int hidden = 1
+export describe(int length, color shade, string timeframeValue) => "constant"
+`);
+    const result = checkProgram(parse(`
+indicator("Imported Constant Types")
+import TestUser/Constants/1 as c
+fast = c.fast
+weighted = close * c.multiplier
+isBull = c.bull == color.green
+description = c.describe(c.fast, c.bull, c.period)
+float badPeriod = c.period
+hidden = c.hidden
+plot(weighted + fast + (isBull ? 1 : 0) + str.length(description))
+`), {
+      libraries: new Map([['TestUser/Constants/1', library]]),
+    });
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable',
+    ]);
+    expect(types.get('fast')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('weighted')).toMatchObject({ kind: 'float' });
+    expect(types.get('isBull')).toMatchObject({ kind: 'bool' });
+    expect(types.get('description')).toMatchObject({ kind: 'string' });
+    expect(types.get('hidden')).toMatchObject({ kind: 'unknown' });
+  });
+
   it('validates imported library type constructors and fields semantically', () => {
     const library = parse(`
 library("PivotTools", true)
