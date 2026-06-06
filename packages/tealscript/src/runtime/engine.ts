@@ -458,8 +458,10 @@ export class TealscriptEngine {
   private requestExpressionIds = new WeakMap<Expression, number>();
   private callExpressionIds = new WeakMap<CallExpression, number>();
   private expressionHistory = new WeakMap<Expression, ExpressionHistoryEntry>();
+  private sourceSeriesIds = new WeakMap<SeriesAccessor, number>();
   private nextRequestExpressionId = 0;
   private nextCallExpressionId = 0;
+  private nextSourceSeriesId = 0;
   private inferredMaxBarsBack = 0;
   private userFunctionCallStack: string[] = [];
   private importedLibraryCallStack: string[] = [];
@@ -3510,9 +3512,7 @@ export class TealscriptEngine {
         return this.getSourceSeriesForExpression(expr.consequent);
       }
 
-      const consequentSource = this.getSourceSeriesForExpression(expr.consequent);
-      const alternateSource = this.getSourceSeriesForExpression(expr.alternate);
-      return consequentSource && consequentSource === alternateSource ? consequentSource : undefined;
+      return this.getEquivalentSourceSeriesForExpressions([expr.consequent, expr.alternate]);
     }
     if (expr.type === 'SwitchExpression') {
       if (expr.cases.length === 0) {
@@ -3535,11 +3535,7 @@ export class TealscriptEngine {
         return this.getSourceSeriesForExpression(firstExpression);
       }
 
-      const firstSource = this.getSourceSeriesForExpression(firstExpression);
-      if (!firstSource) return undefined;
-      return expressions.slice(1).every((switchCase) => this.getSourceSeriesForExpression(switchCase) === firstSource)
-        ? firstSource
-        : undefined;
+      return this.getEquivalentSourceSeriesForExpressions(expressions);
     }
     if (expr.type === 'BinaryExpression' || expr.type === 'UnaryExpression') {
       return this.getArithmeticSourceSeriesForExpression(expr);
@@ -3547,6 +3543,75 @@ export class TealscriptEngine {
     if (expr.type !== 'Identifier') return undefined;
 
     return this.scope.getSourceSeries(expr.name) ?? this.getKnownSeriesByName(expr.name, this.ctx);
+  }
+
+  private getEquivalentSourceSeriesForExpressions(expressions: Expression[]): SeriesAccessor | undefined {
+    const firstExpression = expressions[0];
+    if (!firstExpression) return undefined;
+
+    const firstSource = this.getSourceSeriesForExpression(firstExpression);
+    if (!firstSource) return undefined;
+
+    const firstKey = this.getSourceExpressionKey(firstExpression);
+    for (const expression of expressions.slice(1)) {
+      const source = this.getSourceSeriesForExpression(expression);
+      if (!source) return undefined;
+      if (source === firstSource) continue;
+
+      const key = this.getSourceExpressionKey(expression);
+      if (!firstKey || key !== firstKey) return undefined;
+    }
+
+    return firstSource;
+  }
+
+  private getSourceExpressionKey(expr: Expression): string | undefined {
+    if (expr.type === 'NumericLiteral') return `number:${expr.value}`;
+    if (expr.type === 'NaExpression') return 'na';
+
+    if (expr.type === 'Identifier') {
+      const scopedSource = this.scope.getSourceSeries(expr.name);
+      if (scopedSource) return `series:${this.sourceSeriesId(scopedSource)}`;
+      return this.getKnownSeriesByName(expr.name, this.ctx) ? `known:${expr.name}` : undefined;
+    }
+
+    if (expr.type === 'UnaryExpression') {
+      if (expr.operator !== '-' && expr.operator !== '+') return undefined;
+      const operand = this.getSourceExpressionKey(expr.argument);
+      return operand ? `unary:${expr.operator}:${operand}` : undefined;
+    }
+
+    if (expr.type === 'BinaryExpression') {
+      if (!['+', '-', '*', '/', '%'].includes(expr.operator)) return undefined;
+      const left = this.getSourceExpressionKey(expr.left);
+      const right = this.getSourceExpressionKey(expr.right);
+      return left && right ? `binary:${expr.operator}:${left}:${right}` : undefined;
+    }
+
+    if (expr.type === 'ConditionalExpression') {
+      const consequent = this.getSourceExpressionKey(expr.consequent);
+      const alternate = this.getSourceExpressionKey(expr.alternate);
+      return consequent && consequent === alternate ? consequent : undefined;
+    }
+
+    if (expr.type === 'SwitchExpression') {
+      const keys = expr.cases.map((switchCase) => (
+        Array.isArray(switchCase.consequent) ? undefined : this.getSourceExpressionKey(switchCase.consequent)
+      ));
+      const firstKey = keys[0];
+      return firstKey && keys.every((key) => key === firstKey) ? firstKey : undefined;
+    }
+
+    return undefined;
+  }
+
+  private sourceSeriesId(series: SeriesAccessor): number {
+    const existing = this.sourceSeriesIds.get(series);
+    if (existing !== undefined) return existing;
+
+    const id = this.nextSourceSeriesId++;
+    this.sourceSeriesIds.set(series, id);
+    return id;
   }
 
   private getArithmeticSourceSeriesForExpression(expr: Expression): SeriesAccessor | undefined {
