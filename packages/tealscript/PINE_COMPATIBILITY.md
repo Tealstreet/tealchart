@@ -155,7 +155,8 @@ Covered behavior and remaining gaps:
   statements, expressions, built-in calls, unique request contexts, inferred
   history depth, and runtime errors. Worker result bundles carry the same
   profile so host charts can inspect expensive scripts without running them on
-  the main thread.
+  the main thread. Worker request freshness metadata keeps stale realtime
+  `updateBar()` tick results from replacing newer ticks.
 
 ## Common History Reference Coverage
 
