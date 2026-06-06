@@ -6630,6 +6630,46 @@ plot(bar_index >= 1 ? ta.sma(passthrough(), 2) : na, title="Conditional Derived 
       expect(result.plots.find((plot) => plot.title === 'Conditional Derived Average')?.values).toEqual([null, 15, 25]);
     });
 
+    it('preserves source identity through same-source switch UDF returns', () => {
+      const script = `//@version=6
+indicator("Switch source return identity")
+passthrough(series float src) => switch
+    bar_index >= 0 => src
+    => src
+plot(bar_index >= 1 ? ta.sma(passthrough(open), 2) : na, title="Switch Return Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Switch Return Average')?.values).toEqual([null, 15, 25]);
+    });
+
+    it('preserves derived source identity through same-identifier switch UDF returns', () => {
+      const script = `//@version=6
+indicator("Switch derived source return identity")
+passthrough() => switch
+    bar_index >= 0 => hl2
+    => hl2
+plot(bar_index >= 1 ? ta.sma(passthrough(), 2) : na, title="Switch Derived Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 18, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Switch Derived Average')?.values).toEqual([null, 15, 25]);
+    });
+
     it('keeps mixed named and positional source helper results numeric', () => {
       const script = `//@version=6
 indicator("Mixed source binding")
