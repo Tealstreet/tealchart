@@ -975,7 +975,7 @@ export method shifted(
 method smooth(float this, int length) => ta.sma(this, length)
 
 value = close +
-    open +
+    open + // public scripts often annotate wrapped operands
     high
 smoothed = close
     .smooth(
@@ -1002,6 +1002,49 @@ plot(smoothed)
         { name: 'value', init: 'BinaryExpression' },
         { name: 'smoothed', init: 'CallExpression' },
       ]);
+    });
+
+    it('parses inline comments on wrapped continuation lines', () => {
+      const ast = parse(`indicator("Wrapped Comments")
+float x = open +
+  high +           // Indented by 2 spaces.
+     low +         // Indented by 5 spaces.
+          close    // Indented by 10 spaces.
+colorLine = plot(
+    series = x, // comment after wrapped argument
+    title = "X",
+    color = color.blue
+)
+upDown(float s) =>
+    bool isGrowing = s > s[1]
+    int ud = isGrowing ?
+        1 : // comment after wrapped ternary consequent
+        -1
+    ud
+plot(upDown(close))
+`);
+      expect(ast.body.map((statement) => statement.type)).toEqual([
+        'IndicatorDeclaration',
+        'VariableDeclaration',
+        'VariableDeclaration',
+        'FunctionDeclaration',
+        'ExpressionStatement',
+      ]);
+      const declarations = ast.body.filter((statement): statement is VariableDeclaration => statement.type === 'VariableDeclaration');
+      expect(declarations.map((declaration) => declaration.init.type)).toEqual([
+        'BinaryExpression',
+        'CallExpression',
+      ]);
+      const fn = ast.body.find((statement): statement is FunctionDeclaration => statement.type === 'FunctionDeclaration');
+      expect(Array.isArray(fn?.body)).toBe(true);
+      if (fn && Array.isArray(fn.body)) {
+        expect(fn.body.map((statement) => statement.type)).toEqual([
+          'VariableDeclaration',
+          'VariableDeclaration',
+          'ExpressionStatement',
+        ]);
+        expect(fn.body[1]?.type === 'VariableDeclaration' ? fn.body[1].init.type : null).toBe('ConditionalExpression');
+      }
     });
 
     it('parses declaration and assignment initializers on continuation lines', () => {
