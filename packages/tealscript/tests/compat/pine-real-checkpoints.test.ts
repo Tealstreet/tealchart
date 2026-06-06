@@ -2194,6 +2194,76 @@ plot(strategy.netprofit, title="Net Profit")
     ]);
   });
 
+  it('locks a reduced public strategy trade-list table idiom', () => {
+    // Public idiom reference: strategy trade-list public scripts commonly
+    // summarize the latest closed trade with `strategy.closedtrades.*()` accessors.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20trade%20list/
+    const bars: Bar[] = [
+      { time: 1_700_615_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_615_060_000, open: 103, high: 105, low: 102, close: 104, volume: 100 },
+      { time: 1_700_615_120_000, open: 105, high: 107, low: 104, close: 106, volume: 100 },
+      { time: 1_700_615_180_000, open: 106, high: 107, low: 105, close: 106, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Public Strategy Trade List Checkpoint", overlay=true, process_orders_on_close=true)
+var trades = table.new(position.top_right, 2, 5, border_width=1, border_color=color.white)
+if bar_index == 0
+    strategy.entry("L", strategy.long, qty=2, comment="seed")
+if bar_index == 2
+    strategy.close("L", comment="manual exit")
+hasClosed = strategy.closedtrades > 0
+lastTrade = strategy.closedtrades - 1
+lastEntry = hasClosed ? strategy.closedtrades.entry_price(lastTrade) : na
+lastExit = hasClosed ? strategy.closedtrades.exit_price(lastTrade) : na
+lastProfit = hasClosed ? strategy.closedtrades.profit(lastTrade) : na
+lastReturn = hasClosed ? strategy.closedtrades.profit_percent(lastTrade) : na
+lastExitId = hasClosed ? strategy.closedtrades.exit_id(lastTrade) : ""
+if barstate.islast and hasClosed
+    table.cell(trades, 0, 0, "Field", text_color=color.white, bgcolor=color.blue)
+    table.cell(trades, 1, 0, "Latest", text_color=color.white, bgcolor=color.blue)
+    table.cell(trades, 0, 1, "Entry", text_color=color.white, bgcolor=color.gray)
+    table.cell(trades, 1, 1, str.tostring(lastEntry, "#.##"), text_color=color.white, bgcolor=color.green)
+    table.cell(trades, 0, 2, "Exit", text_color=color.white, bgcolor=color.gray)
+    table.cell(trades, 1, 2, str.tostring(lastExit, "#.##"), text_color=color.white, bgcolor=color.green)
+    table.cell(trades, 0, 3, "Profit", text_color=color.white, bgcolor=color.gray)
+    table.cell(trades, 1, 3, str.tostring(lastProfit, "#.##"), text_color=color.white, bgcolor=color.green)
+    table.cell(trades, 0, 4, "Exit Id", text_color=color.white, bgcolor=color.gray)
+    table.cell(trades, 1, 4, lastExitId, text_color=color.white, bgcolor=color.green)
+plot(strategy.closedtrades, title="Closed Trades")
+plot(lastEntry, title="Last Entry")
+plot(lastExit, title="Last Exit")
+plot(lastProfit, title="Last Profit")
+plot(lastReturn, title="Last Return")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 0, 1, 1]);
+    expect(getPlot(result, 'Last Entry').values).toEqual([null, null, 100, 100]);
+    expect(getPlot(result, 'Last Exit').values).toEqual([null, null, 106, 106]);
+    expect(getPlot(result, 'Last Profit').values).toEqual([null, null, 12, 12]);
+    expect(roundSeries(getPlot(result, 'Last Return').values)).toEqual([null, null, 6, 6]);
+    expect(result.strategy.closedTrades[0]).toMatchObject({
+      entryOrderId: 'L',
+      exitOrderId: 'Close L',
+      entryPrice: 100,
+      exitPrice: 106,
+      profit: 12,
+    });
+    const table = result.drawings.find((drawing) => drawing.type === 'table');
+    expect(table?.type === 'table' ? table.cells.map((cell) => cell.text) : []).toEqual([
+      'Field',
+      'Latest',
+      'Entry',
+      '100.00',
+      'Exit',
+      '106.00',
+      'Profit',
+      '12.00',
+      'Exit Id',
+      'Close L',
+    ]);
+  });
+
   it('locks the official strategy profit-loss exit idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const bars: Bar[] = [

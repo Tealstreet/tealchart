@@ -561,6 +561,16 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-strategy-trade-list-checkpoint',
+      title: 'Public Strategy Trade List Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy trade list',
+      category: 'strategy',
+      featureTags: ['strategy', 'performance', 'tables', 'trade_accessors'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-alert-signal-checkpoint',
       title: 'Public Alert Signal Checkpoint',
       searchContext: 'TradingView public scripts search: alert signal',

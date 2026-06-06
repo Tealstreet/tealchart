@@ -1014,6 +1014,8 @@ including risk-free-rate metadata, limit-fill verification ticks, close-entry se
 positions, and per-bar equity snapshots. Read-only `strategy.*` state variables such as
 `strategy.equity`, `strategy.account_currency`, `strategy.position_size`,
 `strategy.position_entry_name`, and trade counters are available for scripts.
+Source-linked public checkpoints cover both strategy stats tables and
+closed-trade list tables built from trade accessors.
 The semantic checker validates common strategy order, close/cancel,
 declaration argument, declaration literal value, and trade-accessor call shapes
 before runtime, reports literal declaration setting diagnostics plus order
