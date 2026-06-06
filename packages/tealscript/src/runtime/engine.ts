@@ -2173,6 +2173,13 @@ export class TealscriptEngine {
     throw new Error(`Invalid strategy default_qty_type: ${this.toStringValue(value)}`);
   }
 
+  private normalizeStrategyCashOrPercentRiskType(value: unknown): 'cash' | 'percent_of_equity' {
+    if (value === 'cash' || value === 'percent_of_equity') {
+      return value;
+    }
+    throw new Error(`Invalid strategy risk type: ${this.toStringValue(value)}`);
+  }
+
   private normalizeStrategyCommissionType(value: unknown): StrategyLedgerSettings['commissionType'] {
     if (value === 'percent' || value === 'cash_per_order' || value === 'cash_per_contract') {
       return value;
@@ -6142,6 +6149,39 @@ export class TealscriptEngine {
         this.getCallArg(args, namedArgs, 0, 'contracts'),
         'strategy.risk.max_position_size contracts',
       );
+      return undefined;
+    });
+    this.builtins.set('strategy.risk.max_drawdown', (args, namedArgs) => {
+      this.ctx.strategyLedger.settings.riskRules.maxDrawdown = {
+        value: this.normalizePositiveNumber(this.getCallArg(args, namedArgs, 0, 'value'), 'strategy.risk.max_drawdown value'),
+        type: this.normalizeStrategyCashOrPercentRiskType(this.getCallArg(args, namedArgs, 1, 'type')),
+        alertMessage: this.toOptionalString(this.getCallArg(args, namedArgs, 2, 'alert_message')),
+      };
+      return undefined;
+    });
+    this.builtins.set('strategy.risk.max_intraday_loss', (args, namedArgs) => {
+      this.ctx.strategyLedger.settings.riskRules.maxIntradayLoss = {
+        value: this.normalizePositiveNumber(this.getCallArg(args, namedArgs, 0, 'value'), 'strategy.risk.max_intraday_loss value'),
+        type: this.normalizeStrategyCashOrPercentRiskType(this.getCallArg(args, namedArgs, 1, 'type')),
+        alertMessage: this.toOptionalString(this.getCallArg(args, namedArgs, 2, 'alert_message')),
+      };
+      return undefined;
+    });
+    this.builtins.set('strategy.risk.max_intraday_filled_orders', (args, namedArgs) => {
+      this.ctx.strategyLedger.settings.riskRules.maxIntradayFilledOrders = {
+        count: this.normalizePositiveNumber(
+          this.getCallArg(args, namedArgs, 0, 'count'),
+          'strategy.risk.max_intraday_filled_orders count',
+        ),
+        alertMessage: this.toOptionalString(this.getCallArg(args, namedArgs, 1, 'alert_message')),
+      };
+      return undefined;
+    });
+    this.builtins.set('strategy.risk.max_cons_loss_days', (args, namedArgs) => {
+      this.ctx.strategyLedger.settings.riskRules.maxConsLossDays = {
+        count: this.normalizePositiveNumber(this.getCallArg(args, namedArgs, 0, 'count'), 'strategy.risk.max_cons_loss_days count'),
+        alertMessage: this.toOptionalString(this.getCallArg(args, namedArgs, 1, 'alert_message')),
+      };
       return undefined;
     });
     this.builtins.set('strategy.opentrades.entry_id', (args, namedArgs) => (

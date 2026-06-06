@@ -935,7 +935,11 @@ opposite-direction entry transactions to reverse positions. The
 `strategy.entry()` to the allowed direction, converting disallowed opposite
 entries into close-only market orders while leaving raw `strategy.order()` calls
 unrestricted. `strategy.risk.max_position_size()` caps `strategy.entry()`
-exposure while leaving raw `strategy.order()` calls unrestricted. The
+exposure while leaving raw `strategy.order()` calls unrestricted. Other common
+strategy risk guards (`max_drawdown`, `max_intraday_loss`,
+`max_intraday_filled_orders`, and `max_cons_loss_days`) are accepted and stored
+as ledger metadata; exact session halt and forced-close enforcement remains a
+fidelity target. The
 `strategy(..., slippage=...)` setting applies fixed tick slippage to market,
 stop, and trailing-stop fills in trade direction while preserving limit-fill
 prices. `strategy.close(..., immediately=true)` and
