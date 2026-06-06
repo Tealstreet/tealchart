@@ -352,11 +352,12 @@ Phases:
 4. Support point-series request families such as dividends, earnings, splits,
    financial, economic, currency rates, and seed where host data exists.
 5. Defer `request.footprint()` until host footprint/intrabar-volume data is
-   available.
+   available, while preserving an explicit planned-unsupported semantic
+   diagnostic for corpus/editor classification.
 6. Maintain corpus-driven checkpoints for MTF trend filters, lower-timeframe
    arrays, currency conversion, earnings events, corporate actions, financial
-   dashboards, economic macro overlays, seed datasets, synthetic ticker IDs, and
-   request-limit reuse.
+   dashboards, economic macro overlays, seed datasets, synthetic ticker IDs,
+   planned unsupported ticker constructors, and request-limit reuse.
 
 Done means MTF and multi-symbol scripts can run against deterministic or
 host-provided data.

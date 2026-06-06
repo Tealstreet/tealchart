@@ -1418,6 +1418,14 @@ const SIGNED_BUILTIN_CALL_NAMESPACES = new Set(
     }),
 );
 
+const PLANNED_UNSUPPORTED_BUILTIN_CALL_MESSAGES = new Map<string, string>([
+  [
+    'request.footprint',
+    'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+  ],
+  ['ticker.rangebar', 'ticker.* functions are not supported yet: ticker.rangebar'],
+]);
+
 export function checkProgram(program: Program): SemanticCheckResult {
   return new SemanticChecker().check(program);
 }
@@ -3049,7 +3057,7 @@ class SemanticChecker {
     const displayName = this.memberPath(expression.callee).join('.');
     const signature = this.resolveBuiltinSignature(displayName, expression, scope);
     if (!signature) {
-      this.checkUnsupportedBuiltinNamespaceCall(expression, displayName);
+      this.checkUnsupportedBuiltinNamespaceCall(expression, displayName, scope);
       return;
     }
 
@@ -3088,10 +3096,18 @@ class SemanticChecker {
       .map((arg) => this.inferExpressionType(arg.value, scope));
   }
 
-  private checkUnsupportedBuiltinNamespaceCall(expression: CallExpression, displayName: string): void {
+  private checkUnsupportedBuiltinNamespaceCall(expression: CallExpression, displayName: string, scope: SemanticScope): void {
     if (expression.callee.type !== 'MemberExpression') return;
     const namespace = this.memberPath(expression.callee)[0];
-    if (!namespace || !SIGNED_BUILTIN_CALL_NAMESPACES.has(namespace)) return;
+    if (!namespace) return;
+
+    const plannedUnsupportedMessage = PLANNED_UNSUPPORTED_BUILTIN_CALL_MESSAGES.get(displayName);
+    if (plannedUnsupportedMessage && !scope.lookup(namespace)) {
+      this.addDiagnostic('unsupported-feature', plannedUnsupportedMessage, expression.callee.loc);
+      return;
+    }
+
+    if (!SIGNED_BUILTIN_CALL_NAMESPACES.has(namespace)) return;
     this.addDiagnostic('unknown-function', `Unknown function: ${displayName}`, expression.callee.loc);
   }
 
