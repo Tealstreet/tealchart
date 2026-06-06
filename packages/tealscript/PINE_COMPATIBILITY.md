@@ -185,10 +185,11 @@ statistical helper pass covers `ta.median`, `ta.mode`,
 `ta.percentrank`. Covered DMI, SAR, pivot, and linear regression helpers accept
 common Pine named arguments, and pivot helpers support default-source
 two-argument calls. Event and cross helpers accept named `condition`/`source`
-arguments and cross helper `source1`/`source2` arguments. Cross helpers preserve
-per-call previous values for derived source expressions. These are covered in the
-golden compatibility harness. `ta.rma()` uses Pine's SMA-seeded warmup before
-recursive smoothing. Recursive `ta.atr()` smoothing state, `ta.rsi()`
+arguments and cross helper `source1`/`source2` arguments. Numeric `ta.change()`
+and cross helpers preserve per-call previous values for derived source
+expressions. These are covered in the golden compatibility harness. `ta.rma()`
+uses Pine's SMA-seeded warmup before recursive smoothing. Recursive `ta.atr()`
+smoothing state, `ta.rsi()`
 smoothing state, `ta.dmi()` tuple smoothing state, `ta.supertrend()` tuple
 state, and `ta.sar()` trend state are isolated per call site so repeated
 same-parameter calls do not share accumulators. Semantic

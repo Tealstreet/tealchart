@@ -8309,7 +8309,7 @@ export class TealscriptEngine {
     });
 
     // Change - difference from N bars ago
-    this.builtins.set('ta.change', (args, namedArgs, ctx, scope, callId) => {
+    this.builtins.set('ta.change', (args, namedArgs, _ctx, scope, callId) => {
       const taChangeArgs = ['source', 'length'];
       const rawSource = this.getOrderedCallArg(args, namedArgs, taChangeArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taChangeArgs, 1, 1));
@@ -8324,13 +8324,10 @@ export class TealscriptEngine {
       }
 
       const source = rawSource as number;
+      const values = this.getCompleteSourceWindow(scope, `_change_num_${callId}`, source, length + 1);
+      if (!values) return NaN;
 
-      // Get the series for the source value
-      const series = this.getSeriesForSource(source, ctx);
-      const prev = series.get(length);
-      if (prev === undefined) return NaN;
-
-      return source - prev;
+      return source - values[length]!;
     });
 
     // Crossover - source1 crosses above source2
