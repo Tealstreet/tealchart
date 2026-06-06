@@ -104,7 +104,7 @@ idioms rather than isolated unit coverage.
 | Alerts and alert conditions | `Official Alert Checkpoint`; alert crossover fixture in `pine-visuals.test.ts` | `pine-real-checkpoints.test.ts`; `pine-visuals.test.ts` |
 | Strategy broker flows | `Official Strategy Checkpoint`; `Official Broker Emulator Path Checkpoint`; `Official Bar Magnifier Checkpoint`; `Official Stop Limit Checkpoint`; `Official Immediate Close Checkpoint`; `Official Disable Alert Checkpoint`; `Official Allow Entry In Checkpoint`; `Official Recalculate After Fill Checkpoint`; `Official Bar Magnifier Recalculate Checkpoint`; `Official Calc On Every Tick Checkpoint`; `Public Strategy Trailing Stop Checkpoint`; `Public Strategy Stats Checkpoint` | `pine-real-checkpoints.test.ts` |
 | Limits and request-context reuse | `Official Request Limit Checkpoint` | `pine-real-checkpoints.test.ts` |
-| User-defined objects | `Public Object Method Checkpoint`; reduced official object idioms | `pine-real-checkpoints.test.ts`; `pine-objects.test.ts` |
+| User-defined objects | `Public Object Method Checkpoint`; `Public UDT State Layout Checkpoint`; reduced official object idioms | `pine-real-checkpoints.test.ts`; `pine-objects.test.ts` |
 | Drawings and tables | `Public Drawing Zone Checkpoint`; `Public Financial Dashboard Checkpoint`; `Public Linefill Channel Checkpoint`; `Public Zigzag Polyline Checkpoint`; manual comparison milestones plus reduced drawing fixtures | `pine-real-checkpoints.test.ts`; `PINE_CHECKPOINTS.md`; `pine-drawings.test.ts` |
 
 ## Adding A Checkpoint
@@ -136,6 +136,7 @@ chart interaction. Keep those checks manual and repeatable:
 | Divergence markers | `Public Divergence Checkpoint` | Pivot delay, marker bar alignment, and repeated-signal suppression. |
 | Session filters | `Public Session Filter Checkpoint`; `Official Dynamic Session Checkpoint` | Session boundary inclusion, dynamic session strings, exchange timezone assumptions, and masked signals. |
 | Drawing objects | `pine-drawings.test.ts` label/line/box/table fixtures | Object creation bar, update behavior, z-order, and text/color fidelity. |
+| UDT state layout | `Public UDT State Layout Checkpoint` | Wrapped field defaults, first-bar initialization, persistent object mutation, and method-dispatch state. |
 | Strategies | `engine.test.ts` and strategy compat fixtures | Entry/exit bar alignment, fills, position sizing, and ledger values. |
 
 Manual notes should stay short and link to the issue or PR where the comparison

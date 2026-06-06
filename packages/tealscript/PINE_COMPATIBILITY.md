@@ -413,6 +413,10 @@ Compatibility fixtures include a reduced pivot-object array idiom derived from
 TradingView's objects documentation, where scripts define a `pivotPoint` UDT,
 push `pivotPoint.new(...)` instances into an array, retrieve objects with array
 methods, and read fields from the resulting object references.
+The source-linked checkpoint corpus also includes a reduced public
+market-structure state idiom with wrapped UDT field defaults, first-bar
+constructor initialization, persistent object mutation, and method-dispatch
+state.
 
 User-defined `method` declarations now parse and dispatch for primitive and
 UDT receiver values, including method calls that mutate and return UDT
