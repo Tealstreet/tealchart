@@ -5255,6 +5255,12 @@ plot(open, title="After")`;
       const result = executeScript(ast, bars);
 
       expect(result.errors[0]?.message).toBe('stop here');
+      expect(result.errors[0]?.code).toBe('runtime.error');
+      expect(result.errors[0]?.runtimeError).toMatchObject({
+        code: 'runtime.error',
+        message: 'stop here',
+        line: 4,
+      });
       expect(result.plots.find((plot) => plot.title === 'Before')?.values).toEqual([100.2]);
       expect(result.plots.find((plot) => plot.title === 'After')).toBeUndefined();
     });
@@ -5270,6 +5276,7 @@ plot(close)`;
       const result = executeScript(ast, bars);
 
       expect(result.errors[0]?.message).toBe('named stop');
+      expect(result.errors[0]?.code).toBe('runtime.error');
       expect(result.plots).toHaveLength(0);
     });
 

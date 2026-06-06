@@ -159,6 +159,8 @@ class TealscriptWorkerWrapper {
           message: message.message as string,
           line: message.line as number | undefined,
           column: message.column as number | undefined,
+          ...(message.type === 'error' && message.code ? { code: message.code } : {}),
+          ...(message.type === 'error' && message.runtimeError ? { runtimeError: message.runtimeError } : {}),
           diagnostics: message.type === 'semanticError' ? message.diagnostics : undefined,
         });
         break;

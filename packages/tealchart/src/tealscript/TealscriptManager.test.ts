@@ -217,6 +217,50 @@ describe('TealscriptManager', () => {
     expect(errors).toHaveLength(0);
   });
 
+  it('surfaces runtime worker error payloads as runtime errors', async () => {
+    const worker = new FakeWorker();
+    const errors: Array<{ scriptId: string; error: WorkerError }> = [];
+
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      onError: (scriptId, error) => errors.push({ scriptId, error }),
+    });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")');
+    worker.emit({ type: 'ready' });
+    await addScript;
+
+    const [initMessage] = worker.messages as PostedWorkerMessage[];
+    worker.emit({
+      type: 'error',
+      scriptId: 'study-1',
+      message: 'bad bar',
+      code: 'runtime.error',
+      runtimeError: {
+        code: 'runtime.error',
+        message: 'bad bar',
+      },
+      metadata: initMessage?.metadata,
+    });
+
+    expect(errors).toEqual([
+      {
+        scriptId: 'study-1',
+        error: {
+          type: 'runtime',
+          message: 'bad bar',
+          code: 'runtime.error',
+          line: undefined,
+          column: undefined,
+          runtimeError: {
+            code: 'runtime.error',
+            message: 'bad bar',
+          },
+        },
+      },
+    ]);
+  });
+
   it('surfaces semantic worker diagnostics as semantic errors', async () => {
     const worker = new FakeWorker();
     const errors: Array<{ scriptId: string; error: WorkerError }> = [];

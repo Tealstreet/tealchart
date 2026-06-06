@@ -549,6 +549,9 @@ namespace and validates the variadic `message` signature before runtime.
 `log.error()` records an error-level log entry in `ExecutionResult.logs`
 without halting execution; use `runtime.error()` for Pine-compatible runtime
 halts.
+`runtime.error()` halts execution with a stable `runtime.error` code in
+`ExecutionResult.errors`, worker runtime error messages, and Tealchart manager
+error callbacks while preserving the legacy message, line, and column fields.
 
 ## Core `na` And Logical Semantics Coverage
 
