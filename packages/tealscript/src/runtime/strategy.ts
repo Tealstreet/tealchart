@@ -166,6 +166,7 @@ export interface StrategyLedgerSettings {
   processOrdersOnClose: boolean;
   useBarMagnifier: boolean;
   riskFreeRate: number;
+  backtestFillLimitsAssumptionTicks: number;
 }
 
 export interface StrategyOrder {
@@ -320,6 +321,7 @@ export function createDefaultStrategySettings(settings: Partial<StrategyLedgerSe
     processOrdersOnClose: false,
     useBarMagnifier: false,
     riskFreeRate: 2,
+    backtestFillLimitsAssumptionTicks: 0,
     ...settings,
   };
 }
@@ -509,8 +511,9 @@ export function fillPendingStrategyOrders(
   mintick: number = 0,
 ): StrategyFill[] {
   const fills: StrategyFill[] = [];
+  const limitVerificationPrice = getLimitVerificationPrice(ledger.settings, mintick);
   for (const order of ledger.orders) {
-    const price = getPendingOrderFillPrice(order, high, low, barIndex, time);
+    const price = getPendingOrderFillPrice(order, high, low, barIndex, time, limitVerificationPrice);
     if (price === null) {
       continue;
     }
@@ -536,12 +539,13 @@ export function fillPendingStrategyOrdersOnTicks(
     .sort((left, right) => left.sequence - right.sequence);
 
   let previousTick: StrategyExecutionTick | undefined;
+  const limitVerificationPrice = getLimitVerificationPrice(ledger.settings, mintick);
   for (const tick of orderedTicks) {
     const high = previousTick === undefined ? tick.price : Math.max(previousTick.price, tick.price);
     const low = previousTick === undefined ? tick.price : Math.min(previousTick.price, tick.price);
 
     for (const order of ledger.orders) {
-      const price = getPendingOrderFillPriceForTick(order, high, low, tick, barIndex, previousTick === undefined);
+      const price = getPendingOrderFillPriceForTick(order, high, low, tick, barIndex, previousTick === undefined, limitVerificationPrice);
       if (price === null) {
         continue;
       }
@@ -671,6 +675,7 @@ function getPendingOrderFillPrice(
   low: number,
   barIndex: number,
   time: number,
+  limitVerificationPrice: number,
 ): number | null {
   if (order.status !== 'pending' || order.qty === null || order.activationBarIndex >= barIndex) {
     return null;
@@ -680,7 +685,7 @@ function getPendingOrderFillPrice(
   }
 
   if (order.type === 'limit' && order.limitPrice !== undefined) {
-    return getLimitOrderFillPrice(order, high, low);
+    return getLimitOrderFillPrice(order, high, low, limitVerificationPrice);
   }
 
   if (order.type === 'stop' && order.stopPrice !== undefined) {
@@ -716,7 +721,7 @@ function getPendingOrderFillPrice(
     if (order.stopLimitActivatedBarIndex !== null && order.stopLimitActivatedBarIndex >= barIndex) {
       return null;
     }
-    return getLimitOrderFillPrice(order, high, low);
+    return getLimitOrderFillPrice(order, high, low, limitVerificationPrice);
   }
 
   return null;
@@ -729,9 +734,10 @@ function getPendingOrderFillPriceForTick(
   tick: StrategyExecutionTick,
   barIndex: number,
   isOpeningTick: boolean,
+  limitVerificationPrice: number,
 ): number | null {
   const wasStopLimitActivated = order.type === 'stop_limit' && order.stopLimitActivated;
-  const price = getPendingOrderFillPrice(order, high, low, barIndex, tick.time);
+  const price = getPendingOrderFillPrice(order, high, low, barIndex, tick.time, limitVerificationPrice);
   if (
     price === null
     && wasStopLimitActivated
@@ -739,7 +745,7 @@ function getPendingOrderFillPriceForTick(
     && order.stopLimitActivatedBarIndex === barIndex
     && order.createdBarIndex < barIndex
   ) {
-    return getLimitOrderFillPrice(order, high, low);
+    return getLimitOrderFillPrice(order, high, low, limitVerificationPrice);
   }
   if (price === null || !isOpeningTick || order.type === 'trailing_stop') {
     return price;
@@ -781,14 +787,22 @@ function isOpeningGapFill(order: StrategyOrder, openPrice: number): boolean {
   return false;
 }
 
-function getLimitOrderFillPrice(order: StrategyOrder, high: number, low: number): number | null {
+function getLimitVerificationPrice(settings: StrategyLedgerSettings, mintick: number): number {
+  if (!Number.isFinite(mintick) || mintick <= 0) {
+    return 0;
+  }
+  const ticks = Math.max(0, Math.trunc(settings.backtestFillLimitsAssumptionTicks));
+  return ticks * mintick;
+}
+
+function getLimitOrderFillPrice(order: StrategyOrder, high: number, low: number, verificationPrice: number): number | null {
   if (order.limitPrice === undefined) {
     return null;
   }
-  if (order.direction === 'long' && low <= order.limitPrice) {
+  if (order.direction === 'long' && low <= order.limitPrice - verificationPrice) {
     return order.limitPrice;
   }
-  if (order.direction === 'short' && high >= order.limitPrice) {
+  if (order.direction === 'short' && high >= order.limitPrice + verificationPrice) {
     return order.limitPrice;
   }
   return null;

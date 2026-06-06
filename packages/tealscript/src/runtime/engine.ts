@@ -736,6 +736,7 @@ export class TealscriptEngine {
             statement.process_orders_on_close,
             statement.use_bar_magnifier,
             statement.risk_free_rate,
+            statement.backtest_fill_limits_assumption,
           ]),
         );
       case 'LibraryDeclaration':
@@ -2083,6 +2084,12 @@ export class TealscriptEngine {
     }
     if (stmt.risk_free_rate !== undefined) {
       settings.riskFreeRate = this.normalizeFiniteNumber(this.evaluateExpression(stmt.risk_free_rate), 'strategy risk_free_rate');
+    }
+    if (stmt.backtest_fill_limits_assumption !== undefined) {
+      settings.backtestFillLimitsAssumptionTicks = this.normalizeNonNegativeInteger(
+        this.evaluateExpression(stmt.backtest_fill_limits_assumption),
+        'strategy backtest_fill_limits_assumption',
+      );
     }
 
     this.ctx.setStrategyLedger(settings);
