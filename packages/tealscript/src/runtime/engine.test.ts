@@ -2370,6 +2370,90 @@ plot(strategy.position_size)`;
       ]);
     });
 
+    it('cancels stale strategy.exit orders instead of reversing the position', () => {
+      const script = `//@version=6
+strategy("Exit overfill cap", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Take", "Long", qty=1, limit=101.4)
+    strategy.exit("Stop", "Long", qty=1, stop=98)
+plot(strategy.position_size)
+plot(strategy.closedtrades)`;
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 100.4, low: 99.8, close: 100.2, volume: 1000 },
+        { time: 2, open: 100.2, high: 100.5, low: 99.8, close: 100.3, volume: 1000 },
+        { time: 3, open: 100.3, high: 101.5, low: 97.5, close: 100.1, volume: 1000 },
+        { time: 4, open: 100.1, high: 100.4, low: 99.8, close: 100.2, volume: 1000 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        isExit: order.isExit,
+        avgFillPrice: order.avgFillPrice,
+        updatedBarIndex: order.updatedBarIndex,
+      }))).toEqual([
+        { id: 'Long', status: 'filled', isExit: false, avgFillPrice: 100.2, updatedBarIndex: 0 },
+        { id: 'Take', status: 'filled', isExit: true, avgFillPrice: 101.4, updatedBarIndex: 2 },
+        { id: 'Stop', status: 'cancelled', isExit: true, avgFillPrice: null, updatedBarIndex: 2 },
+      ]);
+      expect(result.strategy.position.size).toBe(0);
+      expect(result.strategy.openTrades).toEqual([]);
+      expect(result.strategy.closedTrades).toHaveLength(1);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [1, 1, 1, 0],
+        [0, 0, 0, 1],
+      ]);
+    });
+
+    it('keeps raw strategy.order fills able to reverse positions', () => {
+      const script = `//@version=6
+strategy("Raw order reversal", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.order("Reverse", strategy.short, qty=2, limit=101.4)
+plot(strategy.position_size)
+plot(strategy.opentrades)
+plot(strategy.closedtrades)`;
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 100.4, low: 99.8, close: 100.2, volume: 1000 },
+        { time: 2, open: 100.2, high: 100.5, low: 99.8, close: 100.3, volume: 1000 },
+        { time: 3, open: 100.3, high: 101.5, low: 99.8, close: 101, volume: 1000 },
+        { time: 4, open: 101, high: 101.2, low: 100.5, close: 100.8, volume: 1000 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        isExit: order.isExit,
+        avgFillPrice: order.avgFillPrice,
+      }))).toEqual([
+        { id: 'Long', status: 'filled', isExit: false, avgFillPrice: 100.2 },
+        { id: 'Reverse', status: 'filled', isExit: false, avgFillPrice: 101.4 },
+      ]);
+      expect(result.strategy.position.size).toBe(-1);
+      expect(result.strategy.openTrades).toHaveLength(1);
+      expect(result.strategy.openTrades[0]).toMatchObject({
+        entryOrderId: 'Reverse',
+        direction: 'short',
+        qty: 1,
+      });
+      expect(result.strategy.closedTrades).toHaveLength(1);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [1, 1, 1, -1],
+        [1, 1, 1, 1],
+        [0, 0, 0, 1],
+      ]);
+    });
+
     it('reduces pending strategy.oca.reduce sibling quantities after a fill', () => {
       const script = `//@version=6
 strategy("OCA reduce partial")

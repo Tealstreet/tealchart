@@ -6535,6 +6535,7 @@ export class TealscriptEngine {
         qty,
         qtyType: 'fixed',
         qtyValue: qty,
+        isExit: true,
         limitPrice,
         fromEntry,
         ocaName: exitOcaName,
@@ -6554,6 +6555,7 @@ export class TealscriptEngine {
         qty,
         qtyType: 'fixed',
         qtyValue: qty,
+        isExit: true,
         stopPrice,
         fromEntry,
         ocaName: exitOcaName,
@@ -6573,6 +6575,7 @@ export class TealscriptEngine {
         qty,
         qtyType: 'fixed',
         qtyValue: qty,
+        isExit: true,
         trailActivationPrice,
         trailOffset,
         fromEntry,
@@ -6717,6 +6720,7 @@ export class TealscriptEngine {
       || existingOrder.trailActivationPrice !== input.trailActivationPrice
       || existingOrder.trailOffset !== input.trailOffset;
     existingOrder.direction = input.direction;
+    existingOrder.isExit = input.isExit ?? false;
     if (input.trailActivationPrice !== undefined || input.trailOffset !== undefined) {
       existingOrder.type = 'trailing_stop';
     } else if (input.limitPrice !== undefined && input.stopPrice !== undefined) {
@@ -6847,6 +6851,7 @@ export class TealscriptEngine {
       qty: input.qty,
       qtyType: 'fixed',
       qtyValue: input.qty,
+      isExit: true,
       fromEntry: input.fromEntry,
       comment: input.comment,
       alertMessage: input.alertMessage,
