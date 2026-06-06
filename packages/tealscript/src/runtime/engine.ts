@@ -984,9 +984,18 @@ export class TealscriptEngine {
       case 'ta.percentile_nearest_rank':
       case 'ta.percentile_linear_interpolation':
       case 'ta.percentrank':
+      case 'ta.vwma':
+      case 'ta.cci':
+      case 'ta.wma':
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes);
+      case 'ta.alma':
+      case 'ta.bb':
+      case 'ta.bbw':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['series', 'length'], 1, collectionScopes);
       case 'ta.correlation':
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source1', 'source2', 'length'], 2, collectionScopes);
+      case 'ta.linreg':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length', 'offset'], 1, collectionScopes);
       case 'ta.highest':
       case 'ta.lowest':
       case 'ta.highestbars':

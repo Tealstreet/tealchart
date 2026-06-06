@@ -6245,6 +6245,27 @@ plot(close, title="Close")`;
       expect(result.profile.maxBarsBack).toBe(10);
     });
 
+    it('statically reports unexecuted band and average helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Bands Profile")
+length = input.int(defval=9, title="Length")
+if false
+    plot(ta.vwma(close, length), title="VWMA")
+    plot(ta.cci(source=close, length=8), title="CCI")
+    plot(ta.wma(close, 7), title="WMA")
+    plot(ta.alma(series=close, length=6, offset=0.85, sigma=6), title="ALMA")
+    [middle, upper, lower] = ta.bb(close, length, 2)
+    plot(middle, title="BB")
+    plot(ta.bbw(series=close, length=8, mult=2), title="BBW")
+    plot(ta.linreg(source=close, length=7, offset=0), title="LinReg")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(8);
+    });
+
     it('statically reports unexecuted MACD lookback lengths in the runtime profile', () => {
       const script = `//@version=6
 indicator("Static MACD Profile")
