@@ -25,6 +25,9 @@ real-script intake metadata or corpus summaries:
   `parse_gap`, `semantic_gap`, `unsupported_planned`, `runtime_gap`,
   `data_gap`, `output_gap`, `render_gap`, `oracle_gap`, and
   `licensing_blocked`.
+- Failed stages with an `unsupported-feature` diagnostic code are normalized to
+  the `unsupported_planned` failure class, which keeps planned gaps separate
+  from generic parse, semantic, runtime, or output regressions.
 - `validateCompatibilityStageSequence()` rejects invalid stage statuses,
   duplicate stages, and failure classes on non-failed stages.
 - `runPineCompatibilityCorpus()` converts ledger entries plus deterministic

@@ -92,6 +92,53 @@ describe('Pine compatibility steering model', () => {
     });
   });
 
+  it('classifies unsupported semantic diagnostics as planned compatibility gaps', () => {
+    const stages: CompatibilityStageOutcome[] = [
+      { stage: 'parse', status: 'passed' },
+      {
+        stage: 'semantic',
+        status: 'failed',
+        diagnostics: [{
+          code: 'unsupported-feature',
+          message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+        }],
+      },
+    ];
+
+    expect(validateCompatibilityStageOutcome(stages[1]!)).toEqual([]);
+    expect(validateCompatibilityStageOutcome({
+      stage: 'semantic',
+      status: 'failed',
+      diagnostics: [{ code: 'unknown-function', message: 'Unknown function: ta.foo' }],
+    })).toEqual(['failed stage semantic must include a failureClass']);
+    expect(createCompatibilityRunOutcome({ scriptId: 'public-footprint-gap', pineVersion: 'v6', stages })).toEqual({
+      schemaVersion: PINE_COMPATIBILITY_SCHEMA_VERSION,
+      scriptId: 'public-footprint-gap',
+      pineVersion: 'v6',
+      stages: [
+        { stage: 'parse', status: 'passed' },
+        {
+          stage: 'semantic',
+          status: 'failed',
+          failureClass: 'unsupported_planned',
+          diagnostics: [{
+            code: 'unsupported-feature',
+            message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+          }],
+        },
+        { stage: 'runtime', status: 'not_run' },
+        { stage: 'datafeed', status: 'not_run' },
+        { stage: 'output', status: 'not_run' },
+        { stage: 'render', status: 'not_run' },
+      ],
+      summary: {
+        passed: false,
+        firstFailureStage: 'semantic',
+        firstFailureClass: 'unsupported_planned',
+      },
+    });
+  });
+
   it('validates stage statuses, failure classes, and duplicate stages', () => {
     expect(validateCompatibilityStageOutcome({ stage: 'parse', status: 'failed' })).toEqual([
       'failed stage parse must include a failureClass',
@@ -224,6 +271,46 @@ describe('Pine compatibility steering model', () => {
       request: { total: 1, passed: 0, failed: 1 },
       ta: { total: 1, passed: 1, failed: 0 },
       timeframe: { total: 1, passed: 0, failed: 1 },
+    });
+  });
+
+  it('summarizes planned unsupported diagnostics without validation errors', () => {
+    const unsupportedEntry = createLedgerEntry({
+      id: 'public-planned-unsupported',
+      featureTags: ['request', 'footprint'],
+      source: {
+        kind: 'public_script',
+        searchContext: 'Public TradingView examples using request.footprint',
+        licenseStatus: 'unknown',
+      },
+    });
+
+    const run = runPineCompatibilityCorpus([
+      {
+        ledgerEntry: unsupportedEntry,
+        stages: [
+          { stage: 'parse', status: 'passed' },
+          {
+            stage: 'semantic',
+            status: 'failed',
+            diagnostics: [{ code: 'unsupported-feature', message: 'request.footprint is not supported yet' }],
+          },
+        ],
+      },
+    ]);
+
+    expect(run.summary).toMatchObject({
+      total: 1,
+      passed: 0,
+      failed: 1,
+      byFirstFailureStage: { semantic: 1 },
+      byFirstFailureClass: { unsupported_planned: 1 },
+      validationErrors: {},
+    });
+    expect(run.outcomes[0]?.stages[1]).toMatchObject({
+      stage: 'semantic',
+      status: 'failed',
+      failureClass: 'unsupported_planned',
     });
   });
 
