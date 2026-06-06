@@ -9126,20 +9126,21 @@ export class TealscriptEngine {
 
     // HMA - Hull Moving Average
     // Formula: wma(2 * wma(src, len/2) - wma(src, len), sqrt(len))
-    this.builtins.set('ta.hma', (args, namedArgs, ctx, scope, callId) => {
+    this.builtins.set('ta.hma', (args, namedArgs, _ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
       const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
 
-      const series = this.getSeriesForSource(source, ctx);
+      const values = this.getCompleteSourceWindow(scope, `_ta_hma_source_${callId}_${length}`, source, length);
+      if (!values) return NaN;
 
       // Helper to calculate WMA
-      const calcWma = (len: number, offset: number = 0): number => {
+      const calcWma = (len: number): number => {
         let weightedSum = 0;
         let weightSum = 0;
 
         for (let i = 0; i < len; i++) {
-          const val = series.get(i + offset);
+          const val = values[i];
           if (val === undefined || isNaN(val)) return NaN;
 
           const weight = len - i;
@@ -9166,7 +9167,7 @@ export class TealscriptEngine {
 
       hmaRawHistory.push(rawHma);
       if (hmaRawHistory.length > sqrtLen) hmaRawHistory.shift();
-      scope.declare(hmaRawKey, 'var', hmaRawHistory);
+      this.setBuiltinState(scope, hmaRawKey, hmaRawHistory);
 
       // WMA of the raw values
       if (hmaRawHistory.length < sqrtLen) return NaN;

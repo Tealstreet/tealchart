@@ -1713,10 +1713,13 @@ plot(ta.ema(spread, 3), title="Spread EMA")
 plot(ta.ema(source=spread, 3), title="Mixed Spread EMA")
 plot(ta.rma(spread, 3), title="Spread RMA")
 plot(ta.wma(spread, 3), title="Spread WMA")
+plot(ta.hma(spread, 5), title="Spread HMA")
 plot(ta.rma(source=spread, length=3), title="Named Spread RMA")
 plot(ta.rma(source=spread, 3), title="Mixed Spread RMA")
 plot(ta.wma(source=spread, length=3), title="Named Spread WMA")
 plot(ta.wma(source=spread, 3), title="Mixed Spread WMA")
+plot(ta.hma(source=spread, length=5), title="Named Spread HMA")
+plot(ta.hma(source=spread, 5), title="Mixed Spread HMA")
 plot(ta.highest(spread, 3), title="Spread Highest")
 plot(ta.highest(source=spread, 3), title="Mixed Spread Highest")
 plot(ta.lowest(spread, 3), title="Spread Lowest")
@@ -1737,10 +1740,13 @@ plot(ta.roc(source=spread, 2), title="Mixed Spread ROC")
     expect(roundSeries(getPlot(result, 'Mixed Spread EMA').values)).toEqual(roundSeries(getPlot(result, 'Spread EMA').values));
     expect(roundSeries(getPlot(result, 'Spread RMA').values)).toEqual([null, null, 2.333333, 0.222222, -1.185185, -0.45679, 1.028807, 2.352538, 1.235025, 1.82335, 0.882233, 1.254822]);
     expect(roundSeries(getPlot(result, 'Spread WMA').values)).toEqual([null, null, 2.333333, -0.833333, -3, -1.5, 1.666667, 4, 1.833333, 2, 0.333333, 1.166667]);
+    expect(roundSeries(getPlot(result, 'Spread HMA').values)).toEqual([null, null, null, null, null, -2.355556, 3.644444, 6.666667, 2.622222, 0.777778, -0.022222, 0.355556]);
     expect(roundSeries(getPlot(result, 'Named Spread RMA').values)).toEqual(roundSeries(getPlot(result, 'Spread RMA').values));
     expect(roundSeries(getPlot(result, 'Mixed Spread RMA').values)).toEqual(roundSeries(getPlot(result, 'Spread RMA').values));
     expect(roundSeries(getPlot(result, 'Named Spread WMA').values)).toEqual(roundSeries(getPlot(result, 'Spread WMA').values));
     expect(roundSeries(getPlot(result, 'Mixed Spread WMA').values)).toEqual(roundSeries(getPlot(result, 'Spread WMA').values));
+    expect(roundSeries(getPlot(result, 'Named Spread HMA').values)).toEqual(roundSeries(getPlot(result, 'Spread HMA').values));
+    expect(roundSeries(getPlot(result, 'Mixed Spread HMA').values)).toEqual(roundSeries(getPlot(result, 'Spread HMA').values));
     expect(roundSeries(getPlot(result, 'Spread Highest').values)).toEqual([2, 3, 3, 3, 2, 1, 4, 5, 5, 5, 3, 3]);
     expect(roundSeries(getPlot(result, 'Mixed Spread Highest').values)).toEqual(roundSeries(getPlot(result, 'Spread Highest').values));
     expect(roundSeries(getPlot(result, 'Spread Lowest').values)).toEqual([2, 2, 2, -4, -4, -4, -4, 1, -1, -1, -1, -1]);
