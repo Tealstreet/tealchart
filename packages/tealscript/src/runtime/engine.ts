@@ -3171,9 +3171,9 @@ export class TealscriptEngine {
     const args: unknown[] = [];
     const namedArgs = new Map<string, unknown>();
     const hasPositionalArgumentAfterNamed = this.hasPositionalArgumentAfterNamed(expr.arguments);
-    for (const arg of expr.arguments) {
-      const positionalIndex = arg.name ? -1 : args.length;
-      const value = this.shouldPreserveBuiltinSourceArgument(fullName, arg, positionalIndex)
+    for (let argIndex = 0; argIndex < expr.arguments.length; argIndex++) {
+      const arg = expr.arguments[argIndex]!;
+      const value = this.shouldPreserveBuiltinSourceArgument(fullName, expr.arguments, argIndex)
         ? this.evaluateBuiltinSourceArgument(arg.value)
         : this.evaluateExpression(arg.value);
       if (arg.name) {
@@ -3386,21 +3386,64 @@ export class TealscriptEngine {
     return false;
   }
 
-  private shouldPreserveBuiltinSourceArgument(fullName: string, arg: CallArgument, positionalIndex: number): boolean {
+  private shouldPreserveBuiltinSourceArgument(fullName: string, args: CallArgument[], argIndex: number): boolean {
     if (fullName !== 'math.sum' && !fullName.startsWith('ta.')) return false;
 
+    const parameterName = this.getBuiltinSourceArgumentParameterName(fullName, args, argIndex);
+    return parameterName !== undefined && ['source', 'series', 'source1', 'source2', 'high', 'low'].includes(parameterName);
+  }
+
+  private getBuiltinSourceArgumentParameterName(fullName: string, args: CallArgument[], argIndex: number): string | undefined {
+    const arg = args[argIndex];
+    if (!arg) return undefined;
+
     const name = arg.name?.name;
-    if (name) {
-      return ['source', 'series', 'source1', 'source2', 'high', 'low'].includes(name);
+    if (name) return name;
+
+    const parameters = this.getBuiltinSourcePreservationParameters(fullName);
+    if (!parameters) return undefined;
+
+    const namedParameters = new Set(args.map((candidate) => candidate.name?.name).filter((candidate): candidate is string => candidate !== undefined));
+    let positionalOrdinal = 0;
+    for (let index = 0; index < argIndex; index++) {
+      if (!args[index]!.name) positionalOrdinal++;
     }
 
-    if (fullName === 'math.sum') return positionalIndex === 0;
-    if (['ta.cross', 'ta.crossover', 'ta.crossunder', 'ta.correlation'].includes(fullName)) {
-      return positionalIndex === 0 || positionalIndex === 1;
+    let currentOrdinal = 0;
+    for (const parameter of parameters) {
+      if (namedParameters.has(parameter)) continue;
+      if (currentOrdinal === positionalOrdinal) return parameter;
+      currentOrdinal++;
     }
-    if (fullName === 'ta.stoch') return positionalIndex === 0 || positionalIndex === 1 || positionalIndex === 2;
-    if (fullName === 'ta.valuewhen') return positionalIndex === 1;
-    return positionalIndex === 0;
+    return undefined;
+  }
+
+  private getBuiltinSourcePreservationParameters(fullName: string): readonly string[] | undefined {
+    switch (fullName) {
+      case 'math.sum':
+        return ['source', 'length'];
+      case 'ta.cross':
+      case 'ta.crossover':
+      case 'ta.crossunder':
+      case 'ta.correlation':
+        return ['source1', 'source2', 'length'];
+      case 'ta.stoch':
+        return ['source', 'high', 'low', 'length'];
+      case 'ta.valuewhen':
+        return ['condition', 'source', 'occurrence'];
+      case 'ta.alma':
+        return ['series', 'length', 'offset', 'sigma', 'floor'];
+      case 'ta.bb':
+      case 'ta.bbw':
+        return ['series', 'length', 'mult'];
+      case 'ta.kc':
+      case 'ta.kcw':
+        return ['series', 'length', 'mult', 'useTrueRange'];
+      case 'ta.linreg':
+        return ['source', 'length', 'offset'];
+      default:
+        return fullName.startsWith('ta.') ? ['source', 'length'] : undefined;
+    }
   }
 
   private evaluateBuiltinSourceArgument(expr: Expression): unknown {
@@ -6005,9 +6048,11 @@ export class TealscriptEngine {
     if (!this.isKnownSourceValue(source)) return null;
 
     const values: number[] = [];
-    const offsetLimit = skipNa
-      ? Math.min(this.ctx.bar_index + 1, TealscriptEngine.MAX_BUILTIN_SOURCE_HISTORY)
-      : length;
+    const offsetLimit = Math.min(
+      length,
+      this.ctx.bar_index + 1,
+      TealscriptEngine.MAX_BUILTIN_SOURCE_HISTORY,
+    );
     for (let offset = 0; offset < offsetLimit && values.length < length; offset++) {
       const value = source.series.get(offset);
       if (value === undefined) return null;
