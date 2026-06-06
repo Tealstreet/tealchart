@@ -102,6 +102,7 @@ type TupleInitializerShape =
 
 interface SemanticImportedLibrary {
   alias: string;
+  functions: Map<string, FunctionDeclaration>;
   types: Map<string, TypeDeclaration>;
   enumTypeNames: Set<string>;
   methods: Map<string, FunctionDeclaration[]>;
@@ -1563,6 +1564,7 @@ class SemanticChecker {
 
       const types = new Map<string, TypeDeclaration>();
       const enumTypeNames = new Set<string>();
+      const functions = new Map<string, FunctionDeclaration>();
       const methods = new Map<string, FunctionDeclaration[]>();
       for (const libraryStatement of libraryProgram.body) {
         if (libraryStatement.type === 'TypeDeclaration' && libraryStatement.exported) {
@@ -1573,11 +1575,14 @@ class SemanticChecker {
           const overloads = methods.get(libraryStatement.name.name) ?? [];
           overloads.push(libraryStatement);
           methods.set(libraryStatement.name.name, overloads);
+        } else if (libraryStatement.type === 'FunctionDeclaration' && !libraryStatement.isMethod && libraryStatement.exported) {
+          functions.set(libraryStatement.name.name, libraryStatement);
         }
       }
 
       libraries.set(statement.alias.name, {
         alias: statement.alias.name,
+        functions,
         types,
         enumTypeNames,
         methods,
@@ -3952,7 +3957,9 @@ class SemanticChecker {
 
   private checkUserCallableArguments(expression: CallExpression, scope: SemanticScope): void {
     const offendingArgument = this.firstPositionalArgumentAfterNamed(expression.arguments);
-    const callable = this.resolveLocalUserCallable(expression, scope) ?? this.resolveImportedUserMethodDiagnosticCallable(expression, scope);
+    const callable = this.resolveLocalUserCallable(expression, scope)
+      ?? this.resolveImportedUserFunctionDiagnosticCallable(expression)
+      ?? this.resolveImportedUserMethodDiagnosticCallable(expression, scope);
     if (!callable) return;
 
     if (offendingArgument) {
@@ -4004,6 +4011,52 @@ class SemanticChecker {
       ))[0];
     return declaration
       ? { declaration, displayName: `method ${expression.callee.property.name}`, parameterOffset: 1 }
+      : undefined;
+  }
+
+  private resolveImportedUserFunctionCallable(
+    expression: CallExpression,
+  ): { declaration: FunctionDeclaration; displayName: string; parameterOffset: number; libraryAlias: string } | undefined {
+    if (expression.callee.type !== 'MemberExpression') return undefined;
+
+    const path = this.memberPath(expression.callee);
+    if (path.length !== 2) return undefined;
+
+    const [alias, functionName] = path;
+    if (!alias || !functionName) return undefined;
+
+    const declaration = this.importedLibraries.get(alias)?.functions.get(functionName);
+    if (!declaration || !this.callArgumentsFitParameters(expression.arguments, declaration.params)) return undefined;
+
+    return {
+      declaration,
+      displayName: `library function ${alias}.${functionName}`,
+      parameterOffset: 0,
+      libraryAlias: alias,
+    };
+  }
+
+  private resolveImportedUserFunctionDiagnosticCallable(
+    expression: CallExpression,
+  ): { declaration: FunctionDeclaration; displayName: string; parameterOffset: number; libraryAlias: string } | undefined {
+    const compatibleCallable = this.resolveImportedUserFunctionCallable(expression);
+    if (compatibleCallable) return compatibleCallable;
+    if (expression.callee.type !== 'MemberExpression') return undefined;
+
+    const path = this.memberPath(expression.callee);
+    if (path.length !== 2) return undefined;
+
+    const [alias, functionName] = path;
+    if (!alias || !functionName) return undefined;
+
+    const declaration = this.importedLibraries.get(alias)?.functions.get(functionName);
+    return declaration
+      ? {
+        declaration,
+        displayName: `library function ${alias}.${functionName}`,
+        parameterOffset: 0,
+        libraryAlias: alias,
+      }
       : undefined;
   }
 
@@ -4938,6 +4991,8 @@ class SemanticChecker {
     if (mapValueReadType) return mapValueReadType;
     const userFunctionType = this.inferUserFunctionCallType(expression, scope);
     if (userFunctionType) return userFunctionType;
+    const importedUserFunctionType = this.inferImportedUserFunctionCallType(expression, scope);
+    if (importedUserFunctionType) return importedUserFunctionType;
     const userMethodType = this.inferUserMethodCallType(expression, scope);
     if (userMethodType) return userMethodType;
     const importedUserMethodType = this.inferImportedUserMethodCallType(expression, scope);
@@ -5194,6 +5249,16 @@ class SemanticChecker {
     if (!declaration) return undefined;
 
     return this.inferFunctionTupleElementTypes(declaration, this.inferCallableParameterTypes(declaration, expression.arguments, scope));
+  }
+
+  private inferImportedUserFunctionCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
+    const callable = this.resolveImportedUserFunctionCallable(expression);
+    if (!callable) return undefined;
+
+    return this.inferFunctionReturnType(
+      callable.declaration,
+      this.inferImportedCallableParameterTypes(callable.libraryAlias, callable.declaration, expression.arguments, scope),
+    );
   }
 
   private inferUserMethodCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
