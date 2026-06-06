@@ -5943,7 +5943,15 @@ export class TealscriptEngine {
   }
 
   private builtinCallId(name: string, expr: CallExpression): string {
-    if ((name === 'alert' || name === 'math.random' || name === 'ta.macd' || name === 'ta.obv') && expr.loc) {
+    if (
+      (
+        name === 'alert'
+        || name === 'math.random'
+        || name === 'ta.macd'
+        || name === 'ta.obv'
+        || name === 'ta.supertrend'
+      ) && expr.loc
+    ) {
       this.profileBuiltinCalls += 1;
       return `${name}_${expr.loc.start.line}_${expr.loc.start.column}`;
     }
@@ -9234,7 +9242,7 @@ export class TealscriptEngine {
 
     // SuperTrend - ATR-based trend indicator
     // Returns [supertrend value, direction (1 = up, -1 = down)]
-    this.builtins.set('ta.supertrend', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.supertrend', (args, namedArgs, ctx, scope, callId) => {
       const taSupertrendArgs = ['factor', 'atrPeriod'];
       const factor = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSupertrendArgs, 0, 3.0));
       const atrLength = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSupertrendArgs, 1, 10));
@@ -9252,7 +9260,7 @@ export class TealscriptEngine {
         tr = Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose));
       }
 
-      const atrKey = `_st_atr_${atrLength}`;
+      const atrKey = `_ta_supertrend_atr_${callId}_${atrLength}`;
       let atr = scope.get(atrKey) as number | undefined;
 
       if (atr === undefined || isNaN(atr)) {
@@ -9273,7 +9281,7 @@ export class TealscriptEngine {
       } else {
         atr = (atr * (atrLength - 1) + tr) / atrLength;
       }
-      scope.declare(atrKey, 'var', atr);
+      this.setBuiltinState(scope, atrKey, atr);
 
       // Calculate basic upper and lower bands
       const hl2 = (high + low) / 2;
@@ -9281,9 +9289,9 @@ export class TealscriptEngine {
       const basicLowerBand = hl2 - factor * atr;
 
       // Get previous values
-      const prevUpperKey = `_st_upper_${factor}_${atrLength}`;
-      const prevLowerKey = `_st_lower_${factor}_${atrLength}`;
-      const prevDirKey = `_st_dir_${factor}_${atrLength}`;
+      const prevUpperKey = `_ta_supertrend_upper_${callId}_${factor}_${atrLength}`;
+      const prevLowerKey = `_ta_supertrend_lower_${callId}_${factor}_${atrLength}`;
+      const prevDirKey = `_ta_supertrend_dir_${callId}_${factor}_${atrLength}`;
 
       let prevUpper = scope.get(prevUpperKey) as number | undefined;
       let prevLower = scope.get(prevLowerKey) as number | undefined;
@@ -9323,9 +9331,9 @@ export class TealscriptEngine {
       // SuperTrend value
       const supertrend = direction === 1 ? finalLowerBand : finalUpperBand;
 
-      scope.declare(prevUpperKey, 'var', finalUpperBand);
-      scope.declare(prevLowerKey, 'var', finalLowerBand);
-      scope.declare(prevDirKey, 'var', direction);
+      this.setBuiltinState(scope, prevUpperKey, finalUpperBand);
+      this.setBuiltinState(scope, prevLowerKey, finalLowerBand);
+      this.setBuiltinState(scope, prevDirKey, direction);
 
       return [supertrend, direction];
     });
