@@ -16,6 +16,7 @@ import type {
   InputDefinition,
   IndicatorDeclarationMetadata,
   TealscriptRuntimeOptions,
+  Program,
   Bar,
   FromWorkerMessage,
   WorkerOutputMetadata,
@@ -86,6 +87,11 @@ export interface TealscriptManagerOptions {
    * Provides the current chart runtime context for newly initialized scripts.
    */
   getRuntimeOptions?: () => TealscriptRuntimeOptions;
+
+  /**
+   * Provides host-registered Pine library ASTs for newly initialized scripts.
+   */
+  getLibraries?: () => Map<string, Program>;
 }
 
 /**
@@ -176,6 +182,7 @@ class TealscriptWorkerWrapper {
     bars: Bar[],
     inputs: Record<string, unknown> = {},
     runtime?: TealscriptRuntimeOptions,
+    libraries?: Map<string, Program>,
   ): Promise<void> {
     await this.waitForReady();
     this.scriptId = scriptId;
@@ -186,6 +193,7 @@ class TealscriptWorkerWrapper {
       bars,
       inputs,
       runtime,
+      libraries,
       metadata: this.nextRequestMetadata(true),
     });
   }
@@ -531,6 +539,7 @@ export class TealscriptManager {
       this.bars,
       currentScript.inputValues,
       this.options.getRuntimeOptions?.(),
+      this.options.getLibraries?.(),
     );
   }
 

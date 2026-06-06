@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createResultMessage, type Bar, type DrawingOutput, type PlotOutput, type WorkerError } from '@tealstreet/tealscript';
+import { createResultMessage, type Bar, type DrawingOutput, type PlotOutput, type Program, type WorkerError } from '@tealstreet/tealscript';
 
 import { TealscriptManager } from './TealscriptManager';
 
@@ -26,6 +26,7 @@ class FakeWorker {
 interface PostedWorkerMessage {
   type: string;
   runtime?: unknown;
+  libraries?: unknown;
   metadata?: {
     generation?: number;
     requestId?: number;
@@ -463,5 +464,22 @@ describe('TealscriptManager', () => {
         isticks: false,
       },
     });
+  });
+
+  it('passes host library registries into worker init messages', async () => {
+    const worker = new FakeWorker();
+    const libraries = new Map<string, Program>();
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      getLibraries: () => libraries,
+    });
+
+    const addScript = manager.addScript('study-1', 'import sig from "sig"\nindicator("T")');
+    worker.emit({ type: 'ready' });
+    await addScript;
+
+    const [initMessage] = worker.messages as PostedWorkerMessage[];
+    expect(initMessage.type).toBe('init');
+    expect(initMessage.libraries).toBe(libraries);
   });
 });
