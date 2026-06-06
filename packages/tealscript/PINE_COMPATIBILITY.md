@@ -899,8 +899,8 @@ rollback. Remaining gaps are TradingView-exact sizing and pixel parity.
 
 ## Strategy Diagnostic Coverage
 
-The strategy pass accepts `strategy(...)` declarations and maps common settings
-into the exported ledger primitives for settings, orders, fills, trades,
+The strategy pass accepts `strategy(...)` declarations and maps common settings,
+including risk-free-rate metadata, into the exported ledger primitives for settings, orders, fills, trades,
 positions, and equity snapshots. Read-only `strategy.*` state variables such as
 `strategy.equity`, `strategy.account_currency`, `strategy.position_size`,
 `strategy.position_entry_name`, and trade counters are available for scripts.

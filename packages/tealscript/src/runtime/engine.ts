@@ -735,6 +735,7 @@ export class TealscriptEngine {
             statement.calc_on_every_tick,
             statement.process_orders_on_close,
             statement.use_bar_magnifier,
+            statement.risk_free_rate,
           ]),
         );
       case 'LibraryDeclaration':
@@ -2080,6 +2081,9 @@ export class TealscriptEngine {
     if (stmt.use_bar_magnifier !== undefined) {
       settings.useBarMagnifier = this.isTruthy(this.evaluateExpression(stmt.use_bar_magnifier));
     }
+    if (stmt.risk_free_rate !== undefined) {
+      settings.riskFreeRate = this.normalizeFiniteNumber(this.evaluateExpression(stmt.risk_free_rate), 'strategy risk_free_rate');
+    }
 
     this.ctx.setStrategyLedger(settings);
   }
@@ -2119,6 +2123,14 @@ export class TealscriptEngine {
     const number = this.toNumber(value);
     if (!Number.isFinite(number) || number < 0) {
       throw new Error(`${name} must be a non-negative number`);
+    }
+    return number;
+  }
+
+  private normalizeFiniteNumber(value: unknown, name: string): number {
+    const number = this.toNumber(value);
+    if (!Number.isFinite(number)) {
+      throw new Error(`${name} must be a finite number`);
     }
     return number;
   }
