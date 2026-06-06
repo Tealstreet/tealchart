@@ -2492,6 +2492,41 @@ plot(strategy.opentrades, title="Open Trades")
     });
   });
 
+  it('locks a reduced official strategy intraday filled-order risk idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
+    const bars: Bar[] = [
+      { time: 1_700_380_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_380_060_000, open: 101, high: 102, low: 100, close: 101, volume: 100 },
+      { time: 1_700_380_120_000, open: 102, high: 103, low: 101, close: 102, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Official Intraday Filled Orders Risk Checkpoint", process_orders_on_close=true)
+strategy.risk.max_intraday_filled_orders(count=1)
+if bar_index == 0
+    strategy.entry("Allowed", strategy.long, qty=1)
+if bar_index == 1
+    strategy.entry("Blocked Entry", strategy.long, qty=1)
+if bar_index == 2
+    strategy.order("Blocked Raw", strategy.long, qty=1)
+plot(strategy.position_size, title="Position")
+plot(strategy.opentrades, title="Open Trades")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Position').values).toEqual([1, 1, 1]);
+    expect(getPlot(result, 'Open Trades').values).toEqual([1, 1, 1]);
+    expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Allowed']);
+    expect(result.strategy.orders.map((order) => ({
+      id: order.id,
+      status: order.status,
+      qty: order.qty,
+      requestedQty: order.requestedQty,
+    }))).toEqual([
+      { id: 'Allowed', status: 'filled', qty: 1, requestedQty: 1 },
+    ]);
+    expect(result.strategy.settings.riskRules.maxIntradayFilledOrders).toEqual({ count: 1 });
+  });
+
   it('locks a reduced official strategy bar-magnifier idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const baseTime = 1_700_100_000_000;
