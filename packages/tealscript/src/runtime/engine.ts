@@ -3501,6 +3501,11 @@ export class TealscriptEngine {
   private getSourceSeriesForExpression(expr: Expression, value?: unknown): SeriesAccessor | undefined {
     const valueSeries = this.getSourceSeriesForValue(value);
     if (valueSeries) return valueSeries;
+    if (expr.type === 'ConditionalExpression') {
+      const consequentSource = this.getSourceSeriesForExpression(expr.consequent);
+      const alternateSource = this.getSourceSeriesForExpression(expr.alternate);
+      return consequentSource && consequentSource === alternateSource ? consequentSource : undefined;
+    }
     if (expr.type !== 'Identifier') return undefined;
 
     return this.scope.getSourceSeries(expr.name) ?? this.getKnownSeriesByName(expr.name, this.ctx);
