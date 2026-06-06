@@ -177,6 +177,12 @@ const INPUT_DEFAULT_TYPE_REQUIREMENTS = new Map<string, 'bool' | 'int' | 'number
 
 const INPUT_RANGE_OPTION_OVERLOAD_NAMES = new Set(['input.float', 'input.int']);
 const INPUT_RANGE_OPTION_RANGE_PARAMS = new Set(['minval', 'maxval', 'step']);
+const ALERT_FREQUENCY_VALUES = new Set(['all', 'once_per_bar', 'once_per_bar_close']);
+const ALERT_FREQUENCY_CONSTANT_VALUES = new Map([
+  ['alert.freq_all', 'all'],
+  ['alert.freq_once_per_bar', 'once_per_bar'],
+  ['alert.freq_once_per_bar_close', 'once_per_bar_close'],
+]);
 const REQUEST_GAPS_MODES = new Set(['barmerge.gaps_on', 'barmerge.gaps_off']);
 const REQUEST_LOOKAHEAD_MODES = new Set(['barmerge.lookahead_on', 'barmerge.lookahead_off']);
 const REQUEST_BARMERGE_MODE_CALLS = new Set([
@@ -3218,6 +3224,7 @@ class SemanticChecker {
     this.checkMapCallTypes(expression, scope);
     this.checkInputDefaultValueType(expression, scope);
     this.checkMaxBarsBackLiteralArguments(expression);
+    this.checkAlertFrequencyLiteralArguments(expression);
     this.checkRequestCalcBarsCountLiteralArguments(expression);
     this.checkRequestBarmergeModeLiteralArguments(expression);
     this.checkVisualLineStyleLiteralArguments(expression);
@@ -3945,6 +3952,23 @@ class SemanticChecker {
     if (typeof value === 'string' && !allowedValues.has(value)) {
       this.addDiagnostic('type-mismatch', `${messagePrefix}: ${value}`, expression.loc);
     }
+  }
+
+  private checkAlertFrequencyLiteralArguments(expression: CallExpression): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    if (calleeName !== 'alert') return;
+
+    const parameterNames = BUILTIN_SIGNATURES.get(calleeName)?.params;
+    if (!parameterNames) return;
+
+    const frequency = this.resolveCallArgumentExpression(expression, parameterNames, parameterNames.indexOf('freq'));
+    this.checkNamespacedConstantStringValue(
+      frequency,
+      ALERT_FREQUENCY_VALUES,
+      ALERT_FREQUENCY_CONSTANT_VALUES,
+      'alert.freq_',
+      'Invalid alert frequency',
+    );
   }
 
   private checkVisualLineStyleLiteralArguments(expression: CallExpression): void {
