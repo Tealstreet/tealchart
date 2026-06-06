@@ -6273,6 +6273,21 @@ plot(filled + fixed + asFloat + asInt + (asBool ? 1 : 0) + str.length(asString) 
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('reports invalid global helper value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Global Values")
+badNzSource = nz(source=true)
+badNzReplacement = nz(source=close, replacement=false)
+badFixnan = fixnan(source=true)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'nz source cannot be a boolean',
+      'nz replacement cannot be a boolean',
+      'fixnan source cannot be a boolean',
+    ]);
+  });
+
   it('infers global helper return types for downstream diagnostics', () => {
     const result = checkProgram(parse(`
 indicator("Global Helper Return Types")
