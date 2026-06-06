@@ -832,6 +832,41 @@ plot(state.rising ? 1 : 0, title="Rising Pivot")
     expect(getPlot(result, 'Rising Pivot').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
   });
 
+  it('locks a reduced public UDT state layout idiom', () => {
+    // Public idiom reference: market-structure scripts often wrap UDT field
+    // defaults and then mutate the persistent state object through methods.
+    // Source search: https://www.tradingview.com/scripts/search/market%20structure%20object/
+    const result = runCompatScript(`
+indicator("Public UDT State Layout Checkpoint")
+type PullbackState
+    float base =
+        close
+    float highest =
+        high
+    int touches =
+        0
+
+method track(PullbackState this, bool signal) =>
+    this.highest := math.max(this.highest, high)
+    if signal
+        this.touches += 1
+        this.base := close
+    this
+
+var state = PullbackState.new()
+signal = close > open
+state := state.track(signal)
+plot(state.touches, title="Touch Count")
+plot(state.base, title="Base Close")
+plot(state.highest, title="Highest High")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Touch Count').values).toEqual([1, 2, 3, 3, 3, 4, 5, 6, 6, 7, 7, 8]);
+    expect(getPlot(result, 'Base Close').values).toEqual([102, 105, 107, 107, 107, 100, 104, 109, 109, 111, 111, 112]);
+    expect(getPlot(result, 'Highest High').values).toEqual([103, 106, 108, 109, 109, 109, 109, 110, 111, 112, 114, 114]);
+  });
+
   it('locks a reduced public session-gated signal idiom', () => {
     // Public idiom reference: intraday scripts frequently gate signals with a
     // user/session time filter.
