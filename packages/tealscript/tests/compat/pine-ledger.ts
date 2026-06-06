@@ -292,6 +292,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-udt-state-layout-checkpoint',
+      title: 'Public UDT State Layout Checkpoint',
+      searchContext: 'TradingView public scripts search: market structure object',
+      featureTags: ['objects', 'udt', 'methods', 'state', 'layout'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-session-filter-checkpoint',
       title: 'Public Session Filter Checkpoint',
       searchContext: 'TradingView public scripts search: session filter',
