@@ -144,8 +144,9 @@ Covered behavior and remaining gaps:
   required arguments, and invalid positional arguments after named arguments on
   strict signatures. Visual output diagnostics cover `plot()`, `hline()`,
   `fill()` alias bindings, OHLC `plotbar()` / `plotcandle()` arguments, and
-  marker missing, unknown, and duplicate argument bindings, while semantic
-  analysis preserves `plot()` and `hline()` handle return types for downstream
+  marker missing, unknown, and duplicate argument bindings, plus non-string
+  visual title/text arguments, while semantic analysis preserves `plot()` and
+  `hline()` handle return types for downstream
   assignment diagnostics. Drawing
   constructors distinguish coordinate and `chart.point` overload bindings for
   `line.new()`
@@ -619,6 +620,8 @@ Semantic diagnostics reject invalid literal `display` option values while
 leaving dynamic display expressions available for Pine-style masks. Tealchart renderer
 coverage applies plot line-style metadata in main and indicator panes and
 renders common plot offsets for line, marker, histogram, and area plot styles.
+Semantic diagnostics also reject non-string visual title/text arguments on
+common plot, hline, fill, color, OHLC, marker, and arrow outputs before runtime.
 Renderer coverage also honors `display.none` while retaining hidden plot values
 for dependent fills, and applies `histbase` baselines to histogram/columns and
 area plot rendering when supplied. Area-style plots now render filled regions
