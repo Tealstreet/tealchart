@@ -193,7 +193,7 @@ import {
   fillPendingStrategyMarketOrders,
   fillPendingStrategyOrdersOnTicks,
   fillStrategyMarketOrder,
-  hasReachedStrategyIntradayFilledOrderLimit,
+  hasReachedStrategyOrderRiskLimit,
   markStrategyLedgerToMarket,
   selectStrategyIntrabarContext,
   submitStrategyOrder,
@@ -6370,7 +6370,7 @@ export class TealscriptEngine {
       return undefined;
     }
     const time = this.ctx.time.get(0) ?? 0;
-    if (!isEntry && hasReachedStrategyIntradayFilledOrderLimit(this.ctx.strategyLedger, time)) {
+    if (!isEntry && hasReachedStrategyOrderRiskLimit(this.ctx.strategyLedger, time)) {
       return undefined;
     }
     let requestedQty = this.resolveStrategyOrderQty(qtyType, qtyValue, limitPrice, stopPrice);
@@ -6383,7 +6383,7 @@ export class TealscriptEngine {
       requestedQty = 0;
       orderQty = closeOnlyQty;
     } else if (isEntry) {
-      if (hasReachedStrategyIntradayFilledOrderLimit(this.ctx.strategyLedger, time)) {
+      if (hasReachedStrategyOrderRiskLimit(this.ctx.strategyLedger, time)) {
         return undefined;
       }
       requestedQty = this.applyStrategyMaxPositionSize(direction, requestedQty);
