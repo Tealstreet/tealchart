@@ -287,7 +287,7 @@ EnumFieldDeclaration
 
 // User-defined method: method scale(float this, float factor) => this * factor
 MethodDeclaration
-  = exported:("export" _)? "method" !IdentifierPart _ name:Identifier _ "(" __ first:TypedParameter rest:(__ "," __ Parameter)* __ ")" _ "=>" _ LineTerminator body:FunctionIndentedBlock {
+  = exported:("export" _)? "method" !IdentifierPart _ name:Identifier _ "(" __ first:TypedParameter rest:(__ "," __ Parameter)* (__ ",")? __ ")" _ "=>" _ LineTerminator body:FunctionIndentedBlock {
       return {
         type: 'FunctionDeclaration',
         name,
@@ -298,7 +298,7 @@ MethodDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? "method" !IdentifierPart _ name:Identifier _ "(" __ first:TypedParameter rest:(__ "," __ Parameter)* __ ")" _ "=>" _ body:Expression _ LineTerminator? {
+  / exported:("export" _)? "method" !IdentifierPart _ name:Identifier _ "(" __ first:TypedParameter rest:(__ "," __ Parameter)* (__ ",")? __ ")" _ "=>" _ body:Expression _ LineTerminator? {
       return {
         type: 'FunctionDeclaration',
         name,
@@ -334,7 +334,7 @@ FunctionDeclaration
     }
 
 ParameterList
-  = head:Parameter tail:(__ "," __ Parameter)* {
+  = head:Parameter tail:(__ "," __ Parameter)* (__ ",")? {
       return [head, ...tail.map(t => t[3])];
     }
 
