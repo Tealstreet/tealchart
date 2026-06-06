@@ -677,6 +677,13 @@ const STRATEGY_STRING_PARAMETER_NAMES = new Set([
   'alert_loss',
   'alert_trailing',
 ]);
+const STRATEGY_ENUM_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['strategy.entry', ['direction', 'oca_type']],
+  ['strategy.order', ['direction', 'oca_type']],
+  ['strategy.risk.allow_entry_in', ['value']],
+  ['strategy.risk.max_drawdown', ['type']],
+  ['strategy.risk.max_intraday_loss', ['type']],
+]);
 const STRATEGY_NUMERIC_PARAMETER_NAMES = new Set([
   'qty',
   'limit',
@@ -3502,6 +3509,7 @@ class SemanticChecker {
     this.checkStrategyLiteralArgumentConstraints(expression);
     this.checkStrategyBoolOptionArguments(expression, scope);
     this.checkStrategyStringOptionArguments(expression, scope);
+    this.checkStrategyEnumStringOptionArguments(expression, scope);
     this.checkStrategyNumericOptionArguments(expression, scope);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
@@ -4358,6 +4366,33 @@ class SemanticChecker {
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
 
     for (const parameterName of STRATEGY_STRING_PARAMETER_NAMES) {
+      if (!signature.params.includes(parameterName)) continue;
+
+      const parameterIndex = signature.params.indexOf(parameterName);
+      const argument = this.resolveCallArgumentExpression(expression, signature.params, parameterIndex);
+      if (!argument) continue;
+
+      const argumentType = this.inferExpressionType(argument, scope);
+      if (argumentType.kind === 'unknown' || argumentType.kind === 'string') continue;
+
+      this.addDiagnostic(
+        'type-mismatch',
+        `${calleeName} ${parameterName} must be a string, got ${this.formatSemanticType(argumentType)}`,
+        argument.loc,
+      );
+    }
+  }
+
+  private checkStrategyEnumStringOptionArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const parameterNames = STRATEGY_ENUM_STRING_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!parameterNames) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of parameterNames) {
       if (!signature.params.includes(parameterName)) continue;
 
       const parameterIndex = signature.params.indexOf(parameterName);
