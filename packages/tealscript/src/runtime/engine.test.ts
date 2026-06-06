@@ -2526,6 +2526,78 @@ plot(strategy.position_size)`;
       expect(result.plots[0]?.values).toEqual([1, 0]);
     });
 
+    it('blocks new non-exit orders after strategy.risk.max_cons_loss_days is reached', () => {
+      const script = `//@version=6
+strategy("Consecutive loss day cap", process_orders_on_close=true)
+strategy.risk.max_cons_loss_days(count=2)
+if bar_index == 0
+    strategy.entry("Day 1", strategy.long, qty=1)
+if bar_index == 1
+    strategy.close("Day 1")
+if bar_index == 2
+    strategy.entry("Day 2", strategy.long, qty=1)
+if bar_index == 3
+    strategy.close("Day 2")
+if bar_index == 4
+    strategy.entry("Blocked", strategy.long, qty=1)
+plot(strategy.position_size)`;
+      const bars = [
+        { time: Date.UTC(2024, 0, 1, 9), open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: Date.UTC(2024, 0, 1, 10), open: 100, high: 101, low: 98, close: 99, volume: 100 },
+        { time: Date.UTC(2024, 0, 2, 9), open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: Date.UTC(2024, 0, 2, 10), open: 100, high: 101, low: 97, close: 98, volume: 100 },
+        { time: Date.UTC(2024, 0, 3, 9), open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Day 1', 'Close Day 1', 'Day 2', 'Close Day 2']);
+      expect(result.strategy.closedTrades.map((trade) => ({
+        entryOrderId: trade.entryOrderId,
+        exitOrderId: trade.exitOrderId,
+        profit: trade.profit,
+        exitTime: trade.exitTime,
+      }))).toEqual([
+        { entryOrderId: 'Day 1', exitOrderId: 'Close Day 1', profit: -1, exitTime: Date.UTC(2024, 0, 1, 10) },
+        { entryOrderId: 'Day 2', exitOrderId: 'Close Day 2', profit: -2, exitTime: Date.UTC(2024, 0, 2, 10) },
+      ]);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Day 1', 'Close Day 1', 'Day 2', 'Close Day 2']);
+      expect(result.plots[0]?.values).toEqual([1, 0, 1, 0, 0]);
+    });
+
+    it('cancels pending non-exit fills after strategy.risk.max_cons_loss_days is reached', () => {
+      const script = `//@version=6
+strategy("Pending consecutive loss day cap", pyramiding=2, process_orders_on_close=true)
+strategy.risk.max_cons_loss_days(count=1)
+if bar_index == 0
+    strategy.entry("Loss", strategy.long, qty=1)
+    strategy.entry("Pending", strategy.long, qty=1, limit=95)
+if bar_index == 1
+    strategy.close("Loss")
+plot(strategy.position_size)`;
+      const bars = [
+        { time: Date.UTC(2024, 0, 1, 9), open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: Date.UTC(2024, 0, 1, 10), open: 100, high: 101, low: 98, close: 99, volume: 100 },
+        { time: Date.UTC(2024, 0, 2, 9), open: 99, high: 100, low: 94, close: 96, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        status: order.status,
+        filledQty: order.filledQty,
+      }))).toEqual([
+        { id: 'Loss', status: 'filled', filledQty: 1 },
+        { id: 'Pending', status: 'cancelled', filledQty: 0 },
+        { id: 'Close Loss', status: 'filled', filledQty: 1 },
+      ]);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Loss', 'Close Loss']);
+      expect(result.plots[0]?.values).toEqual([1, 0, 0]);
+    });
+
     it('fills strategy.exit brackets and cancels the sibling OCA order', () => {
       const script = `//@version=6
 strategy("Exit bracket fill", process_orders_on_close=true)
