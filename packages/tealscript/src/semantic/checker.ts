@@ -310,6 +310,31 @@ const MATH_SERIES_FLOAT_RETURN_NAMES = new Set([
   'math.toradians',
   'math.todegrees',
 ]);
+const MATH_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['math.abs', ['number']],
+  ['math.sqrt', ['number']],
+  ['math.log', ['number']],
+  ['math.log10', ['number']],
+  ['math.exp', ['number']],
+  ['math.trunc', ['number']],
+  ['math.floor', ['number']],
+  ['math.ceil', ['number']],
+  ['math.sign', ['number']],
+  ['math.sin', ['number']],
+  ['math.cos', ['number']],
+  ['math.tan', ['number']],
+  ['math.asin', ['number']],
+  ['math.acos', ['number']],
+  ['math.atan', ['number']],
+  ['math.toradians', ['number']],
+  ['math.todegrees', ['number']],
+  ['math.pow', ['base', 'exponent']],
+  ['math.round', ['number', 'precision']],
+  ['math.round_to_mintick', ['number']],
+  ['math.sum', ['source', 'length']],
+  ['math.random', ['min', 'max', 'seed']],
+]);
+const MATH_VARIADIC_NUMERIC_PARAMETER_CALLS = new Set(['math.max', 'math.min', 'math.avg']);
 
 const STRING_RETURN_NAMES = new Set([
   'str.tostring',
@@ -3595,6 +3620,7 @@ class SemanticChecker {
     this.checkInputDefaultValueType(expression, scope);
     this.checkColorFunctionArgumentTypes(expression, scope);
     this.checkStringFunctionArgumentTypes(expression, scope);
+    this.checkMathFunctionArgumentTypes(expression, scope);
     this.checkMaxBarsBackLiteralArguments(expression);
     this.checkAlertFrequencyLiteralArguments(expression);
     this.checkAlertStringOptionArguments(expression, scope);
@@ -4136,11 +4162,27 @@ class SemanticChecker {
     }
   }
 
+  private checkMathFunctionArgumentTypes(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const parameterNames = MATH_NUMERIC_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    const isVariadicMathCall = MATH_VARIADIC_NUMERIC_PARAMETER_CALLS.has(calleeName);
+    if (!parameterNames && !isVariadicMathCall) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    const numericParameterNames = isVariadicMathCall ? this.resolveSignatureParams(expression.arguments, signature) : (parameterNames ?? []);
+    for (const parameterName of numericParameterNames) {
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, numericParameterNames, parameterName, 'number');
+    }
+  }
+
   private checkBuiltinArgumentKind(
     expression: CallExpression,
     scope: SemanticScope,
     calleeName: string,
-    parameterNames: string[],
+    parameterNames: readonly string[],
     parameterName: string,
     expectedKind: 'color' | 'number' | 'string',
   ): void {
@@ -7114,7 +7156,7 @@ class SemanticChecker {
   private inferCallArgumentType(
     expression: CallExpression,
     scope: SemanticScope,
-    parameterNames: string[],
+    parameterNames: readonly string[],
     index: number,
   ): SemanticType | undefined {
     const argument = this.resolveCallArgumentExpression(expression, parameterNames, index);
@@ -7123,7 +7165,7 @@ class SemanticChecker {
 
   private resolveCallArgumentExpression(
     expression: CallExpression,
-    parameterNames: string[],
+    parameterNames: readonly string[],
     index: number,
   ): Expression | undefined {
     const name = parameterNames[index];
