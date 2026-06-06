@@ -1582,6 +1582,18 @@ const VISUAL_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>
   ['plotchar', ['title', 'char', 'text']],
   ['plotarrow', ['title']],
 ]);
+const VISUAL_COLOR_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['barcolor', ['color']],
+  ['bgcolor', ['color']],
+  ['fill', ['color']],
+  ['hline', ['color']],
+  ['plot', ['color']],
+  ['plotbar', ['color']],
+  ['plotcandle', ['color', 'wickcolor', 'bordercolor']],
+  ['plotshape', ['color', 'textcolor']],
+  ['plotchar', ['color', 'textcolor']],
+  ['plotarrow', ['colorup', 'colordown']],
+]);
 
 const DRAWING_XLOC_VALUES = new Set(['bar_index', 'bar_time']);
 const DRAWING_XLOC_CONSTANT_VALUES = new Map([
@@ -1619,6 +1631,27 @@ const DRAWING_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]
   ['table.cell', ['text', 'tooltip']],
   ['table.cell_set_text', ['text']],
   ['table.cell_set_tooltip', ['tooltip']],
+]);
+const DRAWING_COLOR_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['label.new', ['color', 'textcolor']],
+  ['label.set_color', ['color']],
+  ['label.set_textcolor', ['textcolor']],
+  ['line.new', ['color']],
+  ['line.set_color', ['color']],
+  ['box.new', ['border_color', 'bgcolor', 'text_color']],
+  ['box.set_bgcolor', ['color']],
+  ['box.set_border_color', ['color']],
+  ['box.set_text_color', ['text_color']],
+  ['polyline.new', ['line_color', 'fill_color']],
+  ['linefill.new', ['color']],
+  ['linefill.set_color', ['color']],
+  ['table.new', ['bgcolor', 'frame_color', 'border_color']],
+  ['table.set_bgcolor', ['bgcolor']],
+  ['table.set_frame_color', ['frame_color']],
+  ['table.set_border_color', ['border_color']],
+  ['table.cell', ['text_color', 'bgcolor']],
+  ['table.cell_set_bgcolor', ['bgcolor']],
+  ['table.cell_set_text_color', ['text_color']],
 ]);
 const DRAWING_LABEL_STYLE_VALUES = new Set([
   'none',
@@ -3535,6 +3568,7 @@ class SemanticChecker {
     this.checkMarkerStyleLocationSizeLiteralArguments(expression);
     this.checkVisualNumericOptionLiteralArguments(expression);
     this.checkVisualStringOptionArguments(expression, scope);
+    this.checkColorOptionArguments(expression, scope);
     this.checkDisplayOptionLiteralArguments(expression);
     this.checkDrawingCoordinateOptionLiteralArguments(expression, scope);
     this.checkDrawingStyleOptionLiteralArguments(expression, scope);
@@ -4430,9 +4464,9 @@ class SemanticChecker {
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
 
     for (const parameterName of parameterNames) {
-      if (!signature.params.includes(parameterName)) continue;
-
       const parameterIndex = signature.params.indexOf(parameterName);
+      if (parameterIndex === -1) continue;
+
       const argument = this.resolveCallArgumentExpression(expression, signature.params, parameterIndex);
       if (!argument) continue;
 
@@ -4718,6 +4752,34 @@ class SemanticChecker {
     }
   }
 
+  private checkColorOptionArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const parameterNames =
+      VISUAL_COLOR_PARAMETER_NAMES_BY_CALL.get(calleeName) ?? DRAWING_COLOR_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!parameterNames) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of parameterNames) {
+      const parameterIndex = signature.params.indexOf(parameterName);
+      if (parameterIndex === -1) continue;
+
+      const argument = this.resolveCallArgumentExpression(expression, signature.params, parameterIndex);
+      if (!argument) continue;
+
+      const argumentType = this.inferExpressionType(argument, scope);
+      if (argumentType.kind === 'unknown' || argumentType.kind === 'color') continue;
+
+      this.addDiagnostic(
+        'type-mismatch',
+        `${calleeName} ${parameterName} must be a color, got ${this.formatSemanticType(argumentType)}`,
+        argument.loc,
+      );
+    }
+  }
+
   private checkDisplayOptionLiteralArguments(expression: CallExpression): void {
     const calleeName = this.memberPath(expression.callee).join('.');
     const signature = BUILTIN_SIGNATURES.get(calleeName);
@@ -4926,9 +4988,9 @@ class SemanticChecker {
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
 
     for (const parameterName of parameterNames) {
-      if (!signature.params.includes(parameterName)) continue;
-
       const parameterIndex = signature.params.indexOf(parameterName);
+      if (parameterIndex === -1) continue;
+
       const argument = this.resolveCallArgumentExpression(expression, signature.params, parameterIndex);
       if (!argument) continue;
 
