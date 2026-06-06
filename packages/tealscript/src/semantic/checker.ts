@@ -1836,6 +1836,12 @@ const DRAWING_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[
   ['box.set_border_width', ['width']],
   ['polyline.new', ['line_width']],
 ]);
+const DRAWING_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['label.new', ['force_overlay']],
+  ['line.new', ['force_overlay']],
+  ['box.new', ['force_overlay']],
+  ['polyline.new', ['curved', 'closed', 'force_overlay']],
+]);
 const TABLE_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['table.new', ['columns', 'rows', 'frame_width', 'border_width']],
   ['table.clear', ['start_column', 'start_row', 'end_column', 'end_row']],
@@ -4418,14 +4424,18 @@ class SemanticChecker {
   private checkDrawingFunctionArgumentTypes(expression: CallExpression, scope: SemanticScope): void {
     const calleeName = this.memberPath(expression.callee).join('.');
     const numericParameterNames = DRAWING_NUMERIC_PARAMETER_NAMES_BY_CALL.get(calleeName);
-    if (!numericParameterNames) return;
+    const boolParameterNames = DRAWING_BOOL_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!numericParameterNames && !boolParameterNames) return;
 
     const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
     if (!signature) return;
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
 
-    for (const parameterName of numericParameterNames) {
+    for (const parameterName of numericParameterNames ?? []) {
       this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'number');
+    }
+    for (const parameterName of boolParameterNames ?? []) {
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'boolean');
     }
   }
 
