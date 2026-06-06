@@ -5973,6 +5973,8 @@ export class TealscriptEngine {
         || name === 'ta.dmi'
         || name === 'ta.macd'
         || name === 'ta.obv'
+        || name === 'ta.pivothigh'
+        || name === 'ta.pivotlow'
         || name === 'ta.rma'
         || name === 'ta.rsi'
         || name === 'ta.sar'
@@ -8196,11 +8198,6 @@ export class TealscriptEngine {
     return undefined;
   }
 
-  private getSeriesForSource(source: number, ctx: ExecutionContext): { get: (offset: number) => number | undefined } {
-    // Default: fallback to close (most common case)
-    return this.getKnownSeriesForSource(source, ctx) ?? ctx.close;
-  }
-
   private registerTaBuiltins(): void {
     // SMA - Simple Moving Average
     this.builtins.set('ta.sma', (args, namedArgs, _ctx, scope, callId) => {
@@ -9513,26 +9510,32 @@ export class TealscriptEngine {
 
     // PivotHigh - Detect pivot highs
     // Returns the pivot high price or na
-    this.builtins.set('ta.pivothigh', (args, namedArgs, ctx) => {
+    this.builtins.set('ta.pivothigh', (args, namedArgs, ctx, scope, callId) => {
       const [source, leftBars, rightBars] = this.getTaPivotArgs(args, namedArgs, ctx, 'high');
-
-      const series = this.getSeriesForSource(source, ctx);
+      const windowLength = leftBars + rightBars + 1;
+      const values = this.updateBuiltinSourceHistory(
+        scope,
+        `_ta_pivothigh_source_${callId}_${leftBars}_${rightBars}`,
+        source,
+        windowLength,
+      );
+      if (values.length < windowLength) return NaN;
 
       // We need rightBars of data after the potential pivot
       // The pivot would be at offset = rightBars
-      const pivotValue = series.get(rightBars);
-      if (pivotValue === undefined) return NaN;
+      const pivotValue = values[rightBars];
+      if (pivotValue === undefined || isNaN(pivotValue)) return NaN;
 
       // Check left side (bars before the pivot, at higher offsets)
       for (let i = 1; i <= leftBars; i++) {
-        const val = series.get(rightBars + i);
-        if (val === undefined || val >= pivotValue) return NaN;
+        const val = values[rightBars + i];
+        if (val === undefined || isNaN(val) || val >= pivotValue) return NaN;
       }
 
       // Check right side (bars after the pivot, at lower offsets)
       for (let i = 1; i <= rightBars; i++) {
-        const val = series.get(rightBars - i);
-        if (val === undefined || val >= pivotValue) return NaN;
+        const val = values[rightBars - i];
+        if (val === undefined || isNaN(val) || val >= pivotValue) return NaN;
       }
 
       return pivotValue;
@@ -9540,25 +9543,31 @@ export class TealscriptEngine {
 
     // PivotLow - Detect pivot lows
     // Returns the pivot low price or na
-    this.builtins.set('ta.pivotlow', (args, namedArgs, ctx) => {
+    this.builtins.set('ta.pivotlow', (args, namedArgs, ctx, scope, callId) => {
       const [source, leftBars, rightBars] = this.getTaPivotArgs(args, namedArgs, ctx, 'low');
-
-      const series = this.getSeriesForSource(source, ctx);
+      const windowLength = leftBars + rightBars + 1;
+      const values = this.updateBuiltinSourceHistory(
+        scope,
+        `_ta_pivotlow_source_${callId}_${leftBars}_${rightBars}`,
+        source,
+        windowLength,
+      );
+      if (values.length < windowLength) return NaN;
 
       // The pivot would be at offset = rightBars
-      const pivotValue = series.get(rightBars);
-      if (pivotValue === undefined) return NaN;
+      const pivotValue = values[rightBars];
+      if (pivotValue === undefined || isNaN(pivotValue)) return NaN;
 
       // Check left side (bars before the pivot, at higher offsets)
       for (let i = 1; i <= leftBars; i++) {
-        const val = series.get(rightBars + i);
-        if (val === undefined || val <= pivotValue) return NaN;
+        const val = values[rightBars + i];
+        if (val === undefined || isNaN(val) || val <= pivotValue) return NaN;
       }
 
       // Check right side (bars after the pivot, at lower offsets)
       for (let i = 1; i <= rightBars; i++) {
-        const val = series.get(rightBars - i);
-        if (val === undefined || val <= pivotValue) return NaN;
+        const val = values[rightBars - i];
+        if (val === undefined || isNaN(val) || val <= pivotValue) return NaN;
       }
 
       return pivotValue;

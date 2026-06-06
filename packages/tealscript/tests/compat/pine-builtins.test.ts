@@ -534,6 +534,53 @@ plot(ta.linreg(change, 3, 0), title="Change LinReg")
     expect(roundSeries(getPlot(result, 'Change LinReg').values)).toEqual([null, null, null, -3.166667, -5, 0.166667, 4.333333, 5.333333, 0.166667, 1.333333, 0.333333, 0.833333]);
   });
 
+  it('tracks pivot windows for derived sources', () => {
+    const result = runCompatScript(`
+indicator("Pivot derived source")
+spread = close - open
+plot(ta.pivothigh(spread, 2, 2), title="Spread Pivot High")
+plot(ta.pivotlow(spread, 1, 1), title="Spread Pivot Low")
+plot(ta.pivothigh(source=spread, leftbars=2, rightbars=2), title="Named Spread Pivot High")
+plot(ta.pivotlow(source=spread, leftbars=1, rightbars=1), title="Named Spread Pivot Low")
+plot(ta.pivothigh(source=spread, 2, 2), title="Mixed Spread Pivot High")
+plot(ta.pivotlow(source=spread, 1, 1), title="Mixed Spread Pivot Low")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Spread Pivot High').values)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      5,
+      null,
+      null,
+    ]);
+    expect(roundSeries(getPlot(result, 'Spread Pivot Low').values)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      -1,
+      null,
+      -1,
+    ]);
+    expect(roundSeries(getPlot(result, 'Named Spread Pivot High').values)).toEqual(roundSeries(getPlot(result, 'Spread Pivot High').values));
+    expect(roundSeries(getPlot(result, 'Named Spread Pivot Low').values)).toEqual(roundSeries(getPlot(result, 'Spread Pivot Low').values));
+    expect(roundSeries(getPlot(result, 'Mixed Spread Pivot High').values)).toEqual(roundSeries(getPlot(result, 'Spread Pivot High').values));
+    expect(roundSeries(getPlot(result, 'Mixed Spread Pivot Low').values)).toEqual(roundSeries(getPlot(result, 'Spread Pivot Low').values));
+  });
+
   it('runs tail ta helper named argument idioms', () => {
     const positional = runCompatScript(`
 indicator("Tail TA positional helpers")
