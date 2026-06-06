@@ -3,6 +3,7 @@ import {
   TealscriptParseError,
 } from '../parser';
 import { checkProgram } from '../semantic';
+import type { SemanticCheckOptions } from '../semantic';
 
 import type {
   CompatibilityDiagnostic,
@@ -10,10 +11,13 @@ import type {
   CompatibilityStageOutcome,
 } from './index';
 
-export function createPineParseSemanticStageOutcomes(source: string): CompatibilityStageOutcome[] {
+export function createPineParseSemanticStageOutcomes(
+  source: string,
+  semanticOptions: SemanticCheckOptions = {},
+): CompatibilityStageOutcome[] {
   try {
     const program = parse(source);
-    const semanticResult = checkProgram(program);
+    const semanticResult = checkProgram(program, semanticOptions);
 
     if (semanticResult.diagnostics.length > 0) {
       const diagnostics = semanticResult.diagnostics.map((diagnostic) => ({
