@@ -6,7 +6,7 @@
  */
 
 import type { Bar, IBasicDataFeed, UnifiedPaneLayout } from '../types';
-import type { ChartWidgetCoreOptions, IIndicatorManager } from './ChartWidgetCore';
+import type { IIndicatorManager } from './ChartWidgetCore';
 
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 
@@ -127,7 +127,6 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
       instance.dispose();
       coreRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, options.datafeed]);
 
   // Handle symbol prop changes

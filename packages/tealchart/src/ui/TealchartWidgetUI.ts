@@ -14,17 +14,15 @@ import type {
   ResolutionString,
   Viewport,
 } from '../types';
-import type { ChartCoreOptions, IndicatorPaneInfo } from './ChartCore';
+import type { IndicatorPaneInfo } from './ChartCore';
 import type { ActiveIndicator } from './ChartLegend';
-import type { ChartTopBarOptions } from './ChartTopBar';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
-import { getChartStore } from '../state/chartState';
 import { TIME_AXIS_HEIGHT } from '../types';
 import { ChartCore } from './ChartCore';
 import { ChartLegend } from './ChartLegend';
 import { ChartTopBar } from './ChartTopBar';
-import { div, icons, span } from './dom';
+import { div, span } from './dom';
 import { IndicatorPaneLegend } from './IndicatorPaneLegend';
 import { IndicatorSettingsModal } from './IndicatorSettingsModal';
 import { IndicatorsModal } from './IndicatorsModal';

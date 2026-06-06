@@ -695,7 +695,7 @@ export class TealchartRenderer {
    * Handles different line types: 'price' (default), 'order', 'position', 'liquidation'
    */
   private drawPriceLines(bounds: PriceLineLabelBounds[], viewport: Viewport): void {
-    const { ctx, options, margins } = this;
+    const { options, margins } = this;
     const chartHeight = options.height - margins.top - margins.bottom;
     const volumeHeight = options.showVolume ? chartHeight * options.volumeHeight : 0;
     const priceHeight = chartHeight - volumeHeight;
@@ -826,7 +826,7 @@ export class TealchartRenderer {
         const text = segment.textShort || segment.text;
         chartLabelWidth += ctx.measureText(text).width + 8; // padding only, no gap
       }
-      for (const button of chartLabel.buttons || []) {
+      for (const _button of chartLabel.buttons || []) {
         chartLabelWidth += 16; // button width, no gap
       }
 
@@ -1368,7 +1368,7 @@ export class TealchartRenderer {
     backgroundColor: string,
     textColor: string,
     viewport: Viewport,
-    priceHeight: number,
+    _priceHeight: number,
   ): void {
     const { ctx, options, margins } = this;
 
@@ -1584,12 +1584,11 @@ export class TealchartRenderer {
    * Draw crosshair vertical line, horizontal lines on all panes, and time label
    * Note: Price label for main pane is rendered through the unified PriceLine system
    */
-  drawCrosshair(crosshair: CrosshairState, viewport: Viewport, layout?: UnifiedPaneLayout): void {
+  drawCrosshair(crosshair: CrosshairState, viewport: Viewport, _layout?: UnifiedPaneLayout): void {
     if (!crosshair.visible) return;
 
     const { ctx, options, margins } = this;
     const chartWidth = options.width - margins.left - margins.right;
-    const chartHeight = options.height - margins.top - margins.bottom;
 
     const { x, y } = crosshair;
 
@@ -3085,7 +3084,7 @@ export class TealchartRenderer {
     priceLines: PriceLine[],
     viewport: Viewport,
     layout: UnifiedPaneLayout,
-    plots?: PlotOutput[],
+    _plots?: PlotOutput[],
     _crosshair?: { y: number; visible: boolean; color: string },
   ): PriceLineLabelBounds[] {
     const { ctx, options } = this;
@@ -3536,7 +3535,7 @@ export class TealchartRenderer {
     executionLines?: ExecutionLineRenderData[],
     drawings?: DrawingOutput[],
   ): void {
-    const { ctx, options, margins } = this;
+    const { options } = this;
 
     // Compute pixel positions for all panes
     const computedPanes = this.computePanesLayout(layout, options.height);
@@ -3612,7 +3611,7 @@ export class TealchartRenderer {
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
     drawings?: DrawingOutput[],
   ): void {
-    const { ctx, options, margins } = this;
+    const { ctx, options } = this;
 
     // Clip to pane bounds for indicator panes only
     // Main pane is NOT clipped so candles can render under the top bar (transparent overlay)
@@ -3658,7 +3657,7 @@ export class TealchartRenderer {
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
     drawings?: DrawingOutput[],
   ): void {
-    const { ctx, options, margins } = this;
+    const { options } = this;
 
     // Draw grid for main pane
     this.renderPaneGrid(pane, viewport);
@@ -3899,7 +3898,7 @@ export class TealchartRenderer {
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
     drawings?: DrawingOutput[],
   ): void {
-    const { ctx, options, margins } = this;
+    const { ctx, options } = this;
 
     // Draw pane background first (same as main chart for consistency)
     ctx.fillStyle = options.backgroundColor;
@@ -4116,7 +4115,6 @@ export class TealchartRenderer {
     // Volume uses bottom 15% of main pane
     const volumeRatio = 0.15;
     const volumeHeight = pane.height * volumeRatio;
-    const volumeTop = pane.bottom - volumeHeight;
 
     const maxVolume = Math.max(...bars.map((b) => b.volume));
     if (maxVolume === 0) return;
@@ -4419,7 +4417,7 @@ export class TealchartRenderer {
     // Use extended width that goes under the price axis for transparency effect
     const chartWidth = options.width - margins.left;
 
-    const { values, color, linewidth = 1 } = plot;
+    const { values, color } = plot;
     const plotBaseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
 
     // Check for style overrides
@@ -4491,7 +4489,7 @@ export class TealchartRenderer {
     viewport: Viewport,
     pane: ComputedPane,
   ): PriceLineLabelBounds[] {
-    const { ctx, options, margins } = this;
+    const { ctx, margins } = this;
 
     // Calculate initial bounds for each label
     const labelFont = `11px ${this.font}`;
@@ -4716,7 +4714,7 @@ export class TealchartRenderer {
         const text = segment.textShort || segment.text;
         chartLabelWidth += ctx.measureText(text).width + 8; // padding only, no gap
       }
-      for (const button of chartLabel.buttons || []) {
+      for (const _button of chartLabel.buttons || []) {
         chartLabelWidth += 16; // button width, no gap
       }
 
