@@ -2290,6 +2290,10 @@ class SemanticChecker {
     this.checkDeclarationFormatValue(statement.format, statement.declarationKind);
     this.checkDeclarationScaleValue(statement.scale, statement.declarationKind);
     this.checkNonNegativeLiteralIntegerValue(
+      statement.precision,
+      `${statement.declarationKind} precision must be a non-negative integer`,
+    );
+    this.checkNonNegativeLiteralIntegerValue(
       statement.max_bars_back,
       `${statement.declarationKind} max_bars_back must be a non-negative integer`,
     );

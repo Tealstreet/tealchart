@@ -599,6 +599,18 @@ strategy("Invalid Strategy Format Scale", format=format.bad, scale="center")
     ]);
   });
 
+  it('reports invalid literal declaration precision values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Precision", precision=-1)
+strategy("Invalid Strategy Precision", precision=1.5)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'indicator precision must be a non-negative integer',
+      'strategy precision must be a non-negative integer',
+    ]);
+  });
+
   it('reports invalid literal calc_bars_count values', () => {
     const result = checkProgram(parse(`
 indicator("Invalid Calc Bars Count", calc_bars_count=-1)
