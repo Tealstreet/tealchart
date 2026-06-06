@@ -552,6 +552,20 @@ max_bars_back(close, 10, 20)
     ]);
   });
 
+  it('reports invalid literal max_bars_back values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Max Bars Back", max_bars_back=-1)
+max_bars_back(close, num=-2)
+max_bars_back(open, 1.5)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'indicator max_bars_back must be a non-negative integer',
+      'max_bars_back num must be a non-negative integer',
+      'max_bars_back num must be a non-negative integer',
+    ]);
+  });
+
   it('reports invalid OHLC visual output argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Invalid OHLC Visual Bindings")
