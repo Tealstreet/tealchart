@@ -5933,6 +5933,30 @@ econ = request.economic("US", "GDP", unexpected=1)
     ]);
   });
 
+  it('reports invalid literal request point-series field values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Request Fields")
+badDividendConstant = request.dividends("NASDAQ:AAPL", dividends.cash)
+badDividendString = request.dividends("NASDAQ:AAPL", "gross")
+badEarningsConstant = request.earnings("NASDAQ:AAPL", earnings.forecast)
+badEarningsString = request.earnings("NASDAQ:AAPL", "estimate")
+badSplitConstant = request.splits("NASDAQ:AAPL", splits.adjusted)
+badSplitString = request.splits("NASDAQ:AAPL", "numerator")
+duplicate = request.dividends("NASDAQ:AAPL", dividends.gross, ticker="NASDAQ:MSFT")
+plot(badDividendConstant + badDividendString + badEarningsConstant + badEarningsString + badSplitConstant + badSplitString + duplicate)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid request.dividends field: dividends.cash',
+      'Invalid request.dividends field: gross',
+      'Invalid request.earnings field: earnings.forecast',
+      'Invalid request.earnings field: estimate',
+      'Invalid request.splits field: splits.adjusted',
+      'Invalid request.splits field: numerator',
+      "Argument 'ticker' for request.dividends() was supplied multiple times",
+    ]);
+  });
+
   it('resolves Pine input overload bindings for range and options calls', () => {
     const result = checkProgram(parse(`
 indicator("Input Overloads")

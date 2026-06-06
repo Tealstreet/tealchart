@@ -193,6 +193,12 @@ const REQUEST_BARMERGE_MODE_CALLS = new Set([
   'request.financial',
   'request.economic',
 ]);
+const REQUEST_DIVIDENDS_FIELD_VALUES = new Set(['dividends.gross', 'dividends.net']);
+const REQUEST_DIVIDENDS_FIELD_CONSTANT_VALUES = new Map([...REQUEST_DIVIDENDS_FIELD_VALUES].map((value) => [value, value]));
+const REQUEST_EARNINGS_FIELD_VALUES = new Set(['earnings.actual', 'earnings.estimate', 'earnings.standardized']);
+const REQUEST_EARNINGS_FIELD_CONSTANT_VALUES = new Map([...REQUEST_EARNINGS_FIELD_VALUES].map((value) => [value, value]));
+const REQUEST_SPLITS_FIELD_VALUES = new Set(['splits.denominator', 'splits.numerator']);
+const REQUEST_SPLITS_FIELD_CONSTANT_VALUES = new Map([...REQUEST_SPLITS_FIELD_VALUES].map((value) => [value, value]));
 
 const COLOR_CONSTRUCTOR_NAMES = new Set(['color.new', 'color.rgb']);
 const COLOR_CHANNEL_NAMES = new Set(['color.r', 'color.g', 'color.b', 'color.t']);
@@ -3382,6 +3388,7 @@ class SemanticChecker {
     this.checkAlertFrequencyLiteralArguments(expression);
     this.checkRequestCalcBarsCountLiteralArguments(expression);
     this.checkRequestBarmergeModeLiteralArguments(expression);
+    this.checkRequestSeriesFieldLiteralArguments(expression, scope);
     this.checkVisualLineStyleLiteralArguments(expression);
     this.checkVisualFormatPrecisionLiteralArguments(expression);
     this.checkMarkerStyleLocationSizeLiteralArguments(expression);
@@ -4113,6 +4120,51 @@ class SemanticChecker {
     const value = this.constantLiteralValue(expression);
     if (typeof value === 'string' && !allowedValues.has(value)) {
       this.addDiagnostic('type-mismatch', `${messagePrefix}: ${value}`, expression.loc);
+    }
+  }
+
+  private checkRequestSeriesFieldLiteralArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    if (calleeName !== 'request.dividends' && calleeName !== 'request.earnings' && calleeName !== 'request.splits') return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    switch (calleeName) {
+      case 'request.dividends':
+        this.checkDrawingOptionLiteralArgument(
+          expression,
+          signature.params,
+          calleeName,
+          'field',
+          REQUEST_DIVIDENDS_FIELD_VALUES,
+          REQUEST_DIVIDENDS_FIELD_CONSTANT_VALUES,
+          'dividends.',
+        );
+        break;
+      case 'request.earnings':
+        this.checkDrawingOptionLiteralArgument(
+          expression,
+          signature.params,
+          calleeName,
+          'field',
+          REQUEST_EARNINGS_FIELD_VALUES,
+          REQUEST_EARNINGS_FIELD_CONSTANT_VALUES,
+          'earnings.',
+        );
+        break;
+      case 'request.splits':
+        this.checkDrawingOptionLiteralArgument(
+          expression,
+          signature.params,
+          calleeName,
+          'field',
+          REQUEST_SPLITS_FIELD_VALUES,
+          REQUEST_SPLITS_FIELD_CONSTANT_VALUES,
+          'splits.',
+        );
+        break;
     }
   }
 
