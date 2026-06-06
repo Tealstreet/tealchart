@@ -1452,6 +1452,59 @@ const DRAWING_EXTEND_CONSTANT_VALUES = new Map([
   ['extend.left', 'left'],
   ['extend.both', 'both'],
 ]);
+const DRAWING_LINE_STYLE_VALUES = new Set(['solid', 'dotted', 'dashed', 'arrow_left', 'arrow_right', 'arrow_both']);
+const DRAWING_LINE_STYLE_CONSTANT_VALUES = new Map([
+  ['line.style_solid', 'solid'],
+  ['line.style_dotted', 'dotted'],
+  ['line.style_dashed', 'dashed'],
+  ['line.style_arrow_left', 'arrow_left'],
+  ['line.style_arrow_right', 'arrow_right'],
+  ['line.style_arrow_both', 'arrow_both'],
+]);
+const DRAWING_LABEL_STYLE_VALUES = new Set([
+  'none',
+  'label_up',
+  'label_down',
+  'label_left',
+  'label_right',
+  'label_center',
+  'label_lower_left',
+  'label_lower_right',
+  'label_upper_left',
+  'label_upper_right',
+  'circle',
+  'square',
+  'diamond',
+  'cross',
+  'xcross',
+  'triangleup',
+  'triangledown',
+  'flag',
+  'arrowup',
+  'arrowdown',
+]);
+const DRAWING_LABEL_STYLE_CONSTANT_VALUES = new Map([
+  ['label.style_none', 'none'],
+  ['label.style_label_up', 'label_up'],
+  ['label.style_label_down', 'label_down'],
+  ['label.style_label_left', 'label_left'],
+  ['label.style_label_right', 'label_right'],
+  ['label.style_label_center', 'label_center'],
+  ['label.style_label_lower_left', 'label_lower_left'],
+  ['label.style_label_lower_right', 'label_lower_right'],
+  ['label.style_label_upper_left', 'label_upper_left'],
+  ['label.style_label_upper_right', 'label_upper_right'],
+  ['label.style_circle', 'circle'],
+  ['label.style_square', 'square'],
+  ['label.style_diamond', 'diamond'],
+  ['label.style_cross', 'cross'],
+  ['label.style_xcross', 'xcross'],
+  ['label.style_triangleup', 'triangleup'],
+  ['label.style_triangledown', 'triangledown'],
+  ['label.style_flag', 'flag'],
+  ['label.style_arrowup', 'arrowup'],
+  ['label.style_arrowdown', 'arrowdown'],
+]);
 
 for (const name of CALENDAR_FUNCTION_NAMES) {
   BUILTIN_SIGNATURES.set(name, { params: ['time', 'timezone'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true });
@@ -3262,6 +3315,7 @@ class SemanticChecker {
     this.checkVisualNumericOptionLiteralArguments(expression);
     this.checkDisplayOptionLiteralArguments(expression);
     this.checkDrawingCoordinateOptionLiteralArguments(expression, scope);
+    this.checkDrawingStyleOptionLiteralArguments(expression, scope);
     this.checkStrategyLiteralArgumentConstraints(expression);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
@@ -4196,6 +4250,76 @@ class SemanticChecker {
       DRAWING_EXTEND_CONSTANT_VALUES,
       'extend.',
     );
+  }
+
+  private checkDrawingStyleOptionLiteralArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+
+    if (calleeName === 'line.new' || calleeName === 'line.set_style') {
+      this.checkDrawingOptionLiteralArgument(
+        expression,
+        signature.params,
+        calleeName,
+        'style',
+        DRAWING_LINE_STYLE_VALUES,
+        DRAWING_LINE_STYLE_CONSTANT_VALUES,
+        'line.style_',
+      );
+      return;
+    }
+
+    if (calleeName === 'label.new' || calleeName === 'label.set_style') {
+      this.checkDrawingOptionLiteralArgument(
+        expression,
+        signature.params,
+        calleeName,
+        'style',
+        DRAWING_LABEL_STYLE_VALUES,
+        DRAWING_LABEL_STYLE_CONSTANT_VALUES,
+        'label.style_',
+      );
+      return;
+    }
+
+    if (calleeName === 'box.new') {
+      this.checkDrawingOptionLiteralArgument(
+        expression,
+        signature.params,
+        calleeName,
+        'border_style',
+        DRAWING_LINE_STYLE_VALUES,
+        DRAWING_LINE_STYLE_CONSTANT_VALUES,
+        'line.style_',
+      );
+      return;
+    }
+
+    if (calleeName === 'box.set_border_style') {
+      this.checkDrawingOptionLiteralArgument(
+        expression,
+        signature.params,
+        calleeName,
+        'style',
+        DRAWING_LINE_STYLE_VALUES,
+        DRAWING_LINE_STYLE_CONSTANT_VALUES,
+        'line.style_',
+      );
+      return;
+    }
+
+    if (calleeName === 'polyline.new') {
+      this.checkDrawingOptionLiteralArgument(
+        expression,
+        signature.params,
+        calleeName,
+        'line_style',
+        DRAWING_LINE_STYLE_VALUES,
+        DRAWING_LINE_STYLE_CONSTANT_VALUES,
+        'line.style_',
+      );
+    }
   }
 
   private checkDrawingOptionLiteralArgument(

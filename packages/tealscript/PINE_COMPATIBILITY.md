@@ -874,7 +874,7 @@ drawing output. The label mutation pass covers persistent `var` label handles,
 mutators and getters accept Pine-style named `id` and value arguments. Semantic
 analysis preserves known label getter return types and `label.all` handle-array
 element types for downstream diagnostics, and rejects invalid literal `xloc`
-and `yloc` option values. Rendering
+and `yloc` option values plus invalid literal label `style` values. Rendering
 routes labels to the script pane: overlay scripts use the main pane, non-overlay
 scripts use their indicator pane. Renderer coverage handles text-only
 `label.style_none`, directional label bodies, and common symbol bodies including
@@ -897,8 +897,8 @@ and getters accept Pine-style named `id`, value, and point arguments. Semantic
 analysis validates `line.new()` call-shape names, preserves known line getter
 return types, and preserves `line.all` handle-array element types for
 downstream diagnostics, while rejecting invalid literal `xloc` and `extend`
-option values. Rendering routes line segments to the script pane with
-color/style/width, horizontal extension support, and Pine
+option values plus invalid literal line `style` values. Rendering routes line
+segments to the script pane with color/style/width, horizontal extension support, and Pine
 `line.style_arrow_left`, `line.style_arrow_right`, and `line.style_arrow_both`
 arrowheads.
 `force_overlay` lines render in the main pane even when created by non-overlay
@@ -928,8 +928,8 @@ common border, fill, text, `extend`, and `xloc` options, including
 and point arguments. Semantic analysis validates `box.new()` call-shape names,
 preserves known box getter return types, preserves `box.all` handle-array
 element types for downstream diagnostics, and rejects invalid literal `xloc`
-and `extend` option values. Rendering routes filled rectangles to
-the script pane with borders, text alignment, `text_wrap=auto` wrapping,
+and `extend` option values plus invalid literal border-style values. Rendering
+routes filled rectangles to the script pane with borders, text alignment, `text_wrap=auto` wrapping,
 default/monospace font-family metadata, and bold/italic text formatting. Full
 TradingView text pixel parity and remaining edge-case
 styling remain planned.
@@ -939,9 +939,9 @@ arguments, `polyline.copy()`, `polyline.delete()`, and `polyline.all`.
 `polyline.copy()` and `polyline.delete()` accept Pine-style named `id`
 arguments. Semantic analysis preserves `polyline.new()` and `polyline.copy()`
 handle return types and `polyline.all` handle-array element types for downstream
-diagnostics, and rejects invalid literal `xloc` option values. Renderer coverage
-applies fixed path geometry, optional fill, line styling, and approximate curved
-paths when `curved=true`. The checkpoint corpus tracks a reduced public zigzag-polyline idiom that renders recent swing
+diagnostics, and rejects invalid literal `xloc` and `line_style` option values.
+Renderer coverage applies fixed path geometry, optional fill, line styling, and
+approximate curved paths when `curved=true`. The checkpoint corpus tracks a reduced public zigzag-polyline idiom that renders recent swing
 `chart.point` vertices as a last-bar path.
 
 ## Table Drawing Coverage
