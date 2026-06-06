@@ -223,7 +223,7 @@ TypeFieldDeclaration
   / UntypedTypeFieldDeclaration
 
 TypedTypeFieldDeclaration
-  = varip:("varip" !IdentifierPart _)? type:TypeAnnotation _ name:Identifier defaultValue:(_ "=" _ Expression)? _ LineTerminator? {
+  = varip:("varip" !IdentifierPart _)? type:TypeAnnotation _ name:Identifier defaultValue:(_ "=" InitializerSpace Expression)? _ LineTerminator? {
       return {
         type: 'TypeFieldDeclaration',
         name,
@@ -235,7 +235,7 @@ TypedTypeFieldDeclaration
     }
 
 UntypedTypeFieldDeclaration
-  = varip:("varip" !IdentifierPart _)? name:Identifier defaultValue:(_ "=" _ Expression)? _ LineTerminator? {
+  = varip:("varip" !IdentifierPart _)? name:Identifier defaultValue:(_ "=" InitializerSpace Expression)? _ LineTerminator? {
       return {
         type: 'TypeFieldDeclaration',
         name,
