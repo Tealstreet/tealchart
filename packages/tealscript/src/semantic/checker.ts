@@ -1762,6 +1762,18 @@ const VISUAL_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['plotchar', ['editable', 'force_overlay']],
   ['plotarrow', ['editable', 'force_overlay']],
 ]);
+const VISUAL_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['barcolor', ['offset', 'show_last']],
+  ['bgcolor', ['offset', 'show_last']],
+  ['fill', ['show_last']],
+  ['hline', ['price', 'linewidth']],
+  ['plot', ['linewidth', 'histbase', 'offset', 'show_last', 'precision']],
+  ['plotbar', ['open', 'high', 'low', 'close', 'show_last', 'precision']],
+  ['plotcandle', ['open', 'high', 'low', 'close', 'show_last', 'precision']],
+  ['plotshape', ['offset', 'show_last', 'precision']],
+  ['plotchar', ['offset', 'show_last', 'precision']],
+  ['plotarrow', ['series', 'offset', 'minheight', 'maxheight', 'show_last', 'precision']],
+]);
 
 const DRAWING_XLOC_VALUES = new Set(['bar_index', 'bar_time']);
 const DRAWING_XLOC_CONSTANT_VALUES = new Map([
@@ -3796,6 +3808,7 @@ class SemanticChecker {
     this.checkVisualFormatPrecisionLiteralArguments(expression);
     this.checkMarkerStyleLocationSizeLiteralArguments(expression);
     this.checkVisualNumericOptionLiteralArguments(expression);
+    this.checkVisualNumericOptionArguments(expression, scope);
     this.checkVisualStringOptionArguments(expression, scope);
     this.checkVisualBoolOptionArguments(expression, scope);
     this.checkColorOptionArguments(expression, scope);
@@ -5195,6 +5208,20 @@ class SemanticChecker {
         `${calleeName} ${parameterName} must be a string, got ${this.formatSemanticType(argumentType)}`,
         argument.loc,
       );
+    }
+  }
+
+  private checkVisualNumericOptionArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const parameterNames = VISUAL_NUMERIC_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!parameterNames) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of parameterNames) {
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'number');
     }
   }
 
