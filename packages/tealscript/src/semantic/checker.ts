@@ -204,6 +204,13 @@ const REQUEST_EARNINGS_FIELD_VALUES = new Set(['earnings.actual', 'earnings.esti
 const REQUEST_EARNINGS_FIELD_CONSTANT_VALUES = new Map([...REQUEST_EARNINGS_FIELD_VALUES].map((value) => [value, value]));
 const REQUEST_SPLITS_FIELD_VALUES = new Set(['splits.denominator', 'splits.numerator']);
 const REQUEST_SPLITS_FIELD_CONSTANT_VALUES = new Map([...REQUEST_SPLITS_FIELD_VALUES].map((value) => [value, value]));
+const STRATEGY_DECLARATION_BOOL_OPTIONS = [
+  'calc_on_order_fills',
+  'calc_on_every_tick',
+  'process_orders_on_close',
+  'use_bar_magnifier',
+  'fill_orders_on_standard_ohlc',
+] as const;
 
 const COLOR_CONSTRUCTOR_NAMES = new Set(['color.new', 'color.rgb']);
 const COLOR_CHANNEL_NAMES = new Set(['color.r', 'color.g', 'color.b', 'color.t']);
@@ -2470,7 +2477,7 @@ class SemanticChecker {
   private checkStatement(statement: Statement, scope: SemanticScope): void {
     switch (statement.type) {
       case 'IndicatorDeclaration':
-        this.checkIndicatorDeclarationArguments(statement);
+        this.checkIndicatorDeclarationArguments(statement, scope);
         this.checkExpressions(scope, [
           statement.title,
           statement.shorttitle,
@@ -2549,7 +2556,7 @@ class SemanticChecker {
     }
   }
 
-  private checkIndicatorDeclarationArguments(statement: IndicatorDeclaration): void {
+  private checkIndicatorDeclarationArguments(statement: IndicatorDeclaration, scope: SemanticScope): void {
     const displayName = `${statement.declarationKind}()`;
     const allowedKeys = statement.declarationKind === 'strategy'
       ? STRATEGY_DECLARATION_KEYS
@@ -2587,6 +2594,7 @@ class SemanticChecker {
     );
     if (statement.declarationKind === 'strategy') {
       this.checkStrategyDeclarationLiteralValueConstraints(statement);
+      this.checkStrategyDeclarationBooleanOptions(statement, scope);
     }
   }
 
@@ -4753,6 +4761,22 @@ class SemanticChecker {
       'strategy backtest_fill_limits_assumption must be a non-negative integer',
     );
     this.checkStrategyCloseEntriesRuleValue(statement.close_entries_rule);
+  }
+
+  private checkStrategyDeclarationBooleanOptions(statement: IndicatorDeclaration, scope: SemanticScope): void {
+    for (const optionName of STRATEGY_DECLARATION_BOOL_OPTIONS) {
+      const expression = statement[optionName];
+      if (!expression) continue;
+
+      const type = this.inferExpressionType(expression, scope);
+      if (type.kind === 'unknown' || type.kind === 'bool') continue;
+
+      this.addDiagnostic(
+        'type-mismatch',
+        `strategy ${optionName} must be a boolean, got ${this.formatSemanticType(type)}`,
+        expression.loc,
+      );
+    }
   }
 
   private checkStrategyDefaultQtyTypeValue(expression: Expression | undefined): void {
