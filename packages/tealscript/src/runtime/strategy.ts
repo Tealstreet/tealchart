@@ -173,6 +173,7 @@ export interface StrategyLedgerSettings {
 
 export interface StrategyOrder {
   id: string;
+  sourceId?: string;
   direction: StrategyDirection;
   type: StrategyOrderType;
   status: StrategyOrderStatus;
@@ -212,6 +213,7 @@ export interface StrategyOrder {
 
 export interface StrategyOrderInput {
   id: string;
+  sourceId?: string;
   direction: StrategyDirection;
   qty: number | null;
   qtyType: StrategyQuantityType;
@@ -425,6 +427,7 @@ export function createStrategyOrder(input: StrategyOrderInput): StrategyOrder {
   validateStrategyOrderInput(input);
   return {
     id: input.id,
+    sourceId: input.sourceId,
     direction: input.direction,
     type: inferStrategyOrderType(
       input.limitPrice,
@@ -920,7 +923,7 @@ export function cancelStrategyOrder(ledger: StrategyLedger, id: string, barIndex
   let cancelled = false;
   for (let index = ledger.orders.length - 1; index >= 0; index--) {
     const order = ledger.orders[index];
-    if (!order || order.id !== id || order.status !== 'pending') {
+    if (!order || (order.id !== id && order.sourceId !== id) || order.status !== 'pending') {
       continue;
     }
 

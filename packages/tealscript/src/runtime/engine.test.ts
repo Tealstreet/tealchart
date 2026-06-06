@@ -1756,6 +1756,45 @@ plot(strategy.closedtrades)`;
       ]);
     });
 
+    it('cancels generated strategy.exit bracket orders by their source id', () => {
+      const script = `//@version=6
+strategy("Cancel exit brackets", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.exit("Bracket", "Long", limit=101.4, stop=99)
+if bar_index == 2
+    strategy.cancel("Bracket")
+plot(strategy.position_size)
+plot(strategy.closedtrades)`;
+      const bars: Bar[] = [
+        { time: 1, open: 100, high: 100.4, low: 99.8, close: 100.2, volume: 1000 },
+        { time: 2, open: 100.2, high: 100.5, low: 99.8, close: 100.3, volume: 1000 },
+        { time: 3, open: 100.3, high: 101.5, low: 98.5, close: 100.1, volume: 1000 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        sourceId: order.sourceId,
+        status: order.status,
+        avgFillPrice: order.avgFillPrice,
+        updatedBarIndex: order.updatedBarIndex,
+      }))).toEqual([
+        { id: 'Long', sourceId: undefined, status: 'filled', avgFillPrice: 100.2, updatedBarIndex: 0 },
+        { id: 'Bracket Limit', sourceId: 'Bracket', status: 'cancelled', avgFillPrice: null, updatedBarIndex: 2 },
+        { id: 'Bracket Stop', sourceId: 'Bracket', status: 'cancelled', avgFillPrice: null, updatedBarIndex: 2 },
+      ]);
+      expect(result.strategy.position.size).toBe(1);
+      expect(result.strategy.closedTrades).toEqual([]);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [1, 1, 1],
+        [0, 0, 0],
+      ]);
+    });
+
     it('records long strategy.exit profit and loss offsets as tick-based brackets', () => {
       const script = `//@version=6
 strategy("Exit profit loss", process_orders_on_close=true)
