@@ -5630,7 +5630,16 @@ export class TealscriptEngine {
     return typeof value === 'number' && Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
   }
 
-  private updateBuiltinSourceHistory(scope: Scope, key: string, source: number, keep: number): number[] {
+  private updateBuiltinSourceHistory(
+    scope: Scope,
+    key: string,
+    source: number,
+    keep: number,
+    recordLookback = true,
+  ): number[] {
+    if (recordLookback) {
+      this.recordLookbackLength(keep);
+    }
     const history = (scope.get(key) as number[] | undefined) ?? [];
     this.prependBoundedHistory(history, source, keep);
     this.setBuiltinState(scope, key, history);
@@ -5649,7 +5658,7 @@ export class TealscriptEngine {
       Math.max(maxLength, this.ctx.bar_index + 1),
       TealscriptEngine.MAX_BUILTIN_SOURCE_HISTORY,
     );
-    const values = this.updateBuiltinSourceHistory(scope, key, source, keep);
+    const values = this.updateBuiltinSourceHistory(scope, key, source, keep, false);
     const window = values.slice(0, length);
     if (window.length < length || window.some((value) => isNaN(value))) return null;
     return window;
@@ -5658,7 +5667,7 @@ export class TealscriptEngine {
   private getAvailableSourceWindow(scope: Scope, key: string, source: number, length: number): number[] {
     this.recordLookbackLength(length);
     if (isNaN(source) || length < 1) return [];
-    const values = this.updateBuiltinSourceHistory(scope, key, source, length);
+    const values = this.updateBuiltinSourceHistory(scope, key, source, length, false);
     return values.slice(0, length).filter((value) => !isNaN(value));
   }
 
@@ -5690,6 +5699,7 @@ export class TealscriptEngine {
   }
 
   private updateBuiltinEmaState(scope: Scope, key: string, value: number, length: number): number {
+    this.recordLookbackLength(length);
     const alpha = 2 / (length + 1);
     const previous = scope.get(key) as number | undefined;
     const next = previous === undefined || isNaN(previous) ? value : alpha * value + (1 - alpha) * previous;
@@ -9325,6 +9335,7 @@ export class TealscriptEngine {
       const fastLen = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taMacdArgs, 1, 12));
       const slowLen = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taMacdArgs, 2, 26));
       const signalLen = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taMacdArgs, 3, 9));
+      this.recordLookbackLength(Math.max(fastLen, slowLen, signalLen));
 
       // Calculate EMAs
       const fastAlpha = 2 / (fastLen + 1);

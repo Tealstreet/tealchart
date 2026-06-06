@@ -6160,6 +6160,22 @@ plot(ta.stdev(close, 4), title="Stdev")`;
       expect(result.profile.maxBarsBack).toBe(4);
     });
 
+    it('reports recursive and retained TA lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Recursive TA Profile")
+plot(ta.ema(close, 7), title="EMA")
+plot(ta.rsi(close, 4), title="RSI")
+[macdLine, signalLine, histLine] = ta.macd(close, 3, 9, 5)
+plot(macdLine, title="MACD")
+plot(signalLine, title="Signal")
+plot(histLine, title="Hist")`;
+
+      const result = executeScript(parse(script), createBars(10, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(8);
+    });
+
     it('reports invalid max_bars_back function hint values', () => {
       const script = `//@version=6
 indicator("Invalid Function Max Bars Back")
