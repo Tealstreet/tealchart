@@ -585,6 +585,20 @@ strategy("Invalid Strategy Drawing Limits", max_labels_count=-3)
     ]);
   });
 
+  it('reports invalid literal declaration format and scale values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Format Scale", format="bad", scale=scale.top)
+strategy("Invalid Strategy Format Scale", format=format.bad, scale="center")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid indicator format: bad',
+      'Invalid indicator scale: scale.top',
+      'Invalid strategy format: format.bad',
+      'Invalid strategy scale: center',
+    ]);
+  });
+
   it('reports invalid literal calc_bars_count values', () => {
     const result = checkProgram(parse(`
 indicator("Invalid Calc Bars Count", calc_bars_count=-1)
