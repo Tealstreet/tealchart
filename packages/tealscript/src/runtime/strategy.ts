@@ -419,6 +419,7 @@ export function markStrategyLedgerToMarket(
   close: number,
   high: number = close,
   low: number = close,
+  point?: { barIndex: number; time: number },
 ): void {
   let openProfit = 0;
   let maxRunup = ledger.maxRunup;
@@ -448,6 +449,38 @@ export function markStrategyLedgerToMarket(
   ledger.position.maxDrawdown = Math.max(ledger.position.maxDrawdown, maxDrawdown);
   ledger.maxRunup = maxRunup;
   ledger.maxDrawdown = maxDrawdown;
+  if (point) {
+    recordStrategyEquityPoint(ledger, point.barIndex, point.time, openProfit);
+  }
+}
+
+function recordStrategyEquityPoint(ledger: StrategyLedger, barIndex: number, time: number, openProfit: number): void {
+  if (!Number.isFinite(barIndex) || !Number.isFinite(time) || !Number.isFinite(ledger.equity)) {
+    return;
+  }
+
+  const existingIndex = ledger.equityCurve.findIndex((point) => point.barIndex === barIndex);
+  const priorPoints = existingIndex === -1
+    ? ledger.equityCurve
+    : ledger.equityCurve.slice(0, existingIndex);
+  const previousEquities = priorPoints.map((point) => point.equity);
+  const peakEquity = Math.max(ledger.initialCapital, ...previousEquities);
+  const troughEquity = Math.min(ledger.initialCapital, ...previousEquities);
+  const equityPoint: StrategyEquityPoint = {
+    barIndex,
+    time,
+    equity: ledger.equity,
+    openProfit,
+    netProfit: ledger.netProfit,
+    drawdown: Math.max(0, peakEquity - ledger.equity),
+    runup: Math.max(0, ledger.equity - troughEquity),
+  };
+
+  if (existingIndex === -1) {
+    ledger.equityCurve.push(equityPoint);
+  } else {
+    ledger.equityCurve[existingIndex] = equityPoint;
+  }
 }
 
 export function createStrategyOrder(input: StrategyOrderInput): StrategyOrder {

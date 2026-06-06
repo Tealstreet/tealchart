@@ -200,6 +200,43 @@ plot(strategy.position_size)`;
       expect(result.plots.map((plot) => plot.values)).toEqual([[25000], [0]]);
     });
 
+    it('records strategy equity curve points during execution', () => {
+      const script = `//@version=6
+strategy("Equity curve", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+plot(strategy.equity)`;
+      const bars = [
+        { time: 100, open: 100, high: 102, low: 99, close: 100, volume: 100 },
+        { time: 200, open: 100, high: 106, low: 100, close: 105, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.equityCurve).toEqual([
+        {
+          barIndex: 0,
+          time: 100,
+          equity: 100_000,
+          openProfit: 0,
+          netProfit: 0,
+          drawdown: 0,
+          runup: 0,
+        },
+        {
+          barIndex: 1,
+          time: 200,
+          equity: 100_005,
+          openProfit: 5,
+          netProfit: 0,
+          drawdown: 0,
+          runup: 5,
+        },
+      ]);
+      expect(result.plots[0]?.values).toEqual([100_000, 100_005]);
+    });
+
     it('applies strategy named-prefix positional tail settings', () => {
       const script = `//@version=6
 strategy(title="Mixed strategy", "Mixed", true, format.price, 3, scale.right, 100, "60", true, false, true, 10, 20, 30, 40, 50, true, 25000, "EUR", strategy.percent_of_equity, 10, 2, strategy.commission.percent, 0.05, 1, 50, 60, true, true, true, true, 1.75, 3, "ANY", true)
