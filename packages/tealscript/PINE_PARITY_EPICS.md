@@ -166,8 +166,9 @@ Phases:
    session filters, exchange session-state gates, dashboard tables, custom
    candles, drawing zones, linefill channels, zigzag polylines, screeners,
    currency conversion, earnings event markers, corporate-action overlays,
-   financial dashboards, economic macro overlays, seed dataset overlays, library
-   helpers, public strategy stats tables, and UDT object-method state.
+   financial dashboards, economic macro overlays, seed dataset overlays,
+   volatility-band overlays, library helpers, public strategy stats tables, and
+   UDT object-method state.
    Strategy-bracket coverage includes official broker examples plus a reduced
    public fixed-bracket strategy fixture, and trailing-stop coverage includes
    official and reduced public strategy fixtures.
