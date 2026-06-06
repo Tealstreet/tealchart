@@ -1434,6 +1434,25 @@ const DISPLAY_OPTION_VALUES = new Set([
 ]);
 const DISPLAY_OPTION_CONSTANT_VALUES = new Map([...DISPLAY_OPTION_VALUES].map((value) => [value, value]));
 
+const DRAWING_XLOC_VALUES = new Set(['bar_index', 'bar_time']);
+const DRAWING_XLOC_CONSTANT_VALUES = new Map([
+  ['xloc.bar_index', 'bar_index'],
+  ['xloc.bar_time', 'bar_time'],
+]);
+const DRAWING_YLOC_VALUES = new Set(['price', 'abovebar', 'belowbar']);
+const DRAWING_YLOC_CONSTANT_VALUES = new Map([
+  ['yloc.price', 'price'],
+  ['yloc.abovebar', 'abovebar'],
+  ['yloc.belowbar', 'belowbar'],
+]);
+const DRAWING_EXTEND_VALUES = new Set(['none', 'right', 'left', 'both']);
+const DRAWING_EXTEND_CONSTANT_VALUES = new Map([
+  ['extend.none', 'none'],
+  ['extend.right', 'right'],
+  ['extend.left', 'left'],
+  ['extend.both', 'both'],
+]);
+
 for (const name of CALENDAR_FUNCTION_NAMES) {
   BUILTIN_SIGNATURES.set(name, { params: ['time', 'timezone'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true });
 }
@@ -3242,6 +3261,7 @@ class SemanticChecker {
     this.checkMarkerStyleLocationSizeLiteralArguments(expression);
     this.checkVisualNumericOptionLiteralArguments(expression);
     this.checkDisplayOptionLiteralArguments(expression);
+    this.checkDrawingCoordinateOptionLiteralArguments(expression, scope);
     this.checkStrategyLiteralArgumentConstraints(expression);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
@@ -4142,6 +4162,62 @@ class SemanticChecker {
         `Invalid ${calleeName} display`,
       );
     }
+  }
+
+  private checkDrawingCoordinateOptionLiteralArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+
+    this.checkDrawingOptionLiteralArgument(
+      expression,
+      signature.params,
+      calleeName,
+      'xloc',
+      DRAWING_XLOC_VALUES,
+      DRAWING_XLOC_CONSTANT_VALUES,
+      'xloc.',
+    );
+    this.checkDrawingOptionLiteralArgument(
+      expression,
+      signature.params,
+      calleeName,
+      'yloc',
+      DRAWING_YLOC_VALUES,
+      DRAWING_YLOC_CONSTANT_VALUES,
+      'yloc.',
+    );
+    this.checkDrawingOptionLiteralArgument(
+      expression,
+      signature.params,
+      calleeName,
+      'extend',
+      DRAWING_EXTEND_VALUES,
+      DRAWING_EXTEND_CONSTANT_VALUES,
+      'extend.',
+    );
+  }
+
+  private checkDrawingOptionLiteralArgument(
+    expression: CallExpression,
+    parameterNames: string[],
+    calleeName: string,
+    parameterName: string,
+    allowedValues: Set<string>,
+    constantValues: Map<string, string>,
+    namespacePrefix: string,
+  ): void {
+    const parameterIndex = parameterNames.indexOf(parameterName);
+    if (parameterIndex === -1) return;
+
+    const option = this.resolveCallArgumentExpression(expression, parameterNames, parameterIndex);
+    this.checkNamespacedConstantStringValue(
+      option,
+      allowedValues,
+      constantValues,
+      namespacePrefix,
+      `Invalid ${calleeName} ${parameterName}`,
+    );
   }
 
   private checkStrategyOrderLiteralArguments(expression: CallExpression, displayName: string): void {
