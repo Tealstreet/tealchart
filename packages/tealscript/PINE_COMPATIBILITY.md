@@ -169,9 +169,9 @@ selected pure `math.*` helper-derived offsets including min/max, rounding,
 averaging, power, and square-root helpers, selected numeric normalization
 helpers, and input-gated simple conditional history offsets, including static numeric
 comparisons, even when they sit behind unexecuted branches. Covered rolling
-window helpers such as `math.sum()` report their observed prior-bar lookback
-requirements as well. Truly dynamic series offsets are still inferred from
-observed runtime access.
+window helpers such as `math.sum()` and common `ta.*` source-window helpers
+report their observed prior-bar lookback requirements as well. Truly dynamic
+series offsets are still inferred from observed runtime access.
 
 ## Roadmaps
 
@@ -754,9 +754,10 @@ runtime profile from static literal/simple numeric offset inference,
 selected pure `math.*` helper offsets including averaging, power, and
 square-root helpers, selected numeric normalization helper offsets,
 input-controlled simple conditional offsets, observed dynamic access, and
-covered rolling-window helper lookbacks such as `math.sum()`. Full Pine-style
-preallocation for arbitrary series offsets remains a compatibility target. The
-checkpoint corpus tracks an official `max_bars_back`
+covered rolling-window helper lookbacks such as `math.sum()` and common `ta.*`
+source-window helpers. Full Pine-style preallocation for arbitrary series
+offsets remains a compatibility target. The checkpoint corpus tracks an
+official `max_bars_back`
 bounded-history fixture.
 
 ## Common Drawing Object Coverage
