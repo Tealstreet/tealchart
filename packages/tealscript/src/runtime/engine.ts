@@ -977,7 +977,16 @@ export class TealscriptEngine {
       case 'ta.stdev':
       case 'ta.variance':
       case 'ta.range':
+      case 'ta.dev':
+      case 'ta.cog':
+      case 'ta.median':
+      case 'ta.mode':
+      case 'ta.percentile_nearest_rank':
+      case 'ta.percentile_linear_interpolation':
+      case 'ta.percentrank':
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes);
+      case 'ta.correlation':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source1', 'source2', 'length'], 2, collectionScopes);
       case 'ta.highest':
       case 'ta.lowest':
       case 'ta.highestbars':
