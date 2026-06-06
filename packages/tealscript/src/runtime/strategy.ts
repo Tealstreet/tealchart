@@ -504,6 +504,15 @@ export function submitStrategyOrder(ledger: StrategyLedger, input: StrategyOrder
   return order;
 }
 
+export function hasReachedStrategyIntradayFilledOrderLimit(ledger: StrategyLedger, time: number): boolean {
+  const rule = ledger.settings.riskRules.maxIntradayFilledOrders;
+  if (rule === null || !Number.isFinite(time)) {
+    return false;
+  }
+
+  return countStrategyFillsForUtcDay(ledger, time) >= rule.count;
+}
+
 export function fillStrategyMarketOrder(
   ledger: StrategyLedger,
   order: StrategyOrder,
@@ -611,6 +620,13 @@ function fillStrategyOrder(
   if (order.status !== 'pending' || order.qty === null) {
     return null;
   }
+  const isCloseOnlyEntry = order.isEntry && order.requestedQty === 0;
+  if (!order.isExit && !isCloseOnlyEntry && hasReachedStrategyIntradayFilledOrderLimit(ledger, time)) {
+    order.status = 'cancelled';
+    order.updatedBarIndex = barIndex;
+    order.updatedTime = time;
+    return null;
+  }
   if (!Number.isFinite(price)) {
     throw new Error('strategy fill price must be finite');
   }
@@ -656,6 +672,28 @@ function fillStrategyOrder(
   applyStrategyFillToTrades(ledger, fill);
   applyStrategyFillToPosition(ledger, fill);
   return fill;
+}
+
+function countStrategyFillsForUtcDay(ledger: StrategyLedger, time: number): number {
+  const day = strategyUtcDayKey(time);
+  if (day === null) {
+    return 0;
+  }
+
+  return ledger.fills.filter((fill) => strategyUtcDayKey(fill.time) === day).length;
+}
+
+function strategyUtcDayKey(time: number): string | null {
+  if (!Number.isFinite(time)) {
+    return null;
+  }
+
+  const date = new Date(time);
+  if (!Number.isFinite(date.getTime())) {
+    return null;
+  }
+
+  return date.toISOString().slice(0, 10);
 }
 
 function resolveStrategyFillSlippage(settings: StrategyLedgerSettings, order: StrategyOrder, mintick: number): number {
