@@ -620,8 +620,9 @@ Semantic diagnostics reject invalid literal `display` option values while
 leaving dynamic display expressions available for Pine-style masks. Tealchart renderer
 coverage applies plot line-style metadata in main and indicator panes and
 renders common plot offsets for line, marker, histogram, and area plot styles.
-Semantic diagnostics also reject non-string visual title/text arguments on
-common plot, hline, fill, color, OHLC, marker, and arrow outputs before runtime.
+Semantic diagnostics also reject non-string visual title/text arguments and
+non-color visual color arguments on common plot, hline, fill, color, OHLC,
+marker, and arrow outputs before runtime.
 Renderer coverage also honors `display.none` while retaining hidden plot values
 for dependent fills, and applies `histbase` baselines to histogram/columns and
 area plot rendering when supplied. Area-style plots now render filled regions
@@ -890,8 +891,8 @@ analysis preserves known label getter return types and `label.all` handle-array
 element types for downstream diagnostics, and rejects invalid literal `xloc`
 and `yloc` option values plus invalid literal label `style`, `textalign`,
 `size`, `text_font_family`, and `text_formatting` values, plus non-string
-label text and tooltip values. Rendering routes labels to the script pane:
-overlay scripts use the main pane, non-overlay
+label text and tooltip values and non-color label color values. Rendering routes
+labels to the script pane: overlay scripts use the main pane, non-overlay
 scripts use their indicator pane. Renderer coverage handles text-only
 `label.style_none`, directional label bodies, and common symbol bodies including
 circle, square, diamond, cross, xcross, triangle, flag, arrow styles, label text
@@ -913,8 +914,8 @@ and getters accept Pine-style named `id`, value, and point arguments. Semantic
 analysis validates `line.new()` call-shape names, preserves known line getter
 return types, and preserves `line.all` handle-array element types for
 downstream diagnostics, while rejecting invalid literal `xloc` and `extend`
-option values plus invalid literal line `style` values. Rendering routes line
-segments to the script pane with color/style/width, horizontal extension support, and Pine
+option values plus invalid literal line `style` values and non-color line color
+values. Rendering routes line segments to the script pane with color/style/width, horizontal extension support, and Pine
 `line.style_arrow_left`, `line.style_arrow_right`, and `line.style_arrow_both`
 arrowheads.
 `force_overlay` lines render in the main pane even when created by non-overlay
@@ -923,7 +924,7 @@ scripts. `linefill.new()` records fills between two line handles;
 while `linefill.get_line1()`, `linefill.get_line2()`, and `linefill.delete()`
 support named `id` arguments. Semantic analysis preserves linefill getter line
 handle returns and `linefill.all` handle-array element types for downstream
-diagnostics. The renderer fills between resolved line segments in the routed
+diagnostics and rejects non-color linefill color values. The renderer fills between resolved line segments in the routed
 script pane. `linefill.new()` rejects missing or non-line handles without
 creating a drawing. `chart.point` overloads, GC limits, and full realtime
 rollback parity remain planned.
@@ -945,7 +946,8 @@ and point arguments. Semantic analysis validates `box.new()` call-shape names,
 preserves known box getter return types, preserves `box.all` handle-array
 element types for downstream diagnostics, and rejects invalid literal `xloc`
 and `extend` option values plus invalid literal border-style values and
-non-string box text values. Rendering routes filled rectangles to the script pane with borders, text alignment, `text_wrap=auto` wrapping,
+non-string box text values plus non-color box border, background, and text
+color values. Rendering routes filled rectangles to the script pane with borders, text alignment, `text_wrap=auto` wrapping,
 default/monospace font-family metadata, and bold/italic text formatting. Semantic
 analysis also rejects invalid literal `text_halign`, `text_valign`,
 `text_wrap`, `text_size`, `text_font_family`, and `text_formatting` values. Full
@@ -958,6 +960,7 @@ arguments, `polyline.copy()`, `polyline.delete()`, and `polyline.all`.
 arguments. Semantic analysis preserves `polyline.new()` and `polyline.copy()`
 handle return types and `polyline.all` handle-array element types for downstream
 diagnostics, and rejects invalid literal `xloc` and `line_style` option values.
+Semantic analysis also rejects non-color polyline line and fill color values.
 Renderer coverage applies fixed path geometry, optional fill, line styling, and
 approximate curved paths when `curved=true`. The checkpoint corpus tracks a reduced public zigzag-polyline idiom that renders recent swing
 `chart.point` vertices as a last-bar path.
@@ -975,7 +978,7 @@ parameters exist. Semantic analysis preserves `table.new()` handle return types
 and `table.all` handle-array element types for downstream diagnostics, and
 rejects invalid literal table position values plus cell text alignment,
 text-size, font-family, and text-formatting values, plus non-string cell text
-and tooltip values. Rendering lays out fixed tables in the script pane with measured automatic cell sizes,
+and tooltip values and non-color table/cell color values. Rendering lays out fixed tables in the script pane with measured automatic cell sizes,
 percentage-based explicit cell sizes, merged cell spans, cell backgrounds,
 borders, frame borders, text alignment, default/monospace font-family metadata,
 and bold/italic font styling. Runtime coverage also
