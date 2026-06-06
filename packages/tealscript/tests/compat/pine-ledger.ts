@@ -202,6 +202,16 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: officialDocsEntry({
+      id: 'official-max-drawdown-risk-checkpoint',
+      title: 'Official Max Drawdown Risk Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/strategies/',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'risk', 'fills'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
       id: 'official-recalculate-after-fill-checkpoint',
       title: 'Official Recalculate After Fill Checkpoint',
       url: 'https://www.tradingview.com/pine-script-docs/concepts/strategies/',
