@@ -273,6 +273,19 @@ const STRATEGY_DECLARATION_STRING_OPTIONS = [
 
 const COLOR_CONSTRUCTOR_NAMES = new Set(['color.new', 'color.rgb']);
 const COLOR_CHANNEL_NAMES = new Set(['color.r', 'color.g', 'color.b', 'color.t']);
+const COLOR_FUNCTION_COLOR_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['color.new', ['color']],
+  ['color.r', ['color']],
+  ['color.g', ['color']],
+  ['color.b', ['color']],
+  ['color.t', ['color']],
+  ['color.from_gradient', ['bottom_color', 'top_color']],
+]);
+const COLOR_FUNCTION_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['color.new', ['transp']],
+  ['color.rgb', ['red', 'green', 'blue', 'transp']],
+  ['color.from_gradient', ['value', 'bottom_value', 'top_value']],
+]);
 
 const MATH_CONSTANT_NAMES = new Set(['math.pi', 'math.e', 'math.phi']);
 const MATH_PRESERVE_NUMERIC_NAMES = new Set(['math.abs', 'math.max', 'math.min']);
@@ -3554,6 +3567,7 @@ class SemanticChecker {
     this.checkMatrixSortFieldType(expression, scope);
     this.checkMapCallTypes(expression, scope);
     this.checkInputDefaultValueType(expression, scope);
+    this.checkColorFunctionArgumentTypes(expression, scope);
     this.checkMaxBarsBackLiteralArguments(expression);
     this.checkAlertFrequencyLiteralArguments(expression);
     this.checkAlertStringOptionArguments(expression, scope);
@@ -4055,6 +4069,51 @@ class SemanticChecker {
         this.checkMapArgumentType(mapCall.mapType.keyType, mapCall.keyArgument, 'map key', scope);
         break;
     }
+  }
+
+  private checkColorFunctionArgumentTypes(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const colorParameterNames = COLOR_FUNCTION_COLOR_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    const numericParameterNames = COLOR_FUNCTION_NUMERIC_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!colorParameterNames && !numericParameterNames) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of colorParameterNames ?? []) {
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'color');
+    }
+
+    for (const parameterName of numericParameterNames ?? []) {
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'number');
+    }
+  }
+
+  private checkBuiltinArgumentKind(
+    expression: CallExpression,
+    scope: SemanticScope,
+    calleeName: string,
+    parameterNames: string[],
+    parameterName: string,
+    expectedKind: 'color' | 'number',
+  ): void {
+    const parameterIndex = parameterNames.indexOf(parameterName);
+    if (parameterIndex === -1) return;
+
+    const argument = this.resolveCallArgumentExpression(expression, parameterNames, parameterIndex);
+    if (!argument) return;
+
+    const argumentType = this.inferExpressionType(argument, scope);
+    if (argumentType.kind === 'unknown') return;
+    if (expectedKind === 'color' && argumentType.kind === 'color') return;
+    if (expectedKind === 'number' && this.isNumericType(argumentType)) return;
+
+    this.addDiagnostic(
+      'type-mismatch',
+      `${calleeName} ${parameterName} must be a ${expectedKind}, got ${this.formatSemanticType(argumentType)}`,
+      argument.loc,
+    );
   }
 
   private checkInputDefaultValueType(expression: CallExpression, scope: SemanticScope): void {

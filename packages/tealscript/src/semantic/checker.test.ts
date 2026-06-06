@@ -5831,6 +5831,33 @@ gradientShort = color.from_gradient(close, 0, 100, color.red)
     ]);
   });
 
+  it('reports invalid color helper value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Color Values")
+badNew = color.new(1, "transparent")
+badRgb = color.rgb("1", true, "blue", "25")
+badChannel = color.r(1)
+badGradient = color.from_gradient("close", "zero", true, 1, 2)
+badDuplicate = color.new(1, 20, color=color.red)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'color.new color must be a color, got int',
+      'color.new transp must be a number, got string',
+      'color.rgb red must be a number, got string',
+      'color.rgb green must be a number, got bool',
+      'color.rgb blue must be a number, got string',
+      'color.rgb transp must be a number, got string',
+      'color.r color must be a color, got int',
+      'color.from_gradient bottom_color must be a color, got int',
+      'color.from_gradient top_color must be a color, got int',
+      'color.from_gradient value must be a number, got string',
+      'color.from_gradient bottom_value must be a number, got string',
+      'color.from_gradient top_value must be a number, got bool',
+      "Argument 'color' for color.new() was supplied multiple times",
+    ]);
+  });
+
   it('resolves string helper named arguments and aliases', () => {
     const result = checkProgram(parse(`
 indicator("String Signatures")
