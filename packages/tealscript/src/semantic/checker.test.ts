@@ -748,6 +748,9 @@ strategy.cancel_all("unexpected")
 strategy.entri("Long", strategy.long)
 strategy.opentrades.entry_price()
 strategy.exit("Exit", from_entry="Long", unknown=1)
+strategy.entry("Long", strategy.long, 1, na, na, "Oca", strategy.oca.cancel, "comment", "alert", false, "extra")
+strategy.order("Add", strategy.short, 1, na, na, "Oca", strategy.oca.cancel, "comment", "alert", false, "extra")
+strategy.exit("Exit", "Long", 1, 100, 10, close + 1, 10, close - 1, na, na, na, na, "comment", "profit", "loss", "trail", "alert", "profit alert", "loss alert", "trail alert", false, "extra")
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -758,6 +761,9 @@ strategy.exit("Exit", from_entry="Long", unknown=1)
       'strategy.opentrades.entry_price() expects at least 1 argument',
       "strategy.opentrades.entry_price() missing required argument 'trade_num'",
       "Unknown argument 'unknown' for strategy.exit()",
+      'strategy.entry() expects at most 10 arguments',
+      'strategy.order() expects at most 10 arguments',
+      'strategy.exit() expects at most 21 arguments',
     ]);
   });
 
