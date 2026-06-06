@@ -334,6 +334,32 @@ plot(namedRsi, title="Named RSI")
     expect(roundSeries(getPlot(result, 'Named RSI').values)).toEqual(roundSeries(getPlot(result, 'First RSI').values));
   });
 
+  it('tracks RSI history for derived sources', () => {
+    const result = runCompatScript(`
+indicator("RSI derived source")
+spread = close - open
+plot(ta.rsi(spread, 3), title="Spread RSI")
+plot(ta.rsi(source=spread, length=3), title="Named Spread RSI")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Spread RSI').values)).toEqual([
+      null,
+      100,
+      40,
+      6.25,
+      6.25,
+      63.691377,
+      76.596782,
+      80.128338,
+      33.979986,
+      58.10728,
+      37.532605,
+      55.327494,
+    ]);
+    expect(roundSeries(getPlot(result, 'Named Spread RSI').values)).toEqual(roundSeries(getPlot(result, 'Spread RSI').values));
+  });
+
   it('seeds RMA from a complete Pine SMA window', () => {
     const result = runCompatScript(`
 indicator("RMA seed")
