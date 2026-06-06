@@ -387,6 +387,51 @@ plot(ta.rma(source=close, 3), title="Mixed RMA")
     expect(roundSeries(getPlot(result, 'Mixed RMA').values)).toEqual(roundSeries(getPlot(result, 'RMA').values));
   });
 
+  it('runs ATR as an RMA of true range with persistent call-site state', () => {
+    const result = runCompatScript(`
+indicator("ATR helper")
+atr = ta.atr(3)
+namedAtr = ta.atr(length=3)
+manualAtr = ta.rma(ta.tr(true), 3)
+plot(atr, title="ATR")
+plot(namedAtr, title="Named ATR")
+plot(manualAtr, title="Manual ATR")
+plot(atr - manualAtr, title="ATR Diff")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'ATR').values)).toEqual([
+      null,
+      null,
+      4.333333,
+      5.222222,
+      5.481481,
+      5.320988,
+      5.547325,
+      6.03155,
+      5.6877,
+      5.458467,
+      5.305644,
+      5.203763,
+    ]);
+    expect(roundSeries(getPlot(result, 'Named ATR').values)).toEqual(roundSeries(getPlot(result, 'ATR').values));
+    expect(roundSeries(getPlot(result, 'Manual ATR').values)).toEqual(roundSeries(getPlot(result, 'ATR').values));
+    expect(roundSeries(getPlot(result, 'ATR Diff').values)).toEqual([
+      null,
+      null,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+    ]);
+  });
+
   it('runs cumulative and dispersion TA helpers', () => {
     const result = runCompatScript(`
 indicator("Cumulative TA docs smoke")
