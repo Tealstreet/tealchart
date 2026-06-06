@@ -94,6 +94,8 @@ Covered behavior and remaining gaps:
   user-defined function and method signatures.
 - Function and declaration calls support Pine named arguments, including the
   reserved parameter key `type=` used by common strategy risk APIs.
+  Semantic diagnostics reject non-boolean declaration flags on common
+  `indicator()`, `strategy()`, and `library()` headers before runtime coercion.
 - Top-level nested control blocks share the deeper block parser used by
   function bodies, including nested `if` / `else` dedents with reassignment
   statements.
