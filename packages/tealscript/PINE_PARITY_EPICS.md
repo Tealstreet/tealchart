@@ -513,7 +513,7 @@ impact.
    pass-rate summaries unless they are explicitly marked `skipped`; direct
    checkpoint coverage now locks both sides of that contract.
 4. Pine layout parser audit fixtures: keep reduced coverage for top-level
-   nested dedents, eighth-level UDF branches, wrapped indented expressions,
+   nested dedents, ninth-level UDF branches, wrapped indented expressions,
    wrapped function/method signatures, wrapped request calls with multiline
    ternary arguments, and shared library/type/method blocks before deeper
    parser architecture changes.
