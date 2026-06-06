@@ -738,6 +738,7 @@ export class TealscriptEngine {
             statement.risk_free_rate,
             statement.backtest_fill_limits_assumption,
             statement.close_entries_rule,
+            statement.fill_orders_on_standard_ohlc,
           ]),
         );
       case 'LibraryDeclaration':
@@ -2094,6 +2095,9 @@ export class TealscriptEngine {
     }
     if (stmt.close_entries_rule !== undefined) {
       settings.closeEntriesRule = this.normalizeStrategyCloseEntriesRule(this.evaluateExpression(stmt.close_entries_rule));
+    }
+    if (stmt.fill_orders_on_standard_ohlc !== undefined) {
+      settings.fillOrdersOnStandardOhlc = this.isTruthy(this.evaluateExpression(stmt.fill_orders_on_standard_ohlc));
     }
 
     this.ctx.setStrategyLedger(settings);

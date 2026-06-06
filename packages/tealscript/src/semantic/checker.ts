@@ -1256,6 +1256,7 @@ const STRATEGY_DECLARATION_KEYS = new Set([
   'risk_free_rate',
   'backtest_fill_limits_assumption',
   'close_entries_rule',
+  'fill_orders_on_standard_ohlc',
 ]);
 
 const LIBRARY_DECLARATION_KEYS = new Set([
@@ -2113,6 +2114,7 @@ class SemanticChecker {
           statement.risk_free_rate,
           statement.backtest_fill_limits_assumption,
           statement.close_entries_rule,
+          statement.fill_orders_on_standard_ohlc,
         ]);
         break;
       case 'LibraryDeclaration':
