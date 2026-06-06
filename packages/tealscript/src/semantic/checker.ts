@@ -2189,6 +2189,7 @@ class SemanticChecker {
           statement.max_lines_count,
           statement.max_boxes_count,
           statement.max_polylines_count,
+          statement.calc_bars_count,
           statement.timeframe,
           statement.timeframe_gaps,
           statement.dynamic_requests,
@@ -2261,6 +2262,10 @@ class SemanticChecker {
     this.checkNonNegativeLiteralIntegerValue(
       statement.max_bars_back,
       `${statement.declarationKind} max_bars_back must be a non-negative integer`,
+    );
+    this.checkNonNegativeLiteralIntegerValue(
+      statement.calc_bars_count,
+      `${statement.declarationKind} calc_bars_count must be a non-negative integer`,
     );
     if (statement.declarationKind === 'strategy') {
       this.checkStrategyDeclarationLiteralValueConstraints(statement);
@@ -3019,6 +3024,7 @@ class SemanticChecker {
     this.checkMapCallTypes(expression, scope);
     this.checkInputDefaultValueType(expression, scope);
     this.checkMaxBarsBackLiteralArguments(expression);
+    this.checkRequestCalcBarsCountLiteralArguments(expression);
     this.checkStrategyLiteralArgumentConstraints(expression);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
@@ -3666,6 +3672,31 @@ class SemanticChecker {
     this.checkNonNegativeLiteralIntegerValue(num, 'max_bars_back num must be a non-negative integer');
   }
 
+  private checkRequestCalcBarsCountLiteralArguments(expression: CallExpression): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const calcBarsCountPosition = this.requestCalcBarsCountPosition(calleeName);
+    if (calcBarsCountPosition === undefined) return;
+
+    const calcBarsCount = this.getCallArgument(expression.arguments, 'calc_bars_count', calcBarsCountPosition);
+    this.checkPositiveLiteralIntegerValue(
+      calcBarsCount,
+      `${calleeName} calc_bars_count must be a positive integer`,
+    );
+  }
+
+  private requestCalcBarsCountPosition(calleeName: string): number | undefined {
+    switch (calleeName) {
+      case 'request.security':
+        return 7;
+      case 'request.security_lower_tf':
+        return 6;
+      case 'request.seed':
+        return 4;
+      default:
+        return undefined;
+    }
+  }
+
   private checkStrategyOrderLiteralArguments(expression: CallExpression, displayName: string): void {
     this.checkNonEmptyLiteralStringArgument(expression, 'id', 0, `${displayName} id must not be empty`);
     this.checkStrategyDirectionArgument(expression, displayName, 'direction', 1);
@@ -3860,6 +3891,15 @@ class SemanticChecker {
 
     const value = this.constantLiteralValue(expression);
     if (typeof value === 'number' && (value < 0 || !Number.isInteger(value))) {
+      this.addDiagnostic('type-mismatch', message, expression.loc);
+    }
+  }
+
+  private checkPositiveLiteralIntegerValue(expression: Expression | undefined, message: string): void {
+    if (!expression) return;
+
+    const value = this.constantLiteralValue(expression);
+    if (typeof value === 'number' && (value <= 0 || !Number.isInteger(value))) {
       this.addDiagnostic('type-mismatch', message, expression.loc);
     }
   }

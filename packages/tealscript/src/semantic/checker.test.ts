@@ -566,6 +566,24 @@ max_bars_back(open, 1.5)
     ]);
   });
 
+  it('reports invalid literal calc_bars_count values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Calc Bars Count", calc_bars_count=-1)
+strategy("Invalid Strategy Calc Bars Count", calc_bars_count=-1)
+request.security(syminfo.tickerid, "1D", close, calc_bars_count=0)
+request.security_lower_tf(syminfo.tickerid, "1", close, calc_bars_count=-2)
+request.seed("seed", "SYM", close, calc_bars_count=1.5)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'indicator calc_bars_count must be a non-negative integer',
+      'strategy calc_bars_count must be a non-negative integer',
+      'request.security calc_bars_count must be a positive integer',
+      'request.security_lower_tf calc_bars_count must be a positive integer',
+      'request.seed calc_bars_count must be a positive integer',
+    ]);
+  });
+
   it('reports invalid OHLC visual output argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Invalid OHLC Visual Bindings")
