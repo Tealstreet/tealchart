@@ -1610,6 +1610,16 @@ const DRAWING_LINE_STYLE_CONSTANT_VALUES = new Map([
   ['line.style_arrow_right', 'arrow_right'],
   ['line.style_arrow_both', 'arrow_both'],
 ]);
+const DRAWING_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['label.new', ['text', 'tooltip']],
+  ['label.set_text', ['text']],
+  ['label.set_tooltip', ['tooltip']],
+  ['box.new', ['text']],
+  ['box.set_text', ['text']],
+  ['table.cell', ['text', 'tooltip']],
+  ['table.cell_set_text', ['text']],
+  ['table.cell_set_tooltip', ['tooltip']],
+]);
 const DRAWING_LABEL_STYLE_VALUES = new Set([
   'none',
   'label_up',
@@ -3529,6 +3539,7 @@ class SemanticChecker {
     this.checkDrawingCoordinateOptionLiteralArguments(expression, scope);
     this.checkDrawingStyleOptionLiteralArguments(expression, scope);
     this.checkDrawingTextOptionLiteralArguments(expression, scope);
+    this.checkDrawingStringOptionArguments(expression, scope);
     this.checkTablePositionOptionLiteralArguments(expression, scope);
     this.checkDrawingSizeOptionLiteralArguments(expression, scope);
     this.checkTickerOptionLiteralArguments(expression, scope);
@@ -4340,9 +4351,9 @@ class SemanticChecker {
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
 
     for (const parameterName of parameterNames) {
-      if (!signature.params.includes(parameterName)) continue;
-
       const parameterIndex = signature.params.indexOf(parameterName);
+      if (parameterIndex === -1) continue;
+
       const argument = this.resolveCallArgumentExpression(expression, signature.params, parameterIndex);
       if (!argument) continue;
 
@@ -4903,6 +4914,33 @@ class SemanticChecker {
       DRAWING_TEXT_FORMATTING_CONSTANT_VALUES,
       'text.format_',
     );
+  }
+
+  private checkDrawingStringOptionArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const parameterNames = DRAWING_STRING_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!parameterNames) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of parameterNames) {
+      if (!signature.params.includes(parameterName)) continue;
+
+      const parameterIndex = signature.params.indexOf(parameterName);
+      const argument = this.resolveCallArgumentExpression(expression, signature.params, parameterIndex);
+      if (!argument) continue;
+
+      const argumentType = this.inferExpressionType(argument, scope);
+      if (argumentType.kind === 'unknown' || argumentType.kind === 'string') continue;
+
+      this.addDiagnostic(
+        'type-mismatch',
+        `${calleeName} ${parameterName} must be a string, got ${this.formatSemanticType(argumentType)}`,
+        argument.loc,
+      );
+    }
   }
 
   private checkTablePositionOptionLiteralArguments(expression: CallExpression, scope: SemanticScope): void {
