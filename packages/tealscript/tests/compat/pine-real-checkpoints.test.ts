@@ -2527,6 +2527,48 @@ plot(strategy.opentrades, title="Open Trades")
     expect(result.strategy.settings.riskRules.maxIntradayFilledOrders).toEqual({ count: 1 });
   });
 
+  it('locks a reduced official strategy consecutive loss-days risk idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
+    const bars: Bar[] = [
+      { time: Date.UTC(2024, 0, 1, 9), open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: Date.UTC(2024, 0, 1, 10), open: 100, high: 101, low: 98, close: 99, volume: 100 },
+      { time: Date.UTC(2024, 0, 2, 9), open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: Date.UTC(2024, 0, 2, 10), open: 100, high: 101, low: 97, close: 98, volume: 100 },
+      { time: Date.UTC(2024, 0, 3, 9), open: 100, high: 101, low: 99, close: 100, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Official Consecutive Loss Days Risk Checkpoint", process_orders_on_close=true)
+strategy.risk.max_cons_loss_days(count=2)
+if bar_index == 0
+    strategy.entry("Day 1", strategy.long, qty=1)
+if bar_index == 1
+    strategy.close("Day 1")
+if bar_index == 2
+    strategy.entry("Day 2", strategy.long, qty=1)
+if bar_index == 3
+    strategy.close("Day 2")
+if bar_index == 4
+    strategy.entry("Blocked", strategy.long, qty=1)
+plot(strategy.position_size, title="Position")
+plot(strategy.closedtrades, title="Closed Trades")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Position').values).toEqual([1, 0, 1, 0, 0]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 1, 1, 2, 2]);
+    expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Day 1', 'Close Day 1', 'Day 2', 'Close Day 2']);
+    expect(result.strategy.closedTrades.map((trade) => ({
+      entryOrderId: trade.entryOrderId,
+      exitOrderId: trade.exitOrderId,
+      profit: trade.profit,
+    }))).toEqual([
+      { entryOrderId: 'Day 1', exitOrderId: 'Close Day 1', profit: -1 },
+      { entryOrderId: 'Day 2', exitOrderId: 'Close Day 2', profit: -2 },
+    ]);
+    expect(result.strategy.orders.map((order) => order.id)).toEqual(['Day 1', 'Close Day 1', 'Day 2', 'Close Day 2']);
+    expect(result.strategy.settings.riskRules.maxConsLossDays).toEqual({ count: 2 });
+  });
+
   it('locks a reduced official strategy bar-magnifier idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const baseTime = 1_700_100_000_000;
