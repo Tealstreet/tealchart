@@ -1016,6 +1016,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ],
   ['input.time', { params: ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['input.timeframe', { params: ['defval', 'title', 'options', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['input.enum', { params: ['defval', 'title', 'options', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['input.symbol', { params: ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['input.session', { params: ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['input.text_area', { params: ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'], minArgs: 1, allowNamedPrefixWithPositional: true }],
@@ -3301,6 +3302,11 @@ class SemanticChecker {
 
   private checkInputDefaultValueType(expression: CallExpression, scope: SemanticScope): void {
     const displayName = this.memberPath(expression.callee).join('.');
+    if (displayName === 'input.enum') {
+      this.checkInputEnumDefaultValueType(expression, scope);
+      return;
+    }
+
     const requirement = INPUT_DEFAULT_TYPE_REQUIREMENTS.get(displayName);
     if (!requirement) return;
 
@@ -3334,6 +3340,28 @@ class SemanticChecker {
 
     this.checkInputDefaultRangeConstraints(expression, displayName, defval);
     this.checkInputDefaultOptionsConstraint(expression, displayName, defval);
+  }
+
+  private checkInputEnumDefaultValueType(expression: CallExpression, scope: SemanticScope): void {
+    const defval = this.getCallArgument(expression.arguments, 'defval', 0);
+    if (!defval) return;
+
+    const defvalType = this.inferExpressionType(defval, scope);
+    if (defvalType.kind === 'unknown') return;
+    if (defvalType.kind !== 'udt' || !defvalType.name) {
+      this.addDiagnostic('type-mismatch', 'input.enum defval must be an enum member', defval.loc);
+      return;
+    }
+
+    const options = this.getCallArgument(expression.arguments, 'options', 2);
+    if (!options || options.type !== 'ArrayExpression') return;
+
+    const optionTypes = options.elements.map((element) => this.inferExpressionType(element, scope));
+    if (optionTypes.some((optionType) => optionType.kind === 'unknown')) return;
+    const mismatchedOption = optionTypes.find((optionType) => optionType.kind !== 'udt' || optionType.name !== defvalType.name);
+    if (mismatchedOption) {
+      this.addDiagnostic('type-mismatch', 'input.enum options must use the same enum type as defval', options.loc);
+    }
   }
 
   private checkInputDefaultRangeConstraints(expression: CallExpression, displayName: string, defval: Expression): void {
@@ -4752,6 +4780,10 @@ class SemanticChecker {
     if (calleeName === 'input.source') {
       const source = this.inferCallArgumentType(expression, scope, ['defval'], 0);
       return source ? { ...source, qualifier: source.qualifier ?? 'series' } : { kind: 'unknown', qualifier: 'series' };
+    }
+    if (calleeName === 'input.enum') {
+      const defval = this.inferCallArgumentType(expression, scope, ['defval'], 0);
+      return defval ? { ...defval, qualifier: 'input' } : { kind: 'unknown', qualifier: 'input' };
     }
 
     const kind = INPUT_RETURN_TYPES.get(calleeName);

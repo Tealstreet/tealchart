@@ -5457,6 +5457,11 @@ start = input.time(defval=1700000000000, "Mixed Start", "Start tooltip")
 symbol = input.symbol(defval="BINANCE:BTCUSDT", "Mixed Symbol", "Symbol tooltip")
 session = input.session(defval="0930-1600", "Mixed Session", "Session tooltip")
 memo = input.text_area(defval="notes", "Mixed Notes", "Notes tooltip")
+enum Direction
+    long = "Long"
+    short = "Short"
+direction = input.enum(Direction.long, "Direction", [Direction.long, Direction.short], "Direction tooltip")
+mixedDirection = input.enum(defval=Direction.short, "Mixed Direction", [Direction.long, Direction.short], "Mixed direction tooltip")
 source = input.source(defval=close, "Source", "Source tooltip", "src", "Data", true)
 price = input.price(101.25, "Level", "Drag level")
 mixedPrice = input.price(defval=101.25, "Mixed Level", "Drag mixed level")
@@ -5478,6 +5483,12 @@ tf = input.timeframe("60")
 symbol = input.symbol("BINANCE:BTCUSDT")
 session = input.session("0930-1600")
 memo = input.text_area("notes")
+enum Direction
+    long = "Long"
+    short = "Short"
+enum Mode
+    fast = "Fast"
+direction = input.enum(Direction.long)
 level = input.price(101.25)
 source = input.source(defval=close, "Source")
 length := "bad"
@@ -5490,6 +5501,7 @@ tf := 1
 symbol := 2
 session := 3
 memo := 4
+direction := Mode.fast
 level := "bad"
 source := "bad"
 plot(source + level + multiplier + length)
@@ -5508,6 +5520,7 @@ plot(source + level + multiplier + length)
       'Cannot assign int value to string variable symbol',
       'Cannot assign int value to string variable session',
       'Cannot assign int value to string variable memo',
+      'Cannot assign Mode value to Direction variable direction',
       'Cannot assign string value to float variable level',
       'Cannot assign string value to float variable source',
     ]);
@@ -5521,6 +5534,7 @@ plot(source + level + multiplier + length)
     expect(types.get('symbol')).toMatchObject({ kind: 'string', qualifier: 'input' });
     expect(types.get('session')).toMatchObject({ kind: 'string', qualifier: 'input' });
     expect(types.get('memo')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('direction')).toMatchObject({ kind: 'udt', name: 'Direction', qualifier: 'input' });
     expect(types.get('level')).toMatchObject({ kind: 'float', qualifier: 'input' });
     expect(types.get('source')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
@@ -5538,6 +5552,13 @@ tf = input.timeframe(60)
 symbol = input.symbol(1)
 session = input.session(930)
 memo = input.text_area(1)
+enum Direction
+    long = "Long"
+    short = "Short"
+enum Mode
+    fast = "Fast"
+levelMode = input.enum("Long")
+mixedMode = input.enum(Direction.long, "Direction", [Direction.short, Mode.fast])
 level = input.price("101.25")
 `));
 
@@ -5552,6 +5573,8 @@ level = input.price("101.25")
       'input.symbol defval must be a string',
       'input.session defval must be a string',
       'input.text_area defval must be a string',
+      'input.enum defval must be an enum member',
+      'input.enum options must use the same enum type as defval',
       'input.price defval must be a number',
     ]);
   });

@@ -247,11 +247,11 @@ including `str.split()` array element types.
 
 The common input helper pass covers generic `input()` inference, common typed
 helpers (`input.price`, `input.time`, `input.timeframe`, `input.symbol`, `input.session`,
-`input.text_area`), and common metadata (`options`, `tooltip`, `group`,
+`input.text_area`, `input.enum`), and common metadata (`options`, `tooltip`, `group`,
 `inline`, `confirm`, `display`, `active`) so generated scripts retain Pine-like control
 definitions. Semantic analysis preserves known `input.*` return types for
 downstream assignment diagnostics, including `input.source()` defval source
-types. It also reports Pine-style diagnostics for typed default-value
+types and `input.enum()` defval enum types. It also reports Pine-style diagnostics for typed default-value
 mismatches, literal default `minval` / `maxval` / `options` constraint
 violations, and `input.int()` / `input.float()` calls that mix `options` with
 range-only `minval`/`maxval`/`step` arguments.
