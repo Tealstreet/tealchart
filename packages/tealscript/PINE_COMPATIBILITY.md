@@ -234,7 +234,9 @@ overrides preserve selected source identity for the same helpers, including
 delayed calls that first execute after warmup bars. UDF, imported library
 function, and method parameters also carry known source identity, so public
 helper wrappers around rolling helpers can use historical source bars on
-delayed calls. `ta.rma()`, `ta.rsi()`, and `ta.atr()` use
+delayed calls, and simple UDF or method returns of those source parameters keep
+that identity for downstream delayed helper windows. `ta.rma()`, `ta.rsi()`,
+and `ta.atr()` use
 Pine's SMA-seeded RMA warmup before recursive smoothing; `ta.atr()` is covered
 as the RMA of `ta.tr(true)`.
 Recursive `ta.atr()` smoothing state, `ta.rsi()`
