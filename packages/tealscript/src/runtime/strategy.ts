@@ -513,6 +513,40 @@ export function hasReachedStrategyIntradayFilledOrderLimit(ledger: StrategyLedge
   return countStrategyFillsForUtcDay(ledger, time) >= rule.count;
 }
 
+export function hasReachedStrategyConsLossDaysLimit(ledger: StrategyLedger, time: number): boolean {
+  const rule = ledger.settings.riskRules.maxConsLossDays;
+  const currentDay = strategyUtcDayKey(time);
+  if (rule === null || currentDay === null) {
+    return false;
+  }
+
+  const dailyProfit = new Map<string, number>();
+  for (const trade of ledger.closedTrades) {
+    const exitTime = trade.exitTime;
+    if (exitTime === undefined) {
+      continue;
+    }
+    const day = strategyUtcDayKey(exitTime);
+    if (day === null || day > currentDay) {
+      continue;
+    }
+    dailyProfit.set(day, (dailyProfit.get(day) ?? 0) + trade.profit - trade.commission);
+  }
+
+  let consecutiveLossDays = 0;
+  for (const [, profit] of [...dailyProfit.entries()].sort(([left], [right]) => left.localeCompare(right))) {
+    consecutiveLossDays = profit < 0 ? consecutiveLossDays + 1 : 0;
+    if (consecutiveLossDays >= rule.count) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function hasReachedStrategyOrderRiskLimit(ledger: StrategyLedger, time: number): boolean {
+  return hasReachedStrategyIntradayFilledOrderLimit(ledger, time) || hasReachedStrategyConsLossDaysLimit(ledger, time);
+}
+
 export function fillStrategyMarketOrder(
   ledger: StrategyLedger,
   order: StrategyOrder,
@@ -621,7 +655,7 @@ function fillStrategyOrder(
     return null;
   }
   const isCloseOnlyEntry = order.isEntry && order.requestedQty === 0;
-  if (!order.isExit && !isCloseOnlyEntry && hasReachedStrategyIntradayFilledOrderLimit(ledger, time)) {
+  if (!order.isExit && !isCloseOnlyEntry && hasReachedStrategyOrderRiskLimit(ledger, time)) {
     order.status = 'cancelled';
     order.updatedBarIndex = barIndex;
     order.updatedTime = time;
