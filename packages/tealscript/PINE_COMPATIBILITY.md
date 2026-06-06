@@ -180,10 +180,13 @@ fixed/default lookback helpers such as `ta.cross()`, `ta.crossover()`,
 source-window, retained-source, recursive, and selected default-argument helpers
 such as `ta.macd(close)`, `ta.cmo(source)`, `ta.mom(source)`, `ta.roc(source)`,
 and `ta.cci(source)`, plus oscillator helpers such as `ta.stoch()`, `ta.mfi()`,
-and `ta.wpr()` also contribute static lookback
+and `ta.wpr()`, plus remaining common TA helpers such as `ta.atr()`,
+`ta.hma()`, `ta.kc()`, `ta.kcw()`, `ta.tsi()`, `ta.dmi()`,
+`ta.supertrend()`, `ta.sar()`, and `ta.obv()` also contribute static lookback
 requirements when their length arguments are static, including default-source
 highest/lowest lookback forms and pivot left/right windows. Runtime-observed
-direct OHLC helper lookbacks such as `ta.wpr()` and `ta.tr()` are also profiled. Truly dynamic series offsets and dynamic helper
+direct OHLC helper lookbacks such as `ta.wpr()`, `ta.tr()`, and TA variables
+that read prior close/volume bars are also profiled. Truly dynamic series offsets and dynamic helper
 lengths are still inferred from observed runtime access.
 
 ## Roadmaps
@@ -772,7 +775,8 @@ selected static or observed rolling-window helper lookbacks such as
 helpers, momentum helpers, band/average/regression helpers, and `ta.*`
 fixed/default, source-window, retained-source, recursive, and default-argument
 helpers, oscillator helpers, and direct OHLC helper lookbacks, including
-default-source highest/lowest and pivot left/right windows. Full Pine-style
+remaining common TA helpers, default-source highest/lowest and pivot left/right
+windows, and TA variables that read prior close/volume bars. Full Pine-style
 preallocation for arbitrary series offsets remains a compatibility target. The
 checkpoint corpus tracks an official `max_bars_back`
 bounded-history fixture.

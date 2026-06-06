@@ -989,10 +989,14 @@ export class TealscriptEngine {
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes);
       case 'ta.cci':
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 0, 20);
+      case 'ta.hma':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes);
       case 'ta.alma':
       case 'ta.bb':
       case 'ta.bbw':
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['series', 'length'], 1, collectionScopes);
+      case 'ta.atr':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['length'], 0, collectionScopes, 1);
       case 'ta.correlation':
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source1', 'source2', 'length'], 2, collectionScopes);
       case 'ta.linreg':
@@ -1028,6 +1032,23 @@ export class TealscriptEngine {
           return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['series', 'length'], 1, collectionScopes, 1, 14);
         }
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1, 14);
+      case 'ta.tsi':
+        return Math.max(
+          1,
+          this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'short_length', 'long_length'], 1, collectionScopes),
+          this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'short_length', 'long_length'], 2, collectionScopes),
+        );
+      case 'ta.kc':
+      case 'ta.kcw':
+        return this.inferStaticKeltnerMaxBarsBack(expression, collectionScopes);
+      case 'ta.dmi':
+        return this.inferStaticDmiMaxBarsBack(expression, collectionScopes);
+      case 'ta.supertrend':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['factor', 'atrPeriod'], 1, collectionScopes, 1, 10);
+      case 'ta.sar':
+        return 2;
+      case 'ta.obv':
+        return 1;
       case 'ta.crossover':
       case 'ta.crossunder':
       case 'ta.cross':
@@ -1072,6 +1093,25 @@ export class TealscriptEngine {
     }
 
     return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes);
+  }
+
+  private inferStaticKeltnerMaxBarsBack(expression: CallExpression, collectionScopes: StaticCollectionScopes): number {
+    const lengthMaxBarsBack = this.inferStaticLookbackArgumentMaxBarsBack(
+      expression,
+      ['series', 'length', 'mult', 'useTrueRange'],
+      1,
+      collectionScopes,
+    );
+    const useTrueRangeArgument = this.getStaticOrderedCallArgument(expression, ['series', 'length', 'mult', 'useTrueRange'], 3);
+    const useTrueRange = useTrueRangeArgument ? this.inferStaticBooleanValue(useTrueRangeArgument, collectionScopes) : true;
+    return useTrueRange === false ? lengthMaxBarsBack : Math.max(lengthMaxBarsBack, 1);
+  }
+
+  private inferStaticDmiMaxBarsBack(expression: CallExpression, collectionScopes: StaticCollectionScopes): number {
+    return Math.max(
+      this.inferStaticLookbackArgumentMaxBarsBack(expression, ['diLength', 'adxSmoothing'], 0, collectionScopes, 1, 14),
+      this.inferStaticLookbackArgumentMaxBarsBack(expression, ['diLength', 'adxSmoothing'], 1, collectionScopes, 0, 14),
+    );
   }
 
   private inferStaticPivotMaxBarsBack(expression: CallExpression, collectionScopes: StaticCollectionScopes): number {
@@ -2831,6 +2871,7 @@ export class TealscriptEngine {
       case 'ohlc4':
         return this.ctx.ohlc4;
       case 'ta.obv':
+        this.recordLookbackLength(2);
         return this.updateObv(this.ctx.close.get(0)!, this.ctx.close.get(1), this.ctx.volume.get(0)!, this.scope, '_ta_obv_value');
       case 'ta.iii':
         return this.currentIntradayIntensityIndex();
@@ -4934,10 +4975,12 @@ export class TealscriptEngine {
           return this.naIfMissing(this.getOhlc4(offset));
         case 'ta.obv':
           this.checkHistoryOffset(offset);
+          this.recordLookbackLength(2);
           this.updateObv(this.ctx.close.get(0)!, this.ctx.close.get(1), this.ctx.volume.get(0)!, this.scope, '_ta_obv_value');
           return this.naIfMissing(this.scope.getWithOffset('_ta_obv_value', offset));
         case 'ta.tr':
           this.checkHistoryOffset(offset);
+          this.recordLookbackLength(offset + 2);
           return this.naIfMissing(this.trueRange(offset, false));
       }
 
@@ -4962,6 +5005,7 @@ export class TealscriptEngine {
           return this.naIfMissing(this.scope.getWithOffset('_ta_nvi_value', offset));
         case 'ta.obv':
           this.checkHistoryOffset(offset);
+          this.recordLookbackLength(2);
           this.updateObv(this.ctx.close.get(0)!, this.ctx.close.get(1), this.ctx.volume.get(0)!, this.scope, '_ta_obv_value');
           return this.naIfMissing(this.scope.getWithOffset('_ta_obv_value', offset));
         case 'ta.pvi':
@@ -4974,6 +5018,7 @@ export class TealscriptEngine {
           return this.naIfMissing(this.scope.getWithOffset('_ta_pvt_value', offset));
         case 'ta.tr':
           this.checkHistoryOffset(offset);
+          this.recordLookbackLength(offset + 2);
           return this.naIfMissing(this.trueRange(offset, false));
         case 'ta.wad':
           this.checkHistoryOffset(offset);
@@ -5132,6 +5177,7 @@ export class TealscriptEngine {
   }
 
   private updateVolumeIndex(scope: Scope, key: string, shouldUpdate: (volume: number, previousVolume: number) => boolean): number {
+    this.recordLookbackLength(2);
     return this.updateBarCachedNumericState(scope, key, 1, (previous) => {
       const close = this.ctx.close.get(0);
       const previousClose = this.ctx.close.get(1);
@@ -5152,6 +5198,7 @@ export class TealscriptEngine {
   }
 
   private updatePriceVolumeTrend(scope: Scope, key: string): number {
+    this.recordLookbackLength(2);
     return this.updateBarCachedNumericState(scope, key, 0, (previous) => {
       const close = this.ctx.close.get(0);
       const previousClose = this.ctx.close.get(1);
@@ -5164,6 +5211,7 @@ export class TealscriptEngine {
   }
 
   private updateWilliamsAccumulationDistribution(scope: Scope, key: string): number {
+    this.recordLookbackLength(2);
     return this.updateBarCachedNumericState(scope, key, 0, (previous) => {
       const high = this.ctx.high.get(0);
       const low = this.ctx.low.get(0);
@@ -5882,6 +5930,9 @@ export class TealscriptEngine {
     }
 
     const previousClose = this.ctx.close.get(1);
+    if (useTrueRange) {
+      this.recordLookbackLength(2);
+    }
     const trueRange = previousClose === undefined || isNaN(previousClose)
       ? high - low
       : Math.max(high - low, Math.abs(high - previousClose), Math.abs(low - previousClose));
@@ -9417,6 +9468,7 @@ export class TealscriptEngine {
     // ATR - Average True Range
     this.builtins.set('ta.atr', (args, namedArgs, ctx, scope, callId) => {
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 0, 'length'));
+      this.recordLookbackLength(length + 1);
 
       // Calculate True Range
       const high = ctx.high.get(0)!;
@@ -9831,6 +9883,7 @@ export class TealscriptEngine {
       const shortLength = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taTsiArgs, 1));
       const longLength = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taTsiArgs, 2));
       if (isNaN(source) || shortLength < 1 || longLength < 1) return NaN;
+      this.recordLookbackLength(2);
 
       const sourceKey = `_ta_tsi_source_${callId}`;
       const sourceHistory = (scope.get(sourceKey) as number[] | undefined) ?? [];
@@ -10120,6 +10173,7 @@ export class TealscriptEngine {
       const taSupertrendArgs = ['factor', 'atrPeriod'];
       const factor = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSupertrendArgs, 0, 3.0));
       const atrLength = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSupertrendArgs, 1, 10));
+      this.recordLookbackLength(atrLength + 1);
 
       const high = ctx.high.get(0)!;
       const low = ctx.low.get(0)!;
@@ -10221,6 +10275,7 @@ export class TealscriptEngine {
       if (length < 1 || adxSmoothing < 1) {
         return [NaN, NaN, NaN];
       }
+      this.recordLookbackLength(length + 1);
 
       const high = ctx.high.get(0)!;
       const low = ctx.low.get(0)!;
@@ -10305,6 +10360,7 @@ export class TealscriptEngine {
       const start = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSarArgs, 0, 0.02));
       const increment = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSarArgs, 1, 0.02));
       const maximum = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSarArgs, 2, 0.2));
+      this.recordLookbackLength(3);
 
       const high = ctx.high.get(0)!;
       const low = ctx.low.get(0)!;
