@@ -2569,6 +2569,37 @@ plot(strategy.closedtrades, title="Closed Trades")
     expect(result.strategy.settings.riskRules.maxConsLossDays).toEqual({ count: 2 });
   });
 
+  it('locks a reduced official strategy intraday loss risk idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
+    const bars: Bar[] = [
+      { time: Date.UTC(2024, 0, 1, 9), open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: Date.UTC(2024, 0, 1, 10), open: 100, high: 101, low: 89, close: 90, volume: 100 },
+      { time: Date.UTC(2024, 0, 1, 11), open: 90, high: 92, low: 88, close: 91, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Official Intraday Loss Risk Checkpoint", process_orders_on_close=true)
+strategy.risk.max_intraday_loss(value=5, type=strategy.cash)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 2
+    strategy.entry("Blocked", strategy.long, qty=1)
+plot(strategy.position_size, title="Position")
+plot(strategy.equity, title="Equity")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Position').values).toEqual([1, 1, 1]);
+    expect(getPlot(result, 'Equity').values).toEqual([100_000, 99_990, 99_991]);
+    expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Long']);
+    expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long']);
+    expect(result.strategy.equityCurve.map(({ equity, drawdown }) => ({ equity, drawdown }))).toEqual([
+      { equity: 100_000, drawdown: 0 },
+      { equity: 99_990, drawdown: 10 },
+      { equity: 99_991, drawdown: 9 },
+    ]);
+    expect(result.strategy.settings.riskRules.maxIntradayLoss).toEqual({ value: 5, type: 'cash' });
+  });
+
   it('locks a reduced official strategy bar-magnifier idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const baseTime = 1_700_100_000_000;
