@@ -8230,18 +8230,19 @@ export class TealscriptEngine {
     });
 
     // RSI - Relative Strength Index
-    this.builtins.set('ta.rsi', (args, namedArgs, ctx, scope, callId) => {
+    this.builtins.set('ta.rsi', (args, namedArgs, _ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
       const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
 
-      // Get the series for the source value
-      const series = this.getSeriesForSource(source, ctx);
+      if (isNaN(source) || length < 1) return NaN;
+
+      const sourceHistory = this.updateBuiltinSourceHistory(scope, `_ta_rsi_source_${callId}_${length}`, source, length + 1);
 
       const avgGainKey = `_ta_rsi_gain_${callId}_${length}`;
       const avgLossKey = `_ta_rsi_loss_${callId}_${length}`;
 
-      const prevSource = series.get(1);
+      const prevSource = sourceHistory[1];
       if (prevSource === undefined) return NaN;
 
       const change = source - prevSource;
@@ -8257,8 +8258,8 @@ export class TealscriptEngine {
         let totalLoss = 0;
 
         for (let i = 0; i < length; i++) {
-          const curr = series.get(i);
-          const prev = series.get(i + 1);
+          const curr = sourceHistory[i];
+          const prev = sourceHistory[i + 1];
           if (curr === undefined || prev === undefined) continue;
 
           const c = curr - prev;
