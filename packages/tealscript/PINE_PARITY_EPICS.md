@@ -101,6 +101,8 @@ Known structural gaps:
 
 - The harness has a real-script intake ledger, offline pass-rate summaries, and
   a stable parse/semantic/runtime/data/output/render failure taxonomy. The
+  runner treats omitted canonical stages as `not_run` failures while preserving
+  explicitly `skipped` stages as pass-neutral evidence. The
   checkpoint corpus dashboard can now be generated as JSON/Markdown artifacts
   for CI; the remaining evidence gap is scaling the ledger with more
   public-script metadata.
@@ -491,7 +493,8 @@ impact.
    `strategy.exit()` profit/loss offset brackets and trailing exit
    tick-distance offsets, covered in the source-linked corpus.
 3. Harness incomplete outcomes: keep canonical `not_run` stages failing corpus
-   pass-rate summaries unless they are explicitly marked `skipped`.
+   pass-rate summaries unless they are explicitly marked `skipped`; direct
+   checkpoint coverage now locks both sides of that contract.
 4. Pine layout parser audit fixtures: keep reduced coverage for top-level
    nested dedents, seventh-level UDF branches, wrapped indented expressions,
    wrapped function/method signatures, wrapped request calls with multiline
