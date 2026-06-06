@@ -1071,7 +1071,8 @@ Pine's alert contract: `freq_all` emits every call, non-`all` alerts emit only
 the first eligible execution per call site per bar, and
 `freq_once_per_bar_close` emits only on confirmed bar executions. Direct alert
 events include an `isRealtime` marker so consumers can distinguish historical
-calculation events from live update events.
+calculation events from live update events. Semantic checks also reject invalid
+literal or namespace-constant `alert()` frequency values before runtime.
 The checkpoint fixture follows TradingView's
 documented trigger-condition idiom by deriving a boolean condition, registering
 it with `alertcondition()`, and firing a direct `alert()` from an `if` block.

@@ -519,6 +519,19 @@ alertcondition(true, title="A", message="M", freq=alert.freq_all)
     ]);
   });
 
+  it('reports invalid literal Pine alert frequency values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Alert Frequency")
+alert("bad", "sometimes")
+alert(message="bad namespace", freq=alert.freq_never)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid alert frequency: sometimes',
+      'Invalid alert frequency: alert.freq_never',
+    ]);
+  });
+
   it('reports invalid Pine built-in argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Invalid Built-in Bindings")
