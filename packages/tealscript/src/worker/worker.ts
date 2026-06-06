@@ -8,7 +8,7 @@
  */
 
 import { parse, TealscriptParseError } from '../parser';
-import { TealscriptEngine } from '../runtime/engine';
+import { createRuntimeErrorPayload, TealscriptEngine } from '../runtime/engine';
 import type { TealscriptRuntimeOptions } from '../runtime/engine';
 import { checkProgram } from '../semantic';
 import type { Program } from '../parser/ast';
@@ -243,6 +243,11 @@ function executeAndSendResults(metadata?: WorkerOutputMetadata): void {
 
     // Execute the script
     const result = state.engine.execute(state.ast, state.bars, inputsMap);
+    const runtimeError = result.errors.find((error) => error.runtimeError)?.runtimeError;
+    if (runtimeError) {
+      postResult(createRuntimeErrorMessage(state.scriptId, runtimeError, metadata));
+      return;
+    }
 
     // Convert result inputs to InputDefinition[]
     const inputs: InputDefinition[] = result.inputs.map((input) => ({
@@ -274,6 +279,12 @@ function executeAndSendResults(metadata?: WorkerOutputMetadata): void {
  * Handle execution errors
  */
 function handleError(error: unknown, metadata?: WorkerOutputMetadata): void {
+  const runtimeError = createRuntimeErrorPayload(error);
+  if (runtimeError) {
+    postResult(createRuntimeErrorMessage(state?.scriptId ?? 'unknown', runtimeError, metadata));
+    return;
+  }
+
   const errorMessage: ErrorMessage = {
     type: 'error',
     scriptId: state?.scriptId ?? 'unknown',
@@ -281,6 +292,23 @@ function handleError(error: unknown, metadata?: WorkerOutputMetadata): void {
     metadata,
   };
   postResult(errorMessage);
+}
+
+function createRuntimeErrorMessage(
+  scriptId: string,
+  runtimeError: NonNullable<ErrorMessage['runtimeError']>,
+  metadata?: WorkerOutputMetadata,
+): ErrorMessage {
+  return {
+    type: 'error',
+    scriptId,
+    message: runtimeError.message,
+    code: runtimeError.code,
+    line: runtimeError.line,
+    column: runtimeError.column,
+    runtimeError,
+    metadata,
+  };
 }
 
 // Signal that worker is ready

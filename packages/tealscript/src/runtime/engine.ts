@@ -332,6 +332,17 @@ export interface RuntimeProfile {
  */
 export interface ExecutionError {
   message: string;
+  code?: RuntimeErrorCode;
+  line?: number;
+  column?: number;
+  runtimeError?: RuntimeErrorPayload;
+}
+
+export type RuntimeErrorCode = 'runtime.error';
+
+export interface RuntimeErrorPayload {
+  code: RuntimeErrorCode;
+  message: string;
   line?: number;
   column?: number;
 }
@@ -600,11 +611,7 @@ export class TealscriptEngine {
       try {
         this.executeStatement(stmt);
       } catch (error) {
-        this.errors.push({
-          message: error instanceof Error ? error.message : String(error),
-          line: stmt.loc?.start.line,
-          column: stmt.loc?.start.column,
-        });
+        this.errors.push(createExecutionError(error, stmt.loc?.start.line, stmt.loc?.start.column));
         if (error instanceof RuntimeErrorException) {
           return true;
         }
@@ -1718,11 +1725,7 @@ export class TealscriptEngine {
       try {
         this.executeStatement(stmt);
       } catch (error) {
-        this.errors.push({
-          message: error instanceof Error ? error.message : String(error),
-          line: stmt.loc?.start.line,
-          column: stmt.loc?.start.column,
-        });
+        this.errors.push(createExecutionError(error, stmt.loc?.start.line, stmt.loc?.start.column));
         if (error instanceof RuntimeErrorException) {
           throw error;
         }
@@ -11185,10 +11188,38 @@ class ContinueException extends Error {
  * Exception for runtime.error().
  */
 class RuntimeErrorException extends Error {
+  readonly runtimeErrorCode: RuntimeErrorCode;
+
   constructor(message: string) {
     super(message);
     this.name = 'RuntimeErrorException';
+    this.runtimeErrorCode = 'runtime.error';
   }
+}
+
+export function createRuntimeErrorPayload(
+  error: unknown,
+  line?: number,
+  column?: number,
+): RuntimeErrorPayload | undefined {
+  if (!(error instanceof RuntimeErrorException)) return undefined;
+  return {
+    code: error.runtimeErrorCode,
+    message: error.message,
+    line,
+    column,
+  };
+}
+
+function createExecutionError(error: unknown, line?: number, column?: number): ExecutionError {
+  const message = error instanceof Error ? error.message : String(error);
+  const runtimeError = createRuntimeErrorPayload(error, line, column);
+  return {
+    message,
+    line,
+    column,
+    ...(runtimeError ? { code: runtimeError.code, runtimeError } : {}),
+  };
 }
 
 /**
