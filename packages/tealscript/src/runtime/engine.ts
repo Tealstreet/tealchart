@@ -374,6 +374,14 @@ interface ImportedLibrary {
   constants: Map<string, unknown>;
 }
 
+type SeriesAccessor = { get: (offset: number) => number | undefined };
+
+interface KnownSourceValue {
+  __tealscriptKnownSource: true;
+  value: number;
+  series: SeriesAccessor;
+}
+
 type TimeframeUnit = 'tick' | 'second' | 'minute' | 'day' | 'week' | 'month';
 type RuntimeSessionKind = Extract<SessionClosureKind, 'premarket' | 'regular' | 'postmarket' | 'extended'>;
 
@@ -3163,9 +3171,11 @@ export class TealscriptEngine {
     const args: unknown[] = [];
     const namedArgs = new Map<string, unknown>();
     const hasPositionalArgumentAfterNamed = this.hasPositionalArgumentAfterNamed(expr.arguments);
-
-    for (const arg of expr.arguments) {
-      const value = this.evaluateExpression(arg.value);
+    for (let argIndex = 0; argIndex < expr.arguments.length; argIndex++) {
+      const arg = expr.arguments[argIndex]!;
+      const value = this.shouldPreserveBuiltinSourceArgument(fullName, expr.arguments, argIndex)
+        ? this.evaluateBuiltinSourceArgument(arg.value)
+        : this.evaluateExpression(arg.value);
       if (arg.name) {
         const argName = arg.name.name;
         if (namedArgs.has(argName)) {
@@ -3374,6 +3384,84 @@ export class TealscriptEngine {
       }
     }
     return false;
+  }
+
+  private shouldPreserveBuiltinSourceArgument(fullName: string, args: CallArgument[], argIndex: number): boolean {
+    if (fullName !== 'math.sum' && !fullName.startsWith('ta.')) return false;
+
+    const parameterName = this.getBuiltinSourceArgumentParameterName(fullName, args, argIndex);
+    return parameterName !== undefined && ['source', 'series', 'source1', 'source2', 'high', 'low'].includes(parameterName);
+  }
+
+  private getBuiltinSourceArgumentParameterName(fullName: string, args: CallArgument[], argIndex: number): string | undefined {
+    const arg = args[argIndex];
+    if (!arg) return undefined;
+
+    const name = arg.name?.name;
+    if (name) return name;
+
+    const parameters = this.getBuiltinSourcePreservationParameters(fullName);
+    if (!parameters) return undefined;
+
+    const namedParameters = new Set(args.map((candidate) => candidate.name?.name).filter((candidate): candidate is string => candidate !== undefined));
+    let positionalOrdinal = 0;
+    for (let index = 0; index < argIndex; index++) {
+      if (!args[index]!.name) positionalOrdinal++;
+    }
+
+    let currentOrdinal = 0;
+    for (const parameter of parameters) {
+      if (namedParameters.has(parameter)) continue;
+      if (currentOrdinal === positionalOrdinal) return parameter;
+      currentOrdinal++;
+    }
+    return undefined;
+  }
+
+  private getBuiltinSourcePreservationParameters(fullName: string): readonly string[] | undefined {
+    switch (fullName) {
+      case 'math.sum':
+        return ['source', 'length'];
+      case 'ta.cross':
+      case 'ta.crossover':
+      case 'ta.crossunder':
+      case 'ta.correlation':
+        return ['source1', 'source2', 'length'];
+      case 'ta.stoch':
+        return ['source', 'high', 'low', 'length'];
+      case 'ta.valuewhen':
+        return ['condition', 'source', 'occurrence'];
+      case 'ta.alma':
+        return ['series', 'length', 'offset', 'sigma', 'floor'];
+      case 'ta.bb':
+      case 'ta.bbw':
+        return ['series', 'length', 'mult'];
+      case 'ta.kc':
+      case 'ta.kcw':
+        return ['series', 'length', 'mult', 'useTrueRange'];
+      case 'ta.linreg':
+        return ['source', 'length', 'offset'];
+      default:
+        return fullName.startsWith('ta.') ? ['source', 'length'] : undefined;
+    }
+  }
+
+  private evaluateBuiltinSourceArgument(expr: Expression): unknown {
+    const value = this.evaluateExpression(expr);
+    if (expr.type !== 'Identifier') return value;
+
+    const series = this.getKnownSeriesByName(expr.name, this.ctx);
+    return series ? this.toKnownSourceValue(value, series) : value;
+  }
+
+  private toKnownSourceValue(value: unknown, series: SeriesAccessor): unknown {
+    const numericValue = this.toNumber(value);
+    if (isNaN(numericValue)) return value;
+    return {
+      __tealscriptKnownSource: true,
+      value: numericValue,
+      series,
+    } satisfies KnownSourceValue;
   }
 
   private userCallableScopeKey(fn: FunctionDeclaration): string {
@@ -5323,6 +5411,7 @@ export class TealscriptEngine {
   // ===========================================================================
 
   private isTruthy(value: unknown): boolean {
+    if (this.isKnownSourceValue(value)) return this.isTruthy(value.value);
     if (this.isNa(value)) return false;
     if (typeof value === 'boolean') return value;
     if (typeof value === 'number') return value !== 0;
@@ -5331,7 +5420,18 @@ export class TealscriptEngine {
   }
 
   private isNa(value: unknown): boolean {
+    if (this.isKnownSourceValue(value)) return isNaN(value.value);
     return typeof value === 'number' && isNaN(value);
+  }
+
+  private isKnownSourceValue(value: unknown): value is KnownSourceValue {
+    return typeof value === 'object'
+      && value !== null
+      && (value as KnownSourceValue).__tealscriptKnownSource === true;
+  }
+
+  private unwrapKnownSourceValue(value: unknown): unknown {
+    return this.isKnownSourceValue(value) ? value.value : value;
   }
 
   private isComparisonOperator(operator: string): boolean {
@@ -5457,6 +5557,9 @@ export class TealscriptEngine {
   }
 
   private toStringValue(value: unknown, format?: string): string {
+    if (this.isKnownSourceValue(value)) {
+      return this.toStringValue(value.value, format);
+    }
     if (value === null || value === undefined || this.isNa(value)) {
       return 'NaN';
     }
@@ -5817,6 +5920,7 @@ export class TealscriptEngine {
   }
 
   private toNumber(value: unknown): number {
+    if (this.isKnownSourceValue(value)) return value.value;
     if (typeof value === 'number') return value;
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : Number.NaN;
@@ -5890,9 +5994,13 @@ export class TealscriptEngine {
     return history;
   }
 
-  private getCompleteSourceWindow(scope: Scope, key: string, source: number, length: number): number[] | null {
+  private getCompleteSourceWindow(scope: Scope, key: string, source: unknown, length: number): number[] | null {
     this.recordLookbackLength(length);
-    if (isNaN(source) || length < 1) return null;
+    const numericSource = this.toNumber(source);
+    if (isNaN(numericSource) || length < 1) return null;
+    const knownWindow = this.getKnownSourceWindow(source, length);
+    if (knownWindow) return knownWindow;
+
     const maxLengthKey = `${key}_max_length`;
     const previousMaxLength = scope.get(maxLengthKey) as number | undefined;
     const maxLength = Math.max(length, previousMaxLength ?? 0);
@@ -5902,30 +6010,59 @@ export class TealscriptEngine {
       Math.max(maxLength, this.ctx.bar_index + 1),
       TealscriptEngine.MAX_BUILTIN_SOURCE_HISTORY,
     );
-    const values = this.updateBuiltinSourceHistory(scope, key, source, keep, false);
+    const values = this.updateBuiltinSourceHistory(scope, key, numericSource, keep, false);
     const window = values.slice(0, length);
     if (window.length < length || window.some((value) => isNaN(value))) return null;
     return window;
   }
 
-  private getAvailableSourceWindow(scope: Scope, key: string, source: number, length: number): number[] {
+  private getAvailableSourceWindow(scope: Scope, key: string, source: unknown, length: number): number[] {
     this.recordLookbackLength(length);
-    if (isNaN(source) || length < 1) return [];
-    const values = this.updateBuiltinSourceHistory(scope, key, source, length, false);
+    const numericSource = this.toNumber(source);
+    if (isNaN(numericSource) || length < 1) return [];
+    const knownWindow = this.getKnownSourceWindow(source, length);
+    if (knownWindow) return knownWindow;
+
+    const values = this.updateBuiltinSourceHistory(scope, key, numericSource, length, false);
     return values.slice(0, length).filter((value) => !isNaN(value));
   }
 
-  private getCompleteNonNaSourceWindow(scope: Scope, key: string, source: number, length: number): number[] | null {
+  private getCompleteNonNaSourceWindow(scope: Scope, key: string, source: unknown, length: number): number[] | null {
     this.recordLookbackLength(length);
     if (length < 1) return null;
+    const knownWindow = this.getKnownSourceWindow(source, length, true);
+    if (knownWindow) return knownWindow;
+
+    const numericSource = this.toNumber(source);
     const history = (scope.get(key) as number[] | undefined) ?? [];
-    if (!isNaN(source)) {
-      this.prependBoundedHistory(history, source, length);
+    if (!isNaN(numericSource)) {
+      this.prependBoundedHistory(history, numericSource, length);
     } else if (history.length > length) {
       history.length = length;
     }
     this.setBuiltinState(scope, key, history);
     return history.length < length ? null : history;
+  }
+
+  private getKnownSourceWindow(source: unknown, length: number, skipNa = false): number[] | null {
+    if (!this.isKnownSourceValue(source)) return null;
+
+    const values: number[] = [];
+    const offsetLimit = Math.min(
+      length,
+      this.ctx.bar_index + 1,
+      TealscriptEngine.MAX_BUILTIN_SOURCE_HISTORY,
+    );
+    for (let offset = 0; offset < offsetLimit && values.length < length; offset++) {
+      const value = source.series.get(offset);
+      if (value === undefined) return null;
+      if (isNaN(value)) {
+        if (skipNa) continue;
+        return null;
+      }
+      values.push(value);
+    }
+    return values.length < length ? null : values;
   }
 
   private prependBoundedHistory<T>(history: T[], source: T, keep: number): void {
@@ -6048,21 +6185,14 @@ export class TealscriptEngine {
     scope: Scope,
     leftKey: string,
     rightKey: string,
-    leftSource: number,
-    rightSource: number,
+    leftSource: unknown,
+    rightSource: unknown,
     length: number,
   ): [number[], number[]] | null {
-    if (length < 1 || isNaN(leftSource) || isNaN(rightSource)) return null;
-    const leftValues = this.updateBuiltinSourceHistory(scope, leftKey, leftSource, length);
-    const rightValues = this.updateBuiltinSourceHistory(scope, rightKey, rightSource, length);
-    if (
-      leftValues.length < length
-      || rightValues.length < length
-      || leftValues.some((value) => isNaN(value))
-      || rightValues.some((value) => isNaN(value))
-    ) {
-      return null;
-    }
+    if (length < 1 || isNaN(this.toNumber(leftSource)) || isNaN(this.toNumber(rightSource))) return null;
+    const leftValues = this.getCompleteSourceWindow(scope, leftKey, leftSource, length);
+    const rightValues = this.getCompleteSourceWindow(scope, rightKey, rightSource, length);
+    if (!leftValues || !rightValues) return null;
     return [leftValues, rightValues];
   }
 
@@ -7984,7 +8114,7 @@ export class TealscriptEngine {
     });
     this.builtins.set('math.sum', (args, namedArgs, _ctx, scope, callId) => {
       const mathSumArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, mathSumArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, mathSumArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, mathSumArgs, 1));
       const values = this.getCompleteNonNaSourceWindow(scope, `_math_sum_source_${callId}`, source, length);
       return values ? values.reduce((sum, value) => sum + value, 0) : Number.NaN;
@@ -9281,17 +9411,78 @@ export class TealscriptEngine {
    * Get a series accessor for a given source value.
    * Maps current bar values back to their source series.
    */
-  private getKnownSeriesForSource(source: number, ctx: ExecutionContext): { get: (offset: number) => number | undefined } | undefined {
+  private getKnownSeriesByName(name: string, ctx: ExecutionContext): SeriesAccessor | undefined {
+    switch (name) {
+      case 'open':
+        return ctx.open;
+      case 'high':
+        return ctx.high;
+      case 'low':
+        return ctx.low;
+      case 'close':
+        return ctx.close;
+      case 'volume':
+        return ctx.volume;
+      case 'bid':
+        return ctx.bid;
+      case 'ask':
+        return ctx.ask;
+      case 'hl2':
+        return {
+          get: (i) => {
+            const h = ctx.high.get(i);
+            const l = ctx.low.get(i);
+            return h !== undefined && l !== undefined ? (h + l) / 2 : undefined;
+          },
+        };
+      case 'hlc3':
+        return {
+          get: (i) => {
+            const h = ctx.high.get(i);
+            const l = ctx.low.get(i);
+            const c = ctx.close.get(i);
+            return h !== undefined && l !== undefined && c !== undefined ? (h + l + c) / 3 : undefined;
+          },
+        };
+      case 'ohlc4':
+        return {
+          get: (i) => {
+            const o = ctx.open.get(i);
+            const h = ctx.high.get(i);
+            const l = ctx.low.get(i);
+            const c = ctx.close.get(i);
+            return o !== undefined && h !== undefined && l !== undefined && c !== undefined
+              ? (o + h + l + c) / 4
+              : undefined;
+          },
+        };
+      case 'hlcc4':
+        return {
+          get: (i) => {
+            const h = ctx.high.get(i);
+            const l = ctx.low.get(i);
+            const c = ctx.close.get(i);
+            return h !== undefined && l !== undefined && c !== undefined ? (h + l + c + c) / 4 : undefined;
+          },
+        };
+      default:
+        return undefined;
+    }
+  }
+
+  private getKnownSeriesForSource(source: unknown, ctx: ExecutionContext): SeriesAccessor | undefined {
+    if (this.isKnownSourceValue(source)) return source.series;
+    const sourceValue = this.toNumber(source);
     // Check if source matches any built-in series at offset 0
-    if (source === ctx.close.get(0)) return ctx.close;
-    if (source === ctx.high.get(0)) return ctx.high;
-    if (source === ctx.low.get(0)) return ctx.low;
-    if (source === ctx.open.get(0)) return ctx.open;
-    if (source === ctx.volume.get(0)) return ctx.volume;
-    if (source === ctx.bid.get(0)) return ctx.bid;
-    if (source === ctx.ask.get(0)) return ctx.ask;
+    if (sourceValue === ctx.close.get(0)) return ctx.close;
+    if (sourceValue === ctx.high.get(0)) return ctx.high;
+    if (sourceValue === ctx.low.get(0)) return ctx.low;
+    if (sourceValue === ctx.open.get(0)) return ctx.open;
+    if (sourceValue === ctx.volume.get(0)) return ctx.volume;
+    if (sourceValue === ctx.bid.get(0)) return ctx.bid;
+    if (sourceValue === ctx.ask.get(0)) return ctx.ask;
     // Check derived series
-    if (source === ctx.hl2)
+    if (sourceValue === ctx.hl2)
       return {
         get: (i) => {
           const h = ctx.high.get(i);
@@ -9299,7 +9490,7 @@ export class TealscriptEngine {
           return h !== undefined && l !== undefined ? (h + l) / 2 : undefined;
         },
       };
-    if (source === ctx.hlc3)
+    if (sourceValue === ctx.hlc3)
       return {
         get: (i) => {
           const h = ctx.high.get(i);
@@ -9308,7 +9499,7 @@ export class TealscriptEngine {
           return h !== undefined && l !== undefined && c !== undefined ? (h + l + c) / 3 : undefined;
         },
       };
-    if (source === ctx.ohlc4)
+    if (sourceValue === ctx.ohlc4)
       return {
         get: (i) => {
           const o = ctx.open.get(i);
@@ -9320,7 +9511,7 @@ export class TealscriptEngine {
             : undefined;
         },
       };
-    if (source === ctx.hlcc4)
+    if (sourceValue === ctx.hlcc4)
       return {
         get: (i) => {
           const h = ctx.high.get(i);
@@ -9336,7 +9527,7 @@ export class TealscriptEngine {
     // SMA - Simple Moving Average
     this.builtins.set('ta.sma', (args, namedArgs, _ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_sma_source_${callId}`, source, length);
       if (!values) return NaN;
@@ -9402,7 +9593,7 @@ export class TealscriptEngine {
     this.builtins.set('ta.valuewhen', (args, namedArgs, _ctx, scope, callId) => {
       const taValuewhenArgs = ['condition', 'source', 'occurrence'];
       const condition = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taValuewhenArgs, 0));
-      const source = this.getOrderedCallArg(args, namedArgs, taValuewhenArgs, 1) as number;
+      const source = this.unwrapKnownSourceValue(this.getOrderedCallArg(args, namedArgs, taValuewhenArgs, 1));
       const occurrence = Math.max(0, Math.trunc(this.toNumber(this.getOrderedCallArg(args, namedArgs, taValuewhenArgs, 2, 0))));
       const key = `_valuewhen_${callId}`;
       const values = (scope.get(key) as unknown[] | undefined) ?? [];
@@ -9430,8 +9621,8 @@ export class TealscriptEngine {
         return previous === undefined ? false : rawSource !== previous;
       }
 
-      const source = rawSource as number;
-      const values = this.getCompleteSourceWindow(scope, `_change_num_${callId}`, source, length + 1);
+      const source = this.toNumber(rawSource);
+      const values = this.getCompleteSourceWindow(scope, `_change_num_${callId}`, rawSource, length + 1);
       if (!values) return NaN;
 
       return source - values[length]!;
@@ -9441,10 +9632,12 @@ export class TealscriptEngine {
     // Uses scope to track previous values of both arguments
     this.builtins.set('ta.crossover', (args, namedArgs, ctx, scope, callId) => {
       const taCrossArgs = ['source1', 'source2'];
-      const source1 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0));
-      const source2 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1));
-      const series1 = this.getKnownSeriesForSource(source1, ctx);
-      const series2 = this.getKnownSeriesForSource(source2, ctx);
+      const rawSource1 = this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0);
+      const rawSource2 = this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1);
+      const source1 = this.toNumber(rawSource1);
+      const source2 = this.toNumber(rawSource2);
+      const series1 = this.getKnownSeriesForSource(rawSource1, ctx);
+      const series2 = this.getKnownSeriesForSource(rawSource2, ctx);
       const trackKey1 = `_cross_over_src1_${callId}`;
       const trackKey2 = `_cross_over_src2_${callId}`;
       const previous1 = series1?.get(1) ?? (scope.get(trackKey1) as number | undefined);
@@ -9464,10 +9657,12 @@ export class TealscriptEngine {
     // Crossunder - source1 crosses below source2
     this.builtins.set('ta.crossunder', (args, namedArgs, ctx, scope, callId) => {
       const taCrossArgs = ['source1', 'source2'];
-      const source1 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0));
-      const source2 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1));
-      const series1 = this.getKnownSeriesForSource(source1, ctx);
-      const series2 = this.getKnownSeriesForSource(source2, ctx);
+      const rawSource1 = this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0);
+      const rawSource2 = this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1);
+      const source1 = this.toNumber(rawSource1);
+      const source2 = this.toNumber(rawSource2);
+      const series1 = this.getKnownSeriesForSource(rawSource1, ctx);
+      const series2 = this.getKnownSeriesForSource(rawSource2, ctx);
       const trackKey1 = `_cross_under_src1_${callId}`;
       const trackKey2 = `_cross_under_src2_${callId}`;
       const previous1 = series1?.get(1) ?? (scope.get(trackKey1) as number | undefined);
@@ -9486,10 +9681,12 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.cross', (args, namedArgs, ctx, scope, callId) => {
       const taCrossArgs = ['source1', 'source2'];
-      const source1 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0));
-      const source2 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1));
-      const series1 = this.getKnownSeriesForSource(source1, ctx);
-      const series2 = this.getKnownSeriesForSource(source2, ctx);
+      const rawSource1 = this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0);
+      const rawSource2 = this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1);
+      const source1 = this.toNumber(rawSource1);
+      const source2 = this.toNumber(rawSource2);
+      const series1 = this.getKnownSeriesForSource(rawSource1, ctx);
+      const series2 = this.getKnownSeriesForSource(rawSource2, ctx);
       const trackKey1 = `_cross_any_src1_${callId}`;
       const trackKey2 = `_cross_any_src2_${callId}`;
       const stored1 = scope.get(trackKey1) as number | undefined;
@@ -9541,7 +9738,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.range', (args, namedArgs, _ctx, scope, callId) => {
       const taRangeArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taRangeArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taRangeArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taRangeArgs, 1));
       const values = this.getAvailableSourceWindow(scope, `_ta_range_source_${callId}`, source, length);
 
@@ -9633,7 +9830,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.vwma', (args, namedArgs, ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_vwma_source_${callId}`, source, length);
       if (!values) return NaN;
@@ -9706,7 +9903,7 @@ export class TealscriptEngine {
     // STDEV - Standard Deviation
     this.builtins.set('ta.stdev', (args, namedArgs, _ctx, scope, callId) => {
       const taStdevArgs = ['source', 'length', 'biased'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taStdevArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taStdevArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taStdevArgs, 1));
       const biased = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taStdevArgs, 2, true));
       const values = this.getCompleteSourceWindow(scope, `_ta_stdev_source_${callId}`, source, length);
@@ -9726,7 +9923,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.variance', (args, namedArgs, _ctx, scope, callId) => {
       const taVarianceArgs = ['source', 'length', 'biased'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taVarianceArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taVarianceArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taVarianceArgs, 1));
       const biased = this.isTruthy(this.getOrderedCallArg(args, namedArgs, taVarianceArgs, 2, true));
       const values = this.getCompleteSourceWindow(scope, `_ta_variance_source_${callId}`, source, length);
@@ -9740,7 +9937,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.dev', (args, namedArgs, _ctx, scope, callId) => {
       const taDevArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taDevArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taDevArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taDevArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_dev_source_${callId}`, source, length);
       if (!values) return NaN;
@@ -9751,8 +9948,8 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.correlation', (args, namedArgs, _ctx, scope, callId) => {
       const taCorrelationArgs = ['source1', 'source2', 'length'];
-      const sourceA = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCorrelationArgs, 0));
-      const sourceB = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCorrelationArgs, 1));
+      const sourceA = this.getOrderedCallArg(args, namedArgs, taCorrelationArgs, 0);
+      const sourceB = this.getOrderedCallArg(args, namedArgs, taCorrelationArgs, 1);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taCorrelationArgs, 2));
       const windows = this.getCompletePairedSourceWindows(
         scope,
@@ -9785,7 +9982,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.cog', (args, namedArgs, _ctx, scope, callId) => {
       const taCogArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCogArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taCogArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taCogArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_cog_source_${callId}`, source, length);
       if (!values) return NaN;
@@ -9799,7 +9996,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.median', (args, namedArgs, _ctx, scope, callId) => {
       const taMedianArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taMedianArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taMedianArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taMedianArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_median_source_${callId}`, source, length);
       if (!values) return NaN;
@@ -9811,7 +10008,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.mode', (args, namedArgs, _ctx, scope, callId) => {
       const taModeArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taModeArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taModeArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taModeArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_mode_source_${callId}`, source, length);
       if (!values) return NaN;
@@ -9834,7 +10031,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.percentile_nearest_rank', (args, namedArgs, _ctx, scope, callId) => {
       const taPercentileArgs = ['source', 'length', 'percentage'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 1));
       const percentage = Math.min(100, Math.max(0, this.toNumber(this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 2))));
       const values = this.getCompleteSourceWindow(scope, `_ta_percentile_nearest_source_${callId}`, source, length);
@@ -9847,7 +10044,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.percentile_linear_interpolation', (args, namedArgs, _ctx, scope, callId) => {
       const taPercentileArgs = ['source', 'length', 'percentage'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 1));
       const percentage = Math.min(100, Math.max(0, this.toNumber(this.getOrderedCallArg(args, namedArgs, taPercentileArgs, 2))));
       const values = this.getCompleteSourceWindow(scope, `_ta_percentile_linear_source_${callId}`, source, length);
@@ -9865,9 +10062,10 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.percentrank', (args, namedArgs, _ctx, scope, callId) => {
       const taPercentrankArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taPercentrankArgs, 0));
+      const rawSource = this.getOrderedCallArg(args, namedArgs, taPercentrankArgs, 0);
+      const source = this.toNumber(rawSource);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taPercentrankArgs, 1));
-      const values = this.getCompleteSourceWindow(scope, `_ta_percentrank_source_${callId}`, source, length);
+      const values = this.getCompleteSourceWindow(scope, `_ta_percentrank_source_${callId}`, rawSource, length);
       if (!values) return NaN;
 
       const belowOrEqual = values.filter((value) => value <= source).length;
@@ -9936,8 +10134,8 @@ export class TealscriptEngine {
     this.builtins.set('ta.stoch', (args, namedArgs, _ctx, scope, callId) => {
       const taStochArgs = ['source', 'high', 'low', 'length'];
       const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taStochArgs, 0));
-      const highSource = this.toNumber(this.getOrderedCallArg(args, namedArgs, taStochArgs, 1));
-      const lowSource = this.toNumber(this.getOrderedCallArg(args, namedArgs, taStochArgs, 2));
+      const highSource = this.getOrderedCallArg(args, namedArgs, taStochArgs, 1);
+      const lowSource = this.getOrderedCallArg(args, namedArgs, taStochArgs, 2);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taStochArgs, 3, 14));
       const windows = this.getCompletePairedSourceWindows(
         scope,
@@ -10013,7 +10211,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.cmo', (args, namedArgs, _ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1, 14));
       const values = this.getCompleteSourceWindow(scope, `_ta_cmo_source_${callId}`, source, length + 1);
       if (!values) return NaN;
@@ -10093,9 +10291,10 @@ export class TealscriptEngine {
     // MOM - Momentum
     this.builtins.set('ta.mom', (args, namedArgs, _ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const rawSource = this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0);
+      const source = this.toNumber(rawSource);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1, 10));
-      const values = this.getCompleteSourceWindow(scope, `_ta_mom_source_${callId}`, source, length + 1);
+      const values = this.getCompleteSourceWindow(scope, `_ta_mom_source_${callId}`, rawSource, length + 1);
       const prev = values?.[length];
 
       if (prev === undefined) return NaN;
@@ -10106,9 +10305,10 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.cci', (args, namedArgs, _ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const rawSource = this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0);
+      const source = this.toNumber(rawSource);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1, 20));
-      const values = this.getCompleteSourceWindow(scope, `_ta_cci_source_${callId}`, source, length);
+      const values = this.getCompleteSourceWindow(scope, `_ta_cci_source_${callId}`, rawSource, length);
       if (!values) return NaN;
 
       const basis = values.reduce((sum, value) => sum + value, 0) / length;
@@ -10148,7 +10348,7 @@ export class TealscriptEngine {
     // Formula: wma = sum(source[i] * weight[i]) / sum(weights) where weight = length - i
     this.builtins.set('ta.wma', (args, namedArgs, _ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
       const values = this.getCompleteSourceWindow(scope, `_ta_wma_source_${callId}`, source, length);
       if (!values) return NaN;
@@ -10169,7 +10369,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.swma', (args, namedArgs, _ctx, scope, callId) => {
       const taSwmaArgs = ['source'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSwmaArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taSwmaArgs, 0);
       const values = this.getCompleteSourceWindow(scope, `_ta_swma_source_${callId}`, source, 4);
       if (!values) return NaN;
 
@@ -10178,7 +10378,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.alma', (args, namedArgs, _ctx, scope, callId) => {
       const taAlmaArgs = ['series', 'length', 'offset', 'sigma', 'floor'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 1));
       const offset = this.toNumber(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 2));
       const sigma = this.toNumber(this.getOrderedCallArg(args, namedArgs, taAlmaArgs, 3));
@@ -10204,7 +10404,7 @@ export class TealscriptEngine {
     // Formula: wma(2 * wma(src, len/2) - wma(src, len), sqrt(len))
     this.builtins.set('ta.hma', (args, namedArgs, _ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1));
 
       const values = this.getCompleteSourceWindow(scope, `_ta_hma_source_${callId}_${length}`, source, length);
@@ -10264,7 +10464,7 @@ export class TealscriptEngine {
     // Returns [middle, upper, lower]
     this.builtins.set('ta.bb', (args, namedArgs, _ctx, scope, callId) => {
       const taBbArgs = ['series', 'length', 'mult'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taBbArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taBbArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taBbArgs, 1));
       const mult = this.toNumber(this.getOrderedCallArg(args, namedArgs, taBbArgs, 2, 2.0));
       const values = this.getCompleteSourceWindow(scope, `_ta_bb_source_${callId}`, source, length);
@@ -10305,9 +10505,10 @@ export class TealscriptEngine {
     // Formula: (current - previous) / previous * 100
     this.builtins.set('ta.roc', (args, namedArgs, _ctx, scope, callId) => {
       const taSourceLengthArgs = ['source', 'length'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0));
+      const rawSource = this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 0);
+      const source = this.toNumber(rawSource);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taSourceLengthArgs, 1, 1));
-      const values = this.getCompleteSourceWindow(scope, `_ta_roc_source_${callId}`, source, length + 1);
+      const values = this.getCompleteSourceWindow(scope, `_ta_roc_source_${callId}`, rawSource, length + 1);
       const prev = values?.[length];
 
       if (prev === undefined || prev === 0) return NaN;
@@ -10657,7 +10858,7 @@ export class TealscriptEngine {
 
     this.builtins.set('ta.linreg', (args, namedArgs, _ctx, scope, callId) => {
       const taLinregArgs = ['source', 'length', 'offset'];
-      const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, taLinregArgs, 0));
+      const source = this.getOrderedCallArg(args, namedArgs, taLinregArgs, 0);
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taLinregArgs, 1));
       const offset = this.toNumber(this.getOrderedCallArg(args, namedArgs, taLinregArgs, 2, 0));
       const values = this.getCompleteSourceWindow(scope, `_ta_linreg_source_${callId}`, source, length);
