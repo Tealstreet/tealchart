@@ -5988,6 +5988,7 @@ validDescription = sig.describe(sig.State.short)
 validLabel = sig.State.long.label()
 missing = sig.State.sideways
 hidden = sig.Hidden.private
+missingEnum = sig.Missing.fast
 plot(str.length(validDescription) + str.length(validLabel) + str.length(shadow(1)))
 `), {
       libraries: new Map([['TestUser/SignalTools/1', library]]),
@@ -5997,6 +5998,8 @@ plot(str.length(validDescription) + str.length(validLabel) + str.length(shadow(1
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       "Unknown enum member 'sideways' on enum sig.State",
+      'Unknown imported enum namespace: sig.Hidden',
+      'Unknown imported enum namespace: sig.Missing',
     ]);
     expect(types.get('selected')).toMatchObject({ kind: 'udt', name: 'sig.State' });
     expect(types.get('validDescription')).toMatchObject({ kind: 'string' });
