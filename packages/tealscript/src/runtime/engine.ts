@@ -901,6 +901,7 @@ export class TealscriptEngine {
             (max, argument) => Math.max(max, this.inferExpressionMaxBarsBack(argument.value, collectionScopes)),
             0,
           ),
+          this.inferMaxBarsBackHint(expression, collectionScopes),
         );
       case 'MemberExpression':
         return this.inferExpressionMaxBarsBack(expression.object, collectionScopes);
@@ -950,6 +951,19 @@ export class TealscriptEngine {
       (max, expression) => Math.max(max, expression ? this.inferExpressionMaxBarsBack(expression, collectionScopes) : 0),
       0,
     );
+  }
+
+  private inferMaxBarsBackHint(expression: CallExpression, collectionScopes: StaticCollectionScopes): number {
+    if (this.getCallExpressionName(expression) !== 'max_bars_back') return 0;
+
+    const value = this.getStaticOrderedCallArgument(expression, ['var', 'num'], 1);
+    if (!value) return 0;
+
+    const numericValue = this.inferStaticNumericValue(value, collectionScopes);
+    if (numericValue === null || !Number.isFinite(numericValue)) return 0;
+
+    const offset = this.normalizeIndexOffset(numericValue);
+    return offset ?? 0;
   }
 
   private inferIfAlternateMaxBarsBack(alternate: IfStatement['alternate'], collectionScopes: StaticCollectionScopes): number {
@@ -1895,9 +1909,9 @@ export class TealscriptEngine {
     throw new Error(`import not found in deterministic library registry: ${stmt.path} as ${stmt.alias.name}`);
   }
 
-  private normalizeMaxBarsBack(value: unknown): number {
+  private normalizeMaxBarsBack(value: unknown, label = 'indicator max_bars_back'): number {
     if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || !Number.isInteger(value)) {
-      throw new Error('indicator max_bars_back must be a non-negative integer');
+      throw new Error(`${label} must be a non-negative integer`);
     }
     return value;
   }
@@ -7616,6 +7630,11 @@ export class TealscriptEngine {
     unaryMath('math.atan', Math.atan);
     unaryMath('math.toradians', (number) => number * (Math.PI / 180));
     unaryMath('math.todegrees', (number) => number * (180 / Math.PI));
+
+    this.builtins.set('max_bars_back', (args, namedArgs) => {
+      this.normalizeMaxBarsBack(this.getOrderedCallArg(args, namedArgs, ['var', 'num'], 1), 'max_bars_back num');
+      return undefined;
+    });
 
     // nz - replace na with value
     this.builtins.set('nz', (args, namedArgs) => {

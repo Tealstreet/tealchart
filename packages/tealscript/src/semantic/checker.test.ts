@@ -14,6 +14,7 @@ plot(spread(high), title="Spread")
 plot(not na(time("1", "0930-1600")) ? 1 : 0, title="Session")
 plot(time_tradingday, title="Trading Day")
 plot(last_bar_time, title="Last Bar Time")
+max_bars_back(close, num=10)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -474,6 +475,7 @@ fill(plot1=plot(high), color=color.blue)
 plotshape(series=close > open, caption="Bad")
 plot(ta.sma(source=close))
 plot(strategy.opentrades.entry_price(trade_num=0, 1))
+max_bars_back(close, 10, 20)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -489,6 +491,7 @@ plot(strategy.opentrades.entry_price(trade_num=0, 1))
       'ta.sma() expects at least 2 arguments',
       "ta.sma() missing required argument 'length'",
       'strategy.opentrades.entry_price() cannot use positional arguments after named arguments',
+      'max_bars_back() expects at most 2 arguments',
     ]);
   });
 

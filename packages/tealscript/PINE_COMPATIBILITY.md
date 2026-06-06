@@ -740,9 +740,11 @@ feeds are tracked in [`STRATEGY_INTRABAR_DESIGN.md`](./STRATEGY_INTRABAR_DESIGN.
 ## `max_bars_back` Declaration Coverage
 
 `indicator(..., max_bars_back=N)` is parsed and recorded on execution results
-as `indicatorMaxBarsBack`. Values must be finite, non-negative integers.
-Explicit history references that exceed the declared bound produce runtime
-errors, while in-range references remain available over loaded history.
+as `indicatorMaxBarsBack`. The `max_bars_back(var, num)` function is accepted as
+a Pine-compatible buffer/profile hint. Values must be finite, non-negative
+integers. Explicit history references that exceed the declared indicator bound
+produce runtime errors, while in-range references remain available over loaded
+history.
 Scripts without an explicit declaration report inferred history depth in the
 runtime profile from static literal/simple numeric offset inference,
 selected pure `math.*` helper offsets, selected numeric normalization helper
