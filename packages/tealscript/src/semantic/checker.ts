@@ -562,6 +562,12 @@ const CHART_BOOL_MEMBER_NAMES = new Set([
 ]);
 const CHART_COLOR_MEMBER_NAMES = new Set(['chart.bg_color', 'chart.fg_color']);
 const CHART_INT_MEMBER_NAMES = new Set(['chart.left_visible_bar_time', 'chart.right_visible_bar_time']);
+const CHART_POINT_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['chart.point.from_index', ['index', 'price']],
+  ['chart.point.from_time', ['time', 'price']],
+  ['chart.point.new', ['time', 'index', 'price']],
+  ['chart.point.now', ['price']],
+]);
 
 const TICKER_STRING_RETURN_NAMES = new Set([
   'ticker.heikinashi',
@@ -3701,6 +3707,7 @@ class SemanticChecker {
     this.checkTaFunctionArgumentTypes(expression, scope);
     this.checkTimeFunctionArgumentTypes(expression, scope);
     this.checkGlobalFunctionArgumentTypes(expression, scope);
+    this.checkChartPointFunctionArgumentTypes(expression, scope);
     this.checkMaxBarsBackLiteralArguments(expression);
     this.checkAlertFrequencyLiteralArguments(expression);
     this.checkAlertStringOptionArguments(expression, scope);
@@ -4311,6 +4318,20 @@ class SemanticChecker {
 
     for (const parameterName of nonBoolParameterNames) {
       this.checkBuiltinArgumentNotBool(expression, scope, calleeName, signature.params, parameterName);
+    }
+  }
+
+  private checkChartPointFunctionArgumentTypes(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const numericParameterNames = CHART_POINT_NUMERIC_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!numericParameterNames) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of numericParameterNames) {
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'number');
     }
   }
 
