@@ -275,6 +275,156 @@ plotarrow(arrowStrength, title="Signal Arrow", colorup=color.lime, colordown=col
     ]);
   });
 
+  it('locks a reduced public volatility band overlay idiom', () => {
+    // Public idiom reference: volatility and squeeze public indicators
+    // commonly render Bollinger-style bands, filled channels, background
+    // squeeze states, and breakout markers together.
+    // Source search: https://www.tradingview.com/scripts/search/bollinger%20band%20squeeze/
+    const result = runCompatScript(`
+indicator("Public Volatility Band Checkpoint", overlay=true)
+[basis, upper, lower] = ta.bb(close, 3, 2.0)
+bandWidth = ta.bbw(close, 3, 2.0)
+squeeze = bandWidth < 0.08
+breakout = close > basis and bandWidth > 0.08
+upperPlot = plot(upper, title="Upper Band", color=color.new(color.blue, 0))
+lowerPlot = plot(lower, title="Lower Band", color=color.new(color.blue, 0))
+plot(basis, title="Basis", color=color.gray)
+fill(upperPlot, lowerPlot, color=color.new(color.blue, 85), title="Band Fill")
+bgcolor(squeeze ? color.new(color.orange, 80) : na, title="Squeeze Background")
+plotshape(breakout, title="Breakout Marker", style=shape.triangleup, location=location.abovebar, color=color.lime, text="BO")
+plot(bandWidth, title="Band Width")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Upper Band').values)).toEqual([
+      null,
+      null,
+      108.776276,
+      108.265986,
+      109.531973,
+      104.066013,
+      105.320494,
+      111.696907,
+      111.320494,
+      111.827772,
+      112.161105,
+      112.632993,
+    ]);
+    expect(roundSeries(getPlot(result, 'Lower Band').values)).toEqual([
+      null,
+      null,
+      100.557057,
+      101.734014,
+      96.468027,
+      97.26732,
+      96.679506,
+      96.969759,
+      102.679506,
+      106.838895,
+      107.172228,
+      109.367007,
+    ]);
+    expect(roundSeries(getPlot(result, 'Basis').values)).toEqual([
+      null,
+      null,
+      104.666667,
+      105,
+      103,
+      100.666667,
+      101,
+      104.333333,
+      107,
+      109.333333,
+      109.666667,
+      111,
+    ]);
+    expect(roundSeries(getPlot(result, 'Band Width').values)).toEqual([
+      null,
+      null,
+      0.078528,
+      0.062209,
+      0.126834,
+      0.067537,
+      0.085554,
+      0.141155,
+      0.080757,
+      0.04563,
+      0.045491,
+      0.029423,
+    ]);
+    expect(getPlot(result, 'Band Fill')).toMatchObject({
+      type: 'fill',
+      plot1Id: 'plot_Upper Band',
+      plot2Id: 'plot_Lower Band',
+      color: Array(compatibilityBars.length).fill('#2196F326'),
+    });
+    expect(getPlot(result, 'Squeeze Background')).toMatchObject({
+      type: 'bgcolor',
+      color: [
+        null,
+        null,
+        '#FF980033',
+        '#FF980033',
+        null,
+        '#FF980033',
+        null,
+        null,
+        null,
+        '#FF980033',
+        '#FF980033',
+        '#FF980033',
+      ],
+      values: [
+        null,
+        null,
+        1,
+        1,
+        null,
+        1,
+        null,
+        null,
+        null,
+        1,
+        1,
+        1,
+      ],
+    });
+    expect(getPlot(result, 'Breakout Marker')).toMatchObject({
+      type: 'plotshape',
+      shape: 'triangleup',
+      location: 'abovebar',
+      text: 'BO',
+    });
+    expect(getPlot(result, 'Breakout Marker').values).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      1,
+      1,
+      1,
+      null,
+      null,
+      null,
+    ]);
+    expect(getPlot(result, 'Breakout Marker').color).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      '#00E676',
+      '#00E676',
+      '#00E676',
+      null,
+      null,
+      null,
+    ]);
+  });
+
   it('locks reduced official plot-style payload idioms', () => {
     // Source: https://www.tradingview.com/pine-script-docs/visuals/plots/
     const result = runCompatScript(`

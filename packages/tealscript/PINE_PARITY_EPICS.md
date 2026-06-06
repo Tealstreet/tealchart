@@ -519,6 +519,6 @@ impact.
    declaration argument diagnostics, covered while using corpus failures to
    prioritize remaining named/positional overload gaps.
 6. Visual output payload audit: keep marker dynamic text-color payloads,
-   hidden-marker style masking, the source-linked public marker signal payload
-   checkpoint, and other runtime visual metadata stable before investing in
-   renderer fidelity.
+   hidden-marker style masking, the source-linked public marker signal and
+   volatility-band checkpoints, filled plot channels, background masks, and
+   other runtime visual metadata stable before investing in renderer fidelity.
