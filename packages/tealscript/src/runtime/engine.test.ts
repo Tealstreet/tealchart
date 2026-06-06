@@ -192,6 +192,7 @@ plot(strategy.position_size)`;
         processOrdersOnClose: true,
         useBarMagnifier: true,
         riskFreeRate: 1.75,
+        backtestFillLimitsAssumptionTicks: 0,
       });
       expect(result.strategy.equity).toBe(25000);
       expect(result.plots.map((plot) => plot.values)).toEqual([[25000], [0]]);
@@ -199,7 +200,7 @@ plot(strategy.position_size)`;
 
     it('applies strategy named-prefix positional tail settings', () => {
       const script = `//@version=6
-strategy(title="Mixed strategy", "Mixed", true, format.price, 3, scale.right, 100, "60", true, false, true, 10, 20, 30, 40, 50, true, 25000, "EUR", strategy.percent_of_equity, 10, 2, strategy.commission.percent, 0.05, 1, 50, 60, true, true, true, true, 1.75)
+strategy(title="Mixed strategy", "Mixed", true, format.price, 3, scale.right, 100, "60", true, false, true, 10, 20, 30, 40, 50, true, 25000, "EUR", strategy.percent_of_equity, 10, 2, strategy.commission.percent, 0.05, 1, 50, 60, true, true, true, true, 1.75, 3)
 plot(strategy.equity)`;
 
       const result = executeScript(parse(script), createBars(1));
@@ -223,6 +224,7 @@ plot(strategy.equity)`;
         processOrdersOnClose: true,
         useBarMagnifier: true,
         riskFreeRate: 1.75,
+        backtestFillLimitsAssumptionTicks: 3,
       });
     });
 
@@ -259,9 +261,68 @@ plot(strategy.initial_capital)`;
         processOrdersOnClose: false,
         useBarMagnifier: false,
         riskFreeRate: 0,
+        backtestFillLimitsAssumptionTicks: 0,
       });
       expect(result.strategy.equity).toBe(0);
       expect(result.plots[0]?.values).toEqual([0]);
+    });
+
+    it('delays long limit fills until price exceeds the limit verification ticks', () => {
+      const script = `//@version=6
+strategy("Verified limit", process_orders_on_close=true, backtest_fill_limits_assumption=3)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1, limit=100.3)
+plot(strategy.position_size)`;
+      const bars: Bar[] = [
+        { time: 1_700_000_000_000, open: 101, high: 102, low: 100.5, close: 101, volume: 100 },
+        { time: 1_700_000_060_000, open: 101, high: 102, low: 100.28, close: 101, volume: 100 },
+        { time: 1_700_000_120_000, open: 101, high: 102, low: 100.26, close: 101, volume: 100 },
+        { time: 1_700_000_180_000, open: 101, high: 102, low: 100.2, close: 101, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders[0]).toMatchObject({
+        id: 'Long',
+        type: 'limit',
+        status: 'filled',
+        avgFillPrice: 100.3,
+        updatedBarIndex: 2,
+      });
+      expect(result.strategy.fills.map(({ orderId, price, barIndex }) => ({ orderId, price, barIndex }))).toEqual([
+        { orderId: 'Long', price: 100.3, barIndex: 2 },
+      ]);
+      expect(result.plots[0]?.values).toEqual([0, 0, 0, 1]);
+    });
+
+    it('delays short limit fills until price exceeds the limit verification ticks', () => {
+      const script = `//@version=6
+strategy("Verified short limit", process_orders_on_close=true, backtest_fill_limits_assumption=3)
+if bar_index == 0
+    strategy.entry("Short", strategy.short, qty=1, limit=100.3)
+plot(strategy.position_size)`;
+      const bars: Bar[] = [
+        { time: 1_700_000_000_000, open: 100, high: 100.1, low: 99, close: 100, volume: 100 },
+        { time: 1_700_000_060_000, open: 100, high: 100.32, low: 99, close: 100, volume: 100 },
+        { time: 1_700_000_120_000, open: 100, high: 100.34, low: 99, close: 100, volume: 100 },
+        { time: 1_700_000_180_000, open: 100, high: 100.4, low: 99, close: 100, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders[0]).toMatchObject({
+        id: 'Short',
+        type: 'limit',
+        status: 'filled',
+        avgFillPrice: 100.3,
+        updatedBarIndex: 2,
+      });
+      expect(result.strategy.fills.map(({ orderId, price, barIndex }) => ({ orderId, price, barIndex }))).toEqual([
+        { orderId: 'Short', price: 100.3, barIndex: 2 },
+      ]);
+      expect(result.plots[0]?.values).toEqual([0, 0, 0, -1]);
     });
 
     it('uses the official default strategy risk-free rate', () => {

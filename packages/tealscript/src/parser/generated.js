@@ -528,7 +528,8 @@ function peg$parse(input, options) {
       'calc_on_every_tick',
       'process_orders_on_close',
       'use_bar_magnifier',
-      'risk_free_rate'
+      'risk_free_rate',
+      'backtest_fill_limits_assumption'
     ];
     for (const arg of args) {
       if (arg.name) {
