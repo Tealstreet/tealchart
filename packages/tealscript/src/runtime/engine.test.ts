@@ -6496,6 +6496,29 @@ plot(x)`;
       expect(plot.values[4]).not.toBeNull();
     });
 
+    it('preserves direct source identity for rolling helpers when current values collide', () => {
+      const script = `//@version=6
+indicator("Source identity")
+plot(ta.sma(open, 2), title="Open SMA")
+plot(math.sum(open, 2), title="Open Sum")
+plot(ta.change(open), title="Open Change")
+plot(ta.correlation(open, close, 2), title="Open Close Correlation")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 10, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 10, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 30, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Open SMA')?.values).toEqual([null, 15, 25]);
+      expect(result.plots.find((plot) => plot.title === 'Open Sum')?.values).toEqual([null, 30, 50]);
+      expect(result.plots.find((plot) => plot.title === 'Open Change')?.values).toEqual([null, 10, 10]);
+      expect(result.plots.find((plot) => plot.title === 'Open Close Correlation')?.values).toEqual([null, null, 1]);
+    });
+
     it('calculates ta.highest', () => {
       const script = `//@version=6
 indicator("Test")
