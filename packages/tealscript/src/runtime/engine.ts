@@ -1101,10 +1101,85 @@ export class TealscriptEngine {
 
   private inferStaticNumericCallValue(expression: CallExpression, collectionScopes: StaticCollectionScopes): number | null {
     const name = this.getCallExpressionName(expression);
-    if (name !== 'input.int' && name !== 'input.float') return null;
+    if (name === 'input.int' || name === 'input.float') {
+      const defval = this.getStaticCallArgument(expression, ['defval'], 0);
+      return defval ? this.inferStaticNumericValue(defval, collectionScopes) : null;
+    }
 
-    const defval = this.getStaticCallArgument(expression, ['defval'], 0);
-    return defval ? this.inferStaticNumericValue(defval, collectionScopes) : null;
+    return this.inferStaticMathCallValue(expression, name, collectionScopes);
+  }
+
+  private inferStaticMathCallValue(
+    expression: CallExpression,
+    name: string | null,
+    collectionScopes: StaticCollectionScopes,
+  ): number | null {
+    switch (name) {
+      case 'math.max':
+        return this.inferStaticVariadicMathCallValue(expression, Math.max, collectionScopes);
+      case 'math.min':
+        return this.inferStaticVariadicMathCallValue(expression, Math.min, collectionScopes);
+      case 'math.abs':
+        return this.inferStaticUnaryMathCallValue(expression, Math.abs, collectionScopes);
+      case 'math.trunc':
+        return this.inferStaticUnaryMathCallValue(expression, Math.trunc, collectionScopes);
+      case 'math.floor':
+        return this.inferStaticUnaryMathCallValue(expression, Math.floor, collectionScopes);
+      case 'math.ceil':
+        return this.inferStaticUnaryMathCallValue(expression, Math.ceil, collectionScopes);
+      case 'math.round':
+        return this.inferStaticRoundCallValue(expression, collectionScopes);
+      default:
+        return null;
+    }
+  }
+
+  private inferStaticVariadicMathCallValue(
+    expression: CallExpression,
+    fn: (...values: number[]) => number,
+    collectionScopes: StaticCollectionScopes,
+  ): number | null {
+    const args = this.getStaticVariadicCallArguments(expression, 'number');
+    if (args.length === 0) return null;
+
+    const values = args.map((argument) => this.inferStaticNumericValue(argument, collectionScopes));
+    if (values.some((value) => value === null || !Number.isFinite(value))) return null;
+
+    const result = fn(...(values as number[]));
+    return Number.isFinite(result) ? result : null;
+  }
+
+  private inferStaticUnaryMathCallValue(
+    expression: CallExpression,
+    fn: (value: number) => number,
+    collectionScopes: StaticCollectionScopes,
+  ): number | null {
+    const argument = this.getStaticOrderedCallArgument(expression, ['number'], 0);
+    if (!argument) return null;
+
+    const value = this.inferStaticNumericValue(argument, collectionScopes);
+    if (value === null || !Number.isFinite(value)) return null;
+
+    const result = fn(value);
+    return Number.isFinite(result) ? result : null;
+  }
+
+  private inferStaticRoundCallValue(expression: CallExpression, collectionScopes: StaticCollectionScopes): number | null {
+    const valueArgument = this.getStaticOrderedCallArgument(expression, ['number', 'precision'], 0);
+    if (!valueArgument) return null;
+
+    const value = this.inferStaticNumericValue(valueArgument, collectionScopes);
+    if (value === null || !Number.isFinite(value)) return null;
+
+    const precisionArgument = this.getStaticOrderedCallArgument(expression, ['number', 'precision'], 1);
+    const rawPrecision = precisionArgument ? this.inferStaticNumericValue(precisionArgument, collectionScopes) : 0;
+    if (rawPrecision === null || !Number.isFinite(rawPrecision)) return null;
+
+    const factor = 10 ** Math.trunc(rawPrecision);
+    if (!Number.isFinite(factor)) return null;
+
+    const result = Math.round(value * factor) / factor;
+    return Number.isFinite(result) ? result : null;
   }
 
   private inferStaticBooleanValue(expression: Expression, collectionScopes: StaticCollectionScopes): boolean | null {
@@ -1217,6 +1292,61 @@ export class TealscriptEngine {
     }
 
     return undefined;
+  }
+
+  private getStaticOrderedCallArgument(
+    expression: CallExpression,
+    names: readonly string[],
+    position: number,
+  ): Expression | undefined {
+    const name = names[position];
+    if (name) {
+      for (const argument of expression.arguments) {
+        if (argument.name?.name === name) return argument.value;
+      }
+    }
+
+    const priorNamedCount = names
+      .slice(0, position)
+      .filter((priorName) => expression.arguments.some((argument) => argument.name?.name === priorName))
+      .length;
+    const positionalPosition = position - priorNamedCount;
+    let positionalIndex = 0;
+    for (const argument of expression.arguments) {
+      if (argument.name) continue;
+      if (positionalIndex === positionalPosition) return argument.value;
+      positionalIndex += 1;
+    }
+
+    return undefined;
+  }
+
+  private getStaticVariadicCallArguments(expression: CallExpression, prefix: string): Expression[] {
+    const args: Expression[] = [];
+    const assigned: boolean[] = [];
+    for (const argument of expression.arguments) {
+      const name = argument.name?.name;
+      if (!name?.startsWith(prefix)) continue;
+      const suffix = name.slice(prefix.length);
+      if (!/^\d+$/.test(suffix)) continue;
+      const index = Number(suffix);
+      if (!Number.isSafeInteger(index)) continue;
+      args[index] = argument.value;
+      assigned[index] = true;
+    }
+
+    for (const argument of expression.arguments) {
+      if (argument.name) continue;
+      let index = 0;
+      while (assigned[index]) index += 1;
+      args[index] = argument.value;
+      assigned[index] = true;
+    }
+
+    for (let index = 0; index < args.length; index += 1) {
+      if (!assigned[index]) return [];
+    }
+    return args;
   }
 
   /**
