@@ -457,6 +457,14 @@ const BUILTIN_TUPLE_RETURN_TYPES = new Map<string, SemanticType[]>([
     ],
   ],
   [
+    'ta.kc',
+    [
+      { kind: 'float', qualifier: 'series' },
+      { kind: 'float', qualifier: 'series' },
+      { kind: 'float', qualifier: 'series' },
+    ],
+  ],
+  [
     'ta.macd',
     [
       { kind: 'float', qualifier: 'series' },
