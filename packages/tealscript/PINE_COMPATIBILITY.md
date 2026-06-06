@@ -150,7 +150,8 @@ Covered behavior and remaining gaps:
 - `ta.vwap()` accepts Pine-style default-source calls plus `source`/`anchor`
   positional, named, and named-prefix mixed argument forms. Runtime VWAP
   accumulators are isolated per call site and reset when `anchor` is true.
-  The `stdev_mult` overload returns `[vwap, upper, lower]` band tuples with
+  Semantic analysis preserves scalar VWAP calls as `series float` while the
+  `stdev_mult` overload returns `[vwap, upper, lower]` band tuples with
   weighted cumulative standard-deviation bands.
 - Recursive user-defined function calls are rejected with an explicit diagnostic
   instead of overflowing the runtime stack.
@@ -254,8 +255,8 @@ smoothing state, `ta.dmi()` tuple smoothing state, `ta.supertrend()` tuple
 state, and `ta.sar()` trend state are isolated per call site so repeated
 same-parameter calls do not share accumulators. Semantic
 analysis preserves known scalar TA helper return types for downstream
-assignment diagnostics, including source-preserving `ta.change()` and
-`ta.valuewhen()` results.
+assignment diagnostics, including scalar `ta.vwap()` overloads and
+source-preserving `ta.change()` and `ta.valuewhen()` results.
 
 ## Common `str.*` Coverage
 
@@ -835,9 +836,9 @@ selected static or observed rolling-window helper lookbacks such as
 `math.sum()`, `ta.range()`, `ta.rising()`/`ta.falling()`, common statistical
 helpers, momentum helpers, band/average/regression helpers, and `ta.*`
 fixed/default, source-window, retained-source, recursive, and default-argument
-helpers, oscillator helpers, and direct OHLC helper lookbacks, including
-remaining common TA helpers, default-source highest/lowest and pivot left/right
-windows, and TA variables that read prior close/volume bars. Full Pine-style
+helpers, oscillator helpers, direct OHLC helper lookbacks, default-source
+highest/lowest and pivot left/right windows, and TA variables that read prior
+close/volume bars. Full Pine-style
 preallocation for arbitrary series offsets remains a compatibility target. The
 checkpoint corpus tracks an official `max_bars_back`
 bounded-history fixture.

@@ -2588,10 +2588,10 @@ class SemanticChecker {
       ?? this.inferUserMethodTupleElementTypes(init, scope);
   }
 
-  private inferBuiltinTupleElementTypes(expression: CallExpression, scope: SemanticScope): SemanticType[] | undefined {
+  private inferBuiltinTupleElementTypes(expression: CallExpression, _scope: SemanticScope): SemanticType[] | undefined {
     const calleeName = this.memberPath(expression.callee).join('.');
     if (calleeName === 'ta.vwap') {
-      const stdevMult = this.inferCallArgumentType(expression, scope, ['source', 'anchor', 'stdev_mult'], 2);
+      const stdevMult = this.resolveCallArgumentExpression(expression, ['source', 'anchor', 'stdev_mult'], 2);
       return stdevMult ? [
         { kind: 'float', qualifier: 'series' },
         { kind: 'float', qualifier: 'series' },
@@ -5235,6 +5235,10 @@ class SemanticChecker {
     if (calleeName === 'ta.change') {
       return this.inferTaSourceReturnType(expression, scope, ['source', 'length'], 0);
     }
+    if (calleeName === 'ta.vwap') {
+      const stdevMult = this.resolveCallArgumentExpression(expression, ['source', 'anchor', 'stdev_mult'], 2);
+      return stdevMult ? undefined : { kind: 'float', qualifier: 'series' };
+    }
     if (calleeName === 'ta.valuewhen') {
       return this.inferTaSourceReturnType(expression, scope, ['condition', 'source', 'occurrence'], 1);
     }
@@ -5319,18 +5323,27 @@ class SemanticChecker {
     parameterNames: string[],
     index: number,
   ): SemanticType | undefined {
+    const argument = this.resolveCallArgumentExpression(expression, parameterNames, index);
+    return argument ? this.inferExpressionType(argument, scope) : undefined;
+  }
+
+  private resolveCallArgumentExpression(
+    expression: CallExpression,
+    parameterNames: string[],
+    index: number,
+  ): Expression | undefined {
     const name = parameterNames[index];
     if (!name) return undefined;
 
     const named = expression.arguments.find((argument) => argument.name?.name === name);
-    if (named) return this.inferExpressionType(named.value, scope);
+    if (named) return named.value;
 
     const priorNamedCount = parameterNames
       .slice(0, index)
       .filter((priorName) => expression.arguments.some((argument) => argument.name?.name === priorName))
       .length;
     const positional = expression.arguments.filter((argument) => !argument.name)[index - priorNamedCount];
-    return positional ? this.inferExpressionType(positional.value, scope) : undefined;
+    return positional?.value;
   }
 
   private inferUserFunctionCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
