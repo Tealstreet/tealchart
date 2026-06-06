@@ -14,6 +14,7 @@ import { checkProgram } from '../semantic';
 import type { Program } from '../parser/ast';
 import type { Bar, InputDefinition } from '../runtime/context';
 import { createResultMessage, createSemanticErrorMessage } from './protocol';
+import { semanticOptionsFromLibraries } from './semanticOptions';
 import type {
   ToWorkerMessage,
   FromWorkerMessage,
@@ -33,6 +34,7 @@ interface ScriptState {
   bars: Bar[];
   inputs: Record<string, unknown>;
   runtime?: TealscriptRuntimeOptions;
+  libraries?: Map<string, Program>;
   lastInputs: InputDefinition[];
 }
 
@@ -56,7 +58,7 @@ self.onmessage = (event: MessageEvent<ToWorkerMessage>) => {
   try {
     switch (message.type) {
       case 'init':
-        handleInit(message.scriptId, message.script, message.bars, message.inputs, message.runtime, metadata);
+        handleInit(message.scriptId, message.script, message.bars, message.inputs, message.runtime, message.libraries, metadata);
         break;
 
       case 'updateBars':
@@ -93,12 +95,13 @@ function handleInit(
   bars: Bar[],
   inputs: Record<string, unknown>,
   runtime?: TealscriptRuntimeOptions,
+  libraries?: Map<string, Program>,
   metadata?: WorkerOutputMetadata
 ): void {
   try {
     // Parse the script
     const ast = parse(script);
-    const semanticResult = checkProgram(ast);
+    const semanticResult = checkProgram(ast, semanticOptionsFromLibraries(libraries));
     if (semanticResult.diagnostics[0]) {
       postResult(createSemanticErrorMessage(
         scriptId,
@@ -110,7 +113,7 @@ function handleInit(
     }
 
     // Create engine
-    const engine = new TealscriptEngine({ runtime });
+    const engine = new TealscriptEngine({ runtime, libraries });
 
     // Store state
     state = {
@@ -120,6 +123,7 @@ function handleInit(
       bars,
       inputs,
       runtime,
+      libraries,
       lastInputs: [],
     };
 
