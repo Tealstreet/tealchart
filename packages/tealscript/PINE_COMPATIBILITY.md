@@ -115,7 +115,8 @@ Covered behavior and remaining gaps:
   branch yields a value.
 - Declaration and reassignment initializers may start on an indented
   continuation line after `=`, `:=`, and compound assignment operators,
-  including typed declarations, tuple declarations, and UDF-local declarations.
+  including typed declarations, tuple declarations, UDF-local declarations, and
+  UDT field defaults.
 - User-defined function bodies can return the last expression result from
   numeric `for`, collection `for ... in`, and `while` loop bodies.
 - Direct user-defined function calls infer semantic return types and preserve

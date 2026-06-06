@@ -2426,11 +2426,16 @@ function peg$parse(input, options) {
           if (peg$silentFails === 0) { peg$fail(peg$e12); }
         }
         if (s7 !== peg$FAILED) {
-          s8 = peg$parse_();
-          s9 = peg$parseExpression();
-          if (s9 !== peg$FAILED) {
-            s6 = [s6, s7, s8, s9];
-            s5 = s6;
+          s8 = peg$parseInitializerSpace();
+          if (s8 !== peg$FAILED) {
+            s9 = peg$parseExpression();
+            if (s9 !== peg$FAILED) {
+              s6 = [s6, s7, s8, s9];
+              s5 = s6;
+            } else {
+              peg$currPos = s5;
+              s5 = peg$FAILED;
+            }
           } else {
             peg$currPos = s5;
             s5 = peg$FAILED;
@@ -2511,11 +2516,16 @@ function peg$parse(input, options) {
         if (peg$silentFails === 0) { peg$fail(peg$e12); }
       }
       if (s5 !== peg$FAILED) {
-        s6 = peg$parse_();
-        s7 = peg$parseExpression();
-        if (s7 !== peg$FAILED) {
-          s4 = [s4, s5, s6, s7];
-          s3 = s4;
+        s6 = peg$parseInitializerSpace();
+        if (s6 !== peg$FAILED) {
+          s7 = peg$parseExpression();
+          if (s7 !== peg$FAILED) {
+            s4 = [s4, s5, s6, s7];
+            s3 = s4;
+          } else {
+            peg$currPos = s3;
+            s3 = peg$FAILED;
+          }
         } else {
           peg$currPos = s3;
           s3 = peg$FAILED;
