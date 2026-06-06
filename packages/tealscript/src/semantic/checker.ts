@@ -915,6 +915,20 @@ const LINE_NEW_POINT_SIGNATURE: BuiltinSignature = {
   allowNamedPrefixWithPositional: true,
 };
 
+const LABEL_NEW_COORDINATE_SIGNATURE: BuiltinSignature = {
+  params: ['x', 'y', 'text', 'xloc', 'yloc', 'color', 'style', 'textcolor', 'size', 'textalign', 'tooltip', 'text_font_family', 'force_overlay', 'text_formatting'],
+  minArgs: 2,
+  maxArgs: 14,
+  allowNamedPrefixWithPositional: true,
+};
+
+const LABEL_NEW_POINT_SIGNATURE: BuiltinSignature = {
+  params: ['point', 'text', 'xloc', 'yloc', 'color', 'style', 'textcolor', 'size', 'textalign', 'tooltip', 'text_font_family', 'force_overlay', 'text_formatting'],
+  minArgs: 1,
+  maxArgs: 13,
+  allowNamedPrefixWithPositional: true,
+};
+
 const BOX_NEW_COORDINATE_SIGNATURE: BuiltinSignature = {
   params: [
     'left',
@@ -1003,12 +1017,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['int', { params: ['x'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   [
     'label.new',
-    {
-      params: ['x', 'y', 'text', 'xloc', 'yloc', 'color', 'style', 'textcolor', 'size', 'textalign', 'tooltip', 'text_font_family', 'force_overlay', 'text_formatting'],
-      minArgs: 2,
-      maxArgs: 14,
-      allowNamedPrefixWithPositional: true,
-    },
+    LABEL_NEW_COORDINATE_SIGNATURE,
   ],
   ['label.delete', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['label.copy', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
@@ -1799,6 +1808,33 @@ const DRAWING_COLOR_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>
   ['table.cell', ['text_color', 'bgcolor']],
   ['table.cell_set_bgcolor', ['bgcolor']],
   ['table.cell_set_text_color', ['text_color']],
+]);
+const DRAWING_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['label.new', ['x', 'y']],
+  ['label.set_x', ['x']],
+  ['label.set_y', ['y']],
+  ['label.set_xy', ['x', 'y']],
+  ['label.set_xloc', ['x']],
+  ['line.new', ['x1', 'y1', 'x2', 'y2', 'width']],
+  ['line.set_x1', ['x']],
+  ['line.set_x2', ['x']],
+  ['line.set_y1', ['y']],
+  ['line.set_y2', ['y']],
+  ['line.set_xy1', ['x', 'y']],
+  ['line.set_xy2', ['x', 'y']],
+  ['line.set_xloc', ['x1', 'x2']],
+  ['line.set_width', ['width']],
+  ['line.get_price', ['x']],
+  ['box.new', ['left', 'top', 'right', 'bottom', 'border_width']],
+  ['box.set_left', ['left']],
+  ['box.set_right', ['right']],
+  ['box.set_top', ['top']],
+  ['box.set_bottom', ['bottom']],
+  ['box.set_lefttop', ['left', 'top']],
+  ['box.set_rightbottom', ['right', 'bottom']],
+  ['box.set_xloc', ['left', 'right']],
+  ['box.set_border_width', ['width']],
+  ['polyline.new', ['line_width']],
 ]);
 const TABLE_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['table.new', ['columns', 'rows', 'frame_width', 'border_width']],
@@ -3727,6 +3763,7 @@ class SemanticChecker {
     this.checkTimeFunctionArgumentTypes(expression, scope);
     this.checkGlobalFunctionArgumentTypes(expression, scope);
     this.checkChartPointFunctionArgumentTypes(expression, scope);
+    this.checkDrawingFunctionArgumentTypes(expression, scope);
     this.checkTableFunctionArgumentTypes(expression, scope);
     this.checkMaxBarsBackLiteralArguments(expression);
     this.checkAlertFrequencyLiteralArguments(expression);
@@ -3951,6 +3988,9 @@ class SemanticChecker {
   }
 
   private resolveBuiltinSignature(displayName: string, expression: CallExpression, scope: SemanticScope): BuiltinSignature | undefined {
+    if (displayName === 'label.new') {
+      return this.usesLabelPointOverload(expression, scope) ? LABEL_NEW_POINT_SIGNATURE : LABEL_NEW_COORDINATE_SIGNATURE;
+    }
     if (displayName === 'line.new') {
       return this.usesLinePointOverload(expression, scope) ? LINE_NEW_POINT_SIGNATURE : LINE_NEW_COORDINATE_SIGNATURE;
     }
@@ -3958,6 +3998,12 @@ class SemanticChecker {
       return this.usesBoxPointOverload(expression, scope) ? BOX_NEW_POINT_SIGNATURE : BOX_NEW_COORDINATE_SIGNATURE;
     }
     return BUILTIN_SIGNATURES.get(displayName);
+  }
+
+  private usesLabelPointOverload(expression: CallExpression, scope: SemanticScope): boolean {
+    const suppliedNames = new Set(expression.arguments.flatMap((arg) => arg.name ? [arg.name.name] : []));
+    if (suppliedNames.has('point')) return true;
+    return this.leadingArgumentTypes(expression, scope, 1).some((type) => type.kind === 'chart.point');
   }
 
   private usesLinePointOverload(expression: CallExpression, scope: SemanticScope): boolean {
@@ -4358,6 +4404,20 @@ class SemanticChecker {
   private checkTableFunctionArgumentTypes(expression: CallExpression, scope: SemanticScope): void {
     const calleeName = this.memberPath(expression.callee).join('.');
     const numericParameterNames = TABLE_NUMERIC_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!numericParameterNames) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of numericParameterNames) {
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'number');
+    }
+  }
+
+  private checkDrawingFunctionArgumentTypes(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const numericParameterNames = DRAWING_NUMERIC_PARAMETER_NAMES_BY_CALL.get(calleeName);
     if (!numericParameterNames) return;
 
     const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
