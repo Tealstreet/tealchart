@@ -7,6 +7,7 @@
 
 import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition, LogOutput } from '../runtime/context';
 import type { IndicatorDeclarationMetadata, RuntimeProfile, TealscriptRuntimeOptions } from '../runtime/engine';
+import type { Program } from '../parser/ast';
 import type { SemanticDiagnostic } from '../semantic';
 import { getResultOutput } from './protocol';
 import type {
@@ -302,6 +303,7 @@ export class TealscriptWorker {
     bars: Bar[],
     inputs: Record<string, unknown> = {},
     runtime?: TealscriptRuntimeOptions,
+    libraries?: Map<string, Program>,
   ): Promise<void> {
     await this.waitForReady();
 
@@ -313,6 +315,7 @@ export class TealscriptWorker {
       bars,
       inputs,
       runtime,
+      libraries,
       metadata: this.nextRequestMetadata(true),
     });
   }
