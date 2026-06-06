@@ -2635,6 +2635,60 @@ plot(strategy.position_size)`;
       expect(result.plots[0]?.values).toEqual([1, 0, 0]);
     });
 
+    it('blocks new non-exit orders after strategy.risk.max_intraday_loss cash is reached', () => {
+      const script = `//@version=6
+strategy("Intraday loss cap", process_orders_on_close=true)
+strategy.risk.max_intraday_loss(value=5, type=strategy.cash)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 2
+    strategy.entry("Blocked", strategy.long, qty=1)
+plot(strategy.position_size)`;
+      const bars = [
+        { time: Date.UTC(2024, 0, 1, 9), open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: Date.UTC(2024, 0, 1, 10), open: 100, high: 101, low: 89, close: 90, volume: 100 },
+        { time: Date.UTC(2024, 0, 1, 11), open: 90, high: 92, low: 88, close: 91, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long']);
+      expect(result.strategy.equityCurve.map(({ equity, drawdown }) => ({ equity, drawdown }))).toEqual([
+        { equity: 100_000, drawdown: 0 },
+        { equity: 99_990, drawdown: 10 },
+        { equity: 99_991, drawdown: 9 },
+      ]);
+      expect(result.plots[0]?.values).toEqual([1, 1, 1]);
+    });
+
+    it('blocks new non-exit orders after strategy.risk.max_intraday_loss percent is reached', () => {
+      const script = `//@version=6
+strategy("Intraday percent loss cap", initial_capital=1000, process_orders_on_close=true)
+strategy.risk.max_intraday_loss(value=1, type=strategy.percent_of_equity)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 2
+    strategy.order("Blocked", strategy.long, qty=1)
+plot(strategy.position_size)`;
+      const bars = [
+        { time: Date.UTC(2024, 0, 1, 9), open: 100, high: 101, low: 99, close: 100, volume: 100 },
+        { time: Date.UTC(2024, 0, 1, 10), open: 100, high: 101, low: 94, close: 94, volume: 100 },
+        { time: Date.UTC(2024, 0, 1, 11), open: 94, high: 95, low: 93, close: 95, volume: 100 },
+      ];
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long']);
+      expect(result.strategy.equityCurve.map(({ equity, drawdown }) => ({ equity, drawdown }))).toEqual([
+        { equity: 1000, drawdown: 0 },
+        { equity: 988, drawdown: 12 },
+        { equity: 990, drawdown: 10 },
+      ]);
+      expect(result.plots[0]?.values).toEqual([2, 2, 2]);
+    });
+
     it('fills strategy.exit brackets and cancels the sibling OCA order', () => {
       const script = `//@version=6
 strategy("Exit bracket fill", process_orders_on_close=true)
