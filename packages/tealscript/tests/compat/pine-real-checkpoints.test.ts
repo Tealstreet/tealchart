@@ -4,6 +4,7 @@ import { parse } from '../../src/parser';
 import {
   corporateActionRequestKey,
   currencyRateRequestKey,
+  financialRequestKey,
   InMemoryRequestDatafeed,
   InMemoryStrategyIntrabarDatafeed,
   TealscriptEngine,
@@ -1301,6 +1302,123 @@ plotshape(beat, title="Beat Marker", text="EPS", color=color.green)
     expect(getPlot(result, 'Estimate EPS').values).toEqual([null, 1.4, null, 1.3]);
     expect(getPlot(result, 'EPS Beat').values).toEqual([0, 1, 0, 0]);
     expect(getPlot(result, 'Beat Marker').values).toEqual([null, 1, null, null]);
+  });
+
+  it('locks a reduced public financial dashboard idiom', () => {
+    // Public idiom reference: public fundamental dashboards commonly derive
+    // ratios from request.financial() metrics and summarize the latest value.
+    // Source search: https://www.tradingview.com/scripts/search/fundamental%20dashboard/
+    const bars: Bar[] = [
+      { time: 1_700_530_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_530_060_000, open: 101, high: 102, low: 100, close: 101, volume: 100 },
+      { time: 1_700_530_120_000, open: 102, high: 103, low: 101, close: 102, volume: 100 },
+      { time: 1_700_530_180_000, open: 103, high: 104, low: 102, close: 103, volume: 100 },
+    ];
+    const requestDatafeed = new InMemoryRequestDatafeed([], [
+      {
+        family: 'financial',
+        key: financialRequestKey('NASDAQ:AAPL', 'TOTAL_REVENUE', 'FQ', 'USD'),
+        points: [
+          { time: bars[1]!.time, value: 1_000 },
+          { time: bars[3]!.time, value: 1_200 },
+        ],
+      },
+      {
+        family: 'financial',
+        key: financialRequestKey('NASDAQ:AAPL', 'NET_INCOME', 'FQ', 'USD'),
+        points: [
+          { time: bars[1]!.time, value: 100 },
+          { time: bars[3]!.time, value: 180 },
+        ],
+      },
+    ]);
+    const result = runCompatScript(`
+indicator("Public Financial Dashboard Checkpoint", overlay=true)
+revenue = request.financial("NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", currency=currency.USD)
+income = request.financial("NASDAQ:AAPL", "NET_INCOME", "FQ", currency=currency.USD)
+margin = income / revenue * 100
+var fundamentals = table.new(position.bottom_right, 2, 2, border_width=1, border_color=color.white)
+if barstate.islast
+    table.cell(fundamentals, 0, 0, "Metric", text_color=color.white, bgcolor=color.blue)
+    table.cell(fundamentals, 1, 0, "Value", text_color=color.white, bgcolor=color.blue)
+    table.cell(fundamentals, 0, 1, "Margin", text_color=color.white, bgcolor=color.gray)
+    table.cell(fundamentals, 1, 1, str.tostring(margin, "#.00") + "%", text_color=color.white, bgcolor=color.green)
+plot(revenue, title="Revenue")
+plot(margin, title="Margin")
+`, {
+      bars,
+      engineOptions: { requestDatafeed },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Revenue').values).toEqual([null, 1_000, 1_000, 1_200]);
+    expect(roundSeries(getPlot(result, 'Margin').values, 2)).toEqual([null, 10, 10, 15]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'table_table.new_0_0',
+        type: 'table',
+        persistent: true,
+        barIndex: 0,
+        position: 'bottom_right',
+        columns: 2,
+        rows: 2,
+        bgcolor: null,
+        borderWidth: 1,
+        borderColor: '#FFFFFF',
+        frameWidth: 0,
+        frameColor: null,
+        cells: [
+          {
+            column: 0,
+            row: 0,
+            text: 'Metric',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#2196F3',
+          },
+          {
+            column: 1,
+            row: 0,
+            text: 'Value',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#2196F3',
+          },
+          {
+            column: 0,
+            row: 1,
+            text: 'Margin',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#787B86',
+          },
+          {
+            column: 1,
+            row: 1,
+            text: '15.00%',
+            width: undefined,
+            height: undefined,
+            textColor: '#FFFFFF',
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: '#4CAF50',
+          },
+        ],
+      },
+    ]);
   });
 
   it('locks a reduced public library helper idiom', () => {
