@@ -5967,6 +5967,9 @@ export class TealscriptEngine {
       (
         name === 'alert'
         || name === 'math.random'
+        || name === 'ta.cross'
+        || name === 'ta.crossover'
+        || name === 'ta.crossunder'
         || name === 'ta.dmi'
         || name === 'ta.macd'
         || name === 'ta.obv'
@@ -8332,69 +8335,49 @@ export class TealscriptEngine {
 
     // Crossover - source1 crosses above source2
     // Uses scope to track previous values of both arguments
-    this.builtins.set('ta.crossover', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.crossover', (args, namedArgs, ctx, scope, callId) => {
       const taCrossArgs = ['source1', 'source2'];
       const source1 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0));
       const source2 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1));
+      const series1 = this.getKnownSeriesForSource(source1, ctx);
+      const series2 = this.getKnownSeriesForSource(source2, ctx);
+      const trackKey1 = `_cross_over_src1_${callId}`;
+      const trackKey2 = `_cross_over_src2_${callId}`;
+      const previous1 = series1?.get(1) ?? (scope.get(trackKey1) as number | undefined);
+      const previous2 = series2?.get(1) ?? (scope.get(trackKey2) as number | undefined);
 
-      // Try to get series for source1 (if it's a built-in series)
-      const series1 = this.getSeriesForSource(source1, ctx);
-      const series2 = this.getSeriesForSource(source2, ctx);
+      this.setBuiltinState(scope, trackKey1, source1);
+      this.setBuiltinState(scope, trackKey2, source2);
 
-      // Get previous values
-      const prev1 = series1.get(1);
-      const prev2 = series2.get(1);
-
-      // If we can't get historical values, use scope tracking
-      const trackKey1 = `_cross_src1_${source1}`;
-      const trackKey2 = `_cross_src2_${source2}`;
-
-      const trackedPrev1 = prev1 ?? (scope.get(trackKey1) as number | undefined);
-      const trackedPrev2 = prev2 ?? (scope.get(trackKey2) as number | undefined);
-
-      // Store current values for next bar
-      scope.declare(trackKey1, 'var', source1);
-      scope.declare(trackKey2, 'var', source2);
-
-      if (trackedPrev1 === undefined || trackedPrev2 === undefined) {
+      if (previous1 === undefined || previous2 === undefined || isNaN(source1) || isNaN(source2) || isNaN(previous1) || isNaN(previous2)) {
         return false; // Not enough data
       }
 
       // Crossover: current above, previous at or below
-      return source1 > source2 && trackedPrev1 <= trackedPrev2;
+      return source1 > source2 && previous1 <= previous2;
     });
 
     // Crossunder - source1 crosses below source2
-    this.builtins.set('ta.crossunder', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.crossunder', (args, namedArgs, ctx, scope, callId) => {
       const taCrossArgs = ['source1', 'source2'];
       const source1 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 0));
       const source2 = this.toNumber(this.getOrderedCallArg(args, namedArgs, taCrossArgs, 1));
+      const series1 = this.getKnownSeriesForSource(source1, ctx);
+      const series2 = this.getKnownSeriesForSource(source2, ctx);
+      const trackKey1 = `_cross_under_src1_${callId}`;
+      const trackKey2 = `_cross_under_src2_${callId}`;
+      const previous1 = series1?.get(1) ?? (scope.get(trackKey1) as number | undefined);
+      const previous2 = series2?.get(1) ?? (scope.get(trackKey2) as number | undefined);
 
-      // Try to get series for source1 (if it's a built-in series)
-      const series1 = this.getSeriesForSource(source1, ctx);
-      const series2 = this.getSeriesForSource(source2, ctx);
+      this.setBuiltinState(scope, trackKey1, source1);
+      this.setBuiltinState(scope, trackKey2, source2);
 
-      // Get previous values
-      const prev1 = series1.get(1);
-      const prev2 = series2.get(1);
-
-      // If we can't get historical values, use scope tracking
-      const trackKey1 = `_crossu_src1_${source1}`;
-      const trackKey2 = `_crossu_src2_${source2}`;
-
-      const trackedPrev1 = prev1 ?? (scope.get(trackKey1) as number | undefined);
-      const trackedPrev2 = prev2 ?? (scope.get(trackKey2) as number | undefined);
-
-      // Store current values for next bar
-      scope.declare(trackKey1, 'var', source1);
-      scope.declare(trackKey2, 'var', source2);
-
-      if (trackedPrev1 === undefined || trackedPrev2 === undefined) {
+      if (previous1 === undefined || previous2 === undefined || isNaN(source1) || isNaN(source2) || isNaN(previous1) || isNaN(previous2)) {
         return false; // Not enough data
       }
 
       // Crossunder: current below, previous at or above
-      return source1 < source2 && trackedPrev1 >= trackedPrev2;
+      return source1 < source2 && previous1 >= previous2;
     });
 
     this.builtins.set('ta.cross', (args, namedArgs, ctx, scope, callId) => {
