@@ -3541,9 +3541,69 @@ export class TealscriptEngine {
         ? firstSource
         : undefined;
     }
+    if (expr.type === 'BinaryExpression' || expr.type === 'UnaryExpression') {
+      return this.getArithmeticSourceSeriesForExpression(expr);
+    }
     if (expr.type !== 'Identifier') return undefined;
 
     return this.scope.getSourceSeries(expr.name) ?? this.getKnownSeriesByName(expr.name, this.ctx);
+  }
+
+  private getArithmeticSourceSeriesForExpression(expr: Expression): SeriesAccessor | undefined {
+    if (expr.type === 'NumericLiteral') {
+      return { get: () => expr.value };
+    }
+
+    if (expr.type === 'NaExpression') {
+      return { get: () => Number.NaN };
+    }
+
+    if (expr.type === 'Identifier') {
+      return this.scope.getSourceSeries(expr.name) ?? this.getKnownSeriesByName(expr.name, this.ctx);
+    }
+
+    if (expr.type === 'UnaryExpression') {
+      if (expr.operator !== '-' && expr.operator !== '+') return undefined;
+      const operand = this.getArithmeticSourceSeriesForExpression(expr.argument);
+      if (!operand) return undefined;
+      return {
+        get: (offset) => {
+          const value = operand.get(offset);
+          if (value === undefined) return undefined;
+          return expr.operator === '-' ? -value : value;
+        },
+      };
+    }
+
+    if (expr.type !== 'BinaryExpression') return undefined;
+    if (!['+', '-', '*', '/', '%'].includes(expr.operator)) return undefined;
+
+    const left = this.getArithmeticSourceSeriesForExpression(expr.left);
+    const right = this.getArithmeticSourceSeriesForExpression(expr.right);
+    if (!left || !right) return undefined;
+
+    return {
+      get: (offset) => {
+        const leftValue = left.get(offset);
+        const rightValue = right.get(offset);
+        if (leftValue === undefined || rightValue === undefined) return undefined;
+        if (isNaN(leftValue) || isNaN(rightValue)) return Number.NaN;
+        switch (expr.operator) {
+          case '+':
+            return leftValue + rightValue;
+          case '-':
+            return leftValue - rightValue;
+          case '*':
+            return leftValue * rightValue;
+          case '/':
+            return leftValue / rightValue;
+          case '%':
+            return leftValue % rightValue;
+          default:
+            return undefined;
+        }
+      },
+    };
   }
 
   private getSourceSeriesForValue(value: unknown): SeriesAccessor | undefined {
