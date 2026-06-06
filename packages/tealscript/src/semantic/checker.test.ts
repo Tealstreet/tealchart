@@ -3888,6 +3888,36 @@ table.cell_set_text_formatting(dashboard, 0, 0, text_formatting=text.format_unde
     ]);
   });
 
+  it('reports invalid drawing text string values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing Text Values")
+marker = label.new(bar_index, close, text=1, tooltip=2)
+region = box.new(bar_index, high, bar_index + 1, low, text=1)
+dashboard = table.new(position.top_right, 1, 1)
+label.set_text(marker, text=1)
+label.set_tooltip(marker, tooltip=2)
+box.set_text(region, text=1)
+table.cell(dashboard, 0, 0, text=1, tooltip=2)
+table.cell_set_text(dashboard, 0, 0, text=1)
+table.cell_set_tooltip(dashboard, 0, 0, tooltip=2)
+label.set_text(marker, 1, id=marker)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'label.new text must be a string, got int',
+      'label.new tooltip must be a string, got int',
+      'box.new text must be a string, got int',
+      'label.set_text text must be a string, got int',
+      'label.set_tooltip tooltip must be a string, got int',
+      'box.set_text text must be a string, got int',
+      'table.cell text must be a string, got int',
+      'table.cell tooltip must be a string, got int',
+      'table.cell_set_text text must be a string, got int',
+      'table.cell_set_tooltip tooltip must be a string, got int',
+      "Argument 'id' for label.set_text() was supplied multiple times",
+    ]);
+  });
+
   it('reports invalid literal drawing size option values', () => {
     const result = checkProgram(parse(`
 indicator("Bad Drawing Sizes")

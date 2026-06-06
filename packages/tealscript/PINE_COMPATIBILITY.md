@@ -889,8 +889,9 @@ mutators and getters accept Pine-style named `id` and value arguments. Semantic
 analysis preserves known label getter return types and `label.all` handle-array
 element types for downstream diagnostics, and rejects invalid literal `xloc`
 and `yloc` option values plus invalid literal label `style`, `textalign`,
-`size`, `text_font_family`, and `text_formatting` values. Rendering
-routes labels to the script pane: overlay scripts use the main pane, non-overlay
+`size`, `text_font_family`, and `text_formatting` values, plus non-string
+label text and tooltip values. Rendering routes labels to the script pane:
+overlay scripts use the main pane, non-overlay
 scripts use their indicator pane. Renderer coverage handles text-only
 `label.style_none`, directional label bodies, and common symbol bodies including
 circle, square, diamond, cross, xcross, triangle, flag, arrow styles, label text
@@ -943,8 +944,8 @@ common border, fill, text, `extend`, and `xloc` options, including
 and point arguments. Semantic analysis validates `box.new()` call-shape names,
 preserves known box getter return types, preserves `box.all` handle-array
 element types for downstream diagnostics, and rejects invalid literal `xloc`
-and `extend` option values plus invalid literal border-style values. Rendering
-routes filled rectangles to the script pane with borders, text alignment, `text_wrap=auto` wrapping,
+and `extend` option values plus invalid literal border-style values and
+non-string box text values. Rendering routes filled rectangles to the script pane with borders, text alignment, `text_wrap=auto` wrapping,
 default/monospace font-family metadata, and bold/italic text formatting. Semantic
 analysis also rejects invalid literal `text_halign`, `text_valign`,
 `text_wrap`, `text_size`, `text_font_family`, and `text_formatting` values. Full
@@ -973,8 +974,8 @@ Pine-style named `table_id`, coordinate, and value arguments where those
 parameters exist. Semantic analysis preserves `table.new()` handle return types
 and `table.all` handle-array element types for downstream diagnostics, and
 rejects invalid literal table position values plus cell text alignment,
-text-size, font-family, and text-formatting values. Rendering
-lays out fixed tables in the script pane with measured automatic cell sizes,
+text-size, font-family, and text-formatting values, plus non-string cell text
+and tooltip values. Rendering lays out fixed tables in the script pane with measured automatic cell sizes,
 percentage-based explicit cell sizes, merged cell spans, cell backgrounds,
 borders, frame borders, text alignment, default/monospace font-family metadata,
 and bold/italic font styling. Runtime coverage also
