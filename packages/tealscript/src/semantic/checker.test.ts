@@ -1542,6 +1542,23 @@ strategy.risk.max_intraday_filled_orders(count="two")
     ]);
   });
 
+  it('reports invalid Pine strategy trade accessor index values', () => {
+    const result = checkProgram(parse(`
+strategy("Bad Strategy Trade Indexes")
+openProfit = strategy.opentrades.profit("0")
+openComment = strategy.opentrades.entry_comment(true)
+closedEntry = strategy.closedtrades.entry_price("0")
+closedExitId = strategy.closedtrades.exit_id(false)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'strategy.opentrades.profit trade_num must be a number, got string',
+      'strategy.opentrades.entry_comment trade_num must be a number, got bool',
+      'strategy.closedtrades.entry_price trade_num must be a number, got string',
+      'strategy.closedtrades.exit_id trade_num must be a number, got bool',
+    ]);
+  });
+
   it('reports duplicate declarations in the same scope', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate")
