@@ -356,6 +356,28 @@ const TICKER_STRING_RETURN_NAMES = new Set([
   'ticker.renko',
   'ticker.standard',
 ]);
+const TICKER_SESSION_VALUES = new Set(['regular', 'extended']);
+const TICKER_SESSION_CONSTANT_VALUES = new Map([
+  ['session.regular', 'regular'],
+  ['session.extended', 'extended'],
+]);
+const TICKER_ADJUSTMENT_VALUES = new Set(['none', 'splits', 'dividends']);
+const TICKER_ADJUSTMENT_CONSTANT_VALUES = new Map([
+  ['adjustment.none', 'none'],
+  ['adjustment.splits', 'splits'],
+  ['adjustment.dividends', 'dividends'],
+]);
+const TICKER_INHERIT_ON_OFF_VALUES = new Set(['on', 'off', 'inherit']);
+const TICKER_BACKADJUSTMENT_CONSTANT_VALUES = new Map([
+  ['backadjustment.on', 'on'],
+  ['backadjustment.off', 'off'],
+  ['backadjustment.inherit', 'inherit'],
+]);
+const TICKER_SETTLEMENT_AS_CLOSE_CONSTANT_VALUES = new Map([
+  ['settlement_as_close.on', 'on'],
+  ['settlement_as_close.off', 'off'],
+  ['settlement_as_close.inherit', 'inherit'],
+]);
 
 const REQUEST_FLOAT_RETURN_NAMES = new Set([
   'request.currency_rate',
@@ -3370,6 +3392,7 @@ class SemanticChecker {
     this.checkDrawingTextOptionLiteralArguments(expression, scope);
     this.checkTablePositionOptionLiteralArguments(expression, scope);
     this.checkDrawingSizeOptionLiteralArguments(expression, scope);
+    this.checkTickerOptionLiteralArguments(expression, scope);
     this.checkStrategyLiteralArgumentConstraints(expression);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
@@ -4478,6 +4501,81 @@ class SemanticChecker {
       VISUAL_SIZE_CONSTANT_VALUES,
       'size.',
     );
+  }
+
+  private checkTickerOptionLiteralArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    if (calleeName !== 'ticker.new' && calleeName !== 'ticker.modify') return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    this.checkDrawingOptionLiteralArgument(
+      expression,
+      signature.params,
+      calleeName,
+      'session',
+      TICKER_SESSION_VALUES,
+      TICKER_SESSION_CONSTANT_VALUES,
+      'session.',
+    );
+    this.checkDrawingOptionLiteralArgument(
+      expression,
+      signature.params,
+      calleeName,
+      'adjustment',
+      TICKER_ADJUSTMENT_VALUES,
+      TICKER_ADJUSTMENT_CONSTANT_VALUES,
+      'adjustment.',
+    );
+    this.checkDrawingOptionLiteralArgument(
+      expression,
+      signature.params,
+      calleeName,
+      'backadjustment',
+      TICKER_INHERIT_ON_OFF_VALUES,
+      TICKER_BACKADJUSTMENT_CONSTANT_VALUES,
+      'backadjustment.',
+    );
+    this.checkDrawingOptionLiteralArgument(
+      expression,
+      signature.params,
+      calleeName,
+      'settlement_as_close',
+      TICKER_INHERIT_ON_OFF_VALUES,
+      TICKER_SETTLEMENT_AS_CLOSE_CONSTANT_VALUES,
+      'settlement_as_close.',
+    );
+  }
+
+  private hasUnstableOptionArgumentBindings(args: CallArgument[], signature: BuiltinSignature): boolean {
+    const params = this.resolveSignatureParams(args, signature);
+    const positionalParams = signature.allowNamedPrefixWithPositional
+      ? this.positionalBindingParams(args, signature, params)
+      : params;
+    const boundParams = new Set<string>();
+    const positionalBoundParams = new Set<string>();
+    const seenNames = new Set<string>();
+
+    for (const arg of args) {
+      if (!arg.name) {
+        const positionalParam = positionalParams.find((param) => !boundParams.has(param));
+        if (positionalParam) {
+          boundParams.add(positionalParam);
+          positionalBoundParams.add(positionalParam);
+        }
+        continue;
+      }
+
+      const canonicalName = this.canonicalSignatureArgumentName(arg.name.name, signature);
+      if (!params.includes(canonicalName)) return true;
+      if (seenNames.has(canonicalName) || positionalBoundParams.has(canonicalName)) return true;
+      seenNames.add(canonicalName);
+      boundParams.add(canonicalName);
+    }
+
+    return false;
   }
 
   private checkDrawingOptionLiteralArgument(
