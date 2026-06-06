@@ -2202,6 +2202,8 @@ class SemanticChecker {
           statement.calc_bars_count,
           statement.timeframe,
           statement.timeframe_gaps,
+          statement.explicit_plot_zorder,
+          statement.behind_chart,
           statement.dynamic_requests,
           statement.initial_capital,
           statement.currency,
