@@ -2342,6 +2342,90 @@ plot(strategy.position_size)`;
       expect(result.plots[0]?.values).toEqual([2, 1]);
     });
 
+    it('caps strategy.entry exposure with strategy.risk.max_position_size', () => {
+      const script = `//@version=6
+strategy("Max position risk", process_orders_on_close=true, pyramiding=2)
+strategy.risk.max_position_size(3)
+if bar_index == 0
+    strategy.entry("A", strategy.long, qty=2)
+if bar_index == 1
+    strategy.entry("B", strategy.long, qty=2)
+if bar_index == 2
+    strategy.entry("C", strategy.long, qty=1)
+plot(strategy.position_size)
+plot(strategy.opentrades)`;
+
+      const result = executeScript(parse(script), createBars(3));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.settings.maxPositionSize).toBe(3);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        qty: order.qty,
+        requestedQty: order.requestedQty,
+        filledQty: order.filledQty,
+      }))).toEqual([
+        { id: 'A', qty: 2, requestedQty: 2, filledQty: 2 },
+        { id: 'B', qty: 1, requestedQty: 1, filledQty: 1 },
+      ]);
+      expect(result.strategy.position.size).toBe(3);
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        [2, 3, 3],
+        [1, 2, 2],
+      ]);
+    });
+
+    it('counts pending same-direction entries toward strategy.risk.max_position_size', () => {
+      const script = `//@version=6
+strategy("Pending max position risk", pyramiding=2)
+strategy.risk.max_position_size(3)
+if bar_index == 0
+    strategy.entry("A", strategy.long, qty=2)
+    strategy.entry("B", strategy.long, qty=2)
+plot(strategy.position_size)`;
+
+      const result = executeScript(parse(script), createBars(2));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        qty: order.qty,
+        requestedQty: order.requestedQty,
+        filledQty: order.filledQty,
+      }))).toEqual([
+        { id: 'A', qty: 2, requestedQty: 2, filledQty: 2 },
+        { id: 'B', qty: 1, requestedQty: 1, filledQty: 1 },
+      ]);
+      expect(result.strategy.position.size).toBe(3);
+      expect(result.plots[0]?.values).toEqual([0, 3]);
+    });
+
+    it('does not apply strategy.risk.max_position_size to raw strategy.order calls', () => {
+      const script = `//@version=6
+strategy("Raw order ignores max position", process_orders_on_close=true)
+strategy.risk.max_position_size(1)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.order("Add", strategy.long, qty=2)
+plot(strategy.position_size)`;
+
+      const result = executeScript(parse(script), createBars(2));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.orders.map((order) => ({
+        id: order.id,
+        qty: order.qty,
+        requestedQty: order.requestedQty,
+        filledQty: order.filledQty,
+      }))).toEqual([
+        { id: 'Long', qty: 1, requestedQty: 1, filledQty: 1 },
+        { id: 'Add', qty: 2, requestedQty: 2, filledQty: 2 },
+      ]);
+      expect(result.strategy.position.size).toBe(3);
+      expect(result.plots[0]?.values).toEqual([1, 3]);
+    });
+
     it('fills strategy.exit brackets and cancels the sibling OCA order', () => {
       const script = `//@version=6
 strategy("Exit bracket fill", process_orders_on_close=true)
