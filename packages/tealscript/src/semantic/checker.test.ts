@@ -3847,7 +3847,8 @@ first = label.new(x=bar_index, close, "Entry", xloc.bar_index, yloc.price, color
 second = label.new(bar_index, high, text="High", color=color.orange, style=label.style_label_down)
 labelPoint = chart.point.from_index(bar_index, low)
 third = label.new(labelPoint, "Point", xloc.bar_index, yloc.price, color.blue)
-labels = array.from(first, second, third)
+fourth = label.new(point=labelPoint, text="Named Point", color=color.yellow)
+labels = array.from(first, second, third, fourth)
 plot(array.size(labels))
 `));
 
@@ -4015,6 +4016,8 @@ region = box.new(bar_index, high, bar_index + 1, low)
 firstPoint = chart.point.from_index(bar_index, high)
 secondPoint = chart.point.from_index(bar_index + 1, low)
 points = array.from(firstPoint, secondPoint)
+badLabel = label.new(x="0", y=false)
+pointLabel = label.new(point=firstPoint, text="Point")
 badLabelX = label.set_x(marker, x="1")
 badLabelY = label.set_y(marker, y=false)
 badLabelXY = label.set_xy(marker, x="1", y=false)
@@ -4035,6 +4038,8 @@ badPolylineWidth = polyline.new(points, line_width="2")
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'label.new x must be a number, got string',
+      'label.new y must be a number, got bool',
       'label.set_x x must be a number, got string',
       'label.set_y y must be a number, got bool',
       'label.set_xy x must be a number, got string',

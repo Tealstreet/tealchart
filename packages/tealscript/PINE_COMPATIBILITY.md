@@ -905,7 +905,7 @@ element types for downstream diagnostics, and rejects invalid literal `xloc`
 and `yloc` option values plus invalid literal label `style`, `textalign`,
 `size`, `text_font_family`, and `text_formatting` values, plus non-string
 label text and tooltip values, non-color label color values, and non-numeric
-label setter coordinate values. Rendering routes
+label constructor/setter coordinate values. Rendering routes
 labels to the script pane: overlay scripts use the main pane, non-overlay
 scripts use their indicator pane. Renderer coverage handles text-only
 `label.style_none`, directional label bodies, and common symbol bodies including
