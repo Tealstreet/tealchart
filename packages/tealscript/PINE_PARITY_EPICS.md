@@ -259,8 +259,9 @@ Phases:
    array/map/matrix indexes, compound assignments, and invalid targets.
 4. Complete historical series commitment and function-local series behavior.
 5. Maintain explicit `max_bars_back` enforcement and broaden inferred runtime
-   buffer sizing beyond static literal, simple numeric, and input-bool-gated
-   or comparison-gated conditional offsets when corpus evidence requires it.
+   buffer sizing beyond static literal, simple numeric, selected pure `math.*`,
+   and input-bool- or comparison-gated conditional offsets when corpus evidence
+   requires it.
 6. Add stable runtime error payloads and `runtime.error()` coverage.
 7. Add focused fixtures for common public-script idioms that previously parsed
    but failed or drifted at runtime.
