@@ -11,6 +11,7 @@ import {
   createResultMessage,
   createCompatibilityRunOutcome,
   createPineCompatibilityCoverageIndex,
+  createPineParseSemanticStageOutcomes,
   createPineScriptLedger,
   corporateActionRequestKey,
   currencyRateRequestKey,
@@ -74,6 +75,7 @@ describe('public package entrypoints', () => {
       scriptId: 'manual-fixture',
       stages: smokeStages,
     });
+    const parseSemanticStages = createPineParseSemanticStageOutcomes('indicator("Smoke")\nplot(close)');
     const ledgerEntry: PineScriptLedgerEntry = {
       id: 'manual-fixture',
       title: 'Manual fixture',
@@ -93,6 +95,10 @@ describe('public package entrypoints', () => {
     expect(typeof parse).toBe('function');
     expect(typeof validate).toBe('function');
     expect(typeof executeScript).toBe('function');
+    expect(parseSemanticStages).toEqual([
+      { stage: 'parse', status: 'passed' },
+      { stage: 'semantic', status: 'passed' },
+    ]);
     expect(compatibilityStages).toContain('parse');
     expect(compatibilityFailureClasses).toContain('runtime_gap');
     expect(compatibilityOutcome.summary.passed).toBe(true);

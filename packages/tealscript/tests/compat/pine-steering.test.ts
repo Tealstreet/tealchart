@@ -6,6 +6,7 @@ import {
   compatibilityStages,
   createCompatibilityRunOutcome,
   createPineScriptLedger,
+  createPineParseSemanticStageOutcomes,
   formatPineCompatibilityCorpusMarkdown,
   normalizeCompatibilityStageOutcomes,
   PINE_COMPATIBILITY_SCHEMA_VERSION,
@@ -136,6 +137,48 @@ describe('Pine compatibility steering model', () => {
         firstFailureStage: 'semantic',
         firstFailureClass: 'unsupported_planned',
       },
+    });
+  });
+
+  it('creates parse and semantic compatibility stages from reduced source', () => {
+    expect(createPineParseSemanticStageOutcomes(`
+indicator("Pass")
+plot(close)
+`)).toEqual([
+      { stage: 'parse', status: 'passed' },
+      { stage: 'semantic', status: 'passed' },
+    ]);
+
+    expect(createPineParseSemanticStageOutcomes(`
+indicator("Parse Gap"
+plot(close)
+`)[0]).toMatchObject({
+      stage: 'parse',
+      status: 'failed',
+      failureClass: 'parse_gap',
+      diagnostics: [expect.objectContaining({ code: 'parse.error' })],
+    });
+
+    expect(createPineParseSemanticStageOutcomes(`
+indicator("Semantic Gap")
+ta.mystery(close)
+plot(close)
+`)[1]).toMatchObject({
+      stage: 'semantic',
+      status: 'failed',
+      failureClass: 'semantic_gap',
+      diagnostics: [expect.objectContaining({ code: 'unknown-function', message: 'Unknown function: ta.mystery' })],
+    });
+
+    expect(createPineParseSemanticStageOutcomes(`
+indicator("Planned Gap")
+request.footprint(syminfo.tickerid)
+plot(close)
+`)[1]).toMatchObject({
+      stage: 'semantic',
+      status: 'failed',
+      failureClass: 'unsupported_planned',
+      diagnostics: [expect.objectContaining({ code: 'unsupported-feature' })],
     });
   });
 

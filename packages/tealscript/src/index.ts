@@ -49,6 +49,10 @@ export {
 } from './compat';
 
 export {
+  createPineParseSemanticStageOutcomes,
+} from './compat/sourceStages';
+
+export {
   // Parser functions
   parse,
   validate,
