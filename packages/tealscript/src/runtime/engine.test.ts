@@ -6682,6 +6682,27 @@ plot(bar_index >= 1 ? ta.sma(passthrough(), 2) : na, title="Conditional Derived 
       expect(result.plots.find((plot) => plot.title === 'Conditional Derived Average')?.values).toEqual([null, 15, 25]);
     });
 
+    it('preserves source identity through arithmetic expression UDF returns', () => {
+      const script = `//@version=6
+indicator("Arithmetic source return identity")
+midpoint() => (high + low) / 2
+scaled(series float src) => src * 2
+plot(bar_index >= 1 ? ta.sma(midpoint(), 2) : na, title="Arithmetic Average")
+plot(bar_index >= 1 ? ta.sma(scaled(open), 2) : na, title="Scaled Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 18, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Arithmetic Average')?.values).toEqual([null, 15, 25]);
+      expect(result.plots.find((plot) => plot.title === 'Scaled Average')?.values).toEqual([null, 30, 50]);
+    });
+
     it('preserves source identity through same-source switch UDF returns', () => {
       const script = `//@version=6
 indicator("Switch source return identity")
