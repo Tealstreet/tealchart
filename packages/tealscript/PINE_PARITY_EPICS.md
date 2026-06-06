@@ -165,9 +165,9 @@ Phases:
    corpus includes reduced public fixtures for MTF filters, divergence,
    session filters, exchange session-state gates, dashboard tables, custom
    candles, drawing zones, linefill channels, zigzag polylines, screeners,
-   currency conversion, earnings event markers, financial dashboards, economic
-   macro overlays, seed dataset overlays, library helpers, public strategy stats
-   tables, and UDT object-method state.
+   currency conversion, earnings event markers, corporate-action overlays,
+   financial dashboards, economic macro overlays, seed dataset overlays, library
+   helpers, public strategy stats tables, and UDT object-method state.
    Strategy-bracket coverage includes official broker examples plus a reduced
    public fixed-bracket strategy fixture, and trailing-stop coverage includes
    official and reduced public strategy fixtures.
@@ -351,8 +351,9 @@ Phases:
 5. Defer `request.footprint()` until host footprint/intrabar-volume data is
    available.
 6. Maintain corpus-driven checkpoints for MTF trend filters, lower-timeframe
-   arrays, currency conversion, earnings events, financial dashboards, economic
-   macro overlays, seed datasets, synthetic ticker IDs, and request-limit reuse.
+   arrays, currency conversion, earnings events, corporate actions, financial
+   dashboards, economic macro overlays, seed datasets, synthetic ticker IDs, and
+   request-limit reuse.
 
 Done means MTF and multi-symbol scripts can run against deterministic or
 host-provided data.

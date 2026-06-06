@@ -1306,6 +1306,58 @@ plotshape(beat, title="Beat Marker", text="EPS", color=color.green)
     expect(getPlot(result, 'Beat Marker').values).toEqual([null, 1, null, null]);
   });
 
+  it('locks a reduced public corporate action event idiom', () => {
+    // Public idiom reference: public corporate-action overlays commonly combine
+    // dividend and split event series into chart markers.
+    // Source search: https://www.tradingview.com/scripts/search/dividends%20splits/
+    const bars: Bar[] = [
+      { time: 1_700_530_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_530_060_000, open: 101, high: 102, low: 100, close: 101, volume: 100 },
+      { time: 1_700_530_120_000, open: 102, high: 103, low: 101, close: 102, volume: 100 },
+      { time: 1_700_530_180_000, open: 103, high: 104, low: 102, close: 103, volume: 100 },
+    ];
+    const requestDatafeed = new InMemoryRequestDatafeed([], [
+      {
+        family: 'dividends',
+        key: corporateActionRequestKey('NASDAQ:AAPL', 'dividends.gross', 'USD'),
+        points: [{ time: bars[1]!.time, value: 0.82 }],
+      },
+      {
+        family: 'splits',
+        key: corporateActionRequestKey('NASDAQ:AAPL', 'splits.numerator'),
+        points: [{ time: bars[3]!.time, value: 4 }],
+      },
+      {
+        family: 'splits',
+        key: corporateActionRequestKey('NASDAQ:AAPL', 'splits.denominator'),
+        points: [{ time: bars[3]!.time, value: 1 }],
+      },
+    ]);
+    const result = runCompatScript(`
+indicator("Public Corporate Actions Checkpoint", overlay=true)
+dividend = request.dividends("NASDAQ:AAPL", dividends.gross, gaps=barmerge.gaps_on, currency=currency.USD)
+splitNumerator = request.splits("NASDAQ:AAPL", splits.numerator, gaps=barmerge.gaps_on)
+splitDenominator = request.splits("NASDAQ:AAPL", splits.denominator, gaps=barmerge.gaps_on)
+splitRatio = splitNumerator / splitDenominator
+actionScore = (na(dividend) ? 0 : dividend) + (na(splitRatio) ? 0 : splitRatio)
+plot(dividend, title="Dividend")
+plot(splitRatio, title="Split Ratio")
+plot(actionScore, title="Action Score")
+plotshape(not na(dividend), title="Dividend Marker", text="DIV", color=color.blue)
+plotshape(not na(splitRatio), title="Split Marker", text="SPLIT", color=color.orange)
+`, {
+      bars,
+      engineOptions: { requestDatafeed },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Dividend').values).toEqual([null, 0.82, null, null]);
+    expect(getPlot(result, 'Split Ratio').values).toEqual([null, null, null, 4]);
+    expect(getPlot(result, 'Action Score').values).toEqual([0, 0.82, 0, 4]);
+    expect(getPlot(result, 'Dividend Marker').values).toEqual([null, 1, null, null]);
+    expect(getPlot(result, 'Split Marker').values).toEqual([null, null, null, 1]);
+  });
+
   it('locks a reduced public financial dashboard idiom', () => {
     // Public idiom reference: public fundamental dashboards commonly derive
     // ratios from request.financial() metrics and summarize the latest value.
