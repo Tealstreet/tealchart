@@ -226,7 +226,10 @@ the golden compatibility harness. Common rolling helpers preserve direct
 OHLCV, quote, and derived OHLC source identity for calls such as
 `ta.sma(open, 2)`, `math.sum(open, 2)`, and `ta.correlation(open, close, 2)`,
 so equal current-bar source values no longer collapse to the wrong history
-series. `ta.rma()`, `ta.rsi()`, and `ta.atr()` use
+series. Simple source aliases such as `src = open`, alias-to-alias
+declarations, and `:=` reassignment to a known source preserve the same
+identity for rolling helper windows while keeping normal alias history
+references such as `src[1]` numeric. `ta.rma()`, `ta.rsi()`, and `ta.atr()` use
 Pine's SMA-seeded RMA warmup before recursive smoothing; `ta.atr()` is covered
 as the RMA of `ta.tr(true)`.
 Recursive `ta.atr()` smoothing state, `ta.rsi()`
