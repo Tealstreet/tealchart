@@ -21,9 +21,9 @@ describe('Pine compatibility checkpoint corpus', () => {
     const run = runPineCompatibilityCorpus(compatibilityCheckpointCorpus);
 
     expect(validatePineScriptLedger(compatibilityCheckpointLedger)).toEqual({});
-    expect(compatibilityCheckpointLedger.entries).toHaveLength(39);
-    expect(run.summary.total).toBe(39);
-    expect(run.summary.passed).toBe(39);
+    expect(compatibilityCheckpointLedger.entries).toHaveLength(40);
+    expect(run.summary.total).toBe(40);
+    expect(run.summary.passed).toBe(40);
     expect(run.summary.failed).toBe(0);
     expect(run.summary.validationErrors).toEqual({});
     expect(run.summary.byFeatureTag).toMatchObject({
@@ -31,10 +31,11 @@ describe('Pine compatibility checkpoint corpus', () => {
       request: { total: 6, passed: 6, failed: 0 },
       runtime: { total: 2, passed: 2, failed: 0 },
       sessions: { total: 3, passed: 3, failed: 0 },
-      strategy: { total: 12, passed: 12, failed: 0 },
+      strategy: { total: 13, passed: 13, failed: 0 },
       time: { total: 2, passed: 2, failed: 0 },
       timeframes: { total: 1, passed: 1, failed: 0 },
       ticker: { total: 2, passed: 2, failed: 0 },
+      trailing_stop: { total: 2, passed: 2, failed: 0 },
       visuals: { total: 10, passed: 10, failed: 0 },
       alerts: { total: 3, passed: 3, failed: 0 },
       brackets: { total: 1, passed: 1, failed: 0 },
@@ -73,6 +74,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('public-linefill-channel-checkpoint');
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('public-zigzag-polyline-checkpoint');
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('public-strategy-bracket-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('public-strategy-trailing-stop-checkpoint');
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('public-strategy-stats-checkpoint');
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('public-alert-signal-checkpoint');
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('public-custom-candle-checkpoint');
@@ -82,12 +84,12 @@ describe('Pine compatibility checkpoint corpus', () => {
   it('renders a stable checkpoint corpus report', () => {
     const markdown = formatPineCompatibilityCorpusMarkdown(runPineCompatibilityCorpus(compatibilityCheckpointCorpus));
 
-    expect(markdown).toContain('Total: 39');
+    expect(markdown).toContain('Total: 40');
     expect(markdown).toContain('Pass rate: 100.0%');
     expect(markdown).toContain('| inputs | 2 | 2 | 0 |');
     expect(markdown).toContain('| runtime | 2 | 2 | 0 |');
     expect(markdown).toContain('| sessions | 3 | 3 | 0 |');
-    expect(markdown).toContain('| strategy | 12 | 12 | 0 |');
+    expect(markdown).toContain('| strategy | 13 | 13 | 0 |');
     expect(markdown).toContain('| time | 2 | 2 | 0 |');
     expect(markdown).toContain('| timeframes | 1 | 1 | 0 |');
     expect(markdown).toContain('| request | 6 | 6 | 0 |');
@@ -112,6 +114,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| state | 2 | 2 | 0 |');
     expect(markdown).toContain('| tables | 3 | 3 | 0 |');
     expect(markdown).toContain('| ticker | 2 | 2 | 0 |');
+    expect(markdown).toContain('| trailing_stop | 2 | 2 | 0 |');
     expect(markdown).toContain('| udt | 1 | 1 | 0 |');
     expect(markdown).toContain('| zigzag | 1 | 1 | 0 |');
     expect(markdown).toContain('| zones | 1 | 1 | 0 |');
@@ -129,8 +132,8 @@ describe('Pine compatibility checkpoint corpus', () => {
     );
     const json = formatPineCompatibilityCorpusJson(run);
 
-    expect(run.summary.total).toBe(39);
-    expect(run.summary.passed).toBe(39);
+    expect(run.summary.total).toBe(40);
+    expect(run.summary.passed).toBe(40);
     expect(run.summary.validationErrors).toEqual({});
     expect(json).toContain('"schemaVersion": 1');
     expect(json).toContain('"scriptId": "official-builtins-checkpoint"');
@@ -199,21 +202,22 @@ describe('Pine compatibility checkpoint corpus', () => {
 
     expect(index).toMatchObject({
       schemaVersion: 1,
-      total: 39,
-      byCategory: { indicator: 27, strategy: 12 },
-      bySourceKind: { official_docs: 22, public_script: 17 },
-      byPineVersion: { v6: 39 },
-      byStoragePolicy: { reduced_fixture_only: 39 },
+      total: 40,
+      byCategory: { indicator: 27, strategy: 13 },
+      bySourceKind: { official_docs: 22, public_script: 18 },
+      byPineVersion: { v6: 40 },
+      byStoragePolicy: { reduced_fixture_only: 40 },
     });
     expect(index.byFeatureTag).toMatchObject({
       inputs: 2,
       request: 6,
       runtime: 2,
       sessions: 3,
-      strategy: 12,
+      strategy: 13,
       time: 2,
       timeframes: 1,
       ticker: 2,
+      trailing_stop: 2,
       visuals: 10,
       alerts: 3,
       brackets: 1,
@@ -242,11 +246,11 @@ describe('Pine compatibility checkpoint corpus', () => {
       zones: 1,
     });
     expect(markdown).toContain('# Pine Compatibility Coverage');
-    expect(markdown).toContain('Total checkpoints: 39');
+    expect(markdown).toContain('Total checkpoints: 40');
     expect(markdown).toContain('| official_docs | 22 |');
-    expect(markdown).toContain('| public_script | 17 |');
-    expect(markdown).toContain('| reduced_fixture_only | 39 |');
-    expect(formatPineCompatibilityCoverageJson(index)).toContain('"total": 39');
+    expect(markdown).toContain('| public_script | 18 |');
+    expect(markdown).toContain('| reduced_fixture_only | 40 |');
+    expect(formatPineCompatibilityCoverageJson(index)).toContain('"total": 40');
   });
 
   it('generates deterministic dashboard artifacts for CI', () => {
@@ -263,10 +267,10 @@ describe('Pine compatibility checkpoint corpus', () => {
         stdio: 'pipe',
       });
 
-      expect(readFileSync(join(outDir, 'pine-compatibility-corpus.json'), 'utf8')).toContain('"passed": 39');
+      expect(readFileSync(join(outDir, 'pine-compatibility-corpus.json'), 'utf8')).toContain('"passed": 40');
       expect(readFileSync(join(outDir, 'pine-compatibility-corpus.md'), 'utf8')).toContain('Pass rate: 100.0%');
-      expect(readFileSync(join(outDir, 'pine-compatibility-coverage.json'), 'utf8')).toContain('"total": 39');
-      expect(readFileSync(join(outDir, 'pine-compatibility-coverage.md'), 'utf8')).toContain('Total checkpoints: 39');
+      expect(readFileSync(join(outDir, 'pine-compatibility-coverage.json'), 'utf8')).toContain('"total": 40');
+      expect(readFileSync(join(outDir, 'pine-compatibility-coverage.md'), 'utf8')).toContain('Total checkpoints: 40');
     } finally {
       rmSync(outDir, { recursive: true, force: true });
     }

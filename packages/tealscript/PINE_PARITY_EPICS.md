@@ -165,7 +165,8 @@ Phases:
    candles, drawing zones, linefill channels, zigzag polylines, screeners,
    library helpers, public strategy stats tables, and UDT object-method state.
    Strategy-bracket coverage includes official broker examples plus a reduced
-   public fixed-bracket strategy fixture.
+   public fixed-bracket strategy fixture, and trailing-stop coverage includes
+   official and reduced public strategy fixtures.
    Alert coverage includes official docs examples plus a reduced public signal
    fixture with both `alertcondition()` metadata and direct `alert()` emission.
    Synthetic ticker coverage includes official docs examples plus a reduced
@@ -491,7 +492,8 @@ impact.
    path, opening-gap fill assumptions, stop-limit activation/fill behavior, and
    selective immediate close/fill-alert/entry-direction behavior, plus
    `strategy.exit()` profit/loss offset brackets and trailing exit
-   tick-distance offsets, covered in the source-linked corpus.
+   tick-distance offsets, covered in the source-linked corpus with a public
+   trailing-stop strategy checkpoint.
 3. Harness incomplete outcomes: keep canonical `not_run` stages failing corpus
    pass-rate summaries unless they are explicitly marked `skipped`; direct
    checkpoint coverage now locks both sides of that contract.
