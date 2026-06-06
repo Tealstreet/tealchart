@@ -730,6 +730,16 @@ exchange calendar holidays or partial-session closures. The checkpoint corpus
 tracks public session-filter gating, public exchange session-state helper
 gating, and the official dynamic-session string idiom.
 
+## Common Tick Quote Coverage
+
+The tick-quote pass covers Pine v6 `bid` and `ask` variables as `series float`
+values sourced from optional host bar fields on the `1T` timeframe. Missing
+host quote fields, and all non-`1T` chart or request contexts, return `na`.
+Direct reads, history references such as `bid[1]`, selected TA source-window
+helpers such as `ta.sma(ask, 2)`, realtime tick replacement, semantic known
+global analysis, and `request.security(..., "1T", bid/ask)` are covered by
+runtime tests.
+
 ## Request Data And Ticker Coverage
 
 The request data pass covers `request.security()` over deterministic

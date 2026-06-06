@@ -2888,6 +2888,10 @@ export class TealscriptEngine {
         return this.ctx.close.get(0);
       case 'volume':
         return this.ctx.volume.get(0);
+      case 'bid':
+        return this.ctx.bid.get(0);
+      case 'ask':
+        return this.ctx.ask.get(0);
       case 'time':
         return this.ctx.time.get(0);
       case 'time_tradingday':
@@ -5001,6 +5005,12 @@ export class TealscriptEngine {
         case 'volume':
           this.checkHistoryOffset(offset);
           return this.naIfMissing(this.ctx.volume.get(offset));
+        case 'bid':
+          this.checkHistoryOffset(offset);
+          return this.naIfMissing(this.ctx.bid.get(offset));
+        case 'ask':
+          this.checkHistoryOffset(offset);
+          return this.naIfMissing(this.ctx.ask.get(offset));
         case 'time':
           this.checkHistoryOffset(offset);
           return this.naIfMissing(this.ctx.time.get(offset));
@@ -7675,6 +7685,10 @@ export class TealscriptEngine {
         return ctx.close.get(0);
       case 'volume':
         return ctx.volume.get(0);
+      case 'bid':
+        return ctx.bid.get(0);
+      case 'ask':
+        return ctx.ask.get(0);
       case 'ticker':
         return ctx.syminfo.ticker;
       case 'exchange':
@@ -7928,6 +7942,10 @@ export class TealscriptEngine {
         return ctx.low.get(0);
       case 'close':
         return ctx.close.get(0);
+      case 'bid':
+        return ctx.bid.get(0);
+      case 'ask':
+        return ctx.ask.get(0);
       case 'hl2':
         return ctx.hl2;
       case 'hlc3':
@@ -9270,6 +9288,8 @@ export class TealscriptEngine {
     if (source === ctx.low.get(0)) return ctx.low;
     if (source === ctx.open.get(0)) return ctx.open;
     if (source === ctx.volume.get(0)) return ctx.volume;
+    if (source === ctx.bid.get(0)) return ctx.bid;
+    if (source === ctx.ask.get(0)) return ctx.ask;
     // Check derived series
     if (source === ctx.hl2)
       return {
