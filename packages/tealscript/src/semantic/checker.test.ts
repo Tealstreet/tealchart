@@ -496,6 +496,29 @@ plotcandle(open, high, low, close, close=close)
     ]);
   });
 
+  it('reports invalid marker visual output argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Marker Visual Bindings")
+plotchar()
+plotchar(series=close > open, glyph="B")
+plotchar(close > open, series=close < open)
+plotarrow()
+plotarrow(series=close - open, color_up=color.green)
+plotarrow(close - open, series=open - close)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'plotchar() expects at least 1 argument',
+      "plotchar() missing required argument 'series'",
+      "Unknown argument 'glyph' for plotchar()",
+      "Argument 'series' for plotchar() was supplied multiple times",
+      'plotarrow() expects at least 1 argument',
+      "plotarrow() missing required argument 'series'",
+      "Unknown argument 'color_up' for plotarrow()",
+      "Argument 'series' for plotarrow() was supplied multiple times",
+    ]);
+  });
+
   it('reports invalid Pine declaration arguments', () => {
     const result = checkProgram(parse(`
 indicator("Bad Indicator", initial_capital=1000, typo=true)
