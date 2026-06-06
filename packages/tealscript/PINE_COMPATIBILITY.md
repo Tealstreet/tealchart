@@ -772,7 +772,7 @@ selected static or observed rolling-window helper lookbacks such as
 helpers, momentum helpers, band/average/regression helpers, and `ta.*`
 fixed/default, source-window, retained-source, recursive, and default-argument
 helpers, oscillator helpers, and direct OHLC helper lookbacks, including
-default-source highest/lowest and pivot forms. Full Pine-style
+default-source highest/lowest and pivot left/right windows. Full Pine-style
 preallocation for arbitrary series offsets remains a compatibility target. The
 checkpoint corpus tracks an official `max_bars_back`
 bounded-history fixture.
