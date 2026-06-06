@@ -6229,6 +6229,22 @@ plot(close, title="Close")`;
       expect(result.profile.maxBarsBack).toBe(8);
     });
 
+    it('statically reports unexecuted momentum helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Momentum Profile")
+length = input.int(defval=10, title="Length")
+if false
+    plot(ta.cmo(close, length), title="CMO")
+    plot(ta.mom(source=close, length=8), title="Momentum")
+    plot(ta.roc(close, 6), title="ROC")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(10);
+    });
+
     it('statically reports unexecuted MACD lookback lengths in the runtime profile', () => {
       const script = `//@version=6
 indicator("Static MACD Profile")
