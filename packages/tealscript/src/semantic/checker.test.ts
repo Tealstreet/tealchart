@@ -6173,6 +6173,47 @@ plot(htf + array.size(ltf) + rate + dividend + earning + split + revenue + econ 
     ]);
   });
 
+  it('reports non-string request identifiers', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Request Strings")
+htf = request.security(1, 2, close, currency=3)
+ltf = request.security_lower_tf("NASDAQ:AAPL", 1, close, currency=2)
+rate = request.currency_rate(1, 2)
+dividend = request.dividends(1, dividends.gross, currency=2)
+earning = request.earnings(1, earnings.actual, currency=2)
+split = request.splits(1, splits.denominator)
+revenue = request.financial(1, 2, 3, currency=4)
+econ = request.economic(1, 2)
+seeded = request.seed(1, 2, close)
+duplicate = request.security(1, "2", close, symbol="NASDAQ:MSFT")
+plot(htf + array.size(ltf) + rate + dividend + earning + split + revenue + econ + seeded + duplicate)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'request.security symbol must be a string, got int',
+      'request.security timeframe must be a string, got int',
+      'request.security currency must be a string, got int',
+      'request.security_lower_tf timeframe must be a string, got int',
+      'request.security_lower_tf currency must be a string, got int',
+      'request.currency_rate from must be a string, got int',
+      'request.currency_rate to must be a string, got int',
+      'request.dividends ticker must be a string, got int',
+      'request.dividends currency must be a string, got int',
+      'request.earnings ticker must be a string, got int',
+      'request.earnings currency must be a string, got int',
+      'request.splits ticker must be a string, got int',
+      'request.financial symbol must be a string, got int',
+      'request.financial financial_id must be a string, got int',
+      'request.financial period must be a string, got int',
+      'request.financial currency must be a string, got int',
+      'request.economic country_code must be a string, got int',
+      'request.economic field must be a string, got int',
+      'request.seed source must be a string, got int',
+      'request.seed symbol must be a string, got int',
+      "Argument 'symbol' for request.security() was supplied multiple times",
+    ]);
+  });
+
   it('resolves Pine input overload bindings for range and options calls', () => {
     const result = checkProgram(parse(`
 indicator("Input Overloads")
