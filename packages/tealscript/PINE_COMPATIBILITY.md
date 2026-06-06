@@ -580,13 +580,15 @@ The Pine Logs pass covers `log.info`, `log.warning`, and `log.error` with
 message-only and format-string forms. The runtime captures log level, bar
 index, bar time, and message in `ExecutionResult.logs` and forwards them
 through worker result bundles. The semantic checker recognizes the `log`
-namespace and validates the variadic `message` signature before runtime.
+namespace, validates the variadic `message` signature, and reports non-string
+message arguments before runtime.
 `log.error()` records an error-level log entry in `ExecutionResult.logs`
 without halting execution; use `runtime.error()` for Pine-compatible runtime
 halts.
 `runtime.error()` halts execution with a stable `runtime.error` code in
 `ExecutionResult.errors`, worker runtime error messages, and Tealchart manager
 error callbacks while preserving the legacy message, line, and column fields.
+Semantic analysis reports non-string `runtime.error()` messages before runtime.
 
 ## Core `na` And Logical Semantics Coverage
 
@@ -1096,7 +1098,9 @@ the first eligible execution per call site per bar, and
 `freq_once_per_bar_close` emits only on confirmed bar executions. Direct alert
 events include an `isRealtime` marker so consumers can distinguish historical
 calculation events from live update events. Semantic checks also reject invalid
-literal or namespace-constant `alert()` frequency values before runtime.
+literal or namespace-constant `alert()` frequency values and non-string alert
+message/title/frequency arguments before runtime, and report non-boolean
+`alertcondition()` conditions before runtime.
 The checkpoint fixture follows TradingView's
 documented trigger-condition idiom by deriving a boolean condition, registering
 it with `alertcondition()`, and firing a direct `alert()` from an `if` block.

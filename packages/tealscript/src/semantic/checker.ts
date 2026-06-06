@@ -183,6 +183,17 @@ const ALERT_FREQUENCY_CONSTANT_VALUES = new Map([
   ['alert.freq_once_per_bar', 'once_per_bar'],
   ['alert.freq_once_per_bar_close', 'once_per_bar_close'],
 ]);
+const ALERT_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['alert', ['message', 'freq']],
+  ['alertcondition', ['title', 'message']],
+  ['log.error', ['message']],
+  ['log.info', ['message']],
+  ['log.warning', ['message']],
+  ['runtime.error', ['message']],
+]);
+const ALERT_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['alertcondition', ['condition']],
+]);
 const REQUEST_GAPS_MODES = new Set(['barmerge.gaps_on', 'barmerge.gaps_off']);
 const REQUEST_LOOKAHEAD_MODES = new Set(['barmerge.lookahead_on', 'barmerge.lookahead_off']);
 const REQUEST_BARMERGE_MODE_CALLS = new Set([
@@ -3490,6 +3501,8 @@ class SemanticChecker {
     this.checkInputDefaultValueType(expression, scope);
     this.checkMaxBarsBackLiteralArguments(expression);
     this.checkAlertFrequencyLiteralArguments(expression);
+    this.checkAlertStringOptionArguments(expression, scope);
+    this.checkAlertBoolOptionArguments(expression, scope);
     this.checkRequestCalcBarsCountLiteralArguments(expression);
     this.checkRequestBarmergeModeLiteralArguments(expression);
     this.checkRequestSeriesFieldLiteralArguments(expression, scope);
@@ -4469,6 +4482,60 @@ class SemanticChecker {
       'alert.freq_',
       'Invalid alert frequency',
     );
+  }
+
+  private checkAlertStringOptionArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const parameterNames = ALERT_STRING_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!parameterNames) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of parameterNames) {
+      if (!signature.params.includes(parameterName)) continue;
+
+      const parameterIndex = signature.params.indexOf(parameterName);
+      const argument = this.resolveCallArgumentExpression(expression, signature.params, parameterIndex);
+      if (!argument) continue;
+
+      const argumentType = this.inferExpressionType(argument, scope);
+      if (argumentType.kind === 'unknown' || argumentType.kind === 'string') continue;
+
+      this.addDiagnostic(
+        'type-mismatch',
+        `${calleeName} ${parameterName} must be a string, got ${this.formatSemanticType(argumentType)}`,
+        argument.loc,
+      );
+    }
+  }
+
+  private checkAlertBoolOptionArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const parameterNames = ALERT_BOOL_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!parameterNames) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of parameterNames) {
+      if (!signature.params.includes(parameterName)) continue;
+
+      const parameterIndex = signature.params.indexOf(parameterName);
+      const argument = this.resolveCallArgumentExpression(expression, signature.params, parameterIndex);
+      if (!argument) continue;
+
+      const argumentType = this.inferExpressionType(argument, scope);
+      if (argumentType.kind === 'unknown' || argumentType.kind === 'bool') continue;
+
+      this.addDiagnostic(
+        'type-mismatch',
+        `${calleeName} ${parameterName} must be a boolean, got ${this.formatSemanticType(argumentType)}`,
+        argument.loc,
+      );
+    }
   }
 
   private checkVisualLineStyleLiteralArguments(expression: CallExpression): void {
