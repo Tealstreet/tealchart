@@ -6263,6 +6263,36 @@ plot(close, title="Close")`;
       expect(result.errors).toEqual([]);
       expect(result.profile.maxBarsBack).toBe(8);
     });
+
+    it('statically reports cast-normalized history offsets', () => {
+      const script = `//@version=6
+indicator("Cast Static History")
+raw = input.float(defval=5.9, title="Raw")
+length = int(x=raw + 1)
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(6);
+    });
+
+    it('statically reports nz fallback history offsets', () => {
+      const script = `//@version=6
+indicator("NZ Static History")
+fallback = input.int(defval=11, title="Fallback")
+length = nz(source=na, replacement=fallback)
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(11);
+    });
   });
 
   describe('inputs', () => {
