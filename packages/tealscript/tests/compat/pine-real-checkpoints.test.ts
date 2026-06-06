@@ -2576,6 +2576,57 @@ plot(recalculations, title="Recalculations")
     ]);
   });
 
+  it('locks a reduced official strategy bar-magnifier recalculation idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
+    const baseTime = 1_700_250_000_000;
+    const bars: Bar[] = [
+      { time: baseTime, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: baseTime + 60_000, open: 100, high: 105, low: 96, close: 100, volume: 100 },
+      { time: baseTime + 120_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+    ];
+    const intrabars = new InMemoryStrategyIntrabarDatafeed([{
+      symbol: 'BTCUSDT',
+      timeframe: '60',
+      chartBarTime: bars[1].time,
+      chartBarIndex: 1,
+      chartBar: bars[1],
+      source: 'lower_timeframe',
+      ticks: [
+        { time: bars[1].time, price: 100, kind: 'intrabar_open', sequence: 0 },
+        { time: bars[1].time + 15_000, price: 105, kind: 'intrabar_high', sequence: 1 },
+        { time: bars[1].time + 30_000, price: 96, kind: 'intrabar_low', sequence: 2 },
+        { time: bars[1].time + 45_000, price: 100, kind: 'intrabar_close', sequence: 3 },
+      ],
+    }]);
+    const result = runCompatScript(`
+strategy("Official Bar Magnifier Recalculate Checkpoint", calc_on_order_fills=true, use_bar_magnifier=true, process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1, limit=97)
+if strategy.position_size > 0
+    strategy.exit("Take", "Long", limit=104)
+plot(strategy.position_size, title="Position")
+plot(strategy.closedtrades, title="Closed Trades")
+`, {
+      bars,
+      engineOptions: { strategyIntrabarDatafeed: intrabars },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Position').values).toEqual([0, 1, 1]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 0, 0]);
+    expect(result.strategy.fills.map(({ orderId, price, barIndex, time }) => ({ orderId, price, barIndex, time }))).toEqual([
+      { orderId: 'Long', price: 97, barIndex: 1, time: bars[1].time + 30_000 },
+    ]);
+    expect(result.strategy.orders.map((order) => ({
+      id: order.id,
+      status: order.status,
+      avgFillPrice: order.avgFillPrice,
+    }))).toEqual([
+      { id: 'Long', status: 'filled', avgFillPrice: 97 },
+      { id: 'Take', status: 'pending', avgFillPrice: null },
+    ]);
+  });
+
   it('locks a reduced official strategy calc-on-every-tick idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const bars: Bar[] = [
