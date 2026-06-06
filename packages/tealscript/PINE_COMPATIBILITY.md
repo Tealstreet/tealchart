@@ -263,7 +263,9 @@ state, and `ta.sar()` trend state are isolated per call site so repeated
 same-parameter calls do not share accumulators. Semantic
 analysis preserves known scalar TA helper return types for downstream
 assignment diagnostics, including scalar `ta.vwap()` overloads and
-source-preserving `ta.change()` and `ta.valuewhen()` results.
+source-preserving `ta.change()` and `ta.valuewhen()` results, and rejects
+common non-numeric TA helper arguments plus non-boolean TA condition and option
+arguments before runtime.
 
 ## Common `str.*` Coverage
 

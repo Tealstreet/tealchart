@@ -5715,6 +5715,58 @@ unknownTr = ta.tr(handle_na=true, fallback=true)
     ]);
   });
 
+  it('reports invalid TA helper value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad TA Values")
+badBarsSince = ta.barssince(condition=close)
+badValueWhen = ta.valuewhen(condition=1, source=close, occurrence="0")
+badCross = ta.cross(source1=close, source2=true)
+badHighest = ta.highest(source="high", length="3")
+badVariance = ta.variance(source=close, length="3", biased="yes")
+badAlma = ta.alma(series="close", length=true, offset="0.85", sigma=false, floor=1)
+badKc = ta.kc(series="close", length=true, mult="1", useTrueRange="no")
+badMacd = ta.macd(source="close", fastlen=true, slowlen="26", siglen=false)
+badStoch = ta.stoch(source=close, high="high", low=true, length="3")
+badPivot = ta.pivothigh(source="high", leftbars=true, rightbars="2")
+badTr = ta.tr(handle_na=1)
+badVwap = ta.vwap(source="close", anchor=1, stdev_mult="2")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'ta.barssince condition must be a boolean, got float',
+      'ta.valuewhen occurrence must be a number, got string',
+      'ta.valuewhen condition must be a boolean, got int',
+      'ta.cross source2 must be a number, got bool',
+      'ta.highest source must be a number, got string',
+      'ta.highest length must be a number, got string',
+      'ta.variance length must be a number, got string',
+      'ta.variance biased must be a boolean, got string',
+      'ta.alma series must be a number, got string',
+      'ta.alma length must be a number, got bool',
+      'ta.alma offset must be a number, got string',
+      'ta.alma sigma must be a number, got bool',
+      'ta.alma floor must be a boolean, got int',
+      'ta.kc series must be a number, got string',
+      'ta.kc length must be a number, got bool',
+      'ta.kc mult must be a number, got string',
+      'ta.kc useTrueRange must be a boolean, got string',
+      'ta.macd source must be a number, got string',
+      'ta.macd fastlen must be a number, got bool',
+      'ta.macd slowlen must be a number, got string',
+      'ta.macd siglen must be a number, got bool',
+      'ta.stoch high must be a number, got string',
+      'ta.stoch low must be a number, got bool',
+      'ta.stoch length must be a number, got string',
+      'ta.pivothigh source must be a number, got string',
+      'ta.pivothigh leftbars must be a number, got bool',
+      'ta.pivothigh rightbars must be a number, got string',
+      'ta.tr handle_na must be a boolean, got int',
+      'ta.vwap source must be a number, got string',
+      'ta.vwap stdev_mult must be a number, got string',
+      'ta.vwap anchor must be a boolean, got int',
+    ]);
+  });
+
   it('resolves color helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Color Signatures")

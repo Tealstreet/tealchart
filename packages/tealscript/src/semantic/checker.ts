@@ -416,6 +416,69 @@ const TA_FLOAT_RETURN_NAMES = new Set([
 const TA_SOURCE_RETURN_NAMES = new Set(['ta.range', 'ta.median', 'ta.mode', 'ta.mom']);
 const TA_DEFAULT_SOURCE_RETURN_NAMES = new Set(['ta.highest', 'ta.lowest']);
 const TA_FLOAT_MEMBER_NAMES = new Set(['ta.iii', 'ta.nvi', 'ta.obv', 'ta.pvi', 'ta.pvt', 'ta.tr', 'ta.wad', 'ta.wvad']);
+const TA_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['ta.alma', ['series', 'length', 'offset', 'sigma']],
+  ['ta.cci', ['source', 'length']],
+  ['ta.cmo', ['source', 'length']],
+  ['ta.cum', ['source']],
+  ['ta.crossover', ['source1', 'source2']],
+  ['ta.crossunder', ['source1', 'source2']],
+  ['ta.cross', ['source1', 'source2']],
+  ['ta.correlation', ['source1', 'source2', 'length']],
+  ['ta.cog', ['source', 'length']],
+  ['ta.dev', ['source', 'length']],
+  ['ta.dmi', ['diLength', 'adxSmoothing']],
+  ['ta.ema', ['source', 'length']],
+  ['ta.hma', ['source', 'length']],
+  ['ta.highest', ['source', 'length']],
+  ['ta.lowest', ['source', 'length']],
+  ['ta.highestbars', ['source', 'length']],
+  ['ta.lowestbars', ['source', 'length']],
+  ['ta.kc', ['series', 'length', 'mult']],
+  ['ta.kcw', ['series', 'length', 'mult']],
+  ['ta.median', ['source', 'length']],
+  ['ta.mfi', ['source', 'length']],
+  ['ta.macd', ['source', 'fastlen', 'slowlen', 'siglen']],
+  ['ta.mode', ['source', 'length']],
+  ['ta.obv', ['source', 'volume']],
+  ['ta.percentile_nearest_rank', ['source', 'length', 'percentage']],
+  ['ta.percentile_linear_interpolation', ['source', 'length', 'percentage']],
+  ['ta.percentrank', ['source', 'length']],
+  ['ta.pivothigh', ['source', 'leftbars', 'rightbars']],
+  ['ta.pivotlow', ['source', 'leftbars', 'rightbars']],
+  ['ta.mom', ['source', 'length']],
+  ['ta.range', ['source', 'length']],
+  ['ta.rising', ['source', 'length']],
+  ['ta.falling', ['source', 'length']],
+  ['ta.rma', ['source', 'length']],
+  ['ta.roc', ['source', 'length']],
+  ['ta.rsi', ['source', 'length']],
+  ['ta.sar', ['start', 'inc', 'max']],
+  ['ta.sma', ['source', 'length']],
+  ['ta.stdev', ['source', 'length']],
+  ['ta.stoch', ['source', 'high', 'low', 'length']],
+  ['ta.supertrend', ['factor', 'atrPeriod']],
+  ['ta.swma', ['source']],
+  ['ta.tsi', ['source', 'short_length', 'long_length']],
+  ['ta.valuewhen', ['occurrence']],
+  ['ta.variance', ['source', 'length']],
+  ['ta.vwap', ['source', 'stdev_mult']],
+  ['ta.vwma', ['source', 'length']],
+  ['ta.linreg', ['source', 'length', 'offset']],
+  ['ta.wma', ['source', 'length']],
+  ['ta.wpr', ['length']],
+]);
+const TA_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['ta.alma', ['floor']],
+  ['ta.barssince', ['condition']],
+  ['ta.kc', ['useTrueRange']],
+  ['ta.kcw', ['useTrueRange']],
+  ['ta.stdev', ['biased']],
+  ['ta.tr', ['handle_na']],
+  ['ta.valuewhen', ['condition']],
+  ['ta.variance', ['biased']],
+  ['ta.vwap', ['anchor']],
+]);
 
 const TIMEFRAME_BOOL_MEMBER_NAMES = new Set([
   'timeframe.isdaily',
@@ -3621,6 +3684,7 @@ class SemanticChecker {
     this.checkColorFunctionArgumentTypes(expression, scope);
     this.checkStringFunctionArgumentTypes(expression, scope);
     this.checkMathFunctionArgumentTypes(expression, scope);
+    this.checkTaFunctionArgumentTypes(expression, scope);
     this.checkMaxBarsBackLiteralArguments(expression);
     this.checkAlertFrequencyLiteralArguments(expression);
     this.checkAlertStringOptionArguments(expression, scope);
@@ -4178,13 +4242,32 @@ class SemanticChecker {
     }
   }
 
+  private checkTaFunctionArgumentTypes(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const numericParameterNames = TA_NUMERIC_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    const boolParameterNames = TA_BOOL_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!numericParameterNames && !boolParameterNames) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of numericParameterNames ?? []) {
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'number');
+    }
+
+    for (const parameterName of boolParameterNames ?? []) {
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'boolean');
+    }
+  }
+
   private checkBuiltinArgumentKind(
     expression: CallExpression,
     scope: SemanticScope,
     calleeName: string,
     parameterNames: readonly string[],
     parameterName: string,
-    expectedKind: 'color' | 'number' | 'string',
+    expectedKind: 'boolean' | 'color' | 'number' | 'string',
   ): void {
     const parameterIndex = parameterNames.indexOf(parameterName);
     if (parameterIndex === -1) return;
@@ -4194,6 +4277,7 @@ class SemanticChecker {
 
     const argumentType = this.inferExpressionType(argument, scope);
     if (argumentType.kind === 'unknown') return;
+    if (expectedKind === 'boolean' && argumentType.kind === 'bool') return;
     if (expectedKind === 'color' && argumentType.kind === 'color') return;
     if (expectedKind === 'number' && this.isNumericType(argumentType)) return;
     if (expectedKind === 'string' && argumentType.kind === 'string') return;
