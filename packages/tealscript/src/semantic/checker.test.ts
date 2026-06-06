@@ -5928,11 +5928,11 @@ plot(valid.value + str.length(enumDescription) + missing.value + unknown.value +
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "library function pivots.lifted missing required argument 'amount'",
-      "Unknown argument 'source' for library function pivots.lifted",
-      "Argument 'amount' for library function pivots.lifted was supplied multiple times",
-      'Too many arguments for library function pivots.lifted: expected 2, got 3',
-      'library function pivots.lifted cannot use positional arguments after named arguments',
+      "library method pivots.lifted missing required argument 'amount'",
+      "Unknown argument 'source' for library method pivots.lifted",
+      "Argument 'amount' for library method pivots.lifted was supplied multiple times",
+      'Too many arguments for library method pivots.lifted: expected 2, got 3',
+      'library method pivots.lifted cannot use positional arguments after named arguments',
     ]);
     expect(types.get('p')).toMatchObject({ kind: 'udt', name: 'pivots.Pivot' });
     expect(types.get('valid')).toMatchObject({ kind: 'udt', name: 'pivots.Pivot' });

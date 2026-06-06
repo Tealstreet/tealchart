@@ -3639,7 +3639,7 @@ export class TealscriptEngine {
         fn,
         args,
         namedArgs,
-        `library function ${library.alias}.${fn.name.name}`,
+        `library ${fn.isMethod ? 'method' : 'function'} ${library.alias}.${fn.name.name}`,
         scopeKey,
         recursionKey,
         hasPositionalArgumentAfterNamed,
