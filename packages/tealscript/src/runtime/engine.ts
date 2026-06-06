@@ -1075,6 +1075,7 @@ export class TealscriptEngine {
       case 'ta.sar':
         return 2;
       case 'ta.obv':
+      case 'ta.tr':
         return 1;
       case 'ta.crossover':
       case 'ta.crossunder':

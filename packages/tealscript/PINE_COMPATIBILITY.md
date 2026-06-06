@@ -194,11 +194,12 @@ such as `ta.macd(close)`, `ta.cmo(source)`, `ta.mom(source)`, `ta.roc(source)`,
 and `ta.cci(source)`, plus oscillator helpers such as `ta.stoch()`, `ta.mfi()`,
 and `ta.wpr()`, plus common TA helpers such as `ta.atr()`, `ta.hma()`,
 `ta.kc()`, `ta.kcw()`, `ta.tsi()`, `ta.dmi()`,
-`ta.supertrend()`, `ta.sar()`, and `ta.obv()` also contribute static lookback
-requirements when their length arguments are static, including default-source
-highest/lowest lookback forms and pivot left/right windows. Runtime-observed
-direct OHLC helper lookbacks such as `ta.wpr()`, `ta.tr()`, and TA variables
-that read prior close/volume bars are also profiled. Truly dynamic series offsets and dynamic helper
+`ta.supertrend()`, `ta.sar()`, `ta.obv()`, and `ta.tr()` also contribute static
+lookback requirements when their length or direct source requirements are
+static, including default-source highest/lowest lookback forms and pivot
+left/right windows. Runtime-observed direct OHLC helper lookbacks such as
+`ta.wpr()`, `ta.tr()`, and TA variables that read prior close/volume bars are
+also profiled. Truly dynamic series offsets and dynamic helper
 lengths are still inferred from observed runtime access.
 
 ## Roadmaps
@@ -842,7 +843,8 @@ helpers, momentum helpers, band/average/regression helpers, and `ta.*`
 fixed/default, source-window, retained-source, recursive, and default-argument
 helpers, oscillator helpers, direct OHLC helper lookbacks, default-source
 highest/lowest and pivot left/right windows, and TA variables that read prior
-close/volume bars. Full Pine-style
+close/volume bars. Static unexecuted `ta.tr()` calls now contribute their direct
+true-range prior-close requirement to the same profile. Full Pine-style
 preallocation for arbitrary series offsets remains a compatibility target. The
 checkpoint corpus tracks an official `max_bars_back`
 bounded-history fixture.
