@@ -128,8 +128,9 @@ Covered behavior and remaining gaps:
   duplicate positional/named bindings, duplicate named arguments, missing
   required arguments, and invalid positional arguments after named arguments on
   strict signatures. Visual output diagnostics cover `plot()`, `hline()`,
-  `fill()` alias bindings, and marker argument names. Drawing constructors
-  distinguish coordinate and `chart.point` overload bindings for `line.new()`
+  `fill()` alias bindings, OHLC `plotbar()` / `plotcandle()` arguments, and
+  marker argument names. Drawing constructors distinguish coordinate and
+  `chart.point` overload bindings for `line.new()`
   and `box.new()`. Worker protocol and wrapper coverage preserve structured
   semantic diagnostic codes, messages, severities, locations, and freshness
   metadata for editor-facing error callbacks.

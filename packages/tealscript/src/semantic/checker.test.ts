@@ -473,6 +473,29 @@ plot(strategy.opentrades.entry_price(trade_num=0, 1))
     ]);
   });
 
+  it('reports invalid OHLC visual output argument bindings', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid OHLC Visual Bindings")
+plotbar(open=open, high=high, low=low)
+plotbar(open, high, low, close, candle_color=color.red)
+plotbar(open, high, low, close, open=open)
+plotcandle(open=open, high=high, low=low)
+plotcandle(open, high, low, close, wick_color=color.red)
+plotcandle(open, high, low, close, close=close)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'plotbar() expects at least 4 arguments',
+      "plotbar() missing required argument 'close'",
+      "Unknown argument 'candle_color' for plotbar()",
+      "Argument 'open' for plotbar() was supplied multiple times",
+      'plotcandle() expects at least 4 arguments',
+      "plotcandle() missing required argument 'close'",
+      "Unknown argument 'wick_color' for plotcandle()",
+      "Argument 'close' for plotcandle() was supplied multiple times",
+    ]);
+  });
+
   it('reports invalid Pine declaration arguments', () => {
     const result = checkProgram(parse(`
 indicator("Bad Indicator", initial_capital=1000, typo=true)
