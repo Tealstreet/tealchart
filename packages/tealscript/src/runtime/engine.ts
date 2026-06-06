@@ -737,6 +737,7 @@ export class TealscriptEngine {
             statement.use_bar_magnifier,
             statement.risk_free_rate,
             statement.backtest_fill_limits_assumption,
+            statement.close_entries_rule,
           ]),
         );
       case 'LibraryDeclaration':
@@ -2091,6 +2092,9 @@ export class TealscriptEngine {
         'strategy backtest_fill_limits_assumption',
       );
     }
+    if (stmt.close_entries_rule !== undefined) {
+      settings.closeEntriesRule = this.normalizeStrategyCloseEntriesRule(this.evaluateExpression(stmt.close_entries_rule));
+    }
 
     this.ctx.setStrategyLedger(settings);
   }
@@ -2162,6 +2166,14 @@ export class TealscriptEngine {
       return value;
     }
     throw new Error(`Invalid strategy commission_type: ${this.toStringValue(value)}`);
+  }
+
+  private normalizeStrategyCloseEntriesRule(value: unknown): StrategyLedgerSettings['closeEntriesRule'] {
+    const rule = this.toStringValue(value).toUpperCase();
+    if (rule === 'FIFO' || rule === 'ANY') {
+      return rule;
+    }
+    throw new Error(`Invalid strategy close_entries_rule: ${this.toStringValue(value)}`);
   }
 
   private applyDrawingLimit(

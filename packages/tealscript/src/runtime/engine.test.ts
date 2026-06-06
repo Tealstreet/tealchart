@@ -193,6 +193,7 @@ plot(strategy.position_size)`;
         useBarMagnifier: true,
         riskFreeRate: 1.75,
         backtestFillLimitsAssumptionTicks: 0,
+        closeEntriesRule: 'FIFO',
       });
       expect(result.strategy.equity).toBe(25000);
       expect(result.plots.map((plot) => plot.values)).toEqual([[25000], [0]]);
@@ -200,7 +201,7 @@ plot(strategy.position_size)`;
 
     it('applies strategy named-prefix positional tail settings', () => {
       const script = `//@version=6
-strategy(title="Mixed strategy", "Mixed", true, format.price, 3, scale.right, 100, "60", true, false, true, 10, 20, 30, 40, 50, true, 25000, "EUR", strategy.percent_of_equity, 10, 2, strategy.commission.percent, 0.05, 1, 50, 60, true, true, true, true, 1.75, 3)
+strategy(title="Mixed strategy", "Mixed", true, format.price, 3, scale.right, 100, "60", true, false, true, 10, 20, 30, 40, 50, true, 25000, "EUR", strategy.percent_of_equity, 10, 2, strategy.commission.percent, 0.05, 1, 50, 60, true, true, true, true, 1.75, 3, "ANY")
 plot(strategy.equity)`;
 
       const result = executeScript(parse(script), createBars(1));
@@ -225,6 +226,7 @@ plot(strategy.equity)`;
         useBarMagnifier: true,
         riskFreeRate: 1.75,
         backtestFillLimitsAssumptionTicks: 3,
+        closeEntriesRule: 'ANY',
       });
     });
 
@@ -262,9 +264,36 @@ plot(strategy.initial_capital)`;
         useBarMagnifier: false,
         riskFreeRate: 0,
         backtestFillLimitsAssumptionTicks: 0,
+        closeEntriesRule: 'FIFO',
       });
       expect(result.strategy.equity).toBe(0);
       expect(result.plots[0]?.values).toEqual([0]);
+    });
+
+    it('uses close_entries_rule ANY to close the matching entry id before FIFO trades', () => {
+      const script = `//@version=6
+strategy("Close entries any", process_orders_on_close=true, pyramiding=2, close_entries_rule="ANY")
+if bar_index == 0
+    strategy.entry("A", strategy.long, qty=1)
+if bar_index == 1
+    strategy.entry("B", strategy.long, qty=1)
+if bar_index == 2
+    strategy.close("B")
+plot(strategy.position_size)`;
+      const bars = createBars(3);
+
+      const result = executeScript(parse(script), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.closedTrades).toHaveLength(1);
+      expect(result.strategy.closedTrades[0]).toMatchObject({
+        entryOrderId: 'B',
+        exitOrderId: 'Close B',
+        entryPrice: bars[1].close,
+        exitPrice: bars[2].close,
+      });
+      expect(result.strategy.openTrades.map((trade) => trade.entryOrderId)).toEqual(['A']);
+      expect(result.plots[0]?.values).toEqual([1, 2, 1]);
     });
 
     it('delays long limit fills until price exceeds the limit verification ticks', () => {

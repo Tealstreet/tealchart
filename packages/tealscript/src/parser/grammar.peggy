@@ -132,7 +132,8 @@ IndicatorDeclaration
         'process_orders_on_close',
         'use_bar_magnifier',
         'risk_free_rate',
-        'backtest_fill_limits_assumption'
+        'backtest_fill_limits_assumption',
+        'close_entries_rule'
       ];
       for (const arg of args) {
         if (arg.name) {

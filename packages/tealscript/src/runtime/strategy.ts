@@ -167,6 +167,7 @@ export interface StrategyLedgerSettings {
   useBarMagnifier: boolean;
   riskFreeRate: number;
   backtestFillLimitsAssumptionTicks: number;
+  closeEntriesRule: 'FIFO' | 'ANY';
 }
 
 export interface StrategyOrder {
@@ -322,6 +323,7 @@ export function createDefaultStrategySettings(settings: Partial<StrategyLedgerSe
     useBarMagnifier: false,
     riskFreeRate: 2,
     backtestFillLimitsAssumptionTicks: 0,
+    closeEntriesRule: 'FIFO',
     ...settings,
   };
 }
@@ -1012,7 +1014,7 @@ function applyStrategyFillToTrades(ledger: StrategyLedger, fill: StrategyFill): 
   const oppositeDirection: StrategyDirection = fill.direction === 'long' ? 'short' : 'long';
 
   while (remainingQty > 0) {
-    const tradeIndex = ledger.openTrades.findIndex((trade) => trade.direction === oppositeDirection);
+    const tradeIndex = selectOpenTradeIndexForFill(ledger, fill, oppositeDirection);
     if (tradeIndex === -1) {
       break;
     }
@@ -1074,4 +1076,16 @@ function applyStrategyFillToTrades(ledger: StrategyLedger, fill: StrategyFill): 
       maxDrawdown: 0,
     });
   }
+}
+
+function selectOpenTradeIndexForFill(ledger: StrategyLedger, fill: StrategyFill, direction: StrategyDirection): number {
+  if (ledger.settings.closeEntriesRule === 'ANY' && fill.entryId !== undefined) {
+    const matchingIndex = ledger.openTrades.findIndex((trade) => (
+      trade.direction === direction && trade.entryOrderId === fill.entryId
+    ));
+    if (matchingIndex !== -1) {
+      return matchingIndex;
+    }
+  }
+  return ledger.openTrades.findIndex((trade) => trade.direction === direction);
 }

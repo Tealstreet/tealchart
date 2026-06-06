@@ -66,7 +66,7 @@ describe('Tealscript Parser', () => {
     });
 
     it('parses strategy risk-free-rate declaration arguments', () => {
-      const ast = parse('strategy("Risk", risk_free_rate=1.75, backtest_fill_limits_assumption=3)\n');
+      const ast = parse('strategy("Risk", risk_free_rate=1.75, backtest_fill_limits_assumption=3, close_entries_rule="ANY")\n');
       const strategy = ast.body[0] as IndicatorDeclaration;
 
       expect(strategy.declarationKind).toBe('strategy');
@@ -77,6 +77,10 @@ describe('Tealscript Parser', () => {
       expect(strategy.backtest_fill_limits_assumption).toEqual(expect.objectContaining({
         type: 'NumericLiteral',
         value: 3,
+      }));
+      expect(strategy.close_entries_rule).toEqual(expect.objectContaining({
+        type: 'StringLiteral',
+        value: 'ANY',
       }));
     });
 
