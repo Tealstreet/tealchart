@@ -849,6 +849,29 @@ export f(float x) => x
     ]);
   });
 
+  it('reports invalid Pine declaration numeric values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Indicator Numeric Settings",
+    precision="two",
+    max_bars_back="bars",
+    max_labels_count="labels",
+    max_lines_count="lines",
+    max_boxes_count="boxes",
+    max_polylines_count="polylines",
+    calc_bars_count="calc")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'indicator precision must be a number, got string',
+      'indicator max_bars_back must be a number, got string',
+      'indicator max_labels_count must be a number, got string',
+      'indicator max_lines_count must be a number, got string',
+      'indicator max_boxes_count must be a number, got string',
+      'indicator max_polylines_count must be a number, got string',
+      'indicator calc_bars_count must be a number, got string',
+    ]);
+  });
+
   it('reports invalid literal Pine strategy declaration values', () => {
     const result = checkProgram(parse(`
 strategy("Bad Strategy Settings",
