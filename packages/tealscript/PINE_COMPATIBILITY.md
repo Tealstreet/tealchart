@@ -141,7 +141,9 @@ Covered behavior and remaining gaps:
   required arguments, and invalid positional arguments after named arguments on
   strict signatures. Visual output diagnostics cover `plot()`, `hline()`,
   `fill()` alias bindings, OHLC `plotbar()` / `plotcandle()` arguments, and
-  marker missing, unknown, and duplicate argument bindings. Drawing
+  marker missing, unknown, and duplicate argument bindings, while semantic
+  analysis preserves `plot()` and `hline()` handle return types for downstream
+  assignment diagnostics. Drawing
   constructors distinguish coordinate and `chart.point` overload bindings for
   `line.new()`
   and `box.new()`. Worker protocol and wrapper coverage preserve structured
@@ -641,7 +643,9 @@ display hiding, and pane-coordinate behavior for the current output shape.
 
 Fill renderer coverage applies `show_last` windows to filled regions while
 preserving existing gap handling, per-bar fill colors, display hiding, and
-plot/hline handle fills.
+plot/hline handle fills. Semantic analysis now preserves `plot()` and `hline()`
+handle return types so mixed handle assignments report Pine-shaped diagnostics
+before runtime.
 
 Plotarrow renderer coverage scales arrows between Pine `minheight` and
 `maxheight` using the visible series magnitude and suppresses zero-value arrows.

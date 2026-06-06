@@ -5042,6 +5042,8 @@ class SemanticChecker {
     const calleeName = calleePath.join('.');
     const referenceReturnType = REFERENCE_CONSTRUCTOR_RETURN_TYPES.get(calleeName);
     if (referenceReturnType) return { kind: referenceReturnType };
+    if (calleeName === 'plot') return { kind: 'plot' };
+    if (calleeName === 'hline') return { kind: 'hline' };
     if (calleeName === 'label.get_x') return { kind: 'int' };
     if (calleeName === 'label.get_y') return { kind: 'float' };
     if (calleeName === 'label.get_color' || calleeName === 'label.get_textcolor') return { kind: 'color' };
