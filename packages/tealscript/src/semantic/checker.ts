@@ -2968,6 +2968,7 @@ class SemanticChecker {
     this.checkCallee(expression.callee, scope);
     this.checkBuiltinSignature(expression, scope);
     this.checkUdtConstructorSignature(expression, scope);
+    this.checkImportedLibraryCallAvailability(expression, scope);
     this.checkArrayConstructorTypeArguments(expression);
     this.checkMatrixConstructorTypeArguments(expression);
     this.checkMapConstructorTypeArguments(expression);
@@ -3180,6 +3181,53 @@ class SemanticChecker {
     }
 
     if (!SIGNED_BUILTIN_CALL_NAMESPACES.has(namespace)) return;
+    this.addDiagnostic('unknown-function', `Unknown function: ${displayName}`, expression.callee.loc);
+  }
+
+  private checkImportedLibraryCallAvailability(expression: CallExpression, scope: SemanticScope): void {
+    if (expression.callee.type !== 'MemberExpression') return;
+
+    const path = this.memberPath(expression.callee);
+    const [alias, memberName] = path;
+    if (alias && memberName && this.importedLibraries.has(alias)) {
+      this.checkImportedNamespaceCallAvailability(expression, path);
+      return;
+    }
+
+    this.checkImportedMethodCallAvailability(expression, scope);
+  }
+
+  private checkImportedNamespaceCallAvailability(expression: CallExpression, path: string[]): void {
+    const [alias, memberName] = path;
+    if (!alias || !memberName) return;
+
+    const library = this.importedLibraries.get(alias);
+    if (!library) return;
+
+    if (path.length === 2) {
+      if (library.functions.has(memberName)) return;
+      this.addDiagnostic('unknown-function', `Unknown library function: ${alias}.${memberName}`, expression.callee.loc);
+      return;
+    }
+
+    if (path.length === 3 && path[2] === 'new') {
+      if (library.types.has(memberName)) return;
+      this.addDiagnostic('unknown-function', `Unknown library constructor: ${alias}.${memberName}.new`, expression.callee.loc);
+    }
+  }
+
+  private checkImportedMethodCallAvailability(expression: CallExpression, scope: SemanticScope): void {
+    if (expression.callee.type !== 'MemberExpression') return;
+    if (expression.callee.property.name === 'copy') return;
+
+    const receiverType = this.inferExpressionType(expression.callee.object, scope);
+    const importedReceiver = this.importedReceiverType(receiverType);
+    if (!importedReceiver) return;
+
+    if (this.resolveLocalUserCallable(expression, scope)) return;
+    if (this.importedLibraries.get(importedReceiver.alias)?.methods.has(expression.callee.property.name)) return;
+
+    const displayName = this.memberPath(expression.callee).join('.') || expression.callee.property.name;
     this.addDiagnostic('unknown-function', `Unknown function: ${displayName}`, expression.callee.loc);
   }
 
