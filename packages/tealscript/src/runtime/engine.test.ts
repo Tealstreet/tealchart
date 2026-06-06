@@ -6825,6 +6825,34 @@ plot(bar_index >= 1 ? ta.sma(passthrough(), 2) : na, title="Switch Derived Avera
       expect(result.plots.find((plot) => plot.title === 'Switch Derived Average')?.values).toEqual([null, 15, 25]);
     });
 
+    it('preserves source identity through same-arithmetic block if returns and initializers', () => {
+      const script = `//@version=6
+indicator("Block if arithmetic source return identity")
+blockMidpoint() =>
+    if bar_index >= 0
+        (high + low) / 2
+    else
+        (high + low) / 2
+selected = if bar_index >= 0
+    open * 2
+else
+    open * 2
+plot(bar_index >= 1 ? ta.sma(blockMidpoint(), 2) : na, title="Block If Arithmetic Average")
+plot(bar_index >= 1 ? ta.sma(selected, 2) : na, title="Block If Initializer Average")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 18, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Block If Arithmetic Average')?.values).toEqual([null, 15, 25]);
+      expect(result.plots.find((plot) => plot.title === 'Block If Initializer Average')?.values).toEqual([null, 30, 50]);
+    });
+
     it('keeps mixed named and positional source helper results numeric', () => {
       const script = `//@version=6
 indicator("Mixed source binding")
