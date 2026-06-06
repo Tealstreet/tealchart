@@ -6283,6 +6283,24 @@ plot(close, title="Close")`;
       expect(result.profile.maxBarsBack).toBe(3);
     });
 
+    it('statically reports unexecuted defaulted TA helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Default Helpers Profile")
+if false
+    plot(ta.cmo(close), title="CMO")
+    plot(ta.mom(close), title="Momentum")
+    plot(ta.roc(close), title="ROC")
+    plot(ta.cci(close), title="CCI")
+    [macdLine, signalLine, histLine] = ta.macd(close)
+    plot(macdLine, title="MACD")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(25);
+    });
+
     it('statically reports unexecuted MACD lookback lengths in the runtime profile', () => {
       const script = `//@version=6
 indicator("Static MACD Profile")
