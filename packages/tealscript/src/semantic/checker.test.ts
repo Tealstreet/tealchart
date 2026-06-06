@@ -676,6 +676,17 @@ export f(float x) => x
     ]);
   });
 
+  it('checks Pine declaration visual option expressions', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Indicator Visual Options", explicit_plot_zorder=missingOrder, behind_chart=missingBehind)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Unknown identifier: missingOrder',
+      'Unknown identifier: missingBehind',
+    ]);
+  });
+
   it('reports invalid literal Pine strategy declaration values', () => {
     const result = checkProgram(parse(`
 strategy("Bad Strategy Settings",
