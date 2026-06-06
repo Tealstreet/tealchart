@@ -619,6 +619,7 @@ export f(float x) => x
     const result = checkProgram(parse(`
 strategy("Strategy", initial_capital=1000, pyramiding=1, default_qty_type=strategy.fixed, default_qty_value=1, risk_free_rate=1.75, backtest_fill_limits_assumption=3, close_entries_rule="ANY", fill_orders_on_standard_ohlc=true)
 strategy.risk.allow_entry_in(strategy.direction.long)
+strategy.risk.max_position_size(3)
 strategy.entry("Long", strategy.long, qty=1, limit=close, oca_type=strategy.oca.cancel, alert_message="entry")
 strategy.entry(id="PrefixLong", strategy.long, 1, close, na, "EntryOca", strategy.oca.cancel, "entry comment", "entry alert")
 strategy.order(id="Add", direction=strategy.long, qty=1)
@@ -819,6 +820,7 @@ strategy.order(id="Add", direction="down", qty=-1, oca_type=strategy.oca.cancel)
 strategy.close("", qty=-1, qty_percent=0)
 strategy.exit("", qty=-1, qty_percent=0, profit=0, loss=-1, trail_points=-1, trail_offset=0)
 strategy.risk.allow_entry_in("sideways")
+strategy.risk.max_position_size(0)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -839,6 +841,7 @@ strategy.risk.allow_entry_in("sideways")
       'strategy.exit trail_points must be a non-negative number',
       'strategy.exit trailing stop offset must be positive',
       'Invalid strategy entry direction: sideways',
+      'strategy.risk.max_position_size contracts must be a positive number',
     ]);
   });
 

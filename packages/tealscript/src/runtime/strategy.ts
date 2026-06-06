@@ -169,6 +169,7 @@ export interface StrategyLedgerSettings {
   backtestFillLimitsAssumptionTicks: number;
   closeEntriesRule: 'FIFO' | 'ANY';
   fillOrdersOnStandardOhlc: boolean;
+  maxPositionSize: number | null;
 }
 
 export interface StrategyOrder {
@@ -330,6 +331,7 @@ export function createDefaultStrategySettings(settings: Partial<StrategyLedgerSe
     backtestFillLimitsAssumptionTicks: 0,
     closeEntriesRule: 'FIFO',
     fillOrdersOnStandardOhlc: false,
+    maxPositionSize: null,
     ...settings,
   };
 }

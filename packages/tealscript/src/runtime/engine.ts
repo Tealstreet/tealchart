@@ -2142,6 +2142,14 @@ export class TealscriptEngine {
     return number;
   }
 
+  private normalizePositiveNumber(value: unknown, name: string): number {
+    const number = this.toNumber(value);
+    if (!Number.isFinite(number) || number <= 0) {
+      throw new Error(`${name} must be a positive number`);
+    }
+    return number;
+  }
+
   private normalizeFiniteNumber(value: unknown, name: string): number {
     const number = this.toNumber(value);
     if (!Number.isFinite(number)) {
@@ -6129,6 +6137,13 @@ export class TealscriptEngine {
       );
       return undefined;
     });
+    this.builtins.set('strategy.risk.max_position_size', (args, namedArgs) => {
+      this.ctx.strategyLedger.settings.maxPositionSize = this.normalizePositiveNumber(
+        this.getCallArg(args, namedArgs, 0, 'contracts'),
+        'strategy.risk.max_position_size contracts',
+      );
+      return undefined;
+    });
     this.builtins.set('strategy.opentrades.entry_id', (args, namedArgs) => (
       this.strategyOpenTrade(args, namedArgs)?.entryOrderId ?? ''
     ));
@@ -6322,6 +6337,12 @@ export class TealscriptEngine {
       }
       requestedQty = 0;
       orderQty = closeOnlyQty;
+    } else if (isEntry) {
+      requestedQty = this.applyStrategyMaxPositionSize(direction, requestedQty);
+      if (requestedQty <= 0) {
+        return undefined;
+      }
+      orderQty = requestedQty;
     }
 
     const order = submitStrategyOrder(this.ctx.strategyLedger, {
@@ -6376,6 +6397,23 @@ export class TealscriptEngine {
       return 0;
     }
     return Math.abs(position.size);
+  }
+
+  private applyStrategyMaxPositionSize(direction: StrategyDirection, requestedQty: number): number {
+    const maxPositionSize = this.ctx.strategyLedger.settings.maxPositionSize;
+    if (maxPositionSize === null) {
+      return requestedQty;
+    }
+
+    const position = this.ctx.strategyLedger.position;
+    const sameDirectionSize = position.direction === direction ? Math.abs(position.size) : 0;
+    const pendingSameDirectionSize = this.ctx.strategyLedger.orders.reduce((total, order) => {
+      if (order.status !== 'pending' || !order.isEntry || order.direction !== direction) {
+        return total;
+      }
+      return total + (order.requestedQty ?? order.qty ?? 0);
+    }, 0);
+    return Math.min(requestedQty, Math.max(0, maxPositionSize - sameDirectionSize - pendingSameDirectionSize));
   }
 
   private resolveStrategyOrderQty(
