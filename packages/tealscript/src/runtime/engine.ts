@@ -985,9 +985,10 @@ export class TealscriptEngine {
       case 'ta.percentile_linear_interpolation':
       case 'ta.percentrank':
       case 'ta.vwma':
-      case 'ta.cci':
       case 'ta.wma':
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes);
+      case 'ta.cci':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 0, 20);
       case 'ta.alma':
       case 'ta.bb':
       case 'ta.bbw':
@@ -1008,19 +1009,22 @@ export class TealscriptEngine {
       case 'ta.rsi':
       case 'ta.rising':
       case 'ta.falling':
-      case 'ta.cmo':
-      case 'ta.mom':
-      case 'ta.roc':
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1);
+      case 'ta.cmo':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1, 14);
+      case 'ta.mom':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1, 10);
+      case 'ta.roc':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1, 1);
       case 'ta.crossover':
       case 'ta.crossunder':
       case 'ta.cross':
         return 1;
       case 'ta.macd':
         return Math.max(
-          this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'fastlen', 'slowlen', 'siglen'], 1, collectionScopes),
-          this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'fastlen', 'slowlen', 'siglen'], 2, collectionScopes),
-          this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'fastlen', 'slowlen', 'siglen'], 3, collectionScopes),
+          this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'fastlen', 'slowlen', 'siglen'], 1, collectionScopes, 0, 12),
+          this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'fastlen', 'slowlen', 'siglen'], 2, collectionScopes, 0, 26),
+          this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'fastlen', 'slowlen', 'siglen'], 3, collectionScopes, 0, 9),
         );
       default:
         return 0;
