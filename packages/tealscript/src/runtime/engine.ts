@@ -6519,13 +6519,19 @@ export class TealscriptEngine {
     const high = this.ctx.high.get(0) ?? close;
     const low = this.ctx.low.get(0) ?? close;
     if (!Number.isFinite(close)) return;
-    markStrategyLedgerToMarket(this.ctx.strategyLedger, close, high, low);
+    markStrategyLedgerToMarket(this.ctx.strategyLedger, close, high, low, {
+      barIndex: this.ctx.bar_index,
+      time: this.ctx.time.get(0) ?? 0,
+    });
   }
 
   private markStrategyLedgerToMarketAtCurrentClose(): void {
     const close = this.ctx.close.get(0) ?? Number.NaN;
     if (!Number.isFinite(close)) return;
-    markStrategyLedgerToMarket(this.ctx.strategyLedger, close);
+    markStrategyLedgerToMarket(this.ctx.strategyLedger, close, close, close, {
+      barIndex: this.ctx.bar_index,
+      time: this.ctx.time.get(0) ?? 0,
+    });
   }
 
   private markStrategyLedgerAfterPendingOrders(): void {

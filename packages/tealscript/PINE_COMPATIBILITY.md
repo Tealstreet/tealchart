@@ -904,7 +904,7 @@ rollback. Remaining gaps are TradingView-exact sizing and pixel parity.
 
 The strategy pass accepts `strategy(...)` declarations and maps common settings,
 including risk-free-rate metadata, limit-fill verification ticks, close-entry selection rules, and standard-OHLC fill metadata, into the exported ledger primitives for settings, orders, fills, trades,
-positions, and equity snapshots. Read-only `strategy.*` state variables such as
+positions, and per-bar equity snapshots. Read-only `strategy.*` state variables such as
 `strategy.equity`, `strategy.account_currency`, `strategy.position_size`,
 `strategy.position_entry_name`, and trade counters are available for scripts.
 The semantic checker validates common strategy order, close/cancel,
@@ -919,7 +919,8 @@ fill at the next bar open by default, or at the signal bar close when
 Basic open/closed trade counters are maintained as fixed-size market fills
 change exposure. Open trades are marked to market from current OHLC, updating
 `strategy.openprofit`, `strategy.equity`, and trade-level maximum run-up and
-drawdown snapshots. Price-based `strategy.exit()` limit/stop brackets are
+drawdown snapshots, while the ledger records one equity-curve point per bar for
+downstream strategy analytics. Price-based `strategy.exit()` limit/stop brackets are
 recorded as pending exit orders. Profit/loss tick-distance exits are translated
 from the matching weighted entry price into limit/stop brackets, with absolute
 limit/stop prices taking precedence. Pending limit/stop orders fill on later
