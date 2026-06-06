@@ -958,8 +958,8 @@ bold/italic text formatting, and tooltips. Table lifecycle helpers and setters a
 Pine-style named `table_id`, coordinate, and value arguments where those
 parameters exist. Semantic analysis preserves `table.new()` handle return types
 and `table.all` handle-array element types for downstream diagnostics, and
-rejects invalid literal cell text alignment, font-family, and text-formatting
-values. Rendering
+rejects invalid literal table position values plus cell text alignment,
+font-family, and text-formatting values. Rendering
 lays out fixed tables in the script pane with measured automatic cell sizes,
 percentage-based explicit cell sizes, merged cell spans, cell backgrounds,
 borders, frame borders, text alignment, default/monospace font-family metadata,

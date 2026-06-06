@@ -1533,6 +1533,28 @@ const DRAWING_TEXT_FORMATTING_CONSTANT_VALUES = new Map([
   ['text.format_bold', 'bold'],
   ['text.format_italic', 'italic'],
 ]);
+const TABLE_POSITION_VALUES = new Set([
+  'top_left',
+  'top_center',
+  'top_right',
+  'middle_left',
+  'middle_center',
+  'middle_right',
+  'bottom_left',
+  'bottom_center',
+  'bottom_right',
+]);
+const TABLE_POSITION_CONSTANT_VALUES = new Map([
+  ['position.top_left', 'top_left'],
+  ['position.top_center', 'top_center'],
+  ['position.top_right', 'top_right'],
+  ['position.middle_left', 'middle_left'],
+  ['position.middle_center', 'middle_center'],
+  ['position.middle_right', 'middle_right'],
+  ['position.bottom_left', 'bottom_left'],
+  ['position.bottom_center', 'bottom_center'],
+  ['position.bottom_right', 'bottom_right'],
+]);
 
 for (const name of CALENDAR_FUNCTION_NAMES) {
   BUILTIN_SIGNATURES.set(name, { params: ['time', 'timezone'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true });
@@ -3345,6 +3367,7 @@ class SemanticChecker {
     this.checkDrawingCoordinateOptionLiteralArguments(expression, scope);
     this.checkDrawingStyleOptionLiteralArguments(expression, scope);
     this.checkDrawingTextOptionLiteralArguments(expression, scope);
+    this.checkTablePositionOptionLiteralArguments(expression, scope);
     this.checkStrategyLiteralArgumentConstraints(expression);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
@@ -4409,6 +4432,22 @@ class SemanticChecker {
       DRAWING_TEXT_FORMATTING_VALUES,
       DRAWING_TEXT_FORMATTING_CONSTANT_VALUES,
       'text.format_',
+    );
+  }
+
+  private checkTablePositionOptionLiteralArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+
+    this.checkDrawingOptionLiteralArgument(
+      expression,
+      signature.params,
+      calleeName,
+      'position',
+      TABLE_POSITION_VALUES,
+      TABLE_POSITION_CONSTANT_VALUES,
+      'position.',
     );
   }
 
