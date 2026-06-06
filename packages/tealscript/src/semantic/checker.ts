@@ -1505,6 +1505,28 @@ const DRAWING_LABEL_STYLE_CONSTANT_VALUES = new Map([
   ['label.style_arrowup', 'arrowup'],
   ['label.style_arrowdown', 'arrowdown'],
 ]);
+const DRAWING_TEXT_HALIGN_VALUES = new Set(['left', 'center', 'right']);
+const DRAWING_TEXT_HALIGN_CONSTANT_VALUES = new Map([
+  ['text.align_left', 'left'],
+  ['text.align_center', 'center'],
+  ['text.align_right', 'right'],
+]);
+const DRAWING_TEXT_VALIGN_VALUES = new Set(['top', 'middle', 'bottom']);
+const DRAWING_TEXT_VALIGN_CONSTANT_VALUES = new Map([
+  ['text.align_top', 'top'],
+  ['text.align_middle', 'middle'],
+  ['text.align_bottom', 'bottom'],
+]);
+const DRAWING_TEXT_WRAP_VALUES = new Set(['none', 'auto']);
+const DRAWING_TEXT_WRAP_CONSTANT_VALUES = new Map([
+  ['text.wrap_none', 'none'],
+  ['text.wrap_auto', 'auto'],
+]);
+const DRAWING_FONT_FAMILY_VALUES = new Set(['default', 'monospace']);
+const DRAWING_FONT_FAMILY_CONSTANT_VALUES = new Map([
+  ['font.family_default', 'default'],
+  ['font.family_monospace', 'monospace'],
+]);
 
 for (const name of CALENDAR_FUNCTION_NAMES) {
   BUILTIN_SIGNATURES.set(name, { params: ['time', 'timezone'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true });
@@ -3316,6 +3338,7 @@ class SemanticChecker {
     this.checkDisplayOptionLiteralArguments(expression);
     this.checkDrawingCoordinateOptionLiteralArguments(expression, scope);
     this.checkDrawingStyleOptionLiteralArguments(expression, scope);
+    this.checkDrawingTextOptionLiteralArguments(expression, scope);
     this.checkStrategyLiteralArgumentConstraints(expression);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
@@ -4320,6 +4343,58 @@ class SemanticChecker {
         'line.style_',
       );
     }
+  }
+
+  private checkDrawingTextOptionLiteralArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+
+    this.checkDrawingOptionLiteralArgument(
+      expression,
+      signature.params,
+      calleeName,
+      'textalign',
+      DRAWING_TEXT_HALIGN_VALUES,
+      DRAWING_TEXT_HALIGN_CONSTANT_VALUES,
+      'text.align_',
+    );
+    this.checkDrawingOptionLiteralArgument(
+      expression,
+      signature.params,
+      calleeName,
+      'text_halign',
+      DRAWING_TEXT_HALIGN_VALUES,
+      DRAWING_TEXT_HALIGN_CONSTANT_VALUES,
+      'text.align_',
+    );
+    this.checkDrawingOptionLiteralArgument(
+      expression,
+      signature.params,
+      calleeName,
+      'text_valign',
+      DRAWING_TEXT_VALIGN_VALUES,
+      DRAWING_TEXT_VALIGN_CONSTANT_VALUES,
+      'text.align_',
+    );
+    this.checkDrawingOptionLiteralArgument(
+      expression,
+      signature.params,
+      calleeName,
+      'text_wrap',
+      DRAWING_TEXT_WRAP_VALUES,
+      DRAWING_TEXT_WRAP_CONSTANT_VALUES,
+      'text.wrap_',
+    );
+    this.checkDrawingOptionLiteralArgument(
+      expression,
+      signature.params,
+      calleeName,
+      'text_font_family',
+      DRAWING_FONT_FAMILY_VALUES,
+      DRAWING_FONT_FAMILY_CONSTANT_VALUES,
+      'font.family_',
+    );
   }
 
   private checkDrawingOptionLiteralArgument(

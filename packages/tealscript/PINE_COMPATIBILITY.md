@@ -874,7 +874,8 @@ drawing output. The label mutation pass covers persistent `var` label handles,
 mutators and getters accept Pine-style named `id` and value arguments. Semantic
 analysis preserves known label getter return types and `label.all` handle-array
 element types for downstream diagnostics, and rejects invalid literal `xloc`
-and `yloc` option values plus invalid literal label `style` values. Rendering
+and `yloc` option values plus invalid literal label `style`, `textalign`, and
+`text_font_family` values. Rendering
 routes labels to the script pane: overlay scripts use the main pane, non-overlay
 scripts use their indicator pane. Renderer coverage handles text-only
 `label.style_none`, directional label bodies, and common symbol bodies including
@@ -930,7 +931,9 @@ preserves known box getter return types, preserves `box.all` handle-array
 element types for downstream diagnostics, and rejects invalid literal `xloc`
 and `extend` option values plus invalid literal border-style values. Rendering
 routes filled rectangles to the script pane with borders, text alignment, `text_wrap=auto` wrapping,
-default/monospace font-family metadata, and bold/italic text formatting. Full
+default/monospace font-family metadata, and bold/italic text formatting. Semantic
+analysis also rejects invalid literal `text_halign`, `text_valign`,
+`text_wrap`, and `text_font_family` values. Full
 TradingView text pixel parity and remaining edge-case
 styling remain planned.
 
@@ -954,7 +957,8 @@ color, background, size, width, height, text alignment, font family, and
 bold/italic text formatting, and tooltips. Table lifecycle helpers and setters accept
 Pine-style named `table_id`, coordinate, and value arguments where those
 parameters exist. Semantic analysis preserves `table.new()` handle return types
-and `table.all` handle-array element types for downstream diagnostics. Rendering
+and `table.all` handle-array element types for downstream diagnostics, and
+rejects invalid literal cell text alignment and font-family values. Rendering
 lays out fixed tables in the script pane with measured automatic cell sizes,
 percentage-based explicit cell sizes, merged cell spans, cell backgrounds,
 borders, frame borders, text alignment, default/monospace font-family metadata,

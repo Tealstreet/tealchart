@@ -3576,6 +3576,42 @@ box.set_border_style(region, style=line.style_curve)
     ]);
   });
 
+  it('reports invalid literal drawing text option values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing Text Options")
+marker = label.new(bar_index, close, textalign=text.align_top, text_font_family=font.family_serif)
+region = box.new(bar_index, high, bar_index + 1, low, text_halign=text.align_top, text_valign=text.align_left, text_wrap=text.wrap_clip, text_font_family=font.family_serif)
+dashboard = table.new(position.top_right, 1, 1)
+label.set_textalign(marker, textalign=text.align_top)
+label.set_text_font_family(marker, text_font_family=font.family_serif)
+box.set_text_halign(region, text_halign=text.align_top)
+box.set_text_valign(region, text_valign=text.align_left)
+box.set_text_wrap(region, text_wrap=text.wrap_clip)
+box.set_text_font_family(region, text_font_family=font.family_serif)
+table.cell_set_text_halign(dashboard, 0, 0, text_halign=text.align_top)
+table.cell_set_text_valign(dashboard, 0, 0, text_valign=text.align_left)
+table.cell_set_text_font_family(dashboard, 0, 0, text_font_family=font.family_serif)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid label.new textalign: text.align_top',
+      'Invalid label.new text_font_family: font.family_serif',
+      'Invalid box.new text_halign: text.align_top',
+      'Invalid box.new text_valign: text.align_left',
+      'Invalid box.new text_wrap: text.wrap_clip',
+      'Invalid box.new text_font_family: font.family_serif',
+      'Invalid label.set_textalign textalign: text.align_top',
+      'Invalid label.set_text_font_family text_font_family: font.family_serif',
+      'Invalid box.set_text_halign text_halign: text.align_top',
+      'Invalid box.set_text_valign text_valign: text.align_left',
+      'Invalid box.set_text_wrap text_wrap: text.wrap_clip',
+      'Invalid box.set_text_font_family text_font_family: font.family_serif',
+      'Invalid table.cell_set_text_halign text_halign: text.align_top',
+      'Invalid table.cell_set_text_valign text_valign: text.align_left',
+      'Invalid table.cell_set_text_font_family text_font_family: font.family_serif',
+    ]);
+  });
+
   it('resolves label method named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Label Method Signatures")
@@ -3957,6 +3993,8 @@ unknownPoint = box.new(top_left=topLeft, bottom_right=bottomRight, left=bar_inde
       "box.new() missing required argument 'bottom'",
       "Argument 'top_left' for box.new() was supplied multiple times",
       'box.new() expects at most 17 arguments',
+      'Invalid box.new text_valign: center',
+      'Invalid box.new text_wrap: wrap',
       "Unknown argument 'left' for box.new()",
     ]);
   });
@@ -4563,6 +4601,7 @@ tooMany = table.cell(dashboard, 0, 0, "A", 1, 1, color.white, "left", "top", siz
       "table.cell() missing required argument 'row'",
       "Argument 'table_id' for table.cell() was supplied multiple times",
       'table.cell() expects at most 14 arguments',
+      'Invalid table.cell text_font_family: mono',
     ]);
   });
 
