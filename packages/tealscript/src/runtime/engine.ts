@@ -175,7 +175,7 @@ import {
   removeMapValue,
   type PineMap,
 } from './maps';
-import { Scope, createRootScope, type ScopeSnapshot } from './scope';
+import { Scope, createRootScope, type ScopeSnapshot, type SourceSeriesAccessor } from './scope';
 import {
   corporateActionRequestKey,
   currencyRateRequestKey,
@@ -374,7 +374,7 @@ interface ImportedLibrary {
   constants: Map<string, unknown>;
 }
 
-type SeriesAccessor = { get: (offset: number) => number | undefined };
+type SeriesAccessor = SourceSeriesAccessor;
 
 interface KnownSourceValue {
   __tealscriptKnownSource: true;
@@ -2537,7 +2537,13 @@ export class TealscriptEngine {
       }
       const drawingCount = this.ctx.getDrawingCount();
       const value = this.evaluateVariableInitializer(stmt.init);
-      this.scope.declare(name, kind, value, this.getTypeAnnotationName(stmt.typeAnnotation));
+      this.scope.declare(
+        name,
+        kind,
+        value,
+        this.getTypeAnnotationName(stmt.typeAnnotation),
+        this.getSourceSeriesForInitializer(stmt.init),
+      );
       this.markPersistentDeclarationDrawings(kind, drawingCount);
     } else if (stmt.names.type === 'TupleDeclarator') {
       const names = stmt.names.names.map((name) => name.name).filter((name) => name !== '_');
@@ -2586,7 +2592,11 @@ export class TealscriptEngine {
 
       const newValue = this.applyAssignmentOperator(currentValue, value, stmt.operator);
 
-      this.scope.set(name, newValue);
+      this.scope.set(
+        name,
+        newValue,
+        stmt.operator === ':=' ? this.getSourceSeriesForExpression(stmt.right) : undefined,
+      );
     } else if (stmt.left.type === 'IndexExpression') {
       this.executeIndexAssignment(stmt.left, value, stmt.operator);
     } else {
@@ -2819,6 +2829,10 @@ export class TealscriptEngine {
     } finally {
       this.requestLocalScopeDepth--;
     }
+  }
+
+  private getSourceSeriesForInitializer(init: Expression | IfStatement): SeriesAccessor | undefined {
+    return init.type === 'IfStatement' ? undefined : this.getSourceSeriesForExpression(init);
   }
 
   // ===========================================================================
@@ -3448,10 +3462,15 @@ export class TealscriptEngine {
 
   private evaluateBuiltinSourceArgument(expr: Expression): unknown {
     const value = this.evaluateExpression(expr);
-    if (expr.type !== 'Identifier') return value;
 
-    const series = this.getKnownSeriesByName(expr.name, this.ctx);
+    const series = this.getSourceSeriesForExpression(expr);
     return series ? this.toKnownSourceValue(value, series) : value;
+  }
+
+  private getSourceSeriesForExpression(expr: Expression): SeriesAccessor | undefined {
+    if (expr.type !== 'Identifier') return undefined;
+
+    return this.scope.getSourceSeries(expr.name) ?? this.getKnownSeriesByName(expr.name, this.ctx);
   }
 
   private toKnownSourceValue(value: unknown, series: SeriesAccessor): unknown {
