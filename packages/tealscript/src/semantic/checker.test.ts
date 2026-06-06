@@ -793,6 +793,40 @@ plotarrow(close - open, minheight=0, maxheight=1.5)
     ]);
   });
 
+  it('reports invalid visual string option values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Visual String Options")
+plot(close, title=1)
+hline(100, title=1)
+fill(plot(close), plot(open), color.red, title=1)
+barcolor(color.red, title=1)
+bgcolor(color.blue, title=1)
+plotbar(open, high, low, close, title=1)
+plotcandle(open, high, low, close, title=1)
+plotshape(close > open, title=1, text=2)
+plotchar(close > open, title=1, char=2, text=3)
+plotarrow(close - open, title=1)
+plot(close, 1, title="Duplicate")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'plot title must be a string, got int',
+      'hline title must be a string, got int',
+      'fill title must be a string, got int',
+      'barcolor title must be a string, got int',
+      'bgcolor title must be a string, got int',
+      'plotbar title must be a string, got int',
+      'plotcandle title must be a string, got int',
+      'plotshape title must be a string, got int',
+      'plotshape text must be a string, got int',
+      'plotchar title must be a string, got int',
+      'plotchar char must be a string, got int',
+      'plotchar text must be a string, got int',
+      'plotarrow title must be a string, got int',
+      "Argument 'title' for plot() was supplied multiple times",
+    ]);
+  });
+
   it('reports invalid marker visual output argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Invalid Marker Visual Bindings")
