@@ -162,7 +162,9 @@ Covered behavior and remaining gaps:
 The history reference pass covers literal offsets such as `close[1]`, dynamic
 offsets such as `close[length]`, fractional offsets truncated toward zero,
 derived regular-series history, and unavailable or future offsets returning
-`na`/`null` plot values instead of throwing.
+`na`/`null` plot values instead of throwing. Runtime profile metadata reports
+literal history offsets even when they sit behind unexecuted branches, while
+dynamic/non-literal offsets are still inferred from observed runtime access.
 
 ## Roadmaps
 
@@ -737,10 +739,12 @@ feeds are tracked in [`STRATEGY_INTRABAR_DESIGN.md`](./STRATEGY_INTRABAR_DESIGN.
 `indicator(..., max_bars_back=N)` is parsed and recorded on execution results
 as `indicatorMaxBarsBack`. Values must be finite, non-negative integers.
 Explicit history references that exceed the declared bound produce runtime
-errors, while in-range references remain available over loaded history. The
-runtime still does not infer Pine's history buffer sizing rules for scripts
-without an explicit declaration. The checkpoint corpus tracks an official
-`max_bars_back` bounded-history fixture.
+errors, while in-range references remain available over loaded history.
+Scripts without an explicit declaration report inferred history depth in the
+runtime profile from a static literal-offset pass plus observed dynamic access.
+Full Pine-style preallocation for non-literal offsets remains a compatibility
+target. The checkpoint corpus tracks an official `max_bars_back`
+bounded-history fixture.
 
 ## Common Drawing Object Coverage
 
