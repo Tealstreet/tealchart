@@ -4,6 +4,7 @@ import { parse } from '../../src/parser';
 import {
   corporateActionRequestKey,
   currencyRateRequestKey,
+  economicRequestKey,
   financialRequestKey,
   InMemoryRequestDatafeed,
   InMemoryStrategyIntrabarDatafeed,
@@ -1419,6 +1420,42 @@ plot(margin, title="Margin")
         ],
       },
     ]);
+  });
+
+  it('locks a reduced public economic macro overlay idiom', () => {
+    // Public idiom reference: public macro overlays commonly request economic
+    // point series and gate regimes from the latest host-provided value.
+    // Source search: https://www.tradingview.com/scripts/search/macro%20economic/
+    const bars: Bar[] = [
+      { time: 1_700_530_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_530_060_000, open: 101, high: 102, low: 100, close: 101, volume: 100 },
+      { time: 1_700_530_120_000, open: 102, high: 103, low: 101, close: 102, volume: 100 },
+      { time: 1_700_530_180_000, open: 103, high: 104, low: 102, close: 103, volume: 100 },
+    ];
+    const requestDatafeed = new InMemoryRequestDatafeed([], [
+      {
+        family: 'economic',
+        key: economicRequestKey('US', 'GDP'),
+        points: [
+          { time: bars[0]!.time, value: 2.8 },
+          { time: bars[2]!.time, value: 3.1 },
+        ],
+      },
+    ]);
+    const result = runCompatScript(`
+indicator("Public Economic Macro Checkpoint")
+gdp = request.economic("US", "GDP")
+expansion = gdp > 3
+plot(gdp, title="GDP")
+plot(expansion ? 1 : 0, title="Expansion")
+`, {
+      bars,
+      engineOptions: { requestDatafeed },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'GDP').values).toEqual([2.8, 2.8, 3.1, 3.1]);
+    expect(getPlot(result, 'Expansion').values).toEqual([0, 0, 1, 1]);
   });
 
   it('locks a reduced public library helper idiom', () => {
