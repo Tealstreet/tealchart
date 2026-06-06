@@ -997,6 +997,10 @@ export class TealscriptEngine {
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source1', 'source2', 'length'], 2, collectionScopes);
       case 'ta.linreg':
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length', 'offset'], 1, collectionScopes);
+      case 'ta.stoch':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'high', 'low', 'length'], 3, collectionScopes, 0, 14);
+      case 'ta.wpr':
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['length'], 0, collectionScopes, 0, 14);
       case 'ta.swma':
         return 3;
       case 'ta.highest':
@@ -1016,6 +1020,11 @@ export class TealscriptEngine {
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1, 10);
       case 'ta.roc':
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1, 1);
+      case 'ta.mfi':
+        if (expression.arguments.some((argument) => argument.name?.name === 'series') && !expression.arguments.some((argument) => argument.name?.name === 'source')) {
+          return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['series', 'length'], 1, collectionScopes, 1, 14);
+        }
+        return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1, 14);
       case 'ta.crossover':
       case 'ta.crossunder':
       case 'ta.cross':

@@ -179,7 +179,8 @@ fixed/default lookback helpers such as `ta.cross()`, `ta.crossover()`,
 `ta.crossunder()`, `ta.change(source)`, and `ta.swma()`, plus common `ta.*`
 source-window, retained-source, recursive, and selected default-argument helpers
 such as `ta.macd(close)`, `ta.cmo(source)`, `ta.mom(source)`, `ta.roc(source)`,
-and `ta.cci(source)` also contribute static lookback
+and `ta.cci(source)`, plus oscillator helpers such as `ta.stoch()`, `ta.mfi()`,
+and `ta.wpr()` also contribute static lookback
 requirements when their length arguments are static, including default-source
 highest/lowest lookback forms. Truly dynamic series offsets and dynamic helper
 lengths are still inferred from observed runtime access.
@@ -769,7 +770,7 @@ selected static or observed rolling-window helper lookbacks such as
 `math.sum()`, `ta.range()`, `ta.rising()`/`ta.falling()`, common statistical
 helpers, momentum helpers, band/average/regression helpers, and `ta.*`
 fixed/default, source-window, retained-source, recursive, and default-argument
-helpers, including default-source highest/lowest forms. Full Pine-style
+helpers, oscillator helpers, including default-source highest/lowest forms. Full Pine-style
 preallocation for arbitrary series offsets remains a compatibility target. The
 checkpoint corpus tracks an official `max_bars_back`
 bounded-history fixture.
