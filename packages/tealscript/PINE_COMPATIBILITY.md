@@ -991,7 +991,8 @@ parameters exist. Semantic analysis preserves `table.new()` handle return types
 and `table.all` handle-array element types for downstream diagnostics, and
 rejects invalid literal table position values plus cell text alignment,
 text-size, font-family, and text-formatting values, plus non-string cell text
-and tooltip values and non-color table/cell color values. Rendering lays out fixed tables in the script pane with measured automatic cell sizes,
+and tooltip values, non-color table/cell color values, and non-numeric table
+dimension, coordinate, width, height, frame, and border values. Rendering lays out fixed tables in the script pane with measured automatic cell sizes,
 percentage-based explicit cell sizes, merged cell spans, cell backgrounds,
 borders, frame borders, text alignment, default/monospace font-family metadata,
 and bold/italic font styling. Runtime coverage also
