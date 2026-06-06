@@ -216,6 +216,23 @@ plot(ta.cross(source1=close, open), title="Cross")
     expect(getPlot(named, 'Cross').values).toEqual([false, false, false, true, false, true, false, false, true, true, true, true]);
   });
 
+  it('tracks crossover and crossunder state for derived sources', () => {
+    const result = runCompatScript(`
+indicator("Derived cross state")
+spread = close - open
+plot(ta.crossover(spread, 0), title="Spread Crossover")
+plot(ta.crossunder(spread, 0), title="Spread Crossunder")
+plot(ta.crossover(source1=spread, source2=0), title="Named Spread Crossover")
+plot(ta.crossunder(source1=spread, 0), title="Mixed Spread Crossunder")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Spread Crossover').values).toEqual([false, false, false, false, false, true, false, false, false, true, false, true]);
+    expect(getPlot(result, 'Spread Crossunder').values).toEqual([false, false, false, true, false, false, false, false, true, false, true, false]);
+    expect(getPlot(result, 'Named Spread Crossover').values).toEqual(getPlot(result, 'Spread Crossover').values);
+    expect(getPlot(result, 'Mixed Spread Crossunder').values).toEqual(getPlot(result, 'Spread Crossunder').values);
+  });
+
   it('runs Pine oscillator helper idioms', () => {
     const result = runCompatScript(`
 indicator("Oscillator helpers")
