@@ -8535,7 +8535,7 @@ export class TealscriptEngine {
     });
 
     // ATR - Average True Range
-    this.builtins.set('ta.atr', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.atr', (args, namedArgs, ctx, scope, callId) => {
       const length = this.normalizeLookbackLength(this.getCallArg(args, namedArgs, 0, 'length'));
 
       // Calculate True Range
@@ -8551,7 +8551,7 @@ export class TealscriptEngine {
       }
 
       // Use RMA (Wilder's smoothing) for ATR
-      const atrKey = `_atr_${length}`;
+      const atrKey = `_ta_atr_${callId}_${length}`;
       let prevAtr = scope.get(atrKey) as number | undefined;
 
       let atr: number;
@@ -8576,7 +8576,7 @@ export class TealscriptEngine {
         atr = (prevAtr * (length - 1) + tr) / length;
       }
 
-      scope.declare(atrKey, 'var', atr);
+      this.setBuiltinState(scope, atrKey, atr);
       return atr;
     });
 
