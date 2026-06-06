@@ -491,6 +491,16 @@ const TIMEFRAME_BOOL_MEMBER_NAMES = new Set([
   'timeframe.isweekly',
 ]);
 const TIMEFRAME_STRING_MEMBER_NAMES = new Set(['timeframe.main_period', 'timeframe.period']);
+const TIME_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['time', ['timeframe', 'session', 'timezone']],
+  ['time_close', ['timeframe', 'session', 'timezone']],
+  ['timeframe.change', ['timeframe']],
+  ['timeframe.in_seconds', ['timeframe']],
+  ['timeframe.to_seconds', ['timeframe']],
+]);
+const TIME_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['timeframe.from_seconds', ['seconds']],
+]);
 
 const SYMINFO_STRING_MEMBER_NAMES = new Set([
   'syminfo.basecurrency',
@@ -3685,6 +3695,7 @@ class SemanticChecker {
     this.checkStringFunctionArgumentTypes(expression, scope);
     this.checkMathFunctionArgumentTypes(expression, scope);
     this.checkTaFunctionArgumentTypes(expression, scope);
+    this.checkTimeFunctionArgumentTypes(expression, scope);
     this.checkMaxBarsBackLiteralArguments(expression);
     this.checkAlertFrequencyLiteralArguments(expression);
     this.checkAlertStringOptionArguments(expression, scope);
@@ -4258,6 +4269,29 @@ class SemanticChecker {
 
     for (const parameterName of boolParameterNames ?? []) {
       this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'boolean');
+    }
+  }
+
+  private checkTimeFunctionArgumentTypes(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const stringParameterNames = CALENDAR_FUNCTION_NAMES.has(calleeName)
+      ? ['timezone']
+      : TIME_STRING_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    const numericParameterNames = CALENDAR_FUNCTION_NAMES.has(calleeName)
+      ? ['time']
+      : TIME_NUMERIC_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!stringParameterNames && !numericParameterNames) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of stringParameterNames ?? []) {
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'string');
+    }
+
+    for (const parameterName of numericParameterNames ?? []) {
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'number');
     }
   }
 
