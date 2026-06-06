@@ -2536,13 +2536,14 @@ export class TealscriptEngine {
         return;
       }
       const drawingCount = this.ctx.getDrawingCount();
-      const value = this.evaluateVariableInitializer(stmt.init);
+      const rawValue = this.evaluateVariableInitializer(stmt.init);
+      const value = this.unwrapKnownSourceValue(rawValue);
       this.scope.declare(
         name,
         kind,
         value,
         this.getTypeAnnotationName(stmt.typeAnnotation),
-        this.getSourceSeriesForInitializer(stmt.init),
+        this.getSourceSeriesForInitializer(stmt.init, rawValue),
       );
       this.markPersistentDeclarationDrawings(kind, drawingCount);
     } else if (stmt.names.type === 'TupleDeclarator') {
@@ -2584,7 +2585,8 @@ export class TealscriptEngine {
   }
 
   private executeAssignment(stmt: AssignmentStatement): void {
-    const value = this.evaluateExpression(stmt.right);
+    const rawValue = this.evaluateExpression(stmt.right);
+    const value = this.unwrapKnownSourceValue(rawValue);
 
     if (stmt.left.type === 'Identifier') {
       const name = stmt.left.name;
@@ -2595,7 +2597,7 @@ export class TealscriptEngine {
       this.scope.set(
         name,
         newValue,
-        stmt.operator === ':=' ? this.getSourceSeriesForExpression(stmt.right) : undefined,
+        stmt.operator === ':=' ? this.getSourceSeriesForExpression(stmt.right, rawValue) : undefined,
       );
     } else if (stmt.left.type === 'IndexExpression') {
       this.executeIndexAssignment(stmt.left, value, stmt.operator);
@@ -2831,7 +2833,9 @@ export class TealscriptEngine {
     }
   }
 
-  private getSourceSeriesForInitializer(init: Expression | IfStatement): SeriesAccessor | undefined {
+  private getSourceSeriesForInitializer(init: Expression | IfStatement, value?: unknown): SeriesAccessor | undefined {
+    const valueSeries = this.getSourceSeriesForValue(value);
+    if (valueSeries) return valueSeries;
     return init.type === 'IfStatement' ? undefined : this.getSourceSeriesForExpression(init);
   }
 
@@ -3401,9 +3405,10 @@ export class TealscriptEngine {
   }
 
   private shouldPreserveBuiltinSourceArgument(fullName: string, args: CallArgument[], argIndex: number): boolean {
-    if (fullName !== 'math.sum' && !fullName.startsWith('ta.')) return false;
+    if (fullName !== 'input.source' && fullName !== 'math.sum' && !fullName.startsWith('ta.')) return false;
 
     const parameterName = this.getBuiltinSourceArgumentParameterName(fullName, args, argIndex);
+    if (fullName === 'input.source') return parameterName === 'defval';
     return parameterName !== undefined && ['source', 'series', 'source1', 'source2', 'high', 'low'].includes(parameterName);
   }
 
@@ -3436,6 +3441,8 @@ export class TealscriptEngine {
     switch (fullName) {
       case 'math.sum':
         return ['source', 'length'];
+      case 'input.source':
+        return ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'];
       case 'ta.cross':
       case 'ta.crossover':
       case 'ta.crossunder':
@@ -3467,10 +3474,16 @@ export class TealscriptEngine {
     return series ? this.toKnownSourceValue(value, series) : value;
   }
 
-  private getSourceSeriesForExpression(expr: Expression): SeriesAccessor | undefined {
+  private getSourceSeriesForExpression(expr: Expression, value?: unknown): SeriesAccessor | undefined {
+    const valueSeries = this.getSourceSeriesForValue(value);
+    if (valueSeries) return valueSeries;
     if (expr.type !== 'Identifier') return undefined;
 
     return this.scope.getSourceSeries(expr.name) ?? this.getKnownSeriesByName(expr.name, this.ctx);
+  }
+
+  private getSourceSeriesForValue(value: unknown): SeriesAccessor | undefined {
+    return this.isKnownSourceValue(value) ? value.series : undefined;
   }
 
   private toKnownSourceValue(value: unknown, series: SeriesAccessor): unknown {
@@ -5481,7 +5494,7 @@ export class TealscriptEngine {
     if (value === null || value === undefined || this.isNa(value)) {
       return null;
     }
-    return value as number;
+    return this.unwrapKnownSourceValue(value) as number;
   }
 
   private toPlotColor(value: unknown): string | null {
@@ -8048,7 +8061,8 @@ export class TealscriptEngine {
 
     // input.source is special - it returns a series
     this.builtins.set('input.source', (args, namedArgs, ctx) => {
-      const defval = inputArg(args, namedArgs, inputSimpleArgs, 0); // Should be a series like 'close'
+      const rawDefval = inputArg(args, namedArgs, inputSimpleArgs, 0); // Should be a series like 'close'
+      const defval = this.unwrapKnownSourceValue(rawDefval);
       const title = this.toStringValue(inputArg(args, namedArgs, inputSimpleArgs, 1, 'Source'));
       const id = `input_${title}`;
       const metadata = {
@@ -8073,7 +8087,7 @@ export class TealscriptEngine {
       const inputValue = ctx.getInput(id);
       const registeredDefault = ctx.inputDefinitions.find((input) => input.id === id)?.defval;
       if (inputValue === undefined || inputValue === registeredDefault) {
-        return defval;
+        return rawDefval;
       }
       return this.resolveInputSourceValue(inputValue, ctx);
     });
@@ -8084,25 +8098,25 @@ export class TealscriptEngine {
 
     switch (value) {
       case 'open':
-        return ctx.open.get(0);
+        return this.toKnownSourceValue(ctx.open.get(0), ctx.open);
       case 'high':
-        return ctx.high.get(0);
+        return this.toKnownSourceValue(ctx.high.get(0), ctx.high);
       case 'low':
-        return ctx.low.get(0);
+        return this.toKnownSourceValue(ctx.low.get(0), ctx.low);
       case 'close':
-        return ctx.close.get(0);
+        return this.toKnownSourceValue(ctx.close.get(0), ctx.close);
       case 'bid':
-        return ctx.bid.get(0);
+        return this.toKnownSourceValue(ctx.bid.get(0), ctx.bid);
       case 'ask':
-        return ctx.ask.get(0);
+        return this.toKnownSourceValue(ctx.ask.get(0), ctx.ask);
       case 'hl2':
-        return ctx.hl2;
+        return this.toKnownSourceValue(ctx.hl2, this.getKnownSeriesByName('hl2', ctx)!);
       case 'hlc3':
-        return ctx.hlc3;
+        return this.toKnownSourceValue(ctx.hlc3, this.getKnownSeriesByName('hlc3', ctx)!);
       case 'ohlc4':
-        return ctx.ohlc4;
+        return this.toKnownSourceValue(ctx.ohlc4, this.getKnownSeriesByName('ohlc4', ctx)!);
       case 'hlcc4':
-        return ctx.hlcc4;
+        return this.toKnownSourceValue(ctx.hlcc4, this.getKnownSeriesByName('hlcc4', ctx)!);
       default:
         return value;
     }

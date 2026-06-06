@@ -7757,6 +7757,36 @@ plot(ta.sma(source, 2))`;
       expect(roundSeries(result.plots[0].values, 4)).toEqual([null, 100.4, 100.9]);
     });
 
+    it('preserves input source identity when current source values collide', () => {
+      const script = `//@version=6
+indicator("Source Input Identity")
+source = input.source(defval=open, title="Source")
+plot(ta.sma(source, 2), title="Average")
+plot(bar_index >= 1 ? ta.sma(source, 2) : na, title="Delayed Average")
+plot(math.sum(source, 2), title="Sum")
+plot(ta.change(source), title="Change")`;
+
+      const bars = [
+        { time: 1_000_000, open: 10, high: 22, low: 9, close: 15, volume: 100 },
+        { time: 1_060_000, open: 20, high: 23, low: 18, close: 20, volume: 100 },
+        { time: 1_120_000, open: 30, high: 31, low: 24, close: 25, volume: 100 },
+      ];
+      const defaultResult = executeScript(parse(script), bars);
+      const closeOverrideResult = executeScript(parse(script), bars, new Map([['input_Source', 'close']]));
+
+      expect(defaultResult.errors).toEqual([]);
+      expect(defaultResult.plots.find((plot) => plot.title === 'Average')?.values).toEqual([null, 15, 25]);
+      expect(defaultResult.plots.find((plot) => plot.title === 'Delayed Average')?.values).toEqual([null, 15, 25]);
+      expect(defaultResult.plots.find((plot) => plot.title === 'Sum')?.values).toEqual([null, 30, 50]);
+      expect(defaultResult.plots.find((plot) => plot.title === 'Change')?.values).toEqual([null, 10, 10]);
+
+      expect(closeOverrideResult.errors).toEqual([]);
+      expect(closeOverrideResult.plots.find((plot) => plot.title === 'Average')?.values).toEqual([null, 17.5, 22.5]);
+      expect(closeOverrideResult.plots.find((plot) => plot.title === 'Delayed Average')?.values).toEqual([null, 17.5, 22.5]);
+      expect(closeOverrideResult.plots.find((plot) => plot.title === 'Sum')?.values).toEqual([null, 35, 45]);
+      expect(closeOverrideResult.plots.find((plot) => plot.title === 'Change')?.values).toEqual([null, 5, 5]);
+    });
+
     it('reports invalid Pine input defaults', () => {
       const script = `//@version=6
 indicator("Invalid input")
