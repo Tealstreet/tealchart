@@ -692,7 +692,9 @@ objects, `chart.point` constructors, and core `label`, `line`, `linefill`,
 `box`, `polyline`, and `table` lifecycles. Label renderer coverage now handles
 Pine text-only, directional label, and symbol label styles. Line renderer
 coverage now draws Pine `line.style_arrow_left`, `line.style_arrow_right`, and
-`line.style_arrow_both` arrowheads.
+`line.style_arrow_both` arrowheads. Semantic analysis preserves
+`chart.point` helper return types and rejects non-numeric point coordinate
+arguments before runtime.
 
 ## Common OHLC Plot Coverage
 

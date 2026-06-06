@@ -3819,6 +3819,27 @@ duplicateCopy = chart.point.copy(point, id=point)
     ]);
   });
 
+  it('reports invalid chart point helper value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Chart Point Values")
+badNew = chart.point.new(time="now", index=true, price="close")
+badNow = chart.point.now(price=false)
+badIndex = chart.point.from_index(index="0", price=true)
+badTime = chart.point.from_time(time="now", price="close")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'chart.point.new time must be a number, got string',
+      'chart.point.new index must be a number, got bool',
+      'chart.point.new price must be a number, got string',
+      'chart.point.now price must be a number, got bool',
+      'chart.point.from_index index must be a number, got string',
+      'chart.point.from_index price must be a number, got bool',
+      'chart.point.from_time time must be a number, got string',
+      'chart.point.from_time price must be a number, got string',
+    ]);
+  });
+
   it('resolves label.new named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Label Signatures")
