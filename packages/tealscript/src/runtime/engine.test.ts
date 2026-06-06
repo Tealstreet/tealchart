@@ -6519,6 +6519,33 @@ plot(ta.correlation(open, close, 2), title="Open Close Correlation")`;
       expect(result.plots.find((plot) => plot.title === 'Open Close Correlation')?.values).toEqual([null, null, 1]);
     });
 
+    it('preserves source identity through simple source aliases when current values collide', () => {
+      const script = `//@version=6
+indicator("Source alias identity")
+src = open
+srcCopy = src
+reassigned = close
+reassigned := open
+plot(ta.sma(src, 2), title="Alias SMA")
+plot(math.sum(srcCopy, 2), title="Alias Copy Sum")
+plot(ta.change(reassigned), title="Reassigned Change")
+plot(src[1], title="Alias History")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: 1, open: 10, high: 12, low: 8, close: 10, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 10, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 30, volume: 100 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Alias SMA')?.values).toEqual([null, 15, 25]);
+      expect(result.plots.find((plot) => plot.title === 'Alias Copy Sum')?.values).toEqual([null, 30, 50]);
+      expect(result.plots.find((plot) => plot.title === 'Reassigned Change')?.values).toEqual([null, 10, 10]);
+      expect(result.plots.find((plot) => plot.title === 'Alias History')?.values).toEqual([null, 10, 20]);
+    });
+
     it('keeps mixed named and positional source helper results numeric', () => {
       const script = `//@version=6
 indicator("Mixed source binding")
