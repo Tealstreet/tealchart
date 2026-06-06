@@ -132,6 +132,26 @@ plot(bar_index >= 1 ? ta.sma(selected, 2) : na, title="Imported Block If Average
     expect(getPlot(result, 'Imported Block If Average').values).toEqual([null, 15, 25]);
   });
 
+  it('preserves source identity through same-source if initializers', () => {
+    const result = runCompatScript(`
+indicator("If initializer source identity")
+selected = if bar_index >= 0
+    open
+else
+    open
+plot(bar_index >= 1 ? ta.sma(selected, 2) : na, title="If Initializer Average")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ],
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'If Initializer Average').values).toEqual([null, 15, 25]);
+  });
+
   it('preserves source identity through imported same-source switch returns', () => {
     const library = parse(`
 library("SourceTools", true)
