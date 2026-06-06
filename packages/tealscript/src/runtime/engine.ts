@@ -391,6 +391,8 @@ interface ExpressionHistoryEntry {
   values: unknown[];
 }
 
+type StaticCollectionScopes = Array<Map<string, boolean>>;
+
 const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['ticker']);
 
 /**
@@ -520,7 +522,7 @@ export class TealscriptEngine {
     this.expressionHistory = new WeakMap();
     this.nextRequestExpressionId = 0;
     this.nextCallExpressionId = 0;
-    this.inferredMaxBarsBack = 0;
+    this.inferredMaxBarsBack = this.inferStaticMaxBarsBack(ast);
     this.userFunctionCallStack = [];
     this.importedLibraryCallStack = [];
     this.indicatorDynamicRequests = true;
@@ -681,6 +683,325 @@ export class TealscriptEngine {
     this.profileStatements = 0;
     this.profileExpressions = 0;
     this.profileBuiltinCalls = 0;
+  }
+
+  private inferStaticMaxBarsBack(ast: Program): number {
+    return this.inferStatementsMaxBarsBack(ast.body, [new Map()]);
+  }
+
+  private inferStatementsMaxBarsBack(statements: Statement[], collectionScopes: StaticCollectionScopes): number {
+    return statements.reduce((max, statement) => Math.max(max, this.inferStatementMaxBarsBack(statement, collectionScopes)), 0);
+  }
+
+  private inferStatementMaxBarsBack(statement: Statement, collectionScopes: StaticCollectionScopes): number {
+    switch (statement.type) {
+      case 'IndicatorDeclaration':
+        return Math.max(
+          this.inferExpressionMaxBarsBack(statement.title, collectionScopes),
+          this.inferOptionalExpressionsMaxBarsBack(collectionScopes, [
+            statement.shorttitle,
+            statement.overlay,
+            statement.format,
+            statement.precision,
+            statement.scale,
+            statement.max_bars_back,
+            statement.max_labels_count,
+            statement.max_lines_count,
+            statement.max_boxes_count,
+            statement.max_polylines_count,
+            statement.timeframe,
+            statement.timeframe_gaps,
+            statement.explicit_plot_zorder,
+            statement.behind_chart,
+            statement.calc_bars_count,
+            statement.dynamic_requests,
+            statement.initial_capital,
+            statement.currency,
+            statement.default_qty_type,
+            statement.default_qty_value,
+            statement.pyramiding,
+            statement.commission_type,
+            statement.commission_value,
+            statement.slippage,
+            statement.margin_long,
+            statement.margin_short,
+            statement.calc_on_order_fills,
+            statement.calc_on_every_tick,
+            statement.process_orders_on_close,
+            statement.use_bar_magnifier,
+          ]),
+        );
+      case 'LibraryDeclaration':
+        return Math.max(
+          this.inferExpressionMaxBarsBack(statement.title, collectionScopes),
+          this.inferOptionalExpressionsMaxBarsBack(collectionScopes, [
+            statement.overlay,
+            statement.dynamic_requests,
+          ]),
+        );
+      case 'TypeDeclaration':
+        return statement.fields.reduce(
+          (max, field) => Math.max(max, field.defaultValue ? this.inferExpressionMaxBarsBack(field.defaultValue, collectionScopes) : 0),
+          0,
+        );
+      case 'EnumDeclaration':
+        return 0;
+      case 'FunctionDeclaration':
+        return this.withStaticCollectionScope(collectionScopes, () => {
+          for (const param of statement.params) {
+            this.setStaticCollectionName(param.name, this.isCollectionTypeAnnotation(param.typeAnnotation), collectionScopes);
+          }
+          return Math.max(
+            this.inferOptionalExpressionsMaxBarsBack(
+              collectionScopes,
+              statement.params.map((param) => param.defaultValue),
+            ),
+            this.inferFunctionBodyMaxBarsBack(statement.body, collectionScopes),
+          );
+        });
+      case 'VariableDeclaration': {
+        const initMax = this.inferInitializerMaxBarsBack(statement.init, collectionScopes);
+        const isCollection = this.isCollectionTypeAnnotation(statement.typeAnnotation)
+          || (statement.init.type !== 'IfStatement' && this.expressionReturnsCollection(statement.init, collectionScopes));
+        if (statement.names.type === 'VariableDeclarator') {
+          this.setStaticCollectionName(statement.names.name.name, isCollection, collectionScopes);
+        } else {
+          for (const name of statement.names.names) {
+            this.setStaticCollectionName(name.name, false, collectionScopes);
+          }
+        }
+        return initMax;
+      }
+      case 'AssignmentStatement': {
+        const rightMax = this.inferExpressionMaxBarsBack(statement.right, collectionScopes);
+        if (statement.left.type === 'Identifier') {
+          this.assignStaticCollectionName(
+            statement.left.name,
+            this.expressionReturnsCollection(statement.right, collectionScopes),
+            collectionScopes,
+          );
+        }
+        return Math.max(
+          this.inferAssignmentTargetMaxBarsBack(statement.left, collectionScopes),
+          rightMax,
+        );
+      }
+      case 'ExpressionStatement':
+        return this.inferExpressionMaxBarsBack(statement.expression, collectionScopes);
+      case 'IfStatement':
+        return Math.max(
+          this.inferExpressionMaxBarsBack(statement.test, collectionScopes),
+          this.withStaticCollectionScope(
+            collectionScopes,
+            () => this.inferStatementsMaxBarsBack(statement.consequent, collectionScopes),
+          ),
+          this.inferIfAlternateMaxBarsBack(statement.alternate, collectionScopes),
+        );
+      case 'ForStatement':
+        if (statement.kind === 'collection') {
+          return Math.max(
+            this.inferExpressionMaxBarsBack(statement.iterable, collectionScopes),
+            this.withStaticCollectionScope(collectionScopes, () => {
+              this.setStaticCollectionName(statement.counter.name, false, collectionScopes);
+              if (statement.indexCounter) this.setStaticCollectionName(statement.indexCounter.name, false, collectionScopes);
+              return this.inferStatementsMaxBarsBack(statement.body, collectionScopes);
+            }),
+          );
+        }
+        return Math.max(
+          this.inferExpressionMaxBarsBack(statement.start, collectionScopes),
+          this.inferExpressionMaxBarsBack(statement.end, collectionScopes),
+          statement.step ? this.inferExpressionMaxBarsBack(statement.step, collectionScopes) : 0,
+          this.withStaticCollectionScope(collectionScopes, () => {
+            this.setStaticCollectionName(statement.counter.name, false, collectionScopes);
+            return this.inferStatementsMaxBarsBack(statement.body, collectionScopes);
+          }),
+        );
+      case 'WhileStatement':
+        return Math.max(
+          this.inferExpressionMaxBarsBack(statement.test, collectionScopes),
+          this.withStaticCollectionScope(
+            collectionScopes,
+            () => this.inferStatementsMaxBarsBack(statement.body, collectionScopes),
+          ),
+        );
+      case 'ImportDeclaration':
+      case 'BreakStatement':
+      case 'ContinueStatement':
+        return 0;
+    }
+  }
+
+  private inferExpressionMaxBarsBack(expression: Expression, collectionScopes: StaticCollectionScopes): number {
+    switch (expression.type) {
+      case 'NumericLiteral':
+      case 'StringLiteral':
+      case 'BooleanLiteral':
+      case 'ColorLiteral':
+      case 'Identifier':
+      case 'NaExpression':
+        return 0;
+      case 'BinaryExpression':
+        return Math.max(
+          this.inferExpressionMaxBarsBack(expression.left, collectionScopes),
+          this.inferExpressionMaxBarsBack(expression.right, collectionScopes),
+        );
+      case 'UnaryExpression':
+        return this.inferExpressionMaxBarsBack(expression.argument, collectionScopes);
+      case 'ConditionalExpression':
+        return Math.max(
+          this.inferExpressionMaxBarsBack(expression.test, collectionScopes),
+          this.inferExpressionMaxBarsBack(expression.consequent, collectionScopes),
+          this.inferExpressionMaxBarsBack(expression.alternate, collectionScopes),
+        );
+      case 'SwitchExpression':
+        return Math.max(
+          expression.discriminant ? this.inferExpressionMaxBarsBack(expression.discriminant, collectionScopes) : 0,
+          expression.cases.reduce(
+            (max, switchCase) => Math.max(
+              max,
+              switchCase.test ? this.inferExpressionMaxBarsBack(switchCase.test, collectionScopes) : 0,
+              Array.isArray(switchCase.consequent)
+                ? this.withStaticCollectionScope(
+                  collectionScopes,
+                  () => this.inferStatementsMaxBarsBack(switchCase.consequent as Statement[], collectionScopes),
+                )
+                : this.inferExpressionMaxBarsBack(switchCase.consequent, collectionScopes),
+            ),
+            0,
+          ),
+        );
+      case 'ForStatement':
+      case 'WhileStatement':
+        return this.inferStatementMaxBarsBack(expression, collectionScopes);
+      case 'CallExpression':
+        return Math.max(
+          this.inferExpressionMaxBarsBack(expression.callee, collectionScopes),
+          expression.arguments.reduce(
+            (max, argument) => Math.max(max, this.inferExpressionMaxBarsBack(argument.value, collectionScopes)),
+            0,
+          ),
+        );
+      case 'MemberExpression':
+        return this.inferExpressionMaxBarsBack(expression.object, collectionScopes);
+      case 'IndexExpression': {
+        const indexMax = this.inferExpressionMaxBarsBack(expression.index, collectionScopes);
+        const objectMax = this.inferExpressionMaxBarsBack(expression.object, collectionScopes);
+        const offset = this.literalHistoryOffset(expression);
+        if (offset === null || this.expressionReturnsCollection(expression.object, collectionScopes)) {
+          return Math.max(indexMax, objectMax);
+        }
+        return Math.max(indexMax, objectMax, offset);
+      }
+      case 'ArrayExpression':
+        return expression.elements.reduce(
+          (max, element) => Math.max(max, this.inferExpressionMaxBarsBack(element, collectionScopes)),
+          0,
+        );
+    }
+  }
+
+  private inferFunctionBodyMaxBarsBack(body: FunctionDeclaration['body'], collectionScopes: StaticCollectionScopes): number {
+    return Array.isArray(body)
+      ? this.inferStatementsMaxBarsBack(body, collectionScopes)
+      : this.inferExpressionMaxBarsBack(body, collectionScopes);
+  }
+
+  private inferInitializerMaxBarsBack(init: VariableDeclaration['init'], collectionScopes: StaticCollectionScopes): number {
+    return init.type === 'IfStatement'
+      ? this.inferStatementMaxBarsBack(init, collectionScopes)
+      : this.inferExpressionMaxBarsBack(init, collectionScopes);
+  }
+
+  private inferAssignmentTargetMaxBarsBack(target: AssignmentStatement['left'], collectionScopes: StaticCollectionScopes): number {
+    if (target.type === 'Identifier') return 0;
+    if (target.type === 'MemberExpression') return this.inferExpressionMaxBarsBack(target.object, collectionScopes);
+    return Math.max(
+      this.inferExpressionMaxBarsBack(target.object, collectionScopes),
+      this.inferExpressionMaxBarsBack(target.index, collectionScopes),
+    );
+  }
+
+  private inferOptionalExpressionsMaxBarsBack(
+    collectionScopes: StaticCollectionScopes,
+    expressions: Array<Expression | undefined>,
+  ): number {
+    return expressions.reduce(
+      (max, expression) => Math.max(max, expression ? this.inferExpressionMaxBarsBack(expression, collectionScopes) : 0),
+      0,
+    );
+  }
+
+  private inferIfAlternateMaxBarsBack(alternate: IfStatement['alternate'], collectionScopes: StaticCollectionScopes): number {
+    if (!alternate) return 0;
+    return Array.isArray(alternate)
+      ? this.withStaticCollectionScope(
+        collectionScopes,
+        () => this.inferStatementsMaxBarsBack(alternate, collectionScopes),
+      )
+      : this.inferStatementMaxBarsBack(alternate, collectionScopes);
+  }
+
+  private isCollectionTypeAnnotation(typeAnnotation: TypeAnnotation | null | undefined): boolean {
+    return typeAnnotation?.baseType === 'array' || typeAnnotation?.baseType === 'matrix' || typeAnnotation?.baseType === 'map';
+  }
+
+  private expressionReturnsCollection(expression: Expression, collectionScopes: StaticCollectionScopes): boolean {
+    if (expression.type === 'ArrayExpression') return true;
+    if (expression.type === 'Identifier') return this.isStaticCollectionName(expression.name, collectionScopes);
+    if (expression.type !== 'CallExpression') return false;
+
+    const name = this.getCallExpressionName(expression);
+    return !!name && (
+      name.startsWith('array.')
+      || name.startsWith('matrix.')
+      || name === 'str.split'
+      || name === 'request.security_lower_tf'
+    );
+  }
+
+  private withStaticCollectionScope<T>(collectionScopes: StaticCollectionScopes, callback: () => T): T {
+    collectionScopes.push(new Map());
+    try {
+      return callback();
+    } finally {
+      collectionScopes.pop();
+    }
+  }
+
+  private setStaticCollectionName(name: string, isCollection: boolean, collectionScopes: StaticCollectionScopes): void {
+    collectionScopes[collectionScopes.length - 1].set(name, isCollection);
+  }
+
+  private assignStaticCollectionName(name: string, isCollection: boolean, collectionScopes: StaticCollectionScopes): void {
+    for (let index = collectionScopes.length - 1; index >= 0; index--) {
+      if (collectionScopes[index].has(name)) {
+        collectionScopes[index].set(name, isCollection);
+        return;
+      }
+    }
+    this.setStaticCollectionName(name, isCollection, collectionScopes);
+  }
+
+  private isStaticCollectionName(name: string, collectionScopes: StaticCollectionScopes): boolean {
+    for (let index = collectionScopes.length - 1; index >= 0; index--) {
+      const collectionState = collectionScopes[index].get(name);
+      if (collectionState !== undefined) return collectionState;
+    }
+    return false;
+  }
+
+  private getCallExpressionName(expression: CallExpression): string | null {
+    if (expression.callee.type === 'Identifier') return expression.callee.name;
+    if (expression.callee.type === 'MemberExpression') {
+      return this.getMemberPath(expression.callee)?.join('.') ?? null;
+    }
+    return null;
+  }
+
+  private literalHistoryOffset(expression: IndexExpression): number | null {
+    if (expression.index.type !== 'NumericLiteral') return null;
+    return this.normalizeIndexOffset(expression.index.value);
   }
 
   /**

@@ -258,8 +258,8 @@ Phases:
 3. Complete assignment and mutability semantics for identifiers, UDT fields,
    array/map/matrix indexes, compound assignments, and invalid targets.
 4. Complete historical series commitment and function-local series behavior.
-5. Maintain explicit `max_bars_back` enforcement and add inferred runtime buffer
-   sizing when corpus evidence requires it.
+5. Maintain explicit `max_bars_back` enforcement and broaden inferred runtime
+   buffer sizing beyond static literal offsets when corpus evidence requires it.
 6. Add stable runtime error payloads and `runtime.error()` coverage.
 7. Add focused fixtures for common public-script idioms that previously parsed
    but failed or drifted at runtime.
