@@ -211,6 +211,15 @@ const INDICATOR_DECLARATION_BOOL_OPTIONS = [
   'behind_chart',
   'dynamic_requests',
 ] as const;
+const INDICATOR_DECLARATION_NUMERIC_OPTIONS = [
+  'precision',
+  'max_bars_back',
+  'max_labels_count',
+  'max_lines_count',
+  'max_boxes_count',
+  'max_polylines_count',
+  'calc_bars_count',
+] as const;
 const LIBRARY_DECLARATION_BOOL_OPTIONS = [
   'overlay',
   'dynamic_requests',
@@ -2652,6 +2661,7 @@ class SemanticChecker {
       `${statement.declarationKind} max_polylines_count must be a non-negative integer`,
     );
     this.checkDeclarationBooleanOptions(statement, scope, INDICATOR_DECLARATION_BOOL_OPTIONS, statement.declarationKind);
+    this.checkDeclarationNumericOptions(statement, scope, INDICATOR_DECLARATION_NUMERIC_OPTIONS, statement.declarationKind);
     if (statement.declarationKind === 'strategy') {
       this.checkStrategyDeclarationLiteralValueConstraints(statement);
       this.checkStrategyDeclarationBooleanOptions(statement, scope);
@@ -4977,6 +4987,27 @@ class SemanticChecker {
       this.addDiagnostic(
         'type-mismatch',
         `${declarationKind} ${optionName} must be a boolean, got ${this.formatSemanticType(type)}`,
+        expression.loc,
+      );
+    }
+  }
+
+  private checkDeclarationNumericOptions(
+    statement: IndicatorDeclaration,
+    scope: SemanticScope,
+    optionNames: readonly (keyof IndicatorDeclaration & string)[],
+    declarationKind: string,
+  ): void {
+    for (const optionName of optionNames) {
+      const expression = statement[optionName as keyof typeof statement] as Expression | undefined;
+      if (!expression) continue;
+
+      const type = this.inferExpressionType(expression, scope);
+      if (type.kind === 'unknown' || type.kind === 'int' || type.kind === 'float') continue;
+
+      this.addDiagnostic(
+        'type-mismatch',
+        `${declarationKind} ${optionName} must be a number, got ${this.formatSemanticType(type)}`,
         expression.loc,
       );
     }
