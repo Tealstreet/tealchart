@@ -170,6 +170,25 @@ export interface StrategyLedgerSettings {
   closeEntriesRule: 'FIFO' | 'ANY';
   fillOrdersOnStandardOhlc: boolean;
   maxPositionSize: number | null;
+  riskRules: StrategyRiskRules;
+}
+
+export interface StrategyCashOrPercentRiskRule {
+  value: number;
+  type: 'cash' | 'percent_of_equity';
+  alertMessage?: string;
+}
+
+export interface StrategyCountRiskRule {
+  count: number;
+  alertMessage?: string;
+}
+
+export interface StrategyRiskRules {
+  maxDrawdown: StrategyCashOrPercentRiskRule | null;
+  maxIntradayLoss: StrategyCashOrPercentRiskRule | null;
+  maxIntradayFilledOrders: StrategyCountRiskRule | null;
+  maxConsLossDays: StrategyCountRiskRule | null;
 }
 
 export interface StrategyOrder {
@@ -332,6 +351,12 @@ export function createDefaultStrategySettings(settings: Partial<StrategyLedgerSe
     closeEntriesRule: 'FIFO',
     fillOrdersOnStandardOhlc: false,
     maxPositionSize: null,
+    riskRules: {
+      maxDrawdown: null,
+      maxIntradayLoss: null,
+      maxIntradayFilledOrders: null,
+      maxConsLossDays: null,
+    },
     ...settings,
   };
 }
@@ -371,7 +396,7 @@ export function createStrategyLedger(settings: Partial<StrategyLedgerSettings> =
 
 export function cloneStrategyLedger(ledger: StrategyLedger): StrategyLedger {
   return {
-    settings: { ...ledger.settings },
+    settings: { ...ledger.settings, riskRules: { ...ledger.settings.riskRules } },
     orders: ledger.orders.map((order) => ({ ...order })),
     fills: ledger.fills.map((fill) => ({ ...fill })),
     openTrades: ledger.openTrades.map((trade) => ({ ...trade })),

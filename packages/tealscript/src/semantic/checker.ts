@@ -535,6 +535,7 @@ const STRATEGY_EXIT_PARAMS = [
 const STRATEGY_DIRECTION_VALUES = new Set(['long', 'short']);
 const STRATEGY_ALLOWED_ENTRY_DIRECTION_VALUES = new Set(['all', 'long', 'short']);
 const STRATEGY_OCA_TYPE_VALUES = new Set(['cancel', 'reduce', 'none']);
+const STRATEGY_CASH_OR_PERCENT_RISK_TYPE_VALUES = new Set(['cash', 'percent_of_equity']);
 const STRATEGY_TRADE_ACCESSORS = [
   'entry_id',
   'entry_comment',
@@ -1106,6 +1107,10 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['strategy.exit', { params: STRATEGY_EXIT_PARAMS, minArgs: 1, maxArgs: STRATEGY_EXIT_PARAMS.length, allowNamedPrefixWithPositional: true }],
   ['strategy.order', { params: STRATEGY_ORDER_PARAMS, minArgs: 2, maxArgs: STRATEGY_ORDER_PARAMS.length, allowNamedPrefixWithPositional: true }],
   ['strategy.risk.allow_entry_in', { params: ['value'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['strategy.risk.max_cons_loss_days', { params: ['count', 'alert_message'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['strategy.risk.max_drawdown', { params: ['value', 'type', 'alert_message'], minArgs: 2, maxArgs: 3, allowNamedPrefixWithPositional: true }],
+  ['strategy.risk.max_intraday_filled_orders', { params: ['count', 'alert_message'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['strategy.risk.max_intraday_loss', { params: ['value', 'type', 'alert_message'], minArgs: 2, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['strategy.risk.max_position_size', { params: ['contracts'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['ta.alma', { params: ['series', 'length', 'offset', 'sigma', 'floor'], minArgs: 4, maxArgs: 5, allowNamedPrefixWithPositional: true }],
   ['ta.atr', { params: ['length'], minArgs: 1, maxArgs: 1 }],
@@ -3446,6 +3451,28 @@ class SemanticChecker {
           'strategy.risk.max_position_size contracts must be a positive number',
         );
         return;
+      case 'strategy.risk.max_drawdown':
+        this.checkStrategyCashOrPercentRiskRuleArguments(expression, 'strategy.risk.max_drawdown');
+        return;
+      case 'strategy.risk.max_intraday_loss':
+        this.checkStrategyCashOrPercentRiskRuleArguments(expression, 'strategy.risk.max_intraday_loss');
+        return;
+      case 'strategy.risk.max_intraday_filled_orders':
+        this.checkPositiveLiteralNumberArgument(
+          expression,
+          'count',
+          0,
+          'strategy.risk.max_intraday_filled_orders count must be a positive number',
+        );
+        return;
+      case 'strategy.risk.max_cons_loss_days':
+        this.checkPositiveLiteralNumberArgument(
+          expression,
+          'count',
+          0,
+          'strategy.risk.max_cons_loss_days count must be a positive number',
+        );
+        return;
       default:
         return;
     }
@@ -3481,6 +3508,18 @@ class SemanticChecker {
     const value = this.strategyConstantStringValue(argument);
     if (value !== undefined && !STRATEGY_ALLOWED_ENTRY_DIRECTION_VALUES.has(value)) {
       this.addDiagnostic('type-mismatch', `Invalid strategy entry direction: ${value}`, argument.loc);
+    }
+  }
+
+  private checkStrategyCashOrPercentRiskRuleArguments(expression: CallExpression, displayName: string): void {
+    this.checkPositiveLiteralNumberArgument(expression, 'value', 0, `${displayName} value must be a positive number`);
+
+    const argument = this.getCallArgument(expression.arguments, 'type', 1);
+    if (!argument) return;
+
+    const value = this.strategyConstantStringValue(argument);
+    if (value !== undefined && !STRATEGY_CASH_OR_PERCENT_RISK_TYPE_VALUES.has(value)) {
+      this.addDiagnostic('type-mismatch', `Invalid strategy risk type for ${displayName}: ${value}`, argument.loc);
     }
   }
 
