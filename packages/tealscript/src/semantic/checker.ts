@@ -1322,6 +1322,45 @@ const DECLARATION_SCALE_CONSTANT_VALUES = new Map([
   ['scale.none', 'none'],
 ]);
 
+const PLOT_STYLE_VALUES = new Set([
+  'line',
+  'linebr',
+  'stepline',
+  'steplinebr',
+  'stepline_diamond',
+  'histogram',
+  'circles',
+  'cross',
+  'columns',
+  'area',
+  'areabr',
+]);
+const PLOT_STYLE_CONSTANT_VALUES = new Map([
+  ['plot.style_line', 'line'],
+  ['plot.style_linebr', 'linebr'],
+  ['plot.style_stepline', 'stepline'],
+  ['plot.style_steplinebr', 'steplinebr'],
+  ['plot.style_stepline_diamond', 'stepline_diamond'],
+  ['plot.style_histogram', 'histogram'],
+  ['plot.style_circles', 'circles'],
+  ['plot.style_cross', 'cross'],
+  ['plot.style_columns', 'columns'],
+  ['plot.style_area', 'area'],
+  ['plot.style_areabr', 'areabr'],
+]);
+
+const VISUAL_LINESTYLE_VALUES = new Set(['solid', 'dotted', 'dashed']);
+const PLOT_LINESTYLE_CONSTANT_VALUES = new Map([
+  ['plot.linestyle_solid', 'solid'],
+  ['plot.linestyle_dotted', 'dotted'],
+  ['plot.linestyle_dashed', 'dashed'],
+]);
+const HLINE_LINESTYLE_CONSTANT_VALUES = new Map([
+  ['hline.style_solid', 'solid'],
+  ['hline.style_dotted', 'dotted'],
+  ['hline.style_dashed', 'dashed'],
+]);
+
 for (const name of CALENDAR_FUNCTION_NAMES) {
   BUILTIN_SIGNATURES.set(name, { params: ['time', 'timezone'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true });
 }
@@ -2327,51 +2366,51 @@ class SemanticChecker {
   }
 
   private checkDeclarationFormatValue(expression: Expression | undefined, declarationKind: string): void {
-    this.checkDeclarationConstantStringValue(
+    this.checkNamespacedConstantStringValue(
       expression,
       DECLARATION_FORMAT_VALUES,
       DECLARATION_FORMAT_CONSTANT_VALUES,
-      'format',
+      'format.',
       `Invalid ${declarationKind} format`,
     );
   }
 
   private checkDeclarationScaleValue(expression: Expression | undefined, declarationKind: string): void {
-    this.checkDeclarationConstantStringValue(
+    this.checkNamespacedConstantStringValue(
       expression,
       DECLARATION_SCALE_VALUES,
       DECLARATION_SCALE_CONSTANT_VALUES,
-      'scale',
+      'scale.',
       `Invalid ${declarationKind} scale`,
     );
   }
 
-  private checkDeclarationConstantStringValue(
+  private checkNamespacedConstantStringValue(
     expression: Expression | undefined,
     allowedValues: Set<string>,
     constantValues: Map<string, string>,
-    namespace: string,
+    namespacePrefix: string,
     messagePrefix: string,
   ): void {
     if (!expression) return;
 
-    const value = this.declarationConstantStringValue(expression, constantValues, namespace);
+    const value = this.namespacedConstantStringValue(expression, constantValues, namespacePrefix);
     if (value !== undefined && !allowedValues.has(value)) {
       this.addDiagnostic('type-mismatch', `${messagePrefix}: ${value}`, expression.loc);
     }
   }
 
-  private declarationConstantStringValue(
+  private namespacedConstantStringValue(
     expression: Expression,
     constantValues: Map<string, string>,
-    namespace: string,
+    namespacePrefix: string,
   ): string | undefined {
     const value = this.constantLiteralValue(expression);
     if (typeof value === 'string') return value;
 
     const path = this.memberPath(expression).join('.');
     if (constantValues.has(path)) return constantValues.get(path);
-    return path.startsWith(`${namespace}.`) ? path : undefined;
+    return path.startsWith(namespacePrefix) ? path : undefined;
   }
 
   private checkDeclarationKnownProperties(statement: object, allowedKeys: Set<string>, displayName: string): void {
@@ -3124,6 +3163,7 @@ class SemanticChecker {
     this.checkMaxBarsBackLiteralArguments(expression);
     this.checkRequestCalcBarsCountLiteralArguments(expression);
     this.checkRequestBarmergeModeLiteralArguments(expression);
+    this.checkVisualLineStyleLiteralArguments(expression);
     this.checkStrategyLiteralArgumentConstraints(expression);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
@@ -3844,6 +3884,45 @@ class SemanticChecker {
     const value = this.constantLiteralValue(expression);
     if (typeof value === 'string' && !allowedValues.has(value)) {
       this.addDiagnostic('type-mismatch', `${messagePrefix}: ${value}`, expression.loc);
+    }
+  }
+
+  private checkVisualLineStyleLiteralArguments(expression: CallExpression): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const signature = BUILTIN_SIGNATURES.get(calleeName);
+    if (!signature) return;
+
+    switch (calleeName) {
+      case 'plot': {
+        const style = this.resolveCallArgumentExpression(expression, signature.params, signature.params.indexOf('style'));
+        this.checkNamespacedConstantStringValue(
+          style,
+          PLOT_STYLE_VALUES,
+          PLOT_STYLE_CONSTANT_VALUES,
+          'plot.style_',
+          'Invalid plot style',
+        );
+        const linestyle = this.resolveCallArgumentExpression(expression, signature.params, signature.params.indexOf('linestyle'));
+        this.checkNamespacedConstantStringValue(
+          linestyle,
+          VISUAL_LINESTYLE_VALUES,
+          PLOT_LINESTYLE_CONSTANT_VALUES,
+          'plot.linestyle_',
+          'Invalid plot linestyle',
+        );
+        break;
+      }
+      case 'hline': {
+        const linestyle = this.resolveCallArgumentExpression(expression, signature.params, signature.params.indexOf('linestyle'));
+        this.checkNamespacedConstantStringValue(
+          linestyle,
+          VISUAL_LINESTYLE_VALUES,
+          HLINE_LINESTYLE_CONSTANT_VALUES,
+          'hline.style_',
+          'Invalid hline linestyle',
+        );
+        break;
+      }
     }
   }
 

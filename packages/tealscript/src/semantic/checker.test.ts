@@ -673,6 +673,24 @@ plotcandle(open, high, low, close, close=close)
     ]);
   });
 
+  it('reports invalid visual line style values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Visual Line Styles")
+plot(close, style="zigzag", linestyle=plot.linestyle_arrow)
+plot(open, "Bad Positional", color.blue, 1, plot.style_bad)
+hline(100, linestyle="dashdot")
+hline(200, "Bad Positional", color.red, hline.style_arrow)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid plot style: zigzag',
+      'Invalid plot linestyle: plot.linestyle_arrow',
+      'Invalid plot style: plot.style_bad',
+      'Invalid hline linestyle: dashdot',
+      'Invalid hline linestyle: hline.style_arrow',
+    ]);
+  });
+
   it('reports invalid marker visual output argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Invalid Marker Visual Bindings")
