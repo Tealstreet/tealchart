@@ -521,7 +521,7 @@ impact.
    argument signatures, marker `plotchar()` / `plotarrow()` missing, unknown,
    and duplicate argument diagnostics, typed `input.*` default and literal
    constraint diagnostics, and `input.int()` / `input.float()` range-vs-options
-   overload diagnostics, plus literal strategy order value diagnostics and
+   overload diagnostics, plus literal strategy order value and arity diagnostics and
    declaration argument diagnostics, covered while using corpus failures to
    prioritize remaining named/positional overload gaps.
 6. Visual output payload audit: keep marker dynamic text-color payloads,
