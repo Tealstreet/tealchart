@@ -164,7 +164,8 @@ strategy("Test strategy",
     calc_on_order_fills=true,
     calc_on_every_tick=true,
     process_orders_on_close=true,
-    use_bar_magnifier=true)
+    use_bar_magnifier=true,
+    risk_free_rate=1.75)
 plot(strategy.equity)
 plot(strategy.position_size)`;
 
@@ -190,6 +191,7 @@ plot(strategy.position_size)`;
         calcOnEveryTick: true,
         processOrdersOnClose: true,
         useBarMagnifier: true,
+        riskFreeRate: 1.75,
       });
       expect(result.strategy.equity).toBe(25000);
       expect(result.plots.map((plot) => plot.values)).toEqual([[25000], [0]]);
@@ -197,7 +199,7 @@ plot(strategy.position_size)`;
 
     it('applies strategy named-prefix positional tail settings', () => {
       const script = `//@version=6
-strategy(title="Mixed strategy", "Mixed", true, format.price, 3, scale.right, 100, "60", true, false, true, 10, 20, 30, 40, 50, true, 25000, "EUR", strategy.percent_of_equity, 10, 2, strategy.commission.percent, 0.05, 1, 50, 60, true, true, true, true)
+strategy(title="Mixed strategy", "Mixed", true, format.price, 3, scale.right, 100, "60", true, false, true, 10, 20, 30, 40, 50, true, 25000, "EUR", strategy.percent_of_equity, 10, 2, strategy.commission.percent, 0.05, 1, 50, 60, true, true, true, true, 1.75)
 plot(strategy.equity)`;
 
       const result = executeScript(parse(script), createBars(1));
@@ -220,6 +222,7 @@ plot(strategy.equity)`;
         calcOnEveryTick: true,
         processOrdersOnClose: true,
         useBarMagnifier: true,
+        riskFreeRate: 1.75,
       });
     });
 
@@ -236,7 +239,8 @@ strategy("Zero settings",
     calc_on_order_fills=false,
     calc_on_every_tick=false,
     process_orders_on_close=false,
-    use_bar_magnifier=false)
+    use_bar_magnifier=false,
+    risk_free_rate=0)
 plot(strategy.initial_capital)`;
 
       const result = executeScript(parse(script), createBars(1));
@@ -254,9 +258,17 @@ plot(strategy.initial_capital)`;
         calcOnEveryTick: false,
         processOrdersOnClose: false,
         useBarMagnifier: false,
+        riskFreeRate: 0,
       });
       expect(result.strategy.equity).toBe(0);
       expect(result.plots[0]?.values).toEqual([0]);
+    });
+
+    it('uses the official default strategy risk-free rate', () => {
+      const result = executeScript(parse('//@version=6\nstrategy("Defaults")\nplot(strategy.equity)\n'), createBars(1));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.settings.riskFreeRate).toBe(2);
     });
 
     it('records lower-timeframe strategy execution paths when bar magnifier data is available', () => {

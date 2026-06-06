@@ -1253,6 +1253,7 @@ const STRATEGY_DECLARATION_KEYS = new Set([
   'calc_on_every_tick',
   'process_orders_on_close',
   'use_bar_magnifier',
+  'risk_free_rate',
 ]);
 
 const LIBRARY_DECLARATION_KEYS = new Set([
@@ -2107,6 +2108,7 @@ class SemanticChecker {
           statement.calc_on_every_tick,
           statement.process_orders_on_close,
           statement.use_bar_magnifier,
+          statement.risk_free_rate,
         ]);
         break;
       case 'LibraryDeclaration':
