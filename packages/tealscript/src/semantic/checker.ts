@@ -194,6 +194,10 @@ const ALERT_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>(
 const ALERT_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['alertcondition', ['condition']],
 ]);
+const GLOBAL_NON_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['fixnan', ['source']],
+  ['nz', ['source', 'replacement']],
+]);
 const REQUEST_GAPS_MODES = new Set(['barmerge.gaps_on', 'barmerge.gaps_off']);
 const REQUEST_LOOKAHEAD_MODES = new Set(['barmerge.lookahead_on', 'barmerge.lookahead_off']);
 const REQUEST_BARMERGE_MODE_CALLS = new Set([
@@ -3696,6 +3700,7 @@ class SemanticChecker {
     this.checkMathFunctionArgumentTypes(expression, scope);
     this.checkTaFunctionArgumentTypes(expression, scope);
     this.checkTimeFunctionArgumentTypes(expression, scope);
+    this.checkGlobalFunctionArgumentTypes(expression, scope);
     this.checkMaxBarsBackLiteralArguments(expression);
     this.checkAlertFrequencyLiteralArguments(expression);
     this.checkAlertStringOptionArguments(expression, scope);
@@ -4295,6 +4300,20 @@ class SemanticChecker {
     }
   }
 
+  private checkGlobalFunctionArgumentTypes(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const nonBoolParameterNames = GLOBAL_NON_BOOL_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!nonBoolParameterNames) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of nonBoolParameterNames) {
+      this.checkBuiltinArgumentNotBool(expression, scope, calleeName, signature.params, parameterName);
+    }
+  }
+
   private checkBuiltinArgumentKind(
     expression: CallExpression,
     scope: SemanticScope,
@@ -4319,6 +4338,29 @@ class SemanticChecker {
     this.addDiagnostic(
       'type-mismatch',
       `${calleeName} ${parameterName} must be a ${expectedKind}, got ${this.formatSemanticType(argumentType)}`,
+      argument.loc,
+    );
+  }
+
+  private checkBuiltinArgumentNotBool(
+    expression: CallExpression,
+    scope: SemanticScope,
+    calleeName: string,
+    parameterNames: readonly string[],
+    parameterName: string,
+  ): void {
+    const parameterIndex = parameterNames.indexOf(parameterName);
+    if (parameterIndex === -1) return;
+
+    const argument = this.resolveCallArgumentExpression(expression, parameterNames, parameterIndex);
+    if (!argument) return;
+
+    const argumentType = this.inferExpressionType(argument, scope);
+    if (argumentType.kind !== 'bool') return;
+
+    this.addDiagnostic(
+      'type-mismatch',
+      `${calleeName} ${parameterName} cannot be a boolean`,
       argument.loc,
     );
   }

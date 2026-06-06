@@ -578,7 +578,8 @@ plotting or comparing them. `nz()` supports default-zero and explicit
 replacement forms, `fixnan()` carries forward the previous non-`na` value per
 call site, and both helpers reject bool arguments per Pine v6 behavior.
 Semantic analysis preserves known `nz()` and `fixnan()` return types for
-downstream assignment diagnostics.
+downstream assignment diagnostics and rejects bool `nz()` / `fixnan()`
+arguments before runtime.
 
 ## Pine Logs Coverage
 
