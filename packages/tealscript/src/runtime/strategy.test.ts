@@ -13,6 +13,7 @@ import {
   fillPendingStrategyOrdersOnTicks,
   fillStrategyMarketOrder,
   InMemoryStrategyIntrabarDatafeed,
+  markStrategyLedgerToMarket,
   selectStrategyIntrabarContext,
   strategyIntrabarContextKey,
   submitStrategyOrder,
@@ -281,6 +282,45 @@ describe('strategy ledger model', () => {
       avgPrice: 100.5,
       openProfit: 12,
     });
+  });
+
+  it('records and replaces equity curve points when marked with bar metadata', () => {
+    const ledger = createStrategyLedger({ initialCapital: 1_000 });
+    const order = submitStrategyOrder(ledger, {
+      id: 'Long',
+      direction: 'long',
+      qty: 1,
+      qtyType: 'fixed',
+      qtyValue: 1,
+      barIndex: 0,
+      time: 100,
+    });
+    fillStrategyMarketOrder(ledger, order, 100, 0, 100);
+
+    markStrategyLedgerToMarket(ledger, 105, 110, 95, { barIndex: 0, time: 100 });
+    markStrategyLedgerToMarket(ledger, 104, 108, 96, { barIndex: 0, time: 100 });
+    markStrategyLedgerToMarket(ledger, 98, 100, 97, { barIndex: 1, time: 200 });
+
+    expect(ledger.equityCurve).toEqual([
+      {
+        barIndex: 0,
+        time: 100,
+        equity: 1_004,
+        openProfit: 4,
+        netProfit: 0,
+        drawdown: 0,
+        runup: 4,
+      },
+      {
+        barIndex: 1,
+        time: 200,
+        equity: 998,
+        openProfit: -2,
+        netProfit: 0,
+        drawdown: 6,
+        runup: 0,
+      },
+    ]);
   });
 
   it('creates, submits, and cancels pending orders', () => {
