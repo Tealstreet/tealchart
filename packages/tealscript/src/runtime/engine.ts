@@ -4872,6 +4872,10 @@ export class TealscriptEngine {
     }
   }
 
+  private recordLookbackLength(length: number): void {
+    this.inferredMaxBarsBack = Math.max(this.inferredMaxBarsBack, Math.max(0, length - 1));
+  }
+
   private readExpressionHistory(expression: Expression, currentValue: unknown, offset: number): unknown {
     let entry = this.expressionHistory.get(expression);
     if (!entry) {
@@ -7602,6 +7606,7 @@ export class TealscriptEngine {
       const mathSumArgs = ['source', 'length'];
       const source = this.toNumber(this.getOrderedCallArg(args, namedArgs, mathSumArgs, 0));
       const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, mathSumArgs, 1));
+      this.recordLookbackLength(length);
       const values = this.getCompleteNonNaSourceWindow(scope, `_math_sum_source_${callId}`, source, length);
       return values ? values.reduce((sum, value) => sum + value, 0) : Number.NaN;
     });
