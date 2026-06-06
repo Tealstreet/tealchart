@@ -2500,9 +2500,9 @@ plot(strategy.position_size)`;
       const result = executeScript(parse(script), bars);
 
       expect(result.errors).toEqual([]);
-      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long']);
-      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Long']);
-      expect(result.plots[0]?.values).toEqual([1, 1]);
+      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long', 'Risk Close All']);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Long', 'Risk Close All']);
+      expect(result.plots[0]?.values).toEqual([0, 0]);
     });
 
     it('cancels excess pending non-exit fills after strategy.risk.max_intraday_filled_orders is reached', () => {
@@ -2528,12 +2528,13 @@ plot(strategy.position_size)`;
       }))).toEqual([
         { id: 'A', status: 'filled', filledQty: 1 },
         { id: 'B', status: 'cancelled', filledQty: 0 },
+        { id: 'Risk Close All', status: 'filled', filledQty: 1 },
       ]);
-      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['A']);
-      expect(result.plots[0]?.values).toEqual([0, 1]);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['A', 'Risk Close All']);
+      expect(result.plots[0]?.values).toEqual([0, 0]);
     });
 
-    it('allows restricted close-only entries after strategy.risk.max_intraday_filled_orders is reached', () => {
+    it('force-closes before restricted close-only entries after strategy.risk.max_intraday_filled_orders is reached', () => {
       const script = `//@version=6
 strategy("Close-only after intraday cap", process_orders_on_close=true)
 strategy.risk.max_intraday_filled_orders(count=1)
@@ -2551,16 +2552,16 @@ plot(strategy.position_size)`;
       const result = executeScript(parse(script), bars);
 
       expect(result.errors).toEqual([]);
-      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['RawLong', 'CloseOnlyShort']);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['RawLong', 'Risk Close All']);
       expect(result.strategy.orders.map((order) => ({
         id: order.id,
         status: order.status,
         requestedQty: order.requestedQty,
       }))).toEqual([
         { id: 'RawLong', status: 'filled', requestedQty: 1 },
-        { id: 'CloseOnlyShort', status: 'filled', requestedQty: 0 },
+        { id: 'Risk Close All', status: 'filled', requestedQty: 1 },
       ]);
-      expect(result.plots[0]?.values).toEqual([1, 0]);
+      expect(result.plots[0]?.values).toEqual([0, 0]);
     });
 
     it('blocks new non-exit orders after strategy.risk.max_cons_loss_days is reached', () => {
@@ -2653,13 +2654,14 @@ plot(strategy.position_size)`;
       const result = executeScript(parse(script), bars);
 
       expect(result.errors).toEqual([]);
-      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long']);
+      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long', 'Risk Close All']);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Long', 'Risk Close All']);
       expect(result.strategy.equityCurve.map(({ equity, drawdown }) => ({ equity, drawdown }))).toEqual([
         { equity: 100_000, drawdown: 0 },
         { equity: 99_990, drawdown: 10 },
-        { equity: 99_991, drawdown: 9 },
+        { equity: 99_990, drawdown: 10 },
       ]);
-      expect(result.plots[0]?.values).toEqual([1, 1, 1]);
+      expect(result.plots[0]?.values).toEqual([1, 0, 0]);
     });
 
     it('blocks new non-exit orders after strategy.risk.max_intraday_loss percent is reached', () => {
@@ -2680,13 +2682,14 @@ plot(strategy.position_size)`;
       const result = executeScript(parse(script), bars);
 
       expect(result.errors).toEqual([]);
-      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long']);
+      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long', 'Risk Close All']);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Long', 'Risk Close All']);
       expect(result.strategy.equityCurve.map(({ equity, drawdown }) => ({ equity, drawdown }))).toEqual([
         { equity: 1000, drawdown: 0 },
         { equity: 988, drawdown: 12 },
-        { equity: 990, drawdown: 10 },
+        { equity: 988, drawdown: 12 },
       ]);
-      expect(result.plots[0]?.values).toEqual([2, 2, 2]);
+      expect(result.plots[0]?.values).toEqual([2, 0, 0]);
     });
 
     it('blocks new non-exit orders after strategy.risk.max_drawdown cash is reached', () => {
@@ -2707,13 +2710,14 @@ plot(strategy.position_size)`;
       const result = executeScript(parse(script), bars);
 
       expect(result.errors).toEqual([]);
-      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long']);
+      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long', 'Risk Close All']);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Long', 'Risk Close All']);
       expect(result.strategy.equityCurve.map(({ equity, drawdown }) => ({ equity, drawdown }))).toEqual([
         { equity: 100_000, drawdown: 0 },
         { equity: 99_990, drawdown: 10 },
-        { equity: 99_991, drawdown: 9 },
+        { equity: 99_990, drawdown: 10 },
       ]);
-      expect(result.plots[0]?.values).toEqual([1, 1, 1]);
+      expect(result.plots[0]?.values).toEqual([1, 0, 0]);
     });
 
     it('blocks new non-exit orders after strategy.risk.max_drawdown percent is reached', () => {
@@ -2734,13 +2738,14 @@ plot(strategy.position_size)`;
       const result = executeScript(parse(script), bars);
 
       expect(result.errors).toEqual([]);
-      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long']);
+      expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long', 'Risk Close All']);
+      expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Long', 'Risk Close All']);
       expect(result.strategy.equityCurve.map(({ equity, drawdown }) => ({ equity, drawdown }))).toEqual([
         { equity: 1000, drawdown: 0 },
         { equity: 988, drawdown: 12 },
-        { equity: 990, drawdown: 10 },
+        { equity: 988, drawdown: 12 },
       ]);
-      expect(result.plots[0]?.values).toEqual([2, 2, 2]);
+      expect(result.plots[0]?.values).toEqual([2, 0, 0]);
     });
 
     it('fills strategy.exit brackets and cancels the sibling OCA order', () => {

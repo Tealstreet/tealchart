@@ -6501,6 +6501,7 @@ export class TealscriptEngine {
       this.ctx.syminfo.mintick,
     );
     this.emitStrategyFillAlerts(fills);
+    this.enforceStrategyRiskStopForCurrentBar();
   }
 
   private fillPendingStrategyMarketOrdersForCurrentBar(): void {
@@ -6512,6 +6513,7 @@ export class TealscriptEngine {
       this.ctx.syminfo.mintick,
     );
     this.emitStrategyFillAlerts(fills);
+    this.enforceStrategyRiskStopForCurrentBar();
   }
 
   private markStrategyLedgerToMarketForCurrentBar(): void {
@@ -6523,6 +6525,7 @@ export class TealscriptEngine {
       barIndex: this.ctx.bar_index,
       time: this.ctx.time.get(0) ?? 0,
     });
+    this.enforceStrategyRiskStopForCurrentBar();
   }
 
   private markStrategyLedgerToMarketAtCurrentClose(): void {
@@ -6531,6 +6534,28 @@ export class TealscriptEngine {
     markStrategyLedgerToMarket(this.ctx.strategyLedger, close, close, close, {
       barIndex: this.ctx.bar_index,
       time: this.ctx.time.get(0) ?? 0,
+    });
+    this.enforceStrategyRiskStopForCurrentBar();
+  }
+
+  private enforceStrategyRiskStopForCurrentBar(): void {
+    const time = this.ctx.time.get(0) ?? 0;
+    if (!hasReachedStrategyOrderRiskLimit(this.ctx.strategyLedger, time)) {
+      return;
+    }
+
+    cancelAllStrategyOrders(this.ctx.strategyLedger, this.ctx.bar_index, time);
+
+    const position = this.ctx.strategyLedger.position;
+    if (position.direction === null || position.size === 0) {
+      return;
+    }
+
+    this.submitFilledStrategyCloseOrder({
+      id: 'Risk Close All',
+      direction: position.direction === 'long' ? 'short' : 'long',
+      qty: Math.abs(position.size),
+      immediately: true,
     });
   }
 

@@ -2549,9 +2549,9 @@ plot(strategy.opentrades, title="Open Trades")
 `, { bars });
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Position').values).toEqual([1, 1, 1]);
-    expect(getPlot(result, 'Open Trades').values).toEqual([1, 1, 1]);
-    expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Allowed']);
+    expect(getPlot(result, 'Position').values).toEqual([0, 0, 0]);
+    expect(getPlot(result, 'Open Trades').values).toEqual([0, 0, 0]);
+    expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Allowed', 'Risk Close All']);
     expect(result.strategy.orders.map((order) => ({
       id: order.id,
       status: order.status,
@@ -2559,6 +2559,7 @@ plot(strategy.opentrades, title="Open Trades")
       requestedQty: order.requestedQty,
     }))).toEqual([
       { id: 'Allowed', status: 'filled', qty: 1, requestedQty: 1 },
+      { id: 'Risk Close All', status: 'filled', qty: 1, requestedQty: 1 },
     ]);
     expect(result.strategy.settings.riskRules.maxIntradayFilledOrders).toEqual({ count: 1 });
   });
@@ -2624,14 +2625,14 @@ plot(strategy.equity, title="Equity")
 `, { bars });
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Position').values).toEqual([1, 1, 1]);
-    expect(getPlot(result, 'Equity').values).toEqual([100_000, 99_990, 99_991]);
-    expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Long']);
-    expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long']);
+    expect(getPlot(result, 'Position').values).toEqual([1, 0, 0]);
+    expect(getPlot(result, 'Equity').values).toEqual([100_000, 99_990, 99_990]);
+    expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Long', 'Risk Close All']);
+    expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long', 'Risk Close All']);
     expect(result.strategy.equityCurve.map(({ equity, drawdown }) => ({ equity, drawdown }))).toEqual([
       { equity: 100_000, drawdown: 0 },
       { equity: 99_990, drawdown: 10 },
-      { equity: 99_991, drawdown: 9 },
+      { equity: 99_990, drawdown: 10 },
     ]);
     expect(result.strategy.settings.riskRules.maxIntradayLoss).toEqual({ value: 5, type: 'cash' });
   });
@@ -2655,14 +2656,14 @@ plot(strategy.equity, title="Equity")
 `, { bars });
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Position').values).toEqual([1, 1, 1]);
-    expect(getPlot(result, 'Equity').values).toEqual([100_000, 99_990, 99_991]);
-    expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Long']);
-    expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long']);
+    expect(getPlot(result, 'Position').values).toEqual([1, 0, 0]);
+    expect(getPlot(result, 'Equity').values).toEqual([100_000, 99_990, 99_990]);
+    expect(result.strategy.fills.map((fill) => fill.orderId)).toEqual(['Long', 'Risk Close All']);
+    expect(result.strategy.orders.map((order) => order.id)).toEqual(['Long', 'Risk Close All']);
     expect(result.strategy.equityCurve.map(({ equity, drawdown }) => ({ equity, drawdown }))).toEqual([
       { equity: 100_000, drawdown: 0 },
       { equity: 99_990, drawdown: 10 },
-      { equity: 99_991, drawdown: 9 },
+      { equity: 99_990, drawdown: 10 },
     ]);
     expect(result.strategy.settings.riskRules.maxDrawdown).toEqual({ value: 5, type: 'cash' });
   });

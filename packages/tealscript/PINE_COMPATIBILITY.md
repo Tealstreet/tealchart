@@ -942,16 +942,20 @@ unrestricted. `strategy.risk.max_position_size()` caps `strategy.entry()`
 exposure while leaving raw `strategy.order()` calls unrestricted.
 `strategy.risk.max_intraday_filled_orders()` caps same-UTC-day non-exit
 strategy order fills by blocking new non-exit submissions and cancelling excess
-pending non-exit fills after the configured count is reached.
+pending non-exit fills after the configured count is reached, then closing any
+open position with a market risk-exit order.
 `strategy.risk.max_cons_loss_days()` caps non-exit orders after the configured
 number of consecutive UTC losing days, based on closed-trade net PnL, and
-cancels pending non-exit fills after the cap is reached.
+cancels pending non-exit fills after the cap is reached. If an open position
+remains when the guard trips, TealScript closes it with a market risk-exit
+order.
 `strategy.risk.max_intraday_loss()` caps non-exit orders after the same-UTC-day
 equity-curve loss from peak equity reaches the configured cash or
 percent-of-equity value. `strategy.risk.max_drawdown()` caps non-exit orders
 after the overall equity-curve drawdown from peak equity reaches the configured
-cash or percent-of-equity value. Exact session halt and forced-close
-enforcement remain fidelity targets. The
+cash or percent-of-equity value. Both equity risk guards cancel pending orders
+and close open positions with a market risk-exit order after the cap is reached.
+TradingView-exact session halt semantics remain a fidelity target. The
 `strategy(..., slippage=...)` setting applies fixed tick slippage to market,
 stop, and trailing-stop fills in trade direction while preserving limit-fill
 prices. `strategy.close(..., immediately=true)` and
