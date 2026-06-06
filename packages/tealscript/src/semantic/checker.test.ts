@@ -691,6 +691,33 @@ hline(200, "Bad Positional", color.red, hline.style_arrow)
     ]);
   });
 
+  it('reports invalid visual format and precision values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Visual Format Precision")
+plot(close, format="bad", precision=-1)
+plotbar(open, high, low, close, format=format.bad, precision=1.5)
+plotcandle(open, high, low, close, format="ticks", precision=-2)
+plotshape(close > open, format=format.bad, precision=2.5)
+plotchar(close < open, format="invalid", precision=-3)
+plotarrow(close - open, format=format.bad, precision=3.5)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid plot format: bad',
+      'plot precision must be a non-negative integer',
+      'Invalid plotbar format: format.bad',
+      'plotbar precision must be a non-negative integer',
+      'Invalid plotcandle format: ticks',
+      'plotcandle precision must be a non-negative integer',
+      'Invalid plotshape format: format.bad',
+      'plotshape precision must be a non-negative integer',
+      'Invalid plotchar format: invalid',
+      'plotchar precision must be a non-negative integer',
+      'Invalid plotarrow format: format.bad',
+      'plotarrow precision must be a non-negative integer',
+    ]);
+  });
+
   it('reports invalid marker visual output argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Invalid Marker Visual Bindings")
