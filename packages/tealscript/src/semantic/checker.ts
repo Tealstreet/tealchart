@@ -233,6 +233,12 @@ const STRATEGY_DECLARATION_NUMERIC_OPTIONS = [
   'risk_free_rate',
   'backtest_fill_limits_assumption',
 ] as const;
+const STRATEGY_DECLARATION_STRING_OPTIONS = [
+  'currency',
+  'default_qty_type',
+  'commission_type',
+  'close_entries_rule',
+] as const;
 
 const COLOR_CONSTRUCTOR_NAMES = new Set(['color.new', 'color.rgb']);
 const COLOR_CHANNEL_NAMES = new Set(['color.r', 'color.g', 'color.b', 'color.t']);
@@ -2650,6 +2656,7 @@ class SemanticChecker {
       this.checkStrategyDeclarationLiteralValueConstraints(statement);
       this.checkStrategyDeclarationBooleanOptions(statement, scope);
       this.checkStrategyDeclarationNumericOptions(statement, scope);
+      this.checkStrategyDeclarationStringOptions(statement, scope);
     }
   }
 
@@ -4933,6 +4940,22 @@ class SemanticChecker {
       this.addDiagnostic(
         'type-mismatch',
         `strategy ${optionName} must be a number, got ${this.formatSemanticType(type)}`,
+        expression.loc,
+      );
+    }
+  }
+
+  private checkStrategyDeclarationStringOptions(statement: IndicatorDeclaration, scope: SemanticScope): void {
+    for (const optionName of STRATEGY_DECLARATION_STRING_OPTIONS) {
+      const expression = statement[optionName];
+      if (!expression) continue;
+
+      const type = this.inferExpressionType(expression, scope);
+      if (type.kind === 'unknown' || type.kind === 'string') continue;
+
+      this.addDiagnostic(
+        'type-mismatch',
+        `strategy ${optionName} must be a string, got ${this.formatSemanticType(type)}`,
         expression.loc,
       );
     }
