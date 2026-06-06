@@ -551,7 +551,8 @@ The common color helper pass covers `color.rgb`, `color.new`, `color.r`,
 fixture follows TradingView's documented calculated-color idioms by deriving a
 variant color from RGB channels and plotting an RSI gradient. Semantic analysis
 preserves known color constructor and channel return types for downstream
-assignment diagnostics.
+assignment diagnostics and rejects non-color color arguments plus non-numeric
+channel, transparency, and gradient threshold arguments before runtime.
 
 ## Common `math.*` Coverage
 
