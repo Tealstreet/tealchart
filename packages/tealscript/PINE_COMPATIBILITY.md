@@ -280,7 +280,8 @@ weekday-name `E`/`EEEE`, day-of-year `D`/`DD`/`DDD`, fractional-second
 `S`/`SS`/`SSS`, week-of-year `w`/`ww`, week-of-month `W`, 12-hour `h`/`hh`,
 AM/PM `a`, and timezone-name `z`/`zzzz` tokens. Semantic analysis preserves
 known string helper return types for downstream assignment diagnostics,
-including `str.split()` array element types.
+including `str.split()` array element types, and rejects non-string string
+parameters plus non-numeric time, position, count, and occurrence parameters.
 
 ## Common `input.*` Coverage
 
