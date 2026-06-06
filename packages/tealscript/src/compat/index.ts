@@ -58,10 +58,17 @@ export interface CompatibilityRunOutcome {
   summary: CompatibilityRunSummary;
 }
 
+export type PineCompatibilityCorpusStages = CompatibilityStageOutcome[] | (() => CompatibilityStageOutcome[]);
+
 export interface PineCompatibilityCorpusCase {
   ledgerEntry: PineScriptLedgerEntry;
-  stages: CompatibilityStageOutcome[];
+  stages: PineCompatibilityCorpusStages;
 }
+
+type ResolvedPineCompatibilityCorpusCase = {
+  ledgerEntry: PineScriptLedgerEntry;
+  stages: CompatibilityStageOutcome[];
+};
 
 export interface PineCompatibilityCorpusSummary {
   total: number;
@@ -265,7 +272,8 @@ export function validatePineScriptLedger(ledger: PineScriptLedger): Record<strin
 }
 
 export function runPineCompatibilityCorpus(cases: PineCompatibilityCorpusCase[]): PineCompatibilityCorpusRun {
-  const outcomes = cases.map(({ ledgerEntry, stages }) => createCompatibilityRunOutcome({
+  const resolvedCases = cases.map(resolvePineCompatibilityCorpusCase);
+  const outcomes = resolvedCases.map(({ ledgerEntry, stages }) => createCompatibilityRunOutcome({
     scriptId: ledgerEntry.id,
     pineVersion: ledgerEntry.pineVersion,
     stages,
@@ -274,7 +282,7 @@ export function runPineCompatibilityCorpus(cases: PineCompatibilityCorpusCase[])
   return {
     schemaVersion: PINE_COMPATIBILITY_SCHEMA_VERSION,
     outcomes,
-    summary: summarizePineCompatibilityCorpus(cases, outcomes),
+    summary: summarizePineCompatibilityCorpus(resolvedCases, outcomes),
   };
 }
 
@@ -317,7 +325,7 @@ export function createPineCompatibilityCoverageIndex(ledger: PineScriptLedger): 
 }
 
 export function summarizePineCompatibilityCorpus(
-  cases: PineCompatibilityCorpusCase[],
+  cases: Array<{ ledgerEntry: PineScriptLedgerEntry; stages: CompatibilityStageOutcome[] }>,
   outcomes: CompatibilityRunOutcome[],
 ): PineCompatibilityCorpusSummary {
   const validationErrors: Record<string, string[]> = {
@@ -370,6 +378,13 @@ export function summarizePineCompatibilityCorpus(
     byFirstFailureClass,
     byFeatureTag,
     validationErrors,
+  };
+}
+
+function resolvePineCompatibilityCorpusCase(corpusCase: PineCompatibilityCorpusCase): ResolvedPineCompatibilityCorpusCase {
+  return {
+    ledgerEntry: corpusCase.ledgerEntry,
+    stages: typeof corpusCase.stages === 'function' ? corpusCase.stages() : corpusCase.stages,
   };
 }
 

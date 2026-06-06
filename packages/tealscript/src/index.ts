@@ -34,6 +34,7 @@ export {
   type CompatibilityStageOutcome,
   type CompatibilityStageStatus,
   type PineCompatibilityCorpusCase,
+  type PineCompatibilityCorpusStages,
   type PineCompatibilityCorpusRun,
   type PineCompatibilityCorpusSummary,
   type PineCompatibilityCoverageIndex,

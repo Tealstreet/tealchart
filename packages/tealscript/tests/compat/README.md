@@ -37,7 +37,9 @@ real-script intake metadata or corpus summaries:
   duplicate stages, and failure classes on non-failed stages.
 - `runPineCompatibilityCorpus()` converts ledger entries plus deterministic
   stage outcomes into an offline report with pass/fail counts, first-failure
-  buckets, feature tag summaries, and validation errors.
+  buckets, feature tag summaries, and validation errors. Corpus cases may
+  provide either a static stage list or a deterministic stage factory when
+  parse or semantic stages should be recomputed from a reduced source fixture.
 - `runPineCompatibilityLedger()` builds that same report from a
   `PineScriptLedger` plus a deterministic stage provider.
 - `createPineCompatibilityCoverageIndex()` counts checkpoint metadata by
