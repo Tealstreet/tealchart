@@ -1169,6 +1169,10 @@ export class TealscriptEngine {
         return this.inferStaticVariadicMathCallValue(expression, Math.min, collectionScopes);
       case 'math.abs':
         return this.inferStaticUnaryMathCallValue(expression, Math.abs, collectionScopes);
+      case 'math.sqrt':
+        return this.inferStaticUnaryMathCallValue(expression, Math.sqrt, collectionScopes);
+      case 'math.pow':
+        return this.inferStaticBinaryMathCallValue(expression, ['base', 'exponent'], Math.pow, collectionScopes);
       case 'math.trunc':
         return this.inferStaticUnaryMathCallValue(expression, Math.trunc, collectionScopes);
       case 'math.floor':
@@ -1209,6 +1213,24 @@ export class TealscriptEngine {
     if (value === null || !Number.isFinite(value)) return null;
 
     const result = fn(value);
+    return Number.isFinite(result) ? result : null;
+  }
+
+  private inferStaticBinaryMathCallValue(
+    expression: CallExpression,
+    params: readonly [string, string],
+    fn: (left: number, right: number) => number,
+    collectionScopes: StaticCollectionScopes,
+  ): number | null {
+    const leftArgument = this.getStaticOrderedCallArgument(expression, params, 0);
+    const rightArgument = this.getStaticOrderedCallArgument(expression, params, 1);
+    if (!leftArgument || !rightArgument) return null;
+
+    const left = this.inferStaticNumericValue(leftArgument, collectionScopes);
+    const right = this.inferStaticNumericValue(rightArgument, collectionScopes);
+    if (left === null || right === null || !Number.isFinite(left) || !Number.isFinite(right)) return null;
+
+    const result = fn(left, right);
     return Number.isFinite(result) ? result : null;
   }
 
