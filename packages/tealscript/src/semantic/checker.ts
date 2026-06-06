@@ -222,6 +222,17 @@ const STRATEGY_DECLARATION_BOOL_OPTIONS = [
   'use_bar_magnifier',
   'fill_orders_on_standard_ohlc',
 ] as const;
+const STRATEGY_DECLARATION_NUMERIC_OPTIONS = [
+  'initial_capital',
+  'default_qty_value',
+  'pyramiding',
+  'commission_value',
+  'slippage',
+  'margin_long',
+  'margin_short',
+  'risk_free_rate',
+  'backtest_fill_limits_assumption',
+] as const;
 
 const COLOR_CONSTRUCTOR_NAMES = new Set(['color.new', 'color.rgb']);
 const COLOR_CHANNEL_NAMES = new Set(['color.r', 'color.g', 'color.b', 'color.t']);
@@ -2638,6 +2649,7 @@ class SemanticChecker {
     if (statement.declarationKind === 'strategy') {
       this.checkStrategyDeclarationLiteralValueConstraints(statement);
       this.checkStrategyDeclarationBooleanOptions(statement, scope);
+      this.checkStrategyDeclarationNumericOptions(statement, scope);
     }
   }
 
@@ -4908,6 +4920,22 @@ class SemanticChecker {
 
   private checkStrategyDeclarationBooleanOptions(statement: IndicatorDeclaration, scope: SemanticScope): void {
     this.checkDeclarationBooleanOptions(statement, scope, STRATEGY_DECLARATION_BOOL_OPTIONS, 'strategy');
+  }
+
+  private checkStrategyDeclarationNumericOptions(statement: IndicatorDeclaration, scope: SemanticScope): void {
+    for (const optionName of STRATEGY_DECLARATION_NUMERIC_OPTIONS) {
+      const expression = statement[optionName];
+      if (!expression) continue;
+
+      const type = this.inferExpressionType(expression, scope);
+      if (type.kind === 'unknown' || type.kind === 'int' || type.kind === 'float') continue;
+
+      this.addDiagnostic(
+        'type-mismatch',
+        `strategy ${optionName} must be a number, got ${this.formatSemanticType(type)}`,
+        expression.loc,
+      );
+    }
   }
 
   private checkDeclarationBooleanOptions(
