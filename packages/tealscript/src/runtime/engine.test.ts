@@ -6232,6 +6232,37 @@ plot(close, title="Close")`;
       expect(result.errors).toEqual([]);
       expect(result.profile.maxBarsBack).toBe(9);
     });
+
+    it('statically reports math max history offsets', () => {
+      const script = `//@version=6
+indicator("Math Max Static History")
+shortLength = input.int(defval=5, title="Short")
+longLength = input.int(defval=12, title="Long")
+length = math.max(number0=shortLength, longLength, 8)
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(12);
+    });
+
+    it('statically reports rounded math history offsets', () => {
+      const script = `//@version=6
+indicator("Rounded Math Static History")
+raw = input.float(defval=7.6, title="Raw")
+length = math.floor(math.round(number=raw, precision=0))
+if false
+    plot(close[length], title="Hidden")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(8);
+    });
   });
 
   describe('inputs', () => {
