@@ -6123,6 +6123,30 @@ plot(close, title="Close")`;
       expect(result.profile.maxBarsBack).toBe(7);
     });
 
+    it('reports math.sum lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Math Sum Profile")
+length = input.int(defval=5, title="Length")
+plot(math.sum(source=close, length=length), title="Sum")`;
+
+      const result = executeScript(parse(script), createBars(6, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(4);
+    });
+
+    it('reports the largest dynamic math.sum lookback length in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Dynamic Math Sum Profile")
+length = bar_index < 3 ? 2 : 6
+plot(math.sum(close, length), title="Sum")`;
+
+      const result = executeScript(parse(script), createBars(7, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(5);
+    });
+
     it('reports invalid max_bars_back function hint values', () => {
       const script = `//@version=6
 indicator("Invalid Function Max Bars Back")
