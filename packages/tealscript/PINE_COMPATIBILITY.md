@@ -170,8 +170,10 @@ averaging, power, and square-root helpers, selected numeric normalization
 helpers, and input-gated simple conditional history offsets, including static numeric
 comparisons, even when they sit behind unexecuted branches. Covered rolling
 window helper calls such as `math.sum()`, `ta.range()`, trend helpers
-`ta.rising()`/`ta.falling()`, and common `ta.*` source-window,
-retained-source, and recursive helpers also contribute static lookback
+`ta.rising()`/`ta.falling()`, statistical helpers such as `ta.dev()`,
+`ta.correlation()`, median/mode, percentile, and percent-rank helpers,
+and common `ta.*` source-window, retained-source, and recursive helpers
+also contribute static lookback
 requirements when their length arguments are static, including default-source
 highest/lowest lookback forms. Truly dynamic series offsets and dynamic helper
 lengths are still inferred from observed runtime access.
@@ -758,8 +760,8 @@ selected pure `math.*` helper offsets including averaging, power, and
 square-root helpers, selected numeric normalization helper offsets,
 input-controlled simple conditional offsets, observed dynamic access, and
 selected static or observed rolling-window helper lookbacks such as
-`math.sum()`, `ta.range()`, `ta.rising()`/`ta.falling()`, and common `ta.*`
-source-window, retained-source, and recursive
+`math.sum()`, `ta.range()`, `ta.rising()`/`ta.falling()`, common statistical
+helpers, and `ta.*` source-window, retained-source, and recursive
 helpers, including default-source highest/lowest forms. Full Pine-style
 preallocation for arbitrary series offsets remains a compatibility target. The
 checkpoint corpus tracks an official `max_bars_back`
