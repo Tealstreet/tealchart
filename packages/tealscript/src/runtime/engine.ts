@@ -976,6 +976,7 @@ export class TealscriptEngine {
       case 'ta.rma':
       case 'ta.stdev':
       case 'ta.variance':
+      case 'ta.range':
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes);
       case 'ta.highest':
       case 'ta.lowest':
@@ -984,6 +985,8 @@ export class TealscriptEngine {
         return this.inferStaticTaSourceLengthMaxBarsBack(expression, collectionScopes);
       case 'ta.change':
       case 'ta.rsi':
+      case 'ta.rising':
+      case 'ta.falling':
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1);
       case 'ta.macd':
         return Math.max(

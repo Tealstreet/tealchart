@@ -6192,6 +6192,22 @@ plot(close, title="Close")`;
       expect(result.profile.maxBarsBack).toBe(5);
     });
 
+    it('statically reports unexecuted trend helper lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Trend Profile")
+length = input.int(defval=8, title="Length")
+if false
+    plot(ta.range(close, 5), title="Range")
+    plot(ta.rising(close, length), title="Rising")
+    plot(ta.falling(source=close, length=6), title="Falling")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(8);
+    });
+
     it('statically reports unexecuted MACD lookback lengths in the runtime profile', () => {
       const script = `//@version=6
 indicator("Static MACD Profile")
