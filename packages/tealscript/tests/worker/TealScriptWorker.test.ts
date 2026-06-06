@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { TealscriptWorkerFactory, type WorkerError } from '../../src/worker/TealScriptWorker';
 import type { FromWorkerMessage, ToWorkerMessage } from '../../src/worker/protocol';
+import { parse } from '../../src/parser';
 
 class MockWorker {
   static instances: MockWorker[] = [];
@@ -132,6 +133,33 @@ describe('TealscriptWorker semantic diagnostics', () => {
         ],
       },
     ]);
+  });
+
+  it('passes deterministic libraries through init messages', async () => {
+    globalThis.Worker = MockWorker as unknown as typeof Worker;
+    const worker = new TealscriptWorkerFactory('tealscript-worker.js').create();
+    const mock = MockWorker.instances[0]!;
+    const library = parse(`
+library("Constants")
+export const int fast = 2
+`);
+    const libraries = new Map([['TestUser/Constants/1', library]]);
+
+    mock.emit({ type: 'ready' });
+    await worker.init(
+      'study-library',
+      'indicator("Library")\nimport TestUser/Constants/1 as c\nplot(c.fast)\n',
+      [],
+      {},
+      undefined,
+      libraries,
+    );
+
+    expect(mock.messages[0]).toMatchObject({
+      type: 'init',
+      scriptId: 'study-library',
+      libraries,
+    });
   });
 
   it('ignores stale semantic diagnostics after a newer result settles', async () => {

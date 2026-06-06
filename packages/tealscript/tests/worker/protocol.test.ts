@@ -7,7 +7,9 @@ import {
   type ResultMessage,
   type WorkerOutputBundle,
 } from '../../src/worker/protocol';
+import { parse } from '../../src/parser';
 import type { SemanticDiagnostic } from '../../src/semantic';
+import { semanticOptionsFromLibraries } from '../../src/worker/semanticOptions';
 
 describe('worker protocol output bundles', () => {
   const output: WorkerOutputBundle = {
@@ -149,5 +151,18 @@ describe('worker protocol semantic diagnostics', () => {
       column: 1,
       metadata: undefined,
     });
+  });
+});
+
+describe('worker semantic options', () => {
+  it('forwards deterministic runtime libraries to semantic checks', () => {
+    const library = parse(`
+library("Constants")
+export const int fast = 2
+`);
+    const libraries = new Map([['TestUser/Constants/1', library]]);
+
+    expect(semanticOptionsFromLibraries(libraries)).toEqual({ libraries });
+    expect(semanticOptionsFromLibraries()).toEqual({});
   });
 });
