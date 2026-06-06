@@ -718,6 +718,22 @@ plotarrow(close - open, format=format.bad, precision=3.5)
     ]);
   });
 
+  it('reports invalid marker style location and size values', () => {
+    const result = checkProgram(parse(`
+indicator("Invalid Marker Styles")
+plotshape(close > open, style=shape.bad, location="middle", size=size.giant)
+plotchar(close < open, location=location.middle, size="giant")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid plotshape style: shape.bad',
+      'Invalid plotshape location: middle',
+      'Invalid plotshape size: size.giant',
+      'Invalid plotchar location: location.middle',
+      'Invalid plotchar size: giant',
+    ]);
+  });
+
   it('reports invalid marker visual output argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Invalid Marker Visual Bindings")
