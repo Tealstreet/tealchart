@@ -904,7 +904,8 @@ analysis preserves known label getter return types and `label.all` handle-array
 element types for downstream diagnostics, and rejects invalid literal `xloc`
 and `yloc` option values plus invalid literal label `style`, `textalign`,
 `size`, `text_font_family`, and `text_formatting` values, plus non-string
-label text and tooltip values and non-color label color values. Rendering routes
+label text and tooltip values, non-color label color values, and non-numeric
+label setter coordinate values. Rendering routes
 labels to the script pane: overlay scripts use the main pane, non-overlay
 scripts use their indicator pane. Renderer coverage handles text-only
 `label.style_none`, directional label bodies, and common symbol bodies including
@@ -928,7 +929,7 @@ analysis validates `line.new()` call-shape names, preserves known line getter
 return types, and preserves `line.all` handle-array element types for
 downstream diagnostics, while rejecting invalid literal `xloc` and `extend`
 option values plus invalid literal line `style` values and non-color line color
-values. Rendering routes line segments to the script pane with color/style/width, horizontal extension support, and Pine
+values plus non-numeric line coordinate and width values. Rendering routes line segments to the script pane with color/style/width, horizontal extension support, and Pine
 `line.style_arrow_left`, `line.style_arrow_right`, and `line.style_arrow_both`
 arrowheads.
 `force_overlay` lines render in the main pane even when created by non-overlay
@@ -960,7 +961,7 @@ preserves known box getter return types, preserves `box.all` handle-array
 element types for downstream diagnostics, and rejects invalid literal `xloc`
 and `extend` option values plus invalid literal border-style values and
 non-string box text values plus non-color box border, background, and text
-color values. Rendering routes filled rectangles to the script pane with borders, text alignment, `text_wrap=auto` wrapping,
+color values plus non-numeric box coordinate and border-width values. Rendering routes filled rectangles to the script pane with borders, text alignment, `text_wrap=auto` wrapping,
 default/monospace font-family metadata, and bold/italic text formatting. Semantic
 analysis also rejects invalid literal `text_halign`, `text_valign`,
 `text_wrap`, `text_size`, `text_font_family`, and `text_formatting` values. Full
@@ -973,7 +974,8 @@ arguments, `polyline.copy()`, `polyline.delete()`, and `polyline.all`.
 arguments. Semantic analysis preserves `polyline.new()` and `polyline.copy()`
 handle return types and `polyline.all` handle-array element types for downstream
 diagnostics, and rejects invalid literal `xloc` and `line_style` option values.
-Semantic analysis also rejects non-color polyline line and fill color values.
+Semantic analysis also rejects non-color polyline line and fill color values and
+non-numeric polyline line-width values.
 Renderer coverage applies fixed path geometry, optional fill, line styling, and
 approximate curved paths when `curved=true`. The checkpoint corpus tracks a reduced public zigzag-polyline idiom that renders recent swing
 `chart.point` vertices as a last-bar path.

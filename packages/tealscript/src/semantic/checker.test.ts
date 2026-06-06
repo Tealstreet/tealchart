@@ -4006,6 +4006,69 @@ label.set_text(marker, 1, id=marker)
     ]);
   });
 
+  it('reports invalid drawing coordinate and width value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing Numeric Values")
+marker = label.new(bar_index, close)
+trend = line.new(bar_index, high, bar_index + 1, low)
+region = box.new(bar_index, high, bar_index + 1, low)
+firstPoint = chart.point.from_index(bar_index, high)
+secondPoint = chart.point.from_index(bar_index + 1, low)
+points = array.from(firstPoint, secondPoint)
+badLabelX = label.set_x(marker, x="1")
+badLabelY = label.set_y(marker, y=false)
+badLabelXY = label.set_xy(marker, x="1", y=false)
+badLabelXloc = label.set_xloc(marker, x="1", xloc=xloc.bar_index)
+badLine = line.new(x1="0", y1=true, x2="1", y2=false, width="2")
+badLineXY = line.set_xy1(trend, x="0", y=true)
+badLineXloc = line.set_xloc(trend, x1="0", x2=false, xloc=xloc.bar_index)
+badLinePrice = line.get_price(trend, x="1")
+badLineWidth = line.set_width(trend, width=false)
+pointLine = line.new(firstPoint, secondPoint, width="2")
+badBox = box.new(left="0", top=true, right="1", bottom=false, border_width="2")
+badBoxSet = box.set_lefttop(region, left="0", top=true)
+badBoxRightBottom = box.set_rightbottom(region, right=false, bottom="2")
+badBoxXloc = box.set_xloc(region, left="0", right=false, xloc=xloc.bar_index)
+badBorderWidth = box.set_border_width(region, width="2")
+pointBox = box.new(firstPoint, secondPoint, border_width=false)
+badPolylineWidth = polyline.new(points, line_width="2")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'label.set_x x must be a number, got string',
+      'label.set_y y must be a number, got bool',
+      'label.set_xy x must be a number, got string',
+      'label.set_xy y must be a number, got bool',
+      'label.set_xloc x must be a number, got string',
+      'line.new x1 must be a number, got string',
+      'line.new y1 must be a number, got bool',
+      'line.new x2 must be a number, got string',
+      'line.new y2 must be a number, got bool',
+      'line.new width must be a number, got string',
+      'line.set_xy1 x must be a number, got string',
+      'line.set_xy1 y must be a number, got bool',
+      'line.set_xloc x1 must be a number, got string',
+      'line.set_xloc x2 must be a number, got bool',
+      'line.get_price x must be a number, got string',
+      'line.set_width width must be a number, got bool',
+      'line.new width must be a number, got string',
+      'box.new left must be a number, got string',
+      'box.new top must be a number, got bool',
+      'box.new right must be a number, got string',
+      'box.new bottom must be a number, got bool',
+      'box.new border_width must be a number, got string',
+      'box.set_lefttop left must be a number, got string',
+      'box.set_lefttop top must be a number, got bool',
+      'box.set_rightbottom right must be a number, got bool',
+      'box.set_rightbottom bottom must be a number, got string',
+      'box.set_xloc left must be a number, got string',
+      'box.set_xloc right must be a number, got bool',
+      'box.set_border_width width must be a number, got string',
+      'box.new border_width must be a number, got bool',
+      'polyline.new line_width must be a number, got string',
+    ]);
+  });
+
   it('reports invalid drawing color option values', () => {
     const result = checkProgram(parse(`
 indicator("Bad Drawing Color Values")

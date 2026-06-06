@@ -1800,6 +1800,32 @@ const DRAWING_COLOR_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>
   ['table.cell_set_bgcolor', ['bgcolor']],
   ['table.cell_set_text_color', ['text_color']],
 ]);
+const DRAWING_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['label.set_x', ['x']],
+  ['label.set_y', ['y']],
+  ['label.set_xy', ['x', 'y']],
+  ['label.set_xloc', ['x']],
+  ['line.new', ['x1', 'y1', 'x2', 'y2', 'width']],
+  ['line.set_x1', ['x']],
+  ['line.set_x2', ['x']],
+  ['line.set_y1', ['y']],
+  ['line.set_y2', ['y']],
+  ['line.set_xy1', ['x', 'y']],
+  ['line.set_xy2', ['x', 'y']],
+  ['line.set_xloc', ['x1', 'x2']],
+  ['line.set_width', ['width']],
+  ['line.get_price', ['x']],
+  ['box.new', ['left', 'top', 'right', 'bottom', 'border_width']],
+  ['box.set_left', ['left']],
+  ['box.set_right', ['right']],
+  ['box.set_top', ['top']],
+  ['box.set_bottom', ['bottom']],
+  ['box.set_lefttop', ['left', 'top']],
+  ['box.set_rightbottom', ['right', 'bottom']],
+  ['box.set_xloc', ['left', 'right']],
+  ['box.set_border_width', ['width']],
+  ['polyline.new', ['line_width']],
+]);
 const TABLE_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['table.new', ['columns', 'rows', 'frame_width', 'border_width']],
   ['table.clear', ['start_column', 'start_row', 'end_column', 'end_row']],
@@ -3727,6 +3753,7 @@ class SemanticChecker {
     this.checkTimeFunctionArgumentTypes(expression, scope);
     this.checkGlobalFunctionArgumentTypes(expression, scope);
     this.checkChartPointFunctionArgumentTypes(expression, scope);
+    this.checkDrawingFunctionArgumentTypes(expression, scope);
     this.checkTableFunctionArgumentTypes(expression, scope);
     this.checkMaxBarsBackLiteralArguments(expression);
     this.checkAlertFrequencyLiteralArguments(expression);
@@ -4358,6 +4385,20 @@ class SemanticChecker {
   private checkTableFunctionArgumentTypes(expression: CallExpression, scope: SemanticScope): void {
     const calleeName = this.memberPath(expression.callee).join('.');
     const numericParameterNames = TABLE_NUMERIC_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!numericParameterNames) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of numericParameterNames) {
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'number');
+    }
+  }
+
+  private checkDrawingFunctionArgumentTypes(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const numericParameterNames = DRAWING_NUMERIC_PARAMETER_NAMES_BY_CALL.get(calleeName);
     if (!numericParameterNames) return;
 
     const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
