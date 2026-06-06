@@ -8719,6 +8719,7 @@ export class TealscriptEngine {
       'format.price': 'price',
       'format.volume': 'volume',
       'format.percent': 'percent',
+      'format.mintick': 'mintick',
     };
 
     for (const [name, value] of Object.entries(formatConstants)) {
