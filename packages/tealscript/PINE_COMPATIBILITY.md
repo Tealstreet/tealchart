@@ -984,7 +984,7 @@ The semantic checker validates common strategy order, close/cancel,
 declaration argument, declaration literal value, and trade-accessor call shapes
 before runtime, reports literal declaration setting diagnostics plus order
 id/direction/OCA/quantity diagnostics, non-boolean strategy declaration flags,
-and excess positional order arguments,
+non-boolean order alert/immediate flags, and excess positional order arguments,
 and preserves known strategy state/accessor return types for downstream
 assignment diagnostics. `strategy.entry()`,
 `strategy.order()`, `strategy.close()`,
