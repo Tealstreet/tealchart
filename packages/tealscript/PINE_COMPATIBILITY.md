@@ -175,7 +175,9 @@ window helper calls such as `math.sum()`, `ta.range()`, trend helpers
 momentum helpers such as `ta.cmo()`, `ta.mom()`, and `ta.roc()`, and common
 band, average, and regression helpers such as `ta.bb()`, `ta.bbw()`,
 `ta.vwma()`, `ta.wma()`, `ta.alma()`, `ta.cci()`, and `ta.linreg()`, plus
-common `ta.*` source-window, retained-source, and recursive helpers also contribute static lookback
+fixed/default lookback helpers such as `ta.cross()`, `ta.crossover()`,
+`ta.crossunder()`, `ta.change(source)`, and `ta.swma()`, plus common `ta.*`
+source-window, retained-source, and recursive helpers also contribute static lookback
 requirements when their length arguments are static, including default-source
 highest/lowest lookback forms. Truly dynamic series offsets and dynamic helper
 lengths are still inferred from observed runtime access.
@@ -764,7 +766,7 @@ input-controlled simple conditional offsets, observed dynamic access, and
 selected static or observed rolling-window helper lookbacks such as
 `math.sum()`, `ta.range()`, `ta.rising()`/`ta.falling()`, common statistical
 helpers, momentum helpers, band/average/regression helpers, and `ta.*`
-source-window, retained-source, and recursive
+fixed/default, source-window, retained-source, and recursive
 helpers, including default-source highest/lowest forms. Full Pine-style
 preallocation for arbitrary series offsets remains a compatibility target. The
 checkpoint corpus tracks an official `max_bars_back`
