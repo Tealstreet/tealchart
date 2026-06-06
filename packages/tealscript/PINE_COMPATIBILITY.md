@@ -948,9 +948,10 @@ number of consecutive UTC losing days, based on closed-trade net PnL, and
 cancels pending non-exit fills after the cap is reached.
 `strategy.risk.max_intraday_loss()` caps non-exit orders after the same-UTC-day
 equity-curve loss from peak equity reaches the configured cash or
-percent-of-equity value. `strategy.risk.max_drawdown()` is accepted and stored
-as ledger metadata; exact session halt and forced-close enforcement remains a
-fidelity target. The
+percent-of-equity value. `strategy.risk.max_drawdown()` caps non-exit orders
+after the overall equity-curve drawdown from peak equity reaches the configured
+cash or percent-of-equity value. Exact session halt and forced-close
+enforcement remain fidelity targets. The
 `strategy(..., slippage=...)` setting applies fixed tick slippage to market,
 stop, and trailing-stop fills in trade direction while preserving limit-fill
 prices. `strategy.close(..., immediately=true)` and
