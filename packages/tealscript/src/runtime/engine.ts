@@ -974,11 +974,14 @@ export class TealscriptEngine {
       case 'ta.sma':
       case 'ta.ema':
       case 'ta.rma':
-      case 'ta.highest':
-      case 'ta.lowest':
       case 'ta.stdev':
       case 'ta.variance':
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes);
+      case 'ta.highest':
+      case 'ta.lowest':
+      case 'ta.highestbars':
+      case 'ta.lowestbars':
+        return this.inferStaticTaSourceLengthMaxBarsBack(expression, collectionScopes);
       case 'ta.change':
       case 'ta.rsi':
         return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes, 1);
@@ -1008,6 +1011,21 @@ export class TealscriptEngine {
 
     const length = Math.max(0, Math.trunc(value));
     return Math.max(0, length - 1 + extraPriorBars);
+  }
+
+  private inferStaticTaSourceLengthMaxBarsBack(expression: CallExpression, collectionScopes: StaticCollectionScopes): number {
+    if (!expression.arguments.some((argument) => argument.name?.name === 'source' || argument.name?.name === 'length')) {
+      const positionalArgs = expression.arguments.filter((argument) => !argument.name);
+      if (positionalArgs.length === 1) {
+        const value = this.inferStaticNumericValue(positionalArgs[0].value, collectionScopes);
+        if (value === null || !Number.isFinite(value)) return 0;
+
+        const length = Math.max(0, Math.trunc(value));
+        return Math.max(0, length - 1);
+      }
+    }
+
+    return this.inferStaticLookbackArgumentMaxBarsBack(expression, ['source', 'length'], 1, collectionScopes);
   }
 
   private inferIfAlternateMaxBarsBack(alternate: IfStatement['alternate'], collectionScopes: StaticCollectionScopes): number {

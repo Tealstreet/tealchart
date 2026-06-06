@@ -6206,6 +6206,23 @@ plot(close, title="Close")`;
       expect(result.profile.maxBarsBack).toBe(8);
     });
 
+    it('statically reports unexecuted default-source TA lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("Static Default Source Profile")
+length = input.int(defval=7, title="Length")
+if false
+    plot(ta.highest(length), title="Highest")
+    plot(ta.lowest(length=5), title="Lowest")
+    plot(ta.highestbars(6), title="Highest Offset")
+    plot(ta.lowestbars(length=4), title="Lowest Offset")
+plot(close, title="Close")`;
+
+      const result = executeScript(parse(script), createBars(3, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(6);
+    });
+
     it('reports invalid max_bars_back function hint values', () => {
       const script = `//@version=6
 indicator("Invalid Function Max Bars Back")
