@@ -1162,18 +1162,21 @@ plot(price)
 indicator("TA Tuple Types")
 [macdLine, signalLine, hist] = ta.macd(close, 12, 26, 9)
 [basis, upper, lower] = ta.bb(close, 20, 2)
+[kcBasis, kcUpper, kcLower] = ta.kc(close, 20, 1.5)
 [supertrend, direction] = ta.supertrend(3, 10)
 [diPlus, diMinus, adx] = ta.dmi(14, 14)
 macdLine := "bad"
 basis := "bad"
+kcUpper := "bad"
 direction := "up"
 adx := "bad"
-plot(signalLine + hist + upper + lower + supertrend + diPlus + diMinus)
+plot(signalLine + hist + upper + lower + kcBasis + kcLower + supertrend + diPlus + diMinus)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot assign string value to float variable macdLine',
       'Cannot assign string value to float variable basis',
+      'Cannot assign string value to float variable kcUpper',
       'Cannot assign string value to int variable direction',
       'Cannot assign string value to float variable adx',
     ]);
