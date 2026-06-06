@@ -168,6 +168,7 @@ export interface StrategyLedgerSettings {
   riskFreeRate: number;
   backtestFillLimitsAssumptionTicks: number;
   closeEntriesRule: 'FIFO' | 'ANY';
+  fillOrdersOnStandardOhlc: boolean;
 }
 
 export interface StrategyOrder {
@@ -324,6 +325,7 @@ export function createDefaultStrategySettings(settings: Partial<StrategyLedgerSe
     riskFreeRate: 2,
     backtestFillLimitsAssumptionTicks: 0,
     closeEntriesRule: 'FIFO',
+    fillOrdersOnStandardOhlc: false,
     ...settings,
   };
 }

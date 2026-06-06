@@ -194,6 +194,7 @@ plot(strategy.position_size)`;
         riskFreeRate: 1.75,
         backtestFillLimitsAssumptionTicks: 0,
         closeEntriesRule: 'FIFO',
+        fillOrdersOnStandardOhlc: false,
       });
       expect(result.strategy.equity).toBe(25000);
       expect(result.plots.map((plot) => plot.values)).toEqual([[25000], [0]]);
@@ -201,7 +202,7 @@ plot(strategy.position_size)`;
 
     it('applies strategy named-prefix positional tail settings', () => {
       const script = `//@version=6
-strategy(title="Mixed strategy", "Mixed", true, format.price, 3, scale.right, 100, "60", true, false, true, 10, 20, 30, 40, 50, true, 25000, "EUR", strategy.percent_of_equity, 10, 2, strategy.commission.percent, 0.05, 1, 50, 60, true, true, true, true, 1.75, 3, "ANY")
+strategy(title="Mixed strategy", "Mixed", true, format.price, 3, scale.right, 100, "60", true, false, true, 10, 20, 30, 40, 50, true, 25000, "EUR", strategy.percent_of_equity, 10, 2, strategy.commission.percent, 0.05, 1, 50, 60, true, true, true, true, 1.75, 3, "ANY", true)
 plot(strategy.equity)`;
 
       const result = executeScript(parse(script), createBars(1));
@@ -227,6 +228,7 @@ plot(strategy.equity)`;
         riskFreeRate: 1.75,
         backtestFillLimitsAssumptionTicks: 3,
         closeEntriesRule: 'ANY',
+        fillOrdersOnStandardOhlc: true,
       });
     });
 
@@ -265,6 +267,7 @@ plot(strategy.initial_capital)`;
         riskFreeRate: 0,
         backtestFillLimitsAssumptionTicks: 0,
         closeEntriesRule: 'FIFO',
+        fillOrdersOnStandardOhlc: false,
       });
       expect(result.strategy.equity).toBe(0);
       expect(result.plots[0]?.values).toEqual([0]);
