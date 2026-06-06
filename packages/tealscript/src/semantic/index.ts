@@ -1,6 +1,7 @@
 export {
   checkProgram,
   type SemanticCheckResult,
+  type SemanticCheckOptions,
   type SemanticDiagnostic,
   type SemanticDiagnosticSeverity,
   type SemanticQualifier,

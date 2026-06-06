@@ -91,10 +91,20 @@ export interface SemanticCheckResult {
   symbols: SemanticSymbol[];
 }
 
+export interface SemanticCheckOptions {
+  libraries?: Map<string, Program>;
+}
+
 type TupleInitializerShape =
   | { kind: 'tuple'; arity: number }
   | { kind: 'non-tuple' }
   | { kind: 'unknown' };
+
+interface SemanticImportedLibrary {
+  alias: string;
+  types: Map<string, TypeDeclaration>;
+  methods: Map<string, FunctionDeclaration[]>;
+}
 
 class SemanticScope {
   private readonly symbols = new Map<string, SemanticSymbol>();
@@ -1438,8 +1448,8 @@ const PLANNED_UNSUPPORTED_BUILTIN_CALL_MESSAGES = new Map<string, string>([
   ['ticker.rangebar', 'ticker.* functions are not supported yet: ticker.rangebar'],
 ]);
 
-export function checkProgram(program: Program): SemanticCheckResult {
-  return new SemanticChecker().check(program);
+export function checkProgram(program: Program, options: SemanticCheckOptions = {}): SemanticCheckResult {
+  return new SemanticChecker(options).check(program);
 }
 
 class SemanticChecker {
@@ -1448,8 +1458,11 @@ class SemanticChecker {
   private typeDeclarations = new Map<string, TypeDeclaration>();
   private enumDeclarations = new Map<string, EnumDeclaration>();
   private methodDeclarations = new Map<string, FunctionDeclaration[]>();
+  private importedLibraries = new Map<string, SemanticImportedLibrary>();
   private functionSymbolDeclarations = new WeakMap<SemanticSymbol, FunctionDeclaration>();
   private activeReturnInferences = new Set<FunctionDeclaration>();
+
+  constructor(private readonly options: SemanticCheckOptions = {}) {}
 
   check(program: Program): SemanticCheckResult {
     this.diagnostics = [];
@@ -1457,6 +1470,7 @@ class SemanticChecker {
     this.typeDeclarations = this.collectTypeDeclarations(program.body);
     this.enumDeclarations = this.collectEnumDeclarations(program.body);
     this.methodDeclarations = this.collectMethodDeclarations(program.body);
+    this.importedLibraries = this.collectImportedLibraries(program);
     this.functionSymbolDeclarations = new WeakMap();
     this.activeReturnInferences = new Set();
     this.checkLibraryExportDeclarations(program.body);
@@ -1534,6 +1548,38 @@ class SemanticChecker {
       if (declaration.type !== 'FunctionDeclaration') continue;
       this.checkExportedFunctionScope(declaration, globalVariableQualifiers);
     }
+  }
+
+  private collectImportedLibraries(program: Program): Map<string, SemanticImportedLibrary> {
+    const libraries = new Map<string, SemanticImportedLibrary>();
+    if (!this.options.libraries?.size) return libraries;
+
+    for (const statement of program.body) {
+      if (statement.type !== 'ImportDeclaration') continue;
+
+      const libraryProgram = this.options.libraries.get(statement.path);
+      if (!libraryProgram) continue;
+
+      const types = new Map<string, TypeDeclaration>();
+      const methods = new Map<string, FunctionDeclaration[]>();
+      for (const libraryStatement of libraryProgram.body) {
+        if (libraryStatement.type === 'TypeDeclaration' && libraryStatement.exported) {
+          types.set(libraryStatement.name.name, libraryStatement);
+        } else if (libraryStatement.type === 'FunctionDeclaration' && libraryStatement.isMethod && libraryStatement.exported) {
+          const overloads = methods.get(libraryStatement.name.name) ?? [];
+          overloads.push(libraryStatement);
+          methods.set(libraryStatement.name.name, overloads);
+        }
+      }
+
+      libraries.set(statement.alias.name, {
+        alias: statement.alias.name,
+        types,
+        methods,
+      });
+    }
+
+    return libraries;
   }
 
   private checkExportedTypeFields(
@@ -3898,7 +3944,7 @@ class SemanticChecker {
 
   private checkUserCallableArguments(expression: CallExpression, scope: SemanticScope): void {
     const offendingArgument = this.firstPositionalArgumentAfterNamed(expression.arguments);
-    const callable = this.resolveLocalUserCallable(expression, scope);
+    const callable = this.resolveLocalUserCallable(expression, scope) ?? this.resolveImportedUserMethodCallable(expression, scope);
     if (!callable) return;
 
     if (offendingArgument) {
@@ -3950,6 +3996,55 @@ class SemanticChecker {
       ))[0];
     return declaration
       ? { declaration, displayName: `method ${expression.callee.property.name}`, parameterOffset: 1 }
+      : undefined;
+  }
+
+  private resolveImportedUserMethodCallable(
+    expression: CallExpression,
+    scope: SemanticScope,
+  ): { declaration: FunctionDeclaration; displayName: string; parameterOffset: number; libraryAlias?: string } | undefined {
+    if (expression.callee.type !== 'MemberExpression') return undefined;
+
+    const receiverType = this.inferExpressionType(expression.callee.object, scope);
+    const importedReceiver = this.importedReceiverType(receiverType);
+    if (!importedReceiver) return undefined;
+
+    const methods = this.importedLibraries.get(importedReceiver.alias)?.methods.get(expression.callee.property.name) ?? [];
+    const receiverMatches = methods.filter((method) => this.importedMethodReceiverMatches(method, importedReceiver));
+    if (receiverMatches.length === 0) return undefined;
+
+    const candidates = receiverMatches
+      .map((method) => ({
+        method,
+        score: this.importedMethodReceiverSpecificityScore(method, importedReceiver)
+          + (this.userCallableSpecificityScore(method, expression, 1, scope) ?? Number.NEGATIVE_INFINITY),
+      }))
+      .filter((candidate) => Number.isFinite(candidate.score));
+    if (candidates.length > 0) {
+      const bestScore = Math.max(...candidates.map((candidate) => candidate.score));
+      const bestCandidates = candidates.filter((candidate) => candidate.score === bestScore);
+      if (bestCandidates.length === 1 && bestCandidates[0]) {
+        return {
+          declaration: bestCandidates[0].method,
+          displayName: `library function ${importedReceiver.alias}.${expression.callee.property.name}`,
+          parameterOffset: 1,
+          libraryAlias: importedReceiver.alias,
+        };
+      }
+    }
+
+    const declaration = receiverMatches
+      .sort((left, right) => (
+        this.importedMethodReceiverSpecificityScore(right, importedReceiver)
+        - this.importedMethodReceiverSpecificityScore(left, importedReceiver)
+      ))[0];
+    return declaration
+      ? {
+        declaration,
+        displayName: `library function ${importedReceiver.alias}.${expression.callee.property.name}`,
+        parameterOffset: 1,
+        libraryAlias: importedReceiver.alias,
+      }
       : undefined;
   }
 
@@ -4018,6 +4113,36 @@ class SemanticChecker {
 
   private isBuiltinCollectionMemberMethod(receiverType: SemanticType, methodName: string): boolean {
     return BUILTIN_COLLECTION_MEMBER_METHODS.get(receiverType.kind)?.has(methodName) ?? false;
+  }
+
+  private importedReceiverType(type: SemanticType): { alias: string; type: SemanticType } | undefined {
+    if (type.kind !== 'udt' || !type.name) return undefined;
+
+    const [alias, typeName] = type.name.split('.');
+    if (!alias || !typeName || !this.importedLibraries.has(alias)) return undefined;
+    return { alias, type };
+  }
+
+  private importedMethodReceiverMatches(
+    method: FunctionDeclaration,
+    receiver: { alias: string; type: SemanticType },
+  ): boolean {
+    const receiverType = this.importedSemanticTypeFromAnnotation(receiver.alias, method.params[0]?.typeAnnotation ?? undefined);
+    return !!receiverType
+      && this.isAssignableType(receiverType, receiver.type)
+      && this.isAssignableQualifier(receiverType.qualifier, receiver.type.qualifier);
+  }
+
+  private importedMethodReceiverSpecificityScore(
+    method: FunctionDeclaration,
+    receiver: { alias: string; type: SemanticType },
+  ): number {
+    const receiverType = this.importedSemanticTypeFromAnnotation(receiver.alias, method.params[0]?.typeAnnotation ?? undefined);
+    if (!receiverType) return 0;
+
+    let score = this.typeSpecificityScore(receiverType, receiver.type);
+    if (receiverType.qualifier === receiver.type.qualifier) score += 2;
+    return score;
   }
 
   private isAssignableQualifier(targetQualifier: SemanticQualifier | undefined, sourceQualifier: SemanticQualifier | undefined): boolean {
@@ -4792,6 +4917,8 @@ class SemanticChecker {
     if (userFunctionType) return userFunctionType;
     const userMethodType = this.inferUserMethodCallType(expression, scope);
     if (userMethodType) return userMethodType;
+    const importedUserMethodType = this.inferImportedUserMethodCallType(expression, scope);
+    if (importedUserMethodType) return importedUserMethodType;
     if (calleePath.join('.') === 'array.from') {
       return {
         kind: 'array',
@@ -4827,6 +4954,12 @@ class SemanticChecker {
     }
     if (calleePath.length === 2 && calleePath[1] === 'new' && calleePath[0] && this.typeDeclarations.has(calleePath[0])) {
       return { kind: 'udt', name: calleePath[0] };
+    }
+    if (calleePath.length === 3 && calleePath[2] === 'new') {
+      const [alias, typeName] = calleePath;
+      if (alias && typeName && this.importedLibraries.get(alias)?.types.has(typeName)) {
+        return { kind: 'udt', name: `${alias}.${typeName}` };
+      }
     }
     return { kind: 'unknown', qualifier: this.inferMaxQualifier(expression.arguments.map((argument) => argument.value), scope) };
   }
@@ -5053,6 +5186,16 @@ class SemanticChecker {
     return this.inferFunctionReturnType(method, this.inferCallableParameterTypes(method, expression.arguments, scope, receiverType));
   }
 
+  private inferImportedUserMethodCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
+    const callable = this.resolveImportedUserMethodCallable(expression, scope);
+    if (!callable?.libraryAlias) return undefined;
+
+    return this.inferFunctionReturnType(
+      callable.declaration,
+      this.inferImportedCallableParameterTypes(callable.libraryAlias, callable.declaration, expression.arguments, scope),
+    );
+  }
+
   private inferUserMethodTupleElementTypes(expression: CallExpression, scope: SemanticScope): SemanticType[] | undefined {
     if (expression.callee.type !== 'MemberExpression') return undefined;
 
@@ -5199,6 +5342,44 @@ class SemanticChecker {
       parameterTypes.set(parameter.name, this.typeFromParameterArgument(parameter, this.inferExpressionType(argument, scope)));
     }
     return parameterTypes;
+  }
+
+  private inferImportedCallableParameterTypes(
+    libraryAlias: string,
+    declaration: FunctionDeclaration,
+    args: CallArgument[],
+    scope: SemanticScope,
+  ): Map<string, SemanticType> {
+    const parameterTypes = new Map<string, SemanticType>();
+    for (const [index, parameter] of declaration.params.entries()) {
+      if (index === 0) {
+        const receiverType = this.importedSemanticTypeFromAnnotation(libraryAlias, parameter.typeAnnotation ?? undefined);
+        if (receiverType) parameterTypes.set(parameter.name, receiverType);
+        continue;
+      }
+
+      const argument = this.getCallArgument(args, parameter.name, index - 1);
+      if (!argument) continue;
+
+      parameterTypes.set(
+        parameter.name,
+        this.typeFromImportedParameterArgument(libraryAlias, parameter, this.inferExpressionType(argument, scope)),
+      );
+    }
+    return parameterTypes;
+  }
+
+  private typeFromImportedParameterArgument(
+    libraryAlias: string,
+    parameter: FunctionDeclaration['params'][number],
+    argumentType: SemanticType,
+  ): SemanticType {
+    const annotationType = this.importedSemanticTypeFromAnnotation(libraryAlias, parameter.typeAnnotation ?? undefined);
+    if (!annotationType) return argumentType;
+    return {
+      ...annotationType,
+      qualifier: annotationType.qualifier ?? argumentType.qualifier,
+    };
   }
 
   private typeFromParameterArgument(parameter: FunctionDeclaration['params'][number], argumentType: SemanticType): SemanticType {
@@ -5493,7 +5674,37 @@ class SemanticChecker {
   }
 
   private findUdtField(typeName: string, fieldName: string): TypeFieldDeclaration | undefined {
-    return this.typeDeclarations.get(typeName)?.fields.find((field) => field.name.name === fieldName);
+    const localField = this.typeDeclarations.get(typeName)?.fields.find((field) => field.name.name === fieldName);
+    if (localField) return localField;
+
+    const [alias, importedTypeName] = typeName.split('.');
+    if (!alias || !importedTypeName) return undefined;
+    return this.importedLibraries.get(alias)?.types.get(importedTypeName)?.fields.find((field) => field.name.name === fieldName);
+  }
+
+  private importedSemanticTypeFromAnnotation(libraryAlias: string, annotation?: TypeAnnotation | null): SemanticType | undefined {
+    const type = this.typeFromAnnotation(annotation);
+    return type ? this.qualifyImportedSemanticType(libraryAlias, type) : undefined;
+  }
+
+  private qualifyImportedSemanticType(libraryAlias: string, type: SemanticType): SemanticType {
+    if (type.kind === 'array' || type.kind === 'matrix') {
+      return {
+        ...type,
+        elementType: type.elementType ? this.qualifyImportedSemanticType(libraryAlias, type.elementType) : undefined,
+      };
+    }
+    if (type.kind === 'map') {
+      return {
+        ...type,
+        keyType: type.keyType ? this.qualifyImportedSemanticType(libraryAlias, type.keyType) : undefined,
+        valueType: type.valueType ? this.qualifyImportedSemanticType(libraryAlias, type.valueType) : undefined,
+      };
+    }
+    if (type.kind !== 'udt' || !type.name || type.name.includes('.')) return type;
+
+    const library = this.importedLibraries.get(libraryAlias);
+    return library?.types.has(type.name) ? { ...type, name: `${libraryAlias}.${type.name}` } : type;
   }
 
   private inferMaxQualifier(expressions: Expression[], scope: SemanticScope): SemanticQualifier | undefined {

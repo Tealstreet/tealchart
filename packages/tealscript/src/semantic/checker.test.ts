@@ -5881,6 +5881,43 @@ plot(str.length(stateLabel) + str.length(priceLabel) + shadowValue)
     expect(types.get('shadowValue')).toMatchObject({ kind: 'int' });
   });
 
+  it('reports imported library method argument diagnostics semantically', () => {
+    const library = parse(`
+library("PivotTools", true)
+export type Pivot
+    float value
+export method lifted(Pivot this, float amount, float factor=1) =>
+    this.value += amount * factor
+    this
+`);
+    const result = checkProgram(parse(`
+indicator("Imported Method Diagnostics")
+import TestUser/PivotTools/1 as pivots
+p = pivots.Pivot.new(close)
+valid = p.lifted(1)
+missing = p.lifted()
+unknown = p.lifted(source=1)
+duplicate = p.lifted(1, amount=2)
+tooMany = p.lifted(1, 2, 3)
+badOrder = p.lifted(amount=1, 2)
+plot(valid.value + missing.value + unknown.value + duplicate.value + tooMany.value + badOrder.value)
+`), {
+      libraries: new Map([['TestUser/PivotTools/1', library]]),
+    });
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "library function pivots.lifted missing required argument 'amount'",
+      "Unknown argument 'source' for library function pivots.lifted",
+      "Argument 'amount' for library function pivots.lifted was supplied multiple times",
+      'Too many arguments for library function pivots.lifted: expected 2, got 3',
+      'library function pivots.lifted cannot use positional arguments after named arguments',
+    ]);
+    expect(types.get('p')).toMatchObject({ kind: 'udt', name: 'pivots.Pivot' });
+    expect(types.get('valid')).toMatchObject({ kind: 'udt', name: 'pivots.Pivot' });
+  });
+
   it('does not report user method receiver mismatches for builtin collection member calls', () => {
     const result = checkProgram(parse(`
 indicator("Builtin Method Names")
