@@ -88,6 +88,7 @@ export interface IndicatorDeclaration extends BaseNode {
   use_bar_magnifier?: Expression;
   risk_free_rate?: Expression;
   backtest_fill_limits_assumption?: Expression;
+  close_entries_rule?: Expression;
 }
 
 /**
