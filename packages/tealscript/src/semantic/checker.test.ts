@@ -5981,6 +5981,57 @@ shortReplace = str.replace(source="BTC", target="B")
     ]);
   });
 
+  it('reports invalid string helper value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad String Values")
+badTostring = str.tostring(close, format=1)
+badTonumber = str.tonumber(1)
+badTime = str.format_time(time="now", format=1, timezone=2)
+badFormat = str.format(1, close)
+badLength = str.length(1)
+badContains = str.contains(1, 2)
+badSubstring = str.substring(1, begin_pos="0", end_pos="3")
+badMatch = str.match(1, regex=2)
+badRepeat = str.repeat(1, repeat="3", separator=2)
+badSplit = str.split(1, separator=2)
+badUpper = str.upper(1)
+badReplace = str.replace(1, target=2, replacement=3, occurrence="1")
+badReplaceAll = str.replace_all(1, target=2, replacement=3)
+badDuplicate = str.contains("BTC", 1, source="ETH")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'str.tostring format must be a string, got int',
+      'str.tonumber string must be a string, got int',
+      'str.format_time format must be a string, got int',
+      'str.format_time timezone must be a string, got int',
+      'str.format_time time must be a number, got string',
+      'str.format format must be a string, got int',
+      'str.length source must be a string, got int',
+      'str.contains source must be a string, got int',
+      'str.contains str must be a string, got int',
+      'str.substring source must be a string, got int',
+      'str.substring begin_pos must be a number, got string',
+      'str.substring end_pos must be a number, got string',
+      'str.match source must be a string, got int',
+      'str.match regex must be a string, got int',
+      'str.repeat source must be a string, got int',
+      'str.repeat separator must be a string, got int',
+      'str.repeat repeat must be a number, got string',
+      'str.split source must be a string, got int',
+      'str.split separator must be a string, got int',
+      'str.upper source must be a string, got int',
+      'str.replace source must be a string, got int',
+      'str.replace target must be a string, got int',
+      'str.replace replacement must be a string, got int',
+      'str.replace occurrence must be a number, got string',
+      'str.replace_all source must be a string, got int',
+      'str.replace_all target must be a string, got int',
+      'str.replace_all replacement must be a string, got int',
+      "Argument 'source' for str.contains() was supplied multiple times",
+    ]);
+  });
+
   it('resolves math helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Math Signatures")
@@ -6981,7 +7032,7 @@ validLabel = sig.State.long.label()
 missing = sig.State.sideways
 hidden = sig.Hidden.private
 missingEnum = sig.Missing.fast
-plot(str.length(validDescription) + str.length(validLabel) + str.length(shadow(1)))
+plot(str.length(validDescription) + str.length(validLabel) + str.length(str.tostring(shadow(1))))
 `), {
       libraries: new Map([['TestUser/SignalTools/1', library]]),
     });
