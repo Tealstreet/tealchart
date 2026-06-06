@@ -180,6 +180,7 @@ export interface StrategyOrder {
   qtyType: StrategyQuantityType;
   qtyValue: number;
   isEntry: boolean;
+  isExit: boolean;
   requestedQty: number | null;
   filledQty: number;
   avgFillPrice: number | null;
@@ -216,6 +217,7 @@ export interface StrategyOrderInput {
   qtyType: StrategyQuantityType;
   qtyValue: number;
   isEntry?: boolean;
+  isExit?: boolean;
   requestedQty?: number | null;
   limitPrice?: number;
   stopPrice?: number;
@@ -435,6 +437,7 @@ export function createStrategyOrder(input: StrategyOrderInput): StrategyOrder {
     qtyType: input.qtyType,
     qtyValue: input.qtyValue,
     isEntry: input.isEntry ?? false,
+    isExit: input.isExit ?? false,
     requestedQty: input.requestedQty ?? input.qty,
     filledQty: 0,
     avgFillPrice: null,
@@ -587,6 +590,14 @@ function fillStrategyOrder(
     throw new Error('strategy fill price must be finite');
   }
   const fillQty = resolveStrategyFillQty(ledger, order);
+  if (fillQty <= 0) {
+    if (order.isExit) {
+      order.status = 'cancelled';
+      order.updatedBarIndex = barIndex;
+      order.updatedTime = time;
+    }
+    return null;
+  }
   const commission = resolveStrategyFillCommission(ledger.settings, fillQty, fillPrice);
 
   order.status = 'filled';
@@ -661,6 +672,9 @@ function applyStrategyCommission(ledger: StrategyLedger, commission: number): vo
 }
 
 function resolveStrategyFillQty(ledger: StrategyLedger, order: StrategyOrder): number {
+  if (order.isExit) {
+    return resolveStrategyExitFillQty(ledger, order);
+  }
   if (!order.isEntry) {
     return order.qty ?? 0;
   }
@@ -671,6 +685,25 @@ function resolveStrategyFillQty(ledger: StrategyLedger, order: StrategyOrder): n
     return requestedQty;
   }
   return Math.abs(position.size) + requestedQty;
+}
+
+function resolveStrategyExitFillQty(ledger: StrategyLedger, order: StrategyOrder): number {
+  if (order.qty === null) {
+    return 0;
+  }
+
+  const openDirection: StrategyDirection = order.direction === 'long' ? 'short' : 'long';
+  const openQty = ledger.openTrades.reduce((total, trade) => {
+    if (trade.direction !== openDirection) {
+      return total;
+    }
+    if (order.fromEntry !== undefined && trade.entryOrderId !== order.fromEntry) {
+      return total;
+    }
+    return total + trade.qty;
+  }, 0);
+
+  return Math.min(order.qty, openQty);
 }
 
 function getPendingOrderFillPrice(
