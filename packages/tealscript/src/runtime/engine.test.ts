@@ -62,7 +62,7 @@ plot(basis, title="Basis")`;
       expect(result.profile.expressions).toBeGreaterThan(0);
       expect(result.profile.builtinCalls).toBeGreaterThan(0);
       expect(result.profile.requestContexts).toBe(0);
-      expect(result.profile.maxBarsBack).toBe(0);
+      expect(result.profile.maxBarsBack).toBe(1);
       expect(result.profile.errors).toBe(0);
       expect(result.profile.elapsedMs).toBeGreaterThanOrEqual(0);
     });
@@ -6145,6 +6145,19 @@ plot(math.sum(close, length), title="Sum")`;
 
       expect(result.errors).toEqual([]);
       expect(result.profile.maxBarsBack).toBe(5);
+    });
+
+    it('reports shared TA window lookback lengths in the runtime profile', () => {
+      const script = `//@version=6
+indicator("TA Window Profile")
+plot(ta.sma(close, 3), title="SMA")
+plot(ta.highest(high, 5), title="Highest")
+plot(ta.stdev(close, 4), title="Stdev")`;
+
+      const result = executeScript(parse(script), createBars(6, 100));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.maxBarsBack).toBe(4);
     });
 
     it('reports invalid max_bars_back function hint values', () => {
