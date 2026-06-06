@@ -1184,7 +1184,42 @@ FunctionHyperDeepNestedBlock
     }
 
 FunctionHyperDeepNestedStatement
-  = &FunctionHyperDeepNestedIndent FunctionHyperDeepNestedIndent stmt:Statement {
+  = &FunctionHyperDeepNestedIndent FunctionHyperDeepNestedIndent stmt:(FunctionHyperDeepNestedIfStatement / Statement) {
+      return stmt;
+    }
+
+FunctionHyperDeepNestedIfStatement
+  = "if" _ test:Expression _ LineTerminator consequent:FunctionExtremeDeepNestedBlock alternate:FunctionHyperDeepNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+
+FunctionHyperDeepNestedElseClause
+  = FunctionHyperDeepNestedIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionExtremeDeepNestedBlock alternate:FunctionHyperDeepNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / FunctionHyperDeepNestedIndent "else" _ LineTerminator? block:FunctionExtremeDeepNestedBlock {
+      return block;
+    }
+
+FunctionExtremeDeepNestedBlock
+  = statements:(BlockIgnorableLine / FunctionExtremeDeepNestedStatement)+ {
+      return statements.filter(s => s !== null);
+    }
+
+FunctionExtremeDeepNestedStatement
+  = &FunctionExtremeDeepNestedIndent FunctionExtremeDeepNestedIndent stmt:Statement {
       return stmt;
     }
 
@@ -1272,6 +1307,9 @@ FunctionSuperDeepNestedIndent
 
 FunctionHyperDeepNestedIndent
   = Indent Indent Indent Indent Indent Indent Indent Indent
+
+FunctionExtremeDeepNestedIndent
+  = Indent Indent Indent Indent Indent Indent Indent Indent Indent
 
 SingleLineBody
   = stmt:(VariableDeclaration / AssignmentStatement / ExpressionStatement / BreakStatement / ContinueStatement) {
