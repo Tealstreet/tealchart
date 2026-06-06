@@ -2426,6 +2426,26 @@ plot(strategy.position_size)`;
       expect(result.plots[0]?.values).toEqual([1, 3]);
     });
 
+    it('captures common strategy.risk guard metadata', () => {
+      const script = `//@version=6
+strategy("Risk metadata")
+strategy.risk.max_drawdown(25, strategy.percent_of_equity, "drawdown")
+strategy.risk.max_intraday_loss(1000, strategy.cash, "loss")
+strategy.risk.max_intraday_filled_orders(10, "fills")
+strategy.risk.max_cons_loss_days(count=3, alert_message="days")
+plot(close)`;
+
+      const result = executeScript(parse(script), createBars(1));
+
+      expect(result.errors).toEqual([]);
+      expect(result.strategy.settings.riskRules).toEqual({
+        maxDrawdown: { value: 25, type: 'percent_of_equity', alertMessage: 'drawdown' },
+        maxIntradayLoss: { value: 1000, type: 'cash', alertMessage: 'loss' },
+        maxIntradayFilledOrders: { count: 10, alertMessage: 'fills' },
+        maxConsLossDays: { count: 3, alertMessage: 'days' },
+      });
+    });
+
     it('fills strategy.exit brackets and cancels the sibling OCA order', () => {
       const script = `//@version=6
 strategy("Exit bracket fill", process_orders_on_close=true)
