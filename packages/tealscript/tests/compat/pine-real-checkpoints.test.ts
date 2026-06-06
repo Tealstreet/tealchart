@@ -1217,6 +1217,111 @@ plot(slow, title="Slow Average")
     ]);
   });
 
+  it('locks a reduced public matrix scoreboard idiom', () => {
+    // Public idiom reference: matrix-heavy public dashboards commonly turn
+    // recent price factors into score matrices and summarize the last bar in a table.
+    // Source search: https://www.tradingview.com/scripts/search/matrix%20dashboard/
+    const result = runCompatScript(`
+indicator("Public Matrix Scoreboard Checkpoint", overlay=true)
+weights = matrix.new_float(2, 2, 0)
+matrix.set(weights, 0, 0, 1.0)
+matrix.set(weights, 0, 1, 0.5)
+matrix.set(weights, 1, 0, -0.25)
+matrix.set(weights, 1, 1, 1.5)
+factors = matrix.new_float(2, 1, 0)
+momentum = nz(close - close[1])
+rangeScore = high - low
+matrix.set(factors, 0, 0, momentum)
+matrix.set(factors, 1, 0, rangeScore)
+score = matrix.mult(weights, factors)
+transposed = matrix.transpose(score)
+topRow = matrix.row(score, 0)
+bias = array.get(topRow, 0)
+confirmation = matrix.get(transposed, 0, 1)
+averageScore = matrix.avg(score)
+shapeCode = matrix.rows(score) * 10 + matrix.columns(score)
+var board = table.new(position.top_right, 2, 4, border_width=1, border_color=color.white)
+if barstate.islast
+    table.cell(board, 0, 0, "Metric", text_color=color.white, bgcolor=color.blue)
+    table.cell(board, 1, 0, "Score", text_color=color.white, bgcolor=color.blue)
+    table.cell(board, 0, 1, "Bias", text_color=color.white, bgcolor=color.gray)
+    table.cell(board, 1, 1, str.tostring(bias, "#.00"), text_color=color.white, bgcolor=bias > 0 ? color.green : color.red)
+    table.cell(board, 0, 2, "Confirm", text_color=color.white, bgcolor=color.gray)
+    table.cell(board, 1, 2, str.tostring(confirmation, "#.00"), text_color=color.white, bgcolor=confirmation > 0 ? color.green : color.red)
+    table.cell(board, 0, 3, "Shape", text_color=color.white, bgcolor=color.gray)
+    table.cell(board, 1, 3, str.tostring(shapeCode), text_color=color.black, bgcolor=color.yellow)
+plot(bias, title="Matrix Bias")
+plot(confirmation, title="Matrix Confirmation")
+plot(averageScore, title="Matrix Average")
+plot(shapeCode, title="Matrix Shape")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Matrix Bias').values)).toEqual([
+      2,
+      5.5,
+      4,
+      -0.5,
+      -1,
+      3.5,
+      7,
+      8.5,
+      1.5,
+      5.5,
+      1.5,
+      4.5,
+    ]);
+    expect(roundSeries(getPlot(result, 'Matrix Confirmation').values)).toEqual([
+      6,
+      6.75,
+      5.5,
+      11.5,
+      10,
+      7.25,
+      8,
+      9.25,
+      7.75,
+      6.75,
+      7.75,
+      7,
+    ]);
+    expect(roundSeries(getPlot(result, 'Matrix Average').values)).toEqual([
+      4,
+      6.125,
+      4.75,
+      5.5,
+      4.5,
+      5.375,
+      7.5,
+      8.875,
+      4.625,
+      6.125,
+      4.625,
+      5.75,
+    ]);
+    expect(getPlot(result, 'Matrix Shape').values).toEqual(Array(compatibilityBars.length).fill(21));
+    expect(result.drawings).toEqual([
+      expect.objectContaining({
+        type: 'table',
+        position: 'top_right',
+        columns: 2,
+        rows: 4,
+        borderColor: '#FFFFFF',
+        borderWidth: 1,
+        cells: [
+          expect.objectContaining({ column: 0, row: 0, text: 'Metric', textColor: '#FFFFFF', bgcolor: '#2196F3' }),
+          expect.objectContaining({ column: 1, row: 0, text: 'Score', textColor: '#FFFFFF', bgcolor: '#2196F3' }),
+          expect.objectContaining({ column: 0, row: 1, text: 'Bias', textColor: '#FFFFFF', bgcolor: '#787B86' }),
+          expect.objectContaining({ column: 1, row: 1, text: '4.50', textColor: '#FFFFFF', bgcolor: '#4CAF50' }),
+          expect.objectContaining({ column: 0, row: 2, text: 'Confirm', textColor: '#FFFFFF', bgcolor: '#787B86' }),
+          expect.objectContaining({ column: 1, row: 2, text: '7.00', textColor: '#FFFFFF', bgcolor: '#4CAF50' }),
+          expect.objectContaining({ column: 0, row: 3, text: 'Shape', textColor: '#FFFFFF', bgcolor: '#787B86' }),
+          expect.objectContaining({ column: 1, row: 3, text: '21', textColor: '#363A45', bgcolor: '#FDD835' }),
+        ],
+      }),
+    ]);
+  });
+
   it('locks a reduced public multi-symbol screener idiom', () => {
     // Public idiom reference: screener-style public indicators commonly use
     // request.security() for several symbols and summarize signals in a table.

@@ -381,7 +381,9 @@ Phases:
    updated through user-defined methods.
 4. Complete matrix API breadth used by public scripts; defer rare numerical
    exactness such as repeated-eigenvalue basis parity unless corpus demand
-   justifies it.
+   justifies it. Source-linked matrix scoreboard checkpoint coverage now
+   exercises weighted factor matrices, row extraction, transpose reads,
+   aggregate scores, and table output.
 5. Keep library/module version lookup as later work unless corpus failures show
    it blocks many scripts.
 

@@ -48,8 +48,8 @@ timeframe comparisons, official plot-style payloads, and public MTF,
 divergence, volatility-band overlays, session-filter, session-state,
 dashboard-table, multi-symbol screener, currency conversion, earnings event
 markers, corporate-action overlays, financial dashboards, economic macro
-overlays, seed dataset overlays, drawing-zone, linefill-channel, custom-candle,
-and library-helper idioms.
+overlays, seed dataset overlays, matrix scoreboards, drawing-zone,
+linefill-channel, custom-candle, and library-helper idioms.
 Public-source coverage also includes alert signal metadata, direct alert
 emission, Heikin-Ashi synthetic ticker trend requests, public zigzag polylines,
 public strategy performance tables, plus UDT state objects updated through
@@ -402,6 +402,10 @@ same runtime built-ins for calls such as
 `values.pinv()`, `values.rank()`, `values.eigenvalues()`,
 `values.eigenvectors()`, `values.kron(other)`, `values.is_identity()`, and
 `values.avg()`.
+Source-linked public checkpoint coverage now also exercises a common matrix
+scoreboard idiom that builds weighted factor matrices, reads row arrays,
+transposes score matrices, aggregates scores, and renders the last-bar result
+through a table.
 
 ## Common `map.*` Coverage
 
