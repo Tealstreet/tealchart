@@ -5995,6 +5995,40 @@ plot(p.value)
     ]);
   });
 
+  it('reports unavailable imported library calls semantically', () => {
+    const library = parse(`
+library("HiddenTools", true)
+export type Pivot
+    float value
+type Hidden
+    float value
+export visible(float value) => value
+hidden(float value) => value
+method secret(Pivot this) => this
+`);
+    const result = checkProgram(parse(`
+indicator("Imported Call Availability")
+import TestUser/HiddenTools/1 as tools
+p = tools.Pivot.new(close)
+method local(tools.Pivot this) => this.value
+validLocal = p.local()
+missingFunction = tools.missing(close)
+privateFunction = tools.hidden(close)
+missingConstructor = tools.Hidden.new(close)
+missingMethod = p.secret()
+plot(validLocal + missingFunction + privateFunction + missingConstructor.value + missingMethod.value)
+`), {
+      libraries: new Map([['TestUser/HiddenTools/1', library]]),
+    });
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Unknown library function: tools.missing',
+      'Unknown library function: tools.hidden',
+      'Unknown library constructor: tools.Hidden.new',
+      'Unknown function: p.secret',
+    ]);
+  });
+
   it('does not report user method receiver mismatches for builtin collection member calls', () => {
     const result = checkProgram(parse(`
 indicator("Builtin Method Names")
