@@ -1361,6 +1361,15 @@ const HLINE_LINESTYLE_CONSTANT_VALUES = new Map([
   ['hline.style_dashed', 'dashed'],
 ]);
 
+const VISUAL_FORMAT_PRECISION_CALLS = new Set([
+  'plot',
+  'plotbar',
+  'plotcandle',
+  'plotshape',
+  'plotchar',
+  'plotarrow',
+]);
+
 for (const name of CALENDAR_FUNCTION_NAMES) {
   BUILTIN_SIGNATURES.set(name, { params: ['time', 'timezone'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true });
 }
@@ -3164,6 +3173,7 @@ class SemanticChecker {
     this.checkRequestCalcBarsCountLiteralArguments(expression);
     this.checkRequestBarmergeModeLiteralArguments(expression);
     this.checkVisualLineStyleLiteralArguments(expression);
+    this.checkVisualFormatPrecisionLiteralArguments(expression);
     this.checkStrategyLiteralArgumentConstraints(expression);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
@@ -3924,6 +3934,31 @@ class SemanticChecker {
         break;
       }
     }
+  }
+
+  private checkVisualFormatPrecisionLiteralArguments(expression: CallExpression): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    if (!VISUAL_FORMAT_PRECISION_CALLS.has(calleeName)) return;
+
+    const parameterNames = BUILTIN_SIGNATURES.get(calleeName)?.params;
+    if (!parameterNames) return;
+
+    const formatIndex = parameterNames.indexOf('format');
+    const format = this.resolveCallArgumentExpression(expression, parameterNames, formatIndex);
+    this.checkNamespacedConstantStringValue(
+      format,
+      DECLARATION_FORMAT_VALUES,
+      DECLARATION_FORMAT_CONSTANT_VALUES,
+      'format.',
+      `Invalid ${calleeName} format`,
+    );
+
+    const precisionIndex = parameterNames.indexOf('precision');
+    const precision = this.resolveCallArgumentExpression(expression, parameterNames, precisionIndex);
+    this.checkNonNegativeLiteralIntegerValue(
+      precision,
+      `${calleeName} precision must be a non-negative integer`,
+    );
   }
 
   private checkStrategyOrderLiteralArguments(expression: CallExpression, displayName: string): void {
