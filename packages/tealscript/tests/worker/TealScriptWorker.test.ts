@@ -137,4 +137,92 @@ describe('TealscriptWorker semantic diagnostics', () => {
     expect(onResult).toHaveBeenCalledTimes(1);
     expect(onError).not.toHaveBeenCalled();
   });
+
+  it('ignores stale realtime updateBar results after a newer tick is requested', async () => {
+    globalThis.Worker = MockWorker as unknown as typeof Worker;
+    const onResult = vi.fn();
+    const worker = new TealscriptWorkerFactory('tealscript-worker.js').create({ onResult });
+    const mock = MockWorker.instances[0]!;
+    const bar = {
+      time: Date.UTC(2024, 0, 1),
+      open: 100,
+      high: 101,
+      low: 99,
+      close: 100.5,
+      volume: 1000,
+    };
+
+    mock.emit({ type: 'ready' });
+    await worker.init('study-1', 'indicator("Realtime")\nplot(close)\n', [bar], {});
+    worker.updateBar({ ...bar, close: 101 });
+    worker.updateBar({ ...bar, close: 102 });
+
+    expect(mock.messages.map((message) => message.type)).toEqual(['init', 'updateBar', 'updateBar']);
+    expect(mock.messages.map((message) => 'metadata' in message ? message.metadata : undefined)).toEqual([
+      { generation: 1, requestId: 1 },
+      { generation: 1, requestId: 2 },
+      { generation: 1, requestId: 3 },
+    ]);
+
+    mock.emit({
+      type: 'result',
+      scriptId: 'study-1',
+      plots: [],
+      drawings: [],
+      alerts: [],
+      logs: [],
+      inputs: [],
+      output: {
+        plots: [
+          {
+            id: 'plot_close',
+            type: 'plot',
+            title: 'Close',
+            values: [101],
+            color: '#2196F3',
+          },
+        ],
+        drawings: [],
+        alerts: [],
+        logs: [],
+        inputs: [],
+        metadata: { generation: 1, requestId: 2 },
+      },
+    });
+    mock.emit({
+      type: 'result',
+      scriptId: 'study-1',
+      plots: [],
+      drawings: [],
+      alerts: [],
+      logs: [],
+      inputs: [],
+      output: {
+        plots: [
+          {
+            id: 'plot_close',
+            type: 'plot',
+            title: 'Close',
+            values: [102],
+            color: '#2196F3',
+          },
+        ],
+        drawings: [],
+        alerts: [],
+        logs: [],
+        inputs: [],
+        metadata: { generation: 1, requestId: 3 },
+      },
+    });
+
+    expect(onResult).toHaveBeenCalledTimes(1);
+    expect(onResult).toHaveBeenCalledWith(expect.objectContaining({
+      plots: [
+        expect.objectContaining({
+          title: 'Close',
+          values: [102],
+        }),
+      ],
+    }));
+  });
 });
