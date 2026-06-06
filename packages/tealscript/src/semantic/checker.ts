@@ -326,6 +326,32 @@ const STRING_RETURN_NAMES = new Set([
 ]);
 const STRING_BOOL_RETURN_NAMES = new Set(['str.contains', 'str.startswith', 'str.endswith']);
 const STRING_INT_RETURN_NAMES = new Set(['str.length', 'str.pos']);
+const STRING_FUNCTION_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['str.tostring', ['format']],
+  ['str.tonumber', ['string']],
+  ['str.format_time', ['format', 'timezone']],
+  ['str.format', ['format']],
+  ['str.length', ['source']],
+  ['str.contains', ['source', 'str']],
+  ['str.startswith', ['source', 'str']],
+  ['str.endswith', ['source', 'str']],
+  ['str.pos', ['source', 'str']],
+  ['str.substring', ['source']],
+  ['str.match', ['source', 'regex']],
+  ['str.repeat', ['source', 'separator']],
+  ['str.split', ['source', 'separator']],
+  ['str.upper', ['source']],
+  ['str.lower', ['source']],
+  ['str.trim', ['source']],
+  ['str.replace', ['source', 'target', 'replacement']],
+  ['str.replace_all', ['source', 'target', 'replacement']],
+]);
+const STRING_FUNCTION_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['str.format_time', ['time']],
+  ['str.substring', ['begin_pos', 'end_pos']],
+  ['str.repeat', ['repeat']],
+  ['str.replace', ['occurrence']],
+]);
 
 const TA_BOOL_RETURN_NAMES = new Set(['ta.cross', 'ta.crossover', 'ta.crossunder', 'ta.rising', 'ta.falling']);
 const TA_INT_RETURN_NAMES = new Set(['ta.barssince', 'ta.highestbars', 'ta.lowestbars']);
@@ -3568,6 +3594,7 @@ class SemanticChecker {
     this.checkMapCallTypes(expression, scope);
     this.checkInputDefaultValueType(expression, scope);
     this.checkColorFunctionArgumentTypes(expression, scope);
+    this.checkStringFunctionArgumentTypes(expression, scope);
     this.checkMaxBarsBackLiteralArguments(expression);
     this.checkAlertFrequencyLiteralArguments(expression);
     this.checkAlertStringOptionArguments(expression, scope);
@@ -4090,13 +4117,32 @@ class SemanticChecker {
     }
   }
 
+  private checkStringFunctionArgumentTypes(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const stringParameterNames = STRING_FUNCTION_STRING_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    const numericParameterNames = STRING_FUNCTION_NUMERIC_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!stringParameterNames && !numericParameterNames) return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+
+    for (const parameterName of stringParameterNames ?? []) {
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'string');
+    }
+
+    for (const parameterName of numericParameterNames ?? []) {
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'number');
+    }
+  }
+
   private checkBuiltinArgumentKind(
     expression: CallExpression,
     scope: SemanticScope,
     calleeName: string,
     parameterNames: string[],
     parameterName: string,
-    expectedKind: 'color' | 'number',
+    expectedKind: 'color' | 'number' | 'string',
   ): void {
     const parameterIndex = parameterNames.indexOf(parameterName);
     if (parameterIndex === -1) return;
@@ -4108,6 +4154,7 @@ class SemanticChecker {
     if (argumentType.kind === 'unknown') return;
     if (expectedKind === 'color' && argumentType.kind === 'color') return;
     if (expectedKind === 'number' && this.isNumericType(argumentType)) return;
+    if (expectedKind === 'string' && argumentType.kind === 'string') return;
 
     this.addDiagnostic(
       'type-mismatch',
