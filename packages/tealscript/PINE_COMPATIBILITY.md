@@ -801,6 +801,8 @@ host datafeed work. Obvious invalid literal declaration and request
 `calc_bars_count` values, request `gaps` / `lookahead` modes, and
 point-series request field selectors are reported by semantic diagnostics
 before runtime. Request `ignore_invalid_*` option flags also report non-boolean
+argument types before runtime, and request symbol, timeframe, currency, source,
+country, financial id, period, and economic field identifiers report non-string
 argument types before runtime.
 Visual output registration enforces Pine's 64 plot-output
 limit while exempting `hline()` outputs. Table creation enforces a conservative
