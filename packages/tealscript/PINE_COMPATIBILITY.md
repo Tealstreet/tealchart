@@ -565,7 +565,8 @@ rounding to fixed precision, converting a right angle between radians and
 degrees, summing the latest non-`na` source values, and checking random bounds.
 Semantic analysis preserves known math constant and helper return types for
 downstream assignment diagnostics, including int/float overload distinctions for
-rounding helpers and series-only math helpers.
+rounding helpers and series-only math helpers, and rejects non-numeric math
+helper arguments before runtime.
 
 ## Common Global Helper Coverage
 

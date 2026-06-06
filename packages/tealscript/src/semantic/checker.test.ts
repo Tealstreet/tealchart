@@ -6142,6 +6142,38 @@ tooManyMintick = math.round_to_mintick(1.0, 2)
     ]);
   });
 
+  it('reports invalid math helper value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Math Values")
+badUnary = math.sqrt("16")
+badPow = math.pow("2", true)
+badRound = math.round("1", precision="2")
+badSum = math.sum("close", "3")
+badRandom = math.random(min="0", max=true, seed="7")
+badMax = math.max(1, "2", number2=true)
+badAvg = math.avg(number0="1", number1=2, number2="3")
+badDuplicate = math.round("1", number=2)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'math.sqrt number must be a number, got string',
+      'math.pow base must be a number, got string',
+      'math.pow exponent must be a number, got bool',
+      'math.round number must be a number, got string',
+      'math.round precision must be a number, got string',
+      'math.sum source must be a number, got string',
+      'math.sum length must be a number, got string',
+      'math.random min must be a number, got string',
+      'math.random max must be a number, got bool',
+      'math.random seed must be a number, got string',
+      'math.max number1 must be a number, got string',
+      'math.max number2 must be a number, got bool',
+      'math.avg number0 must be a number, got string',
+      'math.avg number2 must be a number, got string',
+      "Argument 'number' for math.round() was supplied multiple times",
+    ]);
+  });
+
   it('resolves global helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Global Helper Signatures")
