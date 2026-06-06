@@ -87,6 +87,53 @@ describe('TealscriptWorker semantic diagnostics', () => {
     ]);
   });
 
+  it('forwards planned unsupported semantic diagnostics to error callbacks', async () => {
+    globalThis.Worker = MockWorker as unknown as typeof Worker;
+    const errors: WorkerError[] = [];
+    const worker = new TealscriptWorkerFactory('tealscript-worker.js').create({
+      onError: (error) => errors.push(error),
+    });
+    const mock = MockWorker.instances[0]!;
+
+    mock.emit({ type: 'ready' });
+    await worker.init('study-unsupported', 'indicator("Unsupported")\nrequest.footprint(syminfo.tickerid)\n', [], {});
+    mock.emit({
+      type: 'semanticError',
+      scriptId: 'study-unsupported',
+      message: 'line 2:1: request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+      line: 2,
+      column: 1,
+      metadata: { generation: 1, requestId: 1 },
+      diagnostics: [
+        {
+          code: 'unsupported-feature',
+          message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+          severity: 'error',
+          line: 2,
+          column: 1,
+        },
+      ],
+    });
+
+    expect(errors).toEqual([
+      {
+        type: 'semantic',
+        message: 'line 2:1: request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+        line: 2,
+        column: 1,
+        diagnostics: [
+          {
+            code: 'unsupported-feature',
+            message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+            severity: 'error',
+            line: 2,
+            column: 1,
+          },
+        ],
+      },
+    ]);
+  });
+
   it('ignores stale semantic diagnostics after a newer result settles', async () => {
     globalThis.Worker = MockWorker as unknown as typeof Worker;
     const onError = vi.fn();
