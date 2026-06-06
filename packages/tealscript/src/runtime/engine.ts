@@ -1105,8 +1105,42 @@ export class TealscriptEngine {
       const defval = this.getStaticCallArgument(expression, ['defval'], 0);
       return defval ? this.inferStaticNumericValue(defval, collectionScopes) : null;
     }
+    if (name === 'int' || name === 'float') {
+      return this.inferStaticNumericCastValue(expression, name, collectionScopes);
+    }
+    if (name === 'nz') {
+      return this.inferStaticNzNumericValue(expression, collectionScopes);
+    }
 
     return this.inferStaticMathCallValue(expression, name, collectionScopes);
+  }
+
+  private inferStaticNumericCastValue(
+    expression: CallExpression,
+    name: 'int' | 'float',
+    collectionScopes: StaticCollectionScopes,
+  ): number | null {
+    const argument = this.getStaticOrderedCallArgument(expression, ['x'], 0);
+    if (!argument) return null;
+
+    const value = this.inferStaticNumericValue(argument, collectionScopes);
+    if (value === null || !Number.isFinite(value)) return null;
+    return name === 'int' ? Math.trunc(value) : value;
+  }
+
+  private inferStaticNzNumericValue(expression: CallExpression, collectionScopes: StaticCollectionScopes): number | null {
+    const source = this.getStaticOrderedCallArgument(expression, ['source', 'replacement'], 0);
+    if (!source) return null;
+
+    const sourceValue = this.inferStaticNumericValue(source, collectionScopes);
+    if (sourceValue !== null && Number.isFinite(sourceValue)) return sourceValue;
+    if (source.type !== 'NaExpression') return null;
+
+    const replacement = this.getStaticOrderedCallArgument(expression, ['source', 'replacement'], 1);
+    if (!replacement) return 0;
+
+    const replacementValue = this.inferStaticNumericValue(replacement, collectionScopes);
+    return replacementValue !== null && Number.isFinite(replacementValue) ? replacementValue : null;
   }
 
   private inferStaticMathCallValue(
