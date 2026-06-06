@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
-import { InMemoryRequestDatafeed, InMemoryStrategyIntrabarDatafeed, TealscriptEngine, type Bar } from '../../src/runtime';
+import {
+  currencyRateRequestKey,
+  InMemoryRequestDatafeed,
+  InMemoryStrategyIntrabarDatafeed,
+  TealscriptEngine,
+  type Bar,
+} from '../../src/runtime';
 import { compatibilityBars, getPlot, roundSeries, runCompatScript } from './fixtures';
 
 describe('Pine real idiom checkpoints', () => {
@@ -1208,6 +1214,43 @@ plot(nvdaUp ? 1 : 0, title="NVDA Up")
         ],
       },
     ]);
+  });
+
+  it('locks a reduced public currency conversion idiom', () => {
+    // Public idiom reference: public portfolio and multi-asset indicators
+    // commonly normalize values with request.currency_rate().
+    // Source search: https://www.tradingview.com/scripts/search/currency%20conversion/
+    const bars: Bar[] = [
+      { time: 1_700_530_000_000, open: 10, high: 10.5, low: 9.5, close: 10, volume: 100 },
+      { time: 1_700_530_060_000, open: 11, high: 11.5, low: 10.5, close: 11, volume: 100 },
+      { time: 1_700_530_120_000, open: 12, high: 12.5, low: 11.5, close: 12, volume: 100 },
+      { time: 1_700_530_180_000, open: 13, high: 13.5, low: 12.5, close: 13, volume: 100 },
+    ];
+    const requestDatafeed = new InMemoryRequestDatafeed([], [
+      {
+        family: 'currency_rate',
+        key: currencyRateRequestKey('USD', 'EUR'),
+        points: [
+          { time: bars[0]!.time, value: 0.9 },
+          { time: bars[2]!.time, value: 0.92 },
+        ],
+      },
+    ]);
+    const result = runCompatScript(`
+indicator("Public Currency Conversion Checkpoint")
+usdValue = close * 100
+eurRate = request.currency_rate("USD", "EUR")
+eurValue = usdValue * eurRate
+plot(eurRate, title="EUR Rate")
+plot(eurValue, title="EUR Value")
+`, {
+      bars,
+      engineOptions: { requestDatafeed },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'EUR Rate').values).toEqual([0.9, 0.9, 0.92, 0.92]);
+    expect(roundSeries(getPlot(result, 'EUR Value').values)).toEqual([900, 990, 1104, 1196]);
   });
 
   it('locks a reduced public library helper idiom', () => {

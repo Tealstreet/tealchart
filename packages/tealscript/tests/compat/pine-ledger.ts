@@ -336,6 +336,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-currency-conversion-checkpoint',
+      title: 'Public Currency Conversion Checkpoint',
+      searchContext: 'TradingView public scripts search: currency conversion',
+      featureTags: ['request', 'currency'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-library-helper-checkpoint',
       title: 'Public Library Helper Checkpoint',
       searchContext: 'TradingView public scripts search: library helper',
