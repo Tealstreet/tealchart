@@ -3223,6 +3223,7 @@ class SemanticChecker {
     this.checkVisualLineStyleLiteralArguments(expression);
     this.checkVisualFormatPrecisionLiteralArguments(expression);
     this.checkMarkerStyleLocationSizeLiteralArguments(expression);
+    this.checkVisualNumericOptionLiteralArguments(expression);
     this.checkStrategyLiteralArgumentConstraints(expression);
     this.checkUserCallableArguments(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
@@ -4045,6 +4046,34 @@ class SemanticChecker {
       'size.',
       `Invalid ${calleeName} size`,
     );
+  }
+
+  private checkVisualNumericOptionLiteralArguments(expression: CallExpression): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    const parameterNames = BUILTIN_SIGNATURES.get(calleeName)?.params;
+    if (!parameterNames) return;
+
+    if (calleeName === 'plot' || calleeName === 'hline') {
+      const linewidth = this.resolveCallArgumentExpression(expression, parameterNames, parameterNames.indexOf('linewidth'));
+      this.checkPositiveLiteralIntegerValue(
+        linewidth,
+        `${calleeName} linewidth must be a positive integer`,
+      );
+      return;
+    }
+
+    if (calleeName === 'plotarrow') {
+      const minheight = this.resolveCallArgumentExpression(expression, parameterNames, parameterNames.indexOf('minheight'));
+      this.checkPositiveLiteralIntegerValue(
+        minheight,
+        'plotarrow minheight must be a positive integer',
+      );
+      const maxheight = this.resolveCallArgumentExpression(expression, parameterNames, parameterNames.indexOf('maxheight'));
+      this.checkPositiveLiteralIntegerValue(
+        maxheight,
+        'plotarrow maxheight must be a positive integer',
+      );
+    }
   }
 
   private checkStrategyOrderLiteralArguments(expression: CallExpression, displayName: string): void {
