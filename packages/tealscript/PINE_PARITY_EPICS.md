@@ -94,9 +94,9 @@ The current runtime already covers a useful common-script subset:
   divergence, session filters, exchange session-state gates, dynamic sessions,
   timeframe comparisons, bar coloring, plot-style payloads, dashboard tables,
   custom candles, drawing zones, multi-symbol screeners, currency conversion,
-  imported library helpers, alerts, request-limit reuse, strategy entry/exit
-  flows, default broker-emulator path and gap-fill behavior, and common
-  drawing/table patterns.
+  earnings event markers, imported library helpers, alerts, request-limit reuse,
+  strategy entry/exit flows, default broker-emulator path and gap-fill
+  behavior, and common drawing/table patterns.
 
 Known structural gaps:
 
@@ -164,8 +164,8 @@ Phases:
    corpus includes reduced public fixtures for MTF filters, divergence,
    session filters, exchange session-state gates, dashboard tables, custom
    candles, drawing zones, linefill channels, zigzag polylines, screeners,
-   currency conversion, library helpers, public strategy stats tables, and UDT
-   object-method state.
+   currency conversion, earnings event markers, library helpers, public
+   strategy stats tables, and UDT object-method state.
    Strategy-bracket coverage includes official broker examples plus a reduced
    public fixed-bracket strategy fixture, and trailing-stop coverage includes
    official and reduced public strategy fixtures.
@@ -349,7 +349,8 @@ Phases:
 5. Defer `request.footprint()` until host footprint/intrabar-volume data is
    available.
 6. Maintain corpus-driven checkpoints for MTF trend filters, lower-timeframe
-   arrays, currency conversion, synthetic ticker IDs, and request-limit reuse.
+   arrays, currency conversion, earnings events, synthetic ticker IDs, and
+   request-limit reuse.
 
 Done means MTF and multi-symbol scripts can run against deterministic or
 host-provided data.
