@@ -4522,6 +4522,23 @@ tooMany = table.new(position.top_right, 2, 3, color.black, color.gray, 1, color.
     ]);
   });
 
+  it('reports invalid literal table position values', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Table Positions")
+dashboard = table.new(position=position.center, columns=2, rows=2)
+compact = table.new("center", 1, 1)
+table.set_position(dashboard, position=position.center)
+table.set_position(compact, position="center")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Invalid table.new position: position.center',
+      'Invalid table.new position: center',
+      'Invalid table.set_position position: position.center',
+      'Invalid table.set_position position: center',
+    ]);
+  });
+
   it('resolves table management named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Table Management Signatures")
