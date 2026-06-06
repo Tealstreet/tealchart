@@ -4074,6 +4074,34 @@ badPolylineWidth = polyline.new(points, line_width="2")
     ]);
   });
 
+  it('reports invalid drawing boolean option value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Drawing Boolean Values")
+firstPoint = chart.point.from_index(bar_index, high)
+secondPoint = chart.point.from_index(bar_index + 1, low)
+points = array.from(firstPoint, secondPoint)
+badLabel = label.new(bar_index, close, force_overlay="yes")
+badPointLabel = label.new(point=firstPoint, text="Point", force_overlay=1)
+badLine = line.new(bar_index, high, bar_index + 1, low, force_overlay="yes")
+badPointLine = line.new(firstPoint, secondPoint, force_overlay=1)
+badBox = box.new(bar_index, high, bar_index + 1, low, force_overlay="yes")
+badPointBox = box.new(firstPoint, secondPoint, force_overlay=1)
+badPolyline = polyline.new(points, curved="yes", closed=1, force_overlay="no")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'label.new force_overlay must be a boolean, got string',
+      'label.new force_overlay must be a boolean, got int',
+      'line.new force_overlay must be a boolean, got string',
+      'line.new force_overlay must be a boolean, got int',
+      'box.new force_overlay must be a boolean, got string',
+      'box.new force_overlay must be a boolean, got int',
+      'polyline.new curved must be a boolean, got string',
+      'polyline.new closed must be a boolean, got int',
+      'polyline.new force_overlay must be a boolean, got string',
+    ]);
+  });
+
   it('reports invalid drawing color option values', () => {
     const result = checkProgram(parse(`
 indicator("Bad Drawing Color Values")
