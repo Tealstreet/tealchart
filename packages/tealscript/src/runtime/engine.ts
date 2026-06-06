@@ -5949,6 +5949,7 @@ export class TealscriptEngine {
         || name === 'math.random'
         || name === 'ta.macd'
         || name === 'ta.obv'
+        || name === 'ta.sar'
         || name === 'ta.supertrend'
       ) && expr.loc
     ) {
@@ -9415,7 +9416,7 @@ export class TealscriptEngine {
     });
 
     // SAR - Parabolic Stop and Reverse
-    this.builtins.set('ta.sar', (args, namedArgs, ctx, scope) => {
+    this.builtins.set('ta.sar', (args, namedArgs, ctx, scope, callId) => {
       const taSarArgs = ['start', 'inc', 'max'];
       const start = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSarArgs, 0, 0.02));
       const increment = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSarArgs, 1, 0.02));
@@ -9424,10 +9425,11 @@ export class TealscriptEngine {
       const high = ctx.high.get(0)!;
       const low = ctx.low.get(0)!;
 
-      const sarKey = '_sar_value';
-      const epKey = '_sar_ep'; // Extreme Point
-      const afKey = '_sar_af'; // Acceleration Factor
-      const trendKey = '_sar_trend'; // 1 = up, -1 = down
+      const stateKey = `${callId}_${start}_${increment}_${maximum}`;
+      const sarKey = `_ta_sar_value_${stateKey}`;
+      const epKey = `_ta_sar_ep_${stateKey}`; // Extreme Point
+      const afKey = `_ta_sar_af_${stateKey}`; // Acceleration Factor
+      const trendKey = `_ta_sar_trend_${stateKey}`; // 1 = up, -1 = down
 
       let sar = scope.get(sarKey) as number | undefined;
       let ep = scope.get(epKey) as number | undefined;
@@ -9487,10 +9489,10 @@ export class TealscriptEngine {
         }
       }
 
-      scope.declare(sarKey, 'var', sar);
-      scope.declare(epKey, 'var', ep);
-      scope.declare(afKey, 'var', af);
-      scope.declare(trendKey, 'var', trend);
+      this.setBuiltinState(scope, sarKey, sar);
+      this.setBuiltinState(scope, epKey, ep);
+      this.setBuiltinState(scope, afKey, af);
+      this.setBuiltinState(scope, trendKey, trend);
 
       return sar;
     });
