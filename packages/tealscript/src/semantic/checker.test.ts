@@ -96,6 +96,36 @@ plot(stamp + prefixStamp + dateStamp)
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('reports invalid time helper value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Time Values")
+openTime = time(timeframe=60, session=true, timezone=1)
+closeTime = time_close("60", 123, true)
+changed = timeframe.change(60)
+seconds = timeframe.in_seconds(30)
+label = timeframe.to_seconds(true)
+frame = timeframe.from_seconds("60")
+yearValue = year(time="now", timezone=1)
+hourValue = hour(time=true, timezone=2)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'time timeframe must be a string, got int',
+      'time session must be a string, got bool',
+      'time timezone must be a string, got int',
+      'time_close session must be a string, got int',
+      'time_close timezone must be a string, got bool',
+      'timeframe.change timeframe must be a string, got int',
+      'timeframe.in_seconds timeframe must be a string, got int',
+      'timeframe.to_seconds timeframe must be a string, got bool',
+      'timeframe.from_seconds seconds must be a number, got string',
+      'year timezone must be a string, got int',
+      'year time must be a number, got string',
+      'hour timezone must be a string, got int',
+      'hour time must be a number, got bool',
+    ]);
+  });
+
   it('accepts session state helpers and session constants', () => {
     const result = checkProgram(parse(`
 indicator("Session State")

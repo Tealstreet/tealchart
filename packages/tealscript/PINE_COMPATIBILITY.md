@@ -762,7 +762,9 @@ and `second`), matching callable helpers such as `hour(time)`, common
 fixed-offset or IANA timezone arguments such as `"GMT+2"` and
 `"America/New_York"`. The checkpoint fixture follows TradingView's documented
 calendar-filter idioms by gating plots against a start timestamp, weekday,
-minute threshold, and named exchange timezone.
+minute threshold, and named exchange timezone. Semantic analysis rejects
+non-numeric calendar `time` arguments and non-string calendar `timezone`
+arguments before runtime.
 
 ## Common Session Time Coverage
 
@@ -779,7 +781,10 @@ timezone-aware DST boundaries. Host-provided `closedDates` and closure entries
 can suppress session-filtered `time()` calls and session-state helpers for
 exchange calendar holidays or partial-session closures. The checkpoint corpus
 tracks public session-filter gating, public exchange session-state helper
-gating, and the official dynamic-session string idiom.
+gating, and the official dynamic-session string idiom. Semantic analysis
+rejects non-string `time()` / `time_close()` timeframe, session, and timezone
+arguments plus invalid `timeframe.*` string/numeric helper arguments before
+runtime.
 
 ## Common Tick Quote Coverage
 
