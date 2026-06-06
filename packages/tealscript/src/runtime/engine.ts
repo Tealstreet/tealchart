@@ -6531,6 +6531,7 @@ export class TealscriptEngine {
     if (limitPrice !== undefined) {
       this.submitOrReplaceStrategyExitOrder({
         id: suffixOrders ? `${id} Limit` : id,
+        sourceId: id,
         direction: exitDirection,
         qty,
         qtyType: 'fixed',
@@ -6551,6 +6552,7 @@ export class TealscriptEngine {
     if (stopPrice !== undefined) {
       this.submitOrReplaceStrategyExitOrder({
         id: suffixOrders ? `${id} Stop` : id,
+        sourceId: id,
         direction: exitDirection,
         qty,
         qtyType: 'fixed',
@@ -6571,6 +6573,7 @@ export class TealscriptEngine {
     if (trailActivationPrice !== undefined && trailOffset !== undefined) {
       this.submitOrReplaceStrategyExitOrder({
         id: suffixOrders ? `${id} Trail` : id,
+        sourceId: id,
         direction: exitDirection,
         qty,
         qtyType: 'fixed',
@@ -6720,6 +6723,7 @@ export class TealscriptEngine {
       || existingOrder.trailActivationPrice !== input.trailActivationPrice
       || existingOrder.trailOffset !== input.trailOffset;
     existingOrder.direction = input.direction;
+    existingOrder.sourceId = input.sourceId;
     existingOrder.isExit = input.isExit ?? false;
     if (input.trailActivationPrice !== undefined || input.trailOffset !== undefined) {
       existingOrder.type = 'trailing_stop';
