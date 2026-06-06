@@ -1209,6 +1209,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['timeframe.change', { params: ['timeframe'], minArgs: 0, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['timeframe.from_seconds', { params: ['seconds'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['timeframe.in_seconds', { params: ['timeframe'], minArgs: 0, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['timeframe.to_seconds', { params: ['timeframe'], minArgs: 0, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['timestamp', { params: ['timezone', 'year', 'month', 'day', 'hour', 'minute', 'second'], minArgs: 1, maxArgs: 7, allowNamedPrefixWithPositional: true }],
 ]);
 
@@ -4880,7 +4881,7 @@ class SemanticChecker {
     const calleeName = calleePath.join('.');
     if (calleeName === 'time' || calleeName === 'time_close') return { kind: 'int', qualifier: 'series' };
     if (calleeName === 'timeframe.change') return { kind: 'bool', qualifier: 'series' };
-    if (calleeName === 'timeframe.in_seconds') return { kind: 'int', qualifier: 'simple' };
+    if (calleeName === 'timeframe.in_seconds' || calleeName === 'timeframe.to_seconds') return { kind: 'int', qualifier: 'simple' };
     if (calleeName === 'timeframe.from_seconds') return { kind: 'string', qualifier: 'simple' };
     if (calleeName === 'timestamp') return { kind: 'int', qualifier: 'const' };
     return undefined;

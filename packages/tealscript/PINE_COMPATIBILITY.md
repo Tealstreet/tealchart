@@ -680,7 +680,8 @@ multi-timeframe script templates, including `syminfo.tickerid`, `syminfo.root`,
 `syminfo.expiration_date`, `syminfo.recommendations_date`, and
 `syminfo.target_price_*`,
 `timeframe.period`, `timeframe.main_period`, `timeframe.multiplier`,
-`timeframe.in_seconds()`, `timeframe.from_seconds()`, `timeframe.change()`,
+`timeframe.in_seconds()`/`timeframe.to_seconds()`,
+`timeframe.from_seconds()`, `timeframe.change()`,
 timeframe category flags, `chart.bg_color`, `chart.fg_color`, and chart-type
 flags such as `chart.is_heikinashi` and `chart.is_renko`. The checkpoint corpus
 tracks the official timeframe-comparison idiom that converts chart and selected
