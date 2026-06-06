@@ -599,12 +599,20 @@ plot(histLine, title="Hist")
 indicator("Remaining TA call-site state")
 first = close > open ? ta.obv(close, volume) : na
 openObv = ta.obv(open, volume)
+firstAtr = ta.atr(3)
+secondAtr = ta.atr(3)
+namedAtr = ta.atr(length=3)
 plot(first, title="Conditional OBV")
 plot(openObv, title="Open OBV")
+plot(firstAtr, title="First ATR")
+plot(secondAtr, title="Second ATR")
+plot(namedAtr, title="Named ATR")
 `);
 
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Open OBV').values).toEqual([0, 1100, 2000, 3250, 1850, 800, 2100, 3700, 4900, 3400, 4750, 3300]);
+    expect(roundSeries(getPlot(result, 'Second ATR').values)).toEqual(roundSeries(getPlot(result, 'First ATR').values));
+    expect(roundSeries(getPlot(result, 'Named ATR').values)).toEqual(roundSeries(getPlot(result, 'First ATR').values));
   });
 
   it('handles na previous close in ta.tr handle_na mode', () => {
