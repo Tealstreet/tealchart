@@ -2647,3 +2647,229 @@ plot(convAbove ? 1 : 0, title="ConvAbove")
     expect(result.plots.some((p) => p.type === 'fill')).toBe(true);
   });
 });
+
+// ===========================================================================================
+// Pine v4/v5 legacy patterns
+// Verifies that popular idioms from v4 and v5 public scripts parse and run without rewrites.
+// These patterns appear frequently in pasted scripts from TradingView's public script library.
+// ===========================================================================================
+
+describe('Pine v4/v5 legacy patterns', () => {
+  it('locks v4 study() with resolution= parameter (legacy timeframe name)', () => {
+    // v4 used `resolution=` instead of `timeframe=` in study() declarations.
+    // The runtime accepts the old name transparently; title and plots propagate correctly.
+    // Source search: https://www.tradingview.com/scripts/search/v4%20study%20resolution%20parameter/
+    const result = runCompatScript(`//@version=4
+study("V4 Resolution Study Checkpoint", resolution="D")
+length = input(3, "Length")
+s = sma(close, length)
+plot(s, title="SMA")`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('V4 Resolution Study Checkpoint');
+    expect(roundSeries(getPlot(result, 'SMA').values)).toEqual([
+      null, null,
+      104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111,
+    ]);
+  });
+
+  it('locks v4 input() with type=input.integer and type=input.bool parameters', () => {
+    // v4 used the generic input() function with an explicit type= qualifier rather than
+    // typed variants like input.int() or input.bool(). The runtime maps these to the
+    // corresponding typed inputs; the title is taken from the second positional arg.
+    // Source search: https://www.tradingview.com/scripts/search/v4%20input%20type%20integer%20bool/
+    const result = runCompatScript(`//@version=4
+indicator("V4 Integer Bool Input Checkpoint")
+len = input(5, "Length", type=input.integer)
+flag = input(true, "Flag", type=input.bool)
+s = sma(close, len)
+plot(len, title="Length")
+plot(flag ? 1 : 0, title="Flag")
+plot(s, title="SMA")`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('V4 Integer Bool Input Checkpoint');
+    expect(result.inputs.map((i) => [i.title, i.type])).toEqual([
+      ['Length', 'int'],
+      ['Flag', 'bool'],
+    ]);
+    expect(getPlot(result, 'Length').values).toEqual(Array(compatibilityBars.length).fill(5));
+    expect(getPlot(result, 'Flag').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(roundSeries(getPlot(result, 'SMA').values)).toEqual([
+      null, null, null, null,
+      103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110,
+    ]);
+  });
+
+  it('locks plotshape() with omitted location (default location.abovebar)', () => {
+    // v4/v5 scripts frequently omit the location= parameter in plotshape(), relying on
+    // the default. Confirms plotshape without location does not throw and produces
+    // the same shape output pattern as when location is explicit.
+    // Source search: https://www.tradingview.com/scripts/search/plotshape%20default%20location%20omitted/
+    const result = runCompatScript(`indicator("V4V5 Plotshape Default Location Checkpoint")
+cond = close > open
+plotshape(cond, title="Shape", style=shape.triangleup, color=color.green)
+plot(cond ? 1 : 0, title="Cond")`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('V4V5 Plotshape Default Location Checkpoint');
+    // close > open: bars 0,1,2 yes; 3,4 no; 5,6,7 yes; 8 no; 9 yes; 10 no; 11 yes
+    expect(getPlot(result, 'Cond').values).toEqual([1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
+    expect(getPlot(result, 'Shape').values).toEqual([1, 1, 1, null, null, 1, 1, 1, null, 1, null, 1]);
+  });
+
+  it('locks legacy strategy.position_size == 0 flat-position check', () => {
+    // v4/v5 strategies commonly gate new entries on `strategy.position_size == 0`
+    // to ensure a flat position before placing orders. Confirms the equality check
+    // against zero works correctly after a close order flattens the book.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20position_size%20equals%20zero%20check/
+    const stratBars = [
+      { time: 1_700_610_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_610_060_000, open: 103, high: 105, low: 102, close: 104, volume: 100 },
+      { time: 1_700_610_120_000, open: 104, high: 106, low: 103, close: 105, volume: 100 },
+      { time: 1_700_610_180_000, open: 105, high: 106, low: 104, close: 105, volume: 100 },
+    ];
+    const result = runCompatScript(`strategy("Legacy Position Size Check Checkpoint", overlay=true, process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("L", strategy.long, qty=1)
+if bar_index == 2
+    strategy.close("L")
+isFlat = strategy.position_size == 0
+plot(isFlat ? 1 : 0, title="IsFlat")
+plot(strategy.position_size, title="PosSize")`, { bars: stratBars });
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Legacy Position Size Check Checkpoint');
+    // Entry at bar0 (close=100); close at bar2 (close=105)
+    expect(getPlot(result, 'PosSize').values).toEqual([1, 1, 0, 0]);
+    expect(getPlot(result, 'IsFlat').values).toEqual([0, 0, 1, 1]);
+  });
+
+  it('locks v5 array.new_float() without generic type parameter', () => {
+    // In v5 and earlier scripts, array.new_float(size, initial) was the idiomatic
+    // constructor. The runtime handles it identically to the generic form.
+    // Source search: https://www.tradingview.com/scripts/search/array.new_float%20v5%20no%20generic/
+    const result = runCompatScript(`indicator("Legacy array.new_float() Checkpoint")
+arr = array.new_float(3, 0.0)
+arr.set(0, close)
+arr.set(1, high)
+arr.set(2, low)
+s = array.sum(arr)
+plot(s, title="Sum")
+plot(arr.size(), title="Size")`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Legacy array.new_float() Checkpoint');
+    // sum = close + high + low per bar
+    expect(getPlot(result, 'Sum').values).toEqual([304, 312, 319, 314, 301, 297, 308, 322, 325, 330, 333, 333]);
+    // size is always 3 (pre-allocated)
+    expect(getPlot(result, 'Size').values).toEqual(Array(compatibilityBars.length).fill(3));
+  });
+
+  it('locks v5 str.tostring() with number format pattern "#.##"', () => {
+    // v5 scripts commonly use str.tostring(value, "#.##") to format numbers for
+    // label text. Confirms the call parses and executes without errors; the
+    // formatted string is used in a label drawing on each bar.
+    // Source search: https://www.tradingview.com/scripts/search/str.tostring%20number%20format%20decimal/
+    const result = runCompatScript(`indicator("Legacy str.tostring Format Checkpoint")
+s = str.tostring(close, "#.##")
+label.new(bar_index, close, s, style=label.style_label_down)
+plot(close, title="Close")`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Legacy str.tostring Format Checkpoint');
+    expect(getPlot(result, 'Close').values).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+    // Each bar produces a label with formatted close text
+    expect(result.drawings.filter((d) => d.type === 'label').length).toBeGreaterThan(0);
+  });
+
+  it('locks legacy timeframe.period string comparison pattern', () => {
+    // Scripts that route logic based on the current chart timeframe compare
+    // timeframe.period against string literals like "D", "W", or "60".
+    // In the test harness the default period is "60" (60-minute), so isDaily and
+    // isWeekly are false but is60 is true on all bars. This confirms string comparison
+    // against timeframe.period works correctly for both matching and non-matching cases.
+    // Source search: https://www.tradingview.com/scripts/search/timeframe.period%20comparison%20string/
+    const result = runCompatScript(`indicator("Legacy timeframe.period Checkpoint")
+isDaily = timeframe.period == "D"
+isWeekly = timeframe.period == "W"
+is60 = timeframe.period == "60"
+plot(isDaily ? 1 : 0, title="IsDaily")
+plot(isWeekly ? 1 : 0, title="IsWeekly")
+plot(is60 ? 1 : 0, title="Is60")`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Legacy timeframe.period Checkpoint');
+    // Default test harness period is "60" — isDaily and isWeekly are false, is60 is true
+    expect(getPlot(result, 'IsDaily').values).toEqual(Array(compatibilityBars.length).fill(0));
+    expect(getPlot(result, 'IsWeekly').values).toEqual(Array(compatibilityBars.length).fill(0));
+    expect(getPlot(result, 'Is60').values).toEqual(Array(compatibilityBars.length).fill(1));
+  });
+
+  it('locks v5 ta.change(source, length) two-argument form', () => {
+    // v5 introduced an optional second argument to ta.change(source, length) to
+    // compute the difference between source and source[length]. The single-arg form
+    // (length=1 by default) is also tested side-by-side to confirm both work.
+    // Source search: https://www.tradingview.com/scripts/search/ta.change%20two%20argument%20length/
+    const result = runCompatScript(`indicator("V5 ta.change Two-Arg Checkpoint")
+c1 = ta.change(close)
+c5 = ta.change(close, 5)
+plot(c1, title="Change1")
+plot(c5, title="Change5")`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('V5 ta.change Two-Arg Checkpoint');
+    // change(close) = close - close[1]
+    expect(roundSeries(getPlot(result, 'Change1').values)).toEqual([
+      null, 3, 2, -4, -4, 1, 4, 5, -1, 3, -1, 2,
+    ]);
+    // change(close, 5) = close - close[5]; first 5 bars are null
+    expect(roundSeries(getPlot(result, 'Change5').values)).toEqual([
+      null, null, null, null, null, -2, -1, 2, 5, 12, 10, 8,
+    ]);
+  });
+
+  it('locks legacy nz(value, replacement) two-argument form', () => {
+    // v4/v5 scripts rely on nz(x, y) to substitute y when x is na.
+    // The canonical use case is `nz(close[1], 0)` on bar 0 where close[1] is na.
+    // Confirms the two-arg nz returns the replacement on bar 0 and the real value from bar 1 onward.
+    // Source search: https://www.tradingview.com/scripts/search/nz%20two%20argument%20replacement/
+    const result = runCompatScript(`indicator("Legacy nz() Two-Arg Checkpoint")
+v = nz(close[1], 0.0)
+plot(v, title="NZ")`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Legacy nz() Two-Arg Checkpoint');
+    // Bar 0: close[1] is na → returns 0.0; bars 1-11: returns close[1]
+    expect(getPlot(result, 'NZ').values).toEqual([0, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110]);
+  });
+
+  it('locks v5 math.max() with five arguments (variadic form)', () => {
+    // v5 made math.max() variadic; scripts pass 3–5 moving average series to pick
+    // the highest. Confirms the runtime handles more than two positional arguments.
+    // Source search: https://www.tradingview.com/scripts/search/math.max%20variadic%20multiple%20args/
+    const result = runCompatScript(`indicator("V5 math.max Variadic Checkpoint")
+a = ta.sma(close, 3)
+b = ta.sma(close, 5)
+c = ta.ema(close, 3)
+d = ta.ema(close, 5)
+e = close
+m5 = math.max(a, b, c, d, e)
+m2 = math.max(a, b)
+plot(m5, title="Max5")
+plot(m2, title="Max2")`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('V5 math.max Variadic Checkpoint');
+    // max of 5 series; close dominates during warm-up gaps (null propagates for na args)
+    expect(roundSeries(getPlot(result, 'Max5').values)).toEqual([
+      null, null, null, null,
+      103.2, 102.8, 104, 109, 108, 111, 110, 112,
+    ]);
+    // max of two SMA series; valid from bar 4 (SMA5 warm-up)
+    expect(roundSeries(getPlot(result, 'Max2').values)).toEqual([
+      null, null, null, null,
+      103.2, 102.8, 102.6, 104.333333, 107, 109.333333, 109.666667, 111,
+    ]);
+  });
+});

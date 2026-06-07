@@ -1829,6 +1829,102 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'legacy-v4-study-resolution-checkpoint',
+      title: 'Legacy V4 Study Resolution Checkpoint',
+      searchContext: 'TradingView public scripts search: v4 study resolution parameter',
+      pineVersion: 'v4',
+      featureTags: ['legacy', 'v4_compat', 'ta', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'legacy-v4-input-type-integer-bool-checkpoint',
+      title: 'Legacy V4 Input Type Integer Bool Checkpoint',
+      searchContext: 'TradingView public scripts search: v4 input type integer bool',
+      pineVersion: 'v4',
+      featureTags: ['legacy', 'v4_compat', 'inputs', 'ta', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'legacy-plotshape-default-location-checkpoint',
+      title: 'Legacy Plotshape Default Location Checkpoint',
+      searchContext: 'TradingView public scripts search: plotshape default location omitted',
+      featureTags: ['legacy', 'visuals', 'plotshape', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'legacy-strategy-position-size-zero-checkpoint',
+      title: 'Legacy Strategy Position Size Zero Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy position_size equals zero check',
+      category: 'strategy',
+      featureTags: ['legacy', 'strategy', 'broker', 'orders', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'legacy-array-new-float-checkpoint',
+      title: 'Legacy array.new_float() Checkpoint',
+      searchContext: 'TradingView public scripts search: array.new_float v5 no generic',
+      pineVersion: 'v5',
+      featureTags: ['legacy', 'v5_compat', 'arrays', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'legacy-str-tostring-format-checkpoint',
+      title: 'Legacy str.tostring Format Checkpoint',
+      searchContext: 'TradingView public scripts search: str.tostring number format decimal',
+      featureTags: ['legacy', 'drawings', 'labels', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'legacy-timeframe-period-checkpoint',
+      title: 'Legacy timeframe.period Checkpoint',
+      searchContext: 'TradingView public scripts search: timeframe.period comparison string',
+      featureTags: ['legacy', 'timeframes', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'legacy-ta-change-two-arg-checkpoint',
+      title: 'Legacy ta.change Two-Arg Checkpoint',
+      searchContext: 'TradingView public scripts search: ta.change two argument length',
+      pineVersion: 'v5',
+      featureTags: ['legacy', 'v5_compat', 'ta', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'legacy-nz-two-arg-checkpoint',
+      title: 'Legacy nz() Two-Arg Checkpoint',
+      searchContext: 'TradingView public scripts search: nz two argument replacement',
+      featureTags: ['legacy', 'na', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'legacy-math-max-variadic-checkpoint',
+      title: 'Legacy math.max Variadic Checkpoint',
+      searchContext: 'TradingView public scripts search: math.max variadic multiple args',
+      pineVersion: 'v5',
+      featureTags: ['legacy', 'v5_compat', 'ta', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
