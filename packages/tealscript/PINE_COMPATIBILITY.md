@@ -596,8 +596,8 @@ is also exported by the library.
 The checkpoint corpus tracks reduced public library-helper import idioms that
 bind exported helpers through this deterministic registry, validate their series
 output, and cover source-preserving helper wrappers used before delayed rolling
-calls, including arithmetic ternary/switch branches and multiline block `if`
-wrappers.
+calls, including arithmetic ternary/switch branches, multiline block `if`
+returns, and block-local `if` initializers.
 
 Published TradingView lookup is not implemented yet. `import` declarations
 without a matching registry entry emit an explicit missing-registry diagnostic.
