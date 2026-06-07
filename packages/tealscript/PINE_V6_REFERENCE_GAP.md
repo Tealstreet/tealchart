@@ -120,6 +120,48 @@ targeting complex feature combinations. All 10 pass.
 All 10 advanced scripts passed without any parse, semantic, runtime, or output gaps.
 No new failure classes were introduced.
 
+### Edge-case corpus probe (12 scripts) — 2026-06-08
+
+12 edge-case scripts added to `tests/compat/pine-realworld-corpus.test.ts` targeting
+parser and runtime edge cases. 11 pass; 1 skipped (trailing comma in function calls).
+
+| Script | Status | Pattern |
+| --- | --- | --- |
+| Deeply nested calls | pass | ta.sma(ta.ema(close, math.round(length/2)), 20) — 3-deep nesting |
+| Ternary in arg position | pass | ta.sma(close > open ? high : low, 3) |
+| Empty UDF body (na) | pass | f() => na; nz(f(), 0.0) |
+| Three-tuple UDF return | pass | [h, l, m] = getStats(close, 3) |
+| NA propagation warm-up | pass | ta.sma null for first length-1 bars |
+| Cumulative accumulation | pass | var float cumSum = 0.0; cumSum += close |
+| valuewhen + crossover | pass | ta.valuewhen(ta.crossover(sma3, sma5), high, 0) |
+| plotshape dynamic text | pass | plotshape(cond, text=str.tostring(close, "#.##")) |
+| color.rgb boundary clamp | pass | transparency 0, 100, -10, 110 all clamp correctly |
+| input.source UDF arg | pass | src = input.source(close); out = smoothed(src, 3) |
+| Strategy multi-exit | pass | strategy.exit with profit=, loss=, trail_offset= together |
+| Array copy + sort chain | pass | vals.copy(); sorted.sort(); sorted.get(0) |
+| **Trailing comma in call** | **skip** | `ta.sma(close, 5,)` → parse error; gap below |
+
+### Real-World Corpus Gaps — Edge Cases
+
+#### Parser gap: trailing comma in function call argument list
+
+**Pattern:** `ta.sma(close, 5,)` — some editors/formatters emit a trailing comma
+after the last argument in a function call.
+
+**Status:** Parser rejects this with a parse error. The `ArgumentList` grammar rule
+requires each entry to be a valid `Argument` (positional or named), so a bare trailing
+comma is invalid.
+
+**Impact:** Low — almost no hand-written scripts use trailing commas; only machine-
+formatted code does. Not blocking for copy-paste parity.
+
+**Test:** `it.skip('trailing comma in function call args', ...)` in `pine-realworld-corpus.test.ts`.
+
+**Fix path:** Add `(__ ",")?` after the last argument in `ArgumentList` in `grammar.peggy`,
+rebuild the parser, and unskip the test.
+
+---
+
 ## Summary
 
 | Category | Gaps | Impact |
@@ -133,3 +175,4 @@ No new failure classes were introduced.
 | Deferred (host-dependent) | 9 | — |
 | **Real-world corpus probe (15 scripts)** | **0** | All pass |
 | **Advanced corpus probe (10 scripts)** | **0** | All pass |
+| **Edge-case corpus probe (12 scripts)** | **1 (parser)** | 11 pass, 1 skipped (trailing comma) |
