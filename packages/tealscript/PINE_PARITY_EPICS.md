@@ -201,7 +201,7 @@ Phases:
    `ta.pvt` price-volume trend with EMA signal-line routing,
    `ta.atr()` smoothed true-range with EMA signal-line routing,
    and `ta.macd()` MACD-line/signal-line/histogram destructuring with bullish
-   crossover routing into plotted trend/signal outputs.
+   above-signal routing into plotted trend/signal outputs.
    Synthetic ticker coverage includes official docs examples plus a reduced
    public Heikin-Ashi trend request fixture.
    Public footprint request coverage is tracked as a planned unsupported

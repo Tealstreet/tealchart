@@ -169,7 +169,7 @@ Current `ta.*` progress:
   smoothed true-range idiom with EMA signal line and expanding-volatility
   routing over deterministic OHLC bars.
 - A source-linked public MACD signal checkpoint locks the common `ta.macd()`
-  MACD-line/signal-line/histogram destructuring idiom with bullish crossover
+  MACD-line/signal-line/histogram destructuring idiom with bullish above-signal
   routing over deterministic close bars.
 
 Current `str.*` progress:

@@ -6085,7 +6085,7 @@ plot(bullish ? 1 : 0, title="Bullish")
   it('locks a reduced public MACD signal idiom', () => {
     // Public idiom reference: MACD scripts expose fast/slow/signal length inputs,
     // destructure ta.macd() into the MACD line, signal line, and histogram, then
-    // mark bullish crossover bars where the MACD line crosses above the signal line.
+    // mark bullish bars where the MACD line is above the signal line.
     // Source search: https://www.tradingview.com/scripts/search/MACD%20signal%20crossover/
     const result = runCompatScript(`
 indicator("Public MACD Signal Checkpoint")
