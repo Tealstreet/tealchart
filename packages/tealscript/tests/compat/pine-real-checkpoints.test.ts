@@ -1630,6 +1630,95 @@ plot(slopeUp ? 1 : 0, title="Slope Up")
     expect(getPlot(result, 'Slope Up').values).toEqual([0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1]);
   });
 
+  it('locks a reduced public Keltner Channel signal idiom', () => {
+    // Public idiom reference: Keltner Channel scripts commonly expose
+    // length/multiplier/range inputs, plot channel bands, and route breakouts.
+    // Source search: https://www.tradingview.com/scripts/search/keltner%20channel%20signal/
+    const result = runCompatScript(`
+indicator("Public Keltner Channel Signal Checkpoint", overlay=true)
+length = input.int(4, "Length")
+mult = input.float(0.75, "Multiplier")
+useTrueRange = input.bool(true, "Use True Range")
+[basis, upper, lower] = ta.kc(series=close, length=length, mult=mult, useTrueRange=useTrueRange)
+width = ta.kcw(series=close, length=length, mult=mult, useTrueRange=useTrueRange)
+bullSignal = close > basis
+bearSignal = close < basis
+plot(basis, title="Basis")
+plot(upper, title="Upper")
+plot(lower, title="Lower")
+plot(width, title="Width")
+plot(bullSignal ? 1 : 0, title="Bull Signal")
+plot(bearSignal ? 1 : 0, title="Bear Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public Keltner Channel Signal Checkpoint');
+    expect(result.indicatorOverlay).toBe(true);
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Length', 'int'],
+      ['Multiplier', 'float'],
+      ['Use True Range', 'bool'],
+    ]);
+    expect(roundSeries(getPlot(result, 'Basis').values)).toEqual([
+      102,
+      103.2,
+      104.72,
+      104.032,
+      102.0192,
+      101.21152,
+      102.326912,
+      104.996147,
+      106.197688,
+      108.118613,
+      108.871168,
+      110.122701,
+    ]);
+    expect(roundSeries(getPlot(result, 'Upper').values)).toEqual([
+      105,
+      106.5,
+      107.9,
+      108.04,
+      106.224,
+      105.2344,
+      106.54064,
+      109.624384,
+      110.47463,
+      112.184778,
+      112.810867,
+      113.98652,
+    ]);
+    expect(roundSeries(getPlot(result, 'Lower').values)).toEqual([
+      99,
+      99.9,
+      101.54,
+      100.024,
+      97.8144,
+      97.18864,
+      98.113184,
+      100.36791,
+      101.920746,
+      104.052448,
+      104.931469,
+      106.258881,
+    ]);
+    expect(roundSeries(getPlot(result, 'Width').values)).toEqual([
+      0.058824,
+      0.063953,
+      0.060733,
+      0.077053,
+      0.082432,
+      0.079495,
+      0.082358,
+      0.08816,
+      0.080547,
+      0.075217,
+      0.072374,
+      0.070173,
+    ]);
+    expect(getPlot(result, 'Bull Signal').values).toEqual([0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0]);
+  });
+
   it('locks a reduced public stochastic signal idiom', () => {
     // Public idiom reference: stochastic oscillator scripts commonly expose
     // %K/%D smoothing and overbought/oversold gates before routing signals.
