@@ -298,6 +298,28 @@ literal and forward each element separately, then re-assemble as a destructurabl
 
 ---
 
+## Multi-feature integration probe (11 scripts) — 2026-06-08
+
+A "Multi-feature integration" describe block was added to `tests/compat/pine-realworld-corpus.test.ts`
+targeting scripts that combine 3-4 distinct subsystems simultaneously. All 11 pass.
+
+| Script | Status | Subsystems Combined |
+| --- | --- | --- |
+| Trend-following system | pass | ta.ema crossover, var state tracking, barcolor/bgcolor, barstate.islast table |
+| Volatility dashboard | pass | ta.atr + ta.bb + ta.kc + array rolling avg + squeeze detection |
+| Multi-MA strategy | pass | strategy.entry/close + bgcolor + equity/netprofit/possize plots |
+| Price action scanner | pass | UDT candle pattern type, method detect(), array<string> history, plotshape |
+| Risk management overlay | pass | input params, ta.atr stop dist, ta.sma trend filter, var entry price |
+| Custom oscillator | pass | UDF wrapping ta.ema/ta.sma, fill() between plots, alertcondition |
+| Session-aware state table | pass | ta.ema crossover, var int counters, plotshape markers, barcolor, barstate.islast table |
+| Portfolio equity tracker | pass | strategy two-cycle, str.format, strategy.netprofit/closedtrades/max_drawdown table |
+| Divergence detector | pass | ta.rsi, ta.highest/lowest rolling windows, bearish divergence, plotshape |
+| Oscillator gradient | pass | UDF with input.string mode, close-EMA osc, fill() vs zero line, alertcondition |
+| Ichimoku-style overlay | pass | ta.highest/lowest for cloud lines, plot with offset=, fill(), plotshape crossover |
+
+All 11 scripts passed without any parse, semantic, runtime, or output gaps.
+No new failure classes were introduced.
+
 ## Summary
 
 | Category | Gaps | Impact |
@@ -315,3 +337,4 @@ literal and forward each element separately, then re-assemble as a destructurabl
 | **Pine v5 compatibility probe (9 scripts)** | **1** | 8 pass, 1 skipped (security datafeed) |
 | **Parser stress probe (8 scripts)** | **0** | 8 pass |
 | **Deep parity probes (12 scripts)** | **1 (runtime)** | 11 pass, 1 skipped (request.security tuple) |
+| **Multi-feature integration probe (11 scripts)** | **0** | All pass |

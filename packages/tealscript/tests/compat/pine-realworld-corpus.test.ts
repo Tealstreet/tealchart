@@ -2171,3 +2171,483 @@ plot(mode, title="Mode")
     expect(getPlot(result, 'Mode').values).toEqual([10, 20, 30, 10, 20, 30, 10, 20, 30, 10, 20, 30]);
   });
 });
+
+// ===========================================================================================
+// Multi-feature integration
+// Real TradingView scripts combine many subsystems together.  Each test below is a
+// reduced realistic indicator or strategy that exercises 3-4 distinct subsystems in
+// combination, the class of script most likely to expose hidden interaction bugs.
+// ===========================================================================================
+
+describe('Multi-feature integration', () => {
+  it('locks trend-following system: ema crossover, var state, barcolor, bgcolor, table win-rate', () => {
+    // Combines: ta.ema crossover detection, var int state tracking, barcolor/bgcolor
+    // for trend coloring, and a barstate.islast summary table showing win rate.
+    // Source search: https://www.tradingview.com/scripts/search/ema%20crossover%20trend%20win%20rate%20table/
+    const result = runCompatScript(`
+indicator("Multi-Feature Trend System Checkpoint", overlay=true)
+fastLen = input.int(3, "Fast Length")
+slowLen = input.int(6, "Slow Length")
+fastEma = ta.ema(close, fastLen)
+slowEma = ta.ema(close, slowLen)
+crossUp = ta.crossover(fastEma, slowEma)
+crossDn = ta.crossunder(fastEma, slowEma)
+var int wins = 0
+var int total = 0
+if crossUp or crossDn
+    total := total + 1
+if crossUp
+    wins := wins + 1
+winRate = total > 0 ? wins * 100.0 / total : 0.0
+trendUp = fastEma > slowEma
+barcolor(trendUp ? color.new(color.green, 50) : color.new(color.red, 50))
+bgcolor(trendUp ? color.new(color.green, 95) : color.new(color.red, 95))
+var table t = table.new(position.top_right, 2, 2)
+if barstate.islast
+    table.cell(t, 0, 0, "Win Rate")
+    table.cell(t, 1, 0, str.tostring(math.round(winRate)) + "%")
+plot(fastEma, title="FastEMA")
+plot(slowEma, title="SlowEMA")
+plot(crossUp ? 1 : 0, title="CrossUp")
+plot(trendUp ? 1 : 0, title="TrendUp")
+plot(winRate, title="WinRate")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Multi-Feature Trend System Checkpoint');
+    expect(result.inputs.map((i) => [i.title, i.type])).toEqual([
+      ['Fast Length', 'int'],
+      ['Slow Length', 'int'],
+    ]);
+    expect(roundSeries(getPlot(result, 'FastEMA').values)).toEqual([
+      102, 103.5, 105.25, 104.125, 101.5625, 100.78125,
+      102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957,
+    ]);
+    expect(roundSeries(getPlot(result, 'SlowEMA').values)).toEqual([
+      102, 102.857143, 104.040816, 103.74344, 102.388172, 101.705837,
+      102.361312, 104.25808, 105.3272, 106.948, 107.82, 109.014286,
+    ]);
+    // crossUp fires at bar1 (fast crosses above slow) and bar6
+    expect(getPlot(result, 'CrossUp').values).toEqual([0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]);
+    // trendUp: fast > slow
+    expect(getPlot(result, 'TrendUp').values).toEqual([0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1]);
+    // winRate: 2 cross events total (bar1 up, bar4 down), 1 win → 50% at bar4; then bar6 up → 2/3 wins
+    expect(roundSeries(getPlot(result, 'WinRate').values)).toEqual([
+      0, 100, 100, 100, 50, 50, 66.666667, 66.666667, 66.666667, 66.666667, 66.666667, 66.666667,
+    ]);
+    // barcolor and bgcolor outputs present
+    expect(result.plots.some((p) => p.type === 'barcolor')).toBe(true);
+    expect(result.plots.some((p) => p.type === 'bgcolor')).toBe(true);
+    // summary table drawn at last bar
+    expect(result.drawings.filter((d) => d.type === 'table').length).toBeGreaterThan(0);
+  });
+
+  it('locks volatility dashboard: ta.atr, ta.bb, ta.kc, array.avg, squeeze detection', () => {
+    // Combines: ta.atr, ta.bb, ta.kc, a rolling array of recent ATR values with
+    // array.avg, and squeeze detection (BB width < KC width).
+    // Source search: https://www.tradingview.com/scripts/search/atr%20bollinger%20keltner%20squeeze%20dashboard/
+    const result = runCompatScript(`
+indicator("Multi-Feature Volatility Dashboard Checkpoint")
+length = input.int(5, "Length")
+atr = ta.atr(length)
+[mid, upper, lower] = ta.bb(close, length, 2.0)
+[kcMid, kcUpper, kcLower] = ta.kc(close, length, 1.5)
+squeeze = upper - lower < kcUpper - kcLower
+var array<float> atrHist = array.new<float>()
+if not na(atr)
+    atrHist.push(atr)
+    if atrHist.size() > 5
+        atrHist.shift()
+avgAtr = atrHist.size() > 0 ? array.avg(atrHist) : na
+plot(nz(atr), title="ATR")
+plot(squeeze ? 1 : 0, title="Squeeze")
+plot(nz(avgAtr), title="AvgATR")
+plot(upper - lower, title="BBWidth")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Multi-Feature Volatility Dashboard Checkpoint');
+    // ATR: nz gives 0 during warmup (first 4 bars), then valid values
+    expect(roundSeries(getPlot(result, 'ATR').values)).toEqual([
+      0, 0, 0, 0, 5.2, 5.16, 5.328, 5.6624, 5.52992, 5.423936, 5.339149, 5.271319,
+    ]);
+    // squeeze is always true once BB and KC are available
+    expect(getPlot(result, 'Squeeze').values).toEqual([0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]);
+    // AvgATR tracks rolling mean of up to 5 ATR values
+    expect(roundSeries(getPlot(result, 'AvgATR').values)).toEqual([
+      0, 0, 0, 0, 5.2, 5.18, 5.229333, 5.3376, 5.376064, 5.420851, 5.456681, 5.445345,
+    ]);
+    // BBWidth is null during warmup, then positive
+    const bbWidth = getPlot(result, 'BBWidth').values as (number | null)[];
+    expect(bbWidth.slice(0, 4)).toEqual([null, null, null, null]);
+    for (const v of bbWidth.slice(4)) {
+      expect(v).toBeGreaterThan(0);
+    }
+  });
+
+  it('locks multi-MA strategy: strategy.entry/close, bgcolor, equity plot', () => {
+    // Combines: strategy declarations, strategy.entry/close with bar_index gating,
+    // conditional bgcolor for trend state, strategy.equity/netprofit/position_size plots.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20ma%20crossover%20equity%20bgcolor/
+    const result = runCompatScript(`
+strategy("Multi-Feature MA Strategy Checkpoint", overlay=true, process_orders_on_close=true)
+fastLen = input.int(2, "Fast")
+slowLen = input.int(3, "Slow")
+fastMa = ta.sma(close, fastLen)
+slowMa = ta.sma(close, slowLen)
+if bar_index == 1
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 2
+    strategy.close("Long")
+trendUp = fastMa > slowMa
+bgcolor(trendUp ? color.new(color.green, 90) : color.new(color.red, 90))
+plot(strategy.equity, title="Equity")
+plot(strategy.netprofit, title="NetProfit")
+plot(strategy.position_size, title="PosSize")
+`, { bars: stratBars });
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Multi-Feature MA Strategy Checkpoint');
+    // Entry at bar1 (close=104), close at bar2 (close=105) → profit=1
+    expect(getPlot(result, 'NetProfit').values).toEqual([0, 0, 1, 1]);
+    expect(getPlot(result, 'PosSize').values).toEqual([0, 1, 0, 0]);
+    expect(getPlot(result, 'Equity').values).toEqual([100000, 100000, 100001, 100001]);
+    expect(result.plots.some((p) => p.type === 'bgcolor')).toBe(true);
+  });
+
+  it('locks price action scanner: UDT candle pattern, method, array, plotshape markers', () => {
+    // Combines: UDT for candle patterns (doji, hammer), method to detect pattern,
+    // array to store recent pattern names (capped at 3), plotshape markers on signal.
+    // Source search: https://www.tradingview.com/scripts/search/udt%20candle%20pattern%20method%20array/
+    const result = runCompatScript(`
+indicator("Multi-Feature Price Action Checkpoint", overlay=true)
+type CandlePattern
+    bool isDoji = false
+    bool isHammer = false
+    float bodySize = 0.0
+    float rangeSize = 0.0
+
+method detect(CandlePattern this) =>
+    this.bodySize := math.abs(close - open)
+    this.rangeSize := high - low
+    this.isDoji := this.bodySize / math.max(this.rangeSize, 0.001) < 0.1
+    this.isHammer := not this.isDoji and (low < math.min(open, close) - this.rangeSize * 0.5) and close > open
+    this
+
+var array<string> recentPatterns = array.new<string>()
+pat = CandlePattern.new()
+pat.detect()
+recentPatterns.push(pat.isDoji ? "doji" : pat.isHammer ? "hammer" : "none")
+if recentPatterns.size() > 3
+    recentPatterns.shift()
+plotshape(pat.isDoji, title="Doji", style=shape.circle, location=location.abovebar, color=color.orange)
+plotshape(pat.isHammer, title="Hammer", style=shape.triangleup, location=location.belowbar, color=color.green)
+plot(pat.bodySize, title="BodySize")
+plot(pat.isDoji ? 1 : 0, title="DojiFlag")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Multi-Feature Price Action Checkpoint');
+    // bodySize = abs(close - open) per bar
+    // bar0:102-100=2, bar1:105-102=3, bar2:107-105=2, bar3:103-107=4, bar4:99-103=4
+    // bar5:100-99=1, bar6:104-100=4, bar7:109-104=5, bar8:108-109=1, bar9:111-108=3
+    // bar10:110-111=1, bar11:112-110=2
+    expect(getPlot(result, 'BodySize').values).toEqual([2, 3, 2, 4, 4, 1, 4, 5, 1, 3, 1, 2]);
+    // No bar has bodySize/rangeSize < 0.1 with these bars
+    expect(getPlot(result, 'DojiFlag').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    // Hammer detected at bar5: low=96 < min(99,100)-range*0.5 = 99-2.5=96.5 → 96<96.5 yes, close>open yes
+    expect(getPlot(result, 'Hammer').values).toEqual([
+      null, null, null, null, null, 1, null, null, null, null, null, null,
+    ]);
+    // recent pattern array size caps at 3 after bar 2
+    // (size tracked via recentPatterns.size() indirectly; just verify no errors)
+    expect(result.errors).toEqual([]);
+  });
+
+  it('locks risk management overlay: input params, ta.atr, var entry tracking, bull-state from sma', () => {
+    // Combines: input params for risk %, ATR for stop distance calculation, var float
+    // for tracking entry price, ta.sma for trend filter, and RR ratio plot.
+    // Source search: https://www.tradingview.com/scripts/search/risk%20management%20atr%20entry%20rr%20ratio/
+    const result = runCompatScript(`
+indicator("Multi-Feature Risk Management Checkpoint", overlay=true)
+riskPct = input.float(1.0, "Risk %")
+atrLen = input.int(5, "ATR Length")
+atrMult = input.float(2.0, "ATR Mult")
+atr = ta.atr(atrLen)
+stopDist = atr * atrMult
+sma = ta.sma(close, atrLen)
+var float entryPrice = na
+isBull = close > sma
+if isBull and na(entryPrice)
+    entryPrice := close
+rrRatio = not na(entryPrice) and stopDist > 0 ? 2.0 : 0.0
+plot(rrRatio, title="RR Ratio")
+plot(nz(atr), title="ATR")
+plot(isBull ? 1 : 0, title="BullState")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Multi-Feature Risk Management Checkpoint');
+    expect(result.inputs.map((i) => [i.title, i.type])).toEqual([
+      ['Risk %', 'float'],
+      ['ATR Length', 'int'],
+      ['ATR Mult', 'float'],
+    ]);
+    // entry price first set at bar6 (close=104 > sma=102.6), RR=2.0 from then on
+    expect(getPlot(result, 'RR Ratio').values).toEqual([0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2]);
+    // ATR nz: 0 for bars 0-3, valid from bar4
+    expect(roundSeries(getPlot(result, 'ATR').values)).toEqual([
+      0, 0, 0, 0, 5.2, 5.16, 5.328, 5.6624, 5.52992, 5.423936, 5.339149, 5.271319,
+    ]);
+    // isBull: close > sma5 — sma5 starts at bar4
+    expect(getPlot(result, 'BullState').values).toEqual([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
+  });
+
+  it('locks custom oscillator: UDF wrapping ta.ema/ta.sma, fill, alertcondition', () => {
+    // Combines: UDF that computes a custom oscillator (EMA-SMA spread), ta.ema for
+    // signal line, fill() between osc and signal plots, alertcondition on crossover.
+    // Source search: https://www.tradingview.com/scripts/search/custom%20oscillator%20udf%20fill%20alert/
+    const result = runCompatScript(`
+indicator("Multi-Feature Custom Oscillator Checkpoint")
+length = input.int(5, "Length")
+signalLen = input.int(3, "Signal")
+customOsc(src, len) =>
+    fast = ta.ema(src, len)
+    slow = ta.sma(src, len)
+    fast - slow
+osc = customOsc(close, length)
+signal = ta.ema(osc, signalLen)
+oscPlot = plot(osc, title="Osc")
+sigPlot = plot(signal, title="Signal")
+fill(oscPlot, sigPlot, color=color.new(color.gray, 80), title="Fill")
+alertcondition(ta.crossover(osc, signal), title="Bull Cross", message="Osc crossed above signal")
+plot(osc > signal ? 1 : 0, title="BullOsc")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Multi-Feature Custom Oscillator Checkpoint');
+    expect(result.inputs.map((i) => [i.title, i.type])).toEqual([
+      ['Length', 'int'],
+      ['Signal', 'int'],
+    ]);
+    expect(roundSeries(getPlot(result, 'Osc').values)).toEqual([
+      null, null, null, null,
+      -0.940741, -1.293827, -0.262551, 1.558299, 1.705533, 1.070355, -0.08643, -0.45762,
+    ]);
+    expect(roundSeries(getPlot(result, 'Signal').values)).toEqual([
+      null, null, null, null,
+      -0.940741, -1.117284, -0.689918, 0.434191, 1.069862, 1.070108, 0.491839, 0.01711,
+    ]);
+    // fill output present
+    expect(result.plots.some((p) => p.type === 'fill')).toBe(true);
+    // osc > signal: bars 4(0-eq no),5(no),6(osc=-0.26 > sig=-0.69 yes),7(yes),8(yes),9(yes),10(no),11(no)
+    expect(getPlot(result, 'BullOsc').values).toEqual([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0]);
+  });
+
+  it('locks session-aware indicator: var state tracking, barcolor, plotshape, table', () => {
+    // Combines: ta.ema crossover with var int state counters for bull/bear bar counts,
+    // plotshape for crossover signals, barcolor for trend, and a barstate.islast table.
+    // Source search: https://www.tradingview.com/scripts/search/ema%20crossover%20barcolor%20state%20table/
+    const result = runCompatScript(`
+indicator("Multi-Feature EMA State Table Checkpoint", overlay=true)
+fastLen = input.int(3, "Fast")
+slowLen = input.int(5, "Slow")
+fastEma = ta.ema(close, fastLen)
+slowEma = ta.ema(close, slowLen)
+crossUp = ta.crossover(fastEma, slowEma)
+crossDn = ta.crossunder(fastEma, slowEma)
+var int bullBars = 0
+var int bearBars = 0
+trendUp = fastEma > slowEma
+if trendUp
+    bullBars := bullBars + 1
+else
+    bearBars := bearBars + 1
+plotshape(crossUp, title="BuySignal", style=shape.triangleup, location=location.belowbar, color=color.green)
+plotshape(crossDn, title="SellSignal", style=shape.triangledown, location=location.abovebar, color=color.red)
+barcolor(trendUp ? color.new(color.green, 50) : color.new(color.red, 50))
+var table t = table.new(position.top_right, 2, 2)
+if barstate.islast
+    table.cell(t, 0, 0, "Bull")
+    table.cell(t, 1, 0, str.tostring(bullBars))
+plot(fastEma, title="FastEMA")
+plot(slowEma, title="SlowEMA")
+plot(bullBars, title="BullBars")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Multi-Feature EMA State Table Checkpoint');
+    expect(roundSeries(getPlot(result, 'FastEMA').values)).toEqual([
+      102, 103.5, 105.25, 104.125, 101.5625, 100.78125,
+      102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957,
+    ]);
+    expect(roundSeries(getPlot(result, 'SlowEMA').values)).toEqual([
+      102, 103, 104.333333, 103.888889, 102.259259, 101.506173,
+      102.337449, 104.558299, 105.705533, 107.470355, 108.31357, 109.54238,
+    ]);
+    // bullBars accumulates on trendUp bars (fastEma > slowEma)
+    // bar0: 102==102 → not bull → 0; bar1: 103.5>103 → bull →1; etc.
+    expect(getPlot(result, 'BullBars').values).toEqual([0, 1, 2, 3, 3, 3, 4, 5, 6, 7, 8, 9]);
+    // crossUp at bar1, crossDn at bar4
+    expect(getPlot(result, 'BuySignal').values).toEqual([null, 1, null, null, null, null, 1, null, null, null, null, null]);
+    expect(getPlot(result, 'SellSignal').values).toEqual([null, null, null, null, 1, null, null, null, null, null, null, null]);
+    expect(result.plots.some((p) => p.type === 'barcolor')).toBe(true);
+    expect(result.drawings.filter((d) => d.type === 'table').length).toBeGreaterThan(0);
+  });
+
+  it('locks portfolio equity tracker: strategy with two trade cycles, stats table, str.format', () => {
+    // Combines: strategy with two entry/close cycles on stratBars, performance stats
+    // (netprofit, closedtrades, max_drawdown) in a table with str.format formatting,
+    // and equity/netprofit/closedtrades plots.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20equity%20performance%20stats%20table/
+    const result = runCompatScript(`
+strategy("Multi-Feature Equity Tracker Checkpoint", overlay=false, process_orders_on_close=true)
+fastLen = input.int(2, "Fast")
+slowLen = input.int(3, "Slow")
+fastMa = ta.sma(close, fastLen)
+slowMa = ta.sma(close, slowLen)
+if bar_index == 0
+    strategy.entry("L", strategy.long, qty=1)
+if bar_index == 1
+    strategy.close("L")
+if bar_index == 2
+    strategy.entry("L", strategy.long, qty=1)
+if bar_index == 3
+    strategy.close("L")
+var table perf = table.new(position.top_right, 2, 4, border_width=1, border_color=color.gray)
+if barstate.islast
+    table.cell(perf, 0, 0, "Metric")
+    table.cell(perf, 1, 0, "Value")
+    table.cell(perf, 0, 1, "Net P/L")
+    table.cell(perf, 1, 1, str.format("{0,number,#.##}", strategy.netprofit))
+    table.cell(perf, 0, 2, "Trades")
+    table.cell(perf, 1, 2, str.tostring(strategy.closedtrades))
+    table.cell(perf, 0, 3, "Max DD")
+    table.cell(perf, 1, 3, str.format("{0,number,#.##}", strategy.max_drawdown))
+plot(strategy.equity, title="Equity")
+plot(strategy.netprofit, title="NetProfit")
+plot(strategy.closedtrades, title="ClosedTrades")
+`, { bars: stratBars });
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Multi-Feature Equity Tracker Checkpoint');
+    // Trade1: entry at bar0(close=100), close at bar1(close=104) → +4
+    // Trade2: entry at bar2(close=105), close at bar3(close=105) → 0
+    expect(getPlot(result, 'NetProfit').values).toEqual([0, 4, 4, 4]);
+    expect(getPlot(result, 'ClosedTrades').values).toEqual([0, 1, 1, 2]);
+    expect(getPlot(result, 'Equity').values).toEqual([100000, 100004, 100004, 100004]);
+    expect(result.drawings.filter((d) => d.type === 'table').length).toBeGreaterThan(0);
+  });
+
+  it('locks divergence detector: ta.rsi, ta.highest/lowest rolling window, bearish divergence, plotshape', () => {
+    // Combines: ta.rsi, ta.highest/lowest for rolling pivot detection, bearish
+    // divergence logic (price new high but RSI lower), plotshape markers.
+    // Source search: https://www.tradingview.com/scripts/search/rsi%20divergence%20highest%20lowest%20plotshape/
+    const result = runCompatScript(`
+indicator("Multi-Feature Divergence Detector Checkpoint", overlay=false)
+rsiLen = input.int(5, "RSI Length")
+lookback = input.int(3, "Lookback")
+rsi = ta.rsi(close, rsiLen)
+priceHighest = ta.highest(high, lookback)
+priceLower = ta.lowest(low, lookback)
+rsiHighest = ta.highest(rsi, lookback)
+rsiLowest = ta.lowest(rsi, lookback)
+bearDiv = high == priceHighest and rsi < rsiHighest and not na(rsi)
+bullDiv = low == priceLower and rsi > rsiLowest and not na(rsi)
+plotshape(bearDiv, title="BearDiv", style=shape.triangledown, location=location.abovebar, color=color.red)
+plotshape(bullDiv, title="BullDiv", style=shape.triangleup, location=location.belowbar, color=color.green)
+plot(nz(rsi), title="RSI")
+plot(bearDiv ? 1 : 0, title="BearDivFlag")
+plot(bullDiv ? 1 : 0, title="BullDivFlag")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Multi-Feature Divergence Detector Checkpoint');
+    expect(result.inputs.map((i) => [i.title, i.type])).toEqual([
+      ['RSI Length', 'int'],
+      ['Lookback', 'int'],
+    ]);
+    expect(roundSeries(getPlot(result, 'RSI').values)).toEqual([
+      0, 0, 0, 0, 0, 42.857143, 57.894737, 70.16317, 65.39924, 72.421258, 66.774781, 72.194557,
+    ]);
+    // bearDiv: high equals rolling 3-bar high AND rsi < rolling 3-bar rsi max
+    expect(getPlot(result, 'BearDivFlag').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0]);
+    expect(getPlot(result, 'BullDivFlag').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    // plotshape markers match the flag values
+    expect(getPlot(result, 'BearDiv').values).toEqual([null, null, null, null, null, null, null, null, 1, null, 1, null]);
+  });
+
+  it('locks custom oscillator: UDF with input.string mode selector, dynamic plot color, fill vs zero, alertcondition', () => {
+    // Combines: UDF with input.string mode selector (EMA vs SMA), plot with dynamic
+    // per-bar color expression, fill() between osc and zero-line plots, alertcondition.
+    // Source search: https://www.tradingview.com/scripts/search/custom%20oscillator%20gradient%20fill%20zero%20line/
+    const result = runCompatScript(`
+indicator("Multi-Feature Oscillator Gradient Checkpoint")
+length = input.int(5, "Length")
+maType = input.string("EMA", "MA Type")
+getMA(src, len) =>
+    maType == "EMA" ? ta.ema(src, len) : ta.sma(src, len)
+ma = getMA(close, length)
+osc = close - ma
+zeroLine = plot(0, title="Zero", color=color.gray)
+oscPlot = plot(osc, title="Osc", color=osc > 0 ? color.new(color.green, 30) : color.new(color.red, 30))
+fill(oscPlot, zeroLine, color=color.new(color.blue, 85), title="OscFill")
+alertcondition(ta.cross(osc, 0), title="Zero Cross", message="Oscillator crossed zero")
+plot(osc > 0 ? 1 : 0, title="AboveZero")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Multi-Feature Oscillator Gradient Checkpoint');
+    // osc = close - ema(close,5); ema(close,5) uses alpha=2/6 by the EMA formula
+    expect(roundSeries(getPlot(result, 'Osc').values)).toEqual([
+      0, 2, 2.666667, -0.888889, -3.259259, -1.506173,
+      1.662551, 4.441701, 2.294467, 3.529645, 1.68643, 2.45762,
+    ]);
+    // above zero: close > ema(close,5)
+    expect(getPlot(result, 'AboveZero').values).toEqual([0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
+    expect(result.plots.some((p) => p.type === 'fill')).toBe(true);
+  });
+
+  it('locks ichimoku-style overlay: multiple ta.sma offsets, fill, color.new transparency, plotshape crossover', () => {
+    // Combines: multiple ta.highest/ta.lowest calculations for Tenkan/Kijun/Kumo lines,
+    // plot with offset=N parameter, fill between two cloud plots, color.new with dynamic
+    // transparency based on cloud direction, and plotshape for crossover signals.
+    // Source search: https://www.tradingview.com/scripts/search/ichimoku%20cloud%20fill%20crossover%20plotshape/
+    const result = runCompatScript(`
+indicator("Multi-Feature Ichimoku Checkpoint", overlay=true)
+convLen = input.int(3, "Conversion")
+baseLen = input.int(5, "Base")
+conv = (ta.highest(high, convLen) + ta.lowest(low, convLen)) / 2
+base = (ta.highest(high, baseLen) + ta.lowest(low, baseLen)) / 2
+spanA = (conv + base) / 2
+spanB = (ta.highest(high, 4) + ta.lowest(low, 4)) / 2
+convAbove = conv > base
+convPlot = plot(conv, title="Conversion", color=color.blue)
+basePlot = plot(base, title="Base", color=color.red)
+spanAPlot = plot(spanA, title="SpanA", offset=2, color=color.new(color.green, 50))
+spanBPlot = plot(spanB, title="SpanB", offset=2, color=color.new(color.red, 50))
+fill(convPlot, basePlot, color=convAbove ? color.new(color.green, 80) : color.new(color.red, 80), title="CloudFill")
+plotshape(ta.crossover(conv, base), title="BullCross", style=shape.triangleup, location=location.belowbar, color=color.green)
+plot(convAbove ? 1 : 0, title="ConvAbove")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Multi-Feature Ichimoku Checkpoint');
+    expect(result.inputs.map((i) => [i.title, i.type])).toEqual([
+      ['Conversion', 'int'],
+      ['Base', 'int'],
+    ]);
+    expect(getPlot(result, 'Conversion').values).toEqual([
+      101, 102.5, 103.5, 105, 103.5, 102.5, 100.5, 103, 105, 107.5, 110, 110.5,
+    ]);
+    expect(getPlot(result, 'Base').values).toEqual([
+      101, 102.5, 103.5, 104, 103.5, 102.5, 102.5, 103, 103.5, 104, 106.5, 108.5,
+    ]);
+    // convAbove: conv > base
+    expect(getPlot(result, 'ConvAbove').values).toEqual([0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1]);
+    // bullCross fires at bar3 (conv crosses above base) and bar8
+    expect(getPlot(result, 'BullCross').values).toEqual([null, null, null, 1, null, null, null, null, 1, null, null, null]);
+    // fill between Conversion and Base plots is present
+    expect(result.plots.some((p) => p.type === 'fill')).toBe(true);
+  });
+});
