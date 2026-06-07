@@ -255,6 +255,49 @@ Two related issues were resolved:
 
 ---
 
+## Deep Parity Probes (12 scripts) — 2026-06-08
+
+A "Deep parity probes" describe block was added to `tests/compat/pine-realworld-corpus.test.ts`
+targeting untested idiom combinations. 11 of 12 pass; 1 is skipped.
+
+| Script | Status | Pattern |
+| --- | --- | --- |
+| Pine v4 study() with input.integer type | pass | `//@version=4` + `input(n, title, type=input.integer)` + v4 global `sma()` alias |
+| for [key, value] in map | pass | `for [k, v] in m` tuple destructuring over a `map<string,float>` |
+| array.new<float>() generic constructor | pass | `var array<float> w = array.new<float>()` — angle-bracket type param |
+| switch on string values | pass | `switch mode` with `"buy"/"sell"/"hold"` arms |
+| Multi-line string + concatenation | pass | `"O:" + str.tostring(open) + " H:" + ...` across continuation lines |
+| **request.security tuple destructure** | **skip** | `[htfO, htfH, htfL, htfC] = request.security(...)` — gap below |
+| plotcandle conditional colors | pass | `plotcandle(o, h, l, c, color=isBull ? green : red)` |
+| ta.bb with fill | pass | `[mid, upper, lower] = ta.bb(close, 5, 2.0)` + `fill(upperPlot, lowerPlot)` |
+| strategy.exit OCA group | pass | Two `strategy.exit` calls (TP + SL) on same entry — auto-OCA cancels the other |
+| Type casting chain | pass | `int(math.round(float(bar_index) / 2.0))` |
+| Nested UDF with var series state | pass | `accumulate()` uses `var float acc`; called from both top-level and another UDF |
+| label.delete lifecycle | pass | `var label lbl = na`; delete previous, create new each bar; only 1 label survives |
+
+### Gap: request.security tuple expression destructure
+
+**Pattern:**
+```pine
+[htfO, htfH, htfL, htfC] = request.security(syminfo.tickerid, "2", [open, high, low, close])
+```
+
+**Status:** Runtime fails with "Cannot destructure non-array value". The expression
+`[open, high, low, close]` is evaluated in the chart execution context (not the HTF context),
+so it returns the chart-bar array values, not an HTF-merged tuple. The `request.security`
+runtime merges scalar series, not array expressions.
+
+**Impact:** Medium — some public scripts pass OHLC as a tuple to avoid 4 separate
+`request.security` calls. Workaround is 4 separate calls: `htfO = request.security(..., open)`, etc.
+
+**Test:** `it.skip('request.security with tuple expression destructure [o, h, l, c]', ...)` in
+`pine-realworld-corpus.test.ts`.
+
+**Fix path:** The `requestDatafeed.ts` merge path needs to detect when the expression is a tuple
+literal and forward each element separately, then re-assemble as a destructurable array.
+
+---
+
 ## Summary
 
 | Category | Gaps | Impact |
@@ -271,3 +314,4 @@ Two related issues were resolved:
 | **Edge-case corpus probe (12 scripts)** | **1 (parser)** | 11 pass, 1 skipped (trailing comma) |
 | **Pine v5 compatibility probe (9 scripts)** | **1** | 8 pass, 1 skipped (security datafeed) |
 | **Parser stress probe (8 scripts)** | **0** | 8 pass |
+| **Deep parity probes (12 scripts)** | **1 (runtime)** | 11 pass, 1 skipped (request.security tuple) |
