@@ -558,8 +558,17 @@ AssignmentOperator
   / "%="
 
 // Expression statement (function calls, etc.)
+// StatementReservedWord excludes switch/na/true/false so they can appear
+// as standalone expression statements (e.g. UDF last-line switch, else-na).
+StatementReservedWord
+  = ("if" / "else" / "for" / "while" / "break" / "continue" / "var" / "varip"
+    / "and" / "or" / "not" / "to" / "by"
+    / "type" / "method" / "enum"
+    / "indicator" / "library" / "import" / "export"
+    ) !IdentifierPart
+
 ExpressionStatement
-  = !ReservedWord expr:Expression _ LineTerminator? {
+  = !StatementReservedWord expr:Expression _ LineTerminator? {
       return {
         type: 'ExpressionStatement',
         expression: expr,

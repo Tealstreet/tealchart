@@ -663,6 +663,142 @@ plot(close)`);
     });
   });
 
+  describe('reserved-word expression statements', () => {
+    it('parses switch as last expression in multiline UDF body', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+ma(source, length, _type) =>
+    switch _type
+        'SMA' => ta.sma(source, length)
+        'EMA' => ta.ema(source, length)
+plot(ma(close, 14, 'SMA'))`);
+
+      const fn = ast.body.find((s) => s.type === 'FunctionDeclaration');
+      expect(fn).toBeDefined();
+      if (fn?.type === 'FunctionDeclaration') {
+        const body = Array.isArray(fn.body) ? fn.body : [fn.body];
+        const last = body[body.length - 1];
+        expect(last?.type).toBe('ExpressionStatement');
+        if (last?.type === 'ExpressionStatement') {
+          expect(last.expression.type).toBe('SwitchExpression');
+        }
+      }
+    });
+
+    it('parses na as standalone expression in else block', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+x = if close > open
+    close
+else
+    na`);
+
+      const decl = ast.body.find(
+        (s) => s.type === 'VariableDeclaration' && s.names.type === 'VariableDeclarator' && s.names.name.name === 'x',
+      );
+      expect(decl).toBeDefined();
+      if (decl?.type === 'VariableDeclaration' && decl.init.type === 'IfStatement') {
+        const alt = decl.init.alternate;
+        expect(Array.isArray(alt)).toBe(true);
+        if (Array.isArray(alt)) {
+          expect(alt[0]?.type).toBe('ExpressionStatement');
+          if (alt[0]?.type === 'ExpressionStatement') {
+            expect(alt[0].expression.type).toBe('NaExpression');
+          }
+        }
+      }
+    });
+
+    it('parses true as standalone expression in if block', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+x = if close > open
+    true
+else
+    false`);
+
+      const decl = ast.body.find(
+        (s) => s.type === 'VariableDeclaration' && s.names.type === 'VariableDeclarator' && s.names.name.name === 'x',
+      );
+      expect(decl).toBeDefined();
+      if (decl?.type === 'VariableDeclaration' && decl.init.type === 'IfStatement') {
+        const consequent = decl.init.consequent;
+        expect(Array.isArray(consequent)).toBe(true);
+        if (Array.isArray(consequent)) {
+          expect(consequent[0]?.type).toBe('ExpressionStatement');
+          if (consequent[0]?.type === 'ExpressionStatement') {
+            expect(consequent[0].expression.type).toBe('BooleanLiteral');
+            if (consequent[0].expression.type === 'BooleanLiteral') {
+              expect(consequent[0].expression.value).toBe(true);
+            }
+          }
+        }
+        const alt = decl.init.alternate;
+        expect(Array.isArray(alt)).toBe(true);
+        if (Array.isArray(alt)) {
+          expect(alt[0]?.type).toBe('ExpressionStatement');
+          if (alt[0]?.type === 'ExpressionStatement') {
+            expect(alt[0].expression.type).toBe('BooleanLiteral');
+            if (alt[0].expression.type === 'BooleanLiteral') {
+              expect(alt[0].expression.value).toBe(false);
+            }
+          }
+        }
+      }
+    });
+
+    it('parses switch inside if block body', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+mode = "EMA"
+if close > open
+    switch mode
+        'EMA' => ta.ema(close, 14)
+        => close`);
+
+      const ifStmt = ast.body.find((s) => s.type === 'IfStatement');
+      expect(ifStmt).toBeDefined();
+      if (ifStmt?.type === 'IfStatement') {
+        const body = Array.isArray(ifStmt.consequent) ? ifStmt.consequent : [ifStmt.consequent];
+        const stmt = body[0];
+        expect(stmt?.type).toBe('ExpressionStatement');
+        if (stmt?.type === 'ExpressionStatement') {
+          expect(stmt.expression.type).toBe('SwitchExpression');
+        }
+      }
+    });
+
+    it('parses switch inside for loop body', () => {
+      const ast = parse(`//@version=6
+indicator("Test")
+mode = "EMA"
+for i = 0 to 3
+    switch mode
+        'EMA' => ta.ema(close, 14)
+        => close`);
+
+      const forStmt = ast.body.find((s) => s.type === 'ForStatement');
+      expect(forStmt).toBeDefined();
+      if (forStmt?.type === 'ForStatement') {
+        const body = Array.isArray(forStmt.body) ? forStmt.body : [forStmt.body];
+        const stmt = body[0];
+        expect(stmt?.type).toBe('ExpressionStatement');
+        if (stmt?.type === 'ExpressionStatement') {
+          expect(stmt.expression.type).toBe('SwitchExpression');
+        }
+      }
+    });
+
+    it('still rejects switch/na/true/false as variable names', () => {
+      // These are allowed as expression statements but must not be valid identifiers.
+      expect(() => parse(`//@version=6\nindicator("T")\nswitch = 1`)).toThrow(TealscriptParseError);
+      expect(() => parse(`//@version=6\nindicator("T")\nna = 1`)).toThrow(TealscriptParseError);
+      expect(() => parse(`//@version=6\nindicator("T")\ntrue = 1`)).toThrow(TealscriptParseError);
+      expect(() => parse(`//@version=6\nindicator("T")\nfalse = 1`)).toThrow(TealscriptParseError);
+      expect(() => parse(`//@version=6\nindicator("T")\nvar na = 1`)).toThrow(TealscriptParseError);
+    });
+  });
+
   describe('error handling', () => {
     it('throws TealscriptParseError for syntax errors', () => {
       expect(() => {

@@ -6259,3 +6259,88 @@ plot(close,  style=plot.style_area,      title="Area")
     ]);
   });
 });
+
+describe('Statement expression fixes', () => {
+  it('TradingView-style MA function with switch type selector', () => {
+    // Source idiom: TradingView official BB / ATR / Linear Regression indicators
+    // use a UDF whose last statement is a switch that selects the MA type.
+    // Source search: https://www.tradingview.com/scripts/bollingerbands/
+    const result = runCompatScript(`
+indicator("Switch MA Checkpoint")
+ma(source, length, _type) =>
+    switch _type
+        'SMA' => ta.sma(source, length)
+        'EMA' => ta.ema(source, length)
+plot(ma(close, 5, 'SMA'), title="SMA")
+plot(ma(close, 5, 'EMA'), title="EMA")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Switch MA Checkpoint');
+    expect(roundSeries(getPlot(result, 'SMA').values)).toEqual([
+      null, null, null, null, 103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110,
+    ]);
+    expect(roundSeries(getPlot(result, 'EMA').values)).toEqual([
+      102, 103, 104.333333, 103.888889, 102.259259, 101.506173, 102.337449, 104.558299, 105.705533, 107.470355, 108.31357, 109.54238,
+    ]);
+  });
+
+  it('conditional plotting with if/else na pattern', () => {
+    // Ubiquitous Pine pattern: assign na in the else branch so plots show gaps
+    // when the condition is false (e.g. only plot on up-bars).
+    const result = runCompatScript(`
+indicator("Else Na Checkpoint")
+x = if close > open
+    close
+else
+    na
+plot(x, title="X")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Else Na Checkpoint');
+    // close > open: bar 0 (100>100 false), bar 1 (103>102 false wait — open vs close)
+    // compatibilityBars: open/close are [100/102, 102/105, 105/107, 107/103, 103/99,
+    //   99/100, 100/104, 104/109, 109/108, 108/111, 111/110, 110/112]
+    // close > open: T, T, T, F, F, T, T, T, F, T, F, T → close or na
+    expect(roundSeries(getPlot(result, 'X').values)).toEqual([
+      102, 105, 107, null, null, 100, 104, 109, null, 111, null, 112,
+    ]);
+  });
+
+  it('boolean function with if/else true/false pattern', () => {
+    // Pattern: UDF returning true/false as standalone statements in if/else blocks.
+    const result = runCompatScript(`
+indicator("Bool Func Checkpoint")
+isUp(src) =>
+    if src > src[1]
+        true
+    else
+        false
+plot(isUp(close) ? 1 : 0, title="Up")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Bool Func Checkpoint');
+    expect(getPlot(result, 'Up').values).toEqual([0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
+  });
+
+  it('switch result is accessible in the enclosing scope', () => {
+    // Bug R1 check: switch expression value assigned to a variable must be
+    // readable on the same bar after the switch completes.
+    const result = runCompatScript(`
+indicator("Switch Scope Checkpoint")
+mode = "EMA"
+r = switch mode
+    'SMA' => ta.sma(close, 5)
+    'EMA' => ta.ema(close, 5)
+plot(r, title="R")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Switch Scope Checkpoint');
+    expect(roundSeries(getPlot(result, 'R').values)).toEqual([
+      102, 103, 104.333333, 103.888889, 102.259259, 101.506173, 102.337449, 104.558299, 105.705533, 107.470355, 108.31357, 109.54238,
+    ]);
+  });
+});
