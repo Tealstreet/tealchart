@@ -7172,6 +7172,27 @@ tf = input.timeframe("240", "Timeframe", ["15", "60"])
     ]);
   });
 
+  it('reports invalid Pine input options argument types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Input Options")
+badIntOptions = input.int(14, "Length", options="fast")
+badFloatOption = input.float(2.0, "Multiplier", options=[1.0, "2.0"])
+badStringOption = input.string("EMA", "Mode", options=[1, "EMA"])
+badTimeframeOptions = input.timeframe("60", "Timeframe", options=60)
+badTimeframeOption = input.timeframe("60", "Timeframe", ["15", 60])
+rangeLength = input.int(14, "Length", 1, 50, 1)
+plot(badIntOptions + badFloatOption + rangeLength)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'input.int options must be an array, got string',
+      'input.float options must contain number values, got string',
+      'input.string options must contain string values, got int',
+      'input.timeframe options must be an array, got int',
+      'input.timeframe options must contain string values, got int',
+    ]);
+  });
+
   it('reports non-boolean Pine input confirm and active metadata', () => {
     const result = checkProgram(parse(`
 indicator("Bad Input Boolean Metadata")

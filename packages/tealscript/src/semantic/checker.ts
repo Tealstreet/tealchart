@@ -1,5 +1,6 @@
 import type {
   AssignmentStatement,
+  ArrayExpression,
   CallArgument,
   CallExpression,
   EnumDeclaration,
@@ -178,6 +179,12 @@ const INPUT_DEFAULT_TYPE_REQUIREMENTS = new Map<string, 'bool' | 'color' | 'int'
 
 const INPUT_RANGE_OPTION_OVERLOAD_NAMES = new Set(['input.float', 'input.int']);
 const INPUT_RANGE_OPTION_RANGE_PARAMS = new Set(['minval', 'maxval', 'step']);
+const INPUT_OPTIONS_ELEMENT_REQUIREMENTS = new Map<string, 'int' | 'number' | 'string'>([
+  ['input.float', 'number'],
+  ['input.int', 'int'],
+  ['input.string', 'string'],
+  ['input.timeframe', 'string'],
+]);
 const ALERT_FREQUENCY_VALUES = new Set(['all', 'once_per_bar', 'once_per_bar_close']);
 const ALERT_FREQUENCY_CONSTANT_VALUES = new Map([
   ['alert.freq_all', 'all'],
@@ -3843,6 +3850,7 @@ class SemanticChecker {
     this.checkInputDefaultValueType(expression, scope);
     this.checkInputBoolOptionArguments(expression, scope);
     this.checkInputStringOptionArguments(expression, scope);
+    this.checkInputOptionsArgumentType(expression, scope);
     this.checkColorFunctionArgumentTypes(expression, scope);
     this.checkStringFunctionArgumentTypes(expression, scope);
     this.checkMathFunctionArgumentTypes(expression, scope);
@@ -4621,7 +4629,7 @@ class SemanticChecker {
     }
 
     this.checkInputDefaultRangeConstraints(expression, displayName, defval);
-    this.checkInputDefaultOptionsConstraint(expression, displayName, defval);
+    this.checkInputDefaultOptionsConstraint(expression, scope, displayName, defval);
   }
 
   private checkInputBoolOptionArguments(expression: CallExpression, scope: SemanticScope): void {
@@ -4644,6 +4652,47 @@ class SemanticChecker {
 
     for (const parameterName of ['title', 'tooltip', 'inline', 'group']) {
       this.checkBuiltinArgumentKind(expression, scope, displayName, signature.params, parameterName, 'string');
+    }
+  }
+
+  private checkInputOptionsArgumentType(expression: CallExpression, scope: SemanticScope): void {
+    const displayName = this.memberPath(expression.callee).join('.');
+    if (!displayName.startsWith('input.')) return;
+
+    const signature = BUILTIN_SIGNATURES.get(displayName);
+    if (!signature) return;
+
+    const parameterNames = this.resolveSignatureParams(expression.arguments, signature);
+    const optionsIndex = parameterNames.indexOf('options');
+    if (optionsIndex === -1) return;
+
+    const options = this.resolveCallArgumentExpression(expression, parameterNames, optionsIndex);
+    if (!options) return;
+
+    const optionsType = this.inferExpressionType(options, scope);
+    if (options.type !== 'ArrayExpression') {
+      if (optionsType.kind === 'unknown' || optionsType.kind === 'array') return;
+      this.addDiagnostic('type-mismatch', `${displayName} options must be an array, got ${this.formatSemanticType(optionsType)}`, options.loc);
+      return;
+    }
+
+    const requirement = INPUT_OPTIONS_ELEMENT_REQUIREMENTS.get(displayName);
+    if (!requirement) return;
+
+    for (const element of options.elements) {
+      const elementType = this.inferExpressionType(element, scope);
+      if (elementType.kind === 'unknown') continue;
+      if (requirement === 'int' && elementType.kind === 'int') continue;
+      if (requirement === 'number' && this.isNumericType(elementType)) continue;
+      if (requirement === 'string' && elementType.kind === 'string') continue;
+
+      const expectedLabel = requirement === 'int' ? 'integer' : requirement;
+      this.addDiagnostic(
+        'type-mismatch',
+        `${displayName} options must contain ${expectedLabel} values, got ${this.formatSemanticType(elementType)}`,
+        element.loc,
+      );
+      return;
     }
   }
 
@@ -4692,12 +4741,13 @@ class SemanticChecker {
     }
   }
 
-  private checkInputDefaultOptionsConstraint(expression: CallExpression, displayName: string, defval: Expression): void {
+  private checkInputDefaultOptionsConstraint(expression: CallExpression, scope: SemanticScope, displayName: string, defval: Expression): void {
     const defvalValue = this.constantLiteralValue(defval);
     if (defvalValue === undefined) return;
 
     const options = this.getCallArgument(expression.arguments, 'options', 2);
     if (!options || options.type !== 'ArrayExpression') return;
+    if (this.inputOptionsArrayHasTypeMismatch(displayName, options, scope)) return;
 
     const optionValues = options.elements.map((element) => this.constantLiteralValue(element));
     if (optionValues.some((option) => option === undefined)) return;
@@ -4705,6 +4755,19 @@ class SemanticChecker {
     if (!optionValues.some((option) => Object.is(option, defvalValue))) {
       this.addDiagnostic('type-mismatch', `${displayName} defval must be one of options`, defval.loc);
     }
+  }
+
+  private inputOptionsArrayHasTypeMismatch(displayName: string, options: ArrayExpression, scope: SemanticScope): boolean {
+    const requirement = INPUT_OPTIONS_ELEMENT_REQUIREMENTS.get(displayName);
+    if (!requirement) return false;
+
+    return options.elements.some((element) => {
+      const elementType = this.inferExpressionType(element, scope);
+      if (elementType.kind === 'unknown') return false;
+      if (requirement === 'int') return elementType.kind !== 'int';
+      if (requirement === 'number') return !this.isNumericType(elementType);
+      return elementType.kind !== 'string';
+    });
   }
 
   private constantLiteralValue(expression: Expression): number | string | boolean | undefined {
