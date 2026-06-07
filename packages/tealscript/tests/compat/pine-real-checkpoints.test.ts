@@ -3253,6 +3253,37 @@ plot(bar_index >= 1 ? ta.sma(selected, 2) : na, title="Block Switch Average")
     expect(getPlot(result, 'Block Switch Average').values).toEqual([null, 15, 25]);
   });
 
+  it('locks a reduced public library arithmetic source-helper idiom', () => {
+    // Public idiom reference: public library helpers commonly derive sources
+    // with equivalent arithmetic expressions before callers apply delayed
+    // rolling windows.
+    // Source search: https://www.tradingview.com/scripts/search/library%20source%20helper%20arithmetic%20wrapper/
+    const library = parse(`
+library("ArithmeticSourceTools", true)
+export midpoint() => (high + low) / 2
+export scaled(series float src) => src * 2
+`);
+    const result = runCompatScript(`
+indicator("Public Library Arithmetic Source Helper Checkpoint")
+import PublicUser/ArithmeticSourceTools/1 as ast
+plot(bar_index >= 1 ? ta.sma(ast.midpoint(), 2) : na, title="Arithmetic Midpoint Average")
+plot(bar_index >= 1 ? ta.sma(ast.scaled(open), 2) : na, title="Scaled Source Average")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 18, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ],
+      engineOptions: {
+        libraries: new Map([['PublicUser/ArithmeticSourceTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Arithmetic Midpoint Average').values).toEqual([null, 15, 25]);
+    expect(getPlot(result, 'Scaled Source Average').values).toEqual([null, 30, 50]);
+  });
+
   it('locks a reduced public library arithmetic branch source-helper idiom', () => {
     // Public idiom reference: public library helpers commonly wrap source
     // calculations in equivalent ternary/switch branches before callers feed
