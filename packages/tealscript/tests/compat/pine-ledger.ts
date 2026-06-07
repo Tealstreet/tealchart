@@ -1925,6 +1925,98 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'libfin-library-export-checkpoint',
+      title: 'Library Export Declaration Checkpoint',
+      searchContext: 'TradingView public scripts search: library export functions',
+      featureTags: ['libraries', 'imports', 'udf', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'libfin-enum-switch-barcolor-checkpoint',
+      title: 'Enum Switch Barcolor Checkpoint',
+      searchContext: 'TradingView public scripts search: enum switch barcolor plotshape',
+      featureTags: ['signals', 'state', 'visuals', 'barcolor', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'libfin-request-financial-checkpoint',
+      title: 'Request Financial Empty Datafeed Checkpoint',
+      searchContext: 'TradingView public scripts search: request.financial fundamental',
+      featureTags: ['request', 'financial', 'na', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'libfin-request-dividends-earnings-checkpoint',
+      title: 'Request Dividends Earnings Empty Datafeed Checkpoint',
+      searchContext: 'TradingView public scripts search: request.dividends request.earnings event',
+      featureTags: ['request', 'dividends', 'earnings', 'na', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'libfin-strategy-pyramiding-checkpoint',
+      title: 'Strategy Pyramiding Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy pyramiding scale in',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'pyramiding', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'libfin-strategy-commission-checkpoint',
+      title: 'Strategy Commission Percent Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy commission percent cost',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'commission', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'libfin-ta-vwap-anchor-checkpoint',
+      title: 'TA VWAP Anchor Reset Checkpoint',
+      searchContext: 'TradingView public scripts search: ta.vwap anchor reset session',
+      featureTags: ['ta', 'signals', 'vwap', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'libfin-str-format-time-timezone-checkpoint',
+      title: 'Str Format Time Timezone Checkpoint',
+      searchContext: 'TradingView public scripts search: str.format_time timezone display',
+      featureTags: ['signals', 'time', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'libfin-conditional-na-inference-checkpoint',
+      title: 'Conditional NA Inference Checkpoint',
+      searchContext: 'TradingView public scripts search: conditional na ternary sparse series',
+      featureTags: ['runtime', 'na', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'libfin-runtime-error-guard-checkpoint',
+      title: 'Runtime Error Guard Checkpoint',
+      searchContext: 'TradingView public scripts search: runtime.error invariant guard',
+      featureTags: ['runtime', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
