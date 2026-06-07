@@ -979,6 +979,44 @@ plot(barClose - barOpen, title="Synthetic Change")
     expect(getPlot(result, 'Synthetic Change').values).toEqual([null, 3, 2, -4, -4, 1, 4, 5, -1, 3, -1, 2]);
   });
 
+  it('locks a reduced public plot metadata idiom', () => {
+    // Public idiom reference: projection and level scripts commonly use plot()
+    // offset/show_last/display/trackprice metadata to route current levels while
+    // hiding helper series from the chart.
+    // Source search: https://www.tradingview.com/scripts/search/projected%20levels/
+    const result = runCompatScript(`
+indicator("Public Plot Metadata Checkpoint", overlay=true)
+basis = ta.sma(close, 3)
+projected = close > basis ? high : low
+hiddenHelper = close - open
+plot(projected, title="Projected Level", color=color.orange, linewidth=2, style=plot.style_line, trackprice=true, offset=1, show_last=5, display=display.price_scale, format=format.price, precision=2, force_overlay=true)
+plot(hiddenHelper, title="Hidden Helper", color=color.gray, display=display.none)
+plot(close > basis ? 1 : 0, title="Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    const projected = getPlot(result, 'Projected Level');
+    expect(projected).toMatchObject({
+      type: 'plot',
+      color: Array(compatibilityBars.length).fill('#FF9800'),
+      linewidth: 2,
+      style: 'line',
+      trackprice: true,
+      offset: 1,
+      showLast: 5,
+      display: 8,
+      format: 'price',
+      precision: 2,
+      forceOverlay: true,
+    });
+    expect(roundSeries(projected.values)).toEqual([99, 101, 108, 102, 98, 96, 105, 110, 111, 112, 114, 113]);
+    const hidden = getPlot(result, 'Hidden Helper');
+    expect(hidden.color).toEqual(Array(compatibilityBars.length).fill('#787B86'));
+    expect(hidden.display).toBe(0);
+    expect(hidden.values).toEqual([2, 3, 2, -4, -4, 1, 4, 5, -1, 3, -1, 2]);
+    expect(getPlot(result, 'Signal').values).toEqual([0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
+  });
+
   it('locks a reduced public MTF trend-filter idiom', () => {
     // Public idiom reference: MTF trend filters commonly combine local price
     // with higher-timeframe moving averages from request.security().

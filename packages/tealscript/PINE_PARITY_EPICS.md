@@ -486,7 +486,9 @@ Phases:
    stable viewport setup, and manual visual comparison notes for milestone
    scripts.
 2. Improve plot and marker geometry, price-scale labels, z-order, line styles,
-   histogram/area edge cases, and offset/show-last behavior.
+   histogram/area edge cases, and offset/show-last behavior; the source-linked
+   public plot metadata checkpoint now locks projected-level `plot()` routing
+   with offset, `show_last`, `display.price_scale`, `trackprice`, and hidden helper output.
 3. Improve label, line, box, polyline, and table pixel geometry, sizing,
    wrapping, alignment, fonts, and theme behavior.
 4. Add renderer regression fixtures only when the behavior affects common
