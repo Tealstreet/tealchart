@@ -291,6 +291,9 @@ const GLOBAL_NON_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[
   ['na', ['x']],
   ['nz', ['source', 'replacement']],
 ]);
+const GLOBAL_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['iff', ['condition']],
+]);
 const REQUEST_GAPS_MODES = new Set(['barmerge.gaps_on', 'barmerge.gaps_off']);
 const REQUEST_LOOKAHEAD_MODES = new Set(['barmerge.lookahead_on', 'barmerge.lookahead_off']);
 const REQUEST_BARMERGE_MODE_CALLS = new Set([
@@ -858,6 +861,7 @@ const BUILTIN_FUNCTIONS = new Set([
   'fixnan',
   'float',
   'hline',
+  'iff',
   'indicator',
   'input',
   'int',
@@ -1132,6 +1136,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ],
   ['fixnan', { params: ['source'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['float', { params: ['x'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['iff', { params: ['condition', 'then', 'else'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['hline', { params: ['price', 'title', 'color', 'linestyle', 'linewidth', 'editable', 'display'], minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['int', { params: ['x'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   [
@@ -4727,14 +4732,18 @@ class SemanticChecker {
   private checkGlobalFunctionArgumentTypes(expression: CallExpression, scope: SemanticScope): void {
     const calleeName = this.memberPath(expression.callee).join('.');
     const nonBoolParameterNames = GLOBAL_NON_BOOL_PARAMETER_NAMES_BY_CALL.get(calleeName);
-    if (!nonBoolParameterNames) return;
+    const boolParameterNames = GLOBAL_BOOL_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (!nonBoolParameterNames && !boolParameterNames) return;
 
     const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
     if (!signature) return;
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
 
-    for (const parameterName of nonBoolParameterNames) {
+    for (const parameterName of nonBoolParameterNames ?? []) {
       this.checkBuiltinArgumentNotBool(expression, scope, calleeName, signature.params, parameterName);
+    }
+    for (const parameterName of boolParameterNames ?? []) {
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'boolean');
     }
   }
 
@@ -7870,6 +7879,7 @@ class SemanticChecker {
     if (calleePath.join('.') === 'int') return { kind: 'int', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
     if (calleePath.join('.') === 'string') return { kind: 'string', qualifier: this.inferCallArgumentMaxQualifier(expression, scope) };
     if (calleePath.join('.') === 'fixnan') return this.inferFixnanCallType(expression, scope);
+    if (calleePath.join('.') === 'iff') return this.inferIffCallType(expression, scope);
     if (calleePath.join('.') === 'nz') return this.inferNzCallType(expression, scope);
     if (CALENDAR_FUNCTION_NAMES.has(calleePath.join('.'))) return { kind: 'int', qualifier: 'series' };
     const arrayElementReadType = this.inferArrayElementReadCallType(expression, scope);
@@ -7964,6 +7974,18 @@ class SemanticChecker {
 
     const kind = INPUT_RETURN_TYPES.get(calleeName);
     return kind ? { kind, qualifier: 'input' } : undefined;
+  }
+
+  private inferIffCallType(expression: CallExpression, scope: SemanticScope): SemanticType {
+    const conditionType = this.inferCallArgumentType(expression, scope, ['condition', 'then', 'else'], 0);
+    const thenType = this.inferCallArgumentType(expression, scope, ['condition', 'then', 'else'], 1);
+    const elseType = this.inferCallArgumentType(expression, scope, ['condition', 'then', 'else'], 2);
+    if (!thenType || !elseType) return { kind: 'unknown', qualifier: conditionType?.qualifier };
+    const mergedType = this.mergeCompatibleType(thenType, elseType);
+    return {
+      ...mergedType,
+      qualifier: conditionType ? this.maxQualifier(conditionType, mergedType) : mergedType.qualifier,
+    };
   }
 
   private inferInputTypeConstantType(expression: MemberExpression): SemanticType | undefined {

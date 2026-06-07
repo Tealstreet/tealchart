@@ -569,7 +569,7 @@ ExpressionStatement
 
 // If statement
 IfStatement
-  = "if" _ test:Expression _ LineTerminator consequent:IndentedBlock alternate:ElseClause? {
+  = "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:IndentedBlock alternate:ElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -578,7 +578,7 @@ IfStatement
         loc: loc()
       };
     }
-  / "if" _ test:Expression _ LineTerminator? _ consequent:SingleLineBody {
+  / "if" !IdentifierPart _ test:Expression _ LineTerminator? _ consequent:SingleLineBody {
       return {
         type: 'IfStatement',
         test,
@@ -589,7 +589,7 @@ IfStatement
     }
 
 ElseClause
-  = _ "else" _ "if" _ test:Expression _ LineTerminator consequent:IndentedBlock alternate:ElseClause? {
+  = _ "else" !IdentifierPart _ "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:IndentedBlock alternate:ElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -598,13 +598,13 @@ ElseClause
         loc: loc()
       };
     }
-  / _ "else" _ LineTerminator? block:IndentedBlock {
+  / _ "else" !IdentifierPart _ LineTerminator? block:IndentedBlock {
       return block;
     }
 
 // For loop
 ForStatement
-  = "for" _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:IndentedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:IndentedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -615,7 +615,7 @@ ForStatement
         loc: loc()
       };
     }
-  / "for" _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:IndentedBlock {
+  / "for" !IdentifierPart _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:IndentedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -638,7 +638,7 @@ CollectionForCounter
 
 // While loop
 WhileStatement
-  = "while" _ test:Expression _ LineTerminator body:IndentedBlock {
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:IndentedBlock {
       return {
         type: 'WhileStatement',
         test,
@@ -679,7 +679,7 @@ FunctionIndentedStatement
     }
 
 FunctionIfStatement
-  = "if" _ test:Expression _ LineTerminator consequent:FunctionNestedBlock alternate:FunctionElseClause? {
+  = "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:FunctionNestedBlock alternate:FunctionElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -688,7 +688,7 @@ FunctionIfStatement
         loc: loc()
       };
     }
-  / "if" _ test:Expression _ LineTerminator? _ consequent:SingleLineBody {
+  / "if" !IdentifierPart _ test:Expression _ LineTerminator? _ consequent:SingleLineBody {
       return {
         type: 'IfStatement',
         test,
@@ -699,7 +699,7 @@ FunctionIfStatement
     }
 
 FunctionElseClause
-  = FunctionElseIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionNestedBlock alternate:FunctionElseClause? {
+  = FunctionElseIndent "else" !IdentifierPart _ "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:FunctionNestedBlock alternate:FunctionElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -708,12 +708,12 @@ FunctionElseClause
         loc: loc()
       };
     }
-  / FunctionElseIndent "else" _ LineTerminator? block:FunctionNestedBlock {
+  / FunctionElseIndent "else" !IdentifierPart _ LineTerminator? block:FunctionNestedBlock {
       return block;
     }
 
 FunctionForStatement
-  = "for" _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:FunctionNestedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:FunctionNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -724,7 +724,7 @@ FunctionForStatement
         loc: loc()
       };
     }
-  / "for" _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:FunctionNestedBlock {
+  / "for" !IdentifierPart _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:FunctionNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -738,7 +738,7 @@ FunctionForStatement
     }
 
 FunctionWhileStatement
-  = "while" _ test:Expression _ LineTerminator body:FunctionNestedBlock {
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionNestedBlock {
       return {
         type: 'WhileStatement',
         test,
@@ -810,7 +810,7 @@ FunctionNestedStatement
     }
 
 FunctionNestedIfStatement
-  = "if" _ test:Expression _ LineTerminator consequent:FunctionDeepNestedBlock alternate:FunctionNestedElseClause? {
+  = "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:FunctionDeepNestedBlock alternate:FunctionNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -821,7 +821,7 @@ FunctionNestedIfStatement
     }
 
 FunctionNestedElseClause
-  = FunctionNestedIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionDeepNestedBlock alternate:FunctionNestedElseClause? {
+  = FunctionNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:FunctionDeepNestedBlock alternate:FunctionNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -830,12 +830,12 @@ FunctionNestedElseClause
         loc: loc()
       };
     }
-  / FunctionNestedIndent "else" _ LineTerminator? block:FunctionDeepNestedBlock {
+  / FunctionNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionDeepNestedBlock {
       return block;
     }
 
 FunctionNestedForStatement
-  = "for" _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:FunctionDeepNestedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:FunctionDeepNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -846,7 +846,7 @@ FunctionNestedForStatement
         loc: loc()
       };
     }
-  / "for" _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:FunctionDeepNestedBlock {
+  / "for" !IdentifierPart _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:FunctionDeepNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -860,7 +860,7 @@ FunctionNestedForStatement
     }
 
 FunctionNestedWhileStatement
-  = "while" _ test:Expression _ LineTerminator body:FunctionDeepNestedBlock {
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionDeepNestedBlock {
       return {
         type: 'WhileStatement',
         test,
@@ -932,7 +932,7 @@ FunctionDeepNestedStatement
     }
 
 FunctionDeepNestedIfStatement
-  = "if" _ test:Expression _ LineTerminator consequent:FunctionVeryDeepNestedBlock alternate:FunctionDeepNestedElseClause? {
+  = "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:FunctionVeryDeepNestedBlock alternate:FunctionDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -943,7 +943,7 @@ FunctionDeepNestedIfStatement
     }
 
 FunctionDeepNestedElseClause
-  = FunctionDeepNestedIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionVeryDeepNestedBlock alternate:FunctionDeepNestedElseClause? {
+  = FunctionDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:FunctionVeryDeepNestedBlock alternate:FunctionDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -952,12 +952,12 @@ FunctionDeepNestedElseClause
         loc: loc()
       };
     }
-  / FunctionDeepNestedIndent "else" _ LineTerminator? block:FunctionVeryDeepNestedBlock {
+  / FunctionDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionVeryDeepNestedBlock {
       return block;
     }
 
 FunctionDeepNestedForStatement
-  = "for" _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:FunctionVeryDeepNestedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:FunctionVeryDeepNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -968,7 +968,7 @@ FunctionDeepNestedForStatement
         loc: loc()
       };
     }
-  / "for" _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:FunctionVeryDeepNestedBlock {
+  / "for" !IdentifierPart _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:FunctionVeryDeepNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -982,7 +982,7 @@ FunctionDeepNestedForStatement
     }
 
 FunctionDeepNestedWhileStatement
-  = "while" _ test:Expression _ LineTerminator body:FunctionVeryDeepNestedBlock {
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionVeryDeepNestedBlock {
       return {
         type: 'WhileStatement',
         test,
@@ -1054,7 +1054,7 @@ FunctionVeryDeepNestedStatement
     }
 
 FunctionVeryDeepNestedIfStatement
-  = "if" _ test:Expression _ LineTerminator consequent:FunctionUltraDeepNestedBlock alternate:FunctionVeryDeepNestedElseClause? {
+  = "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:FunctionUltraDeepNestedBlock alternate:FunctionVeryDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1065,7 +1065,7 @@ FunctionVeryDeepNestedIfStatement
     }
 
 FunctionVeryDeepNestedElseClause
-  = FunctionVeryDeepNestedIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionUltraDeepNestedBlock alternate:FunctionVeryDeepNestedElseClause? {
+  = FunctionVeryDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:FunctionUltraDeepNestedBlock alternate:FunctionVeryDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1074,7 +1074,7 @@ FunctionVeryDeepNestedElseClause
         loc: loc()
       };
     }
-  / FunctionVeryDeepNestedIndent "else" _ LineTerminator? block:FunctionUltraDeepNestedBlock {
+  / FunctionVeryDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionUltraDeepNestedBlock {
       return block;
     }
 
@@ -1089,7 +1089,7 @@ FunctionUltraDeepNestedStatement
     }
 
 FunctionUltraDeepNestedIfStatement
-  = "if" _ test:Expression _ LineTerminator consequent:FunctionMegaDeepNestedBlock alternate:FunctionUltraDeepNestedElseClause? {
+  = "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:FunctionMegaDeepNestedBlock alternate:FunctionUltraDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1100,7 +1100,7 @@ FunctionUltraDeepNestedIfStatement
     }
 
 FunctionUltraDeepNestedElseClause
-  = FunctionUltraDeepNestedIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionMegaDeepNestedBlock alternate:FunctionUltraDeepNestedElseClause? {
+  = FunctionUltraDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:FunctionMegaDeepNestedBlock alternate:FunctionUltraDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1109,7 +1109,7 @@ FunctionUltraDeepNestedElseClause
         loc: loc()
       };
     }
-  / FunctionUltraDeepNestedIndent "else" _ LineTerminator? block:FunctionMegaDeepNestedBlock {
+  / FunctionUltraDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionMegaDeepNestedBlock {
       return block;
     }
 
@@ -1124,7 +1124,7 @@ FunctionMegaDeepNestedStatement
     }
 
 FunctionMegaDeepNestedIfStatement
-  = "if" _ test:Expression _ LineTerminator consequent:FunctionSuperDeepNestedBlock alternate:FunctionMegaDeepNestedElseClause? {
+  = "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:FunctionSuperDeepNestedBlock alternate:FunctionMegaDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1135,7 +1135,7 @@ FunctionMegaDeepNestedIfStatement
     }
 
 FunctionMegaDeepNestedElseClause
-  = FunctionMegaDeepNestedIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionSuperDeepNestedBlock alternate:FunctionMegaDeepNestedElseClause? {
+  = FunctionMegaDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:FunctionSuperDeepNestedBlock alternate:FunctionMegaDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1144,7 +1144,7 @@ FunctionMegaDeepNestedElseClause
         loc: loc()
       };
     }
-  / FunctionMegaDeepNestedIndent "else" _ LineTerminator? block:FunctionSuperDeepNestedBlock {
+  / FunctionMegaDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionSuperDeepNestedBlock {
       return block;
     }
 
@@ -1159,7 +1159,7 @@ FunctionSuperDeepNestedStatement
     }
 
 FunctionSuperDeepNestedIfStatement
-  = "if" _ test:Expression _ LineTerminator consequent:FunctionHyperDeepNestedBlock alternate:FunctionSuperDeepNestedElseClause? {
+  = "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:FunctionHyperDeepNestedBlock alternate:FunctionSuperDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1170,7 +1170,7 @@ FunctionSuperDeepNestedIfStatement
     }
 
 FunctionSuperDeepNestedElseClause
-  = FunctionSuperDeepNestedIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionHyperDeepNestedBlock alternate:FunctionSuperDeepNestedElseClause? {
+  = FunctionSuperDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:FunctionHyperDeepNestedBlock alternate:FunctionSuperDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1179,7 +1179,7 @@ FunctionSuperDeepNestedElseClause
         loc: loc()
       };
     }
-  / FunctionSuperDeepNestedIndent "else" _ LineTerminator? block:FunctionHyperDeepNestedBlock {
+  / FunctionSuperDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionHyperDeepNestedBlock {
       return block;
     }
 
@@ -1194,7 +1194,7 @@ FunctionHyperDeepNestedStatement
     }
 
 FunctionHyperDeepNestedIfStatement
-  = "if" _ test:Expression _ LineTerminator consequent:FunctionExtremeDeepNestedBlock alternate:FunctionHyperDeepNestedElseClause? {
+  = "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:FunctionExtremeDeepNestedBlock alternate:FunctionHyperDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1205,7 +1205,7 @@ FunctionHyperDeepNestedIfStatement
     }
 
 FunctionHyperDeepNestedElseClause
-  = FunctionHyperDeepNestedIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionExtremeDeepNestedBlock alternate:FunctionHyperDeepNestedElseClause? {
+  = FunctionHyperDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:FunctionExtremeDeepNestedBlock alternate:FunctionHyperDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1214,7 +1214,7 @@ FunctionHyperDeepNestedElseClause
         loc: loc()
       };
     }
-  / FunctionHyperDeepNestedIndent "else" _ LineTerminator? block:FunctionExtremeDeepNestedBlock {
+  / FunctionHyperDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionExtremeDeepNestedBlock {
       return block;
     }
 
@@ -1229,7 +1229,7 @@ FunctionExtremeDeepNestedStatement
     }
 
 FunctionExtremeDeepNestedIfStatement
-  = "if" _ test:Expression _ LineTerminator consequent:FunctionMaxDeepNestedBlock alternate:FunctionExtremeDeepNestedElseClause? {
+  = "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:FunctionMaxDeepNestedBlock alternate:FunctionExtremeDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1240,7 +1240,7 @@ FunctionExtremeDeepNestedIfStatement
     }
 
 FunctionExtremeDeepNestedElseClause
-  = FunctionExtremeDeepNestedIndent "else" _ "if" _ test:Expression _ LineTerminator consequent:FunctionMaxDeepNestedBlock alternate:FunctionExtremeDeepNestedElseClause? {
+  = FunctionExtremeDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart _ test:Expression _ LineTerminator consequent:FunctionMaxDeepNestedBlock alternate:FunctionExtremeDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1249,7 +1249,7 @@ FunctionExtremeDeepNestedElseClause
         loc: loc()
       };
     }
-  / FunctionExtremeDeepNestedIndent "else" _ LineTerminator? block:FunctionMaxDeepNestedBlock {
+  / FunctionExtremeDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionMaxDeepNestedBlock {
       return block;
     }
 
@@ -1390,7 +1390,7 @@ SwitchExpression
     }
 
 CollectionForExpression
-  = "for" _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:IndentedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:IndentedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -1403,7 +1403,7 @@ CollectionForExpression
     }
 
 NumericForExpression
-  = "for" _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:IndentedBlock {
+  = "for" !IdentifierPart _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:IndentedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -1417,7 +1417,7 @@ NumericForExpression
     }
 
 WhileExpression
-  = "while" _ test:Expression _ LineTerminator body:IndentedBlock {
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:IndentedBlock {
       return {
         type: 'WhileStatement',
         test,

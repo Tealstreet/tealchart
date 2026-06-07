@@ -1436,6 +1436,16 @@ plot(str.length(score()))
           'android',
         ]);
       });
+
+      it('does not split control-flow keyword prefixes inside function identifiers', () => {
+        const ast = parse('legacy = iff(close > open, close, open)\n');
+        const declaration = ast.body[0] as VariableDeclaration;
+
+        expect(declaration.init).toEqual(expect.objectContaining({
+          type: 'CallExpression',
+          callee: expect.objectContaining({ type: 'Identifier', name: 'iff' }),
+        }));
+      });
     });
 
     describe('Unary expressions', () => {
