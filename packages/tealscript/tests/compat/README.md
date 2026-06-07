@@ -56,6 +56,9 @@ real-script intake metadata or corpus summaries:
   generated artifacts without adding network or TradingView dependencies to CI.
 - `formatPineCompatibilityCorpusJson()` renders the normalized run object as a
   stable JSON artifact.
+- Corpus summaries keep raw `failed` counts and also expose
+  `plannedUnsupported` / `actionableFailed` plus an actionable pass rate so
+  explicitly planned host/data gaps do not hide true regressions.
 
 Use `fixtures.ts` helpers by default:
 

@@ -29,6 +29,8 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(run.summary.total).toBe(81);
     expect(run.summary.passed).toBe(80);
     expect(run.summary.failed).toBe(1);
+    expect(run.summary.plannedUnsupported).toBe(1);
+    expect(run.summary.actionableFailed).toBe(0);
     expect(run.summary.byFirstFailureStage).toEqual({ semantic: 1 });
     expect(run.summary.byFirstFailureClass).toEqual({ unsupported_planned: 1 });
     expect(run.summary.validationErrors).toEqual({});
@@ -164,7 +166,10 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('Total: 81');
     expect(markdown).toContain('Passed: 80');
     expect(markdown).toContain('Failed: 1');
+    expect(markdown).toContain('Planned unsupported: 1');
+    expect(markdown).toContain('Actionable failed: 0');
     expect(markdown).toContain('Pass rate: 98.8%');
+    expect(markdown).toContain('Actionable pass rate: 100.0%');
     expect(markdown).toContain('| semantic | 1 |');
     expect(markdown).toContain('| unsupported_planned | 1 |');
     expect(markdown).toContain('| inputs | 4 | 4 | 0 |');
@@ -249,6 +254,8 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(run.summary.total).toBe(81);
     expect(run.summary.passed).toBe(80);
     expect(run.summary.failed).toBe(1);
+    expect(run.summary.plannedUnsupported).toBe(1);
+    expect(run.summary.actionableFailed).toBe(0);
     expect(run.summary.validationErrors).toEqual({});
     expect(json).toContain('"schemaVersion": 1');
     expect(json).toContain('"scriptId": "official-builtins-checkpoint"');
@@ -471,7 +478,9 @@ plot(signals.fast(close, 2), title="Fast")
       });
 
       expect(readFileSync(join(outDir, 'pine-compatibility-corpus.json'), 'utf8')).toContain('"passed": 80');
+      expect(readFileSync(join(outDir, 'pine-compatibility-corpus.json'), 'utf8')).toContain('"actionableFailed": 0');
       expect(readFileSync(join(outDir, 'pine-compatibility-corpus.md'), 'utf8')).toContain('Pass rate: 98.8%');
+      expect(readFileSync(join(outDir, 'pine-compatibility-corpus.md'), 'utf8')).toContain('Actionable pass rate: 100.0%');
       expect(readFileSync(join(outDir, 'pine-compatibility-coverage.json'), 'utf8')).toContain('"total": 81');
       expect(readFileSync(join(outDir, 'pine-compatibility-coverage.md'), 'utf8')).toContain('Total checkpoints: 81');
     } finally {
