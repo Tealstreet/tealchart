@@ -40,14 +40,14 @@ Used by strategy stats tables and performance dashboards.
 - [x] session.islastbar
 - [x] session.islastbar_regular
 
-## Chart Type Detection (6 gaps — MEDIUM IMPACT)
+## Chart Type Detection (0 gaps remaining — CLOSED)
 
-- [ ] chart.is_heikinashi
-- [ ] chart.is_kagi
-- [ ] chart.is_linebreak
-- [ ] chart.is_pnf
-- [ ] chart.is_range
-- [ ] chart.is_renko
+- [x] chart.is_heikinashi
+- [x] chart.is_kagi
+- [x] chart.is_linebreak
+- [x] chart.is_pnf
+- [x] chart.is_range
+- [x] chart.is_renko
 
 ## Symbol Info (3 gaps — LOW IMPACT)
 
@@ -76,8 +76,8 @@ Used by strategy stats tables and performance dashboards.
 | --- | ---: | --- |
 | Strategy performance variables | 0 | CLOSED |
 | Session state variables | 0 | CLOSED |
-| Chart type detection | 6 | MEDIUM |
+| Chart type detection | 0 | CLOSED |
 | Symbol info fields | 3 | LOW |
 | Misc constants | 3 | LOW |
-| **Total actionable** | **12** | |
+| **Total actionable** | **6** | |
 | Deferred (host-dependent) | 9 | — |
