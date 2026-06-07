@@ -3701,6 +3701,15 @@ class SemanticChecker {
   }
 
   private checkBooleanContext(expression: Expression, scope: SemanticScope): void {
+    if (this.isNaLiteralExpression(expression)) {
+      this.addDiagnostic(
+        'invalid-na-bool',
+        'na cannot be used as a boolean expression; wrap it in bool(...) or test a value with na(...)',
+        expression.loc,
+      );
+      return;
+    }
+
     const type = this.inferExpressionType(expression, scope);
     if (!this.isNumericType(type)) return;
 
