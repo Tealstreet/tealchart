@@ -362,8 +362,6 @@ plotarrow(close - open, "Move Arrow", color.new(color.green, 50), color.new(colo
     });
     expect(getPlot(result, 'Move Arrow')).toMatchObject({
       type: 'plotarrow',
-      colorup: '#4CAF5080',
-      colordown: '#F2364580',
       offset: 0,
       minHeight: 5,
       maxHeight: 20,
@@ -374,6 +372,34 @@ plotarrow(close - open, "Move Arrow", color.new(color.green, 50), color.new(colo
       precision: 2,
       forceOverlay: true,
     });
+    expect(getPlot(result, 'Move Arrow').colorup).toEqual([
+      '#4CAF5080',
+      '#4CAF5080',
+      '#4CAF5080',
+      null,
+      null,
+      '#4CAF5080',
+      '#4CAF5080',
+      '#4CAF5080',
+      null,
+      '#4CAF5080',
+      null,
+      '#4CAF5080',
+    ]);
+    expect(getPlot(result, 'Move Arrow').colordown).toEqual([
+      null,
+      null,
+      null,
+      '#F2364580',
+      '#F2364580',
+      null,
+      null,
+      null,
+      '#F2364580',
+      null,
+      '#F2364580',
+      null,
+    ]);
   });
 
   it('preserves dynamic marker text colors in visual payloads', () => {
@@ -564,11 +590,37 @@ fill(plot1=upper, lower, color.new(color.orange, 80), "Mixed Fill", false, 6)
     });
     expect(getPlot(result, 'Mixed Arrow')).toMatchObject({
       type: 'plotarrow',
-      colorup: '#4CAF50',
-      colordown: '#F23645',
       minHeight: 5,
       maxHeight: 15,
     });
+    expect(getPlot(result, 'Mixed Arrow').colorup).toEqual([
+      '#4CAF50',
+      '#4CAF50',
+      '#4CAF50',
+      null,
+      null,
+      '#4CAF50',
+      '#4CAF50',
+      '#4CAF50',
+      null,
+      '#4CAF50',
+      null,
+      '#4CAF50',
+    ]);
+    expect(getPlot(result, 'Mixed Arrow').colordown).toEqual([
+      null,
+      null,
+      null,
+      '#F23645',
+      '#F23645',
+      null,
+      null,
+      null,
+      '#F23645',
+      null,
+      '#F23645',
+      null,
+    ]);
     expect(getPlot(result, 'Mixed Fill')).toMatchObject({
       type: 'fill',
       plot1Id: 'plot_Fill Upper',
