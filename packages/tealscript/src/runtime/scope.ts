@@ -390,6 +390,29 @@ export class Scope {
   }
 
   /**
+   * Promote variables declared in this scope to a parent scope.
+   * New names are inserted; existing regular (kind='none') names are updated
+   * with the current value so the parent sees the branch result every bar.
+   * Persistent (var/varip) names are never overwritten in the parent.
+   * Used by if/else to make branch-declared variables visible after the block.
+   */
+  promoteNewLocalsTo(target: Scope): void {
+    for (const [name, entry] of this.variables) {
+      const existing = target.variables.get(name);
+      if (!existing) {
+        target.variables.set(name, entry);
+      } else if (existing.kind === 'none' && entry.kind === 'none') {
+        // Update the parent entry's value so subsequent statements see the result.
+        existing.value = entry.series ? entry.series.get(0) : entry.value;
+        existing.initialized = entry.initialized;
+        if (existing.series) {
+          existing.series.set(existing.value);
+        }
+      }
+    }
+  }
+
+  /**
    * Get all variable names including parents
    */
   getAllNames(): string[] {

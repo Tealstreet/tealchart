@@ -212,7 +212,7 @@ calls. Not a new gap; documented here for completeness.
 Discovered by the parser stress probe in `tests/compat/pine-realworld-corpus.test.ts`
 (describe block "Parser stress probe") on 2026-06-08.
 
-7 of 8 planned parser stress patterns pass. 1 is skipped.
+All 8 planned parser stress patterns pass.
 
 | Script | Status | Pattern |
 | --- | --- | --- |
@@ -223,9 +223,9 @@ Discovered by the parser stress probe in `tests/compat/pine-realworld-corpus.tes
 | Empty lines in block | pass | blank lines before/after `if` body |
 | Inline comments everywhere | pass | every line has trailing `// comment` |
 | Long switch (10 cases) | pass | switch with 10 numeric arms + default |
-| **Mixed tabs and spaces** | **skip** | tab-indented `if` body, space-indented `else` |
+| Mixed tabs and spaces | pass | tab-indented `if` body, space-indented `else` |
 
-### Gap: Mixed tabs and spaces in block bodies
+### Gap: Mixed tabs and spaces in block bodies — CLOSED
 
 **Pattern:**
 ```pine
@@ -236,20 +236,22 @@ else
 plot(x, title="X")
 ```
 
-**Status:** The variable `x` declared inside the tab-indented `if` body is not visible
-to the following `plot(x)` statement. The runtime reports "Unknown identifier: x".
-Root cause: the indentation-tracking parser treats a tab and 4 spaces as distinct
-indentation levels, so the `if` and `else` branches are parsed as separate unrelated
-blocks rather than paired branches of the same conditional.
+**Status:** CLOSED. Fixed in PR #938.
 
-**Impact:** Low — hand-written Pine scripts rarely mix tabs and spaces. Only affects
-scripts formatted by editors with tab/space inconsistency.
+Two related issues were resolved:
 
-**Test:** `it.skip('mixed tabs and spaces in block bodies', ...)` in `pine-realworld-corpus.test.ts`.
+1. **Tab normalization** (`src/parser/parser.ts`): Leading tabs on each line are now
+   normalized to 4 spaces before the source reaches the PEG parser. This prevents
+   edge cases where multi-level tab indentation (`\t\t`) might mismatch nested `Indent`
+   tokens.
 
-**Fix path:** Normalize tab characters to spaces (e.g. 4 spaces per tab) in the
-pre-tokenization phase of `grammar.peggy`, or in the `parse()` function in
-`parser.ts` before the source is fed to the PEG parser.
+2. **If/else scope promotion** (`src/runtime/engine.ts`): Variables declared inside
+   `if`/`else` branch bodies are now promoted to the enclosing scope after the branch
+   executes. This matches Pine's semantics where branch-local declarations are visible
+   to subsequent statements at the same nesting level.
+
+**Test:** `it('mixed tabs and spaces in block bodies', ...)` in `pine-realworld-corpus.test.ts`
+(previously `it.skip`).
 
 ---
 
@@ -268,4 +270,4 @@ pre-tokenization phase of `grammar.peggy`, or in the `parse()` function in
 | **Advanced corpus probe (10 scripts)** | **0** | All pass |
 | **Edge-case corpus probe (12 scripts)** | **1 (parser)** | 11 pass, 1 skipped (trailing comma) |
 | **Pine v5 compatibility probe (9 scripts)** | **1** | 8 pass, 1 skipped (security datafeed) |
-| **Parser stress probe (8 scripts)** | **1 (indentation)** | 7 pass, 1 skipped (mixed tabs/spaces) |
+| **Parser stress probe (8 scripts)** | **0** | 8 pass |

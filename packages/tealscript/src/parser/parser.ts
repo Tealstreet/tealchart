@@ -83,9 +83,10 @@ export function parse(source: string, options: ParseOptions<'Statement'>): State
 export function parse<T extends ParseStartRule>(source: string, options: ParseOptions<T>): ParseResult<T>;
 export function parse(source: string, options: ParseOptions<ParseStartRule> = {}): Program | Expression | Statement {
   assertSourceLength(source, options.maxSourceLength ?? DEFAULT_MAX_SOURCE_LENGTH);
+  const normalized = normalizeLeadingTabs(source);
 
   try {
-    const result = generatedParser.parse(source, {
+    const result = generatedParser.parse(normalized, {
       startRule: options.startRule || 'Program',
       grammarSource: options.grammarSource || 'input',
     });
@@ -114,6 +115,12 @@ export function parse(source: string, options: ParseOptions<ParseStartRule> = {}
     }
     throw error;
   }
+}
+
+// Replace leading tabs on each line with 4 spaces (Pine convention).
+// Only affects leading whitespace so tabs inside string literals are untouched.
+function normalizeLeadingTabs(source: string): string {
+  return source.replace(/^(\t+)/gm, (tabs) => '    '.repeat(tabs.length));
 }
 
 function assertSourceLength(source: string, maxSourceLength: number): void {
