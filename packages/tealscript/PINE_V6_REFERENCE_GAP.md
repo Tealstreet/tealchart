@@ -156,6 +156,20 @@ plus two focused cases in `src/parser/parser.test.ts`.
 
 ---
 
+## Pine v4 Legacy Global `color()` Function — CLOSED
+
+**Pattern:** `color(r, g, b, transp)` — v3/v4 global alias for `color.rgb(r, g, b, transp)`.
+
+**Status:** CLOSED. `color` → `color.rgb` is now registered in `LEGACY_GLOBAL_BUILTIN_ALIASES`
+in both `engine.ts` and `checker.ts`. The alias only fires when `color` is used as a
+call `Identifier`; `color.red`, `color.new`, etc. continue to resolve through
+`MemberExpression` paths and are unaffected.
+
+**Test:** `it('locks v3/v4 legacy color(r, g, b, transp) global function alias', ...)`
+in `pine-realworld-corpus.test.ts` (Pine v4/v5 legacy patterns describe block).
+
+---
+
 ## Pine v5 Compatibility Gaps
 
 Discovered by the Pine v5 compatibility probe in `tests/compat/pine-realworld-corpus.test.ts`
