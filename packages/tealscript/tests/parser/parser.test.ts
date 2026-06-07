@@ -1453,13 +1453,34 @@ plot(str.length(score()))
         }));
       });
 
-      it('parses hex colors', () => {
+      it('parses 6-digit hex colors', () => {
         const ast = parse('x = #FF0000\n');
         const decl = ast.body[0] as VariableDeclaration;
         expect(decl.init).toEqual(expect.objectContaining({
           type: 'ColorLiteral',
           value: '#FF0000',
         }));
+      });
+
+      it('parses 8-digit hex colors with alpha channel', () => {
+        const ast = parse('x = #FF000080\n');
+        const decl = ast.body[0] as VariableDeclaration;
+        expect(decl.init).toEqual(expect.objectContaining({
+          type: 'ColorLiteral',
+          value: '#FF000080',
+        }));
+      });
+
+      it('rejects 3-digit hex colors', () => {
+        expect(() => parse('x = #F00\n')).toThrow(TealscriptParseError);
+      });
+
+      it('rejects 1-digit hex colors', () => {
+        expect(() => parse('x = #F\n')).toThrow(TealscriptParseError);
+      });
+
+      it('rejects 10-digit hex colors', () => {
+        expect(() => parse('x = #FF0000FFFF\n')).toThrow(TealscriptParseError);
       });
     });
 

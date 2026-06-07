@@ -2173,7 +2173,7 @@ BooleanLiteral
     }
 
 ColorLiteral
-  = "#" hex:$[0-9a-fA-F]+ {
+  = "#" hex:$([0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]([0-9a-fA-F][0-9a-fA-F])?) !IdentifierPart {
       return {
         type: 'ColorLiteral',
         value: '#' + hex,
