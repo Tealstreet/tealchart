@@ -537,7 +537,12 @@ function peg$parse(input, options) {
     ];
     for (const arg of args) {
       if (arg.name) {
-        result[arg.name.name] = arg.value;
+        const name = declarationKind === 'study' && arg.name.name === 'resolution'
+          ? 'timeframe'
+          : declarationKind === 'study' && arg.name.name === 'resolution_gaps'
+            ? 'timeframe_gaps'
+            : arg.name.name;
+        result[name] = arg.value;
       } else {
         const param = params.find((name) => result[name] === undefined);
         if (param) {

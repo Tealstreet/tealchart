@@ -66,7 +66,7 @@ describe('Tealscript Parser', () => {
     });
 
     it('parses legacy study declarations as indicators', () => {
-      const ast = parse('//@version=4\nstudy("Legacy Study", shorttitle="LS", overlay=true)\n');
+      const ast = parse('//@version=4\nstudy("Legacy Study", shorttitle="LS", overlay=true, resolution="60", resolution_gaps=false)\n');
       const indicator = ast.body[0] as IndicatorDeclaration;
 
       expect(indicator.type).toBe('IndicatorDeclaration');
@@ -83,6 +83,16 @@ describe('Tealscript Parser', () => {
         type: 'BooleanLiteral',
         value: true,
       }));
+      expect(indicator.timeframe).toEqual(expect.objectContaining({
+        type: 'StringLiteral',
+        value: '60',
+      }));
+      expect(indicator.timeframe_gaps).toEqual(expect.objectContaining({
+        type: 'BooleanLiteral',
+        value: false,
+      }));
+      expect('resolution' in indicator).toBe(false);
+      expect('resolution_gaps' in indicator).toBe(false);
     });
 
     it('parses strategy risk-free-rate declaration arguments', () => {
