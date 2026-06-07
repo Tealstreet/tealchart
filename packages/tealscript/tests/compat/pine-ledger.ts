@@ -1008,6 +1008,141 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-rsi-ob-os-signal-checkpoint',
+      title: 'Real-World RSI OB/OS Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: rsi signal overbought oversold',
+      featureTags: ['ta', 'signals', 'rsi', 'oscillator', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-macd-crossover-signal-checkpoint',
+      title: 'Real-World MACD Crossover Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: MACD signal crossover',
+      featureTags: ['ta', 'signals', 'macd', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-atr-position-sizing-checkpoint',
+      title: 'Real-World ATR Position Sizing Checkpoint',
+      searchContext: 'TradingView public scripts search: average true range signal',
+      featureTags: ['ta', 'signals', 'atr', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-pvt-signal-checkpoint',
+      title: 'Real-World PVT Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: price volume trend signal',
+      featureTags: ['ta', 'signals', 'pvt', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-bb-kc-squeeze-checkpoint',
+      title: 'Real-World BB KC Squeeze Checkpoint',
+      searchContext: 'TradingView public scripts search: bollinger band keltner squeeze',
+      featureTags: ['ta', 'signals', 'volatility', 'channels', 'kc', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-ma-ribbon-checkpoint',
+      title: 'Real-World MA Ribbon Checkpoint',
+      searchContext: 'TradingView public scripts search: moving average ribbon ema',
+      featureTags: ['ta', 'signals', 'moving_average', 'trend_filter', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-barcolor-trend-checkpoint',
+      title: 'Real-World Barcolor Trend Checkpoint',
+      searchContext: 'TradingView public scripts search: bar color trend sma',
+      featureTags: ['visuals', 'signals', 'trend_filter', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-udf-smoothed-rsi-checkpoint',
+      title: 'Real-World UDF Smoothed RSI Checkpoint',
+      searchContext: 'TradingView public scripts search: smoothed rsi function',
+      featureTags: ['ta', 'signals', 'udf', 'rsi', 'oscillator', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-rsi-divergence-checkpoint',
+      title: 'Real-World RSI Divergence Checkpoint',
+      searchContext: 'TradingView public scripts search: rsi divergence scanner',
+      featureTags: ['ta', 'signals', 'rsi', 'divergence', 'pivots', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-volume-analysis-checkpoint',
+      title: 'Real-World Volume Analysis Checkpoint',
+      searchContext: 'TradingView public scripts search: obv volume trend analysis',
+      featureTags: ['ta', 'signals', 'obv', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-multi-indicator-dashboard-checkpoint',
+      title: 'Real-World Multi-Indicator Dashboard Checkpoint',
+      searchContext: 'TradingView public scripts search: multi indicator dashboard table',
+      featureTags: ['ta', 'signals', 'tables', 'dashboard', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-oscillator-combo-checkpoint',
+      title: 'Real-World Oscillator Combo Checkpoint',
+      searchContext: 'TradingView public scripts search: rsi stochastic oscillator combo',
+      featureTags: ['ta', 'signals', 'rsi', 'stoch', 'oscillator', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-ma-crossover-alert-checkpoint',
+      title: 'Real-World MA Crossover Alert Checkpoint',
+      searchContext: 'TradingView public scripts search: ma crossover alert signal',
+      featureTags: ['ta', 'signals', 'alerts', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-vwap-dev-bands-checkpoint',
+      title: 'Real-World VWAP Dev Bands Checkpoint',
+      searchContext: 'TradingView public scripts search: vwap standard deviation bands',
+      featureTags: ['ta', 'signals', 'vwap', 'var', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realworld-pivot-support-resistance-checkpoint',
+      title: 'Real-World Pivot Support Resistance Checkpoint',
+      searchContext: 'TradingView public scripts search: support resistance pivot levels',
+      featureTags: ['ta', 'signals', 'drawings', 'lines', 'pivots', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(

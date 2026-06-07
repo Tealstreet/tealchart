@@ -70,6 +70,35 @@ Used by strategy stats tables and performance dashboards.
 
 ---
 
+## Real-World Corpus Gaps
+
+Discovered by running 15 reduced real-world idioms through the runtime
+(`tests/compat/pine-realworld-corpus.test.ts`) on 2026-06-08. All 15 pass
+with no actionable gaps. No new deferred items were found.
+
+### Probe results summary
+
+| Script | Status | Notes |
+| --- | --- | --- |
+| RSI OB/OS Signal | pass | ta.rsi + threshold plots |
+| MACD Crossover Signal | pass | ta.macd() tuple destructure + bullish flag |
+| ATR Position Sizing | pass | ta.atr() + derived stop/size series |
+| PVT Signal | pass | ta.pvt + EMA signal line |
+| BB/KC Squeeze | pass | ta.bb() + ta.kc() width comparison |
+| MA Ribbon | pass | 3-EMA ribbon with bull-trend flag |
+| Barcolor Trend | pass | barcolor() + state plot |
+| UDF Smoothed RSI | pass | user-defined function wrapping ta.rsi + ta.sma |
+| RSI Divergence | pass | RSI vs price swing divergence gates |
+| Volume Analysis (OBV) | pass | ta.obv + SMA signal + high-volume flag |
+| Multi-Indicator Dashboard | pass | RSI + SMA + ATR feeding a table |
+| Oscillator Combo (RSI+Stoch) | pass | Combined OB/OS from two oscillators |
+| MA Crossover Alert | pass | alertcondition() with dynamic message templates |
+| VWAP Dev Bands | pass | var-accumulated VWAP with ±2σ envelope |
+| Pivot S/R Lines | pass | ta.highest/lowest pivots + line.new() drawings |
+
+All 15 scripts ran without parse, semantic, runtime, or output gaps.
+No new failure classes were introduced.
+
 ## Summary
 
 | Category | Gaps | Impact |
@@ -81,3 +110,4 @@ Used by strategy stats tables and performance dashboards.
 | Misc constants | 0 | CLOSED |
 | **Total actionable** | **0** | |
 | Deferred (host-dependent) | 9 | — |
+| **Real-world corpus probe (15 scripts)** | **0** | All pass |
