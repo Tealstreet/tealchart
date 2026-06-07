@@ -909,6 +909,76 @@ plot(haClose - haOpen, title="HA Body")
     ]);
   });
 
+  it('locks a reduced public custom bar OHLC idiom', () => {
+    // Public idiom reference: overlay public scripts commonly derive synthetic
+    // OHLC ranges and render them with plotbar() for trend or range models.
+    // Source search: https://www.tradingview.com/scripts/search/custom%20bars/
+    const result = runCompatScript(`
+indicator("Public Custom Bar Checkpoint", overlay=true)
+rangePad = ta.sma(high - low, 2)
+barOpen = close[1]
+barClose = close
+barHigh = math.max(high, math.max(barOpen, barClose)) + rangePad
+barLow = math.min(low, math.min(barOpen, barClose)) - rangePad
+barColor = barClose >= barOpen ? color.green : color.red
+plotbar(barOpen, barHigh, barLow, barClose, title="Synthetic Bars", color=barColor, editable=false, show_last=8, display=display.price_scale, force_overlay=true)
+plot(barClose - barOpen, title="Synthetic Change")
+`);
+
+    expect(result.errors).toEqual([]);
+    const bars = getPlot(result, 'Synthetic Bars');
+    expect(bars.type).toBe('plotbar');
+    expect(roundSeries(bars.openValues ?? [])).toEqual([null, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110]);
+    expect(roundSeries(bars.highValues ?? [])).toEqual([
+      null,
+      110.5,
+      112.5,
+      114.5,
+      110.5,
+      106.5,
+      110.5,
+      116.5,
+      117,
+      117,
+      119,
+      118,
+    ]);
+    expect(roundSeries(bars.lowValues ?? [])).toEqual([
+      null,
+      96.5,
+      99.5,
+      96.5,
+      91.5,
+      90.5,
+      93.5,
+      96.5,
+      100,
+      102,
+      104,
+      103,
+    ]);
+    expect(roundSeries(bars.closeValues ?? [])).toEqual([null, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+    expect(bars.color).toEqual([
+      null,
+      '#4CAF50',
+      '#4CAF50',
+      '#F23645',
+      '#F23645',
+      '#4CAF50',
+      '#4CAF50',
+      '#4CAF50',
+      '#F23645',
+      '#4CAF50',
+      '#F23645',
+      '#4CAF50',
+    ]);
+    expect(bars.editable).toBe(false);
+    expect(bars.showLast).toBe(8);
+    expect(bars.display).toBe(8);
+    expect(bars.forceOverlay).toBe(true);
+    expect(getPlot(result, 'Synthetic Change').values).toEqual([null, 3, 2, -4, -4, 1, 4, 5, -1, 3, -1, 2]);
+  });
+
   it('locks a reduced public MTF trend-filter idiom', () => {
     // Public idiom reference: MTF trend filters commonly combine local price
     // with higher-timeframe moving averages from request.security().
