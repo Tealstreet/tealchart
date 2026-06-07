@@ -115,6 +115,9 @@ Current `ta.*` progress:
   common channel-overlay idiom in the offline corpus.
 - A source-linked public Supertrend signal checkpoint locks the common
   `ta.supertrend()` direction-routing idiom over deterministic bars.
+- A source-linked public ADX/DMI trend-strength checkpoint locks the common
+  `ta.dmi()` directional-line and ADX-threshold routing idiom over deterministic
+  bars.
 
 Current `str.*` progress:
 
