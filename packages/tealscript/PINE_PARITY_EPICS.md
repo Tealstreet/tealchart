@@ -197,7 +197,8 @@ Phases:
    state, `ta.mfi()` threshold state, `ta.cci()` threshold state,
    `ta.cmo()` threshold state, `ta.tsi()` signal-line state, `ta.roc()`
    threshold state, `ta.mom()` threshold state, `ta.wpr()` threshold state,
-   and `ta.obv` cumulative-volume momentum with EMA signal-line routing
+   `ta.obv` cumulative-volume momentum with EMA signal-line routing,
+   and `ta.pvt` price-volume trend with EMA signal-line routing
    into plotted trend/signal outputs.
    Synthetic ticker coverage includes official docs examples plus a reduced
    public Heikin-Ashi trend request fixture.
