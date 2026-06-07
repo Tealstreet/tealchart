@@ -203,6 +203,18 @@ const ALERT_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>(
 const ALERT_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['alertcondition', ['condition']],
 ]);
+const LEGACY_GLOBAL_BUILTIN_ALIASES = new Map<string, string>([
+  ['security', 'request.security'],
+  ['sma', 'ta.sma'],
+  ['ema', 'ta.ema'],
+  ['rsi', 'ta.rsi'],
+  ['highest', 'ta.highest'],
+  ['lowest', 'ta.lowest'],
+  ['cross', 'ta.cross'],
+  ['crossover', 'ta.crossover'],
+  ['crossunder', 'ta.crossunder'],
+]);
+const canonicalBuiltinName = (name: string): string => LEGACY_GLOBAL_BUILTIN_ALIASES.get(name) ?? name;
 const GLOBAL_NON_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['fixnan', ['source']],
   ['na', ['x']],
@@ -211,6 +223,7 @@ const GLOBAL_NON_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[
 const REQUEST_GAPS_MODES = new Set(['barmerge.gaps_on', 'barmerge.gaps_off']);
 const REQUEST_LOOKAHEAD_MODES = new Set(['barmerge.lookahead_on', 'barmerge.lookahead_off']);
 const REQUEST_BARMERGE_MODE_CALLS = new Set([
+  'security',
   'request.security',
   'request.dividends',
   'request.earnings',
@@ -224,6 +237,7 @@ const REQUEST_BOOL_PARAMETER_NAMES = new Set([
   'ignore_invalid_timeframe',
 ]);
 const REQUEST_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['security', ['symbol', 'timeframe', 'currency']],
   ['request.security', ['symbol', 'timeframe', 'currency']],
   ['request.security_lower_tf', ['symbol', 'timeframe', 'currency']],
   ['request.currency_rate', ['from', 'to']],
@@ -392,9 +406,12 @@ const STRING_FUNCTION_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly
   ['str.replace', ['occurrence']],
 ]);
 
-const TA_BOOL_RETURN_NAMES = new Set(['ta.cross', 'ta.crossover', 'ta.crossunder', 'ta.rising', 'ta.falling']);
+const TA_BOOL_RETURN_NAMES = new Set(['cross', 'crossover', 'crossunder', 'ta.cross', 'ta.crossover', 'ta.crossunder', 'ta.rising', 'ta.falling']);
 const TA_INT_RETURN_NAMES = new Set(['ta.barssince', 'ta.highestbars', 'ta.lowestbars']);
 const TA_FLOAT_RETURN_NAMES = new Set([
+  'ema',
+  'rsi',
+  'sma',
   'ta.alma',
   'ta.atr',
   'ta.bbw',
@@ -429,13 +446,16 @@ const TA_FLOAT_RETURN_NAMES = new Set([
   'ta.wpr',
 ]);
 const TA_SOURCE_RETURN_NAMES = new Set(['ta.range', 'ta.median', 'ta.mode', 'ta.mom']);
-const TA_DEFAULT_SOURCE_RETURN_NAMES = new Set(['ta.highest', 'ta.lowest']);
+const TA_DEFAULT_SOURCE_RETURN_NAMES = new Set(['highest', 'lowest', 'ta.highest', 'ta.lowest']);
 const TA_FLOAT_MEMBER_NAMES = new Set(['ta.iii', 'ta.nvi', 'ta.obv', 'ta.pvi', 'ta.pvt', 'ta.tr', 'ta.wad', 'ta.wvad']);
 const TA_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['ta.alma', ['series', 'length', 'offset', 'sigma']],
   ['ta.cci', ['source', 'length']],
   ['ta.cmo', ['source', 'length']],
   ['ta.cum', ['source']],
+  ['cross', ['source1', 'source2']],
+  ['crossover', ['source1', 'source2']],
+  ['crossunder', ['source1', 'source2']],
   ['ta.crossover', ['source1', 'source2']],
   ['ta.crossunder', ['source1', 'source2']],
   ['ta.cross', ['source1', 'source2']],
@@ -444,9 +464,12 @@ const TA_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['ta.cog', ['source', 'length']],
   ['ta.dev', ['source', 'length']],
   ['ta.dmi', ['diLength', 'adxSmoothing']],
+  ['ema', ['source', 'length']],
   ['ta.ema', ['source', 'length']],
   ['ta.hma', ['source', 'length']],
+  ['highest', ['source', 'length']],
   ['ta.highest', ['source', 'length']],
+  ['lowest', ['source', 'length']],
   ['ta.lowest', ['source', 'length']],
   ['ta.highestbars', ['source', 'length']],
   ['ta.lowestbars', ['source', 'length']],
@@ -468,8 +491,10 @@ const TA_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['ta.falling', ['source', 'length']],
   ['ta.rma', ['source', 'length']],
   ['ta.roc', ['source', 'length']],
+  ['rsi', ['source', 'length']],
   ['ta.rsi', ['source', 'length']],
   ['ta.sar', ['start', 'inc', 'max']],
+  ['sma', ['source', 'length']],
   ['ta.sma', ['source', 'length']],
   ['ta.stdev', ['source', 'length']],
   ['ta.stoch', ['source', 'high', 'low', 'length']],
@@ -769,15 +794,21 @@ const BUILTIN_FUNCTIONS = new Set([
   'barcolor',
   'bgcolor',
   'bool',
+  'cross',
+  'crossover',
+  'crossunder',
+  'ema',
   'fill',
   'fixnan',
   'float',
+  'highest',
   'hline',
   'indicator',
   'input',
   'int',
   'label',
   'line',
+  'lowest',
   'max_bars_back',
   'na',
   'nz',
@@ -787,7 +818,10 @@ const BUILTIN_FUNCTIONS = new Set([
   'plotcandle',
   'plotchar',
   'plotshape',
+  'rsi',
   'runtime',
+  'security',
+  'sma',
   'string',
   'strategy',
   'time',
@@ -4227,7 +4261,7 @@ class SemanticChecker {
     if (displayName === 'box.new') {
       return this.usesBoxPointOverload(expression, scope) ? BOX_NEW_POINT_SIGNATURE : BOX_NEW_COORDINATE_SIGNATURE;
     }
-    return BUILTIN_SIGNATURES.get(displayName);
+    return BUILTIN_SIGNATURES.get(displayName) ?? BUILTIN_SIGNATURES.get(canonicalBuiltinName(displayName));
   }
 
   private usesLabelPointOverload(expression: CallExpression, scope: SemanticScope): boolean {
@@ -5012,7 +5046,7 @@ class SemanticChecker {
 
   private checkRequestCalcBarsCountLiteralArguments(expression: CallExpression): void {
     const calleeName = this.memberPath(expression.callee).join('.');
-    const calcBarsCountPosition = this.requestCalcBarsCountPosition(calleeName);
+    const calcBarsCountPosition = this.requestCalcBarsCountPosition(canonicalBuiltinName(calleeName));
     if (calcBarsCountPosition === undefined) return;
 
     const calcBarsCount = this.getCallArgument(expression.arguments, 'calc_bars_count', calcBarsCountPosition);
@@ -5037,7 +5071,7 @@ class SemanticChecker {
 
   private checkRequestBarmergeModeLiteralArguments(expression: CallExpression): void {
     const calleeName = this.memberPath(expression.callee).join('.');
-    const binding = this.requestBarmergeModeBinding(calleeName);
+    const binding = this.requestBarmergeModeBinding(canonicalBuiltinName(calleeName));
     if (!binding) return;
 
     if (binding.gaps !== undefined) {
@@ -5133,7 +5167,7 @@ class SemanticChecker {
 
   private checkRequestBoolOptionArguments(expression: CallExpression, scope: SemanticScope): void {
     const calleeName = this.memberPath(expression.callee).join('.');
-    if (!calleeName.startsWith('request.')) return;
+    if (!canonicalBuiltinName(calleeName).startsWith('request.')) return;
 
     const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
     if (!signature) return;
@@ -7903,7 +7937,7 @@ class SemanticChecker {
   }
 
   private inferTaCallType(expression: CallExpression, scope: SemanticScope, calleePath: string[]): SemanticType | undefined {
-    const calleeName = calleePath.join('.');
+    const calleeName = canonicalBuiltinName(calleePath.join('.'));
     if (TA_BOOL_RETURN_NAMES.has(calleeName)) return { kind: 'bool', qualifier: 'series' };
     if (TA_INT_RETURN_NAMES.has(calleeName)) return { kind: 'int', qualifier: 'series' };
     if (TA_FLOAT_RETURN_NAMES.has(calleeName)) return { kind: 'float', qualifier: 'series' };
@@ -7939,7 +7973,7 @@ class SemanticChecker {
   }
 
   private inferRequestCallType(expression: CallExpression, scope: SemanticScope, calleePath: string[]): SemanticType | undefined {
-    const calleeName = calleePath.join('.');
+    const calleeName = canonicalBuiltinName(calleePath.join('.'));
     if (calleeName === 'request.security') {
       const source = this.inferCallArgumentType(expression, scope, ['symbol', 'timeframe', 'expression'], 2);
       return source ? { ...source, qualifier: 'series' } : { kind: 'unknown', qualifier: 'series' };

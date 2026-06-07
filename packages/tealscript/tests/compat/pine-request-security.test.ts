@@ -198,6 +198,21 @@ plot(htfClose, title="HTF Close")
     expect(getPlot(result, 'HTF Close').values).toEqual([null, null, 10, 10, 20, 20]);
   });
 
+  it('accepts the legacy global security alias', () => {
+    const result = runCompatScript(`
+//@version=4
+study("Legacy security")
+htfClose = security(syminfo.tickerid, "2", close, lookahead=barmerge.lookahead_on)
+plot(htfClose, title="HTF Close")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: requestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'HTF Close').values).toEqual([10, 10, 20, 20, 30, 30]);
+  });
+
   it('supports lookahead and gaps barmerge modes', () => {
     const result = runCompatScript(`
 indicator("HTF request modes")

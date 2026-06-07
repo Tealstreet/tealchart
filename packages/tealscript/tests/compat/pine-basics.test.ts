@@ -45,6 +45,35 @@ plot(rsi, title="RSI")
     expect(getPlot(result, 'RSI').values).toHaveLength(compatibilityBars.length);
   });
 
+  it('accepts legacy global TA aliases used by v4 public scripts', () => {
+    const result = runCompatScript(`
+//@version=4
+study("Legacy global TA")
+fast = ema(close, 3)
+slow = sma(close, 5)
+upper = highest(2)
+lower = lowest(2)
+crossed = cross(fast, slow) ? 1 : 0
+up = crossover(fast, slow) ? 1 : 0
+down = crossunder(fast, slow) ? 1 : 0
+momentum = rsi(close, 5)
+plot(fast, title="Fast EMA")
+plot(slow, title="Slow SMA")
+plot(upper, title="Highest")
+plot(lower, title="Lowest")
+plot(crossed + up + down, title="Cross Flags")
+plot(momentum, title="RSI")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Fast EMA').values)).toEqual([102, 103.5, 105.25, 104.125, 101.5625, 100.78125, 102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957]);
+    expect(roundSeries(getPlot(result, 'Slow SMA').values)).toEqual([null, null, null, null, 103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110]);
+    expect(getPlot(result, 'Highest').values).toEqual([103, 106, 108, 109, 109, 104, 105, 110, 111, 112, 114, 114]);
+    expect(getPlot(result, 'Lowest').values).toEqual([99, 99, 101, 102, 98, 96, 96, 99, 103, 106, 107, 108]);
+    expect(getPlot(result, 'Cross Flags').values).toHaveLength(compatibilityBars.length);
+    expect(getPlot(result, 'RSI').values).toHaveLength(compatibilityBars.length);
+  });
+
   it('covers tuple-returning MACD and Bollinger band snippets', () => {
     const result = runCompatScript(`
 indicator("MACD and BB")
