@@ -7081,7 +7081,7 @@ class SemanticChecker {
     if (firstPositional?.type === 'StringLiteral') {
       return positionalArgs.length === 1 ? (dateStringParams ?? signature.params) : signature.params;
     }
-    if (firstPositional?.type === 'NumericLiteral') {
+    if (firstPositional) {
       return numericDateParams ?? signature.params;
     }
 
@@ -7563,7 +7563,7 @@ class SemanticChecker {
     if (taType) return taType;
     const requestType = this.inferRequestCallType(expression, scope, calleePath);
     if (requestType) return requestType;
-    const timeType = this.inferTimeCallType(calleePath);
+    const timeType = this.inferTimeCallType(expression, scope, calleePath);
     if (timeType) return timeType;
     const tickerType = this.inferTickerCallType(calleePath);
     if (tickerType) return tickerType;
@@ -7789,14 +7789,25 @@ class SemanticChecker {
     return rest;
   }
 
-  private inferTimeCallType(calleePath: string[]): SemanticType | undefined {
+  private inferTimeCallType(expression: CallExpression, scope: SemanticScope, calleePath: string[]): SemanticType | undefined {
     const calleeName = calleePath.join('.');
     if (calleeName === 'time' || calleeName === 'time_close') return { kind: 'int', qualifier: 'series' };
     if (calleeName === 'timeframe.change') return { kind: 'bool', qualifier: 'series' };
     if (calleeName === 'timeframe.in_seconds' || calleeName === 'timeframe.to_seconds') return { kind: 'int', qualifier: 'simple' };
     if (calleeName === 'timeframe.from_seconds') return { kind: 'string', qualifier: 'simple' };
-    if (calleeName === 'timestamp') return { kind: 'int', qualifier: 'const' };
+    if (calleeName === 'timestamp') return this.inferTimestampCallType(expression, scope);
     return undefined;
+  }
+
+  private inferTimestampCallType(expression: CallExpression, scope: SemanticScope): SemanticType {
+    const signature = BUILTIN_SIGNATURES.get('timestamp');
+    if (!signature) return { kind: 'int', qualifier: 'simple' };
+
+    const params = this.resolveTimestampSignatureParams(expression.arguments, signature);
+    if (params.includes('dateString')) return { kind: 'int', qualifier: 'const' };
+
+    const qualifier = this.inferCallArgumentMaxQualifier(expression, scope);
+    return { kind: 'int', qualifier: this.simpleOrSeriesQualifier(qualifier) };
   }
 
   private inferTickerCallType(calleePath: string[]): SemanticType | undefined {

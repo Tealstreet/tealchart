@@ -97,6 +97,28 @@ plot(stamp + prefixStamp + defaultTimezoneStamp + dateStamp)
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('infers timestamp return qualifiers by overload and arguments', () => {
+    const result = checkProgram(parse(`
+indicator("Timestamp Qualifiers")
+const int dateStamp = timestamp("20 Aug 2024 00:00:00 +0000")
+simple int literalStamp = timestamp(2024, 1, 5)
+series int seriesStamp = timestamp(bar_index, 1, 5)
+const int badLiteralStamp = timestamp(2024, 1, 5)
+simple int badSeriesStamp = timestamp(bar_index, 1, 5)
+plot(dateStamp + literalStamp + seriesStamp)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign simple value to const int',
+      'Cannot assign series value to simple int',
+    ]);
+    expect(types.get('dateStamp')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('literalStamp')).toMatchObject({ kind: 'int', qualifier: 'simple' });
+    expect(types.get('seriesStamp')).toMatchObject({ kind: 'int', qualifier: 'series' });
+  });
+
   it('reports invalid time helper value types', () => {
     const result = checkProgram(parse(`
 indicator("Bad Time Values")
@@ -324,7 +346,7 @@ plot(multiplier + secondsValue + legacySecondsValue + sessionOpen + sessionClose
     expect(types.get('changed')).toMatchObject({ kind: 'bool', qualifier: 'series' });
     expect(types.get('sessionOpen')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('sessionClose')).toMatchObject({ kind: 'int', qualifier: 'series' });
-    expect(types.get('stamp')).toMatchObject({ kind: 'int', qualifier: 'const' });
+    expect(types.get('stamp')).toMatchObject({ kind: 'int', qualifier: 'simple' });
   });
 
   it('infers syminfo member return types for downstream diagnostics', () => {
