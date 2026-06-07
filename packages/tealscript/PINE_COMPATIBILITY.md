@@ -835,9 +835,10 @@ per re-execution. `session.ismarket`, `session.ispremarket`, and
 session classification windows. Higher-timeframe `time()` / `time_close()`
 aggregation is covered for intraday, daily, and weekly buckets, including
 timezone-aware DST boundaries. `time()` / `time_close()` accept Pine v6
-`bars_back` offsets in named form, third-position no-timezone form, and
-fourth-position timezone form, and the runtime evaluates those offsets against
-known chart bars before applying timeframe aggregation and session filters.
+`bars_back` and `timeframe_bars_back` offsets in named form, no-timezone
+positional form, and timezone positional form, and the runtime evaluates those
+offsets against known chart bars before applying timeframe aggregation and
+session filters.
 Host-provided `closedDates` and closure entries can suppress session-filtered
 `time()` calls and session-state helpers for exchange calendar holidays or
 partial-session closures. The checkpoint corpus
@@ -845,10 +846,9 @@ tracks public session-filter gating, public date/session input gating, public
 exchange session-state helper gating, and the official dynamic-session string
 idiom. Semantic analysis
 rejects non-string `time()` / `time_close()` timeframe, session, and timezone
-arguments, non-numeric `bars_back` values, plus invalid `timeframe.*`
-string/numeric helper arguments before runtime. Full future timestamp
-projection beyond locally known chart bars and `timeframe_bars_back` remain
-planned.
+arguments, non-numeric `bars_back` / `timeframe_bars_back` values, plus invalid
+`timeframe.*` string/numeric helper arguments before runtime. Full future
+timestamp projection beyond locally known chart bars remains planned.
 
 ## Common Tick Quote Coverage
 

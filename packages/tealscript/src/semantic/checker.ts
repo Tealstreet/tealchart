@@ -516,8 +516,8 @@ const TIME_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['timeframe.to_seconds', ['timeframe']],
 ]);
 const TIME_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
-  ['time', ['bars_back']],
-  ['time_close', ['bars_back']],
+  ['time', ['bars_back', 'timeframe_bars_back']],
+  ['time_close', ['bars_back', 'timeframe_bars_back']],
   ['timestamp', ['year', 'month', 'day', 'hour', 'minute', 'second']],
   ['timeframe.from_seconds', ['seconds']],
 ]);
@@ -1577,20 +1577,20 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   [
     'time',
     {
-      params: ['timeframe', 'session', 'timezone', 'bars_back'],
-      overloads: [['timeframe', 'session', 'bars_back']],
+      params: ['timeframe', 'session', 'timezone', 'bars_back', 'timeframe_bars_back'],
+      overloads: [['timeframe', 'session', 'bars_back', 'timeframe_bars_back']],
       minArgs: 0,
-      maxArgs: 4,
+      maxArgs: 5,
       allowNamedPrefixWithPositional: true,
     },
   ],
   [
     'time_close',
     {
-      params: ['timeframe', 'session', 'timezone', 'bars_back'],
-      overloads: [['timeframe', 'session', 'bars_back']],
+      params: ['timeframe', 'session', 'timezone', 'bars_back', 'timeframe_bars_back'],
+      overloads: [['timeframe', 'session', 'bars_back', 'timeframe_bars_back']],
       minArgs: 0,
-      maxArgs: 4,
+      maxArgs: 5,
       allowNamedPrefixWithPositional: true,
     },
   ],
@@ -7094,10 +7094,10 @@ class SemanticChecker {
 
     const positionalArgs = args.filter((arg) => !arg.name);
     const thirdPositional = positionalArgs[2]?.value;
-    if (thirdPositional && thirdPositional.type !== 'StringLiteral' && positionalArgs.length === 3) {
+    if (thirdPositional && thirdPositional.type !== 'StringLiteral' && positionalArgs.length <= 4) {
       return noTimezoneParams;
     }
-    if (suppliedNames.has('bars_back') && positionalArgs.length <= 2) {
+    if ((suppliedNames.has('bars_back') || suppliedNames.has('timeframe_bars_back')) && positionalArgs.length <= 2) {
       return noTimezoneParams;
     }
 

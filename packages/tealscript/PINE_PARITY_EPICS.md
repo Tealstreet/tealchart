@@ -335,8 +335,9 @@ Phases:
    `timenow`, `last_bar_time`, and `str.format_time()` for common IANA and UTC
    offset usage. Current semantic coverage accepts common `timestamp()`
    date-string, timezone-prefixed, and default-timezone numeric date overloads.
-   `time()` / `time_close()` now cover `bars_back` for locally known chart bars;
-   full future projection beyond loaded bars and `timeframe_bars_back` remain.
+   `time()` / `time_close()` now cover `bars_back` for locally known chart bars
+   and `timeframe_bars_back` shifts on the requested timeframe; full future
+   projection beyond loaded bars remains.
 3. Complete time-based sessions, overnight sessions, multi-segment sessions,
    day masks, named sessions where host data exists, and regular/extended
    session routing.
