@@ -47,6 +47,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-input-configuration-checkpoint',
+      title: 'Public Input Configuration Checkpoint',
+      searchContext: 'TradingView public scripts search: configurable indicator inputs',
+      featureTags: ['inputs', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-varip-array-checkpoint',
       title: 'Public Varip Array Checkpoint',
       searchContext: 'TradingView public scripts search: varip array',

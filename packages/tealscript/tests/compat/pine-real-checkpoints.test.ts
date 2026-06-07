@@ -62,6 +62,99 @@ plot(array.size(values), title="Array Size")
     expect(getPlot(result, 'Array Size').values).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
   });
 
+  it('locks a reduced public input configuration idiom', () => {
+    // Public idiom reference: configurable public indicators commonly expose
+    // grouped inputs for mode selection, source, lengths, and levels before
+    // deriving a visible signal.
+    // Source search: https://www.tradingview.com/scripts/search/configurable%20indicator%20inputs/
+    const result = runCompatScript(`
+indicator("Public Input Configuration Checkpoint")
+enum Mode
+    sma = "SMA"
+    ema = "EMA"
+mode = input.enum(Mode.sma, "Mode", [Mode.sma, Mode.ema], "Mode tooltip")
+length = input.int(3, "Length", minval=1, maxval=10, step=1, tooltip="Length tooltip", inline="ma", group="Inputs", confirm=true, display=display.data_window, active=true)
+showSignals = input.bool(true, "Show Signals", tooltip="Toggle signals")
+source = input.source(close, "Source", "Source tooltip", "src", "Inputs", true, display.data_window, true)
+level = input.price(104.5, "Level", "Level tooltip")
+basis = mode == Mode.sma ? ta.sma(source, length) : ta.ema(source, length)
+signal = showSignals and close > basis and close > level
+plot(basis, title="Basis")
+plot(signal ? 1 : 0, title="Signal")
+plot(level, title="Level")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.inputs).toHaveLength(5);
+    expect(result.inputs).toMatchObject([
+      {
+        id: 'input_Mode',
+        type: 'enum',
+        title: 'Mode',
+        defval: 'Mode.sma',
+        options: ['Mode.sma', 'Mode.ema'],
+        tooltip: 'Mode tooltip',
+      },
+      {
+        id: 'input_Length',
+        type: 'int',
+        title: 'Length',
+        defval: 3,
+        minval: 1,
+        maxval: 10,
+        step: 1,
+        tooltip: 'Length tooltip',
+        inline: 'ma',
+        group: 'Inputs',
+        confirm: true,
+        display: 2,
+        active: true,
+      },
+      {
+        id: 'input_Show Signals',
+        type: 'bool',
+        title: 'Show Signals',
+        defval: true,
+        tooltip: 'Toggle signals',
+      },
+      {
+        id: 'input_Source',
+        type: 'source',
+        title: 'Source',
+        defval: 102,
+        tooltip: 'Source tooltip',
+        inline: 'src',
+        group: 'Inputs',
+        confirm: true,
+        display: 2,
+        active: true,
+      },
+      {
+        id: 'input_Level',
+        type: 'price',
+        title: 'Level',
+        defval: 104.5,
+        tooltip: 'Level tooltip',
+      },
+    ]);
+    expect(roundSeries(getPlot(result, 'Basis').values)).toEqual([
+      null,
+      null,
+      104.666667,
+      105,
+      103,
+      100.666667,
+      101,
+      104.333333,
+      107,
+      109.333333,
+      109.666667,
+      111,
+    ]);
+    expect(getPlot(result, 'Signal').values).toEqual([0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Level').values).toEqual(Array(compatibilityBars.length).fill(104.5));
+  });
+
   it('locks a reduced public varip intrabar array idiom', () => {
     // Public idiom reference: realtime public scripts commonly use `varip`
     // arrays to collect values across same-bar tick executions, then clear the
