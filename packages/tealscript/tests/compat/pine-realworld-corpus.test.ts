@@ -4649,8 +4649,9 @@ plot(not cond ? 1 : 0, title="NotCond")
   });
 
   it('locks na equality — na == na and na != na are both false', () => {
-    // In Pine (and TealScript), any comparison involving na returns false.
-    // This means na == na is false and na != na is also false — not true.
+    // TealScript returns false for any comparison that involves na (early-exit).
+    // Real Pine v6 returns na itself, but TealScript's isTruthy(NaN)=false matches
+    // practical script behavior for guard conditions.
     // Source search: https://www.tradingview.com/pine-script-docs/language/operators/
     const result = runCompatScript(`
 indicator("Ops Na Equality Checkpoint")
