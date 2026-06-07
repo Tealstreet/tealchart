@@ -9639,6 +9639,10 @@ export class TealscriptEngine {
     this.builtins.set('session.ismarket', () => this.evaluateSessionState('regular', 'session.ismarket'));
     this.builtins.set('session.ispremarket', () => this.evaluateSessionState('premarket', 'session.ispremarket'));
     this.builtins.set('session.ispostmarket', () => this.evaluateSessionState('postmarket', 'session.ispostmarket'));
+    this.builtins.set('session.isfirstbar', () => this.evaluateSessionBarBoundary('any', 'first', 'session.isfirstbar'));
+    this.builtins.set('session.isfirstbar_regular', () => this.evaluateSessionBarBoundary('regular', 'first', 'session.isfirstbar_regular'));
+    this.builtins.set('session.islastbar', () => this.evaluateSessionBarBoundary('any', 'last', 'session.islastbar'));
+    this.builtins.set('session.islastbar_regular', () => this.evaluateSessionBarBoundary('regular', 'last', 'session.islastbar_regular'));
     this.builtins.set('adjustment.none', () => 'none');
     this.builtins.set('adjustment.splits', () => 'splits');
     this.builtins.set('adjustment.dividends', () => 'dividends');
@@ -9834,6 +9838,64 @@ export class TealscriptEngine {
       return false;
     }
     return this.isTimestampInSession(timestamp, session, timezone);
+  }
+
+  // Returns true if `timestamp` falls within any active session segment (premarket | regular | postmarket).
+  private isTimestampInAnySession(timestamp: number, timezone: string): boolean {
+    for (const kind of ['premarket', 'regular', 'postmarket'] as const) {
+      const session = this.runtimeOptions.session?.[kind];
+      if (session && session !== '' && !this.isExchangeSessionClosed(timestamp, timezone, kind) && this.isTimestampInSession(timestamp, session, timezone)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private evaluateSessionBarBoundary(
+    scope: 'any' | 'regular',
+    boundary: 'first' | 'last',
+    name: string,
+  ): boolean {
+    const timezone = this.runtimeOptions.session?.timezone?.trim() || this.ctx.syminfo.timezone;
+
+    if (scope === 'regular') {
+      const regularSession = this.runtimeOptions.session?.regular;
+      if (regularSession === undefined || regularSession === '') {
+        throw new RuntimeErrorException(`${name} requires exchange session classification, which is not available in this runtime`);
+      }
+    } else {
+      const hasAnySession = ['premarket', 'regular', 'postmarket'].some(
+        (k) => this.runtimeOptions.session?.[k as 'premarket' | 'regular' | 'postmarket'],
+      );
+      if (!hasAnySession) {
+        throw new RuntimeErrorException(`${name} requires exchange session classification, which is not available in this runtime`);
+      }
+    }
+
+    const timestamp = this.ctx.time.get(0);
+    if (timestamp === undefined || !Number.isFinite(timestamp)) return false;
+
+    const isInSession = (ts: number): boolean => {
+      if (scope === 'regular') {
+        const session = this.runtimeOptions.session!.regular!;
+        if (this.isExchangeSessionClosed(ts, timezone, 'regular')) return false;
+        return this.isTimestampInSession(ts, session, timezone);
+      }
+      return this.isTimestampInAnySession(ts, timezone);
+    };
+
+    if (!isInSession(timestamp)) return false;
+
+    if (boundary === 'first') {
+      const prevBar = this.ctx.getBar(this.ctx.bar_index - 1);
+      if (prevBar === undefined) return true;
+      return !isInSession(prevBar.time);
+    }
+
+    // boundary === 'last'
+    const nextBar = this.ctx.getBar(this.ctx.bar_index + 1);
+    if (nextBar === undefined) return true;
+    return !isInSession(nextBar.time);
   }
 
   private normalizeTickerModifier(

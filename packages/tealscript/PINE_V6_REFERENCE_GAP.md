@@ -33,12 +33,12 @@ Used by strategy stats tables and performance dashboards.
 - [x] strategy.closedtrades.first_index
 - [x] strategy.opentrades.capital_held
 
-## Session State Variables (4 gaps — MEDIUM IMPACT)
+## Session State Variables (0 gaps — MEDIUM IMPACT)
 
-- [ ] session.isfirstbar
-- [ ] session.isfirstbar_regular
-- [ ] session.islastbar
-- [ ] session.islastbar_regular
+- [x] session.isfirstbar
+- [x] session.isfirstbar_regular
+- [x] session.islastbar
+- [x] session.islastbar_regular
 
 ## Chart Type Detection (6 gaps — MEDIUM IMPACT)
 
@@ -75,9 +75,9 @@ Used by strategy stats tables and performance dashboards.
 | Category | Gaps | Impact |
 | --- | ---: | --- |
 | Strategy performance variables | 0 | CLOSED |
-| Session state variables | 4 | MEDIUM |
+| Session state variables | 0 | CLOSED |
 | Chart type detection | 6 | MEDIUM |
 | Symbol info fields | 3 | LOW |
 | Misc constants | 3 | LOW |
-| **Total actionable** | **16** | |
+| **Total actionable** | **12** | |
 | Deferred (host-dependent) | 9 | — |

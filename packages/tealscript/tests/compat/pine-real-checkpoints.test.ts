@@ -2774,6 +2774,88 @@ plot(extendedState ? 1 : 0, title="Extended Active")
     expect(getPlot(result, 'Extended Active').values).toEqual([1, 1, 1, 0]);
   });
 
+  it('locks a reduced session first/last bar idiom', () => {
+    // Public idiom: scripts detect session open/close to fire entry/exit logic.
+    // Source search: https://www.tradingview.com/scripts/search/session%20isfirstbar/
+    //
+    // Bars cover two trading days with out-of-session gaps.
+    // Day 1 (2024-01-05, UTC): premarket at 13:00, regular 14:30–20:00, out-of-session at 22:00.
+    // Day 2 (2024-01-08, UTC): regular 14:30–17:00.
+    // Session: premarket 1200-1430, regular 1430-2100.
+    const sessionFirstLastBars: Bar[] = [
+      // Day 1
+      { time: Date.UTC(2024, 0, 5, 13, 0), open: 1, high: 2, low: 1, close: 2, volume: 1 },  // Bar 0: premarket
+      { time: Date.UTC(2024, 0, 5, 14, 30), open: 2, high: 3, low: 2, close: 3, volume: 1 }, // Bar 1: regular start
+      { time: Date.UTC(2024, 0, 5, 17, 0), open: 3, high: 4, low: 3, close: 4, volume: 1 },  // Bar 2: regular mid
+      { time: Date.UTC(2024, 0, 5, 20, 0), open: 4, high: 5, low: 4, close: 5, volume: 1 },  // Bar 3: regular end
+      { time: Date.UTC(2024, 0, 5, 22, 0), open: 5, high: 6, low: 5, close: 6, volume: 1 },  // Bar 4: out-of-session
+      // Day 2
+      { time: Date.UTC(2024, 0, 8, 14, 30), open: 6, high: 7, low: 6, close: 7, volume: 1 }, // Bar 5: regular start
+      { time: Date.UTC(2024, 0, 8, 17, 0), open: 7, high: 8, low: 7, close: 8, volume: 1 },  // Bar 6: regular mid (last bar)
+    ];
+    const result = runCompatScript(`
+indicator("Session First/Last Bar Checkpoint")
+plot(session.isfirstbar ? 1 : 0, title="First Any")
+plot(session.isfirstbar_regular ? 1 : 0, title="First Regular")
+plot(session.islastbar ? 1 : 0, title="Last Any")
+plot(session.islastbar_regular ? 1 : 0, title="Last Regular")
+`, {
+      bars: sessionFirstLastBars,
+      engineOptions: {
+        runtime: {
+          session: {
+            timezone: 'UTC',
+            premarket: '1200-1430:1234567',
+            regular: '1430-2100:1234567',
+            postmarket: '',
+          },
+        },
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+
+    // isfirstbar (any = premarket+regular): first bar after a gap in any-session coverage
+    // Bar 0: prev=none          → true   (premarket)
+    // Bar 1: prev=Bar0 in pre   → false  (premarket→regular, no gap)
+    // Bar 2: prev=Bar1 in reg   → false
+    // Bar 3: prev=Bar2 in reg   → false
+    // Bar 4: prev=Bar3 in reg   → false  (out-of-session, so not in session itself → yields false)
+    // Bar 5: prev=Bar4 out-ses  → true   (first in-session bar after gap)
+    // Bar 6: prev=Bar5 in reg   → false
+    expect(getPlot(result, 'First Any').values).toEqual([1, 0, 0, 0, 0, 1, 0]);
+
+    // isfirstbar_regular: first bar in the regular session after being out of regular
+    // Bar 0: not in regular     → false
+    // Bar 1: prev=Bar0 not-reg  → true
+    // Bar 2: prev=Bar1 in reg   → false
+    // Bar 3: prev=Bar2 in reg   → false
+    // Bar 4: not in regular     → false
+    // Bar 5: prev=Bar4 not-reg  → true
+    // Bar 6: prev=Bar5 in reg   → false
+    expect(getPlot(result, 'First Regular').values).toEqual([0, 1, 0, 0, 0, 1, 0]);
+
+    // islastbar (any): last in-session bar before a gap (or last bar of dataset)
+    // Bar 0: next=Bar1 in pre   → false
+    // Bar 1: next=Bar2 in reg   → false
+    // Bar 2: next=Bar3 in reg   → false
+    // Bar 3: next=Bar4 out-ses  → true
+    // Bar 4: not in session     → false
+    // Bar 5: next=Bar6 in reg   → false
+    // Bar 6: next=none          → true   (last bar of dataset)
+    expect(getPlot(result, 'Last Any').values).toEqual([0, 0, 0, 1, 0, 0, 1]);
+
+    // islastbar_regular: last regular-session bar before a gap (or last bar of dataset)
+    // Bar 0: not in regular     → false
+    // Bar 1: next=Bar2 in reg   → false
+    // Bar 2: next=Bar3 in reg   → false
+    // Bar 3: next=Bar4 not-reg  → true
+    // Bar 4: not in regular     → false
+    // Bar 5: next=Bar6 in reg   → false
+    // Bar 6: next=none, in reg  → true
+    expect(getPlot(result, 'Last Regular').values).toEqual([0, 0, 0, 1, 0, 0, 1]);
+  });
+
   it('locks a reduced public drawing zone idiom', () => {
     // Public idiom reference: supply/demand public scripts commonly keep a
     // persistent box zone and a midline updated from recent swing ranges.

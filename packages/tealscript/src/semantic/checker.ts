@@ -8736,7 +8736,15 @@ class SemanticChecker {
   private inferMemberExpressionType(expression: MemberExpression, scope: SemanticScope): SemanticType {
     const path = this.memberPath(expression);
     const memberName = path.join('.');
-    if (memberName === 'session.ismarket' || memberName === 'session.ispremarket' || memberName === 'session.ispostmarket') {
+    if (
+      memberName === 'session.ismarket' ||
+      memberName === 'session.ispremarket' ||
+      memberName === 'session.ispostmarket' ||
+      memberName === 'session.isfirstbar' ||
+      memberName === 'session.isfirstbar_regular' ||
+      memberName === 'session.islastbar' ||
+      memberName === 'session.islastbar_regular'
+    ) {
       return { kind: 'bool', qualifier: 'series' };
     }
     if (memberName === 'session.regular' || memberName === 'session.extended') {
