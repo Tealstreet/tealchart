@@ -11274,15 +11274,17 @@ export class TealscriptEngine {
     const timezoneArg = hasTimezoneArgument ? this.getOrderedCallArg(args, namedArgs, timeArgs, 2, this.ctx.syminfo.timezone) : this.ctx.syminfo.timezone;
     const barsBackArg = this.getOrderedCallArg(args, namedArgs, timeArgs, hasTimezoneArgument ? 3 : 2, 0);
     const timeframeBarsBackArg = this.getOrderedCallArg(args, namedArgs, timeArgs, hasTimezoneArgument ? 4 : 3, 0);
-    const barsBack = Math.trunc(this.toNumber(barsBackArg));
-    const timeframeBarsBack = Math.trunc(this.toNumber(timeframeBarsBackArg));
+    const barsBack = this.normalizeTimeOffset(barsBackArg);
+    const timeframeBarsBack = this.normalizeTimeOffset(timeframeBarsBackArg);
+    if (barsBack === null || timeframeBarsBack === null) return Number.NaN;
+
     const targetBarIndex = this.ctx.bar_index - barsBack;
     const timestamp = barsBack === 0 ? (this.ctx.time.get(0) ?? Number.NaN) : (this.ctx.getBar(targetBarIndex)?.time ?? Number.NaN);
     const timeframe = timeframeArg === undefined || timeframeArg === '' ? this.ctx.timeframe.period : this.toStringValue(timeframeArg);
     const session = sessionArg === undefined || sessionArg === '' ? undefined : this.toStringValue(sessionArg);
     const timezone = timezoneArg === undefined || timezoneArg === '' ? this.ctx.syminfo.timezone : this.toStringValue(timezoneArg);
 
-    if (!Number.isFinite(barsBack) || !Number.isFinite(timeframeBarsBack) || !Number.isFinite(timestamp)) return Number.NaN;
+    if (!Number.isFinite(timestamp)) return Number.NaN;
     if (session && this.isExchangeSessionClosed(timestamp, timezone, this.getRuntimeSessionKind(session, timestamp, timezone))) {
       return Number.NaN;
     }
@@ -11292,6 +11294,12 @@ export class TealscriptEngine {
 
     const openTime = this.shiftTimeframeOpenTime(this.getTimeframeOpenTime(timestamp, timeframe, timezone), timeframe, timezone, -timeframeBarsBack);
     return closeTime ? this.getTimeframeCloseTime(openTime, timeframe, timezone) : openTime;
+  }
+
+  private normalizeTimeOffset(value: unknown): number | null {
+    const offset = this.toNumber(value ?? 0);
+    if (!Number.isInteger(offset) || offset < -500 || offset > 5000) return null;
+    return offset;
   }
 
   private evaluateTimestamp(args: unknown[], namedArgs: Map<string, unknown>): number {
