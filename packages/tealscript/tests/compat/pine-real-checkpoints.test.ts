@@ -275,6 +275,61 @@ plotarrow(arrowStrength, title="Signal Arrow", colorup=color.lime, colordown=col
     ]);
   });
 
+  it('locks a reduced public label signal payload idiom', () => {
+    // Source context: https://www.tradingview.com/scripts/search/signal%20label/
+    const result = runCompatScript(`
+indicator("Public Label Signal Checkpoint", overlay=true)
+fast = ta.sma(close, 2)
+slow = ta.sma(close, 4)
+bull = fast > slow
+signalText = bull ? "BUY" : "SELL"
+signalColor = bull ? color.green : color.red
+var signalLabel = label.new(na, na, text="", style=label.style_label_left, color=color.gray, textcolor=color.white)
+if barstate.islast
+    label.set_xy(signalLabel, bar_index, close)
+    label.set_text(signalLabel, signalText + "\\n" + str.tostring(close, "#.00"))
+    label.set_style(signalLabel, bull ? label.style_label_up : label.style_label_down)
+    label.set_color(signalLabel, color.new(signalColor, 20))
+    label.set_textcolor(signalLabel, bull ? color.black : color.white)
+    label.set_size(signalLabel, size.large)
+    label.set_textalign(signalLabel, text.align_center)
+    label.set_text_font_family(signalLabel, font.family_monospace)
+    label.set_text_formatting(signalLabel, text.format_bold)
+    label.set_tooltip(signalLabel, "Latest signal")
+plot(bull ? 1 : -1, title="Signal Score")
+plot(label.get_x(signalLabel), title="Label X")
+plot(label.get_y(signalLabel), title="Label Y")
+plot(array.size(label.all), title="Label Count")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Signal Score').values).toEqual([-1, -1, -1, 1, -1, -1, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Label X').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 11]);
+    expect(getPlot(result, 'Label Y').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 112]);
+    expect(getPlot(result, 'Label Count').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(result.drawings).toEqual([
+      {
+        id: 'label_label.new_0_0',
+        type: 'label',
+        barIndex: 11,
+        x: 11,
+        y: 112,
+        text: 'BUY\n112.00',
+        xloc: 'bar_index',
+        yloc: 'price',
+        style: 'label_up',
+        color: '#4CAF50CC',
+        textColor: '#363A45',
+        size: 'large',
+        tooltip: 'Latest signal',
+        persistent: true,
+        textAlign: 'center',
+        textFontFamily: 'monospace',
+        textFormatting: 'bold',
+      },
+    ]);
+  });
+
   it('locks a reduced public volatility band overlay idiom', () => {
     // Public idiom reference: volatility and squeeze public indicators
     // commonly render Bollinger-style bands, filled channels, background

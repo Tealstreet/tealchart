@@ -928,7 +928,10 @@ scripts use their indicator pane. Renderer coverage handles text-only
 circle, square, diamond, cross, xcross, triangle, flag, arrow styles, label text
 alignment, default/monospace font-family metadata, and bold/italic text formatting. GC
 limits and realtime rollback parity are covered by the shared drawing store;
-remaining gaps are TradingView-exact pixel geometry and edge-case style parity.
+the source-linked public label signal checkpoint locks persistent last-bar
+signal-label updates with multiline text, dynamic style/color/textcolor, text
+alignment, font-family, formatting, tooltip, and getter plots. Remaining gaps
+are TradingView-exact pixel geometry and edge-case style parity.
 
 The line drawing pass covers common trendline/channel idioms. `line.new()`
 accepts positional or named `x1`, `y1`, `x2`, and `y2` arguments plus common
