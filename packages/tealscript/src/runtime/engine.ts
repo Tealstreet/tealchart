@@ -367,8 +367,7 @@ const LEGACY_GLOBAL_BUILTIN_ALIASES = new Map<string, string>([
   ['security', 'request.security'],
   ...LEGACY_GLOBAL_TA_ALIASES.map((name) => [name, `ta.${name}`] as const),
   ...LEGACY_GLOBAL_MATH_ALIASES.map((name) => [name, `math.${name}`] as const),
-  ['tostring', 'str.tostring'],
-  ['tonumber', 'str.tonumber'],
+  ...LEGACY_GLOBAL_STR_ALIASES.map((name) => [name, `str.${name}`] as const),
 ]);
 
 export interface IndicatorDeclarationMetadata {

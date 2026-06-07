@@ -293,8 +293,7 @@ const LEGACY_GLOBAL_BUILTIN_ALIASES = new Map<string, string>([
   ['security', 'request.security'],
   ...LEGACY_GLOBAL_TA_ALIASES.map((name) => [name, `ta.${name}`] as const),
   ...LEGACY_GLOBAL_MATH_ALIASES.map((name) => [name, `math.${name}`] as const),
-  ['tostring', 'str.tostring'],
-  ['tonumber', 'str.tonumber'],
+  ...LEGACY_GLOBAL_STR_ALIASES.map((name) => [name, `str.${name}`] as const),
 ]);
 const canonicalBuiltinName = (name: string): string => LEGACY_GLOBAL_BUILTIN_ALIASES.get(name) ?? name;
 const GLOBAL_NON_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
