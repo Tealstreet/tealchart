@@ -406,6 +406,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-donchian-channel-signal-checkpoint',
+      title: 'Public Donchian Channel Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: donchian channel signal',
+      featureTags: ['ta', 'signals', 'donchian', 'channels', 'highest', 'lowest', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-moving-average-ribbon-checkpoint',
       title: 'Public Moving Average Ribbon Checkpoint',
       searchContext: 'TradingView public scripts search: moving average ribbon',
