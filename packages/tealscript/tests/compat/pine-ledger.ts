@@ -2017,6 +2017,96 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-label-array-cap-checkpoint',
+      title: 'Adv Label Array Cap Checkpoint',
+      searchContext: 'TradingView public scripts search: label array oldest delete cap',
+      featureTags: ['drawings', 'labels', 'arrays', 'state', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-table-merged-header-checkpoint',
+      title: 'Adv Table Merged Header Checkpoint',
+      searchContext: 'TradingView public scripts search: table merge cells header row',
+      featureTags: ['tables', 'dashboard', 'drawings', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-line-extend-dashed-checkpoint',
+      title: 'Adv Line Extend Dashed Checkpoint',
+      searchContext: 'TradingView public scripts search: trend line extend right dashed color',
+      featureTags: ['drawings', 'lines', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-box-with-text-checkpoint',
+      title: 'Adv Box With Text Checkpoint',
+      searchContext: 'TradingView public scripts search: box with text border zone',
+      featureTags: ['drawings', 'boxes', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-polyline-price-action-checkpoint',
+      title: 'Adv Polyline Price Action Checkpoint',
+      searchContext: 'TradingView public scripts search: polyline chart point price action',
+      featureTags: ['drawings', 'polylines', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-label-dynamic-tooltip-checkpoint',
+      title: 'Adv Label Dynamic Tooltip Checkpoint',
+      searchContext: 'TradingView public scripts search: label tooltip str format signal',
+      featureTags: ['drawings', 'labels', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-hline-fill-checkpoint',
+      title: 'Adv Hline Fill Checkpoint',
+      searchContext: 'TradingView public scripts search: hline fill overbought oversold zone',
+      featureTags: ['visuals', 'fills', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-plotbar-ohlc-checkpoint',
+      title: 'Adv Plotbar OHLC Checkpoint',
+      searchContext: 'TradingView public scripts search: plotbar ohlc custom candle color',
+      featureTags: ['visuals', 'candles', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-table-gradient-color-checkpoint',
+      title: 'Adv Table Gradient Color Checkpoint',
+      searchContext: 'TradingView public scripts search: table color gradient heatmap',
+      featureTags: ['tables', 'dashboard', 'drawings', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'adv-drawing-cleanup-checkpoint',
+      title: 'Adv Drawing Cleanup Checkpoint',
+      searchContext: 'TradingView public scripts search: line delete recreate per bar',
+      featureTags: ['drawings', 'lines', 'state', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
