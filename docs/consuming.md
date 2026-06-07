@@ -2,7 +2,7 @@
 
 tealchart isn't published to npm — consumers vendor it (git submodule) and link
 the packages from source. The wiring has a few non-obvious steps; this is the
-short version. (Reference consumers: `premys/apps/client`, `hyperprop/apps/hyperpaper-demo`.)
+short version.
 
 ## 1. Vendor + link
 
@@ -17,8 +17,8 @@ Add this repo as a submodule and depend on both packages by path:
 ```
 
 `packages/tealchart` declares its `@tealstreet/tealscript` dependency as `"*"`,
-which a package manager will try to fetch from the registry (it's private).
-Force it to the vendored sibling:
+which a package manager will try to fetch from the registry, where it isn't
+published. Force it to the vendored sibling:
 
 - **yarn**: add a `resolutions` entry pointing `@tealstreet/tealscript` at the same `file:` path.
 - **pnpm**: a `.pnpmfile.cjs` `readPackage` hook is the most reliable — rewrite
@@ -57,8 +57,7 @@ const widget = createTealchartWidget({
 - **Data** comes through a TradingView-style `IBasicDataFeed` you implement
   against your own market source.
 - **Indicators** need a TealScript worker. In bundlers where `new Worker(new URL(...))`
-  is awkward, a main-thread stand-in works (TealScript is pure compute) — see the
-  reference consumers.
+  is awkward, a main-thread stand-in works (TealScript is pure compute).
 - **Order/position overlays** use `widget.activeChart().createOrderLine()` /
   `createPositionLine()` (interactive, with cancel/close callbacks), not a generic
   price-line API.
