@@ -760,6 +760,9 @@ The barstate pass exposes common Pine bar-state booleans through `barstate.*`
 member access. Historical execution marks loaded bars as confirmed history,
 sets `islastconfirmedhistory` on the last historical bar, and switches
 `isrealtime` / `isconfirmed` during realtime current-bar updates.
+The source-linked public barstate dashboard checkpoint locks first-bar
+initialization, last-confirmed-history snapshots, last-bar table updates, and
+confirmed/history gate plots over deterministic bars.
 
 ## Common Chart Info Coverage
 
@@ -1059,8 +1062,10 @@ TradingView-exact sizing and pixel parity.
 The strategy pass accepts `strategy(...)` declarations and maps common settings,
 including risk-free-rate metadata, limit-fill verification ticks, close-entry selection rules, and standard-OHLC fill metadata, into the exported ledger primitives for settings, orders, fills, trades,
 positions, and per-bar equity snapshots. Read-only `strategy.*` state variables such as
-`strategy.equity`, `strategy.account_currency`, `strategy.position_size`,
-`strategy.position_entry_name`, and trade counters are available for scripts.
+`strategy.equity`, `strategy.netprofit_percent`, `strategy.grossprofit_percent`,
+`strategy.grossloss_percent`, `strategy.openprofit_percent`, `strategy.account_currency`,
+`strategy.position_size`, `strategy.position_entry_name`, and trade counters are
+available for scripts.
 Source-linked public checkpoints cover strategy stats tables plus closed-trade
 list and open-position dashboard tables built from trade accessors.
 The semantic checker validates common strategy order, close/cancel,
