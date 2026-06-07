@@ -7195,6 +7195,29 @@ plot(badConfirm + badActive + badSource + okActive)
     ]);
   });
 
+  it('reports non-string Pine input text metadata', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Input Text Metadata")
+section = input.string("Signals", "Section")
+enum Direction
+    long = "Long"
+    short = "Short"
+badTitle = input.int(14, title=1)
+badTooltip = input.float(2.0, "Multiplier", tooltip=true)
+badInline = input.enum(Direction.long, "Direction", inline=3)
+badGroup = input.source(close, "Source", group=false)
+okGroup = input.price(101.25, title="Level", tooltip=section, inline="levels", group=section)
+plot(badTitle + badTooltip + badGroup + okGroup)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'input.int title must be a string, got int',
+      'input.float tooltip must be a string, got bool',
+      'input.enum inline must be a string, got int',
+      'input.source group must be a string, got bool',
+    ]);
+  });
+
   it('reports duplicate Pine input bindings against the selected overload', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate Input Args")
