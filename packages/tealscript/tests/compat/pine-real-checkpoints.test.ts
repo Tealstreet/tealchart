@@ -6051,6 +6051,36 @@ plot(risingOBV ? 1 : 0, title="Rising OBV")
     ]);
     expect(getPlot(result, 'Rising OBV').values).toEqual([0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
   });
+
+  it('locks a reduced public PVT signal idiom', () => {
+    // Public idiom reference: PVT scripts expose a signal-line length input,
+    // accumulate (close-close[1])/close[1]*volume into a running total, and
+    // route bull/bear state through an EMA signal line into plots.
+    // Source search: https://www.tradingview.com/scripts/search/price%20volume%20trend%20signal/
+    const result = runCompatScript(`
+indicator("Public PVT Signal Checkpoint")
+length = input.int(3, "Signal Length")
+pvt = ta.pvt
+signal = ta.ema(pvt, length)
+bullish = pvt > signal
+plot(pvt, title="PVT")
+plot(signal, title="Signal")
+plot(bullish ? 1 : 0, title="Bullish")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public PVT Signal Checkpoint');
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Signal Length', 'int'],
+    ]);
+    expect(roundSeries(getPlot(result, 'PVT').values)).toEqual([
+      0, 32.352941, 49.495798, 2.766826, -51.602106, -40.996045, 11.003955, 87.927032, 76.917858, 118.584524, 106.422362, 132.785998,
+    ]);
+    expect(roundSeries(getPlot(result, 'Signal').values)).toEqual([
+      0, 16.176471, 32.836134, 17.80148, -16.900313, -28.948179, -8.972112, 39.47746, 58.197659, 88.391091, 97.406727, 115.096363,
+    ]);
+    expect(getPlot(result, 'Bullish').values).toEqual([0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
+  });
 });
 
 function getRealtimePlot(plots: PlotOutput[], title: string): PlotOutput {
