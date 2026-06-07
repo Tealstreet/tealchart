@@ -129,7 +129,9 @@ Covered behavior and remaining gaps:
 - Operator line continuations are supported after arithmetic, comparison,
   logical, unary, and ternary operators. Leading comparison, logical,
   multiplicative, numeric and non-numeric `-`, `+`, and ternary operators are
-  also supported.
+  also supported. Numeric and collection `for` headers may place the `=`, `to`,
+  `by`, and `in` values on indented continuation lines, including inside UDF
+  bodies.
 - User-defined function bodies can return expression results from `if` /
   `else if` / `else` branches, including partial `if` expressions with no
   `else` when the present branch has an inferable value. Nested UDF `if`
