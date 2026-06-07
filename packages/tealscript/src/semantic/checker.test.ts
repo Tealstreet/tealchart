@@ -6524,6 +6524,22 @@ plot(close, color=color.teal)
     expect(types.get('hidden')).toMatchObject({ kind: 'color', qualifier: 'const' });
   });
 
+  it('reports literal color transparency values outside the Pine range', () => {
+    const result = checkProgram(parse(`
+indicator("Color Transparency Bounds")
+dynamicTransparency = close > open ? 120 : -1
+validDynamic = color.new(color.red, dynamicTransparency)
+tooTransparent = color.new(color.red, -1)
+tooOpaque = color.rgb(1, 2, 3, transparency=101)
+plot(close, color=validDynamic)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'color.new transp must be between 0 and 100',
+      'color.rgb transp must be between 0 and 100',
+    ]);
+  });
+
   it('infers chart member return types for downstream diagnostics', () => {
     const result = checkProgram(parse(`
 indicator("Chart Return Types")
