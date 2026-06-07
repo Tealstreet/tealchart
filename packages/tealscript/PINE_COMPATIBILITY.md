@@ -58,10 +58,11 @@ Public-source coverage also includes alert signal metadata, direct alert
 emission, public log signal telemetry, Heikin-Ashi synthetic ticker trend
 requests, public Supertrend signal routing, public ADX/DMI trend-strength
 filters, public Parabolic SAR reversal routing, public linear-regression
-channels, public stochastic, MFI, and CCI oscillator signals, public zigzag
-polylines, public strategy performance tables, public `varip` intrabar array
-buffers, public wrapped declaration/call layouts, planned footprint request
-diagnostics, plus UDT state objects updated through user-defined methods.
+channels, public stochastic, MFI, CCI, and CMO oscillator signals, public
+zigzag polylines, public strategy performance tables, public `varip` intrabar
+array buffers, public wrapped declaration/call layouts, planned footprint
+request diagnostics, plus UDT state objects updated through user-defined
+methods.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
 suppression, entry-direction, max-position, intraday filled-order, and

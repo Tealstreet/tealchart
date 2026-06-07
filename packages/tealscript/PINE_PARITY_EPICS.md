@@ -183,11 +183,11 @@ Phases:
    fixtures with `alertcondition()` metadata, direct `alert()` emission, and
    Pine Logs startup/signal/final-summary output.
    Public TA signal coverage includes reduced Supertrend, ADX/DMI, Parabolic
-   SAR, linear-regression channel, stochastic oscillator, MFI, and CCI fixtures
-   that route `ta.supertrend()` direction, `ta.dmi()` trend-strength state,
-   `ta.sar()` reversal state, `ta.linreg()` channel slope, smoothed
-   `ta.stoch()` state, `ta.mfi()` threshold state, and `ta.cci()` threshold
-   state into plotted trend/signal outputs.
+   SAR, linear-regression channel, stochastic oscillator, MFI, CCI, and CMO
+   fixtures that route `ta.supertrend()` direction, `ta.dmi()` trend-strength
+   state, `ta.sar()` reversal state, `ta.linreg()` channel slope, smoothed
+   `ta.stoch()` state, `ta.mfi()` threshold state, `ta.cci()` threshold state,
+   and `ta.cmo()` threshold state into plotted trend/signal outputs.
    Synthetic ticker coverage includes official docs examples plus a reduced
    public Heikin-Ashi trend request fixture.
    Public footprint request coverage is tracked as a planned unsupported

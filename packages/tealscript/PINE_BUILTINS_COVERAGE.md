@@ -131,6 +131,8 @@ Current `ta.*` progress:
   threshold-routing idiom over deterministic volume bars.
 - A source-linked public CCI signal checkpoint locks the common `ta.cci()`
   threshold-routing idiom over deterministic typical-price bars.
+- A source-linked public CMO signal checkpoint locks the common `ta.cmo()`
+  threshold-routing idiom over deterministic close-series bars.
 
 Current `str.*` progress:
 
