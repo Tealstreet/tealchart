@@ -721,8 +721,9 @@ color channels. Pine v4 positional `transp` slots are also mapped for `plot()`,
 changing v5/v6 positional binding. Semantic diagnostics reject non-numeric
 transparency values before runtime.
 
-Plotarrow renderer coverage scales arrows between Pine `minheight` and
-`maxheight` using the visible series magnitude and suppresses zero-value arrows.
+Plotarrow payloads preserve per-bar up/down color channels, and renderer
+coverage scales arrows between Pine `minheight` and `maxheight` using the
+visible series magnitude and suppresses zero-value arrows.
 Plotshape renderer coverage now draws Pine flag and label marker bodies in
 addition to the existing basic geometric marker shapes, and plotshape, plotchar,
 and plotarrow outputs route through indicator pane coordinates when rendered

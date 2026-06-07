@@ -218,8 +218,8 @@ export interface PlotOutput {
   char?: string;
 
   // For plotarrow
-  colorup?: string;
-  colordown?: string;
+  colorup?: string | (string | null)[];
+  colordown?: string | (string | null)[];
   minHeight?: number;
   maxHeight?: number;
 

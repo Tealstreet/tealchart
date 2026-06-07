@@ -620,11 +620,47 @@ plotcandle(1, 2, 0, 1.5, title="Candles", color=color.yellow, wickcolor=color.bl
       expect(result.plots.find((plot) => plot.title === 'Char')?.color).toEqual(Array(bars.length).fill('#4CAF5099'));
       expect(result.plots.find((plot) => plot.title === 'Char')?.textColor).toBe('#FFFFFF');
       expect(result.plots.find((plot) => plot.title === 'Arrow Up')?.color).toEqual(Array(bars.length).fill('#4CAF5066'));
+      expect(result.plots.find((plot) => plot.title === 'Arrow Up')?.colorup).toEqual(Array(bars.length).fill('#4CAF5066'));
+      expect(result.plots.find((plot) => plot.title === 'Arrow Up')?.colordown).toEqual(Array(bars.length).fill(null));
       expect(result.plots.find((plot) => plot.title === 'Arrow Down')?.color).toEqual(Array(bars.length).fill('#F2364566'));
+      expect(result.plots.find((plot) => plot.title === 'Arrow Down')?.colorup).toEqual(Array(bars.length).fill(null));
+      expect(result.plots.find((plot) => plot.title === 'Arrow Down')?.colordown).toEqual(Array(bars.length).fill('#F2364566'));
       expect(result.plots.find((plot) => plot.title === 'Bars')?.color).toEqual(Array(bars.length).fill('#9C27B0B3'));
       expect(result.plots.find((plot) => plot.title === 'Candles')?.color).toEqual(Array(bars.length).fill('#FDD83580'));
       expect(result.plots.find((plot) => plot.title === 'Candles')?.wickColor).toEqual(Array(bars.length).fill('#363A4580'));
       expect(result.plots.find((plot) => plot.title === 'Candles')?.borderColor).toEqual(Array(bars.length).fill('#2196F380'));
+    });
+
+    it('preserves plotarrow up and down color channels per visible arrow bar', () => {
+      const code = `//@version=6
+indicator("Dynamic Arrow Colors")
+upColor = bar_index % 2 == 0 ? color.green : color.lime
+downColor = bar_index % 2 == 0 ? color.red : color.orange
+signal = bar_index == 0 ? 1 : bar_index == 1 ? -1 : bar_index == 2 ? 0 : na
+plotarrow(signal, title="Signal", colorup=upColor, colordown=downColor)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Signal')?.color).toEqual([
+        '#4CAF50',
+        '#FF9800',
+        null,
+        ...Array(bars.length - 3).fill(null),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Signal')?.colorup).toEqual([
+        '#4CAF50',
+        null,
+        null,
+        ...Array(bars.length - 3).fill(null),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Signal')?.colordown).toEqual([
+        null,
+        '#FF9800',
+        null,
+        ...Array(bars.length - 3).fill(null),
+      ]);
     });
 
     it('maps v4 positional transp arguments before later visual options', () => {

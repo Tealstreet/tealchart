@@ -7988,8 +7988,8 @@ export class TealscriptEngine {
           type: 'plotarrow',
           title,
           color: [],
-          colorup: colorup ?? undefined,
-          colordown: colordown ?? undefined,
+          colorup: [],
+          colordown: [],
           location: 'abovebar', // Arrows position relative to price
           offset,
           minHeight,
@@ -8011,6 +8011,12 @@ export class TealscriptEngine {
         } else {
           plot.color.push(series > 0 ? colorup : colordown);
         }
+      }
+      if (plot && Array.isArray(plot.colorup)) {
+        plot.colorup.push(!isNaN(series) && series > 0 ? colorup : null);
+      }
+      if (plot && Array.isArray(plot.colordown)) {
+        plot.colordown.push(!isNaN(series) && series < 0 ? colordown : null);
       }
 
       // Value determines arrow direction and size

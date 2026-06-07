@@ -452,8 +452,6 @@ plotarrow(arrowStrength, title="Signal Arrow", colorup=color.lime, colordown=col
     ]);
     expect(getPlot(result, 'Signal Arrow')).toMatchObject({
       type: 'plotarrow',
-      colorup: '#00E676',
-      colordown: '#F23645',
       minHeight: 5,
       maxHeight: 20,
     });
@@ -470,6 +468,34 @@ plotarrow(arrowStrength, title="Signal Arrow", colorup=color.lime, colordown=col
       '#00E676',
       '#00E676',
       '#00E676',
+      null,
+    ]);
+    expect(getPlot(result, 'Signal Arrow').colorup).toEqual([
+      null,
+      null,
+      '#00E676',
+      null,
+      null,
+      null,
+      '#00E676',
+      '#00E676',
+      '#00E676',
+      '#00E676',
+      '#00E676',
+      null,
+    ]);
+    expect(getPlot(result, 'Signal Arrow').colordown).toEqual([
+      null,
+      null,
+      null,
+      null,
+      '#F23645',
+      '#F23645',
+      null,
+      null,
+      null,
+      null,
+      null,
       null,
     ]);
   });
