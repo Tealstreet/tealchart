@@ -406,6 +406,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-moving-average-ribbon-checkpoint',
+      title: 'Public Moving Average Ribbon Checkpoint',
+      searchContext: 'TradingView public scripts search: moving average ribbon',
+      featureTags: ['ta', 'signals', 'moving_average', 'vwma', 'wma', 'alma', 'hma', 'trend_filter', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-stochastic-signal-checkpoint',
       title: 'Public Stochastic Signal Checkpoint',
       searchContext: 'TradingView public scripts search: stochastic oscillator signal',
