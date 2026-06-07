@@ -56,6 +56,16 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-legacy-v4-copy-paste-checkpoint',
+      title: 'Public Legacy V4 Copy-Paste Checkpoint',
+      searchContext: 'TradingView public scripts search: legacy v4 indicator study input iff',
+      pineVersion: 'v4',
+      featureTags: ['legacy', 'inputs', 'signals', 'ta', 'builtins', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-date-session-input-checkpoint',
       title: 'Public Date Session Input Checkpoint',
       searchContext: 'TradingView public scripts search: date session filter',
@@ -823,13 +833,14 @@ function publicSearchEntry(input: {
   id: string;
   title: string;
   searchContext: string;
+  pineVersion?: PineScriptLedgerEntry['pineVersion'];
   category?: PineScriptLedgerEntry['category'];
   featureTags: string[];
 }): PineScriptLedgerEntry {
   return {
     id: input.id,
     title: input.title,
-    pineVersion: 'v6',
+    pineVersion: input.pineVersion ?? 'v6',
     category: input.category ?? 'indicator',
     source: {
       kind: 'public_script',
