@@ -1314,6 +1314,7 @@ const DRAWING_CONSTANTS: Record<string, string> = {
   'label.style_flag': 'flag',
   'label.style_arrowup': 'arrowup',
   'label.style_arrowdown': 'arrowdown',
+  'label.style_text_outline': 'text_outline',
   'text.align_left': 'left',
   'text.align_center': 'center',
   'text.align_right': 'right',

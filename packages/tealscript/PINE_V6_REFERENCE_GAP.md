@@ -49,17 +49,17 @@ Used by strategy stats tables and performance dashboards.
 - [x] chart.is_range
 - [x] chart.is_renko
 
-## Symbol Info (3 gaps — LOW IMPACT)
+## Symbol Info (0 gaps remaining — CLOSED)
 
-- [ ] syminfo.minmove
-- [ ] syminfo.shares_outstanding_float
-- [ ] syminfo.shares_outstanding_total
+- [x] syminfo.minmove
+- [x] syminfo.shares_outstanding_float
+- [x] syminfo.shares_outstanding_total
 
-## Misc (3 gaps — LOW IMPACT)
+## Misc (0 gaps remaining — CLOSED)
 
-- [ ] math.rphi
-- [ ] timeframe.isticks
-- [ ] label.style_text_outline
+- [x] math.rphi
+- [x] timeframe.isticks
+- [x] label.style_text_outline
 
 ## Deferred (host-dependent)
 
@@ -77,7 +77,7 @@ Used by strategy stats tables and performance dashboards.
 | Strategy performance variables | 0 | CLOSED |
 | Session state variables | 0 | CLOSED |
 | Chart type detection | 0 | CLOSED |
-| Symbol info fields | 3 | LOW |
-| Misc constants | 3 | LOW |
-| **Total actionable** | **6** | |
+| Symbol info fields | 0 | CLOSED |
+| Misc constants | 0 | CLOSED |
+| **Total actionable** | **0** | |
 | Deferred (host-dependent) | 9 | — |

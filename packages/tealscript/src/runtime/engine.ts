@@ -8655,6 +8655,7 @@ export class TealscriptEngine {
     this.builtins.set('math.pi', () => Math.PI);
     this.builtins.set('math.e', () => Math.E);
     this.builtins.set('math.phi', () => (1 + Math.sqrt(5)) / 2);
+    this.builtins.set('math.rphi', () => 2 / (1 + Math.sqrt(5)));
     const unaryMath = (name: string, fn: (value: number) => number): void => {
       this.builtins.set(name, (args, namedArgs) => fn(this.toNumber(this.getCallArg(args, namedArgs, 0, 'number'))));
     };
