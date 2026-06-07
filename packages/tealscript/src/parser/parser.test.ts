@@ -361,6 +361,22 @@ x = na(close[1])`);
         const declaration = ast.body.find((s) => s.type === 'VariableDeclaration' && s.names.type === 'VariableDeclarator' && s.names.name.name === 'x');
         expect(declaration?.type === 'VariableDeclaration' ? declaration.init.type : null).toBe('CallExpression');
       });
+
+      it('parses trailing comma in positional argument list', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+x = ta.sma(close, 5,)`);
+
+        expect(ast.body.length).toBeGreaterThan(1);
+      });
+
+      it('parses trailing comma in named argument list', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+plot(close, color=color.blue,)`);
+
+        expect(ast.body.length).toBeGreaterThan(1);
+      });
     });
 
     describe('history access', () => {

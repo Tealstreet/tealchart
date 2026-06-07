@@ -1725,7 +1725,7 @@ ReservedWord
 // ============================================================================
 
 ArgumentList
-  = head:Argument tail:(__ "," __ Argument)* {
+  = head:Argument tail:(__ "," __ Argument)* (__ ",")? {
       return [head, ...tail.map(t => t[3])];
     }
 
