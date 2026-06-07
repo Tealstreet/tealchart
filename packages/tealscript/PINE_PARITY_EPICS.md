@@ -336,8 +336,8 @@ Phases:
    session routing.
 4. Add exchange calendar and closure catalog hooks without making CI depend on
    live exchange calendars.
-5. Add public-script fixtures for session filters, market-hours logic, and
-   timeframe comparisons.
+5. Maintain public-script fixtures for session filters, date/session input
+   gates, market-hours logic, and timeframe comparisons.
 
 Done means context/time/session gaps are not dominant runtime blockers for
 common public scripts.
