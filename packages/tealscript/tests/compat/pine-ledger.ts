@@ -1035,6 +1035,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'public-rsi-signal-checkpoint',
+      title: 'Public RSI Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: rsi signal overbought oversold',
+      featureTags: ['ta', 'signals', 'rsi', 'oscillator', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(

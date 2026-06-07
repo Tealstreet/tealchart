@@ -6148,6 +6148,39 @@ plot(expanding ? 1 : 0, title="Expanding")
     ]);
     expect(getPlot(result, 'Expanding').values).toEqual([0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0]);
   });
+
+  it('locks a reduced public RSI signal idiom', () => {
+    // Public idiom reference: RSI scripts commonly expose a length input, route
+    // the relative strength index through an EMA signal line, and mark overbought
+    // and oversold conditions.
+    // Source search: https://www.tradingview.com/scripts/search/rsi%20signal%20overbought%20oversold/
+    const result = runCompatScript(`
+indicator("Public RSI Signal Checkpoint")
+length = input.int(3, "Length")
+rsiValue = ta.rsi(close, length)
+signal = ta.ema(rsiValue, length)
+overbought = rsiValue > 70
+oversold = rsiValue < 30
+plot(rsiValue, title="RSI")
+plot(signal, title="Signal")
+plot(overbought ? 1 : 0, title="Overbought")
+plot(oversold ? 1 : 0, title="Oversold")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public RSI Signal Checkpoint');
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Length', 'int'],
+    ]);
+    expect(roundSeries(getPlot(result, 'RSI').values)).toEqual([
+      null, null, null, 55.555556, 33.333333, 42.028986, 67.479675, 82.162765, 72.361316, 82.015652, 69.821198, 79.13023,
+    ]);
+    expect(roundSeries(getPlot(result, 'Signal').values)).toEqual([
+      null, null, null, 55.555556, 44.444444, 43.236715, 55.358195, 68.76048, 70.560898, 76.288275, 73.054737, 76.092483,
+    ]);
+    expect(getPlot(result, 'Overbought').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1]);
+    expect(getPlot(result, 'Oversold').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  });
 });
 
 function getRealtimePlot(plots: PlotOutput[], title: string): PlotOutput {
