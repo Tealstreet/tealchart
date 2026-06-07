@@ -5161,3 +5161,322 @@ plot(result, title="PrevBarIdx")
     ]);
   });
 });
+
+describe('Advanced strategy patterns', () => {
+  it('locks strategy.entry + strategy.exit with profit/loss ticks triggering TP before SL', () => {
+    // Public idiom reference: the canonical bracket order places entry on bar 0 then
+    // attaches a combined profit/loss exit; the TP limit should fill when price exceeds
+    // entry + profit ticks.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20take%20profit%20stop%20loss%20exit/
+    const bars: Bar[] = [
+      { time: 1_700_700_000_000, open: 100, high: 101, low: 99,  close: 100, volume: 100 },
+      { time: 1_700_700_060_000, open: 101, high: 102, low: 100, close: 101, volume: 100 },
+      { time: 1_700_700_120_000, open: 101, high: 106, low: 100, close: 105, volume: 100 },
+      { time: 1_700_700_180_000, open: 105, high: 107, low: 104, close: 106, volume: 100 },
+    ];
+    // Entry fills at bar 0 close (100) via process_orders_on_close. profit=4 ticks →
+    // TP at 104. Bar 2 OHLC high=106 >= 104 → limit fills at 104. Plot captures
+    // strategy.closedtrades BEFORE the fill, so Closed reflects on bar 3.
+    const result = runCompatScript(`
+strategy("TP SL Checkpoint", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if strategy.position_size > 0
+    strategy.exit("Bracket", "Long", profit=4, loss=3)
+plot(strategy.position_size, title="Pos")
+plot(strategy.closedtrades, title="Closed")
+plot(strategy.netprofit, title="Profit")
+`, { bars, engineOptions: { runtime: { syminfo: { mintick: 1 } } } });
+
+    expect(result.errors).toEqual([]);
+    // Plots are captured before order fills; TP fires on bar 2, reflected at bar 3.
+    expect(getPlot(result, 'Closed').values).toEqual([0, 0, 0, 1]);
+    expect(result.strategy.closedTrades[0]).toMatchObject({
+      entryOrderId: 'Long',
+      exitOrderId: 'Bracket Limit',
+      entryPrice: 100,
+      exitPrice: 104,
+      profit: 4,
+    });
+  });
+
+  it('locks pyramiding=3 — position_size grows and opentrades increments with each entry', () => {
+    // Public idiom reference: scale-in strategies pyramid into a position on each
+    // successive signal bar; pyramiding=3 allows up to 4 concurrent same-direction trades.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20pyramiding%20scale%20in%20entries/
+    const bars: Bar[] = [
+      { time: 1_700_710_000_000, open: 100, high: 101, low: 99,  close: 100, volume: 100 },
+      { time: 1_700_710_060_000, open: 101, high: 102, low: 100, close: 101, volume: 100 },
+      { time: 1_700_710_120_000, open: 102, high: 103, low: 101, close: 102, volume: 100 },
+      { time: 1_700_710_180_000, open: 103, high: 104, low: 102, close: 103, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Pyramiding Scale In Checkpoint", pyramiding=3, process_orders_on_close=true)
+if bar_index <= 2
+    strategy.entry("Long", strategy.long, qty=1)
+plot(strategy.position_size, title="Pos")
+plot(strategy.opentrades, title="Open")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    // Each bar entry fills at that bar's close; bar 0→1, 1→2, 2→3
+    expect(getPlot(result, 'Pos').values).toEqual([1, 2, 3, 3]);
+    expect(getPlot(result, 'Open').values).toEqual([1, 2, 3, 3]);
+  });
+
+  it('locks bidirectional strategy — position_size goes positive then negative', () => {
+    // Public idiom reference: bi-directional strategies flip from long to short by
+    // submitting opposite-direction entries; position_size sign reflects direction.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20long%20short%20bidirectional/
+    const bars: Bar[] = [
+      { time: 1_700_720_000_000, open: 100, high: 101, low: 99,  close: 100, volume: 100 },
+      { time: 1_700_720_060_000, open: 101, high: 102, low: 100, close: 101, volume: 100 },
+      { time: 1_700_720_120_000, open: 101, high: 102, low: 100, close: 101, volume: 100 },
+      { time: 1_700_720_180_000, open: 101, high: 102, low: 100, close: 101, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Bidirectional Checkpoint", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 2
+    strategy.entry("Short", strategy.short, qty=2)
+plot(strategy.position_size, title="Pos")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    // bar 0: long 2 fills → +2; bar 2: short 2 closes long then opens short → -2
+    expect(getPlot(result, 'Pos').values).toEqual([2, 2, -2, -2]);
+  });
+
+  it('locks strategy.closedtrades accessor chain — entry_price, exit_price, profit', () => {
+    // Public idiom reference: strategy reporting scripts read the last closed trade
+    // via strategy.closedtrades.entry_price(N), .exit_price(N), .profit(N) and plot them.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20closedtrades%20accessor%20entry%20exit%20profit/
+    const bars: Bar[] = [
+      { time: 1_700_730_000_000, open: 100, high: 101, low: 99,  close: 100, volume: 100 },
+      { time: 1_700_730_060_000, open: 103, high: 106, low: 102, close: 105, volume: 100 },
+      { time: 1_700_730_120_000, open: 105, high: 107, low: 104, close: 106, volume: 100 },
+      { time: 1_700_730_180_000, open: 106, high: 108, low: 105, close: 107, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Closed Trades Accessor Checkpoint", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("L", strategy.long, qty=1)
+if bar_index == 1
+    strategy.close("L")
+hasClosed = strategy.closedtrades > 0
+idx = strategy.closedtrades - 1
+ep = hasClosed ? strategy.closedtrades.entry_price(idx) : na
+xp = hasClosed ? strategy.closedtrades.exit_price(idx) : na
+pr = hasClosed ? strategy.closedtrades.profit(idx) : na
+plot(ep, title="Entry")
+plot(xp, title="Exit")
+plot(pr, title="Profit")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    // entry fills at bar 0 close = 100; exit (strategy.close) fills at bar 1 close = 105
+    expect(getPlot(result, 'Entry').values).toEqual([null, 100, 100, 100]);
+    expect(getPlot(result, 'Exit').values).toEqual([null, 105, 105, 105]);
+    expect(getPlot(result, 'Profit').values).toEqual([null, 5, 5, 5]);
+    expect(result.strategy.closedTrades[0]).toMatchObject({
+      entryOrderId: 'L',
+      exitOrderId: 'Close L',
+      entryPrice: 100,
+      exitPrice: 105,
+      profit: 5,
+    });
+  });
+
+  it('locks strategy.opentrades accessors — entry_price and size while trade is open', () => {
+    // Public idiom reference: live dashboards read the current open trade's entry price
+    // and size via strategy.opentrades.entry_price(0) and strategy.opentrades.size(0).
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20opentrades%20entry%20price%20size%20dashboard/
+    const bars: Bar[] = [
+      { time: 1_700_740_000_000, open: 100, high: 101, low: 99,  close: 100, volume: 100 },
+      { time: 1_700_740_060_000, open: 101, high: 102, low: 100, close: 101, volume: 100 },
+      { time: 1_700_740_120_000, open: 102, high: 103, low: 101, close: 102, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Open Trades Accessor Checkpoint", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("L", strategy.long, qty=3)
+hasOpen = strategy.opentrades > 0
+ep = hasOpen ? strategy.opentrades.entry_price(0) : na
+sz = hasOpen ? strategy.opentrades.size(0) : na
+plot(ep, title="EntryPx")
+plot(sz, title="Size")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    // With process_orders_on_close=true the entry fills at bar 0 close immediately
+    // during script execution, so opentrades>0 is true at bar 0 plot time.
+    expect(getPlot(result, 'EntryPx').values).toEqual([100, 100, 100]);
+    expect(getPlot(result, 'Size').values).toEqual([3, 3, 3]);
+  });
+
+  it('locks strategy.risk.max_position_size — entries beyond cap are blocked', () => {
+    // Public idiom reference: risk management scripts call strategy.risk.max_position_size
+    // to cap total contracts; excess entry qty is clipped to zero at the cap boundary.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20risk%20max%20position%20size/
+    const bars: Bar[] = [
+      { time: 1_700_750_000_000, open: 100, high: 101, low: 99,  close: 100, volume: 100 },
+      { time: 1_700_750_060_000, open: 101, high: 102, low: 100, close: 101, volume: 100 },
+      { time: 1_700_750_120_000, open: 102, high: 103, low: 101, close: 102, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Risk Max Position Checkpoint", pyramiding=2, process_orders_on_close=true)
+strategy.risk.max_position_size(3)
+if bar_index == 0
+    strategy.entry("A", strategy.long, qty=2)
+if bar_index == 1
+    strategy.entry("B", strategy.long, qty=2)
+plot(strategy.position_size, title="Pos")
+plot(strategy.opentrades, title="Open")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    // A fills for 2; B is clipped to 1 (cap=3); C would be 0
+    expect(getPlot(result, 'Pos').values).toEqual([2, 3, 3]);
+    expect(getPlot(result, 'Open').values).toEqual([1, 2, 2]);
+    expect(result.strategy.settings.maxPositionSize).toBe(3);
+  });
+
+  it('locks process_orders_on_close=true — orders fill at the bar close, not next open', () => {
+    // Public idiom reference: strategies that set process_orders_on_close=true have
+    // market orders execute at the current close rather than the following bar's open.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20process%20orders%20on%20close/
+    const bars: Bar[] = [
+      { time: 1_700_760_000_000, open: 100, high: 102, low: 99, close: 101, volume: 100 },
+      { time: 1_700_760_060_000, open: 104, high: 106, low: 103, close: 105, volume: 100 },
+      { time: 1_700_760_120_000, open: 105, high: 107, low: 104, close: 106, volume: 100 },
+    ];
+    // With process_orders_on_close=true, bar 0 entry fills at close=101 (not bar-1 open).
+    const result = runCompatScript(`
+strategy("Process On Close Checkpoint", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 1
+    strategy.close("Long")
+plot(strategy.position_size, title="Pos")
+plot(strategy.closedtrades, title="Closed")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    // entry fills at bar-0 close=101; close fills at bar-1 close=105
+    expect(getPlot(result, 'Pos').values).toEqual([1, 0, 0]);
+    expect(getPlot(result, 'Closed').values).toEqual([0, 1, 1]);
+    expect(result.strategy.closedTrades[0]).toMatchObject({
+      entryOrderId: 'Long',
+      exitOrderId: 'Close Long',
+      entryPrice: 101,
+      exitPrice: 105,
+      profit: 4,
+    });
+  });
+
+  it('locks strategy.equity and strategy.netprofit updating after fills', () => {
+    // Public idiom reference: equity-tracker scripts plot strategy.equity and
+    // strategy.netprofit to visualise running P&L; equity = initial_capital + netprofit.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20equity%20netprofit%20tracker/
+    const bars: Bar[] = [
+      { time: 1_700_770_000_000, open: 100, high: 101, low: 99,  close: 100, volume: 100 },
+      { time: 1_700_770_060_000, open: 103, high: 106, low: 102, close: 105, volume: 100 },
+      { time: 1_700_770_120_000, open: 105, high: 107, low: 104, close: 106, volume: 100 },
+      { time: 1_700_770_180_000, open: 106, high: 108, low: 105, close: 107, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Equity Tracker Checkpoint", initial_capital=1000, process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("L", strategy.long, qty=1)
+if bar_index == 1
+    strategy.close("L")
+plot(strategy.equity, title="Equity")
+plot(strategy.netprofit, title="NetProfit")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    // bar 0: entry at 100, no close yet → equity=1000, netprofit=0
+    // bar 1: close at 105, profit=5 → equity=1005, netprofit=5
+    expect(getPlot(result, 'Equity').values).toEqual([1000, 1005, 1005, 1005]);
+    expect(getPlot(result, 'NetProfit').values).toEqual([0, 5, 5, 5]);
+  });
+
+  it('locks multiple strategy.exit with different from_entry — each bracket targets its own entry', () => {
+    // Public idiom reference: strategies with multiple concurrent long entries can attach
+    // separate exit orders scoped to distinct entry IDs via the from_entry parameter.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20exit%20from_entry%20multiple%20brackets/
+    const bars: Bar[] = [
+      { time: 1_700_780_000_000, open: 100, high: 101, low: 99,  close: 100, volume: 100 },
+      { time: 1_700_780_060_000, open: 101, high: 102, low: 100, close: 101, volume: 100 },
+      { time: 1_700_780_120_000, open: 101, high: 107, low: 100, close: 106, volume: 100 },
+      { time: 1_700_780_180_000, open: 106, high: 108, low: 105, close: 107, volume: 100 },
+    ];
+    // Two entries at bar 0 and bar 1; each gets its own exit order (limit=106 and limit=107).
+    // Bar 2: high=107 → X1 (limit 106) fires via OHLC ticks; X2 (limit 107) also fires.
+    // Plots capture before fills, so position reflects on bar 3.
+    const result = runCompatScript(`
+strategy("Multi Exit From Entry Checkpoint", pyramiding=2, process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("E1", strategy.long, qty=1)
+if bar_index == 1
+    strategy.entry("E2", strategy.long, qty=1)
+if strategy.opentrades > 0
+    strategy.exit("X1", from_entry="E1", limit=106)
+if strategy.opentrades > 1
+    strategy.exit("X2", from_entry="E2", limit=107)
+plot(strategy.position_size, title="Pos")
+plot(strategy.closedtrades, title="Closed")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    // E1 at bar 0 close=100; E2 at bar 1 close=101; both exit orders fire on bar 2
+    // via OHLC high=107. Plots see old state at bar 2; new state reflected at bar 3.
+    expect(getPlot(result, 'Pos').values).toEqual([1, 2, 2, 0]);
+    expect(getPlot(result, 'Closed').values).toEqual([0, 0, 0, 2]);
+    expect(result.strategy.closedTrades).toHaveLength(2);
+    expect(result.strategy.closedTrades[0]).toMatchObject({
+      entryOrderId: 'E1',
+      exitOrderId: 'X1',
+      entryPrice: 100,
+      exitPrice: 106,
+      profit: 6,
+    });
+    expect(result.strategy.closedTrades[1]).toMatchObject({
+      entryOrderId: 'E2',
+      exitOrderId: 'X2',
+      entryPrice: 101,
+      exitPrice: 107,
+      profit: 6,
+    });
+  });
+
+  it('locks strategy.cancel — cancels a pending limit entry before it fills', () => {
+    // Public idiom reference: conditional entry management scripts submit a pending
+    // limit order then cancel it on the next bar if a signal reverses; the position
+    // remains flat throughout.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20cancel%20pending%20order/
+    const bars: Bar[] = [
+      { time: 1_700_790_000_000, open: 100, high: 101, low: 99,  close: 100, volume: 100 },
+      { time: 1_700_790_060_000, open: 101, high: 102, low: 100, close: 101, volume: 100 },
+      { time: 1_700_790_120_000, open: 102, high: 103, low: 101, close: 102, volume: 100 },
+    ];
+    // Bar 0: submit limit entry at 98 (never hit). Bar 1: cancel it.
+    const result = runCompatScript(`
+strategy("Cancel Order Checkpoint", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1, limit=98)
+if bar_index == 1
+    strategy.cancel("Long")
+plot(strategy.position_size, title="Pos")
+plot(strategy.opentrades, title="Open")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    // Order cancelled before any fill — position stays at 0
+    expect(getPlot(result, 'Pos').values).toEqual([0, 0, 0]);
+    expect(getPlot(result, 'Open').values).toEqual([0, 0, 0]);
+    const cancelledOrder = result.strategy.orders.find((o) => o.id === 'Long');
+    expect(cancelledOrder?.status).toBe('cancelled');
+  });
+});
