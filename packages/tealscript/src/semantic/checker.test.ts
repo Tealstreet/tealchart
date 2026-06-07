@@ -2932,6 +2932,45 @@ plot(badUnknown + badDuplicate + badTooMany + badMissing + badMethodUnknown + ba
     ]);
   });
 
+  it('reports literal na passed to bool user-callable parameters', () => {
+    const library = parse(`
+library("BoolTools", true)
+export type Box
+    float value
+export score(bool flag) => flag ? 1 : 0
+export method score(Box this, bool flag) => flag ? this.value : 0
+`);
+    const result = checkProgram(parse(`
+indicator("User Callable Bool NA")
+import TestUser/BoolTools/1 as bt
+enabled(bool flag=na) => flag ? 1 : 0
+okDefault(bool flag=bool(na)) => flag ? 1 : 0
+method toggled(float this, bool flag=na) => flag ? this : 0
+method keep(float this, bool flag) => flag ? this : 0
+badFunction = enabled(na)
+badFunctionNamed = enabled(flag=na)
+okFunction = enabled(bool(na)) + okDefault()
+badMethod = close.keep(na)
+okMethod = close.keep(bool(na))
+p = bt.Box.new(close)
+badImportedFunction = bt.score(na)
+badImportedMethod = p.score(na)
+plot(badFunction + badFunctionNamed + okFunction + badMethod + okMethod + badImportedFunction + badImportedMethod)
+`), {
+      libraries: new Map([['TestUser/BoolTools/1', library]]),
+    });
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign na value to bool parameter function enabled.flag',
+      'Cannot assign na value to bool parameter method toggled.flag',
+      'Cannot pass na value to bool parameter flag for function enabled',
+      'Cannot pass na value to bool parameter flag for function enabled',
+      'Cannot pass na value to bool parameter flag for method keep',
+      'Cannot pass na value to bool parameter flag for library function bt.score',
+      'Cannot pass na value to bool parameter flag for library method bt.score',
+    ]);
+  });
+
   it('infers user-defined function call return types', () => {
     const result = checkProgram(parse(`
 indicator("User Function Returns")
