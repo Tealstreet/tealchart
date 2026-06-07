@@ -3884,7 +3884,13 @@ plot(time_close(timeframe="30", session="1430-1600", timezone="UTC"), title="Nam
 plot(time("60", "1430-1600", 1), title="Previous Session Open")
 plot(time("60", "1430-1600", "UTC", 1), title="Previous Session Open With Timezone")
 plot(time_close(timeframe="30", session="1430-1600", bars_back=1), title="Named Previous Close")
-plot(time(timeframe="", bars_back=-1), title="Next Known Open")`;
+plot(time(timeframe="", bars_back=-1), title="Next Known Open")
+dynamicBarsBack = bar_index == 1 ? 5001 : 0
+dynamicTimeframeBarsBack = bar_index == 1 ? -501 : 0
+dynamicFractionalBarsBack = bar_index == 1 ? 1.5 : 0
+plot(na(time("60", bars_back=dynamicBarsBack)) ? 1 : 0, title="Invalid Dynamic Bars Back")
+plot(na(time_close("60", timeframe_bars_back=dynamicTimeframeBarsBack)) ? 1 : 0, title="Invalid Dynamic Timeframe Bars Back")
+plot(na(time("60", bars_back=dynamicFractionalBarsBack)) ? 1 : 0, title="Invalid Fractional Bars Back")`;
 
       const ast = parse(script);
       const bars: Bar[] = [
@@ -3942,6 +3948,9 @@ plot(time(timeframe="", bars_back=-1), title="Next Known Open")`;
         Date.UTC(2024, 0, 5, 16, 0),
         null,
       ]);
+      expect(result.plots.find((plot) => plot.title === 'Invalid Dynamic Bars Back')?.values).toEqual([0, 1, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Invalid Dynamic Timeframe Bars Back')?.values).toEqual([0, 1, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Invalid Fractional Bars Back')?.values).toEqual([0, 1, 0]);
     });
 
     it('supports timestamp named arguments and date strings', () => {
