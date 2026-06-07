@@ -269,7 +269,8 @@ Phases:
    buffer sizing beyond function hints, static literal, simple numeric, selected
    pure `math.*`, selected numeric normalization helpers, and input-bool- or
    comparison-gated conditional offsets when corpus evidence requires it.
-6. Add stable runtime error payloads and `runtime.error()` coverage.
+6. Maintain stable runtime error payloads and source-linked `runtime.error()`
+   guard coverage as new public-script halt patterns appear.
 7. Add focused fixtures for common public-script idioms that previously parsed
    but failed or drifted at runtime.
 

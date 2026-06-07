@@ -729,6 +729,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-runtime-error-guard-checkpoint',
+      title: 'Public Runtime Error Guard Checkpoint',
+      searchContext: 'TradingView public scripts search: runtime.error guard',
+      featureTags: ['runtime', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-custom-candle-checkpoint',
       title: 'Public Custom Candle Checkpoint',
       searchContext: 'TradingView public scripts search: heikin ashi candles',

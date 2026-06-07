@@ -616,6 +616,9 @@ and final-summary log output while plots continue to execute.
 `runtime.error()` halts execution with a stable `runtime.error` code in
 `ExecutionResult.errors`, worker runtime error messages, and Tealchart manager
 error callbacks while preserving the legacy message, line, and column fields.
+The source-linked public runtime error guard checkpoint locks the common public
+indicator pattern where a chart/configuration guard emits a stable runtime halt
+and stops subsequent plot evaluation.
 Semantic analysis reports non-string `runtime.error()` messages before runtime.
 
 ## Core `na` And Logical Semantics Coverage

@@ -2899,6 +2899,28 @@ plot(signalCount, title="Signal Count")
     ]);
   });
 
+  it('locks a reduced public runtime error guard idiom', () => {
+    // Public idiom reference: public indicators commonly halt with
+    // `runtime.error()` when required configuration or chart context is invalid.
+    // Source search: https://www.tradingview.com/scripts/search/runtime.error%20guard/
+    const result = runCompatScript(`
+indicator("Public Runtime Error Guard Checkpoint")
+threshold = input.float(103.0, "Required Threshold")
+plot(close, title="Before Guard")
+if bar_index == 2 and close > threshold
+    runtime.error("Required threshold guard tripped")
+plot(close > threshold ? 1 : 0, title="After Guard")
+`);
+
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0]).toMatchObject({
+      code: 'runtime.error',
+      message: 'Required threshold guard tripped',
+    });
+    expect(roundSeries(getPlot(result, 'Before Guard').values)).toEqual([102, 105, 107]);
+    expect(getPlot(result, 'After Guard').values).toEqual([0, 1]);
+  });
+
   it('locks the official strategy entry and bracket-exit idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const bars: Bar[] = [
