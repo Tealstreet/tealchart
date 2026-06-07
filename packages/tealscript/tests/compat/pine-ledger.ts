@@ -2558,6 +2558,96 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realtime-islast-table-checkpoint',
+      title: 'Realtime Islast Table Checkpoint',
+      searchContext: 'TradingView public scripts search: barstate islast dashboard table',
+      featureTags: ['barstate', 'tables', 'dashboard', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realtime-isconfirmed-checkpoint',
+      title: 'Realtime Isconfirmed Checkpoint',
+      searchContext: 'TradingView public scripts search: barstate isconfirmed anti repainting',
+      featureTags: ['barstate', 'signals', 'realtime', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realtime-multi-alert-checkpoint',
+      title: 'Realtime Multi Alert Checkpoint',
+      searchContext: 'TradingView public scripts search: multiple alertcondition signals',
+      featureTags: ['alerts', 'signals', 'ta', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realtime-alert-freq-checkpoint',
+      title: 'Realtime Alert Freq Checkpoint',
+      searchContext: 'TradingView public scripts search: alert frequency once per bar',
+      featureTags: ['alerts', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realtime-isfirst-init-checkpoint',
+      title: 'Realtime Isfirst Init Checkpoint',
+      searchContext: 'TradingView public scripts search: barstate isfirst initialization',
+      featureTags: ['barstate', 'arrays', 'var', 'state', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realtime-isnew-checkpoint',
+      title: 'Realtime Isnew Checkpoint',
+      searchContext: 'TradingView public scripts search: barstate isnew candle open',
+      featureTags: ['barstate', 'state', 'realtime', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realtime-log-levels-checkpoint',
+      title: 'Realtime Log Levels Checkpoint',
+      searchContext: 'TradingView public scripts search: log info warning error signal',
+      featureTags: ['logs', 'barstate', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realtime-strformat-alert-checkpoint',
+      title: 'Realtime Strformat Alert Checkpoint',
+      searchContext: 'TradingView public scripts search: alert str.format price message',
+      featureTags: ['alerts', 'signals', 'str_format', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realtime-alertcondition-crossover-checkpoint',
+      title: 'Realtime Alertcondition Crossover Checkpoint',
+      searchContext: 'TradingView public scripts search: alertcondition crossover plot',
+      featureTags: ['alerts', 'signals', 'ta', 'crossover', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'realtime-lastbar-summary-checkpoint',
+      title: 'Realtime Lastbar Summary Checkpoint',
+      searchContext: 'TradingView public scripts search: last bar summary statistics',
+      featureTags: ['barstate', 'state', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(

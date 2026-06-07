@@ -235,6 +235,7 @@ idioms rather than isolated unit coverage.
 | Anchored VWAP, str.format_time, conditional na, runtime.error | `TA VWAP Anchor Reset Checkpoint`; `Str Format Time Timezone Checkpoint`; `Conditional NA Inference Checkpoint`; `Runtime Error Guard Checkpoint`; `Enum Switch Barcolor Checkpoint` | `pine-realworld-corpus.test.ts` |
 | User-defined objects | `Public Object Method Checkpoint`; `Public UDT State Layout Checkpoint`; `Public UDT Array Checkpoint`; reduced official object idioms | `pine-real-checkpoints.test.ts`; `pine-objects.test.ts` |
 | Drawings and tables | `Public Label Signal Checkpoint`; `Public Line Signal Checkpoint`; `Public Drawing Zone Checkpoint`; `Public Box Zone Checkpoint`; `Public Financial Dashboard Checkpoint`; `Public Table Setter Checkpoint`; `Public Linefill Channel Checkpoint`; `Public Zigzag Polyline Checkpoint`; manual comparison milestones plus reduced drawing fixtures | `pine-real-checkpoints.test.ts`; `PINE_CHECKPOINTS.md`; `pine-drawings.test.ts` |
+| Barstate, alert, and realtime patterns | `Realtime Islast Table Checkpoint`; `Realtime Isconfirmed Checkpoint`; `Realtime Multi Alert Checkpoint`; `Realtime Alert Freq Checkpoint`; `Realtime Isfirst Init Checkpoint`; `Realtime Isnew Checkpoint`; `Realtime Log Levels Checkpoint`; `Realtime Strformat Alert Checkpoint`; `Realtime Alertcondition Crossover Checkpoint`; `Realtime Lastbar Summary Checkpoint` | `pine-realworld-corpus.test.ts` |
 
 ## Adding A Checkpoint
 

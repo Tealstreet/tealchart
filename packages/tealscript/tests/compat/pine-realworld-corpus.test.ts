@@ -4668,3 +4668,292 @@ plot(na == 0 ? 1 : 0, title="NaEqZero")
     expect(getPlot(result, 'NaEqZero').values).toEqual(Array(compatibilityBars.length).fill(0));
   });
 });
+
+describe('Barstate, alert, and realtime patterns', () => {
+  it('locks barstate.islast conditional table — only populate on last bar', () => {
+    // Public idiom: indicators create/update a dashboard table only on the last bar
+    // to avoid per-bar overhead and ensure the final state is shown.
+    // Source search: https://www.tradingview.com/scripts/search/barstate%20islast%20dashboard%20table/
+    const result = runCompatScript(`
+indicator("Realtime Islast Table Checkpoint", overlay=true)
+sma = ta.sma(close, 3)
+var table dash = table.new(position.top_right, 2, 2)
+plot(sma, title="SMA")
+plot(barstate.islast ? 1 : 0, title="IsLast Flag")
+if barstate.islast
+    table.cell(dash, 0, 0, "Close")
+    table.cell(dash, 1, 0, str.tostring(close))
+    table.cell(dash, 0, 1, "SMA")
+    table.cell(dash, 1, 1, str.tostring(math.round(sma, 2)))
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Realtime Islast Table Checkpoint');
+    // islast flag is 1 only on bar_index 11
+    expect(getPlot(result, 'IsLast Flag').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+    // Table is created at last bar
+    expect(result.drawings.filter((d) => d.type === 'table').length).toBeGreaterThan(0);
+  });
+
+  it('locks barstate.isconfirmed anti-repainting guard — only act on confirmed bars', () => {
+    // Public idiom: indicators guard signal logic behind barstate.isconfirmed to
+    // prevent intrabar repainting; on confirmed history bars this always passes.
+    // Source search: https://www.tradingview.com/scripts/search/barstate%20isconfirmed%20anti%20repainting/
+    const result = runCompatScript(`
+indicator("Realtime Isconfirmed Checkpoint")
+sma = ta.sma(close, 3)
+confirmedClose = barstate.isconfirmed ? close : na
+confirmedSignal = barstate.isconfirmed and close > sma
+plot(confirmedClose, title="Confirmed Close")
+plot(confirmedSignal ? 1 : 0, title="Confirmed Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Realtime Isconfirmed Checkpoint');
+    // All compat bars are confirmed (history); confirmedClose == close on every bar
+    expect(getPlot(result, 'Confirmed Close').values).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+    // close > sma(3): sma starts at bar 2; bars 0,1 have null sma → close>null is false
+    // sma bar2=104.666667, close=107 → 1; bar3=105, close=103 → 0; bar4=103, close=99 → 0
+    // bar5=100.666667, close=100 → 0; bar6=101, close=104 → 1; bar7=104.333333, close=109 → 1
+    // bar8=107, close=108 → 1; bar9=109.333333, close=111 → 1; bar10=109.666667, close=110 → 1
+    // bar11=111, close=112 → 1
+    expect(getPlot(result, 'Confirmed Signal').values).toEqual([0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
+  });
+
+  it('locks multiple alertconditions in one script — three distinct conditions captured', () => {
+    // Public idiom: alert-rich scripts define multiple alertconditions for different
+    // signal types (buy, sell, caution) with distinct titles and messages.
+    // Source search: https://www.tradingview.com/scripts/search/multiple%20alertcondition%20signals/
+    const result = runCompatScript(`
+indicator("Realtime Multi Alert Checkpoint")
+sma = ta.sma(close, 3)
+buySignal = ta.crossover(close, sma)
+sellSignal = ta.crossunder(close, sma)
+cautionSignal = math.abs(close - sma) < 1
+alertcondition(buySignal, title="Buy", message="Price crossed above SMA")
+alertcondition(sellSignal, title="Sell", message="Price crossed below SMA")
+alertcondition(cautionSignal, title="Caution", message="Price near SMA")
+plot(close, title="Close")
+plot(sma, title="SMA")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Realtime Multi Alert Checkpoint');
+    const buyAlert = result.alerts.find((a) => a.type === 'alertcondition' && a.title === 'Buy');
+    const sellAlert = result.alerts.find((a) => a.type === 'alertcondition' && a.title === 'Sell');
+    const cautionAlert = result.alerts.find((a) => a.type === 'alertcondition' && a.title === 'Caution');
+    expect(buyAlert).toBeDefined();
+    expect(sellAlert).toBeDefined();
+    expect(cautionAlert).toBeDefined();
+    expect(buyAlert?.message).toBe('Price crossed above SMA');
+    expect(sellAlert?.message).toBe('Price crossed below SMA');
+    expect(cautionAlert?.message).toBe('Price near SMA');
+    // crossover fires on bar 6 (close crosses above sma from below)
+    expect(buyAlert?.values.some((v) => v === true)).toBe(true);
+    // All three alertconditions registered
+    expect(result.alerts.filter((a) => a.type === 'alertcondition')).toHaveLength(3);
+  });
+
+  it('locks alert() with freq_once_per_bar — fires at most once per bar', () => {
+    // Public idiom: scripts use alert.freq_once_per_bar to suppress intrabar
+    // re-fires and ensure alerts fire at most once per confirmed bar.
+    // Source search: https://www.tradingview.com/scripts/search/alert%20frequency%20once%20per%20bar/
+    const result = runCompatScript(`
+indicator("Realtime Alert Freq Checkpoint")
+sma = ta.sma(close, 3)
+signal = close > sma
+if signal
+    alert("Close above SMA", alert.freq_once_per_bar)
+plot(signal ? 1 : 0, title="Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Realtime Alert Freq Checkpoint');
+    const directAlert = result.alerts.find((a) => a.type === 'alert');
+    expect(directAlert).toBeDefined();
+    // Each event should have frequency 'once_per_bar'
+    expect(directAlert?.events.every((e) => e.frequency === 'once_per_bar')).toBe(true);
+    // Signal fires on bars where close > sma(3): bars 2,6,7,8,9,10,11
+    expect(directAlert?.events.map((e) => e.barIndex)).toEqual([2, 6, 7, 8, 9, 10, 11]);
+  });
+
+  it('locks barstate.isfirst initialization — one-time setup of var array', () => {
+    // Public idiom: scripts use if barstate.isfirst to seed persistent state
+    // (arrays, accumulators) with the first bar's values before general logic runs.
+    // Source search: https://www.tradingview.com/scripts/search/barstate%20isfirst%20initialization/
+    const result = runCompatScript(`
+indicator("Realtime Isfirst Init Checkpoint")
+var array<float> history = array.new_float(0)
+var float initClose = na
+if barstate.isfirst
+    initClose := close
+    array.push(history, close)
+array.push(history, close)
+plot(initClose, title="Init Close")
+plot(array.size(history), title="History Size")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Realtime Isfirst Init Checkpoint');
+    // initClose set on first bar (102) and persists
+    expect(getPlot(result, 'Init Close').values).toEqual(Array(compatibilityBars.length).fill(102));
+    // On bar 0: isfirst pushes once + general push = 2 total; each subsequent bar adds 1
+    expect(getPlot(result, 'History Size').values).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+  });
+
+  it('locks barstate.isnew candle open detection — counts new candles formed', () => {
+    // Public idiom: scripts use barstate.isnew to detect when a new bar has just
+    // opened, common for session-open tracking and first-bar initialization.
+    // Source search: https://www.tradingview.com/scripts/search/barstate%20isnew%20candle%20open/
+    const result = runCompatScript(`
+indicator("Realtime Isnew Checkpoint")
+var int newCount = 0
+if barstate.isnew
+    newCount += 1
+plot(barstate.isnew ? 1 : 0, title="Is New")
+plot(newCount, title="New Count")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Realtime Isnew Checkpoint');
+    // All history bars have isnew=true
+    expect(getPlot(result, 'Is New').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'New Count').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  it('locks conditional log levels — info/warning/error at different severities', () => {
+    // Public idiom: debug scripts emit log.info for startup, log.warning for signal
+    // state changes, and log.error for final summaries or anomaly reports.
+    // Source search: https://www.tradingview.com/scripts/search/log%20info%20warning%20error%20signal/
+    const result = runCompatScript(`
+indicator("Realtime Log Levels Checkpoint")
+sma = ta.sma(close, 5)
+signal = close > sma
+var int bullBars = 0
+if barstate.isfirst
+    log.info("Start: first close {0}", close)
+if signal
+    bullBars += 1
+    if bullBars == 1
+        log.warning("First bull bar {0}", bar_index)
+if barstate.islast
+    log.error(message="Bull bars: {0}", bullBars)
+plot(signal ? 1 : 0, title="Signal")
+plot(bullBars, title="Bull Count")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Realtime Log Levels Checkpoint');
+    // sma(5) starts at bar 4: 103.2; close values: 102,105,107,103,99,100,104,109,108,111,110,112
+    // close > sma(5): null first 4 bars (false); bar4: 99>103.2 no; bar5: 100>102.8 no;
+    // bar6: 104>102.6 yes; bar7: 109>103 yes; bar8: 108>104 yes; bar9: 111>106.4 yes;
+    // bar10: 110>108.4 yes; bar11: 112>110 yes
+    expect(getPlot(result, 'Signal').values).toEqual([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Bull Count').values).toEqual([0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6]);
+    expect(result.logs.map(({ level, barIndex, message }) => ({ level, barIndex, message }))).toEqual([
+      { level: 'info', barIndex: 0, message: 'Start: first close 102' },
+      { level: 'warning', barIndex: 6, message: 'First bull bar 6' },
+      { level: 'error', barIndex: 11, message: 'Bull bars: 6' },
+    ]);
+  });
+
+  it('locks alert with str.format — formats price in alert message', () => {
+    // Public idiom: scripts build dynamic alert messages using str.format to embed
+    // numeric values such as the current close or computed signal level.
+    // Source search: https://www.tradingview.com/scripts/search/alert%20str.format%20price%20message/
+    const result = runCompatScript(`
+indicator("Realtime Strformat Alert Checkpoint")
+sma = ta.sma(close, 3)
+buySignal = ta.crossover(close, sma)
+if buySignal
+    alert(str.format("Buy signal at {0,number,#.##} SMA {1,number,#.##}", close, sma), alert.freq_once_per_bar)
+plot(buySignal ? 1 : 0, title="Buy Signal")
+plot(sma, title="SMA")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Realtime Strformat Alert Checkpoint');
+    const directAlert = result.alerts.find((a) => a.type === 'alert');
+    expect(directAlert).toBeDefined();
+    // All events carry once_per_bar frequency
+    expect(directAlert?.events.every((e) => e.frequency === 'once_per_bar')).toBe(true);
+    // First crossover fires on bar 6: close=104 crosses above sma=101
+    expect(directAlert?.events[0]?.barIndex).toBe(6);
+    expect(directAlert?.events[0]?.message).toContain('Buy signal at');
+    expect(directAlert?.events[0]?.message).toContain('104');
+  });
+
+  it('locks alertcondition with crossover — condition based on plot crossover', () => {
+    // Public idiom: scripts define alertconditions based on ta.crossover/crossunder
+    // results, with messages that include the ticker and price level.
+    // Source search: https://www.tradingview.com/scripts/search/alertcondition%20crossover%20plot/
+    const result = runCompatScript(`
+indicator("Realtime Alertcondition Crossover Checkpoint")
+fastMa = ta.sma(close, 3)
+slowMa = ta.sma(close, 5)
+crossUp = ta.crossover(fastMa, slowMa)
+crossDown = ta.crossunder(fastMa, slowMa)
+alertcondition(crossUp, title="Golden Cross", message="Fast MA crossed above slow MA")
+alertcondition(crossDown, title="Death Cross", message="Fast MA crossed below slow MA")
+plot(fastMa, title="Fast MA")
+plot(slowMa, title="Slow MA")
+plot(crossUp ? 1 : 0, title="Cross Up")
+plot(crossDown ? 1 : 0, title="Cross Down")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Realtime Alertcondition Crossover Checkpoint');
+    const goldenCross = result.alerts.find((a) => a.type === 'alertcondition' && a.title === 'Golden Cross');
+    const deathCross = result.alerts.find((a) => a.type === 'alertcondition' && a.title === 'Death Cross');
+    expect(goldenCross).toBeDefined();
+    expect(deathCross).toBeDefined();
+    expect(goldenCross?.message).toBe('Fast MA crossed above slow MA');
+    expect(deathCross?.message).toBe('Fast MA crossed below slow MA');
+    // At least one crossover event among all bars
+    expect(goldenCross?.values.some((v) => v === true) || deathCross?.values.some((v) => v === true)).toBe(true);
+  });
+
+  it('locks last-bar summary pattern — accumulate stats then output on islast', () => {
+    // Public idiom: scripts track per-bar stats (bull bars, bear bars, average close)
+    // across all history, then display a summary plot or label on the last bar only.
+    // Source search: https://www.tradingview.com/scripts/search/last%20bar%20summary%20statistics/
+    const result = runCompatScript(`
+indicator("Realtime Lastbar Summary Checkpoint")
+var int bullBars = 0
+var int bearBars = 0
+var float sumClose = 0.0
+sumClose += close
+if close > open
+    bullBars += 1
+else
+    bearBars += 1
+avgClose = sumClose / (bar_index + 1)
+summaryBull = barstate.islast ? bullBars : na
+summaryBear = barstate.islast ? bearBars : na
+plot(bullBars, title="Bull Count")
+plot(bearBars, title="Bear Count")
+plot(summaryBull, title="Summary Bull")
+plot(summaryBear, title="Summary Bear")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Realtime Lastbar Summary Checkpoint');
+    // close vs open per bar: open/close pairs:
+    // bar0: o=100,c=102 bull; bar1: o=102,c=105 bull; bar2: o=105,c=107 bull
+    // bar3: o=107,c=103 bear; bar4: o=103,c=99 bear; bar5: o=99,c=100 bull
+    // bar6: o=100,c=104 bull; bar7: o=104,c=109 bull; bar8: o=109,c=108 bear
+    // bar9: o=108,c=111 bull; bar10: o=111,c=110 bear; bar11: o=110,c=112 bull
+    expect(getPlot(result, 'Bull Count').values).toEqual([1, 2, 3, 3, 3, 4, 5, 6, 6, 7, 7, 8]);
+    expect(getPlot(result, 'Bear Count').values).toEqual([0, 0, 0, 1, 2, 2, 2, 2, 3, 3, 4, 4]);
+    // summaryBull/Bear: na on all bars except last
+    const summaryBullVals = getPlot(result, 'Summary Bull').values;
+    const summaryBearVals = getPlot(result, 'Summary Bear').values;
+    expect(summaryBullVals[11]).toBe(8);
+    expect(summaryBearVals[11]).toBe(4);
+    // All bars except last should be null
+    for (let i = 0; i < 11; i++) {
+      expect(summaryBullVals[i]).toBeNull();
+      expect(summaryBearVals[i]).toBeNull();
+    }
+  });
+});
