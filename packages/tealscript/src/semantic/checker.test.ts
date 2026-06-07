@@ -156,9 +156,13 @@ indicator("Direct NA")
 gap = close[100]
 plot(gap == na ? 1 : 0)
 plot(na != gap ? 1 : 0)
+plot(gap > na ? 1 : 0)
+plot(na <= gap ? 1 : 0)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Do not compare directly to na; use na(value) instead',
+      'Do not compare directly to na; use na(value) instead',
       'Do not compare directly to na; use na(value) instead',
       'Do not compare directly to na; use na(value) instead',
     ]);
