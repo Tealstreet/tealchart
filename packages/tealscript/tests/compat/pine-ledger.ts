@@ -1476,6 +1476,131 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'deep-v4-integer-input-checkpoint',
+      title: 'Deep V4 Integer Input Checkpoint',
+      searchContext: 'TradingView public scripts search: v4 study input integer type',
+      pineVersion: 'v4',
+      featureTags: ['legacy', 'v4_compat', 'inputs', 'ta', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'deep-for-map-kv-checkpoint',
+      title: 'Deep For Map Key-Value Checkpoint',
+      searchContext: 'TradingView public scripts search: for map key value iterate',
+      featureTags: ['map', 'state', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'deep-generic-array-checkpoint',
+      title: 'Deep Generic Array Checkpoint',
+      searchContext: 'TradingView public scripts search: array.new generic float type',
+      featureTags: ['arrays', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'deep-switch-string-checkpoint',
+      title: 'Deep Switch String Checkpoint',
+      searchContext: 'TradingView public scripts search: switch string mode signal',
+      featureTags: ['signals', 'state', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'deep-string-concat-checkpoint',
+      title: 'Deep String Concat Checkpoint',
+      searchContext: 'TradingView public scripts search: multiline string concatenation label',
+      featureTags: ['signals', 'parser', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'deep-request-security-tuple-checkpoint',
+      title: 'Deep Request Security Tuple Checkpoint',
+      searchContext: 'TradingView public scripts search: request.security ohlc tuple destructure',
+      featureTags: ['request', 'tuple', 'intrabar', 'unsupported'],
+    }),
+    stages: [
+      { stage: 'parse', status: 'passed' },
+      { stage: 'semantic', status: 'passed' },
+      {
+        stage: 'runtime',
+        status: 'failed',
+        failureClass: 'unsupported_planned',
+        message: 'request.security tuple expression: runtime cannot forward [open,high,low,close] array through the HTF merge — expression evaluates in chart context, not HTF context',
+        diagnostics: [{
+          code: 'unsupported-feature',
+          message: 'request.security with tuple expression argument cannot be destructured at runtime',
+          line: 2,
+          column: 1,
+        }],
+      },
+    ],
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'deep-plotcandle-colors-checkpoint',
+      title: 'Deep Plotcandle Conditional Colors Checkpoint',
+      searchContext: 'TradingView public scripts search: plotcandle bull bear color',
+      featureTags: ['visuals', 'candles', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'deep-bb-fill-checkpoint',
+      title: 'Deep BB Fill Checkpoint',
+      searchContext: 'TradingView public scripts search: bollinger bands fill standard',
+      featureTags: ['ta', 'signals', 'bands', 'fills', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'deep-strategy-oca-exit-checkpoint',
+      title: 'Deep Strategy OCA Exit Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy exit take profit stop loss',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'deep-type-cast-chain-checkpoint',
+      title: 'Deep Type Cast Chain Checkpoint',
+      searchContext: 'TradingView public scripts search: type casting int float math.round',
+      featureTags: ['runtime', 'edge_case', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'deep-nested-udf-state-checkpoint',
+      title: 'Deep Nested UDF State Checkpoint',
+      searchContext: 'TradingView public scripts search: nested function var accumulate state',
+      featureTags: ['udf', 'state', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'deep-label-delete-lifecycle-checkpoint',
+      title: 'Deep Label Delete Lifecycle Checkpoint',
+      searchContext: 'TradingView public scripts search: label delete previous bar lifecycle',
+      featureTags: ['drawings', 'labels', 'state', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
