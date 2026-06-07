@@ -1138,9 +1138,10 @@ available for scripts.
 Strategy declarations also populate the shared declaration metadata payload for
 title, short title, overlay, format, precision, scale, timeframe, z-order,
 behind-chart, calculation-bar count, dynamic request, history-buffer, and drawing
-limit settings.
-Source-linked public checkpoints cover strategy stats tables plus closed-trade
-list and open-position dashboard tables built from trade accessors.
+limit settings. A source-linked public strategy metadata checkpoint locks those
+header settings for common copied strategy scripts.
+Source-linked public checkpoints also cover strategy stats tables plus
+closed-trade list and open-position dashboard tables built from trade accessors.
 The semantic checker validates common strategy order, close/cancel,
 declaration argument, declaration literal value, and trade-accessor call shapes
 before runtime, reports literal declaration setting diagnostics plus order

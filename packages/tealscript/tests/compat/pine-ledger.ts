@@ -727,6 +727,16 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-strategy-metadata-checkpoint',
+      title: 'Public Strategy Metadata Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy declaration metadata',
+      category: 'strategy',
+      featureTags: ['strategy', 'declaration_metadata', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-strategy-stats-checkpoint',
       title: 'Public Strategy Stats Checkpoint',
       searchContext: 'TradingView public scripts search: strategy performance table',

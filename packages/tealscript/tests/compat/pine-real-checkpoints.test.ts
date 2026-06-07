@@ -3438,6 +3438,84 @@ plot(strategy.netprofit, title="Net Profit")
     expect(result.strategy.closedTrades[0]?.profit).toBeCloseTo(0.2);
   });
 
+  it('locks a reduced public strategy declaration metadata idiom', () => {
+    // Public strategy scripts commonly configure chart placement, price scale,
+    // precision, request behavior, history, and drawing limits in their header.
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20declaration%20metadata/
+    const result = runCompatScript(`
+strategy(
+  "Public Strategy Metadata Checkpoint",
+  shorttitle="Meta Strat",
+  overlay=true,
+  format=format.price,
+  precision=4,
+  scale=scale.right,
+  max_bars_back=50,
+  timeframe="60",
+  timeframe_gaps=true,
+  explicit_plot_zorder=true,
+  behind_chart=false,
+  max_lines_count=2,
+  max_labels_count=3,
+  max_boxes_count=4,
+  calc_bars_count=25,
+  max_polylines_count=5,
+  dynamic_requests=false,
+  initial_capital=5000,
+  currency="USD"
+)
+plot(strategy.equity, title="Equity")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.declaration).toMatchObject({
+      title: 'Public Strategy Metadata Checkpoint',
+      shortTitle: 'Meta Strat',
+      overlay: true,
+      format: 'price',
+      precision: 4,
+      scale: 'right',
+      maxBarsBack: 50,
+      timeframe: '60',
+      timeframeGaps: true,
+      explicitPlotZOrder: true,
+      behindChart: false,
+      calcBarsCount: 25,
+      dynamicRequests: false,
+      drawingLimits: {
+        line: 2,
+        label: 3,
+        box: 4,
+        polyline: 5,
+      },
+    });
+    expect(result.indicatorTitle).toBe('Public Strategy Metadata Checkpoint');
+    expect(result.indicatorShortTitle).toBe('Meta Strat');
+    expect(result.indicatorOverlay).toBe(true);
+    expect(result.indicatorFormat).toBe('price');
+    expect(result.indicatorPrecision).toBe(4);
+    expect(result.indicatorScale).toBe('right');
+    expect(result.indicatorTimeframe).toBe('60');
+    expect(result.indicatorTimeframeGaps).toBe(true);
+    expect(result.indicatorExplicitPlotZOrder).toBe(true);
+    expect(result.indicatorBehindChart).toBe(false);
+    expect(result.indicatorCalcBarsCount).toBe(25);
+    expect(result.indicatorMaxBarsBack).toBe(50);
+    expect(result.indicatorDynamicRequests).toBe(false);
+    expect(result.indicatorDrawingLimits).toEqual({
+      line: 2,
+      label: 3,
+      box: 4,
+      polyline: 5,
+    });
+    expect(result.strategy.settings).toMatchObject({
+      title: 'Public Strategy Metadata Checkpoint',
+      initialCapital: 5000,
+      currency: 'USD',
+    });
+    expect(getPlot(result, 'Equity').values).toEqual([5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000]);
+  });
+
   it('locks a reduced public strategy stats table idiom', () => {
     // Public idiom reference: strategy performance public scripts commonly
     // summarize closed trades, win count, and net profit in a last-bar table.

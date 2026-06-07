@@ -477,7 +477,8 @@ Phases:
 5. Maintain bounded `calc_on_order_fills` recalculation coverage.
 6. Maintain `calc_on_every_tick` realtime strategy checkpoint coverage.
 7. Keep expanding reduced TradingView checkpoint fixtures for bar magnifier,
-   recalculation examples, and public strategy performance-table idioms.
+   recalculation examples, public strategy declaration metadata, and public
+   strategy performance-table idioms.
    Current coverage includes OCA cancel/reduce order-management fixtures and a
    combined bar-magnifier/recalculate-after-fill fixture that locks
    recalc-created price exits against pre-fill intrabar ticks.
