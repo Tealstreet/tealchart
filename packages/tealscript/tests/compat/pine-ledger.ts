@@ -2838,6 +2838,79 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  // ── End-to-end indicator replicas ─────────────────────────────────────────
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'replica-squeeze-momentum-checkpoint',
+      title: 'Replica Squeeze Momentum Checkpoint',
+      searchContext: 'TradingView public scripts search: squeeze momentum lazybear BB KC barcolor',
+      featureTags: ['ta', 'signals', 'barcolor', 'kc', 'channels', 'volatility', 'indicator_replica', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'replica-supertrend-trailing-stop-checkpoint',
+      title: 'Replica SuperTrend Trailing Stop Checkpoint',
+      searchContext: 'TradingView public scripts search: supertrend trailing stop barcolor plotshape',
+      featureTags: ['ta', 'signals', 'barcolor', 'state', 'var', 'supertrend', 'indicator_replica', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'replica-volume-profile-lite-checkpoint',
+      title: 'Replica Volume Profile Lite Checkpoint',
+      searchContext: 'TradingView public scripts search: volume profile colored bars sma bgcolor',
+      featureTags: ['ta', 'signals', 'barcolor', 'visuals', 'indicator_replica', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'replica-rsi-divergence-scanner-checkpoint',
+      title: 'Replica RSI Divergence Scanner Checkpoint',
+      searchContext: 'TradingView public scripts search: rsi divergence scanner pivot plotshape',
+      featureTags: ['ta', 'signals', 'rsi', 'divergence', 'pivots', 'indicator_replica', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'replica-mtf-ma-system-checkpoint',
+      title: 'Replica MTF MA System Checkpoint',
+      searchContext: 'TradingView public scripts search: moving average system fast medium slow fill barcolor',
+      featureTags: ['ta', 'signals', 'barcolor', 'state', 'var', 'fills', 'indicator_replica', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'replica-smc-structure-checkpoint',
+      title: 'Replica SMC Structure Checkpoint',
+      searchContext: 'TradingView public scripts search: smart money concepts structure break plotshape',
+      featureTags: ['ta', 'signals', 'state', 'var', 'indicator_replica', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'replica-ha-oscillator-checkpoint',
+      title: 'Replica HA Oscillator Checkpoint',
+      searchContext: 'TradingView public scripts search: heikin ashi smoothed oscillator ema',
+      featureTags: ['ta', 'signals', 'heikin_ashi', 'oscillator', 'indicator_replica', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'replica-position-size-calculator-checkpoint',
+      title: 'Replica Position Size Calculator Checkpoint',
+      searchContext: 'TradingView public scripts search: position size calculator risk percent stop distance',
+      featureTags: ['inputs', 'signals', 'indicator_replica', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
   // ── Type system and enum patterns ─────────────────────────────────────────
   {
     ledgerEntry: officialDocsEntry({

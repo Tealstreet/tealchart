@@ -39,7 +39,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(run.summary.byFirstFailureClass).toEqual({ unsupported_planned: 3 });
     expect(run.summary.validationErrors).toEqual({});
     expect(run.summary.byFeatureTag).toMatchObject({
-      inputs: { total: 17, passed: 17, failed: 0 },
+      inputs: { total: 18, passed: 18, failed: 0 },
       legacy: { total: 19, passed: 19, failed: 0 },
       v4_compat: { total: 3, passed: 3, failed: 0 },
       v5_compat: { total: 10, passed: 10, failed: 0 },
@@ -53,7 +53,7 @@ describe('Pine compatibility checkpoint corpus', () => {
       ticker: { total: 2, passed: 2, failed: 0 },
       trailing_stop: { total: 3, passed: 3, failed: 0 },
       trend_filter: { total: 9, passed: 9, failed: 0 },
-      visuals: { total: 41, passed: 41, failed: 0 },
+      visuals: { total: 42, passed: 42, failed: 0 },
       alerts: { total: 10, passed: 10, failed: 0 },
       arrays: { total: 26, passed: 26, failed: 0 },
       strings: { total: 4, passed: 4, failed: 0 },
@@ -67,7 +67,7 @@ describe('Pine compatibility checkpoint corpus', () => {
       boxes: { total: 4, passed: 4, failed: 0 },
       box_setters: { total: 1, passed: 1, failed: 0 },
       candles: { total: 3, passed: 3, failed: 0 },
-      channels: { total: 5, passed: 5, failed: 0 },
+      channels: { total: 6, passed: 6, failed: 0 },
       currency: { total: 1, passed: 1, failed: 0 },
       custom_bars: { total: 1, passed: 1, failed: 0 },
       dashboard: { total: 15, passed: 15, failed: 0 },
@@ -77,7 +77,7 @@ describe('Pine compatibility checkpoint corpus', () => {
       economic: { total: 1, passed: 1, failed: 0 },
       earnings: { total: 2, passed: 2, failed: 0 },
       financial: { total: 2, passed: 2, failed: 0 },
-      fills: { total: 14, passed: 14, failed: 0 },
+      fills: { total: 15, passed: 15, failed: 0 },
       footprint: { total: 1, passed: 0, failed: 1 },
       imports: { total: 8, passed: 8, failed: 0 },
       libraries: { total: 8, passed: 8, failed: 0 },
@@ -94,7 +94,7 @@ describe('Pine compatibility checkpoint corpus', () => {
       objects: { total: 7, passed: 7, failed: 0 },
       performance: { total: 6, passed: 6, failed: 0 },
       momentum: { total: 2, passed: 2, failed: 0 },
-      oscillator: { total: 10, passed: 10, failed: 0 },
+      oscillator: { total: 11, passed: 11, failed: 0 },
       plot_metadata: { total: 1, passed: 1, failed: 0 },
       polylines: { total: 2, passed: 2, failed: 0 },
       risk: { total: 6, passed: 6, failed: 0 },
@@ -102,17 +102,17 @@ describe('Pine compatibility checkpoint corpus', () => {
       screener: { total: 1, passed: 1, failed: 0 },
       seed: { total: 1, passed: 1, failed: 0 },
       splits: { total: 1, passed: 1, failed: 0 },
-      heikin_ashi: { total: 3, passed: 3, failed: 0 },
+      heikin_ashi: { total: 4, passed: 4, failed: 0 },
       integration: { total: 11, passed: 11, failed: 0 },
       intrabar: { total: 5, passed: 3, failed: 2 },
       markers: { total: 3, passed: 3, failed: 0 },
       realtime: { total: 4, passed: 4, failed: 0 },
-      signals: { total: 201, passed: 201, failed: 0 },
+      signals: { total: 209, passed: 209, failed: 0 },
       declaration_metadata: { total: 5, passed: 5, failed: 0 },
-      output: { total: 243, passed: 243, failed: 0 },
-      supertrend: { total: 1, passed: 1, failed: 0 },
-      ta: { total: 77, passed: 77, failed: 0 },
-      barcolor: { total: 4, passed: 4, failed: 0 },
+      output: { total: 251, passed: 251, failed: 0 },
+      supertrend: { total: 2, passed: 2, failed: 0 },
+      ta: { total: 84, passed: 84, failed: 0 },
+      barcolor: { total: 8, passed: 8, failed: 0 },
       barssince: { total: 2, passed: 2, failed: 0 },
       valuewhen: { total: 2, passed: 2, failed: 0 },
       event_memory: { total: 1, passed: 1, failed: 0 },
@@ -125,7 +125,7 @@ describe('Pine compatibility checkpoint corpus', () => {
       highest: { total: 1, passed: 1, failed: 0 },
       lowest: { total: 1, passed: 1, failed: 0 },
       linreg: { total: 1, passed: 1, failed: 0 },
-      kc: { total: 2, passed: 2, failed: 0 },
+      kc: { total: 3, passed: 3, failed: 0 },
       moving_average: { total: 2, passed: 2, failed: 0 },
       vwma: { total: 1, passed: 1, failed: 0 },
       wma: { total: 1, passed: 1, failed: 0 },
@@ -143,7 +143,7 @@ describe('Pine compatibility checkpoint corpus', () => {
       stoch: { total: 2, passed: 2, failed: 0 },
       tsi: { total: 1, passed: 1, failed: 0 },
       source_identity: { total: 6, passed: 6, failed: 0 },
-      state: { total: 35, passed: 35, failed: 0 },
+      state: { total: 38, passed: 38, failed: 0 },
       syminfo: { total: 2, passed: 2, failed: 0 },
       tables: { total: 21, passed: 21, failed: 0 },
       barstate: { total: 10, passed: 10, failed: 0 },
@@ -155,19 +155,19 @@ describe('Pine compatibility checkpoint corpus', () => {
       trade_accessors: { total: 4, passed: 4, failed: 0 },
       open_trades: { total: 2, passed: 2, failed: 0 },
       cancel: { total: 1, passed: 1, failed: 0 },
-      volatility: { total: 5, passed: 5, failed: 0 },
+      volatility: { total: 6, passed: 6, failed: 0 },
       vwap: { total: 3, passed: 3, failed: 0 },
       wpr: { total: 1, passed: 1, failed: 0 },
       obv: { total: 2, passed: 2, failed: 0 },
       zigzag: { total: 1, passed: 1, failed: 0 },
       zones: { total: 2, passed: 2, failed: 0 },
-      rsi: { total: 6, passed: 6, failed: 0 },
+      rsi: { total: 7, passed: 7, failed: 0 },
       macd: { total: 1, passed: 1, failed: 0 },
       atr: { total: 1, passed: 1, failed: 0 },
       pvt: { total: 1, passed: 1, failed: 0 },
-      divergence: { total: 3, passed: 3, failed: 0 },
-      pivots: { total: 4, passed: 4, failed: 0 },
-      var: { total: 11, passed: 11, failed: 0 },
+      divergence: { total: 4, passed: 4, failed: 0 },
+      pivots: { total: 5, passed: 5, failed: 0 },
+      var: { total: 14, passed: 14, failed: 0 },
       parser: { total: 12, passed: 12, failed: 0 },
       edge_case: { total: 20, passed: 20, failed: 0 },
       nested_calls: { total: 1, passed: 1, failed: 0 },
@@ -187,6 +187,7 @@ describe('Pine compatibility checkpoint corpus', () => {
       type_annotations: { total: 4, passed: 4, failed: 0 },
       qualified_types: { total: 1, passed: 1, failed: 0 },
       method_extension: { total: 1, passed: 1, failed: 0 },
+      indicator_replica: { total: 8, passed: 8, failed: 0 },
     });
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('public-mtf-trend-checkpoint');
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('public-input-configuration-checkpoint');
@@ -476,6 +477,14 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('type-na-typed-default-checkpoint');
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('type-qualified-types-checkpoint');
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('type-conditional-compat-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('replica-squeeze-momentum-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('replica-supertrend-trailing-stop-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('replica-volume-profile-lite-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('replica-rsi-divergence-scanner-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('replica-mtf-ma-system-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('replica-smc-structure-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('replica-ha-oscillator-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('replica-position-size-calculator-checkpoint');
   });
 
   it('renders a stable checkpoint corpus report', () => {
@@ -490,7 +499,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| semantic | 1 |');
     expect(markdown).toContain('| runtime | 2 |');
     expect(markdown).toContain('| unsupported_planned | 3 |');
-    expect(markdown).toContain('| inputs | 17 | 17 | 0 |');
+    expect(markdown).toContain('| inputs | 18 | 18 | 0 |');
     expect(markdown).toContain('| legacy | 19 | 19 | 0 |');
     expect(markdown).toContain('| v4_compat | 3 | 3 | 0 |');
     expect(markdown).toContain('| v5_compat | 10 | 10 | 0 |');
@@ -503,13 +512,13 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| request | 16 | 14 | 2 |');
     expect(markdown).toContain('| alerts | 10 | 10 | 0 |');
     expect(markdown).toContain('| arrays | 26 | 26 | 0 |');
-    expect(markdown).toContain('| barcolor | 4 | 4 | 0 |');
+    expect(markdown).toContain('| barcolor | 8 | 8 | 0 |');
     expect(markdown).toContain('| barstate | 10 | 10 | 0 |');
     expect(markdown).toContain('| brackets | 3 | 3 | 0 |');
     expect(markdown).toContain('| boxes | 4 | 4 | 0 |');
     expect(markdown).toContain('| box_setters | 1 | 1 | 0 |');
     expect(markdown).toContain('| candles | 3 | 3 | 0 |');
-    expect(markdown).toContain('| channels | 5 | 5 | 0 |');
+    expect(markdown).toContain('| channels | 6 | 6 | 0 |');
     expect(markdown).toContain('| currency | 1 | 1 | 0 |');
     expect(markdown).toContain('| custom_bars | 1 | 1 | 0 |');
     expect(markdown).toContain('| dashboard | 15 | 15 | 0 |');
@@ -519,7 +528,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| economic | 1 | 1 | 0 |');
     expect(markdown).toContain('| earnings | 2 | 2 | 0 |');
     expect(markdown).toContain('| financial | 2 | 2 | 0 |');
-    expect(markdown).toContain('| fills | 14 | 14 | 0 |');
+    expect(markdown).toContain('| fills | 15 | 15 | 0 |');
     expect(markdown).toContain('| footprint | 1 | 0 | 1 |');
     expect(markdown).toContain('| imports | 8 | 8 | 0 |');
     expect(markdown).toContain('| libraries | 8 | 8 | 0 |');
@@ -534,7 +543,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| methods | 7 | 7 | 0 |');
     expect(markdown).toContain('| objects | 7 | 7 | 0 |');
     expect(markdown).toContain('| momentum | 2 | 2 | 0 |');
-    expect(markdown).toContain('| oscillator | 10 | 10 | 0 |');
+    expect(markdown).toContain('| oscillator | 11 | 11 | 0 |');
     expect(markdown).toContain('| performance | 6 | 6 | 0 |');
     expect(markdown).toContain('| plot_metadata | 1 | 1 | 0 |');
     expect(markdown).toContain('| polylines | 2 | 2 | 0 |');
@@ -543,15 +552,15 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| screener | 1 | 1 | 0 |');
     expect(markdown).toContain('| seed | 1 | 1 | 0 |');
     expect(markdown).toContain('| splits | 1 | 1 | 0 |');
-    expect(markdown).toContain('| heikin_ashi | 3 | 3 | 0 |');
+    expect(markdown).toContain('| heikin_ashi | 4 | 4 | 0 |');
     expect(markdown).toContain('| intrabar | 5 | 3 | 2 |');
     expect(markdown).toContain('| markers | 3 | 3 | 0 |');
     expect(markdown).toContain('| realtime | 4 | 4 | 0 |');
-    expect(markdown).toContain('| signals | 201 | 201 | 0 |');
+    expect(markdown).toContain('| signals | 209 | 209 | 0 |');
     expect(markdown).toContain('| declaration_metadata | 5 | 5 | 0 |');
-    expect(markdown).toContain('| output | 243 | 243 | 0 |');
-    expect(markdown).toContain('| supertrend | 1 | 1 | 0 |');
-    expect(markdown).toContain('| ta | 77 | 77 | 0 |');
+    expect(markdown).toContain('| output | 251 | 251 | 0 |');
+    expect(markdown).toContain('| supertrend | 2 | 2 | 0 |');
+    expect(markdown).toContain('| ta | 84 | 84 | 0 |');
     expect(markdown).toContain('| barssince | 2 | 2 | 0 |');
     expect(markdown).toContain('| valuewhen | 2 | 2 | 0 |');
     expect(markdown).toContain('| event_memory | 1 | 1 | 0 |');
@@ -563,7 +572,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| donchian | 1 | 1 | 0 |');
     expect(markdown).toContain('| highest | 1 | 1 | 0 |');
     expect(markdown).toContain('| lowest | 1 | 1 | 0 |');
-    expect(markdown).toContain('| kc | 2 | 2 | 0 |');
+    expect(markdown).toContain('| kc | 3 | 3 | 0 |');
     expect(markdown).toContain('| moving_average | 2 | 2 | 0 |');
     expect(markdown).toContain('| vwma | 1 | 1 | 0 |');
     expect(markdown).toContain('| wma | 1 | 1 | 0 |');
@@ -582,7 +591,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| stoch | 2 | 2 | 0 |');
     expect(markdown).toContain('| tsi | 1 | 1 | 0 |');
     expect(markdown).toContain('| source_identity | 6 | 6 | 0 |');
-    expect(markdown).toContain('| state | 35 | 35 | 0 |');
+    expect(markdown).toContain('| state | 38 | 38 | 0 |');
     expect(markdown).toContain('| syminfo | 2 | 2 | 0 |');
     expect(markdown).toContain('| tables | 21 | 21 | 0 |');
     expect(markdown).toContain('| table_setters | 1 | 1 | 0 |');
@@ -596,19 +605,19 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| udt | 8 | 8 | 0 |');
     expect(markdown).toContain('| unsupported | 3 | 0 | 3 |');
     expect(markdown).toContain('| varip | 2 | 2 | 0 |');
-    expect(markdown).toContain('| visuals | 41 | 41 | 0 |');
-    expect(markdown).toContain('| volatility | 5 | 5 | 0 |');
+    expect(markdown).toContain('| visuals | 42 | 42 | 0 |');
+    expect(markdown).toContain('| volatility | 6 | 6 | 0 |');
     expect(markdown).toContain('| vwap | 3 | 3 | 0 |');
     expect(markdown).toContain('| wpr | 1 | 1 | 0 |');
     expect(markdown).toContain('| obv | 2 | 2 | 0 |');
     expect(markdown).toContain('| zigzag | 1 | 1 | 0 |');
     expect(markdown).toContain('| zones | 2 | 2 | 0 |');
-    expect(markdown).toContain('| rsi | 6 | 6 | 0 |');
+    expect(markdown).toContain('| rsi | 7 | 7 | 0 |');
     expect(markdown).toContain('| macd | 1 | 1 | 0 |');
     expect(markdown).toContain('| atr | 1 | 1 | 0 |');
     expect(markdown).toContain('| pvt | 1 | 1 | 0 |');
-    expect(markdown).toContain('| divergence | 3 | 3 | 0 |');
-    expect(markdown).toContain('| pivots | 4 | 4 | 0 |');
+    expect(markdown).toContain('| divergence | 4 | 4 | 0 |');
+    expect(markdown).toContain('| pivots | 5 | 5 | 0 |');
     expect(markdown).toContain('| v5_compat | 10 | 10 | 0 |');
     expect(markdown).toContain('| parser | 12 | 12 | 0 |');
     expect(markdown).toContain('| edge_case | 20 | 20 | 0 |');
@@ -631,6 +640,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| type_annotations | 4 | 4 | 0 |');
     expect(markdown).toContain('| qualified_types | 1 | 1 | 0 |');
     expect(markdown).toContain('| method_extension | 1 | 1 | 0 |');
+    expect(markdown).toContain('| indicator_replica | 8 | 8 | 0 |');
     expect(markdown).not.toContain('Validation Errors');
   });
 
@@ -775,13 +785,13 @@ plot(signals.fast(close, 2), title="Fast")
     expect(index).toMatchObject({
       schemaVersion: 1,
       total: EXPECTED_CHECKPOINT_TOTAL,
-      byCategory: { indicator: 272, strategy: 42 },
-      bySourceKind: { official_docs: 53, public_script: 261 },
-      byPineVersion: { v4: 4, v5: 10, v6: 300 },
+      byCategory: { indicator: 280, strategy: 42 },
+      bySourceKind: { official_docs: 53, public_script: 269 },
+      byPineVersion: { v4: 4, v5: 10, v6: 308 },
       byStoragePolicy: { reduced_fixture_only: EXPECTED_CHECKPOINT_TOTAL },
     });
     expect(index.byFeatureTag).toMatchObject({
-      inputs: 17,
+      inputs: 18,
       legacy: 19,
       v4_compat: 3,
       v5_compat: 10,
@@ -795,15 +805,15 @@ plot(signals.fast(close, 2), title="Fast")
       ticker: 2,
       trailing_stop: 3,
       trend_filter: 9,
-      visuals: 41,
+      visuals: 42,
       alerts: 10,
       arrays: 26,
-      barcolor: 4,
+      barcolor: 8,
       brackets: 3,
       boxes: 4,
       box_setters: 1,
       candles: 3,
-      channels: 5,
+      channels: 6,
       currency: 1,
       custom_bars: 1,
       dashboard: 15,
@@ -815,7 +825,7 @@ plot(signals.fast(close, 2), title="Fast")
       earnings: 2,
       financial: 2,
       footprint: 1,
-      fills: 14,
+      fills: 15,
       imports: 8,
       integration: 11,
       libraries: 8,
@@ -831,7 +841,7 @@ plot(signals.fast(close, 2), title="Fast")
       multi_symbol: 1,
       objects: 7,
       momentum: 2,
-      oscillator: 10,
+      oscillator: 11,
       performance: 6,
       plot_metadata: 1,
       polylines: 2,
@@ -840,14 +850,14 @@ plot(signals.fast(close, 2), title="Fast")
       screener: 1,
       seed: 1,
       splits: 1,
-      heikin_ashi: 3,
+      heikin_ashi: 4,
       intrabar: 5,
       markers: 3,
       realtime: 4,
-      signals: 201,
-      output: 243,
-      supertrend: 1,
-      ta: 77,
+      signals: 209,
+      output: 251,
+      supertrend: 2,
+      ta: 84,
       barssince: 2,
       valuewhen: 2,
       event_memory: 1,
@@ -859,7 +869,7 @@ plot(signals.fast(close, 2), title="Fast")
       donchian: 1,
       highest: 1,
       lowest: 1,
-      kc: 2,
+      kc: 3,
       moving_average: 2,
       vwma: 1,
       wma: 1,
@@ -878,7 +888,7 @@ plot(signals.fast(close, 2), title="Fast")
       stoch: 2,
       tsi: 1,
       source_identity: 6,
-      state: 35,
+      state: 38,
       syminfo: 2,
       tables: 21,
       barstate: 10,
@@ -890,18 +900,18 @@ plot(signals.fast(close, 2), title="Fast")
       udt: 8,
       unsupported: 3,
       varip: 2,
-      volatility: 5,
+      volatility: 6,
       vwap: 3,
       wpr: 1,
       obv: 2,
       zigzag: 1,
       zones: 2,
-      rsi: 6,
+      rsi: 7,
       macd: 1,
       atr: 1,
       pvt: 1,
-      divergence: 3,
-      pivots: 4,
+      divergence: 4,
+      pivots: 5,
       parser: 12,
       edge_case: 20,
       nested_calls: 1,
@@ -914,7 +924,7 @@ plot(signals.fast(close, 2), title="Fast")
       series: 14,
       scope: 6,
       control_flow: 6,
-      var: 11,
+      var: 14,
       strings: 4,
       operators: 10,
       arithmetic: 5,
@@ -929,11 +939,12 @@ plot(signals.fast(close, 2), title="Fast")
       type_annotations: 4,
       qualified_types: 1,
       method_extension: 1,
+      indicator_replica: 8,
     });
     expect(markdown).toContain('# Pine Compatibility Coverage');
     expect(markdown).toContain(`Total checkpoints: ${EXPECTED_CHECKPOINT_TOTAL}`);
     expect(markdown).toContain('| official_docs | 53 |');
-    expect(markdown).toContain('| public_script | 261 |');
+    expect(markdown).toContain('| public_script | 269 |');
     expect(markdown).toContain(`| reduced_fixture_only | ${EXPECTED_CHECKPOINT_TOTAL} |`);
     expect(formatPineCompatibilityCoverageJson(index)).toContain(`"total": ${EXPECTED_CHECKPOINT_TOTAL}`);
   });
@@ -956,7 +967,7 @@ plot(signals.fast(close, 2), title="Fast")
         `"passed": ${EXPECTED_CHECKPOINT_PASSED}`,
       );
       expect(readFileSync(join(outDir, 'pine-compatibility-corpus.json'), 'utf8')).toContain('"actionableFailed": 0');
-      expect(readFileSync(join(outDir, 'pine-compatibility-corpus.md'), 'utf8')).toContain('Pass rate: 99.0%');
+      expect(readFileSync(join(outDir, 'pine-compatibility-corpus.md'), 'utf8')).toContain('Pass rate: 99.1%');
       expect(readFileSync(join(outDir, 'pine-compatibility-corpus.md'), 'utf8')).toContain('Actionable pass rate: 100.0%');
       expect(readFileSync(join(outDir, 'pine-compatibility-coverage.json'), 'utf8')).toContain(
         `"total": ${EXPECTED_CHECKPOINT_TOTAL}`,
