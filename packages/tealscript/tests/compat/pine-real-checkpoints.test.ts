@@ -1339,6 +1339,74 @@ plot(indexedScore(values), title="Indexed Score")
     expect(getPlot(result, 'Indexed Score').values).toEqual(Array(compatibilityBars.length).fill(9));
   });
 
+  it('locks a reduced public wrapped call layout idiom', () => {
+    // Public idiom reference: public indicator scripts often wrap declaration
+    // metadata, helper signatures, named calls, arithmetic continuations, and
+    // final plot calls when exposing configurable signal logic.
+    // Source search: https://www.tradingview.com/scripts/search/wrapped%20indicator%20call%20layout/
+    const result = runCompatScript(`
+indicator(
+    "Public Wrapped Call Layout Checkpoint",
+    overlay =
+        false,
+    max_bars_back =
+        4)
+
+normalizedFloor(
+    float source,
+    int length) =>
+    basis =
+        ta.sma(
+            source =
+                source,
+            length =
+                length)
+    distance =
+        math.max(
+            math.abs(
+                source -
+                    basis),
+            1.0)
+    basis -
+        distance
+
+floorValue =
+    normalizedFloor(
+        close,
+        3)
+gate =
+    close >
+        floorValue ?
+        1 :
+        0
+plot(
+    floorValue,
+    title =
+        "Envelope Floor")
+plot(
+    gate,
+    title =
+        "Wrapped Gate")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Envelope Floor').values)).toEqual([
+      null,
+      null,
+      102.333333,
+      103,
+      99,
+      99.666667,
+      98,
+      99.666667,
+      106,
+      107.666667,
+      108.666667,
+      110,
+    ]);
+    expect(getPlot(result, 'Wrapped Gate').values).toEqual([0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1]);
+  });
+
   it('locks a reduced public UDT array state idiom', () => {
     // Public idiom reference: market-structure scripts commonly store UDT
     // pivot records in bounded arrays, read fields from the latest record, and

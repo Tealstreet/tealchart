@@ -173,8 +173,8 @@ Phases:
    volatility-band overlays, library helpers including source-preserving helper
    wrappers and block `if` source wrappers, public strategy stats tables, UDT
    object-method state, UDT state objects with wrapped field defaults, public
-   loop-header continuation layouts, and public `varip` intrabar array tick
-   buffers.
+   loop-header continuation layouts, wrapped declaration/call layouts, and
+   public `varip` intrabar array tick buffers.
    Strategy-bracket coverage includes official broker examples plus a reduced
    public fixed-bracket strategy fixture, and trailing-stop coverage includes
    official and reduced public strategy fixtures.
@@ -549,8 +549,8 @@ impact.
 4. Pine layout parser audit fixtures: keep reduced coverage for top-level
    nested dedents, ninth-level UDF branches, wrapped indented expressions,
    wrapped function/method signatures, wrapped request calls with multiline
-   ternary arguments, and shared library/type/method blocks before deeper
-   parser architecture changes.
+   ternary arguments, shared library/type/method blocks, and public wrapped
+   declaration/call layouts before deeper parser architecture changes.
 5. Call-binding diagnostics sweep: keep signed built-in namespace typo
    diagnostics, built-in duplicate/unknown/missing/order argument diagnostics,
    visual output call signatures including `hline()`, `fill()` alias bindings,
