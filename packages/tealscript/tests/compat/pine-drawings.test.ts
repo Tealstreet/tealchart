@@ -1018,4 +1018,15 @@ plot(mixedPrice, title="Mixed Line Price")
     ]);
     expect(getPlot(result, 'Mixed Line Price').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 113]);
   });
+
+  it('uses label.style_text_outline constant for label style', () => {
+    const result = runCompatScript(`
+indicator("Text Outline Label", overlay=true)
+if barstate.islast
+    label.new(bar_index, close, text="outline", style=label.style_text_outline)
+`);
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toHaveLength(1);
+    expect(result.drawings[0]).toMatchObject({ type: 'label', style: 'text_outline' });
+  });
 });

@@ -410,7 +410,7 @@ const COLOR_FUNCTION_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly 
   ['color.from_gradient', ['value', 'bottom_value', 'top_value']],
 ]);
 
-const MATH_CONSTANT_NAMES = new Set(['math.pi', 'math.e', 'math.phi']);
+const MATH_CONSTANT_NAMES = new Set(['math.pi', 'math.e', 'math.phi', 'math.rphi']);
 const MATH_PRESERVE_NUMERIC_NAMES = new Set(['math.abs', 'math.max', 'math.min']);
 const MATH_FLOAT_RETURN_NAMES = new Set([
   'math.sqrt',
@@ -2179,6 +2179,7 @@ const DRAWING_LABEL_STYLE_VALUES = new Set([
   'flag',
   'arrowup',
   'arrowdown',
+  'text_outline',
 ]);
 const DRAWING_LABEL_STYLE_CONSTANT_VALUES = new Map([
   ['label.style_none', 'none'],
@@ -2201,6 +2202,7 @@ const DRAWING_LABEL_STYLE_CONSTANT_VALUES = new Map([
   ['label.style_flag', 'flag'],
   ['label.style_arrowup', 'arrowup'],
   ['label.style_arrowdown', 'arrowdown'],
+  ['label.style_text_outline', 'text_outline'],
 ]);
 const DRAWING_TEXT_HALIGN_VALUES = new Set(['left', 'center', 'right']);
 const DRAWING_TEXT_HALIGN_CONSTANT_VALUES = new Map([
