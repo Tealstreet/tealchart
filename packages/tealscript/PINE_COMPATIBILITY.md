@@ -305,8 +305,8 @@ coverage now locks grouped mode, length, source, toggle, and price-level inputs
 feeding plotted signal output, plus date/session/symbol/timeframe/color/notes
 inputs that gate a filtered public-style signal. It also reports Pine-style diagnostics for typed
 default-value mismatches, including `input.color()` color defaults, literal default
-`minval` / `maxval` / `options` constraint violations, invalid literal `display`
-option values, and `input.int()` /
+`minval` / `maxval` / `options` constraint violations, invalid `options`
+argument shapes and element types, invalid literal `display` option values, and `input.int()` /
 `input.float()` calls that mix `options` with range-only
 `minval`/`maxval`/`step` arguments. Input metadata diagnostics also reject
 non-string `title`/`tooltip`/`inline`/`group` values and non-boolean `confirm`
