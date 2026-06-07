@@ -2609,6 +2609,9 @@ export class TealscriptEngine {
       if (fullName === 'strategy.opentrades.capital_held') {
         return this.evaluateStrategyOpenTradesCapitalHeld();
       }
+      if (fullName === 'strategy.closedtrades.first_index') {
+        return this.evaluateStrategyClosedTradesFirstIndex();
+      }
       if (namespace === 'strategy') {
         return this.evaluateStrategy(prop);
       }
@@ -5177,6 +5180,9 @@ export class TealscriptEngine {
       if (fullName === 'strategy.opentrades.capital_held') {
         return this.evaluateStrategyOpenTradesCapitalHeld();
       }
+      if (fullName === 'strategy.closedtrades.first_index') {
+        return this.evaluateStrategyClosedTradesFirstIndex();
+      }
       if (namespace === 'strategy') {
         return this.evaluateStrategy(prop);
       }
@@ -5412,6 +5418,45 @@ export class TealscriptEngine {
         return ledger.maxRunup;
       case 'max_drawdown':
         return ledger.maxDrawdown;
+      case 'max_drawdown_percent':
+        return this.strategyInitialCapitalPercent(ledger.maxDrawdown);
+      case 'max_runup_percent':
+        return this.strategyInitialCapitalPercent(ledger.maxRunup);
+      case 'avg_trade': {
+        const closed = ledger.closedTrades;
+        return closed.length === 0 ? Number.NaN : ledger.netProfit / closed.length;
+      }
+      case 'avg_trade_percent': {
+        const closed = ledger.closedTrades;
+        if (closed.length === 0) return Number.NaN;
+        return this.strategyInitialCapitalPercent(ledger.netProfit / closed.length);
+      }
+      case 'avg_winning_trade': {
+        const winners = ledger.closedTrades.filter((t) => t.profit > 0);
+        return winners.length === 0 ? Number.NaN : ledger.grossProfit / winners.length;
+      }
+      case 'avg_winning_trade_percent': {
+        const winners = ledger.closedTrades.filter((t) => t.profit > 0);
+        if (winners.length === 0) return Number.NaN;
+        return this.strategyInitialCapitalPercent(ledger.grossProfit / winners.length);
+      }
+      case 'avg_losing_trade': {
+        const losers = ledger.closedTrades.filter((t) => t.profit < 0);
+        return losers.length === 0 ? Number.NaN : ledger.grossLoss / losers.length;
+      }
+      case 'avg_losing_trade_percent': {
+        const losers = ledger.closedTrades.filter((t) => t.profit < 0);
+        if (losers.length === 0) return Number.NaN;
+        return this.strategyInitialCapitalPercent(ledger.grossLoss / losers.length);
+      }
+      case 'max_contracts_held_all':
+        return ledger.maxContractsHeldAll;
+      case 'max_contracts_held_long':
+        return ledger.maxContractsHeldLong;
+      case 'max_contracts_held_short':
+        return ledger.maxContractsHeldShort;
+      case 'margin_liquidation_price':
+        return Number.NaN;
       default:
         throw new Error(`Unknown strategy property: ${prop}`);
     }
@@ -5421,6 +5466,10 @@ export class TealscriptEngine {
     return this.ctx.strategyLedger.openTrades.reduce((total, trade) => (
       total + (trade.entryPrice * Math.abs(trade.qty))
     ), 0);
+  }
+
+  private evaluateStrategyClosedTradesFirstIndex(): number {
+    return this.ctx.strategyLedger.closedTrades.length === 0 ? Number.NaN : 0;
   }
 
   private strategyInitialCapitalPercent(value: number): number {
