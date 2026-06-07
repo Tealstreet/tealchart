@@ -7114,6 +7114,7 @@ length = input.int(3.5)
 count = input.int("3")
 multiplier = input.float("2")
 enabled = input.bool(1)
+tint = input.color(1)
 mode = input.string(1)
 start = input.time("1700000000000")
 tf = input.timeframe(60)
@@ -7135,6 +7136,7 @@ level = input.price("101.25")
       'input.int defval must be a number',
       'input.float defval must be a number',
       'input.bool defval must be a boolean',
+      'input.color defval must be a color',
       'input.string defval must be a string',
       'input.time defval must be a number',
       'input.timeframe defval must be a string',
