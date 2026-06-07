@@ -5480,3 +5480,253 @@ plot(strategy.opentrades, title="Open")
     expect(cancelledOrder?.status).toBe('cancelled');
   });
 });
+
+// ===========================================================================================
+// Type system and enum patterns
+// Tests enum declarations, type annotations, qualified types, method extensions, and
+// type-compatibility rules from Pine v6. Enums require string-valued members to parse
+// (bare identifiers without = fail the grammar).
+// ===========================================================================================
+
+describe('Type system and enum patterns', () => {
+  it('locks enum declaration with string-valued members and conditional comparisons', () => {
+    // Enum members must have explicit string initializers (e.g. Long = "Long") — the
+    // bare-identifier-only syntax is not yet supported by the grammar.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/enums/
+    const result = runCompatScript(`
+indicator("Type Enum Basic Checkpoint")
+enum Direction
+    LongDir = "Long"
+    ShortDir = "Short"
+    FlatDir = "Flat"
+isBull = close > open
+isBear = open > close
+d = isBull ? Direction.LongDir : isBear ? Direction.ShortDir : Direction.FlatDir
+plot(d == Direction.LongDir ? 1 : 0, title="IsLong")
+plot(d == Direction.ShortDir ? 1 : 0, title="IsShort")
+plot(d == Direction.FlatDir ? 1 : 0, title="IsFlat")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Type Enum Basic Checkpoint');
+    // close > open: bars 0,1,2,5,6,7,9,11 bull; bars 3,4,8,10 bear; no flat
+    expect(getPlot(result, 'IsLong').values).toEqual([1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
+    expect(getPlot(result, 'IsShort').values).toEqual([0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0]);
+    expect(getPlot(result, 'IsFlat').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('locks enum in a switch expression routing to numeric signals', () => {
+    // Common pattern: switch on an enum value to produce an integer signal.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/enums/
+    const result = runCompatScript(`
+indicator("Type Enum Switch Checkpoint")
+enum TrendDir
+    Up = "Up"
+    Down = "Down"
+    Neutral = "Neutral"
+isBull = close > open
+isBear = open > close
+d = isBull ? TrendDir.Up : isBear ? TrendDir.Down : TrendDir.Neutral
+signal = switch d
+    TrendDir.Up => 1
+    TrendDir.Down => -1
+    TrendDir.Neutral => 0
+plot(signal, title="Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Type Enum Switch Checkpoint');
+    // bar bull→1, bear→-1, neutral→0
+    expect(getPlot(result, 'Signal').values).toEqual([1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, 1]);
+  });
+
+  // Pine's enum .title() method is not yet implemented — member access is resolved
+  // as a namespace call which the runtime does not recognise.
+  // Gap documented: type system — enum built-in methods are planned but not supported.
+  it.skip('enum .title() method returns the string representation', () => {
+    const result = runCompatScript(`
+indicator("Type Enum Title Checkpoint")
+enum Direction
+    LongDir = "Long"
+    ShortDir = "Short"
+d = Direction.LongDir
+s = d.title()
+plot(close, title="C")
+`);
+    expect(result.errors).toEqual([]);
+  });
+
+  it('locks explicit type annotations on scalar variables', () => {
+    // float/int/string/bool explicit annotations are parsed and the runtime assigns
+    // the declared type; plots confirm value pass-through is unaffected.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/type-system/
+    const result = runCompatScript(`
+indicator("Type Annotations Checkpoint")
+float x = 1.5
+int y = 5
+string s = "hello"
+bool b = true
+plot(x, title="FloatX")
+plot(y, title="IntY")
+plot(b ? 1 : 0, title="BoolB")
+plot(s == "hello" ? 1 : 0, title="StrMatch")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Type Annotations Checkpoint');
+    expect(getPlot(result, 'FloatX').values).toEqual(Array(compatibilityBars.length).fill(1.5));
+    expect(getPlot(result, 'IntY').values).toEqual(Array(compatibilityBars.length).fill(5));
+    expect(getPlot(result, 'BoolB').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'StrMatch').values).toEqual(Array(compatibilityBars.length).fill(1));
+  });
+
+  it('locks collection type annotations — array<float> and map<string, float>', () => {
+    // Generic collection constructors with explicit type params; the type annotation
+    // on the variable mirrors Pine v6 library patterns.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/arrays/
+    const result = runCompatScript(`
+indicator("Collection Type Ann Checkpoint")
+array<float> a = array.new<float>(0)
+a.push(close)
+a.push(high)
+map<string, float> m = map.new<string, float>()
+m.put("c", close)
+m.put("h", high)
+plot(a.size(), title="ArraySize")
+plot(m.size(), title="MapSize")
+plot(nz(m.get("c")), title="MapC")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Collection Type Ann Checkpoint');
+    // Both collections re-created each bar — always 2 elements
+    expect(getPlot(result, 'ArraySize').values).toEqual(Array(compatibilityBars.length).fill(2));
+    expect(getPlot(result, 'MapSize').values).toEqual(Array(compatibilityBars.length).fill(2));
+    // map.get("c") = close on each bar
+    expect(getPlot(result, 'MapC').values).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+  });
+
+  it('locks UDT type declaration with float and int fields', () => {
+    // type Block defines a UDT with two fields; .new() assigns price=close and bar=bar_index.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/objects/
+    const result = runCompatScript(`
+indicator("UDT Type Fields Checkpoint")
+type Signal
+    float price = na
+    int bar = 0
+s = Signal.new(close)
+s.bar := bar_index
+plot(s.price, title="Price")
+plot(s.bar, title="Bar")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('UDT Type Fields Checkpoint');
+    expect(getPlot(result, 'Price').values).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+    expect(getPlot(result, 'Bar').values).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+  });
+
+  it('locks user method declaration on a built-in float type', () => {
+    // Pine v6 allows extending built-in types with methods using the method keyword.
+    // method double(float this) => this * 2 attaches a callable to the float type.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/methods/
+    const result = runCompatScript(`
+indicator("Builtin Method Checkpoint")
+method double(float this) => this * 2
+method half(float this) => this / 2.0
+x = close.double()
+y = close.half()
+plot(x, title="Double")
+plot(y, title="Half")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Builtin Method Checkpoint');
+    expect(getPlot(result, 'Double').values).toEqual([204, 210, 214, 206, 198, 200, 208, 218, 216, 222, 220, 224]);
+    expect(roundSeries(getPlot(result, 'Half').values)).toEqual([51, 52.5, 53.5, 51.5, 49.5, 50, 52, 54.5, 54, 55.5, 55, 56]);
+  });
+
+  it('locks tuple return from UDF with mixed types — [float, int] destructure', () => {
+    // A UDF returning a [float, int] tuple; the caller destructures into two variables.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/user-defined-functions/
+    const result = runCompatScript(`
+indicator("Tuple Type Return Checkpoint")
+priceAndIndex() =>
+    [close, bar_index]
+[p, b] = priceAndIndex()
+plot(p, title="Price")
+plot(b, title="BarIdx")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Tuple Type Return Checkpoint');
+    expect(getPlot(result, 'Price').values).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+    expect(getPlot(result, 'BarIdx').values).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+  });
+
+  it('locks na as typed default — float x = na and int y = na coerce to the annotated type', () => {
+    // Pine allows na as the default value when a type annotation is present.
+    // na(x) returns true; nz(x, fallback) substitutes the fallback.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/type-system/
+    const result = runCompatScript(`
+indicator("NA Typed Default Checkpoint")
+float x = na
+int y = na
+xIsNa = na(x) ? 1 : 0
+yIsNa = na(y) ? 1 : 0
+safeX = nz(x, 99.0)
+safeY = nz(y, 7)
+plot(xIsNa, title="XIsNa")
+plot(yIsNa, title="YIsNa")
+plot(safeX, title="SafeX")
+plot(safeY, title="SafeY")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('NA Typed Default Checkpoint');
+    expect(getPlot(result, 'XIsNa').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'YIsNa').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'SafeX').values).toEqual(Array(compatibilityBars.length).fill(99.0));
+    expect(getPlot(result, 'SafeY').values).toEqual(Array(compatibilityBars.length).fill(7));
+  });
+
+  it('locks qualified type expressions — simple int and series float prefixes', () => {
+    // Pine v6 supports qualifier-prefixed type declarations: const/input/simple/series.
+    // simple int x = 5 declares a non-series constant; series float y = close is the
+    // standard series assignment. Both parse and execute without errors.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/type-system/
+    const result = runCompatScript(`
+indicator("Qualified Types Checkpoint")
+simple int x = 5
+series float y = close
+plot(x, title="SimpleInt")
+plot(y, title="SeriesFloat")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Qualified Types Checkpoint');
+    expect(getPlot(result, 'SimpleInt').values).toEqual(Array(compatibilityBars.length).fill(5));
+    expect(getPlot(result, 'SeriesFloat').values).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+  });
+
+  it('locks conditional type compatibility — int and float in ternary produce float', () => {
+    // In Pine, mixing int and float operands in a ternary promotes the result to float.
+    // close > 0 is always true for our test data, so result is always the int branch (1),
+    // but the output type is float. A false branch with 2.0 confirms the promotion.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/type-system/
+    const result = runCompatScript(`
+indicator("Conditional Type Compat Checkpoint")
+x = close > 0 ? 1 : 2.0
+y = close > 200 ? 3 : 4.5
+plot(x, title="X")
+plot(y, title="Y")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Conditional Type Compat Checkpoint');
+    // close > 0 always true → x = 1 (int coerced to float) on all bars
+    expect(getPlot(result, 'X').values).toEqual(Array(compatibilityBars.length).fill(1));
+    // close > 200 never true → y = 4.5 (float branch) on all bars
+    expect(getPlot(result, 'Y').values).toEqual(Array(compatibilityBars.length).fill(4.5));
+  });
+});

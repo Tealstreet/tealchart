@@ -2838,6 +2838,121 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  // ── Type system and enum patterns ─────────────────────────────────────────
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'type-enum-basic-checkpoint',
+      title: 'Type Enum Basic Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/language/enums/',
+      featureTags: ['enum', 'type_system', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'type-enum-switch-checkpoint',
+      title: 'Type Enum Switch Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/language/enums/',
+      featureTags: ['enum', 'type_system', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'type-enum-title-checkpoint',
+      title: 'Type Enum Title Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/language/enums/',
+      featureTags: ['enum', 'type_system', 'unsupported'],
+    }),
+    stages: [
+      { stage: 'parse', status: 'passed' },
+      { stage: 'semantic', status: 'passed' },
+      {
+        stage: 'runtime',
+        status: 'failed',
+        failureClass: 'unsupported_planned',
+        message: 'enum .title() built-in method is not implemented — member access is resolved as a namespace call that the runtime does not recognise',
+        diagnostics: [{
+          code: 'unsupported-feature',
+          message: 'enum .title() built-in method is not yet implemented in the runtime',
+          line: 6,
+          column: 5,
+        }],
+      },
+    ],
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'type-annotations-checkpoint',
+      title: 'Type Annotations Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/language/type-system/',
+      featureTags: ['type_system', 'type_annotations', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'type-collection-ann-checkpoint',
+      title: 'Collection Type Ann Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/language/arrays/',
+      featureTags: ['type_system', 'type_annotations', 'collections', 'arrays', 'map', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'type-udt-fields-checkpoint',
+      title: 'UDT Type Fields Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/language/objects/',
+      featureTags: ['udt', 'type_system', 'objects', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'type-builtin-method-checkpoint',
+      title: 'Builtin Method Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/language/methods/',
+      featureTags: ['methods', 'method_extension', 'type_system', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'type-tuple-return-checkpoint',
+      title: 'Tuple Type Return Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/language/user-defined-functions/',
+      featureTags: ['udf', 'tuple', 'type_system', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'type-na-typed-default-checkpoint',
+      title: 'NA Typed Default Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/language/type-system/',
+      featureTags: ['type_system', 'type_annotations', 'na', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'type-qualified-types-checkpoint',
+      title: 'Qualified Types Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/language/type-system/',
+      featureTags: ['type_system', 'qualified_types', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'type-conditional-compat-checkpoint',
+      title: 'Conditional Type Compat Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/language/type-system/',
+      featureTags: ['type_system', 'type_annotations', 'ternary', 'signals', 'runtime', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
