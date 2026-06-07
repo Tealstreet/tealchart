@@ -58,10 +58,10 @@ Public-source coverage also includes alert signal metadata, direct alert
 emission, public log signal telemetry, Heikin-Ashi synthetic ticker trend
 requests, public Supertrend signal routing, public ADX/DMI trend-strength
 filters, public Parabolic SAR reversal routing, public linear-regression
-channels, public stochastic oscillator signals, public zigzag polylines, public
-strategy performance tables, public `varip` intrabar array buffers, public
-wrapped declaration/call layouts, planned footprint request diagnostics, plus
-UDT state objects updated through user-defined methods.
+channels, public stochastic and MFI oscillator signals, public zigzag polylines,
+public strategy performance tables, public `varip` intrabar array buffers,
+public wrapped declaration/call layouts, planned footprint request diagnostics,
+plus UDT state objects updated through user-defined methods.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
 suppression, entry-direction, max-position, intraday filled-order, and
@@ -942,11 +942,12 @@ Visual output registration enforces Pine's 64 plot-output
 limit while exempting `hline()` outputs. Table creation enforces a conservative
 TealScript sandbox cap of 10,000 declared table cells across live tables.
 The checkpoint corpus tracks public MTF trend-filter, ADX/DMI trend-strength,
-Parabolic SAR reversal, linear-regression channel, stochastic oscillator,
-currency-conversion, earnings-event, corporate-action, financial-dashboard,
-economic-macro, and seed-dataset request idioms, an official lower-timeframe
-array idiom, plus a public multi-symbol screener idiom. It also tracks a public
-footprint request diagnostic as an `unsupported_planned` semantic blocker.
+Parabolic SAR reversal, linear-regression channel, stochastic and MFI
+oscillators, currency-conversion, earnings-event, corporate-action,
+financial-dashboard, economic-macro, and seed-dataset request idioms, an
+official lower-timeframe array idiom, plus a public multi-symbol screener idiom.
+It also tracks a public footprint request diagnostic as an `unsupported_planned`
+semantic blocker.
 
 Known limits: request data availability is host/provider-gated, and
 `request.footprint()` remains unsupported until the host can provide the
