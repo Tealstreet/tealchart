@@ -59,10 +59,10 @@ emission, public log signal telemetry, Heikin-Ashi synthetic ticker trend
 requests, public Supertrend signal routing, public ADX/DMI trend-strength
 filters, public Parabolic SAR reversal routing, public linear-regression
 channels, public stochastic, MFI, CCI, CMO, and TSI oscillator signals, public
-zigzag polylines, public strategy performance tables, public `varip` intrabar
-array buffers, public wrapped declaration/call layouts, planned footprint
-request diagnostics, plus UDT state objects updated through user-defined
-methods.
+ROC momentum signals, public zigzag polylines, public strategy performance
+tables, public `varip` intrabar array buffers, public wrapped declaration/call
+layouts, planned footprint request diagnostics, plus UDT state objects updated
+through user-defined methods.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
 suppression, entry-direction, max-position, intraday filled-order, and
