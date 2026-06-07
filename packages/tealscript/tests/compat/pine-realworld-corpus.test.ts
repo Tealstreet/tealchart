@@ -5336,7 +5336,7 @@ plot(strategy.opentrades, title="Open")
 `, { bars });
 
     expect(result.errors).toEqual([]);
-    // A fills for 2; B is clipped to 1 (cap=3); C would be 0
+    // A fills for 2; B is clipped to 1 to stay at cap=3
     expect(getPlot(result, 'Pos').values).toEqual([2, 3, 3]);
     expect(getPlot(result, 'Open').values).toEqual([1, 2, 2]);
     expect(result.strategy.settings.maxPositionSize).toBe(3);
