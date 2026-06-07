@@ -1483,6 +1483,81 @@ plot(bearTrend ? 1 : 0, title="Bear Trend")
     expect(getPlot(result, 'Bear Trend').values).toEqual([0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]);
   });
 
+  it('locks a reduced public Parabolic SAR reversal idiom', () => {
+    // Public idiom reference: Parabolic SAR public indicators commonly expose
+    // acceleration inputs, compare price with `ta.sar()`, and route flip markers.
+    // Source search: https://www.tradingview.com/scripts/search/parabolic%20sar%20reversal/
+    const result = runCompatScript(`
+indicator("Public Parabolic SAR Reversal Checkpoint", overlay=true)
+start = input.float(0.02, "Start")
+increment = input.float(0.02, "Increment")
+maximum = input.float(0.2, "Maximum")
+sar = ta.sar(start=start, inc=increment, max=maximum)
+isUpTrend = close > sar
+trendState = isUpTrend ? 1 : 0
+bullFlip = trendState == 1 and trendState[1] == 0
+bearFlip = trendState == 0 and trendState[1] == 1
+plot(sar, title="SAR")
+plot(isUpTrend ? close : na, title="Up Close")
+plot(not isUpTrend ? close : na, title="Down Close")
+plot(bullFlip ? 1 : 0, title="Bull Flip")
+plot(bearFlip ? 1 : 0, title="Bear Flip")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public Parabolic SAR Reversal Checkpoint');
+    expect(result.indicatorOverlay).toBe(true);
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Start', 'float'],
+      ['Increment', 'float'],
+      ['Maximum', 'float'],
+    ]);
+    expect(roundSeries(getPlot(result, 'SAR').values)).toEqual([
+      103,
+      99,
+      99,
+      99.36,
+      109,
+      109,
+      108.48,
+      96,
+      96.28,
+      96.8688,
+      97.776672,
+      99.074538,
+    ]);
+    expect(getPlot(result, 'Up Close').values).toEqual([
+      null,
+      105,
+      107,
+      103,
+      null,
+      null,
+      null,
+      109,
+      108,
+      111,
+      110,
+      112,
+    ]);
+    expect(getPlot(result, 'Down Close').values).toEqual([
+      102,
+      null,
+      null,
+      null,
+      99,
+      100,
+      104,
+      null,
+      null,
+      null,
+      null,
+      null,
+    ]);
+    expect(getPlot(result, 'Bull Flip').values).toEqual([0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Bear Flip').values).toEqual([0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]);
+  });
+
   it('locks a reduced public object-method state idiom', () => {
     // Public idiom reference: market-structure public indicators commonly keep
     // swing state in user-defined objects and update it through methods.
