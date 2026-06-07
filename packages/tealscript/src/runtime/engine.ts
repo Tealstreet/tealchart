@@ -2574,8 +2574,24 @@ export class TealscriptEngine {
     const namespace = memberPath.slice(0, -1).join('.');
     const prop = memberPath[memberPath.length - 1]!;
     const fullName = memberPath.join('.');
+    const inputTypeConstants = new Set([
+      'input.bool',
+      'input.color',
+      'input.float',
+      'input.integer',
+      'input.int',
+      'input.resolution',
+      'input.session',
+      'input.source',
+      'input.string',
+      'input.symbol',
+      'input.timeframe',
+    ]);
 
     try {
+      if (inputTypeConstants.has(fullName)) {
+        return fullName;
+      }
       if (namespace === 'barstate' && prop in this.ctx.barstate) {
         return this.ctx.barstate[prop as keyof typeof this.ctx.barstate];
       }
@@ -5183,6 +5199,21 @@ export class TealscriptEngine {
         if (fieldName && enumValues?.has(fieldName)) {
           return enumValues.get(fieldName);
         }
+      }
+      if (namespace === 'input' && [
+        'bool',
+        'color',
+        'float',
+        'integer',
+        'int',
+        'resolution',
+        'session',
+        'source',
+        'string',
+        'symbol',
+        'timeframe',
+      ].includes(prop)) {
+        return fullName;
       }
 
       // Check builtins
@@ -8270,12 +8301,31 @@ export class TealscriptEngine {
     const inputRangeArgs = ['defval', 'title', 'minval', 'maxval', 'step', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'] as const;
     const inputOptionsArgs = ['defval', 'title', 'options', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'] as const;
     const inputSimpleArgs = ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'] as const;
+    const legacyInputArgs = ['defval', 'title', 'type', 'minval', 'maxval', 'confirm', 'step', 'options', 'tooltip', 'inline', 'group', 'display', 'active'] as const;
+    const legacyInputTypeAliases = new Map<string, InputType>([
+      ['input.bool', 'bool'],
+      ['input.color', 'color'],
+      ['input.float', 'float'],
+      ['input.integer', 'int'],
+      ['input.int', 'int'],
+      ['input.resolution', 'timeframe'],
+      ['input.session', 'session'],
+      ['input.source', 'source'],
+      ['input.string', 'string'],
+      ['input.symbol', 'symbol'],
+      ['input.timeframe', 'timeframe'],
+    ]);
 
     const inferInputType = (value: unknown): InputType => {
       if (typeof value === 'number') return Number.isInteger(value) ? 'int' : 'float';
       if (typeof value === 'boolean') return 'bool';
       if (typeof value === 'string') return 'string';
       return 'source';
+    };
+
+    const normalizeInputType = (value: unknown): InputType | undefined => {
+      if (typeof value !== 'string') return undefined;
+      return legacyInputTypeAliases.get(value) ?? legacyInputTypeAliases.get(`input.${value}`);
     };
 
     const inputArg = (
@@ -8317,8 +8367,8 @@ export class TealscriptEngine {
       return value === undefined ? undefined : this.isTruthy(value);
     };
 
-    const optionsArg = (args: unknown[], namedArgs: Map<string, unknown>, names: readonly string[]): unknown[] | undefined => {
-      const value = inputArg(args, namedArgs, names, 2);
+    const optionsArg = (args: unknown[], namedArgs: Map<string, unknown>, names: readonly string[], index = 2): unknown[] | undefined => {
+      const value = inputArg(args, namedArgs, names, index);
       return Array.isArray(value) ? value : undefined;
     };
 
@@ -8379,6 +8429,28 @@ export class TealscriptEngine {
       return commonMetadata(args, namedArgs, inputSimpleArgs, 2);
     };
 
+    const legacyMetadataForInput = (type: InputType, args: unknown[], namedArgs: Map<string, unknown>): InputMetadata => {
+      const metadata: InputMetadata = {
+        confirm: optionalBoolArg(args, namedArgs, legacyInputArgs, 5),
+        tooltip: optionalStringArg(args, namedArgs, legacyInputArgs, 8),
+        inline: optionalStringArg(args, namedArgs, legacyInputArgs, 9),
+        group: optionalStringArg(args, namedArgs, legacyInputArgs, 10),
+        display: inputArg(args, namedArgs, legacyInputArgs, 11),
+        active: inputArg(args, namedArgs, legacyInputArgs, 12),
+      };
+
+      if (type === 'int' || type === 'float') {
+        metadata.minval = optionalNumberArg(args, namedArgs, legacyInputArgs, 3);
+        metadata.maxval = optionalNumberArg(args, namedArgs, legacyInputArgs, 4);
+        metadata.step = optionalNumberArg(args, namedArgs, legacyInputArgs, 6);
+      }
+      if (type === 'int' || type === 'float' || type === 'string' || type === 'timeframe') {
+        metadata.options = optionsArg(args, namedArgs, legacyInputArgs, 7);
+      }
+
+      return metadata;
+    };
+
     const validateInputDefault = (type: InputType, defval: unknown, metadata: InputMetadata): void => {
       if ((type === 'int' || type === 'float' || type === 'price' || type === 'time') && typeof defval !== 'number') {
         throw new Error(`input.${type} defval must be a number`);
@@ -8403,11 +8475,15 @@ export class TealscriptEngine {
       }
     };
 
-    const createInputFunc = (type: InputType) => {
+    const createInputFunc = (
+      type: InputType,
+      names: readonly string[] = inputSimpleArgs,
+      metadataResolver: (type: InputType, args: unknown[], namedArgs: Map<string, unknown>) => InputMetadata = metadataForInput,
+    ) => {
       return (args: unknown[], namedArgs: Map<string, unknown>, ctx: ExecutionContext) => {
-        const defval = inputArg(args, namedArgs, inputSimpleArgs, 0);
-        const title = this.toStringValue(inputArg(args, namedArgs, inputSimpleArgs, 1, type));
-        const metadata = metadataForInput(type, args, namedArgs);
+        const defval = inputArg(args, namedArgs, names, 0);
+        const title = this.toStringValue(inputArg(args, namedArgs, names, 1, type));
+        const metadata = metadataResolver(type, args, namedArgs);
 
         const id = `input_${title}`;
 
@@ -8426,7 +8502,47 @@ export class TealscriptEngine {
       };
     };
 
+    const createSourceInputFunc = (names: readonly string[]) => {
+      return (args: unknown[], namedArgs: Map<string, unknown>, ctx: ExecutionContext) => {
+        const rawDefval = inputArg(args, namedArgs, names, 0); // Should be a series like 'close'
+        const defval = this.unwrapKnownSourceValue(rawDefval);
+        const title = this.toStringValue(inputArg(args, namedArgs, names, 1, 'Source'));
+        const id = `input_${title}`;
+        const metadata = names === legacyInputArgs
+          ? legacyMetadataForInput('source', args, namedArgs)
+          : {
+              tooltip: optionalStringArg(args, namedArgs, inputSimpleArgs, 2),
+              inline: optionalStringArg(args, namedArgs, inputSimpleArgs, 3),
+              group: optionalStringArg(args, namedArgs, inputSimpleArgs, 4),
+              confirm: optionalBoolArg(args, namedArgs, inputSimpleArgs, 5),
+              display: inputArg(args, namedArgs, inputSimpleArgs, 6),
+              active: inputArg(args, namedArgs, inputSimpleArgs, 7),
+            };
+
+        if (ctx.bar_index === 0) {
+          ctx.registerInput({
+            id,
+            type: 'source',
+            title,
+            defval,
+            ...metadata,
+          });
+        }
+
+        const inputValue = ctx.getInput(id);
+        const registeredDefault = ctx.inputDefinitions.find((input) => input.id === id)?.defval;
+        if (inputValue === undefined || inputValue === registeredDefault) {
+          return rawDefval;
+        }
+        return this.resolveInputSourceValue(inputValue, ctx);
+      };
+    };
+
     this.builtins.set('input', (args, namedArgs, ctx) => {
+      const explicitType = normalizeInputType(inputArg(args, namedArgs, legacyInputArgs, 2));
+      if (explicitType === 'source') return createSourceInputFunc(legacyInputArgs)(args, namedArgs, ctx);
+      if (explicitType) return createInputFunc(explicitType, legacyInputArgs, legacyMetadataForInput)(args, namedArgs, ctx);
+
       const defval = inputArg(args, namedArgs, inputSimpleArgs, 0);
       return createInputFunc(inferInputType(defval))(args, namedArgs, ctx);
     });
@@ -8444,37 +8560,7 @@ export class TealscriptEngine {
     this.builtins.set('input.enum', createInputFunc('enum'));
 
     // input.source is special - it returns a series
-    this.builtins.set('input.source', (args, namedArgs, ctx) => {
-      const rawDefval = inputArg(args, namedArgs, inputSimpleArgs, 0); // Should be a series like 'close'
-      const defval = this.unwrapKnownSourceValue(rawDefval);
-      const title = this.toStringValue(inputArg(args, namedArgs, inputSimpleArgs, 1, 'Source'));
-      const id = `input_${title}`;
-      const metadata = {
-        tooltip: optionalStringArg(args, namedArgs, inputSimpleArgs, 2),
-        inline: optionalStringArg(args, namedArgs, inputSimpleArgs, 3),
-        group: optionalStringArg(args, namedArgs, inputSimpleArgs, 4),
-        confirm: optionalBoolArg(args, namedArgs, inputSimpleArgs, 5),
-        display: inputArg(args, namedArgs, inputSimpleArgs, 6),
-        active: inputArg(args, namedArgs, inputSimpleArgs, 7),
-      };
-
-      if (ctx.bar_index === 0) {
-        ctx.registerInput({
-          id,
-          type: 'source',
-          title,
-          defval,
-          ...metadata,
-        });
-      }
-
-      const inputValue = ctx.getInput(id);
-      const registeredDefault = ctx.inputDefinitions.find((input) => input.id === id)?.defval;
-      if (inputValue === undefined || inputValue === registeredDefault) {
-        return rawDefval;
-      }
-      return this.resolveInputSourceValue(inputValue, ctx);
-    });
+    this.builtins.set('input.source', createSourceInputFunc(inputSimpleArgs));
   }
 
   private resolveInputSourceValue(value: unknown, ctx: ExecutionContext): unknown {

@@ -162,6 +162,25 @@ const INPUT_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['input.time', 'int'],
   ['input.timeframe', 'string'],
 ]);
+const LEGACY_INPUT_TYPE_ALIASES = new Map<string, string>([
+  ['input.bool', 'input.bool'],
+  ['input.color', 'input.color'],
+  ['input.float', 'input.float'],
+  ['input.integer', 'input.int'],
+  ['input.int', 'input.int'],
+  ['input.resolution', 'input.timeframe'],
+  ['input.session', 'input.session'],
+  ['input.source', 'input.source'],
+  ['input.string', 'input.string'],
+  ['input.symbol', 'input.symbol'],
+  ['input.timeframe', 'input.timeframe'],
+]);
+const LEGACY_INPUT_TYPE_CONSTANT_NAMES = new Set(LEGACY_INPUT_TYPE_ALIASES.keys());
+const LEGACY_INPUT_SIGNATURE: BuiltinSignature = {
+  params: ['defval', 'title', 'type', 'minval', 'maxval', 'confirm', 'step', 'options', 'tooltip', 'inline', 'group', 'display', 'active'],
+  minArgs: 1,
+  allowNamedPrefixWithPositional: true,
+};
 
 const INPUT_DEFAULT_TYPE_REQUIREMENTS = new Map<string, 'bool' | 'color' | 'int' | 'number' | 'string'>([
   ['input.bool', 'bool'],
@@ -4286,6 +4305,9 @@ class SemanticChecker {
   }
 
   private resolveBuiltinSignature(displayName: string, expression: CallExpression, scope: SemanticScope): BuiltinSignature | undefined {
+    if (displayName === 'input' && this.legacyInputTypeCallName(expression)) {
+      return LEGACY_INPUT_SIGNATURE;
+    }
     if (displayName === 'label.new') {
       return this.usesLabelPointOverload(expression, scope) ? LABEL_NEW_POINT_SIGNATURE : LABEL_NEW_COORDINATE_SIGNATURE;
     }
@@ -4296,6 +4318,23 @@ class SemanticChecker {
       return this.usesBoxPointOverload(expression, scope) ? BOX_NEW_POINT_SIGNATURE : BOX_NEW_COORDINATE_SIGNATURE;
     }
     return BUILTIN_SIGNATURES.get(displayName) ?? BUILTIN_SIGNATURES.get(canonicalBuiltinName(displayName));
+  }
+
+  private legacyInputTypeCallName(expression: CallExpression): string | undefined {
+    const typeArgument = this.getCallArgument(expression.arguments, 'type', 2);
+    if (!typeArgument) return undefined;
+    if (typeArgument.type === 'MemberExpression') {
+      return LEGACY_INPUT_TYPE_ALIASES.get(this.memberPath(typeArgument).join('.'));
+    }
+    if (typeArgument.type === 'StringLiteral') {
+      return LEGACY_INPUT_TYPE_ALIASES.get(typeArgument.value) ?? LEGACY_INPUT_TYPE_ALIASES.get(`input.${typeArgument.value}`);
+    }
+    return undefined;
+  }
+
+  private effectiveInputCallName(expression: CallExpression): string {
+    const displayName = this.memberPath(expression.callee).join('.');
+    return displayName === 'input' ? (this.legacyInputTypeCallName(expression) ?? displayName) : displayName;
   }
 
   private usesLabelPointOverload(expression: CallExpression, scope: SemanticScope): boolean {
@@ -4798,7 +4837,7 @@ class SemanticChecker {
   }
 
   private checkInputDefaultValueType(expression: CallExpression, scope: SemanticScope): void {
-    const displayName = this.memberPath(expression.callee).join('.');
+    const displayName = this.effectiveInputCallName(expression);
     if (displayName === 'input.enum') {
       this.checkInputEnumDefaultValueType(expression, scope);
       return;
@@ -4840,10 +4879,10 @@ class SemanticChecker {
   }
 
   private checkInputBoolOptionArguments(expression: CallExpression, scope: SemanticScope): void {
-    const displayName = this.memberPath(expression.callee).join('.');
+    const displayName = this.effectiveInputCallName(expression);
     if (!isInputCallName(displayName)) return;
 
-    const signature = BUILTIN_SIGNATURES.get(displayName);
+    const signature = this.resolveBuiltinSignature(this.memberPath(expression.callee).join('.'), expression, scope);
     if (!signature) return;
 
     this.checkBuiltinArgumentKind(expression, scope, displayName, signature.params, 'confirm', 'boolean');
@@ -4851,10 +4890,10 @@ class SemanticChecker {
   }
 
   private checkInputStringOptionArguments(expression: CallExpression, scope: SemanticScope): void {
-    const displayName = this.memberPath(expression.callee).join('.');
+    const displayName = this.effectiveInputCallName(expression);
     if (!isInputCallName(displayName)) return;
 
-    const signature = BUILTIN_SIGNATURES.get(displayName);
+    const signature = this.resolveBuiltinSignature(this.memberPath(expression.callee).join('.'), expression, scope);
     if (!signature) return;
 
     for (const parameterName of ['title', 'tooltip', 'inline', 'group']) {
@@ -4863,10 +4902,10 @@ class SemanticChecker {
   }
 
   private checkInputOptionsArgumentType(expression: CallExpression, scope: SemanticScope): void {
-    const displayName = this.memberPath(expression.callee).join('.');
+    const displayName = this.effectiveInputCallName(expression);
     if (!isInputCallName(displayName)) return;
 
-    const signature = BUILTIN_SIGNATURES.get(displayName);
+    const signature = this.resolveBuiltinSignature(this.memberPath(expression.callee).join('.'), expression, scope);
     if (!signature) return;
 
     const parameterNames = this.resolveSignatureParams(expression.arguments, signature);
@@ -4984,6 +5023,10 @@ class SemanticChecker {
     if (expression.type === 'UnaryExpression' && expression.argument.type === 'NumericLiteral') {
       if (expression.operator === '-') return -expression.argument.value;
       if (expression.operator === '+') return expression.argument.value;
+    }
+    if (expression.type === 'MemberExpression') {
+      const memberName = this.memberPath(expression).join('.');
+      if (LEGACY_INPUT_TYPE_CONSTANT_NAMES.has(memberName)) return memberName;
     }
     return undefined;
   }
@@ -7491,6 +7534,10 @@ class SemanticChecker {
           const taMemberType = this.inferTaMemberType(expression);
           if (taMemberType) return taMemberType;
         }
+        if (expression.object.type === 'Identifier' && expression.object.name === 'input') {
+          const inputConstantType = this.inferInputTypeConstantType(expression);
+          if (inputConstantType) return inputConstantType;
+        }
         const drawingAllType = this.inferDrawingAllMemberType(expression);
         if (drawingAllType) return drawingAllType;
         if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
@@ -7891,6 +7938,14 @@ class SemanticChecker {
   private inferInputCallType(expression: CallExpression, scope: SemanticScope, calleePath: string[]): SemanticType | undefined {
     const calleeName = calleePath.join('.');
     if (calleeName === 'input') {
+      const explicitTypeName = this.legacyInputTypeCallName(expression);
+      if (explicitTypeName === 'input.source') {
+        const source = this.inferCallArgumentType(expression, scope, ['defval'], 0);
+        return source ? { ...source, qualifier: source.qualifier ?? 'series' } : { kind: 'unknown', qualifier: 'series' };
+      }
+      const explicitKind = explicitTypeName ? INPUT_RETURN_TYPES.get(explicitTypeName) : undefined;
+      if (explicitKind) return { kind: explicitKind, qualifier: 'input' };
+
       const defval = this.inferCallArgumentType(expression, scope, ['defval'], 0);
       if (!defval || defval.kind === 'unknown') return { kind: 'unknown', qualifier: 'input' };
       if (defval.kind === 'bool' || defval.kind === 'float' || defval.kind === 'int' || defval.kind === 'string') {
@@ -7909,6 +7964,10 @@ class SemanticChecker {
 
     const kind = INPUT_RETURN_TYPES.get(calleeName);
     return kind ? { kind, qualifier: 'input' } : undefined;
+  }
+
+  private inferInputTypeConstantType(expression: MemberExpression): SemanticType | undefined {
+    return LEGACY_INPUT_TYPE_CONSTANT_NAMES.has(this.memberPath(expression).join('.')) ? { kind: 'string', qualifier: 'const' } : undefined;
   }
 
   private inferColorCallType(expression: CallExpression, scope: SemanticScope, calleePath: string[]): SemanticType | undefined {
@@ -8601,6 +8660,8 @@ class SemanticChecker {
     if (drawingAllType) return drawingAllType;
     const taMemberType = this.inferTaMemberType(expression);
     if (taMemberType) return taMemberType;
+    const inputConstantType = this.inferInputTypeConstantType(expression);
+    if (inputConstantType) return inputConstantType;
     const importedConstantType = this.inferImportedConstantMemberType(expression, scope);
     if (importedConstantType) return importedConstantType;
     const enumType = this.inferEnumMemberType(expression, scope);
