@@ -162,6 +162,12 @@ Current `ta.*` progress:
 - A source-linked public OBV signal checkpoint locks the common `ta.obv`
   cumulative-volume momentum idiom with EMA signal line and rising/falling
   routing over deterministic close/volume bars.
+- Tuple-returning TA functions (`ta.bb`, `ta.macd`, `ta.dmi`, `ta.supertrend`,
+  `ta.kc`, `ta.vwap` with stdev_mult) now support named member access:
+  `bb = ta.bb(close, 20, 2); plot(bb.upper)` is equivalent to tuple
+  destructuring. Supported field names: `basis`/`middle`, `upper`, `lower`
+  (bb/kc/vwap); `macd`, `signal`, `hist` (macd); `plus`, `minus`, `adx` (dmi);
+  `supertrend`, `direction` (supertrend).
 
 Current `str.*` progress:
 

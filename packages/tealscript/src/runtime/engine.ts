@@ -230,6 +230,15 @@ const MONTH_NAMES = [
 
 const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const;
 
+// Maps Pine tuple member names to array indices for TA functions that return arrays.
+// bb/kc: [middle/basis, upper, lower]; macd: [macd, signal, hist];
+// dmi: [plus, minus, adx]; supertrend: [supertrend, direction]; vwap: [vwap, upper, lower]
+const TUPLE_FIELD_INDEX: Record<string, number> = {
+  middle: 0, basis: 0, vwap: 0, macd: 0, plus: 0, supertrend: 0,
+  upper: 1, signal: 1, minus: 1, direction: 1,
+  lower: 2, hist: 2, adx: 2,
+};
+
 /**
  * Execution result
  */
@@ -5248,6 +5257,10 @@ export class TealscriptEngine {
         if (isPineUdtObject(value)) {
           return getUdtField(value, prop);
         }
+        if (Array.isArray(value)) {
+          const idx = TUPLE_FIELD_INDEX[prop];
+          if (idx !== undefined && idx < value.length) return value[idx];
+        }
       }
     }
 
@@ -5257,6 +5270,10 @@ export class TealscriptEngine {
     }
     if (isPineUdtObject(object)) {
       return getUdtField(object, expr.property.name);
+    }
+    if (Array.isArray(object)) {
+      const idx = TUPLE_FIELD_INDEX[expr.property.name];
+      if (idx !== undefined && idx < object.length) return object[idx];
     }
 
     throw new Error('Member access not supported except for namespaced constants and user-defined type fields');
