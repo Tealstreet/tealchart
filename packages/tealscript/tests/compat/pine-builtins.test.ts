@@ -1588,6 +1588,8 @@ namedColor = color.new(color=color.rgb(red=1, green=2, blue=3), transp=25)
 namedChannelColor = color.rgb(red=color.r(color=baseColor), green=color.g(color=namedColor), blue=color.b(color=namedColor), transp=color.t(color=derivedColor))
 prefixBaseColor = color.rgb(red=10, 20, 30)
 prefixDerivedColor = color.new(color=prefixBaseColor, 40)
+clampedTransparent = color.new(color=prefixBaseColor, transp=100 + 50)
+clampedOpaque = color.rgb(red=10, green=20, blue=30, transparency=0 - 20)
 signal = ta.rsi(close, 7)
 signalColor = color.from_gradient(signal, 0, 100, color.rgb(255, 0, 0), color.rgb(0, 255, 0, 50))
 namedSignalColor = color.from_gradient(value=signal, bottom_value=0, top_value=100, bottom_color=color.rgb(255, 0, 0), top_color=color.rgb(0, 255, 0, 50))
@@ -1596,6 +1598,8 @@ plot(close, title="Close", color=derivedColor)
 plot(open, title="Named", color=namedColor)
 plot(low, title="Named Channels", color=namedChannelColor)
 plot(high, title="Prefix Named", color=prefixDerivedColor)
+plot(high, title="Clamped Transparent", color=clampedTransparent)
+plot(high, title="Clamped Opaque", color=clampedOpaque)
 plot(high, title="Hidden", color=color.none)
 plot(signal, title="Signal", color=signalColor)
 plot(signal, title="Named Signal", color=namedSignalColor)
@@ -1607,6 +1611,8 @@ plot(signal, title="Prefix Signal", color=prefixSignalColor)
     expect(getPlot(result, 'Named').color).toEqual(Array(compatibilityBars.length).fill('#010203BF'));
     expect(getPlot(result, 'Named Channels').color).toEqual(Array(compatibilityBars.length).fill('#FF020380'));
     expect(getPlot(result, 'Prefix Named').color).toEqual(Array(compatibilityBars.length).fill('#0A141E99'));
+    expect(getPlot(result, 'Clamped Transparent').color).toEqual(Array(compatibilityBars.length).fill('#0A141E00'));
+    expect(getPlot(result, 'Clamped Opaque').color).toEqual(Array(compatibilityBars.length).fill('#0A141EFF'));
     expect(getPlot(result, 'Hidden').color).toEqual(Array(compatibilityBars.length).fill(null));
     expect(roundSeries(getPlot(result, 'Signal').values)).toEqual([
       null,
