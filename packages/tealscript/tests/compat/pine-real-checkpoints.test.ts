@@ -1816,6 +1816,90 @@ plot(bearSignal ? 1 : 0, title="Bear Signal")
     expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]);
   });
 
+  it('locks a reduced public event-memory signal idiom', () => {
+    // Public idiom reference: trigger/confirmation scripts commonly remember
+    // the latest signal price and the number of bars since that trigger.
+    // Source search: https://www.tradingview.com/scripts/search/bars%20since%20signal%20valuewhen/
+    const result = runCompatScript(`
+indicator("Public Event Memory Signal Checkpoint")
+length = input.int(3, "Length")
+basis = ta.sma(close, length)
+trigger = ta.crossover(close, basis)
+barsSinceTrigger = ta.barssince(trigger)
+triggerClose = ta.valuewhen(trigger, close, 0)
+previousTriggerClose = ta.valuewhen(trigger, close, 1)
+freshSignal = barsSinceTrigger <= 2 and close > triggerClose
+plot(basis, title="Basis")
+plot(barsSinceTrigger, title="Bars Since Trigger")
+plot(triggerClose, title="Trigger Close")
+plot(previousTriggerClose, title="Previous Trigger Close")
+plot(freshSignal ? 1 : 0, title="Fresh Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public Event Memory Signal Checkpoint');
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Length', 'int'],
+    ]);
+    expect(roundSeries(getPlot(result, 'Basis').values)).toEqual([
+      null,
+      null,
+      104.666667,
+      105,
+      103,
+      100.666667,
+      101,
+      104.333333,
+      107,
+      109.333333,
+      109.666667,
+      111,
+    ]);
+    expect(getPlot(result, 'Bars Since Trigger').values).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      0,
+      1,
+      2,
+      3,
+      4,
+      0,
+    ]);
+    expect(getPlot(result, 'Trigger Close').values).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      104,
+      104,
+      104,
+      104,
+      104,
+      112,
+    ]);
+    expect(getPlot(result, 'Previous Trigger Close').values).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      104,
+    ]);
+    expect(getPlot(result, 'Fresh Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0]);
+  });
+
   it('locks a reduced public moving-average ribbon signal idiom', () => {
     // Public idiom reference: moving-average ribbon scripts commonly expose
     // multiple average lengths and route trend state from fast/slow overlays.
