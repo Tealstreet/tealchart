@@ -7170,6 +7170,29 @@ tf = input.timeframe("240", "Timeframe", ["15", "60"])
     ]);
   });
 
+  it('reports non-boolean Pine input confirm and active metadata', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Input Boolean Metadata")
+enabled = input.bool(true, "Enabled")
+enum Direction
+    long = "Long"
+    short = "Short"
+badConfirm = input.int(14, "Length", confirm=1)
+badActive = input.float(2.0, "Multiplier", active="yes")
+badEnum = input.enum(Direction.long, "Direction", active=1)
+badSource = input.source(close, "Source", confirm="later")
+okActive = input.price(101.25, "Level", active=enabled, confirm=false)
+plot(badConfirm + badActive + badSource + okActive)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'input.int confirm must be a boolean, got int',
+      'input.float active must be a boolean, got string',
+      'input.enum active must be a boolean, got int',
+      'input.source confirm must be a boolean, got string',
+    ]);
+  });
+
   it('reports duplicate Pine input bindings against the selected overload', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate Input Args")
