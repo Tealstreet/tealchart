@@ -1246,10 +1246,7 @@ plot(r, title="RSI")
     ]);
   });
 
-  // tostring() is the v5 global alias for str.tostring(). Not yet implemented.
-  // Error: "Unknown function: tostring"
-  // Gap documented in PINE_V6_REFERENCE_GAP.md under "Pine v5 Compatibility Gaps".
-  it.skip('v5 tostring() global alias for str.tostring()', () => {
+  it('locks v5 tostring() global alias for str.tostring()', () => {
     const result = runCompatScript(`
 //@version=5
 indicator("V5 Tostring Checkpoint")
