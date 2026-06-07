@@ -162,8 +162,9 @@ const INPUT_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['input.timeframe', 'string'],
 ]);
 
-const INPUT_DEFAULT_TYPE_REQUIREMENTS = new Map<string, 'bool' | 'int' | 'number' | 'string'>([
+const INPUT_DEFAULT_TYPE_REQUIREMENTS = new Map<string, 'bool' | 'color' | 'int' | 'number' | 'string'>([
   ['input.bool', 'bool'],
+  ['input.color', 'color'],
   ['input.float', 'number'],
   ['input.int', 'int'],
   ['input.price', 'number'],
