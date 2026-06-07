@@ -11,6 +11,7 @@ import {
   seedRequestSymbol,
   TealscriptEngine,
   type Bar,
+  type PlotOutput,
 } from '../../src/runtime';
 import { compatibilityBars, getPlot, roundSeries, runCompatScript } from './fixtures';
 
@@ -59,6 +60,68 @@ plot(array.size(values), title="Array Size")
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'First Close').values).toEqual(Array(compatibilityBars.length).fill(102));
     expect(getPlot(result, 'Array Size').values).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+  });
+
+  it('locks a reduced public varip intrabar array idiom', () => {
+    // Public idiom reference: realtime public scripts commonly use `varip`
+    // arrays to collect values across same-bar tick executions, then clear the
+    // buffer on the next bar.
+    // Source search: https://www.tradingview.com/scripts/search/varip%20array/
+    const script = `
+indicator("Public Varip Array Checkpoint")
+varip ticks = array.new<float>()
+if barstate.isnew
+    array.clear(ticks)
+if barstate.isrealtime
+    array.push(ticks, close)
+plot(array.size(ticks), title="Tick Count")
+plot(array.size(ticks) > 0 ? array.get(ticks, array.size(ticks) - 1) : na, title="Last Tick")
+`;
+    const ast = parse(script);
+    const bars: Bar[] = [
+      { time: 1_700_000_000_000, open: 100, high: 101, low: 99, close: 100.25, volume: 100 },
+      { time: 1_700_000_060_000, open: 101, high: 102, low: 100, close: 101.25, volume: 110 },
+      { time: 1_700_000_120_000, open: 102, high: 103, low: 101, close: 102.25, volume: 120 },
+    ];
+    const engine = new TealscriptEngine();
+
+    const historical = engine.execute(ast, bars);
+    const historicalTickCount = [...getPlot(historical, 'Tick Count').values];
+    const historicalLastTick = [...getPlot(historical, 'Last Tick').values];
+    const realtimeBar: Bar = {
+      time: 1_700_000_180_000,
+      open: 103,
+      high: 104,
+      low: 102,
+      close: 103.25,
+      volume: 130,
+    };
+    const firstTick = engine.updateBar(ast, realtimeBar);
+    const firstTickCount = [...getRealtimePlot(firstTick, 'Tick Count').values];
+    const firstLastTick = [...getRealtimePlot(firstTick, 'Last Tick').values];
+    const secondTick = engine.updateBar(ast, { ...realtimeBar, close: 103.75 });
+    const secondTickCount = [...getRealtimePlot(secondTick, 'Tick Count').values];
+    const secondLastTick = [...getRealtimePlot(secondTick, 'Last Tick').values];
+    const nextBar = engine.updateBar(ast, {
+      time: 1_700_000_240_000,
+      open: 104,
+      high: 105,
+      low: 103,
+      close: 104.25,
+      volume: 140,
+    });
+    const nextBarTickCount = [...getRealtimePlot(nextBar, 'Tick Count').values];
+    const nextBarLastTick = [...getRealtimePlot(nextBar, 'Last Tick').values];
+
+    expect(historical.errors).toEqual([]);
+    expect(historicalTickCount).toEqual([0, 0, 0]);
+    expect(historicalLastTick).toEqual([null, null, null]);
+    expect(firstTickCount).toEqual([0, 0, 0, 1]);
+    expect(firstLastTick).toEqual([null, null, null, 103.25]);
+    expect(secondTickCount).toEqual([0, 0, 0, 2]);
+    expect(secondLastTick).toEqual([null, null, null, 103.75]);
+    expect(nextBarTickCount).toEqual([0, 0, 0, 3, 1]);
+    expect(nextBarLastTick).toEqual([null, null, null, 103.75, 104.25]);
   });
 
   it('locks a reduced official max bars back idiom', () => {
@@ -3714,3 +3777,11 @@ plot(reqSum, title="Request Sum")
     expect(getPlot(result, 'Request Sum').values).toEqual([0]);
   });
 });
+
+function getRealtimePlot(plots: PlotOutput[], title: string): PlotOutput {
+  const plot = plots.find((candidate) => candidate.title === title || candidate.id === `plot_${title}`);
+  if (!plot) {
+    throw new Error(`Expected realtime plot "${title}" to exist. Found: ${plots.map((candidate) => candidate.title).join(', ')}`);
+  }
+  return plot;
+}

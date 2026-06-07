@@ -46,6 +46,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     stages: passedThroughRuntime,
   },
   {
+    ledgerEntry: publicSearchEntry({
+      id: 'public-varip-array-checkpoint',
+      title: 'Public Varip Array Checkpoint',
+      searchContext: 'TradingView public scripts search: varip array',
+      featureTags: ['arrays', 'varip', 'realtime', 'intrabar', 'state'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
     ledgerEntry: officialDocsEntry({
       id: 'official-max-bars-back-checkpoint',
       title: 'Official Max Bars Back Checkpoint',
