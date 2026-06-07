@@ -124,6 +124,9 @@ Current `ta.*` progress:
 - A source-linked public linear-regression channel checkpoint locks the common
   `ta.linreg()` basis/deviation-band and slope-routing idiom over deterministic
   bars.
+- A source-linked public stochastic signal checkpoint locks the common
+  `ta.stoch()` K/D smoothing and overbought/oversold signal-routing idiom over
+  deterministic bars.
 
 Current `str.*` progress:
 
