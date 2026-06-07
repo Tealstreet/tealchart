@@ -279,10 +279,11 @@ analysis preserves known scalar TA helper return types for downstream
 assignment diagnostics, including scalar `ta.vwap()` overloads and
 source-preserving `ta.change()` and `ta.valuewhen()` results, and rejects
 common non-numeric TA helper arguments plus non-boolean TA condition and option
-arguments before runtime. Legacy public-script aliases `sma()`, `ema()`,
-`rsi()`, `highest()`, `lowest()`, `cross()`, `crossover()`, and `crossunder()`
-route through their `ta.*` equivalents with the same source preservation,
-return inference, call-shape diagnostics, and runtime behavior.
+arguments before runtime. Legacy public-script aliases for the supported TA
+helper set route through their `ta.*` equivalents, including common scalar,
+window, event, cross, channel, tuple-returning, and trend helpers, with the same
+source preservation, return inference, call-shape diagnostics, and runtime
+behavior.
 
 ## Common `str.*` Coverage
 

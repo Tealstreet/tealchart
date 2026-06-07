@@ -24,8 +24,15 @@ rangeHigh = highest(2)
 rangeLow = lowest(2)
 isCross = cross(fast, slow) or crossover(fast, slow) or crossunder(fast, slow)
 momentum = rsi(close, 5)
+[macdLine, signalLine, histLine] = macd(close, 3, 6, 2)
+[basis, upper, lower] = bb(close, 3, 2.0)
+[kcBasis, kcUpper, kcLower] = kc(close, 3, 1.25)
+[plusDi, minusDi, adx] = dmi(3, 3)
+[trendLine, direction] = supertrend(2.0, 3)
+smooth = atr(3) + stdev(close, 3) + variance(close, 3) + linreg(close, 3, 0) + wma(close, 3) + vwma(close, 3)
+events = barssince(close > open) + valuewhen(close > open, close, 0) + highestbars(high, 3) + lowestbars(low, 3)
 requested = security(syminfo.tickerid, "2", close, lookahead=barmerge.lookahead_on)
-plot(isCross ? requested + momentum + rangeHigh - rangeLow : fast + slow)
+plot(isCross ? requested + momentum + rangeHigh - rangeLow + smooth + events + macdLine + signalLine + histLine + basis + upper + lower + kcBasis + kcUpper + kcLower + plusDi + minusDi + adx + trendLine + direction : fast + slow)
 `));
 
     expect(result.diagnostics).toEqual([]);
