@@ -155,6 +155,49 @@ plot(level, title="Level")
     expect(getPlot(result, 'Level').values).toEqual(Array(compatibilityBars.length).fill(104.5));
   });
 
+  it('locks a reduced public syminfo metadata idiom', () => {
+    // Public idiom reference: symbol-aware public indicators commonly derive
+    // labels, routing gates, and tick-normalized levels from `syminfo.*`
+    // metadata supplied by the host chart.
+    // Source search: https://www.tradingview.com/scripts/search/syminfo%20metadata/
+    const result = runCompatScript(`
+indicator("Public Syminfo Metadata Checkpoint")
+symbolLabel = syminfo.prefix + ":" + syminfo.ticker
+isStock = syminfo.type == "stock"
+isRegular = syminfo.session == "regular"
+tickValue = syminfo.mintick * syminfo.pointvalue
+roundedClose = math.round_to_mintick(close)
+metadataSignal = isStock and isRegular and syminfo.currency == "USD" and syminfo.root == "AAPL"
+plot(str.length(symbolLabel), title="Symbol Label Length")
+plot(tickValue, title="Tick Value")
+plot(roundedClose, title="Rounded Close")
+plot(metadataSignal ? 1 : 0, title="Metadata Signal")
+`, {
+      engineOptions: {
+        runtime: {
+          syminfo: {
+            ticker: 'AAPL',
+            tickerid: 'NASDAQ:AAPL',
+            prefix: 'NASDAQ',
+            root: 'AAPL',
+            type: 'stock',
+            session: 'regular',
+            currency: 'USD',
+            mintick: 0.25,
+            pricescale: 4,
+            pointvalue: 50,
+          },
+        },
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Symbol Label Length').values).toEqual(Array(compatibilityBars.length).fill(11));
+    expect(getPlot(result, 'Tick Value').values).toEqual(Array(compatibilityBars.length).fill(12.5));
+    expect(getPlot(result, 'Rounded Close').values).toEqual(compatibilityBars.map((bar) => bar.close));
+    expect(getPlot(result, 'Metadata Signal').values).toEqual(Array(compatibilityBars.length).fill(1));
+  });
+
   it('locks a reduced public varip intrabar array idiom', () => {
     // Public idiom reference: realtime public scripts commonly use `varip`
     // arrays to collect values across same-bar tick executions, then clear the

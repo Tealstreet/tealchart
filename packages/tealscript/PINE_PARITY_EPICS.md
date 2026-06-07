@@ -164,9 +164,9 @@ Phases:
    divergence, session filters, strategy brackets, drawing/table dashboards,
    libraries, alerts, screeners, and synthetic tickers. The current checkpoint
    corpus includes reduced public fixtures for configurable indicator inputs,
-   MTF filters, divergence, session filters, exchange session-state gates,
-   dashboard tables, custom candles, drawing zones, drawing-copy lifecycles,
-   linefill channels, zigzag polylines, screeners,
+   symbol metadata gates, MTF filters, divergence, session filters, exchange
+   session-state gates, dashboard tables, custom candles, drawing zones,
+   drawing-copy lifecycles, linefill channels, zigzag polylines, screeners,
    currency conversion, earnings event markers, corporate-action overlays,
    financial dashboards, economic macro overlays, seed dataset overlays,
    volatility-band overlays, library helpers including source-preserving helper
