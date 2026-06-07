@@ -52,9 +52,10 @@ overlays, seed dataset overlays, array signal queues, map signal dashboards,
 matrix scoreboards, drawing-zone, drawing-copy, linefill-channel, custom-candle,
 and library-helper idioms.
 Public-source coverage also includes alert signal metadata, direct alert
-emission, Heikin-Ashi synthetic ticker trend requests, public zigzag polylines,
-public strategy performance tables, public `varip` intrabar array buffers, plus
-UDT state objects updated through user-defined methods.
+emission, public log signal telemetry, Heikin-Ashi synthetic ticker trend
+requests, public zigzag polylines, public strategy performance tables, public
+`varip` intrabar array buffers, plus UDT state objects updated through
+user-defined methods.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
 suppression, entry-direction, max-position, intraday filled-order, and
@@ -608,6 +609,8 @@ message arguments before runtime.
 `log.error()` records an error-level log entry in `ExecutionResult.logs`
 without halting execution; use `runtime.error()` for Pine-compatible runtime
 halts.
+The source-linked public log signal checkpoint locks startup, signal-transition,
+and final-summary log output while plots continue to execute.
 `runtime.error()` halts execution with a stable `runtime.error` code in
 `ExecutionResult.errors`, worker runtime error messages, and Tealchart manager
 error callbacks while preserving the legacy message, line, and column fields.
