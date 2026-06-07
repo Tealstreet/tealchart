@@ -162,15 +162,6 @@ Current `ta.*` progress:
 - A source-linked public OBV signal checkpoint locks the common `ta.obv`
   cumulative-volume momentum idiom with EMA signal line and rising/falling
   routing over deterministic close/volume bars.
-- A source-linked public PVT signal checkpoint locks the common `ta.pvt`
-  price-volume trend idiom with EMA signal line and bull/bear routing over
-  deterministic close/volume bars.
-- A source-linked public ATR signal checkpoint locks the common `ta.atr()`
-  smoothed true-range idiom with EMA signal line and expanding-volatility
-  routing over deterministic OHLC bars.
-- A source-linked public MACD signal checkpoint locks the common `ta.macd()`
-  MACD-line/signal-line/histogram destructuring idiom with bullish above-signal
-  routing over deterministic close bars.
 
 Current `str.*` progress:
 
