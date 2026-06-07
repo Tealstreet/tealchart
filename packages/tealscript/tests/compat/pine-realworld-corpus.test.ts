@@ -5730,3 +5730,281 @@ plot(y, title="Y")
     expect(getPlot(result, 'Y').values).toEqual(Array(compatibilityBars.length).fill(4.5));
   });
 });
+
+describe('End-to-end indicator replicas', () => {
+  it('replicates the Squeeze Momentum indicator — BB/KC squeeze detection + momentum histogram + barcolor + plotshape', () => {
+    // Source search: https://www.tradingview.com/scripts/search/squeeze%20momentum%20lazybear/
+    // Reduced replica: BB/KC squeeze detection, momentum histogram, barcolor for squeeze state.
+    const result = runCompatScript(`
+indicator("Replica Squeeze Momentum Checkpoint")
+length = input.int(5, "Length")
+mult = input.float(2.0, "BB Mult")
+[bbMid, bbUpper, bbLower] = ta.bb(close, length, mult)
+[kcMid, kcUpper, kcLower] = ta.kc(close, length, 1.5)
+bbWidth = bbUpper - bbLower
+kcWidth = kcUpper - kcLower
+squeeze = bbWidth < kcWidth
+momentum = close - ta.sma(close, length)
+barcolor(squeeze ? color.blue : color.gray, title="Squeeze Color")
+plot(momentum, title="Momentum")
+plot(squeeze ? 1 : 0, title="Squeeze")
+plot(bbWidth, title="BB Width")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Replica Squeeze Momentum Checkpoint');
+    expect(result.inputs.map((i) => [i.title, i.type])).toEqual([
+      ['Length', 'int'],
+      ['BB Mult', 'float'],
+    ]);
+    // Momentum: close - SMA(close,5) — null until bar 4
+    expect(roundSeries(getPlot(result, 'Momentum').values)).toEqual([
+      null, null, null, null, -4.2, -2.8, 1.4, 6, 4, 4.6, 1.6, 2,
+    ]);
+    // BB always narrower than KC → squeeze is always true after warmup
+    expect(getPlot(result, 'Squeeze').values).toEqual([0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]);
+    expect(roundSeries(getPlot(result, 'BB Width').values)).toEqual([
+      null, null, null, null,
+      10.851728, 11.973304, 11.48216, 14.085453, 16.198765, 15.717506, 9.666437, 5.656854,
+    ]);
+  });
+
+  it('replicates the SuperTrend indicator — ta.supertrend direction + var state + barcolor + plotshape for trend changes', () => {
+    // Source search: https://www.tradingview.com/scripts/search/supertrend%20trailing%20stop/
+    // Reduced replica: ta.supertrend destructure, var trend direction, barcolor + plotshape for reversals.
+    const result = runCompatScript(`
+indicator("Replica SuperTrend Trailing Stop Checkpoint")
+atrLen = input.int(3, "ATR Length")
+factor = input.float(1.0, "Factor")
+[stLine, stDir] = ta.supertrend(factor, atrLen)
+var int trendDir = 1
+trendDir := stDir
+trendChanged = trendDir != trendDir[1]
+barcolor(trendDir == 1 ? color.green : color.red, title="Trend Color")
+plotshape(trendChanged and trendDir == 1, title="Bull Change", location=location.belowbar, style=shape.triangleup)
+plotshape(trendChanged and trendDir == -1, title="Bear Change", location=location.abovebar, style=shape.triangledown)
+plot(stLine, title="SuperTrend Line")
+plot(trendDir, title="Trend Dir")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Replica SuperTrend Trailing Stop Checkpoint');
+    expect(result.inputs.map((i) => [i.title, i.type])).toEqual([
+      ['ATR Length', 'int'],
+      ['Factor', 'float'],
+    ]);
+    // SuperTrend line values (resistance when bearish, support when bullish)
+    expect(roundSeries(getPlot(result, 'SuperTrend Line').values)).toEqual([
+      102.333333, 100.944444, 102.962963, 102.962963,
+      105.90535, 103.4369, 96.708733, 100.639156,
+      102.926104, 104.117402, 106.244935, 106.244935,
+    ]);
+    // Direction: -1 on bar 0, flips to 1 on bar 1, back to -1 on bar 4, then 1 from bar 6
+    expect(getPlot(result, 'Trend Dir').values).toEqual([-1, 1, 1, 1, -1, -1, 1, 1, 1, 1, 1, 1]);
+  });
+
+  it('replicates Volume Profile Lite — volume colored by direction + volume SMA + bgcolor for high volume', () => {
+    // Source search: https://www.tradingview.com/scripts/search/volume%20profile%20colored%20bars/
+    // Reduced replica: barcolor by close>open, bgcolor for volume spikes above 1.2×SMA.
+    const result = runCompatScript(`
+indicator("Replica Volume Profile Lite Checkpoint")
+volLen = input.int(5, "Vol MA Length")
+volSma = ta.sma(volume, volLen)
+isUp = close > open
+isHighVol = volume > volSma * 1.2
+barcolor(isUp ? color.green : color.red, title="Vol Color")
+bgcolor(isHighVol ? color.new(color.yellow, 80) : na, title="High Vol BG")
+plot(volume, title="Volume")
+plot(volSma, title="Vol SMA")
+plot(isHighVol ? 1 : 0, title="High Vol")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Replica Volume Profile Lite Checkpoint');
+    expect(result.inputs.map((i) => [i.title, i.type])).toEqual([['Vol MA Length', 'int']]);
+    expect(getPlot(result, 'Volume').values).toEqual([
+      1000, 1100, 900, 1250, 1400, 1050, 1300, 1600, 1200, 1500, 1350, 1450,
+    ]);
+    expect(roundSeries(getPlot(result, 'Vol SMA').values)).toEqual([
+      null, null, null, null, 1130, 1140, 1180, 1320, 1310, 1330, 1390, 1420,
+    ]);
+    // volume > volSma * 1.2: bars 4 (1400 > 1130*1.2=1356) and 7 (1600 > 1320*1.2=1584)
+    expect(getPlot(result, 'High Vol').values).toEqual([0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0]);
+  });
+
+  it('replicates the RSI Divergence Scanner — RSI + pivot detection + bearish/bullish divergence signals', () => {
+    // Source search: https://www.tradingview.com/scripts/search/rsi%20divergence%20scanner%20pivot/
+    // Reduced replica: RSI, ta.highest/lowest for pivots on both price and RSI, divergence flags.
+    const result = runCompatScript(`
+indicator("Replica RSI Divergence Scanner Checkpoint")
+rsiLen = input.int(5, "RSI Length")
+pivotLen = input.int(3, "Pivot Len")
+rsi = ta.rsi(close, rsiLen)
+pricePivotHigh = ta.highest(high, pivotLen)
+pricePivotLow = ta.lowest(low, pivotLen)
+rsiPivotHigh = ta.highest(rsi, pivotLen)
+rsiPivotLow = ta.lowest(rsi, pivotLen)
+bearDiv = high >= pricePivotHigh and rsi < rsiPivotHigh
+bullDiv = low <= pricePivotLow and rsi > rsiPivotLow
+plotshape(bearDiv, title="Bear Div", location=location.abovebar, style=shape.triangledown)
+plotshape(bullDiv, title="Bull Div", location=location.belowbar, style=shape.triangleup)
+plot(rsi, title="RSI")
+plot(bearDiv ? 1 : 0, title="Bear Div Signal")
+plot(bullDiv ? 1 : 0, title="Bull Div Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Replica RSI Divergence Scanner Checkpoint');
+    expect(result.inputs.map((i) => [i.title, i.type])).toEqual([
+      ['RSI Length', 'int'],
+      ['Pivot Len', 'int'],
+    ]);
+    expect(roundSeries(getPlot(result, 'RSI').values)).toEqual([
+      null, null, null, null, null,
+      42.857143, 57.894737, 70.16317, 65.39924, 72.421258, 66.774781, 72.194557,
+    ]);
+    // Bearish divergence: price at pivot high but RSI below its pivot high (bars 8, 10)
+    expect(getPlot(result, 'Bear Div Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0]);
+    expect(getPlot(result, 'Bull Div Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('replicates the Multi-Timeframe MA System — three MAs + fill + var trend state machine + barcolor', () => {
+    // Source search: https://www.tradingview.com/scripts/search/moving%20average%20system%20fast%20medium%20slow/
+    // Reduced replica: fast EMA, medium EMA, slow SMA; fill between fast and medium;
+    // var trendState updated per bar; barcolor driven by trend state.
+    const result = runCompatScript(`
+indicator("Replica MTF MA System Checkpoint")
+fastLen = input.int(3, "Fast Length")
+medLen = input.int(5, "Medium Length")
+slowLen = input.int(7, "Slow Length")
+fastMA = ta.ema(close, fastLen)
+medMA = ta.ema(close, medLen)
+slowMA = ta.sma(close, slowLen)
+pFast = plot(fastMA, title="Fast MA")
+pMed = plot(medMA, title="Med MA")
+fill(pFast, pMed, color=color.new(color.blue, 85), title="MA Fill")
+var int trendState = 0
+trendState := fastMA > medMA and medMA > slowMA ? 1 : fastMA < medMA and medMA < slowMA ? -1 : 0
+barcolor(trendState == 1 ? color.green : trendState == -1 ? color.red : color.gray, title="Trend BC")
+plot(trendState, title="Trend State")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Replica MTF MA System Checkpoint');
+    expect(result.inputs.map((i) => [i.title, i.type])).toEqual([
+      ['Fast Length', 'int'],
+      ['Medium Length', 'int'],
+      ['Slow Length', 'int'],
+    ]);
+    expect(roundSeries(getPlot(result, 'Fast MA').values)).toEqual([
+      102, 103.5, 105.25, 104.125, 101.5625, 100.78125,
+      102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957,
+    ]);
+    expect(roundSeries(getPlot(result, 'Med MA').values)).toEqual([
+      102, 103, 104.333333, 103.888889, 102.259259, 101.506173,
+      102.337449, 104.558299, 105.705533, 107.470355, 108.31357, 109.54238,
+    ]);
+    // fill emits 1 for every bar (fill is always "active")
+    expect(getPlot(result, 'MA Fill').values).toEqual(Array(compatibilityBars.length).fill(1));
+    // slowMA needs 7 bars to warm up; trendState=1 once all three align bullish (bar 7+)
+    expect(getPlot(result, 'Trend State').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
+  });
+
+  it('replicates Smart Money Concepts — structure detection via swing high/low + var trend + break-of-structure plotshape', () => {
+    // Source search: https://www.tradingview.com/scripts/search/smart%20money%20concepts%20structure%20break/
+    // Reduced replica: ta.highest/ta.lowest for swing detection, var trend state, BOS signals.
+    const result = runCompatScript(`
+indicator("Replica SMC Structure Checkpoint")
+pivotLen = input.int(3, "Pivot Length")
+swingHigh = ta.highest(high, pivotLen)
+swingLow = ta.lowest(low, pivotLen)
+var int trend = 0
+newHH = high > swingHigh[1]
+newLL = low < swingLow[1]
+trend := newHH ? 1 : newLL ? -1 : trend
+bos = trend != trend[1]
+plotshape(bos and trend == 1, title="Bull BOS", location=location.belowbar, style=shape.triangleup)
+plotshape(bos and trend == -1, title="Bear BOS", location=location.abovebar, style=shape.triangledown)
+plot(swingHigh, title="Swing High")
+plot(swingLow, title="Swing Low")
+plot(trend, title="Trend")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Replica SMC Structure Checkpoint');
+    expect(result.inputs.map((i) => [i.title, i.type])).toEqual([['Pivot Length', 'int']]);
+    expect(getPlot(result, 'Swing High').values).toEqual([103, 106, 108, 109, 109, 109, 105, 110, 111, 112, 114, 114]);
+    expect(getPlot(result, 'Swing Low').values).toEqual([99, 99, 99, 101, 98, 96, 96, 96, 99, 103, 106, 107]);
+    // trend: 0 → 1 (bar1 new HH) → stays 1 → -1 (bar4 new LL) → stays → 1 (bar7 new HH)
+    expect(getPlot(result, 'Trend').values).toEqual([0, 1, 1, 1, -1, -1, -1, 1, 1, 1, 1, 1]);
+  });
+
+  it('replicates the Heikin-Ashi Smoothed Oscillator — custom HA calculation + EMA smoothing + oscillator plot', () => {
+    // Source search: https://www.tradingview.com/scripts/search/heikin%20ashi%20smoothed%20oscillator/
+    // Reduced replica: HA close from OHLC average, EMA-smoothed open, oscillator = haClose - haOpen.
+    const result = runCompatScript(`
+indicator("Replica HA Oscillator Checkpoint")
+smoothLen = input.int(3, "Smooth Length")
+haClose = (open + high + low + close) / 4
+haOpen = ta.ema(open, smoothLen)
+haOscillator = haClose - haOpen
+smoothOsc = ta.ema(haOscillator, smoothLen)
+plot(haOscillator, title="HA Oscillator")
+plot(smoothOsc, title="Smooth Oscillator")
+plot(smoothOsc > 0 ? 1 : 0, title="Bullish")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Replica HA Oscillator Checkpoint');
+    expect(result.inputs.map((i) => [i.title, i.type])).toEqual([['Smooth Length', 'int']]);
+    // haClose = (o+h+l+c)/4; haOpen = EMA(open,3)
+    expect(roundSeries(getPlot(result, 'HA Oscillator').values)).toEqual([
+      1, 2.5, 3, 0.25, -3, -2.5, 1.25, 4.125, 2.8125, 2.65625, 2.078125, 1.289063,
+    ]);
+    expect(roundSeries(getPlot(result, 'Smooth Oscillator').values)).toEqual([
+      1, 1.75, 2.375, 1.3125, -0.84375, -1.671875, -0.210937, 1.957031,
+      2.384766, 2.520508, 2.299316, 1.794189,
+    ]);
+    // bullish when smooth oscillator > 0
+    expect(getPlot(result, 'Bullish').values).toEqual([1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1]);
+  });
+
+  it('replicates the Position Size Calculator — account/risk inputs + ATR stop math + position size output', () => {
+    // Source search: https://www.tradingview.com/scripts/search/position%20size%20calculator%20risk%20percent/
+    // Reduced replica: account balance + risk pct inputs, stop distance from close pct, posSize = riskAmt/stopDist.
+    const result = runCompatScript(`
+indicator("Replica Position Size Calculator Checkpoint")
+accountBalance = input.float(10000.0, "Account Balance")
+riskPct = input.float(1.0, "Risk Pct")
+stopDistPct = input.float(2.0, "Stop Distance Pct")
+riskAmt = accountBalance * riskPct / 100
+stopDist = close * stopDistPct / 100
+posSize = riskAmt / stopDist
+riskValue = posSize * stopDist
+plot(posSize, title="Position Size")
+plot(riskAmt, title="Risk Amount")
+plot(stopDist, title="Stop Distance")
+plot(riskValue, title="Risk Value")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Replica Position Size Calculator Checkpoint');
+    expect(result.inputs.map((i) => [i.title, i.type])).toEqual([
+      ['Account Balance', 'float'],
+      ['Risk Pct', 'float'],
+      ['Stop Distance Pct', 'float'],
+    ]);
+    // riskAmt = 10000 * 1/100 = 100 on every bar
+    expect(getPlot(result, 'Risk Amount').values).toEqual(Array(compatibilityBars.length).fill(100));
+    // stopDist = close * 0.02; posSize = 100 / stopDist
+    expect(roundSeries(getPlot(result, 'Stop Distance').values)).toEqual([
+      2.04, 2.1, 2.14, 2.06, 1.98, 2, 2.08, 2.18, 2.16, 2.22, 2.2, 2.24,
+    ]);
+    expect(roundSeries(getPlot(result, 'Position Size').values)).toEqual([
+      49.019608, 47.619048, 46.728972, 48.543689, 50.505051,
+      50, 48.076923, 45.87156, 46.296296, 45.045045, 45.454545, 44.642857,
+    ]);
+    // posSize * stopDist ≈ riskAmt = 100 always (round-trip identity; float precision)
+    expect(roundSeries(getPlot(result, 'Risk Value').values)).toEqual(Array(compatibilityBars.length).fill(100));
+  });
+});
