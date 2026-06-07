@@ -947,6 +947,118 @@ plot(hist)
       expect(result.errors).toHaveLength(0);
       expect(result.plots).toHaveLength(3);
     });
+
+    it('accesses ta.bb results via member syntax', () => {
+      const code = `//@version=6
+indicator("Test")
+bb = ta.bb(close, 20, 2)
+plot(bb.upper)
+plot(bb.basis)
+plot(bb.lower)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, createBars(30));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(3);
+      // On bars with enough history the values should be finite numbers
+      const lastUpper = result.plots[0]!.values.at(-1);
+      const lastBasis = result.plots[1]!.values.at(-1);
+      const lastLower = result.plots[2]!.values.at(-1);
+      expect(typeof lastUpper).toBe('number');
+      expect(typeof lastBasis).toBe('number');
+      expect(typeof lastLower).toBe('number');
+      // upper >= basis >= lower
+      expect(lastUpper).toBeGreaterThanOrEqual(lastBasis as number);
+      expect(lastBasis).toBeGreaterThanOrEqual(lastLower as number);
+    });
+
+    it('accesses ta.bb results via member syntax including .middle alias', () => {
+      const code = `//@version=6
+indicator("Test")
+bb = ta.bb(close, 20, 2)
+plot(bb.middle)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, createBars(30));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(1);
+    });
+
+    it('accesses ta.macd results via member syntax', () => {
+      const code = `//@version=6
+indicator("Test")
+m = ta.macd(close, 12, 26, 9)
+plot(m.macd)
+plot(m.signal)
+plot(m.hist)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, createBars(30));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(3);
+    });
+
+    it('accesses ta.dmi results via member syntax and matches destructuring', () => {
+      const memberCode = `//@version=6
+indicator("Test")
+dmi = ta.dmi(14, 14)
+plot(dmi.plus)
+plot(dmi.minus)
+plot(dmi.adx)
+`;
+      const destructureCode = `//@version=6
+indicator("Test")
+[a, b, c] = ta.dmi(14, 14)
+plot(a)
+plot(b)
+plot(c)
+`;
+      const bars = createBars(30);
+      const memberResult = executeScript(parse(memberCode), bars);
+      const destructureResult = executeScript(parse(destructureCode), bars);
+
+      expect(memberResult.errors).toHaveLength(0);
+      expect(destructureResult.errors).toHaveLength(0);
+      expect(memberResult.plots).toHaveLength(3);
+      // Values from member access and destructuring must be identical
+      for (let p = 0; p < 3; p++) {
+        const mVals = memberResult.plots[p]!.values;
+        const dVals = destructureResult.plots[p]!.values;
+        expect(mVals).toEqual(dVals);
+      }
+    });
+
+    it('accesses ta.supertrend results via member syntax', () => {
+      const code = `//@version=6
+indicator("Test")
+st = ta.supertrend(3, 10)
+plot(st.supertrend)
+plot(st.direction)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, createBars(30));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(2);
+    });
+
+    it('accesses ta.kc results via member syntax', () => {
+      const code = `//@version=6
+indicator("Test")
+kc = ta.kc(close, 20, 1.5)
+plot(kc.upper)
+plot(kc.middle)
+plot(kc.lower)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, createBars(30));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(3);
+    });
   });
 
   describe('complete indicators', () => {

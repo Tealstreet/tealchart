@@ -230,6 +230,40 @@ const MONTH_NAMES = [
 
 const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const;
 
+// Maps tuple member names to their array index in TA function return arrays.
+// ta.bb / ta.kc: [middle/basis, upper, lower]
+// ta.macd:       [macd, signal, hist]
+// ta.dmi:        [plus, minus, adx]
+// ta.supertrend: [supertrend, direction]
+// ta.vwap:       [vwap, upper, lower]
+const TUPLE_FIELD_INDEX: Record<string, number> = {
+  // ta.bb / ta.kc — index 0
+  middle: 0,
+  basis: 0,
+  // ta.bb / ta.kc / ta.vwap — index 1
+  upper: 1,
+  // ta.bb / ta.kc / ta.vwap — index 2
+  lower: 2,
+  // ta.macd — index 0
+  macd: 0,
+  // ta.macd — index 1
+  signal: 1,
+  // ta.macd — index 2
+  hist: 2,
+  // ta.dmi — index 0
+  plus: 0,
+  // ta.dmi — index 1
+  minus: 1,
+  // ta.dmi — index 2
+  adx: 2,
+  // ta.supertrend — index 0
+  supertrend: 0,
+  // ta.supertrend — index 1
+  direction: 1,
+  // ta.vwap with stdev_mult — index 0
+  vwap: 0,
+};
+
 /**
  * Execution result
  */
@@ -5248,6 +5282,10 @@ export class TealscriptEngine {
         if (isPineUdtObject(value)) {
           return getUdtField(value, prop);
         }
+        if (Array.isArray(value)) {
+          const idx = TUPLE_FIELD_INDEX[prop];
+          if (idx !== undefined && idx < value.length) return value[idx];
+        }
       }
     }
 
@@ -5257,6 +5295,10 @@ export class TealscriptEngine {
     }
     if (isPineUdtObject(object)) {
       return getUdtField(object, expr.property.name);
+    }
+    if (Array.isArray(object)) {
+      const idx = TUPLE_FIELD_INDEX[expr.property.name];
+      if (idx !== undefined && idx < object.length) return object[idx];
     }
 
     throw new Error('Member access not supported except for namespaced constants and user-defined type fields');
