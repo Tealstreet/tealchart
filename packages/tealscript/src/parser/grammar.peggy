@@ -772,7 +772,7 @@ TypedFunctionVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression _ LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -796,7 +796,7 @@ UntypedFunctionVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression _ LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -894,7 +894,7 @@ TypedFunctionNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression _ LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -918,7 +918,7 @@ UntypedFunctionNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression _ LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -1016,7 +1016,7 @@ TypedFunctionDeepNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression _ LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -1040,7 +1040,7 @@ UntypedFunctionDeepNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression _ LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression LineTerminator? {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',

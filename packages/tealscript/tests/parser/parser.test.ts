@@ -18,6 +18,21 @@ import type {
 } from '../../src/parser';
 
 describe('Tealscript Parser', () => {
+  describe('BOM handling (Bug P4)', () => {
+    it('strips UTF-8 BOM before parsing', () => {
+      const ast = parse('﻿//@version=6\nindicator("BOM Test")\n');
+      expect(ast.type).toBe('Program');
+      expect(ast.version).toBe(6);
+      expect(ast.body).toHaveLength(1);
+    });
+
+    it('strips BOM on a script without version annotation', () => {
+      const ast = parse('﻿x = 1\n');
+      expect(ast.type).toBe('Program');
+      expect(ast.body).toHaveLength(1);
+    });
+  });
+
   describe('Version annotation', () => {
     it('parses version annotation', () => {
       const ast = parse('//@version=6\n');

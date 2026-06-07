@@ -6343,4 +6343,32 @@ plot(r, title="R")
       102, 103, 104.333333, 103.888889, 102.259259, 101.506173, 102.337449, 104.558299, 105.705533, 107.470355, 108.31357, 109.54238,
     ]);
   });
+
+  it('switch result in UDF body is accessible after the switch (Bug R1)', () => {
+    // Source search: https://www.tradingview.com/scripts/bollingerbands/
+    // Pattern: UDF assigns switch result to a variable, then returns that variable
+    // as the last expression. Was throwing "Unknown identifier: r" because the
+    // trailing _ in UntypedFunctionVariableDeclaration was eating the next
+    // statement's indent, making the trailing identifier invisible to the parser.
+    const result = runCompatScript(`
+indicator("Switch UDF Scope Checkpoint")
+ma(src, maType) =>
+    r = switch maType
+        'EMA' => ta.ema(src, 14)
+        => ta.sma(src, 14)
+    r
+plot(ma(close, 'EMA'), title="EMA")
+plot(ma(close, 'SMA'), title="SMA")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Switch UDF Scope Checkpoint');
+    expect(roundSeries(getPlot(result, 'EMA').values)).toEqual([
+      102, 102.4, 103.013333, 103.011556, 102.476681, 102.146457, 102.393596, 103.27445, 103.904523, 104.850587, 105.537175, 106.398885,
+    ]);
+    // SMA-14 needs 14 bars; compatibility fixture has 12, so all bars are null.
+    expect(roundSeries(getPlot(result, 'SMA').values)).toEqual([
+      null, null, null, null, null, null, null, null, null, null, null, null,
+    ]);
+  });
 });
