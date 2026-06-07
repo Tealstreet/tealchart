@@ -714,7 +714,10 @@ Fill renderer coverage applies `show_last` windows to filled regions while
 preserving existing gap handling, per-bar fill colors, display hiding, and
 plot/hline handle fills. Semantic analysis now preserves `plot()` and `hline()`
 handle return types so mixed handle assignments report Pine-shaped diagnostics
-before runtime.
+before runtime. Legacy named `transp` arguments are accepted and applied to
+`plot()`, `fill()`, `bgcolor()`, and `barcolor()` colors; marker and OHLC visual
+transparency aliases remain planned separately because they involve multiple
+color channels.
 
 Plotarrow renderer coverage scales arrows between Pine `minheight` and
 `maxheight` using the visible series magnitude and suppresses zero-value arrows.
