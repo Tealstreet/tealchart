@@ -1026,6 +1026,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'public-macd-signal-checkpoint',
+      title: 'Public MACD Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: MACD signal crossover',
+      featureTags: ['ta', 'signals', 'macd', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
