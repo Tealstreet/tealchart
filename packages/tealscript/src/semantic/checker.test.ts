@@ -5768,6 +5768,8 @@ variance = ta.variance(source=close, length=3, biased=false)
 varianceMixed = ta.variance(source=close, 3, false)
 deviation = ta.dev(source=close, length=3)
 deviationMixed = ta.dev(source=close, 3)
+covariance = ta.covariance(source1=close, source2=open, length=3)
+covarianceMixed = ta.covariance(source1=close, open, 3)
 correlation = ta.correlation(source1=close, source2=open, length=3)
 correlationMixed = ta.correlation(source1=close, open, 3)
 cog = ta.cog(source=close, length=3)
@@ -5783,7 +5785,7 @@ linearMixed = ta.percentile_linear_interpolation(source=close, 3, 75)
 rank = ta.percentrank(source=close, length=3)
 rankMixed = ta.percentrank(source=close, 3)
 total = ta.cum(source=close)
-plot(variance + varianceMixed + deviation + deviationMixed + correlation + correlationMixed + cog + mixedCog + median + medianMixed + mode + modeMixed + nearest + nearestMixed + linear + linearMixed + rank + rankMixed + total)
+plot(variance + varianceMixed + deviation + deviationMixed + covariance + covarianceMixed + correlation + correlationMixed + cog + mixedCog + median + medianMixed + mode + modeMixed + nearest + nearestMixed + linear + linearMixed + rank + rankMixed + total)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -5794,6 +5796,7 @@ plot(variance + varianceMixed + deviation + deviationMixed + correlation + corre
 indicator("Bad TA Stats Signatures")
 duplicateVariance = ta.variance(close, source=open, length=3)
 unknownDeviation = ta.dev(source=close, length=3, average=2)
+missingCovariance = ta.covariance(source1=close, source2=open)
 missingCorrelation = ta.correlation(source1=close, source2=open)
 shortPercentile = ta.percentile_nearest_rank(source=close, length=3)
 tooManyCum = ta.cum(close, open)
@@ -5802,6 +5805,8 @@ tooManyCum = ta.cum(close, open)
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       "Argument 'source' for ta.variance() was supplied multiple times",
       "Unknown argument 'average' for ta.dev()",
+      'ta.covariance() expects at least 3 arguments',
+      "ta.covariance() missing required argument 'length'",
       'ta.correlation() expects at least 3 arguments',
       "ta.correlation() missing required argument 'length'",
       'ta.percentile_nearest_rank() expects at least 3 arguments',

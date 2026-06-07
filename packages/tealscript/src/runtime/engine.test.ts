@@ -7058,6 +7058,7 @@ indicator("TA stats")
 plot(ta.cum(close), title="Cum")
 plot(ta.variance(close, 3), title="Variance")
 plot(ta.dev(close, 3), title="Deviation")
+plot(ta.covariance(close, open, 3), title="Covariance")
 plot(ta.correlation(close, open, 3), title="Correlation")
 plot(ta.correlation(close, close, 3), title="Self Correlation")
 plot(ta.correlation(close, 1, 3), title="Flat Correlation")
@@ -7082,6 +7083,7 @@ plot(ta.cog(close - open, 3), title="Derived COG")`;
       expect(deviationValues[2]).toBeCloseTo(16 / 9);
       expect(deviationValues[3]).toBeCloseTo(10 / 9);
       expect(deviationValues[4]).toBeCloseTo(4 / 3);
+      expect(result.plots.find((plot) => plot.title === 'Covariance')?.values[2]).toBeCloseTo(5 / 3);
       expect(result.plots.find((plot) => plot.title === 'Correlation')?.values[2]).toBeCloseTo(0.993399);
       expect(result.plots.find((plot) => plot.title === 'Self Correlation')?.values[2]).toBeCloseTo(1);
       expect(result.plots.find((plot) => plot.title === 'Flat Correlation')?.values).toEqual([null, null, null, null, null]);

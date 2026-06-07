@@ -10197,6 +10197,33 @@ export class TealscriptEngine {
       return values.reduce((sum, value) => sum + Math.abs(value - mean), 0) / values.length;
     });
 
+    this.builtins.set('ta.covariance', (args, namedArgs, _ctx, scope, callId) => {
+      const taCovarianceArgs = ['source1', 'source2', 'length'];
+      const sourceA = this.getOrderedCallArg(args, namedArgs, taCovarianceArgs, 0);
+      const sourceB = this.getOrderedCallArg(args, namedArgs, taCovarianceArgs, 1);
+      const length = this.normalizeLookbackLength(this.getOrderedCallArg(args, namedArgs, taCovarianceArgs, 2));
+      const windows = this.getCompletePairedSourceWindows(
+        scope,
+        `_ta_covariance_source_a_${callId}`,
+        `_ta_covariance_source_b_${callId}`,
+        sourceA,
+        sourceB,
+        length,
+      );
+      if (!windows) return NaN;
+
+      const [leftValues, rightValues] = windows;
+      const leftMean = leftValues.reduce((sum, value) => sum + value, 0) / length;
+      const rightMean = rightValues.reduce((sum, value) => sum + value, 0) / length;
+      let covariance = 0;
+
+      for (let index = 0; index < length; index++) {
+        covariance += (leftValues[index] - leftMean) * (rightValues[index] - rightMean);
+      }
+
+      return covariance / length;
+    });
+
     this.builtins.set('ta.correlation', (args, namedArgs, _ctx, scope, callId) => {
       const taCorrelationArgs = ['source1', 'source2', 'length'];
       const sourceA = this.getOrderedCallArg(args, namedArgs, taCorrelationArgs, 0);

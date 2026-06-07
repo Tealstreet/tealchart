@@ -450,6 +450,9 @@ plot(ta.cog(close - open, 3), title="Derived COG")
 plot(ta.cum(source=close), title="Named Cum Close")
 plot(ta.dev(source=close, length=3), title="Named Mean Deviation")
 plot(ta.dev(source=close, 3), title="Mixed Mean Deviation")
+plot(ta.covariance(close, open, 3), title="Close Open Covariance")
+plot(ta.covariance(source1=close, source2=open, length=3), title="Named Close Open Covariance")
+plot(ta.covariance(source1=close, open, 3), title="Mixed Close Open Covariance")
 plot(ta.correlation(source1=close, source2=open, length=3), title="Named Close Open Correlation")
 plot(ta.correlation(source1=close, open, 3), title="Mixed Close Open Correlation")
 plot(ta.cog(source=close, length=3), title="Named COG")
@@ -472,6 +475,9 @@ plot(ta.cog(source=close, 3), title="Mixed COG")
     expect(roundSeries(getPlot(result, 'Named Cum Close').values)).toEqual(roundSeries(getPlot(result, 'Cum Close').values));
     expect(roundSeries(getPlot(result, 'Named Mean Deviation').values)).toEqual(roundSeries(getPlot(result, 'Mean Deviation').values));
     expect(roundSeries(getPlot(result, 'Mixed Mean Deviation').values)).toEqual(roundSeries(getPlot(result, 'Mean Deviation').values));
+    expect(roundSeries(getPlot(result, 'Close Open Covariance').values)).toEqual([null, null, 4.111111, -1.333333, 2.666667, 4, -1.666667, 7.666667, 5.666667, 0, -0.222222, -0.333333]);
+    expect(roundSeries(getPlot(result, 'Named Close Open Covariance').values)).toEqual(roundSeries(getPlot(result, 'Close Open Covariance').values));
+    expect(roundSeries(getPlot(result, 'Mixed Close Open Covariance').values)).toEqual(roundSeries(getPlot(result, 'Close Open Covariance').values));
     expect(roundSeries(getPlot(result, 'Named Close Open Correlation').values)).toEqual(roundSeries(getPlot(result, 'Close Open Correlation').values));
     expect(roundSeries(getPlot(result, 'Mixed Close Open Correlation').values)).toEqual(roundSeries(getPlot(result, 'Close Open Correlation').values));
     expect(roundSeries(getPlot(result, 'Named COG').values)).toEqual(roundSeries(getPlot(result, 'COG').values));
