@@ -1728,6 +1728,107 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughRuntime,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'integration-trend-system-checkpoint',
+      title: 'Integration Trend System Checkpoint',
+      searchContext: 'TradingView public scripts search: ema crossover trend win rate table',
+      featureTags: ['integration', 'ta', 'signals', 'barcolor', 'tables', 'state', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'integration-volatility-dashboard-checkpoint',
+      title: 'Integration Volatility Dashboard Checkpoint',
+      searchContext: 'TradingView public scripts search: atr bollinger keltner squeeze dashboard',
+      featureTags: ['integration', 'ta', 'signals', 'arrays', 'volatility', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'integration-ma-strategy-checkpoint',
+      title: 'Integration MA Strategy Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy ma crossover equity bgcolor',
+      category: 'strategy',
+      featureTags: ['integration', 'strategy', 'ta', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'integration-price-action-scanner-checkpoint',
+      title: 'Integration Price Action Scanner Checkpoint',
+      searchContext: 'TradingView public scripts search: udt candle pattern method array',
+      featureTags: ['integration', 'udt', 'methods', 'arrays', 'signals', 'visuals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'integration-risk-management-checkpoint',
+      title: 'Integration Risk Management Checkpoint',
+      searchContext: 'TradingView public scripts search: risk management atr entry rr ratio',
+      featureTags: ['integration', 'ta', 'signals', 'state', 'var', 'inputs', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'integration-custom-oscillator-checkpoint',
+      title: 'Integration Custom Oscillator Checkpoint',
+      searchContext: 'TradingView public scripts search: custom oscillator udf fill alert',
+      featureTags: ['integration', 'udf', 'ta', 'signals', 'fills', 'alerts', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'integration-ema-state-table-checkpoint',
+      title: 'Integration EMA State Table Checkpoint',
+      searchContext: 'TradingView public scripts search: ema crossover barcolor state table',
+      featureTags: ['integration', 'ta', 'signals', 'barcolor', 'state', 'tables', 'visuals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'integration-equity-tracker-checkpoint',
+      title: 'Integration Equity Tracker Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy equity performance stats table',
+      category: 'strategy',
+      featureTags: ['integration', 'strategy', 'performance', 'tables', 'dashboard', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'integration-divergence-detector-checkpoint',
+      title: 'Integration Divergence Detector Checkpoint',
+      searchContext: 'TradingView public scripts search: rsi divergence highest lowest plotshape',
+      featureTags: ['integration', 'ta', 'signals', 'rsi', 'divergence', 'visuals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'integration-oscillator-gradient-checkpoint',
+      title: 'Integration Oscillator Gradient Checkpoint',
+      searchContext: 'TradingView public scripts search: custom oscillator gradient fill zero line',
+      featureTags: ['integration', 'udf', 'ta', 'signals', 'fills', 'alerts', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'integration-ichimoku-checkpoint',
+      title: 'Integration Ichimoku Checkpoint',
+      searchContext: 'TradingView public scripts search: ichimoku cloud fill crossover plotshape',
+      featureTags: ['integration', 'ta', 'signals', 'fills', 'visuals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
