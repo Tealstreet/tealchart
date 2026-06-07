@@ -281,10 +281,12 @@ smoothing state, `ta.dmi()` tuple smoothing state, `ta.supertrend()` tuple
 state, and `ta.sar()` trend state are isolated per call site so repeated
 same-parameter calls do not share accumulators. Semantic
 analysis preserves known scalar TA helper return types for downstream
-assignment diagnostics, including scalar `ta.vwap()` overloads and
-source-preserving `ta.change()` and `ta.valuewhen()` results, and rejects
-common non-numeric TA helper arguments plus non-boolean TA condition and option
-arguments before runtime. Legacy public-script aliases for the supported TA
+assignment diagnostics, including scalar `ta.vwap()` overloads,
+variable-only TA series variables such as `ta.iii`, `ta.nvi`, `ta.pvt`, and
+`ta.wad`, and source-preserving `ta.change()` and `ta.valuewhen()` results, and
+rejects common non-numeric TA helper arguments, non-boolean TA condition and
+option arguments, plus variable-only TA members used as function calls before
+runtime. Legacy public-script aliases for the supported TA
 helper set route through their `ta.*` equivalents, including common scalar,
 window, event, cross, channel, tuple-returning, and trend helpers, with the same
 source preservation, return inference, call-shape diagnostics, and runtime
@@ -619,7 +621,7 @@ degrees, summing the latest non-`na` source values, and checking random bounds.
 Semantic analysis preserves known math constant and helper return types for
 downstream assignment diagnostics, including int/float overload distinctions for
 rounding helpers and series-only math helpers, and rejects non-numeric math
-helper arguments before runtime.
+helper arguments plus math constants used as function calls before runtime.
 
 ## Common Global Helper Coverage
 

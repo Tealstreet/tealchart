@@ -32,7 +32,10 @@ import type {
   MemberExpression,
   IndexExpression,
 } from '../parser/ast';
-import { isExportableBuiltinConstantPath } from '../builtinMetadata';
+import {
+  isExportableBuiltinConstantPath,
+  VARIABLE_ONLY_BUILTIN_NAMES,
+} from '../builtinMetadata';
 
 import {
   absArrayValue,
@@ -3396,6 +3399,10 @@ export class TealscriptEngine {
         this.assertNoArguments('copy', args, namedArgs);
         return copyUdtObject(receiver);
       }
+    }
+
+    if (VARIABLE_ONLY_BUILTIN_NAMES.has(builtinName)) {
+      throw new Error(`Unknown function: ${builtinName}`);
     }
 
     const builtin = this.builtins.get(builtinName);
