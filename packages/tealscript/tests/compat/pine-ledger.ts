@@ -1017,6 +1017,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'public-atr-signal-checkpoint',
+      title: 'Public ATR Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: average true range signal',
+      featureTags: ['ta', 'signals', 'atr', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
