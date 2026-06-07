@@ -328,7 +328,7 @@ indicator("My Test Indicator", overlay=true)
 
     it('executes legacy study declarations as indicators', () => {
       const code = `//@version=4
-study("Legacy Study", shorttitle="LS", overlay=true)
+study("Legacy Study", shorttitle="LS", overlay=true, resolution="60", resolution_gaps=false)
 `;
       const ast = parse(code);
       const result = executeScript(ast, bars);
@@ -336,6 +336,10 @@ study("Legacy Study", shorttitle="LS", overlay=true)
       expect(result.indicatorTitle).toBe('Legacy Study');
       expect(result.declaration.shortTitle).toBe('LS');
       expect(result.declaration.overlay).toBe(true);
+      expect(result.indicatorTimeframe).toBe('60');
+      expect(result.indicatorTimeframeGaps).toBe(false);
+      expect(result.declaration.timeframe).toBe('60');
+      expect(result.declaration.timeframeGaps).toBe(false);
       expect(result.errors).toHaveLength(0);
     });
 
