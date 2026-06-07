@@ -183,10 +183,12 @@ Phases:
    fixtures with `alertcondition()` metadata, direct `alert()` emission, and
    Pine Logs startup/signal/final-summary output.
    Public TA signal coverage includes reduced Supertrend, ADX/DMI, Parabolic
-   SAR, linear-regression channel, Keltner Channel, stochastic oscillator, MFI,
-   CCI, CMO, TSI, ROC, Momentum, and Williams %R fixtures that route `ta.supertrend()`
+   SAR, linear-regression channel, Keltner Channel, moving-average ribbon,
+   stochastic oscillator, MFI, CCI, CMO, TSI, ROC, Momentum, and Williams %R
+   fixtures that route `ta.supertrend()`
    direction, `ta.dmi()` trend-strength state, `ta.sar()` reversal state,
-   `ta.linreg()` channel slope, `ta.kc()`/`ta.kcw()` channel state, smoothed
+   `ta.linreg()` channel slope, `ta.kc()`/`ta.kcw()` channel state,
+   `ta.vwma()`/`ta.wma()`/`ta.alma()`/`ta.hma()` ribbon state, smoothed
    `ta.stoch()` state, `ta.mfi()` threshold state, `ta.cci()` threshold state,
    `ta.cmo()` threshold state, `ta.tsi()` signal-line state, `ta.roc()`
    threshold state, `ta.mom()` threshold state, and `ta.wpr()` threshold state

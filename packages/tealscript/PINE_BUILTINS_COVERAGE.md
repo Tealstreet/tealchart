@@ -127,6 +127,9 @@ Current `ta.*` progress:
 - A source-linked public Keltner Channel signal checkpoint locks the common
   `ta.kc()`/`ta.kcw()` basis/band/width and channel-regime routing idiom over
   deterministic OHLC bars.
+- A source-linked public moving-average ribbon checkpoint locks common
+  `ta.vwma()`, `ta.wma()`, `ta.alma()`, and `ta.hma()` overlay/ribbon routing
+  over deterministic OHLCV bars.
 - A source-linked public stochastic signal checkpoint locks the common
   `ta.stoch()` K/D smoothing and overbought/oversold signal-routing idiom over
   deterministic bars.
