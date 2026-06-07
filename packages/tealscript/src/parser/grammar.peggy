@@ -1283,7 +1283,7 @@ FunctionVeryDeepNestedBlock
     }
 
 FunctionVeryDeepNestedStatement
-  = &FunctionVeryDeepNestedIndent FunctionVeryDeepNestedIndent stmt:(FunctionVeryDeepNestedSwitchExpressionStatement / FunctionVeryDeepNestedIfStatement / FunctionVeryDeepNestedVariableDeclaration / Statement) {
+  = &FunctionVeryDeepNestedIndent FunctionVeryDeepNestedIndent stmt:(FunctionVeryDeepNestedSwitchExpressionStatement / FunctionVeryDeepNestedIfStatement / FunctionVeryDeepNestedForStatement / FunctionVeryDeepNestedWhileStatement / FunctionVeryDeepNestedVariableDeclaration / Statement) {
       return stmt;
     }
 
@@ -1336,6 +1336,41 @@ FunctionVeryDeepNestedSwitchCase
         type: 'SwitchCase',
         test,
         consequent,
+        loc: loc()
+      };
+    }
+
+FunctionVeryDeepNestedForStatement
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionUltraDeepNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'collection',
+        counter: counter.valueCounter,
+        indexCounter: counter.indexCounter,
+        iterable,
+        body,
+        loc: loc()
+      };
+    }
+  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionUltraDeepNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'numeric',
+        counter,
+        start,
+        end,
+        step: step ? step[3] : null,
+        body,
+        loc: loc()
+      };
+    }
+
+FunctionVeryDeepNestedWhileStatement
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionUltraDeepNestedBlock {
+      return {
+        type: 'WhileStatement',
+        test,
+        body,
         loc: loc()
       };
     }
@@ -1423,8 +1458,43 @@ FunctionUltraDeepNestedBlock
     }
 
 FunctionUltraDeepNestedStatement
-  = &FunctionUltraDeepNestedIndent FunctionUltraDeepNestedIndent stmt:(FunctionUltraDeepNestedIfStatement / Statement) {
+  = &FunctionUltraDeepNestedIndent FunctionUltraDeepNestedIndent stmt:(FunctionUltraDeepNestedIfStatement / FunctionUltraDeepNestedForStatement / FunctionUltraDeepNestedWhileStatement / Statement) {
       return stmt;
+    }
+
+FunctionUltraDeepNestedForStatement
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionMegaDeepNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'collection',
+        counter: counter.valueCounter,
+        indexCounter: counter.indexCounter,
+        iterable,
+        body,
+        loc: loc()
+      };
+    }
+  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionMegaDeepNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'numeric',
+        counter,
+        start,
+        end,
+        step: step ? step[3] : null,
+        body,
+        loc: loc()
+      };
+    }
+
+FunctionUltraDeepNestedWhileStatement
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionMegaDeepNestedBlock {
+      return {
+        type: 'WhileStatement',
+        test,
+        body,
+        loc: loc()
+      };
     }
 
 FunctionUltraDeepNestedIfStatement
@@ -1458,8 +1528,43 @@ FunctionMegaDeepNestedBlock
     }
 
 FunctionMegaDeepNestedStatement
-  = &FunctionMegaDeepNestedIndent FunctionMegaDeepNestedIndent stmt:(FunctionMegaDeepNestedIfStatement / Statement) {
+  = &FunctionMegaDeepNestedIndent FunctionMegaDeepNestedIndent stmt:(FunctionMegaDeepNestedIfStatement / FunctionMegaDeepNestedForStatement / FunctionMegaDeepNestedWhileStatement / Statement) {
       return stmt;
+    }
+
+FunctionMegaDeepNestedForStatement
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionSuperDeepNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'collection',
+        counter: counter.valueCounter,
+        indexCounter: counter.indexCounter,
+        iterable,
+        body,
+        loc: loc()
+      };
+    }
+  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionSuperDeepNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'numeric',
+        counter,
+        start,
+        end,
+        step: step ? step[3] : null,
+        body,
+        loc: loc()
+      };
+    }
+
+FunctionMegaDeepNestedWhileStatement
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionSuperDeepNestedBlock {
+      return {
+        type: 'WhileStatement',
+        test,
+        body,
+        loc: loc()
+      };
     }
 
 FunctionMegaDeepNestedIfStatement
@@ -1493,8 +1598,43 @@ FunctionSuperDeepNestedBlock
     }
 
 FunctionSuperDeepNestedStatement
-  = &FunctionSuperDeepNestedIndent FunctionSuperDeepNestedIndent stmt:(FunctionSuperDeepNestedIfStatement / Statement) {
+  = &FunctionSuperDeepNestedIndent FunctionSuperDeepNestedIndent stmt:(FunctionSuperDeepNestedIfStatement / FunctionSuperDeepNestedForStatement / FunctionSuperDeepNestedWhileStatement / Statement) {
       return stmt;
+    }
+
+FunctionSuperDeepNestedForStatement
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionHyperDeepNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'collection',
+        counter: counter.valueCounter,
+        indexCounter: counter.indexCounter,
+        iterable,
+        body,
+        loc: loc()
+      };
+    }
+  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionHyperDeepNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'numeric',
+        counter,
+        start,
+        end,
+        step: step ? step[3] : null,
+        body,
+        loc: loc()
+      };
+    }
+
+FunctionSuperDeepNestedWhileStatement
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionHyperDeepNestedBlock {
+      return {
+        type: 'WhileStatement',
+        test,
+        body,
+        loc: loc()
+      };
     }
 
 FunctionSuperDeepNestedIfStatement
@@ -1528,8 +1668,43 @@ FunctionHyperDeepNestedBlock
     }
 
 FunctionHyperDeepNestedStatement
-  = &FunctionHyperDeepNestedIndent FunctionHyperDeepNestedIndent stmt:(FunctionHyperDeepNestedIfStatement / Statement) {
+  = &FunctionHyperDeepNestedIndent FunctionHyperDeepNestedIndent stmt:(FunctionHyperDeepNestedIfStatement / FunctionHyperDeepNestedForStatement / FunctionHyperDeepNestedWhileStatement / Statement) {
       return stmt;
+    }
+
+FunctionHyperDeepNestedForStatement
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionExtremeDeepNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'collection',
+        counter: counter.valueCounter,
+        indexCounter: counter.indexCounter,
+        iterable,
+        body,
+        loc: loc()
+      };
+    }
+  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionExtremeDeepNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'numeric',
+        counter,
+        start,
+        end,
+        step: step ? step[3] : null,
+        body,
+        loc: loc()
+      };
+    }
+
+FunctionHyperDeepNestedWhileStatement
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionExtremeDeepNestedBlock {
+      return {
+        type: 'WhileStatement',
+        test,
+        body,
+        loc: loc()
+      };
     }
 
 FunctionHyperDeepNestedIfStatement
@@ -1563,8 +1738,43 @@ FunctionExtremeDeepNestedBlock
     }
 
 FunctionExtremeDeepNestedStatement
-  = &FunctionExtremeDeepNestedIndent FunctionExtremeDeepNestedIndent stmt:(FunctionExtremeDeepNestedIfStatement / Statement) {
+  = &FunctionExtremeDeepNestedIndent FunctionExtremeDeepNestedIndent stmt:(FunctionExtremeDeepNestedIfStatement / FunctionExtremeDeepNestedForStatement / FunctionExtremeDeepNestedWhileStatement / Statement) {
       return stmt;
+    }
+
+FunctionExtremeDeepNestedForStatement
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionMaxDeepNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'collection',
+        counter: counter.valueCounter,
+        indexCounter: counter.indexCounter,
+        iterable,
+        body,
+        loc: loc()
+      };
+    }
+  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionMaxDeepNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'numeric',
+        counter,
+        start,
+        end,
+        step: step ? step[3] : null,
+        body,
+        loc: loc()
+      };
+    }
+
+FunctionExtremeDeepNestedWhileStatement
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionMaxDeepNestedBlock {
+      return {
+        type: 'WhileStatement',
+        test,
+        body,
+        loc: loc()
+      };
     }
 
 FunctionExtremeDeepNestedIfStatement

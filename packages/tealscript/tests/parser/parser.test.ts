@@ -738,6 +738,78 @@ map<string, sig.State> stateBySymbol = na
         expect(fourth?.type === 'IfStatement' ? Array.isArray(fourth.alternate) : false).toBe(true);
       }
     });
+
+    it('parses four nested for loops inside a multiline function (depth 4)', () => {
+      const ast = parse(`nestedLoops(n) =>
+    for a = 0 to n
+        for b = 0 to a
+            for c = 0 to b
+                for d = 0 to c
+                    d
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        const depth1 = fn.body[0];
+        expect(depth1.type).toBe('ForStatement');
+        const depth2 = depth1.type === 'ForStatement' ? depth1.body[0] : null;
+        expect(depth2?.type).toBe('ForStatement');
+        const depth3 = depth2?.type === 'ForStatement' ? depth2.body[0] : null;
+        expect(depth3?.type).toBe('ForStatement');
+        const depth4 = depth3?.type === 'ForStatement' ? depth3.body[0] : null;
+        expect(depth4?.type).toBe('ForStatement');
+      }
+    });
+
+    it('parses for inside if inside for inside if inside function (mixed nesting at depth 4)', () => {
+      const ast = parse(`mixed(x) =>
+    if x > 0
+        for i = 0 to x
+            if i > 0
+                for j = 0 to i
+                    j
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        const outerIf = fn.body[0];
+        expect(outerIf.type).toBe('IfStatement');
+        const outerFor = outerIf.type === 'IfStatement' ? outerIf.consequent[0] : null;
+        expect(outerFor?.type).toBe('ForStatement');
+        const innerIf = outerFor?.type === 'ForStatement' ? outerFor.body[0] : null;
+        expect(innerIf?.type).toBe('IfStatement');
+        const innerFor = innerIf?.type === 'IfStatement' ? innerIf.consequent[0] : null;
+        expect(innerFor?.type).toBe('ForStatement');
+      }
+    });
+
+    it('parses while loop at depth 4 inside a multiline function', () => {
+      const ast = parse(`whileDeep(x) =>
+    if x > 0
+        for i = 0 to x
+            if i > 0
+                while i > 0
+                    i := i - 1
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        const outerIf = fn.body[0];
+        expect(outerIf.type).toBe('IfStatement');
+        const outerFor = outerIf.type === 'IfStatement' ? outerIf.consequent[0] : null;
+        expect(outerFor?.type).toBe('ForStatement');
+        const innerIf = outerFor?.type === 'ForStatement' ? outerFor.body[0] : null;
+        expect(innerIf?.type).toBe('IfStatement');
+        const whileStmt = innerIf?.type === 'IfStatement' ? innerIf.consequent[0] : null;
+        expect(whileStmt?.type).toBe('WhileStatement');
+      }
+    });
   });
 
   describe('Layout gap fixtures', () => {
