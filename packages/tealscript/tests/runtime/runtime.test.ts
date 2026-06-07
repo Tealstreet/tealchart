@@ -601,6 +601,32 @@ barcolor(color=color.purple, transp=10, title="Bars")
       expect(result.plots.find((plot) => plot.title === 'Bars')?.color).toEqual(Array(bars.length).fill('#9C27B0E6'));
     });
 
+    it('applies legacy marker and OHLC transp arguments to visual colors', () => {
+      const code = `//@version=4
+study("Legacy Visual Transparency Channels", overlay=true)
+plotshape(true, title="Shape", color=color.blue, textcolor=color.white, transp=20)
+plotchar(true, title="Char", color=color.green, textcolor=color.white, transp=40)
+plotarrow(1, title="Arrow Up", colorup=color.green, colordown=color.red, transp=60)
+plotarrow(-1, title="Arrow Down", colorup=color.green, colordown=color.red, transp=60)
+plotbar(1, 2, 0, 1.5, title="Bars", color=color.purple, transp=30)
+plotcandle(1, 2, 0, 1.5, title="Candles", color=color.yellow, wickcolor=color.black, bordercolor=color.blue, transp=50)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Shape')?.color).toEqual(Array(bars.length).fill('#2196F3CC'));
+      expect(result.plots.find((plot) => plot.title === 'Shape')?.textColor).toBe('#FFFFFF');
+      expect(result.plots.find((plot) => plot.title === 'Char')?.color).toEqual(Array(bars.length).fill('#4CAF5099'));
+      expect(result.plots.find((plot) => plot.title === 'Char')?.textColor).toBe('#FFFFFF');
+      expect(result.plots.find((plot) => plot.title === 'Arrow Up')?.color).toEqual(Array(bars.length).fill('#4CAF5066'));
+      expect(result.plots.find((plot) => plot.title === 'Arrow Down')?.color).toEqual(Array(bars.length).fill('#F2364566'));
+      expect(result.plots.find((plot) => plot.title === 'Bars')?.color).toEqual(Array(bars.length).fill('#9C27B0B3'));
+      expect(result.plots.find((plot) => plot.title === 'Candles')?.color).toEqual(Array(bars.length).fill('#FDD83580'));
+      expect(result.plots.find((plot) => plot.title === 'Candles')?.wickColor).toEqual(Array(bars.length).fill('#363A4580'));
+      expect(result.plots.find((plot) => plot.title === 'Candles')?.borderColor).toEqual(Array(bars.length).fill('#2196F380'));
+    });
+
     it('extracts color channels and transparency', () => {
       const code = `//@version=6
 indicator("Test")

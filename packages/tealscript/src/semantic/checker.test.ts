@@ -995,6 +995,11 @@ basePlot = plot(open, color=color.red)
 fill(linePlot, basePlot, color=color.green, transp=50)
 barcolor(color.red, transp=10)
 bgcolor(color.blue, transp=75)
+plotshape(close > open, color=color.green, transp=20)
+plotchar(close > open, color=color.blue, transp=30)
+plotarrow(close - open, colorup=color.green, colordown=color.red, transp=40)
+plotbar(open, high, low, close, color=color.purple, transp=50)
+plotcandle(open, high, low, close, color=color.yellow, wickcolor=color.gray, bordercolor=color.blue, transp=60)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -1010,11 +1015,11 @@ hline(price="100", linewidth="2")
 fill(linePlot, basePlot, color.red, show_last="10", transp="50")
 barcolor(color.red, offset="1", show_last=false, transp="10")
 bgcolor(color.blue, offset=false, show_last="10", transp="75")
-plotbar(open="o", high=true, low="l", close=false, show_last="10", precision="2")
-plotcandle(open="o", high=true, low="l", close=false, show_last="10", precision="2")
-plotshape(close > open, offset="1", show_last=false, precision="2")
-plotchar(close > open, offset=false, show_last="10", precision="2")
-plotarrow(series="spread", offset=false, minheight="5", maxheight=false, show_last="10", precision="2")
+plotbar(open="o", high=true, low="l", close=false, show_last="10", precision="2", transp="30")
+plotcandle(open="o", high=true, low="l", close=false, show_last="10", precision="2", transp="40")
+plotshape(close > open, offset="1", show_last=false, precision="2", transp="20")
+plotchar(close > open, offset=false, show_last="10", precision="2", transp="30")
+plotarrow(series="spread", offset=false, minheight="5", maxheight=false, show_last="10", precision="2", transp="40")
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -1040,24 +1045,29 @@ plotarrow(series="spread", offset=false, minheight="5", maxheight=false, show_la
       'plotbar close must be a number, got bool',
       'plotbar show_last must be a number, got string',
       'plotbar precision must be a number, got string',
+      'plotbar transp must be a number, got string',
       'plotcandle open must be a number, got string',
       'plotcandle high must be a number, got bool',
       'plotcandle low must be a number, got string',
       'plotcandle close must be a number, got bool',
       'plotcandle show_last must be a number, got string',
       'plotcandle precision must be a number, got string',
+      'plotcandle transp must be a number, got string',
       'plotshape offset must be a number, got string',
       'plotshape show_last must be a number, got bool',
       'plotshape precision must be a number, got string',
+      'plotshape transp must be a number, got string',
       'plotchar offset must be a number, got bool',
       'plotchar show_last must be a number, got string',
       'plotchar precision must be a number, got string',
+      'plotchar transp must be a number, got string',
       'plotarrow series must be a number, got string',
       'plotarrow offset must be a number, got bool',
       'plotarrow minheight must be a number, got string',
       'plotarrow maxheight must be a number, got bool',
       'plotarrow show_last must be a number, got string',
       'plotarrow precision must be a number, got string',
+      'plotarrow transp must be a number, got string',
     ]);
   });
 

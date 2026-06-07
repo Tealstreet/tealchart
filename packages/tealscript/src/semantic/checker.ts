@@ -1212,7 +1212,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   [
     'plotbar',
     {
-      params: ['open', 'high', 'low', 'close', 'title', 'color', 'editable', 'show_last', 'display', 'format', 'precision', 'force_overlay'],
+      params: ['open', 'high', 'low', 'close', 'title', 'color', 'editable', 'show_last', 'display', 'format', 'precision', 'force_overlay', 'transp'],
       minArgs: 4,
       allowNamedPrefixWithPositional: true,
     },
@@ -1235,6 +1235,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'format',
         'precision',
         'force_overlay',
+        'transp',
       ],
       minArgs: 4,
       allowNamedPrefixWithPositional: true,
@@ -1259,6 +1260,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'format',
         'precision',
         'force_overlay',
+        'transp',
       ],
       minArgs: 1,
       allowNamedPrefixWithPositional: true,
@@ -1283,6 +1285,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'format',
         'precision',
         'force_overlay',
+        'transp',
       ],
       minArgs: 1,
       allowNamedPrefixWithPositional: true,
@@ -1305,6 +1308,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'format',
         'precision',
         'force_overlay',
+        'transp',
       ],
       minArgs: 1,
       allowNamedPrefixWithPositional: true,
@@ -1830,11 +1834,11 @@ const VISUAL_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]
   ['fill', ['show_last', 'transp']],
   ['hline', ['price', 'linewidth']],
   ['plot', ['linewidth', 'histbase', 'offset', 'show_last', 'precision', 'transp']],
-  ['plotbar', ['open', 'high', 'low', 'close', 'show_last', 'precision']],
-  ['plotcandle', ['open', 'high', 'low', 'close', 'show_last', 'precision']],
-  ['plotshape', ['offset', 'show_last', 'precision']],
-  ['plotchar', ['offset', 'show_last', 'precision']],
-  ['plotarrow', ['series', 'offset', 'minheight', 'maxheight', 'show_last', 'precision']],
+  ['plotbar', ['open', 'high', 'low', 'close', 'show_last', 'precision', 'transp']],
+  ['plotcandle', ['open', 'high', 'low', 'close', 'show_last', 'precision', 'transp']],
+  ['plotshape', ['offset', 'show_last', 'precision', 'transp']],
+  ['plotchar', ['offset', 'show_last', 'precision', 'transp']],
+  ['plotarrow', ['series', 'offset', 'minheight', 'maxheight', 'show_last', 'precision', 'transp']],
 ]);
 
 const DRAWING_XLOC_VALUES = new Set(['bar_index', 'bar_time']);
