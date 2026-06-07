@@ -108,7 +108,8 @@ Covered behavior and remaining gaps:
   declaration path for common public v3/v4 copy-paste scripts, including
   mapping named `resolution` / `resolution_gaps` arguments to the existing
   indicator `timeframe` / `timeframe_gaps` metadata. This is a declaration alias
-  only; broader old-version built-in/API differences remain outside this
+  only; selected legacy global built-in aliases are covered separately below,
+  while broader old-version built-in/API differences remain outside this
   compatibility point.
 - Top-level nested control blocks share the deeper block parser used by
   function bodies, including nested `if` / `else` dedents with reassignment
@@ -278,7 +279,10 @@ analysis preserves known scalar TA helper return types for downstream
 assignment diagnostics, including scalar `ta.vwap()` overloads and
 source-preserving `ta.change()` and `ta.valuewhen()` results, and rejects
 common non-numeric TA helper arguments plus non-boolean TA condition and option
-arguments before runtime.
+arguments before runtime. Legacy public-script aliases `sma()`, `ema()`,
+`rsi()`, `highest()`, `lowest()`, `cross()`, `crossover()`, and `crossunder()`
+route through their `ta.*` equivalents with the same source preservation,
+return inference, call-shape diagnostics, and runtime behavior.
 
 ## Common `str.*` Coverage
 
@@ -884,7 +888,8 @@ The request data pass covers `request.security()` over deterministic
 host-provided contexts, including same-symbol and other-symbol requests,
 higher-timeframe merging, common `gaps` / `lookahead` behavior,
 `ignore_invalid_symbol`, `calc_bars_count`, tuple expressions, dynamic request
-guards, `request.security_lower_tf()`, and `request.currency_rate()`.
+guards, legacy global `security()` aliasing with the same call binding and
+diagnostics, `request.security_lower_tf()`, and `request.currency_rate()`.
 Host-provided point-series contexts cover `request.dividends()`,
 `request.earnings()`, `request.splits()`, `request.financial()`, and
 `request.economic()`, including `lookahead_on` for timestamped corporate-action
