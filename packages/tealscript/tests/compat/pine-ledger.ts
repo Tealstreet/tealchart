@@ -3117,6 +3117,30 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughRuntime,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'public-recursive-udf-checkpoint',
+      title: 'Public Recursive UDF Checkpoint',
+      searchContext: 'TradingView public scripts search: recursive user-defined function factorial',
+      featureTags: ['udf', 'recursive', 'unsupported'],
+    }),
+    stages: [
+      { stage: 'parse', status: 'passed' },
+      { stage: 'semantic', status: 'passed' },
+      {
+        stage: 'runtime',
+        status: 'failed',
+        failureClass: 'unsupported_planned',
+        message: 'Recursive user function calls are not supported: factorial -> factorial',
+        diagnostics: [{
+          code: 'unsupported-feature',
+          message: 'Recursive user function calls are not supported',
+          line: 1,
+          column: 1,
+        }],
+      },
+    ],
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(

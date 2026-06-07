@@ -21,8 +21,8 @@ import {
 import { compatibilityCheckpointCorpus, compatibilityCheckpointLedger } from './pine-ledger';
 
 const EXPECTED_CHECKPOINT_TOTAL = compatibilityCheckpointLedger.entries.length;
-const EXPECTED_CHECKPOINT_FAILED = 3;
-const EXPECTED_CHECKPOINT_PLANNED_UNSUPPORTED = 3;
+const EXPECTED_CHECKPOINT_FAILED = 4;
+const EXPECTED_CHECKPOINT_PLANNED_UNSUPPORTED = 4;
 const EXPECTED_CHECKPOINT_PASSED = EXPECTED_CHECKPOINT_TOTAL - EXPECTED_CHECKPOINT_FAILED;
 
 describe('Pine compatibility checkpoint corpus', () => {
@@ -35,8 +35,8 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(run.summary.failed).toBe(EXPECTED_CHECKPOINT_FAILED);
     expect(run.summary.plannedUnsupported).toBe(EXPECTED_CHECKPOINT_PLANNED_UNSUPPORTED);
     expect(run.summary.actionableFailed).toBe(0);
-    expect(run.summary.byFirstFailureStage).toEqual({ semantic: 1, runtime: 2 });
-    expect(run.summary.byFirstFailureClass).toEqual({ unsupported_planned: 3 });
+    expect(run.summary.byFirstFailureStage).toEqual({ semantic: 1, runtime: 3 });
+    expect(run.summary.byFirstFailureClass).toEqual({ unsupported_planned: 4 });
     expect(run.summary.validationErrors).toEqual({});
     expect(run.summary.byFeatureTag).toMatchObject({
       inputs: { total: 18, passed: 18, failed: 0 },
@@ -148,9 +148,9 @@ describe('Pine compatibility checkpoint corpus', () => {
       tables: { total: 22, passed: 22, failed: 0 },
       barstate: { total: 10, passed: 10, failed: 0 },
       table_setters: { total: 1, passed: 1, failed: 0 },
-      udf: { total: 24, passed: 24, failed: 0 },
+      udf: { total: 25, passed: 24, failed: 1 },
       udt: { total: 8, passed: 8, failed: 0 },
-      unsupported: { total: 3, passed: 0, failed: 3 },
+      unsupported: { total: 4, passed: 0, failed: 4 },
       varip: { total: 2, passed: 2, failed: 0 },
       trade_accessors: { total: 4, passed: 4, failed: 0 },
       open_trades: { total: 2, passed: 2, failed: 0 },
@@ -495,6 +495,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('str-case-trim-checkpoint');
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('table-formatted-numbers-checkpoint');
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('plot-all-styles-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('public-recursive-udf-checkpoint');
   });
 
   it('renders a stable checkpoint corpus report', () => {
@@ -507,8 +508,8 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('Actionable failed: 0');
     expect(markdown).toContain('Actionable pass rate: 100.0%');
     expect(markdown).toContain('| semantic | 1 |');
-    expect(markdown).toContain('| runtime | 2 |');
-    expect(markdown).toContain('| unsupported_planned | 3 |');
+    expect(markdown).toContain('| runtime | 3 |');
+    expect(markdown).toContain('| unsupported_planned | 4 |');
     expect(markdown).toContain('| inputs | 18 | 18 | 0 |');
     expect(markdown).toContain('| legacy | 19 | 19 | 0 |');
     expect(markdown).toContain('| v4_compat | 3 | 3 | 0 |');
@@ -611,9 +612,9 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| trade_accessors | 4 | 4 | 0 |');
     expect(markdown).toContain('| open_trades | 2 | 2 | 0 |');
     expect(markdown).toContain('| cancel | 1 | 1 | 0 |');
-    expect(markdown).toContain('| udf | 24 | 24 | 0 |');
+    expect(markdown).toContain('| udf | 25 | 24 | 1 |');
     expect(markdown).toContain('| udt | 8 | 8 | 0 |');
-    expect(markdown).toContain('| unsupported | 3 | 0 | 3 |');
+    expect(markdown).toContain('| unsupported | 4 | 0 | 4 |');
     expect(markdown).toContain('| varip | 2 | 2 | 0 |');
     expect(markdown).toContain('| visuals | 46 | 46 | 0 |');
     expect(markdown).toContain('| volatility | 6 | 6 | 0 |');
@@ -795,9 +796,9 @@ plot(signals.fast(close, 2), title="Fast")
     expect(index).toMatchObject({
       schemaVersion: 1,
       total: EXPECTED_CHECKPOINT_TOTAL,
-      byCategory: { indicator: 290, strategy: 42 },
-      bySourceKind: { official_docs: 53, public_script: 279 },
-      byPineVersion: { v4: 4, v5: 10, v6: 318 },
+      byCategory: { indicator: 291, strategy: 42 },
+      bySourceKind: { official_docs: 53, public_script: 280 },
+      byPineVersion: { v4: 4, v5: 10, v6: 319 },
       byStoragePolicy: { reduced_fixture_only: EXPECTED_CHECKPOINT_TOTAL },
     });
     expect(index.byFeatureTag).toMatchObject({
@@ -906,9 +907,9 @@ plot(signals.fast(close, 2), title="Fast")
       trade_accessors: 4,
       open_trades: 2,
       cancel: 1,
-      udf: 24,
+      udf: 25,
       udt: 8,
-      unsupported: 3,
+      unsupported: 4,
       varip: 2,
       volatility: 6,
       vwap: 3,
@@ -954,7 +955,7 @@ plot(signals.fast(close, 2), title="Fast")
     expect(markdown).toContain('# Pine Compatibility Coverage');
     expect(markdown).toContain(`Total checkpoints: ${EXPECTED_CHECKPOINT_TOTAL}`);
     expect(markdown).toContain('| official_docs | 53 |');
-    expect(markdown).toContain('| public_script | 279 |');
+    expect(markdown).toContain('| public_script | 280 |');
     expect(markdown).toContain(`| reduced_fixture_only | ${EXPECTED_CHECKPOINT_TOTAL} |`);
     expect(formatPineCompatibilityCoverageJson(index)).toContain(`"total": ${EXPECTED_CHECKPOINT_TOTAL}`);
   });
@@ -977,7 +978,7 @@ plot(signals.fast(close, 2), title="Fast")
         `"passed": ${EXPECTED_CHECKPOINT_PASSED}`,
       );
       expect(readFileSync(join(outDir, 'pine-compatibility-corpus.json'), 'utf8')).toContain('"actionableFailed": 0');
-      expect(readFileSync(join(outDir, 'pine-compatibility-corpus.md'), 'utf8')).toContain('Pass rate: 99.1%');
+      expect(readFileSync(join(outDir, 'pine-compatibility-corpus.md'), 'utf8')).toContain('Pass rate: 98.8%');
       expect(readFileSync(join(outDir, 'pine-compatibility-corpus.md'), 'utf8')).toContain('Actionable pass rate: 100.0%');
       expect(readFileSync(join(outDir, 'pine-compatibility-coverage.json'), 'utf8')).toContain(
         `"total": ${EXPECTED_CHECKPOINT_TOTAL}`,
