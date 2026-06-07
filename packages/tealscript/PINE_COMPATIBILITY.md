@@ -632,7 +632,9 @@ operators when either operand is `na`, and short-circuiting
 comparisons such as `value == na` and `value > na`; use `na(value)` instead.
 Known numeric and literal `na` expressions in boolean contexts are also
 rejected, matching Pine v6's explicit boolean condition requirement; compare
-them explicitly or wrap them in `bool(...)`.
+them explicitly or wrap them in `bool(...)`. Typed `bool` variables also reject
+literal `na` initializers and reassignments while preserving explicit
+`bool(na)` conversion.
 
 ## Common Visual Coloring Coverage
 

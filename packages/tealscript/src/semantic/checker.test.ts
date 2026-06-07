@@ -189,6 +189,22 @@ plot(na or close > open ? 1 : 0)
     ]);
   });
 
+  it('reports literal na assigned to bool variables', () => {
+    const result = checkProgram(parse(`
+indicator("NA Bool Assignments")
+bool converted = bool(na)
+bool initialized = na
+bool reassigned = true
+reassigned := na
+plot(converted ? 1 : 0)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign na value to bool variable',
+      'Cannot assign na value to bool variable reassigned',
+    ]);
+  });
+
   it('reports numeric expressions used as booleans', () => {
     const result = checkProgram(parse(`
 indicator("Numeric Bool")
