@@ -1783,6 +1783,39 @@ plot(bearSignal ? 1 : 0, title="Bear Signal")
     expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0]);
   });
 
+  it('locks a reduced public range trend-filter signal idiom', () => {
+    // Public idiom reference: range breakout scripts commonly combine rolling
+    // range expansion with rising/falling trend filters before routing signals.
+    // Source search: https://www.tradingview.com/scripts/search/range%20breakout%20trend%20filter/
+    const result = runCompatScript(`
+indicator("Public Range Trend Filter Checkpoint")
+length = input.int(4, "Length")
+minRange = input.float(7.0, "Minimum Range")
+priceRange = ta.range(source=close, length=length)
+risingClose = ta.rising(source=close, length=3)
+fallingClose = ta.falling(source=close, length=3)
+bullSignal = priceRange > minRange and risingClose
+bearSignal = priceRange > minRange and fallingClose
+plot(priceRange, title="Range")
+plot(risingClose ? 1 : 0, title="Rising")
+plot(fallingClose ? 1 : 0, title="Falling")
+plot(bullSignal ? 1 : 0, title="Bull Signal")
+plot(bearSignal ? 1 : 0, title="Bear Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public Range Trend Filter Checkpoint');
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Length', 'int'],
+      ['Minimum Range', 'float'],
+    ]);
+    expect(roundSeries(getPlot(result, 'Range').values)).toEqual([0, 3, 5, 5, 8, 8, 5, 10, 9, 7, 3, 4]);
+    expect(getPlot(result, 'Rising').values).toEqual([0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1]);
+    expect(getPlot(result, 'Falling').values).toEqual([0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Bull Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]);
+  });
+
   it('locks a reduced public moving-average ribbon signal idiom', () => {
     // Public idiom reference: moving-average ribbon scripts commonly expose
     // multiple average lengths and route trend state from fast/slow overlays.
