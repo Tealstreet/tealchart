@@ -487,8 +487,6 @@ interface StaticNameInfo {
 
 type StaticCollectionScopes = Array<Map<string, StaticNameInfo>>;
 
-const PLANNED_UNSUPPORTED_NAMESPACES = new Set(['ticker']);
-
 /**
  * Tealscript Engine - executes AST bar-by-bar
  */
@@ -3405,10 +3403,6 @@ export class TealscriptEngine {
       return builtin(args, namedArgs, this.ctx, this.scope, this.builtinCallId(builtinName, expr));
     }
 
-    if (namespace && !this.scope.has(namespace) && this.isPlannedUnsupportedNamespace(namespace)) {
-      throw new Error(`${namespace}.* functions are not supported yet: ${fullName}`);
-    }
-
     if (expr.callee.type === 'MemberExpression') {
       let receiver: unknown;
       try {
@@ -4073,10 +4067,6 @@ export class TealscriptEngine {
 
   private isUnsupportedDrawingNamespace(_namespace: string): boolean {
     return false;
-  }
-
-  private isPlannedUnsupportedNamespace(namespace: string): boolean {
-    return PLANNED_UNSUPPORTED_NAMESPACES.has(namespace);
   }
 
   private assertCanEvaluateRequest(fullName: string): void {

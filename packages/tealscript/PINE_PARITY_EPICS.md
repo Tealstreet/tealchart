@@ -374,8 +374,8 @@ Phases:
    diagnostic for corpus/editor classification.
 6. Maintain corpus-driven checkpoints for MTF trend filters, lower-timeframe
    arrays, currency conversion, earnings events, corporate actions, financial
-   dashboards, economic macro overlays, seed datasets, synthetic ticker IDs,
-   planned unsupported ticker constructors, and request-limit reuse.
+   dashboards, economic macro overlays, seed datasets, documented synthetic
+   ticker IDs, and request-limit reuse.
 
 Done means MTF and multi-symbol scripts can run against deterministic or
 host-provided data.
