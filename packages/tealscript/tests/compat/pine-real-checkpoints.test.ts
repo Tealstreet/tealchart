@@ -1735,6 +1735,48 @@ plot(bearSignal ? 1 : 0, title="Bear Signal")
     expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1]);
   });
 
+  it('locks a reduced public CCI signal idiom', () => {
+    // Public idiom reference: Commodity Channel Index scripts commonly expose
+    // length and threshold inputs, then route oscillator overbought/oversold signals.
+    // Source search: https://www.tradingview.com/scripts/search/commodity%20channel%20index%20signal/
+    const result = runCompatScript(`
+indicator("Public CCI Signal Checkpoint")
+length = input.int(4, "Length")
+overbought = input.float(100.0, "Overbought")
+oversold = input.float(-100.0, "Oversold")
+cci = ta.cci(source=hlc3, length=length)
+bullSignal = cci < oversold
+bearSignal = cci > overbought
+plot(cci, title="CCI")
+plot(bullSignal ? 1 : 0, title="Bull Signal")
+plot(bearSignal ? 1 : 0, title="Bear Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public CCI Signal Checkpoint');
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Length', 'int'],
+      ['Overbought', 'float'],
+      ['Oversold', 'float'],
+    ]);
+    expect(roundSeries(getPlot(result, 'CCI').values)).toEqual([
+      null,
+      null,
+      null,
+      27.45098,
+      -133.333333,
+      -81.904762,
+      33.333333,
+      125,
+      76.190476,
+      88.050314,
+      91.666667,
+      66.666667,
+    ]);
+    expect(getPlot(result, 'Bull Signal').values).toEqual([0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]);
+  });
+
   it('locks a reduced public object-method state idiom', () => {
     // Public idiom reference: market-structure public indicators commonly keep
     // swing state in user-defined objects and update it through methods.
