@@ -4194,6 +4194,75 @@ plot(strategy.position_size, title="Position")
     });
   });
 
+  it('locks the official strategy OCA cancel idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/#oca-groups
+    const bars: Bar[] = [
+      { time: 1_700_155_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_155_060_000, open: 100, high: 103, low: 99, close: 102, volume: 100 },
+      { time: 1_700_155_120_000, open: 102, high: 103, low: 101, close: 102, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Official OCA Cancel Checkpoint")
+if bar_index == 0
+    strategy.entry("Breakout Long", strategy.long, stop=102, oca_name="Breakout", oca_type=strategy.oca.cancel)
+    strategy.entry("Breakout Short", strategy.short, stop=98, oca_name="Breakout", oca_type=strategy.oca.cancel)
+plot(strategy.position_size, title="Position")
+plot(strategy.opentrades, title="Open Trades")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Position').values).toEqual([0, 0, 1]);
+    expect(getPlot(result, 'Open Trades').values).toEqual([0, 0, 1]);
+    expect(result.strategy.orders.map((order) => ({
+      id: order.id,
+      status: order.status,
+      avgFillPrice: order.avgFillPrice,
+      updatedBarIndex: order.updatedBarIndex,
+    }))).toEqual([
+      { id: 'Breakout Long', status: 'filled', avgFillPrice: 102, updatedBarIndex: 1 },
+      { id: 'Breakout Short', status: 'cancelled', avgFillPrice: null, updatedBarIndex: 1 },
+    ]);
+  });
+
+  it('locks the official strategy OCA reduce idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/faq/strategies/#using-strategyocareduce
+    const bars: Bar[] = [
+      { time: 1_700_156_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_156_060_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 1_700_156_120_000, open: 101, high: 102.5, low: 98, close: 99, volume: 100 },
+      { time: 1_700_156_180_000, open: 99, high: 100, low: 98, close: 99, volume: 100 },
+    ];
+    const result = runCompatScript(`
+strategy("Official OCA Reduce Checkpoint", process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=3)
+if strategy.position_size > 0 and bar_index == 1
+    strategy.order("Target 1", strategy.short, qty=1, limit=102, oca_name="Bracket", oca_type=strategy.oca.reduce)
+    strategy.order("Target 2", strategy.short, qty=1, limit=103, oca_name="Bracket", oca_type=strategy.oca.reduce)
+    strategy.order("Stop", strategy.short, qty=3, stop=99, oca_name="Bracket", oca_type=strategy.oca.reduce)
+plot(strategy.position_size, title="Position")
+plot(strategy.closedtrades, title="Closed Trades")
+plot(strategy.netprofit, title="Net Profit")
+`, { bars });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Position').values).toEqual([3, 3, 3, 0]);
+    expect(getPlot(result, 'Closed Trades').values).toEqual([0, 0, 0, 2]);
+    expect(getPlot(result, 'Net Profit').values).toEqual([0, 0, 0, 0]);
+    expect(result.strategy.orders.map((order) => ({
+      id: order.id,
+      status: order.status,
+      qty: order.qty,
+      filledQty: order.filledQty,
+      avgFillPrice: order.avgFillPrice,
+    }))).toEqual([
+      { id: 'Long', status: 'filled', qty: 3, filledQty: 3, avgFillPrice: 100 },
+      { id: 'Target 1', status: 'filled', qty: 1, filledQty: 1, avgFillPrice: 102 },
+      { id: 'Target 2', status: 'cancelled', qty: 0, filledQty: 0, avgFillPrice: null },
+      { id: 'Stop', status: 'filled', qty: 2, filledQty: 2, avgFillPrice: 99 },
+    ]);
+  });
+
   it('locks a reduced official strategy calc-on-order-fills idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const bars: Bar[] = [
