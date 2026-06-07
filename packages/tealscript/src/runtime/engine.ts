@@ -7524,11 +7524,11 @@ export class TealscriptEngine {
     const hlineArgs = ['price', 'title', 'color', 'linestyle', 'linewidth', 'editable', 'display'] as const;
     const bgcolorArgs = ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay', 'transp'] as const;
     const barcolorArgs = ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'transp'] as const;
-    const plotbarArgs = ['open', 'high', 'low', 'close', 'title', 'color', 'editable', 'show_last', 'display', 'format', 'precision', 'force_overlay'] as const;
-    const plotcandleArgs = ['open', 'high', 'low', 'close', 'title', 'color', 'wickcolor', 'editable', 'show_last', 'bordercolor', 'display', 'format', 'precision', 'force_overlay'] as const;
-    const plotshapeArgs = ['series', 'title', 'style', 'location', 'color', 'offset', 'text', 'textcolor', 'editable', 'size', 'show_last', 'display', 'format', 'precision', 'force_overlay'] as const;
-    const plotcharArgs = ['series', 'title', 'char', 'location', 'color', 'offset', 'text', 'textcolor', 'editable', 'size', 'show_last', 'display', 'format', 'precision', 'force_overlay'] as const;
-    const plotarrowArgs = ['series', 'title', 'colorup', 'colordown', 'offset', 'minheight', 'maxheight', 'editable', 'show_last', 'display', 'format', 'precision', 'force_overlay'] as const;
+    const plotbarArgs = ['open', 'high', 'low', 'close', 'title', 'color', 'editable', 'show_last', 'display', 'format', 'precision', 'force_overlay', 'transp'] as const;
+    const plotcandleArgs = ['open', 'high', 'low', 'close', 'title', 'color', 'wickcolor', 'editable', 'show_last', 'bordercolor', 'display', 'format', 'precision', 'force_overlay', 'transp'] as const;
+    const plotshapeArgs = ['series', 'title', 'style', 'location', 'color', 'offset', 'text', 'textcolor', 'editable', 'size', 'show_last', 'display', 'format', 'precision', 'force_overlay', 'transp'] as const;
+    const plotcharArgs = ['series', 'title', 'char', 'location', 'color', 'offset', 'text', 'textcolor', 'editable', 'size', 'show_last', 'display', 'format', 'precision', 'force_overlay', 'transp'] as const;
+    const plotarrowArgs = ['series', 'title', 'colorup', 'colordown', 'offset', 'minheight', 'maxheight', 'editable', 'show_last', 'display', 'format', 'precision', 'force_overlay', 'transp'] as const;
     const fillArgs = ['plot1', 'plot2', 'color', 'title', 'editable', 'show_last', 'fillgaps', 'display', 'transp'] as const;
 
     this.builtins.set('plot', (args, namedArgs, ctx) => {
@@ -7691,14 +7691,17 @@ export class TealscriptEngine {
       const low = this.toPlotValue(this.getOrderedCallArg(args, namedArgs, plotbarArgs, 2));
       const close = this.toPlotValue(this.getOrderedCallArg(args, namedArgs, plotbarArgs, 3));
       const title = (this.getOrderedCallArg(args, namedArgs, plotbarArgs, 4, callId)) as string;
-      const color = this.toPlotColor(
-        this.getOrderedCallArg(
-          args,
-          namedArgs,
-          plotbarArgs,
-          5,
-          close !== null && open !== null && close >= open ? '#4CAF50' : '#F23645',
+      const color = this.applyPlotTransparency(
+        this.toPlotColor(
+          this.getOrderedCallArg(
+            args,
+            namedArgs,
+            plotbarArgs,
+            5,
+            close !== null && open !== null && close >= open ? '#4CAF50' : '#F23645',
+          ),
         ),
+        this.getOrderedCallArg(args, namedArgs, plotbarArgs, 12),
       );
       const editable = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, plotbarArgs, 6));
       const showLast = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotbarArgs, 7));
@@ -7740,11 +7743,12 @@ export class TealscriptEngine {
       const close = this.toPlotValue(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 3));
       const title = (this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 4, callId)) as string;
       const defaultColor = close !== null && open !== null && close >= open ? '#4CAF50' : '#F23645';
-      const color = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 5, defaultColor));
-      const wickColor = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 6, color));
+      const transp = this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 14);
+      const color = this.applyPlotTransparency(this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 5, defaultColor)), transp);
+      const wickColor = this.applyPlotTransparency(this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 6, color)), transp);
       const editable = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 7));
       const showLast = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 8));
-      const borderColor = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 9, color));
+      const borderColor = this.applyPlotTransparency(this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 9, color)), transp);
       const display = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 10));
       const format = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 11));
       const precision = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 12));
@@ -7805,7 +7809,10 @@ export class TealscriptEngine {
       const title = (this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 1, 'Shape')) as string;
       const style = (this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 2, 'circle')) as string;
       const location = (this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 3, 'abovebar')) as string;
-      const color = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 4, '#2196F3'));
+      const color = this.applyPlotTransparency(
+        this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 4, '#2196F3')),
+        this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 15),
+      );
       const offset = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 5));
       const text = (this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 6, '')) as string;
       const textColor = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 7, '#FFFFFF'));
@@ -7867,7 +7874,10 @@ export class TealscriptEngine {
       const title = (this.getOrderedCallArg(args, namedArgs, plotcharArgs, 1, 'Char')) as string;
       const char = (this.getOrderedCallArg(args, namedArgs, plotcharArgs, 2, '●')) as string;
       const location = (this.getOrderedCallArg(args, namedArgs, plotcharArgs, 3, 'abovebar')) as string;
-      const color = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotcharArgs, 4, '#2196F3'));
+      const color = this.applyPlotTransparency(
+        this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotcharArgs, 4, '#2196F3')),
+        this.getOrderedCallArg(args, namedArgs, plotcharArgs, 15),
+      );
       const offset = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotcharArgs, 5));
       const text = (this.getOrderedCallArg(args, namedArgs, plotcharArgs, 6, '')) as string;
       const textColor = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotcharArgs, 7, '#FFFFFF'));
@@ -7927,8 +7937,9 @@ export class TealscriptEngine {
     this.builtins.set('plotarrow', (args, namedArgs, ctx) => {
       const series = this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 0) as number; // Positive = up arrow, negative = down arrow
       const title = (this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 1, 'Arrow')) as string;
-      const colorup = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 2, '#4CAF50'));
-      const colordown = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 3, '#F23645'));
+      const transp = this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 13);
+      const colorup = this.applyPlotTransparency(this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 2, '#4CAF50')), transp);
+      const colordown = this.applyPlotTransparency(this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 3, '#F23645')), transp);
       const offset = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 4));
       const minHeight = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 5));
       const maxHeight = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 6));

@@ -715,9 +715,9 @@ preserving existing gap handling, per-bar fill colors, display hiding, and
 plot/hline handle fills. Semantic analysis now preserves `plot()` and `hline()`
 handle return types so mixed handle assignments report Pine-shaped diagnostics
 before runtime. Legacy named `transp` arguments are accepted and applied to
-`plot()`, `fill()`, `bgcolor()`, and `barcolor()` colors; marker and OHLC visual
-transparency aliases remain planned separately because they involve multiple
-color channels.
+`plot()`, `fill()`, `bgcolor()`, `barcolor()`, marker, arrow, and OHLC visual
+color channels, with semantic diagnostics rejecting non-numeric transparency
+values before runtime.
 
 Plotarrow renderer coverage scales arrows between Pine `minheight` and
 `maxheight` using the visible series magnitude and suppresses zero-value arrows.
