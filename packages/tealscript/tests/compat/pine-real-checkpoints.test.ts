@@ -1630,6 +1630,69 @@ plot(slopeUp ? 1 : 0, title="Slope Up")
     expect(getPlot(result, 'Slope Up').values).toEqual([0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1]);
   });
 
+  it('locks a reduced public stochastic signal idiom', () => {
+    // Public idiom reference: stochastic oscillator scripts commonly expose
+    // %K/%D smoothing and overbought/oversold gates before routing signals.
+    // Source search: https://www.tradingview.com/scripts/search/stochastic%20oscillator%20signal/
+    const result = runCompatScript(`
+indicator("Public Stochastic Signal Checkpoint")
+length = input.int(4, "Length")
+kSmooth = input.int(2, "K Smooth")
+dSmooth = input.int(3, "D Smooth")
+overbought = input.float(80.0, "Overbought")
+oversold = input.float(20.0, "Oversold")
+rawK = ta.stoch(source=close, high=high, low=low, length=length)
+k = ta.sma(rawK, kSmooth)
+d = ta.sma(k, dSmooth)
+bullSignal = k > d and k < overbought
+bearSignal = k < d and k > oversold
+plot(k, title="K")
+plot(d, title="D")
+plot(bullSignal ? 1 : 0, title="Bull Signal")
+plot(bearSignal ? 1 : 0, title="Bear Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public Stochastic Signal Checkpoint');
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Length', 'int'],
+      ['K Smooth', 'int'],
+      ['D Smooth', 'int'],
+      ['Overbought', 'float'],
+      ['Oversold', 'float'],
+    ]);
+    expect(roundSeries(getPlot(result, 'K').values)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      24.545455,
+      19.93007,
+      46.153846,
+      77.197802,
+      86.428571,
+      86.153846,
+      77.972028,
+      69.318182,
+    ]);
+    expect(roundSeries(getPlot(result, 'D').values)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      30.20979,
+      47.760573,
+      69.92674,
+      83.260073,
+      83.518149,
+      77.814685,
+    ]);
+    expect(getPlot(result, 'Bull Signal').values).toEqual([0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1]);
+  });
+
   it('locks a reduced public object-method state idiom', () => {
     // Public idiom reference: market-structure public indicators commonly keep
     // swing state in user-defined objects and update it through methods.
