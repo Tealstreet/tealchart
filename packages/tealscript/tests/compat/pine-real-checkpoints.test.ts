@@ -1558,6 +1558,78 @@ plot(bearFlip ? 1 : 0, title="Bear Flip")
     expect(getPlot(result, 'Bear Flip').values).toEqual([0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]);
   });
 
+  it('locks a reduced public linear-regression channel idiom', () => {
+    // Public idiom reference: linear-regression channel scripts commonly expose
+    // length/deviation inputs, route channel bands, and derive slope signals.
+    // Source search: https://www.tradingview.com/scripts/search/linear%20regression%20channel/
+    const result = runCompatScript(`
+indicator("Public Linear Regression Channel Checkpoint", overlay=true)
+length = input.int(4, "Length")
+deviation = input.float(1.5, "Deviation")
+basis = ta.linreg(source=close, length=length, offset=0)
+previousBasis = ta.linreg(source=close, length=length, offset=1)
+spread = ta.stdev(close, length) * deviation
+upper = basis + spread
+lower = basis - spread
+slopeUp = basis > previousBasis
+plot(basis, title="Basis")
+plot(upper, title="Upper")
+plot(lower, title="Lower")
+plot(slopeUp ? 1 : 0, title="Slope Up")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public Linear Regression Channel Checkpoint');
+    expect(result.indicatorOverlay).toBe(true);
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Length', 'int'],
+      ['Deviation', 'float'],
+    ]);
+    expect(roundSeries(getPlot(result, 'Basis').values)).toEqual([
+      null,
+      null,
+      null,
+      105,
+      100.2,
+      98.5,
+      102.1,
+      108.1,
+      109.6,
+      111,
+      110.4,
+      111.9,
+    ]);
+    expect(roundSeries(getPlot(result, 'Upper').values)).toEqual([
+      null,
+      null,
+      null,
+      107.88043,
+      104.63706,
+      103.168712,
+      105.192329,
+      114.005506,
+      114.942928,
+      114.824265,
+      112.077051,
+      114.11853,
+    ]);
+    expect(roundSeries(getPlot(result, 'Lower').values)).toEqual([
+      null,
+      null,
+      null,
+      102.11957,
+      95.76294,
+      93.831288,
+      99.007671,
+      102.194494,
+      104.257072,
+      107.175735,
+      108.722949,
+      109.68147,
+    ]);
+    expect(getPlot(result, 'Slope Up').values).toEqual([0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1]);
+  });
+
   it('locks a reduced public object-method state idiom', () => {
     // Public idiom reference: market-structure public indicators commonly keep
     // swing state in user-defined objects and update it through methods.
