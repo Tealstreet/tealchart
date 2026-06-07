@@ -176,4 +176,3 @@ rebuild the parser, and unskip the test.
 | **Real-world corpus probe (15 scripts)** | **0** | All pass |
 | **Advanced corpus probe (10 scripts)** | **0** | All pass |
 | **Edge-case corpus probe (12 scripts)** | **1 (parser)** | 11 pass, 1 skipped (trailing comma) |
-| **Edge-case corpus probe (12 scripts)** | **1** | 11 pass, 1 skipped |
