@@ -48,8 +48,8 @@ explicit `max_bars_back` metadata, official lower-timeframe request arrays,
 official synthetic ticker requests, official dynamic sessions, official
 timeframe comparisons, official plot-style payloads, and public configurable
 input panels, legacy v4 study/input/helper copy-paste scripts, MTF, divergence,
-volatility-band overlays, session-filter, session-state, dashboard-table,
-multi-symbol screener, currency conversion, earnings event markers,
+volatility-band and anchored VWAP band overlays, session-filter, session-state,
+dashboard-table, multi-symbol screener, currency conversion, earnings event markers,
 corporate-action overlays, financial dashboards, economic macro overlays, seed
 dataset overlays, array signal queues, map signal dashboards, matrix
 scoreboards, drawing-zone, drawing-copy, linefill-channel, custom-candle, and
@@ -181,7 +181,9 @@ Covered behavior and remaining gaps:
   accumulators are isolated per call site and reset when `anchor` is true.
   Semantic analysis preserves scalar VWAP calls as `series float` while the
   `stdev_mult` overload returns `[vwap, upper, lower]` band tuples with
-  weighted cumulative standard-deviation bands.
+  weighted cumulative standard-deviation bands. A source-linked public
+  anchored VWAP band checkpoint locks the common overlay/channel idiom in the
+  offline corpus.
 - Recursive user-defined function calls are rejected with an explicit diagnostic
   instead of overflowing the runtime stack.
 - Arbitrary nested indented blocks still use a simplified indentation grammar

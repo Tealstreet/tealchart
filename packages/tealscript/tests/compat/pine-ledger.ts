@@ -397,6 +397,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-anchored-vwap-band-checkpoint',
+      title: 'Public Anchored VWAP Band Checkpoint',
+      searchContext: 'TradingView public scripts search: anchored vwap bands',
+      featureTags: ['visuals', 'signals', 'ta', 'bands', 'fills', 'vwap'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-object-method-checkpoint',
       title: 'Public Object Method Checkpoint',
       searchContext: 'TradingView public scripts search: market structure object',

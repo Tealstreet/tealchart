@@ -755,6 +755,83 @@ plot(bandWidth, title="Band Width")
     ]);
   });
 
+  it('locks a reduced public anchored VWAP band idiom', () => {
+    // Public idiom reference: anchored VWAP public indicators commonly reset
+    // VWAP on user/session anchors, render stdev bands, and flag band breaks.
+    // Source search: https://www.tradingview.com/scripts/search/anchored%20vwap%20bands/
+    const result = runCompatScript(`
+indicator("Public Anchored VWAP Band Checkpoint", overlay=true)
+anchor = bar_index == 0 or bar_index == 6
+[vwap, upper, lower] = ta.vwap(source=close, anchor=anchor, stdev_mult=1.5)
+upperPlot = plot(upper, title="Upper VWAP Band", color=color.new(color.blue, 0))
+lowerPlot = plot(lower, title="Lower VWAP Band", color=color.new(color.blue, 0))
+fill(upperPlot, lowerPlot, color=color.new(color.blue, 85), title="VWAP Channel")
+plot(vwap, title="Anchored VWAP", color=color.orange, linewidth=2)
+plot(close > upper ? 1 : 0, title="Upper Break")
+plot(close < lower ? 1 : 0, title="Lower Break")
+plotshape(close > upper, title="Upper Break Marker", style=shape.triangleup, location=location.abovebar, color=color.green, text="VWAP")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Anchored VWAP').values)).toEqual([
+      102,
+      103.571429,
+      104.6,
+      104.129412,
+      102.858407,
+      102.410448,
+      104,
+      106.758621,
+      107.121951,
+      108.160714,
+      108.517986,
+      109.119048,
+    ]);
+    expect(roundSeries(getPlot(result, 'Upper VWAP Band').values)).toEqual([
+      102,
+      105.818876,
+      107.614963,
+      106.888455,
+      106.952329,
+      106.480228,
+      104,
+      110.488501,
+      110.371259,
+      111.950964,
+      112.091053,
+      112.921571,
+    ]);
+    expect(roundSeries(getPlot(result, 'Lower VWAP Band').values)).toEqual([
+      102,
+      101.323981,
+      101.585037,
+      101.370369,
+      98.764485,
+      98.340667,
+      104,
+      103.02874,
+      103.872643,
+      104.370465,
+      104.944919,
+      105.316524,
+    ]);
+    expect(getPlot(result, 'Upper Break').values).toEqual(Array(compatibilityBars.length).fill(0));
+    expect(getPlot(result, 'Lower Break').values).toEqual(Array(compatibilityBars.length).fill(0));
+    expect(getPlot(result, 'Upper Break Marker')).toMatchObject({
+      type: 'plotshape',
+      shape: 'triangleup',
+      location: 'abovebar',
+      text: 'VWAP',
+    });
+    expect(getPlot(result, 'Upper Break Marker').values).toEqual(Array(compatibilityBars.length).fill(null));
+    expect(getPlot(result, 'VWAP Channel')).toMatchObject({
+      type: 'fill',
+      plot1Id: 'plot_Upper VWAP Band',
+      plot2Id: 'plot_Lower VWAP Band',
+      color: Array(compatibilityBars.length).fill('#2196F326'),
+    });
+  });
+
   it('locks reduced official plot-style payload idioms', () => {
     // Source: https://www.tradingview.com/pine-script-docs/visuals/plots/
     const result = runCompatScript(`
