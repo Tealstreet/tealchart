@@ -307,7 +307,8 @@ inputs that gate a filtered public-style signal. It also reports Pine-style diag
 default-value mismatches, literal default `minval` / `maxval` / `options` constraint
 violations, invalid literal `display` option values, and `input.int()` /
 `input.float()` calls that mix `options` with range-only
-`minval`/`maxval`/`step` arguments.
+`minval`/`maxval`/`step` arguments. Input metadata diagnostics also reject
+non-boolean `confirm` and `active` values before runtime.
 
 ## Common `array.*` Coverage
 
