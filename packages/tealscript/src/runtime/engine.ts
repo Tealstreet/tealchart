@@ -230,38 +230,13 @@ const MONTH_NAMES = [
 
 const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const;
 
-// Maps tuple member names to their array index in TA function return arrays.
-// ta.bb / ta.kc: [middle/basis, upper, lower]
-// ta.macd:       [macd, signal, hist]
-// ta.dmi:        [plus, minus, adx]
-// ta.supertrend: [supertrend, direction]
-// ta.vwap:       [vwap, upper, lower]
+// Maps Pine tuple member names to array indices for TA functions that return arrays.
+// bb/kc: [middle/basis, upper, lower]; macd: [macd, signal, hist];
+// dmi: [plus, minus, adx]; supertrend: [supertrend, direction]; vwap: [vwap, upper, lower]
 const TUPLE_FIELD_INDEX: Record<string, number> = {
-  // ta.bb / ta.kc — index 0
-  middle: 0,
-  basis: 0,
-  // ta.bb / ta.kc / ta.vwap — index 1
-  upper: 1,
-  // ta.bb / ta.kc / ta.vwap — index 2
-  lower: 2,
-  // ta.macd — index 0
-  macd: 0,
-  // ta.macd — index 1
-  signal: 1,
-  // ta.macd — index 2
-  hist: 2,
-  // ta.dmi — index 0
-  plus: 0,
-  // ta.dmi — index 1
-  minus: 1,
-  // ta.dmi — index 2
-  adx: 2,
-  // ta.supertrend — index 0
-  supertrend: 0,
-  // ta.supertrend — index 1
-  direction: 1,
-  // ta.vwap with stdev_mult — index 0
-  vwap: 0,
+  middle: 0, basis: 0, vwap: 0, macd: 0, plus: 0, supertrend: 0,
+  upper: 1, signal: 1, minus: 1, direction: 1,
+  lower: 2, hist: 2, adx: 2,
 };
 
 /**

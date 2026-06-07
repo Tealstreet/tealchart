@@ -1059,6 +1059,21 @@ plot(kc.lower)
       expect(result.errors).toHaveLength(0);
       expect(result.plots).toHaveLength(3);
     });
+
+    it('accesses ta.vwap results via member syntax when stdev_mult is provided', () => {
+      const code = `//@version=6
+indicator("Test")
+v = ta.vwap(hlc3, false, 1.0)
+plot(v.vwap)
+plot(v.upper)
+plot(v.lower)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, createBars(10));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(3);
+    });
   });
 
   describe('complete indicators', () => {
