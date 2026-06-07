@@ -175,8 +175,9 @@ Phases:
    Strategy-bracket coverage includes official broker examples plus a reduced
    public fixed-bracket strategy fixture, and trailing-stop coverage includes
    official and reduced public strategy fixtures.
-   Alert coverage includes official docs examples plus a reduced public signal
-   fixture with both `alertcondition()` metadata and direct `alert()` emission.
+   Alert/log coverage includes official docs examples plus reduced public signal
+   fixtures with `alertcondition()` metadata, direct `alert()` emission, and
+   Pine Logs startup/signal/final-summary output.
    Synthetic ticker coverage includes official docs examples plus a reduced
    public Heikin-Ashi trend request fixture.
 7. Generate a trendable pass-rate report: total scripts, parse pass, semantic

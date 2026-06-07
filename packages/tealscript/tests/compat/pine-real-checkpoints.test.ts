@@ -2729,6 +2729,40 @@ plot(average, title="Average")
     ]);
   });
 
+  it('locks a reduced public log signal idiom', () => {
+    // Public idiom reference: public signal/debug scripts commonly emit Pine
+    // Logs entries around startup, signal transitions, and final summaries.
+    // Source search: https://www.tradingview.com/scripts/search/log%20signal/
+    const result = runCompatScript(`
+indicator("Public Log Signal Checkpoint")
+average = ta.sma(close, 3)
+signal = close > average
+var signalCount = 0
+var previousSignal = false
+if barstate.isfirst
+    log.info("Public log checkpoint {0}", syminfo.ticker)
+if signal
+    signalCount += 1
+if signal and not previousSignal
+    log.warning("Signal {0} close {1:#.00}", bar_index, close)
+previousSignal := signal
+if barstate.islast
+    log.error(message="Final signals {0}", signalCount)
+plot(signal ? 1 : 0, title="Signal")
+plot(signalCount, title="Signal Count")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Signal').values).toEqual([0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Signal Count').values).toEqual([0, 0, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7]);
+    expect(result.logs.map(({ level, barIndex, message }) => ({ level, barIndex, message }))).toEqual([
+      { level: 'info', barIndex: 0, message: 'Public log checkpoint BTCUSDT' },
+      { level: 'warning', barIndex: 2, message: 'Signal 2 close 107.00' },
+      { level: 'warning', barIndex: 6, message: 'Signal 6 close 104.00' },
+      { level: 'error', barIndex: 11, message: 'Final signals 7' },
+    ]);
+  });
+
   it('locks the official strategy entry and bracket-exit idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
     const bars: Bar[] = [

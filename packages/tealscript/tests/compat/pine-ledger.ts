@@ -680,6 +680,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-log-signal-checkpoint',
+      title: 'Public Log Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: log signal',
+      featureTags: ['logs', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-custom-candle-checkpoint',
       title: 'Public Custom Candle Checkpoint',
       searchContext: 'TradingView public scripts search: heikin ashi candles',
