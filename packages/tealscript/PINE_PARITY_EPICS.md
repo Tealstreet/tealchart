@@ -272,7 +272,9 @@ Phases:
 6. Maintain stable runtime error payloads and source-linked `runtime.error()`
    guard coverage as new public-script halt patterns appear.
 7. Add focused fixtures for common public-script idioms that previously parsed
-   but failed or drifted at runtime.
+   but failed or drifted at runtime. Current source-linked coverage includes a
+   public barstate dashboard fixture that locks first-bar initialization,
+   last-confirmed-history snapshots, and last-bar table updates.
 
 Done means common historical indicator scripts run without semantic drift for
 supported features.

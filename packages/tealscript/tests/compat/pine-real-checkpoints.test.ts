@@ -1912,6 +1912,89 @@ plot(slow, title="Slow Average")
     ]);
   });
 
+  it('locks a reduced public barstate dashboard idiom', () => {
+    // Public idiom reference: public dashboards commonly initialize state on
+    // the first bar, snapshot confirmed historical values, and update tables
+    // only on the last visible bar.
+    // Source search: https://www.tradingview.com/scripts/search/barstate%20dashboard/
+    const result = runCompatScript(`
+indicator("Public Barstate Dashboard Checkpoint", overlay=true)
+var seedClose = na
+var lastHistoricalClose = na
+if barstate.isfirst
+    seedClose := close
+if barstate.islastconfirmedhistory
+    lastHistoricalClose := close
+lastGate = barstate.islast ? close : na
+confirmedGate = barstate.isconfirmed ? 1 : 0
+historyGate = barstate.ishistory ? 1 : 0
+var board = table.new(position.bottom_right, 2, 3, border_width=1, border_color=color.white)
+if barstate.islast
+    table.cell(board, 0, 0, "State", text_color=color.white, bgcolor=color.blue)
+    table.cell(board, 1, 0, barstate.islastconfirmedhistory ? "Confirmed History" : "Realtime", text_color=color.white, bgcolor=color.green)
+    table.cell(board, 0, 1, "Last Close", text_color=color.white, bgcolor=color.gray)
+    table.cell(board, 1, 1, str.tostring(close, "#.00"), text_color=color.black, bgcolor=color.yellow)
+    table.cell(board, 0, 2, "Seed Close", text_color=color.white, bgcolor=color.gray)
+    table.cell(board, 1, 2, str.tostring(seedClose, "#.00"), text_color=color.black, bgcolor=color.yellow)
+plot(lastGate, title="Last Close Gate")
+plot(lastHistoricalClose, title="Last Historical Close")
+plot(seedClose, title="Seed Close")
+plot(confirmedGate, title="Confirmed Gate")
+plot(historyGate, title="History Gate")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Last Close Gate').values).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      112,
+    ]);
+    expect(getPlot(result, 'Last Historical Close').values).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      112,
+    ]);
+    expect(getPlot(result, 'Seed Close').values).toEqual(Array(compatibilityBars.length).fill(102));
+    expect(getPlot(result, 'Confirmed Gate').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'History Gate').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(result.drawings).toContainEqual(
+      expect.objectContaining({
+        type: 'table',
+        position: 'bottom_right',
+        columns: 2,
+        rows: 3,
+        borderColor: '#FFFFFF',
+        borderWidth: 1,
+        cells: expect.arrayContaining([
+          expect.objectContaining({ column: 0, row: 0, text: 'State', bgcolor: '#2196F3' }),
+          expect.objectContaining({ column: 1, row: 0, text: 'Confirmed History', bgcolor: '#4CAF50' }),
+          expect.objectContaining({ column: 0, row: 1, text: 'Last Close', bgcolor: '#787B86' }),
+          expect.objectContaining({ column: 1, row: 1, text: '112.00', bgcolor: '#FDD835' }),
+          expect.objectContaining({ column: 0, row: 2, text: 'Seed Close', bgcolor: '#787B86' }),
+          expect.objectContaining({ column: 1, row: 2, text: '102.00', bgcolor: '#FDD835' }),
+        ]),
+      }),
+    );
+  });
+
   it('locks a reduced public dashboard table setter idiom', () => {
     // Public idiom reference: dashboard-style public indicators often create a
     // persistent table and update its position, frame, cells, and tooltips only

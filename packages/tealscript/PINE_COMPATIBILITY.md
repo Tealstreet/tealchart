@@ -760,6 +760,9 @@ The barstate pass exposes common Pine bar-state booleans through `barstate.*`
 member access. Historical execution marks loaded bars as confirmed history,
 sets `islastconfirmedhistory` on the last historical bar, and switches
 `isrealtime` / `isconfirmed` during realtime current-bar updates.
+The source-linked public barstate dashboard checkpoint locks first-bar
+initialization, last-confirmed-history snapshots, last-bar table updates, and
+confirmed/history gate plots over deterministic bars.
 
 ## Common Chart Info Coverage
 
