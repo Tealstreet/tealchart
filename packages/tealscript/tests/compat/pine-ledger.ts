@@ -1601,6 +1601,133 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'official-exec-model-barstate-checkpoint',
+      title: 'Official Exec Model Barstate Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/execution-model/',
+      featureTags: ['barstate', 'runtime', 'signals', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'official-type-cast-checkpoint',
+      title: 'Official Type Cast Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/language/type-system/',
+      featureTags: ['runtime', 'signals', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'official-array-stats-checkpoint',
+      title: 'Official Array Stats Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/language/arrays/',
+      featureTags: ['arrays', 'signals', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'official-array-slice-checkpoint',
+      title: 'Official Array Slice Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/language/arrays/',
+      featureTags: ['arrays', 'state', 'signals', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'official-map-checkpoint',
+      title: 'Official Map Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/language/maps/',
+      featureTags: ['map', 'state', 'signals', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'official-udt-checkpoint',
+      title: 'Official UDT Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/language/objects/',
+      featureTags: ['udt', 'objects', 'signals', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'official-method-dispatch-checkpoint',
+      title: 'Official Method Dispatch Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/language/methods/',
+      featureTags: ['udt', 'objects', 'methods', 'signals', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'official-inputs-all-types-checkpoint',
+      title: 'Official Inputs All Types Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/inputs/',
+      featureTags: ['inputs', 'signals', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'official-plots-hline-fill-checkpoint',
+      title: 'Official Plots Hline Fill Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/plots/',
+      featureTags: ['visuals', 'plot', 'fills', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'official-bgcolor-trend-checkpoint',
+      title: 'Official Bgcolor Trend Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/backgrounds/',
+      featureTags: ['visuals', 'signals', 'ta', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'official-strategy-entry-close-checkpoint',
+      title: 'Official Strategy Entry Close Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/strategies/',
+      category: 'strategy',
+      featureTags: ['strategy', 'broker', 'orders', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'official-plotshape-plotchar-checkpoint',
+      title: 'Official Plotshape Plotchar Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/text-and-shapes/',
+      featureTags: ['visuals', 'plotshape', 'plotchar', 'signals', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'official-repainting-guard-checkpoint',
+      title: 'Official Repainting Guard Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/concepts/repainting/',
+      featureTags: ['barstate', 'runtime', 'signals', 'state', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: officialDocsEntry({
+      id: 'official-conditionals-checkpoint',
+      title: 'Official Conditionals Checkpoint',
+      url: 'https://www.tradingview.com/pine-script-docs/language/conditional-structures/',
+      featureTags: ['runtime', 'signals', 'state', 'output'],
+    }),
+    stages: passedThroughRuntime,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(
