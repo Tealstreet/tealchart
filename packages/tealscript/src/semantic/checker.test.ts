@@ -7312,6 +7312,15 @@ genericLength = input(14, "Generic Length")
 genericMultiplier = input(2.5, "Generic Multiplier")
 genericEnabled = input(true, "Generic Enabled")
 genericMode = input("EMA", "Generic Mode")
+legacyLength = input(14, "Legacy Length", type=input.integer)
+legacyMultiplier = input(2.5, "Legacy Multiplier", type=input.float)
+legacyEnabled = input(true, "Legacy Enabled", type=input.bool)
+legacyMode = input("EMA", "Legacy Mode", type=input.string, options=["SMA", "EMA"])
+legacyTf = input("60", "Legacy Timeframe", type=input.resolution)
+legacySymbol = input("BINANCE:BTCUSDT", "Legacy Symbol", type=input.symbol)
+legacySession = input("0930-1600", "Legacy Session", type=input.session)
+legacyTint = input(color.red, "Legacy Tint", type=input.color)
+legacySource = input(close, "Legacy Source", type=input.source)
 length := "bad"
 multiplier := "bad"
 enabled := 1
@@ -7329,7 +7338,16 @@ genericLength := "bad"
 genericMultiplier := "bad"
 genericEnabled := 1
 genericMode := 1
-plot(source + level + multiplier + length + genericLength + genericMultiplier)
+legacyLength := "bad"
+legacyMultiplier := "bad"
+legacyEnabled := 1
+legacyMode := 1
+legacyTf := 1
+legacySymbol := 2
+legacySession := 3
+legacyTint := "bad"
+legacySource := "bad"
+plot(source + level + multiplier + length + genericLength + genericMultiplier + legacySource + legacyLength + legacyMultiplier)
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -7352,6 +7370,15 @@ plot(source + level + multiplier + length + genericLength + genericMultiplier)
       'Cannot assign string value to float variable genericMultiplier',
       'Cannot assign int value to bool variable genericEnabled',
       'Cannot assign int value to string variable genericMode',
+      'Cannot assign string value to int variable legacyLength',
+      'Cannot assign string value to float variable legacyMultiplier',
+      'Cannot assign int value to bool variable legacyEnabled',
+      'Cannot assign int value to string variable legacyMode',
+      'Cannot assign int value to string variable legacyTf',
+      'Cannot assign int value to string variable legacySymbol',
+      'Cannot assign int value to string variable legacySession',
+      'Cannot assign string value to color variable legacyTint',
+      'Cannot assign string value to float variable legacySource',
     ]);
     expect(types.get('length')).toMatchObject({ kind: 'int', qualifier: 'input' });
     expect(types.get('multiplier')).toMatchObject({ kind: 'float', qualifier: 'input' });
@@ -7370,6 +7397,15 @@ plot(source + level + multiplier + length + genericLength + genericMultiplier)
     expect(types.get('genericMultiplier')).toMatchObject({ kind: 'float', qualifier: 'input' });
     expect(types.get('genericEnabled')).toMatchObject({ kind: 'bool', qualifier: 'input' });
     expect(types.get('genericMode')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('legacyLength')).toMatchObject({ kind: 'int', qualifier: 'input' });
+    expect(types.get('legacyMultiplier')).toMatchObject({ kind: 'float', qualifier: 'input' });
+    expect(types.get('legacyEnabled')).toMatchObject({ kind: 'bool', qualifier: 'input' });
+    expect(types.get('legacyMode')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('legacyTf')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('legacySymbol')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('legacySession')).toMatchObject({ kind: 'string', qualifier: 'input' });
+    expect(types.get('legacyTint')).toMatchObject({ kind: 'color', qualifier: 'input' });
+    expect(types.get('legacySource')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid Pine input default value types', () => {
@@ -7394,6 +7430,12 @@ enum Mode
 levelMode = input.enum("Long")
 mixedMode = input.enum(Direction.long, "Direction", [Direction.short, Mode.fast])
 level = input.price("101.25")
+legacyLength = input(3.5, "Legacy Length", type=input.integer)
+legacyMultiplier = input("2", "Legacy Multiplier", type=input.float)
+legacyEnabled = input(1, "Legacy Enabled", type=input.bool)
+legacyTint = input(1, "Legacy Tint", type=input.color)
+legacyMode = input(1, "Legacy Mode", type=input.string)
+legacyTf = input(60, "Legacy Timeframe", type=input.resolution)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -7411,6 +7453,12 @@ level = input.price("101.25")
       'input.enum defval must be an enum member',
       'input.enum options must use the same enum type as defval',
       'input.price defval must be a number',
+      'input.int defval must be an integer',
+      'input.float defval must be a number',
+      'input.bool defval must be a boolean',
+      'input.color defval must be a color',
+      'input.string defval must be a string',
+      'input.timeframe defval must be a string',
     ]);
   });
 
