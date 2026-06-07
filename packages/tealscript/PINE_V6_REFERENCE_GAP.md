@@ -167,7 +167,7 @@ rebuild the parser, and unskip the test.
 Discovered by the Pine v5 compatibility probe in `tests/compat/pine-realworld-corpus.test.ts`
 (describe block "Pine v5 compatibility probe") on 2026-06-08.
 
-7 of 9 planned v5 patterns pass. 2 are skipped.
+8 of 9 planned v5 patterns pass. 1 is skipped.
 
 | Script | Status | Pattern |
 | --- | --- | --- |
@@ -178,23 +178,19 @@ Discovered by the Pine v5 compatibility probe in `tests/compat/pine-realworld-co
 | v5 ema() global alias | pass | `ema(close, 14)` maps to `ta.ema` |
 | v5 rsi() global alias | pass | `rsi(close, 14)` maps to `ta.rsi` |
 | v5 mixed-pattern indicator | pass | study() + input() + sma()/ema() combined |
-| **v5 tostring() global** | **skip** | `tostring(close)` → "Unknown function: tostring" |
+| **v5 tostring() global** | **pass** | `tostring(close)` → `str.tostring(close)` alias registered |
 | **v5 security() at runtime** | **skip** | Parses + type-checks; fails with "requires a request datafeed" |
 
-### Gap: tostring() global alias
+### Gap: tostring() global alias — CLOSED
 
 **Pattern:** `tostring(close)` — v5 global alias for `str.tostring()`.
 
-**Status:** Runtime error "Unknown function: tostring". The alias is not registered in
-the engine's builtin map.
+**Status:** CLOSED. `tostring` → `str.tostring` and `tonumber` → `str.tonumber` are
+registered in `LEGACY_GLOBAL_BUILTIN_ALIASES` in both `engine.ts` and `checker.ts`.
+The bare math aliases (`abs`, `ceil`, `floor`, `round`, `sqrt`, `log`, `log10`, `pow`,
+`sign`, `max`, `min`, `avg`, `sum`) are also registered as `math.*` aliases.
 
-**Impact:** Medium — common in v5 public scripts that display prices/values in labels
-or dashboards. Easy fix.
-
-**Test:** `it.skip('v5 tostring() global alias...')` in `pine-realworld-corpus.test.ts`.
-
-**Fix path:** Register `tostring` as an alias for `str.tostring` in `engine.ts`
-`registerBuiltins()`, and add it to `BUILTIN_FUNCTIONS` in `checker.ts`.
+**Test:** `it('locks v5 tostring() global alias...')` passes in `pine-realworld-corpus.test.ts`.
 
 ### Gap: security() at runtime (datafeed dependency)
 
@@ -271,5 +267,5 @@ pre-tokenization phase of `grammar.peggy`, or in the `parse()` function in
 | **Real-world corpus probe (15 scripts)** | **0** | All pass |
 | **Advanced corpus probe (10 scripts)** | **0** | All pass |
 | **Edge-case corpus probe (12 scripts)** | **1 (parser)** | 11 pass, 1 skipped (trailing comma) |
-| **Pine v5 compatibility probe (9 scripts)** | **2** | 7 pass, 2 skipped (tostring, security datafeed) |
+| **Pine v5 compatibility probe (9 scripts)** | **1** | 8 pass, 1 skipped (security datafeed) |
 | **Parser stress probe (8 scripts)** | **1 (indentation)** | 7 pass, 1 skipped (mixed tabs/spaces) |

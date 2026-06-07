@@ -356,9 +356,19 @@ const LEGACY_GLOBAL_TA_ALIASES = [
   'wma',
   'wpr',
 ] as const;
+// v5 bare math.* globals: abs(x) → math.abs(x), etc.
+const LEGACY_GLOBAL_MATH_ALIASES = [
+  'abs', 'ceil', 'floor', 'round', 'sqrt',
+  'log', 'log10', 'pow', 'sign', 'max', 'min', 'avg', 'sum',
+] as const;
+// v5 bare str.* globals: tostring(x) → str.tostring(x), tonumber(x) → str.tonumber(x)
+const LEGACY_GLOBAL_STR_ALIASES = ['tostring', 'tonumber'] as const;
 const LEGACY_GLOBAL_BUILTIN_ALIASES = new Map<string, string>([
   ['security', 'request.security'],
   ...LEGACY_GLOBAL_TA_ALIASES.map((name) => [name, `ta.${name}`] as const),
+  ...LEGACY_GLOBAL_MATH_ALIASES.map((name) => [name, `math.${name}`] as const),
+  ['tostring', 'str.tostring'],
+  ['tonumber', 'str.tonumber'],
 ]);
 
 export interface IndicatorDeclarationMetadata {
