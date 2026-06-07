@@ -1234,6 +1234,115 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'edge-nested-calls-checkpoint',
+      title: 'Edge Nested Calls Checkpoint',
+      searchContext: 'TradingView public scripts search: nested indicator function call',
+      featureTags: ['parser', 'edge_case', 'nested_calls', 'ta', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'edge-ternary-arg-checkpoint',
+      title: 'Edge Ternary Arg Checkpoint',
+      searchContext: 'TradingView public scripts search: ternary argument source selection',
+      featureTags: ['parser', 'edge_case', 'ternary', 'ta', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'edge-empty-udf-body-checkpoint',
+      title: 'Edge Empty UDF Body Checkpoint',
+      searchContext: 'TradingView public scripts search: function returns na guard',
+      featureTags: ['parser', 'edge_case', 'udf', 'na', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'edge-tuple-return-checkpoint',
+      title: 'Edge Tuple Return Checkpoint',
+      searchContext: 'TradingView public scripts search: function returns tuple three values',
+      featureTags: ['parser', 'edge_case', 'udf', 'tuple', 'ta', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'edge-na-propagation-checkpoint',
+      title: 'Edge NA Propagation Checkpoint',
+      searchContext: 'TradingView public scripts search: sma na warmup period null',
+      featureTags: ['runtime', 'edge_case', 'na', 'ta', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'edge-cumsum-accumulation-checkpoint',
+      title: 'Edge Cumsum Accumulation Checkpoint',
+      searchContext: 'TradingView public scripts search: cumulative sum var accumulate',
+      featureTags: ['runtime', 'edge_case', 'var', 'state', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'edge-valuewhen-crossover-checkpoint',
+      title: 'Edge ValueWhen Crossover Checkpoint',
+      searchContext: 'TradingView public scripts search: valuewhen sma crossover condition',
+      featureTags: ['runtime', 'edge_case', 'ta', 'valuewhen', 'crossover', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'edge-plotshape-dynamic-text-checkpoint',
+      title: 'Edge Plotshape Dynamic Text Checkpoint',
+      searchContext: 'TradingView public scripts search: plotshape dynamic text tostring',
+      featureTags: ['runtime', 'edge_case', 'visuals', 'plotshape', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'edge-color-rgb-clamp-checkpoint',
+      title: 'Edge Color RGB Clamp Checkpoint',
+      searchContext: 'TradingView public scripts search: color.rgb transparency clamping',
+      featureTags: ['runtime', 'edge_case', 'visuals', 'color', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'edge-input-source-udf-checkpoint',
+      title: 'Edge Input Source UDF Checkpoint',
+      searchContext: 'TradingView public scripts search: input.source user function argument',
+      featureTags: ['runtime', 'edge_case', 'inputs', 'udf', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'edge-multi-exit-checkpoint',
+      title: 'Edge Multi-Exit Checkpoint',
+      searchContext: 'TradingView public scripts search: strategy exit profit loss trail',
+      category: 'strategy',
+      featureTags: ['runtime', 'edge_case', 'strategy', 'broker', 'orders', 'trailing_stop', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'edge-array-copy-sort-checkpoint',
+      title: 'Edge Array Copy Sort Checkpoint',
+      searchContext: 'TradingView public scripts search: array copy sort min value',
+      featureTags: ['runtime', 'edge_case', 'arrays', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(

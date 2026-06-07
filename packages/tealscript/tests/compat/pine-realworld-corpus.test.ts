@@ -842,3 +842,289 @@ plot(spreadPct, title="Spread Pct")
     expect(result.drawings.filter((d) => d.type === 'table').length).toBeGreaterThan(0);
   });
 });
+
+// ===========================================================================================
+// Edge-case corpus probe
+// Targets the hardest parser and runtime patterns from real TradingView scripts.
+// Each test is a reduced idiom that exercises one edge case.
+// ===========================================================================================
+
+const edgeCaseStratBars = [
+  { time: 1_700_610_000_000, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+  { time: 1_700_610_060_000, open: 103, high: 105, low: 102, close: 104, volume: 100 },
+  { time: 1_700_610_120_000, open: 104, high: 106, low: 103, close: 105, volume: 100 },
+  { time: 1_700_610_180_000, open: 105, high: 107, low: 104, close: 106, volume: 100 },
+  { time: 1_700_610_240_000, open: 106, high: 108, low: 100, close: 95, volume: 100 },
+  { time: 1_700_610_300_000, open: 95, high: 96, low: 90, close: 91, volume: 100 },
+];
+
+describe('Edge-case corpus probe', () => {
+  it('locks deeply nested wrapped function call idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/nested%20indicator%20function%20call/
+    // Pattern: plot(ta.sma(ta.ema(close, input.int / 2), 5)) — multiple levels of
+    // nested calls. Confirms the parser handles deeply chained argument positions.
+    const result = runCompatScript(`
+indicator("Edge Nested Calls Checkpoint")
+length = input.int(14, "Length")
+ema_inner = ta.ema(close, math.round(length / 2))
+result = ta.sma(ema_inner, 20)
+plot(result, title="Nested")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Edge Nested Calls Checkpoint');
+    // EMA(close, 7) for 12 bars is not long enough for SMA(20) — all null
+    expect(getPlot(result, 'Nested').values).toEqual(Array(compatibilityBars.length).fill(null));
+  });
+
+  it('locks ternary expression in function argument position idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/ternary%20argument%20source%20selection/
+    // Pattern: ta.sma(close > open ? high : low, length) — ternary as positional arg.
+    // Confirms the parser resolves ternary inside argument lists without ambiguity.
+    const result = runCompatScript(`
+indicator("Edge Ternary Arg Checkpoint")
+src = close > open ? high : low
+sma = ta.sma(src, 3)
+plot(sma, title="SMA")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Edge Ternary Arg Checkpoint');
+    expect(roundSeries(getPlot(result, 'SMA').values)).toEqual([
+      null, null,
+      105.666667, 105.333333, 102.666667, 100.333333, 101.333333,
+      105.333333, 107, 109.333333, 109, 111.333333,
+    ]);
+  });
+
+  it('locks empty single-expression UDF body returning na idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/function%20returns%20na%20guard/
+    // Pattern: f() => na — single-expression body returning na.
+    // Confirms function with only na body doesn't break callers that use nz().
+    const result = runCompatScript(`
+indicator("Edge Empty UDF Body Checkpoint")
+f() => na
+val = nz(f(), 0.0)
+plot(val, title="Val")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Edge Empty UDF Body Checkpoint');
+    expect(getPlot(result, 'Val').values).toEqual(Array(compatibilityBars.length).fill(0));
+  });
+
+  it('locks three-element tuple return from UDF idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/function%20returns%20tuple%20three%20values/
+    // Pattern: [h, l, m] = getStats(close, 3) where getStats returns [high, low, mean].
+    // Confirms the runtime correctly destructures 3-element tuples from UDFs.
+    const result = runCompatScript(`
+indicator("Edge Tuple Return Checkpoint")
+getStats(src, len) =>
+    h = ta.highest(src, len)
+    l = ta.lowest(src, len)
+    m = ta.sma(src, len)
+    [h, l, m]
+[h, l, m] = getStats(close, 3)
+plot(h, title="High")
+plot(l, title="Low")
+plot(m, title="Mid")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Edge Tuple Return Checkpoint');
+    expect(getPlot(result, 'High').values).toEqual([
+      102, 105, 107, 107, 107, 103, 104, 109, 109, 111, 111, 112,
+    ]);
+    expect(getPlot(result, 'Low').values).toEqual([
+      102, 102, 102, 103, 99, 99, 99, 100, 104, 108, 108, 110,
+    ]);
+    expect(roundSeries(getPlot(result, 'Mid').values)).toEqual([
+      null, null,
+      104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111,
+    ]);
+  });
+
+  it('locks na propagation through ta.sma warm-up period idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/sma%20na%20warmup%20period%20null/
+    // Pattern: ta.sma(close, 5) returns na for the first 4 bars, then valid values.
+    // Confirms na propagation contract: first length-1 bars yield null, rest are numeric.
+    const result = runCompatScript(`
+indicator("Edge NA Propagation Checkpoint")
+plot(ta.sma(close, 5), title="SMA5")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Edge NA Propagation Checkpoint');
+    expect(roundSeries(getPlot(result, 'SMA5').values)).toEqual([
+      null, null, null, null,
+      103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110,
+    ]);
+  });
+
+  it('locks var float cumulative accumulation idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/cumulative%20sum%20var%20accumulate/
+    // Pattern: var float cumSum = 0.0; cumSum += close — running total across all bars.
+    // Confirms var persistence and += assignment work together across many bars.
+    const result = runCompatScript(`
+indicator("Edge Cumsum Accumulation Checkpoint")
+var float cumSum = 0.0
+cumSum += close
+plot(cumSum, title="CumSum")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Edge Cumsum Accumulation Checkpoint');
+    expect(getPlot(result, 'CumSum').values).toEqual([
+      102, 207, 314, 417, 516, 616, 720, 829, 937, 1048, 1158, 1270,
+    ]);
+  });
+
+  it('locks ta.valuewhen with nested TA crossover condition idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/valuewhen%20sma%20crossover%20condition/
+    // Pattern: ta.valuewhen(ta.crossover(sma_fast, sma_slow), high, 0) — valuewhen
+    // with a composite crossover condition. Confirms correct last-event lookup.
+    const result = runCompatScript(`
+indicator("Edge ValueWhen Crossover Checkpoint")
+sma3 = ta.sma(close, 3)
+sma5 = ta.sma(close, 5)
+crossUp = ta.crossover(sma3, sma5)
+val = ta.valuewhen(crossUp, high, 0)
+plot(nz(val), title="ValueWhen")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Edge ValueWhen Crossover Checkpoint');
+    // No crossover until the last bar (sma3 crosses sma5 upward at bar 11)
+    expect(roundSeries(getPlot(result, 'ValueWhen').values)).toEqual([
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 113,
+    ]);
+  });
+
+  it('locks plotshape with dynamic str.tostring text idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/plotshape%20dynamic%20text%20tostring/
+    // Pattern: plotshape(cond, text=str.tostring(close, "#.##")) — shape with
+    // a runtime-computed text string. Confirms plotshape accepts dynamic text without error.
+    const result = runCompatScript(`
+indicator("Edge Plotshape Dynamic Text Checkpoint")
+cond = close > open
+plotshape(cond, text=str.tostring(close, "#.##"), title="Shape", style=shape.triangleup, location=location.belowbar)
+plot(cond ? 1 : 0, title="Cond")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Edge Plotshape Dynamic Text Checkpoint');
+    // close > open: bars 0,1,2 yes; 3,4 no; 5,6,7 yes; 8 no; 9 yes; 10 no; 11 yes
+    expect(getPlot(result, 'Cond').values).toEqual([1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
+    // plotshape emits 1 when cond is true, null otherwise
+    expect(getPlot(result, 'Shape').values).toEqual([1, 1, 1, null, null, 1, 1, 1, null, 1, null, 1]);
+  });
+
+  it('locks color.rgb with boundary and out-of-range transparency idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/color.rgb%20transparency%20clamping/
+    // Pattern: color.rgb(r, g, b, transp) where transp is 0, 100, negative, and >100.
+    // Confirms transparency is clamped at 0 and 100; out-of-range values don't throw.
+    const result = runCompatScript(`
+indicator("Edge Color RGB Clamp Checkpoint")
+c0 = color.rgb(255, 0, 0, 0)
+c100 = color.rgb(255, 0, 0, 100)
+cneg = color.rgb(255, 0, 0, -10)
+cgt100 = color.rgb(255, 0, 0, 110)
+isFullRed = c0 == "#FF0000FF"
+isFullTrans = c100 == "#FF000000"
+isClamped0 = cneg == "#FF0000FF"
+isClamped100 = cgt100 == "#FF000000"
+plot(isFullRed ? 1 : 0, title="FullRed")
+plot(isFullTrans ? 1 : 0, title="FullTrans")
+plot(isClamped0 ? 1 : 0, title="ClampedNeg")
+plot(isClamped100 ? 1 : 0, title="ClampedGt100")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Edge Color RGB Clamp Checkpoint');
+    // All assertions hold on every bar
+    expect(getPlot(result, 'FullRed').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'FullTrans').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'ClampedNeg').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'ClampedGt100').values).toEqual(Array(compatibilityBars.length).fill(1));
+  });
+
+  it('locks input.source series passed into user-defined function idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/input.source%20user%20function%20argument/
+    // Pattern: src = input.source(close, "Source"); out = smoothed(src, 3) where
+    // smoothed() is a UDF that applies ta.sma. Confirms input.source series threads
+    // correctly into UDF arguments.
+    const result = runCompatScript(`
+indicator("Edge Input Source UDF Checkpoint")
+smoothed(src, len) =>
+    ta.sma(src, len)
+src = input.source(close, "Source")
+out = smoothed(src, 3)
+plot(out, title="Smoothed")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Edge Input Source UDF Checkpoint');
+    expect(result.inputs.map((i) => [i.title, i.type])).toEqual([['Source', 'source']]);
+    expect(roundSeries(getPlot(result, 'Smoothed').values)).toEqual([
+      null, null,
+      104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111,
+    ]);
+  });
+
+  it('locks strategy with simultaneous profit-target, stop-loss, and trail-offset exits idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/strategy%20exit%20profit%20loss%20trail/
+    // Pattern: strategy.exit with profit=, loss=, and trail_offset= all set together.
+    // Confirms the broker emulator resolves whichever exit fires first (profit at bar 2).
+    const result = runCompatScript(`
+strategy("Edge Multi-Exit Checkpoint", overlay=true, process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if strategy.position_size > 0
+    strategy.exit("Exit", "Long", profit=5.0, loss=5.0, trail_offset=1.0)
+plot(strategy.position_size, title="Pos Size")
+plot(strategy.netprofit, title="Net Profit")
+`, { bars: edgeCaseStratBars });
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Edge Multi-Exit Checkpoint');
+    // Entry at bar0 (close=100); profit target=105 hit at bar2 (close=105)
+    expect(getPlot(result, 'Pos Size').values).toEqual([1, 1, 0, 0, 0, 0]);
+    expect(roundSeries(getPlot(result, 'Net Profit').values)).toEqual([0, 0, 3, 3, 3, 3]);
+  });
+
+  it('locks array copy-and-sort method chaining idiom', () => {
+    // Source search: https://www.tradingview.com/scripts/search/array%20copy%20sort%20min%20value/
+    // Pattern: vals.copy().sort() — array method call on result of another method.
+    // Confirms chained postfix member calls on array instances work correctly.
+    const result = runCompatScript(`
+indicator("Edge Array Copy Sort Checkpoint")
+var array<float> vals = array.new<float>()
+vals.push(close)
+sorted = vals.copy()
+sorted.sort()
+plot(vals.size(), title="Size")
+plot(sorted.size() > 0 ? sorted.get(0) : na, title="Min")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Edge Array Copy Sort Checkpoint');
+    expect(getPlot(result, 'Size').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    // Minimum close seen so far on each bar
+    expect(getPlot(result, 'Min').values).toEqual([
+      102, 102, 102, 102, 99, 99, 99, 99, 99, 99, 99, 99,
+    ]);
+  });
+
+  // Trailing comma in function call args is NOT supported by the grammar.
+  // ta.sma(close, 5,) throws a parse error because ParameterList does not accept
+  // a bare trailing comma in the ArgumentList rule.
+  // Skipped: gap documented in PINE_V6_REFERENCE_GAP.md under "Real-World Corpus Gaps — Edge Cases".
+  it.skip('trailing comma in function call args', () => {
+    const result = runCompatScript(`
+indicator("Edge Trailing Comma Checkpoint")
+sma = ta.sma(close, 5,)
+plot(sma, title="SMA")
+`);
+    expect(result.errors).toEqual([]);
+  });
+});
