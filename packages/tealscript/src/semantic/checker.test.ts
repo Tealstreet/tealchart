@@ -85,12 +85,13 @@ plot(second(time=stamp, timezone="Asia/Singapore"))
 indicator("Time Variants")
 stamp = timestamp(timezone="America/New_York", year=2024, month=1, day=5, hour=9, minute=30)
 prefixStamp = timestamp(timezone="America/New_York", 2024, 1, 5, 9, 30)
+defaultTimezoneStamp = timestamp(2024, 1, 5, 9, 30)
 dateStamp = timestamp("20 Aug 2024 00:00:00 +0000")
 plot(time(timeframe="60", session="0930-1600", timezone="America/New_York"))
 plot(time(timeframe="60", "0930-1600", "America/New_York"))
 plot(time_close(timeframe="60", session="0930-1600", timezone="America/New_York"))
 plot(time_close(timeframe="60", "0930-1600", "America/New_York"))
-plot(stamp + prefixStamp + dateStamp)
+plot(stamp + prefixStamp + defaultTimezoneStamp + dateStamp)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -107,6 +108,9 @@ label = timeframe.to_seconds(true)
 frame = timeframe.from_seconds("60")
 yearValue = year(time="now", timezone=1)
 hourValue = hour(time=true, timezone=2)
+badStamp = timestamp("UTC", "2024", 1, 5, 9, 30)
+badDefaultStamp = timestamp(2024, "1", 5)
+badDateString = timestamp(1700000000000, timezone="UTC")
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -123,6 +127,9 @@ hourValue = hour(time=true, timezone=2)
       'year time must be a number, got string',
       'hour timezone must be a string, got int',
       'hour time must be a number, got bool',
+      'timestamp year must be a number, got string',
+      'timestamp month must be a number, got string',
+      'Argument \'timezone\' for timestamp() was supplied multiple times',
     ]);
   });
 

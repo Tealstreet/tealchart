@@ -333,7 +333,8 @@ Phases:
    metadata injection contracts.
 2. Complete calendar variables/functions, `timestamp()`, `time`, `time_close`,
    `timenow`, `last_bar_time`, and `str.format_time()` for common IANA and UTC
-   offset usage.
+   offset usage. Current semantic coverage accepts common `timestamp()`
+   date-string, timezone-prefixed, and default-timezone numeric date overloads.
 3. Complete time-based sessions, overnight sessions, multi-segment sessions,
    day masks, named sessions where host data exists, and regular/extended
    session routing.

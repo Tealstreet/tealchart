@@ -810,13 +810,15 @@ assignment diagnostics.
 The calendar pass covers Pine's current-bar calendar variables
 (`year`, `month`, `weekofyear`, `dayofmonth`, `dayofweek`, `hour`, `minute`,
 and `second`), matching callable helpers such as `hour(time)`, common
-`dayofweek.*` constants, `timestamp()` forms used in date/time filters, and
-fixed-offset or IANA timezone arguments such as `"GMT+2"` and
-`"America/New_York"`. The checkpoint fixture follows TradingView's documented
+`dayofweek.*` constants, `timestamp()` date-string, timezone-prefixed, and
+default-timezone numeric date forms used in date/time filters, and fixed-offset
+or IANA timezone arguments such as `"GMT+2"` and `"America/New_York"`. The
+checkpoint fixture follows TradingView's documented
 calendar-filter idioms by gating plots against a start timestamp, weekday,
 minute threshold, and named exchange timezone. Semantic analysis rejects
 non-numeric calendar `time` arguments and non-string calendar `timezone`
-arguments before runtime.
+arguments before runtime, and binds common `timestamp()` overloads before
+diagnosing date-field types.
 
 ## Common Session Time Coverage
 
