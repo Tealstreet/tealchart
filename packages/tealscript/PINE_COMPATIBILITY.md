@@ -727,9 +727,9 @@ arguments before runtime.
 The OHLC plot pass covers `plotbar()` and `plotcandle()` for custom bar and
 candle overlays. The runtime emits open, high, low, close, and per-bar color
 arrays with `na` gaps preserved as nulls; the Tealchart renderer draws those
-custom bars/candles in overlay and indicator panes. The checkpoint fixture is
-modeled on TradingView's documented custom bar plotting idiom using directional
-body colors, transparent wick colors, and skipped bars.
+custom bars/candles in overlay and indicator panes. Source-linked public custom
+bar and Heikin-Ashi candle checkpoints lock derived OHLC arrays, directional
+colors, overlay routing, and skipped bars.
 
 ## Common `switch` Coverage
 

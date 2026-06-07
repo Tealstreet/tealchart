@@ -426,7 +426,7 @@ Phases:
    than pixels. Source-linked public signal-label and trendline-signal
    checkpoint coverage now exercises persistent last-bar label, line, and box
    payloads with dynamic visual metadata, text layout, copy lifecycles, getters,
-   and object-count arrays.
+   object-count arrays, plus custom `plotbar()` / `plotcandle()` OHLC overlays.
 
 Done means pasted scripts can produce usable, inspectable output payloads even
 when renderer fidelity is not final.
