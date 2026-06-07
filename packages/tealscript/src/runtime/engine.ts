@@ -11264,16 +11264,23 @@ export class TealscriptEngine {
   }
 
   private evaluateTimeFilter(args: unknown[], namedArgs: Map<string, unknown>, closeTime: boolean): number {
-    const timeArgs = ['timeframe', 'session', 'timezone'] as const;
-    const timestamp = this.ctx.time.get(0) ?? Number.NaN;
+    const timezoneCandidate = this.getOrderedCallArg(args, namedArgs, ['timeframe', 'session', 'timezone'], 2);
+    const hasTimezoneArgument = namedArgs.has('timezone') || (timezoneCandidate !== undefined && typeof timezoneCandidate === 'string');
+    const timeArgs = hasTimezoneArgument
+      ? (['timeframe', 'session', 'timezone', 'bars_back'] as const)
+      : (['timeframe', 'session', 'bars_back'] as const);
     const timeframeArg = this.getOrderedCallArg(args, namedArgs, timeArgs, 0, this.ctx.timeframe.period);
     const sessionArg = this.getOrderedCallArg(args, namedArgs, timeArgs, 1);
-    const timezoneArg = this.getOrderedCallArg(args, namedArgs, timeArgs, 2, this.ctx.syminfo.timezone);
+    const timezoneArg = hasTimezoneArgument ? this.getOrderedCallArg(args, namedArgs, timeArgs, 2, this.ctx.syminfo.timezone) : this.ctx.syminfo.timezone;
+    const barsBackArg = this.getOrderedCallArg(args, namedArgs, timeArgs, hasTimezoneArgument ? 3 : 2, 0);
+    const barsBack = Math.trunc(this.toNumber(barsBackArg));
+    const targetBarIndex = this.ctx.bar_index - barsBack;
+    const timestamp = barsBack === 0 ? (this.ctx.time.get(0) ?? Number.NaN) : (this.ctx.getBar(targetBarIndex)?.time ?? Number.NaN);
     const timeframe = timeframeArg === undefined || timeframeArg === '' ? this.ctx.timeframe.period : this.toStringValue(timeframeArg);
     const session = sessionArg === undefined || sessionArg === '' ? undefined : this.toStringValue(sessionArg);
     const timezone = timezoneArg === undefined || timezoneArg === '' ? this.ctx.syminfo.timezone : this.toStringValue(timezoneArg);
 
-    if (!Number.isFinite(timestamp)) return Number.NaN;
+    if (!Number.isFinite(barsBack) || !Number.isFinite(timestamp)) return Number.NaN;
     if (session && this.isExchangeSessionClosed(timestamp, timezone, this.getRuntimeSessionKind(session, timestamp, timezone))) {
       return Number.NaN;
     }

@@ -3880,7 +3880,11 @@ plot(time("60", "1430-1600") == time ? 1 : 0, title="In Session")
 plot(na(time("60", "1600-1700")) ? 1 : 0, title="Out Session")
 plot(time_close("30", "1430-1600"), title="Filtered Close")
 plot(time(timeframe="60", session="1430-1600", timezone="UTC") == time ? 1 : 0, title="Named Time")
-plot(time_close(timeframe="30", session="1430-1600", timezone="UTC"), title="Named Close")`;
+plot(time_close(timeframe="30", session="1430-1600", timezone="UTC"), title="Named Close")
+plot(time("60", "1430-1600", 1), title="Previous Session Open")
+plot(time("60", "1430-1600", "UTC", 1), title="Previous Session Open With Timezone")
+plot(time_close(timeframe="30", session="1430-1600", bars_back=1), title="Named Previous Close")
+plot(time(timeframe="", bars_back=-1), title="Next Known Open")`;
 
       const ast = parse(script);
       const bars: Bar[] = [
@@ -3926,6 +3930,18 @@ plot(time_close(timeframe="30", session="1430-1600", timezone="UTC"), title="Nam
       expect(result.plots.find((plot) => plot.title === 'Filtered Close')?.values).toEqual([null, Date.UTC(2024, 0, 5, 15, 0), null]);
       expect(result.plots.find((plot) => plot.title === 'Named Time')?.values).toEqual([0, 1, 0]);
       expect(result.plots.find((plot) => plot.title === 'Named Close')?.values).toEqual([null, Date.UTC(2024, 0, 5, 15, 0), null]);
+      expect(result.plots.find((plot) => plot.title === 'Previous Session Open')?.values).toEqual([null, null, Date.UTC(2024, 0, 5, 14, 30)]);
+      expect(result.plots.find((plot) => plot.title === 'Previous Session Open With Timezone')?.values).toEqual([
+        null,
+        null,
+        Date.UTC(2024, 0, 5, 14, 30),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Named Previous Close')?.values).toEqual([null, null, Date.UTC(2024, 0, 5, 15, 0)]);
+      expect(result.plots.find((plot) => plot.title === 'Next Known Open')?.values).toEqual([
+        Date.UTC(2024, 0, 5, 14, 30),
+        Date.UTC(2024, 0, 5, 16, 0),
+        null,
+      ]);
     });
 
     it('supports timestamp named arguments and date strings', () => {

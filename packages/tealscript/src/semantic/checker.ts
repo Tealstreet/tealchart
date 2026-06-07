@@ -516,6 +516,8 @@ const TIME_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['timeframe.to_seconds', ['timeframe']],
 ]);
 const TIME_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['time', ['bars_back']],
+  ['time_close', ['bars_back']],
   ['timestamp', ['year', 'month', 'day', 'hour', 'minute', 'second']],
   ['timeframe.from_seconds', ['seconds']],
 ]);
@@ -1572,8 +1574,26 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['ticker.linebreak', { params: ['symbol', 'number_of_lines'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ticker.kagi', { params: ['symbol', 'style', 'param'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['ticker.pointfigure', { params: ['symbol', 'source', 'style', 'param', 'reversal'], minArgs: 5, maxArgs: 5, allowNamedPrefixWithPositional: true }],
-  ['time', { params: ['timeframe', 'session', 'timezone'], minArgs: 0, maxArgs: 3, allowNamedPrefixWithPositional: true }],
-  ['time_close', { params: ['timeframe', 'session', 'timezone'], minArgs: 0, maxArgs: 3, allowNamedPrefixWithPositional: true }],
+  [
+    'time',
+    {
+      params: ['timeframe', 'session', 'timezone', 'bars_back'],
+      overloads: [['timeframe', 'session', 'bars_back']],
+      minArgs: 0,
+      maxArgs: 4,
+      allowNamedPrefixWithPositional: true,
+    },
+  ],
+  [
+    'time_close',
+    {
+      params: ['timeframe', 'session', 'timezone', 'bars_back'],
+      overloads: [['timeframe', 'session', 'bars_back']],
+      minArgs: 0,
+      maxArgs: 4,
+      allowNamedPrefixWithPositional: true,
+    },
+  ],
   ['timeframe.change', { params: ['timeframe'], minArgs: 0, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['timeframe.from_seconds', { params: ['seconds'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['timeframe.in_seconds', { params: ['timeframe'], minArgs: 0, maxArgs: 1, allowNamedPrefixWithPositional: true }],
@@ -7034,6 +7054,9 @@ class SemanticChecker {
     if (signature === BUILTIN_SIGNATURES.get('timestamp')) {
       return this.resolveTimestampSignatureParams(args, signature);
     }
+    if (signature === BUILTIN_SIGNATURES.get('time') || signature === BUILTIN_SIGNATURES.get('time_close')) {
+      return this.resolveTimeSignatureParams(args, signature);
+    }
 
     if (signature.variadicParamPrefix) {
       const escapedPrefix = signature.variadicParamPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -7060,6 +7083,25 @@ class SemanticChecker {
     const rangeOverload = signature.overloads.find((params) => params.includes('minval'));
 
     return (usesOptionsOverload ? optionsOverload : rangeOverload) ?? signature.params;
+  }
+
+  private resolveTimeSignatureParams(args: CallArgument[], signature: BuiltinSignature): string[] {
+    const noTimezoneParams = signature.overloads?.[0];
+    if (!noTimezoneParams) return signature.params;
+
+    const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
+    if (suppliedNames.has('timezone')) return signature.params;
+
+    const positionalArgs = args.filter((arg) => !arg.name);
+    const thirdPositional = positionalArgs[2]?.value;
+    if (thirdPositional && thirdPositional.type !== 'StringLiteral' && positionalArgs.length === 3) {
+      return noTimezoneParams;
+    }
+    if (suppliedNames.has('bars_back') && positionalArgs.length <= 2) {
+      return noTimezoneParams;
+    }
+
+    return signature.params;
   }
 
   private resolveTimestampSignatureParams(args: CallArgument[], signature: BuiltinSignature): string[] {
