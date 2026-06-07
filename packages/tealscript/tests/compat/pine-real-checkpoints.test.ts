@@ -155,6 +155,66 @@ plot(level, title="Level")
     expect(getPlot(result, 'Level').values).toEqual(Array(compatibilityBars.length).fill(104.5));
   });
 
+  it('locks a reduced public legacy v4 copy-paste idiom', () => {
+    // Public idiom reference: older public scripts commonly use `study()`,
+    // generic `input(..., type=input.*)`, global TA aliases, and `iff()`.
+    // Source search: https://www.tradingview.com/scripts/search/legacy%20v4%20indicator%20study%20input%20iff/
+    const result = runCompatScript(`
+//@version=4
+study("Public Legacy V4 Copy-Paste Checkpoint", shorttitle="PLV4", overlay=true, resolution="60", resolution_gaps=false)
+src = input(close, title="Source", type=input.source)
+length = input(3, title="Length", type=input.integer)
+show = input(true, title="Show", type=input.bool)
+fast = ema(src, length)
+slow = sma(src, length + 2)
+signal = iff(show and crossover(fast, slow), high, na)
+plot(fast, title="Fast")
+plot(slow, title="Slow")
+plot(signal, title="Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public Legacy V4 Copy-Paste Checkpoint');
+    expect(result.indicatorShortTitle).toBe('PLV4');
+    expect(result.indicatorOverlay).toBe(true);
+    expect(result.indicatorTimeframe).toBe('60');
+    expect(result.indicatorTimeframeGaps).toBe(false);
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Source', 'source'],
+      ['Length', 'int'],
+      ['Show', 'bool'],
+    ]);
+    expect(roundSeries(getPlot(result, 'Fast').values)).toEqual([
+      102,
+      103.5,
+      105.25,
+      104.125,
+      101.5625,
+      100.78125,
+      102.390625,
+      105.695313,
+      106.847656,
+      108.923828,
+      109.461914,
+      110.730957,
+    ]);
+    expect(roundSeries(getPlot(result, 'Slow').values)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      103.2,
+      102.8,
+      102.6,
+      103,
+      104,
+      106.4,
+      108.4,
+      110,
+    ]);
+    expect(getPlot(result, 'Signal').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 113]);
+  });
+
   it('locks a reduced public syminfo metadata idiom', () => {
     // Public idiom reference: symbol-aware public indicators commonly derive
     // labels, routing gates, and tick-normalized levels from `syminfo.*`
