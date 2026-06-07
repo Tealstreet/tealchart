@@ -180,6 +180,8 @@ Phases:
    Pine Logs startup/signal/final-summary output.
    Synthetic ticker coverage includes official docs examples plus a reduced
    public Heikin-Ashi trend request fixture.
+   Public footprint request coverage is tracked as a planned unsupported
+   semantic blocker until a host footprint/intrabar volume data model exists.
 7. Generate a trendable pass-rate report: total scripts, parse pass, semantic
    pass, runtime pass, usable-output pass, top failure classes, and regressions.
 
