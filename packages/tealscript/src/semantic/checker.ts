@@ -510,11 +510,13 @@ const TIMEFRAME_STRING_MEMBER_NAMES = new Set(['timeframe.main_period', 'timefra
 const TIME_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['time', ['timeframe', 'session', 'timezone']],
   ['time_close', ['timeframe', 'session', 'timezone']],
+  ['timestamp', ['date_string', 'timezone']],
   ['timeframe.change', ['timeframe']],
   ['timeframe.in_seconds', ['timeframe']],
   ['timeframe.to_seconds', ['timeframe']],
 ]);
 const TIME_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['timestamp', ['year', 'month', 'day', 'hour', 'minute', 'second']],
   ['timeframe.from_seconds', ['seconds']],
 ]);
 
@@ -1576,7 +1578,19 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['timeframe.from_seconds', { params: ['seconds'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['timeframe.in_seconds', { params: ['timeframe'], minArgs: 0, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['timeframe.to_seconds', { params: ['timeframe'], minArgs: 0, maxArgs: 1, allowNamedPrefixWithPositional: true }],
-  ['timestamp', { params: ['timezone', 'year', 'month', 'day', 'hour', 'minute', 'second'], minArgs: 1, maxArgs: 7, allowNamedPrefixWithPositional: true }],
+  [
+    'timestamp',
+    {
+      params: ['timezone', 'year', 'month', 'day', 'hour', 'minute', 'second'],
+      overloads: [
+        ['date_string'],
+        ['year', 'month', 'day', 'hour', 'minute', 'second'],
+      ],
+      minArgs: 1,
+      maxArgs: 7,
+      allowNamedPrefixWithPositional: true,
+    },
+  ],
 ]);
 
 const INDICATOR_DECLARATION_KEYS = new Set([
@@ -4422,12 +4436,14 @@ class SemanticChecker {
     if (!signature) return;
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
 
+    const params = this.resolveSignatureParams(expression.arguments, signature);
+
     for (const parameterName of stringParameterNames ?? []) {
-      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'string');
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, params, parameterName, 'string');
     }
 
     for (const parameterName of numericParameterNames ?? []) {
-      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'number');
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, params, parameterName, 'number');
     }
   }
 
@@ -4480,12 +4496,14 @@ class SemanticChecker {
     if (!signature) return;
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
 
+    const params = this.resolveSignatureParams(expression.arguments, signature);
+
     for (const parameterName of stringParameterNames ?? []) {
-      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'string');
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, params, parameterName, 'string');
     }
 
     for (const parameterName of numericParameterNames ?? []) {
-      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'number');
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, params, parameterName, 'number');
     }
   }
 
@@ -6989,6 +7007,10 @@ class SemanticChecker {
   }
 
   private resolveSignatureParams(args: CallArgument[], signature: BuiltinSignature): string[] {
+    if (signature === BUILTIN_SIGNATURES.get('timestamp')) {
+      return this.resolveTimestampSignatureParams(args, signature);
+    }
+
     if (signature.variadicParamPrefix) {
       const escapedPrefix = signature.variadicParamPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const variadicNamePattern = new RegExp(`^${escapedPrefix}(\\d+)$`);
@@ -7014,6 +7036,32 @@ class SemanticChecker {
     const rangeOverload = signature.overloads.find((params) => params.includes('minval'));
 
     return (usesOptionsOverload ? optionsOverload : rangeOverload) ?? signature.params;
+  }
+
+  private resolveTimestampSignatureParams(args: CallArgument[], signature: BuiltinSignature): string[] {
+    const positionalArgs = args.filter((arg) => !arg.name);
+    const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
+    const [dateStringParams, numericDateParams] = signature.overloads ?? [];
+
+    if (suppliedNames.has('date_string')) {
+      return dateStringParams ?? signature.params;
+    }
+    if (suppliedNames.has('timezone')) {
+      return signature.params;
+    }
+    if (suppliedNames.has('year') || suppliedNames.has('month') || suppliedNames.has('day')) {
+      return numericDateParams ?? signature.params;
+    }
+
+    const firstPositional = positionalArgs[0]?.value;
+    if (firstPositional?.type === 'StringLiteral') {
+      return positionalArgs.length === 1 ? (dateStringParams ?? signature.params) : signature.params;
+    }
+    if (firstPositional?.type === 'NumericLiteral') {
+      return numericDateParams ?? signature.params;
+    }
+
+    return signature.params;
   }
 
   private leadingPositionalCount(args: CallArgument[]): number {
