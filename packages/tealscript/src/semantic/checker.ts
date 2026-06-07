@@ -291,6 +291,8 @@ const LEGACY_GLOBAL_MATH_ALIASES = [
 const LEGACY_GLOBAL_STR_ALIASES = ['tostring', 'tonumber'] as const;
 const LEGACY_GLOBAL_BUILTIN_ALIASES = new Map<string, string>([
   ['security', 'request.security'],
+  // v3/v4 bare color(r,g,b,transp) global → color.rgb
+  ['color', 'color.rgb'],
   ...LEGACY_GLOBAL_TA_ALIASES.map((name) => [name, `ta.${name}`] as const),
   ...LEGACY_GLOBAL_MATH_ALIASES.map((name) => [name, `math.${name}`] as const),
   ...LEGACY_GLOBAL_STR_ALIASES.map((name) => [name, `str.${name}`] as const),
@@ -383,7 +385,7 @@ const STRATEGY_DECLARATION_STRING_OPTIONS = [
   'close_entries_rule',
 ] as const;
 
-const COLOR_CONSTRUCTOR_NAMES = new Set(['color.new', 'color.rgb']);
+const COLOR_CONSTRUCTOR_NAMES = new Set(['color', 'color.new', 'color.rgb']);
 const COLOR_CHANNEL_NAMES = new Set(['color.r', 'color.g', 'color.b', 'color.t']);
 const COLOR_CONSTANT_NAMES = new Set([
   'color.aqua',
@@ -414,6 +416,7 @@ const COLOR_FUNCTION_COLOR_PARAMETER_NAMES_BY_CALL = new Map<string, readonly st
   ['color.from_gradient', ['bottom_color', 'top_color']],
 ]);
 const COLOR_FUNCTION_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['color', ['red', 'green', 'blue', 'transp']],
   ['color.new', ['transp']],
   ['color.rgb', ['red', 'green', 'blue', 'transp']],
   ['color.from_gradient', ['value', 'bottom_value', 'top_value']],
@@ -900,6 +903,7 @@ const BUILTIN_FUNCTIONS = new Set([
   'barcolor',
   'bgcolor',
   'bool',
+  'color',
   'fill',
   'fixnan',
   'float',
@@ -1159,6 +1163,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['chart.point.from_time', { params: ['time', 'price'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['chart.point.new', { params: ['time', 'index', 'price'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['chart.point.now', { params: ['price'], minArgs: 0, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['color', { params: ['red', 'green', 'blue', 'transp'], aliases: { transparency: 'transp' }, minArgs: 3, maxArgs: 4, allowNamedPrefixWithPositional: true }],
   ['color.new', { params: ['color', 'transp'], aliases: { transparency: 'transp' }, minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['color.rgb', { params: ['red', 'green', 'blue', 'transp'], aliases: { transparency: 'transp' }, minArgs: 3, maxArgs: 4, allowNamedPrefixWithPositional: true }],
   ['color.r', { params: ['color'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
@@ -4696,7 +4701,7 @@ class SemanticChecker {
   }
 
   private checkColorTransparencyLiteralArgument(expression: CallExpression, calleeName: string, signature: BuiltinSignature): void {
-    if (calleeName !== 'color.new' && calleeName !== 'color.rgb') return;
+    if (calleeName !== 'color' && calleeName !== 'color.new' && calleeName !== 'color.rgb') return;
 
     const resolvedParams = this.resolveSignatureParams(expression.arguments, signature);
     const transparency = this.resolveCallArgumentExpression(expression, resolvedParams, resolvedParams.indexOf('transp'), signature);

@@ -2872,4 +2872,29 @@ plot(m2, title="Max2")`);
       103.2, 102.8, 102.6, 104.333333, 107, 109.333333, 109.666667, 111,
     ]);
   });
+
+  it('locks v3/v4 legacy color(r, g, b, transp) global function alias', () => {
+    // Pine v3/v4 scripts call color() as a global function: color(r, g, b, transp).
+    // In v5/v6 this became color.rgb(). Confirms the alias delegates to color.rgb and
+    // produces correct #RRGGBBAA hex strings, including transparency clamping.
+    // Source search: https://www.tradingview.com/scripts/search/color%20r%20g%20b%20transp%20v4/
+    const result = runCompatScript(`
+indicator("Legacy color() Global Checkpoint")
+cSolid = color(255, 0, 0, 0)
+cHalf = color(0, 255, 0, 50)
+cTrans = color(0, 0, 255, 100)
+isSolid = cSolid == "#FF0000FF"
+isHalf = cHalf == "#00FF0080"
+isTrans = cTrans == "#0000FF00"
+plot(isSolid ? 1 : 0, title="Solid")
+plot(isHalf ? 1 : 0, title="Half")
+plot(isTrans ? 1 : 0, title="Trans")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Legacy color() Global Checkpoint');
+    expect(getPlot(result, 'Solid').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'Half').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'Trans').values).toEqual(Array(compatibilityBars.length).fill(1));
+  });
 });

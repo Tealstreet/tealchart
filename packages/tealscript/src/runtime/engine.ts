@@ -365,6 +365,8 @@ const LEGACY_GLOBAL_MATH_ALIASES = [
 const LEGACY_GLOBAL_STR_ALIASES = ['tostring', 'tonumber'] as const;
 const LEGACY_GLOBAL_BUILTIN_ALIASES = new Map<string, string>([
   ['security', 'request.security'],
+  // v3/v4 bare color(r,g,b,transp) global → color.rgb
+  ['color', 'color.rgb'],
   ...LEGACY_GLOBAL_TA_ALIASES.map((name) => [name, `ta.${name}`] as const),
   ...LEGACY_GLOBAL_MATH_ALIASES.map((name) => [name, `math.${name}`] as const),
   ...LEGACY_GLOBAL_STR_ALIASES.map((name) => [name, `str.${name}`] as const),
