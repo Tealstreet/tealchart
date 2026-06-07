@@ -4476,3 +4476,194 @@ plot(sma5, title="SMA5")
     });
   });
 });
+
+// ===========================================================================================
+// Operator semantics and comparison patterns
+// Tests Pine arithmetic, comparison, and assignment operators with concrete per-bar values.
+// Each test locks one operator semantic contract to catch subtle arithmetic/comparison bugs.
+// ===========================================================================================
+
+describe('Operator semantics and comparison patterns', () => {
+  it('locks float division — 3 / 2 yields 1.5 not integer 1', () => {
+    // Pine always uses float division; there is no integer-division operator.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/operators/
+    const result = runCompatScript(`
+indicator("Ops Float Division Checkpoint")
+v = 3 / 2
+plot(v, title="Div")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ops Float Division Checkpoint');
+    // 3 / 2 = 1.5 on every bar — float result, not truncated
+    expect(getPlot(result, 'Div').values).toEqual(Array(compatibilityBars.length).fill(1.5));
+  });
+
+  it('locks modulo operator — positive, negative, and float operands', () => {
+    // Pine % uses JavaScript remainder semantics: sign follows the dividend.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/operators/
+    const result = runCompatScript(`
+indicator("Ops Modulo Checkpoint")
+plot(7 % 3, title="Pos")
+plot(-7 % 3, title="Neg")
+plot(5.5 % 2.0, title="Float")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ops Modulo Checkpoint');
+    // 7 % 3 = 1, -7 % 3 = -1 (sign of dividend), 5.5 % 2.0 = 1.5
+    expect(getPlot(result, 'Pos').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'Neg').values).toEqual(Array(compatibilityBars.length).fill(-1));
+    expect(getPlot(result, 'Float').values).toEqual(Array(compatibilityBars.length).fill(1.5));
+  });
+
+  it('locks string comparison — equality, inequality, and lexicographic order', () => {
+    // Pine supports == / != / < / > on string literals using lexicographic order.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/operators/
+    const result = runCompatScript(`
+indicator("Ops String Comparison Checkpoint")
+plot("abc" == "abc" ? 1 : 0, title="Eq")
+plot("abc" != "def" ? 1 : 0, title="Neq")
+plot("abc" < "def" ? 1 : 0, title="Lt")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ops String Comparison Checkpoint');
+    // All three are constant true on every bar
+    expect(getPlot(result, 'Eq').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'Neq').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'Lt').values).toEqual(Array(compatibilityBars.length).fill(1));
+  });
+
+  it('locks boolean arithmetic — booleans coerce to 0/1 in arithmetic', () => {
+    // Pine treats true as 1 and false as 0 in arithmetic contexts.
+    // int() cast of a boolean yields the same numeric value.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/type-system/
+    const result = runCompatScript(`
+indicator("Ops Boolean Arithmetic Checkpoint")
+plot(true + true, title="TrueTrue")
+plot(false + 1, title="FalseOne")
+plot(int(true), title="IntTrue")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ops Boolean Arithmetic Checkpoint');
+    // true + true = 2, false + 1 = 1, int(true) = 1
+    expect(getPlot(result, 'TrueTrue').values).toEqual(Array(compatibilityBars.length).fill(2));
+    expect(getPlot(result, 'FalseOne').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'IntTrue').values).toEqual(Array(compatibilityBars.length).fill(1));
+  });
+
+  it('locks comparison chaining via and — a > b and b > c idiom', () => {
+    // Pine does not support Python-style a > b > c chaining; the idiomatic pattern
+    // is (a > b) and (b > c). Verifies per-bar evaluation over the close series.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/operators/
+    const result = runCompatScript(`
+indicator("Ops Comparison Chaining Checkpoint")
+inRange = close > 100 and close < 110
+plot(inRange ? 1 : 0, title="InRange")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ops Comparison Chaining Checkpoint');
+    // close values: 102,105,107,103,99,100,104,109,108,111,110,112
+    // > 100 AND < 110: T,T,T,T,F(99),F(100=not>100),T,T,T,F(111),F(110=not<110),F(112)
+    expect(getPlot(result, 'InRange').values).toEqual([1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0]);
+  });
+
+  it('locks operator precedence — multiplication before addition, unary minus', () => {
+    // Pine follows standard arithmetic precedence: * before +, unary - applies to
+    // the operand before multiplication.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/operators/
+    const result = runCompatScript(`
+indicator("Ops Precedence Checkpoint")
+plot(2 + 3 * 4, title="AddMul")
+plot(-2 * 3, title="UnaryMul")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ops Precedence Checkpoint');
+    // 2 + (3*4) = 14, not (2+3)*4 = 20
+    expect(getPlot(result, 'AddMul').values).toEqual(Array(compatibilityBars.length).fill(14));
+    // (-2) * 3 = -6
+    expect(getPlot(result, 'UnaryMul').values).toEqual(Array(compatibilityBars.length).fill(-6));
+  });
+
+  it('locks compound assignment operators — += accumulates across bars', () => {
+    // Pine supports +=, -=, *=, /= on var-declared variables.
+    // This test accumulates close - open (the candle body delta) bar by bar.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/operators/
+    const result = runCompatScript(`
+indicator("Ops Compound Assignment Checkpoint")
+var float cumDelta = 0.0
+cumDelta += close - open
+plot(cumDelta, title="CumDelta")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ops Compound Assignment Checkpoint');
+    // close-open per bar: 2,3,2,-4,-4,1,4,5,-1,3,-1,2
+    // cumulative:          2,5,7, 3,-1,0,4,9, 8,11,10,12
+    expect(getPlot(result, 'CumDelta').values).toEqual([2, 5, 7, 3, -1, 0, 4, 9, 8, 11, 10, 12]);
+  });
+
+  it('locks unary minus on series — -close and -(high - low) per bar', () => {
+    // Unary minus applied to a series value negates each bar's value.
+    // Also verifies negation of a parenthesized expression.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/operators/
+    const result = runCompatScript(`
+indicator("Ops Unary Minus Checkpoint")
+plot(-close, title="NegClose")
+plot(-(high - low), title="NegRange")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ops Unary Minus Checkpoint');
+    // -close: negate each close value
+    expect(getPlot(result, 'NegClose').values).toEqual(
+      [-102, -105, -107, -103, -99, -100, -104, -109, -108, -111, -110, -112],
+    );
+    // -(high - low): bars have ranges 4,5,4,7,6,5,6,7,5,5,5,5 → negated
+    expect(getPlot(result, 'NegRange').values).toEqual([-4, -5, -4, -7, -6, -5, -6, -7, -5, -5, -5, -5]);
+  });
+
+  it('locks not operator — negates boolean conditions per bar', () => {
+    // The not unary operator inverts a boolean expression on each bar.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/operators/
+    const result = runCompatScript(`
+indicator("Ops Not Operator Checkpoint")
+plot(not true ? 1 : 0, title="NotTrue")
+plot(not false ? 1 : 0, title="NotFalse")
+cond = close > 105
+plot(not cond ? 1 : 0, title="NotCond")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ops Not Operator Checkpoint');
+    // not true = false on every bar
+    expect(getPlot(result, 'NotTrue').values).toEqual(Array(compatibilityBars.length).fill(0));
+    // not false = true on every bar
+    expect(getPlot(result, 'NotFalse').values).toEqual(Array(compatibilityBars.length).fill(1));
+    // close > 105: F,F,T,F,F,F,F,T,T,T,T,T  → not: T,T,F,T,T,T,T,F,F,F,F,F
+    expect(getPlot(result, 'NotCond').values).toEqual([1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0]);
+  });
+
+  it('locks na equality — na == na and na != na are both false', () => {
+    // In Pine (and TealScript), any comparison involving na returns false.
+    // This means na == na is false and na != na is also false — not true.
+    // Source search: https://www.tradingview.com/pine-script-docs/language/operators/
+    const result = runCompatScript(`
+indicator("Ops Na Equality Checkpoint")
+plot(na == na ? 1 : 0, title="NaEqNa")
+plot(na != na ? 1 : 0, title="NaNeqNa")
+plot(na == 0 ? 1 : 0, title="NaEqZero")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Ops Na Equality Checkpoint');
+    // All comparisons involving na return false (0)
+    expect(getPlot(result, 'NaEqNa').values).toEqual(Array(compatibilityBars.length).fill(0));
+    expect(getPlot(result, 'NaNeqNa').values).toEqual(Array(compatibilityBars.length).fill(0));
+    expect(getPlot(result, 'NaEqZero').values).toEqual(Array(compatibilityBars.length).fill(0));
+  });
+});
