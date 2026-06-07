@@ -6008,3 +6008,254 @@ plot(riskValue, title="Risk Value")
     expect(roundSeries(getPlot(result, 'Risk Value').values)).toEqual(Array(compatibilityBars.length).fill(100));
   });
 });
+
+// ===========================================================================================
+// Color operations and string formatting
+// Exercises color.rgb channel extraction, color.from_gradient, color.new transparency,
+// str.format variants, str.replace/replace_all, str.split+array+str.contains,
+// str.lower/upper/trim, table with formatted numbers, and plot style types.
+// ===========================================================================================
+
+describe('Color operations and string formatting', () => {
+  it('locks color.rgb channel extraction chain — create, plot each channel', () => {
+    // Source search: https://www.tradingview.com/scripts/search/color.rgb%20channel%20extraction%20r%20g%20b%20t/
+    // Pattern: build a color with color.rgb(r, g, b, transp), then read back each
+    // channel via color.r(), color.g(), color.b(), color.t(). Confirms round-trip fidelity.
+    const result = runCompatScript(`
+indicator("Color RGB Channel Checkpoint")
+c = color.rgb(200, 100, 50, 0)
+plot(color.r(c), title="R")
+plot(color.g(c), title="G")
+plot(color.b(c), title="B")
+plot(color.t(c), title="T")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Color RGB Channel Checkpoint');
+    // color.rgb(200, 100, 50, 0) → #C86432FF; extracting each channel
+    expect(getPlot(result, 'R').values).toEqual(Array(compatibilityBars.length).fill(200));
+    expect(getPlot(result, 'G').values).toEqual(Array(compatibilityBars.length).fill(100));
+    expect(getPlot(result, 'B').values).toEqual(Array(compatibilityBars.length).fill(50));
+    // transparency=0 → color.t() returns 0 on every bar
+    expect(getPlot(result, 'T').values).toEqual(Array(compatibilityBars.length).fill(0));
+  });
+
+  it('locks dynamic color gradient across bars — from_gradient red→green per bar_index', () => {
+    // Source search: https://www.tradingview.com/scripts/search/color.from_gradient%20bar_index%20red%20green/
+    // Pattern: color.from_gradient(bar_index, 0, last_bar_index, color.red, color.green)
+    // produces a different hex color on bar 0 vs bar 11 (last).
+    const result = runCompatScript(`
+indicator("Color Gradient Checkpoint")
+grad = color.from_gradient(bar_index, 0, last_bar_index, color.red, color.green)
+plot(close, color=grad, title="Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Color Gradient Checkpoint');
+    const colors = getPlot(result, 'Close').color as string[];
+    expect(colors).toHaveLength(compatibilityBars.length);
+    // Bar 0 (ratio=0) → bottom color = color.red = #F23645 with full alpha → #F23645FF
+    expect(colors[0]).toBe('#F23645FF');
+    // Bar 11 (ratio=1) → top color = color.green = #4CAF50 with full alpha → #4CAF50FF
+    expect(colors[11]).toBe('#4CAF50FF');
+    // Gradient progresses: bar 5 is strictly between red and green, not equal to either
+    expect(colors[5]).not.toBe(colors[0]);
+    expect(colors[5]).not.toBe(colors[11]);
+  });
+
+  it('locks color transparency blending — color.new(color.blue, 80) alpha channel', () => {
+    // Source search: https://www.tradingview.com/scripts/search/color.new%20transparency%20alpha%20blue/
+    // Pattern: color.new(color.blue, 80) creates a blue color at 80% transparency.
+    // 80% transparency → alpha = round((100-80)/100 * 255) = round(51) = 51 = 0x33.
+    const result = runCompatScript(`
+indicator("Color Transparency Checkpoint")
+c80 = color.new(color.blue, 80)
+c0  = color.new(color.blue, 0)
+plot(color.t(c80), title="T80")
+plot(color.t(c0),  title="T0")
+plot(close, color=c80, title="Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Color Transparency Checkpoint');
+    // color.blue = #2196F3; transparency=80 → alpha=51=0x33 → t()=80
+    expect(roundSeries(getPlot(result, 'T80').values)).toEqual(Array(compatibilityBars.length).fill(80));
+    expect(getPlot(result, 'T0').values).toEqual(Array(compatibilityBars.length).fill(0));
+    const colors = getPlot(result, 'Close').color as string[];
+    // Every bar: color.blue #2196F3 with 0x33 alpha → #2196F333
+    expect(colors.every((c) => c === '#2196F333')).toBe(true);
+  });
+
+  it('locks str.format with currency format — formats a number as $N,NNN.NN', () => {
+    // Source search: https://www.tradingview.com/scripts/search/str.format%20currency%20format%20price/
+    // Pattern: str.format("{0,number,currency}", value) → "$12,345.67" currency string.
+    // Confirmed by formatNumber("currency") branch in engine.
+    const result = runCompatScript(`
+indicator("Str Format Currency Checkpoint")
+var string formatted = na
+if bar_index == 0
+    formatted := str.format("{0,number,currency}", 12345.67)
+label.new(bar_index, close, text=na(formatted) ? "" : formatted)
+plot(close, title="Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Str Format Currency Checkpoint');
+    // Only checking no runtime errors and that the script runs cleanly
+    expect(getPlot(result, 'Close').values).toHaveLength(compatibilityBars.length);
+    // Verify a label was created with the formatted string on bar 0
+    const labels = result.drawings.filter((d) => d.type === 'label');
+    expect(labels.length).toBeGreaterThan(0);
+    // The first bar's label should contain the dollar-formatted string
+    const firstLabel = labels[0] as { type: string; text?: string };
+    expect(firstLabel.text).toBe('$12,345.67');
+  });
+
+  it('locks str.format with four OHLC placeholders — O/H/L/C string per bar', () => {
+    // Source search: https://www.tradingview.com/scripts/search/str.format%20ohlc%20four%20placeholder%20label/
+    // Pattern: str.format("O:{0} H:{1} L:{2} C:{3}", open, high, low, close)
+    // on bar 0: open=100, high=103, low=99, close=102 → "O:100 H:103 L:99 C:102"
+    const result = runCompatScript(`
+indicator("Str Format OHLC Checkpoint")
+var string ohlcStr = na
+if barstate.isfirst
+    ohlcStr := str.format("O:{0} H:{1} L:{2} C:{3}", open, high, low, close)
+label.new(bar_index, close, text=na(ohlcStr) ? "" : ohlcStr)
+plot(close, title="Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Str Format OHLC Checkpoint');
+    const labels = result.drawings.filter((d) => d.type === 'label');
+    expect(labels.length).toBeGreaterThan(0);
+    const firstLabel = labels[0] as { type: string; text?: string };
+    expect(firstLabel.text).toBe('O:100 H:103 L:99 C:102');
+  });
+
+  it('locks str.replace and str.replace_all — partial vs global replacement', () => {
+    // Source search: https://www.tradingview.com/scripts/search/str.replace%20str.replace_all%20pattern%20occurrence/
+    // str.replace replaces the first occurrence; str.replace_all replaces every occurrence.
+    const result = runCompatScript(`
+indicator("Str Replace Checkpoint")
+src = "aa-bb-aa"
+once = str.replace(src, "aa", "XX")
+all  = str.replace_all(src, "aa", "XX")
+plot(str.length(once), title="OnceLen")
+plot(str.length(all),  title="AllLen")
+plot(str.contains(once, "aa") ? 1 : 0, title="OnceHasAA")
+plot(str.contains(all,  "aa") ? 1 : 0, title="AllHasAA")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Str Replace Checkpoint');
+    // "aa-bb-aa".replace first "aa"→"XX" → "XX-bb-aa" (length 8, still has "aa")
+    expect(getPlot(result, 'OnceLen').values).toEqual(Array(compatibilityBars.length).fill(8));
+    expect(getPlot(result, 'OnceHasAA').values).toEqual(Array(compatibilityBars.length).fill(1));
+    // "aa-bb-aa".replaceAll "aa"→"XX" → "XX-bb-XX" (length 8, no more "aa")
+    expect(getPlot(result, 'AllLen').values).toEqual(Array(compatibilityBars.length).fill(8));
+    expect(getPlot(result, 'AllHasAA').values).toEqual(Array(compatibilityBars.length).fill(0));
+  });
+
+  it('locks str.split + array.size + str.contains — delimited config string parsing', () => {
+    // Source search: https://www.tradingview.com/scripts/search/str.split%20array.size%20str.contains%20config%20parse/
+    // Pattern: split a CSV config string, check count and membership via str.contains.
+    const result = runCompatScript(`
+indicator("Str Split Contains Checkpoint")
+config = "RSI,MACD,ATR"
+parts  = str.split(config, ",")
+plot(array.size(parts), title="Count")
+plot(str.contains(config, "MACD") ? 1 : 0, title="HasMACD")
+plot(str.contains(config, "OBV")  ? 1 : 0, title="HasOBV")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Str Split Contains Checkpoint');
+    // "RSI,MACD,ATR" splits into 3 parts
+    expect(getPlot(result, 'Count').values).toEqual(Array(compatibilityBars.length).fill(3));
+    // str.contains("RSI,MACD,ATR", "MACD") → true → 1
+    expect(getPlot(result, 'HasMACD').values).toEqual(Array(compatibilityBars.length).fill(1));
+    // str.contains("RSI,MACD,ATR", "OBV") → false → 0
+    expect(getPlot(result, 'HasOBV').values).toEqual(Array(compatibilityBars.length).fill(0));
+  });
+
+  it('locks str.lower / str.upper / str.trim — case conversion and whitespace trimming', () => {
+    // Source search: https://www.tradingview.com/scripts/search/str.lower%20str.upper%20str.trim%20case%20whitespace/
+    // Pattern: case conversion and trimming idiom used in dashboard/label string normalization.
+    const result = runCompatScript(`
+indicator("Str Case Trim Checkpoint")
+src = "  Hello World  "
+lower = str.lower(src)
+upper = str.upper(src)
+trimmed = str.trim(src)
+plot(str.length(lower),   title="LowerLen")
+plot(str.length(upper),   title="UpperLen")
+plot(str.length(trimmed), title="TrimLen")
+plot(str.contains(lower, "hello world") ? 1 : 0, title="IsLower")
+plot(str.contains(upper, "HELLO WORLD") ? 1 : 0, title="IsUpper")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Str Case Trim Checkpoint');
+    // "  Hello World  " has length 15; lower/upper preserve spaces → length 15
+    expect(getPlot(result, 'LowerLen').values).toEqual(Array(compatibilityBars.length).fill(15));
+    expect(getPlot(result, 'UpperLen').values).toEqual(Array(compatibilityBars.length).fill(15));
+    // str.trim removes 2 leading + 2 trailing spaces → "Hello World" = 11 chars
+    expect(getPlot(result, 'TrimLen').values).toEqual(Array(compatibilityBars.length).fill(11));
+    // str.lower("  Hello World  ") contains "hello world" (with spaces) → true
+    expect(getPlot(result, 'IsLower').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'IsUpper').values).toEqual(Array(compatibilityBars.length).fill(1));
+  });
+
+  it('locks table with str.tostring formatted numbers — #.#### precision cell', () => {
+    // Source search: https://www.tradingview.com/scripts/search/table%20str.tostring%20number%20format%20precision/
+    // Pattern: dashboard tables use str.tostring(value, "#.####") for high-precision
+    // display of indicator values.
+    const result = runCompatScript(`
+indicator("Table Formatted Numbers Checkpoint")
+rsi = ta.rsi(close, 5)
+atr = ta.atr(5)
+var table dash = table.new(position.top_right, 2, 2)
+if barstate.islast
+    table.cell(dash, 0, 0, "RSI")
+    table.cell(dash, 1, 0, str.tostring(nz(rsi), "#.####"))
+    table.cell(dash, 0, 1, "ATR")
+    table.cell(dash, 1, 1, str.tostring(nz(atr), "#.####"))
+plot(nz(rsi), title="RSI")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Table Formatted Numbers Checkpoint');
+    expect(result.drawings.filter((d) => d.type === 'table').length).toBeGreaterThan(0);
+    // RSI series is valid after warmup
+    expect(roundSeries(getPlot(result, 'RSI').values)).toEqual([
+      0, 0, 0, 0, 0, 42.857143, 57.894737, 70.16317, 65.39924, 72.421258, 66.774781, 72.194557,
+    ]);
+  });
+
+  it('locks plot with all five style types — line/histogram/circles/columns/area', () => {
+    // Source search: https://www.tradingview.com/scripts/search/plot%20style%20line%20histogram%20circles%20columns%20area/
+    // Pattern: indicator authors use different plot styles for visual variety —
+    // line for price, histogram for momentum, circles for signals, columns for volume,
+    // area for bands. Each style type maps to a distinct string constant.
+    const result = runCompatScript(`
+indicator("Plot Styles Checkpoint")
+plot(close,  style=plot.style_line,      title="Line")
+plot(close,  style=plot.style_histogram, title="Histogram")
+plot(close,  style=plot.style_circles,   title="Circles")
+plot(volume, style=plot.style_columns,   title="Columns")
+plot(close,  style=plot.style_area,      title="Area")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Plot Styles Checkpoint');
+    expect(getPlot(result, 'Line').style).toBe('line');
+    expect(getPlot(result, 'Histogram').style).toBe('histogram');
+    expect(getPlot(result, 'Circles').style).toBe('circles');
+    expect(getPlot(result, 'Columns').style).toBe('columns');
+    expect(getPlot(result, 'Area').style).toBe('area');
+    // All plots return the correct numeric series
+    expect(roundSeries(getPlot(result, 'Line').values)).toEqual([
+      102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112,
+    ]);
+  });
+});

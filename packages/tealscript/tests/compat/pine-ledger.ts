@@ -2911,6 +2911,97 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  // ── Color operations and string formatting ────────────────────────────────
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'color-rgb-channel-extraction-checkpoint',
+      title: 'Color RGB Channel Extraction Checkpoint',
+      searchContext: 'TradingView public scripts search: color.rgb channel extraction r g b t',
+      featureTags: ['visuals', 'color', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'color-gradient-bars-checkpoint',
+      title: 'Color Gradient Bars Checkpoint',
+      searchContext: 'TradingView public scripts search: color.from_gradient bar_index red green',
+      featureTags: ['visuals', 'color', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'color-transparency-blend-checkpoint',
+      title: 'Color Transparency Blend Checkpoint',
+      searchContext: 'TradingView public scripts search: color.new transparency alpha blue',
+      featureTags: ['visuals', 'color', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'str-format-currency-checkpoint',
+      title: 'Str Format Currency Checkpoint',
+      searchContext: 'TradingView public scripts search: str.format currency format price',
+      featureTags: ['strings', 'str_format', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'str-format-ohlc-placeholder-checkpoint',
+      title: 'Str Format OHLC Placeholder Checkpoint',
+      searchContext: 'TradingView public scripts search: str.format ohlc four placeholder label',
+      featureTags: ['strings', 'str_format', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'str-replace-replace-all-checkpoint',
+      title: 'Str Replace Replace All Checkpoint',
+      searchContext: 'TradingView public scripts search: str.replace str.replace_all pattern occurrence',
+      featureTags: ['strings', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'str-split-contains-checkpoint',
+      title: 'Str Split Contains Checkpoint',
+      searchContext: 'TradingView public scripts search: str.split array.size str.contains config parse',
+      featureTags: ['strings', 'str_split', 'arrays', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'str-case-trim-checkpoint',
+      title: 'Str Case Trim Checkpoint',
+      searchContext: 'TradingView public scripts search: str.lower str.upper str.trim case whitespace',
+      featureTags: ['strings', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'table-formatted-numbers-checkpoint',
+      title: 'Table Formatted Numbers Checkpoint',
+      searchContext: 'TradingView public scripts search: table str.tostring number format precision',
+      featureTags: ['tables', 'dashboard', 'strings', 'ta', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'plot-all-styles-checkpoint',
+      title: 'Plot All Styles Checkpoint',
+      searchContext: 'TradingView public scripts search: plot style line histogram circles columns area',
+      featureTags: ['visuals', 'plot', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
   // ── Type system and enum patterns ─────────────────────────────────────────
   {
     ledgerEntry: officialDocsEntry({
