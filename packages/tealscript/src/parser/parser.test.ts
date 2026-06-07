@@ -82,7 +82,7 @@ indicator(title="Mixed Indicator", "Mixed", true, format.price, 3)`);
 
       it('parses legacy study declarations on the indicator path', () => {
         const ast = parse(`//@version=4
-study("Legacy Indicator", shorttitle="LI", overlay=true)`);
+study("Legacy Indicator", shorttitle="LI", overlay=true, resolution="60", resolution_gaps=false)`);
 
         const indicator = ast.body[0];
         expect(indicator.type).toBe('IndicatorDeclaration');
@@ -91,6 +91,10 @@ study("Legacy Indicator", shorttitle="LI", overlay=true)`);
           expect(indicator.title?.type).toBe('StringLiteral');
           expect(indicator.shorttitle?.type).toBe('StringLiteral');
           expect(indicator.overlay?.type).toBe('BooleanLiteral');
+          expect(indicator.timeframe?.type).toBe('StringLiteral');
+          expect(indicator.timeframe_gaps?.type).toBe('BooleanLiteral');
+          expect('resolution' in indicator).toBe(false);
+          expect('resolution_gaps' in indicator).toBe(false);
         }
       });
 

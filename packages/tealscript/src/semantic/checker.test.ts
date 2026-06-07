@@ -4,6 +4,16 @@ import { parse } from '../parser';
 import { checkProgram } from './checker';
 
 describe('semantic checker', () => {
+  it('accepts legacy study resolution declaration aliases', () => {
+    const result = checkProgram(parse(`
+//@version=4
+study("Legacy MTF", resolution="60", resolution_gaps=false)
+plot(close)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
   it('accepts known Pine globals, namespaces, and user declarations', () => {
     const result = checkProgram(parse(`
 indicator("Semantic OK")
