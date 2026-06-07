@@ -326,6 +326,9 @@ export interface StrategyLedger {
   grossLoss: number;
   maxRunup: number;
   maxDrawdown: number;
+  maxContractsHeldAll: number;
+  maxContractsHeldLong: number;
+  maxContractsHeldShort: number;
 }
 
 export function createDefaultStrategySettings(settings: Partial<StrategyLedgerSettings> = {}): StrategyLedgerSettings {
@@ -391,6 +394,9 @@ export function createStrategyLedger(settings: Partial<StrategyLedgerSettings> =
     grossLoss: 0,
     maxRunup: 0,
     maxDrawdown: 0,
+    maxContractsHeldAll: 0,
+    maxContractsHeldLong: 0,
+    maxContractsHeldShort: 0,
   };
 }
 
@@ -411,6 +417,9 @@ export function cloneStrategyLedger(ledger: StrategyLedger): StrategyLedger {
     grossLoss: ledger.grossLoss,
     maxRunup: ledger.maxRunup,
     maxDrawdown: ledger.maxDrawdown,
+    maxContractsHeldAll: ledger.maxContractsHeldAll,
+    maxContractsHeldLong: ledger.maxContractsHeldLong,
+    maxContractsHeldShort: ledger.maxContractsHeldShort,
   };
 }
 
@@ -1272,6 +1281,11 @@ function applyStrategyFillToPosition(ledger: StrategyLedger, fill: StrategyFill)
 
   ledger.position.size = nextSize;
   ledger.position.direction = nextSize > 0 ? 'long' : nextSize < 0 ? 'short' : null;
+
+  const absSize = Math.abs(nextSize);
+  if (absSize > ledger.maxContractsHeldAll) ledger.maxContractsHeldAll = absSize;
+  if (nextSize > 0 && nextSize > ledger.maxContractsHeldLong) ledger.maxContractsHeldLong = nextSize;
+  if (nextSize < 0 && -nextSize > ledger.maxContractsHeldShort) ledger.maxContractsHeldShort = -nextSize;
 }
 
 function applyStrategyFillToTrades(ledger: StrategyLedger, fill: StrategyFill): void {

@@ -61,7 +61,7 @@ Local runtime registrations: 429
 | `session` | 2 | Partial | Epic 7 time and sessions |
 | `settlement_as_close` | 3 | Partial | Epic 9 ticker and request data |
 | `str` | 18 | Partial | Epic 5 `str.*` pass |
-| `strategy` | 31 | Partial | Epic 14 strategy broker emulator |
+| `strategy` | 44 | Partial | Epic 14 strategy broker emulator; +13 performance-stat variables |
 | `ta` | 56 | Partial | Epic 5 `ta.*` pass |
 | `table` | 8 | Partial | Epic 11 drawing objects |
 | `ticker` | 9 | Partial | Epic 9 ticker and request data |
