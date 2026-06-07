@@ -182,8 +182,9 @@ Phases:
    Alert/log coverage includes official docs examples plus reduced public signal
    fixtures with `alertcondition()` metadata, direct `alert()` emission, and
    Pine Logs startup/signal/final-summary output.
-   Public TA signal coverage includes a reduced Supertrend fixture that routes
-   `ta.supertrend()` direction into up/down trend plots and flip signals.
+   Public TA signal coverage includes reduced Supertrend and ADX/DMI fixtures
+   that route `ta.supertrend()` direction and `ta.dmi()` trend-strength state
+   into plotted trend/signal outputs.
    Synthetic ticker coverage includes official docs examples plus a reduced
    public Heikin-Ashi trend request fixture.
    Public footprint request coverage is tracked as a planned unsupported

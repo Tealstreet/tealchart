@@ -1411,6 +1411,78 @@ plot(sellSignal ? 1 : 0, title="Sell Signal")
     expect(getPlot(result, 'Supertrend').values.some((value) => value !== null)).toBe(true);
   });
 
+  it('locks a reduced public ADX/DMI trend-strength idiom', () => {
+    // Public idiom reference: trend-strength public indicators commonly compare
+    // `ta.dmi()` directional lines against an ADX threshold before routing signals.
+    // Source search: https://www.tradingview.com/scripts/search/adx%20dmi%20trend%20strength/
+    const result = runCompatScript(`
+indicator("Public ADX DMI Trend Strength Checkpoint")
+diLength = input.int(3, "DI Length")
+adxSmoothing = input.int(3, "ADX Smoothing")
+threshold = input.float(25.0, "Trend Threshold")
+[plusDI, minusDI, adx] = ta.dmi(diLength, adxSmoothing)
+bullTrend = plusDI > minusDI and adx > threshold
+bearTrend = minusDI > plusDI and adx > threshold
+plot(plusDI, title="Plus DI")
+plot(minusDI, title="Minus DI")
+plot(adx, title="ADX")
+plot(bullTrend ? 1 : 0, title="Bull Trend")
+plot(bearTrend ? 1 : 0, title="Bear Trend")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public ADX DMI Trend Strength Checkpoint');
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['DI Length', 'int'],
+      ['ADX Smoothing', 'int'],
+      ['Trend Threshold', 'float'],
+    ]);
+    expect(roundSeries(getPlot(result, 'Plus DI').values)).toEqual([
+      null,
+      null,
+      null,
+      31.914894,
+      20.27027,
+      13.921114,
+      32.937685,
+      47.828065,
+      39.673607,
+      33.666546,
+      35.656079,
+      24.236113,
+    ]);
+    expect(roundSeries(getPlot(result, 'Minus DI').values)).toEqual([
+      null,
+      null,
+      null,
+      12.765957,
+      32.432432,
+      34.802784,
+      22.255193,
+      13.645668,
+      9.647078,
+      6.701477,
+      4.596336,
+      9.529838,
+    ]);
+    expect(roundSeries(getPlot(result, 'ADX').values)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      36.263736,
+      30.627437,
+      38.953253,
+      46.262234,
+      53.107519,
+      61.125824,
+      55.268404,
+    ]);
+    expect(getPlot(result, 'Bull Trend').values).toEqual([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Bear Trend').values).toEqual([0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]);
+  });
+
   it('locks a reduced public object-method state idiom', () => {
     // Public idiom reference: market-structure public indicators commonly keep
     // swing state in user-defined objects and update it through methods.

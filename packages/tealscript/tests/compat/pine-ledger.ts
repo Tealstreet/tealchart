@@ -370,6 +370,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-adx-dmi-trend-strength-checkpoint',
+      title: 'Public ADX DMI Trend Strength Checkpoint',
+      searchContext: 'TradingView public scripts search: adx dmi trend strength',
+      featureTags: ['ta', 'signals', 'adx', 'dmi', 'trend_filter', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-marker-signal-checkpoint',
       title: 'Public Marker Signal Checkpoint',
       searchContext: 'TradingView public scripts search: buy sell signal markers',
