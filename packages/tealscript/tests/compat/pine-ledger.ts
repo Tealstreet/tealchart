@@ -1008,6 +1008,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'public-pvt-signal-checkpoint',
+      title: 'Public PVT Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: price volume trend signal',
+      featureTags: ['ta', 'signals', 'pvt', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(

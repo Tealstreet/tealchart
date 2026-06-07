@@ -96,11 +96,11 @@ describe('Pine compatibility checkpoint corpus', () => {
       intrabar: { total: 4, passed: 3, failed: 1 },
       markers: { total: 3, passed: 3, failed: 0 },
       realtime: { total: 2, passed: 2, failed: 0 },
-      signals: { total: 47, passed: 47, failed: 0 },
+      signals: { total: 48, passed: 48, failed: 0 },
       declaration_metadata: { total: 1, passed: 1, failed: 0 },
-      output: { total: 36, passed: 36, failed: 0 },
+      output: { total: 37, passed: 37, failed: 0 },
       supertrend: { total: 1, passed: 1, failed: 0 },
-      ta: { total: 24, passed: 24, failed: 0 },
+      ta: { total: 25, passed: 25, failed: 0 },
       barssince: { total: 1, passed: 1, failed: 0 },
       valuewhen: { total: 1, passed: 1, failed: 0 },
       event_memory: { total: 1, passed: 1, failed: 0 },
@@ -146,6 +146,7 @@ describe('Pine compatibility checkpoint corpus', () => {
       vwap: { total: 1, passed: 1, failed: 0 },
       wpr: { total: 1, passed: 1, failed: 0 },
       obv: { total: 1, passed: 1, failed: 0 },
+      pvt: { total: 1, passed: 1, failed: 0 },
       zigzag: { total: 1, passed: 1, failed: 0 },
       zones: { total: 2, passed: 2, failed: 0 },
     });
@@ -228,6 +229,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('public-plot-metadata-checkpoint');
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('public-synthetic-ticker-checkpoint');
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('public-obv-signal-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('public-pvt-signal-checkpoint');
   });
 
   it('renders a stable checkpoint corpus report', () => {
@@ -238,7 +240,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain(`Failed: ${EXPECTED_CHECKPOINT_FAILED}`);
     expect(markdown).toContain(`Planned unsupported: ${EXPECTED_CHECKPOINT_PLANNED_UNSUPPORTED}`);
     expect(markdown).toContain('Actionable failed: 0');
-    expect(markdown).toContain('Pass rate: 99.0%');
+    expect(markdown).toContain('Pass rate: 99.1%');
     expect(markdown).toContain('Actionable pass rate: 100.0%');
     expect(markdown).toContain('| semantic | 1 |');
     expect(markdown).toContain('| unsupported_planned | 1 |');
@@ -294,11 +296,11 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| intrabar | 4 | 3 | 1 |');
     expect(markdown).toContain('| markers | 3 | 3 | 0 |');
     expect(markdown).toContain('| realtime | 2 | 2 | 0 |');
-    expect(markdown).toContain('| signals | 47 | 47 | 0 |');
+    expect(markdown).toContain('| signals | 48 | 48 | 0 |');
     expect(markdown).toContain('| declaration_metadata | 1 | 1 | 0 |');
-    expect(markdown).toContain('| output | 36 | 36 | 0 |');
+    expect(markdown).toContain('| output | 37 | 37 | 0 |');
     expect(markdown).toContain('| supertrend | 1 | 1 | 0 |');
-    expect(markdown).toContain('| ta | 24 | 24 | 0 |');
+    expect(markdown).toContain('| ta | 25 | 25 | 0 |');
     expect(markdown).toContain('| barssince | 1 | 1 | 0 |');
     expect(markdown).toContain('| valuewhen | 1 | 1 | 0 |');
     expect(markdown).toContain('| event_memory | 1 | 1 | 0 |');
@@ -347,6 +349,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| vwap | 1 | 1 | 0 |');
     expect(markdown).toContain('| wpr | 1 | 1 | 0 |');
     expect(markdown).toContain('| obv | 1 | 1 | 0 |');
+    expect(markdown).toContain('| pvt | 1 | 1 | 0 |');
     expect(markdown).toContain('| zigzag | 1 | 1 | 0 |');
     expect(markdown).toContain('| zones | 2 | 2 | 0 |');
     expect(markdown).not.toContain('Validation Errors');
@@ -493,9 +496,9 @@ plot(signals.fast(close, 2), title="Fast")
     expect(index).toMatchObject({
       schemaVersion: 1,
       total: EXPECTED_CHECKPOINT_TOTAL,
-      byCategory: { indicator: 83, strategy: 22 },
-      bySourceKind: { official_docs: 28, public_script: 77 },
-      byPineVersion: { v4: 1, v6: 104 },
+      byCategory: { indicator: 84, strategy: 22 },
+      bySourceKind: { official_docs: 28, public_script: 78 },
+      byPineVersion: { v4: 1, v6: 105 },
       byStoragePolicy: { reduced_fixture_only: EXPECTED_CHECKPOINT_TOTAL },
     });
     expect(index.byFeatureTag).toMatchObject({
@@ -557,10 +560,10 @@ plot(signals.fast(close, 2), title="Fast")
       intrabar: 4,
       markers: 3,
       realtime: 2,
-      signals: 47,
-      output: 36,
+      signals: 48,
+      output: 37,
       supertrend: 1,
-      ta: 24,
+      ta: 25,
       barssince: 1,
       valuewhen: 1,
       event_memory: 1,
@@ -606,13 +609,14 @@ plot(signals.fast(close, 2), title="Fast")
       vwap: 1,
       wpr: 1,
       obv: 1,
+      pvt: 1,
       zigzag: 1,
       zones: 2,
     });
     expect(markdown).toContain('# Pine Compatibility Coverage');
     expect(markdown).toContain(`Total checkpoints: ${EXPECTED_CHECKPOINT_TOTAL}`);
     expect(markdown).toContain('| official_docs | 28 |');
-    expect(markdown).toContain('| public_script | 77 |');
+    expect(markdown).toContain('| public_script | 78 |');
     expect(markdown).toContain(`| reduced_fixture_only | ${EXPECTED_CHECKPOINT_TOTAL} |`);
     expect(formatPineCompatibilityCoverageJson(index)).toContain(`"total": ${EXPECTED_CHECKPOINT_TOTAL}`);
   });
@@ -635,7 +639,7 @@ plot(signals.fast(close, 2), title="Fast")
         `"passed": ${EXPECTED_CHECKPOINT_PASSED}`,
       );
       expect(readFileSync(join(outDir, 'pine-compatibility-corpus.json'), 'utf8')).toContain('"actionableFailed": 0');
-      expect(readFileSync(join(outDir, 'pine-compatibility-corpus.md'), 'utf8')).toContain('Pass rate: 99.0%');
+      expect(readFileSync(join(outDir, 'pine-compatibility-corpus.md'), 'utf8')).toContain('Pass rate: 99.1%');
       expect(readFileSync(join(outDir, 'pine-compatibility-corpus.md'), 'utf8')).toContain('Actionable pass rate: 100.0%');
       expect(readFileSync(join(outDir, 'pine-compatibility-coverage.json'), 'utf8')).toContain(
         `"total": ${EXPECTED_CHECKPOINT_TOTAL}`,
