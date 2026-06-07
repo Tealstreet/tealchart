@@ -662,7 +662,6 @@ plot(close)
     const result = checkProgram(parse(`
 indicator("Planned Unsupported Calls")
 request.footprint(syminfo.tickerid)
-ticker.rangebar(syminfo.tickerid, 10)
 plot(close)
 `));
 
@@ -671,10 +670,6 @@ plot(close)
         code: 'unsupported-feature',
         message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
       }),
-      expect.objectContaining({
-        code: 'unsupported-feature',
-        message: 'ticker.* functions are not supported yet: ticker.rangebar',
-      }),
     ]);
   });
 
@@ -682,6 +677,7 @@ plot(close)
     const result = checkProgram(parse(`
 indicator("Unknown Ticker Calls")
 ticker.make("NASDAQ:AAPL")
+ticker.rangebar(syminfo.tickerid, 10)
 plot(close)
 `));
 
@@ -689,6 +685,10 @@ plot(close)
       expect.objectContaining({
         code: 'unknown-function',
         message: 'Unknown function: ticker.make',
+      }),
+      expect.objectContaining({
+        code: 'unknown-function',
+        message: 'Unknown function: ticker.rangebar',
       }),
     ]);
   });

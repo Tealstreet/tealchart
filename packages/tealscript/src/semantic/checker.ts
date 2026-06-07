@@ -2402,7 +2402,6 @@ const PLANNED_UNSUPPORTED_BUILTIN_CALL_MESSAGES = new Map<string, string>([
     'request.footprint',
     'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
   ],
-  ['ticker.rangebar', 'ticker.* functions are not supported yet: ticker.rangebar'],
 ]);
 
 export function checkProgram(program: Program, options: SemanticCheckOptions = {}): SemanticCheckResult {

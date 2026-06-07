@@ -27,15 +27,15 @@ plot(map.get(0))
     expect(result.plots[0]?.values).toEqual([102]);
   });
 
-  it('reports planned ticker namespace calls explicitly', () => {
+  it('keeps undocumented ticker namespace calls on the unknown-function path', () => {
     const result = runCompatScript(`
-indicator("Unsupported ticker")
+indicator("Unknown ticker")
 ticker.rangebar(syminfo.tickerid, 10)
 plot(close)
 `, { bars: [compatibilityBars[0]!] });
 
     expect(result.errors.map((error) => error.message)).toEqual([
-      'ticker.* functions are not supported yet: ticker.rangebar',
+      'Unknown function: ticker.rangebar',
     ]);
   });
 
