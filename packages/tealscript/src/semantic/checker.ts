@@ -3842,6 +3842,7 @@ class SemanticChecker {
     this.checkMapCallTypes(expression, scope);
     this.checkInputDefaultValueType(expression, scope);
     this.checkInputBoolOptionArguments(expression, scope);
+    this.checkInputStringOptionArguments(expression, scope);
     this.checkColorFunctionArgumentTypes(expression, scope);
     this.checkStringFunctionArgumentTypes(expression, scope);
     this.checkMathFunctionArgumentTypes(expression, scope);
@@ -4632,6 +4633,18 @@ class SemanticChecker {
 
     this.checkBuiltinArgumentKind(expression, scope, displayName, signature.params, 'confirm', 'boolean');
     this.checkBuiltinArgumentKind(expression, scope, displayName, signature.params, 'active', 'boolean');
+  }
+
+  private checkInputStringOptionArguments(expression: CallExpression, scope: SemanticScope): void {
+    const displayName = this.memberPath(expression.callee).join('.');
+    if (!displayName.startsWith('input.')) return;
+
+    const signature = BUILTIN_SIGNATURES.get(displayName);
+    if (!signature) return;
+
+    for (const parameterName of ['title', 'tooltip', 'inline', 'group']) {
+      this.checkBuiltinArgumentKind(expression, scope, displayName, signature.params, parameterName, 'string');
+    }
   }
 
   private checkInputEnumDefaultValueType(expression: CallExpression, scope: SemanticScope): void {
