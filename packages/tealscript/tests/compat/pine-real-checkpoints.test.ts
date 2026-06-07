@@ -3179,6 +3179,46 @@ plot(bar_index >= 1 ? ta.sma(bst.switchScaled(open), 2) : na, title="Switch Scal
     expect(getPlot(result, 'Switch Scaled Average').values).toEqual([null, 30, 50]);
   });
 
+  it('locks a reduced public library arithmetic block-if source-helper idiom', () => {
+    // Public idiom reference: public library helpers commonly use multiline
+    // block `if` returns and block-local initializers around source
+    // calculations before callers apply delayed rolling windows.
+    // Source search: https://www.tradingview.com/scripts/search/library%20source%20helper%20arithmetic%20if%20wrapper/
+    const library = parse(`
+library("BlockIfSourceTools", true)
+export blockMidpoint() =>
+    if bar_index >= 0
+        (high + low) / 2
+    else
+        (high + low) / 2
+export blockScaled(series float src) =>
+    selected = if bar_index >= 0
+        src * 2
+    else
+        src * 2
+    selected
+`);
+    const result = runCompatScript(`
+indicator("Public Library Arithmetic Block If Source Helper Checkpoint")
+import PublicUser/BlockIfSourceTools/1 as bif
+plot(bar_index >= 1 ? ta.sma(bif.blockMidpoint(), 2) : na, title="Block Midpoint Average")
+plot(bar_index >= 1 ? ta.sma(bif.blockScaled(open), 2) : na, title="Block Scaled Average")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 18, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ],
+      engineOptions: {
+        libraries: new Map([['PublicUser/BlockIfSourceTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Block Midpoint Average').values).toEqual([null, 15, 25]);
+    expect(getPlot(result, 'Block Scaled Average').values).toEqual([null, 30, 50]);
+  });
+
   it('locks a reduced official dynamic session idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/sessions/
     const result = runCompatScript(`
