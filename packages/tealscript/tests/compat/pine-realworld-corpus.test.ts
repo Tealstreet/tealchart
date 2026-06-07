@@ -1796,3 +1796,378 @@ plot(bar_index, title="BarIndex")
     expect(result.drawings.filter((d) => d.type === 'label').length).toBe(1);
   });
 });
+
+// ===========================================================================================
+// Official documentation patterns
+// Tests inspired by canonical examples from the official Pine Script documentation.
+// Each test cites the doc section and asserts concrete output values.
+// ===========================================================================================
+
+describe('Official documentation patterns', () => {
+  it('locks barstate.ishistory and barstate.isrealtime execution model', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/execution-model/
+    // In the test harness all bars are historical: ishistory=true, isrealtime=false.
+    // Confirms the runtime sets barstate fields consistently across all bars.
+    const result = runCompatScript(`
+indicator("Official Exec Model Checkpoint")
+histFlag = barstate.ishistory ? 1 : 0
+rtFlag   = barstate.isrealtime ? 1 : 0
+plot(histFlag, title="IsHistory")
+plot(rtFlag,   title="IsRealtime")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Official Exec Model Checkpoint');
+    // All bars are history in the test harness
+    expect(getPlot(result, 'IsHistory').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'IsRealtime').values).toEqual(Array(compatibilityBars.length).fill(0));
+  });
+
+  it('locks int() and float() type cast qualifier behavior', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/language/type-system/
+    // int(x) truncates to integer; float(x) widens to float; str.tostring converts for display.
+    // close values are already whole numbers in compatibilityBars so int(close)==close.
+    const result = runCompatScript(`
+indicator("Official Type Cast Checkpoint")
+asInt   = int(close)
+asFloat = float(asInt)
+plot(asInt,   title="AsInt")
+plot(asFloat, title="AsFloat")
+plot(close,   title="Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Official Type Cast Checkpoint');
+    const closes = [102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112];
+    expect(getPlot(result, 'AsInt').values).toEqual(closes);
+    expect(getPlot(result, 'AsFloat').values).toEqual(closes);
+    expect(getPlot(result, 'Close').values).toEqual(closes);
+  });
+
+  it('locks array.from(), array.stdev(), and array.variance() statistical methods', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/language/arrays/
+    // array.from() creates a literal array from its arguments.
+    // array.stdev() and array.variance() compute population statistics.
+    const result = runCompatScript(`
+indicator("Official Array Stats Checkpoint")
+arr = array.from(close, high, low)
+sd  = array.stdev(arr)
+vr  = array.variance(arr)
+plot(sd, title="Stdev")
+plot(vr, title="Variance")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Official Array Stats Checkpoint');
+    expect(roundSeries(getPlot(result, 'Stdev').values)).toEqual([
+      1.699673, 2.160247, 1.699673, 3.091206,
+      2.624669, 2.160247, 2.624669, 3.091206,
+      2.054805, 2.160247, 2.160247, 2.160247,
+    ]);
+    expect(roundSeries(getPlot(result, 'Variance').values)).toEqual([
+      2.888889, 4.666667, 2.888889, 9.555556,
+      6.888889, 4.666667, 6.888889, 9.555556,
+      4.222222, 4.666667, 4.666667, 4.666667,
+    ]);
+  });
+
+  it('locks array.slice() for window filtering', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/language/arrays/
+    // Keeps a rolling window of 4 closes, slices the middle 2, and computes their average.
+    const result = runCompatScript(`
+indicator("Official Array Slice Checkpoint")
+var array<float> win = array.new<float>()
+win.push(close)
+if win.size() > 4
+    win.shift()
+sliced = win.size() >= 2 ? win.slice(1, win.size()) : array.new<float>()
+avg    = sliced.size() > 0 ? array.avg(sliced) : close
+plot(win.size(), title="WinSize")
+plot(avg,        title="SliceAvg")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Official Array Slice Checkpoint');
+    // Window grows 1,2,3,4 then caps at 4
+    expect(getPlot(result, 'WinSize').values).toEqual([1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+    // slice(1, size) = all elements after the first
+    // bar0: win=[102], size<2 → avg=close=102
+    // bar1: win=[102,105], slice=[105], avg=105
+    // bar2: win=[102,105,107], slice=[105,107], avg=106
+    // bar3: win=[102,105,107,103], slice=[105,107,103], avg=105
+    // bar4: win=[105,107,103,99], slice=[107,103,99], avg=103
+    // bar5: win=[107,103,99,100], slice=[103,99,100], avg=100.666667
+    // bar6: win=[103,99,100,104], slice=[99,100,104], avg=101
+    // bar7: win=[99,100,104,109], slice=[100,104,109], avg=104.333333
+    // bar8: win=[100,104,109,108], slice=[104,109,108], avg=107
+    // bar9: win=[104,109,108,111], slice=[109,108,111], avg=109.333333
+    // bar10: win=[109,108,111,110], slice=[108,111,110], avg=109.666667
+    // bar11: win=[108,111,110,112], slice=[111,110,112], avg=111
+    expect(roundSeries(getPlot(result, 'SliceAvg').values)).toEqual([
+      102, 105, 106, 105, 103, 100.666667,
+      101, 104.333333, 107, 109.333333, 109.666667, 111,
+    ]);
+  });
+
+  it('locks map.new<string,float>() with .put(), .get(), .contains(), and .keys() idiom', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/language/maps/
+    // Accumulates running high+low sum in a map keyed by "hl"; confirms map access.
+    const result = runCompatScript(`
+indicator("Official Map Checkpoint")
+var map<string, float> m = map.new<string, float>()
+if not m.contains("hl")
+    m.put("hl", 0.0)
+m.put("hl", nz(m.get("hl")) + high + low)
+hlSum   = nz(m.get("hl"))
+keysCnt = m.keys().size()
+plot(hlSum,   title="HLSum")
+plot(keysCnt, title="KeysCount")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Official Map Checkpoint');
+    expect(getPlot(result, 'HLSum').values).toEqual([
+      202, 409, 621, 832, 1034, 1231, 1435, 1648, 1865, 2084, 2307, 2528,
+    ]);
+    // Map always has exactly 1 key: "hl"
+    expect(getPlot(result, 'KeysCount').values).toEqual(Array(compatibilityBars.length).fill(1));
+  });
+
+  it('locks user-defined type with fields and .new() constructor', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/language/objects/
+    // A UDT with float price and score fields; .new() sets price=close and computes score.
+    const result = runCompatScript(`
+indicator("Official UDT Checkpoint")
+type Bar
+    float price = na
+    float score = 0.0
+
+b = Bar.new(close)
+b.score := (high - low) / close * 100
+plot(b.price, title="Price")
+plot(b.score, title="Score")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Official UDT Checkpoint');
+    expect(getPlot(result, 'Price').values).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+    expect(roundSeries(getPlot(result, 'Score').values)).toEqual([
+      3.921569, 4.761905, 3.738318, 6.796117,
+      6.060606, 5, 5.769231, 6.422018,
+      4.62963, 4.504505, 4.545455, 4.464286,
+    ]);
+  });
+
+  it('locks method declaration on a UDT with receiver dispatch', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/language/methods/
+    // A method normalize(this) on a UDT maps close onto [0,100] relative to bar range.
+    const result = runCompatScript(`
+indicator("Official Method Checkpoint")
+type PriceBar
+    float price = na
+    float norm  = 0.0
+
+method normalize(PriceBar this, float lo, float hi) =>
+    rng = hi - lo
+    this.norm := rng == 0 ? 50.0 : (this.price - lo) / rng * 100
+    this
+
+pb = PriceBar.new(close)
+pb.normalize(low, high)
+plot(pb.price, title="Price")
+plot(pb.norm,  title="Norm")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Official Method Checkpoint');
+    expect(getPlot(result, 'Price').values).toEqual([102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110, 112]);
+    expect(roundSeries(getPlot(result, 'Norm').values)).toEqual([
+      75, 80, 75, 14.285714, 16.666667, 80,
+      83.333333, 85.714286, 40, 80, 20, 80,
+    ]);
+  });
+
+  it('locks input.int, input.float, input.bool, and input.string defaults', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/inputs/
+    // All four basic input types are registered with defaults; bool and string
+    // are verified via ternary conversion, not directly plottable.
+    const result = runCompatScript(`
+indicator("Official Inputs Checkpoint")
+lenIn  = input.int(10,    "Length")
+multIn = input.float(0.5, "Mult")
+bullIn = input.bool(true, "Bullish")
+modeIn = input.string("SMA", "Mode")
+plot(lenIn,             title="Len")
+plot(multIn * close,    title="MultClose")
+plot(bullIn ? 1 : 0,    title="BullFlag")
+plot(modeIn == "SMA" ? 1 : 0, title="SMAMode")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Official Inputs Checkpoint');
+    expect(result.inputs.map((i) => [i.title, i.type])).toEqual([
+      ['Length', 'int'],
+      ['Mult', 'float'],
+      ['Bullish', 'bool'],
+      ['Mode', 'string'],
+    ]);
+    expect(getPlot(result, 'Len').values).toEqual(Array(compatibilityBars.length).fill(10));
+    expect(roundSeries(getPlot(result, 'MultClose').values)).toEqual([
+      51, 52.5, 53.5, 51.5, 49.5, 50, 52, 54.5, 54, 55.5, 55, 56,
+    ]);
+    expect(getPlot(result, 'BullFlag').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(getPlot(result, 'SMAMode').values).toEqual(Array(compatibilityBars.length).fill(1));
+  });
+
+  it('locks plot() styles, hline(), and fill() between two plots', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/plots/
+    // Confirms plot() with style options, hline() for static levels, and fill()
+    // between two named plot references produce correct outputs.
+    const result = runCompatScript(`
+indicator("Official Plots Checkpoint")
+sma3 = ta.sma(close, 3)
+sma5 = ta.sma(close, 5)
+p3   = plot(sma3, title="SMA3", style=plot.style_line)
+p5   = plot(sma5, title="SMA5", style=plot.style_line)
+fill(p3, p5, color=color.new(color.blue, 80), title="Fill")
+hline(100.0, title="Base", color=color.gray, linestyle=hline.style_dashed)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Official Plots Checkpoint');
+    expect(roundSeries(getPlot(result, 'SMA3').values)).toEqual([
+      null, null, 104.666667, 105, 103, 100.666667,
+      101, 104.333333, 107, 109.333333, 109.666667, 111,
+    ]);
+    expect(roundSeries(getPlot(result, 'SMA5').values)).toEqual([
+      null, null, null, null, 103.2, 102.8,
+      102.6, 103, 104, 106.4, 108.4, 110,
+    ]);
+    // fill() registers a fill output
+    expect(result.plots.some((p) => p.type === 'fill')).toBe(true);
+    // hline() registers a hline at price=100
+    const hl = result.plots.find((p) => p.type === 'hline');
+    expect(hl).toBeDefined();
+    expect((hl as { price?: number }).price).toBe(100);
+  });
+
+  it('locks bgcolor() conditional background for trend state', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/backgrounds/
+    // bgcolor() emits a background color that alternates by trend state (close vs SMA).
+    const result = runCompatScript(`
+indicator("Official Bgcolor Checkpoint")
+sma5   = ta.sma(close, 5)
+inUp   = close > sma5
+bgcolor(inUp ? color.new(color.green, 90) : color.new(color.red, 90), title="BG")
+plot(inUp ? 1 : 0, title="UpState")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Official Bgcolor Checkpoint');
+    // SMA5 needs 5 bars; up state: close > sma5
+    // SMA5 values: null×4, 103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110
+    // close:              102,105,107,103,99,100,104,109,108,111,110,112
+    // bars 0-3: na → treat as 0 (bgcolor still fires, upState 0 during warmup)
+    expect(getPlot(result, 'UpState').values).toEqual([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
+    // bgcolor emits a plot of type 'bgcolor'
+    expect(result.plots.some((p) => p.type === 'bgcolor')).toBe(true);
+  });
+
+  it('locks strategy.entry(), strategy.close(), and position tracking', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/strategies/
+    // Simple crossover strategy: enters long on bar 0, closes on bar 2; verifies
+    // position_size and netprofit across bars.
+    const result = runCompatScript(`
+strategy("Official Strategy Checkpoint", overlay=true, process_orders_on_close=true)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+if bar_index == 2
+    strategy.close("Long")
+plot(strategy.position_size, title="PosSize")
+plot(strategy.netprofit,     title="NetProfit")
+`, { bars: stratBars });
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Official Strategy Checkpoint');
+    // Entry at bar0 (close=100); close at bar2 (close=105) → profit=5
+    expect(getPlot(result, 'PosSize').values).toEqual([1, 1, 0, 0]);
+    expect(getPlot(result, 'NetProfit').values).toEqual([0, 0, 5, 5]);
+  });
+
+  it('locks plotshape() and plotchar() text and shape markers', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/text-and-shapes/
+    // plotshape emits on even bar_index; plotchar emits on every third bar.
+    const result = runCompatScript(`
+indicator("Official Shapes Checkpoint", overlay=true)
+evenBar  = bar_index % 2 == 0
+thirdBar = bar_index % 3 == 0
+plotshape(evenBar,  title="Shape",  style=shape.triangleup,  location=location.belowbar, color=color.green)
+plotchar(thirdBar,  title="Char",   char="★",                location=location.abovebar, color=color.blue)
+plot(evenBar  ? 1 : 0, title="EvenFlag")
+plot(thirdBar ? 1 : 0, title="ThirdFlag")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Official Shapes Checkpoint');
+    expect(getPlot(result, 'EvenFlag').values).toEqual([1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]);
+    expect(getPlot(result, 'ThirdFlag').values).toEqual([1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0]);
+    expect(getPlot(result, 'Shape').values).toEqual([1, null, 1, null, 1, null, 1, null, 1, null, 1, null]);
+    expect(getPlot(result, 'Char').values).toEqual([1, null, null, 1, null, null, 1, null, null, 1, null, null]);
+  });
+
+  it('locks barstate.isconfirmed anti-repainting guard pattern', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/concepts/repainting/
+    // The isconfirmed guard prevents signals from firing on unconfirmed realtime bars.
+    // In the test harness all bars are history and confirmed, so the signal fires every bar.
+    const result = runCompatScript(`
+indicator("Official Repainting Guard Checkpoint")
+isBull = close > open
+var int lastDir = 0
+if barstate.isconfirmed
+    lastDir := isBull ? 1 : -1
+plot(lastDir, title="LastDir")
+plot(isBull ? 1 : 0, title="Bull")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Official Repainting Guard Checkpoint');
+    // close > open: bars 0(102>100),1(105>102),2(107>105) yes; 3(103<107),4(99<103) no;
+    //               5(100>99),6(104>100),7(109>104) yes; 8(108<109) no; 9(111>108) yes;
+    //               10(110<111) no; 11(112>110) yes
+    const bullVals = [1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1];
+    const lastDir  = [1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, 1];
+    expect(getPlot(result, 'Bull').values).toEqual(bullVals);
+    expect(getPlot(result, 'LastDir').values).toEqual(lastDir);
+  });
+
+  it('locks if/else if/else chain and switch expression with default', () => {
+    // Source: https://www.tradingview.com/pine-script-docs/language/conditional-structures/
+    // Three-zone classifier uses if/else if/else; a mode switch with default covers Pine
+    // switch semantics for values not matched by any case.
+    const result = runCompatScript(`
+indicator("Official Conditionals Checkpoint")
+zone = if close < 103
+    -1
+else if close < 108
+    0
+else
+    1
+
+mode = switch bar_index % 3
+    0 => 10
+    1 => 20
+    => 30
+
+plot(zone, title="Zone")
+plot(mode, title="Mode")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Official Conditionals Checkpoint');
+    // close: 102,105,107,103,99,100,104,109,108,111,110,112
+    // zone:  -1,  0,  0,  0,-1, -1,  0,  1,  1,  1,  1,  1
+    expect(getPlot(result, 'Zone').values).toEqual([-1, 0, 0, 0, -1, -1, 0, 1, 1, 1, 1, 1]);
+    // bar_index%3: 0,1,2,0,1,2,0,1,2,0,1,2 → 10,20,30,10,20,30,10,20,30,10,20,30
+    expect(getPlot(result, 'Mode').values).toEqual([10, 20, 30, 10, 20, 30, 10, 20, 30, 10, 20, 30]);
+  });
+});
