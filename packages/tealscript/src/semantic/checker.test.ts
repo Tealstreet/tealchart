@@ -6107,6 +6107,24 @@ plot(iii + nvi + obv + pvi + pvt + tr + wad + wvad)
     }
   });
 
+  it('reports TA variables used as callable functions', () => {
+    const result = checkProgram(parse(`
+indicator("Bad TA Variables")
+iiiCall = ta.iii()
+nviCall = ta.nvi()
+pvtCall = ta.pvt()
+wadCall = ta.wad()
+plot(iiiCall + nviCall + pvtCall + wadCall)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Unknown function: ta.iii',
+      'Unknown function: ta.nvi',
+      'Unknown function: ta.pvt',
+      'Unknown function: ta.wad',
+    ]);
+  });
+
   it('reports invalid core TA helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Bad TA Core Signatures")
@@ -6886,6 +6904,22 @@ plot(absFloat + maxInt + maxFloat + avgSimple + roundedFloat + mintickSimple + r
     expect(types.get('runningSum')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('randomValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('degrees')).toMatchObject({ kind: 'float', qualifier: 'series' });
+  });
+
+  it('reports math constants used as callable functions', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Math Constants")
+piCall = math.pi()
+eCall = math.e()
+phiCall = math.phi()
+plot(piCall + eCall + phiCall)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Unknown function: math.pi',
+      'Unknown function: math.e',
+      'Unknown function: math.phi',
+    ]);
   });
 
   it('reports invalid math helper named arguments', () => {

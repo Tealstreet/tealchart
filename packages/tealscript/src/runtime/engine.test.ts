@@ -6466,6 +6466,27 @@ plot(sum)`;
   });
 
   describe('math functions', () => {
+    it('keeps math constants as values, not callable functions', () => {
+      const valueScript = `//@version=6
+indicator("Math Constants")
+plot(math.pi, title="PI")
+plot(math.e, title="E")
+plot(math.phi, title="PHI")`;
+      const valueResult = executeScript(parse(valueScript), createBars(1));
+
+      expect(valueResult.errors).toEqual([]);
+      expect(valueResult.plots.find((plot) => plot.title === 'PI')?.values[0]).toBe(Math.PI);
+      expect(valueResult.plots.find((plot) => plot.title === 'E')?.values[0]).toBe(Math.E);
+      expect(valueResult.plots.find((plot) => plot.title === 'PHI')?.values[0]).toBe((1 + Math.sqrt(5)) / 2);
+
+      const callScript = `//@version=6
+indicator("Bad Math Constants")
+plot(math.pi())`;
+      const callResult = executeScript(parse(callScript), createBars(1));
+
+      expect(callResult.errors.map((error) => error.message)).toEqual(['Unknown function: math.pi']);
+    });
+
     it('evaluates math.abs', () => {
       const script = `//@version=6
 indicator("Test")
@@ -6539,6 +6560,27 @@ plot(math.sum(dynamicSource, dynamicLength), title="Dynamic Sparse Sum")`;
   });
 
   describe('TA functions', () => {
+    it('keeps TA series variables as values, not callable functions', () => {
+      const valueScript = `//@version=6
+indicator("TA Variables")
+plot(ta.iii, title="III")
+plot(ta.nvi, title="NVI")
+plot(ta.pvt, title="PVT")`;
+      const valueResult = executeScript(parse(valueScript), createBars(3));
+
+      expect(valueResult.errors).toEqual([]);
+      expect(valueResult.plots.find((plot) => plot.title === 'III')?.values).toHaveLength(3);
+      expect(valueResult.plots.find((plot) => plot.title === 'NVI')?.values).toHaveLength(3);
+      expect(valueResult.plots.find((plot) => plot.title === 'PVT')?.values).toHaveLength(3);
+
+      const callScript = `//@version=6
+indicator("Bad TA Variables")
+plot(ta.iii())`;
+      const callResult = executeScript(parse(callScript), createBars(1));
+
+      expect(callResult.errors.map((error) => error.message)).toEqual(['Unknown function: ta.iii']);
+    });
+
     it('calculates ta.sma', () => {
       const script = `//@version=6
 indicator("Test")

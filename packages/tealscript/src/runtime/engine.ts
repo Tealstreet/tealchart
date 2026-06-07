@@ -356,6 +356,17 @@ const LEGACY_GLOBAL_BUILTIN_ALIASES = new Map<string, string>([
   ['security', 'request.security'],
   ...LEGACY_GLOBAL_TA_ALIASES.map((name) => [name, `ta.${name}`] as const),
 ]);
+const VARIABLE_ONLY_BUILTIN_NAMES = new Set([
+  'math.e',
+  'math.phi',
+  'math.pi',
+  'ta.iii',
+  'ta.nvi',
+  'ta.pvi',
+  'ta.pvt',
+  'ta.wad',
+  'ta.wvad',
+]);
 
 export interface IndicatorDeclarationMetadata {
   title: string;
@@ -3396,6 +3407,10 @@ export class TealscriptEngine {
         this.assertNoArguments('copy', args, namedArgs);
         return copyUdtObject(receiver);
       }
+    }
+
+    if (VARIABLE_ONLY_BUILTIN_NAMES.has(builtinName)) {
+      throw new Error(`Unknown function: ${builtinName}`);
     }
 
     const builtin = this.builtins.get(builtinName);
