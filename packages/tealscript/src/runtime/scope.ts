@@ -390,6 +390,19 @@ export class Scope {
   }
 
   /**
+   * Promote variables declared in this scope to a parent scope.
+   * Only promotes names not already declared in the target scope's own locals.
+   * Used by if/else to make branch-declared variables visible after the block.
+   */
+  promoteNewLocalsTo(target: Scope): void {
+    for (const [name, entry] of this.variables) {
+      if (!target.variables.has(name)) {
+        target.variables.set(name, entry);
+      }
+    }
+  }
+
+  /**
    * Get all variable names including parents
    */
   getAllNames(): string[] {
