@@ -332,6 +332,8 @@ plot(close)
       total: 2,
       passed: 1,
       failed: 1,
+      plannedUnsupported: 0,
+      actionableFailed: 1,
       byFirstFailureStage: { runtime: 1 },
       byFirstFailureClass: { runtime_gap: 1 },
       validationErrors: {},
@@ -373,6 +375,8 @@ plot(close)
       total: 1,
       passed: 0,
       failed: 1,
+      plannedUnsupported: 1,
+      actionableFailed: 0,
       byFirstFailureStage: { semantic: 1 },
       byFirstFailureClass: { unsupported_planned: 1 },
       validationErrors: {},
@@ -430,7 +434,10 @@ Schema version: 1
 Total: 2
 Passed: 1
 Failed: 1
+Planned unsupported: 0
+Actionable failed: 1
 Pass rate: 50.0%
+Actionable pass rate: 50.0%
 
 ## First Failure Stages
 | Name | Count |

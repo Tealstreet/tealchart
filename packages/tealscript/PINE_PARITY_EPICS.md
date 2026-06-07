@@ -106,8 +106,9 @@ Known structural gaps:
   runner treats omitted canonical stages as `not_run` failures while preserving
   explicitly `skipped` stages as pass-neutral evidence. The
   checkpoint corpus dashboard can now be generated as JSON/Markdown artifacts
-  for CI; the remaining evidence gap is scaling the ledger with more
-  public-script metadata.
+  for CI, including planned-unsupported and actionable-failure counts; the
+  remaining evidence gap is scaling the ledger with more public-script
+  metadata.
 - Layout parsing still needs a general indentation/continuation model that can
   scale to arbitrary nested pasted Pine code.
 - Pine's qualified type system (`const < input < simple < series`) is partially
