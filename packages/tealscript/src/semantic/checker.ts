@@ -3900,6 +3900,7 @@ class SemanticChecker {
     this.checkMathFunctionArgumentTypes(expression, scope);
     this.checkTaFunctionArgumentTypes(expression, scope);
     this.checkTimeFunctionArgumentTypes(expression, scope);
+    this.checkTimeOffsetLiteralArguments(expression, scope);
     this.checkGlobalFunctionArgumentTypes(expression, scope);
     this.checkChartPointFunctionArgumentTypes(expression, scope);
     this.checkDrawingFunctionArgumentTypes(expression, scope);
@@ -4886,6 +4887,39 @@ class SemanticChecker {
 
     const num = this.getCallArgument(expression.arguments, 'num', 1);
     this.checkNonNegativeLiteralIntegerValue(num, 'max_bars_back num must be a non-negative integer');
+  }
+
+  private checkTimeOffsetLiteralArguments(expression: CallExpression, scope: SemanticScope): void {
+    const calleeName = this.memberPath(expression.callee).join('.');
+    if (calleeName !== 'time' && calleeName !== 'time_close') return;
+
+    const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+    if (!signature) return;
+
+    const params = this.resolveTimeSignatureParams(expression.arguments, signature);
+    const timeframe = this.resolveCallArgumentExpression(expression, params, params.indexOf('timeframe'), signature);
+    const timeframeBarsBack = this.resolveCallArgumentExpression(expression, params, params.indexOf('timeframe_bars_back'), signature);
+    if (timeframeBarsBack && !timeframe) {
+      this.addDiagnostic(
+        'argument-count',
+        `${calleeName} timeframe_bars_back requires an explicit timeframe argument`,
+        timeframeBarsBack.loc,
+      );
+    }
+
+    for (const parameterName of ['bars_back', 'timeframe_bars_back']) {
+      const argument = this.resolveCallArgumentExpression(expression, params, params.indexOf(parameterName), signature);
+      this.checkTimeOffsetLiteralValue(argument, `${calleeName} ${parameterName} must be an integer between -500 and 5000`);
+    }
+  }
+
+  private checkTimeOffsetLiteralValue(expression: Expression | undefined, message: string): void {
+    if (!expression) return;
+    const value = this.constantLiteralValue(expression);
+    if (typeof value !== 'number') return;
+    if (!Number.isInteger(value) || value < -500 || value > 5000) {
+      this.addDiagnostic('type-mismatch', message, expression.loc);
+    }
   }
 
   private checkRequestCalcBarsCountLiteralArguments(expression: CallExpression): void {
