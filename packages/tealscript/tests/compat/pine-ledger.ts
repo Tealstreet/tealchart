@@ -415,6 +415,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-loop-header-layout-checkpoint',
+      title: 'Public Loop Header Layout Checkpoint',
+      searchContext: 'TradingView public scripts search: array loop signal',
+      featureTags: ['layout', 'arrays', 'signals', 'udf'],
+    }),
+    stages: passedThroughRuntime,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-udt-array-checkpoint',
       title: 'Public UDT Array Checkpoint',
       searchContext: 'TradingView public scripts search: market structure object array',

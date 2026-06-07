@@ -1305,6 +1305,40 @@ plot(state.highest, title="Highest High")
     expect(getPlot(result, 'Highest High').values).toEqual([103, 106, 108, 109, 109, 109, 109, 110, 111, 112, 114, 114]);
   });
 
+  it('locks a reduced public loop-header layout idiom', () => {
+    // Public idiom reference: public signal scripts often wrap longer loop
+    // headers while aggregating arrays inside helpers.
+    // Source search: https://www.tradingview.com/scripts/search/array%20loop%20signal/
+    const result = runCompatScript(`
+indicator("Public Loop Header Layout Checkpoint")
+values = array.from(1.0, 2.0, 3.0)
+numericTotal = 0.0
+for i =
+    0 to
+    array.size(values) - 1 by
+    1
+    numericTotal += array.get(values, i)
+collectionTotal = 0.0
+for value in
+    values
+    collectionTotal += value
+indexedScore(items) =>
+    total = 0.0
+    for [index, value] in
+        items
+        total += value + index
+    total
+plot(numericTotal, title="Numeric Total")
+plot(collectionTotal, title="Collection Total")
+plot(indexedScore(values), title="Indexed Score")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Numeric Total').values).toEqual(Array(compatibilityBars.length).fill(6));
+    expect(getPlot(result, 'Collection Total').values).toEqual(Array(compatibilityBars.length).fill(6));
+    expect(getPlot(result, 'Indexed Score').values).toEqual(Array(compatibilityBars.length).fill(9));
+  });
+
   it('locks a reduced public UDT array state idiom', () => {
     // Public idiom reference: market-structure scripts commonly store UDT
     // pivot records in bounded arrays, read fields from the latest record, and
