@@ -162,8 +162,6 @@ rebuild the parser, and unskip the test.
 
 ---
 
----
-
 ## Pine v5 Compatibility Gaps
 
 Discovered by the Pine v5 compatibility probe in `tests/compat/pine-realworld-corpus.test.ts`
