@@ -1005,6 +1005,30 @@ plotcandle(open, high, low, close, color=color.yellow, wickcolor=color.gray, bor
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('accepts v4 positional visual transp arguments', () => {
+    const result = checkProgram(parse(`//@version=4
+study("Legacy Positional Visual Transparency", overlay=true)
+linePlot = plot(close, "A", color.blue, 1, plot.style_line, false, 25, 0, 1)
+basePlot = plot(open, "B", color.red)
+fill(linePlot, basePlot, color.green, 50, "Band", true, 3, false)
+bgcolor(color.yellow, 75, 0, true, 3, "Background")
+plotshape(close > open, "Shape", shape.circle, location.abovebar, color.blue, 20, 0, "S", color.white, true, size.small, 3)
+plotchar(close > open, "Char", "C", location.belowbar, color.green, 40, 0, "T", color.white, true, size.tiny, 3)
+plotarrow(close - open, "Arrow", color.green, color.red, 60, 0, 5, 15, true, 3)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('keeps v6 positional plot histbase binding distinct from legacy transp', () => {
+    const result = checkProgram(parse(`//@version=6
+indicator("V6 Positional Plot")
+plot(close, "V6", color.blue, 1, plot.style_line, false, 25)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
   it('reports invalid visual numeric option value types', () => {
     const result = checkProgram(parse(`
 indicator("Invalid Visual Numeric Values")

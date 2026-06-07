@@ -627,6 +627,52 @@ plotcandle(1, 2, 0, 1.5, title="Candles", color=color.yellow, wickcolor=color.bl
       expect(result.plots.find((plot) => plot.title === 'Candles')?.borderColor).toEqual(Array(bars.length).fill('#2196F380'));
     });
 
+    it('maps v4 positional transp arguments before later visual options', () => {
+      const code = `//@version=4
+study("Legacy Positional Transparency", overlay=true)
+lineA = plot(close, "A", color.blue, 1, plot.style_line, false, 25, 0, 1)
+lineB = plot(open, "B", color.red)
+fill(lineA, lineB, color.green, 50, "Band", true, 3, false)
+bgcolor(color.yellow, 75, 0, true, 3, "Background")
+plotshape(true, "Shape", shape.circle, location.abovebar, color.blue, 20, 0, "S", color.white, true, size.small, 3)
+plotchar(true, "Char", "C", location.belowbar, color.green, 40, 0, "T", color.white, true, size.tiny, 3)
+plotarrow(1, "Arrow", color.green, color.red, 60, 0, 5, 15, true, 3)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'A')?.color).toEqual(Array(bars.length).fill('#2196F3BF'));
+      expect(result.plots.find((plot) => plot.title === 'A')?.histbase).toBe(0);
+      expect(result.plots.find((plot) => plot.title === 'A')?.offset).toBe(1);
+      expect(result.plots.find((plot) => plot.title === 'Band')?.color).toEqual(Array(bars.length).fill('#4CAF5080'));
+      expect(result.plots.find((plot) => plot.title === 'Band')?.showLast).toBe(3);
+      expect(result.plots.find((plot) => plot.title === 'Background')?.color).toEqual(Array(bars.length).fill('#FDD83540'));
+      expect(result.plots.find((plot) => plot.title === 'Background')?.showLast).toBe(3);
+      expect(result.plots.find((plot) => plot.title === 'Shape')?.color).toEqual(Array(bars.length).fill('#2196F3CC'));
+      expect(result.plots.find((plot) => plot.title === 'Shape')?.text).toBe('S');
+      expect(result.plots.find((plot) => plot.title === 'Shape')?.size).toBe('small');
+      expect(result.plots.find((plot) => plot.title === 'Char')?.color).toEqual(Array(bars.length).fill('#4CAF5099'));
+      expect(result.plots.find((plot) => plot.title === 'Char')?.char).toBe('C');
+      expect(result.plots.find((plot) => plot.title === 'Char')?.size).toBe('tiny');
+      expect(result.plots.find((plot) => plot.title === 'Arrow')?.color).toEqual(Array(bars.length).fill('#4CAF5066'));
+      expect(result.plots.find((plot) => plot.title === 'Arrow')?.minHeight).toBe(5);
+      expect(result.plots.find((plot) => plot.title === 'Arrow')?.maxHeight).toBe(15);
+    });
+
+    it('keeps v6 positional plot histbase distinct from legacy transp', () => {
+      const code = `//@version=6
+indicator("V6 Positional Plot")
+plot(close, "V6", color.blue, 1, plot.style_line, false, 25)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'V6')?.color).toEqual(Array(bars.length).fill('#2196F3'));
+      expect(result.plots.find((plot) => plot.title === 'V6')?.histbase).toBe(25);
+    });
+
     it('extracts color channels and transparency', () => {
       const code = `//@version=6
 indicator("Test")
