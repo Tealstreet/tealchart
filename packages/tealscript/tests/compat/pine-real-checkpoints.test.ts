@@ -1333,6 +1333,113 @@ plot(array.size(box.all), title="Box Count")
     ]);
   });
 
+  it('locks a reduced public drawing-copy idiom', () => {
+    // Public idiom reference: drawing-heavy public scripts commonly clone
+    // configured labels, lines, and boxes before moving the copies to the
+    // latest signal or zone.
+    // Source search: https://www.tradingview.com/scripts/search/drawing%20copy/
+    const result = runCompatScript(`
+indicator("Public Drawing Copy Checkpoint", overlay=true)
+rangeHigh = ta.highest(high, 4)
+rangeLow = ta.lowest(low, 4)
+rangeMid = (rangeHigh + rangeLow) / 2
+var seedLabel = label.new(na, na, text="Seed", style=label.style_label_left, color=color.gray, textcolor=color.white)
+var seedLine = line.new(na, na, na, na, color=color.gray, style=line.style_dotted, width=1)
+var seedBox = box.new(na, na, na, na, bgcolor=color.new(color.gray, 90), border_color=color.gray, text="Seed")
+if barstate.islast
+    label.set_xy(seedLabel, bar_index, rangeHigh)
+    label.set_text(seedLabel, "Base")
+    label.set_color(seedLabel, color.green)
+    labelClone = label.copy(seedLabel)
+    label.set_xy(labelClone, bar_index - 1, rangeLow)
+    label.set_text(labelClone, "Clone")
+    label.set_color(labelClone, color.red)
+    line.set_xy1(seedLine, bar_index - 3, rangeMid)
+    line.set_xy2(seedLine, bar_index, rangeMid)
+    line.set_color(seedLine, color.green)
+    lineClone = line.copy(seedLine)
+    line.set_xy1(lineClone, bar_index - 3, rangeLow)
+    line.set_xy2(lineClone, bar_index, rangeHigh)
+    line.set_color(lineClone, color.red)
+    box.set_lefttop(seedBox, bar_index - 3, rangeHigh)
+    box.set_rightbottom(seedBox, bar_index, rangeLow)
+    box.set_bgcolor(seedBox, color.new(color.green, 85))
+    box.set_text(seedBox, "Base Zone")
+    boxClone = box.copy(seedBox)
+    box.set_lefttop(boxClone, bar_index - 4, rangeHigh + 1)
+    box.set_rightbottom(boxClone, bar_index - 1, rangeLow + 1)
+    box.set_bgcolor(boxClone, color.new(color.red, 85))
+    box.set_text(boxClone, "Clone Zone")
+plot(array.size(label.all), title="Label Count")
+plot(array.size(line.all), title="Line Count")
+plot(array.size(box.all), title="Box Count")
+plot(rangeHigh - rangeLow, title="Range Width")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Label Count').values).toEqual([...Array(compatibilityBars.length - 1).fill(1), 2]);
+    expect(getPlot(result, 'Line Count').values).toEqual([...Array(compatibilityBars.length - 1).fill(1), 2]);
+    expect(getPlot(result, 'Box Count').values).toEqual([...Array(compatibilityBars.length - 1).fill(1), 2]);
+    expect(getPlot(result, 'Range Width').values).toEqual([4, 7, 9, 10, 11, 13, 13, 14, 15, 13, 11, 8]);
+    expect(result.drawings).toHaveLength(6);
+    expect(result.drawings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        type: 'label',
+        persistent: true,
+        x: 11,
+        y: 114,
+        text: 'Base',
+        color: '#4CAF50',
+      }),
+      expect.objectContaining({
+        type: 'label',
+        persistent: false,
+        x: 10,
+        y: 106,
+        text: 'Clone',
+        color: '#F23645',
+      }),
+      expect.objectContaining({
+        type: 'line',
+        persistent: true,
+        x1: 8,
+        y1: 110,
+        x2: 11,
+        y2: 110,
+        color: '#4CAF50',
+      }),
+      expect.objectContaining({
+        type: 'line',
+        persistent: false,
+        x1: 8,
+        y1: 106,
+        x2: 11,
+        y2: 114,
+        color: '#F23645',
+      }),
+      expect.objectContaining({
+        type: 'box',
+        persistent: true,
+        left: 8,
+        top: 114,
+        right: 11,
+        bottom: 106,
+        bgcolor: '#4CAF5026',
+        text: 'Base Zone',
+      }),
+      expect.objectContaining({
+        type: 'box',
+        persistent: false,
+        left: 7,
+        top: 115,
+        right: 10,
+        bottom: 107,
+        bgcolor: '#F2364526',
+        text: 'Clone Zone',
+      }),
+    ]));
+  });
+
   it('locks a reduced public linefill channel idiom', () => {
     // Public idiom reference: public channel indicators commonly draw upper
     // and lower line handles and fill the area between them.
