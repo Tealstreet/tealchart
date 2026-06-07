@@ -131,7 +131,8 @@ Covered behavior and remaining gaps:
   multiplicative, numeric and non-numeric `-`, `+`, and ternary operators are
   also supported. Numeric and collection `for` headers may place the `=`, `to`,
   `by`, and `in` values on indented continuation lines, including inside UDF
-  bodies.
+  bodies; the source-linked public loop-header layout checkpoint locks this
+  shape against the offline compatibility corpus.
 - User-defined function bodies can return expression results from `if` /
   `else if` / `else` branches, including partial `if` expressions with no
   `else` when the present branch has an inferable value. Nested UDF `if`
