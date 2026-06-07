@@ -2648,6 +2648,96 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'series-history-deep-lookback-checkpoint',
+      title: 'Series Deep Lookback Checkpoint',
+      searchContext: 'TradingView public scripts search: history lookback na boundary',
+      featureTags: ['runtime', 'series', 'history', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'series-history-derived-series-checkpoint',
+      title: 'Series Derived History Checkpoint',
+      searchContext: 'TradingView public scripts search: derived series history lag',
+      featureTags: ['runtime', 'series', 'history', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'series-history-varip-vs-var-checkpoint',
+      title: 'Series Varip Vs Var Checkpoint',
+      searchContext: 'TradingView public scripts search: varip var historical persist',
+      featureTags: ['runtime', 'series', 'history', 'varip', 'var', 'state', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'series-history-udf-arg-history-checkpoint',
+      title: 'Series UDF Arg History Checkpoint',
+      searchContext: 'TradingView public scripts search: udf series argument history lag',
+      featureTags: ['runtime', 'udf', 'series', 'history', 'scope', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'series-history-rolling-sum-checkpoint',
+      title: 'Series Rolling Sum Checkpoint',
+      searchContext: 'TradingView public scripts search: manual rolling sum for loop history',
+      featureTags: ['runtime', 'series', 'history', 'ta', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'series-history-change-of-sma-checkpoint',
+      title: 'Series Change Of SMA Checkpoint',
+      searchContext: 'TradingView public scripts search: ta.change sma derived series',
+      featureTags: ['runtime', 'series', 'history', 'ta', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'series-history-bar-index-semantics-checkpoint',
+      title: 'Series Bar Index Semantics Checkpoint',
+      searchContext: 'TradingView public scripts search: bar_index last_bar_index semantics',
+      featureTags: ['runtime', 'series', 'history', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'series-history-variable-shadowing-checkpoint',
+      title: 'Series Variable Shadowing Checkpoint',
+      searchContext: 'TradingView public scripts search: variable shadowing scope if block',
+      featureTags: ['runtime', 'series', 'scope', 'state', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'series-history-ema-warmup-checkpoint',
+      title: 'Series EMA Warmup Checkpoint',
+      searchContext: 'TradingView public scripts search: ema seeding first bar value',
+      featureTags: ['runtime', 'series', 'ta', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
+      id: 'series-history-prev-bar-tracking-checkpoint',
+      title: 'Series Prev Bar Index Checkpoint',
+      searchContext: 'TradingView public scripts search: bar_index previous bar tracking',
+      featureTags: ['runtime', 'series', 'var', 'state', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(

@@ -4957,3 +4957,207 @@ plot(summaryBear, title="Summary Bear")
     }
   });
 });
+
+// ===========================================================================================
+// Series history and execution model
+// Tests the most nuanced Pine semantics: series lookback behavior, varip vs var, and
+// execution model edge cases. Each test asserts concrete per-bar values to catch subtle
+// series-state bugs.
+// ===========================================================================================
+
+describe('Series history and execution model', () => {
+  it('locks deep history lookback — close[10] returns na on bars before index 10', () => {
+    // Pine semantics: close[N] is na on bars where bar_index < N (not enough history).
+    // close[10] becomes valid only on bar 10 (= compatibilityBars[0].close = 102) and beyond.
+    // Source search: https://www.tradingview.com/scripts/search/history%20lookback%20na%20boundary/
+    const result = runCompatScript(`
+indicator("Series Deep Lookback Checkpoint")
+plot(close[10], title="Deep")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Series Deep Lookback Checkpoint');
+    // Bars 0-9: not enough history → null; bar 10 = bar[0].close = 102; bar 11 = bar[1].close = 105
+    expect(getPlot(result, 'Deep').values).toEqual([
+      null, null, null, null, null, null, null, null, null, null, 102, 105,
+    ]);
+  });
+
+  it('locks derived series history — x = close - open; x[1] tracks the prior bar diff', () => {
+    // A derived local variable maintains full series history. x[1] should reflect
+    // the previous bar's computed value, not the current one.
+    // Source search: https://www.tradingview.com/scripts/search/derived%20series%20history%20lag/
+    const result = runCompatScript(`
+indicator("Series Derived History Checkpoint")
+x = close - open
+plot(x[1], title="PrevDiff")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Series Derived History Checkpoint');
+    // close - open per bar: [2, 3, 2, -4, -4, 1, 4, 5, -1, 3, -1, 2]
+    // x[1]: bar 0 has no prior → null; bar N = diff[N-1]
+    expect(getPlot(result, 'PrevDiff').values).toEqual([
+      null, 2, 3, 2, -4, -4, 1, 4, 5, -1, 3, -1,
+    ]);
+  });
+
+  it('locks varip vs var — in historical mode both persist and accumulate identically', () => {
+    // In historical (replay) mode, varip and var behave the same: both initialize once
+    // and persist their value across bars. This test verifies both increment in lockstep.
+    // Source search: https://www.tradingview.com/scripts/search/varip%20var%20historical%20persist/
+    const result = runCompatScript(`
+indicator("Series Varip Vs Var Checkpoint")
+var float a = 0.0
+a += 1
+varip float b = 0.0
+b += 1
+plot(a, title="VarA")
+plot(b, title="VarIP")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Series Varip Vs Var Checkpoint');
+    // Both should accumulate 1 per bar over 12 bars
+    expect(getPlot(result, 'VarA').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(getPlot(result, 'VarIP').values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  it('locks series as UDF argument — arg[1] accesses the prior bar of a passed series', () => {
+    // A series passed into a UDF retains full history. src[1] inside a UDF resolves
+    // to the previous bar's value of the argument, not the UDF local scope.
+    // Source search: https://www.tradingview.com/scripts/search/udf%20series%20argument%20history%20lag/
+    const result = runCompatScript(`
+indicator("Series UDF Arg History Checkpoint")
+lookback(src) => src[1]
+result = lookback(ta.sma(close, 3))
+plot(result, title="Lag")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Series UDF Arg History Checkpoint');
+    // sma(close, 3): [null, null, 104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111]
+    // lag (sma[1]):  bars 0-2 are null; bar 3 = sma[bar2] = 104.666667, etc.
+    expect(roundSeries(getPlot(result, 'Lag').values)).toEqual([
+      null, null, null, 104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667,
+    ]);
+  });
+
+  it('locks rolling window via history — manual 10-bar sum using for loop with nz guard', () => {
+    // Pine allows for i = 0 to 9; sum += close[i] as a manual rolling accumulator.
+    // nz() guards against na from bars with insufficient history (early bars).
+    // Source search: https://www.tradingview.com/scripts/search/manual%20rolling%20sum%20for%20loop%20history/
+    const result = runCompatScript(`
+indicator("Series Rolling Sum Checkpoint")
+sum = 0.0
+for i = 0 to 9
+    sum += nz(close[i], 0)
+plot(sum, title="ManualSum")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Series Rolling Sum Checkpoint');
+    // Bars 0-8: not all 10 lookbacks available; nz fills missing history with 0.
+    // Bar 9: first bar where all 10 lookbacks exist → sum = 102+105+107+103+99+100+104+109+108+111 = 1048.
+    // Bars 10-11: window slides forward (oldest drops off because close[10]/close[11] become na, giving 0 via nz).
+    expect(getPlot(result, 'ManualSum').values).toEqual([
+      102, 207, 314, 417, 516, 616, 720, 829, 937, 1048, 1056, 1063,
+    ]);
+  });
+
+  it('locks ta.change() history chain — change of a derived SMA series', () => {
+    // ta.change(ta.sma(close, 5)) exercises the change-of-a-derived-series path:
+    // the SMA itself has a warmup period, so change is na until bar 5.
+    // Source search: https://www.tradingview.com/scripts/search/ta.change%20sma%20derived%20series/
+    const result = runCompatScript(`
+indicator("Series Change Of SMA Checkpoint")
+result = ta.change(ta.sma(close, 5))
+plot(result, title="Change")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Series Change Of SMA Checkpoint');
+    // sma5: [null, null, null, null, 103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110]
+    // change = sma5 - sma5[1]: null until bar 5 (needs two valid sma5 values)
+    expect(roundSeries(getPlot(result, 'Change').values)).toEqual([
+      null, null, null, null, null, -0.4, -0.2, 0.4, 1, 2.4, 2, 1.6,
+    ]);
+  });
+
+  it('locks bar_index vs last_bar_index semantics — index increments, last is constant', () => {
+    // bar_index starts at 0 on the first bar and increments by 1 each bar.
+    // last_bar_index is fixed at the final bar index for the entire execution.
+    // Source search: https://www.tradingview.com/scripts/search/bar_index%20last_bar_index%20semantics/
+    const result = runCompatScript(`
+indicator("Series Bar Index Semantics Checkpoint")
+plot(bar_index, title="BarIdx")
+plot(last_bar_index, title="LastBarIdx")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Series Bar Index Semantics Checkpoint');
+    // bar_index: 0, 1, 2, ..., 11 (one per bar, 12 bars)
+    expect(getPlot(result, 'BarIdx').values).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    // last_bar_index: always 11 (= total bars - 1)
+    expect(getPlot(result, 'LastBarIdx').values).toEqual(Array(12).fill(11));
+  });
+
+  it('locks variable shadowing — inner scope redeclaration does not mutate outer var', () => {
+    // In Pine, a typed declaration inside an if block (e.g. float x = ...) creates a
+    // new local binding that shadows the outer var x. The outer x is unchanged after the block.
+    // Source search: https://www.tradingview.com/scripts/search/variable%20shadowing%20scope%20if%20block/
+    const result = runCompatScript(`
+indicator("Series Variable Shadowing Checkpoint")
+var float x = 100.0
+if close > open
+    float x = close * 2
+plot(x, title="Outer")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Series Variable Shadowing Checkpoint');
+    // The outer var x remains 100.0 on every bar regardless of the inner assignment
+    expect(getPlot(result, 'Outer').values).toEqual(Array(12).fill(100));
+  });
+
+  it('locks EMA seeding — ta.ema seeds from bar 0 with no warmup gap', () => {
+    // Unlike ta.sma, ta.ema in TealScript seeds immediately from bar 0 (no na warmup).
+    // The first value equals close[0]; subsequent values follow the EMA recurrence.
+    // Source search: https://www.tradingview.com/scripts/search/ema%20seeding%20first%20bar%20value/
+    const result = runCompatScript(`
+indicator("Series EMA Warmup Checkpoint")
+plot(ta.ema(close, 14), title="EMA14")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Series EMA Warmup Checkpoint');
+    // EMA(14): seeds with close[0]=102, then follows alpha=2/15 recurrence
+    expect(roundSeries(getPlot(result, 'EMA14').values)).toEqual([
+      102, 102.4, 103.013333, 103.011556, 102.476681, 102.146457,
+      102.393596, 103.27445, 103.904523, 104.850587, 105.537175, 106.398885,
+    ]);
+    // No null values — EMA has no warmup gap
+    expect(getPlot(result, 'EMA14').values.every((v) => v !== null)).toBe(true);
+  });
+
+  it('locks manual prev-bar tracking — var float accumulator mirrors bar_index - 1', () => {
+    // Verifies that a var float updated with the prior iteration's bar_index correctly
+    // lags by one bar, producing null on bar 0 and the prior bar_index on all subsequent bars.
+    // Source search: https://www.tradingview.com/scripts/search/bar_index%20previous%20bar%20tracking/
+    const result = runCompatScript(`
+indicator("Series Prev Bar Index Checkpoint")
+var float prevBarIdx = na
+curBarIdx = float(bar_index)
+result = prevBarIdx
+prevBarIdx := curBarIdx
+plot(result, title="PrevBarIdx")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Series Prev Bar Index Checkpoint');
+    // Bar 0: prevBarIdx unset → null; bar N: prevBarIdx = N - 1
+    expect(getPlot(result, 'PrevBarIdx').values).toEqual([
+      null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    ]);
+  });
+});
