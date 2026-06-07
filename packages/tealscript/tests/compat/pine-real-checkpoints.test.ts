@@ -2840,6 +2840,56 @@ plot(str.length(dynamicSession), title="Session Length")
     expect(getPlot(result, 'Session Length').values).toEqual(Array(compatibilityBars.length).fill(15));
   });
 
+  it('locks a reduced public date and session input gate idiom', () => {
+    // Public idiom reference: configurable public indicators commonly expose
+    // start/end date, session, symbol, timeframe, color, and note inputs before
+    // gating visible signals.
+    // Source search: https://www.tradingview.com/scripts/search/date%20session%20filter/
+    const result = runCompatScript(`
+indicator("Public Date Session Input Checkpoint")
+startTime = input.time(1700000300000, "Start Time", "Start tooltip", group="Filters")
+endTime = input.time(1700000600000, "End Time", "End tooltip", group="Filters")
+sessionInput = input.session("2218-2224", "Session", "Session tooltip", group="Filters")
+tfInput = input.timeframe("60", "Signal Timeframe", ["60", "240"], "Timeframe tooltip", group="Filters")
+symbolInput = input.symbol("BINANCE:BTCUSDT", "Symbol", "Symbol tooltip", group="Filters")
+signalColor = input.color(color.green, "Signal Color", "Color tooltip", group="Style")
+notes = input.text_area("watch breakout", "Notes", "Notes tooltip", group="Style")
+inDateRange = time >= startTime and time <= endTime
+inSession = not na(time(timeframe.period, sessionInput))
+symbolMatches = symbolInput == "BINANCE:BTCUSDT"
+tfMatches = timeframe.in_seconds(tfInput) == 3600
+notesMatch = str.contains(notes, "breakout")
+signal = inDateRange and inSession and symbolMatches and tfMatches and notesMatch
+plot(signal ? 1 : 0, title="Filtered Signal", color=signalColor)
+plot(inDateRange ? 1 : 0, title="Date Range")
+plot(str.length(notes), title="Notes Length")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.inputs).toHaveLength(7);
+    expect(result.inputs).toMatchObject([
+      { id: 'input_Start Time', type: 'time', title: 'Start Time', defval: 1_700_000_300_000, tooltip: 'Start tooltip', group: 'Filters' },
+      { id: 'input_End Time', type: 'time', title: 'End Time', defval: 1_700_000_600_000, tooltip: 'End tooltip', group: 'Filters' },
+      { id: 'input_Session', type: 'session', title: 'Session', defval: '2218-2224', tooltip: 'Session tooltip', group: 'Filters' },
+      {
+        id: 'input_Signal Timeframe',
+        type: 'timeframe',
+        title: 'Signal Timeframe',
+        defval: '60',
+        options: ['60', '240'],
+        tooltip: 'Timeframe tooltip',
+        group: 'Filters',
+      },
+      { id: 'input_Symbol', type: 'symbol', title: 'Symbol', defval: 'BINANCE:BTCUSDT', tooltip: 'Symbol tooltip', group: 'Filters' },
+      { id: 'input_Signal Color', type: 'color', title: 'Signal Color', tooltip: 'Color tooltip', group: 'Style' },
+      { id: 'input_Notes', type: 'text_area', title: 'Notes', defval: 'watch breakout', tooltip: 'Notes tooltip', group: 'Style' },
+    ]);
+    expect(getPlot(result, 'Filtered Signal').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0]);
+    expect(getPlot(result, 'Filtered Signal').color).toEqual(Array(compatibilityBars.length).fill('#4CAF50'));
+    expect(getPlot(result, 'Date Range').values).toEqual([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0]);
+    expect(getPlot(result, 'Notes Length').values).toEqual(Array(compatibilityBars.length).fill(14));
+  });
+
   it('locks a reduced official timeframe comparison idiom', () => {
     // Source: https://www.tradingview.com/pine-script-docs/concepts/timeframes/
     const result = runCompatScript(`

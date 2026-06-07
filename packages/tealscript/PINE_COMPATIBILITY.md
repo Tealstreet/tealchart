@@ -300,7 +300,8 @@ definitions. Semantic analysis preserves known `input.*` return types for
 downstream assignment diagnostics, including `input.source()` defval source
 types and `input.enum()` defval enum types. Source-linked public checkpoint
 coverage now locks grouped mode, length, source, toggle, and price-level inputs
-feeding plotted signal output. It also reports Pine-style diagnostics for typed
+feeding plotted signal output, plus date/session/symbol/timeframe/color/notes
+inputs that gate a filtered public-style signal. It also reports Pine-style diagnostics for typed
 default-value mismatches, literal default `minval` / `maxval` / `options` constraint
 violations, invalid literal `display` option values, and `input.int()` /
 `input.float()` calls that mix `options` with range-only
@@ -811,8 +812,9 @@ aggregation is covered for intraday, daily, and weekly buckets, including
 timezone-aware DST boundaries. Host-provided `closedDates` and closure entries
 can suppress session-filtered `time()` calls and session-state helpers for
 exchange calendar holidays or partial-session closures. The checkpoint corpus
-tracks public session-filter gating, public exchange session-state helper
-gating, and the official dynamic-session string idiom. Semantic analysis
+tracks public session-filter gating, public date/session input gating, public
+exchange session-state helper gating, and the official dynamic-session string
+idiom. Semantic analysis
 rejects non-string `time()` / `time_close()` timeframe, session, and timezone
 arguments plus invalid `timeframe.*` string/numeric helper arguments before
 runtime.
