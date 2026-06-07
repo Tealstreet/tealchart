@@ -57,8 +57,9 @@ library-helper idioms.
 Public-source coverage also includes alert signal metadata, direct alert
 emission, public log signal telemetry, Heikin-Ashi synthetic ticker trend
 requests, public zigzag polylines, public strategy performance tables, public
-`varip` intrabar array buffers, planned footprint request diagnostics, plus UDT
-state objects updated through user-defined methods.
+`varip` intrabar array buffers, public wrapped declaration/call layouts,
+planned footprint request diagnostics, plus UDT state objects updated through
+user-defined methods.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
 suppression, entry-direction, max-position, intraday filled-order, and
@@ -99,7 +100,10 @@ Covered behavior and remaining gaps:
   fixtures also cover public-script-shaped wrapped `request.security()`
   arguments with multiline ternary expressions inside nested UDF blocks, inline
   comments on wrapped continuation lines, plus trailing commas in wrapped
-  user-defined function and method signatures.
+  user-defined function and method signatures. The source-linked public wrapped
+  call layout checkpoint locks wrapped declaration metadata, helper signatures,
+  named helper calls, arithmetic continuations, and plot calls in the offline
+  compatibility corpus.
 - Function and declaration calls support Pine named arguments, including the
   reserved parameter key `type=` used by common strategy risk APIs.
   Semantic diagnostics reject non-boolean declaration flags on common

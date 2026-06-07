@@ -424,6 +424,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-wrapped-call-layout-checkpoint',
+      title: 'Public Wrapped Call Layout Checkpoint',
+      searchContext: 'TradingView public scripts search: wrapped indicator call layout',
+      featureTags: ['layout', 'udf', 'signals', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-udt-array-checkpoint',
       title: 'Public UDT Array Checkpoint',
       searchContext: 'TradingView public scripts search: market structure object array',
