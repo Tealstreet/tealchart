@@ -196,6 +196,7 @@ const ALERT_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
 ]);
 const GLOBAL_NON_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['fixnan', ['source']],
+  ['na', ['x']],
   ['nz', ['source', 'replacement']],
 ]);
 const REQUEST_GAPS_MODES = new Set(['barmerge.gaps_on', 'barmerge.gaps_off']);
