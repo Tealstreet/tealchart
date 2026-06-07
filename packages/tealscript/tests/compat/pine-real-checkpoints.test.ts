@@ -1719,6 +1719,99 @@ plot(bearSignal ? 1 : 0, title="Bear Signal")
     expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0]);
   });
 
+  it('locks a reduced public moving-average ribbon signal idiom', () => {
+    // Public idiom reference: moving-average ribbon scripts commonly expose
+    // multiple average lengths and route trend state from fast/slow overlays.
+    // Source search: https://www.tradingview.com/scripts/search/moving%20average%20ribbon/
+    const result = runCompatScript(`
+indicator("Public Moving Average Ribbon Checkpoint", overlay=true)
+fastLength = input.int(3, "Fast Length")
+slowLength = input.int(5, "Slow Length")
+almaOffset = input.float(0.85, "ALMA Offset")
+almaSigma = input.float(6.0, "ALMA Sigma")
+fast = ta.vwma(source=close, length=fastLength)
+weighted = ta.wma(source=close, length=fastLength)
+smooth = ta.alma(series=close, length=slowLength, offset=almaOffset, sigma=almaSigma)
+slow = ta.hma(source=close, length=slowLength)
+bullRibbon = fast > slow and weighted > smooth
+bearRibbon = fast < slow and weighted < smooth
+plot(fast, title="VWMA Fast")
+plot(weighted, title="WMA Fast")
+plot(smooth, title="ALMA Smooth")
+plot(slow, title="HMA Slow")
+plot(bullRibbon ? 1 : 0, title="Bull Ribbon")
+plot(bearRibbon ? 1 : 0, title="Bear Ribbon")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public Moving Average Ribbon Checkpoint');
+    expect(result.indicatorOverlay).toBe(true);
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Fast Length', 'int'],
+      ['Slow Length', 'int'],
+      ['ALMA Offset', 'float'],
+      ['ALMA Sigma', 'float'],
+    ]);
+    expect(roundSeries(getPlot(result, 'VWMA Fast').values)).toEqual([
+      null,
+      null,
+      104.6,
+      104.784615,
+      102.43662,
+      100.635135,
+      101.013333,
+      104.962025,
+      107.121951,
+      109.418605,
+      109.777778,
+      111.023256,
+    ]);
+    expect(roundSeries(getPlot(result, 'WMA Fast').values)).toEqual([
+      null,
+      null,
+      105.5,
+      104.666667,
+      101.666667,
+      100.166667,
+      101.833333,
+      105.833333,
+      107.666667,
+      109.666667,
+      110,
+      111.166667,
+    ]);
+    expect(roundSeries(getPlot(result, 'ALMA Smooth').values)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      101.918274,
+      99.97516,
+      101.504063,
+      105.458142,
+      107.88929,
+      109.296928,
+      110.200868,
+      110.912922,
+    ]);
+    expect(roundSeries(getPlot(result, 'HMA Slow').values)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      97.822222,
+      101.466667,
+      108.133333,
+      110.755556,
+      111.533333,
+      111.511111,
+      111.866667,
+    ]);
+    expect(getPlot(result, 'Bull Ribbon').values).toEqual([0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Bear Ribbon').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0]);
+  });
+
   it('locks a reduced public stochastic signal idiom', () => {
     // Public idiom reference: stochastic oscillator scripts commonly expose
     // %K/%D smoothing and overbought/oversold gates before routing signals.
