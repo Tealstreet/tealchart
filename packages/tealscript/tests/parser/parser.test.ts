@@ -2011,6 +2011,136 @@ hline(30, "Oversold", color=color.green)
     });
   });
 
+  describe('Nested switch expressions (Bug P3)', () => {
+    it('parses switch nested inside outer switch case body', () => {
+      const ast = parse(`//@version=6
+indicator("test")
+x = switch close > open
+    true =>
+        inner = switch high > high[1]
+            true => 2
+            => 1
+        inner
+    false => -1
+plot(x)
+`);
+      const xDecl = ast.body[1] as VariableDeclaration;
+      const outerSwitch = xDecl.init;
+      expect(outerSwitch.type).toBe('SwitchExpression');
+      if (outerSwitch.type === 'SwitchExpression') {
+        expect(outerSwitch.cases).toHaveLength(2);
+        expect(outerSwitch.cases[0].test).toEqual(expect.objectContaining({ value: true }));
+        expect(outerSwitch.cases[1].test).toEqual(expect.objectContaining({ value: false }));
+        const outerConsequent = outerSwitch.cases[0].consequent;
+        const innerDecl = Array.isArray(outerConsequent) ? outerConsequent[0] : null;
+        expect(innerDecl?.type === 'VariableDeclaration' ? innerDecl.init.type : null).toBe('SwitchExpression');
+        if (innerDecl?.type === 'VariableDeclaration' && innerDecl.init.type === 'SwitchExpression') {
+          expect(innerDecl.init.cases).toHaveLength(2);
+        }
+      }
+    });
+
+    it('parses switch nested inside outer switch case body with multiline inner case body', () => {
+      const ast = parse(`//@version=6
+indicator("test")
+x = switch close > open
+    true =>
+        inner = switch high > high[1]
+            true =>
+                3
+            => 0
+        inner
+    false => -1
+plot(x)
+`);
+      const xDecl = ast.body[1] as VariableDeclaration;
+      const outerSwitch = xDecl.init;
+      expect(outerSwitch.type).toBe('SwitchExpression');
+      if (outerSwitch.type === 'SwitchExpression') {
+        expect(outerSwitch.cases).toHaveLength(2);
+        const outerConsequent = outerSwitch.cases[0].consequent;
+        const innerDecl = Array.isArray(outerConsequent) ? outerConsequent[0] : null;
+        expect(innerDecl?.type === 'VariableDeclaration' ? innerDecl.init.type : null).toBe('SwitchExpression');
+        if (innerDecl?.type === 'VariableDeclaration' && innerDecl.init.type === 'SwitchExpression') {
+          expect(innerDecl.init.cases).toHaveLength(2);
+          expect(Array.isArray(innerDecl.init.cases[0].consequent)).toBe(true);
+        }
+      }
+    });
+
+    it('parses switch inside if block inside switch case body', () => {
+      const ast = parse(`//@version=6
+indicator("test")
+x = switch close > open
+    true =>
+        if high > low
+            switch volume > 100
+                true => 1
+                => 0
+        else
+            -1
+    false => -2
+plot(x)
+`);
+      const xDecl = ast.body[1] as VariableDeclaration;
+      const outerSwitch = xDecl.init;
+      expect(outerSwitch.type).toBe('SwitchExpression');
+      if (outerSwitch.type === 'SwitchExpression') {
+        expect(outerSwitch.cases).toHaveLength(2);
+        const outerConsequent = outerSwitch.cases[0].consequent;
+        const ifStmt = Array.isArray(outerConsequent) ? outerConsequent[0] : null;
+        expect(ifStmt?.type).toBe('IfStatement');
+        if (ifStmt?.type === 'IfStatement') {
+          expect(Array.isArray(ifStmt.alternate)).toBe(true);
+          const innerSwitch = ifStmt.consequent[0];
+          expect(innerSwitch.type).toBe('ExpressionStatement');
+          if (innerSwitch.type === 'ExpressionStatement') {
+            expect(innerSwitch.expression.type).toBe('SwitchExpression');
+            if (innerSwitch.expression.type === 'SwitchExpression') {
+              expect(innerSwitch.expression.cases).toHaveLength(2);
+            }
+          }
+        }
+      }
+    });
+
+    it('parses three levels of nested switch expressions', () => {
+      const ast = parse(`//@version=6
+indicator("test")
+x = switch close > open
+    true =>
+        inner = switch high > high[1]
+            true =>
+                deepest = switch volume > volume[1]
+                    true => 3
+                    => 1
+                deepest
+            => 0
+        inner
+    false => -1
+plot(x)
+`);
+      const xDecl = ast.body[1] as VariableDeclaration;
+      const outerSwitch = xDecl.init;
+      expect(outerSwitch.type).toBe('SwitchExpression');
+      if (outerSwitch.type === 'SwitchExpression') {
+        expect(outerSwitch.cases).toHaveLength(2);
+        const outerConsequent = outerSwitch.cases[0].consequent;
+        const innerDecl = Array.isArray(outerConsequent) ? outerConsequent[0] : null;
+        expect(innerDecl?.type === 'VariableDeclaration' ? innerDecl.init.type : null).toBe('SwitchExpression');
+        if (innerDecl?.type === 'VariableDeclaration' && innerDecl.init.type === 'SwitchExpression') {
+          expect(innerDecl.init.cases).toHaveLength(2);
+          const innerConsequent = innerDecl.init.cases[0].consequent;
+          const deepestDecl = Array.isArray(innerConsequent) ? innerConsequent[0] : null;
+          expect(deepestDecl?.type === 'VariableDeclaration' ? deepestDecl.init.type : null).toBe('SwitchExpression');
+          if (deepestDecl?.type === 'VariableDeclaration' && deepestDecl.init.type === 'SwitchExpression') {
+            expect(deepestDecl.init.cases).toHaveLength(2);
+          }
+        }
+      }
+    });
+  });
+
   describe('Error handling', () => {
     it('throws TealscriptParseError on syntax error', () => {
       expect(() => parse('x = \n')).toThrow(TealscriptParseError);
