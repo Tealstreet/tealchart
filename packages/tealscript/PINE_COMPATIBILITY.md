@@ -616,15 +616,17 @@ helper arguments before runtime.
 
 ## Common Global Helper Coverage
 
-The global helper pass covers `na`, `nz`, `fixnan`, and explicit primitive
-casts used by generated scripts to normalize optional source values before
-plotting or comparing them. `nz()` supports default-zero and explicit
-replacement forms, `fixnan()` carries forward the previous non-`na` value per
-call site, and `na()` / `nz()` / `fixnan()` reject bool arguments per Pine v6
-behavior.
-Semantic analysis preserves known `nz()` and `fixnan()` return types for
-downstream assignment diagnostics and rejects bool `na()` / `nz()` / `fixnan()`
-arguments before runtime.
+The global helper pass covers legacy `iff()`, `na`, `nz`, `fixnan`, and
+explicit primitive casts used by generated scripts to normalize optional source
+values before plotting or comparing them. `iff()` maps common v3/v4 public
+script conditional helper calls to the selected branch value, `nz()` supports
+default-zero and explicit replacement forms, `fixnan()` carries forward the
+previous non-`na` value per call site, and `na()` / `nz()` / `fixnan()` reject
+bool arguments per Pine v6 behavior.
+Semantic analysis preserves known `iff()` branch-merged, `nz()`, and `fixnan()`
+return types for downstream assignment diagnostics, rejects non-boolean
+`iff()` conditions, and rejects bool `na()` / `nz()` / `fixnan()` arguments
+before runtime.
 
 ## Pine Logs Coverage
 

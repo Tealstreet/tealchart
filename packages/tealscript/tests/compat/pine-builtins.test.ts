@@ -1212,9 +1212,13 @@ plot(namedGeneric == 4, title="Named Generic")
     const result = runCompatScript(`
 indicator("Global helper docs smoke")
 source = bar_index % 3 == 0 ? na : close
+legacySource = iff(close > open, close, open)
 plot(nz(source=source, replacement=open), title="Named NZ")
 plot(nz(source=source, open), title="Prefix NZ")
 plot(fixnan(source=source), title="Named Fix")
+plot(iff(condition=close > open, high, low), title="Named IFF")
+plot(iff(condition=close > open, high, low), title="Prefix IFF")
+plot(legacySource, title="Legacy IFF")
 plot(float(x="4.5"), title="Named Float")
 plot(int(x=4.9), title="Named Int")
 plot(bool(x=1), title="Named Bool")
@@ -1226,6 +1230,9 @@ plot(na(x=source), title="Named NA")
     expect(roundSeries(getPlot(result, 'Named NZ').values)).toEqual([100, 105, 107, 107, 99, 100, 100, 109, 108, 108, 110, 112]);
     expect(roundSeries(getPlot(result, 'Prefix NZ').values)).toEqual([100, 105, 107, 107, 99, 100, 100, 109, 108, 108, 110, 112]);
     expect(roundSeries(getPlot(result, 'Named Fix').values)).toEqual([null, 105, 107, 107, 99, 100, 100, 109, 108, 108, 110, 112]);
+    expect(roundSeries(getPlot(result, 'Named IFF').values)).toEqual([103, 106, 108, 102, 98, 101, 105, 110, 106, 112, 109, 113]);
+    expect(roundSeries(getPlot(result, 'Prefix IFF').values)).toEqual(roundSeries(getPlot(result, 'Named IFF').values));
+    expect(roundSeries(getPlot(result, 'Legacy IFF').values)).toEqual([102, 105, 107, 107, 103, 100, 104, 109, 109, 111, 111, 112]);
     expect(getPlot(result, 'Named Float').values).toEqual(Array(compatibilityBars.length).fill(4.5));
     expect(getPlot(result, 'Named Int').values).toEqual(Array(compatibilityBars.length).fill(4));
     expect(getPlot(result, 'Named Bool').values).toEqual(Array(compatibilityBars.length).fill(true));
