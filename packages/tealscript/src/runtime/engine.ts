@@ -11279,7 +11279,9 @@ export class TealscriptEngine {
     if (barsBack === null || timeframeBarsBack === null) return Number.NaN;
 
     const targetBarIndex = this.ctx.bar_index - barsBack;
-    const timestamp = barsBack === 0 ? (this.ctx.time.get(0) ?? Number.NaN) : (this.ctx.getBar(targetBarIndex)?.time ?? Number.NaN);
+    const timestamp = barsBack === 0
+      ? (this.ctx.time.get(0) ?? Number.NaN)
+      : (this.ctx.getBar(targetBarIndex)?.time ?? this.projectFutureChartBarTime(barsBack));
     const timeframe = timeframeArg === undefined || timeframeArg === '' ? this.ctx.timeframe.period : this.toStringValue(timeframeArg);
     const session = sessionArg === undefined || sessionArg === '' ? undefined : this.toStringValue(sessionArg);
     const timezone = timezoneArg === undefined || timezoneArg === '' ? this.ctx.syminfo.timezone : this.toStringValue(timezoneArg);
@@ -11294,6 +11296,16 @@ export class TealscriptEngine {
 
     const openTime = this.shiftTimeframeOpenTime(this.getTimeframeOpenTime(timestamp, timeframe, timezone), timeframe, timezone, -timeframeBarsBack);
     return closeTime ? this.getTimeframeCloseTime(openTime, timeframe, timezone) : openTime;
+  }
+
+  private projectFutureChartBarTime(barsBack: number): number {
+    if (barsBack >= 0) return Number.NaN;
+    return this.shiftTimeframeOpenTime(
+      this.ctx.time.get(0) ?? Number.NaN,
+      this.ctx.timeframe.period,
+      this.ctx.syminfo.timezone,
+      -barsBack,
+    );
   }
 
   private normalizeTimeOffset(value: unknown): number | null {

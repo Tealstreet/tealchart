@@ -3884,7 +3884,8 @@ plot(time_close(timeframe="30", session="1430-1600", timezone="UTC"), title="Nam
 plot(time("60", "1430-1600", 1), title="Previous Session Open")
 plot(time("60", "1430-1600", "UTC", 1), title="Previous Session Open With Timezone")
 plot(time_close(timeframe="30", session="1430-1600", bars_back=1), title="Named Previous Close")
-plot(time(timeframe="", bars_back=-1), title="Next Known Open")
+plot(time(timeframe="", bars_back=-1), title="Next Open")
+plot(time_close(timeframe="", bars_back=-1), title="Next Projected Close")
 dynamicBarsBack = bar_index == 1 ? 5001 : 0
 dynamicTimeframeBarsBack = bar_index == 1 ? -501 : 0
 dynamicFractionalBarsBack = bar_index == 1 ? 1.5 : 0
@@ -3943,10 +3944,15 @@ plot(na(time("60", bars_back=dynamicFractionalBarsBack)) ? 1 : 0, title="Invalid
         Date.UTC(2024, 0, 5, 14, 30),
       ]);
       expect(result.plots.find((plot) => plot.title === 'Named Previous Close')?.values).toEqual([null, null, Date.UTC(2024, 0, 5, 15, 0)]);
-      expect(result.plots.find((plot) => plot.title === 'Next Known Open')?.values).toEqual([
+      expect(result.plots.find((plot) => plot.title === 'Next Open')?.values).toEqual([
         Date.UTC(2024, 0, 5, 14, 30),
         Date.UTC(2024, 0, 5, 16, 0),
-        null,
+        Date.UTC(2024, 0, 5, 17, 0),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Next Projected Close')?.values).toEqual([
+        Date.UTC(2024, 0, 5, 15, 30),
+        Date.UTC(2024, 0, 5, 17, 0),
+        Date.UTC(2024, 0, 5, 18, 0),
       ]);
       expect(result.plots.find((plot) => plot.title === 'Invalid Dynamic Bars Back')?.values).toEqual([0, 1, 0]);
       expect(result.plots.find((plot) => plot.title === 'Invalid Dynamic Timeframe Bars Back')?.values).toEqual([0, 1, 0]);
