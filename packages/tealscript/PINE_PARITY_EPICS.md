@@ -170,7 +170,8 @@ Phases:
    financial dashboards, economic macro overlays, seed dataset overlays,
    volatility-band overlays, library helpers including source-preserving helper
    wrappers and block `if` source wrappers, public strategy stats tables, UDT
-   object-method state, and UDT state objects with wrapped field defaults.
+   object-method state, UDT state objects with wrapped field defaults, and
+   public `varip` intrabar array tick buffers.
    Strategy-bracket coverage includes official broker examples plus a reduced
    public fixed-bracket strategy fixture, and trailing-stop coverage includes
    official and reduced public strategy fixtures.
