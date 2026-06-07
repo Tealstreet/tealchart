@@ -3531,6 +3531,15 @@ class SemanticChecker {
     const targetType = scope.lookup(statement.left.name)?.type;
     if (!targetType) return;
 
+    if (targetType.kind === 'bool' && this.isNaLiteralExpression(statement.right)) {
+      this.addDiagnostic(
+        'type-mismatch',
+        `Cannot assign na value to bool variable ${statement.left.name}`,
+        statement.loc,
+      );
+      return;
+    }
+
     const sourceType = this.inferExpressionType(statement.right, scope);
     if (!this.isAssignableQualifier(targetType.qualifier, sourceType.qualifier)) {
       this.addDiagnostic(
@@ -8279,6 +8288,15 @@ class SemanticChecker {
   private checkTypeCompatibility(annotation: TypeAnnotation | undefined | null, init: Expression | IfStatement, scope: SemanticScope, loc?: SourceLocation): void {
     const targetType = this.typeFromAnnotation(annotation);
     if (!targetType || !this.canCheckTypeCompatibility(annotation)) return;
+
+    if (targetType.kind === 'bool' && init.type === 'NaExpression') {
+      this.addDiagnostic(
+        'type-mismatch',
+        'Cannot assign na value to bool variable',
+        loc,
+      );
+      return;
+    }
 
     const initType = init.type === 'IfStatement'
       ? this.inferIfExpressionType(init, scope)
