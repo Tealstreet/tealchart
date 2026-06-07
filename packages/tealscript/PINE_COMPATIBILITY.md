@@ -1089,7 +1089,9 @@ strategy declaration settings,
 non-boolean order alert/immediate flags, non-string order id/comment/alert
 arguments, non-string order/risk enum-like arguments, non-numeric order/risk sizing
 arguments, non-numeric trade accessor indexes, and excess positional order arguments,
-and preserves known strategy state/accessor return types for downstream
+requires `strategy.exit()` calls to specify at least one limit, stop, profit,
+loss, or trailing-stop target and `trail_offset` when a trailing target is
+provided, and preserves known strategy state/accessor return types for downstream
 assignment diagnostics. `strategy.entry()`,
 `strategy.order()`, `strategy.close()`,
 `strategy.close_all()`, `strategy.exit()`, `strategy.cancel()`, and

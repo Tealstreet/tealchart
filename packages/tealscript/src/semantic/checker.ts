@@ -5809,6 +5809,65 @@ class SemanticChecker {
     this.checkPositiveLiteralNumberArgument(expression, 'loss', 6, 'strategy.exit loss must be a positive number');
     this.checkNonNegativeLiteralNumberArgument(expression, 'trail_points', 9, 'strategy.exit trail_points must be a non-negative number');
     this.checkPositiveLiteralNumberArgument(expression, 'trail_offset', 10, 'strategy.exit trailing stop offset must be positive');
+    this.checkStrategyExitTargetArguments(expression);
+    this.checkStrategyExitTrailingOffsetArgument(expression);
+  }
+
+  private checkStrategyExitTargetArguments(expression: CallExpression): void {
+    if (this.hasUnstableStrategyExitBindings(expression)) return;
+
+    const targetArguments = [
+      this.strategyExitArgument(expression, 'profit'),
+      this.strategyExitArgument(expression, 'limit'),
+      this.strategyExitArgument(expression, 'loss'),
+      this.strategyExitArgument(expression, 'stop'),
+      this.strategyExitArgument(expression, 'trail_price'),
+      this.strategyExitArgument(expression, 'trail_points'),
+    ];
+
+    if (targetArguments.some((argument) => this.hasUsableStrategyExitArgument(argument))) return;
+
+    this.addDiagnostic(
+      'type-mismatch',
+      'strategy.exit requires a limit, stop, profit, loss, or trailing stop price',
+      expression.loc,
+    );
+  }
+
+  private checkStrategyExitTrailingOffsetArgument(expression: CallExpression): void {
+    if (this.hasUnstableStrategyExitBindings(expression)) return;
+
+    const trailingTarget = [
+      this.strategyExitArgument(expression, 'trail_price'),
+      this.strategyExitArgument(expression, 'trail_points'),
+    ].find((argument) => this.hasUsableStrategyExitArgument(argument));
+    if (!trailingTarget) return;
+
+    const trailingOffset = this.strategyExitArgument(expression, 'trail_offset');
+    if (this.hasUsableStrategyExitArgument(trailingOffset)) return;
+
+    this.addDiagnostic(
+      'type-mismatch',
+      'strategy.exit trailing stop requires trail_offset',
+      trailingTarget.loc,
+    );
+  }
+
+  private strategyExitArgument(expression: CallExpression, parameterName: string): Expression | undefined {
+    return this.resolveCallArgumentExpression(
+      expression,
+      STRATEGY_EXIT_PARAMS,
+      STRATEGY_EXIT_PARAMS.indexOf(parameterName),
+    );
+  }
+
+  private hasUsableStrategyExitArgument(argument: Expression | undefined): boolean {
+    return argument !== undefined && !this.isNaLiteralExpression(argument);
+  }
+
+  private hasUnstableStrategyExitBindings(expression: CallExpression): boolean {
+    const signature = BUILTIN_SIGNATURES.get('strategy.exit');
+    return signature === undefined || this.hasUnstableOptionArgumentBindings(expression.arguments, signature);
   }
 
   private checkStrategyCloseLiteralArguments(expression: CallExpression): void {
