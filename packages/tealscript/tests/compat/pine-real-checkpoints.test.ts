@@ -1919,6 +1919,48 @@ plot(bearSignal ? 1 : 0, title="Bear Signal")
     expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0]);
   });
 
+  it('locks a reduced public Momentum signal idiom', () => {
+    // Public idiom reference: momentum scripts commonly expose length and
+    // threshold inputs before routing positive/negative momentum regimes.
+    // Source search: https://www.tradingview.com/scripts/search/momentum%20indicator%20signal/
+    const result = runCompatScript(`
+indicator("Public Momentum Signal Checkpoint")
+length = input.int(3, "Length")
+upperThreshold = input.float(3.0, "Upper Threshold")
+lowerThreshold = input.float(-3.0, "Lower Threshold")
+momentum = ta.mom(source=close, length=length)
+bullSignal = momentum > upperThreshold
+bearSignal = momentum < lowerThreshold
+plot(momentum, title="Momentum")
+plot(bullSignal ? 1 : 0, title="Bull Signal")
+plot(bearSignal ? 1 : 0, title="Bear Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public Momentum Signal Checkpoint');
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Length', 'int'],
+      ['Upper Threshold', 'float'],
+      ['Lower Threshold', 'float'],
+    ]);
+    expect(roundSeries(getPlot(result, 'Momentum').values)).toEqual([
+      null,
+      null,
+      null,
+      1,
+      -6,
+      -7,
+      1,
+      10,
+      8,
+      7,
+      1,
+      4,
+    ]);
+    expect(getPlot(result, 'Bull Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1]);
+    expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0]);
+  });
+
   it('locks a reduced public object-method state idiom', () => {
     // Public idiom reference: market-structure public indicators commonly keep
     // swing state in user-defined objects and update it through methods.

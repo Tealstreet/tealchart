@@ -137,6 +137,8 @@ Current `ta.*` progress:
   signal-line routing idiom over deterministic close-series bars.
 - A source-linked public ROC signal checkpoint locks the common `ta.roc()`
   threshold-routing idiom over deterministic close-series bars.
+- A source-linked public Momentum signal checkpoint locks the common `ta.mom()`
+  threshold-routing idiom over deterministic close-series bars.
 
 Current `str.*` progress:
 

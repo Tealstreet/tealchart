@@ -451,6 +451,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-momentum-signal-checkpoint',
+      title: 'Public Momentum Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: momentum indicator signal',
+      featureTags: ['ta', 'signals', 'mom', 'momentum', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-marker-signal-checkpoint',
       title: 'Public Marker Signal Checkpoint',
       searchContext: 'TradingView public scripts search: buy sell signal markers',
