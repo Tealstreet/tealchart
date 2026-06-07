@@ -74,6 +74,8 @@ export interface PineCompatibilityCorpusSummary {
   total: number;
   passed: number;
   failed: number;
+  plannedUnsupported: number;
+  actionableFailed: number;
   byFirstFailureStage: Partial<Record<CompatibilityStage, number>>;
   byFirstFailureClass: Partial<Record<CompatibilityFailureClass, number>>;
   byFeatureTag: Record<string, { total: number; passed: number; failed: number }>;
@@ -335,6 +337,7 @@ export function summarizePineCompatibilityCorpus(
   const byFirstFailureClass: Partial<Record<CompatibilityFailureClass, number>> = {};
   const byFeatureTag: Record<string, { total: number; passed: number; failed: number }> = {};
   let passed = 0;
+  let plannedUnsupported = 0;
 
   for (let index = 0; index < outcomes.length; index += 1) {
     const outcome = outcomes[index];
@@ -367,13 +370,20 @@ export function summarizePineCompatibilityCorpus(
     }
     if (outcome.summary.firstFailureClass) {
       byFirstFailureClass[outcome.summary.firstFailureClass] = (byFirstFailureClass[outcome.summary.firstFailureClass] ?? 0) + 1;
+      if (outcome.summary.firstFailureClass === 'unsupported_planned') {
+        plannedUnsupported += 1;
+      }
     }
   }
+
+  const failed = outcomes.length - passed;
 
   return {
     total: outcomes.length,
     passed,
-    failed: outcomes.length - passed,
+    failed,
+    plannedUnsupported,
+    actionableFailed: failed - plannedUnsupported,
     byFirstFailureStage,
     byFirstFailureClass,
     byFeatureTag,
@@ -461,6 +471,8 @@ function incrementCount(counts: Record<string, number>, key: string): void {
 
 export function formatPineCompatibilityCorpusMarkdown(run: PineCompatibilityCorpusRun): string {
   const passRate = run.summary.total === 0 ? '0.0' : ((run.summary.passed / run.summary.total) * 100).toFixed(1);
+  const actionableTotal = run.summary.total - run.summary.plannedUnsupported;
+  const actionablePassRate = actionableTotal <= 0 ? '0.0' : ((run.summary.passed / actionableTotal) * 100).toFixed(1);
   const lines = [
     '# Pine Compatibility Corpus',
     '',
@@ -468,7 +480,10 @@ export function formatPineCompatibilityCorpusMarkdown(run: PineCompatibilityCorp
     `Total: ${run.summary.total}`,
     `Passed: ${run.summary.passed}`,
     `Failed: ${run.summary.failed}`,
+    `Planned unsupported: ${run.summary.plannedUnsupported}`,
+    `Actionable failed: ${run.summary.actionableFailed}`,
     `Pass rate: ${passRate}%`,
+    `Actionable pass rate: ${actionablePassRate}%`,
     '',
     '## First Failure Stages',
     ...formatCountTable(run.summary.byFirstFailureStage),
