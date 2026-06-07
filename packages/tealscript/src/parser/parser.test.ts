@@ -80,6 +80,20 @@ indicator(title="Mixed Indicator", "Mixed", true, format.price, 3)`);
         }
       });
 
+      it('parses legacy study declarations on the indicator path', () => {
+        const ast = parse(`//@version=4
+study("Legacy Indicator", shorttitle="LI", overlay=true)`);
+
+        const indicator = ast.body[0];
+        expect(indicator.type).toBe('IndicatorDeclaration');
+        if (indicator.type === 'IndicatorDeclaration') {
+          expect(indicator.declarationKind).toBe('indicator');
+          expect(indicator.title?.type).toBe('StringLiteral');
+          expect(indicator.shorttitle?.type).toBe('StringLiteral');
+          expect(indicator.overlay?.type).toBe('BooleanLiteral');
+        }
+      });
+
       it('parses max_bars_back metadata', () => {
         const ast = parse(`//@version=6
 indicator("My Indicator", max_bars_back=500)`);
