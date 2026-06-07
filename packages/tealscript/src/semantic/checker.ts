@@ -907,6 +907,7 @@ const STRATEGY_CLOSED_TRADE_ACCESSORS = [
 
 interface BuiltinSignature {
   params: string[];
+  legacyV4Params?: string[];
   aliases?: Record<string, string>;
   overloads?: string[][];
   minArgs?: number;
@@ -1007,7 +1008,15 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['alert', { params: ['message', 'freq'], minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['alertcondition', { params: ['condition', 'title', 'message'], minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['barcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'transp'], minArgs: 1, allowNamedPrefixWithPositional: true }],
-  ['bgcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay', 'transp'], minArgs: 1, allowNamedPrefixWithPositional: true }],
+  [
+    'bgcolor',
+    {
+      params: ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay', 'transp'],
+      legacyV4Params: ['color', 'transp', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay'],
+      minArgs: 1,
+      allowNamedPrefixWithPositional: true,
+    },
+  ],
   ['bool', { params: ['x'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['chart.point.copy', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['chart.point.from_index', { params: ['index', 'price'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
@@ -1028,6 +1037,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
     'fill',
     {
       params: ['plot1', 'plot2', 'color', 'title', 'editable', 'show_last', 'fillgaps', 'display', 'transp'],
+      legacyV4Params: ['plot1', 'plot2', 'color', 'transp', 'title', 'editable', 'show_last', 'fillgaps', 'display'],
       aliases: { hline1: 'plot1', hline2: 'plot2' },
       minArgs: 3,
       allowNamedPrefixWithPositional: true,
@@ -1205,6 +1215,25 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'linestyle',
         'transp',
       ],
+      legacyV4Params: [
+        'series',
+        'title',
+        'color',
+        'linewidth',
+        'style',
+        'trackprice',
+        'transp',
+        'histbase',
+        'offset',
+        'join',
+        'editable',
+        'show_last',
+        'display',
+        'format',
+        'precision',
+        'force_overlay',
+        'linestyle',
+      ],
       minArgs: 1,
       allowNamedPrefixWithPositional: true,
     },
@@ -1262,6 +1291,24 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'force_overlay',
         'transp',
       ],
+      legacyV4Params: [
+        'series',
+        'title',
+        'style',
+        'location',
+        'color',
+        'transp',
+        'offset',
+        'text',
+        'textcolor',
+        'editable',
+        'size',
+        'show_last',
+        'display',
+        'format',
+        'precision',
+        'force_overlay',
+      ],
       minArgs: 1,
       allowNamedPrefixWithPositional: true,
     },
@@ -1287,6 +1334,24 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'force_overlay',
         'transp',
       ],
+      legacyV4Params: [
+        'series',
+        'title',
+        'char',
+        'location',
+        'color',
+        'transp',
+        'offset',
+        'text',
+        'textcolor',
+        'editable',
+        'size',
+        'show_last',
+        'display',
+        'format',
+        'precision',
+        'force_overlay',
+      ],
       minArgs: 1,
       allowNamedPrefixWithPositional: true,
     },
@@ -1309,6 +1374,22 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'precision',
         'force_overlay',
         'transp',
+      ],
+      legacyV4Params: [
+        'series',
+        'title',
+        'colorup',
+        'colordown',
+        'transp',
+        'offset',
+        'minheight',
+        'maxheight',
+        'editable',
+        'show_last',
+        'display',
+        'format',
+        'precision',
+        'force_overlay',
       ],
       minArgs: 1,
       allowNamedPrefixWithPositional: true,
@@ -2225,6 +2306,7 @@ class SemanticChecker {
   private importedLibraries = new Map<string, SemanticImportedLibrary>();
   private functionSymbolDeclarations = new WeakMap<SemanticSymbol, FunctionDeclaration>();
   private activeReturnInferences = new Set<FunctionDeclaration>();
+  private currentPineVersion = 6;
 
   constructor(private readonly options: SemanticCheckOptions = {}) {}
 
@@ -2237,6 +2319,7 @@ class SemanticChecker {
     this.importedLibraries = this.collectImportedLibraries(program);
     this.functionSymbolDeclarations = new WeakMap();
     this.activeReturnInferences = new Set();
+    this.currentPineVersion = program.version;
     this.checkLibraryExportDeclarations(program.body);
     this.checkStatements(program.body, this.rootScope);
     return {
@@ -5299,10 +5382,11 @@ class SemanticChecker {
     const calleeName = this.memberPath(expression.callee).join('.');
     const signature = BUILTIN_SIGNATURES.get(calleeName);
     if (!signature) return;
+    const parameterNames = this.resolveSignatureParams(expression.arguments, signature);
 
     switch (calleeName) {
       case 'plot': {
-        const style = this.resolveCallArgumentExpression(expression, signature.params, signature.params.indexOf('style'));
+        const style = this.resolveCallArgumentExpression(expression, parameterNames, parameterNames.indexOf('style'));
         this.checkNamespacedConstantStringValue(
           style,
           PLOT_STYLE_VALUES,
@@ -5310,7 +5394,7 @@ class SemanticChecker {
           'plot.style_',
           'Invalid plot style',
         );
-        const linestyle = this.resolveCallArgumentExpression(expression, signature.params, signature.params.indexOf('linestyle'));
+        const linestyle = this.resolveCallArgumentExpression(expression, parameterNames, parameterNames.indexOf('linestyle'));
         this.checkNamespacedConstantStringValue(
           linestyle,
           VISUAL_LINESTYLE_VALUES,
@@ -5321,7 +5405,7 @@ class SemanticChecker {
         break;
       }
       case 'hline': {
-        const linestyle = this.resolveCallArgumentExpression(expression, signature.params, signature.params.indexOf('linestyle'));
+        const linestyle = this.resolveCallArgumentExpression(expression, parameterNames, parameterNames.indexOf('linestyle'));
         this.checkNamespacedConstantStringValue(
           linestyle,
           VISUAL_LINESTYLE_VALUES,
@@ -5338,8 +5422,9 @@ class SemanticChecker {
     const calleeName = this.memberPath(expression.callee).join('.');
     if (!VISUAL_FORMAT_PRECISION_CALLS.has(calleeName)) return;
 
-    const parameterNames = BUILTIN_SIGNATURES.get(calleeName)?.params;
-    if (!parameterNames) return;
+    const signature = BUILTIN_SIGNATURES.get(calleeName);
+    if (!signature) return;
+    const parameterNames = this.resolveSignatureParams(expression.arguments, signature);
 
     const formatIndex = parameterNames.indexOf('format');
     const format = this.resolveCallArgumentExpression(expression, parameterNames, formatIndex);
@@ -5363,8 +5448,9 @@ class SemanticChecker {
     const calleeName = this.memberPath(expression.callee).join('.');
     if (calleeName !== 'plotshape' && calleeName !== 'plotchar') return;
 
-    const parameterNames = BUILTIN_SIGNATURES.get(calleeName)?.params;
-    if (!parameterNames) return;
+    const signature = BUILTIN_SIGNATURES.get(calleeName);
+    if (!signature) return;
+    const parameterNames = this.resolveSignatureParams(expression.arguments, signature);
 
     if (calleeName === 'plotshape') {
       const style = this.resolveCallArgumentExpression(expression, parameterNames, parameterNames.indexOf('style'));
@@ -5398,8 +5484,9 @@ class SemanticChecker {
 
   private checkVisualNumericOptionLiteralArguments(expression: CallExpression): void {
     const calleeName = this.memberPath(expression.callee).join('.');
-    const parameterNames = BUILTIN_SIGNATURES.get(calleeName)?.params;
-    if (!parameterNames) return;
+    const signature = BUILTIN_SIGNATURES.get(calleeName);
+    if (!signature) return;
+    const parameterNames = this.resolveSignatureParams(expression.arguments, signature);
 
     if (calleeName === 'plot' || calleeName === 'hline') {
       const linewidth = this.resolveCallArgumentExpression(expression, parameterNames, parameterNames.indexOf('linewidth'));
@@ -5432,12 +5519,13 @@ class SemanticChecker {
     const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
     if (!signature) return;
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+    const resolvedParams = this.resolveSignatureParams(expression.arguments, signature);
 
     for (const parameterName of parameterNames) {
-      if (!signature.params.includes(parameterName)) continue;
+      if (!resolvedParams.includes(parameterName)) continue;
 
-      const parameterIndex = signature.params.indexOf(parameterName);
-      const argument = this.resolveCallArgumentExpression(expression, signature.params, parameterIndex);
+      const parameterIndex = resolvedParams.indexOf(parameterName);
+      const argument = this.resolveCallArgumentExpression(expression, resolvedParams, parameterIndex);
       if (!argument) continue;
 
       const argumentType = this.inferExpressionType(argument, scope);
@@ -5459,9 +5547,10 @@ class SemanticChecker {
     const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
     if (!signature) return;
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+    const resolvedParams = this.resolveSignatureParams(expression.arguments, signature);
 
     for (const parameterName of parameterNames) {
-      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'number');
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, resolvedParams, parameterName, 'number');
     }
   }
 
@@ -5473,9 +5562,10 @@ class SemanticChecker {
     const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
     if (!signature) return;
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+    const resolvedParams = this.resolveSignatureParams(expression.arguments, signature);
 
     for (const parameterName of parameterNames) {
-      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'boolean');
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, resolvedParams, parameterName, 'boolean');
     }
   }
 
@@ -5488,12 +5578,13 @@ class SemanticChecker {
     const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
     if (!signature) return;
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+    const resolvedParams = this.resolveSignatureParams(expression.arguments, signature);
 
     for (const parameterName of parameterNames) {
-      const parameterIndex = signature.params.indexOf(parameterName);
+      const parameterIndex = resolvedParams.indexOf(parameterName);
       if (parameterIndex === -1) continue;
 
-      const argument = this.resolveCallArgumentExpression(expression, signature.params, parameterIndex);
+      const argument = this.resolveCallArgumentExpression(expression, resolvedParams, parameterIndex);
       if (!argument) continue;
 
       const argumentType = this.inferExpressionType(argument, scope);
@@ -5510,13 +5601,14 @@ class SemanticChecker {
   private checkDisplayOptionLiteralArguments(expression: CallExpression): void {
     const calleeName = this.memberPath(expression.callee).join('.');
     const signature = BUILTIN_SIGNATURES.get(calleeName);
-    if (!signature?.params.includes('display')) return;
+    if (!signature?.params.includes('display') && !signature?.legacyV4Params?.includes('display')) return;
+    const resolvedParams = this.resolveSignatureParams(expression.arguments, signature);
 
     const candidates = new Set<Expression>();
     const namedDisplay = expression.arguments.find((argument) => argument.name?.name === 'display')?.value;
     if (namedDisplay) candidates.add(namedDisplay);
 
-    for (const parameterNames of [signature.params, ...(signature.overloads ?? [])]) {
+    for (const parameterNames of [resolvedParams, ...(signature.overloads ?? [])]) {
       const displayIndex = parameterNames.indexOf('display');
       if (displayIndex === -1) continue;
       const display = this.resolveCallArgumentExpression(expression, parameterNames, displayIndex);
@@ -7095,6 +7187,9 @@ class SemanticChecker {
     }
     if (signature === BUILTIN_SIGNATURES.get('time') || signature === BUILTIN_SIGNATURES.get('time_close')) {
       return this.resolveTimeSignatureParams(args, signature);
+    }
+    if (this.currentPineVersion <= 4 && signature.legacyV4Params) {
+      return signature.legacyV4Params;
     }
 
     if (signature.variadicParamPrefix) {
