@@ -772,7 +772,9 @@ multi-timeframe script templates, including `syminfo.tickerid`, `syminfo.root`,
 timeframe category flags, `chart.bg_color`, `chart.fg_color`, and chart-type
 flags such as `chart.is_heikinashi` and `chart.is_renko`. The checkpoint corpus
 tracks the official timeframe-comparison idiom that converts chart and selected
-input timeframes to seconds before validating them.
+input timeframes to seconds before validating them, plus a source-linked public
+symbol-metadata checkpoint that derives labels, tick values, rounded closes,
+and metadata-gated signals from host-provided `syminfo.*` fields.
 `indicator(timeframe=...)` updates the exposed timeframe metadata for
 seconds/minutes/D/W/M and tick declaration values, including
 `timeframe.isticks`. Semantic analysis preserves known `syminfo.*` metadata,
