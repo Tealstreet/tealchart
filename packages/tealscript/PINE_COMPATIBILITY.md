@@ -601,7 +601,9 @@ calculated-color idioms by deriving a variant color from RGB channels and
 plotting an RSI gradient. Semantic analysis preserves known named color
 constants, constructor, and channel return types for downstream assignment
 diagnostics and rejects non-color color arguments plus non-numeric channel,
-`transp`/`transparency`, and gradient threshold arguments before runtime.
+`transp`/`transparency`, out-of-range literal transparency values, and gradient
+threshold arguments before runtime. Runtime color formatting clamps dynamic
+transparency expressions to Pine's 0-100 range.
 
 ## Common `math.*` Coverage
 

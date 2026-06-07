@@ -4665,6 +4665,16 @@ class SemanticChecker {
     for (const parameterName of numericParameterNames ?? []) {
       this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'number', signature);
     }
+
+    this.checkColorTransparencyLiteralArgument(expression, calleeName, signature);
+  }
+
+  private checkColorTransparencyLiteralArgument(expression: CallExpression, calleeName: string, signature: BuiltinSignature): void {
+    if (calleeName !== 'color.new' && calleeName !== 'color.rgb') return;
+
+    const resolvedParams = this.resolveSignatureParams(expression.arguments, signature);
+    const transparency = this.resolveCallArgumentExpression(expression, resolvedParams, resolvedParams.indexOf('transp'), signature);
+    this.checkNumericLiteralRangeValue(transparency, 0, 100, `${calleeName} transp must be between 0 and 100`);
   }
 
   private checkStringFunctionArgumentTypes(expression: CallExpression, scope: SemanticScope): void {
@@ -5147,6 +5157,15 @@ class SemanticChecker {
     const value = this.constantLiteralValue(expression);
     if (typeof value !== 'number') return;
     if (!Number.isInteger(value) || value < -500 || value > 5000) {
+      this.addDiagnostic('type-mismatch', message, expression.loc);
+    }
+  }
+
+  private checkNumericLiteralRangeValue(expression: Expression | undefined, min: number, max: number, message: string): void {
+    if (!expression) return;
+    const value = this.constantLiteralValue(expression);
+    if (typeof value !== 'number') return;
+    if (value < min || value > max) {
       this.addDiagnostic('type-mismatch', message, expression.loc);
     }
   }

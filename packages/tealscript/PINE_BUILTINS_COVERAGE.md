@@ -78,7 +78,7 @@ approximate coverage to tested Pine-compatible behavior.
 | `ta.*` | 56 registrations covering moving averages, oscillators, pivots, ranges, tuples, and volume helpers | Exact `na` handling, warmup lengths, tuple return shapes, source defaults, oscillator variants, smoothing variants, edge-case parity |
 | `math.*` | 28 registrations covering constants, numeric operators, rounding, trig, logs, random, and mintick rounding | Overloads, integer vs float return behavior, deterministic random semantics, `na` propagation, mintick rounding exactness |
 | `str.*` | 18 registrations covering search, replace, split, case, formatting, conversion, and trimming | `str.tonumber`, `str.format_time`, placeholder compatibility, Unicode and escape handling, exact `na` conversion behavior |
-| `color.*` | 7 registrations covering RGB construction, channel extraction, transparency, and gradients | Named constants, transparency range behavior, channel precision, theme-sensitive behavior where possible |
+| `color.*` | 7 registrations covering RGB construction, channel extraction, transparency, and gradients | Channel precision and theme-sensitive behavior where possible |
 | Global helpers | 23 mixed global registrations including casts, `na`, `nz`, `fixnan`, time helpers, and visual functions | Typed casts, `na`/`nz`/`fixnan` parity across types, and separation of visual/data helpers into later epics |
 
 Current `math.*` progress:
@@ -134,6 +134,9 @@ Current `color.*` progress:
   arguments.
 - Pine v6 named color constants infer as `const color`, and `color.none` maps to
   the runtime's existing invisible/`na` plot color representation.
+- Literal `color.new()` and `color.rgb()` transparency values outside Pine's
+  0-100 range are diagnosed before runtime, while dynamic values are clamped by
+  the runtime color formatter.
 - Gradient helpers support named value, bound, and color parameters for common
   public-script idioms.
 
