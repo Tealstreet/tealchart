@@ -1819,6 +1819,64 @@ plot(bearSignal ? 1 : 0, title="Bear Signal")
     expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0]);
   });
 
+  it('locks a reduced public TSI signal idiom', () => {
+    // Public idiom reference: True Strength Index scripts commonly expose
+    // short/long/signal smoothing inputs and compare TSI against a signal line.
+    // Source search: https://www.tradingview.com/scripts/search/true%20strength%20index%20signal/
+    const result = runCompatScript(`
+indicator("Public TSI Signal Checkpoint")
+shortLength = input.int(2, "Short Length")
+longLength = input.int(3, "Long Length")
+signalLength = input.int(3, "Signal Length")
+tsi = ta.tsi(source=close, short_length=shortLength, long_length=longLength)
+signalLine = ta.sma(tsi, signalLength)
+bullSignal = tsi > signalLine
+bearSignal = tsi < signalLine
+plot(tsi, title="TSI")
+plot(signalLine, title="Signal Line")
+plot(bullSignal ? 1 : 0, title="Bull Signal")
+plot(bearSignal ? 1 : 0, title="Bear Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public TSI Signal Checkpoint');
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Short Length', 'int'],
+      ['Long Length', 'int'],
+      ['Signal Length', 'int'],
+    ]);
+    expect(roundSeries(getPlot(result, 'TSI').values)).toEqual([
+      null,
+      1,
+      1,
+      0.127273,
+      -0.423181,
+      -0.350948,
+      0.263311,
+      0.667454,
+      0.546809,
+      0.68082,
+      0.455692,
+      0.582409,
+    ]);
+    expect(roundSeries(getPlot(result, 'Signal Line').values)).toEqual([
+      null,
+      null,
+      null,
+      0.709091,
+      0.234697,
+      -0.215619,
+      -0.170272,
+      0.193273,
+      0.492525,
+      0.631695,
+      0.561107,
+      0.572974,
+    ]);
+    expect(getPlot(result, 'Bull Signal').values).toEqual([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1]);
+    expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0]);
+  });
+
   it('locks a reduced public object-method state idiom', () => {
     // Public idiom reference: market-structure public indicators commonly keep
     // swing state in user-defined objects and update it through methods.
