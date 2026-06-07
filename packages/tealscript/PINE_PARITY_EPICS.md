@@ -202,7 +202,8 @@ Phases:
    compiler annotations in nested blocks.
 3. Complete line continuation after and before operators.
 4. Support wrapped declarations, calls, tuple patterns, generics, index/member
-   chains, arrays, maps, matrices, and nested expressions consistently.
+   chains, arrays, maps, matrices, loop headers, and nested expressions
+   consistently.
 5. Ensure multiline UDF, method, type, enum, and library bodies share the same
    block parser.
 6. Add parser checkpoints from reduced public Pine snippets.

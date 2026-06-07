@@ -1809,6 +1809,27 @@ lookup = map.new<
       }
     });
 
+    it('parses numeric for loop header continuations', () => {
+      const ast = parse(`for i =
+    0 to
+    array.size(values) - 1 by
+    2
+    sum := sum + i
+`);
+      const forStmt = ast.body[0];
+
+      expect(forStmt.type).toBe('ForStatement');
+      if (forStmt.type === 'ForStatement') {
+        expect(forStmt.kind).toBe('numeric');
+        if (forStmt.kind === 'numeric') {
+          expect(forStmt.start.type).toBe('NumericLiteral');
+          expect(forStmt.end.type).toBe('BinaryExpression');
+          expect(forStmt.step?.type).toBe('NumericLiteral');
+        }
+        expect(forStmt.body.map((statement) => statement.type)).toEqual(['AssignmentStatement']);
+      }
+    });
+
     it('parses numeric for loop expressions', () => {
       const ast = parse(`value = for i = 0 to 3
     i
@@ -1834,6 +1855,33 @@ lookup = map.new<
         expect(forStmt.kind).toBe('collection');
         if (forStmt.kind === 'collection') {
           expect(forStmt.iterable.type).toBe('CallExpression');
+        }
+      }
+    });
+
+    it('parses collection for loop header continuations inside function bodies', () => {
+      const ast = parse(`score(values) =>
+    total = 0
+    for [index, value] in
+        values
+        total := total + value + index
+    total
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        const forStmt = fn.body[1];
+        expect(forStmt.type).toBe('ForStatement');
+        if (forStmt.type === 'ForStatement') {
+          expect(forStmt.kind).toBe('collection');
+          if (forStmt.kind === 'collection') {
+            expect(forStmt.indexCounter?.name).toBe('index');
+            expect(forStmt.counter.name).toBe('value');
+            expect(forStmt.iterable.type).toBe('Identifier');
+          }
+          expect(forStmt.body.map((statement) => statement.type)).toEqual(['AssignmentStatement']);
         }
       }
     });

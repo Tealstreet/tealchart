@@ -604,7 +604,7 @@ ElseClause
 
 // For loop
 ForStatement
-  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:IndentedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:IndentedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -615,7 +615,7 @@ ForStatement
         loc: loc()
       };
     }
-  / "for" !IdentifierPart _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:IndentedBlock {
+  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:IndentedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -713,7 +713,7 @@ FunctionElseClause
     }
 
 FunctionForStatement
-  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:FunctionNestedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -724,7 +724,7 @@ FunctionForStatement
         loc: loc()
       };
     }
-  / "for" !IdentifierPart _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:FunctionNestedBlock {
+  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -835,7 +835,7 @@ FunctionNestedElseClause
     }
 
 FunctionNestedForStatement
-  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:FunctionDeepNestedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionDeepNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -846,7 +846,7 @@ FunctionNestedForStatement
         loc: loc()
       };
     }
-  / "for" !IdentifierPart _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:FunctionDeepNestedBlock {
+  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionDeepNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -957,7 +957,7 @@ FunctionDeepNestedElseClause
     }
 
 FunctionDeepNestedForStatement
-  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:FunctionVeryDeepNestedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionVeryDeepNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -968,7 +968,7 @@ FunctionDeepNestedForStatement
         loc: loc()
       };
     }
-  / "for" !IdentifierPart _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:FunctionVeryDeepNestedBlock {
+  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionVeryDeepNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -1390,7 +1390,7 @@ SwitchExpression
     }
 
 CollectionForExpression
-  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" _ iterable:Expression _ LineTerminator body:IndentedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:IndentedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -1403,7 +1403,7 @@ CollectionForExpression
     }
 
 NumericForExpression
-  = "for" !IdentifierPart _ counter:Identifier _ "=" _ start:Expression _ "to" _ end:Expression step:(_ "by" _ Expression)? _ LineTerminator body:IndentedBlock {
+  = "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:IndentedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -1781,6 +1781,9 @@ _
 InitializerSpace
   = &( _ LineTerminator Indent) _ LineTerminator Indent _
   / _
+
+LoopHeaderContinuationSpace
+  = InitializerSpace
 
 // Delimited whitespace allows line continuations inside parentheses/brackets.
 __
