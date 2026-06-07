@@ -104,6 +104,10 @@ Covered behavior and remaining gaps:
   Semantic diagnostics reject non-boolean declaration flags on common
   `indicator()`, `strategy()`, and `library()` headers plus non-numeric
   `indicator()` / `strategy()` count and precision settings before runtime coercion.
+- Legacy `study()` declarations parse and execute on the existing indicator
+  declaration path for common public v3/v4 copy-paste scripts. This is a
+  declaration alias only; broader old-version built-in/API differences remain
+  outside this compatibility point.
 - Top-level nested control blocks share the deeper block parser used by
   function bodies, including nested `if` / `else` dedents with reassignment
   statements.

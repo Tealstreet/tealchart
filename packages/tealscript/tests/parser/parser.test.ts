@@ -65,6 +65,26 @@ describe('Tealscript Parser', () => {
       }));
     });
 
+    it('parses legacy study declarations as indicators', () => {
+      const ast = parse('//@version=4\nstudy("Legacy Study", shorttitle="LS", overlay=true)\n');
+      const indicator = ast.body[0] as IndicatorDeclaration;
+
+      expect(indicator.type).toBe('IndicatorDeclaration');
+      expect(indicator.declarationKind).toBe('indicator');
+      expect(indicator.title).toEqual(expect.objectContaining({
+        type: 'StringLiteral',
+        value: 'Legacy Study',
+      }));
+      expect(indicator.shorttitle).toEqual(expect.objectContaining({
+        type: 'StringLiteral',
+        value: 'LS',
+      }));
+      expect(indicator.overlay).toEqual(expect.objectContaining({
+        type: 'BooleanLiteral',
+        value: true,
+      }));
+    });
+
     it('parses strategy risk-free-rate declaration arguments', () => {
       const ast = parse('strategy("Risk", risk_free_rate=1.75, backtest_fill_limits_assumption=3, close_entries_rule="ANY", fill_orders_on_standard_ohlc=true)\n');
       const strategy = ast.body[0] as IndicatorDeclaration;
