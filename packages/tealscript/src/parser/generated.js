@@ -10374,7 +10374,7 @@ function peg$parse(input, options) {
         s4 = peg$parse_();
         s5 = peg$parseLineTerminator();
         if (s5 !== peg$FAILED) {
-          s6 = peg$parseFunctionUltraDeepNestedBlock();
+          s6 = peg$parseFunctionMegaDeepNestedBlock();
           if (s6 !== peg$FAILED) {
             peg$savedPos = s0;
             s0 = peg$f137(s6);
@@ -10413,7 +10413,7 @@ function peg$parse(input, options) {
             s6 = peg$parse_();
             s7 = peg$parseLineTerminator();
             if (s7 !== peg$FAILED) {
-              s8 = peg$parseFunctionUltraDeepNestedBlock();
+              s8 = peg$parseFunctionMegaDeepNestedBlock();
               if (s8 !== peg$FAILED) {
                 peg$savedPos = s0;
                 s0 = peg$f138(s3, s8);

@@ -1307,7 +1307,7 @@ FunctionVeryDeepNestedSwitchExpression
     }
 
 FunctionVeryDeepNestedSwitchCase
-  = Indent _ "=>" _ LineTerminator consequent:FunctionUltraDeepNestedBlock {
+  = Indent _ "=>" _ LineTerminator consequent:FunctionMegaDeepNestedBlock {
       return {
         type: 'SwitchCase',
         test: null,
@@ -1315,7 +1315,7 @@ FunctionVeryDeepNestedSwitchCase
         loc: loc()
       };
     }
-  / Indent _ test:ConditionalExpression _ "=>" _ LineTerminator consequent:FunctionUltraDeepNestedBlock {
+  / Indent _ test:ConditionalExpression _ "=>" _ LineTerminator consequent:FunctionMegaDeepNestedBlock {
       return {
         type: 'SwitchCase',
         test,
