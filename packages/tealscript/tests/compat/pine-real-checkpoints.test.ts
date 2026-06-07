@@ -1961,6 +1961,48 @@ plot(bearSignal ? 1 : 0, title="Bear Signal")
     expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0]);
   });
 
+  it('locks a reduced public Williams %R signal idiom', () => {
+    // Public idiom reference: Williams %R scripts commonly expose length and
+    // overbought/oversold inputs before routing oscillator threshold regimes.
+    // Source search: https://www.tradingview.com/scripts/search/williams%20percent%20r%20signal/
+    const result = runCompatScript(`
+indicator("Public Williams %R Signal Checkpoint")
+length = input.int(4, "Length")
+overbought = input.float(-20.0, "Overbought")
+oversold = input.float(-80.0, "Oversold")
+wpr = ta.wpr(length=length)
+bullSignal = wpr < oversold
+bearSignal = wpr > overbought
+plot(wpr, title="Williams %R")
+plot(bullSignal ? 1 : 0, title="Bull Signal")
+plot(bearSignal ? 1 : 0, title="Bear Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public Williams %R Signal Checkpoint');
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Length', 'int'],
+      ['Overbought', 'float'],
+      ['Oversold', 'float'],
+    ]);
+    expect(roundSeries(getPlot(result, 'Williams %R').values)).toEqual([
+      null,
+      null,
+      null,
+      -60,
+      -90.909091,
+      -69.230769,
+      -38.461538,
+      -7.142857,
+      -20,
+      -7.692308,
+      -36.363636,
+      -25,
+    ]);
+    expect(getPlot(result, 'Bull Signal').values).toEqual([0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]);
+    expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0]);
+  });
+
   it('locks a reduced public object-method state idiom', () => {
     // Public idiom reference: market-structure public indicators commonly keep
     // swing state in user-defined objects and update it through methods.
