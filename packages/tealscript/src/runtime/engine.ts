@@ -475,6 +475,7 @@ export class TealscriptEngine {
   private profileExpressions = 0;
   private profileBuiltinCalls = 0;
   private runtimeOptions: TealscriptRuntimeOptions;
+  private pineVersion = 6;
   private hasStrategyDeclaration = false;
   private strategyOrderFillRecalculationRequested = false;
   private currentStrategyIntrabarContext: StrategyIntrabarContext | null = null;
@@ -555,6 +556,7 @@ export class TealscriptEngine {
     this.expressionHistory = new WeakMap();
     this.nextRequestExpressionId = 0;
     this.nextCallExpressionId = 0;
+    this.pineVersion = ast.version;
     this.inferredMaxBarsBack = this.inferStaticMaxBarsBack(ast);
     this.userFunctionCallStack = [];
     this.importedLibraryCallStack = [];
@@ -1630,6 +1632,7 @@ export class TealscriptEngine {
   updateBar(ast: Program, bar: Bar): PlotOutput[] {
     this.errors = [];
     this.resetProfile();
+    this.pineVersion = ast.version;
     const currentBar = this.ctx.getBar(this.ctx.last_bar_index);
     if (currentBar && bar.time > currentBar.time) {
       if (this.ctx.barstate.isrealtime && !this.ctx.barstate.isconfirmed) {
@@ -5901,6 +5904,17 @@ export class TealscriptEngine {
         : fallback;
   }
 
+  private getOrderedCallArgByName(
+    args: unknown[],
+    namedArgs: Map<string, unknown>,
+    names: readonly string[],
+    name: string,
+    fallback?: unknown,
+  ): unknown {
+    const index = names.indexOf(name);
+    return index === -1 ? fallback : this.getOrderedCallArg(args, namedArgs, names, index, fallback);
+  }
+
   private getVariadicNumberArgs(args: unknown[], namedArgs: Map<string, unknown>, prefix: string): number[] {
     const values: number[] = [];
     const assigned: boolean[] = [];
@@ -7521,40 +7535,48 @@ export class TealscriptEngine {
 
   private registerPlotBuiltins(): void {
     const plotArgs = ['series', 'title', 'color', 'linewidth', 'style', 'trackprice', 'histbase', 'offset', 'join', 'editable', 'show_last', 'display', 'format', 'precision', 'force_overlay', 'linestyle', 'transp'] as const;
+    const plotV4Args = ['series', 'title', 'color', 'linewidth', 'style', 'trackprice', 'transp', 'histbase', 'offset', 'join', 'editable', 'show_last', 'display', 'format', 'precision', 'force_overlay', 'linestyle'] as const;
     const hlineArgs = ['price', 'title', 'color', 'linestyle', 'linewidth', 'editable', 'display'] as const;
     const bgcolorArgs = ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay', 'transp'] as const;
+    const bgcolorV4Args = ['color', 'transp', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay'] as const;
     const barcolorArgs = ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'transp'] as const;
     const plotbarArgs = ['open', 'high', 'low', 'close', 'title', 'color', 'editable', 'show_last', 'display', 'format', 'precision', 'force_overlay', 'transp'] as const;
     const plotcandleArgs = ['open', 'high', 'low', 'close', 'title', 'color', 'wickcolor', 'editable', 'show_last', 'bordercolor', 'display', 'format', 'precision', 'force_overlay', 'transp'] as const;
     const plotshapeArgs = ['series', 'title', 'style', 'location', 'color', 'offset', 'text', 'textcolor', 'editable', 'size', 'show_last', 'display', 'format', 'precision', 'force_overlay', 'transp'] as const;
+    const plotshapeV4Args = ['series', 'title', 'style', 'location', 'color', 'transp', 'offset', 'text', 'textcolor', 'editable', 'size', 'show_last', 'display', 'format', 'precision', 'force_overlay'] as const;
     const plotcharArgs = ['series', 'title', 'char', 'location', 'color', 'offset', 'text', 'textcolor', 'editable', 'size', 'show_last', 'display', 'format', 'precision', 'force_overlay', 'transp'] as const;
+    const plotcharV4Args = ['series', 'title', 'char', 'location', 'color', 'transp', 'offset', 'text', 'textcolor', 'editable', 'size', 'show_last', 'display', 'format', 'precision', 'force_overlay'] as const;
     const plotarrowArgs = ['series', 'title', 'colorup', 'colordown', 'offset', 'minheight', 'maxheight', 'editable', 'show_last', 'display', 'format', 'precision', 'force_overlay', 'transp'] as const;
+    const plotarrowV4Args = ['series', 'title', 'colorup', 'colordown', 'transp', 'offset', 'minheight', 'maxheight', 'editable', 'show_last', 'display', 'format', 'precision', 'force_overlay'] as const;
     const fillArgs = ['plot1', 'plot2', 'color', 'title', 'editable', 'show_last', 'fillgaps', 'display', 'transp'] as const;
+    const fillV4Args = ['plot1', 'plot2', 'color', 'transp', 'title', 'editable', 'show_last', 'fillgaps', 'display'] as const;
 
     this.builtins.set('plot', (args, namedArgs, ctx) => {
-      const value = this.getOrderedCallArg(args, namedArgs, plotArgs, 0) as number;
+      const parameterNames = this.pineVersion <= 4 ? plotV4Args : plotArgs;
+      const arg = (name: string, fallback?: unknown) => this.getOrderedCallArgByName(args, namedArgs, parameterNames, name, fallback);
+      const value = arg('series') as number;
       const callIndex = this.plotCallIndex++;
-      const titleArg = this.getOrderedCallArg(args, namedArgs, plotArgs, 1);
+      const titleArg = arg('title');
       const hasExplicitTitle = namedArgs.has('title') || titleArg !== undefined;
       const title = (titleArg ?? `Plot ${callIndex + 1}`) as string;
-      const colorArg = this.getOrderedCallArg(args, namedArgs, plotArgs, 2, '#2196F3');
+      const colorArg = arg('color', '#2196F3');
       const color = this.applyPlotTransparency(
         this.toPlotColor(colorArg),
-        this.getOrderedCallArg(args, namedArgs, plotArgs, 16),
+        arg('transp'),
       );
-      const linewidth = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotArgs, 3, 1)) ?? 1;
-      const style = (this.getOrderedCallArg(args, namedArgs, plotArgs, 4, 'line')) as string;
-      const trackprice = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, plotArgs, 5));
-      const histbase = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, plotArgs, 6));
-      const offset = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotArgs, 7));
-      const join = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, plotArgs, 8));
-      const editable = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, plotArgs, 9));
-      const showLast = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotArgs, 10));
-      const display = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotArgs, 11));
-      const format = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, plotArgs, 12));
-      const precision = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotArgs, 13));
-      const forceOverlay = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, plotArgs, 14));
-      const lineStyle = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, plotArgs, 15)) as PlotLineStyle | undefined;
+      const linewidth = this.toOptionalInteger(arg('linewidth', 1)) ?? 1;
+      const style = (arg('style', 'line')) as string;
+      const trackprice = this.toOptionalBoolean(arg('trackprice'));
+      const histbase = this.toOptionalNumber(arg('histbase'));
+      const offset = this.toOptionalInteger(arg('offset'));
+      const join = this.toOptionalBoolean(arg('join'));
+      const editable = this.toOptionalBoolean(arg('editable'));
+      const showLast = this.toOptionalInteger(arg('show_last'));
+      const display = this.toOptionalInteger(arg('display'));
+      const format = this.toOptionalString(arg('format'));
+      const precision = this.toOptionalInteger(arg('precision'));
+      const forceOverlay = this.toOptionalBoolean(arg('force_overlay'));
+      const lineStyle = this.toOptionalString(arg('linestyle')) as PlotLineStyle | undefined;
 
       // Use plot call order for untitled plots so multiple plot(...) calls do
       // not collapse into one "Plot" series across every bar.
@@ -7621,16 +7643,18 @@ export class TealscriptEngine {
     });
 
     this.builtins.set('bgcolor', (args, namedArgs, ctx) => {
+      const parameterNames = this.pineVersion <= 4 ? bgcolorV4Args : bgcolorArgs;
+      const arg = (name: string, fallback?: unknown) => this.getOrderedCallArgByName(args, namedArgs, parameterNames, name, fallback);
       const color = this.applyPlotTransparency(
-        this.toPlotColor(this.getOrderedCallArg(args, namedArgs, bgcolorArgs, 0)),
-        this.getOrderedCallArg(args, namedArgs, bgcolorArgs, 7),
+        this.toPlotColor(arg('color')),
+        arg('transp'),
       );
-      const offset = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, bgcolorArgs, 1)) ?? 0;
-      const editable = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, bgcolorArgs, 2));
-      const showLast = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, bgcolorArgs, 3));
-      const title = (this.getOrderedCallArg(args, namedArgs, bgcolorArgs, 4, 'bgcolor')) as string;
-      const display = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, bgcolorArgs, 5));
-      const forceOverlay = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, bgcolorArgs, 6));
+      const offset = this.toOptionalInteger(arg('offset')) ?? 0;
+      const editable = this.toOptionalBoolean(arg('editable'));
+      const showLast = this.toOptionalInteger(arg('show_last'));
+      const title = (arg('title', 'bgcolor')) as string;
+      const display = this.toOptionalInteger(arg('display'));
+      const forceOverlay = this.toOptionalBoolean(arg('force_overlay'));
 
       const id = `bgcolor_${title}`;
 
@@ -7805,24 +7829,26 @@ export class TealscriptEngine {
     // plotshape - Conditional shape markers
     // =========================================================================
     this.builtins.set('plotshape', (args, namedArgs, ctx) => {
-      const series = this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 0); // Can be boolean or number
-      const title = (this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 1, 'Shape')) as string;
-      const style = (this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 2, 'circle')) as string;
-      const location = (this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 3, 'abovebar')) as string;
+      const parameterNames = this.pineVersion <= 4 ? plotshapeV4Args : plotshapeArgs;
+      const arg = (name: string, fallback?: unknown) => this.getOrderedCallArgByName(args, namedArgs, parameterNames, name, fallback);
+      const series = arg('series'); // Can be boolean or number
+      const title = (arg('title', 'Shape')) as string;
+      const style = (arg('style', 'circle')) as string;
+      const location = (arg('location', 'abovebar')) as string;
       const color = this.applyPlotTransparency(
-        this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 4, '#2196F3')),
-        this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 15),
+        this.toPlotColor(arg('color', '#2196F3')),
+        arg('transp'),
       );
-      const offset = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 5));
-      const text = (this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 6, '')) as string;
-      const textColor = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 7, '#FFFFFF'));
-      const editable = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 8));
-      const size = (this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 9, 'normal')) as string;
-      const showLast = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 10));
-      const display = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 11));
-      const format = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 12));
-      const precision = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 13));
-      const forceOverlay = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, plotshapeArgs, 14));
+      const offset = this.toOptionalInteger(arg('offset'));
+      const text = (arg('text', '')) as string;
+      const textColor = this.toPlotColor(arg('textcolor', '#FFFFFF'));
+      const editable = this.toOptionalBoolean(arg('editable'));
+      const size = (arg('size', 'normal')) as string;
+      const showLast = this.toOptionalInteger(arg('show_last'));
+      const display = this.toOptionalInteger(arg('display'));
+      const format = this.toOptionalString(arg('format'));
+      const precision = this.toOptionalInteger(arg('precision'));
+      const forceOverlay = this.toOptionalBoolean(arg('force_overlay'));
 
       const id = `plotshape_${title}`;
 
@@ -7870,24 +7896,26 @@ export class TealscriptEngine {
     // plotchar - Custom character markers
     // =========================================================================
     this.builtins.set('plotchar', (args, namedArgs, ctx) => {
-      const series = this.getOrderedCallArg(args, namedArgs, plotcharArgs, 0); // Can be boolean or number
-      const title = (this.getOrderedCallArg(args, namedArgs, plotcharArgs, 1, 'Char')) as string;
-      const char = (this.getOrderedCallArg(args, namedArgs, plotcharArgs, 2, '●')) as string;
-      const location = (this.getOrderedCallArg(args, namedArgs, plotcharArgs, 3, 'abovebar')) as string;
+      const parameterNames = this.pineVersion <= 4 ? plotcharV4Args : plotcharArgs;
+      const arg = (name: string, fallback?: unknown) => this.getOrderedCallArgByName(args, namedArgs, parameterNames, name, fallback);
+      const series = arg('series'); // Can be boolean or number
+      const title = (arg('title', 'Char')) as string;
+      const char = (arg('char', '●')) as string;
+      const location = (arg('location', 'abovebar')) as string;
       const color = this.applyPlotTransparency(
-        this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotcharArgs, 4, '#2196F3')),
-        this.getOrderedCallArg(args, namedArgs, plotcharArgs, 15),
+        this.toPlotColor(arg('color', '#2196F3')),
+        arg('transp'),
       );
-      const offset = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotcharArgs, 5));
-      const text = (this.getOrderedCallArg(args, namedArgs, plotcharArgs, 6, '')) as string;
-      const textColor = this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotcharArgs, 7, '#FFFFFF'));
-      const editable = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, plotcharArgs, 8));
-      const size = (this.getOrderedCallArg(args, namedArgs, plotcharArgs, 9, 'normal')) as string;
-      const showLast = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotcharArgs, 10));
-      const display = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotcharArgs, 11));
-      const format = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, plotcharArgs, 12));
-      const precision = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotcharArgs, 13));
-      const forceOverlay = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, plotcharArgs, 14));
+      const offset = this.toOptionalInteger(arg('offset'));
+      const text = (arg('text', '')) as string;
+      const textColor = this.toPlotColor(arg('textcolor', '#FFFFFF'));
+      const editable = this.toOptionalBoolean(arg('editable'));
+      const size = (arg('size', 'normal')) as string;
+      const showLast = this.toOptionalInteger(arg('show_last'));
+      const display = this.toOptionalInteger(arg('display'));
+      const format = this.toOptionalString(arg('format'));
+      const precision = this.toOptionalInteger(arg('precision'));
+      const forceOverlay = this.toOptionalBoolean(arg('force_overlay'));
 
       const id = `plotchar_${title}`;
 
@@ -7935,20 +7963,22 @@ export class TealscriptEngine {
     // plotarrow - Directional arrows
     // =========================================================================
     this.builtins.set('plotarrow', (args, namedArgs, ctx) => {
-      const series = this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 0) as number; // Positive = up arrow, negative = down arrow
-      const title = (this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 1, 'Arrow')) as string;
-      const transp = this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 13);
-      const colorup = this.applyPlotTransparency(this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 2, '#4CAF50')), transp);
-      const colordown = this.applyPlotTransparency(this.toPlotColor(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 3, '#F23645')), transp);
-      const offset = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 4));
-      const minHeight = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 5));
-      const maxHeight = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 6));
-      const editable = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 7));
-      const showLast = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 8));
-      const display = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 9));
-      const format = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 10));
-      const precision = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 11));
-      const forceOverlay = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, plotarrowArgs, 12));
+      const parameterNames = this.pineVersion <= 4 ? plotarrowV4Args : plotarrowArgs;
+      const arg = (name: string, fallback?: unknown) => this.getOrderedCallArgByName(args, namedArgs, parameterNames, name, fallback);
+      const series = arg('series') as number; // Positive = up arrow, negative = down arrow
+      const title = (arg('title', 'Arrow')) as string;
+      const transp = arg('transp');
+      const colorup = this.applyPlotTransparency(this.toPlotColor(arg('colorup', '#4CAF50')), transp);
+      const colordown = this.applyPlotTransparency(this.toPlotColor(arg('colordown', '#F23645')), transp);
+      const offset = this.toOptionalInteger(arg('offset'));
+      const minHeight = this.toOptionalInteger(arg('minheight'));
+      const maxHeight = this.toOptionalInteger(arg('maxheight'));
+      const editable = this.toOptionalBoolean(arg('editable'));
+      const showLast = this.toOptionalInteger(arg('show_last'));
+      const display = this.toOptionalInteger(arg('display'));
+      const format = this.toOptionalString(arg('format'));
+      const precision = this.toOptionalInteger(arg('precision'));
+      const forceOverlay = this.toOptionalBoolean(arg('force_overlay'));
 
       const id = `plotarrow_${title}`;
 
@@ -7993,23 +8023,25 @@ export class TealscriptEngine {
     // fill - Fill area between two plots
     // =========================================================================
     this.builtins.set('fill', (args, namedArgs, ctx, _scope, callId) => {
+      const parameterNames = this.pineVersion <= 4 ? fillV4Args : fillArgs;
       const canonicalNamedArgs = new Map(namedArgs);
       if (!canonicalNamedArgs.has('plot1') && canonicalNamedArgs.has('hline1')) canonicalNamedArgs.set('plot1', canonicalNamedArgs.get('hline1'));
       if (!canonicalNamedArgs.has('plot2') && canonicalNamedArgs.has('hline2')) canonicalNamedArgs.set('plot2', canonicalNamedArgs.get('hline2'));
+      const arg = (name: string, fallback?: unknown) => this.getOrderedCallArgByName(args, canonicalNamedArgs, parameterNames, name, fallback);
 
-      const plot1Id = this.resolveFillPlotId(this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 0), ctx);
-      const plot2Id = this.resolveFillPlotId(this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 1), ctx);
+      const plot1Id = this.resolveFillPlotId(arg('plot1'), ctx);
+      const plot2Id = this.resolveFillPlotId(arg('plot2'), ctx);
       const color = this.applyPlotTransparency(
-        this.toPlotColor(this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 2, 'rgba(33, 150, 243, 0.2)')),
-        this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 8),
+        this.toPlotColor(arg('color', 'rgba(33, 150, 243, 0.2)')),
+        arg('transp'),
       );
-      const titleArg = this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 3);
+      const titleArg = arg('title');
       const hasExplicitTitle = canonicalNamedArgs.has('title') || titleArg !== undefined;
       const title = (titleArg ?? 'Fill') as string;
-      const editable = this.toOptionalBoolean(this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 4));
-      const showLast = this.toOptionalInteger(this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 5));
-      const fillgaps = this.toOptionalBoolean(this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 6));
-      const display = this.toOptionalInteger(this.getOrderedCallArg(args, canonicalNamedArgs, fillArgs, 7));
+      const editable = this.toOptionalBoolean(arg('editable'));
+      const showLast = this.toOptionalInteger(arg('show_last'));
+      const fillgaps = this.toOptionalBoolean(arg('fillgaps'));
+      const display = this.toOptionalInteger(arg('display'));
 
       const id = hasExplicitTitle ? `fill_${title}` : `fill_${callId}`;
 
