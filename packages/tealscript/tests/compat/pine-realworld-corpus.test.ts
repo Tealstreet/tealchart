@@ -1422,14 +1422,14 @@ plot(s, title="SMA") // output
     ]);
   });
 
-  // Mixed tabs and spaces in block bodies cause the variable declared in the
-  // tab-indented branch to be invisible in a following space-indented line
-  // (the parser treats the indents as distinct levels).
-  // Gap documented in PINE_V6_REFERENCE_GAP.md under "Parser Stress Gaps".
-  it.skip('mixed tabs and spaces in block bodies', () => {
+  it('mixed tabs and spaces in block bodies', () => {
+    // Tab-indented if body, space-indented else body. Parser normalizes leading
+    // tabs to spaces; runtime promotes branch declarations to the outer scope.
     const src = 'indicator("Mixed Indent")\nif close > open\n\tx = 1\nelse\n    x = 0\nplot(x, title="X")';
     const result = runCompatScript(src);
     expect(result.errors).toEqual([]);
+    // close > open on bars: 0,1,2,5,6,7,9,11 → 1; bars 3,4,8,10 → 0
+    expect(getPlot(result, 'X').values).toEqual([1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
   });
 
   it('locks long switch expression with 10 case branches', () => {

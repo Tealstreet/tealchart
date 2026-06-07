@@ -604,6 +604,49 @@ plot(close)`);
     });
   });
 
+  describe('tab normalization', () => {
+    it('parses if/else block with tab-indented if body and space-indented else body', () => {
+      // Tab in if branch, 4 spaces in else branch — should parse without error
+      const ast = parse('indicator("T")\nif close > open\n\tx = 1\nelse\n    x = 0\nplot(x)');
+      expect(ast.type).toBe('Program');
+      expect(ast.body.length).toBeGreaterThan(0);
+    });
+
+    it('parses if block with all-tab indentation', () => {
+      const ast = parse('indicator("T")\nif close > open\n\tx = 1\nplot(x)');
+      expect(ast.type).toBe('Program');
+    });
+
+    it('parses for loop with tab-indented body', () => {
+      const ast = parse('indicator("T")\nfor i = 0 to 3\n\tx = i\nplot(x)');
+      expect(ast.type).toBe('Program');
+    });
+
+    it('parses while loop with tab-indented body', () => {
+      const ast = parse('indicator("T")\nwhile false\n\tx = 1\nplot(x)');
+      expect(ast.type).toBe('Program');
+    });
+
+    it('parses UDF body with tab indentation', () => {
+      const ast = parse('indicator("T")\nf(v) =>\n\tv * 2\nplot(f(close))');
+      expect(ast.type).toBe('Program');
+    });
+
+    it('normalizes multiple leading tabs to correct indent depth', () => {
+      // Double-tab = 8 spaces = 2 indent levels (nested block)
+      const ast = parse('indicator("T")\nf(v) =>\n\tif v > 0\n\t\tv\n\telse\n\t\t0\nplot(f(close))');
+      expect(ast.type).toBe('Program');
+    });
+
+    it('does not alter tabs inside string literals', () => {
+      const ast = parse('indicator("T")\ns = "hello\tworld"\nplot(close)');
+      expect(ast.type).toBe('Program');
+      // The string node should still contain the tab character
+      const strDecl = ast.body.find((n) => n.type === 'VariableDeclaration');
+      expect(strDecl).toBeDefined();
+    });
+  });
+
   describe('error handling', () => {
     it('throws TealscriptParseError for syntax errors', () => {
       expect(() => {

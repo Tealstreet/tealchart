@@ -2773,6 +2773,7 @@ export class TealscriptEngine {
       } finally {
         this.requestLocalScopeDepth--;
         this.scope = savedScope;
+        childScope.promoteNewLocalsTo(savedScope);
       }
     } else if (stmt.alternate) {
       if (Array.isArray(stmt.alternate)) {
@@ -2788,6 +2789,7 @@ export class TealscriptEngine {
         } finally {
           this.requestLocalScopeDepth--;
           this.scope = savedScope;
+          childScope.promoteNewLocalsTo(savedScope);
         }
       } else {
         // else-if
