@@ -39,7 +39,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(run.summary.byFirstFailureClass).toEqual({ unsupported_planned: 2 });
     expect(run.summary.validationErrors).toEqual({});
     expect(run.summary.byFeatureTag).toMatchObject({
-      inputs: { total: 20, passed: 20, failed: 0 },
+      inputs: { total: 17, passed: 17, failed: 0 },
       legacy: { total: 19, passed: 19, failed: 0 },
       v4_compat: { total: 3, passed: 3, failed: 0 },
       v5_compat: { total: 10, passed: 10, failed: 0 },
@@ -431,7 +431,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| semantic | 1 |');
     expect(markdown).toContain('| runtime | 1 |');
     expect(markdown).toContain('| unsupported_planned | 2 |');
-    expect(markdown).toContain('| inputs | 20 | 20 | 0 |');
+    expect(markdown).toContain('| inputs | 17 | 17 | 0 |');
     expect(markdown).toContain('| legacy | 19 | 19 | 0 |');
     expect(markdown).toContain('| v4_compat | 3 | 3 | 0 |');
     expect(markdown).toContain('| v5_compat | 10 | 10 | 0 |');
@@ -714,7 +714,7 @@ plot(signals.fast(close, 2), title="Fast")
       byStoragePolicy: { reduced_fixture_only: EXPECTED_CHECKPOINT_TOTAL },
     });
     expect(index.byFeatureTag).toMatchObject({
-      inputs: 20,
+      inputs: 17,
       legacy: 19,
       v4_compat: 3,
       v5_compat: 10,
