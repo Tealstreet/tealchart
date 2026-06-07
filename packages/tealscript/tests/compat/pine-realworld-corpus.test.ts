@@ -3172,3 +3172,247 @@ plot(close > 100 ? 1 : 0, title="After")
     expect(getPlot(result, 'After').values).toEqual([1, 1, 1]);
   });
 });
+
+// ===========================================================================================
+// Advanced drawing and table patterns
+// Tests complex combinations of labels, lines, boxes, polylines, and tables that push
+// the drawing subsystem: array management, extend/style, gradient colors, plotbar, fill.
+// ===========================================================================================
+
+describe('Advanced drawing and table patterns', () => {
+  it('locks dynamic label array management with oldest-delete cap pattern', () => {
+    // Public idiom reference: S/R indicator scripts create labels on each signal bar,
+    // push them into a var array, and delete the oldest when the array exceeds a cap.
+    // Source search: https://www.tradingview.com/scripts/search/label%20array%20oldest%20delete%20cap/
+    const result = runCompatScript(`
+indicator("Adv Label Array Cap Checkpoint", overlay=true)
+var array<label> lbls = array.new<label>()
+maxCount = 4
+isBull = close > open
+if isBull
+    lbl = label.new(bar_index, close, str.tostring(close), style=label.style_label_down, color=color.green, textcolor=color.white)
+    lbls.push(lbl)
+    if lbls.size() > maxCount
+        label.delete(lbls.shift())
+plot(lbls.size(), title="Label Count")
+plot(isBull ? 1 : 0, title="Bull Bar")
+`);
+
+    expect(result.errors).toEqual([]);
+    // Bull bars (close > open): 0(102>100), 1(105>102), 2(107>105), 5(100>99), 6(104>100), 7(109>104), 9(111>108), 11(112>110)
+    expect(getPlot(result, 'Bull Bar').values).toEqual([1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
+    // Array grows to 3, then cap at 4
+    expect(getPlot(result, 'Label Count').values).toEqual([1, 2, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4]);
+    // After cap hits, oldest are deleted; 4 labels survive
+    expect(result.drawings.filter((d) => d.type === 'label').length).toBe(4);
+  });
+
+  it('locks table with merged header cells pattern', () => {
+    // Public idiom reference: dashboard scripts use table.merge_cells() to span a
+    // header row across all columns, then fill individual data cells below it.
+    // Source search: https://www.tradingview.com/scripts/search/table%20merge%20cells%20header%20row/
+    const result = runCompatScript(`
+indicator("Adv Table Merged Header Checkpoint", overlay=true)
+var tbl = table.new(position.top_right, 3, 2, border_color=color.white, border_width=1)
+if barstate.islast
+    table.cell(tbl, 0, 0, "Market Summary", text_color=color.white, bgcolor=color.blue)
+    table.merge_cells(tbl, 0, 0, 2, 0)
+    table.cell(tbl, 0, 1, "RSI", text_color=color.white)
+    table.cell(tbl, 1, 1, str.tostring(math.round(ta.rsi(close, 5))), text_color=color.yellow)
+    table.cell(tbl, 2, 1, "OK", bgcolor=color.green, text_color=color.white)
+plot(array.size(table.all), title="Table Count")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Table Count').values).toEqual(Array(compatibilityBars.length).fill(1));
+    const tblDrawing = result.drawings.find((d) => d.type === 'table');
+    expect(tblDrawing).toBeDefined();
+    expect((tblDrawing as { mergedCells?: unknown[] }).mergedCells).toHaveLength(1);
+  });
+
+  it('locks line with extend.right and style_dashed with conditional color change', () => {
+    // Public idiom reference: trend-line scripts draw a dashed line from a pivot
+    // extending right, then recolor it based on the current price relationship.
+    // Source search: https://www.tradingview.com/scripts/search/trend%20line%20extend%20right%20dashed%20color/
+    const result = runCompatScript(`
+indicator("Adv Line Extend Dashed Checkpoint", overlay=true)
+var myLine = line.new(bar_index, close, bar_index + 1, close, extend=extend.right, style=line.style_dashed, color=color.gray)
+isAbove = close > close[1]
+if isAbove
+    line.set_color(myLine, color.green)
+else
+    line.set_color(myLine, color.red)
+plot(isAbove ? 1 : 0, title="Above")
+`);
+
+    expect(result.errors).toEqual([]);
+    // Last bar (bar 11): close=112 > close[1]=110, so isAbove=true, color=green
+    expect(result.drawings).toHaveLength(1);
+    expect(result.drawings[0]).toMatchObject({
+      type: 'line',
+      extend: 'right',
+      style: 'dashed',
+      color: '#4CAF50',
+    });
+    expect(getPlot(result, 'Above').values).toEqual([0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
+  });
+
+  it('locks box with text content and border styling pattern', () => {
+    // Public idiom reference: zone scripts draw a box with embedded text label,
+    // custom text alignment, and a colored border to mark a price region.
+    // Source search: https://www.tradingview.com/scripts/search/box%20with%20text%20border%20zone/
+    const result = runCompatScript(`
+indicator("Adv Box With Text Checkpoint", overlay=true)
+if barstate.islast
+    box.new(bar_index - 3, high, bar_index, low, border_color=color.orange, border_width=2, bgcolor=color.new(color.orange, 85), text="Supply Zone", text_color=color.white, text_halign=text.align_left, text_valign=text.align_top)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toHaveLength(1);
+    expect(result.drawings[0]).toMatchObject({
+      type: 'box',
+      left: 8,
+      top: 113,
+      right: 11,
+      bottom: 108,
+      borderColor: '#FF9800',
+      borderWidth: 2,
+      text: 'Supply Zone',
+      textColor: '#FFFFFF',
+      textHalign: 'left',
+      textValign: 'top',
+    });
+  });
+
+  it('locks polyline from chart.point array built from price action', () => {
+    // Public idiom reference: zigzag and wave scripts build chart.point arrays from
+    // recent highs/lows and render them as a polyline connecting pivot points.
+    // Source search: https://www.tradingview.com/scripts/search/polyline%20chart%20point%20price%20action/
+    const result = runCompatScript(`
+indicator("Adv Polyline Price Action Checkpoint", overlay=true)
+if barstate.islast
+    pts = array.new<chart.point>()
+    pts.push(chart.point.from_index(bar_index - 4, low[4]))
+    pts.push(chart.point.from_index(bar_index - 2, high[2]))
+    pts.push(chart.point.now(close))
+    polyline.new(pts, line_color=color.purple, line_width=2)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toHaveLength(1);
+    expect(result.drawings[0]).toMatchObject({
+      type: 'polyline',
+      lineColor: '#9C27B0',
+      lineWidth: 2,
+    });
+    const pts = (result.drawings[0] as { points: Array<{ index: number; price: number }> }).points;
+    expect(pts).toHaveLength(3);
+    expect(pts[0]!.index).toBe(7);  // bar_index - 4 = 11 - 4 = 7
+    expect(pts[1]!.index).toBe(9);  // bar_index - 2 = 11 - 2 = 9
+    expect(pts[2]!.index).toBe(11); // bar_index
+  });
+
+  it('locks label with dynamic str.format tooltip pattern', () => {
+    // Public idiom reference: signal scripts attach a multi-field tooltip to labels
+    // using str.format with placeholders for RSI, ATR, and price values.
+    // Source search: https://www.tradingview.com/scripts/search/label%20tooltip%20str%20format%20signal/
+    const result = runCompatScript(`
+indicator("Adv Label Dynamic Tooltip Checkpoint", overlay=true)
+rsi = ta.rsi(close, 5)
+atr = ta.atr(5)
+if barstate.islast
+    tip = str.format("RSI: {0,number,#.#} | ATR: {1,number,#.##} | Close: {2}", nz(rsi), nz(atr), close)
+    label.new(bar_index, high, "Signal", tooltip=tip, style=label.style_label_down, color=color.blue, textcolor=color.white)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toHaveLength(1);
+    expect(result.drawings[0]).toMatchObject({ type: 'label', text: 'Signal', color: '#2196F3' });
+    const tooltip = (result.drawings[0] as { tooltip?: string }).tooltip;
+    expect(tooltip).toBeDefined();
+    expect(tooltip).toContain('RSI:');
+    expect(tooltip).toContain('ATR:');
+    expect(tooltip).toContain('Close: 112');
+  });
+
+  it('locks fill between two hlines at fixed price levels', () => {
+    // Public idiom reference: indicator scripts call hline() at fixed RSI overbought/
+    // oversold levels and fill() between them to shade the neutral zone.
+    // Source search: https://www.tradingview.com/scripts/search/hline%20fill%20overbought%20oversold%20zone/
+    const result = runCompatScript(`
+indicator("Adv Hline Fill Checkpoint")
+rsi = ta.rsi(close, 5)
+h70 = hline(70, "OB", color=color.red, linestyle=hline.style_dashed)
+h30 = hline(30, "OS", color=color.green, linestyle=hline.style_dashed)
+fill(h70, h30, color=color.new(color.gray, 85), title="Neutral Zone")
+plot(rsi, title="RSI")
+`);
+
+    expect(result.errors).toEqual([]);
+    // hlines produce plots/fills; no errors
+    const fills = result.plots.filter((p) => p.type === 'fill');
+    expect(fills.length).toBeGreaterThan(0);
+    expect(result.plots.some((p) => p.title === 'RSI')).toBe(true);
+  });
+
+  it('locks plotbar OHLC overlay with conditional bar color', () => {
+    // Public idiom reference: custom candle scripts overlay plotbar() calls with
+    // green/red coloring based on whether the bar is bullish or bearish.
+    // Source search: https://www.tradingview.com/scripts/search/plotbar%20ohlc%20custom%20candle%20color/
+    const result = runCompatScript(`
+indicator("Adv Plotbar OHLC Checkpoint", overlay=true)
+isBull = close >= open
+barCol = isBull ? color.new(color.green, 20) : color.new(color.red, 20)
+plotbar(open, high, low, close, title="Custom OHLC", color=barCol)
+plot(isBull ? 1 : 0, title="Bull")
+`);
+
+    expect(result.errors).toEqual([]);
+    // close >= open: bars 0(102>=100),1(105>=102),2(107>=105),5(100>=99),6(104>=100),7(109>=104),9(111>=108),11(112>=110)
+    expect(getPlot(result, 'Bull').values).toEqual([1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
+    // plotbar output exists
+    const pbPlot = result.plots.find((p) => p.type === 'plotbar');
+    expect(pbPlot).toBeDefined();
+  });
+
+  it('locks table with color.from_gradient cells pattern', () => {
+    // Public idiom reference: heatmap table scripts populate cells using
+    // color.from_gradient() to encode a value as a color on a green-to-red scale.
+    // Source search: https://www.tradingview.com/scripts/search/table%20color%20gradient%20heatmap/
+    const result = runCompatScript(`
+indicator("Adv Table Gradient Color Checkpoint", overlay=true)
+rsi = nz(ta.rsi(close, 5))
+gradColor = color.from_gradient(rsi, 0, 100, color.red, color.green)
+var tbl = table.new(position.bottom_right, 1, 2)
+if barstate.islast
+    table.cell(tbl, 0, 0, "RSI", text_color=color.white, bgcolor=gradColor)
+    table.cell(tbl, 0, 1, str.tostring(math.round(rsi)), text_color=color.white, bgcolor=gradColor)
+plot(rsi, title="RSI")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings.filter((d) => d.type === 'table').length).toBeGreaterThan(0);
+    expect(result.plots.some((p) => p.title === 'RSI')).toBe(true);
+  });
+
+  it('locks drawing cleanup pattern with var line delete-and-recreate per bar', () => {
+    // Public idiom reference: real-time scripts keep a single persistent line,
+    // delete it at the start of each bar and recreate it with updated coordinates.
+    // Source search: https://www.tradingview.com/scripts/search/line%20delete%20recreate%20per%20bar/
+    const result = runCompatScript(`
+indicator("Adv Drawing Cleanup Checkpoint", overlay=true)
+var line myLine = na
+if not na(myLine)
+    line.delete(myLine)
+myLine := line.new(bar_index - 1, close[1], bar_index, close, color=color.blue, width=2)
+plot(line.get_x2(myLine), title="Line X2")
+`);
+
+    expect(result.errors).toEqual([]);
+    // Only the last line survives (all prior ones were deleted)
+    expect(result.drawings.filter((d) => d.type === 'line').length).toBe(1);
+    expect(result.drawings[0]).toMatchObject({ type: 'line', color: '#2196F3', width: 2 });
+    // x2 = bar_index on each bar
+    expect(getPlot(result, 'Line X2').values).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+  });
+});
