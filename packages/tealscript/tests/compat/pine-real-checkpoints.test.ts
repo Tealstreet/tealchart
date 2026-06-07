@@ -6082,6 +6082,43 @@ plot(bullish ? 1 : 0, title="Bullish")
     expect(getPlot(result, 'Bullish').values).toEqual([0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
   });
 
+  it('locks a reduced public MACD signal idiom', () => {
+    // Public idiom reference: MACD scripts expose fast/slow/signal length inputs,
+    // destructure ta.macd() into the MACD line, signal line, and histogram, then
+    // mark bullish crossover bars where the MACD line crosses above the signal line.
+    // Source search: https://www.tradingview.com/scripts/search/MACD%20signal%20crossover/
+    const result = runCompatScript(`
+indicator("Public MACD Signal Checkpoint")
+fastLen = input.int(3, "Fast Length")
+slowLen = input.int(6, "Slow Length")
+sigLen = input.int(2, "Signal Length")
+[macdLine, signalLine, histogram] = ta.macd(close, fastLen, slowLen, sigLen)
+bullish = macdLine > signalLine
+plot(macdLine, title="MACD")
+plot(signalLine, title="Signal")
+plot(histogram, title="Histogram")
+plot(bullish ? 1 : 0, title="Bullish")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public MACD Signal Checkpoint');
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Fast Length', 'int'],
+      ['Slow Length', 'int'],
+      ['Signal Length', 'int'],
+    ]);
+    expect(roundSeries(getPlot(result, 'MACD').values)).toEqual([
+      0, 0.642857, 1.209184, 0.38156, -0.825672, -0.924587, 0.029313, 1.437232, 1.520456, 1.975828, 1.641914, 1.716671,
+    ]);
+    expect(roundSeries(getPlot(result, 'Signal').values)).toEqual([
+      0, 0.428571, 0.94898, 0.5707, -0.360214, -0.736463, -0.225946, 0.88284, 1.307917, 1.753191, 1.679006, 1.704116,
+    ]);
+    expect(roundSeries(getPlot(result, 'Histogram').values)).toEqual([
+      0, 0.214286, 0.260204, -0.18914, -0.465457, -0.188124, 0.255259, 0.554393, 0.212539, 0.222637, -0.037092, 0.012555,
+    ]);
+    expect(getPlot(result, 'Bullish').values).toEqual([0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1]);
+  });
+
   it('locks a reduced public ATR signal idiom', () => {
     // Public idiom reference: ATR scripts commonly expose a length input, route
     // the smoothed true range through an EMA signal line, and mark bars where
