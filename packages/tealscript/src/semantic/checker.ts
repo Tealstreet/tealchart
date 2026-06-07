@@ -375,6 +375,26 @@ const STRATEGY_DECLARATION_STRING_OPTIONS = [
 
 const COLOR_CONSTRUCTOR_NAMES = new Set(['color.new', 'color.rgb']);
 const COLOR_CHANNEL_NAMES = new Set(['color.r', 'color.g', 'color.b', 'color.t']);
+const COLOR_CONSTANT_NAMES = new Set([
+  'color.aqua',
+  'color.black',
+  'color.blue',
+  'color.fuchsia',
+  'color.gray',
+  'color.green',
+  'color.lime',
+  'color.maroon',
+  'color.navy',
+  'color.none',
+  'color.olive',
+  'color.orange',
+  'color.purple',
+  'color.red',
+  'color.silver',
+  'color.teal',
+  'color.white',
+  'color.yellow',
+]);
 const COLOR_FUNCTION_COLOR_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['color.new', ['color']],
   ['color.r', ['color']],
@@ -7547,6 +7567,10 @@ class SemanticChecker {
           const inputConstantType = this.inferInputTypeConstantType(expression);
           if (inputConstantType) return inputConstantType;
         }
+        if (expression.object.type === 'Identifier' && expression.object.name === 'color') {
+          const colorConstantType = this.inferColorConstantType(expression);
+          if (colorConstantType) return colorConstantType;
+        }
         const drawingAllType = this.inferDrawingAllMemberType(expression);
         if (drawingAllType) return drawingAllType;
         if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
@@ -7990,6 +8014,10 @@ class SemanticChecker {
 
   private inferInputTypeConstantType(expression: MemberExpression): SemanticType | undefined {
     return LEGACY_INPUT_TYPE_CONSTANT_NAMES.has(this.memberPath(expression).join('.')) ? { kind: 'string', qualifier: 'const' } : undefined;
+  }
+
+  private inferColorConstantType(expression: MemberExpression): SemanticType | undefined {
+    return COLOR_CONSTANT_NAMES.has(this.memberPath(expression).join('.')) ? { kind: 'color', qualifier: 'const' } : undefined;
   }
 
   private inferColorCallType(expression: CallExpression, scope: SemanticScope, calleePath: string[]): SemanticType | undefined {
@@ -8684,6 +8712,8 @@ class SemanticChecker {
     if (taMemberType) return taMemberType;
     const inputConstantType = this.inferInputTypeConstantType(expression);
     if (inputConstantType) return inputConstantType;
+    const colorConstantType = this.inferColorConstantType(expression);
+    if (colorConstantType) return colorConstantType;
     const importedConstantType = this.inferImportedConstantMemberType(expression, scope);
     if (importedConstantType) return importedConstantType;
     const enumType = this.inferEnumMemberType(expression, scope);
