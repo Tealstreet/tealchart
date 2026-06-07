@@ -54,8 +54,8 @@ and library-helper idioms.
 Public-source coverage also includes alert signal metadata, direct alert
 emission, public log signal telemetry, Heikin-Ashi synthetic ticker trend
 requests, public zigzag polylines, public strategy performance tables, public
-`varip` intrabar array buffers, plus UDT state objects updated through
-user-defined methods.
+`varip` intrabar array buffers, planned footprint request diagnostics, plus UDT
+state objects updated through user-defined methods.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
 suppression, entry-direction, max-position, intraday filled-order, and
@@ -850,14 +850,16 @@ TealScript sandbox cap of 10,000 declared table cells across live tables.
 The checkpoint corpus tracks public MTF trend-filter, currency-conversion,
 earnings-event, corporate-action, financial-dashboard, economic-macro, and
 seed-dataset request idioms, an official lower-timeframe array idiom, plus a
-public multi-symbol screener idiom.
+public multi-symbol screener idiom. It also tracks a public footprint request
+diagnostic as an `unsupported_planned` semantic blocker.
 
 Known limits: request data availability is host/provider-gated, and
 `request.footprint()` remains unsupported until the host can provide the
 footprint/intrabar volume model described in
 [`FOOTPRINT_REQUEST_DESIGN.md`](./FOOTPRINT_REQUEST_DESIGN.md). Semantic
 analysis reports the planned `request.footprint()` gap with the same explicit
-unsupported-feature diagnostic used by runtime execution.
+unsupported-feature diagnostic used by runtime execution, and the source-linked
+footprint checkpoint keeps that gap visible in pass-rate reporting.
 
 The ticker pass covers `ticker.new()`, `ticker.modify()`, `ticker.standard()`,
 `ticker.inherit()`, `ticker.heikinashi()`, `ticker.renko()`,
