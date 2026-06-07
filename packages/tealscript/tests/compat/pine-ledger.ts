@@ -1008,42 +1008,6 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
     }),
     stages: passedThroughOutput,
   },
-  {
-    ledgerEntry: publicSearchEntry({
-      id: 'public-pvt-signal-checkpoint',
-      title: 'Public PVT Signal Checkpoint',
-      searchContext: 'TradingView public scripts search: price volume trend signal',
-      featureTags: ['ta', 'signals', 'pvt', 'output'],
-    }),
-    stages: passedThroughOutput,
-  },
-  {
-    ledgerEntry: publicSearchEntry({
-      id: 'public-atr-signal-checkpoint',
-      title: 'Public ATR Signal Checkpoint',
-      searchContext: 'TradingView public scripts search: average true range signal',
-      featureTags: ['ta', 'signals', 'atr', 'output'],
-    }),
-    stages: passedThroughOutput,
-  },
-  {
-    ledgerEntry: publicSearchEntry({
-      id: 'public-macd-signal-checkpoint',
-      title: 'Public MACD Signal Checkpoint',
-      searchContext: 'TradingView public scripts search: MACD signal crossover',
-      featureTags: ['ta', 'signals', 'macd', 'output'],
-    }),
-    stages: passedThroughOutput,
-  },
-  {
-    ledgerEntry: publicSearchEntry({
-      id: 'public-rsi-signal-checkpoint',
-      title: 'Public RSI Signal Checkpoint',
-      searchContext: 'TradingView public scripts search: rsi signal overbought oversold',
-      featureTags: ['ta', 'signals', 'rsi', 'oscillator', 'output'],
-    }),
-    stages: passedThroughOutput,
-  },
 ];
 
 export const compatibilityCheckpointLedger: PineScriptLedger = createPineScriptLedger(

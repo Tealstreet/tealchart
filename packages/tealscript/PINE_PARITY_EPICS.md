@@ -185,7 +185,7 @@ Phases:
    Public TA signal coverage includes reduced Supertrend, ADX/DMI, Parabolic
    SAR, linear-regression channel, Keltner Channel, Donchian Channel, range
    trend filters, event-memory signals, moving-average ribbon,
-   percentile/rank regimes, stochastic oscillator, MFI, CCI, CMO, TSI, ROC, Momentum, Williams %R, MACD, and RSI fixtures that route
+   percentile/rank regimes, stochastic oscillator, MFI, CCI, CMO, TSI, ROC, Momentum, and Williams %R fixtures that route
    `ta.supertrend()`
    direction, `ta.dmi()` trend-strength state, `ta.sar()` reversal state,
    `ta.linreg()` channel slope, `ta.kc()`/`ta.kcw()` channel state,
@@ -197,13 +197,8 @@ Phases:
    state, `ta.mfi()` threshold state, `ta.cci()` threshold state,
    `ta.cmo()` threshold state, `ta.tsi()` signal-line state, `ta.roc()`
    threshold state, `ta.mom()` threshold state, `ta.wpr()` threshold state,
-   `ta.obv` cumulative-volume momentum with EMA signal-line routing,
-   `ta.pvt` price-volume trend with EMA signal-line routing,
-   `ta.atr()` smoothed true-range with EMA signal-line routing,
-   `ta.macd()` MACD-line/signal-line/histogram destructuring with bullish
-   above-signal routing,
-   and `ta.rsi()` relative strength index with EMA signal-line routing and
-   overbought/oversold threshold state into plotted trend/signal outputs.
+   and `ta.obv` cumulative-volume momentum with EMA signal-line routing
+   into plotted trend/signal outputs.
    Synthetic ticker coverage includes official docs examples plus a reduced
    public Heikin-Ashi trend request fixture.
    Public footprint request coverage is tracked as a planned unsupported
