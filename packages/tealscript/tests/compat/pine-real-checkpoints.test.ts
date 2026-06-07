@@ -3146,6 +3146,45 @@ plot(isUp ? 1 : 0, title="Imported Signal")
     expect(getPlot(result, 'Imported Signal').values).toEqual([0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
   });
 
+  it('locks a reduced public library source-helper idiom', () => {
+    // Public idiom reference: public library helpers commonly preserve source
+    // parameters through delayed averages, named calls, and equivalent
+    // ternary/switch passthrough wrappers.
+    // Source search: https://www.tradingview.com/scripts/search/library%20source%20helper/
+    const library = parse(`
+library("SourceTools", true)
+export delayedAverage(series float src) =>
+    bar_index >= 1 ? ta.sma(src, 2) : na
+export conditional(series float src) => bar_index >= 0 ? src : src
+export switched(series float src) => switch
+    bar_index >= 0 => src
+    => src
+`);
+    const result = runCompatScript(`
+indicator("Public Library Source Helper Checkpoint")
+import PublicUser/SourceTools/1 as st
+plot(st.delayedAverage(open), title="Imported Average")
+plot(st.delayedAverage(src=open), title="Named Imported Average")
+plot(bar_index >= 1 ? ta.sma(st.conditional(open), 2) : na, title="Conditional Average")
+plot(bar_index >= 1 ? ta.sma(st.switched(open), 2) : na, title="Switch Average")
+`, {
+      bars: [
+        { time: 1, open: 10, high: 12, low: 8, close: 15, volume: 100 },
+        { time: 2, open: 20, high: 22, low: 9, close: 20, volume: 100 },
+        { time: 3, open: 30, high: 32, low: 28, close: 25, volume: 100 },
+      ],
+      engineOptions: {
+        libraries: new Map([['PublicUser/SourceTools/1', library]]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Imported Average').values).toEqual([null, 15, 25]);
+    expect(getPlot(result, 'Named Imported Average').values).toEqual([null, 15, 25]);
+    expect(getPlot(result, 'Conditional Average').values).toEqual([null, 15, 25]);
+    expect(getPlot(result, 'Switch Average').values).toEqual([null, 15, 25]);
+  });
+
   it('locks a reduced public library arithmetic branch source-helper idiom', () => {
     // Public idiom reference: public library helpers commonly wrap source
     // calculations in equivalent ternary/switch branches before callers feed
