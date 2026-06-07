@@ -82,6 +82,8 @@ export function parse(source: string, options: ParseOptions<'Expression'>): Expr
 export function parse(source: string, options: ParseOptions<'Statement'>): Statement;
 export function parse<T extends ParseStartRule>(source: string, options: ParseOptions<T>): ParseResult<T>;
 export function parse(source: string, options: ParseOptions<ParseStartRule> = {}): Program | Expression | Statement {
+  // Strip UTF-8 BOM if present so scripts saved with BOM parse correctly.
+  source = source.replace(/^﻿/, '');
   assertSourceLength(source, options.maxSourceLength ?? DEFAULT_MAX_SOURCE_LENGTH);
   const normalized = normalizeLeadingTabs(source);
 
