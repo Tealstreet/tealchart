@@ -84,7 +84,7 @@ describe('Pine compatibility checkpoint corpus', () => {
       objects: { total: 4, passed: 4, failed: 0 },
       performance: { total: 3, passed: 3, failed: 0 },
       momentum: { total: 2, passed: 2, failed: 0 },
-      oscillator: { total: 7, passed: 7, failed: 0 },
+      oscillator: { total: 8, passed: 8, failed: 0 },
       plot_metadata: { total: 1, passed: 1, failed: 0 },
       polylines: { total: 1, passed: 1, failed: 0 },
       risk: { total: 5, passed: 5, failed: 0 },
@@ -96,11 +96,11 @@ describe('Pine compatibility checkpoint corpus', () => {
       intrabar: { total: 4, passed: 3, failed: 1 },
       markers: { total: 3, passed: 3, failed: 0 },
       realtime: { total: 2, passed: 2, failed: 0 },
-      signals: { total: 50, passed: 50, failed: 0 },
+      signals: { total: 51, passed: 51, failed: 0 },
       declaration_metadata: { total: 1, passed: 1, failed: 0 },
-      output: { total: 39, passed: 39, failed: 0 },
+      output: { total: 40, passed: 40, failed: 0 },
       supertrend: { total: 1, passed: 1, failed: 0 },
-      ta: { total: 27, passed: 27, failed: 0 },
+      ta: { total: 28, passed: 28, failed: 0 },
       barssince: { total: 1, passed: 1, failed: 0 },
       valuewhen: { total: 1, passed: 1, failed: 0 },
       event_memory: { total: 1, passed: 1, failed: 0 },
@@ -149,6 +149,7 @@ describe('Pine compatibility checkpoint corpus', () => {
       pvt: { total: 1, passed: 1, failed: 0 },
       atr: { total: 1, passed: 1, failed: 0 },
       macd: { total: 1, passed: 1, failed: 0 },
+      rsi: { total: 1, passed: 1, failed: 0 },
       zigzag: { total: 1, passed: 1, failed: 0 },
       zones: { total: 2, passed: 2, failed: 0 },
     });
@@ -234,6 +235,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('public-pvt-signal-checkpoint');
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('public-atr-signal-checkpoint');
     expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('public-macd-signal-checkpoint');
+    expect(run.outcomes.map((outcome) => outcome.scriptId)).toContain('public-rsi-signal-checkpoint');
   });
 
   it('renders a stable checkpoint corpus report', () => {
@@ -287,7 +289,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| methods | 3 | 3 | 0 |');
     expect(markdown).toContain('| objects | 4 | 4 | 0 |');
     expect(markdown).toContain('| momentum | 2 | 2 | 0 |');
-    expect(markdown).toContain('| oscillator | 7 | 7 | 0 |');
+    expect(markdown).toContain('| oscillator | 8 | 8 | 0 |');
     expect(markdown).toContain('| performance | 3 | 3 | 0 |');
     expect(markdown).toContain('| plot_metadata | 1 | 1 | 0 |');
     expect(markdown).toContain('| polylines | 1 | 1 | 0 |');
@@ -300,11 +302,11 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| intrabar | 4 | 3 | 1 |');
     expect(markdown).toContain('| markers | 3 | 3 | 0 |');
     expect(markdown).toContain('| realtime | 2 | 2 | 0 |');
-    expect(markdown).toContain('| signals | 50 | 50 | 0 |');
+    expect(markdown).toContain('| signals | 51 | 51 | 0 |');
     expect(markdown).toContain('| declaration_metadata | 1 | 1 | 0 |');
-    expect(markdown).toContain('| output | 39 | 39 | 0 |');
+    expect(markdown).toContain('| output | 40 | 40 | 0 |');
     expect(markdown).toContain('| supertrend | 1 | 1 | 0 |');
-    expect(markdown).toContain('| ta | 27 | 27 | 0 |');
+    expect(markdown).toContain('| ta | 28 | 28 | 0 |');
     expect(markdown).toContain('| barssince | 1 | 1 | 0 |');
     expect(markdown).toContain('| valuewhen | 1 | 1 | 0 |');
     expect(markdown).toContain('| event_memory | 1 | 1 | 0 |');
@@ -356,6 +358,7 @@ describe('Pine compatibility checkpoint corpus', () => {
     expect(markdown).toContain('| pvt | 1 | 1 | 0 |');
     expect(markdown).toContain('| atr | 1 | 1 | 0 |');
     expect(markdown).toContain('| macd | 1 | 1 | 0 |');
+    expect(markdown).toContain('| rsi | 1 | 1 | 0 |');
     expect(markdown).toContain('| zigzag | 1 | 1 | 0 |');
     expect(markdown).toContain('| zones | 2 | 2 | 0 |');
     expect(markdown).not.toContain('Validation Errors');
@@ -502,9 +505,9 @@ plot(signals.fast(close, 2), title="Fast")
     expect(index).toMatchObject({
       schemaVersion: 1,
       total: EXPECTED_CHECKPOINT_TOTAL,
-      byCategory: { indicator: 86, strategy: 22 },
-      bySourceKind: { official_docs: 28, public_script: 80 },
-      byPineVersion: { v4: 1, v6: 107 },
+      byCategory: { indicator: 87, strategy: 22 },
+      bySourceKind: { official_docs: 28, public_script: 81 },
+      byPineVersion: { v4: 1, v6: 108 },
       byStoragePolicy: { reduced_fixture_only: EXPECTED_CHECKPOINT_TOTAL },
     });
     expect(index.byFeatureTag).toMatchObject({
@@ -553,7 +556,7 @@ plot(signals.fast(close, 2), title="Fast")
       multi_symbol: 1,
       objects: 4,
       momentum: 2,
-      oscillator: 7,
+      oscillator: 8,
       performance: 3,
       plot_metadata: 1,
       polylines: 1,
@@ -566,10 +569,10 @@ plot(signals.fast(close, 2), title="Fast")
       intrabar: 4,
       markers: 3,
       realtime: 2,
-      signals: 50,
-      output: 39,
+      signals: 51,
+      output: 40,
       supertrend: 1,
-      ta: 27,
+      ta: 28,
       barssince: 1,
       valuewhen: 1,
       event_memory: 1,
@@ -618,13 +621,14 @@ plot(signals.fast(close, 2), title="Fast")
       pvt: 1,
       atr: 1,
       macd: 1,
+      rsi: 1,
       zigzag: 1,
       zones: 2,
     });
     expect(markdown).toContain('# Pine Compatibility Coverage');
     expect(markdown).toContain(`Total checkpoints: ${EXPECTED_CHECKPOINT_TOTAL}`);
     expect(markdown).toContain('| official_docs | 28 |');
-    expect(markdown).toContain('| public_script | 80 |');
+    expect(markdown).toContain('| public_script | 81 |');
     expect(markdown).toContain(`| reduced_fixture_only | ${EXPECTED_CHECKPOINT_TOTAL} |`);
     expect(formatPineCompatibilityCoverageJson(index)).toContain(`"total": ${EXPECTED_CHECKPOINT_TOTAL}`);
   });
