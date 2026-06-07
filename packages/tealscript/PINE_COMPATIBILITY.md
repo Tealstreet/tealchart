@@ -309,7 +309,8 @@ default-value mismatches, including `input.color()` color defaults, literal defa
 option values, and `input.int()` /
 `input.float()` calls that mix `options` with range-only
 `minval`/`maxval`/`step` arguments. Input metadata diagnostics also reject
-non-boolean `confirm` and `active` values before runtime.
+non-string `title`/`tooltip`/`inline`/`group` values and non-boolean `confirm`
+and `active` values before runtime.
 
 ## Common `array.*` Coverage
 
