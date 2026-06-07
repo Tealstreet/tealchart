@@ -397,6 +397,15 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   },
   {
     ledgerEntry: publicSearchEntry({
+      id: 'public-keltner-channel-signal-checkpoint',
+      title: 'Public Keltner Channel Signal Checkpoint',
+      searchContext: 'TradingView public scripts search: keltner channel signal',
+      featureTags: ['ta', 'signals', 'kc', 'channels', 'volatility', 'output'],
+    }),
+    stages: passedThroughOutput,
+  },
+  {
+    ledgerEntry: publicSearchEntry({
       id: 'public-stochastic-signal-checkpoint',
       title: 'Public Stochastic Signal Checkpoint',
       searchContext: 'TradingView public scripts search: stochastic oscillator signal',
