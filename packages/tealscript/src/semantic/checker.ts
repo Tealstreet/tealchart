@@ -1010,8 +1010,8 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['chart.point.from_time', { params: ['time', 'price'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['chart.point.new', { params: ['time', 'index', 'price'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['chart.point.now', { params: ['price'], minArgs: 0, maxArgs: 1, allowNamedPrefixWithPositional: true }],
-  ['color.new', { params: ['color', 'transp'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
-  ['color.rgb', { params: ['red', 'green', 'blue', 'transp'], minArgs: 3, maxArgs: 4, allowNamedPrefixWithPositional: true }],
+  ['color.new', { params: ['color', 'transp'], aliases: { transparency: 'transp' }, minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['color.rgb', { params: ['red', 'green', 'blue', 'transp'], aliases: { transparency: 'transp' }, minArgs: 3, maxArgs: 4, allowNamedPrefixWithPositional: true }],
   ['color.r', { params: ['color'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['color.g', { params: ['color'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['color.b', { params: ['color'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
@@ -4408,7 +4408,7 @@ class SemanticChecker {
     }
 
     for (const parameterName of numericParameterNames ?? []) {
-      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'number');
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'number', signature);
     }
   }
 
@@ -4556,11 +4556,12 @@ class SemanticChecker {
     parameterNames: readonly string[],
     parameterName: string,
     expectedKind: 'boolean' | 'color' | 'number' | 'string',
+    signature?: BuiltinSignature,
   ): void {
     const parameterIndex = parameterNames.indexOf(parameterName);
     if (parameterIndex === -1) return;
 
-    const argument = this.resolveCallArgumentExpression(expression, parameterNames, parameterIndex);
+    const argument = this.resolveCallArgumentExpression(expression, parameterNames, parameterIndex, signature);
     if (!argument) return;
 
     const argumentType = this.inferExpressionType(argument, scope);
@@ -7763,16 +7764,25 @@ class SemanticChecker {
     expression: CallExpression,
     parameterNames: readonly string[],
     index: number,
+    signature?: BuiltinSignature,
   ): Expression | undefined {
     const name = parameterNames[index];
     if (!name) return undefined;
 
-    const named = expression.arguments.find((argument) => argument.name?.name === name);
+    const named = expression.arguments.find((argument) => {
+      if (!argument.name) return false;
+      const argumentName = signature ? this.canonicalSignatureArgumentName(argument.name.name, signature) : argument.name.name;
+      return argumentName === name;
+    });
     if (named) return named.value;
 
     const priorNamedCount = parameterNames
       .slice(0, index)
-      .filter((priorName) => expression.arguments.some((argument) => argument.name?.name === priorName))
+      .filter((priorName) => expression.arguments.some((argument) => {
+        if (!argument.name) return false;
+        const argumentName = signature ? this.canonicalSignatureArgumentName(argument.name.name, signature) : argument.name.name;
+        return argumentName === priorName;
+      }))
       .length;
     const positional = expression.arguments.filter((argument) => !argument.name)[index - priorNamedCount];
     return positional?.value;
