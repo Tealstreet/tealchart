@@ -56,8 +56,9 @@ scoreboards, drawing-zone, drawing-copy, linefill-channel, custom-candle, and
 library-helper idioms.
 Public-source coverage also includes alert signal metadata, direct alert
 emission, public log signal telemetry, Heikin-Ashi synthetic ticker trend
-requests, public Supertrend signal routing, public zigzag polylines, public
-strategy performance tables, public `varip` intrabar array buffers, public
+requests, public Supertrend signal routing, public ADX/DMI trend-strength
+filters, public zigzag polylines, public strategy performance tables, public
+`varip` intrabar array buffers, public
 wrapped declaration/call layouts, planned footprint request diagnostics, plus
 UDT state objects updated through user-defined methods.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
@@ -939,11 +940,11 @@ argument types before runtime.
 Visual output registration enforces Pine's 64 plot-output
 limit while exempting `hline()` outputs. Table creation enforces a conservative
 TealScript sandbox cap of 10,000 declared table cells across live tables.
-The checkpoint corpus tracks public MTF trend-filter, currency-conversion,
-earnings-event, corporate-action, financial-dashboard, economic-macro, and
-seed-dataset request idioms, an official lower-timeframe array idiom, plus a
-public multi-symbol screener idiom. It also tracks a public footprint request
-diagnostic as an `unsupported_planned` semantic blocker.
+The checkpoint corpus tracks public MTF trend-filter, ADX/DMI trend-strength,
+currency-conversion, earnings-event, corporate-action, financial-dashboard,
+economic-macro, and seed-dataset request idioms, an official lower-timeframe
+array idiom, plus a public multi-symbol screener idiom. It also tracks a public
+footprint request diagnostic as an `unsupported_planned` semantic blocker.
 
 Known limits: request data availability is host/provider-gated, and
 `request.footprint()` remains unsupported until the host can provide the
