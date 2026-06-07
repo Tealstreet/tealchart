@@ -300,7 +300,7 @@ literal and forward each element separately, then re-assemble as a destructurabl
 
 ## Multi-feature integration probe (11 scripts) — 2026-06-08
 
-An "Multi-feature integration" describe block was added to `tests/compat/pine-realworld-corpus.test.ts`
+A "Multi-feature integration" describe block was added to `tests/compat/pine-realworld-corpus.test.ts`
 targeting scripts that combine 3-4 distinct subsystems simultaneously. All 11 pass.
 
 | Script | Status | Subsystems Combined |

@@ -2577,9 +2577,9 @@ plot(bullDiv ? 1 : 0, title="BullDivFlag")
     expect(getPlot(result, 'BearDiv').values).toEqual([null, null, null, null, null, null, null, null, 1, null, 1, null]);
   });
 
-  it('locks custom oscillator with color.from_gradient and fill between signal and zero', () => {
-    // Combines: UDF wrapping ta.ema/ta.sma math, plot with nz() zero-line, fill
-    // between two plot references, and alertcondition for crossover signals.
+  it('locks custom oscillator: UDF with input.string mode selector, dynamic plot color, fill vs zero, alertcondition', () => {
+    // Combines: UDF with input.string mode selector (EMA vs SMA), plot with dynamic
+    // per-bar color expression, fill() between osc and zero-line plots, alertcondition.
     // Source search: https://www.tradingview.com/scripts/search/custom%20oscillator%20gradient%20fill%20zero%20line/
     const result = runCompatScript(`
 indicator("Multi-Feature Oscillator Gradient Checkpoint")
