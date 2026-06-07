@@ -6771,7 +6771,7 @@ function peg$parse(input, options) {
   }
 
   function peg$parseTypedFunctionVariableDeclaration() {
-    let s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12;
+    let s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11;
 
     s0 = peg$currPos;
     s1 = peg$currPos;
@@ -6882,10 +6882,9 @@ function peg$parse(input, options) {
             if (s9 !== peg$FAILED) {
               s10 = peg$parseExpression();
               if (s10 !== peg$FAILED) {
-                s11 = peg$parse_();
-                s12 = peg$parseLineTerminator();
-                if (s12 === peg$FAILED) {
-                  s12 = null;
+                s11 = peg$parseLineTerminator();
+                if (s11 === peg$FAILED) {
+                  s11 = null;
                 }
                 peg$savedPos = s0;
                 s0 = peg$f82(s1, s2, s4, s6, s10);
@@ -6915,7 +6914,7 @@ function peg$parse(input, options) {
   }
 
   function peg$parseUntypedFunctionVariableDeclaration() {
-    let s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10;
+    let s0, s1, s2, s3, s4, s5, s6, s7, s8, s9;
 
     s0 = peg$currPos;
     s1 = peg$currPos;
@@ -7016,10 +7015,9 @@ function peg$parse(input, options) {
           if (s7 !== peg$FAILED) {
             s8 = peg$parseExpression();
             if (s8 !== peg$FAILED) {
-              s9 = peg$parse_();
-              s10 = peg$parseLineTerminator();
-              if (s10 === peg$FAILED) {
-                s10 = null;
+              s9 = peg$parseLineTerminator();
+              if (s9 === peg$FAILED) {
+                s9 = null;
               }
               peg$savedPos = s0;
               s0 = peg$f84(s1, s2, s4, s8);
@@ -7611,7 +7609,7 @@ function peg$parse(input, options) {
   }
 
   function peg$parseTypedFunctionNestedVariableDeclaration() {
-    let s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12;
+    let s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11;
 
     s0 = peg$currPos;
     s1 = peg$currPos;
@@ -7722,10 +7720,9 @@ function peg$parse(input, options) {
             if (s9 !== peg$FAILED) {
               s10 = peg$parseExpression();
               if (s10 !== peg$FAILED) {
-                s11 = peg$parse_();
-                s12 = peg$parseLineTerminator();
-                if (s12 === peg$FAILED) {
-                  s12 = null;
+                s11 = peg$parseLineTerminator();
+                if (s11 === peg$FAILED) {
+                  s11 = null;
                 }
                 peg$savedPos = s0;
                 s0 = peg$f94(s1, s2, s4, s6, s10);
@@ -7755,7 +7752,7 @@ function peg$parse(input, options) {
   }
 
   function peg$parseUntypedFunctionNestedVariableDeclaration() {
-    let s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10;
+    let s0, s1, s2, s3, s4, s5, s6, s7, s8, s9;
 
     s0 = peg$currPos;
     s1 = peg$currPos;
@@ -7856,10 +7853,9 @@ function peg$parse(input, options) {
           if (s7 !== peg$FAILED) {
             s8 = peg$parseExpression();
             if (s8 !== peg$FAILED) {
-              s9 = peg$parse_();
-              s10 = peg$parseLineTerminator();
-              if (s10 === peg$FAILED) {
-                s10 = null;
+              s9 = peg$parseLineTerminator();
+              if (s9 === peg$FAILED) {
+                s9 = null;
               }
               peg$savedPos = s0;
               s0 = peg$f96(s1, s2, s4, s8);
@@ -8451,7 +8447,7 @@ function peg$parse(input, options) {
   }
 
   function peg$parseTypedFunctionDeepNestedVariableDeclaration() {
-    let s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12;
+    let s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11;
 
     s0 = peg$currPos;
     s1 = peg$currPos;
@@ -8562,10 +8558,9 @@ function peg$parse(input, options) {
             if (s9 !== peg$FAILED) {
               s10 = peg$parseExpression();
               if (s10 !== peg$FAILED) {
-                s11 = peg$parse_();
-                s12 = peg$parseLineTerminator();
-                if (s12 === peg$FAILED) {
-                  s12 = null;
+                s11 = peg$parseLineTerminator();
+                if (s11 === peg$FAILED) {
+                  s11 = null;
                 }
                 peg$savedPos = s0;
                 s0 = peg$f106(s1, s2, s4, s6, s10);
@@ -8595,7 +8590,7 @@ function peg$parse(input, options) {
   }
 
   function peg$parseUntypedFunctionDeepNestedVariableDeclaration() {
-    let s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10;
+    let s0, s1, s2, s3, s4, s5, s6, s7, s8, s9;
 
     s0 = peg$currPos;
     s1 = peg$currPos;
@@ -8696,10 +8691,9 @@ function peg$parse(input, options) {
           if (s7 !== peg$FAILED) {
             s8 = peg$parseExpression();
             if (s8 !== peg$FAILED) {
-              s9 = peg$parse_();
-              s10 = peg$parseLineTerminator();
-              if (s10 === peg$FAILED) {
-                s10 = null;
+              s9 = peg$parseLineTerminator();
+              if (s9 === peg$FAILED) {
+                s9 = null;
               }
               peg$savedPos = s0;
               s0 = peg$f108(s1, s2, s4, s8);
