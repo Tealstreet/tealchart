@@ -1719,6 +1719,70 @@ plot(bearSignal ? 1 : 0, title="Bear Signal")
     expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0]);
   });
 
+  it('locks a reduced public Donchian channel signal idiom', () => {
+    // Public idiom reference: Donchian/high-low channel scripts commonly
+    // expose a lookback, route channel bands, and use offset helpers for state.
+    // Source search: https://www.tradingview.com/scripts/search/donchian%20channel%20signal/
+    const result = runCompatScript(`
+indicator("Public Donchian Channel Signal Checkpoint", overlay=true)
+length = input.int(4, "Length")
+upper = ta.highest(source=high, length=length)
+lower = ta.lowest(source=low, length=length)
+mid = (upper + lower) / 2
+upperOffset = ta.highestbars(source=high, length=length)
+lowerOffset = ta.lowestbars(source=low, length=length)
+bullSignal = close > mid and upperOffset == 0
+bearSignal = close < mid and lowerOffset == 0
+plot(upper, title="Upper")
+plot(lower, title="Lower")
+plot(mid, title="Middle")
+plot(upperOffset, title="Upper Offset")
+plot(lowerOffset, title="Lower Offset")
+plot(bullSignal ? 1 : 0, title="Bull Signal")
+plot(bearSignal ? 1 : 0, title="Bear Signal")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.indicatorTitle).toBe('Public Donchian Channel Signal Checkpoint');
+    expect(result.indicatorOverlay).toBe(true);
+    expect(result.inputs.map((input) => [input.title, input.type])).toEqual([
+      ['Length', 'int'],
+    ]);
+    expect(roundSeries(getPlot(result, 'Upper').values)).toEqual([
+      103,
+      106,
+      108,
+      109,
+      109,
+      109,
+      109,
+      110,
+      111,
+      112,
+      114,
+      114,
+    ]);
+    expect(roundSeries(getPlot(result, 'Lower').values)).toEqual([99, 99, 99, 99, 98, 96, 96, 96, 96, 99, 103, 106]);
+    expect(roundSeries(getPlot(result, 'Middle').values)).toEqual([
+      101,
+      102.5,
+      103.5,
+      104,
+      103.5,
+      102.5,
+      102.5,
+      103,
+      103.5,
+      105.5,
+      108.5,
+      110,
+    ]);
+    expect(getPlot(result, 'Upper Offset').values).toEqual([0, 0, 0, 0, 1, 2, 3, 0, 0, 0, 0, 1]);
+    expect(getPlot(result, 'Lower Offset').values).toEqual([0, 1, 2, 3, 0, 0, 1, 2, 3, 3, 3, 3]);
+    expect(getPlot(result, 'Bull Signal').values).toEqual([1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0]);
+    expect(getPlot(result, 'Bear Signal').values).toEqual([0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0]);
+  });
+
   it('locks a reduced public moving-average ribbon signal idiom', () => {
     // Public idiom reference: moving-average ribbon scripts commonly expose
     // multiple average lengths and route trend state from fast/slow overlays.
