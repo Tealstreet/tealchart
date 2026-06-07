@@ -4290,8 +4290,11 @@ plot(timeframe.in_seconds("15") < timeframe.in_seconds("1D") ? 1 : 0, title="Com
 indicator("Higher Timeframe Time")
 plot(time("60"), title="Hourly Open")
 plot(time_close("60"), title="Hourly Close")
+plot(time("60", "", 0, 1), title="Previous Hourly Open")
+plot(time("60", "", "UTC", 0, -1), title="Next Hourly Open")
 plot(time("D"), title="Daily Open")
 plot(time_close("D"), title="Daily Close")
+plot(time("D", timezone="America/New_York", timeframe_bars_back=-1), title="Next NY Daily Open")
 plot(time("W"), title="Weekly Open")
 plot(time("M"), title="Monthly Open")
 plot(time("D", timezone="America/New_York"), title="NY Daily Open")
@@ -4333,6 +4336,18 @@ plot(time_close("D", timezone="America/New_York"), title="NY Daily Close")`;
         Date.UTC(2024, 0, 6, 0, 0),
         Date.UTC(2024, 0, 6, 1, 0),
       ]);
+      expect(result.plots.find((plot) => plot.title === 'Previous Hourly Open')?.values).toEqual([
+        Date.UTC(2024, 0, 4, 23, 0),
+        Date.UTC(2024, 0, 5, 0, 0),
+        Date.UTC(2024, 0, 5, 22, 0),
+        Date.UTC(2024, 0, 5, 23, 0),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Next Hourly Open')?.values).toEqual([
+        Date.UTC(2024, 0, 5, 1, 0),
+        Date.UTC(2024, 0, 5, 2, 0),
+        Date.UTC(2024, 0, 6, 0, 0),
+        Date.UTC(2024, 0, 6, 1, 0),
+      ]);
       expect(result.plots.find((plot) => plot.title === 'Daily Open')?.values).toEqual([
         Date.UTC(2024, 0, 5),
         Date.UTC(2024, 0, 5),
@@ -4344,6 +4359,12 @@ plot(time_close("D", timezone="America/New_York"), title="NY Daily Close")`;
         Date.UTC(2024, 0, 6),
         Date.UTC(2024, 0, 6),
         Date.UTC(2024, 0, 7),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Next NY Daily Open')?.values).toEqual([
+        Date.UTC(2024, 0, 5, 5),
+        Date.UTC(2024, 0, 5, 5),
+        Date.UTC(2024, 0, 6, 5),
+        Date.UTC(2024, 0, 6, 5),
       ]);
       expect(result.plots.find((plot) => plot.title === 'Weekly Open')?.values).toEqual([
         Date.UTC(2024, 0, 1),
